@@ -14,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class DateFormat extends FormatParser {
+final class DateFormat extends FormatParser {
   /** With pattern: ","  min-width ("-" max-width)?. */
   private static final Pattern WIDTH = Pattern.compile("^(\\*|\\d+)(-(\\*|\\d+))?$");
 
@@ -25,7 +25,7 @@ public final class DateFormat extends FormatParser {
    * @param ii input info
    * @throws QueryException query exception
    */
-  public DateFormat(final byte[] pic, final byte[] df, final InputInfo ii)
+  DateFormat(final byte[] pic, final byte[] df, final InputInfo ii)
       throws QueryException {
 
     super(ii);

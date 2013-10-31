@@ -57,7 +57,7 @@ public final class FTNot extends FTExpr {
    * @param item item
    * @return specified item
    */
-  static FTNode not(final FTNode item) {
+  private static FTNode not(final FTNode item) {
     if(item != null) {
       item.all = not(item.all);
       item.score(Scoring.not(item.score()));

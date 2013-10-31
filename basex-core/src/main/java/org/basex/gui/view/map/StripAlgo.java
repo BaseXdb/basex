@@ -24,15 +24,13 @@ final class StripAlgo extends MapAlgo {
     double ww = r.w;
 
     MapRects row = new MapRects();
-    int width;
     double weight = 0;
     double sumweight = 1;
-    double tmpratio;
     double rowratio = Double.MAX_VALUE;
 
     while(ni <= ne && xx + ww <= r.x + r.w && yy + hh <= r.y + r.h) {
       weight += ml.weight[ni];
-      width = (int) (weight / sumweight * ww);
+      int width = (int) (weight / sumweight * ww);
       width = width > 0 ? width : 1;
 
       final MapRects tmp = new MapRects();
@@ -48,7 +46,7 @@ final class StripAlgo extends MapAlgo {
         else break;
         y += h;
       }
-      tmpratio = lineRatio(tmp);
+      final double tmpratio = lineRatio(tmp);
 
       // if ar has increased discard tmp and add row
       if(tmpratio > rowratio) {

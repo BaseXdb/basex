@@ -36,9 +36,9 @@ public final class FTContainsExpr extends FTContains {
   public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Iter iter = expr.iter(ctx);
     final FTLexer tmp = ctx.ftToken;
-    double s = 0;
 
     ctx.ftToken = lex;
+    double s = 0;
     for(Item it; (it = iter.next()) != null;) {
       lex.init(it.string(info));
       final FTNode item = ftexpr.item(ctx, info);

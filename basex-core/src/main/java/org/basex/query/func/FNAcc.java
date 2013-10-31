@@ -34,7 +34,7 @@ public final class FNAcc extends StandardFunc {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Expr e = expr.length != 0 ? expr[0] : checkCtx(ctx);
+    final Expr e = expr.length == 0 ? checkCtx(ctx) : expr[0];
     switch(sig) {
       case POSITION:
         return Int.get(ctx.pos);
@@ -98,7 +98,7 @@ public final class FNAcc extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return !(!oneOf(sig, POSITION, LAST) && 0 == expr.length && !visitor.lock(DBLocking.CTX)) &&
+    return !(!oneOf(sig, POSITION, LAST) && expr.length == 0 && !visitor.lock(DBLocking.CTX)) &&
       super.accept(visitor);
   }
 }

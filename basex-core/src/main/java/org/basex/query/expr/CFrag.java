@@ -28,8 +28,7 @@ public abstract class CFrag extends Arr {
   }
 
   @Override
-  public abstract ANode item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException;
+  public abstract ANode item(final QueryContext ctx, final InputInfo ii) throws QueryException;
 
   @Override
   public boolean has(final Flag flag) {

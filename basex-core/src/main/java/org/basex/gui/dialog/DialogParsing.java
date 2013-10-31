@@ -92,7 +92,7 @@ final class DialogParsing extends BaseXBack {
   /**
    * Sets the parsing options.
    */
-  public void update() {
+  void update() {
     for(final DialogParser dp : parsers) dp.update();
   }
 

@@ -25,7 +25,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
-public final class DialogImport extends BaseXBack {
+final class DialogImport extends BaseXBack {
   /** User feedback. */
   final BaseXLabel info;
   /** Resource to add. */
@@ -56,7 +56,7 @@ public final class DialogImport extends BaseXBack {
    * @param panel feature panel
    * @param parse parsing dialog
    */
-  public DialogImport(final BaseXDialog dial, final BaseXBack panel, final DialogParsing parse) {
+  DialogImport(final BaseXDialog dial, final BaseXBack panel, final DialogParsing parse) {
     gui = dial.gui;
     parsing = parse;
 
@@ -255,7 +255,7 @@ public final class DialogImport extends BaseXBack {
    * @param in input stream
    * @return type
    */
-  static MainParser guess(final IO in) {
+  private static MainParser guess(final IO in) {
     if(!in.exists() || in instanceof IOUrl) return null;
 
     BufferInput ti = null;

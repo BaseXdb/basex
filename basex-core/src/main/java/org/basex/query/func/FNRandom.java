@@ -16,7 +16,7 @@ import org.basex.util.*;
  */
 public final class FNRandom extends StandardFunc {
   /** Random instance. */
-  static final Random RND = new Random();
+  private static final Random RND = new Random();
 
   /**
    * Constructor.
@@ -114,7 +114,7 @@ public final class FNRandom extends StandardFunc {
       final Random r = new Random(seed);
 
       @Override
-      public Item next() throws QueryException {
+      public Item next() {
         return ++count <= num ? Dbl.get(r.nextDouble()) : null;
       }
     };
@@ -133,7 +133,7 @@ public final class FNRandom extends StandardFunc {
       final int num = (int) checkItr(expr[0], ctx);
       int count;
       @Override
-      public Item next() throws QueryException {
+      public Item next() {
         return ++count <= num ? Dbl.get(RND.nextGaussian()) : null;
       }
     };

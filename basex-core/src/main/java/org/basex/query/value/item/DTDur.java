@@ -152,6 +152,6 @@ public final class DTDur extends Dur {
   public int diff(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
     if(it.type != type) Err.diff(ii, it, this);
-    return sec.subtract(((Dur) it).sec).signum();
+    return sec.subtract(((ADateDur) it).sec).signum();
   }
 }

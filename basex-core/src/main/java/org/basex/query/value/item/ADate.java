@@ -28,14 +28,14 @@ public abstract class ADate extends ADateDur {
   private static final long ADD_NEG = (MAX_YEAR / 400 + 1) * 400;
 
   /** Pattern for two digits. */
-  protected static final String DD = "(\\d{2})";
+  static final String DD = "(\\d{2})";
   /** Year pattern. */
-  protected static final String YEAR =
+  static final String YEAR =
       "(-?(000[1-9]|00[1-9]\\d|0[1-9]\\d{2}|[1-9]\\d{3,}))";
   /** Date pattern. */
-  protected static final String ZONE = "((\\+|-)" + DD + ':' + DD + "|Z)?";
+  static final String ZONE = "((\\+|-)" + DD + ':' + DD + "|Z)?";
   /** Day per months. */
-  protected static final byte[] DAYS = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+  static final byte[] DAYS = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
   /** Date pattern. */
   private static final Pattern DATE = Pattern.compile(YEAR + '-' + DD + '-' + DD + ZONE);
   /** Time pattern. */
@@ -48,17 +48,17 @@ public abstract class ADate extends ADateDur {
    *   <li> 0 - {@link Long#MIN_VALUE}: BC, +1 added</li>
    *   <li> {@link Long#MAX_VALUE}: undefined</li>
    * </ul> */
-  protected long yea = Long.MAX_VALUE;
+  long yea = Long.MAX_VALUE;
   /** Month ({@code 0-11}). {@code -1}: undefined. */
-  protected byte mon = -1;
+  byte mon = -1;
   /** Day ({@code 0-30}). {@code -1}: undefined. */
-  protected byte day = -1;
+  byte day = -1;
   /** Hour ({@code 0-59}). {@code -1}: undefined. */
-  protected byte hou = -1;
+  byte hou = -1;
   /** Minute ({@code 0-59}). {@code -1}: undefined. */
-  protected byte min = -1;
+  byte min = -1;
   /** Timezone in minutes ({@code -14*60-14*60}). {@link Short#MAX_VALUE}: undefined. */
-  protected short zon = Short.MAX_VALUE;
+  short zon = Short.MAX_VALUE;
 
   /** Data factory. */
   public static DatatypeFactory df;
@@ -153,14 +153,14 @@ public abstract class ADate extends ADateDur {
 
     final String tz = mt.group(p);
     if(tz == null) return;
-    if(tz.equals("Z")) {
+    if("Z".equals(tz)) {
       zon = 0;
     } else {
       final int th = Token.toInt(mt.group(p + 2));
       final int tm = Token.toInt(mt.group(p + 3));
       if(th > 14 || tm > 59 || th == 14 && tm != 0) INVALIDZONE.thrw(ii, val);
       final int mn = th * 60 + tm;
-      zon = (short) (mt.group(p + 1).equals("-") ? -mn : mn);
+      zon = (short) ("-".equals(mt.group(p + 1)) ? -mn : mn);
     }
   }
 
@@ -169,7 +169,7 @@ public abstract class ADate extends ADateDur {
    * @param dur duration
    * @param p plus/minus flag
    */
-  protected final void calc(final DTDur dur, final boolean p) {
+  final void calc(final DTDur dur, final boolean p) {
     add(p ? dur.sec : dur.sec.negate());
   }
 
@@ -181,11 +181,10 @@ public abstract class ADate extends ADateDur {
    * @throws QueryException query exception
    */
   final void calc(final YMDur dur, final boolean p, final InputInfo ii) throws QueryException {
-
     final long m = p ? dur.mon : -dur.mon;
     final long mn = mon + m;
     mon = (byte) mod(mn, 12);
-    yea = yea + div(mn, 12);
+    yea += div(mn, 12);
     day = (byte) Math.min(dpm(yea, mon) - 1, day);
 
     if(yea <= MIN_YEAR || yea > MAX_YEAR) DATEADDRANGE.thrw(ii, this);
@@ -250,7 +249,7 @@ public abstract class ADate extends ADateDur {
    * @param ii input info
    * @throws QueryException query exception
    */
-  protected void tz(final DTDur tz, final boolean spec, final InputInfo ii)
+  void tz(final DTDur tz, final boolean spec, final InputInfo ii)
       throws QueryException {
 
     final short t;
@@ -339,7 +338,7 @@ public abstract class ADate extends ADateDur {
    * Adds the time zone to the specified token builder.
    * @param tb token builder
    */
-  protected void zone(final TokenBuilder tb) {
+  void zone(final TokenBuilder tb) {
     if(zon == Short.MAX_VALUE) return;
     if(zon == 0) {
       tb.add('Z');
@@ -357,7 +356,7 @@ public abstract class ADate extends ADateDur {
    * @param n number to be printed
    * @param z maximum number of zero digits
    */
-  protected static void prefix(final TokenBuilder tb, final long n, final int z) {
+  static void prefix(final TokenBuilder tb, final long n, final int z) {
     final byte[] t = Token.token(n);
     for(int i = t.length; i < z; i++) tb.add('0');
     tb.add(t);
@@ -389,14 +388,14 @@ public abstract class ADate extends ADateDur {
   @Override
   public final XMLGregorianCalendar toJava() {
     return df.newXMLGregorianCalendar(
-      yea != Long.MAX_VALUE ? BigInteger.valueOf(yea > 0 ? yea : yea - 1) : null,
+      yea == Long.MAX_VALUE ? null : BigInteger.valueOf(yea > 0 ? yea : yea - 1),
       mon >= 0 ? mon + 1 : Integer.MIN_VALUE,
       day >= 0 ? day + 1 : Integer.MIN_VALUE,
       hou >= 0 ? hou : Integer.MIN_VALUE,
       min >= 0 ? min : Integer.MIN_VALUE,
       sec != null ? sec.intValue() : Integer.MIN_VALUE,
       sec != null ? sec.remainder(BigDecimal.ONE) : null,
-      zon != Short.MAX_VALUE ? zon : Integer.MIN_VALUE);
+      zon == Short.MAX_VALUE ? Integer.MIN_VALUE : zon);
   }
 
   /**
@@ -433,7 +432,7 @@ public abstract class ADate extends ADateDur {
    * @param day days
    * @return days
    */
-  public static BigDecimal days(final long yea, final int mon, final int day) {
+  private static BigDecimal days(final long yea, final int mon, final int day) {
     final long y = yea - (mon < 2 ? 1 : 0);
     final int m = mon + (mon < 2 ? 13 : 1);
     final int d = day + 1;

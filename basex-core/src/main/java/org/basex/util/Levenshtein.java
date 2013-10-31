@@ -16,7 +16,7 @@ public final class Levenshtein {
   private static final int MAX = 50;
 
   /** Default number of allowed errors; dynamic calculation if value is 0. */
-  public final int error;
+  private final int error;
   /** Matrix for calculating Levenshtein distance. */
   private int[][] matrix;
 
@@ -53,8 +53,9 @@ public final class Levenshtein {
    * @return true if the arrays are similar
    */
   public boolean similar(final byte[] token, final byte[] sub, final int err) {
-    int sl = 0, tl = 0;
+    int sl = 0;
     for(int s = 0; s < sub.length; s += cl(sub, s)) ++sl;
+    int tl = 0;
     for(int t = 0; t < token.length; t += cl(token, t)) ++tl;
     if(tl == 0) return false;
 
@@ -125,8 +126,8 @@ public final class Levenshtein {
    * @return true if the arrays are equal
    */
   private static boolean same(final byte[] tk, final byte[] sb) {
-    int t = 0, s = 0;
-    for(; t < tk.length && s < sb.length; t += cl(tk, t), s += cl(sb, s)) {
+    int t = 0;
+    for(int s = 0; t < tk.length && s < sb.length; t += cl(tk, t), s += cl(sb, s)) {
       if(lc(norm(cp(tk, t))) != lc(norm(cp(sb, t)))) return false;
     }
     return true;

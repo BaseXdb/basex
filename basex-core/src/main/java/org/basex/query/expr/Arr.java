@@ -110,7 +110,7 @@ public abstract class Arr extends ParseExpr {
    * Checks if none of the expressions are updating expressions.
    * @throws QueryException query exception
    */
-  public final void checkNoUp() throws QueryException {
+  final void checkNoUp() throws QueryException {
     checkNoneUp(expr);
   }
 

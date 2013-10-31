@@ -59,7 +59,7 @@ final class TreeNodeCache implements TreeConstants {
     final int l = 0;
     final int r = nodes[lv].size() - 1;
     int min = searchPreIndex(lv, lp, rp, l, r);
-    if(min == -1) return min;
+    if(min == -1) return -1;
     final int[] n = nodes[lv].toArray();
     while(min-- > 0 && n[min] > lp);
     return min + 1;

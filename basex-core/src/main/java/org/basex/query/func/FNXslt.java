@@ -66,7 +66,7 @@ public final class FNXslt extends StandardFunc {
    * @param name name flag
    * @return string
    */
-  static String get(final boolean name) {
+  private static String get(final boolean name) {
     return IMPL[OFFSET + (name ? 1 : 2)];
   }
 
@@ -118,7 +118,7 @@ public final class FNXslt extends StandardFunc {
       throw IOERR.thrw(info, ex);
     } catch(final TransformerException ex) {
       System.setErr(tmp);
-      throw BXSL_ERROR.thrw(info, Token.trim(Token.utf8(ao.toArray(), Prop.ENCODING)));
+      throw BXSL_ERROR.thrw(info, trim(utf8(ao.toArray(), Prop.ENCODING)));
     } finally {
       System.setErr(tmp);
     }

@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
-public final class Count extends GFLWOR.Clause {
+public final class Count extends Clause {
   /** Count variable. */
   final Var count;
 
@@ -77,7 +77,7 @@ public final class Count extends GFLWOR.Clause {
   }
 
   @Override
-  public Count optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Count optimize(final QueryContext ctx, final VarScope scp) {
     return this;
   }
 
@@ -93,7 +93,7 @@ public final class Count extends GFLWOR.Clause {
 
   @Override
   public Clause inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+      final Var v, final Expr e) {
     return null;
   }
 
@@ -110,7 +110,7 @@ public final class Count extends GFLWOR.Clause {
   }
 
   @Override
-  public void checkUp() throws QueryException {
+  public void checkUp() {
     // never
   }
 

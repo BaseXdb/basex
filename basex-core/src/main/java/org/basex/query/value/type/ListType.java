@@ -46,7 +46,7 @@ public enum ListType implements Type {
   };
 
   /** Cached enums (faster). */
-  public static final ListType[] VALUES = values();
+  private static final ListType[] VALUES = values();
 
   /** Name. */
   private final QNm name;
@@ -71,8 +71,8 @@ public enum ListType implements Type {
    * @return created value
    * @throws QueryException query exception
    */
-  protected static Value create(final Item it, final QueryContext ctx,
-      final StaticContext sc, final InputInfo ii, final AtomType type)
+  private static Value create(final Item it, final QueryContext ctx,
+                              final StaticContext sc, final InputInfo ii, final AtomType type)
           throws QueryException {
 
     final byte[][] values = split(norm(it.string(ii)), ' ');
@@ -164,7 +164,7 @@ public enum ListType implements Type {
   }
 
   @Override
-  public Type.ID id() {
+  public ID id() {
     return null;
   }
 

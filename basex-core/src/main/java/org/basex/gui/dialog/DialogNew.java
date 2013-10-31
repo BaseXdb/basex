@@ -105,7 +105,7 @@ public final class DialogNew extends BaseXDialog {
     final String nm = dbname.getText().trim();
     ok = valid && !nm.isEmpty();
 
-    String inf = !valid ? RES_NOT_FOUND : !ok ? ENTER_DB_NAME : null;
+    String inf = valid ? ok ? null : ENTER_DB_NAME : RES_NOT_FOUND;
     Msg icon = Msg.ERROR;
     if(ok) {
       ok = Databases.validName(nm);

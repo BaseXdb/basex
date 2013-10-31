@@ -10,7 +10,7 @@ import java.util.*;
  */
 public final class NumbersOption extends Option<int[]> {
   /** Default value. */
-  public final int[] value;
+  private final int[] value;
 
   /**
    * Default constructor.

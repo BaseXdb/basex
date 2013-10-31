@@ -33,8 +33,8 @@ public enum NodeType implements Type {
   TXT("text", NOD, ID.TXT) {
     @Override
     public ANode cast(final Object o, final QueryContext ctx, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      if(o instanceof BXText) return ((BXText) o).getNode();
+        final InputInfo ii) {
+      if(o instanceof BXText) return ((BXNode) o).getNode();
       if(o instanceof Text) return new FTxt((Text) o);
       return new FTxt(o.toString());
     }
@@ -45,7 +45,7 @@ public enum NodeType implements Type {
     @Override
     public ANode cast(final Object o, final QueryContext ctx, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      if(o instanceof BXPI) return ((BXPI) o).getNode();
+      if(o instanceof BXPI) return ((BXNode) o).getNode();
       if(o instanceof ProcessingInstruction) return new FPI((ProcessingInstruction) o);
       final Matcher m = Pattern.compile("<\\?(.*?) (.*)\\?>").matcher(o.toString());
       if(m.find()) return new FPI(m.group(1), m.group(2));
@@ -58,7 +58,7 @@ public enum NodeType implements Type {
     @Override
     public ANode cast(final Object o, final QueryContext ctx, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      if(o instanceof BXElem)  return ((BXElem) o).getNode();
+      if(o instanceof BXElem)  return ((BXNode) o).getNode();
       if(o instanceof Element) return new FElem((Element) o, null, new TokenMap());
       try {
         final DBNode db = new DBNode(new IOContent(o.toString()), new MainOptions());
@@ -75,7 +75,7 @@ public enum NodeType implements Type {
     @Override
     public ANode cast(final Object o, final QueryContext ctx, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      if(o instanceof BXDoc) return ((BXDoc) o).getNode();
+      if(o instanceof BXDoc) return ((BXNode) o).getNode();
       try {
         if(o instanceof Document) {
           final DOMWrapper p = new DOMWrapper((Document) o, "", new MainOptions());
@@ -110,7 +110,7 @@ public enum NodeType implements Type {
     @Override
     public ANode cast(final Object o, final QueryContext ctx, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      if(o instanceof BXAttr) return ((BXAttr) o).getNode();
+      if(o instanceof BXAttr) return ((BXNode) o).getNode();
       if(o instanceof Attr) return new FAttr((Attr) o);
       final Matcher m = Pattern.compile(" (.*?)=\"(.*)\"").matcher(o.toString());
       if(m.find()) return new FAttr(m.group(1), m.group(2));
@@ -123,7 +123,7 @@ public enum NodeType implements Type {
     @Override
     public ANode cast(final Object o, final QueryContext ctx, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      if(o instanceof BXComm) return ((BXComm) o).getNode();
+      if(o instanceof BXComm) return ((BXNode) o).getNode();
       if(o instanceof Comment) return new FComm((Comment) o);
       final Matcher m = Pattern.compile("<!--(.*?)-->").matcher(o.toString());
       if(m.find()) return new FComm(m.group(1));
@@ -141,7 +141,7 @@ public enum NodeType implements Type {
   SCA("schema-attribute", NOD, ID.SCA);
 
   /** Cached enums (faster). */
-  public static final NodeType[] VALUES = values();
+  private static final NodeType[] VALUES = values();
   /** String representation. */
   private final byte[] string;
   /** Parent type. */
@@ -191,7 +191,7 @@ public enum NodeType implements Type {
   @Override
   public Item cast(final Item it, final QueryContext ctx, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return it.type != this ? error(it, ii) : it;
+    return it.type == this ? it : error(it, ii);
   }
 
   @Override
@@ -226,7 +226,7 @@ public enum NodeType implements Type {
 
   @Override
   public Type union(final Type t) {
-    return !t.isNode() ? AtomType.ITEM : this == t ? this : NOD;
+    return t.isNode() ? this == t ? this : NOD : AtomType.ITEM;
   }
 
   @Override

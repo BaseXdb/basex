@@ -40,7 +40,7 @@ public final class WebDAVLockService {
   /**
    * Releases the lock for the given token.
    * @param token lock token
-   * @throws java.io.IOException I/O exception
+   * @throws IOException I/O exception
    */
   public void unlock(final String token) throws IOException {
     new LockQuery(http, "w:delete-lock($lock-token)").
@@ -131,7 +131,7 @@ public final class WebDAVLockService {
    * @throws IOException I/O exception
    */
   public boolean conflictingLocks(final String db, final String p) throws IOException {
-    return new LockQuery(http,
+    return !new LockQuery(http,
       "w:conflicting-locks(" +
         "<w:lockinfo>" +
         "<w:path>{ $path }</w:path>" +
@@ -141,8 +141,7 @@ public final class WebDAVLockService {
         "</w:lockinfo>)").
       bind("path", db + SEP + p).
       bind("owner", http.user).
-      execute().
-      size() > 0;
+      execute().isEmpty();
   }
 
   /**

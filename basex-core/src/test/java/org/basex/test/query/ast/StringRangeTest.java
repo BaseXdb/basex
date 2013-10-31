@@ -56,8 +56,8 @@ public final class StringRangeTest extends QueryPlanTest {
    */
   @Test
   public void geLe() throws BaseXException {
-    final Class<? extends Expr> clz = StringRangeAccess.class;
     test("exists(//*[text() >= '999' and text() <= '999'])", "true", ValueAccess.class);
+    final Class<? extends Expr> clz = StringRangeAccess.class;
     test("count(//*[text() >= '990' and text() <= '999'])", "10", clz);
     test("count(//*[text() >= '900' and text() <= '999'])", "100", clz);
     test("count(//*[text() >= '100' and text() <= '999'])", "900", clz);
@@ -72,8 +72,8 @@ public final class StringRangeTest extends QueryPlanTest {
    */
   @Test
   public void leGe() throws BaseXException {
-    final Class<? extends Expr> clz = StringRangeAccess.class;
     test("exists(//*[text() <= '999' and text() >= '999'])", "true", ValueAccess.class);
+    final Class<? extends Expr> clz = StringRangeAccess.class;
     test("count(//*[text() <= '999' and text() >= '990'])", "10", clz);
     test("count(//*[text() <= '999' and text() >= '900'])", "100", clz);
     test("count(//*[text() <= '999' and text() >= '100'])", "900", clz);
@@ -87,8 +87,8 @@ public final class StringRangeTest extends QueryPlanTest {
    */
   @Test
   public void gtLt() throws BaseXException {
-    final Class<? extends Expr> clz = StringRangeAccess.class;
     test("exists(//*[text() > '999' and text() < '999'])", "false");
+    final Class<? extends Expr> clz = StringRangeAccess.class;
     test("count(//*[text() > '990' and text() < '999'])", "8", clz);
     test("count(//*[text() > '900' and text() < '999'])", "98", clz);
     test("count(//*[text() > '100' and text() < '999'])", "898", clz);
@@ -104,13 +104,13 @@ public final class StringRangeTest extends QueryPlanTest {
    * @param expr class expected in query plan
    * @throws BaseXException database exception
    */
-  public void test(final String query, final String result,
-      final Class<? extends Expr> expr) throws BaseXException {
+  private static void test(final String query, final String result,
+                           final Class<? extends Expr> expr) throws BaseXException {
 
     new CreateIndex(CmdIndex.TEXT).execute(context);
-    check(query, result, "exists(//" + Util.className(expr) + ")");
+    check(query, result, "exists(//" + Util.className(expr) + ')');
     new DropIndex(CmdIndex.TEXT).execute(context);
-    check(query, result, "not(//" + Util.className(expr) + ")");
+    check(query, result, "not(//" + Util.className(expr) + ')');
   }
 
   /**
@@ -119,7 +119,7 @@ public final class StringRangeTest extends QueryPlanTest {
    * @param result expected result
    * @throws BaseXException database exception
    */
-  public void test(final String query, final String result) throws BaseXException {
+  private static void test(final String query, final String result) throws BaseXException {
     new CreateIndex(CmdIndex.TEXT).execute(context);
     check(query, result);
     new DropIndex(CmdIndex.TEXT).execute(context);

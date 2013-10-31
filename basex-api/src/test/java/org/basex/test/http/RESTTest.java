@@ -190,7 +190,7 @@ public class RESTTest extends HTTPTest {
    * @param prefix prefix
    */
   private static void assertStartsWith(final String string, final String prefix) {
-    assertTrue("'" + string + "' does not start with '" + prefix + "'",
+    assertTrue('\'' + string + "' does not start with '" + prefix + '\'',
         string.startsWith(prefix));
   }
 
@@ -378,9 +378,9 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void putOption() throws IOException {
-    put(ROOT + NAME + "?" + MainOptions.CHOP.name() + "=true", new FileInputStream(FILE));
+    put(ROOT + NAME + '?' + MainOptions.CHOP.name() + "=true", new FileInputStream(FILE));
     assertEquals("5", get(NAME + "?query=count(//text())"));
-    put(ROOT + NAME + "?" + MainOptions.CHOP.name() + "=false", new FileInputStream(FILE));
+    put(ROOT + NAME + '?' + MainOptions.CHOP.name() + "=false", new FileInputStream(FILE));
     assertEquals("22", get(NAME + "?query=count(//text())"));
 
     try {

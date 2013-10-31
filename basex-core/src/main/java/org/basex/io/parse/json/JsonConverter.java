@@ -17,13 +17,13 @@ import org.basex.util.*;
  */
 public abstract class JsonConverter {
   /** JSON options. */
-  protected final JsonParserOptions jopts;
+  final JsonParserOptions jopts;
 
   /**
    * Constructor.
    * @param opts json options
    */
-  protected JsonConverter(final JsonParserOptions opts) {
+  JsonConverter(final JsonParserOptions opts) {
     jopts = opts;
   }
 
@@ -52,7 +52,7 @@ public abstract class JsonConverter {
   }
 
   /**
-   * Returns a {@link JsonConverter} for the given configuration.
+   * Returns a  for the given configuration.
    * @param jopts options
    * @return a JSON converter
    */

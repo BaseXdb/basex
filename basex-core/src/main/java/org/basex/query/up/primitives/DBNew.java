@@ -22,7 +22,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public abstract class DBNew extends BasicOperation {
+abstract class DBNew extends BasicOperation {
   /** Numeric index options. */
   private static final NumberOption[] N_OPT = { MainOptions.MAXCATS, MainOptions.MAXLEN,
     MainOptions.INDEXSPLITSIZE, MainOptions.FTINDEXSPLITSIZE };
@@ -48,18 +48,18 @@ public abstract class DBNew extends BasicOperation {
   }
 
   /** Query context. */
-  protected final QueryContext qc;
+  final QueryContext qc;
   /** Inputs to add. */
-  protected List<NewInput> inputs;
+  List<NewInput> inputs;
   /** Optimization options. */
-  protected HashMap<String, String> options;
+  HashMap<String, String> options;
   /** Insertion sequence. */
-  protected Data md;
+  Data md;
 
   /** New options. */
-  protected final HashMap<Option<?>, Object> nprops = new HashMap<Option<?>, Object>();
+  final HashMap<Option<?>, Object> nprops = new HashMap<Option<?>, Object>();
   /** Original options. */
-  protected final HashMap<Option<?>, Object> oprops = new HashMap<Option<?>, Object>();
+  private final HashMap<Option<?>, Object> oprops = new HashMap<Option<?>, Object>();
 
   /**
    * Constructor.
@@ -68,7 +68,7 @@ public abstract class DBNew extends BasicOperation {
    * @param c query context
    * @param ii input info
    */
-  public DBNew(final TYPE t, final Data d, final QueryContext c, final InputInfo ii) {
+  DBNew(final TYPE t, final Data d, final QueryContext c, final InputInfo ii) {
     super(t, d, ii);
     qc = c;
   }
@@ -79,7 +79,7 @@ public abstract class DBNew extends BasicOperation {
    * @param name name of database
    * @throws QueryException query exception
    */
-  protected final void addDocs(final MemData dt, final String name) throws QueryException {
+  final void addDocs(final MemData dt, final String name) throws QueryException {
     md = dt;
     final long ds = inputs.size();
     for(int i = 0; i < ds; i++) {
@@ -122,7 +122,7 @@ public abstract class DBNew extends BasicOperation {
    * @param create create or optimize database
    * @throws QueryException query exception
    */
-  protected final void check(final boolean create) throws QueryException {
+  final void check(final boolean create) throws QueryException {
     for(final Entry<String, String> entry : options.entrySet()) {
       final String key = entry.getKey();
       if(!eq(key, K_N_OPT) && !eq(key, K_B_OPT) && !eq(key, K_S_OPT) ||
@@ -141,7 +141,7 @@ public abstract class DBNew extends BasicOperation {
   /**
    * Assigns indexing options.
    */
-  protected void initOptions() {
+  void initOptions() {
     for(int o = 0; o < K_N_OPT.length; o++) if(options.containsKey(K_N_OPT[o]))
       nprops.put(N_OPT[o], toInt(options.get(K_N_OPT[o])));
     for(int o = 0; o < K_B_OPT.length; o++) if(options.containsKey(K_B_OPT[o]))
@@ -153,7 +153,7 @@ public abstract class DBNew extends BasicOperation {
   /**
    * Caches original options and assigns cached options.
    */
-  protected void assignOptions() {
+  void assignOptions() {
     final MainOptions opts = qc.context.options;
     for(final Option<?> option : nprops.keySet()) oprops.put(option, opts.get(option));
     setOptions(nprops);
@@ -162,7 +162,7 @@ public abstract class DBNew extends BasicOperation {
   /**
    * Restores original options.
    */
-  protected void resetOptions() {
+  void resetOptions() {
     setOptions(oprops);
   }
 
@@ -172,6 +172,6 @@ public abstract class DBNew extends BasicOperation {
    */
   private void setOptions(final HashMap<Option<?>, Object> map) {
     final MainOptions opts = qc.context.options;
-    for(final Map.Entry<Option<?>, Object> e : map.entrySet()) opts.put(e.getKey(), e.getValue());
+    for(final Entry<Option<?>, Object> e : map.entrySet()) opts.put(e.getKey(), e.getValue());
   }
 }

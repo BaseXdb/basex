@@ -80,18 +80,18 @@ public final class Insert extends Update {
     UpdatePrimitive up;
     DBNode dbn;
     // no update primitive is created if node list is empty
-    if(aList.size() > 0) {
+    if(!aList.isEmpty()) {
       final ANode targ = before || after ? par : n;
       if(targ.type != NodeType.ELM)
         (before || after ? UPATTELM : UPATTELM2).thrw(info);
 
       dbn = ctx.updates.determineDataRef(targ, ctx);
-      up = new InsertAttribute(dbn.pre, dbn.data, info, checkNS(aList, targ, ctx));
+      up = new InsertAttribute(dbn.pre, dbn.data, info, checkNS(aList, targ));
       ctx.updates.add(up, ctx);
     }
 
     // no update primitive is created if node list is empty
-    if(cList.size() > 0) {
+    if(!cList.isEmpty()) {
       dbn = ctx.updates.determineDataRef(n, ctx);
       if(before) up = new InsertBefore(dbn.pre, dbn.data, info, cList);
       else if(after) up = new InsertAfter(dbn.pre, dbn.data, info, cList);

@@ -102,7 +102,7 @@ public final class PoolTest extends SandboxTest {
    * @param cmd command reference
    * @param session Session
    */
-  static void ok(final Command cmd, final Session session) {
+  private static void ok(final Command cmd, final Session session) {
     try {
       session.execute(cmd);
     } catch(final IOException ex) {

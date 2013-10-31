@@ -72,7 +72,7 @@ final class MapRect extends ViewRect implements Comparable<MapRect> {
 
   @Override
   public boolean equals(final Object o) {
-    return o instanceof MapRect && ((MapRect) o).pre == pre;
+    return o instanceof MapRect && ((ViewRect) o).pre == pre;
   }
 
   @Override

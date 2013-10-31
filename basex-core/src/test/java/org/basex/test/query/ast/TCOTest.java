@@ -74,7 +74,7 @@ public class TCOTest extends QueryPlanTest {
 
         null,
 
-        "exists(//" + Util.className(StaticFunc.class) + "/" +
+        "exists(//" + Util.className(StaticFunc.class) + '/' +
             Util.className(StaticFuncCall.class) + "[@tailCall eq 'true'])",
         "exists(//" + Util.className(StaticFuncCall.class) + "[@tailCall eq 'false'])"
     );
@@ -88,7 +88,7 @@ public class TCOTest extends QueryPlanTest {
 
         "12345",
 
-        "exists(//" + Util.className(If.class) + "/" +
+        "exists(//" + Util.className(If.class) + '/' +
             Util.className(StaticFuncCall.class) + "[@tailCall eq 'true'])"
     );
   }
@@ -103,7 +103,7 @@ public class TCOTest extends QueryPlanTest {
 
         "12345",
 
-        "exists(//" + Util.className(If.class) + "/" +
+        "exists(//" + Util.className(If.class) + '/' +
             Util.className(StaticFuncCall.class) + "[@tailCall eq 'true'])"
     );
   }

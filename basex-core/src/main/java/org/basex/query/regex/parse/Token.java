@@ -2,11 +2,13 @@
 /* JavaCCOptions:TOKEN_EXTENDS=,KEEP_LINE_COL=null,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 package org.basex.query.regex.parse;
 
+import java.io.Serializable;
+
 /**
  * Describes the input token stream.
  */
 
-public class Token implements java.io.Serializable {
+public class Token implements Serializable {
 
   /**
    * The version identifier for this Serializable class.
@@ -91,7 +93,7 @@ public class Token implements java.io.Serializable {
    * @param k token kind
    * @param img token image string
    */
-  public Token(final int k, final String img) {
+  private Token(final int k, final String img) {
     this.kind = k;
     this.image = img;
   }
@@ -116,7 +118,7 @@ public class Token implements java.io.Serializable {
    * @param img image string
    * @return token
    */
-  public static Token newToken(final int k, final String img) {
+  private static Token newToken(final int k, final String img) {
     switch(k) {
       default : return new Token(k, img);
     }

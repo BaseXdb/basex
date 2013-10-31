@@ -106,7 +106,7 @@ public final class FTWildcard {
     int c = 0;
     for(int s = 0; s < size; s++) {
       final int m = max[s];
-      if(m == Integer.MAX_VALUE) return m;
+      if(m == Integer.MAX_VALUE) return Integer.MAX_VALUE;
       c += m;
     }
     return c;

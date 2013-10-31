@@ -67,7 +67,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   @Override
   public Service getService(final String nm, final String ver) throws XMLDBException {
     check();
-    if(ver.equals("1.0")) {
+    if("1.0".equals(ver)) {
       if(Token.eq(nm, BXQueryService.XPATH, BXQueryService.XQUERY))
         return new BXQueryService(this, nm, ver);
       if(nm.equals(BXCollectionManagementService.MANAGEMENT))
@@ -118,10 +118,9 @@ public final class BXCollection implements Collection, BXXMLDBText {
   }
 
   @Override
-  public BXXMLResource createResource(final String id, final String type)
-      throws XMLDBException {
-
+  public BXXMLResource createResource(final String id, final String type) throws XMLDBException {
     check();
+
     if(type.equals(XMLResource.RESOURCE_TYPE)) {
       // create new id, if necessary
       final String uid = id == null || id.isEmpty() ? createId() : id;

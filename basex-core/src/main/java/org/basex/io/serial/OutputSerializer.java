@@ -26,32 +26,32 @@ import org.basex.util.options.*;
  */
 public abstract class OutputSerializer extends Serializer {
   /** System document type. */
-  protected String docsys;
+  String docsys;
   /** Public document type. */
   private String docpub;
   /** Flag for printing content type. */
-  protected int ct;
+  int ct;
   /** Separator flag (used for formatting). */
   protected boolean sep;
   /** Item separator flag (used for formatting). */
-  protected boolean isep;
+  private boolean isep;
   /** Script flag. */
-  protected boolean script;
+  boolean script;
 
   /** HTML5 flag. */
-  protected final boolean html5;
+  final boolean html5;
   /** URI escape flag. */
-  protected final boolean escuri;
+  final boolean escuri;
   /** Standalone 'omit' flag. */
-  protected final boolean saomit;
+  final boolean saomit;
   /** Include content type flag. */
-  protected final boolean content;
+  final boolean content;
   /** WebDAV flag. */
-  protected final boolean webdav;
+  private final boolean webdav;
   /** New line. */
   protected final byte[] nl;
   /** Output stream. */
-  protected final PrintOutput out;
+  final PrintOutput out;
 
   /** Item flag (used for formatting). */
   private boolean item;
@@ -119,8 +119,8 @@ public abstract class OutputSerializer extends Serializer {
     wrap    = wPre.length != 0;
 
     nl = utf8(token(opts.get(NEWLINE).newline()), enc);
-    itemsep = !opts.contains(ITEM_SEPARATOR) ? null : token(
-      opts.get(ITEM_SEPARATOR).replace("\\n", "\n").replace("\\r", "\r").replace("\\t", "\t"));
+    itemsep = opts.contains(ITEM_SEPARATOR) ? token(opts.get(ITEM_SEPARATOR).replace("\\n", "\n").
+        replace("\\r", "\r").replace("\\t", "\t")) : null;
 
     docsys  = opts.get(DOCTYPE_SYSTEM);
     docpub  = opts.get(DOCTYPE_PUBLIC);
@@ -130,7 +130,7 @@ public abstract class OutputSerializer extends Serializer {
     undecl  = opts.yes(UNDECLARE_PREFIXES);
     indent  = opts.yes(INDENT) && format;
 
-    webdav = maps.equals("webdav");
+    webdav = "webdav".equals(maps);
     if(!webdav && !maps.isEmpty()) SERMAP.thrwIO(maps);
 
     if(docsys.isEmpty()) docsys = null;
@@ -230,7 +230,7 @@ public abstract class OutputSerializer extends Serializer {
         isep = true;
       }
     }
-    if(wrap) startElement(wPre.length != 0 ? concat(wPre, COLON, T_RESULT) : T_RESULT);
+    if(wrap) startElement(wPre.length == 0 ? T_RESULT : concat(wPre, COLON, T_RESULT));
   }
 
   @Override
@@ -401,7 +401,7 @@ public abstract class OutputSerializer extends Serializer {
    * @return true if doctype was added
    * @throws IOException I/O exception
    */
-  protected boolean doctype(final byte[] dt) throws IOException {
+  boolean doctype(final byte[] dt) throws IOException {
     if(level != 0 || docsys == null && docpub == null) return false;
     if(sep) indent();
     print(DOCTYPE);
@@ -437,7 +437,7 @@ public abstract class OutputSerializer extends Serializer {
    * @param ch character
    * @throws IOException I/O exception
    */
-  protected final void hex(final int ch) throws IOException {
+  final void hex(final int ch) throws IOException {
     print("&#x");
     final int h = ch >> 4;
     if(h != 0) print(HEX[h]);
@@ -502,7 +502,7 @@ public abstract class OutputSerializer extends Serializer {
    * @return {@code true} if declaration was printed
    * @throws IOException I/O exception
    */
-  protected boolean ct(final boolean empty, final boolean html) throws IOException {
+  boolean ct(final boolean empty, final boolean html) throws IOException {
     if(ct != 1) return false;
     ct++;
     if(empty) finishOpen();
@@ -532,8 +532,8 @@ public abstract class OutputSerializer extends Serializer {
    * @return value
    * @throws QueryIOException query I/O exception
    */
-  private String supported(final StringOption option, final Options opts, final String... allowed)
-      throws QueryIOException {
+  private static String supported(final StringOption option, final Options opts,
+      final String... allowed) throws QueryIOException {
 
     final String val = opts.get(option);
     if(val.isEmpty()) return allowed.length > 0 ? allowed[0] : val;

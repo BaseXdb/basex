@@ -58,8 +58,8 @@ public abstract class Filter extends Preds {
       if(root.isEmpty()) return optPre(null, ctx);
       // convert filters without numeric predicates to axis paths
       if(root instanceof AxisPath && !super.has(Flag.FCS))
-        return ((AxisPath) root.copy(ctx,
-            scp)).addPreds(ctx, scp, preds).compile(ctx, scp);
+        return ((Path) root.copy(ctx,
+          scp)).addPreds(ctx, scp, preds).compile(ctx, scp);
 
       // optimize filter expressions
       ctx.value = null;
@@ -84,17 +84,17 @@ public abstract class Filter extends Preds {
 
     // determine number of results and type
     final long s = root.size();
-    if(s != -1) {
+    if(s == -1) {
+      type = SeqType.get(t.type, t.zeroOrOne() ? Occ.ZERO_ONE : Occ.ZERO_MORE);
+    } else {
       if(pos != null) {
         size = Math.max(0, s + 1 - pos.min) - Math.max(0, s - pos.max);
       } else if(last) {
         size = s > 0 ? 1 : 0;
       }
       // no results will remain: return empty sequence
-      if(size == 0) return optPre(null, ctx);
+      if (size == 0) return optPre(null, ctx);
       type = SeqType.get(t.type, size);
-    } else {
-      type = SeqType.get(t.type, t.zeroOrOne() ? Occ.ZERO_ONE : Occ.ZERO_MORE);
     }
 
     // no numeric predicates.. use simple iterator
@@ -138,7 +138,7 @@ public abstract class Filter extends Preds {
       if(root.isEmpty()) return optPre(null, ctx);
       // convert filters without numeric predicates to axis paths
       if(root instanceof AxisPath && !super.has(Flag.FCS))
-        return ((AxisPath) root.copy(ctx, scp)).addPreds(ctx, scp, preds);
+        return ((Path) root.copy(ctx, scp)).addPreds(ctx, scp, preds);
 
       // no predicates.. return root; otherwise, do some advanced compilations
       return preds.length == 0 ? root : opt(ctx);

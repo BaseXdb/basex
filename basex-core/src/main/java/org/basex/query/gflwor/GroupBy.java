@@ -27,13 +27,13 @@ import org.basex.util.hash.*;
  */
 public final class GroupBy extends GFLWOR.Clause {
   /** Grouping specs. */
-  final Spec[] specs;
+  private final Spec[] specs;
   /** Non-grouping variable expressions. */
-  Expr[] preExpr;
+  private Expr[] preExpr;
   /** Non-grouping variables. */
-  Var[] post;
+  private Var[] post;
   /** Number of non-occluded grouping variables. */
-  final int nonOcc;
+  private final int nonOcc;
 
   /**
    * Constructor.
@@ -141,7 +141,8 @@ public final class GroupBy extends GFLWOR.Clause {
           }
 
           // find the group for this key
-          Group fst, grp = null;
+          final Group fst;
+          Group grp = null;
           // no collations, so we can use hashing
           for(Group g = fst = map.get(hash); g != null; g = g.next) {
             if(eq(key, g.key, colls)) {

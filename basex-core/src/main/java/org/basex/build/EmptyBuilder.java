@@ -44,29 +44,27 @@ public final class EmptyBuilder extends Builder {
   }
 
   @Override
-  protected void addDoc(final byte[] value) throws IOException {
+  protected void addDoc(final byte[] value) {
     meta.size++;
   }
 
   @Override
   protected void addElem(final int dist, final int nm, final int asize, final int uri,
-      final boolean ne) throws IOException {
+      final boolean ne) {
     meta.size++;
   }
 
   @Override
-  protected void addAttr(final int nm, final byte[] value, final int dist, final int uri)
-      throws IOException {
+  protected void addAttr(final int nm, final byte[] value, final int dist, final int uri) {
     meta.size++;
   }
 
   @Override
-  protected void addText(final byte[] value, final int dist, final byte kind)
-      throws IOException {
+  protected void addText(final byte[] value, final int dist, final byte kind) {
     meta.size++;
   }
 
   @Override
-  protected void setSize(final int pre, final int size) throws IOException {
+  protected void setSize(final int pre, final int size) {
   }
 }

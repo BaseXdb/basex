@@ -78,8 +78,8 @@ public abstract class AxisPath extends Path {
 
     // merge two axis paths
     if(root instanceof AxisPath) {
-      Expr[] st = ((AxisPath) root).steps;
-      root = ((AxisPath) root).root;
+      Expr[] st = ((Path) root).steps;
+      root = ((Path) root).root;
       for(final Expr s : steps) st = Array.add(st, s);
       steps = st;
       // refresh root context
@@ -218,13 +218,13 @@ public abstract class AxisPath extends Path {
         for(int j = smin; j >= 0; --j) {
           final Axis ax = step(j).axis.invert();
           if(ax == null) break;
-          if(j != 0) {
-            final Step prev = step(j - 1);
-            invSteps = Array.add(invSteps, Step.get(info, ax, prev.test, prev.preds));
-          } else {
+          if(j == 0) {
             // add document test for collections and axes other than ancestors
             if(test != Test.DOC || ax != Axis.ANC && ax != Axis.ANCORSELF)
               invSteps = Array.add(invSteps, Step.get(info, ax, test));
+          } else {
+            final Step prev = step(j - 1);
+            invSteps = Array.add(invSteps, Step.get(info, ax, prev.test, prev.preds));
           }
         }
       }
@@ -270,7 +270,7 @@ public abstract class AxisPath extends Path {
     int s = steps.length;
     final Expr[] e = new Expr[s--];
     // add predicates of last step to new root node
-    final Expr rt = step(s).preds.length != 0 ? Filter.get(info, r, step(s).preds) : r;
+    final Expr rt = step(s).preds.length == 0 ? r : Filter.get(info, r, step(s).preds);
 
     // add inverted steps in a backward manner
     int c = 0;
@@ -345,7 +345,7 @@ public abstract class AxisPath extends Path {
    * @return guess
    */
   public boolean cheap() {
-    if(!(root instanceof ANode) || ((ANode) root).type != NodeType.DOC) return false;
+    if(!(root instanceof ANode) || ((Value) root).type != NodeType.DOC) return false;
     final Axis[] expensive = { Axis.DESC, Axis.DESCORSELF, Axis.PREC, Axis.PRECSIBL,
         Axis.FOLL, Axis.FOLLSIBL };
     for(int i = 0; i < steps.length; i++) {

@@ -53,13 +53,12 @@ public class BaseX extends Main {
     // create session to show optional login request
     session();
 
-    SerializerOptions sopts = null;
-    final StringBuilder bind = new StringBuilder();
-    boolean v = false, qi = false, qp = false;
-
     console = true;
     try {
       // loop through all commands
+      final StringBuilder bind = new StringBuilder();
+      SerializerOptions sopts = null;
+      boolean v = false, qi = false, qp = false;
       for(int i = 0; i < ops.size(); i++) {
         final int c = ops.get(i);
         String val = vals.get(i);
@@ -176,7 +175,7 @@ public class BaseX extends Main {
    * Tests if this client is stand-alone.
    * @return stand-alone flag
    */
-  protected boolean sa() {
+  boolean sa() {
     return true;
   }
 

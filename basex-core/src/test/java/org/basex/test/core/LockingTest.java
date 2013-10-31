@@ -15,7 +15,7 @@ import org.junit.runners.*;
 import org.junit.runners.Parameterized.*;
 
 /**
- * Tests for {@link org.basex.core.DBLocking}.
+ * Tests for {@link DBLocking}.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Jens Erat
@@ -49,9 +49,9 @@ public final class LockingTest extends SandboxTest {
   /** Global options, used to read parallel transactions limit. */
   private final GlobalOptions gopts = new Context().globalopts;
   /** Locking instance used for testing. */
-  final DBLocking locks = new DBLocking(gopts);
+  private final DBLocking locks = new DBLocking(gopts);
   /** Objects used for locking. */
-  final String[] objects = new String[5];
+  private final String[] objects = new String[5];
   /** Empty string array for convenience. */
   private static final String[] NONE = new String[0];
 
@@ -151,7 +151,7 @@ public final class LockingTest extends SandboxTest {
   public void parallelTransactionLimitTest() throws InterruptedException {
     final CountDownLatch latch =
         new CountDownLatch(Math.max(gopts.get(GlobalOptions.PARALLEL), 1));
-    // Container for (maximum number allowed transactions) + 1 testers
+    // Container for(maximum number allowed transactions) + 1 testers
     final LockTester[] testers = (LockTester[]) Array.newInstance(
         LockTester.class, (int) (latch.getCount() + 1));
 
@@ -607,7 +607,7 @@ public final class LockingTest extends SandboxTest {
     @Override
     public void run() {
       // Await latch if set
-      if(null != await) {
+      if(await != null) {
         try {
           if(!await.await(WAIT, TimeUnit.MILLISECONDS)) fail("Latch timed out.");
         } catch(final InterruptedException e) {
@@ -618,17 +618,17 @@ public final class LockingTest extends SandboxTest {
       // Fetch lock if objects are set
       final Command cmd = new Cmd(writing);
       locks.acquire(cmd,
-            null != readObjects ? new StringList().add(readObjects) : null,
-            null != writeObjects ? new StringList().add(writeObjects) : null);
+        readObjects != null ? new StringList().add(readObjects) : null,
+        writeObjects != null ? new StringList().add(writeObjects) : null);
 
       // We hold the lock, count down
-      if(null != countDown) countDown.countDown();
+      if(countDown != null) countDown.countDown();
 
       // Wait until we're asked to release the lock
       synchronized(this) {
         try {
-          while(!requestRelease || null != downgrade) {
-            if(null != downgrade) {
+          while(!requestRelease || downgrade != null) {
+            if(downgrade != null) {
               locks.downgrade(new StringList().add(downgrade));
               downgrade = null;
             }

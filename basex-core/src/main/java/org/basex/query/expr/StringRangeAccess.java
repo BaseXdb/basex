@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
  */
 public final class StringRangeAccess extends IndexAccess {
   /** Index token. */
-  final StringRange sr;
+  private final StringRange sr;
 
   /**
    * Constructor.

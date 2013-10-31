@@ -19,10 +19,10 @@ import org.basex.util.list.*;
  */
 public abstract class Query {
   /** Client output stream. */
-  protected OutputStream out;
+  OutputStream out;
 
   /** Cached results. */
-  protected TokenList cache;
+  TokenList cache;
   /** Cached result types. */
   private ByteList types;
   /** Cache pointer. */
@@ -111,7 +111,7 @@ public abstract class Query {
    * @param is input stream
    * @throws IOException I/O exception
    */
-  protected void cache(final InputStream is) throws IOException {
+  void cache(final InputStream is) throws IOException {
     cache = new TokenList();
     types = new ByteList();
     final ByteList bl = new ByteList();

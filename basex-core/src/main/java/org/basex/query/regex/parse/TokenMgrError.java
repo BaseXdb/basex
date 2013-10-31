@@ -50,8 +50,8 @@ public class TokenMgrError extends Error {
    */
   protected static String addEscapes(final String str) {
     final StringBuilder retval = new StringBuilder();
-    char ch;
     for (int i = 0; i < str.length(); i++) {
+      char ch;
       switch (str.charAt(i)) {
         case 0 :
           continue;
@@ -109,7 +109,7 @@ public class TokenMgrError extends Error {
       final int col, final String after, final char curr) {
     return "Lexical error at line " + line + ", column " + col + ".  Encountered: " +
       (eof ? "<EOF> " : '"' + addEscapes(String.valueOf(curr)) + '"' +
-        " (" + (int) curr + "), ") + "after : \"" + addEscapes(after) + '"';
+        " (" + curr + "), ") + "after : \"" + addEscapes(after) + '"';
   }
 
   /**

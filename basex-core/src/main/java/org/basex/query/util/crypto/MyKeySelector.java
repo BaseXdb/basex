@@ -4,6 +4,7 @@ import java.security.*;
 import java.util.*;
 
 import javax.security.cert.*;
+import javax.security.cert.Certificate;
 import javax.xml.crypto.*;
 import javax.xml.crypto.dsig.*;
 import javax.xml.crypto.dsig.keyinfo.*;
@@ -40,12 +41,10 @@ class MyKeySelector extends KeySelector {
   }
 
   @Override
-  public KeySelectorResult select(final KeyInfo ki, final Purpose p,
-      final AlgorithmMethod m, final XMLCryptoContext c)
-      throws KeySelectorException {
+  public KeySelectorResult select(final KeyInfo ki, final Purpose p, final AlgorithmMethod m,
+      final XMLCryptoContext c) throws KeySelectorException {
 
-    if(ki == null)
-      throw new KeySelectorException("KeyInfo is null");
+    if(ki == null) throw new KeySelectorException("KeyInfo is null");
 
     final SignatureMethod sm = (SignatureMethod) m;
     @SuppressWarnings("unchecked")
@@ -62,19 +61,20 @@ class MyKeySelector extends KeySelector {
         }
 
       } else if(s instanceof X509Data) {
-        for(final Object d : ((X509Data) s).getContent())
-          if(d instanceof X509Certificate)
-            pk = ((X509Certificate) d).getPublicKey();
+        for(final Object d : ((X509Data) s).getContent()) {
+          if(d instanceof X509Certificate) {
+            pk = ((Certificate) d).getPublicKey();
+          }
+        }
       }
 
       if(pk != null) {
         final String sa = sm.getAlgorithm();
         final String ka = pk.getAlgorithm();
-        if(ka.equalsIgnoreCase("DSA") && sa.equalsIgnoreCase(
-                "http://www.w3.org/2000/09/xmldsig#dsa-sha1") ||
-                ka.equalsIgnoreCase("RSA") && sa.equalsIgnoreCase(
-                    "http://www.w3.org/2000/09/xmldsig#rsa-sha1"))
+        if("DSA".equalsIgnoreCase(ka) && "http://www.w3.org/2000/09/xmldsig#dsa-sha1".equals(sa) ||
+          "RSA".equalsIgnoreCase(ka) && "http://www.w3.org/2000/09/xmldsig#rsa-sha1".equals(sa)) {
           return new MyKeySelectorResult(pk);
+        }
       }
     }
 

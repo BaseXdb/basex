@@ -23,14 +23,14 @@ public final class GlobalOptions extends Options {
 
   /** Database path. */
   public static final StringOption DBPATH = new StringOption("DBPATH",
-    Prop.HOME + (USERHOME ? Prop.NAME + "Data" : "data"));
+    HOME + (USERHOME ? NAME + "Data" : "data"));
   /** Package repository path. */
   public static final StringOption REPOPATH = new StringOption("REPOPATH",
-    Prop.HOME + (USERHOME ? Prop.NAME + "Repo" : "repo"));
+    HOME + (USERHOME ? NAME + "Repo" : "repo"));
   /** Debug mode. */
   public static final BooleanOption DEBUG = new BooleanOption("DEBUG", false);
   /** Language name. */
-  public static final StringOption LANG = new StringOption("LANG", Prop.language);
+  public static final StringOption LANG = new StringOption("LANG", language);
   /** Flag to include key names in the language strings. */
   public static final BooleanOption LANGKEYS = new BooleanOption("LANGKEYS", false);
   /** Applied locking algorithm: local (database) vs. global (process) locking. */
@@ -77,7 +77,7 @@ public final class GlobalOptions extends Options {
 
   /** Web path. */
   public static final StringOption WEBPATH = new StringOption("WEBPATH",
-    Prop.HOME + (USERHOME ? Prop.NAME + "Web" : "webapp"));
+    HOME + (USERHOME ? NAME + "Web" : "webapp"));
   /** RESTXQ path (relative to web path). */
   public static final StringOption RESTXQPATH = new StringOption("RESTXQPATH", "");
   /** Local (embedded) mode. */
@@ -92,9 +92,9 @@ public final class GlobalOptions extends Options {
   GlobalOptions(final boolean file) {
     super(file ? new IOFile(HOME + IO.BASEXSUFFIX) : null);
     // set some static options
-    Prop.language = get(LANG);
-    Prop.langkeys = get(LANGKEYS);
-    Prop.debug = get(DEBUG);
+    language = get(LANG);
+    langkeys = get(LANGKEYS);
+    debug = get(DEBUG);
     final String ph = get(PROXYHOST);
     final String pp = Integer.toString(get(PROXYPORT));
     setSystem("http.proxyHost", ph);

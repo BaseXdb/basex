@@ -245,7 +245,7 @@ public final class FNValidate extends StandardFunc {
    * @return resulting file
    * @throws IOException I/O exception
    */
-  static IOFile createTmp(final IO in) throws IOException {
+  private static IOFile createTmp(final IO in) throws IOException {
     if(!(in instanceof IOContent || in instanceof IOStream)) return null;
     final IOFile tmp = new IOFile(File.createTempFile("validate", IO.BASEXSUFFIX));
     tmp.write(in.read());
@@ -336,7 +336,7 @@ public final class FNValidate extends StandardFunc {
      * Returns the exception messages.
      * @return exception messages
      */
-    protected TokenList getExceptions() {
+    TokenList getExceptions() {
       return exceptions;
     }
   }

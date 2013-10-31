@@ -118,7 +118,7 @@ public final class GUIMacOSX {
       }
       // mark the current event as 'handled' if handler doesn't return a false boolean
       GUIMacOSX.invoke(obj, "setHandled",
-          null != result && Boolean.class.isInstance(result) ? (Boolean) result : true);
+        result != null && Boolean.class.isInstance(result) ? (Boolean) result : true);
       return null;
     }
 
@@ -199,7 +199,7 @@ public final class GUIMacOSX {
    * @param window the window
    */
   public static void enableOSXFullscreen(final Window window) {
-    if(null == window) return;
+    if(window == null) return;
     try {
       final Class<?> util = Class.forName("com.apple.eawt.FullScreenUtilities");
       final Class<?>[] params = { Window.class, Boolean.TYPE };

@@ -41,7 +41,7 @@ public final class IntSeq extends NativeSeq {
   }
 
   @Override
-  public Object toJava() throws QueryException {
+  public Object toJava() {
     switch((AtomType) type) {
       case BYT:
         final byte[] t1 = new byte[(int) size];

@@ -207,8 +207,8 @@ public final class MapView extends View implements Runnable {
 
     // calculate zooming speed (slower for large zooming scales)
     if(mainRect.w > 0 && mainRect.h > 0) {
-      zoomSpeed = (int) (Math.log(64d * getWidth() / mainRect.w) +
-          Math.log(64d * getHeight() / mainRect.h));
+      zoomSpeed = (int) (StrictMath.log(64d * getWidth() / mainRect.w) +
+        StrictMath.log(64d * getHeight() / mainRect.h));
     }
 
     if(quick) {

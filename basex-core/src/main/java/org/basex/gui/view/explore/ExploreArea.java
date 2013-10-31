@@ -15,6 +15,8 @@ import org.basex.index.stats.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
+import javax.swing.text.JTextComponent;
+
 /**
  * This view provides standard GUI components to browse the currently opened database.
  *
@@ -233,7 +235,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       String val1 = null;
       String val2 = null;
       if(comp instanceof BaseXTextField) {
-        val1 = ((BaseXTextField) comp).getText();
+        val1 = ((JTextComponent) comp).getText();
         if(!val1.isEmpty()) {
           if(val1.startsWith("\"")) {
             val1 = val1.replaceAll("\"", "");
@@ -279,7 +281,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     String simple = all.getText().trim();
     if(!simple.isEmpty()) {
       simple = Find.find(simple, gui.context, rt);
-      qu = !qu.isEmpty() ? simple + " | " + qu : simple;
+      qu = qu.isEmpty() ? simple : simple + " | " + qu;
     }
 
     if(qu.isEmpty()) qu = rt || root ? "/" : ".";

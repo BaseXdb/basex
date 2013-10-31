@@ -46,7 +46,7 @@ public final class CreateUser extends AUser {
    * @param ctx database context
    * @throws BaseXException database exception
    */
-  public static void create(final String user, final String pass, final Context ctx)
+  private static void create(final String user, final String pass, final Context ctx)
       throws BaseXException {
 
     if(!Databases.validName(user)) throw new BaseXException(NAME_INVALID_X, user);

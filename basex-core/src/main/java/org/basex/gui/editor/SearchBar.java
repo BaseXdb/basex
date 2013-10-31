@@ -29,13 +29,13 @@ public final class SearchBar extends BaseXBack {
   };
 
   /** GUI reference. */
-  final GUI gui;
+  private final GUI gui;
   /** Action: close panel. */
-  final BaseXButton cls;
+  private final BaseXButton cls;
   /** Search text. */
-  final BaseXTextField search;
+  private final BaseXTextField search;
   /** Replace text. */
-  final BaseXTextField replace;
+  private final BaseXTextField replace;
   /** Mode: regular expression. */
   final BaseXButton regex;
   /** Mode: match case. */
@@ -45,12 +45,12 @@ public final class SearchBar extends BaseXBack {
   /** Mode: multi-line. */
   final BaseXButton multi;
   /** Action: replace text. */
-  final BaseXButton rplc;
+  private final BaseXButton rplc;
 
   /** Search button. */
-  BaseXButton button;
+  private BaseXButton button;
   /** Current editor reference. */
-  Editor editor;
+  private Editor editor;
 
   /**
    * Constructor.
@@ -300,7 +300,7 @@ public final class SearchBar extends BaseXBack {
    * @param in input
    * @return decoded string
    */
-  static String decode(final String in) {
+  private static String decode(final String in) {
     final StringBuilder sb = new StringBuilder();
     boolean bs = false;
     for(int i = 0; i < in.length(); i++) {

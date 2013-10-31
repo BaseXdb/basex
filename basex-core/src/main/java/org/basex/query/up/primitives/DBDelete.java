@@ -2,7 +2,6 @@ package org.basex.query.up.primitives;
 
 import org.basex.core.cmd.*;
 import org.basex.data.*;
-import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -48,5 +47,5 @@ public final class DBDelete extends BasicOperation {
   }
 
   @Override
-  public void prepare(final MemData tmp) throws QueryException { }
+  public void prepare(final MemData tmp) { }
 }

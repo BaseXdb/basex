@@ -273,7 +273,7 @@ public final class Context {
     // replace empty string with currently opened database and return array
     for(int d = 0; d < sl.size(); d++) {
       if(Token.eq(sl.get(d), DBLocking.CTX, DBLocking.COLL)) {
-        if(null == data) sl.deleteAt(d);
+        if(data == null) sl.deleteAt(d);
         else sl.set(d, data.meta.name);
       }
     }

@@ -179,7 +179,7 @@ public final class JsonParserTest {
   private void error(final String json, final JsonSpec spec) {
     try {
       parse(json, spec);
-      fail("Should have failed: '" + json + "'");
+      fail("Should have failed: '" + json + '\'');
     } catch(final QueryIOException qe) {
       // expected error
     }

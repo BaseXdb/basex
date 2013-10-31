@@ -20,11 +20,11 @@ import org.junit.*;
  */
 public final class SemaphoreTest extends SandboxTest {
   /** Create random number. */
-  static final Random RANDOM = new Random();
+  private static final Random RANDOM = new Random();
   /** Test file. */
   private static final String FILE = "src/test/resources/factbook.zip";
   /** Test queries. */
-  static final String [] QUERIES = {
+  private static final String [] QUERIES = {
     "xquery for $n in (db:open('" + NAME + "')//province)[position() < 100] " +
     "       return insert node <test/> into $n",
     "xquery for $n in 1 to 100000 where $n = 0 return $n"
@@ -90,7 +90,7 @@ public final class SemaphoreTest extends SandboxTest {
     /**
      * Default constructor.
      */
-    public Client() {
+    Client() {
       try {
         session = createClient();
       } catch(final IOException ex) {

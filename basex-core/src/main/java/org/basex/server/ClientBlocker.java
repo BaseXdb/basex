@@ -19,7 +19,7 @@ public final class ClientBlocker {
    */
   public synchronized int delay(final byte[] client) {
     int delay = blocked.get(client);
-    delay = delay == -1 ? 1 : Math.min(delay, 1024) * 2;
+    delay = delay == -1 ? 1 : Math.min(delay, 1024) << 1;
     blocked.put(client, delay);
     return delay;
   }

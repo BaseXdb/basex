@@ -264,7 +264,7 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public void compile(final QueryContext ctx) throws QueryException {
+  public void compile(final QueryContext ctx) {
     // nothing to do here
   }
 
@@ -274,7 +274,7 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Object toJava() throws QueryException {
+  public Object toJava() {
     throw Util.notexpected();
   }
 

@@ -50,7 +50,7 @@ public final class InputInfo {
    * @param pos query position
    * @return two element array of line and column number
    */
-  public static int[] lineCol(final String query, final int pos) {
+  private static int[] lineCol(final String query, final int pos) {
     int l = 1, c = 1;
     for(int i = 0, ch; i < pos; i += Character.charCount(ch)) {
       ch = query.codePointAt(i);

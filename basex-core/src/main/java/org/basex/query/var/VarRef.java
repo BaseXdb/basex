@@ -34,7 +34,7 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr compile(final QueryContext ctx, final VarScope scp) {
     // constant propagation
     final Value v = ctx.get(var);
     return v != null ? v : optimize(ctx, scp);
@@ -53,12 +53,12 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Iter iter(final QueryContext ctx) {
     return ctx.get(var).iter();
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
+  public Value value(final QueryContext ctx) {
     return ctx.get(var);
   }
 
@@ -74,9 +74,9 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+      final Var v, final Expr e) {
     // [LW] Is copying always necessary?
-    return !v.is(var) ? null : e.isValue() ? e : e.copy(ctx, scp);
+    return v.is(var) ? e.isValue() ? e : e.copy(ctx, scp) : null;
   }
 
   @Override
@@ -109,7 +109,7 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public void checkUp() throws QueryException {
+  public void checkUp() {
   }
 
   @Override

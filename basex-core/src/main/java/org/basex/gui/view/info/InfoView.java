@@ -24,7 +24,7 @@ import org.basex.util.list.*;
  */
 public final class InfoView extends View implements LinkListener {
   /** Searchable editor. */
-  final SearchEditor editor;
+  private final SearchEditor editor;
 
   /** Current text. */
   private final TokenBuilder text = new TokenBuilder();
@@ -34,8 +34,6 @@ public final class InfoView extends View implements LinkListener {
   private final BaseXLabel timer;
   /** Text Area. */
   private final Editor area;
-  /** Buttons. */
-  final BaseXBack buttons;
 
   /** Query statistics. */
   private IntList stat = new IntList(4);
@@ -72,7 +70,7 @@ public final class InfoView extends View implements LinkListener {
 
     final BaseXButton srch = new BaseXButton(gui, "search",
         BaseXLayout.addShortcut(SEARCH, BaseXKeys.FIND.toString()));
-    buttons = new BaseXBack(Fill.NONE);
+    final BaseXBack buttons = new BaseXBack(Fill.NONE);
     buttons.layout(new TableLayout(1, 3, 8, 0)).border(0, 0, 4, 0);
     buttons.add(srch);
     buttons.add(timer);

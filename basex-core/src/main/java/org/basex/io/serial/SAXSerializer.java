@@ -123,13 +123,13 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
   @Override
   public void setFeature(final String name, final boolean value)
-      throws SAXNotRecognizedException, SAXNotSupportedException {
+      throws SAXNotRecognizedException {
     throw new SAXNotRecognizedException();
   }
 
   @Override
   public void setProperty(final String name, final Object value)
-      throws SAXNotRecognizedException, SAXNotSupportedException {
+      throws SAXNotRecognizedException {
     throw new SAXNotRecognizedException();
   }
 
@@ -141,13 +141,13 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   private NSDecl namespaces;
 
   @Override
-  protected void startOpen(final byte[] n) throws IOException {
+  protected void startOpen(final byte[] n) {
     namespaces = new NSDecl(namespaces);
     attributes.clear();
   }
 
   @Override
-  protected void attribute(final byte[] n, final byte[] v) throws IOException {
+  protected void attribute(final byte[] n, final byte[] v) {
     byte[] prefix = null;
     if(startsWith(n, XMLNS)) {
       if(n.length == 5) {
@@ -239,7 +239,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  protected void atomic(final Item i) throws IOException {
+  protected void atomic(final Item i) {
     // ignored
   }
 

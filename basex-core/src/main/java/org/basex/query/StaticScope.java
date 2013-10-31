@@ -41,8 +41,8 @@ public abstract class StaticScope extends ExprInfo implements Scope {
    * @param xqdoc documentation (may be {@code null} or empty)
    * @param sctx static context
    */
-  public StaticScope(final VarScope scp, final String xqdoc, final StaticContext sctx,
-      final InputInfo ii) {
+  StaticScope(final VarScope scp, final String xqdoc, final StaticContext sctx,
+              final InputInfo ii) {
     sc = sctx;
     scope = scp;
     info = ii;
@@ -93,8 +93,8 @@ public abstract class StaticScope extends ExprInfo implements Scope {
    * @param val value
    * @param map map
    */
-  private void add(final byte[] key, final TokenBuilder val,
-      final TokenObjMap<TokenList> map) {
+  private static void add(final byte[] key, final TokenBuilder val,
+                          final TokenObjMap<TokenList> map) {
 
     final byte[] k = key == null ? DOC_TAGS[0] : key;
     TokenList tl = map.get(k);

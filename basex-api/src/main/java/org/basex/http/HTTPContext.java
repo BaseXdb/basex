@@ -182,7 +182,8 @@ public final class HTTPContext {
    */
   public String dbpath() {
     final TokenBuilder tb = new TokenBuilder();
-    for(int p = 1; p < segments.length; p++) {
+    final int ps = segments.length;
+    for(int p = 1; p < ps; p++) {
       if(!tb.isEmpty()) tb.add('/');
       tb.add(segments[p]);
     }
@@ -205,7 +206,8 @@ public final class HTTPContext {
    */
   public String[] produces() {
     final String[] acc = req.getHeader("Accept").split("\\s*,\\s*");
-    for(int a = 0; a < acc.length; a++) {
+    final int as = acc.length;
+    for(int a = 0; a < as; a++) {
       if(acc[a].indexOf(';') != -1) acc[a] = acc[a].replaceAll("\\w*;.*", "");
     }
     return acc;
@@ -224,7 +226,7 @@ public final class HTTPContext {
       res.resetBuffer();
       if(code == SC_UNAUTHORIZED) res.setHeader(WWW_AUTHENTICATE, BASIC);
 
-      if(error && code >= 400) {
+      if(error && code >= SC_BAD_REQUEST) {
         res.sendError(code, message);
       } else {
         res.setStatus(code);
@@ -257,7 +259,7 @@ public final class HTTPContext {
         throw new LoginException(NOPASSWD);
       final Context ctx = new Context(context(), null);
       ctx.user = ctx.users.get(user);
-      if(ctx.user == null || !ctx.user.password.equals(Token.md5(pass))) throw new LoginException();
+      if(ctx.user == null || !ctx.user.password.equals(md5(pass))) throw new LoginException();
 
       context.blocker.remove(address);
       return ctx;
@@ -329,7 +331,7 @@ public final class HTTPContext {
         k = Prop.DBPREFIX + GlobalOptions.RESTXQPATH.name();
       } else if(key.equals(Prop.DBPREFIX + "mode")) {
         k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.name();
-        v = Boolean.toString(v.equals("local"));
+        v = Boolean.toString("local".equals(v));
       } else if(key.equals(Prop.DBPREFIX + "server")) {
         k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.name();
         v = Boolean.toString(!Boolean.parseBoolean(v));

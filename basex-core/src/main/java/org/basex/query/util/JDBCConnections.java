@@ -54,7 +54,7 @@ public final class JDBCConnections {
       if(obj == null) continue;
       try {
         if(obj instanceof Connection) ((Connection) obj).close();
-        else ((PreparedStatement) obj).close();
+        else ((Statement) obj).close();
       } catch(final SQLException ex) {
         Util.debug(ex);
       }

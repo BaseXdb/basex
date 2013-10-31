@@ -804,7 +804,7 @@ public interface Text {
   String LOCAL_OPTIONS = lang("local_options");
 
   /** "(chopped)". */
-  String CHOPPED = "(" + lang("chopped") + ") ";
+  String CHOPPED = '(' + lang("chopped") + ") ";
   /** "(% entries)". */
   String ENTRIES = '(' + lang("entries_%") + ')';
   /** "Error". */

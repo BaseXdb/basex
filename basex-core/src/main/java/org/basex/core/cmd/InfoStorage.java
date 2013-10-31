@@ -131,9 +131,9 @@ public final class InfoStorage extends AQuery {
 
     final byte[] cont;
     if(k == Data.ELEM) {
-      cont = data.name(p, k);
+      cont = data.name(p, Data.ELEM);
     } else if(k == Data.ATTR) {
-      cont = new TokenBuilder(data.name(p, k)).add(ATT1).add(
+      cont = new TokenBuilder(data.name(p, Data.ATTR)).add(ATT1).add(
           data.text(p, false)).add(ATT2).finish();
     } else {
       cont = data.text(p, true);

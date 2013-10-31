@@ -32,7 +32,7 @@ public abstract class FTContains extends ParseExpr {
    * @param fte full-text expression
    * @param ii input info
    */
-  public FTContains(final Expr e, final FTExpr fte, final InputInfo ii) {
+  protected FTContains(final Expr e, final FTExpr fte, final InputInfo ii) {
     super(ii);
     expr = e;
     ftexpr = fte;

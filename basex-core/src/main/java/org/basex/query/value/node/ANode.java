@@ -165,16 +165,15 @@ public abstract class ANode extends Item {
   /**
    * Recursively finds the uri for the specified prefix.
    * @param pref prefix
-   * @param ctx query context
    * @return uri
    */
-  public final byte[] uri(final byte[] pref, final QueryContext ctx) {
+  public final byte[] uri(final byte[] pref) {
     final Atts at = namespaces();
     if(at != null) {
       final byte[] s = at.value(pref);
       if(s != null) return s;
       final ANode n = parent();
-      if(n != null) return n.uri(pref, ctx);
+      if(n != null) return n.uri(pref);
     }
     return pref.length == 0 ? Token.EMPTY : null;
   }
@@ -209,7 +208,7 @@ public abstract class ANode extends Item {
    * @return {@code 0} if the nodes are identical, or {@code 1}/{@code -1}
    * if the first node appears after/before the second
    */
-  protected static int diff(final ANode node1, final ANode node2) {
+  static int diff(final ANode node1, final ANode node2) {
     // cache parents of first node
     final ANodeList nl = new ANodeList();
     for(ANode n = node1; n != null; n = n.parent()) {
@@ -258,7 +257,7 @@ public abstract class ANode extends Item {
    * @param p parent node
    * @return self reference
    */
-  public abstract ANode parent(final ANode p);
+  protected abstract ANode parent(final ANode p);
 
   /**
    * Returns true if the node has children.

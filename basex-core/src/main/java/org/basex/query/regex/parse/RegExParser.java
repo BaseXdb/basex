@@ -109,7 +109,7 @@ public class RegExParser implements RegExParserConstants {
     nd = branch();
         brs = new RegExp[] { nd };
     label_1:
-    while (true) {
+    while(true) {
       switch (jj_ntk==-1?jj_ntk():jj_ntk) {
       case OR:
         ;
@@ -140,7 +140,7 @@ public class RegExParser implements RegExParserConstants {
     RegExp[] pieces = new RegExp[0];
     Quantifier qu = null;
     label_2:
-    while (true) {
+    while(true) {
       switch (jj_ntk==-1?jj_ntk():jj_ntk) {
       case NPAR_OPEN:
       case PAR_OPEN:
@@ -351,8 +351,8 @@ public class RegExParser implements RegExParserConstants {
     tok = jj_consume_token(BACK_REF);
       backref = token.image.charAt(1) - '0';
     label_3:
-    while (true) {
-      if (jj_2_1(1) && 10 * backref + token.next.image.charAt(0) - '0' <= groups) {
+    while(true) {
+      if(jj_2_1(1) && 10 * backref + token.next.image.charAt(0) - '0' <= groups) {
         ;
       } else {
         break label_3;
@@ -448,7 +448,7 @@ public class RegExParser implements RegExParserConstants {
       break;
     default:
       jj_la1[11] = jj_gen;
-      if (jj_2_2(1)) {
+      if(jj_2_2(1)) {
         group = posCharGroup();
       } else {
         jj_consume_token(-1);
@@ -478,8 +478,8 @@ public class RegExParser implements RegExParserConstants {
     final ArrayList<RegExp> cg = new ArrayList<RegExp>();
     RegExp sub = null;
     label_4:
-    while (true) {
-      if (jj_2_3(3)) {
+    while(true) {
+      if(jj_2_3(3)) {
         sub = charRange();
                                        cg.add(sub);
       } else {
@@ -510,7 +510,7 @@ public class RegExParser implements RegExParserConstants {
           throw new ParseException();
         }
       }
-      if (jj_2_4(1)) {
+      if(jj_2_4(1)) {
         ;
       } else {
         break label_4;
@@ -527,7 +527,7 @@ public class RegExParser implements RegExParserConstants {
    */
   final public RegExp charRange() throws ParseException {
     int a = -1, b = -1;
-    if (getToken(2).kind == CHAR && "-".equals(getToken(2).image)) {
+    if(getToken(2).kind == CHAR && "-".equals(getToken(2).image)) {
       a = charOrEsc();
       jj_consume_token(CHAR);
       b = charOrEsc();
@@ -630,44 +630,44 @@ public class RegExParser implements RegExParserConstants {
     jj_lookingAhead = true;
     jj_semLA = getToken(2).kind == CHAR && "-".equals(getToken(2).image);
     jj_lookingAhead = false;
-    if (!jj_semLA || jj_3R_8()) {
+    if(!jj_semLA || jj_3R_8()) {
     jj_scanpos = xsp;
-    if (jj_3R_9()) return true;
+    if(jj_3R_9()) return true;
     }
     return false;
   }
 
   private boolean jj_3R_13() {
-    if (jj_scan_token(SINGLE_ESC)) return true;
+    if(jj_scan_token(SINGLE_ESC)) return true;
     return false;
   }
 
   private boolean jj_3R_12() {
-    if (jj_3R_11()) return true;
+    if(jj_3R_11()) return true;
     return false;
   }
 
   private boolean jj_3R_10() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_12()) {
+    if(jj_3R_12()) {
     jj_scanpos = xsp;
-    if (jj_3R_13()) return true;
+    if(jj_3R_13()) return true;
     }
     return false;
   }
 
   private boolean jj_3_2() {
-    if (jj_3R_5()) return true;
+    if(jj_3R_5()) return true;
     return false;
   }
 
   private boolean jj_3R_11() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_scan_token(12)) {
+    if(jj_scan_token(12)) {
     jj_scanpos = xsp;
-    if (jj_scan_token(13)) return true;
+    if(jj_scan_token(13)) return true;
     }
     return false;
   }
@@ -675,55 +675,55 @@ public class RegExParser implements RegExParserConstants {
   private boolean jj_3R_7() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_scan_token(18)) {
+    if(jj_scan_token(18)) {
     jj_scanpos = xsp;
-    if (jj_scan_token(19)) {
+    if(jj_scan_token(19)) {
     jj_scanpos = xsp;
-    if (jj_scan_token(20)) return true;
+    if(jj_scan_token(20)) return true;
     }
     }
     return false;
   }
 
   private boolean jj_3_3() {
-    if (jj_3R_6()) return true;
+    if(jj_3R_6()) return true;
     return false;
   }
 
   private boolean jj_3_4() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_3()) {
+    if(jj_3_3()) {
     jj_scanpos = xsp;
-    if (jj_3R_7()) return true;
+    if(jj_3R_7()) return true;
     }
     return false;
   }
 
   private boolean jj_3R_9() {
-    if (jj_3R_11()) return true;
+    if(jj_3R_11()) return true;
     return false;
   }
 
   private boolean jj_3R_5() {
     Token xsp;
-    if (jj_3_4()) return true;
-    while (true) {
+    if(jj_3_4()) return true;
+    while(true) {
       xsp = jj_scanpos;
-      if (jj_3_4()) { jj_scanpos = xsp; break; }
+      if(jj_3_4()) { jj_scanpos = xsp; break; }
     }
     return false;
   }
 
   private boolean jj_3R_8() {
-    if (jj_3R_10()) return true;
-    if (jj_scan_token(CHAR)) return true;
-    if (jj_3R_10()) return true;
+    if(jj_3R_10()) return true;
+    if(jj_scan_token(CHAR)) return true;
+    if(jj_3R_10()) return true;
     return false;
   }
 
   private boolean jj_3_1() {
-    if (jj_scan_token(DIGIT)) return true;
+    if(jj_scan_token(DIGIT)) return true;
     return false;
   }
 
@@ -759,8 +759,8 @@ public class RegExParser implements RegExParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
-    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+    for(int i = 0; i < 18; i++) jj_la1[i] = -1;
+    for(int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   /** Reinitialise. */
@@ -769,23 +769,23 @@ public class RegExParser implements RegExParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
-    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+    for(int i = 0; i < 18; i++) jj_la1[i] = -1;
+    for(int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   private Token jj_consume_token(final int kind) throws ParseException {
     Token oldToken;
-    if ((oldToken = token).next != null) token = token.next;
+    if((oldToken = token).next != null) token = token.next;
     else token = token.next = token_source.getNextToken();
     jj_ntk = -1;
-    if (token.kind == kind) {
+    if(token.kind == kind) {
       jj_gen++;
-      if (++jj_gc > 100) {
+      if(++jj_gc > 100) {
         jj_gc = 0;
         for(final JJCalls jj_2_rtn : jj_2_rtns) {
           JJCalls c = jj_2_rtn;
-          while (c != null) {
-            if (c.gen < jj_gen) c.first = null;
+          while(c != null) {
+            if(c.gen < jj_gen) c.first = null;
             c = c.next;
           }
         }
@@ -800,9 +800,9 @@ public class RegExParser implements RegExParserConstants {
   static private final class LookaheadSuccess extends java.lang.Error { }
   static final private LookaheadSuccess jj_ls = new LookaheadSuccess();
   private boolean jj_scan_token(final int kind) {
-    if (jj_scanpos == jj_lastpos) {
+    if(jj_scanpos == jj_lastpos) {
       jj_la--;
-      if (jj_scanpos.next == null) {
+      if(jj_scanpos.next == null) {
         jj_lastpos = jj_scanpos = jj_scanpos.next = token_source.getNextToken();
       } else {
         jj_lastpos = jj_scanpos = jj_scanpos.next;
@@ -810,20 +810,20 @@ public class RegExParser implements RegExParserConstants {
     } else {
       jj_scanpos = jj_scanpos.next;
     }
-    if (jj_rescan) {
+    if(jj_rescan) {
       int i = 0; Token tok = token;
-      while (tok != null && tok != jj_scanpos) { i++; tok = tok.next; }
-      if (tok != null) jj_add_error_token(kind, i);
+      while(tok != null && tok != jj_scanpos) { i++; tok = tok.next; }
+      if(tok != null) jj_add_error_token(kind, i);
     }
-    if (jj_scanpos.kind != kind) return true;
-    if (jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;
+    if(jj_scanpos.kind != kind) return true;
+    if(jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;
     return false;
   }
 
 
 /** Get the next Token. */
   final public Token getNextToken() {
-    if (token.next != null) token = token.next;
+    if(token.next != null) token = token.next;
     else token = token.next = token_source.getNextToken();
     jj_ntk = -1;
     jj_gen++;
@@ -833,15 +833,15 @@ public class RegExParser implements RegExParserConstants {
 /** Get the specific Token. */
   final public Token getToken(final int index) {
     Token t = jj_lookingAhead ? jj_scanpos : token;
-    for (int i = 0; i < index; i++) {
-      if (t.next != null) t = t.next;
+    for(int i = 0; i < index; i++) {
+      if(t.next != null) t = t.next;
       else t = t.next = token_source.getNextToken();
     }
     return t;
   }
 
   private int jj_ntk() {
-    if ((jj_nt=token.next) == null)
+    if((jj_nt=token.next) == null)
       return jj_ntk = (token.next=token_source.getNextToken()).kind;
     else
       return jj_ntk = jj_nt.kind;
@@ -854,19 +854,19 @@ public class RegExParser implements RegExParserConstants {
   private int jj_endpos;
 
   private void jj_add_error_token(final int kind, final int pos) {
-    if (pos >= 100) return;
-    if (pos == jj_endpos + 1) {
+    if(pos >= 100) return;
+    if(pos == jj_endpos + 1) {
       jj_lasttokens[jj_endpos++] = kind;
-    } else if (jj_endpos != 0) {
+    } else if(jj_endpos != 0) {
       jj_expentry = new int[jj_endpos];
-      for (int i = 0; i < jj_endpos; i++) {
+      for(int i = 0; i < jj_endpos; i++) {
         jj_expentry[i] = jj_lasttokens[i];
       }
       jj_entries_loop: for(final Object name : jj_expentries) {
         final int[] oldentry = (int[])name;
-        if (oldentry.length == jj_expentry.length) {
-          for (int i = 0; i < jj_expentry.length; i++) {
-            if (oldentry[i] != jj_expentry[i]) {
+        if(oldentry.length == jj_expentry.length) {
+          for(int i = 0; i < jj_expentry.length; i++) {
+            if(oldentry[i] != jj_expentry[i]) {
               continue jj_entries_loop;
             }
           }
@@ -874,7 +874,7 @@ public class RegExParser implements RegExParserConstants {
           break jj_entries_loop;
         }
       }
-      if (pos != 0) jj_lasttokens[(jj_endpos = pos) - 1] = kind;
+      if(pos != 0) jj_lasttokens[(jj_endpos = pos) - 1] = kind;
     }
   }
 
@@ -882,21 +882,21 @@ public class RegExParser implements RegExParserConstants {
   public ParseException generateParseException() {
     jj_expentries.clear();
     final boolean[] la1tokens = new boolean[25];
-    if (jj_kind >= 0) {
+    if(jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 18; i++) {
-      if (jj_la1[i] == jj_gen) {
-        for (int j = 0; j < 32; j++) {
-          if ((jj_la1_0[i] & 1<<j) != 0) {
+    for(int i = 0; i < 18; i++) {
+      if(jj_la1[i] == jj_gen) {
+        for(int j = 0; j < 32; j++) {
+          if((jj_la1_0[i] & 1<<j) != 0) {
             la1tokens[j] = true;
           }
         }
       }
     }
-    for (int i = 0; i < 25; i++) {
-      if (la1tokens[i]) {
+    for(int i = 0; i < 25; i++) {
+      if(la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
         jj_expentries.add(jj_expentry);
@@ -906,7 +906,7 @@ public class RegExParser implements RegExParserConstants {
     jj_rescan_token();
     jj_add_error_token(0, 0);
     final int[][] exptokseq = new int[jj_expentries.size()][];
-    for (int i = 0; i < jj_expentries.size(); i++) {
+    for(int i = 0; i < jj_expentries.size(); i++) {
       exptokseq[i] = jj_expentries.get(i);
     }
     return new ParseException(token, exptokseq, tokenImage);
@@ -922,11 +922,11 @@ public class RegExParser implements RegExParserConstants {
 
   private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 4; i++) {
+    for(int i = 0; i < 4; i++) {
     try {
       JJCalls p = jj_2_rtns[i];
       do {
-        if (p.gen > jj_gen) {
+        if(p.gen > jj_gen) {
           jj_la = p.arg; jj_lastpos = jj_scanpos = p.first;
           switch (i) {
             case 0: jj_3_1(); break;
@@ -936,7 +936,7 @@ public class RegExParser implements RegExParserConstants {
           }
         }
         p = p.next;
-      } while (p != null);
+      } while(p != null);
       } catch(final LookaheadSuccess ls) { }
     }
     jj_rescan = false;
@@ -944,8 +944,8 @@ public class RegExParser implements RegExParserConstants {
 
   private void jj_save(final int index, final int xla) {
     JJCalls p = jj_2_rtns[index];
-    while (p.gen > jj_gen) {
-      if (p.next == null) { p = p.next = new JJCalls(); break; }
+    while(p.gen > jj_gen) {
+      if(p.next == null) { p = p.next = new JJCalls(); break; }
       p = p.next;
     }
     p.gen = jj_gen + xla - jj_la; p.first = token; p.arg = xla;

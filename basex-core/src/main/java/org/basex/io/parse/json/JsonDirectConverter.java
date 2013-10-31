@@ -20,7 +20,7 @@ import org.basex.util.*;
  * <li>Names (keys) of objects are represented as elements:
  * <ol>
  *   <li>Empty names are represented by a single underscore
- *       (<code>&lt;_&gt;...&lt;/_&gt;</code>).</li>
+ *       ({@code &lt;_&gt;...&lt;/_&gt;}).</li>
  *   <li>Underscore characters are rewritten to two underscores ({@code __}).
  *   </li>
  *   <li>A character that cannot be represented as NCName character is
@@ -80,39 +80,39 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   }
 
   @Override
-  public void openObject() {
+  void openObject() {
     elem = addElem(OBJECT);
   }
 
   @Override
-  public void openPair(final byte[] key) {
+  void openPair(final byte[] key) {
     name = XMLToken.encode(key, lax);
   }
 
   @Override
-  public void closePair() { }
+  void closePair() { }
 
   @Override
-  public void closeObject() {
+  void closeObject() {
     final FElem par = (FElem) elem.parent();
     if(par != null) elem = par;
   }
 
   @Override
-  public void openArray() {
+  void openArray() {
     elem = addElem(ARRAY);
   }
 
   @Override
-  public void openItem() {
+  void openItem() {
     name = VALUE;
   }
 
   @Override
-  public void closeItem() { }
+  void closeItem() { }
 
   @Override
-  public void closeArray() {
+  void closeArray() {
     closeObject();
   }
 

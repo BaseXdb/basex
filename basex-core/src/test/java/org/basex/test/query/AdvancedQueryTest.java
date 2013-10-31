@@ -64,9 +64,9 @@ public abstract class AdvancedQueryTest extends SandboxTest {
   protected static String transform(final String input, final String modification,
       final String ret) {
     return
-      "copy $input := " + input + " " +
+      "copy $input := " + input + ' ' +
       "modify (" + modification + ") " +
-      "return (" + (ret.length() == 0 ? "$input" : ret) + ")";
+      "return (" + (ret.isEmpty() ? "$input" : ret) + ')';
   }
 
   /**
@@ -109,14 +109,14 @@ public abstract class AdvancedQueryTest extends SandboxTest {
       final String res = ao.toString().replaceAll("(\\r|\\n)+ *", "");
       final StringBuilder sb = new StringBuilder("Query did not fail:\n");
       sb.append(query).append("\n[E]");
-      for(final Err e : error) sb.append(" ").append(e);
+      for(final Err e : error) sb.append(' ').append(e);
       fail(sb.append("\n[F] ").append(res).toString());
     } catch(final QueryIOException ex) {
       check(query, ex.getCause(), error);
     } catch(final QueryException ex) {
       check(query, ex, error);
     } catch(final Exception ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
       fail("Unexpected exception: " + ex);
     } finally {
       qp.close();
@@ -142,11 +142,11 @@ public abstract class AdvancedQueryTest extends SandboxTest {
       tb.add("Error(s): ");
       if(err != null) {
         int c = 0;
-        for(final Err er : error) tb.add(c++ != 0 ? "/" : "").add(er.name());
+        for(final Err er : error) tb.add(c++ == 0 ? "" : "/").add(er.name());
         fail(tb.add("\nResult: ").add(err.name() + " (" + err.qname() + ')').toString());
       } else {
         int c = 0;
-        for(final Err er : error) tb.add(c++ != 0 ? "/" : "").add(er.qname().local());
+        for(final Err er : error) tb.add(c++ == 0 ? "" : "/").add(er.qname().local());
         fail(tb.add("\nResult: ").add(ex.qname().string()).toString());
       }
     }

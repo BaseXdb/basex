@@ -16,7 +16,7 @@ import org.basex.util.*;
  */
 public final class CommandParser extends InputParser {
   /** Context. */
-  public final CmdParser parser;
+  private final CmdParser parser;
 
   /**
    * Constructor.

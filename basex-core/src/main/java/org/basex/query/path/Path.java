@@ -58,18 +58,17 @@ public abstract class Path extends ParseExpr {
     for(int p = 0; p < path.length; p++) {
       Expr e = path[p];
       if(e instanceof Context) {
-        e = Step.get(((Context) e).info, Axis.SELF, Test.NOD);
+        e = Step.get(((ParseExpr) e).info, SELF, Test.NOD);
       } else if(e instanceof Filter) {
         final Filter f = (Filter) e;
         if(f.root instanceof Context) {
-          e = Step.get(f.info, Axis.SELF, Test.NOD, f.preds);
+          e = Step.get(f.info, SELF, Test.NOD, f.preds);
         }
       }
       axes &= e instanceof Step;
       path[p] = e;
     }
-    return axes ? new CachedPath(ii, r, path).finish(null) :
-      new MixedPath(ii, r, path);
+    return axes ? new CachedPath(ii, r, path).finish(null) : new MixedPath(ii, r, path);
   }
 
   @Override
@@ -127,7 +126,7 @@ public abstract class Path extends ParseExpr {
     // no root reference, no context: return null
     if(!(root instanceof Root) || v == null) return null;
     // return context sequence or root of current context
-    return v.size() != 1 ? v : Root.root(v);
+    return v.size() == 1 ? Root.root(v) : v;
   }
 
   /**
@@ -251,10 +250,10 @@ public abstract class Path extends ParseExpr {
           }
         }
       } else {
-        boolean warning = true;
         final Step ls = axisStep(l - 1);
         if(ls == null) continue;
         final Axis lsa = ls.axis;
+        boolean warning = true;
         if(sa == SELF || sa == DESCORSELF) {
           // .../self:: / .../descendant-or-self::
           if(s.test == Test.NOD) continue;
@@ -333,7 +332,7 @@ public abstract class Path extends ParseExpr {
       final Expr[] stps = new Expr[ts + steps.length - s - 1];
       for(int t = 0; t < ts; ++t) {
         final Expr[] preds = t == ts - 1 ?
-            ((Step) steps[s]).preds : new Expr[0];
+            ((Preds) steps[s]).preds : new Expr[0];
         final QNm nm = qnm.get(ts - t - 1);
         final NameTest nt = nm == null ? new NameTest(false) :
           new NameTest(nm, Mode.LN, false, null);

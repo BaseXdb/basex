@@ -29,7 +29,7 @@ public final class Let extends GFLWOR.Clause {
   /** Bound expression. */
   public Expr expr;
   /** Score flag. */
-  final boolean score;
+  private final boolean score;
 
   /**
    * Constructor.
@@ -84,7 +84,7 @@ public final class Let extends GFLWOR.Clause {
    * @return score
    * @throws QueryException evaluation exception
    */
-  static Dbl score(final Iter iter) throws QueryException {
+  private static Dbl score(final Iter iter) throws QueryException {
     double sum = 0;
     int sz = 0;
     for(Item it; (it = iter.next()) != null; sum += it.score(), sz++);
@@ -122,7 +122,7 @@ public final class Let extends GFLWOR.Clause {
     if(!score && expr instanceof TypeCheck) {
       final TypeCheck tc = (TypeCheck) expr;
       if(tc.isRedundant(var) || var.adoptCheck(tc.type, tc.promote)) {
-        ctx.compInfo(QueryText.OPTCAST, tc.type);
+        ctx.compInfo(OPTCAST, tc.type);
         expr = tc.expr;
       }
     }
@@ -144,7 +144,7 @@ public final class Let extends GFLWOR.Clause {
    */
   void bindConst(final QueryContext ctx) throws QueryException {
     if(expr.isValue()) {
-      ctx.compInfo(QueryText.OPTBIND, var);
+      ctx.compInfo(OPTBIND, var);
       ctx.set(var, score ? score(expr.iter(ctx)) : (Value) expr, info);
     }
   }

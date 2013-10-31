@@ -10,7 +10,7 @@ public class CharGroup extends RegExp {
   /** Negation flag, set after construction. */
   public boolean negative;
   /** Sub-ranges. */
-  public final RegExp[] subs;
+  private final RegExp[] subs;
   /**
    * Constructor.
    * @param sub sub-ranges

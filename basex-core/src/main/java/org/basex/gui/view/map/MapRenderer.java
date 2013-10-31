@@ -143,22 +143,10 @@ final class MapRenderer {
    * @param fs font size
    */
   static void drawThumbnails(final Graphics g, final MapRect r, final byte[] s, final int fs) {
-    // thumbnail width
-    final double ffmax = 0.25;
-    final double ffmin = 0.14;
-    // thumbnail height
-    final double ffhmax = 0.5;
-    final double ffhmin = 0.28;
-    // empty line height
-    final double flhmax = 0.3;
-    final double flhmin = 0.168;
-
+    // thumbnail width and height, empty line height
+    final double ffmax = 0.25, ffhmax = 0.5, flhmax = 0.3;
     double ff = ffmax, ffh = ffhmax, flh = flhmax;
-    double fftmin = ffmin, fftmax = ffmax, ffhtmin = ffhmin,
-           ffhtmax = ffhmax, flhtmin = flhmin, flhtmax = flhmax;
-    double bff = ffmax, bffh = ffhmax, bflh = flhmax;
-    byte lhmi = (byte) Math.max(3, ffh * fs);
-    byte fhmi = (byte) Math.max(6, (flh + ffh) * fs);
+    byte lhmi = (byte) Math.max(3, ffh * fs), fhmi = (byte) Math.max(6, (flh + ffh) * fs);
 
     int h = r.h;
     r.thumbf = ff * fs;
@@ -166,6 +154,9 @@ final class MapRenderer {
 
     final int[][] data = new FTLexer().init(s).info();
     boolean l = false;
+    final double flhmin = 0.168, ffhmin = 0.28, ffmin = 0.14;
+    double flhtmin = flhmin, ffhtmax = ffhmax, ffhtmin = ffhmin, fftmax = ffmax, fftmin = ffmin;
+    double bflh = flhmax, bffh = ffhmax, bff = ffmax, flhtmax = flhmax;
     while(r.thumbal < 2) {
       // find parameter setting for the available space
       ff = round(fftmax, fftmin);
@@ -287,26 +278,26 @@ final class MapRenderer {
     final int xx = r.x;
     final int ww = r.w;
     int yy = r.y + 3;
-    int wl, ll = 0; // word and line length
 
     final Color textc = color(r.level + 4);
     g.setColor(textc);
-    int lastl, count = -1;
-    int ct, pp = 0, sl = 0, pl = 0;
+    int count = -1;
+    int pp = 0, sl = 0, pl = 0;
     int psl = 0, ppl = 0;
     double error = 0;
 
     int i = 0;
+    int ll = 0;
     while(i < data[0].length) {
-      wl = 0;
-      ct = 0;
       g.setColor(textc);
 
+      int ct = 0;
+      int wl = 0;  // word and line length
       while(i < data[0].length && ppl < data[2].length && data[2][ppl] > pl &&
         (psl < data[1].length && data[1][psl] > sl || psl >= data[1].length)) {
         sl += data[0][i];
         pl += data[0][i];
-        lastl = (int) (data[0][i] * r.thumbf);
+        final int lastl = (int) (data[0][i] * r.thumbf);
         error += data[0][i] * r.thumbf - lastl;
         if(error >= 1) {
           wl += (int) error;
@@ -408,7 +399,6 @@ final class MapRenderer {
     final FTPos ftp = r.pos;
 
     int yy = r.y + 3;
-    int wl; // word length
     double ll = 0; // line length
     double e = 0;
 
@@ -417,7 +407,7 @@ final class MapRenderer {
     int sl = 0, pl = 0;
     int psl = 0, ppl = 0;
     for(int i = 0; i < data[0].length; ++i) {
-      wl = (int) (data[0][i] * r.thumbf);
+      int wl = (int) (data[0][i] * r.thumbf); // word length
       e += data[0][i] * r.thumbf - wl;
 
       if(e >= 1) {
@@ -505,14 +495,17 @@ final class MapRenderer {
     final int ww = r.w;
     int yy = r.y + 3;
 
-    double ll = 0; // line length
-    double error = 0;
     ul = -1;
-    int psl = 0, ppl = 0, pl = 0, sl = 0, cc = 0;
     final TokenList tl = new TokenList();
     ttcol = new BoolList();
+    int cc = 0;
+    int sl = 0;
+    int pl = 0;
+    int ppl = 0;
+    int psl = 0;
+    double error = 0;
+    double ll = 0; // line length
     for(int i = 0; i < data[0].length; ++i) {
-      boolean ir = false;
       double wl = data[0][i] * r.thumbf;
       // sum up error, caused by int cast
       error += data[0][i] * r.thumbf - wl;
@@ -527,6 +520,7 @@ final class MapRenderer {
       cc += data[0][i];
 
       // find hovered thumbnail and corresponding text
+      boolean ir = false;
       if(ll + wl + (ds && psl < data[1].length &&
           data[1][psl] == sl ? r.thumbsw : 0) >= ww) {
         if(ds) {

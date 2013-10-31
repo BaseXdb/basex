@@ -153,7 +153,7 @@ public final class XQDoc extends Inspect {
    * @param st sequence type
    * @param parent parent node
    */
-  protected void type(final SeqType st, final FElem parent) {
+  void type(final SeqType st, final FElem parent) {
     if(st == null) return;
     final FElem type = elem("type", parent).add(st.typeString());
     final String occ = st.occ.toString();

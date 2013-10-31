@@ -43,7 +43,7 @@ public enum HTTPCode {
    * @param c status code
    * @param d description
    */
-  private HTTPCode(final int c, final String d) {
+  HTTPCode(final int c, final String d) {
     code = c;
     desc = d;
   }

@@ -103,7 +103,7 @@ public final class PathTest extends SandboxTest {
   /** Checks the results of the queries with the db week.
    * @throws Exception exception
    */
-  static void weekTest() throws Exception {
+  private static void weekTest() throws Exception {
     final String count = "count(collection('" + WEEK1 +
       "/week/monday')/root/monday/text[text() = 'text'])";
     final QueryProcessor qp = new QueryProcessor(count, context);
@@ -120,7 +120,7 @@ public final class PathTest extends SandboxTest {
   /** Checks the results of the queries with the db week.
    * @throws Exception exception
    */
-  static void weekTest2() throws Exception {
+  private static void weekTest2() throws Exception {
     final String count = "count(collection('" + WEEK1 +
       "/week/monday')/root/monday/text[text() = 'text'])," +
       " count(collection('" + WEEK2 +

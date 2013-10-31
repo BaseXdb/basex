@@ -29,13 +29,13 @@ public abstract class BXNode implements Node {
     "#document", null, "#text", null, "#comment", null, "#cdata-section", "#document-fragment"
   };
   /** Node reference. */
-  protected final ANode node;
+  final ANode node;
 
   /**
    * Constructor.
    * @param n node reference
    */
-  protected BXNode(final ANode n) {
+  BXNode(final ANode n) {
     node = n;
   }
 
@@ -72,7 +72,7 @@ public abstract class BXNode implements Node {
    * Returns a numeric value for the node kind.
    * @return node kind
    */
-  protected int kind() {
+  int kind() {
     return node.kind();
   }
 
@@ -158,7 +158,7 @@ public abstract class BXNode implements Node {
   public BXDoc getOwnerDocument() {
     ANode n = node;
     for(ANode p; (p = n.parent()) != null;) n = p;
-    return n.type == NodeType.DOC ? (BXDoc) BXNode.get(n) : null;
+    return n.type == NodeType.DOC ? (BXDoc) get(n) : null;
   }
 
   @Override
@@ -267,10 +267,10 @@ public abstract class BXNode implements Node {
    * @param tag tag name
    * @return nodes
    */
-  protected final BXNList getElements(final String tag) {
+  final BXNList getElements(final String tag) {
     final ANodeList nb = new ANodeList();
     final AxisIter ai = node.descendant();
-    final byte[] nm = tag.equals("*") ? null : token(tag);
+    final byte[] nm = "*".equals(tag) ? null : token(tag);
     for(ANode n; (n = ai.next()) != null;) {
       if(n.type == NodeType.ELM && (nm == null || eq(nm, n.name()))) nb.add(n.finish());
     }
@@ -282,7 +282,7 @@ public abstract class BXNode implements Node {
    * @param ai axis iterator
    * @return node cache
    */
-  protected static ANodeList finish(final AxisIter ai) {
+  static ANodeList finish(final AxisIter ai) {
     final ANodeList nl = new ANodeList();
     for(ANode n; (n = ai.next()) != null;) nl.add(n.finish());
     return nl;
@@ -300,7 +300,7 @@ public abstract class BXNode implements Node {
    * Throws a DOM modification exception.
    * @return DOM exception
    */
-  protected static DOMException readOnly() {
+  static DOMException readOnly() {
     throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
         "DOM implementation is read-only.");
   }

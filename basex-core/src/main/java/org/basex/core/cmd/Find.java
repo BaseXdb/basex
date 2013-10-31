@@ -79,7 +79,6 @@ public final class Find extends AQuery {
 
     String pre = "";
     String preds = "";
-    final String tag = "*";
     for(String term : terms) {
       if(term.startsWith("@=")) {
         preds += "[@* = \"" + term.substring(2) + "\"]";
@@ -108,6 +107,7 @@ public final class Find extends AQuery {
 
     // create final string
     final TokenBuilder tb = new TokenBuilder();
+    final String tag = "*";
     tb.add(pre + (r ? "/" : "") + Axis.DESCORSELF + "::" + tag + preds);
     return tb.toString();
   }

@@ -53,7 +53,7 @@ public final class QueryContext extends Proc {
   /** Functions. */
   public final StaticFuncs funcs = new StaticFuncs();
   /** Externally bound variables. */
-  public final HashMap<QNm, Expr> bindings = new HashMap<QNm, Expr>();
+  private final HashMap<QNm, Expr> bindings = new HashMap<QNm, Expr>();
 
   /** Query resources. */
   public final QueryResources resource = new QueryResources(this);
@@ -135,13 +135,13 @@ public final class QueryContext extends Proc {
   /** Module loader. */
   public final ModuleLoader modules;
   /** Opened connections to relational databases. */
-  JDBCConnections jdbc;
+  private JDBCConnections jdbc;
   /** Opened connections to relational databases. */
-  ClientSessions sessions;
+  private ClientSessions sessions;
   /** Root expression of the query. */
-  MainModule root;
+  private MainModule root;
   /** Original query. */
-  String query;
+  private String query;
 
   /** String container for verbose query info. */
   private final TokenBuilder info = new TokenBuilder();
@@ -264,7 +264,7 @@ public final class QueryContext extends Proc {
    * Compiles all used functions and the root expression.
    * @throws QueryException query exception
    */
-  public void analyze() throws QueryException {
+  void analyze() throws QueryException {
     try {
       // compile the expression
       if(root != null) QueryCompiler.compile(this, root);
@@ -312,7 +312,7 @@ public final class QueryContext extends Proc {
    * @return resulting value
    * @throws QueryException query exception
    */
-  public Value update() throws QueryException {
+  Value update() throws QueryException {
     if(updating) {
       context.downgrade(this, updates.databases());
       updates.apply();
@@ -635,7 +635,7 @@ public final class QueryContext extends Proc {
         final JsonParserOptions jp = new JsonParserOptions();
         jp.set(JsonOptions.SPEC, JsonSpec.ECMA_262);
         jp.set(JsonOptions.FORMAT, JsonFormat.MAP);
-        return JsonConverter.convert(Token.token(val.toString()), jp);
+        return JsonConverter.convert(token(val.toString()), jp);
       }
     } catch(final QueryIOException ex) {
       throw ex.getCause();
@@ -689,9 +689,9 @@ public final class QueryContext extends Proc {
       final String ymd = DateTime.format(d, DateTime.DATE);
       final String hms = DateTime.format(d, DateTime.TIME);
       final String zn = zon.substring(0, 3) + ':' + zon.substring(3);
-      time = new Tim(Token.token(hms + zn), null);
-      date = new Dat(Token.token(ymd + zn), null);
-      dtm = new Dtm(Token.token(ymd + 'T' + hms + zn), null);
+      time = new Tim(token(hms + zn), null);
+      date = new Dat(token(ymd + zn), null);
+      dtm = new Dtm(token(ymd + 'T' + hms + zn), null);
       zone = new DTDur(toInt(zon.substring(0, 3)), toInt(zon.substring(3)));
     }
     return this;

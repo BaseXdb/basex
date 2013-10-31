@@ -19,7 +19,7 @@ public final class NameTest extends Test {
   /** Local name. */
   public final byte[] ln;
   /** Default element namespace. */
-  public final byte[] defElemNS;
+  private final byte[] defElemNS;
 
   /**
    * Empty constructor ('*').

@@ -26,7 +26,7 @@ import org.basex.util.list.*;
  */
 public final class OptimizeAll extends ACreate {
   /** Current pre value. */
-  int pre;
+  private int pre;
   /** Data size. */
   private int size;
 
@@ -190,7 +190,7 @@ public final class OptimizeAll extends ACreate {
         }
 
         @Override
-        public void openDoc(final byte[] name) throws IOException {
+        protected void openDoc(final byte[] name) throws IOException {
           super.openDoc(name);
           if(cmd != null) cmd.pre++;
         }

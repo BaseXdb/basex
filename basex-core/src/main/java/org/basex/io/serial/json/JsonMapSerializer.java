@@ -60,8 +60,8 @@ public class JsonMapSerializer extends JsonSerializer {
         // print current object or array
         object = num == 0;
         print(object ? '{' : '[');
-        boolean f = false;
         if(object) num = keys.size();
+        boolean f = false;
         for(int i = 0; i < num; i++) {
           final Item k = object ? keys.itemAt(i) : Int.get(i + 1);
           if(f) print(',');

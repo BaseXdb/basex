@@ -69,7 +69,8 @@ public final class Args {
         pos = 0;
         dash = false;
         return true;
-      } else if(pos < a.length()) {
+      }
+      if(pos < a.length()) {
         // check next character
         return true;
       }
@@ -111,7 +112,7 @@ public final class Args {
       final StringBuilder sb = new StringBuilder();
       while(p < a.length()) sb.append(a.charAt(p++));
       final String str = sb.toString();
-      return str.equals("-") ? new Scanner(System.in).useDelimiter("\0").next() : str;
+      return "-".equals(str) ? new Scanner(System.in).useDelimiter("\0").next() : str;
     }
     return "";
   }

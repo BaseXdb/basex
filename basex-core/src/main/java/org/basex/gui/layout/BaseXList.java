@@ -24,15 +24,15 @@ import org.basex.util.list.*;
  */
 public final class BaseXList extends BaseXBack {
   /** Single choice. */
-  final boolean single;
+  private final boolean single;
   /** Text field. */
-  final BaseXTextField text;
+  private final BaseXTextField text;
   /** List. */
-  final JList list;
+  private final JList list;
   /** List values. */
-  String[] values;
+  private String[] values;
   /** Numeric list. */
-  boolean num = true;
+  private boolean num = true;
 
   /** Scroll pane. */
   private final JScrollPane scroll;
@@ -93,7 +93,7 @@ public final class BaseXList extends BaseXBack {
         final IntList il = new IntList();
         for(int n = np1; n <= np2; n++) il.add(n);
         // choose new list value
-        final int nv = op2 != np2 ? np2 : np1;
+        final int nv = op2 == np2 ? np1 : np2;
         final String val = values[nv];
         list.setSelectedValue(val, true);
         if(e.isShiftDown() && !single) {
@@ -142,7 +142,7 @@ public final class BaseXList extends BaseXBack {
               break;
             }
           }
-          if(il.size() > 0) {
+          if(!il.isEmpty()) {
             list.setSelectedValue(values[il.get(il.size() - 1)], true);
           }
           list.setSelectedIndices(il.toArray());
@@ -270,7 +270,7 @@ public final class BaseXList extends BaseXBack {
    * Sets the specified list index.
    * @param i list entry
    */
-  public void setIndex(final int i) {
+  void setIndex(final int i) {
     if(i < values.length) setValue(values[i]);
     else text.setText("");
   }

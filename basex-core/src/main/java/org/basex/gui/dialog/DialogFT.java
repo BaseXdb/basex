@@ -67,11 +67,11 @@ final class DialogFT extends BaseXBack {
     final BaseXLabel[] labels = new BaseXLabel[FLAGS];
     for(int f = 0; f < check.length; ++f) {
       check[f] = new BaseXCheckBox(cb[f], val[f], d);
-      if(!create) {
+      if(create) {
+        check[f].setToolTipText(desc[f]);
+      } else {
         check[f].bold();
         labels[f] = new BaseXLabel(desc[f], true, false);
-      } else {
-        check[f].setToolTipText(desc[f]);
       }
     }
 

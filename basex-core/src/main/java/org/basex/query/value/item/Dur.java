@@ -21,7 +21,7 @@ import org.basex.util.*;
  */
 public class Dur extends ADateDur {
   /** Pattern for one or more digits. */
-  protected static final String DP = "(\\d+)";
+  static final String DP = "(\\d+)";
 
   /** Date pattern. */
   private static final Pattern DUR = Pattern.compile("(-?)P(" + DP + "Y)?(" + DP +
@@ -91,7 +91,7 @@ public class Dur extends ADateDur {
    * @param ii input info
    * @throws QueryException query exception
    */
-  protected void yearMonth(final byte[] vl, final Matcher mt, final InputInfo ii)
+  void yearMonth(final byte[] vl, final Matcher mt, final InputInfo ii)
       throws QueryException {
 
     final long y = mt.group(2) != null ? toLong(mt.group(3), true, ii) : 0;
@@ -113,8 +113,8 @@ public class Dur extends ADateDur {
    * @param ii input info
    * @throws QueryException query exception
    */
-  protected void dayTime(final byte[] vl, final Matcher mt, final int p,
-      final InputInfo ii) throws QueryException {
+  void dayTime(final byte[] vl, final Matcher mt, final int p,
+               final InputInfo ii) throws QueryException {
 
     final long d = mt.group(p) != null ? toLong(mt.group(p + 1), true, ii) : 0;
     final long h = mt.group(p + 3) != null ? toLong(mt.group(p + 4), true, ii) : 0;
@@ -182,7 +182,7 @@ public class Dur extends ADateDur {
    * Adds the date to the specified token builder.
    * @param tb token builder
    */
-  protected final void date(final TokenBuilder tb) {
+  final void date(final TokenBuilder tb) {
     tb.add('P');
     final long y = yea();
     if(y != 0) { tb.addLong(Math.abs(y)); tb.add('Y'); }
@@ -196,7 +196,7 @@ public class Dur extends ADateDur {
    * Adds the time to the specified token builder.
    * @param tb token builder
    */
-  protected final void time(final TokenBuilder tb) {
+  final void time(final TokenBuilder tb) {
     if(sec.remainder(DAYSECONDS).signum() == 0) return;
     tb.add('T');
     final long h = hou();

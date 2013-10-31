@@ -36,7 +36,7 @@ public final class Put extends BasicOperation {
    * @param u location path URI
    */
   public Put(final InputInfo i, final int id, final Data d, final String u) {
-    super(BasicOperation.TYPE.FNPUT, d, i);
+    super(TYPE.FNPUT, d, i);
     nodeid = id;
     paths.add(u);
   }
@@ -66,7 +66,7 @@ public final class Put extends BasicOperation {
   }
 
   @Override
-  public void merge(final BasicOperation o) throws QueryException {
+  public void merge(final BasicOperation o) {
     for(final String u : ((Put) o).paths) paths.add(u);
   }
 
@@ -81,7 +81,7 @@ public final class Put extends BasicOperation {
   }
 
   @Override
-  public void prepare(final MemData tmp) throws QueryException { }
+  public void prepare(final MemData tmp) { }
 
   @Override
   public DBNode getTargetNode() {

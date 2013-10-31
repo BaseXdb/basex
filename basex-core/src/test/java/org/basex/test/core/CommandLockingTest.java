@@ -73,7 +73,7 @@ public class CommandLockingTest extends SandboxTest {
     ckDBs(new CreateUser(NAME, NAME), true, ADMIN_LIST);
     ckDBs(new Delete(FILE), true, CTX_LIST);
     ckDBs(new DropBackup(NAME), true, BACKUP_LIST);
-    ckDBs(new DropDB(NAME + "*"), true, null); // Drop using globbing
+    ckDBs(new DropDB(NAME + '*'), true, null); // Drop using globbing
     ckDBs(new DropDB(NAME), true, NAME_LIST);
     ckDBs(new DropEvent(NAME), true, EVENT_LIST);
     ckDBs(new DropIndex(IndexType.TEXT), true, CTX_LIST);
@@ -85,7 +85,7 @@ public class CommandLockingTest extends SandboxTest {
     ckDBs(new Get("DBPATH"), false, NONE);
     ckDBs(new Grant("all", NAME), true, ADMIN_LIST);
     ckDBs(new Grant("all", NAME, NAME), true, ADMIN_NAME);
-    ckDBs(new Grant("all", NAME, NAME + "*"), true, null);
+    ckDBs(new Grant("all", NAME, NAME + '*'), true, null);
     ckDBs(new Help("HELP"), false, NONE);
     ckDBs(new Info(), false, NONE);
     ckDBs(new InfoDB(), false, CTX_LIST);
@@ -317,7 +317,7 @@ public class CommandLockingTest extends SandboxTest {
    * @param read Required and allowed databases for read lock
    * @param write Required and allowed databases for write lock
    */
-  private void ckDBs(final Command cmd, final StringList read, final StringList write) {
+  private static void ckDBs(final Command cmd, final StringList read, final StringList write) {
     ckDBs(cmd, read, read, write, write);
   }
 
@@ -331,7 +331,7 @@ public class CommandLockingTest extends SandboxTest {
    * @param req Required databases
    * @param allow Allowed databases
    */
-  private void ckDBs(final Command cmd, final boolean up, final StringList req,
+  private static void ckDBs(final Command cmd, final boolean up, final StringList req,
       final StringList allow) {
     ckDBs(cmd, up ? NONE : req, up ? NONE : allow, up ? req : NONE, up ? allow : NONE);
   }
@@ -347,31 +347,31 @@ public class CommandLockingTest extends SandboxTest {
    * @param reqWt Required databases for write locks
    * @param allowWt Allowed databases for write locks
    */
-  private void ckDBs(final Command cmd, final StringList reqRd, final StringList allowRd,
-      final StringList reqWt, final StringList allowWt) {
+  private static void ckDBs(final Command cmd, final StringList reqRd, final StringList allowRd,
+                            final StringList reqWt, final StringList allowWt) {
     // Fetch databases BaseX thinks it needs to lock
     final LockResult lr = new LockResult();
     // [CG] cmd.updating needed because of some side-effects (instantiate QueryProcessor?)
     cmd.updating(DUMMY_CONTEXT);
     cmd.databases(lr);
     // Need sorted lists for compareAll
-    for (final StringList list : new StringList[]
+    for(final StringList list : new StringList[]
         {reqRd, allowRd, reqWt, allowWt, lr.read, lr.write})
-      if (null != list) list.sort(false).unique();
+      if(list != null) list.sort(false).unique();
 
     // Test if read locking too much or less databases
-    if(null == reqRd && !lr.readAll) fail("Should read lock all databases, didn't.");
-    if(null != reqRd && null != allowRd && !lr.read.containsAll(reqRd))
+    if(reqRd == null && !lr.readAll) fail("Should read lock all databases, didn't.");
+    if(reqRd != null && allowRd != null && !lr.read.containsAll(reqRd))
       fail("Didn't read lock all necessary databases.");
-    if(null != allowRd && lr.readAll) fail("Read locked all databases, may not.");
-    if(null != allowRd && !allowRd.containsAll(lr.read))
+    if(allowRd != null && lr.readAll) fail("Read locked all databases, may not.");
+    if(allowRd != null && !allowRd.containsAll(lr.read))
       fail("Read locked more databases than I should.");
     // Test if write locking too much or less databases
-    if(null == reqWt && !lr.writeAll) fail("Should write lock all databases, didn't.");
-    if(null != reqWt && null != allowWt && !lr.write.containsAll(reqWt))
+    if(reqWt == null && !lr.writeAll) fail("Should write lock all databases, didn't.");
+    if(reqWt != null && allowWt != null && !lr.write.containsAll(reqWt))
       fail("Didn't write lock all necessary databases.");
-    if(null != allowWt && lr.writeAll) fail("Write locked all databases, may not.");
-    if(null != allowWt && !allowWt.containsAll(lr.write))
+    if(allowWt != null && lr.writeAll) fail("Write locked all databases, may not.");
+    if(allowWt != null && !allowWt.containsAll(lr.write))
       fail("Write locked more databases than I should.");
   }
 }

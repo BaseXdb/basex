@@ -36,11 +36,11 @@ abstract class TextDecoder {
    */
   static TextDecoder get(final String enc) throws IOException {
     final TextDecoder td;
-    if(enc == UTF8) td = new TextDecoder.UTF8();
-    else if(enc == UTF32) td = new TextDecoder.UTF32();
-    else if(enc == UTF16LE) td = new TextDecoder.UTF16LE();
-    else if(enc == UTF16BE) td = new TextDecoder.UTF16BE();
-    else td = new TextDecoder.Generic(enc);
+    if(enc == UTF8) td = new UTF8();
+    else if(enc == UTF32) td = new UTF32();
+    else if(enc == UTF16LE) td = new UTF16LE();
+    else if(enc == UTF16BE) td = new UTF16BE();
+    else td = new Generic(enc);
     td.encoding = enc;
     return td;
   }

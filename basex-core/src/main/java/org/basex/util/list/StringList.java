@@ -110,7 +110,7 @@ public class StringList extends ElementList implements Iterable<String> {
     int i = 0;
     for(final String e : elements) {
       int result;
-      while(0 != (result = list[i].compareTo(e))) {
+      while((result = list[i].compareTo(e)) != 0) {
         if(++i >= size() || result > 0) return false;
       }
     }

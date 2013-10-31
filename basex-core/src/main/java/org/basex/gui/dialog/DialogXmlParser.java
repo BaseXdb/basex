@@ -75,7 +75,14 @@ final class DialogXmlParser extends DialogParser {
     browsec = new BaseXButton(BROWSE_D, d);
     browsec.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(final ActionEvent e) { catchoose(); }
+      public void actionPerformed(final ActionEvent e) {
+        final GUIOptions gopts = dialog.gui.gopts;
+        final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR,
+          gopts.get(GUIOptions.INPUTPATH), dialog.gui).filter(XML_DOCUMENTS, IO.XMLSUFFIX);
+
+        final IO file = fc.select(Mode.FDOPEN);
+        if(file != null) cfile.setText(file.path());
+      }
     });
     browsec.setEnabled(rsen);
     cr.add(browsec);
@@ -119,17 +126,5 @@ final class DialogXmlParser extends DialogParser {
     gui.set(MainOptions.DTD, dtd.isSelected());
     gui.set(MainOptions.INTPARSE, intparse.isSelected());
     gui.set(MainOptions.CATFILE, usecat.isSelected() ? cfile.getText() : "");
-  }
-
-  /**
-   * Opens a file dialog to choose an XML catalog or directory.
-   */
-  private void catchoose() {
-    final GUIOptions gopts = dialog.gui.gopts;
-    final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR,
-        gopts.get(GUIOptions.INPUTPATH), dialog.gui).filter(XML_DOCUMENTS, IO.XMLSUFFIX);
-
-    final IO file = fc.select(Mode.FDOPEN);
-    if(file != null) cfile.setText(file.path());
   }
 }

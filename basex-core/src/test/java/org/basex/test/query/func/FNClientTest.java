@@ -44,7 +44,7 @@ public final class FNClientTest extends AdvancedQueryTest {
   @Test
   public void connect() {
     query(conn());
-    query(EXISTS.args(" " + conn()));
+    query(EXISTS.args(' ' + conn()));
     // BXCL0001: connection errors
     error(_CLIENT_CONNECT.args(Text.LOCALHOST, 9999, Text.ADMIN, ""), Err.BXCL_CONN);
     error(_CLIENT_CONNECT.args("xxx", 9999, Text.ADMIN, Text.ADMIN), Err.BXCL_CONN);
@@ -55,8 +55,8 @@ public final class FNClientTest extends AdvancedQueryTest {
   public void execute() {
     contains(_CLIENT_EXECUTE.args(conn(), new ShowUsers()), Text.USERHEAD[0]);
     query("let $a := " + conn() + ", $b := " + conn() + " return (" +
-        _CLIENT_EXECUTE.args("$a", new XQuery("1")) + "," +
-        _CLIENT_EXECUTE.args("$b", new XQuery("2")) + ")", "1 2");
+        _CLIENT_EXECUTE.args("$a", new XQuery("1")) + ',' +
+        _CLIENT_EXECUTE.args("$b", new XQuery("2")) + ')', "1 2");
     // BXCL0004: connection errors
     error(_CLIENT_EXECUTE.args(conn(), "x"), Err.BXCL_COMMAND);
   }
@@ -67,7 +67,7 @@ public final class FNClientTest extends AdvancedQueryTest {
     // check if the info string is not empty
     query("let $a := " + conn() + " return (" +
         _CLIENT_EXECUTE.args("$a", "xquery 123") + " and " +
-        _CLIENT_INFO.args("$a") + ")", "true");
+        _CLIENT_INFO.args("$a") + ')', "true");
   }
 
   /** Test method. */
@@ -75,7 +75,7 @@ public final class FNClientTest extends AdvancedQueryTest {
   public void query() {
     contains(_CLIENT_EXECUTE.args(conn(), new ShowUsers()), Text.USERHEAD[0]);
     query("let $a := " + conn() + ", $b := " + conn() + " return " +
-        _CLIENT_QUERY.args("$a", "1") + "+" + _CLIENT_QUERY.args("$b", "2"), "3");
+        _CLIENT_QUERY.args("$a", "1") + '+' + _CLIENT_QUERY.args("$b", "2"), "3");
     query(_CLIENT_QUERY.args(conn(), "\"$a*2\"", " { 'a':1 }"), "2");
     // query errors
     error(_CLIENT_QUERY.args(conn(), "x"), Err.NOCTX);
@@ -88,7 +88,7 @@ public final class FNClientTest extends AdvancedQueryTest {
     final Object[][] types = XdmInfoTest.TYPES;
     for(final Object[] type : types) {
       if(type == null || type.length < 3) continue;
-      query(_CLIENT_QUERY.args(conn(), " " + "\"" + type[1] + "\""), type[2]);
+      query(_CLIENT_QUERY.args(conn(), " \"" + type[1] + '"'), type[2]);
     }
   }
 
@@ -100,7 +100,7 @@ public final class FNClientTest extends AdvancedQueryTest {
     error(_CLIENT_CLOSE.args("xs:anyURI('unknown')"), Err.BXCL_NOTAVL);
     // BXCL0002: session has already been closed
     error(conn() + " ! (" + _CLIENT_CLOSE.args(" .") + ", " +
-        _CLIENT_CLOSE.args(" .") + ")", Err.BXCL_NOTAVL);
+        _CLIENT_CLOSE.args(" .") + ')', Err.BXCL_NOTAVL);
   }
 
   /**

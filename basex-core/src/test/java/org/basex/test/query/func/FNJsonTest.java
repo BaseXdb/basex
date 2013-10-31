@@ -115,7 +115,7 @@ public final class FNJsonTest extends AdvancedQueryTest {
    * @param options options
    * @param expected expected result
    */
-  private void parse(final String input, final String options, final String expected) {
+  private static void parse(final String input, final String options, final String expected) {
     query(input, options, expected, _JSON_PARSE);
   }
 
@@ -125,7 +125,7 @@ public final class FNJsonTest extends AdvancedQueryTest {
    * @param options options
    * @param expected expected result
    */
-  private void serial(final String input, final String options, final String expected) {
+  private static void serial(final String input, final String options, final String expected) {
     query(input, options, expected, _JSON_SERIALIZE);
   }
 
@@ -136,10 +136,11 @@ public final class FNJsonTest extends AdvancedQueryTest {
    * @param expected expected result
    * @param function function
    */
-  private void query(final String input, final String options, final String expected,
+  private static void query(final String input, final String options, final String expected,
       final Function function) {
+
     final String query = options.isEmpty() ? function.args(input) :
-      function.args(input, " {" + options + "}");
+      function.args(input, " {" + options + '}');
     if(expected.startsWith("...")) {
       contains(query, expected.substring(3));
     } else {
@@ -152,7 +153,7 @@ public final class FNJsonTest extends AdvancedQueryTest {
    * @param input query input
    * @param options options
    */
-  private void parseError(final String input, final String options) {
+  private static void parseError(final String input, final String options) {
     error(input, options, _JSON_PARSE);
   }
 
@@ -161,7 +162,7 @@ public final class FNJsonTest extends AdvancedQueryTest {
    * @param input query input
    * @param options options
    */
-  private void serialError(final String input, final String options) {
+  private static void serialError(final String input, final String options) {
     error(input, options, _JSON_SERIALIZE);
   }
 
@@ -171,9 +172,9 @@ public final class FNJsonTest extends AdvancedQueryTest {
    * @param options options
    * @param function function
    */
-  private void error(final String input, final String options, final Function function) {
+  private static void error(final String input, final String options, final Function function) {
     final String query = options.isEmpty() ? function.args(input) :
-      function.args(input, " {" + options + "}");
+      function.args(input, " {" + options + '}');
     error(query, Err.INVALIDOPT, Err.BXJS_PARSE, Err.BXJS_SERIAL);
   }
 }

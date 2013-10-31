@@ -22,8 +22,8 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
    * @param res result or {@code null} for no comparison
    * @param pr queries on the query plan
    */
-  protected static void check(final String qu, final String res,
-      final String... pr) {
+  static void check(final String qu, final String res,
+                    final String... pr) {
 
     final QueryProcessor qp = new QueryProcessor(qu, context);
     try {

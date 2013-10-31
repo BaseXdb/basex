@@ -24,7 +24,7 @@ public final class FTWildcardTest {
     { "\u00fcbersch\u00fcsse", "\u00fcberschuss" }
   };
   /** Sample texts which should NOT be matched. */
-  private static final String[][] TEXTS_BAD = new String[][] {
+  private static final String[][] TEXTS_BAD = {
     { "wll", "wel", "ell" },
     { "bite", "abite", "sit", "asit" },
     { "impro", "mprove" },
@@ -35,7 +35,7 @@ public final class FTWildcardTest {
   };
 
   /** Valid wild-card expressions. */
-  private static final String[] VALIDWC = new String[] {
+  private static final String[] VALIDWC = {
     "w.ll",
     ".?site",
     "improv.*",
@@ -46,7 +46,7 @@ public final class FTWildcardTest {
   };
 
   /** Valid wild card expressions. */
-  private static final String[] INVALIDWC = new String[] {
+  private static final String[] INVALIDWC = {
     ".{5,7]",
     ".{2,1}",
     ".{,}",

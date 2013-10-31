@@ -118,7 +118,7 @@ public final class DiskData extends Data {
    * Initializes the database.
    * @throws IOException I/O exception
    */
-  public void init() throws IOException {
+  void init() throws IOException {
     table = new TableDiskAccess(meta, false);
     texts = new DataAccess(meta.dbfile(DATATXT));
     values = new DataAccess(meta.dbfile(DATAATV));
@@ -420,5 +420,10 @@ public final class DiskData extends Data {
     }
     if(!txts.isEmpty()) ((DiskValues) txtindex).delete(txts);
     if(!atvs.isEmpty()) ((DiskValues) atvindex).delete(atvs);
+  }
+
+  @Override
+  public boolean inMemory() {
+    return false;
   }
 }

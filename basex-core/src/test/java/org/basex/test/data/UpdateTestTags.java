@@ -198,8 +198,8 @@ public final class UpdateTestTags extends UpdateTest {
     if(pos == 0) {
       root = par + data.size(par, kind);
     } else {
-      int currPos = 1;
       root = par + data.attSize(par, kind);
+      int currPos = 1;
       while(currPos < pos) {
         final int k = data.kind(root);
         if(data.parent(root, k) != par) break;

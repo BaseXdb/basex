@@ -592,18 +592,18 @@ public enum GUICommands implements GUICmd {
       final Context ctx = gui.context;
       final boolean root = ctx.root();
       final Data data = ctx.data();
-      if(!rt) {
-        if(!root) {
-          gui.notify.context(new Nodes(0, data), true, null);
-          gui.notify.mark(ctx.current(), null);
-        }
-      } else {
+      if(rt) {
         if(root) {
           gui.notify.mark(new Nodes(data), null);
         } else {
           final Nodes mark = ctx.marked;
           ctx.marked = new Nodes(data);
           gui.notify.context(mark, true, null);
+        }
+      } else {
+        if(!root) {
+          gui.notify.context(new Nodes(0, data), true, null);
+          gui.notify.mark(ctx.current(), null);
         }
       }
     }
@@ -827,7 +827,7 @@ public enum GUICommands implements GUICmd {
    * @param no disallowed node types
    * @return result of check
    */
-  static boolean updatable(final Nodes n, final int... no) {
+  private static boolean updatable(final Nodes n, final int... no) {
     if(n == null || (no.length == 0 ? n.size() < 1 : n.size() != 1)) return false;
     final int k = n.data.kind(n.pres[0]);
     for(final int i : no) if(k == i) return false;
@@ -839,7 +839,7 @@ public enum GUICommands implements GUICmd {
    * @param s string to encode
    * @return quoted string
    */
-  static String quote(final String s) {
+  private static String quote(final String s) {
     return '"' + s.replaceAll("\"", "&quot;") + '"';
   }
 
@@ -849,7 +849,7 @@ public enum GUICommands implements GUICmd {
    * @param i offset
    * @return function string
    */
-  static String openPre(final Nodes n, final int i) {
+  private static String openPre(final Nodes n, final int i) {
     return Function._DB_OPEN_PRE.get(null, Str.get(n.data.meta.name),
         Int.get(n.pres[i])).toString();
   }

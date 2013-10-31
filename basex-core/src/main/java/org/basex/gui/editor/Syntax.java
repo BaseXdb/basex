@@ -15,17 +15,17 @@ import org.basex.gui.*;
  */
 abstract class Syntax {
   /** Standard color. */
-  protected static final Color TEXT = Color.BLACK;
+  static final Color TEXT = Color.BLACK;
   /** Comment color. */
-  protected static final Color COMMENT = new Color(0, 160, 160);
+  static final Color COMMENT = new Color(0, 160, 160);
   /** String color. */
-  protected static final Color STRING = GUIConstants.RED;
+  static final Color STRING = GUIConstants.RED;
   /** Keyword color. */
-  protected static final Color KEYWORD = GUIConstants.BLUE;
+  static final Color KEYWORD = GUIConstants.BLUE;
   /** Function color. */
-  protected static final Color FUNCTION = new Color(160, 0, 160);
+  static final Color FUNCTION = new Color(160, 0, 160);
   /** Variable color. */
-  protected static final Color VARIABLE = GUIConstants.GREEN;
+  static final Color VARIABLE = GUIConstants.GREEN;
 
   /** Simple syntax. */
   static final Syntax SIMPLE = new Syntax() {

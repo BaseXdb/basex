@@ -9,7 +9,7 @@ import org.basex.util.*;
  * Interface for light-weight axis iterators, throwing no exceptions.
  *
  * This class also implements the {@link Iterable} interface, which is why all of its
- * values can also be retrieved via enhanced for (for-each) loops. Note, however, that
+ * values can also be retrieved via enhanced for(for-each) loops. Note, however, that
  * using the {@link #next()} method will give you better performance.
  *
  * <b>Important</b>: to improve performance, this iterator may return the same node

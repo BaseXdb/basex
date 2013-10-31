@@ -24,7 +24,7 @@ import org.xml.sax.*;
  */
 public final class HtmlParser extends XMLParser {
   /** Name of HTML Parser. */
-  public static final String NAME = "TagSoup";
+  private static final String NAME = "TagSoup";
   /** TagSoup URL. */
   private static final String FEATURES = "http://www.ccil.org/~cowan/tagsoup/features/";
 
@@ -102,7 +102,8 @@ public final class HtmlParser extends XMLParser {
         // extracts the encoding string
         cs += encoding.length;
         int ce = cs;
-        while(++ce < content.length && content[ce] > 0x28);
+        final int cl = content.length;
+        while(++ce < cl && content[ce] > 0x28);
         enc = string(substring(content, cs, ce));
       }
 

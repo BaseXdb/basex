@@ -18,7 +18,7 @@ public abstract class StaticDecl extends StaticScope {
   /** This declaration's name. */
   public final QNm name;
   /** Declared type, {@code null} if not specified. */
-  public final SeqType declType;
+  protected final SeqType declType;
 
   /** Flag that is set during compilation and execution and prevents infinite loops. */
   protected boolean dontEnter;
@@ -33,8 +33,8 @@ public abstract class StaticDecl extends StaticScope {
    * @param xqdoc documentation
    * @param ii input info
    */
-  public StaticDecl(final StaticContext sctx, final Ann a, final QNm nm, final SeqType t,
-      final VarScope scp, final String xqdoc, final InputInfo ii) {
+  protected StaticDecl(final StaticContext sctx, final Ann a, final QNm nm, final SeqType t,
+                       final VarScope scp, final String xqdoc, final InputInfo ii) {
 
     super(scp, xqdoc, sctx, ii);
     ann = a == null ? new Ann() : a;

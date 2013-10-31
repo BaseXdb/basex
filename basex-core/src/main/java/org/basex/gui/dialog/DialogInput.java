@@ -80,8 +80,8 @@ public final class DialogInput extends BaseXDialog {
   @Override
   public void action(final Object cmp) {
     final String in = input();
-    String msg = null;
     ok = type != 0 && (db.contains(in) || in.equals(old));
+    String msg = null;
     if(ok) msg = Util.info(DB_EXISTS_X, in);
     if(!ok) {
       ok = type == 0 ? MetaData.normPath(in) != null : Databases.validName(in);

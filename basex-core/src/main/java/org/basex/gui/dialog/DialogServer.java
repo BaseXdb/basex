@@ -34,27 +34,27 @@ public final class DialogServer extends BaseXDialog {
   /** Tabulators. */
   final BaseXTabs tabs;
   /** User panel. */
-  final DialogUser user = new DialogUser(true, this);
+  private final DialogUser user = new DialogUser(true, this);
   /** Databases panel. */
-  final DialogUser dbsP = new DialogUser(false, this);
+  private final DialogUser dbsP = new DialogUser(false, this);
   /** Databases panel. */
-  final BaseXBack databases = dbsP.getTablePanel();
+  private final BaseXBack databases = dbsP.getTablePanel();
   /** Sessions/Databases panel. */
-  final BaseXBack sess = new BaseXBack();
+  private final BaseXBack sess = new BaseXBack();
   /** Log panel. */
-  final BaseXBack logs = new BaseXBack();
+  private final BaseXBack logs = new BaseXBack();
   /** Username textfield. */
   final BaseXTextField admuser;
   /** Disconnect button. */
   final BaseXButton disconnect;
   /** Refresh button. */
-  final BaseXButton refreshSess;
+  private final BaseXButton refreshSess;
   /** Connect button. */
-  final BaseXButton connect;
+  private final BaseXButton connect;
   /** Start button. */
-  final BaseXButton start;
+  private final BaseXButton start;
   /** Indicates which tab is activated. */
-  int tab;
+  private int tab;
 
   /** Context. */
   private final Context ctx = gui.context;
@@ -153,10 +153,10 @@ public final class DialogServer extends BaseXDialog {
 
     p = new BaseXBack(new TableLayout(2, 1));
     BaseXLabel l = new BaseXLabel(S_INFO1);
-    l.setForeground(GUIConstants.DGRAY);
+    l.setForeground(DGRAY);
     p.add(l);
     l = new BaseXLabel(S_INFO2);
-    l.setForeground(GUIConstants.DGRAY);
+    l.setForeground(DGRAY);
     p.add(l);
     conn.add(p, BorderLayout.SOUTH);
 
@@ -268,13 +268,12 @@ public final class DialogServer extends BaseXDialog {
 
   @Override
   public void action(final Object cmp) {
-    Msg icon = Msg.SUCCESS;
-    String msg = null;
-    String msg2 = null;
-
     final boolean wait = cmp == start || cmp == stop || cmp == connect;
     if(wait) setCursor(CURSORWAIT);
 
+    String msg2 = null;
+    String msg = null;
+    Msg icon = Msg.SUCCESS;
     try {
       if(cmp == start) {
         try {
@@ -374,10 +373,9 @@ public final class DialogServer extends BaseXDialog {
     final boolean vallp = new String(admpass.getPassword()).matches("[^ ;'\"]*");
     final boolean valh = host.getText().matches("([\\w]+://)?[\\w.-]+");
 
-    if(msg == null && msg2 == null &&
-        !(valpl && valh && valp && vallu && vallp)) {
-      msg = Util.info(INVALID_X, !valpl ? S_LOCALPORT : !valh ? S_HOST :
-        !valp ? S_PORT : !vallu ? USERNAME : PASSWORD);
+    if(msg == null && msg2 == null && !(valpl && valh && valp && vallu && vallp)) {
+      msg = Util.info(INVALID_X, valpl ? valh ? valp ? vallu ?
+        PASSWORD : USERNAME : S_PORT : S_HOST : S_LOCALPORT);
       icon = Msg.WARN;
     }
     infoC.setText(msg, icon);

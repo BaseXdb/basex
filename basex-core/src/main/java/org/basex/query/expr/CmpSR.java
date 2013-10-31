@@ -70,7 +70,7 @@ public final class CmpSR extends Single {
    */
   static Expr get(final CmpG ex) throws QueryException {
     if(!(ex.expr[1] instanceof AStr)) return ex;
-    final byte[] d = ((AStr) ex.expr[1]).string(ex.info);
+    final byte[] d = ((Item) ex.expr[1]).string(ex.info);
     final Expr e = ex.expr[0];
     switch(ex.op.op) {
       case GE: return new CmpSR(e, d, true, null, true, ex.collation, ex.info);

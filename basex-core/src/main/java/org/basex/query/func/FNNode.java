@@ -36,7 +36,7 @@ public final class FNNode extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     // functions have 0 or 1 arguments...
-    final Item it = (expr.length != 0 ? expr[0] : checkCtx(ctx)).item(ctx, info);
+    final Item it = (expr.length == 0 ? checkCtx(ctx) : expr[0]).item(ctx, info);
     final ANode node = it == null ? null : checkNode(it);
 
     switch(sig) {
@@ -100,7 +100,7 @@ public final class FNNode extends StandardFunc {
    * @param node node to start from
    * @return resulting iterator
    */
-  private Str path(final ANode node) {
+  private static Str path(final ANode node) {
     ANode n = node;
     final TokenList tl = new TokenList();
     while(n.parent() != null) {

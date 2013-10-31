@@ -38,7 +38,7 @@ public abstract class SingleParser extends Parser {
    * Parses the current input.
    * @throws IOException I/O exception
    */
-  public abstract void parse() throws IOException;
+  protected abstract void parse() throws IOException;
 
   /**
    * Sets the database builder.

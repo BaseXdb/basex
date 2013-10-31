@@ -10,7 +10,6 @@ import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
 import org.basex.http.*;
-import org.basex.io.*;
 
 /**
  * REST-based evaluation of PUT operations.
@@ -40,7 +39,7 @@ final class RESTPut {
     final String ct = http.contentType();
     // choose correct importer
     MainParser parser = null;
-    if(MimeTypes.isJSON(ct)) {
+    if(isJSON(ct)) {
       parser = MainParser.JSON;
       if(APP_JSONML.equals(ct)) {
         final JsonParserOptions jopts = new JsonParserOptions();
@@ -51,9 +50,9 @@ final class RESTPut {
       parser = MainParser.CSV;
     } else if(TEXT_HTML.equals(ct)) {
       parser = MainParser.HTML;
-    } else if(ct != null && MimeTypes.isText(ct)) {
+    } else if(ct != null && isText(ct)) {
       parser = MainParser.TEXT;
-    } else if(ct != null && !MimeTypes.isXML(ct)) {
+    } else if(ct != null && !isXML(ct)) {
       xml = false;
     }
     if(parser != null) rs.context.options.set(MainOptions.PARSER, parser);

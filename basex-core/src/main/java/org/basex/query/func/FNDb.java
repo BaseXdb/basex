@@ -45,25 +45,25 @@ public final class FNDb extends StandardFunc {
   private static final QNm Q_OPTIONS = QNm.get("options");
 
   /** Resource element name. */
-  static final String SYSTEM = "system";
+  private static final String SYSTEM = "system";
   /** Resource element name. */
-  static final String DATABASE = "database";
+  private static final String DATABASE = "database";
   /** Backup element name. */
-  static final String BACKUP = "backup";
+  private static final String BACKUP = "backup";
   /** Resource element name. */
-  static final String RESOURCE = "resource";
+  private static final String RESOURCE = "resource";
   /** Resource element name. */
-  static final String RESOURCES = "resources";
+  private static final String RESOURCES = "resources";
   /** Path element name. */
-  static final String PATH = "path";
+  private static final String PATH = "path";
   /** Raw element name. */
-  static final String RAW = "raw";
+  private static final String RAW = "raw";
   /** Size element name. */
-  static final String SIZE = "size";
+  private static final String SIZE = "size";
   /** Content type element name. */
-  static final String CTYPE = "content-type";
+  private static final String CTYPE = "content-type";
   /** Modified date element name. */
-  static final String MDATE = "modified-date";
+  private static final String MDATE = "modified-date";
 
   /**
    * Constructor.
@@ -277,7 +277,7 @@ public final class FNDb extends StandardFunc {
       int up = -1;
 
       @Override
-      public Item next() throws QueryException {
+      public Item next() {
         if(++up >= list.size()) return null;
         final String name = list.get(up);
         final long length = new IOFile(dbpath, name).length();
@@ -304,7 +304,7 @@ public final class FNDb extends StandardFunc {
       final int is = il.size(), ts = tl.size();
       int ip, tp;
       @Override
-      public ANode get(final long i) throws QueryException {
+      public ANode get(final long i) {
         if(i < is) {
           final byte[] pt = data.text(il.get((int) i), true);
           return resource(pt, false, 0, token(MimeTypes.APP_XML), data.meta.time);
@@ -318,7 +318,7 @@ public final class FNDb extends StandardFunc {
         return null;
       }
       @Override
-      public ANode next() throws QueryException {
+      public ANode next() {
         return ip < is ? get(ip++) : tp < ts ? get(ip + tp++) : null;
       }
       @Override
@@ -491,8 +491,8 @@ public final class FNDb extends StandardFunc {
    * @param mdate modified date
    * @return <code>&lt;resource/&gt;</code> node
    */
-  static FNode resource(final byte[] path, final boolean raw, final long size,
-      final byte[] ctype, final long mdate) {
+  private static FNode resource(final byte[] path, final boolean raw, final long size,
+                                final byte[] ctype, final long mdate) {
 
     final String tstamp = DateTime.format(new Date(mdate), DateTime.FULL);
     final FElem res = new FElem(RESOURCE).add(path).

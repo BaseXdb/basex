@@ -14,9 +14,9 @@ public final class BaseXHistory {
   /** Maximum number of history entries. */
   private static final int MAX = 12;
   /** GUI reference. */
-  final GUI gui;
+  private final GUI gui;
   /** History option. */
-  final StringsOption history;
+  private final StringsOption history;
 
   /**
    * Constructor.

@@ -69,8 +69,8 @@ public final class FTContent extends FTFilter {
   @Override
   public String toString() {
     return super.toString() + (
-      content == FTContents.START ? (AT + ' ' + START) :
-      content == FTContents.END   ? (AT + ' ' + END) :
-      (ENTIRE + ' ' + CONTENT));
+      content == FTContents.START ? AT + ' ' + START :
+      content == FTContents.END   ? AT + ' ' + END :
+        ENTIRE + ' ' + CONTENT);
   }
 }

@@ -20,40 +20,40 @@ public final class BaseXBar extends BaseXPanel {
   /** Maximum scrolling speed. */
   private static final int MAXSTEP = 15;
   /** Animated scrollbar zooming steps. */
-  static final int[] STEPS = { -MAXSTEP, -14, -11, -8, -6, -4, -3,
+  private static final int[] STEPS = { -MAXSTEP, -14, -11, -8, -6, -4, -3,
       -2, -1, -1, 0, 0, 1, 1, 2, 3, 4, 6, 8, 11, 14, MAXSTEP };
   /** Minimum size for the scrollbar slider. */
   private static final int MINSIZE = 20;
 
   /** Reference to the scrolled component. */
-  final BaseXPanel comp;
+  private final BaseXPanel comp;
   /** Scrollbar width. */
-  final int ww;
+  private final int ww;
 
   /** Current scrolling speed. */
-  int step = STEPS.length / 2;
+  private int step = STEPS.length / 2;
   /** Flag reporting if the scrollbar animation is running. */
-  boolean animated;
+  private boolean animated;
   /** Scrollbar height. */
-  int hh;
+  private int hh;
   /** Scrollbar slider position. */
-  int barPos;
+  private int barPos;
   /** Scrollbar slider size. */
-  int barSize;
+  private int barSize;
   /** Scrollbar dragging position. */
-  int dragPos;
+  private int dragPos;
   /** Flag for button clicks. */
-  boolean button;
+  private boolean button;
   /** Flag for scrolling downward. */
-  boolean down;
+  private boolean down;
   /** Flag for sliding the scrollbar. */
-  boolean sliding;
+  private boolean sliding;
   /** Flag for moving upward. */
-  boolean moving;
+  private boolean moving;
   /** Current panel position. */
-  int pos;
+  private int pos;
   /** Current panel height. */
-  int height;
+  private int height;
 
   /** Flag for scrolling upward. */
   private boolean up;

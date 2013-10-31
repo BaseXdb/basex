@@ -35,7 +35,7 @@ public final class ExploreView extends View {
     border(5).layout(new BorderLayout(0, 4));
 
     label = new BaseXLabel(EXPLORER, true, false);
-    label.setForeground(GUIConstants.GRAY);
+    label.setForeground(GRAY);
 
     filter = BaseXButton.command(GUICommands.C_FILTER, gui);
     filter.addKeyListener(this);
@@ -80,7 +80,7 @@ public final class ExploreView extends View {
 
   @Override
   public void refreshLayout() {
-    label.border(-6, 0, 0, 2).setFont(GUIConstants.lfont);
+    label.border(-6, 0, 0, 2).setFont(lfont);
     refreshMark();
   }
 

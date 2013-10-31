@@ -62,7 +62,7 @@ public final class FNAggr extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx) throws QueryException {
+  protected Expr opt(final QueryContext ctx) {
     // skip non-deterministic and variable expressions
     final Expr e = expr[0];
     if(e.has(Flag.NDT) || e instanceof VarRef) return this;
@@ -94,11 +94,10 @@ public final class FNAggr extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item sum(final Iter iter, final Item it, final boolean avg) throws QueryException {
-
     Item rs = it.type.isUntyped() ? Dbl.get(it.string(info), info) : it;
     final boolean n = rs instanceof ANum;
-    final boolean dtd = !n && rs.type == AtomType.DTD;
-    final boolean ymd = !n && !dtd && rs.type == AtomType.YMD;
+    final boolean dtd = !n && rs.type == DTD;
+    final boolean ymd = !n && !dtd && rs.type == YMD;
     if(!n && (!(rs instanceof Dur) || rs.type == DUR)) SUMTYPE.thrw(info, this, rs.type);
 
     int c = 1;
@@ -107,7 +106,7 @@ public final class FNAggr extends StandardFunc {
         if(!n) FUNDUR.thrw(info, this, i.type);
       } else {
         if(n) FUNNUM.thrw(info, this, i.type);
-        if(dtd && i.type != AtomType.DTD || ymd && i.type != AtomType.YMD)
+        if(dtd && i.type != DTD || ymd && i.type != YMD)
           FUNCMP.thrw(info, this, it.type, i.type);
       }
       rs = Calc.PLUS.ev(info, rs, i);
@@ -144,7 +143,7 @@ public final class FNAggr extends StandardFunc {
       return rs;
     }
     // dates, durations and booleans
-    if(rs instanceof ADate || rs instanceof Dur || rs.type == AtomType.BLN) {
+    if(rs instanceof ADate || rs instanceof Dur || rs.type == BLN) {
       for(Item it; (it = iter.next()) != null;) {
         if(rs.type != it.type) FUNCMP.thrw(info, this, rs.type, it.type);
         if(cmp.eval(rs, it, coll, info)) rs = it;

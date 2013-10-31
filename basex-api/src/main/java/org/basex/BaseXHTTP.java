@@ -30,10 +30,10 @@ import org.eclipse.jetty.xml.*;
 public final class BaseXHTTP {
   /** Database context. */
   private final Context context;
-  /** HTTP port. */
-  private int httpPort;
   /** HTTP server. */
   private final Server jetty;
+  /** HTTP port. */
+  private int httpPort;
   /** Start as daemon. */
   private boolean service;
   /** Stopped flag. */
@@ -257,7 +257,7 @@ public final class BaseXHTTP {
     /* command-line properties will be stored in system properties;
      * this way, they will not be overwritten by the settings specified in web.xml. */
     final Args arg = new Args(args, this, HTTPINFO, Util.info(CONSOLE, HTTP));
-    boolean daemon = false;
+    boolean serve = true;
     while(arg.more()) {
       if(arg.dash()) {
         switch(arg.next()) {
@@ -266,7 +266,7 @@ public final class BaseXHTTP {
             Prop.debug = true;
             break;
           case 'D': // hidden flag: daemon mode
-            daemon = true;
+            serve = false;
             break;
           case 'e': // parse event port
             Options.setSystem(GlobalOptions.EVENTPORT, arg.number());
@@ -292,7 +292,7 @@ public final class BaseXHTTP {
             Options.setSystem(GlobalOptions.STOPPORT, arg.number());
             break;
           case 'S': // set service flag
-            service = !daemon;
+            service = serve;
             break;
           case 'U': // specify user name
             Options.setSystem(GlobalOptions.USER, arg.string());
@@ -304,7 +304,7 @@ public final class BaseXHTTP {
             arg.usage();
         }
       } else {
-        if(!arg.string().equalsIgnoreCase("stop")) arg.usage();
+        if(!"stop".equalsIgnoreCase(arg.string())) arg.usage();
         stopped = true;
       }
     }
@@ -326,7 +326,7 @@ public final class BaseXHTTP {
     // try to connect to the new server instance
     for(int c = 1; c < 10; ++c) {
       if(ping(LOCALHOST, port, ssl)) return;
-      Performance.sleep(c * 100);
+      Performance.sleep(c * 100L);
     }
     throw new BaseXException(CONNECTION_ERROR);
   }
@@ -379,7 +379,6 @@ public final class BaseXHTTP {
   }
 
   /** Monitor for stopping the Jetty server. */
-  @SuppressWarnings("synthetic-access")
   private final class StopServer extends Thread {
     /** Server socket. */
     private final ServerSocket ss;

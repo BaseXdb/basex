@@ -210,7 +210,7 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   public abstract Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
-      final Expr e) throws QueryException;
+                                 final Expr e) throws QueryException;
 
   /**
    * Inlines the given expression into all elements of the given array.
@@ -271,7 +271,7 @@ public abstract class Expr extends ExprInfo {
    * If the arguments of the called expression return a boolean anyway,
    * the expression will be simplified.</p>
    * <p>Example in {@link CmpV}:
-   * {@code if($x eq true())} is rewritten to {@code if($x)}, if {@code $x}
+   * <code>if($x eq true())</code> is rewritten to <code>if($x)</code>, if <code>$x</code>
    * is known to return a single boolean.</p>
    * @param ctx query context
    * @return optimized expression
@@ -411,7 +411,7 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr typeCheck(final TypeCheck tc, final QueryContext ctx, final VarScope scp)
+  protected Expr typeCheck(final TypeCheck tc, final QueryContext ctx, final VarScope scp)
       throws QueryException {
     return null;
   }

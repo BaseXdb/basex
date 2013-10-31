@@ -78,8 +78,8 @@ public final class FNGen extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx) throws QueryException {
-    if(sig == Function.DATA && expr.length == 1) {
+  protected Expr opt(final QueryContext ctx) {
+    if(sig == DATA && expr.length == 1) {
       final SeqType t = expr[0].type();
       type = t.type.isNode() ? SeqType.get(AtomType.ATM, t.occ) : t;
     }
@@ -93,7 +93,7 @@ public final class FNGen extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter data(final QueryContext ctx) throws QueryException {
-    final Iter ir = ctx.iter(expr.length != 0 ? expr[0] : checkCtx(ctx));
+    final Iter ir = ctx.iter(expr.length == 0 ? checkCtx(ctx) : expr[0]);
 
     return new Iter() {
       @Override

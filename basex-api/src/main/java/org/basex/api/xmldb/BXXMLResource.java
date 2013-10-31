@@ -185,7 +185,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
   }
 
   @Override
-  public ContentHandler setContentAsSAX() throws XMLDBException {
+  public ContentHandler setContentAsSAX() {
     // ..might be replaced by a custom SAX content handler in future
     final MemBuilder mb = new MemBuilder("", Parser.emptyParser(new MainOptions()));
     mb.init();

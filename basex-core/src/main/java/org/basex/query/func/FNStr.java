@@ -122,7 +122,7 @@ public final class FNStr extends StandardFunc {
         sb = checkEStr(expr[1], ctx);
         if(coll == null) {
           final int p = indexOf(ss, sb);
-          return p != -1 ? Str.get(substring(ss, p + sb.length)) : Str.ZERO;
+          return p == -1 ? Str.ZERO : Str.get(substring(ss, p + sb.length));
         }
         return Str.get(coll.after(ss, sb, info));
       case SUBSTRING_BEFORE:
@@ -131,7 +131,7 @@ public final class FNStr extends StandardFunc {
         sb = checkEStr(expr[1], ctx);
         if(coll == null) {
           final int p = indexOf(ss, sb);
-          return p != -1 ? Str.get(substring(ss, 0, p)) : Str.ZERO;
+          return p == -1 ? Str.ZERO : Str.get(substring(ss, 0, p));
         }
         return Str.get(coll.before(ss, sb, info));
       default:

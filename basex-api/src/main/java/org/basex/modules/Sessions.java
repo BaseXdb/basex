@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class Sessions extends QueryModule {
+final class Sessions extends QueryModule {
   /**
    * Returns the ids of all registered sessions.
    * @return session ids
@@ -86,7 +86,7 @@ public final class Sessions extends QueryModule {
    * @return session attribute
    * @throws QueryException query exception
    */
-  public Item get(final Str id, final Str key, final Item def) throws QueryException {
+  Item get(final Str id, final Str key, final Item def) throws QueryException {
     final Object o = session(id).getAttribute(key.toJava());
     if(o == null) return def;
     if(o instanceof Item) return (Item) o;

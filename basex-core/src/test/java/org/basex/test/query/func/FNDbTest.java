@@ -203,7 +203,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     new CreateBackup(NAME).execute(context);
     query(COUNT.args(_DB_BACKUPS.args()), "1");
     query(COUNT.args(_DB_BACKUPS.args(NAME)), "1");
-    query(COUNT.args(_DB_BACKUPS.args(NAME + "X")), "0");
+    query(COUNT.args(_DB_BACKUPS.args(NAME + 'X')), "0");
     new DropBackup(NAME).execute(context);
     query(COUNT.args(_DB_BACKUPS.args(NAME)), "0");
   }
@@ -329,7 +329,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_DB_OPEN.args(dbname) + "/root()", "<dummy/>");
 
     // try to create DB twice during same query
-    error(_DB_CREATE.args(dbname) + "," + _DB_CREATE.args(dbname), Err.BXDB_CREATE);
+    error(_DB_CREATE.args(dbname) + ',' + _DB_CREATE.args(dbname), Err.BXDB_CREATE);
 
     // create DB from file
     query(_DB_CREATE.args(dbname, FILE, "in/"));
@@ -357,13 +357,13 @@ public final class FNDbTest extends AdvancedQueryTest {
 
     // try to access non-existing DB (create is supposed to be called last)
     query(_DB_DROP.args(dbname));
-    error(_DB_CREATE.args(dbname) + "," + _DB_DROP.args(dbname), Err.BXDB_OPEN);
+    error(_DB_CREATE.args(dbname) + ',' + _DB_DROP.args(dbname), Err.BXDB_OPEN);
 
     // run update on existing DB then drop it and create a new one
     query(_DB_CREATE.args(dbname, "<a/>", "a.xml"));
     query("insert node <dummy/> into " + _DB_OPEN.args(dbname));
     query(_DB_CREATE.args(dbname, "<dummy/>", "t1.xml") +
-        ", insert node <dummy/> into " + _DB_OPEN.args(dbname) + "," +
+        ", insert node <dummy/> into " + _DB_OPEN.args(dbname) + ',' +
         _DB_DROP.args(dbname));
     query(_DB_OPEN.args(dbname) + "/root()", "<dummy/>");
 
@@ -635,7 +635,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_FILE_EXISTS.args(f));
     // serializes as text; ensures that the output contains no angle bracket
     query(_DB_EXPORT.args(NAME, new IOFile(Prop.TMP, NAME), " {'method':'text'}"));
-    query("0[" + CONTAINS.args(_FILE_READ_TEXT.args(f), "&lt;") + "]", "");
+    query("0[" + CONTAINS.args(_FILE_READ_TEXT.args(f), "&lt;") + ']', "");
     // deletes the exported file
     query(_FILE_DELETE.args(f));
   }

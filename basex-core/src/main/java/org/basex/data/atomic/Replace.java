@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 final class Replace extends StructuralUpdate {
   /** Insertion sequence. */
-  final DataClip insseq;
+  private final DataClip insseq;
 
   /**
    * Constructor.

@@ -21,7 +21,7 @@ public abstract class IndexBuilder extends Proc {
   /** Total parsing value. */
   protected final int size;
   /** Number of index operations to perform before writing a partial index to disk. */
-  protected final int splitSize;
+  private final int splitSize;
 
   /** Runtime for memory consumption. */
   private final Runtime rt = Runtime.getRuntime();
@@ -95,8 +95,8 @@ public abstract class IndexBuilder extends Proc {
     if(!Prop.debug) return;
 
     final StringBuilder sb = new StringBuilder();
-    if(splits > 1) sb.append(" ").append(splits).append(" splits,");
-    sb.append(" ").append(count).append(" operations, ");
+    if(splits > 1) sb.append(' ').append(splits).append(" splits,");
+    sb.append(' ').append(count).append(" operations, ");
     sb.append(perf).append(" (").append(Performance.getMemory()).append(')');
     Util.errln(sb);
   }

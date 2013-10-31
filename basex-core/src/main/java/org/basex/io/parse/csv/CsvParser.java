@@ -11,7 +11,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class CsvParser extends InputParser {
+final class CsvParser extends InputParser {
   /** Converter. */
   private final CsvConverter conv;
   /** Header flag. */

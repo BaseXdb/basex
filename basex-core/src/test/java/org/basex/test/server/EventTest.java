@@ -265,7 +265,7 @@ public final class EventTest extends SandboxTest {
      * @param v value
      * @throws IOException I/O exception
      */
-    public Client(final boolean f, final String v) throws IOException {
+    Client(final boolean f, final String v) throws IOException {
       cs = createClient();
       first = f;
       value = v;

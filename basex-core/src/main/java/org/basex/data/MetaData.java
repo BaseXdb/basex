@@ -387,7 +387,7 @@ public final class MetaData {
    * @return result
    */
   private static boolean toBool(final String v) {
-    return v.equals("1");
+    return "1".equals(v);
   }
 
   /**

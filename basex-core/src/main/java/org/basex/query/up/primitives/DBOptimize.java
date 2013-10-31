@@ -45,7 +45,7 @@ public final class DBOptimize extends DBNew {
   }
 
   @Override
-  public void prepare(final MemData tmp) throws QueryException { }
+  public void prepare(final MemData tmp) { }
 
   @Override
   public void apply() throws QueryException {

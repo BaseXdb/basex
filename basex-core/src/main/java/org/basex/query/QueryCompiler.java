@@ -15,7 +15,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
-public final class QueryCompiler {
+final class QueryCompiler {
   /** Number of scopes from which on linear search is replaced by a hash map. */
   private static final int MAP_THRESHOLD = 16;
 
@@ -32,9 +32,9 @@ public final class QueryCompiler {
   private int next;
 
   /** Adjacency list. */
-  final ArrayList<int[]> adjacent = new ArrayList<int[]>();
+  private final ArrayList<int[]> adjacent = new ArrayList<int[]>();
   /** Declaration list. */
-  final ArrayList<Scope> scopes = new ArrayList<Scope>();
+  private final ArrayList<Scope> scopes = new ArrayList<Scope>();
   /** Declaration list. */
   private IdentityHashMap<Scope, Integer> ids;
 
@@ -79,7 +79,7 @@ public final class QueryCompiler {
    * @return scope to be compiled, the others are compiled recursively
    * @throws QueryException query exception
    */
-  private Scope circCheck(final Scope[] comp) throws QueryException {
+  private static Scope circCheck(final Scope[] comp) throws QueryException {
     if(comp.length > 1)
       for(final Scope scp : comp)
         if(scp instanceof StaticVar) throw Err.circVar((StaticVar) scp);
@@ -219,7 +219,7 @@ public final class QueryCompiler {
         return true;
       }
     });
-    if(!ok) throw Err.VARUNDEF.thrw(((StaticVar) curr).info, curr);
+    if(!ok) throw Err.VARUNDEF.thrw(((StaticScope) curr).info, curr);
     return adj.toArray();
   }
 }

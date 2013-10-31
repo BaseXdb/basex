@@ -65,7 +65,7 @@ public final class FNDbServerTest extends AdvancedQueryTest {
 
     c1.execute(new XQuery(_DB_CREATE.args(NAME)));
     c2.execute(new XQuery(_DB_CREATE.args(NAME)));
-    Assert.assertEquals("true", c1.execute(new XQuery(_DB_EXISTS.args(NAME))));
+    assertEquals("true", c1.execute(new XQuery(_DB_EXISTS.args(NAME))));
   }
 
   /**
@@ -79,24 +79,24 @@ public final class FNDbServerTest extends AdvancedQueryTest {
 
     // same DB name, which is 2 x NUM times
     runTwoClients(new XQuery(_DB_CREATE.args(NAME)));
-    Assert.assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
+    assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
     runTwoClients(new XQuery(_DB_CREATE.args(NAME)));
-    Assert.assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
+    assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
 
     // same DB name and files
     runTwoClients(new XQuery(_DB_CREATE.args(NAME, FILE, "in/")));
-    Assert.assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
+    assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
 
     // drop, create
     runTwoClients(new XQuery(
-      _DB_DROP.args(NAME) + "," +
+      _DB_DROP.args(NAME) + ',' +
       _DB_CREATE.args(NAME, FILE, "in/")
     ));
 
     // add, drop, create
     runTwoClients(new XQuery(
-      _DB_ADD.args(NAME, "<X/>", "x.xml") + "," +
-      _DB_DROP.args(NAME) + "," +
+      _DB_ADD.args(NAME, "<X/>", "x.xml") + ',' +
+      _DB_DROP.args(NAME) + ',' +
       _DB_CREATE.args(NAME, FILE)));
 
     check.execute(new DropDB(NAME));
@@ -108,7 +108,7 @@ public final class FNDbServerTest extends AdvancedQueryTest {
    * @throws IOException I/O exception
    * @throws InterruptedException interrupted exception
    */
-  private void runTwoClients(final Command cmd) throws IOException, InterruptedException {
+  private static void runTwoClients(final Command cmd) throws IOException, InterruptedException {
     final CountDownLatch start = new CountDownLatch(1);
     final CountDownLatch stop = new CountDownLatch(NUM);
     final Client[] clients = new Client[NUM];

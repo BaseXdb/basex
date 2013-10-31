@@ -2,11 +2,10 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.*;
-
 import org.basex.core.*;
 import org.basex.core.parse.*;
-import org.basex.core.parse.Commands.*;
+import org.basex.core.parse.Commands.Cmd;
+import org.basex.core.parse.Commands.CmdRepo;
 import org.basex.query.*;
 import org.basex.query.util.pkg.*;
 import org.basex.util.*;
@@ -32,7 +31,7 @@ public final class RepoDelete extends ARepo {
   }
 
   @Override
-  protected boolean run() throws IOException {
+  protected boolean run() {
     try {
       new RepoManager(context, info).delete(args[0]);
       return info(PKG_DELETED_X, args[0]);

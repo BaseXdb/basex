@@ -19,7 +19,7 @@ public final class EditorText {
   /** Search context. */
   private SearchContext search;
   /** Start and end positions of search terms. */
-  IntList[] spos = { new IntList(), new IntList() };
+  private IntList[] spos = { new IntList(), new IntList() };
 
   /** Text array to be written. */
   private byte[] text = EMPTY;
@@ -481,7 +481,7 @@ public final class EditorText {
       final byte b = text[p];
       if(b == '\n') break;
       if(b == '\t') {
-        s += EditorText.TAB;
+        s += TAB;
       } else if(b == ' ') {
         s++;
       } else {
@@ -491,12 +491,12 @@ public final class EditorText {
     // indent after opening bracket
     if(ps > 0) {
       final int l = text[ps - 1];
-      if(l == '(' || l == '{' || l == '[') s += EditorText.TAB;
+      if(l == '(' || l == '{' || l == '[') s += TAB;
     }
     // unindent before closing bracket
     if(ps < text.length) {
       final int l = text[ps];
-      if(l == ')' || l == '}' || l == ']') s -= EditorText.TAB;
+      if(l == ')' || l == '}' || l == ']') s -= TAB;
     }
     for(int p = 0; p < s; p++) sb.append(' ');
   }
@@ -671,7 +671,7 @@ public final class EditorText {
    * Selects the word at the cursor position.
    */
   void selectWord() {
-    pos(getCaret());
+    pos(pc);
     final boolean ch = ftChar(prev(true));
     while(pos() > 0) {
       final int c = prev(true);
@@ -691,7 +691,7 @@ public final class EditorText {
    * Selects the word at the cursor position.
    */
   void selectLine() {
-    pos(getCaret());
+    pos(pc);
     bol(true);
     startSelect();
     eol(true);

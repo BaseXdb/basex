@@ -86,7 +86,7 @@ public abstract class Step extends Preds {
       if(e != this || e instanceof IterStep) return e;
 
     } finally {
-      if(ct == NodeType.DOC) ctx.value.type = ct;
+      if(ct == NodeType.DOC) ctx.value.type = NodeType.DOC;
       ctx.leaf = leaf;
     }
 
@@ -209,7 +209,7 @@ public abstract class Step extends Preds {
       if(ct == NodeType.DOC) ctx.value.type = NodeType.NOD;
       return super.inline(ctx, scp, v, e);
     } finally {
-      if(ct == NodeType.DOC) ctx.value.type = ct;
+      if(ct == NodeType.DOC) ctx.value.type = NodeType.DOC;
       ctx.leaf = leaf;
     }
   }

@@ -49,7 +49,7 @@ public class DataAccessTest {
   /** Long string: binary representation with unsigned bytes. */
   private static final int[] STR_LONG_BIN = stringToByteArray(STR_LONG);
   /** Byte: binary representation with unsigned bytes. */
-  private static final int[] BYTE_BIN = new int[] { toUnsignedByte(BYTE) };
+  private static final int[] BYTE_BIN = { toUnsignedByte(BYTE) };
   /** Long (5-byte long): binary representation with unsigned bytes. */
   private static final int[] LONG_BIN = longToByteArray(LONG);
   /** Integer: binary representation with unsigned bytes. */
@@ -68,9 +68,9 @@ public class DataAccessTest {
   private static final long RANDOM_POS = 15L;
 
   /** Temporary file. */
-  protected IOFile file;
+  private IOFile file;
   /** Instance under test. */
-  protected DataAccess da;
+  private DataAccess da;
 
   /**
    * Set up method.
@@ -356,7 +356,7 @@ public class DataAccessTest {
    * @param bytes expected unsigned bytes
    * @throws IOException I/O exception
    */
-  protected void assertContent(final long pos, final int[] bytes) throws IOException {
+  void assertContent(final long pos, final int[] bytes) throws IOException {
     final RandomAccessFile f = new RandomAccessFile(file.file(), "r");
     try {
       f.seek(pos);
@@ -372,7 +372,7 @@ public class DataAccessTest {
    * @param out file.
    * @throws IOException I/O exception
    */
-  protected static void initialContent(final RandomAccessFile out) throws IOException {
+  private static void initialContent(final RandomAccessFile out) throws IOException {
     write(out, STR_BIN);
     write(out, BYTE_BIN);
     write(out, LONG_BIN);

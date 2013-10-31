@@ -23,13 +23,13 @@ import org.junit.*;
  */
 public abstract class SandboxTest {
   /** Default output stream. */
-  public static final PrintStream OUT = System.out;
+  static final PrintStream OUT = System.out;
   /** Default error stream. */
-  public static final PrintStream ERR = System.err;
+  protected static final PrintStream ERR = System.err;
   /** Null output stream. */
-  public static final PrintStream NULL = new PrintStream(new NullOutput());
+  protected static final PrintStream NULL = new PrintStream(new NullOutput());
   /** Test name. */
-  public static final String NAME = Util.className(SandboxTest.class);
+  protected static final String NAME = Util.className(SandboxTest.class);
   /** Database context. */
   protected static Context context;
   /** Clean up files. */
@@ -110,7 +110,7 @@ public abstract class SandboxTest {
    * @return client instance
    * @throws IOException I/O exception
    */
-  public static ClientSession createClient(final String... login) throws IOException {
+  protected static ClientSession createClient(final String... login) throws IOException {
     final String user = login.length > 0 ? login[0] : ADMIN;
     final String pass = login.length > 1 ? login[1] : ADMIN;
     return new ClientSession(LOCALHOST, 9999, user, pass);
@@ -157,13 +157,13 @@ public abstract class SandboxTest {
     @Override
     public void run() {
       try {
-        if(null != startSignal) startSignal.await();
+        if(startSignal != null) startSignal.await();
         session.execute(cmd);
         session.close();
       } catch(final Throwable ex) {
-        error = "\n" + cmd + "\n" + ex;
+        error = "\n" + cmd + '\n' + ex;
       } finally {
-        if(null != stopSignal) stopSignal.countDown();
+        if(stopSignal != null) stopSignal.countDown();
       }
     }
   }

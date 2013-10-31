@@ -77,7 +77,7 @@ public final class IOFile extends IO {
       try {
         if(file.createNewFile()) return true;
       } catch(final IOException ex) {
-        Performance.sleep(i * 10l);
+        Performance.sleep(i * 10L);
         Util.debug(ex);
       }
     }
@@ -242,13 +242,13 @@ public final class IOFile extends IO {
    * @return success flag
    */
   public boolean delete() {
-    boolean ok = true;
     if(file.exists()) {
+      boolean ok = true;
       if(isDir()) for(final IOFile ch : children()) ok &= ch.delete();
       // some file systems require several runs
       for(int i = 0; i < 5; i++) {
         if(file.delete() && !file.exists()) return ok;
-        Performance.sleep(i * 10l);
+        Performance.sleep(i * 10L);
       }
     }
     return false;
@@ -341,14 +341,10 @@ public final class IOFile extends IO {
   public static String regex(final String glob, final boolean sub) {
     final StringBuilder sb = new StringBuilder();
     for(final String g : glob.split(",")) {
-      boolean suf = false;
       final String gl = g.trim();
-      if(sb.length() != 0) {
-        if(suf) sb.append(".*");
-        suf = false;
-        sb.append('|');
-      }
+      if(sb.length() != 0) sb.append('|');
       // loop through single pattern
+      boolean suf = false;
       for(int f = 0; f < gl.length(); f++) {
         char ch = gl.charAt(f);
         if(ch == '*') {
@@ -374,7 +370,7 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Normalizes the specified URL and creates a new {@link IOFile} instance.
+   * Normalizes the specified URL and creates a new instance of this class.
    * @param url url to be converted
    * @return file path
    */
@@ -449,10 +445,10 @@ public final class IOFile extends IO {
       if(s.length() > 1 && s.charAt(1) == ':' && size == 0) {
         s = Character.toUpperCase(s.charAt(0)) + s.substring(1);
       }
-      if(s.equals("..") && size > 0) {
+      if("..".equals(s) && size > 0) {
         // parent step
         if(list[size - 1].indexOf(':') == -1) deleteAt(size - 1);
-      } else if(!s.equals(".") && !s.isEmpty()) {
+      } else if(!".".equals(s) && !s.isEmpty()) {
         // skip self and empty steps
         add(s);
       }

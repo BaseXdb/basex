@@ -70,7 +70,7 @@ public final class XMLParserTest extends SandboxTest {
 
       // compare results
       if(def != cust) {
-        sb.append("\n").append(def ? "- not accepted: " : "- not rejected: ").append(doc);
+        sb.append('\n').append(def ? "- not accepted: " : "- not rejected: ").append(doc);
       }
     }
 

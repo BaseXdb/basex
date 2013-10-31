@@ -63,7 +63,7 @@ public final class QuerySuggest extends QueryParser {
   }
 
   @Override
-  protected void checkInit() {
+  void checkInit() {
     if(stack != null && !stack.empty()) return;
     all = data.paths.root();
     curr = all;

@@ -11,11 +11,4 @@ import org.basex.util.options.*;
 public final class CsvParserOptions extends CsvOptions {
   /** Option: encoding. */
   public static final StringOption ENCODING = new StringOption("encoding");
-
-  /**
-   * Constructor.
-   */
-  public CsvParserOptions() {
-    super();
-  }
 }

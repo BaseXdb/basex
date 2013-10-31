@@ -34,9 +34,9 @@ public final class Zip extends Proc {
    * @throws IOException I/O exception
    */
   private int size() throws IOException {
-    int c = 0;
     final ZipInputStream in = new ZipInputStream(archive.inputStream());
     try {
+      int c = 0;
       while(in.getNextEntry() != null) c++;
       return c;
     } finally {
@@ -67,11 +67,11 @@ public final class Zip extends Proc {
    * @throws IOException I/O exception
    */
   public void unzip(final IOFile target) throws IOException {
-    final byte[] data = new byte[IO.BLOCKSIZE];
     final ZipInputStream in = new ZipInputStream(archive.inputStream());
     total = size();
     curr = 0;
     try {
+      final byte[] data = new byte[IO.BLOCKSIZE];
       for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
         curr++;
         final IOFile trg = new IOFile(target, ze.getName());
@@ -101,7 +101,6 @@ public final class Zip extends Proc {
   public void zip(final IOFile root, final StringList files) throws IOException {
     if(!(archive instanceof IOFile)) throw new FileNotFoundException(archive.path());
 
-    final byte[] data = new byte[IO.BLOCKSIZE];
     final ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(
         new FileOutputStream(archive.path())));
     curr = 0;
@@ -111,6 +110,7 @@ public final class Zip extends Proc {
       out.setLevel(1);
       // loop through all files
       total = files.size();
+      final byte[] data = new byte[IO.BLOCKSIZE];
       for(final String file : files) {
         curr++;
         final FileInputStream in = new FileInputStream(new File(root.file(), file));
@@ -140,7 +140,7 @@ public final class Zip extends Proc {
    * @return entry
    * @throws IOException I/O exception
    */
-  public static byte[] getEntry(final ZipInputStream in, final String entry)
+  private static byte[] getEntry(final ZipInputStream in, final String entry)
       throws IOException {
 
     for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {

@@ -31,9 +31,9 @@ public final class SAXWrapper extends SingleParser {
     "http://xml.org/sax/properties/lexical-handler";
 
   /** File counter. */
-  long counter;
+  private long counter;
   /** Current line. */
-  int line = 1;
+  private int line = 1;
 
   /** SAX handler reference. */
   private SAXHandler saxh;

@@ -13,7 +13,7 @@ import org.basex.io.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public abstract class MainTest extends SandboxTest {
+abstract class MainTest extends SandboxTest {
   /** Input file. */
   static final IOFile INPUT = new IOFile(Prop.TMP + NAME + ".in");
 

@@ -22,11 +22,11 @@ public final class GUIOptions extends Options {
   public static final Comment C_PATHS = new Comment("Paths");
 
   /** Path to database input. */
-  public static final StringOption INPUTPATH = new StringOption("INPUTPATH", Prop.HOME);
+  public static final StringOption INPUTPATH = new StringOption("INPUTPATH", HOME);
   /** Path for additional material. */
-  public static final StringOption DATAPATH = new StringOption("DATAPATH", Prop.HOME);
+  public static final StringOption DATAPATH = new StringOption("DATAPATH", HOME);
   /** Path to working directory. */
-  public static final StringOption WORKPATH = new StringOption("WORKPATH", Prop.HOME);
+  public static final StringOption WORKPATH = new StringOption("WORKPATH", HOME);
   /** Last editor files. */
   public static final StringsOption EDITOR = new StringsOption("EDITOR");
   /** Input paths. */
@@ -205,8 +205,8 @@ public final class GUIOptions extends Options {
   public GUIOptions() {
     super(new IOFile(HOME + IO.BASEXSUFFIX + "gui"));
     // reset realtime operations
-    set(GUIOptions.FILTERRT, false);
-    set(GUIOptions.EXECRT, false);
-    Prop.gui = true;
+    set(FILTERRT, false);
+    set(EXECRT, false);
+    gui = true;
   }
 }

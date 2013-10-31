@@ -91,13 +91,13 @@ public class FuncType implements Type {
 
   @Override
   public final Item cast(final Object o, final QueryContext ctx, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+      final InputInfo ii) {
     throw Util.notexpected(o);
   }
 
   @Override
   public final Item castString(final String s, final QueryContext ctx,
-      final StaticContext sc, final InputInfo ii) throws QueryException {
+      final StaticContext sc, final InputInfo ii) {
     throw Util.notexpected(s);
   }
 
@@ -204,7 +204,7 @@ public class FuncType implements Type {
   public static Type find(final QNm type) {
     if(type.uri().length == 0) {
       final byte[] ln = type.local();
-      if(Token.eq(ln, token(FUNCTION))) return FuncType.ANY_FUN;
+      if(Token.eq(ln, token(FUNCTION))) return ANY_FUN;
       if(Token.eq(ln, MAP)) return SeqType.ANY_MAP;
     }
     return null;

@@ -69,7 +69,7 @@ final class BXServletRequest extends AbstractRequest {
    * Constructor.
    * @param r HTTP servlet request
    */
-  public BXServletRequest(final HttpServletRequest r) {
+  BXServletRequest(final HttpServletRequest r) {
     req = r;
     method = Method.valueOf(r.getMethod());
     url = r.getRequestURL().toString(); // MiltonUtils.stripContext(r);
@@ -219,7 +219,7 @@ final class BXServletRequest extends AbstractRequest {
    * @return {@code true} if the request is multi-part
    */
   boolean isMultiPart() {
-    return ContentType.MULTIPART.equals(getRequestContentType());
+    return getRequestContentType() == ContentType.MULTIPART;
   }
 }
 
@@ -255,7 +255,7 @@ class FileItemWrapper implements com.bradmcevoy.http.FileItem {
    * Constructor.
    * @param f file item
    */
-  public FileItemWrapper(final FileItem f) {
+  FileItemWrapper(final FileItem f) {
     wrapped = f;
     name = fixIEFileName(wrapped.getName());
   }

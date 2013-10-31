@@ -24,11 +24,11 @@ import org.basex.util.options.*;
  */
 public final class GUIInput extends BaseXTextField {
   /** Reference to main window. */
-  final GUI gui;
+  private final GUI gui;
   /** JComboBox. */
-  final BaseXCombo box;
+  private final BaseXCombo box;
   /** BasicComboPopup Menu. */
-  ComboPopup pop;
+  private ComboPopup pop;
 
   /** String for temporary input. */
   private String pre = "";
@@ -77,16 +77,16 @@ public final class GUIInput extends BaseXTextField {
 
         int bi = box.getSelectedIndex();
         if(NEXTLINE.is(e)) {
-          if(!pop.isVisible()) {
-            showPopup();
-          } else {
+          if(pop.isVisible()) {
             if(++bi == count) bi = 0;
+          } else {
+            showPopup();
           }
         } else if(PREVLINE.is(e)) {
-          if(!pop.isVisible()) {
-            showPopup();
-          } else {
+          if(pop.isVisible()) {
             if(--bi < 0) bi = count - 1;
+          } else {
+            showPopup();
           }
         }
         if(bi != box.getSelectedIndex()) box.setSelectedIndex(bi);

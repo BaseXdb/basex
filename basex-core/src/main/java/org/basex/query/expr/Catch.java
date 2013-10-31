@@ -31,7 +31,7 @@ public final class Catch extends Single {
     create(E_LINE_NUMBER), create(E_COLUM_NUMBER), create(E_ADDITIONAL)
   };
   /** Error types. */
-  public static final SeqType[] TYPES = {
+  private static final SeqType[] TYPES = {
     SeqType.QNM, SeqType.STR_ZO, SeqType.ITEM_ZM, SeqType.STR_ZO,
     SeqType.ITR_ZO, SeqType.ITR_ZO, SeqType.ITEM_ZM
   };
@@ -57,7 +57,7 @@ public final class Catch extends Single {
   }
 
   @Override
-  public Catch compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Catch compile(final QueryContext ctx, final VarScope scp) {
     try {
       expr = expr.compile(ctx, scp);
       type = expr.type();
@@ -97,7 +97,7 @@ public final class Catch extends Single {
 
   @Override
   public Catch inline(final QueryContext ctx, final VarScope scp, final Var v,
-      final Expr e) throws QueryException {
+      final Expr e) {
     try {
       final Expr sub = expr.inline(ctx, scp, v, e);
       if(sub == null) return null;
@@ -116,8 +116,8 @@ public final class Catch extends Single {
    * @return equivalent expression
    * @throws QueryException query exception during inlining
    */
-  protected Expr asExpr(final QueryException ex, final QueryContext ctx,
-      final VarScope scp) throws QueryException {
+  Expr asExpr(final QueryException ex, final QueryContext ctx,
+              final VarScope scp) throws QueryException {
 
     if(expr.isValue()) return expr;
     int i = 0;
@@ -157,7 +157,7 @@ public final class Catch extends Single {
    * @param qe thrown error
    * @return result of check
    */
-  protected boolean matches(final QueryException qe) {
+  boolean matches(final QueryException qe) {
     final QNm code = qe.qname();
     for(final NameTest c : codes) if(c.eq(code)) return true;
     return false;

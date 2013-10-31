@@ -246,7 +246,7 @@ public final class DialogExport extends BaseXDialog {
    * @param opts serialization options
    * @return string
    */
-  private String tooltip(final Options opts) {
+  private static String tooltip(final Options opts) {
     final StringBuilder sb = new StringBuilder("<html><b>").append(PARAMETERS).append(":</b><br>");
     for(final Option<?> so : opts) {
       if(!(so instanceof OptionsOption)) sb.append("\u2022 ").append(so).append("<br/>");

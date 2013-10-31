@@ -63,7 +63,7 @@ import org.basex.util.*;
  * S2 are to be inserted on the following axis of S1.<br/>
  *
  * Another case: P2 a {@link DeleteNode} on T and P1 an {@link InsertBefore} on T. As
- * L2=L1, P2, the execution sequence must be (P2,P1). For (P1,P2) S1 would be deleted by
+ * L2=L1, P2, the execution sequence must be (P2,P1). for(P1,P2) S1 would be deleted by
  * P2. The correct order is also determined by the order of {@link PrimitiveType}. Here
  * we see that ordering updates simply by the actually affected PRE value L is not
  * sufficient.</li>

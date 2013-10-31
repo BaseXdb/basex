@@ -40,7 +40,7 @@ public abstract class ConsoleReader {
    * Reads a password.
    * @return password as plain text
    */
-  public abstract String readPassword();
+  protected abstract String readPassword();
 
   /**
    * Create a new password reader for this console.

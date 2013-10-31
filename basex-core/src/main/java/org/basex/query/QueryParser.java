@@ -81,9 +81,9 @@ public class QueryParser extends InputParser {
   public final TokenMap namespaces = new TokenMap();
 
   /** Query context. */
-  final QueryContext ctx;
+  private final QueryContext ctx;
   /** Static context. */
-  final StaticContext sc;
+  private final StaticContext sc;
 
   /** Temporary token cache. */
   private final TokenBuilder tok = new TokenBuilder();
@@ -477,7 +477,7 @@ public class QueryParser extends InputParser {
     if(wsConsumeWs(PAR1)) {
       do {
         final Expr ex = literal();
-        if(ex == null || !(ex instanceof Item)) error(ANNVALUE);
+        if(!(ex instanceof Item)) error(ANNVALUE);
         vb.add((Item) ex);
       } while(wsConsumeWs(COMMA));
       wsCheck(PAR2);
@@ -882,9 +882,9 @@ public class QueryParser extends InputParser {
     final SeqType tp = optAsType();
     if(module != null && !eq(vn.uri(), module.uri())) error(MODNS, vn);
 
-    final Expr bind;
     scope = new VarScope(sc);
     final boolean external = wsConsumeWs(EXTERNAL);
+    final Expr bind;
     if(external) {
       bind = sc.xquery3() && wsConsumeWs(ASSIGN) ? check(single(), NOVARDECL) : null;
     } else {
@@ -1282,8 +1282,8 @@ public class QueryParser extends InputParser {
       least = !wsConsumeWs(GREATEST);
       if(least) wsCheck(LEAST);
     }
-    final Collation coll = !wsConsumeWs(COLLATION) ? sc.collation :
-      Collation.get(stringLiteral(), ctx, sc, info(), FLWORCOLL);
+    final Collation coll = wsConsumeWs(COLLATION) ?
+      Collation.get(stringLiteral(), ctx, sc, info(), FLWORCOLL) : sc.collation;
     return new OrderBy.Key(info(), e, desc, least, coll);
   }
 
@@ -1331,8 +1331,8 @@ public class QueryParser extends InputParser {
         by = vr;
       }
 
-      final Collation coll = !wsConsumeWs(COLLATION) ? sc.collation :
-        Collation.get(stringLiteral(), ctx, sc, info(), FLWORCOLL);
+      final Collation coll = wsConsumeWs(COLLATION) ? Collation.get(stringLiteral(),
+          ctx, sc, info(), FLWORCOLL) : sc.collation;
       final GroupBy.Spec spec =
           new GroupBy.Spec(ii, addLocal(name, type, false), by, coll);
       if(specs == null) {
@@ -1902,7 +1902,7 @@ public class QueryParser extends InputParser {
   /**
    * Performs an optional check init.
    */
-  protected void checkInit() { }
+  void checkInit() { }
 
   /**
    * Performs an optional axis check.
@@ -2181,8 +2181,7 @@ public class QueryParser extends InputParser {
       if(keyword(name)) error(RESERVED, name.local());
       final Expr ex = numericLiteral(true);
       if(!(ex instanceof Int)) return ex;
-      final long card = ex instanceof Int ? ((Int) ex).itr() : -1;
-      if(card < 0 || card > Integer.MAX_VALUE) error(FUNCUNKNOWN, name);
+      final long card = ((ANum) ex).itr();
       final Expr lit = Functions.getLiteral(name, (int) card, ctx, sc, info());
       return lit != null ? lit : FuncLit.unknown(name, card, ctx, sc, info());
     }
@@ -2445,11 +2444,11 @@ public class QueryParser extends InputParser {
               consume();
             } else {
               final byte[] text = tb.finish();
-              if(text.length != 0) {
-                add(attv, Str.get(text));
-              } else {
+              if(text.length == 0) {
                 add(attv, enclosed(NOENCLEXPR));
                 simple = false;
+              } else {
+                add(attv, Str.get(text));
               }
               tb.reset();
             }
@@ -2714,7 +2713,7 @@ public class QueryParser extends InputParser {
   private Expr compElement() throws QueryException {
     skipWS();
 
-    Expr name;
+    final Expr name;
     final QNm qn = eQName(null, SKIPCHECK);
     if(qn != null) {
       name = qn;
@@ -2739,7 +2738,7 @@ public class QueryParser extends InputParser {
   private Expr compAttribute() throws QueryException {
     skipWS();
 
-    Expr name;
+    final Expr name;
     final QNm qn = eQName(null, SKIPCHECK);
     if(qn != null) {
       name = qn;
@@ -2765,14 +2764,14 @@ public class QueryParser extends InputParser {
     if(!sc.xquery3()) return null;
     skipWS();
 
-    Expr name;
+    final Expr name;
     final byte[] str = ncName(null);
-    if(str.length != 0) {
-      name = Str.get(str);
-    } else {
+    if(str.length == 0) {
       if(!wsConsume(BRACE1)) return null;
       name = check(expr(), NSWRONG);
       wsCheck(BRACE2);
+    } else {
+      name = Str.get(str);
     }
 
     if(!wsConsume(BRACE1)) return null;
@@ -2813,14 +2812,14 @@ public class QueryParser extends InputParser {
   private Expr compPI() throws QueryException {
     skipWS();
 
-    Expr name;
+    final Expr name;
     final byte[] str = ncName(null);
-    if(str.length != 0) {
-      name = Str.get(str);
-    } else {
+    if(str.length == 0) {
       if(!wsConsume(BRACE1)) return null;
       name = check(expr(), PIWRONG);
       wsCheck(BRACE2);
+    } else {
+      name = Str.get(str);
     }
 
     if(!wsConsume(BRACE1)) return null;
@@ -2937,7 +2936,7 @@ public class QueryParser extends InputParser {
     if(!(t instanceof NodeType)) wsCheck(PAR2);
 
     // return type with an optional kind test for node types
-    return SeqType.get(t, SeqType.Occ.ONE, kindTest((NodeType) t));
+    return SeqType.get(t, Occ.ONE, kindTest((NodeType) t));
   }
 
   /**
@@ -3074,8 +3073,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Test piTest() throws QueryException {
-    final byte[] nm;
     tok.reset();
+    final byte[] nm;
     if(quote(curr())) {
       nm = trim(stringLiteral());
       if(!XMLToken.isNCName(nm)) error(INVNCNAME, nm);
@@ -3481,8 +3480,8 @@ public class QueryParser extends InputParser {
     if(range != null) {
       wsCheck(LEVELS);
       // values will always be integer instances
-      min = ((Int) range[0]).itr();
-      max = ((Int) range[1]).itr();
+      min = ((ANum) range[0]).itr();
+      max = ((ANum) range[1]).itr();
     }
     thes.add(new Thesaurus(fl, rel, min, max, ctx.context));
   }
@@ -3679,13 +3678,13 @@ public class QueryParser extends InputParser {
     if(!ncName()) {
       if(err != null) error(err, consume());
     } else if(consume(':')) {
-      if(!XMLToken.isNCStartChar(curr())) {
-        --pos;
-      } else {
+      if(XMLToken.isNCStartChar(curr())) {
         tok.add(':');
         do {
           tok.add(consume());
         } while(XMLToken.isNCChar(curr()));
+      } else {
+        --pos;
       }
     }
     return tok.finish();
@@ -3769,7 +3768,7 @@ public class QueryParser extends InputParser {
   private void entityError(final int p, final Err c) throws QueryException {
     final String sub = input.substring(p, Math.min(p + 20, length));
     final int semi = sub.indexOf(';');
-    final String ent = semi != -1 ? sub.substring(0, semi + 1) : sub + "...";
+    final String ent = semi == -1 ? sub + "..." : sub.substring(0, semi + 1);
     error(c, ent);
   }
 
@@ -3988,7 +3987,7 @@ public class QueryParser extends InputParser {
    * @return never
    * @throws QueryException query exception
    */
-  public QueryException error(final Err err, final Object... arg) throws QueryException {
+  QueryException error(final Err err, final Object... arg) throws QueryException {
     throw err.thrw(info(), arg);
   }
 

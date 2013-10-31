@@ -158,7 +158,7 @@ public final class MainOptions extends Options {
   public static final NumberOption MAXHITS = new NumberOption("MAXHITS", -1);
 
   /** Parser. */
-  public static enum MainParser {
+  public enum MainParser {
     /** XML.  */ XML,
     /** HTML. */ HTML,
     /** Json. */ JSON,

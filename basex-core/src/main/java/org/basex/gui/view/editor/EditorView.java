@@ -55,22 +55,22 @@ public final class EditorView extends View {
       "^.*\r?\n" + STOPPED_AT + "|\r?\n" + STACK_TRACE + COL + ".*", Pattern.DOTALL);
 
   /** Search bar. */
-  final SearchBar search;
+  private final SearchBar search;
   /** History Button. */
-  final BaseXButton hist;
+  private final BaseXButton hist;
   /** Execute Button. */
-  final BaseXButton stop;
+  private final BaseXButton stop;
   /** Info label. */
-  final BaseXLabel info;
+  private final BaseXLabel info;
   /** Position label. */
-  final BaseXLabel pos;
+  private final BaseXLabel pos;
   /** Query area. */
-  final BaseXTabs tabs;
+  private final BaseXTabs tabs;
   /** Execute button. */
-  final BaseXButton go;
+  private final BaseXButton go;
 
   /** Thread counter. */
-  int threadID;
+  private int threadID;
   /** File in which the most recent error occurred. */
   IO errFile;
 
@@ -93,7 +93,7 @@ public final class EditorView extends View {
     border(5).layout(new BorderLayout());
 
     label = new BaseXLabel(EDITOR, true, false);
-    label.setForeground(GUIConstants.GRAY);
+    label.setForeground(GRAY);
 
     final BaseXButton openB = BaseXButton.command(GUICommands.C_EDITOPEN, gui);
     final BaseXButton saveB = new BaseXButton(gui, "save", H_SAVE);
@@ -271,10 +271,10 @@ public final class EditorView extends View {
 
   @Override
   public void refreshLayout() {
-    label.border(-6, 0, 0, 2).setFont(GUIConstants.lfont);
-    for(final EditorArea edit : editors()) edit.setFont(GUIConstants.mfont);
+    label.border(-6, 0, 0, 2).setFont(lfont);
+    for(final EditorArea edit : editors()) edit.setFont(mfont);
     search.refreshLayout();
-    final Font ef = GUIConstants.font.deriveFont(7f + (GUIConstants.fontSize >> 1));
+    final Font ef = GUIConstants.font.deriveFont(7f + (fontSize >> 1));
     info.setFont(ef);
     pos.setFont(ef);
   }
@@ -393,9 +393,8 @@ public final class EditorView extends View {
    */
   void refreshHistory(final IO file) {
     final StringList paths = new StringList();
-    String path;
     if(file != null) {
-      path = file.path();
+      final String path = file.path();
       gui.gopts.set(GUIOptions.WORKPATH, file.dirPath());
       paths.add(path);
       tabs.setToolTipTextAt(tabs.getSelectedIndex(), path);
@@ -447,8 +446,8 @@ public final class EditorView extends View {
     final DialogLine dl = new DialogLine(gui, l);
     if(!dl.ok()) return;
     final int el = dl.line();
-    int p = 0;
     l = 1;
+    int p = 0;
     for(int e = 0; e < ll && l < el; e += cl(edit.last, e)) {
       if(edit.last[e] != '\n') continue;
       p = e + 1;
@@ -497,11 +496,11 @@ public final class EditorView extends View {
     }
 
     if(ok) {
-      info.setCursor(GUIConstants.CURSORARROW);
+      info.setCursor(CURSORARROW);
       info.setText(msg, Msg.SUCCESS).setToolTipText(null);
     } else {
       error(msg, false);
-      info.setCursor(GUIConstants.CURSORHAND);
+      info.setCursor(CURSORHAND);
       info.setText(ERRORINFO.matcher(msg).replaceAll(""), Msg.ERROR);
       final String tt = ERRORTT.matcher(msg).replaceAll("").
           replace("<", "&lt;").replace(">", "&gt;").
@@ -539,15 +538,16 @@ public final class EditorView extends View {
    */
   private void error(final boolean jump) {
     Matcher m = XQERROR.matcher(errMsg);
-    int el, ec = 2;
+    final int el;
+    int ec = 2;
     if(m.matches()) {
       errFile = new IOFile(m.group(1));
-      el = Token.toInt(m.group(2));
-      ec = Token.toInt(m.group(3));
+      el = toInt(m.group(2));
+      ec = toInt(m.group(3));
     } else {
       m = XMLERROR.matcher(errMsg);
       if(!m.matches()) return;
-      el = Token.toInt(m.group(1));
+      el = toInt(m.group(1));
       errFile = getEditor().file;
     }
 
@@ -608,7 +608,7 @@ public final class EditorView extends View {
    * Returns the current editor.
    * @return editor
    */
-  public EditorArea getEditor() {
+  EditorArea getEditor() {
     final Component c = tabs.getSelectedComponent();
     return c instanceof EditorArea ? (EditorArea) c : null;
   }
@@ -698,7 +698,7 @@ public final class EditorView extends View {
    */
   EditorArea addTab() {
     final EditorArea edit = new EditorArea(this, newTabFile());
-    edit.setFont(GUIConstants.mfont);
+    edit.setFont(mfont);
 
     final BaseXBack tab = new BaseXBack(new BorderLayout(10, 0)).mode(Fill.NONE);
     tab.add(edit.label, BorderLayout.CENTER);

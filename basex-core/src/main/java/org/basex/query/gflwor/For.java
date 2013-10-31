@@ -27,7 +27,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
-public final class For extends GFLWOR.Clause {
+public final class For extends Clause {
   /** Item variable. */
   final Var var;
   /** Position variable. */
@@ -102,13 +102,13 @@ public final class For extends GFLWOR.Clause {
     if(empty) e.add(planAttr(Token.token(EMPTYORD), Token.TRUE));
     var.plan(e);
     if(pos != null) {
-      final FElem e2 = new FElem(QueryText.AT);
+      final FElem e2 = new FElem(AT);
       pos.plan(e2);
       e.add(e2);
     }
 
     if(score != null) {
-      final FElem e2 = new FElem(QueryText.SCORE);
+      final FElem e2 = new FElem(SCORE);
       score.plan(e2);
       e.add(e2);
     }
@@ -209,7 +209,7 @@ public final class For extends GFLWOR.Clause {
    * @param p position
    * @return {@code true} if the clause was converted, {@code false} otherwise
    */
-  boolean asLet(final List<GFLWOR.Clause> clauses, final int p) {
+  boolean asLet(final List<Clause> clauses, final int p) {
     if(expr.size() != 1 && !expr.type().one()) return false;
     clauses.set(p, Let.fromFor(this));
     if(score != null) clauses.add(p + 1, Let.fromForScore(this));
@@ -235,7 +235,7 @@ public final class For extends GFLWOR.Clause {
 
     // add to clause expression
     if(expr instanceof AxisPath) {
-      expr = ((AxisPath) expr).addPreds(ctx, scp, a);
+      expr = ((Path) expr).addPreds(ctx, scp, a);
     } else if(expr instanceof Filter) {
       expr = ((Filter) expr).addPred(ctx, scp, a);
     } else {

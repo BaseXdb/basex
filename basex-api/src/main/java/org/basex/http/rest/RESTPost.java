@@ -45,7 +45,7 @@ final class RESTPost {
     validate(input);
 
     final Context ctx = rs.context;
-    DBNode doc;
+    final DBNode doc;
     try {
       doc = new DBNode(new IOContent(input), ctx.options);
     } catch(final IOException ex) {
@@ -87,8 +87,8 @@ final class RESTPost {
       }
 
       // handle input
-      String value = null;
       qp = new QueryProcessor("*/*:context/node()", ctx).context(doc);
+      String value = null;
       for(final Item it : qp.value()) {
         if(value != null) HTTPCode.MULTIPLE_CONTEXT_X.thrw();
         // create main memory instance of the specified node

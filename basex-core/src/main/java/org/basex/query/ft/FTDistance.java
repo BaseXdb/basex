@@ -100,7 +100,7 @@ public final class FTDistance extends FTFilter {
   @Override
   public FTExpr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
       throws QueryException {
-    return inlineAll(ctx, scp, expr, v, e) | inlineAll(ctx, scp, new Expr[] { min, max }, v, e)
+    return inlineAll(ctx, scp, expr, v, e) || inlineAll(ctx, scp, new Expr[] { min, max }, v, e)
         ? optimize(ctx, scp) : null;
   }
 

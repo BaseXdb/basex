@@ -261,7 +261,7 @@ public final class BaseXServer extends Main implements Runnable {
             arg.usage();
         }
       } else {
-        if(arg.string().equalsIgnoreCase("stop")) {
+        if("stop".equalsIgnoreCase(arg.string())) {
           stopped = true;
         } else {
           arg.usage();
@@ -367,7 +367,7 @@ public final class BaseXServer extends Main implements Runnable {
    * @author BaseX Team 2005-13, BSD License
    * @author Andreas Weiler
    */
-  final class EventListener extends Thread {
+  private final class EventListener extends Thread {
     @Override
     public void run() {
       while(running) {

@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  */
 public class MainModule extends StaticScope {
   /** Declared type, {@code null} if not specified. */
-  public final SeqType declType;
+  private final SeqType declType;
 
   /**
    * Constructor.

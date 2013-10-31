@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public interface Type {
   /** Type IDs for client/server communication. */
-  public static enum ID {
+  enum ID {
     // function types
     /** function(*).              */ FUN(7),
 
@@ -96,7 +96,7 @@ public interface Type {
      * Constructor.
      * @param i type id
      */
-    private ID(final int i) {
+    ID(final int i) {
       id = (byte) i;
     }
 

@@ -96,7 +96,7 @@ final class EnglishStemmer extends InternalStemmer {
   protected byte[] stem(final byte[] str) {
     te = str.length;
     tok = str;
-    return !s() ? str : Arrays.copyOf(str, te);
+    return s() ? Arrays.copyOf(str, te) : str;
   }
 
   /**

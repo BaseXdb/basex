@@ -38,7 +38,7 @@ final class FTTokenizer {
    * @param w full-text words
    * @param ctx query context
    */
-  public FTTokenizer(final FTWords w, final QueryContext ctx) {
+  FTTokenizer(final FTWords w, final QueryContext ctx) {
     this(w, ctx.ftOpt(), new Levenshtein(ctx.context.options.get(MainOptions.LSERROR)));
   }
 
@@ -48,7 +48,7 @@ final class FTTokenizer {
    * @param o full-text options
    * @param l Levenshtein distance calculation
    */
-  public FTTokenizer(final FTWords w, final FTOpt o, final Levenshtein l) {
+  private FTTokenizer(final FTWords w, final FTOpt o, final Levenshtein l) {
     words = w;
     opt = o;
     ls = l;
@@ -157,7 +157,7 @@ final class FTTokenizer {
    * @param ftw calling expression
    * @return copy
    */
-  protected FTTokenizer copy(final FTWords ftw) {
+  FTTokenizer copy(final FTWords ftw) {
     return new FTTokenizer(ftw, opt, ls);
   }
 }

@@ -47,7 +47,6 @@ public class ParseException extends Exception {
    */
 
   public ParseException() {
-    super();
   }
 
   /** Constructor with message.
@@ -108,7 +107,7 @@ public class ParseException extends Exception {
     }
     String retval = "Encountered \"";
     Token tok = curr.next;
-    for (int i = 0; i < maxSize; i++) {
+    for(int i = 0; i < maxSize; i++) {
       if(i != 0) retval += " ";
       if(tok.kind == 0) {
         retval += img[0];
@@ -122,7 +121,7 @@ public class ParseException extends Exception {
     }
     retval += "\" at line " + curr.next.beginLine + ", column " + curr.next.beginColumn;
     retval += '.' + eol;
-    if (exps.length == 1) {
+    if(exps.length == 1) {
       retval += "Was expecting:" + eol + "    ";
     } else {
       retval += "Was expecting one of:" + eol + "    ";
@@ -145,9 +144,9 @@ public class ParseException extends Exception {
    */
   static String addEscapes(final String str) {
       final StringBuilder retval = new StringBuilder();
+    for(int i = 0; i < str.length(); i++) {
       char ch;
-      for (int i = 0; i < str.length(); i++) {
-        switch (str.charAt(i)) {
+      switch (str.charAt(i)) {
            case 0 :
               continue;
            case '\b':

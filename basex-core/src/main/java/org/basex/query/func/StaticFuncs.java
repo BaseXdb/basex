@@ -34,7 +34,7 @@ public final class StaticFuncs extends ExprInfo {
    * @param arity function arity
    * @return the function's signature
    */
-  protected static byte[] sig(final QNm name, final long arity) {
+  static byte[] sig(final QNm name, final long arity) {
     return new TokenBuilder(name.id()).add('#').add(Token.token(arity)).finish();
   }
 
@@ -152,9 +152,8 @@ public final class StaticFuncs extends ExprInfo {
   /**
    * Compiles the functions.
    * @param ctx query context
-   * @throws QueryException query exception
    */
-  public void compile(final QueryContext ctx) throws QueryException {
+  public void compile(final QueryContext ctx) {
     // only compile those functions that are used
     for(final FuncCache fc : funcs.values()) {
       if(!fc.calls.isEmpty()) fc.func.compile(ctx);

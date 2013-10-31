@@ -28,7 +28,7 @@ final class DataFTBuilder {
    * @param pos full-text position data
    * @param len length of extract
    */
-  public DataFTBuilder(final FTPosData pos, final int len) {
+  DataFTBuilder(final FTPosData pos, final int len) {
     ftpos = pos;
     ftlen = len;
   }

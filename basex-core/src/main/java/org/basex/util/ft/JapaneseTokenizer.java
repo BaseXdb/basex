@@ -94,9 +94,7 @@ public class JapaneseTokenizer extends Tokenizer {
 
   static {
     File dic = null;
-    if(!Reflect.available(PATTERN)) {
-      available = false;
-    } else {
+    if(Reflect.available(PATTERN)) {
       dic = new File(LANG);
       if(!dic.exists()) {
         dic = new File(Prop.HOME, "etc/" + LANG);
@@ -104,6 +102,8 @@ public class JapaneseTokenizer extends Tokenizer {
           available = false;
         }
       }
+    } else {
+      available = false;
     }
 
     if(available) {
@@ -213,8 +213,8 @@ public class JapaneseTokenizer extends Tokenizer {
    * @return result of check
    */
   private static boolean isFtChar(final String s) {
-    return s.equals(".") || s.equals("?") || s.equals("*") || s.equals("+") ||
-           s.equals("\\") || s.equals("{") || s.equals("}");
+    return ".".equals(s) || "?".equals(s) || "*".equals(s) || "+".equals(s) ||
+      "\\".equals(s) || "{".equals(s) || "}".equals(s);
   }
 
   /**
@@ -224,9 +224,7 @@ public class JapaneseTokenizer extends Tokenizer {
   private boolean moreWC() {
     final StringBuilder word = new StringBuilder();
     final int size = tokenList.size();
-    boolean period = false;
-    boolean bs = false;
-    boolean more = false;
+    boolean period = false, bs = false, more = false;
 
     for(; cpos < size; cpos++) {
       String cSrfc = tokenList.get(cpos).getSurface();
@@ -239,39 +237,38 @@ public class JapaneseTokenizer extends Tokenizer {
       }
 
       if(nSrfc != null) {
-        if(cSrfc.equals("\\")) bs = true;
+        if("\\".equals(cSrfc)) bs = true;
 
         // delimiter
-        if(cMark && !isFtChar(cSrfc) ||
-          cSrfc.equals("\\") && nMark) {
-            period = false;
-            bs = false;
-            if(word.length() != 0) {
-              more = true;
-              break;
-            }
-            if(cSrfc.equals("\\") && nMark) cpos++;
-            continue;
+        if(cMark && !isFtChar(cSrfc) || "\\".equals(cSrfc) && nMark) {
+          period = false;
+          bs = false;
+          if(word.length() != 0) {
+            more = true;
+            break;
+          }
+          if("\\".equals(cSrfc) && nMark) cpos++;
+          continue;
         }
 
         word.append(cSrfc);
 
-        if(bs || nSrfc.equals("\\")) {
+        if(bs || "\\".equals(nSrfc)) {
           more = true;
           continue;
         }
 
-        if(cSrfc.equals(".") || nSrfc.equals(".")) {
+        if(".".equals(cSrfc) || ".".equals(nSrfc)) {
           period = true;
           continue;
         }
         if(period) {
-          if(cSrfc.equals("{")) {
+          if("{".equals(cSrfc)) {
             cpos++;
             for(; cpos < size; cpos++) {
               cSrfc = tokenList.get(cpos).getSurface();
               word.append(cSrfc);
-              if(cSrfc.equals("}")) {
+              if("}".equals(cSrfc)) {
                 more = true;
                 break;
               }
@@ -284,7 +281,7 @@ public class JapaneseTokenizer extends Tokenizer {
       } else {
         // last token.
         if(cMark) {
-          if(cSrfc.equals("\\")) continue;
+          if("\\".equals(cSrfc)) continue;
           if(word.length() != 0) {
             word.append(cSrfc);
           }
@@ -306,8 +303,8 @@ public class JapaneseTokenizer extends Tokenizer {
       break;
     }
     if(more) {
-      currToken = word.length() != 0 ?
-        new Morpheme(word.toString(), MEISHI_FEATURE) : tokenList.get(cpos - 1);
+      currToken = word.length() == 0 ? tokenList.get(cpos - 1) :
+        new Morpheme(word.toString(), MEISHI_FEATURE);
     }
     return more;
   }

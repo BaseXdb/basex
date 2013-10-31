@@ -135,7 +135,7 @@ final class DatabaseUpdates {
 
       final int k = data.kind(pre);
       if(k == Data.ATTR) {
-        par = data.parent(pre, k);
+        par = data.parent(pre, Data.ATTR);
         final IntList il = new IntList();
         while(p >= 0 && (pre = nodes.get(p)) > par) {
           il.add(pre);

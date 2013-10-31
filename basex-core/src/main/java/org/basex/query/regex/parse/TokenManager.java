@@ -14,7 +14,7 @@ public interface TokenManager {
    * A token of kind 0 (&lt;EOF>) should be returned on EOF.
    * @return the next token
    */
-  public Token getNextToken();
+  Token getNextToken();
 
 }
 /* JavaCC - OriginalChecksum=06afe96651fae510c1b250bfb8f28360 (do not edit this line) */

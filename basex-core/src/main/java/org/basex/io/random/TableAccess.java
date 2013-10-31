@@ -14,9 +14,9 @@ import org.basex.io.*;
  */
 public abstract class TableAccess {
   /** Meta data. */
-  protected final MetaData meta;
+  final MetaData meta;
   /** Dirty index flag. */
-  protected boolean dirty;
+  boolean dirty;
 
   /**
    * Constructor.
@@ -140,7 +140,7 @@ public abstract class TableAccess {
    * @param pre pre value
    * @param entries array of bytes containing the entries to insert
    */
-  public final void set(final int pre, final byte[] entries) {
+  final void set(final int pre, final byte[] entries) {
     dirty = true;
     copy(entries, pre, pre + (entries.length >>> IO.NODEPOWER));
   }

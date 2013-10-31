@@ -124,7 +124,7 @@ public class FnHttpTest extends HTTPTest {
     Result r = qp.execute();
     checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
-    assertEquals(NodeType.DOC, ((ValueBuilder) r).get(1).type);
+    assertEquals(NodeType.DOC, ((Iter) r).get(1).type);
     qp.close();
 
     // GET2 - with override-media-type='text/plain'
@@ -133,7 +133,7 @@ public class FnHttpTest extends HTTPTest {
     r = qp.execute();
     checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
-    assertEquals(AtomType.STR, ((ValueBuilder) r).get(1).type);
+    assertEquals(AtomType.STR, ((Iter) r).get(1).type);
     qp.close();
 
     // Get3 - with status-only='true'
@@ -260,8 +260,7 @@ public class FnHttpTest extends HTTPTest {
 
     // check parts
     final Iterator<Part> i = r.parts.iterator();
-    Part part;
-    part = i.next();
+    Part part = i.next();
     assertEquals(2, part.headers.size());
     assertEquals(1, part.bodyContent.size());
     assertEquals(1, part.bodyAttrs.size());
@@ -421,9 +420,6 @@ public class FnHttpTest extends HTTPTest {
    */
   @Test
   public void writeMultipartMessage() throws IOException, QueryException {
-    final String plain = "...plain text....";
-    final String rich = ".... richtext version...";
-    final String fancy = ".... fanciest formatted version...";
 
     final HTTPRequest req = new HTTPRequest();
     req.isMultipart = true;
@@ -432,16 +428,19 @@ public class FnHttpTest extends HTTPTest {
     final Part p1 = new Part();
     p1.headers.put(token("Content-Type"), token("text/plain; charset=us-ascii"));
     p1.bodyAttrs.put(token("media-type"), token("text/plain"));
+    final String plain = "...plain text....";
     p1.bodyContent.add(Str.get(plain + '\n'));
 
     final Part p2 = new Part();
     p2.headers.put(token("Content-Type"), token("text/richtext"));
     p2.bodyAttrs.put(token("media-type"), token("text/richtext"));
+    final String rich = ".... richtext version...";
     p2.bodyContent.add(Str.get(rich));
 
     final Part p3 = new Part();
     p3.headers.put(token("Content-Type"), token("text/x-whatever"));
     p3.bodyAttrs.put(token("media-type"), token("text/x-whatever"));
+    final String fancy = ".... fanciest formatted version...";
     p3.bodyContent.add(Str.get(fancy));
 
     req.parts.add(p1);
@@ -617,11 +616,10 @@ public class FnHttpTest extends HTTPTest {
     final FakeHttpConnection conn = new FakeHttpConnection(new URL(
         "http://www.test.com"));
 
-    final String test = "\u0442\u0435\u0441\u0442";
-
     // Set content type
     conn.contentType = "text/plain; charset=CP1251";
     // set content encoded in CP1251
+    final String test = "\u0442\u0435\u0441\u0442";
     conn.content = Charset.forName("CP1251").encode(test).array();
     final Iter i = new HTTPResponse(null, ctx.options).getResponse(
         conn, Bln.FALSE.string(), null);

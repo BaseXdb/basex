@@ -23,7 +23,7 @@ import org.basex.util.*;
  */
 final class QueryListener extends Proc {
   /** Performance. */
-  final Performance perf = new Performance();
+  private final Performance perf = new Performance();
   /** Query info. */
   private final QueryInfo qi = new QueryInfo();
   /** Query string. */

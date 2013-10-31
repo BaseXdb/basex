@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
 import java.math.*;
+import java.util.Date;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -71,7 +72,7 @@ public final class Dtm extends ADate {
    * @throws QueryException query exception
    */
   public Dtm(final long ms, final InputInfo ii) throws QueryException {
-    this(Token.token(DateTime.format(new java.util.Date(ms), DateTime.FULL)), ii);
+    this(Token.token(DateTime.format(new Date(ms), DateTime.FULL)), ii);
   }
 
   /**

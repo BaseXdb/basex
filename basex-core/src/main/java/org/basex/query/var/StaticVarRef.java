@@ -20,7 +20,7 @@ public final class StaticVarRef extends ParseExpr {
   /** Variable name. */
   private final QNm name;
   /** Referenced variable. */
-  StaticVar var;
+  private StaticVar var;
   /** URI of the enclosing module. */
   private final StaticContext sc;
 
@@ -37,7 +37,7 @@ public final class StaticVarRef extends ParseExpr {
   }
 
   @Override
-  public void checkUp() throws QueryException {
+  public void checkUp() {
   }
 
   @Override
@@ -96,7 +96,7 @@ public final class StaticVarRef extends ParseExpr {
 
   @Override
   public Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
-      final Expr e) throws QueryException {
+      final Expr e) {
     return null;
   }
 

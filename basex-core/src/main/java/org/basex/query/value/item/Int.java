@@ -89,7 +89,7 @@ public final class Int extends ANum {
   }
 
   @Override
-  public Item test(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item test(final QueryContext ctx, final InputInfo ii) {
     return val == ctx.pos ? this : null;
   }
 

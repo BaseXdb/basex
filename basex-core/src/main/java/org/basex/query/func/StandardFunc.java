@@ -75,7 +75,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  protected Expr opt(final QueryContext ctx) throws QueryException {
+  Expr opt(final QueryContext ctx) throws QueryException {
     return this;
   }
 
@@ -109,7 +109,7 @@ public abstract class StandardFunc extends Arr {
    * @return result
    * @throws QueryException query exception
    */
-  protected byte[] serialize(final Iter ir, final SerializerOptions opts, final Err err)
+  byte[] serialize(final Iter ir, final SerializerOptions opts, final Err err)
       throws QueryException {
 
     final ArrayOutput ao = new ArrayOutput();
@@ -164,7 +164,7 @@ public abstract class StandardFunc extends Arr {
    * @return data instance
    * @throws QueryException query exception
    */
-  protected final Data checkData(final QueryContext ctx) throws QueryException {
+  final Data checkData(final QueryContext ctx) throws QueryException {
     final String name = string(checkStr(expr[0], ctx));
     if(!Databases.validName(name)) INVDB.thrw(info, name);
     return ctx.resource.data(name, info);
@@ -177,7 +177,7 @@ public abstract class StandardFunc extends Arr {
    * @return file instance
    * @throws QueryException query exception
    */
-  protected File checkFile(final int i, final QueryContext ctx) throws QueryException {
+  File checkFile(final int i, final QueryContext ctx) throws QueryException {
     if(i >= expr.length) return null;
     final String file = string(checkStr(expr[i], ctx));
     return (IOUrl.isFileURL(file) ? IOFile.get(file) : new IOFile(file)).file();
@@ -190,7 +190,7 @@ public abstract class StandardFunc extends Arr {
    * @param visitor visitor
    * @return result of check
    */
-  protected final boolean dataLock(final ASTVisitor visitor) {
+  final boolean dataLock(final ASTVisitor visitor) {
     return visitor.lock(expr[0] instanceof Str ? string(((Str) expr[0]).string()) : null);
   }
 
@@ -202,7 +202,7 @@ public abstract class StandardFunc extends Arr {
    * @return text entry
    * @throws QueryException query exception
    */
-  protected final String encoding(final int i, final Err err, final QueryContext ctx)
+  final String encoding(final int i, final Err err, final QueryContext ctx)
       throws QueryException {
 
     if(i >= expr.length) return null;
@@ -225,8 +225,8 @@ public abstract class StandardFunc extends Arr {
    * @return passed on options
    * @throws QueryException query exception
    */
-  protected <E extends Options> E checkOptions(final int i, final QNm qnm, final E opts,
-      final QueryContext ctx) throws QueryException {
+  <E extends Options> E checkOptions(final int i, final QNm qnm, final E opts,
+                                     final QueryContext ctx) throws QueryException {
     if(i < expr.length) new FuncOptions(qnm, info).parse(expr[i].item(ctx, info), opts);
     return opts;
   }
@@ -238,7 +238,7 @@ public abstract class StandardFunc extends Arr {
    * @return resulting value
    * @throws QueryException query exception
    */
-  protected final long dateTimeToMs(final Expr e, final QueryContext ctx)
+  final long dateTimeToMs(final Expr e, final QueryContext ctx)
       throws QueryException {
 
     final Dtm dtm = (Dtm) checkType(checkItem(e, ctx), AtomType.DTM);
@@ -253,7 +253,7 @@ public abstract class StandardFunc extends Arr {
    * @return resulting map
    * @throws QueryException query exception
    */
-  protected final HashMap<String, Value> bindings(final int i, final QueryContext ctx)
+  final HashMap<String, Value> bindings(final int i, final QueryContext ctx)
       throws QueryException {
 
     final HashMap<String, Value> hm = new HashMap<String, Value>();
@@ -283,7 +283,7 @@ public abstract class StandardFunc extends Arr {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  protected final void cache(final Iter ir, final ValueBuilder vb, final QueryContext ctx)
+  final void cache(final Iter ir, final ValueBuilder vb, final QueryContext ctx)
       throws QueryException {
 
     for(Item it; (it = ir.next()) != null;) {
@@ -303,7 +303,7 @@ public abstract class StandardFunc extends Arr {
    * @param sigs signatures to be compared
    * @return result of check
    */
-  protected static boolean oneOf(final Function sig, final Function... sigs) {
+  static boolean oneOf(final Function sig, final Function... sigs) {
     for(final Function s : sigs) if(sig == s) return true;
     return false;
   }

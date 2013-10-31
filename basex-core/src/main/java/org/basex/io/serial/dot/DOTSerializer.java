@@ -93,7 +93,7 @@ public final class DOTSerializer extends OutputSerializer {
 
   @Override
   protected void finishComment(final byte[] t) throws IOException {
-    print(new TokenBuilder(COMM_O).add(norm(t)).add(COMM_C).finish(), DOTData.COMM);
+    print(new TokenBuilder(COMM_O).add(norm(t)).add(COMM_C).finish(), COMM);
   }
 
   @Override

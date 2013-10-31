@@ -47,7 +47,7 @@ public final class XPathMarkFTTest extends QueryTest {
       " xml:lang='it'>zuzzurellone</Z></X></A>";
 
   /** Test queries. */
-  public static final Object[][] QUERIES = new Object[][] {
+  public static final Object[][] QUERIES = {
       { "A01", node(59, 64, 79), "//L/*" },
       { "A02", node(20), "//L/parent::*" },
       { "A03", node(59, 64, 68, 73, 79), "//L/descendant::*" },

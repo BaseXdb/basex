@@ -230,7 +230,7 @@ public final class IndexCache {
      * @param v stored cache entry
      * @param rq reference queue
      */
-    public BucketEntry(final int h, final BucketEntry n, final IndexEntry v,
+    BucketEntry(final int h, final BucketEntry n, final IndexEntry v,
         final ReferenceQueue<IndexEntry> rq) {
       super(v, rq);
       hash = h;

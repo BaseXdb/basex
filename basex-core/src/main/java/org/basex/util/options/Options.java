@@ -440,8 +440,7 @@ public class Options implements Iterable<Option<?>> {
    * @param val value
    */
   public static void setSystem(final String key, final Object val) {
-    final String name = key.indexOf('.') != -1 ? key :
-      DBPREFIX + key.toLowerCase(Locale.ENGLISH);
+    final String name = key.indexOf('.') == -1 ? DBPREFIX + key.toLowerCase(Locale.ENGLISH) : key;
     if(System.getProperty(name) == null) System.setProperty(name, val.toString());
   }
 
@@ -510,11 +509,11 @@ public class Options implements Iterable<Option<?>> {
     final StringList read = new StringList();
     final StringList errs = new StringList();
     final boolean exists = file.exists();
-    boolean local = false;
     if(exists) {
       BufferedReader br = null;
       try {
         br = new BufferedReader(new FileReader(file.file()));
+        boolean local = false;
         for(String line; (line = br.readLine()) != null;) {
           line = line.trim();
 
@@ -540,7 +539,7 @@ public class Options implements Iterable<Option<?>> {
           final int ss = name.length();
           for(int s = 0; s < ss; ++s) {
             if(Character.isDigit(name.charAt(s))) {
-              num = Token.toInt(name.substring(s));
+              num = toInt(name.substring(s));
               name = name.substring(0, s);
               break;
             }

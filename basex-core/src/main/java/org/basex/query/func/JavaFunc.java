@@ -171,7 +171,7 @@ public final class JavaFunc extends JavaMapping {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, cls.getName() + "." + mth), expr);
+    addPlan(plan, planElem(NAM, cls.getName() + '.' + mth), expr);
   }
 
   @Override

@@ -11,7 +11,7 @@ import org.basex.util.*;
  */
 public abstract class ElementList {
   /** Resize factor for extending the arrays. */
-  protected double factor = Array.RESIZE;
+  double factor = Array.RESIZE;
   /** Number of elements. */
   protected int size;
 

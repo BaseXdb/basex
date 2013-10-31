@@ -127,7 +127,7 @@ public final class Transform extends Arr {
   public String toString() {
     final StringBuilder sb = new StringBuilder(COPY + ' ');
     for(final Let t : copies)
-      sb.append(t.var).append(" ").append(ASSIGN).append(' ').append(t.expr).append(' ');
+      sb.append(t.var).append(' ').append(ASSIGN).append(' ').append(t.expr).append(' ');
     return sb.append(MODIFY + ' ' + expr[0] + ' ' + RETURN + ' ' + expr[1]).toString();
   }
 

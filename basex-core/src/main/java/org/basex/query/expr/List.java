@@ -72,7 +72,7 @@ public final class List extends Arr {
           vs[c++] = v;
         }
 
-        Value val;
+        final Value val;
         final int s = (int) size;
         if(all == AtomType.STR)      val = StrSeq.get(vs, s);
         else if(all == AtomType.BLN) val = BlnSeq.get(vs, s);
@@ -98,7 +98,7 @@ public final class List extends Arr {
       SeqType t = null;
       for(final Expr e : expr) {
         final SeqType st = e.type();
-        if(e.size() != 0 && st.occ != Occ.ZERO) t = t == null ? st : t.union(st);
+        if(!e.isEmpty() && st.occ != Occ.ZERO) t = t == null ? st : t.union(st);
       }
       type = SeqType.get(t == null ? AtomType.ITEM : t.type, o);
     }

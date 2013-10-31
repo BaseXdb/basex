@@ -601,7 +601,7 @@ public class CommandTest extends SandboxTest {
    * Assumes that this command fails.
    * @param cmd command reference
    */
-  static void no(final Command cmd) {
+  private static void no(final Command cmd) {
     try {
       session.execute(cmd);
       fail("\"" + cmd + "\" was supposed to fail.");

@@ -61,7 +61,6 @@ public final class Unit {
   public FElem test(final StaticContext sc, final ArrayList<StaticFunc> funcs)
       throws QueryException {
     final FElem testsuite = new FElem(TESTSUITE).add(NAME, sc.baseURI().string());
-    int t = 0, e = 0, f = 0, s = 0;
 
     final ArrayList<StaticFunc> before = new ArrayList<StaticFunc>(1);
     final ArrayList<StaticFunc> after = new ArrayList<StaticFunc>(1);
@@ -92,6 +91,10 @@ public final class Unit {
       if(indexOf(uf, TEST) != -1) tests.add(uf);
     }
 
+    int s = 0;
+    int f = 0;
+    int e = 0;
+    int t = 0;
     try {
       // call initializing functions before first test
       for(final StaticFunc uf : beforeModule) eval(uf);
@@ -116,14 +119,7 @@ public final class Unit {
 
         final Performance pt = new Performance();
         final int skip = indexOf(uf, IGNORE);
-        if(skip != -1) {
-          // skip test
-          final FElem skipped = new FElem(SKIPPED);
-          final Value sv = uf.ann.values[skip];
-          if(sv.size() > 0) skipped.add(MESSAGE, sv.itemAt(0).string(info));
-          testcase.add(skipped);
-          s++;
-        } else {
+        if(skip == -1) {
           try {
             // call functions marked with "before"
             for(final StaticFunc fn : before) eval(fn);
@@ -139,7 +135,7 @@ public final class Unit {
               error.add(TYPE, code);
               testcase.add(error);
             }
-          } catch(final QueryException ex) {
+          } catch (final QueryException ex) {
             final QNm name = ex.qname();
             if(code == null || !eq(code, name.local())) {
               final boolean failure = eq(name.uri(), QueryText.UNITURI);
@@ -152,6 +148,13 @@ public final class Unit {
               testcase.add(error);
             }
           }
+        } else {
+          // skip test
+          final FElem skipped = new FElem(SKIPPED);
+          final Value sv = uf.ann.values[skip];
+          if(!sv.isEmpty()) skipped.add(MESSAGE, sv.itemAt(0).string(info));
+          testcase.add(skipped);
+          s++;
         }
         testcase.add(TIME, time(pt));
         testsuite.add(testcase);

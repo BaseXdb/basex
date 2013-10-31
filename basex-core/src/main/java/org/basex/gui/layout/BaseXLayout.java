@@ -116,7 +116,7 @@ public final class BaseXLayout {
     final String label = b.getText();
     for(int l = 0; l < label.length(); l++) {
       final char ch = Character.toLowerCase(label.charAt(l));
-      if(!Token.letter(ch) || mnem.indexOf(Character.toString(ch)) != -1)
+      if(!letter(ch) || mnem.indexOf(Character.toString(ch)) != -1)
         continue;
       b.setMnemonic(ch);
       mnem.append(ch);
@@ -178,7 +178,7 @@ public final class BaseXLayout {
         @Override
         public void keyPressed(final KeyEvent e) {
           final Object s = e.getSource();
-          if(s instanceof BaseXCombo && ((BaseXCombo) s).isPopupVisible()) return;
+          if(s instanceof BaseXCombo && ((JComboBox) s).isPopupVisible()) return;
 
           // do not key close dialog of button or editor is focused
           if(ENTER.is(e) && !(s instanceof BaseXButton || s instanceof Editor)) {
@@ -260,7 +260,7 @@ public final class BaseXLayout {
     if(sc == null) return str;
     final StringBuilder sb = new StringBuilder();
     for(final String s : sc.split(" ")) {
-      String t = s.equals("%") ? Prop.MAC ? "meta" : "control" : s;
+      String t = "%".equals(s) ? Prop.MAC ? "meta" : "control" : s;
       if(t.length() != 1) t = Toolkit.getProperty("AWT." + t.toLowerCase(), t);
       sb.append('+').append(t);
     }
@@ -328,22 +328,17 @@ public final class BaseXLayout {
   public static void fill(final Graphics gg, final Color c1, final Color c2, final int xs,
       final int ys, final int xe, final int ye) {
 
-    final int w = xe - xs;
-    final int h = ye - ys;
-    final int r = c1.getRed();
-    final int g = c1.getGreen();
-    final int b = c1.getBlue();
+    final int w = xe - xs, h = ye - ys;
+    final int r = c1.getRed(), g = c1.getGreen(), b = c1.getBlue();
     final float rf = (c2.getRed() - r) / (float) h;
     final float gf = (c2.getGreen() - g) / (float) h;
     final float bf = (c2.getBlue() - b) / (float) h;
 
-    int nr, ng, nb;
-    int cr = 0, cg = 0, cb = 0;
     int hh = 0;
-    for(int y = 0; y < h; ++y) {
-      nr = r + (int) (rf * y);
-      ng = g + (int) (gf * y);
-      nb = b + (int) (bf * y);
+    for(int y = 0, cr = 0, cg = 0, cb = 0; y < h; ++y) {
+      final int nr = r + (int) (rf * y);
+      final int ng = g + (int) (gf * y);
+      final int nb = b + (int) (bf * y);
       if(nr != cr || ng != cg || nb != cb) {
         gg.setColor(new Color(nr, ng, nb));
         gg.fillRect(xs, ys + y - hh, w, hh);
@@ -435,9 +430,9 @@ public final class BaseXLayout {
     final int[] cw = fontWidths(g.getFont());
 
     int j = s.length;
-    int fw = 0;
-    int l = 0;
     try {
+      int l = 0;
+      int fw = 0;
       for(int k = 0; k < j; k += l) {
         final int ww = width(g, cw, cp(s, k));
         if(fw + ww >= w - 4) {

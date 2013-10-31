@@ -19,11 +19,11 @@ import org.basex.util.list.*;
  */
 public final class Ann extends ElementList {
   /** Annotation "private". */
-  public static final QNm Q_PRIVATE = new QNm(QueryText.PRIVATE, XQURI);
+  public static final QNm Q_PRIVATE = new QNm(PRIVATE, XQURI);
   /** Annotation "public". */
-  public static final QNm Q_PUBLIC = new QNm(QueryText.PUBLIC, XQURI);
+  public static final QNm Q_PUBLIC = new QNm(PUBLIC, XQURI);
   /** Annotation "updating". */
-  public static final QNm Q_UPDATING = new QNm(QueryText.UPDATING, XQURI);
+  public static final QNm Q_UPDATING = new QNm(UPDATING, XQURI);
 
   /** Supported REST annotations. */
   private static final byte[][] ANN_REST = tokens("error", "path", "produces", "consumes",
@@ -91,27 +91,27 @@ public final class Ann extends ElementList {
   /**
    * Returns the union of these annotations and the given ones.
    * @param ann other annotations
-   * @return a n {@link Ann} instance containing all annotations
+   * @return a new instance, containing all annotations
    */
   public Ann union(final Ann ann) {
     final Ann o = new Ann();
     boolean pub = false, priv = false, up = false;
     for(int i = 0; i < size; i++) {
-      if(names[i].eq(Ann.Q_PUBLIC)) pub = true;
-      else if(names[i].eq(Ann.Q_PRIVATE)) priv = true;
-      else if(names[i].eq(Ann.Q_UPDATING)) up = true;
+      if(names[i].eq(Q_PUBLIC)) pub = true;
+      else if(names[i].eq(Q_PRIVATE)) priv = true;
+      else if(names[i].eq(Q_UPDATING)) up = true;
       o.add(names[i], values[i], infos[i]);
     }
 
     for(int i = 0; i < ann.size; i++) {
       final QNm name = ann.names[i];
-      if(name.eq(Ann.Q_PUBLIC)) {
+      if(name.eq(Q_PUBLIC)) {
         if(pub) continue;
         if(priv) return null;
-      } else if(name.eq(Ann.Q_PRIVATE)) {
+      } else if(name.eq(Q_PRIVATE)) {
         if(pub) return null;
         if(priv) continue;
-      } else if(name.eq(Ann.Q_UPDATING) && up) {
+      } else if(name.eq(Q_UPDATING) && up) {
         continue;
       }
       o.add(ann.names[i], ann.values[i], ann.infos[i]);

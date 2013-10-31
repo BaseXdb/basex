@@ -250,11 +250,11 @@ public final class Collation {
     do {
       final int cs = next(is);
       if(cs == -1) return 0;
+      int c;
       do {
-        final int c = next(i);
+        c = next(i);
         if(c == -1) return -1;
-        if(c == cs) break;
-      } while(true);
+      } while(c != cs);
 
       final int s = i.getOffset();
       if(startsWith(i, is) && (!ends || next(i) == -1))

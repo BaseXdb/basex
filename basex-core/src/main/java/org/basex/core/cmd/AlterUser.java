@@ -28,8 +28,8 @@ public final class AlterUser extends AUser {
     final String user = args[0];
     final String pass = args[1];
     if(!Databases.validName(user)) return error(NAME_INVALID_X, user);
-    return !isMD5(pass) ? error(PW_NOT_VALID) : context.users.alter(user, pass) ?
-        info(PW_CHANGED_X, user) : error(UNKNOWN_USER_X, user);
+    return isMD5(pass) ? context.users.alter(user, pass) ? info(PW_CHANGED_X, user) :
+      error(UNKNOWN_USER_X, user) : error(PW_NOT_VALID);
   }
 
   @Override

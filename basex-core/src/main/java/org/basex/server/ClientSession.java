@@ -31,7 +31,7 @@ import org.basex.util.*;
  */
 public class ClientSession extends Session {
   /** Event notifications. */
-  protected final Map<String, EventNotifier> notifiers =
+  private final Map<String, EventNotifier> notifiers =
     Collections.synchronizedMap(new HashMap<String, EventNotifier>());
   /** Server output (buffered). */
   protected final PrintOutput sout;
@@ -274,7 +274,7 @@ public class ClientSession extends Session {
    * @param strings string arguments
    * @throws IOException I/O exception
    */
-  protected void send(final ServerCmd cmd, final InputStream input, final String... strings)
+  void send(final ServerCmd cmd, final InputStream input, final String... strings)
       throws IOException {
 
     sout.write(cmd.code);
@@ -312,7 +312,7 @@ public class ClientSession extends Session {
    * @return string
    * @throws IOException I/O exception
    */
-  protected String exec(final ServerCmd cmd, final String arg, final OutputStream os)
+  String exec(final ServerCmd cmd, final String arg, final OutputStream os)
       throws IOException {
 
     final OutputStream o = os == null ? new ArrayOutput() : os;
@@ -320,8 +320,8 @@ public class ClientSession extends Session {
     send(arg);
     sout.flush();
     final BufferInput bi = new BufferInput(sin);
-    ClientSession.receive(bi, o);
-    if(!ClientSession.ok(bi)) throw new BaseXException(bi.readString());
+    receive(bi, o);
+    if(!ok(bi)) throw new BaseXException(bi.readString());
     return o.toString();
   }
 

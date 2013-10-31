@@ -74,7 +74,7 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem el = planElem(QueryText.TCL, tailCall);
+    final FElem el = planElem(TCL, tailCall);
     final int es = expr.length;
     addPlan(plan, el, expr[es - 1]);
     for(int e = 0; e < es - 1; e++) expr[e].plan(el);

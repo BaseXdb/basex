@@ -38,10 +38,12 @@ class KindTest extends Test {
   public Test intersect(final Test other) {
     if(other instanceof NodeTest || other instanceof DocTest) {
       return other.type.instanceOf(type) ? other : null;
-    } else if(other instanceof KindTest) {
+    }
+    if(other instanceof KindTest) {
       return type.instanceOf(other.type) ? this :
         other.type.instanceOf(type) ? other : null;
-    } else if(other instanceof NameTest || other instanceof InvDocTest) {
+    }
+    if(other instanceof NameTest || other instanceof InvDocTest) {
       throw Util.notexpected(other);
     }
     return null;

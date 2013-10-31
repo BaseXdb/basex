@@ -146,7 +146,7 @@ public final class DialogPackages extends BaseXDialog {
         path.setText(pp.replace('.', '/'));
       }
       // enable or disable buttons
-      delete.setEnabled(pkgs.size() > 0);
+      delete.setEnabled(!pkgs.isEmpty());
     }
 
     // run all commands

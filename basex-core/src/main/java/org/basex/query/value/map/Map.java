@@ -307,7 +307,7 @@ public final class Map extends FItem {
    * @param tb token builder
    * @param level level
    */
-  private void indent(final TokenBuilder tb, final int level) {
+  private static void indent(final TokenBuilder tb, final int level) {
     for(int l = 0; l < level; l++) tb.add("  ");
   }
 
@@ -321,7 +321,7 @@ public final class Map extends FItem {
 
   @Override
   public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
-      final InputInfo ii) throws QueryException {
+      final InputInfo ii) {
     return null;
   }
 }

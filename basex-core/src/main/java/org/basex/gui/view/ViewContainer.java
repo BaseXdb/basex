@@ -111,7 +111,7 @@ public final class ViewContainer extends BaseXBack {
     g.drawImage(logo, (w - logo.getWidth(this)) / 2, y, this);
     if(w < 200 || h < 200) return;
 
-    g.setColor(GUIConstants.DGRAY);
+    g.setColor(DGRAY);
     g.setFont(lfont);
     BaseXLayout.drawCenter(g, VERSINFO + ' ' + Prop.VERSION, w, y + 20 + lh);
   }
@@ -253,11 +253,10 @@ public final class ViewContainer extends BaseXBack {
     if(source == null) return;
 
     ((Graphics2D) g).setStroke(STROKE);
-    final int ac = AlphaComposite.SRC_OVER;
     if(orient != null) {
       g.setColor(color(16));
       g.drawRect(pos[0], pos[1], pos[2] - 1, pos[3] - 1);
-      ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac, 0.3f));
+      ((Graphics2D) g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
       g.setColor(color(8));
       g.fillRect(pos[0], pos[1], pos[2], pos[3]);
     }
@@ -344,22 +343,22 @@ public final class ViewContainer extends BaseXBack {
    */
   private boolean buildLayout(final String cnstr) {
     try {
-      int nv = 0;
       layout = null;
       int lvl = -1;
       final ViewAlignment[] l = new ViewAlignment[16];
       final StringTokenizer st = new StringTokenizer(cnstr);
+      int nv = 0;
       while(st.hasMoreTokens()) {
         final String t = st.nextToken();
         if(Token.eq(t, "H", "V")) {
-          l[lvl + 1] = new ViewAlignment(t.equals("H"));
+          l[lvl + 1] = new ViewAlignment("H".equals(t));
           if(layout == null) {
             layout = l[0];
           } else {
             l[lvl].add(l[lvl + 1]);
           }
           ++lvl;
-        } else if(t.equals("-")) {
+        } else if("-".equals(t)) {
           --lvl;
         } else {
           final ViewPanel view = getView(t);

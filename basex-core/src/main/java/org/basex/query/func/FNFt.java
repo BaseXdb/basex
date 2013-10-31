@@ -255,7 +255,7 @@ public final class FNFt extends StandardFunc {
   @Override
   public boolean iterable() {
     // index functions will always yield ordered and duplicate-free results
-    return sig == Function._FT_SEARCH || super.iterable();
+    return sig == _FT_SEARCH || super.iterable();
   }
 
   @Override

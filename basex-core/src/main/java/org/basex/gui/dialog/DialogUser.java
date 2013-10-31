@@ -169,9 +169,9 @@ final class DialogUser extends BaseXBack {
         pass.setText("");
         user.requestFocusInWindow();
       } else if(cmp == drop) {
-        String msg2 = "";
         final int[] rows = table.getSelectedRows();
         if(BaseXDialog.confirm(dia.gui, Util.info(S_DRQUESTION, rows.length))) {
+          String msg2 = "";
           for(final int r : rows) {
             sess.execute(new DropUser(table.data.value(r, 0), db));
             if(msg == null) msg = sess.info();
@@ -227,8 +227,8 @@ final class DialogUser extends BaseXBack {
 
     Msg icon = ok ? Msg.SUCCESS : Msg.ERROR;
     if(msg == null && !(valname && valpass && newname && valdrop)) {
-      msg = !newname ? Util.info(USER_EXISTS_X, user.getText()) : !valdrop ?
-          ADMIN_STATIC_X : Util.info(INVALID_X, !valname ? USERNAME : PASSWORD);
+      msg = newname ? valdrop ? Util.info(INVALID_X, valname ? PASSWORD : USERNAME) :
+        ADMIN_STATIC_X : Util.info(USER_EXISTS_X, user.getText());
       icon = Msg.WARN;
     }
     info.setText(msg, icon);

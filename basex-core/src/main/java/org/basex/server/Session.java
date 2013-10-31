@@ -21,7 +21,7 @@ import org.basex.io.out.*;
  */
 public abstract class Session {
   /** Client output stream. */
-  protected OutputStream out;
+  OutputStream out;
   /** Command info. */
   String info;
 

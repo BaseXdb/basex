@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
  */
 final class IterPosFilter extends Filter {
   /** Offset flag. */
-  final boolean off;
+  private final boolean off;
 
   /**
    * Constructor.

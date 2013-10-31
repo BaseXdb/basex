@@ -106,7 +106,7 @@ public final class ViewData {
    */
   public static byte[] name(final GUIOptions opts, final Data data, final int pre) {
     if(data.kind(pre) == Data.ELEM) {
-      final int id = ViewData.nameID(data);
+      final int id = nameID(data);
       if(id != 0 && opts.get(GUIOptions.SHOWNAME)) {
         final byte[] att = data.attValue(id, pre);
         if(att != null) return att;
@@ -121,7 +121,7 @@ public final class ViewData {
    * @return name id
    */
   public static int nameID(final Data data) {
-    return data.atnindex.id(DataText.T_NAME);
+    return data.atnindex.id(T_NAME);
   }
 
   /**
@@ -130,7 +130,7 @@ public final class ViewData {
    * @return name id
    */
   public static int sizeID(final Data data) {
-    return data.atnindex.id(DataText.T_SIZE);
+    return data.atnindex.id(T_SIZE);
   }
 
   /**

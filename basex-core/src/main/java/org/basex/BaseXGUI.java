@@ -112,7 +112,7 @@ public final class BaseXGUI {
    * Initializes the GUI.
    * @param opts gui options
    */
-  static void init(final GUIOptions opts) {
+  private static void init(final GUIOptions opts) {
     try {
       // added to handle possible JDK 1.6 bug (thanks to Makoto Yui)
       UIManager.getInstalledLookAndFeels();

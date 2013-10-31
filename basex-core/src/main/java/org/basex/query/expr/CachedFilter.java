@@ -22,7 +22,7 @@ final class CachedFilter extends Filter {
    * @param r expression
    * @param p predicates
    */
-  public CachedFilter(final InputInfo ii, final Expr r, final Expr... p) {
+  CachedFilter(final InputInfo ii, final Expr r, final Expr... p) {
     super(ii, r, p);
   }
 
@@ -76,8 +76,7 @@ final class CachedFilter extends Filter {
   }
 
   @Override
-  public Filter addPred(final QueryContext ctx, final VarScope scp, final Expr p)
-      throws QueryException {
+  public Filter addPred(final QueryContext ctx, final VarScope scp, final Expr p) {
     preds = Array.add(preds, p);
     return this;
   }

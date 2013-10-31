@@ -39,8 +39,7 @@ public final class FNFile extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNFile(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNFile(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 
@@ -207,9 +206,8 @@ public final class FNFile extends StandardFunc {
     if(!dir.isDirectory()) FILE_NODIR.thrw(info, dir);
 
     final boolean rec = optionalBool(1, ctx);
-    final Pattern pat = expr.length != 3 ? null :
-      Pattern.compile(IOFile.regex(string(checkStr(expr[2], ctx))),
-        Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
+    final Pattern pat = expr.length == 3 ? Pattern.compile(IOFile.regex(
+        string(checkStr(expr[2], ctx))), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE) : null;
 
     final StringList list = new StringList();
     final String p = dir.getPath();
@@ -335,7 +333,7 @@ public final class FNFile extends StandardFunc {
       if(!file.mkdirs()) FILE_CREATE.thrw(info, file);
       path = dir(path);
     } else {
-      new IOFile(file).write(Token.EMPTY);
+      new IOFile(file).write(EMPTY);
     }
     return Str.get(path);
   }

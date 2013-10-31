@@ -125,14 +125,14 @@ public abstract class JavaMapping extends Arr {
     if(obj instanceof String[]) {
       final String[] r = (String[]) obj;
       final byte[][] b = new byte[r.length][];
-      for(int v = 0; v < s; v++) b[v] = Token.token(r[v]);
+      for(int v = 0; v < s; v++) b[v] = token(r[v]);
       return StrSeq.get(b);
     }
     // character array
     if(obj instanceof char[][]) {
       final char[][] r = (char[][]) obj;
       final byte[][] b = new byte[r.length][];
-      for(int v = 0; v < s; v++) b[v] = Token.token(new String(r[v]));
+      for(int v = 0; v < s; v++) b[v] = token(new String(r[v]));
       return StrSeq.get(b);
     }
     // short array
@@ -187,10 +187,10 @@ public abstract class JavaMapping extends Arr {
     if(!ctx.context.user.has(perm)) return null;
 
     // Add module locks to QueryContext.
-    QueryModule.Lock lock = meth.getAnnotation(QueryModule.Lock.class);
+    final QueryModule.Lock lock = meth.getAnnotation(QueryModule.Lock.class);
     if(lock != null) {
-      for(String read : lock.read()) ctx.readLocks.add(DBLocking.MODULE_PREFIX + read);
-      for(String write : lock.write()) ctx.writeLocks.add(DBLocking.MODULE_PREFIX + write);
+      for(final String read : lock.read()) ctx.readLocks.add(DBLocking.MODULE_PREFIX + read);
+      for(final String write : lock.write()) ctx.writeLocks.add(DBLocking.MODULE_PREFIX + write);
     }
 
     return meth;
@@ -257,7 +257,7 @@ public abstract class JavaMapping extends Arr {
    * @param o object
    * @return xquery type, or {@code null} if no appropriate type was found
    */
-  public static Type type(final Object o) {
+  private static Type type(final Object o) {
     final Type t = type(o.getClass());
     if(t != null) return t;
 
@@ -296,7 +296,7 @@ public abstract class JavaMapping extends Arr {
    * @param type Java type
    * @return xquery type
    */
-  protected static Type type(final Class<?> type) {
+  static Type type(final Class<?> type) {
     for(int j = 0; j < JAVA.length; ++j) {
       if(JAVA[j].isAssignableFrom(type)) return XQUERY[j];
     }
@@ -308,7 +308,7 @@ public abstract class JavaMapping extends Arr {
    * @param args array with arguments
    * @return string representation
    */
-  protected static String foundArgs(final Value[] args) {
+  static String foundArgs(final Value[] args) {
     // compose found arguments
     final StringBuilder sb = new StringBuilder();
     for(final Value v : args) {

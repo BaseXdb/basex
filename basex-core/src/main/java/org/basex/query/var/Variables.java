@@ -20,7 +20,7 @@ import org.basex.util.*;
  */
 public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   /** The variables. */
-  public final HashMap<QNm, VarEntry> vars = new HashMap<QNm, VarEntry>();
+  private final HashMap<QNm, VarEntry> vars = new HashMap<QNm, VarEntry>();
 
   /**
    * Declares a new static variable.
@@ -150,7 +150,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   }
 
   /** Entry for static variables and their references. */
-  private class VarEntry {
+  private static class VarEntry {
     /** The static variable. */
     StaticVar var;
     /** Variable references. */

@@ -110,7 +110,7 @@ public final class FNSimple extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx) throws QueryException {
+  protected Expr opt(final QueryContext ctx) {
     if(expr.length == 0) return this;
     final Expr e = expr[0];
 
@@ -119,7 +119,7 @@ public final class FNSimple extends StandardFunc {
       case EXISTS:
         // ignore non-deterministic expressions (e.g.: error())
         return e.size() == -1 || e.has(Flag.NDT) || e.has(Flag.CNS) ? this :
-          Bln.get(sig == Function.EMPTY ^ e.size() != 0);
+          Bln.get(sig == Function.EMPTY ^ !e.isEmpty());
       case BOOLEAN:
         // simplify, e.g.: if(boolean(A)) -> if(A)
         return e.type().eq(SeqType.BLN) ? e : this;
@@ -127,12 +127,12 @@ public final class FNSimple extends StandardFunc {
         if(e.isFunction(Function.EMPTY)) {
           // simplify: not(empty(A)) -> exists(A)
           ctx.compInfo(QueryText.OPTWRITE, this);
-          expr = ((StandardFunc) e).expr;
+          expr = ((Arr) e).expr;
           sig = Function.EXISTS;
         } else if(e.isFunction(Function.EXISTS)) {
           // simplify: not(exists(A)) -> empty(A)
           ctx.compInfo(QueryText.OPTWRITE, this);
-          expr = ((StandardFunc) e).expr;
+          expr = ((Arr) e).expr;
           sig = Function.EMPTY;
         } else if(e instanceof CmpV || e instanceof CmpG) {
           // simplify: not('a' = 'b') -> 'a' != 'b'
@@ -140,7 +140,7 @@ public final class FNSimple extends StandardFunc {
           return c == e ? this : c;
         } else if(e.isFunction(Function.NOT)) {
           // simplify: not(not(A)) -> boolean(A)
-          return compBln(((StandardFunc) e).expr[0], info);
+          return compBln(((Arr) e).expr[0], info);
         } else {
           // simplify, e.g.: not(boolean(A)) -> not(A)
           expr[0] = e.compEbv(ctx);
@@ -154,7 +154,7 @@ public final class FNSimple extends StandardFunc {
         return e.type().one() ? e : this;
       case ONE_OR_MORE:
         type = SeqType.get(e.type().type, Occ.ONE_MORE);
-        return !e.type().mayBeZero() ? e : this;
+        return e.type().mayBeZero() ? this : e;
       case UNORDERED:
         return e;
       default:

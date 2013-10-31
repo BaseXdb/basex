@@ -28,7 +28,7 @@ public final class GZIPIn extends ArchiveIn {
   }
 
   @Override
-  public boolean more() throws IOException {
+  public boolean more() {
     return more ^= true;
   }
 

@@ -335,7 +335,7 @@ public final class DataAccess {
    * @param offset offset in the buffer where the token starts
    * @param length token length
    */
-  public void writeToken(final byte[] buf, final int offset, final int length) {
+  void writeToken(final byte[] buf, final int offset, final int length) {
     writeNum(length);
 
     final int last = offset + length;

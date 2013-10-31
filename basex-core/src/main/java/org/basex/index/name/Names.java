@@ -22,7 +22,7 @@ import org.basex.util.hash.*;
  */
 public final class Names extends TokenSet implements Index {
   /** Statistical information. */
-  Stats[] stats;
+  private Stats[] stats;
   /** Meta data. */
   private final MetaData meta;
 
@@ -102,8 +102,8 @@ public final class Names extends TokenSet implements Index {
   @Override
   public byte[] info() {
     final int[] tl = new int[size];
-    int len = 0;
     tl[0] = 0;
+    int len = 0;
     for(int i = 1; i < size; ++i) {
       if(len < keys[i].length) len = keys[i].length;
       if(stats[i] == null) continue;

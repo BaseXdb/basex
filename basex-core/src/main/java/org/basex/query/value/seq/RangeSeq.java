@@ -20,9 +20,9 @@ import org.basex.util.*;
  */
 public final class RangeSeq extends Seq {
   /** Start value. */
-  public final long start;
+  private final long start;
   /** Ascending/descending. */
-  public final boolean asc;
+  private final boolean asc;
 
   /**
    * Constructor.

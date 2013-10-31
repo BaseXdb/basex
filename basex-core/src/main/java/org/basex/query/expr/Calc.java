@@ -25,7 +25,7 @@ public enum Calc {
       final Type ta = a.type, tb = b.type;
       final boolean t1 = ta.isNumberOrUntyped();
       final boolean t2 = tb.isNumberOrUntyped();
-      if(t1 ^ t2) errNum(ii, !t1 ? a : b);
+      if(t1 ^ t2) errNum(ii, t1 ? b : a);
 
       if(t1 && t2) {
         // numbers or untyped values
@@ -43,7 +43,7 @@ public enum Calc {
 
       // dates or durations
       if(ta == tb) {
-        if(!(a instanceof Dur)) errNum(ii, !t1 ? a : b);
+        if(!(a instanceof Dur)) errNum(ii, t1 ? b : a);
         if(ta == YMD) return new YMDur((YMDur) a, (YMDur) b, true, ii);
         if(ta == DTD) return new DTDur((DTDur) a, (DTDur) b, true, ii);
       }
@@ -64,7 +64,7 @@ public enum Calc {
       final Type ta = a.type, tb = b.type;
       final boolean t1 = ta.isNumberOrUntyped();
       final boolean t2 = tb.isNumberOrUntyped();
-      if(t1 ^ t2) errNum(ii, !t1 ? a : b);
+      if(t1 ^ t2) errNum(ii, t1 ? b : a);
 
       if(t1 && t2) {
         // numbers or untyped values
@@ -86,7 +86,7 @@ public enum Calc {
           return new DTDur((ADate) a, (ADate) b, ii);
         if(ta == YMD) return new YMDur((YMDur) a, (YMDur) b, false, ii);
         if(ta == DTD) return new DTDur((DTDur) a, (DTDur) b, false, ii);
-        errNum(ii, !t1 ? a : b);
+        errNum(ii, t1 ? b : a);
       }
       if(ta == DTM) return new Dtm((Dtm) a, checkDur(ii, b), false, ii);
       if(ta == DAT) return new Dat((Dat) a, checkDur(ii, b), false, ii);
@@ -132,7 +132,7 @@ public enum Calc {
         if(t == FLT) return Flt.get(a.flt(ii) * b.flt(ii));
         return Dec.get(a.dec(ii).multiply(b.dec(ii)));
       }
-      throw errNum(ii, !t1 ? a : b);
+      throw errNum(ii, t1 ? b : a);
     }
   },
 
@@ -305,7 +305,7 @@ public enum Calc {
    * @param d value to be checked
    * @throws QueryException query exception
    */
-  static void checkRange(final InputInfo ii, final double d) throws QueryException {
+  private static void checkRange(final InputInfo ii, final double d) throws QueryException {
     if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) RANGE.thrw(ii, d);
   }
 

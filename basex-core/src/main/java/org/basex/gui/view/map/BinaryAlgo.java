@@ -41,7 +41,7 @@ final class BinaryAlgo extends MapAlgo {
 
     int xx = r.x;
     int yy = r.y;
-    int ww = !(r.w > r.h) ? r.w : (int) (r.w / sumweight * weight);
+    int ww = r.w > r.h ? (int) (r.w / sumweight * weight) : r.w;
     int hh = r.w > r.h ? r.h : (int) (r.h / sumweight * weight);
     // paint both rectangles if enough space is left
     if(ww > 0 && hh > 0 && weight > 0) rects.add(calcMap(

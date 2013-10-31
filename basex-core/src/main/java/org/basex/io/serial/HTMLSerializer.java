@@ -131,7 +131,7 @@ public class HTMLSerializer extends OutputSerializer {
   }
 
   @Override
-  protected boolean doctype(final byte[] dt) throws IOException {
+  boolean doctype(final byte[] dt) throws IOException {
     if(level != 0) return false;
     if(!super.doctype(dt) && html5) {
       if(sep) indent();

@@ -55,7 +55,7 @@ final class RestXqWadl {
 
         // create resource
         final FElem resource = new FElem(WADL + "resource", WADL_URI).add("path", path);
-        map.put(path + "?" + methods, resource);
+        map.put(path + '?' + methods, resource);
 
         // add documentation for path variables
         final Matcher var = Pattern.compile("\\$[^}]*").matcher(path);
@@ -116,7 +116,7 @@ final class RestXqWadl {
    * @param parent parent node
    * @return element node
    */
-  private FElem elem(final String name, final FElem parent) {
+  private static FElem elem(final String name, final FElem parent) {
     final FElem elem = new FElem(WADL + name, WADL_URI);
     if(parent != null) parent.add(elem);
     return elem;

@@ -38,7 +38,7 @@ public final class Inspect extends Command {
    * @param data data
    * @return info string
    */
-  public static String inspect(final Data data) {
+  private static String inspect(final Data data) {
     final MetaData md = data.meta;
     final Check invKind = new Check();
     final Check parRef = new Check();

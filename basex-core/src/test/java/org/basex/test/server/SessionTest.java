@@ -28,7 +28,7 @@ public abstract class SessionTest extends SandboxTest {
   /** Output stream. */
   ArrayOutput out;
   /** Serialization parameters to wrap query result with an element. */
-  static final String WRAPPER =
+  private static final String WRAPPER =
     "declare option output:wrap-prefix 'db';" +
     "declare option output:wrap-uri 'ns';";
   /** Client session. */
@@ -611,7 +611,7 @@ public abstract class SessionTest extends SandboxTest {
    * @param exp expected string
    * @param ret string returned from the client API
    */
-  protected final void assertEqual(final Object exp, final Object ret) {
+  final void assertEqual(final Object exp, final Object ret) {
     final String result = (out != null ? out : ret).toString();
     if(out != null) out.reset();
     assertEquals(exp.toString(), result.replaceAll("\\r|\\n", ""));

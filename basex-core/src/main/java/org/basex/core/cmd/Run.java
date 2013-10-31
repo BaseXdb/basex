@@ -43,7 +43,7 @@ public final class Run extends Execute {
           // retrieve file contents
           final String input = file.string();
           // interpret as commands if input ends with command script suffix
-          if(file.hasSuffix(IO.BXSSUFFIX)) return super.init(input, ctx);
+          if(file.hasSuffix(IO.BXSSUFFIX)) return init(input, ctx);
           // otherwise, interpret input as xquery
           list.add(new XQuery(input));
         } catch(final IOException ex) {

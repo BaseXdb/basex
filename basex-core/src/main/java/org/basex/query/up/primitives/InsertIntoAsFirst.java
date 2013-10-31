@@ -2,7 +2,6 @@ package org.basex.query.up.primitives;
 
 import org.basex.data.*;
 import org.basex.data.atomic.*;
-import org.basex.query.*;
 import org.basex.query.up.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
@@ -28,7 +27,7 @@ public final class InsertIntoAsFirst extends NodeCopy {
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) throws QueryException {
+  public void merge(final UpdatePrimitive p) {
     final ANodeList newInsert = ((NodeCopy) p).insert;
     for(final ANode n : newInsert) insert.add(n);
   }

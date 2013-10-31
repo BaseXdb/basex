@@ -86,7 +86,7 @@ public final class Var extends ExprInfo {
 
   /**
    * Type of values bound to this variable.
-   * @return (non-{@code null}) type
+   * @return type (not {@code null})
    */
   public SeqType type() {
     final SeqType intersect = declType != null ? declType.intersect(inType) : null;

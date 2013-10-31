@@ -45,7 +45,7 @@ public class JsonMLConverter extends JsonXmlConverter {
    * @param ext error details
    * @throws QueryIOException query I/O exception
    */
-  void error(final String msg, final Object... ext) throws QueryIOException {
+  private static void error(final String msg, final Object... ext) throws QueryIOException {
     throw BXJS_PARSEML.thrwIO(Util.inf(msg, ext));
   }
 

@@ -7,6 +7,7 @@ import org.basex.index.path.*;
 import org.basex.index.value.*;
 import org.basex.io.random.*;
 import org.basex.util.*;
+import org.basex.util.hash.TokenSet;
 
 /**
  * This class stores and organizes the database table and the index structures
@@ -37,8 +38,8 @@ public final class MemData extends Data {
    * @param txt text index
    * @param atv attribute value index
    */
-  public MemData(final Names tag, final Names att, final PathSummary ps,
-      final Namespaces ns, final MainOptions opts, final Index txt, final Index atv) {
+  private MemData(final Names tag, final Names att, final PathSummary ps,
+                  final Namespaces ns, final MainOptions opts, final Index txt, final Index atv) {
 
     meta = new MetaData(opts);
     table = new TableMemAccess(meta);
@@ -90,7 +91,7 @@ public final class MemData extends Data {
 
   @Override
   public byte[] text(final int pre, final boolean text) {
-    return ((MemValues) (text ? txtindex : atvindex)).key((int) textOff(pre));
+    return ((TokenSet) (text ? txtindex : atvindex)).key((int) textOff(pre));
   }
 
   @Override
@@ -141,5 +142,10 @@ public final class MemData extends Data {
         ((MemValues) (isAttr ? atvindex : txtindex)).delete(key, id(p));
       }
     }
+  }
+
+  @Override
+  public boolean inMemory() {
+    return true;
   }
 }

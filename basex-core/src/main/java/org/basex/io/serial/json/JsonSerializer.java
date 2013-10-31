@@ -14,11 +14,11 @@ import org.basex.io.serial.*;
  */
 public abstract class JsonSerializer extends OutputSerializer {
   /** JSON options. */
-  protected final JsonSerialOptions jopts;
+  final JsonSerialOptions jopts;
   /** JSON spec. */
-  protected final JsonSpec spec;
+  final JsonSpec spec;
   /** Escape special characters. */
-  protected final boolean escape;
+  private final boolean escape;
 
   /**
    * Constructor.
@@ -26,7 +26,7 @@ public abstract class JsonSerializer extends OutputSerializer {
    * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  protected JsonSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
+  JsonSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
     super(os, opts);
     jopts = opts.get(SerializerOptions.JSON);
     escape = jopts.get(JsonSerialOptions.ESCAPE);
@@ -36,17 +36,35 @@ public abstract class JsonSerializer extends OutputSerializer {
 
   @Override
   protected final void encode(final int ch) throws IOException {
-    if(!escape) {
+    if(escape) {
+      switch (ch) {
+        case '\b':
+          print("\\b");
+          break;
+        case '\f':
+          print("\\f");
+          break;
+        case '\n':
+          print("\\n");
+          break;
+        case '\r':
+          print("\\r");
+          break;
+        case '\t':
+          print("\\t");
+          break;
+        case '"':
+          print("\\\"");
+          break;
+        case '\\':
+          print("\\\\");
+          break;
+        default:
+          print(ch);
+          break;
+      }
+    } else {
       print(ch);
-    } else switch(ch) {
-      case '\b': print("\\b");  break;
-      case '\f': print("\\f");  break;
-      case '\n': print("\\n");  break;
-      case '\r': print("\\r");  break;
-      case '\t': print("\\t");  break;
-      case '"':  print("\\\""); break;
-      case '\\': print("\\\\"); break;
-      default:   print(ch);     break;
     }
   }
 }

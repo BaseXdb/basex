@@ -101,7 +101,7 @@ public class DBNode extends ANode {
    * @param p pre value
    * @param k node kind
    */
-  public final void set(final int p, final int k) {
+  final void set(final int p, final int k) {
     type = type(k);
     par = null;
     val = null;
@@ -253,7 +253,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final DBNode parent(final ANode p) {
+  protected final DBNode parent(final ANode p) {
     par = p;
     return this;
   }
@@ -466,7 +466,7 @@ public class DBNode extends ANode {
   @Override
   public final ID typeId() {
     // check if a document has a single element as child
-    Type.ID t = type.id();
+    ID t = type.id();
     if(type == NodeType.DOC) {
       final AxisMoreIter ai = children();
       if(ai.more() && ai.next().type == NodeType.ELM && !ai.more()) t = NodeType.DEL.id();

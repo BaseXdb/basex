@@ -74,12 +74,10 @@ public final class Add extends ACreate {
     }
 
     final Data data = context.data();
-    final Parser parser;
 
-    // set name of document
-    if(!name.isEmpty()) io.name(name);
     // get name from io reference
-    else name = io.name();
+    if(name.isEmpty()) name = io.name();
+    else io.name(name);
 
     // ensure that the final name is not empty
     if(name.isEmpty()) return error(NAME_INVALID_X, name);
@@ -87,7 +85,7 @@ public final class Add extends ACreate {
     String db = null;
     Data tmp = null;
     try {
-      parser = new DirParser(io, options, data.meta.path);
+      final Parser parser = new DirParser(io, options, data.meta.path);
       parser.target(target);
 
       // create random database name for disk-based creation

@@ -18,7 +18,7 @@ public final class BaseXTable extends JTable {
   /** Table data. */
   public Table data;
   /** Dialog instance. */
-  final BaseXDialog dialog;
+  private final BaseXDialog dialog;
   /** Table model. */
   private final TableModel model;
 
@@ -83,7 +83,7 @@ public final class BaseXTable extends JTable {
     @Override
     public Object getValueAt(final int row, final int col) {
       final String o = data.value(row, col);
-      return o.isEmpty() ? Boolean.FALSE : o.equals("X") ? Boolean.TRUE : o;
+      return o.isEmpty() ? Boolean.FALSE : "X".equals(o) ? Boolean.TRUE : o;
     }
 
     @Override
@@ -93,7 +93,7 @@ public final class BaseXTable extends JTable {
 
     @Override
     public boolean isCellEditable(final int row, final int col) {
-      return col != 0 && !data.value(row, 0).equals("admin");
+      return col != 0 && !"admin".equals(data.value(row, 0));
     }
 
     @Override
@@ -105,7 +105,7 @@ public final class BaseXTable extends JTable {
   /**
    * Own Renderer for cells.
    */
-  final class CellRenderer extends DefaultTableCellRenderer {
+  private final class CellRenderer extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(final JTable tab, final Object val,
         final boolean sel, final boolean foc, final int row, final int col) {

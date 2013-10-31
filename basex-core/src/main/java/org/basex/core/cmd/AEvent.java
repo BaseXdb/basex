@@ -13,7 +13,7 @@ abstract class AEvent extends Command {
    * Protected constructor.
    * @param a arguments
    */
-  protected AEvent(final String... a) {
+  AEvent(final String... a) {
     super(Perm.ADMIN, false, a);
   }
 

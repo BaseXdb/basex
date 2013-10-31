@@ -39,7 +39,7 @@ public final class SyntaxXQuery extends Syntax {
     try {
       // add query tokens
       for(final Field f : QueryText.class.getFields()) {
-        if(f.getName().equals("IGNORE")) break;
+        if("IGNORE".equals(f.getName())) break;
         final String s = (String) f.get(null);
         Collections.addAll(KEYS, s.split("-"));
       }

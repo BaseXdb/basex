@@ -73,7 +73,7 @@ public final class If extends Arr {
     // if not(A) then B else C -> if A then C else B
     if(cond.isFunction(Function.NOT)) {
       ctx.compInfo(OPTWRITE, this);
-      cond = ((StandardFunc) cond).expr[0];
+      cond = ((Arr) cond).expr[0];
       final Expr tmp = expr[0];
       expr[0] = expr[1];
       expr[1] = tmp;
