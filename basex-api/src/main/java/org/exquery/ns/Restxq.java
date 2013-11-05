@@ -12,7 +12,7 @@ import org.basex.query.value.node.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-final class Restxq extends QueryModule {
+public final class Restxq extends QueryModule {
   /**
    * Returns an {Code application.wadl} description including all RESTXQ services.
    * @return wadl description

@@ -1,10 +1,11 @@
-package org.basex.test.http;
+package org.exquery.ns;
 
 import static org.junit.Assert.*;
 
 import java.net.*;
 
 import org.basex.core.*;
+import org.basex.http.*;
 import org.basex.util.*;
 import org.junit.*;
 

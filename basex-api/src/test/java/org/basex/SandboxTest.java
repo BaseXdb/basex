@@ -1,4 +1,4 @@
-package org.basex.test;
+package org.basex;
 
 import static org.junit.Assert.*;
 
@@ -7,7 +7,10 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
+import org.basex.modules.*;
 import org.basex.util.*;
+import org.expath.ns.*;
+import org.exquery.ns.*;
 import org.junit.*;
 
 /**
@@ -72,5 +75,16 @@ public abstract class SandboxTest {
    */
   private static IOFile sandbox() {
     return new IOFile(Prop.TMP, NAME);
+  }
+
+  /**
+   * Dummy method; avoids that visibility of query modules gets weakened.
+   */
+  static void visibility() {
+    new Restxq();
+    new Request();
+    new Response();
+    new Session();
+    new Geo();
   }
 }

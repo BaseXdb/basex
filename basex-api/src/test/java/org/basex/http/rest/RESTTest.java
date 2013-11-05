@@ -1,4 +1,4 @@
-package org.basex.test.http;
+package org.basex.http.rest;
 
 import static org.basex.io.MimeTypes.*;
 import static org.basex.util.Token.*;
@@ -8,7 +8,7 @@ import java.io.*;
 import java.net.*;
 
 import org.basex.core.*;
-import org.basex.http.rest.*;
+import org.basex.http.*;
 import org.basex.io.in.*;
 import org.basex.query.func.*;
 import org.basex.util.*;

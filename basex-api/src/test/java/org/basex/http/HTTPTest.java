@@ -1,4 +1,4 @@
-package org.basex.test.http;
+package org.basex.http;
 
 import static org.basex.http.HTTPMethod.*;
 import static org.basex.util.Token.*;
@@ -9,12 +9,11 @@ import java.net.*;
 import java.util.*;
 
 import org.basex.*;
+import org.basex.SandboxTest;
 import org.basex.core.*;
-import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
-import org.basex.test.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.junit.*;
@@ -41,7 +40,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @param local local flag
    * @throws Exception exception
    */
-  static void init(final String rt, final boolean local) throws Exception {
+  public static void init(final String rt, final boolean local) throws Exception {
     initContext(CONTEXT);
     assertTrue(new IOFile(CONTEXT.globalopts.get(GlobalOptions.WEBPATH)).md());
     root = rt;
@@ -89,7 +88,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  static String get(final String query) throws IOException {
+  public static String get(final String query) throws IOException {
     return request(query, GET);
   }
 
@@ -99,7 +98,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @return response code
    * @throws IOException I/O exception
    */
-  static String delete(final String query) throws IOException {
+  public static String delete(final String query) throws IOException {
     return request(query, DELETE);
   }
 
@@ -109,7 +108,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  static String head(final String query) throws IOException {
+  public static String head(final String query) throws IOException {
     return request(query, HEAD);
   }
 
@@ -143,8 +142,8 @@ public abstract class HTTPTest extends SandboxTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  static String post(final String query, final String request,
-                     final String type) throws IOException {
+  public static String post(final String query, final String request, final String type)
+      throws IOException {
 
     // create connection
     final URL url = new URL(root + query);
@@ -176,7 +175,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @return exception
    * @throws IOException I/O exception
    */
-  static IOException error(final HttpURLConnection conn, final IOException ex)
+  public static IOException error(final HttpURLConnection conn, final IOException ex)
       throws IOException {
 
     final String msg = read(conn.getErrorStream());
@@ -189,7 +188,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @return string
    * @throws IOException I/O exception
    */
-  static String read(final InputStream is) throws IOException {
+  public static String read(final InputStream is) throws IOException {
     final ArrayOutput ao = new ArrayOutput();
     if(is != null) {
       final BufferInput bi = new BufferInput(is);
@@ -205,7 +204,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @param is input stream
    * @throws IOException I/O exception
    */
-  static void put(final String u, final InputStream is) throws IOException {
+  public static void put(final String u, final InputStream is) throws IOException {
     put(u, is, null);
   }
 
@@ -216,8 +215,8 @@ public abstract class HTTPTest extends SandboxTest {
    * @param ctype content type (optional, may be {@code null})
    * @throws IOException I/O exception
    */
-  static void put(final String u, final InputStream is,
-                  final String ctype) throws IOException {
+  public static void put(final String u, final InputStream is, final String ctype)
+      throws IOException {
 
     final URL url = new URL(u);
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();

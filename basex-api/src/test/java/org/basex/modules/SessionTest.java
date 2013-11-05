@@ -1,15 +1,16 @@
-package org.basex.test.http;
+package org.basex.modules;
 
 import static org.junit.Assert.*;
 
 import java.net.*;
 
 import org.basex.core.*;
+import org.basex.http.*;
 import org.basex.util.*;
 import org.junit.*;
 
 /**
- * This class tests the Request Module.
+ * This class tests the Session Module.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen

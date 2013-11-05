@@ -1,4 +1,4 @@
-package org.basex.test.http;
+package org.basex.http;
 
 import static org.basex.core.Text.*;
 import static org.basex.query.func.Function.*;

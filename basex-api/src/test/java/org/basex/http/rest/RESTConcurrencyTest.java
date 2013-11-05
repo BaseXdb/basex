@@ -1,11 +1,11 @@
-package org.basex.test.http;
+package org.basex.http.rest;
 
 import static org.junit.Assert.*;
 
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.http.rest.*;
+import org.basex.http.*;
 import org.junit.*;
 
 /**

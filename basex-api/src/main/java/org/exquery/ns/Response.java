@@ -8,5 +8,5 @@ import org.basex.query.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-final class Response extends QueryModule {
+public final class Response extends QueryModule {
 }

@@ -1,4 +1,4 @@
-package org.basex.test;
+package org.basex;
 
 import static org.junit.Assert.*;
 
@@ -41,7 +41,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
    * @param query query string
    * @param result query result
    */
-  static void query(final String query, final Object result) {
+  public static void query(final String query, final Object result) {
     final String res = query(query);
     final String exp = result.toString();
     if(!res.equals(exp))

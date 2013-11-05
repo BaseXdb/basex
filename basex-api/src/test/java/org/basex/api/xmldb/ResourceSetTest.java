@@ -1,4 +1,4 @@
-package org.basex.test.api.xmldb;
+package org.basex.api.xmldb;
 
 import static org.junit.Assert.*;
 

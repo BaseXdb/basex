@@ -1,10 +1,9 @@
-package org.basex.test.api.xmldb;
+package org.basex.api.xmldb;
 
 import static org.basex.core.Text.*;
 
 import java.io.*;
 
-import org.basex.api.xmldb.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 

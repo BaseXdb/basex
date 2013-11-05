@@ -1,4 +1,4 @@
-package org.basex.test.http;
+package org.basex.http.rest;
 
 import org.junit.*;
 

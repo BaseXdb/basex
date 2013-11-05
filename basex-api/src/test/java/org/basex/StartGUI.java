@@ -1,4 +1,4 @@
-import org.basex.*;
+package org.basex;
 
 /**
  * This class contains a main method for starting the GUI from the API package.
