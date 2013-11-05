@@ -361,6 +361,10 @@ public final class Namespaces {
    */
   public int add(final int pre, final int par, final byte[] pref, final byte[] uri,
       final Data data) {
+
+    // don't store XML namespace
+    if(Token.eq(pref, Token.XML)) return 0;
+
     final NSNode nd = current.find(par, data);
     final NSNode t = new NSNode(pre);
 
