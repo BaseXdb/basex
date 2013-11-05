@@ -2,7 +2,7 @@ package org.basex.test.performance;
 
 import org.basex.*;
 import org.basex.server.*;
-import org.basex.test.*;
+import org.basex.test.SandboxTest;
 import org.junit.*;
 
 /**
