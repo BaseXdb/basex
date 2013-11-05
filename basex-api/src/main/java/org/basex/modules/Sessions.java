@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-final class Sessions extends QueryModule {
+public final class Sessions extends QueryModule {
   /**
    * Returns the ids of all registered sessions.
    * @return session ids

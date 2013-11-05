@@ -85,6 +85,7 @@ public abstract class SandboxTest {
     new Request();
     new Response();
     new Session();
+    new Sessions();
     new Geo();
   }
 }
