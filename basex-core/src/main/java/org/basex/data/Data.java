@@ -398,7 +398,7 @@ public abstract class Data {
 
   /**
    * Returns all namespace keys and values.
-   * Should be only called for element nodes.
+   * Should only be called for element nodes.
    * @param pre pre value
    * @return key and value ids
    */
@@ -774,11 +774,10 @@ public abstract class Data {
           nm = data.name(spre, kind);
           // check if prefix already in nsScope or not
           final byte[] attPref = prefix(nm);
-          // check if prefix of attribute has already been declared, otherwise
-          // add declaration to parent node
           if(data.nsFlag(spre) && nsScope.get(attPref) == null) {
+            // add declaration to parent node
             nspaces.add(nsPre, preStack.isEmpty() ? -1 : preStack.peek(), attPref,
-                                                  data.nspaces.uri(data.uri(spre, kind)), this);
+            data.nspaces.uri(data.uri(spre, kind)), this);
             // save pre value to set ns flag later for this node. can't be done
             // here as direct table access would interfere with the buffer
             flagPres.add(nsPre);

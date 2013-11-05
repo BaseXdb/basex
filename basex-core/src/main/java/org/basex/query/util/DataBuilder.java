@@ -121,7 +121,7 @@ public final class DataBuilder {
     }
     final int n = data.atnindex.index(q.string(), null, false);
     // usually, attributes don't have a namespace flag.
-    // this is different here, because as a stand-alone attribute has no parent element.
+    // this is different here, because a stand-alone attribute has no parent element.
     data.attr(ds, pre - par, n, node.string(), u, u != 0);
     data.insert(ds);
     return pre + 1;
