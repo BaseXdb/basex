@@ -106,12 +106,12 @@ public final class ModuleLoader {
 
   /**
    * Returns a reference to the specified class.
-   * @param clz fully classified class name
+   * @param name fully classified class name
    * @return found class, or {@code null}
    * @throws Throwable any exception or error: {@link ClassNotFoundException},
    *   {@link LinkageError} or {@link ExceptionInInitializerError}.
    */
-  public Class<?> findClass(final String clz) throws Throwable {
+  public Class<?> findClass(final String name) throws Throwable {
     // add cached URLs to class loader
     final int us = urls.size();
     if(us != 0) {
@@ -119,7 +119,7 @@ public final class ModuleLoader {
       urls.clear();
     }
     // no external classes added: use default class loader
-    return loader == LOADER ? Reflect.forName(clz) : Class.forName(clz, true, loader);
+    return loader == LOADER ? Reflect.forName(name) : Class.forName(name, true, loader);
   }
 
   /**

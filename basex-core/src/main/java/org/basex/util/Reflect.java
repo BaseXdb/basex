@@ -42,8 +42,6 @@ public final class Reflect {
    * @return reference, or {@code null} if the class is not found
    */
   public static Class<?> find(final String name) {
-    final Class<?> c = CLASSES.get(name);
-    if(c != null) return c;
     try {
       return forName(name);
     } catch(final Throwable ex) {
@@ -58,20 +56,12 @@ public final class Reflect {
    * @throws ClassNotFoundException any exception or error
    */
   public static Class<?> forName(final String name) throws ClassNotFoundException {
-    return cache(name, Class.forName(name));
-  }
-
-  /**
-   * Caches the specified class.
-   * @param name fully qualified class name
-   * @param c class
-   * @return reference, or {@code null} if the class is not found
-   */
-  private static Class<?> cache(final String name, final Class<?> c) {
-    try {
-      if(!accessible(c)) return null;
+    Class<?> c = CLASSES.get(name);
+    if(c == null) {
+      c = Class.forName(name);
+      if(!Modifier.isPublic(c.getModifiers())) throw new ClassNotFoundException(name);
       CLASSES.put(name, c);
-    } catch(final Throwable ignored) { }
+    }
     return c;
   }
 
@@ -217,15 +207,5 @@ public final class Reflect {
       Util.debug(ex);
       return null;
     }
-  }
-
-  /**
-   * Check if a class is accessible.
-   * @param cls class
-   * @return {@code true} if a class is accessible
-   */
-  private static boolean accessible(final Class<?> cls) {
-    // non public classes cannot be instantiated
-    return Modifier.isPublic(cls.getModifiers());
   }
 }
