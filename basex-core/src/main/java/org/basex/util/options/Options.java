@@ -43,17 +43,7 @@ public class Options implements Iterable<Option<?>> {
    * Default constructor.
    */
   public Options() {
-    init();
-  }
-
-  /**
-   * Constructor with options string.
-   * @param opts options strings
-   * @throws BaseXException database exception
-   */
-  protected Options(final String opts) throws BaseXException {
-    this();
-    parse(opts);
+    this(null);
   }
 
   /**
@@ -61,7 +51,7 @@ public class Options implements Iterable<Option<?>> {
    * @param opts options file
    */
   protected Options(final IOFile opts) {
-    this();
+    init();
     if(opts != null) read(opts);
     // overwrite initialized options with system properties
     setSystem();
