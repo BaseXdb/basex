@@ -171,4 +171,12 @@ public final class MainOptions extends Options {
       return super.toString().toLowerCase(Locale.ENGLISH);
     }
   }
+
+  /**
+   * Constructor.
+   */
+  public MainOptions() {
+    super();
+    setSystem();
+  }
 }

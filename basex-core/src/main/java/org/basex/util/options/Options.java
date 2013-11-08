@@ -53,8 +53,6 @@ public class Options implements Iterable<Option<?>> {
   protected Options(final IOFile opts) {
     init();
     if(opts != null) read(opts);
-    // overwrite initialized options with system properties
-    setSystem();
   }
 
   /**
@@ -346,7 +344,7 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Scans the system properties and initializes the database options.
+   * Overwrites the options with system properties.
    * All properties starting with {@code org.basex.} will be assigned as options.
    */
   public final void setSystem() {

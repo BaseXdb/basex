@@ -91,6 +91,8 @@ public final class GlobalOptions extends Options {
    */
   GlobalOptions(final boolean file) {
     super(file ? new IOFile(HOME + IO.BASEXSUFFIX) : null);
+    setSystem();
+
     // set some static options
     language = get(LANG);
     langkeys = get(LANGKEYS);
