@@ -30,7 +30,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import org.basex.test.qt3ts.', $suite, '.*;
+import org.basex.qt3ts.', $suite, '.*;
 
 /**
  * Test suite for the "', $suite, '" test group.

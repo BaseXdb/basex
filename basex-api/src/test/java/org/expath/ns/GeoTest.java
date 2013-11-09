@@ -3,7 +3,7 @@ package org.expath.ns;
 import static org.basex.query.util.Err.*;
 import static org.junit.Assert.*;
 
-import org.basex.*;
+import org.basex.AdvancedQueryTest;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.junit.*;

@@ -8,8 +8,8 @@ declare variable $QT3TS external;
 qt3ts:to-junit(
   $QT3TS,
   '*',
-  'org.basex.test.qt3ts',
-  'src/test/java/org/basex/test/qt3ts',
+  'org.basex.qt3ts',
+  'src/test/java/org/basex/qt3ts',
   function($type, $vals) {
     switch($type)
       case 'spec'
