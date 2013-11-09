@@ -189,7 +189,9 @@ final class DatabaseUpdates {
     // execute fn:put operations
     for(final Put p : puts.values()) p.apply();
 
-    if(data.meta.options.get(MainOptions.WRITEBACK) && !data.meta.original.isEmpty()) {
+    // optional: write main memory databases of file instances back to disk
+    if(data.inMemory() && !data.meta.original.isEmpty() &&
+        data.meta.options.get(MainOptions.WRITEBACK)) {
       try {
         Export.export(data, data.meta.original, data.meta.options.get(MainOptions.EXPORTER), null);
       } catch(final IOException ex) {
