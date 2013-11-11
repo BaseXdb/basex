@@ -10,7 +10,6 @@ import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.Type;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -127,46 +126,40 @@ public final class JavaFunc extends JavaMapping {
   }
 
   /**
-   * Checks if the arguments conform with the specified parameters.
+   * Converts the arguments to objects that match the specified function parameters.
+   * {@code null} is returned if conversion is not possible.
    * @param params parameters
    * @param args arguments
    * @param stat static flag
-   * @return argument array or {@code null}
+   * @return argument array, or {@code null}
    * @throws QueryException query exception
    */
-  static Object[] args(final Class<?>[] params, final Value[] args,
-      final boolean stat) throws QueryException {
+  static Object[] args(final Class<?>[] params, final Value[] args, final boolean stat)
+      throws QueryException {
 
     final int s = stat ? 0 : 1;
     final int l = args.length - s;
     if(l != params.length) return null;
 
     // function arguments
-    final Object[] val = new Object[l];
-    int a = 0;
-
-    for(final Class<?> par : params) {
-      // check original type
+    final Object[] vals = new Object[l];
+    for(int a = 0; a < l; a++) {
+      final Class<?> param = params[a];
       final Value arg = args[s + a];
-      if(par.isInstance(arg)) {
-        val[a++] = arg;
-        continue;
+
+      if(arg.type.instanceOf(type(param))) {
+        // convert to Java object if an XQuery type exists for the function parameter
+        vals[a] = arg.toJava();
+      } else {
+        // convert to Java object if
+        // - argument is of type {@link Jav}, wrapping a Java object, or
+        // - function parameter is not of type {@link Value}, or a sub-class of it
+        vals[a] = arg instanceof Jav || !Value.class.isAssignableFrom(param) ? arg.toJava() : arg;
+        // abort conversion if argument is not an instance of function parameter
+        if(!param.isInstance(vals[a])) return null;
       }
-      // check Java type
-      if(arg instanceof Jav) {
-        final Object jav = ((Jav) arg).toJava();
-        if(par.isInstance(jav)) {
-          val[a++] = jav;
-          continue;
-        }
-      }
-      // check XQuery type
-      final Type jtype = type(par);
-      if(jtype == null || !arg.type.instanceOf(jtype) && !jtype.instanceOf(arg.type))
-        return null;
-      val[a++] = arg.toJava();
     }
-    return val;
+    return vals;
   }
 
   @Override

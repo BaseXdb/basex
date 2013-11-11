@@ -11,7 +11,6 @@ import org.junit.*;
  * @author Leo Woerteler
  */
 public class JavaFuncTest extends AdvancedQueryTest {
-
   /** Tests calling some Java constructors from XQuery. */
   @Test
   public void constr() {
@@ -52,13 +51,21 @@ public class JavaFuncTest extends AdvancedQueryTest {
   public void importClass() {
     query("import module namespace set='java.util.HashSet';" +
         "let $a := (set:add('a'), set:add('b')) return set:size()", "2");
+    query("import module namespace set='java.util.HashSet';" +
+        "let $a := (set:add(128), set:add(128)) return set:size()", "1");
 
     // use class with capital and lower case
-    query("import module namespace string='http://lang.java/String';" +
-        "string:length()", "0");
-    query("import module namespace string='http://lang.java/string';" +
-        "string:length()", "0");
+    query("import module namespace string='http://lang.java/String'; string:length()", "0");
+    query("import module namespace string='http://lang.java/string'; string:length()", "0");
 
+    // handle {@link Jav} type
+    query("declare namespace set = 'java.util.HashSet';" +
+        "set:add(set:new(), Q{java.awt.Point}new())", "true");
+  }
+
+  /** Tests importing a query module. */
+  @Test
+  public void importQueryModule() {
     // address class extending QueryModule
     query("import module namespace qm='java:org.basex.query.func.QueryModuleTest';" +
         "qm:fast(0)", "Apple");
@@ -71,6 +78,10 @@ public class JavaFuncTest extends AdvancedQueryTest {
   /** Tests importing a Java class and throwing errors. */
   @Test
   public void importError() {
+    // handle {@link Jav} type
+    error("declare namespace string = 'java.lang.String';" +
+        "string:concat(string:new(), Q{java.awt.Point}new())", Err.JAVAMTH);
+
     query("declare namespace qm='java:org.basex.query.func.QueryModuleTest';" +
         "try{qm:error(qm:new())} catch * {local-name-from-QName($err:code)}", "BASX0000");
     query("import module namespace qm='java:org.basex.query.func.QueryModuleTest';" +

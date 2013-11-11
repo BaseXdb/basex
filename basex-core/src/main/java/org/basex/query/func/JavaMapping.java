@@ -118,8 +118,9 @@ public abstract class JavaMapping extends Arr {
 
     // no array: return Java type
     if(!obj.getClass().isArray()) return new Jav(obj, ctx);
-    final int s = Array.getLength(obj);
+
     // empty array
+    final int s = Array.getLength(obj);
     if(s == 0) return Empty.SEQ;
     // string array
     if(obj instanceof String[]) {
@@ -298,7 +299,7 @@ public abstract class JavaMapping extends Arr {
    */
   static Type type(final Class<?> type) {
     for(int j = 0; j < JAVA.length; ++j) {
-      if(JAVA[j].isAssignableFrom(type)) return XQUERY[j];
+      if(JAVA[j] == type) return XQUERY[j];
     }
     return null;
   }

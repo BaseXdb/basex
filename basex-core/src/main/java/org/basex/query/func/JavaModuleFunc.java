@@ -35,8 +35,8 @@ public final class JavaModuleFunc extends JavaMapping {
    * @param m Java method/field
    * @param a arguments
    */
-  JavaModuleFunc(final StaticContext sctx, final InputInfo ii, final Object jm,
-      final Method m, final Expr[] a) {
+  JavaModuleFunc(final StaticContext sctx, final InputInfo ii, final Object jm, final Method m,
+      final Expr[] a) {
     super(sctx, ii, a);
     module = jm;
     mth = m;
@@ -44,7 +44,6 @@ public final class JavaModuleFunc extends JavaMapping {
 
   @Override
   protected Object eval(final Value[] vals, final QueryContext ctx) throws QueryException {
-
     // assign context if module is inheriting {@link QueryModule}
     if(module instanceof QueryModule) {
       final QueryModule mod = (QueryModule) module;
