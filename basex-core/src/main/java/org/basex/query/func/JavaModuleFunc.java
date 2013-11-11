@@ -26,6 +26,10 @@ public final class JavaModuleFunc extends JavaMapping {
   private final Object module;
   /** Method to be called. */
   private final Method mth;
+  /** Method parameters. */
+  private final Class<?>[] params;
+  /** Indicates if function parameters are of (sub)class {@link Value}. */
+  private final boolean[] vTypes;
 
   /**
    * Constructor.
@@ -40,6 +44,8 @@ public final class JavaModuleFunc extends JavaMapping {
     super(sctx, ii, a);
     module = jm;
     mth = m;
+    params = m.getParameterTypes();
+    vTypes = JavaFunc.values(params);
   }
 
   @Override
@@ -51,7 +57,7 @@ public final class JavaModuleFunc extends JavaMapping {
       mod.queryContext = ctx;
     }
 
-    final Object[] args = JavaFunc.args(mth.getParameterTypes(), vals, true);
+    final Object[] args = JavaFunc.args(params, vTypes, vals, true);
     if(args != null) {
       try {
         return mth.invoke(module, args);
