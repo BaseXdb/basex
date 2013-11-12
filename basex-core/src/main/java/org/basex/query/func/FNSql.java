@@ -358,13 +358,15 @@ public final class FNSql extends StandardFunc {
         final FElem row = new FElem(Q_ROW);
         rows.add(row);
         for(int k = 1; k <= cc; k++) {
-          // For each row add column values as children
-          final String label = metadata.getColumnLabel(k);
-          final Object value = rs.getObject(label);
-          // Null values are ignored
+          // for each row add column values as children
+          final String name = metadata.getColumnLabel(k);
+          Object value = rs.getObject(k);
+          // null values are ignored
           if(value == null) continue;
-          // Element <sql:column name='...'>...</sql:column>
-          row.add(new FElem(Q_COLUMN).add(NAME, label).add(value.toString()));
+          // serialize XML values
+          if(value instanceof SQLXML) value = ((SQLXML) value).getString();
+          // element <sql:column name='...'>...</sql:column>
+          row.add(new FElem(Q_COLUMN).add(NAME, name).add(value.toString()));
         }
       }
       return rows;
