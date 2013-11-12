@@ -331,7 +331,20 @@ final class Renderer extends BaseXBack {
       if(text.erroneous()) drawError(g);
 
       // don't write whitespaces
-      if(ch >= ' ') {
+      if(ch == '\u00a0') {
+        final int s = fontH / 12;
+        g.setColor(GUIConstants.GRAY);
+        g.fillRect(x + (wordW >> 1), y - fontH * 3 / 10, s, s);
+      } else if(ch == '\t') {
+        final int yy = y - fontH * 3 / 10;
+        final int s = 1 + fontH / 12;
+        final int xe = x + charW(g, '\t') - s;
+        final int as = s * 2 - 1;
+        g.setColor(GUIConstants.GRAY);
+        g.drawLine(x + s, yy, xe, yy);
+        g.drawLine(xe - as, yy - as, xe, yy);
+        g.drawLine(xe - as, yy + as, xe, yy);
+      } else if(ch >= 0) {
         g.setColor(color);
         String n = text.nextString();
         int ww = w - x;
@@ -344,13 +357,12 @@ final class Renderer extends BaseXBack {
           n = n.substring(0, c);
         }
         if(ch != ' ') g.drawString(n, x, y);
-
-        // underline linked text
-        if(link) g.drawLine(x, y + 1, x + wordW, y + 1);
-
       } else if(ch <= TokenBuilder.ULINE) {
         g.setFont(font);
       }
+
+      // underline linked text
+      if(link) g.drawLine(x, y + 1, x + wordW, y + 1);
 
       // show cursor
       if(cursor && text.edited()) {
