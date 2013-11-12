@@ -77,7 +77,7 @@ final class CachedFilter extends Filter {
 
   @Override
   public Filter addPred(final QueryContext ctx, final VarScope scp, final Expr p) {
-    preds = Array.add(preds, p);
+    preds = Array.add(preds, new Expr[preds.length + 1], p);
     return this;
   }
 

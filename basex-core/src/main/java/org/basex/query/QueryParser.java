@@ -978,7 +978,7 @@ public class QueryParser extends InputParser {
       for(final Var v : args)
         if(v.name.eq(var.name)) error(FUNCDUPL, var);
 
-      args = Array.add(args, var);
+      args = Array.add(args, new Var[args.length + 1], var);
       if(!consume(',')) break;
     }
     return args;
@@ -2370,7 +2370,6 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private int[] argumentList(final ExprList args, final Object name) throws QueryException {
-
     int[] holes = null;
     if(!wsConsume(PAR2)) {
       int i = 0;

@@ -181,9 +181,8 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
      * @throws QueryException query exception
      */
     void addRef(final StaticVarRef ref) throws QueryException {
-      refs = Array.add(refs, ref);
+      refs = Array.add(refs, new StaticVarRef[refs.length + 1], ref);
       if(var != null) ref.init(var);
     }
   }
-
 }
