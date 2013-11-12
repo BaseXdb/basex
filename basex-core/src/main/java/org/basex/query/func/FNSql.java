@@ -5,11 +5,13 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
+import java.io.*;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
 import java.util.Map.Entry;
 
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -210,7 +212,7 @@ public final class FNSql extends StandardFunc {
     try {
       stmt = ((Connection) obj).createStatement();
       final boolean result = stmt.execute(query);
-      return result ? buildResult(stmt.getResultSet()) : new NodeSeqBuilder();
+      return result ? buildResult(stmt.getResultSet(), ctx) : new NodeSeqBuilder();
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.thrw(info, ex);
     } finally {
@@ -243,7 +245,7 @@ public final class FNSql extends StandardFunc {
       // Check if number of parameters equals number of place holders
       if(c != stmt.getParameterMetaData().getParameterCount()) BXSQ_PARAMS.thrw(info);
       if(params != null) setParameters(params.children(), stmt);
-      return stmt.execute() ? buildResult(stmt.getResultSet()) : new NodeSeqBuilder();
+      return stmt.execute() ? buildResult(stmt.getResultSet(), ctx) : new NodeSeqBuilder();
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.thrw(info, ex);
     }
@@ -345,11 +347,14 @@ public final class FNSql extends StandardFunc {
   /**
    * Builds a sequence of elements from a query's result set.
    * @param rs result set
+   * @param ctx query context
    * @return sequence of elements <tuple/> each of which represents a row from
    *         the result set
    * @throws QueryException query exception
    */
-  private NodeSeqBuilder buildResult(final ResultSet rs) throws QueryException {
+  private NodeSeqBuilder buildResult(final ResultSet rs, final QueryContext ctx)
+      throws QueryException {
+
     try {
       final ResultSetMetaData metadata = rs.getMetaData();
       final int cc = metadata.getColumnCount();
@@ -363,10 +368,24 @@ public final class FNSql extends StandardFunc {
           Object value = rs.getObject(k);
           // null values are ignored
           if(value == null) continue;
-          // serialize XML values
-          if(value instanceof SQLXML) value = ((SQLXML) value).getString();
+
           // element <sql:column name='...'>...</sql:column>
-          row.add(new FElem(Q_COLUMN).add(NAME, name).add(value.toString()));
+          final FElem col = new FElem(Q_COLUMN).add(NAME, name);
+          row.add(col);
+
+          if(value instanceof SQLXML) {
+            // add XML value as child element
+            final String xml = ((SQLXML) value).getString();
+            try {
+              col.add(new DBNode(new IOContent(xml), ctx.context.options).children().next());
+            } catch(final IOException ex) {
+              // fallback: add string representation
+              col.add(xml);
+            }
+          } else {
+            // add string representation of other values
+            col.add(value.toString());
+          }
         }
       }
       return rows;
