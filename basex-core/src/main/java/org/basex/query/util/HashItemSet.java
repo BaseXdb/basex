@@ -54,7 +54,7 @@ public class HashItemSet extends ASet implements ItemSet {
    * @return id, or {@code 0} if key does not exist
    * @throws QueryException query exception
    */
-  final int id(final Item key, final InputInfo ii) throws QueryException {
+  public final int id(final Item key, final InputInfo ii) throws QueryException {
     final int h = key.hash(ii);
     final int p = h & bucket.length - 1;
     for(int id = bucket[p]; id != 0; id = next[id]) {
