@@ -71,7 +71,7 @@ public final class TableDiskAccess extends TableAccess {
       fpres = new int[b];
       pages = new int[b];
       for(int i = 0; i < b; i++) {
-        fpres[i] = i * IO.BLOCKSIZE >>> IO.NODEPOWER;
+        fpres[i] = i * IO.ENTRIES;
         pages[i] = i;
       }
     } else {
