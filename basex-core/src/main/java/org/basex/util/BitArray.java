@@ -92,7 +92,7 @@ public final class BitArray {
 
   /**
    * Returns the number of bits set to {@code true}.
-   * @return  the number of bits set to {@code true}
+   * @return number of bits set to {@code true}
    */
   public int cardinality() {
     int sum = 0;
@@ -104,7 +104,7 @@ public final class BitArray {
   /**
    * Get the value of the i<sup>th</sup> bit.
    * @param i index of the bit
-   * @return <code>true</code> if the i<sup>th</sup> bit is set
+   * @return {@code true} if the i<sup>th</sup> bit is set
    */
   public boolean get(final int i) {
     if(i >= size) return false;

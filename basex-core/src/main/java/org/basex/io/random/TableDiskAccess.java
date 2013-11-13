@@ -27,8 +27,8 @@ public final class TableDiskAccess extends TableAccess {
   private final Buffers bm = new Buffers();
   /** File storing all blocks. */
   private final RandomAccessFile file;
-  /** Bitmap storing free (=0) and occupied (=1) pages. */
-  private final BitArray freePages;
+  /** Bitmap storing free (=0) and used (=1) pages. */
+  private final BitArray usedPages;
   /** File lock. */
   private FileLock fl;
 
@@ -84,15 +84,15 @@ public final class TableDiskAccess extends TableAccess {
     // check if the page map has been stored
     if(regular) {
       // create empty bitmap
-      freePages = new BitArray(blocks, true);
+      usedPages = new BitArray(used, true);
     } else {
       final int psize = in.readNum();
       if(psize == 0) {
         // legacy: init the map with empty pages
-        freePages = new BitArray(blocks);
-        for(final int p : pages) freePages.set(p);
+        usedPages = new BitArray(blocks);
+        for(final int p : pages) usedPages.set(p);
       } else {
-        freePages = new BitArray(in.readLongs(psize), blocks);
+        usedPages = new BitArray(in.readLongs(psize), used);
       }
     }
     in.close();
@@ -145,7 +145,7 @@ public final class TableDiskAccess extends TableAccess {
     out.writeNum(blocks);
     for(int a = 0; a < blocks; a++) out.writeNum(pages[a]);
 
-    out.writeLongs(freePages.toArray());
+    out.writeLongs(usedPages.toArray());
     out.close();
     dirty = false;
   }
@@ -309,7 +309,7 @@ public final class TableDiskAccess extends TableAccess {
       // if whole block was deleted, remove it from the index
       if(npre == fpre) {
         // mark the block as empty
-        freePages.clear(pages[page]);
+        usedPages.clear(pages[page]);
 
         Array.move(fpres, page + 1, -1, used - page - 1);
         Array.move(pages, page + 1, -1, used - page - 1);
@@ -329,7 +329,7 @@ public final class TableDiskAccess extends TableAccess {
         ++unused;
         // mark the blocks as empty; range clear cannot be used because the
         // blocks may not be consecutive
-        freePages.clear(pages[page]);
+        usedPages.clear(pages[page]);
       }
       setPage(page + 1);
       from = 0;
@@ -339,7 +339,7 @@ public final class TableDiskAccess extends TableAccess {
     readBlock(pages[page]);
     final Buffer bf = bm.current();
     if(npre == last) {
-      freePages.clear((int) bf.pos);
+      usedPages.clear((int) bf.pos);
       ++unused;
       if(page < used - 1) readPage(page + 1);
       else ++page;
@@ -375,7 +375,7 @@ public final class TableDiskAccess extends TableAccess {
     if(used == 0) {
       // special case: insert new data into first block if database is empty
       readPage(0);
-      freePages.set(0);
+      usedPages.set(0);
       ++used;
     } else if(pre > 0) {
       // find the offset within the block where the new records will be inserted
@@ -560,8 +560,8 @@ public final class TableDiskAccess extends TableAccess {
    * Moves the cursor to a free block (either new or existing empty one).
    */
   private void freeBlock() {
-    final int b = freePages.nextFree(0);
-    freePages.set(b);
+    final int b = usedPages.nextFree(0);
+    usedPages.set(b);
     readBlock(b);
     ++used;
     ++page;
