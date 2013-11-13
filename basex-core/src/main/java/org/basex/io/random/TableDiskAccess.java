@@ -32,7 +32,7 @@ public final class TableDiskAccess extends TableAccess {
   /** File lock. */
   private FileLock fl;
 
-  /** FirstPre values (sorted ascending; length: {@link #blocks}). */
+  /** FirstPre values (ascending order; length: {@link #blocks}). */
   private int[] fpres;
   /** Page index (length: {@link #blocks}). */
   private int[] pages;
@@ -60,20 +60,40 @@ public final class TableDiskAccess extends TableAccess {
 
     // read meta and index data
     final DataInput in = new DataInput(meta.dbfile(DATATBL + 'i'));
-    blocks = in.readNum();
-    used   = in.readNum();
-    fpres  = in.readNums();
-    pages  = in.readNums();
+    final int b = in.readNum();
+    blocks = b;
 
-    final int psize = in.readNum();
-    // check if the page map has been stored
-    if(psize == 0) {
-      // init the map with empty pages
-      freePages = new BitArray(blocks);
-      for(final int p : pages) freePages.set(p);
-      dirty = true;
+    final int u = in.readNum();
+    // check if page index is regular and can be calculated (0: no pages)
+    final boolean regular = u == 0 || u == Integer.MAX_VALUE;
+    if(regular) {
+      used = u == 0 ? 0 : b;
+      fpres = new int[b];
+      pages = new int[b];
+      for(int i = 0; i < b; i++) {
+        fpres[i] = i * IO.BLOCKSIZE >>> IO.NODEPOWER;
+        pages[i] = i;
+      }
     } else {
-      freePages = new BitArray(in.readLongs(psize), blocks);
+      // read page index and first pre values from disk
+      used = u;
+      fpres = in.readNums();
+      pages = in.readNums();
+    }
+
+    // check if the page map has been stored
+    if(regular) {
+      // create empty bitmap
+      freePages = new BitArray(blocks, true);
+    } else {
+      final int psize = in.readNum();
+      if(psize == 0) {
+        // legacy: init the map with empty pages
+        freePages = new BitArray(blocks);
+        for(final int p : pages) freePages.set(p);
+      } else {
+        freePages = new BitArray(in.readLongs(psize), blocks);
+      }
     }
     in.close();
 
@@ -457,8 +477,7 @@ public final class TableDiskAccess extends TableAccess {
 
     // update cached variables
     fpre = fpres[page];
-    npre = page + 1 < used && fpres[page + 1] < meta.size ?
-        fpres[page + 1] : meta.size;
+    npre = page + 1 < used && fpres[page + 1] < meta.size ? fpres[page + 1] : meta.size;
   }
 
   // PRIVATE METHODS ==========================================================
@@ -579,8 +598,7 @@ public final class TableDiskAccess extends TableAccess {
    * @param dp destination position
    * @param l source length
    */
-  private void copy(final byte[] s, final int sp, final byte[] d,
-      final int dp, final int l) {
+  private void copy(final byte[] s, final int sp, final byte[] d, final int dp, final int l) {
     System.arraycopy(s, sp << IO.NODEPOWER, d, dp << IO.NODEPOWER,
         l << IO.NODEPOWER);
     bm.current().dirty = true;
