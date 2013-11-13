@@ -116,7 +116,7 @@ public abstract class TableAccess {
    * @param sub size of the subtree that is replaced
    */
   public final void replace(final int pre, final byte[] entries, final int sub) {
-    dirty = true;
+    dirty();
     final int nsize = entries.length >>> IO.NODEPOWER;
     final int diff = sub - nsize;
     final int last = diff <= 0 ? pre + nsize - Math.abs(diff) : pre + nsize;
@@ -141,9 +141,14 @@ public abstract class TableAccess {
    * @param entries array of bytes containing the entries to insert
    */
   final void set(final int pre, final byte[] entries) {
-    dirty = true;
+    dirty();
     copy(entries, pre, pre + (entries.length >>> IO.NODEPOWER));
   }
+
+  /**
+   * Marks the data structures as dirty.
+   */
+  protected abstract void dirty();
 
   /**
    * Copies the specified values into the database.

@@ -365,7 +365,7 @@ public final class FNSql extends StandardFunc {
         for(int k = 1; k <= cc; k++) {
           // for each row add column values as children
           final String name = metadata.getColumnLabel(k);
-          Object value = rs.getObject(k);
+          final Object value = rs.getObject(k);
           // null values are ignored
           if(value == null) continue;
 
