@@ -154,7 +154,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
    * @param cmds commands to be run
    */
   private static void execute(final GUI gui, final BaseXDialog dialog, final Runnable post,
-                              final Command... cmds) {
+      final Command... cmds) {
 
     for(final Command cmd : cmds) {
       // reset views

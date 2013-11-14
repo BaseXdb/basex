@@ -252,6 +252,14 @@ public class Editor extends BaseXPanel {
     return text.text();
   }
 
+  /**
+   * Tests if text has been selected.
+   * @return result of check
+   */
+  public final boolean selected() {
+    return text.selected();
+  }
+
   @Override
   public final void setFont(final Font f) {
     super.setFont(f);

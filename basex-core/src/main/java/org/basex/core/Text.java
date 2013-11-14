@@ -948,6 +948,8 @@ public interface Text {
   String B_NO = "  " + lang("no") + "  ";
   /** Button: "cancel". */
   String B_CANCEL = lang("cancel");
+  /** Button for refreshing. */
+  String B_REFRESH = lang("refresh");
 
   /** "Search". */
   String SEARCH = lang("search");
@@ -980,8 +982,6 @@ public interface Text {
   String CONNECT = lang("connect");
   /** Button for disconnecting. */
   String DISCONNECT = lang("disconnect");
-  /** Button for refreshing. */
-  String REFRESH = lang("refresh");
   /** Button for deleting all. */
   String DELETE_ALL = lang("delete_all");
   /** Button for adding. */
