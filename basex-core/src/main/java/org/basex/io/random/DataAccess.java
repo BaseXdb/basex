@@ -25,12 +25,19 @@ public final class DataAccess {
 
   /**
    * Constructor, initializing the file reader.
-   * @param f the file to be read
+   * @param fl the file to be read
    * @throws IOException I/O Exception
    */
-  public DataAccess(final IOFile f) throws IOException {
-    file = new RandomAccessFile(f.file(), "rw");
-    len = file.length();
+  public DataAccess(final IOFile fl) throws IOException {
+    RandomAccessFile f = null;
+    try {
+      f = new RandomAccessFile(fl.file(), "rw");
+      len = f.length();
+    } catch(final IOException ex) {
+      if(f != null) f.close();
+      throw ex;
+    }
+    file = f;
     cursor(0);
   }
 
@@ -92,6 +99,15 @@ public final class DataAccess {
    */
   public boolean more() {
     return cursor() < len;
+  }
+
+  /**
+   * Reads the next byte.
+   * @return next byte
+   */
+  public int read() {
+    final Buffer bf = buffer(off == IO.BLOCKSIZE);
+    return bf.data[off++] & 0xFF;
   }
 
   /**
@@ -250,6 +266,26 @@ public final class DataAccess {
     default:
       return (read() << 24) + (read() << 16) + (read() << 8) + read();
     }
+  }
+
+  /**
+   * Writes the next byte.
+   * @param b byte to be written
+   */
+  public void write(final int b) {
+    final Buffer bf = buffer(off == IO.BLOCKSIZE);
+    bf.dirty = true;
+    bf.data[off++] = (byte) b;
+    final long nl = bf.pos + off;
+    if(nl > len) length(nl);
+  }
+
+  /**
+   * Writes bytes to a file.
+   * @param bytes bytes to write
+   */
+  public synchronized void writeBytes(final byte[] bytes) {
+    for(final byte b : bytes) write(b);
   }
 
   /**
@@ -425,35 +461,12 @@ public final class DataAccess {
   }
 
   /**
-   * Reads the next byte.
-   * @return next byte
-   */
-  private int read() {
-    final Buffer bf = buffer(off == IO.BLOCKSIZE);
-    return bf.data[off++] & 0xFF;
-  }
-
-  /**
-   * Writes the next byte.
-   * @param b byte to be written
-   */
-  private void write(final int b) {
-    final Buffer bf = buffer(off == IO.BLOCKSIZE);
-    bf.dirty = true;
-    bf.data[off++] = (byte) b;
-    final long nl = bf.pos + off;
-    if(nl > len) length(nl);
-  }
-
-  /**
    * Returns the current or next buffer.
    * @param next next block
    * @return buffer
    */
   private Buffer buffer(final boolean next) {
-    if(next) {
-      cursor(bm.current().pos + IO.BLOCKSIZE);
-    }
+    if(next) cursor(bm.current().pos + IO.BLOCKSIZE);
     return bm.current();
   }
 }

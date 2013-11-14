@@ -294,6 +294,8 @@ public enum Err {
   FILE_NEDIR(FILE, 4, "Path '%' is a non-empty directory."),
   /** FILE0005. */
   FILE_ENCODING(FILE, 5, "Encoding '%' is not supported."),
+  /** FILE0006. */
+  FILE_BOUNDS(FILE, 6, "Requested file chunk [%,%] exceeds file bounds."),
   /** FILE9999. */
   FILE_IO(FILE, 9999, "%"),
   /** FILE9999. */

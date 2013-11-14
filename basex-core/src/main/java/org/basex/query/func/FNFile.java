@@ -11,6 +11,7 @@ import java.util.regex.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
+import org.basex.io.random.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -116,7 +117,6 @@ public final class FNFile extends StandardFunc {
   private Item size(final QueryContext ctx) throws QueryException {
     final File path = checkFile(0, ctx);
     if(!path.exists()) FILE_WHICH.thrw(info, path.getAbsolutePath());
-    if(path.isDirectory()) FILE_DIR.thrw(info, path.getAbsolutePath());
     return Int.get(path.length());
   }
 
@@ -311,7 +311,7 @@ public final class FNFile extends StandardFunc {
       throws QueryException, IOException {
 
     final String pref = string(checkStr(expr[0], ctx));
-    final String suf = string(checkStr(expr[1], ctx));
+    final String suf = expr.length > 1 ? string(checkStr(expr[1], ctx)) : "";
     final File root;
     if(expr.length > 2) {
       root = checkFile(2, ctx);
@@ -371,12 +371,31 @@ public final class FNFile extends StandardFunc {
    * @param ctx query context
    * @return Base64Binary
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  private B64Stream readBinary(final QueryContext ctx) throws QueryException {
+  private B64 readBinary(final QueryContext ctx) throws QueryException, IOException {
     final File path = checkFile(0, ctx);
+    final long off = expr.length > 1 ? checkItr(expr[1], ctx) : 0;
+    long len = expr.length > 2 ? checkItr(expr[2], ctx) : 0;
+
     if(!path.exists()) FILE_WHICH.thrw(info, path.getAbsolutePath());
     if(path.isDirectory()) FILE_DIR.thrw(info, path.getAbsolutePath());
-    return new B64Stream(new IOFile(path), FILE_IO);
+
+    // read full file
+    if(expr.length == 1) return new B64Stream(new IOFile(path), FILE_IO);
+
+    // read file chunk
+    final DataAccess da = new DataAccess(new IOFile(path));
+    try {
+      final long dlen = da.length();
+      if(expr.length == 2) len = dlen - off;
+      if(off < 0 || off > dlen || len < 0 || off + len > dlen)
+        FILE_BOUNDS.thrw(info, off, off + len);
+      da.cursor(off);
+      return new B64(da.readBytes((int) len));
+    } finally {
+      da.close();
+    }
   }
 
   /**
@@ -499,20 +518,33 @@ public final class FNFile extends StandardFunc {
       throws QueryException, IOException {
 
     final File path = check(checkFile(0, ctx));
-    final Iter ir = expr[1].iter(ctx);
-    final BufferOutput out = new BufferOutput(new FileOutputStream(path, append));
-    try {
-      for(Item it; (it = ir.next()) != null;) {
-        if(!(it instanceof Bin)) BINARYTYPE.thrw(info, it.type);
-        final InputStream is = it.input(info);
+    final Bin bin = checkBinary(expr[1], ctx);
+    final long off = expr.length > 2 ? checkItr(expr[2], ctx) : 0;
+
+    // write full file
+    if(expr.length == 2) {
+      final BufferOutput out = new BufferOutput(new FileOutputStream(path, append));
+      try {
+        final InputStream is = bin.input(info);
         try {
           for(int i; (i = is.read()) != -1;)  out.write(i);
         } finally {
           is.close();
         }
+      } finally {
+        out.close();
       }
+    }
+
+    // write file chunk
+    final RandomAccessFile raf = new RandomAccessFile(path, "rw");
+    try {
+      final long dlen = raf.length();
+      if(off < 0 || off > dlen) FILE_BOUNDS.thrw(info, off, dlen);
+      raf.seek(off);
+      raf.write(bin.binary(info));
     } finally {
-      out.close();
+      raf.close();
     }
     return null;
   }
@@ -539,8 +571,8 @@ public final class FNFile extends StandardFunc {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private synchronized Item relocate(final boolean copy,
-      final QueryContext ctx) throws QueryException, IOException {
+  private synchronized Item relocate(final boolean copy, final QueryContext ctx)
+      throws QueryException, IOException {
 
     final File src = checkFile(0, ctx).getCanonicalFile();
     File trg = checkFile(1, ctx).getCanonicalFile();

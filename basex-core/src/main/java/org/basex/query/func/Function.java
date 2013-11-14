@@ -709,8 +709,7 @@ public enum Function {
   /** XQuery function. */
   _FILE_TEMP_DIR(FNFile.class, "temp-dir()", arg(), STR),
   /** XQuery function. */
-  _FILE_BASE_NAME(FNFile.class, "base-name(path[,suffix])",
-      arg(STR, STR), STR),
+  _FILE_BASE_NAME(FNFile.class, "base-name(path[,suffix])", arg(STR, STR), STR),
   /** XQuery function. */
   _FILE_DIR_NAME(FNFile.class, "dir-name(path)", arg(STR), STR),
   /** XQuery function. */
@@ -743,19 +742,18 @@ public enum Function {
   /** XQuery function. */
   _FILE_DELETE(FNFile.class, "delete(path[,recursive])", arg(STR, BLN), EMP, flag(NDT)),
   /** XQuery function. */
-  _FILE_READ_TEXT(FNFile.class, "read-text(path[,encoding])",
-      arg(STR, STR), STR, flag(NDT)),
+  _FILE_READ_TEXT(FNFile.class, "read-text(path[,encoding])", arg(STR, STR), STR, flag(NDT)),
   /** XQuery function. */
   _FILE_READ_TEXT_LINES(FNFile.class, "read-text-lines(path[,encoding])",
       arg(STR, STR), STR_ZM, flag(NDT)),
   /** XQuery function. */
-  _FILE_READ_BINARY(FNFile.class, "read-binary(path)", arg(STR), B64, flag(NDT)),
+  _FILE_READ_BINARY(FNFile.class, "read-binary(path[,offset[,length]])",
+      arg(STR, ITR, ITR), B64, flag(NDT)),
   /** XQuery function. */
-  _FILE_WRITE(FNFile.class, "write(path,data[,params])",
-      arg(STR, ITEM_ZM, ITEM), EMP, flag(NDT)),
+  _FILE_WRITE(FNFile.class, "write(path,data[,params])", arg(STR, ITEM_ZM, ITEM), EMP, flag(NDT)),
   /** XQuery function. */
-  _FILE_WRITE_BINARY(FNFile.class, "write-binary(path,item)",
-      arg(STR, BIN), EMP, flag(NDT)),
+  _FILE_WRITE_BINARY(FNFile.class, "write-binary(path,item[,offset])",
+      arg(STR, BIN, ITR), EMP, flag(NDT)),
   /** XQuery function. */
   _FILE_WRITE_TEXT(FNFile.class, "write-text(path,text[,encoding])",
       arg(STR, STR, STR), EMP, flag(NDT)),
@@ -763,11 +761,9 @@ public enum Function {
   _FILE_WRITE_TEXT_LINES(FNFile.class, "write-text-lines(path,texts[,encoding])",
       arg(STR, STR_ZM, STR), EMP, flag(NDT)),
   /** XQuery function. */
-  _FILE_APPEND(FNFile.class, "append(path,data[,params])",
-      arg(STR, ITEM_ZM, ITEM), EMP, flag(NDT)),
+  _FILE_APPEND(FNFile.class, "append(path,data[,params])", arg(STR, ITEM_ZM, ITEM), EMP, flag(NDT)),
   /** XQuery function. */
-  _FILE_APPEND_BINARY(FNFile.class, "append-binary(path,item)",
-      arg(STR, BIN), EMP, flag(NDT)),
+  _FILE_APPEND_BINARY(FNFile.class, "append-binary(path,item)", arg(STR, BIN), EMP, flag(NDT)),
   /** XQuery function. */
   _FILE_APPEND_TEXT(FNFile.class, "append-text(path,text[,encoding])",
       arg(STR, STR, STR), EMP, flag(NDT)),
