@@ -649,8 +649,8 @@ public interface QueryText {
 
   /** Java prefix. */
   byte[] JAVAPREF = token("java:");
-  /** Default collation. */
-  byte[] URLCOLL = concat(FNURI, token("/collation/codepoint"));
+  /** URI of default collation. */
+  byte[] COLLATIONURI = concat(FNURI, token("/collation/codepoint"));
 
   /** Supported documentation tags. */
   byte[][] DOC_TAGS = tokens("description", "author", "version", "param",

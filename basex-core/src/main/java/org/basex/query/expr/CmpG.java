@@ -125,8 +125,7 @@ public final class CmpG extends Cmp {
    * @param coll collation
    * @param ii input info
    */
-  public CmpG(final Expr e1, final Expr e2, final OpG o, final Collation coll,
-      final InputInfo ii) {
+  public CmpG(final Expr e1, final Expr e2, final OpG o, final Collation coll, final InputInfo ii) {
     super(ii, e1, e2, coll);
     op = o;
     type = SeqType.BLN;
@@ -303,8 +302,7 @@ public final class CmpG extends Cmp {
    * @return true if union was successful
    * @throws QueryException query exception
    */
-  boolean union(final CmpG g, final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  boolean union(final CmpG g, final QueryContext ctx, final VarScope scp) throws QueryException {
     if(op != g.op || !expr[0].sameAs(g.expr[0])) return false;
     expr[1] = new List(info, expr[1], g.expr[1]).compile(ctx, scp);
     atomic = atomic && expr[1].type().zeroOrOne();
@@ -313,8 +311,9 @@ public final class CmpG extends Cmp {
 
   @Override
   public boolean indexAccessible(final IndexCosts ic) throws QueryException {
-    // accept only location path, string and equality expressions
-    if(op != OpG.EQ) return false;
+    // only equality expressions on default collation can be rewritten
+    if(op != OpG.EQ || collation != null) return false;
+    // location path, string
     final Step s = expr[0] instanceof Context ? ic.step : indexStep(expr[0]);
     if(s == null) return false;
 
@@ -373,7 +372,7 @@ public final class CmpG extends Cmp {
   /**
    * If possible, returns the last location step of the specified expression.
    * @param expr expression
-   * @return location step
+   * @return location step, or {@code null}
    */
   public static Step indexStep(final Expr expr) {
     // check if index can be applied

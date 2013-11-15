@@ -23,7 +23,7 @@ public final class StaticContext {
   /** Static and dynamic namespaces. */
   public final NSContext ns = new NSContext();
 
-  /** Default collation. */
+  /** Default collation (default collection ({@link QueryText#COLLATIONURI}): {@code null}). */
   public Collation collation;
   /** Default element/type namespace. */
   public byte[] elemNS;

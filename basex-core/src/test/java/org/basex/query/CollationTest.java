@@ -16,9 +16,7 @@ public class CollationTest extends AdvancedQueryTest {
   /** Default collation used in the tests. */
   private static final String PROLOG = "declare default collation '" + COLLATION + "'; ";
   /** Strengths. */
-  private static final String[] STRENGTHS = {
-    "primary", "secondary", "tertiary", "identical"
-  };
+  private static final String[] STRENGTHS = { "primary", "secondary", "tertiary", "identical" };
 
   /** Checks the German collation and different strengths. */
   @Test
@@ -108,5 +106,12 @@ public class CollationTest extends AdvancedQueryTest {
         "' return count($a)", "2");
     query("for $a in 'a' group by $a, $a:=$a collation '" + COLLATION +
         "' return $a", "a");
+  }
+
+  /** Disallow index rewritings. */
+  @Test
+  public void index() {
+    query(PROLOG + "doc('<X>&#xe4;</X>')/X/text()[. = 'a']", "\u00e4");
+    query(PROLOG + "doc('<X>&#xe4;</X>')/X[text() = 'a']", "<X>\u00e4</X>");
   }
 }

@@ -204,7 +204,7 @@ public final class Map extends FItem {
    * @return collation
    */
   public Str collation() {
-    return Str.get(URLCOLL);
+    return Str.get(COLLATIONURI);
   }
 
   /**

@@ -34,7 +34,7 @@ public final class FNContext extends StandardFunc {
       case IMPLICIT_TIMEZONE: return ctx.initDateTime().zone;
       case DEFAULT_COLLATION:
         final Collation coll = sc.collation;
-        return Uri.uri(coll == null ? QueryText.URLCOLL : coll.uri());
+        return Uri.uri(coll == null ? QueryText.COLLATIONURI : coll.uri());
       case STATIC_BASE_URI:
         final Uri uri = sc.baseURI();
         return uri == Uri.EMPTY ? null : uri;

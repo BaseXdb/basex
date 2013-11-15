@@ -80,7 +80,7 @@ public final class Collation {
       args = sc.baseURI().resolve(u, info).string();
     }
     // return unicode point collation
-    if(eq(URLCOLL, args)) return null;
+    if(eq(COLLATIONURI, args)) return null;
 
     // normalize arguments
     if(Token.startsWith(args, URL)) args = substring(args, URL.length);
