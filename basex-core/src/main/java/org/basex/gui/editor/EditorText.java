@@ -518,6 +518,27 @@ public final class EditorText {
   }
 
   /**
+   * Checks if an opening element can automatically be closed.
+   * @param sb string builder
+   */
+  void closeElem(final StringBuilder sb) {
+    int p = ps - 1;
+    for(; p >= 0; p--) {
+      final byte b = text[p];
+      if(!XMLToken.isNCChar(b) && b != ':') {
+        if(b == '<' && p < ps - 1) {
+          // add closing element
+          sb.append("</");
+          while(++p < ps) sb.append((char) text[p]);
+          sb.append(">");
+          break;
+        }
+        return;
+      }
+    }
+  }
+
+  /**
    * Deletes the current character or selection.
    * Assumes that the current position allows a deletion.
    */

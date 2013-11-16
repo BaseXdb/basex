@@ -171,7 +171,6 @@ public class Editor extends BaseXPanel {
       // ignore carriage return
       if(b != 0x0D) t[ns++] = t[r];
       // support characters, highlighting codes, tabs and newlines
-      //if(b >= ' ' || b <= TokenBuilder.ULINE || b == 0x09 || b == 0x0A) t[ns++] = t[r];
       eq &= ns < ts && ns < s && t[ns] == old[ns];
     }
     eq &= ns == ts;
@@ -726,8 +725,7 @@ public class Editor extends BaseXPanel {
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    if(!hist.active() || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e))
-      return;
+    if(!hist.active() || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e)) return;
 
     final int pc = text.getCaret();
     text.pos(pc);
@@ -739,15 +737,22 @@ public class Editor extends BaseXPanel {
     // delete marked text
     if(text.selected() && !indent) text.delete();
 
+    boolean elem = false;
     if(ENTER.is(e)) {
       text.open(sb);
-    } else if(sb.length() != 0 && "}])".contains(sb.toString())) {
-      text.close();
+    } else if(sb.length() != 0) {
+      if("}])".contains(sb.toString())) {
+        text.close();
+      } else if(sb.charAt(0) == '>') {
+        elem = true;
+        text.closeElem(sb);
+      }
     }
 
     if(sb.length() != 0) text.add(sb.toString());
     text.setCaret();
     hist.store(text.text(), pc, text.getCaret());
+    if(elem) text.setCaret(text.getCaret() - sb.length() + 1);
     calcCode.invokeLater(true);
     e.consume();
   }
