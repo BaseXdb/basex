@@ -62,7 +62,7 @@ public enum Err {
   /** BXCO0001. */
   BXCO_BASE64(BXCO, 1, "String cannot be converted to the supplied encoding."),
   /** BXCO0002. */
-  BXCO_ENCODING(BXCO, 2, "Encoding '%' is not supported."),
+  BXCO_ENCODING(BXCO, 2, "Unknown encoding '%'."),
 
   // CSV module
 
@@ -110,7 +110,7 @@ public enum Err {
   /** BXFE0001. */
   BXFE_IO(BXFE, 1, "%"),
   /** BXFE0002. */
-  BXFE_ENCODING(BXFE, 2, "Encoding not supported: '%'."),
+  BXFE_ENCODING(BXFE, 2, "Unknown encoding '%'."),
 
   // Fulltext module
 
@@ -134,7 +134,7 @@ public enum Err {
   // Process module
 
   /** BXPR9999. */
-  BXPR_ENC(BXPR, 9999, "Encoding not supported: '%'."),
+  BXPR_ENC(BXPR, 9999, "Unknown encoding '%'."),
 
   // Repository module
 
@@ -227,7 +227,7 @@ public enum Err {
   /** ARCH0003. */
   ARCH_DATETIME(ARCH, 3, "xs:dateTime value is invalid : '%'."),
   /** ARCH0004. */
-  ARCH_ENCODING(ARCH, 4, "Encoding is not supported: '%'."),
+  ARCH_ENCODING(ARCH, 4, "Unknown encoding '%'."),
   /** ARCH0004. */
   ARCH_ENCODE(ARCH, 4, "String conversion: %."),
   /** ARCH0005. */
@@ -236,6 +236,31 @@ public enum Err {
   ARCH_ONE(ARCH, 6, "% archives are limited to a single entry."),
    /** ARCH9999. */
   ARCH_FAIL(ARCH, 9999, "Operation failed: %."),
+
+  /** Binary error. */
+  BIN_DLA_X_X(BIN, "differing-length-arguments", "Inputs are of different length (%/%)."),
+  /** Binary error. */
+  BIN_NO_X(BIN, "negative-offset", "Offset '%' is negative."),
+  /** Binary error. */
+  BIN_OBE_X_X_X(BIN, "offset-beyond-end", "Offset '%' and size '%' exceed size of data (%)."),
+  /** Binary error. */
+  BIN_OBE_X_X(BIN, "offset-beyond-end", "Offset '%' exceeds size of data (%)."),
+  /** Binary error. */
+  BIN_NS_X(BIN, "negative-size", "Size '%' is negative."),
+  /** Binary error. */
+  BIN_ESI(BIN, "empty-search-item", "Search data must not be empty."),
+  /** Binary error. */
+  BIN_OOR_X(BIN, "octet-out-of-range", "Octet '%' is out of range."),
+  /** Binary error. */
+  BIN_NNC(BIN, "non-numeric-character", "Invalid character in constructor string."),
+  /** Binary error. */
+  BIN_UE_X(BIN, "unknown-encoding", "Unknown encoding '%'."),
+  /** Binary error. */
+  BIN_DE(BIN, "decoding-error", "An error occurred while decoding the string."),
+  /** Binary error. */
+  BIN_EE(BIN, "encoding-error", "An error occurred while encoding the string."),
+  /** Binary error. */
+  BIN_USO_X(BIN, "unknown-significance-order", "Unknown octet-order value: '%'."),
 
   /** CX0001. */
   CX_CANINV(CX, 1, "Canonicalization algorithm is not supported."),
@@ -293,7 +318,7 @@ public enum Err {
   /** FILE0004. */
   FILE_NEDIR(FILE, 4, "Path '%' is a non-empty directory."),
   /** FILE0005. */
-  FILE_ENCODING(FILE, 5, "Encoding '%' is not supported."),
+  FILE_ENCODING(FILE, 5, "Unknown encoding '%'."),
   /** FILE0006. */
   FILE_BOUNDS(FILE, 6, "Requested file chunk [%,%] exceeds file bounds."),
   /** FILE9999. */
@@ -542,7 +567,7 @@ public enum Err {
   /** FOUT1170. */
   INVURL(FOUT, 1170, "URI is invalid: %"),
   /** FOUT1190. */
-  WHICHENC(FOUT, 1190, "Encoding '%' is not supported."),
+  WHICHENC(FOUT, 1190, "Unknown encoding '%'."),
   /** FOUT1190. */
   INVCHARS(FOUT, 1190, "%."),
   /** FOUT1200. */
@@ -581,7 +606,7 @@ public enum Err {
   /** SEPM0004. */
   SERDT(SEPM, 4, "If 'doctype-system' is specified, the root must be a single element."),
   /** SESU0007. */
-  SERENCODING(SESU, 7, "Encoding not supported: '%'."),
+  SERENCODING(SESU, 7, "Unknown encoding '%'."),
   /** SEPM0009. */
   SERSTAND(SEPM, 9, "Invalid combination of 'omit-xml-declaration'."),
   /** SEPM0010. */
@@ -1116,23 +1141,43 @@ public enum Err {
   /** Cached enums (faster). */
   private static final Err[] VALUES = values();
 
-  /** Error type. */
-  public final ErrType type;
-  /** Error number. */
-  public final int num;
+  /** Error code. */
+  public final String code;
+  /** Error URI. */
+  public final byte[] uri;
+  /** Error prefix. */
+  public final String prefix;
   /** Error description. */
   public final String desc;
 
   /**
    * Constructor.
-   * @param t error type
-   * @param n error number
-   * @param d description
+   * @param type error type
+   * @param msg error message
+   * @param dsc description
    */
-  Err(final ErrType t, final int n, final String d) {
-    type = t;
-    num = n;
-    desc = d;
+  Err(final ErrType type, final String msg, final String dsc) {
+    code = new StringBuilder().append(msg).toString();
+    uri = type.uri;
+    prefix = type.prefix;
+    desc = dsc;
+  }
+
+  /**
+   * Constructor.
+   * @param type error type
+   * @param nr error number
+   * @param dsc description
+   */
+  Err(final ErrType type, final int nr, final String dsc) {
+    final StringBuilder sb = new StringBuilder(8).append(type);
+    final String n = Integer.toString(nr);
+    final int s  = 4 - n.length();
+    for(int i = 0; i < s; i++) sb.append('0');
+    code = sb.append(n).toString();
+    uri = type.uri;
+    prefix = type.prefix;
+    desc = dsc;
   }
 
   /**
@@ -1181,14 +1226,15 @@ public enum Err {
     /** BXVA Error type. */ BXVA(QueryText.BXERR, QueryText.BXERRORS),
     /** BXXQ Error type. */ BXXQ(QueryText.BXERR, QueryText.BXERRORS),
     /** HASH Error type. */ HASH(QueryText.BXERR, QueryText.BXERRORS),
-    /** UNIT Error type. */ UNIT(QueryText.UNIT, QueryText.UNITURI),
+    /** UNIT Error type. */ UNIT(QueryText.UNIT,  QueryText.UNITURI),
 
     // EXPath errors
 
-    /** CX Error type.   */ CX(QueryText.EXPERR, QueryText.EXPERROR),
+    /** BIN  Error type. */ BIN(QueryText.BIN,     QueryText.BINURI),
+    /** CX   Error type. */ CX(QueryText.EXPERR,   QueryText.EXPERROR),
     /** FILE Error type. */ FILE(QueryText.EXPERR, QueryText.EXPERROR),
-    /** HC Error type.   */ HC(QueryText.EXPERR, QueryText.EXPERROR),
-    /** ZIP Error type. */  ZIP(QueryText.EXPERR, QueryText.EXPERROR),
+    /** HC   Error type. */ HC(QueryText.EXPERR,   QueryText.EXPERROR),
+    /** ZIP  Error type. */ ZIP(QueryText.EXPERR,  QueryText.EXPERROR),
     /** ARCH Error type. */ ARCH(QueryText.EXPERR, QueryText.EXPERROR),
 
     // W3 errors
@@ -1245,15 +1291,6 @@ public enum Err {
     ErrType() {
       this(QueryText.ERR, QueryText.ERRORURI);
     }
-
-    /**
-     * Creates a QName for the given error number.
-     * @param num error number
-     * @return constructed QName
-     */
-    public final QNm qname(final int num) {
-      return new QNm(String.format("%s:%s%04d", prefix, name(), num), uri);
-    }
   }
 
   /**
@@ -1261,7 +1298,16 @@ public enum Err {
    * @return function
    */
   public final QNm qname() {
-    return type.qname(num);
+    return new QNm(new StringBuilder().append(prefix).append(':').append(code).toString(), uri);
+  }
+
+  /**
+   * Checks if the error code is of the specified type.
+   * @param type type
+   * @return result of check
+   */
+  public final boolean is(final ErrType type) {
+    return code.startsWith(type.name());
   }
 
   /**
@@ -1370,6 +1416,6 @@ public enum Err {
 
   @Override
   public String toString() {
-    return String.format("%s%04d", type, num);
+    return code;
   }
 }

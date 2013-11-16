@@ -11,8 +11,7 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * String item ({@code xs:string}, {@code xs:normalizedString}, {@code xs:language},
- * etc.).
+ * String item ({@code xs:string}, {@code xs:normalizedString}, {@code xs:language}, etc.).
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen

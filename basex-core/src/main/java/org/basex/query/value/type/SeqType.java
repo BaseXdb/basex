@@ -124,6 +124,8 @@ public final class SeqType {
   public static final SeqType DBL_ZM = new SeqType(AtomType.DBL, Occ.ZERO_MORE);
   /** Zero or one double. */
   public static final SeqType DBL_ZO = new SeqType(AtomType.DBL, Occ.ZERO_ONE);
+  /** Float number. */
+  public static final SeqType FLT = AtomType.FLT.seqType();
   /** Zero or one decimal number. */
   public static final SeqType DEC_ZO = new SeqType(AtomType.DEC, Occ.ZERO_ONE);
   /** Single integer; for simplicity, numbers are summarized by this type. */
@@ -219,6 +221,8 @@ public final class SeqType {
   public static final SeqType HEX = AtomType.HEX.seqType();
   /** Single xs:base64Binary. */
   public static final SeqType B64 = AtomType.B64.seqType();
+  /** Zero or one xs:base64Binary. */
+  public static final SeqType B64_ZO = new SeqType(AtomType.B64, Occ.ZERO_ONE);
   /** Zero or more xs:base64Binary. */
   public static final SeqType B64_ZM = new SeqType(AtomType.B64, Occ.ZERO_MORE);
 

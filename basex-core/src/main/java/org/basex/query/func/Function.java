@@ -482,6 +482,68 @@ public enum Function {
   /** XQuery function. */
   _ARCHIVE_WRITE(FNArchive.class, "write(path,archive[,entries])", arg(STR, B64, ITEM_ZM), EMP),
 
+  /* FNBin functions. */
+
+  /** XQuery function. */
+  _BIN_HEX(FNBin.class, "hex(string)", arg(STR_ZO), B64_ZO),
+  /** XQuery function. */
+  _BIN_BIN(FNBin.class, "bin(string)", arg(STR_ZO), B64_ZO),
+  /** XQuery function. */
+  _BIN_OCTAL(FNBin.class, "octal(string)", arg(STR_ZO), B64_ZO),
+  /** XQuery function. */
+  _BIN_TO_OCTETS(FNBin.class, "to-octets(binary)", arg(B64_ZO), ITR_ZM),
+  /** XQuery function. */
+  _BIN_FROM_OCTETS(FNBin.class, "from-octets(integers)", arg(ITR_ZM), B64),
+  /** XQuery function. */
+  _BIN_LENGTH(FNBin.class, "length(binary)", arg(B64), ITR),
+  /** XQuery function. */
+  _BIN_PART(FNBin.class, "part(binary,offset[,size])", arg(B64_ZO, ITR, ITR), B64_ZO),
+  /** XQuery function. */
+  _BIN_JOIN(FNBin.class, "join(binaries)", arg(B64_ZM), B64),
+  /** XQuery function. */
+  _BIN_INSERT_BEFORE(FNBin.class, "insert-before(binary,offset,extra)",
+      arg(B64_ZO, ITR, B64_ZO), B64_ZO),
+  /** XQuery function. */
+  _BIN_PAD_LEFT(FNBin.class, "pad-left(binary,size[,octet])", arg(B64_ZO, ITR, ITR), B64_ZO),
+  /** XQuery function. */
+  _BIN_PAD_RIGHT(FNBin.class, "pad-right(binary,size[,octet])", arg(B64_ZO, ITR, ITR), B64_ZO),
+  /** XQuery function. */
+  _BIN_FIND(FNBin.class, "find(binary,offset,search)", arg(B64_ZO, ITR, B64_ZO), ITR_ZO),
+  /** XQuery function. */
+  _BIN_DECODE_STRING(FNBin.class, "decode-string(binary,encoding[,offset[,size]])",
+      arg(B64_ZO, STR, ITR, ITR), STR_ZO),
+  /** XQuery function. */
+  _BIN_ENCODE_STRING(FNBin.class, "encode-string(string,encoding)", arg(STR_ZO, STR), B64_ZO),
+  /** XQuery function. */
+  _BIN_PACK_DOUBLE(FNBin.class, "pack-double(double[,order])", arg(DBL, STR), B64),
+  /** XQuery function. */
+  _BIN_PACK_FLOAT(FNBin.class, "pack-float(float[,order])", arg(FLT, STR), B64),
+  /** XQuery function. */
+  _BIN_PACK_INTEGER(FNBin.class, "pack-integer(integer,size[,order])",
+      arg(ITR, ITR, STR), B64),
+  /** XQuery function. */
+  _BIN_UNPACK_DOUBLE(FNBin.class, "unpack-double(binary,offset[,order])",
+      arg(B64, ITR, STR), DBL),
+  /** XQuery function. */
+  _BIN_UNPACK_FLOAT(FNBin.class, "unpack-float(binary,offset[,order])",
+      arg(B64, ITR, STR), FLT),
+  /** XQuery function. */
+  _BIN_UNPACK_INTEGER(FNBin.class, "unpack-integer(binary,offset,size[,order])",
+      arg(B64, ITR, ITR, STR), ITR),
+  /** XQuery function. */
+  _BIN_UNPACK_UNSIGNED_INTEGER(FNBin.class, "unpack-unsigned-integer(binary,offset,size[,order])",
+      arg(B64, ITR, ITR, STR), ITR),
+  /** XQuery function. */
+  _BIN_OR(FNBin.class, "or(binary1,binary2)", arg(B64_ZO, B64_ZO), B64_ZO),
+  /** XQuery function. */
+  _BIN_XOR(FNBin.class, "xor(binary1,binary2)", arg(B64_ZO, B64_ZO), B64_ZO),
+  /** XQuery function. */
+  _BIN_AND(FNBin.class, "and(binary1,binary2)", arg(B64_ZO, B64_ZO), B64_ZO),
+  /** XQuery function. */
+  _BIN_NOT(FNBin.class, "not(binary)", arg(B64_ZO), B64_ZO),
+  /** XQuery function. */
+  _BIN_SHIFT(FNBin.class, "shift(binary,by)", arg(B64_ZO, ITR), B64_ZO),
+
   /* FNClient functions. */
 
   /** XQuery function. */
@@ -979,6 +1041,7 @@ public enum Function {
     URIS.put(FNMap.class,  MAPURI);
     URIS.put(FNMath.class, MATHURI);
     // EXPath functions
+    URIS.put(FNBin.class,    BINURI);
     URIS.put(FNCrypto.class, CRYPTOURI);
     URIS.put(FNFile.class,   FILEURI);
     URIS.put(FNHttp.class,   HTTPURI);

@@ -250,10 +250,21 @@ public final class FNConvert extends StandardFunc {
    * @return resulting value
    * @throws IOException I/O exception
    */
-  public static byte[] toString(final InputStream is, final String enc,
-      final QueryContext ctx) throws IOException {
+  public static byte[] toString(final InputStream is, final String enc, final QueryContext ctx)
+      throws IOException {
+    return toString(is, enc, ctx.context.options.get(MainOptions.CHECKSTRINGS));
+  }
 
-    final boolean val = ctx.context.options.get(MainOptions.CHECKSTRINGS);
+  /**
+   * Converts the specified input to a string in the specified encoding.
+   * @param is input stream
+   * @param enc encoding
+   * @param val validate string
+   * @return resulting value
+   * @throws IOException I/O exception
+   */
+  public static byte[] toString(final InputStream is, final String enc, final boolean val)
+      throws IOException {
     try {
       return new NewlineInput(is).encoding(enc).validate(val).content();
     } finally {
@@ -272,12 +283,26 @@ public final class FNConvert extends StandardFunc {
     final String enc = encoding(1, BXCO_ENCODING, ctx);
     if(enc == null || enc == UTF8) return in;
     try {
-      final CharsetEncoder ce = Charset.forName(enc).newEncoder();
-      final CharBuffer cb = CharBuffer.wrap(string(in));
-      return ce.encode(cb).array();
+      return toBinary(in, enc);
     } catch(final CharacterCodingException ex) {
       throw BXCO_BASE64.thrw(info);
     }
+  }
+
+  /**
+   * Converts the first argument from a string to a byte array.
+   * @param in input string
+   * @param enc encoding
+   * @return resulting value
+   * @throws CharacterCodingException character coding exception
+   */
+  public static byte[] toBinary(final byte[] in, final String enc)
+      throws CharacterCodingException {
+
+    if(enc == UTF8) return in;
+    final CharsetEncoder ce = Charset.forName(enc).newEncoder();
+    final CharBuffer cb = CharBuffer.wrap(string(in));
+    return ce.encode(cb).array();
   }
 
   /**

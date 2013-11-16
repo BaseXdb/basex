@@ -34,6 +34,7 @@ public final class NSGlobal {
     NS.add(ERR, ERRORURI);
     // EXPath namespaces
     NS.add(EXPERR, EXPERROR);
+    NS.add(BIN, BINURI);
     NS.add(CRYPTO, CRYPTOURI);
     NS.add(FILE, FILEURI);
     NS.add(HTTP, HTTPURI);

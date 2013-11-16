@@ -189,8 +189,8 @@ public final class FNGen extends StandardFunc {
       return Bln.get(doc(ctx) != null);
     } catch(final QueryException ex) {
       final Err err = ex.err();
-      if(err != null && err.type == ErrType.FODC &&
-          (err.num == 2 || err.num == 4)) return Bln.FALSE;
+      if(err != null && err.is(ErrType.FODC) &&
+          (err.code.endsWith("0002") || err.code.endsWith("0004"))) return Bln.FALSE;
       throw ex;
     }
   }
@@ -203,7 +203,6 @@ public final class FNGen extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item unparsedText(final QueryContext ctx, final boolean check) throws QueryException {
-
     checkCreate(ctx);
     final byte[] path = checkStr(expr[0], ctx);
     final IO base = sc.baseIO();
@@ -235,7 +234,7 @@ public final class FNGen extends StandardFunc {
         is.close();
       }
     } catch(final QueryException ex) {
-      if(check && ex.err().type != ErrType.XPTY) return Bln.FALSE;
+      if(check && !ex.err().is(ErrType.XPTY)) return Bln.FALSE;
       throw ex;
     } catch(final IOException ex) {
       if(check) return Bln.FALSE;

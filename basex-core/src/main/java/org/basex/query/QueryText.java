@@ -516,6 +516,8 @@ public interface QueryText {
   byte[] SQL = token("sql");
   /** SQL token. */
   byte[] STREAM = token("stream");
+  /** Binary token. */
+  byte[] BIN = token("bin");
   /** Cryptography token. */
   byte[] CRYPTO = token("crypto");
   /** Random token. */
@@ -574,17 +576,19 @@ public interface QueryText {
 
   /** EXPath URI. */
   String EXPATH = "http://expath.org/ns/";
-  /** Cryptographic module URI. */
+  /** URI of Binary Module. */
+  byte[] BINURI = token(EXPATH + "bin");
+  /** URI of Cryptographic Module. */
   byte[] CRYPTOURI = token(EXPATH + "crypto");
-  /** File module URI. */
+  /** URI of File Module. */
   byte[] FILEURI = token(EXPATH + "file");
-  /** HTTP Client URI. */
+  /** URI of HTTP Client Module. */
   byte[] HTTPURI = token(EXPATH + "http-client");
-  /** Package API URI. */
+  /** URI of Package API. */
   byte[] PKGURI = token(EXPATH + "pkg");
-  /** ZIP URI.*/
+  /** URI of ZIP Module.*/
   byte[] ZIPURI = token(EXPATH + "zip");
-  /** EXPath Error URI. */
+  /** URI of EXPath errors. */
   byte[] EXPERROR = token(EXPATH + "error");
 
   /** Project URI. */

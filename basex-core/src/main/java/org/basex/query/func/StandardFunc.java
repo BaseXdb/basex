@@ -214,9 +214,7 @@ public abstract class StandardFunc extends Arr {
    * @return text entry
    * @throws QueryException query exception
    */
-  final String encoding(final int i, final Err err, final QueryContext ctx)
-      throws QueryException {
-
+  final String encoding(final int i, final Err err, final QueryContext ctx) throws QueryException {
     if(i >= expr.length) return null;
     final String enc = string(checkStr(expr[i], ctx));
     try {

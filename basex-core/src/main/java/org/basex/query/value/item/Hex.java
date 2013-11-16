@@ -48,8 +48,7 @@ public final class Hex extends Bin {
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public boolean eq(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     return Token.eq(binary(ii), it instanceof Bin ? ((Bin) it).binary(ii) :
       decode(it.string(ii), ii));
   }
@@ -61,7 +60,7 @@ public final class Hex extends Bin {
    * @return decoded string
    * @throws QueryException query exception
    */
-  private static byte[] decode(final byte[] d, final InputInfo ii) throws QueryException {
+  public static byte[] decode(final byte[] d, final InputInfo ii) throws QueryException {
     if((d.length & 1) != 0) throw FUNCAST.thrw(ii, AtomType.HEX, (char) d[0]);
     final int l = d.length >>> 1;
     final byte[] v = new byte[l];

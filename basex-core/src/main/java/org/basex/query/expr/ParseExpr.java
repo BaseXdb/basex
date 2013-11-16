@@ -219,6 +219,20 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
+   * Checks if the specified expression yields a float.
+   * Returns the float or throws an exception.
+   * @param e expression to be checked
+   * @param ctx query context
+   * @return double
+   * @throws QueryException query exception
+   */
+  protected final float checkFlt(final Expr e, final QueryContext ctx) throws QueryException {
+    final Item it = checkNoEmpty(e.item(ctx, info), AtomType.FLT);
+    if(it.type.isNumberOrUntyped()) return it.flt(info);
+    throw number(this, it);
+  }
+
+  /**
    * Checks if the specified expression is an integer.
    * Returns a token representation or an exception.
    * @param e expression to be checked
@@ -328,8 +342,8 @@ public abstract class ParseExpr extends Expr {
     if(it == null) return EMPTY;
     final Type ip = it.type;
     if(ip.isStringOrUntyped()) return it.string(info);
-    if(it instanceof FItem) FIATOM.thrw(info, this);
-    throw Err.INVCAST.thrw(info, it.type, AtomType.STR);
+    throw it instanceof FItem ? FIATOM.thrw(info, this) :
+      Err.INVCAST.thrw(info, it.type, AtomType.STR);
   }
 
   /**
@@ -353,8 +367,8 @@ public abstract class ParseExpr extends Expr {
   protected final ANode checkNode(final QueryContext ctx) throws QueryException {
     final Value v = ctx.value;
     if(v == null) NOCTX.thrw(info, this);
-    if(!(v instanceof ANode)) STEPNODE.thrw(info, this, v.type);
-    return (ANode) v;
+    if(v instanceof ANode) return (ANode) v;
+    throw STEPNODE.thrw(info, this, v.type);
   }
 
   /**
