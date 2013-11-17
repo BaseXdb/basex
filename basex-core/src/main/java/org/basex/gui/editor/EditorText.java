@@ -13,6 +13,10 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class EditorText {
+  /** Opening brackets. */
+  static final String OPENING = "{[(";
+  /** Closing brackets. */
+  static final String CLOSING = "}])";
   /** Tab width. */
   static final int TAB = 2;
 
@@ -489,20 +493,45 @@ public final class EditorText {
       }
     }
     // indent after opening bracket
-    if(ps > 0) {
-      final int l = text[ps - 1];
-      if(l == '(' || l == '{' || l == '[') s += TAB;
-    }
+    if(ps > 0 && OPENING.indexOf(text[ps - 1]) != -1) s += TAB;
     // unindent before closing bracket
-    if(ps < text.length) {
-      final int l = text[ps];
-      if(l == ')' || l == '}' || l == ']') s -= TAB;
-    }
+    if(ps < text.length && CLOSING.indexOf(text[ps]) != -1) s -= TAB;
     for(int p = 0; p < s; p++) sb.append(' ');
   }
 
   /**
-   * Closes a bracket.
+   * Processes and adds the specified string.
+   * @param sb string to be added
+   * @return indicates if cursor position should eventually be adjusted
+   */
+  boolean add(final StringBuilder sb) {
+    boolean move = false;
+    if(sb.length() != 0) {
+      final char ch = sb.charAt(0);
+      final int curr = ps < text.length ? text[ps] : 0;
+      // adds a closing to an opening bracket
+      final int open = OPENING.indexOf(ch);
+      if(open != -1) {
+        sb.append(CLOSING.charAt(open));
+        move = true;
+      } else if(CLOSING.indexOf(ch) != -1) {
+        // closing bracket: ignore when next character is the same
+        move = ch == curr;
+        if(move) sb.setLength(0);
+        close();
+      } else if(ch == '>') {
+        // closes an opening element
+        move = true;
+        closeElem(sb);
+      }
+      add(sb.toString());
+      setCaret();
+    }
+    return move;
+  }
+
+  /**
+   * Closes a bracket and unindents leading whitespaces.
    */
   void close() {
     int p = ps - 1;
