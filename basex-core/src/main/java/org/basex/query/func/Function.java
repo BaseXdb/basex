@@ -845,9 +845,6 @@ public enum Function {
   /** XQuery function. */
   _INDEX_FACETS(FNIndex.class, "facets(database[,type])", arg(STR, STR), DOC_O),
   /** XQuery function. */
-  _INDEX_TOKENS(FNIndex.class, "tokens(database[,prefix[,ascending]])",
-      arg(STR, STR, BLN), NOD_ZM, flag(NDT)),
-  /** XQuery function. */
   _INDEX_TEXTS(FNIndex.class, "texts(database[,prefix[,ascending]])",
       arg(STR, STR, BLN), NOD_ZM, flag(NDT)),
   /** XQuery function. */
