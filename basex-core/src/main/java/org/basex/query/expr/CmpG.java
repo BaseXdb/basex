@@ -349,7 +349,7 @@ public final class CmpG extends Cmp {
     while((it = ir.next()) != null) {
       if(!it.type.isStringOrUntyped()) return false;
 
-      final int is = data.count(new StringToken(ind, it.string(info)));
+      final int is = data.costs(new StringToken(ind, it.string(info)));
       // add only expressions that yield results
       if(is != 0) {
         va = Array.add(va, new ValueAccess(info, it, ind, ic.ictx));

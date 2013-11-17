@@ -42,6 +42,10 @@ public final class UpdatableMemValues extends MemValues {
             while(more() && data.kind(pres[p++]) != k);
             return pres[p - 1];
           }
+          @Override
+          public int size() {
+            return s;
+          }
         };
       }
     }

@@ -147,12 +147,13 @@ public abstract class Data {
   }
 
   /**
-   * Returns the number of indexed pre references for the specified token.
+   * Returns a cost estimation for searching the specified token.
+   * Smaller values are better, a value of zero indicates that no results will be returned.
    * @param token text to be found
-   * @return number of hits
+   * @return cost estimation
    */
-  public final int count(final IndexToken token) {
-    return index(token.type()).count(token);
+  public final int costs(final IndexToken token) {
+    return index(token.type()).costs(token);
   }
 
   /**

@@ -248,7 +248,7 @@ public final class PathSummary implements Index {
   }
 
   @Override
-  public int count(final IndexToken token) {
+  public int costs(final IndexToken token) {
     throw Util.notexpected();
   }
 

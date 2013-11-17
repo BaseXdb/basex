@@ -93,7 +93,7 @@ public class DiskValues implements Index {
   }
 
   @Override
-  public int count(final IndexToken it) {
+  public int costs(final IndexToken it) {
     if(it instanceof StringRange) return idRange((StringRange) it).size();
     if(it instanceof NumericRange) return idRange((NumericRange) it).size();
     final byte[] key = it.get();

@@ -215,7 +215,7 @@ public final class FTWords extends FTExpr {
       @Override
       public int size() {
         // worst case
-        return data.meta.size >>> 1;
+        return Math.max(1, data.meta.size >>> 1);
       }
     };
   }
@@ -347,7 +347,7 @@ public final class FTWords extends FTExpr {
 
     // estimate costs if text is not statically known
     if(txt == null) {
-      ic.costs(Math.max(1, dt.meta.size >> 10));
+      ic.costs(Math.max(1, dt.meta.size >>> 3));
       return true;
     }
 
@@ -374,7 +374,7 @@ public final class FTWords extends FTExpr {
           }
         }
         // reduce number of expected results to favor full-text index requests
-        ic.addCosts(Math.max(1, dt.count(ft) >> 10));
+        ic.addCosts(Math.max(1, dt.costs(ft) >> 10));
       }
     }
     return true;

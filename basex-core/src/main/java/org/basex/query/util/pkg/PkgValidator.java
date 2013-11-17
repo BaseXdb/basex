@@ -91,18 +91,19 @@ public final class PkgValidator {
   }
 
   /**
-   * Checks if current version of BaseX is among the processor dependencies.
+   * Checks if current database version of is among the processor dependencies.
    * @param procs processor dependencies
    * @throws QueryException query exception
    */
   private void checkProcs(final ArrayList<Dependency> procs) throws QueryException {
     boolean supported = false;
-    // extract basex version
+    // extract database version
     final int i = Prop.VERSION.indexOf(' ');
-    final TokenSet versions = new TokenSet(token(i == -1 ? Prop.VERSION : Prop.VERSION.substring(0, i)));
-    final byte[] basex = token(Text.NAMELC);
+    final TokenSet versions = new TokenSet(token(i == -1 ? Prop.VERSION :
+      Prop.VERSION.substring(0, i)));
+    final byte[] name = token(Text.NAMELC);
     for(final Dependency d : procs) {
-      if(!eq(lc(d.processor), basex)) {
+      if(!eq(lc(d.processor), name)) {
         supported = false;
         break;
       }

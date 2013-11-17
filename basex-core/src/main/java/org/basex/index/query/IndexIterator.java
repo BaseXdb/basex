@@ -30,13 +30,8 @@ public abstract class IndexIterator {
   public abstract int pre();
 
   /**
-   * Returns the total number of index results.
-   * The iterator may get exhausted by calling this method.
-   * @return result number of results
+   * Returns an approximate number of index results.
+   * @return result approximate number of results
    */
-  public int size() {
-    int c = 0;
-    while(more()) ++c;
-    return c;
-  }
+  public abstract int size();
 }

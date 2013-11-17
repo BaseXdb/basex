@@ -56,6 +56,8 @@ public class MemValues extends TokenSet implements Index {
             while(more() && data.kind(pres[p++]) != k);
             return pres[p - 1];
           }
+          @Override
+          public int size() { return s; }
         };
       }
     }
@@ -63,7 +65,7 @@ public class MemValues extends TokenSet implements Index {
   }
 
   @Override
-  public int count(final IndexToken it) {
+  public int costs(final IndexToken it) {
     final int i = id(it.get());
     return i == 0 ? 0 : len[i];
   }

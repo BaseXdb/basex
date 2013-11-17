@@ -105,13 +105,13 @@ public final class FTIndex implements Index {
   public synchronized void init() { }
 
   @Override
-  public synchronized int count(final IndexToken it) {
+  public synchronized int costs(final IndexToken it) {
     final byte[] tok = it.get();
     if(tok.length > data.meta.maxlen) return Integer.MAX_VALUE;
 
     // estimate costs for queries which stretch over multiple index entries
     final FTOpt opt = ((FTLexer) it).ftOpt();
-    if(opt.is(FZ) || opt.is(WC)) return Math.max(1, data.meta.size / 10);
+    if(opt.is(FZ) || opt.is(WC)) return Math.max(1, data.meta.size >> 4);
 
     return entry(tok).size;
   }

@@ -172,7 +172,7 @@ public final class Resources implements Index {
   }
 
   @Override
-  public int count(final IndexToken token) {
+  public int costs(final IndexToken token) {
     throw Util.notexpected();
   }
 

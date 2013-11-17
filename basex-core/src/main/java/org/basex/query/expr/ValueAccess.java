@@ -103,6 +103,10 @@ public final class ValueAccess extends IndexAccess {
         }
         return false;
       }
+      @Override
+      public int size() {
+        return Math.max(1, data.meta.size >>> 1);
+      }
     };
   }
 

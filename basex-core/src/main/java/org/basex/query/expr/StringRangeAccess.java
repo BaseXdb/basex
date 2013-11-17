@@ -80,6 +80,10 @@ public final class StringRangeAccess extends IndexAccess {
         }
         return false;
       }
+      @Override
+      public int size() {
+        return Math.max(1, ictx.data.meta.size >>> 2);
+      }
     };
   }
 
