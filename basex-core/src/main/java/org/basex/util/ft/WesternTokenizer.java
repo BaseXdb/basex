@@ -30,14 +30,10 @@ public final class WesternTokenizer extends Tokenizer {
   /** Cached paragraph positions. */
   private final IntList par = new IntList();
 
+  /** Case option. */
+  private final FTCase cs;
   /** Diacritics flag. */
   private final boolean dc;
-  /** Sensitivity flag. */
-  private final boolean cs;
-  /** Uppercase flag. */
-  private final boolean uc;
-  /** Lowercase flag. */
-  private final boolean lc;
   /** Wildcard flag. */
   private final boolean wc;
   /** Flag for a paragraph. */
@@ -67,14 +63,12 @@ public final class WesternTokenizer extends Tokenizer {
 
   /**
    * Constructor.
-   * @param f full-text options
+   * @param fto full-text options
    */
-  public WesternTokenizer(final FTOpt f) {
-    lc = f != null && f.is(LC);
-    uc = f != null && f.is(UC);
-    cs = f != null && f.is(CS);
-    wc = f != null && f.is(WC);
-    dc = f != null && f.is(DC);
+  public WesternTokenizer(final FTOpt fto) {
+    cs = fto != null && fto.cs != null ? fto.cs : FTCase.INSENSITIVE;
+    wc = fto != null && fto.is(WC);
+    dc = fto != null && fto.is(DC);
   }
 
   @Override
@@ -202,8 +196,8 @@ public final class WesternTokenizer extends Tokenizer {
     byte[] n = orig();
     final boolean a = ascii(n);
     if(!a && !dc) n = dia(n);
-    if(uc) n = upper(n, a);
-    if(lc || !cs) n = lower(n, a);
+    if(cs == FTCase.UPPER) n = upper(n, a);
+    else if(cs != FTCase.SENSITIVE) n = lower(n, a);
     return n;
   }
 

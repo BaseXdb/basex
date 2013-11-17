@@ -20,6 +20,8 @@ import org.basex.query.value.node.*;
 public final class FTOpt extends ExprInfo {
   /** Flag values. */
   private final EnumMap<FTFlag, Boolean> map = new EnumMap<FTFlag, Boolean>(FTFlag.class);
+  /** Case. */
+  public FTCase cs;
   /** Stemming dictionary. */
   public StemDir sd;
   /** Stop words. */
@@ -39,6 +41,7 @@ public final class FTOpt extends ExprInfo {
       final FTFlag fl = f.getKey();
       if(map.get(fl) == null) map.put(fl, f.getValue());
     }
+    if(cs == null) cs = opt.cs;
     if(sw == null) sw = opt.sw;
     if(sd == null) sd = opt.sd;
     if(ln == null) ln = opt.ln;
@@ -53,7 +56,7 @@ public final class FTOpt extends ExprInfo {
    * @return self reference
    */
   public FTOpt copy(final MetaData md) {
-    set(CS, md.casesens);
+    cs = md.casesens ? FTCase.SENSITIVE : FTCase.INSENSITIVE;
     set(DC, md.diacritics);
     set(ST, md.stemming);
     ln = md.language;
@@ -92,8 +95,7 @@ public final class FTOpt extends ExprInfo {
   public void plan(final FElem plan) {
     if(is(WC)) plan.add(planAttr(WILDCARDS, TRUE));
     if(is(FZ)) plan.add(planAttr(FUZZY, TRUE));
-    if(is(UC)) plan.add(planAttr(UPPERCASE, TRUE));
-    if(is(LC)) plan.add(planAttr(LOWERCASE, TRUE));
+    if(cs != FTCase.INSENSITIVE) plan.add(planAttr(CASE, cs));
     if(is(DC)) plan.add(planAttr(DIACRITICS, TRUE));
     if(is(ST)) plan.add(planAttr(STEMMING, TRUE));
     if(ln != null) plan.add(planAttr(LANGUAGE, ln));
@@ -105,8 +107,9 @@ public final class FTOpt extends ExprInfo {
     final StringBuilder s = new StringBuilder();
     if(is(WC)) s.append(' ' + USING + ' ' + WILDCARDS);
     if(is(FZ)) s.append(' ' + USING + ' ' + FUZZY);
-    if(is(UC)) s.append(' ' + USING + ' ' + UPPERCASE);
-    if(is(LC)) s.append(' ' + USING + ' ' + LOWERCASE);
+    if(cs == FTCase.LOWER) s.append(' ' + USING + ' ' + LOWERCASE);
+    else if(cs == FTCase.UPPER) s.append(' ' + USING + ' ' + UPPERCASE);
+    else if(cs == FTCase.SENSITIVE) s.append(' ' + USING + ' ' + CASE + ' ' + SENSITIVE);
     if(is(DC)) s.append(' ' + USING + ' ' + DIACRITICS + ' ' + SENSITIVE);
     if(is(ST) || sd != null) s.append(' ' + USING + ' ' + STEMMING);
     if(ln != null) s.append(' ' + USING + ' ' + LANGUAGE + " '" + ln + '\'');

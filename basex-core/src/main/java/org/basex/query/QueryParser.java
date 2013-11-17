@@ -3374,17 +3374,19 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(USING)) return false;
 
     if(wsConsumeWs(LOWERCASE)) {
-      if(opt.isSet(LC) || opt.isSet(UC) || opt.isSet(CS)) error(FTDUP, CASE);
-      opt.set(CS, true);
-      opt.set(LC, true);
+      if(opt.cs != null) error(FTDUP, CASE);
+      opt.cs = FTCase.LOWER;
     } else if(wsConsumeWs(UPPERCASE)) {
-      if(opt.isSet(LC) || opt.isSet(UC) || opt.isSet(CS)) error(FTDUP, CASE);
-      opt.set(CS, true);
-      opt.set(UC, true);
+      if(opt.cs != null) error(FTDUP, CASE);
+      opt.cs = FTCase.UPPER;
     } else if(wsConsumeWs(CASE)) {
-      if(opt.isSet(LC) || opt.isSet(UC) || opt.isSet(CS)) error(FTDUP, CASE);
-      opt.set(CS, wsConsumeWs(SENSITIVE));
-      if(!opt.is(CS)) wsCheck(INSENSITIVE);
+      if(opt.cs != null) error(FTDUP, CASE);
+      if(wsConsumeWs(SENSITIVE)) {
+        opt.cs = FTCase.SENSITIVE;
+      } else {
+        opt.cs = FTCase.INSENSITIVE;
+        wsCheck(INSENSITIVE);
+      }
     } else if(wsConsumeWs(DIACRITICS)) {
       if(opt.isSet(DC)) error(FTDUP, DIACRITICS);
       opt.set(DC, wsConsumeWs(SENSITIVE));

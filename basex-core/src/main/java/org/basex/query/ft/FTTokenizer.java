@@ -90,10 +90,12 @@ final class FTTokenizer {
     final FTOpt to = lex.ftOpt();
     to.set(ST, opt.is(ST));
     to.set(DC, opt.is(DC));
-    to.set(CS, opt.is(CS));
     to.ln = opt.ln;
     to.th = opt.th;
     to.sd = opt.sd;
+    // only change case in insensitive mode
+    to.cs = opt.cs != null && opt.cs != FTCase.INSENSITIVE ? FTCase.SENSITIVE :
+      FTCase.INSENSITIVE;
     return new FTLexer(to).init(lex.text());
   }
 

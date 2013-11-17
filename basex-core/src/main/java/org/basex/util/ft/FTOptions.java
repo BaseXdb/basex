@@ -8,25 +8,14 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class FTOptions extends Options {
-  /** Option: wildcards. */
-  public static final EnumOption<FTMode> MODE = new EnumOption<FTMode>("mode", FTMode.ANY);
-  /** Option: fuzzy. */
-  public static final BooleanOption FUZZY = new BooleanOption("fuzzy", false);
-  /** Option: wildcards. */
-  public static final BooleanOption WILDCARDS = new BooleanOption("wildcards", false);
-  /** Option: ordered. */
-  public static final BooleanOption ORDERED = new BooleanOption("ordered", false);
-  /** Option: distance. */
-  public static final OptionsOption<FTDistanceOptions> DISTANCE =
-      new OptionsOption<FTDistanceOptions>("distance", FTDistanceOptions.class);
-  /** Option: window. */
-  public static final OptionsOption<FTWindowOptions> WINDOW =
-      new OptionsOption<FTWindowOptions>("window", FTWindowOptions.class);
-  /** Option: scope. */
-  public static final OptionsOption<FTScopeOptions> SCOPE =
-      new OptionsOption<FTScopeOptions>("scope", FTScopeOptions.class);
-  /** Option: content. */
-  public static final EnumOption<FTContents> CONTENT =
-      new EnumOption<FTContents>("content", FTContents.class);
+public final class FTOptions extends FTIndexOptions {
+  /** Option: case. */
+  public static final EnumOption<FTCase> CASE = new EnumOption<FTCase>("case", FTCase.class);
+  /** Option: case. */
+  public static final EnumOption<FTDiacritics> DIACRITICS =
+      new EnumOption<FTDiacritics>("diacritics", FTDiacritics.INSENSITIVE);
+  /** Option: stemming. */
+  public static final BooleanOption STEMMING = new BooleanOption("stemming", false);
+  /** Option: language. */
+  public static final StringOption LANGUAGE = new StringOption("language", "en");
 }

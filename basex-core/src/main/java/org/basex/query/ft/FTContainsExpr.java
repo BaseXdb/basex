@@ -86,9 +86,7 @@ public final class FTContainsExpr extends FTContains {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final FTContains ftc =  new FTContainsExpr(expr.copy(ctx, scp, vs),
+    return new FTContainsExpr(expr.copy(ctx, scp, vs),
         ftexpr.copy(ctx, scp, vs), info);
-    if(lex != null) ftc.lex = new FTLexer(new FTOpt());
-    return ftc;
   }
 }

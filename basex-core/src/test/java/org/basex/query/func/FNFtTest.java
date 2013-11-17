@@ -34,6 +34,48 @@ public final class FNFtTest extends AdvancedQueryTest {
 
   /**
    * Test method.
+   */
+  @Test
+  public void contains() {
+    // check index results
+    query(_FT_CONTAINS.args("Assignments", "assignments"), true);
+    query(_FT_CONTAINS.args("Exercise 1", "('exercise','1')"), true);
+    query(_FT_CONTAINS.args("Exercise 1", "<x>1</x>"), true);
+    query(_FT_CONTAINS.args("Exercise 1", "1"), true);
+    query(_FT_CONTAINS.args("Exercise 1", "X"), false);
+    query(_FT_CONTAINS.args("('A','B')", "('C','B')"), true);
+
+    // check match options
+    query(_FT_CONTAINS.args("Assignments", "Azzignments", " { 'fuzzy':'' }"), true);
+    query(_FT_CONTAINS.args("Assignments", "Azzignments", " { 'fuzzy':'no' }"), false);
+    query(_FT_CONTAINS.args("Assignments", "assignment", " { 'stemming':true() }"), true);
+    query(_FT_CONTAINS.args("Assignment", "assignments", " { 'stemming':true() }"), true);
+    query(_FT_CONTAINS.args("A", "a", " { 'case':'upper' }"), true);
+    query(_FT_CONTAINS.args("a", "A", " { 'case':'lower' }"), true);
+    query(_FT_CONTAINS.args("A", "a", " { 'case':'insensitive' }"), true);
+    query(_FT_CONTAINS.args("A", "a", " { 'case':'sensitive' }"), false);
+    // check search modes
+    query(_FT_CONTAINS.args("Exercise 1", "1 Exercise", " { 'mode':'phrase' }"), false);
+    query(_FT_CONTAINS.args("Exercise 1", "1 Exercise", " { 'mode':'all' }"), false);
+    query(_FT_CONTAINS.args("Exercise 1", "1 Exercise", " { 'mode':'any' }"), false);
+    query(_FT_CONTAINS.args("Exercise 1", "1 Exercise", " { 'mode':'any word' }"), true);
+    query(_FT_CONTAINS.args("Exercise 1", "1 Exercise", " { 'mode':'all words' }"), true);
+
+    query(_FT_CONTAINS.args("databases and xml", "databases xml", " { 'mode':'all words'," +
+        "'distance':{'min':0,'max':1} }"), true);
+    query(_FT_CONTAINS.args("databases and xml", "databases xml", " { 'mode':'all words'," +
+        "'distance':{'max':0} }"), false);
+    query(_FT_CONTAINS.args("databases and xml", "databases xml", " { 'mode':'all words'," +
+        "'window':{'size':3} }"), true);
+
+    // check buggy options
+    error(_FT_CONTAINS.args("x", "x", " { 'x':'y' }"), Err.INVALIDOPT);
+    error(_FT_CONTAINS.args("x", "x", " { 'mode':'' }"), Err.INVALIDOPT);
+    error(_FT_CONTAINS.args("x", "x", " 1"), Err.ELMMAPTYPE);
+  }
+
+  /**
+   * Test method.
    * @throws BaseXException database exception
    */
   @Test

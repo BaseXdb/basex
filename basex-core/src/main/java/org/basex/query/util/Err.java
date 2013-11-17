@@ -115,7 +115,7 @@ public enum Err {
   // Fulltext module
 
   /** BXFT0001. */
-  BXFT_MATCH(BXFT, 1, "Either wildcards or fuzzy search supported."),
+  BXFT_MATCH(BXFT, 1, "Wildcards and fuzzy option cannot be both specified."),
 
   // HTML module
 

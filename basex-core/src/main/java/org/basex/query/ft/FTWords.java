@@ -68,17 +68,12 @@ public final class FTWords extends FTExpr {
    * @param ic index context
    * @param t query terms
    * @param m search mode
-   * @param ctx query context
-   * @throws QueryException query exception
    */
-  public FTWords(final InputInfo ii, final IndexContext ic, final Value t, final FTMode m,
-      final QueryContext ctx) throws QueryException {
-
+  public FTWords(final InputInfo ii, final IndexContext ic, final Value t, final FTMode m) {
     super(ii);
     query = t;
     mode = m;
     ictx = ic;
-    compile(ctx, null);
   }
 
   @Override
@@ -345,7 +340,7 @@ public final class FTWords extends FTExpr {
      * that conflict with the index options. As a consequence, though, index-
      * based querying might yield other results than sequential scanning. */
     if(occ != null ||
-       fto.isSet(CS) && md.casesens != fto.is(CS) ||
+       fto.cs != null && md.casesens == (fto.cs == FTCase.INSENSITIVE) ||
        fto.isSet(DC) && md.diacritics != fto.is(DC) ||
        fto.isSet(ST) && md.stemming != fto.is(ST) ||
        fto.ln != null && !fto.ln.equals(md.language)) return false;
@@ -481,6 +476,6 @@ public final class FTWords extends FTExpr {
       default:
     }
     if(occ != null) sb.append(OCCURS + ' ' + occ[0] + ' ' + TO + ' ' + occ[1] + ' ' + TIMES);
-    return sb.toString();
+    return sb.append(ftt.opt).toString();
   }
 }

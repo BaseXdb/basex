@@ -40,8 +40,8 @@ public final class FTBuilder extends IndexBuilder {
     final MainOptions opts = d.meta.options;
     final FTOpt fto = new FTOpt();
     fto.set(FTFlag.DC, opts.get(MainOptions.DIACRITICS));
-    fto.set(FTFlag.CS, opts.get(MainOptions.CASESENS));
     fto.set(FTFlag.ST, opts.get(MainOptions.STEMMING));
+    fto.cs = opts.get(MainOptions.CASESENS) ? FTCase.SENSITIVE : FTCase.INSENSITIVE;
     fto.sw = new StopWords(d, opts.get(MainOptions.STOPWORDS));
     fto.ln = Language.get(opts);
 

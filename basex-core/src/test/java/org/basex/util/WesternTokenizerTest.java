@@ -160,10 +160,10 @@ public final class WesternTokenizerTest {
    * @param flags bit mask with full-text flags
    */
   private void setFTFlags(final int flags) {
-    if((flags & FTCS) != 0) opt.set(FTFlag.CS, true);
     if((flags & FTDC) != 0) opt.set(FTFlag.DC, true);
-    if((flags & FTLC) != 0) opt.set(FTFlag.LC, true);
-    if((flags & FTUC) != 0) opt.set(FTFlag.UC, true);
     if((flags & FTWC) != 0) opt.set(FTFlag.WC, true);
+    if((flags & FTCS) != 0) opt.cs = FTCase.SENSITIVE;
+    if((flags & FTLC) != 0) opt.cs = FTCase.LOWER;
+    if((flags & FTUC) != 0) opt.cs = FTCase.UPPER;
   }
 }

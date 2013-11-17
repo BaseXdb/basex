@@ -776,6 +776,9 @@ public enum Function {
   /* FNFt functions. */
 
   /** XQuery function. */
+  _FT_CONTAINS(FNFt.class, "contains(input,terms[,options])",
+      arg(ITEM, ITEM_ZM, ITEM), NOD_ZM, flag(NDT)),
+  /** XQuery function. */
   _FT_SEARCH(FNFt.class, "search(database,terms[,options])",
       arg(STR, ITEM_ZM, ITEM), NOD_ZM, flag(NDT)),
   /** XQuery function. */

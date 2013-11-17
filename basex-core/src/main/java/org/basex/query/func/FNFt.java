@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
-import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
 import java.util.*;
@@ -33,7 +32,7 @@ public final class FNFt extends StandardFunc {
   /** Element: options. */
   private static final QNm Q_OPTIONS = QNm.get("options");
   /** Marker element. */
-  private static final byte[] MARK = token("mark");
+  private static final byte[] MARK = Token.token("mark");
 
   /**
    * Constructor.
@@ -42,16 +41,16 @@ public final class FNFt extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNFt(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNFt(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case _FT_COUNT: return count(ctx);
-      default:        return super.item(ctx, ii);
+      case _FT_CONTAINS: return contains(ctx);
+      case _FT_COUNT:    return count(ctx);
+      default:           return super.item(ctx, ii);
     }
   }
 
@@ -78,7 +77,8 @@ public final class FNFt extends StandardFunc {
     final FTPosData tmp = ctx.ftPosData;
     ctx.ftPosData = new FTPosData();
     final Iter ir = ctx.iter(expr[0]);
-    for(Item it; (it = ir.next()) != null;) checkDBNode(it);
+    for(Item it; (it = ir.next()) != null;)
+      checkDBNode(it);
     final int s = ctx.ftPosData.size();
     ctx.ftPosData = tmp;
     return Int.get(s);
@@ -161,6 +161,34 @@ public final class FNFt extends StandardFunc {
   }
 
   /**
+   * Performs the contains function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Bln contains(final QueryContext ctx) throws QueryException {
+    final Value input = ctx.value(expr[0]);
+    final Value query = ctx.value(expr[1]);
+    final FTOptions opts = checkOptions(2, Q_OPTIONS, new FTOptions(), ctx);
+
+    final FTOpt opt = new FTOpt();
+    final FTMode mode = opts.get(FTIndexOptions.MODE);
+    opt.set(FZ, opts.get(FTIndexOptions.FUZZY));
+    opt.set(WC, opts.get(FTIndexOptions.WILDCARDS));
+    opt.set(DC, opts.get(FTOptions.DIACRITICS) == FTDiacritics.SENSITIVE);
+    opt.set(ST, opts.get(FTOptions.STEMMING));
+    opt.ln = Language.get(opts.get(FTOptions.LANGUAGE));
+    opt.cs = opts.get(FTOptions.CASE);
+    if(opt.is(FZ) && opt.is(WC)) BXFT_MATCH.thrw(info, this);
+
+    final FTOpt tmp = ctx.ftOpt();
+    ctx.ftOpt(opt);
+    final FTExpr fte = new FTWords(info, query, mode, null).compile(ctx, null);
+    ctx.ftOpt(tmp);
+    return new FTContainsExpr(input, options(fte, opts), info).item(ctx, info);
+  }
+
+  /**
    * Performs the search function.
    * @param ctx query context
    * @return iterator
@@ -175,47 +203,56 @@ public final class FNFt extends StandardFunc {
     if(!data.meta.ftxtindex) BXDB_INDEX.thrw(info, data.meta.name,
         IndexType.FULLTEXT.toString().toLowerCase(Locale.ENGLISH));
 
-    final FTOpt tmp = ctx.ftOpt();
     final FTOpt opt = new FTOpt().copy(data.meta);
-    FTMode mode = FTMode.ANY;
-    if(opts != null) {
-      opt.set(FZ, opts.get(FTOptions.FUZZY));
-      opt.set(WC, opts.get(FTOptions.WILDCARDS));
-      mode = opts.get(FTOptions.MODE);
-    }
-    ctx.ftOpt(opt);
-    FTExpr fte = new FTWords(info, ic, terms, mode, ctx);
-    ctx.ftOpt(tmp);
+    final FTMode mode = opts.get(FTIndexOptions.MODE);
+    opt.set(FZ, opts.get(FTIndexOptions.FUZZY));
+    opt.set(WC, opts.get(FTIndexOptions.WILDCARDS));
+    if(opt.is(FZ) && opt.is(WC)) BXFT_MATCH.thrw(info, this);
 
+    final FTOpt tmp = ctx.ftOpt();
+    ctx.ftOpt(opt);
+    final FTExpr fte = new FTWords(info, ic, terms, mode).compile(ctx, null);
+    ctx.ftOpt(tmp);
+    return new FTIndexAccess(info, options(fte, opts), ic).iter(ctx);
+  }
+
+  /**
+   * Performs the search function.
+   * @param ftexpr full-text expression
+   * @param opts full-text options
+   * @return expressions
+   */
+  private FTExpr options(final FTExpr ftexpr, final FTOptions opts) {
+    FTExpr fte = ftexpr;
     if(opts != null) {
-      if(opts.get(FTOptions.ORDERED)) {
+      if(opts.get(FTIndexOptions.ORDERED)) {
         fte = new FTOrder(info, fte);
       }
-      if(opts.contains(FTOptions.DISTANCE)) {
-        final FTDistanceOptions fopts = opts.get(FTOptions.DISTANCE);
+      if(opts.contains(FTIndexOptions.DISTANCE)) {
+        final FTDistanceOptions fopts = opts.get(FTIndexOptions.DISTANCE);
         final Int min = Int.get(fopts.get(FTDistanceOptions.MIN));
         final Int max = Int.get(fopts.get(FTDistanceOptions.MAX));
         final FTUnit unit = fopts.get(FTDistanceOptions.UNIT);
         fte = new FTDistance(info, fte, min, max, unit);
       }
-      if(opts.contains(FTOptions.WINDOW)) {
-        final FTWindowOptions fopts = opts.get(FTOptions.WINDOW);
+      if(opts.contains(FTIndexOptions.WINDOW)) {
+        final FTWindowOptions fopts = opts.get(FTIndexOptions.WINDOW);
         final Int sz = Int.get(fopts.get(FTWindowOptions.SIZE));
         final FTUnit unit = fopts.get(FTWindowOptions.UNIT);
         fte = new FTWindow(info, fte, sz, unit);
       }
-      if(opts.contains(FTOptions.SCOPE)) {
-        final FTScopeOptions fopts = opts.get(FTOptions.SCOPE);
+      if(opts.contains(FTIndexOptions.SCOPE)) {
+        final FTScopeOptions fopts = opts.get(FTIndexOptions.SCOPE);
         final boolean same = fopts.get(FTScopeOptions.SAME);
         final FTUnit unit = fopts.get(FTScopeOptions.UNIT).unit();
         fte = new FTScope(info, fte, same, unit);
       }
-      if(opts.contains(FTOptions.CONTENT)) {
-        final FTContents cont = opts.get(FTOptions.CONTENT);
+      if(opts.contains(FTIndexOptions.CONTENT)) {
+        final FTContents cont = opts.get(FTIndexOptions.CONTENT);
         fte = new FTContent(info, fte, cont);
       }
     }
-    return new FTIndexAccess(info, fte, ic).iter(ctx);
+    return fte;
   }
 
   /**
