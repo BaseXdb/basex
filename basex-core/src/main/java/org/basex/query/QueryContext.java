@@ -217,7 +217,7 @@ public final class QueryContext extends Proc {
       try {
         context.options.assign(o.get(s).toUpperCase(Locale.ENGLISH), o.get(s + 1));
       } catch(final BaseXException ex) {
-        BASX_VALUE.thrw(null, o.get(s), o.get(s + 1));
+        throw BASX_VALUE.get(null, o.get(s), o.get(s + 1));
       }
     }
     // set tail call option after assignment database option
@@ -234,7 +234,7 @@ public final class QueryContext extends Proc {
       } catch(final QueryException ex) {
         if(ex.err() != NOCTX) throw ex;
         // only {@link ParseExpr} instances may cause this error
-        CIRCCTX.thrw(ctxItem.info);
+        throw CIRCCTX.get(ctxItem.info);
       }
     } else if(nodes != null) {
       // add full-text container reference
@@ -272,7 +272,7 @@ public final class QueryContext extends Proc {
       else funcs.compile(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      BASX_STACKOVERFLOW.thrw(null, ex);
+      throw BASX_STACKOVERFLOW.get(null, ex);
     }
   }
 
@@ -287,7 +287,7 @@ public final class QueryContext extends Proc {
       return updating ? value().iter() : root.iter(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      throw BASX_STACKOVERFLOW.thrw(null);
+      throw BASX_STACKOVERFLOW.get(null);
     }
   }
 
@@ -303,7 +303,7 @@ public final class QueryContext extends Proc {
       return u != null ? u : v;
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      throw BASX_STACKOVERFLOW.thrw(null);
+      throw BASX_STACKOVERFLOW.get(null);
     }
   }
 
@@ -644,7 +644,7 @@ public final class QueryContext extends Proc {
     // convert to the specified type
     // [LW] type should be parsed properly
     final QNm nm = new QNm(token(type.replaceAll("\\(.*?\\)$", "")), sc);
-    if(!nm.hasURI() && nm.hasPrefix()) NOURI.thrw(null, nm.string());
+    if(!nm.hasURI() && nm.hasPrefix()) throw NOURI.get(null, nm.string());
 
     Type t;
     if(type.endsWith(")")) {
@@ -653,7 +653,7 @@ public final class QueryContext extends Proc {
       t = ListType.find(nm);
       if(t == null) t = AtomType.find(nm, false);
     }
-    if(t == null) NOTYPE.thrw(null, type);
+    if(t == null) throw NOTYPE.get(null, type);
     return t.cast(val, this, sc, null);
   }
 

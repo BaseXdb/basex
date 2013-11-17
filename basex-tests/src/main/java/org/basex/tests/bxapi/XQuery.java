@@ -265,7 +265,7 @@ public final class XQuery implements Iterable<XdmItem> {
 
       @Override
       public void remove() {
-        Util.notexpected();
+        throw Util.notExpected();
       }
     };
   }

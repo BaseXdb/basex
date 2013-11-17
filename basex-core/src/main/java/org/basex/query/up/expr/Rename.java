@@ -41,8 +41,8 @@ public final class Rename extends Update {
     final Item i = t.next();
 
     // check target constraints
-    if(i == null) throw UPSEQEMP.thrw(info, Util.className(this));
-    if(t.next() != null) UPWRTRGTYP.thrw(info);
+    if(i == null) throw UPSEQEMP.get(info, Util.className(this));
+    if(t.next() != null) throw UPWRTRGTYP.get(info);
 
     final CFrag ex;
     if(i.type == NodeType.ELM) {
@@ -52,7 +52,7 @@ public final class Rename extends Update {
     } else if(i.type == NodeType.PI) {
       ex = new CPI(sc, info, expr[1], Empty.SEQ);
     } else {
-      throw UPWRTRGTYP.thrw(info);
+      throw UPWRTRGTYP.get(info);
     }
 
     final QNm rename = ex.item(ctx, info).qname();
@@ -65,7 +65,7 @@ public final class Rename extends Update {
       final Atts at = targ.nsScope();
       final int as = at.size();
       for(int a = 0; a < as; a++) {
-        if(eq(at.name(a), rp) && !eq(at.value(a), ru)) UPNSCONFL.thrw(info);
+        if(eq(at.name(a), rp) && !eq(at.value(a), ru)) throw UPNSCONFL.get(info);
       }
     }
 

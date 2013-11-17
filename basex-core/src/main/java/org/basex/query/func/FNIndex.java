@@ -100,7 +100,7 @@ public final class FNIndex extends StandardFunc {
   private Iter values(final QueryContext ctx, final IndexType it) throws QueryException {
     final Data data = checkData(ctx);
     final byte[] entry = expr.length < 2 ? EMPTY : checkStr(expr[1], ctx);
-    if(data.inMemory()) BXDB_MEM.thrw(info, data.meta.name);
+    if(data.inMemory()) throw BXDB_MEM.get(info, data.meta.name);
 
     final IndexEntries et = expr.length < 3 ? new IndexEntries(entry, it) :
       new IndexEntries(entry, checkBln(expr[2], ctx), it);
@@ -131,7 +131,7 @@ public final class FNIndex extends StandardFunc {
       index = data.ftxindex;
       avl = data.meta.ftxtindex;
     }
-    if(!avl) BXDB_INDEX.thrw(call.info, data.meta.name,
+    if(!avl) throw BXDB_INDEX.get(call.info, data.meta.name,
         it.toString().toLowerCase(Locale.ENGLISH));
     return entries(index, entries);
   }

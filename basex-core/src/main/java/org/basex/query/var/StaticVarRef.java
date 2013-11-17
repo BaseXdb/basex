@@ -1,5 +1,6 @@
 package org.basex.query.var;
 
+import static org.basex.query.util.Err.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -112,7 +113,7 @@ public final class StaticVarRef extends ParseExpr {
    */
   public void init(final StaticVar vr) throws QueryException {
     if(vr.ann.contains(Ann.Q_PRIVATE) && !Token.eq(sc.baseURI().string(),
-       vr.sc.baseURI().string())) throw Err.VARPRIVATE.thrw(info, vr);
+       vr.sc.baseURI().string())) throw VARPRIVATE.get(info, vr);
     var = vr;
   }
 }

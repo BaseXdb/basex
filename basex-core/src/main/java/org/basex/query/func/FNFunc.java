@@ -63,7 +63,7 @@ public final class FNFunc extends StandardFunc {
   private Item lookup(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final QNm name = checkQNm(expr[0], ctx, sc);
     final long arity = checkItr(expr[1], ctx);
-    if(arity < 0 || arity > Integer.MAX_VALUE) FUNCUNKNOWN.thrw(ii, name);
+    if(arity < 0 || arity > Integer.MAX_VALUE) throw FUNCUNKNOWN.get(ii, name);
 
     try {
       final Expr lit = Functions.getLiteral(name, (int) arity, ctx, sc, ii);
@@ -201,6 +201,6 @@ public final class FNFunc extends StandardFunc {
       final FItem fi = (FItem) it;
       if(fi.arity() == a) return fi;
     }
-    throw Err.type(this, FuncType.arity(a), it);
+    throw Err.typeError(this, FuncType.arity(a), it);
   }
 }

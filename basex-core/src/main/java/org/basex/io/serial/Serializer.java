@@ -105,11 +105,11 @@ public abstract class Serializer {
     openResult();
     if(item instanceof ANode) {
       final Type type = item.type;
-      if(type == NodeType.ATT) SERATTR.thrwIO(item);
-      if(type == NodeType.NSP) SERNS.thrwIO(item);
+      if(type == NodeType.ATT) throw SERATTR.getIO(item);
+      if(type == NodeType.NSP) throw SERNS.getIO(item);
       serialize((ANode) item);
     } else if(item instanceof FItem) {
-      SERFUNC.thrwIO(item.description());
+      throw SERFUNC.getIO(item.description());
     } else {
       finishElement();
       atomic(item);
@@ -362,7 +362,7 @@ public abstract class Serializer {
     final Data data = node.data;
     int p = node.pre;
     int k = data.kind(p);
-    if(k == Data.ATTR) SERATTR.thrwIO(node);
+    if(k == Data.ATTR) throw SERATTR.getIO(node);
 
     boolean doc = false;
     final TokenSet nsp = data.nspaces.size() == 0 ? null : new TokenSet();

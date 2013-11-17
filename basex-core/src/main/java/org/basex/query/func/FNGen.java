@@ -100,7 +100,7 @@ public final class FNGen extends StandardFunc {
       public Item next() throws QueryException {
         final Item it = ir.next();
         if(it == null) return null;
-        if(it instanceof FItem) FIATOM.thrw(info, FNGen.this);
+        if(it instanceof FItem) throw FIATOM.get(info, FNGen.this);
         return atom(it, info);
       }
     };
@@ -118,7 +118,7 @@ public final class FNGen extends StandardFunc {
 
     // check if reference is valid
     final byte[] in = checkEStr(expr[0].item(ctx, info));
-    if(!Uri.uri(in).isValid()) INVCOLL.thrw(info, in);
+    if(!Uri.uri(in).isValid()) throw INVCOLL.get(info, in);
     return ctx.resource.collection(string(in), sc.baseIO(), info);
   }
 
@@ -150,15 +150,15 @@ public final class FNGen extends StandardFunc {
     checkCreate(ctx);
     final byte[] file = checkEStr(expr[1], ctx);
     final ANode nd = checkNode(expr[0], ctx);
-    if(nd.type != NodeType.DOC && nd.type != NodeType.ELM) UPFOTYPE.thrw(info, expr[0]);
+    if(nd.type != NodeType.DOC && nd.type != NodeType.ELM) throw UPFOTYPE.get(info, expr[0]);
 
     final Uri u = Uri.uri(file);
-    if(u == Uri.EMPTY || !u.isValid()) UPFOURI.thrw(info, file);
+    if(u == Uri.EMPTY || !u.isValid()) throw UPFOURI.get(info, file);
     final DBNode target = ctx.updates.determineDataRef(nd, ctx);
 
     final String uri = IO.get(u.toJava()).path();
     // check if all target paths are unique
-    if(!ctx.updates.putPaths.add(uri)) UPURIDUP.thrw(info, uri);
+    if(!ctx.updates.putPaths.add(uri)) throw UPURIDUP.get(info, uri);
 
     ctx.updates.add(new Put(info, target.pre, target.data, uri), ctx);
     return null;
@@ -174,7 +174,7 @@ public final class FNGen extends StandardFunc {
     final Item it = expr[0].item(ctx, info);
     if(it == null) return null;
     final byte[] in = checkEStr(it);
-    if(!Uri.uri(in).isValid()) INVDOC.thrw(info, in);
+    if(!Uri.uri(in).isValid()) throw INVDOC.get(info, in);
     return ctx.resource.doc(new QueryInput(string(in)), sc.baseIO(), info);
   }
 
@@ -206,15 +206,15 @@ public final class FNGen extends StandardFunc {
     checkCreate(ctx);
     final byte[] path = checkStr(expr[0], ctx);
     final IO base = sc.baseIO();
-    if(base == null) throw STBASEURI.thrw(info);
+    if(base == null) throw STBASEURI.get(info);
 
     String enc = null;
     try {
       enc = encoding(1, WHICHENC, ctx);
 
       final String p = string(path);
-      if(p.indexOf('#') != -1) FRAGID.thrw(info, p);
-      if(!Uri.uri(p).isValid()) INVURL.thrw(info, p);
+      if(p.indexOf('#') != -1) throw FRAGID.get(info, p);
+      if(!Uri.uri(p).isValid()) throw INVURL.get(info, p);
 
       IO io = base.merge(p);
       final String[] rp = ctx.resource.resources.get(io.path());
@@ -222,7 +222,7 @@ public final class FNGen extends StandardFunc {
         io = IO.get(rp[0]);
         if(rp.length > 1) enc = rp[1];
       }
-      if(!io.exists()) RESNF.thrw(info, p);
+      if(!io.exists()) throw RESNF.get(info, p);
 
       final InputStream is = io.inputStream();
       try {
@@ -239,10 +239,10 @@ public final class FNGen extends StandardFunc {
     } catch(final IOException ex) {
       if(check) return Bln.FALSE;
       if(ex instanceof InputException) {
-        if(ex instanceof EncodingException || enc != null) INVCHARS.thrw(info, ex);
-        else WHICHCHARS.thrw(info, ex);
+        final boolean inv = ex instanceof EncodingException || enc != null;
+        throw (inv ? INVCHARS : WHICHCHARS).get(info, ex);
       }
-      throw RESNF.thrw(info, path);
+      throw RESNF.get(info, path);
     }
   }
 
@@ -272,12 +272,12 @@ public final class FNGen extends StandardFunc {
           try {
             return nli.readLine(tb) ? Str.get(tb.finish()) : null;
           } catch(final IOException ex) {
-            throw Util.notexpected(ex);
+            throw Util.notExpected(ex);
           }
         }
       };
     } catch(final IOException ex) {
-      throw Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
   }
 
@@ -295,7 +295,7 @@ public final class FNGen extends StandardFunc {
       final IO io = new IOContent(checkStr(item), string(sc.baseURI().string()));
       return parseXml(io, ctx.context, frag);
     } catch(final IOException ex) {
-      throw SAXERR.thrw(info, ex);
+      throw SAXERR.get(info, ex);
     }
   }
 

@@ -78,7 +78,7 @@ public final class BXAttr extends BXNode implements Attr {
 
   @Override
   public TypeInfo getSchemaTypeInfo() {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override

@@ -1,5 +1,7 @@
 package org.basex.query.value.item;
 
+import static org.basex.query.util.Err.*;
+
 import java.math.*;
 
 import org.basex.query.*;
@@ -151,7 +153,7 @@ public final class Int extends ANum {
     try {
       return Long.parseLong(Token.string(val).trim());
     } catch(final NumberFormatException ex) {
-      throw NUMS[0].castErr(val, ii);
+      throw FUNCAST.get(ii, NUMS[0].type, val);
     }
   }
 }

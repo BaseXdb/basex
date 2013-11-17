@@ -44,7 +44,7 @@ class KindTest extends Test {
         other.type.instanceOf(type) ? other : null;
     }
     if(other instanceof NameTest || other instanceof InvDocTest) {
-      throw Util.notexpected(other);
+      throw Util.notExpected(other);
     }
     return null;
   }

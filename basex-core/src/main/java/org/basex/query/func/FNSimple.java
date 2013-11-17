@@ -39,7 +39,7 @@ public final class FNSimple extends StandardFunc {
       case ONE_OR_MORE:
         final Iter ir = expr[0].iter(ctx);
         final long len = ir.size();
-        if(len == 0) throw EXPECTOM.thrw(info);
+        if(len == 0) throw EXPECTOM.get(info);
         if(len > 0) return ir;
         return new Iter() {
           private boolean first = true;
@@ -47,7 +47,7 @@ public final class FNSimple extends StandardFunc {
           public Item next() throws QueryException {
             final Item it = ir.next();
             if(first) {
-              if(it == null) throw EXPECTOM.thrw(info);
+              if(it == null) throw EXPECTOM.get(info);
               first = false;
             }
             return it;
@@ -65,7 +65,7 @@ public final class FNSimple extends StandardFunc {
     switch(sig) {
       case ONE_OR_MORE:
         final Value val = ctx.value(expr[0]);
-        if(val.isEmpty()) throw EXPECTOM.thrw(info);
+        if(val.isEmpty()) throw EXPECTOM.get(info);
         return val;
       case UNORDERED:
         return ctx.value(expr[0]);
@@ -97,12 +97,12 @@ public final class FNSimple extends StandardFunc {
       case ZERO_OR_ONE:
         Iter ir = e.iter(ctx);
         Item it = ir.next();
-        if(it != null && ir.next() != null) EXPECTZ0.thrw(info);
+        if(it != null && ir.next() != null) throw EXPECTZ0.get(info);
         return it;
       case EXACTLY_ONE:
         ir = e.iter(ctx);
         it = ir.next();
-        if(it == null || ir.next() != null) EXPECTO.thrw(info);
+        if(it == null || ir.next() != null) throw EXPECTO.get(info);
         return it;
       default:
         return super.item(ctx, ii);
@@ -211,7 +211,7 @@ public final class FNSimple extends StandardFunc {
             break;
           }
         }
-        if(!found) INVALIDOPTX.thrw(info, key);
+        if(!found) throw INVALIDOPTX.get(info, key);
       }
     }
     return cmp.deep(ctx.iter(expr[0]), ctx.iter(expr[1]));

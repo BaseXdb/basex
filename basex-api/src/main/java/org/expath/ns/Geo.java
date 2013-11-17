@@ -670,7 +670,7 @@ public final class Geo extends QueryModule {
    * @throws QueryException query exception
    */
   private Geometry geo(final ANode node, final QNm... names) throws QueryException {
-    if(node.type != NodeType.ELM) Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
+    if(node.type != NodeType.ELM) throw Err.FUNCMP.get(null, this, NodeType.ELM, node.type);
 
     final QNm qname = node.qname();
     for(final QNm geo : names) {
@@ -708,7 +708,7 @@ public final class Geo extends QueryModule {
       final IO io = new IOContent(geo);
       return new DBNode(MemBuilder.build(new XMLParser(io, queryContext.context.options)));
     } catch(final IOException ex) {
-      throw Err.IOERR.thrw(null, ex);
+      throw Err.IOERR.get(null, ex);
     }
   }
 }

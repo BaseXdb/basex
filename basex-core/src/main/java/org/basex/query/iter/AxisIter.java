@@ -42,7 +42,7 @@ public abstract class AxisIter extends NodeIter implements Iterable<ANode> {
 
       @Override
       public void remove() {
-        Util.notexpected();
+        throw Util.notExpected();
       }
     };
   }

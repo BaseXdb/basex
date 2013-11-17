@@ -157,7 +157,7 @@ public final class ValueBuilder extends ValueIter implements Result {
     try {
       return serialize().toString();
     } catch(final IOException ex) {
-      throw Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
   }
 }

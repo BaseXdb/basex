@@ -94,7 +94,7 @@ public final class BXDoc extends BXNode implements Document {
       final BXNode n = list.item(l);
       if(n.getNodeType() == Node.ELEMENT_NODE) return (BXElem) n;
     }
-    throw Util.notexpected();
+    throw Util.notExpected();
   }
 
   @Override
@@ -104,12 +104,12 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public DOMConfiguration getDomConfig() {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
   public BXElem getElementById(final String elementId) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
@@ -119,7 +119,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXNList getElementsByTagNameNS(final String namespaceURI, final String localName) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
@@ -134,7 +134,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public boolean getStrictErrorChecking() {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
@@ -154,7 +154,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXNode importNode(final Node importedNode, final boolean deep) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
@@ -175,16 +175,16 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public void setStrictErrorChecking(final boolean strictErrorChecking) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
   public void setXmlStandalone(final boolean xmlStandalone) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
   public void setXmlVersion(final String xmlVersion) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 }

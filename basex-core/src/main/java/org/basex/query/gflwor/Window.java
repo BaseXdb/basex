@@ -1,6 +1,7 @@
 package org.basex.query.gflwor;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
@@ -86,7 +87,7 @@ public final class Window extends Clause {
     for(int i = 0; i < vs.length; i++) {
       final Var v = vs[i];
       for(int j = i; --j >= 0;)
-        if(v.name.eq(vs[j].name)) throw Err.WINDOWUNIQ.thrw(ii, vs[j]);
+        if(v.name.eq(vs[j].name)) throw WINDOWUNIQ.get(ii, vs[j]);
     }
     return vs;
   }
@@ -303,7 +304,7 @@ public final class Window extends Clause {
           start.copy(ctx, scp, vs), only, end != null ? end.copy(ctx, scp, vs) : null);
     } catch(final QueryException e) {
       // checks have already been done
-      throw Util.notexpected(e);
+      throw Util.notExpected(e);
     }
   }
 

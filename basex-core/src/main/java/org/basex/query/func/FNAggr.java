@@ -98,16 +98,16 @@ public final class FNAggr extends StandardFunc {
     final boolean n = rs instanceof ANum;
     final boolean dtd = !n && rs.type == DTD;
     final boolean ymd = !n && !dtd && rs.type == YMD;
-    if(!n && (!(rs instanceof Dur) || rs.type == DUR)) SUMTYPE.thrw(info, this, rs.type);
+    if(!n && (!(rs instanceof Dur) || rs.type == DUR)) throw SUMTYPE.get(info, this, rs.type);
 
     int c = 1;
     for(Item i; (i = iter.next()) != null;) {
       if(i.type.isNumberOrUntyped()) {
-        if(!n) FUNDUR.thrw(info, this, i.type);
+        if(!n) throw FUNDUR.get(info, this, i.type);
       } else {
-        if(n) FUNNUM.thrw(info, this, i.type);
+        if(n) throw FUNNUM.get(info, this, i.type);
         if(dtd && i.type != DTD || ymd && i.type != YMD)
-          FUNCMP.thrw(info, this, it.type, i.type);
+          throw FUNCMP.get(info, this, it.type, i.type);
       }
       rs = Calc.PLUS.ev(info, rs, i);
       ++c;
@@ -137,7 +137,7 @@ public final class FNAggr extends StandardFunc {
     // strings
     if(rs instanceof AStr) {
       for(Item it; (it = iter.next()) != null;) {
-        if(!(it instanceof AStr)) FUNCMP.thrw(info, this, rs.type, it.type);
+        if(!(it instanceof AStr)) throw FUNCMP.get(info, this, rs.type, it.type);
         if(cmp.eval(rs, it, coll, info)) rs = it;
       }
       return rs;
@@ -145,7 +145,7 @@ public final class FNAggr extends StandardFunc {
     // dates, durations and booleans
     if(rs instanceof ADate || rs instanceof Dur || rs.type == BLN) {
       for(Item it; (it = iter.next()) != null;) {
-        if(rs.type != it.type) FUNCMP.thrw(info, this, rs.type, it.type);
+        if(rs.type != it.type) throw FUNCMP.get(info, this, rs.type, it.type);
         if(cmp.eval(rs, it, coll, info)) rs = it;
       }
       return rs;
@@ -170,7 +170,7 @@ public final class FNAggr extends StandardFunc {
   private Type numType(final Item r, final Item i) throws QueryException {
     final Type tr = r.type, ti = i.type;
     if(ti.isUntyped()) return DBL;
-    if(!(i instanceof ANum)) FUNCMP.thrw(info, this, tr, ti);
+    if(!(i instanceof ANum)) throw FUNCMP.get(info, this, tr, ti);
 
     if(tr == ti) return tr;
     if(tr == DBL || ti == DBL) return DBL;

@@ -43,7 +43,7 @@ public final class Functions extends TokenSet {
       final String dsc = def.desc;
       final byte[] ln = token(dsc.substring(0, dsc.indexOf(PAR1)));
       final int i = put(new QNm(ln, def.uri()).id());
-      if(funcs[i] != null) Util.notexpected("Function defined twice:" + def);
+      if(funcs[i] != null) throw Util.notExpected("Function defined twice:" + def);
       funcs[i] = def;
     }
   }
@@ -66,7 +66,7 @@ public final class Functions extends TokenSet {
     // no constructor function found, or abstract type specified
     if(type != null && type != AtomType.NOT && type != AtomType.AAT) {
       if(arity == 1) return type;
-      FUNCTYPEPL.thrw(ii, name.string(), arity, 1);
+      throw FUNCTYPEPL.get(ii, name.string(), arity, 1);
     }
 
     // include similar function name in error message
@@ -75,10 +75,10 @@ public final class Functions extends TokenSet {
       if(t.par == null) continue;
       final byte[] u = t.name.uri();
       if(eq(u, XSURI) && t != AtomType.NOT && t != AtomType.AAT && ls.similar(
-          lc(ln), lc(t.string()))) FUNCSIMILAR.thrw(ii, name.string(), t.string());
+          lc(ln), lc(t.string()))) throw FUNCSIMILAR.get(ii, name.string(), t.string());
     }
     // no similar name: constructor function found, or abstract type specified
-    throw FUNCUNKNOWN.thrw(ii, name.string());
+    throw FUNCUNKNOWN.get(ii, name.string());
   }
 
   /**
@@ -91,14 +91,14 @@ public final class Functions extends TokenSet {
    */
   private Function getBuiltIn(final QNm name, final long arity, final InputInfo ii)
       throws QueryException {
+
     final int id = id(name.id());
     if(id == 0) return null;
     final Function fl = funcs[id];
     if(!eq(fl.uri(), name.uri())) return null;
     // check number of arguments
-    if(arity < fl.min || arity > fl.max)
-      (arity == 1 ? FUNCARGSG : FUNCARGPL).thrw(ii, fl, arity);
-    return fl;
+    if(arity >= fl.min && arity <= fl.max) return fl;
+    throw (arity == 1 ? FUNCARGSG : FUNCARGPL).get(ii, fl, arity);
   }
 
   /**
@@ -219,7 +219,7 @@ public final class Functions extends TokenSet {
     // pre-defined functions
     final StandardFunc fun = get().get(name, args, sc, ii);
     if(fun != null) {
-      if(!sc.xquery3() && fun.has(Flag.X30)) FUNC30.thrw(ii);
+      if(!sc.xquery3() && fun.has(Flag.X30)) throw FUNC30.get(ii);
       if(fun.sig.has(Flag.UPD)) ctx.updating(true);
       // [LW] correct annotations
       return new TypedFunc(fun, new Ann(), fun.sig.type(args.length));
@@ -259,11 +259,11 @@ public final class Functions extends TokenSet {
       final byte[] l = substring(keys[k], i + 1);
       if(eq(ln, l)) {
         final byte[] ur = name.uri();
-        FUNCSIMILAR.thrw(ii,
+        throw FUNCSIMILAR.get(ii,
             new TokenBuilder(NSGlobal.prefix(ur)).add(':').add(l),
             new TokenBuilder(NSGlobal.prefix(u)).add(':').add(l));
       } else if(ls.similar(ln, l)) {
-        FUNCSIMILAR.thrw(ii, name.string(), l);
+        throw FUNCSIMILAR.get(ii, name.string(), l);
       }
     }
   }

@@ -57,8 +57,8 @@ public final class StaticFuncs extends ExprInfo {
       final String xqdoc, final InputInfo ii) throws QueryException {
 
     final byte[] uri = nm.uri();
-    if(uri.length == 0) FUNNONS.thrw(ii, nm.string());
-    if(NSGlobal.reserved(uri)) NAMERES.thrw(ii, nm.string());
+    if(uri.length == 0) throw FUNNONS.get(ii, nm.string());
+    if(NSGlobal.reserved(uri)) throw NAMERES.get(ii, nm.string());
 
     final StaticFunc fn = new StaticFunc(ann, nm, args, ret, body, sc, scp, xqdoc, ii);
     final byte[] sig = fn.id();
@@ -128,13 +128,13 @@ public final class StaticFuncs extends ExprInfo {
             exp.append(al.get(a));
           }
           final int a = call.expr.length;
-          (a == 1 ? FUNCTYPESG : FUNCTYPEPL).thrw(call.info, call.name.string(), a, exp);
+          throw (a == 1 ? FUNCTYPESG : FUNCTYPEPL).get(call.info, call.name.string(), a, exp);
         }
         // if not, indicate that function is unknown
-        FUNCUNKNOWN.thrw(call.info, call.name.string());
+        throw FUNCUNKNOWN.get(call.info, call.name.string());
       }
       if(call != null) {
-        if(fc.func.expr == null) FUNCNOIMPL.thrw(call.info, call.name.string());
+        if(fc.func.expr == null) throw FUNCNOIMPL.get(call.info, call.name.string());
         qc.updating |= fc.func.updating;
       }
       id++;
@@ -191,7 +191,7 @@ public final class StaticFuncs extends ExprInfo {
     for(final FuncCache fc : funcs.values()) {
       final StaticFunc sf = fc.func;
       if(sf != null && sf.expr != null && ls.similar(nm, lc(sf.name.local()))) {
-        FUNCSIMILAR.thrw(ii, name.string(), sf.name.string());
+        throw FUNCSIMILAR.get(ii, name.string(), sf.name.string());
       }
     }
   }
@@ -243,7 +243,7 @@ public final class StaticFuncs extends ExprInfo {
      * @throws QueryException query exception
      */
     public void setFunc(final StaticFunc fn) throws QueryException {
-      if(func != null) throw FUNCDEFINED.thrw(fn.info, fn.name.string());
+      if(func != null) throw FUNCDEFINED.get(fn.info, fn.name.string());
       func = fn;
       for(final StaticFuncCall call : calls) call.init(fn);
     }

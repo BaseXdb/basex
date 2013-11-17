@@ -27,7 +27,7 @@ final class Rename extends BasicUpdate {
    */
   private Rename(final int l, final int k, final byte[] n, final byte[] u, final int p) {
     super(l, p);
-    if(n.length == 0) Util.notexpected("New name must not be empty.");
+    if(n.length == 0) throw Util.notExpected("New name must not be empty.");
     targetkind = k;
     name = n;
     uri = u;
@@ -53,8 +53,7 @@ final class Rename extends BasicUpdate {
 
   @Override
   DataClip getInsertionData() {
-    Util.notexpected("No insertion sequence needed for atomic rename operation.");
-    return null;
+    throw Util.notExpected("No insertion sequence needed for atomic rename operation.");
   }
 
   @Override

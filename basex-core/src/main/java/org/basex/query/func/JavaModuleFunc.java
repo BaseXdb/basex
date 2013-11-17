@@ -68,7 +68,7 @@ public final class JavaModuleFunc extends JavaMapping {
           e = e.getCause();
         }
         throw e instanceof QueryException ? ((QueryException) e).info(info) :
-          JAVAERR.thrw(info, e);
+          JAVAERR.get(info, e);
       }
     }
 
@@ -78,7 +78,7 @@ public final class JavaModuleFunc extends JavaMapping {
       if(!expect.isEmpty()) expect.add(", ");
       expect.add(Util.className(c));
     }
-    throw JAVAMOD.thrw(info, mth.getName() + '(' + expect + ')',
+    throw JAVAMOD.get(info, mth.getName() + '(' + expect + ')',
         mth.getName() + '(' + foundArgs(vals) + ')');
   }
 

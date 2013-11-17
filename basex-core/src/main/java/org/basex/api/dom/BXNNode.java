@@ -31,26 +31,26 @@ public final class BXNNode extends BXNList implements NamedNodeMap {
 
   @Override
   public BXNode getNamedItemNS(final String uri, final String ln) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
   public BXNode setNamedItem(final Node node) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
   public BXNode removeNamedItem(final String name) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
   public BXNode setNamedItemNS(final Node node) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
   public BXNode removeNamedItemNS(final String uri, final String ln) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 }

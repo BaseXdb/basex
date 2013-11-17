@@ -78,10 +78,10 @@ public final class Map extends FItem {
    */
   private Item key(final Item it, final InputInfo ii) throws QueryException {
     // no empty sequence allowed
-    if(it == null) throw INVEMPTY.thrw(ii, description());
+    if(it == null) throw INVEMPTY.get(ii, description());
 
     // function items can't be keys
-    if(it instanceof FItem) throw FIATOM.thrw(ii, it.description());
+    if(it instanceof FItem) throw FIATOM.get(ii, it.description());
 
     // NaN can't be stored as key, as it isn't equal to anything
     if(it == Flt.NAN || it == Dbl.NAN) return null;
@@ -159,7 +159,7 @@ public final class Map extends FItem {
   public Map coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    if(!(ft instanceof MapType) || !hasType((MapType) ft)) throw cast(ii, ft, this);
+    if(!(ft instanceof MapType) || !hasType((MapType) ft)) throw castError(ii, ft, this);
     return this;
   }
 
@@ -264,7 +264,7 @@ public final class Map extends FItem {
         val.plan(el);
       }
     } catch(final QueryException ex) {
-      Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
     addPlan(plan, el);
   }

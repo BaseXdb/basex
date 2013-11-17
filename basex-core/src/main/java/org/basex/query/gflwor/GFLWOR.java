@@ -767,19 +767,19 @@ public final class GFLWOR extends ParseExpr {
     @Deprecated
     @Override
     public Iter iter(final QueryContext ctx) throws QueryException {
-      throw Util.notexpected();
+      throw Util.notExpected();
     }
 
     @Deprecated
     @Override
     public Value value(final QueryContext ctx) throws QueryException {
-      throw Util.notexpected();
+      throw Util.notExpected();
     }
 
     @Deprecated
     @Override
     public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-      throw Util.notexpected();
+      throw Util.notExpected();
     }
 
     @Override

@@ -67,7 +67,7 @@ public class Options implements Iterable<Option<?>> {
         options.put(name, opt);
       }
     } catch(final Exception ex) {
-      Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
   }
 
@@ -206,7 +206,7 @@ public class Options implements Iterable<Option<?>> {
       n.parse(o.toString());
       return n;
     } catch(final Exception ex) {
-      throw Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
   }
 
@@ -561,7 +561,7 @@ public class Options implements Iterable<Option<?>> {
           if(ok && !(opt instanceof Comment)) ok = read.contains(opt.name());
         }
       } catch(final IllegalAccessException ex) {
-        Util.notexpected(ex);
+        throw Util.notExpected(ex);
       }
     }
 

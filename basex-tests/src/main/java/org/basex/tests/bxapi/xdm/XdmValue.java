@@ -34,7 +34,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return node name
    */
   public String getBaseURI() {
-    throw Util.notexpected("Item must be a node.");
+    throw Util.notExpected("Item must be a node.");
   }
 
   /**
@@ -42,7 +42,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return node name
    */
   public QName getName() {
-    throw Util.notexpected("Item must be a node.");
+    throw Util.notExpected("Item must be a node.");
   }
 
   /**
@@ -50,7 +50,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return node name
    */
   public boolean getBoolean() {
-    throw Util.notexpected("Value has no boolean representation.");
+    throw Util.notExpected("Value has no boolean representation.");
   }
 
   /**
@@ -61,7 +61,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
     try {
       return Long.parseLong(getString());
     } catch(final NumberFormatException ex) {
-      throw Util.notexpected("Value has no integer representation.");
+      throw Util.notExpected("Value has no integer representation.");
     }
   }
 
@@ -70,7 +70,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return node name
    */
   public String getString() {
-    throw Util.notexpected("Value has no string representation.");
+    throw Util.notExpected("Value has no string representation.");
   }
 
   /**

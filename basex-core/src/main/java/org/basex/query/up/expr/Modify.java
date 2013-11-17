@@ -35,7 +35,7 @@ public final class Modify extends Arr {
     checkNoUp(expr[0]);
     final Expr m = expr[1];
     m.checkUp();
-    if(!m.isVacuous() && !m.has(Flag.UPD)) UPMODIFY.thrw(info);
+    if(!m.isVacuous() && !m.has(Flag.UPD)) throw UPMODIFY.get(info);
   }
 
   @Override
@@ -55,7 +55,7 @@ public final class Modify extends Arr {
     try {
       final Iter ir = ctx.iter(expr[0]);
       Item i = ir.next();
-      if(!(i instanceof ANode) || ir.next() != null) UPSOURCE.thrw(info);
+      if(!(i instanceof ANode) || ir.next() != null) throw UPSOURCE.get(info);
 
       // copy node to main memory data instance
       i = ((ANode) i).dbCopy(ctx.context.options);

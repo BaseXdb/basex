@@ -144,13 +144,13 @@ public enum Calc {
       if(ta == tb) {
         if(ta == YMD) {
           final BigDecimal bd = BigDecimal.valueOf(((YMDur) b).ymd());
-          if(bd.doubleValue() == 0.0) DIVZERO.thrw(ii, a);
+          if(bd.doubleValue() == 0.0) throw DIVZERO.get(ii, a);
           return Dec.get(BigDecimal.valueOf(((YMDur) a).ymd()).divide(
               bd, 20, BigDecimal.ROUND_HALF_EVEN));
         }
         if(ta == DTD) {
           final BigDecimal bd = ((DTDur) b).dtd();
-          if(bd.doubleValue() == 0.0) DIVZERO.thrw(ii, a);
+          if(bd.doubleValue() == 0.0) throw DIVZERO.get(ii, a);
           return Dec.get(((DTDur) a).dtd().divide(bd, 20,
               BigDecimal.ROUND_HALF_EVEN));
         }
@@ -171,7 +171,7 @@ public enum Calc {
 
       final BigDecimal b1 = a.dec(ii);
       final BigDecimal b2 = b.dec(ii);
-      if(b2.signum() == 0) DIVZERO.thrw(ii, a);
+      if(b2.signum() == 0) throw DIVZERO.get(ii, a);
       final int s = Math.max(18, Math.max(b1.scale(), b2.scale()));
       return Dec.get(b1.divide(b2, s, BigDecimal.ROUND_HALF_EVEN));
     }
@@ -184,10 +184,10 @@ public enum Calc {
       checkNum(ii, a, b);
       final double d1 = a.dbl(ii);
       final double d2 = b.dbl(ii);
-      if(d2 == 0) DIVZERO.thrw(ii, a);
+      if(d2 == 0) throw DIVZERO.get(ii, a);
       final double d = d1 / d2;
       if(Double.isNaN(d) || Double.isInfinite(d) || d > Long.MAX_VALUE)
-        DIVFLOW.thrw(ii, d1, d2);
+        throw DIVFLOW.get(ii, d1, d2);
       return Int.get(type(a.type, b.type) == ITR ? a.itr(ii) / b.itr(ii) : (long) d);
     }
   },
@@ -203,13 +203,13 @@ public enum Calc {
       if(t == ITR) {
         final long b1 = a.itr(ii);
         final long b2 = b.itr(ii);
-        if(b2 == 0) DIVZERO.thrw(ii, a);
+        if(b2 == 0) throw DIVZERO.get(ii, a);
         return Int.get(b1 % b2);
       }
 
       final BigDecimal b1 = a.dec(ii);
       final BigDecimal b2 = b.dec(ii);
-      if(b2.signum() == 0) DIVZERO.thrw(ii, a);
+      if(b2.signum() == 0) throw DIVZERO.get(ii, a);
       final BigDecimal q = b1.divide(b2, 0, BigDecimal.ROUND_DOWN);
       return Dec.get(b1.subtract(q.multiply(b2)));
     }
@@ -259,7 +259,7 @@ public enum Calc {
    */
   final QueryException errType(final InputInfo ii, final Type ta, final Type tb)
       throws QueryException {
-    throw CALCTYPE.thrw(ii, info(), ta, tb);
+    throw CALCTYPE.get(ii, info(), ta, tb);
   }
 
   /**
@@ -270,7 +270,7 @@ public enum Calc {
    * @throws QueryException query exception
    */
   final QueryException errNum(final InputInfo ii, final Item it) throws QueryException {
-    throw NONUMBER.thrw(ii, info(), it.type);
+    throw NONUMBER.get(ii, info(), it.type);
   }
 
   /**
@@ -282,8 +282,8 @@ public enum Calc {
    */
   final Dur checkDur(final InputInfo ii, final Item it) throws QueryException {
     final Type ip = it.type;
-    if(!(it instanceof Dur)) NODUR.thrw(ii, info(), ip);
-    if(ip == DUR) throw NOSUBDUR.thrw(ii, info(), it);
+    if(!(it instanceof Dur)) throw NODUR.get(ii, info(), ip);
+    if(ip == DUR) throw NOSUBDUR.get(ii, info(), it);
     return (Dur) it;
   }
 
@@ -306,7 +306,7 @@ public enum Calc {
    * @throws QueryException query exception
    */
   private static void checkRange(final InputInfo ii, final double d) throws QueryException {
-    if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) RANGE.thrw(ii, d);
+    if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw RANGE.get(ii, d);
   }
 
   /**

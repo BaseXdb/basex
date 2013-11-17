@@ -153,7 +153,7 @@ public final class TableDiskAccess extends TableAccess {
     } catch(final IOException ex) {
       Util.stack(ex);
     }
-    throw Util.notexpected((lock ? "Exclusive" : "Shared") +
+    throw Util.notExpected((lock ? "Exclusive" : "Shared") +
         " lock could not be acquired.");
   }
 
@@ -368,7 +368,7 @@ public final class TableDiskAccess extends TableAccess {
     } else {
       // all insert operations will add data after first node.
       // i.e., there is no "insert before first document" statement
-      Util.notexpected("Insertion at beginning of populated table.");
+      throw Util.notExpected("Insertion at beginning of populated table.");
     }
 
     // number of bytes occupied by old records in the current block
@@ -505,7 +505,7 @@ public final class TableDiskAccess extends TableAccess {
         fp = fpre(m);
         np = m == last ? meta.size : fpre(m + 1);
       }
-      if(l > h) Util.notexpected(
+      if(l > h) throw Util.notExpected(
           "Data Access out of bounds:" +
           "\n- pre value: " + pre +
           "\n- #used blocks: " + used +

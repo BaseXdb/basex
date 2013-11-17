@@ -37,9 +37,9 @@ public abstract class ArchiveOut {
       if(format.equals(FNArchive.ZIP)) return new ZIPOut();
       if(format.equals(FNArchive.GZIP)) return new GZIPOut();
     } catch(final IOException ex) {
-      throw ARCH_FAIL.thrw(info, ex);
+      throw ARCH_FAIL.get(info, ex);
     }
-    throw ARCH_UNKNOWN.thrw(info);
+    throw ARCH_UNKNOWN.get(info);
   }
 
   /**

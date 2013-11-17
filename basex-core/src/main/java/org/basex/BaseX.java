@@ -221,10 +221,10 @@ public class BaseX extends Main {
             // specify user name
             context.globalopts.set(GlobalOptions.USER, arg.string());
           } else {
-            arg.usage();
+            throw arg.usage();
           }
         } else {
-          arg.usage();
+          throw arg.usage();
         }
       } else {
         v = arg.string().trim();

@@ -48,7 +48,7 @@ public final class Dat extends ADate {
     this(date);
     if(dur instanceof DTDur) {
       calc((DTDur) dur, plus);
-      if(yea <= MIN_YEAR || yea > MAX_YEAR) DATEADDRANGE.thrw(ii, this);
+      if(yea <= MIN_YEAR || yea > MAX_YEAR) throw DATEADDRANGE.get(ii, this);
     } else {
       calc((YMDur) dur, plus, ii);
     }

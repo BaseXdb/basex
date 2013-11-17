@@ -124,17 +124,17 @@ public final class Args {
    */
   public int number() throws BaseXException {
     final int i = Token.toInt(string());
-    if(i < 0) usage();
+    if(i < 0) throw usage();
     return i;
   }
 
   /**
    * Throws an exception with the command usage info.
-   * @throws BaseXException database exception
+   * @return database exception
    */
-  public void usage() throws BaseXException {
-    throw new BaseXException(header +
-        "Usage: " + Util.className(obj).toLowerCase(Locale.ENGLISH) + usage);
+  public BaseXException usage() {
+    final String name = Util.className(obj).toLowerCase(Locale.ENGLISH);
+    return new BaseXException(header + "Usage: " + name + usage);
   }
 
   @Override

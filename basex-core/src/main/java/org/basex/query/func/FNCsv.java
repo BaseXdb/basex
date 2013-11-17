@@ -56,7 +56,7 @@ public class FNCsv extends StandardFunc {
     try {
       return CsvConverter.convert(input, opts);
     } catch(final QueryIOException ex) {
-      throw BXCS_PARSE.thrw(info, ex);
+      throw BXCS_PARSE.get(info, ex);
     }
   }
 

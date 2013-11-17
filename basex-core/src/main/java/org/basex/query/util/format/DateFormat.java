@@ -51,7 +51,7 @@ final class DateFormat extends FormatParser {
     final byte[] width = comma == -1 ? null : substring(pic, comma + 1);
     if(width != null) {
       final Matcher m = WIDTH.matcher(string(width));
-      if(!m.find()) PICDATE.thrw(ii, width);
+      if(!m.find()) throw PICDATE.get(ii, width);
       int i = toInt(m.group(1));
       if(i != Integer.MIN_VALUE) min = i;
       final String mc = m.group(3);

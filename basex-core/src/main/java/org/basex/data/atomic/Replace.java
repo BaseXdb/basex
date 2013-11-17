@@ -99,7 +99,7 @@ final class Replace extends StructuralUpdate {
           break;
 
         case Data.ATTR:
-//          Util.notexpected("replace by value: update ATTR ?");
+//          throw Util.notexpecte("replace by value: update ATTR ?");
           break;
 
         case Data.TEXT:

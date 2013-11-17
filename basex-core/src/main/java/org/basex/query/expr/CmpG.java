@@ -285,7 +285,7 @@ public final class CmpG extends Cmp {
         (ta == tb || ta.isUntyped() || tb.isUntyped() ||
         a instanceof ANum && b instanceof ANum ||
         a instanceof AStr && b instanceof AStr)) return op.op.eval(a, b, coll, info);
-    throw Err.INVTYPECMP.thrw(info, ta, tb);
+    throw Err.INVTYPECMP.get(info, ta, tb);
   }
 
   @Override

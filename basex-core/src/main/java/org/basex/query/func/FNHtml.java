@@ -56,7 +56,7 @@ public final class FNHtml extends StandardFunc {
     try {
       return new DBNode(new HtmlParser(new IOContent(in), ctx.context.options, opts));
     } catch(final IOException ex) {
-      throw BXHL_IO.thrw(info, ex);
+      throw BXHL_IO.get(info, ex);
     }
   }
 }

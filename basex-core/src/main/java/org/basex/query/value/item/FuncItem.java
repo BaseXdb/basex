@@ -241,7 +241,7 @@ public final class FuncItem extends FItem implements Scope {
   public FItem coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    if(vars.length != ft.args.length) throw Err.cast(ii, ft, this);
+    if(vars.length != ft.args.length) throw Err.castError(ii, ft, this);
     return type.instanceOf(ft) ? this : coerce(ctx, sc, ii, this, ft);
   }
 
@@ -275,7 +275,7 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public Object toJava() {
-    throw Util.notexpected();
+    throw Util.notExpected();
   }
 
   @Override

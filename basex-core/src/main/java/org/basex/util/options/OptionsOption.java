@@ -50,7 +50,7 @@ public final class OptionsOption<O extends Options> extends Option<O> {
     try {
       o.parse(value.toString());
     } catch(final Exception ex) {
-      Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
     return o;
   }
@@ -63,7 +63,7 @@ public final class OptionsOption<O extends Options> extends Option<O> {
     try {
       return clazz.newInstance();
     } catch(final Exception ex) {
-      throw Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
   }
 }

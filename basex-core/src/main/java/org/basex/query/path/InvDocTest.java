@@ -75,6 +75,6 @@ final class InvDocTest extends Test {
 
   @Override
   public Test intersect(final Test other) {
-    throw Util.notexpected(this);
+    throw Util.notExpected(this);
   }
 }

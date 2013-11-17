@@ -51,7 +51,7 @@ public final class DBCreate extends DBNew {
 
   @Override
   public void merge(final BasicOperation o) throws QueryException {
-    BXDB_CREATE.thrw(info, ((DBCreate) o).name);
+    throw BXDB_CREATE.get(info, ((DBCreate) o).name);
   }
 
   @Override
@@ -64,14 +64,14 @@ public final class DBCreate extends DBNew {
     // remove data instance from list of opened resources
     qc.resource.removeData(name);
     // check if addressed database is still pinned by any other process
-    if(qc.context.pinned(name)) BXDB_OPENED.thrw(info, name);
+    if(qc.context.pinned(name)) throw BXDB_OPENED.get(info, name);
 
     initOptions();
     assignOptions();
     try {
       data = CreateDB.create(name, Parser.emptyParser(qc.context.options), qc.context);
     } catch(final IOException ex) {
-      UPDBOPTERR.thrw(info, ex);
+      throw UPDBOPTERR.get(info, ex);
     } finally {
       resetOptions();
     }
@@ -79,13 +79,13 @@ public final class DBCreate extends DBNew {
 
     // add initial documents
     if(md != null) {
-      if(!data.startUpdate()) BXDB_OPENED.thrw(null, data.meta.name);
+      if(!data.startUpdate()) throw BXDB_OPENED.get(null, data.meta.name);
       data.insert(data.meta.size, -1, new DataClip(md));
       try {
         Optimize.optimize(data, false, null);
       } catch(final IOException ex) {
         data.finishUpdate();
-        UPDBOPTERR.thrw(info, ex);
+        throw UPDBOPTERR.get(info, ex);
       }
     }
   }

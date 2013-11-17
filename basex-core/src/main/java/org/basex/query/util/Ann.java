@@ -84,7 +84,7 @@ public final class Ann extends ElementList {
       return false;
     } catch(final QueryException e) {
       // should never happen because annotations can only contain simple literals
-      throw Util.notexpected(e);
+      throw Util.notExpected(e);
     }
   }
 
@@ -136,7 +136,7 @@ public final class Ann extends ElementList {
         }
       } catch(final QueryException ex) {
         // should never happen because annotations can only contain simple literals
-        Util.notexpected(ex);
+        throw Util.notExpected(ex);
       }
     }
     return o;
@@ -154,25 +154,25 @@ public final class Ann extends ElementList {
       final byte[] local = name.local();
       final byte[] uri = name.uri();
       if(name.eq(Q_UPDATING)) {
-        if(up) DUPLUPD.thrw(infos[a]);
+        if(up) throw DUPLUPD.get(infos[a]);
         up = true;
       } else if(name.eq(Q_PUBLIC) || name.eq(Q_PRIVATE)) {
         // only one visibility modifier allowed
-        if(vis) (var ? DUPLVARVIS : DUPLVIS).thrw(infos[a]);
+        if(vis) throw (var ? DUPLVARVIS : DUPLVIS).get(infos[a]);
         vis = true;
       } else if(NSGlobal.reserved(name.uri())) {
         // no global namespaces allowed
-        ANNRES.thrw(infos[a], '%', name.string());
+        throw ANNRES.get(infos[a], '%', name.string());
       } else if(eq(uri, OUTPUTURI)) {
         if(Serializer.OPTIONS.option(string(local)) == null)
-          BASX_ANNOT.thrw(infos[a], '%', name.string());
+          throw BASX_ANNOT.get(infos[a], '%', name.string());
         if(values[a].size() != 1 || !values[a].itemAt(0).type.isStringOrUntyped()) {
-          BASX_ANNOTARGS.thrw(infos[a], '%', name.string());
+          throw BASX_ANNOTARGS.get(infos[a], '%', name.string());
         }
       } else if(eq(uri, RESTURI)) {
-        if(!eq(local, ANN_REST)) BASX_ANNOT.thrw(infos[a], '%', name.string());
+        if(!eq(local, ANN_REST)) throw BASX_ANNOT.get(infos[a], '%', name.string());
       } else if(eq(uri, UNITURI)) {
-        if(!eq(local, ANN_UNIT)) BASX_ANNOT.thrw(infos[a], '%', name.string());
+        if(!eq(local, ANN_UNIT)) throw BASX_ANNOT.get(infos[a], '%', name.string());
       }
     }
   }

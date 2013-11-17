@@ -81,7 +81,7 @@ public final class Constr {
    * @throws QueryException query exception
    */
   private boolean add(final Item it) throws QueryException {
-    if(it instanceof FItem) CONSFUNC.thrw(info, it);
+    if(it instanceof FItem) throw CONSFUNC.get(info, it);
 
     if(it instanceof ANode) {
       // type: nodes

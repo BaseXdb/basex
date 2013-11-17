@@ -75,7 +75,7 @@ final class IterPath extends AxisPath {
               }
             } else if(p < iter.length - 1) {
               // ensure that root only returns nodes
-              if(r && p == 0 && !(it instanceof ANode)) PATHNODE.thrw(info, it.type);
+              if(r && p == 0 && !(it instanceof ANode)) throw PATHNODE.get(info, it.type);
               ctx.value = it;
               ++p;
               if(iter[p] == null || !iter[p].reset()) iter[p] = ctx.iter(expr[p]);

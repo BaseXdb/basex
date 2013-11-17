@@ -1,5 +1,7 @@
 package org.basex.query.func;
 
+import static org.basex.query.util.Err.*;
+
 import java.util.*;
 
 import org.basex.query.*;
@@ -56,7 +58,7 @@ public final class PartFunc extends Arr {
     if(t.instanceOf(SeqType.FUN_O) && t.type != FuncType.ANY_FUN) {
       final FuncType ft = (FuncType) t.type;
       final int arity = expr.length + holes.length - 1;
-      if(ft.args.length != arity) Err.INVARITY.thrw(info, f, arity);
+      if(ft.args.length != arity) throw INVARITY.get(info, f, arity);
       final SeqType[] ar = new SeqType[holes.length];
       for(int i = 0; i < holes.length; i++) ar[i] = ft.args[holes[i]];
       type = FuncType.get(ft.type, ar).seqType();
@@ -72,7 +74,7 @@ public final class PartFunc extends Arr {
     final FuncType ft = (FuncType) f.type;
 
     final int arity = expr.length + holes.length - 1;
-    if(f.arity() != arity) Err.INVARITY.thrw(ii, f, arity);
+    if(f.arity() != arity) throw INVARITY.get(ii, f, arity);
     final Expr[] args = new Expr[arity];
 
     final VarScope scp = new VarScope(sc);

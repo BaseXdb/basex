@@ -36,8 +36,8 @@ public final class CDoc extends CFrag {
 
     // add child nodes
     c.add(ctx, expr);
-    if(c.errAtt || !c.atts.isEmpty()) DOCATTS.thrw(ii);
-    if(c.errNS || !c.nspaces.isEmpty()) DOCNS.thrw(ii);
+    if(c.errAtt || !c.atts.isEmpty()) throw DOCATTS.get(ii);
+    if(c.errNS || !c.nspaces.isEmpty()) throw DOCNS.get(ii);
     return doc.optimize();
   }
 

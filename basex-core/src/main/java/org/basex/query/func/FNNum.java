@@ -1,10 +1,11 @@
 package org.basex.query.func;
 
+import static org.basex.query.util.Err.*;
+
 import java.math.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -34,7 +35,7 @@ public final class FNNum extends StandardFunc {
     if(it == null) return null;
 
     final Type ip = it.type;
-    if(!ip.isNumberOrUntyped()) Err.number(this, it);
+    if(!ip.isNumberOrUntyped()) throw numberError(this, it);
     final double d = it.dbl(info);
     switch(sig) {
       case ABS:                return abs(it, info);

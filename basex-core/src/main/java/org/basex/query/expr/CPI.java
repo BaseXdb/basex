@@ -35,11 +35,11 @@ public final class CPI extends CName {
   public FPI item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Item it = checkItem(name, ctx);
     final Type ip = it.type;
-    if(!ip.isStringOrUntyped() && ip != AtomType.QNM) CPIWRONG.thrw(info, it);
+    if(!ip.isStringOrUntyped() && ip != AtomType.QNM) throw CPIWRONG.get(info, it);
 
     final byte[] nm = trim(it.string(ii));
-    if(eq(lc(nm), XML)) CPIXML.thrw(info, nm);
-    if(!XMLToken.isNCName(nm)) CPIINVAL.thrw(info, nm);
+    if(eq(lc(nm), XML)) throw CPIXML.get(info, nm);
+    if(!XMLToken.isNCName(nm)) throw CPIINVAL.get(info, nm);
 
     byte[] v = value(ctx, ii);
     int i = -1;

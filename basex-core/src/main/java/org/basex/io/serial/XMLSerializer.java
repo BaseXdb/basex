@@ -54,7 +54,7 @@ public class XMLSerializer extends OutputSerializer {
    * @throws QueryIOException query I/O exception
    */
   private void check() throws QueryIOException {
-    if(!saomit) SERSA.thrwIO();
-    if(docsys != null) SERDT.thrwIO();
+    if(!saomit) throw SERSA.getIO();
+    if(docsys != null) throw SERDT.getIO();
   }
 }

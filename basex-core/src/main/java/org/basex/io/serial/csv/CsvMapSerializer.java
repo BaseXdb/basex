@@ -36,7 +36,7 @@ public class CsvMapSerializer extends CsvSerializer {
     if(sep && level == 0) print(' ');
 
     if(!(item instanceof Map))
-      BXCS_SERIAL.thrwIO("Top level must be a map; " + item.type + " found");
+      throw BXCS_SERIAL.getIO("Top level must be a map; " + item.type + " found");
 
     try {
       final TokenList tl = new TokenList();
@@ -46,9 +46,9 @@ public class CsvMapSerializer extends CsvSerializer {
       final Value keys = map.keys();
       long rows = 0;
       for(final Item key : keys) {
-        if(key.type != AtomType.ITR) BXCS_SERIAL.thrwIO("Key " + key + " is not numeric");
+        if(key.type != AtomType.ITR) throw BXCS_SERIAL.getIO("Key " + key + " is not numeric");
         final long n = key.itr(null);
-        if(n <= 0) BXCS_SERIAL.thrwIO("Key '" + n + "' is no positive integer");
+        if(n <= 0) throw BXCS_SERIAL.getIO("Key '" + n + "' is no positive integer");
         rows = Math.max(rows, n);
       }
 
@@ -64,7 +64,7 @@ public class CsvMapSerializer extends CsvSerializer {
           }
           for(final Item key : r.keys()) {
             final Value val = r.get(key, null);
-            if(val.size() != 1) BXCS_SERIAL.thrwIO("Single value expected as entry.");
+            if(val.size() != 1) throw BXCS_SERIAL.getIO("Single value expected as entry.");
             tl.add(((Item) val).string(null));
           }
         } else {

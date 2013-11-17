@@ -1276,7 +1276,7 @@ public final class Token {
       final MessageDigest md = MessageDigest.getInstance("MD5");
       return string(hex(md.digest(token(string)), false));
     } catch(final Exception ex) {
-      throw Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
   }
 

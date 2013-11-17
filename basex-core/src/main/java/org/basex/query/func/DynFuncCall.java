@@ -46,7 +46,7 @@ public final class DynFuncCall extends FuncCall {
     final Type t = f.type().type;
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
-      if(ft.args != null && ft.args.length != ar) INVARITY.thrw(info, f, ar);
+      if(ft.args != null && ft.args.length != ar) throw INVARITY.get(info, f, ar);
       if(ft.type != null) type = ft.type;
     }
 
@@ -100,9 +100,9 @@ public final class DynFuncCall extends FuncCall {
   FItem evalFunc(final QueryContext ctx) throws QueryException {
     final int ar = expr.length - 1;
     final Item it = checkItem(expr[ar], ctx);
-    if(!(it instanceof FItem)) INVCAST.thrw(info, it.type, "function item");
+    if(!(it instanceof FItem)) throw INVCAST.get(info, it.type, "function item");
     final FItem fit = (FItem) it;
-    if(fit.arity() != ar) INVARITY.thrw(info, fit, ar);
+    if(fit.arity() != ar) throw INVARITY.get(info, fit, ar);
     return fit;
   }
 

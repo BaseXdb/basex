@@ -214,7 +214,7 @@ public final class QueryProcessor extends Proc {
     final Result res = execute();
     if(res instanceof Nodes) return (Nodes) res;
     // throw error
-    if(res.size() != 0) BXDB_DBRETURN.thrw(null);
+    if(res.size() != 0) throw BXDB_DBRETURN.get(null);
     // return empty result set
     return new Nodes(ctx.nodes.data);
   }

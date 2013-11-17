@@ -56,25 +56,25 @@ public final class Insert extends Update {
     final Constr c = new Constr(ii, sc).add(ctx, expr[1]);
     final ANodeList cList = c.children;
     final ANodeList aList = c.atts;
-    if(c.errAtt) UPNOATTRPER.thrw(info);
-    if(c.duplAtt != null) UPATTDUPL.thrw(info, new QNm(c.duplAtt));
+    if(c.errAtt) throw UPNOATTRPER.get(info);
+    if(c.duplAtt != null) throw UPATTDUPL.get(info, new QNm(c.duplAtt));
 
     // check target constraints
     final Iter t = ctx.iter(expr[0]);
     final Item i = t.next();
-    if(i == null) UPSEQEMP.thrw(info, Util.className(this));
+    if(i == null) throw UPSEQEMP.get(info, Util.className(this));
     if(!(i instanceof ANode) || t.next() != null)
-      (before || after ? UPTRGTYP2 : UPTRGTYP).thrw(info);
+      throw (before || after ? UPTRGTYP2 : UPTRGTYP).get(info);
 
     final ANode n = (ANode) i;
     final ANode par = n.parent();
     if(before || after) {
       if(n.type == NodeType.ATT || n.type == NodeType.DOC)
-        UPTRGTYP2.thrw(info);
-      if(par == null) UPPAREMPTY.thrw(info);
+        throw UPTRGTYP2.get(info);
+      if(par == null) throw UPPAREMPTY.get(info);
     } else {
       if(n.type != NodeType.ELM && n.type != NodeType.DOC)
-        UPTRGTYP.thrw(info);
+        throw UPTRGTYP.get(info);
     }
 
     UpdatePrimitive up;
@@ -82,8 +82,7 @@ public final class Insert extends Update {
     // no update primitive is created if node list is empty
     if(!aList.isEmpty()) {
       final ANode targ = before || after ? par : n;
-      if(targ.type != NodeType.ELM)
-        (before || after ? UPATTELM : UPATTELM2).thrw(info);
+      if(targ.type != NodeType.ELM) throw (before || after ? UPATTELM : UPATTELM2).get(info);
 
       dbn = ctx.updates.determineDataRef(targ, ctx);
       up = new InsertAttribute(dbn.pre, dbn.data, info, checkNS(aList, targ));

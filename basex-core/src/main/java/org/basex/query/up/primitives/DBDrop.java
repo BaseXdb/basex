@@ -45,9 +45,9 @@ public final class DBDrop extends BasicOperation {
     // invalidate data instance to avoid repeated removal of locks
     data = null;
     // check if database is stilled pinned by another process
-    if(ctx.context.pinned(name)) BXDB_OPENED.thrw(info, name);
+    if(ctx.context.pinned(name)) throw BXDB_OPENED.get(info, name);
     // check if database files can be safely removed
-    if(!DropDB.drop(name, ctx.context)) UPDBDROP.thrw(info, name);
+    if(!DropDB.drop(name, ctx.context)) throw UPDBDROP.get(info, name);
   }
 
   @Override

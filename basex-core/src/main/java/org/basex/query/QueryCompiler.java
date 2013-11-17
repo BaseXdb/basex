@@ -1,5 +1,7 @@
 package org.basex.query;
 
+import static org.basex.query.util.Err.*;
+
 import java.util.*;
 
 import org.basex.query.func.*;
@@ -82,7 +84,7 @@ final class QueryCompiler {
   private static Scope circCheck(final Scope[] comp) throws QueryException {
     if(comp.length > 1)
       for(final Scope scp : comp)
-        if(scp instanceof StaticVar) throw Err.circVar((StaticVar) scp);
+        if(scp instanceof StaticVar) throw circVarError((StaticVar) scp);
     return comp[0];
   }
 
@@ -219,7 +221,7 @@ final class QueryCompiler {
         return true;
       }
     });
-    if(!ok) throw Err.VARUNDEF.thrw(((StaticScope) curr).info, curr);
+    if(!ok) throw Err.VARUNDEF.get(((StaticScope) curr).info, curr);
     return adj.toArray();
   }
 }

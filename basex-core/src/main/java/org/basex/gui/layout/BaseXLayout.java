@@ -200,7 +200,7 @@ public final class BaseXLayout {
     if(win instanceof GUI) {
       comp.addKeyListener(globalShortcuts((GUI) win));
     } else {
-      Util.notexpected("Reference to main window expected.");
+      throw Util.notExpected("Reference to main window expected.");
     }
   }
 

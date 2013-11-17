@@ -132,7 +132,7 @@ public final class FNArchive extends StandardFunc {
     if(alg != null) {
       if(format.equals(ZIP)  && !eq(alg, STORED, DEFLATE) ||
          format.equals(GZIP) && !eq(alg, DEFLATE)) {
-        ARCH_SUPP.thrw(info, ArchiveOptions.ALGORITHM.name(), alg);
+        throw ARCH_SUPP.get(info, ArchiveOptions.ALGORITHM.name(), alg);
       }
       if(eq(alg, STORED)) level = ZipEntry.STORED;
       else if(eq(alg, DEFLATE)) level = ZipEntry.DEFLATED;
@@ -148,7 +148,7 @@ public final class FNArchive extends StandardFunc {
         cn = cont.next();
         if(en == null || cn == null) break;
         if(out instanceof GZIPOut && c > 0)
-          ARCH_ONE.thrw(info, format.toUpperCase(Locale.ENGLISH));
+          throw ARCH_ONE.get(info, format.toUpperCase(Locale.ENGLISH));
         add(checkElmStr(en), cn, out, level, ctx);
         e++;
         c++;
@@ -156,9 +156,9 @@ public final class FNArchive extends StandardFunc {
       // count remaining entries
       if(cn != null) do c++; while(cont.next() != null);
       if(en != null) do e++; while(entr.next() != null);
-      if(e != c) throw ARCH_DIFF.thrw(info, e, c);
+      if(e != c) throw ARCH_DIFF.get(info, e, c);
     } catch(final IOException ex) {
-      throw ARCH_FAIL.thrw(info, ex);
+      throw ARCH_FAIL.get(info, ex);
     } finally {
       out.close();
     }
@@ -186,7 +186,7 @@ public final class FNArchive extends StandardFunc {
         break;
       }
     } catch(final IOException ex) {
-      ARCH_FAIL.thrw(info, ex);
+      throw ARCH_FAIL.get(info, ex);
     } finally {
       arch.close();
     }
@@ -228,7 +228,7 @@ public final class FNArchive extends StandardFunc {
       }
       return vb;
     } catch(final IOException ex) {
-      throw ARCH_FAIL.thrw(info, ex);
+      throw ARCH_FAIL.get(info, ex);
     } finally {
       in.close();
     }
@@ -286,13 +286,13 @@ public final class FNArchive extends StandardFunc {
     // count remaining entries
     if(cn != null) do c++; while(cont.next() != null);
     if(en != null) do e++; while(entr.next() != null);
-    if(e != c) ARCH_DIFF.thrw(info, e, c);
+    if(e != c) throw ARCH_DIFF.get(info, e, c);
 
     final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
     final ArchiveOut out = ArchiveOut.get(in.format(), info);
     try {
       if(in instanceof GZIPIn)
-        ARCH_MODIFY.thrw(info, in.format().toUpperCase(Locale.ENGLISH));
+        throw ARCH_MODIFY.get(info, in.format().toUpperCase(Locale.ENGLISH));
       // delete entries to be updated
       while(in.more()) if(!hm.contains(token(in.entry().getName()))) out.write(in);
       // add new and updated entries
@@ -302,7 +302,7 @@ public final class FNArchive extends StandardFunc {
         add(it[0], it[1], out, ZipEntry.DEFLATED, ctx);
       }
     } catch(final IOException ex) {
-      ARCH_FAIL.thrw(info, ex);
+      throw ARCH_FAIL.get(info, ex);
     } finally {
       in.close();
       out.close();
@@ -329,10 +329,10 @@ public final class FNArchive extends StandardFunc {
     final ArchiveOut out = ArchiveOut.get(in.format(), info);
     try {
       if(in instanceof GZIPIn)
-        ARCH_MODIFY.thrw(info, in.format().toUpperCase(Locale.ENGLISH));
+        throw ARCH_MODIFY.get(info, in.format().toUpperCase(Locale.ENGLISH));
       while(in.more()) if(!hm.contains(token(in.entry().getName()))) out.write(in);
     } catch(final IOException ex) {
-      ARCH_FAIL.thrw(info, ex);
+      throw ARCH_FAIL.get(info, ex);
     } finally {
       in.close();
       out.close();
@@ -359,7 +359,7 @@ public final class FNArchive extends StandardFunc {
           tl.add(in.read());
       }
     } catch(final IOException ex) {
-      ARCH_FAIL.thrw(info, ex);
+      throw ARCH_FAIL.get(info, ex);
     } finally {
       in.close();
     }
@@ -393,7 +393,7 @@ public final class FNArchive extends StandardFunc {
         }
       }
     } catch(final IOException ex) {
-      ARCH_FAIL.thrw(info, ex);
+      throw ARCH_FAIL.get(info, ex);
     } finally {
       in.close();
     }
@@ -436,7 +436,7 @@ public final class FNArchive extends StandardFunc {
 
     // create new zip entry
     String name = string(entry.string(info));
-    if(name.isEmpty()) ARCH_EMPTY.thrw(info);
+    if(name.isEmpty()) throw ARCH_EMPTY.get(info);
     if(Prop.WIN) name = name.replace('\\', '/');
 
     final ZipEntry ze = new ZipEntry(name);
@@ -454,7 +454,7 @@ public final class FNArchive extends StandardFunc {
         try {
           ze.setTime(dateTimeToMs(new Dtm(mod, info), ctx));
         } catch(final QueryException qe) {
-          ARCH_DATETIME.thrw(info, mod);
+          throw ARCH_DATETIME.get(info, mod);
         }
       }
 
@@ -462,7 +462,7 @@ public final class FNArchive extends StandardFunc {
       final byte[] enc = el.attribute(ENCODING);
       if(enc != null) {
         en = string(enc);
-        if(!Charset.isSupported(en)) ARCH_ENCODING.thrw(info, enc);
+        if(!Charset.isSupported(en)) throw ARCH_ENCODING.get(info, enc);
       }
     }
 
@@ -473,7 +473,7 @@ public final class FNArchive extends StandardFunc {
     try {
       out.level(lvl == null ? level : toInt(lvl));
     } catch(final IllegalArgumentException ex) {
-      ARCH_LEVEL.thrw(info, lvl);
+      throw ARCH_LEVEL.get(info, lvl);
     }
     out.write(ze, val);
   }
@@ -492,7 +492,7 @@ public final class FNArchive extends StandardFunc {
     try {
       return FNConvert.toString(new ArrayInput(val), en, ctx);
     } catch(final IOException ex) {
-      throw ARCH_ENCODE.thrw(info, ex);
+      throw ARCH_ENCODE.get(info, ex);
     }
   }
 
@@ -504,6 +504,6 @@ public final class FNArchive extends StandardFunc {
    */
   private Item checkElmStr(final Item it) throws QueryException {
     if(it instanceof AStr || TEST.eq(it)) return it;
-    throw ELMSTRTYPE.thrw(info, Q_ENTRY.string(), it.type);
+    throw ELMSTRTYPE.get(info, Q_ENTRY.string(), it.type);
   }
 }

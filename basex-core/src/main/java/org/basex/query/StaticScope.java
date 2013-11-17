@@ -81,7 +81,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
         val.add(l).add('\n');
       }
     } catch(final IOException ex) {
-      Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
     add(key, val, map);
     return map;

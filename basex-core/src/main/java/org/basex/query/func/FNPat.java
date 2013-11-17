@@ -107,7 +107,7 @@ public final class FNPat extends StandardFunc {
   private Item analyzeString(final byte[] val, final QueryContext ctx) throws QueryException {
 
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
-    if(p.matcher("").matches()) REGROUP.thrw(info);
+    if(p.matcher("").matches()) throw REGROUP.get(info);
     final String str = string(val);
     final Matcher m = p.matcher(str);
 
@@ -174,15 +174,15 @@ public final class FNPat extends StandardFunc {
     for(int i = 0; i < rep.length; ++i) {
       if(rep[i] == '\\') {
         if(i + 1 == rep.length || rep[i + 1] != '\\' && rep[i + 1] != '$')
-          FUNREPBS.thrw(info);
+          throw FUNREPBS.get(info);
         ++i;
       }
       if(rep[i] == '$' && (i == 0 || rep[i - 1] != '\\') &&
-        (i + 1 == rep.length || !digit(rep[i + 1]))) FUNREPDOL.thrw(info);
+        (i + 1 == rep.length || !digit(rep[i + 1]))) throw FUNREPDOL.get(info);
     }
 
     final Pattern p = pattern(expr[1], expr.length == 4 ? expr[3] : null, ctx);
-    if(p.pattern().isEmpty()) REGROUP.thrw(info);
+    if(p.pattern().isEmpty()) throw REGROUP.get(info);
 
     String r = string(rep);
     if((p.flags() & Pattern.LITERAL) != 0) {
@@ -192,8 +192,8 @@ public final class FNPat extends StandardFunc {
     try {
       return Str.get(p.matcher(string(val)).replaceAll(r));
     } catch(final Exception ex) {
-      if(ex.getMessage().contains("No group")) REGROUP.thrw(info);
-      throw REGPAT.thrw(info, ex);
+      if(ex.getMessage().contains("No group")) throw REGROUP.get(info);
+      throw REGPAT.get(info, ex);
     }
   }
 
@@ -206,7 +206,7 @@ public final class FNPat extends StandardFunc {
   private Value tokenize(final QueryContext ctx) throws QueryException {
     final byte[] val = checkEStr(expr[0], ctx);
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
-    if(p.matcher("").matches()) REGROUP.thrw(info);
+    if(p.matcher("").matches()) throw REGROUP.get(info);
 
     final TokenList tl = new TokenList();
     final String str = string(val);

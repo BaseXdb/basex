@@ -83,12 +83,10 @@ public abstract class CName extends CFrag {
     final Type ip = it.type;
     if(ip == AtomType.QNM) return (QNm) it;
 
-    final byte[] str = it.string(ii);
-    if(!XMLToken.isQName(str)) {
-      (ip.isStringOrUntyped() ? INVNAME : INVQNAME).thrw(info, str);
-    }
     // create and update namespace
-    return new QNm(str, sc);
+    final byte[] str = it.string(ii);
+    if(XMLToken.isQName(str)) return new QNm(str, sc);
+    throw (ip.isStringOrUntyped() ? INVNAME : INVQNAME).get(info, str);
   }
 
   @Override

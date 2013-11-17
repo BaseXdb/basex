@@ -71,7 +71,7 @@ final class RestXqPath implements Iterable<String>, Comparable<RestXqPath> {
       @Override
       public String next() { return segment[c++]; }
       @Override
-      public void remove() { Util.notexpected(); }
+      public void remove() { throw Util.notExpected(); }
     };
   }
 

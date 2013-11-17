@@ -75,7 +75,7 @@ public final class Collation {
 
     byte[] args = uri;
     final Uri u = Uri.uri(args);
-    if(!u.isValid()) INVURI.thrw(info, args);
+    if(!u.isValid()) throw INVURI.get(info, args);
     if(!u.isAbsolute() && !Token.startsWith(args, '?')) {
       args = sc.baseURI().resolve(u, info).string();
     }
@@ -93,7 +93,7 @@ public final class Collation {
     Collation coll = ctx.collations.get(full);
     if(coll == null) {
       final Collator cl = get(args);
-      if(cl == null) err.thrw(info, uri);
+      if(cl == null) throw err.get(info, uri);
       coll = new Collation(cl, full);
       ctx.collations.put(full, coll);
     }
@@ -299,6 +299,6 @@ public final class Collation {
    */
   private RuleBasedCollator rbc(final InputInfo info) throws QueryException {
     if(coll instanceof RuleBasedCollator) return (RuleBasedCollator) coll;
-    throw CHARCOLL.thrw(info);
+    throw CHARCOLL.get(info);
   }
 }

@@ -155,7 +155,7 @@ final class DatabaseUpdates {
    * @throws QueryException query exception
    */
   void startUpdate() throws QueryException {
-    if(!data.startUpdate()) BXDB_OPENED.thrw(null, data.meta.name);
+    if(!data.startUpdate()) throw BXDB_OPENED.get(null, data.meta.name);
   }
 
   /**
@@ -195,7 +195,7 @@ final class DatabaseUpdates {
       try {
         Export.export(data, data.meta.original, data.meta.options.get(MainOptions.EXPORTER), null);
       } catch(final IOException ex) {
-        UPPUTERR.thrw(null, data.meta.original);
+        throw UPPUTERR.get(null, data.meta.original);
       }
     }
   }
@@ -262,7 +262,7 @@ final class DatabaseUpdates {
       if(ups != null) for(final UpdatePrimitive up : ups.prim) up.update(pool);
     }
     // check namespaces
-    if(!pool.nsOK()) UPNSCONFL2.thrw(null);
+    if(!pool.nsOK()) throw UPNSCONFL2.get(null);
 
     // add the already existing attributes to the name pool
     final IntSet il = new IntSet();
@@ -289,6 +289,6 @@ final class DatabaseUpdates {
       }
     }
     final QNm dup = pool.duplicate();
-    if(dup != null) UPATTDUPL.thrw(null, dup);
+    if(dup != null) throw UPATTDUPL.get(null, dup);
   }
 }

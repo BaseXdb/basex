@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -85,15 +84,15 @@ public final class FNQName extends StandardFunc {
    */
   private Item qName(final Item it, final Item it2) throws QueryException {
     final byte[] uri = checkEStr(it);
-    if(it2 == null) INVEMPTYEX.thrw(info, description(), AtomType.STR);
+    if(it2 == null) throw INVEMPTYEX.get(info, description(), AtomType.STR);
 
     final byte[] name = checkEStr(it2);
     final byte[] str = !contains(name, ':') && eq(uri, XMLURI) ?
         concat(XMLC, name) : name;
-    if(!XMLToken.isQName(str)) Err.value(info, AtomType.QNM, Str.get(name));
+    if(!XMLToken.isQName(str)) throw valueError(info, AtomType.QNM, Str.get(name));
     final QNm nm = new QNm(str, uri);
     if(nm.hasPrefix() && uri.length == 0)
-      Err.value(info, AtomType.URI, Str.get(nm.uri()));
+      throw valueError(info, AtomType.URI, Str.get(nm.uri()));
     return nm;
   }
 
@@ -136,12 +135,12 @@ public final class FNQName extends StandardFunc {
     if(it == null) return null;
 
     final byte[] name = checkEStr(it);
-    if(!XMLToken.isQName(name)) Err.value(info, AtomType.QNM, it);
+    if(!XMLToken.isQName(name)) throw valueError(info, AtomType.QNM, it);
 
     final QNm nm = new QNm(name);
     final byte[] pref = nm.prefix();
     final byte[] uri = base.uri(pref);
-    if(uri == null) NSDECL.thrw(info, pref);
+    if(uri == null) throw NSDECL.get(info, pref);
     nm.uri(uri);
     return nm;
   }
@@ -175,14 +174,14 @@ public final class FNQName extends StandardFunc {
     if(it == null) return null;
     // check relative uri
     final Uri rel = Uri.uri(checkEStr(it));
-    if(!rel.isValid()) URIINVRES.thrw(info, rel);
+    if(!rel.isValid()) throw URIINVRES.get(info, rel);
     if(rel.isAbsolute()) return rel;
 
     // check base uri
     final Uri base = it2 == null ? sc.baseURI() : Uri.uri(checkEStr(it2));
-    if(!base.isAbsolute()) URIABS.thrw(info, base);
+    if(!base.isAbsolute()) throw URIABS.get(info, base);
     if(!base.isValid() || contains(base.string(), '#') || !contains(base.string(), '/'))
-      URIINVRES.thrw(info, base);
+      throw URIINVRES.get(info, base);
 
     return base.resolve(rel, info);
   }

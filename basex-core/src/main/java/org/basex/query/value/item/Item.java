@@ -91,7 +91,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public boolean bool(final InputInfo ii) throws QueryException {
-    throw CONDTYPE.thrw(ii, type, this);
+    throw CONDTYPE.get(ii, type, this);
   }
 
   /**
@@ -184,7 +184,7 @@ public abstract class Item extends Value {
    */
   @SuppressWarnings("unused")
   public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
-    throw (this == it ? TYPECMP : INVTYPECMP).thrw(ii, type, it.type);
+    throw (this == it ? TYPECMP : INVTYPECMP).get(ii, type, it.type);
   }
 
   /**
@@ -239,18 +239,6 @@ public abstract class Item extends Value {
     if(score != null || s != 0) score = s;
   }
 
-  /**
-   * Throws a cast error.
-   * @param val cast value
-   * @param ii input info
-   * @return never
-   * @throws QueryException query exception
-   */
-  final QueryException castErr(final Object val, final InputInfo ii)
-      throws QueryException {
-    return FUNCAST.thrw(ii, type, val);
-  }
-
   @Override
   public String description() {
     return type.toString();
@@ -263,7 +251,7 @@ public abstract class Item extends Value {
     } catch(final QueryException ex) {
       // only function items throw exceptions in atomization, and they should
       // override plan(Serializer) sensibly
-      Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
   }
 

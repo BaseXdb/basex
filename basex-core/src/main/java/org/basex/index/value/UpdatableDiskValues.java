@@ -77,7 +77,7 @@ public final class UpdatableDiskValues extends DiskValues {
       final byte[] key = nkeys.get(j);
 
       final int in = -(1 + get(key, 0, i + 1));
-      if(in < 0) Util.notexpected("Key should not exist: '" + string(key) + '\'');
+      if(in < 0) throw Util.notExpected("Key should not exist: '" + string(key) + '\'');
 
       // shift all bigger keys to the right
       while(i >= in) {
@@ -134,7 +134,7 @@ public final class UpdatableDiskValues extends DiskValues {
     final int s = size.get();
     for(final byte[] key : allkeys) {
       p = get(key, ++p, s);
-      if(p < 0) Util.notexpected("Tried to delete ids " + m.get(key) +
+      if(p < 0) throw Util.notExpected("Tried to delete ids " + m.get(key) +
           " of non-existing index key: '" + string(key) + '\'');
       else if(deleteIds(p, key, m.get(key).sort().toArray()) == 0) empty.add(p);
     }

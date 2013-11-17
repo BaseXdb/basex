@@ -120,7 +120,7 @@ public abstract class StandardFunc extends Arr {
     } catch(final QueryIOException ex) {
       throw ex.getCause(info);
     } catch(final IOException ex) {
-      err.thrw(info, ex);
+      throw err.get(info, ex);
     }
     return ao.toArray();
   }
@@ -166,7 +166,7 @@ public abstract class StandardFunc extends Arr {
    */
   final Data checkData(final QueryContext ctx) throws QueryException {
     final String name = string(checkStr(expr[0], ctx));
-    if(!Databases.validName(name)) INVDB.thrw(info, name);
+    if(!Databases.validName(name)) throw INVDB.get(info, name);
     return ctx.resource.data(name, info);
   }
 
@@ -222,7 +222,7 @@ public abstract class StandardFunc extends Arr {
     } catch(final IllegalArgumentException e) {
       /* character set is invalid or unknown (e.g. empty string) */
     }
-    throw err.thrw(info, enc);
+    throw err.get(info, enc);
   }
 
   /**
@@ -250,7 +250,7 @@ public abstract class StandardFunc extends Arr {
    */
   final long dateTimeToMs(final Expr e, final QueryContext ctx) throws QueryException {
     final Dtm dtm = (Dtm) checkType(checkItem(e, ctx), AtomType.DTM);
-    if(dtm.yea() > 292278993) INTRANGE.thrw(info, dtm);
+    if(dtm.yea() > 292278993) throw INTRANGE.get(info, dtm);
     return dtm.toJava().toGregorianCalendar().getTimeInMillis();
   }
 
@@ -297,7 +297,7 @@ public abstract class StandardFunc extends Arr {
       if(d != null && !d.inMemory()) {
         it = ((ANode) it).dbCopy(ctx.context.options);
       } else if(it instanceof FItem) {
-        FIVALUE.thrw(info, it);
+        throw FIVALUE.get(info, it);
       }
       vb.add(it.materialize(info));
     }

@@ -28,7 +28,7 @@ public final class FTMildNot extends FTExpr {
    */
   public FTMildNot(final InputInfo ii, final FTExpr e1, final FTExpr e2) throws QueryException {
     super(ii, e1, e2);
-    if(usesExclude()) FTMILD.thrw(info);
+    if(usesExclude()) throw FTMILD.get(info);
   }
 
   @Override
@@ -108,7 +108,7 @@ public final class FTMildNot extends FTExpr {
       return new FTMildNot(info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs));
     } catch(final QueryException e) {
       // checks were already done
-      throw Util.notexpected(e);
+      throw Util.notExpected(e);
     }
   }
 

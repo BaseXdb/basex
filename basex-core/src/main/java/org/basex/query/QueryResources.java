@@ -55,7 +55,7 @@ public final class QueryResources {
    */
   void compile(final Nodes nodes) throws QueryException {
     final Data d = nodes.data;
-    if(!ctx.context.perm(Perm.READ, d.meta)) BASX_PERM.thrw(null, Perm.READ);
+    if(!ctx.context.perm(Perm.READ, d.meta)) throw BASX_PERM.get(null, Perm.READ);
 
     // assign initial context value
     final boolean root = nodes.root;
@@ -98,7 +98,7 @@ public final class QueryResources {
       addData(d);
       return d;
     } catch(final IOException ex) {
-      throw BXDB_OPEN.thrw(info, ex);
+      throw BXDB_OPEN.get(info, ex);
     }
   }
 
@@ -139,7 +139,7 @@ public final class QueryResources {
    * @throws QueryException query exception
    */
   public Value collection(final InputInfo info) throws QueryException {
-    if(colls == 0) NODEFCOLL.thrw(info);
+    if(colls == 0) throw NODEFCOLL.get(info);
     return coll[0];
   }
 
@@ -268,7 +268,7 @@ public final class QueryResources {
       addData(d);
       return d;
     } catch(final IOException ex) {
-      throw IOERR.thrw(info, ex);
+      throw IOERR.get(info, ex);
     }
   }
 
@@ -290,7 +290,7 @@ public final class QueryResources {
       in = baseIO.merge(input.original);
       if(!in.path().equals(input.original) && in.exists()) return in;
     }
-    throw WHICHRES.thrw(info, in);
+    throw WHICHRES.get(info, in);
   }
 
   /**
@@ -307,9 +307,8 @@ public final class QueryResources {
     // get all document nodes of the specified database
     final IntList docs = dt.resources.docs(qi.path);
     // ensure that a single document was filtered
-    if(docs.size() != 1)
-      (docs.isEmpty() ? BXDB_NODOC : BXDB_SINGLE).thrw(info, qi.original);
-    return new DBNode(dt, docs.get(0), Data.DOC);
+    if(docs.size() == 1) return new DBNode(dt, docs.get(0), Data.DOC);
+    throw (docs.isEmpty() ? BXDB_NODOC : BXDB_SINGLE).get(info, qi.original);
   }
 
   /**

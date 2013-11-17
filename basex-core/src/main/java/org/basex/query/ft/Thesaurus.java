@@ -115,7 +115,7 @@ public final class Thesaurus {
         build(new Nodes(result.pres[n], data));
       }
     } catch(final IOException ex) {
-      NOTHES.thrw(ii, file);
+      throw NOTHES.get(ii, file);
     }
   }
 

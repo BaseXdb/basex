@@ -20,9 +20,9 @@ final class DatabaseModifier extends ContextModifier {
     add(o);
     // check permissions
     if(o instanceof DBCreate) {
-      if(!ctx.context.perm(Perm.CREATE, null))
-        BASX_PERM.thrw(o.getInfo(), Perm.CREATE);
-    } else if(!ctx.context.perm(Perm.WRITE, o.getData().meta))
-      BASX_PERM.thrw(o.getInfo(), Perm.WRITE);
+      if(!ctx.context.perm(Perm.CREATE, null)) throw BASX_PERM.get(o.getInfo(), Perm.CREATE);
+    } else if(!ctx.context.perm(Perm.WRITE, o.getData().meta)) {
+      throw BASX_PERM.get(o.getInfo(), Perm.WRITE);
+    }
   }
 }

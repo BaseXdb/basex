@@ -85,7 +85,7 @@ public final class FNValidate extends StandardFunc {
   private Item xsd(final QueryContext ctx) throws QueryException {
     final Value seq = xsdInfo(ctx);
     if(seq == Empty.SEQ) return null;
-    throw BXVA_FAIL.thrw(info, seq.iter().next());
+    throw BXVA_FAIL.get(info, seq.iter().next());
   }
 
   /**
@@ -151,7 +151,7 @@ public final class FNValidate extends StandardFunc {
   private Item dtd(final QueryContext ctx) throws QueryException {
     final Value seq = dtdInfo(ctx);
     if(seq == Empty.SEQ) return null;
-    throw BXVA_FAIL.thrw(info, seq.iter().next());
+    throw BXVA_FAIL.get(info, seq.iter().next());
   }
 
   /**
@@ -214,9 +214,9 @@ public final class FNValidate extends StandardFunc {
     try {
       v.process(handler);
     } catch(final IOException ex) {
-      throw BXVA_START.thrw(info, ex);
+      throw BXVA_START.get(info, ex);
     } catch(final ParserConfigurationException ex) {
-      throw BXVA_START.thrw(info, ex);
+      throw BXVA_START.get(info, ex);
     } catch(final SAXException ex) {
       // fatal exception: get original message
       Throwable e = ex;
@@ -278,7 +278,7 @@ public final class FNValidate extends StandardFunc {
       }
       return io;
     }
-    throw STRNODTYPE.thrw(info, this, it.type);
+    throw STRNODTYPE.get(info, this, it.type);
   }
 
   /** Schema error handler. */

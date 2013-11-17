@@ -114,10 +114,10 @@ public final class FNXslt extends StandardFunc {
       return node ? new DBNode(new IOContent(result), ctx.context.options) : Str.get(result);
     } catch(final IOException ex) {
       System.setErr(tmp);
-      throw IOERR.thrw(info, ex);
+      throw IOERR.get(info, ex);
     } catch(final TransformerException ex) {
       System.setErr(tmp);
-      throw BXSL_ERROR.thrw(info, trim(utf8(ao.toArray(), Prop.ENCODING)));
+      throw BXSL_ERROR.get(info, trim(utf8(ao.toArray(), Prop.ENCODING)));
     } finally {
       System.setErr(tmp);
     }
@@ -144,7 +144,7 @@ public final class FNXslt extends StandardFunc {
     if(it.type.isStringOrUntyped()) {
       return checkPath(it, ctx);
     }
-    throw STRNODTYPE.thrw(info, this, it.type);
+    throw STRNODTYPE.get(info, this, it.type);
   }
 
   /**

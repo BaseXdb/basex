@@ -45,7 +45,7 @@ public final class YMDur extends Dur {
 
     this(it);
     final double d = (double) mon + (p ? a.mon : -a.mon);
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) DURADDRANGE.thrw(ii, type);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw DURADDRANGE.get(ii, type);
     mon += p ? a.mon : -a.mon;
   }
 
@@ -61,10 +61,10 @@ public final class YMDur extends Dur {
       throws QueryException {
 
     this(it);
-    if(Double.isNaN(f)) DATECALC.thrw(ii, description(), f);
-    if(m ? Double.isInfinite(f) : f == 0) DATEZERO.thrw(ii, description());
+    if(Double.isNaN(f)) throw DATECALC.get(ii, description(), f);
+    if(m ? Double.isInfinite(f) : f == 0) throw DATEZERO.get(ii, description());
     final double d = m ? mon * f : mon / f;
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) DURADDRANGE.thrw(ii, type);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw DURADDRANGE.get(ii, type);
     mon = StrictMath.round(d);
   }
 
@@ -101,9 +101,8 @@ public final class YMDur extends Dur {
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    if(it.type != type) Err.diff(ii, it, this);
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
+    if(it.type != type) throw diffError(ii, it, this);
     final long m = mon - ((Dur) it).mon;
     return m < 0 ? -1 : m > 0 ? 1 : 0;
   }

@@ -54,7 +54,7 @@ public final class Suite {
           qc.close();
         }
       } catch(final IOException ex) {
-        throw IOERR.thrw(info, ex);
+        throw IOERR.get(info, ex);
       }
     }
     return suites;

@@ -49,7 +49,7 @@ public enum NodeType implements Type {
       if(o instanceof ProcessingInstruction) return new FPI((ProcessingInstruction) o);
       final Matcher m = Pattern.compile("<\\?(.*?) (.*)\\?>").matcher(o.toString());
       if(m.find()) return new FPI(m.group(1), m.group(2));
-      throw NODEERR.thrw(ii, this, o);
+      throw NODEERR.get(ii, this, o);
     }
   },
 
@@ -61,12 +61,10 @@ public enum NodeType implements Type {
       if(o instanceof BXElem)  return ((BXNode) o).getNode();
       if(o instanceof Element) return new FElem((Element) o, null, new TokenMap());
       try {
-        final DBNode db = new DBNode(new IOContent(o.toString()), new MainOptions());
-        return db.children().next();
+        return new DBNode(new IOContent(o.toString()), new MainOptions()).children().next();
       } catch(final IOException ex) {
-        NODEERR.thrw(ii, this, ex);
+        throw NODEERR.get(ii, this, ex);
       }
-      return null;
     }
   },
 
@@ -91,7 +89,7 @@ public enum NodeType implements Type {
         if(c.startsWith("<")) return new DBNode(new IOContent(c), new MainOptions());
         return new FDoc().add(new FTxt(c));
       } catch(final IOException ex) {
-        throw NODEERR.thrw(ii, this, ex);
+        throw NODEERR.get(ii, this, ex);
       }
     }
   },
@@ -114,7 +112,7 @@ public enum NodeType implements Type {
       if(o instanceof Attr) return new FAttr((Attr) o);
       final Matcher m = Pattern.compile(" (.*?)=\"(.*)\"").matcher(o.toString());
       if(m.find()) return new FAttr(m.group(1), m.group(2));
-      throw NODEERR.thrw(ii, this, o);
+      throw NODEERR.get(ii, this, o);
     }
   },
 
@@ -127,7 +125,7 @@ public enum NodeType implements Type {
       if(o instanceof Comment) return new FComm((Comment) o);
       final Matcher m = Pattern.compile("<!--(.*?)-->").matcher(o.toString());
       if(m.find()) return new FComm(m.group(1));
-      throw NODEERR.thrw(ii, this, o);
+      throw NODEERR.get(ii, this, o);
     }
   },
 
@@ -197,8 +195,7 @@ public enum NodeType implements Type {
   @Override
   public Item cast(final Object o, final QueryContext ctx, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    Util.notexpected(o);
-    return null;
+    throw Util.notExpected(o);
   }
 
   @Override
@@ -258,8 +255,7 @@ public enum NodeType implements Type {
    * @throws QueryException query exception
    */
   Item error(final Item it, final InputInfo ii) throws QueryException {
-    Err.cast(ii, this, it);
-    return null;
+    throw Err.castError(ii, this, it);
   }
 
   /**

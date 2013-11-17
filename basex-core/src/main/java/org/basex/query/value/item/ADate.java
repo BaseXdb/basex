@@ -66,7 +66,7 @@ public abstract class ADate extends ADateDur {
     try {
       df = DatatypeFactory.newInstance();
     } catch(final Exception ex) {
-      Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
   }
 
@@ -112,7 +112,7 @@ public abstract class ADate extends ADateDur {
     day = (byte) (Token.toInt(mt.group(4)) - 1);
 
     if(mon < 0 || mon >= 12 || day < 0 || day >= dpm(yea, mon)) dateErr(d, e, ii);
-    if(yea <= MIN_YEAR || yea > MAX_YEAR) DATERANGE.thrw(ii, type, d);
+    if(yea <= MIN_YEAR || yea > MAX_YEAR) throw DATERANGE.get(ii, type, d);
     zone(mt, 5, d, ii);
   }
 
@@ -158,7 +158,7 @@ public abstract class ADate extends ADateDur {
     } else {
       final int th = Token.toInt(mt.group(p + 2));
       final int tm = Token.toInt(mt.group(p + 3));
-      if(th > 14 || tm > 59 || th == 14 && tm != 0) INVALIDZONE.thrw(ii, val);
+      if(th > 14 || tm > 59 || th == 14 && tm != 0) throw INVALIDZONE.get(ii, val);
       final int mn = th * 60 + tm;
       zon = (short) ("-".equals(mt.group(p + 1)) ? -mn : mn);
     }
@@ -187,7 +187,7 @@ public abstract class ADate extends ADateDur {
     yea += div(mn, 12);
     day = (byte) Math.min(dpm(yea, mon) - 1, day);
 
-    if(yea <= MIN_YEAR || yea > MAX_YEAR) DATEADDRANGE.thrw(ii, this);
+    if(yea <= MIN_YEAR || yea > MAX_YEAR) throw DATEADDRANGE.get(ii, this);
   }
 
   /**
@@ -261,8 +261,8 @@ public abstract class ADate extends ADateDur {
         t = (short) ((c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET)) / 60000);
       } else {
         t = (short) (tz.min() + tz.hou() * 60);
-        if(tz.sec().signum() != 0) ZONESEC.thrw(ii, tz);
-        if(Math.abs(t) > 60 * 14 || tz.day() != 0) INVALZONE.thrw(ii, tz);
+        if(tz.sec().signum() != 0) throw ZONESEC.get(ii, tz);
+        if(Math.abs(t) > 60 * 14 || tz.day() != 0) throw INVALZONE.get(ii, tz);
       }
 
       // change time if two competing time zones exist

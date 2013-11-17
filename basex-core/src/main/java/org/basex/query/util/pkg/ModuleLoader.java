@@ -223,15 +223,15 @@ public final class ModuleLoader {
     try {
       clz = findClass(cp);
     } catch(final ClassNotFoundException ex) {
-      WHICHCLASS.thrw(ii, ex.getMessage());
+      throw WHICHCLASS.get(ii, ex.getMessage());
       // expected exception
     } catch(final Throwable th) {
-      MODINITERR.thrw(ii, th);
+      throw MODINITERR.get(ii, th);
     }
 
     final boolean qm = clz.getSuperclass() == QueryModule.class;
     final Object jm = Reflect.get(clz);
-    if(jm == null) INSTERR.thrw(ii, cp);
+    if(jm == null) throw INSTERR.get(ii, cp);
 
     // add all public methods of the class (ignore methods from super classes)
     final ArrayList<Method> list = new ArrayList<Method>();
@@ -262,7 +262,7 @@ public final class ModuleLoader {
 
     // find package in package dictionary
     final byte[] pDir = context.repo.pkgDict().get(name);
-    if(pDir == null) BXRE_NOTINST.thrw(ii, name);
+    if(pDir == null) throw BXRE_NOTINST.get(ii, name);
     final IOFile pkgDir = context.repo.path(string(pDir));
 
     // parse package descriptor
@@ -280,15 +280,12 @@ public final class ModuleLoader {
     if(!pkg.dep.isEmpty()) toLoad.add(name);
     for(final Dependency d : pkg.dep) {
       if(d.pkg != null) {
-      // we consider only package dependencies here
-      final byte[] depPkg = new PkgValidator(context.repo, ii).depPkg(d);
-      if(depPkg == null) {
-        BXRE_NOTINST.thrw(ii, string(d.pkg));
-      } else {
-        if(toLoad.contains(depPkg)) CIRCMODULE.thrw(ii);
+        // we consider only package dependencies here
+        final byte[] depPkg = new PkgValidator(context.repo, ii).depPkg(d);
+        if(depPkg == null) throw BXRE_NOTINST.get(ii, string(d.pkg));
+        if(toLoad.contains(depPkg)) throw CIRCMODULE.get(ii);
         addRepo(depPkg, toLoad, loaded, ii, qp);
       }
-     }
     }
     for(final Component comp : pkg.comps) {
       final String p = new IOFile(new IOFile(pkgDir, string(pkg.abbrev)),

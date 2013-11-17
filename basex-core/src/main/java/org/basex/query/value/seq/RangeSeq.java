@@ -56,7 +56,7 @@ public final class RangeSeq extends Seq {
 
   @Override
   public Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    throw CONDTYPE.thrw(ii, this);
+    throw CONDTYPE.get(ii, this);
   }
 
   @Override

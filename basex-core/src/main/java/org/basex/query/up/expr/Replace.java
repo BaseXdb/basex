@@ -43,16 +43,16 @@ public final class Replace extends Update {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Constr c = new Constr(ii, sc).add(ctx, expr[1]);
-    if(c.errAtt) UPNOATTRPER.thrw(info);
-    if(c.duplAtt != null) UPATTDUPL.thrw(info, new QNm(c.duplAtt));
+    if(c.errAtt) throw UPNOATTRPER.get(info);
+    if(c.duplAtt != null) throw UPATTDUPL.get(info, new QNm(c.duplAtt));
 
     final Iter t = ctx.iter(expr[0]);
     final Item i = t.next();
     // check target constraints
-    if(i == null) throw UPSEQEMP.thrw(info, Util.className(this));
+    if(i == null) throw UPSEQEMP.get(info, Util.className(this));
     final Type tp = i.type;
     if(!(i instanceof ANode) || tp == NodeType.DOC || t.next() != null)
-      UPTRGMULT.thrw(info);
+      throw UPTRGMULT.get(info);
     final ANode targ = (ANode) i;
     final DBNode dbn = ctx.updates.determineDataRef(targ, ctx);
 
@@ -70,14 +70,14 @@ public final class Replace extends Update {
       ctx.updates.add(new ReplaceValue(dbn.pre, dbn.data, info, txt), ctx);
     } else {
       final ANode par = targ.parent();
-      if(par == null) UPNOPAR.thrw(info, i);
+      if(par == null) throw UPNOPAR.get(info, i);
       if(tp == NodeType.ATT) {
         // replace attribute node
-        if(!list.isEmpty()) UPWRATTR.thrw(info);
+        if(!list.isEmpty()) throw UPWRATTR.get(info);
         list = checkNS(aList, par);
       } else {
         // replace non-attribute node
-        if(!aList.isEmpty()) UPWRELM.thrw(info);
+        if(!aList.isEmpty()) throw UPWRELM.get(info);
       }
       // conforms to specification: insertion sequence may be empty
       ctx.updates.add(new ReplaceNode(dbn.pre, dbn.data, info, list), ctx);

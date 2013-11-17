@@ -151,11 +151,11 @@ public final class Names extends TokenSet implements Index {
 
   @Override
   public IndexIterator iter(final IndexToken token) {
-    throw Util.notexpected();
+    throw Util.notExpected();
   }
 
   @Override
   public int costs(final IndexToken token) {
-    throw Util.notexpected();
+    throw Util.notExpected();
   }
 }

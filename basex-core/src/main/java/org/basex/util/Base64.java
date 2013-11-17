@@ -94,7 +94,7 @@ public final class Base64 {
     for(final byte c : token) if(c < 0 || c > ' ') bl.add(c);
     final byte[] s = bl.toArray();
     // input must be a multiple of four characters
-    if((s.length & 3) != 0) error(s);
+    if((s.length & 3) != 0) throw error(s);
 
     final int l = s.length, g = l >>> 2;
     int m = 0, n = g;
@@ -105,9 +105,9 @@ public final class Base64 {
       }
       if(s[l - 2] == '=') {
         ++m;
-        if(!contains(ENDING, s[l - 3])) error(substring(s, l - 3));
+        if(!contains(ENDING, s[l - 3])) throw error(substring(s, l - 3));
       }
-      if(m == 1 && !contains(ENDING2, s[l - 2])) error(substring(s, l - 4));
+      if(m == 1 && !contains(ENDING2, s[l - 2])) throw error(substring(s, l - 4));
     }
 
     final byte[] val = new byte[3 * g - m];
@@ -144,17 +144,18 @@ public final class Base64 {
    * @return encoded value
    */
   private static int b2h(final byte c) {
-    if(c < 0 || c >= B2H.length) error((char) c);
+    if(c < 0 || c >= B2H.length) throw error((char) c);
     final int result = B2H[c];
-    if(result < 0) error((char) c);
+    if(result < 0) throw error((char) c);
     return result;
   }
 
   /**
    * Throws an illegal argument exception for the specified character.
    * @param a character
+   * @return error
    */
-  private static void error(final Object a) {
-    throw new IllegalArgumentException(Util.info("Invalid Base64 cast: %.", a));
+  private static IllegalArgumentException error(final Object a) {
+    return new IllegalArgumentException(Util.info("Invalid Base64 cast: %.", a));
   }
 }

@@ -114,7 +114,7 @@ public final class FNAdmin extends StandardFunc {
             nli.close();
           }
         } catch(final IOException ex) {
-          IOERR.thrw(info, ex);
+          throw IOERR.get(info, ex);
         }
       }
     }

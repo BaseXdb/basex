@@ -272,11 +272,11 @@ public final class InlineFunc extends Single implements Scope {
     if(u) expr.checkUp();
     if(updating) {
       // updating function
-      if(ret != null) UPFUNCTYPE.thrw(info);
-      if(!u && !expr.isVacuous()) UPEXPECTF.thrw(info);
+      if(ret != null) throw UPFUNCTYPE.get(info);
+      if(!u && !expr.isVacuous()) throw UPEXPECTF.get(info);
     } else if(u) {
       // uses updates, but is not declared as such
-      UPNOT.thrw(info, description());
+      throw UPNOT.get(info, description());
     }
   }
 

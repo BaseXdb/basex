@@ -562,7 +562,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       try {
         pars.put(parts[0], Str.get(URLDecoder.decode(parts[1], UTF8)));
       } catch(final Exception ex) {
-        Util.notexpected(ex);
+        throw Util.notExpected(ex);
       }
     }
   }

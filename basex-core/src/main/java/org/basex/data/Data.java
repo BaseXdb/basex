@@ -178,7 +178,7 @@ public abstract class Data {
       case ATTRIBUTE: return atvindex;
       case FULLTEXT:  return ftxindex;
       case PATH:      return paths;
-      default:        throw Util.notexpected();
+      default:        throw Util.notExpected();
     }
   }
 

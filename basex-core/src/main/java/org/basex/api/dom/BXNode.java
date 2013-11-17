@@ -203,22 +203,22 @@ public abstract class BXNode implements Node {
 
   @Override
   public final boolean isDefaultNamespace(final String namespaceURI) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
   public final boolean isEqualNode(final Node cmp) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
   public final String lookupNamespaceURI(final String prefix) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
   public final String lookupPrefix(final String namespaceURI) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
@@ -301,7 +301,7 @@ public abstract class BXNode implements Node {
    * @return DOM exception
    */
   static DOMException readOnly() {
-    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+    return new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
         "DOM implementation is read-only.");
   }
 }

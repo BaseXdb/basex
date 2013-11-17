@@ -1,6 +1,7 @@
 package org.basex.query.value.item;
 
 import static java.lang.Double.*;
+import static org.basex.query.util.Err.*;
 
 import java.math.*;
 
@@ -123,7 +124,7 @@ public final class Dbl extends ANum {
     } catch(final NumberFormatException ex) {
       if(Token.eq(Token.trim(val), Token.INF)) return POSITIVE_INFINITY;
       if(Token.eq(Token.trim(val), Token.NINF)) return NEGATIVE_INFINITY;
-      throw ZERO.castErr(val, ii);
+      throw FUNCAST.get(ii, ZERO.type, val);
     }
   }
 }

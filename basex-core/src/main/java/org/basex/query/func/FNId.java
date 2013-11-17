@@ -188,7 +188,7 @@ public final class FNId extends StandardFunc {
       ANode n = node;
       while(n.type != NodeType.DOC) {
         n = n.parent();
-        if(n == null) throw IDDOC.thrw(info);
+        if(n == null) throw IDDOC.get(info);
       }
     }
     return node;

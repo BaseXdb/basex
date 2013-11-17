@@ -113,7 +113,7 @@ abstract class DBNew extends BasicOperation {
       final MemBuilder b = new MemBuilder(dbname, p);
       return new DataClip(b.build());
     } catch(final IOException ex) {
-      throw IOERR.thrw(info, ex);
+      throw IOERR.get(info, ex);
     }
   }
 
@@ -126,14 +126,14 @@ abstract class DBNew extends BasicOperation {
     for(final Entry<String, String> entry : options.entrySet()) {
       final String key = entry.getKey();
       if(!eq(key, K_N_OPT) && !eq(key, K_B_OPT) && !eq(key, K_S_OPT) ||
-         !create && eq(key, K_B_OPT[K_B_OPT.length - 1])) BASX_OPTIONS.thrw(info, key);
+         !create && eq(key, K_B_OPT[K_B_OPT.length - 1])) throw BASX_OPTIONS.get(info, key);
       final String v = entry.getValue();
       if(eq(key, K_N_OPT)) {
-        if(toInt(v) < 0) BASX_VALUE.thrw(info, key, v);
+        if(toInt(v) < 0) throw BASX_VALUE.get(info, key, v);
       } else if(eq(key, K_B_OPT)) {
         if(Util.yes(v)) options.put(key, Text.TRUE);
         else if(Util.no(v)) options.put(key, Text.FALSE);
-        else BASX_VALUE.thrw(info, key, v);
+        else throw BASX_VALUE.get(info, key, v);
       }
     }
   }

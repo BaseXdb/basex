@@ -1,5 +1,7 @@
 package org.basex.query.func;
 
+import static org.basex.query.util.Err.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
@@ -57,7 +59,7 @@ public final class FuncLit extends Single implements Scope {
 
     if(check) {
       final StaticFunc sf = ctx.funcs.get(name, args.length, info);
-      if(sf == null) throw Err.FUNCUNKNOWN.thrw(info, name.string());
+      if(sf == null) throw FUNCUNKNOWN.get(info, name.string());
       type = sf.funcType().seqType();
     }
 

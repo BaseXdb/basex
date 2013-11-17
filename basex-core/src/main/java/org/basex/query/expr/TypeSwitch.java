@@ -81,7 +81,7 @@ public final class TypeSwitch extends ParseExpr {
       if(iter != null) return iter;
     }
     // will never happen
-    throw Util.notexpected();
+    throw Util.notExpected();
   }
 
   @Override

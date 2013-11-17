@@ -216,7 +216,7 @@ public final class StringParser extends CmdParser {
         }
         break;
     }
-    throw Util.notexpected("command specified, but not implemented yet");
+    throw Util.notExpected("command specified, but not implemented yet");
   }
 
   /**

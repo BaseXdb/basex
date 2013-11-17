@@ -112,7 +112,7 @@ public final class CmpN extends Cmp {
 
   @Override
   public CmpN invert() {
-    throw Util.notexpected();
+    throw Util.notExpected();
   }
 
   @Override

@@ -90,19 +90,19 @@ final class XMLScanner extends Proc {
       // process document declaration...
       if(consume(DOCDECL)) {
         if(s()) {
-          if(!version()) error(DECLSTART);
+          if(!version()) throw error(DECLSTART);
           boolean s = s();
           enc = encoding();
           if(enc != null) {
-            if(!s) error(WSERROR);
+            if(!s) throw error(WSERROR);
             s = s();
           }
-          if(sddecl() != null && !s) error(WSERROR);
+          if(sddecl() != null && !s) throw error(WSERROR);
           s();
           int ch = nextChar();
-          if(ch != '?') error(WRONGCHAR, '?', (char) ch);
+          if(ch != '?') throw error(WRONGCHAR, '?', (char) ch);
           ch = nextChar();
-          if(ch != '>') error(WRONGCHAR, '>', (char) ch);
+          if(ch != '>') throw error(WRONGCHAR, '>', (char) ch);
         } else {
           prev(5);
         }
@@ -112,7 +112,7 @@ final class XMLScanner extends Proc {
       if(!fragment) {
         final int n = consume();
         if(!s(n)) {
-          if(n != '<') error(n == 0 ? DOCEMPTY : BEFOREROOT);
+          if(n != '<') throw error(n == 0 ? DOCEMPTY : BEFOREROOT);
           prev(1);
         }
       }
@@ -152,7 +152,7 @@ final class XMLScanner extends Proc {
    */
   void close() throws IOException {
     input.close();
-    if(!fragment && prolog) error(DOCEMPTY);
+    if(!fragment && prolog) throw error(DOCEMPTY);
   }
 
   /**
@@ -180,7 +180,7 @@ final class XMLScanner extends Proc {
         type = Type.DTD;
         dtd();
       } else {
-        error(COMMDASH);
+        throw error(COMMDASH);
       }
       return;
     }
@@ -230,7 +230,7 @@ final class XMLScanner extends Proc {
         state = State.CONTENT;
       } else {
         token.add(c);
-        error(CLOSING);
+        throw error(CLOSING);
       }
     } else if(s(c)) {
       // scan whitespace...
@@ -243,7 +243,7 @@ final class XMLScanner extends Proc {
       state = State.ATT;
     } else {
       // undefined character...
-      error(CHARACTER, (char) c);
+      throw error(CHARACTER, (char) c);
     }
   }
 
@@ -272,15 +272,15 @@ final class XMLScanner extends Proc {
     boolean wrong = false;
     int c = ch;
     do {
-      if(c == 0) error(ATTCLOSE, (char) 0);
+      if(c == 0) throw error(ATTCLOSE, (char) 0);
       wrong |= c == '\'' || c == '"';
-      if(c == '<') error(wrong ? ATTCLOSE : ATTCHAR, '<');
+      if(c == '<') throw error(wrong ? ATTCLOSE : ATTCHAR, '<');
       if(c == 0x0A) c = ' ';
       if(c == '&') {
         // verify...
         final byte[] r = ref(true);
         if(r.length == 1) token.add(r);
-        else if(!input.add(r, false)) error(RECENT);
+        else if(!input.add(r, false)) throw error(RECENT);
       } else {
         token.add(c);
       }
@@ -309,12 +309,12 @@ final class XMLScanner extends Proc {
           // scan entity
           final byte[] r = ref(true);
           if(r.length == 1) token.add(r);
-          else if(!input.add(r, false)) error(RECENT);
+          else if(!input.add(r, false)) throw error(RECENT);
         } else {
           if(c == ']') {
             // ']]>' not allowed in content
             if(consume() == ']') {
-              if(consume() == '>') error(CONTCDATA);
+              if(consume() == '>') throw error(CONTCDATA);
               prev(1);
             }
             prev(1);
@@ -328,7 +328,7 @@ final class XMLScanner extends Proc {
     }
     // end of file
     if(!fragment) {
-      if(!ws(token.finish())) error(AFTERROOT);
+      if(!ws(token.finish())) throw error(AFTERROOT);
       type = Type.EOF;
     }
   }
@@ -344,7 +344,7 @@ final class XMLScanner extends Proc {
       prev(1);
       return false;
     }
-    if(!consume(CDATA)) error(CDATASEC);
+    if(!consume(CDATA)) throw error(CDATASEC);
     return true;
   }
 
@@ -385,11 +385,11 @@ final class XMLScanner extends Proc {
    */
   private void pi() throws IOException {
     final byte[] tok = name(true);
-    if(eq(lc(tok), XML)) error(PIRES);
+    if(eq(lc(tok), XML)) throw error(PIRES);
     token.add(tok);
 
     int ch = nextChar();
-    if(ch != '?' && !ws(ch)) error(PITEXT);
+    if(ch != '?' && !ws(ch)) throw error(PITEXT);
     do {
       while(ch != '?') {
         token.add(ch);
@@ -417,7 +417,7 @@ final class XMLScanner extends Proc {
    * @throws IOException I/O exception
    */
   private void checkS() throws IOException {
-    if(!s()) error(NOWS, (char) consume());
+    if(!s()) throw error(NOWS, (char) consume());
   }
 
   /**
@@ -427,7 +427,7 @@ final class XMLScanner extends Proc {
    */
   private void check(final char ch) throws IOException {
     final int c = consume();
-    if(c != ch) error(WRONGCHAR, ch, (char) c);
+    if(c != ch) throw error(WRONGCHAR, ch, (char) c);
   }
 
   /**
@@ -436,7 +436,7 @@ final class XMLScanner extends Proc {
    * @throws IOException I/O exception
    */
   private void check(final byte[] tok) throws IOException {
-    if(!consume(tok)) error(WRONGCHAR, tok, (char) consume());
+    if(!consume(tok)) throw error(WRONGCHAR, tok, (char) consume());
   }
 
   /**
@@ -462,7 +462,7 @@ final class XMLScanner extends Proc {
    */
   private int qu() throws IOException {
     final int qu = consume();
-    if(qu != '\'' && qu != '"') error(SCANQUOTE, (char) qu);
+    if(qu != '\'' && qu != '"') throw error(SCANQUOTE, (char) qu);
     return qu;
   }
 
@@ -557,7 +557,7 @@ final class XMLScanner extends Proc {
    */
   private int nextChar() throws IOException {
     final int ch = consume();
-    if(ch == 0) error(UNCLOSED, token);
+    if(ch == 0) throw error(UNCLOSED, token);
     return ch;
   }
 
@@ -581,7 +581,7 @@ final class XMLScanner extends Proc {
       if(ch == '%' && pe) { // [69]
         final byte[] key = name(true);
         final byte[] val = pents.get(key);
-        if(val == null) error(UNKNOWNPE, key);
+        if(val == null) throw error(UNKNOWNPE, key);
         check(';');
         input.add(val, true);
       } else {
@@ -630,7 +630,7 @@ final class XMLScanner extends Proc {
     final TokenBuilder name = new TokenBuilder();
     int c = consume();
     if(!isStartChar(c)) {
-      if(f) error(INVNAME);
+      if(f) throw error(INVNAME);
       prev(1);
       return null;
     }
@@ -648,7 +648,7 @@ final class XMLScanner extends Proc {
     int c;
     while(isChar(c = nextChar())) name.add(c);
     prev(1);
-    if(name.isEmpty()) error(INVNAME);
+    if(name.isEmpty()) throw error(INVNAME);
   }
 
   /**
@@ -656,8 +656,8 @@ final class XMLScanner extends Proc {
    * @throws IOException I/O exception
    */
   private void dtd() throws IOException {
-    if(!prolog) error(TYPEAFTER);
-    if(!s()) error(ERRDT);
+    if(!prolog) throw error(TYPEAFTER);
+    if(!s()) throw error(ERRDT);
 
     name(true); // parse root tag
     s(); externalID(true, true); s();
@@ -709,23 +709,23 @@ final class XMLScanner extends Proc {
         if(consume(XDECL)) {
           check(XML); s();
           if(version()) checkS();
-          s(); if(encoding() == null) error(TEXTENC);
+          s(); if(encoding() == null) throw error(TEXTENC);
           ch = nextChar();
           if(s(ch)) ch = nextChar();
-          if(ch != '?') error(WRONGCHAR, '?', ch);
+          if(ch != '?') throw error(WRONGCHAR, '?', ch);
           ch = nextChar();
-          if(ch != '>') error(WRONGCHAR, '>', ch);
+          if(ch != '>') throw error(WRONGCHAR, '>', ch);
           cont = Arrays.copyOfRange(cont, input.pos(), cont.length);
         }
 
         s();
         if(r) {
           extSubsetDecl();
-          if(!consume((char) 0)) error(INVEND);
+          if(!consume((char) 0)) throw error(INVEND);
         }
         input = tin;
       } else {
-        if(f) error(SCANQUOTE, (char) qu);
+        if(f) throw error(SCANQUOTE, (char) qu);
         prev(1);
       }
     }
@@ -740,7 +740,7 @@ final class XMLScanner extends Proc {
     final int qu = qu();
     int ch;
     while((ch = nextChar()) != qu) {
-      if(!isChar(ch) && !contains(PUBIDTOK, ch)) error(PUBID, (char) ch);
+      if(!isChar(ch) && !contains(PUBIDTOK, ch)) throw error(PUBID, (char) ch);
     }
   }
 
@@ -768,7 +768,7 @@ final class XMLScanner extends Proc {
         while(c != 0) {
           if(consume(COND)) ++c;
           else if(consume(CONE)) --c;
-          else if(consume() == 0) error(INVEND);
+          else if(consume() == 0) throw error(INVEND);
         }
       }
     }
@@ -789,7 +789,7 @@ final class XMLScanner extends Proc {
         byte[] val = entityValue(true); //[74]
         if(val == null) {
           val = externalID(true, false);
-          if(val == null) error(INVEND);
+          if(val == null) throw error(INVEND);
         }
         s();
         pents.put(key, val);
@@ -799,7 +799,7 @@ final class XMLScanner extends Proc {
         byte[] val = entityValue(false); // [73] EntityDef
         if(val == null) {
           val = externalID(true, false);
-          if(val == null) error(INVEND);
+          if(val == null) throw error(INVEND);
           if(s()) {
             check(ND);
             checkS();
@@ -824,7 +824,7 @@ final class XMLScanner extends Proc {
             boolean alt = false;
             while(consume('|')) { s(); name(true); s(); alt = true; }
             check(')');
-            if(!consume('*') && alt) error(INVEND);
+            if(!consume('*') && alt) throw error(INVEND);
           } else {
             cp();
             s();
@@ -834,7 +834,7 @@ final class XMLScanner extends Proc {
             occ();
           }
         } else {
-          error(INVEND);
+          throw error(INVEND);
         }
       }
       s();
@@ -930,7 +930,7 @@ final class XMLScanner extends Proc {
     while((ch = nextChar()) != qu) {
       if(ch == '&') tok.add(ref(false));
       else if(ch == '%') {
-        if(!p) error(INVPE);
+        if(!p) throw error(INVPE);
         tok.add(peRef());
       } else {
         tok.add(ch);
@@ -957,7 +957,7 @@ final class XMLScanner extends Proc {
     if(!consume(VERS)) return false;
     s(); check('='); s();
     final int d = qu();
-    if(!consume(VERS10) && !consume(VERS11)) error(DECLVERSION);
+    if(!consume(VERS10) && !consume(VERS11)) throw error(DECLVERSION);
     check((char) d);
     return true;
   }
@@ -969,7 +969,7 @@ final class XMLScanner extends Proc {
    */
   private String encoding() throws IOException {
     if(!consume(ENCOD)) {
-      if(fragment) error(TEXTENC);
+      if(fragment) throw error(TEXTENC);
       return null;
     }
     s(); check('='); s();
@@ -984,7 +984,7 @@ final class XMLScanner extends Proc {
       prev(1);
     }
     check((char) d);
-    if(enc.isEmpty()) error(DECLENCODE, enc);
+    if(enc.isEmpty()) throw error(DECLENCODE, enc);
     final String e = string(enc.finish());
     input.encoding(e);
     return e;
@@ -1002,7 +1002,7 @@ final class XMLScanner extends Proc {
     byte[] sd = token(NO);
     if(!consume(sd)) {
       sd = token(YES);
-      if(!consume(sd) || fragment) error(DECLSTANDALONE);
+      if(!consume(sd) || fragment) throw error(DECLSTANDALONE);
     }
     check((char) d);
     return sd;
@@ -1013,10 +1013,9 @@ final class XMLScanner extends Proc {
    * @param e error message
    * @param a error arguments
    * @return build exception (indicates that an error is raised)
-   * @throws BuildException build exception
    */
-  private BuildException error(final String e, final Object... a) throws BuildException {
-    throw new BuildException(det() + COLS + e, a);
+  private BuildException error(final String e, final Object... a) {
+    return new BuildException(det() + COLS + e, a);
   }
 
   @Override

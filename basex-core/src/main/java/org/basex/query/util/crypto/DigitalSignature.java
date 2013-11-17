@@ -113,26 +113,26 @@ public final class DigitalSignature {
     byte[] b = c;
     if(b.length == 0) b = DEFC;
     b = CANONICALIZATIONS.get(lc(b));
-    if(b == null) CX_CANINV.thrw(info, c);
+    if(b == null) throw CX_CANINV.get(info, c);
     final String canonicalization = string(b);
 
     b = d;
     if(b.length == 0) b = DEFD;
     b = DIGESTS.get(lc(b));
-    if(b == null) CX_DIGINV.thrw(info, d);
+    if(b == null) throw CX_DIGINV.get(info, d);
     final String digest = string(b);
 
     b = sig;
     if(b.length == 0) b = DEFS;
     final byte[] tsig = b;
     b = SIGNATURES.get(lc(b));
-    if(b == null) CX_SIGINV.thrw(info, sig);
+    if(b == null) throw CX_SIGINV.get(info, sig);
     final String signature = string(b);
     final String keytype = string(tsig).substring(0, 3);
 
     b = t;
     if(b.length == 0) b = DEFT;
-    if(!TYPES.contains(lc(b))) CX_SIGTYPINV.thrw(info, t);
+    if(!TYPES.contains(lc(b))) throw CX_SIGTYPINV.get(info, t);
     final byte[] type = b;
 
     Item signedNode = null;
@@ -148,7 +148,7 @@ public final class DigitalSignature {
 
         final Document ceDOM = toDOMNode(ce);
         if(!"digital-certificate".equals(ceDOM.getDocumentElement().getNodeName()))
-          CX_INVNM.thrw(info, ceDOM);
+          throw CX_INVNM.get(info, ceDOM);
         final NodeList ceChildren = ceDOM.getDocumentElement().getChildNodes();
         final int s = ceChildren.getLength();
         int ci = 0;
@@ -178,14 +178,14 @@ public final class DigitalSignature {
         try {
           ks = KeyStore.getInstance(ksTY);
         } catch(final KeyStoreException ex) {
-          CX_KSNULL.thrw(info, ex);
+          throw CX_KSNULL.get(info, ex);
         }
 
         ks.load(new FileInputStream(ksURI), ksPW.toCharArray());
         pk = (PrivateKey) ks.getKey(kAlias, pkPW.toCharArray());
         final X509Certificate x509ce = (X509Certificate)
             ks.getCertificate(kAlias);
-        if(x509ce == null) CX_ALINV.thrw(info, kAlias);
+        if(x509ce == null) throw CX_ALINV.get(info, kAlias);
         final PublicKey puk = x509ce.getPublicKey();
         final KeyInfoFactory kifactory = fac.getKeyInfoFactory();
         final KeyValue keyValue = kifactory.newKeyValue(puk);
@@ -223,7 +223,7 @@ public final class DigitalSignature {
         final NodeList xRes = (NodeList) xExpr.evaluate(inputNode,
             XPathConstants.NODESET);
         if(xRes.getLength() < 1)
-          CX_XPINV.thrw(info, expr);
+          throw CX_XPINV.get(info, expr);
         tfList = new ArrayList<Transform>(2);
         tfList.add(fac.newTransform(Transform.XPATH,
             new XPathFilterParameterSpec(string(expr))));
@@ -271,29 +271,29 @@ public final class DigitalSignature {
       signedNode = NodeType.DOC.cast(inputNode, ctx, null, ii);
 
     } catch(final XPathExpressionException e) {
-      CX_XPINV.thrw(info, e);
+      throw CX_XPINV.get(info, e);
     } catch(final SAXException e) {
-      CX_IOEXC.thrw(info, e);
+      throw CX_IOEXC.get(info, e);
     } catch(final IOException e) {
-      CX_IOEXC.thrw(info, e);
+      throw CX_IOEXC.get(info, e);
     } catch(final ParserConfigurationException e) {
-      CX_IOEXC.thrw(info, e);
+      throw CX_IOEXC.get(info, e);
     } catch(final KeyStoreException e) {
-      CX_KSEXC.thrw(info, e);
+      throw CX_KSEXC.get(info, e);
     } catch(final MarshalException e) {
-      CX_SIGEXC.thrw(info, e);
+      throw CX_SIGEXC.get(info, e);
     } catch(final XMLSignatureException e) {
-      CX_SIGEXC.thrw(info, e);
+      throw CX_SIGEXC.get(info, e);
     } catch(final NoSuchAlgorithmException e) {
-      CX_ALGEXC.thrw(info, e);
+      throw CX_ALGEXC.get(info, e);
     } catch(final CertificateException e) {
-      CX_ALGEXC.thrw(info, e);
+      throw CX_ALGEXC.get(info, e);
     } catch(final UnrecoverableKeyException e) {
-      CX_NOKEY.thrw(info, e);
+      throw CX_NOKEY.get(info, e);
     } catch(final KeyException e) {
-      CX_NOKEY.thrw(info, e);
+      throw CX_NOKEY.get(info, e);
     } catch(final InvalidAlgorithmParameterException e) {
-      CX_ALGEXC.thrw(info, e);
+      throw CX_ALGEXC.get(info, e);
     }
     return signedNode;
   }
@@ -316,22 +316,22 @@ public final class DigitalSignature {
       final NodeList signl = doc.getElementsByTagNameNS(XMLSignature.XMLNS,
           "Signature");
       if(signl.getLength() < 1)
-        CX_NOSIG.thrw(info, node);
+        throw CX_NOSIG.get(info, node);
       valContext.setNode(signl.item(0));
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
       final XMLSignature signature = fac.unmarshalXMLSignature(valContext);
       coreVal = signature.validate(valContext);
 
     } catch(final XMLSignatureException e) {
-      CX_IOEXC.thrw(info, e);
+      throw CX_IOEXC.get(info, e);
     } catch(final SAXException e) {
-      CX_IOEXC.thrw(info, e);
+      throw CX_IOEXC.get(info, e);
     } catch(final ParserConfigurationException e) {
-      CX_IOEXC.thrw(info, e);
+      throw CX_IOEXC.get(info, e);
     } catch(final IOException e) {
-      CX_IOEXC.thrw(info, e);
+      throw CX_IOEXC.get(info, e);
     } catch(final MarshalException e) {
-      CX_SIGEXC.thrw(info, e);
+      throw CX_SIGEXC.get(info, e);
     }
 
     return Bln.get(coreVal);

@@ -134,7 +134,7 @@ public final class Bln extends Item {
     final byte[] s = Token.trim(str);
     if(Token.eq(s, Token.TRUE) || Token.eq(s, Token.ONE)) return true;
     if(Token.eq(s, Token.FALSE) || Token.eq(s, Token.ZERO)) return false;
-    throw FUNCAST.thrw(ii, AtomType.BLN, str);
+    throw FUNCAST.get(ii, AtomType.BLN, str);
   }
 
   @Override

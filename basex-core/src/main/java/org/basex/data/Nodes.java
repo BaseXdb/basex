@@ -67,7 +67,7 @@ public final class Nodes implements Result {
     data = d;
     ftpos = ft;
     set(n);
-    if(d == null) Util.notexpected("No data available");
+    if(d == null) throw Util.notExpected("No data available");
   }
 
   /**
@@ -249,7 +249,7 @@ public final class Nodes implements Result {
     try {
       return serialize().toString();
     } catch(final IOException ex) {
-      throw Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
   }
 }

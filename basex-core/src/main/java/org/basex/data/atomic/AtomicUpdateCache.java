@@ -210,37 +210,37 @@ public final class AtomicUpdateCache {
   static void check(final BasicUpdate a, final BasicUpdate b) {
     // check order of location PRE, must be strictly ordered low-to-high
     if(b.location < a.location)
-      Util.notexpected("Invalid order at location " + a.location);
+      throw Util.notExpected("Invalid order at location " + a.location);
 
     if(b.location == a.location) {
       // check invalid sequence of {@link Delete}, {@link Insert}
       // - the inserted node would directly be deleted without this restriction
       if(b instanceof Insert || b instanceof InsertAttr)
         if(a instanceof Delete)
-          Util.notexpected("Invalid sequence of delete, insert at location "
+          throw Util.notExpected("Invalid sequence of delete, insert at location "
           + a.location);
         else if(a instanceof Replace)
-          Util.notexpected("Invalid sequence of replace, insert at location "
+          throw Util.notExpected("Invalid sequence of replace, insert at location "
               + a.location);
 
       // check multiple {@link Delete}, {@link Replace}
       if(b.destructive() && a.destructive())
-        Util.notexpected("Multiple deletes/replaces on node " + a.location);
+        throw Util.notExpected("Multiple deletes/replaces on node " + a.location);
 
       // check multiple {@link Rename}
       if(b instanceof Rename && a instanceof Rename)
-        Util.notexpected("Multiple renames on node " + a.location);
+        throw Util.notExpected("Multiple renames on node " + a.location);
 
       // check multiple {@link UpdateValue}
       if(b instanceof UpdateValue && a instanceof UpdateValue)
-        Util.notexpected("Multiple updates on node " + a.location);
+        throw Util.notExpected("Multiple updates on node " + a.location);
 
       /* Check invalid order of destructive/non-destructive updates to support TAU
        *  cases like: <rename X, delete X>: node X would be deleted and then X+1 renamed,
        *  as this shifts down to X.
        */
       if(b.destructive() && !(a instanceof StructuralUpdate))
-        Util.notexpected("Invalid sequence of value update and destructive update at" +
+        throw Util.notExpected("Invalid sequence of value update and destructive update at" +
             " location " + a.location);
     }
   }

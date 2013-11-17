@@ -66,9 +66,9 @@ public abstract class Inspect {
       module = QueryProcessor.isLibrary(input) ? qp.parseLibrary(true) : qp.parseMain();
       return qp;
     } catch(final IOException ex) {
-      throw IOERR.thrw(info, ex);
+      throw IOERR.get(info, ex);
     } catch(final QueryException ex) {
-      throw IOERR.thrw(info, ex);
+      throw IOERR.get(info, ex);
     } finally {
       qc.close();
     }

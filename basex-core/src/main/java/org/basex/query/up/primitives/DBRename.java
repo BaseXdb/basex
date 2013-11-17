@@ -37,7 +37,7 @@ public final class DBRename extends BasicOperation {
   public void merge(final BasicOperation o) throws QueryException {
     for(final Entry<String, String> e : ((DBRename) o).map.entrySet()) {
       final String src = e.getKey();
-      if(map.containsKey(src)) UPPATHREN.thrw(info, src);
+      if(map.containsKey(src)) throw UPPATHREN.get(info, src);
       map.put(src, e.getValue());
     }
   }

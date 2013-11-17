@@ -111,7 +111,7 @@ public final class Empty extends Value {
 
   @Override
   public Item itemAt(final long pos) {
-    throw Util.notexpected();
+    throw Util.notExpected();
   }
 
   @Override

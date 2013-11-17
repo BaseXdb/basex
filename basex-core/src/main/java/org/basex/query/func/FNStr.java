@@ -152,7 +152,7 @@ public final class FNStr extends StandardFunc {
       final int i = (int) n;
       // check int boundaries before casting
       if(n < Integer.MIN_VALUE || n > Integer.MAX_VALUE || !XMLToken.valid(i))
-        INVCODE.thrw(info, Long.toHexString(n));
+        throw INVCODE.get(info, Long.toHexString(n));
       tb.add(i);
     }
     return Str.get(tb.finish());
@@ -296,7 +296,7 @@ public final class FNStr extends StandardFunc {
       try {
         form = Form.valueOf(string(n));
       } catch(final IllegalArgumentException ex) {
-        NORMUNI.thrw(info, n);
+        throw NORMUNI.get(info, n);
       }
     }
     return ascii(str) ? Str.get(str) : Str.get(Normalizer.normalize(string(str), form));

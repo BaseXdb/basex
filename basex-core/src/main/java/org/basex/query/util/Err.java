@@ -1175,20 +1175,18 @@ public enum Err {
    * @param ii input info
    * @param ext extended info
    * @return query exception (indicates that an error is raised)
-   * @throws QueryException query exception
    */
-  public QueryException thrw(final InputInfo ii, final Object... ext) throws QueryException {
-    throw new QueryException(ii, this, ext);
+  public QueryException get(final InputInfo ii, final Object... ext) {
+    return new QueryException(ii, this, ext);
   }
 
   /**
    * Throws a query I/O exception without {@link InputInfo} reference.
    * @param ext extended info
    * @return query I/O exception (indicates that an error is raised)
-   * @throws QueryIOException query I/O exception
    */
-  public QueryIOException thrwIO(final Object... ext) throws QueryIOException {
-    throw new QueryIOException(new QueryException(null, this, ext));
+  public QueryIOException getIO(final Object... ext) {
+    return new QueryIOException(get(null, ext));
   }
 
   /**
@@ -1306,17 +1304,13 @@ public enum Err {
    * @param ii input info
    * @param msg error message
    * @return exception or null
-   * @throws QueryException query exception
    */
-  public static QueryException thrw(final String name, final InputInfo ii, final String msg)
-      throws QueryException {
-
+  public static QueryException get(final String name, final InputInfo ii, final String msg) {
     for(final Err e : VALUES) {
-      if(e.toString().equals(name)) throw new QueryException(ii, e.qname(), msg).err(e);
+      if(e.toString().equals(name)) return new QueryException(ii, e.qname(), msg).err(e);
     }
     return null;
   }
-
 
   /**
    * Throws a comparison exception.
@@ -1324,11 +1318,9 @@ public enum Err {
    * @param it1 first item
    * @param it2 second item
    * @return query exception (indicates that an error is raised)
-   * @throws QueryException query exception
    */
-  public static QueryException diff(final InputInfo ii, final Item it1, final Item it2)
-      throws QueryException {
-    throw (it1 == it2 ? TYPECMP : INVTYPECMP).thrw(ii, it1.type, it2.type);
+  public static QueryException diffError(final InputInfo ii, final Item it1, final Item it2) {
+    return (it1 == it2 ? TYPECMP : INVTYPECMP).get(ii, it1.type, it2.type);
   }
 
   /**
@@ -1337,11 +1329,9 @@ public enum Err {
    * @param t expression cast type
    * @param v value
    * @return query exception (indicates that an error is raised)
-   * @throws QueryException query exception
    */
-  public static QueryException cast(final InputInfo ii, final Type t, final Value v)
-      throws QueryException {
-    throw INVCASTEX.thrw(ii, v.type, t, v);
+  public static QueryException castError(final InputInfo ii, final Type t, final Value v) {
+    return INVCASTEX.get(ii, v.type, t, v);
   }
 
   /**
@@ -1350,11 +1340,9 @@ public enum Err {
    * @param t expression cast type
    * @param e expression
    * @return query exception (indicates that an error is raised)
-   * @throws QueryException query exception
    */
-  public static QueryException treat(final InputInfo ii, final SeqType t, final Expr e)
-      throws QueryException {
-    throw INVTREAT.thrw(ii, e.description(), t, e);
+  public static QueryException treatError(final InputInfo ii, final SeqType t, final Expr e) {
+    return INVTREAT.get(ii, e.description(), t, e);
   }
 
   /**
@@ -1363,11 +1351,9 @@ public enum Err {
    * @param t expected type
    * @param it found item
    * @return query exception (indicates that an error is raised)
-   * @throws QueryException query exception
    */
-  public static QueryException type(final ParseExpr e, final Type t, final Item it)
-      throws QueryException {
-    throw INVCAST.thrw(e.info, it.type, t);
+  public static QueryException typeError(final ParseExpr e, final Type t, final Item it) {
+    return INVCAST.get(e.info, it.type, t);
   }
 
   /**
@@ -1375,10 +1361,9 @@ public enum Err {
    * @param e parsing expression
    * @param it found item
    * @return query exception (indicates that an error is raised)
-   * @throws QueryException query exception
    */
-  public static QueryException number(final ParseExpr e, final Item it) throws QueryException {
-    throw NONUMBER.thrw(e.info, e.description(), it.type);
+  public static QueryException numberError(final ParseExpr e, final Item it) {
+    return NONUMBER.get(e.info, e.description(), it.type);
   }
 
   /**
@@ -1387,21 +1372,18 @@ public enum Err {
    * @param t expected type
    * @param v value
    * @return query exception (indicates that an error is raised)
-   * @throws QueryException query exception
    */
-  public static QueryException value(final InputInfo ii, final Type t, final Object v)
-      throws QueryException {
-    throw INVALUE.thrw(ii, t, v);
+  public static QueryException valueError(final InputInfo ii, final Type t, final Object v) {
+    return INVALUE.get(ii, t, v);
   }
 
   /**
    * Throws an exception for circular static variables.
    * @param var variable expression
    * @return never
-   * @throws QueryException query exception
    */
-  public static QueryException circVar(final StaticVar var) throws QueryException {
-    throw (var.sc.xquery3() ? CIRCVAR30 : CIRCVAR).thrw(var.info, var);
+  public static QueryException circVarError(final StaticVar var) {
+    return (var.sc.xquery3() ? CIRCVAR30 : CIRCVAR).get(var.info, var);
   }
 
   @Override

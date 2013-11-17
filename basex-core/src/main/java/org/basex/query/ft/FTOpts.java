@@ -53,13 +53,13 @@ public final class FTOpts extends FTExpr {
   @Override
   public FTNode item(final QueryContext ctx, final InputInfo ii) {
     // shouldn't be called, as compile returns argument
-    throw Util.notexpected();
+    throw Util.notExpected();
   }
 
   @Override
   public FTIter iter(final QueryContext ctx) {
     // shouldn't be called, as compile returns argument
-    throw Util.notexpected();
+    throw Util.notExpected();
   }
 
   @Override

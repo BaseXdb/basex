@@ -71,8 +71,8 @@ public final class StaticVar extends StaticDecl {
 
   @Override
   public void compile(final QueryContext ctx) throws QueryException {
-    if(expr == null) throw (implicit ? VARUNDEF : VAREMPTY).thrw(info, this);
-    if(dontEnter) throw circVar(this);
+    if(expr == null) throw (implicit ? VARUNDEF : VAREMPTY).get(info, this);
+    if(dontEnter) throw circVarError(this);
 
     if(!compiled) {
       dontEnter = true;
@@ -104,9 +104,9 @@ public final class StaticVar extends StaticDecl {
    * @throws QueryException query exception
    */
   public Value value(final QueryContext ctx) throws QueryException {
-    if(dontEnter) circVar(this);
+    if(dontEnter) throw circVarError(this);
     if(lazy) {
-      if(!compiled) throw Util.notexpected(this + " was not compiled.");
+      if(!compiled) throw Util.notExpected(this + " was not compiled.");
       if(value != null) return value;
       dontEnter = true;
       final int fp = scope.enter(ctx);
@@ -121,7 +121,7 @@ public final class StaticVar extends StaticDecl {
     }
 
     if(value != null) return value;
-    if(expr == null) throw VAREMPTY.thrw(info, this);
+    if(expr == null) throw VAREMPTY.get(info, this);
     dontEnter = true;
     final int fp = scope.enter(ctx);
     try {
@@ -137,7 +137,7 @@ public final class StaticVar extends StaticDecl {
    * @throws QueryException query exception
    */
   public void checkUp() throws QueryException {
-    if(expr != null && expr.has(Flag.UPD)) UPNOT.thrw(info, description());
+    if(expr != null && expr.has(Flag.UPD)) throw UPNOT.get(info, description());
   }
 
   /**
@@ -186,7 +186,7 @@ public final class StaticVar extends StaticDecl {
   private Expr checkType(final Expr e, final InputInfo ii) throws QueryException {
     if(declType != null) {
       if(e instanceof Value) declType.treat((Value) e, ii);
-      else if(e.type().intersect(declType) == null) throw treat(ii, declType, e);
+      else if(e.type().intersect(declType) == null) throw treatError(ii, declType, e);
     }
     return e;
   }

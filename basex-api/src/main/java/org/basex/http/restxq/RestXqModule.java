@@ -130,7 +130,7 @@ final class RestXqModule {
       else qc.parseLibrary(cont, path, null);
       return qc;
     } catch(final IOException ex) {
-      throw IOERR.thrw(null, ex);
+      throw IOERR.get(null, ex);
     }
   }
 }

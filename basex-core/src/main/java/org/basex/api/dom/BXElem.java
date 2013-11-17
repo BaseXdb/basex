@@ -49,7 +49,7 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public String getAttributeNS(final String uri, final String ln) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
@@ -59,7 +59,7 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public BXAttr getAttributeNodeNS(final String uri, final String ln) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
@@ -69,12 +69,12 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public BXNList getElementsByTagNameNS(final String uri, final String ln) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
   public TypeInfo getSchemaTypeInfo() {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
@@ -89,7 +89,7 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public boolean hasAttributeNS(final String uri, final String ln) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override

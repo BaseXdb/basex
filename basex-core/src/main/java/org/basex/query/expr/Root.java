@@ -41,7 +41,7 @@ public final class Root extends Simple {
     final NodeSeqBuilder nc = new NodeSeqBuilder().check();
     for(Item i; (i = iter.next()) != null;) {
       final ANode n = root(i);
-      if(n == null || n.type != NodeType.DOC) CTXNODE.thrw(info);
+      if(n == null || n.type != NodeType.DOC) throw CTXNODE.get(info);
       nc.add(n);
     }
     return nc;

@@ -60,7 +60,7 @@ public final class Put extends BasicOperation {
           po.close();
         }
       } catch(final IOException ex) {
-        UPPUTERR.thrw(info, u);
+        throw UPPUTERR.get(info, u);
       }
     }
   }

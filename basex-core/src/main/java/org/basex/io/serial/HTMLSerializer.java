@@ -75,7 +75,7 @@ public class HTMLSerializer extends OutputSerializer {
   @Override
   protected void finishPi(final byte[] n, final byte[] v) throws IOException {
     if(sep) indent();
-    if(contains(v, '>')) SERPI.thrwIO();
+    if(contains(v, '>')) throw SERPI.getIO();
     print(PI_O);
     print(n);
     print(' ');
@@ -86,7 +86,7 @@ public class HTMLSerializer extends OutputSerializer {
   @Override
   protected void encode(final int ch) throws IOException {
     if(script) printChar(ch);
-    else if(ch > 0x7F && ch < 0xA0 && !html5) SERILL.thrwIO(Integer.toHexString(ch));
+    else if(ch > 0x7F && ch < 0xA0 && !html5) throw SERILL.getIO(Integer.toHexString(ch));
     else if(ch == 0xA0) print(E_NBSP);
     else super.encode(ch);
   }

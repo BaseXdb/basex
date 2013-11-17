@@ -130,7 +130,7 @@ public final class Dec extends ANum {
    * @throws QueryException query exception
    */
   public static BigDecimal parse(final double val, final InputInfo ii) throws QueryException {
-    if(Double.isNaN(val) || Double.isInfinite(val)) Err.value(ii, AtomType.DEC, val);
+    if(Double.isNaN(val) || Double.isInfinite(val)) throw valueError(ii, AtomType.DEC, val);
     return BigDecimal.valueOf(val);
   }
 
@@ -142,12 +142,12 @@ public final class Dec extends ANum {
    * @throws QueryException query exception
    */
   public static BigDecimal parse(final byte[] val, final InputInfo ii) throws QueryException {
-    if(contains(val, 'e') || contains(val, 'E')) FUNCAST.thrw(ii, AtomType.DEC, val);
+    if(contains(val, 'e') || contains(val, 'E')) throw FUNCAST.get(ii, AtomType.DEC, val);
 
     try {
       return new BigDecimal(Token.string(val).trim());
     } catch(final NumberFormatException ex) {
-      throw ZERO.castErr(val, ii);
+      throw FUNCAST.get(ii, ZERO.type, val);
     }
   }
 }

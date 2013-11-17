@@ -36,7 +36,7 @@ public final class ReplaceNode extends NodeCopy {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    UPMULTREPL.thrw(info, getTargetNode());
+    throw UPMULTREPL.get(info, getTargetNode());
   }
 
   @Override

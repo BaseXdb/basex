@@ -104,7 +104,7 @@ public final class OrderBy extends GFLWOR.Clause {
                   if(m == Dbl.NAN || m == Flt.NAN) m = null;
                   if(n == Dbl.NAN || n == Flt.NAN) n = null;
                   if(m != null && n != null && !m.comparable(n))
-                    Err.cast(or.info, m.type, n);
+                    throw Err.castError(or.info, m.type, n);
 
                   final int c = m == null
                       ? n == null ? 0                 : or.least ? -1 : 1

@@ -36,12 +36,12 @@ public final class CNSpace extends CName {
   public FNames item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Item it = name.item(ctx, info);
     final byte[] cp = checkEStr(it);
-    if(cp.length != 0 && !XMLToken.isNCName(cp)) INVNSNAME.thrw(info, cp);
+    if(cp.length != 0 && !XMLToken.isNCName(cp)) throw INVNSNAME.get(info, cp);
 
     final byte[] cu = trim(value(ctx, ii));
-    if(eq(cp, XML) ^ eq(cu, XMLURI)) CNXML.thrw(info);
-    if(eq(cp, XMLNS)) CNINV.thrw(info, cp);
-    if(eq(cu, XMLNSURI) || cu.length == 0) CNINV.thrw(info, cu);
+    if(eq(cp, XML) ^ eq(cu, XMLURI)) throw CNXML.get(info);
+    if(eq(cp, XMLNS)) throw CNINV.get(info, cp);
+    if(eq(cu, XMLNSURI) || cu.length == 0) throw CNINV.get(info, cu);
 
     return new FNames(cp, cu);
   }

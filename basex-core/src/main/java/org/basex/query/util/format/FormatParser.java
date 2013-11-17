@@ -89,23 +89,23 @@ public abstract class FormatParser extends FormatUtil {
       final int d = zeroes(ch);
       if(d != -1) {
         // mandatory-digit-sign
-        if(first != d) DIFFMAND.thrw(info, pic);
+        if(first != d) throw DIFFMAND.get(info, pic);
         mds = true;
         gss = false;
       } else if(ch == '#') {
         // optional-digit-sign
-        if(mds) OPTAFTER.thrw(info, pic);
+        if(mds) throw OPTAFTER.get(info, pic);
         gss = false;
       } else if(!Character.isLetter(ch)) {
         // grouping-separator-sign
-        if(gss) INVGROUP.thrw(info, pic);
+        if(gss) throw INVGROUP.get(info, pic);
         gss = true;
       } else {
         // any other letter: return default primary token
-        INVDDPATTERN.thrw(info, pic);
+        throw INVDDPATTERN.get(info, pic);
       }
     }
-    if(gss) INVGROUP.thrw(info, pic);
+    if(gss) throw INVGROUP.get(info, pic);
     return pic;
   }
 

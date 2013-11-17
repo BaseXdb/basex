@@ -71,7 +71,7 @@ public final class FNHash extends StandardFunc {
     try {
       return new B64(MessageDigest.getInstance(algo).digest(val));
     } catch(final NoSuchAlgorithmException ex) {
-      throw HASH_ALG.thrw(info, algo);
+      throw HASH_ALG.get(info, algo);
     }
   }
 }

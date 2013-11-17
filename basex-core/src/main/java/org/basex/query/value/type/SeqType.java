@@ -352,14 +352,14 @@ public final class SeqType {
       final InputInfo ii, final ExprInfo e) throws QueryException {
 
     if(it == null) {
-      if(!occ.check(0)) INVEMPTYEX.thrw(ii, e.description(), this);
+      if(!occ.check(0)) throw INVEMPTYEX.get(ii, e.description(), this);
       return Empty.SEQ;
     }
 
-    if(!occ.check(1)) INVCAST.thrw(ii, it.type, this);
+    if(!occ.check(1)) throw INVCAST.get(ii, it.type, this);
     final Value v = it.type.eq(type) ? it : type.cast(it, ctx, sc, ii);
     if(kind != null) {
-      for(final Item i : v) if(!kind.eq(it)) Err.cast(ii, type, i);
+      for(final Item i : v) if(!kind.eq(it)) throw Err.castError(ii, type, i);
     }
     return v;
   }
@@ -378,7 +378,7 @@ public final class SeqType {
       final InputInfo ii, final ExprInfo e) throws QueryException {
     if(val.size() < 2) return cast(val.isEmpty() ? null : val.itemAt(0), ctx, sc, ii, e);
 
-    if(!occ.check(val.size())) INVCAST.thrw(ii, val.type(), this);
+    if(!occ.check(val.size())) throw INVCAST.get(ii, val.type(), this);
     final ValueBuilder vb = new ValueBuilder((int) val.size());
     for(int i = 0; i < val.size(); i++) vb.add(cast(val.itemAt(i), ctx, sc, ii, e));
     return vb.value();
@@ -395,7 +395,7 @@ public final class SeqType {
     if(val.type().instanceOf(this)) return val;
 
     final int size = (int) val.size();
-    if(!occ.check(size)) Err.treat(ii, this, val);
+    if(!occ.check(size)) throw Err.treatError(ii, this, val);
 
     // empty sequence has all types
     if(size == 0) return Empty.SEQ;
@@ -405,7 +405,7 @@ public final class SeqType {
     // check heterogeneous sequences
     if(!val.homogeneous())
       for(int i = 1; ins && i < size; i++) ins = instance(val.itemAt(i), true);
-    if(!ins) Err.treat(ii, this, val);
+    if(!ins) throw Err.treatError(ii, this, val);
     return val;
   }
 
@@ -426,8 +426,8 @@ public final class SeqType {
       if(atom != it && atom.type.instanceOf(type)) return it;
       if(atom.type == AtomType.ATM) {
         if(type.nsSensitive()) {
-          if(sc.xquery3()) NSSENS.thrw(ii, it.type, type);
-          Err.treat(ii, withOcc(Occ.ONE), it);
+          if(sc.xquery3()) throw NSSENS.get(ii, it.type, type);
+          throw Err.treatError(ii, withOcc(Occ.ONE), it);
         }
         return type.cast(atom, ctx, sc, ii);
       }
@@ -444,7 +444,7 @@ public final class SeqType {
       return ((FItem) it).coerceTo((FuncType) type, ctx, ii);
     }
 
-    throw Err.treat(ii, withOcc(Occ.ONE), it);
+    throw Err.treatError(ii, withOcc(Occ.ONE), it);
   }
 
   /**
@@ -459,7 +459,7 @@ public final class SeqType {
   public Value funcConvert(final QueryContext ctx, final StaticContext sc,
       final InputInfo ii, final Value val) throws QueryException {
     final long n = val.size();
-    if(!occ.check(n)) throw Err.treat(ii, this, val);
+    if(!occ.check(n)) throw Err.treatError(ii, this, val);
     if(n == 0) return Empty.SEQ;
     if(val.isItem())
       return instance((Item) val, true) ? val : funcConv(ctx, sc, ii, (Item) val);

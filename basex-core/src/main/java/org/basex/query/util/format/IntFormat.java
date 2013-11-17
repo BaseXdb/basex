@@ -24,7 +24,7 @@ public final class IntFormat extends FormatParser {
 
     final int sc = lastIndexOf(p, ';');
     final byte[] pres = sc == -1 ? p : substring(p, 0, sc);
-    if(pres.length == 0) PICEMPTY.thrw(info, p);
+    if(pres.length == 0) throw PICEMPTY.get(info, p);
     finish(presentation(pres, ONE, false));
     if(sc == -1) return;
 
@@ -37,7 +37,7 @@ public final class IntFormat extends FormatParser {
       final TokenBuilder ord = new TokenBuilder();
       if(tp.consume('(')) {
         while(!tp.consume(')')) {
-          if(!tp.more()) INVORDINAL.thrw(info, mod);
+          if(!tp.more()) throw INVORDINAL.get(info, mod);
           final int cp = tp.next();
           if(cp != '-') ord.add(cp);
         }
@@ -46,6 +46,6 @@ public final class IntFormat extends FormatParser {
     }
     // parse alphabetical/traditional flag
     if(!tp.consume('a')) tp.consume('t');
-    if(tp.more()) INVORDINAL.thrw(info, mod);
+    if(tp.more()) throw INVORDINAL.get(info, mod);
   }
 }

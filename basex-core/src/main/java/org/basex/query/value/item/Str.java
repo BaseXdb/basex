@@ -74,7 +74,7 @@ public class Str extends AStr {
       final int bl = bytes.length;
       for(int b = 0; b < bl; b += Token.cl(bytes, b)) {
         final int cp = Token.cp(bytes, b);
-        if(!XMLToken.valid(cp)) INVCODE.thrw(ii, Integer.toHexString(cp));
+        if(!XMLToken.valid(cp)) throw INVCODE.get(ii, Integer.toHexString(cp));
       }
     }
     return get(bytes);

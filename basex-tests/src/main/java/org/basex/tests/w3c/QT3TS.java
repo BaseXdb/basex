@@ -887,10 +887,10 @@ public final class QT3TS {
           slow = new TreeMap<Long, String>();
         } else if(c == 'p') {
           final File f = new File(arg.string());
-          if(!f.isDirectory()) arg.usage();
+          if(!f.isDirectory()) throw arg.usage();
           basePath = f.getCanonicalPath();
         } else {
-          arg.usage();
+          throw arg.usage();
         }
       } else {
         single = arg.string();

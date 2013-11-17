@@ -1,13 +1,14 @@
 package org.basex.query.var;
 
-import org.basex.data.ExprInfo;
+import static org.basex.query.util.Err.*;
+
+import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.query.expr.*;
-import org.basex.query.util.*;
 import org.basex.util.*;
 
 /**
@@ -114,7 +115,7 @@ public final class Var extends ExprInfo {
 
     if(t == null) return;
     if(declType != null) {
-      if(declType.occ.intersect(t.occ) == null) Err.INVCAST.thrw(ii, t, declType);
+      if(declType.occ.intersect(t.occ) == null) throw INVCAST.get(ii, t, declType);
       if(!t.convertibleTo(declType)) return;
     }
 
@@ -165,7 +166,7 @@ public final class Var extends ExprInfo {
       throws QueryException {
     if(!checksType() || declType.instance(val)) return val;
     if(promote) return declType.funcConvert(ctx, sc, ii, val);
-    throw Err.INVCAST.thrw(ii, val.type(), declType);
+    throw INVCAST.get(ii, val.type(), declType);
   }
 
   /**

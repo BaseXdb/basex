@@ -1,9 +1,9 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -49,7 +49,7 @@ public final class Unary extends Single {
     if(it == null) return null;
     final Type ip = it.type;
 
-    if(!ip.isNumberOrUntyped()) Err.number(this, it);
+    if(!ip.isNumberOrUntyped()) throw numberError(this, it);
     final double d = it.dbl(info);
     if(ip.isUntyped()) return Dbl.get(minus ? -d : d);
 
@@ -60,7 +60,7 @@ public final class Unary extends Single {
       case DEC: return Dec.get(it.dec(info).negate());
       default:
         final long l = it.itr(info);
-        if(l == Long.MIN_VALUE) Err.RANGE.thrw(info, it);
+        if(l == Long.MIN_VALUE) throw RANGE.get(info, it);
         return Int.get(-l);
     }
   }

@@ -1,5 +1,7 @@
 package org.basex.query.var;
 
+import static org.basex.query.util.Err.*;
+
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -65,7 +67,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
       final QNm name = e.getKey();
       final VarEntry ve = e.getValue();
       if(ve.var == null) {
-        if(name.uri().length != 0) throw Err.VARUNDEF.thrw(ve.refs[0].info, ve.refs[0]);
+        if(name.uri().length != 0) throw VARUNDEF.get(ve.refs[0].info, ve.refs[0]);
         ve.setVar(new StaticVar(sc, name, ve.refs[0].info));
       }
     }
@@ -144,7 +146,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
 
       @Override
       public void remove() {
-        Util.notexpected();
+        throw Util.notExpected();
       }
     };
   }
@@ -170,7 +172,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
      * @throws QueryException if the variable was already declared
      */
     void setVar(final StaticVar vr) throws QueryException {
-      if(var != null) throw Err.VARDUPL.thrw(vr.info, var);
+      if(var != null) throw VARDUPL.get(vr.info, var);
       var = vr;
       for(final StaticVarRef ref : refs) ref.init(var);
     }

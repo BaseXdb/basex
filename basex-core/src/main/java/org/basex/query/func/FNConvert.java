@@ -112,7 +112,7 @@ public final class FNConvert extends StandardFunc {
   private Str integerToBase(final QueryContext ctx, final InputInfo ii) throws QueryException {
 
     final long num = checkItr(expr[0], ctx), base = checkItr(expr[1], ctx);
-    if(base < 2 || base > 36) INVBASE.thrw(ii, base);
+    if(base < 2 || base > 36) throw INVBASE.get(ii, base);
 
     // use fast variant for powers of two
     for(int i = 1, p = 2; i < 6; i++, p <<= 1)
@@ -153,14 +153,14 @@ public final class FNConvert extends StandardFunc {
 
     final byte[] str = checkStr(expr[0], ctx);
     final long base = checkItr(expr[1], ctx);
-    if(base < 2 || base > 36) INVBASE.thrw(ii, base);
+    if(base < 2 || base > 36) throw INVBASE.get(ii, base);
 
     long res = 0;
     for(final byte b : str) {
       final int num = b <= '9' ? b - 0x30 : (b & 0xDF) - 0x37;
       if(!(b >= '0' && b <= '9' || b >= 'a' && b <= 'z' ||
           b >= 'A' && b <= 'Z') || num >= base)
-        INVDIG.thrw(ii, base, (char) (b & 0xff));
+        throw INVDIG.get(ii, base, (char) (b & 0xff));
 
       res = res * base + num;
     }
@@ -178,7 +178,7 @@ public final class FNConvert extends StandardFunc {
     try {
       return BytSeq.get(checkItem(expr[0], ctx).input(info).content());
     } catch(final IOException ex) {
-      throw BXCO_STRING.thrw(info, ex);
+      throw BXCO_STRING.get(info, ex);
     }
   }
 
@@ -221,7 +221,7 @@ public final class FNConvert extends StandardFunc {
   private Int dayTimeToInteger(final QueryContext ctx) throws QueryException {
     final DTDur dur = (DTDur) checkType(checkItem(expr[0], ctx), AtomType.DTD);
     final BigDecimal ms = dur.sec.multiply(BigDecimal.valueOf(1000));
-    if(ms.compareTo(ADateDur.BDMAXLONG) > 0) INTRANGE.thrw(info, dur);
+    if(ms.compareTo(ADateDur.BDMAXLONG) > 0) throw INTRANGE.get(info, dur);
     return Int.get(ms.longValue());
   }
 
@@ -238,7 +238,7 @@ public final class FNConvert extends StandardFunc {
     try {
       return Str.get(toString(bin.input(info), enc, ctx));
     } catch(final IOException ex) {
-      throw BXCO_STRING.thrw(info, ex);
+      throw BXCO_STRING.get(info, ex);
     }
   }
 
@@ -285,7 +285,7 @@ public final class FNConvert extends StandardFunc {
     try {
       return toBinary(in, enc);
     } catch(final CharacterCodingException ex) {
-      throw BXCO_BASE64.thrw(info);
+      throw BXCO_BASE64.get(info);
     }
   }
 

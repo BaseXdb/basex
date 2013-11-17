@@ -36,7 +36,7 @@ public final class B64Stream extends B64 {
     try {
       return input.read();
     } catch(final IOException ex) {
-      throw error.thrw(ii, ex);
+      throw error.get(ii, ex);
     }
   }
 
@@ -45,7 +45,7 @@ public final class B64Stream extends B64 {
     try {
       return new BufferInput(input);
     } catch(final IOException ex) {
-      throw error.thrw(ii, ex);
+      throw error.get(ii, ex);
     }
   }
 

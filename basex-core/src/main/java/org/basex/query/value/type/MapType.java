@@ -40,7 +40,7 @@ public final class MapType extends FuncType {
       final Map m = (Map) it;
       if(m.hasType(this)) return m;
     }
-    throw Err.cast(ii, this, it);
+    throw Err.castError(ii, this, it);
   }
 
   @Override

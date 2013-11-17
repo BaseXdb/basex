@@ -52,11 +52,11 @@ final class JarParser {
         else if(eq(CLASS, name.local())) desc.classes.add(next.string());
         // [CG] Packaging: add warning if unknown elements are encountered
       }
-      if(desc.jars.isEmpty()) BXRE_JARDESC.thrw(info, NOJARS);
-      else if(desc.classes.isEmpty()) BXRE_JARDESC.thrw(info, NOCLASSES);
+      if(desc.jars.isEmpty()) throw BXRE_JARDESC.get(info, NOJARS);
+      else if(desc.classes.isEmpty()) throw BXRE_JARDESC.get(info, NOCLASSES);
       return desc;
     } catch(final IOException ex) {
-      throw BXRE_JARFAIL.thrw(info, ex);
+      throw BXRE_JARFAIL.get(info, ex);
     }
   }
 }

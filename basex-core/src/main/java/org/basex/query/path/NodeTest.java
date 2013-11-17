@@ -88,7 +88,7 @@ public class NodeTest extends Test {
       return type.instanceOf(other.type) ? this : null;
     }
     if(other instanceof NameTest) {
-      throw Util.notexpected(other);
+      throw Util.notExpected(other);
     }
 
     return null;

@@ -416,6 +416,6 @@ public final class JsonParser extends InputParser {
    */
   private QueryIOException error(final String msg, final Object... ext) throws QueryIOException {
     final int[] lc = new InputInfo(this).lineCol();
-    throw BXJS_PARSE.thrwIO(lc[0], lc[1], Util.inf(msg, ext));
+    throw BXJS_PARSE.getIO(lc[0], lc[1], Util.inf(msg, ext));
   }
 }

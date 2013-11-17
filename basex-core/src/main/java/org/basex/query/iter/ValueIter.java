@@ -51,7 +51,7 @@ public abstract class ValueIter extends Iter implements Iterable<Item> {
 
       @Override
       public void remove() {
-        Util.notexpected();
+        throw Util.notExpected();
       }
     };
   }

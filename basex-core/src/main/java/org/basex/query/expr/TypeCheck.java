@@ -1,8 +1,8 @@
 package org.basex.query.expr;
 
+import static org.basex.query.util.Err.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -56,7 +56,7 @@ public final class TypeCheck extends Single {
 
     if(argType.type.instanceOf(type.type)) {
       final SeqType.Occ occ = argType.occ.intersect(type.occ);
-      if(occ == null) throw Err.INVCAST.thrw(info, argType, type);
+      if(occ == null) throw INVCAST.get(info, argType, type);
     }
 
     final Expr opt = expr.typeCheck(this, ctx, scp);
@@ -75,7 +75,7 @@ public final class TypeCheck extends Single {
     final Value val = expr.value(ctx);
     if(type.instance(val)) return val;
     if(promote) return type.funcConvert(ctx, sc, info, val);
-    throw Err.INVCAST.thrw(info, val.type(), type);
+    throw INVCAST.get(info, val.type(), type);
   }
 
   @Override

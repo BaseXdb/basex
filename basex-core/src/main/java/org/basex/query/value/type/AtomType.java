@@ -385,7 +385,7 @@ public enum AtomType implements Type {
       final BigDecimal v = checkNum(it, ii).dec(ii);
       final BigDecimal i = v.setScale(0, BigDecimal.ROUND_DOWN);
       if(v.signum() < 0 || v.compareTo(Dec.MAXULNG) > 0 ||
-        it.type.isStringOrUntyped() && !v.equals(i)) FUNCAST.thrw(ii, this, it);
+        it.type.isStringOrUntyped() && !v.equals(i)) throw FUNCAST.get(ii, this, it);
       return new Dec(i, this);
     }
   },
@@ -676,7 +676,7 @@ public enum AtomType implements Type {
 
       if(!it.type.isStringOrUntyped()) invCast(it, ii);
       final Uri u = Uri.uri(it.string(ii));
-      if(!u.isValid()) FUNCAST.thrw(ii, this, it);
+      if(!u.isValid()) throw FUNCAST.get(ii, this, it);
       return u;
     }
     @Override
@@ -695,9 +695,9 @@ public enum AtomType implements Type {
       // xquery 3.0 also allows untyped arguments
       if(it.type != STR && !(sc.xquery3() && it.type.isUntyped())) invCast(it, ii);
       final byte[] nm = trim(it.string(ii));
-      if(!XMLToken.isQName(nm)) FUNCAST.thrw(ii, this, it);
+      if(!XMLToken.isQName(nm)) throw FUNCAST.get(ii, this, it);
       final QNm qn = new QNm(nm, sc);
-      if(!qn.hasURI() && qn.hasPrefix()) NSDECL.thrw(ii, qn.prefix());
+      if(!qn.hasURI() && qn.hasPrefix()) throw NSDECL.get(ii, qn.prefix());
       return qn;
     }
     @Override
@@ -800,7 +800,7 @@ public enum AtomType implements Type {
   @Override
   public Item cast(final Object o, final QueryContext ctx, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    throw Util.notexpected(o);
+    throw Util.notExpected(o);
   }
 
   @Override
@@ -896,18 +896,18 @@ public enum AtomType implements Type {
     final Type ip = it.type;
     if(ip == DBL || ip == FLT) {
       final double d = it.dbl(ii);
-      if(Double.isNaN(d) || Double.isInfinite(d)) value(ii, this, it);
-      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) INTRANGE.thrw(ii, d);
-      if(min != max && (d < min || d > max)) FUNCAST.thrw(ii, this, it);
+      if(Double.isNaN(d) || Double.isInfinite(d)) throw valueError(ii, this, it);
+      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw INTRANGE.get(ii, d);
+      if(min != max && (d < min || d > max)) throw FUNCAST.get(ii, this, it);
       return (long) d;
     }
     if(min == max) {
       final double d = it.dbl(ii);
-      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) FUNCAST.thrw(ii, this, it);
+      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw FUNCAST.get(ii, this, it);
     }
 
     final long l = it.itr(ii);
-    if(min != max && (l < min || l > max)) FUNCAST.thrw(ii, this, it);
+    if(min != max && (l < min || l > max)) throw FUNCAST.get(ii, this, it);
     return l;
   }
 
@@ -942,7 +942,7 @@ public enum AtomType implements Type {
    * @throws QueryException query exception
    */
   Item invCast(final Item it, final InputInfo ii) throws QueryException {
-    throw Err.cast(ii, this, it);
+    throw castError(ii, this, it);
   }
 
   /**
@@ -953,7 +953,7 @@ public enum AtomType implements Type {
    * @throws QueryException query exception
    */
   Item invValue(final Item it, final InputInfo ii) throws QueryException {
-    throw FUNCCASTEX.thrw(ii, it.type(), this, it);
+    throw FUNCCASTEX.get(ii, it.type(), this, it);
   }
 
   /**

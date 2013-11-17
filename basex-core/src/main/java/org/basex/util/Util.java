@@ -48,10 +48,10 @@ public final class Util {
    * @param ext optional extension
    * @return runtime exception (indicates that an error is raised)
    */
-  public static RuntimeException notexpected(final Object... ext) {
+  public static RuntimeException notExpected(final Object... ext) {
     final TokenBuilder tb = new TokenBuilder();
     tb.addExt("%", ext.length == 0 ? "Not Expected." : ext[0]);
-    throw new RuntimeException(tb.toString());
+    return new RuntimeException(tb.toString());
   }
 
   /**
@@ -59,10 +59,10 @@ public final class Util {
    * @param ext optional extension
    * @return runtime exception (indicates that an error is raised)
    */
-  public static RuntimeException notimplemented(final Object... ext) {
+  public static UnsupportedOperationException notImplemented(final Object... ext) {
     final TokenBuilder tb = new TokenBuilder("Not Implemented");
     if(ext.length != 0) tb.addExt(" (%)", ext);
-    throw new UnsupportedOperationException(tb.add('.').toString());
+    return new UnsupportedOperationException(tb.add('.').toString());
   }
 
   /**
@@ -258,8 +258,7 @@ public final class Util {
     try {
       return new ProcessBuilder(sl.toArray()).start();
     } catch(final IOException ex) {
-      notexpected(ex);
-      return null;
+      throw notExpected(ex);
     }
   }
 

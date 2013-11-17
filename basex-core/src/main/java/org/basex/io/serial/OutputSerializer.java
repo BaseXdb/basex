@@ -107,7 +107,7 @@ public abstract class OutputSerializer extends Serializer {
     try {
       encoding = Charset.forName(enc);
     } catch(final Exception ex) {
-      throw SERENCODING.thrwIO(enc);
+      throw SERENCODING.getIO(enc);
     }
     utf8 = enc == UTF8;
 
@@ -131,7 +131,7 @@ public abstract class OutputSerializer extends Serializer {
     indent  = opts.yes(INDENT) && format;
 
     webdav = "webdav".equals(maps);
-    if(!webdav && !maps.isEmpty()) SERMAP.thrwIO(maps);
+    if(!webdav && !maps.isEmpty()) throw SERMAP.getIO(maps);
 
     if(docsys.isEmpty()) docsys = null;
     if(docpub.isEmpty()) docpub = null;
@@ -166,10 +166,10 @@ public abstract class OutputSerializer extends Serializer {
         if(!html || c.contains(":") && (!html5 || !c.contains("html:"))) cdata.add(c);
       }
 
-      if(undecl && ver.equals(V10)) SERUNDECL.thrwIO();
+      if(undecl && ver.equals(V10)) throw SERUNDECL.getIO();
       if(xml) {
         if(omitDecl) {
-          if(!saomit || !ver.equals(V10) && docsys != null) SERSTAND.thrwIO();
+          if(!saomit || !ver.equals(V10) && docsys != null) throw SERSTAND.getIO();
         } else {
           print(PI_O);
           print(DOCDECL1);
@@ -538,6 +538,6 @@ public abstract class OutputSerializer extends Serializer {
     final String val = opts.get(option);
     if(val.isEmpty()) return allowed.length > 0 ? allowed[0] : val;
     for(final String a : allowed) if(a.equals(val)) return val;
-    throw SERNOTSUPP.thrwIO(Options.allowed(option, (Object[]) allowed));
+    throw SERNOTSUPP.getIO(Options.allowed(option, (Object[]) allowed));
   }
 }

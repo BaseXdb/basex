@@ -62,14 +62,14 @@ public final class FNInfo extends StandardFunc {
    */
   private Iter error(final QueryContext ctx) throws QueryException {
     final int al = expr.length;
-    if(al == 0) FUNERR1.thrw(info);
+    if(al == 0) throw FUNERR1.get(info);
 
     QNm name = FUNERR1.qname();
     String msg = FUNERR1.desc;
 
     final Item it = expr[0].item(ctx, info);
     if(it == null) {
-      if(al == 1) INVEMPTY.thrw(info, description());
+      if(al == 1) throw INVEMPTY.get(info, description());
     } else {
       name = checkQNm(it, ctx, sc);
     }

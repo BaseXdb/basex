@@ -82,7 +82,7 @@ public final class FNClient extends StandardFunc {
     try {
       return ctx.sessions().add(new ClientSession(host, port, user, pass));
     } catch(final IOException ex) {
-      throw BXCL_CONN.thrw(info, ex);
+      throw BXCL_CONN.get(info, ex);
     }
   }
 
@@ -103,9 +103,9 @@ public final class FNClient extends StandardFunc {
       cs.setOutputStream(null);
       return Str.get(ao.toArray());
     } catch(final BaseXException ex) {
-      throw BXCL_COMMAND.thrw(info, ex);
+      throw BXCL_COMMAND.get(info, ex);
     } catch(final IOException ex) {
-      throw BXCL_COMM.thrw(info, ex);
+      throw BXCL_COMM.get(info, ex);
     }
   }
 
@@ -137,7 +137,7 @@ public final class FNClient extends StandardFunc {
         final String k = it.getKey();
         final Value v = it.getValue();
         final ArrayOutput val = v.serialize();
-        if(!v.isItem()) BXCL_ITEM.thrw(info, v);
+        if(!v.isItem()) throw BXCL_ITEM.get(info, v);
         final String t = v.type().toString();
         if(k.isEmpty()) cq.context(val, t);
         else cq.bind(k, val, t);
@@ -153,12 +153,12 @@ public final class FNClient extends StandardFunc {
     } catch(final BaseXException ex) {
       final Matcher m = QUERYPAT.matcher(ex.getMessage());
       if(m.find()) {
-        thrw(m.group(1), info, m.group(2));
-        throw new QueryException(info, new QNm(m.group(1)), m.group(2));
+        final QueryException exc = get(m.group(1), info, m.group(2));
+        throw exc == null ? new QueryException(info, new QNm(m.group(1)), m.group(2)) : exc;
       }
-      throw BXCL_QUERY.thrw(info, ex);
+      throw BXCL_QUERY.get(info, ex);
     } catch(final IOException ex) {
-      throw BXCL_COMM.thrw(info, ex);
+      throw BXCL_COMM.get(info, ex);
     } finally {
       if(cq != null) try { cq.close(); } catch(final IOException ignored) { }
     }
@@ -175,7 +175,7 @@ public final class FNClient extends StandardFunc {
       session(ctx, true).close();
       return null;
     } catch(final IOException ex) {
-      throw BXCL_COMMAND.thrw(info, ex);
+      throw BXCL_COMMAND.get(info, ex);
     }
   }
 
@@ -192,7 +192,7 @@ public final class FNClient extends StandardFunc {
 
     final Uri id = (Uri) checkType(expr[0].item(ctx, info), AtomType.URI);
     final ClientSession cs = ctx.sessions().get(id);
-    if(cs == null) BXCL_NOTAVL.thrw(info, id);
+    if(cs == null) throw BXCL_NOTAVL.get(info, id);
     if(del) ctx.sessions().remove(id);
     return cs;
   }

@@ -63,10 +63,10 @@ public final class CElem extends CName {
       // create and check QName
       final QNm nm = qname(ctx, ii);
       final byte[] cp = nm.prefix(), cu = nm.uri();
-      if(eq(cp, XML) ^ eq(cu, XMLURI)) CEXML.thrw(info, cu, cp);
-      if(eq(cu, XMLNSURI)) CEINV.thrw(info, cu);
-      if(eq(cp, XMLNS)) CEINV.thrw(info, cp);
-      if(!nm.hasURI() && nm.hasPrefix()) INVPREF.thrw(info, nm);
+      if(eq(cp, XML) ^ eq(cu, XMLURI)) throw CEXML.get(info, cu, cp);
+      if(eq(cu, XMLNSURI)) throw CEINV.get(info, cu);
+      if(eq(cp, XMLNS)) throw CEINV.get(info, cp);
+      if(!nm.hasURI() && nm.hasPrefix()) throw INVPREF.get(info, nm);
 
       // analyze element namespace unless it is "xml"
       if(!eq(cp, XML)) {
@@ -91,13 +91,13 @@ public final class CElem extends CName {
 
       // add child and attribute nodes
       constr.add(ctx, expr);
-      if(constr.errAtt) NOATTALL.thrw(info);
-      if(constr.errNS) NONSALL.thrw(info);
-      if(constr.duplAtt != null) CATTDUPL.thrw(info, constr.duplAtt);
-      if(constr.duplNS != null) DUPLNSCONS.thrw(info, constr.duplNS);
+      if(constr.errAtt) throw NOATTALL.get(info);
+      if(constr.errNS) throw NONSALL.get(info);
+      if(constr.duplAtt != null) throw CATTDUPL.get(info, constr.duplAtt);
+      if(constr.duplNS != null) throw DUPLNSCONS.get(info, constr.duplNS);
 
       // check namespaces
-      if(constr.nspaces.contains(EMPTY) && !nm.hasURI()) DUPLNSCONS.thrw(info, EMPTY);
+      if(constr.nspaces.contains(EMPTY) && !nm.hasURI()) throw DUPLNSCONS.get(info, EMPTY);
 
       // add namespaces from constructor
       final Atts cns = constr.nspaces;

@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -212,9 +213,9 @@ public final class CmpV extends Cmp {
     if(b == null) return null;
     if(a.comparable(b)) return Bln.get(op.eval(a, b, collation, info));
 
-    if(a instanceof FItem) Err.FIEQ.thrw(info, a);
-    if(b instanceof FItem) Err.FIEQ.thrw(info, b);
-    throw Err.INVTYPECMP.thrw(info, a.type, b.type);
+    if(a instanceof FItem) throw FIEQ.get(info, a);
+    if(b instanceof FItem) throw FIEQ.get(info, b);
+    throw INVTYPECMP.get(info, a.type, b.type);
   }
 
   @Override

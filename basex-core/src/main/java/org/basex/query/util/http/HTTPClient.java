@@ -56,7 +56,7 @@ public final class HTTPClient {
 
     try {
       if(request == null) {
-        if(href == null || href.length == 0) HC_PARAMS.thrw(info);
+        if(href == null || href.length == 0) throw HC_PARAMS.get(info);
         final HttpURLConnection conn = openConnection(string(href));
         try {
           return new HTTPResponse(info, options).getResponse(conn, Bln.FALSE.string(), null);
@@ -67,7 +67,7 @@ public final class HTTPClient {
 
       final HTTPRequest r = new HTTPRequestParser(info).parse(request, bodies);
       final byte[] dest = href == null ? r.attrs.get(HREF) : href;
-      if(dest == null) HC_URL.thrw(info);
+      if(dest == null) throw HC_URL.get(info);
 
       final HttpURLConnection conn = openConnection(string(dest));
       try {
@@ -85,7 +85,7 @@ public final class HTTPClient {
         conn.disconnect();
       }
     } catch(final IOException ex) {
-      throw HC_ERROR.thrw(info, ex);
+      throw HC_ERROR.get(info, ex);
     }
   }
 
@@ -102,7 +102,7 @@ public final class HTTPClient {
 
     final URL url = new URL(dest);
     if(!eqic(url.getProtocol(), "HTTP", "HTTPS"))
-      HC_ERROR.thrw(info, "Invalid URL: " + url);
+      throw HC_ERROR.get(info, "Invalid URL: " + url);
     return (HttpURLConnection) url.openConnection();
   }
 

@@ -98,7 +98,7 @@ public final class FNFt extends StandardFunc {
     if(expr.length > 1) {
       // name of the marker element; default is <mark/>
       m = checkStr(expr[1], ctx);
-      if(!XMLToken.isQName(m)) Err.value(info, AtomType.QNM, m);
+      if(!XMLToken.isQName(m)) throw valueError(info, AtomType.QNM, m);
     }
     if(expr.length > 2) {
       l = (int) checkItr(expr[2], ctx);
@@ -179,7 +179,7 @@ public final class FNFt extends StandardFunc {
     opt.set(ST, opts.get(FTOptions.STEMMING));
     opt.ln = Language.get(opts.get(FTOptions.LANGUAGE));
     opt.cs = opts.get(FTOptions.CASE);
-    if(opt.is(FZ) && opt.is(WC)) BXFT_MATCH.thrw(info, this);
+    if(opt.is(FZ) && opt.is(WC)) throw BXFT_MATCH.get(info, this);
 
     final FTOpt tmp = ctx.ftOpt();
     ctx.ftOpt(opt);
@@ -200,14 +200,14 @@ public final class FNFt extends StandardFunc {
     final FTOptions opts = checkOptions(2, Q_OPTIONS, new FTOptions(), ctx);
 
     final IndexContext ic = new IndexContext(data, false);
-    if(!data.meta.ftxtindex) BXDB_INDEX.thrw(info, data.meta.name,
+    if(!data.meta.ftxtindex) throw BXDB_INDEX.get(info, data.meta.name,
         IndexType.FULLTEXT.toString().toLowerCase(Locale.ENGLISH));
 
     final FTOpt opt = new FTOpt().copy(data.meta);
     final FTMode mode = opts.get(FTIndexOptions.MODE);
     opt.set(FZ, opts.get(FTIndexOptions.FUZZY));
     opt.set(WC, opts.get(FTIndexOptions.WILDCARDS));
-    if(opt.is(FZ) && opt.is(WC)) BXFT_MATCH.thrw(info, this);
+    if(opt.is(FZ) && opt.is(WC)) throw BXFT_MATCH.get(info, this);
 
     final FTOpt tmp = ctx.ftOpt();
     ctx.ftOpt(opt);

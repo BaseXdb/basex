@@ -45,16 +45,16 @@ public final class CAttr extends CName {
     final byte[] cp = nm.prefix();
     if(comp) {
       final byte[] cu = nm.uri();
-      if(eq(cp, XML) ^ eq(cu, XMLURI)) CAXML.thrw(info);
-      if(eq(cu, XMLNSURI)) CAINV.thrw(info, cu);
+      if(eq(cp, XML) ^ eq(cu, XMLURI)) throw CAXML.get(info);
+      if(eq(cu, XMLNSURI)) throw CAINV.get(info, cu);
       if(eq(cp, XMLNS) || cp.length == 0 && eq(nm.string(), XMLNS))
-        CAINV.thrw(info, nm.string());
+        throw CAINV.get(info, nm.string());
 
       // create new standard namespace to cover most frequent cases
       if(eq(cp, EMPTY) && !eq(cu, EMPTY))
         nm = new QNm(concat(NS0, nm.string()), cu);
     }
-    if(!nm.hasURI() && nm.hasPrefix()) INVPREF.thrw(info, nm);
+    if(!nm.hasURI() && nm.hasPrefix()) throw INVPREF.get(info, nm);
 
     byte[] val = value(ctx, ii);
     if(eq(cp, XML) && eq(nm.local(), ID)) val = norm(val);

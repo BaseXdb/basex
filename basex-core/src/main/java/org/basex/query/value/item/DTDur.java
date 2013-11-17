@@ -64,7 +64,7 @@ public final class DTDur extends Dur {
     this(it);
     sec = p ? sec.add(a.sec) : sec.subtract(a.sec);
     final double d = sec.doubleValue();
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) DURADDRANGE.thrw(ii, type);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw DURADDRANGE.get(ii, type);
   }
 
   /**
@@ -79,8 +79,8 @@ public final class DTDur extends Dur {
       throws QueryException {
 
     this(it);
-    if(Double.isNaN(f)) DATECALC.thrw(ii, description(), f);
-    if(m ? Double.isInfinite(f) : f == 0) DATEZERO.thrw(ii, description());
+    if(Double.isNaN(f)) throw DATECALC.get(ii, description(), f);
+    if(m ? Double.isInfinite(f) : f == 0) throw DATEZERO.get(ii, description());
     if(m ? f == 0 : Double.isInfinite(f)) {
       sec = BigDecimal.ZERO;
     } else {
@@ -110,7 +110,7 @@ public final class DTDur extends Dur {
     sec = dat.days().subtract(sub.days()).multiply(DAYSECONDS).add(
         dat.seconds().subtract(sub.seconds()));
     final double d = sec.doubleValue();
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) DATEADDRANGE.thrw(ii, type);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw DATEADDRANGE.get(ii, type);
   }
 
   /**
@@ -151,7 +151,7 @@ public final class DTDur extends Dur {
   @Override
   public int diff(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
-    if(it.type != type) Err.diff(ii, it, this);
+    if(it.type != type) throw diffError(ii, it, this);
     return sec.subtract(((ADateDur) it).sec).signum();
   }
 }

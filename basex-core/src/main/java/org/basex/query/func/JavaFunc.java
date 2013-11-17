@@ -49,12 +49,12 @@ public final class JavaFunc extends JavaMapping {
     } catch(final InvocationTargetException ex) {
       final Throwable cause = ex.getCause();
       throw cause instanceof QueryException ? ((QueryException) cause).info(info) :
-        JAVAERR.thrw(info, cause);
+        JAVAERR.get(info, cause);
     } catch(final QueryException ex) {
       throw ex;
     } catch(final Throwable ex) {
       Util.debug(ex);
-      throw JAVAFUN.thrw(info, name(), foundArgs(args));
+      throw JAVAFUN.get(info, name(), foundArgs(args));
     }
   }
 
@@ -74,7 +74,7 @@ public final class JavaFunc extends JavaMapping {
       final Object[] arg = args(con.getParameterTypes(), null, ar, true);
       if(arg != null) return con.newInstance(arg);
     }
-    throw JAVACON.thrw(info, name(), foundArgs(ar));
+    throw JAVACON.get(info, name(), foundArgs(ar));
   }
 
   /**
@@ -111,7 +111,7 @@ public final class JavaFunc extends JavaMapping {
         return meth.invoke(inst, arg);
       }
     }
-    throw JAVAMTH.thrw(info, name(), foundArgs(ar));
+    throw JAVAMTH.get(info, name(), foundArgs(ar));
   }
 
   /**

@@ -126,6 +126,6 @@ public final class NameTest extends Test {
 
   @Override
   public Test intersect(final Test other) {
-    throw Util.notexpected(other);
+    throw Util.notExpected(other);
   }
 }

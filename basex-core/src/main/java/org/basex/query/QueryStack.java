@@ -65,7 +65,7 @@ public final class QueryStack {
    */
   private int pos(final Var v) {
     final int pos = fp + v.slot;
-    if(pos < fp || sl <= pos) throw Util.notexpected(v);
+    if(pos < fp || sl <= pos) throw Util.notExpected(v);
     return pos;
   }
 

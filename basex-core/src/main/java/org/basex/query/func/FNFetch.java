@@ -81,14 +81,14 @@ public final class FNFetch extends StandardFunc {
         final URLConnection hc = url.openConnection();
         mt = hc.getContentType();
       } catch(final IOException ex) {
-        throw BXFE_IO.thrw(info, ex);
+        throw BXFE_IO.get(info, ex);
       }
     } else if(io instanceof IOContent) {
       mt = MimeTypes.APP_XML;
     } else {
       mt = io.exists() ? MimeTypes.get(path) : null;
     }
-    if(mt == null) throw BXFE_IO.thrw(info, new FileNotFoundException(path));
+    if(mt == null) throw BXFE_IO.get(info, new FileNotFoundException(path));
     return Str.get(mt);
   }
 }

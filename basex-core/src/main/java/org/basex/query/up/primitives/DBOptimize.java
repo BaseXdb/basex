@@ -70,7 +70,7 @@ public final class DBOptimize extends DBNew {
       if(all) OptimizeAll.optimizeAll(data, qc.context, null);
       else Optimize.optimize(data, rebuild, null);
     } catch(final IOException ex) {
-      UPDBOPTERR.thrw(info, ex);
+      throw UPDBOPTERR.get(info, ex);
     } finally {
       resetOptions();
     }

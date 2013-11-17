@@ -35,7 +35,7 @@ public final class RenameNode extends UpdatePrimitive {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    UPMULTREN.thrw(info, getTargetNode());
+    throw UPMULTREN.get(info, getTargetNode());
   }
 
   @Override

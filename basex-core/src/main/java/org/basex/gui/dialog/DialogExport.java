@@ -212,7 +212,7 @@ public final class DialogExport extends BaseXDialog {
     final SerialMethod mth = SerialMethod.valueOf(method.getSelectedItem());
     try {
       gui.set(MainOptions.EXPORTER, options(mth));
-    } catch(final BaseXException ex) { Util.notexpected(ex); }
+    } catch(final BaseXException ex) { throw Util.notExpected(ex); }
 
     super.close();
     path.store();

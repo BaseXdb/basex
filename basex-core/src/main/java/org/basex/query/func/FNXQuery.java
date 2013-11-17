@@ -99,7 +99,7 @@ public final class FNXQuery extends StandardFunc {
     // evaluate query
     try {
       qc.parseMain(string(qu), path, sctx);
-      if(qc.updating) BXXQ_UPDATING.thrw(info);
+      if(qc.updating) throw BXXQ_UPDATING.get(info);
       qc.compile();
       final ValueBuilder vb = new ValueBuilder();
       cache(qc.iter(), vb, ctx);
@@ -121,7 +121,7 @@ public final class FNXQuery extends StandardFunc {
     try {
       return eval(ctx, io.read(), io.path());
     } catch(final IOException ex) {
-      throw IOERR.thrw(info, ex);
+      throw IOERR.get(info, ex);
     }
   }
 

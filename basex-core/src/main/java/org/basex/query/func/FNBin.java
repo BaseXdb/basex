@@ -112,7 +112,7 @@ public class FNBin extends StandardFunc {
     try {
       return new B64(Hex.decode(bytes, info));
     } catch(final QueryException ex) {
-      throw BIN_NNC.thrw(info);
+      throw BIN_NNC.get(info);
     }
   }
 
@@ -153,7 +153,7 @@ public class FNBin extends StandardFunc {
       }
       return new B64(binary2bytes(bin));
     } catch(final NumberFormatException ex) {
-      throw BIN_NNC.thrw(info);
+      throw BIN_NNC.get(info);
     }
   }
 
@@ -172,7 +172,7 @@ public class FNBin extends StandardFunc {
       if(b == '1') {
         tmp[l + i >>> 3] |= 0x80 >>> (i - r & 7);
       } else if(b != '0') {
-        throw BIN_NNC.thrw(info);
+        throw BIN_NNC.get(info);
       }
     }
     return tmp;
@@ -231,7 +231,7 @@ public class FNBin extends StandardFunc {
     final ByteList bl = new ByteList(Math.max(Array.CAPACITY, (int) ir.size()));
     for(Item it; (it = ir.next()) != null;) {
       final long l = checkItr(it);
-      if(l < 0 || l > 255) throw BIN_OOR_X.thrw(info, l);
+      if(l < 0 || l > 255) throw BIN_OOR_X.get(info, l);
       bl.add((int) l);
     }
     return new B64(bl.toArray());
@@ -326,8 +326,8 @@ public class FNBin extends StandardFunc {
     final byte[] bytes = b64.binary(info);
     final int bl = bytes.length;
 
-    if(sz < 0) throw BIN_NS_X.thrw(info, sz);
-    if(octet < 0 || octet > 255) throw BIN_OOR_X.thrw(info, octet);
+    if(sz < 0) throw BIN_NS_X.get(info, sz);
+    if(octet < 0 || octet > 255) throw BIN_OOR_X.get(info, octet);
 
     final byte[] tmp = new byte[(int) (bl + sz)];
     if(left) {
@@ -358,7 +358,7 @@ public class FNBin extends StandardFunc {
     final int sl = search.length;
 
     final int[] bounds = bounds(off, null, bl);
-    if(sl == 0) throw BIN_ESI.thrw(info, off);
+    if(sl == 0) throw BIN_ESI.get(info, off);
 
     final int pos = indexOf(bytes, search, bounds[0]);
     return pos == -1 ? null : Int.get(pos);
@@ -390,7 +390,7 @@ public class FNBin extends StandardFunc {
     try {
       return Str.get(FNConvert.toString(new IOContent(bytes).inputStream(), enc, true));
     } catch(final IOException ex) {
-      throw BIN_DE.thrw(info, ex);
+      throw BIN_DE.get(info, ex);
     }
   }
 
@@ -407,7 +407,7 @@ public class FNBin extends StandardFunc {
     try {
       return new B64(FNConvert.toBinary(str, enc));
     } catch(final CharacterCodingException ex) {
-      throw BIN_EE.thrw(info);
+      throw BIN_EE.get(info);
     }
   }
 
@@ -446,7 +446,7 @@ public class FNBin extends StandardFunc {
     final long sz = checkItr(expr[1], ctx);
     final ByteOrder bo = order(2, ctx);
 
-    if(sz < 0 || sz > Long.MAX_VALUE) throw BIN_NS_X.thrw(info, sz);
+    if(sz < 0 || sz > Long.MAX_VALUE) throw BIN_NS_X.get(info, sz);
 
     final byte[] tmp = new byte[(int) sz];
     final int tl = tmp.length;
@@ -537,7 +537,7 @@ public class FNBin extends StandardFunc {
     final byte[] bytes2 = b2.binary(info);
     final int bl1 = bytes1.length;
     final int bl2 = bytes2.length;
-    if(bl1 != bl2) throw BIN_DLA_X_X.thrw(info, bl1, bl2);
+    if(bl1 != bl2) throw BIN_DLA_X_X.get(info, bl1, bl2);
 
     final byte[] tmp = new byte[bl1];
     for(int b = 0; b < bl1; b++) {
@@ -612,7 +612,7 @@ public class FNBin extends StandardFunc {
     final Item it = e.item(ctx, info);
     if(it == null) {
       if(empty) return null;
-      throw INVEMPTY.thrw(info, description());
+      throw INVEMPTY.get(info, description());
     }
     return (B64) checkType(it, AtomType.B64);
   }
@@ -642,7 +642,7 @@ public class FNBin extends StandardFunc {
     final byte[] order = checkStr(expr[o], ctx);
     if(eq(order, BIG)) return ByteOrder.BIG_ENDIAN;
     if(eq(order, LITTLE)) return ByteOrder.LITTLE_ENDIAN;
-    throw BIN_USO_X.thrw(info, order);
+    throw BIN_USO_X.get(info, order);
   }
 
   /**
@@ -656,13 +656,13 @@ public class FNBin extends StandardFunc {
   private int[] bounds(final Long off, final Long len, final int sz) throws QueryException {
     int o = 0, s = sz;
     if(off != null) {
-      if(off < 0) throw BIN_NO_X.thrw(info, off);
-      if(off > sz || off > Integer.MAX_VALUE) throw BIN_OBE_X_X.thrw(info, off);
+      if(off < 0) throw BIN_NO_X.get(info, off);
+      if(off > sz || off > Integer.MAX_VALUE) throw BIN_OBE_X_X.get(info, off);
       o = (int) off.longValue();
     }
     if(len != null) {
-      if(len < 0) throw BIN_NS_X.thrw(info, off);
-      if(o + len > sz || len > Integer.MAX_VALUE) throw BIN_OBE_X_X_X.thrw(info, off, len, sz);
+      if(len < 0) throw BIN_NS_X.get(info, off);
+      if(o + len > sz || len > Integer.MAX_VALUE) throw BIN_OBE_X_X_X.get(info, off, len, sz);
       s = (int) len.longValue();
     } else {
       s = sz - o;

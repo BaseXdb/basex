@@ -51,7 +51,7 @@ public final class FNUnit extends StandardFunc {
   private Item assrt(final QueryContext ctx) throws QueryException {
     final byte[] str = expr.length < 2 ? null : checkStr(expr[1], ctx);
     if(expr[0].ebv(ctx, info).bool(info)) return null;
-    throw str == null ? UNIT_ASSERT.thrw(info) : UNIT_MESSAGE.thrw(info, str);
+    throw str == null ? UNIT_ASSERT.get(info) : UNIT_MESSAGE.get(info, str);
   }
 
   /**
@@ -61,7 +61,7 @@ public final class FNUnit extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item fail(final QueryContext ctx) throws QueryException {
-    throw UNIT_MESSAGE.thrw(info, checkStr(expr[0], ctx));
+    throw UNIT_MESSAGE.get(info, checkStr(expr[0], ctx));
   }
 
   /**

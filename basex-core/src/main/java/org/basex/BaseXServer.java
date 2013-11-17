@@ -258,13 +258,13 @@ public final class BaseXServer extends Main implements Runnable {
             context.globalopts.set(GlobalOptions.LOG, false);
             break;
           default:
-            arg.usage();
+            throw arg.usage();
         }
       } else {
         if("stop".equalsIgnoreCase(arg.string())) {
           stopped = true;
         } else {
-          arg.usage();
+          throw arg.usage();
         }
       }
     }

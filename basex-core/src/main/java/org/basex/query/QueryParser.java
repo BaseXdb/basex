@@ -577,9 +577,9 @@ public class QueryParser extends InputParser {
           FuncOptions.serializer(node, ctx.serialOpts, info);
 
           final HashMap<String, String> free = ctx.serialOpts.free();
-          if(!free.isEmpty()) SERWHICH.thrw(info, free.keySet().iterator().next());
+          if(!free.isEmpty()) throw SERWHICH.get(info, free.keySet().iterator().next());
           final StringOption cm = SerializerOptions.USE_CHARACTER_MAPS;
-          if(!ctx.serialOpts.get(cm).isEmpty()) SERWHICH.thrw(info, cm.name());
+          if(!ctx.serialOpts.get(cm).isEmpty()) throw SERWHICH.get(info, cm.name());
         } catch(final IOException ex) {
           error(OUTDOC, val);
         }
@@ -3989,7 +3989,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   QueryException error(final Err err, final Object... arg) throws QueryException {
-    throw err.thrw(info(), arg);
+    throw err.get(info(), arg);
   }
 
   /**

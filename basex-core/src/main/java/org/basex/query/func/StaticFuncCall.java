@@ -1,6 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -62,7 +63,7 @@ public final class StaticFuncCall extends FuncCall {
 
     // disallow call of private functions from module with different uri
     if(func.ann.contains(Ann.Q_PRIVATE) && !Token.eq(func.sc.baseURI().string(),
-        sc.baseURI().string())) throw Err.FUNCPRIV.thrw(info, name.string());
+        sc.baseURI().string())) throw FUNCPRIV.get(info, name.string());
 
     // compile mutually recursive functions
     func.compile(ctx);
@@ -97,7 +98,7 @@ public final class StaticFuncCall extends FuncCall {
   public StaticFuncCall init(final StaticFunc f) throws QueryException {
     func = f;
     if(f.ann.contains(Ann.Q_PRIVATE) && !Token.eq(sc.baseURI().string(),
-        f.sc.baseURI().string())) throw Err.FUNCPRIV.thrw(info, f.name.string());
+        f.sc.baseURI().string())) throw FUNCPRIV.get(info, f.name.string());
     return this;
   }
 

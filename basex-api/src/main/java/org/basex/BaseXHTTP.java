@@ -301,10 +301,10 @@ public final class BaseXHTTP {
             Options.setSystem(GlobalOptions.LOG, false);
             break;
           default:
-            arg.usage();
+            throw arg.usage();
         }
       } else {
-        if(!"stop".equalsIgnoreCase(arg.string())) arg.usage();
+        if(!"stop".equalsIgnoreCase(arg.string())) throw arg.usage();
         stopped = true;
       }
     }

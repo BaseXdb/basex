@@ -75,7 +75,7 @@ public final class HTTPPayload {
     if(isMultipart(ct)) {
       // multipart response
       final byte[] boundary = boundary(ctype);
-      if(boundary == null) HC_REQ.thrw(info, "No separation boundary specified");
+      if(boundary == null) throw HC_REQ.get(info, "No separation boundary specified");
 
       body = new FElem(Q_MULTIPART).add(MEDIA_TYPE, ct).add(BOUNDARY, boundary);
       final ANodeList parts = new ANodeList();
@@ -135,7 +135,7 @@ public final class HTTPPayload {
     try {
       return value(new IOContent(payload), options, ctype, null);
     } catch(final IOException ex) {
-      throw HC_PARSE.thrw(info, ex);
+      throw HC_PARSE.get(info, ex);
     }
   }
 
@@ -153,7 +153,7 @@ public final class HTTPPayload {
       // RFC 1341: Preamble is to be ignored -> read till 1st boundary
       while(true) {
         final byte[] l = readLine();
-        if(l == null) HC_REQ.thrw(info, "No body specified for http:part");
+        if(l == null) throw HC_REQ.get(info, "No body specified for http:part");
         if(eq(sep, l)) break;
       }
       while(extractPart(sep, concat(sep, DASHES), parts));
@@ -257,7 +257,7 @@ public final class HTTPPayload {
    */
   private byte[] boundary(final String ct) throws QueryException {
     int i = ct.toLowerCase(Locale.ENGLISH).indexOf(BOUNDARY_IS);
-    if(i == -1) HC_REQ.thrw(info, "No separation boundary specified");
+    if(i == -1) throw HC_REQ.get(info, "No separation boundary specified");
 
     String b = ct.substring(i + BOUNDARY_IS.length());
     if(b.charAt(0) == '"') {

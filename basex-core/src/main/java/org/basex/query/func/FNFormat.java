@@ -76,14 +76,14 @@ public final class FNFormat extends StandardFunc {
     // evaluate arguments
     Item it = expr[0].item(ctx, info);
     if(it == null) it = Dbl.NAN;
-    else if(!it.type.isNumberOrUntyped()) number(this, it);
+    else if(!it.type.isNumberOrUntyped()) throw numberError(this, it);
     // retrieve picture
     final byte[] pic = checkStr(expr[1], ctx);
     // retrieve format declaration
     final QNm frm = expr.length == 3 ? new QNm(trim(checkEStr(expr[2], ctx)), sc) :
       new QNm(EMPTY);
     final DecFormatter df = sc.decFormats.get(frm.id());
-    if(df == null) throw FORMNUM.thrw(info, frm);
+    if(df == null) throw FORMNUM.get(info, frm);
 
     return Str.get(df.format(info, it, pic));
   }

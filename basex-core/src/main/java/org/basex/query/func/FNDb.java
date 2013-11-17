@@ -155,7 +155,7 @@ public final class FNDb extends StandardFunc {
     final Data data = checkData(ctx);
     final int v = (int) checkItr(expr[1], ctx);
     final int pre = id ? data.pre(v) : v;
-    if(pre < 0 || pre >= data.meta.size) BXDB_RANGE.thrw(info, this, v);
+    if(pre < 0 || pre >= data.meta.size) throw BXDB_RANGE.get(info, this, v);
     return new DBNode(data, pre);
   }
 
@@ -344,7 +344,7 @@ public final class FNDb extends StandardFunc {
         try {
           meta.read();
         } catch(final IOException ex) {
-          BXDB_OPEN.thrw(info, ex);
+          throw BXDB_OPEN.get(info, ex);
         }
 
         final FElem res = new FElem(DATABASE);
@@ -434,7 +434,7 @@ public final class FNDb extends StandardFunc {
       final IOFile io = data.meta.binary(path);
       if(io.exists() && !io.isDir()) return Str.get(MimeTypes.get(path));
     }
-    throw WHICHRES.thrw(info, path);
+    throw WHICHRES.get(info, path);
   }
 
   /**
@@ -451,7 +451,7 @@ public final class FNDb extends StandardFunc {
     try {
       Export.export(data, path, sopts, null);
     } catch(final IOException ex) {
-      SERANY.thrw(info, ex);
+      throw SERANY.get(info, ex);
     }
     return null;
   }
@@ -591,7 +591,7 @@ public final class FNDb extends StandardFunc {
     final IOFile bin = data.inMemory() ? null : data.meta.binary(path);
     if(bin != null) {
       if(bin.exists()) {
-        if(bin.isDir()) BXDB_DIR.thrw(info, path);
+        if(bin.isDir()) throw BXDB_DIR.get(info, path);
         ctx.updates.add(new DBStore(data, path, input, info), ctx);
       } else {
         ctx.updates.add(new DBAdd(data, input, ctx, info), ctx);
@@ -619,7 +619,7 @@ public final class FNDb extends StandardFunc {
     // delete raw resources
     if(!data.inMemory()) {
       final IOFile bin = data.meta.binary(path);
-      if(bin == null) UPDBDELERR.thrw(info, path);
+      if(bin == null) throw UPDBDELERR.get(info, path);
       ctx.updates.add(new DBDelete(data, path, info), ctx);
     }
     return null;
@@ -633,7 +633,7 @@ public final class FNDb extends StandardFunc {
    */
   private Item create(final QueryContext ctx) throws QueryException {
     final String name = string(checkStr(expr[0], ctx));
-    if(!Databases.validName(name)) BXDB_NAME.thrw(info, name);
+    if(!Databases.validName(name)) throw BXDB_NAME.get(info, name);
 
     final TokenList paths = new TokenList();
     if(expr.length > 2) {
@@ -641,7 +641,7 @@ public final class FNDb extends StandardFunc {
       for(Item it; (it = ir.next()) != null;) {
         final String path = string(checkStr(it));
         final String norm = MetaData.normPath(path);
-        if(norm == null) RESINV.thrw(info, path);
+        if(norm == null) throw RESINV.get(info, path);
         paths.add(norm);
       }
     }
@@ -652,7 +652,7 @@ public final class FNDb extends StandardFunc {
       final Value val = ctx.value(expr[1]);
       // number of specified inputs and paths must be identical
       final long is = val.size();
-      if(ps != 0 && is != ps) BXDB_CREATEARGS.thrw(info, is, ps);
+      if(ps != 0 && is != ps) throw BXDB_CREATEARGS.get(info, is, ps);
 
       for(int i = 0; i < is; i++) {
         final byte[] path = i < ps ? paths.get(i) : Token.EMPTY;
@@ -696,14 +696,14 @@ public final class FNDb extends StandardFunc {
       final int pre = il.get(i);
       final String trg = Rename.target(data, pre, source, target);
       if(trg.isEmpty() || trg.endsWith("/") || trg.endsWith("."))
-        BXDB_RENAME.thrw(info, this);
+        throw BXDB_RENAME.get(info, this);
       ctx.updates.add(new ReplaceValue(pre, data, info, token(trg)), ctx);
     }
     // rename files
     if(!data.inMemory()) {
       final IOFile src = data.meta.binary(source);
       final IOFile trg = data.meta.binary(target);
-      if(src == null || trg == null) UPDBRENAMEERR.thrw(info, src);
+      if(src == null || trg == null) throw UPDBRENAMEERR.get(info, src);
       ctx.updates.add(new DBRename(data, src.path(), trg.path(), info), ctx);
     }
     return null;
@@ -732,9 +732,9 @@ public final class FNDb extends StandardFunc {
   private Item store(final QueryContext ctx) throws QueryException {
     final Data data = checkWrite(checkData(ctx), ctx);
     final String path = path(1, ctx);
-    if(data.inMemory()) BXDB_MEM.thrw(info, data.meta.name);
+    if(data.inMemory()) throw BXDB_MEM.get(info, data.meta.name);
     final IOFile file = data.meta.binary(path);
-    if(file == null || file.isDir()) RESINV.thrw(info, path);
+    if(file == null || file.isDir()) throw RESINV.get(info, path);
 
     final Item it = checkItem(expr[2], ctx);
     ctx.updates.add(new DBStore(data, path, it, info), ctx);
@@ -761,10 +761,10 @@ public final class FNDb extends StandardFunc {
   private B64Stream retrieve(final QueryContext ctx) throws QueryException {
     final Data data = checkData(ctx);
     final String path = path(1, ctx);
-    if(data.inMemory()) BXDB_MEM.thrw(info, data.meta.name);
+    if(data.inMemory()) throw BXDB_MEM.get(info, data.meta.name);
 
     final IOFile file = data.meta.binary(path);
-    if(file == null || !file.exists() || file.isDir()) WHICHRES.thrw(info, path);
+    if(file == null || !file.exists() || file.isDir()) throw WHICHRES.get(info, path);
     return new B64Stream(file, IOERR);
   }
 
@@ -800,7 +800,8 @@ public final class FNDb extends StandardFunc {
     try {
       final ArrayOutput ao = ctx.value(expr[1]).serialize();
       // throw exception if event is unknown
-      if(!ctx.context.events.notify(ctx.context, name, ao.toArray())) BXDB_EVENT.thrw(info, name);
+      if(!ctx.context.events.notify(ctx.context, name, ao.toArray()))
+        throw BXDB_EVENT.get(info, name);
       return null;
     } catch(final QueryIOException ex) {
       throw ex.getCause(info);
@@ -815,7 +816,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item output(final QueryContext ctx) throws QueryException {
-    if(ctx.updates.mod instanceof TransformModifier) BASX_DBTRANSFORM.thrw(info);
+    if(ctx.updates.mod instanceof TransformModifier) throw BASX_DBTRANSFORM.get(info);
     cache(ctx.iter(expr[0]), ctx.output, ctx);
     return null;
   }
@@ -831,7 +832,7 @@ public final class FNDb extends StandardFunc {
     final NewInput ni = new NewInput();
 
     if(in.type.isNode()) {
-      if(endsWith(path, '.') || endsWith(path, '/')) RESINV.thrw(info, path);
+      if(endsWith(path, '.') || endsWith(path, '/')) throw RESINV.get(info, path);
 
       // ensure that the final name is not empty
       ANode nd = (ANode) in;
@@ -844,12 +845,12 @@ public final class FNDb extends StandardFunc {
         final int i = d == null || d.inMemory() ? lastIndexOf(name, '/') :
           indexOf(name, '/');
         if(i != -1) name = substring(name, i + 1);
-        if(name.length == 0) RESINV.thrw(info, name);
+        if(name.length == 0) throw RESINV.get(info, name);
       }
 
       // adding a document node
       if(nd.type != NodeType.DOC) {
-        if(nd.type == NodeType.ATT) UPDOCTYPE.thrw(info, nd);
+        if(nd.type == NodeType.ATT) throw UPDOCTYPE.get(info, nd);
         nd = new FDoc(name).add(nd);
       }
       ni.node = nd;
@@ -857,14 +858,14 @@ public final class FNDb extends StandardFunc {
       return ni;
     }
 
-    if(!in.type.isStringOrUntyped()) throw STRNODTYPE.thrw(info, this, in.type);
+    if(!in.type.isStringOrUntyped()) throw STRNODTYPE.get(info, this, in.type);
 
     final QueryInput qi = new QueryInput(string(in.string(info)));
-    if(!qi.input.exists()) WHICHRES.thrw(info, qi.original);
+    if(!qi.input.exists()) throw WHICHRES.get(info, qi.original);
 
     // add slash to the target if the addressed file is an archive or directory
     String name = string(path);
-    if(name.endsWith(".")) RESINV.thrw(info, path);
+    if(name.endsWith(".")) throw RESINV.get(info, path);
     if(!name.endsWith("/") && (qi.input.isDir() || qi.input.isArchive())) name += "/";
     String target = "";
     final int s = name.lastIndexOf('/');
@@ -879,7 +880,7 @@ public final class FNDb extends StandardFunc {
     else if(!(qi.input instanceof IOContent)) name = qi.input.name();
 
     // ensure that the final name is not empty
-    if(name.isEmpty()) RESINV.thrw(info, path);
+    if(name.isEmpty()) throw RESINV.get(info, path);
 
     ni.io = qi.input;
     ni.dbname = token(name);
@@ -916,7 +917,7 @@ public final class FNDb extends StandardFunc {
   private String path(final int i, final QueryContext ctx) throws QueryException {
     final String path = string(checkStr(expr[i], ctx));
     final String norm = MetaData.normPath(path);
-    if(norm == null) RESINV.thrw(info, path);
+    if(norm == null) throw RESINV.get(info, path);
     return norm;
   }
 }
