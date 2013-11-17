@@ -515,10 +515,16 @@ public final class EditorText {
         sb.append(CLOSING.charAt(open));
         move = true;
       } else if(CLOSING.indexOf(ch) != -1) {
-        // closing bracket: ignore when next character is the same
+        // closing bracket: ignore if it equals next character
         move = ch == curr;
         if(move) sb.setLength(0);
         close();
+      } else if(ch == '"' || ch == '\'') {
+        // quote: ignore if it equals next character
+        if(ch == curr) sb.setLength(0);
+        // don't add second quote if previous character is quote as well
+        else if(ps == 0 || text[ps - 1] != ch) sb.append(ch);
+        move = true;
       } else if(ch == '>') {
         // closes an opening element
         move = true;

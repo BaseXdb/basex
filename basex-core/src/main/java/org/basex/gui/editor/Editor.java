@@ -740,7 +740,7 @@ public class Editor extends BaseXPanel {
     if(ENTER.is(e)) text.open(sb);
     final boolean move = text.add(sb);
     hist.store(text.text(), pc, text.getCaret());
-    if(move) text.setCaret(pc + 1);
+    if(move && pc + 1 <= text.size()) text.setCaret(pc + 1);
 
     // adjust text height
     calcCode.invokeLater(true);
