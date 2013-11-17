@@ -97,16 +97,17 @@ public final class PkgValidator {
    */
   private void checkProcs(final ArrayList<Dependency> procs) throws QueryException {
     boolean supported = false;
+    // extract basex version
+    final int i = Prop.VERSION.indexOf(' ');
+    final TokenSet versions = new TokenSet(token(i == -1 ? Prop.VERSION : Prop.VERSION.substring(0, i)));
+    final byte[] basex = token(Text.NAMELC);
     for(final Dependency d : procs) {
-      if(!eq(lc(d.processor), token(Text.NAMELC))) {
+      if(!eq(lc(d.processor), basex)) {
         supported = false;
         break;
       }
-      // extract version
-      final int i = Prop.VERSION.indexOf(' ');
-      final String v = i == -1 ? Prop.VERSION : Prop.VERSION.substring(0, i);
       // check if current version is acceptable for the dependency
-      supported = availVersion(d, new TokenSet(token(v))) != null;
+      supported = availVersion(d, versions) != null;
     }
     if(!supported) BXRE_VERSION.thrw(info);
   }
