@@ -599,8 +599,6 @@ public enum Err {
   SERNS(SENR, 1, "Namespaces cannot be serialized:%."),
   /** SENR0001. */
   SERFUNC(SENR, 1, "Functions cannot be serialized: %."),
-  /** SENR0001. */
-  SERITEM(SENR, 1, "Item cannot be serialized: %."),
   /** SEPM0004. */
   SERSA(SEPM, 4, "If 'standalone' is specified, the root must be a single element."),
   /** SEPM0004. */
@@ -1034,8 +1032,6 @@ public enum Err {
   /** XQST0108. */
   MODOUT(XQST, 108, "No output declarations allowed in library modules."),
   /** XPST0109. */
-  OUTWHICH(XQST, 109, "Unknown serialization parameter: '%'."),
-  /** XPST0109. */
   OUTINVALID(XQST, 109, "%"),
   /** XPST0110. */
   OUTDUPL(XQST, 110, "Duplicate declaration of 'output:%'."),
@@ -1051,14 +1047,8 @@ public enum Err {
   TAGWRONG(XQST, 118, "Start and end tag are different: <%>...</%>."),
   /** XQST0119. */
   OUTDOC(XQST, 119, "Serialization document '%' cannot be parsed."),
-  /** XQST0120. */
-  FEATNOTSUPP(XQST, 120, "Feature '%' is not supported by the implementation."),
-  /** XQST0122. */
-  DECLQNAME(XQST, 122, "Invalid QName: '%'."),
   /** XQST0123. */
   DECLOPTION(XQST, 123, "Unknown option: %."),
-  /** XQST0123. */
-  DECLFEAT(XQST, 123, "Unknown feature: '%'."),
   /** XPST0125. */
   INVISIBLE(XQST, 125, "No visibility annotation allowed in inline function."),
 

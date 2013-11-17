@@ -17,9 +17,6 @@ public interface HTTPText {
   /** HTTP basic authentication. */
   String BASIC = "Basic";
 
-  /** Payload string. */
-  String PAYLOAD = "payload";
-
   /** Content-Disposition. */
   byte[] CONTENT_DISPOSITION = token("Content-Disposition");
   /** Dashes. */

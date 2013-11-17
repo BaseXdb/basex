@@ -22,9 +22,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class Catch extends Single {
-  /** Prefix wildcard. */
-  public static final byte[] WILDCARD = token("*");
-
   /** Error QNames. */
   public static final QNm[] NAMES = {
     create(E_CODE), create(E_DESCRIPTION), create(E_VALUE), create(E_MODULE),
@@ -142,14 +139,6 @@ public final class Catch extends Single {
         Str.get(ex.getLocalizedMessage()), val == null ? Empty.SEQ : val,
         Str.get(io), Int.get(ex.line()), Int.get(ex.col()),
         Str.get(ex.getMessage().replaceAll("\r\n?", "\n")) };
-  }
-
-  /**
-   * Returns the variables used in the {@code catch} expression.
-   * @return variables
-   */
-  public Var[] vars() {
-    return vars;
   }
 
   /**

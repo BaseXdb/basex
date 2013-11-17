@@ -293,14 +293,6 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
       endColumn = lc[3];
     }
 
-    /**
-     * Finds the name of this token's production.
-     * @return token name
-     */
-    public String getName() {
-      return RegExParserConstants.tokenImage[kind];
-    }
-
     @Override
     public Object getValue() {
       return obj;

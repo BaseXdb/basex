@@ -181,30 +181,6 @@ public class StringList extends ElementList implements Iterable<String> {
     return this;
   }
 
-  /**
-   * Returns the uppermost element from the stack.
-   * @return the uppermost element
-   */
-  public final String peek() {
-    return list[size - 1];
-  }
-
-  /**
-   * Pops the uppermost element from the stack.
-   * @return the popped element
-   */
-  public final String pop() {
-    return list[--size];
-  }
-
-  /**
-   * Pushes an element onto the stack.
-   * @param element element
-   */
-  public final void push(final String element) {
-    add(element);
-  }
-
   @Override
   public final Iterator<String> iterator() {
     return new ArrayIterator<String>(list, size);

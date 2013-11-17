@@ -281,14 +281,6 @@ public final class DataAccess {
   }
 
   /**
-   * Writes bytes to a file.
-   * @param bytes bytes to write
-   */
-  public synchronized void writeBytes(final byte[] bytes) {
-    for(final byte b : bytes) write(b);
-  }
-
-  /**
    * Writes a 5-byte value to the specified position.
    * @param p position in the file
    * @param v value to be written

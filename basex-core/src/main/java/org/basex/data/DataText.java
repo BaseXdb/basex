@@ -110,9 +110,6 @@ public interface DataText {
 
   // XML SERIALIZATION ========================================================
 
-  /** Omit flag. */
-  String OMIT = "omit";
-
   /** Version. */
   String V10 = "1.0";
   /** Version. */

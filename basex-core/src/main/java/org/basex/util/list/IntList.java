@@ -173,22 +173,6 @@ public class IntList extends ElementList {
   }
 
   /**
-   * Removes duplicates from a sorted list.
-   * @return self reference
-   */
-  public IntList unique() {
-    if(size != 0) {
-      int s = 0;
-      for(int l = 1; l < size; l++) {
-        if(list[l] != list[s]) list[++s] = list[l];
-      }
-      size = s + 1;
-    }
-    return this;
-  }
-
-
-  /**
    * Sorts the data.
    * @return self reference
    */

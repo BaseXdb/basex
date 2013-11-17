@@ -712,12 +712,7 @@ public interface Text {
   /** "Unknown option '%'". */
   String UNKNOWN_OPTION_X = lang("unknown_option_%");
   /** Unknown command error. */
-  String UNKNOWN_OPT_SIMILAR_X_X = lang("unknown_option_%") + ' ' +
-      lang("similar_cmd_%");
-  /** "Unknown parser '%'". */
-  String UNKNOWN_PARSER_X = lang("unknown_parser_%");
-  /** Invalid value. */
-  String INVALID_VALUE_X_X = lang("invalid_value_%_%");
+  String UNKNOWN_OPT_SIMILAR_X_X = lang("unknown_option_%") + ' ' + lang("similar_cmd_%");
 
   // INFO STRINGS =============================================================
 
@@ -809,10 +804,6 @@ public interface Text {
   String ENTRIES = '(' + lang("entries_%") + ')';
   /** "Error". */
   String ERROR = lang("error");
-  /** "Fatal". */
-  String FATAL = "Fatal";
-  /** "Warning". */
-  String WARNING = "Warning";
 
   /** Options error. */
   String OPT_OFFSET = "List counter for '%' is invalid.";
