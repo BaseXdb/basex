@@ -509,6 +509,7 @@ public final class EditorText {
     if(sb.length() != 0) {
       final char ch = sb.charAt(0);
       final int curr = ps < text.length ? text[ps] : 0;
+      final int prev = ps > 0 ? text[ps - 1] : 0;
       // adds a closing to an opening bracket
       final int open = OPENING.indexOf(ch);
       if(open != -1) {
@@ -522,8 +523,8 @@ public final class EditorText {
       } else if(ch == '"' || ch == '\'') {
         // quote: ignore if it equals next character
         if(ch == curr) sb.setLength(0);
-        // don't add second quote if previous character is quote as well
-        else if(ps == 0 || text[ps - 1] != ch) sb.append(ch);
+        // only add second quote if previous character is no character
+        else if(!XMLToken.isNCChar(prev)) sb.append(ch);
         move = true;
       } else if(ch == '>') {
         // closes an opening element
