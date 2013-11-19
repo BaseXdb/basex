@@ -172,7 +172,7 @@ public abstract class Builder extends Proc {
    * @param enc encoding
    */
   public final void encoding(final String enc) {
-    meta.encoding = eq(enc, UTF8, UTF82) ? UTF8 : enc;
+    meta.encoding = normEncoding(enc);
   }
 
   // PROGRESS INFORMATION =====================================================

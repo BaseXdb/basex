@@ -52,7 +52,7 @@ public class TextInput extends BufferInput {
       final int b = readByte();
       final int c = readByte();
       final int d = readByte();
-      String e = null;
+      String e = UTF8;
       int skip = 0;
       if(a == 0xFF && b == 0xFE) { // BOM: FF FE
         e = UTF16LE;
@@ -69,7 +69,7 @@ public class TextInput extends BufferInput {
       }
       reset();
       for(int s = 0; s < skip; s++) readByte();
-      decoder = TextDecoder.get(normEncoding(e));
+      decoder = TextDecoder.get(e);
     } catch(final IOException ex) {
       close();
       throw ex;

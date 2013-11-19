@@ -266,7 +266,7 @@ public final class FNConvert extends StandardFunc {
   public static byte[] toString(final InputStream is, final String enc, final boolean val)
       throws IOException {
     try {
-      return new NewlineInput(is).encoding(enc).validate(val).content();
+      return new TextInput(is).encoding(enc).validate(val).content();
     } finally {
       is.close();
     }

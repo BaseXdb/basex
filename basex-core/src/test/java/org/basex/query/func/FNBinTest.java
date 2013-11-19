@@ -235,18 +235,22 @@ public final class FNBinTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void not() {
-    hexQuery(_BIN_NOT.args("()"),         "");
-    hexQuery(_BIN_NOT.args(base64("00")), "FF");
+    hexQuery(_BIN_NOT.args("()"),           "");
+    hexQuery(_BIN_NOT.args(base64("00")),   "FF");
     hexQuery(_BIN_NOT.args(base64("8081")), "7F7E");
   }
 
   /** Test method. */
   @Test
   public void shift() {
-    hexQuery(_BIN_SHIFT.args("()", 1),          "");
-    hexQuery(_BIN_SHIFT.args(base64("77"), 0),  "77");
-    hexQuery(_BIN_SHIFT.args(base64("33"), 1),  "66");
-    hexQuery(_BIN_SHIFT.args(base64("66"), -1), "33");
+    hexQuery(_BIN_SHIFT.args("()", 1),                 "");
+    hexQuery(_BIN_SHIFT.args(base64("77"), 0),         "77");
+    hexQuery(_BIN_SHIFT.args(base64("33"), 1),         "66");
+    hexQuery(_BIN_SHIFT.args(base64("66"), -1),        "33");
+    hexQuery(_BIN_SHIFT.args(base64("0066"), 8),       "6600");
+    hexQuery(_BIN_SHIFT.args(base64("6600"), -8),      "0066");
+    hexQuery(_BIN_SHIFT.args(base64("12345678"), 16),  "56780000");
+    hexQuery(_BIN_SHIFT.args(base64("12345678"), -16), "00001234");
   }
 
   /** Test method. */

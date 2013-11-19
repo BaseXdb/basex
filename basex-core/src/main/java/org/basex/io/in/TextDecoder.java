@@ -6,6 +6,8 @@ import java.io.*;
 import java.nio.*;
 import java.nio.charset.*;
 
+import org.basex.util.*;
+
 /**
  * This abstract class specifies a single method for decoding input to UTF-8.
  * The inheriting classes are optimized for performance and faster than Java's
@@ -30,7 +32,7 @@ abstract class TextDecoder {
 
   /**
    * Returns a decoder for the specified encoding.
-   * @param enc encoding
+   * @param enc encoding, normalized via {@link Token#normEncoding}.
    * @return decoder
    * @throws IOException I/O exception
    */

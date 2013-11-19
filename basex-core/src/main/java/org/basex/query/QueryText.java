@@ -577,7 +577,7 @@ public interface QueryText {
   /** EXPath URI. */
   String EXPATH = "http://expath.org/ns/";
   /** URI of Binary Module. */
-  byte[] BINURI = token(EXPATH + "bin");
+  byte[] BINURI = token(EXPATH + "binary");
   /** URI of Cryptographic Module. */
   byte[] CRYPTOURI = token(EXPATH + "crypto");
   /** URI of File Module. */
