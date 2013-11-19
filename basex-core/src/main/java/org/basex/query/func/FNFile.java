@@ -116,7 +116,7 @@ public final class FNFile extends StandardFunc {
   private Item size(final QueryContext ctx) throws QueryException {
     final File path = checkFile(0, ctx);
     if(!path.exists()) throw FILE_WHICH.get(info, path.getAbsolutePath());
-    return Int.get(path.length());
+    return Int.get(path.isDirectory() ? 0 : path.length());
   }
 
   /**
