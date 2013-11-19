@@ -9,14 +9,12 @@ import static org.basex.util.Token.*;
  * @author Christian Gruen
  */
 public interface DataText {
-  // META DATA ================================================================
+  // META DATA ====================================================================================
 
-  /** Database version; if it's modified, old database instances can't
-   * be parsed anymore. */
-  String STORAGE = "7.1";
-  /** Index version; if it's modified, new indexes can't be parsed anymore
-   * by older versions. */
-  String ISTORAGE = "7.1";
+  /** Database version; older version cannot open these instances. */
+  String STORAGE = "7.8";
+  /** Index version; older version cannot open indexes of these instances. */
+  String ISTORAGE = "7.8";
 
   /** Database version. */
   String DBSTR = "STORAGE";
@@ -89,7 +87,7 @@ public interface DataText {
   /** Namespace. */
   String DBNS = "NS";
 
-  // DATABASE FILES ===========================================================
+  // DATABASE FILES ===============================================================================
 
   /** Database - Info. */
   String DATAINF = "inf";
@@ -108,7 +106,7 @@ public interface DataText {
   /** Database - Updating flag. */
   String DATAUPD = "upd";
 
-  // XML SERIALIZATION ========================================================
+  // XML SERIALIZATION ============================================================================
 
   /** Version. */
   String V10 = "1.0";
@@ -220,7 +218,7 @@ public interface DataText {
   /** HTML: charset attribute value. */
   byte[] CHARSET = token("; charset=");
 
-  // TABLE SERIALIZATION ======================================================
+  // TABLE SERIALIZATION ==========================================================================
 
   /** First table Header. */
   byte[] TABLEID = token("ID");
