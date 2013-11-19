@@ -20,7 +20,7 @@ public final class Prop {
   /** Project name. */
   public static final String NAME = "BaseX";
   /** Code version (may contain major, minor and optional patch number). */
-  public static final String VERSION = "7.8 beta";
+  public static final String VERSION = version("dev");
   /** Main author. */
   public static final String AUTHOR = "Christian Gr\u00FCn";
   /** Co-authors (1). */
@@ -162,5 +162,29 @@ public final class Prop {
    */
   private static String dir(final String dir) {
     return dir.endsWith("\\") || dir.endsWith("/") ? dir : dir + File.separator;
+  }
+
+  /**
+   * Get source revision from manifest file.
+   * @return source revision
+   */
+  private static String revision() {
+    return JarManifest.basexManifestAttributes.get("Implementation-Build");
+  }
+
+  /**
+   * Build version string using data from the JAR manifest.
+   * @param devVersion version used during development; returned if there is no implementation version or no manifest.
+   * @return version string
+   */
+  private static String version(String devVersion) {
+    final String version = Prop.class.getPackage().getImplementationVersion();
+    if (version == null) return devVersion;
+    if (!version.contains("-SNAPSHOT")) return version;
+
+    final StringBuilder result = new StringBuilder(version.replace("-SNAPSHOT", " beta"));
+    final String revision = revision();
+    if (revision != null) result.append(' ').append(revision);
+    return result.toString();
   }
 }
