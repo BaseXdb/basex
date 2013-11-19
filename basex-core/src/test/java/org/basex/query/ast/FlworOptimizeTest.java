@@ -1,6 +1,5 @@
 package org.basex.query.ast;
 
-import org.basex.core.*;
 import org.basex.query.expr.*;
 import org.basex.query.gflwor.*;
 import org.basex.util.*;

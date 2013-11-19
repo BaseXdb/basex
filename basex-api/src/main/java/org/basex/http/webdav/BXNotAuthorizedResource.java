@@ -5,7 +5,7 @@ import java.util.*;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.Request.Method;
-import org.basex.core.*;
+import org.basex.util.*;
 
 /**
  * Dummy resource to be returned when no authorization is provided.

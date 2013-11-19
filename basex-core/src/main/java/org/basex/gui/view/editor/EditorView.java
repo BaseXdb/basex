@@ -13,7 +13,6 @@ import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;

@@ -13,6 +13,7 @@ import org.basex.core.parse.*;
 import org.basex.io.*;
 import org.basex.query.util.*;
 import org.basex.query.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**

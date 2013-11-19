@@ -3,6 +3,7 @@ package org.basex.util.ft;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.util.*;
 
 /**
  * This class contains language tokens which are valid for the xml:lang

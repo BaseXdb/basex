@@ -1,11 +1,12 @@
 package org.basex.gui;
 
-import static org.basex.core.Prop.*;
+import static org.basex.util.Prop.*;
 
 import java.awt.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**

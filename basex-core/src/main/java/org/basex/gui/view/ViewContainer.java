@@ -6,7 +6,6 @@ import static org.basex.gui.GUIConstants.*;
 import java.awt.*;
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;

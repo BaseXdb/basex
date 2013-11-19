@@ -1,7 +1,7 @@
 package org.basex.util.options;
 
 import static java.lang.Integer.*;
-import static org.basex.core.Prop.*;
+import static org.basex.util.Prop.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;

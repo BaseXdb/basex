@@ -8,7 +8,6 @@ import java.nio.charset.*;
 import java.util.*;
 import java.util.regex.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.random.*;

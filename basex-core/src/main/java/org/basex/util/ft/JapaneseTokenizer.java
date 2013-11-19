@@ -7,7 +7,6 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.util.*;
 
 /**

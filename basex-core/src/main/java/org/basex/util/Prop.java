@@ -1,11 +1,11 @@
-package org.basex.core;
+package org.basex.util;
 
 import java.io.*;
 import java.net.*;
 import java.security.*;
 
+import org.basex.core.*;
 import org.basex.io.*;
-import org.basex.util.*;
 
 /**
  * This class contains constants and system properties which are used all around the project.
@@ -17,10 +17,30 @@ public final class Prop {
   /** Private constructor. */
   private Prop() { }
 
+  /** User's home directory. */
+  public static final String USERHOME;
+  /** Application URL. */
+  public static final URL LOCATION;
+
+  static {
+    // linux: check HOME variable (#773)
+    final String home = System.getenv("HOME");
+    USERHOME = dir(home != null ? home : System.getProperty("user.home"));
+
+    // retrieve application URL
+    URL loc = null;
+    final ProtectionDomain pd = MainOptions.class.getProtectionDomain();
+    if(pd != null) {
+      final CodeSource cs = pd.getCodeSource();
+      if(cs != null) loc = cs.getLocation();
+    }
+    LOCATION = loc;
+  }
+
   /** Project name. */
   public static final String NAME = "BaseX";
   /** Code version (may contain major, minor and optional patch number). */
-  public static final String VERSION = version("dev");
+  public static final String VERSION = version("7.8 beta");
   /** Main author. */
   public static final String AUTHOR = "Christian Gr\u00FCn";
   /** Co-authors (1). */
@@ -51,14 +71,6 @@ public final class Prop {
   public static final String DBPREFIX = "org.basex.";
   /** System property for specifying database home directory. */
   public static final String PATH = DBPREFIX + "path";
-  /** User's home directory. */
-  public static final String USERHOME;
-
-  static {
-    // linux: check HOME variable (#773)
-    final String home = System.getenv("HOME");
-    USERHOME = dir(home != null ? home : System.getProperty("user.home"));
-  }
 
   /** Directory for storing the property files, database directory, etc. */
   public static final String HOME = dir(homePath());
@@ -124,16 +136,10 @@ public final class Prop {
    * @return application path.
    */
   private static String applicationPath() {
-    final ProtectionDomain pd = MainOptions.class.getProtectionDomain();
-    if(pd == null) return null;
-    // code source (may be null)
-    final CodeSource cs = pd.getCodeSource();
-    if(cs == null) return null;
-    // location (may be null)
-    final URL url = cs.getLocation();
-    if(url == null) return null;
-    final String path = url.getPath();
+    if(LOCATION == null) return null;
+
     // decode path; URLDecode returns wrong results
+    final String path = LOCATION.getPath();
     final TokenBuilder tb = new TokenBuilder();
     final int pl = path.length();
     for(int p = 0; p < pl; ++p) {
@@ -165,26 +171,19 @@ public final class Prop {
   }
 
   /**
-   * Get source revision from manifest file.
-   * @return source revision
-   */
-  private static String revision() {
-    return JarManifest.basexManifestAttributes.get("Implementation-Build");
-  }
-
-  /**
    * Build version string using data from the JAR manifest.
-   * @param devVersion version used during development; returned if there is no implementation version or no manifest.
+   * @param devVersion version used during development;
+   *        returned if there is no implementation version or no manifest.
    * @return version string
    */
-  private static String version(String devVersion) {
+  private static String version(final String devVersion) {
     final String version = Prop.class.getPackage().getImplementationVersion();
-    if (version == null) return devVersion;
-    if (!version.contains("-SNAPSHOT")) return version;
+    if(version == null) return devVersion;
+    if(!version.contains("-SNAPSHOT")) return version;
 
     final StringBuilder result = new StringBuilder(version.replace("-SNAPSHOT", " beta"));
-    final String revision = revision();
-    if (revision != null) result.append(' ').append(revision);
+    final Object revision = JarManifest.get("Implementation-Build");
+    if(revision != null) result.append(' ').append(revision);
     return result.toString();
   }
 }

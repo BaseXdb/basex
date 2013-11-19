@@ -3,8 +3,8 @@ package org.basex.gui;
 import java.awt.*;
 import java.lang.reflect.*;
 
-import org.basex.core.*;
 import org.basex.gui.layout.*;
+import org.basex.util.*;
 
 /**
  * Sets some Mac OS X specific interface options.

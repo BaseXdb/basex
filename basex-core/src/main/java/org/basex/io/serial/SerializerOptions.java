@@ -3,7 +3,6 @@ package org.basex.io.serial;
 import java.util.*;
 
 import org.basex.build.*;
-import org.basex.core.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 

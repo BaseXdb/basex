@@ -4,8 +4,8 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * Tests the command-line arguments of the starter classes.

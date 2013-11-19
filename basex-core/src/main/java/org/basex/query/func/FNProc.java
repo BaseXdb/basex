@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.nio.charset.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;

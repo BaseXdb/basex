@@ -9,7 +9,6 @@ import java.nio.charset.*;
 import java.util.*;
 import java.util.zip.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;

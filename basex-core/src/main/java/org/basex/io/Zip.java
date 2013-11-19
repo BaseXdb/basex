@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.zip.*;
 
 import org.basex.core.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**

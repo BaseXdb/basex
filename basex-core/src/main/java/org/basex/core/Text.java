@@ -5,6 +5,7 @@ import static org.basex.core.Lang.*;
 import java.util.*;
 
 import org.basex.core.parse.Commands.*;
+import org.basex.util.*;
 
 /**
  * This class contains internationalized text strings, which are used throughout the project.

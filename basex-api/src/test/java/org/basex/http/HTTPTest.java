@@ -9,7 +9,6 @@ import java.net.*;
 import java.util.*;
 
 import org.basex.*;
-import org.basex.SandboxTest;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;

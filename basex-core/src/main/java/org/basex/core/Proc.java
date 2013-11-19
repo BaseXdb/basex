@@ -17,9 +17,9 @@ public abstract class Proc {
   public InfoListener listen;
   /** This flag indicates that a command may perform updates. */
   public boolean updating;
-  /** Indicates if a process is currently registered. */
-  protected boolean registered;
 
+  /** Indicates if a process is currently registered. */
+  private boolean registered;
   /** Stopped flag. */
   private boolean stopped;
   /** Timeout thread. */

@@ -6,6 +6,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.out.*;
 import org.basex.query.value.node.*;
+import org.basex.util.*;
 
 /**
  * QT3TS Report builder.

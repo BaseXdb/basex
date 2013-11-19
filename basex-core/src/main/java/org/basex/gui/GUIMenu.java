@@ -7,7 +7,6 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import org.basex.core.*;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
 

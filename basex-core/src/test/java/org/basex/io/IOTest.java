@@ -2,7 +2,7 @@ package org.basex.io;
 
 import static org.junit.Assert.*;
 
-import org.basex.core.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**

@@ -11,6 +11,7 @@ import org.basex.core.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
 import org.basex.gui.view.map.*;
+import org.basex.util.*;
 
 /**
  * GUI Constants used in different views.

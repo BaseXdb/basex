@@ -1,6 +1,6 @@
 package org.basex.core;
 
-import static org.basex.core.Prop.NL;
+import static org.basex.util.Prop.*;
 
 import java.util.*;
 import java.util.concurrent.*;

@@ -7,10 +7,10 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.util.zip.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.util.*;
 import org.basex.query.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**

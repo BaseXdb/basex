@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;

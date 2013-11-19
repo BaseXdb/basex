@@ -1,6 +1,6 @@
 package org.basex.query.ast;
 
-import static org.basex.core.Prop.NL;
+import static org.basex.util.Prop.*;
 import static org.junit.Assert.*;
 
 import org.basex.query.*;

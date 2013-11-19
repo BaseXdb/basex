@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**

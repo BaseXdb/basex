@@ -1,8 +1,8 @@
 package org.basex.gui.layout;
 
 import static java.awt.event.KeyEvent.*;
-import static org.basex.core.Prop.MAC;
 import static org.basex.gui.GUIConstants.*;
+import static org.basex.util.Prop.*;
 
 import java.awt.event.*;
 

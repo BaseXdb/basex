@@ -7,7 +7,6 @@ import java.util.regex.*;
 
 import javax.xml.transform.stream.*;
 
-import org.basex.core.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.util.*;

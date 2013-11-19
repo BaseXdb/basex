@@ -6,7 +6,6 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.server.*;
 import org.basex.util.list.*;
 

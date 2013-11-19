@@ -5,7 +5,6 @@ import static com.bradmcevoy.http.LockResult.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.core.Prop;
 import org.basex.http.webdav.impl.ResourceMetaData;
 import org.basex.http.webdav.impl.WebDAVService;
 import org.basex.util.*;

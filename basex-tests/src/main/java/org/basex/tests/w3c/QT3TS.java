@@ -1,7 +1,8 @@
 package org.basex.tests.w3c;
 
-import static org.basex.core.Prop.NL;
 import static org.basex.tests.w3c.QT3Constants.*;
+import static org.basex.tests.w3c.QT3Constants.ENCODING;
+import static org.basex.util.Prop.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;

@@ -2,7 +2,6 @@ package org.basex.io.out;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.util.*;
 
 /**

@@ -15,7 +15,6 @@ import java.util.List;
 
 import javax.swing.*;
 
-import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.editor.*;
 import org.basex.util.*;
