@@ -446,23 +446,34 @@ public final class EditorText {
   void complete() {
     if(selected()) return;
 
+    // ignore space before cursor
     final boolean space = ps > 0 && ws(text[ps - 1]);
     if(space) ps--;
+
+    // replace pre-defined completion strings
     for(int s = 0; s < REPLACE.size(); s += 2) {
       final String key = REPLACE.get(s);
-      if(find(key)) {
-        String value = REPLACE.get(s + 1);
-        int p = ps - key.length();
-        int cursor = value.indexOf('_');
-        if(cursor != -1) value = value.replace("_", "");
-        select(p, ps);
-        delete();
-        add(value);
-        if(cursor != -1) setCaret(p + cursor);
-        return;
+      if(!find(key)) continue;
+      // key found
+      String value = REPLACE.get(s + 1);
+      final int p = ps - key.length(), cursor = value.indexOf('_');
+      if(cursor != -1) value = value.replace("_", "");
+      // adopt current indentation
+      final StringBuilder spaces = new StringBuilder();
+      open(spaces);
+      if(spaces.length() != 0) {
+        value = new TokenBuilder().addSep(value.split("\n"), "\n" + spaces).toString();
       }
+      // delete old string, add new one
+      select(p, ps);
+      delete();
+      add(value);
+      // adjust cursor
+      if(cursor != -1) setCaret(p + cursor);
+      return;
     }
 
+    // replace entities
     int s = ps;
     while(--s >= 0 && XMLToken.isChar(text[s]));
     ++s;
@@ -483,7 +494,7 @@ public final class EditorText {
    */
   private boolean find(final String key) {
     final byte[] k = token(key);
-    int s = ps - k.length;
+    final int s = ps - k.length;
     return s >= 0 && indexOf(text, k, s) != -1 && (s == 0 || !XMLToken.isChar(text[s - 1]));
   }
 
