@@ -43,6 +43,7 @@ public enum BaseXKeys {
   /** Find previous hit.     */ FINDPREV(SC | SHF, VK_G, true),
   /** Find previous hit.     */ FINDPREV2(MAC ? SC | SHF : SHF, VK_F3, true),
   /** Jump to error.         */ FINDERROR(SC, VK_PERIOD),
+  /** Code completion.       */ COMPLETE(SC, VK_SPACE),
 
   // Editing
 

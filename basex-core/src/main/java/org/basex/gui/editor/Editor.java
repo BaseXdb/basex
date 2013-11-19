@@ -602,6 +602,8 @@ public class Editor extends BaseXPanel {
         }
       } else if(COMMENT.is(e)) {
         text.comment(rend.getSyntax());
+      } else if(COMPLETE.is(e)) {
+        text.complete();
       } else if(DELLINE.is(e)) {
         text.deleteLine();
       } else if(DELLINEEND.is(e) || DELNEXTWORD.is(e) || DELNEXT.is(e)) {
@@ -621,15 +623,16 @@ public class Editor extends BaseXPanel {
       } else if(DELLINESTART.is(e) || DELPREVWORD.is(e) || DELPREV.is(e)) {
         if(nomark) {
           if(text.pos() == 0) return;
-          text.startSelect();
           if(DELPREVWORD.is(e)) {
+            text.startSelect();
             text.prevToken(true);
+            text.finishSelect();
           } else if(DELLINESTART.is(e)) {
+            text.startSelect();
             text.bol(true);
           } else {
-            text.prev();
+            text.backspace();
           }
-          text.finishSelect();
         }
         text.delete();
         down = false;
@@ -727,7 +730,7 @@ public class Editor extends BaseXPanel {
   public void keyTyped(final KeyEvent e) {
     if(!hist.active() || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e)) return;
 
-    final int pc = text.getCaret();
+    int pc = text.getCaret();
     text.pos(pc);
 
     // remember if marked text is to be deleted
@@ -736,11 +739,12 @@ public class Editor extends BaseXPanel {
 
     // delete marked text
     if(text.selected() && !indent) text.delete();
+    final int ps = text.pos();
 
     if(ENTER.is(e)) text.open(sb);
-    final boolean move = text.add(sb);
+    final int move = text.add(sb);
     hist.store(text.text(), pc, text.getCaret());
-    if(move && pc + 1 <= text.size()) text.setCaret(pc + 1);
+    if(move != 0) text.setCaret(Math.min(text.size(), ps + move));
 
     // adjust text height
     calcCode.invokeLater(true);

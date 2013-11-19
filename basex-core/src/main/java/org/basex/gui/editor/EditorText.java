@@ -2,7 +2,11 @@ package org.basex.gui.editor;
 
 import static org.basex.util.Token.*;
 
+import java.io.*;
+
 import org.basex.gui.editor.Editor.SearchDir;
+import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -437,6 +441,53 @@ public final class EditorText {
   }
 
   /**
+   * Code completion.
+   */
+  void complete() {
+    if(selected()) return;
+
+    final boolean space = ps > 0 && ws(text[ps - 1]);
+    if(space) ps--;
+    for(int s = 0; s < REPLACE.size(); s += 2) {
+      final String key = REPLACE.get(s);
+      if(find(key)) {
+        String value = REPLACE.get(s + 1);
+        int p = ps - key.length();
+        int cursor = value.indexOf('_');
+        if(cursor != -1) value = value.replace("_", "");
+        select(p, ps);
+        delete();
+        add(value);
+        if(cursor != -1) setCaret(p + cursor);
+        return;
+      }
+    }
+
+    int s = ps;
+    while(--s >= 0 && XMLToken.isChar(text[s]));
+    ++s;
+    final String key = Token.string(text, s, ps - s);
+    final byte[] value = XMLToken.getEntity(token(key));
+    if(value != null) {
+      select(s, ps);
+      delete();
+      add(string(value));
+    }
+    if(space) ps++;
+  }
+
+  /**
+   * Checks if the specified key is found before the current cursor position.
+   * @param key string to be found
+   * @return result of check
+   */
+  private boolean find(final String key) {
+    final byte[] k = token(key);
+    int s = ps - k.length;
+    return s >= 0 && indexOf(text, k, s) != -1 && (s == 0 || !XMLToken.isChar(text[s - 1]));
+  }
+
+  /**
    * Indents the current line or text.
    * @param sb typed in string
    * @param shift shift key
@@ -502,34 +553,55 @@ public final class EditorText {
   /**
    * Processes and adds the specified string.
    * @param sb string to be added
-   * @return indicates if cursor position should eventually be adjusted
+   * @return returns the number spaces to move forward
    */
-  boolean add(final StringBuilder sb) {
-    boolean move = false;
+  int add(final StringBuilder sb) {
+    int move = 0;
     if(sb.length() != 0) {
       final char ch = sb.charAt(0);
       final int curr = ps < text.length ? text[ps] : 0;
       final int prev = ps > 0 ? text[ps - 1] : 0;
-      // adds a closing to an opening bracket
+      final int pprv = ps > 1 ? text[ps - 2] : 0;
       final int open = OPENING.indexOf(ch);
       if(open != -1) {
-        sb.append(CLOSING.charAt(open));
-        move = true;
+        // adds a closing to an opening bracket
+        if(curr == 0 || Token.ws(curr)) {
+          sb.append(CLOSING.charAt(open));
+          move = 1;
+        }
       } else if(CLOSING.indexOf(ch) != -1) {
         // closing bracket: ignore if it equals next character
-        move = ch == curr;
-        if(move) sb.setLength(0);
+        if(ch == curr) {
+          sb.setLength(0);
+          move = 1;
+        }
         close();
       } else if(ch == '"' || ch == '\'') {
         // quote: ignore if it equals next character
         if(ch == curr) sb.setLength(0);
         // only add second quote if previous character is no character
         else if(!XMLToken.isNCChar(prev)) sb.append(ch);
-        move = true;
+        move = 1;
       } else if(ch == '>') {
         // closes an opening element
-        move = true;
         closeElem(sb);
+        move = 1;
+      } else if(ch == '~') {
+        if(prev == ':' && pprv == '(') {
+          sb.append("\n : \n :");
+          if(curr != ')') sb.append(')');
+          move = 5;
+        }
+      } else if(ch == '-') {
+        if(prev == '-' && pprv == '!' && ps > 2 && text[ps - 3] == '<') {
+          sb.append("  -->");
+          move = 2;
+        }
+      } else if(ch == '?') {
+        if(prev == '<') {
+          sb.append(" ?>");
+          move = 1;
+        }
       }
       add(sb.toString());
       setCaret();
@@ -571,6 +643,25 @@ public final class EditorText {
         }
         return;
       }
+    }
+  }
+
+  /**
+   * Marks characters for pressed backspace key.
+   */
+  void backspace() {
+    ms = ps;
+    me = ps - 1;
+    final int curr = ps < text.length ? text[ps] : 0;
+    final int prev = ps > 0 ? text[ps - 1] : 0;
+    final int pprv = ps > 1 ? text[ps - 2] : 0;
+    if(curr == prev && (curr == '"' || curr == '\'')) {
+      // remove closing quote
+      ms++;
+    } else {
+      // remove closing bracket
+      final int open = OPENING.indexOf(prev);
+      if(open != -1 && CLOSING.indexOf(curr) == open && !XMLToken.isChar(pprv)) ms++;
     }
   }
 
@@ -885,5 +976,33 @@ public final class EditorText {
   @Override
   public String toString() {
     return copy();
+  }
+
+  /** Index for all replacements. */
+  private static final StringList REPLACE = new StringList();
+
+  /** Reads in the property file. */
+  static {
+    try {
+      final String file = "/completions.properties";
+      final InputStream is = MimeTypes.class.getResourceAsStream(file);
+      if(is == null) {
+        Util.errln(file + " not found.");
+      } else {
+        final NewlineInput nli = new NewlineInput(is);
+        try {
+          for(String line; (line = nli.readLine()) != null;) {
+            final int i = line.indexOf('=');
+            if(i == -1 || line.startsWith("#")) continue;
+            REPLACE.add(line.substring(0, i));
+            REPLACE.add(line.substring(i + 1).replace("\\n", "\n"));
+          }
+        } finally {
+          nli.close();
+        }
+      }
+    } catch(final IOException ex) {
+      Util.errln(ex);
+    }
   }
 }
