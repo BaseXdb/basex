@@ -6,6 +6,7 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.nio.*;
 import java.nio.charset.*;
 
 import org.basex.data.*;
@@ -46,15 +47,21 @@ public abstract class OutputSerializer extends Serializer {
   final boolean saomit;
   /** Include content type flag. */
   final boolean content;
-  /** WebDAV flag. */
-  private final boolean webdav;
+
   /** New line. */
   protected final byte[] nl;
   /** Output stream. */
-  final PrintOutput out;
+  protected final PrintOutput out;
 
   /** Item flag (used for formatting). */
   private boolean item;
+  /** Charset encoder. */
+  private CharsetEncoder encoder;
+  /** Encoding buffer. */
+  private TokenBuilder encbuffer;
+
+  /** Charset. */
+  private final Charset encoding;
   /** UTF8 flag. */
   private final boolean utf8;
   /** CData elements. */
@@ -63,10 +70,10 @@ public abstract class OutputSerializer extends Serializer {
   private final TokenSet suppress = new TokenSet();
   /** Media type. */
   private final String media;
-  /** Charset. */
-  private final Charset encoding;
   /** Item separator. */
   private final byte[] itemsep;
+  /** WebDAV flag. */
+  private final boolean webdav;
 
   // project specific parameters
 
@@ -103,13 +110,17 @@ public abstract class OutputSerializer extends Serializer {
     saomit = sa == YesNoOmit.OMIT;
 
     final String maps = opts.get(USE_CHARACTER_MAPS);
-    final String enc = normEncoding(opts.get(ENCODING));
+    final String enc = normEncoding(opts.get(ENCODING), true);
     try {
       encoding = Charset.forName(enc);
     } catch(final Exception ex) {
       throw SERENCODING.getIO(enc);
     }
     utf8 = enc == UTF8;
+    if(!utf8) {
+      encoder = encoding.newEncoder();
+      encbuffer = new TokenBuilder();
+    }
 
     // project specific options
     indents = opts.get(INDENTS);
@@ -463,8 +474,14 @@ public abstract class OutputSerializer extends Serializer {
    */
   protected void print(final int ch) throws IOException {
     // comparison by reference
-    if(utf8) out.utf8(ch);
-    else out.write(new TokenBuilder(4).add(ch).toString().getBytes(encoding));
+    if(utf8) {
+      out.utf8(ch);
+    } else {
+      encbuffer.reset();
+      encoder.reset();
+      final ByteBuffer bb = encoder.encode(CharBuffer.wrap(encbuffer.add(ch).toString()));
+      out.write(bb.array(), 0, bb.limit());
+    }
   }
 
   /**

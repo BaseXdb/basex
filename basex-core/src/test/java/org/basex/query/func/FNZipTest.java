@@ -96,7 +96,7 @@ public final class FNZipTest extends AdvancedQueryTest {
     // check third file
     query(_ZIP_ZIP_FILE.args(
         params("<entry name='three' encoding='UTF-16'>!</entry>")));
-    checkEntry("three", new byte[] { '!', '\0' });
+    checkEntry("three", new byte[] { '\0', '!' });
     // check fourth file
     query(_ZIP_ZIP_FILE.args(params("<entry name='four' src='" + TMPFILE + "'/>")));
     checkEntry("four", new byte[] { '!' });

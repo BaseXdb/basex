@@ -23,7 +23,7 @@ public class JavaFuncTest extends AdvancedQueryTest {
   @Test
   public void staticField() {
     query("Q{java:java.lang.Math}PI()", Math.PI);
-    query("Q{java:org.basex.core.Prop}gui()");
+    query("Q{java:org.basex.util.Prop}gui()");
   }
 
   /** Tests calling some Java object fields from XQuery. */

@@ -68,7 +68,9 @@ public final class Token {
 
   /** UTF8 encoding string. */
   public static final String UTF8 = "UTF-8";
-  /** UTF16BE (=UTF16) encoding string. */
+  /** UTF16 encoding string. */
+  public static final String UTF16 = "UTF-16";
+  /** UTF16BE encoding string. */
   public static final String UTF16BE = "UTF-16BE";
   /** UTF16 encoding string. */
   public static final String UTF16LE = "UTF-16LE";
@@ -78,7 +80,7 @@ public final class Token {
   /** UTF8 encoding strings. */
   private static final String[] ALL_UTF8 = { UTF8, "UTF8" };
   /** UTF16-LE encoding strings. */
-  private static final String[] ALL_UTF16 = { UTF16LE, "UTF-16", "UTF16" };
+  private static final String[] ALL_UTF16 = { UTF16, "UTF16" };
   /** UTF32 encoding strings. */
   private static final String[] ALL_UTF32 = { UTF32, "UTF32" };
 
@@ -236,23 +238,22 @@ public final class Token {
    * @return encoding
    */
   public static String normEncoding(final String encoding) {
-    return normEncoding(encoding, null);
+    return normEncoding(encoding, false);
   }
 
   /**
    * Returns a unified representation of the specified encoding.
    * @param encoding input encoding (UTF-8 is returned for a {@code null} reference)
-   * @param old previous encoding (optional, normalized)
+   * @param utf16 normalize UTF-16 encoding
    * @return encoding
    */
-  public static String normEncoding(final String encoding, final String old) {
-    if(encoding == null) return old != null ? old : UTF8;
+  public static String normEncoding(final String encoding, final boolean utf16) {
+    if(encoding == null) return UTF8;
     final String e = encoding.toUpperCase(Locale.ENGLISH);
-    if(eq(e, ALL_UTF8))   return UTF8;
+    if(eq(e, ALL_UTF8)) return UTF8;
     if(e.equals(UTF16LE)) return UTF16LE;
     if(e.equals(UTF16BE)) return UTF16BE;
-    // give old BE/LE encoding preference
-    if(eq(e, ALL_UTF16))  return old == UTF16LE || old == UTF16BE ? old : UTF16LE;
+    if(eq(e, ALL_UTF16))  return utf16 ? UTF16BE : UTF16;
     if(eq(e, ALL_UTF32))  return UTF32;
     return encoding;
   }

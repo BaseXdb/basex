@@ -296,13 +296,12 @@ public final class FNConvert extends StandardFunc {
    * @return resulting value
    * @throws CharacterCodingException character coding exception
    */
-  public static byte[] toBinary(final byte[] in, final String enc)
-      throws CharacterCodingException {
-
+  public static byte[] toBinary(final byte[] in, final String enc) throws CharacterCodingException {
     if(enc == UTF8) return in;
-    final CharsetEncoder ce = Charset.forName(enc).newEncoder();
-    final CharBuffer cb = CharBuffer.wrap(string(in));
-    return ce.encode(cb).array();
+    final ByteBuffer bb = Charset.forName(enc).newEncoder().encode(CharBuffer.wrap(string(in)));
+    final int il = bb.limit();
+    final byte[] tmp = bb.array();
+    return tmp.length == il  ? tmp : Array.copyOf(tmp, il);
   }
 
   /**

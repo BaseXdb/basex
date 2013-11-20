@@ -41,7 +41,7 @@ abstract class TextDecoder {
     if(enc == UTF8) td = new UTF8();
     else if(enc == UTF32) td = new UTF32();
     else if(enc == UTF16LE) td = new UTF16LE();
-    else if(enc == UTF16BE) td = new UTF16BE();
+    else if(enc == UTF16 || enc == UTF16BE) td = new UTF16BE();
     else td = new Generic(enc);
     td.encoding = enc;
     return td;

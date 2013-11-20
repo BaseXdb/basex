@@ -24,6 +24,18 @@ public final class Array {
    * @param size new array size
    * @return new array
    */
+  public static byte[] copyOf(final byte[] array, final int size) {
+    final byte[] tmp = new byte[size];
+    System.arraycopy(array, 0, tmp, 0, Math.min(size, array.length));
+    return tmp;
+  }
+
+  /**
+   * Copies the specified array.
+   * @param array array to be copied
+   * @param size new array size
+   * @return new array
+   */
   public static byte[][] copyOf(final byte[][] array, final int size) {
     final byte[][] tmp = new byte[size][];
     System.arraycopy(array, 0, tmp, 0, Math.min(size, array.length));

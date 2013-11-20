@@ -439,7 +439,7 @@ public final class FNArchive extends StandardFunc {
     if(Prop.WIN) name = name.replace('\\', '/');
 
     final ZipEntry ze = new ZipEntry(name);
-    String en = null;
+    String enc = null;
 
     // compression level
     byte[] lvl = null;
@@ -458,16 +458,16 @@ public final class FNArchive extends StandardFunc {
       }
 
       // encoding
-      final byte[] enc = el.attribute(ENCODING);
-      if(enc != null) {
-        en = string(enc);
-        if(!Charset.isSupported(en)) throw ARCH_ENCODING.get(info, enc);
+      final byte[] ea = el.attribute(ENCODING);
+      if(ea != null) {
+        enc = string(ea);
+        if(!Charset.isSupported(enc)) throw ARCH_ENCODING.get(info, ea);
       }
     }
 
     // data to be compressed
     byte[] val = checkStrBin(cont);
-    if(cont instanceof AStr && en != null && en != UTF8) val = encode(val, en, ctx);
+    if(cont instanceof AStr && enc != null && enc != UTF8) val = encode(val, enc, ctx);
 
     try {
       out.level(lvl == null ? level : toInt(lvl));
@@ -480,16 +480,16 @@ public final class FNArchive extends StandardFunc {
   /**
    * Encodes the specified string to another encoding.
    * @param val value to be encoded
-   * @param en encoding
+   * @param enc encoding
    * @param ctx query context
    * @return encoded string
    * @throws QueryException query exception
    */
-  private byte[] encode(final byte[] val, final String en, final QueryContext ctx)
+  private byte[] encode(final byte[] val, final String enc, final QueryContext ctx)
       throws QueryException {
 
     try {
-      return FNConvert.toString(new ArrayInput(val), en, ctx);
+      return FNConvert.toString(new ArrayInput(val), enc, ctx);
     } catch(final IOException ex) {
       throw ARCH_ENCODE.get(info, ex);
     }

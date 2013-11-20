@@ -104,7 +104,9 @@ public class TextInput extends BufferInput {
    */
   public TextInput encoding(final String enc) throws IOException {
     if(enc != null) {
-      decoder = TextDecoder.get(normEncoding(enc, decoder.encoding));
+      String e = normEncoding(enc);
+      if(e == UTF16) e = decoder.encoding == UTF16LE ? UTF16LE : UTF16BE;
+      decoder = TextDecoder.get(e);
       decoder.valid = valid;
     }
     return this;

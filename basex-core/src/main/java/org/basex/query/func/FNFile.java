@@ -533,17 +533,17 @@ public final class FNFile extends StandardFunc {
       } finally {
         out.close();
       }
-    }
-
-    // write file chunk
-    final RandomAccessFile raf = new RandomAccessFile(path, "rw");
-    try {
-      final long dlen = raf.length();
-      if(off < 0 || off > dlen) throw FILE_BOUNDS.get(info, off, dlen);
-      raf.seek(off);
-      raf.write(bin.binary(info));
-    } finally {
-      raf.close();
+    } else {
+      // write file chunk
+      final RandomAccessFile raf = new RandomAccessFile(path, "rw");
+      try {
+        final long dlen = raf.length();
+        if(off < 0 || off > dlen) throw FILE_BOUNDS.get(info, off, dlen);
+        raf.seek(off);
+        raf.write(bin.binary(info));
+      } finally {
+        raf.close();
+      }
     }
     return null;
   }

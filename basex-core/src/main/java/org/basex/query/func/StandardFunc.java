@@ -219,7 +219,7 @@ public abstract class StandardFunc extends Arr {
     final String enc = string(checkStr(expr[i], ctx));
     try {
       if(Charset.isSupported(enc)) return normEncoding(enc);
-    } catch(final IllegalArgumentException e) {
+    } catch(final IllegalArgumentException ignored) {
       /* character set is invalid or unknown (e.g. empty string) */
     }
     throw err.get(info, enc);
