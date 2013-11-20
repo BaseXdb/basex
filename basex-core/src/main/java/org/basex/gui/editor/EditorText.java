@@ -459,32 +459,42 @@ public final class EditorText {
       final int p = ps - key.length(), cursor = value.indexOf('_');
       if(cursor != -1) value = value.replace("_", "");
       // adopt current indentation
-      final StringBuilder spaces = new StringBuilder();
-      open(spaces);
+      final StringBuilder spaces = open(new StringBuilder());
       if(spaces.length() != 0) {
         value = new TokenBuilder().addSep(value.split("\n"), "\n" + spaces).toString();
       }
       // delete old string, add new one
-      select(p, ps);
-      delete();
-      add(value);
+      replace(p, ps + (space ? 1 : 0), value);
       // adjust cursor
-      if(cursor != -1) setCaret(p + cursor);
+      setCaret(cursor != -1 ? p + cursor : ps);
       return;
     }
 
     // replace entities
-    int s = ps;
-    while(--s >= 0 && XMLToken.isChar(text[s]));
-    ++s;
-    final String key = Token.string(text, s, ps - s);
+    int p = ps;
+    while(--p >= 0 && XMLToken.isChar(text[p]));
+    ++p;
+    final String key = Token.string(text, p, ps - p);
     final byte[] value = XMLToken.getEntity(token(key));
     if(value != null) {
-      select(s, ps);
-      delete();
-      add(string(value));
+      replace(p, ps + (space ? 1 : 0), string(value));
+      setCaret(ps);
+      return;
     }
+
     if(space) ps++;
+  }
+
+  /**
+   * Checks if the specified key is found before the current cursor position.
+   * @param s start
+   * @param e end
+   * @param value new value
+   */
+  private void replace(final int s, final int e, final String value) {
+    select(s, e);
+    delete();
+    add(value);
   }
 
   /**
@@ -495,7 +505,7 @@ public final class EditorText {
   private boolean find(final String key) {
     final byte[] k = token(key);
     final int s = ps - k.length;
-    return s >= 0 && indexOf(text, k, s) != -1 && (s == 0 || !XMLToken.isChar(text[s - 1]));
+    return s >= 0 && indexOf(text, k, s) == s && (s == 0 || !XMLToken.isChar(text[s - 1]));
   }
 
   /**
@@ -539,8 +549,9 @@ public final class EditorText {
   /**
    * Processes the enter key and checks for opening brackets.
    * @param sb typed in string
+   * @return specified string builder
    */
-  void open(final StringBuilder sb) {
+  StringBuilder open(final StringBuilder sb) {
     // adopt indentation from previous line
     int s = 0;
     for(int p = ps - 1; p >= 0; p--) {
@@ -559,6 +570,7 @@ public final class EditorText {
     // unindent before closing bracket
     if(ps < text.length && CLOSING.indexOf(text[ps]) != -1) s -= TAB;
     for(int p = 0; p < s; p++) sb.append(' ');
+    return sb;
   }
 
   /**
@@ -576,7 +588,7 @@ public final class EditorText {
       final int open = OPENING.indexOf(ch);
       if(open != -1) {
         // adds a closing to an opening bracket
-        if(curr == 0 || Token.ws(curr)) {
+        if(!XMLToken.isChar(curr)) {
           sb.append(CLOSING.charAt(open));
           move = 1;
         }
@@ -605,12 +617,12 @@ public final class EditorText {
         }
       } else if(ch == '-') {
         if(prev == '-' && pprv == '!' && ps > 2 && text[ps - 3] == '<') {
-          sb.append("  -->");
+          sb.append("  -->\n");
           move = 2;
         }
       } else if(ch == '?') {
         if(prev == '<') {
-          sb.append(" ?>");
+          sb.append(" ?>\n");
           move = 1;
         }
       }
@@ -649,7 +661,7 @@ public final class EditorText {
           // add closing element
           sb.append("</");
           while(++p < ps) sb.append((char) text[p]);
-          sb.append(">");
+          sb.append(">\n");
           break;
         }
         return;
@@ -661,18 +673,16 @@ public final class EditorText {
    * Marks characters for pressed backspace key.
    */
   void backspace() {
-    ms = ps;
-    me = ps - 1;
-    final int curr = ps < text.length ? text[ps] : 0;
-    final int prev = ps > 0 ? text[ps - 1] : 0;
-    final int pprv = ps > 1 ? text[ps - 2] : 0;
+    startSelect();
+    final int curr = curr(), prev = prev();
+    finishSelect();
     if(curr == prev && (curr == '"' || curr == '\'')) {
       // remove closing quote
       ms++;
     } else {
       // remove closing bracket
       final int open = OPENING.indexOf(prev);
-      if(open != -1 && CLOSING.indexOf(curr) == open && !XMLToken.isChar(pprv)) ms++;
+      if(open != -1 && CLOSING.indexOf(curr) == open) ms++;
     }
   }
 
