@@ -106,6 +106,8 @@ public final class MainOptions extends Options {
   public static final StringOption BINDINGS = new StringOption("BINDINGS", "");
   /** Path to current query. */
   public static final StringOption QUERYPATH = new StringOption("QUERYPATH", "");
+  /** Flag for the size limit on inlineable functions. */
+  public static final NumberOption INLINELIMIT = new NumberOption("INLINELIMIT", 100);
   /** Caches the query results. */
   public static final BooleanOption CACHEQUERY = new BooleanOption("CACHEQUERY", false);
   /** Forces database creation for unknown documents. */
@@ -152,8 +154,6 @@ public final class MainOptions extends Options {
 
   /** Hidden: flag for tail-call optimization. */
   public static final NumberOption TAILCALLS = new NumberOption("TAILCALLS", 256);
-  /** Hidden: flag for the size limit on inlineable functions. */
-  public static final NumberOption INLINELIMIT = new NumberOption("INLINELIMIT", 32);
   /** Hidden: maximum number of hits to be displayed in the GUI (will be overwritten). */
   public static final NumberOption MAXHITS = new NumberOption("MAXHITS", -1);
 
