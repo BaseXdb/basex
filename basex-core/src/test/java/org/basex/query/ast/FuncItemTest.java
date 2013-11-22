@@ -177,4 +177,20 @@ public final class FuncItemTest extends QueryPlanTest {
         "count(distinct-values(//" + Util.className(Var.class) + "/@id)) = 3"
     );
   }
+
+  /**
+   * Checks if function items that have a non-empty closure but no arguments are correctly inlined.
+   * @see <a href="https://github.com/BaseXdb/basex/issues/796">GH-796</a>
+   */
+  @Test
+  public void closureOnlyInlining() {
+    check("declare function local:f($x as item()) { function() { $x } };" +
+        "declare function local:g($f, $x) {if(fn:empty($f())) then local:f($x) else local:f(())};" +
+        "declare variable $x := local:g(function() { () }, function() { () });" +
+        "fn:count($x())",
+        "1",
+        // the query should be pre-evaluated
+        "QueryPlan/Int/@value = 1"
+    );
+  }
 }
