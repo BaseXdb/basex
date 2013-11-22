@@ -293,8 +293,8 @@ public final class FuncItem extends FItem implements Scope {
       throws QueryException {
     if(!inline(exprs, ctx)) return null;
     // create let bindings for all variables
-    final LinkedList<GFLWOR.Clause> cls = exprs.length == 0 ? null :
-      new LinkedList<GFLWOR.Clause>();
+    final LinkedList<GFLWOR.Clause> cls =
+        exprs.length == 0 && closure.isEmpty() ? null : new LinkedList<GFLWOR.Clause>();
     final IntObjMap<Var> vs = new IntObjMap<Var>();
     for(int i = 0; i < vars.length; i++) {
       final Var old = vars[i], v = scp.newCopyOf(ctx, old);
