@@ -1,9 +1,10 @@
 package org.basex.data.atomic;
 
+import static org.basex.util.Token.*;
+
 import java.util.*;
 
 import org.basex.data.*;
-import org.basex.util.*;
 
 /**
  * Replaces a node in the database with an insertion sequence.
@@ -46,22 +47,22 @@ final class Replace extends StructuralUpdate {
   }
 
   @Override
-  void apply(final Data dest) {
-
-    if(fastReplace(dest)) {
-      // [LK] activate lazy replace (some TC not running then.. / not yet finished)
-//      if(lazyReplace(dest)) return;
+  void apply(final Data targetData) {
+    // [LK] replace optimizations only work without namespaces..
+    if(targetData.nspaces.size() == 0 && insseq.data.nspaces.size() == 0) {
+      // Lazy Replace
+      if(lazyReplace(targetData)) return;
       // Rapid Replace
-      dest.replace(location, insseq);
+      targetData.replace(location, insseq);
     } else {
-      final int targetKind = dest.kind(location);
-      final int targetParent = dest.parent(location, targetKind);
+      final int targetKind = targetData.kind(location);
+      final int targetParent = targetData.parent(location, targetKind);
       // delete first - otherwise insert must be at location+1
-      dest.delete(location);
+      targetData.delete(location);
       if(targetKind == Data.ATTR)
-        dest.insertAttr(location, targetParent, insseq);
+        targetData.insertAttr(location, targetParent, insseq);
       else
-        dest.insert(location, targetParent, insseq);
+        targetData.insert(location, targetParent, insseq);
     }
   }
 
@@ -69,65 +70,69 @@ final class Replace extends StructuralUpdate {
    * Lazy Replace implementation. Checks if the replace operation can be substituted with
    * cheaper value updates. If structural changes have to be made no substitution takes
    * place.
-   * @param dst destination data reference
+   * @param trg destination data reference
    * @return true if substitution successful
    */
-  boolean lazyReplace(final Data dst) {
+  boolean lazyReplace(final Data trg) {
     final Data src = insseq.data;
-    final int sourceSize = insseq.size();
-    if(sourceSize != dst.size(location, dst.kind(location))) return false;
+    final int srcSize = insseq.size();
+    // check for equal subtree size
+    if(srcSize != trg.size(location, trg.kind(location))) return false;
 
     final List<BasicUpdate> valueUpdates = new ArrayList<BasicUpdate>();
-    // [LK] check for equal size of both! src.size==dst.size
-    for(int c = 0; c < sourceSize; c++) {
+    for(int c = 0; c < srcSize; c++) {
       final int s = insseq.start + c;
-      final int d = location + c;
+      final int t = location + c;
       final int sk = src.kind(s);
-      final int dk = dst.kind(d);
-      if(sk != dk)
+      final int tk = trg.kind(t);
+
+      if(sk != tk)
         return false;
-      final int sdis = src.dist(s, sk);
-      final int ddis = dst.dist(d, dk);
-      if(sdis != ddis)
+      // distance can differ for first two tuples
+      if(c > 0 && src.dist(s, sk) != trg.dist(t, tk))
         return false;
-
-      switch(sk) {
-        case Data.ELEM:
-          if(src.attSize(s, sk) != dst.attSize(d, dk) ||
-            src.size(s, sk) != dst.size(d, dk))
-            return false;
-          break;
-
-        case Data.ATTR:
-//          throw Util.notexpecte("replace by value: update ATTR ?");
-          break;
-
-        case Data.TEXT:
-        case Data.COMM:
-        case Data.PI:
-          final byte[] stxt = src.text(s, true);
-          // [LK] compare potentially huge texts?
-          if(dst.textLen(d, true) != src.textLen(s, true) ||
-              !Token.eq(dst.text(d, true), stxt))
-            valueUpdates.add(UpdateValue.getInstance(dst, d, stxt));
+      // check text / comment values
+      if(sk == Data.TEXT || sk == Data.COMM) {
+        byte[] srcText = src.text(s, true);
+        if(trg.textLen(t, true) != src.textLen(s, true) ||
+            !eq(trg.text(t, true), srcText))
+          valueUpdates.add(UpdateValue.getInstance(trg, t, srcText));
+      } else {
+        // check element, attribute, processing instruction name
+        final byte[] srcName = src.name(s, sk);
+        final byte[] trgName = trg.name(t, tk);
+        if(!eq(srcName, trgName))
+          valueUpdates.add(Rename.getInstance(trg, t, srcName, EMPTY));
+        switch(sk) {
+          case Data.ELEM:
+            // check size of elements
+            if(src.attSize(s, sk) != trg.attSize(t, tk) || src.size(s, sk) != trg.size(t, tk))
+              return false;
+            break;
+          case Data.ATTR:
+            // check attribute values
+            byte[] srcValue = src.text(s, false);
+            if(!eq(trg.text(t, false), srcValue))
+              valueUpdates.add(UpdateValue.getInstance(trg, t, srcValue));
+            break;
+          case Data.PI:
+            // check processing istruction value
+            final byte[] srcText = src.text(s, true);
+            final byte[] trgText = trg.text(t, true);
+            final int i = indexOf(srcText, ' ');
+            srcValue =  i == -1 ? EMPTY : substring(srcText, i + 1);
+            if(!eq(srcValue, indexOf(trgText, ' ') == -1 ? EMPTY :
+              substring(trgText, i + 1))) {
+              valueUpdates.add(UpdateValue.getInstance(trg, t, srcValue));
+            }
+            break;
+        }
       }
     }
-
     for(final BasicUpdate u : valueUpdates) {
-      u.apply(dst);
+      u.apply(trg);
     }
     return true;
-  }
-
-  /**
-   * Checks whether an optimization for a faster replace can be leveraged. Only available
-   * if no {@link Namespaces} exist in both the target and the source database.
-   * @param d target database
-   * @return true if fast replace possible
-   */
-  private boolean fastReplace(final Data d) {
-    return d.nspaces.size() == 0 && insseq.data.nspaces.size() == 0 &&
-        d.kind(location) != Data.ATTR;
   }
 
   @Override

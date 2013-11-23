@@ -26,10 +26,46 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   public final ExpectedException thrown = ExpectedException.none();
 
   /**
+   * Basic Lazy Replace tests.
+   */
+  @Test
+  public void lazyReplace() {
+    // IDENTICAL: 0 value updates
+    query(transform("<doc><tree/></doc>",
+            "replace node $input//tree with <tree/>"),
+        "<doc><tree/></doc>");
+    // FAIL: different size of trees
+    query(transform("<doc><tree><n/></tree></doc>",
+            "replace node $input//tree with <tree/>"),
+        "<doc><tree/></doc>");
+    // FAIL: kind
+    query(transform("<doc><tree><n/></tree></doc>",
+            "replace node $input//tree with <tree>text</tree>"),
+        "<doc><tree>text</tree></doc>");
+    // FAIL: distance (size would've already failed on ancestor axis)
+    query(transform("<doc><tree><n/></tree></doc>",
+            "replace node $input//tree with <tree/>"),
+        "<doc><tree/></doc>");
+    // FAIL: replace attribute w/ sequence of attributes
+    query(transform("<doc><tree id=\"0\"/></doc>",
+        "replace node $input//@id with (attribute id {\"1\"}, attribute id2 {\"2\"})"),
+    "<doc><tree id=\"1\" id2=\"2\"/></doc>");
+    // LAZY REPLACE: 8 value updates -> element, attribute, text, comment, processing instruction
+    query(transform("<doc><tree1 a='0'>text1<a/><!--comm1--><a/><?p1 i1?><?p11?></tree1></doc>",
+            "replace node $input//tree1 with " +
+            "<tree2 b='1'>text2<a/><!--comm2--><a/><?p2 i2?><?p22?></tree2>"),
+        "<doc><tree2 b=\"1\">text2<a/><!--comm2--><a/><?p2 i2?><?p22 ?></tree2></doc>");
+    // LAZY REPLACE: 2 value updates -> single attribute
+    query(transform("<doc><tree id1=\"0\"/></doc>",
+            "replace node $input//@id1 with attribute id2 {\"1\"}"),
+        "<doc><tree id2=\"1\"/></doc>");
+  }
+
+  /**
    * Basic test for tree-aware updates.
    */
   @Test
-  public void treeAwareUpdates() {
+  public void treeAwareUpdates0() {
     final String doc = "<n1>" + "<n2 att3='0'><n4/><n5><n6/></n5></n2>" + "</n1>";
     final AtomicUpdateCache l = atomics(doc);
     final MemData m = new MemData(l.data);
