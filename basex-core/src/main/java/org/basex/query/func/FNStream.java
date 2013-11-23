@@ -3,6 +3,7 @@ package org.basex.query.func;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -55,7 +56,7 @@ public final class FNStream extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx) {
+  protected Expr opt(final QueryContext ctx, final VarScope scp) {
     if(sig == Function._STREAM_MATERIALIZE) type = expr[0].type();
     return this;
   }

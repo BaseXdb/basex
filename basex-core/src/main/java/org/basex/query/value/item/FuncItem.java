@@ -281,10 +281,18 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public String toString() {
     final FuncType ft = (FuncType) type;
-    final TokenBuilder tb = new TokenBuilder(FUNCTION).add('(');
+    final TokenBuilder tb = new TokenBuilder();
+    if (!closure.isEmpty()) {
+      tb.add("((: closure :) ");
+      for (final Entry<Var, Value> e : closure.entrySet())
+        tb.add("let ").addExt(e.getKey()).add(" := ").addExt(e.getValue()).add(' ');
+      tb.add(RETURN).add(' ');
+    }
+    tb.add(FUNCTION).add('(');
     for(final Var v : vars) tb.addExt(v).add(v == vars[vars.length - 1] ? "" : ", ");
-    return tb.add(')').add(ft.type != null ? " as " + ft.type : "").add(" { ").
-        addExt(expr).add(" }").toString();
+    tb.add(')').add(ft.type != null ? " as " + ft.type : "").add(" { ").addExt(expr).add(" }");
+    if (!closure.isEmpty()) tb.addByte((byte) ')');
+    return tb.toString();
   }
 
   @Override

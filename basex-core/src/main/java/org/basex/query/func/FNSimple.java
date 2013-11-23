@@ -12,6 +12,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -110,7 +111,7 @@ public final class FNSimple extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx) {
+  protected Expr opt(final QueryContext ctx, final VarScope scp) {
     if(expr.length == 0) return this;
     final Expr e = expr[0];
 

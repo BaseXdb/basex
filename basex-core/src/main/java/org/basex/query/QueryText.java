@@ -803,6 +803,8 @@ public interface QueryText {
   String OPTBIND = "binding static variable %";
   /** Optimization info. */
   String OPTCHILD = "converting % to child steps";
+  /** Optimization info. */
+  String OPTUNROLL = "unrolling %";
 
   /** Warning. */
   String WARNSELF = "Warning: '%' will never yield results.";

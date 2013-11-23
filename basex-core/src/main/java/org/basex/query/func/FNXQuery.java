@@ -14,6 +14,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -50,19 +51,14 @@ public final class FNXQuery extends StandardFunc {
     switch(sig) {
       case _XQUERY_EVAL:   return eval(ctx).value();
       case _XQUERY_INVOKE: return invoke(ctx).value();
-      case _XQUERY_TYPE:   return opt(ctx).value(ctx);
+      case _XQUERY_TYPE:   return type(ctx).value(ctx);
       default:             return super.value(ctx);
     }
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx) {
-    if(sig == _XQUERY_TYPE) {
-      FNInfo.dump(Util.inf("{ type: %, size: % }", expr[0].type(), expr[0].size()),
-          token(expr[0].toString()), ctx);
-      return expr[0];
-    }
-    return this;
+  protected Expr opt(final QueryContext ctx, final VarScope scp) {
+    return sig == _XQUERY_TYPE ? type(ctx) : this;
   }
 
   /**
@@ -123,6 +119,17 @@ public final class FNXQuery extends StandardFunc {
     } catch(final IOException ex) {
       throw IOERR.get(info, ex);
     }
+  }
+
+  /**
+   * Dumps the argument's type and size and returns it unchanged.
+   * @param ctx query context
+   * @return the argument expression
+   */
+  private Expr type(final QueryContext ctx) {
+    FNInfo.dump(Util.inf("{ type: %, size: % }", expr[0].type(), expr[0].size()),
+        token(expr[0].toString()), ctx);
+    return expr[0];
   }
 
   @Override

@@ -12,6 +12,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -71,7 +72,7 @@ public final class FNHof extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx) {
+  protected Expr opt(final QueryContext ctx, final VarScope scp) {
     return oneOf(sig, _HOF_ID, _HOF_CONST) ? expr[0] : this;
   }
 

@@ -17,6 +17,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -142,7 +143,7 @@ public final class FNSeq extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx) throws QueryException {
+  protected Expr opt(final QueryContext ctx, final VarScope scp) throws QueryException {
     // static typing:
     // index-of will create integers, insert-before might add new types
     if(sig == Function.INDEX_OF || sig == Function.INSERT_BEFORE) return this;

@@ -92,19 +92,21 @@ public final class InlineFunc extends Single implements Scope {
    * Removes and returns all static bindings from this function's closure.
    * @return static variable bindings
    */
-  private Collection<Entry<Var, Expr>> staticBindings() {
-    Collection<Entry<Var, Expr>> propagate = null;
+  private Collection<Entry<Var, Value>> staticBindings() {
+    Collection<Entry<Var, Value>> propagate = null;
     final Iterator<Entry<Var, Expr>> cls = scope.closure().entrySet().iterator();
     while(cls.hasNext()) {
       final Entry<Var, Expr> e = cls.next();
       final Expr c = e.getValue();
-      if(c.isValue()) {
-        if(propagate == null) propagate = new ArrayList<Entry<Var, Expr>>();
-        propagate.add(e);
+      if(c instanceof Value) {
+        @SuppressWarnings({ "unchecked", "rawtypes"})
+        final Entry<Var, Value> e2 = (Entry) e;
+        if(propagate == null) propagate = new ArrayList<Entry<Var, Value>>();
+        propagate.add(e2);
         cls.remove();
       }
     }
-    return propagate == null ? Collections.<Entry<Var, Expr>>emptyList() : propagate;
+    return propagate == null ? Collections.<Entry<Var, Value>>emptyList() : propagate;
   }
 
   @Override
@@ -113,14 +115,17 @@ public final class InlineFunc extends Single implements Scope {
     compiled = true;
 
     // compile closure
-    for(final Entry<Var, Expr> e : scope.closure().entrySet())
-      e.setValue(e.getValue().compile(ctx, scp));
+    for(final Entry<Var, Expr> e : scope.closure().entrySet()) {
+      final Expr bound = e.getValue().compile(ctx, scp);
+      e.setValue(bound);
+      e.getKey().refineType(bound.type(), ctx, info);
+    }
 
     final int fp = scope.enter(ctx);
     try {
       // constant propagation
-      for(final Entry<Var, Expr> e : staticBindings())
-        ctx.set(e.getKey(), e.getValue().value(ctx), info);
+      for(final Entry<Var, Value> e : staticBindings())
+        ctx.set(e.getKey(), e.getValue(), info);
 
       expr = expr.compile(ctx, scope);
     } catch(final QueryException qe) {
@@ -141,6 +146,21 @@ public final class InlineFunc extends Single implements Scope {
   public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     type = FuncType.get(ann, args, ret).seqType();
     size = 1;
+
+    final int fp = scope.enter(ctx);
+    try {
+      // inline all values in the closure
+      for(final Entry<Var, Value> e : staticBindings()) {
+        final Expr inlined = expr.inline(ctx, scope, e.getKey(), e.getValue());
+        if (inlined != null) expr = inlined;
+      }
+    } catch(final QueryException qe) {
+      expr = FNInfo.error(qe, ret != null ? ret : expr.type());
+    } finally {
+      scope.cleanUp(this);
+      scope.exit(ctx, fp);
+    }
+
     // only evaluate if the closure is empty, so we don't lose variables
     return scope.closure().isEmpty() ? preEval(ctx) : this;
   }
@@ -156,29 +176,13 @@ public final class InlineFunc extends Single implements Scope {
   @Override
   public Expr inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
-    boolean change = false, val = false;
+    boolean change = false;
 
     for(final Entry<Var, Expr> entry : scope.closure().entrySet()) {
       final Expr ex = entry.getValue().inline(ctx, scp, v, e);
       if(ex != null) {
         change = true;
-        val |= ex.isValue();
         entry.setValue(ex);
-      }
-    }
-
-    if(val) {
-      final int fp = scope.enter(ctx);
-      try {
-        for(final Entry<Var, Expr> entry : staticBindings()) {
-          final Expr inl = expr.inline(ctx, scope, entry.getKey(), entry.getValue());
-          if(inl != null) expr = inl;
-        }
-      } catch(final QueryException qe) {
-        expr = FNInfo.error(qe, ret != null ? ret : expr.type());
-      } finally {
-        scope.cleanUp(this);
-        scope.exit(ctx, fp);
       }
     }
 
@@ -256,14 +260,23 @@ public final class InlineFunc extends Single implements Scope {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(FUNCTION).append(PAR1);
+    final StringBuilder sb = new StringBuilder();
+    if (!scope.closure().isEmpty()) {
+      sb.append("((: inline-closure :) ");
+      for (final Entry<Var, Expr> e : scope.closure().entrySet())
+        sb.append("let ").append(e.getKey()).append(" := ").append(e.getValue()).append(' ');
+      sb.append(RETURN).append(' ');
+    }
+    sb.append(FUNCTION).append(PAR1);
     for(int i = 0; i < args.length; i++) {
       if(i > 0) sb.append(", ");
       sb.append(args[i].toString());
     }
     sb.append(PAR2).append(' ');
     if(ret != null) sb.append("as ").append(ret.toString()).append(' ');
-    return sb.append("{ ").append(expr).append(" }").toString();
+    sb.append("{ ").append(expr).append(" }");
+    if(!scope.closure().isEmpty()) sb.append(')');
+    return sb.toString();
   }
 
   @Override
