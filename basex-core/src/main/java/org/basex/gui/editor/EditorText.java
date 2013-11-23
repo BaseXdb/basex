@@ -459,15 +459,16 @@ public final class EditorText {
       final int p = ps - key.length(), cursor = value.indexOf('_');
       if(cursor != -1) value = value.replace("_", "");
       // adopt current indentation
-      final StringBuilder spaces = open(new StringBuilder());
-      if(spaces.length() != 0) {
+      final int ind = open();
+      if(ind != 0) {
+        final StringBuilder spaces = new StringBuilder();
+        for(int i = 0; i < ind; i++) spaces.append(' ');
         value = new TokenBuilder().addSep(value.split("\n"), "\n" + spaces).toString();
       }
       // delete old string, add new one
       replace(p, ps + (space ? 1 : 0), value);
       // adjust cursor
       setCaret(cursor != -1 ? p + cursor : ps);
-      return;
     }
 
     // replace entities
@@ -547,30 +548,52 @@ public final class EditorText {
   }
 
   /**
-   * Processes the enter key and checks for opening brackets.
-   * @param sb typed in string
-   * @return specified string builder
+   * Adds indenting spaces to the specified string builder.
+   * @return number of spaces to indent
    */
-  StringBuilder open(final StringBuilder sb) {
+  int open() {
     // adopt indentation from previous line
-    int s = 0;
+    int ind = 0;
     for(int p = ps - 1; p >= 0; p--) {
       final byte b = text[p];
       if(b == '\n') break;
       if(b == '\t') {
-        s += TAB;
+        ind += TAB;
       } else if(b == ' ') {
-        s++;
+        ind++;
       } else {
-        s = 0;
+        ind = 0;
       }
     }
+    return ind;
+  }
+
+  /**
+   * Processes the enter key and checks for opening brackets.
+   * @param sb typed in string
+   * @return specified string builder
+   */
+  int enter(final StringBuilder sb) {
     // indent after opening bracket
-    if(ps > 0 && OPENING.indexOf(text[ps - 1]) != -1) s += TAB;
-    // unindent before closing bracket
-    if(ps < text.length && CLOSING.indexOf(text[ps]) != -1) s -= TAB;
-    for(int p = 0; p < s; p++) sb.append(' ');
-    return sb;
+    final boolean opening = ps > 0 && OPENING.indexOf(text[ps - 1]) != -1;
+    final boolean closing = ps < text.length && CLOSING.indexOf(text[ps]) != -1;
+
+    int ind = open(), move = 0;
+    if(opening) {
+      if(closing) {
+        for(int p = 0; p < ind + TAB; p++) sb.append(' ');
+        move = ind + TAB + 1;
+        sb.append('\n');
+      } else {
+        ind += TAB;
+      }
+    } else if(closing) {
+      // unindent before closing bracket
+      ind -= TAB;
+    }
+    for(int p = 0; p < ind; p++) sb.append(' ');
+    add(sb);
+    return move;
   }
 
   /**

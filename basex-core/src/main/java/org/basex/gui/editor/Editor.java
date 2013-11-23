@@ -742,8 +742,7 @@ public class Editor extends BaseXPanel {
     }
     final int ps = text.pos();
 
-    if(ENTER.is(e)) text.open(sb);
-    final int move = text.add(sb);
+    final int move = ENTER.is(e) ? text.enter(sb) : text.add(sb);
 
     // refresh history and adjust cursor position
     hist.store(text.text(), pc, text.getCaret());
