@@ -604,7 +604,7 @@ public abstract class Data {
     if(data.kind(spre) == ATTR) {
       int d = 0;
       while(spre < source.end && data.kind(spre++) == ATTR) d++;
-      if(d > 1) attSize(tpar, kind(tpar), d + 1);
+      if(d > 1) attSize(tpar, kind(tpar), d + attSize(tpar, ELEM) - 1);
     }
   }
 
