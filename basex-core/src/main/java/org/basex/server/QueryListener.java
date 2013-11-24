@@ -145,7 +145,7 @@ final class QueryListener extends Proc {
             }
             ser.reset();
           }
-          ser.serialize(it);
+          ser.serialize(it, full);
           if(iter && !wrap) {
             po.flush();
             out.write(0);

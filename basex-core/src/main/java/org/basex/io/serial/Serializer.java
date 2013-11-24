@@ -96,17 +96,30 @@ public abstract class Serializer {
 
   // PUBLIC METHODS =====================================================================
 
+
   /**
    * Serializes the specified item, which may be a node or an atomic value.
    * @param item item to be serialized
    * @throws IOException I/O exception
    */
   public void serialize(final Item item) throws IOException {
+    serialize(item, false);
+  }
+
+  /**
+   * Serializes the specified item, which may be a node or an atomic value.
+   * @param item item to be serialized
+   * @param atts also serialize attributes and namespaces
+   * @throws IOException I/O exception
+   */
+  public void serialize(final Item item, final boolean atts) throws IOException {
     openResult();
     if(item instanceof ANode) {
       final Type type = item.type;
-      if(type == NodeType.ATT) throw SERATTR.getIO(item);
-      if(type == NodeType.NSP) throw SERNS.getIO(item);
+      if(!atts) {
+        if(type == NodeType.ATT) throw SERATTR.getIO(item);
+        if(type == NodeType.NSP) throw SERNS.getIO(item);
+      }
       serialize((ANode) item);
     } else if(item instanceof FItem) {
       throw SERFUNC.getIO(item.description());
@@ -315,6 +328,8 @@ public abstract class Serializer {
         text(node.string());
       } else if(type == NodeType.PI) {
         pi(node.name(), node.string());
+      } else if(type == NodeType.ATT) {
+        attribute(node.name(), node.string());
       } else if(type == NodeType.NSP) {
         namespace(node.name(), node.string());
       } else if(type == NodeType.DOC) {
