@@ -136,8 +136,7 @@ public final class InlineFunc extends Single implements Scope {
     }
 
     // convert all function calls in tail position to proper tail calls
-    ctx.compInfo(OPTTCE, this);
-    expr.markTailCalls();
+    expr.markTailCalls(ctx);
 
     return optimize(ctx, scp);
   }
@@ -195,7 +194,7 @@ public final class InlineFunc extends Single implements Scope {
     final Var[] a = args.clone();
     for(int i = 0; i < a.length; i++) a[i] = vs.get(a[i].id);
     final Expr e = expr.copy(cx, v, vs);
-    e.markTailCalls();
+    e.markTailCalls(null);
     return copyType(new InlineFunc(info, name, ret, a, e, ann, sc, v));
   }
 

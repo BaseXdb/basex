@@ -758,7 +758,7 @@ public interface QueryText {
   /** Optimization info. */
   String OPTREMOVE = "%: removing %";
   /** Optimization info. */
-  String OPTTCE = "rewriting for tail calls: %";
+  String OPTTCE = "marking as tail call: %";
   /** Optimization info. */
   String OPTREMCTX = "removing context expression (.)";
   /** Optimization info. */

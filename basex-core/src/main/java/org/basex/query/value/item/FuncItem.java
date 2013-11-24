@@ -233,7 +233,7 @@ public final class FuncItem extends FItem implements Scope {
       refs[i] = new VarRef(ii, vs[i]);
     }
     final Expr e = new DynFuncCall(ii, fun, refs);
-    e.markTailCalls();
+    e.markTailCalls(null);
     return new FuncItem(fun.name, vs, e, t, fun.cast != null, null, vsc, sc, fun.func);
   }
 
