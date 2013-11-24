@@ -81,6 +81,9 @@ public enum BaseXKeys {
   /** Browse up.             */ GOUP(MAC ? SC : ALT, VK_UP, true),
   /** Browse home.           */ GOHOME(MAC ? SC : ALT, VK_HOME, true),
 
+  /** Refresh.               */ REFRESH(VK_F5),
+  /** Jump to project.       */ PROJECT(SC | SHF, VK_R, true),
+
   // Font
 
   /** Increment size.        */ INCFONT1(SC, VK_PLUS, true),

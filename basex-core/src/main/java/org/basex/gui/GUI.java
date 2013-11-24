@@ -61,7 +61,7 @@ public final class GUI extends AGUI {
   /** Fullscreen flag. */
   public boolean fullscreen;
   /** Result panel. */
-  private final GUIMenu menu;
+  public final GUIMenu menu;
   /** Button panel. */
   public final BaseXBack buttons;
   /** Navigation/input panel. */

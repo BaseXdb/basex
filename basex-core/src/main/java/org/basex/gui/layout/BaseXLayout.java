@@ -228,6 +228,14 @@ public final class BaseXLayout {
 
           // jump to input bar
           if(INPUTBAR.is(e)) gui.input.requestFocusInWindow();
+          // jump to project view
+          if(PROJECT.is(e)) {
+            if(!gui.gopts.get(GUIOptions.SHOWPROJECT)) {
+              gui.gopts.invert(GUIOptions.SHOWPROJECT);
+              gui.editor.project();
+            }
+            gui.editor.focusTree();
+          }
 
           // change font size
           final int fs = gui.gopts.get(GUIOptions.FONTSIZE);
@@ -256,7 +264,7 @@ public final class BaseXLayout {
    * @return tooltip
    */
   public static String addShortcut(final String str, final String sc) {
-    if(sc == null) return str;
+    if(sc == null || str == null) return str;
     final StringBuilder sb = new StringBuilder();
     for(final String s : sc.split(" ")) {
       String t = "%".equals(s) ? Prop.MAC ? "meta" : "control" : s;

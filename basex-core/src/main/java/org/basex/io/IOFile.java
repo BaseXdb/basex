@@ -131,6 +131,14 @@ public final class IOFile extends IO {
   }
 
   /**
+   * Checks if the file is hidden.
+   * @return result of check
+   */
+  public boolean hidden() {
+    return file.isHidden();
+  }
+
+  /**
    * Recursively creates the directory.
    * @return success flag
    */

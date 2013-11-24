@@ -56,6 +56,8 @@ public final class MimeTypes {
 
   /** XML media types' suffix. */
   private static final String XML_SUFFIX = "+xml";
+  /** XQuery media types' suffix. */
+  private static final String XQUERY_SUFFIX = "/xquery";
 
   /** Private constructor. */
   private MimeTypes() { }
@@ -69,6 +71,15 @@ public final class MimeTypes {
   public static String get(final String path) {
     final String ct = TYPES.get(IO.suffix(path));
     return ct != null ? ct : APP_OCTET;
+  }
+
+  /**
+   * Checks if the content type is an XQuery content type.
+   * @param type content type
+   * @return result of check
+   */
+  public static boolean isXQuery(final String type) {
+    return type.endsWith(XQUERY_SUFFIX);
   }
 
   /**

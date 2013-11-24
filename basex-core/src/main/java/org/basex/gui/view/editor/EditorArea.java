@@ -26,7 +26,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-final class EditorArea extends Editor {
+public final class EditorArea extends Editor {
   /** File label. */
   final BaseXLabel label;
   /** File in tab. */

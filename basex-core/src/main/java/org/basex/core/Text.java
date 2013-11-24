@@ -893,6 +893,8 @@ public interface Text {
   /** Command info. */
   String FOLDER = lang("folder");
   /** Command info. */
+  String PROJECT_VIEW = lang("project_view");
+  /** Command info. */
   String COMMUNITY = lang("community");
   /** Command info. */
   String CHECK_FOR_UPDATES = lang("check_for_updates");
@@ -1174,6 +1176,8 @@ public interface Text {
   String DELETE_NODES = lang("delete_nodes");
   /** Dialog title for closing a file. */
   String CLOSE_FILE_X = lang("close_file_%");
+  /** Dialog title for deleting a file. */
+  String DELETE_FILE_X = lang("delete_file_%");
   /** Dialog title for reopening a file. */
   String REOPEN_FILE_X = lang("reopen_file_%");
 
