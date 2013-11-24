@@ -87,7 +87,7 @@ public final class BaseXGUI {
           boolean xq = file.endsWith(IO.BXSSUFFIX);
           for(final String suf : IO.XQSUFFIXES) xq |= file.endsWith(suf);
           if(xq) {
-            gui.editor.open(io, true);
+            gui.editor.open(io);
           } else if(!xml) {
             // only parse first xml file
             gopts.set(GUIOptions.INPUTPATH, io.path());

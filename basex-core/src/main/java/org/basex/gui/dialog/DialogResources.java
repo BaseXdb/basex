@@ -55,9 +55,7 @@ public final class DialogResources extends BaseXBack {
     tree.setRootVisible(false);
     tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
-    final ImageIcon xml = BaseXLayout.icon("file_xml");
-    final ImageIcon raw = BaseXLayout.icon("file_raw");
-    tree.setCellRenderer(new TreeNodeRenderer(xml, raw));
+    tree.setCellRenderer(new TreeNodeRenderer());
     tree.addTreeSelectionListener(new TreeSelectionListener() {
       @Override
       public void valueChanged(final TreeSelectionEvent e) {
@@ -158,7 +156,7 @@ public final class DialogResources extends BaseXBack {
       filtered = true;
     } else if(comp == clear) {
       filterText.setText("/");
-      filterText.requestFocus();
+      filterText.requestFocusInWindow();
       refreshFolder(root);
       filtered = false;
     }
@@ -235,19 +233,9 @@ public final class DialogResources extends BaseXBack {
    */
   private static final class TreeNodeRenderer extends DefaultTreeCellRenderer {
     /** Icon for xml files. */
-    private final Icon xmlIcon;
+    private final Icon xmlIcon = BaseXLayout.icon("file_xml");
     /** Icon for raw files. */
-    private final Icon rawIcon;
-
-    /**
-     * Constructor.
-     * @param xml xml icon
-     * @param raw raw icon
-     */
-    TreeNodeRenderer(final Icon xml, final Icon raw) {
-      xmlIcon = xml;
-      rawIcon = raw;
-    }
+    private final Icon rawIcon = BaseXLayout.icon("file_raw");
 
     @Override
     public Component getTreeCellRendererComponent(final JTree tree, final Object val,

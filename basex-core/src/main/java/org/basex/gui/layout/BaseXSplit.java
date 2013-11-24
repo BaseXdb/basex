@@ -10,13 +10,13 @@ import java.awt.*;
  */
 public final class BaseXSplit extends BaseXBack implements LayoutManager {
   /** Layout: horizontal = true, vertical = false. */
-  private final boolean l;
-  /** Panel positions. */
-  private double[] s;
-  /** Temporary panel positions. */
-  private double[] t;
-  /** Temporary drag position. */
-  private double d;
+  private final boolean horiz;
+  /** Proportional panel sizes. */
+  private double[] propSize;
+  /** Panel positions; assigned when a drag operation starts. */
+  private double[] dragSize;
+  /** Current drag position. */
+  private double dragPos;
 
   /**
    * Constructor.
@@ -24,21 +24,33 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
    */
   public BaseXSplit(final boolean lay) {
     layout(this);
-    l = lay;
+    horiz = lay;
   }
 
   @Override
   public Component add(final Component comp) {
-    if(getComponentCount() != 0) super.add(new BaseXSplitSep(l));
+    if(getComponentCount() != 0) super.add(new BaseXSplitSep(horiz));
     super.add(comp);
-    s = null;
+    propSize = null;
     return comp;
   }
 
   @Override
   public void removeAll() {
     super.removeAll();
-    s = null;
+    propSize = null;
+  }
+
+  /**
+   * Sets proportional panel size (sum must be 1.0).
+   * @param sz sizes
+   * @return old sizes
+   */
+  public double[] sizes(final double[] sz) {
+    final double[] old = propSize;
+    propSize = sz;
+    revalidate();
+    return old;
   }
 
   /**
@@ -46,8 +58,8 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
    * @param p position
    */
   void startDrag(final double p) {
-    d = p;
-    t = s.clone();
+    dragPos = p;
+    dragSize = propSize.clone();
   }
 
   /**
@@ -57,14 +69,14 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
    */
   void drag(final BaseXSplitSep sep, final double p) {
     final Component[] m = getComponents();
-    final int r = s.length;
+    final int r = propSize.length;
     int q = 0;
     for(int n = 0; n < r - 1; ++n) if(m[(n << 1) + 1] == sep) q = n + 1;
-    final double v = (d - p) / (l ? getWidth() : getHeight());
-    for(int i = 0; i < q; ++i) if(t[i] - v / q < .0001) return;
-    for(int i = q; i < r; ++i) if(t[i] + v / (r - q) < .0001) return;
-    for(int i = 0; i < q; ++i) s[i] = t[i] - v / q;
-    for(int i = q; i < r; ++i) s[i] = t[i] + v / (r - q);
+    final double v = (dragPos - p) / (horiz ? getWidth() : getHeight());
+    for(int i = 0; i < q; ++i) if(dragSize[i] - v / q < .0001) return;
+    for(int i = q; i < r; ++i) if(dragSize[i] + v / (r - q) < .0001) return;
+    for(int i = 0; i < q; ++i) propSize[i] = dragSize[i] - v / q;
+    for(int i = q; i < r; ++i) propSize[i] = dragSize[i] + v / (r - q);
     revalidate();
   }
 
@@ -87,22 +99,29 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
   @Override
   public void layoutContainer(final Container parent) {
     final Component[] c = getComponents();
-    final int h = getHeight();
-    final int w = getWidth();
-    final int m = c.length + 1 >> 1;
-    final double p = (l ? w : h) - (m - 1) * BaseXSplitSep.SIZE;
+    final int h = getHeight(), w = getWidth();
+    final double m = c.length + 1 >> 1;
 
-    final boolean a = s == null;
-    if(a) s = new double[m];
+    // calculate proportional size of panels
+    if(propSize == null) {
+      propSize = new double[(int) m];
+      for(int n = 0; n < c.length; ++n) {
+        if((n & 1) == 0) propSize[n >> 1] = 1 / m;
+      }
+    }
 
+    // set bounds
+    final double sz = (horiz ? w : h) - (m - 1) * BaseXSplitSep.SIZE;
     double v = 0;
     for(int n = 0; n < c.length; ++n) {
-      final boolean b = (n & 1) == 0;
-      double z = BaseXSplitSep.SIZE;
-      if(b) z = s[n >> 1] == 0 ? (int) (p / m) : s[n >> 1] * p;
+      final boolean sep = (n & 1) != 0;
+      final int z = sep ? BaseXSplitSep.SIZE : (int) (propSize[n >> 1] * sz);
       final int y = (int) v;
-      c[n].setBounds(l ? y : 0, l ? 0 : y, l ? (int) z : w, l ? h : (int) z);
-      if(a && b) s[n >> 1] = z / p;
+      if(horiz) {
+        c[n].setBounds(y, 0, z, h);
+      } else {
+        c[n].setBounds(0, y, w, z);
+      }
       v += z;
     }
   }

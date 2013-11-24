@@ -96,6 +96,8 @@ public final class GUIOptions extends Options {
   public static final BooleanOption SHOWEDITOR = new BooleanOption("SHOWEDITOR", true);
   /** Flag for activated tree view. */
   public static final BooleanOption SHOWTREE = new BooleanOption("SHOWTREE", false);
+  /** Flag for activated project structure. */
+  public static final BooleanOption SHOWPROJECT = new BooleanOption("SHOWPROJECT", true);
 
   /** Dialog location. */
   public static final NumbersOption MAPLAYOUTLOC = new NumbersOption("MAPLAYOUTLOC", 790, 520);

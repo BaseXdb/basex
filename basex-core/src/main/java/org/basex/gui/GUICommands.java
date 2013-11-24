@@ -370,6 +370,21 @@ public enum GUICommands implements GUICmd {
     }
   },
 
+  /** Shows the XQuery project structure. */
+  C_SHOWPROJECT(PROJECT_VIEW, "% shift P", null, false, true) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.gopts.invert(GUIOptions.SHOWPROJECT);
+      gui.editor.project();
+    }
+
+    @Override
+    public void refresh(final GUI gui, final AbstractButton b) {
+      b.setEnabled(gui.gopts.get(GUIOptions.SHOWEDITOR));
+      b.setSelected(gui.gopts.get(GUIOptions.SHOWPROJECT));
+    }
+  },
+
   /** Shows info. */
   C_SHOWINFO(QUERY_INFO, "% I", H_QUERY_INFO, false, true) {
     @Override

@@ -13,9 +13,7 @@ import org.basex.data.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
-public abstract class TreeNode extends DefaultMutableTreeNode
-    implements TreeWillExpandListener {
-
+public abstract class TreeNode extends DefaultMutableTreeNode implements TreeWillExpandListener {
   /** Node name. */
   public final byte[] name;
   /** Relative path to this node. Starts with one slash, no trailing slashes.
