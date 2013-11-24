@@ -58,6 +58,8 @@ public class Editor extends BaseXPanel {
   private final Renderer rend;
   /** Scrollbar reference. */
   private final BaseXBar scroll;
+  /** Line number bar reference. */
+  private final LineNumberBar lineNumberBar;
   /** Editable flag. */
   private final boolean editable;
   /** Search bar. */
@@ -104,11 +106,13 @@ public class Editor extends BaseXPanel {
       }
     });
 
-    layout(new BorderLayout(4, 0));
+    layout(new BorderLayout(0, 0));
     scroll = new BaseXBar(this);
-    rend = new Renderer(text, scroll);
+    lineNumberBar = editable ? new LineNumberBar() : null;
+    rend = new Renderer(text, scroll, lineNumberBar);
     setFont(GUIConstants.dmfont);
 
+    if(lineNumberBar != null) add(lineNumberBar, BorderLayout.WEST);
     add(rend, BorderLayout.CENTER);
     add(scroll, BorderLayout.EAST);
 
@@ -261,10 +265,8 @@ public class Editor extends BaseXPanel {
   @Override
   public final void setFont(final Font f) {
     super.setFont(f);
-    if(rend != null) {
-      rend.setFont(f);
-      rend.repaint();
-    }
+    if(rend != null) rend.setFont(f);
+    if(lineNumberBar != null) lineNumberBar.setFont(f);
   }
 
   /** Thread counter. */

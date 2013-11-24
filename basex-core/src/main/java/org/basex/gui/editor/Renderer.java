@@ -18,6 +18,8 @@ import org.basex.util.list.*;
 final class Renderer extends BaseXBack {
   /** Vertical start position. */
   private final BaseXBar bar;
+  /** Vertical line number bar. */
+  private final LineNumberBar lineNumberBar;
 
   /** Font. */
   private Font font;
@@ -41,6 +43,8 @@ final class Renderer extends BaseXBack {
 
   /** Border offset. */
   private int off;
+  /** Offset from the line number bar. */
+  private int lineNumberOffset;
   /** Current x coordinate. */
   private int x;
   /** Current y coordinate. */
@@ -64,11 +68,13 @@ final class Renderer extends BaseXBack {
    * Constructor.
    * @param t text to be drawn
    * @param b scrollbar reference
+   * @param l line number bar
    */
-  Renderer(final EditorText t, final BaseXBar b) {
+  Renderer(final EditorText t, final BaseXBar b, final LineNumberBar l) {
     mode(Fill.NONE);
     text = t;
     bar = b;
+    lineNumberBar = l;
   }
 
   @Override
@@ -80,15 +86,33 @@ final class Renderer extends BaseXBack {
 
   @Override
   public void paintComponent(final Graphics g) {
+    if(lineNumberBar != null) {
+      // the line number bar goes over the text, so we need to offset the text
+      lineNumberBar.setLastLineNumber(text.lineNumbers());
+      lineNumberOffset = lineNumberBar.getWidth() - 8;
+    }
+
     super.paintComponent(g);
 
     pars.reset();
     init(g, bar.pos());
-    while(more(g)) write(g);
+    if(lineNumberBar != null) {
+      lineNumberBar.resetLineNumbers();
+      // there is always at least one line in the editor
+      lineNumberBar.addRenderedTextLine(y);
+    }
+    int oldY;
+    while(more(g)) {
+      oldY = y;
+      write(g);
+      if(lineNumberBar != null && y != oldY) lineNumberBar.addRenderedTextLine(y);
+    }
     wordW = 0;
     final int s = text.size();
     if(cursor && s == text.getCaret()) drawCursor(g, x);
     if(s == text.error()) drawError(g);
+
+    if(lineNumberBar != null) lineNumberBar.repaint();
   }
 
   /**
@@ -201,7 +225,7 @@ final class Renderer extends BaseXBack {
     syntax.init();
     text.init();
     link = false;
-    x = off;
+    x = off + lineNumberOffset;
     y = off + fontH - pos - 2;
     if(g != null) g.setFont(font);
   }
@@ -262,7 +286,7 @@ final class Renderer extends BaseXBack {
 
     // jump to new line
     if(x + ww > w) {
-      x = off;
+      x = off + lineNumberOffset;
       y += fontH;
     }
     wordW = ww;
@@ -278,7 +302,7 @@ final class Renderer extends BaseXBack {
   private boolean next() {
     final int ch = text.curr();
     if(ch == TokenBuilder.NLINE || ch == TokenBuilder.HLINE) {
-      x = off;
+      x = off + lineNumberOffset;
       y += fontH >> (ch == TokenBuilder.NLINE ? 0 : 1);
       return true;
     }
