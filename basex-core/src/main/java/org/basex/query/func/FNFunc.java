@@ -21,7 +21,7 @@ import org.basex.util.*;
  */
 public final class FNFunc extends StandardFunc {
   /** Minimum size of a loop that should not be unrolled. */
-  private static final int UNROLL_LIMIT = 10;
+  static final int UNROLL_LIMIT = 10;
 
   /**
    * Constructor.

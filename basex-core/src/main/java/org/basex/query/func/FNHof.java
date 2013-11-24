@@ -1,6 +1,6 @@
 package org.basex.query.func;
 
-import static org.basex.query.func.Function.*;
+import static org.basex.query.util.Err.*;
 
 import java.util.*;
 
@@ -72,8 +72,25 @@ public final class FNHof extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx, final VarScope scp) {
-    return oneOf(sig, _HOF_ID, _HOF_CONST) ? expr[0] : this;
+  protected Expr opt(final QueryContext ctx, final VarScope scp) throws QueryException {
+    switch(sig) {
+      case _HOF_ID:
+      case _HOF_CONST:
+        return expr[0];
+      case _HOF_FOLD_LEFT1:
+        if(allAreValues() && expr[0].size() < FNFunc.UNROLL_LIMIT) {
+          ctx.compInfo(QueryText.OPTUNROLL, this);
+          final Value seq = (Value) expr[0];
+          if(seq.isEmpty()) throw INVEMPTY.get(info, description());
+          Expr e = seq.itemAt(0);
+          for(int i = 1, len = (int) seq.size(); i < len; i++)
+            e = new DynFuncCall(info, expr[1], e, seq.itemAt(i)).optimize(ctx, scp);
+          return e;
+        }
+        return this;
+      default:
+        return this;
+    }
   }
 
   /**

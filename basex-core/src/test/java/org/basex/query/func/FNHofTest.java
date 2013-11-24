@@ -2,8 +2,10 @@ package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
 
+import org.basex.query.ast.*;
 import org.basex.query.util.*;
-import org.basex.query.*;
+import org.basex.query.value.item.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -12,7 +14,7 @@ import org.junit.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
-public final class FNHofTest extends AdvancedQueryTest {
+public final class FNHofTest extends QueryPlanTest {
   /** Test method. */
   @Test
   public void idTest() {
@@ -42,6 +44,21 @@ public final class FNHofTest extends AdvancedQueryTest {
   public void foldLeft1Test() {
     query("hof:fold-left1(1 to 10, function($x, $y) { $x + $y })", "55");
     error("hof:fold-left1((), function($x, $y) { $x + $y })", Err.INVEMPTY);
+    // should be unrolled and evaluated at compile time
+    check("hof:fold-left1(1 to 9, function($a,$b) {$a+$b})",
+        "45",
+        "empty(//" + Util.className(FNHof.class) + "[contains(@name, 'fold-left1')])",
+        "exists(*/" + Util.className(Int.class) + ")");
+    // should be unrolled but not evaluated at compile time
+    check("hof:fold-left1(1 to 9, function($a,$b) {0*random:integer($a)+$b})",
+        "9",
+        "empty(//" + Util.className(FNHof.class) + "[contains(@name, 'fold-left1')])",
+        "empty(*/" + Util.className(Int.class) + ")",
+        "count(//" + Util.className(DynFuncCall.class) + ") eq 8");
+    // should not be unrolled
+    check("hof:fold-left1(1 to 10, function($a,$b) {$a+$b})",
+        "55",
+        "exists(//" + Util.className(FNHof.class) + "[contains(@name, 'fold-left1')])");
   }
 
   /** Test method. */
