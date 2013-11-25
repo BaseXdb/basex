@@ -735,12 +735,11 @@ public class Editor extends BaseXPanel {
     final boolean indent = TAB.is(e) && text.indent(sb, e.isShiftDown());
 
     // delete marked text
-    if(text.selected() && !indent) {
-      text.delete();
-    }
-    final int ps = text.pos();
+    final boolean selected = text.selected() && !indent;
+    if(selected) text.delete();
 
-    final int move = ENTER.is(e) ? text.enter(sb) : text.add(sb);
+    final int ps = text.pos();
+    final int move = ENTER.is(e) ? text.enter(sb) : text.add(sb, selected);
 
     // refresh history and adjust cursor position
     hist.store(text.text(), pc, text.getCaret());

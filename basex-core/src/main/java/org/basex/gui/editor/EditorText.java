@@ -592,16 +592,17 @@ public final class EditorText {
       ind -= TAB;
     }
     for(int p = 0; p < ind; p++) sb.append(' ');
-    add(sb);
+    add(sb, false);
     return move;
   }
 
   /**
    * Processes and adds the specified string.
    * @param sb string to be added
+   * @param selected states if the text was selected
    * @return returns the number spaces to move forward
    */
-  int add(final StringBuilder sb) {
+  int add(final StringBuilder sb, final boolean selected) {
     int move = 0;
     if(sb.length() != 0) {
       final char ch = sb.charAt(0);
@@ -611,7 +612,7 @@ public final class EditorText {
       final int open = OPENING.indexOf(ch);
       if(open != -1) {
         // adds a closing to an opening bracket
-        if(!XMLToken.isChar(curr)) {
+        if(!selected && !XMLToken.isChar(curr)) {
           sb.append(CLOSING.charAt(open));
           move = 1;
         }
@@ -625,25 +626,28 @@ public final class EditorText {
       } else if(ch == '"' || ch == '\'') {
         // quote: ignore if it equals next character
         if(ch == curr) sb.setLength(0);
-        // only add second quote if previous character is no character
-        else if(!XMLToken.isNCChar(prev)) sb.append(ch);
+        // add second quote
+        else if(!selected && !XMLToken.isNCChar(prev)) sb.append(ch);
         move = 1;
       } else if(ch == '>') {
         // closes an opening element
         closeElem(sb);
         move = 1;
       } else if(ch == '~') {
+        // closes XQuery comments
         if(prev == ':' && pprv == '(') {
           sb.append("\n : \n :");
           if(curr != ')') sb.append(')');
           move = 5;
         }
       } else if(ch == '-') {
+        // closes XML comments
         if(prev == '-' && pprv == '!' && ps > 2 && text[ps - 3] == '<') {
           sb.append("  -->\n");
           move = 2;
         }
       } else if(ch == '?') {
+        // closes XML processing instructions
         if(prev == '<') {
           sb.append(" ?>\n");
           move = 1;
