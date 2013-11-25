@@ -176,8 +176,8 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public void markTailCalls() {
-    for(final SwitchCase sc : cases) sc.markTailCalls();
+  public void markTailCalls(final QueryContext ctx) {
+    for(final SwitchCase sc : cases) sc.markTailCalls(ctx);
   }
 
   @Override

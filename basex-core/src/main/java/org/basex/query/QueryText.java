@@ -758,7 +758,7 @@ public interface QueryText {
   /** Optimization info. */
   String OPTREMOVE = "%: removing %";
   /** Optimization info. */
-  String OPTTCE = "rewriting for tail calls: %";
+  String OPTTCE = "marking as tail call: %";
   /** Optimization info. */
   String OPTREMCTX = "removing context expression (.)";
   /** Optimization info. */
@@ -803,6 +803,8 @@ public interface QueryText {
   String OPTBIND = "binding static variable %";
   /** Optimization info. */
   String OPTCHILD = "converting % to child steps";
+  /** Optimization info. */
+  String OPTUNROLL = "unrolling %";
 
   /** Warning. */
   String WARNSELF = "Warning: '%' will never yield results.";

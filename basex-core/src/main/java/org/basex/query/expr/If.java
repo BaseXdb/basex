@@ -178,9 +178,9 @@ public final class If extends Arr {
   }
 
   @Override
-  public void markTailCalls() {
-    expr[0].markTailCalls();
-    expr[1].markTailCalls();
+  public void markTailCalls(final QueryContext ctx) {
+    expr[0].markTailCalls(ctx);
+    expr[1].markTailCalls(ctx);
   }
 
   @Override

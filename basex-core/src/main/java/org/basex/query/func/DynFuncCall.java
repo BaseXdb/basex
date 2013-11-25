@@ -29,7 +29,7 @@ public final class DynFuncCall extends FuncCall {
    * @param fun function expression
    * @param arg arguments
    */
-  public DynFuncCall(final InputInfo ii, final Expr fun, final Expr[] arg) {
+  public DynFuncCall(final InputInfo ii, final Expr fun, final Expr... arg) {
     super(ii, Array.add(arg, fun));
   }
 

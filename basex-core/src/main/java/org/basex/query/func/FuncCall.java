@@ -58,7 +58,8 @@ public abstract class FuncCall extends Arr {
   }
 
   @Override
-  public final void markTailCalls() {
+  public final void markTailCalls(final QueryContext ctx) {
+    if (ctx != null) ctx.compInfo(QueryText.OPTTCE, this);
     tailCall = true;
   }
 
