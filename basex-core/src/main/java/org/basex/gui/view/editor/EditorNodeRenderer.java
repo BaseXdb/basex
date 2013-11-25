@@ -21,6 +21,10 @@ public final class EditorNodeRenderer extends DefaultTreeCellRenderer {
   private final Icon fileXml = BaseXLayout.icon("file-xml");
   /** Icon for unknown file types. */
   private final Icon fileUnknown = BaseXLayout.icon("file-unknown");
+  /** Icon for closed directories. */
+  private final Icon fileDir1 = BaseXLayout.icon("file-dir1");
+  /** Icon for opened directories. */
+  private final Icon fileDir2 = BaseXLayout.icon("file-dir2");
 
   @Override
   public Component getTreeCellRendererComponent(final JTree tree, final Object val,
@@ -35,6 +39,8 @@ public final class EditorNodeRenderer extends DefaultTreeCellRenderer {
         setIcon(MimeTypes.isXML(mime) || MimeTypes.isXQuery(mime) ? fileXml :
           MimeTypes.isText(mime) ? fileText : fileUnknown);
       }
+    } else {
+      setIcon(exp ? fileDir2 : fileDir1);
     }
     return this;
   }
