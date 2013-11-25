@@ -489,14 +489,12 @@ public class Editor extends BaseXPanel {
     // ignore modifier keys
     if(modifier(e)) return;
 
-    // operations that change the focus are put first..
     if(PREVTAB.is(e)) {
-      transferFocusBackward();
-      return;
-    }
-    if(NEXTTAB.is(e)) {
-      transferFocus();
-      return;
+      gui.editor.tab(false);
+      e.consume();
+    } else if(NEXTTAB.is(e)) {
+      gui.editor.tab(true);
+      e.consume();
     }
 
     // re-animate cursor

@@ -80,13 +80,13 @@ public final class EditorView extends View {
   private double[] sizes = new double[] { 0.2, 0.8 };
   /** Thread counter. */
   private int threadID;
-  /** File in which the most recent error occurred. */
-  IO errFile;
 
   /** Last error message. */
   private String errMsg;
   /** Most recent error position; used for clicking on error message. */
   private int errPos;
+  /** File in which the most recent error occurred. */
+  IO errFile;
 
   /**
    * Default constructor.
@@ -326,6 +326,16 @@ public final class EditorView extends View {
    */
   public void focusTree() {
     files.tree.requestFocusInWindow();
+  }
+
+  /**
+   * Switches the current editor tab.
+   * @param next next next/previous tag
+   */
+  public void tab(final boolean next) {
+    final int s = tabs.getTabCount() - 1;
+    final int i = (s + tabs.getSelectedIndex() + (next ? 1 : -1)) % s;
+    tabs.setSelectedIndex(i);
   }
 
   /**
