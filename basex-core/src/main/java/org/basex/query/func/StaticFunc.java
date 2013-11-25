@@ -82,8 +82,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     }
 
     // convert all function calls in tail position to proper tail calls
-    ctx.compInfo(OPTTCE, name);
-    expr.markTailCalls();
+    expr.markTailCalls(ctx);
 
     if(declType != null) {
       // remove redundant casts

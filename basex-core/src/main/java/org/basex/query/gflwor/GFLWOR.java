@@ -675,10 +675,10 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public void markTailCalls() {
+  public void markTailCalls(final QueryContext ctx) {
     long n = 1;
     for(final Clause c : clauses) if((n = c.calcSize(n)) != 1) return;
-    ret.markTailCalls();
+    ret.markTailCalls(ctx);
   }
 
   @Override

@@ -22,6 +22,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -78,7 +79,7 @@ public final class FNGen extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx) {
+  protected Expr opt(final QueryContext ctx, final VarScope scp) {
     if(sig == DATA && expr.length == 1) {
       final SeqType t = expr[0].type();
       type = t.type.isNode() ? SeqType.get(AtomType.ATM, t.occ) : t;

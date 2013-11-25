@@ -33,6 +33,7 @@ public abstract class Expr extends ExprInfo {
     /** Focus-dependent. Example: position(). */             FCS,
     /** Performs updates. Example: insert expression. */     UPD,
     /** XQuery 3.0 function. Example: has-children(). */     X30,
+    /** Invokes user-supplied functions. Example: fold. */   HOF,
   }
 
   /**
@@ -372,8 +373,11 @@ public abstract class Expr extends ExprInfo {
     });
   }
 
-  /** Finds and marks tail calls, enabling TCO. */
-  public void markTailCalls() { }
+  /**
+   * Finds and marks tail calls, enabling TCO.
+   * @param ctx query context, {@code null} if the changes should not be reported
+   */
+  public void markTailCalls(@SuppressWarnings("unused") final QueryContext ctx) { }
 
   /**
    * Traverses this expression, notifying the visitor of declared and used variables,

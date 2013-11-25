@@ -10,6 +10,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -19,6 +20,9 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class FNFunc extends StandardFunc {
+  /** Minimum size of a loop that should not be unrolled. */
+  static final int UNROLL_LIMIT = 10;
+
   /**
    * Constructor.
    * @param sctx static context
@@ -51,6 +55,39 @@ public final class FNFunc extends StandardFunc {
       case FUNCTION_LOOKUP: return lookup(ctx, ii);
       default:              return super.item(ctx, ii);
     }
+  }
+
+  @Override
+  Expr opt(final QueryContext ctx, final VarScope scp) throws QueryException {
+    if(oneOf(sig, Function.FOLD_LEFT, Function.FOLD_RIGHT, Function.FOR_EACH)
+        && allAreValues() && expr[0].size() < UNROLL_LIMIT) {
+      // unroll the loop
+      ctx.compInfo(QueryText.OPTUNROLL, this);
+      final Value seq = (Value) expr[0];
+      final int len = (int) seq.size();
+
+      // fn:for-each(...)
+      if (sig == Function.FOR_EACH) {
+        final Expr[] results = new Expr[len];
+        for(int i = 0; i < len; i++) {
+          results[i] = new DynFuncCall(info, expr[1], seq.itemAt(i)).optimize(ctx, scp);
+        }
+        return new List(info, results).optimize(ctx, scp);
+      }
+
+      // folds
+      Expr e = expr[1];
+      if (sig == Function.FOLD_LEFT) {
+        for (final Item it : seq)
+          e = new DynFuncCall(info, expr[2], e, it).optimize(ctx, scp);
+      } else {
+        for (int i = len; --i >= 0;)
+          e = new DynFuncCall(info, expr[2], seq.itemAt(i), e).optimize(ctx, scp);
+      }
+      return e;
+    }
+
+    return this;
   }
 
   /**

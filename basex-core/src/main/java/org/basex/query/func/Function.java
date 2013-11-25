@@ -150,7 +150,7 @@ public enum Function {
 
   /** XQuery function. */
   FILTER(FNFunc.class, "filter(seq,function)",
-      arg(ITEM_ZM, FuncType.get(BLN, ITEM).seqType()), ITEM_ZM, flag(X30)),
+      arg(ITEM_ZM, FuncType.get(BLN, ITEM).seqType()), ITEM_ZM, flag(X30, Flag.HOF)),
   /** XQuery function. */
   FUNCTION_NAME(FNFunc.class, "function-name(function)", arg(FUN_O), QNM_ZO, flag(X30)),
   /** XQuery function. */
@@ -160,16 +160,19 @@ public enum Function {
       arg(QNM, ITR), FUN_OZ, flag(CTX, FCS, NDT, X30)),
   /** XQuery function. */
   FOR_EACH(FNFunc.class, "for-each(seq,function)",
-      arg(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM).seqType()), ITEM_ZM, flag(X30)),
+      arg(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM).seqType()), ITEM_ZM, flag(X30, Flag.HOF)),
   /** XQuery function. */
   FOR_EACH_PAIR(FNFunc.class, "for-each-pair(seq1,seq2,function)",
-      arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM, ITEM).seqType()), ITEM_ZM, flag(X30)),
+      arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM, ITEM).seqType()), ITEM_ZM,
+      flag(X30, Flag.HOF)),
   /** XQuery function. */
   FOLD_LEFT(FNFunc.class, "fold-left(seq,zero,function)",
-      arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM).seqType()), ITEM_ZM, flag(X30)),
+      arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM).seqType()), ITEM_ZM,
+      flag(X30, Flag.HOF)),
   /** XQuery function. */
   FOLD_RIGHT(FNFunc.class, "fold-right(seq,zero,function)",
-      arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM, ITEM_ZM).seqType()), ITEM_ZM, flag(X30)),
+      arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM, ITEM_ZM).seqType()), ITEM_ZM,
+      flag(X30, Flag.HOF)),
 
   /* FNGen functions. */
 
@@ -816,16 +819,16 @@ public enum Function {
   _HOF_CONST(FNHof.class, "const(return,ignore)", arg(ITEM_ZM, ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
   _HOF_UNTIL(FNHof.class, "until(pred,function,start)", arg(FuncType.get(BLN, ITEM_ZM).seqType(),
-      FuncType.get(ITEM_ZM, ITEM_ZM).seqType(), ITEM_ZM), ITEM_ZM),
+      FuncType.get(ITEM_ZM, ITEM_ZM).seqType(), ITEM_ZM), ITEM_ZM, flag(Flag.HOF)),
   /** XQuery function. */
   _HOF_FOLD_LEFT1(FNHof.class, "fold-left1(non-empty-seq,function)",
-      arg(ITEM_OM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM).seqType()), ITEM_ZM),
+      arg(ITEM_OM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM).seqType()), ITEM_ZM, flag(Flag.HOF)),
   /** XQuery function. */
   _HOF_TOP_K_BY(FNHof.class, "top-k-by(seq,key-fun,k)",
-      arg(ITEM_ZM, FuncType.arity(1).seqType(), ITR), ITEM_ZM),
+      arg(ITEM_ZM, FuncType.arity(1).seqType(), ITR), ITEM_ZM, flag(Flag.HOF)),
   /** XQuery function. */
   _HOF_TOP_K_WITH(FNHof.class, "top-k-with(seq,less-than,k)",
-      arg(ITEM_ZM, FuncType.get(BLN, ITEM_ZO, ITEM_ZO).seqType(), ITR), ITEM_ZM),
+      arg(ITEM_ZM, FuncType.get(BLN, ITEM_ZO, ITEM_ZO).seqType(), ITR), ITEM_ZM, flag(Flag.HOF)),
 
   /* FNHtml functions. */
 
