@@ -105,10 +105,10 @@ public final class FNBinTest extends AdvancedQueryTest {
     hexQuery(_BIN_PART.args(base64("FF"), 1),    "");
     hexQuery(_BIN_PART.args(base64("FF"), 1, 0), "");
     // errors
-    error(_BIN_PART.args(base64("FF"), -1),    BIN_NO_X);
+    error(_BIN_PART.args(base64("FF"), -1),    BIN_IOOR_X_X);
     error(_BIN_PART.args(base64("FF"), 0, -1), BIN_NS_X);
-    error(_BIN_PART.args(base64("FF"), 2),     BIN_OBE_X_X);
-    error(_BIN_PART.args(base64("FF"), 0, 2),  BIN_OBE_X_X_X);
+    error(_BIN_PART.args(base64("FF"), 2),     BIN_IOOR_X_X);
+    error(_BIN_PART.args(base64("FF"), 0, 2),  BIN_IOOR_X_X);
   }
 
   /** Test method. */
@@ -134,8 +134,8 @@ public final class FNBinTest extends AdvancedQueryTest {
     hexQuery(_BIN_INSERT_BEFORE.args(base64("12"),   1, base64("3456")), "123456");
     hexQuery(_BIN_INSERT_BEFORE.args(base64("12"),   1, base64("34")),   "1234");
     // errors
-    error(_BIN_INSERT_BEFORE.args(base64(""), -1, "()"), BIN_NO_X);
-    error(_BIN_INSERT_BEFORE.args(base64(""),  1, "()"), BIN_OBE_X_X);
+    error(_BIN_INSERT_BEFORE.args(base64(""), -1, "()"), BIN_IOOR_X_X);
+    error(_BIN_INSERT_BEFORE.args(base64(""),  1, "()"), BIN_IOOR_X_X);
   }
 
   /** Test method. */
@@ -166,36 +166,39 @@ public final class FNBinTest extends AdvancedQueryTest {
     query(_BIN_FIND.args(base64("1122"),   0, base64("11")), 0);
     query(_BIN_FIND.args(base64("1122"),   1, base64("11")), "");
     query(_BIN_FIND.args(base64("112233"), 0, base64("22")), 1);
+    query(_BIN_FIND.args(base64(""), 0, base64("")), 0);
     // errors
-    error(_BIN_FIND.args(base64(""), -1, base64("11")), BIN_NO_X);
-    error(_BIN_FIND.args(base64(""), 1, base64("11")),  BIN_OBE_X_X);
-    error(_BIN_FIND.args(base64(""), 0, base64("")),    BIN_ESI);
+    error(_BIN_FIND.args(base64(""), -1, base64("11")), BIN_IOOR_X_X);
+    error(_BIN_FIND.args(base64(""), 1, base64("11")),  BIN_IOOR_X_X);
   }
 
   /** Test method. */
   @Test
   public void decodeString() {
-    query(_BIN_DECODE_STRING.args(base64("3132"), "US-ASCII"),      "12");
-    query(_BIN_DECODE_STRING.args(base64("3132"), "UTF-8"),         "12");
-    query(_BIN_DECODE_STRING.args(base64("313233"), "UTF-8", 1, 1), "2");
+    query(_BIN_DECODE_STRING.args(base64("31")),                  "1");
+    query(_BIN_DECODE_STRING.args(base64("31"), "US-ASCII"),      "1");
+    query(_BIN_DECODE_STRING.args(base64("31"), "UTF-8"),         "1");
+    query(_BIN_DECODE_STRING.args(base64("3132"), "UTF-8", 1, 1), "2");
     // errors
-    error(_BIN_DECODE_STRING.args(base64(""), "UTF-8", -1),    BIN_NO_X);
+    error(_BIN_DECODE_STRING.args(base64(""), "UTF-8", -1),    BIN_IOOR_X_X);
     error(_BIN_DECODE_STRING.args(base64(""), "UTF-8", 0, -1), BIN_NS_X);
-    error(_BIN_DECODE_STRING.args(base64(""), "UTF-8", 1, 0),  BIN_OBE_X_X);
-    error(_BIN_DECODE_STRING.args(base64(""), "UTF-8", 0, 1),  BIN_OBE_X_X_X);
+    error(_BIN_DECODE_STRING.args(base64(""), "UTF-8", 1, 0),  BIN_IOOR_X_X);
+    error(_BIN_DECODE_STRING.args(base64(""), "UTF-8", 0, 1),  BIN_IOOR_X_X);
     error(_BIN_DECODE_STRING.args(base64(""), "X"),            BIN_UE_X);
-    error(_BIN_DECODE_STRING.args(base64("FF"), "UTF-8"),      BIN_DE);
+    error(_BIN_DECODE_STRING.args(base64("FF"), "UTF-8"),      BIN_CE);
+    error(_BIN_DECODE_STRING.args(_BIN_HEX.args("03")),        BIN_CE);
   }
 
   /** Test method. */
   @Test
   public void encodeString() {
+    hexQuery(_BIN_ENCODE_STRING.args(""),                "");
     hexQuery(_BIN_ENCODE_STRING.args("", "US-ASCII"),    "");
     hexQuery(_BIN_ENCODE_STRING.args("a", "US-ASCII"),   "61");
     hexQuery(_BIN_ENCODE_STRING.args("\u00c4", "UTF-8"), "C384");
     // errors
     error(_BIN_ENCODE_STRING.args("", "X"),              BIN_UE_X);
-    error(_BIN_ENCODE_STRING.args("\u00c4", "US-ASCII"), BIN_EE);
+    error(_BIN_ENCODE_STRING.args("\u00c4", "US-ASCII"), BIN_CE);
   }
 
   /** Test method. */
@@ -333,9 +336,9 @@ public final class FNBinTest extends AdvancedQueryTest {
     query(_BIN_UNPACK_DOUBLE.args(base64("000000000000F03F"), 0, "little-endian"),          1);
     query(_BIN_UNPACK_DOUBLE.args(base64("000000000000F03F"), 0, "LE"),                     1);
     // errors
-    error(_BIN_UNPACK_DOUBLE.args(base64("0000000000000000"), -1),     BIN_NO_X);
-    error(_BIN_UNPACK_DOUBLE.args(base64("0000000000000000"), 1),      BIN_OBE_X_X_X);
-    error(_BIN_UNPACK_DOUBLE.args(base64("00"), 0),                    BIN_OBE_X_X_X);
+    error(_BIN_UNPACK_DOUBLE.args(base64("0000000000000000"), -1),     BIN_IOOR_X_X);
+    error(_BIN_UNPACK_DOUBLE.args(base64("0000000000000000"), 1),      BIN_IOOR_X_X);
+    error(_BIN_UNPACK_DOUBLE.args(base64("00"), 0),                    BIN_IOOR_X_X);
     error(_BIN_UNPACK_DOUBLE.args(base64("0000000000000000"), 0, "X"), BIN_USO_X);
   }
 
@@ -357,9 +360,9 @@ public final class FNBinTest extends AdvancedQueryTest {
     query(_BIN_UNPACK_FLOAT.args(base64("0000803F"), 0, "little-endian"),          1);
     query(_BIN_UNPACK_FLOAT.args(base64("0000803F"), 0, "LE"),                     1);
     // errors
-    error(_BIN_UNPACK_FLOAT.args(base64("00000000"), -1),     BIN_NO_X);
-    error(_BIN_UNPACK_FLOAT.args(base64("00000000"), 1),      BIN_OBE_X_X_X);
-    error(_BIN_UNPACK_FLOAT.args(base64("00"), 0),            BIN_OBE_X_X_X);
+    error(_BIN_UNPACK_FLOAT.args(base64("00000000"), -1),     BIN_IOOR_X_X);
+    error(_BIN_UNPACK_FLOAT.args(base64("00000000"), 1),      BIN_IOOR_X_X);
+    error(_BIN_UNPACK_FLOAT.args(base64("00"), 0),            BIN_IOOR_X_X);
     error(_BIN_UNPACK_FLOAT.args(base64("00000000"), 0, "X"), BIN_USO_X);
   }
 
@@ -379,9 +382,9 @@ public final class FNBinTest extends AdvancedQueryTest {
     query(_BIN_UNPACK_INTEGER.args(base64("0100"), 0, 2, "little-endian"), 1);
     query(_BIN_UNPACK_INTEGER.args(base64("0100"), 0, 2, "LE"), 1);
     // errors
-    error(_BIN_UNPACK_INTEGER.args(base64("00"), -1, 0), BIN_NO_X);
-    error(_BIN_UNPACK_INTEGER.args(base64("00"), 0, -1), BIN_NS_X);
-    error(_BIN_UNPACK_INTEGER.args(base64("00"), 0, 2), BIN_OBE_X_X_X);
+    error(_BIN_UNPACK_INTEGER.args(base64("00"), -1, 0),     BIN_IOOR_X_X);
+    error(_BIN_UNPACK_INTEGER.args(base64("00"), 0, -1),     BIN_NS_X);
+    error(_BIN_UNPACK_INTEGER.args(base64("00"), 0, 2),      BIN_IOOR_X_X);
     error(_BIN_UNPACK_INTEGER.args(base64("00"), 0, 0, "X"), BIN_USO_X);
   }
 
@@ -405,9 +408,9 @@ public final class FNBinTest extends AdvancedQueryTest {
     query(_BIN_UNPACK_UNSIGNED_INTEGER.args(base64("0100"), 0, 2, "little-endian"), 1);
     query(_BIN_UNPACK_UNSIGNED_INTEGER.args(base64("0100"), 0, 2, "LE"), 1);
     // errors
-    error(_BIN_UNPACK_UNSIGNED_INTEGER.args(base64("00"), -1, 0), BIN_NO_X);
-    error(_BIN_UNPACK_UNSIGNED_INTEGER.args(base64("00"), 0, -1), BIN_NS_X);
-    error(_BIN_UNPACK_UNSIGNED_INTEGER.args(base64("00"), 0, 2), BIN_OBE_X_X_X);
+    error(_BIN_UNPACK_UNSIGNED_INTEGER.args(base64("00"), -1, 0),     BIN_IOOR_X_X);
+    error(_BIN_UNPACK_UNSIGNED_INTEGER.args(base64("00"), 0, -1),     BIN_NS_X);
+    error(_BIN_UNPACK_UNSIGNED_INTEGER.args(base64("00"), 0, 2),      BIN_IOOR_X_X);
     error(_BIN_UNPACK_UNSIGNED_INTEGER.args(base64("00"), 0, 0, "X"), BIN_USO_X);
   }
 

@@ -513,10 +513,10 @@ public enum Function {
   /** XQuery function. */
   _BIN_FIND(FNBin.class, "find(binary,offset,search)", arg(B64_ZO, ITR, B64_ZO), ITR_ZO),
   /** XQuery function. */
-  _BIN_DECODE_STRING(FNBin.class, "decode-string(binary,encoding[,offset[,size]])",
+  _BIN_DECODE_STRING(FNBin.class, "decode-string(binary[,encoding[,offset[,size]]])",
       arg(B64_ZO, STR, ITR, ITR), STR_ZO),
   /** XQuery function. */
-  _BIN_ENCODE_STRING(FNBin.class, "encode-string(string,encoding)", arg(STR_ZO, STR), B64_ZO),
+  _BIN_ENCODE_STRING(FNBin.class, "encode-string(string[,encoding])", arg(STR_ZO, STR), B64_ZO),
   /** XQuery function. */
   _BIN_PACK_DOUBLE(FNBin.class, "pack-double(double[,order])", arg(DBL, STR), B64),
   /** XQuery function. */

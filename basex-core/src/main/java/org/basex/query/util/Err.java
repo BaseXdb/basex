@@ -240,15 +240,9 @@ public enum Err {
   /** Binary error. */
   BIN_DLA_X_X(BIN, "differing-length-arguments", "Inputs are of different length (%/%)."),
   /** Binary error. */
-  BIN_NO_X(BIN, "negative-offset", "Offset '%' is negative."),
-  /** Binary error. */
-  BIN_OBE_X_X_X(BIN, "offset-beyond-end", "Offset '%' and size '%' exceed size of data (%)."),
-  /** Binary error. */
-  BIN_OBE_X_X(BIN, "offset-beyond-end", "Offset '%' exceeds size of data (%)."),
+  BIN_IOOR_X_X(BIN, "index-out-of-range", "Index '%' is out of range (0-%)."),
   /** Binary error. */
   BIN_NS_X(BIN, "negative-size", "Size '%' is negative."),
-  /** Binary error. */
-  BIN_ESI(BIN, "empty-search-item", "Search data must not be empty."),
   /** Binary error. */
   BIN_OOR_X(BIN, "octet-out-of-range", "Octet '%' is out of range."),
   /** Binary error. */
@@ -256,9 +250,7 @@ public enum Err {
   /** Binary error. */
   BIN_UE_X(BIN, "unknown-encoding", "Unknown encoding '%'."),
   /** Binary error. */
-  BIN_DE(BIN, "decoding-error", "An error occurred while decoding the string."),
-  /** Binary error. */
-  BIN_EE(BIN, "encoding-error", "An error occurred while encoding the string."),
+  BIN_CE(BIN, "conversion-error", "%."),
   /** Binary error. */
   BIN_USO_X(BIN, "unknown-significance-order", "Unknown octet-order value: '%'."),
 

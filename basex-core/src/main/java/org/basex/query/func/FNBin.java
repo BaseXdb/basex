@@ -355,11 +355,7 @@ public class FNBin extends StandardFunc {
     final byte[] bytes = b64.binary(info);
     final int bl = bytes.length;
     final byte[] search = srch.binary(info);
-    final int sl = search.length;
-
     final int[] bounds = bounds(off, null, bl);
-    if(sl == 0) throw BIN_ESI.get(info, off);
-
     final int pos = indexOf(bytes, search, bounds[0]);
     return pos == -1 ? null : Int.get(pos);
   }
@@ -390,7 +386,7 @@ public class FNBin extends StandardFunc {
     try {
       return Str.get(FNConvert.toString(new IOContent(bytes).inputStream(), enc, true));
     } catch(final IOException ex) {
-      throw BIN_DE.get(info, ex);
+      throw BIN_CE.get(info, ex);
     }
   }
 
@@ -405,9 +401,9 @@ public class FNBin extends StandardFunc {
     final String enc = encoding(1, BIN_UE_X, ctx);
     if(str == null) return null;
     try {
-      return new B64(FNConvert.toBinary(str, enc));
+      return new B64(enc == null || enc == UTF8 ? str : FNConvert.toBinary(str, enc));
     } catch(final CharacterCodingException ex) {
-      throw BIN_EE.get(info);
+      throw BIN_CE.get(info, ex);
     }
   }
 
@@ -679,13 +675,12 @@ public class FNBin extends StandardFunc {
   private int[] bounds(final Long off, final Long len, final int sz) throws QueryException {
     int o = 0, s = sz;
     if(off != null) {
-      if(off < 0) throw BIN_NO_X.get(info, off);
-      if(off > sz || off > Integer.MAX_VALUE) throw BIN_OBE_X_X.get(info, off);
+      if(off < 0 || off > sz || off > Integer.MAX_VALUE) throw BIN_IOOR_X_X.get(info, off, sz);
       o = (int) off.longValue();
     }
     if(len != null) {
       if(len < 0) throw BIN_NS_X.get(info, off);
-      if(o + len > sz || len > Integer.MAX_VALUE) throw BIN_OBE_X_X_X.get(info, off, len, sz);
+      if(o + len > sz || len > Integer.MAX_VALUE) throw BIN_IOOR_X_X.get(info, o + len, sz);
       s = (int) len.longValue();
     } else {
       s = sz - o;
