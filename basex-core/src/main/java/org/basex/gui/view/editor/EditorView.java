@@ -86,7 +86,7 @@ public final class EditorView extends View {
   /** Most recent error position; used for clicking on error message. */
   private int errPos;
   /** File in which the most recent error occurred. */
-  IO errFile;
+  IOFile errFile;
 
   /**
    * Default constructor.
@@ -94,7 +94,7 @@ public final class EditorView extends View {
    */
   public EditorView(final ViewNotifier man) {
     super(EDITORVIEW, man);
-    border(5).layout(new BorderLayout());
+    layout(new BorderLayout());
 
     label = new BaseXLabel(EDITOR, true, false);
     label.setForeground(GRAY);
@@ -128,25 +128,15 @@ public final class EditorView extends View {
     buttons.add(go);
     buttons.add(filter);
 
-    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
-    b.add(buttons, BorderLayout.WEST);
-    b.add(label, BorderLayout.EAST);
-    add(b, BorderLayout.NORTH);
+    final BaseXBack north = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    north.add(buttons, BorderLayout.WEST);
+    north.add(label, BorderLayout.EAST);
 
     tabs = new BaseXTabs(gui);
     tabs.setFocusable(Prop.MAC);
-    final SearchEditor se = new SearchEditor(gui, tabs, null).button(srch);
-    search = se.bar();
+    final SearchEditor center = new SearchEditor(gui, tabs, null).button(srch);
+    search = center.bar();
     addCreateTab();
-
-    files = new EditorTree(this);
-    split = new BaseXSplit(true);
-    split.mode(Fill.NONE);
-    split.add(files);
-    split.add(se);
-    split.sizes(sizes);
-    project();
-    add(split, BorderLayout.CENTER);
 
     // status and query pane
     search.editor(addTab(), false);
@@ -159,7 +149,21 @@ public final class EditorView extends View {
     south.layout(new BorderLayout(4, 0));
     south.add(info, BorderLayout.CENTER);
     south.add(pos, BorderLayout.EAST);
-    add(south, BorderLayout.SOUTH);
+
+    final BaseXBack main = new BaseXBack().border(5).mode(Fill.NONE);
+    main.layout(new BorderLayout());
+    main.add(north, BorderLayout.NORTH);
+    main.add(center, BorderLayout.CENTER);
+    main.add(south, BorderLayout.SOUTH);
+
+    files = new EditorTree(this);
+    split = new BaseXSplit(true);
+    split.mode(Fill.NONE);
+    split.add(files);
+    split.add(main);
+    split.sizes(sizes);
+    project();
+    add(split, BorderLayout.CENTER);
 
     refreshLayout();
 
@@ -397,11 +401,12 @@ public final class EditorView extends View {
   /**
    * Deletes a file.
    * @param file file to be deleted
+   * @return success flag
    */
-  public void delete(final IOFile file) {
+  public boolean delete(final IOFile file) {
     final EditorArea edit = find(file, true);
     if(edit != null) close(edit);
-    file.delete();
+    return file.delete();
   }
 
   /**
@@ -409,7 +414,7 @@ public final class EditorView extends View {
    * @param file query file
    * @return opened editor, or {@code null} if file could not be opened
    */
-  public EditorArea open(final IO file) {
+  public EditorArea open(final IOFile file) {
     return open(file, true);
   }
 
@@ -419,7 +424,7 @@ public final class EditorView extends View {
    * @param parse parse contents
    * @return opened editor, or {@code null} if file could not be opened
    */
-  private EditorArea open(final IO file, final boolean parse) {
+  private EditorArea open(final IOFile file, final boolean parse) {
     if(!visible()) GUICommands.C_SHOWEDITOR.execute(gui);
 
     EditorArea edit = find(file, true);
@@ -678,6 +683,41 @@ public final class EditorView extends View {
   }
 
   /**
+   * Updates the references to renamed files.
+   * @param old old file file reference
+   * @param renamed updated file reference
+   */
+  public void rename(final IOFile old, final IOFile renamed) {
+    try {
+      // use canonical representation and add slash to names of directories
+      final boolean dir = renamed.isDir();
+      final String oldPath = old.file().getCanonicalPath() + (dir ? File.separator : "");
+      // iterate through all tabs
+      final int s = tabs.getTabCount() - 1;
+      for(int i = 0; i < s; i++) {
+        final Component c = tabs.getComponentAt(i);
+        if(!(c instanceof EditorArea)) continue;
+
+        final EditorArea ea = (EditorArea) c;
+        final String editPath = ea.file.file().getCanonicalPath();
+        if(dir) {
+          // change path to files in a renamed directory
+          if(editPath.startsWith(oldPath)) {
+            ea.file = new IOFile(renamed + File.separator + editPath.substring(oldPath.length()));
+          }
+        } else if(oldPath.equals(editPath)) {
+          // update file reference and label of editor tab
+          ea.file = renamed;
+          ea.label.setText(renamed.name());
+          break;
+        }
+      }
+    } catch(final IOException ex) {
+      Util.errln(ex);
+    }
+  }
+
+  /**
    * Refreshes the query modification flag.
    * @param force action
    */
@@ -725,10 +765,10 @@ public final class EditorView extends View {
    * @param file file to write
    * @return {@code false} if confirmation was canceled
    */
-  private boolean save(final IO file) {
+  private boolean save(final IOFile file) {
     try {
       final EditorArea edit = getEditor();
-      ((IOFile) file).write(edit.getText());
+      file.write(edit.getText());
       edit.file(file);
       files.repaint();
       return true;

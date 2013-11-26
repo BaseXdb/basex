@@ -164,7 +164,7 @@ public final class DialogServer extends BaseXDialog {
     sess.border(8).layout(new BorderLayout());
     sese = new Editor(false, this);
     sese.setFont(start.getFont());
-    refreshSess = new BaseXButton(B_REFRESH, this);
+    refreshSess = new BaseXButton(REFRESH, this);
 
     pp = new BaseXBack(new BorderLayout());
     pp.add(new BaseXLabel(S_SESSIONS + COLS, false, true), BorderLayout.NORTH);
@@ -188,7 +188,7 @@ public final class DialogServer extends BaseXDialog {
 
     logt.border(5);
     infoL = new BaseXLabel(" ").border(12, 0, 0, 0);
-    refreshLog = new BaseXButton(B_REFRESH, this);
+    refreshLog = new BaseXButton(REFRESH, this);
 
     p = new BaseXBack(new BorderLayout());
     pp = new BaseXBack();

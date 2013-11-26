@@ -168,7 +168,7 @@ public abstract class BaseXDialog extends JDialog {
    * @return button list
    */
   protected BaseXBack okCancel() {
-    return newButtons(B_OK, B_CANCEL);
+    return newButtons(B_OK, CANCEL);
   }
 
   /**

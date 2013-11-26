@@ -13,9 +13,10 @@ final class EditorFile extends EditorNode {
   /**
    * Constructor.
    * @param io file
+   * @param tr tree
    */
-  EditorFile(final IOFile io) {
-    super(io);
+  EditorFile(final IOFile io, final EditorTree tr) {
+    super(io, tr);
   }
 
   @Override

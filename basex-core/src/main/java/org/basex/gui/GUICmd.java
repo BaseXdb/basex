@@ -1,5 +1,7 @@
 package org.basex.gui;
 
+import java.awt.*;
+
 import javax.swing.*;
 
 /**
@@ -9,6 +11,10 @@ import javax.swing.*;
  * @author Christian Gruen
  */
 public interface GUICmd {
+  /** Shortcut string for meta key. */
+  String META = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ==
+      Event.META_MASK ? "meta" : "ctrl";
+
   /**
    * Executes the command.
    * @param gui reference to the main window

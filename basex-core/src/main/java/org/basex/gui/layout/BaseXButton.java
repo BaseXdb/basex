@@ -34,7 +34,7 @@ public class BaseXButton extends JButton {
       @Override
       public void actionPerformed(final ActionEvent e) {
         final String text = getText();
-        if(text.equals(B_CANCEL)) d.cancel();
+        if(text.equals(CANCEL)) d.cancel();
         else if(text.equals(B_OK)) d.close();
         else d.action(e.getSource());
       }

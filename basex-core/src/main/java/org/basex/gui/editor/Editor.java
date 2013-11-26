@@ -851,8 +851,8 @@ public class Editor extends BaseXPanel {
       finish(-1);
     }
     @Override
-    public void refresh(final GUI main, final AbstractButton button) {
-      button.setEnabled(!hist.first());
+    public boolean enabled(final GUI main) {
+      return !hist.first();
     }
     @Override
     public String label() {
@@ -872,8 +872,8 @@ public class Editor extends BaseXPanel {
       finish(-1);
     }
     @Override
-    public void refresh(final GUI main, final AbstractButton button) {
-      button.setEnabled(!hist.last());
+    public boolean enabled(final GUI mein) {
+      return !hist.last();
     }
     @Override
     public String label() {
@@ -894,8 +894,8 @@ public class Editor extends BaseXPanel {
       finish(tc);
     }
     @Override
-    public void refresh(final GUI main, final AbstractButton button) {
-      button.setEnabled(text.selected());
+    public boolean enabled(final GUI main) {
+      return text.selected();
     }
     @Override
     public String label() {
@@ -910,8 +910,8 @@ public class Editor extends BaseXPanel {
       copy();
     }
     @Override
-    public void refresh(final GUI main, final AbstractButton button) {
-      button.setEnabled(text.selected());
+    public boolean enabled(final GUI main) {
+      return text.selected();
     }
     @Override
     public String label() {
@@ -933,8 +933,8 @@ public class Editor extends BaseXPanel {
       finish(tc);
     }
     @Override
-    public void refresh(final GUI main, final AbstractButton button) {
-      button.setEnabled(clip() != null);
+    public boolean enabled(final GUI main) {
+      return clip() != null;
     }
     @Override
     public String label() {
@@ -953,8 +953,8 @@ public class Editor extends BaseXPanel {
       finish(tc);
     }
     @Override
-    public void refresh(final GUI main, final AbstractButton button) {
-      button.setEnabled(text.selected());
+    public boolean enabled(final GUI main) {
+      return text.selected();
     }
     @Override
     public String label() {

@@ -55,7 +55,7 @@ public final class DialogMessage extends BaseXDialog {
       if(ic == Msg.QUESTION) {
         buttons = newButtons(yes, no);
       } else {
-        buttons = newButtons(yes, no, new BaseXButton(Text.B_CANCEL, this));
+        buttons = newButtons(yes, no, new BaseXButton(Text.CANCEL, this));
       }
     } else {
       yes = new BaseXButton(Text.B_OK, this);

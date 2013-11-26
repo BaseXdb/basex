@@ -30,7 +30,7 @@ public final class EditorArea extends Editor {
   /** File label. */
   final BaseXLabel label;
   /** File in tab. */
-  IO file;
+  IOFile file;
   /** Flag for modified content. */
   boolean modified;
   /** Last input. */
@@ -211,7 +211,7 @@ public final class EditorArea extends Editor {
    * Updates the file reference, timestamp and history.
    * @param f file
    */
-  void file(final IO f) {
+  void file(final IOFile f) {
     file = f;
     tstamp = f.timeStamp();
     setSyntax(file, true);

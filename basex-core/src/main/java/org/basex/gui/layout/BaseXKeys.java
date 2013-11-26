@@ -83,6 +83,7 @@ public enum BaseXKeys {
 
   /** Refresh.               */ REFRESH(VK_F5),
   /** Jump to project.       */ PROJECT(SC | SHF, VK_R, true),
+  /** New directory.         */ NEWDIR(SC | SHF, VK_N),
 
   // Font
 

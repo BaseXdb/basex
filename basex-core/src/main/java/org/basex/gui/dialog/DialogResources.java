@@ -273,11 +273,9 @@ public final class DialogResources extends BaseXBack {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
+    public boolean enabled(final GUI gui) {
       final TreeNode n = selection();
-      if(n instanceof TreeLeaf)
-        button.setEnabled(!((TreeLeaf) n).abbr);
-      else button.setEnabled(n != null && !n.equals(root));
+      return n instanceof TreeLeaf ? !((TreeLeaf) n).abbr : n != null && !n.equals(root);
     }
   }
 
@@ -307,10 +305,9 @@ public final class DialogResources extends BaseXBack {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
+    public boolean enabled(final GUI gui) {
       final TreeNode n = selection();
-      if(n instanceof TreeLeaf) button.setEnabled(!((TreeLeaf) n).abbr);
-      else button.setEnabled(n != null && !n.equals(root));
+      return n instanceof TreeLeaf ? !((TreeLeaf) n).abbr : n != null && !n.equals(root);
     }
   }
 }

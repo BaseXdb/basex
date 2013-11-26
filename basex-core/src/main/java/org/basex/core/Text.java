@@ -555,8 +555,6 @@ public interface Text {
   String DB_OPENED_X = lang("db_opened_%");
   /** Database exported. */
   String DB_EXPORTED_X = lang("db_exported_%");
-  /** Database not deleted. */
-  String FILE_NOT_DELETED_X = lang("file_not_deleted_%");
   /** Database already exists. */
   String DB_EXISTS_X = lang("db_exists_%");
   /** Database was dropped. */
@@ -565,6 +563,10 @@ public interface Text {
   String BACKUP_NOT_FOUND_X = lang("backup_not_found_%");
   /** File not stored. */
   String FILE_NOT_STORED_X = lang("file_not_stored_%");
+  /** File could not be deleted. */
+  String FILE_NOT_DELETED_X = lang("file_not_deleted_%");
+  /** File could not be renamed. */
+  String FILE_NOT_RENAMED_X = lang("file_not_renamed_%");
 
   /** Index created. */
   String INDEX_CREATED_X_X = lang("index_created_%_%");
@@ -941,9 +943,9 @@ public interface Text {
   /** Button: " no ". */
   String B_NO = "  " + lang("no") + "  ";
   /** Button: "cancel". */
-  String B_CANCEL = lang("cancel");
+  String CANCEL = lang("cancel");
   /** Button for refreshing. */
-  String B_REFRESH = lang("refresh");
+  String REFRESH = lang("refresh");
 
   /** "Search". */
   String SEARCH = lang("search");
@@ -1005,6 +1007,8 @@ public interface Text {
   String INFORMATION = lang("information");
   /** Dialog title for choosing a directory. */
   String CHOOSE_DIR = lang("choose_dir");
+  /** Command info. */
+  String NEW_DIR = lang("new_dir");
 
   /** Dialog title for choosing a file. */
   String FILE_OR_DIR = lang("file_or_dir");

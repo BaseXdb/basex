@@ -32,9 +32,6 @@ public final class GUIMenu extends JMenuBar {
     gui = main;
     if(Prop.langright) setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 
-    final String sm = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ==
-      Event.META_MASK ? "meta" : "ctrl";
-
     // create menu for each top level menu entries
     int c = 0;
     for(int b = 0; b < MENUBAR.length; ++b) {
@@ -60,9 +57,7 @@ public final class GUIMenu extends JMenuBar {
           // add a menu entry
           final JMenuItem item = newItem(cmd, gui, mnem);
           final String sc = cmd.key();
-          if(sc != null) {
-            item.setAccelerator(KeyStroke.getKeyStroke(Util.info(sc, sm)));
-          }
+          if(sc != null) item.setAccelerator(KeyStroke.getKeyStroke(Util.info(sc, GUICmd.META)));
           items[c++] = item;
           if(Prop.langright) {
             item.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
@@ -83,9 +78,7 @@ public final class GUIMenu extends JMenuBar {
    */
   public static JMenuItem newItem(final GUICmd cmd, final GUI gui, final StringBuilder mnem) {
     final String desc = cmd.label();
-    final JMenuItem item = cmd.checked() ?
-        new JCheckBoxMenuItem(desc) : new JMenuItem(desc);
-
+    final JMenuItem item = cmd.checked() ? new JCheckBoxMenuItem(desc) : new JMenuItem(desc);
     item.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {

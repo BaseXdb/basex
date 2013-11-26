@@ -8,6 +8,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import org.basex.gui.*;
+import org.basex.util.*;
 
 /**
  * Project specific Popup menu implementation.
@@ -61,19 +62,22 @@ public final class BaseXPopup extends JPopupMenu {
       }
     });
 
-    for(final GUICmd c : pop) {
-      if(c == null) {
+    final StringBuilder gmnem = new StringBuilder();
+    for(final GUICmd cmd : pop) {
+      if(cmd == null) {
         addSeparator();
       } else {
-        final JMenuItem item = add(c.label());
+        final JMenuItem item = add(cmd.label());
         item.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(final ActionEvent e) {
-            if(!gui.updating) c.execute(gui);
+            if(!gui.updating) cmd.execute(gui);
           }
         });
-        item.setMnemonic(c.label().charAt(0));
-        item.setToolTipText(c.help());
+        BaseXLayout.setMnemonic(item, gmnem);
+        final String sc = cmd.key();
+        if(sc != null) item.setAccelerator(KeyStroke.getKeyStroke(Util.info(sc, GUICmd.META)));
+        item.setToolTipText(cmd.help());
       }
     }
   }

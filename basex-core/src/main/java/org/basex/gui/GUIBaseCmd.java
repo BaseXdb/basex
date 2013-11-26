@@ -18,11 +18,11 @@ public abstract class GUIBaseCmd implements GUICmd {
   };
 
   @Override
-  public boolean checked() {
+  public final boolean checked() {
     return false;
   }
   @Override
-  public String help() {
+  public final String help() {
     return null;
   }
   @Override
@@ -30,6 +30,16 @@ public abstract class GUIBaseCmd implements GUICmd {
     return null;
   }
   @Override
-  public void refresh(final GUI main, final AbstractButton button) {
+  public final void refresh(final GUI main, final AbstractButton button) {
+    button.setEnabled(enabled(main));
+  }
+
+  /**
+   * Checks if the command is currently enabled.
+   * @param main main window
+   * @return result of check
+   */
+  public boolean enabled(@SuppressWarnings("unused") final GUI main) {
+    return true;
   }
 }

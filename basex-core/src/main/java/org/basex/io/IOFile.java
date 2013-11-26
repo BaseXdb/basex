@@ -20,6 +20,9 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class IOFile extends IO {
+  /** Pattern for valid file names. */
+  private static final Pattern VALIDNAME =
+      Pattern.compile("^[^\\\\/" + (Prop.WIN ? ":*?\"<>\\|" : "") + "]+$");
   /** File reference. */
   private final File file;
 
@@ -262,29 +265,29 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Renames the file to the specified name.
-   * @param trg target reference
+   * Renames a file to the specified path. The path must not exist yet.
+   * @param target target reference
    * @return success flag
    */
-  public boolean rename(final IOFile trg) {
-    return file.renameTo(trg.file);
+  public boolean rename(final IOFile target) {
+    return file.renameTo(target.file);
   }
 
   /**
    * Copies a file to another target.
-   * @param trg target
+   * @param target target
    * @throws IOException I/O exception
    */
-  public void copyTo(final IOFile trg) throws IOException {
+  public void copyTo(final IOFile target) throws IOException {
     // optimize buffer size
     final int bsize = (int) Math.max(1, Math.min(length(), 1 << 22));
     final byte[] buf = new byte[bsize];
 
     // create parent directory of target file
-    trg.dir().md();
+    target.dir().md();
     final FileInputStream fis = new FileInputStream(file);
     try {
-      final FileOutputStream fos = new FileOutputStream(trg.file);
+      final FileOutputStream fos = new FileOutputStream(target.file);
       try {
         // copy file buffer by buffer
         for(int i; (i = fis.read(buf)) != -1;) fos.write(buf, 0, i);
@@ -315,6 +318,15 @@ public final class IOFile extends IO {
     }
     if(isDir()) tb.add('/');
     return tb.toString();
+  }
+
+  /**
+   * Checks if the specified sting is a valid file name.
+   * @param name file name
+   * @return result of check
+   */
+  public static boolean isValidName(final String name) {
+    return VALIDNAME.matcher(name).matches();
   }
 
   /**

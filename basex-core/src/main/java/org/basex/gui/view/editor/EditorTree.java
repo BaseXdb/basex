@@ -1,7 +1,6 @@
 package org.basex.gui.view.editor;
 
 import static org.basex.core.Text.*;
-import static org.basex.gui.layout.BaseXKeys.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -9,13 +8,14 @@ import java.io.*;
 import java.util.*;
 
 import javax.swing.*;
+import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
 
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
-import org.basex.gui.layout.BaseXFileChooser.*;
+import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -29,8 +29,8 @@ import org.basex.util.list.*;
 public final class EditorTree extends BaseXPanel implements TreeWillExpandListener {
   /** Root node. */
   final DefaultMutableTreeNode root;
-  /** Root paths. */
-  final StringList roots;
+  /** Root node. */
+  final EditorCellRenderer renderer;
   /** Tree. */
   final BaseXTree tree;
   /** Editor view. */
@@ -43,24 +43,28 @@ public final class EditorTree extends BaseXPanel implements TreeWillExpandListen
   EditorTree(final EditorView ev) {
     super(ev.gui);
     view = ev;
-    setLayout(new BorderLayout());
+    setLayout(new GridLayout(1, 1));
 
     root = new DefaultMutableTreeNode();
     tree = new BaseXTree(root, gui).border(4, 4, 4, 4);
-    tree.setCellRenderer(new EditorNodeRenderer());
+    renderer = new EditorCellRenderer();
+    tree.setExpandsSelectedPaths(true);
+    tree.setCellRenderer(renderer);
     tree.addTreeWillExpandListener(this);
     tree.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        if(REFRESH.is(e)) {
-          refresh();
-        } else if(DELNEXT.is(e)) {
-          delete();
+        if(BaseXKeys.REFRESH.is(e)) {
+          new RefreshCmd().execute(gui);
+        } else if(BaseXKeys.DELNEXT.is(e)) {
+          new DeleteCmd().execute(gui);
+        } else if(BaseXKeys.NEWDIR.is(e)) {
+          new NewCmd().execute(gui);
         }
       }
       @Override
       public void keyTyped(final KeyEvent e) {
-        if(ENTER.is(e)) open();
+        if(BaseXKeys.ENTER.is(e)) open();
       }
     });
     tree.addMouseListener(new MouseAdapter() {
@@ -70,30 +74,73 @@ public final class EditorTree extends BaseXPanel implements TreeWillExpandListen
       }
     });
 
-    // choose common parent directories of project folders
-    roots = roots();
+    tree.setCellEditor(new EditorCellEditor(tree, renderer));
+    tree.setEditable(true);
+
+    // choose common parent directories of project directories
+    final StringList roots = roots();
+    root.removeAllChildren();
+    for(final String s : roots) root.add(new EditorDir(new IOFile(s), this));
 
     // expand root and child directories
-    init();
     for(int c = 0; c <= roots.size(); c++) tree.expandRow(c);
     tree.setRootVisible(false);
     tree.setSelectionRow(0);
-    add(new JScrollPane(tree), BorderLayout.CENTER);
 
-    new BaseXPopup(tree, gui, new DeleteCmd(), null, new ChangeCmd());
+    // add scroll bar
+    final JScrollPane jsp = new JScrollPane(tree);
+    jsp.setBorder(new EmptyBorder(0, 0, 0, 0));
+    add(jsp);
+
+    new BaseXPopup(tree, gui, new DeleteCmd(), new RenameCmd(), new NewCmd(), null,
+        new ChangeCmd(), new RefreshCmd());
+  }
+
+  @Override
+  public void treeWillExpand(final TreeExpansionEvent event) throws ExpandVetoException {
+    final Object obj = event.getPath().getLastPathComponent();
+    if(obj instanceof EditorNode) {
+      final EditorNode node = (EditorNode) obj;
+      node.expand();
+      node.updateTree();
+    }
+  }
+
+  @Override
+  public void treeWillCollapse(final TreeExpansionEvent event) throws ExpandVetoException {
+    final Object obj = event.getPath().getLastPathComponent();
+    if(obj instanceof EditorNode) {
+      final EditorNode node = (EditorNode) obj;
+      node.collapse();
+      node.updateTree();
+    }
   }
 
   /**
-   * Initializes the tree structure.
+   * Renames a file or directory in the tree.
+   * @param node source node
+   * @param name new name of file or directory
+   * @return new file reference, or {@code null} if operation failed
    */
-  private void init() {
-    final DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-    root.removeAllChildren();
-    for(final String s : roots) root.add(new EditorFolder(new IOFile(s), model));
+  IOFile rename(final EditorNode node, final String name) {
+    // check if chosen file name is valid
+    if(IOFile.isValidName(name)) {
+      final IOFile old = node.file;
+      final IOFile updated = new IOFile(old.file().getParent(), name);
+      // rename file or show error dialog
+      if(!old.rename(updated)) {
+        BaseXDialog.error(gui, Util.info(FILE_NOT_RENAMED_X, old));
+      } else {
+        // update tab references if file or directory could be renamed
+        gui.editor.rename(old, updated);
+        return updated;
+      }
+    }
+    return null;
   }
 
   /**
-   * Returns the common parent directories of the project folders.
+   * Returns the common parent directories of the project directories.
    * @return root directories
    */
   private StringList roots() {
@@ -116,23 +163,11 @@ public final class EditorTree extends BaseXPanel implements TreeWillExpandListen
   }
 
   /**
-   * Deletes selected files.
-   */
-  private void delete() {
-    final ArrayList<EditorNode> selected = selected();
-    if(BaseXDialog.confirm(gui, Util.info(DELETE_FILE_X, selected.size()))) {
-      for(final EditorNode node : selected) view.delete(node.file);
-      tree.setSelectionRow(0);
-      refresh();
-    }
-  }
-
-  /**
    * Opens the selected file.
    */
   private void open() {
     boolean opened = false;
-    for(final EditorNode node : selected()) {
+    for(final EditorNode node : selectedNodes()) {
       final IOFile file = node.file;
       if(!file.isDir()) {
         view.open(file);
@@ -143,81 +178,162 @@ public final class EditorTree extends BaseXPanel implements TreeWillExpandListen
   }
 
   /**
-   * Refreshes the tree structure.
-   */
-  private void refresh() {
-    boolean refreshed = false;
-    for(final EditorNode node : selected()) {
-      if(node.file.isDir()) {
-        node.collapse();
-        node.expand();
-        refreshed = true;
-      }
-    }
-    if(refreshed) repaint();
-  }
-
-  /**
    * Returns the selected nodes.
    * @return selected node
    */
-  private ArrayList<EditorNode> selected() {
+  private ArrayList<EditorNode> selectedNodes() {
     final ArrayList<EditorNode> nodes = new ArrayList<EditorNode>();
-    for(final TreePath tp : tree.getSelectionPaths()) {
-      final Object node = tp.getLastPathComponent();
-      if(node instanceof EditorNode) nodes.add((EditorNode) node);
+    final TreePath[] paths = tree.getSelectionPaths();
+    if(paths != null) {
+      for(final TreePath path : paths) {
+        final Object node = path.getLastPathComponent();
+        if(node instanceof EditorNode) nodes.add((EditorNode) node);
+      }
     }
     return nodes;
   }
 
-  @Override
-  public void treeWillExpand(final TreeExpansionEvent event) throws ExpandVetoException {
-    final Object node = event.getPath().getLastPathComponent();
-    if(node instanceof EditorNode) ((EditorNode) node).expand();
+  /**
+   * Returns a single selected node, or {@code null} if zero or more than node is selected.
+   * @return selected node
+   */
+  private EditorNode selectedNode() {
+    final TreePath path = selectedPath();
+    if(path != null) {
+      final Object node = path.getLastPathComponent();
+      if(node instanceof EditorNode) return (EditorNode) node;
+    }
+    return null;
   }
 
-  @Override
-  public void treeWillCollapse(final TreeExpansionEvent event) throws ExpandVetoException {
-    final Object node = event.getPath().getLastPathComponent();
-    if(node instanceof EditorNode) ((EditorNode) node).collapse();
+  /**
+   * Returns the selected path, or returns {@code null} if zero or more than paths are selected.
+   * @return path
+   */
+  private TreePath selectedPath() {
+    final TreePath[] tps = tree.getSelectionPaths();
+    return tps == null || tps.length > 1 ? null : tps[0];
+  }
+
+  // COMMANDS =====================================================================================
+
+  /** Refresh command. */
+  final class RefreshCmd extends GUIBaseCmd {
+    @Override
+    public void execute(final GUI main) { if(enabled(main)) selectedNode().refresh(); }
+    @Override
+    public boolean enabled(final GUI main) { return selectedNode() != null; }
+    @Override
+    public String label() { return REFRESH; }
+    @Override
+    public String key() { return BaseXKeys.REFRESH.toString(); }
+  }
+
+  /** New directory command. */
+  final class NewCmd extends GUIBaseCmd {
+    @Override
+    public void execute(final GUI main) {
+      if(!enabled(gui)) return;
+      EditorNode parent = selectedNode();
+      if(parent instanceof EditorFile) parent = (EditorDir) parent.getParent();
+
+      // choose free name
+      String name = '(' + NEW_DIR + ')';
+      IOFile dir = new IOFile(parent.file, name);
+      int c = 1;
+      while(dir.exists()) {
+        name = '(' + NEW_DIR + ' ' + ++c + ')';
+        dir = new IOFile(parent.file, name);
+      }
+      if(dir.md()) {
+        tree.setSelectionPaths(null);
+        parent.refresh();
+        final int cl = parent.getChildCount();
+        for(int i = 0; i < cl; i++) {
+          final EditorNode node = (EditorNode) parent.getChildAt(i);
+          if(node.file.name().equals(name)) {
+            final TreePath path = node.path();
+            tree.setSelectionPath(path);
+            tree.startEditingAtPath(path);
+            break;
+          }
+        }
+      }
+    }
+    @Override
+    public boolean enabled(final GUI main) { return selectedNode() != null; }
+    @Override
+    public String label() { return NEW_DIR; }
+    @Override
+    public String key() { return "% shift N"; }
   }
 
   /** Delete command. */
   final class DeleteCmd extends GUIBaseCmd {
     @Override
-    public void execute(final GUI g) { delete(); }
+    public void execute(final GUI main) {
+      if(!enabled(gui)) return;
+
+      final EditorNode node = selectedNode();
+      if(BaseXDialog.confirm(gui, Util.info(DELETE_FILE_X, node.file))) {
+        final EditorNode parent = (EditorNode) node.getParent();
+        // delete file or show error dialog
+        if(!view.delete(node.file)) {
+          BaseXDialog.error(gui, Util.info(FILE_NOT_DELETED_X, node.file));
+        } else {
+          parent.refresh();
+          tree.setSelectionPath(parent.path());
+        }
+      }
+    }
+    @Override
+    public boolean enabled(final GUI main) {
+      final EditorNode node = selectedNode();
+      return node != null && !node.root();
+    }
     @Override
     public String label() { return DELETE + DOTS; }
     @Override
-    public void refresh(final GUI g, final AbstractButton button) {
-      boolean rt = false;
-      for(final int r : tree.getSelectionRows()) rt |= r == 0;
-      button.setEnabled(!rt);
+    public String key() { return "DELETE"; }
+  }
+
+  /** Rename command. */
+  final class RenameCmd extends GUIBaseCmd {
+    @Override
+    public void execute(final GUI main) {
+      if(!enabled(gui)) return;
+      tree.startEditingAtPath(selectedNode().path());
     }
+    @Override
+    public boolean enabled(final GUI main) {
+      final EditorNode node = selectedNode();
+      return node != null && !node.root();
+    }
+    @Override
+    public String label() { return RENAME; }
+    @Override
+    public String key() { return "F2"; }
   }
 
   /** Delete command. */
   final class ChangeCmd extends GUIBaseCmd {
     @Override
-    public void execute(final GUI g) {
-      final EditorNode child = (EditorNode) root.getChildAt(0);
+    public void execute(final GUI main) {
+      if(!enabled(gui)) return;
+      final EditorNode child = selectedNode();
       final BaseXFileChooser fc = new BaseXFileChooser(CHOOSE_DIR, child.file.path(), gui);
       final IOFile io = fc.select(Mode.DOPEN);
       if(io != null) {
-        tree.collapseRow(0);
-        roots.set(0, io.path());
-        root.removeAllChildren();
-        init();
-        for(int c = 0; c < roots.size(); c++) tree.expandRow(c);
+        child.file = io;
+        child.refresh();
       }
     }
     @Override
-    public String label() { return "Directory" + DOTS; }
-    @Override
-    public void refresh(final GUI g, final AbstractButton button) {
-      boolean rt = false;
-      for(final int r : tree.getSelectionRows()) rt |= r == 0;
-      button.setEnabled(rt);
+    public boolean enabled(final GUI main) {
+      final EditorNode node = selectedNode();
+      return node != null && node.root();
     }
+    @Override
+    public String label() { return CHOOSE_DIR + DOTS; }
   }
 }
