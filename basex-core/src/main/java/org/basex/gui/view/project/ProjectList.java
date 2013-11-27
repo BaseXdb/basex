@@ -2,12 +2,12 @@ package org.basex.gui.view.project;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 import javax.swing.*;
 
 import org.basex.gui.layout.*;
 import org.basex.io.*;
-import org.basex.util.list.*;
 
 /**
  * List of filtered file entries.
@@ -48,7 +48,7 @@ public class ProjectList extends JList {
    * Assigns the specified list entries and selects the first entry.
    * @param list entries to set
    */
-  void addElements(final StringList list) {
+  void addElements(final TreeSet<String> list) {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {

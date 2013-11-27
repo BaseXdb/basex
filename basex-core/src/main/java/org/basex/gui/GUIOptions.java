@@ -28,12 +28,12 @@ public final class GUIOptions extends Options {
   public static final StringOption DATAPATH = new StringOption("DATAPATH", HOME);
   /** Path to working directory. */
   public static final StringOption WORKPATH = new StringOption("WORKPATH", HOME);
+  /** Path to database project. */
+  public static final StringOption PROJECTPATH = new StringOption("PROJECTPATH", "");
   /** Last editor files. */
   public static final StringsOption EDITOR = new StringsOption("EDITOR");
   /** Input paths. */
   public static final StringsOption INPUTS = new StringsOption("INPUTS");
-  /** Project filter. */
-  public static final StringsOption FILTERS = new StringsOption("FILTERS");
 
   /** Comment: written to options file. */
   public static final Comment C_LAYOUT = new Comment("Layout");

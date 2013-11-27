@@ -8,7 +8,6 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.io.*;
 import org.basex.util.list.*;
@@ -22,14 +21,15 @@ import org.basex.util.list.*;
 public class ProjectFilter extends BaseXTextField {
   /** Project view. */
   private ProjectView project;
-  /** Current filter id. */
-  private int threadID;
   /** Cached file paths. */
-  final StringList cache = new StringList();
+  private final StringList cache = new StringList();
+
   /** Last entered string. */
   String last = "";
   /** Running flag. */
   boolean running;
+  /** Current filter id. */
+  private int threadID;
 
   /**
    * Constructor.
@@ -37,7 +37,6 @@ public class ProjectFilter extends BaseXTextField {
    */
   public ProjectFilter(final ProjectView view) {
     super(view.gui);
-    history(view.gui, GUIOptions.FILTERS);
     project = view;
 
     addKeyListener(new KeyAdapter() {
@@ -63,9 +62,20 @@ public class ProjectFilter extends BaseXTextField {
         }
         if(oldView != newView) view.scroll.setViewportView(newView);
       }
+
+      @Override
+      public void keyPressed(final KeyEvent e) {
+        if(BaseXKeys.NEXTLINE.is(e) || BaseXKeys.PREVLINE.is(e) ||
+            BaseXKeys.NEXTPAGE.is(e) || BaseXKeys.PREVPAGE.is(e) ||
+            BaseXKeys.LINESTART.is(e) || BaseXKeys.LINEEND.is(e)) {
+          project.list.dispatchEvent(e);
+        }
+      }
+
       @Override
       public void keyTyped(final KeyEvent e) {
         if(BaseXKeys.ENTER.is(e)) view.list.open();
+        else if(BaseXKeys.ESCAPE.is(e)) setText("");
       }
     });
   }
@@ -82,17 +92,12 @@ public class ProjectFilter extends BaseXTextField {
    */
   void init() {
     if(cache.isEmpty()) {
-      project.list.addElements(new StringList(Text.PLEASE_WAIT_D));
-
-      final Enumeration<?> en = project.root.children();
-      while(en.hasMoreElements()) {
-        final Object obj = en.nextElement();
-        if(obj instanceof ProjectDir) {
-          final IOFile root = ((ProjectDir) obj).file;
-          for(final String path : root.descendants()) {
-            cache.add(root.path() + File.separator + path);
-          }
-        }
+      final TreeSet<String> set = new TreeSet<String>();
+      set.add(Text.PLEASE_WAIT_D);
+      project.list.addElements(set);
+      final IOFile root = project.dir.file;
+      for(final String path : root.descendants()) {
+        cache.add(root.path() + File.separator + path);
       }
     }
   }
@@ -114,8 +119,7 @@ public class ProjectFilter extends BaseXTextField {
     running = true;
     setCursor(CURSORWAIT);
     init();
-
-    final StringList files = filter(pattern, thread);
+    final TreeSet<String> files = filter(pattern, thread);
     if(files != null) project.list.addElements(files);
     setCursor(CURSORARROW);
     running = false;
@@ -127,33 +131,45 @@ public class ProjectFilter extends BaseXTextField {
    * @param thread current thread id
    * @return result of check
    */
-  private StringList filter(final String pattern, final int thread) {
-    final StringList match = new StringList();
+  private TreeSet<String> filter(final String pattern, final int thread) {
+    final boolean path = pattern.indexOf('\\') != -1 || pattern.indexOf('/') != -1;
+
+    final TreeSet<String> match = new TreeSet<String>();
     for(final String input : cache) {
-      final int a = input.lastIndexOf('\\'), b = input.lastIndexOf('/'), c = a > b ? a : b;
-      if(input.startsWith(pattern, c + 1)) {
+      if(input.startsWith(pattern, offset(input, path))) {
         match.add(input);
         if(match.size() >= 100) return match;
       }
       if(threadID != thread) return null;
     }
     for(final String input : cache) {
-      final int a = input.lastIndexOf('\\'), b = input.lastIndexOf('/'), c = a > b ? a : b;
-      if(input.substring(c + 1).contains(pattern) && !match.contains(input)) {
+      if(input.substring(offset(input, path)).contains(pattern) && !match.contains(input)) {
         match.add(input);
         if(match.size() >= 100) return match;
       }
       if(threadID != thread) return null;
     }
     for(final String input : cache) {
-      final int a = input.lastIndexOf('\\'), b = input.lastIndexOf('/'), c = a > b ? a : b;
-      if(matches(input, pattern, c + 1) && !match.contains(input)) {
+      if(matches(input, pattern, offset(input, path)) && !match.contains(input)) {
         match.add(input);
         if(match.size() >= 100) return match;
       }
       if(threadID != thread) return null;
     }
     return match;
+  }
+
+  /**
+   * Returns the offset after the last slash, or {@code 0} if full paths are to be processed.
+   * @param input input string
+   * @param path full path processing
+   * @return resulting offset
+   */
+  private static int offset(final String input, final boolean path) {
+    if(path) return 0;
+    final int a = input.lastIndexOf('\\');
+    final int b = input.lastIndexOf('/');
+    return (a > b ? a : b) + 1;
   }
 
   /**
@@ -169,7 +185,8 @@ public class ProjectFilter extends BaseXTextField {
     for(int i = off; i < il && p < pl; i++) {
       final char ic = input.charAt(i);
       final char pc = pattern.charAt(p);
-      if(Character.isLowerCase(pc) && pc == Character.toLowerCase(ic) || pc == ic) p++;
+      if(Character.isLowerCase(pc) && pc == Character.toLowerCase(ic) || pc == ic ||
+          (pc == '/' || pc == '\\') && (ic == '/' || ic == '\\')) p++;
     }
     return p == pl;
   }
