@@ -162,7 +162,7 @@ public final class BaseXLayout {
    * @param comp component
    * @param win parent window
    */
-  static void addInteraction(final Component comp, final Window win) {
+  public static void addInteraction(final Component comp, final Window win) {
     comp.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseEntered(final MouseEvent e) {

@@ -127,8 +127,10 @@ public final class EditorArea extends Editor {
   @Override
   public void keyReleased(final KeyEvent e) {
     super.keyReleased(e);
-    if(!e.isActionKey() && !modifier(e) && !FINDERROR.is(e)) {
-      release(EXEC.is(e) ? Action.EXECUTE : Action.CHECK);
+    if(EXEC1.is(e) || EXEC2.is(e)) {
+      release(Action.EXECUTE);
+    } else if(!e.isActionKey() && !modifier(e) && !FINDERROR.is(e)) {
+      release(Action.CHECK);
     }
   }
 

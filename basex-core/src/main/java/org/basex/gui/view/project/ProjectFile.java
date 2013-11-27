@@ -1,4 +1,4 @@
-package org.basex.gui.view.editor;
+package org.basex.gui.view.project;
 
 import org.basex.io.*;
 import org.basex.util.*;
@@ -9,14 +9,14 @@ import org.basex.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-final class EditorFile extends EditorNode {
+final class ProjectFile extends ProjectNode {
   /**
    * Constructor.
    * @param io file
-   * @param tr tree
+   * @param proj project view
    */
-  EditorFile(final IOFile io, final EditorTree tr) {
-    super(io, tr);
+  ProjectFile(final IOFile io, final ProjectView proj) {
+    super(io, proj);
   }
 
   @Override

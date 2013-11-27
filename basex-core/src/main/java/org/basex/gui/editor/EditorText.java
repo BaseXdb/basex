@@ -65,12 +65,12 @@ public final class EditorText {
 
   /**
    * Sets a new text.
-   * @param t new text
+   * @param txt new text
    */
-  void text(final byte[] t) {
-    text = t;
+  void text(final byte[] txt) {
+    text = txt;
     noSelect();
-    if(search != null) spos = search.search(t);
+    if(search != null) spos = search.search(txt);
   }
 
   /**
@@ -292,7 +292,7 @@ public final class EditorText {
   }
 
   /**
-   * Moves to the specified position of to the of the line.
+   * Moves to the specified position or the end of the line.
    * @param p position to move to
    * @param select selection flag
    */
@@ -335,45 +335,37 @@ public final class EditorText {
 
   /**
    * Indents lines.
-   * @param s start position
-   * @param e end position
-   * @param sh shift flag
+   * @param shift shift flag
    */
-  void indent(final int s, final int e, final boolean sh) {
+  void indent(final boolean shift) {
     // extend selection to match whole lines
+    int s = Math.min(ms, me), e = Math.max(ms, me) - 1;
     pos(s);
     bol(true);
-    startSelect();
+    s = ps;
     pos(e);
     forward(Integer.MAX_VALUE, true);
-    next(true);
-    finishSelect();
+    e = ps;
 
-    // decide if to use tab or spaces
-    boolean tab = false;
-    for(final byte t : text) tab |= t == '\t';
-    byte[] add = { '\t' };
-    if(!tab) {
-      add = new byte[TAB];
-      for(int a = 0; a < TAB; a++) add[a] = ' ';
-    }
+    byte[] add = new byte[TAB];
+    for(int a = 0; a < TAB; a++) add[a] = ' ';
 
     // build new text
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(text, 0, ms);
+    tb.add(text, 0, s);
     final int pl = text.length;
-    for(int p = ms; p < ps; p += cl(text, p)) {
+    for(int p = s; p < ps; p += cl(text, p)) {
       if(p == 0 || text[p - 1] == '\n') {
-        if(sh) {
+        if(shift) {
           // remove indentation
           if(text[p] == '\t') {
-            me--;
+            e--;
             continue;
           }
           if(text[p] == ' ') {
-            me--;
+            e--;
             for(int i = 1; i < TAB && p + i < pl && text[p + i] == ' '; i++) {
-              me--;
+              e--;
               p++;
             }
             continue;
@@ -381,17 +373,16 @@ public final class EditorText {
         } else {
           // add new indentation
           tb.add(add);
-          me += add.length;
+          e += add.length;
         }
       }
       tb.add(cp(text, p));
     }
     tb.add(text, ps, text.length);
-    ps = me;
-    final int ss = ms;
     text(tb.finish());
-    ms = ss;
-    me = ps;
+    ms = s;
+    me = e;
+    pc = e;
   }
 
   /**
@@ -520,31 +511,25 @@ public final class EditorText {
     if(!selected() && shift && text.length != 0) select(ps + 1, ps);
 
     // check if something is selected
-    boolean i = false;
     if(selected()) {
-      // check if lines are to be indented
-      final int s = Math.min(ps, start());
-      final int l = Math.max(ps, start()) - 1;
-      int p = s;
-      for(; p <= l && p < text.length; p++) i |= text[p] != '\n';
-      i |= p == text.length;
-      if(i) {
-        indent(s, l, shift);
-        sb.setLength(0);
-      }
-    } else {
+      indent(shift);
+      sb.setLength(0);
+      return selected();
+    }
+
+    if(!shift) {
       boolean c = ps > 0;
       for(int p = ps - 1; p >= 0 && c; p--) {
         final byte b = text[p];
-        c = ws(b);
+        if(!ws(b)) return false;
         if(b == '\n') break;
       }
-      if(c) {
-        sb.setLength(0);
-        sb.append("  ");
-      }
+      sb.setLength(0);
+      sb.append("  ");
+    } else {
+      sb.setLength(0);
     }
-    return i;
+    return false;
   }
 
   /**
@@ -837,8 +822,7 @@ public final class EditorText {
    * @return result of check
    */
   boolean selectStart() {
-    return selected() &&
-        (inSelect() || (ms < me ? ms >= ps && ms < pe : me >= ps && me < pe));
+    return selected() && (inSelect() || (ms < me ? ms >= ps && ms < pe : me >= ps && me < pe));
   }
 
   /**

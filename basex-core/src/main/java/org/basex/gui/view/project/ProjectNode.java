@@ -1,4 +1,4 @@
-package org.basex.gui.view.editor;
+package org.basex.gui.view.project;
 
 import javax.swing.tree.*;
 
@@ -10,26 +10,26 @@ import org.basex.io.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public abstract class EditorNode extends DefaultMutableTreeNode {
-  /** Model. */
-  protected final EditorTree tree;
+public abstract class ProjectNode extends DefaultMutableTreeNode {
+  /** Project view. */
+  protected final ProjectView project;
   /** Path. */
   protected IOFile file;
 
   /**
    * Constructor.
    * @param io file reference
-   * @param tr tree
+   * @param proj project view
    */
-  EditorNode(final IOFile io, final EditorTree tr) {
+  ProjectNode(final IOFile io, final ProjectView proj) {
     super(io == null ? null : io.name());
     file = io;
-    tree = tr;
+    project = proj;
   }
 
   @Override
   public void setUserObject(final Object uo) {
-    final IOFile renamed = tree.rename(this, uo.toString());
+    final IOFile renamed = project.rename(this, uo.toString());
     if(renamed != null) {
       file = renamed;
       refresh();
@@ -59,9 +59,9 @@ public abstract class EditorNode extends DefaultMutableTreeNode {
    * Updates the tree structure.
    */
   final void updateTree() {
-    final DefaultTreeModel model = (DefaultTreeModel) tree.tree.getModel();
+    final DefaultTreeModel model = (DefaultTreeModel) project.tree.getModel();
     model.nodeStructureChanged(this);
-    tree.repaint();
+    project.repaint();
   }
 
   /**
@@ -69,7 +69,7 @@ public abstract class EditorNode extends DefaultMutableTreeNode {
    * @return path
    */
   final TreePath path() {
-    final DefaultTreeModel model = (DefaultTreeModel) tree.tree.getModel();
+    final DefaultTreeModel model = (DefaultTreeModel) project.tree.getModel();
     return new TreePath(model.getPathToRoot(this));
   }
 

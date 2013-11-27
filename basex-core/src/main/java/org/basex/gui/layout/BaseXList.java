@@ -29,13 +29,14 @@ public final class BaseXList extends BaseXBack {
   private final BaseXTextField text;
   /** List. */
   private final JList list;
+  /** Scroll pane. */
+  private final JScrollPane scroll;
+
   /** List values. */
   private String[] values;
   /** Numeric list. */
   private boolean num = true;
 
-  /** Scroll pane. */
-  private final JScrollPane scroll;
 
   /**
    * Default constructor.

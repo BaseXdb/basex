@@ -1,4 +1,4 @@
-package org.basex.gui.view.editor;
+package org.basex.gui.view.project;
 
 import java.awt.*;
 import java.util.*;
@@ -8,18 +8,18 @@ import javax.swing.tree.*;
 
 /**
  * Custom tree cell editor. The edited node name will be updated in
- * {@link EditorNode#setUserObject}.
+ * {@link ProjectNode#setUserObject}.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-final class EditorCellEditor extends DefaultTreeCellEditor {
+final class ProjectCellEditor extends DefaultTreeCellEditor {
   /**
    * Constructor.
    * @param tr tree
    * @param rend renderer
    */
-  public EditorCellEditor(final JTree tr, final DefaultTreeCellRenderer rend) {
+  public ProjectCellEditor(final JTree tr, final DefaultTreeCellRenderer rend) {
     super(tr, rend);
   }
 
@@ -36,9 +36,9 @@ final class EditorCellEditor extends DefaultTreeCellEditor {
       final boolean selected, final boolean expanded, final boolean leaf, final int row) {
 
     // choose correct icon
-    editingIcon = EditorCellRenderer.icon(val, expanded);
+    editingIcon = ProjectCellRenderer.icon(val, expanded);
     // replace label to be edited with file name
-    final Object value = val instanceof EditorNode ? ((EditorNode) val).file.name() : val;
+    final Object value = val instanceof ProjectNode ? ((ProjectNode) val).file.name() : val;
     return super.getTreeCellEditorComponent(tr, value, selected, expanded, leaf, row);
   }
 

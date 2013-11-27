@@ -63,7 +63,7 @@ public enum GUICommands implements GUICmd {
   },
 
   /** Exports a database. */
-  C_EXPORT(EXPORT + DOTS, "% shift E", H_EXPORT, true, false) {
+  C_EXPORT(EXPORT + DOTS, null, H_EXPORT, true, false) {
     @Override
     public void execute(final GUI gui) {
       final DialogExport dialog = new DialogExport(gui);
@@ -118,7 +118,7 @@ public enum GUICommands implements GUICmd {
   },
 
   /** Creates a new file in the editor. */
-  C_EDITNEW(NEW + DOTS, "% T", H_NEW_FILE, false, false) {
+  C_EDITNEW(NEW, "% T", H_NEW_FILE, false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.newFile();
@@ -134,7 +134,7 @@ public enum GUICommands implements GUICmd {
   },
 
   /** Reverts the current editor file. */
-  C_EDITREOPEN(REOPEN + DOTS, "% shift R", H_REOPEN_FILE, false, false) {
+  C_EDITREOPEN(REOPEN + DOTS, null, H_REOPEN_FILE, false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.reopen();
@@ -371,7 +371,7 @@ public enum GUICommands implements GUICmd {
   },
 
   /** Shows the XQuery project structure. */
-  C_SHOWPROJECT(PROJECT_VIEW, "% shift P", null, false, true) {
+  C_SHOWPROJECT(PROJECT_VIEW, "% shift E", null, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWPROJECT);

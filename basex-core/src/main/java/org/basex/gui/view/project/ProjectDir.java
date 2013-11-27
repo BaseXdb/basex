@@ -1,4 +1,4 @@
-package org.basex.gui.view.editor;
+package org.basex.gui.view.project;
 
 import org.basex.io.*;
 
@@ -8,14 +8,14 @@ import org.basex.io.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-final class EditorDir extends EditorNode {
+final class ProjectDir extends ProjectNode {
   /**
    * Constructor.
    * @param io file
-   * @param tr tree
+   * @param proj project view
    */
-  EditorDir(final IOFile io, final EditorTree tr) {
-    super(io, tr);
+  ProjectDir(final IOFile io, final ProjectView proj) {
+    super(io, proj);
     addDummy();
   }
 
@@ -23,8 +23,8 @@ final class EditorDir extends EditorNode {
   void expand() {
     removeAllChildren();
     final IOFile[] files = file.children();
-    for(final IOFile f : files) if(f.isDir())  add(new EditorDir(f, tree));
-    for(final IOFile f : files) if(!f.isDir()) add(new EditorFile(f, tree));
+    for(final IOFile f : files) if(f.isDir())  add(new ProjectDir(f, project));
+    for(final IOFile f : files) if(!f.isDir()) add(new ProjectFile(f, project));
   }
 
   @Override
@@ -37,7 +37,7 @@ final class EditorDir extends EditorNode {
    * Adds a dummy node if a directory contains entries.
    */
   private void addDummy() {
-    if(file.children().length != 0) add(new EditorFile(null, tree));
+    if(file.children().length != 0) add(new ProjectFile(null, project));
   }
 
   @Override

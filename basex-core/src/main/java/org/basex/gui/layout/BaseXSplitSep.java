@@ -15,7 +15,7 @@ import org.basex.gui.*;
  */
 final class BaseXSplitSep extends BaseXBack {
   /** Size of splitter. */
-  static final int SIZE = 6;
+  static final int SIZE = 8;
   /** Color foreground. */
   private final Color fore;
   /** Color background. */

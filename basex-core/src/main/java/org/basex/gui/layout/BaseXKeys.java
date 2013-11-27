@@ -67,7 +67,8 @@ public enum BaseXKeys {
   /** Delete complete line.  */ DELLINE(SC | SHF, VK_D, true),
 
   /** (Un)comment.           */ COMMENT(SC, VK_K, false),
-  /** Execute.               */ EXEC(SC, VK_ENTER, true),
+  /** Execute.               */ EXEC1(SC, VK_ENTER, true),
+  /** Execute.               */ EXEC2(SC, VK_F11, true),
 
   // Navigation
 
