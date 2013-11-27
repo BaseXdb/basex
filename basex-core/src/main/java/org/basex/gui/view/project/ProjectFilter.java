@@ -4,7 +4,6 @@ import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -49,6 +48,7 @@ public class ProjectFilter extends BaseXTextField {
         final Component oldView = view.scroll.getViewport().getView(), newView;
         if(pattern.isEmpty()) {
           newView = view.tree;
+          ++threadID;
         } else {
           newView = view.list;
           final Thread t = new Thread() {
@@ -66,8 +66,8 @@ public class ProjectFilter extends BaseXTextField {
       @Override
       public void keyPressed(final KeyEvent e) {
         if(BaseXKeys.NEXTLINE.is(e) || BaseXKeys.PREVLINE.is(e) ||
-            BaseXKeys.NEXTPAGE.is(e) || BaseXKeys.PREVPAGE.is(e) ||
-            BaseXKeys.LINESTART.is(e) || BaseXKeys.LINEEND.is(e)) {
+           BaseXKeys.NEXTPAGE.is(e) || BaseXKeys.PREVPAGE.is(e) ||
+           BaseXKeys.LINESTART.is(e) || BaseXKeys.LINEEND.is(e)) {
           project.list.dispatchEvent(e);
         }
       }
@@ -88,16 +88,35 @@ public class ProjectFilter extends BaseXTextField {
   }
 
   /**
-   * Initializes the filter cache.
+   * Initializes the file cache.
+   * @param thread current thread id
    */
-  void init() {
+  void init(final int thread) {
     if(cache.isEmpty()) {
-      final TreeSet<String> set = new TreeSet<String>();
-      set.add(Text.PLEASE_WAIT_D);
-      project.list.addElements(set);
-      final IOFile root = project.dir.file;
-      for(final String path : root.descendants()) {
-        cache.add(root.path() + File.separator + path);
+      final TreeSet<String> wait = new TreeSet<String>();
+      wait.add(Text.PLEASE_WAIT_D);
+      project.list.addElements(wait);
+      reset();
+      add(project.dir.file, thread);
+    }
+  }
+
+  /**
+   * Initializes the filter cache.
+   * @param thread current thread id
+   * @param root root directory
+   */
+  void add(final IOFile root, final int thread) {
+    for(final IOFile file : root.children()) {
+      if(file.isDir()) {
+        add(file, thread);
+      } else {
+        cache.add(file.path());
+      }
+      // newer thread has arrived
+      if(threadID != thread) {
+        cache.reset();
+        return;
       }
     }
   }
@@ -118,7 +137,7 @@ public class ProjectFilter extends BaseXTextField {
     // thread is accepted; start filtering
     running = true;
     setCursor(CURSORWAIT);
-    init();
+    init(thread);
     final TreeSet<String> files = filter(pattern, thread);
     if(files != null) project.list.addElements(files);
     setCursor(CURSORARROW);

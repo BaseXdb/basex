@@ -9,6 +9,7 @@ import javax.swing.tree.*;
 
 import org.basex.gui.layout.*;
 import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * Custom tree cell renderer to distinguish between raw and xml leaf nodes.
@@ -54,7 +55,7 @@ final class ProjectCellRenderer extends DefaultTreeCellRenderer {
    * @return icon
    */
   static Icon fileIcon(final IOFile file) {
-    if(file == null) return UNKNOWN;
+    if(file == null || Prop.MAC) return UNKNOWN;
     final String path = file.path();
     final int i = path.lastIndexOf(path, '.');
     final String suffix = i != -1 ? path.substring(i + 1) : null;
