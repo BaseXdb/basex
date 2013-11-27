@@ -33,8 +33,7 @@ import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
- * This class is the main window of the GUI. It is the central instance
- * for user interactions.
+ * This class is the main window of the GUI. It is the central instance for user interactions.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
@@ -192,8 +191,8 @@ public final class GUI extends AGUI {
           }
         };
         final int i = context.data() == null ? 2 : gopts.get(GUIOptions.SEARCHMODE);
-        final String[] hs = gopts.get(i == 0 ? GUIOptions.SEARCH : i == 1 ?
-            GUIOptions.XQUERY : GUIOptions.COMMANDS);
+        final String[] hs = gopts.get(i == 0 ? GUIOptions.SEARCH : i == 1 ? GUIOptions.XQUERY
+                                                                         : GUIOptions.COMMANDS);
         for(final String en : hs) {
           final JMenuItem jmi = new JMenuItem(en);
           jmi.addActionListener(al);
@@ -234,10 +233,9 @@ public final class GUI extends AGUI {
     info = new InfoView(notify);
 
     // create panels for closed and opened database mode
-    views = new ViewContainer(this, text, editor, info,
-        new FolderView(notify), new PlotView(notify), new TableView(notify),
-        new MapView(notify), new TreeView(notify), new ExploreView(notify)
-    );
+    views = new ViewContainer(this, text, editor, info, new FolderView(notify),
+        new PlotView(notify), new TableView(notify), new MapView(notify), new TreeView(notify),
+        new ExploreView(notify));
 
     top.add(views, BorderLayout.CENTER);
     setContentBorder();
@@ -272,8 +270,8 @@ public final class GUI extends AGUI {
     final boolean max = getExtendedState() == MAXIMIZED_BOTH;
     gopts.set(GUIOptions.MAXSTATE, max);
     if(!max) {
-      gopts.set(GUIOptions.GUILOC, new int[] { getX(), getY() });
-      gopts.set(GUIOptions.GUISIZE, new int[] { getWidth(), getHeight() });
+      gopts.set(GUIOptions.GUILOC, new int[] { getX(), getY()});
+      gopts.set(GUIOptions.GUISIZE, new int[] { getWidth(), getHeight()});
     }
     super.dispose();
     gopts.write();
@@ -306,8 +304,8 @@ public final class GUI extends AGUI {
   }
 
   /**
-   * Launches a query. Adds the default namespace, if available.
-   * The command is ignored if an update operation takes place.
+   * Launches a query. Adds the default namespace, if available. The command is ignored if an update
+   * operation takes place.
    * @param qu query to be run
    * @param edit editor panel
    */
@@ -322,8 +320,8 @@ public final class GUI extends AGUI {
   }
 
   /**
-   * Launches the specified command in a separate thread.
-   * The command is ignored if an update operation takes place.
+   * Launches the specified command in a separate thread. The command is ignored if an update
+   * operation takes place.
    * @param cmd command to be launched
    */
   public void execute(final Command cmd) {
@@ -331,8 +329,8 @@ public final class GUI extends AGUI {
   }
 
   /**
-   * Launches the specified commands in a separate thread.
-   * The command is ignored if an update operation takes place.
+   * Launches the specified commands in a separate thread. The command is ignored if an update
+   * operation takes place.
    * @param edit call from editor view
    * @param cmd command to be launched
    */
@@ -340,13 +338,16 @@ public final class GUI extends AGUI {
     // ignore command if updates take place
     if(updating) return;
 
-    new Thread() {
+    final Thread t = new Thread() {
       @Override
       public void run() {
         if(cmd.length == 0) info.setInfo("", null, true, true);
-        for(final Command c : cmd) if(!exec(c, edit)) break;
+        for(final Command c : cmd)
+          if(!exec(c, edit)) break;
       }
-    }.start();
+    };
+    t.setDaemon(true);
+    t.start();
   }
 
   /**
@@ -373,8 +374,7 @@ public final class GUI extends AGUI {
 
       final Data data = context.data();
       // reset current context if realtime filter is activated
-      if(gopts.get(GUIOptions.FILTERRT) && data != null && !context.root())
-        context.update();
+      if(gopts.get(GUIOptions.FILTERRT) && data != null && !context.root()) context.update();
 
       // remember current command and context nodes
       final Nodes current = context.current();
@@ -423,10 +423,9 @@ public final class GUI extends AGUI {
       } else {
         // get query result
         final Result result = cmd.result();
-        Nodes nodes = result instanceof Nodes && result.size() != 0 ?
-          (Nodes) result : null;
+        Nodes nodes = result instanceof Nodes && result.size() != 0 ? (Nodes) result : null;
 
-       if(context.data() != data) {
+        if(context.data() != data) {
           // database reference has changed - notify views
           notify.init();
         } else if(cmd.updated(context)) {
@@ -482,30 +481,30 @@ public final class GUI extends AGUI {
     return ok;
   }
 
- /**
-  * Stops the current process.
-  */
- public void stop() {
-   if(command != null) command.stop();
-   cursor(CURSORARROW, true);
-   command = null;
- }
+  /**
+   * Stops the current process.
+   */
+  public void stop() {
+    if(command != null) command.stop();
+    cursor(CURSORARROW, true);
+    command = null;
+  }
 
- /**
-  * Sets an option if its value differs from current value and displays the command
-  * in the info view.
+  /**
+   * Sets an option if its value differs from current value and displays the command in the info
+   * view.
    * @param <T> option type
    * @param <V> value type
-  * @param opt option to be set
-  * @param val value
-  */
- public <T extends Option<V>, V> void set(final T opt, final V val) {
-   if(!context.options.get(opt).equals(val)) {
-     final Set cmd = new Set(opt, val);
-     cmd.run(context);
-     info.setInfo(cmd.info(), cmd, true, false);
-   }
- }
+   * @param opt option to be set
+   * @param val value
+   */
+  public <T extends Option<V>, V> void set(final T opt, final V val) {
+    if(!context.options.get(opt).equals(val)) {
+      final Set cmd = new Set(opt, val);
+      cmd.run(context);
+      info.setInfo(cmd.info(), cmd, true, false);
+    }
+  }
 
   /**
    * Sets the border of the content area.
@@ -593,8 +592,8 @@ public final class GUI extends AGUI {
     menu.refresh();
 
     final int i = context.data() == null ? 2 : gopts.get(GUIOptions.SEARCHMODE);
-    final StringsOption options = i == 0 ? GUIOptions.SEARCH : i == 1 ?
-      GUIOptions.XQUERY : GUIOptions.COMMANDS;
+    final StringsOption options = i == 0 ? GUIOptions.SEARCH : i == 1 ? GUIOptions.XQUERY
+                                                                     : GUIOptions.COMMANDS;
     hist.setEnabled(gopts.get(options).length != 0);
   }
 
@@ -640,8 +639,7 @@ public final class GUI extends AGUI {
       fullscr.removeAll();
       fullscr.dispose();
       fullscr = null;
-      if(!gopts.get(GUIOptions.SHOWBUTTONS))
-        control.add(buttons, BorderLayout.CENTER);
+      if(!gopts.get(GUIOptions.SHOWBUTTONS)) control.add(buttons, BorderLayout.CENTER);
       if(!gopts.get(GUIOptions.SHOWINPUT)) control.add(nav, BorderLayout.SOUTH);
       if(!gopts.get(GUIOptions.SHOWSTATUS)) top.add(status, BorderLayout.SOUTH);
       setJMenuBar(menu);
@@ -653,8 +651,8 @@ public final class GUI extends AGUI {
     gopts.set(GUIOptions.SHOWSTATUS, !full);
     fullscreen = full;
 
-    GraphicsEnvironment.getLocalGraphicsEnvironment().
-      getDefaultScreenDevice().setFullScreenWindow(fullscr);
+    GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(
+        fullscr);
     setContentBorder();
     refreshControls();
     updateControl(menu, !full, BorderLayout.NORTH);
@@ -677,8 +675,8 @@ public final class GUI extends AGUI {
             Pattern.DOTALL).matcher(page);
         if(m.matches()) {
           final Version latest = new Version(m.group(2));
-          if(disk.compareTo(latest) < 0 && BaseXDialog.confirm(this,
-              Util.info(H_NEW_VERSION, Prop.NAME, latest))) {
+          if(disk.compareTo(latest) < 0
+              && BaseXDialog.confirm(this, Util.info(H_NEW_VERSION, Prop.NAME, latest))) {
             BaseXDialog.browse(this, UPDATE_URL);
           } else {
             // don't show update dialog anymore if it has been rejected once

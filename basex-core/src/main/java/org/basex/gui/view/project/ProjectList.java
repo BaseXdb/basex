@@ -7,7 +7,7 @@ import javax.swing.*;
 
 import org.basex.gui.layout.*;
 import org.basex.io.*;
-import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * List of filtered file entries.
@@ -16,37 +16,54 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class ProjectList extends JList {
+  /** Project view. */
+  private ProjectView project;
   /** Model. */
   final DefaultListModel model;
 
   /**
    * Constructor.
-   * @param view view
+   * @param view project view
    */
   ProjectList(final ProjectView view) {
+    project = view;
     model = new DefaultListModel();
     setModel(model);
     setCellRenderer(new CellRenderer());
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyTyped(final KeyEvent e) {
-        if(BaseXKeys.ENTER.is(e)) open(view);
+        if(BaseXKeys.ENTER.is(e)) open();
       }
     });
     addMouseListener(new MouseAdapter() {
       @Override
       public void mousePressed(final MouseEvent e) {
-        if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) open(view);
+        if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) open();
+      }
+    });
+  }
+
+  /**
+   * Assigns the specified list entries and selects the first entry.
+   * @param list entries to set
+   */
+  void addElements(final StringList list) {
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        model.removeAllElements();
+        for(final String file : list) model.addElement(file);
+        setSelectedIndex(0);
       }
     });
   }
 
   /**
    * Open all selected files.
-   * @param view view
    */
-  private void open(final ProjectView view) {
-    for(final Object o : getSelectedValues()) view.open(new IOFile(o.toString()));
+  void open() {
+    for(final Object o : getSelectedValues()) project.open(new IOFile(o.toString()));
   }
 
   /** List cell renderer. */
@@ -68,11 +85,7 @@ public class ProjectList extends JList {
 
       final IOFile file = new IOFile(value.toString());
       label.setIcon(ProjectCellRenderer.fileIcon(file));
-
-      final StringBuilder sb = new StringBuilder();
-      sb.append(file.name()).append(" (");
-      sb.append(Performance.format(file.length(), true)).append(')');
-      label.setText(sb.toString());
+      label.setText(ProjectFile.toString(file));
       label.setToolTipText(file.path());
 
       if(selected) {

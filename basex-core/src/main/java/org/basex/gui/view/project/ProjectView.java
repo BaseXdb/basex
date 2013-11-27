@@ -138,7 +138,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
 
   @Override
   public boolean requestFocusInWindow() {
-    return tree.requestFocusInWindow();
+    return scroll.getViewport().getView().requestFocusInWindow();
   }
 
   /**
