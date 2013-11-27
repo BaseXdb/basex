@@ -181,7 +181,6 @@ int_parser           = Gebruik interne XML parser
 interrupted          = Interrupted.
 invalid_%            = % is ongeldig.
 italics              = Cursief
-java_lf              = Gebruik Java Look & Feel
 kill_self_%          = '%' kan zichzelf niet stoppen.
 language             = Taal
 lax_name_conversion  = Lax name conversion

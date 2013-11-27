@@ -182,7 +182,6 @@ int_parser           = Дотоод XML Parser-р хөрвүүлэх
 interrupted          = Interrupted.
 invalid_%            = % нь хүчинтэй.
 italics              = Налуу
-java_lf              = Жава хэлбэрээр харах болон ашиглах
 kill_self_%          = '%' өөрийгөө устгах боломжгүй.
 language             = Хэл
 lax_name_conversion  = Lax name conversion

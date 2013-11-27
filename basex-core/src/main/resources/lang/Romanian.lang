@@ -181,7 +181,6 @@ int_parser           = Utilizare parser XML intern
 interrupted          = Intrerupt.
 invalid_%            = % este invalid.
 italics              = Italice
-java_lf              = Foloseste Java Look & Feel
 kill_self_%          = '%' nu poate sa se omoare.
 language             = Limbă
 lax_name_conversion  = Lax name conversion

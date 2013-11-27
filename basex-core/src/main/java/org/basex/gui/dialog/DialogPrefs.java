@@ -5,6 +5,9 @@ import static org.basex.core.Text.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import javax.swing.*;
+import javax.swing.UIManager.*;
+
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
@@ -13,6 +16,7 @@ import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.view.*;
 import org.basex.io.*;
+import org.basex.util.list.*;
 
 /**
  * Dialog window for changing some project's preferences.
@@ -47,7 +51,7 @@ public final class DialogPrefs extends BaseXDialog {
   /** Simple file dialog checkbox. */
   private final BaseXCheckBox simpfd;
   /** Simple file dialog checkbox. */
-  private final BaseXCheckBox javalook;
+  private final BaseXCombo lookfeel;
   /** Old value for show names flag. */
   private final boolean oldShowNames;
 
@@ -59,7 +63,7 @@ public final class DialogPrefs extends BaseXDialog {
     super(main, PREFERENCES);
 
     // create checkboxes
-    final BaseXBack pp = new BaseXBack(new TableLayout(12, 1));
+    final BaseXBack pp = new BaseXBack(new TableLayout(13, 1));
     pp.add(new BaseXLabel(DATABASE_PATH + COL, true, true));
 
     BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
@@ -83,10 +87,6 @@ public final class DialogPrefs extends BaseXDialog {
     pp.add(p);
     pp.add(new BaseXLabel(GUI_INTERACTIONS + COL, true, true).border(12, 0, 6, 0));
 
-    // checkbox for Java look and feel
-    javalook = new BaseXCheckBox(JAVA_LF, GUIOptions.JAVALOOK, gopts, this);
-    pp.add(javalook);
-
     // checkbox for realtime mouse focus
     focus = new BaseXCheckBox(RT_FOCUS, GUIOptions.MOUSEFOCUS, gopts, this);
     pp.add(focus);
@@ -109,11 +109,24 @@ public final class DialogPrefs extends BaseXDialog {
       public void actionPerformed(final ActionEvent e) { action(limit); }
     });
     label = new BaseXLabel(" ");
-    p = new BaseXBack(new TableLayout(1, 4, 12, 0)).border(8, 0, 0, 0);
+
+    p = new BaseXBack(new TableLayout(1, 3, 12, 0)).border(8, 0, 0, 0);
     p.add(new BaseXLabel(MAX_NO_OF_HITS + COL));
     p.add(limit);
     p.add(label);
     pp.add(p);
+
+    pp.add(new BaseXLabel(JAVA_LF + COL).border(12, 0, 6, 0));
+    final StringList lafs = new StringList("(default)");
+    for(final LookAndFeelInfo lafi : UIManager.getInstalledLookAndFeels()) lafs.add(lafi.getName());
+    lookfeel = new BaseXCombo(this, lafs.toArray());
+    final String laf = gopts.get(GUIOptions.LOOKANDFEEL);
+    if(laf.isEmpty()) {
+      lookfeel.setSelectedIndex(0);
+    } else {
+      lookfeel.setSelectedItem(laf);
+    }
+    pp.add(lookfeel);
 
     // checkbox for simple file dialog
     pp.add(new BaseXLabel(LANGUAGE_RESTART + COL, true, true).border(16, 0, 6, 0));
@@ -159,8 +172,9 @@ public final class DialogPrefs extends BaseXDialog {
     final GUIOptions gopts = gui.gopts;
     gopts.set(GUIOptions.MOUSEFOCUS, focus.isSelected());
     gopts.set(GUIOptions.SIMPLEFD, simpfd.isSelected());
-    gopts.set(GUIOptions.JAVALOOK, javalook.isSelected());
     gopts.set(GUIOptions.MAXHITS, mh);
+    gopts.set(GUIOptions.LOOKANDFEEL, lookfeel.getSelectedIndex() == 0 ? "" :
+      lookfeel.getSelectedItem());
     gopts.write();
     dispose();
   }

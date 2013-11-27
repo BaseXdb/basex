@@ -181,7 +181,6 @@ int_parser           = Gunakan XML parser internal
 interrupted          = Terganggu.
 invalid_%            = % tidak sah.
 italics              = Miring
-java_lf              = Gunakan Java Look & Feel
 kill_self_%          = '%' tidak dapat mematikan sendiri.
 language             = Bahasa
 lax_name_conversion  = Lax name conversion

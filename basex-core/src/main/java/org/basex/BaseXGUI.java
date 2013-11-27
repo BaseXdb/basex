@@ -6,6 +6,7 @@ import java.awt.*;
 import java.util.*;
 
 import javax.swing.*;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -113,13 +114,15 @@ public final class BaseXGUI {
    * @param opts gui options
    */
   private static void init(final GUIOptions opts) {
+    // added to handle possible JDK 1.6 bug (thanks to Makoto Yui)
+    final LookAndFeelInfo[] lafis = UIManager.getInstalledLookAndFeels();
+
+    final String laf = opts.get(GUIOptions.LOOKANDFEEL);
     try {
-      // added to handle possible JDK 1.6 bug (thanks to Makoto Yui)
-      UIManager.getInstalledLookAndFeels();
       // refresh views when windows are resized
       Toolkit.getDefaultToolkit().setDynamicLayout(true);
       // set specified look & feel
-      if(opts.get(GUIOptions.JAVALOOK)) {
+      if(laf.equals("Metal")) {
         // use non-bold fonts in Java's look & feel
         final UIDefaults def = UIManager.getDefaults();
         final Enumeration<?> en = def.keys();
@@ -128,8 +131,15 @@ public final class BaseXGUI {
           final Object v = def.get(k);
           if(v instanceof Font) def.put(k, ((Font) v).deriveFont(Font.PLAIN));
         }
-      } else {
+      } else if(laf.isEmpty()) {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      } else {
+        for(final LookAndFeelInfo lafi : lafis) {
+          if(lafi.getName().equals(laf)) {
+            UIManager.setLookAndFeel(lafi.getClassName());
+            break;
+          }
+        }
       }
     } catch(final Exception ex) {
       Util.stack(ex);

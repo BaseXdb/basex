@@ -109,7 +109,7 @@ public final class GUIOptions extends Options {
   public static final NumbersOption COLORSLOC = new NumbersOption("COLORSLOC", 530, 620);
 
   /** Flag for Java look and feel. */
-  public static final BooleanOption JAVALOOK = new BooleanOption("JAVALOOK", false);
+  public static final StringOption LOOKANDFEEL = new StringOption("LOOKANDFEEL", "");
   /** Flag for dissolving name attributes. */
   public static final BooleanOption SHOWNAME = new BooleanOption("SHOWNAME", true);
   /** Focus follows mouse. */

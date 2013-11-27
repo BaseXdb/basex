@@ -1195,7 +1195,7 @@ public interface Text {
   /** Interactions. */
   String GUI_INTERACTIONS = lang("gui_interactions");
   /** Look and feel. */
-  String JAVA_LF = lang("java_lf") + " (" + lang("requires_restart") + ')';
+  String JAVA_LF = "Look & Feel (" + lang("requires_restart") + ')';
   /** Focus. */
   String RT_FOCUS = lang("rt_focus");
   /** Simple file dialog. */
