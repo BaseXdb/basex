@@ -28,8 +28,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class ProjectView extends BaseXPanel implements TreeWillExpandListener {
-  /** Root node. */
-  final ProjectDir dir;
+  /** Root directory. */
+  final ProjectDir root;
   /** Root node. */
   final ProjectCellRenderer renderer;
   /** Tree. */
@@ -52,8 +52,8 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
     view = ev;
     setLayout(new BorderLayout());
 
-    final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-    tree = new BaseXTree(root, gui).border(4, 4, 4, 4);
+    final DefaultMutableTreeNode invisible = new DefaultMutableTreeNode();
+    tree = new BaseXTree(invisible, gui).border(4, 4, 4, 4);
     renderer = new ProjectCellRenderer();
     tree.setExpandsSelectedPaths(true);
     tree.setCellRenderer(renderer);
@@ -85,8 +85,8 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
     tree.setEditable(true);
 
     // choose common parent directories of project directories
-    dir = new ProjectDir(new IOFile(root()), this);
-    root.add(dir);
+    root = new ProjectDir(new IOFile(root()), this);
+    invisible.add(root);
 
     // expand root and child directories
     for(int r = 0; r < 2; r++) tree.expandRow(r);
@@ -359,16 +359,15 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
       final BaseXFileChooser fc = new BaseXFileChooser(CHOOSE_DIR, child.file.path(), gui);
       final IOFile io = fc.select(Mode.DOPEN);
       if(io != null) {
-        child.file = io;
-        child.refresh();
+        root.file = io;
+        root.refresh();
         filter.reset();
         gui.gopts.set(GUIOptions.PROJECTPATH, io.path());
       }
     }
     @Override
     public boolean enabled(final GUI main) {
-      final ProjectNode node = selectedNode();
-      return node != null && node.root();
+      return true;
     }
     @Override
     public String label() { return CHOOSE_DIR + DOTS; }

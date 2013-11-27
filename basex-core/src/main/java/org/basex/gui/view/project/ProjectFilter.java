@@ -97,7 +97,7 @@ public class ProjectFilter extends BaseXTextField {
       wait.add(Text.PLEASE_WAIT_D);
       project.list.addElements(wait);
       reset();
-      add(project.dir.file, thread);
+      add(project.root.file, thread);
     }
   }
 
