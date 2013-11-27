@@ -495,6 +495,8 @@ public class Editor extends BaseXPanel {
     } else if(NEXTTAB.is(e)) {
       gui.editor.tab(true);
       e.consume();
+    } else if(CLOSETAB.is(e)) {
+      gui.editor.close(null);
     }
 
     // re-animate cursor

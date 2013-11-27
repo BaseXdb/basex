@@ -73,8 +73,9 @@ public enum BaseXKeys {
   // Navigation
 
   /** Jump to input bar.     */ INPUTBAR(MAC ? SC : 0, VK_F6, true),
-  /** Next panel.            */ NEXTTAB(CTRL, VK_TAB, true),
-  /** Previous panel.        */ PREVTAB(CTRL | SHF, VK_TAB, true),
+  /** Next tab.              */ NEXTTAB(CTRL, VK_TAB, true),
+  /** Previous tab.          */ PREVTAB(CTRL | SHF, VK_TAB, true),
+  /** Close tab.             */ CLOSETAB(SC, VK_F4, true),
 
   /** Browse back.           */ GOBACK(MAC ? SC : ALT, VK_LEFT, true),
   /** Browse back.           */ GOBACK2(VK_BACK_SPACE, true),
@@ -84,6 +85,7 @@ public enum BaseXKeys {
 
   /** Refresh.               */ REFRESH(VK_F5),
   /** Jump to project.       */ PROJECT(SC | SHF, VK_R, true),
+  /** Jump to filter.        */ FILTER(SC | SHF, VK_T, true),
   /** New directory.         */ NEWDIR(SC | SHF, VK_N),
 
   // Font

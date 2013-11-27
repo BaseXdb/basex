@@ -319,7 +319,7 @@ public final class EditorView extends View {
   public void project() {
     if(gui.gopts.get(GUIOptions.SHOWPROJECT)) {
       split.sizes(sizes);
-      if(gui.editor != null) gui.editor.focusTree();
+      if(gui.editor != null) gui.editor.focus(false);
     } else {
       sizes = split.sizes(new double[] { 0, 1 });
       if(gui.editor != null) gui.editor.getEditor().requestFocusInWindow();
@@ -327,10 +327,11 @@ public final class EditorView extends View {
   }
 
   /**
-   * Focuses the tree view.
+   * Focuses the project view.
+   * @param filt focus filter or content
    */
-  public void focusTree() {
-    projects.requestFocusInWindow();
+  public void focus(final boolean filt) {
+    projects.focus(filt);
   }
 
   /**
@@ -493,7 +494,7 @@ public final class EditorView extends View {
       addTab();
       SwingUtilities.invokeLater(new Runnable() {
         @Override
-        public void run() { focusTree(); }
+        public void run() { focus(false); }
       });
     } else if(i + 1 == t) {
       // if necessary, activate last editor tab
