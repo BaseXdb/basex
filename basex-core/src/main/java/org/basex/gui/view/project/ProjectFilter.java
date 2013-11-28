@@ -9,6 +9,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.gui.layout.*;
 import org.basex.io.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -21,7 +22,7 @@ public class ProjectFilter extends BaseXTextField {
   /** Project view. */
   private ProjectView project;
   /** Cached file paths. */
-  private final StringList cache = new StringList();
+  private final TokenList cache = new TokenList();
 
   /** Last entered string. */
   String last = "";
@@ -54,7 +55,7 @@ public class ProjectFilter extends BaseXTextField {
           final Thread t = new Thread() {
             @Override
             public void run() {
-              filter(pattern);
+              filter(Token.token(pattern));
             }
           };
           t.setDaemon(true);
@@ -125,7 +126,7 @@ public class ProjectFilter extends BaseXTextField {
    * Filters the entries.
    * @param pattern pattern
    */
-  void filter(final String pattern) {
+  void filter(final byte[] pattern) {
     // wait when command is still running
     final int thread = ++threadID;
     while(running) {
@@ -150,32 +151,36 @@ public class ProjectFilter extends BaseXTextField {
    * @param thread current thread id
    * @return result of check
    */
-  private TreeSet<String> filter(final String pattern, final int thread) {
-    final boolean path = pattern.indexOf('\\') != -1 || pattern.indexOf('/') != -1;
-
+  private TreeSet<String> filter(final byte[] pattern, final int thread) {
     final TreeSet<String> match = new TreeSet<String>();
-    for(final String input : cache) {
-      if(input.startsWith(pattern, offset(input, path))) {
-        match.add(input);
-        if(match.size() >= 100) return match;
-      }
-      if(threadID != thread) return null;
-    }
-    for(final String input : cache) {
-      if(input.substring(offset(input, path)).contains(pattern) && !match.contains(input)) {
-        match.add(input);
-        if(match.size() >= 100) return match;
-      }
-      if(threadID != thread) return null;
-    }
-    for(final String input : cache) {
-      if(matches(input, pattern, offset(input, path)) && !match.contains(input)) {
-        match.add(input);
-        if(match.size() >= 100) return match;
-      }
-      if(threadID != thread) return null;
-    }
+    for(int i = 0; i < 3; i++) if(!filter(pattern, thread, i, match)) return null;
     return match;
+  }
+
+  /**
+   * Chooses tokens from the file cache that match the specified pattern.
+   * @param pattern pattern
+   * @param thread current thread id
+   * @param mode search mode (0-2)
+   * @param match set with matches
+   * @return success flag
+   */
+  private boolean filter(final byte[] pattern, final int thread, final int mode,
+      final TreeSet<String> match) {
+
+    final boolean path = Token.indexOf(pattern, '\\') != -1 || Token.indexOf(pattern, '/') != -1;
+    for(final byte[] input : cache) {
+      final int offset = offset(input, path);
+      if(mode == 0 && Token.startsWith(input, pattern, offset) ||
+         mode == 1 && Token.startsWith(input, pattern, offset) ||
+         mode == 2 && Token.contains(input, pattern, offset) ||
+         matches(input, pattern, offset)) {
+        match.add(Token.string(input));
+        if(match.size() >= 100) break;
+      }
+      if(thread != threadID) return false;
+    }
+    return true;
   }
 
   /**
@@ -184,10 +189,10 @@ public class ProjectFilter extends BaseXTextField {
    * @param path full path processing
    * @return resulting offset
    */
-  private static int offset(final String input, final boolean path) {
+  private static int offset(final byte[] input, final boolean path) {
     if(path) return 0;
-    final int a = input.lastIndexOf('\\');
-    final int b = input.lastIndexOf('/');
+    final int a = Token.lastIndexOf(input, '\\');
+    final int b = Token.lastIndexOf(input, '/');
     return (a > b ? a : b) + 1;
   }
 
@@ -198,14 +203,14 @@ public class ProjectFilter extends BaseXTextField {
    * @param off offset
    * @return result of check
    */
-  private static boolean matches(final String input, final String pattern, final int off) {
-    final int il = input.length(), pl = pattern.length();
+  private static boolean matches(final byte[] input, final byte[] pattern, final int off) {
+    final int il = input.length, pl = pattern.length;
     int p = 0;
     for(int i = off; i < il && p < pl; i++) {
-      final char ic = input.charAt(i);
-      final char pc = pattern.charAt(p);
-      if(Character.isLowerCase(pc) && pc == Character.toLowerCase(ic) || pc == ic ||
-          (pc == '/' || pc == '\\') && (ic == '/' || ic == '\\')) p++;
+      final byte ic = input[i];
+      final byte pc = pattern[p];
+      if(pc == ic || pc > 0x61 && pc < 0x7a && pc == (ic | 0x20) ||
+        (pc == '/' || pc == '\\') && (ic == '/' || ic == '\\')) p++;
     }
     return p == pl;
   }

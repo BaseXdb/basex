@@ -482,8 +482,7 @@ public final class Token {
    * @return token
    */
   public static byte[] chopNumber(final byte[] token) {
-    if(!contains(token, '.') || contains(token, 'e') ||
-        contains(token, 'E')) return token;
+    if(!contains(token, '.') || contains(token, 'e') || contains(token, 'E')) return token;
     // remove trailing zeroes
     int l = token.length;
     while(--l > 0 && token[l] == '0');
@@ -759,7 +758,18 @@ public final class Token {
    * @return result of test
    */
   public static boolean contains(final byte[] token, final byte[] sub) {
-    return indexOf(token, sub) != -1;
+    return contains(token, sub, 0);
+  }
+
+  /**
+   * Checks if the first token contains the second token.
+   * @param token token
+   * @param sub token to be found
+   * @param pos start position
+   * @return result of test
+   */
+  public static boolean contains(final byte[] token, final byte[] sub, final int pos) {
+    return indexOf(token, sub, pos) != -1;
   }
 
   /**
@@ -843,7 +853,18 @@ public final class Token {
    * @return result of test
    */
   public static boolean startsWith(final byte[] token, final int ch) {
-    return token.length != 0 && token[0] == ch;
+    return startsWith(token, ch, 0);
+  }
+
+  /**
+   * Checks if the first token starts with the specified character.
+   * @param token token
+   * @param ch character to be found
+   * @param pos start position
+   * @return result of test
+   */
+  public static boolean startsWith(final byte[] token, final int ch, final int pos) {
+    return pos < token.length && token[pos] == ch;
   }
 
   /**
@@ -853,9 +874,22 @@ public final class Token {
    * @return result of test
    */
   public static boolean startsWith(final byte[] token, final byte[] sub) {
+    return startsWith(token, sub, 0);
+  }
+
+  /**
+   * Checks if the first token starts with the second token.
+   * @param token token
+   * @param sub token to be found
+   * @param pos start position
+   * @return result of test
+   */
+  public static boolean startsWith(final byte[] token, final byte[] sub, final int pos) {
     final int sl = sub.length;
-    if(sl > token.length) return false;
-    for(int s = 0; s < sl; ++s) if(sub[s] != token[s]) return false;
+    if(sl > token.length - pos) return false;
+    for(int s = 0, p = pos; s < sl; ++s, ++p) {
+      if(sub[s] != token[p]) return false;
+    }
     return true;
   }
 
