@@ -208,10 +208,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
    * @param file file to be opened
    */
   void open(final IOFile file) {
-    if(!file.isDir()) {
-      view.open(file);
-      view.getEditor().requestFocusInWindow();
-    }
+    if(!file.isDir() && view.open(file) != null) view.getEditor().requestFocusInWindow();
   }
 
   /**

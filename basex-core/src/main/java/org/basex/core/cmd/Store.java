@@ -72,7 +72,8 @@ public final class Store extends ACreate {
       store(in, file);
       return info(QUERY_EXECUTED_X_X, "", perf);
     } catch(final IOException ex) {
-      return error(FILE_NOT_STORED_X, Util.message(ex));
+      Util.debug(ex);
+      return error(FILE_NOT_SAVED_X, file);
     } finally {
       data.finishUpdate();
     }

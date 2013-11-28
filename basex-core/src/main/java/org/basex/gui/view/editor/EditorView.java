@@ -26,6 +26,7 @@ import org.basex.gui.layout.BaseXLayout.DropHandler;
 import org.basex.gui.view.*;
 import org.basex.gui.view.project.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -436,7 +437,9 @@ public final class EditorView extends View {
       edit.reopen(true);
     } else {
       try {
-        final byte[] text = file.read();
+        // check and retrieve content
+        final byte[] text = read(file);
+        if(text == null) return null;
 
         // get current editor
         edit = getEditor();
@@ -447,11 +450,48 @@ public final class EditorView extends View {
         if(parse) edit.release(Action.PARSE);
       } catch(final IOException ex) {
         refreshHistory(null);
-        BaseXDialog.error(gui, FILE_NOT_OPENED);
+        Util.debug(ex);
+        BaseXDialog.error(gui, Util.info(FILE_NOT_OPENED_X, file));
+        ex.printStackTrace();
         return null;
       }
     }
     return edit;
+  }
+
+
+  /**
+   * Retrieves the contents of the specified file.
+   * @param file query file
+   * @return contents, or {@code null} reference
+   * @throws IOException I/O exception
+   */
+  private byte[] read(final IOFile file) throws IOException {
+    // check content
+    final BufferInput bi = new BufferInput(file);
+    final byte[] buffer = new byte[IO.BLOCKSIZE];
+    final int size = Math.max(0, bi.read(buffer) - 4);
+    for(int c = 0; c < size; c += cl(buffer, c)) {
+      if(!XMLToken.valid(cp(buffer, c))) {
+        if(!BaseXDialog.confirm(gui, H_FILE_BINARY)) break;
+        try {
+          Desktop.getDesktop().open(file.file());
+        } catch(final IOException ex) {
+          // default solution does not always work; fallback solutions:
+          final String[] args;
+          if(Prop.WIN) {
+            args = new String[] { "rundll32", "url.dll,FileProtocolHandler", file.path() };
+          } else if(Prop.MAC) {
+            args = new String[] { "/usr/bin/open", file.path() };
+          } else {
+            args = new String[] { "xdg-open", file.path() };
+          }
+          new ProcessBuilder(args).start();
+        }
+        return null;
+      }
+    }
+    return file.read();
   }
 
   /**
@@ -775,7 +815,7 @@ public final class EditorView extends View {
       projects.repaint();
       return true;
     } catch(final Exception ex) {
-      BaseXDialog.error(gui, FILE_NOT_SAVED);
+      BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, file));
       return false;
     }
   }

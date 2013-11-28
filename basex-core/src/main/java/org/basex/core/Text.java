@@ -561,12 +561,18 @@ public interface Text {
   String BACKUP_DROPPED_X = lang("backup_dropped_%");
   /** Backup was not found. */
   String BACKUP_NOT_FOUND_X = lang("backup_not_found_%");
-  /** File not stored. */
-  String FILE_NOT_STORED_X = lang("file_not_stored_%");
   /** File could not be deleted. */
   String FILE_NOT_DELETED_X = lang("file_not_deleted_%");
   /** File could not be renamed. */
   String FILE_NOT_RENAMED_X = lang("file_not_renamed_%");
+  /** File dialog error. */
+  String FILE_NOT_OPENED_X = lang("file_not_opened_%");
+  /** File dialog error. */
+  String FILE_NOT_SAVED_X = lang("file_not_saved_%");
+  /** File dialog replace information. */
+  String FILE_EXISTS_X = lang("file_exists_%");
+  /** Dir dialog replace information. */
+  String FILES_REPLACE_X = lang("files_replace_%");
 
   /** Index created. */
   String INDEX_CREATED_X_X = lang("index_created_%_%");
@@ -1122,15 +1128,6 @@ public interface Text {
   /** Dialog asking if a new database should be be created. */
   String NEW_DB_QUESTION = lang("no_db_found") + NL + lang("new_db_question");
 
-  /** File dialog error. */
-  String FILE_NOT_OPENED = lang("file_not_opened");
-  /** File dialog error. */
-  String FILE_NOT_SAVED = lang("file_not_saved");
-  /** File dialog replace information. */
-  String FILE_EXISTS_X = lang("file_exists_%");
-  /** Dir dialog replace information. */
-  String FILES_REPLACE_X = lang("files_replace_%");
-
   /** Users. */
   String USERS = lang("users");
   /** Users. */
@@ -1437,6 +1434,8 @@ public interface Text {
   String H_LARGE_DB = lang("h_large_db") + NL + ' ';
   /** Dialog for downloading a new version. */
   String H_NEW_VERSION = lang("h_new_version");
+  /** Dialog title for announcing binary file. */
+  String H_FILE_BINARY = lang("h_binary_file") + NL + ' ';
 
   /** HTML Parser. */
   String H_HTML_PARSER = lang("h_html_parser");

@@ -201,7 +201,8 @@ public final class EditorArea extends Editor {
           release(Action.PARSE);
           return true;
         } catch(final IOException ex) {
-          BaseXDialog.error(gui, FILE_NOT_OPENED);
+          Util.debug(ex);
+          BaseXDialog.error(gui, Util.info(FILE_NOT_OPENED_X, file));
         }
       }
       tstamp = ts;

@@ -225,7 +225,7 @@ public final class TextView extends View {
         for(final byte t : txt) if(t < 0 || t > ' ' || ws(t)) out.write(t);
       }
     } catch(final IOException ex) {
-      BaseXDialog.error(gui, FILE_NOT_SAVED);
+      BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, file));
     } finally {
       if(out != null) try { out.close(); } catch(final IOException ignored) { }
       opts.set(MainOptions.MAXHITS, mh);
