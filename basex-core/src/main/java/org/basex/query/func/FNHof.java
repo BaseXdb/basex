@@ -83,7 +83,7 @@ public final class FNHof extends StandardFunc {
           final Value seq = (Value) expr[0];
           if(seq.isEmpty()) throw INVEMPTY.get(info, description());
           Expr e = seq.itemAt(0);
-          for(int i = 1, len = (int) seq.size(); i < len; i++)
+          for(int i = 0, len = (int) seq.size(); i < len; i++)
             e = new DynFuncCall(info, expr[1], e, seq.itemAt(i)).optimize(ctx, scp);
           return e;
         }
