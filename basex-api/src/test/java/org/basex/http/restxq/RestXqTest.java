@@ -65,6 +65,14 @@ public final class RestXqTest extends HTTPTest {
     get(f, "var/y", "y");
   }
 
+  /** Retrieve path with namespace declarations.
+   * @throws Exception exception */
+  @Test public void getVariableNS() throws Exception {
+    get("declare default element namespace 'X';" +
+        "declare %R:path('{$x}') function m:f($x) {$x};", "z", "z");
+    get("declare %R:path('{$m:x}') function m:f($m:x) {$m:x};", "z", "z");
+  }
+
   /** Retrieve path with variable on root level.
    * @throws Exception exception */
   @Test public void getRootVariable() throws Exception {

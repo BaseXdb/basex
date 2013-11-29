@@ -221,6 +221,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         final Matcher m = TEMPLATE.matcher(path.segment[s]);
         if(!m.find()) continue;
         final QNm qnm = new QNm(token(m.group(1)), function.sc);
+        if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
         bind(qnm, arg, new Atm(http.segment(s)));
       }
     }
