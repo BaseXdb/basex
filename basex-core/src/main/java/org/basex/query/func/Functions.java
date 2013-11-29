@@ -243,13 +243,13 @@ public final class Functions extends TokenSet {
   }
 
   /**
-   * Throws an exception if the name of a pre-defined functions is similar to the
+   * Returns an exception if the name of a pre-defined functions is similar to the
    * specified function name.
    * @param name function name
    * @param ii input info
-   * @throws QueryException query exception
+   * @return query exception
    */
-  void errorIfSimilar(final QNm name, final InputInfo ii) throws QueryException {
+  QueryException similarError(final QNm name, final InputInfo ii) {
     // compare specified name with names of predefined functions
     final byte[] ln = name.local();
     final Levenshtein ls = new Levenshtein();
@@ -259,13 +259,14 @@ public final class Functions extends TokenSet {
       final byte[] l = substring(keys[k], i + 1);
       if(eq(ln, l)) {
         final byte[] ur = name.uri();
-        throw FUNCSIMILAR.get(ii,
+        return FUNCSIMILAR.get(ii,
             new TokenBuilder(NSGlobal.prefix(ur)).add(':').add(l),
             new TokenBuilder(NSGlobal.prefix(u)).add(':').add(l));
       } else if(ls.similar(ln, l)) {
-        throw FUNCSIMILAR.get(ii, name.string(), l);
+        return FUNCSIMILAR.get(ii, name.string(), l);
       }
     }
+    return null;
   }
 
   @Override

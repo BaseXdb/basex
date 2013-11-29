@@ -96,7 +96,10 @@ public final class StaticFuncs extends ExprInfo {
   public TypedFunc getFuncRef(final QNm name, final Expr[] args, final StaticContext sc,
       final InputInfo ii) throws QueryException {
 
-    if(NSGlobal.reserved(name.uri())) errorIfSimilar(name, ii);
+    if(NSGlobal.reserved(name.uri())) {
+      final QueryException qe = similarError(name, ii);
+      if(qe != null) throw qe;
+    }
     final byte[] sig = sig(name, args.length);
     if(!funcs.contains(sig)) funcs.put(sig, new FuncCache(null));
     return getRef(name, args, sc, ii);
@@ -171,7 +174,10 @@ public final class StaticFuncs extends ExprInfo {
   public StaticFunc get(final QNm name, final long arity, final InputInfo ii)
       throws QueryException {
 
-    if(NSGlobal.reserved(name.uri())) errorIfSimilar(name, ii);
+    if(NSGlobal.reserved(name.uri())) {
+      final QueryException qe = similarError(name, ii);
+      if(qe != null) throw qe;
+    }
     final FuncCache fc = funcs.get(sig(name, arity));
     return fc == null ? null : fc.func;
   }
@@ -180,20 +186,24 @@ public final class StaticFuncs extends ExprInfo {
    * Throws an exception if the name of a function is similar to the specified function name.
    * @param name function name
    * @param ii input info
-   * @throws QueryException query exception
+   * @return exception
    */
-  public void errorIfSimilar(final QNm name, final InputInfo ii) throws QueryException {
+  public QueryException similarError(final QNm name, final InputInfo ii) {
     // find global function
-    Functions.get().errorIfSimilar(name, ii);
-    // find local functions
-    final Levenshtein ls = new Levenshtein();
-    final byte[] nm = lc(name.local());
-    for(final FuncCache fc : funcs.values()) {
-      final StaticFunc sf = fc.func;
-      if(sf != null && sf.expr != null && ls.similar(nm, lc(sf.name.local()))) {
-        throw FUNCSIMILAR.get(ii, name.string(), sf.name.string());
+    QueryException qe = Functions.get().similarError(name, ii);
+    if(qe == null) {
+      // find local functions
+      final Levenshtein ls = new Levenshtein();
+      final byte[] nm = lc(name.local());
+      for(final FuncCache fc : funcs.values()) {
+        final StaticFunc sf = fc.func;
+        if(sf != null && sf.expr != null && ls.similar(nm, lc(sf.name.local()))) {
+          qe = FUNCSIMILAR.get(ii, name.string(), sf.name.string());
+          break;
+        }
       }
     }
+    return null;
   }
 
   @Override
