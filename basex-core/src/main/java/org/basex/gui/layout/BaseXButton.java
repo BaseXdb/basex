@@ -1,7 +1,6 @@
 package org.basex.gui.layout;
 
 import static org.basex.core.Text.*;
-import static org.basex.gui.layout.BaseXKeys.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -11,6 +10,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 import org.basex.gui.*;
+import org.basex.util.*;
 
 /**
  * Project specific button implementation.
@@ -42,7 +42,13 @@ public class BaseXButton extends JButton {
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        if(ESCAPE.is(e)) d.cancel();
+        if(BaseXKeys.ESCAPE.is(e)) {
+          d.cancel();
+        } else if(BaseXKeys.NEXT.is(e) || BaseXKeys.NEXTLINE.is(e)) {
+          transferFocus();
+        } else if(BaseXKeys.PREV.is(e) || BaseXKeys.PREVLINE.is(e)) {
+          transferFocusBackward();
+        }
       }
     });
     BaseXLayout.setMnemonic(this, d.mnem);
