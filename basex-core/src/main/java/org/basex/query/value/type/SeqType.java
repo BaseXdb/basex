@@ -596,9 +596,9 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instanceOf(final SeqType t) {
-    return type.instanceOf(t.type) && occ.instanceOf(t.occ)
+    return (t.type == AtomType.ITEM || type.instanceOf(t.type)) && occ.instanceOf(t.occ)
       // [LW] complete kind check
-      && t.kind == null || kind != null && kind.intersect(t.kind) != null;
+      && (t.kind == null || kind != null && kind.intersect(t.kind) != null);
   }
 
   @Override

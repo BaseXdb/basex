@@ -58,7 +58,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     super(stc, a, n, r, scp, xqdoc, ii);
     args = v;
     expr = e;
-    cast = r != null;
+    cast = r != null && !r.eq(SeqType.ITEM_ZM);
     updating = ann.contains(Ann.Q_UPDATING);
   }
 

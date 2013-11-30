@@ -53,7 +53,7 @@ public final class Var extends ExprInfo {
       final boolean fun) {
     sc = sctx;
     name = n;
-    declType = typ;
+    declType = typ == null || typ.eq(SeqType.ITEM_ZM) ? null : typ;
     inType = SeqType.ITEM_ZM;
     id = ctx.varIDs++;
     param = fun;
