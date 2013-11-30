@@ -100,6 +100,16 @@ public final class EditorText {
   }
 
   /**
+   * Count the number of lines in the text.
+   * @return number of new lines in the text
+   */
+  public int lineNumbers() {
+    int count = 1;
+    for (byte ch : text) if (ch == '\n') ++count;
+    return count;
+  }
+
+  /**
    * Returns the token as string.
    * @return string
    */
