@@ -14,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class BaseXBar extends BaseXPanel {
+public final class BaseXScrollBar extends BaseXPanel {
   /** Scrollbar size. */
   public static final int SIZE = 16;
   /** Maximum scrolling speed. */
@@ -65,7 +65,7 @@ public final class BaseXBar extends BaseXPanel {
    * if the component is completely displayed.
    * @param cmp reference to the scrolled component
    */
-  public BaseXBar(final BaseXPanel cmp) {
+  public BaseXScrollBar(final BaseXPanel cmp) {
     super(cmp.gui);
     comp = cmp;
     addMouseListener(this);

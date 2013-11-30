@@ -1,6 +1,7 @@
 package org.basex.gui.editor;
 
 import java.awt.*;
+
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.editor.Editor.SearchDir;
@@ -16,103 +17,114 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class Renderer extends BaseXBack {
+  /** Offset. */
+  private static final int OFFSET = 5;
+
+  /** Text array to be written. */
+  private final EditorText text;
   /** Vertical start position. */
-  private final BaseXBar bar;
-  /** Vertical line number bar. */
-  private final LineNumberBar lineNumberBar;
+  private final BaseXScrollBar scroll;
+  /** Flag for displaying line numbers. */
+  private final boolean lineNumbers;
+  /** Current brackets. */
+  private final IntList pars = new IntList();
 
   /** Font. */
   private Font font;
   /** Default font. */
-  private Font dfont;
+  private Font defaultFont;
   /** Bold font. */
-  private Font bfont;
+  private Font boldFont;
   /** Font height. */
-  private int fontH;
+  private int fontHeight;
   /** Character widths. */
-  private int[] fwidth = GUIConstants.mfwidth;
+  private int[] charWidths = GUIConstants.mfwidth;
+  /** Width of current word. */
+  private int wordWidth;
   /** Color. */
   private Color color;
-  /** Color highlighting flag. */
-  private boolean high;
-  /** Current link. */
-  private boolean link;
-
-  /** Width of current word. */
-  private int wordW;
 
   /** Border offset. */
-  private int off;
-  /** Offset from the line number bar. */
-  private int lineNumberOffset;
+  private int offset;
   /** Current x coordinate. */
   private int x;
   /** Current y coordinate. */
   private int y;
   /** Current width. */
-  private int w;
+  private int width;
   /** Current height. */
-  private int h;
+  private int height;
+  /** Current line. */
+  private int line;
 
-  /** Current brackets. */
-  private final IntList pars = new IntList();
-
-  /** Text array to be written. */
-  private final EditorText text;
   /** Vertical start position. */
-  private transient Syntax syntax = Syntax.SIMPLE;
+  private Syntax syntax = Syntax.SIMPLE;
   /** Visibility of cursor. */
   private boolean cursor;
+  /** Color highlighting flag. */
+  private boolean highlighted;
+  /** Indicates if current text is a link. */
+  private boolean link;
 
   /**
    * Constructor.
    * @param t text to be drawn
-   * @param b scrollbar reference
-   * @param l line number bar
+   * @param s scrollbar reference
+   * @param editable editable flag
    */
-  Renderer(final EditorText t, final BaseXBar b, final LineNumberBar l) {
+  Renderer(final EditorText t, final BaseXScrollBar s, final boolean editable) {
     mode(Fill.NONE);
     text = t;
-    bar = b;
-    lineNumberBar = l;
+    scroll = s;
+    lineNumbers = editable;
   }
 
   @Override
   public void setFont(final Font f) {
-    dfont = f;
-    bfont = f.deriveFont(Font.BOLD);
+    defaultFont = f;
+    boldFont = f.deriveFont(Font.BOLD);
     font(f);
   }
 
   @Override
   public void paintComponent(final Graphics g) {
-    if(lineNumberBar != null) {
-      // the line number bar goes over the text, so we need to offset the text
-      lineNumberBar.setLastLineNumber(text.lineNumbers());
-      lineNumberOffset = lineNumberBar.getWidth() - 8;
-    }
-
     super.paintComponent(g);
 
     pars.reset();
-    init(g, bar.pos());
-    if(lineNumberBar != null) {
-      lineNumberBar.resetLineNumbers();
-      // there is always at least one line in the editor
-      lineNumberBar.addRenderedTextLine(y);
-    }
-    int oldY;
+    init(g, scroll.pos());
+
+    int oldL = 0;
     while(more(g)) {
-      oldY = y;
+      if(line != oldL && y >= 0) {
+        drawLine(g);
+        oldL = line;
+      }
       write(g);
-      if(lineNumberBar != null && y != oldY) lineNumberBar.addRenderedTextLine(y);
     }
-    wordW = 0;
+    if(line != oldL) drawLine(g);
+
+    wordWidth = 0;
     final int s = text.size();
     if(cursor && s == text.getCaret()) drawCursor(g, x);
     if(s == text.error()) drawError(g);
 
-    if(lineNumberBar != null) lineNumberBar.repaint();
+    if(lineNumbers) {
+      final int lw = offset - OFFSET * 3 / 2;
+      g.setColor(GUIConstants.LGRAY);
+      g.drawLine(lw, 0, lw, height);
+    }
+  }
+
+  /**
+   * Renders the current line number.
+   * @param g graphics reference
+   */
+  private void drawLine(final Graphics g) {
+    if(lineNumbers) {
+      g.setColor(GUIConstants.GRAY);
+      final String s = Integer.toString(line);
+      g.drawString(s, offset - fontWidth(g, s) - OFFSET * 2, y);
+    }
   }
 
   /**
@@ -142,11 +154,11 @@ final class Renderer extends BaseXBack {
     final int pos = text.jump(dir, select);
     if(pos == -1) return -1;
 
-    final int hh = h;
-    h = Integer.MAX_VALUE;
+    final int hh = height;
+    height = Integer.MAX_VALUE;
     final Graphics g = getGraphics();
     for(init(g); more(g) && text.pos() < pos; next());
-    h = hh;
+    height = hh;
     return y;
   }
 
@@ -155,13 +167,13 @@ final class Renderer extends BaseXBack {
    * @return line/column
    */
   int[] pos() {
-    final int hh = h;
-    h = Integer.MAX_VALUE;
+    final int hh = height;
+    height = Integer.MAX_VALUE;
     final Graphics g = getGraphics();
     init(g);
     boolean more = true;
-    int line = 1;
     int col = 1;
+    final int l = 1;
     while(more(g)) {
       final int p = text.pos();
       while(text.more()) {
@@ -172,12 +184,10 @@ final class Renderer extends BaseXBack {
       }
       if(!more) break;
       text.pos(p);
-      if(next()) {
-        line++;
-        col = 1;
-      }
+      next();
+      if(l != line) col = 1;
     }
-    h = hh;
+    height = hh;
     return new int[] { line, col };
   }
 
@@ -187,23 +197,22 @@ final class Renderer extends BaseXBack {
    */
   private void font(final Font f) {
     font = f;
-    off = f.getSize() + 1 >> 2;
-    fontH = f.getSize() + off;
-    fwidth = GUIConstants.fontWidths(f);
+    fontHeight = f.getSize() * 5 / 4;
+    charWidths = GUIConstants.fontWidths(f);
   }
 
   @Override
   public Dimension getPreferredSize() {
     final Graphics g = getGraphics();
-    w = Integer.MAX_VALUE;
-    h = Integer.MAX_VALUE;
+    width = Integer.MAX_VALUE;
+    height = Integer.MAX_VALUE;
     init(g);
     int max = 0;
     while(more(g)) {
       if(text.curr() == 0x0A) max = Math.max(x, max);
       next();
     }
-    return new Dimension(Math.max(x, max) + fwidth[' '], y + fontH);
+    return new Dimension(Math.max(x, max) + charWidths[' '], y + fontHeight);
   }
 
   /**
@@ -220,13 +229,17 @@ final class Renderer extends BaseXBack {
    * @param pos current text position
    */
   private void init(final Graphics g, final int pos) {
-    font = dfont;
+    font = defaultFont;
     color = Color.black;
     syntax.init();
     text.init();
     link = false;
-    x = off + lineNumberOffset;
-    y = off + fontH - pos - 2;
+    offset = OFFSET;
+    // calculate line width
+    if(lineNumbers) offset += fontWidth(g, Integer.toString(text.lines())) + OFFSET * 2;
+    x = offset;
+    y = fontHeight - pos - 2;
+    line = 1;
     if(g != null) g.setFont(font);
   }
 
@@ -234,13 +247,13 @@ final class Renderer extends BaseXBack {
    * Calculates the text height.
    */
   void calc() {
-    w = getWidth() - (off >> 1);
-    h = Integer.MAX_VALUE;
+    width = getWidth() - (offset >> 1);
+    height = Integer.MAX_VALUE;
     final Graphics g = getGraphics();
     init(g);
     while(more(g)) next();
-    h = getHeight() + fontH;
-    bar.height(y + off);
+    height = getHeight() + fontHeight;
+    scroll.height(y + OFFSET);
   }
 
   /**
@@ -248,13 +261,13 @@ final class Renderer extends BaseXBack {
    * @return new position
    */
   int cursorY() {
-    final int hh = h;
-    h = Integer.MAX_VALUE;
+    final int hh = height;
+    height = Integer.MAX_VALUE;
     final Graphics g = getGraphics();
     init(g);
     while(more(g) && !text.edited()) next();
-    h = hh;
-    return y - fontH;
+    height = hh;
+    return y - fontHeight;
   }
 
   /**
@@ -273,41 +286,39 @@ final class Renderer extends BaseXBack {
       final int ch = text.next();
       // internal special codes...
       if(ch == TokenBuilder.BOLD) {
-        font(bfont);
+        font(boldFont);
       } else if(ch == TokenBuilder.NORM) {
-        font(dfont);
+        font(defaultFont);
       } else if(ch == TokenBuilder.ULINE) {
         link ^= true;
       } else {
-        ww += charW(g, ch);
+        ww += fontWidth(g, ch);
       }
     }
     text.pos(p);
 
     // jump to new line
-    if(x + ww > w) {
-      x = off + lineNumberOffset;
-      y += fontH;
+    if(x + ww > width) {
+      x = offset;
+      y += fontHeight;
     }
-    wordW = ww;
+    wordWidth = ww;
 
     // check if word has been found, and word is still visible
-    return y < h;
+    return y < height;
   }
 
   /**
    * Finishes the current token.
-   * @return true for new line
    */
-  private boolean next() {
+  private void next() {
     final int ch = text.curr();
     if(ch == TokenBuilder.NLINE || ch == TokenBuilder.HLINE) {
-      x = off + lineNumberOffset;
-      y += fontH >> (ch == TokenBuilder.NLINE ? 0 : 1);
-      return true;
+      x = offset;
+      y += fontHeight >> (ch == TokenBuilder.NLINE ? 0 : 1);
+      line++;
     }
-    x += wordW;
-    return false;
+    x += wordWidth;
   }
 
   /**
@@ -316,37 +327,36 @@ final class Renderer extends BaseXBack {
    */
   private void write(final Graphics g) {
     // choose color for enabled text, depending on highlighting, link, or current syntax
-    color = isEnabled() ?
-      high ? GUIConstants.GREEN : link ? GUIConstants.color4 : syntax.getColor(text) :
-      Color.gray;
-    high = false;
+    color = isEnabled() ? highlighted ? GUIConstants.GREEN : link ? GUIConstants.color4 :
+      syntax.getColor(text) : Color.gray;
+    highlighted = false;
 
     // retrieve first character of current token
     final int ch = text.curr();
-    if(ch == TokenBuilder.MARK) high = true;
+    if(ch == TokenBuilder.MARK) highlighted = true;
 
     final int cp = text.pos();
     final int cc = text.getCaret();
-    if(y > 0 && y < h) {
+    if(y > 0 && y < height) {
       // mark selected text
       if(text.selectStart()) {
         int xx = x;
-        while(!text.inSelect() && text.more()) xx += charW(g, text.next());
+        while(!text.inSelect() && text.more()) xx += fontWidth(g, text.next());
         int cw = 0;
-        while(text.inSelect() && text.more()) cw += charW(g, text.next());
+        while(text.inSelect() && text.more()) cw += fontWidth(g, text.next());
         g.setColor(GUIConstants.color(3));
-        g.fillRect(xx, y - fontH * 4 / 5, cw, fontH);
+        g.fillRect(xx, y - fontHeight * 4 / 5, cw, fontHeight);
         text.pos(cp);
       }
 
       // mark found text
       int xx = x;
       while(text.more() && text.searchStart()) {
-        while(!text.inSearch() && text.more()) xx += charW(g, text.next());
+        while(!text.inSearch() && text.more()) xx += fontWidth(g, text.next());
         int cw = 0;
-        while(text.inSearch() && text.more()) cw += charW(g, text.next());
+        while(text.inSearch() && text.more()) cw += fontWidth(g, text.next());
         g.setColor(GUIConstants.color2A);
-        g.fillRect(xx, y - fontH * 4 / 5, cw, fontH);
+        g.fillRect(xx, y - fontHeight * 4 / 5, cw, fontHeight);
         xx += cw;
       }
       text.pos(cp);
@@ -356,13 +366,13 @@ final class Renderer extends BaseXBack {
 
       // don't write whitespaces
       if(ch == '\u00a0') {
-        final int s = fontH / 12;
+        final int s = fontHeight / 12;
         g.setColor(GUIConstants.GRAY);
-        g.fillRect(x + (wordW >> 1), y - fontH * 3 / 10, s, s);
+        g.fillRect(x + (wordWidth >> 1), y - fontHeight * 3 / 10, s, s);
       } else if(ch == '\t') {
-        final int yy = y - fontH * 3 / 10;
-        final int s = 1 + fontH / 12;
-        final int xe = x + charW(g, '\t') - s;
+        final int yy = y - fontHeight * 3 / 10;
+        final int s = 1 + fontHeight / 12;
+        final int xe = x + fontWidth(g, '\t') - s;
         final int as = s * 2 - 1;
         g.setColor(GUIConstants.GRAY);
         g.drawLine(x + s, yy, xe, yy);
@@ -371,12 +381,12 @@ final class Renderer extends BaseXBack {
       } else if(ch >= ' ') {
         g.setColor(color);
         String n = text.nextString();
-        int ww = w - x;
-        if(x + wordW > ww) {
+        int ww = width - x;
+        if(x + wordWidth > ww) {
           // shorten string if it cannot be completely shown (saves memory)
           int c = 0;
           for(final int nl = n.length(); c < nl && ww > 0; c++) {
-            ww -= charW(g, n.charAt(c));
+            ww -= fontWidth(g, n.charAt(c));
           }
           n = n.substring(0, c);
         }
@@ -386,7 +396,7 @@ final class Renderer extends BaseXBack {
       }
 
       // underline linked text
-      if(link) g.drawLine(x, y + 1, x + wordW, y + 1);
+      if(link) g.drawLine(x, y + 1, x + wordWidth, y + 1);
 
       // show cursor
       if(cursor && text.edited()) {
@@ -396,7 +406,7 @@ final class Renderer extends BaseXBack {
             drawCursor(g, xx);
             break;
           }
-          xx += charW(g, text.next());
+          xx += fontWidth(g, text.next());
         }
         text.pos(cp);
       }
@@ -417,8 +427,8 @@ final class Renderer extends BaseXBack {
         final int xx = pars.pop();
         if(cc == cp || cc == cr) {
           g.setColor(GUIConstants.color3);
-          g.drawRect(xx, yy - fontH * 4 / 5, charW(g, open), fontH);
-          g.drawRect(x, y - fontH * 4 / 5, charW(g, ch), fontH);
+          g.drawRect(xx, yy - fontHeight * 4 / 5, fontWidth(g, open), fontHeight);
+          g.drawRect(x, y - fontHeight * 4 / 5, fontWidth(g, ch), fontHeight);
         }
       }
     }
@@ -432,7 +442,7 @@ final class Renderer extends BaseXBack {
    */
   private void drawCursor(final Graphics g, final int xx) {
     g.setColor(GUIConstants.DGRAY);
-    g.fillRect(xx, y - fontH * 4 / 5, 2, fontH);
+    g.fillRect(xx, y - fontHeight * 4 / 5, 2, fontHeight);
   }
 
   /**
@@ -440,14 +450,39 @@ final class Renderer extends BaseXBack {
    * @param g graphics reference
    */
   private void drawError(final Graphics g) {
-    final int ww = wordW == 0 ? charW(g, ' ') : wordW;
-    final int s = Math.max(1, fontH / 8);
+    final int ww = wordWidth == 0 ? fontWidth(g, ' ') : wordWidth;
+    final int s = Math.max(1, fontHeight / 8);
     g.setColor(GUIConstants.LRED);
     g.fillRect(x, y + 2, ww, s);
     g.setColor(GUIConstants.RED);
     for(int xp = x; xp < x + ww; xp++) {
       if((xp & 1) == 0) g.drawLine(xp, y + 2, xp, y + s + 1);
     }
+  }
+
+  /**
+   * Returns the width of the specified codepoint.
+   * @param g graphics reference
+   * @param cp character
+   * @return width
+   */
+  private int fontWidth(final Graphics g, final int cp) {
+    return cp < ' ' || g == null ?  cp == '\t' ?
+      charWidths[' '] * EditorText.TAB : 0 : cp < 256 ? charWidths[cp] :
+      cp >= 0xD800 && cp <= 0xDC00 ? 0 : g.getFontMetrics().charWidth(cp);
+  }
+
+  /**
+   * Returns the width of the specified string.
+   * @param g graphics reference
+   * @param string string
+   * @return width
+   */
+  private int fontWidth(final Graphics g, final String string) {
+    final int cl = string.length();
+    int w = 0;
+    for(int c = 0; c < cl; c++) w += fontWidth(g, string.charAt(c));
+    return w;
   }
 
   /**
@@ -458,15 +493,15 @@ final class Renderer extends BaseXBack {
    */
   boolean link(final int pos, final Point p) {
     final int xx = p.x;
-    final int yy = p.y - fontH / 5;
+    final int yy = p.y - fontHeight / 5;
 
     final Graphics g = getGraphics();
     init(g, pos);
-    if(yy > y - fontH) {
+    if(yy > y - fontHeight) {
       int s = text.pos();
       while(true) {
         // end of line
-        if(xx > x && yy < y - fontH) {
+        if(xx > x && yy < y - fontHeight) {
           text.pos(s);
           break;
         }
@@ -478,9 +513,9 @@ final class Renderer extends BaseXBack {
         // beginning of line
         if(xx <= x && yy < y) break;
         // middle of line
-        if(xx > x && xx <= x + wordW && yy > y - fontH && yy <= y) {
+        if(xx > x && xx <= x + wordWidth && yy > y - fontHeight && yy <= y) {
           while(text.more()) {
-            final int ww = charW(g, text.curr());
+            final int ww = fontWidth(g, text.curr());
             if(xx < x + ww) break;
             x += ww;
             text.next();
@@ -496,7 +531,6 @@ final class Renderer extends BaseXBack {
 
   /**
    * Selects the text at the specified position.
-   *
    * @param pos current text position
    * @param p mouse position
    * @param start states if selection has just been started
@@ -527,23 +561,11 @@ final class Renderer extends BaseXBack {
   }
 
   /**
-   * Returns the width of the specified codepoint.
-   * @param g graphics reference
-   * @param cp character
-   * @return width
-   */
-  private int charW(final Graphics g, final int cp) {
-    return cp < ' ' || g == null ?  cp == '\t' ?
-      fwidth[' '] * EditorText.TAB : 0 : cp < 256 ? fwidth[cp] :
-      cp >= 0xD800 && cp <= 0xDC00 ? 0 : g.getFontMetrics().charWidth(cp);
-  }
-
-  /**
    * Returns the font height.
    * @return font height
    */
-  int fontH() {
-    return fontH;
+  int fontHeight() {
+    return fontHeight;
   }
 
   /**

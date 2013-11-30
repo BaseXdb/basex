@@ -38,7 +38,7 @@ public final class FolderView extends View {
   private BufferedImage openedMarker;
 
   /** Scroll Bar. */
-  private final BaseXBar scroll;
+  private final BaseXScrollBar scroll;
 
   /** Vertical mouse position. */
   private int totalW;
@@ -59,7 +59,7 @@ public final class FolderView extends View {
     super(FOLDERVIEW, man);
     createBoxes();
     layout(new BorderLayout());
-    scroll = new BaseXBar(this);
+    scroll = new BaseXScrollBar(this);
     add(scroll, BorderLayout.EAST);
     new BaseXPopup(this, POPUP);
   }

@@ -57,9 +57,7 @@ public class Editor extends BaseXPanel {
   /** Renderer reference. */
   private final Renderer rend;
   /** Scrollbar reference. */
-  private final BaseXBar scroll;
-  /** Line number bar reference. */
-  private final LineNumberBar lineNumberBar;
+  private final BaseXScrollBar scroll;
   /** Editable flag. */
   private final boolean editable;
   /** Search bar. */
@@ -106,13 +104,12 @@ public class Editor extends BaseXPanel {
       }
     });
 
-    layout(new BorderLayout(0, 0));
-    scroll = new BaseXBar(this);
-    lineNumberBar = editable ? new LineNumberBar() : null;
-    rend = new Renderer(text, scroll, lineNumberBar);
     setFont(GUIConstants.dmfont);
+    layout(new BorderLayout());
 
-    if(lineNumberBar != null) add(lineNumberBar, BorderLayout.WEST);
+    scroll = new BaseXScrollBar(this);
+    rend = new Renderer(text, scroll, editable);
+
     add(rend, BorderLayout.CENTER);
     add(scroll, BorderLayout.EAST);
 
@@ -266,7 +263,6 @@ public class Editor extends BaseXPanel {
   public final void setFont(final Font f) {
     super.setFont(f);
     if(rend != null) rend.setFont(f);
-    if(lineNumberBar != null) lineNumberBar.setFont(f);
   }
 
   /** Thread counter. */
@@ -388,7 +384,7 @@ public class Editor extends BaseXPanel {
     final int y = rend.jump(dir, select);
     final int h = getHeight();
     final int p = scroll.pos();
-    final int m = y + rend.fontH() * 3 - h;
+    final int m = y + rend.fontHeight() * 3 - h;
     if(y != -1 && (p < m || p > y)) scroll.pos(y - h / 2);
     rend.repaint();
   }
@@ -505,7 +501,7 @@ public class Editor extends BaseXPanel {
     cursor(true);
 
     // operations without cursor movement...
-    final int fh = rend.fontH();
+    final int fh = rend.fontHeight();
     if(SCROLLDOWN.is(e)) {
       scroll.pos(scroll.pos() + fh);
       return;
@@ -669,7 +665,7 @@ public class Editor extends BaseXPanel {
       // updates the visible area
       final int p = scroll.pos();
       final int y = rend.cursorY();
-      final int m = y + rend.fontH() * 3 - getHeight();
+      final int m = y + rend.fontHeight() * 3 - getHeight();
       if(p < m || p > y) {
         final int align = (Integer) arg;
         scroll.pos(align == 0 ? y : align == 1 ? y - getHeight() / 2 : m);

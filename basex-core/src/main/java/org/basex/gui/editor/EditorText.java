@@ -100,12 +100,12 @@ public final class EditorText {
   }
 
   /**
-   * Count the number of lines in the text.
+   * Counts the number of lines in the text.
    * @return number of new lines in the text
    */
-  public int lineNumbers() {
+  public int lines() {
     int count = 1;
-    for (byte ch : text) if (ch == '\n') ++count;
+    for(final byte ch : text) if (ch == '\n') ++count;
     return count;
   }
 
@@ -357,7 +357,7 @@ public final class EditorText {
     forward(Integer.MAX_VALUE, true);
     e = ps;
 
-    byte[] add = new byte[TAB];
+    final byte[] add = new byte[TAB];
     for(int a = 0; a < TAB; a++) add[a] = ' ';
 
     // build new text
@@ -528,7 +528,7 @@ public final class EditorText {
     }
 
     if(!shift) {
-      boolean c = ps > 0;
+      final boolean c = ps > 0;
       for(int p = ps - 1; p >= 0 && c; p--) {
         final byte b = text[p];
         if(!ws(b)) return false;

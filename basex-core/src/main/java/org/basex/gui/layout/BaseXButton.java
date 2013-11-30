@@ -10,7 +10,6 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 import org.basex.gui.*;
-import org.basex.util.*;
 
 /**
  * Project specific button implementation.

@@ -20,7 +20,7 @@ import org.basex.util.*;
  */
 final class TableContent extends BaseXBack {
   /** Scrollbar reference. */
-  private final BaseXBar scroll;
+  private final BaseXScrollBar scroll;
   /** View reference. */
   private final TableData tdata;
   /** GUI reference. */
@@ -33,7 +33,7 @@ final class TableContent extends BaseXBack {
    * @param d table data
    * @param scr scrollbar reference
    */
-  TableContent(final TableData d, final BaseXBar scr) {
+  TableContent(final TableData d, final BaseXScrollBar scr) {
     scroll = scr;
     tdata = d;
     gui = scr.gui;
