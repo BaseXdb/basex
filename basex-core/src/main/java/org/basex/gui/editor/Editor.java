@@ -627,6 +627,7 @@ public class Editor extends BaseXPanel {
           } else if(DELLINESTART.is(e)) {
             text.startSelect();
             text.bol(true);
+            text.finishSelect();
           } else {
             text.backspace();
           }
