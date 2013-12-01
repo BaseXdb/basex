@@ -68,7 +68,7 @@ public final class CsvDirectSerializer extends CsvSerializer {
   }
 
   @Override
-  protected void finishText(final byte[] text) {
+  protected void finishText(final byte[] text) throws IOException {
     if(level == 3) cache(text);
   }
 
@@ -121,10 +121,13 @@ public final class CsvDirectSerializer extends CsvSerializer {
   /**
    * Caches the specified text and its header.
    * @param text text to be cached
+   * @throws IOException I/O exception
    */
-  private void cache(final byte[] text) {
+  private void cache(final byte[] text) throws IOException {
     if(headers != null) {
-      final byte[] name = XMLToken.decode(atts && attv != null ? attv : tag, lax);
+      final byte[] key = atts && attv != null ? attv : tag;
+      final byte[] name = XMLToken.decode(key, lax);
+      if(name == null) error("Invalid element name <%>", key);
       if(!headers.contains(name)) headers.add(name);
       final byte[] old = data.get(name);
       final byte[] txt = old == null || old.length == 0 ? text :
@@ -138,9 +141,10 @@ public final class CsvDirectSerializer extends CsvSerializer {
   /**
    * Raises an error with the specified message.
    * @param msg error message
+   * @param ext error details
    * @throws IOException I/O exception
    */
-  private static void error(final String msg) throws IOException {
-    throw BXCS_SERIAL.getIO(msg);
+  private static void error(final String msg, final Object... ext) throws IOException {
+    throw BXCS_SERIAL.getIO(Util.inf(msg, ext));
   }
 }

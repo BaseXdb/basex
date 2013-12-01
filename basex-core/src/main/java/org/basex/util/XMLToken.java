@@ -204,17 +204,27 @@ public final class XMLToken {
    * @return cached QName
    */
   public static byte[] decode(final byte[] name, final boolean lax) {
-    // convert name to valid XML representation
+    if(lax) return name;
+
+    // convert name back to original representation
     final TokenBuilder tb = new TokenBuilder();
     int uc = 0;
+
     // mode: 0=normal, 1=unicode, 2=underscore, 3=building unicode
     int mode = 0;
     for(int n = 0; n < name.length;) {
       final int cp = cp(name, n);
-      if(lax) {
-        tb.add(cp == '_' ? ' ' : cp);
-      } else if(mode >= 3) {
-        uc = (uc << 4) + cp - (cp >= '0' && cp <= '9' ? '0' : cp >= 'a' ? 0x57 : 0x37);
+      if(mode >= 3) {
+        uc <<= 4;
+        if(cp >= '0' && cp <= '9') {
+          uc += cp - '0';
+        } else if(cp >= 'A' && cp <= 'F') {
+          uc += cp - 0x37;
+        } else if(cp >= 'a' && cp <= 'f') {
+          uc += cp - 0x57;
+        } else {
+          return null;
+        }
         if(++mode == 7) {
           tb.add(uc);
           mode = 0;
@@ -243,13 +253,15 @@ public final class XMLToken {
       }
       n += cl(name, n);
     }
+
     if(mode == 2) {
       tb.add('_');
     } else if(mode > 0 && !tb.isEmpty()) {
-      tb.add('?');
+      return null;
     }
-    return tb.trim().finish();
+    return tb.finish();
   }
+
   /** HTML entities. */
   private static final String[] HTMLENTITIES = { "Aacute", "\u00c1", "aacute",
     "\u00e1", "Acirc", "\u00c2", "acirc", "\u00e2", "acute", "\u00b4",

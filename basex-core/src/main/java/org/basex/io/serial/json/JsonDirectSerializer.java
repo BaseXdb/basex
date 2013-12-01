@@ -97,7 +97,9 @@ public final class JsonDirectSerializer extends JsonSerializer {
         if(atts && !eq(tag, PAIR)) error("<%> found, <%> expected", tag, PAIR);
         if(key == null) error("<%> has no name attribute", tag);
         print('"');
-        print(XMLToken.decode(key, lax));
+        final byte[] name = XMLToken.decode(key, lax);
+        if(name == null) error("Name of element <%> is invalid", key);
+        print(name);
         print("\":");
         if(indent) print(' ');
       } else if(eq(ptype, ARRAY)) {

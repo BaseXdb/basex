@@ -41,10 +41,12 @@ public final class FNCsvTest extends AdvancedQueryTest {
     serial("<csv><record><A__>1</A__></record></csv>", "'header':true(),'lax':false()", "A_1");
     serial("<csv><record><_>1</_></record></csv>", "'header':true(),'lax':false()", "1");
     serial("<csv><record><A_0020B>1</A_0020B></record></csv>", "'header':'yes','lax':'no'", "A B1");
-    serial("<csv><record><_A_>1</_A_></record></csv>", "'header':true(),'lax':true()", "A1");
-    serial("<csv><record><_>1</_></record></csv>", "'header':true(),'lax':true()", "1");
+
+    serial("<csv><record><_A_>1</_A_></record></csv>", "'header':true(),'lax':true()", "_A_1");
+    serial("<csv><record><_>1</_></record></csv>", "'header':true(),'lax':true()", "_1");
+    serial("<csv><record><__>1</__></record></csv>", "'header':true(),'lax':true()", "__1");
     serial("<csv><record><A_0020B>1</A_0020B></record></csv>",
-        "'header':'yes','lax':'yes'", "A 0020B1");
+        "'header':'yes','lax':'yes'", "A_0020B1");
 
     serial("<csv/>", "", "");
 
@@ -61,8 +63,8 @@ public final class FNCsvTest extends AdvancedQueryTest {
     serial("<csv><record><A>1</A></record><record><A>2</A></record></csv>",
         "'header':'yes'", "A12");
 
-    serial("<csv><record><A_B>1</A_B></record></csv>", "'header':'yes'", "A B1");
-    serial("<csv><record><A__B>1</A__B></record></csv>", "'header':true()", "A  B1");
+    serial("<csv><record><A_B>1</A_B></record></csv>", "'header':'yes'", "A_B1");
+    serial("<csv><record><A__B>1</A__B></record></csv>", "'header':true()", "A__B1");
 
     serial("<csv><record><A>1\n2</A></record></csv>", "'header':'yes'", "A\"12\"");
     serial("<csv><record><A>\"</A></record></csv>", "'header':'yes'", "A\"\"\"\"");
