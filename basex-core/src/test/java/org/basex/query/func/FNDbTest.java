@@ -351,8 +351,6 @@ public final class FNDbTest extends AdvancedQueryTest {
     query("for $i in 1 to 5 return " + _DB_CREATE.args(" '" + dbname + "' || $i"));
     query("for $i in 1 to 5 return " + _DB_DROP.args(" '" + dbname + "' || $i"));
 
-    error(_DB_CREATE.args(dbname, ""), Err.WHICHRES);
-
     // create DB with initial EMPTY content
     error(_DB_CREATE.args(""), Err.BXDB_NAME);
 

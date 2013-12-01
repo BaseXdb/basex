@@ -36,11 +36,11 @@ public final class IOFile extends IO {
 
   /**
    * Constructor.
-   * @param f file reference
+   * @param fl file reference
    */
-  public IOFile(final File f) {
-    super(new PathList().create(f.getAbsolutePath()));
-    file = f;
+  public IOFile(final File fl) {
+    super(new PathList().create(fl.getAbsolutePath()));
+    file = fl.isAbsolute() ? fl : fl.getAbsoluteFile();
   }
 
   /**

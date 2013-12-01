@@ -452,7 +452,6 @@ public final class EditorView extends View {
         refreshHistory(null);
         Util.debug(ex);
         BaseXDialog.error(gui, Util.info(FILE_NOT_OPENED_X, file));
-        ex.printStackTrace();
         return null;
       }
     }

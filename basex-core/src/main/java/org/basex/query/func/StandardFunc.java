@@ -181,7 +181,7 @@ public abstract class StandardFunc extends Arr {
   File checkFile(final int i, final QueryContext ctx) throws QueryException {
     if(i >= expr.length) return null;
     final String file = string(checkStr(expr[i], ctx));
-    return (IOUrl.isFileURL(file) ? IOFile.get(file) : new IOFile(file)).file();
+    return IOUrl.isFileURL(file) ? IOFile.get(file).file() : new File(file);
   }
 
   /**
