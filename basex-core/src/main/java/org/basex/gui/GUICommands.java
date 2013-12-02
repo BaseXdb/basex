@@ -795,7 +795,7 @@ public enum GUICommands implements GUICmd {
   /** Menu label. */
   private final String label;
   /** Key shortcut. */
-  private final String key;
+  private final Object key;
   /** Help string. */
   private final String help;
   /** Displays a checkbox, indicating the current selection state. */
@@ -804,7 +804,7 @@ public enum GUICommands implements GUICmd {
   /**
    * Constructor.
    * @param l label of the menu item
-   * @param k key shortcut
+   * @param k shortcut
    * @param h help string
    * @param d requires a database to be opened
    * @param c displays a checkbox, indicating the current selection state
@@ -832,7 +832,7 @@ public enum GUICommands implements GUICmd {
   public String label() { return label; }
 
   @Override
-  public String key() { return key; }
+  public Object key() { return key; }
 
   // STATIC METHODS ===========================================================
 

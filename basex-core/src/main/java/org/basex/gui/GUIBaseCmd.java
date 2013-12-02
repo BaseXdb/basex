@@ -26,7 +26,7 @@ public abstract class GUIBaseCmd implements GUICmd {
     return null;
   }
   @Override
-  public String key() {
+  public Object key() {
     return null;
   }
   @Override

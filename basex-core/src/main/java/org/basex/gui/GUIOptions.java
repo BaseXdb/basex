@@ -34,6 +34,8 @@ public final class GUIOptions extends Options {
   public static final StringsOption EDITOR = new StringsOption("EDITOR");
   /** Input paths. */
   public static final StringsOption INPUTS = new StringsOption("INPUTS");
+  /** Open editor files. */
+  public static final StringsOption OPEN = new StringsOption("OPEN");
 
   /** Comment: written to options file. */
   public static final Comment C_LAYOUT = new Comment("Layout");

@@ -56,8 +56,7 @@ public final class GUIMenu extends JMenuBar {
         } else if(cmd != null) {
           // add a menu entry
           final JMenuItem item = newItem(cmd, gui, mnem);
-          final String sc = cmd.key();
-          if(sc != null) item.setAccelerator(KeyStroke.getKeyStroke(Util.info(sc, GUICmd.META)));
+          item.setAccelerator(BaseXLayout.keyStroke(cmd.key()));
           items[c++] = item;
           if(Prop.langright) {
             item.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);

@@ -267,6 +267,16 @@ public final class EditorView extends View {
         if(file instanceof File) open(new IOFile((File) file));
       }
     });
+
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        // remember opened files
+        for(final String file : gui.gopts.get(GUIOptions.OPEN)) {
+          open(new IOFile(file), false);
+        }
+      }
+    });
   }
 
   @Override
@@ -689,13 +699,20 @@ public final class EditorView extends View {
 
   /**
    * Shows a quit dialog for all modified query files.
-   * @return {@code false} if confirmation was canceled
+   * @return result of check
    */
   public boolean confirm() {
+    // save modified files
     for(final EditorArea edit : editors()) {
       tabs.setSelectedComponent(edit);
-      if(!close(edit)) return false;
+      if(!confirm(edit)) return false;
     }
+    // remember opened files
+    final StringList files = new StringList();
+    for(final EditorArea edit : editors()) {
+      if(edit.opened()) files.add(edit.file.path());
+    }
+    gui.gopts.set(GUIOptions.OPEN, files.toArray());
     return true;
   }
 

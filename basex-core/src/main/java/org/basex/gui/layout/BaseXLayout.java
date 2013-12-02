@@ -103,6 +103,21 @@ public final class BaseXLayout {
   }
 
   /**
+   * Returns a keystroke for the specified string.
+   * @param sc shortcut string
+   * @return keystroke
+   */
+  public static KeyStroke keyStroke(final Object sc) {
+    if(sc == null) return null;
+
+    final String scut = sc instanceof BaseXKeys ? ((BaseXKeys) sc).shortCut() :
+      Util.info(sc, GUICmd.META);
+    final KeyStroke ks = KeyStroke.getKeyStroke(scut);
+    if(ks == null) Util.errln("Could not assign shortcut: " + sc + " / " + scut);
+    return ks;
+  }
+
+  /**
    * Sets a mnemomic for the specified button.
    * @param b button
    * @param mnem mnemonics that have already been assigned

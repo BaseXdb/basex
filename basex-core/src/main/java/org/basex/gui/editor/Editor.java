@@ -125,9 +125,11 @@ public class Editor extends BaseXPanel {
     }
 
     new BaseXPopup(this, edit ?
-      new GUICmd[] { new UndoCmd(), new RedoCmd(), null, new CutCmd(),
-        new CopyCmd(), new PasteCmd(), new DelCmd(), null, new AllCmd() } :
-      new GUICmd[] { new CopyCmd(), null, new AllCmd() });
+      new GUICmd[] { new UndoCmd(), new RedoCmd(), null,
+        new CutCmd(), new CopyCmd(), new PasteCmd(), new DelCmd(), null,
+        new FindNextCmd(), new FindPrevCmd(), null, new AllCmd() } :
+      new GUICmd[] { new CopyCmd(), null, new FindNextCmd(), new FindPrevCmd(), null,
+        new AllCmd() });
   }
 
   /**
@@ -476,11 +478,12 @@ public class Editor extends BaseXPanel {
         search.activate(text.copy(), true);
         return;
       }
-      if(FINDNEXT.is(e) || FINDNEXT2.is(e) || FINDPREV.is(e) || FINDPREV2.is(e)) {
-        final boolean vis = search.isVisible();
-        search.activate(text.copy(), false);
-        jump(vis ? FINDNEXT.is(e) || FINDNEXT2.is(e) ?
-          SearchDir.FORWARD : SearchDir.BACKWARD : SearchDir.CURRENT, true);
+      if(FINDNEXT.is(e) || FINDNEXT2.is(e)) {
+        find(true);
+        return;
+      }
+      if(FINDPREV.is(e) || FINDPREV2.is(e)) {
+        find(false);
         return;
       }
     }
@@ -853,13 +856,11 @@ public class Editor extends BaseXPanel {
       finish(-1);
     }
     @Override
-    public boolean enabled(final GUI main) {
-      return !hist.first();
-    }
+    public boolean enabled(final GUI main) { return !hist.first(); }
     @Override
-    public String label() {
-      return UNDO;
-    }
+    public String label() { return UNDO; }
+    @Override
+    public BaseXKeys key() { return UNDOSTEP; }
   }
 
   /** Redo command. */
@@ -874,13 +875,11 @@ public class Editor extends BaseXPanel {
       finish(-1);
     }
     @Override
-    public boolean enabled(final GUI mein) {
-      return !hist.last();
-    }
+    public boolean enabled(final GUI mein) { return !hist.last(); }
     @Override
-    public String label() {
-      return REDO;
-    }
+    public String label() { return REDO; }
+    @Override
+    public BaseXKeys key() { return REDOSTEP; }
   }
 
   /** Cut command. */
@@ -896,29 +895,23 @@ public class Editor extends BaseXPanel {
       finish(tc);
     }
     @Override
-    public boolean enabled(final GUI main) {
-      return text.selected();
-    }
+    public boolean enabled(final GUI main) { return text.selected(); }
     @Override
-    public String label() {
-      return CUT;
-    }
+    public String label() { return CUT; }
+    @Override
+    public BaseXKeys key() { return CUT1; }
   }
 
   /** Copy command. */
   class CopyCmd extends GUIBaseCmd {
     @Override
-    public void execute(final GUI main) {
-      copy();
-    }
+    public void execute(final GUI main) { copy(); }
     @Override
-    public boolean enabled(final GUI main) {
-      return text.selected();
-    }
+    public boolean enabled(final GUI main) { return text.selected(); }
     @Override
-    public String label() {
-      return COPY;
-    }
+    public String label() { return COPY; }
+    @Override
+    public BaseXKeys key() { return COPY1; }
   }
 
   /** Paste command. */
@@ -935,13 +928,11 @@ public class Editor extends BaseXPanel {
       finish(tc);
     }
     @Override
-    public boolean enabled(final GUI main) {
-      return clip() != null;
-    }
+    public boolean enabled(final GUI main) { return clip() != null; }
     @Override
-    public String label() {
-      return PASTE;
-    }
+    public String label() { return PASTE; }
+    @Override
+    public BaseXKeys key() { return PASTE1; }
   }
 
   /** Delete command. */
@@ -955,24 +946,54 @@ public class Editor extends BaseXPanel {
       finish(tc);
     }
     @Override
-    public boolean enabled(final GUI main) {
-      return text.selected();
-    }
+    public boolean enabled(final GUI main) { return text.selected(); }
     @Override
-    public String label() {
-      return DELETE;
-    }
+    public String label() { return DELETE; }
+    @Override
+    public BaseXKeys key() { return DELNEXT; }
   }
 
   /** Select all command. */
   class AllCmd extends GUIBaseCmd {
     @Override
-    public void execute(final GUI main) {
-      selectAll();
-    }
+    public void execute(final GUI main) { selectAll(); }
     @Override
-    public String label() {
-      return SELECT_ALL;
-    }
+    public String label() { return SELECT_ALL; }
+    @Override
+    public BaseXKeys key() { return SELECTALL; }
+  }
+
+  /** Find next hit. */
+  class FindNextCmd extends GUIBaseCmd {
+    @Override
+    public void execute(final GUI main) { find(true); }
+    @Override
+    public String label() { return "Find next"; }
+    @Override
+    public boolean enabled(final GUI main) { return search.isVisible(); }
+    @Override
+    public BaseXKeys key() { return FINDNEXT; }
+  }
+
+  /** Find previous hit. */
+  class FindPrevCmd extends GUIBaseCmd {
+    @Override
+    public void execute(final GUI main) { find(true); }
+    @Override
+    public String label() { return "Find previous"; }
+    @Override
+    public boolean enabled(final GUI main) { return search.isVisible(); }
+    @Override
+    public BaseXKeys key() { return FINDPREV; }
+  }
+
+  /**
+   * Highlights the next/previous hit.
+   * @param next next/previous hit
+   */
+  void find(final boolean next) {
+    final boolean vis = search.isVisible();
+    search.activate(text.copy(), false);
+    jump(vis ? next ? SearchDir.FORWARD : SearchDir.BACKWARD : SearchDir.CURRENT, true);
   }
 }

@@ -84,6 +84,7 @@ public enum BaseXKeys {
   /** Browse home.           */ GOHOME(MAC ? META : ALT, VK_HOME, true),
 
   /** Refresh.               */ REFRESH(VK_F5),
+  /** Rename.                */ RENAME(VK_F2),
   /** Jump to project.       */ PROJECT(META | SHIFT, VK_R, true),
   /** Jump to filter.        */ FILTER(META | SHIFT, VK_T, true),
   /** New directory.         */ NEWDIR(META | SHIFT, VK_N),
@@ -199,5 +200,22 @@ public enum BaseXKeys {
     final StringBuilder sb = new StringBuilder(getKeyModifiersText(mod));
     if(sb.length() != 0) sb.append('+');
     return sb.append(KeyEvent.getKeyText(key)).toString();
+  }
+
+  /**
+   * Returns a shortcut string.
+   * @return shortcut string
+   */
+  public String shortCut() {
+    final StringBuilder sb = new StringBuilder();
+    if((mod & InputEvent.META_MASK) != 0) sb.append("meta").append(' ');
+    if((mod & InputEvent.CTRL_MASK) != 0) sb.append("ctrl").append(' ');
+    if((mod & InputEvent.ALT_MASK) != 0) sb.append("alt").append(' ');
+    if((mod & InputEvent.SHIFT_MASK) != 0) sb.append("shift").append(' ');
+
+    if(key == KeyEvent.VK_ENTER) sb.append("ENTER");
+    else if(key == KeyEvent.VK_DELETE) sb.append("DELETE");
+    else sb.append(KeyEvent.getKeyText(key));
+    return sb.toString();
   }
 }

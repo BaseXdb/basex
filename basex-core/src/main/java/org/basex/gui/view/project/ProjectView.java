@@ -286,7 +286,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
     @Override
     public String label() { return REFRESH; }
     @Override
-    public String key() { return BaseXKeys.REFRESH.toString(); }
+    public BaseXKeys key() { return BaseXKeys.REFRESH; }
   }
 
   /** New directory command. */
@@ -325,7 +325,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
     @Override
     public String label() { return NEW_DIR; }
     @Override
-    public String key() { return "% shift N"; }
+    public BaseXKeys key() { return BaseXKeys.NEWDIR; }
   }
 
   /** Delete command. */
@@ -355,7 +355,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
     @Override
     public String label() { return DELETE + DOTS; }
     @Override
-    public String key() { return "DELETE"; }
+    public BaseXKeys key() { return BaseXKeys.DELNEXT; }
   }
 
   /** Rename command. */
@@ -374,7 +374,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
     @Override
     public String label() { return RENAME; }
     @Override
-    public String key() { return "F2"; }
+    public BaseXKeys key() { return BaseXKeys.RENAME; }
   }
 
   /** Change directory command. */
@@ -393,9 +393,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
       }
     }
     @Override
-    public boolean enabled(final GUI main) {
-      return true;
-    }
+    public boolean enabled(final GUI main) { return true; }
     @Override
     public String label() { return CHOOSE_DIR + DOTS; }
   }
@@ -417,7 +415,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
     @Override
     public String label() { return OPEN; }
     @Override
-    public String key() { return "ENTER"; }
+    public BaseXKeys key() { return BaseXKeys.ENTER; }
   }
 
   /** Change directory command. */
@@ -443,6 +441,6 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
     @Override
     public String label() { return OPEN_NATIVELY; }
     @Override
-    public String key() { return "shift ENTER"; }
+    public BaseXKeys key() { return BaseXKeys.SHIFT_ENTER; }
   }
 }

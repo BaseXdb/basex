@@ -50,5 +50,5 @@ public interface GUICmd {
    * Returns the command shortcut.
    * @return command shortcut
    */
-  String key();
+  Object key();
 }
