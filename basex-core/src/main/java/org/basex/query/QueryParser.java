@@ -3814,15 +3814,15 @@ public class QueryParser extends InputParser {
     // static variable
     final byte[] uri = name.uri();
 
-    // in XQuery 1.0 only forward declarations are allowed (except for implicit variables)
     final boolean main = module == null, implicit = main && uri.length == 0;
-    if(!(sc.xquery3() || ctx.vars.declared(name) || implicit)) {
+    // in XQuery 1.0 only forward declarations are allowed (except for implicit variables)
+    if(!(sc.xquery3() || ctx.vars.declared(name) || implicit) ||
+       // GUI mode: only allow declared variables
+       Prop.gui && !ctx.vars.exists(name) ||
+       // library module: variable must be declared by the same or a directly imported module
+       !(main || eq(module.uri(), uri) || modules.contains(uri))) {
       throw error(VARUNDEF, '$' + string(name.string()));
     }
-
-    // variable has to be declared by the same or a directly imported module
-    if(!(main || eq(module.uri(), uri) || modules.contains(uri)))
-      throw error(VARUNDEF, '$' + string(name.string()));
 
     return ctx.vars.newRef(name, sc, ii);
   }

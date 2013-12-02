@@ -89,6 +89,15 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   }
 
   /**
+   * Checks if a variable with the given name exists.
+   * @param nm variable name
+   * @return result of check
+   */
+  public boolean exists(final QNm nm) {
+    return vars.get(nm) != null;
+  }
+
+  /**
    * Checks if a variable with the given name was already declared.
    * @param nm variable name
    * @return result of check
@@ -109,6 +118,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    */
   public StaticVarRef newRef(final QNm nm, final StaticContext sctx, final InputInfo ii)
       throws QueryException {
+
     final StaticVarRef ref = new StaticVarRef(ii, nm, sctx);
     final VarEntry e = vars.get(nm), entry = e != null ? e : new VarEntry(null);
     if(e == null) vars.put(nm, entry);
@@ -124,6 +134,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    */
   public void bindExternal(final QueryContext ctx, final HashMap<QNm, Expr> bindings)
       throws QueryException {
+
     for(final Entry<QNm, Expr> e : bindings.entrySet()) {
       final VarEntry ve = vars.get(e.getKey());
       if(ve != null) ve.var.bind(e.getValue(), ctx);
