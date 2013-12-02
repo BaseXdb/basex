@@ -961,6 +961,12 @@ public interface Text {
   String SEARCH_FILES = lang("search_files");
   /** "Search". */
   String SEARCH_CONTENTS = lang("search_contents");
+  /** "Find next ". */
+  String FIND_NEXT = lang("find_next");
+  /** "Find previous". */
+  String FIND_PREVIOUS = lang("find_previous");
+  /** "Jump to error". */
+  String NEXT_ERROR = lang("next_error");
 
   /** "Command". */
   String COMMAND = lang("command");

@@ -61,7 +61,7 @@ public final class BaseXPopup extends JPopupMenu {
       }
     });
 
-    final StringBuilder gmnem = new StringBuilder();
+    final StringBuilder mnemCache = new StringBuilder();
     for(final GUICmd cmd : pop) {
       if(cmd == null) {
         addSeparator();
@@ -73,8 +73,8 @@ public final class BaseXPopup extends JPopupMenu {
             if(!gui.updating) cmd.execute(gui);
           }
         });
-        BaseXLayout.setMnemonic(item, gmnem);
-        item.setAccelerator(BaseXLayout.keyStroke(cmd.key()));
+        BaseXLayout.setMnemonic(item, mnemCache);
+        item.setAccelerator(BaseXLayout.keyStroke(cmd));
         item.setToolTipText(cmd.help());
       }
     }

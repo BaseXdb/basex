@@ -1,4 +1,4 @@
-﻿# LANGUAGE FILE, TRANSLATED BY
+# LANGUAGE FILE, TRANSLATED BY
 # Adrian Berila
 
 OFF                  = Oprit
@@ -136,6 +136,8 @@ file_patterns        = Modele de fişiere (separate prin virgule)
 files_replace_%      = Fişierele vor fi înlocuite în %, n\ Doriţi să continuaţi?
 filter               = Filtrare
 filter_selected      = Filtrare selectata
+find_next            = Find next
+find_previous        = Find previous
 finishing            = In curs de terminare...
 first_line_header    = Parsare a primei linii ca antent al tabelului.
 folder               = Director
@@ -211,6 +213,7 @@ namespaces           = Spaţii de nume
 new                  = Nou
 new_db_question      = Nu doriţi să creaţi una noua?
 new_dir              = Nou director
+next_error           = Next error
 no                   = Nu
 no_data              = Nu există date disponibile.
 no_db_dropped        = Nici o baza de date nu a fost stearsa

@@ -83,12 +83,12 @@ public final class EditorView extends View {
   /** Thread counter. */
   private int threadID;
 
-  /** Last error message. */
-  private String errMsg;
   /** Most recent error position; used for clicking on error message. */
   private int errPos;
   /** File in which the most recent error occurred. */
-  IOFile errFile;
+  public IOFile errFile;
+  /** Last error message. */
+  public String errMsg;
 
   /**
    * Default constructor.
@@ -626,7 +626,7 @@ public final class EditorView extends View {
   /**
    * Jumps to the current error.
    */
-  void jumpToError() {
+  public void jumpToError() {
     if(errMsg != null) error(true);
   }
 

@@ -125,10 +125,14 @@ public class Editor extends BaseXPanel {
     }
 
     new BaseXPopup(this, edit ?
-      new GUICmd[] { new UndoCmd(), new RedoCmd(), null,
+      new GUICmd[] {
+        new JumpErrorCmd(), new FindNextCmd(), new FindPrevCmd(), null,
+        new UndoCmd(), new RedoCmd(), null,
         new CutCmd(), new CopyCmd(), new PasteCmd(), new DelCmd(), null,
-        new FindNextCmd(), new FindPrevCmd(), null, new AllCmd() } :
-      new GUICmd[] { new CopyCmd(), null, new FindNextCmd(), new FindPrevCmd(), null,
+        new AllCmd() } :
+      new GUICmd[] {
+        new FindNextCmd(), new FindPrevCmd(), null,
+        new CopyCmd(), null,
         new AllCmd() });
   }
 
@@ -968,7 +972,7 @@ public class Editor extends BaseXPanel {
     @Override
     public void execute(final GUI main) { find(true); }
     @Override
-    public String label() { return "Find next"; }
+    public String label() { return FIND_NEXT; }
     @Override
     public boolean enabled(final GUI main) { return search.isVisible(); }
     @Override
@@ -980,11 +984,23 @@ public class Editor extends BaseXPanel {
     @Override
     public void execute(final GUI main) { find(true); }
     @Override
-    public String label() { return "Find previous"; }
+    public String label() { return FIND_PREVIOUS; }
     @Override
     public boolean enabled(final GUI main) { return search.isVisible(); }
     @Override
     public BaseXKeys key() { return FINDPREV; }
+  }
+
+  /** Find previous hit. */
+  class JumpErrorCmd extends GUIBaseCmd {
+    @Override
+    public void execute(final GUI main) { gui.editor.jumpToError(); }
+    @Override
+    public String label() { return NEXT_ERROR; }
+    @Override
+    public boolean enabled(final GUI main) { return gui.editor.errMsg != null; }
+    @Override
+    public BaseXKeys key() { return FINDERROR; }
   }
 
   /**

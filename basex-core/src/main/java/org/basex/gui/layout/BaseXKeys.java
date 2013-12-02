@@ -215,6 +215,7 @@ public enum BaseXKeys {
 
     if(key == KeyEvent.VK_ENTER) sb.append("ENTER");
     else if(key == KeyEvent.VK_DELETE) sb.append("DELETE");
+    else if(key == KeyEvent.VK_PERIOD) sb.append("PERIOD");
     else sb.append(KeyEvent.getKeyText(key));
     return sb.toString();
   }

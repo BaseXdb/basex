@@ -104,10 +104,11 @@ public final class BaseXLayout {
 
   /**
    * Returns a keystroke for the specified string.
-   * @param sc shortcut string
+   * @param cmd command
    * @return keystroke
    */
-  public static KeyStroke keyStroke(final Object sc) {
+  public static KeyStroke keyStroke(final GUICmd cmd) {
+    final Object sc = cmd.key();
     if(sc == null) return null;
 
     final String scut = sc instanceof BaseXKeys ? ((BaseXKeys) sc).shortCut() :

@@ -47,7 +47,7 @@ public final class GUIMenu extends JMenuBar {
       BaseXLayout.setMnemonic(menu, gmnem);
 
       // create menu point for each sub menu entry
-      final StringBuilder mnem = new StringBuilder();
+      final StringBuilder mnemCache = new StringBuilder();
       for(int i = 0; i < MENUITEMS[b].length; ++i) {
         // add a separator
         final GUICmd cmd = MENUITEMS[b][i];
@@ -55,8 +55,8 @@ public final class GUIMenu extends JMenuBar {
           menu.addSeparator();
         } else if(cmd != null) {
           // add a menu entry
-          final JMenuItem item = newItem(cmd, gui, mnem);
-          item.setAccelerator(BaseXLayout.keyStroke(cmd.key()));
+          final JMenuItem item = newItem(cmd, gui, mnemCache);
+          item.setAccelerator(BaseXLayout.keyStroke(cmd));
           items[c++] = item;
           if(Prop.langright) {
             item.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
