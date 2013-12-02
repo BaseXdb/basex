@@ -696,7 +696,7 @@ public final class EditorText {
           // add closing element
           sb.append("</");
           while(++p < ps) sb.append((char) text[p]);
-          sb.append(">\n");
+          sb.append('>');
           break;
         }
         return;

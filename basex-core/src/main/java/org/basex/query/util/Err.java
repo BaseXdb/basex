@@ -299,32 +299,32 @@ public enum Err {
   /** CX0028. */
   CX_SIGTYPINV(CX, 28, "Signature type is not supported."),
 
-  /** FILE0001. */
-  FILE_WHICH(FILE, 1, "Path '%' does not exist."),
-  /** FILE0002. */
-  FILE_EXISTS(FILE, 2, "File '%' already exists."),
-  /** FILE0003. */
-  FILE_NODIR(FILE, 3, "Path '%' is no directory."),
-  /** FILE0004. */
-  FILE_DIR(FILE, 4, "Path '%' is a directory."),
-  /** FILE0004. */
-  FILE_NEDIR(FILE, 4, "Path '%' is a non-empty directory."),
-  /** FILE0005. */
-  FILE_ENCODING(FILE, 5, "Unknown encoding '%'."),
-  /** FILE0006. */
-  FILE_BOUNDS(FILE, 6, "Requested file chunk [%,%] exceeds file bounds."),
-  /** FILE9999. */
-  FILE_IO(FILE, 9999, "%"),
-  /** FILE9999. */
-  FILE_CREATE(FILE, 9999, "Directory '%' cannot be created."),
-  /** FILE9999. */
-  FILE_DEL(FILE, 9999, "Path '%' cannot be deleted."),
-  /** FILE9999. */
-  FILE_MOVE(FILE, 9999, "Moving '%' to '%' failed."),
-  /** FILE9999. */
-  FILE_LIST(FILE, 9999, "Files of '%' cannot be accessed."),
-  /** FILE9999. */
-  FILE_PATH(FILE, 9999, "Invalid file path: '%'."),
+  /** File error. */
+  FILE_NF(FILE, "not-found", "File '%' does not exist."),
+  /** File error. */
+  FILE_E(FILE, "exists", "File '%' already exists."),
+  /** File error. */
+  FILE_ND(FILE, "no-dir", "Path '%' is no directory."),
+  /** File error. */
+  FILE_ID(FILE, "is-dir", "Path '%' is a directory."),
+  /** File error. */
+  FILE_ID_FULL(FILE, "is-dir", "Path '%' is a non-empty directory."),
+  /** File error. */
+  FILE_UE(FILE, "unknown-encoding", "Unknown encoding '%'."),
+  /** File error. */
+  FILE_OOR(FILE, "out-of-range", "Requested file chunk [%,%] exceeds file bounds."),
+  /** File error. */
+  FILE_IE(FILE, "io-error", "%"),
+  /** File error. */
+  FILE_IE_DIR(FILE, "io-error", "Directory '%' cannot be created."),
+  /** File error. */
+  FILE_IE_DEL(FILE, "io-error", "Path '%' cannot be deleted."),
+  /** File error. */
+  FILE_IE_MOVE(FILE, "io-error", "Moving '%' to '%' failed."),
+  /** File error. */
+  FILE_IE_ACCESS(FILE, "io-error", "Files of '%' cannot be accessed."),
+  /** File error. */
+  FILE_IE_PATH(FILE, "io-error", "Invalid file path: '%'."),
 
   /** HASH0001. */
   HASH_ALG(HASH, 1, "Algorithm not supported: '%'."),
@@ -1210,12 +1210,12 @@ public enum Err {
 
     // EXPath errors
 
+    /** ARCH Error type. */ ARCH(QueryText.EXPERR, QueryText.EXPERROR),
     /** BIN  Error type. */ BIN(QueryText.BIN,     QueryText.BINURI),
     /** CX   Error type. */ CX(QueryText.EXPERR,   QueryText.EXPERROR),
-    /** FILE Error type. */ FILE(QueryText.EXPERR, QueryText.EXPERROR),
+    /** FILE Error type. */ FILE(QueryText.FILE,   QueryText.FILEURI),
     /** HC   Error type. */ HC(QueryText.EXPERR,   QueryText.EXPERROR),
     /** ZIP  Error type. */ ZIP(QueryText.EXPERR,  QueryText.EXPERROR),
-    /** ARCH Error type. */ ARCH(QueryText.EXPERR, QueryText.EXPERROR),
 
     // W3 errors
 

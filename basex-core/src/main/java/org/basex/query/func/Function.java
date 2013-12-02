@@ -710,9 +710,9 @@ public enum Function {
   /** XQuery function. */
   _FILE_TEMP_DIR(FNFile.class, "temp-dir()", arg(), STR),
   /** XQuery function. */
-  _FILE_BASE_NAME(FNFile.class, "base-name(path[,suffix])", arg(STR, STR), STR),
+  _FILE_NAME(FNFile.class, "name(path)", arg(STR), STR),
   /** XQuery function. */
-  _FILE_DIR_NAME(FNFile.class, "dir-name(path)", arg(STR), STR),
+  _FILE_PARENT(FNFile.class, "parent(path)", arg(STR), STR_ZO),
   /** XQuery function. */
   _FILE_PATH_TO_URI(FNFile.class, "path-to-uri(path)", arg(STR), URI),
   /** XQuery function. */

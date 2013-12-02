@@ -62,13 +62,13 @@ public final class FNFile extends StandardFunc {
         case _FILE_APPEND_BINARY:     return writeBinary(true, ctx);
         case _FILE_APPEND_TEXT:       return writeText(true, ctx);
         case _FILE_APPEND_TEXT_LINES: return writeTextLines(true, ctx);
-        case _FILE_BASE_NAME:         return baseName(ctx);
+        case _FILE_NAME:              return name(ctx);
         case _FILE_COPY:              return relocate(true, ctx);
         case _FILE_CREATE_DIR:        return createDir(ctx);
         case _FILE_CREATE_TEMP_DIR:   return createTemp(true, ctx);
         case _FILE_CREATE_TEMP_FILE:  return createTemp(false, ctx);
         case _FILE_DELETE:            return delete(ctx);
-        case _FILE_DIR_NAME:          return dirName(ctx);
+        case _FILE_PARENT:            return parent(ctx);
         case _FILE_DIR_SEPARATOR:     return Str.get(File.separator);
         case _FILE_EXISTS:            return Bln.get(checkFile(0, ctx).exists());
         case _FILE_IS_DIR:            return Bln.get(checkFile(0, ctx).isDirectory());
@@ -91,7 +91,7 @@ public final class FNFile extends StandardFunc {
         default:                      return super.item(ctx, ii);
       }
     } catch(final IOException ex) {
-      throw FILE_IO.get(info, ex);
+      throw FILE_IE.get(info, ex);
     }
   }
 
@@ -103,7 +103,7 @@ public final class FNFile extends StandardFunc {
    */
   private Item lastModified(final QueryContext ctx) throws QueryException {
     final File path = checkFile(0, ctx);
-    if(!path.exists()) throw FILE_WHICH.get(info, path.getAbsolutePath());
+    if(!path.exists()) throw FILE_NF.get(info, path.getAbsolutePath());
     return new Dtm(path.lastModified(), info);
   }
 
@@ -115,7 +115,7 @@ public final class FNFile extends StandardFunc {
    */
   private Item size(final QueryContext ctx) throws QueryException {
     final File path = checkFile(0, ctx);
-    if(!path.exists()) throw FILE_WHICH.get(info, path.getAbsolutePath());
+    if(!path.exists()) throw FILE_NF.get(info, path.getAbsolutePath());
     return Int.get(path.isDirectory() ? 0 : path.length());
   }
 
@@ -125,14 +125,8 @@ public final class FNFile extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  private Str baseName(final QueryContext ctx) throws QueryException {
-    final File path = checkFile(0, ctx);
-    if(path.getPath().isEmpty()) return Str.get(".");
-    final String suf = expr.length < 2 ? null : string(checkStr(expr[1], ctx));
-    String pth = path.getName();
-    if(suf != null && pth.endsWith(suf))
-      pth = pth.substring(0, pth.length() - suf.length());
-    return Str.get(pth);
+  private Str name(final QueryContext ctx) throws QueryException {
+    return Str.get(checkFile(0, ctx).getName());
   }
 
   /**
@@ -141,11 +135,9 @@ public final class FNFile extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  private Str dirName(final QueryContext ctx) throws QueryException {
-    final File file = checkFile(0, ctx);
-    String par = file.getParent();
-    if(par == null) par = file.toString().contains(File.separator) ? "" : ".";
-    return Str.get(dir(par));
+  private Str parent(final QueryContext ctx) throws QueryException {
+    final String parent = checkFile(0, ctx).getParent();
+    return parent == null ? null : Str.get(dir(parent));
   }
 
   /**
@@ -160,7 +152,7 @@ public final class FNFile extends StandardFunc {
       final String nat = path.getCanonicalFile().getPath();
       return Str.get(path.isDirectory() ? dir(nat) : nat);
     } catch(final IOException ex) {
-      throw FILE_PATH.get(info, path);
+      throw FILE_IE_PATH.get(info, path);
     }
   }
 
@@ -182,8 +174,8 @@ public final class FNFile extends StandardFunc {
    */
   private Str resolvePath(final QueryContext ctx) throws QueryException {
     final File path = checkFile(0, ctx);
-    final String abs = path.getAbsolutePath();
-    return Str.get(path.isDirectory() ? dir(abs) : abs);
+    final File abs = path.getAbsoluteFile();
+    return Str.get(abs.isDirectory() ? dir(abs.getPath()) : abs.getPath());
   }
 
   /**
@@ -198,11 +190,11 @@ public final class FNFile extends StandardFunc {
     try {
       dir = new File(dir.getCanonicalPath());
     } catch(final IOException ex) {
-      throw FILE_PATH.get(info, dir);
+      throw FILE_IE_PATH.get(info, dir);
     }
 
     // check if the addresses path is a directory
-    if(!dir.isDirectory()) throw FILE_NODIR.get(info, dir);
+    if(!dir.isDirectory()) throw FILE_ND.get(info, dir);
 
     final boolean rec = optionalBool(1, ctx);
     final Pattern pat = expr.length == 3 ? Pattern.compile(IOFile.regex(
@@ -265,7 +257,7 @@ public final class FNFile extends StandardFunc {
       final String p2 = f.getCanonicalPath();
       return !(Prop.CASE ? p1.equals(p2) : p1.equalsIgnoreCase(p2));
     } catch(final IOException ex) {
-      throw FILE_PATH.get(info, f);
+      throw FILE_IE_PATH.get(info, f);
     }
   }
 
@@ -282,19 +274,19 @@ public final class FNFile extends StandardFunc {
     try {
       f = path.getCanonicalFile();
     } catch(final IOException ex) {
-      throw FILE_PATH.get(info, path);
+      throw FILE_IE_PATH.get(info, path);
     }
 
     // find lowest existing path
     while(!f.exists()) {
       f = f.getParentFile();
-      if(f == null) throw FILE_PATH.get(info, path);
+      if(f == null) throw FILE_IE_PATH.get(info, path);
     }
     // warn if lowest path points to a file
-    if(f.isFile()) throw FILE_EXISTS.get(info, path);
+    if(f.isFile()) throw FILE_E.get(info, path);
 
     // only create directories if path does not exist yet
-    if(!path.exists() && !path.mkdirs()) throw FILE_CREATE.get(info, path);
+    if(!path.exists() && !path.mkdirs()) throw FILE_IE_DIR.get(info, path);
     return null;
   }
 
@@ -314,7 +306,7 @@ public final class FNFile extends StandardFunc {
     final File root;
     if(expr.length > 2) {
       root = checkFile(2, ctx);
-      if(root.isFile()) throw FILE_NODIR.get(info, root);
+      if(root.isFile()) throw FILE_ND.get(info, root);
     } else {
       root = new File(Prop.TMP);
     }
@@ -329,7 +321,7 @@ public final class FNFile extends StandardFunc {
     // create directory or file
     String path = file.getPath();
     if(dir) {
-      if(!file.mkdirs()) throw FILE_CREATE.get(info, file);
+      if(!file.mkdirs()) throw FILE_IE_DIR.get(info, file);
       path = dir(path);
     } else {
       new IOFile(file).write(EMPTY);
@@ -345,11 +337,11 @@ public final class FNFile extends StandardFunc {
    */
   private synchronized Item delete(final QueryContext ctx) throws QueryException {
     final File path = checkFile(0, ctx);
-    if(!path.exists()) throw FILE_WHICH.get(info, path.getAbsolutePath());
+    if(!path.exists()) throw FILE_NF.get(info, path.getAbsolutePath());
     if(optionalBool(1, ctx)) {
       deleteRec(path);
     } else if(!path.delete()) {
-      throw (path.isDirectory() ? FILE_NEDIR : FILE_DEL).get(info, path);
+      throw (path.isDirectory() ? FILE_ID_FULL : FILE_IE_DEL).get(info, path);
     }
     return null;
   }
@@ -362,7 +354,7 @@ public final class FNFile extends StandardFunc {
   private synchronized void deleteRec(final File path) throws QueryException {
     final File[] ch = path.listFiles();
     if(ch != null) for(final File f : ch) deleteRec(f);
-    if(!path.delete()) throw FILE_DEL.get(info, path);
+    if(!path.delete()) throw FILE_IE_DEL.get(info, path);
   }
 
   /**
@@ -377,11 +369,11 @@ public final class FNFile extends StandardFunc {
     final long off = expr.length > 1 ? checkItr(expr[1], ctx) : 0;
     long len = expr.length > 2 ? checkItr(expr[2], ctx) : 0;
 
-    if(!path.exists()) throw FILE_WHICH.get(info, path.getAbsolutePath());
-    if(path.isDirectory()) throw FILE_DIR.get(info, path.getAbsolutePath());
+    if(!path.exists()) throw FILE_NF.get(info, path.getAbsolutePath());
+    if(path.isDirectory()) throw FILE_ID.get(info, path.getAbsolutePath());
 
     // read full file
-    if(expr.length == 1) return new B64Stream(new IOFile(path), FILE_IO);
+    if(expr.length == 1) return new B64Stream(new IOFile(path), FILE_IE);
 
     // read file chunk
     final DataAccess da = new DataAccess(new IOFile(path));
@@ -389,7 +381,7 @@ public final class FNFile extends StandardFunc {
       final long dlen = da.length();
       if(expr.length == 2) len = dlen - off;
       if(off < 0 || off > dlen || len < 0 || off + len > dlen)
-        throw FILE_BOUNDS.get(info, off, off + len);
+        throw FILE_OOR.get(info, off, off + len);
       da.cursor(off);
       return new B64(da.readBytes((int) len));
     } finally {
@@ -405,10 +397,10 @@ public final class FNFile extends StandardFunc {
    */
   private StrStream readText(final QueryContext ctx) throws QueryException {
     final File path = checkFile(0, ctx);
-    final String enc = encoding(1, FILE_ENCODING, ctx);
-    if(!path.exists()) throw FILE_WHICH.get(info, path.getAbsolutePath());
-    if(path.isDirectory()) throw FILE_DIR.get(info, path.getAbsolutePath());
-    return new StrStream(new IOFile(path), enc, FILE_IO, ctx);
+    final String enc = encoding(1, FILE_UE, ctx);
+    if(!path.exists()) throw FILE_NF.get(info, path.getAbsolutePath());
+    if(path.isDirectory()) throw FILE_ID.get(info, path.getAbsolutePath());
+    return new StrStream(new IOFile(path), enc, FILE_IE, ctx);
   }
 
   /**
@@ -463,7 +455,7 @@ public final class FNFile extends StandardFunc {
 
     final File path = check(checkFile(0, ctx));
     final byte[] s = checkStr(expr[1], ctx);
-    final String enc = encoding(2, FILE_ENCODING, ctx);
+    final String enc = encoding(2, FILE_UE, ctx);
     final Charset cs = enc == null || enc == UTF8 ? null : Charset.forName(enc);
 
     final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append));
@@ -488,7 +480,7 @@ public final class FNFile extends StandardFunc {
 
     final File path = check(checkFile(0, ctx));
     final Iter ir = expr[1].iter(ctx);
-    final String enc = encoding(2, FILE_ENCODING, ctx);
+    final String enc = encoding(2, FILE_UE, ctx);
     final Charset cs = enc == null || enc == UTF8 ? null : Charset.forName(enc);
 
     final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append));
@@ -538,7 +530,7 @@ public final class FNFile extends StandardFunc {
       final RandomAccessFile raf = new RandomAccessFile(path, "rw");
       try {
         final long dlen = raf.length();
-        if(off < 0 || off > dlen) throw FILE_BOUNDS.get(info, off, dlen);
+        if(off < 0 || off > dlen) throw FILE_OOR.get(info, off, dlen);
         raf.seek(off);
         raf.write(bin.binary(info));
       } finally {
@@ -556,9 +548,9 @@ public final class FNFile extends StandardFunc {
    */
   private File check(final File path) throws QueryException {
     final IOFile io = new IOFile(path);
-    if(io.isDir()) throw FILE_DIR.get(info, io);
+    if(io.isDir()) throw FILE_ID.get(info, io);
     final IOFile dir = io.dir();
-    if(!dir.exists()) throw FILE_NODIR.get(info, dir);
+    if(!dir.exists()) throw FILE_ND.get(info, dir);
     return path;
   }
 
@@ -575,18 +567,18 @@ public final class FNFile extends StandardFunc {
 
     final File src = checkFile(0, ctx).getCanonicalFile();
     File trg = checkFile(1, ctx).getCanonicalFile();
-    if(!src.exists()) throw FILE_WHICH.get(info, src.getAbsolutePath());
+    if(!src.exists()) throw FILE_NF.get(info, src.getAbsolutePath());
 
     if(trg.isDirectory()) {
       // target is a directory: attach file name
       trg = new File(trg, src.getName());
-      if(trg.isDirectory()) throw FILE_DIR.get(info, trg);
+      if(trg.isDirectory()) throw FILE_ID.get(info, trg);
     } else if(!trg.isFile()) {
       // target does not exist: ensure that parent exists
-      if(!trg.getParentFile().isDirectory()) throw FILE_NODIR.get(info, trg);
+      if(!trg.getParentFile().isDirectory()) throw FILE_ND.get(info, trg);
     } else if(src.isDirectory()) {
       // if target is file, source cannot be a directory
-      throw FILE_DIR.get(info, src);
+      throw FILE_ID.get(info, src);
     }
 
     // ignore operations on identical, canonical source and target path
@@ -598,8 +590,8 @@ public final class FNFile extends StandardFunc {
       } else {
         // delete target if it is different to source (case is ignored on Windows and Mac)
         if(trg.exists() && (Prop.CASE || !spath.equalsIgnoreCase(tpath)) && !trg.delete())
-          throw FILE_DEL.get(info, src, trg);
-        if(!src.renameTo(trg)) throw FILE_MOVE.get(info, src, trg);
+          throw FILE_IE_DEL.get(info, src, trg);
+        if(!src.renameTo(trg)) throw FILE_IE_MOVE.get(info, src, trg);
       }
     }
     return null;
@@ -616,9 +608,9 @@ public final class FNFile extends StandardFunc {
       throws QueryException, IOException {
 
     if(src.isDirectory()) {
-      if(!trg.mkdir()) throw FILE_CREATE.get(info, trg);
+      if(!trg.mkdir()) throw FILE_IE_DIR.get(info, trg);
       final File[] files = src.listFiles();
-      if(files == null) throw FILE_LIST.get(info, src);
+      if(files == null) throw FILE_IE_ACCESS.get(info, src);
       for(final File f : files) copy(f, new File(trg, f.getName()));
     } else {
       new IOFile(src).copyTo(new IOFile(trg));

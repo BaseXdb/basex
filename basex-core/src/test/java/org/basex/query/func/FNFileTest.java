@@ -129,9 +129,9 @@ public final class FNFileTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void list() {
-    error(_FILE_LIST.args(PATH1), Err.FILE_NODIR);
+    error(_FILE_LIST.args(PATH1), Err.FILE_ND);
     query(_FILE_WRITE.args(PATH1, "()"));
-    error(_FILE_LIST.args(PATH1), Err.FILE_NODIR);
+    error(_FILE_LIST.args(PATH1), Err.FILE_ND);
     contains(_FILE_LIST.args(PATH), NAME);
     contains(_FILE_LIST.args(PATH, "false()"), NAME);
     contains(_FILE_LIST.args(PATH, "false()", NAME), NAME);
@@ -153,8 +153,8 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(_FILE_CREATE_DIR.args(PATH3));
     query(_FILE_DELETE.args(PATH1, "true()"));
     query(_FILE_WRITE.args(PATH1, "()"));
-    error(_FILE_CREATE_DIR.args(PATH1), Err.FILE_EXISTS);
-    error(_FILE_CREATE_DIR.args(PATH3), Err.FILE_EXISTS);
+    error(_FILE_CREATE_DIR.args(PATH1), Err.FILE_E);
+    error(_FILE_CREATE_DIR.args(PATH3), Err.FILE_E);
     query(_FILE_DELETE.args(PATH1));
   }
 
@@ -166,20 +166,20 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(_FILE_CREATE_DIR.args(PATH3));
     query(_FILE_WRITE.args(PATH4, "()"));
     query(_FILE_DELETE.args(PATH1, "true()"));
-    error(_FILE_DELETE.args(PATH1), Err.FILE_WHICH);
+    error(_FILE_DELETE.args(PATH1), Err.FILE_NF);
   }
 
   /** Test method. */
   @Test
   public void readText() {
-    error(_FILE_READ_TEXT.args(PATH1), Err.FILE_WHICH);
-    error(_FILE_READ_TEXT.args(PATH), Err.FILE_DIR);
+    error(_FILE_READ_TEXT.args(PATH1), Err.FILE_NF);
+    error(_FILE_READ_TEXT.args(PATH), Err.FILE_ID);
     query(_FILE_WRITE.args(PATH1, "a\u00e4"));
     query(_FILE_READ_TEXT.args(PATH1), "a\u00e4");
-    error(_FILE_READ_TEXT.args(PATH1, "UNKNOWN"), Err.FILE_ENCODING);
+    error(_FILE_READ_TEXT.args(PATH1, "UNKNOWN"), Err.FILE_UE);
     assertEquals(3, query(_FILE_READ_TEXT.args(PATH1, "CP1252")).length());
     query(_FILE_WRITE_BINARY.args(PATH1, "xs:hexBinary('00')"));
-    error(_FILE_READ_TEXT.args(PATH1), Err.FILE_IO);
+    error(_FILE_READ_TEXT.args(PATH1), Err.FILE_IE);
     query("declare option db:checkstrings 'off';" + _FILE_READ_TEXT.args(PATH1), "&#x0;");
     query(_FILE_DELETE.args(PATH1));
   }
@@ -188,8 +188,8 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void readBinary() {
     // check errors
-    error(_FILE_READ_BINARY.args(PATH1), Err.FILE_WHICH);
-    error(_FILE_READ_BINARY.args(PATH), Err.FILE_DIR);
+    error(_FILE_READ_BINARY.args(PATH1), Err.FILE_NF);
+    error(_FILE_READ_BINARY.args(PATH), Err.FILE_ID);
     // file with single codepoint
     query(_FILE_WRITE.args(PATH1, "0"));
     query(_FILE_READ_BINARY.args(PATH1), "MA==");
@@ -198,11 +198,11 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(_FILE_READ_BINARY.args(PATH1, 1), "");
     query(_FILE_READ_BINARY.args(PATH1, 1, 0), "");
     query(_FILE_READ_BINARY.args(PATH1, 0, 0), "");
-    error(_FILE_READ_BINARY.args(PATH1, -1), Err.FILE_BOUNDS);
-    error(_FILE_READ_BINARY.args(PATH1, 2), Err.FILE_BOUNDS);
-    error(_FILE_READ_BINARY.args(PATH1, 0, -1), Err.FILE_BOUNDS);
-    error(_FILE_READ_BINARY.args(PATH1, 0, 2), Err.FILE_BOUNDS);
-    error(_FILE_READ_BINARY.args(PATH1, 2, 1), Err.FILE_BOUNDS);
+    error(_FILE_READ_BINARY.args(PATH1, -1), Err.FILE_OOR);
+    error(_FILE_READ_BINARY.args(PATH1, 2), Err.FILE_OOR);
+    error(_FILE_READ_BINARY.args(PATH1, 0, -1), Err.FILE_OOR);
+    error(_FILE_READ_BINARY.args(PATH1, 0, 2), Err.FILE_OOR);
+    error(_FILE_READ_BINARY.args(PATH1, 2, 1), Err.FILE_OOR);
     // file with two codepoints
     query(_FILE_WRITE.args(PATH1, "a\u00e4"));
     query(_FILE_READ_BINARY.args(PATH1), "YcOk");
@@ -216,8 +216,8 @@ public final class FNFileTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void write() {
-    error(_FILE_WRITE.args(PATH, "()"), Err.FILE_DIR);
-    error(_FILE_WRITE.args(PATH4, "()"), Err.FILE_NODIR);
+    error(_FILE_WRITE.args(PATH, "()"), Err.FILE_ID);
+    error(_FILE_WRITE.args(PATH4, "()"), Err.FILE_ND);
 
     query(_FILE_WRITE.args(PATH1, "0"));
     query(_FILE_SIZE.args(PATH1), "1");
@@ -247,8 +247,8 @@ public final class FNFileTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void append() {
-    error(_FILE_APPEND.args(PATH, "()"), Err.FILE_DIR);
-    error(_FILE_APPEND.args(PATH4, "()"), Err.FILE_NODIR);
+    error(_FILE_APPEND.args(PATH, "()"), Err.FILE_ID);
+    error(_FILE_APPEND.args(PATH4, "()"), Err.FILE_ND);
 
     query(_FILE_APPEND.args(PATH1, "0"));
     query(_FILE_SIZE.args(PATH1), "1");
@@ -269,7 +269,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void writeText() {
-    error(_FILE_WRITE_TEXT.args(PATH, "x"), Err.FILE_DIR);
+    error(_FILE_WRITE_TEXT.args(PATH, "x"), Err.FILE_ID);
     error(_FILE_WRITE_TEXT.args(PATH1, " 123"), Err.INVCAST);
 
     query(_FILE_WRITE_TEXT.args(PATH1, "x"));
@@ -282,7 +282,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void writeTextLines() {
-    error(_FILE_WRITE_TEXT_LINES.args(PATH, "x"), Err.FILE_DIR);
+    error(_FILE_WRITE_TEXT_LINES.args(PATH, "x"), Err.FILE_ID);
     error(_FILE_WRITE_TEXT_LINES.args(PATH1, " 123"), Err.INVCAST);
 
     query(_FILE_WRITE_TEXT_LINES.args(PATH1, "x"));
@@ -297,7 +297,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   public void writeBinary() {
     // check errors
     final String bin = "xs:base64Binary('MA==')";
-    error(_FILE_WRITE_BINARY.args(PATH, bin), Err.FILE_DIR);
+    error(_FILE_WRITE_BINARY.args(PATH, bin), Err.FILE_ID);
     error(_FILE_WRITE_BINARY.args(PATH1, "NoBinary"), Err.BINARYTYPE);
     // write file and check size
     query(_FILE_WRITE_BINARY.args(PATH1, bin));
@@ -305,7 +305,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(_FILE_WRITE_BINARY.args(PATH1, bin));
     query(_FILE_SIZE.args(PATH1), "1");
     // write data to specific offset and check size
-    error(_FILE_WRITE_BINARY.args(PATH1, bin, 2), Err.FILE_BOUNDS);
+    error(_FILE_WRITE_BINARY.args(PATH1, bin, 2), Err.FILE_OOR);
     query(_FILE_WRITE_BINARY.args(PATH1, bin, 0));
     query(_FILE_READ_TEXT.args(PATH1), "0");
     query(_FILE_WRITE_BINARY.args(PATH1, bin, 1));
@@ -318,7 +318,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void appendBinary() {
     final String bin = "xs:base64Binary('MA==')";
-    error(_FILE_APPEND_BINARY.args(PATH, bin), Err.FILE_DIR);
+    error(_FILE_APPEND_BINARY.args(PATH, bin), Err.FILE_ID);
     error(_FILE_WRITE_BINARY.args(PATH1, "NoBinary"), Err.BINARYTYPE);
 
     query(_FILE_APPEND_BINARY.args(PATH1, bin));
@@ -331,7 +331,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void appendText() {
-    error(_FILE_APPEND_TEXT.args(PATH, "x"), Err.FILE_DIR);
+    error(_FILE_APPEND_TEXT.args(PATH, "x"), Err.FILE_ID);
     error(_FILE_APPEND_TEXT.args(PATH1, " 123"), Err.INVCAST);
 
     query(_FILE_APPEND_TEXT.args(PATH1, "x"));
@@ -344,7 +344,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void appendTextLines() {
-    error(_FILE_APPEND_TEXT_LINES.args(PATH, "x"), Err.FILE_DIR);
+    error(_FILE_APPEND_TEXT_LINES.args(PATH, "x"), Err.FILE_ID);
     error(_FILE_APPEND_TEXT_LINES.args(PATH1, " 123"), Err.INVCAST);
 
     query(_FILE_APPEND_TEXT_LINES.args(PATH1, "x"));
@@ -365,7 +365,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(_FILE_COPY.args(PATH2, PATH2));
     query(_FILE_SIZE.args(PATH1), "1");
     query(_FILE_SIZE.args(PATH2), "1");
-    error(_FILE_COPY.args(PATH1, PATH3), Err.FILE_NODIR);
+    error(_FILE_COPY.args(PATH1, PATH3), Err.FILE_ND);
 
     query(_FILE_DELETE.args(PATH1));
     query(_FILE_DELETE.args(PATH2));
@@ -374,13 +374,13 @@ public final class FNFileTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void move() {
-    error(_FILE_MOVE.args(PATH1, PATH2), Err.FILE_WHICH);
+    error(_FILE_MOVE.args(PATH1, PATH2), Err.FILE_NF);
     query(_FILE_WRITE.args(PATH1, "a"));
     query(_FILE_MOVE.args(PATH1, PATH2));
     query(_FILE_MOVE.args(PATH2, PATH1));
     query(_FILE_MOVE.args(PATH1, PATH1));
     query(_FILE_MOVE.args(PATH1 + "/../" + NAME, PATH1));
-    error(_FILE_MOVE.args(PATH1, PATH4), Err.FILE_NODIR);
+    error(_FILE_MOVE.args(PATH1, PATH4), Err.FILE_ND);
     query(_FILE_SIZE.args(PATH1), "1");
     query(_FILE_EXISTS.args(PATH2), false);
     query(_FILE_DELETE.args(PATH1));
@@ -392,6 +392,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     final String path = query(_FILE_RESOLVE_PATH.args(PATH1));
     final String can = new File(PATH1).getAbsolutePath();
     assertEquals(path.toLowerCase(Locale.ENGLISH), can.toLowerCase(Locale.ENGLISH));
+    query(ENDS_WITH.args(_FILE_RESOLVE_PATH.args("."), File.separator), "true");
   }
 
   /** Test method. */
@@ -404,30 +405,30 @@ public final class FNFileTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
-  public void baseName() {
+  public void name() {
     // check with a simple path
-    query(_FILE_BASE_NAME.args(PATH1), NAME);
+    query(_FILE_NAME.args(PATH1), NAME);
     // check with a path ending with a directory separator
-    query(_FILE_BASE_NAME.args(PATH1 + File.separator), NAME);
+    query(_FILE_NAME.args(PATH1 + File.separator), NAME);
     // check with a path consisting only of directory separators
-    query(_FILE_BASE_NAME.args("//"), "");
+    query(_FILE_NAME.args("//"), "");
     // check with empty string path
-    query(_FILE_BASE_NAME.args(""), ".");
+    query(_FILE_NAME.args(""), "");
     // check using a suffix
-    query(_FILE_BASE_NAME.args(PATH1 + File.separator + "test.xml", ".xml"), "test");
+    query(_FILE_NAME.args(PATH1 + File.separator + "test.xml"), "test.xml");
   }
 
   /** Test method. */
   @Test
-  public void dirName() {
+  public void parent() {
     // check with a simple path
-    assertEquals(norm(PATH), norm(query(_FILE_DIR_NAME.args(PATH1))).toLowerCase(Locale.ENGLISH));
+    assertEquals(norm(PATH), norm(query(_FILE_PARENT.args(PATH1))).toLowerCase(Locale.ENGLISH));
     // check with an empty path
-    query(_FILE_DIR_NAME.args(""), '.' + File.separator);
+    query(EMPTY.args(_FILE_PARENT.args("")), "true");
     // check with a path without directory separators
-    query(_FILE_DIR_NAME.args(NAME), '.' + File.separator);
+    query(EMPTY.args(_FILE_PARENT.args(NAME)), "true");
     // check with a path without directory separators
-    query(_FILE_DIR_NAME.args("/"), File.separator);
+    query(EMPTY.args(_FILE_PARENT.args("/")), "true");
   }
 
   /**
