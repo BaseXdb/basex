@@ -1,5 +1,7 @@
 package org.basex.gui.view.project;
 
+import java.util.*;
+
 import org.basex.io.*;
 
 /**
@@ -9,6 +11,14 @@ import org.basex.io.*;
  * @author Christian Gruen
  */
 final class ProjectDir extends ProjectNode {
+  /** Comparator. */
+  private static final Comparator<IOFile> COMP = new Comparator<IOFile>() {
+    @Override
+    public int compare(final IOFile a, final IOFile b) {
+      return a.path().compareToIgnoreCase(b.path());
+    }
+  };
+
   /**
    * Constructor.
    * @param io file
@@ -22,9 +32,15 @@ final class ProjectDir extends ProjectNode {
   @Override
   void expand() {
     removeAllChildren();
-    final IOFile[] files = file.children();
-    for(final IOFile f : files) if(f.isDir())  add(new ProjectDir(f, project));
-    for(final IOFile f : files) if(!f.isDir()) add(new ProjectFile(f, project));
+    // cache and sort directories and files
+    final ArrayList<IOFile> dirs = new ArrayList<IOFile>();
+    final ArrayList<IOFile> files = new ArrayList<IOFile>();
+    for(final IOFile f : file.children()) (f.isDir() ? dirs : files).add(f);
+    Collections.sort(dirs, COMP);
+    Collections.sort(files, COMP);
+    // create child nodes
+    for(final IOFile f : dirs) add(new ProjectDir(f, project));
+    for(final IOFile f : files) add(new ProjectFile(f, project));
   }
 
   @Override
