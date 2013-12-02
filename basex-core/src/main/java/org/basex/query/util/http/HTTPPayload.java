@@ -21,6 +21,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -132,6 +133,7 @@ public final class HTTPPayload {
    * @throws QueryException query exception
    */
   private Value parse(final byte[] payload, final String ctype) throws QueryException {
+    if(payload.length == 0) return Empty.SEQ;
     try {
       return value(new IOContent(payload), options, ctype, null);
     } catch(final IOException ex) {
