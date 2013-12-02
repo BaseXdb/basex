@@ -232,6 +232,7 @@ offsets              = Салаалах
 ok                   = OK
 only_backup          = Зөвхөн нөөцлөлтөд хүчинтэй
 open                 = Нээх
+open_natively        = Open natively
 open_manage          = Удирдах
 optimize             = Шинэчлэх
 optimized_query      = Квери

@@ -72,13 +72,18 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
       }
       @Override
       public void keyTyped(final KeyEvent e) {
-        if(BaseXKeys.ENTER.is(e)) open();
+        if(BaseXKeys.SHIFT_ENTER.is(e)) {
+          new OpenNativeCmd().execute(gui);
+        } else if(BaseXKeys.ENTER.is(e)) {
+          new OpenCmd().execute(gui);
+        }
       }
     });
     tree.addMouseListener(new MouseAdapter() {
       @Override
       public void mousePressed(final MouseEvent e) {
-        if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) open();
+        if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
+          new OpenCmd().execute(gui);
       }
     });
 
@@ -95,7 +100,8 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
     tree.setSelectionRow(0);
 
     // add popup
-    new BaseXPopup(tree, gui, new DeleteCmd(), new RenameCmd(), new NewCmd(), null,
+    new BaseXPopup(tree, gui, new OpenCmd(), new OpenNativeCmd(), null,
+        new DeleteCmd(), new RenameCmd(), new NewCmd(), null,
         new ChangeCmd(), new RefreshCmd());
 
     // add scroll bar
@@ -199,20 +205,14 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
 
   /**
    * Opens the selected file.
-   */
-  void open() {
-    for(final ProjectNode node : selectedNodes()) open(node.file, null);
-  }
-
-  /**
-   * Opens the selected file.
    * @param file file to be opened
    * @param search search string
    */
   void open(final IOFile file, final String search) {
     if(!file.isDir() && view.open(file) != null) {
-      view.getEditor().requestFocusInWindow();
-      final SearchBar sb = view.getEditor().search;
+      final Editor editor = view.getEditor();
+      editor.requestFocusInWindow();
+      final SearchBar sb = editor.search;
       if(search != null) {
         sb.reset();
         sb.activate(search, false);
@@ -386,5 +386,51 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
     }
     @Override
     public String label() { return CHOOSE_DIR + DOTS; }
+  }
+
+  /** Change directory command. */
+  final class OpenCmd extends GUIBaseCmd {
+    @Override
+    public void execute(final GUI main) {
+      if(!enabled(gui)) return;
+      for(final ProjectNode node : selectedNodes()) open(node.file, null);
+    }
+    @Override
+    public boolean enabled(final GUI main) {
+      for(final ProjectNode node : selectedNodes()) {
+        if(node.file.isDir()) return false;
+      }
+      return true;
+    }
+    @Override
+    public String label() { return OPEN; }
+    @Override
+    public String key() { return "ENTER"; }
+  }
+
+  /** Change directory command. */
+  final class OpenNativeCmd extends GUIBaseCmd {
+    @Override
+    public void execute(final GUI main) {
+      if(!enabled(gui)) return;
+      for(final ProjectNode node : selectedNodes()) {
+        try {
+          Util.open(node.file.path());
+        } catch(final IOException ex) {
+          BaseXDialog.error(gui, Util.info(FILE_NOT_OPENED_X, node.file));
+        }
+      }
+    }
+    @Override
+    public boolean enabled(final GUI main) {
+      for(final ProjectNode node : selectedNodes()) {
+        if(node.file.isDir()) return false;
+      }
+      return true;
+    }
+    @Override
+    public String label() { return OPEN_NATIVELY; }
+    @Override
+    public String key() { return "shift ENTER"; }
   }
 }

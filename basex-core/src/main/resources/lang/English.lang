@@ -231,6 +231,7 @@ offsets              = Offsets
 ok                   = OK
 only_backup          = Only available as a backup.
 open                 = Open
+open_natively        = Open natively
 open_manage          = Open & Manage
 optimize             = Optimize
 optimized_query      = Optimized Query

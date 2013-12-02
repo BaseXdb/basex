@@ -271,13 +271,13 @@ public final class GUIConstants {
   // KEYS =====================================================================
 
   /** Shift key. */
-  public static final int SHF = Event.SHIFT_MASK;
+  public static final int SHIFT = Event.SHIFT_MASK;
   /** Alt key. */
   public static final int ALT = Event.ALT_MASK;
   /** Control key. */
   public static final int CTRL = Event.CTRL_MASK;
   /** Shortcut key (CTRL/META). */
-  public static final int SC = Prop.MAC ? Event.META_MASK : Event.CTRL_MASK;
+  public static final int META = Prop.MAC ? Event.META_MASK : Event.CTRL_MASK;
 
   /** Private constructor, preventing class instantiation. */
   private GUIConstants() { }

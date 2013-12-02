@@ -231,6 +231,7 @@ offsets              = Pengimbang
 ok                   = OK
 only_backup          = Hanya tersedia sebagai cadangan.
 open                 = Buka
+open_natively        = Open natively
 open_manage          = Buka & Kelola
 optimize             = Optimisasi
 optimized_query      = Dioptimalkan kueri

@@ -231,6 +231,7 @@ offsets              = Offsets
 ok                   = OK
 only_backup          = Disponibil numai ca o copie de rezervă.
 open                 = Deschide
+open_natively        = Open natively
 open_manage          = Deschide & administreaza
 optimize             = Optimizaţi
 optimized_query      = Interogare

@@ -238,6 +238,24 @@ public final class Util {
   }
 
   /**
+   * Opens the specified file natively.
+   * @param path file path
+   * @throws IOException I/O exception
+   */
+  public static void open(final String path) throws IOException {
+    // default solution does not always work; fallback solutions:
+    final String[] args;
+    if(Prop.WIN) {
+      args = new String[] { "rundll32", "url.dll,FileProtocolHandler", path };
+    } else if(Prop.MAC) {
+      args = new String[] { "/usr/bin/open", path };
+    } else {
+      args = new String[] { "xdg-open", path };
+    }
+    new ProcessBuilder(args).start();
+  }
+
+  /**
    * Starts the specified class in a separate process.
    * @param clz class to start
    * @param args command-line arguments

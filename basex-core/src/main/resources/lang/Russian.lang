@@ -231,6 +231,7 @@ offsets              = Смещения
 ok                   = OK
 only_backup          = Доступно только в виде резервной копии
 open                 = Открыть
+open_natively        = Open natively
 open_manage          = Открыть и Администрировать
 optimize             = Оптимизировать
 optimized_query      = Оптимизированный запрос

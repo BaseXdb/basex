@@ -19,81 +19,81 @@ public enum BaseXKeys {
 
   /** Left.                  */ PREV(VK_LEFT),
   /** Right.                 */ NEXT(VK_RIGHT),
-  /** Word left.             */ PREVWORD(MAC ? ALT : SC, VK_LEFT),
-  /** Word right.            */ NEXTWORD(MAC ? ALT : SC, VK_RIGHT),
-  /** Beginning of line.     */ LINESTART(MAC ? SC : 0, MAC ? VK_LEFT : VK_HOME),
-  /** End of line.           */ LINEEND(MAC ? SC : 0, MAC ? VK_RIGHT : VK_END),
+  /** Word left.             */ PREVWORD(MAC ? ALT : META, VK_LEFT),
+  /** Word right.            */ NEXTWORD(MAC ? ALT : META, VK_RIGHT),
+  /** Beginning of line.     */ LINESTART(MAC ? META : 0, MAC ? VK_LEFT : VK_HOME),
+  /** End of line.           */ LINEEND(MAC ? META : 0, MAC ? VK_RIGHT : VK_END),
 
   /** Up.                    */ PREVLINE(VK_UP),
   /** Down.                  */ NEXTLINE(VK_DOWN),
   /** Page up.               */ PREVPAGE(VK_PAGE_UP),
   /** Page down.             */ NEXTPAGE(VK_PAGE_DOWN),
-  /** Page up (read-only).   */ PREVPAGE_RO(SHF, VK_SPACE),
+  /** Page up (read-only).   */ PREVPAGE_RO(SHIFT, VK_SPACE),
   /** Page down (read-only). */ NEXTPAGE_RO(VK_SPACE),
-  /** Beginning of text.     */ TEXTSTART(SC, MAC ? VK_UP : VK_HOME),
-  /** End of text.           */ TEXTEND(SC, MAC ? VK_DOWN : VK_END),
-  /** Scroll up.             */ SCROLLUP(MAC ? ALT : SC, VK_UP, true),
-  /** Scroll down.           */ SCROLLDOWN(MAC ? ALT : SC, VK_DOWN, true),
+  /** Beginning of text.     */ TEXTSTART(META, MAC ? VK_UP : VK_HOME),
+  /** End of text.           */ TEXTEND(META, MAC ? VK_DOWN : VK_END),
+  /** Scroll up.             */ SCROLLUP(MAC ? ALT : META, VK_UP, true),
+  /** Scroll down.           */ SCROLLDOWN(MAC ? ALT : META, VK_DOWN, true),
 
   // Find
 
-  /** Find search term.      */ FIND(SC, VK_F, true),
-  /** Find next hit.         */ FINDNEXT(SC, VK_G, true),
-  /** Find next hit.         */ FINDNEXT2(MAC ? SC : 0, VK_F3, true),
-  /** Find previous hit.     */ FINDPREV(SC | SHF, VK_G, true),
-  /** Find previous hit.     */ FINDPREV2(MAC ? SC | SHF : SHF, VK_F3, true),
-  /** Jump to error.         */ FINDERROR(SC, VK_PERIOD),
-  /** Code completion.       */ COMPLETE(SC, VK_SPACE),
+  /** Find search term.      */ FIND(META, VK_F, true),
+  /** Find next hit.         */ FINDNEXT(META, VK_G, true),
+  /** Find next hit.         */ FINDNEXT2(MAC ? META : 0, VK_F3, true),
+  /** Find previous hit.     */ FINDPREV(META | SHIFT, VK_G, true),
+  /** Find previous hit.     */ FINDPREV2(MAC ? META | SHIFT : SHIFT, VK_F3, true),
+  /** Jump to error.         */ FINDERROR(META, VK_PERIOD),
+  /** Code completion.       */ COMPLETE(META, VK_SPACE),
 
   // Editing
 
-  /** Undo.                  */ UNDOSTEP(SC, VK_Z, true),
-  /** Redo.                  */ REDOSTEP(MAC ? SC | SHF : SC, MAC ? VK_Z : VK_Y, true),
+  /** Undo.                  */ UNDOSTEP(META, VK_Z, true),
+  /** Redo.                  */ REDOSTEP(MAC ? META | SHIFT : META, MAC ? VK_Z : VK_Y, true),
 
-  /** Cut.                   */ CUT1(SC, VK_X, true),
-  /** Cut.                   */ CUT2(SHF, VK_DELETE, true),
-  /** Copy.                  */ COPY1(SC, VK_C, true),
-  /** Copy.                  */ COPY2(SC, VK_INSERT, true),
-  /** Paste.                 */ PASTE1(SC, VK_V, true),
-  /** Paste.                 */ PASTE2(SHF, VK_INSERT, true),
-  /** Select all.            */ SELECTALL(SC, VK_A, true),
+  /** Cut.                   */ CUT1(META, VK_X, true),
+  /** Cut.                   */ CUT2(SHIFT, VK_DELETE, true),
+  /** Copy.                  */ COPY1(META, VK_C, true),
+  /** Copy.                  */ COPY2(META, VK_INSERT, true),
+  /** Paste.                 */ PASTE1(META, VK_V, true),
+  /** Paste.                 */ PASTE2(SHIFT, VK_INSERT, true),
+  /** Select all.            */ SELECTALL(META, VK_A, true),
 
   /** Delete backwards.      */ DELPREV(VK_BACK_SPACE),
   /** Delete.                */ DELNEXT(VK_DELETE),
-  /** Delete word backwards. */ DELPREVWORD(MAC ? ALT : SC, VK_BACK_SPACE, true),
-  /** Delete word.           */ DELNEXTWORD(MAC ? ALT : SC, VK_DELETE, true),
-  /** Delete line to begin.  */ DELLINESTART(SC | (MAC ? 0 : SHF), VK_BACK_SPACE, true),
-  /** Delete line to end.    */ DELLINEEND(SC | (MAC ? 0 : SHF), VK_DELETE, true),
-  /** Delete complete line.  */ DELLINE(SC | SHF, VK_D, true),
+  /** Delete word backwards. */ DELPREVWORD(MAC ? ALT : META, VK_BACK_SPACE, true),
+  /** Delete word.           */ DELNEXTWORD(MAC ? ALT : META, VK_DELETE, true),
+  /** Delete line to begin.  */ DELLINESTART(META | (MAC ? 0 : SHIFT), VK_BACK_SPACE, true),
+  /** Delete line to end.    */ DELLINEEND(META | (MAC ? 0 : SHIFT), VK_DELETE, true),
+  /** Delete complete line.  */ DELLINE(META | SHIFT, VK_D, true),
 
-  /** (Un)comment.           */ COMMENT(SC, VK_K, false),
-  /** Execute.               */ EXEC1(SC, VK_ENTER, true),
-  /** Execute.               */ EXEC2(SC, VK_F11, true),
+  /** (Un)comment.           */ COMMENT(META, VK_K, false),
+  /** Execute.               */ EXEC1(META, VK_ENTER, true),
+  /** Execute.               */ EXEC2(META, VK_F11, true),
 
   // Navigation
 
-  /** Jump to input bar.     */ INPUTBAR(MAC ? SC : 0, VK_F6, true),
+  /** Jump to input bar.     */ INPUTBAR(MAC ? META : 0, VK_F6, true),
   /** Next tab.              */ NEXTTAB(CTRL, VK_TAB, true),
-  /** Previous tab.          */ PREVTAB(CTRL | SHF, VK_TAB, true),
-  /** Close tab.             */ CLOSETAB(SC, VK_F4, true),
+  /** Previous tab.          */ PREVTAB(CTRL | SHIFT, VK_TAB, true),
+  /** Close tab.             */ CLOSETAB(META, VK_F4, true),
 
-  /** Browse back.           */ GOBACK(MAC ? SC : ALT, VK_LEFT, true),
+  /** Browse back.           */ GOBACK(MAC ? META : ALT, VK_LEFT, true),
   /** Browse back.           */ GOBACK2(VK_BACK_SPACE, true),
-  /** Browse forward.        */ GOFORWARD(MAC ? SC : ALT, VK_RIGHT, true),
-  /** Browse up.             */ GOUP(MAC ? SC : ALT, VK_UP, true),
-  /** Browse home.           */ GOHOME(MAC ? SC : ALT, VK_HOME, true),
+  /** Browse forward.        */ GOFORWARD(MAC ? META : ALT, VK_RIGHT, true),
+  /** Browse up.             */ GOUP(MAC ? META : ALT, VK_UP, true),
+  /** Browse home.           */ GOHOME(MAC ? META : ALT, VK_HOME, true),
 
   /** Refresh.               */ REFRESH(VK_F5),
-  /** Jump to project.       */ PROJECT(SC | SHF, VK_R, true),
-  /** Jump to filter.        */ FILTER(SC | SHF, VK_T, true),
-  /** New directory.         */ NEWDIR(SC | SHF, VK_N),
+  /** Jump to project.       */ PROJECT(META | SHIFT, VK_R, true),
+  /** Jump to filter.        */ FILTER(META | SHIFT, VK_T, true),
+  /** New directory.         */ NEWDIR(META | SHIFT, VK_N),
 
   // Font
 
-  /** Increment size.        */ INCFONT1(SC, VK_PLUS, true),
-  /** Increment size.        */ INCFONT2(SC, VK_EQUALS, true),
-  /** Decrease size.         */ DECFONT(SC, VK_MINUS, true),
-  /** Standard size.         */ NORMFONT(SC, VK_0, true),
+  /** Increment size.        */ INCFONT1(META, VK_PLUS, true),
+  /** Increment size.        */ INCFONT2(META, VK_EQUALS, true),
+  /** Decrease size.         */ DECFONT(META, VK_MINUS, true),
+  /** Standard size.         */ NORMFONT(META, VK_0, true),
 
   // General
 
@@ -102,7 +102,8 @@ public enum BaseXKeys {
 
   /** Space key.             */ SPACE(VK_SPACE),
   /** Tab key.               */ TAB(VK_TAB),
-  /** Enter.                 */ ENTER(VK_ENTER);
+  /** Enter.                 */ ENTER(VK_ENTER),
+  /** Shift Enter.           */ SHIFT_ENTER(SHIFT, VK_ENTER);
 
   /** Modifiers. */
   private final int mod;
@@ -167,7 +168,7 @@ public enum BaseXKeys {
    * @return result of check
    */
   public static boolean sc(final InputEvent e) {
-    return (SC & e.getModifiers()) == SC;
+    return (META & e.getModifiers()) == META;
   }
 
   /**

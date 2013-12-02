@@ -231,6 +231,7 @@ offsets              = オフセット
 ok                   = OK
 only_backup          = バックアップとしてのみ使用できます。
 open                 = 開く
+open_natively        = Open natively
 open_manage          = 管理
 optimize             = 最適化
 optimized_query      = クエリー

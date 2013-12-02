@@ -231,6 +231,7 @@ offsets              = Offset
 ok                   = OK
 only_backup          = Disponibile solo come backup.
 open                 = Apri
+open_natively        = Open natively
 open_manage          = Gestisci
 optimize             = Ottimizza
 optimized_query      = Interrogazione ottimizzata

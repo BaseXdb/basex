@@ -173,7 +173,6 @@ final class Renderer extends BaseXBack {
     init(g);
     boolean more = true;
     int col = 1;
-    final int l = 1;
     while(more(g)) {
       final int p = text.pos();
       while(text.more()) {
@@ -184,8 +183,7 @@ final class Renderer extends BaseXBack {
       }
       if(!more) break;
       text.pos(p);
-      next();
-      if(l != line) col = 1;
+      if(next()) col = 1;
     }
     height = hh;
     return new int[] { line, col };
@@ -310,15 +308,18 @@ final class Renderer extends BaseXBack {
 
   /**
    * Finishes the current token.
+   * @return new line
    */
-  private void next() {
+  private boolean next() {
     final int ch = text.curr();
     if(ch == TokenBuilder.NLINE || ch == TokenBuilder.HLINE) {
       x = offset;
       y += fontHeight >> (ch == TokenBuilder.NLINE ? 0 : 1);
       line++;
+      return true;
     }
     x += wordWidth;
+    return false;
   }
 
   /**

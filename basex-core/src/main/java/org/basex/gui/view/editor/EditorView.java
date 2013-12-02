@@ -79,7 +79,7 @@ public final class EditorView extends View {
   private final BaseXTabs tabs;
 
   /** Sizes. */
-  private double[] sizes = new double[] { 0.2, 0.8 };
+  private double[] sizes = new double[] { 0.3, 0.7 };
   /** Thread counter. */
   private int threadID;
 
@@ -474,18 +474,9 @@ public final class EditorView extends View {
       if(!XMLToken.valid(cp(buffer, c))) {
         if(!BaseXDialog.confirm(gui, H_FILE_BINARY)) break;
         try {
-          Desktop.getDesktop().open(file.file());
+          Util.open(file.path());
         } catch(final IOException ex) {
-          // default solution does not always work; fallback solutions:
-          final String[] args;
-          if(Prop.WIN) {
-            args = new String[] { "rundll32", "url.dll,FileProtocolHandler", file.path() };
-          } else if(Prop.MAC) {
-            args = new String[] { "/usr/bin/open", file.path() };
-          } else {
-            args = new String[] { "xdg-open", file.path() };
-          }
-          new ProcessBuilder(args).start();
+          Desktop.getDesktop().open(file.file());
         }
         return null;
       }
