@@ -273,7 +273,7 @@ public final class EditorView extends View {
       public void run() {
         // remember opened files
         for(final String file : gui.gopts.get(GUIOptions.OPEN)) {
-          open(new IOFile(file), false);
+          open(new IOFile(file), false, false);
         }
       }
     });
@@ -431,16 +431,17 @@ public final class EditorView extends View {
    * @return opened editor, or {@code null} if file could not be opened
    */
   public EditorArea open(final IOFile file) {
-    return open(file, true);
+    return open(file, true, true);
   }
 
   /**
    * Opens the specified query file.
    * @param file query file
    * @param parse parse contents
+   * @param error display error if file does not exist
    * @return opened editor, or {@code null} if file could not be opened
    */
-  private EditorArea open(final IOFile file, final boolean parse) {
+  private EditorArea open(final IOFile file, final boolean parse, final boolean error) {
     if(!visible()) GUICommands.C_SHOWEDITOR.execute(gui);
 
     EditorArea edit = find(file, true);
@@ -464,7 +465,7 @@ public final class EditorView extends View {
       } catch(final IOException ex) {
         refreshHistory(null);
         Util.debug(ex);
-        BaseXDialog.error(gui, Util.info(FILE_NOT_OPENED_X, file));
+        if(error) BaseXDialog.error(gui, Util.info(FILE_NOT_OPENED_X, file));
         return null;
       }
     }
@@ -667,7 +668,7 @@ public final class EditorView extends View {
 
     EditorArea edit = find(errFile, false);
     if(jump) {
-      if(edit == null) edit = open(errFile, false);
+      if(edit == null) edit = open(errFile, false, true);
       if(edit != null) tabs.setSelectedComponent(edit);
     }
     if(edit == null) return;
