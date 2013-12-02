@@ -70,7 +70,7 @@ public final class EditorView extends View {
   /** Splitter. */
   private final BaseXSplit split;
   /** Project files. */
-  private final ProjectView projects;
+  private final ProjectView project;
   /** Header string. */
   private final BaseXLabel label;
   /** Filter button. */
@@ -158,10 +158,10 @@ public final class EditorView extends View {
     main.add(center, BorderLayout.CENTER);
     main.add(south, BorderLayout.SOUTH);
 
-    projects = new ProjectView(this);
+    project = new ProjectView(this);
     split = new BaseXSplit(true);
     split.mode(Fill.NONE);
-    split.add(projects);
+    split.add(project);
     split.add(main);
     split.sizes(sizes);
     project();
@@ -332,7 +332,7 @@ public final class EditorView extends View {
    * @param filt focus filter or content
    */
   public void focus(final boolean filt) {
-    projects.focus(filt);
+    project.focus(filt);
   }
 
   /**
@@ -390,7 +390,10 @@ public final class EditorView extends View {
     fc.suffix(IO.XQSUFFIX);
 
     final IOFile file = fc.select(Mode.FSAVE);
-    return file != null && save(file);
+    if(file == null || !save(file)) return false;
+
+    project.refresh(file.dir());
+    return true;
   }
 
   /**
@@ -795,14 +798,14 @@ public final class EditorView extends View {
   /**
    * Saves the specified editor contents.
    * @param file file to write
-   * @return {@code false} if confirmation was canceled
+   * @return success flag
    */
   private boolean save(final IOFile file) {
     try {
       final EditorArea edit = getEditor();
       file.write(edit.getText());
       edit.file(file);
-      projects.repaint();
+      project.repaint();
       return true;
     } catch(final Exception ex) {
       BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, file));
