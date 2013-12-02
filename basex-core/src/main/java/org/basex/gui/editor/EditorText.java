@@ -601,6 +601,7 @@ public final class EditorText {
     int move = 0;
     if(sb.length() != 0) {
       final char ch = sb.charAt(0);
+      final int next = ps + 1 < text.length ? text[ps + 1] : 0;
       final int curr = ps < text.length ? text[ps] : 0;
       final int prev = ps > 0 ? text[ps - 1] : 0;
       final int pprv = ps > 1 ? text[ps - 2] : 0;
@@ -628,11 +629,23 @@ public final class EditorText {
         // closes an opening element
         closeElem(sb);
         move = 1;
+      } else if(ch == ':') {
+        // closes XQuery comments
+        if(prev == '(') {
+          sb.append(":");
+          if(curr != ')') sb.append(')');
+          move = 1;
+        }
       } else if(ch == '~') {
         // closes XQuery comments
         if(prev == ':' && pprv == '(') {
-          sb.append("\n : \n :");
-          if(curr != ')') sb.append(')');
+          sb.append("\n : \n ");
+          if(curr != ':') {
+            sb.append(':');
+            if(curr != ')') sb.append(')');
+          } else if(next != ')') {
+            sb.append(')');
+          }
           move = 5;
         }
       } else if(ch == '-') {
