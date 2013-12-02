@@ -64,19 +64,20 @@ public final class SearchBar extends BaseXBack {
     gui = main;
     search = new BaseXTextField(main);
     search.history(gui, GUIOptions.SEARCHED);
-    search.setToolTipText(SEARCH);
     search.setPreferredSize(null);
+    search.hint(SEARCH);
+
     replace = new BaseXTextField(main);
     replace.history(gui, GUIOptions.REPLACED);
-    replace.setToolTipText(REPLACE_WITH);
     replace.setPreferredSize(null);
+    replace.hint(REPLACE_WITH);
 
     regex = onOffButton("s_regex", REGULAR_EXPR, GUIOptions.SR_REGEX);
     mcase = onOffButton("s_case", MATCH_CASE, GUIOptions.SR_CASE);
     word = onOffButton("s_word", WHOLE_WORD, GUIOptions.SR_WORD);
     multi = onOffButton("s_multi", MULTI_LINE, GUIOptions.SR_MULTI);
     rplc  = new BaseXButton(main, "s_replace", REPLACE_ALL);
-    cls = new BaseXButton(main, "s_close", CLOSE);
+    cls = new BaseXButton(main, "s_close", BaseXLayout.addShortcut(CLOSE, ESCAPE.toString()));
     multi.setEnabled(regex.isSelected());
     word.setEnabled(!regex.isSelected());
 
@@ -192,9 +193,19 @@ public final class SearchBar extends BaseXBack {
    */
   public void refreshLayout() {
     if(editor == null) return;
-    final Font ef = GUIConstants.mfont.deriveFont(7f + (GUIConstants.fontSize >> 1));
+    final Font ef = editor.getFont().deriveFont(7f + (GUIConstants.fontSize >> 1));
     search.setFont(ef);
     replace.setFont(ef);
+  }
+
+  /**
+   * Resets the search options.
+   */
+  public void reset() {
+    regex.setSelected(false);
+    mcase.setSelected(true);
+    word.setSelected(false);
+    multi.setSelected(false);
   }
 
   /**

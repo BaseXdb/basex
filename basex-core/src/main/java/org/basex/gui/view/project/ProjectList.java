@@ -2,12 +2,12 @@ package org.basex.gui.view.project;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
 
 import javax.swing.*;
 
 import org.basex.gui.layout.*;
 import org.basex.io.*;
+import org.basex.util.list.*;
 
 /**
  * List of filtered file entries.
@@ -16,10 +16,12 @@ import org.basex.io.*;
  * @author Christian Gruen
  */
 public class ProjectList extends JList {
-  /** Project view. */
-  private ProjectView project;
   /** Model. */
-  final DefaultListModel model;
+  private final DefaultListModel model;
+  /** Project view. */
+  private final ProjectView project;
+  /** Content search string. */
+  private String search;
 
   /**
    * Constructor.
@@ -47,14 +49,16 @@ public class ProjectList extends JList {
   /**
    * Assigns the specified list entries and selects the first entry.
    * @param list entries to set
+   * @param srch content search string
    */
-  void addElements(final TreeSet<String> list) {
+  void setElements(final StringList list, final String srch) {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
         model.removeAllElements();
         for(final String file : list) model.addElement(file);
         setSelectedIndex(0);
+        search = srch;
       }
     });
   }
@@ -63,7 +67,9 @@ public class ProjectList extends JList {
    * Open all selected files.
    */
   void open() {
-    for(final Object o : getSelectedValues()) project.open(new IOFile(o.toString()));
+    for(final Object o : getSelectedValues()) {
+      project.open(new IOFile(o.toString()), search);
+    }
   }
 
   /** List cell renderer. */

@@ -955,6 +955,11 @@ public interface Text {
 
   /** "Search". */
   String SEARCH = lang("search");
+  /** "Search". */
+  String SEARCH_FILES = lang("search_files");
+  /** "Search". */
+  String SEARCH_CONTENTS = lang("search_contents");
+
   /** "Command". */
   String COMMAND = lang("command");
   /** "XQuery". */

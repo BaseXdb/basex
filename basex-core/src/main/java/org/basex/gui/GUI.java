@@ -169,13 +169,14 @@ public final class GUI extends AGUI {
         if(s == gopts.get(GUIOptions.SEARCHMODE) || !mode.isEnabled()) return;
 
         gopts.set(GUIOptions.SEARCHMODE, s);
-        input.setText("");
+        input.mode(mode.getSelectedItem());
         refreshControls();
       }
     });
     nav.add(mode, BorderLayout.WEST);
 
     input = new GUIInput(this);
+    input.mode(mode.getSelectedItem());
 
     hist = new BaseXButton(this, "hist", H_SHOW_HISTORY);
     hist.addActionListener(new ActionListener() {
@@ -584,7 +585,7 @@ public final class GUI extends AGUI {
 
     if(s != t) {
       mode.setSelectedIndex(s);
-      input.setText("");
+      input.mode(mode.getSelectedItem());
       input.requestFocusInWindow();
     }
 

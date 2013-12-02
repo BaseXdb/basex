@@ -14,6 +14,7 @@ import javax.swing.tree.*;
 
 import org.basex.core.*;
 import org.basex.gui.*;
+import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.view.editor.*;
@@ -141,7 +142,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
    */
   public void focus(final boolean filt) {
     if(filt) {
-      filter.requestFocusInWindow();
+      filter.focus();
     } else {
       scroll.getViewport().getView().requestFocusInWindow();
     }
@@ -200,15 +201,25 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
    * Opens the selected file.
    */
   void open() {
-    for(final ProjectNode node : selectedNodes()) open(node.file);
+    for(final ProjectNode node : selectedNodes()) open(node.file, null);
   }
 
   /**
    * Opens the selected file.
    * @param file file to be opened
+   * @param search search string
    */
-  void open(final IOFile file) {
-    if(!file.isDir() && view.open(file) != null) view.getEditor().requestFocusInWindow();
+  void open(final IOFile file, final String search) {
+    if(!file.isDir() && view.open(file) != null) {
+      view.getEditor().requestFocusInWindow();
+      final SearchBar sb = view.getEditor().search;
+      if(search != null) {
+        sb.reset();
+        sb.activate(search, false);
+      } else {
+        sb.deactivate(true);
+      }
+    }
   }
 
   /**

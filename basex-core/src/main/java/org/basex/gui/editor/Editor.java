@@ -53,15 +53,16 @@ public class Editor extends BaseXPanel {
   /** Text array to be written. */
   protected final transient EditorText text = new EditorText(EMPTY);
   /** Undo history. */
-  public transient History hist;
+  public History hist;
+  /** Search bar. */
+  public SearchBar search;
+
   /** Renderer reference. */
   private final Renderer rend;
   /** Scrollbar reference. */
   private final BaseXScrollBar scroll;
   /** Editable flag. */
   private final boolean editable;
-  /** Search bar. */
-  private SearchBar search;
   /** Link listener. */
   private LinkListener linkListener;
 

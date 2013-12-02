@@ -7,6 +7,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.util.options.*;
 
@@ -19,8 +20,11 @@ import org.basex.util.options.*;
 public class BaseXTextField extends JTextField {
   /** Default width of text fields. */
   public static final int DWIDTH = 350;
+
   /** History. */
   private BaseXHistory history;
+  /** Hint. */
+  private BaseXTextHint hint;
   /** Last input. */
   private String last = "";
   /** History pointer. */
@@ -83,6 +87,12 @@ public class BaseXTextField extends JTextField {
     if(dialog != null) addKeyListener(dialog.keys);
   }
 
+  @Override
+  public void setFont(final Font f) {
+    super.setFont(f);
+    if(hint != null) hint.setFont(f);
+  }
+
   /**
    * Attaches a history.
    * @param gui gui reference
@@ -113,6 +123,19 @@ public class BaseXTextField extends JTextField {
     if(history == null) return;
     history.store(getText());
     hist = 0;
+  }
+
+  /**
+   * Adds a hint to the text field.
+   * @param label text of the hint
+   */
+  public void hint(final String label) {
+    if(hint == null) {
+      hint = new BaseXTextHint(label + Text.DOTS, this);
+    } else {
+      hint.setText(label + Text.DOTS);
+    }
+    setToolTipText(label);
   }
 
   @Override

@@ -116,6 +116,15 @@ public final class GUIInput extends BaseXTextField {
   }
 
   /**
+   * Sets the input mode.
+   * @param mode mode
+   */
+  void mode(final String mode) {
+    setText("");
+    hint(mode);
+  }
+
+  /**
    * Checks if the query is a command.
    * @return result of check
    */
