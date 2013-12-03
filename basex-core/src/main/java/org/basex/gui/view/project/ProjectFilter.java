@@ -51,7 +51,6 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
     files.hint(Text.SEARCH_FILES);
 
     contents = new BaseXTextField(view.gui);
-    contents.setEnabled(false);
     contents.hint(Text.SEARCH_CONTENTS);
 
     add(files, BorderLayout.NORTH);
@@ -143,7 +142,7 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
     lastContents = cont;
 
     final Component oldView = project.scroll.getViewport().getView(), newView;
-    if(file.isEmpty()) {
+    if(file.isEmpty() && cont.isEmpty()) {
       newView = project.tree;
       ++threadID;
     } else {
@@ -158,7 +157,6 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
       t.start();
     }
     if(oldView != newView) project.scroll.setViewportView(newView);
-    contents.setEnabled(!file.isEmpty());
   }
 
   @Override
@@ -172,8 +170,12 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    if(BaseXKeys.ENTER.is(e)) project.list.open();
-    else if(BaseXKeys.ESCAPE.is(e)) files.setText("");
+    if(BaseXKeys.ENTER.is(e)) {
+      project.list.open();
+    } else if(BaseXKeys.ESCAPE.is(e)) {
+      files.setText("");
+      contents.setText("");
+    }
   }
 
   // PRIVATE METHODS ==============================================================================

@@ -321,6 +321,25 @@ public final class IOFile extends IO {
   }
 
   /**
+   * Opens the file natively.
+   * @throws IOException I/O exception
+   */
+  public void open() throws IOException {
+    // default solution does not always work; fallback solutions:
+    final String[] args;
+    if(Prop.WIN) {
+      args = new String[] { "rundll32", "url.dll,FileProtocolHandler", path };
+    } else if(Prop.MAC) {
+      args = new String[] { "/usr/bin/open", path };
+    } else {
+      args = new String[] { "xdg-open", path };
+    }
+    new ProcessBuilder(args).directory(dir().file).start();
+  }
+
+  // STATIC METHODS ===============================================================================
+
+  /**
    * Checks if the specified sting is a valid file name.
    * @param name file name
    * @return result of check

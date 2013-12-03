@@ -488,7 +488,7 @@ public final class EditorView extends View {
       if(!XMLToken.valid(cp(buffer, c))) {
         if(!BaseXDialog.confirm(gui, H_FILE_BINARY)) break;
         try {
-          Util.open(file.path());
+          file.open();
         } catch(final IOException ex) {
           Desktop.getDesktop().open(file.file());
         }
@@ -899,7 +899,8 @@ public final class EditorView extends View {
    */
   private BaseXButton tabButton(final String icon) {
     final BaseXButton b = new BaseXButton(gui, icon, null);
-    b.border(2, 2, 2, 2).setContentAreaFilled(false);
+    b.setMargin(new Insets(0, 0, 0, 0));
+    b.setContentAreaFilled(false);
     b.setFocusable(false);
     return b;
   }
