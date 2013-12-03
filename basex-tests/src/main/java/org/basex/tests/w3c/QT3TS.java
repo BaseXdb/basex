@@ -424,6 +424,8 @@ public final class QT3TS {
       "@type = 'unicode-normalization-form' and @value = 'FULLY-NORMALIZED' or " +
       // skip xml/xsd 1.1 tests
       "@type = ('xml-version', 'xsd-version') and @value = ('1.1', '1.0:4-') or " +
+      // skip limits
+      "@type = 'limits' and @value = ('big_integer') or " +
       // skip non-XQuery tests
       "@type = 'spec' and not(contains(@value, 'XQ'))" +
       "]", ctx).context(test).value().size() == 0;
