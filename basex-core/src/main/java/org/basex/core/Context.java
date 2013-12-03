@@ -107,8 +107,7 @@ public final class Context {
     sessions = new Sessions();
     blocker = new ClientBlocker();
     databases = new Databases(this);
-    locks = gopts.get(GlobalOptions.GLOBALLOCK) || Prop.gui ?
-      new ProcLocking(this) : new DBLocking(gopts);
+    locks = gopts.get(GlobalOptions.GLOBALLOCK) ? new ProcLocking(this) : new DBLocking(gopts);
     users = new Users(this);
     repo = new Repo(this);
     log = new Log(this);
