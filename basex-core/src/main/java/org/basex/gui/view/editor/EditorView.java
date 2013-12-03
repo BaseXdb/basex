@@ -483,17 +483,21 @@ public final class EditorView extends View {
     // check content
     final BufferInput bi = new BufferInput(file);
     final byte[] buffer = new byte[IO.BLOCKSIZE];
-    final int size = Math.max(0, bi.read(buffer) - 4);
-    for(int c = 0; c < size; c += cl(buffer, c)) {
-      if(!XMLToken.valid(cp(buffer, c))) {
-        if(!BaseXDialog.confirm(gui, H_FILE_BINARY)) break;
-        try {
-          file.open();
-        } catch(final IOException ex) {
-          Desktop.getDesktop().open(file.file());
+    try {
+      final int size = Math.max(0, bi.read(buffer) - 4);
+      for(int c = 0; c < size; c += cl(buffer, c)) {
+        if(!XMLToken.valid(cp(buffer, c))) {
+          if(!BaseXDialog.confirm(gui, H_FILE_BINARY)) break;
+          try {
+            file.open();
+          } catch(final IOException ex) {
+            Desktop.getDesktop().open(file.file());
+          }
+          return null;
         }
-        return null;
       }
+    } finally {
+      bi.close();
     }
     return file.read();
   }
