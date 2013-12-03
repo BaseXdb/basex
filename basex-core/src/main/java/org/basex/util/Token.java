@@ -834,7 +834,7 @@ public final class Token {
    */
   public static int indexOf(final byte[] token, final byte[] sub, final int pos) {
     final int sl = sub.length;
-    if(sl == 0) return 0;
+    if(sl == 0) return pos;
     final int tl = token.length - sl;
     if(pos > tl) return -1;
 
