@@ -1,11 +1,11 @@
 package org.basex.gui.editor;
 
-import static org.basex.core.Text.*;
 import static org.basex.gui.layout.BaseXKeys.*;
 
 import java.awt.*;
 import java.awt.event.*;
 
+import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.editor.Editor.SearchDir;
@@ -65,19 +65,19 @@ public final class SearchBar extends BaseXBack {
     search = new BaseXTextField(main);
     search.history(gui, GUIOptions.SEARCHED);
     search.setPreferredSize(null);
-    search.hint(SEARCH);
+    search.hint(Text.FIND);
 
     replace = new BaseXTextField(main);
     replace.history(gui, GUIOptions.REPLACED);
     replace.setPreferredSize(null);
-    replace.hint(REPLACE_WITH);
+    replace.hint(Text.REPLACE_WITH);
 
-    regex = onOffButton("s_regex", REGULAR_EXPR, GUIOptions.SR_REGEX);
-    mcase = onOffButton("s_case", MATCH_CASE, GUIOptions.SR_CASE);
-    word = onOffButton("s_word", WHOLE_WORD, GUIOptions.SR_WORD);
-    multi = onOffButton("s_multi", MULTI_LINE, GUIOptions.SR_MULTI);
-    rplc  = new BaseXButton(main, "s_replace", REPLACE_ALL);
-    cls = new BaseXButton(main, "s_close", BaseXLayout.addShortcut(CLOSE, ESCAPE.toString()));
+    regex = onOffButton("s_regex", Text.REGULAR_EXPR, GUIOptions.SR_REGEX);
+    mcase = onOffButton("s_case", Text.MATCH_CASE, GUIOptions.SR_CASE);
+    word = onOffButton("s_word", Text.WHOLE_WORD, GUIOptions.SR_WORD);
+    multi = onOffButton("s_multi", Text.MULTI_LINE, GUIOptions.SR_MULTI);
+    rplc  = new BaseXButton(main, "s_replace", Text.REPLACE_ALL);
+    cls = new BaseXButton(main, "s_close", BaseXLayout.addShortcut(Text.CLOSE, ESCAPE.toString()));
     multi.setEnabled(regex.isSelected());
     word.setEnabled(!regex.isSelected());
 

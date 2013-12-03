@@ -68,11 +68,11 @@ public final class InfoView extends View implements LinkListener {
     timer = new BaseXLabel(" ", true, false);
     timer.setForeground(GUIConstants.DGRAY);
 
-    final BaseXButton srch = new BaseXButton(gui, "search",
-        BaseXLayout.addShortcut(SEARCH, BaseXKeys.FIND.toString()));
+    final BaseXButton find = new BaseXButton(gui, "find",
+        BaseXLayout.addShortcut(FIND, BaseXKeys.FIND.toString()));
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
     buttons.layout(new TableLayout(1, 3, 8, 0)).border(0, 0, 4, 0);
-    buttons.add(srch);
+    buttons.add(find);
     buttons.add(timer);
 
     final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
@@ -83,7 +83,7 @@ public final class InfoView extends View implements LinkListener {
     final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     area = new Editor(false, gui);
     area.setLinkListener(this);
-    editor = new SearchEditor(gui, area).button(srch);
+    editor = new SearchEditor(gui, area).button(find);
     add(editor, BorderLayout.CENTER);
 
     center.add(area, BorderLayout.CENTER);

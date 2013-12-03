@@ -46,7 +46,7 @@ public enum GUICommands implements GUICmd {
   },
 
   /** Opens a dialog to manage databases. */
-  C_OPEN_MANAGE(OPEN_MANAGE + DOTS, "% O", H_OPEN_MANAGE, false, false) {
+  C_OPEN_MANAGE(OPEN_MANAGE + DOTS, "% M", H_OPEN_MANAGE, false, false) {
     @Override
     public void execute(final GUI gui) {
       if(new DialogManage(gui).nodb() && BaseXDialog.confirm(gui, NEW_DB_QUESTION))
@@ -126,7 +126,7 @@ public enum GUICommands implements GUICmd {
   },
 
   /** Opens a new file in the editor. */
-  C_EDITOPEN(OPEN + DOTS, "% R", H_OPEN_FILE, false, false) {
+  C_EDITOPEN(OPEN + DOTS, "% O", H_OPEN_FILE, false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.open();
@@ -142,7 +142,7 @@ public enum GUICommands implements GUICmd {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.editor != null);
+      b.setEnabled(gui.gopts.get(GUIOptions.SHOWEDITOR));
     }
   },
 
@@ -155,7 +155,7 @@ public enum GUICommands implements GUICmd {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.editor != null && gui.editor.modified());
+      b.setEnabled(gui.gopts.get(GUIOptions.SHOWEDITOR) && gui.editor.modified());
     }
   },
 
@@ -165,6 +165,11 @@ public enum GUICommands implements GUICmd {
     public void execute(final GUI gui) {
       gui.editor.saveAs();
     }
+
+    @Override
+    public void refresh(final GUI gui, final AbstractButton b) {
+      b.setEnabled(gui.gopts.get(GUIOptions.SHOWEDITOR));
+    }
   },
 
   /** Closes the current editor file. */
@@ -173,13 +178,36 @@ public enum GUICommands implements GUICmd {
     public void execute(final GUI gui) {
       gui.editor.close(null);
     }
+
+    @Override
+    public void refresh(final GUI gui, final AbstractButton b) {
+      b.setEnabled(gui.gopts.get(GUIOptions.SHOWEDITOR));
+    }
   },
 
-  /** Jumps to a certain line. */
-  C_EDIT_GOTO(GO_TO_LINE + DOTS, "% L", H_GO_TO_LINE, false, false) {
+  /** Jumps to the next error. */
+  C_NEXTERROR(NEXT_ERROR, "% PERIOD", null, false, false) {
     @Override
     public void execute(final GUI gui) {
-      gui.editor.gotoLine();
+      gui.editor.jumpToError();
+    }
+
+    @Override
+    public void refresh(final GUI gui, final AbstractButton b) {
+      b.setEnabled(gui.gopts.get(GUIOptions.SHOWEDITOR));
+    }
+  },
+
+  /** Adds or removes a comment. */
+  C_COMMENT(COMMENT, "% K", null, false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().comment();
+    }
+
+    @Override
+    public void refresh(final GUI gui, final AbstractButton b) {
+      b.setEnabled(gui.gopts.get(GUIOptions.SHOWEDITOR));
     }
   },
 
@@ -370,8 +398,26 @@ public enum GUICommands implements GUICmd {
     }
   },
 
+  /** Finds files. */
+  C_FILESEARCH(FIND_FILES + DOTS, "% shift F", null, false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      if(!gui.gopts.get(GUIOptions.SHOWPROJECT)) {
+        gui.gopts.invert(GUIOptions.SHOWPROJECT);
+        gui.editor.project();
+      }
+      gui.editor.focus(true);
+      gui.layoutViews();
+    }
+
+    @Override
+    public void refresh(final GUI gui, final AbstractButton b) {
+      b.setEnabled(gui.gopts.get(GUIOptions.SHOWEDITOR));
+    }
+  },
+
   /** Shows the XQuery project structure. */
-  C_SHOWPROJECT(PROJECT_VIEW, "% shift E", null, false, true) {
+  C_SHOWPROJECT(PROJECT, "% P", null, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWPROJECT);
@@ -454,7 +500,7 @@ public enum GUICommands implements GUICmd {
   },
 
   /** Shows the text view. */
-  C_SHOWRESULT(RESULT, "% 1", H_RESULT, false, true) {
+  C_SHOWRESULT(RESULT, "% R", H_RESULT, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWTEXT);
@@ -469,7 +515,7 @@ public enum GUICommands implements GUICmd {
   },
 
   /** Shows the map. */
-  C_SHOWMAP(MAP, "% 2", H_MAP, true, true) {
+  C_SHOWMAP(MAP, "% 1", H_MAP, true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWMAP);
@@ -484,7 +530,7 @@ public enum GUICommands implements GUICmd {
   },
 
   /** Shows the tree view. */
-  C_SHOWTREE(TREE, "% 3", H_TREE, true, true) {
+  C_SHOWTREE(TREE, "% 2", H_TREE, true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWTREE);
@@ -499,7 +545,7 @@ public enum GUICommands implements GUICmd {
   },
 
   /** Shows the tree view. */
-  C_SHOWFOLDER(FOLDER, "% 4", H_FOLDER, true, true) {
+  C_SHOWFOLDER(FOLDER, "% 3", H_FOLDER, true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWFOLDER);
@@ -514,7 +560,7 @@ public enum GUICommands implements GUICmd {
   },
 
   /** Shows the plot view. */
-  C_SHOWPLOT(PLOT, "% 5", H_PLOT, true, true) {
+  C_SHOWPLOT(PLOT, "% 4", H_PLOT, true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWPLOT);
@@ -529,7 +575,7 @@ public enum GUICommands implements GUICmd {
   },
 
   /** Shows the table view. */
-  C_SHOWTABLE(TABLE, "% 6", H_TABLE, true, true) {
+  C_SHOWTABLE(TABLE, "% 5", H_TABLE, true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWTABLE);
@@ -544,7 +590,7 @@ public enum GUICommands implements GUICmd {
   },
 
   /** Shows the explorer view. */
-  C_SHOWEXPLORE(EXPLORER, "% 7", H_EXPLORER, true, true) {
+  C_SHOWEXPLORE(EXPLORER, "% 6", H_EXPLORER, true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWEXPLORE);
@@ -663,7 +709,7 @@ public enum GUICommands implements GUICmd {
   },
 
   /** Shows a preference dialog. */
-  C_PREFS(PREFERENCES + DOTS, Prop.MAC ? "% COMMA" : "% P", H_PREFERENCES, false, false) {
+  C_PREFS(PREFERENCES + DOTS, Prop.MAC ? "% COMMA" : "% shift P", H_PREFERENCES, false, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogPrefs(gui);

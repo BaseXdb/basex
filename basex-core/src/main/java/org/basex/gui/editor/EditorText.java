@@ -402,43 +402,36 @@ public final class EditorText {
   void comment(final Syntax syntax) {
     final byte[] st = syntax.commentOpen();
     final byte[] en = syntax.commentEnd();
-    boolean add = true;
-    int min = ps;
-    int max = ps;
+    final int sl = st.length, el = en.length;
 
-    if(selected()) {
-      min = ps < ms ? ps : ms;
-      max = ps > ms ? ps : ms;
-      if(max > min && text[max - 1] == '\n') max--;
+    // no selection: select line
+    if(!selected()) {
+      ms = ps;
+      me = ps;
+      while(ms > 0 && text[ms - 1] != '\n') --ms;
+      while(me < size() && text[me] != '\n') ++me;
+    }
 
-      // selected
-      final int mn = Math.max(min + st.length, max - en.length);
-      // check if selected area already has a comment
-      if(indexOf(text, st, min) == min && indexOf(text, en, mn) == mn) {
-        final TokenBuilder tb = new TokenBuilder();
-        tb.add(text, 0, min);
-        tb.add(text, min + st.length, max - en.length);
-        tb.add(text, max, text.length);
-        text(tb.finish());
-        ms = min;
-        me = max - st.length - en.length;
-        ps = me;
-        add = false;
-      }
+    // selected
+    final int min = Math.min(ms, me);
+    int max = Math.max(ms, me);
+    if(selected() && text[max - 1] == '\n') max--;
+
+    final TokenBuilder tb = new TokenBuilder().add(text, 0, min);
+    final int mx = Math.max(min + sl, max - el), off;
+    if(indexOf(text, st, min) == min && indexOf(text, en, mx) == mx) {
+      // selected area already has a comment
+      tb.add(text, min + sl, max - el);
+      off = -sl - el;
     } else {
-      while(min > 0 && text[min - 1] != '\n') --min;
-      while(max < size() && text[max] != '\n') ++max;
+      tb.add(st).add(text, min, max).add(en);
+      off = sl + el;
     }
-
-    if(add) {
-      pos(max);
-      add(string(en));
-      pos(min);
-      add(string(st));
-      ms = min;
-      me = max + st.length + en.length;
-      ps = me;
-    }
+    text(tb.add(text, max, text.length).finish());
+    ms = min;
+    me = max + off;
+    setCaret(me);
+    checkSelect();
   }
 
   /**

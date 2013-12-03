@@ -111,8 +111,6 @@ public final class EditorArea extends Editor {
     final byte[] t = text.text();
     super.keyPressed(e);
 
-    if(FINDERROR.is(e)) view.jumpToError();
-
     if(t != text.text()) resetError();
     view.posCode.invokeLater();
   }
@@ -129,7 +127,7 @@ public final class EditorArea extends Editor {
     super.keyReleased(e);
     if(EXEC1.is(e) || EXEC2.is(e)) {
       release(Action.EXECUTE);
-    } else if(!e.isActionKey() && !modifier(e) && !FINDERROR.is(e)) {
+    } else if(!e.isActionKey() && !modifier(e)) {
       release(Action.CHECK);
     }
   }

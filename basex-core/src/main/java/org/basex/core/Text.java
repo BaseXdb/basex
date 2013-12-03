@@ -736,6 +736,8 @@ public interface Text {
   String NAME = lang("name");
   /** "Size". */
   String SIZE = lang("size");
+  /** "Nodes". */
+  String NODES = lang("nodes");
   /** "Type". */
   String TYPE = lang("type");
   /** "Input path". */
@@ -831,10 +833,10 @@ public interface Text {
   String EDITOR = lang("editor");
   /** "View". */
   String VIEW = lang("view");
-  /** "Nodes". */
-  String NODES = lang("nodes");
   /** "Options". */
   String OPTIONS = lang("options");
+  /** "Visualization". */
+  String VISUALIZATION = lang("visualization");
   /** "Help". */
   String HELP = lang("help");
 
@@ -901,7 +903,7 @@ public interface Text {
   /** Command info. */
   String FOLDER = lang("folder");
   /** Command info. */
-  String PROJECT_VIEW = lang("project_view");
+  String PROJECT = lang("project");
   /** Command info. */
   String COMMUNITY = lang("community");
   /** Command info. */
@@ -956,11 +958,11 @@ public interface Text {
   String REFRESH = lang("refresh");
 
   /** "Search". */
-  String SEARCH = lang("search");
-  /** "Search". */
-  String SEARCH_FILES = lang("search_files");
-  /** "Search". */
-  String SEARCH_CONTENTS = lang("search_contents");
+  String FIND = lang("find");
+  /** "Find files". */
+  String FIND_FILES = lang("find_files");
+  /** "Find contents". */
+  String FIND_CONTENTS = lang("find_contents");
   /** "Find next ". */
   String FIND_NEXT = lang("find_next");
   /** "Find previous". */
@@ -1217,6 +1219,8 @@ public interface Text {
   /** Language preference. */
   String LANGUAGE_RESTART = lang("language") + " (" + lang("requires_restart") + ')';
 
+  /** Comment. */
+  String COMMENT = lang("comment");
   /** Dialog title for inserting new data. */
   String INSERT_NEW_DATA = lang("insert_new_data");
   /** Dialog title for updating document data. */
@@ -1227,7 +1231,7 @@ public interface Text {
   String EDIT_X = lang("edit_%");
   /** Dialog title for updating text. */
   String[] NODE_KINDS = { lang("document"), lang("element"), lang("text"),
-      lang("attribute"), lang("comment"), lang("pi")
+      lang("attribute"), COMMENT, lang("pi")
   };
 
   /** Dialog title for choosing a font. */
@@ -1406,10 +1410,8 @@ public interface Text {
   String H_REOPEN_FILE = lang("h_reopen_file");
   /** Command info. */
   String H_REPLACE = lang("h_replace");
-  /** Help string. */
+  /** Command info. */
   String H_CLOSE_FILE = lang("h_close_file");
-  /** Help string. */
-  String H_GO_TO_LINE = lang("h_go_to_line");
   /** Command info. */
   String H_SAVE = lang("h_save");
 

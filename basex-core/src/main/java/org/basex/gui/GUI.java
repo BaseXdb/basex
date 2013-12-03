@@ -159,7 +159,7 @@ public final class GUI extends AGUI {
 
     nav = new BaseXBack(new BorderLayout(5, 0)).border(2, 2, 0, 2);
 
-    mode = new BaseXCombo(this, SEARCH, XQUERY, COMMAND);
+    mode = new BaseXCombo(this, FIND, XQUERY, COMMAND);
     mode.setSelectedIndex(2);
 
     mode.addActionListener(new ActionListener() {

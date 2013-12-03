@@ -38,11 +38,10 @@ public enum BaseXKeys {
   // Find
 
   /** Find search term.      */ FIND(META, VK_F, true),
-  /** Find next hit.         */ FINDNEXT(META, VK_G, true),
-  /** Find next hit.         */ FINDNEXT2(MAC ? META : 0, VK_F3, true),
-  /** Find previous hit.     */ FINDPREV(META | SHIFT, VK_G, true),
-  /** Find previous hit.     */ FINDPREV2(MAC ? META | SHIFT : SHIFT, VK_F3, true),
-  /** Jump to error.         */ FINDERROR(META, VK_PERIOD),
+  /** Find next hit.         */ FINDNEXT(MAC ? META : 0, VK_F3, true),
+  /** Find next hit.         */ FINDNEXT2(META, VK_G, true),
+  /** Find previous hit.     */ FINDPREV(MAC ? META | SHIFT : SHIFT, VK_F3, true),
+  /** Find previous hit.     */ FINDPREV2(META | SHIFT, VK_G, true),
   /** Code completion.       */ COMPLETE(META, VK_SPACE),
 
   // Editing
@@ -66,7 +65,6 @@ public enum BaseXKeys {
   /** Delete line to end.    */ DELLINEEND(META | (MAC ? 0 : SHIFT), VK_DELETE, true),
   /** Delete complete line.  */ DELLINE(META | SHIFT, VK_D, true),
 
-  /** (Un)comment.           */ COMMENT(META, VK_K, false),
   /** Execute.               */ EXEC1(META, VK_ENTER, true),
   /** Execute.               */ EXEC2(META, VK_F11, true),
 
@@ -83,10 +81,12 @@ public enum BaseXKeys {
   /** Browse up.             */ GOUP(MAC ? META : ALT, VK_UP, true),
   /** Browse home.           */ GOHOME(MAC ? META : ALT, VK_HOME, true),
 
+  /** Go to line.            */ GOTOLINE(META, VK_L, true),
+
+  // Project structure
+
   /** Refresh.               */ REFRESH(VK_F5),
   /** Rename.                */ RENAME(VK_F2),
-  /** Jump to project.       */ PROJECT(META | SHIFT, VK_R, true),
-  /** Jump to filter.        */ FILTER(META | SHIFT, VK_T, true),
   /** New directory.         */ NEWDIR(META | SHIFT, VK_N),
 
   // Font

@@ -1,6 +1,5 @@
 package org.basex.gui.editor;
 
-import static org.basex.core.Text.*;
 import static org.basex.gui.layout.BaseXKeys.*;
 import static org.basex.util.Token.*;
 
@@ -13,8 +12,10 @@ import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.border.*;
 
+import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
+import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
 import org.basex.io.*;
 import org.basex.util.*;
@@ -126,14 +127,13 @@ public class Editor extends BaseXPanel {
 
     new BaseXPopup(this, edit ?
       new GUICmd[] {
-        new JumpErrorCmd(), new FindNextCmd(), new FindPrevCmd(), null,
+        new FindCmd(), new FindNextCmd(), new FindPrevCmd(), null, new GotoCmd(), null,
         new UndoCmd(), new RedoCmd(), null,
-        new CutCmd(), new CopyCmd(), new PasteCmd(), new DelCmd(), null,
-        new AllCmd() } :
+        new AllCmd(), new CutCmd(), new CopyCmd(), new PasteCmd(), new DelCmd() } :
       new GUICmd[] {
-        new FindNextCmd(), new FindPrevCmd(), null,
-        new CopyCmd(), null,
-        new AllCmd() });
+        new FindCmd(), new FindNextCmd(), new FindPrevCmd(), null, new GotoCmd(), null,
+        new AllCmd(), new CopyCmd() }
+    );
   }
 
   /**
@@ -300,6 +300,13 @@ public class Editor extends BaseXPanel {
     }.start();
   }
 
+  /**
+   * Adds or removes a comment.
+   */
+  public void comment() {
+    text.comment(rend.getSyntax());
+  }
+
   @Override
   public final void setEnabled(final boolean e) {
     super.setEnabled(e);
@@ -352,11 +359,11 @@ public class Editor extends BaseXPanel {
   final void search(final SearchContext sc, final boolean jump) {
     try {
       rend.search(sc);
-      gui.status.setText(sc.search.isEmpty() ? OK : Util.info(STRINGS_FOUND_X,  sc.nr()));
+      gui.status.setText(sc.search.isEmpty() ? Text.OK : Util.info(Text.STRINGS_FOUND_X,  sc.nr()));
       if(jump) jump(SearchDir.CURRENT, false);
     } catch(final Exception ex) {
       final String msg = Util.message(ex).replaceAll(Prop.NL + ".*", "");
-      gui.status.setError(REGULAR_EXPR + COLS + msg);
+      gui.status.setError(Text.REGULAR_EXPR + Text.COLS + msg);
     }
   }
 
@@ -374,10 +381,10 @@ public class Editor extends BaseXPanel {
         text.setCaret(select[0]);
         release(Action.CHECK);
       }
-      gui.status.setText(Util.info(STRINGS_REPLACED));
+      gui.status.setText(Util.info(Text.STRINGS_REPLACED));
     } catch(final Exception ex) {
       final String msg = Util.message(ex).replaceAll(Prop.NL + ".*", "");
-      gui.status.setError(REGULAR_EXPR + COLS + msg);
+      gui.status.setError(Text.REGULAR_EXPR + Text.COLS + msg);
     }
   }
 
@@ -470,40 +477,53 @@ public class Editor extends BaseXPanel {
 
   // KEY INTERACTIONS =======================================================
 
-  @Override
-  public void keyPressed(final KeyEvent e) {
-    // handle search operations
-    if(search != null) {
-      if(ESCAPE.is(e)) {
-        search.deactivate(true);
-        return;
-      }
-      if(FIND.is(e)) {
-        search.activate(text.copy(), true);
-        return;
-      }
-      if(FINDNEXT.is(e) || FINDNEXT2.is(e)) {
-        find(true);
-        return;
-      }
-      if(FINDPREV.is(e) || FINDPREV2.is(e)) {
-        find(false);
-        return;
-      }
+  /**
+   * Invokes special keys.
+   * @param e key event
+   * @return {@code true} if special key was processed
+   */
+  private boolean searchKey(final KeyEvent e) {
+    if(search == null) return false;
+
+    if(ESCAPE.is(e)) {
+      search.deactivate(true);
+    } else if(FIND.is(e)) {
+      search.activate(text.copy(), true);
+    } else if(FINDNEXT.is(e) || FINDNEXT2.is(e)) {
+      find(true);
+    } else if(FINDPREV.is(e) || FINDPREV2.is(e)) {
+      find(false);
+    } else {
+      return false;
     }
+    return true;
+  }
 
-    // ignore modifier keys
-    if(modifier(e)) return;
-
-    if(PREVTAB.is(e)) {
+  /**
+   * Invokes special keys.
+   * @param e key event
+   * @return {@code true} if special key was processed
+   */
+  private boolean specialKey(final KeyEvent e) {
+    if(GOTOLINE.is(e)) {
+      gotoLine();
+    } else if(PREVTAB.is(e)) {
       gui.editor.tab(false);
-      e.consume();
     } else if(NEXTTAB.is(e)) {
       gui.editor.tab(true);
-      e.consume();
     } else if(CLOSETAB.is(e)) {
       gui.editor.close(null);
+    } else {
+      return false;
     }
+    e.consume();
+    return true;
+  }
+
+  @Override
+  public void keyPressed(final KeyEvent e) {
+    // ignore modifier keys
+    if(searchKey(e) || specialKey(e) || modifier(e)) return;
 
     // re-animate cursor
     cursor(true);
@@ -535,7 +555,7 @@ public class Editor extends BaseXPanel {
 
     // necessary on Macs as the shift button is pressed for REDO
     final boolean marking = e.isShiftDown() &&
-      !DELNEXT.is(e) && !DELPREV.is(e) && !PASTE2.is(e) && !COMMENT.is(e) &&
+      !DELNEXT.is(e) && !DELPREV.is(e) && !PASTE2.is(e) &&
       !DELLINE.is(e) && !REDOSTEP.is(e) && !PREVPAGE_RO.is(e);
     final boolean nomark = !text.selecting();
     if(marking && nomark) text.startSelect();
@@ -605,8 +625,6 @@ public class Editor extends BaseXPanel {
           text.text(t);
           text.pos(hist.cursor());
         }
-      } else if(COMMENT.is(e)) {
-        text.comment(rend.getSyntax());
       } else if(COMPLETE.is(e)) {
         text.complete();
       } else if(DELLINE.is(e)) {
@@ -862,7 +880,7 @@ public class Editor extends BaseXPanel {
     @Override
     public boolean enabled(final GUI main) { return !hist.first(); }
     @Override
-    public String label() { return UNDO; }
+    public String label() { return Text.UNDO; }
     @Override
     public BaseXKeys key() { return UNDOSTEP; }
   }
@@ -879,9 +897,9 @@ public class Editor extends BaseXPanel {
       finish(-1);
     }
     @Override
-    public boolean enabled(final GUI mein) { return !hist.last(); }
+    public boolean enabled(final GUI main) { return !hist.last(); }
     @Override
-    public String label() { return REDO; }
+    public String label() { return Text.REDO; }
     @Override
     public BaseXKeys key() { return REDOSTEP; }
   }
@@ -901,7 +919,7 @@ public class Editor extends BaseXPanel {
     @Override
     public boolean enabled(final GUI main) { return text.selected(); }
     @Override
-    public String label() { return CUT; }
+    public String label() { return Text.CUT; }
     @Override
     public BaseXKeys key() { return CUT1; }
   }
@@ -913,7 +931,7 @@ public class Editor extends BaseXPanel {
     @Override
     public boolean enabled(final GUI main) { return text.selected(); }
     @Override
-    public String label() { return COPY; }
+    public String label() { return Text.COPY; }
     @Override
     public BaseXKeys key() { return COPY1; }
   }
@@ -934,7 +952,7 @@ public class Editor extends BaseXPanel {
     @Override
     public boolean enabled(final GUI main) { return clip() != null; }
     @Override
-    public String label() { return PASTE; }
+    public String label() { return Text.PASTE; }
     @Override
     public BaseXKeys key() { return PASTE1; }
   }
@@ -952,7 +970,7 @@ public class Editor extends BaseXPanel {
     @Override
     public boolean enabled(final GUI main) { return text.selected(); }
     @Override
-    public String label() { return DELETE; }
+    public String label() { return Text.DELETE; }
     @Override
     public BaseXKeys key() { return DELNEXT; }
   }
@@ -962,9 +980,21 @@ public class Editor extends BaseXPanel {
     @Override
     public void execute(final GUI main) { selectAll(); }
     @Override
-    public String label() { return SELECT_ALL; }
+    public String label() { return Text.SELECT_ALL; }
     @Override
     public BaseXKeys key() { return SELECTALL; }
+  }
+
+  /** Find next hit. */
+  class FindCmd extends GUIBaseCmd {
+    @Override
+    public void execute(final GUI main) { search.activate(text.copy(), true); }
+    @Override
+    public String label() { return Text.FIND + Text.DOTS; }
+    @Override
+    public boolean enabled(final GUI main) { return search != null; }
+    @Override
+    public BaseXKeys key() { return FIND; }
   }
 
   /** Find next hit. */
@@ -972,9 +1002,9 @@ public class Editor extends BaseXPanel {
     @Override
     public void execute(final GUI main) { find(true); }
     @Override
-    public String label() { return FIND_NEXT; }
+    public String label() { return Text.FIND_NEXT; }
     @Override
-    public boolean enabled(final GUI main) { return search.isVisible(); }
+    public boolean enabled(final GUI main) { return search != null && search.isVisible(); }
     @Override
     public BaseXKeys key() { return FINDNEXT; }
   }
@@ -984,32 +1014,57 @@ public class Editor extends BaseXPanel {
     @Override
     public void execute(final GUI main) { find(true); }
     @Override
-    public String label() { return FIND_PREVIOUS; }
+    public String label() { return Text.FIND_PREVIOUS; }
     @Override
-    public boolean enabled(final GUI main) { return search.isVisible(); }
+    public boolean enabled(final GUI main) { return search != null && search.isVisible(); }
     @Override
     public BaseXKeys key() { return FINDPREV; }
-  }
-
-  /** Find previous hit. */
-  class JumpErrorCmd extends GUIBaseCmd {
-    @Override
-    public void execute(final GUI main) { gui.editor.jumpToError(); }
-    @Override
-    public String label() { return NEXT_ERROR; }
-    @Override
-    public boolean enabled(final GUI main) { return gui.editor.errMsg != null; }
-    @Override
-    public BaseXKeys key() { return FINDERROR; }
   }
 
   /**
    * Highlights the next/previous hit.
    * @param next next/previous hit
    */
-  void find(final boolean next) {
+  private void find(final boolean next) {
     final boolean vis = search.isVisible();
     search.activate(text.copy(), false);
     jump(vis ? next ? SearchDir.FORWARD : SearchDir.BACKWARD : SearchDir.CURRENT, true);
+  }
+
+  /** Go to line. */
+  class GotoCmd extends GUIBaseCmd {
+    @Override
+    public void execute(final GUI main) { gotoLine(); }
+    @Override
+    public String label() { return Text.GO_TO_LINE + Text.DOTS; }
+    @Override
+    public boolean enabled(final GUI main) { return search != null; }
+    @Override
+    public BaseXKeys key() { return GOTOLINE; }
+  }
+
+  /**
+   * Jumps to a specific line.
+   */
+  private void gotoLine() {
+    final byte[] last = text.text();
+    final int ll = last.length;
+    final int cr = getCaret();
+    int l = 1;
+    for(int e = 0; e < ll && e < cr; e += cl(last, e)) {
+      if(last[e] == '\n') ++l;
+    }
+    final DialogLine dl = new DialogLine(gui, l);
+    if(!dl.ok()) return;
+    final int el = dl.line();
+    l = 1;
+    int p = 0;
+    for(int e = 0; e < ll && l < el; e += cl(last, e)) {
+      if(last[e] != '\n') continue;
+      p = e + 1;
+      ++l;
+    }
+    setCaret(p);
+    gui.editor.posCode.invokeLater();
   }
 }

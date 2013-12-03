@@ -60,14 +60,14 @@ public final class TextView extends View {
     home.setEnabled(false);
 
     final BaseXButton save = new BaseXButton(gui, "save", H_SAVE_RESULT);
-    final BaseXButton srch = new BaseXButton(gui, "search",
-        BaseXLayout.addShortcut(SEARCH, BaseXKeys.FIND.toString()));
+    final BaseXButton find = new BaseXButton(gui, "find",
+        BaseXLayout.addShortcut(FIND, BaseXKeys.FIND.toString()));
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
     buttons.layout(new TableLayout(1, 3, 1, 0)).border(0, 0, 4, 0);
     buttons.add(save);
     buttons.add(home);
-    buttons.add(srch);
+    buttons.add(find);
 
     final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     b.add(buttons, BorderLayout.WEST);
@@ -76,7 +76,7 @@ public final class TextView extends View {
 
     text = new Editor(false, gui);
     text.setSyntax(new SyntaxXML());
-    search = new SearchEditor(gui, text).button(srch);
+    search = new SearchEditor(gui, text).button(find);
     add(search, BorderLayout.CENTER);
 
     save.addActionListener(new ActionListener() {

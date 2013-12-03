@@ -244,14 +244,6 @@ public final class BaseXLayout {
 
           // jump to input bar
           if(INPUTBAR.is(e)) gui.input.requestFocusInWindow();
-          // jump to project view
-          if(PROJECT.is(e) || FILTER.is(e)) {
-            if(!gui.gopts.get(GUIOptions.SHOWPROJECT)) {
-              gui.gopts.invert(GUIOptions.SHOWPROJECT);
-              gui.editor.project();
-            }
-            gui.editor.focus(FILTER.is(e));
-          }
 
           // change font size
           final int fs = gui.gopts.get(GUIOptions.FONTSIZE);

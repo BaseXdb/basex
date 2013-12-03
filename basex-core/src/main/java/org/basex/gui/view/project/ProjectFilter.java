@@ -48,10 +48,10 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
 
     layout(new BorderLayout(0, 2));
     files = new BaseXTextField(view.gui);
-    files.hint(Text.SEARCH_FILES);
+    files.hint(Text.FIND_FILES);
 
     contents = new BaseXTextField(view.gui);
-    contents.hint(Text.SEARCH_CONTENTS);
+    contents.hint(Text.FIND_CONTENTS);
 
     add(files, BorderLayout.NORTH);
     add(contents, BorderLayout.CENTER);

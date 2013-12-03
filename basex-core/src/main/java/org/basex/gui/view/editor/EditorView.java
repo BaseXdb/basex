@@ -17,7 +17,6 @@ import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.dialog.*;
 import org.basex.gui.editor.Editor.Action;
 import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
@@ -104,7 +103,7 @@ public final class EditorView extends View {
     final BaseXButton openB = BaseXButton.command(GUICommands.C_EDITOPEN, gui);
     final BaseXButton saveB = new BaseXButton(gui, "save", H_SAVE);
     hist = new BaseXButton(gui, "hist", H_RECENTLY_OPEN);
-    final BaseXButton srch = new BaseXButton(gui, "search",
+    final BaseXButton find = new BaseXButton(gui, "find",
         BaseXLayout.addShortcut(H_REPLACE, BaseXKeys.FIND.toString()));
 
     stop = new BaseXButton(gui, "stop", H_STOP_PROCESS);
@@ -124,7 +123,7 @@ public final class EditorView extends View {
     buttons.add(openB);
     buttons.add(saveB);
     buttons.add(hist);
-    buttons.add(srch);
+    buttons.add(find);
     buttons.add(Box.createHorizontalStrut(6));
     buttons.add(stop);
     buttons.add(go);
@@ -136,7 +135,7 @@ public final class EditorView extends View {
 
     tabs = new BaseXTabs(gui);
     tabs.setFocusable(Prop.MAC);
-    final SearchEditor center = new SearchEditor(gui, tabs, null).button(srch);
+    final SearchEditor center = new SearchEditor(gui, tabs, null).button(find);
     search = center.bar();
     addCreateTab();
 
@@ -410,6 +409,7 @@ public final class EditorView extends View {
    * Creates a new file.
    */
   public void newFile() {
+    if(!visible()) GUICommands.C_SHOWEDITOR.execute(gui);
     addTab();
     refreshControls(true);
   }
@@ -545,31 +545,6 @@ public final class EditorView extends View {
       tabs.setSelectedIndex(i - 1);
     }
     return true;
-  }
-
-  /**
-   * Jumps to a specific line.
-   */
-  public void gotoLine() {
-    final EditorArea edit = getEditor();
-    final int ll = edit.last.length;
-    final int cr = edit.getCaret();
-    int l = 1;
-    for(int e = 0; e < ll && e < cr; e += cl(edit.last, e)) {
-      if(edit.last[e] == '\n') ++l;
-    }
-    final DialogLine dl = new DialogLine(gui, l);
-    if(!dl.ok()) return;
-    final int el = dl.line();
-    l = 1;
-    int p = 0;
-    for(int e = 0; e < ll && l < el; e += cl(edit.last, e)) {
-      if(edit.last[e] != '\n') continue;
-      p = e + 1;
-      ++l;
-    }
-    edit.setCaret(p);
-    posCode.invokeLater();
   }
 
   /**
@@ -792,7 +767,7 @@ public final class EditorView extends View {
   }
 
   /** Code for setting cursor position. */
-  final GUICode posCode = new GUICode() {
+  public final GUICode posCode = new GUICode() {
     @Override
     public void eval(final Object arg) {
       final int[] lc = getEditor().pos();
