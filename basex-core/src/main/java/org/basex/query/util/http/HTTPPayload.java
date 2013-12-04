@@ -69,8 +69,7 @@ public final class HTTPPayload {
       throws IOException, QueryException {
 
     // error: use text/plain as content type
-    final String ct = error ? TEXT_PLAIN :
-      utype != null ? utype : contentType(ctype);
+    final String ct = error ? TEXT_PLAIN : utype != null ? utype : contentType(ctype);
 
     final FElem body;
     if(isMultipart(ct)) {
@@ -191,8 +190,9 @@ public final class HTTPPayload {
         final byte[] key = substring(l, 0, pos);
         final byte[] val = trim(substring(l, pos + 1));
         if(eq(lc(key), CONTENT_TYPE_LC)) {
-          ctype = string(val);
-          enc = charset(ctype);
+          final String ct = string(val);
+          enc = charset(ct);
+          ctype = contentType(ct);
         }
         if(val.length != 0 && parts != null)
           parts.add(new FElem(Q_HEADER).add(NAME, key).add(VALUE, val));
