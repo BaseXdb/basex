@@ -74,11 +74,14 @@ public final class EditorText {
   /**
    * Sets a new text.
    * @param txt new text
+   * @return {@code true} if text has changed
    */
-  void text(final byte[] txt) {
+  boolean text(final byte[] txt) {
+    if(eq(txt, text)) return false;
     text = txt;
     noSelect();
     if(search != null) spos = search.search(txt);
+    return true;
   }
 
   /**
@@ -354,8 +357,9 @@ public final class EditorText {
   /**
    * (Un)comments highlighted text or line.
    * @param syntax syntax highlighter
+   * @return {@code true} if text has changed
    */
-  void comment(final Syntax syntax) {
+  boolean comment(final Syntax syntax) {
     final byte[] st = syntax.commentOpen();
     final byte[] en = syntax.commentEnd();
     final int sl = st.length, el = en.length;
@@ -384,11 +388,12 @@ public final class EditorText {
       tb.add(st).add(text, min, max).add(en);
       off = sl + el;
     }
-    text(tb.add(text, max, text.length).finish());
+    final boolean changed = text(tb.add(text, max, text.length).finish());
     ms = min;
     me = max + off;
     setCaret(me);
     checkSelect();
+    return changed;
   }
 
   /**
@@ -463,20 +468,23 @@ public final class EditorText {
   /**
    * Formats the selected text.
    * @param syntax syntax highlighter
+   * @return {@code true} if text has changed
    */
-  void format(final Syntax syntax) {
+  boolean format(final Syntax syntax) {
     if(!selected()) {
       select(0, size());
-      if(!selected()) return;
+      if(!selected()) return false;
     }
 
     final int s = Math.min(ms, me), e = Math.max(ms, me), tl = text.length;
     final byte[] format = syntax.format(Arrays.copyOfRange(text, s, e));
-    text(new TokenBuilder().add(text, 0, s).add(format).add(text, e, tl).finish());
+    final boolean changed =
+        text(new TokenBuilder().add(text, 0, s).add(format).add(text, e, tl).finish());
     ms = s;
     me = s + format.length;
     setCaret(me);
     checkSelect();
+    return changed;
   }
 
   /**

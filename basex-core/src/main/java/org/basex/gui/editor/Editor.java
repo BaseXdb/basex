@@ -305,8 +305,7 @@ public class Editor extends BaseXPanel {
    */
   public void comment() {
     final int pc = text.getCaret();
-    text.comment(rend.getSyntax());
-    hist.store(text.text(), pc, text.getCaret());
+    if(text.comment(rend.getSyntax())) hist.store(text.text(), pc, text.getCaret());
     calcCode.invokeLater(true);
   }
 
@@ -315,8 +314,7 @@ public class Editor extends BaseXPanel {
    */
   public void format() {
     final int pc = text.getCaret();
-    text.format(rend.getSyntax());
-    hist.store(text.text(), pc, text.getCaret());
+    if(text.format(rend.getSyntax())) hist.store(text.text(), pc, text.getCaret());
     calcCode.invokeLater(true);
   }
 
