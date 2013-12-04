@@ -3,6 +3,7 @@ package org.basex.gui.editor;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.gui.editor.Editor.SearchDir;
 import org.basex.io.*;
@@ -23,6 +24,13 @@ public final class EditorText {
   static final String CLOSING = "}])";
   /** Tab width. */
   static final int TAB = 2;
+  /** Indentation. */
+  static final byte[] INDENT;
+
+  static {
+    INDENT = new byte[TAB];
+    Arrays.fill(INDENT, (byte) ' ');
+  }
 
   /** Search context. */
   private SearchContext search;
@@ -344,58 +352,6 @@ public final class EditorText {
   }
 
   /**
-   * Indents lines.
-   * @param shift shift flag
-   */
-  void indent(final boolean shift) {
-    // extend selection to match whole lines
-    int s = Math.min(ms, me), e = Math.max(ms, me) - 1;
-    pos(s);
-    bol(true);
-    s = ps;
-    pos(e);
-    forward(Integer.MAX_VALUE, true);
-    e = ps;
-
-    final byte[] add = new byte[TAB];
-    for(int a = 0; a < TAB; a++) add[a] = ' ';
-
-    // build new text
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(text, 0, s);
-    final int pl = text.length;
-    for(int p = s; p < ps; p += cl(text, p)) {
-      if(p == 0 || text[p - 1] == '\n') {
-        if(shift) {
-          // remove indentation
-          if(text[p] == '\t') {
-            e--;
-            continue;
-          }
-          if(text[p] == ' ') {
-            e--;
-            for(int i = 1; i < TAB && p + i < pl && text[p + i] == ' '; i++) {
-              e--;
-              p++;
-            }
-            continue;
-          }
-        } else {
-          // add new indentation
-          tb.add(add);
-          e += add.length;
-        }
-      }
-      tb.add(cp(text, p));
-    }
-    tb.add(text, ps, text.length);
-    text(tb.finish());
-    ms = s;
-    me = e;
-    pc = e;
-  }
-
-  /**
    * (Un)comments highlighted text or line.
    * @param syntax syntax highlighter
    */
@@ -521,7 +477,9 @@ public final class EditorText {
       return selected();
     }
 
-    if(!shift) {
+    if(shift) {
+      sb.setLength(0);
+    } else {
       final boolean c = ps > 0;
       for(int p = ps - 1; p >= 0 && c; p--) {
         final byte b = text[p];
@@ -530,10 +488,62 @@ public final class EditorText {
       }
       sb.setLength(0);
       sb.append("  ");
-    } else {
-      sb.setLength(0);
     }
     return false;
+  }
+
+  /**
+   * Extends selection to the beginning of first and end of last line.
+   */
+  void extend() {
+    int s = Math.min(ms, me), e = Math.max(ms, me), tl = text.length;
+    while(s > 0 && text[s - 1] != '\n') --s;
+    while(e < tl && text[e] != '\n') ++e;
+    ms = s;
+    me = e;
+  }
+
+  /**
+   * Indents lines.
+   * @param shift shift flag
+   */
+  void indent(final boolean shift) {
+    extend();
+    int s = ms, e = me, o = e;
+    final int tl = text.length;
+
+    // build new text
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add(text, 0, s);
+    for(int p = s; p < o; p += cl(text, p)) {
+      if(p == 0 || text[p - 1] == '\n') {
+        if(shift) {
+          // remove indentation
+          if(text[p] == '\t') {
+            e--;
+            continue;
+          }
+          if(text[p] == ' ') {
+            e--;
+            for(int i = 1; i < TAB && p + i < tl && text[p + i] == ' '; i++) {
+              e--;
+              p++;
+            }
+            continue;
+          }
+        } else {
+          // add new indentation
+          tb.add(INDENT);
+          e += TAB;
+        }
+      }
+      tb.add(cp(text, p));
+    }
+    tb.add(text, o, tl);
+    text(tb.finish());
+    select(s, e);
+    pc = e;
+    ps = e;
   }
 
   /**
