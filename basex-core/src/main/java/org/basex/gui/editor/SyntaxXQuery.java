@@ -146,25 +146,28 @@ public final class SyntaxXQuery extends Syntax {
   }
 
   @Override
-  public byte[] format(final byte[] string) {
+  public byte[] format(final byte[] text) {
     int ind = 0;
     final TokenBuilder tb = new TokenBuilder();
-    final int sl = string.length;
-    for(int s = 0; s < sl; s++) {
-      final byte ch = string[s];
+    final int tl = text.length;
+    for(int t = 0; t < tl; t++) {
+      final byte ch = text[t];
       final int open = EditorText.OPENING.indexOf(ch);
       final int close = EditorText.CLOSING.indexOf(ch);
-      final int next = s + 1 < sl ? string[s + 1] : '\n';
-      final int prev = s > 0 ? string[s - 1] : '\n';
-      if(open != -1 && next != '\n' && next != ':' && next != EditorText.CLOSING.charAt(open)) {
+      final int next = t + 1 < tl ? text[t + 1] : 0;
+      if(open != -1 && next != ':') {
         ind++;
-        tb.addByte(ch).add('\n');
-        for(int i = 0; i < ind; i++) tb.add(EditorText.INDENT);
-      } else if(close != -1 && next != '\n' && !spaces(s, tb) &&
-          prev != EditorText.OPENING.charAt(close)) {
-        ind = Math.max(0, ind - 1);
-        tb.add('\n');
-        for(int i = 0; i < ind; i++) tb.add(EditorText.INDENT);
+        tb.addByte(ch);
+        if(next != '\n' && !matches(EditorText.CLOSING.charAt(open), t, text, 3)) {
+          tb.add('\n');
+          for(int i = 0; i < ind; i++) tb.add(EditorText.INDENT);
+        }
+      } else if(close != -1) {
+        ind--;
+        if(next != '\n' && !spaces(tb) && !matches(EditorText.OPENING.charAt(close), t, text, -3)) {
+          tb.add('\n');
+          for(int i = 0; i < ind; i++) tb.add(EditorText.INDENT);
+        }
         tb.addByte(ch);
       } else {
         tb.addByte(ch);
@@ -174,16 +177,34 @@ public final class SyntaxXQuery extends Syntax {
   }
 
   /**
-   * Checks if only spaces are found from the beginning of a line and the cursor position.
-   * @param p cursor position
+   * Checks if the last line contains only spaces.
    * @param text text
    * @return result of check
    */
-  private boolean spaces(final int p, final TokenBuilder text) {
-    for(int i = p - 1; i >= 0; i--) {
-      if(text.get(i) == '\n') break;
-      if(!Token.ws(text.get(i))) return false;
+  private boolean spaces(final TokenBuilder text) {
+    for(int t = text.size() - 1; t >= 0; t--) {
+      final byte c = text.get(t);
+      if(c == '\n') break;
+      if(!Token.ws(c)) return false;
     }
     return true;
+  }
+
+  /**
+   * Checks if the specified character.
+   * @param ch character to be found
+   * @param pos current position
+   * @param text text
+   * @param dist maximum allowed distance
+   * @return result of check
+   */
+  private boolean matches(final char ch, final int pos, final byte[] text, final int dist) {
+    for(int d = 0; dist > 0 ? d < dist : d > dist; d += dist > 0 ? 1 : -1) {
+      int p = pos + d;
+      if(p < 0 || p >= text.length) break;
+      if(text[p] == ch) return true;
+    }
+    System.out.println(false);
+    return false;
   }
 }
