@@ -227,7 +227,7 @@ public class QueryParser extends InputParser {
 
       wsCheck(MODULE);
       wsCheck(NSPACE);
-      skipWS();
+      skipWs();
       final byte[] pref = ncName(NONAME);
       wsCheck(IS);
       final byte[] uri = stringLiteral();
@@ -394,7 +394,7 @@ public class QueryParser extends InputParser {
         return;
       }
       currDoc.setLength(0);
-      skipWS();
+      skipWs();
       check(';');
     }
   }
@@ -441,7 +441,7 @@ public class QueryParser extends InputParser {
         }
       }
       currDoc.setLength(0);
-      skipWS();
+      skipWs();
       check(';');
     }
   }
@@ -455,7 +455,7 @@ public class QueryParser extends InputParser {
     final Ann ann = new Ann();
     while(wsConsume("%")) annotation(ann);
     ann.check(false);
-    skipWS();
+    skipWs();
     return ann;
   }
 
@@ -465,7 +465,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void annotation(final Ann ann) throws QueryException {
-    skipWS();
+    skipWs();
     final InputInfo info = info();
     final QNm name = eQName(QNAMEINV, XQURI);
 
@@ -478,7 +478,7 @@ public class QueryParser extends InputParser {
       } while(wsConsumeWs(COMMA));
       wsCheck(PAR2);
     }
-    skipWS();
+    skipWs();
     ann.add(name, vb.value(), info);
   }
 
@@ -544,7 +544,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void optionDecl() throws QueryException {
-    skipWS();
+    skipWs();
     final QNm qnm = eQName(QNAMEINV, sc.xquery3() ? XQURI : URICHECK);
     final byte[] val = stringLiteral();
     final String name = string(qnm.local());
@@ -665,7 +665,7 @@ public class QueryParser extends InputParser {
     int n;
     do {
       n = map.size();
-      skipWS();
+      skipWs();
       final byte[] prop = ncName(null);
       for(final byte[] s : DECFORMATS) {
         if(!eq(prop, s)) continue;
@@ -965,7 +965,7 @@ public class QueryParser extends InputParser {
   private Var[] paramList() throws QueryException {
     Var[] args = { };
     while(true) {
-      skipWS();
+      skipWs();
       if(curr() != '$') {
         if(args.length == 0) break;
         check('$');
@@ -1068,7 +1068,7 @@ public class QueryParser extends InputParser {
 
       if(sc.xquery3() && wsConsumeWs(GROUP)) {
         wsCheck(BY);
-        skipWS();
+        skipWs();
         alterPos = pos;
         final GroupBy.Spec[] specs = groupSpecs(clauses);
 
@@ -1220,7 +1220,7 @@ public class QueryParser extends InputParser {
   private Window windowClause(final boolean slide) throws QueryException {
     wsCheck(slide ? SLIDING : TUMBLING);
     wsCheck(WINDOW);
-    skipWS();
+    skipWs();
 
     final QNm nm = varName();
     final SeqType tp = optAsType();
@@ -1249,7 +1249,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException parse exception
    */
   private Condition windowCond(final boolean start) throws QueryException {
-    skipWS();
+    skipWs();
     final InputInfo ii = info();
     final Var var = curr('$')             ? addLocal(varName(), null, false) : null,
               at  = wsConsumeWs(AT)       ? addLocal(varName(), null, false) : null,
@@ -1420,7 +1420,7 @@ public class QueryParser extends InputParser {
       cs = wsConsumeWs(CASE);
       if(!cs) {
         wsCheck(DEFAULT);
-        skipWS();
+        skipWs();
       }
       Var var = null;
       if(curr('$')) {
@@ -1536,7 +1536,7 @@ public class QueryParser extends InputParser {
     final int i = pos;
     // extensions to the official extension: "=>" and "<-"
     if(consume('=') && consume('>') || consume('<') && consume('-')) {
-      skipWS();
+      skipWs();
     } else if(!wsConsumeWs(CONTAINS) || !wsConsumeWs(TEXT)) {
       pos = i;
       return e;
@@ -1711,7 +1711,7 @@ public class QueryParser extends InputParser {
     boolean minus = false;
     boolean found = false;
     do {
-      skipWS();
+      skipWs();
       if(consume('-')) {
         minus ^= true;
         found = true;
@@ -2024,7 +2024,7 @@ public class QueryParser extends InputParser {
         pos = i2;
         // name test: prefix:name, name
         if(name.hasPrefix() || !consume(':')) {
-          skipWS();
+          skipWs();
           names.add(new QNmCheck(name, !att));
           return new NameTest(name, NameTest.Mode.STD, att, sc.elemNS);
         }
@@ -2082,7 +2082,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr primary() throws QueryException {
-    skipWS();
+    skipWs();
     final char c = curr();
     // variables
     if(c == '$') return checkVar(varName());
@@ -2149,7 +2149,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr functionItem() throws QueryException {
-    skipWS();
+    skipWs();
     final int ip = pos;
 
     // parse annotations; will only be visited for XQuery 3.0 expressions
@@ -2252,7 +2252,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private byte[] stringLiteral() throws QueryException {
-    skipWS();
+    skipWs();
     final char del = curr();
     if(!quote(del)) throw error(NOQUOTE, found());
     consume();
@@ -2301,7 +2301,7 @@ public class QueryParser extends InputParser {
    */
   private QNm varName() throws QueryException {
     check('$');
-    skipWS();
+    skipWs();
     return eQName(NOVARNAME, null);
   }
 
@@ -2618,7 +2618,7 @@ public class QueryParser extends InputParser {
     final byte[] str = ncName(INVALPI);
     if(eq(lc(str), XML)) throw error(PIXML, str);
 
-    final boolean space = skipWS();
+    final boolean space = skipWs();
     final TokenBuilder tb = new TokenBuilder();
     do {
       while(not('?')) {
@@ -2705,7 +2705,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compElement() throws QueryException {
-    skipWS();
+    skipWs();
 
     final Expr name;
     final QNm qn = eQName(null, SKIPCHECK);
@@ -2730,7 +2730,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compAttribute() throws QueryException {
-    skipWS();
+    skipWs();
 
     final Expr name;
     final QNm qn = eQName(null, SKIPCHECK);
@@ -2756,7 +2756,7 @@ public class QueryParser extends InputParser {
    */
   private Expr compNamespace() throws QueryException {
     if(!sc.xquery3()) return null;
-    skipWS();
+    skipWs();
 
     final Expr name;
     final byte[] str = ncName(null);
@@ -2804,7 +2804,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compPI() throws QueryException {
-    skipWS();
+    skipWs();
 
     final Expr name;
     final byte[] str = ncName(null);
@@ -2828,7 +2828,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private SeqType simpleType() throws QueryException {
-    skipWS();
+    skipWs();
     final QNm name = eQName(TYPEINVALID, sc.elemNS);
     Type t = ListType.find(name);
     if(t == null) {
@@ -2845,7 +2845,7 @@ public class QueryParser extends InputParser {
       if(t == AtomType.AST || t == AtomType.AAT || t == AtomType.NOT)
         throw error(CASTUNKNOWN, name);
     }
-    skipWS();
+    skipWs();
     return SeqType.get(t, consume('?') ? Occ.ZERO_ONE : Occ.ONE);
   }
 
@@ -2866,10 +2866,10 @@ public class QueryParser extends InputParser {
 
     // parse item type and occurrence indicator
     final SeqType tw = itemType();
-    skipWS();
+    skipWs();
     final Occ occ = consume('?') ? Occ.ZERO_ONE : consume('+') ? Occ.ONE_MORE :
       consume('*') ? Occ.ZERO_MORE : Occ.ONE;
-    skipWS();
+    skipWs();
     return tw.withOcc(occ);
   }
 
@@ -2880,7 +2880,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private SeqType itemType() throws QueryException {
-    skipWS();
+    skipWs();
 
     // parenthesized item type
     if(consume(PAR1)) {
@@ -2892,7 +2892,7 @@ public class QueryParser extends InputParser {
     // parse optional annotation and type name
     final Ann ann = sc.xquery3() && curr('%') ? annotations() : null;
     final QNm name = eQName(TYPEINVALID, null);
-    skipWS();
+    skipWs();
     // check if name is followed by parentheses
     final boolean func = curr('(');
 
@@ -3004,6 +3004,7 @@ public class QueryParser extends InputParser {
     if(!elem && !consume(SCHEMA_ELEMENT)) return null;
 
     wsCheck(PAR1);
+    skipWs();
     final Test t = elem ? elementTest() : schemaTest();
     wsCheck(PAR2);
     return new DocTest(t != null ? t : Test.ELM);
@@ -3095,7 +3096,7 @@ public class QueryParser extends InputParser {
     do {
       NameTest[] codes = { };
       do {
-        skipWS();
+        skipWs();
         final NameTest test = (NameTest) nodeTest(false, false);
         if(test == null) throw error(NOCATCH);
         codes = Array.add(codes, test);
@@ -3271,7 +3272,7 @@ public class QueryParser extends InputParser {
       return e;
     }
 
-    skipWS();
+    skipWs();
     Expr e = null;
     if(quote(curr())) {
       e = Str.get(stringLiteral());
@@ -3338,7 +3339,7 @@ public class QueryParser extends InputParser {
    */
   private Expr ftAdditive(final boolean i) throws QueryException {
     if(!i) return additive();
-    skipWS();
+    skipWs();
     tok.reset();
     while(digit(curr()))
       tok.add(consume());
@@ -3848,7 +3849,7 @@ public class QueryParser extends InputParser {
   private boolean wsConsumeWs(final String t) throws QueryException {
     final int i = pos;
     if(!wsConsume(t)) return false;
-    if(skipWS() || !XMLToken.isNCStartChar(t.charAt(0))
+    if(skipWs() || !XMLToken.isNCStartChar(t.charAt(0))
         || !XMLToken.isNCChar(curr())) return true;
     pos = i;
     return false;
@@ -3884,7 +3885,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private boolean wsConsume(final String str) throws QueryException {
-    skipWS();
+    skipWs();
     return consume(str);
   }
 
@@ -3893,7 +3894,7 @@ public class QueryParser extends InputParser {
    * @return true if whitespaces were found
    * @throws QueryException query exception
    */
-  private boolean skipWS() throws QueryException {
+  private boolean skipWs() throws QueryException {
     final int i = pos;
     while(more()) {
       final int c = curr();
