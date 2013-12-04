@@ -52,11 +52,10 @@ public final class SearchEditor extends BaseXBack {
 
   /**
    * Sets the search button.
-   * @param b button
+   * @param help help text
    * @return self reference
    */
-  public SearchEditor button(final BaseXButton b) {
-    search.setButton(b);
-    return this;
+  public AbstractButton button(final String help) {
+    return search.button(help);
   }
 }

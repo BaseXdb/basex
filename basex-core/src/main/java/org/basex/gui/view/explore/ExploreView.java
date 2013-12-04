@@ -6,6 +6,8 @@ import static org.basex.gui.GUIConstants.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import javax.swing.*;
+
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
@@ -24,7 +26,7 @@ public final class ExploreView extends View {
   /** Current search panel. */
   private final ExploreArea search;
   /** Filter button. */
-  private final BaseXButton filter;
+  private final AbstractButton filter;
 
   /**
    * Default constructor.

@@ -18,7 +18,7 @@ public abstract class GUIBaseCmd implements GUICmd {
   };
 
   @Override
-  public final boolean checked() {
+  public final boolean toggle() {
     return false;
   }
   @Override

@@ -31,7 +31,7 @@ final class GUIToolBar extends JToolBar {
       if(c == null) {
         addSeparator();
       } else {
-        final BaseXButton button = BaseXButton.command(c, gui);
+        final AbstractButton button = BaseXButton.command(c, gui);
         button.setFocusable(false);
         add(button);
       }

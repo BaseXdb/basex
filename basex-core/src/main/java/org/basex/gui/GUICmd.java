@@ -32,7 +32,7 @@ public interface GUICmd {
    * Tests if this command includes a menu checkbox.
    * @return result of check
    */
-  boolean checked();
+  boolean toggle();
 
   /**
    * Returns the command label.

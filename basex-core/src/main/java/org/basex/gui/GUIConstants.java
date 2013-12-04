@@ -195,6 +195,8 @@ public final class GUIConstants {
   public static final Color GRAY = new Color(160, 160, 160);
   /** Background color. */
   public static final Color DGRAY = new Color(64, 64, 64);
+  /** Background color. */
+  public static final Color DGRAYA = new Color(0, 0, 0, 32);
 
   /** Bright GUI color. */
   public static final Color WHITE = Color.white;

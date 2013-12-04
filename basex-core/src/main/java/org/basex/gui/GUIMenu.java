@@ -77,7 +77,7 @@ public final class GUIMenu extends JMenuBar {
    */
   public static JMenuItem newItem(final GUICmd cmd, final GUI gui, final StringBuilder mnem) {
     final String desc = cmd.label();
-    final JMenuItem item = cmd.checked() ? new JCheckBoxMenuItem(desc) : new JMenuItem(desc);
+    final JMenuItem item = cmd.toggle() ? new JCheckBoxMenuItem(desc) : new JMenuItem(desc);
     item.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {

@@ -6,6 +6,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.regex.*;
 
+import javax.swing.*;
+
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.gui.*;
@@ -68,8 +70,11 @@ public final class InfoView extends View implements LinkListener {
     timer = new BaseXLabel(" ", true, false);
     timer.setForeground(GUIConstants.DGRAY);
 
-    final BaseXButton find = new BaseXButton(gui, "c_find",
-        BaseXLayout.addShortcut(FIND, BaseXKeys.FIND.toString()));
+    area = new Editor(false, gui);
+    area.setLinkListener(this);
+    editor = new SearchEditor(gui, area);
+
+    final AbstractButton find = editor.button(FIND);
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
     buttons.layout(new TableLayout(1, 3, 8, 0)).border(0, 0, 4, 0);
     buttons.add(find);
@@ -81,9 +86,6 @@ public final class InfoView extends View implements LinkListener {
     add(b, BorderLayout.NORTH);
 
     final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout());
-    area = new Editor(false, gui);
-    area.setLinkListener(this);
-    editor = new SearchEditor(gui, area).button(find);
     add(editor, BorderLayout.CENTER);
 
     center.add(area, BorderLayout.CENTER);

@@ -8,6 +8,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 
+import javax.swing.*;
+
 import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.data.*;
@@ -36,7 +38,7 @@ public final class TextView extends View {
   /** Header string. */
   private final BaseXLabel label;
   /** Home button. */
-  private final BaseXButton home;
+  private final AbstractButton home;
   /** Text Area. */
   private final Editor text;
 
@@ -59,9 +61,12 @@ public final class TextView extends View {
     home = BaseXButton.command(GUICommands.C_HOME, gui);
     home.setEnabled(false);
 
-    final BaseXButton save = new BaseXButton(gui, "c_save", H_SAVE_RESULT);
-    final BaseXButton find = new BaseXButton(gui, "c_find",
-        BaseXLayout.addShortcut(FIND, BaseXKeys.FIND.toString()));
+    text = new Editor(false, gui);
+    text.setSyntax(new SyntaxXML());
+    search = new SearchEditor(gui, text);
+
+    final AbstractButton save = BaseXButton.get("c_save", false, H_SAVE_RESULT, gui);
+    final AbstractButton find = search.button(FIND);
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
     buttons.layout(new TableLayout(1, 3, 1, 0)).border(0, 0, 4, 0);
@@ -74,9 +79,6 @@ public final class TextView extends View {
     b.add(label, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
-    text = new Editor(false, gui);
-    text.setSyntax(new SyntaxXML());
-    search = new SearchEditor(gui, text).button(find);
     add(search, BorderLayout.CENTER);
 
     save.addActionListener(new ActionListener() {

@@ -844,8 +844,8 @@ public enum GUICommands implements GUICmd {
   private final Object key;
   /** Help string. */
   private final String help;
-  /** Displays a checkbox, indicating the current selection state. */
-  private final boolean checked;
+  /** Indicates if this command has two states. */
+  private final boolean toggle;
 
   /**
    * Constructor.
@@ -853,14 +853,14 @@ public enum GUICommands implements GUICmd {
    * @param k shortcut
    * @param h help string
    * @param d requires a database to be opened
-   * @param c displays a checkbox, indicating the current selection state
+   * @param t indicates if this command has two states
    */
-  GUICommands(final String l, final String k, final String h, final boolean d, final boolean c) {
+  GUICommands(final String l, final String k, final String h, final boolean d, final boolean t) {
     label = l;
     key = k;
     help = BaseXLayout.addShortcut(h, k);
     data = d;
-    checked = c;
+    toggle = t;
   }
 
   @Override
@@ -869,7 +869,7 @@ public enum GUICommands implements GUICmd {
   }
 
   @Override
-  public final boolean checked() { return checked; }
+  public final boolean toggle() { return toggle; }
 
   @Override
   public String help() { return help; }

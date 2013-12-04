@@ -19,11 +19,12 @@ import org.basex.gui.*;
 public class BaseXButton extends JButton {
   /**
    * Constructor for text buttons.
-   * @param l button title
+   * @param label button label
    * @param win parent window
    */
-  public BaseXButton(final String l, final Window win) {
-    super(l);
+  public BaseXButton(final String label, final Window win) {
+    super(label);
+
     BaseXLayout.addInteraction(this, win);
     if(!(win instanceof BaseXDialog)) return;
 
@@ -53,22 +54,42 @@ public class BaseXButton extends JButton {
   }
 
   /**
-   * Constructor for image buttons.
+   * Returns a new image button.
+   * @param name name of image icon
+   * @param toggle toggle flag
+   * @param help tooltip text
    * @param gui main window
-   * @param img image reference
-   * @param hlp help text
+   * @return button
    */
-  public BaseXButton(final Window gui, final String img, final String hlp) {
-    super(BaseXLayout.icon(img));
-    BaseXLayout.addInteraction(this, gui);
-    if(hlp != null) setToolTipText(hlp);
-    setOpaque(false);
+  public static AbstractButton get(final String name, final boolean toggle, final String help,
+      final Window gui) {
 
-    // Mac: trim horizontal button margins
-    final Insets in = getMargin();
+    final AbstractButton button = toggle ? new JToggleButton() : new JButton();
+    init(button, gui, name, help);
+    return button;
+  }
+
+  /**
+   * Initializes an image button.
+   * @param button button reference
+   * @param gui main window
+   * @param name name of image icon
+   * @param help tooltip text
+   */
+  private static void init(final AbstractButton button, final Window gui, final String name,
+      final String help) {
+
+    button.setIcon(BaseXLayout.icon(name));
+    BaseXLayout.addInteraction(button, gui);
+    if(help != null) button.setToolTipText(help);
+
+    // no shadow effects (flat style)
+    button.setOpaque(false);
+    // trim horizontal button margins (mac)
+    final Insets in = button.getMargin();
     in.left /= 4;
     in.right /= 4;
-    if(in.top < in.left) setMargin(in);
+    if(in.top < in.left) button.setMargin(in);
   }
 
   /**
@@ -77,9 +98,9 @@ public class BaseXButton extends JButton {
    * @param gui reference to main window
    * @return button
    */
-  public static BaseXButton command(final GUICmd cmd, final GUI gui) {
-    final BaseXButton button = new BaseXButton(gui, cmd.toString().toLowerCase(Locale.ENGLISH),
-        cmd.help());
+  public static AbstractButton command(final GUICmd cmd, final GUI gui) {
+    final String name = cmd.toString().toLowerCase(Locale.ENGLISH);
+    final AbstractButton button = get(name, cmd.toggle(), cmd.help(), gui);
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -91,6 +112,7 @@ public class BaseXButton extends JButton {
 
   @Override
   public void setEnabled(final boolean flag) {
+    // skip repainting
     if(flag != isEnabled()) super.setEnabled(flag);
   }
 }

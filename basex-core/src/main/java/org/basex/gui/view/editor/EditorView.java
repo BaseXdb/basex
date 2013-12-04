@@ -55,26 +55,26 @@ public final class EditorView extends View {
   private static final Pattern ERRORTT = Pattern.compile(
       "^.*\r?\n" + STOPPED_AT + "|\r?\n" + STACK_TRACE + COL + ".*", Pattern.DOTALL);
 
+  /** History Button. */
+  private final AbstractButton hist;
+  /** Execute Button. */
+  private final AbstractButton stop;
+  /** Execute button. */
+  private final AbstractButton go;
+  /** Filter button. */
+  private final AbstractButton filter;
   /** Search bar. */
   private final SearchBar search;
-  /** History Button. */
-  private final BaseXButton hist;
-  /** Execute Button. */
-  private final BaseXButton stop;
   /** Info label. */
   private final BaseXLabel info;
   /** Position label. */
   private final BaseXLabel pos;
-  /** Execute button. */
-  private final BaseXButton go;
   /** Splitter. */
   private final BaseXSplit split;
   /** Project files. */
   private final ProjectView project;
   /** Header string. */
   private final BaseXLabel label;
-  /** Filter button. */
-  private final BaseXButton filter;
   /** Query area. */
   private final BaseXTabs tabs;
 
@@ -101,18 +101,24 @@ public final class EditorView extends View {
     label = new BaseXLabel(EDITOR, true, false);
     label.setForeground(GRAY);
 
-    final BaseXButton openB = BaseXButton.command(GUICommands.C_EDITOPEN, gui);
-    final BaseXButton saveB = new BaseXButton(gui, "c_save", H_SAVE);
-    hist = new BaseXButton(gui, "c_hist", H_RECENTLY_OPEN);
-    final BaseXButton find = new BaseXButton(gui, "c_find",
-        BaseXLayout.addShortcut(H_REPLACE, BaseXKeys.FIND.toString()));
+    tabs = new BaseXTabs(gui);
+    tabs.setFocusable(Prop.MAC);
+    addCreateTab();
 
-    stop = new BaseXButton(gui, "c_stop", H_STOP_PROCESS);
+    final SearchEditor center = new SearchEditor(gui, tabs, null);
+    search = center.bar();
+
+    final AbstractButton openB = BaseXButton.command(GUICommands.C_EDITOPEN, gui);
+    final AbstractButton saveB = BaseXButton.get("c_save", false, H_SAVE, gui);
+    final AbstractButton find = search.button(H_REPLACE);
+    hist = BaseXButton.get("c_hist", false, H_RECENTLY_OPEN, gui);
+
+    stop = BaseXButton.get("c_stop", false, H_STOP_PROCESS, gui);
     stop.addKeyListener(this);
     stop.setEnabled(false);
 
-    go = new BaseXButton(gui, "c_go",
-        BaseXLayout.addShortcut(H_EXECUTE_QUERY, BaseXKeys.EXEC1.toString()));
+    go = BaseXButton.get("c_go", false,
+        BaseXLayout.addShortcut(H_EXECUTE_QUERY, BaseXKeys.EXEC1.toString()), gui);
     go.addKeyListener(this);
 
     filter = BaseXButton.command(GUICommands.C_FILTER, gui);
@@ -133,12 +139,6 @@ public final class EditorView extends View {
     final BaseXBack north = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     north.add(buttons, BorderLayout.WEST);
     north.add(label, BorderLayout.EAST);
-
-    tabs = new BaseXTabs(gui);
-    tabs.setFocusable(Prop.MAC);
-    final SearchEditor center = new SearchEditor(gui, tabs, null).button(find);
-    search = center.bar();
-    addCreateTab();
 
     // status and query pane
     search.editor(addTab(), false);
@@ -841,7 +841,7 @@ public final class EditorView extends View {
     final BaseXBack tab = new BaseXBack(new BorderLayout(10, 0)).mode(Fill.NONE);
     tab.add(edit.label, BorderLayout.CENTER);
 
-    final BaseXButton close = tabButton("e_close", "e_close2");
+    final AbstractButton close = tabButton("e_close", "e_close2");
     close.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -858,7 +858,7 @@ public final class EditorView extends View {
    * Adds a tab for creating new tabs.
    */
   private void addCreateTab() {
-    final BaseXButton add = tabButton("e_new", "e_new2");
+    final AbstractButton add = tabButton("e_new", "e_new2");
     add.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -872,12 +872,12 @@ public final class EditorView extends View {
 
   /**
    * Adds a new tab button.
-   * @param icon button icon
+   * @param icon name of button icon
    * @param rollover rollover icon
    * @return button
    */
-  private BaseXButton tabButton(final String icon, final String rollover) {
-    final BaseXButton b = new BaseXButton(gui, icon, null);
+  private AbstractButton tabButton(final String icon, final String rollover) {
+    final AbstractButton b = BaseXButton.get(icon, false, null, gui);
     b.setBorder(new EmptyBorder(2, 0, 2, 0));
     b.setContentAreaFilled(false);
     b.setFocusable(false);

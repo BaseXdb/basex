@@ -47,7 +47,7 @@ public final class GUI extends AGUI {
   /** Input field. */
   public final GUIInput input;
   /** Filter button. */
-  public final BaseXButton filter;
+  public final AbstractButton filter;
   /** Search view. */
   public final EditorView editor;
   /** Info view. */
@@ -69,7 +69,9 @@ public final class GUI extends AGUI {
   /** Content panel, containing all views. */
   private final ViewContainer views;
   /** History button. */
-  private final BaseXButton hist;
+  private final AbstractButton hist;
+  /** Execution Button. */
+  private final AbstractButton go;
   /** Current input Mode. */
   private final BaseXCombo mode;
 
@@ -77,8 +79,6 @@ public final class GUI extends AGUI {
   private final TextView text;
   /** Top panel. */
   private final BaseXBack top;
-  /** Execution Button. */
-  private final BaseXButton go;
   /** Control panel. */
   private final BaseXBack control;
   /** Results label. */
@@ -178,7 +178,7 @@ public final class GUI extends AGUI {
     input = new GUIInput(this);
     input.mode(mode.getSelectedItem());
 
-    hist = new BaseXButton(this, "c_hist", H_SHOW_HISTORY);
+    hist = BaseXButton.get("c_hist", false, H_SHOW_HISTORY, this);
     hist.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -208,7 +208,7 @@ public final class GUI extends AGUI {
     b.add(input, BorderLayout.CENTER);
     nav.add(b, BorderLayout.CENTER);
 
-    go = new BaseXButton(this, "c_go", H_EXECUTE_QUERY);
+    go = BaseXButton.get("c_go", false, H_EXECUTE_QUERY, this);
     go.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {

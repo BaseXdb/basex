@@ -5,6 +5,8 @@ import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import javax.swing.*;
+
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
@@ -28,27 +30,28 @@ public final class SearchBar extends BaseXBack {
     }
   };
 
+  /** Mode: regular expression. */
+  final AbstractButton regex;
+  /** Mode: match case. */
+  final AbstractButton mcase;
+  /** Mode: whole word. */
+  final AbstractButton word;
+  /** Mode: multi-line. */
+  final AbstractButton multi;
+  /** Action: replace text. */
+  final AbstractButton rplc;
+  /** Action: close panel. */
+  final AbstractButton cls;
+
   /** GUI reference. */
   private final GUI gui;
-  /** Action: close panel. */
-  private final BaseXButton cls;
   /** Search text. */
   private final BaseXTextField search;
   /** Replace text. */
   private final BaseXTextField replace;
-  /** Mode: regular expression. */
-  final BaseXButton regex;
-  /** Mode: match case. */
-  final BaseXButton mcase;
-  /** Mode: whole word. */
-  final BaseXButton word;
-  /** Mode: multi-line. */
-  final BaseXButton multi;
-  /** Action: replace text. */
-  private final BaseXButton rplc;
 
   /** Search button. */
-  private BaseXButton button;
+  private AbstractButton button;
   /** Current editor reference. */
   private Editor editor;
 
@@ -76,8 +79,9 @@ public final class SearchBar extends BaseXBack {
     mcase = onOffButton("s_case", Text.MATCH_CASE, GUIOptions.SR_CASE);
     word = onOffButton("s_word", Text.WHOLE_WORD, GUIOptions.SR_WORD);
     multi = onOffButton("s_multi", Text.MULTI_LINE, GUIOptions.SR_MULTI);
-    rplc  = new BaseXButton(main, "s_replace", Text.REPLACE_ALL);
-    cls = new BaseXButton(main, "s_close", BaseXLayout.addShortcut(Text.CLOSE, ESCAPE.toString()));
+    rplc  = BaseXButton.get("s_replace", false, Text.REPLACE_ALL, main);
+    cls = BaseXButton.get("s_close", false,
+        BaseXLayout.addShortcut(Text.CLOSE, ESCAPE.toString()), main);
     multi.setEnabled(regex.isSelected());
     word.setEnabled(!regex.isSelected());
 
@@ -174,11 +178,13 @@ public final class SearchBar extends BaseXBack {
   }
 
   /**
-   * Sets the search button.
-   * @param b button
+   * Returns a search button.
+   * @param help help text
+   * @return button
    */
-  public void setButton(final BaseXButton b) {
-    button = b;
+  public AbstractButton button(final String help) {
+    button = BaseXButton.get("c_find", true,
+        BaseXLayout.addShortcut(help, BaseXKeys.FIND.toString()), gui);
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -186,6 +192,7 @@ public final class SearchBar extends BaseXBack {
         else activate(null, true);
       }
     });
+    return button;
   }
 
   /**
@@ -283,17 +290,16 @@ public final class SearchBar extends BaseXBack {
    * @param option GUI option
    * @return button
    */
-  private BaseXButton onOffButton(final String icon, final String help,
+  private AbstractButton onOffButton(final String icon, final String help,
       final BooleanOption option) {
 
-    final BaseXButton b = new BaseXButton(gui, icon, help);
+    final AbstractButton b = BaseXButton.get(icon, true, help, gui);
     b.setSelected(gui.gopts.get(option));
     b.addKeyListener(escape);
     b.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        final boolean sel = !b.isSelected();
-        b.setSelected(sel);
+        final boolean sel = b.isSelected();
         gui.gopts.set(option, sel);
         if(b == regex) {
           multi.setEnabled(sel);
