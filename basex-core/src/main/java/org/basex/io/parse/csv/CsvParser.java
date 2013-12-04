@@ -18,6 +18,8 @@ final class CsvParser extends InputParser {
   private final boolean header;
   /** Column separator (see {@link CsvOptions#SEPARATOR}). */
   private final int separator;
+  /** Parse quotes.  */
+  private boolean quotes;
 
   /** First entry of a line. */
   private boolean first = true;
@@ -36,6 +38,7 @@ final class CsvParser extends InputParser {
     super(in);
     header = opts.get(CsvOptions.HEADER);
     separator = opts.separator();
+    quotes = opts.get(CsvOptions.QUOTES);
     conv = cnv;
   }
 
@@ -72,7 +75,7 @@ final class CsvParser extends InputParser {
           }
         }
         entry.add(XMLToken.valid(ch) ? ch : '?');
-      } else if(ch == '"') {
+      } else if(quotes && ch == '"') {
         // parse quote
         quoted = true;
       } else if(ch == separator) {

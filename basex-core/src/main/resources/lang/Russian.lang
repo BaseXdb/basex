@@ -251,6 +251,7 @@ packages_%           = Пакетов: %
 parameters           = Параметры
 parse_archives       = Обрабатывать файлы в архивах
 parse_dtds           = Разбирать DTD и сущности
+parse_quotes         = Parse quotes
 parser_%             = Парсер % 
 parsing              = Парсинг
 password             = Пароль

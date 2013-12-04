@@ -251,6 +251,7 @@ packages_%           = % package(s)
 parameters           = Parameters
 parse_archives       = Parse files in archives
 parse_dtds           = Parse DTDs and entities
+parse_quotes         = Parse quotes
 parser_%             = % Parser
 parsing              = Parsing
 password             = Password

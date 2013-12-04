@@ -176,7 +176,7 @@ public abstract class Command extends Proc {
 
   /**
    * Closes an open data reference and returns {@code true} if this command will change
-   * the {@link Context#data} reference. This method is required by the progress dialog
+   * the {@link Context#data()} reference. This method is required by the progress dialog
    * in the frontend.
    * @param ctx database context
    * @return result of check

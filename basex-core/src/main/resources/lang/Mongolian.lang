@@ -252,6 +252,7 @@ packages_%           = % Багцууд
 parameters           = Parameters
 parse_archives       = Архиваар дамжуулан файлыг Parsing хийх
 parse_dtds           = DTD-үүд болон объектуудыг Parsing хийх
+parse_quotes         = Parse quotes
 parser_%             = % Parser
 parsing              = Parsing хийх
 password             = Нууц үг

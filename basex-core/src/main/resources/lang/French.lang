@@ -251,6 +251,7 @@ packages_%           = % paquet(s)
 parameters           = Parameters
 parse_archives       = Analyser les fichiers dans les archives
 parse_dtds           = Analyser les DTD et les entités
+parse_quotes         = Parse quotes
 parser_%             = % Parser
 parsing              = Analyse
 password             = Mot de passe

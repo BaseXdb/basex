@@ -1117,6 +1117,8 @@ public interface Text {
   String SEPARATOR = lang("separator") + COL;
   /** Lax name conversion. */
   String LAX_NAME_CONVERSION = lang("lax_name_conversion");
+  /** Parse quotes. */
+  String PARSE_QUOTES = lang("parse_quotes");
   /** Merge type information. */
   String MERGE_TYPES = lang("merge_types");
   /** Merge type information. */

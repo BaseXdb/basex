@@ -251,6 +251,7 @@ packages_%           = % pacchetto(i)
 parameters           = Parametri
 parse_archives       = Leggi i documenti negli archivi
 parse_dtds           = Leggi le DTD e le entità
+parse_quotes         = Parse quotes
 parser_%             = % Parser
 parsing              = Parsing
 password             = Parola chiave

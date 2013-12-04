@@ -251,6 +251,7 @@ packages_%           = % Pachete
 parameters           = Parametri
 parse_archives       = Parsare fisiere in arhiva
 parse_dtds           = Parsare DTD-uri si entitati
+parse_quotes         = Parse quotes
 parser_%             = % Parser
 parsing              = Parsare
 password             = Parolă

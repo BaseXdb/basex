@@ -20,6 +20,8 @@ abstract class CsvSerializer extends OutputSerializer {
   final CsvOptions copts;
   /** Separator. */
   private final int separator;
+  /** Generate quotes. */
+  private final boolean quotes;
 
   /**
    * Constructor.
@@ -30,6 +32,7 @@ abstract class CsvSerializer extends OutputSerializer {
   CsvSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
     super(os, opts);
     copts = opts.get(SerializerOptions.CSV);
+    quotes = copts.get(CsvOptions.QUOTES);
     separator = copts.separator();
   }
 
@@ -55,7 +58,7 @@ abstract class CsvSerializer extends OutputSerializer {
 
       if(v == null) continue;
       byte[] txt = v;
-      if(contains(txt, separator) || contains(txt, '\n') || contains(txt, '"')) {
+      if(contains(txt, separator) || quotes && (contains(txt, '\n') || contains(txt, '"'))) {
         final TokenBuilder tb = new TokenBuilder().add('"');
         final int len = txt.length;
         for(int c = 0; c < len; c += cl(txt, c)) {

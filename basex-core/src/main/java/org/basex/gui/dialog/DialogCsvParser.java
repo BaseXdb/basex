@@ -25,7 +25,7 @@ import org.basex.util.list.*;
  */
 final class DialogCsvParser extends DialogParser {
   /** CSV example string. */
-  private static final String EXAMPLE = "Name,Born,X?_\nJohn Adam,1984,";
+  private static final String EXAMPLE = "Name,Born?_\n\"John, Adam\",1984";
 
   /** Options. */
   private final CsvParserOptions copts;
@@ -43,6 +43,8 @@ final class DialogCsvParser extends DialogParser {
   private final BaseXTextField sepchar;
   /** CSV: Lax name conversion. */
   private final BaseXCheckBox lax;
+  /** CSV: Parse quotes. */
+  private final BaseXCheckBox quotes;
 
   /**
    * Constructor.
@@ -90,12 +92,16 @@ final class DialogCsvParser extends DialogParser {
     p.add(format);
     pp.add(p);
 
-    p = new BaseXBack(new TableLayout(2, 1));
+    p = new BaseXBack(new TableLayout(3, 1));
     header = new BaseXCheckBox(FIRST_LINE_HEADER, CsvOptions.HEADER, copts, d);
     p.add(header);
 
+    quotes = new BaseXCheckBox(PARSE_QUOTES, CsvOptions.QUOTES, copts, d);
+    p.add(quotes);
+
     lax = new BaseXCheckBox(LAX_NAME_CONVERSION, CsvOptions.LAX, copts, d);
     p.add(lax);
+
     pp.add(p);
 
     add(pp, BorderLayout.WEST);
@@ -132,6 +138,7 @@ final class DialogCsvParser extends DialogParser {
     copts.set(CsvOptions.HEADER, header.isSelected());
     copts.set(CsvOptions.FORMAT, format.getSelectedItem());
     copts.set(CsvOptions.LAX, lax.isSelected());
+    copts.set(CsvOptions.QUOTES, quotes.isSelected());
     String sep;
     if(seps.getSelectedIndex() < CsvSep.values().length) {
       sep = seps.getSelectedItem();

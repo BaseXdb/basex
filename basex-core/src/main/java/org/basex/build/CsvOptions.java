@@ -25,6 +25,9 @@ public class CsvOptions extends Options {
   /** Option: lax conversion of strings to QNames. */
   public static final BooleanOption LAX =
       new BooleanOption("lax", true);
+  /** Option: parse quotes. */
+  public static final BooleanOption QUOTES =
+      new BooleanOption("quotes", true);
 
   /** CSV formats. */
   public enum CsvFormat {

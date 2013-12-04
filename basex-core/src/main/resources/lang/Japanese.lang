@@ -251,6 +251,7 @@ packages_%           = % パッケージ
 parameters           = パラメータ
 parse_archives       = アーカイブ内のファイルを解析する
 parse_dtds           = DTDとエントリーを解析する
+parse_quotes         = Parse quotes
 parser_%             = % Parser
 parsing              = パース
 password             = パスワード
