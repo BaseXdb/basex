@@ -304,7 +304,20 @@ public class Editor extends BaseXPanel {
    * Adds or removes a comment.
    */
   public void comment() {
+    final int pc = text.getCaret();
     text.comment(rend.getSyntax());
+    hist.store(text.text(), pc, text.getCaret());
+    calcCode.invokeLater(true);
+  }
+
+  /**
+   * Formats the selected text.
+   */
+  public void format() {
+    final int pc = text.getCaret();
+    text.format(rend.getSyntax());
+    hist.store(text.text(), pc, text.getCaret());
+    calcCode.invokeLater(true);
   }
 
   @Override
@@ -754,7 +767,7 @@ public class Editor extends BaseXPanel {
   public void keyTyped(final KeyEvent e) {
     if(!hist.active() || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e)) return;
 
-    int pc = text.getCaret();
+    final int pc = text.getCaret();
     text.pos(pc);
 
     // remember if marked text is to be deleted

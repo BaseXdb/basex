@@ -144,4 +144,46 @@ public final class SyntaxXQuery extends Syntax {
   public byte[] commentEnd() {
     return XQCOMM_C;
   }
+
+  @Override
+  public byte[] format(final byte[] string) {
+    int ind = 0;
+    final TokenBuilder tb = new TokenBuilder();
+    final int sl = string.length;
+    for(int s = 0; s < sl; s++) {
+      final byte ch = string[s];
+      final int open = EditorText.OPENING.indexOf(ch);
+      final int close = EditorText.CLOSING.indexOf(ch);
+      final int next = s + 1 < sl ? string[s + 1] : '\n';
+      final int prev = s > 0 ? string[s - 1] : '\n';
+      if(open != -1 && next != '\n' && next != ':' && next != EditorText.CLOSING.charAt(open)) {
+        ind++;
+        tb.addByte(ch).add('\n');
+        for(int i = 0; i < ind; i++) tb.add(EditorText.INDENT);
+      } else if(close != -1 && next != '\n' && !spaces(s, tb) &&
+          prev != EditorText.OPENING.charAt(close)) {
+        ind = Math.max(0, ind - 1);
+        tb.add('\n');
+        for(int i = 0; i < ind; i++) tb.add(EditorText.INDENT);
+        tb.addByte(ch);
+      } else {
+        tb.addByte(ch);
+      }
+    }
+    return tb.finish();
+  }
+
+  /**
+   * Checks if only spaces are found from the beginning of a line and the cursor position.
+   * @param p cursor position
+   * @param text text
+   * @return result of check
+   */
+  private boolean spaces(final int p, final TokenBuilder text) {
+    for(int i = p - 1; i >= 0; i--) {
+      if(text.get(i) == '\n') break;
+      if(!Token.ws(text.get(i))) return false;
+    }
+    return true;
+  }
 }

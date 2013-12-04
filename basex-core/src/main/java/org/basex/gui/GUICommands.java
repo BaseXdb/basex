@@ -211,6 +211,19 @@ public enum GUICommands implements GUICmd {
     }
   },
 
+  /** Jumps to the next error. */
+  C_FORMAT(FORMAT, "% shift F", null, false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().format();
+    }
+
+    @Override
+    public void refresh(final GUI gui, final AbstractButton b) {
+      b.setEnabled(gui.gopts.get(GUIOptions.SHOWEDITOR));
+    }
+  },
+
   /** Exits the application. */
   C_EXIT(EXIT, "% Q", H_EXIT, false, false) {
     @Override
@@ -399,7 +412,7 @@ public enum GUICommands implements GUICmd {
   },
 
   /** Finds files. */
-  C_FILESEARCH(FIND_FILES + DOTS, "% shift F", null, false, false) {
+  C_FILESEARCH(FIND_FILES + DOTS, "% H", null, false, false) {
     @Override
     public void execute(final GUI gui) {
       if(!gui.gopts.get(GUIOptions.SHOWPROJECT)) {

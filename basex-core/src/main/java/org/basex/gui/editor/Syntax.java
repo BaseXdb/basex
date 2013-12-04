@@ -62,4 +62,13 @@ abstract class Syntax {
   public byte[] commentEnd() {
     return EMPTY;
   }
+
+  /**
+   * Returns a formatted version of a string.
+   * @param string string to be formatted
+   * @return formatted string
+   */
+  public byte[] format(final byte[] string) {
+    return string;
+  }
 }

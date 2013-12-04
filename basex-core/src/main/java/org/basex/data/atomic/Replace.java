@@ -93,7 +93,7 @@ final class Replace extends StructuralUpdate {
         return false;
       // check text / comment values
       if(sk == Data.TEXT || sk == Data.COMM) {
-        byte[] srcText = src.text(s, true);
+        final byte[] srcText = src.text(s, true);
         if(trg.textLen(t, true) != src.textLen(s, true) ||
             !eq(trg.text(t, true), srcText))
           valueUpdates.add(UpdateValue.getInstance(trg, t, srcText));

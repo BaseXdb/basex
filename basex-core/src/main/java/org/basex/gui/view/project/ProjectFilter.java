@@ -26,7 +26,7 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
   private final BaseXTextField contents;
 
   /** Project view. */
-  private ProjectView project;
+  private final ProjectView project;
   /** Cached file paths. */
   private final TokenList cache = new TokenList();
 

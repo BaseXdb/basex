@@ -111,7 +111,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
     }
     // count number of invisible panels
     int n = panels - 1;
-    for(double d : propSize) if(d == 0) n--;
+    for(final double d : propSize) if(d == 0) n--;
 
     // set bounds of all components
     final int sz = (horiz ? w : h) - n * BaseXSplitSep.SIZE;

@@ -461,6 +461,22 @@ public final class EditorText {
   }
 
   /**
+   * Formats the selected text.
+   * @param syntax syntax highlighter
+   */
+  void format(final Syntax syntax) {
+    if(!selected()) return;
+
+    final int s = Math.min(ms, me), e = Math.max(ms, me), tl = text.length;
+    final byte[] format = syntax.format(Arrays.copyOfRange(text, s, e));
+    text(new TokenBuilder().add(text, 0, s).add(format).add(text, e, tl).finish());
+    ms = s;
+    me = s + format.length;
+    setCaret(me);
+    checkSelect();
+  }
+
+  /**
    * Indents the current line or text.
    * @param sb typed in string
    * @param shift shift key
@@ -496,7 +512,8 @@ public final class EditorText {
    * Extends selection to the beginning of first and end of last line.
    */
   void extend() {
-    int s = Math.min(ms, me), e = Math.max(ms, me), tl = text.length;
+    int s = Math.min(ms, me), e = Math.max(ms, me);
+    final int tl = text.length;
     while(s > 0 && text[s - 1] != '\n') --s;
     while(e < tl && text[e] != '\n') ++e;
     ms = s;
@@ -509,7 +526,9 @@ public final class EditorText {
    */
   void indent(final boolean shift) {
     extend();
-    int s = ms, e = me, o = e;
+    final int s = ms;
+    int e = me;
+    final int o = e;
     final int tl = text.length;
 
     // build new text
@@ -542,8 +561,7 @@ public final class EditorText {
     tb.add(text, o, tl);
     text(tb.finish());
     select(s, e);
-    pc = e;
-    ps = e;
+    setCaret(e);
   }
 
   /**
