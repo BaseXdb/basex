@@ -116,7 +116,7 @@ final class Replace extends StructuralUpdate {
               valueUpdates.add(UpdateValue.getInstance(trg, t, srcValue));
             break;
           case Data.PI:
-            // check processing istruction value
+            // check processing instruction value
             final byte[] srcText = src.text(s, true);
             final byte[] trgText = trg.text(t, true);
             final int i = indexOf(srcText, ' ');

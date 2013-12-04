@@ -412,18 +412,19 @@ public final class EditorText {
       while(me < size() && text[me] != '\n') ++me;
     }
 
-    // selected
     final int min = Math.min(ms, me);
     int max = Math.max(ms, me);
     if(selected() && text[max - 1] == '\n') max--;
 
+    // create new text with or without comment
     final TokenBuilder tb = new TokenBuilder().add(text, 0, min);
     final int mx = Math.max(min + sl, max - el), off;
     if(indexOf(text, st, min) == min && indexOf(text, en, mx) == mx) {
-      // selected area already has a comment
+      // remove existing comment
       tb.add(text, min + sl, max - el);
       off = -sl - el;
     } else {
+      // add new comment
       tb.add(st).add(text, min, max).add(en);
       off = sl + el;
     }
