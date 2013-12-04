@@ -17,6 +17,9 @@ import org.basex.gui.*;
  * @author Christian Gruen
  */
 public class BaseXButton extends JButton {
+  /** Button template. */
+  private static final AbstractButton TEMPLATE = style(new JToggleButton());
+
   /**
    * Constructor for text buttons.
    * @param label button label
@@ -66,6 +69,10 @@ public class BaseXButton extends JButton {
 
     final AbstractButton button = toggle ? new JToggleButton() : new JButton();
     init(button, gui, name, help);
+    if(!toggle) {
+      button.setBorder(TEMPLATE.getBorder());
+      button.setMargin(TEMPLATE.getMargin());
+    }
     return button;
   }
 
@@ -82,7 +89,15 @@ public class BaseXButton extends JButton {
     button.setIcon(BaseXLayout.icon(name));
     BaseXLayout.addInteraction(button, gui);
     if(help != null) button.setToolTipText(help);
+    style(button);
+  }
 
+  /**
+   * Unifies the button style.
+   * @param button button reference
+   * @return button
+   */
+  private static AbstractButton style(final AbstractButton button) {
     // no shadow effects (flat style)
     button.setOpaque(false);
     // trim horizontal button margins (mac)
@@ -90,6 +105,7 @@ public class BaseXButton extends JButton {
     in.left /= 4;
     in.right /= 4;
     if(in.top < in.left) button.setMargin(in);
+    return button;
   }
 
   /**
