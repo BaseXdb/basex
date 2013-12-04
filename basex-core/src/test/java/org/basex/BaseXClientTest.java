@@ -81,7 +81,6 @@ public final class BaseXClientTest extends BaseXTest {
    * @throws IOException I/O exception
    */
   private static String run(final String[] args, final String[] sargs) throws IOException {
-
     final BaseXServer server = createServer(sargs);
     final ArrayOutput ao = new ArrayOutput();
     System.setOut(new PrintStream(ao));

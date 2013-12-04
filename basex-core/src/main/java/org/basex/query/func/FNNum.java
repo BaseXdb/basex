@@ -56,8 +56,8 @@ public final class FNNum extends StandardFunc {
    * @return absolute item
    * @throws QueryException query exception
    */
-  private Item rnd(final Item it, final double d, final boolean h2e,
-      final QueryContext ctx) throws QueryException {
+  private Item rnd(final Item it, final double d, final boolean h2e, final QueryContext ctx)
+      throws QueryException {
 
     final long p = expr.length == 1 ? 0 : checkItr(expr[1], ctx);
     return round(it, d, p, h2e, info);
@@ -98,8 +98,8 @@ public final class FNNum extends StandardFunc {
    * @return absolute item
    * @throws QueryException query exception
    */
-  public static Item round(final Item it, final double d, final long prec,
-      final boolean h2e, final InputInfo ii) throws QueryException {
+  public static Item round(final Item it, final double d, final long prec, final boolean h2e,
+      final InputInfo ii) throws QueryException {
 
     // take care of untyped items
     final Item num = it.type.isUntyped() ? Dbl.get(it.dbl(ii)) : it;

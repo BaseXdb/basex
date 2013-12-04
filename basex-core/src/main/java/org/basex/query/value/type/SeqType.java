@@ -418,8 +418,8 @@ public final class SeqType {
    * @return promoted item
    * @throws QueryException query exception
    */
-  private Value funcConv(final QueryContext ctx, final StaticContext sc,
-      final InputInfo ii, final Item it) throws QueryException {
+  private Value funcConv(final QueryContext ctx, final StaticContext sc, final InputInfo ii,
+      final Item it) throws QueryException {
 
     if(type instanceof AtomType) {
       final Item atom = StandardFunc.atom(it, ii);

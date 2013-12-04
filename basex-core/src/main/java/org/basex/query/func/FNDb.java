@@ -492,7 +492,7 @@ public final class FNDb extends StandardFunc {
    * @return <code>&lt;resource/&gt;</code> node
    */
   private static FNode resource(final byte[] path, final boolean raw, final long size,
-                                final byte[] ctype, final long mdate) {
+      final byte[] ctype, final long mdate) {
 
     final String tstamp = DateTime.format(new Date(mdate), DateTime.FULL);
     final FElem res = new FElem(RESOURCE).add(path).

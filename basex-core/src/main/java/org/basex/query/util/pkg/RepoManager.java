@@ -118,8 +118,8 @@ public final class RepoManager {
    * @param path package path
    * @return new entry
    */
-  private static TokenList entry(final String name, final String version,
-      final String type, final String path) {
+  private static TokenList entry(final String name, final String version, final String type,
+      final String path) {
 
     final TokenList tl = new TokenList();
     tl.add(name);

@@ -126,9 +126,8 @@ public final class Functions extends TokenSet {
    * @return function literal if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public static Expr getLiteral(final QNm name, final int arity,
-      final QueryContext ctx, final StaticContext sc, final InputInfo ii)
-          throws QueryException {
+  public static Expr getLiteral(final QNm name, final int arity, final QueryContext ctx,
+      final StaticContext sc, final InputInfo ii) throws QueryException {
 
     // parse data type constructors
     if(eq(name.uri(), XSURI)) {
@@ -205,8 +204,7 @@ public final class Functions extends TokenSet {
    * @throws QueryException query exception
    */
   public static TypedFunc get(final QNm name, final Expr[] args, final boolean dyn,
-      final QueryContext ctx, final StaticContext sc, final InputInfo ii)
-          throws QueryException {
+      final QueryContext ctx, final StaticContext sc, final InputInfo ii) throws QueryException {
 
     // get namespace and local name
     // parse data type constructors

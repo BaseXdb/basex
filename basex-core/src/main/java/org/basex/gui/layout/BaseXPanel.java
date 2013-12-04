@@ -11,8 +11,8 @@ import org.basex.gui.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public abstract class BaseXPanel extends BaseXBack implements MouseListener,
-    MouseMotionListener, ComponentListener, KeyListener, MouseWheelListener {
+public abstract class BaseXPanel extends BaseXBack implements MouseListener, MouseMotionListener,
+    ComponentListener, KeyListener, MouseWheelListener {
 
   /** Reference to the main window. */
   public final GUI gui;

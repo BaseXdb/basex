@@ -16,7 +16,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 final class AxisStep extends Step {
-
   /**
    * Constructor.
    * @param ii input info

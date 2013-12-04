@@ -128,9 +128,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
    * @param ex resulting query exception
    * @param error expected errors
    */
-  protected static void check(final String query, final QueryException ex,
-      final Err... error) {
-
+  protected static void check(final String query, final QueryException ex, final Err... error) {
     boolean found = false;
     final Err err = ex.err();
     for(final Err e : error) found |= err != null ? err == e : e.qname().eq(ex.qname());

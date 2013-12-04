@@ -4,7 +4,6 @@ package org.basex.query.regex.parse;
 
 /** Token Manager Error. */
 public class TokenMgrError extends Error {
-
   /**
    * The version identifier for this Serializable class.
    * Increment only if the <i>serialized</i> form of the

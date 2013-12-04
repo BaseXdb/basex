@@ -499,7 +499,6 @@ public final class TreeView extends View implements TreeConstants {
           final int s = sub.levelSize(r, i);
 
           if(tr.bigRect(sub, r, i)) {
-
             if(rl > 1) {
               final TreeBorder tb = sub.treeBorder(r, i);
               final int si = tb.size;
@@ -552,18 +551,15 @@ public final class TreeView extends View implements TreeConstants {
 
     int rn = 0;
     while(rn < roots.length) {
-
       final LinkedList<Integer> marklink = new LinkedList<Integer>();
       for(int i = 0; i < mark.length; ++i)
         marklink.add(i, mark[i]);
 
       for(int lv = 0; lv < sub.subtreeHeight(rn); ++lv) {
-
         final int y = getYperLevel(lv);
         final ListIterator<Integer> li = marklink.listIterator();
 
         if(tr.bigRect(sub, rn, lv)) {
-
           while(li.hasNext()) {
             final int pre = li.next();
 
@@ -767,7 +763,6 @@ public final class TreeView extends View implements TreeConstants {
             : bo.start;
 
         for(int j = 0; j < bo.size; ++j) {
-
           final int dp = sub.prePerIndex(rn, lvd, j + start);
 
           final TreeRect dr = tr.getTreeRectPerIndex(rn, lvd, j + start);
@@ -911,7 +906,6 @@ public final class TreeView extends View implements TreeConstants {
 
       for(int r = 0; r < roots.length; ++r) {
         for(int i = 0; i < sub.subtreeHeight(r); ++i) {
-
           if(tr.bigRect(sub, r, i)) {
             final int index = sub.preIndex(r, i, fpre);
 
@@ -922,7 +916,6 @@ public final class TreeView extends View implements TreeConstants {
               return true;
             }
           } else {
-
             final TreeRect rect = tr.searchRect(sub, r, i, fpre);
 
             if(rect != null) {

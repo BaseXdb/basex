@@ -49,8 +49,8 @@ public final class CmpSR extends Single {
    * @param coll collation
    * @param ii input info
    */
-  private CmpSR(final Expr e, final byte[] mn, final boolean in, final byte[] mx,
-      final boolean ix, final Collation coll, final InputInfo ii) {
+  private CmpSR(final Expr e, final byte[] mn, final boolean in, final byte[] mx, final boolean ix,
+      final Collation coll, final InputInfo ii) {
 
     super(ii, e);
     collation = coll;

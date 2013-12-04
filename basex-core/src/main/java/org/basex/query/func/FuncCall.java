@@ -74,9 +74,8 @@ public abstract class FuncCall extends Arr {
    * @return result of the function call
    * @throws QueryException query exception
    */
-  private static Value invoke(final XQFunction fun, final Value[] arg,
-      final boolean itm, final boolean tc, final QueryContext ctx, final InputInfo ii)
-          throws QueryException {
+  private static Value invoke(final XQFunction fun, final Value[] arg, final boolean itm,
+      final boolean tc, final QueryContext ctx, final InputInfo ii) throws QueryException {
 
     final int calls = ctx.tailCalls, max = ctx.maxCalls;
     if(tc && max >= 0 && ++ctx.tailCalls >= max) {

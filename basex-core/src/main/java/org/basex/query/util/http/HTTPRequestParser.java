@@ -194,7 +194,6 @@ public final class HTTPRequestParser {
    * @throws QueryException query exception
    */
   private void checkBody(final ANode body, final TokenMap bodyAttrs) throws QueryException {
-
     // @media-type is mandatory
     if(bodyAttrs.get(MEDIA_TYPE) == null)
       throw HC_REQ.get(info, "Attribute media-type of http:body is mandatory");

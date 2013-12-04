@@ -117,7 +117,6 @@ public final class FNQName extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item prefixFromQName(final QueryContext ctx, final Item it) throws QueryException {
-
     if(it == null) return null;
     final QNm nm = checkQNm(it, ctx, sc);
     return nm.hasPrefix() ? AtomType.NCN.cast(Str.get(nm.prefix()), ctx, sc, info) : null;
@@ -168,9 +167,7 @@ public final class FNQName extends StandardFunc {
    * @return prefix sequence
    * @throws QueryException query exception
    */
-  private Item resolveUri(final Item it, final Item it2)
-      throws QueryException {
-
+  private Item resolveUri(final Item it, final Item it2) throws QueryException {
     if(it == null) return null;
     // check relative uri
     final Uri rel = Uri.uri(checkEStr(it));

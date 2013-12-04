@@ -436,8 +436,8 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public final Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
 
     final Value oldVal = ctx.value;
     try {

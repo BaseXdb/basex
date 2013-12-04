@@ -76,9 +76,7 @@ public final class Levenshtein {
    * @param k maximum number of accepted errors
    * @return true if the arrays are similar
    */
-  private boolean ls(final byte[] tk, final int tl, final byte[] sb, final int sl,
-      final int k) {
-
+  private boolean ls(final byte[] tk, final int tl, final byte[] sb, final int sl, final int k) {
     int[][] m = matrix;
     if(m == null) {
       m = new int[MAX + 2][MAX + 2];

@@ -17,7 +17,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Replace extends ACreate {
-
   /**
    * Constructor.
    * The input needs to be set via {@link #setInput(InputStream)}.

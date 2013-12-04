@@ -67,8 +67,8 @@ public final class Collation {
    * @return collator instance or {@code null} for unicode point collation
    * @throws QueryException query exception
    */
-  public static Collation get(final byte[] uri, final QueryContext ctx,
-      final StaticContext sc, final InputInfo info, final Err err) throws QueryException {
+  public static Collation get(final byte[] uri, final QueryContext ctx, final StaticContext sc,
+      final InputInfo info, final Err err) throws QueryException {
 
     // return default collation
     if(uri == null) return sc.collation;

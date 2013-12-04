@@ -30,8 +30,7 @@ public final class FNFunc extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNFunc(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNFunc(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 
@@ -230,9 +229,7 @@ public final class FNFunc extends StandardFunc {
    * @return function item
    * @throws QueryException query exception
    */
-  private FItem withArity(final int p, final int a, final QueryContext ctx)
-      throws QueryException {
-
+  private FItem withArity(final int p, final int a, final QueryContext ctx) throws QueryException {
     final Item it = checkItem(expr[p], ctx);
     if(it instanceof FItem) {
       final FItem fi = (FItem) it;

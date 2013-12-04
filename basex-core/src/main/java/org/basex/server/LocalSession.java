@@ -47,7 +47,7 @@ public class LocalSession extends Session {
    * @throws LoginException login exception
    */
   private LocalSession(final Context context, final String user, final String pass,
-                       final OutputStream output) throws LoginException {
+      final OutputStream output) throws LoginException {
 
     this(context, output);
     ctx.user = ctx.users.get(user);

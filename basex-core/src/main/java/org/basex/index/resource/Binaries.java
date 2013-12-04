@@ -55,9 +55,7 @@ final class Binaries {
    * @param dir returns directories instead of files
    * @param tbm map; values will be {@code true} to indicate raw files
    */
-  synchronized void children(final byte[] path, final boolean dir,
-      final TokenBoolMap tbm) {
-
+  synchronized void children(final byte[] path, final boolean dir, final TokenBoolMap tbm) {
     if(data.inMemory()) return;
     final IOFile file = data.meta.binary(string(path));
     if(file == null) return;

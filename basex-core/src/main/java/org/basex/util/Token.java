@@ -1082,9 +1082,7 @@ public final class Token {
    * @param token3 third token
    * @return resulting array
    */
-  public static byte[] concat(final byte[] token1, final byte[] token2,
-      final byte[] token3) {
-
+  public static byte[] concat(final byte[] token1, final byte[] token2, final byte[] token3) {
     final int t1 = token1.length;
     final int t2 = token2.length;
     final int t3 = token3.length;

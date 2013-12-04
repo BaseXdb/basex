@@ -8,7 +8,6 @@ package org.basex.query.regex.parse;
  * of their choice.
  */
 public interface TokenManager {
-
   /**
    * This gets the next token from the input stream.
    * A token of kind 0 (&lt;EOF>) should be returned on EOF.

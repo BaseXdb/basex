@@ -51,8 +51,8 @@ public final class HTTPClient {
    * @return HTTP response
    * @throws QueryException query exception
    */
-  public Iter sendRequest(final byte[] href, final ANode request,
-      final ValueBuilder bodies) throws QueryException {
+  public Iter sendRequest(final byte[] href, final ANode request, final ValueBuilder bodies)
+      throws QueryException {
 
     try {
       if(request == null) {
@@ -97,9 +97,7 @@ public final class HTTPClient {
    * @throws IOException I/O Exception
    * @throws MalformedURLException incorrect url
    */
-  private HttpURLConnection openConnection(final String dest)
-      throws QueryException, IOException {
-
+  private HttpURLConnection openConnection(final String dest) throws QueryException, IOException {
     final URL url = new URL(dest);
     if(!eqic(url.getProtocol(), "HTTP", "HTTPS"))
       throw HC_ERROR.get(info, "Invalid URL: " + url);
@@ -364,8 +362,8 @@ public final class HTTPClient {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private void writePart(final Part part, final OutputStream out,
-      final byte[] boundary) throws IOException, QueryException {
+  private void writePart(final Part part, final OutputStream out, final byte[] boundary)
+      throws IOException, QueryException {
 
     // write boundary preceded by "--"
     final TokenBuilder boundTb = new TokenBuilder();

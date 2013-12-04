@@ -11,7 +11,6 @@ import org.junit.Test;
  * @author BaseX Team 2005-13, BSD License
  */
 public class StringListTest {
-
   /** Tests {@code containsAll(l)} function. */
   @Test
   public void containsAllTest() {

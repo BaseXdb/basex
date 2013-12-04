@@ -20,7 +20,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class CreateBackup extends ABackup {
-
   /**
    * Default constructor.
    * @param arg optional argument

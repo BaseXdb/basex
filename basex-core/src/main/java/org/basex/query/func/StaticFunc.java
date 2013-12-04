@@ -51,9 +51,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @param xqdoc current xqdoc cache
    * @param ii input info
    */
-  public StaticFunc(final Ann a, final QNm n, final Var[] v, final SeqType r,
-      final Expr e, final StaticContext stc, final VarScope scp,
-      final String xqdoc, final InputInfo ii) {
+  public StaticFunc(final Ann a, final QNm n, final Var[] v, final SeqType r, final Expr e,
+      final StaticContext stc, final VarScope scp, final String xqdoc, final InputInfo ii) {
 
     super(stc, a, n, r, scp, xqdoc, ii);
     args = v;
@@ -162,8 +161,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public Item invItem(final QueryContext ctx, final InputInfo ii,
-      final Value... arg) throws QueryException {
+  public Item invItem(final QueryContext ctx, final InputInfo ii, final Value... arg)
+      throws QueryException {
 
     // reset context and evaluate function
     final Value cv = ctx.value;
@@ -182,8 +181,9 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public Value invValue(final QueryContext ctx, final InputInfo ii,
-      final Value... arg) throws QueryException {
+  public Value invValue(final QueryContext ctx, final InputInfo ii, final Value... arg)
+      throws QueryException {
+
     // reset context and evaluate function
     final Value cv = ctx.value;
     ctx.value = null;

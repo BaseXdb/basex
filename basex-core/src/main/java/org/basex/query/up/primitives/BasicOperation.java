@@ -14,9 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
-public abstract class BasicOperation extends Operation
-    implements Comparable<BasicOperation>  {
-
+public abstract class BasicOperation extends Operation implements Comparable<BasicOperation>  {
   /** Basic Operation types. Carried out in the given order. */
   public enum TYPE {
     /** DBAdd.      */ DBADD,

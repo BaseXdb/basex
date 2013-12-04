@@ -317,9 +317,7 @@ public final class QNm extends Item {
    * @param uri uri
    * @return EQName representation
    */
-  public static byte[] internal(final byte[] prefix, final byte[] local,
-      final byte[] uri) {
-
+  public static byte[] internal(final byte[] prefix, final byte[] local, final byte[] uri) {
     // optimized for speed, as it is called quite frequently
     final int ul = uri == null ? 0 : uri.length;
     final int pl = prefix == null ? 0 : prefix.length;

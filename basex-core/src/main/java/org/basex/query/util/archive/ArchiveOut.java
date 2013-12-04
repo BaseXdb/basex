@@ -30,9 +30,7 @@ public abstract class ArchiveOut {
    * @return writer
    * @throws QueryException query exception
    */
-  public static ArchiveOut get(final String format, final InputInfo info)
-      throws QueryException {
-
+  public static ArchiveOut get(final String format, final InputInfo info) throws QueryException {
     try {
       if(format.equals(FNArchive.ZIP)) return new ZIPOut();
       if(format.equals(FNArchive.GZIP)) return new GZIPOut();

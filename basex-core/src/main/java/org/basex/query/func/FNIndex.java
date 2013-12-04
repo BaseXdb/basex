@@ -115,8 +115,8 @@ public final class FNIndex extends StandardFunc {
    * @return text entries
    * @throws QueryException query exception
    */
-  static Iter entries(final Data data, final IndexEntries entries,
-      final StandardFunc call) throws QueryException {
+  static Iter entries(final Data data, final IndexEntries entries, final StandardFunc call)
+      throws QueryException {
 
     final Index index;
     final boolean avl;

@@ -72,9 +72,7 @@ public final class QueryException extends Exception {
    * @param msg error message
    * @param ext error extension
    */
-  public QueryException(final InputInfo ii, final QNm errc, final String msg,
-      final Object... ext) {
-
+  public QueryException(final InputInfo ii, final QNm errc, final String msg, final Object... ext) {
     super(BaseXException.message(msg, ext));
     name = errc;
     if(ii != null) info(ii);

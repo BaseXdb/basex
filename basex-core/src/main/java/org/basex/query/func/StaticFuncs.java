@@ -52,9 +52,9 @@ public final class StaticFuncs extends ExprInfo {
    * @return static function reference
    * @throws QueryException query exception
    */
-  public StaticFunc declare(final Ann ann, final QNm nm, final Var[] args,
-      final SeqType ret, final Expr body, final StaticContext sc, final VarScope scp,
-      final String xqdoc, final InputInfo ii) throws QueryException {
+  public StaticFunc declare(final Ann ann, final QNm nm, final Var[] args, final SeqType ret,
+      final Expr body, final StaticContext sc, final VarScope scp, final String xqdoc,
+      final InputInfo ii) throws QueryException {
 
     final byte[] uri = nm.uri();
     if(uri.length == 0) throw FUNNONS.get(ii, nm.string());
@@ -79,6 +79,7 @@ public final class StaticFuncs extends ExprInfo {
    */
   TypedFunc getRef(final QNm name, final Expr[] args, final StaticContext sc,
       final InputInfo ii) throws QueryException {
+
     // check if function has already been declared
     final FuncCache fc = funcs.get(sig(name, args.length));
     return fc == null ? null : fc.newCall(name, args, sc, ii);

@@ -7,7 +7,6 @@ package org.basex.gui.view.map;
  * @author Joerg Hauser
  */
 final class SplitAlgo extends MapAlgo {
-
   @Override
   MapRects calcMap(final MapRect r, final MapList ml, final int ns, final int ne) {
     return calcMap(r, ml, ns, ne, 1);

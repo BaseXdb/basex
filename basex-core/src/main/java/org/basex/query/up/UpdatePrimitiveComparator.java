@@ -73,7 +73,6 @@ import org.basex.util.*;
  * @author Lukas Kircher
  */
 public class UpdatePrimitiveComparator implements Comparator<UpdatePrimitive> {
-
   @Override
   public int compare(final UpdatePrimitive a, final UpdatePrimitive b) {
     // data the same for both primitives

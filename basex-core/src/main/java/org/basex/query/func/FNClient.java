@@ -187,9 +187,7 @@ public final class FNClient extends StandardFunc {
    * @return connection
    * @throws QueryException query exception
    */
-  private ClientSession session(final QueryContext ctx, final boolean del)
-      throws QueryException {
-
+  private ClientSession session(final QueryContext ctx, final boolean del) throws QueryException {
     final Uri id = (Uri) checkType(expr[0].item(ctx, info), AtomType.URI);
     final ClientSession cs = ctx.sessions().get(id);
     if(cs == null) throw BXCL_NOTAVL.get(info, id);

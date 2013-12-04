@@ -187,7 +187,6 @@ public final class GroupBy extends GFLWOR.Clause {
    * @throws QueryException query exception
    */
   boolean eq(final Item[] as, final Item[] bs, final Collation[] coll) throws QueryException {
-
     for(int i = 0; i < as.length; i++) {
       final Item a = as[i], b = bs[i];
       if(a == null ^ b == null || a != null && !a.equiv(b, coll[i], info)) return false;

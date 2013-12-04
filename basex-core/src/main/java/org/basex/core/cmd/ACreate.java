@@ -84,9 +84,7 @@ public abstract class ACreate extends Command {
    * @param cmd calling command
    * @throws IOException I/O exception
    */
-  static void create(final IndexType index, final Data data, final ACreate cmd)
-      throws IOException {
-
+  static void create(final IndexType index, final Data data, final ACreate cmd) throws IOException {
     if(data.inMemory()) return;
 
     final IndexBuilder ib;

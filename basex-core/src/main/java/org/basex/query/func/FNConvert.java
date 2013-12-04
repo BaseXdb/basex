@@ -110,7 +110,6 @@ public final class FNConvert extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str integerToBase(final QueryContext ctx, final InputInfo ii) throws QueryException {
-
     final long num = checkItr(expr[0], ctx), base = checkItr(expr[1], ctx);
     if(base < 2 || base > 36) throw INVBASE.get(ii, base);
 
@@ -148,9 +147,7 @@ public final class FNConvert extends StandardFunc {
    * @return read integer
    * @throws QueryException exception
    */
-  private Int integerFromBase(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  private Int integerFromBase(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final byte[] str = checkStr(expr[0], ctx);
     final long base = checkItr(expr[1], ctx);
     if(base < 2 || base > 36) throw INVBASE.get(ii, base);

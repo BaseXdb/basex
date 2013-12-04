@@ -167,9 +167,7 @@ public final class DiskBuilder extends Builder {
   }
 
   @Override
-  protected void addText(final byte[] value, final int dist, final byte kind)
-      throws IOException {
-
+  protected void addText(final byte[] value, final int dist, final byte kind) throws IOException {
     tout.write1(kind);
     tout.write2(0);
     tout.write5(textOff(value, true));

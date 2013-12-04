@@ -48,8 +48,8 @@ public final class CmpR extends Single {
    * @param ix include maximum value
    * @param ii input info
    */
-  private CmpR(final Expr e, final double mn, final boolean in, final double mx,
-      final boolean ix, final InputInfo ii) {
+  private CmpR(final Expr e, final double mn, final boolean in, final double mx, final boolean ix,
+      final InputInfo ii) {
 
     super(ii, e);
     min = mn;

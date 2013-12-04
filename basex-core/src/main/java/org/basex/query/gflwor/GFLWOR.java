@@ -268,7 +268,6 @@ public final class GFLWOR extends ParseExpr {
    * @throws QueryException query exception
    */
   private boolean inlineLets(final QueryContext ctx, final VarScope scp) throws QueryException {
-
     boolean change = false, thisRound;
     do {
       thisRound = false;
@@ -613,7 +612,6 @@ public final class GFLWOR extends ParseExpr {
    * @throws QueryException query exception if the whole expression fails
    */
   private boolean clauseError(final QueryException qe, final int idx) throws QueryException {
-
     final ListIterator<Clause> iter = clauses.listIterator(idx);
     while(iter.hasPrevious()) {
       final Clause b4 = iter.previous();

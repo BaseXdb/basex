@@ -165,9 +165,7 @@ public final class Num {
    * @param p position
    * @param l value length
    */
-  private static void set(final byte[] a, final int v, final int p,
-      final int l) {
-
+  private static void set(final byte[] a, final int v, final int p, final int l) {
     int i = p;
     if(l == 5) {
       a[i++] = (byte) 0xC0;

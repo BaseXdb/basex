@@ -430,8 +430,8 @@ public final class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void add(final Item entry, final Item cont, final ArchiveOut out,
-      final int level, final QueryContext ctx) throws QueryException, IOException {
+  private void add(final Item entry, final Item cont, final ArchiveOut out, final int level,
+      final QueryContext ctx) throws QueryException, IOException {
 
     // create new zip entry
     String name = string(entry.string(info));

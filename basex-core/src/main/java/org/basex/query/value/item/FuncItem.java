@@ -117,9 +117,8 @@ public final class FuncItem extends FItem implements Scope {
    * @param sf original function
    */
   public FuncItem(final QNm n, final Var[] arg, final Expr body, final FuncType t,
-      final boolean cst, final Value vl, final long ps, final long sz,
-      final Map<Var, Value> cls, final VarScope scp, final StaticContext sctx,
-      final StaticFunc sf) {
+      final boolean cst, final Value vl, final long ps, final long sz, final Map<Var, Value> cls,
+      final VarScope scp, final StaticContext sctx, final StaticFunc sf) {
 
     super(t);
     name = n;
@@ -166,8 +165,8 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Value invValue(final QueryContext ctx, final InputInfo ii,
-      final Value... args) throws QueryException {
+  public Value invValue(final QueryContext ctx, final InputInfo ii, final Value... args)
+      throws QueryException {
 
     // bind variables and cache context
     final int fp = ctx.stack.enterFrame(stackSize);
@@ -190,8 +189,8 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Item invItem(final QueryContext ctx, final InputInfo ii,
-      final Value... args) throws QueryException {
+  public Item invItem(final QueryContext ctx, final InputInfo ii, final Value... args)
+      throws QueryException {
 
     // bind variables and cache context
     final int fp = ctx.stack.enterFrame(stackSize);

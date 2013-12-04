@@ -34,7 +34,7 @@ public abstract class StaticDecl extends StaticScope {
    * @param ii input info
    */
   protected StaticDecl(final StaticContext sctx, final Ann a, final QNm nm, final SeqType t,
-                       final VarScope scp, final String xqdoc, final InputInfo ii) {
+      final VarScope scp, final String xqdoc, final InputInfo ii) {
 
     super(scp, xqdoc, sctx, ii);
     ann = a == null ? new Ann() : a;

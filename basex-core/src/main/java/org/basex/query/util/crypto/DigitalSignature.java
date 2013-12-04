@@ -145,7 +145,6 @@ public final class DigitalSignature {
 
       // dealing with given certificate details to initialize the keystore
       if(ce != null) {
-
         final Document ceDOM = toDOMNode(ce);
         if(!"digital-certificate".equals(ceDOM.getDocumentElement().getNodeName()))
           throw CX_INVNM.get(info, ceDOM);
@@ -309,7 +308,6 @@ public final class DigitalSignature {
     boolean coreVal = false;
 
     try {
-
       final Document doc = toDOMNode(node);
       final DOMValidateContext valContext =
           new DOMValidateContext(new MyKeySelector(), doc);

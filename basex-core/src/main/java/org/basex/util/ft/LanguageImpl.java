@@ -8,9 +8,7 @@ import java.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Jens Erat
  */
-abstract class LanguageImpl extends FTIterator
-    implements Comparable<LanguageImpl> {
-
+abstract class LanguageImpl extends FTIterator implements Comparable<LanguageImpl> {
   /**
    * Returns the precedence of the processor. If two language implementations
    * support the same language, the processor with the higher precedence

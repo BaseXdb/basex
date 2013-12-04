@@ -105,9 +105,7 @@ public abstract class Builder extends Proc {
    * @param nsp namespaces
    * @throws IOException I/O exception
    */
-  public final void openElem(final byte[] nm, final Atts att, final Atts nsp)
-      throws IOException {
-
+  public final void openElem(final byte[] nm, final Atts att, final Atts nsp) throws IOException {
     addElem(nm, att, nsp);
     ++level;
   }
@@ -119,9 +117,7 @@ public abstract class Builder extends Proc {
    * @param nsp namespaces
    * @throws IOException I/O exception
    */
-  public final void emptyElem(final byte[] nm, final Atts att, final Atts nsp)
-      throws IOException {
-
+  public final void emptyElem(final byte[] nm, final Atts att, final Atts nsp) throws IOException {
     addElem(nm, att, nsp);
     final int pre = pstack.get(level);
     ns.close(pre);
@@ -265,7 +261,6 @@ public abstract class Builder extends Proc {
    * @throws IOException I/O exception
    */
   private void addElem(final byte[] name, final Atts att, final Atts nsp) throws IOException {
-
     // get tag reference
     int n = tags.index(name, null, true);
     path.put(n, Data.ELEM, level);

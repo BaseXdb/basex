@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.regex.*;
 
 import javax.swing.*;
+import javax.swing.border.*;
 import javax.swing.event.*;
 
 import org.basex.data.*;
@@ -101,16 +102,16 @@ public final class EditorView extends View {
     label.setForeground(GRAY);
 
     final BaseXButton openB = BaseXButton.command(GUICommands.C_EDITOPEN, gui);
-    final BaseXButton saveB = new BaseXButton(gui, "save", H_SAVE);
-    hist = new BaseXButton(gui, "hist", H_RECENTLY_OPEN);
-    final BaseXButton find = new BaseXButton(gui, "find",
+    final BaseXButton saveB = new BaseXButton(gui, "c_save", H_SAVE);
+    hist = new BaseXButton(gui, "c_hist", H_RECENTLY_OPEN);
+    final BaseXButton find = new BaseXButton(gui, "c_find",
         BaseXLayout.addShortcut(H_REPLACE, BaseXKeys.FIND.toString()));
 
-    stop = new BaseXButton(gui, "stop", H_STOP_PROCESS);
+    stop = new BaseXButton(gui, "c_stop", H_STOP_PROCESS);
     stop.addKeyListener(this);
     stop.setEnabled(false);
 
-    go = new BaseXButton(gui, "go",
+    go = new BaseXButton(gui, "c_go",
         BaseXLayout.addShortcut(H_EXECUTE_QUERY, BaseXKeys.EXEC1.toString()));
     go.addKeyListener(this);
 
@@ -840,8 +841,7 @@ public final class EditorView extends View {
     final BaseXBack tab = new BaseXBack(new BorderLayout(10, 0)).mode(Fill.NONE);
     tab.add(edit.label, BorderLayout.CENTER);
 
-    final BaseXButton close = tabButton("e_close");
-    close.setRolloverIcon(BaseXLayout.icon("e_close2"));
+    final BaseXButton close = tabButton("e_close", "e_close2");
     close.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -858,8 +858,7 @@ public final class EditorView extends View {
    * Adds a tab for creating new tabs.
    */
   private void addCreateTab() {
-    final BaseXButton add = tabButton("e_new");
-    add.setRolloverIcon(BaseXLayout.icon("e_new2"));
+    final BaseXButton add = tabButton("e_new", "e_new2");
     add.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -874,13 +873,15 @@ public final class EditorView extends View {
   /**
    * Adds a new tab button.
    * @param icon button icon
+   * @param rollover rollover icon
    * @return button
    */
-  private BaseXButton tabButton(final String icon) {
+  private BaseXButton tabButton(final String icon, final String rollover) {
     final BaseXButton b = new BaseXButton(gui, icon, null);
-    b.setMargin(new Insets(0, 0, 0, 0));
+    b.setBorder(new EmptyBorder(2, 0, 2, 0));
     b.setContentAreaFilled(false);
     b.setFocusable(false);
+    b.setRolloverIcon(BaseXLayout.icon(rollover));
     return b;
   }
 

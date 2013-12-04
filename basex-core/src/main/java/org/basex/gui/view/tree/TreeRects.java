@@ -111,7 +111,6 @@ final class TreeRects implements TreeConstants {
     double ww = w;
 
     for(int i = 0; i < subSi; ++i) {
-
       if(slim) {
         final double boxMiddle = xx + ww / 2f;
         final byte[] b = getText(sub.prePerIndex(rn, lv, i));

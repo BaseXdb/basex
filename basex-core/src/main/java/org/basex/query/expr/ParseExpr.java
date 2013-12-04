@@ -85,7 +85,6 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public final Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
-
     final Item it;
     if(type().zeroOrOne()) {
       it = item(ctx, info);

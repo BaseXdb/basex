@@ -15,7 +15,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 final class CachedFilter extends Filter {
-
   /**
    * Constructor.
    * @param ii input info

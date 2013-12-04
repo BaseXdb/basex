@@ -105,7 +105,7 @@ public final class StringRangeTest extends QueryPlanTest {
    * @throws BaseXException database exception
    */
   private static void test(final String query, final String result,
-                           final Class<? extends Expr> expr) throws BaseXException {
+      final Class<? extends Expr> expr) throws BaseXException {
 
     new CreateIndex(CmdIndex.TEXT).execute(context);
     check(query, result, "exists(//" + Util.className(expr) + ')');

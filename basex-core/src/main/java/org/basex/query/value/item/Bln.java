@@ -130,7 +130,6 @@ public final class Bln extends Item {
    * @throws QueryException query exception
    */
   public static boolean parse(final byte[] str, final InputInfo ii) throws QueryException {
-
     final byte[] s = Token.trim(str);
     if(Token.eq(s, Token.TRUE) || Token.eq(s, Token.ONE)) return true;
     if(Token.eq(s, Token.FALSE) || Token.eq(s, Token.ZERO)) return false;

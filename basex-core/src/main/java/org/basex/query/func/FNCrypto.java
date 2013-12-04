@@ -15,7 +15,6 @@ import org.basex.util.*;
  * @author Lukas Kircher
  */
 public final class FNCrypto extends StandardFunc {
-
   /**
    * Constructor.
    * @param sctx static context

@@ -149,9 +149,7 @@ public final class FNDate extends StandardFunc {
    * @return duration
    * @throws QueryException query exception
    */
-  private ADate adjust(final Item it, final Type t, final QueryContext ctx)
-      throws QueryException {
-
+  private ADate adjust(final Item it, final Type t, final QueryContext ctx) throws QueryException {
     final ADate ad;
     if(it.type.isUntyped()) {
       ad = (ADate) t.cast(it, ctx, sc, info);

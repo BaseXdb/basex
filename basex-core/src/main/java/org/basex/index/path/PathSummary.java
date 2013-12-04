@@ -104,9 +104,7 @@ public final class PathSummary implements Index {
    * @param v value
    * @param md meta data
    */
-  public void put(final int n, final byte k, final int l, final byte[] v,
-      final MetaData md) {
-
+  public void put(final int n, final byte k, final int l, final byte[] v, final MetaData md) {
     if(l == 0) {
       if(v != null) root.stats.add(v, md);
       root.stats.count++;
@@ -147,9 +145,7 @@ public final class PathSummary implements Index {
    * @param desc if false, return only children
    * @return descendant nodes
    */
-  public static ArrayList<PathNode> desc(final ArrayList<PathNode> in,
-      final boolean desc) {
-
+  public static ArrayList<PathNode> desc(final ArrayList<PathNode> in, final boolean desc) {
     final ArrayList<PathNode> out = new ArrayList<PathNode>();
     for(final PathNode n : in) {
       for(final PathNode c : n.ch) {

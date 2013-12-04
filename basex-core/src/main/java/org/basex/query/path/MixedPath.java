@@ -34,7 +34,6 @@ public final class MixedPath extends Path {
 
   @Override
   protected Expr compilePath(final QueryContext ctx, final VarScope scp) throws QueryException {
-
     voidStep(steps, ctx);
 
     for(int s = 0; s != steps.length; ++s) {

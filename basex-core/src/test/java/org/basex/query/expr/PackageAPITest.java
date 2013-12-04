@@ -369,8 +369,8 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * @param cont package content
    * @return descriptor
    */
-  private static IOContent desc(final String name, final String abbrev,
-      final String version, final String cont) {
+  private static IOContent desc(final String name, final String abbrev, final String version,
+      final String cont) {
 
     return new IOContent(concat(Util.inf(HEADER, name, abbrev, version),
         token(cont), FOOTER));

@@ -26,9 +26,7 @@ public final class NSContext {
    * @param ii input info
    * @throws QueryException query exception
    */
-  public void add(final byte[] pref, final byte[] uri, final InputInfo ii)
-      throws QueryException {
-
+  public void add(final byte[] pref, final byte[] uri, final InputInfo ii) throws QueryException {
     if(eq(pref, XML, XMLNS)) throw BINDXML.get(ii, pref);
     if(eq(uri, XMLURI)) throw BINDXMLURI.get(ii, uri, XML);
     if(eq(uri, XMLNSURI)) throw BINDXMLURI.get(ii, uri, XMLNS);

@@ -46,8 +46,8 @@ public class MainModule extends StaticScope {
    * @param sctx static context
    * @param ii input info
    */
-  public MainModule(final Expr rt, final VarScope scp, final SeqType type,
-      final String xqdoc, final StaticContext sctx, final InputInfo ii) {
+  public MainModule(final Expr rt, final VarScope scp, final SeqType type, final String xqdoc,
+      final StaticContext sctx, final InputInfo ii) {
 
     super(scp, xqdoc, sctx, ii);
     expr = rt;

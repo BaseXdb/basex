@@ -141,9 +141,7 @@ public final class Zip extends Proc {
    * @return entry
    * @throws IOException I/O exception
    */
-  private static byte[] getEntry(final ZipInputStream in, final String entry)
-      throws IOException {
-
+  private static byte[] getEntry(final ZipInputStream in, final String entry) throws IOException {
     for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
       if(!entry.equals(ze.getName())) continue;
       final int s = (int) ze.getSize();

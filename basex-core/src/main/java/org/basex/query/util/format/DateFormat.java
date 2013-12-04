@@ -25,9 +25,7 @@ final class DateFormat extends FormatParser {
    * @param ii input info
    * @throws QueryException query exception
    */
-  DateFormat(final byte[] pic, final byte[] df, final InputInfo ii)
-      throws QueryException {
-
+  DateFormat(final byte[] pic, final byte[] df, final InputInfo ii) throws QueryException {
     super(ii);
 
     // split variable marker

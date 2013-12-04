@@ -113,8 +113,8 @@ public final class Catch extends Single {
    * @return equivalent expression
    * @throws QueryException query exception during inlining
    */
-  Expr asExpr(final QueryException ex, final QueryContext ctx,
-              final VarScope scp) throws QueryException {
+  Expr asExpr(final QueryException ex, final QueryContext ctx, final VarScope scp)
+      throws QueryException {
 
     if(expr.isValue()) return expr;
     int i = 0;

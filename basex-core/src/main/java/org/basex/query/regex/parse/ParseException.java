@@ -12,7 +12,6 @@ package org.basex.query.regex.parse;
  * mechanisms so long as you retain the public fields.
  */
 public class ParseException extends Exception {
-
   /**
    * The version identifier for this Serializable class.
    * Increment only if the <i>serialized</i> form of the

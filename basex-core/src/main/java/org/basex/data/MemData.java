@@ -38,8 +38,8 @@ public final class MemData extends Data {
    * @param txt text index
    * @param atv attribute value index
    */
-  private MemData(final Names tag, final Names att, final PathSummary ps,
-                  final Namespaces ns, final MainOptions opts, final Index txt, final Index atv) {
+  private MemData(final Names tag, final Names att, final PathSummary ps, final Namespaces ns,
+      final MainOptions opts, final Index txt, final Index atv) {
 
     meta = new MetaData(opts);
     table = new TableMemAccess(meta);

@@ -91,9 +91,7 @@ public class Dur extends ADateDur {
    * @param ii input info
    * @throws QueryException query exception
    */
-  void yearMonth(final byte[] vl, final Matcher mt, final InputInfo ii)
-      throws QueryException {
-
+  void yearMonth(final byte[] vl, final Matcher mt, final InputInfo ii) throws QueryException {
     final long y = mt.group(2) != null ? toLong(mt.group(3), true, ii) : 0;
     final long m = mt.group(4) != null ? toLong(mt.group(5), true, ii) : 0;
     mon = y * 12 + m;
@@ -113,8 +111,8 @@ public class Dur extends ADateDur {
    * @param ii input info
    * @throws QueryException query exception
    */
-  void dayTime(final byte[] vl, final Matcher mt, final int p,
-               final InputInfo ii) throws QueryException {
+  void dayTime(final byte[] vl, final Matcher mt, final int p, final InputInfo ii)
+      throws QueryException {
 
     final long d = mt.group(p) != null ? toLong(mt.group(p + 1), true, ii) : 0;
     final long h = mt.group(p + 3) != null ? toLong(mt.group(p + 4), true, ii) : 0;

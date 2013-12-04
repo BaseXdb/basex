@@ -191,7 +191,6 @@ public final class PkgValidator {
    * @throws QueryException query exception
    */
   private boolean isInstalled(final Component comp, final byte[] name) throws QueryException {
-
     // get packages in which the module's namespace is found
     final TokenSet pkgs = repo.nsDict().get(comp.uri);
     if(pkgs == null) return false;

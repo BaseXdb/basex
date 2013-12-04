@@ -111,9 +111,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   }
 
   @Override
-  public void processingInstruction(final String nm, final String cont)
-      throws SAXException {
-
+  public void processingInstruction(final String nm, final String cont) throws SAXException {
     if(dtd) return;
     try {
       finishText();

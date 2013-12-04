@@ -43,7 +43,6 @@ public final class JavaFunc extends JavaMapping {
 
   @Override
   protected Object eval(final Value[] args, final QueryContext ctx) throws QueryException {
-
     try {
       return mth.equals(NEW) ? constructor(args) : method(args, ctx);
     } catch(final InvocationTargetException ex) {

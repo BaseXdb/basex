@@ -71,9 +71,8 @@ public enum ListType implements Type {
    * @return created value
    * @throws QueryException query exception
    */
-  private static Value create(final Item it, final QueryContext ctx,
-                              final StaticContext sc, final InputInfo ii, final AtomType type)
-          throws QueryException {
+  private static Value create(final Item it, final QueryContext ctx, final StaticContext sc,
+      final InputInfo ii, final AtomType type) throws QueryException {
 
     final byte[][] values = split(norm(it.string(ii)), ' ');
     final ValueBuilder vb = new ValueBuilder(values.length);

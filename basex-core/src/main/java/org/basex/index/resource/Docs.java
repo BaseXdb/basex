@@ -283,9 +283,7 @@ final class Docs {
    * @param dir returns directories instead of files
    * @param tbm map; values will be {@code false} to indicate documents
    */
-  synchronized void children(final byte[] path, final boolean dir,
-      final TokenBoolMap tbm) {
-
+  synchronized void children(final byte[] path, final boolean dir, final TokenBoolMap tbm) {
     final String pth = MetaData.normPath(string(path));
     if(pth == null) return;
 

@@ -223,9 +223,7 @@ public class IntList extends ElementList {
    * @param f ascending/descending sort
    * @param t sort tokens
    */
-  private void sort(final int s, final int e, final boolean g, final boolean f,
-      final byte[][] t) {
-
+  private void sort(final int s, final int e, final boolean g, final boolean f, final byte[][] t) {
     if(e < 7) {
       for(int i = s; i < e + s; ++i) {
         for(int j = i; j > s; j--) {

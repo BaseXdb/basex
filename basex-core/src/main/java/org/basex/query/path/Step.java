@@ -61,7 +61,6 @@ public abstract class Step extends Preds {
 
   @Override
   public final Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-
     // return empty sequence if test will yield no results
     if(!test.compile(ctx)) return Empty.SEQ;
 
@@ -160,8 +159,8 @@ public abstract class Step extends Preds {
    * @param name name id, or {@code 0} as wildcard
    * @param kind node kind, or {@code -1} for all types
    */
-  private void add(final PathNode node, final ArrayList<PathNode> nodes,
-      final int name, final int kind) {
+  private void add(final PathNode node, final ArrayList<PathNode> nodes, final int name,
+      final int kind) {
 
     for(final PathNode n : node.ch) {
       if(axis == Axis.DESC || axis == Axis.DESCORSELF) {

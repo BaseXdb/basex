@@ -160,9 +160,7 @@ public final class FNId extends StandardFunc {
    * @param nc node cache
    * @param node node
    */
-  private static void addRef(final byte[][] ids, final NodeSeqBuilder nc,
-      final ANode node) {
-
+  private static void addRef(final byte[][] ids, final NodeSeqBuilder nc, final ANode node) {
     AxisIter ai = node.attributes();
     for(ANode at; (at = ai.next()) != null;) {
       final byte[] val = at.string();

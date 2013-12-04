@@ -40,8 +40,8 @@ public final class YMDur extends Dur {
    * @param ii input info
    * @throws QueryException query exception
    */
-  public YMDur(final YMDur it, final YMDur a, final boolean p,
-      final InputInfo ii) throws QueryException {
+  public YMDur(final YMDur it, final YMDur a, final boolean p, final InputInfo ii)
+      throws QueryException {
 
     this(it);
     final double d = (double) mon + (p ? a.mon : -a.mon);

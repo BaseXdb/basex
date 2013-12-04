@@ -28,9 +28,7 @@ public abstract class ArchiveIn {
    * @return reader
    * @throws QueryException query exception
    */
-  public static ArchiveIn get(final BufferInput bi, final InputInfo info)
-      throws QueryException {
-
+  public static ArchiveIn get(final BufferInput bi, final InputInfo info) throws QueryException {
     try {
       final LookupInput li = new LookupInput(bi);
       if(li.lookup() == 0x50) return new ZIPIn(li);

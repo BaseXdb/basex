@@ -312,9 +312,7 @@ public class ClientSession extends Session {
    * @return string
    * @throws IOException I/O exception
    */
-  String exec(final ServerCmd cmd, final String arg, final OutputStream os)
-      throws IOException {
-
+  String exec(final ServerCmd cmd, final String arg, final OutputStream os) throws IOException {
     final OutputStream o = os == null ? new ArrayOutput() : os;
     sout.write(cmd.code);
     send(arg);

@@ -273,8 +273,8 @@ public final class FTBuilder extends IndexBuilder {
    * @param vpos compressed pos values
    * @throws IOException IOException
    */
-  private static void writeFTData(final DataOutput out, final byte[] vpre,
-                                  final byte[] vpos) throws IOException {
+  private static void writeFTData(final DataOutput out, final byte[] vpre, final byte[] vpos)
+      throws IOException {
 
     int np = 4, pp = 4;
     final int ns = Num.size(vpre);

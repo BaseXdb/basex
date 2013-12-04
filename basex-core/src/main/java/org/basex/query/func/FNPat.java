@@ -105,7 +105,6 @@ public final class FNPat extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item analyzeString(final byte[] val, final QueryContext ctx) throws QueryException {
-
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
     if(p.matcher("").matches()) throw REGROUP.get(info);
     final String str = string(val);
@@ -130,9 +129,7 @@ public final class FNPat extends StandardFunc {
    * @param g group number
    * @return next group number and position in string
    */
-  private static int[] match(final Matcher m, final String str, final FElem par,
-      final int g) {
-
+  private static int[] match(final Matcher m, final String str, final FElem par, final int g) {
     final FElem nd = new FElem(g == 0 ? Q_MATCH : Q_MGROUP);
     if(g > 0) nd.add(NR, token(g));
 
@@ -230,8 +227,8 @@ public final class FNPat extends StandardFunc {
    * @return pattern modifier
    * @throws QueryException query exception
    */
-  private Pattern pattern(final Expr pattern, final Expr modifier,
-      final QueryContext ctx) throws QueryException {
+  private Pattern pattern(final Expr pattern, final Expr modifier, final QueryContext ctx)
+      throws QueryException {
 
     final byte[] pat = checkStr(pattern, ctx);
     final byte[] mod = modifier != null ? checkStr(modifier, ctx) : null;

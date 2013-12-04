@@ -115,7 +115,6 @@ public final class FNZip extends StandardFunc {
    * @throws QueryException query exception
    */
   private ANode xmlEntry(final QueryContext ctx, final boolean html) throws QueryException {
-
     final MainOptions opts = ctx.context.options;
     final IO io = new IOContent(entry(ctx));
     try {

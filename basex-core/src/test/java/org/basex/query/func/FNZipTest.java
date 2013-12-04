@@ -192,7 +192,6 @@ public final class FNZipTest extends AdvancedQueryTest {
    * @throws IOException I/O exception
    */
   private static void checkEntry(final String file, final byte[] data) throws IOException {
-
     ZipFile zf = null;
     try {
       zf = new ZipFile(TMPZIP);

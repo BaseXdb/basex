@@ -111,7 +111,6 @@ final class Leaf extends TrieNode {
 
   @Override
   TrieNode add(final List o, final int l, final InputInfo ii) throws QueryException {
-
     // same hash? insert binding
     if(hash == o.hash) {
       for(int i = 0; i < o.size; i++) {

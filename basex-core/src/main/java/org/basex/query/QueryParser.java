@@ -170,7 +170,6 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void bind(final StringBuilder key, final StringBuilder val) throws QueryException {
-
     final String k = key.toString().trim();
     if(!k.isEmpty()) ctx.bind(k, new Atm(val.toString()), null);
   }

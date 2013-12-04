@@ -64,7 +64,7 @@ public class BaseXButton extends JButton {
     if(hlp != null) setToolTipText(hlp);
     setOpaque(false);
 
-    // trim horizontal button margins
+    // Mac: trim horizontal button margins
     final Insets in = getMargin();
     in.left /= 4;
     in.right /= 4;

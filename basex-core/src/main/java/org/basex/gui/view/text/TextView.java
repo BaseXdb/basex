@@ -59,8 +59,8 @@ public final class TextView extends View {
     home = BaseXButton.command(GUICommands.C_HOME, gui);
     home.setEnabled(false);
 
-    final BaseXButton save = new BaseXButton(gui, "save", H_SAVE_RESULT);
-    final BaseXButton find = new BaseXButton(gui, "find",
+    final BaseXButton save = new BaseXButton(gui, "c_save", H_SAVE_RESULT);
+    final BaseXButton find = new BaseXButton(gui, "c_find",
         BaseXLayout.addShortcut(FIND, BaseXKeys.FIND.toString()));
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);

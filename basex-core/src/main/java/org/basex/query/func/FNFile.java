@@ -223,8 +223,8 @@ public final class FNFile extends StandardFunc {
    * @param pat file name pattern; ignored if {@code null}
    * @throws QueryException query exception
    */
-  private void list(final int root, final File dir, final StringList list,
-      final boolean rec, final Pattern pat) throws QueryException {
+  private void list(final int root, final File dir, final StringList list, final boolean rec,
+      final Pattern pat) throws QueryException {
 
     // skip invalid directories
     final File[] ch = dir.listFiles();

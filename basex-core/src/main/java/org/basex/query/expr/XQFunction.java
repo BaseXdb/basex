@@ -14,7 +14,6 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public interface XQFunction {
-
   /**
    * Number of arguments this function takes.
    * @return function arity

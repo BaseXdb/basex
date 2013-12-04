@@ -85,12 +85,7 @@ public final class Encryption {
 
     byte[] t = null;
     try {
-
-      if(ec)
-        t = encrypt(in, k, aa, ivl);
-      else
-        t = decrypt(in, k, aa, ivl);
-
+      t = ec ? encrypt(in, k, aa, ivl) : decrypt(in, k, aa, ivl);
     } catch(final NoSuchPaddingException e) {
       throw CX_NOPAD.get(info, e);
     } catch(final BadPaddingException e) {
@@ -124,9 +119,8 @@ public final class Encryption {
    * @throws BadPaddingException ex
    */
   private static byte[] encrypt(final byte[] in, final byte[] k, final byte[] a, final int ivl)
-      throws InvalidKeyException, InvalidAlgorithmParameterException,
-      NoSuchAlgorithmException, NoSuchPaddingException,
-      IllegalBlockSizeException, BadPaddingException {
+      throws InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException,
+      NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 
     final Cipher cipher = Cipher.getInstance(string(ALGN.get(lc(a))));
     final SecretKeySpec kspec = new SecretKeySpec(k, string(a));
@@ -161,9 +155,8 @@ public final class Encryption {
    * @throws BadPaddingException ex
    */
   private static byte[] decrypt(final byte[] in, final byte[] k,
-                                final byte[] a, final int ivl) throws NoSuchAlgorithmException,
-      NoSuchPaddingException, InvalidKeyException,
-      InvalidAlgorithmParameterException, IllegalBlockSizeException,
+      final byte[] a, final int ivl) throws NoSuchAlgorithmException, NoSuchPaddingException,
+      InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException,
       BadPaddingException {
 
     final SecretKeySpec keySpec = new SecretKeySpec(k, string(a));
@@ -185,8 +178,8 @@ public final class Encryption {
    * @return MAC
    * @throws QueryException query exception
    */
-  public Item hmac(final byte[] msg, final byte[] k, final byte[] a,
-      final byte[] enc) throws QueryException {
+  public Item hmac(final byte[] msg, final byte[] k, final byte[] a, final byte[] enc)
+      throws QueryException {
 
     // create hash value from input message
     final Key key = new SecretKeySpec(k, string(a));

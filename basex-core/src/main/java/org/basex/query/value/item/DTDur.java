@@ -105,7 +105,6 @@ public final class DTDur extends Dur {
    * @throws QueryException query exception
    */
   public DTDur(final ADate dat, final ADate sub, final InputInfo ii) throws QueryException {
-
     super(AtomType.DTD);
     sec = dat.days().subtract(sub.days()).multiply(DAYSECONDS).add(
         dat.seconds().subtract(sub.seconds()));

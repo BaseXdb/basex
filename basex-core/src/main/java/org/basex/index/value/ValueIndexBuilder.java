@@ -210,8 +210,8 @@ public final class ValueIndexBuilder extends IndexBuilder {
    * @param il values
    * @throws IOException I/O exception
    */
-  private static void write(final DataOutput outL, final DataOutput outR,
-      final IntList il) throws IOException {
+  private static void write(final DataOutput outL, final DataOutput outR, final IntList il)
+      throws IOException {
 
     // sort values before writing
     il.sort();

@@ -9,7 +9,6 @@ import java.io.Serializable;
  */
 
 public class Token implements Serializable {
-
   /**
    * The version identifier for this Serializable class.
    * Increment only if the <i>serialized</i> form of the

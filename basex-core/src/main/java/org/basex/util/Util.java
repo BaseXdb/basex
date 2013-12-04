@@ -206,6 +206,13 @@ public final class Util {
 
   /**
    * Prints the current stack trace to System.err.
+   */
+  public static void stack() {
+    stack(Short.MAX_VALUE);
+  }
+
+  /**
+   * Prints the current stack trace to System.err.
    * @param i number of steps to print
    */
   public static void stack(final int i) {

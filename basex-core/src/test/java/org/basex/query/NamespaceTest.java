@@ -867,9 +867,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
    * @param second second query
    * @param expected expected output
    */
-  private static void query(final String first, final String second,
-      final String expected) {
-
+  private static void query(final String first, final String second, final String expected) {
     try {
       if(first != null) new XQuery(first).execute(context);
       final String result = new XQuery(second).execute(context).trim();

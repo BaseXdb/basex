@@ -94,7 +94,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
    * @param map map
    */
   private static void add(final byte[] key, final TokenBuilder val,
-                          final TokenObjMap<TokenList> map) {
+      final TokenObjMap<TokenList> map) {
 
     final byte[] k = key == null ? DOC_TAGS[0] : key;
     TokenList tl = map.get(k);
