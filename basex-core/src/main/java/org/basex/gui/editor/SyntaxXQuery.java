@@ -155,14 +155,15 @@ public final class SyntaxXQuery extends Syntax {
       final int open = EditorText.OPENING.indexOf(ch);
       final int close = EditorText.CLOSING.indexOf(ch);
       final int next = t + 1 < tl ? text[t + 1] : 0;
-      if(open != -1 && next != ':') {
+      final int prev = t > 0 ? text[t - 1] : 0;
+      if(open != -1 && (next != ':' || ch != '(')) {
         ind++;
         tb.addByte(ch);
         if(next != '\n' && !matches(EditorText.CLOSING.charAt(open), t, text, 3)) {
           tb.add('\n');
           for(int i = 0; i < ind; i++) tb.add(EditorText.INDENT);
         }
-      } else if(close != -1) {
+      } else if(close != -1 && (prev != ':' || ch != ')')) {
         ind--;
         if(next != '\n' && !spaces(tb) && !matches(EditorText.OPENING.charAt(close), t, text, -3)) {
           tb.add('\n');
