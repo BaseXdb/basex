@@ -362,8 +362,8 @@ public final class EditorText {
 
     // no selection: select line
     if(!selected()) {
-      ms = ps;
-      me = ps;
+      ms = pc;
+      me = pc;
       while(ms > 0 && text[ms - 1] != '\n') --ms;
       while(me < size() && text[me] != '\n') ++me;
     }
@@ -465,7 +465,10 @@ public final class EditorText {
    * @param syntax syntax highlighter
    */
   void format(final Syntax syntax) {
-    if(!selected()) return;
+    if(!selected()) {
+      select(0, size());
+      if(!selected()) return;
+    }
 
     final int s = Math.min(ms, me), e = Math.max(ms, me), tl = text.length;
     final byte[] format = syntax.format(Arrays.copyOfRange(text, s, e));

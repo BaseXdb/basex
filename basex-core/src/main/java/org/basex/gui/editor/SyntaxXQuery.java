@@ -205,7 +205,6 @@ public final class SyntaxXQuery extends Syntax {
       if(p < 0 || p >= text.length) break;
       if(text[p] == ch) return true;
     }
-    System.out.println(false);
     return false;
   }
 }
