@@ -165,7 +165,7 @@ public final class SyntaxXQuery extends Syntax {
         }
       } else if(close != -1 && (prev != ':' || ch != ')')) {
         ind--;
-        if(next != '\n' && !spaces(tb) && !matches(EditorText.OPENING.charAt(close), t, text, -3)) {
+        if(!spaces(tb) && !matches(EditorText.OPENING.charAt(close), t, text, -3)) {
           tb.add('\n');
           for(int i = 0; i < ind; i++) tb.add(EditorText.INDENT);
         }

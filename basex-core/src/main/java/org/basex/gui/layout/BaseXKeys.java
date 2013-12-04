@@ -42,7 +42,7 @@ public enum BaseXKeys {
   /** Find next hit.         */ FINDNEXT2(META, VK_G, true),
   /** Find previous hit.     */ FINDPREV(MAC ? META | SHIFT : SHIFT, VK_F3, true),
   /** Find previous hit.     */ FINDPREV2(META | SHIFT, VK_G, true),
-  /** Code completion.       */ COMPLETE(META, VK_SPACE),
+  /** Code completion.       */ COMPLETE(CTRL, VK_SPACE),
 
   // Editing
 
