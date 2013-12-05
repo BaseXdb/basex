@@ -160,13 +160,18 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
   /**
    * Refreshes the specified file node.
    * @param file file to be opened
+   * @param tr refresh tree or filter
    */
-  public void refresh(final IOFile file) {
-    final Enumeration<?> en = root.depthFirstEnumeration();
-    while(en.hasMoreElements()) {
-      final ProjectNode node = (ProjectNode) en.nextElement();
-      if(node.file != null && node.file.path().equals(file.path())) node.refresh();
+  public void refresh(final IOFile file, final boolean tr) {
+    if(tr) {
+      final Enumeration<?> en = root.depthFirstEnumeration();
+      while(en.hasMoreElements()) {
+        final ProjectNode node = (ProjectNode) en.nextElement();
+        if(node.file != null && node.file.path().equals(file.path())) node.refresh();
+      }
     }
+    // [CG] check if current file may be part of the filter results
+    filter.refresh(true);
   }
 
   /**

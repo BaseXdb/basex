@@ -382,7 +382,11 @@ public final class EditorView extends View {
    */
   public boolean save() {
     final EditorArea edit = getEditor();
-    return edit.opened() ? save(edit.file) : saveAs();
+    if(!edit.opened()) return saveAs();
+
+    if(!save(edit.file)) return false;
+    project.refresh(edit.file, false);
+    return true;
   }
 
   /**
@@ -402,7 +406,7 @@ public final class EditorView extends View {
     final IOFile file = fc.select(Mode.FSAVE);
     if(file == null || !save(file)) return false;
 
-    project.refresh(file.dir());
+    project.refresh(file.dir(), true);
     return true;
   }
 
