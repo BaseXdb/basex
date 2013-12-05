@@ -170,8 +170,10 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
         if(node.file != null && node.file.path().equals(file.path())) node.refresh();
       }
     }
-    // [CG] check if current file may be part of the filter results
-    filter.refresh(true);
+    // check if file to be refreshed is within the root path
+    if(canonical(file.file()).getPath().startsWith(canonical(root.file.file()).getPath())) {
+      filter.refresh(true);
+    }
   }
 
   /**
@@ -224,15 +226,23 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
     final File io3 = fl.isAbsolute() ? fl : new File(io2, fl.getPath());
     final StringList sl = new StringList();
     for(final File f : new File[] { io1, io2, io3 }) {
-      String p;
-      try {
-        p = f.getCanonicalFile().getParent();
-      } catch(final IOException ex) {
-        p = f.getParent();
-      }
+      final String p = canonical(f).getParent();
       if(!sl.contains(p)) sl.add(p);
     }
     return sl.unique().get(0);
+  }
+
+  /**
+   * Returns the canonical or (if not possible) the absolute file reference.
+   * @param f file reference
+   * @return file
+   */
+  private File canonical(final File f) {
+    try {
+      return f.getCanonicalFile();
+    } catch(final IOException ex) {
+      return f.getAbsoluteFile();
+    }
   }
 
   /**
