@@ -64,7 +64,6 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
    * Resets the filter cache.
    */
   void reset() {
-    ++threadID;
     cache.reset();
     refresh(true);
   }
@@ -116,7 +115,8 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
 
     // thread is accepted; start filtering
     running = true;
-    setCursor(CURSORWAIT);
+    files.setCursor(CURSORWAIT);
+    contents.setCursor(CURSORWAIT);
     init(thread);
 
     // collect matches
@@ -125,7 +125,8 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
     while(++i < 3 && filter(file, cont, thread, i, matches));
     if(i == 3) project.list.setElements(matches, cont.length == 0 ? null : Token.string(cont));
 
-    setCursor(CURSORARROW);
+    files.setCursor(CURSORTEXT);
+    contents.setCursor(CURSORTEXT);
     running = false;
   }
 
@@ -139,9 +140,9 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
     if(!force && lastFiles.equals(file) && lastContents.equals(cont)) return;
     lastFiles = file;
     lastContents = cont;
+    ++threadID;
 
     final Component oldView = project.scroll.getViewport().getView(), newView;
-    ++threadID;
     if(file.isEmpty() && cont.isEmpty()) {
       newView = project.tree;
     } else {
@@ -176,6 +177,8 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
        BaseXKeys.NEXTPAGE.is(e) || BaseXKeys.PREVPAGE.is(e) ||
        BaseXKeys.LINESTART.is(e) || BaseXKeys.LINEEND.is(e)) {
       project.list.dispatchEvent(e);
+    } else if(BaseXKeys.REFRESH.is(e)) {
+      refresh(true);
     }
   }
 
