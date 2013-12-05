@@ -64,7 +64,9 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
    * Resets the filter cache.
    */
   void reset() {
+    ++threadID;
     cache.reset();
+    refresh(true);
   }
 
   /**
@@ -74,7 +76,6 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
   void init(final int thread) {
     if(cache.isEmpty()) {
       project.list.setElements(new StringList(Text.PLEASE_WAIT_D), null);
-      reset();
       add(project.root.file, thread);
     }
   }
@@ -103,10 +104,10 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
    * Filters the entries.
    * @param file files pattern
    * @param cont contents pattern
+   * @param thread thread id
    */
-  void filter(final byte[] file, final byte[] cont) {
+  void filter(final byte[] file, final byte[] cont, final int thread) {
     // wait when command is still running
-    final int thread = ++threadID;
     while(running) {
       Thread.yield();
       // newer thread has arrived
@@ -118,12 +119,43 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
     setCursor(CURSORWAIT);
     init(thread);
 
-    final StringList list = filter(file, cont, thread);
-    if(list != null) {
-      project.list.setElements(list, cont.length == 0 ? null : Token.string(cont));
-    }
+    // collect matches
+    final StringList matches = new StringList();
+    int i = -1;
+    while(++i < 3 && filter(file, cont, thread, i, matches));
+    if(i == 3) project.list.setElements(matches, cont.length == 0 ? null : Token.string(cont));
+
     setCursor(CURSORARROW);
     running = false;
+  }
+
+  /**
+   * Refreshes the filter view.
+   * @param force force refresh
+   */
+  void refresh(final boolean force) {
+    final String file = files.getText().trim();
+    final String cont = contents.getText().trim();
+    if(!force && lastFiles.equals(file) && lastContents.equals(cont)) return;
+    lastFiles = file;
+    lastContents = cont;
+
+    final Component oldView = project.scroll.getViewport().getView(), newView;
+    ++threadID;
+    if(file.isEmpty() && cont.isEmpty()) {
+      newView = project.tree;
+    } else {
+      newView = project.list;
+      final Thread t = new Thread() {
+        @Override
+        public void run() {
+          filter(Token.token(file), Token.token(cont), threadID);
+        }
+      };
+      t.setDaemon(true);
+      t.start();
+    }
+    if(oldView != newView) project.scroll.setViewportView(newView);
   }
 
   /**
@@ -135,28 +167,7 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
 
   @Override
   public void keyReleased(final KeyEvent e) {
-    final String file = files.getText().trim();
-    final String cont = contents.getText().trim();
-    if(lastFiles.equals(file) && lastContents.equals(cont)) return;
-    lastFiles = file;
-    lastContents = cont;
-
-    final Component oldView = project.scroll.getViewport().getView(), newView;
-    if(file.isEmpty() && cont.isEmpty()) {
-      newView = project.tree;
-      ++threadID;
-    } else {
-      newView = project.list;
-      final Thread t = new Thread() {
-        @Override
-        public void run() {
-          filter(Token.token(file), Token.token(cont));
-        }
-      };
-      t.setDaemon(true);
-      t.start();
-    }
-    if(oldView != newView) project.scroll.setViewportView(newView);
+    refresh(false);
   }
 
   @Override
@@ -181,19 +192,6 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
   // PRIVATE METHODS ==============================================================================
 
   /**
-   * Creates a list with all filtered paths.
-   * @param file file pattern
-   * @param cont content pattern
-   * @param thread current thread id
-   * @return result of check
-   */
-  private StringList filter(final byte[] file, final byte[] cont, final int thread) {
-    final StringList match = new StringList();
-    for(int i = 0; i < 3; i++) if(!filter(file, cont, thread, i, match)) return null;
-    return match;
-  }
-
-  /**
    * Chooses tokens from the file cache that match the specified pattern.
    * @param file file pattern
    * @param cont content pattern
@@ -205,22 +203,24 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
   private boolean filter(final byte[] file, final byte[] cont, final int thread, final int mode,
       final StringList match) {
 
-    final boolean path = Token.indexOf(file, '\\') != -1 || Token.indexOf(file, '/') != -1;
-    for(final byte[] input : cache) {
-      // check if current file matches the pattern
-      final int offset = offset(input, path);
-      if(mode == 0 && Token.startsWith(input, file, offset) ||
-         mode == 1 && Token.contains(input, file, offset) ||
-         matches(input, file, offset)) {
+    if(match.size() < 100) {
+      final boolean path = Token.indexOf(file, '\\') != -1 || Token.indexOf(file, '/') != -1;
+      for(final byte[] input : cache) {
+        // check if current file matches the pattern
+        final int offset = offset(input, path);
+        if(mode == 0 && Token.startsWith(input, file, offset) ||
+           mode == 1 && Token.contains(input, file, offset) ||
+           matches(input, file, offset)) {
 
-        // accept file; check file contents
-        final String in = Token.string(input);
-        if(search(in, cont) && !match.contains(in)) {
-          match.add(in);
-          if(match.size() >= 100) break;
+          // accept file; check file contents
+          final String in = Token.string(input);
+          if(search(in, cont) && !match.contains(in)) {
+            match.add(in);
+            if(match.size() >= 100) break;
+          }
         }
+        if(thread != threadID) return false;
       }
-      if(thread != threadID) return false;
     }
     return true;
   }
@@ -247,7 +247,8 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
         }
       }
     } catch(final IOException ex) {
-      Util.errln(ex);
+      // file may not be accessible
+      Util.debug(ex);
     } finally {
       if(bi != null) try { bi.close(); } catch(final IOException ignored) { }
     }
