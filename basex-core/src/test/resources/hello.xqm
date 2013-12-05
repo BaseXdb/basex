@@ -24,5 +24,10 @@ declare function hello:inlined() {
 
 (:~ Function returning a simple string. :)
 declare %public function hello:world() as xs:string {
+  hello:internal()
+};
+
+(:~ Private function returning a simple string. :)
+declare %private function hello:internal() as xs:string {
   "hello world"
 };

@@ -29,7 +29,7 @@ public final class FNInspect extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case _INSPECT_FUNCTIONS: return contextFunctions(ctx);
+      case _INSPECT_FUNCTIONS: return functions(ctx);
       default:                 return super.iter(ctx);
     }
   }
@@ -90,15 +90,15 @@ public final class FNInspect extends StandardFunc {
   }
 
   /**
-   * Performs the context-functions function.
+   * Performs the functions function.
    * @param ctx query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  private ValueBuilder contextFunctions(final QueryContext ctx) throws QueryException {
+  private ValueBuilder functions(final QueryContext ctx) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
     for(final StaticFunc sf : ctx.funcs.funcs()) {
-      vb.add(Functions.getUser(sf, ctx, sc, info));
+      vb.add(Functions.getUser(sf, ctx, sf.sc, info));
     }
     return vb;
   }
