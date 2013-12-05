@@ -301,7 +301,7 @@ public final class GUIConstants {
     color1A = new Color(col(r, 110), col(g, 150), col(b, 160), 100);
 
     colormark1A = new Color(col(r, 32), col(g, 160), col(b, 320), 100);
-    colormark2A = new Color(col(r, 16), col(g, 80), col(b, 160), 100);
+    colormark2A = new Color(col(r, 12), col(g, 60), col(b, 120), 100);
     colormark1 = new Color(col(r, 16), col(g, 120), col(b, 240));
     colormark2 = new Color(col(r, 16), col(g, 80), col(b, 160));
     colormark3 = new Color(col(r, 32), col(g, 160), col(b, 320));

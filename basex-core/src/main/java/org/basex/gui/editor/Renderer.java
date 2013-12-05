@@ -50,6 +50,8 @@ final class Renderer extends BaseXBack {
   private int x;
   /** Current y coordinate. */
   private int y;
+  /** Current y line coordinate. */
+  private int lineY;
   /** Current width. */
   private int width;
   /** Current height. */
@@ -96,34 +98,51 @@ final class Renderer extends BaseXBack {
     int oldL = 0;
     while(more(g)) {
       if(line != oldL && y >= 0) {
-        drawLine(g);
+        drawLineNumber(g);
         oldL = line;
       }
       write(g);
     }
-    if(line != oldL) drawLine(g);
+    if(line != oldL) drawLineNumber(g);
 
     wordWidth = 0;
     final int s = text.size();
     if(cursor && s == text.getCaret()) drawCursor(g, x);
     if(s == text.error()) drawError(g);
 
-    if(lineNumbers) {
-      final int lw = offset - OFFSET * 3 / 2;
-      g.setColor(GUIConstants.LGRAY);
-      g.drawLine(lw, 0, lw, height);
-    }
+    drawLinesSep(g);
   }
 
   /**
    * Renders the current line number.
    * @param g graphics reference
    */
-  private void drawLine(final Graphics g) {
+  private void drawLineNumber(final Graphics g) {
     if(lineNumbers) {
       g.setColor(GUIConstants.GRAY);
       final String s = Integer.toString(line);
       g.drawString(s, offset - fontWidth(g, s) - OFFSET * 2, y);
+    }
+  }
+
+  /**
+   * Marks the current line as erroneous.
+   * @param g graphics reference
+   */
+  private void drawErrorLine(final Graphics g) {
+    g.setColor(GUIConstants.colormark2A);
+    g.fillRect(0, lineY, offset - OFFSET * 3 / 2, fontHeight);
+  }
+
+  /**
+   * Draws the line number separator.
+   * @param g graphics reference
+   */
+  private void drawLinesSep(final Graphics g) {
+    if(lineNumbers) {
+      final int lw = offset - OFFSET * 3 / 2;
+      g.setColor(GUIConstants.LGRAY);
+      g.drawLine(lw, 0, lw, height);
     }
   }
 
@@ -237,6 +256,7 @@ final class Renderer extends BaseXBack {
     if(lineNumbers) offset += fontWidth(g, Integer.toString(text.lines())) + OFFSET * 2;
     x = offset;
     y = fontHeight - pos - 2;
+    lineY = y - fontHeight * 4 / 5;
     line = 1;
     if(g != null) g.setFont(font);
   }
@@ -297,8 +317,10 @@ final class Renderer extends BaseXBack {
 
     // jump to new line
     if(x + ww > width) {
+      final int h = fontHeight;
       x = offset;
-      y += fontHeight;
+      y += h;
+      lineY += h;
     }
     wordWidth = ww;
 
@@ -313,8 +335,10 @@ final class Renderer extends BaseXBack {
   private boolean next() {
     final int ch = text.curr();
     if(ch == TokenBuilder.NLINE || ch == TokenBuilder.HLINE) {
+      final int h = fontHeight >> (ch == TokenBuilder.NLINE ? 0 : 1);
       x = offset;
-      y += fontHeight >> (ch == TokenBuilder.NLINE ? 0 : 1);
+      y += h;
+      lineY += h;
       line++;
       return true;
     }
@@ -346,7 +370,7 @@ final class Renderer extends BaseXBack {
         int cw = 0;
         while(text.inSelect() && text.more()) cw += fontWidth(g, text.next());
         g.setColor(GUIConstants.color(3));
-        g.fillRect(xx, y - fontHeight * 4 / 5, cw, fontHeight);
+        g.fillRect(xx, lineY, cw, fontHeight);
         text.pos(cp);
       }
 
@@ -357,7 +381,7 @@ final class Renderer extends BaseXBack {
         int cw = 0;
         while(text.inSearch() && text.more()) cw += fontWidth(g, text.next());
         g.setColor(GUIConstants.color2A);
-        g.fillRect(xx, y - fontHeight * 4 / 5, cw, fontHeight);
+        g.fillRect(xx, lineY, cw, fontHeight);
         xx += cw;
       }
       text.pos(cp);
@@ -429,7 +453,7 @@ final class Renderer extends BaseXBack {
         if(cc == cp || cc == cr) {
           g.setColor(GUIConstants.color3);
           g.drawRect(xx, yy - fontHeight * 4 / 5, fontWidth(g, open), fontHeight);
-          g.drawRect(x, y - fontHeight * 4 / 5, fontWidth(g, ch), fontHeight);
+          g.drawRect(x, lineY, fontWidth(g, ch), fontHeight);
         }
       }
     }
@@ -443,7 +467,7 @@ final class Renderer extends BaseXBack {
    */
   private void drawCursor(final Graphics g, final int xx) {
     g.setColor(GUIConstants.DGRAY);
-    g.fillRect(xx, y - fontHeight * 4 / 5, 2, fontHeight);
+    g.fillRect(xx, lineY, 2, fontHeight);
   }
 
   /**
@@ -459,6 +483,7 @@ final class Renderer extends BaseXBack {
     for(int xp = x; xp < x + ww; xp++) {
       if((xp & 1) == 0) g.drawLine(xp, y + 2, xp, y + s + 1);
     }
+    if(lineNumbers) drawErrorLine(g);
   }
 
   /**
