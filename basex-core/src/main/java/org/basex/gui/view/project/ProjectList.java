@@ -55,12 +55,28 @@ public class ProjectList extends JList {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        model.removeAllElements();
-        for(final String file : list) model.addElement(file);
-        setSelectedIndex(0);
-        search = srch;
+        if(changed(list)) {
+          model.removeAllElements();
+          for(final String file : list) model.addElement(file);
+          setSelectedIndex(0);
+          search = srch;
+        }
       }
     });
+  }
+
+  /**
+   * Checks if the list needs to be updated.
+   * @param list entries to set
+   * @return result of check
+   */
+  boolean changed(final StringList list) {
+    final int sl = list.size(), el = model.getSize();
+    if(sl != el) return true;
+    for(int i = 0; i < sl; i++) {
+      if(!list.get(i).equals(model.getElementAt(i))) return true;
+    }
+    return false;
   }
 
   /**
