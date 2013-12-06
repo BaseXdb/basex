@@ -7,7 +7,11 @@
   <parent>
     <groupId>org.basex</groupId>
     <artifactId>basex-parent</artifactId>
+<<<<<<< HEAD
     <version>7.8-SNAPSHOT</version>
+=======
+    <version>7.7.3-SNAPSHOT</version>
+>>>>>>> 26547469396b3db74f1e5d685d1507b26df19e96
     <relativePath>..</relativePath>
   </parent>
 
@@ -22,6 +26,7 @@
     <dependency>
       <groupId>net.xqj</groupId>
       <artifactId>basex-xqj</artifactId>
+      <version>1.3.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xmldb</groupId>
