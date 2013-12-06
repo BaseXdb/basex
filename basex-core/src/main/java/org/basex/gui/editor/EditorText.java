@@ -525,6 +525,7 @@ public final class EditorText {
   void extend() {
     int s = Math.min(ms, me), e = Math.max(ms, me);
     final int tl = text.length;
+    while(e > 0 && text[e - 1] == '\n') e--;
     while(s > 0 && text[s - 1] != '\n') --s;
     while(e < tl && text[e] != '\n') ++e;
     ms = s;

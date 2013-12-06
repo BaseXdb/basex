@@ -325,7 +325,6 @@ public final class IOFile extends IO {
    * @throws IOException I/O exception
    */
   public void open() throws IOException {
-    // default solution does not always work; fallback solutions:
     final String[] args;
     if(Prop.WIN) {
       args = new String[] { "rundll32", "url.dll,FileProtocolHandler", path };
