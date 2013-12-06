@@ -50,7 +50,7 @@ public final class GUIOptions extends Options {
   public static final NumberOption FONTSIZE = new NumberOption("FONTSIZE", 13);
 
   /** Red GUI color factor. */
-  public static final NumberOption COLORRED = new NumberOption("COLORRED", 13);
+  public static final NumberOption COLORRED = new NumberOption("COLORRED", 15);
   /** Green GUI color factor. */
   public static final NumberOption COLORGREEN = new NumberOption("COLORGREEN", 11);
   /** Blue GUI color factor. */

@@ -287,9 +287,9 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
     try {
       ti = new TextInput(new IOFile(path));
       for(int c = 0, cp = 0; (cp = ti.read()) != -1;) {
+        if(!XMLToken.valid(cp)) break;
         if(Token.lc(cp) == cont[c]) {
-          c++;
-          if(c == cl) return true;
+          if(++c == cl) return true;
         } else {
           c = 0;
         }
