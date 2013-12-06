@@ -14,6 +14,10 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 
+import org.basex.build.*;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.core.parse.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
@@ -27,6 +31,7 @@ import org.basex.gui.view.*;
 import org.basex.gui.view.project.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.query.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -77,6 +82,8 @@ public final class EditorView extends View {
   private final BaseXLabel label;
   /** Query area. */
   private final BaseXTabs tabs;
+  /** Query file that has last been evaluated. */
+  public IOFile execFile;
 
   /** Sizes. */
   private double[] sizes = new double[] { 0.3, 0.7 };
@@ -477,6 +484,89 @@ public final class EditorView extends View {
     return edit;
   }
 
+  /**
+   * Executes the current file.
+   * @param action action
+   * @param editor current editor
+   */
+  void run(final EditorArea editor, final Action action) {
+    refreshControls(false);
+
+    final byte[] in = editor.getText();
+    final boolean eq = eq(in, editor.last);
+    if(eq && action == Action.CHECK) return;
+
+    IOFile file = editor.file;
+    String input = string(in);
+    editor.last = in;
+
+    final boolean xquery = file.hasSuffix(IO.XQSUFFIXES) || !file.path().contains(".");
+    editor.script = !xquery && file.hasSuffix(IO.BXSSUFFIX);
+    if(action == Action.EXECUTE && editor.script) {
+      // execute query if forced, or if realtime execution is activated
+      gui.execute(true, new Execute(input));
+    } else if(xquery || action == Action.EXECUTE) {
+      // check if input is/might be an xquery main module
+      if(input.isEmpty()) input = "()";
+
+      boolean main = !QueryProcessor.isLibrary(input);
+      final boolean exec = action == Action.EXECUTE || gui.gopts.get(GUIOptions.EXECRT);
+      if(exec) {
+        final EditorArea ea = execEditor();
+        if(ea != null) {
+          file = ea.file;
+          input = string(ea.getText());
+          main = true;
+        }
+      }
+
+      System.out.println(main);
+      if(main && exec) {
+        // execute query if forced, or if realtime execution is activated
+        gui.execute(true, new XQuery(input));
+        execFile = file;
+      } else {
+        // parse query
+        gui.context.options.set(MainOptions.QUERYPATH, file.path());
+        final QueryContext qc = new QueryContext(gui.context);
+        try {
+          if(main) qc.parseMain(input, null, null);
+          else qc.parseLibrary(input, null, null);
+          info(OK, true, false);
+        } catch(final QueryException ex) {
+          info(Util.message(ex), false, false);
+        } finally {
+          qc.close();
+        }
+      }
+    } else if(editor.script || file.hasSuffix(IO.XMLSUFFIXES) ||
+        file.hasSuffix(IO.XSLSUFFIXES) || file.hasSuffix(IO.HTMLSUFFIXES)) {
+      try {
+        if(!editor.script || input.trim().startsWith("<"))
+          new EmptyBuilder(new IOContent(in), gui.context).build();
+        if(editor.script) new CommandParser(input, gui.context).parse();
+        info(OK, true, false);
+      } catch(final Exception ex) {
+        info(Util.message(ex), false, false);
+      }
+    } else if(action != Action.CHECK) {
+      info(OK, true, false);
+    }
+  }
+
+  /**
+   * Returns the editor that has been executed last.
+   * @return editor
+   */
+  private EditorArea execEditor() {
+    if(execFile != null) {
+      for(final EditorArea edit : editors()) {
+        if(edit.file.path().equals(execFile.path())) return edit;
+      }
+    }
+    execFile = null;
+    return null;
+  }
 
   /**
    * Retrieves the contents of the specified file.
