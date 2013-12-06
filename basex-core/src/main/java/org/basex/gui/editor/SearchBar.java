@@ -210,7 +210,7 @@ public final class SearchBar extends BaseXBack {
    */
   public void reset() {
     regex.setSelected(false);
-    mcase.setSelected(true);
+    mcase.setSelected(false);
     word.setSelected(false);
     multi.setSelected(false);
   }

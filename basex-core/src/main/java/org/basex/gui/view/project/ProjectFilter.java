@@ -5,6 +5,7 @@ import static org.basex.gui.GUIConstants.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.gui.layout.*;
@@ -101,11 +102,11 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
 
   /**
    * Filters the entries.
-   * @param file files pattern
-   * @param cont contents pattern
+   * @param pattern files pattern
+   * @param content contents pattern
    * @param thread thread id
    */
-  void filter(final byte[] file, final byte[] cont, final int thread) {
+  void filter(final String pattern, final String content, final int thread) {
     // wait when command is still running
     while(running) {
       Thread.yield();
@@ -121,9 +122,13 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
 
     // collect matches
     final StringList matches = new StringList();
-    int i = -1;
-    while(++i < 3 && filter(file, cont, thread, i, matches));
-    if(i == 3) project.list.setElements(matches, cont.length == 0 ? null : Token.string(cont));
+    final IntList il = new IntList();
+    final TokenParser tp = new TokenParser(Token.token(content));
+    while(tp.more()) il.add(Token.lc(tp.next()));
+    if(filter(pattern, il.toArray(), thread, matches)) {
+      project.list.setElements(matches, content.isEmpty() ? null : content);
+    } else {
+    }
 
     files.setCursor(CURSORTEXT);
     contents.setCursor(CURSORTEXT);
@@ -136,21 +141,22 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
    */
   void refresh(final boolean force) {
     final String file = files.getText().trim();
-    final String cont = contents.getText().trim();
-    if(!force && lastFiles.equals(file) && lastContents.equals(cont)) return;
+    final String content = contents.getText().trim();
+    if(!force && lastFiles.equals(file) && lastContents.equals(content)) return;
     lastFiles = file;
-    lastContents = cont;
+    lastContents = content;
+    System.out.println("Search " + content);
     ++threadID;
 
     final Component oldView = project.scroll.getViewport().getView(), newView;
-    if(file.isEmpty() && cont.isEmpty()) {
+    if(file.isEmpty() && content.isEmpty()) {
       newView = project.tree;
     } else {
       newView = project.list;
       final Thread t = new Thread() {
         @Override
         public void run() {
-          filter(Token.token(file), Token.token(cont), threadID);
+          filter(file, content, threadID);
         }
       };
       t.setDaemon(true);
@@ -174,8 +180,7 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
   @Override
   public void keyPressed(final KeyEvent e) {
     if(BaseXKeys.NEXTLINE.is(e) || BaseXKeys.PREVLINE.is(e) ||
-       BaseXKeys.NEXTPAGE.is(e) || BaseXKeys.PREVPAGE.is(e) ||
-       BaseXKeys.LINESTART.is(e) || BaseXKeys.LINEEND.is(e)) {
+       BaseXKeys.NEXTPAGE.is(e) || BaseXKeys.PREVPAGE.is(e)) {
       project.list.dispatchEvent(e);
     } else if(BaseXKeys.REFRESH.is(e)) {
       refresh(true);
@@ -196,31 +201,54 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
 
   /**
    * Chooses tokens from the file cache that match the specified pattern.
-   * @param file file pattern
+   * @param pattern file pattern
+   * @param content content pattern
+   * @param thread current thread id
+   * @param matches set with matches
+   * @return success flag
+   */
+  private boolean filter(final String pattern, final int[] content, final int thread,
+      final StringList matches) {
+
+    // glob pattern
+    if(pattern.contains("*") || pattern.contains("?")) {
+      final Pattern pt = Pattern.compile(IOFile.regex(pattern));
+      for(final byte[] input : cache) {
+        final int offset = offset(input, true);
+        if(pt.matcher(Token.string(Token.substring(input, offset))).matches() &&
+            filterContent(input, content, matches)) return true;
+        if(thread != threadID) return false;
+      }
+    }
+    // starts-with, contains, camel case
+    final byte[] patt = Token.token(pattern);
+    for(int i = 0; i < 3; i++) {
+      if(!filter(patt, content, thread, i, matches)) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Chooses tokens from the file cache that match the specified pattern.
+   * @param pattern file pattern
    * @param cont content pattern
    * @param thread current thread id
    * @param mode search mode (0-2)
-   * @param match set with matches
+   * @param matches set with matches
    * @return success flag
    */
-  private boolean filter(final byte[] file, final byte[] cont, final int thread, final int mode,
-      final StringList match) {
+  private boolean filter(final byte[] pattern, final int[] cont, final int thread, final int mode,
+      final StringList matches) {
 
-    if(match.size() < 100) {
-      final boolean path = Token.indexOf(file, '\\') != -1 || Token.indexOf(file, '/') != -1;
+    if(matches.size() < 100) {
+      final boolean path = Token.indexOf(pattern, '\\') != -1 || Token.indexOf(pattern, '/') != -1;
       for(final byte[] input : cache) {
         // check if current file matches the pattern
         final int offset = offset(input, path);
-        if(mode == 0 && Token.startsWith(input, file, offset) ||
-           mode == 1 && Token.contains(input, file, offset) ||
-           matches(input, file, offset)) {
-
-          // accept file; check file contents
-          final String in = Token.string(input);
-          if(search(in, cont) && !match.contains(in)) {
-            match.add(in);
-            if(match.size() >= 100) break;
-          }
+        if(mode == 0 && Token.startsWith(input, pattern, offset) ||
+           mode == 1 && Token.contains(input, pattern, offset) ||
+           matches(input, pattern, offset)) {
+          if(filterContent(input, cont, matches)) return true;
         }
         if(thread != threadID) return false;
       }
@@ -229,20 +257,37 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
   }
 
   /**
+   * Checks the file contents.
+   * @param input input path
+   * @param content content pattern
+   * @param matches set with matches
+   * @return maximum number of results reached
+   */
+  private boolean filterContent(final byte[] input, final int[] content, final StringList matches) {
+    // accept file; check file contents
+    final String in = Token.string(input);
+    if(filterContent(in, content) && !matches.contains(in)) {
+      matches.add(in);
+      if(matches.size() >= 100) return true;
+    }
+    return false;
+  }
+
+  /**
    * Searches a string in a file.
    * @param path file path
    * @param cont file contents
    * @return result of check
    */
-  private boolean search(final String path, final byte[] cont) {
+  private boolean filterContent(final String path, final int[] cont) {
     final int cl = cont.length;
     if(cl == 0) return true;
 
-    BufferInput bi = null;
+    TextInput ti = null;
     try {
-      bi = new BufferInput(new IOFile(path));
-      for(int c = 0, b = 0; (b = bi.read()) != -1;) {
-        if(b == cont[c]) {
+      ti = new TextInput(new IOFile(path));
+      for(int c = 0, cp = 0; (cp = ti.read()) != -1;) {
+        if(Token.lc(cp) == cont[c]) {
           c++;
           if(c == cl) return true;
         } else {
@@ -253,7 +298,7 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
       // file may not be accessible
       Util.debug(ex);
     } finally {
-      if(bi != null) try { bi.close(); } catch(final IOException ignored) { }
+      if(ti != null) try { ti.close(); } catch(final IOException ignored) { }
     }
     return false;
   }

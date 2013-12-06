@@ -16,8 +16,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public class ProjectList extends JList {
-  /** Model. */
-  private final DefaultListModel model;
   /** Project view. */
   private final ProjectView project;
   /** Content search string. */
@@ -29,8 +27,6 @@ public class ProjectList extends JList {
    */
   ProjectList(final ProjectView view) {
     project = view;
-    model = new DefaultListModel();
-    setModel(model);
     setCellRenderer(new CellRenderer());
     addKeyListener(new KeyAdapter() {
       @Override
@@ -56,11 +52,24 @@ public class ProjectList extends JList {
       @Override
       public void run() {
         if(changed(list)) {
-          model.removeAllElements();
-          for(final String file : list) model.addElement(file);
-          setSelectedIndex(0);
-          search = srch;
+          // check which old values had been selected
+          final Object[] old = getSelectedValues();
+          final IntList il = new IntList();
+          final int is = list.size();
+          for(final Object o : old) {
+            for(int i = 0; i < is; i++) {
+              if(o.equals(list.get(i))) {
+                il.add(i);
+                break;
+              }
+            }
+          }
+          if(il.isEmpty()) il.add(0);
+          // set new values and selections
+          setListData(list.toArray());
+          setSelectedIndices(il.toArray());
         }
+        search = srch;
       }
     });
   }
@@ -71,10 +80,10 @@ public class ProjectList extends JList {
    * @return result of check
    */
   boolean changed(final StringList list) {
-    final int sl = list.size(), el = model.getSize();
+    final int sl = list.size(), el = getModel().getSize();
     if(sl != el) return true;
     for(int i = 0; i < sl; i++) {
-      if(!list.get(i).equals(model.getElementAt(i))) return true;
+      if(!list.get(i).equals(getModel().getElementAt(i))) return true;
     }
     return false;
   }
@@ -83,6 +92,7 @@ public class ProjectList extends JList {
    * Open all selected files.
    */
   void open() {
+    System.out.println("Open " + search);
     for(final Object o : getSelectedValues()) {
       project.open(new IOFile(o.toString()), search);
     }
