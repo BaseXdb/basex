@@ -233,6 +233,8 @@ public final class GUIConstants {
   public static Color color2A;
   /** Transparent frame color. */
   public static Color color3A;
+  /** Cursor background color. */
+  public static Color color4A;
   /** Mark color, custom alpha value. */
   public static Color colormark1A;
   /** Second mark color, custom alpha value. */
@@ -315,6 +317,7 @@ public final class GUIConstants {
     final Color c = COLORS[16];
     color2A = new Color(c.getRed(), c.getGreen(), c.getBlue(), 40);
     color3A = new Color(c.getRed(), c.getGreen(), c.getBlue(), 100);
+    color4A = new Color(c.getRed(), c.getGreen(), c.getBlue(), 20);
 
     final String f = opts.get(GUIOptions.FONT);
     final int type = opts.get(GUIOptions.FONTTYPE);

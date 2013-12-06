@@ -116,7 +116,7 @@ public final class EditorText {
    */
   public int lines() {
     int count = 1;
-    for(final byte ch : text) if (ch == '\n') ++count;
+    for(final byte ch : text) if(ch == '\n') ++count;
     return count;
   }
 
@@ -253,6 +253,20 @@ public final class EditorText {
    */
   int pos() {
     return ps;
+  }
+
+  /**
+   * Checks if the cursor is in the current line.
+   * @param first first call
+   * @return iterator position
+   */
+  boolean cursorLine(final boolean first) {
+    final int tl = text.length;
+    for(int t = ps + (first ? 0 : 1); t < tl; t++) {
+      if(t == pc) return true;
+      if(text[t] == '\n') return false;
+    }
+    return tl == pc;
   }
 
   // POSITION ===========================================================================

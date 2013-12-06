@@ -25,7 +25,7 @@ final class Renderer extends BaseXBack {
   /** Vertical start position. */
   private final BaseXScrollBar scroll;
   /** Flag for displaying line numbers. */
-  private final boolean lineNumbers;
+  private final boolean edit;
   /** Current brackets. */
   private final IntList pars = new IntList();
 
@@ -58,6 +58,8 @@ final class Renderer extends BaseXBack {
   private int height;
   /** Current line. */
   private int line;
+  /** Cursor flag. */
+  private boolean lineC;
 
   /** Vertical start position. */
   private Syntax syntax = Syntax.SIMPLE;
@@ -78,7 +80,7 @@ final class Renderer extends BaseXBack {
     mode(Fill.NONE);
     text = t;
     scroll = s;
-    lineNumbers = editable;
+    edit = editable;
   }
 
   @Override
@@ -103,6 +105,7 @@ final class Renderer extends BaseXBack {
       }
       write(g);
     }
+    if(x == offset) markLine(g);
     if(line != oldL) drawLineNumber(g);
 
     wordWidth = 0;
@@ -118,7 +121,7 @@ final class Renderer extends BaseXBack {
    * @param g graphics reference
    */
   private void drawLineNumber(final Graphics g) {
-    if(lineNumbers) {
+    if(edit) {
       g.setColor(GUIConstants.GRAY);
       final String s = Integer.toString(line);
       g.drawString(s, offset - fontWidth(g, s) - OFFSET * 2, y);
@@ -139,7 +142,7 @@ final class Renderer extends BaseXBack {
    * @param g graphics reference
    */
   private void drawLinesSep(final Graphics g) {
-    if(lineNumbers) {
+    if(edit) {
       final int lw = offset - OFFSET * 3 / 2;
       g.setColor(GUIConstants.LGRAY);
       g.drawLine(lw, 0, lw, height);
@@ -252,12 +255,12 @@ final class Renderer extends BaseXBack {
     text.init();
     link = false;
     offset = OFFSET;
-    // calculate line width
-    if(lineNumbers) offset += fontWidth(g, Integer.toString(text.lines())) + OFFSET * 2;
+    if(edit) offset += fontWidth(g, Integer.toString(text.lines())) + OFFSET * 2;
     x = offset;
     y = fontHeight - pos - 2;
     lineY = y - fontHeight * 4 / 5;
     line = 1;
+    lineC = edit && text.cursorLine(true);
     if(g != null) g.setFont(font);
   }
 
@@ -315,17 +318,32 @@ final class Renderer extends BaseXBack {
     }
     text.pos(p);
 
-    // jump to new line
-    if(x + ww > width) {
-      final int h = fontHeight;
-      x = offset;
-      y += h;
-      lineY += h;
-    }
+    if(x + ww > width) newline(fontHeight);
     wordWidth = ww;
 
     // check if word has been found, and word is still visible
     return y < height;
+  }
+
+  /**
+   * Jumps to the next line.
+   * @param h line height
+   */
+  private void newline(final int h) {
+    x = offset;
+    y += h;
+    lineY += h;
+  }
+
+  /**
+   * Marks the current line.
+   * @param g graphics reference
+   */
+  private void markLine(final Graphics g) {
+    if(lineC) {
+      g.setColor(GUIConstants.color4A);
+      g.fillRect(0, lineY, width + offset, fontHeight);
+    }
   }
 
   /**
@@ -335,11 +353,9 @@ final class Renderer extends BaseXBack {
   private boolean next() {
     final int ch = text.curr();
     if(ch == TokenBuilder.NLINE || ch == TokenBuilder.HLINE) {
-      final int h = fontHeight >> (ch == TokenBuilder.NLINE ? 0 : 1);
-      x = offset;
-      y += h;
-      lineY += h;
+      newline(fontHeight >> (ch == TokenBuilder.NLINE ? 0 : 1));
       line++;
+      lineC = edit && text.cursorLine(false);
       return true;
     }
     x += wordWidth;
@@ -351,6 +367,8 @@ final class Renderer extends BaseXBack {
    * @param g graphics reference
    */
   private void write(final Graphics g) {
+    if(x == offset) markLine(g);
+
     // choose color for enabled text, depending on highlighting, link, or current syntax
     color = isEnabled() ? highlighted ? GUIConstants.GREEN : link ? GUIConstants.color4 :
       syntax.getColor(text) : Color.gray;
@@ -483,7 +501,7 @@ final class Renderer extends BaseXBack {
     for(int xp = x; xp < x + ww; xp++) {
       if((xp & 1) == 0) g.drawLine(xp, y + 2, xp, y + s + 1);
     }
-    if(lineNumbers) drawErrorLine(g);
+    if(edit) drawErrorLine(g);
   }
 
   /**
