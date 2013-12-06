@@ -7,7 +7,6 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * <p>This class converts CSV input to XML.</p>
@@ -25,19 +24,8 @@ public abstract class CsvConverter {
    */
   public static Item convert(final IO input, final CsvParserOptions copts) throws IOException {
     final String encoding = copts.get(CsvParserOptions.ENCODING);
-    return convert(new NewlineInput(input).encoding(encoding).content(), copts);
-  }
-
-  /**
-   * Converts the specified input to an XQuery item.
-   * @param input input stream
-   * @param copts options
-   * @return item
-   * @throws QueryIOException query I/O exception
-   */
-  public static Item convert(final byte[] input, final CsvParserOptions copts)
-      throws QueryIOException {
-    return CsvParser.parse(Token.string(input), copts, get(copts));
+    return CsvParser.parse(new NewlineInput(input).encoding(encoding).cache().toString(), copts,
+        get(copts));
   }
 
   /**

@@ -4,7 +4,10 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
+import java.io.*;
+
 import org.basex.build.*;
+import org.basex.io.*;
 import org.basex.io.parse.csv.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -54,8 +57,8 @@ public class FNCsv extends StandardFunc {
     final byte[] input = checkStr(expr[0], ctx);
     final CsvParserOptions opts = checkOptions(1, Q_OPTIONS, new CsvParserOptions(), ctx);
     try {
-      return CsvConverter.convert(input, opts);
-    } catch(final QueryIOException ex) {
+      return CsvConverter.convert(new IOContent(input), opts);
+    } catch(final IOException ex) {
       throw BXCS_PARSE.get(info, ex);
     }
   }
