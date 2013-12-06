@@ -49,6 +49,8 @@ final class RestXqWadl {
     final TreeMap<String, FElem> map = new TreeMap<String, FElem>();
     for(final RestXqModule mod : modules.values()) {
       for(final RestXqFunction func : mod.functions()) {
+        if(func.path == null) continue;
+
         final TokenObjMap<TokenList> xqdoc = func.function.doc();
         final String path = func.path.toString();
         final String methods = func.methods.toString().replaceAll("[^A-Z ]", "");
