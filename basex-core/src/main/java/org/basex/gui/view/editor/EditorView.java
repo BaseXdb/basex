@@ -520,7 +520,6 @@ public final class EditorView extends View {
         }
       }
 
-      System.out.println(main);
       if(main && exec) {
         // execute query if forced, or if realtime execution is activated
         gui.execute(true, new XQuery(input));
