@@ -38,15 +38,26 @@ public final class Set extends AGet {
   @Override
   protected boolean run() {
     final String name = args[0].toUpperCase(Locale.ENGLISH), val = args[1];
-    // check if the option is a global, read-only option
-    if(context.user.has(Perm.ADMIN) && goptions.option(name) != null)
-      return error(GLOBAL_OPTION_X, name);
+    Options opts = options;
 
-    final Option<?> opt = options.option(name);
+    // check global options: only "debug" can be changed by admin users
+    boolean debug = false;
+    if(context.user.has(Perm.ADMIN)) {
+      final Option<?> opt = goptions.option(name);
+      if(opt == GlobalOptions.DEBUG) {
+        debug = true;
+        opts = goptions;
+      } else if(opt != null) {
+        return error(GLOBAL_OPTION_X, name);
+      }
+    }
+
     try {
       // set value and return info string with new value
-      options.assign(name, val);
-      return info(name + COLS + options.get(opt));
+      opts.assign(name, val);
+      // assign static debugging flag
+      if(debug) Prop.debug = opts.get(GlobalOptions.DEBUG);
+      return info(name + COLS + opts.get(opts.option(name)));
     } catch(final BaseXException ex) {
       Util.debug(ex);
       return error(Util.message(ex));

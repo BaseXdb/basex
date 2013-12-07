@@ -97,7 +97,6 @@ public final class FlworOptimizeTest extends QueryPlanTest {
 
   /** Tests if multiple successive where clauses are merged into one. */
   @Test public void mergeWheresTest() {
-    Prop.debug = true;
     check("let $rnd := random:double() where $rnd div 2 >= 0.2 where $rnd < 0.5 " +
         "where round(2 * $rnd) eq 1 return $rnd",
         null,

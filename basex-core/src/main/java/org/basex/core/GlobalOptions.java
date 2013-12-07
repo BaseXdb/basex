@@ -22,14 +22,14 @@ public final class GlobalOptions extends Options {
   /** Comment: written to options file. */
   public static final Comment C_GENERAL = new Comment("General Options");
 
+  /** Debug mode. */
+  public static final BooleanOption DEBUG = new BooleanOption("DEBUG", false);
   /** Database path. */
   public static final StringOption DBPATH = new StringOption("DBPATH",
     HOME + (USERHOME ? NAME + "Data" : "data"));
   /** Package repository path. */
   public static final StringOption REPOPATH = new StringOption("REPOPATH",
     HOME + (USERHOME ? NAME + "Repo" : "repo"));
-  /** Debug mode. */
-  public static final BooleanOption DEBUG = new BooleanOption("DEBUG", false);
   /** Language name. */
   public static final StringOption LANG = new StringOption("LANG", language);
   /** Flag to include key names in the language strings. */
