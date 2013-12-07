@@ -78,7 +78,7 @@ public final class QueryContext extends Proc {
   public long pos = 1;
   /** Current context size. */
   public long size = 1;
-  /** Optional initial context set. */
+  /** Globally available nodes (may be {@code null}). */
   Nodes nodes;
 
   /** Available collations. */

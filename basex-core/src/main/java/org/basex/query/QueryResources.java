@@ -63,8 +63,7 @@ public final class QueryResources {
 
     // create default collection: use initial node set if it contains all
     // documents of the database. otherwise, create new node set
-    addCollection(root ? ctx.value :
-      DBNodeSeq.get(d.resources.docs(), d, true, true), d.meta.name);
+    addCollection(root ? ctx.value : DBNodeSeq.get(d.resources.docs(), d, true, true), d.meta.name);
 
     addData(d);
     synchronized(ctx.context.dbs) { ctx.context.dbs.pin(d); }
@@ -113,13 +112,22 @@ public final class QueryResources {
    */
   public DBNode doc(final QueryInput qi, final IO baseIO, final InputInfo info)
       throws QueryException {
+
+    // favor default database
+    if(ctx.context.options.get(MainOptions.DEFAULTDB) && ctx.nodes != null) {
+      final Data dt = data[0];
+      final int pre = dt.resources.doc(qi.original);
+      if(pre != -1) return new DBNode(dt, pre, Data.DOC);
+    }
+
     // check currently opened databases
     for(int d = 0; d < datas; ++d) {
       final Data dt = data[d];
-      // database has a single document, input paths are matching
+      // check if database has a single document with an identical input path
       if(dt.resources.docs().size() == 1 && IO.get(dt.meta.original).eq(qi.input))
         return new DBNode(dt, 0, Data.DOC);
 
+      // check if database and input has identical name
       // database instance has same name as input path
       final String n = dt.meta.name;
       if(Prop.CASE ? n.equals(qi.db) : n.equalsIgnoreCase(qi.db))
@@ -146,21 +154,28 @@ public final class QueryResources {
   /**
    * Evaluates {@code fn:collection()}: opens an existing database collection, or creates
    * a new data reference.
-   * @param input collection path
+   * @param qi query input
    * @param baseIO base URI
    * @param info input info
    * @return collection
    * @throws QueryException query exception
    */
-  public Value collection(final String input, final IO baseIO, final InputInfo info)
+  public Value collection(final QueryInput qi, final IO baseIO, final InputInfo info)
       throws QueryException {
 
+    // favor default database
+    if(ctx.context.options.get(MainOptions.DEFAULTDB) && ctx.nodes != null) {
+      final Data dt = data[0];
+      final IntList pres = dt.resources.docs(qi.original);
+      return DBNodeSeq.get(pres, dt, true, qi.original.isEmpty());
+    }
+
     // merge input with base directory
-    final String in = baseIO != null ? baseIO.merge(input).path() : null;
+    final String in = baseIO != null ? baseIO.merge(qi.original).path() : null;
 
     // check currently opened collections
     if(in != null) {
-      final String[] names = { in, input };
+      final String[] names = { in, qi.original };
       for(int c = 0; c < colls; c++) {
         final String n = collName[c];
         if(Prop.CASE ? Token.eq(n, names) : Token.eqic(n, names)) return coll[c];
@@ -168,7 +183,6 @@ public final class QueryResources {
     }
 
     // check currently opened databases
-    final QueryInput qi = new QueryInput(input);
     Data dt = null;
     for(int i = 0; i < datas; ++i) {
       // return database instance with the same name or file path

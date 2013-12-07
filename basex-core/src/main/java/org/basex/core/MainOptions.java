@@ -108,6 +108,10 @@ public final class MainOptions extends Options {
   public static final StringOption QUERYPATH = new StringOption("QUERYPATH", "");
   /** Flag for the size limit on inlineable functions. */
   public static final NumberOption INLINELIMIT = new NumberOption("INLINELIMIT", 100);
+  /** Flag for tail-call optimization. */
+  public static final NumberOption TAILCALLS = new NumberOption("TAILCALLS", 256);
+  /** Favor global database when opening resources. */
+  public static final BooleanOption DEFAULTDB = new BooleanOption("DEFAULTDB", false);
   /** Caches the query results. */
   public static final BooleanOption CACHEQUERY = new BooleanOption("CACHEQUERY", false);
   /** Forces database creation for unknown documents. */
@@ -152,8 +156,6 @@ public final class MainOptions extends Options {
 
   // Other
 
-  /** Hidden: flag for tail-call optimization. */
-  public static final NumberOption TAILCALLS = new NumberOption("TAILCALLS", 256);
   /** Hidden: maximum number of hits to be displayed in the GUI (will be overwritten). */
   public static final NumberOption MAXHITS = new NumberOption("MAXHITS", -1);
 

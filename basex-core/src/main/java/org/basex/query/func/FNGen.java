@@ -120,7 +120,7 @@ public final class FNGen extends StandardFunc {
     // check if reference is valid
     final byte[] in = checkEStr(expr[0].item(ctx, info));
     if(!Uri.uri(in).isValid()) throw INVCOLL.get(info, in);
-    return ctx.resource.collection(string(in), sc.baseIO(), info);
+    return ctx.resource.collection(new QueryInput(string(in)), sc.baseIO(), info);
   }
 
   /**
