@@ -273,7 +273,7 @@ public final class DialogResources extends BaseXBack {
     }
 
     @Override
-    public boolean enabled(final GUI gui) {
+    public boolean enabled() {
       final TreeNode n = selection();
       return n instanceof TreeLeaf ? !((TreeLeaf) n).abbr : n != null && !n.equals(root);
     }
@@ -305,7 +305,7 @@ public final class DialogResources extends BaseXBack {
     }
 
     @Override
-    public boolean enabled(final GUI gui) {
+    public boolean enabled() {
       final TreeNode n = selection();
       return n instanceof TreeLeaf ? !((TreeLeaf) n).abbr : n != null && !n.equals(root);
     }

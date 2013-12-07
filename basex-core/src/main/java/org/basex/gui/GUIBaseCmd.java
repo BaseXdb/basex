@@ -31,15 +31,14 @@ public abstract class GUIBaseCmd implements GUICmd {
   }
   @Override
   public final void refresh(final GUI main, final AbstractButton button) {
-    button.setEnabled(enabled(main));
+    button.setEnabled(enabled());
   }
 
   /**
    * Checks if the command is currently enabled.
-   * @param main main window
    * @return result of check
    */
-  public boolean enabled(@SuppressWarnings("unused") final GUI main) {
+  public boolean enabled() {
     return true;
   }
 }

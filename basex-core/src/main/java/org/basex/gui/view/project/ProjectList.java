@@ -1,10 +1,15 @@
 package org.basex.gui.view.project;
 
+import static org.basex.core.Text.*;
+
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
+import java.util.*;
 
 import javax.swing.*;
 
+import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.io.*;
 import org.basex.util.*;
@@ -30,18 +35,17 @@ public class ProjectList extends JList {
   ProjectList(final ProjectView view) {
     project = view;
     setCellRenderer(new CellRenderer());
-    addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyTyped(final KeyEvent e) {
-        if(BaseXKeys.ENTER.is(e)) open();
-      }
-    });
+    addKeyListener(project.filter.keys);
     addMouseListener(new MouseAdapter() {
       @Override
       public void mousePressed(final MouseEvent e) {
         if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) open();
       }
     });
+
+    // add popup
+    new BaseXPopup(this, view.gui, new OpenCmd(), new OpenExternalCmd(), null,
+        new RefreshCmd(), new CopyPathCmd());
   }
 
   /**
@@ -58,8 +62,6 @@ public class ProjectList extends JList {
         final String[] list = new String[is];
         for(int i = 0; i < is; i++) list[i] = Token.string(matches.key(i + 1));
         if(changed(list)) {
-          setListData(list);
-
           // check which old values had been selected
           final Object[] old = getSelectedValues();
           final IntList il = new IntList();
@@ -71,6 +73,7 @@ public class ProjectList extends JList {
               }
             }
           }
+          setListData(list);
           setSelectedIndices(il.toArray());
         }
         search = srch;
@@ -96,10 +99,19 @@ public class ProjectList extends JList {
    * Open all selected files.
    */
   void open() {
-    // nothing selected: select first entry
-    if(isSelectionEmpty() && getModel().getSize() != 0) setSelectedIndex(0);
-    for(final Object o : getSelectedValues()) {
-      project.open(new IOFile(o.toString()), search);
+    for(final IOFile file : selectedValues()) project.open(file, search);
+  }
+
+  /**
+   * Open all selected files externally.
+   */
+  void openExternal() {
+    for(final IOFile file : selectedValues())  {
+      try {
+        file.open();
+      } catch(final IOException ex) {
+        BaseXDialog.error(project.gui, Util.info(FILE_NOT_OPENED_X, file));
+      }
     }
   }
 
@@ -134,5 +146,60 @@ public class ProjectList extends JList {
       }
       return label;
     }
+  }
+
+  /** Refresh command. */
+  final class RefreshCmd extends GUIBaseCmd {
+    @Override public void execute(final GUI main) { project.filter.refresh(true); }
+    @Override public boolean enabled() { return true; }
+    @Override public String label() { return REFRESH; }
+    @Override public BaseXKeys key() { return BaseXKeys.REFRESH; }
+  }
+
+  /** Change directory command. */
+  final class OpenCmd extends GUIBaseCmd {
+    @Override public void execute(final GUI main) { open(); }
+    @Override public boolean enabled() { return true; }
+    @Override public String label() { return OPEN; }
+    @Override public BaseXKeys key() { return BaseXKeys.ENTER; }
+  }
+
+  /** Change directory command. */
+  final class OpenExternalCmd extends GUIBaseCmd {
+    @Override public void execute(final GUI main) { openExternal(); }
+    @Override public boolean enabled() { return true; }
+    @Override public String label() { return OPEN_EXTERNALLY; }
+    @Override public BaseXKeys key() { return BaseXKeys.OPEN; }
+  }
+
+  /** Copy path command. */
+  final class CopyPathCmd extends GUIBaseCmd {
+    @Override public void execute(final GUI main) {
+      if(enabled()) BaseXLayout.copy(selectedValue());
+    }
+    @Override public boolean enabled() { return selectedValue() != null; }
+    @Override public String label() { return COPY_PATH; }
+    @Override public BaseXKeys key() { return BaseXKeys.COPY_PATH; }
+  }
+
+  /**
+   * Returns a single selected node, or {@code null} if zero or more than node is selected.
+   * @return selected node
+   */
+  private String selectedValue() {
+    final Object[] old = getSelectedValues();
+    return old.length == 1 ? old[0].toString() : null;
+  }
+
+  /**
+   * Returns a single selected node, or {@code null} if zero or more than node is selected.
+   * @return selected node
+   */
+  private IOFile[] selectedValues() {
+    // nothing selected: select first entry
+    if(isSelectionEmpty() && getModel().getSize() != 0) setSelectedIndex(0);
+    final ArrayList<IOFile> list = new ArrayList<IOFile>();
+    for(final Object o : getSelectedValues()) list.add(new IOFile(o.toString()));
+    return list.toArray(new IOFile[list.size()]);
   }
 }

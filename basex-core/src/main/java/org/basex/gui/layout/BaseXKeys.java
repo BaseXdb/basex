@@ -100,11 +100,12 @@ public enum BaseXKeys {
 
   /** Escape.                */ ESCAPE(VK_ESCAPE),
   /** Context menu.          */ CONTEXT(VK_CONTEXT_MENU),
+  /** Copy path.             */ COPY_PATH(META | SHIFT, VK_C),
 
   /** Space key.             */ SPACE(VK_SPACE),
   /** Tab key.               */ TAB(VK_TAB),
   /** Enter.                 */ ENTER(VK_ENTER),
-  /** Shift Enter.           */ SHIFT_ENTER(SHIFT, VK_ENTER);
+  /** Shift Enter.           */ OPEN(SHIFT, VK_ENTER);
 
   /** Modifiers. */
   private final int mod;

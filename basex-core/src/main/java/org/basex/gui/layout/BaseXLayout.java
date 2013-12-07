@@ -161,6 +161,14 @@ public final class BaseXLayout {
   }
 
   /**
+   * Copies the specified string to the clipboard.
+   * @param text text
+   */
+  public static void copy(final String text) {
+    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
+  }
+
+  /**
    * Drag and drop handler.
    * @author BaseX Team 2005-13, BSD License
    * @author Christian Gruen

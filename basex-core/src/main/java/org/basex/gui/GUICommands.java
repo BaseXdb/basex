@@ -3,7 +3,6 @@ package org.basex.gui;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
-import java.awt.datatransfer.*;
 
 import javax.swing.*;
 
@@ -234,15 +233,12 @@ public enum GUICommands implements GUICmd {
 
   /* EDIT COMMANDS */
 
-  /** Copies the current path. */
+  /** Copies the current path to the clipboard. */
   C_COPYPATH(COPY_PATH, "% shift C", H_CPPATH, true, false) {
     @Override
     public void execute(final GUI gui) {
       final int pre = gui.context.marked.pres[0];
-      final byte[] txt = ViewData.path(gui.context.data(), pre);
-      // copy path to clipboard
-      final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
-      clip.setContents(new StringSelection(Token.string(txt)), null);
+      BaseXLayout.copy(Token.string(ViewData.path(gui.context.data(), pre)));
     }
 
     @Override

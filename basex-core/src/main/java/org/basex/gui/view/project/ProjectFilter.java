@@ -21,9 +21,31 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-final class ProjectFilter extends BaseXBack implements KeyListener {
+final class ProjectFilter extends BaseXBack {
   /** Maximum number of filtered hits. */
   private static final int MAXHITS = 256;
+
+  /** Key adapter. */
+  final KeyAdapter keys = new KeyAdapter() {
+    @Override
+    public void keyPressed(final KeyEvent e) {
+      if(BaseXKeys.REFRESH.is(e)) {
+        reset();
+      } else if(BaseXKeys.COPY_PATH.is(e)) {
+        final Object[] vals = project.list.getSelectedValues();
+        if(vals.length == 1) BaseXLayout.copy(vals[0].toString());
+      }
+    }
+    @Override
+    public void keyTyped(final KeyEvent e) {
+      if(BaseXKeys.OPEN.is(e)) {
+        project.list.openExternal();
+      } else if(BaseXKeys.ENTER.is(e)) {
+        project.list.open();
+      }
+    }
+  };
+
   /** Files. */
   private final BaseXTextField files;
   /** Contents. */
@@ -60,8 +82,23 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
     add(files, BorderLayout.NORTH);
     add(contents, BorderLayout.CENTER);
 
-    files.addKeyListener(this);
-    contents.addKeyListener(this);
+    final KeyAdapter refreshKeys = new KeyAdapter() {
+      @Override
+      public void keyPressed(final KeyEvent e) {
+        if(BaseXKeys.NEXTLINE.is(e) || BaseXKeys.PREVLINE.is(e) ||
+           BaseXKeys.NEXTPAGE.is(e) || BaseXKeys.PREVPAGE.is(e)) {
+          project.list.dispatchEvent(e);
+        }
+      }
+      @Override
+      public void keyReleased(final KeyEvent e) {
+        refresh(false);
+      }
+    };
+    files.addKeyListener(keys);
+    contents.addKeyListener(keys);
+    files.addKeyListener(refreshKeys);
+    contents.addKeyListener(refreshKeys);
   }
 
   /**
@@ -132,7 +169,6 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
     while(tp.more()) il.add(Token.lc(tp.next()));
     if(filter(pattern, il.toArray(), thread, matches)) {
       project.list.setElements(matches, content.isEmpty() ? null : content);
-    } else {
     }
 
     files.setCursor(CURSORTEXT);
@@ -174,31 +210,6 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
    */
   void focus() {
     files.requestFocusInWindow();
-  }
-
-  @Override
-  public void keyReleased(final KeyEvent e) {
-    refresh(false);
-  }
-
-  @Override
-  public void keyPressed(final KeyEvent e) {
-    if(BaseXKeys.NEXTLINE.is(e) || BaseXKeys.PREVLINE.is(e) ||
-       BaseXKeys.NEXTPAGE.is(e) || BaseXKeys.PREVPAGE.is(e)) {
-      project.list.dispatchEvent(e);
-    } else if(BaseXKeys.REFRESH.is(e)) {
-      reset();
-    }
-  }
-
-  @Override
-  public void keyTyped(final KeyEvent e) {
-    if(BaseXKeys.ENTER.is(e)) {
-      project.list.open();
-    } else if(BaseXKeys.ESCAPE.is(e)) {
-      files.setText("");
-      contents.setText("");
-    }
   }
 
   // PRIVATE METHODS ==============================================================================

@@ -805,8 +805,7 @@ public class Editor extends BaseXPanel {
     }
 
     // copy selection to clipboard
-    final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
-    clip.setContents(new StringSelection(txt), null);
+    BaseXLayout.copy(txt);
     return true;
   }
 
@@ -885,7 +884,7 @@ public class Editor extends BaseXPanel {
       finish(-1);
     }
     @Override
-    public boolean enabled(final GUI main) { return !hist.first(); }
+    public boolean enabled() { return !hist.first(); }
     @Override
     public String label() { return Text.UNDO; }
     @Override
@@ -904,7 +903,7 @@ public class Editor extends BaseXPanel {
       finish(-1);
     }
     @Override
-    public boolean enabled(final GUI main) { return !hist.last(); }
+    public boolean enabled() { return !hist.last(); }
     @Override
     public String label() { return Text.REDO; }
     @Override
@@ -924,7 +923,7 @@ public class Editor extends BaseXPanel {
       finish(tc);
     }
     @Override
-    public boolean enabled(final GUI main) { return text.selected(); }
+    public boolean enabled() { return text.selected(); }
     @Override
     public String label() { return Text.CUT; }
     @Override
@@ -936,7 +935,7 @@ public class Editor extends BaseXPanel {
     @Override
     public void execute(final GUI main) { copy(); }
     @Override
-    public boolean enabled(final GUI main) { return text.selected(); }
+    public boolean enabled() { return text.selected(); }
     @Override
     public String label() { return Text.COPY; }
     @Override
@@ -957,7 +956,7 @@ public class Editor extends BaseXPanel {
       finish(tc);
     }
     @Override
-    public boolean enabled(final GUI main) { return clip() != null; }
+    public boolean enabled() { return clip() != null; }
     @Override
     public String label() { return Text.PASTE; }
     @Override
@@ -975,7 +974,7 @@ public class Editor extends BaseXPanel {
       finish(tc);
     }
     @Override
-    public boolean enabled(final GUI main) { return text.selected(); }
+    public boolean enabled() { return text.selected(); }
     @Override
     public String label() { return Text.DELETE; }
     @Override
@@ -999,7 +998,7 @@ public class Editor extends BaseXPanel {
     @Override
     public String label() { return Text.FIND + Text.DOTS; }
     @Override
-    public boolean enabled(final GUI main) { return search != null; }
+    public boolean enabled() { return search != null; }
     @Override
     public BaseXKeys key() { return FIND; }
   }
@@ -1011,7 +1010,7 @@ public class Editor extends BaseXPanel {
     @Override
     public String label() { return Text.FIND_NEXT; }
     @Override
-    public boolean enabled(final GUI main) { return search != null && search.isVisible(); }
+    public boolean enabled() { return search != null && search.isVisible(); }
     @Override
     public BaseXKeys key() { return FINDNEXT; }
   }
@@ -1023,7 +1022,7 @@ public class Editor extends BaseXPanel {
     @Override
     public String label() { return Text.FIND_PREVIOUS; }
     @Override
-    public boolean enabled(final GUI main) { return search != null && search.isVisible(); }
+    public boolean enabled() { return search != null && search.isVisible(); }
     @Override
     public BaseXKeys key() { return FINDPREV; }
   }
@@ -1045,7 +1044,7 @@ public class Editor extends BaseXPanel {
     @Override
     public String label() { return Text.GO_TO_LINE + Text.DOTS; }
     @Override
-    public boolean enabled(final GUI main) { return search != null; }
+    public boolean enabled() { return search != null; }
     @Override
     public BaseXKeys key() { return GOTOLINE; }
   }
