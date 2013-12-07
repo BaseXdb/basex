@@ -7,6 +7,8 @@ import javax.swing.*;
 
 import org.basex.gui.layout.*;
 import org.basex.io.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -44,29 +46,31 @@ public class ProjectList extends JList {
 
   /**
    * Assigns the specified list entries and selects the first entry.
-   * @param list entries to set
+   * @param matches entries to set
    * @param srch content search string
    */
-  void setElements(final StringList list, final String srch) {
+  void setElements(final TokenSet matches, final String srch) {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
+        // set new values and selections
+        final int is = matches.size();
+        final String[] list = new String[is];
+        for(int i = 0; i < is; i++) list[i] = Token.string(matches.key(i + 1));
         if(changed(list)) {
+          setListData(list);
+
           // check which old values had been selected
           final Object[] old = getSelectedValues();
           final IntList il = new IntList();
-          final int is = list.size();
           for(final Object o : old) {
             for(int i = 0; i < is; i++) {
-              if(o.equals(list.get(i))) {
+              if(o.equals(matches.key(i + 1))) {
                 il.add(i);
                 break;
               }
             }
           }
-          if(il.isEmpty()) il.add(0);
-          // set new values and selections
-          setListData(list.toArray());
           setSelectedIndices(il.toArray());
         }
         search = srch;
@@ -75,15 +79,15 @@ public class ProjectList extends JList {
   }
 
   /**
-   * Checks if the list needs to be updated.
+   * Checks if the list contents have changed.
    * @param list entries to set
    * @return result of check
    */
-  boolean changed(final StringList list) {
-    final int sl = list.size(), el = getModel().getSize();
+  boolean changed(final String[] list) {
+    final int sl = list.length, el = getModel().getSize();
     if(sl != el) return true;
     for(int i = 0; i < sl; i++) {
-      if(!list.get(i).equals(getModel().getElementAt(i))) return true;
+      if(!list[i].equals(getModel().getElementAt(i))) return true;
     }
     return false;
   }
@@ -92,7 +96,8 @@ public class ProjectList extends JList {
    * Open all selected files.
    */
   void open() {
-    System.out.println("Open " + search);
+    // nothing selected: select first entry
+    if(isSelectionEmpty() && getModel().getSize() != 0) setSelectedIndex(0);
     for(final Object o : getSelectedValues()) {
       project.open(new IOFile(o.toString()), search);
     }

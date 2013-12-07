@@ -268,7 +268,10 @@ final class XMLParser extends CmdParser {
     }
 
     // build validating query
-    final TokenBuilder tb = new TokenBuilder(".");
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add("declare variable $A external;");
+    tb.add("declare variable $O external;");
+    tb.add(".");
     // check existence of mandatory attributes
     tb.add("[every $e in $A satisfies @*/name() = $e]");
     // check existence of unknown attributes

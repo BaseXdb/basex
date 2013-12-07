@@ -75,7 +75,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
       @Override
       public void keyTyped(final KeyEvent e) {
         if(BaseXKeys.SHIFT_ENTER.is(e)) {
-          new OpenNativeCmd().execute(gui);
+          new OpenExternalCmd().execute(gui);
         } else if(BaseXKeys.ENTER.is(e)) {
           new OpenCmd().execute(gui);
         }
@@ -102,7 +102,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
     tree.setSelectionRow(0);
 
     // add popup
-    new BaseXPopup(tree, gui, new OpenCmd(), new OpenNativeCmd(), null,
+    new BaseXPopup(tree, gui, new OpenCmd(), new OpenExternalCmd(), null,
         new DeleteCmd(), new RenameCmd(), new NewCmd(), null, new RefreshCmd());
 
     // add scroll bar
@@ -444,7 +444,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
   }
 
   /** Change directory command. */
-  final class OpenNativeCmd extends GUIBaseCmd {
+  final class OpenExternalCmd extends GUIBaseCmd {
     @Override
     public void execute(final GUI main) {
       if(!enabled(gui)) return;
@@ -464,7 +464,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
       return true;
     }
     @Override
-    public String label() { return OPEN_NATIVELY; }
+    public String label() { return OPEN_EXTERNALLY; }
     @Override
     public BaseXKeys key() { return BaseXKeys.SHIFT_ENTER; }
   }

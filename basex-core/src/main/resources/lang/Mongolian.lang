@@ -238,7 +238,7 @@ offsets              = Салаалах
 ok                   = OK
 only_backup          = Зөвхөн нөөцлөлтөд хүчинтэй
 open                 = Нээх
-open_natively        = Open natively
+open_externally      = Open externally
 open_manage          = Удирдах
 optimize             = Шинэчлэх
 optimized_query      = Квери
@@ -391,7 +391,7 @@ yes                  = Тийм
 
 h_about              = Төслийн ерөнхий мэдээллийг харуулах.
 h_attr_index         = Уг индекс нь атрибутын харьцуулалтыг баталгаатай хурдан ажиллагаатай болгоно.
-h_binary_file        = The file content may be binary.\nDo you want your operating system to open this file?
+h_binary_file        = The file content may be binary.\nDo you want to open this file externally?
 h_browser_error_%    = Вэб хөтөч нээгдэхгүй байна.\nГар аргаар нээнэ үү URL:\n\n%
 h_buttons            = Товчлуур барыг нээх эсвэл хаах.
 h_case               = Индексд томоор бичигдсэн байхаар авч үлдэх.

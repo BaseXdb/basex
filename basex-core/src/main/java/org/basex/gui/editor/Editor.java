@@ -54,7 +54,7 @@ public class Editor extends BaseXPanel {
   /** Text array to be written. */
   protected final transient EditorText text = new EditorText(EMPTY);
   /** Undo history. */
-  public History hist;
+  public final History hist;
   /** Search bar. */
   public SearchBar search;
 
@@ -167,24 +167,20 @@ public class Editor extends BaseXPanel {
    * @param s text size
    */
   public final void setText(final byte[] t, final int s) {
-    // remove invalid characters and compare old with new string
-    int ns = 0;
-    final int pc = text.getCaret();
-    final int ts = text.size();
-    final byte[] old = text.text();
-    boolean eq = true;
-    for(int r = 0; r < s; ++r) {
-      final byte b = t[r];
-      // ignore carriage return
-      if(b != 0x0D) t[ns++] = t[r];
-      // support characters, highlighting codes, tabs and newlines
-      eq &= ns < ts && ns < s && t[ns] == old[ns];
+    byte[] txt = t;
+    if(Token.contains(t, '\r')) {
+      // remove carriage returns
+      int ns = 0;
+      for(int r = 0; r < s; ++r) {
+        final byte b = t[r];
+        if(b != 0x0D) t[ns++] = b;
+      }
+      // new text is different...
+      txt = Arrays.copyOf(t, ns);
     }
-    eq &= ns == ts;
-
-    // new text is different...
-    if(!eq) text.text(Arrays.copyOf(t, ns));
-    if(hist != null) hist.store(t.length == ns ? t : Arrays.copyOf(t, ns), pc, 0);
+    if(text.text(txt)) {
+      if(hist != null) hist.store(txt, text.getCaret(), 0);
+    }
     componentResized(null);
   }
 

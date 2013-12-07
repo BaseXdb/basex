@@ -927,7 +927,7 @@ public interface Text {
   /** Command info. */
   String OPEN = lang("open");
   /** Command info. */
-  String OPEN_NATIVELY = lang("open_natively");
+  String OPEN_EXTERNALLY = lang("open_externally");
   /** Command info. */
   String REOPEN = lang("reopen");
   /** Command info. */

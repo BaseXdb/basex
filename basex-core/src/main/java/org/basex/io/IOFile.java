@@ -321,7 +321,7 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Opens the file natively.
+   * Opens the file externally.
    * @throws IOException I/O exception
    */
   public void open() throws IOException {

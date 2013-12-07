@@ -237,7 +237,7 @@ offsets              = Смещения
 ok                   = OK
 only_backup          = Доступно только в виде резервной копии
 open                 = Открыть
-open_natively        = Open natively
+open_externally      = Open externally
 open_manage          = Открыть и Администрировать
 optimize             = Оптимизировать
 optimized_query      = Оптимизированный запрос
@@ -390,7 +390,7 @@ yes                  = Да
 
 h_about              = Отображение общей информации о проекте
 h_attr_index         = Этот индекс ускоряет сравнение атрибутов в предикатах
-h_binary_file        = The file content may be binary.\nDo you want your operating system to open this file?
+h_binary_file        = The file content may be binary.\nDo you want to open this file externally?
 h_browser_error_%    = Ошибка открытия браузера.\nПожалуйста, перейдите по ссылке:\n\n%
 h_buttons            = Переключение отображения панели кнопок
 h_case               = Индексирование будет производиться с учетом регистра букв

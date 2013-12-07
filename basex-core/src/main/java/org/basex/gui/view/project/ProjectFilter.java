@@ -12,6 +12,7 @@ import org.basex.gui.layout.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -21,6 +22,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class ProjectFilter extends BaseXBack implements KeyListener {
+  /** Maximum number of filtered hits. */
+  private static final int MAXHITS = 256;
   /** Files. */
   private final BaseXTextField files;
   /** Contents. */
@@ -75,7 +78,9 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
    */
   void init(final int thread) {
     if(cache.isEmpty()) {
-      project.list.setElements(new StringList(Text.PLEASE_WAIT_D), null);
+      final TokenSet set = new TokenSet();
+      set.add(Text.PLEASE_WAIT_D);
+      project.list.setElements(set, null);
       add(project.root.file, thread);
     }
   }
@@ -121,7 +126,7 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
     init(thread);
 
     // collect matches
-    final StringList matches = new StringList();
+    final TokenSet matches = new TokenSet();
     final IntList il = new IntList();
     final TokenParser tp = new TokenParser(Token.token(content));
     while(tp.more()) il.add(Token.lc(tp.next()));
@@ -145,7 +150,6 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
     if(!force && lastFiles.equals(file) && lastContents.equals(content)) return;
     lastFiles = file;
     lastContents = content;
-    System.out.println("Search " + content);
     ++threadID;
 
     final Component oldView = project.scroll.getViewport().getView(), newView;
@@ -183,7 +187,7 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
        BaseXKeys.NEXTPAGE.is(e) || BaseXKeys.PREVPAGE.is(e)) {
       project.list.dispatchEvent(e);
     } else if(BaseXKeys.REFRESH.is(e)) {
-      refresh(true);
+      reset();
     }
   }
 
@@ -208,7 +212,7 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
    * @return success flag
    */
   private boolean filter(final String pattern, final int[] content, final int thread,
-      final StringList matches) {
+      final TokenSet matches) {
 
     // glob pattern
     if(pattern.contains("*") || pattern.contains("?")) {
@@ -238,9 +242,9 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
    * @return success flag
    */
   private boolean filter(final byte[] pattern, final int[] cont, final int thread, final int mode,
-      final StringList matches) {
+      final TokenSet matches) {
 
-    if(matches.size() < 100) {
+    if(matches.size() < MAXHITS) {
       final boolean path = Token.indexOf(pattern, '\\') != -1 || Token.indexOf(pattern, '/') != -1;
       for(final byte[] input : cache) {
         // check if current file matches the pattern
@@ -263,12 +267,11 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
    * @param matches set with matches
    * @return maximum number of results reached
    */
-  private boolean filterContent(final byte[] input, final int[] content, final StringList matches) {
+  private boolean filterContent(final byte[] input, final int[] content, final TokenSet matches) {
     // accept file; check file contents
-    final String in = Token.string(input);
-    if(filterContent(in, content) && !matches.contains(in)) {
-      matches.add(in);
-      if(matches.size() >= 100) return true;
+    if(filterContent(input, content) && !matches.contains(input)) {
+      matches.add(input);
+      if(matches.size() >= MAXHITS) return true;
     }
     return false;
   }
@@ -279,13 +282,13 @@ final class ProjectFilter extends BaseXBack implements KeyListener {
    * @param cont file contents
    * @return result of check
    */
-  private boolean filterContent(final String path, final int[] cont) {
+  private boolean filterContent(final byte[] path, final int[] cont) {
     final int cl = cont.length;
     if(cl == 0) return true;
 
     TextInput ti = null;
     try {
-      ti = new TextInput(new IOFile(path));
+      ti = new TextInput(new IOFile(Token.string(path)));
       for(int c = 0, cp = 0; (cp = ti.read()) != -1;) {
         if(!XMLToken.valid(cp)) break;
         if(Token.lc(cp) == cont[c]) {

@@ -609,8 +609,7 @@ public abstract class W3CTS {
   }
 
   /**
-   * Evaluates the the input files and assigns the result to the specified
-   * variables.
+   * Evaluates the the input files and assigns the result to the specified variables.
    * @param nod variables
    * @param var documents
    * @param pth file path

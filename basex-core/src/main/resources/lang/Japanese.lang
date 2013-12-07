@@ -237,7 +237,7 @@ offsets              = オフセット
 ok                   = OK
 only_backup          = バックアップとしてのみ使用できます。
 open                 = 開く
-open_natively        = Open natively
+open_externally      = Open externally
 open_manage          = 管理
 optimize             = 最適化
 optimized_query      = クエリー
@@ -390,7 +390,7 @@ yes                  = はい
 
 h_about              = このプロジェクトについての概要を表示します。
 h_attr_index         = このインデックスは属性比較を高速化します。
-h_binary_file        = The file content may be binary.\nDo you want your operating system to open this file?
+h_binary_file        = The file content may be binary.\nDo you want to open this file externally?
 h_browser_error_%    = ブラウザの起動に失敗しました。任意のブラウザでこのURLを指定して開いてください:\n\n%
 h_buttons            = ボタンバーのオン・オフを切り替えます。
 h_case               = 大文字小文字の区別がインデックス内に保持されます。

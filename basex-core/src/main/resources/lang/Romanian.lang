@@ -237,7 +237,7 @@ offsets              = Offsets
 ok                   = OK
 only_backup          = Disponibil numai ca o copie de rezervă.
 open                 = Deschide
-open_natively        = Open natively
+open_externally      = Open externally
 open_manage          = Deschide & administreaza
 optimize             = Optimizaţi
 optimized_query      = Interogare
@@ -390,7 +390,7 @@ yes                  = Da
 
 h_about              = Afişează informaţii generale despre proiect.
 h_attr_index         = Acest index mareste viteza de comparatie a predicatelor.
-h_binary_file        = The file content may be binary.\nDo you want your operating system to open this file?
+h_binary_file        = The file content may be binary.\nDo you want to open this file externally?
 h_browser_error_%    = Nu am reuşit să deschid un browser.\n Va rog sa-l deschideti manual URLul:\n\n%
 h_buttons            = Comută bara de butoane Pornit / Oprit.
 h_case               = Sensibilitatea la caractere este retinuta in index.

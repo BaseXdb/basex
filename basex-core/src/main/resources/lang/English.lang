@@ -237,7 +237,7 @@ offsets              = Offsets
 ok                   = OK
 only_backup          = Only available as a backup.
 open                 = Open
-open_natively        = Open natively
+open_externally      = Open externally
 open_manage          = Open & Manage
 optimize             = Optimize
 optimized_query      = Optimized Query
@@ -390,7 +390,7 @@ yes                  = Yes
 
 h_about              = Displays general information on the project.
 h_attr_index         = This index speeds up attribute comparisons in predicates.
-h_binary_file        = The file content may be binary.\nDo you want your operating system to open this file?
+h_binary_file        = The file content may be binary.\nDo you want to open this file externally?
 h_browser_error_%    = Failed to open a browser.\nPlease manually open the URL:\n\n%
 h_buttons            = Switches the button bar on/off.
 h_case               = Case sensitivity is retained in the index.

@@ -497,18 +497,16 @@ public final class EditorView extends View {
     if(eq && action == Action.CHECK) return;
 
     IOFile file = editor.file;
-    String input = string(in);
     editor.last = in;
 
     final boolean xquery = file.hasSuffix(IO.XQSUFFIXES) || !file.path().contains(".");
     editor.script = !xquery && file.hasSuffix(IO.BXSSUFFIX);
     if(action == Action.EXECUTE && editor.script) {
       // execute query if forced, or if realtime execution is activated
-      gui.execute(true, new Execute(input));
+      gui.execute(true, new Execute(string(in)));
     } else if(xquery || action == Action.EXECUTE) {
       // check if input is/might be an xquery main module
-      if(input.isEmpty()) input = "()";
-
+      String input = in.length == 0 ? "()" : string(in);
       boolean main = !QueryProcessor.isLibrary(input);
       final boolean exec = action == Action.EXECUTE || gui.gopts.get(GUIOptions.EXECRT);
       if(exec) {
@@ -541,9 +539,12 @@ public final class EditorView extends View {
     } else if(editor.script || file.hasSuffix(IO.XMLSUFFIXES) ||
         file.hasSuffix(IO.XSLSUFFIXES) || file.hasSuffix(IO.HTMLSUFFIXES)) {
       try {
-        if(!editor.script || input.trim().startsWith("<"))
+        // check XML syntax
+        if(startsWith(in, '<') || !editor.script)
           new EmptyBuilder(new IOContent(in), gui.context).build();
-        if(editor.script) new CommandParser(input, gui.context).parse();
+        // check command script
+        if(editor.script)
+          new CommandParser(string(in), gui.context).parse();
         info(OK, true, false);
       } catch(final Exception ex) {
         info(Util.message(ex), false, false);
@@ -568,32 +569,39 @@ public final class EditorView extends View {
   }
 
   /**
-   * Retrieves the contents of the specified file.
+   * Retrieves the contents of the specified file, or opens it externally.
    * @param file query file
    * @return contents, or {@code null} reference
    * @throws IOException I/O exception
    */
   private byte[] read(final IOFile file) throws IOException {
     // check content
-    final BufferInput bi = new BufferInput(file);
-    final byte[] buffer = new byte[IO.BLOCKSIZE];
+    final TokenBuilder text = new TokenBuilder((int) Math.min(1 << 28, file.length()));
+    final TextInput ti = new NewlineInput(file).validate(true);
+    boolean first = true;
     try {
-      final int size = Math.max(0, bi.read(buffer) - 4);
-      for(int c = 0; c < size; c += cl(buffer, c)) {
-        if(!XMLToken.valid(cp(buffer, c))) {
-          if(!BaseXDialog.confirm(gui, H_FILE_BINARY)) break;
-          try {
-            file.open();
-          } catch(final IOException ex) {
-            Desktop.getDesktop().open(file.file());
+      while(true) {
+        try {
+          final int cp = ti.read();
+          if(cp == -1) return text.finish();
+          text.add(cp);
+        } catch(final InputException ex) {
+          if(first) {
+            first = false;
+            if(BaseXDialog.confirm(gui, H_FILE_BINARY)) {
+              try {
+                file.open();
+              } catch(final IOException ioex) {
+                Desktop.getDesktop().open(file.file());
+              }
+              return null;
+            }
           }
-          return null;
         }
       }
     } finally {
-      bi.close();
+      ti.close();
     }
-    return file.read();
   }
 
   /**
@@ -632,6 +640,9 @@ public final class EditorView extends View {
     final int t = tabs.getTabCount();
     final int i = tabs.getSelectedIndex();
     if(t == 1) {
+      // no panels left: close search bar
+      search.deactivate(true);
+
       // reopen single tab and focus project listener
       addTab();
       SwingUtilities.invokeLater(new Runnable() {

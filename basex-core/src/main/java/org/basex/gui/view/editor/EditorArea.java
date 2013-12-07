@@ -86,7 +86,7 @@ public final class EditorArea extends Editor {
   public void initText(final byte[] t) {
     last = t;
     super.setText(t);
-    hist = new History(text.text());
+    hist.init(getText());
   }
 
   @Override

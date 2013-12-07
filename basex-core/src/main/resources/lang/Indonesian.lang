@@ -237,7 +237,7 @@ offsets              = Pengimbang
 ok                   = OK
 only_backup          = Hanya tersedia sebagai cadangan.
 open                 = Buka
-open_natively        = Open natively
+open_externally      = Open externally
 open_manage          = Buka & Kelola
 optimize             = Optimisasi
 optimized_query      = Dioptimalkan kueri
@@ -390,7 +390,7 @@ yes                  = Ya
 
 h_about              = Menampikan informasi umum mengenai proyek.
 h_attr_index         = Indeks ini mempercepat perbandingan atribut dengan predikat.
-h_binary_file        = The file content may be binary.\nDo you want your operating system to open this file?
+h_binary_file        = The file content may be binary.\nDo you want to open this file externally?
 h_browser_error_%    = Gagal membuka peramban.\nMohon buka URL secara terpandu:\n\n%
 h_buttons            = Pengubah papan tombol hidup/mati.
 h_case               = Sensitifitas bentuk dipertahankan dalam indeks.

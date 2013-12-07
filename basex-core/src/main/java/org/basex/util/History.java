@@ -35,11 +35,21 @@ public final class History {
     if(active) {
       cur = new int[MAX];
       hist = new byte[MAX][];
-      hist[0] = text;
+      init(text);
     } else {
       cur = null;
       hist = null;
     }
+  }
+
+  /**
+   * Initializes the history with a text.
+   * @param text initial text
+   */
+  public void init(final byte[] text) {
+    hist[0] = text;
+    pos = 0;
+    max = 0;
   }
 
   /**
