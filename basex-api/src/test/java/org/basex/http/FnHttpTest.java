@@ -635,8 +635,7 @@ public class FnHttpTest extends HTTPTest {
   @Test
   public void multipartResponse() throws IOException, QueryException {
     // Create fake HTTP connection
-    final FakeHttpConnection conn = new FakeHttpConnection(new URL(
-        "http://www.test.com"));
+    final FakeHttpConnection conn = new FakeHttpConnection(new URL("http://www.test.com"));
     final Map<String, List<String>> hdrs = new HashMap<String, List<String>>();
     final List<String> fromVal = new ArrayList<String>();
     fromVal.add("Nathaniel Borenstein <nsb@bellcore.com>");
@@ -666,8 +665,8 @@ public class FnHttpTest extends HTTPTest {
         + "--boundary42" + CRLF + "Content-Type: text/x-whatever" + CRLF + CRLF
         + ".... fanciest formatted version of same  "
         + "message  goes  here" + CRLF + "..."  + CRLF + "--boundary42--");
-    final Iter i = new HTTPResponse(null, ctx.options).getResponse(
-        conn, Bln.FALSE.string(), null);
+    final ValueIter expIter = new HTTPResponse(null, ctx.options).
+        getResponse(conn, Bln.FALSE.string(), null);
 
     // Construct expected result
     final ValueBuilder resultIter = new ValueBuilder();
@@ -693,15 +692,18 @@ public class FnHttpTest extends HTTPTest {
 
     final DBNode dbNode = new DBNode(new IOContent(reqItem), ctx.options);
     resultIter.add(dbNode.children().next());
-    resultIter.add(Str.get("...plain text version of message "
-        + "goes here....\n\n"));
-    resultIter.add(Str.get(".... richtext version of same message "
-        + "goes here ...\n"));
-    resultIter.add(Str.get(".... fanciest formatted version of same  "
-        + "message  goes  here\n...\n"));
+    resultIter.add(Str.get("...plain text version of message goes here....\n\n"));
+    resultIter.add(Str.get(".... richtext version of same message goes here ...\n"));
+    resultIter.add(Str.get(".... fanciest formatted version of same  message  goes  here\n...\n"));
 
     // Compare response with expected result
-    assertTrue(Compare.deep(resultIter, i, null));
+    if(!Compare.deep(resultIter, expIter, null)) {
+      final TokenBuilder exp = new TokenBuilder();
+      for(final Item it : expIter) exp.add("- ").add(it.toString()).add('\n');
+      final TokenBuilder res = new TokenBuilder();
+      for(final Item it : resultIter) exp.add("- ").add(it.toString()).add('\n');
+      fail("Expected:\n" + exp + "\nResult:\n" + res);
+    }
   }
 
   /**
@@ -755,8 +757,8 @@ public class FnHttpTest extends HTTPTest {
         +  CRLF + "--simple boundary--" + CRLF
         + "This is the epilogue.  It is also to be ignored.");
     // Get response as sequence of XQuery items
-    final Iter i = new HTTPResponse(null, ctx.options).getResponse(
-        conn, Bln.FALSE.string(), null);
+    final ValueIter expIter = new HTTPResponse(null, ctx.options).
+        getResponse(conn, Bln.FALSE.string(), null);
 
     // Construct expected result
     final ValueBuilder resultIter = new ValueBuilder();
@@ -787,7 +789,14 @@ public class FnHttpTest extends HTTPTest {
         + "It DOES end with a linebreak.\n\n"));
 
     // Compare response with expected result
-    assertTrue(Compare.deep(resultIter, i, null));
+    // Compare response with expected result
+    if(!Compare.deep(resultIter, expIter, null)) {
+      final TokenBuilder exp = new TokenBuilder();
+      for(final Item it : expIter) exp.add(it.toString()).add('\n');
+      final TokenBuilder res = new TokenBuilder();
+      for(final Item it : resultIter) exp.add(it.toString()).add('\n');
+      fail("Expected:\n" + exp + "\nResult:\n" + res);
+    }
   }
 
   /**

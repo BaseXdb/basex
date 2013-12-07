@@ -181,7 +181,7 @@ public final class HTTPPayload {
 
     // content type of part payload - if not defined by header 'Content-Type',
     // it is equal to 'text/plain' (RFC 1341)
-    String ctype = TEXT_PLAIN, enc = null;
+    String ctype = TEXT_PLAIN, enc = null, ct = ctype;
 
     // extract headers
     for(byte[] l = line; l != null && l.length > 0;) {
@@ -190,9 +190,9 @@ public final class HTTPPayload {
         final byte[] key = substring(l, 0, pos);
         final byte[] val = trim(substring(l, pos + 1));
         if(eq(lc(key), CONTENT_TYPE_LC)) {
-          final String ct = string(val);
+          ctype = string(val);
           enc = charset(ct);
-          ctype = contentType(ct);
+          ct = contentType(ct);
         }
         if(val.length != 0 && parts != null)
           parts.add(new FElem(Q_HEADER).add(NAME, key).add(VALUE, val));
@@ -202,7 +202,7 @@ public final class HTTPPayload {
     if(parts != null) parts.add(new FElem(Q_BODY).add(MEDIA_TYPE, ctype));
 
     final byte[] pl = extractPart(sep, end, enc);
-    if(payloads != null) payloads.add(parse(pl, ctype));
+    if(payloads != null) payloads.add(parse(pl, ct));
     return true;
   }
 
