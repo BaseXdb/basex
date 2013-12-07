@@ -115,7 +115,7 @@ public final class EditorView extends View {
     final SearchEditor center = new SearchEditor(gui, tabs, null);
     search = center.bar();
 
-    final AbstractButton openB = BaseXButton.command(GUICommands.C_EDITOPEN, gui);
+    final AbstractButton openB = BaseXButton.command(GUIMenuCmd.C_EDITOPEN, gui);
     final AbstractButton saveB = BaseXButton.get("c_save", false, H_SAVE, gui);
     final AbstractButton find = search.button(H_REPLACE);
     hist = BaseXButton.get("c_hist", false, H_RECENTLY_OPEN, gui);
@@ -128,7 +128,7 @@ public final class EditorView extends View {
         BaseXLayout.addShortcut(H_EXECUTE_QUERY, BaseXKeys.EXEC1.toString()), gui);
     go.addKeyListener(this);
 
-    filter = BaseXButton.command(GUICommands.C_FILTER, gui);
+    filter = BaseXButton.command(GUIMenuCmd.C_FILTER, gui);
     filter.addKeyListener(this);
     filter.setEnabled(false);
 
@@ -182,10 +182,10 @@ public final class EditorView extends View {
       public void actionPerformed(final ActionEvent e) {
         final JPopupMenu pop = new JPopupMenu();
         final StringBuilder mnem = new StringBuilder();
-        final JMenuItem sa = GUIMenu.newItem(GUICommands.C_EDITSAVE, gui, mnem);
-        final JMenuItem sas = GUIMenu.newItem(GUICommands.C_EDITSAVEAS, gui, mnem);
-        GUICommands.C_EDITSAVE.refresh(gui, sa);
-        GUICommands.C_EDITSAVEAS.refresh(gui, sas);
+        final JMenuItem sa = GUIMenu.newItem(GUIMenuCmd.C_EDITSAVE, gui, mnem);
+        final JMenuItem sas = GUIMenu.newItem(GUIMenuCmd.C_EDITSAVEAS, gui, mnem);
+        sa.setEnabled(GUIMenuCmd.C_EDITSAVE.enabled(gui));
+        sas.setEnabled(GUIMenuCmd.C_EDITSAVEAS.enabled(gui));
         pop.add(sa);
         pop.add(sas);
         pop.show(saveB, 0, saveB.getHeight());
@@ -421,7 +421,7 @@ public final class EditorView extends View {
    * Creates a new file.
    */
   public void newFile() {
-    if(!visible()) GUICommands.C_SHOWEDITOR.execute(gui);
+    if(!visible()) GUIMenuCmd.C_SHOWEDITOR.execute(gui);
     addTab();
     refreshControls(true);
   }
@@ -454,7 +454,7 @@ public final class EditorView extends View {
    * @return opened editor, or {@code null} if file could not be opened
    */
   private EditorArea open(final IOFile file, final boolean parse, final boolean error) {
-    if(!visible()) GUICommands.C_SHOWEDITOR.execute(gui);
+    if(!visible()) GUIMenuCmd.C_SHOWEDITOR.execute(gui);
 
     EditorArea edit = find(file, true);
     if(edit != null) {

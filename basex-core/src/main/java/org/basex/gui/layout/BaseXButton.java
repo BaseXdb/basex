@@ -114,7 +114,7 @@ public class BaseXButton extends JButton {
    * @param gui reference to main window
    * @return button
    */
-  public static AbstractButton command(final GUICmd cmd, final GUI gui) {
+  public static AbstractButton command(final GUICommand cmd, final GUI gui) {
     final String name = cmd.toString().toLowerCase(Locale.ENGLISH);
     final AbstractButton button = get(name, cmd.toggle(), cmd.help(), gui);
     button.addActionListener(new ActionListener() {

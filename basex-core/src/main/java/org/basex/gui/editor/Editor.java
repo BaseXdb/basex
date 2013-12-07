@@ -126,11 +126,11 @@ public class Editor extends BaseXPanel {
     }
 
     new BaseXPopup(this, edit ?
-      new GUICmd[] {
+      new GUICommand[] {
         new FindCmd(), new FindNextCmd(), new FindPrevCmd(), null, new GotoCmd(), null,
         new UndoCmd(), new RedoCmd(), null,
         new AllCmd(), new CutCmd(), new CopyCmd(), new PasteCmd(), new DelCmd() } :
-      new GUICmd[] {
+      new GUICommand[] {
         new FindCmd(), new FindNextCmd(), new FindPrevCmd(), null, new GotoCmd(), null,
         new AllCmd(), new CopyCmd() }
     );
@@ -562,7 +562,7 @@ public class Editor extends BaseXPanel {
 
     // necessary on Macs as the shift button is pressed for REDO
     final boolean marking = e.isShiftDown() &&
-      !DELNEXT.is(e) && !DELPREV.is(e) && !PASTE2.is(e) &&
+      !DELETE.is(e) && !BACKSPACE.is(e) && !PASTE2.is(e) &&
       !DELLINE.is(e) && !REDOSTEP.is(e) && !PREVPAGE_RO.is(e);
     final boolean nomark = !text.selecting();
     if(marking && nomark) text.startSelect();
@@ -636,7 +636,7 @@ public class Editor extends BaseXPanel {
         text.complete();
       } else if(DELLINE.is(e)) {
         text.deleteLine();
-      } else if(DELLINEEND.is(e) || DELNEXTWORD.is(e) || DELNEXT.is(e)) {
+      } else if(DELLINEEND.is(e) || DELNEXTWORD.is(e) || DELETE.is(e)) {
         if(nomark) {
           if(text.pos() == text.size()) return;
           text.startSelect();
@@ -650,7 +650,7 @@ public class Editor extends BaseXPanel {
           text.finishSelect();
         }
         text.delete();
-      } else if(DELLINESTART.is(e) || DELPREVWORD.is(e) || DELPREV.is(e)) {
+      } else if(DELLINESTART.is(e) || DELPREVWORD.is(e) || BACKSPACE.is(e)) {
         if(nomark) {
           if(text.pos() == 0) return;
           if(DELPREVWORD.is(e)) {
@@ -759,7 +759,7 @@ public class Editor extends BaseXPanel {
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    if(!hist.active() || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e)) return;
+    if(!hist.active() || control(e) || DELETE.is(e) || BACKSPACE.is(e) || ESCAPE.is(e)) return;
 
     final int pc = text.getCaret();
     text.pos(pc);
@@ -873,9 +873,12 @@ public class Editor extends BaseXPanel {
   }
 
   /** Undo command. */
-  class UndoCmd extends GUIBaseCmd {
+  class UndoCmd extends GUIPopupCmd {
+    /** Constructor. */
+    UndoCmd() { super(Text.UNDO, UNDOSTEP); }
+
     @Override
-    public void execute(final GUI main) {
+    public void execute() {
       if(!hist.active()) return;
       final byte[] t = hist.prev();
       if(t == null) return;
@@ -884,17 +887,16 @@ public class Editor extends BaseXPanel {
       finish(-1);
     }
     @Override
-    public boolean enabled() { return !hist.first(); }
-    @Override
-    public String label() { return Text.UNDO; }
-    @Override
-    public BaseXKeys key() { return UNDOSTEP; }
+    public boolean enabled(final GUI main) { return !hist.first(); }
   }
 
   /** Redo command. */
-  class RedoCmd extends GUIBaseCmd {
+  class RedoCmd extends GUIPopupCmd {
+    /** Constructor. */
+    RedoCmd() { super(Text.REDO, REDOSTEP); }
+
     @Override
-    public void execute(final GUI main) {
+    public void execute() {
       if(!hist.active()) return;
       final byte[] t = hist.next();
       if(t == null) return;
@@ -903,17 +905,16 @@ public class Editor extends BaseXPanel {
       finish(-1);
     }
     @Override
-    public boolean enabled() { return !hist.last(); }
-    @Override
-    public String label() { return Text.REDO; }
-    @Override
-    public BaseXKeys key() { return REDOSTEP; }
+    public boolean enabled(final GUI main) { return !hist.last(); }
   }
 
   /** Cut command. */
-  class CutCmd extends GUIBaseCmd {
+  class CutCmd extends GUIPopupCmd {
+    /** Constructor. */
+    CutCmd() { super(Text.CUT, CUT1); }
+
     @Override
-    public void execute(final GUI main) {
+    public void execute() {
       if(!hist.active()) return;
       final int tc = text.getCaret();
       text.pos(tc);
@@ -923,29 +924,27 @@ public class Editor extends BaseXPanel {
       finish(tc);
     }
     @Override
-    public boolean enabled() { return text.selected(); }
-    @Override
-    public String label() { return Text.CUT; }
-    @Override
-    public BaseXKeys key() { return CUT1; }
+    public boolean enabled(final GUI main) { return text.selected(); }
   }
 
   /** Copy command. */
-  class CopyCmd extends GUIBaseCmd {
+  class CopyCmd extends GUIPopupCmd {
+    /** Constructor. */
+    CopyCmd() { super(Text.COPY, COPY1); }
+
     @Override
-    public void execute(final GUI main) { copy(); }
+    public void execute() { copy(); }
     @Override
-    public boolean enabled() { return text.selected(); }
-    @Override
-    public String label() { return Text.COPY; }
-    @Override
-    public BaseXKeys key() { return COPY1; }
+    public boolean enabled(final GUI main) { return text.selected(); }
   }
 
   /** Paste command. */
-  class PasteCmd extends GUIBaseCmd {
+  class PasteCmd extends GUIPopupCmd {
+    /** Constructor. */
+    PasteCmd() { super(Text.PASTE, PASTE1); }
+
     @Override
-    public void execute(final GUI main) {
+    public void execute() {
       if(!hist.active()) return;
       final int tc = text.getCaret();
       text.pos(tc);
@@ -956,17 +955,16 @@ public class Editor extends BaseXPanel {
       finish(tc);
     }
     @Override
-    public boolean enabled() { return clip() != null; }
-    @Override
-    public String label() { return Text.PASTE; }
-    @Override
-    public BaseXKeys key() { return PASTE1; }
+    public boolean enabled(final GUI main) { return clip() != null; }
   }
 
   /** Delete command. */
-  class DelCmd extends GUIBaseCmd {
+  class DelCmd extends GUIPopupCmd {
+    /** Constructor. */
+    DelCmd() { super(Text.DELETE, DELETE); }
+
     @Override
-    public void execute(final GUI main) {
+    public void execute() {
       if(!hist.active()) return;
       final int tc = text.getCaret();
       text.pos(tc);
@@ -974,57 +972,49 @@ public class Editor extends BaseXPanel {
       finish(tc);
     }
     @Override
-    public boolean enabled() { return text.selected(); }
-    @Override
-    public String label() { return Text.DELETE; }
-    @Override
-    public BaseXKeys key() { return DELNEXT; }
+    public boolean enabled(final GUI main) { return text.selected(); }
   }
 
   /** Select all command. */
-  class AllCmd extends GUIBaseCmd {
+  class AllCmd extends GUIPopupCmd {
+    /** Constructor. */
+    AllCmd() { super(Text.SELECT_ALL, SELECTALL); }
+
     @Override
-    public void execute(final GUI main) { selectAll(); }
-    @Override
-    public String label() { return Text.SELECT_ALL; }
-    @Override
-    public BaseXKeys key() { return SELECTALL; }
+    public void execute() { selectAll(); }
   }
 
   /** Find next hit. */
-  class FindCmd extends GUIBaseCmd {
+  class FindCmd extends GUIPopupCmd {
+    /** Constructor. */
+    FindCmd() { super(Text.FIND + Text.DOTS, FIND); }
+
     @Override
-    public void execute(final GUI main) { search.activate(text.copy(), true); }
+    public void execute() { search.activate(text.copy(), true); }
     @Override
-    public String label() { return Text.FIND + Text.DOTS; }
-    @Override
-    public boolean enabled() { return search != null; }
-    @Override
-    public BaseXKeys key() { return FIND; }
+    public boolean enabled(final GUI main) { return search != null; }
   }
 
   /** Find next hit. */
-  class FindNextCmd extends GUIBaseCmd {
+  class FindNextCmd extends GUIPopupCmd {
+    /** Constructor. */
+    FindNextCmd() { super(Text.FIND_NEXT, FINDNEXT); }
+
     @Override
-    public void execute(final GUI main) { find(true); }
+    public void execute() { find(true); }
     @Override
-    public String label() { return Text.FIND_NEXT; }
-    @Override
-    public boolean enabled() { return search != null && search.isVisible(); }
-    @Override
-    public BaseXKeys key() { return FINDNEXT; }
+    public boolean enabled(final GUI main) { return search != null && search.isVisible(); }
   }
 
   /** Find previous hit. */
-  class FindPrevCmd extends GUIBaseCmd {
+  class FindPrevCmd extends GUIPopupCmd {
+    /** Constructor. */
+    FindPrevCmd() { super(Text.FIND_PREVIOUS, FINDPREV); }
+
     @Override
-    public void execute(final GUI main) { find(true); }
+    public void execute() { find(true); }
     @Override
-    public String label() { return Text.FIND_PREVIOUS; }
-    @Override
-    public boolean enabled() { return search != null && search.isVisible(); }
-    @Override
-    public BaseXKeys key() { return FINDPREV; }
+    public boolean enabled(final GUI main) { return search != null && search.isVisible(); }
   }
 
   /**
@@ -1038,15 +1028,14 @@ public class Editor extends BaseXPanel {
   }
 
   /** Go to line. */
-  class GotoCmd extends GUIBaseCmd {
+  class GotoCmd extends GUIPopupCmd {
+    /** Constructor. */
+    GotoCmd() { super(Text.GO_TO_LINE + Text.DOTS, GOTOLINE); }
+
     @Override
-    public void execute(final GUI main) { gotoLine(); }
+    public void execute() { gotoLine(); }
     @Override
-    public String label() { return Text.GO_TO_LINE + Text.DOTS; }
-    @Override
-    public boolean enabled() { return search != null; }
-    @Override
-    public BaseXKeys key() { return GOTOLINE; }
+    public boolean enabled(final GUI main) { return search != null; }
   }
 
   /**

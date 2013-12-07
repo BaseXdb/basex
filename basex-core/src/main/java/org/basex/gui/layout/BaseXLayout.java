@@ -27,9 +27,11 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class BaseXLayout {
+  /** Shortcut string for meta key. */
+  private static final String META = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ==
+      Event.META_MASK ? "meta" : "ctrl";
   /** Cached images. */
-  private static final HashMap<String, ImageIcon> IMAGES =
-    new HashMap<String, ImageIcon>();
+  private static final HashMap<String, ImageIcon> IMAGES = new HashMap<String, ImageIcon>();
   /** Key listener for global shortcuts. */
   private static KeyAdapter keys;
 
@@ -43,8 +45,7 @@ public final class BaseXLayout {
   static void focus(final Component cont) {
     final GUI gui = gui(cont);
     if(gui == null) return;
-    if(gui.gopts.get(GUIOptions.MOUSEFOCUS) && cont.isEnabled())
-      cont.requestFocusInWindow();
+    if(gui.gopts.get(GUIOptions.MOUSEFOCUS) && cont.isEnabled()) cont.requestFocusInWindow();
   }
 
   /**
@@ -107,12 +108,11 @@ public final class BaseXLayout {
    * @param cmd command
    * @return keystroke
    */
-  public static KeyStroke keyStroke(final GUICmd cmd) {
-    final Object sc = cmd.key();
+  public static KeyStroke keyStroke(final GUICommand cmd) {
+    final Object sc = cmd.shortcut();
     if(sc == null) return null;
 
-    final String scut = sc instanceof BaseXKeys ? ((BaseXKeys) sc).shortCut() :
-      Util.info(sc, GUICmd.META);
+    final String scut = sc instanceof BaseXKeys ? ((BaseXKeys) sc).shortCut() : Util.info(sc, META);
     final KeyStroke ks = KeyStroke.getKeyStroke(scut);
     if(ks == null) Util.errln("Could not assign shortcut: " + sc + " / " + scut);
     return ks;
@@ -240,13 +240,13 @@ public final class BaseXLayout {
           // browse back/forward
           if(gui.context.data() != null) {
             if(GOBACK.is(e)) {
-              GUICommands.C_GOBACK.execute(gui);
+              GUIMenuCmd.C_GOBACK.execute(gui);
             } else if(GOFORWARD.is(e)) {
-              GUICommands.C_GOFORWARD.execute(gui);
+              GUIMenuCmd.C_GOFORWARD.execute(gui);
             } else if(GOUP.is(e)) {
-              GUICommands.C_GOUP.execute(gui);
+              GUIMenuCmd.C_GOUP.execute(gui);
             } else if(GOHOME.is(e)) {
-              GUICommands.C_GOHOME.execute(gui);
+              GUIMenuCmd.C_GOHOME.execute(gui);
             }
           }
 

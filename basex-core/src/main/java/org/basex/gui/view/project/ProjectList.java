@@ -23,6 +23,25 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public class ProjectList extends JList {
+  /** Popup commands. */
+  final GUIPopupCmd[] commands = {
+    new GUIPopupCmd(OPEN, BaseXKeys.ENTER) {
+      @Override public void execute() { open(); }
+    },
+    new GUIPopupCmd(OPEN_EXTERNALLY, BaseXKeys.OPEN) {
+      @Override public void execute() { openExternal(); }
+    }, null,
+    new GUIPopupCmd(REFRESH, BaseXKeys.REFRESH) {
+      @Override public void execute() { project.filter.refresh(true); }
+    },
+    new GUIPopupCmd(COPY_PATH, BaseXKeys.COPY_PATH) {
+      @Override public void execute() {
+        if(enabled(null)) BaseXLayout.copy(selectedValue());
+      }
+      @Override public boolean enabled(final GUI main) { return selectedValue() != null; }
+    }
+  };
+
   /** Project view. */
   private final ProjectView project;
   /** Content search string. */
@@ -35,17 +54,13 @@ public class ProjectList extends JList {
   ProjectList(final ProjectView view) {
     project = view;
     setCellRenderer(new CellRenderer());
-    addKeyListener(project.filter.keys);
     addMouseListener(new MouseAdapter() {
       @Override
       public void mousePressed(final MouseEvent e) {
         if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) open();
       }
     });
-
-    // add popup
-    new BaseXPopup(this, view.gui, new OpenCmd(), new OpenExternalCmd(), null,
-        new RefreshCmd(), new CopyPathCmd());
+    new BaseXPopup(this, view.gui, commands);
   }
 
   /**
@@ -146,40 +161,6 @@ public class ProjectList extends JList {
       }
       return label;
     }
-  }
-
-  /** Refresh command. */
-  final class RefreshCmd extends GUIBaseCmd {
-    @Override public void execute(final GUI main) { project.filter.refresh(true); }
-    @Override public boolean enabled() { return true; }
-    @Override public String label() { return REFRESH; }
-    @Override public BaseXKeys key() { return BaseXKeys.REFRESH; }
-  }
-
-  /** Change directory command. */
-  final class OpenCmd extends GUIBaseCmd {
-    @Override public void execute(final GUI main) { open(); }
-    @Override public boolean enabled() { return true; }
-    @Override public String label() { return OPEN; }
-    @Override public BaseXKeys key() { return BaseXKeys.ENTER; }
-  }
-
-  /** Change directory command. */
-  final class OpenExternalCmd extends GUIBaseCmd {
-    @Override public void execute(final GUI main) { openExternal(); }
-    @Override public boolean enabled() { return true; }
-    @Override public String label() { return OPEN_EXTERNALLY; }
-    @Override public BaseXKeys key() { return BaseXKeys.OPEN; }
-  }
-
-  /** Copy path command. */
-  final class CopyPathCmd extends GUIBaseCmd {
-    @Override public void execute(final GUI main) {
-      if(enabled()) BaseXLayout.copy(selectedValue());
-    }
-    @Override public boolean enabled() { return selectedValue() != null; }
-    @Override public String label() { return COPY_PATH; }
-    @Override public BaseXKeys key() { return BaseXKeys.COPY_PATH; }
   }
 
   /**

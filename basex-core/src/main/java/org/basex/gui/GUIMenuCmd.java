@@ -4,8 +4,6 @@ import static org.basex.core.Text.*;
 
 import java.awt.*;
 
-import javax.swing.*;
-
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
@@ -27,7 +25,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public enum GUICommands implements GUICmd {
+public enum GUIMenuCmd implements GUICommand {
 
   /* DATABASE MENU */
 
@@ -140,8 +138,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.gopts.get(GUIOptions.SHOWEDITOR));
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
     }
   },
 
@@ -153,8 +151,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.gopts.get(GUIOptions.SHOWEDITOR) && gui.editor.modified());
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR) && gui.editor.modified();
     }
   },
 
@@ -166,8 +164,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.gopts.get(GUIOptions.SHOWEDITOR));
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
     }
   },
 
@@ -179,8 +177,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.gopts.get(GUIOptions.SHOWEDITOR));
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
     }
   },
 
@@ -192,8 +190,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.gopts.get(GUIOptions.SHOWEDITOR));
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
     }
   },
 
@@ -205,8 +203,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.gopts.get(GUIOptions.SHOWEDITOR));
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
     }
   },
 
@@ -218,8 +216,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.gopts.get(GUIOptions.SHOWEDITOR));
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
     }
   },
 
@@ -242,10 +240,10 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
+    public boolean enabled(final GUI gui) {
       // disallow copy of empty node set or root node
       final Nodes marked = gui.context.marked;
-      b.setEnabled(marked != null && marked.size() != 0);
+      return marked != null && marked.size() != 0;
     }
   },
 
@@ -259,9 +257,9 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
+    public boolean enabled(final GUI gui) {
       // disallow copy of empty node set or root node
-      b.setEnabled(updatable(gui.context.marked));
+      return updatable(gui.context.marked);
     }
   },
 
@@ -281,10 +279,10 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
+    public boolean enabled(final GUI gui) {
       final Context ctx = gui.context;
       // disallow copy of empty node set or root node
-      b.setEnabled(updatable(ctx.marked, Data.DOC) && ctx.copied != null);
+      return updatable(ctx.marked, Data.DOC) && ctx.copied != null;
     }
   },
 
@@ -306,9 +304,9 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
+    public boolean enabled(final GUI gui) {
       // disallow deletion of empty node set or root node
-      b.setEnabled(updatable(gui.context.marked));
+      return updatable(gui.context.marked);
     }
   },
 
@@ -336,8 +334,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(updatable(gui.context.marked, Data.ATTR, Data.PI, Data.COMM, Data.TEXT));
+    public boolean enabled(final GUI gui) {
+      return updatable(gui.context.marked, Data.ATTR, Data.PI, Data.COMM, Data.TEXT);
     }
   },
 
@@ -366,8 +364,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(updatable(gui.context.marked, Data.DOC));
+    public boolean enabled(final GUI gui) {
+      return updatable(gui.context.marked, Data.DOC);
     }
   },
 
@@ -386,9 +384,9 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
+    public boolean enabled(final GUI gui) {
       final Nodes marked = gui.context.marked;
-      b.setEnabled(marked != null && marked.size() != 0);
+      return marked != null && marked.size() != 0;
     }
   },
 
@@ -401,9 +399,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      super.refresh(gui, b);
-      b.setSelected(gui.gopts.get(GUIOptions.SHOWEDITOR));
+    public boolean selected(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
     }
   },
 
@@ -420,8 +417,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.gopts.get(GUIOptions.SHOWEDITOR));
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
     }
   },
 
@@ -434,9 +431,13 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.gopts.get(GUIOptions.SHOWEDITOR));
-      b.setSelected(gui.gopts.get(GUIOptions.SHOWPROJECT));
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+
+    @Override
+    public boolean selected(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWPROJECT);
     }
   },
 
@@ -449,9 +450,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      super.refresh(gui, b);
-      b.setSelected(gui.gopts.get(GUIOptions.SHOWINFO));
+    public boolean selected(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWINFO);
     }
   },
 
@@ -474,9 +474,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      super.refresh(gui, b);
-      b.setSelected(gui.gopts.get(GUIOptions.SHOWBUTTONS));
+    public boolean selected(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWBUTTONS);
     }
   },
 
@@ -488,9 +487,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      super.refresh(gui, b);
-      b.setSelected(gui.gopts.get(GUIOptions.SHOWINPUT));
+    public boolean selected(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWINPUT);
     }
   },
 
@@ -502,9 +500,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      super.refresh(gui, b);
-      b.setSelected(gui.gopts.get(GUIOptions.SHOWSTATUS));
+    public boolean selected(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWSTATUS);
     }
   },
 
@@ -517,9 +514,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      super.refresh(gui, b);
-      b.setSelected(gui.gopts.get(GUIOptions.SHOWTEXT));
+    public boolean selected(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWTEXT);
     }
   },
 
@@ -532,9 +528,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      super.refresh(gui, b);
-      b.setSelected(gui.gopts.get(GUIOptions.SHOWMAP));
+    public boolean selected(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWMAP);
     }
   },
 
@@ -547,9 +542,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      super.refresh(gui, b);
-      b.setSelected(gui.gopts.get(GUIOptions.SHOWTREE));
+    public boolean selected(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWTREE);
     }
   },
 
@@ -562,9 +556,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      super.refresh(gui, b);
-      b.setSelected(gui.gopts.get(GUIOptions.SHOWFOLDER));
+    public boolean selected(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWFOLDER);
     }
   },
 
@@ -577,9 +570,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      super.refresh(gui, b);
-      b.setSelected(gui.gopts.get(GUIOptions.SHOWPLOT));
+    public boolean selected(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWPLOT);
     }
   },
 
@@ -592,9 +584,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      super.refresh(gui, b);
-      b.setSelected(gui.gopts.get(GUIOptions.SHOWTABLE));
+    public boolean selected(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWTABLE);
     }
   },
 
@@ -607,9 +598,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      super.refresh(gui, b);
-      b.setSelected(gui.gopts.get(GUIOptions.SHOWEXPLORE));
+    public boolean selected(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEXPLORE);
     }
   },
 
@@ -621,9 +611,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      super.refresh(gui, b);
-      b.setSelected(gui.fullscreen);
+    public boolean selected(final GUI gui) {
+      return gui.fullscreen;
     }
   },
 
@@ -642,9 +631,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      super.refresh(gui, b);
-      b.setSelected(gui.gopts.get(GUIOptions.EXECRT));
+    public boolean selected(final GUI gui) {
+      return gui.gopts.get(GUIOptions.EXECRT);
     }
   },
 
@@ -679,9 +667,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      super.refresh(gui, b);
-      b.setSelected(gui.gopts.get(GUIOptions.FILTERRT));
+    public boolean selected(final GUI gui) {
+      return gui.gopts.get(GUIOptions.FILTERRT);
     }
   },
 
@@ -769,10 +756,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      final String tt = gui.notify.query(true);
-      b.setEnabled(tt != null);
-      b.setToolTipText(tt != null && tt.isEmpty() ? C_GOBACK.help : tt);
+    public boolean enabled(final GUI gui) {
+      return gui.notify.query(true) != null;
     }
   },
 
@@ -784,10 +769,8 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      final String tt = gui.notify.query(false);
-      b.setEnabled(tt != null);
-      b.setToolTipText(tt != null && tt.isEmpty() ? C_GOFORWARD.help : tt);
+    public boolean enabled(final GUI gui) {
+      return gui.notify.query(false) != null;
     }
   },
 
@@ -813,9 +796,9 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(!gui.gopts.get(GUIOptions.FILTERRT) &&
-          gui.context.data() != null && !gui.context.root());
+    public boolean enabled(final GUI gui) {
+      return !gui.gopts.get(GUIOptions.FILTERRT) &&
+          gui.context.data() != null && !gui.context.root();
     }
   },
 
@@ -832,12 +815,12 @@ public enum GUICommands implements GUICmd {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.context.data() != null && !gui.context.root());
+    public boolean enabled(final GUI gui) {
+      return gui.context.data() != null && !gui.context.root();
     }
   },
 
-  /** Displays the root node in the text view. */
+   /** Displays the root node in the text view. */
   C_HOME(GO_HOME, null, H_GO_HOME, true, false) {
     @Override
     public void execute(final GUI gui) {
@@ -864,7 +847,7 @@ public enum GUICommands implements GUICmd {
    * @param d requires a database to be opened
    * @param t indicates if this command has two states
    */
-  GUICommands(final String l, final String k, final String h, final boolean d, final boolean t) {
+  GUIMenuCmd(final String l, final String k, final String h, final boolean d, final boolean t) {
     label = l;
     key = k;
     help = BaseXLayout.addShortcut(h, k);
@@ -873,8 +856,13 @@ public enum GUICommands implements GUICmd {
   }
 
   @Override
-  public void refresh(final GUI gui, final AbstractButton b) {
-    b.setEnabled(!data || gui.context.data() != null);
+  public boolean enabled(final GUI gui) {
+    return !data || gui.context.data() != null;
+  }
+
+  @Override
+  public boolean selected(final GUI gui) {
+    return false;
   }
 
   @Override
@@ -887,7 +875,7 @@ public enum GUICommands implements GUICmd {
   public String label() { return label; }
 
   @Override
-  public Object key() { return key; }
+  public Object shortcut() { return key; }
 
   // STATIC METHODS ===========================================================
 

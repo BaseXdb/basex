@@ -58,7 +58,7 @@ public final class TextView extends View {
     label = new BaseXLabel(RESULT, true, false);
     label.setForeground(GRAY);
 
-    home = BaseXButton.command(GUICommands.C_HOME, gui);
+    home = BaseXButton.command(GUIMenuCmd.C_HOME, gui);
     home.setEnabled(false);
 
     text = new Editor(false, gui);

@@ -252,9 +252,12 @@ public final class DialogResources extends BaseXBack {
   }
 
   /** Delete command. */
-  final class DeleteCmd extends GUIBaseCmd {
+  final class DeleteCmd extends GUIPopupCmd {
+    /** Constructor. */
+    DeleteCmd() { super(DELETE + DOTS, BaseXKeys.DELETE); }
+
     @Override
-    public void execute(final GUI g) {
+    public void execute() {
       final TreeNode n = selection();
       if(n == null || !BaseXDialog.confirm(dialog.gui, DELETE_NODES)) return;
 
@@ -268,21 +271,19 @@ public final class DialogResources extends BaseXBack {
     }
 
     @Override
-    public String label() {
-      return DELETE + DOTS;
-    }
-
-    @Override
-    public boolean enabled() {
+    public boolean enabled(final GUI main) {
       final TreeNode n = selection();
       return n instanceof TreeLeaf ? !((TreeLeaf) n).abbr : n != null && !n.equals(root);
     }
   }
 
   /** Rename command. */
-  final class RenameCmd extends GUIBaseCmd {
+  final class RenameCmd extends GUIPopupCmd {
+    /** Constructor. */
+    RenameCmd() { super(RENAME + DOTS, BaseXKeys.RENAME); }
+
     @Override
-    public void execute(final GUI g) {
+    public void execute() {
       final TreeNode n = selection();
       if(n == null) return;
 
@@ -300,12 +301,7 @@ public final class DialogResources extends BaseXBack {
     }
 
     @Override
-    public String label() {
-      return RENAME + DOTS;
-    }
-
-    @Override
-    public boolean enabled() {
+    public boolean enabled(final GUI main) {
       final TreeNode n = selection();
       return n instanceof TreeLeaf ? !((TreeLeaf) n).abbr : n != null && !n.equals(root);
     }

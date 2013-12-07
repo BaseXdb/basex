@@ -39,7 +39,7 @@ public final class ExploreView extends View {
     label = new BaseXLabel(EXPLORER, true, false);
     label.setForeground(GRAY);
 
-    filter = BaseXButton.command(GUICommands.C_FILTER, gui);
+    filter = BaseXButton.command(GUIMenuCmd.C_FILTER, gui);
     filter.addKeyListener(this);
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);

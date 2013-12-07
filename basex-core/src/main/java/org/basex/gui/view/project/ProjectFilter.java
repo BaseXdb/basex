@@ -8,6 +8,7 @@ import java.io.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
+import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -24,27 +25,6 @@ import org.basex.util.list.*;
 final class ProjectFilter extends BaseXBack {
   /** Maximum number of filtered hits. */
   private static final int MAXHITS = 256;
-
-  /** Key adapter. */
-  final KeyAdapter keys = new KeyAdapter() {
-    @Override
-    public void keyPressed(final KeyEvent e) {
-      if(BaseXKeys.REFRESH.is(e)) {
-        reset();
-      } else if(BaseXKeys.COPY_PATH.is(e)) {
-        final Object[] vals = project.list.getSelectedValues();
-        if(vals.length == 1) BaseXLayout.copy(vals[0].toString());
-      }
-    }
-    @Override
-    public void keyTyped(final KeyEvent e) {
-      if(BaseXKeys.OPEN.is(e)) {
-        project.list.openExternal();
-      } else if(BaseXKeys.ENTER.is(e)) {
-        project.list.open();
-      }
-    }
-  };
 
   /** Files. */
   private final BaseXTextField files;
@@ -88,6 +68,14 @@ final class ProjectFilter extends BaseXBack {
         if(BaseXKeys.NEXTLINE.is(e) || BaseXKeys.PREVLINE.is(e) ||
            BaseXKeys.NEXTPAGE.is(e) || BaseXKeys.PREVPAGE.is(e)) {
           project.list.dispatchEvent(e);
+        } else {
+          for(final GUIPopupCmd cmd : project.list.commands) {
+            if(cmd == null) continue;
+            if(cmd.shortcut().is(e)) {
+              cmd.execute(view.gui);
+              break;
+            }
+          }
         }
       }
       @Override
@@ -95,8 +83,6 @@ final class ProjectFilter extends BaseXBack {
         refresh(false);
       }
     };
-    files.addKeyListener(keys);
-    contents.addKeyListener(keys);
     files.addKeyListener(refreshKeys);
     contents.addKeyListener(refreshKeys);
   }

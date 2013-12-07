@@ -57,8 +57,8 @@ public enum BaseXKeys {
   /** Paste.                 */ PASTE2(SHIFT, VK_INSERT, true),
   /** Select all.            */ SELECTALL(META, VK_A, true),
 
-  /** Delete backwards.      */ DELPREV(VK_BACK_SPACE),
-  /** Delete.                */ DELNEXT(VK_DELETE),
+  /** Delete backwards.      */ BACKSPACE(VK_BACK_SPACE),
+  /** Delete.                */ DELETE(VK_DELETE),
   /** Delete word backwards. */ DELPREVWORD(MAC ? ALT : META, VK_BACK_SPACE, true),
   /** Delete word.           */ DELNEXTWORD(MAC ? ALT : META, VK_DELETE, true),
   /** Delete line to begin.  */ DELLINESTART(META | (MAC ? 0 : SHIFT), VK_BACK_SPACE, true),
@@ -104,7 +104,7 @@ public enum BaseXKeys {
 
   /** Space key.             */ SPACE(VK_SPACE),
   /** Tab key.               */ TAB(VK_TAB),
-  /** Enter.                 */ ENTER(VK_ENTER),
+  /** Enter.                 */ ENTER(VK_ENTER, true),
   /** Shift Enter.           */ OPEN(SHIFT, VK_ENTER);
 
   /** Modifiers. */

@@ -19,27 +19,26 @@ import org.basex.gui.*;
 public final class BaseXPopup extends JPopupMenu {
   /** Reference to main window. */
   private final GUI gui;
-
-  /** Popup reference. */
-  private final GUICmd[] popup;
+  /** Popup commands. */
+  private final GUICommand[] commands;
 
   /**
    * Constructor.
    * @param comp component reference
-   * @param pop popup reference
+   * @param cmds popup reference
    */
-  public BaseXPopup(final BaseXPanel comp, final GUICmd... pop) {
-    this(comp, comp.gui, pop);
+  public BaseXPopup(final BaseXPanel comp, final GUICommand... cmds) {
+    this(comp, comp.gui, cmds);
   }
 
   /**
    * Constructor.
    * @param comp component reference
    * @param g gui reference
-   * @param pop popup reference
+   * @param cmds popup reference
    */
-  public BaseXPopup(final JComponent comp, final GUI g, final GUICmd... pop) {
-    popup = pop;
+  public BaseXPopup(final JComponent comp, final GUI g, final GUICommand... cmds) {
+    commands = cmds;
     gui = g;
 
     // both listeners must be implemented to support different platforms
@@ -57,12 +56,24 @@ public final class BaseXPopup extends JPopupMenu {
     comp.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        if(!gui.updating && CONTEXT.is(e)) show(e.getComponent(), 10, 10);
+        if(!gui.updating && CONTEXT.is(e)) {
+          show(e.getComponent(), 10, 10);
+        } else {
+          for(final GUICommand cmd : cmds) {
+            if(cmd instanceof GUIPopupCmd) {
+              final BaseXKeys sc = ((GUIPopupCmd) cmd).shortcut();
+              if(sc != null && sc.is(e)) {
+                cmd.execute(g);
+                break;
+              }
+            }
+          }
+        }
       }
     });
 
     final StringBuilder mnemCache = new StringBuilder();
-    for(final GUICmd cmd : pop) {
+    for(final GUICommand cmd : cmds) {
       if(cmd == null) {
         addSeparator();
       } else {
@@ -82,8 +93,12 @@ public final class BaseXPopup extends JPopupMenu {
 
   @Override
   public void show(final Component comp, final int x, final int y) {
-    for(int b = 0; b < popup.length; ++b) {
-      if(popup[b] != null) popup[b].refresh(gui, (AbstractButton) getComponent(b));
+    for(int b = 0; b < commands.length; ++b) {
+      if(commands[b] != null) {
+        final AbstractButton button = (AbstractButton) getComponent(b);
+        button.setEnabled(commands[b].enabled(gui));
+        button.setSelected(commands[b].selected(gui));
+      }
     }
     super.show(comp, x, y);
   }

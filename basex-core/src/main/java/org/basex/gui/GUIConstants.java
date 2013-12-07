@@ -1,7 +1,7 @@
 package org.basex.gui;
 
-import static org.basex.gui.GUIBaseCmd.*;
-import static org.basex.gui.GUICommands.*;
+import static org.basex.gui.GUIPopupCmd.*;
+import static org.basex.gui.GUIMenuCmd.*;
 
 import java.awt.*;
 
@@ -41,8 +41,8 @@ import org.basex.util.*;
  *    {@link Text#H_MAP}).
  *  <li> optionally add localized translations in the .lang files
  *    (e.g. {@code c_showmap} and {@code c_showmaptt})
- *  <li> add a corresponding command in the {@link GUICommands} class
- *   (e.g. {@link GUICommands#C_SHOWMAP})and add a reference in the
+ *  <li> add a corresponding command in the {@link GUIMenuCmd} class
+ *   (e.g. {@link GUIMenuCmd#C_SHOWMAP})and add a reference in the
  *   {@link #MENUITEMS} menu structure</li>
  * </ul>
  *
@@ -85,7 +85,7 @@ public final class GUIConstants {
   // TOOLBAR ==================================================================
 
   /** Toolbar entries, containing the button commands. */
-  static final GUICommands[] TOOLBAR = {
+  static final GUIMenuCmd[] TOOLBAR = {
     C_CREATE, C_OPEN_MANAGE, C_INFO, C_CLOSE, null,
     C_GOHOME, C_GOBACK, C_GOUP, C_GOFORWARD, null,
     C_SHOWEDITOR, C_SHOWRESULT, C_SHOWINFO, null, C_SHOWMAP, C_SHOWTREE,
@@ -101,9 +101,9 @@ public final class GUIConstants {
 
   /**
    * Two-dimensional menu entries, containing the menu item commands.
-   * {@link GUIBaseCmd#SEPARATOR} references serve as menu separators.
+   * {@link GUIPopupCmd#SEPARATOR} references serve as menu separators.
    */
-  static final GUICmd[][] MENUITEMS = { {
+  static final GUICommand[][] MENUITEMS = { {
     C_CREATE, C_OPEN_MANAGE, SEPARATOR,
     C_INFO, C_EXPORT, C_CLOSE, SEPARATOR,
     C_SERVER, Prop.MAC ? null : SEPARATOR,
@@ -129,9 +129,8 @@ public final class GUIConstants {
   }};
 
   /** Context menu entries. */
-  public static final GUICommands[] POPUP = {
-    C_GOBACK, C_FILTER, null, C_COPY, C_PASTE, C_DELETE, C_INSERT, C_EDIT, null,
-    C_COPYPATH
+  public static final GUIMenuCmd[] POPUP = {
+    C_GOBACK, C_FILTER, null, C_COPY, C_PASTE, C_DELETE, C_INSERT, C_EDIT, null, C_COPYPATH
   };
 
   // CURSORS ==================================================================

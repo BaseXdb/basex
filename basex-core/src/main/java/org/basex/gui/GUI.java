@@ -216,7 +216,7 @@ public final class GUI extends AGUI {
       }
     });
 
-    filter = BaseXButton.command(GUICommands.C_FILTER, this);
+    filter = BaseXButton.command(GUIMenuCmd.C_FILTER, this);
 
     b = new BaseXBack(new TableLayout(1, 3));
     b.add(go);
@@ -294,7 +294,7 @@ public final class GUI extends AGUI {
         cp.pwReader(READER);
         execute(false, cp.parse());
       } catch(final QueryException ex) {
-        if(!info.visible()) GUICommands.C_SHOWINFO.execute(this);
+        if(!info.visible()) GUIMenuCmd.C_SHOWINFO.execute(this);
         info.setInfo(Util.message(ex), null, false, true);
       }
     } else if(gopts.get(GUIOptions.SEARCHMODE) == 1 || in.startsWith("/")) {
@@ -419,7 +419,7 @@ public final class GUI extends AGUI {
       if(!ok && !interrupted) {
         // display error in info view
         if((!edit || inf.startsWith(BUGINFO)) && !info.visible()) {
-          GUICommands.C_SHOWINFO.execute(this);
+          GUIMenuCmd.C_SHOWINFO.execute(this);
         }
       } else {
         // get query result
@@ -464,7 +464,7 @@ public final class GUI extends AGUI {
 
           if(nodes == null) {
             // make text view visible
-            if(!text.visible() && ao.size() != 0) GUICommands.C_SHOWRESULT.execute(this);
+            if(!text.visible() && ao.size() != 0) GUIMenuCmd.C_SHOWRESULT.execute(this);
             // assign textual output if no node result was created
             text.setText(ao);
           }

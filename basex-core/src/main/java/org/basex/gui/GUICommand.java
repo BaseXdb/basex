@@ -1,19 +1,16 @@
 package org.basex.gui;
 
-import java.awt.*;
-
-import javax.swing.*;
-
 /**
  * This interface defines GUI command methods.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public interface GUICmd {
-  /** Shortcut string for meta key. */
-  String META = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ==
-      Event.META_MASK ? "meta" : "ctrl";
+public interface GUICommand {
+  /** Separator. */
+  GUICommand SEPARATOR = new GUIPopupCmd(null, null) {
+    @Override public void execute() { }
+  };
 
   /**
    * Executes the command.
@@ -22,14 +19,21 @@ public interface GUICmd {
   void execute(final GUI gui);
 
   /**
-   * Enables or disables the specified button, depending on the command properties.
+   * Checks if the command is currently enabled.
    * @param gui reference to the main window
-   * @param button button to be modified
+   * @return result of check
    */
-  void refresh(final GUI gui, final AbstractButton button);
+  boolean enabled(final GUI gui);
 
   /**
-   * Tests if this command includes a menu checkbox.
+   * Checks if the command is currently selected.
+   * @param gui reference to the main window
+   * @return result of check
+   */
+  boolean selected(final GUI gui);
+
+  /**
+   * Indicates if this is a command that can be turned on and off.
    * @return result of check
    */
   boolean toggle();
@@ -50,5 +54,5 @@ public interface GUICmd {
    * Returns the command shortcut.
    * @return command shortcut
    */
-  Object key();
+  Object shortcut();
 }

@@ -50,8 +50,8 @@ public final class GUIMenu extends JMenuBar {
       final StringBuilder mnemCache = new StringBuilder();
       for(int i = 0; i < MENUITEMS[b].length; ++i) {
         // add a separator
-        final GUICmd cmd = MENUITEMS[b][i];
-        if(cmd == GUIBaseCmd.SEPARATOR) {
+        final GUICommand cmd = MENUITEMS[b][i];
+        if(cmd == GUICommand.SEPARATOR) {
           menu.addSeparator();
         } else if(cmd != null) {
           // add a menu entry
@@ -75,7 +75,7 @@ public final class GUIMenu extends JMenuBar {
    * @param mnem assigned mnenomics
    * @return menu item
    */
-  public static JMenuItem newItem(final GUICmd cmd, final GUI gui, final StringBuilder mnem) {
+  public static JMenuItem newItem(final GUICommand cmd, final GUI gui, final StringBuilder mnem) {
     final String desc = cmd.label();
     final JMenuItem item = cmd.toggle() ? new JCheckBoxMenuItem(desc) : new JMenuItem(desc);
     item.addActionListener(new ActionListener() {
@@ -96,9 +96,10 @@ public final class GUIMenu extends JMenuBar {
     int c = 0;
     for(int b = 0; b < MENUBAR.length; ++b) {
       for(int i = 0; i < MENUITEMS[b].length; ++i) {
-        final GUICmd item = MENUITEMS[b][i];
-        if(item != GUIBaseCmd.SEPARATOR && item != null) {
-          item.refresh(gui, items[c++]);
+        final GUICommand item = MENUITEMS[b][i];
+        if(item != GUICommand.SEPARATOR && item != null) {
+          items[c].setEnabled(item.enabled(gui));
+          items[c++].setSelected(item.selected(gui));
         }
       }
     }

@@ -61,26 +61,6 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
     tree.setExpandsSelectedPaths(true);
     tree.setCellRenderer(renderer);
     tree.addTreeWillExpandListener(this);
-    tree.addKeyListener(new KeyAdapter() {
-      @Override public void keyPressed(final KeyEvent e) {
-        if(BaseXKeys.REFRESH.is(e)) {
-          new RefreshCmd().execute(gui);
-        } else if(BaseXKeys.DELNEXT.is(e)) {
-          new DeleteCmd().execute(gui);
-        } else if(BaseXKeys.NEWDIR.is(e)) {
-          new NewCmd().execute(gui);
-        } else if(BaseXKeys.COPY_PATH.is(e)) {
-          new CopyPathCmd().execute(gui);
-        }
-      }
-      @Override public void keyTyped(final KeyEvent e) {
-        if(BaseXKeys.OPEN.is(e)) {
-          new OpenExternalCmd().execute(gui);
-        } else if(BaseXKeys.ENTER.is(e)) {
-          new OpenCmd().execute(gui);
-        }
-      }
-    });
     tree.addMouseListener(new MouseAdapter() {
       @Override public void mousePressed(final MouseEvent e) {
         if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
@@ -102,7 +82,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
 
     // add popup
     new BaseXPopup(tree, gui, new OpenCmd(), new OpenExternalCmd(), null,
-        new DeleteCmd(), new RenameCmd(), new NewCmd(), null,
+        new DeleteCmd(), new RenameCmd(), new NewDirCmd(), null,
         new RefreshCmd(), new CopyPathCmd());
 
     // add scroll bar
@@ -321,20 +301,26 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
   // COMMANDS =====================================================================================
 
   /** Refresh command. */
-  final class RefreshCmd extends GUIBaseCmd {
-    @Override public void execute(final GUI main) {
+  final class RefreshCmd extends GUIPopupCmd {
+    /** Constructor. */
+    RefreshCmd() { super(REFRESH, BaseXKeys.REFRESH); }
+
+    @Override public void execute() {
       filter.reset();
-      if(enabled()) selectedNode().refresh();
+      selectedNode().refresh();
     }
-    @Override public boolean enabled() { return selectedNode() != null; }
-    @Override public String label() { return REFRESH; }
-    @Override public BaseXKeys key() { return BaseXKeys.REFRESH; }
+
+    @Override public boolean enabled(final GUI main) {
+      return selectedNode() != null;
+    }
   }
 
   /** New directory command. */
-  final class NewCmd extends GUIBaseCmd {
-    @Override public void execute(final GUI main) {
-      if(!enabled()) return;
+  final class NewDirCmd extends GUIPopupCmd {
+    /** Constructor. */
+    NewDirCmd() { super(NEW_DIR, BaseXKeys.NEWDIR); }
+
+    @Override public void execute() {
       ProjectNode parent = selectedNode();
       if(parent instanceof ProjectFile) parent = (ProjectDir) parent.getParent();
 
@@ -361,16 +347,15 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
         }
       }
     }
-    @Override public boolean enabled() { return selectedNode() != null; }
-    @Override public String label() { return NEW_DIR; }
-    @Override public BaseXKeys key() { return BaseXKeys.NEWDIR; }
+    @Override public boolean enabled(final GUI main) { return selectedNode() != null; }
   }
 
   /** Delete command. */
-  final class DeleteCmd extends GUIBaseCmd {
-    @Override public void execute(final GUI main) {
-      if(!enabled()) return;
+  final class DeleteCmd extends GUIPopupCmd {
+    /** Constructor. */
+    DeleteCmd() { super(DELETE + DOTS, BaseXKeys.DELETE); }
 
+    @Override public void execute() {
       final ProjectNode node = selectedNode();
       if(BaseXDialog.confirm(gui, Util.info(DELETE_FILE_X, node.file))) {
         final ProjectNode parent = (ProjectNode) node.getParent();
@@ -384,49 +369,52 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
         }
       }
     }
-    @Override public boolean enabled() {
+
+    @Override public boolean enabled(final GUI main) {
       final ProjectNode node = selectedNode();
       return node != null && !node.root();
     }
-    @Override public String label() { return DELETE + DOTS; }
-    @Override public BaseXKeys key() { return BaseXKeys.DELNEXT; }
   }
 
   /** Rename command. */
-  final class RenameCmd extends GUIBaseCmd {
-    @Override public void execute(final GUI main) {
-      if(!enabled()) return;
+  final class RenameCmd extends GUIPopupCmd {
+    /** Constructor. */
+    RenameCmd() { super(RENAME, BaseXKeys.RENAME); }
+
+    @Override public void execute() {
       tree.startEditingAtPath(selectedNode().path());
       filter.reset();
     }
-    @Override public boolean enabled() {
+
+    @Override public boolean enabled(final GUI main) {
       final ProjectNode node = selectedNode();
       return node != null && !node.root();
     }
-    @Override public String label() { return RENAME; }
-    @Override public BaseXKeys key() { return BaseXKeys.RENAME; }
   }
 
   /** Change directory command. */
-  final class OpenCmd extends GUIBaseCmd {
-    @Override public void execute(final GUI main) {
-      if(!enabled()) return;
+  final class OpenCmd extends GUIPopupCmd {
+    /** Constructor. */
+    OpenCmd() { super(OPEN, BaseXKeys.ENTER); }
+
+    @Override public void execute() {
       for(final ProjectNode node : selectedNodes()) open(node.file, null);
     }
-    @Override public boolean enabled() {
+
+    @Override public boolean enabled(final GUI main) {
       for(final ProjectNode node : selectedNodes()) {
         if(node.file.isDir()) return false;
       }
       return true;
     }
-    @Override public String label() { return OPEN; }
-    @Override public BaseXKeys key() { return BaseXKeys.ENTER; }
   }
 
   /** Change directory command. */
-  final class OpenExternalCmd extends GUIBaseCmd {
-    @Override public void execute(final GUI main) {
-      if(!enabled()) return;
+  final class OpenExternalCmd extends GUIPopupCmd {
+    /** Constructor. */
+    OpenExternalCmd() { super(OPEN_EXTERNALLY, BaseXKeys.OPEN); }
+
+    @Override public void execute() {
       for(final ProjectNode node : selectedNodes()) {
         try {
           node.file.open();
@@ -435,21 +423,26 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
         }
       }
     }
-    @Override public boolean enabled() {
+
+    @Override public boolean enabled(final GUI main) {
       for(final ProjectNode node : selectedNodes()) {
         if(node.file.isDir()) return false;
       }
       return true;
     }
-    @Override public String label() { return OPEN_EXTERNALLY; }
-    @Override public BaseXKeys key() { return BaseXKeys.OPEN; }
   }
 
   /** Copy path command. */
-  final class CopyPathCmd extends GUIBaseCmd {
-    @Override public void execute(final GUI main) { BaseXLayout.copy(selectedNode().file.path()); }
-    @Override public boolean enabled() { return selectedNode() != null; }
-    @Override public String label() { return COPY_PATH; }
-    @Override public BaseXKeys key() { return BaseXKeys.COPY_PATH; }
+  final class CopyPathCmd extends GUIPopupCmd {
+    /** Constructor. */
+    CopyPathCmd() { super(COPY_PATH, BaseXKeys.COPY_PATH); }
+
+    @Override public void execute() {
+      BaseXLayout.copy(selectedNode().file.path());
+    }
+
+    @Override public boolean enabled(final GUI main) {
+      return selectedNode() != null;
+    }
   }
 }
