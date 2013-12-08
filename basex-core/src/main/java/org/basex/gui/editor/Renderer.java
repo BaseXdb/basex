@@ -265,9 +265,9 @@ final class Renderer extends BaseXBack {
   }
 
   /**
-   * Calculates the text height.
+   * Updates the scroll bar.
    */
-  void calc() {
+  void updateScrollbar() {
     width = getWidth() - (offset >> 1);
     height = Integer.MAX_VALUE;
     final Graphics g = getGraphics();

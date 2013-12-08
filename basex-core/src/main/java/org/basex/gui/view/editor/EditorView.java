@@ -509,7 +509,7 @@ public final class EditorView extends View {
       String input = in.length == 0 ? "()" : string(in);
       boolean main = !QueryProcessor.isLibrary(input);
       final boolean exec = action == Action.EXECUTE || gui.gopts.get(GUIOptions.EXECRT);
-      if(exec) {
+      if(exec && !main) {
         final EditorArea ea = execEditor();
         if(ea != null) {
           file = ea.file;
@@ -636,6 +636,10 @@ public final class EditorView extends View {
     final EditorArea ea = edit != null ? edit : getEditor();
     if(!confirm(ea)) return false;
 
+    // remove reference to last executed file
+    if(execFile != null && ea.file.path().equals(execFile.path())) {
+      execFile = null;
+    }
     tabs.remove(ea);
     final int t = tabs.getTabCount();
     final int i = tabs.getSelectedIndex();

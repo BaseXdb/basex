@@ -10,7 +10,7 @@ import org.basex.gui.layout.*;
  */
 public abstract class GUIPopupCmd implements GUICommand {
   /** Shortcut. */
-  private BaseXKeys shortcut;
+  private BaseXKeys[] shortcut;
   /** Label. */
   private String label;
 
@@ -19,9 +19,9 @@ public abstract class GUIPopupCmd implements GUICommand {
    * @param lbl label
    * @param sc shortcut
    */
-  protected GUIPopupCmd(final String lbl, final BaseXKeys sc) {
+  protected GUIPopupCmd(final String lbl, final BaseXKeys... sc) {
     label = lbl;
-    shortcut = sc;
+    shortcut = sc.length == 0 ? null : sc;
   }
 
   /**
@@ -50,7 +50,7 @@ public abstract class GUIPopupCmd implements GUICommand {
   }
 
   @Override
-  public final BaseXKeys shortcut() {
+  public final BaseXKeys[] shortcuts() {
     return shortcut;
   }
 

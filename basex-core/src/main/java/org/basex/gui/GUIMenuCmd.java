@@ -875,7 +875,7 @@ public enum GUIMenuCmd implements GUICommand {
   public String label() { return label; }
 
   @Override
-  public Object shortcut() { return key; }
+  public Object shortcuts() { return key; }
 
   // STATIC METHODS ===========================================================
 

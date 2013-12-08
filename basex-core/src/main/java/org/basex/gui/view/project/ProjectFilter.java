@@ -71,9 +71,12 @@ final class ProjectFilter extends BaseXBack {
         } else {
           for(final GUIPopupCmd cmd : project.list.commands) {
             if(cmd == null) continue;
-            if(cmd.shortcut().is(e)) {
-              cmd.execute(view.gui);
-              break;
+            for(final BaseXKeys sc : cmd.shortcuts()) {
+              if(sc.is(e)) {
+                cmd.execute(view.gui);
+                e.consume();
+                return;
+              }
             }
           }
         }

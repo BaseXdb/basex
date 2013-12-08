@@ -109,10 +109,17 @@ public final class BaseXLayout {
    * @return keystroke
    */
   public static KeyStroke keyStroke(final GUICommand cmd) {
-    final Object sc = cmd.shortcut();
+    final Object sc = cmd.shortcuts();
     if(sc == null) return null;
 
-    final String scut = sc instanceof BaseXKeys ? ((BaseXKeys) sc).shortCut() : Util.info(sc, META);
+    final String scut;
+    if(sc instanceof BaseXKeys[]) {
+      final BaseXKeys[] scs = (BaseXKeys[]) sc;
+      if(scs.length == 0) return null;
+      scut = scs[0].shortCut();
+    } else {
+      scut = Util.info(sc, META);
+    }
     final KeyStroke ks = KeyStroke.getKeyStroke(scut);
     if(ks == null) Util.errln("Could not assign shortcut: " + sc + " / " + scut);
     return ks;

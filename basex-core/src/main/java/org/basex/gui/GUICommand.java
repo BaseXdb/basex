@@ -8,7 +8,7 @@ package org.basex.gui;
  */
 public interface GUICommand {
   /** Separator. */
-  GUICommand SEPARATOR = new GUIPopupCmd(null, null) {
+  GUICommand SEPARATOR = new GUIPopupCmd(null) {
     @Override public void execute() { }
   };
 
@@ -51,8 +51,8 @@ public interface GUICommand {
   String help();
 
   /**
-   * Returns the command shortcut.
+   * Returns the command shortcuts.
    * @return command shortcut
    */
-  Object shortcut();
+  Object shortcuts();
 }

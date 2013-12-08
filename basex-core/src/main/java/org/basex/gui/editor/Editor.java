@@ -221,7 +221,7 @@ public class Editor extends BaseXPanel {
   public final void setCaret(final int p) {
     text.setCaret(p);
     text.noSelect();
-    showCursor(1);
+    cursorCode.invokeLater(1);
     cursor(true);
   }
 
@@ -241,7 +241,7 @@ public class Editor extends BaseXPanel {
       @Override
       public void run() {
         text.setCaret(text.size());
-        showCursor(2);
+        cursorCode.eval(2);
       }
     });
   }
@@ -302,7 +302,7 @@ public class Editor extends BaseXPanel {
   public void comment() {
     final int pc = text.getCaret();
     if(text.comment(rend.getSyntax())) hist.store(text.text(), pc, text.getCaret());
-    calcCode.invokeLater(true);
+    scrollCode.invokeLater(true);
   }
 
   /**
@@ -311,7 +311,7 @@ public class Editor extends BaseXPanel {
   public void format() {
     final int pc = text.getCaret();
     if(text.format(rend.getSyntax())) hist.store(text.text(), pc, text.getCaret());
-    calcCode.invokeLater(true);
+    scrollCode.invokeLater(true);
   }
 
   @Override
@@ -489,32 +489,8 @@ public class Editor extends BaseXPanel {
    * @param e key event
    * @return {@code true} if special key was processed
    */
-  private boolean searchKey(final KeyEvent e) {
-    if(search == null) return false;
-
-    if(ESCAPE.is(e)) {
-      search.deactivate(true);
-    } else if(FIND.is(e)) {
-      search.activate(text.copy(), true);
-    } else if(FINDNEXT.is(e) || FINDNEXT2.is(e)) {
-      find(true);
-    } else if(FINDPREV.is(e) || FINDPREV2.is(e)) {
-      find(false);
-    } else {
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Invokes special keys.
-   * @param e key event
-   * @return {@code true} if special key was processed
-   */
   private boolean specialKey(final KeyEvent e) {
-    if(GOTOLINE.is(e)) {
-      gotoLine();
-    } else if(PREVTAB.is(e)) {
+    if(PREVTAB.is(e)) {
       gui.editor.tab(false);
     } else if(NEXTTAB.is(e)) {
       gui.editor.tab(true);
@@ -529,8 +505,13 @@ public class Editor extends BaseXPanel {
 
   @Override
   public void keyPressed(final KeyEvent e) {
+    if(search != null && ESCAPE.is(e)) {
+      search.deactivate(true);
+      return;
+    }
+
     // ignore modifier keys
-    if(searchKey(e) || specialKey(e) || modifier(e)) return;
+    if(specialKey(e) || modifier(e)) return;
 
     // re-animate cursor
     cursor(true);
@@ -545,20 +526,11 @@ public class Editor extends BaseXPanel {
       scroll.pos(scroll.pos() - fh);
       return;
     }
-    if(COPY1.is(e) || COPY2.is(e)) {
-      copy();
-      return;
-    }
 
     // set cursor position and reset last column
     final int pc = text.getCaret();
     text.pos(pc);
     if(!PREVLINE.is(e) && !NEXTLINE.is(e)) lastCol = -1;
-
-    if(SELECTALL.is(e)) {
-      selectAll();
-      return;
-    }
 
     // necessary on Macs as the shift button is pressed for REDO
     final boolean marking = e.isShiftDown() &&
@@ -612,27 +584,7 @@ public class Editor extends BaseXPanel {
       text.finishSelect();
     } else if(hist.active()) {
       // edit operations...
-      if(CUT1.is(e) || CUT2.is(e)) {
-        if(copy()) text.delete();
-      } else if(PASTE1.is(e) || PASTE2.is(e)) {
-        final String clip = clip();
-        if(clip != null) {
-          if(text.selected()) text.delete();
-          text.add(clip);
-        }
-      } else if(UNDOSTEP.is(e)) {
-        final byte[] t = hist.prev();
-        if(t != null) {
-          text.text(t);
-          text.pos(hist.cursor());
-        }
-      } else if(REDOSTEP.is(e)) {
-        final byte[] t = hist.next();
-        if(t != null) {
-          text.text(t);
-          text.pos(hist.cursor());
-        }
-      } else if(COMPLETE.is(e)) {
+      if(COMPLETE.is(e)) {
         text.complete();
       } else if(DELLINE.is(e)) {
         text.deleteLine();
@@ -676,19 +628,19 @@ public class Editor extends BaseXPanel {
     text.setCaret();
     final byte[] tmp = text.text();
     if(txt == tmp) {
-      showCursor(down ? 2 : 0);
+      cursorCode.invokeLater(down ? 2 : 0);
     } else {
       hist.store(tmp, pc, text.getCaret());
-      calcCode.invokeLater(down);
+      scrollCode.invokeLater(down);
     }
   }
 
   /** Thread counter. */
-  private final GUICode calcCode = new GUICode() {
+  private final GUICode scrollCode = new GUICode() {
     @Override
     public void eval(final Object arg) {
-      rend.calc();
-      showCursor((Boolean) arg ? 2 : 0);
+      rend.updateScrollbar();
+      cursorCode.eval((Boolean) arg ? 2 : 0);
     }
   };
 
@@ -707,14 +659,6 @@ public class Editor extends BaseXPanel {
       }
     }
   };
-
-  /**
-   * Displays the currently edited text area.
-   * @param align vertical alignment
-   */
-  final void showCursor(final int align) {
-    cursorCode.invokeLater(align);
-  }
 
   /**
    * Moves the cursor down. The current column position is remembered in
@@ -780,7 +724,7 @@ public class Editor extends BaseXPanel {
     if(move != 0) text.setCaret(Math.min(text.size(), ps + move));
 
     // adjust text height
-    calcCode.invokeLater(true);
+    scrollCode.invokeLater(true);
     e.consume();
   }
 
@@ -828,7 +772,7 @@ public class Editor extends BaseXPanel {
   void finish(final int old) {
     text.setCaret();
     if(old != -1) hist.store(text.text(), old, text.getCaret());
-    calcCode.invokeLater(true);
+    scrollCode.invokeLater(true);
     release(Action.CHECK);
   }
 
@@ -860,7 +804,7 @@ public class Editor extends BaseXPanel {
   private final GUICode resizeCode = new GUICode() {
     @Override
     public void eval(final Object arg) {
-      rend.calc();
+      rend.updateScrollbar();
       // update scrollbar to display value within valid range
       scroll.pos(scroll.pos());
       rend.repaint();
@@ -911,11 +855,10 @@ public class Editor extends BaseXPanel {
   /** Cut command. */
   class CutCmd extends GUIPopupCmd {
     /** Constructor. */
-    CutCmd() { super(Text.CUT, CUT1); }
+    CutCmd() { super(Text.CUT, CUT1, CUT2); }
 
     @Override
     public void execute() {
-      if(!hist.active()) return;
       final int tc = text.getCaret();
       text.pos(tc);
       if(!copy()) return;
@@ -924,13 +867,13 @@ public class Editor extends BaseXPanel {
       finish(tc);
     }
     @Override
-    public boolean enabled(final GUI main) { return text.selected(); }
+    public boolean enabled(final GUI main) { return hist.active() && text.selected(); }
   }
 
   /** Copy command. */
   class CopyCmd extends GUIPopupCmd {
     /** Constructor. */
-    CopyCmd() { super(Text.COPY, COPY1); }
+    CopyCmd() { super(Text.COPY, COPY1, COPY2); }
 
     @Override
     public void execute() { copy(); }
@@ -941,11 +884,10 @@ public class Editor extends BaseXPanel {
   /** Paste command. */
   class PasteCmd extends GUIPopupCmd {
     /** Constructor. */
-    PasteCmd() { super(Text.PASTE, PASTE1); }
+    PasteCmd() { super(Text.PASTE, PASTE1, PASTE2); }
 
     @Override
     public void execute() {
-      if(!hist.active()) return;
       final int tc = text.getCaret();
       text.pos(tc);
       final String clip = clip();
@@ -955,7 +897,7 @@ public class Editor extends BaseXPanel {
       finish(tc);
     }
     @Override
-    public boolean enabled(final GUI main) { return clip() != null; }
+    public boolean enabled(final GUI main) { return hist.active() && clip() != null; }
   }
 
   /** Delete command. */
@@ -965,14 +907,13 @@ public class Editor extends BaseXPanel {
 
     @Override
     public void execute() {
-      if(!hist.active()) return;
       final int tc = text.getCaret();
       text.pos(tc);
       text.delete();
       finish(tc);
     }
     @Override
-    public boolean enabled(final GUI main) { return text.selected(); }
+    public boolean enabled(final GUI main) { return hist.active() && text.selected(); }
   }
 
   /** Select all command. */
@@ -998,23 +939,23 @@ public class Editor extends BaseXPanel {
   /** Find next hit. */
   class FindNextCmd extends GUIPopupCmd {
     /** Constructor. */
-    FindNextCmd() { super(Text.FIND_NEXT, FINDNEXT); }
+    FindNextCmd() { super(Text.FIND_NEXT, FINDNEXT, FINDNEXT2); }
 
     @Override
     public void execute() { find(true); }
     @Override
-    public boolean enabled(final GUI main) { return search != null && search.isVisible(); }
+    public boolean enabled(final GUI main) { return search != null; }
   }
 
   /** Find previous hit. */
   class FindPrevCmd extends GUIPopupCmd {
     /** Constructor. */
-    FindPrevCmd() { super(Text.FIND_PREVIOUS, FINDPREV); }
+    FindPrevCmd() { super(Text.FIND_PREVIOUS, FINDPREV, FINDPREV2); }
 
     @Override
     public void execute() { find(true); }
     @Override
-    public boolean enabled(final GUI main) { return search != null && search.isVisible(); }
+    public boolean enabled(final GUI main) { return search != null; }
   }
 
   /**

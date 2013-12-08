@@ -34,7 +34,7 @@ final class ViewMover extends BaseXPanel {
     setCursor(GUIConstants.CURSORMOVE);
     refreshLayout();
 
-    new BaseXPopup(this, new GUIPopupCmd(Text.CLOSE, null) {
+    new BaseXPopup(this, new GUIPopupCmd(Text.CLOSE) {
       @Override
       public void execute() { ((ViewPanel) getParent()).delete(); }
     });
