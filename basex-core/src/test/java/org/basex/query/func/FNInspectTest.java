@@ -29,12 +29,12 @@ public final class FNInspectTest extends AdvancedQueryTest {
     query(func + "/return/@type/data()", "item()");
     query(func + "/return/@occurrence/data()", "*");
 
-    func = query(_INSPECT_FUNCTION.args(" function($a as xs:string) as item() { $a }"));
+    func = query(_INSPECT_FUNCTION.args(" function($a as xs:int) as xs:integer { $a + 1 }"));
     query(func + "/@name/data()", "");
     query(func + "/@uri/data()", "");
     query(func + "/argument/@name/data()", "");
-    query(func + "/argument/@type/data()", "xs:string");
-    query(func + "/return/@type/data()", "item()");
+    query(func + "/argument/@type/data()", "xs:int");
+    query(func + "/return/@type/data()", "xs:integer");
     query(func + "/return/@occurrence/data()", "");
 
     func = query("declare %private function Q{U}f($v as xs:int) as xs:integer {$v};" +

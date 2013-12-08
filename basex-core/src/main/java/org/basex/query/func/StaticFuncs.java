@@ -209,7 +209,12 @@ public final class StaticFuncs extends ExprInfo {
 
   @Override
   public void plan(final FElem plan) {
-    if(!funcs.isEmpty()) addPlan(plan, planElem(), funcs());
+    if(!funcs.isEmpty()) {
+      final FElem el = planElem();
+      plan.add(el);
+      for(final StaticFunc f : funcs())
+        if(f != null && f.compiled()) f.plan(el);
+    }
   }
 
   /**
@@ -228,7 +233,9 @@ public final class StaticFuncs extends ExprInfo {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     for(final FuncCache fc : funcs.values()) {
-      sb.append(fc.func.toString()).append(Text.NL);
+      if(fc.func != null && fc.func.compiled()) {
+        sb.append(fc.func.toString()).append(Text.NL);
+      }
     }
     return sb.toString();
   }

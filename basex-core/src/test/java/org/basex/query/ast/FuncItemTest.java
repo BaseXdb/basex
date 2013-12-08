@@ -77,9 +77,9 @@ public final class FuncItemTest extends QueryPlanTest {
   @Test
   public void compStatUnusedTest() {
     check("declare function local:foo() { abs(?) };" +
-        "function-lookup(xs:QName('local:foo'), 0)()(-42)",
+        "function-lookup(xs:QName(('local:foo')[random:double() < 1]), 0)()(-42)",
         "42",
-        "exists(//" + Util.className(PartFunc.class) + ')'
+        "empty(//" + Util.className(StaticFuncs.class) + "/*)"
     );
   }
 

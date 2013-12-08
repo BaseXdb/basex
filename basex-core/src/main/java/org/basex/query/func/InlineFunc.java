@@ -143,7 +143,9 @@ public final class InlineFunc extends Single implements Scope {
 
   @Override
   public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
-    type = FuncType.get(ann, args, ret).seqType();
+    final SeqType r = expr.type();
+    final SeqType retType = ret == null || r.instanceOf(ret) ? r : ret;
+    type = FuncType.get(ann, args, retType).seqType();
     size = 1;
 
     final int fp = scope.enter(ctx);
@@ -200,8 +202,8 @@ public final class InlineFunc extends Single implements Scope {
 
   @Override
   public FuncItem item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final FuncType ft = FuncType.get(ann, args, ret);
-    final boolean c = ft.type != null && !expr.type().instanceOf(ft.type);
+    final FuncType ft = (FuncType) type().type;
+    final boolean c = ret != null && !expr.type().instanceOf(ret);
 
     // collect closure
     final Map<Var, Value> clos = new HashMap<Var, Value>();
