@@ -166,8 +166,8 @@ public final class DialogManage extends BaseXDialog {
 
     } else if(cmp == restore) {
       // show warning if existing database would be overwritten
-      if(!gui.context.globalopts.dbexists(db) ||
-          BaseXDialog.confirm(gui, OVERWRITE_DB_QUESTION)) cmds.add(new Restore(db));
+      if(!gui.context.globalopts.dbexists(db) || BaseXDialog.confirm(gui, OVERWRITE_DB_QUESTION))
+        cmds.add(new Restore(backups.getValue()));
 
     } else if(cmp == backups) {
       // don't reset the combo box after selecting an item
