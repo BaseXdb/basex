@@ -30,7 +30,7 @@ public final class Var extends ExprInfo {
   public SeqType declType;
 
   /** Stack slot number. */
-  public int slot = -1;
+  int slot = -1;
   /** Expected result size. */
   public long size = -1;
 
