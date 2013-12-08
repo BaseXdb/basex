@@ -16,7 +16,7 @@ import java.util.List;
 import javax.swing.*;
 
 import org.basex.gui.*;
-import org.basex.gui.editor.*;
+import org.basex.gui.text.*;
 import org.basex.util.*;
 
 /**
@@ -211,13 +211,13 @@ public final class BaseXLayout {
           if(s instanceof BaseXCombo && ((JComboBox) s).isPopupVisible()) return;
 
           // do not key close dialog of button or editor is focused
-          if(ENTER.is(e) && !(s instanceof BaseXButton || s instanceof Editor)) {
+          if(ENTER.is(e) && !(s instanceof BaseXButton || s instanceof TextPanel)) {
             d.close();
           } else if(ESCAPE.is(e)) {
             // do not cancel dialog if search bar is opened
             boolean close = true;
-            if(s instanceof Editor) {
-              final SearchBar bar = ((Editor) s).getSearch();
+            if(s instanceof TextPanel) {
+              final SearchBar bar = ((TextPanel) s).getSearch();
               close = bar == null || !bar.deactivate(true);
             }
             if(close) d.cancel();

@@ -12,8 +12,8 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.*;
 import org.basex.gui.view.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -35,7 +35,7 @@ public final class InfoView extends View implements LinkListener {
   /** Timer label. */
   private final BaseXLabel timer;
   /** Text Area. */
-  private final Editor area;
+  private final TextPanel area;
 
   /** Query statistics. */
   private IntList stat = new IntList(4);
@@ -70,7 +70,7 @@ public final class InfoView extends View implements LinkListener {
     timer = new BaseXLabel(" ", true, false);
     timer.setForeground(GUIConstants.DGRAY);
 
-    area = new Editor(false, gui);
+    area = new TextPanel(false, gui);
     area.setLinkListener(this);
     editor = new SearchEditor(gui, area);
 

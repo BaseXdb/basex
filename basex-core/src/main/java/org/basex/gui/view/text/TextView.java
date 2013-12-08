@@ -15,9 +15,9 @@ import org.basex.core.parse.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
+import org.basex.gui.text.*;
 import org.basex.gui.view.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
@@ -26,7 +26,7 @@ import org.basex.query.*;
 import org.basex.util.*;
 
 /**
- * This class offers a fast text view, using the {@link Editor} class.
+ * This class offers a fast text view, using the {@link TextPanel} class.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
@@ -40,7 +40,7 @@ public final class TextView extends View {
   /** Home button. */
   private final AbstractButton home;
   /** Text Area. */
-  private final Editor text;
+  private final TextPanel text;
 
   /** Result command. */
   private Command cmd;
@@ -61,7 +61,7 @@ public final class TextView extends View {
     home = BaseXButton.command(GUIMenuCmd.C_HOME, gui);
     home.setEnabled(false);
 
-    text = new Editor(false, gui);
+    text = new TextPanel(false, gui);
     text.setSyntax(new SyntaxXML());
     search = new SearchEditor(gui, text);
 

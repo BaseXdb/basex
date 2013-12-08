@@ -11,8 +11,8 @@ import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.gui.*;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -34,7 +34,7 @@ final class DialogJsonParser extends DialogParser {
   /** Options. */
   private final JsonParserOptions jopts;
   /** JSON example. */
-  private final Editor example;
+  private final TextPanel example;
   /** JSON: encoding. */
   private final BaseXCombo encoding;
   /** JSON: format. */
@@ -96,7 +96,7 @@ final class DialogJsonParser extends DialogParser {
     pp.add(p);
     add(pp, BorderLayout.WEST);
 
-    example = new Editor(false, d);
+    example = new TextPanel(false, d);
     add(example, BorderLayout.CENTER);
 
     action(true);

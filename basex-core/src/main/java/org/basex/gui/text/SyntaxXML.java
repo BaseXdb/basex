@@ -1,4 +1,4 @@
-package org.basex.gui.editor;
+package org.basex.gui.text;
 
 import static org.basex.data.DataText.*;
 import java.awt.*;
@@ -31,8 +31,8 @@ public final class SyntaxXML extends Syntax {
   }
 
   @Override
-  public Color getColor(final EditorText text) {
-    final int ch = text.curr();
+  public Color getColor(final TextIterator iter) {
+    final int ch = iter.curr();
     if(comment > 0) return comment(ch);
     if(pi > 0) return pi(ch);
 

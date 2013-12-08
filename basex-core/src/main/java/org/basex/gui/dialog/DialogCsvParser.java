@@ -11,8 +11,8 @@ import org.basex.build.CsvOptions.CsvSep;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.gui.*;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -30,7 +30,7 @@ final class DialogCsvParser extends DialogParser {
   /** Options. */
   private final CsvParserOptions copts;
   /** JSON example. */
-  private final Editor example;
+  private final TextPanel example;
   /** CSV: encoding. */
   private final BaseXCombo encoding;
   /** CSV: Use header. */
@@ -106,7 +106,7 @@ final class DialogCsvParser extends DialogParser {
 
     add(pp, BorderLayout.WEST);
 
-    example = new Editor(false, d);
+    example = new TextPanel(false, d);
 
     add(example, BorderLayout.CENTER);
     action(true);

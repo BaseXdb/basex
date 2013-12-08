@@ -9,8 +9,8 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -35,7 +35,7 @@ public final class DialogEdit extends BaseXDialog {
   /** Text area. */
   private BaseXTextField input2;
   /** Text area. */
-  private Editor input3;
+  private TextPanel input3;
   /** Old content. */
   private String old1;
   /** Old content. */
@@ -86,7 +86,7 @@ public final class DialogEdit extends BaseXDialog {
       b.add(input2, BorderLayout.CENTER);
     }
     if(old3 != null) {
-      input3 = new Editor(true, this, old3);
+      input3 = new TextPanel(true, this, old3);
       input3.addKeyListener(keys);
       input3.setPreferredSize(new Dimension(500, 350));
       b.add(new SearchEditor(main, input3), BorderLayout.CENTER);

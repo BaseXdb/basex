@@ -11,8 +11,8 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.gui.*;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.*;
 import org.basex.index.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -55,7 +55,7 @@ public final class DialogProps extends BaseXDialog {
   /** Add panel. */
   final DialogAdd add;
   /** Index information. */
-  private final Editor[] infos = new Editor[LABELS.length];
+  private final TextPanel[] infos = new TextPanel[LABELS.length];
 
   /** Index labels. */
   private final BaseXLabel[] labels = new BaseXLabel[LABELS.length];
@@ -88,7 +88,7 @@ public final class DialogProps extends BaseXDialog {
     for(int i = 0; i < LABELS.length; ++i) {
       labels[i] = new BaseXLabel(LABELS[i]).large();
       panels[i] = new BaseXBack(new BorderLayout(0, 4));
-      infos[i] = new Editor(false, this, Token.token(PLEASE_WAIT_D));
+      infos[i] = new TextPanel(false, this, Token.token(PLEASE_WAIT_D));
       BaseXLayout.setHeight(infos[i], 200);
       if(i != 1) {
         indxs[i] = new BaseXButton(" ", this);
@@ -127,7 +127,7 @@ public final class DialogProps extends BaseXDialog {
       info.bold().add(NL + NAMESPACES + NL).norm().add(data.nspaces.info());
     }
 
-    final Editor text = new Editor(false, this, info.finish());
+    final TextPanel text = new TextPanel(false, this, info.finish());
     text.setFont(f);
     BaseXLayout.setHeight(text, 200);
     tabGeneral.add(new SearchEditor(main, text), BorderLayout.CENTER);

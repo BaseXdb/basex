@@ -10,18 +10,18 @@ import javax.swing.*;
 
 import org.basex.core.*;
 import org.basex.gui.*;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.*;
 import org.basex.io.*;
 import org.basex.util.*;
 
 /**
- * This class extends the text editor by XQuery features.
+ * This class extends the text panel by editor features.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class EditorArea extends Editor {
+public final class EditorArea extends TextPanel {
   /** File label. */
   final BaseXLabel label;
   /** File in tab. */
@@ -103,18 +103,18 @@ public final class EditorArea extends Editor {
 
   @Override
   public void keyPressed(final KeyEvent e) {
-    final byte[] t = text.text();
+    final byte[] txt = text.text();
     super.keyPressed(e);
 
-    if(t != text.text()) resetError();
+    if(txt != text.text()) resetError();
     view.posCode.invokeLater();
   }
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    final byte[] t = text.text();
+    final byte[] txt = text.text();
     super.keyTyped(e);
-    if(t != text.text()) resetError();
+    if(txt != text.text()) resetError();
   }
 
   @Override

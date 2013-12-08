@@ -7,8 +7,8 @@ import java.awt.*;
 import javax.swing.*;
 
 import org.basex.gui.*;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.*;
 import org.basex.util.*;
 
 /**
@@ -19,7 +19,7 @@ import org.basex.util.*;
  */
 public class DialogMem extends BaseXDialog {
   /** Info text. */
-  private final Editor text;
+  private final TextPanel text;
 
   /**
    * Default constructor.
@@ -29,7 +29,7 @@ public class DialogMem extends BaseXDialog {
     super(main, USED_MEM, false);
     panel.setLayout(new BorderLayout());
 
-    text = new Editor(false, this, Token.token(info()));
+    text = new TextPanel(false, this, Token.token(info()));
     text.setFont(panel.getFont());
     set(text, BorderLayout.CENTER);
 

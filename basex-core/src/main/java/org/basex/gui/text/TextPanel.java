@@ -1,4 +1,4 @@
-package org.basex.gui.editor;
+package org.basex.gui.text;
 
 import static org.basex.gui.layout.BaseXKeys.*;
 import static org.basex.util.Token.*;
@@ -21,18 +21,17 @@ import org.basex.io.*;
 import org.basex.util.*;
 
 /**
- * This class provides a text viewer and editor, using the
- * {@link Renderer} class to render the text.
+ * Renders and provides edit capabilities for text.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public class Editor extends BaseXPanel {
+public class TextPanel extends BaseXPanel {
   /** Delay for highlighting an error. */
   private static final int ERROR_DELAY = 500;
 
   /** Search direction. */
-  public enum SearchDir {
+  enum SearchDir {
     /** Current hit. */
     CURRENT,
     /** Next hit. */
@@ -52,14 +51,14 @@ public class Editor extends BaseXPanel {
   }
 
   /** Text array to be written. */
-  protected final transient EditorText text = new EditorText(EMPTY);
+  protected final transient TextEditor text = new TextEditor(EMPTY);
   /** Undo history. */
   public final History hist;
   /** Search bar. */
   public SearchBar search;
 
   /** Renderer reference. */
-  private final Renderer rend;
+  private final TextRenderer rend;
   /** Scrollbar reference. */
   private final BaseXScrollBar scroll;
   /** Editable flag. */
@@ -72,7 +71,7 @@ public class Editor extends BaseXPanel {
    * @param edit editable flag
    * @param win parent window
    */
-  public Editor(final boolean edit, final Window win) {
+  public TextPanel(final boolean edit, final Window win) {
     this(edit, win, EMPTY);
   }
 
@@ -82,7 +81,7 @@ public class Editor extends BaseXPanel {
    * @param win parent window
    * @param txt initial text
    */
-  public Editor(final boolean edit, final Window win, final byte[] txt) {
+  public TextPanel(final boolean edit, final Window win, final byte[] txt) {
     super(win);
     setFocusable(true);
     setFocusTraversalKeysEnabled(!edit);
@@ -110,7 +109,7 @@ public class Editor extends BaseXPanel {
     layout(new BorderLayout());
 
     scroll = new BaseXScrollBar(this);
-    rend = new Renderer(text, scroll, editable);
+    rend = new TextRenderer(text, scroll, editable);
 
     add(rend, BorderLayout.CENTER);
     add(scroll, BorderLayout.EAST);
@@ -179,7 +178,7 @@ public class Editor extends BaseXPanel {
       txt = Arrays.copyOf(t, ns);
     }
     if(text.text(txt)) {
-      if(hist != null) hist.store(txt, text.getCaret(), 0);
+      if(hist != null) hist.store(txt, text.caret(), 0);
     }
     componentResized(null);
   }
@@ -230,7 +229,7 @@ public class Editor extends BaseXPanel {
    * @return cursor position
    */
   public final int getCaret() {
-    return text.getCaret();
+    return text.caret();
   }
 
   /**
@@ -300,8 +299,8 @@ public class Editor extends BaseXPanel {
    * Adds or removes a comment.
    */
   public void comment() {
-    final int pc = text.getCaret();
-    if(text.comment(rend.getSyntax())) hist.store(text.text(), pc, text.getCaret());
+    final int pc = text.caret();
+    if(text.comment(rend.getSyntax())) hist.store(text.text(), pc, text.caret());
     scrollCode.invokeLater(true);
   }
 
@@ -309,17 +308,17 @@ public class Editor extends BaseXPanel {
    * Formats the selected text.
    */
   public void format() {
-    final int pc = text.getCaret();
-    if(text.format(rend.getSyntax())) hist.store(text.text(), pc, text.getCaret());
+    final int pc = text.caret();
+    if(text.format(rend.getSyntax())) hist.store(text.text(), pc, text.caret());
     scrollCode.invokeLater(true);
   }
 
   @Override
-  public final void setEnabled(final boolean e) {
-    super.setEnabled(e);
-    rend.setEnabled(e);
-    scroll.setEnabled(e);
-    cursor(e);
+  public final void setEnabled(final boolean enabled) {
+    super.setEnabled(enabled);
+    rend.setEnabled(enabled);
+    scroll.setEnabled(enabled);
+    cursor(enabled);
   }
 
   /**
@@ -425,8 +424,8 @@ public class Editor extends BaseXPanel {
   @Override
   public final void mouseMoved(final MouseEvent e) {
     if(linkListener == null) return;
-    final boolean link = rend.link(scroll.pos(), e.getPoint());
-    gui.cursor(link ? GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
+    final TextIterator iter = rend.jump(e.getPoint());
+    gui.cursor(iter.link() != null ? GUIConstants.CURSORARROW : GUIConstants.CURSORHAND);
   }
 
   @Override
@@ -434,8 +433,11 @@ public class Editor extends BaseXPanel {
     if(SwingUtilities.isLeftMouseButton(e)) {
       text.checkSelect();
       // evaluate link
-      if(!text.selected() && rend.link(scroll.pos(), e.getPoint()))
-        linkListener.linkClicked(rend.link());
+      if(!text.selected()) {
+        final TextIterator iter = rend.jump(e.getPoint());
+        final String link = iter.link();
+        if(link != null) linkListener.linkClicked(link);
+      }
     }
   }
 
@@ -450,7 +452,7 @@ public class Editor extends BaseXPanel {
     if(!SwingUtilities.isLeftMouseButton(e)) return;
 
     // selection mode
-    rend.select(scroll.pos(), e.getPoint(), false);
+    rend.select(e.getPoint(), false);
     final int y = Math.max(20, Math.min(e.getY(), getHeight() - 20));
     if(y != e.getY()) scroll.pos(scroll.pos() + e.getY() - y);
   }
@@ -471,14 +473,14 @@ public class Editor extends BaseXPanel {
       if(c == 1) {
         // selection mode
         if(marking && nomark) text.startSelect();
-        rend.select(scroll.pos(), e.getPoint(), !marking);
+        rend.select(e.getPoint(), !marking);
       } else if(c == 2) {
         text.selectWord();
       } else {
         text.selectLine();
       }
     } else if(nomark) {
-      rend.select(scroll.pos(), e.getPoint(), true);
+      rend.select(e.getPoint(), true);
     }
   }
 
@@ -528,7 +530,7 @@ public class Editor extends BaseXPanel {
     }
 
     // set cursor position and reset last column
-    final int pc = text.getCaret();
+    final int pc = text.caret();
     text.pos(pc);
     if(!PREVLINE.is(e) && !NEXTLINE.is(e)) lastCol = -1;
 
@@ -587,7 +589,8 @@ public class Editor extends BaseXPanel {
       if(COMPLETE.is(e)) {
         text.complete();
       } else if(DELLINE.is(e)) {
-        text.deleteLine();
+        text.selectLine();
+        text.delete();
       } else if(DELLINEEND.is(e) || DELNEXTWORD.is(e) || DELETE.is(e)) {
         if(nomark) {
           if(text.pos() == text.size()) return;
@@ -630,7 +633,8 @@ public class Editor extends BaseXPanel {
     if(txt == tmp) {
       cursorCode.invokeLater(down ? 2 : 0);
     } else {
-      hist.store(tmp, pc, text.getCaret());
+      // text has changed: add old text to history
+      hist.store(tmp, pc, text.caret());
       scrollCode.invokeLater(down);
     }
   }
@@ -705,7 +709,7 @@ public class Editor extends BaseXPanel {
   public void keyTyped(final KeyEvent e) {
     if(!hist.active() || control(e) || DELETE.is(e) || BACKSPACE.is(e) || ESCAPE.is(e)) return;
 
-    final int pc = text.getCaret();
+    final int pc = text.caret();
     text.pos(pc);
 
     // remember if marked text is to be deleted
@@ -720,7 +724,7 @@ public class Editor extends BaseXPanel {
     final int move = ENTER.is(e) ? text.enter(sb) : text.add(sb, selected);
 
     // refresh history and adjust cursor position
-    hist.store(text.text(), pc, text.getCaret());
+    hist.store(text.text(), pc, text.caret());
     if(move != 0) text.setCaret(Math.min(text.size(), ps + move));
 
     // adjust text height
@@ -771,7 +775,7 @@ public class Editor extends BaseXPanel {
    */
   void finish(final int old) {
     text.setCaret();
-    if(old != -1) hist.store(text.text(), old, text.getCaret());
+    if(old != -1) hist.store(text.text(), old, text.caret());
     scrollCode.invokeLater(true);
     release(Action.CHECK);
   }
@@ -859,7 +863,7 @@ public class Editor extends BaseXPanel {
 
     @Override
     public void execute() {
-      final int tc = text.getCaret();
+      final int tc = text.caret();
       text.pos(tc);
       if(!copy()) return;
       text.delete();
@@ -888,7 +892,7 @@ public class Editor extends BaseXPanel {
 
     @Override
     public void execute() {
-      final int tc = text.getCaret();
+      final int tc = text.caret();
       text.pos(tc);
       final String clip = clip();
       if(clip == null) return;
@@ -907,7 +911,7 @@ public class Editor extends BaseXPanel {
 
     @Override
     public void execute() {
-      final int tc = text.getCaret();
+      final int tc = text.caret();
       text.pos(tc);
       text.delete();
       finish(tc);

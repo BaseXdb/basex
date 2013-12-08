@@ -1,4 +1,4 @@
-package org.basex.gui.editor;
+package org.basex.gui.text;
 
 import static org.basex.util.Token.*;
 
@@ -32,7 +32,7 @@ abstract class Syntax {
     @Override
     public void init() { }
     @Override
-    public Color getColor(final EditorText tokens) { return TEXT; }
+    public Color getColor(final TextIterator iter) { return TEXT; }
   };
 
   /**
@@ -42,10 +42,10 @@ abstract class Syntax {
 
   /**
    * Returns the color for the current token.
-   * @param tokens tokenizer
+   * @param iter iterator
    * @return color
    */
-  public abstract Color getColor(final EditorText tokens);
+  public abstract Color getColor(final TextIterator iter);
 
   /**
    * Returns the start of a comment.

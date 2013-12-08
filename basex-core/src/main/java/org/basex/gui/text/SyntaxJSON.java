@@ -1,4 +1,4 @@
-package org.basex.gui.editor;
+package org.basex.gui.text;
 
 import java.awt.*;
 
@@ -18,9 +18,9 @@ public final class SyntaxJSON extends Syntax {
   }
 
   @Override
-  public Color getColor(final EditorText text) {
-    final int ch = text.curr();
-    final boolean quote = text.curr() == '"';
+  public Color getColor(final TextIterator iter) {
+    final int ch = iter.curr();
+    final boolean quote = ch == '"';
     Color color = quoted || quote ? KEYWORD : TEXT;
     if(!quoted) {
       if("{}[]".indexOf(ch) != -1) color = STRING;

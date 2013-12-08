@@ -1,4 +1,4 @@
-package org.basex.gui.editor;
+package org.basex.gui.text;
 
 /**
  * Listener interface for handling link events.

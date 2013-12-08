@@ -1,4 +1,4 @@
-package org.basex.gui.editor;
+package org.basex.gui.text;
 
 import static org.basex.data.DataText.*;
 
@@ -77,8 +77,8 @@ public final class SyntaxXQuery extends Syntax {
   }
 
   @Override
-  public Color getColor(final EditorText text) {
-    final int ch = text.curr();
+  public Color getColor(final TextIterator iter) {
+    final int ch = iter.curr();
 
     // opened quote
     if(quote != 0) {
@@ -121,7 +121,7 @@ public final class SyntaxXQuery extends Syntax {
     }
 
     // check for keywords and function names
-    final String word = text.nextString();
+    final String word = iter.nextString();
     final boolean keys = KEYS.contains(word);
     final boolean func = FUNC.contains(word);
     if(fun && func) return FUNCTION;
@@ -152,22 +152,22 @@ public final class SyntaxXQuery extends Syntax {
     final int tl = text.length;
     for(int t = 0; t < tl; t++) {
       final byte ch = text[t];
-      final int open = EditorText.OPENING.indexOf(ch);
-      final int close = EditorText.CLOSING.indexOf(ch);
+      final int open = TextEditor.OPENING.indexOf(ch);
+      final int close = TextEditor.CLOSING.indexOf(ch);
       final int next = t + 1 < tl ? text[t + 1] : 0;
       final int prev = t > 0 ? text[t - 1] : 0;
       if(open != -1 && (next != ':' || ch != '(')) {
         ind++;
         tb.addByte(ch);
-        if(next != '\n' && !matches(EditorText.CLOSING.charAt(open), t, text, 3)) {
+        if(next != '\n' && !matches(TextEditor.CLOSING.charAt(open), t, text, 3)) {
           tb.add('\n');
-          for(int i = 0; i < ind; i++) tb.add(EditorText.INDENT);
+          for(int i = 0; i < ind; i++) tb.add(TextEditor.INDENT);
         }
       } else if(close != -1 && (prev != ':' || ch != ')')) {
         ind--;
-        if(!spaces(tb) && !matches(EditorText.OPENING.charAt(close), t, text, -3)) {
+        if(!spaces(tb) && !matches(TextEditor.OPENING.charAt(close), t, text, -3)) {
           tb.add('\n');
-          for(int i = 0; i < ind; i++) tb.add(EditorText.INDENT);
+          for(int i = 0; i < ind; i++) tb.add(TextEditor.INDENT);
         }
         tb.addByte(ch);
       } else {

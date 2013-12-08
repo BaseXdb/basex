@@ -11,8 +11,8 @@ import javax.swing.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -37,7 +37,7 @@ public final class DialogInsert extends BaseXDialog {
   /** Text area. */
   private final BaseXTextField input1;
   /** Text area. */
-  private final Editor input2;
+  private final TextPanel input2;
   /** First label. */
   private final BaseXLabel label1;
   /** Second label. */
@@ -58,7 +58,7 @@ public final class DialogInsert extends BaseXDialog {
     input1 = new BaseXTextField(this);
     BaseXLayout.setWidth(input1, 500);
 
-    input2 = new Editor(true, this);
+    input2 = new TextPanel(true, this);
     input2.addKeyListener(keys);
     BaseXLayout.setWidth(input2, 500);
 

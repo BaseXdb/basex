@@ -14,9 +14,9 @@ import javax.swing.tree.*;
 
 import org.basex.core.*;
 import org.basex.gui.*;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
+import org.basex.gui.text.*;
 import org.basex.gui.view.editor.*;
 import org.basex.io.*;
 import org.basex.util.*;
@@ -232,7 +232,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
    */
   void open(final IOFile file, final String search) {
     if(!file.isDir() && view.open(file) != null) {
-      final Editor editor = view.getEditor();
+      final TextPanel editor = view.getEditor();
       editor.requestFocusInWindow();
       final SearchBar sb = editor.search;
       if(search != null) {

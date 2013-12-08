@@ -1,4 +1,4 @@
-package org.basex.gui.editor;
+package org.basex.gui.text;
 
 import static org.basex.gui.layout.BaseXKeys.*;
 
@@ -10,9 +10,9 @@ import javax.swing.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.editor.Editor.SearchDir;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
+import org.basex.gui.text.TextPanel.*;
 import org.basex.util.options.*;
 
 /**
@@ -53,7 +53,7 @@ public final class SearchBar extends BaseXBack {
   /** Search button. */
   private AbstractButton button;
   /** Current editor reference. */
-  private Editor editor;
+  private TextPanel editor;
 
   /**
    * Constructor.
@@ -147,7 +147,7 @@ public final class SearchBar extends BaseXBack {
    * @param e editor
    * @param srch triggers a search in the specified editor
    */
-  public void editor(final Editor e, final boolean srch) {
+  public void editor(final TextPanel e, final boolean srch) {
     final boolean ed = e.isEditable();
     if(editor == null || ed != editor.isEditable()) {
       removeAll();

@@ -10,8 +10,8 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.gui.*;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -30,7 +30,7 @@ public final class DialogManage extends BaseXDialog {
   /** Name of current database. */
   private final BaseXLabel doc2;
   /** Information panel. */
-  private final Editor detail;
+  private final TextPanel detail;
   /** Rename button. */
   private final BaseXButton rename;
   /** Drop button. */
@@ -70,7 +70,7 @@ public final class DialogManage extends BaseXDialog {
     doc1 = new BaseXLabel(" ").large();
     doc1.setSize(420, doc1.getHeight());
 
-    detail = new Editor(false, this);
+    detail = new TextPanel(false, this);
     detail.setFont(panel.getFont());
 
     // database buttons
