@@ -237,7 +237,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
       final SearchBar sb = editor.search;
       if(search != null) {
         sb.reset();
-        sb.activate(search, false);
+        sb.activate(search, true);
       } else {
         sb.deactivate(true);
       }
