@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -208,6 +209,11 @@ final class QueryCompiler {
       @Override
       public boolean inlineFunc(final Scope sub) {
         return sub.visit(this);
+      }
+
+      @Override
+      public boolean funcItem(final FuncItem func) {
+        return neighbor(func);
       }
 
       /**
