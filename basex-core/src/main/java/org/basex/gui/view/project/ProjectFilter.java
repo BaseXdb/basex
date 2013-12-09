@@ -170,8 +170,8 @@ final class ProjectFilter extends BaseXBack {
    * @param force force refresh
    */
   void refresh(final boolean force) {
-    final String file = files.getText().trim();
-    final String content = contents.getText().trim();
+    final String file = files.getText();
+    final String content = contents.getText();
     if(!force && lastFiles.equals(file) && lastContents.equals(content)) return;
     lastFiles = file;
     lastContents = content;
