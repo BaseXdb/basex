@@ -61,10 +61,11 @@ public final class FuncItem extends FItem implements Scope {
    * @param scp variable scope
    * @param sctx static context
    * @param sf original function
+   * @param annotations function annotations
    */
   public FuncItem(final QNm n, final Var[] arg, final Expr body, final FuncType t,
-      final VarScope scp, final StaticContext sctx, final StaticFunc sf) {
-    this(n, arg, body, t, false, null, 0, 0, null, scp, sctx, sf);
+      final VarScope scp, final StaticContext sctx, final StaticFunc sf, final Ann annotations) {
+    this(n, arg, body, t, false, null, 0, 0, null, scp, sctx, sf, annotations);
   }
 
   /**
@@ -78,11 +79,12 @@ public final class FuncItem extends FItem implements Scope {
    * @param scp variable scope
    * @param sctx static context
    * @param sf original function
+   * @param annotations function annotations
    */
   public FuncItem(final QNm n, final Var[] arg, final Expr body, final FuncType t,
       final boolean cst, final Map<Var, Value> cls, final VarScope scp,
-      final StaticContext sctx, final StaticFunc sf) {
-    this(n, arg, body, t, cst, null, 0, 0, cls, scp, sctx, sf);
+      final StaticContext sctx, final StaticFunc sf, final Ann annotations) {
+    this(n, arg, body, t, cst, null, 0, 0, cls, scp, sctx, sf, annotations);
   }
 
   /**
@@ -94,11 +96,12 @@ public final class FuncItem extends FItem implements Scope {
    * @param cst cast flag
    * @param scp variable scope
    * @param sctx static context
+   * @param annotations function annotations
    */
   public FuncItem(final Var[] arg, final Expr body, final FuncType t,
       final Map<Var, Value> cl, final boolean cst, final VarScope scp,
-      final StaticContext sctx) {
-    this(null, arg, body, t, cst, cl, scp, sctx, null);
+      final StaticContext sctx, final Ann annotations) {
+    this(null, arg, body, t, cst, cl, scp, sctx, null, annotations);
   }
 
   /**
@@ -115,12 +118,13 @@ public final class FuncItem extends FItem implements Scope {
    * @param scp variable scope
    * @param sctx static context
    * @param sf original function
+   * @param annotations function annotations
    */
   public FuncItem(final QNm n, final Var[] arg, final Expr body, final FuncType t,
       final boolean cst, final Value vl, final long ps, final long sz, final Map<Var, Value> cls,
-      final VarScope scp, final StaticContext sctx, final StaticFunc sf) {
+      final VarScope scp, final StaticContext sctx, final StaticFunc sf, final Ann annotations) {
 
-    super(t);
+    super(t, annotations);
     name = n;
     vars = arg;
     expr = body;
@@ -141,8 +145,13 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public QNm fName() {
+  public QNm funcName() {
     return name;
+  }
+
+  @Override
+  public QNm argName(final int ps) {
+    return vars[ps].name;
   }
 
   @Override
@@ -179,7 +188,7 @@ public final class FuncItem extends FItem implements Scope {
       ctx.size = size;
       final Value v = ctx.value(expr);
       // optionally cast return value to target type
-      return cast != null ? cast.funcConvert(ctx, sc, ii, v) : v;
+      return cast != null ? cast.funcConvert(ctx, sc, ii, v, false) : v;
     } finally {
       ctx.value = cv;
       ctx.pos = ps;
@@ -204,7 +213,7 @@ public final class FuncItem extends FItem implements Scope {
       final Item it = expr.item(ctx, ii);
       final Value v = it == null ? Empty.SEQ : it;
       // optionally cast return value to target type
-      return cast != null ? cast.funcConvert(ctx, sc, ii, v).item(ctx, ii) : it;
+      return cast != null ? cast.funcConvert(ctx, sc, ii, v, false).item(ctx, ii) : it;
     } finally {
       ctx.value = cv;
       ctx.pos = ps;
@@ -214,34 +223,35 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   /**
-   * Coerces a function item to the given type.
+   * Coerces this function item to the given type.
    * @param ctx query context
-   * @param sc static context
    * @param ii input info
-   * @param fun function item to coerce
    * @param t type to coerce to
+   * @param opt if the function body should be optimized
    * @return coerced function item
+   * @throws QueryException query exception
    */
-  private static FuncItem coerce(final QueryContext ctx, final StaticContext sc,
-      final InputInfo ii, final FuncItem fun, final FuncType t) {
+  private FuncItem coerce(final QueryContext ctx, final InputInfo ii,
+      final FuncType t, final boolean opt) throws QueryException {
     final VarScope vsc = new VarScope(sc);
-    final Var[] vs = new Var[fun.vars.length];
+    final Var[] vs = new Var[vars.length];
     final Expr[] refs = new Expr[vs.length];
     for(int i = vs.length; i-- > 0;) {
-      vs[i] = vsc.uniqueVar(ctx, t.args[i], true);
+      vs[i] = vsc.newLocal(ctx, vars[i].name, t.args[i], true);
       refs[i] = new VarRef(ii, vs[i]);
     }
-    final Expr e = new DynFuncCall(ii, fun, refs);
+    final Expr e = new DynFuncCall(ii, this, refs);
     e.markTailCalls(null);
-    return new FuncItem(fun.name, vs, e, t, fun.cast != null, null, vsc, sc, fun.func);
+    return new FuncItem(name, vs, opt ? e.optimize(ctx, vsc) : e,
+        t, cast != null, null, vsc, sc, func, ann);
   }
 
   @Override
-  public FItem coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public FItem coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii,
+      final boolean opt) throws QueryException {
 
     if(vars.length != ft.args.length) throw Err.castError(ii, ft, this);
-    return type.instanceOf(ft) ? this : coerce(ctx, sc, ii, this, ft);
+    return type.instanceOf(ft) ? this : coerce(ctx, ii, ft, opt);
   }
 
   @Override
@@ -296,8 +306,7 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
-      final InputInfo ii)
-      throws QueryException {
+      final InputInfo ii) throws QueryException {
     if(!inline(exprs, ctx)) return null;
     // create let bindings for all variables
     final LinkedList<GFLWOR.Clause> cls =

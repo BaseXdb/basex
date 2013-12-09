@@ -50,7 +50,7 @@ public final class FNFunc extends StandardFunc {
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case FUNCTION_ARITY:  return Int.get(checkFunc(expr[0], ctx).arity());
-      case FUNCTION_NAME:   return checkFunc(expr[0], ctx).fName();
+      case FUNCTION_NAME:   return checkFunc(expr[0], ctx).funcName();
       case FUNCTION_LOOKUP: return lookup(ctx, ii);
       default:              return super.item(ctx, ii);
     }

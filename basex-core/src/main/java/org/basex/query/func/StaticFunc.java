@@ -151,13 +151,23 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public QNm fName() {
+  public QNm funcName() {
     return name;
+  }
+
+  @Override
+  public QNm argName(final int pos) {
+    return args[pos].name;
   }
 
   @Override
   public FuncType funcType() {
     return FuncType.get(ann, args, declType);
+  }
+
+  @Override
+  public Ann annotations() {
+    return ann;
   }
 
   @Override
@@ -173,7 +183,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       final Item it = expr.item(ctx, ii);
       final Value v = it == null ? Empty.SEQ : it;
       // optionally promote return value to target type
-      return cast ? declType.funcConvert(ctx, sc, ii, v).item(ctx, ii) : it;
+      return cast ? declType.funcConvert(ctx, sc, ii, v, false).item(ctx, ii) : it;
     } finally {
       scope.exit(ctx, fp);
       ctx.value = cv;
@@ -192,7 +202,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       addArgs(ctx, ii, arg);
       final Value v = ctx.value(expr);
       // optionally promote return value to target type
-      return cast ? declType.funcConvert(ctx, sc, info, v) : v;
+      return cast ? declType.funcConvert(ctx, sc, info, v, false) : v;
     } finally {
       scope.exit(ctx, fp);
       ctx.value = cv;

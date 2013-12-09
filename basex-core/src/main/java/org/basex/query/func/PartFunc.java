@@ -6,7 +6,6 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -71,7 +70,7 @@ public final class PartFunc extends Arr {
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Expr fn = expr[expr.length - 1];
     final FItem f = (FItem) checkType(fn.item(ctx, ii), FuncType.ANY_FUN);
-    final FuncType ft = (FuncType) f.type;
+    final FuncType ft = f.funcType();
 
     final int arity = expr.length + holes.length - 1;
     if(f.arity() != arity) throw INVARITY.get(ii, f, arity);
@@ -82,15 +81,14 @@ public final class PartFunc extends Arr {
     int p = -1;
     for(int i = 0; i < holes.length; i++) {
       while(++p < holes[i]) args[p] = expr[p - i].value(ctx);
-      vars[i] = scp.uniqueVar(ctx, ft.args[p], true);
+      vars[i] = scp.newLocal(ctx, f.argName(holes[i]), ft.args[p], true);
       args[p] = new VarRef(info, vars[i]);
     }
     while(++p < args.length) args[p] = expr[p - holes.length].value(ctx);
 
     final Expr call = new DynFuncCall(info, f, args).optimize(ctx, scp);
-    // [LW] introduce annotations
     final InlineFunc func = new InlineFunc(
-        info, ft.type, vars, call, new Ann(), sc, scp);
+        info, ft.type, vars, call, f.annotations(), sc, scp);
     return func.optimize(ctx, null).item(ctx, ii);
   }
 

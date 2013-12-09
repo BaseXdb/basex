@@ -215,25 +215,16 @@ public final class StaticVar extends StaticDecl {
     return expr == null || expr.accept(visitor);
   }
 
-  /**
-   * Adds the description of this variable to the given string builder.
-   * @param sb string builder
-   * @return the string builder for convenience
-   */
-  public StringBuilder fullDesc(final StringBuilder sb) {
-    sb.append(DECLARE).append(' ');
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(DECLARE).append(' ');
     if(!ann.isEmpty()) sb.append(ann);
     sb.append(VARIABLE).append(' ').append(DOLLAR).append(
         Token.string(name.string())).append(' ');
     if(declType != null) sb.append(AS).append(' ').append(declType).append(' ');
     if(expr != null) sb.append(ASSIGN).append(' ').append(expr);
     else sb.append(EXTERNAL);
-    return sb.append(';');
-  }
-
-  @Override
-  public String toString() {
-    return new TokenBuilder(DOLLAR).add(name.string()).toString();
+    return sb.append(';').toString();
   }
 
   @Override

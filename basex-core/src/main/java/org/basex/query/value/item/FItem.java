@@ -18,12 +18,22 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public abstract class FItem extends Item implements XQFunction {
+  /** Annotations. */
+  final Ann ann;
+
   /**
    * Constructor.
    * @param t type
+   * @param annotations this function item's annotations
    */
-  protected FItem(final FuncType t) {
+  protected FItem(final FuncType t, final Ann annotations) {
     super(t);
+    ann = annotations;
+  }
+
+  @Override
+  public final Ann annotations() {
+    return ann;
   }
 
   @Override
@@ -43,11 +53,12 @@ public abstract class FItem extends Item implements XQFunction {
    * @param ft function type
    * @param ctx query context
    * @param ii input info
+   * @param opt if the result should be optimized
    * @return coerced item
    * @throws QueryException query exception
    */
-  public abstract FItem coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii)
-      throws QueryException;
+  public abstract FItem coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii,
+      boolean opt) throws QueryException;
 
   @Override
   public final byte[] string(final InputInfo ii) throws QueryException {

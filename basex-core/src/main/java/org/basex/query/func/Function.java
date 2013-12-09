@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.expr.Expr.Flag.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.value.type.SeqType.*;
+
 import static org.basex.query.value.type.SeqType.BIN;
 
 import java.util.*;
@@ -12,6 +13,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Flag;
 import org.basex.query.util.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -343,21 +345,21 @@ public enum Function {
   /** XQuery function. */
   ONE_OR_MORE(FNSimple.class, "one-or-more(item)", arg(ITEM_ZM), ITEM_OM),
   /** XQuery function. */
-  DEEP_EQUAL(FNSimple.class, "deep-equal(item,item[,coll])", arg(ITEM_ZM, ITEM_ZM, STR), BLN),
+  DEEP_EQUAL(FNSimple.class, "deep-equal(seq1,seq2[,coll])", arg(ITEM_ZM, ITEM_ZM, STR), BLN),
   /** XQuery function (project specific). */
-  DEEP_EQUAL_OPT(FNSimple.class, "deep-equal-opt(item,item[,options])",
+  DEEP_EQUAL_OPT(FNSimple.class, "deep-equal-opt(seq1,seq2[,options])",
       arg(ITEM_ZM, ITEM_ZM, ITEM), BLN),
 
   /* FNStr functions. */
 
   /** XQuery function. */
-  CODEPOINT_EQUAL(FNStr.class, "codepoint-equal(string,string)", arg(STR_ZO, STR_ZO), BLN_ZO),
+  CODEPOINT_EQUAL(FNStr.class, "codepoint-equal(string1,string2)", arg(STR_ZO, STR_ZO), BLN_ZO),
   /** XQuery function. */
   CODEPOINTS_TO_STRING(FNStr.class, "codepoints-to-string(nums)", arg(ITR_ZM), STR),
   /** XQuery function. */
   COMPARE(FNStr.class, "compare(first,second[,coll])", arg(STR_ZO, STR_ZO, STR), ITR_ZO),
   /** XQuery function. */
-  CONCAT(FNStr.class, "concat(atom,atom[,...])", arg(AAT_ZO, AAT_ZO), STR),
+  CONCAT(FNStr.class, "concat(atom1,atom2[,...])", arg(AAT_ZO, AAT_ZO), STR),
   /** XQuery function. */
   CONTAINS(FNStr.class, "contains(string,sub[,coll])", arg(STR_ZO, STR_ZO, STR), BLN),
   /** XQuery function. */
@@ -430,9 +432,9 @@ public enum Function {
   /** XQuery function. */
   _MATH_ATAN(FNMath.class, "atan(number)", arg(DBL_ZO), DBL_ZO, flag(X30)),
   /** XQuery function. */
-  _MATH_ATAN2(FNMath.class, "atan2(number,number)", arg(DBL, DBL), DBL, flag(X30)),
+  _MATH_ATAN2(FNMath.class, "atan2(number1,number2)", arg(DBL, DBL), DBL, flag(X30)),
   /** XQuery function. */
-  _MATH_POW(FNMath.class, "pow(number,number)", arg(DBL_ZO, ITR), DBL_ZO, flag(X30)),
+  _MATH_POW(FNMath.class, "pow(number1,number2)", arg(DBL_ZO, ITR), DBL_ZO, flag(X30)),
   /** XQuery function. */
   _MATH_EXP(FNMath.class, "exp(number)", arg(DBL_ZO), DBL_ZO, flag(X30)),
   /** XQuery function. */
@@ -594,17 +596,17 @@ public enum Function {
   /* FNCrypto functions (EXPath Cryptographic module). */
 
   /** XQuery function. */
-  _CRYPTO_HMAC(FNCrypto.class, "hmac(string,string,string[,string])",
+  _CRYPTO_HMAC(FNCrypto.class, "hmac(message,key,algorithm[,encoding])",
       arg(STR, STR, STR, STR_ZO), STR),
   /** XQuery function. */
-  _CRYPTO_ENCRYPT(FNCrypto.class, "encrypt(string,string,string,string)",
+  _CRYPTO_ENCRYPT(FNCrypto.class, "encrypt(input,encryption,key,algorithm)",
       arg(STR, STR, STR, STR), STR),
   /** XQuery function. */
-  _CRYPTO_DECRYPT(FNCrypto.class, "decrypt(string,string,string,string)",
+  _CRYPTO_DECRYPT(FNCrypto.class, "decrypt(input,type,key,algorithm)",
       arg(STR, STR, STR, STR), STR),
   /** XQuery function. */
   _CRYPTO_GENERATE_SIGNATURE(FNCrypto.class, "generate-signature" +
-      "(node,string,string,string,string,string[,item][,item])",
+      "(input,canonicalization,digest,signature,prefix,type[,item1][,item2])",
       arg(NOD, STR, STR, STR, STR, STR, ITEM_ZO, ITEM_ZO), NOD),
   /** XQuery function. */
   _CRYPTO_VALIDATE_SIGNATURE(FNCrypto.class, "validate-signature(node)", arg(NOD), BLN),
@@ -1226,6 +1228,34 @@ public enum Function {
     final EnumSet<Flag> set = EnumSet.noneOf(Flag.class);
     Collections.addAll(set, flags);
     return set;
+  }
+
+  /**
+   * Returns the function's variable names.
+   * @return array of variable names
+   */
+  final String[] names() {
+    final String names = desc.replaceFirst(".*?\\(", "").replace(",...",
+        "").replaceAll("[\\[\\]\\)\\s]", "");
+    return names.isEmpty() ? new String[0] : names.split(",");
+  }
+
+  /**
+   * Returns the the variable names for an instance of this function with the given arity.
+   * @param arity number of arguments
+   * @return array of argument names
+   */
+  public final QNm[] argNames(final int arity) {
+    final String[] names = names();
+    final QNm[] res = new QNm[arity];
+    for(int i = Math.min(arity, names.length); --i >= 0;) res[i] = new QNm(names[i]);
+    if(arity > names.length) {
+      final String[] parts = names[names.length - 1].split("(?=\\d+$)", 2);
+      final int start = Integer.parseInt(parts[1]);
+      for(int i = names.length; i < arity; i++)
+        res[i] = new QNm(parts[0] + (start + i - names.length + 1), "");
+    }
+    return res;
   }
 
   /**

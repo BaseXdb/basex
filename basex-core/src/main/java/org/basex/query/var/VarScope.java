@@ -1,10 +1,7 @@
 package org.basex.query.var;
 
-import static org.basex.util.Token.*;
-
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -119,17 +116,6 @@ public final class VarScope {
   }
 
   /**
-   * Creates a variable with a unique, non-clashing variable name.
-   * @param ctx context for variable ID
-   * @param type type
-   * @param param function parameter flag
-   * @return variable
-   */
-  public Var uniqueVar(final QueryContext ctx, final SeqType type, final boolean param) {
-    return add(new Var(ctx, sc, new QNm(token(ctx.varIDs)), type, param));
-  }
-
-  /**
    * Creates a new local variable in this scope.
    * @param ctx query context
    * @param name variable name
@@ -185,12 +171,17 @@ public final class VarScope {
    */
   public void cleanUp(final Scope expr) {
     final BitSet declared = new BitSet();
-    final AtomicInteger counter = new AtomicInteger();
+    final BitSet used = new BitSet();
     expr.visit(new ASTVisitor() {
       @Override
       public boolean declared(final Var var) {
         declared.set(var.id);
-        var.slot = counter.getAndIncrement();
+        return true;
+      }
+
+      @Override
+      public boolean used(final VarRef ref) {
+        used.set(ref.var.id);
         return true;
       }
     });
@@ -204,6 +195,21 @@ public final class VarScope {
         iter.remove();
       }
     }
+
+    // remove unused entries from the closure
+    final Iterator<Entry<Var, Expr>> cls = closure.entrySet().iterator();
+    while(cls.hasNext()) {
+      final Entry<Var, Expr> e = cls.next();
+      final Var v = e.getKey();
+      if(!used.get(v.id)) {
+        cls.remove();
+        v.slot = -1;
+        vars.remove(v);
+      }
+    }
+
+    // assign new stack slots
+    for(int i = vars.size(); --i >= 0;) vars.get(i).slot = i;
   }
 
   @Override
