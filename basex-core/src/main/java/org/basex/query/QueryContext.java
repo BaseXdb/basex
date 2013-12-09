@@ -256,7 +256,10 @@ public final class QueryContext extends Proc {
     if(inf) {
       info.add(NL).add(QUERY).add(COL).add(NL).add(
           QueryProcessor.removeComments(query, Integer.MAX_VALUE)).add(NL);
-      if(compInfo) info.add(NL + OPTIMIZED_QUERY + COL + NL + usedDecls(root) + NL);
+      if(compInfo) {
+        final String decls = root == null ? funcs.toString() : usedDecls(root);
+        info.add(NL + OPTIMIZED_QUERY + COL + NL + decls + NL);
+      }
     }
   }
 
