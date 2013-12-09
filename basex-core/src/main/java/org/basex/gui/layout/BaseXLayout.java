@@ -9,7 +9,6 @@ import java.awt.datatransfer.*;
 import java.awt.dnd.*;
 import java.awt.event.*;
 import java.io.*;
-import java.net.*;
 import java.util.*;
 import java.util.List;
 
@@ -30,8 +29,6 @@ public final class BaseXLayout {
   /** Shortcut string for meta key. */
   private static final String META = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ==
       Event.META_MASK ? "meta" : "ctrl";
-  /** Cached images. */
-  private static final HashMap<String, ImageIcon> IMAGES = new HashMap<String, ImageIcon>();
   /** Key listener for global shortcuts. */
   private static KeyAdapter keys;
 
@@ -297,44 +294,6 @@ public final class BaseXLayout {
     int i = str.lastIndexOf('.');
     if(i == -1) i = str.length();
     return str.substring(0, i) + " (" + sb.substring(1) + ')' + str.substring(i);
-  }
-
-  /**
-   * Returns the specified image as icon.
-   * @param name name of icon
-   * @return icon
-   */
-  public static ImageIcon icon(final String name) {
-    ImageIcon img = IMAGES.get(name);
-    if(img != null) return img;
-    img = new ImageIcon(image(name));
-    IMAGES.put(name, img);
-    return img;
-  }
-
-  /**
-   * Returns the specified image.
-   * @param name name of image
-   * @return image
-   */
-  public static Image image(final String name) {
-    return Toolkit.getDefaultToolkit().getImage(imageURL(name));
-  }
-
-  /**
-   * Returns the image url.
-   * @param name name of image
-   * @return url
-   */
-  private static URL imageURL(final String name) {
-    final String path = "/img/" + name + ".png";
-    URL url = GUI.class.getResource(path);
-    if(url == null) {
-      Util.errln("Not found: " + path);
-      Util.stack();
-      url = GUI.class.getResource("/img/" + Prop.NAME + ".png");
-    }
-    return url;
   }
 
   /**

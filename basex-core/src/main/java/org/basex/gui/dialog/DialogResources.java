@@ -233,9 +233,9 @@ public final class DialogResources extends BaseXBack {
    */
   private static final class TreeNodeRenderer extends DefaultTreeCellRenderer {
     /** Icon for xml files. */
-    private final Icon xmlIcon = BaseXLayout.icon("file_xml");
+    private final Icon xmlIcon = BaseXImages.icon("file_xml");
     /** Icon for raw files. */
-    private final Icon rawIcon = BaseXLayout.icon("file_raw");
+    private final Icon rawIcon = BaseXImages.icon("file_raw");
 
     @Override
     public Component getTreeCellRendererComponent(final JTree tree, final Object val,

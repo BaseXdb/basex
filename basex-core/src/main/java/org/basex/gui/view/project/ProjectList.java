@@ -148,7 +148,7 @@ public class ProjectList extends JList {
         final int index, final boolean selected, final boolean expanded) {
 
       final IOFile file = new IOFile(value.toString());
-      label.setIcon(ProjectCellRenderer.fileIcon(file));
+      label.setIcon(BaseXImages.file(file));
       label.setText(ProjectFile.toString(file));
       label.setToolTipText(file.path());
 

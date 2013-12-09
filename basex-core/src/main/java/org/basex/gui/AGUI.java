@@ -27,7 +27,7 @@ public abstract class AGUI extends JFrame {
    * @param opts gui options
    */
   AGUI(final Context ctx, final GUIOptions opts) {
-    setIconImage(BaseXLayout.image("icon"));
+    setIconImage(BaseXImages.get("icon"));
     setTitle(null);
     context = ctx;
     gopts = opts;

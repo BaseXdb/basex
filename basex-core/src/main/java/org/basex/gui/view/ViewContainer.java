@@ -58,7 +58,7 @@ public final class ViewContainer extends BaseXBack {
    */
   public ViewContainer(final AGUI main, final View... v) {
     layout(new BorderLayout()).mode(Fill.PLAIN);
-    logo = BaseXLayout.image("logo");
+    logo = BaseXImages.get("logo");
     setBackground(Color.white);
 
     views = new ViewPanel[v.length];

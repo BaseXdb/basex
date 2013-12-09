@@ -48,6 +48,7 @@ public final class EditorArea extends TextPanel {
     view = v;
     file = f;
     label = new BaseXLabel(f.name());
+    label.setIcon(BaseXImages.file(new IOFile(IO.XQSUFFIX)));
     setSyntax(f, false);
 
     addFocusListener(new FocusAdapter() {
@@ -162,6 +163,7 @@ public final class EditorArea extends TextPanel {
    */
   void file(final IOFile f) {
     file = f;
+    label.setIcon(BaseXImages.file(f));
     tstamp = f.timeStamp();
     setSyntax(file, true);
     hist.save();

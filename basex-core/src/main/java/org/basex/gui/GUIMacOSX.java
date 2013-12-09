@@ -81,7 +81,7 @@ public final class GUIMacOSX {
    * @throws Exception if any error occurs.
    */
   private void addDockIcon() throws Exception {
-    invoke(appObj, "setDockIconImage", Image.class, BaseXLayout.image("logo"));
+    invoke(appObj, "setDockIconImage", Image.class, BaseXImages.get("logo"));
   }
 
   /**

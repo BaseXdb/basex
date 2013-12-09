@@ -86,7 +86,7 @@ public class BaseXButton extends JButton {
   private static void init(final AbstractButton button, final Window gui, final String name,
       final String help) {
 
-    button.setIcon(BaseXLayout.icon(name));
+    button.setIcon(BaseXImages.icon(name));
     BaseXLayout.addInteraction(button, gui);
     if(help != null) button.setToolTipText(help);
     style(button);

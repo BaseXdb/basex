@@ -989,7 +989,7 @@ public final class EditorView extends View {
     b.setBorder(new EmptyBorder(2, 0, 2, 0));
     b.setContentAreaFilled(false);
     b.setFocusable(false);
-    b.setRolloverIcon(BaseXLayout.icon(rollover));
+    b.setRolloverIcon(BaseXImages.icon(rollover));
     return b;
   }
 

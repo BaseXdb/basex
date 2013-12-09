@@ -174,7 +174,7 @@ public final class GUIConstants {
      * @param l large icon
      */
     Msg(final String s, final String l) {
-      small = BaseXLayout.icon(s);
+      small = BaseXImages.icon(s);
       large = UIManager.getIcon("OptionPane." + l + "Icon");
     }
   }
