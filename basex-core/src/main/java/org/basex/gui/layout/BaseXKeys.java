@@ -41,7 +41,7 @@ public enum BaseXKeys {
   // Editing
 
   /** Delete backwards.      */ BACKSPACE(VK_BACK_SPACE),
-  /** Delete.                */ DELETE(VK_DELETE, true),
+  /** Delete.                */ DELETE(VK_DELETE),
 
   /** Undo.                  */ UNDOSTEP(META, VK_Z, true),
   /** Redo.                  */ REDOSTEP(MAC ? META | SHIFT : META, MAC ? VK_Z : VK_Y, true),

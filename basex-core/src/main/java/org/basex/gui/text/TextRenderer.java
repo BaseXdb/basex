@@ -568,7 +568,7 @@ final class TextRenderer extends BaseXBack {
         next(iter);
       }
     }
-    iter.link(link);
+    iter.link(!link);
     return iter;
   }
 

@@ -624,6 +624,15 @@ public final class TextEditor {
     pos = s;
   }
 
+  /**
+   * Deletes a line.
+   */
+  void deleteLine() {
+    selectLine();
+    if(selectEnd + 1 < text.length) selectEnd++;
+    delete();
+  }
+
   // PRIVATE METHODS ==============================================================================
 
   /**
@@ -844,14 +853,6 @@ public final class TextEditor {
   }
 
   /**
-   * Tests if text is currently being selected, or has already been selected.
-   * @return result of check
-   */
-  boolean selecting() {
-    return selectPos != -1;
-  }
-
-  /**
    * Tests if text has been selected.
    * @return result of check
    */
@@ -939,12 +940,10 @@ public final class TextEditor {
     else if(s == sl) s = 0;
     final int p = searchPos[0].get(s);
     if(select) {
-      caret = p;
-      selectPos = p;
-      selectEnd = searchPos[1].get(s);
-    } else {
-      caret = p;
+      selectPos = searchPos[1].get(s);
+      selectEnd = p;
     }
+    caret = p;
     return p;
   }
 

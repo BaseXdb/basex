@@ -430,6 +430,8 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public void mouseReleased(final MouseEvent e) {
+    if(linkListener == null) return;
+
     if(SwingUtilities.isLeftMouseButton(e)) {
       text.checkSelect();
       // evaluate link
@@ -466,20 +468,20 @@ public class TextPanel extends BaseXPanel {
 
     if(SwingUtilities.isMiddleMouseButton(e)) copy();
 
-    final boolean marking = e.isShiftDown();
-    final boolean nomark = !text.selecting();
+    final boolean selecting = e.isShiftDown();
+    final boolean selected = text.selected();
     if(SwingUtilities.isLeftMouseButton(e)) {
       final int c = e.getClickCount();
       if(c == 1) {
         // selection mode
-        if(marking && nomark) text.startSelect();
-        rend.select(e.getPoint(), !marking);
+        if(selecting && !selected) text.startSelect();
+        rend.select(e.getPoint(), !selecting);
       } else if(c == 2) {
         text.selectWord();
       } else {
         text.selectLine();
       }
-    } else if(nomark) {
+    } else if(!selected) {
       rend.select(e.getPoint(), true);
     }
   }
@@ -531,12 +533,11 @@ public class TextPanel extends BaseXPanel {
     text.pos(caret);
     if(!PREVLINE.is(e) && !NEXTLINE.is(e)) lastCol = -1;
 
-    final boolean marking = e.isShiftDown() && !BACKSPACE.is(e) && !PASTE2.is(e) &&
+    final boolean selecting = e.isShiftDown() && !BACKSPACE.is(e) && !PASTE2.is(e) &&
         !DELLINE.is(e) && !PREVPAGE_RO.is(e);
-    final boolean nomark = !text.selecting();
-    if(marking && nomark) text.startSelect();
-    boolean down = true;
-    boolean consumed = true;
+    final boolean selected = text.selected();
+    if(selecting && !selected) text.startSelect();
+    boolean down = true, consumed = true;
 
     // operations that consider the last text mark..
     final byte[] txt = text.text();
@@ -545,42 +546,42 @@ public class TextPanel extends BaseXPanel {
     } else if(MOVEUP.is(e)) {
       text.move(false);
     } else if(NEXTWORD.is(e)) {
-      text.nextToken(marking);
+      text.nextToken(selecting);
     } else if(PREVWORD.is(e)) {
-      text.prevToken(marking);
+      text.prevToken(selecting);
       down = false;
     } else if(TEXTSTART.is(e)) {
-      if(!marking) text.noSelect();
+      if(!selecting) text.noSelect();
       text.pos(0);
       down = false;
     } else if(TEXTEND.is(e)) {
-      if(!marking) text.noSelect();
+      if(!selecting) text.noSelect();
       text.pos(text.size());
     } else if(LINESTART.is(e)) {
-      text.home(marking);
+      text.home(selecting);
       down = false;
     } else if(LINEEND.is(e)) {
-      text.eol(marking);
+      text.eol(selecting);
     } else if(PREVPAGE.is(e) || !hist.active() && PREVPAGE_RO.is(e)) {
-      up(getHeight() / fh, marking);
+      up(getHeight() / fh, selecting);
       down = false;
     } else if(NEXTPAGE.is(e) || !hist.active() && NEXTPAGE_RO.is(e)) {
-      down(getHeight() / fh, marking);
+      down(getHeight() / fh, selecting);
     } else if(NEXT.is(e)) {
-      text.next(marking);
+      text.next(selecting);
     } else if(PREV.is(e)) {
-      text.prev(marking);
+      text.prev(selecting);
       down = false;
     } else if(PREVLINE.is(e)) {
-      up(1, marking);
+      up(1, selecting);
       down = false;
     } else if(NEXTLINE.is(e)) {
-      down(1, marking);
+      down(1, selecting);
     } else {
       consumed = false;
     }
 
-    if(marking) {
+    if(selecting) {
       // refresh scroll position
       text.finishSelect();
     } else if(hist.active()) {
@@ -588,10 +589,9 @@ public class TextPanel extends BaseXPanel {
       if(COMPLETE.is(e)) {
         text.complete();
       } else if(DELLINE.is(e)) {
-        text.selectLine();
-        text.delete();
+        text.deleteLine();
       } else if(DELLINEEND.is(e) || DELNEXTWORD.is(e) || DELETE.is(e)) {
-        if(nomark) {
+        if(!selected) {
           if(text.pos() == text.size()) return;
           text.startSelect();
           if(DELNEXTWORD.is(e)) {
@@ -605,7 +605,7 @@ public class TextPanel extends BaseXPanel {
         }
         text.delete();
       } else if(DELLINESTART.is(e) || DELPREVWORD.is(e) || BACKSPACE.is(e)) {
-        if(nomark) {
+        if(!selected) {
           if(text.pos() == 0) return;
           if(DELPREVWORD.is(e)) {
             text.startSelect();
@@ -956,7 +956,7 @@ public class TextPanel extends BaseXPanel {
     FindPrevCmd() { super(Text.FIND_PREVIOUS, FINDPREV1, FINDPREV2); }
 
     @Override
-    public void execute() { find(true); }
+    public void execute() { find(false); }
     @Override
     public boolean enabled(final GUI main) { return search != null; }
   }

@@ -233,7 +233,6 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
   void open(final IOFile file, final String search) {
     if(!file.isDir() && view.open(file) != null) {
       final TextPanel editor = view.getEditor();
-      editor.requestFocusInWindow();
       final SearchBar sb = editor.search;
       if(search != null) {
         sb.reset();
@@ -241,6 +240,13 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
       } else {
         sb.deactivate(true);
       }
+      // request focus (avoid keyTyped event to be handled in editor)
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          editor.requestFocusInWindow();
+        }}
+      );
     }
   }
 
