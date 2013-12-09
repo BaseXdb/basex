@@ -423,13 +423,6 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
         }
       }
     }
-
-    @Override public boolean enabled(final GUI main) {
-      for(final ProjectNode node : selectedNodes()) {
-        if(node.file.isDir()) return false;
-      }
-      return true;
-    }
   }
 
   /** Copy path command. */
