@@ -9,6 +9,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Flag;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
@@ -133,25 +134,33 @@ public final class Functions extends TokenSet {
     if(eq(name.uri(), XSURI)) {
       final Type type = getCast(name, arity, ii);
       final VarScope scp = new VarScope(sc);
-      final Var[] args = { scp.uniqueVar(ctx, SeqType.AAT_ZO, true) };
+      final Var[] args = { scp.newLocal(ctx, new QNm(QueryText.ITEMM, ""), SeqType.AAT_ZO, true) };
       final Expr e = new Cast(sc, ii, new VarRef(ii, args[0]), type.seqType());
       final FuncType tp = FuncType.get(e.type(), SeqType.AAT_ZO);
-      return new FuncItem(name, args, e, tp, scp, sc, null);
+      return new FuncItem(name, args, e, tp, scp, sc, null, new Ann());
     }
 
     // pre-defined functions
     final Function fn = get().getBuiltIn(name, arity, ii);
     if(fn != null) {
+      final Ann a = new Ann();
+      if(fn.has(Flag.UPD)) a.add(Ann.Q_UPDATING, Empty.SEQ, ii);
       final VarScope scp = new VarScope(sc);
       final FuncType ft = fn.type(arity);
+      final QNm[] argNames = fn.argNames(arity);
+
       final Var[] args = new Var[arity];
-      final Expr[] calls = ft.args(args, ctx, scp, ii);
+      final Expr[] calls = new Expr[arity];
+      for(int i = 0; i < arity; i++) {
+        args[i] = scp.newLocal(ctx, argNames[i], ft.args[i], true);
+        calls[i] = new VarRef(ii, args[i]);
+      }
 
       final StandardFunc f = fn.get(sc, calls);
       if(!f.has(Flag.CTX) && !f.has(Flag.FCS))
-        return new FuncItem(name, args, f, ft, scp, sc, null);
+        return new FuncItem(name, args, f, ft, scp, sc, null, a);
 
-      return new FuncLit(name, args, f, ft, scp, sc, ii);
+      return new FuncLit(a, name, args, f, ft, scp, sc, ii);
     }
 
     // user-defined function
@@ -162,9 +171,13 @@ public final class Functions extends TokenSet {
     final VarScope scp = new VarScope(sc);
     final FuncType jt = FuncType.arity(arity);
     final Var[] vs = new Var[arity];
-    final Expr[] refs = jt.args(vs, ctx, scp, ii);
+    final Expr[] refs = new Expr[vs.length];
+    for(int i = 0; i < vs.length; i++) {
+      vs[i] = scp.newLocal(ctx, new QNm(ARG + (i + 1), ""), SeqType.ITEM_ZM, true);
+      refs[i] = new VarRef(ii, vs[i]);
+    }
     final Expr jm = JavaMapping.get(name, refs, ctx, sc, ii);
-    if(jm != null) return new FuncLit(name, vs, jm, jt, scp, sc, ii);
+    if(jm != null) return new FuncLit(new Ann(), name, vs, jm, jt, scp, sc, ii);
 
     return null;
   }
@@ -186,9 +199,13 @@ public final class Functions extends TokenSet {
     final VarScope scp = new VarScope(sc);
     final int arity = sf.args.length;
     final Var[] args = new Var[arity];
-    final Expr[] calls = ft.args(args, ctx, scp, info);
+    final Expr[] calls = new Expr[args.length];
+    for(int i = 0; i < args.length; i++) {
+      args[i] = scp.newLocal(ctx, sf.argName(i), ft.args[i], true);
+      calls[i] = new VarRef(info, args[i]);
+    }
     final TypedFunc tf = ctx.funcs.getFuncRef(sf.name, calls, sc, info);
-    return new FuncItem(sf.name, args, tf.fun, ft, scp, sc, sf);
+    return new FuncItem(sf.name, args, tf.fun, ft, scp, sc, sf, tf.ann);
   }
 
   /**

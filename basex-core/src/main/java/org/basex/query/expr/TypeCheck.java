@@ -3,7 +3,9 @@ package org.basex.query.expr;
 import static org.basex.query.util.Err.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -46,12 +48,19 @@ public final class TypeCheck extends Single {
 
   @Override
   public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
-    if(expr.isValue()) return optPre(value(ctx), ctx);
-
     final SeqType argType = expr.type();
     if(argType.instanceOf(type)) {
       ctx.compInfo(QueryText.OPTCAST, type);
       return expr;
+    }
+
+    if(expr.isValue()) {
+      if(expr instanceof FuncItem && type.type instanceof FuncType) {
+        if(!type.occ.check(1)) throw Err.treatError(info, type, expr);
+        final FuncItem fit = (FuncItem) expr;
+        return optPre(fit.coerceTo((FuncType) type.type, ctx, info, true), ctx);
+      }
+      return optPre(value(ctx), ctx);
     }
 
     if(argType.type.instanceOf(type.type)) {
@@ -74,7 +83,7 @@ public final class TypeCheck extends Single {
   public Value value(final QueryContext ctx) throws QueryException {
     final Value val = expr.value(ctx);
     if(type.instance(val)) return val;
-    if(promote) return type.funcConvert(ctx, sc, info, val);
+    if(promote) return type.funcConvert(ctx, sc, info, val, false);
     throw INVCAST.get(info, val.type(), type);
   }
 

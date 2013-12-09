@@ -22,6 +22,8 @@ public final class FuncLit extends Single implements Scope {
   private final VarScope scope;
   /** Static context. */
   private final StaticContext sc;
+  /** Annotations. */
+  private Ann ann;
   /** Function name. */
   private final QNm name;
   /** Formal parameters. */
@@ -33,6 +35,7 @@ public final class FuncLit extends Single implements Scope {
 
   /**
    * Constructor.
+   * @param a annotations
    * @param nm function name
    * @param arg formal parameters
    * @param fn function body
@@ -41,9 +44,10 @@ public final class FuncLit extends Single implements Scope {
    * @param sctx static context
    * @param ii input info
    */
-  public FuncLit(final QNm nm, final Var[] arg, final Expr fn, final FuncType ft,
+  public FuncLit(final Ann a, final QNm nm, final Var[] arg, final Expr fn, final FuncType ft,
       final VarScope scp, final StaticContext sctx, final InputInfo ii) {
     super(ii, fn);
+    ann = a;
     name = nm;
     args = arg;
     check = ft == null;
@@ -60,6 +64,7 @@ public final class FuncLit extends Single implements Scope {
     if(check) {
       final StaticFunc sf = ctx.funcs.get(name, args.length, info);
       if(sf == null) throw FUNCUNKNOWN.get(info, name.string());
+      ann = sf.ann;
       type = sf.funcType().seqType();
     }
 
@@ -82,17 +87,19 @@ public final class FuncLit extends Single implements Scope {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) {
     return new FuncItem(name, args, expr, (FuncType) type.type, false, ctx.value, ctx.pos,
-        ctx.size, null, scope, sc, null);
+        ctx.size, null, scope, sc, null, ann == null ? new Ann() : ann);
   }
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope o, final IntObjMap<Var> vs) {
+    final Ann a = ann == null ? null : new Ann();
+    if(a != null) for(int i = 0; i < ann.size(); i++) a.add(ann.names[i], ann.values[i], info);
     final VarScope scp = new VarScope(sc);
     final Var[] arg = new Var[args.length];
     for(int i = 0; i < arg.length; i++)
       vs.put(args[i].id, arg[i] = scp.newCopyOf(ctx, args[i]));
     final Expr call = expr.copy(ctx, scp, vs);
-    return new FuncLit(name, arg, call, (FuncType) type.type, scp, sc, info);
+    return new FuncLit(a, name, arg, call, (FuncType) type.type, scp, sc, info);
   }
 
   @Override
@@ -113,11 +120,14 @@ public final class FuncLit extends Single implements Scope {
   public static FuncLit unknown(final QNm nm, final long ar, final QueryContext ctx,
       final StaticContext sctx, final InputInfo ii) throws QueryException {
     final VarScope scp = new VarScope(sctx);
-    final FuncType temp = FuncType.arity((int) ar);
     final Var[] arg = new Var[(int) ar];
-    final Expr[] refs = temp.args(arg, ctx, scp, ii);
+    final Expr[] refs = new Expr[arg.length];
+    for(int i = 0; i < arg.length; i++) {
+      arg[i] = scp.newLocal(ctx, new QNm(QueryText.ARG + (i + 1), ""), SeqType.ITEM_ZM, true);
+      refs[i] = new VarRef(ii, arg[i]);
+    }
     final TypedFunc call = ctx.funcs.getFuncRef(nm, refs, sctx, ii);
-    return new FuncLit(nm, arg, call.fun, null, scp, sctx, ii);
+    return new FuncLit(null, nm, arg, call.fun, null, scp, sctx, ii);
   }
 
   @Override

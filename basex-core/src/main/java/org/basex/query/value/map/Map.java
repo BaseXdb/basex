@@ -8,6 +8,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -38,7 +39,7 @@ public final class Map extends FItem {
    * @param m map
    */
   private Map(final TrieNode m) {
-    super(SeqType.ANY_MAP);
+    super(SeqType.ANY_MAP, new Ann());
     root = m;
   }
 
@@ -48,8 +49,13 @@ public final class Map extends FItem {
   }
 
   @Override
-  public QNm fName() {
+  public QNm funcName() {
     return null;
+  }
+
+  @Override
+  public QNm argName(final int pos) {
+    return new QNm("key", "");
   }
 
   @Override
@@ -156,9 +162,8 @@ public final class Map extends FItem {
   }
 
   @Override
-  public Map coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Map coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii,
+      final boolean opt) throws QueryException {
     if(!(ft instanceof MapType) || !hasType((MapType) ft)) throw castError(ii, ft, this);
     return this;
   }

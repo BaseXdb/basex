@@ -1,7 +1,7 @@
-package org.basex.query;
+package org.basex.query.var;
 
+import org.basex.query.*;
 import org.basex.query.value.Value;
-import org.basex.query.var.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
 

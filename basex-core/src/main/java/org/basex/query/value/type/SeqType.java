@@ -415,11 +415,12 @@ public final class SeqType {
    * @param sc static context
    * @param ii input info
    * @param it item to promote
+   * @param opt if the result should be optimized
    * @return promoted item
    * @throws QueryException query exception
    */
   private Value funcConv(final QueryContext ctx, final StaticContext sc, final InputInfo ii,
-      final Item it) throws QueryException {
+      final Item it, final boolean opt) throws QueryException {
 
     if(type instanceof AtomType) {
       final Item atom = StandardFunc.atom(it, ii);
@@ -441,7 +442,7 @@ public final class SeqType {
       if(tt == AtomType.STR && at.instanceOf(AtomType.URI))
         return Str.get(atom.string(ii));
     } else if(it instanceof FItem && type instanceof FuncType) {
-      return ((FItem) it).coerceTo((FuncType) type, ctx, ii);
+      return ((FItem) it).coerceTo((FuncType) type, ctx, ii, opt);
     }
 
     throw Err.treatError(ii, withOcc(Occ.ONE), it);
@@ -453,22 +454,23 @@ public final class SeqType {
    * @param sc static context
    * @param ii input info
    * @param val value to convert
+   * @param opt if the result should be optimized
    * @return converted value
    * @throws QueryException if the conversion was not possible
    */
   public Value funcConvert(final QueryContext ctx, final StaticContext sc,
-      final InputInfo ii, final Value val) throws QueryException {
+      final InputInfo ii, final Value val, final boolean opt) throws QueryException {
     final long n = val.size();
     if(!occ.check(n)) throw Err.treatError(ii, this, val);
     if(n == 0) return Empty.SEQ;
     if(val.isItem())
-      return instance((Item) val, true) ? val : funcConv(ctx, sc, ii, (Item) val);
+      return instance((Item) val, true) ? val : funcConv(ctx, sc, ii, (Item) val, opt);
 
     ValueBuilder vb = null;
     final Item fst = val.itemAt(0);
     if(!instance(fst, true)) {
       vb = new ValueBuilder(new Item[(int) val.size()], 0);
-      vb.add(funcConv(ctx, sc, ii, fst));
+      vb.add(funcConv(ctx, sc, ii, fst, opt));
     } else if(val.homogeneous()) {
       return val;
     }
@@ -476,11 +478,11 @@ public final class SeqType {
     for(int i = 1; i < n; i++) {
       final Item it = val.itemAt(i);
       if(vb != null) {
-        vb.add(instance(it, true) ? it : funcConv(ctx, sc, ii, it));
+        vb.add(instance(it, true) ? it : funcConv(ctx, sc, ii, it, opt));
       } else if(!instance(it, true)) {
         vb = new ValueBuilder(new Item[(int) val.size()], 0);
         for(int j = 0; j < i; j++) vb.add(val.itemAt(j));
-        vb.add(funcConv(ctx, sc, ii, it));
+        vb.add(funcConv(ctx, sc, ii, it, opt));
       }
     }
     return vb != null ? Seq.get(vb.items(), (int) vb.size(), type) : val;

@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.gflwor.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -24,7 +25,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
-public final class InlineFunc extends Single implements Scope {
+public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
   /** Function name. */
   private final QNm name;
   /** Arguments. */
@@ -81,6 +82,32 @@ public final class InlineFunc extends Single implements Scope {
     updating = ann.contains(Ann.Q_UPDATING);
     scope = scp;
     sc = stc;
+  }
+
+  @Override
+  public int arity() {
+    return args.length;
+  }
+
+  @Override
+  public QNm funcName() {
+    // inline functions have no name
+    return null;
+  }
+
+  @Override
+  public QNm argName(final int pos) {
+    return args[pos].name;
+  }
+
+  @Override
+  public FuncType funcType() {
+    return FuncType.get(ann, args, ret);
+  }
+
+  @Override
+  public Ann annotations() {
+    return ann;
   }
 
   @Override
@@ -201,6 +228,33 @@ public final class InlineFunc extends Single implements Scope {
   }
 
   @Override
+  public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
+      final InputInfo ii) throws QueryException {
+    // create let bindings for all variables
+    final Map<Var, Expr> closure = scope.closure();
+    final LinkedList<GFLWOR.Clause> cls =
+        exprs.length == 0 && closure.isEmpty() ? null : new LinkedList<GFLWOR.Clause>();
+    final IntObjMap<Var> vs = new IntObjMap<Var>();
+    for(int i = 0; i < args.length; i++) {
+      final Var old = args[i], v = scp.newCopyOf(ctx, old);
+      vs.put(old.id, v);
+      cls.add(new Let(v, exprs[i], false, ii).optimize(ctx, scp));
+    }
+
+    for(final Entry<Var, Expr> e : closure.entrySet()) {
+      final Var old = e.getKey(), v = scp.newCopyOf(ctx, old);
+      vs.put(old.id, v);
+      cls.add(new Let(v, e.getValue(), false, ii).optimize(ctx, scp));
+    }
+
+    // copy the function body
+    final Expr cpy = expr.copy(ctx, scp, vs), rt = ret == null ? cpy :
+      new TypeCheck(sc, ii, cpy, ret, true).optimize(ctx, scp);
+
+    return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(ctx, scp);
+  }
+
+  @Override
   public FuncItem item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final FuncType ft = (FuncType) type().type;
     final boolean c = ret != null && !expr.type().instanceOf(ret);
@@ -210,7 +264,7 @@ public final class InlineFunc extends Single implements Scope {
     for(final Entry<Var, Expr> e : scope.closure().entrySet())
       clos.put(e.getKey(), e.getValue().value(ctx));
 
-    return new FuncItem(args, expr, ft, clos, c, scope, sc);
+    return new FuncItem(args, expr, ft, clos, c, scope, sc, ann);
   }
 
   @Override
@@ -237,8 +291,9 @@ public final class InlineFunc extends Single implements Scope {
 
   @Override
   public boolean removable(final Var v) {
-    // [LW] Variables are removable from the closure.
-    return false;
+    for(final Entry<Var, Expr> e : scope.closure().entrySet())
+      if(!e.getValue().removable(v)) return false;
+    return true;
   }
 
   @Override
