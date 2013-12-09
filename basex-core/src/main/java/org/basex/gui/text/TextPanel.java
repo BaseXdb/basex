@@ -240,7 +240,7 @@ public class TextPanel extends BaseXPanel {
       @Override
       public void run() {
         text.setCaret(text.size());
-        cursorCode.eval(2);
+        cursorCode.execute(2);
       }
     });
   }
@@ -299,8 +299,8 @@ public class TextPanel extends BaseXPanel {
    * Adds or removes a comment.
    */
   public void comment() {
-    final int pc = text.caret();
-    if(text.comment(rend.getSyntax())) hist.store(text.text(), pc, text.caret());
+    final int caret = text.caret();
+    if(text.comment(rend.getSyntax())) hist.store(text.text(), caret, text.caret());
     scrollCode.invokeLater(true);
   }
 
@@ -308,8 +308,8 @@ public class TextPanel extends BaseXPanel {
    * Formats the selected text.
    */
   public void format() {
-    final int pc = text.caret();
-    if(text.format(rend.getSyntax())) hist.store(text.text(), pc, text.caret());
+    final int caret = text.caret();
+    if(text.format(rend.getSyntax())) hist.store(text.text(), caret, text.caret());
     scrollCode.invokeLater(true);
   }
 
@@ -498,6 +498,8 @@ public class TextPanel extends BaseXPanel {
       gui.editor.tab(true);
     } else if(CLOSETAB.is(e)) {
       gui.editor.close(null);
+    } else if(search != null && ESCAPE.is(e)) {
+      search.deactivate(true);
     } else {
       return false;
     }
@@ -507,11 +509,6 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public void keyPressed(final KeyEvent e) {
-    if(search != null && ESCAPE.is(e)) {
-      search.deactivate(true);
-      return;
-    }
-
     // ignore modifier keys
     if(specialKey(e) || modifier(e)) return;
 
@@ -530,14 +527,12 @@ public class TextPanel extends BaseXPanel {
     }
 
     // set cursor position and reset last column
-    final int pc = text.caret();
-    text.pos(pc);
+    final int caret = text.caret();
+    text.pos(caret);
     if(!PREVLINE.is(e) && !NEXTLINE.is(e)) lastCol = -1;
 
-    // necessary on Macs as the shift button is pressed for REDO
-    final boolean marking = e.isShiftDown() &&
-      !DELETE.is(e) && !BACKSPACE.is(e) && !PASTE2.is(e) &&
-      !DELLINE.is(e) && !REDOSTEP.is(e) && !PREVPAGE_RO.is(e);
+    final boolean marking = e.isShiftDown() && !BACKSPACE.is(e) && !PASTE2.is(e) &&
+        !DELLINE.is(e) && !PREVPAGE_RO.is(e);
     final boolean nomark = !text.selecting();
     if(marking && nomark) text.startSelect();
     boolean down = true;
@@ -545,7 +540,11 @@ public class TextPanel extends BaseXPanel {
 
     // operations that consider the last text mark..
     final byte[] txt = text.text();
-    if(NEXTWORD.is(e)) {
+    if(MOVEDOWN.is(e)) {
+      text.move(true);
+    } else if(MOVEUP.is(e)) {
+      text.move(false);
+    } else if(NEXTWORD.is(e)) {
       text.nextToken(marking);
     } else if(PREVWORD.is(e)) {
       text.prevToken(marking);
@@ -634,7 +633,7 @@ public class TextPanel extends BaseXPanel {
       cursorCode.invokeLater(down ? 2 : 0);
     } else {
       // text has changed: add old text to history
-      hist.store(tmp, pc, text.caret());
+      hist.store(tmp, caret, text.caret());
       scrollCode.invokeLater(down);
     }
   }
@@ -642,16 +641,16 @@ public class TextPanel extends BaseXPanel {
   /** Thread counter. */
   private final GUICode scrollCode = new GUICode() {
     @Override
-    public void eval(final Object arg) {
+    public void execute(final Object arg) {
       rend.updateScrollbar();
-      cursorCode.eval((Boolean) arg ? 2 : 0);
+      cursorCode.execute((Boolean) arg ? 2 : 0);
     }
   };
 
   /** Thread counter. */
   private final GUICode cursorCode = new GUICode() {
     @Override
-    public void eval(final Object arg) {
+    public void execute(final Object arg) {
       // updates the visible area
       final int p = scroll.pos();
       final int y = rend.cursorY();
@@ -709,8 +708,8 @@ public class TextPanel extends BaseXPanel {
   public void keyTyped(final KeyEvent e) {
     if(!hist.active() || control(e) || DELETE.is(e) || BACKSPACE.is(e) || ESCAPE.is(e)) return;
 
-    final int pc = text.caret();
-    text.pos(pc);
+    final int caret = text.caret();
+    text.pos(caret);
 
     // remember if marked text is to be deleted
     final StringBuilder sb = new StringBuilder(1).append(e.getKeyChar());
@@ -724,7 +723,7 @@ public class TextPanel extends BaseXPanel {
     final int move = ENTER.is(e) ? text.enter(sb) : text.add(sb, selected);
 
     // refresh history and adjust cursor position
-    hist.store(text.text(), pc, text.caret());
+    hist.store(text.text(), caret, text.caret());
     if(move != 0) text.setCaret(Math.min(text.size(), ps + move));
 
     // adjust text height
@@ -807,7 +806,7 @@ public class TextPanel extends BaseXPanel {
   /** Calculation counter. */
   private final GUICode resizeCode = new GUICode() {
     @Override
-    public void eval(final Object arg) {
+    public void execute(final Object arg) {
       rend.updateScrollbar();
       // update scrollbar to display value within valid range
       scroll.pos(scroll.pos());
@@ -943,7 +942,7 @@ public class TextPanel extends BaseXPanel {
   /** Find next hit. */
   class FindNextCmd extends GUIPopupCmd {
     /** Constructor. */
-    FindNextCmd() { super(Text.FIND_NEXT, FINDNEXT, FINDNEXT2); }
+    FindNextCmd() { super(Text.FIND_NEXT, FINDNEXT1, FINDNEXT2); }
 
     @Override
     public void execute() { find(true); }
@@ -954,7 +953,7 @@ public class TextPanel extends BaseXPanel {
   /** Find previous hit. */
   class FindPrevCmd extends GUIPopupCmd {
     /** Constructor. */
-    FindPrevCmd() { super(Text.FIND_PREVIOUS, FINDPREV, FINDPREV2); }
+    FindPrevCmd() { super(Text.FIND_PREVIOUS, FINDPREV1, FINDPREV2); }
 
     @Override
     public void execute() { find(true); }

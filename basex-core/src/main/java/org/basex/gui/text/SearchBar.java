@@ -89,7 +89,7 @@ public final class SearchBar extends BaseXBack {
     search.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        if(FINDPREV.is(e) || FINDPREV2.is(e) || FINDNEXT.is(e) || FINDNEXT2.is(e)) {
+        if(FINDPREV1.is(e) || FINDPREV2.is(e) || FINDNEXT1.is(e) || FINDNEXT2.is(e)) {
           editor.text.noSelect();
           deactivate(false);
         } else if(ESCAPE.is(e)) {

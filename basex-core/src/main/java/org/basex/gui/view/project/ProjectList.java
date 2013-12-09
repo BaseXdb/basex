@@ -34,7 +34,7 @@ public class ProjectList extends JList {
     new GUIPopupCmd(REFRESH, BaseXKeys.REFRESH) {
       @Override public void execute() { project.filter.refresh(true); }
     },
-    new GUIPopupCmd(COPY_PATH, BaseXKeys.COPY_PATH) {
+    new GUIPopupCmd(COPY_PATH, BaseXKeys.COPYPATH) {
       @Override public void execute() {
         if(enabled(null)) BaseXLayout.copy(selectedValue());
       }

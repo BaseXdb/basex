@@ -7,6 +7,7 @@ import java.io.*;
 import java.math.*;
 import java.nio.*;
 import java.nio.charset.*;
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.io.in.*;
@@ -298,7 +299,7 @@ public final class FNConvert extends StandardFunc {
     final ByteBuffer bb = Charset.forName(enc).newEncoder().encode(CharBuffer.wrap(string(in)));
     final int il = bb.limit();
     final byte[] tmp = bb.array();
-    return tmp.length == il  ? tmp : Array.copyOf(tmp, il);
+    return tmp.length == il  ? tmp : Arrays.copyOf(tmp, il);
   }
 
   /**

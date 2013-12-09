@@ -17,7 +17,7 @@ public abstract class GUICode {
    * Code to be run.
    * @param arg argument (may be {@code null})
    */
-  public abstract void eval(final Object arg);
+  public abstract void execute(final Object arg);
 
   /**
    * Invokes the specified thread after all other threads.
@@ -35,7 +35,7 @@ public abstract class GUICode {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        if(c == counter) eval(arg);
+        if(c == counter) execute(arg);
       }
     });
   }

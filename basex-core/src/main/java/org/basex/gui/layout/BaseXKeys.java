@@ -28,23 +28,20 @@ public enum BaseXKeys {
   /** Down.                  */ NEXTLINE(VK_DOWN),
   /** Page up.               */ PREVPAGE(VK_PAGE_UP),
   /** Page down.             */ NEXTPAGE(VK_PAGE_DOWN),
-  /** Page up (read-only).   */ PREVPAGE_RO(SHIFT, VK_SPACE),
-  /** Page down (read-only). */ NEXTPAGE_RO(VK_SPACE),
   /** Beginning of text.     */ TEXTSTART(META, MAC ? VK_UP : VK_HOME),
   /** End of text.           */ TEXTEND(META, MAC ? VK_DOWN : VK_END),
   /** Scroll up.             */ SCROLLUP(MAC ? ALT : META, VK_UP, true),
   /** Scroll down.           */ SCROLLDOWN(MAC ? ALT : META, VK_DOWN, true),
 
-  // Find
+  /** Tab key.               */ TAB(VK_TAB),
 
-  /** Find search term.      */ FIND(META, VK_F, true),
-  /** Find next hit.         */ FINDNEXT(MAC ? META : 0, VK_F3, true),
-  /** Find next hit.         */ FINDNEXT2(META, VK_G, true),
-  /** Find previous hit.     */ FINDPREV(MAC ? META | SHIFT : SHIFT, VK_F3, true),
-  /** Find previous hit.     */ FINDPREV2(META | SHIFT, VK_G, true),
-  /** Code completion.       */ COMPLETE(CTRL, VK_SPACE),
+  /** Page up (read-only).   */ PREVPAGE_RO(SHIFT, VK_SPACE, true),
+  /** Page down (read-only). */ NEXTPAGE_RO(VK_SPACE, true),
 
   // Editing
+
+  /** Delete backwards.      */ BACKSPACE(VK_BACK_SPACE),
+  /** Delete.                */ DELETE(VK_DELETE, true),
 
   /** Undo.                  */ UNDOSTEP(META, VK_Z, true),
   /** Redo.                  */ REDOSTEP(MAC ? META | SHIFT : META, MAC ? VK_Z : VK_Y, true),
@@ -57,16 +54,16 @@ public enum BaseXKeys {
   /** Paste.                 */ PASTE2(SHIFT, VK_INSERT, true),
   /** Select all.            */ SELECTALL(META, VK_A, true),
 
-  /** Delete backwards.      */ BACKSPACE(VK_BACK_SPACE),
-  /** Delete.                */ DELETE(VK_DELETE),
+  /** Move line(s) down.     */ MOVEDOWN(MAC ? ALT | SHIFT : ALT, VK_DOWN, true),
+  /** Move line(s) up.       */ MOVEUP(MAC ? ALT | SHIFT : ALT, VK_UP, true),
+
+  /** Code completion.       */ COMPLETE(CTRL, VK_SPACE, true),
+
   /** Delete word backwards. */ DELPREVWORD(MAC ? ALT : META, VK_BACK_SPACE, true),
   /** Delete word.           */ DELNEXTWORD(MAC ? ALT : META, VK_DELETE, true),
   /** Delete line to begin.  */ DELLINESTART(META | (MAC ? 0 : SHIFT), VK_BACK_SPACE, true),
   /** Delete line to end.    */ DELLINEEND(META | (MAC ? 0 : SHIFT), VK_DELETE, true),
   /** Delete complete line.  */ DELLINE(META | SHIFT, VK_D, true),
-
-  /** Execute.               */ EXEC1(META, VK_ENTER, true),
-  /** Execute.               */ EXEC2(META, VK_F11, true),
 
   // Navigation
 
@@ -83,11 +80,13 @@ public enum BaseXKeys {
 
   /** Go to line.            */ GOTOLINE(META, VK_L, true),
 
-  // Project structure
+  // Find
 
-  /** Refresh.               */ REFRESH(VK_F5),
-  /** Rename.                */ RENAME(VK_F2),
-  /** New directory.         */ NEWDIR(META | SHIFT, VK_N),
+  /** Find search term.      */ FIND(META, VK_F, true),
+  /** Find next hit.         */ FINDNEXT1(MAC ? META : 0, VK_F3, true),
+  /** Find next hit.         */ FINDNEXT2(META, VK_G, true),
+  /** Find previous hit.     */ FINDPREV1(MAC ? META | SHIFT : SHIFT, VK_F3, true),
+  /** Find previous hit.     */ FINDPREV2(META | SHIFT, VK_G, true),
 
   // Font
 
@@ -98,14 +97,20 @@ public enum BaseXKeys {
 
   // General
 
-  /** Escape.                */ ESCAPE(VK_ESCAPE),
-  /** Context menu.          */ CONTEXT(VK_CONTEXT_MENU),
-  /** Copy path.             */ COPY_PATH(META | SHIFT, VK_C),
+  /** Execute.               */ EXEC1(META, VK_ENTER, true),
+  /** Execute.               */ EXEC2(META, VK_F11, true),
 
-  /** Space key.             */ SPACE(VK_SPACE),
-  /** Tab key.               */ TAB(VK_TAB),
+  /** Escape.                */ ESCAPE(VK_ESCAPE, true),
+  /** Context menu.          */ CONTEXT(VK_CONTEXT_MENU, true),
+  /** Copy path.             */ COPYPATH(META | SHIFT, VK_C, true),
+
+  /** Refresh.               */ REFRESH(VK_F5, true),
+  /** Rename.                */ RENAME(VK_F2, true),
+  /** New directory.         */ NEWDIR(META | SHIFT, VK_N, true),
+
+  /** Space key.             */ SPACE(VK_SPACE, true),
   /** Enter.                 */ ENTER(VK_ENTER, true),
-  /** Shift Enter.           */ OPEN(SHIFT, VK_ENTER);
+  /** Shift Enter.           */ OPEN(SHIFT, VK_ENTER, true);
 
   /** Modifiers. */
   private final int mod;

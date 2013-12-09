@@ -105,7 +105,6 @@ public final class EditorArea extends TextPanel {
   public void keyPressed(final KeyEvent e) {
     final byte[] txt = text.text();
     super.keyPressed(e);
-
     if(txt != text.text()) resetError();
     view.posCode.invokeLater();
   }
@@ -122,7 +121,7 @@ public final class EditorArea extends TextPanel {
     super.keyReleased(e);
     if(EXEC1.is(e) || EXEC2.is(e)) {
       release(Action.EXECUTE);
-    } else if(!e.isActionKey() && !modifier(e)) {
+    } else if((!e.isActionKey() || MOVEDOWN.is(e) || MOVEUP.is(e)) && !modifier(e)) {
       release(Action.CHECK);
     }
   }

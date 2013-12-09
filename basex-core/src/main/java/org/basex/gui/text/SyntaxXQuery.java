@@ -201,7 +201,7 @@ public final class SyntaxXQuery extends Syntax {
    */
   private boolean matches(final char ch, final int pos, final byte[] text, final int dist) {
     for(int d = 0; dist > 0 ? d < dist : d > dist; d += dist > 0 ? 1 : -1) {
-      int p = pos + d;
+      final int p = pos + d;
       if(p < 0 || p >= text.length) break;
       if(text[p] == ch) return true;
     }

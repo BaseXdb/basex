@@ -485,7 +485,7 @@ public final class EditorView extends View {
   }
 
   /**
-   * Executes the current file.
+   * Parses or evaluates the current file.
    * @param action action
    * @param editor current editor
    */
@@ -882,7 +882,7 @@ public final class EditorView extends View {
   /** Code for setting cursor position. */
   public final GUICode posCode = new GUICode() {
     @Override
-    public void eval(final Object arg) {
+    public void execute(final Object arg) {
       final int[] lc = getEditor().pos();
       pos.setText(lc[0] + " : " + lc[1]);
     }

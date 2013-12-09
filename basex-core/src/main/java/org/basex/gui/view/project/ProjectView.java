@@ -435,7 +435,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
   /** Copy path command. */
   final class CopyPathCmd extends GUIPopupCmd {
     /** Constructor. */
-    CopyPathCmd() { super(COPY_PATH, BaseXKeys.COPY_PATH); }
+    CopyPathCmd() { super(COPY_PATH, BaseXKeys.COPYPATH); }
 
     @Override public void execute() {
       BaseXLayout.copy(selectedNode().file.path());

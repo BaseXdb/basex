@@ -19,7 +19,7 @@ final class CsvParser extends InputParser {
   /** Column separator (see {@link CsvOptions#SEPARATOR}). */
   private final int separator;
   /** Parse quotes.  */
-  private boolean quotes;
+  private final boolean quotes;
 
   /** First entry of a line. */
   private boolean first = true;

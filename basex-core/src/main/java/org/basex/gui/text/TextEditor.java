@@ -317,6 +317,41 @@ public final class TextEditor {
   }
 
   /**
+   * Moves lines up or down.
+   * @param down down/up flag
+   */
+  void move(final boolean down) {
+    extend();
+    if(!selected()) return;
+
+    final int tl = text.length;
+    final int s = selectPos, e = selectEnd;
+    final byte[] tmp = Arrays.copyOf(text, tl);
+    if(down) {
+      if(e == text.length) return;
+      pos(e);
+      eol(true);
+      int c = s;
+      for(int i = e; i < pos; i++) tmp[c++] = text[i];
+      tmp[c++] = '\n';
+      for(int i = s; i < e - 1; i++) tmp[c++] = text[i];
+      text(tmp);
+      select(s + pos - e + 1, Math.min(tl, pos + 1));
+      pos(s + pos - e + 1);
+    } else {
+      if(s == 0) return;
+      pos(s - 1);
+      bol(true);
+      int c = pos;
+      for(int i = s; i < e; i++) tmp[c++] = text[i];
+      if(tmp[c - 1] != '\n') tmp[c++] = '\n';
+      for(int i = pos; i < s && c < tl; i++) tmp[c++] = text[i];
+      text(tmp);
+      select(pos, pos + e - s);
+    }
+  }
+
+  /**
    * Code completion.
    */
   void complete() {
@@ -363,29 +398,6 @@ public final class TextEditor {
   }
 
   /**
-   * Checks if the specified key is found before the current cursor position.
-   * @param s start
-   * @param e end
-   * @param value new value
-   */
-  private void replace(final int s, final int e, final String value) {
-    select(s, e);
-    delete();
-    add(value);
-  }
-
-  /**
-   * Checks if the specified key is found before the current cursor position.
-   * @param key string to be found
-   * @return result of check
-   */
-  private boolean find(final String key) {
-    final byte[] k = token(key);
-    final int s = pos - k.length;
-    return s >= 0 && indexOf(text, k, s) == s && (s == 0 || !XMLToken.isChar(text[s - 1]));
-  }
-
-  /**
    * Formats the selected text.
    * @param syntax syntax highlighter
    * @return {@code true} if text has changed
@@ -415,7 +427,7 @@ public final class TextEditor {
    */
   boolean indent(final StringBuilder sb, final boolean shift) {
     // no selection, shift pressed: select current character
-    if(!selected() && shift && text.length != 0) select(pos + 1, pos);
+    if(!selected() && shift && text.length != 0) selectLine();
 
     // check if something is selected
     if(selected()) {
@@ -437,80 +449,6 @@ public final class TextEditor {
       sb.append("  ");
     }
     return false;
-  }
-
-  /**
-   * Extends selection to the beginning of first and end of last line.
-   */
-  void extend() {
-    int s = Math.min(selectPos, selectEnd), e = Math.max(selectPos, selectEnd);
-    final int tl = text.length;
-    while(e > 0 && text[e - 1] == '\n') e--;
-    while(s > 0 && text[s - 1] != '\n') --s;
-    while(e < tl && text[e] != '\n') ++e;
-    selectPos = s;
-    selectEnd = e;
-  }
-
-  /**
-   * Indents lines.
-   * @param shift shift flag
-   */
-  void indent(final boolean shift) {
-    extend();
-    final int s = selectPos, e = selectEnd, tl = text.length;
-    int o = e;
-
-    // build new text
-    final TokenBuilder tb = new TokenBuilder();
-    for(int p = s; p < e; p += cl(text, p)) {
-      if(p == 0 || text[p - 1] == '\n') {
-        if(shift) {
-          // remove indentation
-          if(text[p] == '\t') {
-            o--;
-            continue;
-          }
-          if(text[p] == ' ') {
-            o--;
-            for(int i = 1; i < TAB && p + i < tl && text[p + i] == ' '; i++) {
-              o--;
-              p++;
-            }
-            continue;
-          }
-        } else {
-          // add new indentation
-          tb.add(INDENT);
-          o += TAB;
-        }
-      }
-      tb.add(cp(text, p));
-    }
-    add(tb.finish(), s, e);
-    select(s, o);
-    setCaret(o);
-  }
-
-  /**
-   * Adds indenting spaces to the specified string builder.
-   * @return number of spaces to indent
-   */
-  int open() {
-    // adopt indentation from previous line
-    int ind = 0;
-    for(int p = pos - 1; p >= 0; p--) {
-      final byte b = text[p];
-      if(b == '\n') break;
-      if(b == '\t') {
-        ind += TAB;
-      } else if(b == ' ') {
-        ind++;
-      } else {
-        ind = 0;
-      }
-    }
-    return ind;
   }
 
   /**
@@ -685,6 +623,117 @@ public final class TextEditor {
     System.arraycopy(text, e, tmp, s, tl - e);
     text(tmp);
     pos = s;
+  }
+
+  // PRIVATE METHODS ==============================================================================
+
+  /**
+   * Checks if the specified key is found before the current cursor position.
+   * @param s start
+   * @param e end
+   * @param value new value
+   */
+  private void replace(final int s, final int e, final String value) {
+    select(s, e);
+    delete();
+    add(value);
+  }
+
+  /**
+   * Checks if the specified key is found before the current cursor position.
+   * @param key string to be found
+   * @return result of check
+   */
+  private boolean find(final String key) {
+    final byte[] k = token(key);
+    final int s = pos - k.length;
+    return s >= 0 && indexOf(text, k, s) == s && (s == 0 || !XMLToken.isChar(text[s - 1]));
+  }
+
+  /**
+   * Extends the current selection to the beginning of the first and the end of the last line.
+   */
+  private void extend() {
+    if(!selected()) selectLine();
+    int s = Math.min(selectPos, selectEnd), e = Math.max(selectPos, selectEnd);
+    final int tl = text.length;
+    while(s > 0 && text[s - 1] != '\n') s--;
+    if(e > 0) while(e < tl && text[e - 1] != '\n') e++;
+    selectPos = s;
+    selectEnd = e;
+  }
+
+  /**
+   * Indents lines.
+   * @param shift shift flag
+   */
+  private void indent(final boolean shift) {
+    extend();
+    final int s = selectPos, e = selectEnd, tl = text.length;
+    int o = e;
+
+    // build new text
+    final TokenBuilder tb = new TokenBuilder();
+    boolean indent = true;
+    for(int p = s; p < e; p += cl(text, p)) {
+      if(p == 0 || text[p - 1] == '\n') {
+        indent = true;
+        if(shift) {
+          // remove indentation
+          if(text[p] == '\t') {
+            o--;
+            continue;
+          }
+          if(text[p] == ' ') {
+            o--;
+            for(int i = 1; i < TAB && p + i < tl && text[p + i] == ' '; i++) {
+              o--;
+              p++;
+            }
+            continue;
+          }
+        } else {
+          // add new indentation
+          tb.add(INDENT);
+          o += TAB;
+        }
+      }
+      // remove tab indentations
+      int cp = cp(text, p);
+      if(indent) {
+        if(cp == '\t') {
+          cp = ' ';
+          tb.add(' ');
+        } else if(cp != ' ') {
+          indent = false;
+        }
+      }
+      tb.add(cp);
+    }
+    add(tb.finish(), s, e);
+    select(s, o);
+    setCaret(o);
+  }
+
+  /**
+   * Adds indenting spaces to the specified string builder.
+   * @return number of spaces to indent
+   */
+  private int open() {
+    // adopt indentation from previous line
+    int ind = 0;
+    for(int p = pos - 1; p >= 0; p--) {
+      final byte b = text[p];
+      if(b == '\n') break;
+      if(b == '\t') {
+        ind += TAB;
+      } else if(b == ' ') {
+        ind++;
+      } else {
+        ind = 0;
+      }
+    }
+    return ind;
   }
 
   // TEXT NAVIGATION AND SELECTION ================================================================
