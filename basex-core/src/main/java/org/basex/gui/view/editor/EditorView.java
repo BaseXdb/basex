@@ -110,6 +110,7 @@ public final class EditorView extends View {
 
     tabs = new BaseXTabs(gui);
     tabs.setFocusable(Prop.MAC);
+    tabs.addDragDrop(false);
     addCreateTab();
 
     final SearchEditor center = new SearchEditor(gui, tabs, null);

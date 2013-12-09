@@ -1,8 +1,11 @@
 package org.basex.gui.layout;
 
 import java.awt.*;
+import java.awt.event.*;
 
 import javax.swing.*;
+
+import org.basex.gui.*;
 
 /**
  * Project specific TabbedPane implementation.
@@ -11,6 +14,9 @@ import javax.swing.*;
  * @author Christian Gruen
  */
 public final class BaseXTabs extends JTabbedPane {
+  /** Index of currently dragged tab (default: {@code -1}). */
+  private int draggedTab = -1;
+
   /**
    * Default constructor.
    * @param win parent window
@@ -31,69 +37,61 @@ public final class BaseXTabs extends JTabbedPane {
     setTabComponentAt(getSelectedIndex(), header);
   }
 
-  /* Tab image.
-  private Image tabImage;
-  /* Dragged mouse position.
-  private Point dragPos;
-  /* Index of dragged tab.
-  private int dragIndex;
-
-  /*
+  /**
    * Adds drag and drop support.
-  public void dragDrop() {
+   * @param last include last tab
+   */
+  public void addDragDrop(final boolean last) {
     addMouseMotionListener(new MouseMotionAdapter() {
       @Override
       public void mouseDragged(final MouseEvent e) {
-        if(dragIndex < 0) return;
-
-        dragPos = e.getPoint();
-        if(tabImage == null) {
-          final Rectangle bounds = getUI().getTabBounds(BaseXTabs.this, dragIndex);
-          final BufferedImage bi = new BufferedImage(getWidth(), getHeight(),
-              BufferedImage.TYPE_INT_ARGB);
-          Graphics g = bi.getGraphics();
-          g.setClip(bounds);
-          setDoubleBuffered(false);
-          paintComponent(g);
-          tabImage = new BufferedImage(bounds.width, bounds.height, BufferedImage.TYPE_INT_ARGB);
-          g = tabImage.getGraphics();
-          g.drawImage(bi, 0, 0, bounds.width, bounds.height, bounds.x, bounds.y,
-              bounds.x + bounds.width, bounds.y + bounds.height, BaseXTabs.this);
+        if(draggedTab == -1) {
+          int tabs = getTabCount();
+          int t = getUI().tabForCoordinate(BaseXTabs.this, e.getX(), e.getY());
+          if(tabs == (last ? 1 : 2) || !last && t + 1 == tabs) t = -1;
+          if(t != -1) {
+            draggedTab = t;
+            setCursor(GUIConstants.CURSORMOVE);
+          }
         }
-        repaint();
+        refreshTabs();
       }
     });
 
     addMouseListener(new MouseAdapter() {
       @Override
-      public void mousePressed(final MouseEvent e) {
-        dragIndex = getUI().tabForCoordinate(BaseXTabs.this, e.getX(), e.getY());
-        if(dragIndex < 0) return;
-      }
-
-      @Override
       public void mouseReleased(final MouseEvent e) {
-        if(tabImage != null) {
-          final int tab = Math.min(getTabCount() - 2,
-              getUI().tabForCoordinate(BaseXTabs.this, e.getX(), 10));
-          if(tab >= 0) {
-            final Component comp = getComponentAt(dragIndex);
-            final Component head = getTabComponentAt(dragIndex);
-            removeTabAt(dragIndex);
-            add(comp, head, tab);
-          }
+        if(draggedTab < 0) return;
+
+        final int index = Math.min(getTabCount() - (last ? 1 : 2),
+            getUI().tabForCoordinate(BaseXTabs.this, e.getX(), 10));
+        if(index >= 0) {
+          final Component comp = getComponentAt(draggedTab);
+          final Component head = getTabComponentAt(draggedTab);
+          removeTabAt(draggedTab);
+          add(comp, head, index);
         }
-        dragIndex = -1;
-        tabImage = null;
-        repaint();
+        draggedTab = -1;
+        setCursor(GUIConstants.CURSORARROW);
+        refreshTabs();
       }
     });
   }
 
-  @Override
-  public void paintComponent(final Graphics g) {
-    super.paintComponent(g);
-    if(tabImage != null) g.drawImage(tabImage, dragPos.x, dragPos.y, this);
+  /**
+   * Refreshes the appearance of all tabs.
+   */
+  private void refreshTabs() {
+    final int tabs = getTabCount();
+    for(int t = 0; t < tabs; t++) {
+      final Component tab = getTabComponentAt(t);
+      if(tab instanceof Container) {
+        final Container cont = (Container) tab;
+        final int comps = cont.getComponentCount();
+        for(int c = 0; c < comps; c++) {
+          cont.getComponent(c).setEnabled(draggedTab == -1 || t == draggedTab);
+        }
+      }
+    }
   }
-  */
 }
