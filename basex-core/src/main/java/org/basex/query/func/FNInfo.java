@@ -87,20 +87,16 @@ public final class FNInfo extends StandardFunc {
   private Iter trace(final QueryContext ctx) throws QueryException {
     return new Iter() {
       final Iter ir = expr[0].iter(ctx);
-      final byte[] s = checkStr(expr[1], ctx);
+      final byte[] label = checkStr(expr[1], ctx);
       boolean empty = true;
       @Override
       public Item next() throws QueryException {
         final Item it = ir.next();
         if(it != null) {
-          try {
-            dump(it.serialize().toArray(), s, ctx);
-          } catch(final QueryIOException ex) {
-            throw ex.getCause(info);
-          }
+          dump(it, label, info, ctx);
           empty = false;
         } else if(empty) {
-          dump(Token.token(SeqType.EMP.toString()), s, ctx);
+          dump(null, label, info, ctx);
         }
         return it;
       }
@@ -126,6 +122,31 @@ public final class FNInfo extends StandardFunc {
   private Str envVar(final QueryContext ctx) throws QueryException {
     final String e = System.getenv(Token.string(checkStr(expr[0], ctx)));
     return e != null ? Str.get(e) : null;
+  }
+
+  /**
+   * Dumps the specified item.
+   * @param it item to be dumped
+   * @param label label
+   * @param info input info
+   * @param ctx query context
+   * @throws QueryException query exception
+   */
+  public static void dump(final Item it, final byte[] label, final InputInfo info,
+      final QueryContext ctx) throws QueryException {
+    try {
+      final byte[] value;
+      if(it == null) {
+        value = Token.token(SeqType.EMP.toString());
+      } else if(it.type == NodeType.ATT || it.type == NodeType.NSP) {
+        value = Token.token(it.toString());
+      } else {
+        value = it.serialize().toArray();
+      }
+      dump(value, label, ctx);
+    } catch(final QueryIOException ex) {
+      throw ex.getCause(info);
+    }
   }
 
   /**

@@ -7,7 +7,6 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -91,17 +90,13 @@ public final class FNProf extends StandardFunc {
    */
   private Item dump(final QueryContext ctx) throws QueryException {
     final Iter ir = expr[0].iter(ctx);
-    final byte[] s = expr.length > 1 ? checkStr(expr[1], ctx) : null;
+    final byte[] label = expr.length > 1 ? checkStr(expr[1], ctx) : null;
     boolean empty = true;
     for(Item it; (it = ir.next()) != null;) {
-      try {
-        FNInfo.dump(it.serialize().toArray(), s, ctx);
-        empty = false;
-      } catch(final QueryIOException ex) {
-        throw ex.getCause(info);
-      }
+      FNInfo.dump(it, label, info, ctx);
+      empty = false;
     }
-    if(empty) FNInfo.dump(token(SeqType.EMP.toString()), s, ctx);
+    if(empty) FNInfo.dump(null, label, info, ctx);
     return null;
   }
 
