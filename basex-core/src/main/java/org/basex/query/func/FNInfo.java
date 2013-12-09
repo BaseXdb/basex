@@ -26,8 +26,7 @@ public final class FNInfo extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNInfo(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNInfo(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 
@@ -89,13 +88,19 @@ public final class FNInfo extends StandardFunc {
     return new Iter() {
       final Iter ir = expr[0].iter(ctx);
       final byte[] s = checkStr(expr[1], ctx);
+      boolean empty = true;
       @Override
       public Item next() throws QueryException {
         final Item it = ir.next();
-        if(it != null) try {
-          dump(it.serialize().toArray(), s, ctx);
-        } catch(final QueryIOException ex) {
-          throw ex.getCause(info);
+        if(it != null) {
+          try {
+            dump(it.serialize().toArray(), s, ctx);
+          } catch(final QueryIOException ex) {
+            throw ex.getCause(info);
+          }
+          empty = false;
+        } else if(empty) {
+          dump(Token.token(SeqType.EMP.toString()), s, ctx);
         }
         return it;
       }
