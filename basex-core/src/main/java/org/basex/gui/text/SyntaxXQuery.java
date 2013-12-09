@@ -20,10 +20,15 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class SyntaxXQuery extends Syntax {
-  /** Error color. */
-  private static final HashSet<String> KEYS = new HashSet<String>();
-  /** Error color. */
-  private static final HashSet<String> FUNC = new HashSet<String>();
+  /** Opening brackets. */
+  private static final String OPENING = "{(";
+  /** Closing brackets. */
+  private static final String CLOSING = "})";
+
+  /** Keywords. */
+  private static final HashSet<String> KEYWORDS = new HashSet<String>();
+  /** Functions. */
+  private static final HashSet<String> FUNCTIONS = new HashSet<String>();
 
   /** Comment. */
   private int comment;
@@ -41,12 +46,12 @@ public final class SyntaxXQuery extends Syntax {
       for(final Field f : QueryText.class.getFields()) {
         if("IGNORE".equals(f.getName())) break;
         final String s = (String) f.get(null);
-        Collections.addAll(KEYS, s.split("-"));
+        Collections.addAll(KEYWORDS, s.split("-"));
       }
       // add function names
       for(final Function f : Function.values()) {
         final String s = f.toString();
-        Collections.addAll(FUNC, s.substring(0, s.indexOf('(')).split(":|-"));
+        Collections.addAll(FUNCTIONS, s.substring(0, s.indexOf('(')).split(":|-"));
       }
       // add serialization parameters and database options
       addOptions(SerializerOptions.class);
@@ -65,7 +70,7 @@ public final class SyntaxXQuery extends Syntax {
   private static void addOptions(final Class<? extends Options> opt) throws Exception {
     for(final Option<?> o : Options.options(opt)) {
       if(o instanceof Comment) continue;
-      Collections.addAll(FUNC, o.name().toLowerCase(Locale.ENGLISH).split("-"));
+      Collections.addAll(FUNCTIONS, o.name().toLowerCase(Locale.ENGLISH).split("-"));
     }
   }
 
@@ -122,8 +127,8 @@ public final class SyntaxXQuery extends Syntax {
 
     // check for keywords and function names
     final String word = iter.nextString();
-    final boolean keys = KEYS.contains(word);
-    final boolean func = FUNC.contains(word);
+    final boolean keys = KEYWORDS.contains(word);
+    final boolean func = FUNCTIONS.contains(word);
     if(fun && func) return FUNCTION;
     if(keys) return KEYWORD;
     if(func) {
@@ -152,20 +157,20 @@ public final class SyntaxXQuery extends Syntax {
     final int tl = text.length;
     for(int t = 0; t < tl; t++) {
       final byte ch = text[t];
-      final int open = TextEditor.OPENING.indexOf(ch);
-      final int close = TextEditor.CLOSING.indexOf(ch);
+      final int open = OPENING.indexOf(ch);
+      final int close = CLOSING.indexOf(ch);
       final int next = t + 1 < tl ? text[t + 1] : 0;
       final int prev = t > 0 ? text[t - 1] : 0;
       if(open != -1 && (next != ':' || ch != '(')) {
         ind++;
         tb.addByte(ch);
-        if(next != '\n' && !matches(TextEditor.CLOSING.charAt(open), t, text, 3)) {
+        if(next != '\n' && !matches(CLOSING.charAt(open), t, text, 3)) {
           tb.add('\n');
           for(int i = 0; i < ind; i++) tb.add(TextEditor.INDENT);
         }
       } else if(close != -1 && (prev != ':' || ch != ')')) {
         ind--;
-        if(!spaces(tb) && !matches(TextEditor.OPENING.charAt(close), t, text, -3)) {
+        if(!spaces(tb) && !matches(OPENING.charAt(close), t, text, -3)) {
           tb.add('\n');
           for(int i = 0; i < ind; i++) tb.add(TextEditor.INDENT);
         }
