@@ -256,8 +256,51 @@ public final class QueryContext extends Proc {
     if(inf) {
       info.add(NL).add(QUERY).add(COL).add(NL).add(
           QueryProcessor.removeComments(query, Integer.MAX_VALUE)).add(NL);
-      if(compInfo) info.add(NL + OPTIMIZED_QUERY + COL + NL + funcs + root + NL);
+      if(compInfo) info.add(NL + OPTIMIZED_QUERY + COL + NL + usedDecls(root) + NL);
     }
+  }
+
+  /**
+   * Serializes all functions and variables reachable from the given main module.
+   * @param mod module to start from
+   * @return the string representation
+   */
+  private String usedDecls(final MainModule mod) {
+    final IdentityHashMap<Scope, Object> map = new IdentityHashMap<Scope, Object>();
+    final StringBuilder sb = new StringBuilder();
+    mod.visit(new ASTVisitor() {
+      @Override
+      public boolean staticVar(final StaticVar var) {
+        if(map.put(var, var) == null) {
+          var.visit(this);
+          sb.append(var).append(NL);
+        }
+        return true;
+      }
+
+      @Override
+      public boolean funcCall(final StaticFuncCall call) {
+        final StaticFunc f = call.func();
+        if(map.put(f, f) == null) {
+          f.visit(this);
+          sb.append(f).append(NL);
+        }
+        return true;
+      }
+
+      @Override
+      public boolean inlineFunc(final Scope sub) {
+        if(map.put(sub, sub) == null) sub.visit(this);
+        return true;
+      }
+
+      @Override
+      public boolean funcItem(final FuncItem func) {
+        if(map.put(func, func) == null) func.visit(this);
+        return true;
+      }
+    });
+    return sb.append(mod).toString();
   }
 
   /**
