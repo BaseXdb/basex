@@ -19,9 +19,9 @@ import org.basex.util.list.*;
  */
 public final class TextEditor {
   /** Opening brackets. */
-  static final String OPENING = "{[(";
+  private static final String OPENING = "{([";
   /** Closing brackets. */
-  static final String CLOSING = "}])";
+  private static final String CLOSING = "})]";
   /** Tab width. */
   static final int TAB = 2;
   /** Indentation. */
@@ -379,7 +379,7 @@ public final class TextEditor {
       // delete old string, add new one
       replace(p, pos + (space ? 1 : 0), value);
       // adjust cursor
-      setCaret(cursor != -1 ? p + cursor : pos);
+      pos(cursor != -1 ? p + cursor : pos);
     }
 
     // replace entities
@@ -390,7 +390,6 @@ public final class TextEditor {
     final byte[] value = XMLToken.getEntity(token(key));
     if(value != null) {
       replace(p, pos + (space ? 1 : 0), string(value));
-      setCaret(pos);
       return;
     }
 
