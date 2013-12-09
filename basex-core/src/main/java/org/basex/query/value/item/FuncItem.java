@@ -339,7 +339,7 @@ public final class FuncItem extends FItem implements Scope {
    */
   private boolean inline(final Expr[] as, final QueryContext ctx) {
     if(expr.isValue() || expr.exprSize() < ctx.context.options.get(MainOptions.INLINELIMIT) &&
-        !(expr.has(Flag.NDT) || expr.has(Flag.CTX))) {
+        !expr.has(Flag.CTX)) {
       final ASTVisitor visitor = new ASTVisitor() {
         @Override
         public boolean funcItem(final FuncItem f) {

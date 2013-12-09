@@ -1,6 +1,7 @@
 package org.basex.query.func;
 
 import org.basex.query.ast.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -26,7 +27,7 @@ public class FNFuncTest extends QueryPlanTest {
         "10",
         "empty(//" + Util.className(FNFunc.class) + "[contains(@name, 'fold-left')])",
         "empty(*/" + Util.className(Int.class) + ")",
-        "count(//" + Util.className(DynFuncCall.class) + ") eq 9");
+        "count(//" + Util.className(Arith.class) + "[@op = '+']) eq 9");
     // should not be unrolled
     check("fn:fold-left(1 to 10, 0, function($a,$b) {$a+$b})",
         "55",
@@ -46,7 +47,7 @@ public class FNFuncTest extends QueryPlanTest {
         "10",
         "empty(//" + Util.className(FNFunc.class) + ")",
         "empty(*/" + Util.className(Int.class) + ")",
-        "count(//" + Util.className(DynFuncCall.class) + ") eq 9");
+        "count(//" + Util.className(Arith.class) + "[@op = '+']) eq 9");
     // should not be unrolled
     check("fn:fold-right(0 to 9, 10, function($a,$b) {$a+$b})",
         "55",
@@ -66,7 +67,7 @@ public class FNFuncTest extends QueryPlanTest {
         "1 2 3 4 5 6 7 8 9",
         "empty(//" + Util.className(FNFunc.class) + ")",
         "empty(*/" + Util.className(IntSeq.class) + ")",
-        "count(//" + Util.className(DynFuncCall.class) + ") eq 9");
+        "count(//" + Util.className(Arith.class) + "[@op = '+']) eq 9");
     // should not be unrolled
     check("fn:for-each(0 to 9, function($x) {$x+1})",
         "1 2 3 4 5 6 7 8 9 10",

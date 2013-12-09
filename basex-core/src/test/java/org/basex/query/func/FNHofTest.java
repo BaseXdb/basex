@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.ast.*;
+import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -54,7 +55,7 @@ public final class FNHofTest extends QueryPlanTest {
         "9",
         "empty(//" + Util.className(FNHof.class) + "[contains(@name, 'fold-left1')])",
         "empty(*/" + Util.className(Int.class) + ")",
-        "count(//" + Util.className(DynFuncCall.class) + ") eq 8");
+        "count(//" + Util.className(Arith.class) + "[@op = '+']) eq 8");
     // should not be unrolled
     check("hof:fold-left1(1 to 10, function($a,$b) {$a+$b})",
         "55",
