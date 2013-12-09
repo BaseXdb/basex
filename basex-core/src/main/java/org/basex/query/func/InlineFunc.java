@@ -96,6 +96,11 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
+  public QNm argName(final int pos) {
+    return args[pos].name;
+  }
+
+  @Override
   public FuncType funcType() {
     return FuncType.get(ann, args, ret);
   }

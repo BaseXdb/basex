@@ -1231,7 +1231,7 @@ public enum Function {
   }
 
   /**
-   * Returns the function'S variable names.
+   * Returns the function's variable names.
    * @return array of variable names
    */
   final String[] names() {
@@ -1249,7 +1249,7 @@ public enum Function {
     final String[] names = names();
     final QNm[] res = new QNm[arity];
     for(int i = Math.min(arity, names.length); --i >= 0;) res[i] = new QNm(names[i]);
-    if(arity >= names.length) {
+    if(arity > names.length) {
       final String[] parts = names[names.length - 1].split("(?=\\d+$)", 2);
       final int start = Integer.parseInt(parts[1]);
       for(int i = names.length; i < arity; i++)

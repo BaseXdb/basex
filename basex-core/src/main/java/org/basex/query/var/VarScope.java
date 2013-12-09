@@ -1,7 +1,5 @@
 package org.basex.query.var;
 
-import static org.basex.util.Token.*;
-
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -115,17 +113,6 @@ public final class VarScope {
    */
   public VarScope parent() {
     return parent;
-  }
-
-  /**
-   * Creates a variable with a unique, non-clashing variable name.
-   * @param ctx context for variable ID
-   * @param type type
-   * @param param function parameter flag
-   * @return variable
-   */
-  public Var uniqueVar(final QueryContext ctx, final SeqType type, final boolean param) {
-    return add(new Var(ctx, sc, new QNm(token(ctx.varIDs)), type, param));
   }
 
   /**

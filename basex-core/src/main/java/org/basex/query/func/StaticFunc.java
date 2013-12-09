@@ -156,6 +156,11 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
+  public QNm argName(final int pos) {
+    return args[pos].name;
+  }
+
+  @Override
   public FuncType funcType() {
     return FuncType.get(ann, args, declType);
   }

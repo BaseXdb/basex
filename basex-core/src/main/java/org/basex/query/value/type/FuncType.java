@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
@@ -233,23 +232,6 @@ public class FuncType implements Type {
     for(int a = 0; a < at.length; a++)
       at[a] = args[a] == null ? SeqType.ITEM_ZM : args[a].declaredType();
     return new FuncType(an, at, ret == null ? SeqType.ITEM_ZM : ret);
-  }
-
-  /**
-   * Creates variables with types corresponding to this type's arguments.
-   * @param vs array in which to write the variables
-   * @param ctx query context
-   * @param scp variable scope
-   * @param ii input info
-   * @return calls to the variables
-   */
-  public Expr[] args(final Var[] vs, final QueryContext ctx, final VarScope scp,
-      final InputInfo ii) {
-
-    final Expr[] refs = new Expr[vs.length];
-    for(int i = 0; i < vs.length; i++)
-      refs[i] = new VarRef(ii, vs[i] = scp.uniqueVar(ctx, args[i], true));
-    return refs;
   }
 
   @Override

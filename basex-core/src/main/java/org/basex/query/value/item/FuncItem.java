@@ -150,6 +150,11 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
+  public QNm argName(final int ps) {
+    return vars[ps].name;
+  }
+
+  @Override
   public FuncType funcType() {
     return (FuncType) type;
   }

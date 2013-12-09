@@ -147,8 +147,14 @@ public final class Functions extends TokenSet {
       if(fn.has(Flag.UPD)) a.add(Ann.Q_UPDATING, Empty.SEQ, ii);
       final VarScope scp = new VarScope(sc);
       final FuncType ft = fn.type(arity);
+      final QNm[] argNames = fn.argNames(arity);
+
       final Var[] args = new Var[arity];
-      final Expr[] calls = ft.args(args, ctx, scp, ii);
+      final Expr[] calls = new Expr[arity];
+      for(int i = 0; i < arity; i++) {
+        args[i] = scp.newLocal(ctx, argNames[i], ft.args[i], true);
+        calls[i] = new VarRef(ii, args[i]);
+      }
 
       final StandardFunc f = fn.get(sc, calls);
       if(!f.has(Flag.CTX) && !f.has(Flag.FCS))
@@ -165,7 +171,11 @@ public final class Functions extends TokenSet {
     final VarScope scp = new VarScope(sc);
     final FuncType jt = FuncType.arity(arity);
     final Var[] vs = new Var[arity];
-    final Expr[] refs = jt.args(vs, ctx, scp, ii);
+    final Expr[] refs = new Expr[vs.length];
+    for(int i = 0; i < vs.length; i++) {
+      vs[i] = scp.newLocal(ctx, new QNm(ARG + (i + 1), ""), SeqType.ITEM_ZM, true);
+      refs[i] = new VarRef(ii, vs[i]);
+    }
     final Expr jm = JavaMapping.get(name, refs, ctx, sc, ii);
     if(jm != null) return new FuncLit(new Ann(), name, vs, jm, jt, scp, sc, ii);
 
@@ -189,7 +199,11 @@ public final class Functions extends TokenSet {
     final VarScope scp = new VarScope(sc);
     final int arity = sf.args.length;
     final Var[] args = new Var[arity];
-    final Expr[] calls = ft.args(args, ctx, scp, info);
+    final Expr[] calls = new Expr[args.length];
+    for(int i = 0; i < args.length; i++) {
+      args[i] = scp.newLocal(ctx, sf.argName(i), ft.args[i], true);
+      calls[i] = new VarRef(info, args[i]);
+    }
     final TypedFunc tf = ctx.funcs.getFuncRef(sf.name, calls, sc, info);
     return new FuncItem(sf.name, args, tf.fun, ft, scp, sc, sf, tf.ann);
   }

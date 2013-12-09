@@ -27,6 +27,13 @@ public interface XQFunctionExpr {
   QNm funcName();
 
   /**
+   * Name of the argument at the given position.
+   * @param pos position of the argument
+   * @return name of the argument
+   */
+  QNm argName(final int pos);
+
+  /**
    * Type of this function.
    * @return this function's type
    */

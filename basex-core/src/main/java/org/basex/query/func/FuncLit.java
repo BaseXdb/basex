@@ -120,9 +120,12 @@ public final class FuncLit extends Single implements Scope {
   public static FuncLit unknown(final QNm nm, final long ar, final QueryContext ctx,
       final StaticContext sctx, final InputInfo ii) throws QueryException {
     final VarScope scp = new VarScope(sctx);
-    final FuncType temp = FuncType.arity((int) ar);
     final Var[] arg = new Var[(int) ar];
-    final Expr[] refs = temp.args(arg, ctx, scp, ii);
+    final Expr[] refs = new Expr[arg.length];
+    for(int i = 0; i < arg.length; i++) {
+      arg[i] = scp.newLocal(ctx, new QNm(QueryText.ARG + (i + 1), ""), SeqType.ITEM_ZM, true);
+      refs[i] = new VarRef(ii, arg[i]);
+    }
     final TypedFunc call = ctx.funcs.getFuncRef(nm, refs, sctx, ii);
     return new FuncLit(null, nm, arg, call.fun, null, scp, sctx, ii);
   }

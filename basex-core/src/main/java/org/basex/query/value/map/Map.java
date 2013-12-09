@@ -54,6 +54,11 @@ public final class Map extends FItem {
   }
 
   @Override
+  public QNm argName(final int pos) {
+    return new QNm("key", "");
+  }
+
+  @Override
   public FuncType funcType() {
     return MapType.get(AtomType.AAT, SeqType.ITEM_ZM);
   }

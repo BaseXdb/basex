@@ -84,7 +84,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(final VarEntry v : vars.values()) sb.append(v.var.fullDesc(sb));
+    for(final VarEntry v : vars.values()) sb.append(v.var);
     return sb.toString();
   }
 
