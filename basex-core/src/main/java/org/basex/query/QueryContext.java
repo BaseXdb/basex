@@ -246,7 +246,7 @@ public final class QueryContext extends Proc {
     // if specified, convert context item to specified type
     // [LW] should not be necessary
     if(value != null && root.sc.initType != null) {
-      value = root.sc.initType.funcConvert(this, root.sc, null, value);
+      value = root.sc.initType.funcConvert(this, root.sc, null, value, true);
     }
 
     // dynamic compilation

@@ -83,7 +83,7 @@ public final class XQDoc extends Inspect {
     final FElem functions = elem("functions", xqdoc);
     for(final StaticFunc sf : qp.funcs) {
       final int al = sf.arity();
-      final QNm name = sf.fName();
+      final QNm name = sf.funcName();
       final FuncType t = sf.funcType();
       final FElem function = elem("function", functions).add("arity", token(al));
       comment(sf, function);

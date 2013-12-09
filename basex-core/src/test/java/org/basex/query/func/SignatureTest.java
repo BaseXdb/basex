@@ -1,11 +1,16 @@
 package org.basex.query.func;
 
+import java.util.*;
+import java.util.Set;
+
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.query.util.*;
 import org.basex.query.value.type.*;
 import org.basex.query.*;
 import org.junit.*;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests all function signatures.
@@ -34,6 +39,16 @@ public class SignatureTest extends AdvancedQueryTest {
   private static void check(final Function def) {
     final String desc = def.toString();
     final String name = desc.replaceAll("\\(.*", "");
+
+    // check that there are enough argument names
+    final String[] names = def.names();
+    assertTrue(def + Arrays.toString(names),
+        names.length == (def.max == Integer.MAX_VALUE ? def.min : def.max));
+    // all variable names must be distinct
+    final Set<String> set = new HashSet<String>(Arrays.asList(names));
+    assertEquals("Duplicate argument names: " + def, names.length, set.size());
+    // var-arg functions must have a number at the end
+    if(def.max == Integer.MAX_VALUE) assertTrue(names[names.length - 1].matches(".*\\d+$"));
 
     // test too few, too many, and wrong argument types
     for(int al = Math.max(def.min - 1, 0); al <= def.max + 1; al++) {

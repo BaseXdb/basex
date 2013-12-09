@@ -86,7 +86,7 @@ public class FuncType implements Type {
 
     if(!(it instanceof FItem)) throw Err.castError(ii, this, it);
     final FItem f = (FItem) it;
-    return this == ANY_FUN ? f : f.coerceTo(this, ctx, ii);
+    return this == ANY_FUN ? f : f.coerceTo(this, ctx, ii, false);
   }
 
   @Override

@@ -165,7 +165,7 @@ public final class Var extends ExprInfo {
   public Value checkType(final Value val, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     if(!checksType() || declType.instance(val)) return val;
-    if(promote) return declType.funcConvert(ctx, sc, ii, val);
+    if(promote) return declType.funcConvert(ctx, sc, ii, val, true);
     throw INVCAST.get(ii, val.type(), declType);
   }
 
