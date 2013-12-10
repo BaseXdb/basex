@@ -75,12 +75,12 @@ public final class SearchBar extends BaseXBack {
     replace.setPreferredSize(null);
     replace.hint(Text.REPLACE_WITH);
 
-    regex = onOffButton("s_regex", Text.REGULAR_EXPR, GUIOptions.SR_REGEX);
-    mcase = onOffButton("s_case", Text.MATCH_CASE, GUIOptions.SR_CASE);
-    word = onOffButton("s_word", Text.WHOLE_WORD, GUIOptions.SR_WORD);
-    multi = onOffButton("s_multi", Text.MULTI_LINE, GUIOptions.SR_MULTI);
-    rplc  = BaseXButton.get("s_replace", false, Text.REPLACE_ALL, main);
-    cls = BaseXButton.get("s_close", false,
+    regex = onOffButton("f_regex", Text.REGULAR_EXPR, GUIOptions.SR_REGEX);
+    mcase = onOffButton("f_case", Text.MATCH_CASE, GUIOptions.SR_CASE);
+    word = onOffButton("f_word", Text.WHOLE_WORD, GUIOptions.SR_WORD);
+    multi = onOffButton("f_multi", Text.MULTI_LINE, GUIOptions.SR_MULTI);
+    rplc  = BaseXButton.get("f_replace", false, Text.REPLACE_ALL, main);
+    cls = BaseXButton.get("f_close", false,
         BaseXLayout.addShortcut(Text.CLOSE, ESCAPE.toString()), main);
     multi.setEnabled(regex.isSelected());
     word.setEnabled(!regex.isSelected());

@@ -232,21 +232,13 @@ public final class DialogResources extends BaseXBack {
    * @author Lukas Kircher
    */
   private static final class TreeNodeRenderer extends DefaultTreeCellRenderer {
-    /** Icon for xml files. */
-    private final Icon xmlIcon = BaseXImages.icon("file_xml");
-    /** Icon for raw files. */
-    private final Icon rawIcon = BaseXImages.icon("file_raw");
-
     @Override
     public Component getTreeCellRendererComponent(final JTree tree, final Object val,
         final boolean sel, final boolean exp, final boolean leaf, final int row,
         final boolean focus) {
 
       super.getTreeCellRendererComponent(tree, val, sel, exp, leaf, row, focus);
-      if(leaf) {
-        final TreeLeaf l = (TreeLeaf) val;
-        setIcon(l.raw ? rawIcon : l.abbr ? null : xmlIcon);
-      }
+      if(leaf) setIcon(BaseXImages.text(((TreeLeaf) val).raw));
       return this;
     }
   }

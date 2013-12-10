@@ -26,21 +26,25 @@ public final class BaseXImages {
   /** System icons. */
   private static final FileSystemView FS = FileSystemView.getFileSystemView();
 
-  /** Icon for closed directories. */
-  private static final Icon DIR1 = icon("file-dir1");
-  /** Icon for opened directories. */
-  private static final Icon DIR2 = icon("file-dir2");
-  /** Icon for textual files. */
-  private static final Icon TEXT = icon("file-text");
-  /** Icon for XML/XQuery file types. */
-  private static final Icon XML = icon("file-xml");
-  /** Icon for XML/XQuery file types. */
-  private static final Icon XQUERY = icon("file-xquery");
-  /** Icon for BaseX file types. */
-  private static final Icon BASEX = icon("file-basex");
-  /** Icon for unknown file types. */
-  private static final Icon UNKNOWN = icon("file-unknown");
+  /** Icon for xml files. */
+  private static final Icon XMLTEXT = icon("text_xml");
+  /** Icon for raw files. */
+  private static final Icon RAWTEXT = icon("text_raw");
 
+  /** Icon for closed directories. */
+  private static final Icon DIR1 = icon("file_dir1");
+  /** Icon for opened directories. */
+  private static final Icon DIR2 = icon("file_dir2");
+  /** Icon for textual files. */
+  private static final Icon TEXT = icon("file_text");
+  /** Icon for XML/XQuery file types. */
+  private static final Icon XML = icon("file_xml");
+  /** Icon for XML/XQuery file types. */
+  private static final Icon XQUERY = icon("file_xquery");
+  /** Icon for BaseX file types. */
+  private static final Icon BASEX = icon("file_basex");
+  /** Icon for unknown file types. */
+  private static final Icon UNKNOWN = icon("file_unknown");
 
   /** Private constructor. */
   private BaseXImages() { }
@@ -92,6 +96,15 @@ public final class BaseXImages {
     return expanded ? DIR2 : DIR1;
   }
 
+  /**
+   * Returns an icon for the specified text.
+   * @param raw raw/xml text
+   * @return icon
+   */
+  public static Icon text(final boolean raw) {
+    return raw ? RAWTEXT : XMLTEXT;
+  }
+  
   /**
    * Returns an icon for the specified file.
    * @param file file reference
