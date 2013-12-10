@@ -265,7 +265,7 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
     for(final Entry<Var, Expr> e : scope.closure().entrySet())
       clos.put(e.getKey(), e.getValue().value(ctx));
 
-    return new FuncItem(args, expr, ft, clos, c, scope, sc, ann);
+    return new FuncItem(sc, ann, args, ft, expr, c, clos, scope.stackSize());
   }
 
   @Override

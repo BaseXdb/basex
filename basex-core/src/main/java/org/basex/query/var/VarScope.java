@@ -21,31 +21,17 @@ public final class VarScope {
   /** Static context. */
   private final StaticContext sc;
 
-  /** stack of currently accessible variables. */
-  private final VarStack current = new VarStack();
   /** Local variables in this scope. */
   private final ArrayList<Var> vars = new ArrayList<Var>();
   /** This scope's closure. */
   private final Map<Var, Expr> closure = new HashMap<Var, Expr>();
-  /** This scope's parent scope, used for looking up non-local variables. */
-  private final VarScope parent;
 
   /**
    * Constructor for a top-level module.
    * @param sctx static context
    */
   public VarScope(final StaticContext sctx) {
-    parent = null;
     sc = sctx;
-  }
-
-  /**
-   * Constructor.
-   * @param par parent scope
-   */
-  private VarScope(final VarScope par) {
-    parent = par;
-    sc = par.sc;
   }
 
   /**
@@ -56,63 +42,7 @@ public final class VarScope {
   private Var add(final Var var) {
     var.slot = vars.size();
     vars.add(var);
-    current.push(var);
     return var;
-  }
-
-  /**
-   * Tries to resolve the given name as a local variable.
-   * @param name variable name
-   * @param ctx query context
-   * @param ii input info
-   * @return variable reference if found, {@code null} otherwise
-   */
-  public VarRef resolve(final QNm name, final QueryContext ctx, final InputInfo ii) {
-    final Var v = current.get(name);
-    if(v != null) return new VarRef(ii, v);
-
-    if(parent == null) return null;
-    final VarRef nonLocal = parent.resolve(name, ctx, ii);
-    if(nonLocal == null) return null;
-
-    // a variable in the closure
-    final Var local = add(new Var(ctx, sc, name, nonLocal.type()));
-    closure.put(local, nonLocal);
-    return new VarRef(ii, local);
-  }
-
-  /**
-   * Opens a new sub-scope inside this scope. The returned marker has to be supplied to
-   * the corresponding call to {@link VarScope#close(int)} in order to mark the variables
-   * as inaccessible.
-   * @return marker for the current bindings
-   */
-  public int open() {
-    return current.size();
-  }
-
-  /**
-   * Closes the sub-scope and marks all contained variables as inaccessible.
-   * @param marker marker for the start of the sub-scope
-   */
-  public void close(final int marker) {
-    current.size(marker);
-  }
-
-  /**
-   * Get a sub-scope of this scope.
-   * @return sub-scope
-   */
-  public VarScope child() {
-    return new VarScope(this);
-  }
-
-  /**
-   * Parent scope of this scope.
-   * @return parent
-   */
-  public VarScope parent() {
-    return parent;
   }
 
   /**
@@ -234,14 +164,13 @@ public final class VarScope {
    */
   public VarScope copy(final QueryContext ctx, final VarScope scp,
       final IntObjMap<Var> vs) {
-    final VarScope cscp = new VarScope(scp);
+    final VarScope cscp = new VarScope(sc);
     for(final Var v : vars) vs.put(v.id, cscp.newCopyOf(ctx, v));
     for(final Entry<Var, Expr> e : closure.entrySet()) {
       final Var v = vs.get(e.getKey().id);
       final Expr ex = e.getValue().copy(ctx, scp, vs);
       cscp.closure.put(v, ex);
     }
-    cscp.current.clear();
     return cscp;
   }
 }

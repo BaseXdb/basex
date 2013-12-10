@@ -78,7 +78,10 @@ public final class FNUnit extends StandardFunc {
     final Iter ir = ctx.iter(expr[0]);
     for(Item it; (it = ir.next()) != null;) {
       final FItem fi = checkFunc(it, ctx);
-      if(fi instanceof FuncItem) funcs.add(((FuncItem) fi).func);
+      if(fi.funcName() != null) {
+        final StaticFunc sf = ctx.funcs.get(fi.funcName(), fi.arity(), null);
+        if(sf != null) funcs.add(sf);
+      }
     }
     return unit.test(sc, funcs);
   }

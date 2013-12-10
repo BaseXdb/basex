@@ -53,7 +53,8 @@ public final class FNInspect extends StandardFunc {
    */
   private Item function(final QueryContext ctx) throws QueryException {
     final FItem f = checkFunc(expr[0], ctx);
-    final StaticFunc sf = f instanceof FuncItem ? ((FuncItem) f).func : null;
+    final StaticFunc sf = f.funcName() == null ? null :
+      ctx.funcs.get(f.funcName(), f.arity(), null);
     return new PlainDoc(ctx, info).function(f.funcName(), sf, f.funcType(), null);
   }
 

@@ -71,7 +71,8 @@ public final class StaticVar extends StaticDecl {
 
   @Override
   public void compile(final QueryContext ctx) throws QueryException {
-    if(expr == null) throw (implicit ? VARUNDEF : VAREMPTY).get(info, this);
+    if(expr == null) throw (implicit ? VARUNDEF : VAREMPTY).get(info,
+        '$' + Token.string(name.string()));
     if(dontEnter) throw circVarError(this);
 
     if(!compiled) {
