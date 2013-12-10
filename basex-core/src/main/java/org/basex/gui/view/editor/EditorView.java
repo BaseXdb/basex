@@ -280,9 +280,7 @@ public final class EditorView extends View {
       @Override
       public void run() {
         // remember opened files
-        for(final String file : gui.gopts.get(GUIOptions.OPEN)) {
-          open(new IOFile(file), false, false);
-        }
+        for(final String file : gui.gopts.get(GUIOptions.OPEN)) open(new IOFile(file));
       }
     });
   }
@@ -338,10 +336,10 @@ public final class EditorView extends View {
   public void project() {
     if(gui.gopts.get(GUIOptions.SHOWPROJECT)) {
       split.sizes(sizes);
-      if(gui.editor != null) gui.editor.focus(false);
+      focusProject(false);
     } else {
       sizes = split.sizes(new double[] { 0, 1 });
-      if(gui.editor != null) gui.editor.getEditor().requestFocusInWindow();
+      getEditor().requestFocusInWindow();
     }
   }
 
@@ -349,7 +347,7 @@ public final class EditorView extends View {
    * Focuses the project view.
    * @param filt focus filter or content
    */
-  public void focus(final boolean filt) {
+  public void focusProject(final boolean filt) {
     project.focus(filt);
   }
 
@@ -638,25 +636,26 @@ public final class EditorView extends View {
     if(!confirm(ea)) return false;
 
     // remove reference to last executed file
-    if(execFile != null && ea.file.path().equals(execFile.path())) {
-      execFile = null;
-    }
+    if(execFile != null && ea.file.path().equals(execFile.path())) execFile = null;
     tabs.remove(ea);
     final int t = tabs.getTabCount();
     final int i = tabs.getSelectedIndex();
     if(t == 1) {
       // no panels left: close search bar
       search.deactivate(true);
-
       // reopen single tab and focus project listener
       addTab();
       SwingUtilities.invokeLater(new Runnable() {
         @Override
-        public void run() { focus(false); }
+        public void run() { focusProject(false); }
       });
     } else if(i + 1 == t) {
       // if necessary, activate last editor tab
       tabs.setSelectedIndex(i - 1);
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() { getEditor().requestFocusInWindow(); }
+      });
     }
     return true;
   }
