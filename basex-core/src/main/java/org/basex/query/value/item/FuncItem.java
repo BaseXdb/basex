@@ -26,9 +26,6 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class FuncItem extends FItem implements Scope {
-  /** Original function. */
-  public final StaticFunc func;
-
   /** Static context. */
   private final StaticContext sc;
   /** Variables. */
@@ -54,75 +51,72 @@ public final class FuncItem extends FItem implements Scope {
 
   /**
    * Constructor.
+   * @param sctx static context
+   * @param annotations function annotations
    * @param n function name
    * @param arg function arguments
-   * @param body function body
    * @param t function type
-   * @param scp variable scope
-   * @param sctx static context
-   * @param sf original function
-   * @param annotations function annotations
+   * @param body function body
+   * @param stSize stack-frame size
    */
-  public FuncItem(final QNm n, final Var[] arg, final Expr body, final FuncType t,
-      final VarScope scp, final StaticContext sctx, final StaticFunc sf, final Ann annotations) {
-    this(n, arg, body, t, false, null, 0, 0, null, scp, sctx, sf, annotations);
+  public FuncItem(final StaticContext sctx, final Ann annotations, final QNm n, final Var[] arg,
+      final FuncType t, final Expr body, final int stSize) {
+    this(sctx, annotations, n, arg, t, body, false, null, 0, 0, null, stSize);
   }
 
   /**
    * Constructor.
+   * @param sctx static context
+   * @param annotations function annotations
    * @param n function name
    * @param arg function arguments
-   * @param body function body
    * @param t function type
+   * @param body function body
    * @param cst cast flag
    * @param cls closure
-   * @param scp variable scope
-   * @param sctx static context
-   * @param sf original function
-   * @param annotations function annotations
+   * @param stSize stack-frame size
    */
-  public FuncItem(final QNm n, final Var[] arg, final Expr body, final FuncType t,
-      final boolean cst, final Map<Var, Value> cls, final VarScope scp,
-      final StaticContext sctx, final StaticFunc sf, final Ann annotations) {
-    this(n, arg, body, t, cst, null, 0, 0, cls, scp, sctx, sf, annotations);
+  public FuncItem(final StaticContext sctx, final Ann annotations, final QNm n, final Var[] arg,
+      final FuncType t, final Expr body, final boolean cst, final Map<Var, Value> cls,
+      final int stSize) {
+    this(sctx, annotations, n, arg, t, body, cst, null, 0, 0, cls, stSize);
   }
 
   /**
    * Constructor for anonymous functions.
-   * @param arg function arguments
-   * @param body function body
-   * @param t function type
-   * @param cl variables in the closure
-   * @param cst cast flag
-   * @param scp variable scope
    * @param sctx static context
    * @param annotations function annotations
+   * @param arg function arguments
+   * @param t function type
+   * @param body function body
+   * @param cst cast flag
+   * @param cl variables in the closure
+   * @param stSize stack-frame size
    */
-  public FuncItem(final Var[] arg, final Expr body, final FuncType t,
-      final Map<Var, Value> cl, final boolean cst, final VarScope scp,
-      final StaticContext sctx, final Ann annotations) {
-    this(null, arg, body, t, cst, cl, scp, sctx, null, annotations);
+  public FuncItem(final StaticContext sctx, final Ann annotations, final Var[] arg,
+      final FuncType t, final Expr body, final boolean cst,
+      final Map<Var, Value> cl, final int stSize) {
+    this(sctx, annotations, null, arg, t, body, cst, cl, stSize);
   }
 
   /**
    * Constructor.
+   * @param sctx static context
+   * @param annotations function annotations
    * @param n function name
    * @param arg function arguments
-   * @param body function body
    * @param t function type
+   * @param body function body
    * @param cst cast flag
    * @param vl context value
    * @param ps context position
    * @param sz context size
    * @param cls closure
-   * @param scp variable scope
-   * @param sctx static context
-   * @param sf original function
-   * @param annotations function annotations
+   * @param stSize stack-frame size
    */
-  public FuncItem(final QNm n, final Var[] arg, final Expr body, final FuncType t,
-      final boolean cst, final Value vl, final long ps, final long sz, final Map<Var, Value> cls,
-      final VarScope scp, final StaticContext sctx, final StaticFunc sf, final Ann annotations) {
+  public FuncItem(final StaticContext sctx, final Ann annotations, final QNm n, final Var[] arg,
+      final FuncType t, final Expr body, final boolean cst, final Value vl,
+      final long ps, final long sz, final Map<Var, Value> cls, final int stSize) {
 
     super(t, annotations);
     name = n;
@@ -130,13 +124,12 @@ public final class FuncItem extends FItem implements Scope {
     expr = body;
     cast = cst && t.type != null ? t.type : null;
     closure = cls != null ? cls : Collections.<Var, Value>emptyMap();
-    stackSize = scp.stackSize();
+    stackSize = stSize;
     sc = sctx;
 
     ctxVal = vl;
     pos = ps;
     size = sz;
-    func = sf;
   }
 
   @Override
@@ -222,36 +215,23 @@ public final class FuncItem extends FItem implements Scope {
     }
   }
 
-  /**
-   * Coerces this function item to the given type.
-   * @param ctx query context
-   * @param ii input info
-   * @param t type to coerce to
-   * @param opt if the function body should be optimized
-   * @return coerced function item
-   * @throws QueryException query exception
-   */
-  private FuncItem coerce(final QueryContext ctx, final InputInfo ii,
-      final FuncType t, final boolean opt) throws QueryException {
+  @Override
+  public FItem coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii,
+      final boolean opt) throws QueryException {
+    if(vars.length != ft.args.length) throw Err.castError(ii, ft, this);
+    if(type.instanceOf(ft)) return this;
+
     final VarScope vsc = new VarScope(sc);
     final Var[] vs = new Var[vars.length];
     final Expr[] refs = new Expr[vs.length];
     for(int i = vs.length; i-- > 0;) {
-      vs[i] = vsc.newLocal(ctx, vars[i].name, t.args[i], true);
+      vs[i] = vsc.newLocal(ctx, vars[i].name, ft.args[i], true);
       refs[i] = new VarRef(ii, vs[i]);
     }
     final Expr e = new DynFuncCall(ii, this, refs);
     e.markTailCalls(null);
-    return new FuncItem(name, vs, opt ? e.optimize(ctx, vsc) : e,
-        t, cast != null, null, vsc, sc, func, ann);
-  }
-
-  @Override
-  public FItem coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii,
-      final boolean opt) throws QueryException {
-
-    if(vars.length != ft.args.length) throw Err.castError(ii, ft, this);
-    return type.instanceOf(ft) ? this : coerce(ctx, ii, ft, opt);
+    return new FuncItem(sc, ann, name,
+        vs, ft, opt ? e.optimize(ctx, vsc) : e, cast != null, null, vsc.stackSize());
   }
 
   @Override

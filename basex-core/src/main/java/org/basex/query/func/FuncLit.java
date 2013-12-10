@@ -86,8 +86,8 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) {
-    return new FuncItem(name, args, expr, (FuncType) type.type, false, ctx.value, ctx.pos,
-        ctx.size, null, scope, sc, null, ann == null ? new Ann() : ann);
+    return new FuncItem(sc, ann == null ? new Ann() : ann, name, args, (FuncType) type.type,
+        expr, false, ctx.value, ctx.pos, ctx.size, null, scope.stackSize());
   }
 
   @Override

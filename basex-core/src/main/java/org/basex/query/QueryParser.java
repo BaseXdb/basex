@@ -107,8 +107,9 @@ public class QueryParser extends InputParser {
 
   /** Cached QNames. */
   private final ArrayList<QNmCheck> names = new ArrayList<QNmCheck>();
-  /** Current variable scope. */
-  private VarScope scope;
+
+  /** Stack of variable contexts. */
+  private final ArrayList<VarContext> localVars = new ArrayList<VarContext>();
 
   /**
    * Constructor.
@@ -196,12 +197,12 @@ public class QueryParser extends InputParser {
       prolog1();
       prolog2();
 
-      scope = new VarScope(sc);
+      pushVarContext();
       final Expr e = expr();
       if(e == null) throw alter == null ? error(EXPREMPTY) : error();
+      final VarScope scope = popVarContext();
 
       final MainModule mm = new MainModule(e, scope, moduleDoc, sc);
-      scope = null;
       finish(mm, true);
       return mm;
     } catch(final QueryException ex) {
@@ -859,11 +860,13 @@ public class QueryParser extends InputParser {
 
     if(!wsConsumeWs(EXTERNAL)) wsCheck(ASSIGN);
     else if(!wsConsumeWs(ASSIGN)) return;
-    scope = new VarScope(sc);
+
+    pushVarContext();
     final Expr e = check(single(), NOVARDECL);
     final SeqType type = sc.initType == null ? SeqType.ITEM : sc.initType;
+    final VarScope scope = popVarContext();
     ctx.ctxItem = new MainModule(e, scope, type, currDoc.toString(), sc, info());
-    scope = null;
+
     if(module != null) throw error(DECITEM);
     if(e.has(Flag.UPD)) throw error(UPCTX, e);
   }
@@ -878,7 +881,7 @@ public class QueryParser extends InputParser {
     final SeqType tp = optAsType();
     if(module != null && !eq(vn.uri(), module.uri())) throw error(MODNS, vn);
 
-    scope = new VarScope(sc);
+    pushVarContext();
     final boolean external = wsConsumeWs(EXTERNAL);
     final Expr bind;
     if(external) {
@@ -888,20 +891,9 @@ public class QueryParser extends InputParser {
       bind = check(single(), NOVARDECL);
     }
 
+    final VarScope scope = popVarContext();
     vars.add(ctx.vars.declare(vn, tp, ann, bind, external, sc, scope,
         currDoc.toString(), info()));
-    scope = null;
-  }
-
-  /**
-   * Creates and registers a new local variable in the current scope.
-   * @param name variable name
-   * @param tp variable type
-   * @param prm if the variable is a function parameter
-   * @return registered variable
-   */
-  private Var addLocal(final QNm name, final SeqType tp, final boolean prm) {
-    return scope.newLocal(ctx, name, tp, prm);
   }
 
   /**
@@ -935,16 +927,16 @@ public class QueryParser extends InputParser {
     if(module != null && !eq(name.uri(), module.uri())) throw error(MODNS, name);
 
     wsCheck(PAR1);
-    scope = new VarScope(sc);
+    pushVarContext();
     final Var[] args = paramList();
     wsCheck(PAR2);
     final SeqType tp = optAsType();
     if(ann.contains(Ann.Q_UPDATING)) ctx.updating(false);
-
     final Expr body = wsConsumeWs(EXTERNAL) ? null : enclosed(NOFUNBODY);
+    final VarScope scope = popVarContext();
+
     funcs.add(ctx.funcs.declare(ann, name, args, tp, body, sc, scope,
         currDoc.toString(), ii));
-    scope = null;
   }
 
   /**
@@ -970,7 +962,7 @@ public class QueryParser extends InputParser {
         if(args.length == 0) break;
         check('$');
       }
-      final Var var = addLocal(varName(), optAsType(), true);
+      final Var var = addVar(varName(), optAsType(), true);
       for(final Var v : args)
         if(v.name.eq(var.name)) throw error(FUNCDUPL, var);
 
@@ -1043,7 +1035,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr flwor() throws QueryException {
-    final int s = scope.open();
+    final int s = openSubScope();
     final LinkedList<Clause> clauses = initialClause(null);
     if(clauses == null) return null;
 
@@ -1088,7 +1080,7 @@ public class QueryParser extends InputParser {
 
           // if one groups variables such as $x as xs:integer, then the resulting
           // sequence isn't compatible with the type and can't be assigned
-          final Var nv = addLocal(v.var.name, null, false);
+          final Var nv = addVar(v.var.name, null, false);
           // [LW] should be done everywhere
           if(v.type().one())
             nv.refineType(SeqType.get(v.type().type, Occ.ONE_MORE), ctx, info());
@@ -1120,7 +1112,7 @@ public class QueryParser extends InputParser {
       }
 
       if(sc.xquery3() && wsConsumeWs(COUNT, DOLLAR, NOCOUNT)) {
-        final Var v = addLocal(varName(), SeqType.ITR, false);
+        final Var v = addVar(varName(), SeqType.ITR, false);
         curr.put(v.name.id(), v);
         clauses.add(new Count(v, info()));
       }
@@ -1129,7 +1121,7 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(RETURN)) throw alter == null ? error(FLWORRETURN) : error();
 
     final Expr ret = check(single(), NORETURN);
-    scope.close(s);
+    closeSubScope(s);
     return new GFLWOR(clauses.get(0).info, clauses, ret);
   }
 
@@ -1180,9 +1172,9 @@ public class QueryParser extends InputParser {
       final Expr e = check(single(), NOVARDECL);
 
       // declare late because otherwise it would shadow the wrong variables
-      final Var var = addLocal(nm, tp, false);
-      final Var ps = p != null ? addLocal(p, SeqType.ITR, false) : null;
-      final Var scr = s != null ? addLocal(s, SeqType.DBL, false) : null;
+      final Var var = addVar(nm, tp, false);
+      final Var ps = p != null ? addVar(p, SeqType.ITR, false) : null;
+      final Var scr = s != null ? addVar(s, SeqType.DBL, false) : null;
       if(p != null) {
         if(nm.eq(p)) throw error(DUPLVAR, var);
         if(s != null && p.eq(s)) throw error(DUPLVAR, ps);
@@ -1206,7 +1198,7 @@ public class QueryParser extends InputParser {
       final SeqType tp = score ? SeqType.DBL : optAsType();
       wsCheck(ASSIGN);
       final Expr e = check(single(), NOVARDECL);
-      cls.add(new Let(addLocal(nm, tp, false), e, score, info()));
+      cls.add(new Let(addVar(nm, tp, false), e, score, info()));
     } while(wsConsume(COMMA));
   }
 
@@ -1239,7 +1231,7 @@ public class QueryParser extends InputParser {
       if(check) wsCheck(END);
       end = windowCond(false);
     }
-    return new Window(info(), slide, addLocal(nm, tp, false), e, start, only, end);
+    return new Window(info(), slide, addVar(nm, tp, false), e, start, only, end);
   }
 
   /**
@@ -1251,10 +1243,10 @@ public class QueryParser extends InputParser {
   private Condition windowCond(final boolean start) throws QueryException {
     skipWs();
     final InputInfo ii = info();
-    final Var var = curr('$')             ? addLocal(varName(), null, false) : null,
-              at  = wsConsumeWs(AT)       ? addLocal(varName(), null, false) : null,
-              prv = wsConsumeWs(PREVIOUS) ? addLocal(varName(), null, false) : null,
-              nxt = wsConsumeWs(NEXT)     ? addLocal(varName(), null, false) : null;
+    final Var var = curr('$')             ? addVar(varName(), null, false) : null,
+              at  = wsConsumeWs(AT)       ? addVar(varName(), null, false) : null,
+              prv = wsConsumeWs(PREVIOUS) ? addVar(varName(), null, false) : null,
+              nxt = wsConsumeWs(NEXT)     ? addVar(varName(), null, false) : null;
     wsCheck(WHEN);
     return new Condition(start, var, at, prv, nxt, check(single(), NOEXPR), ii);
   }
@@ -1300,7 +1292,7 @@ public class QueryParser extends InputParser {
         if(type != null) wsCheck(ASSIGN);
         by = check(single(), NOVARDECL);
       } else {
-        final VarRef vr = scope.resolve(name, ctx, ii);
+        final VarRef vr = resolveLocalVar(name, ii);
         // the grouping variable has to be declared by the same FLWOR expression
         boolean dec = false;
         if(vr != null) {
@@ -1329,7 +1321,7 @@ public class QueryParser extends InputParser {
       final Collation coll = wsConsumeWs(COLLATION) ? Collation.get(stringLiteral(),
           ctx, sc, info(), FLWORCOLL) : sc.collation;
       final GroupBy.Spec spec =
-          new GroupBy.Spec(ii, addLocal(name, type, false), by, coll);
+          new GroupBy.Spec(ii, addVar(name, type, false), by, coll);
       if(specs == null) {
         specs = new GroupBy.Spec[] { spec };
       } else {
@@ -1354,19 +1346,19 @@ public class QueryParser extends InputParser {
     final boolean some = wsConsumeWs(SOME, DOLLAR, NOSOME);
     if(!some && !wsConsumeWs(EVERY, DOLLAR, NOSOME)) return null;
 
-    final int s = scope.open();
+    final int s = openSubScope();
     For[] fl = { };
     do {
       final QNm nm = varName();
       final SeqType tp = optAsType();
       wsCheck(IN);
       final Expr e = check(single(), NOSOME);
-      fl = Array.add(fl, new For(addLocal(nm, tp, false), null, null, e, false, info()));
+      fl = Array.add(fl, new For(addVar(nm, tp, false), null, null, e, false, info()));
     } while(wsConsumeWs(COMMA));
 
     wsCheck(SATISFIES);
     final Expr e = check(single(), NOSOME);
-    scope.close(s);
+    closeSubScope(s);
     return new Quantifier(info(), fl, e, !some);
   }
 
@@ -1413,7 +1405,7 @@ public class QueryParser extends InputParser {
 
     TypeCase[] cases = { };
     final ArrayList<SeqType> types = new ArrayList<SeqType>();
-    final int s = scope.open();
+    final int s = openSubScope();
     boolean cs;
     do {
       types.clear();
@@ -1424,7 +1416,7 @@ public class QueryParser extends InputParser {
       }
       Var var = null;
       if(curr('$')) {
-        var = addLocal(varName(), null, false);
+        var = addVar(varName(), null, false);
         if(cs) wsCheck(AS);
       }
       if(cs) {
@@ -1435,7 +1427,7 @@ public class QueryParser extends InputParser {
       final Expr ret = check(single(), NOTYPESWITCH);
       cases = Array.add(cases, new TypeCase(info(), var,
           types.toArray(new SeqType[types.size()]), ret));
-      scope.close(s);
+      closeSubScope(s);
     } while(cs);
     if(cases.length == 1) throw error(NOTYPESWITCH);
     return new TypeSwitch(info(), ts, cases);
@@ -1495,11 +1487,11 @@ public class QueryParser extends InputParser {
     final Expr e = comparison();
     if(e != null) {
       if(wsConsumeWs(UPDATE)) {
-        final int s = scope.open();
+        final int s = openSubScope();
         final boolean u = ctx.updating;
         ctx.updating(false);
         final Expr m = check(single(), COPYEXPR);
-        scope.close(s);
+        closeSubScope(s);
         ctx.updating = u;
         return new Modify(info(), e, m);
       }
@@ -2085,7 +2077,10 @@ public class QueryParser extends InputParser {
     skipWs();
     final char c = curr();
     // variables
-    if(c == '$') return checkVar(varName());
+    if(c == '$') {
+      final InputInfo ii = info();
+      return resolveVar(varName(), ii);
+    }
     // parentheses
     if(c == '(' && next() != '#') return parenthesized();
     // direct constructor
@@ -2156,15 +2151,15 @@ public class QueryParser extends InputParser {
     final Ann ann = curr('%') ? annotations() : null;
     // inline function
     if(wsConsume(FUNCTION) && wsConsume(PAR1)) {
-      final VarScope inner = scope = scope.child();
+      pushVarContext();
       final Var[] args = paramList();
       wsCheck(PAR2);
       final SeqType type = optAsType();
       if(ann != null && (ann.contains(Ann.Q_PRIVATE) || ann.contains(Ann.Q_PUBLIC)))
         throw error(INVISIBLE);
       final Expr body = enclosed(NOFUNBODY);
-      scope = scope.parent();
-      return new InlineFunc(info(), type, args, body, ann, sc, inner);
+      final VarScope scope = popVarContext();
+      return new InlineFunc(info(), type, args, body, ann, sc, scope);
     }
     // annotations not allowed here
     if(ann != null) throw error(NOANN);
@@ -3102,10 +3097,13 @@ public class QueryParser extends InputParser {
         codes = Array.add(codes, test);
       } while(wsConsumeWs(PIPE));
 
-      final int s = scope.open();
-      final Catch c = new Catch(info(), codes, ctx, scope);
+      final int s = openSubScope();
+      final Var[] vs = new Var[Catch.NAMES.length];
+      for(int i = 0; i < Catch.NAMES.length; i++)
+        vs[i] = addVar(Catch.NAMES[i], Catch.TYPES[i], false);
+      final Catch c = new Catch(info(), codes, vs);
       c.expr = enclosed(NOENCLEXPR);
-      scope.close(s);
+      closeSubScope(s);
 
       ct = Array.add(ct, c);
     } while(wsConsumeWs(CATCH));
@@ -3581,7 +3579,7 @@ public class QueryParser extends InputParser {
    */
   private Expr transform() throws QueryException {
     if(!wsConsumeWs(COPY, DOLLAR, INCOMPLETE)) return null;
-    final int s = scope.open();
+    final int s = openSubScope();
     final boolean u = ctx.updating;
     ctx.updating(false);
 
@@ -3590,7 +3588,7 @@ public class QueryParser extends InputParser {
       final QNm name = varName();
       wsCheck(ASSIGN);
       final Expr e = check(single(), INCOMPLETE);
-      fl = Array.add(fl, new Let(addLocal(name, SeqType.NOD, false), e, false, info()));
+      fl = Array.add(fl, new Let(addVar(name, SeqType.NOD, false), e, false, info()));
     } while(wsConsumeWs(COMMA));
     wsCheck(MODIFY);
 
@@ -3598,7 +3596,7 @@ public class QueryParser extends InputParser {
     wsCheck(RETURN);
     final Expr r = check(single(), INCOMPLETE);
 
-    scope.close(s);
+    closeSubScope(s);
     ctx.updating = u;
     return new Transform(info(), fl, m, r);
   }
@@ -3800,15 +3798,58 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Checks if a referenced variable is defined and throws the specified error if not.
+   * Creates and registers a new local variable in the current scope.
    * @param name variable name
+   * @param tp variable type
+   * @param prm if the variable is a function parameter
+   * @return registered variable
+   */
+  private Var addVar(final QNm name, final SeqType tp, final boolean prm) {
+    return localVars.get(localVars.size() - 1).addVar(name, tp, prm);
+  }
+
+  /**
+   * Resolves a local variable reference.
+   * @param name variable name
+   * @param ii input info
+   * @return variable reference if the variable was found, {@code null} otherwise
+   */
+  private VarRef resolveLocalVar(final QNm name, final InputInfo ii) {
+    int i = localVars.size();
+    Var var = null;
+
+    // look up through the scopes until we find the declaring scope
+    while(--i >= 0) {
+      var = localVars.get(i).stack.get(name);
+      if(var != null) break;
+    }
+
+    // looked through all scopes, must be a static variable
+    if(var == null) return null;
+
+    // go down through the scopes and add bindings to their closures
+    while(++i < localVars.size()) {
+      final VarContext vctx = localVars.get(i);
+      final Var local = vctx.addVar(var.name, var.type(), false);
+      vctx.scope.closure().put(local, new VarRef(ii, var));
+      var = local;
+    }
+
+    // return the properly propagated variable reference
+    return new VarRef(ii, var);
+  }
+
+  /**
+   * Resolves the referenced variable as a local or static variable and returns a reference to it.
+   * IF the variable is not declared, the specified error is thrown.
+   * @param name variable name
+   * @param ii input info
    * @return referenced variable
    * @throws QueryException if the variable isn't defined
    */
-  private Expr checkVar(final QNm name) throws QueryException {
+  private Expr resolveVar(final QNm name, final InputInfo ii) throws QueryException {
     // local variable
-    final InputInfo ii = info();
-    final VarRef local = scope.resolve(name, ctx, ii);
+    final VarRef local = resolveLocalVar(name, ii);
     if(local != null) return local;
 
     // static variable
@@ -3825,6 +3866,39 @@ public class QueryParser extends InputParser {
     }
 
     return ctx.vars.newRef(name, sc, ii);
+  }
+
+  /**
+   * Pushes a new variable context onto the stack.
+   */
+  private void pushVarContext() {
+    localVars.add(new VarContext());
+  }
+
+  /**
+   * Pops one variable context from the stack.
+   * @return the removed context's variable scope
+   */
+  private VarScope popVarContext() {
+    return localVars.remove(localVars.size() - 1).scope;
+  }
+
+  /**
+   * Opens a new sub-scope inside the current one. The returned marker has to be supplied to
+   * the corresponding call to {@link #closeSubScope(int)} in order to mark the variables
+   * as inaccessible.
+   * @return marker for the current bindings
+   */
+  private int openSubScope() {
+    return localVars.get(localVars.size() - 1).stack.size();
+  }
+
+  /**
+   * Closes the sub-scope and marks all contained variables as inaccessible.
+   * @param marker marker for the start of the sub-scope
+   */
+  private void closeSubScope(final int marker) {
+    localVars.get(localVars.size() - 1).stack.size(marker);
   }
 
   /**
@@ -4036,6 +4110,27 @@ public class QueryParser extends InputParser {
         name.uri(sc.elemNS);
       }
       return name.hasURI();
+    }
+  }
+
+  /** Variable context for resolving local variables. */
+  private class VarContext {
+    /** Stack of local variables. */
+    final VarStack stack = new VarStack();
+    /** Current scope containing all variables and the closure. */
+    final VarScope scope = new VarScope(sc);
+
+    /**
+     * Adds a new variable to this context.
+     * @param name variable name
+     * @param tp variable type
+     * @param prm promotion flag
+     * @return the variable
+     */
+    public Var addVar(final QNm name, final SeqType tp, final boolean prm) {
+      final Var var = scope.newLocal(ctx, name, tp, prm);
+      stack.push(var);
+      return var;
     }
   }
 }

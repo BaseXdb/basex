@@ -28,13 +28,13 @@ public final class Catch extends Single {
     create(E_LINE_NUMBER), create(E_COLUM_NUMBER), create(E_ADDITIONAL)
   };
   /** Error types. */
-  private static final SeqType[] TYPES = {
+  public static final SeqType[] TYPES = {
     SeqType.QNM, SeqType.STR_ZO, SeqType.ITEM_ZM, SeqType.STR_ZO,
     SeqType.ITR_ZO, SeqType.ITR_ZO, SeqType.ITEM_ZM
   };
 
   /** Error variables. */
-  private final Var[] vars = new Var[NAMES.length];
+  private final Var[] vars;
   /** Supported codes. */
   private final NameTest[] codes;
 
@@ -42,15 +42,12 @@ public final class Catch extends Single {
    * Constructor.
    * @param ii input info
    * @param c supported error codes
-   * @param ctx query context
-   * @param scp variable scope
+   * @param vs variables to be bound
    */
-  public Catch(final InputInfo ii, final NameTest[] c, final QueryContext ctx,
-      final VarScope scp) {
+  public Catch(final InputInfo ii, final NameTest[] c, final Var[] vs) {
     super(ii, null);
+    vars = vs;
     codes = c;
-    for(int i = 0; i < NAMES.length; i++)
-      vars[i] = scp.newLocal(ctx, NAMES[i], TYPES[i], false);
   }
 
   @Override
@@ -86,7 +83,10 @@ public final class Catch extends Single {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final Catch ctch = new Catch(info, codes.clone(), ctx, scp);
+    final Var[] vrs = new Var[Catch.NAMES.length];
+    for(int i = 0; i < vrs.length; i++)
+      vrs[i] = scp.newLocal(ctx, Catch.NAMES[i], Catch.TYPES[i], false);
+    final Catch ctch = new Catch(info, codes.clone(), vrs);
     for(int i = 0; i < vars.length; i++) vs.put(vars[i].id, ctch.vars[i]);
     ctch.expr = expr.copy(ctx, scp, vs);
     return ctch;
