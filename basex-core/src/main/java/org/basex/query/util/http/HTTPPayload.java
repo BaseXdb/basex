@@ -191,8 +191,8 @@ public final class HTTPPayload {
         final byte[] val = trim(substring(l, pos + 1));
         if(eq(lc(key), CONTENT_TYPE_LC)) {
           ctype = string(val);
-          enc = charset(ct);
-          ct = contentType(ct);
+          enc = charset(ctype);
+          ct = contentType(ctype);
         }
         if(val.length != 0 && parts != null)
           parts.add(new FElem(Q_HEADER).add(NAME, key).add(VALUE, val));
