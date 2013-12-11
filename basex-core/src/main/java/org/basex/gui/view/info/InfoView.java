@@ -315,7 +315,7 @@ public final class InfoView extends View implements LinkListener {
     bs = bw / (l - 1);
 
     // find maximum value
-    int m = 0;
+    int m = 1;
     for(int i = 0; i < l - 1; ++i) m = Math.max(m, stat.get(i));
 
     // draw focused bar
