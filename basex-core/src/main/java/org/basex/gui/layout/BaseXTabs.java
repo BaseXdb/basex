@@ -46,13 +46,15 @@ public final class BaseXTabs extends JTabbedPane {
       @Override
       public void mouseDragged(final MouseEvent e) {
         if(draggedTab == -1) {
-          int tabs = getTabCount();
           int t = getUI().tabForCoordinate(BaseXTabs.this, e.getX(), e.getY());
+          final int tabs = getTabCount();
           if(tabs == (last ? 1 : 2) || !last && t + 1 == tabs) t = -1;
           if(t != -1) {
             draggedTab = t;
             setCursor(GUIConstants.CURSORMOVE);
           }
+        } else {
+          drop(last, e);
         }
         refreshTabs();
       }
@@ -62,15 +64,7 @@ public final class BaseXTabs extends JTabbedPane {
       @Override
       public void mouseReleased(final MouseEvent e) {
         if(draggedTab < 0) return;
-
-        final int index = Math.min(getTabCount() - (last ? 1 : 2),
-            getUI().tabForCoordinate(BaseXTabs.this, e.getX(), 10));
-        if(index >= 0) {
-          final Component comp = getComponentAt(draggedTab);
-          final Component head = getTabComponentAt(draggedTab);
-          removeTabAt(draggedTab);
-          add(comp, head, index);
-        }
+        drop(last, e);
         draggedTab = -1;
         setCursor(GUIConstants.CURSORARROW);
         refreshTabs();
@@ -78,6 +72,24 @@ public final class BaseXTabs extends JTabbedPane {
     });
   }
 
+  /**
+   * Drops the current tab.
+   * @param last include last tab
+   * @param e mouse event
+   */
+  private void drop(final boolean last, final MouseEvent e) {
+    final int newTab = Math.min(getTabCount() - (last ? 1 : 2),
+        getUI().tabForCoordinate(BaseXTabs.this, e.getX(), e.getY()));
+
+    if(newTab >= 0 && newTab != draggedTab) {
+      final Component comp = getComponentAt(draggedTab);
+      final Component head = getTabComponentAt(draggedTab);
+      removeTabAt(draggedTab);
+      add(comp, head, newTab);
+      draggedTab = newTab;
+    }
+  }
+  
   /**
    * Refreshes the appearance of all tabs.
    */
