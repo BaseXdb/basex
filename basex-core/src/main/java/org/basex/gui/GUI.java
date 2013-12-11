@@ -72,6 +72,8 @@ public final class GUI extends AGUI {
   private final AbstractButton hist;
   /** Execution Button. */
   private final AbstractButton go;
+  /** Execution Button. */
+  private final AbstractButton stop;
   /** Current input Mode. */
   private final BaseXCombo mode;
 
@@ -208,6 +210,18 @@ public final class GUI extends AGUI {
     b.add(input, BorderLayout.CENTER);
     nav.add(b, BorderLayout.CENTER);
 
+    stop = BaseXButton.get("c_stop", false, H_STOP_PROCESS, this);
+    stop.setEnabled(false);
+    stop.addActionListener(new ActionListener() {
+      @Override
+     public void actionPerformed(final ActionEvent e) {
+        if(command != null) {
+          command.stop();
+          stop.setEnabled(false);
+        }
+      }
+    });
+
     go = BaseXButton.get("c_go", false, H_EXECUTE_QUERY, this);
     go.addActionListener(new ActionListener() {
       @Override
@@ -218,9 +232,9 @@ public final class GUI extends AGUI {
 
     filter = BaseXButton.command(GUIMenuCmd.C_FILTER, this);
 
-    b = new BaseXBack(new TableLayout(1, 3));
+    b = new BaseXBack(new TableLayout(1, 3, 1, 0));
+    b.add(stop);
     b.add(go);
-    b.add(Box.createHorizontalStrut(1));
     b.add(filter);
     nav.add(b, BorderLayout.EAST);
 
@@ -368,6 +382,8 @@ public final class GUI extends AGUI {
       if(threadID != thread) return true;
     }
     cursor(CURSORWAIT);
+    input.setCursor(CURSORWAIT);
+    stop.setEnabled(true);
 
     boolean ok = true;
     try {
@@ -476,9 +492,7 @@ public final class GUI extends AGUI {
       BaseXDialog.error(this, Util.info(EXEC_ERROR, cmd, Util.bug(ex)));
       updating = false;
     }
-
-    cursor(CURSORARROW, true);
-    command = null;
+    stop();
     return ok;
   }
 
@@ -488,6 +502,8 @@ public final class GUI extends AGUI {
   public void stop() {
     if(command != null) command.stop();
     cursor(CURSORARROW, true);
+    input.setCursor(CURSORTEXT);
+    stop.setEnabled(false);
     command = null;
   }
 
