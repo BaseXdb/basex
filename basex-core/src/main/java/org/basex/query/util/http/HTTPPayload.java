@@ -44,16 +44,16 @@ public final class HTTPPayload {
   /**
    * Constructor.
    * @param is input stream
-   * @param st only create status
+   * @param body create body
    * @param ii input info
    * @param opts database options
    */
-  public HTTPPayload(final InputStream is, final boolean st, final InputInfo ii,
+  public HTTPPayload(final InputStream is, final boolean body, final InputInfo ii,
       final MainOptions opts) {
     in = is;
     info = ii;
     options = opts;
-    payloads = st ? null : new ValueBuilder();
+    payloads = body ? new ValueBuilder() : null;
   }
 
   /**
