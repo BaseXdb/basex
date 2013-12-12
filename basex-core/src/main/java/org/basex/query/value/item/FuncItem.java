@@ -3,7 +3,6 @@ package org.basex.query.value.item;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
-import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.query.*;
@@ -44,8 +43,6 @@ public final class FuncItem extends FItem implements Scope {
   /** Context length. */
   private final long size;
 
-  /** The closure of this function item. */
-  private final Map<Var, Value> closure;
   /** Size of the stack frame needed for this function. */
   private final int stackSize;
 
@@ -57,46 +54,12 @@ public final class FuncItem extends FItem implements Scope {
    * @param arg function arguments
    * @param t function type
    * @param body function body
+   * @param cst cast flag
    * @param stSize stack-frame size
    */
   public FuncItem(final StaticContext sctx, final Ann annotations, final QNm n, final Var[] arg,
-      final FuncType t, final Expr body, final int stSize) {
-    this(sctx, annotations, n, arg, t, body, false, null, 0, 0, null, stSize);
-  }
-
-  /**
-   * Constructor.
-   * @param sctx static context
-   * @param annotations function annotations
-   * @param n function name
-   * @param arg function arguments
-   * @param t function type
-   * @param body function body
-   * @param cst cast flag
-   * @param cls closure
-   * @param stSize stack-frame size
-   */
-  public FuncItem(final StaticContext sctx, final Ann annotations, final QNm n, final Var[] arg,
-      final FuncType t, final Expr body, final boolean cst, final Map<Var, Value> cls,
-      final int stSize) {
-    this(sctx, annotations, n, arg, t, body, cst, null, 0, 0, cls, stSize);
-  }
-
-  /**
-   * Constructor for anonymous functions.
-   * @param sctx static context
-   * @param annotations function annotations
-   * @param arg function arguments
-   * @param t function type
-   * @param body function body
-   * @param cst cast flag
-   * @param cl variables in the closure
-   * @param stSize stack-frame size
-   */
-  public FuncItem(final StaticContext sctx, final Ann annotations, final Var[] arg,
-      final FuncType t, final Expr body, final boolean cst,
-      final Map<Var, Value> cl, final int stSize) {
-    this(sctx, annotations, null, arg, t, body, cst, cl, stSize);
+      final FuncType t, final Expr body, final boolean cst, final int stSize) {
+    this(sctx, annotations, n, arg, t, body, cst, null, 0, 0, stSize);
   }
 
   /**
@@ -111,19 +74,18 @@ public final class FuncItem extends FItem implements Scope {
    * @param vl context value
    * @param ps context position
    * @param sz context size
-   * @param cls closure
    * @param stSize stack-frame size
    */
   public FuncItem(final StaticContext sctx, final Ann annotations, final QNm n, final Var[] arg,
       final FuncType t, final Expr body, final boolean cst, final Value vl,
-      final long ps, final long sz, final Map<Var, Value> cls, final int stSize) {
+      final long ps, final long sz, final int stSize) {
 
     super(t, annotations);
     name = n;
     vars = arg;
     expr = body;
-    cast = cst && t.type != null ? t.type : null;
-    closure = cls != null ? cls : Collections.<Var, Value>emptyMap();
+
+    cast = cst && t.ret != null ? t.ret : null;
     stackSize = stSize;
     sc = sctx;
 
@@ -152,20 +114,6 @@ public final class FuncItem extends FItem implements Scope {
     return (FuncType) type;
   }
 
-  /**
-   * Binds all variables to the context.
-   * @param ctx query context
-   * @param ii input info
-   * @param arg argument values
-   * @throws QueryException if the arguments can't be bound
-   */
-  private void bindVars(final QueryContext ctx, final InputInfo ii, final Value[] arg)
-      throws QueryException {
-    for(final Entry<Var, Value> e : closure.entrySet())
-      ctx.set(e.getKey(), e.getValue(), ii);
-    for(int v = vars.length; --v >= 0;) ctx.set(vars[v], arg[v], ii);
-  }
-
   @Override
   public Value invValue(final QueryContext ctx, final InputInfo ii, final Value... args)
       throws QueryException {
@@ -175,10 +123,10 @@ public final class FuncItem extends FItem implements Scope {
     final Value cv = ctx.value;
     final long ps = ctx.pos, sz = ctx.size;
     try {
-      bindVars(ctx, ii, args);
       ctx.value = ctxVal;
       ctx.pos = pos;
       ctx.size = size;
+      for(int i = 0; i < vars.length; i++) ctx.set(vars[i], args[i], ii);
       final Value v = ctx.value(expr);
       // optionally cast return value to target type
       return cast != null ? cast.funcConvert(ctx, sc, ii, v, false) : v;
@@ -199,10 +147,10 @@ public final class FuncItem extends FItem implements Scope {
     final Value cv = ctx.value;
     final long ps = ctx.pos, sz = ctx.size;
     try {
-      bindVars(ctx, ii, args);
       ctx.value = ctxVal;
       ctx.pos = pos;
       ctx.size = size;
+      for(int i = 0; i < vars.length; i++) ctx.set(vars[i], args[i], ii);
       final Item it = expr.item(ctx, ii);
       final Value v = it == null ? Empty.SEQ : it;
       // optionally cast return value to target type
@@ -231,7 +179,7 @@ public final class FuncItem extends FItem implements Scope {
     final Expr e = new DynFuncCall(ii, this, refs);
     e.markTailCalls(null);
     return new FuncItem(sc, ann, name,
-        vs, ft, opt ? e.optimize(ctx, vsc) : e, cast != null, null, vsc.stackSize());
+        vs, ft, opt ? e.optimize(ctx, vsc) : e, cast != null, vsc.stackSize());
   }
 
   @Override
@@ -247,8 +195,6 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public boolean visit(final ASTVisitor visitor) {
     for(final Var var : vars) if(!visitor.declared(var)) return false;
-    for(final Entry<Var, Value> e : closure.entrySet())
-      if(!(visitor.declared(e.getKey()) && e.getValue().accept(visitor))) return false;
     return expr.accept(visitor);
   }
 
@@ -270,17 +216,9 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public String toString() {
     final FuncType ft = (FuncType) type;
-    final TokenBuilder tb = new TokenBuilder();
-    if (!closure.isEmpty()) {
-      tb.add("((: closure :) ");
-      for (final Entry<Var, Value> e : closure.entrySet())
-        tb.add("let ").addExt(e.getKey()).add(" := ").addExt(e.getValue()).add(' ');
-      tb.add(RETURN).add(' ');
-    }
-    tb.add(FUNCTION).add('(');
+    final TokenBuilder tb = new TokenBuilder(FUNCTION).add('(');
     for(final Var v : vars) tb.addExt(v).add(v == vars[vars.length - 1] ? "" : ", ");
-    tb.add(')').add(ft.type != null ? " as " + ft.type : "").add(" { ").addExt(expr).add(" }");
-    if (!closure.isEmpty()) tb.addByte((byte) ')');
+    tb.add(')').add(ft.ret != null ? " as " + ft.ret : "").add(" { ").addExt(expr).add(" }");
     return tb.toString();
   }
 
@@ -288,20 +226,15 @@ public final class FuncItem extends FItem implements Scope {
   public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
       final InputInfo ii) throws QueryException {
     if(!inline(exprs, ctx)) return null;
+    ctx.compInfo(OPTINLINEFN, this);
     // create let bindings for all variables
     final LinkedList<GFLWOR.Clause> cls =
-        exprs.length == 0 && closure.isEmpty() ? null : new LinkedList<GFLWOR.Clause>();
+        exprs.length == 0 ? null : new LinkedList<GFLWOR.Clause>();
     final IntObjMap<Var> vs = new IntObjMap<Var>();
     for(int i = 0; i < vars.length; i++) {
       final Var old = vars[i], v = scp.newCopyOf(ctx, old);
       vs.put(old.id, v);
       cls.add(new Let(v, exprs[i], false, ii).optimize(ctx, scp));
-    }
-
-    for(final Entry<Var, Value> e : closure.entrySet()) {
-      final Var old = e.getKey(), v = scp.newCopyOf(ctx, old);
-      vs.put(old.id, v);
-      cls.add(new Let(v, e.getValue(), false, ii).optimize(ctx, scp));
     }
 
     // copy the function body

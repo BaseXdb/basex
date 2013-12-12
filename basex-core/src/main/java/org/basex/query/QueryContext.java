@@ -625,8 +625,12 @@ public final class QueryContext extends Proc {
   void plan(final FDoc doc) {
     // only show root node if functions or variables exist
     final FElem e = new FElem(QueryText.PLAN);
-    funcs.plan(e);
-    vars.plan(e);
+    if(root != null) {
+      for(final StaticScope scp : QueryCompiler.usedDecls(root)) scp.plan(e);
+    } else {
+      funcs.plan(e);
+      vars.plan(e);
+    }
     root.plan(e);
     doc.add(e);
   }

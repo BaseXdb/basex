@@ -231,6 +231,7 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
   public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
       final InputInfo ii) throws QueryException {
     if(expr.has(Flag.CTX)) return null;
+    ctx.compInfo(OPTINLINEFN, this);
     // create let bindings for all variables
     final Map<Var, Expr> closure = scope.closure();
     final LinkedList<GFLWOR.Clause> cls =
@@ -260,12 +261,18 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
     final FuncType ft = (FuncType) type().type;
     final boolean c = ret != null && !expr.type().instanceOf(ret);
 
-    // collect closure
-    final Map<Var, Value> clos = new HashMap<Var, Value>();
-    for(final Entry<Var, Expr> e : scope.closure().entrySet())
-      clos.put(e.getKey(), e.getValue().value(ctx));
+    final Expr body;
+    if(!scope.closure().isEmpty()) {
+      // collect closure
+      final LinkedList<GFLWOR.Clause> cls = new LinkedList<GFLWOR.Clause>();
+      for(final Entry<Var, Expr> e : scope.closure().entrySet())
+        cls.add(new Let(e.getKey(), e.getValue().value(ctx), false, ii));
+      body = new GFLWOR(ii, cls, expr);
+    } else {
+      body = expr;
+    }
 
-    return new FuncItem(sc, ann, args, ft, expr, c, clos, scope.stackSize());
+    return new FuncItem(sc, ann, null, args, ft, body, c, scope.stackSize());
   }
 
   @Override

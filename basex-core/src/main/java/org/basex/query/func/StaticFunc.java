@@ -131,7 +131,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * Checks if this function calls itself recursively.
    * @return result of check
    */
-  boolean selfRecursive() {
+  private boolean selfRecursive() {
     return !expr.accept(new ASTVisitor() {
       @Override
       public boolean funcCall(final StaticFuncCall call) {
@@ -291,6 +291,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
       final InputInfo ii) throws QueryException {
     if(!inline(ctx)) return null;
+    ctx.compInfo(OPTINLINEFN, name);
     // create let bindings for all variables
     final LinkedList<GFLWOR.Clause> cls = exprs.length == 0 ? null :
       new LinkedList<GFLWOR.Clause>();

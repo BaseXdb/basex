@@ -52,6 +52,49 @@ final class QueryCompiler {
   }
 
   /**
+   * Gathers all declarations (functions and static variables) used by the given main module.
+   * @param main the main module to start from
+   * @return list of all declarations that the main module uses
+   */
+  public static List<StaticDecl> usedDecls(final MainModule main) {
+    final List<StaticDecl> scopes = new ArrayList<StaticDecl>();
+    final IdentityHashMap<Scope, Object> map = new IdentityHashMap<Scope, Object>();
+    main.visit(new ASTVisitor() {
+      @Override
+      public boolean staticVar(final StaticVar var) {
+        if(map.put(var, var) == null) {
+          var.visit(this);
+          scopes.add(var);
+        }
+        return true;
+      }
+
+      @Override
+      public boolean funcCall(final StaticFuncCall call) {
+        final StaticFunc f = call.func();
+        if(map.put(f, f) == null) {
+          f.visit(this);
+          scopes.add(f);
+        }
+        return true;
+      }
+
+      @Override
+      public boolean inlineFunc(final Scope sub) {
+        if(map.put(sub, sub) == null) sub.visit(this);
+        return true;
+      }
+
+      @Override
+      public boolean funcItem(final FuncItem func) {
+        if(map.put(func, func) == null) func.visit(this);
+        return true;
+      }
+    });
+    return scopes;
+  }
+
+  /**
    * Compiles all necessary parts of this query.
    * @param ctx query context
    * @param root root expression

@@ -47,20 +47,17 @@ public final class DynFuncCall extends FuncCall {
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
       if(ft.args != null && ft.args.length != ar) throw INVARITY.get(info, f, ar);
-      if(ft.type != null) type = ft.type;
+      if(ft.ret != null) type = ft.ret;
     }
 
     if(f instanceof XQFunctionExpr) {
       // maps can only contain fully evaluated Values, so this is safe
       if(allAreValues() && f instanceof Map) return optPre(value(ctx), ctx);
 
+      // try to inline the function
       final Expr[] args = Arrays.copyOf(expr, expr.length - 1);
       final Expr inl = ((XQFunctionExpr) f).inlineExpr(args, ctx, scp, info);
-      if(inl != null) {
-        // inline the function
-        ctx.compInfo(OPTINLINEFN, f);
-        return inl;
-      }
+      if(inl != null) return inl;
     }
 
     return this;

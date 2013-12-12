@@ -151,6 +151,15 @@ public final class FuncItemTest extends QueryPlanTest {
     );
   }
 
+  /** Checks that recursive function items are not inlined. */
+  @Test
+  public void noLoopTest6() {
+    check("let $f := function($f) { $f($f) } return $f($f)",
+        null,
+        "exists(//" + Util.className(FuncItem.class) + ')'
+    );
+  }
+
   /** Checks in non-recursive function items are inlined. */
   @Test
   public void funcItemInlining() {
