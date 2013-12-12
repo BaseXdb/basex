@@ -282,7 +282,7 @@ public final class QueryContext extends Proc {
       }
 
       @Override
-      public boolean funcCall(final StaticFuncCall call) {
+      public boolean staticFuncCall(final StaticFuncCall call) {
         final StaticFunc f = call.func();
         if(map.put(f, f) == null) {
           f.visit(this);

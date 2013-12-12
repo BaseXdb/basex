@@ -7,6 +7,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
@@ -68,6 +69,11 @@ public final class DynFuncCall extends FuncCall {
     final Expr[] copy = copyAll(ctx, scp, vs, expr);
     final int last = copy.length - 1;
     return copyType(new DynFuncCall(info, copy[last], Arrays.copyOf(copy, last)));
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitor.dynFuncCall(this) && visitAll(visitor, expr);
   }
 
   @Override

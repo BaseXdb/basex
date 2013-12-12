@@ -139,7 +139,7 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitor.funcCall(this) && super.accept(visitor);
+    return visitor.staticFuncCall(this) && super.accept(visitor);
   }
 
   @Override

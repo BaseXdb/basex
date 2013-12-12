@@ -10,7 +10,7 @@ import org.basex.query.value.node.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
-public class LibraryModule extends StaticScope {
+public final class LibraryModule extends StaticScope {
   /** Library name. */
   public final QNm name;
 

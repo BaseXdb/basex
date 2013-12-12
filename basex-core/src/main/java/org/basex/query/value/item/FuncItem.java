@@ -253,7 +253,17 @@ public final class FuncItem extends FItem implements Scope {
   private boolean inline(final Expr[] as, final QueryContext ctx) {
     if(expr.isValue() || expr.exprSize() < ctx.context.options.get(MainOptions.INLINELIMIT) &&
         !expr.has(Flag.CTX)) {
-      final ASTVisitor visitor = new ASTVisitor() {
+      // check if the function item does not introduce new function calls
+      final ASTVisitor self = new ASTVisitor() {
+        @Override
+        public boolean dynFuncCall(final DynFuncCall call) {
+          return false;
+        }
+      };
+      if(expr.accept(self)) return true;
+
+      // checks if the arguments don't contain this function item
+      final ASTVisitor args = new ASTVisitor() {
         @Override
         public boolean funcItem(final FuncItem f) {
           return f != FuncItem.this && f.visit(this);
@@ -263,7 +273,7 @@ public final class FuncItem extends FItem implements Scope {
           return sub.visit(this);
         }
       };
-      return Expr.visitAll(visitor, as);
+      return Expr.visitAll(args, as);
     }
     return false;
   }

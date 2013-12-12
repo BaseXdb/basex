@@ -59,9 +59,8 @@ public final class FuncItemTest extends QueryPlanTest {
         "}(function($f) { 42 })",
         "42",
         // both outer inline functions are pre-compiled
-        "exists(//" + Util.className(DynFuncCall.class) + ')',
-        "every $f in outermost(//" + Util.className(DynFuncCall.class) + ")/* satisfies" +
-        "  $f instance of element(" + Util.className(FuncItem.class) + ')'
+        "empty(//" + Util.className(InlineFunc.class) + ')',
+        "/*/" + Util.className(Int.class) + "/@value = '42'"
     );
   }
 
@@ -147,7 +146,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "let $id := local:foo(function($g) { $g })" +
         "return $id(42)",
         "42",
-        "exists(//" + Util.className(FuncItem.class) + ')'
+        "/*/" + Util.className(Int.class) + "/@value = '42'"
     );
   }
 

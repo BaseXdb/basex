@@ -134,7 +134,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   private boolean selfRecursive() {
     return !expr.accept(new ASTVisitor() {
       @Override
-      public boolean funcCall(final StaticFuncCall call) {
+      public boolean staticFuncCall(final StaticFuncCall call) {
         return call.func != StaticFunc.this;
       }
 
