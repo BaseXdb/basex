@@ -68,12 +68,9 @@ public final class StaticFuncCall extends FuncCall {
     // compile mutually recursive functions
     func.compile(ctx);
 
+    // try to inline the function
     final Expr inl = func.inlineExpr(expr, ctx, scp, info);
-    if(inl != null) {
-      // inline the function
-      ctx.compInfo(OPTINLINEFN, func.name);
-      return inl;
-    }
+    if(inl != null) return inl;
     type = func.type();
     return this;
   }
@@ -127,7 +124,7 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, this, TCL, tailCall), expr);
+    addPlan(plan, planElem(NAM, name, TCL, tailCall), expr);
   }
 
   @Override
@@ -142,7 +139,7 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitor.funcCall(this) && super.accept(visitor);
+    return visitor.staticFuncCall(this) && super.accept(visitor);
   }
 
   @Override

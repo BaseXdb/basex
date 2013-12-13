@@ -104,7 +104,7 @@ public final class BaseXImages {
   public static Icon text(final boolean raw) {
     return raw ? RAWTEXT : XMLTEXT;
   }
-  
+
   /**
    * Returns an icon for the specified file.
    * @param file file reference

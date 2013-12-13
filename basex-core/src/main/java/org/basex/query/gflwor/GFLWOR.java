@@ -705,8 +705,7 @@ public final class GFLWOR extends ParseExpr {
      * Makes the next evaluation step if available. This method is guaranteed
      * to not be called again if it has once returned {@code false}.
      * @param ctx query context
-     * @return {@code true} if step was made, {@code false} if no more
-     * results exist
+     * @return {@code true} if step was made, {@code false} if no more results exist
      * @throws QueryException evaluation exception
      */
     boolean next(final QueryContext ctx) throws QueryException;

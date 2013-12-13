@@ -21,7 +21,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
-public class MainModule extends StaticScope {
+public final class MainModule extends StaticScope {
   /** Declared type, {@code null} if not specified. */
   private final SeqType declType;
 
@@ -193,7 +193,7 @@ public class MainModule extends StaticScope {
     }
 
     @Override
-    public boolean funcCall(final StaticFuncCall call) {
+    public boolean staticFuncCall(final StaticFuncCall call) {
       return func(call.func());
     }
 

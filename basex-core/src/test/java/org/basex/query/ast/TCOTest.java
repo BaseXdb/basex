@@ -42,11 +42,11 @@ public class TCOTest extends QueryPlanTest {
         "  if($n = 0) then true()" +
         "  else local:odd($n - 1)" +
         "};" +
-        "local:odd(123)",
+        "local:odd(12345)",
 
         "true",
 
-        "count(//" + Util.className(StaticFuncCall.class) + "[@tailCall eq 'true']) eq 2"
+        "count(//" + Util.className(StaticFuncCall.class) + "[@tailCall eq 'false']) eq 1"
     );
   }
 
@@ -133,7 +133,7 @@ public class TCOTest extends QueryPlanTest {
   @Test
   public void hofCont() {
     check("declare function local:f($n) { if($n eq 0) then 42 else local:f($n - 1) };" +
-        "fn:for-each(1000, function($x) { local:f($x) })",
+        "distinct-values(fn:for-each((1 to 10) ! 1000, function($x) { local:f($x) }))",
 
         "42"
     );

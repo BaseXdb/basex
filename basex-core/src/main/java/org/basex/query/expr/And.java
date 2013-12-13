@@ -3,8 +3,10 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -22,7 +24,7 @@ public final class And extends Logical {
    * @param ii input info
    * @param e expression list
    */
-  public And(final InputInfo ii, final Expr[] e) {
+  public And(final InputInfo ii, final Expr... e) {
     super(ii, e);
   }
 
@@ -30,8 +32,11 @@ public final class And extends Logical {
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     // remove atomic values
     final Expr c = super.compile(ctx, scp);
-    if(c != this) return c;
+    return c != this ? c : optimize(ctx, scp);
+  }
 
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     // merge predicates if possible
     final int es = expr.length;
     final ExprList el = new ExprList(es);
@@ -57,14 +62,37 @@ public final class And extends Logical {
         else if(tmp != null) return tmp;
       }
       // no optimization found; add original expression
-      if(tmp == null) el.add(e);
+      if(tmp == null && e != Bln.TRUE) {
+        if(e == Bln.FALSE) return optPre(Bln.FALSE, ctx);
+        el.add(e);
+      }
     }
     if(ps != null) el.add(ps);
     if(cr != null) el.add(cr);
     if(cs != null) el.add(cs);
+
+    // all arguments were true()
+    if(el.size() == 0) return optPre(Bln.TRUE, ctx);
+
     if(es != el.size()) ctx.compInfo(OPTWRITE, this);
     expr = el.finish();
     compFlatten(ctx);
+
+    boolean not = true;
+    for(final Expr e : expr) {
+      if(!e.isFunction(Function.NOT)) {
+        not = false;
+        break;
+      }
+    }
+
+    if(not) {
+      ctx.compInfo(OPTWRITE, this);
+      Expr[] inner = new Expr[expr.length];
+      for(int i = 0; i < inner.length; i++) inner[i] = ((Arr) expr[i]).expr[0];
+      final Expr or = new Or(info, inner).optimize(ctx, scp);
+      return Function.NOT.get(null, or).optimize(ctx, scp);
+    }
 
     // return single expression if it yields a boolean
     return expr.length == 1 ? compBln(expr[0], info) : this;
@@ -88,6 +116,13 @@ public final class And extends Logical {
     final Expr[] ex = new Expr[es];
     for(int i = 0; i < es; i++) ex[i] = expr[i].copy(ctx, scp, vars);
     return new And(info, ex);
+  }
+
+  @Override
+  public void markTailCalls(final QueryContext ctx) {
+    // if the last expression surely returns a boolean, we can jump to it
+    final Expr last = expr[expr.length - 1];
+    if(last.type().eq(SeqType.BLN)) last.markTailCalls(ctx);
   }
 
   @Override

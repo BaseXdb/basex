@@ -89,7 +89,7 @@ public final class BaseXTabs extends JTabbedPane {
       draggedTab = newTab;
     }
   }
-  
+
   /**
    * Refreshes the appearance of all tabs.
    */

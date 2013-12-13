@@ -2,6 +2,8 @@ package org.basex.query.gflwor;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -67,15 +69,11 @@ public final class Let extends GFLWOR.Clause {
   }
 
   @Override
-  Eval eval(final Eval sub) {
-    return new Eval() {
-      @Override
-      public boolean next(final QueryContext ctx) throws QueryException {
-        if(!sub.next(ctx)) return false;
-        ctx.set(var, score ? score(expr.iter(ctx)) : ctx.value(expr), info);
-        return true;
-      }
-    };
+  LetEval eval(final Eval sub) {
+    if(!(sub instanceof LetEval)) return new LetEval(this, sub);
+    final LetEval eval = (LetEval) sub;
+    eval.lets.add(this);
+    return eval;
   }
 
   /**
@@ -205,5 +203,32 @@ public final class Let extends GFLWOR.Clause {
   @Override
   public int exprSize() {
     return expr.exprSize();
+  }
+
+  /** Evaluator for a block of {@code let} expressions. */
+  private static class LetEval implements Eval {
+    /** Let expressions of the current block, in declaration order. */
+    private final ArrayList<Let> lets;
+    /** Sub-evaluator. */
+    private final Eval sub;
+
+    /**
+     * Constructor for the first let binding in the block.
+     * @param let first let binding
+     * @param subEval sub-evaluator
+     */
+    LetEval(final Let let, final Eval subEval) {
+      lets = new ArrayList<Let>();
+      lets.add(let);
+      sub = subEval;
+    }
+
+    @Override
+    public boolean next(final QueryContext ctx) throws QueryException {
+      if(!sub.next(ctx)) return false;
+      for(final Let let : lets)
+        ctx.set(let.var, let.score ? score(let.expr.iter(ctx)) : ctx.value(let.expr), let.info);
+      return true;
+    }
   }
 }
