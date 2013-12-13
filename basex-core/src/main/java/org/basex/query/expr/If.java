@@ -79,18 +79,44 @@ public final class If extends Arr {
       expr[1] = tmp;
     }
 
-    // if A then true() else false() -> boolean(A)
-    if(expr[0] == Bln.TRUE && expr[1] == Bln.FALSE) {
-      ctx.compInfo(OPTWRITE, this);
-      return compBln(cond, info);
-    }
+    // rewritings for constant booleans
+    if(expr[0].type().eq(SeqType.BLN) && expr[1].type().eq(SeqType.BLN)) {
+      final Expr a = cond, b = expr[0], c = expr[1];
+      if(b == Bln.TRUE) {
+        if(c == Bln.FALSE) {
+          // if(A) then true() else false() -> xs:boolean(A)
+          ctx.compInfo(OPTPRE, this);
+          return compBln(a, info);
+        }
+        // if(A) then true() else C -> A or C
+        ctx.compInfo(OPTWRITE, this);
+        return new Or(info, a, c).optimize(ctx, scp);
+      }
 
-    // if A then false() else true() -> not(A)
-    // if A then B else true() -> not(A) or B
-    if(expr[0].type().eq(SeqType.BLN) && expr[1] == Bln.TRUE) {
-      ctx.compInfo(OPTWRITE, this);
-      final Expr e = Function.NOT.get(null, info, cond);
-      return expr[0] == Bln.FALSE ? e : new Or(info, e, expr[0]);
+      if(c == Bln.TRUE) {
+        if(b == Bln.FALSE) {
+          // if(A) then false() else true() -> not(A)
+          ctx.compInfo(OPTPRE, this);
+          return Function.NOT.get(null, a).optimize(ctx, scp);
+        }
+        // if(A) then B else true() -> not(A) or B
+        ctx.compInfo(OPTWRITE, this);
+        final Expr notA = Function.NOT.get(null, a).optimize(ctx, scp);
+        return new Or(info, notA, b).optimize(ctx, scp);
+      }
+
+      if(b == Bln.FALSE) {
+        // if(A) then false() else C -> not(A) and C
+        ctx.compInfo(OPTWRITE, this);
+        final Expr notA = Function.NOT.get(null, a).optimize(ctx, scp);
+        return new And(info, notA, c).optimize(ctx, scp);
+      }
+
+      if(c == Bln.FALSE) {
+        // if(A) then B else false() -> A and B
+        ctx.compInfo(OPTWRITE, this);
+        return new And(info, a, b).optimize(ctx, scp);
+      }
     }
 
     type = expr[0].type().union(expr[1].type());

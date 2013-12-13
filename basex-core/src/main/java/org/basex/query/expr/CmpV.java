@@ -164,7 +164,11 @@ public final class CmpV extends Cmp {
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
+    return this.optimize(ctx, scp);
+  }
 
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     // swap expressions
     if(swap()) {
       op = op.swap();

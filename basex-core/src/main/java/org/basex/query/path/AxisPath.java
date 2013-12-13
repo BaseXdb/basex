@@ -100,7 +100,9 @@ public abstract class AxisPath extends Path {
 
   @Override
   public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.optimize(ctx, scp);
+    final Expr opt = super.optimize(ctx, scp);
+    if(opt != this) return opt;
+
     final Value v = ctx.value;
     try {
       ctx.value = root(ctx);

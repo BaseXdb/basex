@@ -60,7 +60,7 @@ public final class PartFunc extends Arr {
       if(ft.args.length != arity) throw INVARITY.get(info, f, arity);
       final SeqType[] ar = new SeqType[holes.length];
       for(int i = 0; i < holes.length; i++) ar[i] = ft.args[holes[i]];
-      type = FuncType.get(ft.type, ar).seqType();
+      type = FuncType.get(ft.ret, ar).seqType();
     }
 
     return this;
@@ -88,7 +88,7 @@ public final class PartFunc extends Arr {
 
     final Expr call = new DynFuncCall(info, f, args).optimize(ctx, scp);
     final InlineFunc func = new InlineFunc(
-        info, ft.type, vars, call, f.annotations(), sc, scp);
+        info, ft.ret, vars, call, f.annotations(), sc, scp);
     return func.optimize(ctx, null).item(ctx, ii);
   }
 

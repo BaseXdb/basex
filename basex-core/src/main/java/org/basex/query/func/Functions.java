@@ -137,7 +137,7 @@ public final class Functions extends TokenSet {
       final Var[] args = { scp.newLocal(ctx, new QNm(QueryText.ITEMM, ""), SeqType.AAT_ZO, true) };
       final Expr e = new Cast(sc, ii, new VarRef(ii, args[0]), type.seqType());
       final FuncType tp = FuncType.get(e.type(), SeqType.AAT_ZO);
-      return new FuncItem(sc, new Ann(), name, args, tp, e, scp.stackSize());
+      return new FuncItem(sc, new Ann(), name, args, tp, e, false, scp.stackSize());
     }
 
     // pre-defined functions
@@ -158,7 +158,7 @@ public final class Functions extends TokenSet {
 
       final StandardFunc f = fn.get(sc, calls);
       if(!f.has(Flag.CTX) && !f.has(Flag.FCS))
-        return new FuncItem(sc, a, name, args, ft, f, scp.stackSize());
+        return new FuncItem(sc, a, name, args, ft, f, false, scp.stackSize());
 
       return new FuncLit(a, name, args, f, ft, scp, sc, ii);
     }
@@ -205,7 +205,7 @@ public final class Functions extends TokenSet {
       calls[i] = new VarRef(info, args[i]);
     }
     final TypedFunc tf = ctx.funcs.getFuncRef(sf.name, calls, sc, info);
-    return new FuncItem(sc, tf.ann, sf.name, args, ft, tf.fun, scp.stackSize());
+    return new FuncItem(sc, tf.ann, sf.name, args, ft, tf.fun, false, scp.stackSize());
   }
 
   /**

@@ -51,11 +51,20 @@ public abstract class ASTVisitor {
   }
 
   /**
-   * Notifies the visitor of a function call.
+   * Notifies the visitor of a static function call.
    * @param call function call
    * @return if more expressions should be visited
    */
-  public boolean funcCall(final StaticFuncCall call) {
+  public boolean staticFuncCall(final StaticFuncCall call) {
+    return true;
+  }
+
+  /**
+   * Notifies the visitor of a dynamic function call.
+   * @param call function call
+   * @return if more expressions should be visited
+   */
+  public boolean dynFuncCall(final DynFuncCall call) {
     return true;
   }
 

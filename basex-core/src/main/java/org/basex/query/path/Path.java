@@ -98,6 +98,12 @@ public abstract class Path extends ParseExpr {
       ctx.compInfo(OPTREMCTX);
       root = null;
     }
+
+    for(final Expr e : steps) {
+      // check for empty steps
+      if(e.isEmpty()) return optPre(null, ctx);
+    }
+
     return this;
   }
 
@@ -448,7 +454,16 @@ public abstract class Path extends ParseExpr {
         ctx.value = oldVal;
         ctx.value = root(ctx);
       }
-      return inlineAll(ctx, scp, steps, v, e) || rt != null ? optimize(ctx, scp) : null;
+
+      boolean change = rt != null;
+      for(int i = 0; i < steps.length; i++) {
+        final Expr nw = steps[i].inline(ctx, scp, v, e);
+        if(nw != null) {
+          steps[i] = nw;
+          change = true;
+        }
+      }
+      return change ? optimize(ctx, scp) : null;
     } finally {
       ctx.value = oldVal;
     }
