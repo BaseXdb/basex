@@ -37,8 +37,6 @@ public abstract class AQuery extends Command {
   private final QueryInfo qi = new QueryInfo();
   /** Query processor. */
   private QueryProcessor qp;
-  /** Query exception. */
-  private QueryException qe;
 
   /**
    * Protected constructor.
@@ -58,8 +56,8 @@ public abstract class AQuery extends Command {
   final boolean query(final String query) {
     final Performance p = new Performance();
     String err;
-    if(qe != null) {
-      err = qe.getMessage();
+    if(cause != null) {
+      err = Util.message(cause);
     } else {
       try {
         final boolean serial = options.get(MainOptions.SERIALIZE);
@@ -116,6 +114,7 @@ public abstract class AQuery extends Command {
         return info(qi.toString(qp, out, hits, options.get(MainOptions.QUERYINFO)));
 
       } catch(final QueryException ex) {
+        cause = ex;
         err = Util.message(ex);
       } catch(final IOException ex) {
         err = Util.message(ex);
@@ -150,7 +149,7 @@ public abstract class AQuery extends Command {
       return qp.updating;
     } catch(final QueryException ex) {
       Util.debug(ex);
-      qe = ex;
+      cause = ex;
       qp.close();
       return false;
     }

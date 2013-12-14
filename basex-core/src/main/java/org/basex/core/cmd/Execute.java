@@ -1,5 +1,7 @@
 package org.basex.core.cmd;
 
+import static org.basex.core.Text.*;
+
 import java.util.*;
 
 import org.basex.core.*;
@@ -45,6 +47,8 @@ public class Execute extends Command {
 
       final StringBuilder sb = new StringBuilder();
       for(final Command c : list) {
+        if(c.openDB && context.data() == null) return error(NO_DB_OPENED);
+
         final boolean ok = proc(c).run(context, out);
         proc(null);
         sb.append(c.info());

@@ -26,6 +26,8 @@ public abstract class Command extends Proc {
   public final String[] args;
   /** Permission required to execute this command. */
   public final Perm perm;
+  /** Indicates if the command requires an opened database. */
+  public final boolean openDB;
 
   /** Performance measurements. */
   protected Performance perf;
@@ -39,11 +41,11 @@ public abstract class Command extends Proc {
   protected MainOptions options;
   /** Global options. */
   protected GlobalOptions goptions;
+  /** Exception, resulting from command execution. */
+  protected Exception cause;
 
   /** Container for query information. */
   private final TokenBuilder info = new TokenBuilder();
-  /** Indicates if the command requires an opened database. */
-  private final boolean data;
 
   /**
    * Constructor for commands requiring no opened database.
@@ -62,7 +64,7 @@ public abstract class Command extends Proc {
    */
   protected Command(final Perm p, final boolean d, final String... arg) {
     perm = p;
-    data = d;
+    openDB = d;
     args = arg;
   }
 
@@ -76,7 +78,7 @@ public abstract class Command extends Proc {
   public final void execute(final Context ctx, final OutputStream os) throws BaseXException {
     // check if data reference is available
     final Data dt = ctx.data();
-    if(dt == null && data) throw new BaseXException(NO_DB_OPENED);
+    if(dt == null && openDB) throw new BaseXException(NO_DB_OPENED);
 
     // check permissions
     if(!ctx.perm(perm, dt != null ? dt.meta : null))
@@ -89,7 +91,11 @@ public abstract class Command extends Proc {
       // register process
       ctx.register(this);
       // run command and return success flag
-      if(!run(ctx, os)) throw new BaseXException(info());
+      if(!run(ctx, os)) {
+        final BaseXException ex = new BaseXException(info());
+        ex.initCause(cause);
+        throw ex;
+      }
     } catch(final RuntimeException th) {
       Util.stack(th);
       throw th;
