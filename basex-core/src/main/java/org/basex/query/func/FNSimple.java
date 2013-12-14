@@ -29,8 +29,7 @@ public final class FNSimple extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNSimple(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNSimple(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 

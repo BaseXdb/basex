@@ -24,8 +24,7 @@ public final class FNNum extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNNum(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNNum(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 

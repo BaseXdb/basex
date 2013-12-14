@@ -34,8 +34,7 @@ public final class FNClient extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNClient(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNClient(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 

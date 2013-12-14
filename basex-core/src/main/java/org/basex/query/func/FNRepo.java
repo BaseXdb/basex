@@ -36,8 +36,7 @@ public final class FNRepo extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNRepo(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNRepo(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 

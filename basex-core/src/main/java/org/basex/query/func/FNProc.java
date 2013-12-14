@@ -37,8 +37,7 @@ public final class FNProc extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNProc(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNProc(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 

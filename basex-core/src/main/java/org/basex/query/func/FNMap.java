@@ -22,8 +22,7 @@ public final class FNMap extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNMap(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNMap(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 

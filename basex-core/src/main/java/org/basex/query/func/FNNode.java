@@ -28,8 +28,7 @@ public final class FNNode extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNNode(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNNode(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 

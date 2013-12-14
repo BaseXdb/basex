@@ -27,8 +27,7 @@ public final class FNId extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNId(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNId(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 

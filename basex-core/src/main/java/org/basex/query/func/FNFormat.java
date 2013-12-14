@@ -28,8 +28,7 @@ public final class FNFormat extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNFormat(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNFormat(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 

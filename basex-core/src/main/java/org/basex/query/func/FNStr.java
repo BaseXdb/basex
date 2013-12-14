@@ -31,8 +31,7 @@ public final class FNStr extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNStr(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNStr(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 

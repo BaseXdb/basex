@@ -39,8 +39,7 @@ public final class FNGen extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNGen(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNGen(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 

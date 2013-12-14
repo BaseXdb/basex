@@ -54,8 +54,7 @@ public final class FNPat extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNPat(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNPat(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 

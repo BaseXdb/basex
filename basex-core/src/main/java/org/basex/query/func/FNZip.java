@@ -59,8 +59,7 @@ public final class FNZip extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNZip(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNZip(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 

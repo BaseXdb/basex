@@ -25,8 +25,7 @@ public final class FNFetch extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNFetch(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNFetch(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 

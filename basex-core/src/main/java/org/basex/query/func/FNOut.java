@@ -27,8 +27,7 @@ public final class FNOut extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNOut(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNOut(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 

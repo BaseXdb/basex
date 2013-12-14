@@ -57,8 +57,7 @@ public final class FNAdmin extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNAdmin(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNAdmin(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 

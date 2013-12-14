@@ -23,8 +23,7 @@ public final class FNHash extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNHash(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNHash(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 

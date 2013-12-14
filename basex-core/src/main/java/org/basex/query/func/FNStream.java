@@ -20,8 +20,7 @@ public final class FNStream extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNStream(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNStream(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 

@@ -21,8 +21,7 @@ public final class FNDate extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNDate(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
+  public FNDate(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
     super(sctx, ii, f, e);
   }
 
