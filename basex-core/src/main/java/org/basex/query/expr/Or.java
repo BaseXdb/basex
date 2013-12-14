@@ -74,7 +74,7 @@ public final class Or extends Logical {
 
     if(not) {
       ctx.compInfo(OPTWRITE, this);
-      Expr[] inner = new Expr[expr.length];
+      final Expr[] inner = new Expr[expr.length];
       for(int i = 0; i < inner.length; i++) inner[i] = ((Arr) expr[i]).expr[0];
       final Expr and = new And(info, inner).optimize(ctx, scp);
       return Function.NOT.get(null, and).optimize(ctx, scp);

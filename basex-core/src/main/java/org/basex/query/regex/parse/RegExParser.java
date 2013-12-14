@@ -8,7 +8,6 @@ import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.regex.*;
-import org.basex.query.util.*;
 import org.basex.util.*;
 import static org.basex.util.Token.*;
 import static java.util.regex.Pattern.*;

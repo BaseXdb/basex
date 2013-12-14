@@ -252,7 +252,6 @@ public final class EditorView extends View {
         search.editor(ea, true);
         gui.refreshControls();
         posCode.invokeLater();
-        System.out.println("?");
         ea.release(Action.PARSE);
       }
     });
@@ -686,7 +685,6 @@ public final class EditorView extends View {
     if(!refresh && stop.isEnabled()) return;
 
     ++threadID;
-    errorInfo = null;
     getEditor().resetError();
 
     if(refresh) {
@@ -696,7 +694,9 @@ public final class EditorView extends View {
 
     if(stopped || th == null) {
       info.setCursor(CURSORARROW);
-      info.setText(stopped ? INTERRUPTED : OK, Msg.SUCCESS).setToolTipText(null);
+      info.setText(stopped ? INTERRUPTED : OK, Msg.SUCCESS);
+      info.setToolTipText(null);
+      errorInfo = null;
     } else {
       info.setCursor(CURSORHAND);
       info.setText(th.getLocalizedMessage(), Msg.ERROR);
