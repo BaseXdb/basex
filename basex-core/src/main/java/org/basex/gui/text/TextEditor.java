@@ -92,8 +92,20 @@ public final class TextEditor {
    * @return selection offsets
    */
   int[] replace(final ReplaceContext rc) {
-    final int start = selected() ? Math.min(selectPos, selectEnd) : 0;
-    final int end = selected() ? Math.max(selectPos, selectEnd) : text.length;
+    // only adopt selection if it extends over more than one line
+    final int tl = text.length;
+    int start = Math.min(selectPos, selectEnd);
+    int end = Math.max(selectPos, selectEnd);
+    boolean sel = selected();
+    if(sel) {
+      int p = start - 1;
+      while(++p < end && text[p] != '\n');
+      sel = p < end;
+    }
+    if(!sel) {
+      start = 0;
+      end = tl;
+    }
     return rc.replace(search, text, start, end);
   }
 
@@ -629,7 +641,6 @@ public final class TextEditor {
    */
   void deleteLine() {
     selectLine();
-    if(selectEnd + 1 < text.length) selectEnd++;
     delete();
   }
 
@@ -901,7 +912,8 @@ public final class TextEditor {
     pos(caret);
     bol(false);
     startSelect();
-    eol(true);
+    eol(false);
+    next();
     finishSelect();
   }
 

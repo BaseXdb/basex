@@ -48,11 +48,13 @@ public class Execute extends Command {
       final StringBuilder sb = new StringBuilder();
       for(final Command c : list) {
         if(c.openDB && context.data() == null) return error(NO_DB_OPENED);
-
         final boolean ok = proc(c).run(context, out);
         proc(null);
         sb.append(c.info());
-        if(!ok) return error(sb.toString());
+        if(!ok) {
+          cause = c.cause;
+          return error(sb.toString());
+        }
       }
       return info(sb.toString().replaceAll("\r?\n?$", ""));
     } finally {

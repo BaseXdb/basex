@@ -80,8 +80,7 @@ public final class BaseXImages {
     final String path = "/img/" + name + ".png";
     URL url = GUI.class.getResource(path);
     if(url == null) {
-      Util.errln("Not found: " + path);
-      Util.stack();
+      Util.stack("Image not found: " + path);
       url = GUI.class.getResource("/img/" + Prop.NAME + ".png");
     }
     return url;

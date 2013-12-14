@@ -96,12 +96,12 @@ public class TextPanel extends BaseXPanel {
     addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(final FocusEvent e) {
-        if(isEnabled()) cursor(true);
+        if(isEnabled()) caret(true);
       }
       @Override
       public void focusLost(final FocusEvent e) {
-        cursor(false);
-        rend.cursor(false);
+        caret(false);
+        rend.caret(false);
       }
     });
 
@@ -153,7 +153,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
-   * Returns the cursor coordinates.
+   * Returns the line and column of the current caret position.
    * @return line/column
    */
   public final int[] pos() {
@@ -207,21 +207,21 @@ public class TextPanel extends BaseXPanel {
 
   /**
    * Sets a syntax highlighter.
-   * @param s syntax reference
+   * @param syntax syntax reference
    */
-  public final void setSyntax(final Syntax s) {
-    rend.setSyntax(s);
+  public final void setSyntax(final Syntax syntax) {
+    rend.setSyntax(syntax);
   }
 
   /**
-   * Sets the text cursor to the specified position. A text selection will be removed.
-   * @param p cursor position
+   * Sets the caret to the specified position. A text selection will be removed.
+   * @param pos caret position
    */
-  public final void setCaret(final int p) {
-    text.setCaret(p);
+  public final void setCaret(final int pos) {
+    text.setCaret(pos);
     text.noSelect();
     cursorCode.invokeLater(1);
-    cursor(true);
+    caret(true);
   }
 
   /**
@@ -318,7 +318,7 @@ public class TextPanel extends BaseXPanel {
     super.setEnabled(enabled);
     rend.setEnabled(enabled);
     scroll.setEnabled(enabled);
-    cursor(enabled);
+    caret(enabled);
   }
 
   /**
@@ -425,7 +425,7 @@ public class TextPanel extends BaseXPanel {
   public final void mouseMoved(final MouseEvent e) {
     if(linkListener == null) return;
     final TextIterator iter = rend.jump(e.getPoint());
-    gui.cursor(iter.link() != null ? GUIConstants.CURSORARROW : GUIConstants.CURSORHAND);
+    gui.cursor(iter.link() != null ? GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
   }
 
   @Override
@@ -464,7 +464,7 @@ public class TextPanel extends BaseXPanel {
     if(!isEnabled() || !isFocusable()) return;
 
     requestFocusInWindow();
-    cursor(true);
+    caret(true);
 
     if(SwingUtilities.isMiddleMouseButton(e)) copy();
 
@@ -515,7 +515,7 @@ public class TextPanel extends BaseXPanel {
     if(specialKey(e) || modifier(e)) return;
 
     // re-animate cursor
-    cursor(true);
+    caret(true);
 
     // operations without cursor movement...
     final int fh = rend.fontHeight();
@@ -779,22 +779,22 @@ public class TextPanel extends BaseXPanel {
     release(Action.CHECK);
   }
 
-  /** Cursor. */
-  private final Timer cursor = new Timer(500, new ActionListener() {
+  /** Text caret. */
+  private final Timer caretTimer = new Timer(500, new ActionListener() {
     @Override
     public void actionPerformed(final ActionEvent e) {
-      rend.cursor(!rend.cursor());
+      rend.caret(!rend.caret());
     }
   });
 
   /**
-   * Stops an old cursor thread and, if requested, starts a new one.
+   * Stops an old text cursor thread and, if requested, starts a new one.
    * @param start start/stop flag
    */
-  final void cursor(final boolean start) {
-    cursor.stop();
-    if(start) cursor.start();
-    rend.cursor(start);
+  final void caret(final boolean start) {
+    caretTimer.stop();
+    if(start) caretTimer.start();
+    rend.caret(start);
   }
 
   @Override
@@ -830,7 +830,7 @@ public class TextPanel extends BaseXPanel {
       final byte[] t = hist.prev();
       if(t == null) return;
       text.text(t);
-      text.pos(hist.cursor());
+      text.pos(hist.caret());
       finish(-1);
     }
     @Override
@@ -848,7 +848,7 @@ public class TextPanel extends BaseXPanel {
       final byte[] t = hist.next();
       if(t == null) return;
       text.text(t);
-      text.pos(hist.cursor());
+      text.pos(hist.caret());
       finish(-1);
     }
     @Override

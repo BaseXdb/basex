@@ -14,8 +14,8 @@ public final class History {
 
   /** String history. */
   private final byte[][] hist;
-  /** Cursor history. */
-  private final int[] cur;
+  /** Caret history. */
+  private final int[] caret;
   /** Active flag. */
   private final boolean active;
 
@@ -33,11 +33,11 @@ public final class History {
   public History(final byte[] text) {
     active = text != null;
     if(active) {
-      cur = new int[MAX];
+      caret = new int[MAX];
       hist = new byte[MAX][];
       init(text);
     } else {
-      cur = null;
+      caret = null;
       hist = null;
     }
   }
@@ -93,28 +93,28 @@ public final class History {
   }
 
   /**
-   * Returns the cursor position.
-   * @return cursor position
+   * Returns the caret position.
+   * @return caret position
    */
-  public int cursor() {
-    return cur[pos];
+  public int caret() {
+    return caret[pos];
   }
 
   /**
    * Stores a string in the history.
    * @param str string to be stored
-   * @param oc old cursor position
-   * @param nc new cursor position
+   * @param oc old caret position
+   * @param nc new caret position
    */
   public void store(final byte[] str, final int oc, final int nc) {
     if(!active || str == hist[pos] || Token.eq(str, hist[pos])) return;
 
     // merge consecutive character inputs without deletions
     int len = str.length;
-    if(pos > 0 && saved != pos && cur[pos] == oc && oc + 1 == nc &&
+    if(pos > 0 && saved != pos && caret[pos] == oc && oc + 1 == nc &&
         hist[pos - 1].length < len) {
       hist[pos] = str;
-      cur[pos] = nc;
+      caret[pos] = nc;
       return;
     }
 
@@ -126,14 +126,14 @@ public final class History {
     // remove entries
     if(off > 0) {
       Array.move(hist, off, -off, MAX - off);
-      Array.move(cur, off, -off, MAX - off);
+      Array.move(caret, off, -off, MAX - off);
       saved -= off;
       pos -= off;
     }
     // save new entry
-    if(pos >= 0) cur[pos] = oc;
+    if(pos >= 0) caret[pos] = oc;
     hist[++pos] = str;
-    cur[pos] = nc;
+    caret[pos] = nc;
     max = pos;
     // remove old entries to save memory
     for(int p = pos + 1; p < MAX; p++) hist[p] = null;

@@ -64,8 +64,8 @@ final class TextRenderer extends BaseXBack {
 
   /** Vertical start position. */
   private Syntax syntax = Syntax.SIMPLE;
-  /** Visibility of cursor. */
-  private boolean cursor;
+  /** Visibility of text cursor. */
+  private boolean caret;
   /** Color highlighting flag. */
   private boolean highlighted;
   /** Indicates if the current token is part of a link. */
@@ -110,7 +110,7 @@ final class TextRenderer extends BaseXBack {
 
     wordWidth = 0;
     final int s = iter.pos();
-    if(cursor && s == iter.caret()) drawCursor(g, x);
+    if(caret && s == iter.caret()) drawCaret(g, x);
     if(s == iter.error()) drawError(g);
 
     drawLinesSep(g);
@@ -185,7 +185,7 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
-   * Returns the cursor coordinates.
+   * Returns the line and column of the current caret position.
    * @return line/column
    */
   int[] pos() {
@@ -441,11 +441,11 @@ final class TextRenderer extends BaseXBack {
       if(link) g.drawLine(x, y + 1, x + wordWidth, y + 1);
 
       // show cursor
-      if(cursor && iter.edited()) {
+      if(caret && iter.edited()) {
         xx = x;
         while(iter.more()) {
           if(cc == iter.pos()) {
-            drawCursor(g, xx);
+            drawCaret(g, xx);
             break;
           }
           xx += fontWidth(g, iter.next());
@@ -482,7 +482,7 @@ final class TextRenderer extends BaseXBack {
    * @param g graphics reference
    * @param xx x position
    */
-  private void drawCursor(final Graphics g, final int xx) {
+  private void drawCaret(final Graphics g, final int xx) {
     g.setColor(GUIConstants.DGRAY);
     g.fillRect(xx, lineY, 2, fontHeight);
   }
@@ -568,7 +568,7 @@ final class TextRenderer extends BaseXBack {
         next(iter);
       }
     }
-    iter.link(!link);
+    iter.link(link);
     return iter;
   }
 
@@ -598,8 +598,8 @@ final class TextRenderer extends BaseXBack {
    * Sets the cursor flag and repaints the panel.
    * @param c cursor flag
    */
-  void cursor(final boolean c) {
-    cursor = c;
+  void caret(final boolean c) {
+    caret = c;
     repaint();
   }
 
@@ -607,8 +607,8 @@ final class TextRenderer extends BaseXBack {
    * Returns the cursor flag.
    * @return cursor flag
    */
-  boolean cursor() {
-    return cursor;
+  boolean caret() {
+    return caret;
   }
 
   /**

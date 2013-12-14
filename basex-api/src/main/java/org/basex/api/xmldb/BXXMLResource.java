@@ -4,8 +4,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import javax.xml.parsers.*;
-
 import org.basex.api.dom.*;
 import org.basex.build.*;
 import org.basex.build.Parser;
@@ -13,7 +11,9 @@ import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.io.out.*;
+import org.basex.io.parse.xml.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.node.*;
@@ -170,15 +170,8 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
   @Override
   public void getContentAsSAX(final ContentHandler handler) throws XMLDBException {
     if(handler == null) throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
-
-    final SAXParserFactory factory = SAXParserFactory.newInstance();
-    factory.setNamespaceAware(true);
-    factory.setValidating(false);
     try {
-      // caching should be avoided and replaced by a stream reader...
-      final XMLReader reader = factory.newSAXParser().getXMLReader();
-      reader.setContentHandler(handler);
-      reader.parse(new InputSource(new StringReader(getContent().toString())));
+      new XmlParser().contentHandler(handler).parse(new ArrayInput(getContent().toString()));
     } catch(final Exception pce) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, pce.getMessage());
     }

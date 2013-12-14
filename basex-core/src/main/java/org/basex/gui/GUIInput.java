@@ -175,8 +175,8 @@ public final class GUIInput extends BaseXTextField {
       new CommandParser(suf, gui.context).suggest();
     } catch(final QueryException ex) {
       sl = ex.suggest();
-      final int marked = ex.markedCol() + (excl ? 2 : 1);
-      if(ex.markedCol() > -1 && marked <= query.length()) {
+      final int marked = ex.markedColumn() + (excl ? 2 : 1);
+      if(ex.markedColumn() > -1 && marked <= query.length()) {
         pre = query.substring(0, marked);
       }
     }
@@ -200,7 +200,7 @@ public final class GUIInput extends BaseXTextField {
       pre = query.substring(0, qs.mark);
     } catch(final QueryException ex) {
       sl = ex.suggest();
-      pre = query.substring(0, ex.col() - (ex.col() == 1 ? 1 : 0));
+      pre = query.substring(0, ex.column() - (ex.column() == 1 ? 1 : 0));
     } finally {
       qc.close();
     }

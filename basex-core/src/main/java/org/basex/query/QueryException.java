@@ -88,15 +88,15 @@ public final class QueryException extends Exception {
    * Returns the error column.
    * @return error column
    */
-  public int col() {
-    return info == null ? 0 : info.lineCol()[1];
+  public int column() {
+    return info == null ? 0 : info.column();
   }
 
   /**
    * Returns the marked error column.
    * @return marked error column
    */
-  public int markedCol() {
+  public int markedColumn() {
     return markedCol;
   }
 
@@ -105,7 +105,7 @@ public final class QueryException extends Exception {
    * @return error line
    */
   public int line() {
-    return info == null ? 0 : info.lineCol()[0];
+    return info == null ? 0 : info.line();
   }
 
   /**
@@ -113,7 +113,7 @@ public final class QueryException extends Exception {
    * @return error line
    */
   public String file() {
-    return info == null ? null : info.file();
+    return info == null ? null : info.path();
   }
 
   /**

@@ -14,7 +14,6 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 
-import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
@@ -31,9 +30,11 @@ import org.basex.gui.view.*;
 import org.basex.gui.view.project.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.io.parse.xml.*;
 import org.basex.query.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.xml.sax.*;
 
 /**
  * This view allows the input and evaluation of queries and documents.
@@ -42,23 +43,12 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class EditorView extends View {
+  /** Link pattern. */
+  private static final Pattern LINK = Pattern.compile("(.*?), ([0-9]+)/([0-9]+)");
   /** Number of files in the history. */
   private static final int HISTORY = 18;
   /** Number of files in the compact history. */
   private static final int HISTCOMP = 7;
-  /** XQuery error pattern. */
-  private static final Pattern XQERROR = Pattern.compile(
-      "(.*?), ([0-9]+)/([0-9]+)" + COL);
-  /** XML error pattern. */
-  private static final Pattern XMLERROR = Pattern.compile(
-      LINE_X.replaceAll("%", "(.*?)") + COL + ".*");
-  /** Error information pattern. */
-  private static final Pattern ERRORINFO = Pattern.compile(
-      "^.*\r?\n\\[.*?\\] |" + LINE_X.replaceAll("%", "\\d+") + COLS + "|\r?\n.*",
-      Pattern.DOTALL);
-  /** Error tooltip pattern. */
-  private static final Pattern ERRORTT = Pattern.compile(
-      "^.*\r?\n" + STOPPED_AT + "|\r?\n" + STACK_TRACE + COL + ".*", Pattern.DOTALL);
 
   /** History Button. */
   private final AbstractButton hist;
@@ -90,12 +80,8 @@ public final class EditorView extends View {
   /** Thread counter. */
   private int threadID;
 
-  /** Most recent error position; used for clicking on error message. */
-  private int errPos;
-  /** File in which the most recent error occurred. */
-  public IOFile errFile;
-  /** Last error message. */
-  public String errMsg;
+  /** Input info. */
+  InputInfo errorInfo;
 
   /**
    * Default constructor.
@@ -266,6 +252,8 @@ public final class EditorView extends View {
         search.editor(ea, true);
         gui.refreshControls();
         posCode.invokeLater();
+        System.out.println("?");
+        ea.release(Action.PARSE);
       }
     });
 
@@ -279,8 +267,10 @@ public final class EditorView extends View {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        // remember opened files
-        for(final String file : gui.gopts.get(GUIOptions.OPEN)) open(new IOFile(file));
+        // remember opened files; don't complain about missing files
+        for(final String file : gui.gopts.get(GUIOptions.OPEN)) {
+          open(new IOFile(file), false, false);
+        }
       }
     });
   }
@@ -528,29 +518,37 @@ public final class EditorView extends View {
         try {
           if(main) qc.parseMain(input, null, null);
           else qc.parseLibrary(input, null, null);
-          info(OK, true, false);
+          info(null);
         } catch(final QueryException ex) {
-          info(Util.message(ex), false, false);
+          info(ex);
         } finally {
           qc.close();
         }
       }
     } else if(editor.script || file.hasSuffix(IO.XMLSUFFIXES) ||
         file.hasSuffix(IO.XSLSUFFIXES) || file.hasSuffix(IO.HTMLSUFFIXES)) {
+
+      final ArrayInput ai = new ArrayInput(in);
       try {
         // check XML syntax
-        if(startsWith(in, '<') || !editor.script)
-          new EmptyBuilder(new IOContent(in), gui.context).build();
+        if(startsWith(in, '<') || !editor.script) new XmlParser().parse(ai);
         // check command script
-        if(editor.script)
-          new CommandParser(string(in), gui.context).parse();
-        info(OK, true, false);
+        if(editor.script) new CommandParser(string(in), gui.context).parse();
+        info(null);
       } catch(final Exception ex) {
-        info(Util.message(ex), false, false);
+        info(ex);
       }
     } else if(action != Action.CHECK) {
-      info(OK, true, false);
+      info(null);
     }
+  }
+
+  /**
+   * Evaluates the info message resulting from command or query parsing.
+   * @param ex exception, or {@code null}
+   */
+  private void info(final Exception ex) {
+    info(ex, false, false);
   }
 
   /**
@@ -575,18 +573,18 @@ public final class EditorView extends View {
    */
   private byte[] read(final IOFile file) throws IOException {
     // check content
-    final TokenBuilder text = new TokenBuilder((int) Math.min(1 << 28, file.length()));
+    final TokenBuilder text = new TokenBuilder((int) Math.min(Integer.MAX_VALUE, file.length()));
     final TextInput ti = new NewlineInput(file).validate(true);
-    boolean first = true;
+    boolean valid = true;
     try {
       while(true) {
         try {
           final int cp = ti.read();
-          if(cp == -1) return text.finish();
+          if(cp == -1) return text.array();
           text.add(cp);
         } catch(final InputException ex) {
-          if(first) {
-            first = false;
+          if(valid) {
+            valid = false;
             if(BaseXDialog.confirm(gui, H_FILE_BINARY)) {
               try {
                 file.open();
@@ -678,19 +676,17 @@ public final class EditorView extends View {
   }
 
   /**
-   * Evaluates the info message resulting from a parsed or executed query.
-   * @param msg info message
-   * @param ok {@code true} if evaluation was successful
+   * Processes the result from a command or query execution.
+   * @param th exception, or {@code null}
+   * @param stopped {@code true} if evaluation was interrupted
    * @param refresh refresh buttons
    */
-  public void info(final String msg, final boolean ok, final boolean refresh) {
+  public void info(final Throwable th, final boolean stopped, final boolean refresh) {
     // do not refresh view when query is running
     if(!refresh && stop.isEnabled()) return;
 
     ++threadID;
-    errPos = -1;
-    errFile = null;
-    errMsg = null;
+    errorInfo = null;
     getEditor().resetError();
 
     if(refresh) {
@@ -698,17 +694,26 @@ public final class EditorView extends View {
       refreshMark();
     }
 
-    if(ok) {
+    if(stopped || th == null) {
       info.setCursor(CURSORARROW);
-      info.setText(msg, Msg.SUCCESS).setToolTipText(null);
+      info.setText(stopped ? INTERRUPTED : OK, Msg.SUCCESS).setToolTipText(null);
     } else {
-      error(msg, false);
       info.setCursor(CURSORHAND);
-      info.setText(ERRORINFO.matcher(msg).replaceAll(""), Msg.ERROR);
-      final String tt = ERRORTT.matcher(msg).replaceAll("").
-          replace("<", "&lt;").replace(">", "&gt;").
+      info.setText(th.getLocalizedMessage(), Msg.ERROR);
+      final String tt = th.getMessage().replace("<", "&lt;").replace(">", "&gt;").
           replaceAll("\r?\n", "<br/>").replaceAll("(<br/>.*?)<br/>.*", "$1");
       info.setToolTipText("<html>" + tt + "</html>");
+
+      if(th instanceof QueryException) {
+        errorInfo = ((QueryException) th).info();
+      } else if(th instanceof SAXParseException) {
+        final SAXParseException ex = (SAXParseException) th;
+        final String path = getEditor().file.path();
+        errorInfo = new InputInfo(path, ex.getLineNumber(), ex.getColumnNumber());
+      } else {
+        errorInfo = new InputInfo(getEditor().file.path(), 1, 1);
+      }
+      error(false);
     }
   }
 
@@ -716,74 +721,72 @@ public final class EditorView extends View {
    * Jumps to the current error.
    */
   public void jumpToError() {
-    if(errMsg != null) error(true);
+    error(true);
   }
 
   /**
-   * Handles info messages resulting from a query execution.
-   * @param jump jump to error position
-   * @param msg info message
+   * Jumps to the specified file and position.
+   * @param link link
    */
-  public void error(final String msg, final boolean jump) {
-    errMsg = msg;
-    for(final String s : msg.split("\r?\n")) {
-      if(XQERROR.matcher(s).matches()) {
-        errMsg = s.replace(STOPPED_AT, "");
-        break;
-      }
+  public void jump(final String link) {
+    final Matcher m = LINK.matcher(link);
+    if(m.matches()) {
+      errorInfo = new InputInfo(m.group(1), toInt(m.group(2)), toInt(m.group(3)));
+      error(true);
+    } else {
+      Util.stack("No match found: " + link);
     }
-    error(jump);
   }
 
   /**
-   * Handles info messages resulting from a query execution.
+   * Jumps to the current error.
    * @param jump jump to error position
    */
   private void error(final boolean jump) {
-    Matcher m = XQERROR.matcher(errMsg);
-    final int el;
-    int ec = 2;
-    if(m.matches()) {
-      errFile = new IOFile(m.group(1));
-      el = toInt(m.group(2));
-      ec = toInt(m.group(3));
-    } else {
-      m = XMLERROR.matcher(errMsg);
-      if(!m.matches()) return;
-      el = toInt(m.group(1));
-      errFile = getEditor().file;
-    }
+    final InputInfo ei = errorInfo;
+    if(ei == null) return;
 
-    EditorArea edit = find(errFile, false);
+    final IOFile file = new IOFile(ei.path());
+    EditorArea edit = find(file, false);
     if(jump) {
-      if(edit == null) edit = open(errFile, false, true);
+      if(edit == null) edit = open(file, false, true);
       if(edit != null) tabs.setSelectedComponent(edit);
     }
     if(edit == null) return;
 
-    // find approximate error position
-    final int ll = edit.last.length;
+    // mark and jump to error position
+    final int ep = pos(edit.last, ei.line(), ei.column());
+    edit.error(ep);
+    if(jump) {
+      edit.setCaret(ep);
+      posCode.invokeLater();
+    }
+  }
+
+  /**
+   * Returns an editor offset for the specified line and column.
+   * @param text text
+   * @param line line
+   * @param col column
+   * @return position
+   */
+  private int pos(final byte[] text, final int line, final int col) {
+    final int ll = text.length;
     int ep = ll;
-    for(int p = 0, l = 1, c = 1; p < ll; ++c, p += cl(edit.last, p)) {
-      if(l > el || l == el && c == ec) {
+    for(int p = 0, l = 1, c = 1; p < ll; ++c, p += cl(text, p)) {
+      if(l > line || l == line && c == col) {
         ep = p;
         break;
       }
-      if(edit.last[p] == '\n') {
+      if(text[p] == '\n') {
         ++l;
         c = 0;
       }
     }
-    if(ep < ll && Character.isLetterOrDigit(cp(edit.last, ep))) {
-      while(ep > 0 && Character.isLetterOrDigit(cp(edit.last, ep - 1))) ep--;
+    if(ep < ll && Character.isLetterOrDigit(cp(text, ep))) {
+      while(ep > 0 && Character.isLetterOrDigit(cp(text, ep - 1))) ep--;
     }
-    edit.error(ep);
-    errPos = ep;
-
-    if(jump) {
-      edit.jumpError(errPos);
-      posCode.invokeLater();
-    }
+    return ep;
   }
 
   /**

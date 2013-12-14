@@ -53,7 +53,7 @@ final class RestXqModule {
       // loop through all functions
       for(final StaticFunc uf : qc.funcs.funcs()) {
         // consider only functions that are defined in this module
-        if(!file.name().equals(new IOFile(uf.info.file()).name())) continue;
+        if(!file.name().equals(new IOFile(uf.info.path()).name())) continue;
         final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
         if(rxf.parse()) functions.add(rxf);
       }

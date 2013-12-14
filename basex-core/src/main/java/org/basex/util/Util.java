@@ -26,10 +26,10 @@ public final class Util {
 
   /**
    * Returns an information string for an unexpected exception.
-   * @param ex exception
+   * @param throwable exception
    * @return dummy object
    */
-  public static String bug(final Throwable ex) {
+  public static String bug(final Throwable throwable) {
     final TokenBuilder tb = new TokenBuilder(BUGINFO);
     tb.add(NL).add("Contact: ").add(MAIL);
     tb.add(NL).add("Version: ").add(TITLE);
@@ -38,7 +38,7 @@ public final class Util {
     tb.add(NL).add("OS: ").add(System.getProperty("os.name"));
     tb.add(", ").add(System.getProperty("os.arch"));
     tb.add(NL).add("Stack Trace: ");
-    for(final String e : toArray(ex)) tb.add(NL).add(e);
+    for(final String e : toArray(throwable)) tb.add(NL).add(e);
     return tb.toString();
   }
 
@@ -66,20 +66,20 @@ public final class Util {
 
   /**
    * Returns the class name of the specified object, excluding its path.
-   * @param obj object
+   * @param object object
    * @return class name
    */
-  public static String className(final Object obj) {
-    return className(obj.getClass());
+  public static String className(final Object object) {
+    return className(object.getClass());
   }
 
   /**
    * Returns the name of the specified class, excluding its path.
-   * @param clz class
+   * @param clazz class
    * @return class name
    */
-  public static String className(final Class<?> clz) {
-    return clz.getSimpleName();
+  public static String className(final Class<?> clazz) {
+    return clazz.getSimpleName();
   }
 
   /**
@@ -112,29 +112,29 @@ public final class Util {
 
   /**
    * Prints a string to standard output, followed by a newline.
-   * @param str output string
+   * @param string output string
    * @param ext text optional extensions
    */
-  public static void outln(final Object str, final Object... ext) {
-    out((str instanceof byte[] ? Token.string((byte[]) str) : str) + NL, ext);
+  public static void outln(final Object string, final Object... ext) {
+    out((string instanceof byte[] ? Token.string((byte[]) string) : string) + NL, ext);
   }
 
   /**
    * Prints a string to standard output.
-   * @param str output string
+   * @param string output string
    * @param ext text optional extensions
    */
-  public static void out(final Object str, final Object... ext) {
-    System.out.print(info(str, ext));
+  public static void out(final Object string, final Object... ext) {
+    System.out.print(info(string, ext));
   }
 
   /**
    * Prints a string to standard error, followed by a newline.
-   * @param obj error string
+   * @param object error object
    * @param ext text optional extensions
    */
-  public static void errln(final Object obj, final Object... ext) {
-    err((obj instanceof Throwable ? message((Throwable) obj) : obj) + NL, ext);
+  public static void errln(final Object object, final Object... ext) {
+    err((object instanceof Throwable ? message((Throwable) object) : object) + NL, ext);
   }
 
   /**
@@ -148,109 +148,110 @@ public final class Util {
 
   /**
    * Returns a more user-friendly error message for the specified exception.
-   * @param ex throwable reference
+   * @param throwable throwable reference
    * @return error message
    */
-  public static String message(final Throwable ex) {
-    debug(ex);
-    if(ex instanceof BindException) return SRV_RUNNING;
-    if(ex instanceof LoginException) return ACCESS_DENIED;
-    if(ex instanceof ConnectException) return CONNECTION_ERROR;
-    if(ex instanceof SocketTimeoutException) return TIMEOUT_EXCEEDED;
-    if(ex instanceof SocketException) return CONNECTION_ERROR;
-    String msg = ex.getMessage();
-    if(msg == null || msg.isEmpty()) msg = ex.toString();
-    if(ex instanceof FileNotFoundException) return info(RES_NOT_FOUND_X, msg);
-    if(ex instanceof UnknownHostException) return info(UNKNOWN_HOST_X, msg);
+  public static String message(final Throwable throwable) {
+    debug(throwable);
+    if(throwable instanceof BindException) return SRV_RUNNING;
+    if(throwable instanceof LoginException) return ACCESS_DENIED;
+    if(throwable instanceof ConnectException) return CONNECTION_ERROR;
+    if(throwable instanceof SocketTimeoutException) return TIMEOUT_EXCEEDED;
+    if(throwable instanceof SocketException) return CONNECTION_ERROR;
+    String msg = throwable.getMessage();
+    if(msg == null || msg.isEmpty()) msg = throwable.toString();
+    if(throwable instanceof FileNotFoundException) return info(RES_NOT_FOUND_X, msg);
+    if(throwable instanceof UnknownHostException) return info(UNKNOWN_HOST_X, msg);
     return msg;
   }
 
   /**
    * Prints the exception stack trace if the {@link Prop#debug} flag is set.
-   * @param ex exception
+   * @param throwable exception
    */
-  public static void debug(final Throwable ex) {
-    if(Prop.debug && ex != null) stack(ex);
+  public static void debug(final Throwable throwable) {
+    if(Prop.debug && throwable != null) stack(throwable);
   }
 
   /**
    * Prints a string to standard error if the {@link Prop#debug} flag is set.
-   * @param str debug string
+   * @param string debug string
    * @param ext text optional extensions
    */
-  public static void debug(final Object str, final Object... ext) {
-    if(Prop.debug) errln(str, ext);
+  public static void debug(final Object string, final Object... ext) {
+    if(Prop.debug) errln(string, ext);
   }
 
   /**
    * Returns a string and replaces all % characters by the specified extensions
    * (see {@link TokenBuilder#addExt} for details).
-   * @param str string to be extended
+   * @param string string to be extended
    * @param ext text text extensions
    * @return extended string
    */
-  public static String info(final Object str, final Object... ext) {
-    return Token.string(inf(str, ext));
+  public static String info(final Object string, final Object... ext) {
+    return Token.string(inf(string, ext));
   }
 
   /**
    * Returns a token and replaces all % characters by the specified extensions
    * (see {@link TokenBuilder#addExt} for details).
-   * @param str string to be extended
+   * @param string string to be extended
    * @param ext text text extensions
    * @return token
    */
-  public static byte[] inf(final Object str, final Object... ext) {
-    return new TokenBuilder().addExt(str, ext).finish();
+  public static byte[] inf(final Object string, final Object... ext) {
+    return new TokenBuilder().addExt(string, ext).finish();
   }
 
   /**
    * Prints the current stack trace to System.err.
+   * @param message error message
    */
-  public static void stack() {
+  public static void stack(final String message) {
+    errln(message);
     stack(Short.MAX_VALUE);
   }
 
   /**
    * Prints the current stack trace to System.err.
-   * @param i number of steps to print
+   * @param depth number of steps to print
    */
-  public static void stack(final int i) {
+  public static void stack(final int depth) {
     errln("You're here:");
     final String[] stack = toArray(new Throwable());
-    final int l = Math.min(Math.max(2, i + 2), stack.length);
+    final int l = Math.min(Math.max(2, depth + 2), stack.length);
     for(int s = 2; s < l; ++s) errln(stack[s]);
   }
 
   /**
    * Prints the stack of the specified error to standard error.
-   * @param th error/exception instance
+   * @param throwable error/exception instance
    */
-  public static void stack(final Throwable th) {
-    //for(final String s : toArray(th)) errln(s);
-    th.printStackTrace();
+  public static void stack(final Throwable throwable) {
+    throwable.printStackTrace();
   }
 
   /**
    * Returns an string array representation of the specified throwable.
-   * @param th throwable
+   * @param throwable throwable
    * @return string array
    */
-  private static String[] toArray(final Throwable th) {
-    final StackTraceElement[] st = th.getStackTrace();
+  private static String[] toArray(final Throwable throwable) {
+    final StackTraceElement[] st = throwable.getStackTrace();
     final String[] obj = new String[st.length + 1];
-    obj[0] = th.toString();
+    obj[0] = throwable.toString();
     for(int i = 0; i < st.length; i++) obj[i + 1] = "\tat " + st[i];
     return obj;
   }
 
   /**
    * Starts the specified class in a separate process.
-   * @param clz class to start
+   * @param clazz class to start
    * @param args command-line arguments
    * @return reference to a {@link Process} instance representing the started process
    */
-  public static Process start(final Class<?> clz, final String... args) {
+  public static Process start(final Class<?> clazz, final String... args) {
     final String[] largs = { "java", "-Xmx" + Runtime.getRuntime().maxMemory(),
         "-cp", System.getProperty("java.class.path") };
     final StringList sl = new StringList().add(largs);
@@ -259,7 +260,7 @@ public final class Util {
       final String k = o.getKey().toString();
       if(k.startsWith(Prop.DBPREFIX)) sl.add("-D" + o.getValue());
     }
-    sl.add(clz.getName()).add("-D").add(args);
+    sl.add(clazz.getName()).add("-D").add(args);
 
     try {
       return new ProcessBuilder(sl.toArray()).start();

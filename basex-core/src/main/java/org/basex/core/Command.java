@@ -28,6 +28,8 @@ public abstract class Command extends Proc {
   public final Perm perm;
   /** Indicates if the command requires an opened database. */
   public final boolean openDB;
+  /** Exception, resulting from command execution. */
+  public Exception cause;
 
   /** Performance measurements. */
   protected Performance perf;
@@ -41,8 +43,6 @@ public abstract class Command extends Proc {
   protected MainOptions options;
   /** Global options. */
   protected GlobalOptions goptions;
-  /** Exception, resulting from command execution. */
-  protected Exception cause;
 
   /** Container for query information. */
   private final TokenBuilder info = new TokenBuilder();

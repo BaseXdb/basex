@@ -64,8 +64,6 @@ public final class EditorArea extends TextPanel {
           @Override
           public void run() {
             if(reopen(false)) return;
-            // skip parsing if editor contains file marked as erroneous
-            if(view.errFile == null || file.eq(view.errFile)) release(Action.PARSE);
           }
         });
       }
@@ -169,14 +167,5 @@ public final class EditorArea extends TextPanel {
     hist.save();
     view.refreshHistory(file);
     view.refreshControls(true);
-  }
-
-  /**
-   * Highlights the error.
-   * @param pos error position
-   */
-  void jumpError(final int pos) {
-    requestFocusInWindow();
-    setCaret(pos);
   }
 }

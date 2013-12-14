@@ -74,7 +74,7 @@ public final class Catch extends Single {
     final Value val = ex.value();
     for(final Value v : new Value[] { ex.qname(),
         Str.get(ex.getLocalizedMessage()), val == null ? Empty.SEQ : val,
-        Str.get(io), Int.get(ex.line()), Int.get(ex.col()),
+        Str.get(io), Int.get(ex.line()), Int.get(ex.column()),
         Str.get(ex.getMessage().replaceAll("\r\n?", "\n")) }) {
       ctx.set(vars[i++], v, info);
     }
@@ -137,7 +137,7 @@ public final class Catch extends Single {
     final Value val = ex.value();
     return new Value[] { ex.qname(),
         Str.get(ex.getLocalizedMessage()), val == null ? Empty.SEQ : val,
-        Str.get(io), Int.get(ex.line()), Int.get(ex.col()),
+        Str.get(io), Int.get(ex.line()), Int.get(ex.column()),
         Str.get(ex.getMessage().replaceAll("\r\n?", "\n")) };
   }
 

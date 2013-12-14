@@ -1,5 +1,6 @@
 package org.basex.util;
 
+
 /**
  * This class contains the original query, its file reference, and line/column
  * information.
@@ -8,14 +9,16 @@ package org.basex.util;
  * @author Christian Gruen
  */
 public final class InputInfo {
-  /** File reference. */
-  private final String file;
+  /** Input path. */
+  private final String path;
   /** Input query. */
-  private final String query;
+  private String query;
   /** Parse position. */
-  private final int pos;
-  /** Line and column number. */
-  private int[] lineCol;
+  private int pos = -1;
+  /** Line number ({@code 0} if not initialized). */
+  private int line;
+  /** Column number ({@code 0} if not initialized). */
+  private int col;
 
   /**
    * Constructor.
@@ -23,61 +26,79 @@ public final class InputInfo {
    */
   public InputInfo(final InputParser parser) {
     query = parser.input;
-    file = parser.file;
+    path = parser.file;
     pos = parser.pos;
+  }
+
+  /**
+   * Constructor.
+   * @param p input path
+   * @param l line
+   * @param c column
+   */
+  public InputInfo(final String p, final int l, final int c) {
+    path = p;
+    line = l;
+    col = c;
   }
 
   /**
    * Returns the input reference.
    * @return input reference
    */
-  public String file() {
-    return file;
+  public String path() {
+    return path;
   }
 
   /**
-   * Returns an array with the line and column position of the associated expression.
-   * @return line and column position
+   * Returns the line position.
+   * @return line position
    */
-  public int[] lineCol() {
-    if(lineCol == null) lineCol = lineCol(query, Math.min(pos, query.length()));
-    return lineCol;
+  public int line() {
+    if(line == 0) lineCol();
+    return line;
   }
 
   /**
-   * Calculates the column and line number of a given offset in the string.
-   * @param query query string
-   * @param pos query position
-   * @return two element array of line and column number
+   * Returns the column position.
+   * @return column position
    */
-  private static int[] lineCol(final String query, final int pos) {
+  public int column() {
+    if(col == 0) lineCol();
+    return col;
+  }
+
+  /**
+   * Calculates the column and line number in a string.
+   */
+  private void lineCol() {
+    final int cl = Math.min(pos, query.length());
+    final String q = query;
     int l = 1, c = 1;
-    for(int i = 0, ch; i < pos; i += Character.charCount(ch)) {
-      ch = query.codePointAt(i);
+    for(int i = 0, ch; i < cl; i += Character.charCount(ch)) {
+      ch = q.codePointAt(i);
       if(ch == '\n') { l++; c = 1; } else if(ch != '\r') { c++; }
     }
-    return new int[] { l, c };
+    line = l;
+    col = c;
   }
 
   @Override
   public boolean equals(final Object object) {
     if(!(object instanceof InputInfo)) return false;
     final InputInfo ii = (InputInfo) object;
-    return (file != null ? file.equals(ii.file) : query.equals(ii.query)) &&
-        pos == ii.pos;
+    return (path != null ? path.equals(ii.path) : query.equals(ii.query)) && pos == ii.pos;
   }
 
   @Override
   public int hashCode() {
-    return (file != null ? file.hashCode() : query.hashCode()) + pos;
+    return (path != null ? path.hashCode() : query.hashCode()) + pos;
   }
 
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(file == null ? "." : file);
-    final int[] lc = lineCol();
-    tb.add(", ").addExt(lc[0]).add('/').addExt(lc[1]);
+    tb.add(path == null ? "." : path).add(", ").addExt(line()).add('/').addExt(column());
     return tb.toString();
   }
 }

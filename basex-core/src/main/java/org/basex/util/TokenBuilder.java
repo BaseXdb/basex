@@ -386,6 +386,15 @@ public final class TokenBuilder {
     return Arrays.copyOf(chars, size);
   }
 
+  /**
+   * Returns the original byte array if its size matches the token size, or returns a copy
+   * as {@link #finish()} does.
+   * @return character array
+   */
+  public byte[] array() {
+    return size == chars.length ? chars : finish();
+  }
+
   @Override
   public String toString() {
     return string(chars, 0, size);

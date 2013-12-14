@@ -411,10 +411,13 @@ public final class GUI extends AGUI {
 
       // evaluate command
       String inf = null;
+      Throwable cause = null;
       try {
         cmd.execute(context, ao);
         inf = cmd.info();
       } catch(final BaseXException ex) {
+        cause = ex.getCause();
+        if(cause == null) cause = ex;
         ok = false;
         inf = Util.message(ex);
       } finally {
@@ -426,13 +429,11 @@ public final class GUI extends AGUI {
       info.setInfo(inf, cmd, time, ok, true);
 
       // sends feedback to the query editor
-      final boolean interrupted = inf.endsWith(INTERRUPTED);
-      if(edit) {
-        editor.info(interrupted ? INTERRUPTED : ok ? OK : inf, ok || interrupted, true);
-      }
+      final boolean stopped = inf.endsWith(INTERRUPTED);
+      if(edit) editor.info(cause, stopped, true);
 
       // check if query feedback was evaluated in the query view
-      if(!ok && !interrupted) {
+      if(!ok && !stopped) {
         // display error in info view
         if((!edit || inf.startsWith(BUGINFO)) && !info.visible()) {
           GUIMenuCmd.C_SHOWINFO.execute(this);
@@ -472,7 +473,7 @@ public final class GUI extends AGUI {
           }
         }
 
-        if(thread == threadID && !interrupted) {
+        if(thread == threadID && !stopped) {
           // show status info
           status.setText(Util.info(TIME_NEEDED_X, time));
           // show number of hits
