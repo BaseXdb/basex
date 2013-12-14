@@ -13,18 +13,18 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * This class indicates exceptions during the parsing or evaluation of a query.
+ * Thrown to indicate an exception during the parsing or evaluation of a query.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class QueryException extends Exception {
+public class QueryException extends Exception {
   /** Stack. */
   private final ArrayList<InputInfo> stack = new ArrayList<InputInfo>();
   /** Error QName. */
   private final QNm name;
   /** Error value. */
-  private transient Value value = Empty.SEQ;
+  private Value value = Empty.SEQ;
   /** Error reference. */
   private Err err;
   /** Code suggestions. */

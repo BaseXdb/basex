@@ -977,6 +977,9 @@ public enum Function {
   /** XQuery function. */
   _UNIT_ASSERT(FNUnit.class, "assert(test[,message])", arg(ITEM_ZM, STR), EMP, flag(NDT)),
   /** XQuery function. */
+  _UNIT_ASSERT_EQUALS(FNUnit.class, "assert-equals(result,expected[,message])",
+      arg(ITEM_ZM, ITEM_ZM, STR), EMP, flag(NDT)),
+  /** XQuery function. */
   _UNIT_FAIL(FNUnit.class, "fail(message)", arg(STR), EMP, flag(NDT)),
   /** XQuery function. */
   _UNIT_TEST(FNUnit.class, "test([functions])", arg(FUN_ZM), ELM, flag(NDT)),

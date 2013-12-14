@@ -130,30 +130,33 @@ public final class Unit {
 
             if(code != null) {
               f++;
-              final FElem error = new FElem(FAILURE);
-              error.add(MESSAGE, "Error expected.");
-              error.add(TYPE, code);
-              testcase.add(error);
+              testcase.add(new FElem(FAILURE).add(new FElem(EXPECTED).add(code)));
             }
-          } catch (final QueryException ex) {
+          } catch(final QueryException ex) {
             final QNm name = ex.qname();
             if(code == null || !eq(code, name.local())) {
               final boolean failure = eq(name.uri(), QueryText.UNITURI);
               if(failure) f++;
               else e++;
-
               final FElem error = new FElem(failure ? FAILURE : ERROR);
-              error.add(MESSAGE, ex.getLocalizedMessage());
-              error.add(TYPE, ex.qname().local());
+              error.add(LINE, token(ex.line()));
+              error.add(COLUMN, token(ex.column()));
+
+              if(ex instanceof UnitException) {
+                final UnitException ue = (UnitException) ex;
+                error.add(elem(ue.returned, RETURNED, ue.count));
+                error.add(elem(ue.expected, EXPECTED, ue.count));
+              } else {
+                error.add(TYPE, ex.qname().local());
+                error.add(ex.getLocalizedMessage());
+              }
               testcase.add(error);
             }
           }
         } else {
           // skip test
-          final FElem skipped = new FElem(SKIPPED);
           final Value sv = uf.ann.values[skip];
-          if(!sv.isEmpty()) skipped.add(MESSAGE, sv.itemAt(0).string(info));
-          testcase.add(skipped);
+          testcase.add(SKIPPED, sv.isEmpty() ? EMPTY : sv.itemAt(0).string(info));
           s++;
         }
         testcase.add(TIME, time(pt));
@@ -176,6 +179,25 @@ public final class Unit {
     testsuite.add(ERRORS, token(e));
     testsuite.add(SKIPPED, token(s));
     return testsuite;
+  }
+
+  /**
+   * Creates a new element.
+   * @param it item
+   * @param name name (expected/returned)
+   * @param c item count
+   * @return new element
+   * @throws QueryException query exception
+   */
+  private FElem elem(final Item it, final byte[] name, final int c) throws QueryException {
+    final FElem exp = new FElem(name);
+    if(it instanceof ANode) {
+      exp.add((ANode) it);
+    } else if(it != null) {
+      exp.add(it.string(info));
+    }
+    exp.add(ITEM, token(c));
+    return exp;
   }
 
   /**
