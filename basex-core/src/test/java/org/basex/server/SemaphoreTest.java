@@ -3,8 +3,6 @@ package org.basex.server;
 import static org.junit.Assert.*;
 
 import java.io.*;
-import java.util.*;
-
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.util.*;
@@ -17,64 +15,51 @@ import org.junit.*;
  * @author Andreas Weiler
  */
 public final class SemaphoreTest extends SandboxTest {
-  /** Create random number. */
-  private static final Random RANDOM = new Random();
   /** Test file. */
   private static final String FILE = "src/test/resources/factbook.zip";
   /** Test queries. */
   private static final String [] QUERIES = {
-    "xquery for $n in (db:open('" + NAME + "')//province)[position() < 100] " +
-    "       return insert node <test/> into $n",
-    "xquery for $n in 1 to 100000 where $n = 0 return $n"
+    "(db:open('" + NAME + "')//province)[position() < 10] ! (insert node <test/> into .)",
+    "(1 to 100000)[. = 0]"
   };
-  /** Number of performance tests. */
-  private static final int TESTS = 5;
+  /** Number of clients. */
+  private static final int CLIENTS = 50;
 
   /** Server reference. */
-  private static BaseXServer server;
+  private BaseXServer server;
   /** Socket reference. */
-  private static Session sess;
+  private Session sess;
 
-  /** Starts the server.
+  /**
+   * Starts the server.
    * @throws IOException exception
    */
-  @BeforeClass
-  public static void start() throws IOException {
+  @Before
+  public void start() throws IOException {
     server = createServer();
     sess = createClient();
+    sess.execute(new CreateDB(NAME, FILE));
   }
 
   /**
    * Stops the server.
    * @throws Exception exception
    */
-  @AfterClass
-  public static void stop() throws Exception {
+  @After
+  public void stop() throws Exception {
     sess.execute(new DropDB(NAME));
     sess.close();
-    // stop server instance
     stopServer(server);
   }
 
   /**
-   * Runs a test for concurrent database creations.
-   * @throws IOException I/O exception
-   */
-  @Test
-  public void createTest() throws IOException {
-    // drops database for clean test
-    sess.execute(new DropDB(NAME));
-    // create database for clean test
-    sess.execute(new CreateDB(NAME, FILE));
-  }
-
-  /** Efficiency test.
+   * Efficiency test.
    * @throws Exception exception
    */
   @Test
   public void runClients() throws Exception {
-    final Client[] cl = new Client[TESTS];
-    for(int i = 0; i < TESTS; ++i) cl[i] = new Client();
+    final Client[] cl = new Client[CLIENTS];
+    for(int i = 0; i < CLIENTS; ++i) cl[i] = new Client(i);
     for(final Client c : cl) c.start();
     for(final Client c : cl) c.join();
     for(final Client c : cl) c.session.close();
@@ -84,11 +69,15 @@ public final class SemaphoreTest extends SandboxTest {
   static class Client extends Thread {
     /** Client session. */
     ClientSession session;
+    /** Query number. */
+    final int number;
 
     /**
      * Default constructor.
+     * @param nr query number
      */
-    Client() {
+    Client(final int nr) {
+      number = nr;
       try {
         session = createClient();
       } catch(final IOException ex) {
@@ -99,8 +88,7 @@ public final class SemaphoreTest extends SandboxTest {
     @Override
     public void run() {
       try {
-        final int t = RANDOM.nextInt(2);
-        session.execute(QUERIES[t]);
+        session.query(QUERIES[number % QUERIES.length]).execute();
       } catch(final IOException ex) {
         fail(Util.message(ex));
       }
