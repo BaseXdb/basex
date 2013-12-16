@@ -114,9 +114,9 @@ final class QueryCompiler {
     for(final Scope[] comp : components(0)) circCheck(comp).compile(ctx);
 
     // check for circular variable declarations without compiling the unused scopes
-    for(final StaticVar v : ctx.vars)
-      if(id(v) == -1)
-        for(final Scope[] comp : components(add(v))) circCheck(comp);
+    for(final StaticVar v : ctx.vars) {
+      if(id(v) == -1) for(final Scope[] comp : components(add(v))) circCheck(comp);
+    }
   }
 
   /**
@@ -126,9 +126,11 @@ final class QueryCompiler {
    * @throws QueryException query exception
    */
   private static Scope circCheck(final Scope[] comp) throws QueryException {
-    if(comp.length > 1)
-      for(final Scope scp : comp)
+    if(comp.length > 1) {
+      for(final Scope scp : comp) {
         if(scp instanceof StaticVar) throw circVarError((StaticVar) scp);
+      }
+    }
     return comp[0];
   }
 

@@ -45,9 +45,10 @@ import org.basex.util.options.*;
  */
 public final class QueryContext extends Proc {
   /** URL pattern (matching Clark and EQName notation). */
-  private static final Pattern BIND =
-      Pattern.compile("^((\"|')(.*?)\\2:|(\\{(.*?)\\}))(.+)$");
+  private static final Pattern BIND = Pattern.compile("^((\"|')(.*?)\\2:|Q?(\\{(.*?)\\}))(.+)$");
 
+  /** The evaluation stack. */
+  public final QueryStack stack = new QueryStack();
   /** Static variables. */
   public final Variables vars = new Variables();
   /** Functions. */
@@ -139,23 +140,24 @@ public final class QueryContext extends Proc {
   /** Opened connections to relational databases. */
   private ClientSessions sessions;
   /** Root expression of the query. */
-  private MainModule root;
-  /** Original query. */
-  private String query;
+  MainModule root;
 
-  /** String container for verbose query info. */
-  private final TokenBuilder info = new TokenBuilder();
-  /** Indicates if verbose query info was requested. */
-  private final boolean inf;
-  /** Indicates if some compilation info has been output. */
-  private boolean compInfo;
-  /** Indicates if some evaluation info has been output. */
-  private boolean evalInfo;
+  /** Parent query context. */
+  private QueryContext parentCtx;
+  /** Query info. */
+  public final QueryInfo info;
   /** Indicates if the query context has been closed. */
   private boolean closed;
 
-  /** The evaluation stack. */
-  public final QueryStack stack = new QueryStack();
+  /**
+   * Constructor.
+   * @param parent parent context
+   */
+  public QueryContext(final QueryContext parent) {
+    this(parent.context);
+    parentCtx = parent;
+    listen = parent.listen;
+  }
 
   /**
    * Constructor.
@@ -164,8 +166,8 @@ public final class QueryContext extends Proc {
   public QueryContext(final Context ctx) {
     context = ctx;
     nodes = ctx.current();
-    inf = ctx.options.get(MainOptions.QUERYINFO) || Prop.debug;
     modules = new ModuleLoader(ctx);
+    info = new QueryInfo(this);
   }
 
   /**
@@ -205,7 +207,7 @@ public final class QueryContext extends Proc {
    */
   public MainModule parseMain(final String qu, final String path, final StaticContext sc)
       throws QueryException {
-    query = qu;
+    info.query = qu;
     root = new QueryParser(qu, path, this, sc).parseMain();
     return root;
   }
@@ -220,7 +222,7 @@ public final class QueryContext extends Proc {
    */
   public LibraryModule parseLibrary(final String qu, final String path, final StaticContext sc)
       throws QueryException {
-    query = qu;
+    info.query = qu;
     return new QueryParser(qu, path, this, sc).parseLibrary(true);
   }
 
@@ -278,59 +280,6 @@ public final class QueryContext extends Proc {
 
     // dynamic compilation
     analyze();
-
-    // dump resulting query
-    if(inf) {
-      info.add(NL).add(QUERY).add(COL).add(NL).add(
-          QueryProcessor.removeComments(query, Integer.MAX_VALUE)).add(NL);
-      if(compInfo) {
-        final String decls = root == null ? funcs.toString() : usedDecls(root);
-        info.add(NL + OPTIMIZED_QUERY + COL + NL + decls + NL);
-      }
-    }
-  }
-
-  /**
-   * Serializes all functions and variables reachable from the given main module.
-   * @param mod module to start from
-   * @return the string representation
-   */
-  private String usedDecls(final MainModule mod) {
-    final IdentityHashMap<Scope, Object> map = new IdentityHashMap<Scope, Object>();
-    final StringBuilder sb = new StringBuilder();
-    mod.visit(new ASTVisitor() {
-      @Override
-      public boolean staticVar(final StaticVar var) {
-        if(map.put(var, var) == null) {
-          var.visit(this);
-          sb.append(var).append(NL);
-        }
-        return true;
-      }
-
-      @Override
-      public boolean staticFuncCall(final StaticFuncCall call) {
-        final StaticFunc f = call.func();
-        if(map.put(f, f) == null) {
-          f.visit(this);
-          sb.append(f).append(NL);
-        }
-        return true;
-      }
-
-      @Override
-      public boolean inlineFunc(final Scope sub) {
-        if(map.put(sub, sub) == null) sub.visit(this);
-        return true;
-      }
-
-      @Override
-      public boolean funcItem(final FuncItem func) {
-        if(map.put(func, func) == null) func.visit(this);
-        return true;
-      }
-    });
-    return sb.append(mod).toString();
   }
 
   /**
@@ -481,12 +430,7 @@ public final class QueryContext extends Proc {
    * @param ext text text extensions
    */
   public void compInfo(final String string, final Object... ext) {
-    if(!inf) return;
-    if(!compInfo) {
-      info.add(NL).add(COMPILING).add(COL).add(NL);
-      compInfo = true;
-    }
-    info.add(LI).addExt(string, ext).add(NL);
+    info.compInfo(string,  ext);
   }
 
   /**
@@ -494,20 +438,15 @@ public final class QueryContext extends Proc {
    * @param string evaluation info
    */
   public void evalInfo(final String string) {
-    if(!inf) return;
-    if(!evalInfo) {
-      info.add(NL).add(EVALUATING).add(COL).add(NL);
-      evalInfo = true;
-    }
-    info.add(LI).add(string.replaceAll("\r?\n\\s*", " ")).add(NL);
+    (parentCtx != null ? parentCtx.info : info).evalInfo(string);
   }
 
   /**
    * Returns info on query compilation and evaluation.
    * @return query info
    */
-  public String info() {
-    return info.toString();
+  public QueryInfo info() {
+    return info;
   }
 
   /**

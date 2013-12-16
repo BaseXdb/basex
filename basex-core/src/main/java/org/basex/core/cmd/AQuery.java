@@ -32,11 +32,10 @@ public abstract class AQuery extends Command {
   private final HashMap<String, String[]> vars = new HashMap<String, String[]>();
   /** HTTP context. */
   private Object http;
-
-  /** Query info. */
-  private final QueryInfo qi = new QueryInfo();
   /** Query processor. */
   private QueryProcessor qp;
+  /** Query info. */
+  private QueryInfo info;
 
   /**
    * Protected constructor.
@@ -60,10 +59,10 @@ public abstract class AQuery extends Command {
       err = Util.message(cause);
     } else {
       try {
-        final boolean serial = options.get(MainOptions.SERIALIZE);
-        qi.runs = Math.max(1, options.get(MainOptions.RUNS));
         long hits = 0;
-        for(int r = 0; r < qi.runs; ++r) {
+        final boolean serial = options.get(MainOptions.SERIALIZE);
+        final int runs = Math.max(1, options.get(MainOptions.RUNS));
+        for(int r = 0; r < runs; ++r) {
           // reuse existing processor instance
           if(r != 0) qp = null;
           qp(query, context);
@@ -74,10 +73,10 @@ public abstract class AQuery extends Command {
             else qp.bind(name, value[0], value[1]);
           }
           qp.parse();
-          qi.pars += p.time();
+          info.parsing += p.time();
           if(r == 0) plan(false);
           qp.compile();
-          qi.cmpl += p.time();
+          info.compiling += p.time();
           if(r == 0) plan(true);
 
           final PrintOutput po = r == 0 && serial ? out : new NullOutput();
@@ -85,14 +84,14 @@ public abstract class AQuery extends Command {
 
           if(options.get(MainOptions.CACHEQUERY)) {
             result = qp.execute();
-            qi.evlt += p.time();
+            info.evaluating += p.time();
             ser = qp.getSerializer(po);
             result.serialize(ser);
             hits = result.size();
           } else {
             hits = 0;
             final Iter ir = qp.iter();
-            qi.evlt += p.time();
+            info.evaluating += p.time();
             Item it = ir.next();
             ser = qp.getSerializer(po);
             while(it != null) {
@@ -104,14 +103,16 @@ public abstract class AQuery extends Command {
           }
           ser.close();
           qp.close();
-          qi.srlz += p.time();
+          info.serializing += p.time();
         }
         // dump some query info
         out.flush();
         // remove string list if global locking is used and if query is updating
-        if(goptions.get(GlobalOptions.GLOBALLOCK) && qp.updating)
-          qi.readLocked = qi.writeLocked = null;
-        return info(qi.toString(qp, out, hits, options.get(MainOptions.QUERYINFO)));
+        if(goptions.get(GlobalOptions.GLOBALLOCK) && qp.updating) {
+          info.readLocked = null;
+          info.writeLocked = null;
+        }
+        return info(info.toString(qp, out.size(), hits, options.get(MainOptions.QUERYINFO)));
 
       } catch(final QueryException ex) {
         cause = ex;
@@ -145,7 +146,7 @@ public abstract class AQuery extends Command {
     try {
       final Performance p = new Performance();
       qp(qu, ctx).parse();
-      qi.pars = p.time();
+      info.parsing = p.time();
       return qp.updating;
     } catch(final QueryException ex) {
       Util.debug(ex);
@@ -176,7 +177,10 @@ public abstract class AQuery extends Command {
    * @return query processor
    */
   private QueryProcessor qp(final String query, final Context ctx) {
-    if(qp == null) qp = proc(new QueryProcessor(query, ctx));
+    if(qp == null) {
+      qp = proc(new QueryProcessor(query, ctx));
+      info = qp.ctx.info;
+    }
     return qp;
   }
 
@@ -293,8 +297,8 @@ public abstract class AQuery extends Command {
       lr.writeAll = true;
     } else {
       qp.databases(lr);
-      qi.readLocked = lr.readAll ? null : lr.read;
-      qi.writeLocked = lr.writeAll ? null : lr.write;
+      info.readLocked = lr.readAll ? null : lr.read;
+      info.writeLocked = lr.writeAll ? null : lr.write;
     }
   }
 

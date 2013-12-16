@@ -81,7 +81,7 @@ public final class FNXQuery extends StandardFunc {
   private ValueBuilder eval(final QueryContext ctx, final byte[] qu, final String path)
       throws QueryException {
 
-    final QueryContext qc = new QueryContext(ctx.context);
+    final QueryContext qc = new QueryContext(ctx);
     final StaticContext sctx = new StaticContext(qc.context.options.get(MainOptions.XQUERY3));
 
     // bind variables and context item

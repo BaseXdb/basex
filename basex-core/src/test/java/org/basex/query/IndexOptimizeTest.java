@@ -207,7 +207,6 @@ public final class IndexOptimizeTest extends SandboxTest {
     QueryProcessor qp = new QueryProcessor(query, context);
     try {
       ArrayOutput ao = qp.execute().serialize();
-      final String info = qp.info();
       if(result != null) assertEquals(result, ao.toString().replaceAll("\\r?\\n", ""));
 
       // fetch query plan
@@ -219,7 +218,7 @@ public final class IndexOptimizeTest extends SandboxTest {
           "[self::" + Util.className(ValueAccess.class) +
           "|self::" + Util.className(FTIndexAccess.class) + ']', context);
       ao = qp.execute().serialize();
-      assertFalse("No index used:\nQuery: " + query + "\nInfo: " + info +
+      assertFalse("No index used:\nQuery: " + query + "\nInfo: " + qp.info() +
           "\nPlan: " + plan, ao.toString().isEmpty());
     } catch(final QueryException ex) {
       fail(Util.message(ex) + "\nQuery: " + query + "\nPlan: " + plan);

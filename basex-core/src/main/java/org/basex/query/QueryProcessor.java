@@ -257,10 +257,10 @@ public final class QueryProcessor extends Proc {
   }
 
   /**
-   * Returns query background information.
-   * @return background information
+   * Returns query information.
+   * @return query information
    */
-  public String info() {
+  public QueryInfo info() {
     return ctx.info();
   }
 

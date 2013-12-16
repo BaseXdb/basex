@@ -24,8 +24,6 @@ import org.basex.util.*;
 final class QueryListener extends Proc {
   /** Performance. */
   private final Performance perf = new Performance();
-  /** Query info. */
-  private final QueryInfo qi = new QueryInfo();
   /** Query string. */
   private final String query;
   /** Database context. */
@@ -124,9 +122,10 @@ final class QueryListener extends Proc {
 
         // create serializer
         qp.compile();
-        qi.cmpl = perf.time();
+        final QueryInfo qi = qp.ctx.info;
+        qi.compiling = perf.time();
         final Iter ir = qp.iter();
-        qi.evlt = perf.time();
+        qi.evaluating = perf.time();
         parameters();
         final boolean wrap = !parameters.get(WRAP_PREFIX).isEmpty();
 
@@ -154,10 +153,10 @@ final class QueryListener extends Proc {
         }
         ser.close();
         if(iter && wrap) out.write(0);
-        qi.srlz = perf.time();
+        qi.serializing = perf.time();
 
         // generate query info
-        info = qi.toString(qp, po, c, ctx.options.get(MainOptions.QUERYINFO));
+        info = qi.toString(qp, po.size(), c, ctx.options.get(MainOptions.QUERYINFO));
 
       } catch(final QueryException ex) {
         throw new BaseXException(ex);
@@ -190,7 +189,7 @@ final class QueryListener extends Proc {
       try {
         perf.time();
         init().parse();
-        qi.pars = perf.time();
+        qp.ctx.info.parsing = perf.time();
         parsed = true;
       } catch(final QueryException ex) {
         throw new BaseXException(ex);

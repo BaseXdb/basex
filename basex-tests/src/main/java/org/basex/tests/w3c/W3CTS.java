@@ -339,7 +339,7 @@ public abstract class W3CTS {
       // print compilation steps
       if(compile) {
         Util.errln("---------------------------------------------------------");
-        Util.err(xq.info());
+        Util.err(xq.info().toString());
         Util.errln(in);
       }
 

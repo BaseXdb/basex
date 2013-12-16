@@ -157,8 +157,8 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Indicates if an expression has the specified compiler property. This method is
-   * called by numerous {@link #compile} methods to test properties of sub-expressions.
-   * It returns {@code true} if at least one test is successful.
+   * called by numerous {@link #compile(QueryContext, VarScope)} methods to test properties of
+   * sub-expressions. It returns {@code true} if at least one test is successful.
    * @param flag flag to be found
    * @return result of check
    */
@@ -187,8 +187,8 @@ public abstract class Expr extends ExprInfo {
    * <li>{@link Preds#removable}, if one of the variables is used within a predicate.</li>
    * <li>{@link MixedPath#removable}, if the variable occurs within the path.</li>
    * </ul>
-   * This method is called by {@link GFLWOR#compile} to rewrite where clauses
-   * into predicates.
+   * This method is called by {@link GFLWOR#compile(QueryContext, VarScope)} to rewrite where
+   * clauses into predicates.
    * @param v variable to be replaced
    * @return result of check
    */
