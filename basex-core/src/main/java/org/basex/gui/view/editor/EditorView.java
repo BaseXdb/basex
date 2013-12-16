@@ -524,9 +524,7 @@ public final class EditorView extends View {
           qc.close();
         }
       }
-    } else if(editor.script || file.hasSuffix(IO.XMLSUFFIXES) ||
-        file.hasSuffix(IO.XSLSUFFIXES) || file.hasSuffix(IO.HTMLSUFFIXES)) {
-
+    } else if(editor.script || file.hasSuffix(IO.XMLSUFFIXES) || file.hasSuffix(IO.XSLSUFFIXES)) {
       final ArrayInput ai = new ArrayInput(in);
       try {
         // check XML syntax
