@@ -176,6 +176,33 @@ public final class QueryContext extends Proc {
    * @return main module
    * @throws QueryException query exception
    */
+  public StaticScope parse(final String qu, final String path, final StaticContext sc)
+      throws QueryException {
+    return parse(qu, QueryProcessor.isLibrary(qu), path, sc);
+  }
+
+  /**
+   * Parses the specified query.
+   * @param qu input query
+   * @param library library/main module
+   * @param path file path (may be {@code null})
+   * @param sc static context
+   * @return main module
+   * @throws QueryException query exception
+   */
+  public StaticScope parse(final String qu, final boolean library, final String path,
+      final StaticContext sc) throws QueryException {
+    return library ? parseLibrary(qu, path, sc) : parseMain(qu, path, sc);
+  }
+
+  /**
+   * Parses the specified query.
+   * @param qu input query
+   * @param path file path (may be {@code null})
+   * @param sc static context
+   * @return main module
+   * @throws QueryException query exception
+   */
   public MainModule parseMain(final String qu, final String path, final StaticContext sc)
       throws QueryException {
     query = qu;
@@ -191,8 +218,8 @@ public final class QueryContext extends Proc {
    * @return name of module
    * @throws QueryException query exception
    */
-  public LibraryModule parseLibrary(final String qu, final String path,
-      final StaticContext sc) throws QueryException {
+  public LibraryModule parseLibrary(final String qu, final String path, final StaticContext sc)
+      throws QueryException {
     query = qu;
     return new QueryParser(qu, path, this, sc).parseLibrary(true);
   }

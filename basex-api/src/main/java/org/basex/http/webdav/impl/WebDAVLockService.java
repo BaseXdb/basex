@@ -24,6 +24,8 @@ import static org.basex.util.Token.string;
  * @author Dimitar Popov
  */
 public final class WebDAVLockService {
+  /** Path to WebDAV module. */
+  private static final String FILE = "xquery/webdav.xqm";
   /** Name of the database with the WebDAV locks. */
   static final String WEBDAV_LOCKS_DB = "~webdav";
   /** HTTP context. */
@@ -215,7 +217,7 @@ public final class WebDAVLockService {
      */
     private void registerModule() throws IOException {
       try {
-        p.ctx.parseLibrary(string(readModule()), null, p.sc);
+        p.ctx.parseLibrary(string(readModule()), FILE, p.sc);
       } catch(final QueryException ex) {
         throw new BaseXException(ex);
       }
@@ -228,7 +230,7 @@ public final class WebDAVLockService {
      */
     private byte[] readModule() throws IOException {
       final ClassLoader cl = getClass().getClassLoader();
-      final InputStream s = cl.getResourceAsStream("xquery/webdav.xqm");
+      final InputStream s = cl.getResourceAsStream(FILE);
       if(s == null) throw new IOException("WebDAV module not found");
       return new IOStream(s).read();
     }

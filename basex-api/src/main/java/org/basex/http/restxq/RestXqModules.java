@@ -119,18 +119,16 @@ public final class RestXqModules {
         cache(http, file, cache);
       } else {
         final String path = file.path();
-        final boolean main = path.endsWith(IO.XQSUFFIX);
-        if(main || path.endsWith(IO.XQMSUFFIX)) {
-          // all files with .xqm suffix will be parsed for RESTXQ annotations
+        final boolean lib = path.endsWith(IO.XQMSUFFIX);
+        if(lib || path.endsWith(IO.XQSUFFIX)) {
           RestXqModule module = modules.get(path);
-
           boolean parsed = false;
           if(module != null) {
             // check if module has been modified
             parsed = module.uptodate();
           } else {
             // create new module
-            module = new RestXqModule(file, main);
+            module = new RestXqModule(file, lib);
           }
           // add module if it has been parsed, and if it contains annotations
           if(parsed || module.parse(http)) {

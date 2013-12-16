@@ -495,18 +495,18 @@ public final class EditorView extends View {
     } else if(xquery || action == Action.EXECUTE) {
       // check if input is/might be an xquery main module
       String input = in.length == 0 ? "()" : string(in);
-      boolean main = !QueryProcessor.isLibrary(input);
+      boolean lib = QueryProcessor.isLibrary(input);
       final boolean exec = action == Action.EXECUTE || gui.gopts.get(GUIOptions.EXECRT);
-      if(exec && !main) {
+      if(exec && lib) {
         final EditorArea ea = execEditor();
         if(ea != null) {
           file = ea.file;
           input = string(ea.getText());
-          main = true;
+          lib = false;
         }
       }
 
-      if(main && exec) {
+      if(!lib && exec) {
         // execute query if forced, or if realtime execution is activated
         gui.execute(true, new XQuery(input));
         execFile = file;
@@ -515,8 +515,7 @@ public final class EditorView extends View {
         gui.context.options.set(MainOptions.QUERYPATH, file.path());
         final QueryContext qc = new QueryContext(gui.context);
         try {
-          if(main) qc.parseMain(input, null, null);
-          else qc.parseLibrary(input, null, null);
+          qc.parse(input, lib, null, null);
           info(null);
         } catch(final QueryException ex) {
           info(ex);

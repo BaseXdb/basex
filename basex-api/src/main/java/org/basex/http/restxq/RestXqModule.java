@@ -22,20 +22,20 @@ final class RestXqModule {
   private final ArrayList<RestXqFunction> functions = new ArrayList<RestXqFunction>();
   /** File reference. */
   private final IOFile file;
-  /** Main module flag. */
-  private final boolean main;
+  /** Library module flag. */
+  private final boolean lib;
   /** Parsing timestamp. */
   private long time;
 
   /**
    * Constructor.
    * @param in xquery module
-   * @param m main module flag
+   * @param l library module flag
    */
-  RestXqModule(final IOFile in, final boolean m) {
+  RestXqModule(final IOFile in, final boolean l) {
     file = in;
     time = in.timeStamp();
-    main = m;
+    lib = l;
   }
 
   /**
@@ -124,10 +124,7 @@ final class RestXqModule {
   private QueryContext parseModule(final HTTPContext http) throws QueryException {
     final QueryContext qc = new QueryContext(http.context());
     try {
-      final String cont = string(file.read());
-      final String path = file.path();
-      if(main) qc.parseMain(cont, path, null);
-      else qc.parseLibrary(cont, path, null);
+      qc.parse(string(file.read()), lib, file.path(), null);
       return qc;
     } catch(final IOException ex) {
       throw IOERR.get(null, ex);

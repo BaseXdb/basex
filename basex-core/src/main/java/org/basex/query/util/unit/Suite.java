@@ -47,7 +47,7 @@ public final class Suite {
       try {
         final QueryContext qc = new QueryContext(ctx.context);
         try {
-          final LibraryModule mod = qc.parseLibrary(string(io.read()), io.path(), null);
+          final StaticScope mod = qc.parse(string(io.read()), io.path(), null);
           qc.compile();
           suites.add(new Unit(qc, info).test(mod.sc));
         } finally {
