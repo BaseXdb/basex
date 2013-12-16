@@ -31,7 +31,7 @@ public class TextPanel extends BaseXPanel {
   private static final int ERROR_DELAY = 500;
 
   /** Search direction. */
-  enum SearchDir {
+  public enum SearchDir {
     /** Current hit. */
     CURRENT,
     /** Next hit. */
@@ -50,8 +50,8 @@ public class TextPanel extends BaseXPanel {
     EXECUTE
   }
 
-  /** Text array to be written. */
-  protected final transient TextEditor text = new TextEditor(EMPTY);
+  /** Text editor. */
+  protected final TextEditor editor = new TextEditor(EMPTY);
   /** Undo history. */
   public final History hist;
   /** Search bar. */
@@ -109,13 +109,13 @@ public class TextPanel extends BaseXPanel {
     layout(new BorderLayout());
 
     scroll = new BaseXScrollBar(this);
-    rend = new TextRenderer(text, scroll, editable);
+    rend = new TextRenderer(editor, scroll, editable);
 
     add(rend, BorderLayout.CENTER);
     add(scroll, BorderLayout.EAST);
 
     setText(txt);
-    hist = new History(edit ? text.text() : null);
+    hist = new History(edit ? editor.text() : null);
 
     if(edit) {
       setBackground(Color.white);
@@ -177,8 +177,8 @@ public class TextPanel extends BaseXPanel {
       // new text is different...
       txt = Arrays.copyOf(t, ns);
     }
-    if(text.text(txt)) {
-      if(hist != null) hist.store(txt, text.caret(), 0);
+    if(editor.text(txt)) {
+      if(hist != null) hist.store(txt, editor.caret(), 0);
     }
     componentResized(null);
   }
@@ -218,8 +218,8 @@ public class TextPanel extends BaseXPanel {
    * @param pos caret position
    */
   public final void setCaret(final int pos) {
-    text.setCaret(pos);
-    text.noSelect();
+    editor.setCaret(pos);
+    editor.noSelect();
     cursorCode.invokeLater(1);
     caret(true);
   }
@@ -229,7 +229,7 @@ public class TextPanel extends BaseXPanel {
    * @return cursor position
    */
   public final int getCaret() {
-    return text.caret();
+    return editor.caret();
   }
 
   /**
@@ -239,7 +239,7 @@ public class TextPanel extends BaseXPanel {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        text.setCaret(text.size());
+        editor.setCaret(editor.size());
         cursorCode.execute(2);
       }
     });
@@ -250,7 +250,7 @@ public class TextPanel extends BaseXPanel {
    * @return output text
    */
   public final byte[] getText() {
-    return text.text();
+    return editor.text();
   }
 
   /**
@@ -258,7 +258,7 @@ public class TextPanel extends BaseXPanel {
    * @return result of check
    */
   public final boolean selected() {
-    return text.selected();
+    return editor.selected();
   }
 
   @Override
@@ -275,7 +275,7 @@ public class TextPanel extends BaseXPanel {
    */
   public final void resetError() {
     ++errorID;
-    text.error(-1);
+    editor.error(-1);
     rend.repaint();
   }
 
@@ -285,7 +285,7 @@ public class TextPanel extends BaseXPanel {
    */
   public final void error(final int pos) {
     final int eid = ++errorID;
-    text.error(pos);
+    editor.error(pos);
     new Thread() {
       @Override
       public void run() {
@@ -299,8 +299,8 @@ public class TextPanel extends BaseXPanel {
    * Adds or removes a comment.
    */
   public void comment() {
-    final int caret = text.caret();
-    if(text.comment(rend.getSyntax())) hist.store(text.text(), caret, text.caret());
+    final int caret = editor.caret();
+    if(editor.comment(rend.getSyntax())) hist.store(editor.text(), caret, editor.caret());
     scrollCode.invokeLater(true);
   }
 
@@ -308,8 +308,8 @@ public class TextPanel extends BaseXPanel {
    * Formats the selected text.
    */
   public void format() {
-    final int caret = text.caret();
-    if(text.format(rend.getSyntax())) hist.store(text.text(), caret, text.caret());
+    final int caret = editor.caret();
+    if(editor.format(rend.getSyntax())) hist.store(editor.text(), caret, editor.caret());
     scrollCode.invokeLater(true);
   }
 
@@ -325,9 +325,9 @@ public class TextPanel extends BaseXPanel {
    * Selects the whole text.
    */
   final void selectAll() {
-    final int s = text.size();
-    text.select(0, s);
-    text.setCaret(s);
+    final int s = editor.size();
+    editor.select(0, s);
+    editor.setCaret(s);
     rend.repaint();
   }
 
@@ -381,10 +381,10 @@ public class TextPanel extends BaseXPanel {
     try {
       final int[] select = rend.replace(rc);
       if(rc.text != null) {
-        final boolean sel = text.selected();
+        final boolean sel = editor.selected();
         setText(rc.text);
-        if(sel) text.select(select[0], select[1]);
-        text.setCaret(select[0]);
+        if(sel) editor.select(select[0], select[1]);
+        editor.setCaret(select[0]);
         release(Action.CHECK);
       }
       gui.status.setText(Util.info(Text.STRINGS_REPLACED));
@@ -399,7 +399,7 @@ public class TextPanel extends BaseXPanel {
    * @param dir search direction
    * @param select select hit
    */
-  final void jump(final SearchDir dir, final boolean select) {
+  public final void jump(final SearchDir dir, final boolean select) {
     // updates the visible area
     final int y = rend.jump(dir, select);
     final int h = getHeight();
@@ -433,9 +433,9 @@ public class TextPanel extends BaseXPanel {
     if(linkListener == null) return;
 
     if(SwingUtilities.isLeftMouseButton(e)) {
-      text.checkSelect();
+      editor.checkSelect();
       // evaluate link
-      if(!text.selected()) {
+      if(!editor.selected()) {
         final TextIterator iter = rend.jump(e.getPoint());
         final String link = iter.link();
         if(link != null) linkListener.linkClicked(link);
@@ -469,17 +469,17 @@ public class TextPanel extends BaseXPanel {
     if(SwingUtilities.isMiddleMouseButton(e)) copy();
 
     final boolean selecting = e.isShiftDown();
-    final boolean selected = text.selected();
+    final boolean selected = editor.selected();
     if(SwingUtilities.isLeftMouseButton(e)) {
       final int c = e.getClickCount();
       if(c == 1) {
         // selection mode
-        if(selecting && !selected) text.startSelect();
+        if(selecting && !selected) editor.startSelect();
         rend.select(e.getPoint(), !selecting);
       } else if(c == 2) {
-        text.selectWord();
+        editor.selectWord();
       } else {
-        text.selectLine();
+        editor.selectLine();
       }
     } else if(!selected) {
       rend.select(e.getPoint(), true);
@@ -529,48 +529,48 @@ public class TextPanel extends BaseXPanel {
     }
 
     // set cursor position and reset last column
-    final int caret = text.caret();
-    text.pos(caret);
+    final int caret = editor.caret();
+    editor.pos(caret);
     if(!PREVLINE.is(e) && !NEXTLINE.is(e)) lastCol = -1;
 
     final boolean selecting = e.isShiftDown() && !BACKSPACE.is(e) && !PASTE2.is(e) &&
         !DELLINE.is(e) && !PREVPAGE_RO.is(e);
-    final boolean selected = text.selected();
-    if(selecting && !selected) text.startSelect();
+    final boolean selected = editor.selected();
+    if(selecting && !selected) editor.startSelect();
     boolean down = true, consumed = true;
 
     // operations that consider the last text mark..
-    final byte[] txt = text.text();
+    final byte[] txt = editor.text();
     if(MOVEDOWN.is(e)) {
-      text.move(true);
+      editor.move(true);
     } else if(MOVEUP.is(e)) {
-      text.move(false);
+      editor.move(false);
     } else if(NEXTWORD.is(e)) {
-      text.nextToken(selecting);
+      editor.nextToken(selecting);
     } else if(PREVWORD.is(e)) {
-      text.prevToken(selecting);
+      editor.prevToken(selecting);
       down = false;
     } else if(TEXTSTART.is(e)) {
-      if(!selecting) text.noSelect();
-      text.pos(0);
+      if(!selecting) editor.noSelect();
+      editor.pos(0);
       down = false;
     } else if(TEXTEND.is(e)) {
-      if(!selecting) text.noSelect();
-      text.pos(text.size());
+      if(!selecting) editor.noSelect();
+      editor.pos(editor.size());
     } else if(LINESTART.is(e)) {
-      text.home(selecting);
+      editor.home(selecting);
       down = false;
     } else if(LINEEND.is(e)) {
-      text.eol(selecting);
+      editor.eol(selecting);
     } else if(PREVPAGE.is(e) || !hist.active() && PREVPAGE_RO.is(e)) {
       up(getHeight() / fh, selecting);
       down = false;
     } else if(NEXTPAGE.is(e) || !hist.active() && NEXTPAGE_RO.is(e)) {
       down(getHeight() / fh, selecting);
     } else if(NEXT.is(e)) {
-      text.next(selecting);
+      editor.next(selecting);
     } else if(PREV.is(e)) {
-      text.prev(selecting);
+      editor.prev(selecting);
       down = false;
     } else if(PREVLINE.is(e)) {
       up(1, selecting);
@@ -583,43 +583,43 @@ public class TextPanel extends BaseXPanel {
 
     if(selecting) {
       // refresh scroll position
-      text.finishSelect();
+      editor.finishSelect();
     } else if(hist.active()) {
       // edit operations...
       if(COMPLETE.is(e)) {
-        text.complete();
+        editor.complete();
       } else if(DELLINE.is(e)) {
-        text.deleteLine();
+        editor.deleteLine();
       } else if(DELLINEEND.is(e) || DELNEXTWORD.is(e) || DELETE.is(e)) {
         if(!selected) {
-          if(text.pos() == text.size()) return;
-          text.startSelect();
+          if(editor.pos() == editor.size()) return;
+          editor.startSelect();
           if(DELNEXTWORD.is(e)) {
-            text.nextToken(true);
+            editor.nextToken(true);
           } else if(DELLINEEND.is(e)) {
-            text.eol(true);
+            editor.eol(true);
           } else {
-            text.next(true);
+            editor.next(true);
           }
-          text.finishSelect();
+          editor.finishSelect();
         }
-        text.delete();
+        editor.delete();
       } else if(DELLINESTART.is(e) || DELPREVWORD.is(e) || BACKSPACE.is(e)) {
         if(!selected) {
-          if(text.pos() == 0) return;
+          if(editor.pos() == 0) return;
           if(DELPREVWORD.is(e)) {
-            text.startSelect();
-            text.prevToken(true);
-            text.finishSelect();
+            editor.startSelect();
+            editor.prevToken(true);
+            editor.finishSelect();
           } else if(DELLINESTART.is(e)) {
-            text.startSelect();
-            text.bol(true);
-            text.finishSelect();
+            editor.startSelect();
+            editor.bol(true);
+            editor.finishSelect();
           } else {
-            text.backspace();
+            editor.backspace();
           }
         }
-        text.delete();
+        editor.delete();
         down = false;
       } else {
         consumed = false;
@@ -627,13 +627,13 @@ public class TextPanel extends BaseXPanel {
     }
     if(consumed) e.consume();
 
-    text.setCaret();
-    final byte[] tmp = text.text();
+    editor.setCaret();
+    final byte[] tmp = editor.text();
     if(txt == tmp) {
       cursorCode.invokeLater(down ? 2 : 0);
     } else {
       // text has changed: add old text to history
-      hist.store(tmp, caret, text.caret());
+      hist.store(tmp, caret, editor.caret());
       scrollCode.invokeLater(down);
     }
   }
@@ -670,15 +670,15 @@ public class TextPanel extends BaseXPanel {
    * @param mark mark flag
    */
   private void down(final int l, final boolean mark) {
-    if(!mark) text.noSelect();
-    final int x = text.bol(mark);
+    if(!mark) editor.noSelect();
+    final int x = editor.bol(mark);
     if(lastCol == -1) lastCol = x;
     for(int i = 0; i < l; ++i) {
-      text.eol(mark);
-      text.next(mark);
+      editor.eol(mark);
+      editor.next(mark);
     }
-    text.forward(lastCol, mark);
-    if(text.pos() == text.size()) lastCol = -1;
+    editor.forward(lastCol, mark);
+    if(editor.pos() == editor.size()) lastCol = -1;
   }
 
   /**
@@ -687,18 +687,18 @@ public class TextPanel extends BaseXPanel {
    * @param mark mark flag
    */
   private void up(final int l, final boolean mark) {
-    if(!mark) text.noSelect();
-    final int x = text.bol(mark);
+    if(!mark) editor.noSelect();
+    final int x = editor.bol(mark);
     if(lastCol == -1) lastCol = x;
-    if(text.pos() == 0) {
+    if(editor.pos() == 0) {
       lastCol = -1;
       return;
     }
     for(int i = 0; i < l; ++i) {
-      text.prev(mark);
-      text.bol(mark);
+      editor.prev(mark);
+      editor.bol(mark);
     }
-    text.forward(lastCol, mark);
+    editor.forward(lastCol, mark);
   }
 
   /** Last horizontal position. */
@@ -708,23 +708,23 @@ public class TextPanel extends BaseXPanel {
   public void keyTyped(final KeyEvent e) {
     if(!hist.active() || control(e) || DELETE.is(e) || BACKSPACE.is(e) || ESCAPE.is(e)) return;
 
-    final int caret = text.caret();
-    text.pos(caret);
+    final int caret = editor.caret();
+    editor.pos(caret);
 
     // remember if marked text is to be deleted
     final StringBuilder sb = new StringBuilder(1).append(e.getKeyChar());
-    final boolean indent = TAB.is(e) && text.indent(sb, e.isShiftDown());
+    final boolean indent = TAB.is(e) && editor.indent(sb, e.isShiftDown());
 
     // delete marked text
-    final boolean selected = text.selected() && !indent;
-    if(selected) text.delete();
+    final boolean selected = editor.selected() && !indent;
+    if(selected) editor.delete();
 
-    final int ps = text.pos();
-    final int move = ENTER.is(e) ? text.enter(sb) : text.add(sb, selected);
+    final int ps = editor.pos();
+    final int move = ENTER.is(e) ? editor.enter(sb) : editor.add(sb, selected);
 
     // refresh history and adjust cursor position
-    hist.store(text.text(), caret, text.caret());
-    if(move != 0) text.setCaret(Math.min(text.size(), ps + move));
+    hist.store(editor.text(), caret, editor.caret());
+    if(move != 0) editor.setCaret(Math.min(editor.size(), ps + move));
 
     // adjust text height
     scrollCode.invokeLater(true);
@@ -745,9 +745,9 @@ public class TextPanel extends BaseXPanel {
    * @return true if text was copied
    */
   final boolean copy() {
-    final String txt = text.copy();
+    final String txt = editor.copy();
     if(txt.isEmpty()) {
-      text.noSelect();
+      editor.noSelect();
       return false;
     }
 
@@ -773,8 +773,8 @@ public class TextPanel extends BaseXPanel {
    * @param old old cursor position; store entry to history if position != -1
    */
   void finish(final int old) {
-    text.setCaret();
-    if(old != -1) hist.store(text.text(), old, text.caret());
+    editor.setCaret();
+    if(old != -1) hist.store(editor.text(), old, editor.caret());
     scrollCode.invokeLater(true);
     release(Action.CHECK);
   }
@@ -829,8 +829,8 @@ public class TextPanel extends BaseXPanel {
       if(!hist.active()) return;
       final byte[] t = hist.prev();
       if(t == null) return;
-      text.text(t);
-      text.pos(hist.caret());
+      editor.text(t);
+      editor.pos(hist.caret());
       finish(-1);
     }
     @Override
@@ -847,8 +847,8 @@ public class TextPanel extends BaseXPanel {
       if(!hist.active()) return;
       final byte[] t = hist.next();
       if(t == null) return;
-      text.text(t);
-      text.pos(hist.caret());
+      editor.text(t);
+      editor.pos(hist.caret());
       finish(-1);
     }
     @Override
@@ -862,15 +862,15 @@ public class TextPanel extends BaseXPanel {
 
     @Override
     public void execute() {
-      final int tc = text.caret();
-      text.pos(tc);
+      final int tc = editor.caret();
+      editor.pos(tc);
       if(!copy()) return;
-      text.delete();
-      text.setCaret();
+      editor.delete();
+      editor.setCaret();
       finish(tc);
     }
     @Override
-    public boolean enabled(final GUI main) { return hist.active() && text.selected(); }
+    public boolean enabled(final GUI main) { return hist.active() && editor.selected(); }
   }
 
   /** Copy command. */
@@ -881,7 +881,7 @@ public class TextPanel extends BaseXPanel {
     @Override
     public void execute() { copy(); }
     @Override
-    public boolean enabled(final GUI main) { return text.selected(); }
+    public boolean enabled(final GUI main) { return editor.selected(); }
   }
 
   /** Paste command. */
@@ -891,12 +891,12 @@ public class TextPanel extends BaseXPanel {
 
     @Override
     public void execute() {
-      final int tc = text.caret();
-      text.pos(tc);
+      final int tc = editor.caret();
+      editor.pos(tc);
       final String clip = clip();
       if(clip == null) return;
-      if(text.selected()) text.delete();
-      text.add(clip);
+      if(editor.selected()) editor.delete();
+      editor.add(clip);
       finish(tc);
     }
     @Override
@@ -910,13 +910,13 @@ public class TextPanel extends BaseXPanel {
 
     @Override
     public void execute() {
-      final int tc = text.caret();
-      text.pos(tc);
-      text.delete();
+      final int tc = editor.caret();
+      editor.pos(tc);
+      editor.delete();
       finish(tc);
     }
     @Override
-    public boolean enabled(final GUI main) { return hist.active() && text.selected(); }
+    public boolean enabled(final GUI main) { return hist.active() && editor.selected(); }
   }
 
   /** Select all command. */
@@ -934,7 +934,7 @@ public class TextPanel extends BaseXPanel {
     FindCmd() { super(Text.FIND + Text.DOTS, FIND); }
 
     @Override
-    public void execute() { search.activate(text.copy(), true); }
+    public void execute() { search.activate(editor.copy(), true); }
     @Override
     public boolean enabled(final GUI main) { return search != null; }
   }
@@ -967,7 +967,7 @@ public class TextPanel extends BaseXPanel {
    */
   private void find(final boolean next) {
     final boolean vis = search.isVisible();
-    search.activate(text.copy(), false);
+    search.activate(editor.copy(), false);
     jump(vis ? next ? SearchDir.FORWARD : SearchDir.BACKWARD : SearchDir.CURRENT, true);
   }
 
@@ -986,7 +986,7 @@ public class TextPanel extends BaseXPanel {
    * Jumps to a specific line.
    */
   private void gotoLine() {
-    final byte[] last = text.text();
+    final byte[] last = editor.text();
     final int ll = last.length;
     final int cr = getCaret();
     int l = 1;

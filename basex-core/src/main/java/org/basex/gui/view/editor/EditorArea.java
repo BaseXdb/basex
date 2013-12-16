@@ -102,17 +102,17 @@ public final class EditorArea extends TextPanel {
 
   @Override
   public void keyPressed(final KeyEvent e) {
-    final byte[] txt = text.text();
+    final byte[] text = editor.text();
     super.keyPressed(e);
-    if(txt != text.text()) resetError();
+    if(text != editor.text()) resetError();
     view.posCode.invokeLater();
   }
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    final byte[] txt = text.text();
+    final byte[] text = editor.text();
     super.keyTyped(e);
-    if(txt != text.text()) resetError();
+    if(text != editor.text()) resetError();
   }
 
   @Override

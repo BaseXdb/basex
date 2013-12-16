@@ -17,6 +17,7 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.text.*;
+import org.basex.gui.text.TextPanel.*;
 import org.basex.gui.view.editor.*;
 import org.basex.io.*;
 import org.basex.util.*;
@@ -231,23 +232,24 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
    * @param search search string
    */
   void open(final IOFile file, final String search) {
-    if(!file.isDir() && view.open(file) != null) {
-      final TextPanel editor = view.getEditor();
-      final SearchBar sb = editor.search;
-      if(search != null) {
-        sb.reset();
-        sb.activate(search, true);
-      } else {
-        sb.deactivate(true);
+    final EditorArea editor = view.open(file);
+    if(editor == null) return;
+
+    // delay search and focus request (avoid keyTyped event to be handled in editor)
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        final SearchBar sb = editor.search;
+        if(search != null) {
+          sb.reset();
+          sb.activate(search, false);
+          editor.jump(SearchDir.CURRENT, true);
+        } else {
+          sb.deactivate(true);
+        }
+        editor.requestFocusInWindow();
       }
-      // request focus (avoid keyTyped event to be handled in editor)
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          editor.requestFocusInWindow();
-        }}
-      );
-    }
+    });
   }
 
   /**
@@ -398,7 +400,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
     }
   }
 
-  /** Change directory command. */
+  /** Open command. */
   final class OpenCmd extends GUIPopupCmd {
     /** Constructor. */
     OpenCmd() { super(OPEN, BaseXKeys.ENTER); }
@@ -415,7 +417,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
     }
   }
 
-  /** Change directory command. */
+  /** Open externally command. */
   final class OpenExternalCmd extends GUIPopupCmd {
     /** Constructor. */
     OpenExternalCmd() { super(OPEN_EXTERNALLY, BaseXKeys.OPEN); }

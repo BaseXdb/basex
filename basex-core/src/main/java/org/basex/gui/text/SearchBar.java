@@ -90,7 +90,7 @@ public final class SearchBar extends BaseXBack {
       @Override
       public void keyPressed(final KeyEvent e) {
         if(FINDPREV1.is(e) || FINDPREV2.is(e) || FINDNEXT1.is(e) || FINDNEXT2.is(e)) {
-          editor.text.noSelect();
+          editor.editor.noSelect();
           deactivate(false);
         } else if(ESCAPE.is(e)) {
           deactivate(search.getText().isEmpty());
@@ -219,7 +219,7 @@ public final class SearchBar extends BaseXBack {
    * Activates the search bar.
    * @param string search string; triggers a new search if it differs from old string.
    * Will be ignored if set to {@code null}
-   * @param focus indicates if text field should be focused
+   * @param focus indicates if the search field should be focused
    */
   public void activate(final String string, final boolean focus) {
     boolean action = !isVisible();

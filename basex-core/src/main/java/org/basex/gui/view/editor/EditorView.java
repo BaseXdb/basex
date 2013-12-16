@@ -581,7 +581,9 @@ public final class EditorView extends View {
         } catch(final InputException ex) {
           if(valid) {
             valid = false;
-            if(BaseXDialog.confirm(gui, H_FILE_BINARY)) {
+            final Boolean binary = BaseXDialog.yesNoCancel(gui, H_FILE_BINARY);
+            if(binary == null) return null;
+            if(binary) {
               try {
                 file.open();
               } catch(final IOException ioex) {
