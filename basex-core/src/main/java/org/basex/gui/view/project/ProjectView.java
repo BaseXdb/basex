@@ -16,8 +16,6 @@ import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
-import org.basex.gui.text.*;
-import org.basex.gui.text.TextPanel.*;
 import org.basex.gui.view.editor.*;
 import org.basex.io.*;
 import org.basex.util.*;
@@ -239,15 +237,7 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        final SearchBar sb = editor.search;
-        if(search != null) {
-          sb.reset();
-          sb.activate(search, false);
-          editor.jump(SearchDir.CURRENT, true);
-        } else {
-          sb.deactivate(true);
-        }
-        editor.requestFocusInWindow();
+        editor.jump(search);
       }
     });
   }

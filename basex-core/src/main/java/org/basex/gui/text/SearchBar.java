@@ -232,6 +232,7 @@ public final class SearchBar extends BaseXBack {
     // set new, different search string
     if(string != null && !new SearchContext(this, search.getText()).matches(string)) {
       search.setText(string);
+      search.store();
       regex.setSelected(false);
       action = true;
     }

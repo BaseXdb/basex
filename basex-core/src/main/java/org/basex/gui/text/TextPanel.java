@@ -395,11 +395,11 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
-   * Jumps to a search string.
+   * Jumps to the current, next or previous search string.
    * @param dir search direction
    * @param select select hit
    */
-  public final void jump(final SearchDir dir, final boolean select) {
+  protected final void jump(final SearchDir dir, final boolean select) {
     // updates the visible area
     final int y = rend.jump(dir, select);
     final int h = getHeight();

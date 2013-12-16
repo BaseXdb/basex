@@ -156,6 +156,21 @@ public final class EditorArea extends TextPanel {
   }
 
   /**
+   * Jumps to the specified string.
+   * @param string search string
+   */
+  public void jump(final String string) {
+    if(string != null) {
+      search.reset();
+      search.activate(string, false);
+      jump(SearchDir.CURRENT, true);
+    } else {
+      search.deactivate(true);
+    }
+    requestFocusInWindow();
+  }
+
+  /**
    * Updates the file reference, timestamp and history.
    * @param f file
    */
