@@ -172,7 +172,7 @@ public class TextPanel extends BaseXPanel {
       int ns = 0;
       for(int r = 0; r < s; ++r) {
         final byte b = t[r];
-        if(b != 0x0D) t[ns++] = b;
+        if(b != '\r') t[ns++] = b;
       }
       // new text is different...
       txt = Arrays.copyOf(t, ns);
