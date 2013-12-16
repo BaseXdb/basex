@@ -60,7 +60,7 @@ public abstract class IO {
   /** XML suffixes. */
   public static final String[] XMLSUFFIXES =
     { XMLSUFFIX, ".xsd", ".svg", ".rdf", ".rss", ".rng", ".sch", ".xhtml" };
-  /** XML suffixes. */
+  /** XSL suffixes. */
   public static final String[] XSLSUFFIXES =
     { ".xsl", ".xslt", ".fo", ".fob" };
   /** HTML suffixes. */

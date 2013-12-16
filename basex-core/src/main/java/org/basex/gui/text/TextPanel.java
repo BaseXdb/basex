@@ -189,12 +189,11 @@ public class TextPanel extends BaseXPanel {
    * @param opened indicates if file was opened from disk
    */
   protected final void setSyntax(final IO file, final boolean opened) {
-    setSyntax(
-      !opened || file.hasSuffix(IO.XQSUFFIXES) ? new SyntaxXQuery() :
+    setSyntax(!opened || file.hasSuffix(IO.XQSUFFIXES) ? new SyntaxXQuery() :
       file.hasSuffix(IO.JSONSUFFIX) ? new SyntaxJSON() :
       file.hasSuffix(IO.XMLSUFFIXES) || file.hasSuffix(IO.HTMLSUFFIXES) ||
       file.hasSuffix(IO.XSLSUFFIXES) || file.hasSuffix(IO.BXSSUFFIX) ?
-        new SyntaxXML() : Syntax.SIMPLE);
+      new SyntaxXML() : Syntax.SIMPLE);
   }
 
   /**

@@ -14,6 +14,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 
+import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
@@ -30,6 +31,7 @@ import org.basex.gui.view.*;
 import org.basex.gui.view.project.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.io.parse.json.*;
 import org.basex.io.parse.xml.*;
 import org.basex.query.*;
 import org.basex.util.*;
@@ -523,6 +525,15 @@ public final class EditorView extends View {
           qc.close();
         }
       }
+    } else if(file.hasSuffix(IO.JSONSUFFIX)) {
+      try {
+        final IOContent io = new IOContent(in);
+        io.name(file.path());
+        JsonConverter.convert(io, new JsonParserOptions());
+        info(null);
+      } catch(final IOException ex) {
+        info(ex);
+      }
     } else if(editor.script || file.hasSuffix(IO.XMLSUFFIXES) || file.hasSuffix(IO.XSLSUFFIXES)) {
       final ArrayInput ai = new ArrayInput(in);
       try {
@@ -703,7 +714,9 @@ public final class EditorView extends View {
           replaceAll("\r?\n", "<br/>").replaceAll("(<br/>.*?)<br/>.*", "$1");
       info.setToolTipText("<html>" + tt + "</html>");
 
-      if(th instanceof QueryException) {
+      if(th instanceof QueryIOException) {
+        errorInfo = ((QueryIOException) th).getCause().info();
+      } else if(th instanceof QueryException) {
         errorInfo = ((QueryException) th).info();
       } else if(th instanceof SAXParseException) {
         final SAXParseException ex = (SAXParseException) th;

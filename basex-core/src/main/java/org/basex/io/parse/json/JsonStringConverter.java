@@ -43,7 +43,7 @@ public final class JsonStringConverter extends JsonConverter {
     final JsonParserOptions jopts = new JsonParserOptions();
     jopts.set(JsonOptions.SPEC, spec);
     jopts.set(JsonParserOptions.UNESCAPE, un);
-    JsonParser.parse(json, jopts, new JsonStringConverter(jopts, tb));
+    JsonParser.parse(json, null, jopts, new JsonStringConverter(jopts, tb));
   }
 
   @Override

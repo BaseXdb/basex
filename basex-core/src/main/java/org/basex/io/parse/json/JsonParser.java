@@ -51,14 +51,17 @@ public final class JsonParser extends InputParser {
    * Parses the input string, directs the parse events to the given handler and returns
    * the resulting value.
    * @param input input string
+   * @param path input path (may be {@code null)}
    * @param opts options
    * @param conv converter
    * @return resulting item
    * @throws QueryIOException parse exception
    */
-  static Item parse(final String input, final JsonParserOptions opts, final JsonConverter conv)
-      throws QueryIOException {
-    new JsonParser(input, opts, conv).parse();
+  static Item parse(final String input, final String path, final JsonParserOptions opts,
+      final JsonConverter conv) throws QueryIOException {
+    final JsonParser parser = new JsonParser(input, opts, conv);
+    parser.file = path;
+    parser.parse();
     return conv.finish();
   }
 
@@ -416,6 +419,7 @@ public final class JsonParser extends InputParser {
    */
   private QueryIOException error(final String msg, final Object... ext) throws QueryIOException {
     final InputInfo info = new InputInfo(this);
-    throw BXJS_PARSE.getIO(info.line(), info.column(), Util.inf(msg, ext));
+    final QueryException qe = BXJS_PARSE.get(info, info.line(), info.column(), Util.inf(msg, ext));
+    throw new QueryIOException(qe);
   }
 }

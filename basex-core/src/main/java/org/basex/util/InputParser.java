@@ -3,9 +3,6 @@ package org.basex.util;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
-import org.basex.core.*;
-import org.basex.io.*;
-
 /**
  * Abstract class for parsing various inputs, such as database commands or queries.
  *
@@ -35,15 +32,6 @@ public class InputParser {
   public InputParser(final String in) {
     input = in;
     length = in.length();
-  }
-
-  /**
-   * Sets a file reference.
-   * @param f file
-   * @param c database context
-   */
-  protected void file(final IO f, final Context c) {
-    file = f == null ? null : c.user.has(Perm.ADMIN) ? f.path() : f.name();
   }
 
   /**

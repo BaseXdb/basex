@@ -184,9 +184,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   public final MainModule parseMain() throws QueryException {
-    file(sc.baseIO(), ctx.context);
-    checkValidChars();
-
+    init();
     try {
       versionDecl();
 
@@ -220,9 +218,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   public final LibraryModule parseLibrary(final boolean check) throws QueryException {
-    file(sc.baseIO(), ctx.context);
-    checkValidChars();
-
+    init();
     try {
       versionDecl();
 
@@ -259,10 +255,12 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Checks the input string for illegal characters.
+   * Initializes the parsing process.
    * @throws QueryException query exception
    */
-  private void checkValidChars() throws QueryException {
+  private void init() throws QueryException {
+    final IO baseIO = sc.baseIO();
+    file = baseIO == null ? null : ctx.context.user.has(Perm.ADMIN) ? baseIO.path() : baseIO.name();
     if(!more()) throw error(QUERYEMPTY);
 
     // checks if the query string contains invalid characters

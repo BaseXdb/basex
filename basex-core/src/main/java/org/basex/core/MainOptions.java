@@ -53,7 +53,7 @@ public final class MainOptions extends Options {
   /** Flag for whitespace chopping. */
   public static final BooleanOption CHOP = new BooleanOption("CHOP", true);
   /** Use internal XML parser. */
-  public static final BooleanOption INTPARSE = new BooleanOption("INTPARSE", true);
+  public static final BooleanOption INTPARSE = new BooleanOption("INTPARSE", false);
   /** Strips namespaces. */
   public static final BooleanOption STRIPNS = new BooleanOption("STRIPNS", false);
   /** Flag for parsing DTDs in internal parser. */

@@ -36,19 +36,20 @@ public abstract class JsonConverter {
    */
   public static Item convert(final IO input, final JsonParserOptions jopts) throws IOException {
     final String encoding = jopts.get(JsonParserOptions.ENCODING);
-    return convert(new NewlineInput(input).encoding(encoding).content(), jopts);
+    return convert(new NewlineInput(input).encoding(encoding).content(), input.path(), jopts);
   }
 
   /**
    * Converts the specified input to an XQuery item.
    * @param input input
+   * @param path input path (may be {@code null)}
    * @param jopts json options
    * @return item
    * @throws QueryIOException query I/O exception
    */
-  public static Item convert(final byte[] input, final JsonParserOptions jopts)
+  public static Item convert(final byte[] input, final String path, final JsonParserOptions jopts)
       throws QueryIOException {
-    return JsonParser.parse(Token.string(input), jopts, get(jopts));
+    return JsonParser.parse(Token.string(input), path, jopts, get(jopts));
   }
 
   /**
