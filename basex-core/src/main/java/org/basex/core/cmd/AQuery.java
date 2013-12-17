@@ -66,14 +66,7 @@ public abstract class AQuery extends Command {
           // reuse existing processor instance
           if(r != 0) qp = null;
           qp(query, context);
-          qp.http(http);
-          for(final String name : vars.keySet()) {
-            final String[] value = vars.get(name);
-            if(name == null) qp.context(value[0], value[1]);
-            else qp.bind(name, value[0], value[1]);
-          }
-          qp.parse();
-          info.parsing += p.time();
+          parse(p);
           if(r == 0) plan(false);
           qp.compile();
           info.compiling += p.time();
@@ -137,6 +130,22 @@ public abstract class AQuery extends Command {
   }
 
   /**
+   * Parses the query.
+   * @param p performance
+   * @throws QueryException query exception
+   */
+  private void parse(final Performance p) throws QueryException {
+    qp.http(http);
+    for(final String name : vars.keySet()) {
+      final String[] value = vars.get(name);
+      if(name == null) qp.context(value[0], value[1]);
+      else qp.bind(name, value[0], value[1]);
+    }
+    qp.parse();
+    if(p != null) info.parsing += p.time();
+  }
+
+  /**
    * Checks if the query might perform updates.
    * @param ctx database context
    * @param qu query
@@ -145,8 +154,8 @@ public abstract class AQuery extends Command {
   final boolean updating(final Context ctx, final String qu) {
     try {
       final Performance p = new Performance();
-      qp(qu, ctx).parse();
-      info.parsing = p.time();
+      qp(qu, ctx);
+      parse(p);
       return qp.updating;
     } catch(final QueryException ex) {
       Util.debug(ex);
@@ -192,7 +201,8 @@ public abstract class AQuery extends Command {
   public SerializerOptions parameters(final Context ctx) {
     SerializerOptions params = Serializer.OPTIONS;
     try {
-      qp(args[0], ctx).parse();
+      qp(args[0], ctx);
+      parse(null);
       params = qp.ctx.serParams();
     } catch(final QueryException ex) {
       error(Util.message(ex));
