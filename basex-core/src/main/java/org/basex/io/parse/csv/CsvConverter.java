@@ -15,17 +15,26 @@ import org.basex.query.value.item.*;
  * @author Christian Gruen
  */
 public abstract class CsvConverter {
+  /** CSV options. */
+  final CsvParserOptions copts;
+
   /**
-   * Converts the specified input to an XQuery item.
+   * Constructor.
+   * @param opts json options
+   */
+  CsvConverter(final CsvParserOptions opts) {
+    copts = opts;
+  }
+
+  /**
+   * Converts the specified input to XML.
    * @param input input
-   * @param copts options
-   * @return item
    * @throws IOException I/O exception
    */
-  public static Item convert(final IO input, final CsvParserOptions copts) throws IOException {
+  public void convert(final IO input) throws IOException {
     final String encoding = copts.get(CsvParserOptions.ENCODING);
-    return CsvParser.parse(new NewlineInput(input).encoding(encoding).cache().toString(), copts,
-        get(copts));
+    final String csv = new NewlineInput(input).encoding(encoding).cache().toString();
+    CsvParser.parse(csv, copts, this);
   }
 
   /**
@@ -33,9 +42,9 @@ public abstract class CsvConverter {
    * @param copts options
    * @return a CSV converter
    */
-  private static CsvConverter get(final CsvParserOptions copts) {
+  public static CsvConverter get(final CsvParserOptions copts) {
     switch(copts.get(CsvOptions.FORMAT)) {
-      case MAP: return new CsvMapConverter();
+      case MAP: return new CsvMapConverter(copts);
       default:  return new CsvDirectConverter(copts);
     }
   }
@@ -63,5 +72,5 @@ public abstract class CsvConverter {
    * @return result
    * @throws QueryIOException query exception
    */
-  abstract Item finish() throws QueryIOException;
+  public abstract Item finish() throws QueryIOException;
 }

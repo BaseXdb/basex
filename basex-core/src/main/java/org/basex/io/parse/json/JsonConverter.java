@@ -28,28 +28,23 @@ public abstract class JsonConverter {
   }
 
   /**
-   * Converts the specified input to an XQuery item.
+   * Converts the specified input to XML.
    * @param input input stream
-   * @param jopts options
-   * @return item
    * @throws IOException I/O exception
    */
-  public static Item convert(final IO input, final JsonParserOptions jopts) throws IOException {
+  public void convert(final IO input) throws IOException {
     final String encoding = jopts.get(JsonParserOptions.ENCODING);
-    return convert(new NewlineInput(input).encoding(encoding).content(), input.path(), jopts);
+    convert(new NewlineInput(input).encoding(encoding).content(), input.path());
   }
 
   /**
    * Converts the specified input to an XQuery item.
    * @param input input
    * @param path input path (may be {@code null)}
-   * @param jopts json options
-   * @return item
    * @throws QueryIOException query I/O exception
    */
-  public static Item convert(final byte[] input, final String path, final JsonParserOptions jopts)
-      throws QueryIOException {
-    return JsonParser.parse(Token.string(input), path, jopts, get(jopts));
+  public void convert(final byte[] input, final String path) throws QueryIOException {
+    JsonParser.parse(Token.string(input), path, jopts, this);
   }
 
   /**
@@ -57,7 +52,7 @@ public abstract class JsonConverter {
    * @param jopts options
    * @return a JSON converter
    */
-  private static JsonConverter get(final JsonParserOptions jopts) {
+  public static JsonConverter get(final JsonParserOptions jopts) {
     switch(jopts.get(JsonOptions.FORMAT)) {
       case JSONML:     return new JsonMLConverter(jopts);
       case ATTRIBUTES: return new JsonAttsConverter(jopts);
@@ -168,5 +163,5 @@ public abstract class JsonConverter {
    * Returns the resulting XQuery value.
    * @return result
    */
-  abstract Item finish();
+  public abstract Item finish();
 }

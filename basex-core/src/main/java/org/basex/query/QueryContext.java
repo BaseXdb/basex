@@ -651,7 +651,9 @@ public final class QueryContext extends Proc {
         final JsonParserOptions jp = new JsonParserOptions();
         jp.set(JsonOptions.SPEC, JsonSpec.ECMA_262);
         jp.set(JsonOptions.FORMAT, JsonFormat.MAP);
-        return JsonConverter.convert(token(val.toString()), null, jp);
+        final JsonConverter conv = JsonConverter.get(jp);
+        conv.convert(token(val.toString()), null);
+        return conv.finish();
       }
     } catch(final QueryIOException ex) {
       throw ex.getCause();

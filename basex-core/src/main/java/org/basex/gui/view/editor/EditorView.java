@@ -529,7 +529,7 @@ public final class EditorView extends View {
       try {
         final IOContent io = new IOContent(in);
         io.name(file.path());
-        JsonConverter.convert(io, new JsonParserOptions());
+        JsonConverter.get(new JsonParserOptions()).convert(io);
         info(null);
       } catch(final IOException ex) {
         info(ex);

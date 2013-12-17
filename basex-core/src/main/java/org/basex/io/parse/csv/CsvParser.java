@@ -2,7 +2,6 @@ package org.basex.io.parse.csv;
 
 import org.basex.build.*;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -48,13 +47,11 @@ final class CsvParser extends InputParser {
    * @param input input string
    * @param opts options
    * @param conv converter
-   * @return resulting item
    * @throws QueryIOException parse exception
    */
-  static Item parse(final String input, final CsvParserOptions opts, final CsvConverter conv)
+  static void parse(final String input, final CsvParserOptions opts, final CsvConverter conv)
       throws QueryIOException {
     new CsvParser(input, opts, conv).parse();
-    return conv.finish();
   }
 
   /**

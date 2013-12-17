@@ -14,6 +14,7 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.text.*;
 import org.basex.io.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -123,7 +124,8 @@ final class DialogJsonParser extends DialogParser {
           json = EXAMPLE;
         }
         final IO io = JsonParser.toXML(new IOContent(json), jopts);
-        example.setText(example(MainParser.JSON.name(), json, io.toString()));
+        final DBNode node = new DBNode(io, dialog.gui.context.options);
+        example.setText(example(MainParser.JSON.name(), json, node.serialize().toString()));
       }
     } catch(final IOException ex) {
       example.setText(error(ex));

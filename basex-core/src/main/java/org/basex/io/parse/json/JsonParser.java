@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import org.basex.build.*;
 import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -54,15 +53,13 @@ public final class JsonParser extends InputParser {
    * @param path input path (may be {@code null)}
    * @param opts options
    * @param conv converter
-   * @return resulting item
    * @throws QueryIOException parse exception
    */
-  static Item parse(final String input, final String path, final JsonParserOptions opts,
+  static void parse(final String input, final String path, final JsonParserOptions opts,
       final JsonConverter conv) throws QueryIOException {
     final JsonParser parser = new JsonParser(input, opts, conv);
     parser.file = path;
     parser.parse();
-    return conv.finish();
   }
 
   /**

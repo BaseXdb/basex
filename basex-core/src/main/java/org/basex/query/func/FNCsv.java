@@ -56,7 +56,9 @@ public class FNCsv extends StandardFunc {
     final byte[] input = checkStr(expr[0], ctx);
     final CsvParserOptions opts = checkOptions(1, Q_OPTIONS, new CsvParserOptions(), ctx);
     try {
-      return CsvConverter.convert(new IOContent(input), opts);
+      final CsvConverter conv = CsvConverter.get(opts);
+      conv.convert(new IOContent(input));
+      return conv.finish();
     } catch(final IOException ex) {
       throw BXCS_PARSE.get(info, ex);
     }

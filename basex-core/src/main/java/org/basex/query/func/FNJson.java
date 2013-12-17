@@ -53,7 +53,9 @@ public final class FNJson extends StandardFunc {
     final byte[] input = checkStr(expr[0], ctx);
     final JsonParserOptions opts = checkOptions(1, Q_OPTIONS, new JsonParserOptions(), ctx);
     try {
-      return JsonConverter.convert(input, null, opts);
+      final JsonConverter conv = JsonConverter.get(opts);
+      conv.convert(input, null);
+      return conv.finish();
     } catch(final QueryIOException ex) {
       throw ex.getCause(info);
     }

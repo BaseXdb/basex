@@ -3,8 +3,9 @@ package org.basex.io.parse.csv;
 import static org.basex.util.Token.*;
 
 import org.basex.build.*;
-import org.basex.build.CsvOptions.*;
-import org.basex.query.value.node.*;
+import org.basex.build.CsvOptions.CsvFormat;
+import org.basex.io.parse.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -14,7 +15,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-final class CsvDirectConverter extends CsvConverter {
+public final class CsvStringConverter extends CsvConverter {
   /** CSV token. */
   private static final byte[] CSV = token("csv");
   /** CSV token. */
@@ -31,10 +32,10 @@ final class CsvDirectConverter extends CsvConverter {
   /** Lax QName conversion. */
   private final boolean lax;
 
-  /** Root node. */
-  private final FElem root = new FElem(CSV);
+  /** XML string. */
+  private final XmlTokenBuilder xml = new XmlTokenBuilder();
   /** Record. */
-  private FElem record;
+  private boolean record;
   /** Current column. */
   private int col;
 
@@ -42,16 +43,18 @@ final class CsvDirectConverter extends CsvConverter {
    * Constructor.
    * @param opts CSV options
    */
-  CsvDirectConverter(final CsvParserOptions opts) {
+  public CsvStringConverter(final CsvParserOptions opts) {
     super(opts);
     lax = opts.get(CsvOptions.LAX);
     atts = opts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
+    xml.openElement(CSV);
   }
 
   @Override
   public void record() {
-    record = new FElem(RECORD);
-    root.add(record);
+    if(record) xml.closeElement(RECORD);
+    xml.openElement(RECORD);
+    record = true;
     col = 0;
   }
 
@@ -63,18 +66,21 @@ final class CsvDirectConverter extends CsvConverter {
   @Override
   public void entry(final byte[] entry) {
     final byte[] name = headers.get(col++);
-    final FElem e;
+    byte[] elem = ENTRY, attr = null;
     if(atts) {
-      e = new FElem(ENTRY);
-      if(name != null) e.add(NAME, name);
-    } else {
-      e = new FElem(name == null ? ENTRY : name);
+      attr = name;
+    } else if(name != null) {
+      elem = name;
     }
-    record.add(e.add(entry));
+    xml.openElement(elem, NAME, attr);
+    xml.addText(entry);
+    xml.closeElement(elem);
   }
 
   @Override
-  public FDoc finish() {
-    return new FDoc().add(root);
+  public Str finish() {
+    if(record) xml.closeElement(RECORD);
+    xml.closeElement(CSV);
+    return Str.get(xml.array());
   }
 }

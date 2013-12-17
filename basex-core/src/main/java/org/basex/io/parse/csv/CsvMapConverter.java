@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 
 import java.util.*;
 
+import org.basex.build.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
@@ -29,6 +30,14 @@ final class CsvMapConverter extends CsvConverter {
   private ValueBuilder record = new ValueBuilder();
   /** Current column. */
   private int col;
+
+  /**
+   * Constructor.
+   * @param opts CSV options
+   */
+  CsvMapConverter(final CsvParserOptions opts) {
+    super(opts);
+  }
 
   @Override
   public void header(final byte[] string) {

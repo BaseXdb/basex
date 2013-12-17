@@ -254,7 +254,8 @@ public abstract class OutputSerializer extends Serializer {
     print(' ');
     print(n);
     print(ATT1);
-    for(int k = 0; k < v.length; k += cl(v, k)) {
+    final int vl = v.length;
+    for(int k = 0; k < vl; k += cl(v, k)) {
       final int ch = cp(v, k);
       if(!format) {
         printChar(ch);
@@ -271,8 +272,9 @@ public abstract class OutputSerializer extends Serializer {
 
   @Override
   protected void finishText(final byte[] b) throws IOException {
+    final int bl = b.length;
     if(cdata.isEmpty() || tags.isEmpty() || !cdata.contains(tags.peek())) {
-      for(int k = 0; k < b.length; k += cl(b, k)) encode(cp(b, k));
+      for(int k = 0; k < bl; k += cl(b, k)) encode(cp(b, k));
     } else {
       print(CDATA_O);
       int c = 0;
