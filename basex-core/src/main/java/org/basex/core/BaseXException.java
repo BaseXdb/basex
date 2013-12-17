@@ -34,24 +34,4 @@ public final class BaseXException extends IOException {
     super(Util.message(ex));
     initCause(ex);
   }
-
-  /**
-   * Creates the error message from the specified text and extension array.
-   * @param text text message with optional placeholders
-   * @param ext info extensions
-   * @return argument
-   */
-  public static String message(final String text, final Object[] ext) {
-    final int es = ext.length;
-    for(int e = 0; e < es; ++e) {
-      if(ext[e] instanceof byte[]) {
-        ext[e] = Token.string((byte[]) ext[e]);
-      } else if(ext[e] instanceof Throwable) {
-        ext[e] = Util.message((Throwable) ext[e]);
-      } else if(!(ext[e] instanceof String)) {
-        ext[e] = String.valueOf(ext[e]);
-      }
-    }
-    return Util.info(text, ext);
-  }
 }

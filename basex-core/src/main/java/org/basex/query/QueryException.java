@@ -4,7 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.util.*;
 
-import org.basex.core.*;
+import org.basex.data.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -73,7 +73,7 @@ public class QueryException extends Exception {
    * @param ext error extension
    */
   public QueryException(final InputInfo ii, final QNm errc, final String msg, final Object... ext) {
-    super(BaseXException.message(msg, ext));
+    super(message(msg, ext));
     name = errc;
     if(ii != null) info(ii);
     for(final Object o : ext) {
@@ -252,5 +252,29 @@ public class QueryException extends Exception {
   public QueryException notCatchable() {
     catchable = false;
     return this;
+  }
+
+  /**
+   * Creates the error message from the specified text and extension array.
+   * @param text text message with optional placeholders
+   * @param ext info extensions
+   * @return argument
+   */
+  private static String message(final String text, final Object[] ext) {
+    final int es = ext.length;
+    for(int e = 0; e < es; e++) {
+      Object o = ext[e];
+      if(o instanceof byte[]) {
+        o = Token.string((byte[]) o);
+      } else if(o instanceof ExprInfo) {
+        o = ((ExprInfo) o).toString(Integer.MAX_VALUE);
+      } else if(o instanceof Throwable) {
+        o = Util.message((Throwable) o);
+      } else if(!(o instanceof String)) {
+        o = String.valueOf(o);
+      }
+      ext[e] = o;
+    }
+    return Util.info(text, ext);
   }
 }

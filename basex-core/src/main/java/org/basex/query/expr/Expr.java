@@ -258,14 +258,6 @@ public abstract class Expr extends ExprInfo {
   public abstract Expr copy(QueryContext ctx, VarScope scp, IntObjMap<Var> vs);
 
   /**
-   * Adds the names of the databases that will be touched by the query.
-   * @param db set
-   * @param rootContext is in root context
-   * @return {@code false} if databases cannot be statically determined
-  public abstract boolean databases(final StringList db, final boolean rootContext);
-   */
-
-  /**
    * <p>This method is overwritten by {@link CmpG}, {@link CmpV} and {@link FNSimple}.
    * It is called at compile time by expressions that perform
    * effective boolean value tests (e.g. {@link If} or {@link Preds}).

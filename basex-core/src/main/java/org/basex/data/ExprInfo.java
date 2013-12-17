@@ -28,6 +28,15 @@ public abstract class ExprInfo {
     return Token.token(Util.className(this));
   }
 
+  /**
+   * Returns a string representation of the expression that can be embedded in error messages.
+   * @param max maximum length of returned string
+   * @return class name
+   */
+  public String toString(@SuppressWarnings("unused") final int max) {
+    return toString();
+  }
+
   @Override
   public abstract String toString();
 
