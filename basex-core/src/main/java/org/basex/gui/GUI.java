@@ -517,7 +517,7 @@ public final class GUI extends AGUI {
    * @param val value
    */
   public <T extends Option<V>, V> void set(final T opt, final V val) {
-    if(!context.options.get(opt).equals(val)) {
+    if(!context.options.get(opt).toString().equals(val.toString())) {
       final Set cmd = new Set(opt, val);
       cmd.run(context);
       info.setInfo(cmd.info(), cmd, true, false);
