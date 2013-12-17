@@ -14,6 +14,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 
@@ -38,20 +39,22 @@ public final class FNXQuery extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case _XQUERY_EVAL:   return eval(ctx);
-      case _XQUERY_INVOKE: return invoke(ctx);
-      case _XQUERY_TYPE:   return value(ctx).iter();
-      default:             return super.iter(ctx);
+      case _XQUERY_EVAL:     return eval(ctx, true);
+      case _XQUERY_EVALUATE: return eval(ctx, false);
+      case _XQUERY_INVOKE:   return invoke(ctx);
+      case _XQUERY_TYPE:     return value(ctx).iter();
+      default:               return super.iter(ctx);
     }
   }
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case _XQUERY_EVAL:   return eval(ctx).value();
-      case _XQUERY_INVOKE: return invoke(ctx).value();
-      case _XQUERY_TYPE:   return type(ctx).value(ctx);
-      default:             return super.value(ctx);
+      case _XQUERY_EVAL:     return eval(ctx, true).value();
+      case _XQUERY_EVALUATE: return eval(ctx, false).value();
+      case _XQUERY_INVOKE:   return invoke(ctx).value();
+      case _XQUERY_TYPE:     return type(ctx).value(ctx);
+      default:               return super.value(ctx);
     }
   }
 
@@ -63,11 +66,12 @@ public final class FNXQuery extends StandardFunc {
   /**
    * Performs the eval function.
    * @param ctx query context
+   * @param openDB allow opening new databases
    * @return resulting value
    * @throws QueryException query exception
    */
-  private ValueBuilder eval(final QueryContext ctx) throws QueryException {
-    return eval(ctx, checkStr(expr[0], ctx), null);
+  private ValueBuilder eval(final QueryContext ctx, final boolean openDB) throws QueryException {
+    return eval(ctx, checkStr(expr[0], ctx), null, openDB);
   }
 
   /**
@@ -75,13 +79,15 @@ public final class FNXQuery extends StandardFunc {
    * @param ctx query context
    * @param qu query string
    * @param path path to query file (may be {@code null})
+   * @param openDB allow opening new databases
    * @return resulting value
    * @throws QueryException query exception
    */
-  private ValueBuilder eval(final QueryContext ctx, final byte[] qu, final String path)
-      throws QueryException {
+  private ValueBuilder eval(final QueryContext ctx, final byte[] qu, final String path,
+      final boolean openDB) throws QueryException {
 
     final QueryContext qc = new QueryContext(ctx);
+    qc.resource.openDB = openDB;
     final StaticContext sctx = new StaticContext(qc.context.options.get(MainOptions.XQUERY3));
 
     // bind variables and context item
@@ -96,8 +102,17 @@ public final class FNXQuery extends StandardFunc {
       qc.parseMain(string(qu), path, sctx);
       if(qc.updating) throw BXXQ_UPDATING.get(info);
       qc.compile();
+
       final ValueBuilder vb = new ValueBuilder();
-      cache(qc.iter(), vb, ctx);
+      final Iter iter = qc.iter();
+      if(openDB) {
+        cache(iter, vb, ctx);
+      } else {
+        for(Item it; (it = iter.next()) != null;) {
+          if(it instanceof FItem) throw FIVALUE.get(info, it);
+          vb.add(it);
+        }
+      }
       return vb;
     } finally {
       qc.close();
@@ -114,7 +129,7 @@ public final class FNXQuery extends StandardFunc {
     checkCreate(ctx);
     final IO io = checkPath(expr[0], ctx);
     try {
-      return eval(ctx, io.read(), io.path());
+      return eval(ctx, io.read(), io.path(), true);
     } catch(final IOException ex) {
       throw IOERR.get(info, ex);
     }

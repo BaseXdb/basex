@@ -505,6 +505,8 @@ public final class QueryContext extends Proc {
    * Closes the query context.
    */
   public void close() {
+    info.close();
+
     // close only once
     if(closed) return;
     closed = true;

@@ -25,6 +25,8 @@ import org.basex.util.list.*;
 public final class QueryResources {
   /** Resources. */
   public final HashMap<String, String[]> resources = new HashMap<String, String[]>();
+  /** Allow opening new databases. */
+  public boolean openDB = true;
 
   /** Database context. */
   private final QueryContext ctx;
@@ -84,12 +86,13 @@ public final class QueryResources {
    * @return database instance
    * @throws QueryException query exception
    */
-  public Data data(final String name, final InputInfo info) throws QueryException {
+  public Data database(final String name, final InputInfo info) throws QueryException {
     // check if a database with the same name has already been opened
     for(int d = 0; d < datas; ++d) {
       final String n = data[d].meta.name;
       if(Prop.CASE ? n.equals(name) : n.equalsIgnoreCase(name)) return data[d];
     }
+    if(!openDB) throw BXXQ_NEWDB.get(info, name);
 
     try {
       // open and add new data reference
@@ -127,11 +130,10 @@ public final class QueryResources {
       if(dt.resources.docs().size() == 1 && IO.get(dt.meta.original).eq(qi.input))
         return new DBNode(dt, 0, Data.DOC);
 
-      // check if database and input has identical name
+      // check if database and input have identical name
       // database instance has same name as input path
       final String n = dt.meta.name;
-      if(Prop.CASE ? n.equals(qi.db) : n.equalsIgnoreCase(qi.db))
-        return doc(dt, qi, info);
+      if(Prop.CASE ? n.equals(qi.db) : n.equalsIgnoreCase(qi.db)) return doc(dt, qi, info);
     }
 
     // open new database, or create new instance
@@ -201,6 +203,8 @@ public final class QueryResources {
     return DBNodeSeq.get(dt.resources.docs(qi.path), dt, true, qi.path.isEmpty());
   }
 
+  // TEST APIS ====================================================================================
+
   /**
    * Adds a document with the specified path. Only called from the test APIs.
    * @param name document identifier (may be {@code null})
@@ -210,6 +214,7 @@ public final class QueryResources {
    */
   public void addDoc(final String name, final String path, final IO baseIO)
       throws QueryException {
+
     final QueryInput qi = new QueryInput(path);
     final Data d = create(qi, true, baseIO, null);
     if(name != null) d.meta.original = name;
@@ -251,7 +256,7 @@ public final class QueryResources {
    * @return data reference
    */
   private Data open(final QueryInput input) {
-    if(input.db != null) {
+    if(openDB && input.db != null) {
       try {
         // try to open database
         final Data d = Open.open(input.db, ctx.context);
@@ -276,11 +281,19 @@ public final class QueryResources {
   private Data create(final QueryInput input, final boolean single, final IO baseIO,
       final InputInfo info) throws QueryException {
 
+    // check if input is an existing file
+    final IO source = checkPath(input, baseIO, info);
+    final boolean createDB = ctx.context.options.get(MainOptions.FORCECREATE);
+    // check if new databases can be created
+    if(createDB && !openDB) throw BXXQ_NEWDB.get(info, input.original);
+
+    if(single && source.isDir()) WHICHRES.get(info, baseIO);
     try {
-      final Data d = CreateDB.create(checkPath(input, baseIO, info), single, ctx.context);
+      final Data dt = createDB ? CreateDB.create(source, ctx.context) :
+        CreateDB.mainMem(source, ctx.context);
       input.path = "";
-      addData(d);
-      return d;
+      addData(dt);
+      return dt;
     } catch(final IOException ex) {
       throw IOERR.get(info, ex);
     }

@@ -45,6 +45,8 @@ public final class QueryInfo {
   private TokenList compile = new TokenList(0);
   /** Evaluation info. */
   private TokenList evaluate = new TokenList(0);
+  /** Optimized query. */
+  private String optQuery;
 
   /**
    * Constructor.
@@ -70,6 +72,13 @@ public final class QueryInfo {
    */
   public void evalInfo(final String string) {
     if(verbose) evaluate.add(token(string.replaceAll("\r?\n\\s*", " ")));
+  }
+
+  /**
+   * Finalizes the query info.
+   */
+  public void close() {
+    if(verbose) optQuery = qc.root == null ? qc.funcs.toString() : usedDecls(qc.root);
   }
 
   /**
@@ -177,7 +186,6 @@ public final class QueryInfo {
     if(!compile.isEmpty()) {
       tb.add(NL).add(COMPILING).add(COL).add(NL);
       for(final byte[] line : compile) tb.add(line).add(NL);
-      final String optQuery = qc.root == null ? qc.funcs.toString() : usedDecls(qc.root);
       tb.add(NL).add(OPTIMIZED_QUERY).add(COL).add(NL).add(optQuery).add(NL);
     }
     if(!evaluate.isEmpty()) {

@@ -176,7 +176,6 @@ public final class CreateDB extends ACreate {
    */
   private static synchronized MemData mainMem(final Parser parser, final Context ctx)
       throws IOException {
-
     if(ctx.user.has(Perm.CREATE)) return MemBuilder.build(parser);
     throw new BaseXException(PERM_REQUIRED_X, Perm.CREATE);
   }
@@ -190,29 +189,18 @@ public final class CreateDB extends ACreate {
    */
   public static synchronized MemData mainMem(final IO source, final Context ctx)
       throws IOException {
-
     if(!source.exists()) throw new BaseXException(RES_NOT_FOUND_X, source);
     return mainMem(new DirParser(source, ctx.options, null), ctx);
   }
 
   /**
-   * Creates a new database if a valid path was specified.
-   * @param source document source
-   * @param single expect single document
+   * Creates a new database from the specified source.
+   * @param source source path
    * @param ctx database context
    * @return data reference
    * @throws IOException I/O exception
    */
-  public static synchronized Data create(final IO source, final boolean single, final Context ctx)
-      throws IOException {
-
-    // check if input is an existing file
-    if(single && source.isDir()) throw new BaseXException(RES_NOT_FOUND_X, source);
-
-    // default: create a main memory instance
-    if(!ctx.options.get(MainOptions.FORCECREATE)) return mainMem(source, ctx);
-
-    // otherwise, create a persistent database instance
+  public static synchronized Data create(final IO source, final Context ctx) throws IOException {
     final String nm = source.dbname();
     final DirParser dp = new DirParser(source, ctx.options, ctx.globalopts.dbpath(nm));
     return create(nm, dp, ctx);

@@ -1004,6 +1004,9 @@ public enum Function {
   /** XQuery function. */
   _XQUERY_EVAL(FNXQuery.class, "eval(string[,bindings])", arg(STR, ITEM), ITEM_ZM, flag(NDT)),
   /** XQuery function. */
+  _XQUERY_EVALUATE(FNXQuery.class, "evaluate(string[,bindings])",
+      arg(STR, ITEM), ITEM_ZM, flag(NDT)),
+  /** XQuery function. */
   _XQUERY_INVOKE(FNXQuery.class, "invoke(uri[,bindings])", arg(STR, ITEM), ITEM_ZM, flag(NDT)),
   /** XQuery function. */
   _XQUERY_TYPE(FNXQuery.class, "type(value)", arg(ITEM_ZM), ITEM_ZM),

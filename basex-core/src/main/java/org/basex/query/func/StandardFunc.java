@@ -168,7 +168,7 @@ public abstract class StandardFunc extends Arr {
   final Data checkData(final QueryContext ctx) throws QueryException {
     final String name = string(checkStr(expr[0], ctx));
     if(!Databases.validName(name)) throw INVDB.get(info, name);
-    return ctx.resource.data(name, info);
+    return ctx.resource.database(name, info);
   }
 
   /**
@@ -294,12 +294,11 @@ public abstract class StandardFunc extends Arr {
       throws QueryException {
 
     for(Item it; (it = ir.next()) != null;) {
+      if(it instanceof FItem) throw FIVALUE.get(info, it);
+      // cache database nodes
       final Data d = it.data();
-      if(d != null && !d.inMemory()) {
-        it = ((ANode) it).dbCopy(ctx.context.options);
-      } else if(it instanceof FItem) {
-        throw FIVALUE.get(info, it);
-      }
+      if(d != null && !d.inMemory()) it = ((ANode) it).dbCopy(ctx.context.options);
+      // add materialized version of nodes
       vb.add(it.materialize(info));
     }
   }

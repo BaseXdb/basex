@@ -13,6 +13,9 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class FNXQueryTest extends AdvancedQueryTest {
+  /** Path to test file. */
+  private static final String PATH = "src/test/resources/input.xml";
+
   /** Test method. */
   @Test
   public void eval() {
@@ -32,6 +35,16 @@ public final class FNXQueryTest extends AdvancedQueryTest {
     error(_XQUERY_EVAL.args("declare %updating function local:x() {()}; local:x()"),
         Err.BXXQ_UPDATING);
     query(_XQUERY_EVAL.args("declare %updating function local:x() {()}; 1"));
+    query(_XQUERY_EVAL.args("\"" + DOC.args(PATH).replace('"', '\'') + "\""));
+  }
+
+  /** Test method. */
+  @Test
+  public void evaluate() {
+    query(_XQUERY_EVALUATE.args("1"), 1);
+    query(_XQUERY_EVALUATE.args("\"" + DOC.args(PATH).replace('"', '\'') + "\""));
+    error(_XQUERY_EVALUATE.args("\"" + _DB_OPEN.args("X").replace('"', '\'') + "\""),
+        Err.BXXQ_NEWDB);
   }
 
   /** Test method. */
