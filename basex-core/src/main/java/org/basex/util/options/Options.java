@@ -11,6 +11,8 @@ import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
+import org.basex.io.out.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -75,36 +77,36 @@ public class Options implements Iterable<Option<?>> {
    * Writes the options to disk.
    */
   public final synchronized void write() {
-    BufferedWriter bw = null;
+    PrintOutput po = null;
     try {
-      bw = new BufferedWriter(new FileWriter(file.file()));
+      po = new PrintOutput(file.path());
       boolean first = true;
       for(final Option<?> opt : options(getClass())) {
         final String name = opt.name();
         if(opt instanceof Comment) {
-          if(!first) bw.write(NL);
-          bw.write("# " + name + NL);
+          if(!first) po.print(NL);
+          po.println("# " + name);
         } else if(opt instanceof NumbersOption) {
           final int[] ints = get((NumbersOption) opt);
           final int is = ints == null ? 0 : ints.length;
-          for(int i = 0; i < is; ++i) bw.write(name + i + " = " + ints[i] + NL);
+          for(int i = 0; i < is; ++i) po.println(name + i + " = " + ints[i]);
         } else if(opt instanceof StringsOption) {
           final String[] strings = get((StringsOption) opt);
           final int ss = strings == null ? 0 : strings.length;
-          bw.write(name + " = " + ss + NL);
-          for(int i = 0; i < ss; ++i) bw.write(name + (i + 1) + " = " + strings[i] + NL);
+          po.println(name + " = " + ss);
+          for(int i = 0; i < ss; ++i) po.println(name + (i + 1) + " = " + strings[i]);
         } else {
-          bw.write(name + " = " + get(opt) + NL);
+          po.println(name + " = " + get(opt));
         }
         first = false;
       }
-      bw.write(NL + PROPUSER + NL);
-      bw.write(user.toString());
+      po.println(NL + PROPUSER);
+      po.print(user.toString());
     } catch(final Exception ex) {
       Util.errln("% could not be written.", file);
       Util.debug(ex);
     } finally {
-      if(bw != null) try { bw.close(); } catch(final IOException ignored) { }
+      if(po != null) try { po.close(); } catch(final IOException ignored) { }
     }
   }
 
@@ -498,11 +500,11 @@ public class Options implements Iterable<Option<?>> {
     final StringList errs = new StringList();
     final boolean exists = file.exists();
     if(exists) {
-      BufferedReader br = null;
+      NewlineInput nli = null;
       try {
-        br = new BufferedReader(new FileReader(file.file()));
+        nli = new NewlineInput(opts);
         boolean local = false;
-        for(String line; (line = br.readLine()) != null;) {
+        for(String line; (line = nli.readLine()) != null;) {
           line = line.trim();
 
           // start of local options
@@ -549,7 +551,7 @@ public class Options implements Iterable<Option<?>> {
         errs.add("file could not be parsed.");
         Util.errln(ex);
       } finally {
-        if(br != null) try { br.close(); } catch(final IOException ignored) { }
+        if(nli != null) try { nli.close(); } catch(final IOException ignored) { }
       }
     }
 
