@@ -75,7 +75,7 @@ public final class EditorView extends View {
   /** Query area. */
   private final BaseXTabs tabs;
   /** Query file that has last been evaluated. */
-  public IOFile execFile;
+  private IOFile execFile;
 
   /** Sizes. */
   private double[] sizes = new double[] { 0.3, 0.7 };
@@ -234,7 +234,7 @@ public final class EditorView extends View {
     });
     stop.addActionListener(new ActionListener() {
       @Override
-     public void actionPerformed(final ActionEvent e) {
+      public void actionPerformed(final ActionEvent e) {
         stop.setEnabled(false);
         go.setEnabled(false);
         gui.stop();
@@ -327,7 +327,7 @@ public final class EditorView extends View {
   public void project() {
     if(gui.gopts.get(GUIOptions.SHOWPROJECT)) {
       split.sizes(sizes);
-      focusProject(false);
+      project.focus();
     } else {
       sizes = split.sizes(new double[] { 0, 1 });
       getEditor().requestFocusInWindow();
@@ -336,10 +336,9 @@ public final class EditorView extends View {
 
   /**
    * Focuses the project view.
-   * @param filt focus filter or content
    */
-  public void focusProject(final boolean filt) {
-    project.focus(filt);
+  public void focusProject() {
+    project.focus();
   }
 
   /**
@@ -634,8 +633,7 @@ public final class EditorView extends View {
 
   /**
    * Closes an editor.
-   * @param edit editor to be closed. {@code null} closes the currently
-   * opened editor.
+   * @param edit editor to be closed. {@code null} closes the currently opened editor.
    * @return {@code true} if editor was closed
    */
   public boolean close(final EditorArea edit) {
@@ -654,7 +652,7 @@ public final class EditorView extends View {
       addTab();
       SwingUtilities.invokeLater(new Runnable() {
         @Override
-        public void run() { focusProject(false); }
+        public void run() { project.focus(); }
       });
     } else if(i + 1 == t) {
       // if necessary, activate last editor tab
@@ -710,8 +708,8 @@ public final class EditorView extends View {
     } else {
       info.setCursor(CURSORHAND);
       info.setText(th.getLocalizedMessage(), Msg.ERROR);
-      final String tt = th.getMessage().replace("<", "&lt;").replace(">", "&gt;").
-          replaceAll("\r?\n", "<br/>").replaceAll("(<br/>.*?)<br/>.*", "$1");
+      final String tt = th.getMessage().replace("<", "&lt;").replace(">", "&gt;").replaceAll(
+          "\r?\n", "<br/>").replaceAll("(<br/>.*?)<br/>.*", "$1");
       info.setToolTipText("<html>" + tt + "</html>");
 
       if(th instanceof QueryIOException) {

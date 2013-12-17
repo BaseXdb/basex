@@ -20,11 +20,11 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
 
   /**
    * Constructor.
-   * @param lay layout: horizontal = true, vertical = false
+   * @param horizontal horizontal/vertical layout
    */
-  public BaseXSplit(final boolean lay) {
+  public BaseXSplit(final boolean horizontal) {
     layout(this);
-    horiz = lay;
+    horiz = horizontal;
   }
 
   @Override

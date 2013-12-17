@@ -9,11 +9,10 @@ import java.util.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.tree.*;
 
 import org.basex.core.*;
 import org.basex.gui.*;
+import org.basex.gui.GUIConstants.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.view.editor.*;
@@ -27,23 +26,23 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class ProjectView extends BaseXPanel implements TreeWillExpandListener {
+public final class ProjectView extends BaseXPanel {
   /** Root directory. */
   final ProjectDir root;
-  /** Root node. */
-  final ProjectCellRenderer renderer;
   /** Tree. */
-  final BaseXTree tree;
+  final ProjectTree tree;
   /** Editor view. */
-  final EditorView view;
+  final EditorView editor;
   /** Filter field. */
   final ProjectFilter filter;
   /** Filter list. */
   final ProjectList list;
-  /** Scroll pane. */
-  final JScrollPane scroll;
   /** Root path. */
   final BaseXTextField path;
+  /** Splitter. */
+  private final BaseXSplit split;
+  /** Sizes. */
+  private double[] sizes = new double[] { 0.2, 0.8 };
 
   /**
    * Constructor.
@@ -51,42 +50,12 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
    */
   public ProjectView(final EditorView ev) {
     super(ev.gui);
-    view = ev;
+    editor = ev;
     setLayout(new BorderLayout());
 
-    final DefaultMutableTreeNode invisible = new DefaultMutableTreeNode();
-    tree = new BaseXTree(invisible, gui).border(4, 4, 4, 4);
-    renderer = new ProjectCellRenderer();
-    tree.setExpandsSelectedPaths(true);
-    tree.setCellRenderer(renderer);
-    tree.addTreeWillExpandListener(this);
-    tree.addMouseListener(new MouseAdapter() {
-      @Override public void mousePressed(final MouseEvent e) {
-        if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
-          new OpenCmd().execute(gui);
-      }
-    });
-
-    tree.setCellEditor(new ProjectCellEditor(tree, renderer));
-    tree.setEditable(true);
-
-    // choose common parent directories of project directories
+    tree = new ProjectTree(this);
     root = new ProjectDir(new IOFile(root()), this);
-    invisible.add(root);
-
-    // expand root and child directories
-    for(int r = 0; r < 2; r++) tree.expandRow(r);
-    tree.setRootVisible(false);
-    tree.setSelectionRow(0);
-
-    // add popup
-    new BaseXPopup(tree, gui, new OpenCmd(), new OpenExternalCmd(), null,
-        new DeleteCmd(), new RenameCmd(), new NewDirCmd(), null,
-        new RefreshCmd(), new CopyPathCmd());
-
-    // add scroll bar
-    scroll = new JScrollPane(tree);
-    scroll.setBorder(new EmptyBorder(0, 0, 0, 0));
+    tree.init(root);
 
     filter = new ProjectFilter(this);
     list = new ProjectList(this);
@@ -112,27 +81,32 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
     back.add(browse, BorderLayout.EAST);
     back.add(filter, BorderLayout.SOUTH);
 
+    // add scroll bars
+    final JScrollPane lscroll = new JScrollPane(list);
+    lscroll.setBorder(new EmptyBorder(0, 0, 0, 0));
+    final JScrollPane tscroll = new JScrollPane(tree);
+    tscroll.setBorder(new EmptyBorder(0, 0, 0, 0));
+
+    split = new BaseXSplit(false);
+    split.mode(Fill.NONE);
+    split.add(lscroll);
+    split.add(tscroll);
+    split.sizes(sizes);
+    showList(false);
+
     add(back, BorderLayout.NORTH);
-    add(scroll, BorderLayout.CENTER);
+    add(split, BorderLayout.CENTER);
   }
 
-  @Override
-  public void treeWillExpand(final TreeExpansionEvent event) throws ExpandVetoException {
-    final Object obj = event.getPath().getLastPathComponent();
-    if(obj instanceof ProjectNode) {
-      final ProjectNode node = (ProjectNode) obj;
-      node.expand();
-      node.updateTree();
-    }
-  }
-
-  @Override
-  public void treeWillCollapse(final TreeExpansionEvent event) throws ExpandVetoException {
-    final Object obj = event.getPath().getLastPathComponent();
-    if(obj instanceof ProjectNode) {
-      final ProjectNode node = (ProjectNode) obj;
-      node.collapse();
-      node.updateTree();
+  /**
+   * Makes the list (in)visible.
+   * @param vis visibility flag
+   */
+  public void showList(final boolean vis) {
+    if(vis) {
+      split.sizes(sizes);
+    } else {
+      sizes = split.sizes(new double[] { 0, 1 });
     }
   }
 
@@ -157,13 +131,12 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
 
   /**
    * Focuses the project view.
-   * @param filt focus filter or content
    */
-  public void focus(final boolean filt) {
-    if(filt) {
+  public void focus() {
+    if(split.getComponent(0).getHeight() != 0) {
       filter.focus();
     } else {
-      scroll.getViewport().getView().requestFocusInWindow();
+      tree.requestFocusInWindow();
     }
   }
 
@@ -230,61 +203,23 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
    * @param search search string
    */
   void open(final IOFile file, final String search) {
-    final EditorArea editor = view.open(file);
-    if(editor == null) return;
+    final EditorArea ea = editor.open(file);
+    if(ea == null) return;
 
     // delay search and focus request (avoid keyTyped event to be handled in editor)
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        editor.jump(search);
+        ea.jump(search);
       }
     });
   }
 
   /**
-   * Returns the selected nodes.
-   * @return selected node
-   */
-  private ArrayList<ProjectNode> selectedNodes() {
-    final ArrayList<ProjectNode> nodes = new ArrayList<ProjectNode>();
-    final TreePath[] paths = tree.getSelectionPaths();
-    if(paths != null) {
-      for(final TreePath tp : paths) {
-        final Object node = tp.getLastPathComponent();
-        if(node instanceof ProjectNode) nodes.add((ProjectNode) node);
-      }
-    }
-    return nodes;
-  }
-
-  /**
-   * Returns a single selected node, or {@code null} if zero or more than node is selected.
-   * @return selected node
-   */
-  private ProjectNode selectedNode() {
-    final TreePath tp = selectedPath();
-    if(tp != null) {
-      final Object node = tp.getLastPathComponent();
-      if(node instanceof ProjectNode) return (ProjectNode) node;
-    }
-    return null;
-  }
-
-  /**
-   * Returns the selected path, or returns {@code null} if zero or more than paths are selected.
-   * @return path
-   */
-  private TreePath selectedPath() {
-    final TreePath[] tps = tree.getSelectionPaths();
-    return tps == null || tps.length > 1 ? null : tps[0];
-  }
-
-  /**
    * Changes the root directory.
    */
-  private void change() {
-    final ProjectNode child = selectedNode();
+  void change() {
+    final ProjectNode child = tree.selectedNode();
     final BaseXFileChooser fc = new BaseXFileChooser(CHOOSE_DIR, child.file.path(), gui);
     final IOFile io = fc.select(Mode.DOPEN);
     if(io != null) {
@@ -293,147 +228,6 @@ public final class ProjectView extends BaseXPanel implements TreeWillExpandListe
       filter.reset();
       path.setText(io.path());
       gui.gopts.set(GUIOptions.PROJECTPATH, io.path());
-    }
-  }
-
-  // COMMANDS =====================================================================================
-
-  /** Refresh command. */
-  final class RefreshCmd extends GUIPopupCmd {
-    /** Constructor. */
-    RefreshCmd() { super(REFRESH, BaseXKeys.REFRESH); }
-
-    @Override public void execute() {
-      filter.reset();
-      selectedNode().refresh();
-    }
-
-    @Override public boolean enabled(final GUI main) {
-      return selectedNode() != null;
-    }
-  }
-
-  /** New directory command. */
-  final class NewDirCmd extends GUIPopupCmd {
-    /** Constructor. */
-    NewDirCmd() { super(NEW_DIR, BaseXKeys.NEWDIR); }
-
-    @Override public void execute() {
-      ProjectNode parent = selectedNode();
-      if(parent instanceof ProjectFile) parent = (ProjectDir) parent.getParent();
-
-      // choose free name
-      String name = '(' + NEW_DIR + ')';
-      IOFile file = new IOFile(parent.file, name);
-      int c = 1;
-      while(file.exists()) {
-        name = '(' + NEW_DIR + ' ' + ++c + ')';
-        file = new IOFile(parent.file, name);
-      }
-      if(file.md()) {
-        tree.setSelectionPaths(null);
-        parent.refresh();
-        final int cl = parent.getChildCount();
-        for(int i = 0; i < cl; i++) {
-          final ProjectNode node = (ProjectNode) parent.getChildAt(i);
-          if(node.file.name().equals(name)) {
-            final TreePath tp = node.path();
-            tree.setSelectionPath(tp);
-            tree.startEditingAtPath(tp);
-            break;
-          }
-        }
-      }
-    }
-    @Override public boolean enabled(final GUI main) { return selectedNode() != null; }
-  }
-
-  /** Delete command. */
-  final class DeleteCmd extends GUIPopupCmd {
-    /** Constructor. */
-    DeleteCmd() { super(DELETE + DOTS, BaseXKeys.DELETE); }
-
-    @Override public void execute() {
-      final ProjectNode node = selectedNode();
-      if(BaseXDialog.confirm(gui, Util.info(DELETE_FILE_X, node.file))) {
-        final ProjectNode parent = (ProjectNode) node.getParent();
-        // delete file or show error dialog
-        if(!view.delete(node.file)) {
-          BaseXDialog.error(gui, Util.info(FILE_NOT_DELETED_X, node.file));
-        } else {
-          parent.refresh();
-          tree.setSelectionPath(parent.path());
-          filter.reset();
-        }
-      }
-    }
-
-    @Override public boolean enabled(final GUI main) {
-      final ProjectNode node = selectedNode();
-      return node != null && !node.root();
-    }
-  }
-
-  /** Rename command. */
-  final class RenameCmd extends GUIPopupCmd {
-    /** Constructor. */
-    RenameCmd() { super(RENAME, BaseXKeys.RENAME); }
-
-    @Override public void execute() {
-      tree.startEditingAtPath(selectedNode().path());
-      filter.reset();
-    }
-
-    @Override public boolean enabled(final GUI main) {
-      final ProjectNode node = selectedNode();
-      return node != null && !node.root();
-    }
-  }
-
-  /** Open command. */
-  final class OpenCmd extends GUIPopupCmd {
-    /** Constructor. */
-    OpenCmd() { super(OPEN, BaseXKeys.ENTER); }
-
-    @Override public void execute() {
-      for(final ProjectNode node : selectedNodes()) open(node.file, null);
-    }
-
-    @Override public boolean enabled(final GUI main) {
-      for(final ProjectNode node : selectedNodes()) {
-        if(node.file.isDir()) return false;
-      }
-      return true;
-    }
-  }
-
-  /** Open externally command. */
-  final class OpenExternalCmd extends GUIPopupCmd {
-    /** Constructor. */
-    OpenExternalCmd() { super(OPEN_EXTERNALLY, BaseXKeys.OPEN); }
-
-    @Override public void execute() {
-      for(final ProjectNode node : selectedNodes()) {
-        try {
-          node.file.open();
-        } catch(final IOException ex) {
-          BaseXDialog.error(gui, Util.info(FILE_NOT_OPENED_X, node.file));
-        }
-      }
-    }
-  }
-
-  /** Copy path command. */
-  final class CopyPathCmd extends GUIPopupCmd {
-    /** Constructor. */
-    CopyPathCmd() { super(COPY_PATH, BaseXKeys.COPYPATH); }
-
-    @Override public void execute() {
-      BaseXLayout.copy(selectedNode().file.path());
-    }
-
-    @Override public boolean enabled(final GUI main) {
-      return selectedNode() != null;
     }
   }
 }

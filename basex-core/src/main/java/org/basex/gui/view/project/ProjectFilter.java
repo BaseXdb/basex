@@ -177,11 +177,8 @@ final class ProjectFilter extends BaseXBack {
     lastContents = content;
     ++threadID;
 
-    final Component oldView = project.scroll.getViewport().getView(), newView;
-    if(file.isEmpty() && content.isEmpty()) {
-      newView = project.tree;
-    } else {
-      newView = project.list;
+    final boolean list = !file.isEmpty() || !content.isEmpty();
+    if(list) {
       final Thread t = new Thread() {
         @Override
         public void run() {
@@ -191,7 +188,7 @@ final class ProjectFilter extends BaseXBack {
       t.setDaemon(true);
       t.start();
     }
-    if(oldView != newView) project.scroll.setViewportView(newView);
+    project.showList(list);
   }
 
   /**
