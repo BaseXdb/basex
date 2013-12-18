@@ -143,9 +143,12 @@ final class TextRenderer extends BaseXBack {
    */
   private void drawLinesSep(final Graphics g) {
     if(edit) {
-      final int lw = offset - OFFSET * 3 / 2;
+      int lx = offset - OFFSET * 3 / 2;
       g.setColor(GUIConstants.LGRAY);
-      g.drawLine(lw, 0, lw, height);
+      g.drawLine(lx, 0, lx, height);
+      // line margin
+      lx = offset + fontWidth(g, ' ') * 100;
+      g.drawLine(lx, 0, lx, height);
     }
   }
 
