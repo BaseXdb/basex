@@ -263,7 +263,10 @@ public class TextPanel extends BaseXPanel {
   @Override
   public final void setFont(final Font f) {
     super.setFont(f);
-    if(rend != null) rend.setFont(f);
+    if(rend != null) {
+      rend.setFont(f);
+      scrollCode.invokeLater(true);
+    }
   }
 
   /** Thread counter. */
@@ -628,34 +631,35 @@ public class TextPanel extends BaseXPanel {
 
     editor.setCaret();
     final byte[] tmp = editor.text();
-    if(txt == tmp) {
-      cursorCode.invokeLater(down ? 2 : 0);
-    } else {
+    if(txt != tmp) {
       // text has changed: add old text to history
       hist.store(tmp, caret, editor.caret());
       scrollCode.invokeLater(down);
+    } else if(caret != editor.caret()) {
+      // cursor position has changed
+      cursorCode.invokeLater(down ? 2 : 0);
     }
   }
 
-  /** Thread counter. */
-  private final GUICode scrollCode = new GUICode() {
+  /** Updates the scroll bar. */
+  public final GUICode scrollCode = new GUICode() {
     @Override
-    public void execute(final Object arg) {
+    public void execute(final Object down) {
       rend.updateScrollbar();
-      cursorCode.execute((Boolean) arg ? 2 : 0);
+      cursorCode.execute((Boolean) down ? 2 : 0);
     }
   };
 
-  /** Thread counter. */
+  /** Updates the cursor position. */
   private final GUICode cursorCode = new GUICode() {
     @Override
-    public void execute(final Object arg) {
+    public void execute(final Object algn) {
       // updates the visible area
       final int p = scroll.pos();
       final int y = rend.cursorY();
       final int m = y + rend.fontHeight() * 3 - getHeight();
       if(p < m || p > y) {
-        final int align = (Integer) arg;
+        final int align = (Integer) algn;
         scroll.pos(align == 0 ? y : align == 1 ? y - getHeight() / 2 : m);
         rend.repaint();
       }
