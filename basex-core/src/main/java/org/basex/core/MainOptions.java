@@ -120,6 +120,8 @@ public final class MainOptions extends Options {
   public static final BooleanOption CHECKSTRINGS = new BooleanOption("CHECKSTRINGS", true);
   /** Levenshtein default error. */
   public static final NumberOption LSERROR = new NumberOption("LSERROR", 0);
+  /** Runs the query results, or only parses it. */
+  public static final BooleanOption RUNQUERY = new BooleanOption("RUNQUERY", true);
   /** Number of query executions. */
   public static final NumberOption RUNS = new NumberOption("RUNS", 1);
 
@@ -142,10 +144,6 @@ public final class MainOptions extends Options {
   public static final BooleanOption DOTPLAN = new BooleanOption("DOTPLAN", false);
   /** Compact dot representation. */
   public static final BooleanOption DOTCOMPACT = new BooleanOption("DOTCOMPACT", false);
-  /** Display dot graph. */
-  public static final BooleanOption DOTDISPLAY = new BooleanOption("DOTDISPLAY", true);
-  /** Path to dotty. */
-  public static final StringOption DOTTY = new StringOption("DOTTY", "dotty");
 
   /** Flushes the database after each update. */
   public static final BooleanOption AUTOFLUSH = new BooleanOption("AUTOFLUSH", true);

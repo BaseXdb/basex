@@ -54,7 +54,7 @@ public interface Text {
   String LOCALMODE = "Standalone";
   /** Start information. */
   String LOCALINFO =
-    " [-bcdiLoqsuvVwxz] [input]" + NL +
+    " [-bcdiLoqrRsuvVwxXz] [input]" + NL +
     "  [input]     Execute input file or expression" + NL +
     "  -b<pars>    Bind external query variables" + NL +
     "  -c<input>   Execute commands from file or string" + NL +
@@ -63,18 +63,21 @@ public interface Text {
     "  -L          Append newlines to query results" + NL +
     "  -o<output>  Write output to file" + NL +
     "  -q<expr>    Execute XQuery expression" + NL +
+    "  -r<num>     Set number of query executions" + NL +
+    "  -R          Turn query execution on/off" + NL +
     "  -s<pars>    Set serialization parameter(s)" + NL +
     "  -u          Write updates back to original files" + NL +
     "  -v/V        Show (all) process info" + NL +
     "  -w          Preserve whitespaces from input files" + NL +
-    "  -x          Show query execution plan" + NL +
+    "  -x          Show query plan" + NL +
+    "  -X          Show query plan before/after compilation" + NL +
     "  -z          Skip output of results";
 
   /** Client mode. */
   String CLIENTMODE = "Client";
   /** Client start information. */
   String CLIENTINFO =
-    " [-bcdiLnopPqsUvVwxz] [input]" + NL +
+    " [-bcdiLnopPqrRsUvVwxz] [input]" + NL +
     "  [input]     Execute input file or expression" + NL +
     "  -b<pars>    Bind external query variables" + NL +
     "  -c<input>   Execute commands from file or string" + NL +
@@ -86,11 +89,14 @@ public interface Text {
     "  -p<port>    Set server port" + NL +
     "  -P<pass>    Specify user password" + NL +
     "  -q<expr>    Execute XQuery expression" + NL +
+    "  -r<num>     Set number of query executions" + NL +
+    "  -R          Turn query execution on/off" + NL +
     "  -s<pars>    Set serialization parameter(s)" + NL +
     "  -U<name>    Specify user name" + NL +
     "  -v/V        Show (all) process info" + NL +
     "  -w          Preserve whitespaces from input files" + NL +
     "  -x          Show query execution plan" + NL +
+    "  -X          Show query plan before/after compilation" + NL +
     "  -z          Skip output of results";
 
   /** Server mode. */

@@ -60,6 +60,7 @@ public abstract class AQuery extends Command {
     } else {
       try {
         long hits = 0;
+        final boolean run = options.get(MainOptions.RUNQUERY);
         final boolean serial = options.get(MainOptions.SERIALIZE);
         final int runs = Math.max(1, options.get(MainOptions.RUNS));
         for(int r = 0; r < runs; ++r) {
@@ -68,6 +69,8 @@ public abstract class AQuery extends Command {
           qp(query, context);
           parse(p);
           if(r == 0) plan(false);
+          if(!run) continue;
+
           qp.compile();
           info.compiling += p.time();
           if(r == 0) plan(true);
@@ -188,7 +191,7 @@ public abstract class AQuery extends Command {
   private QueryProcessor qp(final String query, final Context ctx) {
     if(qp == null) {
       qp = proc(new QueryProcessor(query, ctx));
-      info = qp.ctx.info;
+      if(info == null) info = qp.ctx.info;
     }
     return qp;
   }
@@ -275,9 +278,6 @@ public abstract class AQuery extends Command {
         final DOTSerializer d = new DOTSerializer(bo, options.get(MainOptions.DOTCOMPACT));
         d.serialize(qp.plan());
         d.close();
-
-        if(options.get(MainOptions.DOTDISPLAY))
-          new ProcessBuilder(options.get(MainOptions.DOTTY), dot).start();
       }
       // show XML plan
       if(options.get(MainOptions.XMLPLAN)) {

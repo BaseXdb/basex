@@ -120,8 +120,11 @@ public class BaseX extends Main {
           execute(new Set(MainOptions.QUERYPATH, ""), false);
           console = false;
         } else if(c == 'r') {
-          // hidden option: parse number of runs
+          // parse number of runs
           execute(new Set(MainOptions.RUNS, Token.toInt(val)), false);
+        } else if(c == 'R') {
+          // toggle query evaluation
+          execute(new Set(MainOptions.RUNQUERY, null), false);
         } else if(c == 's') {
           // set/add serialization parameter
           if(sopts == null) sopts = new SerializerOptions();
@@ -149,7 +152,7 @@ public class BaseX extends Main {
           execute(new Set(MainOptions.XMLPLAN, null), false);
           qp ^= true;
         } else if(c == 'X') {
-          // hidden option: show query plan before/after query compilation
+          // show query plan before/after query compilation
           execute(new Set(MainOptions.COMPPLAN, null), false);
         } else if(c == 'z') {
           // toggle result serialization
@@ -202,7 +205,7 @@ public class BaseX extends Main {
            c == 'r' || c == 's') {
           // options followed by a string
           v = arg.string();
-        } else if(c == 'd' || c == 'D' && sa() || c == 'L' || c == 'u' || c == 'v' ||
+        } else if(c == 'd' || c == 'D' && sa() || c == 'L' || c == 'u' || c == 'R' || c == 'v' ||
            c == 'V' || c == 'w' || c == 'W' || c == 'x' || c == 'X' || c == 'z') {
           // options to be toggled
           v = "";
