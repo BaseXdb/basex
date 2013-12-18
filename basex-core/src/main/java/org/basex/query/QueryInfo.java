@@ -185,7 +185,7 @@ public final class QueryInfo {
     }
     if(!compile.isEmpty()) {
       tb.add(NL).add(COMPILING).add(COL).add(NL);
-      for(final byte[] line : compile) tb.add(line).add(NL);
+      for(final byte[] line : compile) tb.add(LI).add(line).add(NL);
       tb.add(NL).add(OPTIMIZED_QUERY).add(COL).add(NL).add(optQuery).add(NL);
     }
     if(!evaluate.isEmpty()) {
