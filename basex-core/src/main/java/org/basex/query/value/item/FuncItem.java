@@ -220,8 +220,8 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
       final InputInfo ii) throws QueryException {
-
-    if(!inline(exprs, ctx)) return null;
+    if(!(expr.isValue() || expr.exprSize() < ctx.context.options.get(MainOptions.INLINELIMIT)
+        && !expr.has(Flag.CTX))) return null;
     ctx.compInfo(OPTINLINE, this);
     // create let bindings for all variables
     final LinkedList<GFLWOR.Clause> cls =
@@ -234,41 +234,21 @@ public final class FuncItem extends FItem implements Scope {
     }
 
     // copy the function body
-    final Expr ret = expr.copy(ctx, scp, vs);
-    return (cls == null ? ret : new GFLWOR(ii, cls, ret)).optimize(ctx, scp);
-  }
+    final Expr rt = expr.copy(ctx, scp, vs);
 
-  /**
-   * Checks if this function item should be inlined.
-   * @param as argument expressions
-   * @param ctx query context
-   * @return result of check
-   */
-  private boolean inline(final Expr[] as, final QueryContext ctx) {
-    if(expr.isValue() || expr.exprSize() < ctx.context.options.get(MainOptions.INLINELIMIT) &&
-        !expr.has(Flag.CTX)) {
-      // check if the function item does not introduce new function calls
-      final ASTVisitor self = new ASTVisitor() {
-        @Override
-        public boolean dynFuncCall(final DynFuncCall call) {
-          return false;
-        }
-      };
-      if(expr.accept(self)) return true;
+    rt.accept(new ASTVisitor() {
+      @Override
+      public boolean inlineFunc(final Scope sub) {
+        return sub.visit(this);
+      }
 
-      // checks if the arguments don't contain this function item
-      final ASTVisitor args = new ASTVisitor() {
-        @Override
-        public boolean funcItem(final FuncItem f) {
-          return f != FuncItem.this && f.visit(this);
-        }
-        @Override
-        public boolean inlineFunc(final Scope sub) {
-          return sub.visit(this);
-        }
-      };
-      return Expr.visitAll(args, as);
-    }
-    return false;
+      @Override
+      public boolean dynFuncCall(final DynFuncCall call) {
+        call.markInlined(FuncItem.this);
+        return true;
+      }
+    });
+
+    return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(ctx, scp);
   }
 }
