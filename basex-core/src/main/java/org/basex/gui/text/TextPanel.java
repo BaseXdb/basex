@@ -536,7 +536,7 @@ public class TextPanel extends BaseXPanel {
     if(!PREVLINE.is(e) && !NEXTLINE.is(e)) lastCol = -1;
 
     final boolean selecting = e.isShiftDown() && !BACKSPACE.is(e) && !PASTE2.is(e) &&
-        !DELLINE.is(e) && !PREVPAGE_RO.is(e);
+        !DELLINE.is(e) && !PREVPAGE_RO.is(e) && !DELETE.is(e);
     final boolean selected = editor.selected();
     if(selecting && !selected) editor.startSelect();
     boolean down = true, consumed = true;
