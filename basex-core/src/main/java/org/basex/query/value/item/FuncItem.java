@@ -26,12 +26,12 @@ import org.basex.util.hash.*;
 public final class FuncItem extends FItem implements Scope {
   /** Static context. */
   private final StaticContext sc;
-  /** Variables. */
-  private final Var[] vars;
-  /** Function expression. */
-  private final Expr expr;
   /** Function name. */
   private final QNm name;
+  /** Formal parameters. */
+  private final Var[] params;
+  /** Function expression. */
+  private final Expr expr;
 
   /** Context value. */
   private final Value ctxVal;
@@ -77,7 +77,7 @@ public final class FuncItem extends FItem implements Scope {
 
     super(t, annotations);
     name = n;
-    vars = arg;
+    params = arg;
     expr = body;
     stackSize = stSize;
     sc = sctx;
@@ -89,7 +89,7 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public int arity() {
-    return vars.length;
+    return params.length;
   }
 
   @Override
@@ -99,7 +99,7 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public QNm argName(final int ps) {
-    return vars[ps].name;
+    return params[ps].name;
   }
 
   @Override
@@ -122,7 +122,7 @@ public final class FuncItem extends FItem implements Scope {
       ctx.value = ctxVal;
       ctx.pos = pos;
       ctx.size = size;
-      for(int i = 0; i < vars.length; i++) ctx.set(vars[i], args[i], ii);
+      for(int i = 0; i < params.length; i++) ctx.set(params[i], args[i], ii);
       return ctx.value(expr);
     } finally {
       ctx.value = cv;
@@ -141,7 +141,7 @@ public final class FuncItem extends FItem implements Scope {
       ctx.value = ctxVal;
       ctx.pos = pos;
       ctx.size = size;
-      for(int i = 0; i < vars.length; i++) ctx.set(vars[i], args[i], ii);
+      for(int i = 0; i < params.length; i++) ctx.set(params[i], args[i], ii);
       return expr.item(ctx, ii);
     } finally {
       ctx.value = cv;
@@ -153,15 +153,15 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public FItem coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii,
       final boolean opt) throws QueryException {
-    if(vars.length != ft.args.length) throw Err.castError(ii, ft, this);
+    if(params.length != ft.args.length) throw Err.castError(ii, ft, this);
     final FuncType tp = funcType();
     if(tp.instanceOf(ft)) return this;
 
     final VarScope vsc = new VarScope(sc);
-    final Var[] vs = new Var[vars.length];
+    final Var[] vs = new Var[params.length];
     final Expr[] refs = new Expr[vs.length];
     for(int i = vs.length; i-- > 0;) {
-      vs[i] = vsc.newLocal(ctx, vars[i].name, ft.args[i], true);
+      vs[i] = vsc.newLocal(ctx, params[i].name, ft.args[i], true);
       refs[i] = new VarRef(ii, vs[i]);
     }
 
@@ -179,7 +179,7 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(TYPE, type), vars, expr);
+    addPlan(plan, planElem(TYPE, type), params, expr);
   }
 
   @Override
@@ -189,7 +189,7 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public boolean visit(final ASTVisitor visitor) {
-    for(final Var var : vars) if(!visitor.declared(var)) return false;
+    for(final Var var : params) if(!visitor.declared(var)) return false;
     return expr.accept(visitor);
   }
 
@@ -212,7 +212,7 @@ public final class FuncItem extends FItem implements Scope {
   public String toString() {
     final FuncType ft = (FuncType) type;
     final TokenBuilder tb = new TokenBuilder(FUNCTION).add('(');
-    for(final Var v : vars) tb.addExt(v).add(v == vars[vars.length - 1] ? "" : ", ");
+    for(final Var v : params) tb.addExt(v).add(v == params[params.length - 1] ? "" : ", ");
     tb.add(')').add(ft.ret != null ? " as " + ft.ret : "").add(" { ").addExt(expr).add(" }");
     return tb.toString();
   }
@@ -227,8 +227,8 @@ public final class FuncItem extends FItem implements Scope {
     final LinkedList<GFLWOR.Clause> cls =
         exprs.length == 0 ? null : new LinkedList<GFLWOR.Clause>();
     final IntObjMap<Var> vs = new IntObjMap<Var>();
-    for(int i = 0; i < vars.length; i++) {
-      final Var old = vars[i], v = scp.newCopyOf(ctx, old);
+    for(int i = 0; i < params.length; i++) {
+      final Var old = params[i], v = scp.newCopyOf(ctx, old);
       vs.put(old.id, v);
       cls.add(new Let(v, exprs[i], false, ii).optimize(ctx, scp));
     }

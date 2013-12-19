@@ -19,7 +19,7 @@ public final class FuncItemTest extends QueryPlanTest {
   public void idTest() {
     check("function($x) { $x }(42)",
         "42",
-        "empty(//" + Util.className(InlineFunc.class) + ')'
+        "empty(//" + Util.className(Closure.class) + ')'
     );
   }
 
@@ -60,7 +60,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "}(function($f) { 42 })",
         "42",
         // both outer inline functions are pre-compiled
-        "empty(//" + Util.className(InlineFunc.class) + ')',
+        "empty(//" + Util.className(Closure.class) + ')',
         "/*/" + Util.className(Int.class) + "/@value = '42'"
     );
   }
@@ -177,7 +177,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "5000050000",
 
         // all inline functions are pre-compiled
-        "empty(//" + Util.className(InlineFunc.class) + ')',
+        "empty(//" + Util.className(Closure.class) + ')',
         // the outer function item was inlined and removed
         "every $f in //" + Util.className(FuncItem.class) + " satisfies $f/*[1]/@name = '$go'",
         // the addition function was inlined

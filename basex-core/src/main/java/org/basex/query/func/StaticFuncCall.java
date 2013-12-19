@@ -74,6 +74,12 @@ public final class StaticFuncCall extends FuncCall {
   }
 
   @Override
+  public StaticFuncCall optimize(final QueryContext ctx, final VarScope scp) {
+    // do not inline a static function after compilation as it must be recursive
+    return this;
+  }
+
+  @Override
   public StaticFuncCall copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final Expr[] arg = new Expr[expr.length];
     for(int i = 0; i < arg.length; i++) arg[i] = expr[i].copy(ctx, scp, vs);

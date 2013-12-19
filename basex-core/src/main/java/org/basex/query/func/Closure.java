@@ -25,7 +25,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
+public final class Closure extends Single implements Scope, XQFunctionExpr {
   /** Function name. */
   private final QNm name;
   /** Arguments. */
@@ -46,6 +46,9 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
 
   /** Local variables in the scope of this function. */
   private final VarScope scope;
+  /** Non-local variable bindings. */
+  private final HashMap<Var, Expr> nonLocal;
+
   /**
    * Constructor.
    * @param ii input info
@@ -53,12 +56,14 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
    * @param v arguments
    * @param e function body
    * @param a annotations
+   * @param bindings bindings for non-local variables
    * @param stc static context
    * @param scp scope
    */
-  public InlineFunc(final InputInfo ii, final SeqType r, final Var[] v,
-      final Expr e, final Ann a, final StaticContext stc, final VarScope scp) {
-    this(ii, null, r, v, e, a, stc, scp);
+  public Closure(final InputInfo ii, final SeqType r, final Var[] v,
+      final Expr e, final Ann a, final HashMap<Var, Expr> bindings,
+      final StaticContext stc, final VarScope scp) {
+    this(ii, null, r, v, e, a, bindings, stc, scp);
   }
 
   /**
@@ -69,17 +74,20 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
    * @param v argument variables
    * @param e function expression
    * @param a annotations
+   * @param bindings bindings for non-local variables
    * @param stc static context
    * @param scp variable scope
    */
-  InlineFunc(final InputInfo ii, final QNm nm, final SeqType r, final Var[] v,
-      final Expr e, final Ann a, final StaticContext stc, final VarScope scp) {
+  Closure(final InputInfo ii, final QNm nm, final SeqType r, final Var[] v,
+      final Expr e, final Ann a, final HashMap<Var, Expr> bindings,
+      final StaticContext stc, final VarScope scp) {
     super(ii, e);
     name = nm;
     args = v;
     ret = r;
     ann = a == null ? new Ann() : a;
     updating = ann.contains(Ann.Q_UPDATING);
+    nonLocal = bindings;
     scope = scp;
     sc = stc;
   }
@@ -121,7 +129,7 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
    */
   private Collection<Entry<Var, Value>> staticBindings() {
     Collection<Entry<Var, Value>> propagate = null;
-    final Iterator<Entry<Var, Expr>> cls = scope.closure().entrySet().iterator();
+    final Iterator<Entry<Var, Expr>> cls = nonLocal.entrySet().iterator();
     while(cls.hasNext()) {
       final Entry<Var, Expr> e = cls.next();
       final Expr c = e.getValue();
@@ -142,7 +150,7 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
     compiled = true;
 
     // compile closure
-    for(final Entry<Var, Expr> e : scope.closure().entrySet()) {
+    for(final Entry<Var, Expr> e : nonLocal.entrySet()) {
       final Expr bound = e.getValue().compile(ctx, scp);
       e.setValue(bound);
       e.getKey().refineType(bound.type(), ctx, info);
@@ -190,13 +198,13 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
     }
 
     // only evaluate if the closure is empty, so we don't lose variables
-    return scope.closure().isEmpty() ? preEval(ctx) : this;
+    return nonLocal.isEmpty() ? preEval(ctx) : this;
   }
 
   @Override
   public VarUsage count(final Var v) {
     VarUsage all = VarUsage.NEVER;
-    for(final Entry<Var, Expr> e : scope.closure().entrySet())
+    for(final Entry<Var, Expr> e : nonLocal.entrySet())
       if((all = all.plus(e.getValue().count(v))) == VarUsage.MORE_THAN_ONCE) break;
     return all;
   }
@@ -206,7 +214,7 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
       final Var v, final Expr e) throws QueryException {
     boolean change = false;
 
-    for(final Entry<Var, Expr> entry : scope.closure().entrySet()) {
+    for(final Entry<Var, Expr> entry : nonLocal.entrySet()) {
       final Expr ex = entry.getValue().inline(ctx, scp, v, e);
       if(ex != null) {
         change = true;
@@ -219,12 +227,18 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public Expr copy(final QueryContext cx, final VarScope scp, final IntObjMap<Var> vs) {
-    final VarScope v = scope.copy(cx, scp, vs);
+    final VarScope v = scope.copy(cx, vs);
+    final HashMap<Var, Expr> nl = new HashMap<Var, Expr>();
+    for(final Entry<Var, Expr> e : nonLocal.entrySet()) {
+      final Var var = vs.get(e.getKey().id);
+      final Expr ex = e.getValue().copy(cx, scp, vs);
+      nl.put(var, ex);
+    }
     final Var[] a = args.clone();
     for(int i = 0; i < a.length; i++) a[i] = vs.get(a[i].id);
     final Expr e = expr.copy(cx, v, vs);
     e.markTailCalls(null);
-    return copyType(new InlineFunc(info, name, ret, a, e, ann, sc, v));
+    return copyType(new Closure(info, name, ret, a, e, ann, nl, sc, v));
   }
 
   @Override
@@ -234,9 +248,8 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
     if(expr.has(Flag.CTX)) return null;
     ctx.compInfo(OPTINLINE, this);
     // create let bindings for all variables
-    final Map<Var, Expr> closure = scope.closure();
     final LinkedList<GFLWOR.Clause> cls =
-        exprs.length == 0 && closure.isEmpty() ? null : new LinkedList<GFLWOR.Clause>();
+        exprs.length == 0 && nonLocal.isEmpty() ? null : new LinkedList<GFLWOR.Clause>();
     final IntObjMap<Var> vs = new IntObjMap<Var>();
     for(int i = 0; i < args.length; i++) {
       final Var old = args[i], v = scp.newCopyOf(ctx, old);
@@ -244,7 +257,7 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
       cls.add(new Let(v, exprs[i], false, ii).optimize(ctx, scp));
     }
 
-    for(final Entry<Var, Expr> e : closure.entrySet()) {
+    for(final Entry<Var, Expr> e : nonLocal.entrySet()) {
       final Var old = e.getKey(), v = scp.newCopyOf(ctx, old);
       vs.put(old.id, v);
       cls.add(new Let(v, e.getValue(), false, ii).optimize(ctx, scp));
@@ -262,10 +275,10 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
     final FuncType ft = (FuncType) type().type;
 
     final Expr body;
-    if(!scope.closure().isEmpty()) {
+    if(!nonLocal.isEmpty()) {
       // collect closure
       final LinkedList<GFLWOR.Clause> cls = new LinkedList<GFLWOR.Clause>();
-      for(final Entry<Var, Expr> e : scope.closure().entrySet())
+      for(final Entry<Var, Expr> e : nonLocal.entrySet())
         cls.add(new Let(e.getKey(), e.getValue().value(ctx), false, ii));
       body = new GFLWOR(ii, cls, expr);
     } else {
@@ -301,7 +314,7 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public boolean removable(final Var v) {
-    for(final Entry<Var, Expr> e : scope.closure().entrySet())
+    for(final Entry<Var, Expr> e : nonLocal.entrySet())
       if(!e.getValue().removable(v)) return false;
     return true;
   }
@@ -317,8 +330,7 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public boolean visit(final ASTVisitor visitor) {
-    final Map<Var, Expr> clos = scope.closure();
-    for(final Entry<Var, Expr> v : clos.entrySet())
+    for(final Entry<Var, Expr> v : nonLocal.entrySet())
       if(!(v.getValue().accept(visitor) && visitor.declared(v.getKey()))) return false;
     for(final Var v : args) if(!visitor.declared(v)) return false;
     return expr.accept(visitor);
@@ -327,9 +339,9 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    if (!scope.closure().isEmpty()) {
+    if (!nonLocal.isEmpty()) {
       sb.append("((: inline-closure :) ");
-      for (final Entry<Var, Expr> e : scope.closure().entrySet())
+      for (final Entry<Var, Expr> e : nonLocal.entrySet())
         sb.append("let ").append(e.getKey()).append(" := ").append(e.getValue()).append(' ');
       sb.append(RETURN).append(' ');
     }
@@ -341,7 +353,7 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
     sb.append(PAR2).append(' ');
     if(ret != null) sb.append("as ").append(ret.toString()).append(' ');
     sb.append("{ ").append(expr).append(" }");
-    if(!scope.closure().isEmpty()) sb.append(')');
+    if(!nonLocal.isEmpty()) sb.append(')');
     return sb.toString();
   }
 
@@ -367,7 +379,7 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    for(final Entry<Var, Expr> e : scope.closure().entrySet())
+    for(final Entry<Var, Expr> e : nonLocal.entrySet())
       if(!e.getValue().accept(visitor)) return false;
     return visitor.inlineFunc(this);
   }
@@ -375,7 +387,7 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final Entry<Var, Expr> e : scope.closure().entrySet())
+    for(final Entry<Var, Expr> e : nonLocal.entrySet())
       sz += e.getValue().exprSize();
     return sz + expr.exprSize();
   }
@@ -383,5 +395,13 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
   @Override
   public boolean compiled() {
     return compiled;
+  }
+
+  /**
+   * Returns an iterator over the non-local bindings of this closure.
+   * @return the iterator
+   */
+  public Iterator<Entry<Var, Expr>> nonLocalBindings() {
+    return nonLocal.entrySet().iterator();
   }
 }
