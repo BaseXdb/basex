@@ -2,16 +2,15 @@ package net.xqj.basex.local;
 
 import static javax.xml.xquery.XQItemType.*;
 import static org.junit.Assert.*;
-
-import java.net.*;
-
-import javax.xml.xquery.*;
-
-import org.junit.*;
-import org.w3c.dom.*;
+import org.junit.Test;
+import java.net.URI;
+import javax.xml.xquery.XQException;
+import javax.xml.xquery.XQItemType;
+import javax.xml.xquery.XQResultSequence;
+import org.w3c.dom.Attr;
 
 /**
- * Basic XQItemAccessor test.
+ * Testing Basic XQItemAccessor functionality
  *
  * @author Charles Foster
  */
