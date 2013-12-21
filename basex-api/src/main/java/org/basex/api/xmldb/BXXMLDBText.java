@@ -10,7 +10,7 @@ import static org.basex.core.Text.*;
  */
 interface BXXMLDBText {
   /** DB URI. */
-  String DBURI = NAMELC + "://";
+  String DBURI = PROJECT_NAME + "://";
   /** XMLDB Prefix. */
   String XMLDB = "xmldb";
   /** XMLDB with colon. */

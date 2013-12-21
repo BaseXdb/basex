@@ -51,7 +51,7 @@ public final class Users {
       }
     } else {
       // define default admin user with all rights
-      list.add(new User(ADMIN, md5(ADMIN), Perm.ADMIN));
+      list.add(new User(S_ADMIN, md5(S_ADMIN), Perm.ADMIN));
     }
   }
 
@@ -180,7 +180,7 @@ public final class Users {
     table.description = USERS_X;
 
     final int sz = file == null ? 3 : 5;
-    for(int u = 0; u < sz; ++u) table.header.add(USERHEAD[u]);
+    for(int u = 0; u < sz; ++u) table.header.add(S_USERINFO[u]);
 
     for(final User user : users(users)) {
       final TokenList tl = new TokenList();
@@ -193,7 +193,7 @@ public final class Users {
       }
       table.contents.add(tl);
     }
-    return table.sort().toTop(token(ADMIN));
+    return table.sort().toTop(token(S_ADMIN));
   }
 
   /**

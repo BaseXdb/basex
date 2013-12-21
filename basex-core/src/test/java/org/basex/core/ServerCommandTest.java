@@ -53,8 +53,8 @@ public final class ServerCommandTest extends CommandTest {
    */
   @Test
   public void kill() throws IOException {
-    ok(new Kill(ADMIN));
-    ok(new Kill(ADMIN + '2'));
+    ok(new Kill(S_ADMIN));
+    ok(new Kill(S_ADMIN + '2'));
     ok(new Kill(Prop.NAME + '*'));
     ok(new CreateUser(NAME2, Token.md5(NAME2)));
     final ClientSession cs = createClient(NAME2, NAME2);

@@ -80,7 +80,7 @@ public final class OptimizeAll extends ACreate {
 
   @Override
   public void build(final CmdBuilder cb) {
-    cb.init(Cmd.OPTIMIZE + " " + C_ALL);
+    cb.init(Cmd.OPTIMIZE + " " + S_ALL);
   }
 
   /**

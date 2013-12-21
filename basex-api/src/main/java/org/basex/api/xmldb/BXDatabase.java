@@ -43,7 +43,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
 
   @Override
   public String getName() {
-    return NAMELC;
+    return PROJECT_NAME;
   }
 
   @Override
@@ -76,7 +76,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
       final String main = uri.startsWith(XMLDBC) ? uri : XMLDBC + uri;
       if(main.startsWith(XMLDBURI)) {
         final String host = main.substring(XMLDBURI.length());
-        final String localhost = LOCALHOST + ':' +
+        final String localhost = S_LOCALHOST + ':' +
             ctx.globalopts.get(GlobalOptions.SERVERPORT) + '/';
         if(host.startsWith(localhost)) return host.substring(localhost.length());
       }

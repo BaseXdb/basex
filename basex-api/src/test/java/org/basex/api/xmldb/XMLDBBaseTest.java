@@ -19,15 +19,15 @@ public abstract class XMLDBBaseTest {
   static final String DRIVER = BXDatabase.class.getName();
   /** Database/document path. */
   static final String URL =
-      "xmldb:" + NAMELC + "://" + LOCALHOST + ':' + GlobalOptions.PORT.value + '/';
+      "xmldb:" + PROJECT_NAME + "://" + S_LOCALHOST + ':' + GlobalOptions.PORT.value + '/';
   /** Name of the collection. */
   static final String COLL = "XMLDB";
   /** Database/document path. */
   static final String PATH = URL + COLL;
   /** Optional login. */
-  static final String LOGIN = ADMIN;
+  static final String LOGIN = S_ADMIN;
   /** Optional password. */
-  static final String PW = ADMIN;
+  static final String PW = S_ADMIN;
   /** Test document. */
   static final String DOC1 = "first.xml";
   /** Test document. */

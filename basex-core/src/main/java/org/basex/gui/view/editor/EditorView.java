@@ -54,9 +54,9 @@ public final class EditorView extends View {
 
   /** History Button. */
   private final AbstractButton hist;
-  /** Execute Button. */
+  /** Stop Button. */
   private final AbstractButton stop;
-  /** Execute button. */
+  /** Go button. */
   private final AbstractButton go;
   /** Filter button. */
   private final AbstractButton filter;
@@ -68,8 +68,6 @@ public final class EditorView extends View {
   private final BaseXLabel pos;
   /** Splitter. */
   private final BaseXSplit split;
-  /** Project files. */
-  private final ProjectView project;
   /** Header string. */
   private final BaseXLabel label;
   /** Query area. */
@@ -82,6 +80,8 @@ public final class EditorView extends View {
   /** Thread counter. */
   private int threadID;
 
+  /** Project files. */
+  final ProjectView project;
   /** Input info. */
   InputInfo errorInfo;
 
@@ -243,7 +243,7 @@ public final class EditorView extends View {
     go.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        getEditor().release(Action.EXECUTE);
+        run(getEditor(), Action.EXECUTE);
       }
     });
     tabs.addChangeListener(new ChangeListener() {
@@ -254,7 +254,7 @@ public final class EditorView extends View {
         search.editor(ea, true);
         gui.refreshControls();
         posCode.invokeLater();
-        ea.release(Action.PARSE);
+        run(ea, Action.PARSE);
       }
     });
 
@@ -378,11 +378,7 @@ public final class EditorView extends View {
    */
   public boolean save() {
     final EditorArea edit = getEditor();
-    if(!edit.opened()) return saveAs();
-
-    if(!save(edit.file)) return false;
-    project.refresh(edit.file, false);
-    return true;
+    return edit.opened() ? edit.save() : saveAs();
   }
 
   /**
@@ -399,10 +395,12 @@ public final class EditorView extends View {
     fc.textFilters();
     fc.suffix(IO.XQSUFFIX);
 
+    // save new file
     final IOFile file = fc.select(Mode.FSAVE);
-    if(file == null || !save(file)) return false;
+    if(file == null) return false;
 
-    project.refresh(file.dir(), true);
+    // success: display new file in project view
+    edit.save(file);
     return true;
   }
 
@@ -411,8 +409,7 @@ public final class EditorView extends View {
    */
   public void newFile() {
     if(!visible()) GUIMenuCmd.C_SHOWEDITOR.execute(gui);
-    addTab();
-    refreshControls(true);
+    refreshControls(addTab(), true);
   }
 
   /**
@@ -462,7 +459,7 @@ public final class EditorView extends View {
         if(edit.opened() || edit.modified) edit = addTab();
         edit.initText(text);
         edit.file(file);
-        if(parse) edit.release(Action.PARSE);
+        if(parse) run(edit, Action.PARSE);
       } catch(final IOException ex) {
         refreshHistory(null);
         Util.debug(ex);
@@ -479,11 +476,17 @@ public final class EditorView extends View {
    * @param editor current editor
    */
   void run(final EditorArea editor, final Action action) {
-    refreshControls(false);
+    refreshControls(editor, false);
 
     final byte[] in = editor.getText();
     final boolean eq = eq(in, editor.last);
     if(eq && action == Action.CHECK) return;
+
+    if(action == Action.EXECUTE && gui.gopts.get(GUIOptions.SAVERUN)) {
+      for(final EditorArea edit : editors()) {
+        if(edit.opened()) edit.save();
+      }
+    }
 
     IOFile file = editor.file;
     editor.last = in;
@@ -873,11 +876,11 @@ public final class EditorView extends View {
 
   /**
    * Refreshes the query modification flag.
+   * @param edit editor
    * @param force action
    */
-  void refreshControls(final boolean force) {
+  void refreshControls(final EditorArea edit, final boolean force) {
     // update modification flag
-    final EditorArea edit = getEditor();
     final boolean oe = edit.modified;
     edit.modified = edit.hist != null && edit.hist.modified();
     if(edit.modified == oe && !force) return;
@@ -912,24 +915,6 @@ public final class EditorView extends View {
       if(edit.file.eq(file) && (!opened || edit.opened())) return edit;
     }
     return null;
-  }
-
-  /**
-   * Saves the specified editor contents.
-   * @param file file to write
-   * @return success flag
-   */
-  private boolean save(final IOFile file) {
-    try {
-      final EditorArea edit = getEditor();
-      file.write(edit.getText());
-      edit.file(file);
-      project.repaint();
-      return true;
-    } catch(final Exception ex) {
-      BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, file));
-      return false;
-    }
   }
 
   /**
@@ -983,8 +968,7 @@ public final class EditorView extends View {
     add.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        addTab();
-        refreshControls(true);
+        refreshControls(addTab(), true);
       }
     });
     tabs.add(new BaseXBack(), add, 0);

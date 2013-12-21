@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
-import org.basex.io.out.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -77,36 +76,38 @@ public class Options implements Iterable<Option<?>> {
    * Writes the options to disk.
    */
   public final synchronized void write() {
-    PrintOutput po = null;
+    final TokenBuilder tmp = new TokenBuilder();
+    boolean first = true;
     try {
-      po = new PrintOutput(file.path());
-      boolean first = true;
       for(final Option<?> opt : options(getClass())) {
         final String name = opt.name();
         if(opt instanceof Comment) {
-          if(!first) po.print(NL);
-          po.println("# " + name);
+          if(!first) tmp.add(NL);
+          tmp.add("# " + name).add(NL);
         } else if(opt instanceof NumbersOption) {
           final int[] ints = get((NumbersOption) opt);
           final int is = ints == null ? 0 : ints.length;
-          for(int i = 0; i < is; ++i) po.println(name + i + " = " + ints[i]);
+          for(int i = 0; i < is; ++i) tmp.add(name + i + " = " + ints[i]).add(NL);
         } else if(opt instanceof StringsOption) {
           final String[] strings = get((StringsOption) opt);
           final int ss = strings == null ? 0 : strings.length;
-          po.println(name + " = " + ss);
-          for(int i = 0; i < ss; ++i) po.println(name + (i + 1) + " = " + strings[i]);
+          tmp.add(name + " = " + ss).add(NL);
+          for(int i = 0; i < ss; ++i) tmp.add(name + (i + 1) + " = " + strings[i]).add(NL);
         } else {
-          po.println(name + " = " + get(opt));
+          tmp.add(name + " = " + get(opt)).add(NL);
         }
         first = false;
       }
-      po.println(NL + PROPUSER);
-      po.print(user.toString());
+      tmp.add(NL).add(PROPUSER).add(NL);
+      tmp.add(user.toString());
+      final byte[] content = tmp.array();
+
+      // only write file if contents have changed
+      if(!file.exists() || !eq(content, file.read())) file.write(content);
+
     } catch(final Exception ex) {
       Util.errln("% could not be written.", file);
       Util.debug(ex);
-    } finally {
-      if(po != null) try { po.close(); } catch(final IOException ignored) { }
     }
   }
 

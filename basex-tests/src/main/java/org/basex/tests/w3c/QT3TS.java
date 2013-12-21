@@ -869,7 +869,7 @@ public final class QT3TS {
         " -r  generate report file" + NL +
         " -s  print slow queries" + NL +
         " -v  verbose output",
-        Util.info(Text.CONSOLE, Util.className(this)));
+        Util.info(Text.S_CONSOLE, Util.className(this)));
 
     while(arg.more()) {
       if(arg.dash()) {

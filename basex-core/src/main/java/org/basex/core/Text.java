@@ -16,7 +16,7 @@ import org.basex.util.*;
  */
 public interface Text {
 
-  // FREQUENTLY USED CHARACTERS ===============================================
+  // FIXED STRINGS ================================================================================
 
   /** New line. */
   String NL = Prop.NL;
@@ -31,29 +31,42 @@ public interface Text {
   /** List. */
   String LI = "- ";
 
+  /** OK Keyword. */
+  String OK = "OK";
+  /** ON flag. */
+  String ON = "ON";
+  /** OFF flag. */
+  String OFF = "OFF";
+  /** Yes flag. */
+  String YES = "yes";
+  /** No flag. */
+  String NO = "no";
+  /** True flag. */
+  String TRUE = "true";
+  /** False flag. */
+  String FALSE = "false";
+
   /** Project namespace. */
-  String NAMELC = Prop.NAME.toLowerCase(Locale.ENGLISH);
+  String PROJECT_NAME = Prop.NAME.toLowerCase(Locale.ENGLISH);
   /** URL. */
-  String URL = "http://" + NAMELC + ".org";
+  String URL = "http://" + PROJECT_NAME + ".org";
   /** URL of the community page. */
   String COMMUNITY_URL = URL + "/community";
   /** URL of the documentation. */
-  String DOC_URL = "http://docs." + NAMELC + ".org";
+  String DOC_URL = "http://docs." + PROJECT_NAME + ".org";
   /** URL of the update page. */
   String UPDATE_URL = URL + "/products/download/all-downloads/";
   /** Version URL. */
-  String VERSION_URL = "http://files." + NAMELC + ".org/version.txt";
+  String VERSION_URL = "http://files." + PROJECT_NAME + ".org/version.txt";
   /** Mail. */
-  String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
+  String MAILING_LIST = PROJECT_NAME + "-talk@mailman.uni-konstanz.de";
   /** Title and version. */
   String TITLE = Prop.NAME + ' ' + Prop.VERSION;
 
-  // CONSOLE INFO =============================================================
-
   /** Local (standalone) mode. */
-  String LOCALMODE = "Standalone";
+  String S_STANDALONE = "Standalone";
   /** Start information. */
-  String LOCALINFO =
+  String  S_LOCALINFO =
     " [-bcdiLoqrRsuvVwxXz] [input]" + NL +
     "  [input]     Execute input file or expression" + NL +
     "  -b<pars>    Bind external query variables" + NL +
@@ -74,9 +87,9 @@ public interface Text {
     "  -z          Skip output of results";
 
   /** Client mode. */
-  String CLIENTMODE = "Client";
+  String S_CLIENT = "Client";
   /** Client start information. */
-  String CLIENTINFO =
+  String S_CLIENTINFO =
     " [-bcdiLnopPqrRsUvVwxz] [input]" + NL +
     "  [input]     Execute input file or expression" + NL +
     "  -b<pars>    Bind external query variables" + NL +
@@ -100,9 +113,9 @@ public interface Text {
     "  -z          Skip output of results";
 
   /** Server mode. */
-  String SERVERMODE = "Server";
+  String S_SERVER = "Server";
   /** Server start information. */
-  String SERVERINFO =
+  String S_SERVERINFO =
     " [-cdeinpSz] [stop]" + NL +
     "  stop      Stop running server" + NL +
     "  -c<cmds>  Execute initial database commands" + NL +
@@ -115,14 +128,14 @@ public interface Text {
     "  -z        Suppress logging";
 
   /** GUI mode. */
-  String GUIMODE = "GUI";
+  String S_GUI = "GUI";
   /** GUI start information. */
-  String GUIINFO =
+  String S_GUIINFO =
     " [file]" + NL +
     "  [file]  Open specified XML or XQuery file";
 
   /** HTTP information. */
-  String HTTPINFO =
+  String S_HTTPINFO =
     " [-dehlnpPsSUz] [stop]" + NL +
     "  stop      Stop running server" + NL +
     "  -d        Activate debugging mode" + NL +
@@ -138,17 +151,96 @@ public interface Text {
     "  -z        Suppress logging";
 
   /** Bug info. */
-  String BUGINFO = "Improper use? Potential bug? Your feedback is welcome:";
+  String S_BUGINFO = "Improper use? Potential bug? Your feedback is welcome:";
   /** Console text. */
-  String CONSOLE = TITLE + " [%]" + NL;
+  String S_CONSOLE = TITLE + " [%]" + NL;
 
-  /** Console text. */
-  String TRY_MORE_X = lang("try_more_%", "help") + NL;
-  /** Version information. */
-  String VERSINFO = lang("version");
+  /** Localhost. */
+  String S_LOCALHOST = "localhost";
+  /** User name. */
+  String[] S_USERINFO = { "Username", "Read", "Write", "Create", "Admin" };
+  /** Default admin user and password. */
+  String S_ADMIN = "admin";
 
-  /** Goodbye information. */
-  String[] BYE = { lang("bye1"), lang("bye2"), lang("bye3"), lang("bye4") };
+  /** Command keyword. */
+  String S_ALL = "ALL";
+  /** Command keyword. */
+  String S_TO = "TO";
+  /** Command keyword. */
+  String S_QUERY = "query";
+  /** Command keyword. */
+  String S_PATH = "path";
+  /** Command keyword. */
+  String S_INPUT = "input";
+  /** Command keyword. */
+  String S_NAME = "name";
+  /** Command keyword. */
+  String S_PW = "password";
+  /** Command keyword. */
+  String S_PKGPATH = "path";
+  /** Command keyword. */
+  String S_PKGNAME = "name";
+  /** Command keyword. */
+  String S_PKGDIR = "dir";
+
+  /** Index info. */
+  String LI_STRUCTURE = LI + "Structure: ";
+  /** Index info. */
+  String LI_SIZE = LI + "Size: ";
+  /** Index info. */
+  String LI_ENTRIES = LI + "Entries: ";
+
+  /** Index info. */
+  String HASH = "Hash";
+  /** Index info. */
+  String FUZZY = "Fuzzy";
+  /** Index info. */
+  String SORTED_LIST = "Sorted List";
+
+  /** Query hits. */
+  String ITEM = "Item";
+  /** Query hits. */
+  String ITEMS = "Items";
+
+  /** Options error. */
+  String OPT_OFFSET = "List counter for '%' is invalid.";
+  /** Options error. */
+  String OPT_BOOLEAN = "Value of '%' must be a boolean.";
+  /** Options error. */
+  String OPT_NUMBER = "Value of '%' must be a number.";
+  /** Options error. */
+  String OPT_ONEOF = "Value of '%' must be one of (%).";
+
+  /** "log". */
+  String PLOTLOG = "log";
+
+  /** File description: XML Documents. */
+  String XML_DOCUMENTS = "XML Documents";
+  /** File description: XSL Documents. */
+  String XSL_DOCUMENTS = "XSL Documents";
+  /** File description: JSON Documents. */
+  String JSON_DOCUMENTS = "JSON Documents";
+  /** File description: HTML Documents. */
+  String HTML_DOCUMENTS = "HTML Documents";
+  /** File description: Comma-Separated Values. */
+  String CSV_DOCUMENTS = "Comma-Separated Values";
+  /** File description: Plain Text. */
+  String PLAIN_TEXT = "Plain Text";
+  /** File description: ZIP Archives. */
+  String ZIP_ARCHIVES = "ZIP Archives";
+  /** File description: XML Archives. */
+  String XML_ARCHIVES = "XML Archives";
+  /** File description: Java archives. */
+  String JAVA_ARCHIVES = "Java Archives";
+  /** File description: XQuery files. */
+  String XQUERY_FILES = "XQuery Files";
+  /** File description: Command scripts. */
+  String BXS_FILES = "Command Scripts";
+
+  /** "Stack Trace". */
+  String STACK_TRACE = "Stack Trace";
+  /** Copyright info. */
+  String COPYRIGHT = "\u00A9 2005-13 " + Prop.ENTITY;
 
   // SERVER ===================================================================
 
@@ -173,13 +265,6 @@ public interface Text {
   /** Password. */
   String PASSWORD = lang("password");
 
-  /** Localhost. */
-  String LOCALHOST = "localhost";
-  /** User name. */
-  String[] USERHEAD = { "Username", "Read", "Write", "Create", "Admin" };
-  /** Default admin user and password. */
-  String ADMIN = "admin";
-
   /** Option flag. */
   String INFOON = lang("ON");
   /** Option flag. */
@@ -187,41 +272,13 @@ public interface Text {
 
   // COMMANDS =================================================================
 
-  /** OK Keyword. */
-  String OK = "OK";
-  /** ON flag. */
-  String ON = "ON";
-  /** OFF flag. */
-  String OFF = "OFF";
-  /** Yes flag. */
-  String YES = "yes";
-  /** No flag. */
-  String NO = "no";
-  /** True flag. */
-  String TRUE = "true";
-  /** False flag. */
-  String FALSE = "false";
+  /** Console text. */
+  String TRY_MORE_X = lang("try_more_%", "help") + NL;
+  /** Version information. */
+  String VERSINFO = lang("version");
 
-  /** Command keyword. */
-  String C_ALL = "ALL";
-  /** Command keyword. */
-  String C_TO = "TO";
-  /** Command keyword. */
-  String C_QUERY = "query";
-  /** Command keyword. */
-  String C_PATH = "path";
-  /** Command keyword. */
-  String C_INPUT = "input";
-  /** Command keyword. */
-  String C_NAME = "name";
-  /** Command keyword. */
-  String C_PW = "password";
-  /** Command keyword. */
-  String C_PKGPATH = "path";
-  /** Command keyword. */
-  String C_PKGNAME = "name";
-  /** Command keyword. */
-  String C_PKGDIR = "dir";
+  /** Goodbye information. */
+  String[] BYE = { lang("bye1"), lang("bye2"), lang("bye3"), lang("bye4") };
 
   /** No help available. */
   String NOHELP = lang("no_help");
@@ -232,49 +289,49 @@ public interface Text {
     CmdCreate.EVENT + '|' + CmdCreate.INDEX + '|' + CmdCreate.USER + "] [...]",
     lang("c_create1"),
     lang("c_create2") + NL +
-    LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL +
-    "  " + lang("c_create4", C_NAME) + NL +
-    LI + CmdCreate.DATABASE + " [" + C_NAME + "] ([" + C_INPUT + "]):"  + NL +
-    "  " + lang("c_create3", C_NAME, C_INPUT) + NL +
-    LI + CmdCreate.EVENT + " [" + C_NAME + "]: " + NL +
+    LI + CmdDrop.BACKUP + " [" + S_NAME + "]:" + NL +
+    "  " + lang("c_create4", S_NAME) + NL +
+    LI + CmdCreate.DATABASE + " [" + S_NAME + "] ([" + S_INPUT + "]):"  + NL +
+    "  " + lang("c_create3", S_NAME, S_INPUT) + NL +
+    LI + CmdCreate.EVENT + " [" + S_NAME + "]: " + NL +
     "  " + lang("c_create9") + NL +
     LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + '|' + CmdIndex.ATTRIBUTE +
     '|' + CmdIndex.FULLTEXT + "]:" + NL +
     "  " + lang("c_create5") + NL +
-    LI + CmdCreate.USER + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
+    LI + CmdCreate.USER + " [" + S_NAME + "] ([" + S_PW + "]):" + NL +
     "  " + lang("c_create8")
   };
 
   /** Command help. */
   String[] HELPCOPY = {
-    '[' + C_NAME + "] [new" + C_NAME + ']', lang("c_copy1"), lang("c_copy2")
+    '[' + S_NAME + "] [new" + S_NAME + ']', lang("c_copy1"), lang("c_copy2")
   };
 
   /** Command help. */
   String[] HELPCHECK = {
-    '[' + C_INPUT + ']', lang("c_check1"), lang("c_check2")
+    '[' + S_INPUT + ']', lang("c_check1"), lang("c_check2")
   };
   /** Command help. */
   String[] HELPADD = {
-    '(' + C_TO + " [" + C_PATH + "]) [" + C_INPUT + ']',
-    lang("c_add1"), lang("c_add2", C_INPUT, C_PATH)
+    '(' + S_TO + " [" + S_PATH + "]) [" + S_INPUT + ']',
+    lang("c_add1"), lang("c_add2", S_INPUT, S_PATH)
   };
   /** Command help. */
   String[] HELPSTORE = {
-    '(' + C_TO + " [" + C_PATH + "]) [" + C_INPUT + ']',
-    lang("c_store1"), lang("c_store2", C_PATH)
+    '(' + S_TO + " [" + S_PATH + "]) [" + S_INPUT + ']',
+    lang("c_store1"), lang("c_store2", S_PATH)
   };
   /** Command help. */
   String[] HELPRETRIEVE = {
-    '[' + C_PATH + ']', lang("c_retrieve1"), lang("c_retrieve2", C_PATH)
+    '[' + S_PATH + ']', lang("c_retrieve1"), lang("c_retrieve2", S_PATH)
   };
   /** Command help. */
   String[] HELPDELETE = {
-    '[' + C_PATH  + ']', lang("c_delete1"), lang("c_delete2")
+    '[' + S_PATH  + ']', lang("c_delete1"), lang("c_delete2")
   };
   /** Command help. */
   String[] HELPOPEN = {
-    '[' + C_NAME + "] ([" + C_PATH + "])", lang("c_open1"), lang("c_open2", C_NAME, C_PATH)
+    '[' + S_NAME + "] ([" + S_PATH + "])", lang("c_open1"), lang("c_open2", S_NAME, S_PATH)
   };
   /** Command help. */
   String[] HELPINFO = {
@@ -285,7 +342,7 @@ public interface Text {
     LI + lang("c_info22") + NL +
     LI + CmdInfo.DATABASE + ": " + lang("c_info23") + NL +
     LI + CmdInfo.INDEX + ": " + lang("c_info24") + NL +
-    LI + CmdInfo.STORAGE + " [start end] | [" + C_QUERY + "]: " + lang("c_info25")
+    LI + CmdInfo.STORAGE + " [start end] | [" + S_QUERY + "]: " + lang("c_info25")
   };
   /** Command help. */
   String[] HELPCLOSE = {
@@ -293,7 +350,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPLIST = {
-    "([" + C_NAME + "] ([" + C_PATH + "]))", lang("c_list1"), lang("c_list2", C_NAME, C_PATH)
+    "([" + S_NAME + "] ([" + S_PATH + "]))", lang("c_list1"), lang("c_list2", S_NAME, S_PATH)
   };
   /** Command help. */
   String[] HELPDROP = {
@@ -301,30 +358,30 @@ public interface Text {
       CmdDrop.INDEX + '|' + CmdDrop.USER + "] [...]",
     lang("c_drop1"),
     lang("c_drop2") + NL +
-    LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL +
-      "  " + lang("c_drop24", C_NAME) + NL +
-    LI + CmdDrop.DATABASE + " [" + C_NAME + "]:" + NL +
+    LI + CmdDrop.BACKUP + " [" + S_NAME + "]:" + NL +
+      "  " + lang("c_drop24", S_NAME) + NL +
+    LI + CmdDrop.DATABASE + " [" + S_NAME + "]:" + NL +
       "  " + lang("c_drop21") + NL +
-    LI + CmdDrop.EVENT + " [" + C_NAME + "]:" + NL +
-      "  " + lang("c_drop25", C_NAME) + NL +
+    LI + CmdDrop.EVENT + " [" + S_NAME + "]:" + NL +
+      "  " + lang("c_drop25", S_NAME) + NL +
     LI + CmdDrop.INDEX + " [" + CmdIndex.TEXT + '|' +
       CmdIndex.ATTRIBUTE + '|' + CmdIndex.FULLTEXT + "]:" + NL +
       "  " + lang("c_drop22") + NL +
-    LI + CmdDrop.USER + " [" + C_NAME + "] (" + ON + " [database]): " + NL +
+    LI + CmdDrop.USER + " [" + S_NAME + "] (" + ON + " [database]): " + NL +
       "  " + lang("c_drop23")
   };
   /** Command help. */
   String[] HELPEXPORT = {
-    '[' + C_PATH + ']', lang("c_export1"), lang("c_export2", C_PATH)
+    '[' + S_PATH + ']', lang("c_export1"), lang("c_export2", S_PATH)
   };
   /** Command help. */
   String[] HELPOPTIMIZE = {
-    '(' + C_ALL + ')', lang("c_optimize1"), lang("c_optimize2", C_ALL)
+    '(' + S_ALL + ')', lang("c_optimize1"), lang("c_optimize2", S_ALL)
   };
 
   /** Command help. */
   String[] HELPXQUERY = {
-    '[' + C_QUERY + ']', lang("c_xquery1"), lang("c_xquery2")
+    '[' + S_QUERY + ']', lang("c_xquery1"), lang("c_xquery2")
   };
   /** Command help. */
   String[] HELPFIND = {
@@ -336,32 +393,32 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPRUN = {
-    '[' + C_PATH + ']', lang("c_run1"), lang("c_run2", C_PATH)
+    '[' + S_PATH + ']', lang("c_run1"), lang("c_run2", S_PATH)
   };
   /** Command help. */
   String[] HELPEXECUTE = {
-    '[' + C_INPUT + ']', lang("c_execute1"), lang("c_execute2", C_INPUT)
+    '[' + S_INPUT + ']', lang("c_execute1"), lang("c_execute2", S_INPUT)
   };
   /** Command help. */
   String[] HELPCS = {
-    '[' + C_QUERY + ']', lang("c_cs1"), lang("c_cs2")
+    '[' + S_QUERY + ']', lang("c_cs1"), lang("c_cs2")
   };
   /** Command help. */
   String[] HELPKILL = {
-    '[' + C_NAME + ']', lang("c_kill1"), lang("c_kill2")
+    '[' + S_NAME + ']', lang("c_kill1"), lang("c_kill2")
   };
   /** Command help. */
   String[] HELPRENAME = {
-    '[' + C_PATH  + "] [newpath]", lang("c_rename1"), lang("c_rename2")
+    '[' + S_PATH  + "] [newpath]", lang("c_rename1"), lang("c_rename2")
   };
   /** Command help. */
   String[] HELPREPLACE = {
-    '[' + C_PATH  + "] [" + C_INPUT + ']',
+    '[' + S_PATH  + "] [" + S_INPUT + ']',
     lang("c_replace1"), lang("c_replace2")
   };
   /** Command help. */
   String[] HELPRESTORE = {
-    '[' + C_NAME + "-(date)]", lang("c_restore1"), lang("c_restore2")
+    '[' + S_NAME + "-(date)]", lang("c_restore1"), lang("c_restore2")
   };
   /** Command help. */
   String[] HELPSHOW = {
@@ -377,7 +434,7 @@ public interface Text {
   /** Command help. */
   String[] HELPGRANT = {
     "[" + CmdPerm.NONE + '|' + CmdPerm.READ + '|' + CmdPerm.WRITE + '|' +
-    CmdPerm.CREATE + '|' + CmdPerm.ADMIN + "] (" + ON + " [database]) " + C_TO +
+    CmdPerm.CREATE + '|' + CmdPerm.ADMIN + "] (" + ON + " [database]) " + S_TO +
     " [user]",
     lang("c_grant1"),
     lang("c_grant2")
@@ -387,9 +444,9 @@ public interface Text {
     "[" + CmdCreate.DATABASE + '|' + CmdCreate.USER + "] [...]",
     lang("c_alter1"),
     lang("c_alter2") + NL  +
-    LI + CmdCreate.DATABASE + " [" + C_NAME + "] [newname]" + NL +
+    LI + CmdCreate.DATABASE + " [" + S_NAME + "] [newname]" + NL +
     "  " + lang("c_alterdb") + NL +
-    LI + CmdCreate.USER  + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
+    LI + CmdCreate.USER  + " [" + S_NAME + "] ([" + S_PW + "]):" + NL +
     "  " + lang("c_alterpw")
   };
   /** Command help. */
@@ -408,17 +465,17 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPPASSWORD = {
-    "([" + C_PW + "])", lang("c_password1"), lang("c_password2")
+    "([" + S_PW + "])", lang("c_password1"), lang("c_password2")
   };
   /** Command help. */
   String[] HELPREPO = {
     "[" + CmdRepo.DELETE + '|' + CmdRepo.INSTALL + '|' + CmdRepo.LIST + ']',
     lang("c_repo1"),
     lang("c_repo2") + NL +
-    LI + CmdRepo.DELETE + " [" + C_PKGNAME + '|' + C_PKGDIR + "]:" +  NL +
-    "  " + lang("c_repo3", C_PKGNAME, C_PKGDIR) + NL +
-    LI + CmdRepo.INSTALL + " [" + C_PKGPATH + "]:" + NL +
-    "  " + lang("c_repo4", C_PKGPATH) + NL +
+    LI + CmdRepo.DELETE + " [" + S_PKGNAME + '|' + S_PKGDIR + "]:" +  NL +
+    "  " + lang("c_repo3", S_PKGNAME, S_PKGDIR) + NL +
+    LI + CmdRepo.INSTALL + " [" + S_PKGPATH + "]:" + NL +
+    "  " + lang("c_repo4", S_PKGPATH) + NL +
     LI + CmdRepo.LIST + ':' + NL +
     "  " + lang("c_repo5")
   };
@@ -589,22 +646,6 @@ public interface Text {
   /** Index not available. */
   String NOT_AVAILABLE = lang("not_available");
 
-  // DATABASE/INDEX INFORMATION ===============================================
-
-  /** Index info. */
-  String LI_STRUCTURE = LI + "Structure: ";
-  /** Index info. */
-  String LI_SIZE = LI + "Size: ";
-  /** Index info. */
-  String LI_ENTRIES = LI + "Entries: ";
-
-  /** Index info. */
-  String HASH = "Hash";
-  /** Index info. */
-  String FUZZY = "Fuzzy";
-  /** Index info. */
-  String SORTED_LIST = "Sorted List";
-
   // XQUERY COMMAND ===========================================================
 
   /** Query info: query. */
@@ -653,11 +694,6 @@ public interface Text {
   String STOPPED_AT = lang("stopped_at") + ' ';
   /** Line info. */
   String LINE_X = lang("line_%");
-
-  /** Query hits. */
-  String ITEM = "Item";
-  /** Query hits. */
-  String ITEMS = "Items";
 
   // ADMIN COMMANDS ==========================================================
 
@@ -822,15 +858,6 @@ public interface Text {
   /** "Error". */
   String ERROR = lang("error");
 
-  /** Options error. */
-  String OPT_OFFSET = "List counter for '%' is invalid.";
-  /** Options error. */
-  String OPT_BOOLEAN = "Value of '%' must be a boolean.";
-  /** Options error. */
-  String OPT_NUMBER = "Value of '%' must be a number.";
-  /** Options error. */
-  String OPT_ONEOF = "Value of '%' must be one of (%).";
-
   // MENU ENTRIES =============================================================
 
   /** "Database". */
@@ -945,10 +972,6 @@ public interface Text {
 
   /** Command info. */
   String FONTS_D = lang("fonts") + DOTS;
-  /** Command info. */
-  String MAP_LAYOUT_D = lang("map_layout") + DOTS;
-  /** Command info. */
-  String TREE_OPTIONS_D = lang("tree_options") + DOTS;
 
   // BUTTONS ==================================================================
 
@@ -1025,9 +1048,6 @@ public interface Text {
   /** "file". */
   String FILE = lang("file");
 
-  /** "log". */
-  String PLOTLOG = "log";
-
   // DIALOG WINDOWS ===========================================================
 
   /** Open dialog - No database. */
@@ -1054,32 +1074,6 @@ public interface Text {
   String NAME_OF_DB_COPY = lang("name_of_db_copy");
   /** Target path. */
   String TARGET_PATH = lang("target_path");
-
-  /** File description: XML Documents. */
-  String XML_DOCUMENTS = "XML Documents";
-  /** File description: XSL Documents. */
-  String XSL_DOCUMENTS = "XSL Documents";
-  /** File description: JSON Documents. */
-  String JSON_DOCUMENTS = "JSON Documents";
-  /** File description: HTML Documents. */
-  String HTML_DOCUMENTS = "HTML Documents";
-  /** File description: Comma-Separated Values. */
-  String CSV_DOCUMENTS = "Comma-Separated Values";
-  /** File description: Plain Text. */
-  String PLAIN_TEXT = "Plain Text";
-  /** File description: ZIP Archives. */
-  String ZIP_ARCHIVES = "ZIP Archives";
-  /** File description: XML Archives. */
-  String XML_ARCHIVES = "XML Archives";
-  /** File description: Java archives. */
-  String JAVA_ARCHIVES = "Java Archives";
-  /** File description: XQuery files. */
-  String XQUERY_FILES = "XQuery Files";
-  /** File description: Command scripts. */
-  String BXS_FILES = "Command Scripts";
-
-  /** "Stack Trace". */
-  String STACK_TRACE = "Stack Trace";
 
   /** Dialog title for database options. */
   String CREATE_DATABASE = lang("create_database");
@@ -1227,6 +1221,23 @@ public interface Text {
   /** Language preference. */
   String LANGUAGE_RESTART = lang("language") + " (" + lang("requires_restart") + ')';
 
+  /** Show line numbers. */
+  String SHOW_LINE_NUMBERS = lang("show_line_numbers");
+  /** Show line margin. */
+  String SHOW_LINE_MARGIN = lang("show_line_margin");
+  /** Show invisible characters. */
+  String SHOW_INVISIBLE = lang("show_invisible");
+  /** Show newlines. */
+  String SHOW_NEWLINES = lang("show_newlines");
+  /** Insert tabs as spaces. */
+  String TABS_AS_SPACES = lang("tabs_as_spaces");
+  /** Indentation size. */
+  String INDENTATION_SIZE = lang("indentation_size");
+  /** Mark current line. */
+  String MARK_EDITED_LINE = lang("mark_edited_line");
+  /** Save before executing file. */
+  String SAVE_BEFORE_EXECUTE = lang("save_before_execute");
+
   /** Comment. */
   String COMMENT = lang("comment");
   /** Dialog title for inserting new data. */
@@ -1296,8 +1307,6 @@ public interface Text {
   /** Memory information. */
   String MEMUSED_C = USED_MEM + COLS;
 
-  /** Copyright info. */
-  String COPYRIGHT = "\u00A9 2005-13 " + Prop.ENTITY;
   /** License info. */
   String LICENSE = lang("license");
   /** Developer info. */
@@ -1366,10 +1375,6 @@ public interface Text {
   String H_PROPERTIES = lang("h_properties");
   /** Command info. */
   String H_NEW_NODE = lang("h_new_node");
-  /** Command info. */
-  String H_MAP_LAYOUT = lang("h_map_layout");
-  /** Command info. */
-  String H_TREE_OPTIONS = lang("h_tree_options");
   /** Command info. */
   String H_PASTE = lang("h_paste");
   /** Command info. */

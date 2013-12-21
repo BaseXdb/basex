@@ -46,14 +46,14 @@ public final class FNClientTest extends AdvancedQueryTest {
     query(conn());
     query(EXISTS.args(' ' + conn()));
     // BXCL0001: connection errors
-    error(_CLIENT_CONNECT.args(Text.LOCALHOST, 9999, Text.ADMIN, ""), Err.BXCL_CONN);
-    error(_CLIENT_CONNECT.args("xxx", 9999, Text.ADMIN, Text.ADMIN), Err.BXCL_CONN);
+    error(_CLIENT_CONNECT.args(Text.S_LOCALHOST, 9999, Text.S_ADMIN, ""), Err.BXCL_CONN);
+    error(_CLIENT_CONNECT.args("xxx", 9999, Text.S_ADMIN, Text.S_ADMIN), Err.BXCL_CONN);
   }
 
   /** Test method. */
   @Test
   public void execute() {
-    contains(_CLIENT_EXECUTE.args(conn(), new ShowUsers()), Text.USERHEAD[0]);
+    contains(_CLIENT_EXECUTE.args(conn(), new ShowUsers()), Text.S_USERINFO[0]);
     query("let $a := " + conn() + ", $b := " + conn() + " return (" +
         _CLIENT_EXECUTE.args("$a", new XQuery("1")) + ',' +
         _CLIENT_EXECUTE.args("$b", new XQuery("2")) + ')', "1 2");
@@ -73,7 +73,7 @@ public final class FNClientTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void query() {
-    contains(_CLIENT_EXECUTE.args(conn(), new ShowUsers()), Text.USERHEAD[0]);
+    contains(_CLIENT_EXECUTE.args(conn(), new ShowUsers()), Text.S_USERINFO[0]);
     query("let $a := " + conn() + ", $b := " + conn() + " return " +
         _CLIENT_QUERY.args("$a", "1") + '+' + _CLIENT_QUERY.args("$b", "2"), "3");
     query(_CLIENT_QUERY.args(conn(), "\"$a*2\"", " { 'a':1 }"), "2");
@@ -108,6 +108,6 @@ public final class FNClientTest extends AdvancedQueryTest {
    * @return connect string
    */
   private static String conn() {
-    return _CLIENT_CONNECT.args(Text.LOCALHOST, 9999, Text.ADMIN, Text.ADMIN);
+    return _CLIENT_CONNECT.args(Text.S_LOCALHOST, 9999, Text.S_ADMIN, Text.S_ADMIN);
   }
 }

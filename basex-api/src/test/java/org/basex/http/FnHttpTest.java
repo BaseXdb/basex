@@ -35,7 +35,7 @@ import org.junit.*;
  */
 public class FnHttpTest extends HTTPTest {
   /** Example url. */
-  private static final String ROOT = "http://" + LOCALHOST + ":9998/rest/";
+  private static final String ROOT = "http://" + S_LOCALHOST + ":9998/rest/";
   /** Example url. */
   static final String RESTURL = ROOT + NAME;
 

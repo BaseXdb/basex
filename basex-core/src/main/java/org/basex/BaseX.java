@@ -164,7 +164,7 @@ public class BaseX extends Main {
       if(console) {
         verbose = true;
         // enter interactive mode
-        Util.outln(CONSOLE + TRY_MORE_X, sa() ? LOCALMODE : CLIENTMODE);
+        Util.outln(S_CONSOLE + TRY_MORE_X, sa() ? S_STANDALONE : S_CLIENT);
         console();
       }
 
@@ -194,8 +194,8 @@ public class BaseX extends Main {
     ops = new IntList();
     vals = new StringList();
 
-    final Args arg = new Args(args, this, sa() ? LOCALINFO : CLIENTINFO,
-        Util.info(CONSOLE, sa() ? LOCALMODE : CLIENTMODE));
+    final Args arg = new Args(args, this, sa() ? S_LOCALINFO : S_CLIENTINFO,
+        Util.info(S_CONSOLE, sa() ? S_STANDALONE : S_CLIENT));
     while(arg.more()) {
       final char c;
       String v = null;

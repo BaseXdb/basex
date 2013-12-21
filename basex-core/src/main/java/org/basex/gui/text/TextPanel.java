@@ -51,7 +51,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Text editor. */
-  protected final TextEditor editor = new TextEditor(EMPTY);
+  protected final TextEditor editor;
   /** Undo history. */
   public final History hist;
   /** Search bar. */
@@ -72,20 +72,22 @@ public class TextPanel extends BaseXPanel {
    * @param win parent window
    */
   public TextPanel(final boolean edit, final Window win) {
-    this(edit, win, EMPTY);
+    this(EMPTY, edit, win);
   }
 
   /**
    * Default constructor.
+   * @param txt initial text
    * @param edit editable flag
    * @param win parent window
-   * @param txt initial text
    */
-  public TextPanel(final boolean edit, final Window win, final byte[] txt) {
+  public TextPanel(final byte[] txt, final boolean edit, final Window win) {
     super(win);
+    editable = edit;
+    editor = new TextEditor(gui);
+
     setFocusable(true);
     setFocusTraversalKeysEnabled(!edit);
-    editable = edit;
 
     addMouseMotionListener(this);
     addMouseWheelListener(this);
@@ -109,7 +111,7 @@ public class TextPanel extends BaseXPanel {
     layout(new BorderLayout());
 
     scroll = new BaseXScrollBar(this);
-    rend = new TextRenderer(editor, scroll, editable);
+    rend = new TextRenderer(editor, scroll, editable, gui);
 
     add(rend, BorderLayout.CENTER);
     add(scroll, BorderLayout.EAST);

@@ -122,8 +122,8 @@ public final class BaseXServer extends Main implements Runnable {
       new Thread(this).start();
       while(!running) Performance.sleep(10);
 
-      Util.outln(CONSOLE + (console ? TRY_MORE_X :
-        Util.info(SRV_STARTED_PORT_X, port)), SERVERMODE);
+      Util.outln(S_CONSOLE + (console ? TRY_MORE_X :
+        Util.info(SRV_STARTED_PORT_X, port)), S_SERVER);
 
       if(console) {
         console();
@@ -223,7 +223,7 @@ public final class BaseXServer extends Main implements Runnable {
 
   @Override
   protected void parseArguments(final String... args) throws IOException {
-    final Args arg = new Args(args, this, SERVERINFO, Util.info(CONSOLE, SERVERMODE));
+    final Args arg = new Args(args, this, S_SERVERINFO, Util.info(S_CONSOLE, S_SERVER));
     commands = new StringList();
     boolean daemon = false;
 
@@ -289,13 +289,13 @@ public final class BaseXServer extends Main implements Runnable {
    */
   public static void start(final int port, final String... args) throws BaseXException {
     // check if server is already running (needs some time)
-    if(ping(LOCALHOST, port)) throw new BaseXException(SRV_RUNNING);
+    if(ping(S_LOCALHOST, port)) throw new BaseXException(SRV_RUNNING);
 
     Util.start(BaseXServer.class, args);
 
     // try to connect to the new server instance
     for(int c = 1; c < 10; ++c) {
-      if(ping(LOCALHOST, port)) return;
+      if(ping(S_LOCALHOST, port)) return;
       Performance.sleep(c * 100);
     }
     throw new BaseXException(CONNECTION_ERROR);
@@ -330,10 +330,10 @@ public final class BaseXServer extends Main implements Runnable {
     final IOFile stop = stopFile(port);
     try {
       stop.touch();
-      new Socket(LOCALHOST, eport).close();
-      new Socket(LOCALHOST, port).close();
+      new Socket(S_LOCALHOST, eport).close();
+      new Socket(S_LOCALHOST, port).close();
       // wait and check if server was really stopped
-      do Performance.sleep(50); while(ping(LOCALHOST, port));
+      do Performance.sleep(50); while(ping(S_LOCALHOST, port));
     } catch(final IOException ex) {
       stop.delete();
       throw ex;

@@ -47,7 +47,7 @@ public abstract class HTTPTest extends SandboxTest {
     final StringList sl = new StringList();
     if(local) sl.add("-l");
     sl.add("-p9996", "-e9997", "-h9998", "-s9999", "-z",
-        "-U" + Text.ADMIN, "-P" + Text.ADMIN);
+        "-U" + Text.S_ADMIN, "-P" + Text.S_ADMIN);
     System.setOut(NULL);
     try {
       http = new BaseXHTTP(sl.toArray());
@@ -151,7 +151,7 @@ public abstract class HTTPTest extends SandboxTest {
     conn.setRequestMethod(POST.name());
     conn.setRequestProperty(MimeTypes.CONTENT_TYPE, type);
     // basic authentication
-    final String encoded = Base64.encode(Text.ADMIN + ':' + Text.ADMIN);
+    final String encoded = Base64.encode(Text.S_ADMIN + ':' + Text.S_ADMIN);
     conn.setRequestProperty(HTTPText.AUTHORIZATION, HTTPText.BASIC + ' ' + encoded);
     // send query
     final OutputStream out = conn.getOutputStream();

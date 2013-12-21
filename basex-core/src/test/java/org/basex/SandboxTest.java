@@ -110,9 +110,9 @@ public abstract class SandboxTest {
    * @throws IOException I/O exception
    */
   protected static ClientSession createClient(final String... login) throws IOException {
-    final String user = login.length > 0 ? login[0] : ADMIN;
-    final String pass = login.length > 1 ? login[1] : ADMIN;
-    return new ClientSession(LOCALHOST, 9999, user, pass);
+    final String user = login.length > 0 ? login[0] : S_ADMIN;
+    final String pass = login.length > 1 ? login[1] : S_ADMIN;
+    return new ClientSession(S_LOCALHOST, 9999, user, pass);
   }
 
   /**

@@ -86,7 +86,7 @@ public final class DialogEdit extends BaseXDialog {
       b.add(input2, BorderLayout.CENTER);
     }
     if(old3 != null) {
-      input3 = new TextPanel(true, this, old3);
+      input3 = new TextPanel(old3, true, this);
       input3.addKeyListener(keys);
       input3.setPreferredSize(new Dimension(500, 350));
       b.add(new SearchEditor(main, input3), BorderLayout.CENTER);

@@ -688,22 +688,6 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
-  /** Map layout. */
-  C_MAPLAYOUT(MAP_LAYOUT_D, null, H_MAP_LAYOUT, true, false) {
-    @Override
-    public void execute(final GUI gui) {
-      new DialogMapLayout(gui);
-    }
-  },
-
-  /** TreeView options. */
-  C_TREEOPTIONS(TREE_OPTIONS_D, null, H_TREE_OPTIONS, true, false) {
-    @Override
-    public void execute(final GUI gui) {
-      new DialogTreeOptions(gui);
-    }
-  },
-
   /** Shows a preference dialog. */
   C_PREFS(PREFERENCES + DOTS, Prop.MAC ? "% COMMA" : "% shift P", H_PREFERENCES, false, false) {
     @Override

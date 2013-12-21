@@ -66,9 +66,10 @@ abstract class Syntax {
   /**
    * Returns a formatted version of a string.
    * @param string string to be formatted
+   * @param spaces spaces
    * @return formatted string
    */
-  public byte[] format(final byte[] string) {
+  public byte[] format(final byte[] string, @SuppressWarnings("unused") final byte[] spaces) {
     return string;
   }
 }

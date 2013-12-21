@@ -446,8 +446,7 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Path constructor. Resolves parent and self references and normalizes the
-   * path.
+   * Path constructor. Resolves parent and self references and normalizes the path.
    */
   static class PathList extends StringList {
     /**

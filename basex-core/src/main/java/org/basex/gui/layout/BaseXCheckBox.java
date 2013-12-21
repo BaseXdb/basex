@@ -14,16 +14,25 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class BaseXCheckBox extends JCheckBox {
+  /** Initial value. */
+  private final boolean initial;
+  /** Options. */
+  private Options options;
+  /** Boolean option. */
+  private BooleanOption option;
+
   /**
    * Checkbox.
    * @param label checkbox text
-   * @param option option
+   * @param opt option
    * @param opts options
    * @param win parent window
    */
-  public BaseXCheckBox(final String label, final BooleanOption option, final Options opts,
+  public BaseXCheckBox(final String label, final BooleanOption opt, final Options opts,
       final Window win) {
-    this(label, opts.get(option), win);
+    this(label, opts.get(opt), win);
+    options = opts;
+    option = opt;
   }
 
   /**
@@ -36,6 +45,8 @@ public final class BaseXCheckBox extends JCheckBox {
     super(label, sel);
     setOpaque(false);
     setMargin(new Insets(0, 0, 0, 0));
+    initial = sel;
+
     BaseXLayout.addInteraction(this, win);
     if(!(win instanceof BaseXDialog)) return;
 
@@ -66,5 +77,19 @@ public final class BaseXCheckBox extends JCheckBox {
     final Font f = getFont();
     setFont(new Font(f.getName(), Font.PLAIN, (int) f.getSize2D() + 4));
     return this;
+  }
+
+  /**
+   * Assigns the current checkbox value to the option specified in the constructor.
+   */
+  public void assign() {
+    options.set(option, isSelected());
+  }
+
+  /**
+   * Assigns the original value to the option specified in the constructor.
+   */
+  public void reset() {
+    options.set(option, initial);
   }
 }

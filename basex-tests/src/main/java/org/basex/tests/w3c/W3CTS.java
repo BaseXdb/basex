@@ -767,7 +767,7 @@ public abstract class W3CTS {
         " -p     change path" + NL +
         " -r     create report" + NL +
         " -t[ms] list slowest queries" + NL +
-        " -v     verbose output", Util.info(CONSOLE, Util.className(this)));
+        " -v     verbose output", Util.info(S_CONSOLE, Util.className(this)));
 
     while(arg.more()) {
       if(arg.dash()) {

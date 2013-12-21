@@ -63,7 +63,7 @@ public final class Log {
   public synchronized void writeServer(final Object... str) {
     final Object[] tmp = new Object[str.length + 2];
     tmp[0] = SERVER;
-    tmp[1] = ADMIN;
+    tmp[1] = S_ADMIN;
     System.arraycopy(str, 0, tmp, 2, str.length);
     write(tmp);
   }

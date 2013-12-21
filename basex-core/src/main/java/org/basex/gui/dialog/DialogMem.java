@@ -29,7 +29,7 @@ public class DialogMem extends BaseXDialog {
     super(main, USED_MEM, false);
     panel.setLayout(new BorderLayout());
 
-    text = new TextPanel(false, this, Token.token(info()));
+    text = new TextPanel(Token.token(info()), false, this);
     text.setFont(panel.getFont());
     set(text, BorderLayout.CENTER);
 

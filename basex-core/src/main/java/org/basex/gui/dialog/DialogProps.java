@@ -88,7 +88,7 @@ public final class DialogProps extends BaseXDialog {
     for(int i = 0; i < LABELS.length; ++i) {
       labels[i] = new BaseXLabel(LABELS[i]).large();
       panels[i] = new BaseXBack(new BorderLayout(0, 4));
-      infos[i] = new TextPanel(false, this, Token.token(PLEASE_WAIT_D));
+      infos[i] = new TextPanel(Token.token(PLEASE_WAIT_D), false, this);
       BaseXLayout.setHeight(infos[i], 200);
       if(i != 1) {
         indxs[i] = new BaseXButton(" ", this);
@@ -127,7 +127,7 @@ public final class DialogProps extends BaseXDialog {
       info.bold().add(NL + NAMESPACES + NL).norm().add(data.nspaces.info());
     }
 
-    final TextPanel text = new TextPanel(false, this, info.finish());
+    final TextPanel text = new TextPanel(info.finish(), false, this);
     text.setFont(f);
     BaseXLayout.setHeight(text, 200);
     tabGeneral.add(new SearchEditor(main, text), BorderLayout.CENTER);

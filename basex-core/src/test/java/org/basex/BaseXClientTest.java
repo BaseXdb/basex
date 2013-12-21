@@ -87,7 +87,7 @@ public final class BaseXClientTest extends BaseXTest {
     System.setErr(NULL);
 
     final StringList sl = new StringList();
-    sl.add("-p9999").add("-U" + Text.ADMIN).add("-P" + Text.ADMIN).add(args);
+    sl.add("-p9999").add("-U" + Text.S_ADMIN).add("-P" + Text.S_ADMIN).add(args);
     try {
       new BaseXClient(sl.toArray());
       return ao.toString();

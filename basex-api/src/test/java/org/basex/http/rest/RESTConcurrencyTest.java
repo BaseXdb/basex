@@ -22,7 +22,7 @@ public class RESTConcurrencyTest extends HTTPTest {
   /** REST identifier. */
   private static final String REST = "rest";
   /** Root path. */
-  private static final String ROOT = "http://" + Text.LOCALHOST + ":9998/" + REST + '/';
+  private static final String ROOT = "http://" + Text.S_LOCALHOST + ":9998/" + REST + '/';
   /** Client count. */
   private static final int CLIENTS = 10;
   /** Runs per client. */

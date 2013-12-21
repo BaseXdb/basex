@@ -151,7 +151,7 @@ public final class SyntaxXQuery extends Syntax {
   }
 
   @Override
-  public byte[] format(final byte[] text) {
+  public byte[] format(final byte[] text, final byte[] spaces) {
     int ind = 0;
     final TokenBuilder tb = new TokenBuilder();
     final int tl = text.length;
@@ -166,13 +166,13 @@ public final class SyntaxXQuery extends Syntax {
         tb.addByte(ch);
         if(next != '\n' && !matches(CLOSING.charAt(open), t, text, 3)) {
           tb.add('\n');
-          for(int i = 0; i < ind; i++) tb.add(TextEditor.INDENT);
+          for(int i = 0; i < ind; i++) tb.add(spaces);
         }
       } else if(close != -1 && (prev != ':' || ch != ')')) {
         ind--;
         if(!spaces(tb) && !matches(OPENING.charAt(close), t, text, -3)) {
           tb.add('\n');
-          for(int i = 0; i < ind; i++) tb.add(TextEditor.INDENT);
+          for(int i = 0; i < ind; i++) tb.add(spaces);
         }
         tb.addByte(ch);
       } else {

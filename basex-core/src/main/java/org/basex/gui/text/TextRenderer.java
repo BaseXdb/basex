@@ -17,6 +17,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class TextRenderer extends BaseXBack {
+  /** Reference to the main window. */
+  public final GUI gui;
   /** Offset. */
   private static final int OFFSET = 5;
 
@@ -41,6 +43,18 @@ final class TextRenderer extends BaseXBack {
   private int[] charWidths = GUIConstants.mfwidth;
   /** Width of current word. */
   private int wordWidth;
+  /** Show invisible characters. */
+  private boolean showInvisible;
+  /** Show newlines. */
+  private boolean showNL;
+  /** Line margin. */
+  private int margin;
+  /** Tab indentation. */
+  private int indent;
+  /** Show line numbers. */
+  private boolean showLines;
+  /** Mark current line. */
+  private boolean markline;
   /** Color. */
   private Color color;
 
@@ -76,12 +90,14 @@ final class TextRenderer extends BaseXBack {
    * @param t text to be drawn
    * @param s scrollbar reference
    * @param editable editable flag
+   * @param main reference to the main window
    */
-  TextRenderer(final TextEditor t, final BaseXScrollBar s, final boolean editable) {
+  TextRenderer(final TextEditor t, final BaseXScrollBar s, final boolean editable, final GUI main) {
     mode(Fill.NONE);
     text = t;
     scroll = s;
     edit = editable;
+    gui = main;
   }
 
   @Override
@@ -89,6 +105,16 @@ final class TextRenderer extends BaseXBack {
     defaultFont = f;
     boldFont = f.deriveFont(Font.BOLD);
     font(f);
+    if(gui != null) {
+      margin = gui.gopts.get(GUIOptions.SHOWMARGIN)
+          ? Math.max(gui.gopts.get(GUIOptions.MARGIN), 1) : -1;
+      showInvisible = gui.gopts.get(GUIOptions.SHOWINVISIBLE);
+      showNL = gui.gopts.get(GUIOptions.SHOWNL);
+      showLines = gui.gopts.get(GUIOptions.SHOWLINES);
+      markline = gui.gopts.get(GUIOptions.MARKLINE);
+      indent = Math.max(1, gui.gopts.get(GUIOptions.INDENT));
+      repaint();
+    }
   }
 
   @Override
@@ -121,7 +147,7 @@ final class TextRenderer extends BaseXBack {
    * @param g graphics reference
    */
   private void drawLineNumber(final Graphics g) {
-    if(edit) {
+    if(edit && showLines) {
       g.setColor(GUIConstants.GRAY);
       final String s = Integer.toString(line);
       g.drawString(s, offset - fontWidth(g, s) - OFFSET * 2, y);
@@ -143,12 +169,17 @@ final class TextRenderer extends BaseXBack {
    */
   private void drawLinesSep(final Graphics g) {
     if(edit) {
-      int lx = offset - OFFSET * 3 / 2;
-      g.setColor(GUIConstants.LGRAY);
-      g.drawLine(lx, 0, lx, height);
-      // line margin
-      lx = offset + fontWidth(g, ' ') * 100;
-      g.drawLine(lx, 0, lx, height);
+      if(showLines) {
+        final int lx = offset - OFFSET * 3 / 2;
+        g.setColor(GUIConstants.LGRAY);
+        g.drawLine(lx, 0, lx, height);
+      }
+      if(margin != -1) {
+        // line margin
+        final int lx = offset + fontWidth(g, ' ') * margin;
+        g.setColor(GUIConstants.LGRAY);
+        g.drawLine(lx, 0, lx, height);
+      }
     }
   }
 
@@ -253,7 +284,7 @@ final class TextRenderer extends BaseXBack {
     final TextIterator iter = new TextIterator(text);
     link = false;
     offset = OFFSET;
-    if(edit) offset += fontWidth(g, Integer.toString(text.lines())) + OFFSET * 2;
+    if(edit && showLines) offset += fontWidth(g, Integer.toString(text.lines())) + OFFSET * 2;
     x = offset;
     y = fontHeight - (start ? 0 : scroll.pos()) - 2;
     lineY = y - fontHeight * 4 / 5;
@@ -340,7 +371,7 @@ final class TextRenderer extends BaseXBack {
    * @param g graphics reference
    */
   private void markLine(final Graphics g) {
-    if(lineC) {
+    if(lineC && markline) {
       g.setColor(GUIConstants.color4A);
       g.fillRect(0, lineY, width + offset, fontHeight);
     }
@@ -410,11 +441,14 @@ final class TextRenderer extends BaseXBack {
       if(iter.erroneous()) drawError(g);
 
       // don't write whitespaces
-      if(ch == '\u00a0') {
-        final int s = fontHeight / 12;
+      if(ch == '\n' && showNL) {
+        g.setColor(GUIConstants.GRAY);
+        g.drawString("\u00b6", x, y);
+      } else if((ch == '\u00a0' || ch >= 0x2000 && ch <= 0x200A) && showInvisible) {
+        final int s = fontHeight / 12 + 1;
         g.setColor(GUIConstants.GRAY);
         g.fillRect(x + (wordWidth >> 1), y - fontHeight * 3 / 10, s, s);
-      } else if(ch == '\t') {
+      } else if(ch == '\t' && showInvisible) {
         final int yy = y - fontHeight * 3 / 10;
         final int s = 1 + fontHeight / 12;
         final int xe = x + fontWidth(g, '\t') - s;
@@ -423,7 +457,7 @@ final class TextRenderer extends BaseXBack {
         g.drawLine(x + s, yy, xe, yy);
         g.drawLine(xe - as, yy - as, xe, yy);
         g.drawLine(xe - as, yy + as, xe, yy);
-      } else if(ch >= ' ') {
+      } else if(ch > ' ') {
         g.setColor(color);
         String n = iter.nextString();
         int ww = width - x;
@@ -514,7 +548,7 @@ final class TextRenderer extends BaseXBack {
    */
   private int fontWidth(final Graphics g, final int cp) {
     return cp < ' ' || g == null ?  cp == '\t' ?
-      charWidths[' '] * TextEditor.TAB : 0 : cp < 256 ? charWidths[cp] :
+      charWidths[' '] * indent : 0 : cp < 256 ? charWidths[cp] :
       cp >= 0xD800 && cp <= 0xDC00 ? 0 : g.getFontMetrics().charWidth(cp);
   }
 

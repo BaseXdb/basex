@@ -112,10 +112,11 @@ public final class PlotView extends View {
         refreshUpdate();
       }
     });
-    dots = new BaseXSlider(-6, 6, gui.gopts.get(GUIOptions.PLOTDOTS), gui, new ActionListener() {
+    dots = new BaseXSlider(-6, 6, GUIOptions.PLOTDOTS, gui.gopts, gui);
+    dots.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        gui.gopts.set(GUIOptions.PLOTDOTS, dots.value());
+        dots.assign();
         refreshLayout();
       }
     });

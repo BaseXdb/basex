@@ -42,7 +42,7 @@ public final class DialogMessage extends BaseXDialog {
     b.setIcon(ic.large);
     back.add(b);
 
-    final TextPanel text = new TextPanel(false, this, Token.token(txt));
+    final TextPanel text = new TextPanel(Token.token(txt), false, this);
     text.setFont(b.getFont());
     back.add(text);
 

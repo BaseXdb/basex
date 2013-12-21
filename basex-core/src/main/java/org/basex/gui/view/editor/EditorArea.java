@@ -156,6 +156,33 @@ public final class EditorArea extends TextPanel {
   }
 
   /**
+   * Saves the specified editor contents.
+   * @return success flag
+   */
+  boolean save() {
+    return save(file);
+  }
+
+  /**
+   * Saves the editor contents.
+   * @param io file to save
+   * @return success flag
+   */
+  boolean save(final IOFile io) {
+    final boolean same = io == file;
+    if(same && !modified) return false;
+    try {
+      io.write(getText());
+      file(io);
+      view.project.refresh(io, true);
+      return true;
+    } catch(final Exception ex) {
+      BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, io));
+      return false;
+    }
+  }
+
+  /**
    * Jumps to the specified string.
    * @param string search string
    */
@@ -172,15 +199,17 @@ public final class EditorArea extends TextPanel {
 
   /**
    * Updates the file reference, timestamp and history.
-   * @param f file
+   * @param io file
    */
-  void file(final IOFile f) {
-    file = f;
-    label.setIcon(BaseXImages.file(f));
-    tstamp = f.timeStamp();
-    setSyntax(file, true);
+  void file(final IOFile io) {
+    if(io != file) {
+      file = io;
+      label.setIcon(BaseXImages.file(io));
+      setSyntax(io, true);
+    }
+    tstamp = file.timeStamp();
     hist.save();
     view.refreshHistory(file);
-    view.refreshControls(true);
+    view.refreshControls(this, true);
   }
 }

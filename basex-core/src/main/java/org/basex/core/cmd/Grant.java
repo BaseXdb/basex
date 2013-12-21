@@ -62,7 +62,7 @@ public final class Grant extends AUser {
   @Override
   protected boolean run(final String user, final String db) {
     // admin cannot be modified
-    if(user.equals(ADMIN)) return !info(ADMIN_STATIC_X);
+    if(user.equals(S_ADMIN)) return !info(ADMIN_STATIC_X);
 
     // set global permissions
     if(db == null) {
@@ -103,6 +103,6 @@ public final class Grant extends AUser {
 
   @Override
   public void build(final CmdBuilder cb) {
-    cb.init().arg(0).arg(ON, 2).arg(C_TO, 1);
+    cb.init().arg(0).arg(ON, 2).arg(S_TO, 1);
   }
 }

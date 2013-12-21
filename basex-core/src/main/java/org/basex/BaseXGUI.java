@@ -152,7 +152,7 @@ public final class BaseXGUI {
    * @throws BaseXException database exception
    */
   private void parseArguments(final String[] args) throws BaseXException {
-    final Args arg = new Args(args, this, GUIINFO, Util.info(CONSOLE, GUIMODE));
+    final Args arg = new Args(args, this, S_GUIINFO, Util.info(S_CONSOLE, S_GUI));
     while(arg.more()) {
       if(arg.dash()) throw arg.usage();
       files.add(arg.string());

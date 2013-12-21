@@ -103,10 +103,10 @@ public final class StringParser extends CmdParser {
       case CHECK:
         return new Check(string(cmd));
       case ADD:
-        String arg = key(C_TO, null) ? string(cmd) : null;
+        String arg = key(S_TO, null) ? string(cmd) : null;
         return new Add(arg, single ? remaining(cmd) : string(cmd));
       case STORE:
-        arg = key(C_TO, null) ? string(cmd) : null;
+        arg = key(S_TO, null) ? string(cmd) : null;
         return new Store(arg, single ? remaining(cmd) : string(cmd));
       case RETRIEVE:
         return new Retrieve(string(cmd));
@@ -203,7 +203,7 @@ public final class StringParser extends CmdParser {
         final CmdPerm perm = consume(CmdPerm.class, cmd);
         if(perm == null) throw help(null, cmd);
         final String db = key(ON, null) ? glob(cmd) : null;
-        key(C_TO, cmd);
+        key(S_TO, cmd);
         return new Grant(perm, glob(cmd), db);
       case REPO:
         switch(consume(CmdRepo.class, cmd)) {

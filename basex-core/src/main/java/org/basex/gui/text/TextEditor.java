@@ -5,7 +5,8 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.gui.text.TextPanel.*;
+import org.basex.gui.*;
+import org.basex.gui.text.TextPanel.SearchDir;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -22,12 +23,6 @@ public final class TextEditor {
   private static final String OPENING = "{([";
   /** Closing brackets. */
   private static final String CLOSING = "})]";
-  /** Tab width. */
-  static final int TAB = 2;
-  /** Indentation. */
-  static final byte[] INDENT = new byte[TAB];
-
-  static { Arrays.fill(INDENT, (byte) ' '); }
 
   /** Start and end positions of search terms. */
   IntList[] searchPos;
@@ -40,6 +35,8 @@ public final class TextEditor {
   /** Cursor position. */
   int caret;
 
+  /** GUI options. */
+  private GUIOptions gopts;
   /** Search context. */
   private SearchContext search;
   /** Text array to be written. */
@@ -51,10 +48,10 @@ public final class TextEditor {
 
   /**
    * Constructor.
-   * @param t text
+   * @param gui gui reference
    */
-  TextEditor(final byte[] t) {
-    text = t;
+  TextEditor(final GUI gui) {
+    gopts = gui.gopts;
   }
 
   /**
@@ -181,14 +178,38 @@ public final class TextEditor {
   // POSITION ===========================================================================
 
   /**
+   * Returns the current indentation.
+   * @return indentation
+   */
+  private int indent() {
+    return Math.max(1, gopts.get(GUIOptions.INDENT));
+  }
+
+  /**
+   * Returns the spaces used for indenting text.
+   * @return spaces
+   */
+  private byte[] spaces() {
+    final byte[] spaces;
+    if(gopts.get(GUIOptions.TABSPACES)) {
+      spaces = new byte[indent()];
+      Arrays.fill(spaces, (byte) ' ');
+    } else {
+      spaces = new byte[] { '\t' };
+    }
+    return spaces;
+  }
+
+  /**
    * Moves to the beginning of the line.
    * @param select selection flag
    * @return number of passed characters
    */
   int bol(final boolean select) {
     if(pos == 0) return 0;
+    final int ind = indent();
     int c = 0;
-    do c += curr() == '\t' ? TAB : 1; while(prev(select) != '\n');
+    do c += curr() == '\t' ? ind : 1; while(prev(select) != '\n');
     if(pos != 0 || curr() == '\n') next(select);
     return c;
   }
@@ -242,9 +263,10 @@ public final class TextEditor {
    * @param select selection flag
    */
   void forward(final int p, final boolean select) {
+    final int ind = indent();
     int nc = 0;
     while(curr() != '\n') {
-      nc += curr() == '\t' ? TAB : 1;
+      nc += curr() == '\t' ? ind : 1;
       if(nc >= p) return;
       next(select);
     }
@@ -421,7 +443,7 @@ public final class TextEditor {
 
     final int s = Math.min(selectPos, selectEnd);
     final int e = Math.max(selectPos, selectEnd);
-    final byte[] format = syntax.format(Arrays.copyOfRange(text, s, e));
+    final byte[] format = syntax.format(Arrays.copyOfRange(text, s, e), spaces());
     final boolean changed = add(format, s, e);
     selectPos = s;
     selectEnd = s + format.length;
@@ -457,7 +479,7 @@ public final class TextEditor {
         if(b == '\n') break;
       }
       sb.setLength(0);
-      sb.append("  ");
+      sb.append(string(spaces()));
     }
     return false;
   }
@@ -472,20 +494,21 @@ public final class TextEditor {
     final boolean opening = pos > 0 && OPENING.indexOf(text[pos - 1]) != -1;
     final boolean closing = pos < text.length && CLOSING.indexOf(text[pos]) != -1;
 
-    int ind = open(), move = 0;
+    final int ind = indent();
+    int indent = open(), move = 0;
     if(opening) {
       if(closing) {
-        for(int p = 0; p < ind + TAB; p++) sb.append(' ');
-        move = ind + TAB + 1;
+        for(int p = 0; p < indent + ind; p++) sb.append(' ');
+        move = indent + ind + 1;
         sb.append('\n');
       } else {
-        ind += TAB;
+        indent += ind;
       }
     } else if(closing) {
       // unindent before closing bracket
-      ind -= TAB;
+      indent -= ind;
     }
-    for(int p = 0; p < ind; p++) sb.append(' ');
+    for(int p = 0; p < indent; p++) sb.append(' ');
     add(sb, false);
     return move;
   }
@@ -577,7 +600,7 @@ public final class TextEditor {
       if(!ws(b)) return;
     }
     if(++p >= pos) return;
-    selectPos = Math.max(pos - TAB, p);
+    selectPos = Math.max(pos - indent(), p);
     selectEnd = Math.max(pos, p);
     if(selectPos != selectEnd) delete();
   }
@@ -688,48 +711,37 @@ public final class TextEditor {
    */
   private void indent(final boolean shift) {
     extend();
-    final int s = selectPos, e = selectEnd, tl = text.length;
-    int o = e;
+    final int s = selectPos, e = selectEnd, ind = indent();
+    final byte[] spaces = spaces();
 
     // build new text
     final TokenBuilder tb = new TokenBuilder();
-    boolean indent = true;
-    for(int p = s; p < e; p += cl(text, p)) {
+    for(int p = s; p < e; p++) {
       if(p == 0 || text[p - 1] == '\n') {
-        indent = true;
-        if(shift) {
-          // remove indentation
-          if(text[p] == '\t') {
-            o--;
-            continue;
+        // find leading whitespaces
+        int i = 0;
+        do {
+          int cp = text[p];
+          if(cp == '\t') {
+            i += ind;
+          } else if(cp == ' ') {
+            i++;
+          } else {
+            break;
           }
-          if(text[p] == ' ') {
-            o--;
-            for(int i = 1; i < TAB && p + i < tl && text[p + i] == ' '; i++) {
-              o--;
-              p++;
-            }
-            continue;
-          }
-        } else {
-          // add new indentation
-          tb.add(INDENT);
-          o += TAB;
-        }
+        } while(++p < e);
+
+        // calculate indentation, add indentation and remaining spaces
+        i = shift ? Math.max(0, i - ind) : i + ind;
+        for(int c = 0; c < i / ind; c++) tb.add(spaces);
+        for(int c = 0; c < i % ind; c++) tb.add(' ');
       }
-      // remove tab indentations
-      int cp = cp(text, p);
-      if(indent) {
-        if(cp == '\t') {
-          cp = ' ';
-          tb.add(' ');
-        } else if(cp != ' ') {
-          indent = false;
-        }
-      }
-      tb.add(cp);
+      if(p < e) tb.addByte(text[p]);
     }
-    add(tb.finish(), s, e);
+
+    final byte[] tmp = tb.finish();
+    add(tmp, s, e);
+    final int o = s + tmp.length;
     select(s, o);
     setCaret(o);
   }
@@ -740,19 +752,20 @@ public final class TextEditor {
    */
   private int open() {
     // adopt indentation from previous line
-    int ind = 0;
+    final int ind = indent();
+    int indent = 0;
     for(int p = pos - 1; p >= 0; p--) {
       final byte b = text[p];
       if(b == '\n') break;
       if(b == '\t') {
-        ind += TAB;
+        indent += ind;
       } else if(b == ' ') {
-        ind++;
+        indent++;
       } else {
-        ind = 0;
+        indent = 0;
       }
     }
-    return ind;
+    return indent;
   }
 
   // TEXT NAVIGATION AND SELECTION ================================================================

@@ -256,7 +256,7 @@ public final class BaseXHTTP {
   private void parseArguments(final String[] args) throws IOException {
     /* command-line properties will be stored in system properties;
      * this way, they will not be overwritten by the settings specified in web.xml. */
-    final Args arg = new Args(args, this, HTTPINFO, Util.info(CONSOLE, HTTP));
+    final Args arg = new Args(args, this, S_HTTPINFO, Util.info(S_CONSOLE, HTTP));
     boolean serve = true;
     while(arg.more()) {
       if(arg.dash()) {
@@ -325,7 +325,7 @@ public final class BaseXHTTP {
     Util.start(BaseXHTTP.class, args);
     // try to connect to the new server instance
     for(int c = 1; c < 10; ++c) {
-      if(ping(LOCALHOST, port, ssl)) return;
+      if(ping(S_LOCALHOST, port, ssl)) return;
       Performance.sleep(c * 100L);
     }
     throw new BaseXException(CONNECTION_ERROR);
@@ -349,7 +349,7 @@ public final class BaseXHTTP {
     final File stop = stopFile(port);
     try {
       stop.createNewFile();
-      new Socket(LOCALHOST, port).close();
+      new Socket(S_LOCALHOST, port).close();
       // give the notified process some time to quit
       Performance.sleep(100);
     } catch(final IOException ex) {

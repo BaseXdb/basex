@@ -111,7 +111,7 @@ public final class Context {
     users = new Users(this);
     repo = new Repo(this);
     log = new Log(this);
-    user = users.get(ADMIN);
+    user = users.get(S_ADMIN);
     listener = null;
   }
 

@@ -176,7 +176,7 @@ public class RESTConcurrencyTest {
 
   /** Start BaseX HTTP. */
   private void startBaseXHTTP() {
-    basexHTTPServer = Util.start(BaseXHTTP.class, "-U" + Text.ADMIN, "-P" + Text.ADMIN);
+    basexHTTPServer = Util.start(BaseXHTTP.class, "-U" + Text.S_ADMIN, "-P" + Text.S_ADMIN);
     Performance.sleep(TIMEOUT); // give the server some time to stop
   }
 

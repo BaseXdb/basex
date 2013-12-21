@@ -31,7 +31,7 @@ public final class XdmInfoTest extends SandboxTest {
   @BeforeClass
   public static void start() throws Exception {
     server = createServer();
-    session = new TestSession(Text.LOCALHOST, 9999, Text.ADMIN, Text.ADMIN);
+    session = new TestSession(Text.S_LOCALHOST, 9999, Text.S_ADMIN, Text.S_ADMIN);
   }
 
   /**

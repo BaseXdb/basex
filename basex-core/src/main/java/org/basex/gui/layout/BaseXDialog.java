@@ -39,7 +39,7 @@ public abstract class BaseXDialog extends JDialog {
     @Override
     public void keyReleased(final KeyEvent e) {
       // don't trigger any action for modifier keys
-      if(!modifier(e)) action(e.getSource());
+      if(!modifier(e) && e.getKeyChar() != KeyEvent.CHAR_UNDEFINED) action(e.getSource());
     }
   };
 
@@ -122,10 +122,10 @@ public abstract class BaseXDialog extends JDialog {
 
   /**
    * Reacts on user input; can be overwritten.
-   * @param comp the action component
+   * @param source source
    */
   @SuppressWarnings("unused")
-  public void action(final Object comp) { }
+  public void action(final Object source) { }
 
   /**
    * Cancels the dialog; can be overwritten.

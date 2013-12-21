@@ -113,20 +113,34 @@ public final class ProjectView extends BaseXPanel {
   /**
    * Refreshes the specified file node.
    * @param file file to be opened
-   * @param tr refresh tree or filter
+   * @param tr refresh tree
    */
   public void refresh(final IOFile file, final boolean tr) {
-    if(tr) {
-      final Enumeration<?> en = root.depthFirstEnumeration();
-      while(en.hasMoreElements()) {
-        final ProjectNode node = (ProjectNode) en.nextElement();
-        if(node.file != null && node.file.path().equals(file.path())) node.refresh();
-      }
-    }
     // check if file to be refreshed is within the root path
-    if(canonical(file.file()).getPath().startsWith(canonical(root.file.file()).getPath())) {
+    final IOFile fl = new IOFile(canonical(file.file()));
+    if(fl.path().startsWith(root.file.path())) {
+      if(tr) refresh(fl);
       filter.refresh(true);
     }
+  }
+
+  /**
+   * Refreshes the specified file node, or its parent.
+   * @param file file to be refreshed
+   */
+  private void refresh(final IOFile file) {
+    final Enumeration<?> en = root.depthFirstEnumeration();
+    while(en.hasMoreElements()) {
+      final ProjectNode node = (ProjectNode) en.nextElement();
+      if(node.file == null) continue;
+      if(node.file.path().equals(file.path())) {
+        node.refresh();
+        return;
+      }
+    }
+    final File parent = file.file().getParentFile();
+    if(parent == null) return;
+    refresh(new IOFile(parent));
   }
 
   /**

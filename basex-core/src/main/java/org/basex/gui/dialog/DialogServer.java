@@ -262,7 +262,7 @@ public final class DialogServer extends BaseXDialog {
    */
   private boolean ping(final boolean local) {
     final GUIOptions gopts = gui.gopts;
-    return BaseXServer.ping(local ? LOCALHOST : gopts.get(GUIOptions.S_HOST),
+    return BaseXServer.ping(local ? S_LOCALHOST : gopts.get(GUIOptions.S_HOST),
       gopts.get(local ? GUIOptions.S_SERVERPORT : GUIOptions.S_PORT));
   }
 
@@ -279,7 +279,7 @@ public final class DialogServer extends BaseXDialog {
         try {
           final int p = Integer.parseInt(ports.getText());
           gui.gopts.set(GUIOptions.S_SERVERPORT, p);
-          if(host.getText().equals(LOCALHOST)) {
+          if(host.getText().equals(S_LOCALHOST)) {
             gui.gopts.set(GUIOptions.S_PORT, p);
             gui.gopts.set(GUIOptions.S_EVENTPORT, p + 1);
             portc.setText(String.valueOf(p));

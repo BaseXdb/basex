@@ -5,6 +5,8 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import org.basex.util.options.*;
+
 /**
  * Project specific ComboBox implementation.
  *
@@ -12,6 +14,54 @@ import javax.swing.*;
  * @author Christian Gruen
  */
 public final class BaseXCombo extends JComboBox {
+  /** Initial value. */
+  private Object initial;
+  /** Options. */
+  private Options options;
+  /** Option. */
+  private Option<?> option;
+
+  /**
+   * Constructor.
+   * @param ch combobox choices
+   * @param opt option
+   * @param opts options
+   * @param win parent window
+   */
+  public BaseXCombo(final Window win, final StringOption opt, final Options opts,
+      final String... ch) {
+    this(win, (Option<?>) opt, opts, ch);
+    setSelectedItem(initial);
+  }
+
+  /**
+   * Constructor.
+   * @param ch combobox choices
+   * @param opt option
+   * @param opts options
+   * @param win parent window
+   */
+  public BaseXCombo(final Window win, final NumberOption opt, final Options opts,
+      final String... ch) {
+    this(win, (Option<?>) opt, opts, ch);
+    setSelectedIndex((Integer) initial);
+  }
+
+  /**
+   * Constructor.
+   * @param ch combobox choices
+   * @param opt option
+   * @param opts options
+   * @param win parent window
+   */
+  private BaseXCombo(final Window win, final Option<?> opt, final Options opts,
+      final String... ch) {
+    this(win, ch);
+    options = opts;
+    option = opt;
+    initial = opts.get(opt);
+  }
+
   /**
    * Constructor.
    * @param ch combobox choices
@@ -48,6 +98,28 @@ public final class BaseXCombo extends JComboBox {
         super.setSelectedItem(value);
         return;
       }
+    }
+  }
+
+  /**
+   * Assigns the current checkbox value to the option specified in the constructor.
+   */
+  public void assign() {
+    if(option instanceof NumberOption) {
+      options.set((NumberOption) option, getSelectedIndex());
+    } else {
+      options.set((StringOption) option, getSelectedItem());
+    }
+  }
+
+  /**
+   * Assigns the original value to the option specified in the constructor.
+   */
+  public void reset() {
+    if(option instanceof NumberOption) {
+      options.set((NumberOption) option, (Integer) initial);
+    } else {
+      options.set((StringOption) option, (String) initial);
     }
   }
 }

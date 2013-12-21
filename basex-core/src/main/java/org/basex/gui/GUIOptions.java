@@ -104,12 +104,12 @@ public final class GUIOptions extends Options {
   public static final BooleanOption SHOWPROJECT = new BooleanOption("SHOWPROJECT", true);
 
   /** Dialog location. */
-  public static final NumbersOption MAPLAYOUTLOC = new NumbersOption("MAPLAYOUTLOC", 790, 520);
-  /** Dialog location. */
   public static final NumbersOption FONTSLOC = new NumbersOption("FONTSLOC", 10, 530);
   /** Dialog location. */
   public static final NumbersOption COLORSLOC = new NumbersOption("COLORSLOC", 530, 620);
 
+  /** Preferences tab. */
+  public static final NumberOption PREFTAB = new NumberOption("PREFTAB", 0);
   /** Flag for Java look and feel. */
   public static final StringOption LOOKANDFEEL = new StringOption("LOOKANDFEEL", "");
   /** Flag for dissolving name attributes. */
@@ -118,6 +118,25 @@ public final class GUIOptions extends Options {
   public static final BooleanOption MOUSEFOCUS = new BooleanOption("MOUSEFOCUS", false);
   /** Flag for showing the simple file dialog. */
   public static final BooleanOption SIMPLEFD = new BooleanOption("SIMPLEFD", false);
+
+  /** Show line margin. */
+  public static final BooleanOption SHOWMARGIN = new BooleanOption("SHOWMARGIN", true);
+  /** Line margin. */
+  public static final NumberOption MARGIN = new NumberOption("MARGIN", 80);
+  /** Insert tabs as spaces. */
+  public static final BooleanOption TABSPACES = new BooleanOption("TABSPACES", true);
+  /** Indentation. */
+  public static final NumberOption INDENT = new NumberOption("INDENT", 2);
+  /** Show invisible characters. */
+  public static final BooleanOption SHOWINVISIBLE = new BooleanOption("SHOWINVISIBLE", true);
+  /** Show newlines. */
+  public static final BooleanOption SHOWNL = new BooleanOption("SHOWNL", false);
+  /** Show line numbers. */
+  public static final BooleanOption SHOWLINES = new BooleanOption("SHOWLINES", true);
+  /** Mark current line. */
+  public static final BooleanOption MARKLINE = new BooleanOption("MARKLINE", true);
+  /** Save before executing file. */
+  public static final BooleanOption SAVERUN = new BooleanOption("SAVERUN", false);
 
   /** Current input mode in global text field (Search, XQuery, Command). */
   public static final NumberOption SEARCHMODE = new NumberOption("SEARCHMODE", 0);
@@ -135,7 +154,7 @@ public final class GUIOptions extends Options {
   public static final Comment C_SERVER = new Comment("Server Dialog");
 
   /** Server: host, used for connecting new clients. */
-  public static final StringOption S_HOST = new StringOption("S_HOST", Text.LOCALHOST);
+  public static final StringOption S_HOST = new StringOption("S_HOST", Text.S_LOCALHOST);
   /** Server: port, used for connecting new clients. */
   public static final NumberOption S_PORT = new NumberOption("S_PORT", 1984);
   /** Server: port, used for binding the server. */

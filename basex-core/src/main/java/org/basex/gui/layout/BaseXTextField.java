@@ -21,6 +21,13 @@ public class BaseXTextField extends JTextField {
   /** Default width of text fields. */
   public static final int DWIDTH = 350;
 
+  /** Initial value. */
+  private String initial;
+  /** Options. */
+  private Options options;
+  /** Option. */
+  private Option<?> option;
+
   /** History. */
   private BaseXHistory history;
   /** Hint. */
@@ -44,6 +51,39 @@ public class BaseXTextField extends JTextField {
    */
   public BaseXTextField(final BaseXDialog dialog) {
     this(null, dialog, dialog);
+  }
+
+  /**
+   * Constructor.
+   * @param opt option
+   * @param opts options
+   * @param dialog dialog window
+   */
+  public BaseXTextField(final NumberOption opt, final Options opts, final BaseXDialog dialog) {
+    this((Option<?>) opt, opts, dialog);
+  }
+
+  /**
+   * Constructor.
+   * @param opt option
+   * @param opts options
+   * @param dialog dialog window
+   */
+  public BaseXTextField(final StringOption opt, final Options opts, final BaseXDialog dialog) {
+    this((Option<?>) opt, opts, dialog);
+  }
+
+  /**
+   * Constructor.
+   * @param opt option
+   * @param opts options
+   * @param dialog dialog window
+   */
+  private BaseXTextField(final Option<?> opt, final Options opts, final BaseXDialog dialog) {
+    this(opts.get(opt).toString(), dialog, dialog);
+    options = opts;
+    option = opt;
+    initial = getText();
   }
 
   /**
@@ -96,10 +136,10 @@ public class BaseXTextField extends JTextField {
   /**
    * Attaches a history.
    * @param gui gui reference
-   * @param option option
+   * @param so option
    */
-  public void history(final GUI gui, final StringsOption option) {
-    history = new BaseXHistory(gui, option);
+  public void history(final GUI gui, final StringsOption so) {
+    history = new BaseXHistory(gui, so);
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
@@ -107,7 +147,7 @@ public class BaseXTextField extends JTextField {
           store();
         } else if(NEXTLINE.is(e) || PREVLINE.is(e)) {
           final boolean next = NEXTLINE.is(e);
-          final String[] qu = gui.gopts.get(option);
+          final String[] qu = gui.gopts.get(so);
           if(qu.length == 0) return;
           hist = next ? Math.min(qu.length - 1, hist + 1) : Math.max(0, hist - 1);
           setText(qu[hist]);
@@ -142,5 +182,29 @@ public class BaseXTextField extends JTextField {
   public void setText(final String txt) {
     last = txt;
     super.setText(txt);
+  }
+
+  /**
+   * Assigns the current checkbox value to the option specified in the constructor.
+   */
+  public void assign() {
+    if(option instanceof NumberOption) {
+      try {
+        options.set((NumberOption) option, Integer.parseInt(getText()));
+      } catch(final NumberFormatException ignored) { }
+    } else {
+      options.set((StringOption) option, getText());
+    }
+  }
+
+  /**
+   * Assigns the original value to the option specified in the constructor.
+   */
+  public void reset() {
+    if(option instanceof NumberOption) {
+      options.set((NumberOption) option, Integer.parseInt(initial));
+    } else {
+      options.set((StringOption) option, initial);
+    }
   }
 }

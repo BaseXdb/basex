@@ -96,7 +96,7 @@ public final class GUIConstants {
 
   /** Top menu entries. */
   static final String[] MENUBAR = {
-    Text.DATABASE, Text.EDITOR, Text.VIEW, Text.OPTIONS, Text.VISUALIZATION, Text.HELP
+    Text.DATABASE, Text.EDITOR, Text.VIEW, Text.VISUALIZATION, Text.OPTIONS, Text.HELP
   };
 
   /**
@@ -116,12 +116,12 @@ public final class GUIConstants {
     C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
     GUIMacOSX.nativeFullscreen() ? null : C_FULL
   }, {
-    C_RTEXEC, C_RTFILTER, SEPARATOR,
-    C_COLOR, C_FONTS, C_MAPLAYOUT, C_TREEOPTIONS, Prop.MAC ? null : SEPARATOR,
-    C_PACKAGES, Prop.MAC ? null : C_PREFS
-  }, {
     C_SHOWMAP, C_SHOWTREE, C_SHOWFOLDER, C_SHOWPLOT, C_SHOWTABLE,
     C_SHOWEXPLORE,
+  }, {
+    C_RTEXEC, C_RTFILTER, SEPARATOR,
+    C_COLOR, C_FONTS, Prop.MAC ? null : SEPARATOR,
+    C_PACKAGES, Prop.MAC ? null : C_PREFS
   }, {
     C_HELP, Prop.MAC ? null : SEPARATOR,
     C_COMMUNITY, C_UPDATES, Prop.MAC ? null : SEPARATOR,

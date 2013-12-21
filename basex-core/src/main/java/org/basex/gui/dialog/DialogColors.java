@@ -6,6 +6,7 @@ import java.awt.*;
 
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.util.options.*;
 
 /**
  * Dialog window for changing the used colors.
@@ -34,15 +35,15 @@ public final class DialogColors extends BaseXDialog {
     final BaseXBack p = new BaseXBack(new TableLayout(3, 2, 16, 8));
 
     p.add(new BaseXLabel(RED));
-    sliderRed = newSlider(gopts.get(GUIOptions.COLORRED));
+    sliderRed = newSlider(GUIOptions.COLORRED);
     p.add(sliderRed);
 
     p.add(new BaseXLabel(GREEN));
-    sliderGreen = newSlider(gopts.get(GUIOptions.COLORGREEN));
+    sliderGreen = newSlider(GUIOptions.COLORGREEN);
     p.add(sliderGreen);
 
     p.add(new BaseXLabel(BLUE));
-    sliderBlue = newSlider(gopts.get(GUIOptions.COLORBLUE));
+    sliderBlue = newSlider(GUIOptions.COLORBLUE);
     p.add(sliderBlue);
 
     set(p, BorderLayout.CENTER);
@@ -53,27 +54,26 @@ public final class DialogColors extends BaseXDialog {
 
   /**
    * Creates a slider.
-   * @param v initial value
+   * @param option option
    * @return slider reference
    */
-  private BaseXSlider newSlider(final int v) {
-    final BaseXSlider slider = new BaseXSlider(0, MAXCOLOR, MAXCOLOR - v, this);
+  private BaseXSlider newSlider(final NumberOption option) {
+    final BaseXSlider slider = new BaseXSlider(0, MAXCOLOR, option, gui.gopts, this);
     BaseXLayout.setWidth(slider, 150);
     return slider;
   }
 
   @Override
   public void action(final Object comp) {
-    final GUIOptions gopts = gui.gopts;
     if(comp instanceof BaseXButton) {
-      sliderRed.value(MAXCOLOR - GUIOptions.COLORRED.value);
-      sliderGreen.value(MAXCOLOR - GUIOptions.COLORGREEN.value);
-      sliderBlue.value(MAXCOLOR - GUIOptions.COLORBLUE.value);
+      // reset default values
+      sliderRed.setValue(GUIOptions.COLORRED.value);
+      sliderGreen.setValue(GUIOptions.COLORGREEN.value);
+      sliderBlue.setValue(GUIOptions.COLORBLUE.value);
     }
-
-    gopts.set(GUIOptions.COLORRED, MAXCOLOR - sliderRed.value());
-    gopts.set(GUIOptions.COLORGREEN, MAXCOLOR - sliderGreen.value());
-    gopts.set(GUIOptions.COLORBLUE, MAXCOLOR - sliderBlue.value());
+    sliderRed.assign();
+    sliderGreen.assign();
+    sliderBlue.assign();
     gui.updateLayout();
   }
 }

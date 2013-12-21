@@ -41,7 +41,7 @@ public final class GlobalOptions extends Options {
   public static final Comment C_CLIENT = new Comment("Client/Server Architecture");
 
   /** Server: host, used for connecting new clients. */
-  public static final StringOption HOST = new StringOption("HOST", Text.LOCALHOST);
+  public static final StringOption HOST = new StringOption("HOST", Text.S_LOCALHOST);
   /** Server: port, used for connecting new clients. */
   public static final NumberOption PORT = new NumberOption("PORT", 1984);
   /** Server: port, used for binding the server. */

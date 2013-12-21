@@ -101,7 +101,7 @@ public final class PkgValidator {
     final int i = Prop.VERSION.indexOf(' ');
     final TokenSet versions = new TokenSet(token(i == -1 ? Prop.VERSION :
       Prop.VERSION.substring(0, i)));
-    final byte[] name = token(Text.NAMELC);
+    final byte[] name = token(Text.PROJECT_NAME);
     for(final Dependency d : procs) {
       if(!eq(lc(d.processor), name)) {
         supported = false;

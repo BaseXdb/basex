@@ -247,14 +247,14 @@ public final class PermissionTest extends SandboxTest {
   /** Tests all commands where admin permission is needed. */
   @Test
   public void adminPermsNeeded() {
-    ok(new Grant(ADMIN, NAME), adminSession);
+    ok(new Grant(S_ADMIN, NAME), adminSession);
     if(server.context.users.get("test2") != null) {
       ok(new DropUser("test2"), testSession);
     }
     ok(new CreateUser("test2", Token.md5(NAME)), testSession);
     ok(new CreateDB(NAME, "<xml/>"), testSession);
     ok(new ShowUsers(), testSession);
-    ok(new Grant(ADMIN, "test2"), testSession);
+    ok(new Grant(S_ADMIN, "test2"), testSession);
     ok(new Grant("create", "test2"), testSession);
     ok(new AlterUser(NAME, Token.md5(NAME)), testSession);
     ok(new DropUser("test2"), testSession);

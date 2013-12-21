@@ -378,7 +378,7 @@ public class CommandTest extends SandboxTest {
   /** Command test. */
   @Test
   public final void password() {
-    ok(new Password(md5(Text.ADMIN)));
+    ok(new Password(md5(Text.S_ADMIN)));
     no(new Password(""));
   }
 

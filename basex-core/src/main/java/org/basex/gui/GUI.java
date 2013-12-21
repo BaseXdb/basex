@@ -267,12 +267,12 @@ public final class GUI extends AGUI {
     refreshControls();
 
     // start logo animation as thread
-    new Thread() {
+    SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
         checkVersion();
       }
-    }.start();
+    });
 
     input.requestFocusInWindow();
   }
@@ -435,7 +435,7 @@ public final class GUI extends AGUI {
       // check if query feedback was evaluated in the query view
       if(!ok && !stopped) {
         // display error in info view
-        if((!edit || inf.startsWith(BUGINFO)) && !info.visible()) {
+        if((!edit || inf.startsWith(S_BUGINFO)) && !info.visible()) {
           GUIMenuCmd.C_SHOWINFO.execute(this);
         }
       } else {
@@ -683,6 +683,7 @@ public final class GUI extends AGUI {
   void checkVersion() {
     final Version disk = new Version(gopts.get(GUIOptions.UPDATEVERSION));
     final Version used = new Version(Prop.VERSION.replaceAll(" .*", ""));
+
     if(disk.compareTo(used) < 0) {
       // update version option to latest used version
       gopts.set(GUIOptions.UPDATEVERSION, used.toString());
@@ -693,12 +694,13 @@ public final class GUI extends AGUI {
             Pattern.DOTALL).matcher(page);
         if(m.matches()) {
           final Version latest = new Version(m.group(2));
-          if(disk.compareTo(latest) < 0
-              && BaseXDialog.confirm(this, Util.info(H_NEW_VERSION, Prop.NAME, latest))) {
-            BaseXDialog.browse(this, UPDATE_URL);
-          } else {
-            // don't show update dialog anymore if it has been rejected once
-            gopts.set(GUIOptions.UPDATEVERSION, latest.toString());
+          if(disk.compareTo(latest) < 0) {
+            if(BaseXDialog.confirm(this, Util.info(H_NEW_VERSION, Prop.NAME, latest))) {
+              BaseXDialog.browse(this, UPDATE_URL);
+            } else {
+              // don't show update dialog anymore if it has been rejected once
+              gopts.set(GUIOptions.UPDATEVERSION, latest.toString());
+            }
           }
         }
       } catch(final Exception ex) {
