@@ -203,7 +203,12 @@ public final class GroupBy extends GFLWOR.Clause {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(GROUP).append(' ').append(BY);
+    final StringBuilder sb = new StringBuilder();
+    for(int i = 0; i < post.length; i++) {
+      sb.append(LET).append(" (: post-group :) ").append(post[i]);
+      sb.append(' ').append(ASSIGN).append(' ').append(preExpr[i]).append(' ');
+    }
+    sb.append(GROUP).append(' ').append(BY);
     for(int i = 0; i < specs.length; i++) sb.append(i == 0 ? " " : SEP).append(specs[i]);
     return sb.toString();
   }

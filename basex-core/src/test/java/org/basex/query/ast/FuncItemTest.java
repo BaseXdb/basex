@@ -1,6 +1,7 @@
 package org.basex.query.ast;
 
 import org.basex.query.func.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -200,5 +201,13 @@ public final class FuncItemTest extends QueryPlanTest {
         // the query should be pre-evaluated
         "QueryPlan/Int/@value = 1"
     );
+  }
+
+  /** Tests for coercion of function items. */
+  @Test
+  public void funcItemCoercion() {
+    error("let $f := function($g as function() as item()) { $g() }" +
+        "return $f(function() { 1, 2 })",
+        Err.INVTREAT);
   }
 }

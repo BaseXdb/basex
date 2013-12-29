@@ -167,7 +167,8 @@ public final class FuncItem extends FItem implements Scope {
   public FItem coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii,
       final boolean opt) throws QueryException {
     if(vars.length != ft.args.length) throw Err.castError(ii, ft, this);
-    if(type.instanceOf(ft)) return this;
+    final FuncType tp = funcType();
+    if(tp.instanceOf(ft)) return this;
 
     final VarScope vsc = new VarScope(sc);
     final Var[] vs = new Var[vars.length];
@@ -179,7 +180,7 @@ public final class FuncItem extends FItem implements Scope {
     final Expr e = new DynFuncCall(ii, this, refs);
     e.markTailCalls(null);
     return new FuncItem(sc, ann, name,
-        vs, ft, opt ? e.optimize(ctx, vsc) : e, cast != null, vsc.stackSize());
+        vs, ft, opt ? e.optimize(ctx, vsc) : e, !tp.ret.instanceOf(ft.ret), vsc.stackSize());
   }
 
   @Override
