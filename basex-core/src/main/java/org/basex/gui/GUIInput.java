@@ -200,7 +200,7 @@ public final class GUIInput extends BaseXTextField {
       pre = query.substring(0, qs.mark);
     } catch(final QueryException ex) {
       sl = ex.suggest();
-      pre = query.substring(0, ex.column() - (ex.column() == 1 ? 1 : 0));
+      pre = query.substring(0, ex.column() - 1);
     } finally {
       qc.close();
     }
