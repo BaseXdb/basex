@@ -97,15 +97,15 @@ public final class FNJsonTest extends AdvancedQueryTest {
 
   /** Tests the configuration argument of {@code json:parse(...)}. */
   @Test public void config() {
-    query("json:parse('[\"foo\",{\"test\":\"asdf\"}]', {'format':'jsonml'})",
+    query("json:parse('[\"foo\",{\"test\":\"asdf\"}]', map {'format':'jsonml'})",
         "<foo test=\"asdf\"/>");
-    query("map:size(json:parse('[\"foo\",{\"test\":\"asdf\"}]', {'format':'map'}))",
+    query("map:size(json:parse('[\"foo\",{\"test\":\"asdf\"}]', map {'format':'map'}))",
         "2");
-    query("json:parse('\"\\t\\u000A\"', {'format':'map','unescape':false(),'spec':'liberal'})",
+    query("json:parse('\"\\t\\u000A\"', map {'format':'map','unescape':false(),'spec':'liberal'})",
         "\\t\\u000A");
     query("string-to-codepoints(json:parse('\"\\t\\u000A\"'," +
-        "  {'format':'map','unescape':true(),'spec':'liberal'}))", "9 10");
-    error("json:parse('42', {'spec':'garbage'})", Err.INVALIDOPT);
+        "  map {'format':'map','unescape':true(),'spec':'liberal'}))", "9 10");
+    error("json:parse('42', map {'spec':'garbage'})", Err.INVALIDOPT);
   }
 
   /**
@@ -139,7 +139,7 @@ public final class FNJsonTest extends AdvancedQueryTest {
       final Function function) {
 
     final String query = options.isEmpty() ? function.args(input) :
-      function.args(input, " {" + options + '}');
+      function.args(input, " map {" + options + '}');
     if(expected.startsWith("...")) {
       contains(query, expected.substring(3));
     } else {
@@ -173,7 +173,7 @@ public final class FNJsonTest extends AdvancedQueryTest {
    */
   private static void error(final String input, final String options, final Function function) {
     final String query = options.isEmpty() ? function.args(input) :
-      function.args(input, " {" + options + '}');
+      function.args(input, " map {" + options + '}');
     error(query, Err.INVALIDOPT, Err.BXJS_PARSE, Err.BXJS_SERIAL);
   }
 }

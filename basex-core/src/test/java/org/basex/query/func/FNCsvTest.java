@@ -113,7 +113,7 @@ public final class FNCsvTest extends AdvancedQueryTest {
   private static void query(final String input, final String options, final String expected,
                             final Function function) {
     final String query = options.isEmpty() ? function.args(input) :
-      function.args(input, " {" + options + '}');
+      function.args(input, " map {" + options + '}');
     if(expected.startsWith("...")) {
       contains(query, expected.substring(3));
     } else {
@@ -147,7 +147,7 @@ public final class FNCsvTest extends AdvancedQueryTest {
    */
   private static void error(final String input, final String options, final Function function) {
     final String query = options.isEmpty() ? function.args(input) :
-      function.args(input, " {" + options + '}');
+      function.args(input, " map {" + options + '}');
     error(query, Err.INVALIDOPT);
   }
 }

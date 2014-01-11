@@ -25,6 +25,8 @@ public interface QueryText {
   /** Parser token. */
   String ANY = "any";
   /** Parser token. */
+  String ARRAY = "array";
+  /** Parser token. */
   String AS = "as";
   /** Parser token. */
   String ASCENDING = "ascending";
@@ -389,8 +391,6 @@ public interface QueryText {
   String BRACE2 = "}";
   /** Parser token. */
   String CDATA = "<![CDATA[";
-  /** Parser token. */
-  String COL = ":";
   /** Parser token. */
   String COLS = "::";
   /** Parser token. */

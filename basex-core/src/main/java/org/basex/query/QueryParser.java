@@ -2097,10 +2097,10 @@ public class QueryParser extends InputParser {
     // ordered expression
     if(wsConsumeWs(ORDERED, BRACE1, INCOMPLETE) ||
         wsConsumeWs(UNORDERED, BRACE1, INCOMPLETE)) return enclosed(NOENCLEXPR);
-    // map literal (old syntax)
-    if(wsConsumeWs(MAPSTR, BRACE1, INCOMPLETE)) return mapLiteral(true);
-    // map literal (new syntax)
-    if(consume(BRACE1)) return mapLiteral(false);
+    // map (including legacy syntax)
+    if(wsConsumeWs(MAPSTR, BRACE1, INCOMPLETE) || curr('{')) return new LitMap(info(), keyValues());
+    // general array constructor
+    //if(wsConsumeWs(ARRAY, BRACE1, INCOMPLETE)) return new LitArray(info(), keyValues());
 
     // context item
     if(c == '.' && !digit(next())) {
@@ -2113,24 +2113,22 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses a literal map.
-   * @param old old syntax
+   * Parses keys and values of maps and arrays.
    * @return map literal
    * @throws QueryException query exception
    */
-  private Expr mapLiteral(final boolean old) throws QueryException {
-    if(old) wsCheck(BRACE1);
-
+  private Expr[] keyValues() throws QueryException {
+    wsCheck(BRACE1);
     final ExprList el = new ExprList();
     if(!wsConsume(BRACE2)) {
       do {
         add(el, check(single(), INVMAPKEY));
-        wsCheck(old ? ASSIGN : COL);
+        if(!wsConsume(ASSIGN)) check(':');
         add(el, check(single(), INVMAPVAL));
       } while(wsConsume(COMMA));
       wsCheck(BRACE2);
     }
-    return new LitMap(info(), el.finish());
+    return el.finish();
   }
 
   /**

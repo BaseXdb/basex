@@ -46,31 +46,31 @@ public final class FNFtTest extends AdvancedQueryTest {
     query(_FT_CONTAINS.args("('A','B')", "('C','B')"), true);
 
     // check match options
-    query(_FT_CONTAINS.args("Assignments", "Azzignments", " { 'fuzzy':'' }"), true);
-    query(_FT_CONTAINS.args("Assignments", "Azzignments", " { 'fuzzy':'no' }"), false);
-    query(_FT_CONTAINS.args("Assignments", "assignment", " { 'stemming':true() }"), true);
-    query(_FT_CONTAINS.args("Assignment", "assignments", " { 'stemming':true() }"), true);
-    query(_FT_CONTAINS.args("A", "a", " { 'case':'upper' }"), true);
-    query(_FT_CONTAINS.args("a", "A", " { 'case':'lower' }"), true);
-    query(_FT_CONTAINS.args("A", "a", " { 'case':'insensitive' }"), true);
-    query(_FT_CONTAINS.args("A", "a", " { 'case':'sensitive' }"), false);
+    query(_FT_CONTAINS.args("Assignments", "Azzignments", " map { 'fuzzy':'' }"), true);
+    query(_FT_CONTAINS.args("Assignments", "Azzignments", " map { 'fuzzy':'no' }"), false);
+    query(_FT_CONTAINS.args("Assignments", "assignment", " map { 'stemming':true() }"), true);
+    query(_FT_CONTAINS.args("Assignment", "assignments", " map { 'stemming':true() }"), true);
+    query(_FT_CONTAINS.args("A", "a", " map { 'case':'upper' }"), true);
+    query(_FT_CONTAINS.args("a", "A", " map { 'case':'lower' }"), true);
+    query(_FT_CONTAINS.args("A", "a", " map { 'case':'insensitive' }"), true);
+    query(_FT_CONTAINS.args("A", "a", " map { 'case':'sensitive' }"), false);
     // check search modes
-    query(_FT_CONTAINS.args("Exercise 1", "1 Exercise", " { 'mode':'phrase' }"), false);
-    query(_FT_CONTAINS.args("Exercise 1", "1 Exercise", " { 'mode':'all' }"), false);
-    query(_FT_CONTAINS.args("Exercise 1", "1 Exercise", " { 'mode':'any' }"), false);
-    query(_FT_CONTAINS.args("Exercise 1", "1 Exercise", " { 'mode':'any word' }"), true);
-    query(_FT_CONTAINS.args("Exercise 1", "1 Exercise", " { 'mode':'all words' }"), true);
+    query(_FT_CONTAINS.args("Exercise 1", "1 Exercise", " map { 'mode':'phrase' }"), false);
+    query(_FT_CONTAINS.args("Exercise 1", "1 Exercise", " map { 'mode':'all' }"), false);
+    query(_FT_CONTAINS.args("Exercise 1", "1 Exercise", " map { 'mode':'any' }"), false);
+    query(_FT_CONTAINS.args("Exercise 1", "1 Exercise", " map { 'mode':'any word' }"), true);
+    query(_FT_CONTAINS.args("Exercise 1", "1 Exercise", " map { 'mode':'all words' }"), true);
 
-    query(_FT_CONTAINS.args("databases and xml", "databases xml", " { 'mode':'all words'," +
-        "'distance':{'min':0,'max':1} }"), true);
-    query(_FT_CONTAINS.args("databases and xml", "databases xml", " { 'mode':'all words'," +
-        "'distance':{'max':0} }"), false);
-    query(_FT_CONTAINS.args("databases and xml", "databases xml", " { 'mode':'all words'," +
-        "'window':{'size':3} }"), true);
+    query(_FT_CONTAINS.args("databases and xml", "databases xml", " map { 'mode':'all words'," +
+        "'distance':map {'min':0,'max':1} }"), true);
+    query(_FT_CONTAINS.args("databases and xml", "databases xml", " map { 'mode':'all words'," +
+        "'distance':map {'max':0} }"), false);
+    query(_FT_CONTAINS.args("databases and xml", "databases xml", " map { 'mode':'all words'," +
+        "'window':map {'size':3} }"), true);
 
     // check buggy options
-    error(_FT_CONTAINS.args("x", "x", " { 'x':'y' }"), Err.INVALIDOPT);
-    error(_FT_CONTAINS.args("x", "x", " { 'mode':'' }"), Err.INVALIDOPT);
+    error(_FT_CONTAINS.args("x", "x", " map { 'x':'y' }"), Err.INVALIDOPT);
+    error(_FT_CONTAINS.args("x", "x", " map { 'mode':'' }"), Err.INVALIDOPT);
     error(_FT_CONTAINS.args("x", "x", " 1"), Err.ELMMAPTYPE);
   }
 
@@ -95,28 +95,28 @@ public final class FNFtTest extends AdvancedQueryTest {
     new CreateIndex(CmdIndex.FULLTEXT).execute(context);
 
     // check match options
-    query(_FT_SEARCH.args(NAME, "Assignments", " { }"), "Assignments");
-    query(_FT_SEARCH.args(NAME, "Azzignments", " { 'fuzzy':'' }"), "Assignments");
-    query(_FT_SEARCH.args(NAME, "Azzignments", " { 'fuzzy':'no' }"), "");
+    query(_FT_SEARCH.args(NAME, "Assignments", " map { }"), "Assignments");
+    query(_FT_SEARCH.args(NAME, "Azzignments", " map { 'fuzzy':'' }"), "Assignments");
+    query(_FT_SEARCH.args(NAME, "Azzignments", " map { 'fuzzy':'no' }"), "");
     // check search modes
-    query(_FT_SEARCH.args(NAME, "1 Exercise", " { 'mode':'phrase' }"), "");
-    query(_FT_SEARCH.args(NAME, "1 Exercise", " { 'mode':'all' }"), "");
-    query(_FT_SEARCH.args(NAME, "1 Exercise", " { 'mode':'any' }"), "");
-    query(_FT_SEARCH.args(NAME, "1 Exercise", " { 'mode':'any word' }"),
+    query(_FT_SEARCH.args(NAME, "1 Exercise", " map { 'mode':'phrase' }"), "");
+    query(_FT_SEARCH.args(NAME, "1 Exercise", " map { 'mode':'all' }"), "");
+    query(_FT_SEARCH.args(NAME, "1 Exercise", " map { 'mode':'any' }"), "");
+    query(_FT_SEARCH.args(NAME, "1 Exercise", " map { 'mode':'any word' }"),
         "Exercise 1Exercise 2");
-    query(_FT_SEARCH.args(NAME, "1 Exercise", " { 'mode':'all words' }"),
+    query(_FT_SEARCH.args(NAME, "1 Exercise", " map { 'mode':'all words' }"),
         "Exercise 1");
 
-    query(_FT_SEARCH.args(NAME, "databases xml", " { 'mode':'all words'," +
-        "'distance':{'min':0,'max':1} }"), "Databases and XML");
-    query(_FT_SEARCH.args(NAME, "databases xml", " { 'mode':'all words'," +
-        "'distance':{'max':0} }"), "");
-    query(_FT_SEARCH.args(NAME, "databases xml", " { 'mode':'all words'," +
-        "'window':{'size':3} }"), "Databases and XML");
+    query(_FT_SEARCH.args(NAME, "databases xml", " map { 'mode':'all words'," +
+        "'distance':map {'min':0,'max':1} }"), "Databases and XML");
+    query(_FT_SEARCH.args(NAME, "databases xml", " map { 'mode':'all words'," +
+        "'distance':map {'max':0} }"), "");
+    query(_FT_SEARCH.args(NAME, "databases xml", " map { 'mode':'all words'," +
+        "'window':map {'size':3} }"), "Databases and XML");
 
     // check buggy options
-    error(_FT_SEARCH.args(NAME, "x", " { 'x':'y' }"), Err.INVALIDOPT);
-    error(_FT_SEARCH.args(NAME, "x", " { 'mode':'' }"), Err.INVALIDOPT);
+    error(_FT_SEARCH.args(NAME, "x", " map { 'x':'y' }"), Err.INVALIDOPT);
+    error(_FT_SEARCH.args(NAME, "x", " map { 'mode':'' }"), Err.INVALIDOPT);
     error(_FT_SEARCH.args(NAME, "x", " 1"), Err.ELMMAPTYPE);
   }
 

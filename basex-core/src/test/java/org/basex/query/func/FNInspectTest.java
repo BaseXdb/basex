@@ -22,7 +22,7 @@ public final class FNInspectTest extends AdvancedQueryTest {
     query(func + "/return/@type/data()", "xs:boolean");
     query(func + "/return/@occurrence/data()", "");
 
-    func = query(_INSPECT_FUNCTION.args(" { }"));
+    func = query(_INSPECT_FUNCTION.args(" map { }"));
     query(func + "/@name/data()", "");
     query(func + "/@uri/data()", "");
     query(func + "/argument/@type/data()", "xs:anyAtomicType");

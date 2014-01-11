@@ -1,7 +1,5 @@
 package org.basex.query.value.map;
 
-import static org.basex.query.QueryText.*;
-
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -185,6 +183,6 @@ final class Leaf extends TrieNode {
 
   @Override
   StringBuilder toString(final StringBuilder sb) {
-    return sb.append(key).append(COL).append(value).append(", ");
+    return sb.append(key).append(": ").append(value).append(", ");
   }
 }
