@@ -21,25 +21,20 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Test XQJ concurrency, both reads and writes
+ * Test XQJ concurrency, both reads and writes.
  *
  * @author Charles Foster
  */
 public class XQJConcurrencyTest extends XQJBaseTest {
-
-  /** Number of threads used when executing read only queries */
+  /** Number of threads used when executing read only queries. */
   private static final int CONCURRENT_READ_THREADS = 256;
-
-  /** Numbers of iterations, when perform a ready query */
+  /** Numbers of iterations, when perform a ready query. */
   private static final int ITERATE_TO = 1024;
-
-  /** Number of threads used when writing documents **/
+  /** Number of threads used when writing documents. */
   private static final int CONCURRENT_WRITE_THREADS = 12;
-
-  /** Total number of documents to insert when writing **/
+  /** Total number of documents to insert when writing. */
   private static final int DOCS_TO_INSERT = CONCURRENT_WRITE_THREADS * 30;
-
-  /** BaseX insert strategy for inserting documents **/
+  /** BaseX insert strategy for inserting documents. */
   private static final BaseXXQInsertOptions INSERT_STRATEGY = options(REPLACE);
 
   /**
@@ -60,14 +55,12 @@ public class XQJConcurrencyTest extends XQJBaseTest {
 
   /**
    * Runs insert concurrency test.
+   * @throws Exception exceptions
    */
   @Test
   public void testConcurrentInsert() throws Exception {
-
     XQExpression xqpe = xqc.createExpression();
-
-    try
-    {
+    try {
       xqpe.executeCommand("CREATE DB xqj-concurrent-insert-test");
       xqpe.executeCommand("OPEN xqj-concurrent-insert-test");
       xqpe.executeCommand("SET DEFAULTDB true");
@@ -81,9 +74,9 @@ public class XQJConcurrencyTest extends XQJBaseTest {
           new ArrayBlockingQueue<Runnable>(CONCURRENT_READ_THREADS),
           new ThreadPoolExecutor.CallerRunsPolicy());
 
-      ArrayList<Future> futures = new ArrayList<Future>();
+      ArrayList<Future<?>> futures = new ArrayList<Future<?>>();
 
-      for(int i=0;i<DOCS_TO_INSERT;i++) {
+      for(int i = 0; i < DOCS_TO_INSERT; i++) {
         String uri = i + "-" + UUID.randomUUID().toString() + ".xml";
         XQItem item = createDocument("<e>" + uri + "</e>");
         docs.put(uri, item);
@@ -92,13 +85,12 @@ public class XQJConcurrencyTest extends XQJBaseTest {
       for(String uri : docs.keySet())
         futures.add(tpe.submit(new InsertItemThread(uri, docs.get(uri))));
 
-      for(Future future : futures)
+      for(Future<?> future : futures)
         future.get();
 
       for(String uri : docs.keySet())
         assertTrue(docAvailable(uri));
-    }
-    finally {
+    } finally {
       xqpe.executeCommand("DROP DB xqj-concurrent-insert-test");
     }
   }
@@ -145,23 +137,27 @@ public class XQJConcurrencyTest extends XQJBaseTest {
     }
   }
 
+  /** Insertion thread. */
   private class InsertItemThread extends Thread {
-
-    /** uri of document being inserted **/
+    /** URI of document being inserted. */
     private final String uri;
-
-    /** content of document being inserted **/
+    /** Content of document being inserted. */
     private final XQItem item;
 
-    public InsertItemThread(String uri, XQItem item) {
-      this.uri = uri;
-      this.item = item;
+    /**
+     * Constructor.
+     * @param u uri
+     * @param it item
+     */
+    public InsertItemThread(final String u, final XQItem it) {
+      uri = u;
+      item = it;
     }
 
     @Override
     public void run() {
       try {
-        XQConnection2 xqc2 = (XQConnection2)xqc;
+        XQConnection2 xqc2 = (XQConnection2) xqc;
         xqc2.insertItem(uri, item, INSERT_STRATEGY);
       } catch(final Throwable th) {
         // a JUnit assertion WILL fail later because of this happening.

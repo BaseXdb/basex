@@ -7,6 +7,7 @@ import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQResultSequence;
 
 import net.xqj.basex.BaseXXQInsertOptions;
+
 import org.junit.After;
 import org.junit.Before;
 
@@ -23,7 +24,9 @@ public abstract class XQJBaseTest {
 
   /**
    * Initializes a test.
+   * @throws XQException query exception
    */
+  @SuppressWarnings("unused")
   @Before
   public void setUp() throws XQException {
     xqds = new BaseXXQDataSource();
@@ -40,12 +43,12 @@ public abstract class XQJBaseTest {
   }
 
   /**
-   * Creates a document-node(element()) with some text content
+   * Creates a document-node(element()) with some text content.
    * @param content the text() content the element() will contain
    * @return a XQItem representing a document-node(element()) item
-   * @throws XQException
+   * @throws XQException query exception
    */
-  public final XQItem createDocument(String content) throws XQException {
+  public final XQItem createDocument(final String content) throws XQException {
     return
       xqc.createItemFromDocument(
         content,
@@ -56,19 +59,29 @@ public abstract class XQJBaseTest {
       );
   }
 
-  public boolean docAvailable(String uri) throws XQException {
+  /**
+   * Checks if a document is available.
+   * @param uri URI
+   * @return result of check
+   * @throws XQException query exception
+   */
+  public boolean docAvailable(final String uri) throws XQException {
     XQResultSequence rs =
       xqc.createExpression().executeQuery(
-        "fn:doc-available('"+uri+"')"
+        "fn:doc-available('" + uri + "')"
       );
     rs.next();
     return rs.getBoolean();
   }
 
-  public final static BaseXXQInsertOptions options(int strategy) {
+  /**
+   * Sets and returns options.
+   * @param strategy insert strategy
+   * @return options
+   */
+  static final BaseXXQInsertOptions options(final int strategy) {
     BaseXXQInsertOptions options = new BaseXXQInsertOptions();
     options.setInsertStrategy(strategy);
     return options;
   }
-
 }

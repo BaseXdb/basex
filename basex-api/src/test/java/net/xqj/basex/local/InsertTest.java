@@ -11,39 +11,43 @@ import org.junit.Test;
 import javax.xml.xquery.*;
 
 /**
- * Testing XQJ insert
+ * Testing XQJ insert.
  *
  * @author Charles Foster
  */
-public class InsertTest extends XQJBaseTest {
-
-  static final String DB = "xqj-test-database";
-  static final String URI = "doc.xml";
+public final class InsertTest extends XQJBaseTest {
+  /** Name of test database. */
+  private static final String DB = "xqj-test-database";
+  /** Name of test document. */
+  private static final String URI = "doc.xml";
 
   @Before
+  @Override
   public void setUp() throws XQException {
     super.setUp();
 
     XQExpression xqpe = xqc.createExpression();
-    xqpe.executeCommand("CREATE DB "+DB);
+    xqpe.executeCommand("CREATE DB " + DB);
     xqpe.executeCommand("SET DEFAULTDB true");
-    xqpe.executeCommand("OPEN "+DB);
+    xqpe.executeCommand("OPEN " + DB);
     xqpe.close();
   }
 
   @After
+  @Override
   public void tearDown() throws XQException {
     XQExpression xqpe = xqc.createExpression();
-    xqpe.executeCommand("DROP DB "+DB);
+    xqpe.executeCommand("DROP DB " + DB);
     super.tearDown();
   }
 
   /**
-   * Testing regular insert
-  **/
+   * Testing regular insert.
+   * @throws XQException query exception
+   **/
   @Test
-  public void testInsert() throws Throwable {
-    XQConnection2 xqc2 = (XQConnection2)xqc;
+  public void testInsert() throws XQException {
+    XQConnection2 xqc2 = (XQConnection2) xqc;
 
     xqc2.insertItem(URI, createDocument("<e>hello</e>"), null);
     assertTrue(docAvailable(URI));
@@ -51,11 +55,12 @@ public class InsertTest extends XQJBaseTest {
   }
 
   /**
-   * Testing insert via ADD strategy
+   * Testing insert via ADD strategy.
+   * @throws XQException query exception
    **/
   @Test
-  public void testAdd() throws Throwable {
-    XQConnection2 xqc2 = (XQConnection2)xqc;
+  public void testAdd() throws XQException {
+    XQConnection2 xqc2 = (XQConnection2) xqc;
     xqc2.insertItem(URI, createDocument("<e>a</e>"), options(ADD));
 
     assertTrue(docAvailable(URI));
@@ -66,11 +71,12 @@ public class InsertTest extends XQJBaseTest {
   }
 
   /**
-   * Testing insert via REPLACE strategy
+   * Testing insert via REPLACE strategy.
+   * @throws XQException query exception
    **/
   @Test
-  public void testReplace() throws Throwable {
-    XQConnection2 xqc2 = (XQConnection2)xqc;
+  public void testReplace() throws XQException {
+    XQConnection2 xqc2 = (XQConnection2) xqc;
     xqc2.insertItem(URI, createDocument("<e>a</e>"), options(REPLACE));
 
     assertTrue(docAvailable(URI));
@@ -81,11 +87,12 @@ public class InsertTest extends XQJBaseTest {
   }
 
   /**
-   * Testing insert via STORE strategy
+   * Testing insert via STORE strategy.
+   * @throws XQException query exception
    **/
   @Test
-  public void testStore() throws Throwable {
-    XQConnection2 xqc2 = (XQConnection2)xqc;
+  public void testStore() throws XQException {
+    XQConnection2 xqc2 = (XQConnection2) xqc;
     xqc2.insertItem(URI, createDocument("<e>a</e>"), options(STORE));
     assertTrue(dbExists(DB, URI));
 
@@ -97,19 +104,33 @@ public class InsertTest extends XQJBaseTest {
   // Helper methods
   // --------------------------------------------------------------------------
 
-  private boolean dbExists(String db, String uri) throws XQException {
+  /**
+   * Checks if a resource exists.
+   * @param db database
+   * @param uri URI
+   * @return result of check
+   * @throws XQException query exception
+   */
+  private boolean dbExists(final String db, final String uri) throws XQException {
     XQResultSequence rs =
       xqc.createExpression().executeQuery(
-        "db:exists('"+db+"', '"+uri+"')"
+        "db:exists('" + db + "', '" + uri + "')"
       );
     rs.next();
     return rs.getBoolean();
   }
 
-  private int countUris(String db, String uri) throws XQException {
+  /**
+   * Counts the resources in the specified database and URI.
+   * @param db database
+   * @param uri URI
+   * @return number of resources
+   * @throws XQException query exception
+   */
+  private int countUris(final String db, final String uri) throws XQException {
     XQResultSequence rs =
       xqc.createExpression().executeQuery(
-        "xs:int(fn:count(db:list('"+db+"', '"+uri+"')))"
+        "xs:int(fn:count(db:list('" + db + "', '" + uri + "')))"
       );
     rs.next();
     return rs.getInt();

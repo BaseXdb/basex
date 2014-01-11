@@ -10,7 +10,7 @@ import javax.xml.xquery.XQResultSequence;
 import org.w3c.dom.Attr;
 
 /**
- * Testing Basic XQItemAccessor functionality
+ * Testing Basic XQItemAccessor functionality.
  *
  * @author Charles Foster
  */
