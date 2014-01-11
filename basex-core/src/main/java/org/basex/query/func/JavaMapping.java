@@ -175,7 +175,7 @@ public abstract class JavaMapping extends Arr {
     Method meth = null;
     for(final Method m : mod.getClass().getMethods()) {
       if(m.getName().equals(name) && m.getParameterTypes().length == arity) {
-        if(meth != null) throw JAVAAMBIG.get(ii, path + ':' + name);
+        if(meth != null) throw JAVAAMBIG.get(ii, "Q{" + path + '}' + name + '#' + arity);
         meth = m;
       }
     }

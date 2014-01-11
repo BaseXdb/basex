@@ -818,7 +818,7 @@ public enum Err {
   /** XPST0017. */
   FUNCJAVA(XPST, 17, "Java function '%' is not found."),
   /** XPST0017. */
-  JAVAAMBIG(XPST, 17, "Signature '%' is ambiguous."),
+  JAVAAMBIG(XPST, 17, "Several implementations found for '%'."),
   /** XPST0017. */
   JAVAINIT(XPST, 17, "Class cannot be initialized: %."),
   /** XPST0003. */
