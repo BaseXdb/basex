@@ -2208,12 +2208,15 @@ public class QueryParser extends InputParser {
       // decimal literal
       if(itr) throw error(NUMBERITR);
       tok.add('.');
-      while(digit(curr()))
-        tok.add(consume());
+      while(digit(curr())) tok.add(consume());
     }
     if(XMLToken.isNCStartChar(curr())) return checkDbl();
 
-    if(dec) return new Dec(tok.finish());
+    if(dec) {
+      final byte[] t = tok.finish();
+      if(endsWith(t, '.')) throw error(NUMBERDEC, t);
+      return new Dec(t);
+    }
 
     final long l = toLong(tok.finish());
     if(l != Long.MIN_VALUE) return Int.get(l);
@@ -2231,9 +2234,8 @@ public class QueryParser extends InputParser {
     tok.add('e');
     if(curr('+') || curr('-')) tok.add(consume());
     final int s = tok.size();
-    while(digit(curr()))
-      tok.add(consume());
-    if(s == tok.size()) throw error(NUMBERINC, tok);
+    while(digit(curr())) tok.add(consume());
+    if(s == tok.size()) throw error(NUMBERDBL, tok);
 
     if(XMLToken.isNCStartChar(curr())) throw error(NUMBERWS);
     return Dbl.get(tok.finish(), info());

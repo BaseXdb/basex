@@ -644,7 +644,9 @@ public enum Err {
   /** XPST0003. */
   NUMBERWS(XPST, 3, "Expecting separator after number."),
   /** XPST0003. */
-  NUMBERINC(XPST, 3, "Incomplete double value: '%'."),
+  NUMBERDBL(XPST, 3, "Incomplete double value: '%'."),
+  /** XPST0003. */
+  NUMBERDEC(XPST, 3, "Incomplete decimal value: '%'."),
   /** XPST0003. */
   NUMBERITR(XPST, 3, "Unexpected decimal point."),
   /** XPST0003. */
