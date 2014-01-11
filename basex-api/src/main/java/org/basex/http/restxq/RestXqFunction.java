@@ -519,8 +519,8 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private void addMultipart(final IOContent body, final Map<String, Value> pars,
-      final String ext) throws IOException, QueryException {
+  private void addMultipart(final IOContent body, final Map<String, Value> pars, final String ext)
+      throws IOException, QueryException {
 
     final MainOptions opts = context.context.options;
     final HTTPPayload hp = new HTTPPayload(body.inputStream(), false, null, opts);
@@ -539,9 +539,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @return cache
    * @throws IOException I/O exception
    */
-  private static IOContent cache(final HTTPContext http, final IOContent cache)
-      throws IOException {
-
+  private static IOContent cache(final HTTPContext http, final IOContent cache) throws IOException {
     if(cache != null) return cache;
     final BufferInput bi = new BufferInput(http.req.getInputStream());
     final IOContent io = new IOContent(bi.content());
@@ -554,9 +552,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param body request body
    * @param pars map parameters
    */
-  private static void addURLEncoded(final IOContent body,
-      final Map<String, Value> pars) {
-
+  private static void addURLEncoded(final IOContent body, final Map<String, Value> pars) {
     for(final String nv : body.toString().split("&")) {
       final String[] parts = nv.split("=", 2);
       if(parts.length < 2) continue;

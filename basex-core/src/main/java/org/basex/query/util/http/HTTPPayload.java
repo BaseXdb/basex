@@ -300,7 +300,7 @@ public final class HTTPPayload {
           } else {
             val = Str.get(cont.toArray());
           }
-          map.put(name, val);
+          if(!name.isEmpty()) map.put(name, val);
           cont.reset();
           lines = -1;
           if(eq(line, last)) break;
