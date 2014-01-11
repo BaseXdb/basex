@@ -843,6 +843,8 @@ public enum Err {
   INVTREAT(XPTY, 4, "Cannot treat % as %: %."),
   /** XPTY0004. */
   CALCTYPE(XPTY, 4, "% not defined for % and %."),
+  /** XPTY0004. */
+  INVFUNCITEM(XPTY, 4, "Function item required for function call, % found."),
 
   /** XPTY0004. */
   NOSUBDUR(XPTY, 4, "%: only supported on subtypes of xs:duration, not %."),

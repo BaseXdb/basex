@@ -104,7 +104,7 @@ public final class DynFuncCall extends FuncCall {
   FItem evalFunc(final QueryContext ctx) throws QueryException {
     final int ar = expr.length - 1;
     final Item it = checkItem(expr[ar], ctx);
-    if(!(it instanceof FItem)) throw INVCAST.get(info, it.type, "function item");
+    if(!(it instanceof FItem)) throw INVFUNCITEM.get(info, it.type);
     final FItem fit = (FItem) it;
     if(fit.arity() != ar) throw INVARITY.get(info, fit, ar);
     return fit;
