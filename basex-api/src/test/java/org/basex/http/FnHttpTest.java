@@ -43,8 +43,6 @@ public class FnHttpTest extends HTTPTest {
   private static final byte[] STATUS = token("status");
   /** Body attribute media-type. */
   private static final byte[] MEDIATYPE = token("media-type");
-  /** Body attribute method. */
-  private static final byte[] METHOD = token("method");
   /** Books document. */
   private static final String BOOKS = "<books>" + "<book id='1'>"
       + "<name>Sherlock Holmes</name>" + "<author>Doyle</author>" + "</book>"
@@ -416,10 +414,9 @@ public class FnHttpTest extends HTTPTest {
   /**
    * Tests method setRequestContent of HttpClient.
    * @throws IOException I/O Exception
-   * @throws QueryException query exception
    */
   @Test
-  public void writeMultipartMessage() throws IOException, QueryException {
+  public void writeMultipartMessage() throws IOException {
 
     final HTTPRequest req = new HTTPRequest();
     req.isMultipart = true;
@@ -469,11 +466,9 @@ public class FnHttpTest extends HTTPTest {
    * Tests writing of request content with different combinations of the body
    * attributes media-type and method.
    * @throws IOException IO exception
-   * @throws QueryException query exception
    */
   @Test
-  public void writeMessage() throws IOException, QueryException {
-
+  public void writeMessage() throws IOException {
     // Case 1: No method, media-type='text/xml'
     final HTTPRequest req1 = new HTTPRequest();
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
@@ -518,13 +513,11 @@ public class FnHttpTest extends HTTPTest {
     assertEquals("a<b>b</b>", fakeConn3.out.toString());
   }
 
-  /**
+  /*
    * Tests writing of body content when @method is http:base64Binary.
-   * @throws QueryException query exception
    * @throws IOException I/O Exception
-   */
   @Test
-  public void writeBase64() throws IOException, QueryException {
+  public void writeBase64() throws IOException {
     // Case 1: content is xs:base64Binary
     final HTTPRequest req1 = new HTTPRequest();
     req1.payloadAttrs.put(METHOD, token("http:base64Binary"));
@@ -546,14 +539,13 @@ public class FnHttpTest extends HTTPTest {
     hc.setRequestContent(fakeConn2.getOutputStream(), req2);
     assertEquals(fakeConn2.out.toString(), "dGVzdA==");
   }
+   */
 
-  /**
+  /*
    * Tests writing of body content when @method is http:hexBinary.
    * @throws IOException I/O Exception
-   * @throws QueryException query exception
-   */
   @Test
-  public void writeHex() throws IOException, QueryException {
+  public void writeHex() throws IOException {
     // Case 1: content is xs:hexBinary
     final HTTPRequest req1 = new HTTPRequest();
     req1.payloadAttrs.put(METHOD, token("http:hexBinary"));
@@ -575,14 +567,14 @@ public class FnHttpTest extends HTTPTest {
     hc.setRequestContent(fakeConn2.getOutputStream(), req2);
     assertEquals(fakeConn2.out.toString(), "74657374");
   }
+   */
 
   /**
    * Tests writing of request content when @src is set.
-   * @throws QueryException query exception
    * @throws IOException I/O Exception
    */
   @Test
-  public void writeFromResource() throws IOException, QueryException {
+  public void writeFromResource() throws IOException {
     // Create a file form which will be read
     final File f = new File(Prop.TMP + Util.className(FnHttpTest.class));
     final FileOutputStream out = new FileOutputStream(f);
@@ -591,10 +583,10 @@ public class FnHttpTest extends HTTPTest {
 
     // Request
     final HTTPRequest req = new HTTPRequest();
-    req.payloadAttrs.put(token("src"), token("file:" + f.getPath()));
+    req.payloadAttrs.put("src", new IOFile(f).url());
+    req.payloadAttrs.put("method", "binary");
     // HTTP connection
-    final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL(
-        "http://www.test.com"));
+    final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL("http://www.test.com"));
     final HTTPClient hc = new HTTPClient(null, ctx.options);
     hc.setRequestContent(fakeConn.getOutputStream(), req);
 

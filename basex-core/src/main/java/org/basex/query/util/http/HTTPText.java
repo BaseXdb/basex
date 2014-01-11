@@ -85,14 +85,11 @@ public interface HTTPText {
   /** Response attribute: message. */
   byte[] MESSAGE = token("message");
 
-  // Serialization methods defined by the EXPath specification.
-  /** Method http:base64Binary. */
-  byte[] BASE64 = token("http:base64Binary");
-  /** Method http:hexBinary. */
-  byte[] HEXBIN = token("http:hexBinary");
-
   /** Header attribute: name. */
   byte[] NAME = token("name");
   /** Header attribute: value. */
   byte[] VALUE = token("value");
+
+  /** Method binary. */
+  String BINARY = "binary";
 }

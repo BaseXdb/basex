@@ -12,6 +12,8 @@ import java.net.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -178,11 +180,8 @@ public final class HTTPClient {
    * @param out output stream
    * @param r request data
    * @throws IOException I/O exception
-   * @throws QueryException query exception
    */
-  public void setRequestContent(final OutputStream out, final HTTPRequest r)
-      throws IOException, QueryException {
-
+  public void setRequestContent(final OutputStream out, final HTTPRequest r) throws IOException {
     if(r.isMultipart) {
       writeMultipart(r, out);
     } else {
@@ -208,84 +207,42 @@ public final class HTTPClient {
    * @param payloadAtts payload attributes
    * @param out output stream
    * @throws IOException I/O exception
-   * @throws QueryException query exception
    */
   private void writePayload(final ValueBuilder payload, final TokenMap payloadAtts,
-      final OutputStream out) throws IOException, QueryException {
+      final OutputStream out) throws IOException {
 
-    final byte[] t = payloadAtts.get(MEDIA_TYPE);
-    final String type = t == null ? null : string(t);
-
-    // no resource to set the content from
-    final byte[] src = payloadAtts.get(SRC);
-    if(src == null) {
-      // default value @method is determined by @media-type
-      byte[] m = payloadAtts.get(METHOD);
-      if(m == null) {
-        if(eq(type, APP_HTML_XML)) {
-          m = token(SerialMethod.XHTML.toString());
-        } else if(eq(type, TEXT_HTML)) {
-          m = token(SerialMethod.HTML.toString());
-        } else if(type != null && isXML(type)) {
-          m = token(SerialMethod.XML.toString());
-        } else if(type != null && isText(type)) {
-          m = token(SerialMethod.TEXT.toString());
-        } else {
-          // default serialization method is XML
-          m = token(SerialMethod.XML.toString());
-        }
-      }
-      // write content depending on the method
-      if(eq(m, BASE64)) {
-        writeBase64(payload, out);
-      } else if(eq(m, HEXBIN)) {
-        writeHex(payload, out);
+    // detect method (specified by @method or derived from @media-type)
+    byte[] m = payloadAtts.get(METHOD);
+    final String method;
+    if(m == null) {
+      final String type = string(payloadAtts.get(MEDIA_TYPE));
+      if(eq(type, APP_HTML_XML)) {
+        method = SerialMethod.XHTML.toString();
+      } else if(eq(type, TEXT_HTML)) {
+        method = SerialMethod.HTML.toString();
+      } else if(type != null && isXML(type)) {
+        method = SerialMethod.XML.toString();
+      } else if(type != null && isText(type)) {
+        method = SerialMethod.TEXT.toString();
       } else {
-        write(payload, payloadAtts, m, out);
+        // default serialization method is XML
+        method = SerialMethod.XML.toString();
       }
     } else {
-      // if the src attribute is present, the content is set as the content of
-      // the linked resource
-      writeResource(src, out);
+      method = string(m);
     }
-  }
 
-  /**
-   * Writes the payload of a body in case method is base64Binary.
-   * @param payload payload
-   * @param out connection output stream
-   * @throws IOException I/O Exception
-   * @throws QueryException query exception
-   */
-  private void writeBase64(final ValueBuilder payload, final OutputStream out)
-      throws IOException, QueryException {
-
-    for(int i = 0; i < payload.size(); i++) {
-      final Item item = payload.get(i);
-      if(item instanceof B64) {
-        out.write(((Bin) item).toJava());
+    // write content depending on the method
+    final byte[] src = payloadAtts.get(SRC);
+    if(src == null) {
+      write(payload, payloadAtts, method, out);
+    } else {
+      final IOUrl io = new IOUrl(string(src));
+      if(eq(method, BINARY)) {
+        out.write(io.read());
       } else {
-        out.write(new B64(item.string(info)).toJava());
-      }
-    }
-  }
-
-  /**
-   * Writes the payload of a body in case method is hexBinary.
-   * @param payload payload
-   * @param out connection output stream
-   * @throws IOException I/O Exception
-   * @throws QueryException query exception
-   */
-  private void writeHex(final ValueBuilder payload, final OutputStream out)
-      throws IOException, QueryException {
-
-    for(int i = 0; i < payload.size(); i++) {
-      final Item item = payload.get(i);
-      if(item instanceof Hex) {
-        out.write(((Bin) item).toJava());
-      } else {
-        out.write(new Hex(item.string(info)).toJava());
+        final ValueBuilder vb = new ValueBuilder().add(Str.get(new TextInput(io).content()));
+        write(vb, payloadAtts, method, out);
       }
     }
   }
@@ -299,11 +256,11 @@ public final class HTTPClient {
    * @throws IOException I/O Exception
    */
   private static void write(final ValueBuilder payload, final TokenMap attrs,
-      final byte[] method, final OutputStream out) throws IOException {
+      final String method, final OutputStream out) throws IOException {
 
     // extract serialization parameters
     final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.METHOD, string(method));
+    sopts.set(SerializerOptions.METHOD, method);
     for(final byte[] key : attrs) {
       if(!eq(key, SRC)) sopts.assign(string(key), string(attrs.get(key)));
     }
@@ -318,37 +275,13 @@ public final class HTTPClient {
   }
 
   /**
-   * Reads the content of the linked resource.
-   * @param src resource link
-   * @param out output stream
-   * @throws IOException I/O Exception
-   */
-  private static void writeResource(final byte[] src, final OutputStream out)
-      throws IOException {
-    final InputStream bis = new URL(string(src)).openStream();
-    try {
-      final byte[] buf = new byte[256];
-      while(true) {
-        final int len = bis.read(buf, 0, buf.length);
-        if(len <= 0) break;
-        out.write(buf, 0, len);
-      }
-    } finally {
-      bis.close();
-    }
-  }
-
-  /**
    * Writes parts of multipart message in the output stream of the HTTP
    * connection.
    * @param r request data
    * @param out output stream
    * @throws IOException I/O exception
-   * @throws QueryException query exception
    */
-  private void writeMultipart(final HTTPRequest r, final OutputStream out)
-      throws IOException, QueryException {
-
+  private void writeMultipart(final HTTPRequest r, final OutputStream out) throws IOException {
     final byte[] boundary = r.payloadAttrs.get(BOUNDARY);
     for(final Part part : r.parts) writePart(part, out, boundary);
     out.write(new TokenBuilder("--").add(boundary).add("--").add(CRLF).finish());
@@ -360,10 +293,9 @@ public final class HTTPClient {
    * @param out connection output stream
    * @param boundary boundary
    * @throws IOException I/O exception
-   * @throws QueryException query exception
    */
   private void writePart(final Part part, final OutputStream out, final byte[] boundary)
-      throws IOException, QueryException {
+      throws IOException {
 
     // write boundary preceded by "--"
     final TokenBuilder boundTb = new TokenBuilder();
