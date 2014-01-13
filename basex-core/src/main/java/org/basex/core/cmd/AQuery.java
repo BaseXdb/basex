@@ -114,6 +114,7 @@ public abstract class AQuery extends Command {
         cause = ex;
         err = Util.message(ex);
       } catch(final IOException ex) {
+        cause = ex;
         err = Util.message(ex);
       } catch(final ProcException ex) {
         err = INTERRUPTED;
