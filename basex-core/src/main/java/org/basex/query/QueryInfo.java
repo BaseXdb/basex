@@ -45,8 +45,6 @@ public final class QueryInfo {
   private TokenList compile = new TokenList(0);
   /** Evaluation info. */
   private TokenList evaluate = new TokenList(0);
-  /** Optimized query. */
-  private String optQuery;
 
   /**
    * Constructor.
@@ -75,13 +73,6 @@ public final class QueryInfo {
   }
 
   /**
-   * Finalizes the query info.
-   */
-  public void close() {
-    if(verbose) optQuery = qc.root == null ? qc.funcs.toString() : usedDecls(qc.root);
-  }
-
-  /**
    * Returns detailed query information.
    * @param qp query processor
    * @param printed printed bytes
@@ -97,7 +88,7 @@ public final class QueryInfo {
     final long total = parsing + compiling + evaluating + serializing;
     if(detailed) {
       final int up = qp.updates();
-      add(tb).add(NL);
+      tb.add(toString()).add(NL);
       tb.add(PARSING_CC).add(Performance.getTime(parsing, runs)).add(NL);
       tb.add(COMPILING_CC).add(Performance.getTime(compiling, runs)).add(NL);
       tb.add(EVALUATING_CC).add(Performance.getTime(evaluating, runs)).add(NL);
@@ -173,12 +164,9 @@ public final class QueryInfo {
     return sb.append(mod).toString();
   }
 
-  /**
-   * Returns detailed query information to the specified token builder.
-   * @param tb token builder
-   * @return reference to token builder
-   */
-  private TokenBuilder add(final TokenBuilder tb) {
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder();
     if(query != null) {
       final String qu = QueryProcessor.removeComments(query, Integer.MAX_VALUE);
       tb.add(NL).add(QUERY).add(COL).add(NL).add(qu).add(NL);
@@ -186,17 +174,13 @@ public final class QueryInfo {
     if(!compile.isEmpty()) {
       tb.add(NL).add(COMPILING).add(COL).add(NL);
       for(final byte[] line : compile) tb.add(LI).add(line).add(NL);
-      tb.add(NL).add(OPTIMIZED_QUERY).add(COL).add(NL).add(optQuery).add(NL);
+      tb.add(NL).add(OPTIMIZED_QUERY).add(COL).add(NL);
+      tb.add(qc.root == null ? qc.funcs.toString() : usedDecls(qc.root)).add(NL);
     }
     if(!evaluate.isEmpty()) {
       tb.add(NL).add(EVALUATING).add(COL).add(NL);
       for(final byte[] line : evaluate) tb.add(LI).add(line).add(NL);
     }
-    return tb;
-  }
-
-  @Override
-  public String toString() {
-    return add(new TokenBuilder()).toString();
+    return tb.toString();
   }
 }

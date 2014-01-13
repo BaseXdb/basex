@@ -445,8 +445,8 @@ public final class QueryContext extends Proc {
    * Returns info on query compilation and evaluation.
    * @return query info
    */
-  public QueryInfo info() {
-    return info;
+  public String info() {
+    return info.toString();
   }
 
   /**
@@ -505,8 +505,6 @@ public final class QueryContext extends Proc {
    * Closes the query context.
    */
   public void close() {
-    info.close();
-
     // close only once
     if(closed) return;
     closed = true;

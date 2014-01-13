@@ -260,7 +260,7 @@ public final class QueryProcessor extends Proc {
    * Returns query information.
    * @return query information
    */
-  public QueryInfo info() {
+  public String info() {
     return ctx.info();
   }
 
