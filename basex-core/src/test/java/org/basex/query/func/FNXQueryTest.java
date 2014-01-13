@@ -21,10 +21,10 @@ public final class FNXQueryTest extends AdvancedQueryTest {
   public void eval() {
     query(_XQUERY_EVAL.args("1"), 1);
     query(_XQUERY_EVAL.args("1 + 2"), 3);
-    query(_XQUERY_EVAL.args("\"$a\"", " map { '$a': 'b' }"), "b");
-    query(_XQUERY_EVAL.args("\"$a\"", " map { 'a': 'b' }"), "b");
-    query(_XQUERY_EVAL.args("\"$a\"", " map { 'a': (1,2) }"), "1 2");
-    query(_XQUERY_EVAL.args("\"declare variable $local:a external;$local:a\"",
+    query(_XQUERY_EVAL.args("\"declare variable $a external; $a\"", " map { '$a': 'b' }"), "b");
+    query(_XQUERY_EVAL.args("\"declare variable $a external; $a\"", " map { 'a': 'b' }"), "b");
+    query(_XQUERY_EVAL.args("\"declare variable $a external; $a\"", " map { 'a': (1,2) }"), "1 2");
+    query(_XQUERY_EVAL.args("\"declare variable $local:a external; $local:a\"",
         " map { xs:QName('local:a'): 1 }"), "1");
     query(_XQUERY_EVAL.args(".", " map { '': 1 }"), "1");
     error(_XQUERY_EVAL.args("1+"), Err.CALCEXPR);
