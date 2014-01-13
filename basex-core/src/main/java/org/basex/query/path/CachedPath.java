@@ -59,26 +59,20 @@ final class CachedPath extends AxisPath {
        * - the code is called for the first time
        * - the value has changed and the underlying node is not the same
        */
-      if(!cache || citer == null || lvalue != r && !(r instanceof ANode &&
-          lvalue instanceof ANode && ((ANode) lvalue).is((ANode) r))) {
-        lvalue = r;
-        citer = new NodeSeqBuilder().check();
-        if(r != null) {
-          final Iter ir = ctx.iter(r);
-          for(Item it; (it = ir.next()) != null;) {
-            // ensure that root only returns nodes
-            if(root != null && !(it instanceof ANode)) throw PATHNODE.get(info, it.type);
-            ctx.value = it;
-            iter(0, citer, ctx);
-          }
-        } else {
-          ctx.value = null;
+      citer = new NodeSeqBuilder().check();
+      if(r != null) {
+        final Iter ir = ctx.iter(r);
+        for(Item it; (it = ir.next()) != null;) {
+          // ensure that root only returns nodes
+          if(root != null && !(it instanceof ANode)) throw PATHNODE.get(info, it.type);
+          ctx.value = it;
           iter(0, citer, ctx);
         }
-        citer.sort();
       } else {
-        citer.reset();
+        ctx.value = null;
+        iter(0, citer, ctx);
       }
+      citer.sort();
       return citer;
     } finally {
       ctx.value = cv;
