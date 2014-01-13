@@ -1,5 +1,7 @@
 package org.basex.query.value.node;
 
+import java.util.concurrent.atomic.*;
+
 import org.basex.api.dom.*;
 import org.basex.core.*;
 import org.basex.data.*;
@@ -24,9 +26,9 @@ public abstract class ANode extends Item {
   /** Static node counter. */
   // [CG] XQuery, node id: move to query context to reduce chance of overflow, or
   // move to FNode to reduce memory usage of DBNode instances
-  private static int sid;
+  private static AtomicInteger sid = new AtomicInteger();
   /** Unique node id. */
-  public final int id = ++sid;
+  public final int id = sid.incrementAndGet();
 
   /** Cached string value. */
   byte[] val;
