@@ -2212,7 +2212,7 @@ public class QueryParser extends InputParser {
 
     if(dec) {
       final byte[] t = tok.finish();
-      if(endsWith(t, '.')) throw error(NUMBERDEC, t);
+      if(t.length == 1 && t[0] == '.') throw error(NUMBERDEC, t);
       return new Dec(t);
     }
 

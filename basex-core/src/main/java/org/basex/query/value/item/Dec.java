@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.math.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -120,6 +121,11 @@ public final class Dec extends ANum {
   @Override
   public Object toJava() {
     return type == AtomType.ULN ? new BigInteger(val.toString()) : val;
+  }
+
+  @Override
+  public boolean sameAs(final Expr cmp) {
+    return cmp instanceof Dec && val.compareTo(((Dec) cmp).val) == 0;
   }
 
   /**

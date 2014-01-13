@@ -14,6 +14,12 @@ public final class SimpleTest extends QueryTest {
     doc = "<x>X</x>";
 
     queries = new Object[][] {
+      { "Number 1", dec(2), "1.+1." },
+
+      { "Annotation 1", itr(1), "declare %local:x(.1) variable $a := 1; $a" },
+      { "Annotation 2", itr(1), "declare %local:x(1.) variable $a := 1; $a" },
+      { "Annotation 3", "declare %local:x(.) variable $a := 1; $a" },
+
       { "Compare 1", "xs:QName('a') = attribute a { 'b' }" },
 
       { "FLWOR 1", itr(3), "(for $i in 1 to 5 return $i)[3]" },
