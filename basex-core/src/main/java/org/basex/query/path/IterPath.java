@@ -29,8 +29,7 @@ final class IterPath extends AxisPath {
    * @param t return type
    * @param c cardinality
    */
-  IterPath(final InputInfo ii, final Expr r, final Expr[] s, final SeqType t,
-      final long c) {
+  IterPath(final InputInfo ii, final Expr r, final Expr[] s, final SeqType t, final long c) {
     super(ii, r, s);
     type = t;
     size = c;
@@ -99,6 +98,7 @@ final class IterPath extends AxisPath {
 
       @Override
       public boolean reset() {
+        System.out.println("?");
         iter = null;
         node = null;
         p = 0;
@@ -108,8 +108,7 @@ final class IterPath extends AxisPath {
   }
 
   @Override
-  public IterPath copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public IterPath copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return copyType(new IterPath(info, root == null ? null : root.copy(ctx, scp, vs),
         Arr.copyAll(ctx, scp, vs, steps), type, size));
   }
