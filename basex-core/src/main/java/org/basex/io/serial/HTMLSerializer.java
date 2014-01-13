@@ -40,14 +40,15 @@ public class HTMLSerializer extends OutputSerializer {
 
   @Override
   protected void attribute(final byte[] n, final byte[] v) throws IOException {
+    print(' ');
+    print(n);
+
     // don't append value for boolean attributes
     final byte[] tagatt = concat(lc(tag), COLON, lc(n));
     if(BOOLEAN.contains(tagatt) && eq(n, v)) return;
     // escape URI attributes
     final byte[] val = escuri && URIS.contains(tagatt) ? escape(v) : v;
 
-    print(' ');
-    print(n);
     print(ATT1);
     for(int k = 0; k < val.length; k += cl(val, k)) {
       final int ch = cp(val, k);

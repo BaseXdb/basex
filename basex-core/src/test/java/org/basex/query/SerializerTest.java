@@ -43,6 +43,8 @@ public final class SerializerTest extends AdvancedQueryTest {
     query(option + "<a b='&lt;'/>", "<a b=\"<\"></a>");
     error(option + "<a>&#x90;</a>", Err.SERILL);
 
+    query(option + "<option selected='selected'/>", "<option selected></option>");
+
     query(option + "<?x y?>", "<?x y>");
     error(option + "<?x > ?>", Err.SERPI);
   }
