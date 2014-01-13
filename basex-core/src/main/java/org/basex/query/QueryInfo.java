@@ -38,9 +38,11 @@ public final class QueryInfo {
   public long evaluating;
   /** Serialization time. */
   public long serializing;
-
   /** Query. */
   public String query;
+
+  /** Runtime flag. */
+  boolean runtime;
   /** Compilation info. */
   private TokenList compile = new TokenList(0);
   /** Evaluation info. */
@@ -61,7 +63,12 @@ public final class QueryInfo {
    * @param ext text text extensions
    */
   void compInfo(final String string, final Object... ext) {
-    if(verbose) compile.add(Util.inf(string,  ext));
+    String info = Util.info(string,  ext);
+    if(runtime) {
+      info = "RUNTIME: " + info;
+      Util.stack(info);
+    }
+    if(verbose) compile.add(info);
   }
 
   /**

@@ -209,8 +209,7 @@ public final class Util {
    * @param message error message
    */
   public static void stack(final String message) {
-    errln(message);
-    stack(Short.MAX_VALUE);
+    stack(message, Short.MAX_VALUE);
   }
 
   /**
@@ -218,7 +217,16 @@ public final class Util {
    * @param depth number of steps to print
    */
   public static void stack(final int depth) {
-    errln("You're here:");
+    stack("You're here:", depth);
+  }
+
+  /**
+   * Prints the current stack trace to System.err.
+   * @param message message
+   * @param depth number of steps to print
+   */
+  public static void stack(final String message, final int depth) {
+    errln(message);
     final String[] stack = toArray(new Throwable());
     final int l = Math.min(Math.max(2, depth + 2), stack.length);
     for(int s = 2; s < l; ++s) errln(stack[s]);

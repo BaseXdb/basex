@@ -280,6 +280,7 @@ public final class QueryContext extends Proc {
 
     // dynamic compilation
     analyze();
+    info.runtime = true;
   }
 
   /**
