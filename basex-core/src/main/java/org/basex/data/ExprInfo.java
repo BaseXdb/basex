@@ -30,10 +30,10 @@ public abstract class ExprInfo {
 
   /**
    * Returns a string representation of the expression that can be embedded in error messages.
-   * @param max maximum length of returned string
+   * Defaults to {@link #toString()}.
    * @return class name
    */
-  public String toString(@SuppressWarnings("unused") final int max) {
+  public String toErrorString() {
     return toString();
   }
 

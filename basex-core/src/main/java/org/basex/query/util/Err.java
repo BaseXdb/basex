@@ -374,32 +374,32 @@ public enum Err {
   /** FOCH0001. */
   INVCODE(FOCH, 1, "Invalid XML character '&#x%;'."),
   /** FOCH0002. */
-  WHICHCOLL(FOCH, 2, "Unknown collation '%'."),
+  WHICHCOLL(FOCH, 2, "Unknown collation \"%\"."),
   /** FOCH0003. */
-  NORMUNI(FOCH, 3, "Unsupported normalization form (%)."),
+  NORMUNI(FOCH, 3, "Unsupported normalization form (\"%\")."),
   /** FOCH0004. */
   CHARCOLL(FOCH, 4, "Collation does not support function."),
 
   /** FODC0001. */
-  IDDOC(FODC, 1, "Root must be a document node."),
+  IDDOC(FODC, 1, "Specified node has no document node as root."),
   /** FODC0002. */
-  NODEERR(FODC, 2, "% could not be created (%)."),
+  NODEERR(FODC, 2, "% could not be created: %."),
   /** FODC0002. */
   NODEFCOLL(FODC, 2, "No default collection available."),
   /** FODC0002. */
   IOERR(FODC, 2, "%"),
   /** FODC0002. */
-  WHICHRES(FODC, 2, "Resource '%' does not exist."),
+  WHICHRES(FODC, 2, "Resource \"%\" does not exist."),
   /** FODC0004. */
-  INVCOLL(FODC, 4, "Invalid collection URI '%'."),
+  INVCOLL(FODC, 4, "Invalid collection URI \"%\"."),
   /** FODC0005. */
-  INVDOC(FODC, 5, "Invalid document URI '%'."),
+  INVDOC(FODC, 5, "Invalid document URI \"%\"."),
   /** FODC0006. */
   SAXERR(FODC, 6, "SAX: %"),
   /** FODC0007. */
-  RESINV(FODC, 7, "Resource path '%' is invalid."),
+  RESINV(FODC, 7, "Resource path \"%\" is invalid."),
   /** FODC0007. */
-  INVDB(FODC, 7, "Invalid database name: '%'."),
+  INVDB(FODC, 7, "Invalid database name: \"%\"."),
 
   /** FODF1280. */
   FORMNUM(FODF, 1280, "Unknown decimal format: %."),
@@ -421,11 +421,15 @@ public enum Err {
   /** FODT0001. */
   DATERANGE(FODT, 1, "%: '%' out of range."),
   /** FODT0001. */
-  DATEADDRANGE(FODT, 1, "%: out of range."),
+  YEARRANGE(FODT, 1, "Year '%' out of range."),
+  /** FODT0001. */
+  SECRANGE(FODT, 1, "Seconds '%' out of range."),
   /** FODT0002. */
   DURRANGE(FODT, 2, "%: '%' out of range."),
   /** FODT0002. */
-  DURADDRANGE(FODT, 2, "%: out of range."),
+  MONTHRANGE(FODT, 2, "Months '%' out of range."),
+  /** FODT0002. */
+  SECDURRANGE(FODT, 2, "Seconds '%' out of range."),
   /** FODT0002. */
   DATEZERO(FODT, 2, "Invalid % calculation: infinity/zero."),
   /** FODT0003. */
@@ -453,7 +457,7 @@ public enum Err {
   /** FORG0001. */
   INVALIDZONE(FORG, 1, "Invalid timezone: %."),
   /** FORG0001. */
-  FUNCAST(FORG, 1, "Invalid % cast: %."),
+  FUNCAST(FORG, 1, "Invalid % cast: \"%\"."),
   /** FORG0001. */
   FUNCCASTEX(FORG, 1, "Invalid cast from % to %: %."),
   /** FORG0001. */
@@ -936,7 +940,7 @@ public enum Err {
   /** XQST0038. */
   DUPLCOLL(XQST, 38, "Duplicate 'collation' declaration."),
   /** XQST0038. */
-  WHICHDEFCOLL(XQST, 38, "Unknown collation '%'."),
+  WHICHDEFCOLL(XQST, 38, "Unknown collation \"%\"."),
   /** XQST0039. */
   FUNCDUPL(XQST, 39, "Duplicate function argument %."),
   /** XQST0040. */
@@ -996,7 +1000,7 @@ public enum Err {
   /** XQST0075. */
   IMPLVAL(XQST, 75, "Validation not supported."),
   /** XQST0076. */
-  FLWORCOLL(XQST, 76, "Unknown collation '%'."),
+  FLWORCOLL(XQST, 76, "Unknown collation \"%\"."),
   /** XQST0079. */
   NOPRAGMA(XQST, 79, "Expecting pragma expression."),
   /** XQST0085. */
@@ -1384,6 +1388,33 @@ public enum Err {
    */
   public static QueryException circVarError(final StaticVar var) {
     return (var.sc.xquery3() ? CIRCVAR30 : CIRCVAR).get(var.info, var);
+  }
+
+  /** Maximum size of chopped error string. */
+  private static final int MAX = 64;
+
+  /**
+   * Chops the specified object to a maximum size.
+   * @param object object
+   * @return exception or null
+   * @throws QueryException query exception
+   */
+  public static byte[] chop(final Object object) throws QueryException {
+    final TokenBuilder tb = new TokenBuilder();
+    byte l = 0;
+    final byte[] string = object instanceof byte[] ? (byte[]) object : object instanceof Item ?
+      ((Item) object).string(null) : Token.token(object.toString());
+    for(byte b : string) {
+      final int ts = tb.size();
+      if(ts == MAX) {
+        tb.add(Text.DOTS);
+        break;
+      }
+      if(b == '\n' || b == '\r') b = ' ';
+      if(b != ' ' || l != ' ') tb.addByte(b);
+      l = b;
+    }
+    return tb.array();
   }
 
   @Override

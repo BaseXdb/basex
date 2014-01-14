@@ -196,7 +196,7 @@ public final class Var extends ExprInfo {
   }
 
   @Override
-  public String toString(final int max) {
+  public String toErrorString() {
     return new TokenBuilder().add(QueryText.DOLLAR).add(name.string()).toString();
   }
 

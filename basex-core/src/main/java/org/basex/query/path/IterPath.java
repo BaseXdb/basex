@@ -98,7 +98,6 @@ final class IterPath extends AxisPath {
 
       @Override
       public boolean reset() {
-        System.out.println("?");
         iter = null;
         node = null;
         p = 0;

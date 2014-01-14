@@ -114,10 +114,11 @@ public final class FNGen extends StandardFunc {
    */
   private Value collection(final QueryContext ctx) throws QueryException {
     // return default collection
-    if(expr.length == 0) return ctx.resource.collection(info);
+    final Item it = expr.length == 0 ? null : expr[0].item(ctx, info);
+    if(it == null) return ctx.resource.collection(info);
 
     // check if reference is valid
-    final byte[] in = checkEStr(expr[0].item(ctx, info));
+    final byte[] in = checkEStr(it);
     if(!Uri.uri(in).isValid()) throw INVCOLL.get(info, in);
     return ctx.resource.collection(new QueryInput(string(in)), sc.baseIO(), info);
   }

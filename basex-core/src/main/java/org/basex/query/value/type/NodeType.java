@@ -49,7 +49,7 @@ public enum NodeType implements Type {
       if(o instanceof ProcessingInstruction) return new FPI((ProcessingInstruction) o);
       final Matcher m = Pattern.compile("<\\?(.*?) (.*)\\?>").matcher(o.toString());
       if(m.find()) return new FPI(m.group(1), m.group(2));
-      throw NODEERR.get(ii, this, o);
+      throw NODEERR.get(ii, this, chop(o));
     }
   },
 
@@ -112,7 +112,7 @@ public enum NodeType implements Type {
       if(o instanceof Attr) return new FAttr((Attr) o);
       final Matcher m = Pattern.compile(" (.*?)=\"(.*)\"").matcher(o.toString());
       if(m.find()) return new FAttr(m.group(1), m.group(2));
-      throw NODEERR.get(ii, this, o);
+      throw NODEERR.get(ii, this, chop(o));
     }
   },
 
@@ -125,7 +125,7 @@ public enum NodeType implements Type {
       if(o instanceof Comment) return new FComm((Comment) o);
       final Matcher m = Pattern.compile("<!--(.*?)-->").matcher(o.toString());
       if(m.find()) return new FComm(m.group(1));
-      throw NODEERR.get(ii, this, o);
+      throw NODEERR.get(ii, this, chop(o));
     }
   },
 

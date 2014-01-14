@@ -148,12 +148,11 @@ public final class Dec extends ANum {
    * @throws QueryException query exception
    */
   public static BigDecimal parse(final byte[] val, final InputInfo ii) throws QueryException {
-    if(contains(val, 'e') || contains(val, 'E')) throw FUNCAST.get(ii, AtomType.DEC, val);
-
     try {
-      return new BigDecimal(Token.string(val).trim());
-    } catch(final NumberFormatException ex) {
-      throw FUNCAST.get(ii, ZERO.type, val);
-    }
+      if(!contains(val, 'e') && !contains(val, 'E'))
+        return new BigDecimal(Token.string(val).trim());
+    } catch(final NumberFormatException ignored) { }
+
+    throw FUNCAST.get(ii, AtomType.DEC, chop(val));
   }
 }

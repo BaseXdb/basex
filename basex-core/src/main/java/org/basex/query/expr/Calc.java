@@ -144,13 +144,13 @@ public enum Calc {
       if(ta == tb) {
         if(ta == YMD) {
           final BigDecimal bd = BigDecimal.valueOf(((YMDur) b).ymd());
-          if(bd.doubleValue() == 0.0) throw DIVZERO.get(ii, a);
+          if(bd.doubleValue() == 0.0) throw DIVZERO.get(ii, chop(a));
           return Dec.get(BigDecimal.valueOf(((YMDur) a).ymd()).divide(
               bd, 20, BigDecimal.ROUND_HALF_EVEN));
         }
         if(ta == DTD) {
           final BigDecimal bd = ((DTDur) b).dtd();
-          if(bd.doubleValue() == 0.0) throw DIVZERO.get(ii, a);
+          if(bd.doubleValue() == 0.0) throw DIVZERO.get(ii, chop(a));
           return Dec.get(((DTDur) a).dtd().divide(bd, 20,
               BigDecimal.ROUND_HALF_EVEN));
         }
@@ -171,7 +171,7 @@ public enum Calc {
 
       final BigDecimal b1 = a.dec(ii);
       final BigDecimal b2 = b.dec(ii);
-      if(b2.signum() == 0) throw DIVZERO.get(ii, a);
+      if(b2.signum() == 0) throw DIVZERO.get(ii, chop(a));
       final int s = Math.max(18, Math.max(b1.scale(), b2.scale()));
       return Dec.get(b1.divide(b2, s, BigDecimal.ROUND_HALF_EVEN));
     }
@@ -184,10 +184,10 @@ public enum Calc {
       checkNum(ii, a, b);
       final double d1 = a.dbl(ii);
       final double d2 = b.dbl(ii);
-      if(d2 == 0) throw DIVZERO.get(ii, a);
+      if(d2 == 0) throw DIVZERO.get(ii, chop(a));
       final double d = d1 / d2;
-      if(Double.isNaN(d) || Double.isInfinite(d) || d > Long.MAX_VALUE)
-        throw DIVFLOW.get(ii, d1, d2);
+      if(Double.isNaN(d) || Double.isInfinite(d)) throw DIVFLOW.get(ii, d1, d2);
+      checkRange(ii, d);
       return Int.get(type(a.type, b.type) == ITR ? a.itr(ii) / b.itr(ii) : (long) d);
     }
   },
@@ -203,13 +203,13 @@ public enum Calc {
       if(t == ITR) {
         final long b1 = a.itr(ii);
         final long b2 = b.itr(ii);
-        if(b2 == 0) throw DIVZERO.get(ii, a);
+        if(b2 == 0) throw DIVZERO.get(ii, chop(a));
         return Int.get(b1 % b2);
       }
 
       final BigDecimal b1 = a.dec(ii);
       final BigDecimal b2 = b.dec(ii);
-      if(b2.signum() == 0) throw DIVZERO.get(ii, a);
+      if(b2.signum() == 0) throw DIVZERO.get(ii, chop(a));
       final BigDecimal q = b1.divide(b2, 0, BigDecimal.ROUND_DOWN);
       return Dec.get(b1.subtract(q.multiply(b2)));
     }

@@ -19,8 +19,7 @@ import org.basex.util.*;
  */
 public final class YMDur extends Dur {
   /** YearMonth pattern. */
-  private static final Pattern DUR =
-      Pattern.compile("(-?)P(" + DP + "Y)?(" + DP + "M)?");
+  private static final Pattern DUR = Pattern.compile("(-?)P(" + DP + "Y)?(" + DP + "M)?");
 
   /**
    * Constructor.
@@ -45,7 +44,7 @@ public final class YMDur extends Dur {
 
     this(it);
     final double d = (double) mon + (p ? a.mon : -a.mon);
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw DURADDRANGE.get(ii, type);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw MONTHRANGE.get(ii, d);
     mon += p ? a.mon : -a.mon;
   }
 
@@ -62,9 +61,9 @@ public final class YMDur extends Dur {
 
     this(it);
     if(Double.isNaN(f)) throw DATECALC.get(ii, description(), f);
-    if(m ? Double.isInfinite(f) : f == 0) throw DATEZERO.get(ii, description());
+    if(m ? Double.isInfinite(f) : f == 0) throw DATEZERO.get(ii, type);
     final double d = m ? mon * f : mon / f;
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw DURADDRANGE.get(ii, type);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw MONTHRANGE.get(ii, d);
     mon = StrictMath.round(d);
   }
 

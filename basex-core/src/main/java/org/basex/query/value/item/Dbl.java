@@ -124,7 +124,7 @@ public final class Dbl extends ANum {
     } catch(final NumberFormatException ex) {
       if(Token.eq(Token.trim(val), Token.INF)) return POSITIVE_INFINITY;
       if(Token.eq(Token.trim(val), Token.NINF)) return NEGATIVE_INFINITY;
-      throw FUNCAST.get(ii, ZERO.type, val);
+      throw FUNCAST.get(ii, ZERO.type, chop(val));
     }
   }
 }

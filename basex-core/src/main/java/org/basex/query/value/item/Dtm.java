@@ -89,7 +89,7 @@ public final class Dtm extends ADate {
     this(date);
     if(dur instanceof DTDur) {
       calc((DTDur) dur, plus);
-      if(yea <= MIN_YEAR || yea > MAX_YEAR) throw DATEADDRANGE.get(ii, this);
+      if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE.get(ii, yea);
     } else {
       calc((YMDur) dur, plus, ii);
     }

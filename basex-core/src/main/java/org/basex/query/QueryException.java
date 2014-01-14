@@ -267,7 +267,7 @@ public class QueryException extends Exception {
       if(o instanceof byte[]) {
         o = Token.string((byte[]) o);
       } else if(o instanceof ExprInfo) {
-        o = ((ExprInfo) o).toString(Integer.MAX_VALUE);
+        o = ((ExprInfo) o).toErrorString();
       } else if(o instanceof Throwable) {
         o = Util.message((Throwable) o);
       } else if(!(o instanceof String)) {

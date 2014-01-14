@@ -385,7 +385,7 @@ public enum AtomType implements Type {
       final BigDecimal v = checkNum(it, ii).dec(ii);
       final BigDecimal i = v.setScale(0, BigDecimal.ROUND_DOWN);
       if(v.signum() < 0 || v.compareTo(Dec.MAXULNG) > 0 ||
-        it.type.isStringOrUntyped() && !v.equals(i)) throw FUNCAST.get(ii, this, it);
+        it.type.isStringOrUntyped() && !v.equals(i)) throw FUNCAST.get(ii, this, chop(it));
       return new Dec(i, this);
     }
   },
@@ -676,7 +676,7 @@ public enum AtomType implements Type {
 
       if(!it.type.isStringOrUntyped()) invCast(it, ii);
       final Uri u = Uri.uri(it.string(ii));
-      if(!u.isValid()) throw FUNCAST.get(ii, this, it);
+      if(!u.isValid()) throw FUNCAST.get(ii, this, chop(it));
       return u;
     }
     @Override
@@ -695,7 +695,7 @@ public enum AtomType implements Type {
       // xquery 3.0 also allows untyped arguments
       if(it.type != STR && !(sc.xquery3() && it.type.isUntyped())) invCast(it, ii);
       final byte[] nm = trim(it.string(ii));
-      if(!XMLToken.isQName(nm)) throw FUNCAST.get(ii, this, it);
+      if(!XMLToken.isQName(nm)) throw FUNCAST.get(ii, this, chop(nm));
       final QNm qn = new QNm(nm, sc);
       if(!qn.hasURI() && qn.hasPrefix()) throw NSDECL.get(ii, qn.prefix());
       return qn;
@@ -897,17 +897,17 @@ public enum AtomType implements Type {
     if(ip == DBL || ip == FLT) {
       final double d = it.dbl(ii);
       if(Double.isNaN(d) || Double.isInfinite(d)) throw valueError(ii, this, it);
+      if(min != max && (d < min || d > max)) throw FUNCAST.get(ii, this, chop(it));
       if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw INTRANGE.get(ii, d);
-      if(min != max && (d < min || d > max)) throw FUNCAST.get(ii, this, it);
       return (long) d;
     }
     if(min == max) {
       final double d = it.dbl(ii);
-      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw FUNCAST.get(ii, this, it);
+      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw FUNCAST.get(ii, this, chop(it));
     }
 
     final long l = it.itr(ii);
-    if(min != max && (l < min || l > max)) throw FUNCAST.get(ii, this, it);
+    if(min != max && (l < min || l > max)) throw FUNCAST.get(ii, this, chop(it));
     return l;
   }
 

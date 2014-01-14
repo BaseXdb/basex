@@ -153,7 +153,7 @@ public final class Int extends ANum {
     try {
       return Long.parseLong(Token.string(val).trim());
     } catch(final NumberFormatException ex) {
-      throw FUNCAST.get(ii, NUMS[0].type, val);
+      throw FUNCAST.get(ii, NUMS[0].type, chop(val));
     }
   }
 }

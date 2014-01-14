@@ -114,7 +114,7 @@ public final class Flt extends ANum {
     } catch(final NumberFormatException ex) {
       if(Token.eq(Token.trim(val), Token.INF)) return Float.POSITIVE_INFINITY;
       if(Token.eq(Token.trim(val), Token.NINF)) return Float.NEGATIVE_INFINITY;
-      throw FUNCAST.get(ii, ZERO.type, val);
+      throw FUNCAST.get(ii, ZERO.type, chop(val));
     }
   }
 }
