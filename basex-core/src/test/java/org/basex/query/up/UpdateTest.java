@@ -1041,6 +1041,19 @@ public final class UpdateTest extends AdvancedQueryTest {
   }
 
   /**
+   * Tests if pre value shifts are accumulated correctly for a mixture of structural and non-
+   * structural updates.
+   */
+  @Test
+  public void delayedDistanceAdjustment26() {
+    query(transform("<n><x at1='0' at2='0'/><y at3='0'/><b/></n>",
+        "delete node $input//@at1," +
+        "delete node $input//@at3," +
+        "rename node ($input//@at2)[1] as 'at2x'"),
+        "<n><x at2x=\"0\"/><y/><b/></n>");
+  }
+
+  /**
    * Tests if side-effecting updates within transform expressions are rejected.
    * Also includes db:output() and fn:put().
    */
