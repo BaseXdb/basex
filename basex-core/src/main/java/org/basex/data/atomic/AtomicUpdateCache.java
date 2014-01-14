@@ -54,6 +54,9 @@ public final class AtomicUpdateCache {
   /** Most recently added update buffer. Used to merge/discard updates and to detect
    * inconsistencies on-the-fly eliminating the need to traverse all updates. */
   private BasicUpdate recent;
+  /** Most recently added structural atomic update - if there is any. Used to calculate accumulated
+   * pre value shifts on-the-fly, as {@link BasicUpdate} don't carry this information. */
+  private BasicUpdate recentStruct;
   /** Target data reference. */
   public final Data data;
 
@@ -123,6 +126,7 @@ public final class AtomicUpdateCache {
     struct.clear();
     val.clear();
     recent = null;
+    recentStruct = null;
   }
 
   /**
@@ -131,14 +135,17 @@ public final class AtomicUpdateCache {
    * @param slack skip consistency checks etc. if true (used during text node merging)
    */
   private void considerAtomic(final BasicUpdate candidate, final boolean slack) {
-    // fill the one-update buffer
+    // fill the one-atomic-update buffer
     if(recent == null) {
       recent = candidate;
+      if(recent instanceof StructuralUpdate)
+        recentStruct = candidate;
       return;
     }
 
     if(candidate instanceof StructuralUpdate) {
-      ((StructuralUpdate) candidate).accumulatedShifts += recent.accumulatedShifts();
+      ((StructuralUpdate) candidate).accumulatedShifts +=
+          recentStruct == null ? 0 : recentStruct.accumulatedShifts();
     }
 
     // prepare & optimize incoming update
@@ -171,6 +178,8 @@ public final class AtomicUpdateCache {
       else val.add(recent);
     }
     recent = u;
+    if(u instanceof StructuralUpdate)
+      recentStruct = u;
   }
 
   /**
@@ -180,6 +189,7 @@ public final class AtomicUpdateCache {
     if(recent != null) {
       add(recent, false);
       recent = null;
+      recentStruct = null;
     }
   }
 
