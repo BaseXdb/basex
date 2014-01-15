@@ -158,7 +158,8 @@ public final class Updates {
     }
 
     it = node.children();
-    for(ANode n; (n = it.next()) != null && n.id <= trgID;) {
+    // n.id <= trgID: rewritten to catch ID overflow
+    for(ANode n; (n = it.next()) != null && trgID - n.id >= 0;) {
       s += preSteps(n, trgID);
     }
     return s;
