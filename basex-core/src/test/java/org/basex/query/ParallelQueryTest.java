@@ -28,7 +28,6 @@ public final class ParallelQueryTest {
    * Test.
    * @throws Throwable throwable
    */
-  //@Ignore
   @Test
   public void test() throws Throwable {
     // generate reference result
