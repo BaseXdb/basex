@@ -95,14 +95,13 @@ public final class FuncOptions {
         if(!val.isItem()) throw FUNCMP.get(info, map.description(), AtomType.ITEM, val);
         tb.add(optString((Item) val).replace(",", ",,")).add(',');
       }
-    } else if(item instanceof ANode) {
+    } else if(item.type == NodeType.ELM) {
       // interpret options
       for(final ANode node : ((ANode) item).children()) {
         if(node.type != NodeType.ELM) continue;
         // ignore elements in other namespace
         final QNm qn = node.qname();
         if(!eq(qn.uri(), root.uri())) continue;
-
         // retrieve key from element name and value from "value" attribute or text node
         byte[] v;
         if(hasElements(node)) {

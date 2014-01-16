@@ -34,10 +34,11 @@ public final class FNXsltTest extends AdvancedQueryTest {
     query(_XSLT_TRANSFORM.args(doc, '"' + style + '"'), "<X/>");
 
     style = wrap("<xsl:param name='t'/><xsl:template match='/'>" +
-      "<X><xsl:value-of select='$t'/></X></xsl:template>");
-    final String param =
-      "<xslt:parameters><xslt:t>1</xslt:t></xslt:parameters>";
+        "<X><xsl:value-of select='$t'/></X></xsl:template>");
+    String param = "<xslt:parameters><xslt:t>1</xslt:t></xslt:parameters>";
+    query(_XSLT_TRANSFORM.args(doc, style, param), "<X>1</X>");
 
+    param = " map { 't' : text { '1' } }";
     query(_XSLT_TRANSFORM.args(doc, style, param), "<X>1</X>");
   }
 
@@ -53,7 +54,6 @@ public final class FNXsltTest extends AdvancedQueryTest {
     style = wrap("<xsl:param name='t'/><xsl:output omit-xml-declaration='yes'/>" +
       "<xsl:template match='/'><xsl:value-of select='$t'/></xsl:template>");
     final String param = "<xslt:parameters><xslt:t>1</xslt:t></xslt:parameters>";
-
     query(_XSLT_TRANSFORM_TEXT.args(doc, style, param), "1");
   }
 
