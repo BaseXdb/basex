@@ -236,7 +236,8 @@ public abstract class ANode extends Item {
       }
       c2 = n;
     }
-    return node1.id < node2.id ? -1 : 1;
+    // subtraction is used instead of comparison to support overflow of node id
+    return node1.id - node2.id < 0 ? -1 : 1;
   }
 
   /**

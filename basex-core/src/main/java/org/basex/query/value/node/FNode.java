@@ -47,9 +47,9 @@ public abstract class FNode extends ANode {
   public final int diff(final ANode node) {
     // compare fragment with database node
     if(node instanceof DBNode) return diff(this, node);
-    // compare fragments: compare node ids
-    final int i = node.id;
-    return id > i ? 1 : id < i ? -1 : 0;
+    // compare fragments. subtraction is used instead of comparison to support overflow of node id
+    final int i = id - node.id;
+    return i > 0 ? 1 : i < 0 ? -1 : 0;
   }
 
   @Override

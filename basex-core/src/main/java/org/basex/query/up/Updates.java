@@ -146,8 +146,7 @@ public final class Updates {
    * @return pre value
    */
   private static int preSteps(final ANode node, final int trgID) {
-    if(node.id == trgID)
-      return 0;
+    if(node.id == trgID) return 0;
 
     int s = 1;
     AxisIter it = node.attributes();
