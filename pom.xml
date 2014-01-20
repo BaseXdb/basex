@@ -18,7 +18,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
-    <jettyVersion>8.1.11.v20130520</jettyVersion>
+    <jettyVersion>8.1.14.v20131031</jettyVersion>
   </properties>
 
   <dependencyManagement>
