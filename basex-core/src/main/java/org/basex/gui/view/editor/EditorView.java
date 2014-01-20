@@ -510,13 +510,13 @@ public final class EditorView extends View {
         }
       }
 
+      gui.context.options.set(MainOptions.QUERYPATH, file.path());
       if(!lib && exec) {
         // execute query if forced, or if realtime execution is activated
         gui.execute(true, new XQuery(input));
         execFile = file;
       } else {
         // parse query
-        gui.context.options.set(MainOptions.QUERYPATH, file.path());
         final QueryContext qc = new QueryContext(gui.context);
         try {
           qc.parse(input, lib, null, null);
