@@ -523,7 +523,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       throws IOException, QueryException {
 
     final MainOptions opts = context.context.options;
-    final HTTPPayload hp = new HTTPPayload(body.inputStream(), false, null, opts);
+    final HTTPPayload hp = new HTTPPayload(body.inputStream(), true, null, opts);
     final HashMap<String, Value> map = hp.multiForm(ext);
     for(final Map.Entry<String, Value> entry : map.entrySet()) {
       pars.put(entry.getKey(), entry.getValue());
