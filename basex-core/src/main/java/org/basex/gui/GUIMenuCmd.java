@@ -412,7 +412,7 @@ public enum GUIMenuCmd implements GUICommand {
         gui.gopts.invert(GUIOptions.SHOWPROJECT);
         gui.editor.project();
       }
-      gui.editor.focusProject();
+      gui.editor.focusFilter();
       gui.layoutViews();
     }
 

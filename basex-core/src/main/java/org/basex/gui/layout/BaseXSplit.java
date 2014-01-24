@@ -17,6 +17,10 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
   private double[] dragSize;
   /** Current drag position. */
   private double dragPos;
+  /** Proportions of visible panels. */
+  private double[] hiddenSize;
+  /** Cached sizes (when panel is hidden). */
+  private double[] cachedSize;
 
   /**
    * Constructor.
@@ -42,15 +46,34 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
   }
 
   /**
-   * Sets proportional panel size (sum must be 1.0).
-   * @param sz sizes
-   * @return old sizes
+   * Sets initial panel sizes (sum must be 1.0).
+   * @param vis visible sizes
+   * @param hidden hidden sizes
    */
-  public double[] sizes(final double[] sz) {
-    final double[] old = propSize;
-    propSize = sz;
-    revalidate();
-    return old;
+  public void init(final double[] vis, final double[] hidden) {
+    propSize = vis;
+    hiddenSize = hidden;
+  }
+
+  /**
+   * Sets proportional panel sizes (sum must be 1.0).
+   * @param show show/hide flag
+   */
+  public void visible(final boolean show) {
+    boolean s = true;
+    if(propSize != null) {
+      for(final double d : propSize) s &= d != 0;
+    }
+    if(propSize == null || s ^ show) {
+      // change state
+      if(show) {
+        propSize = cachedSize;
+      } else {
+        cachedSize = propSize;
+        propSize = hiddenSize;
+      }
+      revalidate();
+    }
   }
 
   /**

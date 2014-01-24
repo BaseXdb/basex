@@ -74,9 +74,6 @@ public final class EditorView extends View {
   private final BaseXTabs tabs;
   /** Query file that has last been evaluated. */
   private IOFile execFile;
-
-  /** Sizes. */
-  private double[] sizes = new double[] { 0.3, 0.7 };
   /** Thread counter. */
   private int threadID;
 
@@ -159,7 +156,7 @@ public final class EditorView extends View {
     split.mode(Fill.NONE);
     split.add(project);
     split.add(main);
-    split.sizes(sizes);
+    split.init(new double[] { 0.3, 0.7 }, new double[] { 0, 1 });
     project();
     add(split, BorderLayout.CENTER);
 
@@ -325,11 +322,11 @@ public final class EditorView extends View {
    * Toggles the project view.
    */
   public void project() {
-    if(gui.gopts.get(GUIOptions.SHOWPROJECT)) {
-      split.sizes(sizes);
-      project.focus();
+    final boolean show = gui.gopts.get(GUIOptions.SHOWPROJECT);
+    split.visible(show);
+    if(show) {
+      project.focus(false);
     } else {
-      sizes = split.sizes(new double[] { 0, 1 });
       getEditor().requestFocusInWindow();
     }
   }
@@ -337,8 +334,8 @@ public final class EditorView extends View {
   /**
    * Focuses the project view.
    */
-  public void focusProject() {
-    project.focus();
+  public void focusFilter() {
+    project.focus(true);
   }
 
   /**
@@ -655,7 +652,7 @@ public final class EditorView extends View {
       addTab();
       SwingUtilities.invokeLater(new Runnable() {
         @Override
-        public void run() { project.focus(); }
+        public void run() { project.focus(false); }
       });
     } else if(i + 1 == t) {
       // if necessary, activate last editor tab

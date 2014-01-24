@@ -41,8 +41,6 @@ public final class ProjectView extends BaseXPanel {
   final BaseXTextField path;
   /** Splitter. */
   private final BaseXSplit split;
-  /** Sizes. */
-  private double[] sizes = new double[] { 0.2, 0.8 };
 
   /**
    * Constructor.
@@ -91,7 +89,8 @@ public final class ProjectView extends BaseXPanel {
     split.mode(Fill.NONE);
     split.add(lscroll);
     split.add(tscroll);
-    split.sizes(sizes);
+    split.init(new double[] { 0.2, 0.8 }, new double[] { 0, 1 });
+    split.visible(false);
     showList(false);
 
     add(back, BorderLayout.NORTH);
@@ -103,11 +102,7 @@ public final class ProjectView extends BaseXPanel {
    * @param vis visibility flag
    */
   public void showList(final boolean vis) {
-    if(vis) {
-      split.sizes(sizes);
-    } else {
-      sizes = split.sizes(new double[] { 0, 1 });
-    }
+    split.visible(vis);
   }
 
   /**
@@ -145,13 +140,11 @@ public final class ProjectView extends BaseXPanel {
 
   /**
    * Focuses the project view.
+   * @param fltr focuses the filter or tree
    */
-  public void focus() {
-    if(split.getComponent(0).getHeight() != 0) {
-      filter.focus();
-    } else {
-      tree.requestFocusInWindow();
-    }
+  public void focus(final boolean fltr) {
+    if(fltr) filter.focus();
+    else tree.requestFocusInWindow();
   }
 
   /**
