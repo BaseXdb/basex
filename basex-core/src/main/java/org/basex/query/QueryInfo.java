@@ -21,8 +21,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class QueryInfo {
-  /** Query processor. */
-  public final QueryContext qc;
   /** Verbose info. */
   private final boolean verbose;
 
@@ -50,11 +48,10 @@ public final class QueryInfo {
 
   /**
    * Constructor.
-   * @param q query processor
+   * @param qc query context
    */
-  QueryInfo(final QueryContext q) {
-    qc = q;
-    verbose = q.context.options.get(MainOptions.QUERYINFO) || Prop.debug;
+  QueryInfo(final QueryContext qc) {
+    verbose = qc.context.options.get(MainOptions.QUERYINFO) || Prop.debug;
   }
 
   /**
@@ -90,12 +87,12 @@ public final class QueryInfo {
   public String toString(final QueryProcessor qp, final long printed, final long hits,
       final boolean detailed) {
 
-    final int runs = Math.max(1, qc.context.options.get(MainOptions.RUNS));
+    final int runs = Math.max(1, qp.ctx.context.options.get(MainOptions.RUNS));
     final TokenBuilder tb = new TokenBuilder();
     final long total = parsing + compiling + evaluating + serializing;
     if(detailed) {
       final int up = qp.updates();
-      tb.add(toString()).add(NL);
+      tb.add(toString(qp.ctx)).add(NL);
       tb.add(PARSING_CC).add(Performance.getTime(parsing, runs)).add(NL);
       tb.add(COMPILING_CC).add(Performance.getTime(compiling, runs)).add(NL);
       tb.add(EVALUATING_CC).add(Performance.getTime(evaluating, runs)).add(NL);
@@ -105,13 +102,13 @@ public final class QueryInfo {
       tb.add(UPDATED_CC + up).add(' ').add(up == 1 ? ITEM : ITEMS).add(NL);
       tb.add(PRINTED_CC).add(Performance.format(printed)).add(NL);
       tb.add(READ_LOCKING_CC);
-      if(readLocked == null) tb.add("global");
-      else if(readLocked.isEmpty()) tb.add("none");
-      else tb.add("local ").add(Arrays.toString(readLocked.toArray()));
+      if(readLocked == null) tb.add(GLOBAL);
+      else if(readLocked.isEmpty()) tb.add(NONE);
+      else tb.add(LOCAL).add(' ').add(Arrays.toString(readLocked.toArray()));
       tb.add(NL).add(WRITE_LOCKING_CC);
-      if(writeLocked == null) tb.add("global");
-      else if(writeLocked.isEmpty()) tb.add("none");
-      else tb.add("local ").add(Arrays.toString(writeLocked.toArray()));
+      if(writeLocked == null) tb.add(GLOBAL);
+      else if(writeLocked.isEmpty()) tb.add(NONE);
+      else tb.add(LOCAL).add(' ').add(Arrays.toString(writeLocked.toArray()));
       tb.add(NL);
     }
     final IO io = qp.sc.baseIO();
@@ -121,11 +118,27 @@ public final class QueryInfo {
   }
 
   /**
-   * Adopts query info from the specified context.
-   * @param parent parent context
+   * Returns detailed compilation and evaluation information.
+   * @param qc query context
+   * @return string
    */
-  public void close(final QueryContext parent) {
-    for(final byte[] line : parent.info.evaluate) evaluate.add(line);
+  public String toString(final QueryContext qc) {
+    final TokenBuilder tb = new TokenBuilder();
+    if(query != null) {
+      final String qu = QueryProcessor.removeComments(query, Integer.MAX_VALUE);
+      tb.add(NL).add(QUERY).add(COL).add(NL).add(qu).add(NL);
+    }
+    if(!compile.isEmpty()) {
+      tb.add(NL).add(COMPILING).add(COL).add(NL);
+      for(final byte[] line : compile) tb.add(LI).add(line).add(NL);
+      tb.add(NL).add(OPTIMIZED_QUERY).add(COL).add(NL);
+      tb.add(qc.root == null ? qc.funcs.toString() : usedDecls(qc.root)).add(NL);
+    }
+    if(!evaluate.isEmpty()) {
+      tb.add(NL).add(EVALUATING).add(COL).add(NL);
+      for(final byte[] line : evaluate) tb.add(LI).add(line).add(NL);
+    }
+    return tb.toString();
   }
 
   /**
@@ -169,25 +182,5 @@ public final class QueryInfo {
       }
     });
     return sb.append(mod).toString();
-  }
-
-  @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    if(query != null) {
-      final String qu = QueryProcessor.removeComments(query, Integer.MAX_VALUE);
-      tb.add(NL).add(QUERY).add(COL).add(NL).add(qu).add(NL);
-    }
-    if(!compile.isEmpty()) {
-      tb.add(NL).add(COMPILING).add(COL).add(NL);
-      for(final byte[] line : compile) tb.add(LI).add(line).add(NL);
-      tb.add(NL).add(OPTIMIZED_QUERY).add(COL).add(NL);
-      tb.add(qc.root == null ? qc.funcs.toString() : usedDecls(qc.root)).add(NL);
-    }
-    if(!evaluate.isEmpty()) {
-      tb.add(NL).add(EVALUATING).add(COL).add(NL);
-      for(final byte[] line : evaluate) tb.add(LI).add(line).add(NL);
-    }
-    return tb.toString();
   }
 }

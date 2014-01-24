@@ -447,7 +447,7 @@ public final class QueryContext extends Proc {
    * @return query info
    */
   public String info() {
-    return info.toString();
+    return info.toString(this);
   }
 
   /**

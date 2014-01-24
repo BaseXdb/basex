@@ -1,6 +1,7 @@
 package org.basex.query.value.node;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.func.Function.*;
 
 import java.io.*;
 
@@ -476,22 +477,6 @@ public class DBNode extends ANode {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(type.string()).add(' ');
-    switch((NodeType) type) {
-      case ATT:
-      case PI:
-        tb.add(name()).add(" { \"").add(Token.chop(string(), 64)).add("\" }");
-        break;
-      case ELM:
-        tb.add(name()).add(" { ... }");
-        break;
-      case DOC:
-        tb.add("{ \"").add(data.text(pre, true)).add("\" }");
-        break;
-      default:
-        tb.add("{ \"").add(Token.chop(string(), 64)).add("\" }");
-        break;
-    }
-    return tb.toString();
+    return _DB_OPEN_PRE.args(data.meta.name, pre);
   }
 }

@@ -262,10 +262,10 @@ public abstract class AQuery extends Command {
 
   /**
    * Creates query plans.
-   * @param c compiled flag
+   * @param comp compiled flag
    */
-  private void plan(final boolean c) {
-    if(c != options.get(MainOptions.COMPPLAN)) return;
+  private void plan(final boolean comp) {
+    if(comp != options.get(MainOptions.COMPPLAN)) return;
 
     // show dot plan
     BufferOutput bo = null;

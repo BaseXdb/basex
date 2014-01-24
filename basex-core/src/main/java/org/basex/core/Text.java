@@ -201,6 +201,12 @@ public interface Text {
   String ITEM = "Item";
   /** Query hits. */
   String ITEMS = "Items";
+  /** Global locking. */
+  String GLOBAL = "global";
+  /** Local locking. */
+  String LOCAL = "local";
+  /** No locking. */
+  String NONE = "none";
 
   /** Options error. */
   String OPT_OFFSET = "List counter for '%' is invalid.";
