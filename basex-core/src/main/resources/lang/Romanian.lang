@@ -58,6 +58,7 @@ copy_db              = Copiaza baza de date
 copy_path            = Calea de copiere
 create               = Creează
 create_database      = Creare baza de date
+create_db_file       = Create database from file %?
 create_stats         = Crea statistici
 creating_db          = Creare baze de date
 creating_indexes     = Crearea Indexuri

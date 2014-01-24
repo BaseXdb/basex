@@ -58,6 +58,7 @@ copy_db              = Salin Basisdata
 copy_path            = Salin Rintis
 create               = Buat
 create_database      = Buat Basisdata
+create_db_file       = Create database from file %?
 create_stats         = Buat statistik
 creating_db          = Membuat Basisdata
 creating_indexes     = Membuat Indeks

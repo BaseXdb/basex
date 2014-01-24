@@ -58,6 +58,7 @@ copy_db              = Kopieer database
 copy_path            = Kopieer pad
 create               = Maak
 create_database      = Maak database
+create_db_file       = Create database from file %?
 create_stats         = Statistieken maken
 creating_db          = Bezig de database te maken
 creating_indexes     = Bezig de indexen te maken

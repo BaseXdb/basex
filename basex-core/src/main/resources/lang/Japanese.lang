@@ -58,6 +58,7 @@ copy_db              = ドキュメントのコピー
 copy_path            = パスのコピー
 create               = 作成
 create_database      = データベースの作成
+create_db_file       = Create database from file %?
 create_stats         = 統計の作成
 creating_db          = データベースを作成しています
 creating_indexes     = インデックスを作成中です。

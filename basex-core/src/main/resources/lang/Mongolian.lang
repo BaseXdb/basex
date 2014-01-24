@@ -58,6 +58,7 @@ copy_db              = Өгөгдлийн санг хуулах
 copy_path            = Байршил хуулах
 create               = Үүсгэх
 create_database      = Өгөгдлийн санг үүсгэх
+create_db_file       = Create database from file %?
 create_stats         = Статистик үзүүлэлт үүсгэх
 creating_db          = Өгөгдлийн санг үүсгэх
 creating_indexes     = Индексүүдийг үүсгэх

@@ -58,6 +58,7 @@ copy_db              = Копировать базу данных
 copy_path            = Копировать пути
 create               = Создать
 create_database      = Создать базу данных
+create_db_file       = Create database from file %?
 create_stats         = Собирается статистика
 creating_db          = Создается база данных
 creating_indexes     = Создаются индексы

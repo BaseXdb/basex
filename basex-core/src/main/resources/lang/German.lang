@@ -58,6 +58,7 @@ copy_db              = Datebank kopieren
 copy_path            = Pfad kopieren
 create               = Erstellen
 create_database      = Datenbank-Optionen
+create_db_file       = Datenbank erzeugen aus der Datei %?
 create_stats         = Erstelle Statistiken
 creating_db          = Datenbank wird angelegt
 creating_indexes     = Indizes werden angelegt

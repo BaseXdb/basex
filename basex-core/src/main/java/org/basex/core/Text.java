@@ -521,6 +521,8 @@ public interface Text {
 
   // CREATE COMMAND ===========================================================
 
+  /** Create database question. */
+  String CREATE_DB_FILE = lang("create_db_file");
   /** Create database information. */
   String CREATING_DB = lang("creating_db");
   /** Create index information. */

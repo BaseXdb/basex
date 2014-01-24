@@ -12,6 +12,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.gui.*;
 import org.basex.gui.dialog.*;
+import org.basex.gui.layout.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -80,21 +81,17 @@ public final class BaseXGUI {
         if(osxGUI != null) osxGUI.init(gui);
 
         // open specified document or database
-        boolean xml = false;
         for(final String file : files) {
           if(file.matches("^.*\\" + IO.BASEXSUFFIX + "[^.]*$")) continue;
 
           final IOFile io = new IOFile(file);
-          boolean xq = file.endsWith(IO.BXSSUFFIX);
-          for(final String suf : IO.XQSUFFIXES) xq |= file.endsWith(suf);
-          if(xq) {
-            gui.editor.open(io);
-          } else if(!xml) {
-            // only parse first xml file
+          final boolean xml = file.endsWith(IO.XMLSUFFIX);
+          if(xml && BaseXDialog.confirm(gui, Util.info(Text.CREATE_DB_FILE, io))) {
             gopts.set(GUIOptions.INPUTPATH, io.path());
             gopts.set(GUIOptions.DBNAME, io.dbname());
             DialogProgress.execute(gui, new Check(file));
-            xml = true;
+          } else {
+            gui.editor.open(io);
           }
         }
       }
