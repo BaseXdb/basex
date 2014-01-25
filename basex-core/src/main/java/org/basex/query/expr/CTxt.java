@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class CTxt extends CFrag {
+public final class CTxt extends CNode {
   /**
    * Constructor.
    * @param sctx static context

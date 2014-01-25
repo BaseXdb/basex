@@ -1102,6 +1102,10 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void modifyCheck() {
     error("copy $c:= <a>X</a> modify 'a' return $c", Err.UPMODIFY);
     error("copy $c:= <a>X</a> modify(delete node $c/text(),'a') return $c", Err.UPALL);
+
+    error("text { <a/> update (delete node <a/>,<b/>) }", Err.UPALL);
+    error("1[<a/> update (delete node <a/>,<b/>)]", Err.UPALL);
+    error("for $i in 1 order by (<a/> update (delete node <a/>,<b/>)) return $i", Err.UPALL);
   }
 
   /** Tests adding an attribute and thus crossing the {@link IO#MAXATTS} line (GH-752). */

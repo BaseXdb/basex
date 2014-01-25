@@ -53,8 +53,8 @@ public abstract class Single extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
     final Expr sub = expr.inline(ctx, scp, v, e);
     if(sub == null) return null;
     expr = sub;

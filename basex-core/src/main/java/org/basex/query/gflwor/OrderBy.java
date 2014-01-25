@@ -167,16 +167,15 @@ public final class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp, final Var v,
+      final Expr e) throws QueryException {
     for(int i = refs.length; --i >= 0;)
       if(v.is(refs[i].var)) refs = Array.delete(refs, i);
     return inlineAll(ctx, scp, keys, v, e) ? optimize(ctx, scp) : null;
   }
 
   @Override
-  public OrderBy copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public OrderBy copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new OrderBy(Arr.copyAll(ctx, scp, vs, refs),
         Arr.copyAll(ctx, scp, vs, keys), info);
   }

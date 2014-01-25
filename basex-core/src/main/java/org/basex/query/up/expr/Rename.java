@@ -44,7 +44,7 @@ public final class Rename extends Update {
     if(i == null) throw UPSEQEMP.get(info, Util.className(this));
     if(t.next() != null) throw UPWRTRGTYP.get(info);
 
-    final CFrag ex;
+    final CNode ex;
     if(i.type == NodeType.ELM) {
       ex = new CElem(sc, info, expr[1], null);
     } else if(i.type == NodeType.ATT) {

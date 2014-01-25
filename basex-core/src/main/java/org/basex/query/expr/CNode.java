@@ -7,12 +7,12 @@ import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
- * Fragment constructor.
+ * Node constructor.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public abstract class CFrag extends Arr {
+public abstract class CNode extends Arr {
   /** Static context. */
   final StaticContext sc;
   /**
@@ -21,7 +21,7 @@ public abstract class CFrag extends Arr {
    * @param ii input info
    * @param n name
    */
-  CFrag(final StaticContext sctx, final InputInfo ii, final Expr... n) {
+  CNode(final StaticContext sctx, final InputInfo ii, final Expr... n) {
     super(ii, n);
     sc = sctx;
     size = 1;

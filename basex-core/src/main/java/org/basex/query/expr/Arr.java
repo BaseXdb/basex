@@ -31,7 +31,7 @@ public abstract class Arr extends ParseExpr {
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoUp();
+    checkNoneUp(expr);
   }
 
   @Override
@@ -59,8 +59,8 @@ public abstract class Arr extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
     return inlineAll(ctx, scp, expr, v, e) ? optimize(ctx, scp) : null;
   }
 
@@ -74,8 +74,8 @@ public abstract class Arr extends ParseExpr {
    * @return deep copy of the array
    */
   @SuppressWarnings("unchecked")
-  public static <T extends Expr> T[] copyAll(final QueryContext ctx,
-      final VarScope scp, final IntObjMap<Var> vs, final T[] arr) {
+  public static <T extends Expr> T[] copyAll(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs, final T[] arr) {
     final T[] copy = arr.clone();
     for(int i = 0; i < copy.length; i++) copy[i] = (T) copy[i].copy(ctx, scp, vs);
     return copy;
@@ -104,14 +104,6 @@ public abstract class Arr extends ParseExpr {
   final boolean oneIsEmpty() {
     for(final Expr e : expr) if(e.isEmpty()) return true;
     return false;
-  }
-
-  /**
-   * Checks if none of the expressions are updating expressions.
-   * @throws QueryException query exception
-   */
-  final void checkNoUp() throws QueryException {
-    checkNoneUp(expr);
   }
 
   @Override

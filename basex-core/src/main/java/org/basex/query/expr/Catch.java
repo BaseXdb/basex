@@ -93,8 +93,7 @@ public final class Catch extends Single {
   }
 
   @Override
-  public Catch inline(final QueryContext ctx, final VarScope scp, final Var v,
-      final Expr e) {
+  public Catch inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e) {
     try {
       final Expr sub = expr.inline(ctx, scp, v, e);
       if(sub == null) return null;

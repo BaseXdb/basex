@@ -17,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public abstract class CName extends CFrag {
+public abstract class CName extends CNode {
   /** Description. */
   private final String desc;
   /** QName. */
