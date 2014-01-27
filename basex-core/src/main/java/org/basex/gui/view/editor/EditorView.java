@@ -325,7 +325,7 @@ public final class EditorView extends View {
     final boolean show = gui.gopts.get(GUIOptions.SHOWPROJECT);
     split.visible(show);
     if(show) {
-      project.focus(false);
+      project.focus();
     } else {
       getEditor().requestFocusInWindow();
     }
@@ -335,7 +335,7 @@ public final class EditorView extends View {
    * Focuses the project view.
    */
   public void focusFilter() {
-    project.focus(true);
+    project.focusFilter();
   }
 
   /**
@@ -652,7 +652,7 @@ public final class EditorView extends View {
       addTab();
       SwingUtilities.invokeLater(new Runnable() {
         @Override
-        public void run() { project.focus(false); }
+        public void run() { project.focus(); }
       });
     } else if(i + 1 == t) {
       // if necessary, activate last editor tab

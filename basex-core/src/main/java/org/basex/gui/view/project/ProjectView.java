@@ -41,6 +41,16 @@ public final class ProjectView extends BaseXPanel {
   final BaseXTextField path;
   /** Splitter. */
   private final BaseXSplit split;
+  /** Last focused component. */
+  private Component last;
+
+  /** Remembers the last focused component. */
+  final FocusAdapter lastfocus = new FocusAdapter() {
+    @Override
+    public void focusLost(final FocusEvent ev) {
+      last = ev.getComponent();
+    }
+  };
 
   /**
    * Constructor.
@@ -95,6 +105,10 @@ public final class ProjectView extends BaseXPanel {
 
     add(back, BorderLayout.NORTH);
     add(split, BorderLayout.CENTER);
+
+    last = tree;
+    tree.addFocusListener(lastfocus);
+    list.addFocusListener(lastfocus);
   }
 
   /**
@@ -139,12 +153,17 @@ public final class ProjectView extends BaseXPanel {
   }
 
   /**
-   * Focuses the project view.
-   * @param fltr focuses the filter or tree
+   * Focuses the project filter.
    */
-  public void focus(final boolean fltr) {
-    if(fltr) filter.focus();
-    else tree.requestFocusInWindow();
+  public void focusFilter() {
+    filter.focus();
+  }
+
+  /**
+   * Focuses the project view.
+   */
+  public void focus() {
+    last.requestFocusInWindow();
   }
 
   /**
