@@ -122,7 +122,7 @@ public abstract class Serializer {
       }
       serialize((ANode) item);
     } else if(item instanceof FItem) {
-      throw SERFUNC.getIO(item.description());
+      throw SERFUNC.getIO(item.type());
     } else {
       finishElement();
       atomic(item);

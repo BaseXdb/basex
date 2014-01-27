@@ -531,15 +531,15 @@ public enum Err {
   FUNREPDOL(FORX, 4, "Replacement string: invalid dollar sign."),
 
   /** FOTY0013. */
-  FIVALUE(FOTY, 13, "Item has no typed value: %."),
+  FIVALUE(FOTY, 13, "Items of type % have no typed value."),
   /** FOTY0013. */
-  FIATOM(FOTY, 13, "Function items cannot be atomized: %."),
+  FIATOM(FOTY, 13, "Items of type % cannot be atomized."),
   /** FOTY0013. */
-  FIEQ(FOTY, 13, "Function items have no defined equality: %."),
+  FIEQ(FOTY, 13, "Items of type % have no defined equality."),
   /** FOTY0013. */
-  FISTR(FOTY, 14, "Function items have no string representation: %."),
+  FISTR(FOTY, 14, "Items of type % have no string representation."),
   /** FOTY0013. */
-  FICMP(FOTY, 15, "Function items cannot be compared: %."),
+  FICMP(FOTY, 15, "Items of type % cannot be compared."),
 
   /** FOUP0001. */
   UPFOTYPE(FOUP, 1, "Document or element expected, % found."),
@@ -598,7 +598,7 @@ public enum Err {
   /** SENR0001. */
   SERNS(SENR, 1, "Namespaces cannot be serialized:%."),
   /** SENR0001. */
-  SERFUNC(SENR, 1, "Functions cannot be serialized: %."),
+  SERFUNC(SENR, 1, "Items of type % cannot be serialized."),
   /** SEPM0004. */
   SERSA(SEPM, 4, "If 'standalone' is specified, the root must be a single element."),
   /** SEPM0004. */

@@ -62,13 +62,13 @@ public abstract class FItem extends Item implements XQFunction {
 
   @Override
   public final byte[] string(final InputInfo ii) throws QueryException {
-    throw FIVALUE.get(ii, description());
+    throw FIVALUE.get(ii, type);
   }
 
   @Override
   public final boolean eq(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
-    throw FIEQ.get(ii, description());
+    throw FIEQ.get(ii, type);
   }
 
   @Override

@@ -87,7 +87,7 @@ public final class Map extends FItem {
     if(it == null) throw INVEMPTY.get(ii, description());
 
     // function items can't be keys
-    if(it instanceof FItem) throw FIATOM.get(ii, it.description());
+    if(it instanceof FItem) throw FIATOM.get(ii, it.type);
 
     // NaN can't be stored as key, as it isn't equal to anything
     if(it == Flt.NAN || it == Dbl.NAN) return null;

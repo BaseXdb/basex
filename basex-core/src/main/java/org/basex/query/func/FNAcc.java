@@ -68,7 +68,7 @@ public final class FNAcc extends StandardFunc {
 
     final Item it = e.item(ctx, info);
     if(it == null) return Str.ZERO;
-    if(it instanceof FItem) throw FISTR.get(ii, this);
+    if(it instanceof FItem) throw FISTR.get(ii, it.type);
     return it.type == AtomType.STR ? it : Str.get(it.string(ii));
   }
 
@@ -82,7 +82,7 @@ public final class FNAcc extends StandardFunc {
   private Item number(final Iter ir, final QueryContext ctx) throws QueryException {
     final Item it = ir.next();
     if(it == null || ir.next() != null) return Dbl.NAN;
-    if(it instanceof FItem) throw FIATOM.get(info, this);
+    if(it instanceof FItem) throw FIATOM.get(info, it.type);
     try {
       return it.type == AtomType.DBL ? it : AtomType.DBL.cast(it, ctx, sc, info);
     } catch(final QueryException ex) {

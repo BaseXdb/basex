@@ -100,7 +100,7 @@ public final class FNGen extends StandardFunc {
       public Item next() throws QueryException {
         final Item it = ir.next();
         if(it == null) return null;
-        if(it instanceof FItem) throw FIATOM.get(info, FNGen.this);
+        if(it instanceof FItem) throw FIATOM.get(info, it.type);
         return atom(it, info);
       }
     };

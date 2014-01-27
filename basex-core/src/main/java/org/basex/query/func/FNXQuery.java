@@ -109,7 +109,7 @@ public final class FNXQuery extends StandardFunc {
         cache(iter, vb, ctx);
       } else {
         for(Item it; (it = iter.next()) != null;) {
-          if(it instanceof FItem) throw FIVALUE.get(info, it);
+          if(it instanceof FItem) throw FIVALUE.get(info, it.type);
           vb.add(it);
         }
       }

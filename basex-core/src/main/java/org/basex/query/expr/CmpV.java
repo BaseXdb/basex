@@ -217,8 +217,8 @@ public final class CmpV extends Cmp {
     if(b == null) return null;
     if(a.comparable(b)) return Bln.get(op.eval(a, b, collation, info));
 
-    if(a instanceof FItem) throw FIEQ.get(info, a);
-    if(b instanceof FItem) throw FIEQ.get(info, b);
+    if(a instanceof FItem) throw FIEQ.get(info, a.type);
+    if(b instanceof FItem) throw FIEQ.get(info, b.type);
     throw INVTYPECMP.get(info, a.type, b.type);
   }
 

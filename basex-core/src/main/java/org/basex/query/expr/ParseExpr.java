@@ -347,8 +347,7 @@ public abstract class ParseExpr extends Expr {
     if(it == null) return EMPTY;
     final Type ip = it.type;
     if(ip.isStringOrUntyped()) return it.string(info);
-    throw it instanceof FItem ? FIATOM.get(info, this) :
-      INVCAST.get(info, it.type, AtomType.STR);
+    throw it instanceof FItem ? FIATOM.get(info, ip) : INVCAST.get(info, it.type, AtomType.STR);
   }
 
   /**
