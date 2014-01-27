@@ -283,7 +283,7 @@ public final class GFLWOR extends ParseExpr {
           if(use == VarUsage.NEVER) {
             ctx.compInfo(QueryText.OPTVAR, lt.var);
             iter.remove();
-            change = true;
+            thisRound = change = true;
           } else if(
             // inline simple values
             expr.isValue()
@@ -297,6 +297,7 @@ public final class GFLWOR extends ParseExpr {
             || expr instanceof AxisPath && ((AxisPath) expr).cheap()) {
             ctx.compInfo(QueryText.OPTINLINE, lt);
             inline(ctx, scp, lt.var, lt.inlineExpr(ctx, scp), next);
+            iter.remove();
             thisRound = change = true;
             // continue from the beginning as clauses below could have been deleted
             break;
