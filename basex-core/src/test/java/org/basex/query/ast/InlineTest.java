@@ -35,6 +35,16 @@ public class InlineTest extends QueryPlanTest {
         "let $type:= switch (fn:true())" +
         "  case $item contains text \"blah\" return <type>a</type>" +
         "  default return ()" +
-        "return $type", "<type>a</type>", "count(//Let) = 2");
+        "return $type",
+        "<type>a</type>",
+        "count(//Let) = 2");
+  }
+
+  /** Regression test for Issue GH-849, "Typing and Function items: XPTY0004". */
+  @Test public void gh849() {
+    check("let $f := function($s as xs:string) { $s }" +
+        "return $f(let $x := <x>1</x> return if($x = 1.1) then () else 'x')",
+        "x",
+        "exists(//Str)");
   }
 }
