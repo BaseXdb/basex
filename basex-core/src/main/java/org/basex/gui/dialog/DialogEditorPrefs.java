@@ -33,6 +33,8 @@ final class DialogEditorPrefs extends BaseXBack {
   private final BaseXCheckBox markline;
   /** Save before executing file. */
   private final BaseXCheckBox saverun;
+  /** Automatically add characters. */
+  private final BaseXCheckBox auto;
 
   /**
    * Default constructor.
@@ -51,6 +53,7 @@ final class DialogEditorPrefs extends BaseXBack {
     markline = new BaseXCheckBox(MARK_EDITED_LINE, GUIOptions.MARKLINE, gopts, d);
     spaces = new BaseXCheckBox(TABS_AS_SPACES, GUIOptions.TABSPACES, gopts, d);
     indent = new BaseXTextField(GUIOptions.INDENT, gopts, d);
+    auto = new BaseXCheckBox(AUTO_ADD_CHARS, GUIOptions.AUTO, gopts, d);
     saverun = new BaseXCheckBox(SAVE_BEFORE_EXECUTE, GUIOptions.SAVERUN, gopts, d);
     BaseXLayout.setWidth(margin, 30);
     BaseXLayout.setWidth(indent, 30);
@@ -68,13 +71,14 @@ final class DialogEditorPrefs extends BaseXBack {
     add(p);
 
     final BaseXBack pv = new BaseXBack().layout(new TableLayout(2, 1, 0, 8));
-    p = new BaseXBack().layout(new TableLayout(3, 1));
+    p = new BaseXBack().layout(new TableLayout(4, 1));
     p.add(new BaseXLabel(EDIT + COL, true, true));
     pp = new BaseXBack().layout(new TableLayout(1, 2, 8, 0));
     pp.add(new BaseXLabel(INDENTATION_SIZE + COL));
     pp.add(indent);
     p.add(pp);
     p.add(spaces);
+    p.add(auto);
     pv.add(p);
 
     p = new BaseXBack().layout(new TableLayout(2, 1));
@@ -98,6 +102,7 @@ final class DialogEditorPrefs extends BaseXBack {
     margin.assign();
     spaces.assign();
     indent.assign();
+    auto.assign();
     saverun.assign();
   }
 }

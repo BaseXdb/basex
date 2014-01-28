@@ -18,6 +18,7 @@ are_you_sure         = Вы уверены?
 attribute            = Атрибут
 attribute_index      = Индекс по атрибутам
 attributes           = Атрибуты
+auto_add_chars       = Automatically add characters
 backup               = Создать резервную копию
 backup_dropped_%     = Файл резервной копии '%' был удален
 backup_not_found_%   = Резервная копия '%' не найдена
