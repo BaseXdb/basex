@@ -154,9 +154,10 @@ public final class ProjectView extends BaseXPanel {
 
   /**
    * Focuses the project filter.
+   * @param string string to be found
    */
-  public void focusFilter() {
-    filter.focus();
+  public void focusFilter(final String string) {
+    filter.focus(string);
   }
 
   /**

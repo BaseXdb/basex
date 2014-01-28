@@ -155,6 +155,15 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
+   * Returns a currently marked string if it does not extend over more than one line.
+   * @return search string, or {@code null}
+   */
+  public String searchString() {
+    final String string = editor.copy();
+    return string.isEmpty() || string.contains("\n") ? null : string;
+  }
+
+  /**
    * Returns the line and column of the current caret position.
    * @return line/column
    */
@@ -939,7 +948,7 @@ public class TextPanel extends BaseXPanel {
     FindCmd() { super(Text.FIND + Text.DOTS, FIND); }
 
     @Override
-    public void execute() { search.activate(editor.copy(), true); }
+    public void execute() { search.activate(searchString(), true); }
     @Override
     public boolean enabled(final GUI main) { return search != null; }
   }
@@ -972,7 +981,7 @@ public class TextPanel extends BaseXPanel {
    */
   private void find(final boolean next) {
     final boolean vis = search.isVisible();
-    search.activate(editor.copy(), false);
+    search.activate(searchString(), false);
     jump(vis ? next ? SearchDir.FORWARD : SearchDir.BACKWARD : SearchDir.CURRENT, true);
   }
 

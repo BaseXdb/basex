@@ -195,9 +195,14 @@ final class ProjectFilter extends BaseXBack {
 
   /**
    * Filters the file search field.
+   * @param string string to be found
    */
-  void focus() {
+  void focus(final String string) {
     files.requestFocusInWindow();
+    if(string != null) {
+      contents.setText(string);
+      refresh(false);
+    }
   }
 
   // PRIVATE METHODS ==============================================================================
