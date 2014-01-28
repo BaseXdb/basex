@@ -24,6 +24,9 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public class ProjectList extends JList {
+  /** Font metrics. */
+  private static FontMetrics fm;
+
   /** Popup commands. */
   final GUIPopupCmd[] commands = {
     new GUIPopupCmd(OPEN, BaseXKeys.ENTER) {
@@ -136,12 +139,35 @@ public class ProjectList extends JList {
   class CellRenderer extends DefaultListCellRenderer {
     /** Label. */
     private final BaseXLabel label;
+    /** Current file. */
+    private IOFile file = new IOFile(".");
 
     /**
      * Constructor.
      */
     CellRenderer() {
-      label = new BaseXLabel();
+      label = new BaseXLabel() {
+        @Override
+        public void paintComponent(final Graphics g) {
+          super.paintComponent(g);
+          BaseXLayout.hints(g);
+
+          if(fm == null) fm = g.getFontMetrics(label.getFont());
+          final int y = fm.getHeight() - 2;
+          int x = (int) label.getPreferredSize().getWidth() + 2;
+
+          final String s = file.name();
+          g.setColor(label.getForeground());
+          g.drawString(s, x, y);
+          x += fm.stringWidth(s);
+
+          final String[] names = file.file().getParent().split("/|\\\\");
+          final StringBuilder sb = new StringBuilder(" ");
+          for(int n = names.length - 1; n >= 0; n--) sb.append('/').append(names[n]);
+          g.setColor(GUIConstants.GRAY);
+          g.drawString(sb.toString(), x, y);
+        }
+      };
       label.setOpaque(true);
     }
 
@@ -149,10 +175,10 @@ public class ProjectList extends JList {
     public Component getListCellRendererComponent(final JList list, final Object value,
         final int index, final boolean selected, final boolean expanded) {
 
-      final IOFile file = new IOFile(value.toString());
+      file = new IOFile(value.toString());
       label.setIcon(BaseXImages.file(file));
-      label.setText(ProjectFile.toString(file));
-      label.setToolTipText(file.path());
+      label.setText("");
+      label.setToolTipText(ProjectFile.toString(file, true));
 
       if(selected) {
         label.setBackground(getSelectionBackground());

@@ -27,18 +27,19 @@ final class ProjectFile extends ProjectNode {
 
   @Override
   public String toString() {
-    return toString(file);
+    return toString(file, false);
   }
 
   /**
    * Returns a string representation for the specified file.
    * @param file file
+   * @param full full path
    * @return string
    */
-  public static String toString(final IOFile file) {
+  static String toString(final IOFile file, final boolean full) {
     final StringBuilder sb = new StringBuilder();
     if(file != null) {
-      sb.append(file.name());
+      sb.append(full ? file.path() : file.name());
       if(file.exists()) sb.append(" (").append(Performance.format(file.length(), true)).append(')');
     }
     return sb.toString();

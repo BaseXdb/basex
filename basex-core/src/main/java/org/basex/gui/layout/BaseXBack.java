@@ -1,14 +1,12 @@
 package org.basex.gui.layout;
 
 import java.awt.*;
-import java.util.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
 
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.util.*;
 
 /**
  * Panel background, extending the {@link JPanel}.
@@ -17,11 +15,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class BaseXBack extends JPanel {
-  /** Desktop hints. */
-  private static final Map<?, ?> HINTS = (Map<?, ?>)
-    Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints");
-  /** Flag for adding rendering hints. */
-  private static boolean hints = true;
   /** Fill mode. */
   private Fill mode;
 
@@ -70,16 +63,7 @@ public class BaseXBack extends JPanel {
     } else {
       super.paintComponent(g);
     }
-
-    // rendering hints are not supported by all platforms
-    if(hints) {
-      try {
-        ((Graphics2D) g).addRenderingHints(HINTS);
-      } catch(final Exception ex) {
-        Util.debug(ex);
-        hints = false;
-      }
-    }
+    BaseXLayout.hints(g);
   }
 
   /**

@@ -26,6 +26,12 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class BaseXLayout {
+  /** Desktop hints. */
+  private static final Map<?, ?> HINTS = (Map<?, ?>)
+    Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints");
+  /** Flag for adding rendering hints. */
+  private static boolean hints = true;
+
   /** Shortcut string for meta key. */
   private static final String META = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ==
       Event.META_MASK ? "meta" : "ctrl";
@@ -43,6 +49,21 @@ public final class BaseXLayout {
     final GUI gui = gui(cont);
     if(gui == null) return;
     if(gui.gopts.get(GUIOptions.MOUSEFOCUS) && cont.isEnabled()) cont.requestFocusInWindow();
+  }
+
+  /**
+   * Set desktop hints (not supported by all platforms).
+   * @param g graphics reference
+   */
+  public static void hints(final Graphics g) {
+    if(hints) {
+      try {
+        ((Graphics2D) g).addRenderingHints(HINTS);
+      } catch(final Exception ex) {
+        Util.debug(ex);
+        hints = false;
+      }
+    }
   }
 
   /**

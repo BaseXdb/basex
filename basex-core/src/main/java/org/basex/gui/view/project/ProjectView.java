@@ -99,7 +99,7 @@ public final class ProjectView extends BaseXPanel {
     split.mode(Fill.NONE);
     split.add(lscroll);
     split.add(tscroll);
-    split.init(new double[] { 0.2, 0.8 }, new double[] { 0, 1 });
+    split.init(new double[] { 0.3, 0.7 }, new double[] { 0, 1 });
     split.visible(false);
     showList(false);
 
