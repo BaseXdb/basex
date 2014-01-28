@@ -23,13 +23,6 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class SAXWrapper extends SingleParser {
-  /** External DTD parsing. */
-  private static final String EXTDTD =
-    "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-  /** Lexical handler. */
-  private static final String LEXHANDLER =
-    "http://xml.org/sax/properties/lexical-handler";
-
   /** File counter. */
   private long counter;
   /** Current line. */
@@ -60,9 +53,12 @@ public final class SAXWrapper extends SingleParser {
     try {
       XMLReader r = saxs.getXMLReader();
       if(r == null) {
+        final boolean dtd = options.get(MainOptions.DTD);
         final SAXParserFactory f = SAXParserFactory.newInstance();
-        f.setFeature(EXTDTD, options.get(MainOptions.DTD));
+        f.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", dtd);
+        f.setFeature("http://xml.org/sax/features/external-parameter-entities", dtd);
         f.setFeature("http://xml.org/sax/features/use-entity-resolver2", false);
+
         f.setNamespaceAware(true);
         f.setValidating(false);
         f.setXIncludeAware(true);
@@ -76,7 +72,7 @@ public final class SAXWrapper extends SingleParser {
 
       r.setDTDHandler(saxh);
       r.setContentHandler(saxh);
-      r.setProperty(LEXHANDLER, saxh);
+      r.setProperty("http://xml.org/sax/properties/lexical-handler", saxh);
       r.setErrorHandler(saxh);
 
       if(is != null) r.parse(is);

@@ -688,13 +688,14 @@ final class XMLScanner extends Proc {
         if(!dtd && r) return cont;
 
         final XMLInput tin = input;
-        try {
-          final IO file = input.io().merge(name);
-          cont = file.read();
-        } catch(final IOException ex) {
-          Util.debug(ex);
-          // skip unknown DTDs/entities
-          cont = new byte[] { '?' };
+        if(dtd) {
+          try {
+            cont = input.io().merge(name).read();
+          } catch(final IOException ex) {
+            throw error(Util.message(ex));
+          }
+        } else {
+          cont = new byte[0];
         }
         input = new XMLInput(new IOContent(cont, name));
 
