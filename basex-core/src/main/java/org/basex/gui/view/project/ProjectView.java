@@ -12,7 +12,7 @@ import javax.swing.border.*;
 
 import org.basex.core.*;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.*;
+import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.view.editor.*;
@@ -82,7 +82,9 @@ public final class ProjectView extends BaseXPanel {
     browse.setToolTipText(CHOOSE_DIR);
     browse.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(final ActionEvent e) { change(); }
+      public void actionPerformed(final ActionEvent e) {
+        change();
+      }
     });
 
     back.add(path, BorderLayout.CENTER);
@@ -99,7 +101,7 @@ public final class ProjectView extends BaseXPanel {
     split.mode(Fill.NONE);
     split.add(lscroll);
     split.add(tscroll);
-    split.init(new double[] { 0.3, 0.7 }, new double[] { 0, 1 });
+    split.init(new double[] { 0.3, 0.7}, new double[] { 0, 1});
     split.visible(false);
     showList(false);
 
@@ -125,12 +127,17 @@ public final class ProjectView extends BaseXPanel {
    * @param tr refresh tree
    */
   public void refresh(final IOFile file, final boolean tr) {
-    // check if file to be refreshed is within the root path
+    if(tr) refresh(file);
+    filter.refresh(true);
+  }
+
+  /**
+   * Jumps to the specified file.
+   * @param file file to be focused
+   */
+  public void jump(final IOFile file) {
     final IOFile fl = new IOFile(canonical(file.file()));
-    if(fl.path().startsWith(root.file.path())) {
-      if(tr) refresh(fl);
-      filter.refresh(true);
-    }
+    if(fl.path().startsWith(root.file.path())) tree.expand(root, fl.path());
   }
 
   /**
@@ -138,18 +145,31 @@ public final class ProjectView extends BaseXPanel {
    * @param file file to be refreshed
    */
   private void refresh(final IOFile file) {
-    final Enumeration<?> en = root.depthFirstEnumeration();
-    while(en.hasMoreElements()) {
-      final ProjectNode node = (ProjectNode) en.nextElement();
-      if(node.file == null) continue;
-      if(node.file.path().equals(file.path())) {
-        node.refresh();
-        return;
+    final ProjectNode node = find(file);
+    if(node != null) {
+      node.refresh();
+    } else {
+      final File parent = file.file().getParentFile();
+      if(parent == null) return;
+      refresh(new IOFile(parent));
+    }
+  }
+
+  /**
+   * Returns the node for the specified file.
+   * @param file file to be found
+   * @return node, or {@code null}
+   */
+  private ProjectNode find(final IOFile file) {
+    final IOFile fl = new IOFile(canonical(file.file()));
+    if(fl.path().startsWith(root.file.path())) {
+      final Enumeration<?> en = root.depthFirstEnumeration();
+      while(en.hasMoreElements()) {
+        final ProjectNode node = (ProjectNode) en.nextElement();
+        if(node.file != null && node.file.path().equals(fl.path())) return node;
       }
     }
-    final File parent = file.file().getParentFile();
-    if(parent == null) return;
-    refresh(new IOFile(parent));
+    return null;
   }
 
   /**
@@ -204,7 +224,7 @@ public final class ProjectView extends BaseXPanel {
     final File fl = new File(gopts.get(GlobalOptions.RESTXQPATH));
     final File io3 = fl.isAbsolute() ? fl : new File(io2, fl.getPath());
     final StringList sl = new StringList();
-    for(final File f : new File[] { io1, io2, io3 }) {
+    for(final File f : new File[] { io1, io2, io3}) {
       final String p = canonical(f).getParent();
       if(!sl.contains(p)) sl.add(p);
     }

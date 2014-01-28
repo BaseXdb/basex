@@ -188,6 +188,7 @@ int_parser           = 内部XMLパーサーを使用
 interrupted          = 中断されました。
 invalid_%            = % は不正です。
 italics              = 斜体
+jump_to_file         = Jump to file
 kill_self_%          = '%' 自身のセッションを切断する事は出来ません。
 language             = 言語
 lax_name_conversion  = Lax name conversion

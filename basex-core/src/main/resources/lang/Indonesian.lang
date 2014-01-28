@@ -188,6 +188,7 @@ int_parser           = Gunakan pengurai XML internal
 interrupted          = Terganggu.
 invalid_%            = % tidak sah.
 italics              = Miring
+jump_to_file         = Jump to file
 kill_self_%          = '%' tidak dapat mematikan sendiri.
 language             = Bahasa
 lax_name_conversion  = Konversi nama Lax

@@ -68,6 +68,33 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     setSelectionRow(0);
   }
 
+  /**
+   * Expands a node and its sub node that matches the specified path.
+   * @param node node
+   * @param path file path
+   * @return {@code true} if file was found
+   */
+  public boolean expand(final ProjectNode node, final String path) {
+    final TreePath tp = node.path();
+    if(!isExpanded(tp)) expandPath(tp);
+
+    final int ns = node.getChildCount();
+    for(int n = 0; n < ns; n++) {
+      final ProjectNode ch = (ProjectNode) node.getChildAt(n);
+      final String np = ch.file.path();
+      // path found
+      if(path.equals(np)) {
+        final TreePath cp = ch.path();
+        setSelectionPath(cp);
+        scrollPathToVisible(cp);
+        return true;
+      }
+      // expand child path
+      if(path.startsWith(np)) return expand(ch, path);
+    }
+    return false;
+  }
+
   @Override
   public void treeWillExpand(final TreeExpansionEvent event) throws ExpandVetoException {
     final Object obj = event.getPath().getLastPathComponent();

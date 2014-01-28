@@ -188,6 +188,7 @@ int_parser           = Использовать встроенный парсе�
 interrupted          = Прервано
 invalid_%            = % введено неверно
 italics              = Наклонный
+jump_to_file         = Jump to file
 kill_self_%          = '%' не может убить себя
 language             = Язык
 lax_name_conversion  = Lax name conversion

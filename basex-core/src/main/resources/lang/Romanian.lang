@@ -188,6 +188,7 @@ int_parser           = Utilizare parser XML intern
 interrupted          = Intrerupt.
 invalid_%            = % este invalid.
 italics              = Italice
+jump_to_file         = Jump to file
 kill_self_%          = '%' nu poate sa se omoare.
 language             = Limbă
 lax_name_conversion  = Lax name conversion

@@ -208,7 +208,7 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
-  /** Jumps to the next error. */
+  /** Formats text in the editor. */
   C_FORMAT(FORMAT, "% shift F", null, false, false) {
     @Override
     public void execute(final GUI gui) {
@@ -404,16 +404,26 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
+  /** Jumps to the currently edited file. */
+  C_JUMPFILE(JUMP_TO_FILE, "% J", null, false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.showProject();
+      gui.editor.jumpToFile();
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+  },
+
   /** Finds files. */
   C_FILESEARCH(FIND_FILES + DOTS, "% H", null, false, false) {
     @Override
     public void execute(final GUI gui) {
-      if(!gui.gopts.get(GUIOptions.SHOWPROJECT)) {
-        gui.gopts.invert(GUIOptions.SHOWPROJECT);
-        gui.editor.project();
-      }
+      gui.editor.showProject();
       gui.editor.focusFilter();
-      gui.layoutViews();
     }
 
     @Override

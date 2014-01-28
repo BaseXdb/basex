@@ -319,6 +319,16 @@ public final class EditorView extends View {
   }
 
   /**
+   * Shows or hides the project view.
+   */
+  public void showProject() {
+    if(!gui.gopts.get(GUIOptions.SHOWPROJECT)) {
+      gui.gopts.invert(GUIOptions.SHOWPROJECT);
+      split.visible(true);
+    }
+  }
+
+  /**
    * Toggles the project view.
    */
   public void project() {
@@ -336,6 +346,14 @@ public final class EditorView extends View {
    */
   public void focusFilter() {
     project.focusFilter(getEditor().searchString());
+  }
+
+  /**
+   * Focuses the currently edited file in the project view.
+   */
+  public void jumpToFile() {
+    final EditorArea editor = getEditor();
+    if(editor.opened()) project.jump(editor.file);
   }
 
   /**
@@ -652,7 +670,7 @@ public final class EditorView extends View {
       addTab();
       SwingUtilities.invokeLater(new Runnable() {
         @Override
-        public void run() { project.focus(); }
+        public void run() { project(); }
       });
     } else if(i + 1 == t) {
       // if necessary, activate last editor tab

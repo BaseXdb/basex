@@ -1006,6 +1006,8 @@ public interface Text {
   String FIND_PREVIOUS = lang("find_previous");
   /** "Jump to error". */
   String NEXT_ERROR = lang("next_error");
+  /** "Jump to file". */
+  String JUMP_TO_FILE = lang("jump_to_file");
 
   /** "Command". */
   String COMMAND = lang("command");

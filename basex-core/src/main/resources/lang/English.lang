@@ -188,6 +188,7 @@ int_parser           = Use internal XML parser
 interrupted          = Interrupted.
 invalid_%            = % is invalid.
 italics              = Italics
+jump_to_file         = Jump to file
 kill_self_%          = '%' cannot kill him-/herself.
 language             = Language
 lax_name_conversion  = Lax name conversion
