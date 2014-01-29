@@ -159,7 +159,7 @@ public enum Function {
   FUNCTION_ARITY(FNFunc.class, "function-arity(function)", arg(FUN_O), ITR, flag(X30)),
   /** XQuery function. */
   FUNCTION_LOOKUP(FNFunc.class, "function-lookup(name,arity)",
-      arg(QNM, ITR), FUN_OZ, flag(CTX, FCS, NDT, X30)),
+      arg(QNM, ITR), FUN_OZ, flag(CTX, FCS, NDT, X30, Flag.HOF)),
   /** XQuery function. */
   FOR_EACH(FNFunc.class, "for-each(seq,function)",
       arg(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM).seqType()), ITEM_ZM, flag(X30, Flag.HOF)),
@@ -869,7 +869,7 @@ public enum Function {
   /** XQuery function. */
   _INSPECT_CONTEXT(FNInspect.class, "context()", arg(), ELM),
   /** XQuery function. */
-  _INSPECT_FUNCTIONS(FNInspect.class, "functions()", arg(), FUN_ZM),
+  _INSPECT_FUNCTIONS(FNInspect.class, "functions()", arg(), FUN_ZM, flag(Flag.HOF)),
   /** XQuery function. */
   _INSPECT_XQDOC(FNInspect.class, "xqdoc(path)", arg(STR), ELM),
 

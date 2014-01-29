@@ -5,6 +5,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.inspect.*;
 import org.basex.query.value.item.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -43,6 +44,15 @@ public final class FNInspect extends StandardFunc {
       case _INSPECT_XQDOC:    return xqdoc(ctx);
       default:                return super.item(ctx, ii);
     }
+  }
+
+  @Override
+  protected Expr opt(final QueryContext ctx, final VarScope scp) throws QueryException {
+    if(sig == Function._INSPECT_FUNCTIONS) {
+      for(final StaticFunc sf : ctx.funcs.funcs()) sf.compile(ctx);
+      return functions(ctx).value();
+    }
+    return this;
   }
 
   /**

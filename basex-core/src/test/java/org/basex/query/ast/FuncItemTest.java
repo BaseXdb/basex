@@ -210,4 +210,12 @@ public final class FuncItemTest extends QueryPlanTest {
         "return $f(function() { 1, 2 })",
         Err.INVTREAT);
   }
+
+  /** Tests if all functions are compiled when reflection takes places. */
+  @Test
+  public void gh839() {
+    check("declare function local:f() { function() { () } };"
+        + "function-lookup(xs:QName('local:f'), 0)()(),"
+        + "inspect:functions()()()", "");
+  }
 }

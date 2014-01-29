@@ -86,6 +86,10 @@ public final class FNFunc extends StandardFunc {
       return e;
     }
 
+    if(sig == Function.FUNCTION_LOOKUP) {
+      for(final StaticFunc sf : ctx.funcs.funcs()) sf.compile(ctx);
+      if(allAreValues()) return lookup(ctx, info);
+    }
     return this;
   }
 
