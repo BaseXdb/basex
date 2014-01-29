@@ -66,7 +66,7 @@ public final class DialogExport extends BaseXDialog {
     BaseXBack pp = new BaseXBack(new TableLayout(1, 2, 8, 0));
 
     path = new BaseXTextField(main.gopts.get(GUIOptions.INPUTPATH), this);
-    path.history(gui, GUIOptions.INPUTS);
+    path.history(GUIOptions.INPUTS, this);
     pp.add(path);
 
     final BaseXButton browse = new BaseXButton(BROWSE_D, this);

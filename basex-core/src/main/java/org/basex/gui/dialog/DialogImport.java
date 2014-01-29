@@ -68,7 +68,7 @@ final class DialogImport extends BaseXBack {
 
     final String path = gui.gopts.get(GUIOptions.INPUTPATH);
     input = new BaseXTextField(path, dial);
-    input.history(gui, GUIOptions.INPUTS);
+    input.history(GUIOptions.INPUTS, dial);
 
     final IO io = IO.get(path);
     if(io instanceof IOFile && !path.isEmpty()) dbname = io.dbname();

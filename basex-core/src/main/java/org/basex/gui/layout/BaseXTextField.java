@@ -135,10 +135,20 @@ public class BaseXTextField extends JTextField {
 
   /**
    * Attaches a history.
-   * @param gui gui reference
    * @param so option
+   * @param win windows reference
    */
-  public void history(final GUI gui, final StringsOption so) {
+  public void history(final StringsOption so, final Window win) {
+    final GUI gui;
+    final BaseXDialog dialog;
+    if(win instanceof BaseXDialog) {
+      dialog = (BaseXDialog) win;
+      gui = dialog.gui;
+    } else {
+      dialog = null;
+      gui = (GUI) win;
+    }
+
     history = new BaseXHistory(gui, so);
     addKeyListener(new KeyAdapter() {
       @Override
@@ -151,6 +161,7 @@ public class BaseXTextField extends JTextField {
           if(qu.length == 0) return;
           hist = next ? Math.min(qu.length - 1, hist + 1) : Math.max(0, hist - 1);
           setText(qu[hist]);
+          if(dialog != null) dialog.action(this);
         }
       }
     });

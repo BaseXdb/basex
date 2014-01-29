@@ -66,12 +66,12 @@ public final class SearchBar extends BaseXBack {
 
     gui = main;
     search = new BaseXTextField(main);
-    search.history(gui, GUIOptions.SEARCHED);
+    search.history(GUIOptions.SEARCHED, gui);
     search.setPreferredSize(null);
     search.hint(Text.FIND);
 
     replace = new BaseXTextField(main);
-    replace.history(gui, GUIOptions.REPLACED);
+    replace.history(GUIOptions.REPLACED, gui);
     replace.setPreferredSize(null);
     replace.hint(Text.REPLACE_WITH);
 
