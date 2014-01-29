@@ -563,7 +563,8 @@ public final class QT3TS {
   private String assertQuery(final XdmValue value, final XdmValue expect) {
     final String exp = expect.getString();
     try {
-      return new XQuery(exp, ctx).bind("result", value).value().getBoolean() ? null : exp;
+      final String qu = "declare variable $result external; " + exp;
+      return new XQuery(qu, ctx).bind("result", value).value().getBoolean() ? null : exp;
     } catch(final XQueryException ex) {
       // should not occur
       return ex.getException().getMessage();
@@ -793,7 +794,8 @@ public final class QT3TS {
     final String exp = expect.getString();
 
     try {
-      final XQuery query = new XQuery("$result instance of " + exp, ctx);
+      final String qu = "declare variable $result external; $result instance of " + exp;
+      final XQuery query = new XQuery(qu, ctx);
       return query.bind("result", value).value().getBoolean() ? null :
         Util.info("Type '%' (found: '%')", exp, value.getType().toString());
     } catch(final XQueryException ex) {

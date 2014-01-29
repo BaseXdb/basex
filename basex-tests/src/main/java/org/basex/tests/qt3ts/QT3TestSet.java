@@ -75,7 +75,8 @@ public abstract class QT3TestSet {
     final XdmValue value = result.value;
     if(value == null) return fail(exp);
     try {
-      return result(new XQuery(exp, ctx).bind("result", value).value().getBoolean(), exp);
+      final String qu = "declare variable $result external; " + exp;
+      return result(new XQuery(qu, ctx).bind("result", value).value().getBoolean(), exp);
     } catch(final XQueryException ex) {
       // should not occur
       return fail(ex.getException().getMessage());
@@ -272,7 +273,8 @@ public abstract class QT3TestSet {
     final XdmValue value = result.value;
     if(value == null) return fail(Util.info("Has type: '%'", exp));
     try {
-      final XQuery query = new XQuery("$result instance of " + exp, ctx);
+      final String qu = "declare variable $result external; $result instance of " + exp;
+      final XQuery query = new XQuery(qu, ctx);
       return result(query.bind("result", value).value().getBoolean(),
         Util.info("type '%' (found: '%')", exp, value.getType().toString()));
     } catch(final XQueryException ex) {

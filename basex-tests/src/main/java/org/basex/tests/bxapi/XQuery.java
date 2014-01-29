@@ -65,8 +65,7 @@ public final class XQuery implements Iterable<XdmItem> {
    */
   public XQuery bind(final String key, final Object value) {
     try {
-      qp.bind(key, value instanceof XdmValue ?
-          ((XdmValue) value).internal() : value);
+      qp.bind(key, value instanceof XdmValue ? ((XdmValue) value).internal() : value);
       return this;
     } catch(final QueryException ex) {
       Util.debug(ex);
