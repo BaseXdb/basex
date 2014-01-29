@@ -79,9 +79,9 @@ public final class SearchBar extends BaseXBack {
     mcase = onOffButton("f_case", Text.MATCH_CASE, GUIOptions.SR_CASE);
     word = onOffButton("f_word", Text.WHOLE_WORD, GUIOptions.SR_WORD);
     multi = onOffButton("f_multi", Text.MULTI_LINE, GUIOptions.SR_MULTI);
-    rplc  = BaseXButton.get("f_replace", false, Text.REPLACE_ALL, main);
-    cls = BaseXButton.get("f_close", false,
-        BaseXLayout.addShortcut(Text.CLOSE, ESCAPE.toString()), main);
+    rplc  = BaseXButton.get("f_replace", Text.REPLACE_ALL, false, main);
+    cls = BaseXButton.get("f_close", BaseXLayout.addShortcut(Text.CLOSE, ESCAPE.toString()),
+        false, main);
     multi.setEnabled(regex.isSelected());
     word.setEnabled(!regex.isSelected());
 
@@ -183,8 +183,8 @@ public final class SearchBar extends BaseXBack {
    * @return button
    */
   public AbstractButton button(final String help) {
-    button = BaseXButton.get("c_find", true,
-        BaseXLayout.addShortcut(help, BaseXKeys.FIND.toString()), gui);
+    button = BaseXButton.get("c_find", BaseXLayout.addShortcut(help, BaseXKeys.FIND.toString()),
+        true, gui);
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -287,14 +287,14 @@ public final class SearchBar extends BaseXBack {
   /**
    * Returns a button that can be switched on and off.
    * @param icon name of icon
-   * @param help help text
+   * @param tooltip tooltip text
    * @param option GUI option
    * @return button
    */
-  private AbstractButton onOffButton(final String icon, final String help,
+  private AbstractButton onOffButton(final String icon, final String tooltip,
       final BooleanOption option) {
 
-    final AbstractButton b = BaseXButton.get(icon, true, help, gui);
+    final AbstractButton b = BaseXButton.get(icon, tooltip, true, gui);
     b.setSelected(gui.gopts.get(option));
     b.addKeyListener(escape);
     b.addActionListener(new ActionListener() {

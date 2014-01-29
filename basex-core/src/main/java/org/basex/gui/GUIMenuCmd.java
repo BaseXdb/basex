@@ -30,7 +30,7 @@ public enum GUIMenuCmd implements GUICommand {
   /* DATABASE MENU */
 
   /** Opens a dialog to create a new database. */
-  C_CREATE(NEW + DOTS, "% N", H_NEW, false, false) {
+  C_CREATE(NEW + DOTS, "% N", false, false) {
     @Override
     public void execute(final GUI gui) {
       // open file chooser for XML creation
@@ -43,7 +43,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Opens a dialog to manage databases. */
-  C_OPEN_MANAGE(OPEN_MANAGE + DOTS, "% M", H_OPEN_MANAGE, false, false) {
+  C_OPEN_MANAGE(OPEN_MANAGE + DOTS, "% M", false, false) {
     @Override
     public void execute(final GUI gui) {
       if(new DialogManage(gui).nodb() && BaseXDialog.confirm(gui, NEW_DB_QUESTION))
@@ -52,7 +52,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows database info. */
-  C_INFO(PROPERTIES + DOTS, "% D", H_PROPERTIES, true, false) {
+  C_INFO(PROPERTIES + DOTS, "% D", true, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogProps(gui);
@@ -60,7 +60,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Exports a database. */
-  C_EXPORT(EXPORT + DOTS, null, H_EXPORT, true, false) {
+  C_EXPORT(EXPORT + DOTS, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       final DialogExport dialog = new DialogExport(gui);
@@ -98,7 +98,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Closes the database. */
-  C_CLOSE(CLOSE, "% shift W", H_CLOSE, true, false) {
+  C_CLOSE(CLOSE, "% shift W", true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.execute(new Close());
@@ -106,7 +106,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Server Dialog. */
-  C_SERVER(S_SERVER_ADMIN + DOTS, null, S_H_SERVER_ADMIN, false, false) {
+  C_SERVER(S_SERVER_ADMIN + DOTS, null, false, false) {
     @Override
     public void execute(final GUI gui) {
       // open file chooser for XML creation
@@ -115,7 +115,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Creates a new file in the editor. */
-  C_EDITNEW(NEW, "% T", H_NEW_FILE, false, false) {
+  C_EDITNEW(NEW, "% T", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.newFile();
@@ -123,7 +123,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Opens a new file in the editor. */
-  C_EDITOPEN(OPEN + DOTS, "% O", H_OPEN_FILE, false, false) {
+  C_EDITOPEN(OPEN + DOTS, "% O", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.open();
@@ -131,7 +131,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Reverts the current editor file. */
-  C_EDITREOPEN(REOPEN + DOTS, null, H_REOPEN_FILE, false, false) {
+  C_EDITREOPEN(REOPEN + DOTS, null, false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.reopen();
@@ -144,7 +144,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Saves the current file in the editor. */
-  C_EDITSAVE(SAVE, "% S", H_SAVE, false, false) {
+  C_EDITSAVE(SAVE, "% S", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.save();
@@ -157,7 +157,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Saves the current editor file under a new name. */
-  C_EDITSAVEAS(SAVE_AS + DOTS, "% shift S", H_SAVE, false, false) {
+  C_EDITSAVEAS(SAVE_AS + DOTS, "% shift S", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.saveAs();
@@ -170,7 +170,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Closes the current editor file. */
-  C_EDITCLOSE(CLOSE, "% W", H_CLOSE_FILE, false, false) {
+  C_EDITCLOSE(CLOSE, "% W", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.close(null);
@@ -183,7 +183,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Jumps to the next error. */
-  C_NEXTERROR(NEXT_ERROR, "% PERIOD", null, false, false) {
+  C_NEXTERROR(NEXT_ERROR, "% PERIOD", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.jumpToError();
@@ -196,7 +196,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Adds or removes a comment. */
-  C_COMMENT(COMMENT, "% K", null, false, false) {
+  C_COMMENT(COMMENT, "% K", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.getEditor().comment();
@@ -209,7 +209,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Formats text in the editor. */
-  C_FORMAT(FORMAT, "% shift F", null, false, false) {
+  C_FORMAT(FORMAT, "% shift F", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.getEditor().format();
@@ -222,7 +222,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Exits the application. */
-  C_EXIT(EXIT, "% Q", H_EXIT, false, false) {
+  C_EXIT(EXIT, "% Q", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.dispose();
@@ -232,7 +232,7 @@ public enum GUIMenuCmd implements GUICommand {
   /* EDIT COMMANDS */
 
   /** Copies the current path to the clipboard. */
-  C_COPYPATH(COPY_PATH, "% shift C", H_CPPATH, true, false) {
+  C_COPYPATH(COPY_PATH, "% shift C", true, false) {
     @Override
     public void execute(final GUI gui) {
       final int pre = gui.context.marked.pres[0];
@@ -248,7 +248,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Copies the currently marked nodes. */
-  C_COPY(COPY, null, H_COPY, true, false) {
+  C_COPY(COPY, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
@@ -264,7 +264,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Pastes the copied nodes. */
-  C_PASTE(PASTE, null, H_PASTE, true, false) {
+  C_PASTE(PASTE, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       final StringBuilder sb = new StringBuilder();
@@ -287,7 +287,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Deletes the currently marked nodes. */
-  C_DELETE(DELETE + DOTS, null, H_DELETE, true, false) {
+  C_DELETE(DELETE + DOTS, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       if(!BaseXDialog.confirm(gui, DELETE_NODES)) return;
@@ -311,7 +311,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Inserts new nodes. */
-  C_INSERT(NEW + DOTS, null, H_NEW_NODE, true, false) {
+  C_INSERT(NEW + DOTS, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       final Nodes n = gui.context.marked;
@@ -340,7 +340,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Opens a dialog to edit the currently marked nodes. */
-  C_EDIT(EDIT + DOTS, null, H_EDIT, true, false) {
+  C_EDIT(EDIT + DOTS, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       final Nodes n = gui.context.marked;
@@ -370,7 +370,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Filters the currently marked nodes. */
-  C_FILTER(FILTER_SELECTED, "alt ENTER", H_FILTER_SELECTED, true, false) {
+  C_FILTER(FILTER_SELECTED, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
@@ -391,7 +391,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the XQuery view. */
-  C_SHOWEDITOR(EDITOR, "% E", H_EDITOR, false, true) {
+  C_SHOWEDITOR(EDITOR, "% E", false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWEDITOR);
@@ -405,7 +405,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Jumps to the currently edited file. */
-  C_JUMPFILE(JUMP_TO_FILE, "% J", null, false, false) {
+  C_JUMPFILE(JUMP_TO_FILE, "% J", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.showProject();
@@ -419,7 +419,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Finds files. */
-  C_FILESEARCH(FIND_FILES + DOTS, "% H", null, false, false) {
+  C_FILESEARCH(FIND_FILES + DOTS, "% H", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.showProject();
@@ -433,7 +433,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the XQuery project structure. */
-  C_SHOWPROJECT(PROJECT, "% P", null, false, true) {
+  C_SHOWPROJECT(PROJECT, "% P", false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWPROJECT);
@@ -452,7 +452,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows info. */
-  C_SHOWINFO(QUERY_INFO, "% I", H_QUERY_INFO, false, true) {
+  C_SHOWINFO(QUERY_INFO, "% I", false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWINFO);
@@ -466,7 +466,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Repository manager. */
-  C_PACKAGES(PACKAGES + DOTS, null, H_PACKAGES, false, false) {
+  C_PACKAGES(PACKAGES + DOTS, null, false, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogPackages(gui);
@@ -476,7 +476,7 @@ public enum GUIMenuCmd implements GUICommand {
   /* VIEW MENU */
 
   /** Shows the buttons. */
-  C_SHOWBUTTONS(BUTTONS, null, H_BUTTONS, false, true) {
+  C_SHOWBUTTONS(BUTTONS, null, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWBUTTONS);
@@ -490,7 +490,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Show Input Field. */
-  C_SHOWINPUT(INPUT_BAR, null, H_INPUT_BAR, false, true) {
+  C_SHOWINPUT(INPUT_BAR, null, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.updateControl(gui.nav, gui.gopts.invert(GUIOptions.SHOWINPUT), BorderLayout.SOUTH);
@@ -503,7 +503,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the status bar. */
-  C_SHOWSTATUS(STATUS_BAR, null, H_STATUS_BAR, false, true) {
+  C_SHOWSTATUS(STATUS_BAR, null, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.updateControl(gui.status, gui.gopts.invert(GUIOptions.SHOWSTATUS), BorderLayout.SOUTH);
@@ -516,7 +516,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the text view. */
-  C_SHOWRESULT(RESULT, "% R", H_RESULT, false, true) {
+  C_SHOWRESULT(RESULT, "% R", false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWTEXT);
@@ -530,7 +530,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the map. */
-  C_SHOWMAP(MAP, "% 1", H_MAP, true, true) {
+  C_SHOWMAP(MAP, "% 1", true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWMAP);
@@ -544,7 +544,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the tree view. */
-  C_SHOWTREE(TREE, "% 2", H_TREE, true, true) {
+  C_SHOWTREE(TREE, "% 2", true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWTREE);
@@ -558,7 +558,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the tree view. */
-  C_SHOWFOLDER(FOLDER, "% 3", H_FOLDER, true, true) {
+  C_SHOWFOLDER(FOLDER, "% 3", true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWFOLDER);
@@ -572,7 +572,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the plot view. */
-  C_SHOWPLOT(PLOT, "% 4", H_PLOT, true, true) {
+  C_SHOWPLOT(PLOT, "% 4", true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWPLOT);
@@ -586,7 +586,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the table view. */
-  C_SHOWTABLE(TABLE, "% 5", H_TABLE, true, true) {
+  C_SHOWTABLE(TABLE, "% 5", true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWTABLE);
@@ -600,7 +600,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the explorer view. */
-  C_SHOWEXPLORE(EXPLORER, "% 6", H_EXPLORER, true, true) {
+  C_SHOWEXPLORE(EXPLORER, "% 6", true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWEXPLORE);
@@ -614,7 +614,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Fullscreen mode. */
-  C_FULL(FULLSCREEN, Prop.MAC ? "% shift F" : "F11", H_FULLSCREEN, false, true) {
+  C_FULL(FULLSCREEN, Prop.MAC ? "% shift F" : "F11", false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.fullscreen();
@@ -629,7 +629,7 @@ public enum GUIMenuCmd implements GUICommand {
   /* OPTION MENU */
 
   /** Realtime execution on/off. */
-  C_RTEXEC(RT_EXECUCTION, null, H_RT_EXECUTION, false, true) {
+  C_RTEXEC(RT_EXECUCTION, null, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.EXECRT);
@@ -647,7 +647,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Realtime filtering on/off. */
-  C_RTFILTER(RT_FILTERING, null, H_RT_FILTERING, true, true) {
+  C_RTFILTER(RT_FILTERING, null, true, true) {
     @Override
     public void execute(final GUI gui) {
       final boolean rt = gui.gopts.invert(GUIOptions.FILTERRT);
@@ -683,7 +683,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Color schema. */
-  C_COLOR(COLORS + DOTS, null, H_COLORS, false, false) {
+  C_COLOR(COLORS + DOTS, null, false, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogColors(gui);
@@ -691,7 +691,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Changes the fonts. */
-  C_FONTS(FONTS_D, null, H_FONTS, false, false) {
+  C_FONTS(FONTS_D, null, false, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogFonts(gui);
@@ -699,7 +699,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows a preference dialog. */
-  C_PREFS(PREFERENCES + DOTS, Prop.MAC ? "% COMMA" : "% shift P", H_PREFERENCES, false, false) {
+  C_PREFS(PREFERENCES + DOTS, Prop.MAC ? "% COMMA" : "% shift P", false, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogPrefs(gui);
@@ -709,7 +709,7 @@ public enum GUIMenuCmd implements GUICommand {
   /* HELP MENU */
 
   /** Shows the documentation web page. */
-  C_HELP(HELP, "F1", H_HELP, false, false) {
+  C_HELP(HELP, "F1", false, false) {
     @Override
     public void execute(final GUI gui) {
       BaseXDialog.browse(gui, DOC_URL);
@@ -717,7 +717,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Opens the community web page. */
-  C_COMMUNITY(COMMUNITY, null, H_COMMUNITY, false, false) {
+  C_COMMUNITY(COMMUNITY, null, false, false) {
     @Override
     public void execute(final GUI gui) {
       BaseXDialog.browse(gui, COMMUNITY_URL);
@@ -725,7 +725,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Opens the update web page. */
-  C_UPDATES(CHECK_FOR_UPDATES, null, H_UPDATES, false, false) {
+  C_UPDATES(CHECK_FOR_UPDATES, null, false, false) {
     @Override
     public void execute(final GUI gui) {
       BaseXDialog.browse(gui, UPDATE_URL);
@@ -733,7 +733,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the "about" information. */
-  C_ABOUT(ABOUT + DOTS, null, H_ABOUT, false, false) {
+  C_ABOUT(ABOUT + DOTS, null, false, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogAbout(gui);
@@ -743,7 +743,7 @@ public enum GUIMenuCmd implements GUICommand {
   /* BROWSE COMMANDS */
 
   /** Goes one step back. */
-  C_GOBACK(GO_BACK, "alt LEFT", GO_BACK, true, false) {
+  C_GOBACK(GO_BACK, "alt LEFT", true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.notify.hist(false);
@@ -756,7 +756,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Goes one step forward. */
-  C_GOFORWARD(GO_FORWARD, "alt RIGHT", GO_FORWARD, true, false) {
+  C_GOFORWARD(GO_FORWARD, "alt RIGHT", true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.notify.hist(true);
@@ -769,7 +769,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Goes one level up. */
-  C_GOUP(GO_UP, "alt UP", H_GO_UP, true, false) {
+  C_GOUP(GO_UP, "alt UP", true, false) {
     @Override
     public void execute(final GUI gui) {
       // skip operation for root context
@@ -797,7 +797,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Goes to the root node. */
-  C_GOHOME(GO_HOME, "alt HOME", H_GO_HOME, true, false) {
+  C_GOHOME(GO_HOME, "alt HOME", true, false) {
     @Override
     public void execute(final GUI gui) {
       // skip operation for root context
@@ -815,7 +815,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
    /** Displays the root node in the text view. */
-  C_HOME(GO_HOME, null, H_GO_HOME, true, false) {
+  C_HOME(GO_HOME, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.execute(new XQuery("/"));
@@ -828,25 +828,24 @@ public enum GUIMenuCmd implements GUICommand {
   private final String label;
   /** Key shortcut. */
   private final Object key;
-  /** Help string. */
-  private final String help;
   /** Indicates if this command has two states. */
   private final boolean toggle;
+  /** Shortcut. */
+  private final String shortcut;
 
   /**
    * Constructor.
    * @param l label of the menu item
    * @param k shortcut
-   * @param h help string
    * @param d requires a database to be opened
    * @param t indicates if this command has two states
    */
-  GUIMenuCmd(final String l, final String k, final String h, final boolean d, final boolean t) {
+  GUIMenuCmd(final String l, final String k, final boolean d, final boolean t) {
     label = l;
     key = k;
-    help = BaseXLayout.addShortcut(h, k);
     data = d;
     toggle = t;
+    shortcut = BaseXLayout.addShortcut(l, k);
   }
 
   @Override
@@ -860,13 +859,13 @@ public enum GUIMenuCmd implements GUICommand {
   }
 
   @Override
+  public final String label() { return label; }
+
+  @Override
   public final boolean toggle() { return toggle; }
 
   @Override
-  public String help() { return help; }
-
-  @Override
-  public String label() { return label; }
+  public String shortcut() { return shortcut; }
 
   @Override
   public Object shortcuts() { return key; }

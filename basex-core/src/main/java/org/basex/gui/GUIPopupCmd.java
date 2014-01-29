@@ -40,13 +40,13 @@ public abstract class GUIPopupCmd implements GUICommand {
   }
 
   @Override
-  public final String help() {
-    return null;
+  public final String label() {
+    return label;
   }
 
   @Override
-  public final String label() {
-    return label;
+  public final String shortcut() {
+    return null;
   }
 
   @Override

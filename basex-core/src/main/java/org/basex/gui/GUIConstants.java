@@ -36,11 +36,9 @@ import org.basex.util.*;
  * <ul>
  *  <li> add a boolean visibility flag with the view name included
  *    in the {@link GUIOptions} class {@link GUIOptions#SHOWMAP})</li>
- *  <li> add strings for the menu text and command description in the
- *    {@link Text} class (e.g. {@link Text#MAP} an
- *    {@link Text#H_MAP}).
+ *  <li> add strings for the menu text.</li>
  *  <li> optionally add localized translations in the .lang files
- *    (e.g. {@code c_showmap} and {@code c_showmaptt})
+ *    (e.g. {@code c_showmap} and {@code c_showmaptt})</li>
  *  <li> add a corresponding command in the {@link GUIMenuCmd} class
  *   (e.g. {@link GUIMenuCmd#C_SHOWMAP})and add a reference in the
  *   {@link #MENUITEMS} menu structure</li>

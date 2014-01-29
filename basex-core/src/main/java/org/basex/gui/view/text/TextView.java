@@ -65,7 +65,7 @@ public final class TextView extends View {
     text.setSyntax(new SyntaxXML());
     search = new SearchEditor(gui, text);
 
-    final AbstractButton save = BaseXButton.get("c_save", false, H_SAVE_RESULT, gui);
+    final AbstractButton save = BaseXButton.get("c_save", SAVE, false, gui);
     final AbstractButton find = search.button(FIND);
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);

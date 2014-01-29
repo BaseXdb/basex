@@ -58,17 +58,17 @@ public class BaseXButton extends JButton {
 
   /**
    * Returns a new image button.
-   * @param name name of image icon
+   * @param icon name of image icon
    * @param toggle toggle flag
-   * @param help tooltip text
+   * @param tooltip tooltip text
    * @param gui main window
    * @return button
    */
-  public static AbstractButton get(final String name, final boolean toggle, final String help,
+  public static AbstractButton get(final String icon, final String tooltip, final boolean toggle,
       final Window gui) {
 
     final AbstractButton button = toggle ? new JToggleButton() : new JButton();
-    init(button, gui, name, help);
+    init(button, icon, tooltip, gui);
     if(!toggle) {
       button.setBorder(TEMPLATE.getBorder());
       button.setMargin(TEMPLATE.getMargin());
@@ -79,16 +79,16 @@ public class BaseXButton extends JButton {
   /**
    * Initializes an image button.
    * @param button button reference
+   * @param icon name of image icon
+   * @param tooltip tooltip text
    * @param gui main window
-   * @param name name of image icon
-   * @param help tooltip text
    */
-  private static void init(final AbstractButton button, final Window gui, final String name,
-      final String help) {
+  private static void init(final AbstractButton button, final String icon, final String tooltip,
+      final Window gui) {
 
-    button.setIcon(BaseXImages.icon(name));
+    button.setIcon(BaseXImages.icon(icon));
     BaseXLayout.addInteraction(button, gui);
-    if(help != null) button.setToolTipText(help);
+    if(tooltip != null) button.setToolTipText(tooltip);
     style(button);
   }
 
@@ -116,7 +116,7 @@ public class BaseXButton extends JButton {
    */
   public static AbstractButton command(final GUICommand cmd, final GUI gui) {
     final String name = cmd.toString().toLowerCase(Locale.ENGLISH);
-    final AbstractButton button = get(name, cmd.toggle(), cmd.help(), gui);
+    final AbstractButton button = get(name, cmd.shortcut(), cmd.toggle(), gui);
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {

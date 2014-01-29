@@ -812,6 +812,15 @@ public interface Text {
   String PATH = lang("path");
 
   /** Command info. */
+  String RECENTLY_OPENED = lang("recently_opened");
+  /** Command info. */
+  String EXECUTE_QUERY = lang("execute_query");
+  /** Command info. */
+  String INPUT_HISTORY = lang("input_history");
+
+  /** Command info. */
+  String FIND_REPLACE = lang("find_replace");
+  /** Command info. */
   String REPLACE_ALL = lang("replace_all");
   /** Command info. */
   String REPLACE_WITH = lang("replace_with");
@@ -1279,8 +1288,6 @@ public interface Text {
   /** Color schema information. */
   String BLUE = lang("blue");
 
-  /** Dialog title for treemap design. */
-  String MAP_LAYOUT = lang("map_layout");
   /** Show attributes. */
   String SHOW_ATTS = lang("show_atts");
   /** Algorithm. */
@@ -1298,15 +1305,7 @@ public interface Text {
   String OFFSETS = lang("offsets");
   /** Size depending on... */
   String RATIO = lang("ratio");
-  /** Size depending on... */
-  String CHILDREN_TEXT_LEN = lang("children_text_len");
-  /** Size depending on... */
-  String NUMBER_CHILDREN = lang("number_children");
-  /** Size depending on... */
-  String TEXT_LENGTH = lang("text_length");
 
-  /** Dialog title for tree view options. */
-  String TREE_OPTIONS = lang("tree_options");
   /** Slim rectangles to text length. */
   String ADJUST_NODES = lang("adjust_nodes");
 
@@ -1338,107 +1337,6 @@ public interface Text {
   String H_USED_MEM = lang("h_used_mem");
   /** Out of memory error due to database creation. */
   String H_OUT_OF_MEM = NL + lang("h_out_of_mem");
-
-  /** Help string. */
-  String H_EXECUTE_QUERY = lang("h_execute_query");
-  /** Help string. */
-  String H_STOP_PROCESS = lang("h_stop_process");
-  /** Help string. */
-  String H_SHOW_HISTORY = lang("h_show_history");
-  /** Help string. */
-  String H_SAVE_RESULT = lang("h_save_result");
-  /** Help string. */
-  String H_RECENTLY_OPEN = lang("h_recently_open");
-
-  /** Command info. */
-  String H_ABOUT = lang("h_about");
-  /** Command info. */
-  String H_CLOSE = lang("h_close");
-  /** Command info. */
-  String H_COLORS = lang("h_colors");
-  /** Command info. */
-  String H_COPY = lang("h_copy");
-  /** Command info. */
-  String H_CPPATH = lang("h_copy_path");
-  /** Command info. */
-  String H_NEW = lang("h_new");
-  /** Command info. */
-  String H_DELETE = lang("h_delete");
-  /** Command info. */
-  String H_OPEN_MANAGE = lang("h_open_manage");
-  /** Command info. */
-  String H_PACKAGES = lang("h_packages");
-
-  /** Command info. */
-  String H_EDIT = lang("h_edit");
-  /** Command info. */
-  String H_EXIT = lang("h_exit");
-  /** Command info. */
-  String H_EXPORT = lang("h_export");
-  /** Command info. */
-  String H_FILTER_SELECTED = lang("h_filter_selected");
-  /** Command info. */
-  String H_FONTS = lang("h_fonts");
-  /** Command info. */
-  String H_FULLSCREEN = lang("h_fullscreen");
-  /** Command info. */
-  String H_GO_UP = lang("h_go_up");
-  /** Command info. */
-  String H_PROPERTIES = lang("h_properties");
-  /** Command info. */
-  String H_NEW_NODE = lang("h_new_node");
-  /** Command info. */
-  String H_PASTE = lang("h_paste");
-  /** Command info. */
-  String H_PREFERENCES = lang("h_preferences");
-  /** Command info. */
-  String H_GO_HOME = lang("h_go_home");
-  /** Command info. */
-  String H_RT_EXECUTION = lang("h_rt_execution");
-  /** Command info. */
-  String H_RT_FILTERING = lang("h_rt_filtering");
-  /** Command info. */
-  String H_BUTTONS = lang("h_buttons");
-  /** Command info. */
-  String H_EXPLORER = lang("h_explorer");
-  /** Command info. */
-  String H_FOLDER = lang("h_folder");
-  /** Command info. */
-  String H_HELP = lang("h_help");
-  /** Command info. */
-  String H_COMMUNITY = lang("h_community");
-  /** Command info. */
-  String H_UPDATES = lang("h_updates");
-  /** Command info. */
-  String H_QUERY_INFO = lang("h_query_info");
-  /** Command info. */
-  String H_INPUT_BAR = lang("h_input_bar");
-  /** Command info. */
-  String H_MAP = lang("h_map");
-  /** Command info. */
-  String H_PLOT = lang("h_plot");
-  /** Command info. */
-  String H_STATUS_BAR = lang("h_status_bar");
-  /** Command info. */
-  String H_TABLE = lang("h_table");
-  /** Command info. */
-  String H_RESULT = lang("h_result");
-  /** Command info. */
-  String H_TREE = lang("h_tree");
-  /** Command info. */
-  String H_EDITOR = lang("h_editor");
-  /** Command info. */
-  String H_NEW_FILE = lang("h_new_file");
-  /** Command info. */
-  String H_OPEN_FILE = lang("h_open_file");
-  /** Command info. */
-  String H_REOPEN_FILE = lang("h_reopen_file");
-  /** Command info. */
-  String H_REPLACE = lang("h_replace");
-  /** Command info. */
-  String H_CLOSE_FILE = lang("h_close_file");
-  /** Command info. */
-  String H_SAVE = lang("h_save");
 
   /** Information on chopping whitespaces. */
   String H_CHOP_WS = lang("h_chop_ws");
@@ -1522,8 +1420,6 @@ public interface Text {
   String S_ALTER = lang("s_alter") + DOTS;
   /** Command info. */
   String S_SERVER_ADMIN = lang("s_server_admin");
-  /** Command info. */
-  String S_H_SERVER_ADMIN = lang("s_h_server_admin");
 
   /** Dummy string to check if all language strings have been assigned. */
   String DUMMY = lang(null);

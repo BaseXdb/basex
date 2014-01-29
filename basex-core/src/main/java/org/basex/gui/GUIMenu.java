@@ -85,7 +85,6 @@ public final class GUIMenu extends JMenuBar {
       }
     });
     BaseXLayout.setMnemonic(item, mnem);
-    item.setToolTipText(cmd.help());
     return item;
   }
 

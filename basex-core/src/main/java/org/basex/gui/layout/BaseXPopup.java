@@ -88,7 +88,6 @@ public final class BaseXPopup extends JPopupMenu {
         });
         BaseXLayout.setMnemonic(item, mnemCache);
         item.setAccelerator(BaseXLayout.keyStroke(cmd));
-        item.setToolTipText(cmd.help());
       }
     }
   }

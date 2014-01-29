@@ -312,9 +312,7 @@ public final class BaseXLayout {
       if(t.length() != 1) t = Toolkit.getProperty("AWT." + t.toLowerCase(), t);
       sb.append('+').append(t);
     }
-    int i = str.lastIndexOf('.');
-    if(i == -1) i = str.length();
-    return str.substring(0, i) + " (" + sb.substring(1) + ')' + str.substring(i);
+    return str + " (" + sb.substring(1) + ')';
   }
 
   /**

@@ -18,7 +18,6 @@ import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
-import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.GUIConstants.Msg;
@@ -58,8 +57,6 @@ public final class EditorView extends View {
   private final AbstractButton stop;
   /** Go button. */
   private final AbstractButton go;
-  /** Filter button. */
-  private final AbstractButton filter;
   /** Search bar. */
   private final SearchBar search;
   /** Info label. */
@@ -102,24 +99,20 @@ public final class EditorView extends View {
     search = center.bar();
 
     final AbstractButton openB = BaseXButton.command(GUIMenuCmd.C_EDITOPEN, gui);
-    final AbstractButton saveB = BaseXButton.get("c_save", false, H_SAVE, gui);
-    final AbstractButton find = search.button(H_REPLACE);
-    hist = BaseXButton.get("c_hist", false, H_RECENTLY_OPEN, gui);
+    final AbstractButton saveB = BaseXButton.get("c_save", SAVE, false, gui);
+    final AbstractButton find = search.button(FIND_REPLACE);
+    hist = BaseXButton.get("c_hist", RECENTLY_OPENED, false, gui);
 
-    stop = BaseXButton.get("c_stop", false, H_STOP_PROCESS, gui);
+    stop = BaseXButton.get("c_stop", STOP, false, gui);
     stop.addKeyListener(this);
     stop.setEnabled(false);
 
-    go = BaseXButton.get("c_go", false,
-        BaseXLayout.addShortcut(H_EXECUTE_QUERY, BaseXKeys.EXEC1.toString()), gui);
+    go = BaseXButton.get("c_go", BaseXLayout.addShortcut(EXECUTE_QUERY, BaseXKeys.EXEC1.toString()),
+        false, gui);
     go.addKeyListener(this);
 
-    filter = BaseXButton.command(GUIMenuCmd.C_FILTER, gui);
-    filter.addKeyListener(this);
-    filter.setEnabled(false);
-
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
-    buttons.layout(new TableLayout(1, 8, 1, 0)).border(0, 0, 8, 0);
+    buttons.layout(new TableLayout(1, 7, 1, 0)).border(0, 0, 8, 0);
     buttons.add(openB);
     buttons.add(saveB);
     buttons.add(hist);
@@ -127,7 +120,6 @@ public final class EditorView extends View {
     buttons.add(Box.createHorizontalStrut(6));
     buttons.add(stop);
     buttons.add(go);
-    buttons.add(filter);
 
     final BaseXBack north = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     north.add(buttons, BorderLayout.WEST);
@@ -281,10 +273,7 @@ public final class EditorView extends View {
 
   @Override
   public void refreshMark() {
-    final EditorArea edit = getEditor();
-    go.setEnabled(edit.script || !gui.gopts.get(GUIOptions.EXECRT));
-    final Nodes m = gui.context.marked;
-    filter.setEnabled(!gui.gopts.get(GUIOptions.FILTERRT) && m != null && m.size() != 0);
+    go.setEnabled(getEditor().script || !gui.gopts.get(GUIOptions.EXECRT));
   }
 
   @Override
@@ -997,7 +986,7 @@ public final class EditorView extends View {
    * @return button
    */
   private AbstractButton tabButton(final String icon, final String rollover) {
-    final AbstractButton b = BaseXButton.get(icon, false, null, gui);
+    final AbstractButton b = BaseXButton.get(icon, null, false, gui);
     b.setBorder(new EmptyBorder(2, 0, 2, 0));
     b.setContentAreaFilled(false);
     b.setFocusable(false);

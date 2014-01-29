@@ -180,7 +180,7 @@ public final class GUI extends AGUI {
     input = new GUIInput(this);
     input.mode(mode.getSelectedItem());
 
-    hist = BaseXButton.get("c_hist", false, H_SHOW_HISTORY, this);
+    hist = BaseXButton.get("c_hist", INPUT_HISTORY, false, this);
     hist.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -210,7 +210,7 @@ public final class GUI extends AGUI {
     b.add(input, BorderLayout.CENTER);
     nav.add(b, BorderLayout.CENTER);
 
-    stop = BaseXButton.get("c_stop", false, H_STOP_PROCESS, this);
+    stop = BaseXButton.get("c_stop", STOP, false, this);
     stop.setEnabled(false);
     stop.addActionListener(new ActionListener() {
       @Override
@@ -222,7 +222,7 @@ public final class GUI extends AGUI {
       }
     });
 
-    go = BaseXButton.get("c_go", false, H_EXECUTE_QUERY, this);
+    go = BaseXButton.get("c_go", EXECUTE_QUERY, false, this);
     go.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {

@@ -45,10 +45,10 @@ public interface GUICommand {
   String label();
 
   /**
-   * Returns the command help.
-   * @return command help
+   * Returns a shortcut.
+   * @return shortcut
    */
-  String help();
+  String shortcut();
 
   /**
    * Returns the command shortcuts.
