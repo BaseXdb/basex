@@ -88,7 +88,7 @@ public final class QueryStack {
    */
   public void set(final Var var, final Value val, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
-    stack[pos(var)] = var.checkType(val, ctx, ii);
+    stack[pos(var)] = var.checkType(val, ctx, ii, false);
   }
 
   @Override

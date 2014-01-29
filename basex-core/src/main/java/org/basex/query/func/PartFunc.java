@@ -81,15 +81,16 @@ public final class PartFunc extends Arr {
     int p = -1;
     for(int i = 0; i < holes.length; i++) {
       while(++p < holes[i]) args[p] = expr[p - i].value(ctx);
-      vars[i] = scp.newLocal(ctx, f.argName(holes[i]), ft.args[p], true);
+      vars[i] = scp.newLocal(ctx, f.argName(holes[i]), null, false);
       args[p] = new VarRef(info, vars[i]);
+      vars[i].refineType(ft.args[p], ctx, ii);
     }
     while(++p < args.length) args[p] = expr[p - holes.length].value(ctx);
 
-    final Expr call = new DynFuncCall(info, f, args).optimize(ctx, scp);
-    final InlineFunc func = new InlineFunc(
-        info, ft.ret, vars, call, f.annotations(), sc, scp);
-    return func.optimize(ctx, null).item(ctx, ii);
+    final Expr call = new DynFuncCall(info, f, args);
+    final FuncType tp = FuncType.get(f.annotations(), vars, ft.ret);
+    return new FuncItem(sc, f.annotations(), null, vars, tp, call, false,
+        ctx.value, ctx.pos, ctx.size, scp.stackSize());
   }
 
   @Override

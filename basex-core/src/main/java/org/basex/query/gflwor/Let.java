@@ -128,7 +128,7 @@ public final class Let extends GFLWOR.Clause {
     type = score ? SeqType.DBL : expr.type();
     var.refineType(type, ctx, info);
     if(var.checksType() && expr.isValue()) {
-      expr = var.checkType((Value) expr, ctx, info);
+      expr = var.checkType((Value) expr, ctx, info, true);
       var.refineType(expr.type(), ctx, info);
     }
     size = score ? 1 : expr.size();

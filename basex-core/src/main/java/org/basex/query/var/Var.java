@@ -159,13 +159,14 @@ public final class Var extends ExprInfo {
    * @param val value to be checked
    * @param ctx query context
    * @param ii input info
+   * @param opt if the result should be optimized
    * @return checked and possibly cast value
    * @throws QueryException if the check failed
    */
-  public Value checkType(final Value val, final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Value checkType(final Value val, final QueryContext ctx, final InputInfo ii,
+      final boolean opt) throws QueryException {
     if(!checksType() || declType.instance(val)) return val;
-    if(promote) return declType.funcConvert(ctx, sc, ii, val, true);
+    if(promote) return declType.funcConvert(ctx, sc, ii, val, opt);
     throw INVCAST.get(ii, val.type(), declType);
   }
 

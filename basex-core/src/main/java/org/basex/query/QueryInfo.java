@@ -63,7 +63,7 @@ public final class QueryInfo {
     String info = Util.info(string,  ext);
     if(runtime) {
       info = "RUNTIME: " + info;
-      //Util.stack(info);
+      Util.stack(info);
     }
     if(verbose) compile.add(info);
   }
