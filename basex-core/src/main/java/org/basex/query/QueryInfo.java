@@ -42,9 +42,9 @@ public final class QueryInfo {
   /** Runtime flag. */
   boolean runtime;
   /** Compilation info. */
-  private TokenList compile = new TokenList(0);
+  private final TokenList compile = new TokenList(0);
   /** Evaluation info. */
-  private TokenList evaluate = new TokenList(0);
+  private final TokenList evaluate = new TokenList(0);
 
   /**
    * Constructor.

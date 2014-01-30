@@ -45,7 +45,9 @@ public final class WebDAVLockService {
    * @throws IOException I/O exception
    */
   public void unlock(final String token) throws IOException {
-    new LockQuery(http, "w:delete-lock($lock-token)").
+    new LockQuery(http,
+      "declare variable $lock-token external;" +
+      "w:delete-lock($lock-token)").
       bind("lock-token", token).
       execute();
   }
@@ -56,7 +58,9 @@ public final class WebDAVLockService {
    * @throws IOException I/O exception
    */
   public void refreshLock(final String token) throws IOException {
-    new LockQuery(http, "w:refresh-lock($lock-token)").
+    new LockQuery(http,
+      "declare variable $lock-token external;" +
+      "w:refresh-lock($lock-token)").
       bind("lock-token", token).
       execute();
   }
@@ -79,7 +83,15 @@ public final class WebDAVLockService {
 
     initLockDb();
     final String token = UUID.randomUUID().toString();
-    new LockQuery(http, "w:create-lock(" +
+    new LockQuery(http,
+      "declare variable $path         external;" +
+      "declare variable $lock-token   external;" +
+      "declare variable $lock-scope   external;" +
+      "declare variable $lock-type    external;" +
+      "declare variable $lock-depth   external;" +
+      "declare variable $lock-owner   external;" +
+      "declare variable $lock-timeout external;" +
+      "w:create-lock(" +
       "$path," +
       "$lock-token," +
       "$lock-scope," +
@@ -105,7 +117,9 @@ public final class WebDAVLockService {
    * @throws IOException I/O exception
    */
   public String lock(final String token) throws IOException {
-    final StringList locks = new LockQuery(http, "w:lock($lock-token)").
+    final StringList locks = new LockQuery(http,
+      "declare variable $lock-token external;" +
+      "w:lock($lock-token)").
       bind("$lock-token", token).
       execute();
     return locks.isEmpty() ? null : locks.get(0);
@@ -119,8 +133,9 @@ public final class WebDAVLockService {
    * @throws IOException I/O exception
    */
   public String lock(final String db, final String p) throws IOException {
-    final StringList locks = new LockQuery(http, "w:locks-on($path)").
-      bind("path", db + SEP + p).
+    final StringList locks = new LockQuery(http,
+        "declare variable $path external;" +
+        "w:locks-on($path)").bind("path", db + SEP + p).
       execute();
     return locks.isEmpty() ? null : locks.get(0);
   }
@@ -134,7 +149,9 @@ public final class WebDAVLockService {
    */
   public boolean conflictingLocks(final String db, final String p) throws IOException {
     return !new LockQuery(http,
-      "w:conflicting-locks(" +
+        "declare variable $path external;" +
+        "declare variable $owner external;" +
+        "w:conflicting-locks(" +
         "<w:lockinfo>" +
         "<w:path>{ $path }</w:path>" +
         "<w:scope>exclusive</w:scope>" +

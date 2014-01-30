@@ -277,6 +277,24 @@ public final class QT3TS {
     }
 
     if(verbose) Util.outln(name);
+
+    // bind variables
+    if(e != null) {
+      for(final HashMap<String, String> par : e.params) {
+        final String decl = par.get(DECLARED);
+        if(decl == null || decl.equals("false")) {
+          string = "declare variable $" + par.get(NNAME) + " external;" + string;
+        }
+      }
+      // bind documents
+      for(final HashMap<String, String> src : e.sources) {
+        final String role = src.get(ROLE);
+        if(role != null && role.startsWith("$")) {
+          string = "declare variable " + role + " external;" + string;
+        }
+      }
+    }
+    
     final XQuery query = new XQuery(string, ctx);
     if(base) query.baseURI(baseURI);
 

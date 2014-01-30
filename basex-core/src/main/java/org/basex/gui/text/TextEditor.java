@@ -36,7 +36,7 @@ public final class TextEditor {
   int caret;
 
   /** GUI options. */
-  private GUIOptions gopts;
+  private final GUIOptions gopts;
   /** Search context. */
   private SearchContext search;
   /** Text array to be written. */
@@ -723,7 +723,7 @@ public final class TextEditor {
         // find leading whitespaces
         int i = 0;
         do {
-          int cp = text[p];
+          final int cp = text[p];
           if(cp == '\t') {
             i += ind;
           } else if(cp == ' ') {

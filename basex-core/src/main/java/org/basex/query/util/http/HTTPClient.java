@@ -212,7 +212,7 @@ public final class HTTPClient {
       final OutputStream out) throws IOException {
 
     // detect method (specified by @method or derived from @media-type)
-    byte[] m = payloadAtts.get(METHOD);
+    final byte[] m = payloadAtts.get(METHOD);
     final String method;
     if(m == null) {
       final String type = string(payloadAtts.get(MEDIA_TYPE));

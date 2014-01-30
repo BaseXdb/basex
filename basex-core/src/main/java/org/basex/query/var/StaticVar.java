@@ -26,8 +26,6 @@ public final class StaticVar extends StaticDecl {
 
   /** If this variable can be bound from outside the query. */
   private final boolean external;
-  /** Flag for implicitly defined variables. */
-  private final boolean implicit;
   /** Bound value. */
   Value value;
   /** Flag for lazy evaluation. */
@@ -46,33 +44,16 @@ public final class StaticVar extends StaticDecl {
    * @param ii input info
    */
   StaticVar(final StaticContext sctx, final VarScope scp, final Ann a, final QNm n,
-      final SeqType t, final Expr e, final boolean ext,
-      final String xqdoc, final InputInfo ii) {
+      final SeqType t, final Expr e, final boolean ext, final String xqdoc, final InputInfo ii) {
     super(sctx, a, n, t, scp, xqdoc, ii);
     expr = e;
     external = ext;
     lazy = ann.contains(LAZY);
-    implicit = false;
-  }
-
-  /**
-   * Constructor for implicitly declared external variables.
-   * @param sctx static context
-   * @param nm variable name
-   * @param ii input info
-   */
-  public StaticVar(final StaticContext sctx, final QNm nm, final InputInfo ii) {
-    super(sctx, null, nm, null, new VarScope(sctx), null, ii);
-    expr = null;
-    external = true;
-    lazy = false;
-    implicit = true;
   }
 
   @Override
   public void compile(final QueryContext ctx) throws QueryException {
-    if(expr == null) throw (implicit ? VARUNDEF : VAREMPTY).get(info,
-        '$' + Token.string(name.string()));
+    if(expr == null) throw VAREMPTY.get(info, '$' + Token.string(name.string()));
     if(dontEnter) throw circVarError(this);
 
     if(!compiled) {

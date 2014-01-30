@@ -3853,18 +3853,14 @@ public class QueryParser extends InputParser {
     // static variable
     final byte[] uri = name.uri();
 
-    final boolean main = module == null;
-    final boolean implicit = main && uri.length == 0;
+    // accept variable reference if:
+    // - XQuery 3.0 is used or variable is declared, and
+    // - a variable uses the module or an imported URI or if it is specified in the main module
+    if((sc.xquery3() || ctx.vars.declared(name)) &&
+        (module == null || eq(module.uri(), uri) || modules.contains(uri)))
+      return ctx.vars.newRef(name, sc, ii);
 
-    // in XQuery 1.0 only forward declarations are allowed (except for implicit variables)
-    if(!sc.xquery3() && !ctx.vars.declared(name) && !implicit ||
-        // library module: variable must be declared by the same or a directly imported module
-        !main && !eq(module.uri(), uri) && !modules.contains(uri)) {
-
-      throw error(VARUNDEF, '$' + string(name.string()));
-    }
-
-    return ctx.vars.newRef(name, sc, ii);
+    throw error(VARUNDEF, '$' + string(name.string()));
   }
 
   /**
