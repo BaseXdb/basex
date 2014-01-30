@@ -125,42 +125,41 @@ public abstract class AxisPath extends Path {
   }
 
   /**
-   * If possible, returns an expression which accesses the index.
-   * Otherwise, returns the original expression.
+   * Returns an equivalent expression which accesses an index.
+   * If the expression cannot be rewritten, the original expression is returned.
    * @param ctx query context
    * @param data data reference
    * @return resulting expression
    * @throws QueryException query exception
    */
   private Expr index(final QueryContext ctx, final Data data) throws QueryException {
-    // disallow relative paths and numeric predicates
-    if(root == null || has(Flag.FCS)) return this;
+    // only rewrite paths with root expression
+    if(root == null) return this;
 
     // cache index access costs
     IndexCosts ics = null;
     // cheapest predicate and step
-    int pmin = 0;
-    int smin = 0;
+    int pmin = 0, smin = 0;
 
     // check if path can be converted to an index access
     for(int s = 0; s < steps.length; ++s) {
-      // find cheapest index access
-      final Step stp = step(s);
-      if(!stp.axis.down) break;
+      // only accept descendant steps without positional predicates
+      final Step step = step(s);
+      if(!step.axis.down || step.has(Flag.FCS)) break;
 
       // check if resulting index path will be duplicate free
       final boolean i = pathNodes(data, s) != null;
       final IndexContext ictx = new IndexContext(data, i);
 
       // choose cheapest index access
-      for(int p = 0; p < stp.preds.length; ++p) {
-        final IndexCosts ic = new IndexCosts(ictx, ctx, stp);
-        if(!stp.preds[p].indexAccessible(ic)) continue;
+      for(int p = 0; p < step.preds.length; ++p) {
+        final IndexCosts ic = new IndexCosts(ictx, ctx, step);
+        if(!step.preds[p].indexAccessible(ic)) continue;
 
         if(ic.costs() == 0) {
           if(ic.not) {
             // not operator... accept all results
-            stp.preds[p] = Bln.TRUE;
+            step.preds[p] = Bln.TRUE;
             continue;
           }
           // no results...
