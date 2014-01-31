@@ -84,9 +84,17 @@ public class FnHttpTest extends HTTPTest {
    * @throws Exception exception
    */
   @Test
-  public void post() throws Exception {
-    // POST - query
+  public void putPost() throws Exception {
+    // PUT - query
     QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        "<http:request method='put' status-only='true'>"
+        + "<http:body media-type='text/xml'>" + BOOKS + "</http:body>"
+        + "</http:request>", RESTURL), ctx);
+    checkResponse(qp.execute(), HttpURLConnection.HTTP_CREATED, 1);
+    qp.close();
+
+    // POST - query
+    qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='post'>"
         + "<http:body media-type='application/xml'>"
         + "<query xmlns='" + URL + "/rest'>"

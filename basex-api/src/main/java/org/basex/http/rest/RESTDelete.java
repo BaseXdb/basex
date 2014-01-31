@@ -25,7 +25,7 @@ final class RESTDelete {
     RESTCmd.parseOptions(rs);
 
     final HTTPContext http = rs.http;
-    if(http.depth() == 0) throw HTTPCode.NO_PATH.thrw();
+    if(http.depth() == 0) throw HTTPCode.NO_PATH.get();
 
     // open database to ensure it exists
     rs.add(new Open(http.db()));

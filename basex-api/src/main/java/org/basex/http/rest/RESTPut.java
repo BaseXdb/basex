@@ -30,7 +30,7 @@ final class RESTPut {
   public static RESTExec get(final RESTSession rs) throws IOException {
     // create new database or update resource
     final HTTPContext http = rs.http;
-    if(http.depth() == 0) HTTPCode.NO_PATH.thrw();
+    if(http.depth() == 0) throw HTTPCode.NO_PATH.get();
 
     RESTCmd.parseOptions(rs);
 

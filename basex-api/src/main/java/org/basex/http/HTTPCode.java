@@ -49,12 +49,11 @@ public enum HTTPCode {
   }
 
   /**
-   * Throws an HTTP exception.
+   * Returns an HTTP exception.
    * @param ext extended info
    * @return HTTP exception
-   * @throws HTTPException HTTP exception
    */
-  public HTTPException thrw(final Object... ext) throws HTTPException {
-    throw new HTTPException(this, ext);
+  public HTTPException get(final Object... ext) {
+    return new HTTPException(this, ext);
   }
 }

@@ -22,14 +22,12 @@ public final class RESTServlet extends BaseXServlet {
     } catch(final BaseXException ex) {
       // catch "database not found" message
       final String msg = Open.dbnf(http.db());
-      if(ex.getMessage().equals(msg)) HTTPCode.NOT_FOUND_X.thrw(msg);
+      if(ex.getMessage().equals(msg)) throw HTTPCode.NOT_FOUND_X.get(msg);
       throw ex;
-    } finally {
-      new Close().run(rs.context);
     }
 
     final HTTPCode code = cmd.code;
-    if(code != null) code.thrw(cmd.info());
+    if(code != null) throw code.get(cmd.info());
   }
 
   /**
@@ -44,6 +42,6 @@ public final class RESTServlet extends BaseXServlet {
     if(mth == HTTPMethod.POST)   return RESTPost.get(rs);
     if(mth == HTTPMethod.PUT)    return RESTPut.get(rs);
     if(mth == HTTPMethod.DELETE) return RESTDelete.get(rs);
-    throw HTTPCode.NOT_IMPLEMENTED_X.thrw(rs.http.req.getMethod());
+    throw HTTPCode.NOT_IMPLEMENTED_X.get(rs.http.req.getMethod());
   }
 }

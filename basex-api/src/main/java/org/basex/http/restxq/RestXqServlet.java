@@ -25,7 +25,8 @@ public final class RestXqServlet extends BaseXServlet {
     final RestXqModules rxm = RestXqModules.get();
     // select XQuery function
     RestXqFunction func = rxm.find(http, null);
-    if(func == null) HTTPCode.NO_XQUERY.thrw();
+    if(func == null) throw HTTPCode.NO_XQUERY.get();
+
     try {
       // process function that matches the current request
       func.process(http, null);

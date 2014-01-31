@@ -6,19 +6,16 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**
- * This class sends parallel requests to the REST API.
- *
- * It currently fails when {@link #CLIENTS} is set to a value larger than 1,
- * because {@link RESTCmd#open} performs separate transactions that may be intervened
- * by the updating transaction of another client.
+ * This class sends parallel GET requests to the REST API.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public class RESTConcurrencyTest extends HTTPTest {
+public final class RESTParallelGetTest extends HTTPTest {
   /** REST identifier. */
   private static final String REST = "rest";
   /** Root path. */
@@ -27,10 +24,8 @@ public class RESTConcurrencyTest extends HTTPTest {
   private static final int CLIENTS = 10;
   /** Runs per client. */
   private static final int RUNS = 10;
-  /** Control client sessions. */
-  private final Client[] clients = new Client[CLIENTS];
-  /** Failed flag. */
-  private static boolean failed;
+  /** Failed string. */
+  private static String failed;
 
   // INITIALIZERS =============================================================
 
@@ -54,12 +49,14 @@ public class RESTConcurrencyTest extends HTTPTest {
     get("?command=create+db+" + REST + "+<a/>");
 
     // start and join concurrent clients
+    final Client[] clients = new Client[CLIENTS];
     final int cs = clients.length;
     for(int i = 0; i < cs; i++) clients[i] = new Client();
     for(final Client c : clients) c.start();
     for(final Client c : clients) c.join();
 
     get("?command=drop+db+" + REST);
+    if(failed != null) fail(failed);
   }
 
   /** Client class. */
@@ -67,7 +64,7 @@ public class RESTConcurrencyTest extends HTTPTest {
     @Override
     public void run() {
       try {
-        for(int i = 0; i < RUNS && !failed; i++) {
+        for(int i = 0; i < RUNS && failed == null; i++) {
           final double rnd = Math.random();
           final boolean query = rnd < 1 / 3d;
           final boolean delete = rnd > 2 / 3d;
@@ -76,8 +73,8 @@ public class RESTConcurrencyTest extends HTTPTest {
           else get('/' + REST + "?query=db:add('rest',<a/>,'x')");
         }
       } catch(final IOException ex) {
-        failed = true;
-        fail(ex.getMessage());
+        failed = ex.getMessage();
+        Util.stack(ex);
       }
     }
   }

@@ -49,7 +49,7 @@ final class RESTPost {
     try {
       doc = new DBNode(new IOContent(input), ctx.options);
     } catch(final IOException ex) {
-      throw HTTPCode.BAD_REQUEST_X.thrw(ex);
+      throw HTTPCode.BAD_REQUEST_X.get(ex);
     }
 
     try {
@@ -64,7 +64,7 @@ final class RESTPost {
         } else if(name.equals(WRAP)) {
           http.wrapping = Util.yes(value);
         } else {
-          HTTPCode.UNKNOWN_PARAM_X.thrw(name);
+          throw HTTPCode.UNKNOWN_PARAM_X.get(name);
         }
       }
 
@@ -90,7 +90,7 @@ final class RESTPost {
       qp = new QueryProcessor("*/*:context/node()", ctx).context(doc);
       String value = null;
       for(final Item it : qp.value()) {
-        if(value != null) HTTPCode.MULTIPLE_CONTEXT_X.thrw();
+        if(value != null) throw HTTPCode.MULTIPLE_CONTEXT_X.get();
         // create main memory instance of the specified node
         value = DataBuilder.stripNS((ANode) it, Token.token(RESTURI), ctx).serialize().toString();
       }
@@ -104,7 +104,7 @@ final class RESTPost {
       return RESTQuery.get(rs, text, vars, value);
 
     } catch(final QueryException ex) {
-      throw HTTPCode.BAD_REQUEST_X.thrw(ex);
+      throw HTTPCode.BAD_REQUEST_X.get(ex);
     }
   }
 
@@ -138,7 +138,7 @@ final class RESTPost {
     } catch(final Exception ex) {
       Util.debug("Error while validating \"" + Token.string(input) + '"');
       // validation fails
-      HTTPCode.BAD_REQUEST_X.thrw(ex);
+      throw HTTPCode.BAD_REQUEST_X.get(ex);
     }
   }
 }

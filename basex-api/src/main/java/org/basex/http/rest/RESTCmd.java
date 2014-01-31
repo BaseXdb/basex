@@ -62,6 +62,8 @@ public abstract class RESTCmd extends Command {
       return true;
     } catch(final IOException ex) {
       return error(ex.getMessage());
+    } finally {
+      new Close().run(context);
     }
   }
 
@@ -92,7 +94,7 @@ public abstract class RESTCmd extends Command {
   final void run(final Command c, final OutputStream os) throws HTTPException {
     final boolean ok = c.run(context, os);
     error(c.info());
-    if(!ok) HTTPCode.BAD_REQUEST_X.thrw(c.info());
+    if(!ok) throw HTTPCode.BAD_REQUEST_X.get(c.info());
   }
 
   /**

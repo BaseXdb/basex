@@ -39,7 +39,7 @@ final class RESTGet {
       final String val = vals[0];
 
       if(Token.eqic(key, COMMAND, QUERY, RUN)) {
-        if(op != null || vals.length > 1) HTTPCode.ONEOP.thrw();
+        if(op != null || vals.length > 1) throw HTTPCode.ONEOP.get();
         op = key;
         input = val;
       } else if(key.equalsIgnoreCase(WRAP)) {

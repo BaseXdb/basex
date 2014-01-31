@@ -46,8 +46,7 @@ public abstract class HTTPTest extends SandboxTest {
 
     final StringList sl = new StringList();
     if(local) sl.add("-l");
-    sl.add("-p9996", "-e9997", "-h9998", "-s9999", "-z",
-        "-U" + Text.S_ADMIN, "-P" + Text.S_ADMIN);
+    sl.add("-p9996", "-e9997", "-h9998", "-s9999", "-z", "-U" + Text.S_ADMIN, "-P" + Text.S_ADMIN);
     System.setOut(NULL);
     try {
       http = new BaseXHTTP(sl.toArray());
@@ -217,7 +216,7 @@ public abstract class HTTPTest extends SandboxTest {
   public static void put(final String u, final InputStream is, final String ctype)
       throws IOException {
 
-    final URL url = new URL(u);
+    final URL url = new URL(root + u);
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     conn.setDoOutput(true);
     conn.setRequestMethod(PUT.name());

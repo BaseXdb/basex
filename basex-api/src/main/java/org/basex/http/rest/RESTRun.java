@@ -57,7 +57,7 @@ public final class RESTRun extends RESTQuery {
     // check if file is not found, is a folder or points to parent folder
     final IOFile io = new IOFile(root, input);
     if(!io.exists() || io.isDir() || !io.path().startsWith(root.path()))
-      HTTPCode.NOT_FOUND_X.thrw(Util.info(RES_NOT_FOUND_X, input));
+      throw HTTPCode.NOT_FOUND_X.get(Util.info(RES_NOT_FOUND_X, input));
 
     // perform query
     rs.add(new XQuery(io.string()));

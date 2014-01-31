@@ -61,9 +61,10 @@ public class RequestTest extends HTTPTest {
    */
   @Test
   public void path() throws Exception {
-    put(ROOT + NAME, null);
+    put(NAME, null);
     assertEquals("/rest/", get("?query=" + request("R:path()")));
     assertEquals("/rest/" + NAME, get(NAME + "?query=" + request("R:path()")));
+    delete(NAME);
   }
 
   /**
