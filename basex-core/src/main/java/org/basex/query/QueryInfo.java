@@ -60,12 +60,14 @@ public final class QueryInfo {
    * @param ext text text extensions
    */
   void compInfo(final String string, final Object... ext) {
-    String info = Util.info(string,  ext);
-    if(runtime) {
-      info = "RUNTIME: " + info;
-      if(Prop.debug) Util.stack(info);
+    if(verbose) {
+      String info = Util.info(string,  ext);
+      if(runtime) {
+        info = "RUNTIME: " + info;
+        if(Prop.debug) Util.stack(info);
+      }
+      compile.add(info);
     }
-    if(verbose) compile.add(info);
   }
 
   /**
