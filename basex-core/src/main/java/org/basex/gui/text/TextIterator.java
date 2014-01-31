@@ -19,9 +19,9 @@ final class TextIterator {
   /** Caret position. */
   private final int caret;
   /** Start position of a text selection. */
-  private final int selectPos;
+  private final int start;
   /** End position of a text selection (+1). */
-  private final int selectEnd;
+  private final int end;
   /** Start position of an error highlighting. */
   private final int errPos;
   /** Start and end positions of search terms. */
@@ -43,10 +43,10 @@ final class TextIterator {
   TextIterator(final TextEditor et) {
     text = et.text();
     length = text.length;
-    caret = et.caret;
-    selectPos = et.selectPos;
-    selectEnd = et.selectEnd;
-    errPos = et.errPos;
+    caret = et.pos();
+    start = et.start;
+    end = et.end;
+    errPos = et.error;
     searchPos = et.searchPos;
   }
 
@@ -87,9 +87,9 @@ final class TextIterator {
    * @return iterator position
    */
   boolean caretLine(final boolean first) {
-    for(int t = pos + (first ? 0 : 1); t < length; t++) {
-      if(t == caret) return true;
-      if(text[t] == '\n') return false;
+    for(int p = pos + (first ? 0 : 1); p < length; p++) {
+      if(p == caret) return true;
+      if(text[p] == '\n') return false;
     }
     return caret == length;
   }
@@ -157,9 +157,9 @@ final class TextIterator {
    * @return result of check
    */
   boolean selectStart() {
-    return selectPos != selectEnd && (inSelect() ||
-        (selectPos < selectEnd ? selectPos >= pos && selectPos < posEnd :
-          selectEnd >= pos && selectEnd < posEnd));
+    return start != end && (inSelect() ||
+        (start < end ? start >= pos && start < posEnd :
+          end >= pos && end < posEnd));
   }
 
   /**
@@ -167,8 +167,8 @@ final class TextIterator {
    * @return result of check
    */
   boolean inSelect() {
-    return selectPos < selectEnd ? pos >= selectPos && pos < selectEnd :
-      pos >= selectEnd && pos < selectPos;
+    return start < end ? pos >= start && pos < end :
+      pos >= end && pos < start;
   }
 
   /**

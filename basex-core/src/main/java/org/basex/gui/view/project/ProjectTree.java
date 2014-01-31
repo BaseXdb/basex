@@ -210,7 +210,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   /** Delete command. */
   final class DeleteCmd extends GUIPopupCmd {
     /** Constructor. */
-    DeleteCmd() { super(DELETE + DOTS, BaseXKeys.DELETE); }
+    DeleteCmd() { super(DELETE + DOTS, BaseXKeys.DELNEXT); }
 
     @Override public void execute() {
       final ProjectNode node = selectedNode();

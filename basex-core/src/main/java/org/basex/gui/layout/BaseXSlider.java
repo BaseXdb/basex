@@ -169,9 +169,9 @@ public final class BaseXSlider extends BaseXPanel {
   @Override
   public void keyPressed(final KeyEvent e) {
     final int old = value;
-    if(PREV.is(e) || PREVLINE.is(e)) {
+    if(PREVCHAR.is(e) || PREVLINE.is(e)) {
       value = Math.max(min, value - 1);
-    } else if(NEXT.is(e) || NEXTLINE.is(e)) {
+    } else if(NEXTCHAR.is(e) || NEXTLINE.is(e)) {
       value = Math.min(max, value + 1);
     } else if(NEXTPAGE.is(e)) {
       value = Math.max(min, value + 10);

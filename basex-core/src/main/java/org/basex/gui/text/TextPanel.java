@@ -189,7 +189,7 @@ public class TextPanel extends BaseXPanel {
       txt = Arrays.copyOf(t, ns);
     }
     if(editor.text(txt)) {
-      if(hist != null) hist.store(txt, editor.caret(), 0);
+      if(hist != null) hist.store(txt, editor.pos(), 0);
     }
     componentResized(null);
   }
@@ -228,8 +228,7 @@ public class TextPanel extends BaseXPanel {
    * @param pos caret position
    */
   public final void setCaret(final int pos) {
-    editor.setCaret(pos);
-    editor.noSelect();
+    editor.pos(pos);
     cursorCode.invokeLater(1);
     caret(true);
   }
@@ -239,7 +238,7 @@ public class TextPanel extends BaseXPanel {
    * @return cursor position
    */
   public final int getCaret() {
-    return editor.caret();
+    return editor.pos();
   }
 
   /**
@@ -249,7 +248,7 @@ public class TextPanel extends BaseXPanel {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        editor.setCaret(editor.size());
+        editor.pos(editor.size());
         cursorCode.execute(2);
       }
     });
@@ -312,8 +311,8 @@ public class TextPanel extends BaseXPanel {
    * Adds or removes a comment.
    */
   public void comment() {
-    final int caret = editor.caret();
-    if(editor.comment(rend.getSyntax())) hist.store(editor.text(), caret, editor.caret());
+    final int caret = editor.pos();
+    if(editor.comment(rend.getSyntax())) hist.store(editor.text(), caret, editor.pos());
     scrollCode.invokeLater(true);
   }
 
@@ -321,8 +320,8 @@ public class TextPanel extends BaseXPanel {
    * Formats the selected text.
    */
   public void format() {
-    final int caret = editor.caret();
-    if(editor.format(rend.getSyntax())) hist.store(editor.text(), caret, editor.caret());
+    final int caret = editor.pos();
+    if(editor.format(rend.getSyntax())) hist.store(editor.text(), caret, editor.pos());
     scrollCode.invokeLater(true);
   }
 
@@ -338,9 +337,7 @@ public class TextPanel extends BaseXPanel {
    * Selects the whole text.
    */
   final void selectAll() {
-    final int s = editor.size();
-    editor.select(0, s);
-    editor.setCaret(s);
+    editor.select(0, editor.size());
     rend.repaint();
   }
 
@@ -396,8 +393,7 @@ public class TextPanel extends BaseXPanel {
       if(rc.text != null) {
         final boolean sel = editor.selected();
         setText(rc.text);
-        if(sel) editor.select(select[0], select[1]);
-        editor.setCaret(select[0]);
+        editor.select(select[0], select[sel ? 1 : 0]);
         release(Action.CHECK);
       }
       gui.status.setText(Util.info(Text.STRINGS_REPLACED));
@@ -446,7 +442,7 @@ public class TextPanel extends BaseXPanel {
     if(linkListener == null) return;
 
     if(SwingUtilities.isLeftMouseButton(e)) {
-      editor.checkSelect();
+      editor.endSelection();
       // evaluate link
       if(!editor.selected()) {
         final TextIterator iter = rend.jump(e.getPoint());
@@ -467,7 +463,7 @@ public class TextPanel extends BaseXPanel {
     if(!SwingUtilities.isLeftMouseButton(e)) return;
 
     // selection mode
-    rend.select(e.getPoint(), false);
+    select(e.getPoint(), false);
     final int y = Math.max(20, Math.min(e.getY(), getHeight() - 20));
     if(y != e.getY()) scroll.pos(scroll.pos() + e.getY() - y);
   }
@@ -481,22 +477,32 @@ public class TextPanel extends BaseXPanel {
 
     if(SwingUtilities.isMiddleMouseButton(e)) copy();
 
-    final boolean selecting = e.isShiftDown();
+    final boolean shift = e.isShiftDown();
     final boolean selected = editor.selected();
     if(SwingUtilities.isLeftMouseButton(e)) {
       final int c = e.getClickCount();
       if(c == 1) {
         // selection mode
-        if(selecting && !selected) editor.startSelect();
-        rend.select(e.getPoint(), !selecting);
+        if(shift) editor.startSelection(true);
+        select(e.getPoint(), !shift);
       } else if(c == 2) {
         editor.selectWord();
       } else {
         editor.selectLine();
       }
     } else if(!selected) {
-      rend.select(e.getPoint(), true);
+      select(e.getPoint(), true);
     }
+  }
+
+  /**
+   * Selects the text at the specified position.
+   * @param point mouse position
+   * @param start states if selection has just been started
+   */
+  private void select(final Point point, final boolean start) {
+    editor.select(rend.jump(point).pos(), start);
+    rend.repaint();
   }
 
   // KEY INTERACTIONS =======================================================
@@ -541,98 +547,80 @@ public class TextPanel extends BaseXPanel {
       return;
     }
 
-    // set cursor position and reset last column
-    final int caret = editor.caret();
-    editor.pos(caret);
-    if(!PREVLINE.is(e) && !NEXTLINE.is(e)) lastCol = -1;
-
-    final boolean selecting = e.isShiftDown() && !BACKSPACE.is(e) && !PASTE2.is(e) &&
-        !DELLINE.is(e) && !PREVPAGE_RO.is(e) && !DELETE.is(e);
+    // set cursor position
     final boolean selected = editor.selected();
-    if(selecting && !selected) editor.startSelect();
+    final int pos = editor.pos();
+
+    final boolean shift = e.isShiftDown();
     boolean down = true, consumed = true;
 
-    // operations that consider the last text mark..
+    // move caret
+    int lc = Integer.MIN_VALUE;
     final byte[] txt = editor.text();
-    if(MOVEDOWN.is(e)) {
-      editor.move(true);
-    } else if(MOVEUP.is(e)) {
-      editor.move(false);
-    } else if(NEXTWORD.is(e)) {
-      editor.nextToken(selecting);
+    if(NEXTWORD.is(e)) {
+      editor.nextWord(shift);
     } else if(PREVWORD.is(e)) {
-      editor.prevToken(selecting);
+      editor.prevWord(shift);
       down = false;
     } else if(TEXTSTART.is(e)) {
-      if(!selecting) editor.noSelect();
-      editor.pos(0);
+      editor.textStart(shift);
       down = false;
     } else if(TEXTEND.is(e)) {
-      if(!selecting) editor.noSelect();
-      editor.pos(editor.size());
+      editor.textEnd(shift);
     } else if(LINESTART.is(e)) {
-      editor.home(selecting);
+      editor.lineStart(shift);
       down = false;
     } else if(LINEEND.is(e)) {
-      editor.eol(selecting);
-    } else if(PREVPAGE.is(e) || !hist.active() && PREVPAGE_RO.is(e)) {
-      up(getHeight() / fh, selecting);
+      editor.lineEnd(shift);
+    } else if(PREVPAGE_RO.is(e) && !hist.active()) {
+      lc = editor.linesUp(getHeight() / fh, false, lastCol);
       down = false;
-    } else if(NEXTPAGE.is(e) || !hist.active() && NEXTPAGE_RO.is(e)) {
-      down(getHeight() / fh, selecting);
-    } else if(NEXT.is(e)) {
-      editor.next(selecting);
-    } else if(PREV.is(e)) {
-      editor.prev(selecting);
+    } else if(NEXTPAGE_RO.is(e) && !hist.active()) {
+      lc = editor.linesDown(getHeight() / fh, false, lastCol);
+    } else if(PREVPAGE.is(e)) {
+      lc = editor.linesUp(getHeight() / fh, shift, lastCol);
       down = false;
-    } else if(PREVLINE.is(e)) {
-      up(1, selecting);
+    } else if(NEXTPAGE.is(e)) {
+      lc = editor.linesDown(getHeight() / fh, shift, lastCol);
+    } else if(NEXTLINE.is(e) && !MOVEDOWN.is(e)) {
+      lc = editor.linesDown(1, shift, lastCol);
+    } else if(PREVLINE.is(e) && !MOVEUP.is(e)) {
+      lc = editor.linesUp(1, shift, lastCol);
       down = false;
-    } else if(NEXTLINE.is(e)) {
-      down(1, selecting);
+    } else if(NEXTCHAR.is(e)) {
+      editor.next(shift);
+    } else if(PREVCHAR.is(e)) {
+      editor.previous(shift);
+      down = false;
     } else {
       consumed = false;
     }
+    lastCol = lc == Integer.MIN_VALUE ? -1 : lc;
 
-    if(selecting) {
-      // refresh scroll position
-      editor.finishSelect();
-    } else if(hist.active()) {
-      // edit operations...
-      if(COMPLETE.is(e)) {
+    // edit text
+    if(hist.active()) {
+      if(MOVEDOWN.is(e)) {
+        editor.move(true);
+      } else if(MOVEUP.is(e)) {
+        editor.move(false);
+      } else if(COMPLETE.is(e)) {
         editor.complete();
       } else if(DELLINE.is(e)) {
         editor.deleteLine();
-      } else if(DELLINEEND.is(e) || DELNEXTWORD.is(e) || DELETE.is(e)) {
-        if(!selected) {
-          if(editor.pos() == editor.size()) return;
-          editor.startSelect();
-          if(DELNEXTWORD.is(e)) {
-            editor.nextToken(true);
-          } else if(DELLINEEND.is(e)) {
-            editor.eol(true);
-          } else {
-            editor.next(true);
-          }
-          editor.finishSelect();
-        }
+      } else if(DELNEXTWORD.is(e)) {
+        editor.deleteNext(true);
+      } else if(DELLINEEND.is(e)) {
+        editor.deleteNext(false);
+      } else if(DELNEXT.is(e)) {
         editor.delete();
-      } else if(DELLINESTART.is(e) || DELPREVWORD.is(e) || BACKSPACE.is(e)) {
-        if(!selected) {
-          if(editor.pos() == 0) return;
-          if(DELPREVWORD.is(e)) {
-            editor.startSelect();
-            editor.prevToken(true);
-            editor.finishSelect();
-          } else if(DELLINESTART.is(e)) {
-            editor.startSelect();
-            editor.bol(true);
-            editor.finishSelect();
-          } else {
-            editor.backspace();
-          }
-        }
-        editor.delete();
+      } else if(DELPREVWORD.is(e)) {
+        editor.deletePrev(true);
+        down = false;
+      } else if(DELLINESTART.is(e)) {
+        editor.deletePrev(false);
+        down = false;
+      } else if(DELPREV.is(e)) {
+        editor.deletePrev();
         down = false;
       } else {
         consumed = false;
@@ -640,14 +628,13 @@ public class TextPanel extends BaseXPanel {
     }
     if(consumed) e.consume();
 
-    editor.setCaret();
     final byte[] tmp = editor.text();
     if(txt != tmp) {
       // text has changed: add old text to history
-      hist.store(tmp, caret, editor.caret());
+      hist.store(tmp, pos, editor.pos());
       scrollCode.invokeLater(down);
-    } else if(caret != editor.caret()) {
-      // cursor position has changed
+    } else if(pos != editor.pos() || selected != editor.selected()) {
+      // cursor position or selection state has changed
       cursorCode.invokeLater(down ? 2 : 0);
     }
   }
@@ -677,53 +664,14 @@ public class TextPanel extends BaseXPanel {
     }
   };
 
-  /**
-   * Moves the cursor down. The current column position is remembered in
-   * {@link #lastCol} and, if possible, restored.
-   * @param l number of lines to move cursor
-   * @param mark mark flag
-   */
-  private void down(final int l, final boolean mark) {
-    if(!mark) editor.noSelect();
-    final int x = editor.bol(mark);
-    if(lastCol == -1) lastCol = x;
-    for(int i = 0; i < l; ++i) {
-      editor.eol(mark);
-      editor.next(mark);
-    }
-    editor.forward(lastCol, mark);
-    if(editor.pos() == editor.size()) lastCol = -1;
-  }
-
-  /**
-   * Moves the cursor up.
-   * @param l number of lines to move cursor
-   * @param mark mark flag
-   */
-  private void up(final int l, final boolean mark) {
-    if(!mark) editor.noSelect();
-    final int x = editor.bol(mark);
-    if(lastCol == -1) lastCol = x;
-    if(editor.pos() == 0) {
-      lastCol = -1;
-      return;
-    }
-    for(int i = 0; i < l; ++i) {
-      editor.prev(mark);
-      editor.bol(mark);
-    }
-    editor.forward(lastCol, mark);
-  }
-
   /** Last horizontal position. */
   private int lastCol = -1;
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    if(!hist.active() || control(e) || DELETE.is(e) || BACKSPACE.is(e) || ESCAPE.is(e)) return;
+    if(!hist.active() || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e)) return;
 
-    final int caret = editor.caret();
-    editor.pos(caret);
+    final int caret = editor.pos();
 
     // remember if marked text is to be deleted
     final StringBuilder sb = new StringBuilder(1).append(e.getKeyChar());
@@ -733,12 +681,11 @@ public class TextPanel extends BaseXPanel {
     final boolean selected = editor.selected() && !indent;
     if(selected) editor.delete();
 
-    final int ps = editor.pos();
     final int move = ENTER.is(e) ? editor.enter(sb) : editor.add(sb, selected);
 
     // refresh history and adjust cursor position
-    hist.store(editor.text(), caret, editor.caret());
-    if(move != 0) editor.setCaret(Math.min(editor.size(), ps + move));
+    hist.store(editor.text(), caret, editor.pos());
+    if(move != 0) editor.pos(Math.min(editor.size(), caret + move));
 
     // adjust text height
     scrollCode.invokeLater(true);
@@ -760,10 +707,7 @@ public class TextPanel extends BaseXPanel {
    */
   final boolean copy() {
     final String txt = editor.copy();
-    if(txt.isEmpty()) {
-      editor.noSelect();
-      return false;
-    }
+    if(txt.isEmpty()) return false;
 
     // copy selection to clipboard
     BaseXLayout.copy(txt);
@@ -787,8 +731,7 @@ public class TextPanel extends BaseXPanel {
    * @param old old cursor position; store entry to history if position != -1
    */
   void finish(final int old) {
-    editor.setCaret();
-    if(old != -1) hist.store(editor.text(), old, editor.caret());
+    if(old != -1) hist.store(editor.text(), old, editor.pos());
     scrollCode.invokeLater(true);
     release(Action.CHECK);
   }
@@ -876,12 +819,10 @@ public class TextPanel extends BaseXPanel {
 
     @Override
     public void execute() {
-      final int tc = editor.caret();
-      editor.pos(tc);
+      final int pos = editor.pos();
       if(!copy()) return;
       editor.delete();
-      editor.setCaret();
-      finish(tc);
+      finish(pos);
     }
     @Override
     public boolean enabled(final GUI main) { return hist.active() && editor.selected(); }
@@ -905,13 +846,12 @@ public class TextPanel extends BaseXPanel {
 
     @Override
     public void execute() {
-      final int tc = editor.caret();
-      editor.pos(tc);
+      final int pos = editor.pos();
       final String clip = clip();
       if(clip == null) return;
       if(editor.selected()) editor.delete();
       editor.add(clip);
-      finish(tc);
+      finish(pos);
     }
     @Override
     public boolean enabled(final GUI main) { return hist.active() && clip() != null; }
@@ -920,14 +860,13 @@ public class TextPanel extends BaseXPanel {
   /** Delete command. */
   class DelCmd extends GUIPopupCmd {
     /** Constructor. */
-    DelCmd() { super(Text.DELETE, DELETE); }
+    DelCmd() { super(Text.DELETE, DELNEXT); }
 
     @Override
     public void execute() {
-      final int tc = editor.caret();
-      editor.pos(tc);
+      final int pos = editor.pos();
       editor.delete();
-      finish(tc);
+      finish(pos);
     }
     @Override
     public boolean enabled(final GUI main) { return hist.active() && editor.selected(); }

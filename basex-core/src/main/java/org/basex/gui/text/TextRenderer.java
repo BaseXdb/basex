@@ -610,20 +610,6 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
-   * Selects the text at the specified position.
-   * @param p mouse position
-   * @param start states if selection has just been started
-   */
-  void select(final Point p, final boolean start) {
-    if(start) text.noSelect();
-    text.pos(jump(p).pos());
-    if(start) text.startSelect();
-    else text.extendSelect();
-    text.setCaret();
-    repaint();
-  }
-
-  /**
    * Returns the font height.
    * @return font height
    */

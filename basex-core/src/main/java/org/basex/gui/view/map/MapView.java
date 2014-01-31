@@ -536,7 +536,7 @@ public final class MapView extends View implements Runnable {
     if(gui.updating || mainRects == null || control(e)) return;
 
     final boolean cursor = PREVLINE.is(e) || NEXTLINE.is(e) ||
-        PREV.is(e) || NEXT.is(e);
+        PREVCHAR.is(e) || NEXTCHAR.is(e);
     if(!cursor) return;
 
     if(focused == null) focused = mainRects.get(0);
@@ -550,10 +550,10 @@ public final class MapView extends View implements Runnable {
     } else if(NEXTLINE.is(e)) {
       mouseY = focused.y + (shift ? o : focused.h + 1);
       if(shift) mouseX = focused.x + (focused.w >> 1);
-    } else if(PREV.is(e)) {
+    } else if(PREVCHAR.is(e)) {
       mouseX = focused.x + (shift ? focused.w - fs : 0) - 1;
       if(shift) mouseY = focused.y + (focused.h >> 1);
-    } else if(NEXT.is(e)) {
+    } else if(NEXTCHAR.is(e)) {
       mouseX = focused.x + (shift ? o : focused.w + 1);
       if(shift) mouseY = focused.y + (focused.h >> 1);
     }

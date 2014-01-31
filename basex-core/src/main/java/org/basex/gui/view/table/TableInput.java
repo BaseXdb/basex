@@ -74,13 +74,13 @@ final class TableInput implements Runnable {
       pos = 0;
     } else if(LINEEND.is(e)) {
       pos = text.length();
-    } else if(PREV.is(e)) {
+    } else if(PREVCHAR.is(e)) {
       pos = Math.max(0, pos - 1);
-    } else if(NEXT.is(e)) {
+    } else if(NEXTCHAR.is(e)) {
       pos = Math.min(text.length(), pos + 1);
-    } else if(BACKSPACE.is(e)) {
+    } else if(DELPREV.is(e)) {
       if(pos > 0) text = text.substring(0, pos - 1) + text.substring(pos--);
-    } else if(DELETE.is(e)) {
+    } else if(DELNEXT.is(e)) {
       if(pos < text.length()) {
         text = text.substring(0, pos) + text.substring(pos + 1);
       }
@@ -94,7 +94,7 @@ final class TableInput implements Runnable {
    */
   boolean add(final KeyEvent e) {
     // backspace/delete...
-    if(DELETE.is(e) || BACKSPACE.is(e)) return true;
+    if(DELNEXT.is(e) || DELPREV.is(e)) return true;
     // skip other control chars
     final char ch = e.getKeyChar();
     if(ch < ' ') return false;

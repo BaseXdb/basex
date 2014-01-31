@@ -46,9 +46,9 @@ public class BaseXButton extends JButton {
       public void keyPressed(final KeyEvent e) {
         if(BaseXKeys.ESCAPE.is(e)) {
           d.cancel();
-        } else if(BaseXKeys.NEXT.is(e) || BaseXKeys.NEXTLINE.is(e)) {
+        } else if(BaseXKeys.NEXTCHAR.is(e) || BaseXKeys.NEXTLINE.is(e)) {
           transferFocus();
-        } else if(BaseXKeys.PREV.is(e) || BaseXKeys.PREVLINE.is(e)) {
+        } else if(BaseXKeys.PREVCHAR.is(e) || BaseXKeys.PREVLINE.is(e)) {
           transferFocusBackward();
         }
       }

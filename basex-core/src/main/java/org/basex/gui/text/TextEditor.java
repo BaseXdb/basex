@@ -27,13 +27,11 @@ public final class TextEditor {
   /** Start and end positions of search terms. */
   IntList[] searchPos;
   /** Start position of a text selection. */
-  int selectPos = -1;
+  int start = -1;
   /** End position of a text selection (+1). */
-  int selectEnd = -1;
+  int end = -1;
   /** Start position of an error highlighting. */
-  int errPos = -1;
-  /** Cursor position. */
-  int caret;
+  int error = -1;
 
   /** GUI options. */
   private final GUIOptions gopts;
@@ -43,7 +41,7 @@ public final class TextEditor {
   private byte[] text = EMPTY;
   /** Number of lines. Required for displaying line numbers. */
   private int lines = -1;
-  /** Current position of an edit operation. */
+  /** Caret/edit position. */
   private int pos;
 
   /**
@@ -90,20 +88,19 @@ public final class TextEditor {
    */
   int[] replace(final ReplaceContext rc) {
     // only adopt selection if it extends over more than one line
-    final int tl = text.length;
-    int start = Math.min(selectPos, selectEnd);
-    int end = Math.max(selectPos, selectEnd);
+    final int tl = size();
+    int s = Math.min(start, end), e = Math.max(start, end);
     boolean sel = selected();
     if(sel) {
-      int p = start - 1;
-      while(++p < end && text[p] != '\n');
-      sel = p < end;
+      int p = s - 1;
+      while(++p < e && text[p] != '\n');
+      sel = p < e;
     }
     if(!sel) {
-      start = 0;
-      end = tl;
+      s = 0;
+      e = tl;
     }
-    return rc.replace(search, text, start, end);
+    return rc.replace(search, text, s, e);
   }
 
   /**
@@ -122,49 +119,101 @@ public final class TextEditor {
   /**
    * Moves one character forward.
    * @param select selection flag
-   * @return character
    */
-  int next(final boolean select) {
-    return resetSelection(select, true) ? curr() : next();
+  void forward(final boolean select) {
+    if(select || !selected()) {
+      next();
+    } else {
+      pos(Math.max(start, end));
+    }
+  }
+
+  /**
+   * Moves one character forward.
+   * @param select selection flag
+   */
+  void next(final boolean select) {
+    if(select && !selected()) startSelect();
+    forward(select);
+    if(select) endSelection();
+  }
+
+  /**
+   * Moves one character forward.
+   * @param select selection flag
+   */
+  void previous(final boolean select) {
+    if(select && !selected()) startSelect();
+    back(select);
+    if(select) endSelection();
   }
 
   /**
    * Moves one token forward.
    * @param select selection flag
    */
-  void nextToken(final boolean select) {
-    int ch = next(select);
-    if(ch == '\n') return;
-    if(Character.isLetterOrDigit(ch)) {
-      while(Character.isLetterOrDigit(ch)) ch = next();
-      while(ch != '\n' && Character.isWhitespace(ch)) ch = next();
-    } else if(Character.isWhitespace(ch)) {
-      while(ch != '\n' && Character.isWhitespace(ch)) ch = next();
-    } else {
-      while(ch != '\n' && !Character.isLetterOrDigit(ch) &&
-          !Character.isWhitespace(ch)) ch = next();
-      while(ch != '\n' && Character.isWhitespace(ch)) ch = next();
+  void nextWord(final boolean select) {
+    if(select && !selected()) startSelect();
+
+    int ch = curr();
+    forward(select);
+    if(ch != '\n') {
+      if(Character.isLetterOrDigit(ch)) {
+        while(Character.isLetterOrDigit(ch)) ch = next();
+        while(ch != '\n' && Character.isWhitespace(ch)) ch = next();
+      } else if(Character.isWhitespace(ch)) {
+        while(ch != '\n' && Character.isWhitespace(ch)) ch = next();
+      } else {
+        while(ch != '\n' && !Character.isLetterOrDigit(ch) &&
+            !Character.isWhitespace(ch)) ch = next();
+        while(ch != '\n' && Character.isWhitespace(ch)) ch = next();
+      }
+      if(pos != size()) prev();
     }
-    if(pos != text.length) prev();
+    if(select) endSelection();
   }
 
   /**
    * Moves one token back.
    * @param select selection flag
    */
-  void prevToken(final boolean select) {
-    int ch = prev(select);
-    if(ch == '\n') return;
-    if(Character.isLetterOrDigit(ch)) {
-      while(Character.isLetterOrDigit(ch)) ch = prev();
-    } else if(Character.isWhitespace(ch)) {
-      while(ch != '\n' && Character.isWhitespace(ch)) ch = prev();
-      while(Character.isLetterOrDigit(ch)) ch = prev();
-    } else {
-      while(ch != '\n' && !Character.isLetterOrDigit(ch) &&
-          !Character.isWhitespace(ch)) ch = prev();
+  void prevWord(final boolean select) {
+    if(select && !selected()) startSelect();
+
+    int ch = back(select);
+    if(ch != '\n') {
+      if(Character.isLetterOrDigit(ch)) {
+        while(Character.isLetterOrDigit(ch)) ch = prev();
+      } else if(Character.isWhitespace(ch)) {
+        while(ch != '\n' && Character.isWhitespace(ch)) ch = prev();
+        while(Character.isLetterOrDigit(ch)) ch = prev();
+      } else {
+        while(ch != '\n' && !Character.isLetterOrDigit(ch) &&
+            !Character.isWhitespace(ch)) ch = prev();
+      }
+      if(pos != 0) next();
     }
-    if(pos != 0) next();
+    if(select) endSelection();
+  }
+
+  /**
+   * Jumps to the beginning of the text.
+   * @param select selection flag
+   */
+  void textStart(final boolean select) {
+    startSelection(select);
+    pos = 0;
+    if(select) endSelection();
+  }
+
+  /**
+   * Jumps to the end of the text.
+   * @param select selection flag
+   */
+  void textEnd(final boolean select) {
+    startSelection(select);
+    pos = size();
+    if(select) endSelection();
   }
 
   /**
@@ -206,43 +255,56 @@ public final class TextEditor {
    * @return number of passed characters
    */
   int bol(final boolean select) {
-    if(pos == 0) return 0;
+    if(pos == 0) {
+      if(!select) noSelect();
+      return 0;
+    }
     final int ind = indent();
     int c = 0;
-    do c += curr() == '\t' ? ind : 1; while(prev(select) != '\n');
-    if(pos != 0 || curr() == '\n') next(select);
+    do c += curr() == '\t' ? ind : 1; while(back(select) != '\n');
+    if(pos != 0 || curr() == '\n') forward(select);
     return c;
   }
 
   /**
-   * Moves to the first character or the beginning of the line.
+   * Moves to the beginning of a line.
    * @param select selection flag
    */
-  void home(final boolean select) {
+  void lineStart(final boolean select) {
+    if(select && !selected()) startSelect();
+
     final int p = pos;
     boolean s = true;
     // find beginning of line
-    while(prev(select) != '\n') s &= Character.isWhitespace(curr());
-    if(pos != 0 || curr() == '\n') next(select);
+    while(back(select) != '\n') s &= Character.isWhitespace(curr());
+    if(pos != 0 || curr() == '\n') forward(select);
     // move to first non-whitespace character
-    if(p == pos || !s) while(Character.isWhitespace(curr()) && curr() != '\n') next(select);
+    if(p == pos || !s) {
+      while(Character.isWhitespace(curr()) && curr() != '\n') forward(select);
+    }
+
+    if(select) endSelection();
   }
 
   /**
-   * Moves to the end of the line.
+   * Moves to the end of a line.
    * @param select selection flag
    */
-  void eol(final boolean select) {
+  void lineEnd(final boolean select) {
+    startSelection(select);
     forward(Integer.MAX_VALUE, select);
+    if(select) endSelection();
   }
 
   /**
    * Moves one character back and returns the found character.
    * @param select selection flag
-   * @return character
+   * @return previous character
    */
-  int prev(final boolean select) {
-    return resetSelection(select, false) ? curr() : prev();
+  int back(final boolean select) {
+    if(select || !selected()) return prev();
+    pos(Math.min(start, end));
+    return curr();
   }
 
   /**
@@ -268,8 +330,55 @@ public final class TextEditor {
     while(curr() != '\n') {
       nc += curr() == '\t' ? ind : 1;
       if(nc >= p) return;
-      next(select);
+      forward(select);
     }
+  }
+
+  /**
+   * Moves the cursor upwards.
+   * @param l number of lines to move cursor
+   * @param select selection flag
+   * @param lastCol last column position
+   * @return last column position
+   */
+  int linesUp(final int l, final boolean select, final int lastCol) {
+    startSelection(select);
+
+    int col = bol(select);
+    if(pos() == 0) {
+      col = -1;
+    } else {
+      if(lastCol != -1) col = lastCol;
+      for(int i = 0; i < l; ++i) {
+        back(select);
+        bol(select);
+      }
+      forward(col, select);
+    }
+    if(select) endSelection();
+    return col;
+  }
+
+  /**
+   * Moves the cursor down. The current column position is remembered and, if possible, restored.
+   * @param l number of lines to move cursor
+   * @param select selection flag
+   * @param lastCol last column position
+   * @return last column position
+   */
+  int linesDown(final int l, final boolean select, final int lastCol) {
+    startSelection(select);
+
+    int lc = lastCol == -1 ? bol(select) : lastCol;
+    for(int i = 0; i < l; ++i) {
+      forward(Integer.MAX_VALUE, select);
+      forward(select);
+    }
+    forward(lc, select);
+    if(pos() == size()) lc = -1;
+
+    if(select) endSelection();
+    return lc;
   }
 
   /**
@@ -304,14 +413,14 @@ public final class TextEditor {
 
     // no selection: select line
     if(!selected()) {
-      selectPos = caret;
-      selectEnd = caret;
-      while(selectPos > 0 && text[selectPos - 1] != '\n') --selectPos;
-      while(selectEnd < size() && text[selectEnd] != '\n') ++selectEnd;
+      start = pos;
+      end = pos;
+      while(start > 0 && text[start - 1] != '\n') --start;
+      while(end < size() && text[end] != '\n') ++end;
     }
 
-    final int min = Math.min(selectPos, selectEnd);
-    int max = Math.max(selectPos, selectEnd);
+    final int min = Math.min(start, end);
+    int max = Math.max(start, end);
     if(selected() && text[max - 1] == '\n') max--;
 
     // create new text with or without comment
@@ -327,10 +436,7 @@ public final class TextEditor {
       off = sl + el;
     }
     final boolean added = add(tb.finish(), min, max);
-    selectPos = min;
-    selectEnd = max + off;
-    setCaret(selectEnd);
-    checkSelect();
+    select(min, max + off);
     return added;
   }
 
@@ -338,43 +444,40 @@ public final class TextEditor {
    * Inserts a string into the given text.
    * @param string new string
    * @param offset offset where to add the new string
-   * @param end offset of remaining text
+   * @param rem offset of remaining text
    * @return {@code true} if text has changed
    */
-  private boolean add(final byte[] string, final int offset, final int end) {
-    final int tl = text.length, al = string.length;
-    final byte[] tmp = new byte[offset + al + tl - end];
+  private boolean add(final byte[] string, final int offset, final int rem) {
+    final int tl = size(), al = string.length;
+    final byte[] tmp = new byte[offset + al + tl - rem];
     System.arraycopy(text, 0, tmp, 0, offset);
     System.arraycopy(string, 0, tmp, offset, al);
-    System.arraycopy(text, end, tmp, offset + al, tl - end);
+    System.arraycopy(text, rem, tmp, offset + al, tl - rem);
     return text(tmp);
   }
 
   /**
-   * Moves lines up or down.
+   * Moves the current line or the selected lines up or down.
    * @param down down/up flag
    */
   void move(final boolean down) {
-    extend();
-    if(!selected()) return;
+    if(!extend()) return;
 
-    final int tl = text.length;
-    final int s = selectPos, e = selectEnd;
+    final int s = start, e = end, tl = size();
     final byte[] tmp = Arrays.copyOf(text, tl);
     if(down) {
-      if(e == text.length) return;
-      pos(e);
-      eol(true);
+      if(e == tl) return;
+      pos = e;
+      lineEnd(true);
       int c = s;
       for(int i = e; i < pos; i++) tmp[c++] = text[i];
       tmp[c++] = '\n';
       for(int i = s; i < e - 1; i++) tmp[c++] = text[i];
       text(tmp);
       select(s + pos - e + 1, Math.min(tl, pos + 1));
-      pos(s + pos - e + 1);
     } else {
       if(s == 0) return;
-      pos(s - 1);
+      pos = s - 1;
       bol(true);
       int c = pos;
       for(int i = s; i < e; i++) tmp[c++] = text[i];
@@ -401,8 +504,8 @@ public final class TextEditor {
       if(!find(key)) continue;
       // key found
       String value = REPLACE.get(s + 1);
-      final int p = pos - key.length(), cursor = value.indexOf('_');
-      if(cursor != -1) value = value.replace("_", "");
+      final int p = pos - key.length(), car = value.indexOf('_');
+      if(car != -1) value = value.replace("_", "");
       // adopt current indentation
       final int ind = open();
       if(ind != 0) {
@@ -413,7 +516,7 @@ public final class TextEditor {
       // delete old string, add new one
       replace(p, pos + (space ? 1 : 0), value);
       // adjust cursor
-      pos(cursor != -1 ? p + cursor : pos);
+      if(car != -1) pos = p + car;
     }
 
     // replace entities
@@ -436,19 +539,12 @@ public final class TextEditor {
    * @return {@code true} if text has changed
    */
   boolean format(final Syntax syntax) {
-    if(!selected()) {
-      select(0, size());
-      if(!selected()) return false;
-    }
-
-    final int s = Math.min(selectPos, selectEnd);
-    final int e = Math.max(selectPos, selectEnd);
+    final boolean sel = selected();
+    final int s = sel ? Math.min(start, end) : 0;
+    final int e = sel ? Math.max(start, end) : size();
     final byte[] format = syntax.format(Arrays.copyOfRange(text, s, e), spaces());
     final boolean changed = add(format, s, e);
-    selectPos = s;
-    selectEnd = s + format.length;
-    setCaret(selectEnd);
-    checkSelect();
+    select(s, s + format.length);
     return changed;
   }
 
@@ -460,7 +556,7 @@ public final class TextEditor {
    */
   boolean indent(final StringBuilder sb, final boolean shift) {
     // no selection, shift pressed: select current character
-    if(!selected() && shift && text.length != 0) selectLine();
+    if(!selected() && shift && size() != 0) selectLine();
 
     // check if something is selected
     if(selected()) {
@@ -492,7 +588,7 @@ public final class TextEditor {
   int enter(final StringBuilder sb) {
     // indent after opening bracket
     final boolean opening = pos > 0 && OPENING.indexOf(text[pos - 1]) != -1;
-    final boolean closing = pos < text.length && CLOSING.indexOf(text[pos]) != -1;
+    final boolean closing = pos < size() && CLOSING.indexOf(text[pos]) != -1;
 
     final int ind = indent();
     int indent = open(), move = 0;
@@ -524,8 +620,8 @@ public final class TextEditor {
     if(sb.length() != 0) {
       if(gopts.get(GUIOptions.AUTO)) {
         final char ch = sb.charAt(0);
-        final int next = pos + 1 < text.length ? text[pos + 1] : 0;
-        final int curr = pos < text.length ? text[pos] : 0;
+        final int next = pos + 1 < size() ? text[pos + 1] : 0;
+        final int curr = pos < size() ? text[pos] : 0;
         final int prev = pos > 0 ? text[pos - 1] : 0;
         final int pprv = pos > 1 ? text[pos - 2] : 0;
         final int open = OPENING.indexOf(ch);
@@ -586,7 +682,6 @@ public final class TextEditor {
         }
       }
       add(sb.toString());
-      setCaret();
     }
     return move;
   }
@@ -602,9 +697,9 @@ public final class TextEditor {
       if(!ws(b)) return;
     }
     if(++p >= pos) return;
-    selectPos = Math.max(pos - indent(), p);
-    selectEnd = Math.max(pos, p);
-    if(selectPos != selectEnd) delete();
+    start = Math.max(pos - indent(), p);
+    end = Math.max(pos, p);
+    if(start != end) delete();
   }
 
   /**
@@ -629,20 +724,26 @@ public final class TextEditor {
   }
 
   /**
-   * Marks characters for pressed backspace key.
+   * Deletes the previous character or the current selection.
    */
-  void backspace() {
-    startSelect();
-    final int curr = curr(), prev = prev();
-    finishSelect();
-    if(curr == prev && (curr == '"' || curr == '\'')) {
-      // remove closing quote
-      selectPos++;
-    } else {
-      // remove closing bracket
-      final int open = OPENING.indexOf(prev);
-      if(open != -1 && CLOSING.indexOf(curr) == open) selectPos++;
+  void deletePrev() {
+    if(!selected()) {
+      startSelect();
+      final int curr = curr(), prev = prev();
+      endSelection();
+
+      if(gopts.get(GUIOptions.AUTO)) {
+        if(curr == prev && (curr == '"' || curr == '\'')) {
+          // remove closing quote
+          start++;
+        } else {
+          // remove closing bracket
+          final int open = OPENING.indexOf(prev);
+          if(open != -1 && CLOSING.indexOf(curr) == open) start++;
+        }
+      }
     }
+    del();
   }
 
   /**
@@ -650,10 +751,20 @@ public final class TextEditor {
    * Assumes that the current position allows a deletion.
    */
   void delete() {
-    final int tl = text.length;
-    if(tl == 0) return;
-    final int s = selected() ? Math.min(selectPos, selectEnd) : pos;
-    final int e = selected() ? Math.max(selectPos, selectEnd) : pos + cl(text, pos);
+    final int tl = size();
+    if(!selected()) {
+      if(pos == tl) return;
+      start = pos;
+      end = pos + cl(text, pos);
+    }
+    del();
+  }
+
+  /**
+   * Deletes the current selection.
+   */
+  private void del() {
+    final int s = Math.min(start, end), e = Math.max(start, end), tl = size();
     final byte[] tmp = new byte[tl - e + s];
     System.arraycopy(text, 0, tmp, 0, s);
     System.arraycopy(text, e, tmp, s, tl - e);
@@ -669,10 +780,40 @@ public final class TextEditor {
     delete();
   }
 
+  /**
+   * Deletes the word or line following the cursor.
+   * @param word word/line flag
+   */
+  void deleteNext(final boolean word) {
+    if(!selected()) {
+      if(pos() == size()) return;
+      startSelect();
+      if(word) nextWord(true);
+      else lineEnd(true);
+      endSelection();
+    }
+    delete();
+  }
+
+  /**
+   * Deletes the word or line preceding the cursor.
+   * @param word word/line flag
+   */
+  void deletePrev(final boolean word) {
+    if(!selected()) {
+      if(pos() == 0) return;
+      startSelect();
+      if(word) prevWord(true);
+      else bol(true);
+      endSelection();
+    }
+    delete();
+  }
+
   // PRIVATE METHODS ==============================================================================
 
   /**
-   * Checks if the specified key is found before the current cursor position.
+   * Replaces the specified text area with another string.
    * @param s start
    * @param e end
    * @param value new value
@@ -696,15 +837,21 @@ public final class TextEditor {
 
   /**
    * Extends the current selection to the beginning of the first and the end of the last line.
+   * @return if text is selected
    */
-  private void extend() {
-    if(!selected()) selectLine();
-    int s = Math.min(selectPos, selectEnd), e = Math.max(selectPos, selectEnd);
-    final int tl = text.length;
+  private boolean extend() {
+    if(!selected()) {
+      selectLine();
+      if(!selected()) return false;
+    }
+
+    int s = Math.min(start, end), e = Math.max(start, end);
+    final int tl = size();
     while(s > 0 && text[s - 1] != '\n') s--;
     if(e > 0) while(e < tl && text[e - 1] != '\n') e++;
-    selectPos = s;
-    selectEnd = e;
+    start = s;
+    end = e;
+    return true;
   }
 
   /**
@@ -712,8 +859,9 @@ public final class TextEditor {
    * @param shift shift flag
    */
   private void indent(final boolean shift) {
-    extend();
-    final int s = selectPos, e = selectEnd, ind = indent();
+    if(!extend()) return;
+
+    final int s = start, e = end, ind = indent();
     final byte[] spaces = spaces();
 
     // build new text
@@ -741,11 +889,8 @@ public final class TextEditor {
       if(p < e) tb.addByte(text[p]);
     }
 
-    final byte[] tmp = tb.finish();
-    add(tmp, s, e);
-    final int o = s + tmp.length;
-    select(s, o);
-    setCaret(o);
+    add(tb.finish(), s, e);
+    select(s, s + tb.size());
   }
 
   /**
@@ -773,109 +918,86 @@ public final class TextEditor {
   // TEXT NAVIGATION AND SELECTION ================================================================
 
   /**
-   * Returns the iterator position.
-   * @return iterator position
+   * Returns the text size.
+   * @return text size
+   */
+  int size() {
+    return text.length;
+  }
+
+  /**
+   * Returns the caret position.
+   * @return caret position
    */
   int pos() {
     return pos;
   }
 
   /**
-   * Sets the iterator position.
-   * @param p iterator position
+   * Sets the caret position and resets a selection.
+   * @param p caret position
    */
   void pos(final int p) {
     pos = p;
-  }
-
-  /**
-   * Returns the current character.
-   * @return current character
-   */
-  int curr() {
-    return pos < 0 || pos >= text.length ? '\n' : cp(text, pos);
-  }
-
-  /**
-   * Moves one character forward.
-   * @return current character
-   */
-  int next() {
-    final int c = curr();
-    if(pos < text.length) pos += cl(text, pos);
-    return c;
-  }
-
-  /**
-   * Jumps to the maximum or minimum position and resets the selection.
-   * @param select selection flag
-   * @param max jump to maximum or minimum position
-   * @return true if selection was reset
-   */
-  private boolean resetSelection(final boolean select, final boolean max) {
-    // only jump if text is currently selected and no more selection is requested
-    if(select || !selected()) return false;
-    pos = max ^ selectPos < selectEnd ? selectPos : selectEnd;
     noSelect();
-    return true;
   }
 
   /**
    * Resets the selection.
    */
   void noSelect() {
-    selectPos = -1;
-    selectEnd = -1;
+    start = -1;
+    end = -1;
   }
 
   /**
-   * Sets the start of a text selection.
+   * Selects the text at the specified position.
+   * @param p position
+   * @param select states if the selection has just been started
    */
-  void startSelect() {
-    selectPos = pos;
-    selectEnd = pos;
+  void select(final int p, final boolean select) {
+    pos = p;
+    if(select) startSelect();
+    else end = pos;
   }
 
   /**
-   * Extends the text selection.
+   * Selects the specified area and places the caret at the end of the selection.
+   * @param s start position
+   * @param e end position
    */
-  void extendSelect() {
-    selectEnd = pos;
+  void select(final int s, final int e) {
+    start = s;
+    end = e;
+    pos = e;
+    checkSelection();
+  }
+
+  /**
+   * Initializes the selection.
+   * @param select select flag
+   */
+  void startSelection(final boolean select) {
+    if(select) {
+      if(!selected()) startSelect();
+    } else {
+      noSelect();
+    }
   }
 
   /**
    * Finishes a text selection.
    */
-  void finishSelect() {
-    selectEnd = pos;
-    checkSelect();
-  }
-
-  /**
-   * Selects the specified area.
-   * @param s start position
-   * @param e end position
-   */
-  void select(final int s, final int e) {
-    selectPos = s;
-    selectEnd = e;
-    checkSelect();
+  void endSelection() {
+    end = pos;
+    checkSelection();
   }
 
   /**
    * Checks the validity of the selection.
    */
-  void checkSelect() {
-    if(selectPos == selectEnd) noSelect();
-  }
-
-  /**
-   * Returns the start of the text selection. The value is {@code -1} if no
-   * text is selected.
-   * @return start selection
-   */
-  int start() {
-    return selectPos;
+  private void checkSelection() {
+    if(start == end) noSelect();
   }
 
   /**
@@ -883,7 +1005,7 @@ public final class TextEditor {
    * @return result of check
    */
   boolean selected() {
-    return selectPos != selectEnd;
+    return start != end;
   }
 
   /**
@@ -892,8 +1014,8 @@ public final class TextEditor {
    */
   String copy() {
     final TokenBuilder tb = new TokenBuilder();
-    final int e = selectPos < selectEnd ? selectEnd : selectPos;
-    for(int s = selectPos < selectEnd ? selectPos : selectEnd; s < e; s += cl(text, s)) {
+    final int e = start < end ? end : start;
+    for(int s = start < end ? start : end; s < e; s += cl(text, s)) {
       final int cp = cp(text, s);
       if(cp >= ' ' || cp == 0x0A || cp == 0x09) tb.add(cp);
     }
@@ -904,32 +1026,58 @@ public final class TextEditor {
    * Selects the word at the cursor position.
    */
   void selectWord() {
-    pos(caret);
-    final boolean ch = ftChar(prev(true));
+    final boolean ch = ftChar(curr());
     while(pos() > 0) {
-      final int cp = prev(true);
-      if(cp == '\n' || ch != ftChar(cp)) break;
+      final int cp = back(true);
+      if(cp == '\n' || ch != ftChar(cp)) {
+        forward(true);
+        break;
+      }
     }
-    if(pos() != 0) next(true);
     startSelect();
     while(pos() < size()) {
       final int cp = curr();
       if(cp == '\n' || ch != ftChar(cp)) break;
-      next(true);
+      forward(true);
     }
-    finishSelect();
+    endSelection();
   }
 
   /**
    * Selects the word at the cursor position.
    */
   void selectLine() {
-    pos(caret);
     bol(false);
     startSelect();
-    eol(false);
+    forward(Integer.MAX_VALUE, true);
     next();
-    finishSelect();
+    endSelection();
+  }
+
+  /**
+   * Returns the current character, or the newline character if the position is out of bounds.
+   * @return current character
+   */
+  private int curr() {
+    return pos < 0 || pos >= size() ? '\n' : cp(text, pos);
+  }
+
+  /**
+   * Returns the current character and moves to the next character.
+   * @return current character
+   */
+  private int next() {
+    final int c = curr();
+    if(pos < size()) pos += cl(text, pos);
+    return c;
+  }
+
+  /**
+   * Sets the text selection to the current position.
+   */
+  private void startSelect() {
+    start = pos;
+    end = pos;
   }
 
   // ERROR HIGHLIGHTING =================================================================
@@ -939,7 +1087,7 @@ public final class TextEditor {
    * @param s start position
    */
   void error(final int s) {
-    errPos = s;
+    error = s;
   }
 
   // SEARCH HIGHLIGHTING ================================================================
@@ -956,7 +1104,7 @@ public final class TextEditor {
       return -1;
     }
 
-    int s = searchPos[0].sortedIndexOf(!select || selected() ? caret : caret - 1);
+    int s = searchPos[0].sortedIndexOf(!select || selected() ? pos : pos - 1);
     switch(dir) {
       case CURRENT:  s = s < 0 ? -s - 1 : s;     break;
       case FORWARD:  s = s < 0 ? -s - 1 : s + 1; break;
@@ -967,45 +1115,14 @@ public final class TextEditor {
     else if(s == sl) s = 0;
     final int p = searchPos[0].get(s);
     if(select) {
-      selectPos = searchPos[1].get(s);
-      selectEnd = p;
+      start = searchPos[1].get(s);
+      end = p;
     }
-    caret = p;
+    pos = p;
     return p;
   }
 
   // CURSOR =============================================================================
-
-  /**
-   * Sets the text cursor to the specified position.
-   * @param c cursor position
-   */
-  void setCaret(final int c) {
-    caret = c;
-  }
-
-  /**
-   * Sets the text cursor to the current position.
-   */
-  void setCaret() {
-    caret = pos;
-  }
-
-  /**
-   * Returns the position of the text cursor.
-   * @return cursor position
-   */
-  int caret() {
-    return caret;
-  }
-
-  /**
-   * Returns the text size.
-   * @return text size
-   */
-  int size() {
-    return text.length;
-  }
 
   @Override
   public String toString() {

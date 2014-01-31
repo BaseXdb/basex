@@ -246,7 +246,7 @@ public final class DialogResources extends BaseXBack {
   /** Delete command. */
   final class DeleteCmd extends GUIPopupCmd {
     /** Constructor. */
-    DeleteCmd() { super(DELETE + DOTS, BaseXKeys.DELETE); }
+    DeleteCmd() { super(DELETE + DOTS, BaseXKeys.DELNEXT); }
 
     @Override
     public void execute() {

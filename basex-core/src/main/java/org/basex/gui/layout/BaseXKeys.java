@@ -17,8 +17,8 @@ public enum BaseXKeys {
 
   // Cursor
 
-  /** Left.                  */ PREV(VK_LEFT),
-  /** Right.                 */ NEXT(VK_RIGHT),
+  /** Left.                  */ PREVCHAR(VK_LEFT),
+  /** Right.                 */ NEXTCHAR(VK_RIGHT),
   /** Word left.             */ PREVWORD(MAC ? ALT : META, VK_LEFT),
   /** Word right.            */ NEXTWORD(MAC ? ALT : META, VK_RIGHT),
   /** Beginning of line.     */ LINESTART(MAC ? META : 0, MAC ? VK_LEFT : VK_HOME),
@@ -40,8 +40,8 @@ public enum BaseXKeys {
 
   // Editing
 
-  /** Delete backwards.      */ BACKSPACE(VK_BACK_SPACE),
-  /** Delete.                */ DELETE(VK_DELETE),
+  /** Delete backwards.      */ DELPREV(VK_BACK_SPACE),
+  /** Delete.                */ DELNEXT(VK_DELETE),
 
   /** Undo.                  */ UNDOSTEP(META, VK_Z, true),
   /** Redo.                  */ REDOSTEP(MAC ? META | SHIFT : META, MAC ? VK_Z : VK_Y, true),

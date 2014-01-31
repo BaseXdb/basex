@@ -416,10 +416,10 @@ public final class FolderView extends View {
     final Data data = gui.context.data();
     final int kind = data.kind(focusPre);
 
-    final boolean right = NEXT.is(e);
+    final boolean right = NEXTCHAR.is(e);
     boolean down = NEXTLINE.is(e);
     boolean up = PREVLINE.is(e);
-    if(right || PREV.is(e)) {
+    if(right || PREVCHAR.is(e)) {
       // open/close subtree
       if(e.isShiftDown()) {
         opened[focusPre] = right;

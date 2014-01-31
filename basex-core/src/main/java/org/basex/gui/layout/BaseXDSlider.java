@@ -151,10 +151,10 @@ public final class BaseXDSlider extends BaseXPanel {
     oldMax = min;
     double diffMin = 0;
     double diffMax = 0;
-    if(PREV.is(e)) {
+    if(PREVCHAR.is(e)) {
       diffMin = -1;
       diffMax = -1;
-    } else if(NEXT.is(e)) {
+    } else if(NEXTCHAR.is(e)) {
       diffMin = 1;
       diffMax = 1;
     } else if(PREVLINE.is(e)) {
