@@ -26,8 +26,6 @@ import static org.basex.util.Token.string;
 public final class WebDAVLockService {
   /** Path to WebDAV module. */
   private static final String FILE = "xquery/webdav.xqm";
-  /** Name of the database with the WebDAV locks. */
-  static final String WEBDAV_LOCKS_DB = "~webdav";
   /** HTTP context. */
   private final HTTPContext http;
 

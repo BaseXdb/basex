@@ -1,7 +1,6 @@
 package org.basex.http.webdav.impl;
 
 import static org.basex.http.webdav.impl.Utils.*;
-import static org.basex.http.webdav.impl.WebDAVLockService.*;
 import static org.basex.io.MimeTypes.*;
 import static org.basex.query.func.Function.*;
 
@@ -26,6 +25,8 @@ import org.basex.util.*;
  * @param <T> the type of resource
  */
 public final class WebDAVService<T> {
+  /** Name of the database with the WebDAV locks. */
+  private static final String WEBDAV_DB = "~webdav";
   /** HTTP context. */
   private final HTTPContext http;
   /** Resource factory. */
@@ -66,7 +67,7 @@ public final class WebDAVService<T> {
   @SuppressWarnings("unused")
   public boolean authorize(final String user, final String action, final String db,
       final String path) {
-    return !WEBDAV_LOCKS_DB.equals(db);
+    return !WEBDAV_DB.equals(db);
   }
 
   /**
@@ -101,7 +102,7 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public boolean dbExists(final String db) throws IOException {
-    final Query q = session().query(_DB_LIST.args() + "[. = $db]");
+    final Query q = session().query(ext("db") + _DB_LIST.args() + "[. = $db]");
     q.bind("db", db);
     return !q.execute().isEmpty();
   }
@@ -113,9 +114,9 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public long timestamp(final String db) throws IOException {
-    final Query q = session().query(DATA.args(_DB_INFO.args("$p") +
+    final Query q = session().query(ext("path") + DATA.args(_DB_INFO.args("$path") +
         "/descendant::" + FNDb.toName(Text.TIMESTAMP) + "[1]"));
-    q.bind("p", db);
+    q.bind("path", db);
     try {
       // retrieve and parse timestamp
       return DateTime.parse(q.execute(), DateTime.DATETIME).getTime();
@@ -134,15 +135,16 @@ public final class WebDAVService<T> {
    */
   ResourceMetaData metaData(final String db, final String path) throws IOException {
     final Query q = session().query(
-        "let $a := " + _DB_LIST_DETAILS.args("$d", "$p") +
+        ext("db") + ext("path") +
+        "let $a := " + _DB_LIST_DETAILS.args("$db", "$path") +
         "return (" +
         "$a/@raw/data()," +
         "$a/@content-type/data()," +
         "$a/@modified-date/data()," +
         "$a/@size/data()," +
         "$a/text())");
-    q.bind("d", db);
-    q.bind("p", path);
+    q.bind("db", db);
+    q.bind("path", path);
     try {
       final boolean raw = Boolean.parseBoolean(q.next());
       final String ctype = q.next();
@@ -204,6 +206,7 @@ public final class WebDAVService<T> {
       throws IOException {
 
     final Query q = session().query(
+        ext("db") + ext("path") + ext("tdb") + ext("tpath") +
         "declare option db:chop 'false'; " +
         "if(" + _DB_IS_RAW.args("$db", "$path") + ") " +
         " then " + _DB_STORE.args("$tdb", "$tpath", _DB_RETRIEVE.args("$db", "$path")) +
@@ -227,6 +230,7 @@ public final class WebDAVService<T> {
       throws IOException {
 
     final Query q = session().query(
+        ext("db") + ext("path") + ext("tdb") + ext("tpath") +
         "declare option db:chop 'false'; " +
         "for $d in " + _DB_LIST.args("$db", "$path") +
         "let $t := $tpath ||'/'|| substring($d, string-length($path) + 1) return " +
@@ -253,9 +257,11 @@ public final class WebDAVService<T> {
 
     final Session session = session();
     session.setOutputStream(out);
-    final Query q = session.query("declare option output:" + (raw ?
-      "method 'raw'; " + _DB_RETRIEVE.args("$db", "$path") :
-      "use-character-maps 'webdav'; " + _DB_OPEN.args("$db", "$path")));
+    final Query q = session.query(
+        ext("db") + ext("path") +
+        "declare option output:" + (raw ?
+        "method 'raw'; " + _DB_RETRIEVE.args("$db", "$path") :
+        "use-character-maps 'webdav'; " + _DB_OPEN.args("$db", "$path")));
     q.bind("db", db);
     q.bind("path", path);
     q.execute();
@@ -312,14 +318,15 @@ public final class WebDAVService<T> {
     final List<T> ch = new ArrayList<T>();
     final HashSet<String> paths = new HashSet<String>();
     final Query q = session().query(
-        "for $a in " + _DB_LIST_DETAILS.args("$d", "$p") +
-        "return ($a/@raw/data()," +
-        "$a/@content-type/data()," +
-        "$a/@modified-date/data()," +
-        "$a/@size/data()," +
-        SUBSTRING_AFTER.args("$a/text()", "$p") + ')');
-    q.bind("d", db);
-    q.bind("p", path);
+        ext("db") + ext("path") +
+        _DB_LIST_DETAILS.args("$db", "$path") + " ! (" +
+        "@raw/data()," +
+        "@content-type/data()," +
+        "@modified-date/data()," +
+        "@size/data()," +
+        SUBSTRING_AFTER.args("text()", "$path") + ')');
+    q.bind("db", db);
+    q.bind("path", path);
     while(q.more()) {
       final boolean raw = Boolean.parseBoolean(q.next());
       final String ctype = q.next();
@@ -350,9 +357,8 @@ public final class WebDAVService<T> {
   public List<T> listDbs() throws IOException {
     final List<T> dbs = new ArrayList<T>();
     final Query q = session().query(
-        "for $d in " + _DB_LIST_DETAILS.args() +
-        "where not($d/text() eq '" + WEBDAV_LOCKS_DB + "') " +
-        "return ($d/text(), $d/@modified-date/data())");
+        _DB_LIST_DETAILS.args() + "[. != '" + WEBDAV_DB + "'] ! " +
+        "(text(), @modified-date/data())");
     try {
       while(q.more()) {
         final String name = q.next();
@@ -441,9 +447,10 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   private boolean pathExists(final String db, final String path) throws IOException {
-    final Query q = session().query(EXISTS.args(_DB_LIST.args("$d", "$p")));
-    q.bind("d", db);
-    q.bind("p", path);
+    final Query q = session().query(
+        ext("db") + ext("path") + EXISTS.args(_DB_LIST.args("$db", "$path")));
+    q.bind("db", db);
+    q.bind("path", path);
     return q.execute().equals(Text.TRUE);
   }
 
@@ -455,9 +462,10 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   private boolean exists(final String db, final String path) throws IOException {
-    final Query q = session().query(_DB_EXISTS.args("$d", "$p"));
-    q.bind("d", db);
-    q.bind("p", path);
+    final Query q = session().query(
+        ext("db") + ext("path") + _DB_EXISTS.args("$db", "$path"));
+    q.bind("db", db);
+    q.bind("path", path);
     return q.execute().equals(Text.TRUE);
   }
 
@@ -559,5 +567,14 @@ public final class WebDAVService<T> {
     final Session session = session();
     session.execute(new Open(db));
     session.store(path + SEP + DUMMY, new ArrayInput(Token.EMPTY));
+  }
+
+  /**
+   * Returns a string with an external variable declaration.
+   * @param name name of the variable
+   * @return string
+   */
+  private String ext(final String name) {
+    return "declare variable $" + name + " external;";
   }
 }
