@@ -22,9 +22,9 @@ public final class RESTParallelPutTest extends HTTPTest {
   /** Root path. */
   private static final String ROOT = "http://" + Text.S_LOCALHOST + ":9998/" + REST + '/';
   /** Client count. */
-  private static final int CLIENTS = 2;
+  private static final int CLIENTS = 10;
   /** Runs per client. */
-  private static final int RUNS = 1;
+  private static final int RUNS = 10;
   /** Failed string. */
   private static String failed;
 
@@ -45,7 +45,6 @@ public final class RESTParallelPutTest extends HTTPTest {
    * Concurrency test.
    * @throws Exception exception
    */
-  @Ignore("GH-666")
   @Test
   public void test() throws Exception {
     put(NAME, new ArrayInput(""));

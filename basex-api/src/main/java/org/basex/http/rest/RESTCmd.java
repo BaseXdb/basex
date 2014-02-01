@@ -46,6 +46,16 @@ public abstract class RESTCmd extends Command {
   @Override
   public void databases(final LockResult lr) {
     for(final Command c : cmds) c.databases(lr);
+
+    // lock globally if context-dependent is found (context will be changed by commands)
+    final boolean wc = lr.write.contains(DBLocking.CTX) || lr.write.contains(DBLocking.COLL);
+    final boolean rc = lr.read.contains(DBLocking.CTX) || lr.read.contains(DBLocking.COLL);
+    if(wc || rc && !lr.write.isEmpty()) {
+      lr.writeAll = true;
+      lr.readAll = true;
+    } else if(rc) {
+      lr.readAll = true;
+    }
   }
 
   @Override
