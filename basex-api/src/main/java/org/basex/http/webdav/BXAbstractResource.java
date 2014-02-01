@@ -25,8 +25,9 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public abstract class BXAbstractResource implements
-    CopyableResource, DeletableResource, MoveableResource, LockableResource {
+public abstract class BXAbstractResource implements CopyableResource, DeletableResource,
+    MoveableResource, LockableResource {
+
   /** Resource meta data. */
   final ResourceMetaData meta;
   /** WebDAV service implementation. */
@@ -37,8 +38,7 @@ public abstract class BXAbstractResource implements
    * @param m resource meta data
    * @param s service
    */
-  BXAbstractResource(final ResourceMetaData m,
-                     final WebDAVService<BXAbstractResource> s) {
+  BXAbstractResource(final ResourceMetaData m, final WebDAVService<BXAbstractResource> s) {
     meta = m;
     service = s;
   }
@@ -243,7 +243,7 @@ public abstract class BXAbstractResource implements
    * @param n new name of the folder
    * @throws IOException I/O exception
    */
-  void moveTo(final BXFolder f, final String n) throws IOException {
+  final void moveTo(final BXFolder f, final String n) throws IOException {
     if(f.meta.db.equals(meta.db)) {
       // folder is moved to a folder in the same database
       rename(f.meta.path + SEP + n);
@@ -261,7 +261,7 @@ public abstract class BXAbstractResource implements
    * @return lock result
    * @throws IOException I/O exception
    */
-  LockResult lockResource(final LockTimeout timeout, final LockInfo lockInfo)
+  final LockResult lockResource(final LockTimeout timeout, final LockInfo lockInfo)
       throws IOException {
 
     final String tokenId = service.locking.lock(meta.db, meta.path,
@@ -280,7 +280,7 @@ public abstract class BXAbstractResource implements
    * @return the token of the active lock or {@code null} if resource is not locked
    * @throws IOException I/O exception
    */
-  LockToken getCurrentActiveLock() throws IOException {
+  final LockToken getCurrentActiveLock() throws IOException {
     final String lockInfoStr = service.locking.lock(meta.db, meta.path);
     return lockInfoStr == null ? null : parseLockInfo(lockInfoStr);
   }
@@ -291,7 +291,7 @@ public abstract class BXAbstractResource implements
    * @return lock result
    * @throws IOException I/O exception
    */
-  LockResult refresh(final String token) throws IOException {
+  final LockResult refresh(final String token) throws IOException {
     service.locking.refreshLock(token);
     final String lockInfoStr = service.locking.lock(token);
     final LockToken lockToken = lockInfoStr == null ? null : parseLockInfo(lockInfoStr);

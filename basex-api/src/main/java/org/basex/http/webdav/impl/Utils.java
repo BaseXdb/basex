@@ -7,6 +7,7 @@ import org.basex.io.in.*;
 
 /**
  * WebDAV utility methods.
+ *
  * @author BaseX Team 2005-13, BSD License
  * @author Dimitar Popov
  */

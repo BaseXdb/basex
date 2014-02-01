@@ -15,13 +15,14 @@ import com.bradmcevoy.http.*;
 public final class WebDAVServlet extends BaseXServlet {
   @Override
   protected void run(final HTTPContext http) throws IOException {
-    final HttpManager manager = new HttpManager(new BXResourceFactory(http));
+    final BXResourceFactory resources = new BXResourceFactory(http);
+    final HttpManager manager = new HttpManager(resources);
     final Request request = new BXServletRequest(http.req);
     final Response response = new BXServletResponse(http.res);
-
     try {
       manager.process(request, response);
     } finally {
+      resources.close();
       http.res.getOutputStream().flush();
       http.res.flushBuffer();
     }

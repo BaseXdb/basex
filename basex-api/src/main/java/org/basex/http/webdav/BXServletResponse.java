@@ -9,12 +9,10 @@ import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.Cookie;
 
 /**
- * Wrapper around {@link HttpServletResponse}, which in addition implements
- * {@link Response}. <br/>
- * This implementation is the same as the implementation of
- * {@code ServletResponse} found in {@code milton-servlet}. Since this is one of
- * the few classes which is needed from that library, the source was integrated
- * into BaseX.
+ * Wrapper around {@link HttpServletResponse}, which in addition implements {@link Response}.<br/>
+ * This implementation is the same as the implementation of {@code ServletResponse} found in
+ * {@code milton-servlet}. Since this is one of the few classes which is needed from that library,
+ * the source was integrated into BaseX.
  *
  * @author Milton Development Team
  * @author BaseX Team 2005-13, BSD License

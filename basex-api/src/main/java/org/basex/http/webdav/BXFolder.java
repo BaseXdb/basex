@@ -22,6 +22,7 @@ import com.bradmcevoy.http.exceptions.*;
  */
 public class BXFolder extends BXAbstractResource implements FolderResource,
     DeletableCollectionResource, LockingCollectionResource {
+
   /**
    * Constructor.
    * @param d resource meta data
@@ -32,32 +33,32 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   }
 
   @Override
-  public Long getContentLength() {
+  public final Long getContentLength() {
     return null;
   }
 
   @Override
-  public String getContentType(final String accepts) {
+  public final String getContentType(final String accepts) {
     return null;
   }
 
   @Override
-  public Date getCreateDate() {
+  public final Date getCreateDate() {
     return null;
   }
 
   @Override
-  public Long getMaxAgeSeconds(final Auth auth) {
+  public final Long getMaxAgeSeconds(final Auth auth) {
     return null;
   }
 
   @Override
-  public void sendContent(final OutputStream out, final Range range,
+  public final void sendContent(final OutputStream out, final Range range,
       final Map<String, String> params, final String contentType) {
   }
 
   @Override
-  public boolean isLockedOutRecursive(final Request request) {
+  public final boolean isLockedOutRecursive(final Request request) {
     return new BXCode<Boolean>(this) {
       @Override
       public Boolean get() throws IOException {
@@ -108,7 +109,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   }
 
   @Override
-  public LockToken createAndLock(final String name, final LockTimeout timeout,
+  public final LockToken createAndLock(final String name, final LockTimeout timeout,
       final LockInfo lockInfo) throws NotAuthorizedException {
     try {
       final BXAbstractResource r = createNew(name, new ArrayInput(Token.EMPTY), 0L, null);
@@ -129,7 +130,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   }
 
   @Override
-  protected void copyTo(final BXFolder folder, final String name) throws IOException {
+  protected final void copyTo(final BXFolder folder, final String name) throws IOException {
     // folder is copied to a folder in a database
     service.copyAll(meta.db, meta.path, folder.meta.db, folder.meta.path + SEP + name);
     service.deleteDummy(folder.meta.db, folder.meta.path);

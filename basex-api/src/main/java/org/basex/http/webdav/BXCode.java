@@ -8,8 +8,8 @@ import com.bradmcevoy.http.exceptions.*;
 
 /**
  * Code container.
- * @param <E> return type
  *
+ * @param <E> return type
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
