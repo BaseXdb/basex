@@ -93,7 +93,7 @@ public abstract class Step extends Preds {
     if(!has(Flag.FCS)) return new IterStep(info, axis, test, preds);
 
     // use iterator for simple numeric predicate
-    return this instanceof IterPosStep || !useIterator() ? this : new IterPosStep(this);
+    return this instanceof IterPosStep || !posIterator() ? this : new IterPosStep(this);
   }
 
   @Override

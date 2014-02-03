@@ -100,24 +100,21 @@ public abstract class Preds extends ParseExpr {
   }
 
   /**
-   * Checks if this expression can be evaluated in an iterative manner.
-   * This is possible if no predicate, or only the first, is positional, or
-   * if a single {@code last()} predicate is specified.
+   * Prepares this expression for iterative evaluation. The expression can be iteratively
+   * evaluated if no predicate or only the first is positional.
    * @return result of check
    */
-  protected boolean useIterator() {
-    // numeric predicate
-    pos = preds[0] instanceof Pos ? (Pos) preds[0] : null;
-    last = preds[0].isFunction(Function.LAST);
-
-    boolean np1 = true;
-    boolean np2 = true;
-    for(int p = 0; p < preds.length; p++) {
-      final boolean np = !preds[p].type().mayBeNumber() && !preds[p].has(Flag.FCS);
-      np1 &= np;
-      if(p > 0) np2 &= np;
+  protected final boolean posIterator() {
+    // check if first predicate is numeric
+    if(preds.length == 1) {
+      if(preds[0] instanceof Int) {
+        final long p = ((Int) preds[0]).itr();
+        preds[0] = Pos.get(p, p, info);
+      }
+      pos = preds[0] instanceof Pos ? (Pos) preds[0] : null;
+      last = preds[0].isFunction(Function.LAST);
     }
-    return np1 || pos != null && np2 || last && preds.length == 1;
+    return pos != null || last;
   }
 
   /**
@@ -127,7 +124,7 @@ public abstract class Preds extends ParseExpr {
    * @return result of check
    * @throws QueryException query exception
    */
-  protected boolean preds(final Item it, final QueryContext ctx) throws QueryException {
+  protected final boolean preds(final Item it, final QueryContext ctx) throws QueryException {
     if(preds.length == 0) return true;
 
     // set context item and position
@@ -167,8 +164,8 @@ public abstract class Preds extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
     return inlineAll(ctx, scp, preds, v, e) ? optimize(ctx, scp) : null;
   }
 
@@ -190,7 +187,7 @@ public abstract class Preds extends ParseExpr {
    * @param p copy
    * @return the copy
    */
-  protected <T extends Preds> T copy(final T p) {
+  protected final <T extends Preds> T copy(final T p) {
     p.last = last;
     p.pos = pos;
     return copyType(p);

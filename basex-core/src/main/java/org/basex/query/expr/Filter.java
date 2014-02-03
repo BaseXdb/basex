@@ -5,6 +5,7 @@ import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
@@ -58,8 +59,7 @@ public abstract class Filter extends Preds {
       if(root.isEmpty()) return optPre(null, ctx);
       // convert filters without numeric predicates to axis paths
       if(root instanceof AxisPath && !super.has(Flag.FCS))
-        return ((Path) root.copy(ctx,
-          scp)).addPreds(ctx, scp, preds).compile(ctx, scp);
+        return ((Path) root.copy(ctx, scp)).addPreds(ctx, scp, preds).compile(ctx, scp);
 
       // optimize filter expressions
       ctx.value = null;
@@ -93,16 +93,21 @@ public abstract class Filter extends Preds {
         size = s > 0 ? 1 : 0;
       }
       // no results will remain: return empty sequence
-      if (size == 0) return optPre(null, ctx);
+      if(size == 0) return optPre(null, ctx);
       type = SeqType.get(t.type, size);
     }
 
     // no numeric predicates.. use simple iterator
     if(!super.has(Flag.FCS)) return new IterFilter(this);
 
-    // one single position() or last() function specified: return single value
-    if(preds.length == 1 && (last || pos != null) && root.isValue() && t.one() &&
-        (last || pos.min == 1 && pos.max == 1)) return optPre(root, ctx);
+    // pre-evaluate if root is value and if one single position() or last() function is specified
+    final boolean iter = posIterator();
+    if(preds.length == 1 && (last || pos != null) && root.isValue()) {
+      final Value v = (Value) root;
+      final long from = last ? v.size() - 1 : pos.min - 1;
+      final long len = last ? 1 : pos.max - from;
+      return optPre(SubSeq.get(v, from, len), ctx);
+    }
 
     // only choose deterministic and context-independent offsets; e.g., skip:
     // (1 to 10)[random:integer(10)]  or  (1 to 10)[.]
@@ -115,7 +120,7 @@ public abstract class Filter extends Preds {
     }
 
     // iterator for simple numeric predicate
-    return off || useIterator() ? new IterPosFilter(this, off) : this;
+    return off || iter ? new IterPosFilter(this, off) : this;
   }
 
   /**

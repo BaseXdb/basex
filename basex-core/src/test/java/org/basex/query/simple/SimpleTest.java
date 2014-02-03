@@ -86,6 +86,8 @@ public final class SimpleTest extends QueryTest {
       { "Filter 3", str("b"), "name(<x><a/><b c='d'/></x>/(a,b)[@c])" },
       { "Filter 4", str("b"), "name(<x><a/><b/></x>/(b,a)[self::b])" },
       { "Filter 5", empty(), "<x><a><b c='d'/></a></x>/(a,b)[@c]" },
+      { "Filter 6", bool(true), "empty((1,2,3)[3][2])" },
+      { "Filter 7", bool(true), "empty((1,2,3)[position() = 3][2])" },
 
       { "ContextItem 0", node(0), "." },
       { "ContextItem 1", node(0), "42[not(.)], ." },
