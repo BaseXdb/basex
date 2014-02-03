@@ -728,6 +728,7 @@ public final class TextEditor {
    */
   void deletePrev() {
     if(!selected()) {
+      if(pos == 0) return;
       startSelect();
       final int curr = curr(), prev = prev();
       endSelection();
@@ -751,9 +752,8 @@ public final class TextEditor {
    * Assumes that the current position allows a deletion.
    */
   void delete() {
-    final int tl = size();
     if(!selected()) {
-      if(pos == tl) return;
+      if(pos == size()) return;
       start = pos;
       end = pos + cl(text, pos);
     }
