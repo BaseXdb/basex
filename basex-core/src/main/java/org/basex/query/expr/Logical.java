@@ -2,9 +2,11 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -16,6 +18,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Logical extends Arr {
+  /** Tail-call flag. */
+  boolean tailCall;
+
   /**
    * Constructor.
    * @param ii input info
@@ -45,6 +50,26 @@ public abstract class Logical extends Arr {
     if(el.isEmpty()) return Bln.get(and);
     expr = el.finish();
     return this;
+  }
+
+  @Override
+  public final void markTailCalls(final QueryContext ctx) {
+    // if the last expression surely returns a boolean, we can jump to it
+    final Expr last = expr[expr.length - 1];
+    if(last.type().eq(SeqType.BLN)) {
+      tailCall = true;
+      last.markTailCalls(ctx);
+    }
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    final FElem el = planElem();
+    if(tailCall) el.add(planAttr(TCL, tailCall));
+    plan.add(el);
+    for(final ExprInfo e : expr) {
+      if(e != null) e.plan(el);
+    }
   }
 
   /**

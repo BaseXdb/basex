@@ -260,7 +260,6 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
   @Override
   public FuncItem item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final FuncType ft = (FuncType) type().type;
-    final boolean c = ret != null && !expr.type().instanceOf(ret);
 
     final Expr body;
     if(!scope.closure().isEmpty()) {
@@ -273,7 +272,9 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
       body = expr;
     }
 
-    return new FuncItem(sc, ann, null, args, ft, body, c, scope.stackSize());
+    final Expr checked = ret == null ? body :
+      new TypeCheck(sc, info, body, ret, true).optimize(ctx, scope);
+    return new FuncItem(sc, ann, null, args, ft, checked, scope.stackSize());
   }
 
   @Override

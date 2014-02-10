@@ -5,6 +5,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -43,6 +44,12 @@ public abstract class FuncCall extends Arr {
   abstract Value[] evalArgs(final QueryContext ctx) throws QueryException;
 
   @Override
+  public final void markTailCalls(final QueryContext ctx) {
+    if (ctx != null) ctx.compInfo(QueryText.OPTTCE, this);
+    tailCall = true;
+  }
+
+  @Override
   public final Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return (Item) invoke(evalFunc(ctx), evalArgs(ctx), true, tailCall, ctx, info);
   }
@@ -57,54 +64,48 @@ public abstract class FuncCall extends Arr {
     return value(ctx).iter();
   }
 
-  @Override
-  public final void markTailCalls(final QueryContext ctx) {
-    if (ctx != null) ctx.compInfo(QueryText.OPTTCE, this);
-    tailCall = true;
-  }
-
   /**
    * Calls the given function with the given arguments and takes care of tail-calls.
    * @param fun function to call
    * @param arg arguments for the call
    * @param ctx query context
    * @param itm flag for requesting a single item
-   * @param tc flag for a tail call
+   * @param tail tail-call flag
    * @param ii input info
    * @return result of the function call
    * @throws QueryException query exception
    */
   private static Value invoke(final XQFunction fun, final Value[] arg, final boolean itm,
-      final boolean tc, final QueryContext ctx, final InputInfo ii) throws QueryException {
-
+      final boolean tail, final QueryContext ctx, final InputInfo ii) throws QueryException {
     final int calls = ctx.tailCalls, max = ctx.maxCalls;
-    if(tc && max >= 0 && ++ctx.tailCalls >= max) {
-      // there are at least `ctx.maxCalls` tail-calls on the stack, eliminate them
-      throw new Continuation(fun, arg);
-    }
-
-    try {
-      // tail-calls are evaluated immediately
-      if(tc) return itm ? fun.invItem(ctx, ii, arg)
-                        : fun.invValue(ctx, ii, arg);
-
-      // non-tail-calls have to catch the continuations and resume from there
+    if(!tail) {
       XQFunction func = fun;
       Value[] args = arg;
-      while(true) {
-        try {
-          return itm ? func.invItem(ctx, ii, args) : func.invValue(ctx, ii, args);
-        } catch (final Continuation c) {
-          func = c.func;
-          args = c.args;
-          ctx.tailCalls = calls;
+      final int fp = ctx.stack.enterFrame(func.stackFrameSize());
+      try {
+        while(true) {
+          final Value ret = itm ? func.invItem(ctx, ii, args) : func.invValue(ctx, ii, args);
+          func = ctx.pollTailCall();
+          if(func == null) return ret;
+          ctx.stack.reuseFrame(func.stackFrameSize());
+          args = ctx.pollTailArgs();
         }
+      } finally {
+        ctx.stack.exitFrame(fp);
       }
-    } catch(final QueryException ex) {
-      ex.add(ii);
-      throw ex;
-    } finally {
-      ctx.tailCalls = calls;
+    } else if(max >= 0 && ctx.tailCalls >= max) {
+      // there are at least `ctx.maxCalls` tail-calls on the stack, eliminate them
+      ctx.registerTailCall(fun, arg);
+      return itm ? null : Empty.SEQ;
+    } else {
+      ctx.tailCalls++;
+      final int fp = ctx.stack.enterFrame(fun.stackFrameSize());
+      try {
+        return itm ? fun.invItem(ctx, ii, arg) : fun.invValue(ctx, ii, arg);
+      } finally {
+        ctx.tailCalls = calls;
+        ctx.stack.exitFrame(fp);
+      }
     }
   }
 
@@ -136,32 +137,5 @@ public abstract class FuncCall extends Arr {
   public static Value value(final XQFunction fun, final Value[] arg,
       final QueryContext ctx, final InputInfo ii) throws QueryException {
     return invoke(fun, arg, false, false, ctx, ii);
-  }
-
-  /**
-   * A continuation that's thrown to free stack frames.
-   * @author Leo Woerteler
-   */
-  private static final class Continuation extends RuntimeException {
-    /** The function to call. */
-    private final XQFunction func;
-    /** The arguments to call the function with. */
-    private final Value[] args;
-
-    /**
-     * Constructor.
-     * @param fun function to call
-     * @param arg arguments to the function
-     */
-    private Continuation(final XQFunction fun, final Value[] arg) {
-      func = fun;
-      args = arg;
-    }
-
-    @Override
-    public synchronized Continuation fillInStackTrace() {
-      // ignore this for efficiency reasons
-      return this;
-    }
   }
 }
