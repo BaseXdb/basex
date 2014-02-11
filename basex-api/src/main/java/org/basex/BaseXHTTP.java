@@ -368,8 +368,7 @@ public final class BaseXHTTP {
   private static boolean ping(final String host, final int port, final boolean ssl) {
     try {
       // create connection
-      final URL url = new URL((ssl ? "https://" : "http://") + host + ':' + port);
-      url.openConnection().getInputStream();
+      new URL((ssl ? "https://" : "http://") + host + ':' + port).openConnection().getInputStream();
       return true;
     } catch(final IOException ex) {
       // if page is not found, server is running

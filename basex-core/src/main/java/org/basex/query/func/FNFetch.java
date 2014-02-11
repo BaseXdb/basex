@@ -3,7 +3,6 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 
 import java.io.*;
-import java.net.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
@@ -76,9 +75,7 @@ public final class FNFetch extends StandardFunc {
     final String mt;
     if(io instanceof IOUrl) {
       try {
-        final URL url = new URL(path);
-        final URLConnection hc = url.openConnection();
-        mt = hc.getContentType();
+        mt = ((IOUrl) io).connection().getContentType();
       } catch(final IOException ex) {
         throw BXFE_IO.get(info, ex);
       }

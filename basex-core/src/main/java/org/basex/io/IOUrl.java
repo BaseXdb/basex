@@ -49,15 +49,9 @@ public final class IOUrl extends IO {
 
   @Override
   public InputStream inputStream() throws IOException {
-    final URL url = new URL(path);
-
     URLConnection conn = null;
     try {
-      conn = url.openConnection();
-      conn.setConnectTimeout(TIMEOUT * 1000);
-      // use basic authentication if credentials are contained in the url
-      final String ui = url.getUserInfo();
-      if(ui != null) conn.setRequestProperty(AUTHORIZATION, "Basic " + Base64.encode(ui));
+      conn = connection();
       return conn.getInputStream();
     } catch(final IOException ex) {
       final TokenBuilder msg = new TokenBuilder(Util.message(ex));
@@ -77,6 +71,21 @@ public final class IOUrl extends IO {
       Util.debug(ex);
       throw new BaseXException(NOT_PARSED_X, path);
     }
+  }
+
+  /**
+   * Returns a connection to the URL.
+   * @return connection
+   * @throws IOException I/O exception
+   */
+  public URLConnection connection() throws IOException {
+    final URL url = new URL(path);
+    final URLConnection conn = url.openConnection();
+    conn.setConnectTimeout(TIMEOUT * 1000);
+    // use basic authentication if credentials are contained in the url
+    final String ui = url.getUserInfo();
+    if(ui != null) conn.setRequestProperty(AUTHORIZATION, "Basic " + Base64.encode(ui));
+    return conn;
   }
 
   @Override

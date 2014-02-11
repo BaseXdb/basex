@@ -93,17 +93,16 @@ public final class HTTPClient {
 
   /**
    * Opens an HTTP connection.
-   * @param dest HTTP URI to open connection to
+   * @param url HTTP URL to open connection to
    * @return HHTP connection
    * @throws QueryException query exception
    * @throws IOException I/O Exception
    * @throws MalformedURLException incorrect url
    */
-  private HttpURLConnection openConnection(final String dest) throws QueryException, IOException {
-    final URL url = new URL(dest);
-    if(!eqic(url.getProtocol(), "HTTP", "HTTPS"))
-      throw HC_ERROR.get(info, "Invalid URL: " + url);
-    return (HttpURLConnection) url.openConnection();
+  private HttpURLConnection openConnection(final String url) throws QueryException, IOException {
+    final URLConnection conn = new IOUrl(url).connection();
+    if(conn instanceof HttpURLConnection) return (HttpURLConnection) conn;
+    throw HC_ERROR.get(info, "Invalid URL: " + url);
   }
 
   /**
