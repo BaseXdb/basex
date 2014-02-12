@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
@@ -15,7 +14,7 @@ import org.basex.util.*;
 /**
  * XQuery 3.0 function data types.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public class FuncType implements Type {
@@ -27,7 +26,7 @@ public class FuncType implements Type {
   /** Argument types. */
   public final SeqType[] args;
   /** Return type. */
-  public final SeqType type;
+  public final SeqType ret;
 
   /** This function type's sequence type. */
   private SeqType seq;
@@ -41,7 +40,7 @@ public class FuncType implements Type {
   FuncType(final Ann a, final SeqType[] arg, final SeqType typ) {
     ann = a != null ? a : new Ann();
     args = arg;
-    type = typ;
+    ret = typ;
   }
 
   @Override
@@ -81,23 +80,24 @@ public class FuncType implements Type {
   }
 
   @Override
-  public FItem cast(final Item it, final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public FItem cast(final Item it, final QueryContext ctx, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
 
-    if(!(it instanceof FItem)) throw Err.cast(ii, this, it);
+    if(!(it instanceof FItem)) throw Err.castError(ii, this, it);
     final FItem f = (FItem) it;
-    return this == ANY_FUN ? f : f.coerceTo(this, ctx, ii);
+    return this == ANY_FUN ? f : f.coerceTo(this, ctx, ii, false);
   }
 
   @Override
-  public final Item cast(final Object o, final QueryContext ctx, final InputInfo ii) {
-    throw Util.notexpected(o);
+  public final Item cast(final Object o, final QueryContext ctx, final StaticContext sc,
+      final InputInfo ii) {
+    throw Util.notExpected(o);
   }
 
   @Override
   public final Item castString(final String s, final QueryContext ctx,
-      final InputInfo ii) {
-    throw Util.notexpected(s);
+      final StaticContext sc, final InputInfo ii) {
+    throw Util.notExpected(s);
   }
 
   @Override
@@ -114,7 +114,7 @@ public class FuncType implements Type {
 
     if(this == ANY_FUN || ft == ANY_FUN || args.length != ft.args.length) return false;
     for(int i = 0; i < args.length; i++) if(!args[i].eq(ft.args[i])) return false;
-    return type.eq(ft.type);
+    return ret.eq(ft.ret);
   }
 
   @Override
@@ -131,7 +131,7 @@ public class FuncType implements Type {
     // takes care of FunType.ANY
     if(this == ft || ft == ANY_FUN) return true;
     if(this == ANY_FUN || args.length != ft.args.length ||
-        !type.instanceOf(ft.type)) return false;
+        !ret.instanceOf(ft.ret)) return false;
     for(int a = 0; a < args.length; a++) {
       if(!ft.args[a].instanceOf(args[a])) return false;
     }
@@ -148,7 +148,7 @@ public class FuncType implements Type {
       arg[i] = args[i].intersect(ft.args[i]);
       if(arg[i] == null) return ANY_FUN;
     }
-    return get(ann.intersect(ft.ann), type.union(ft.type), arg);
+    return get(ann.intersect(ft.ann), ret.union(ft.ret), arg);
   }
 
   @Override
@@ -163,7 +163,7 @@ public class FuncType implements Type {
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
       // ANY_FUN is excluded by the easy cases
-      final SeqType rt = type.intersect(ft.type);
+      final SeqType rt = ret.intersect(ft.ret);
       if(rt != null && args.length == ft.args.length) {
         final SeqType[] arg = new SeqType[args.length];
         for(int i = 0; i < arg.length; i++) arg[i] = args[i].union(ft.args[i]);
@@ -203,7 +203,7 @@ public class FuncType implements Type {
   public static Type find(final QNm type) {
     if(type.uri().length == 0) {
       final byte[] ln = type.local();
-      if(Token.eq(ln, token(FUNCTION))) return FuncType.ANY_FUN;
+      if(Token.eq(ln, token(FUNCTION))) return ANY_FUN;
       if(Token.eq(ln, MAP)) return SeqType.ANY_MAP;
     }
     return null;
@@ -234,23 +234,6 @@ public class FuncType implements Type {
     return new FuncType(an, at, ret == null ? SeqType.ITEM_ZM : ret);
   }
 
-  /**
-   * Creates variables with types corresponding to this type's arguments.
-   * @param vs array in which to write the variables
-   * @param ctx query context
-   * @param scp variable scope
-   * @param ii input info
-   * @return calls to the variables
-   */
-  public Expr[] args(final Var[] vs, final QueryContext ctx, final VarScope scp,
-      final InputInfo ii) {
-
-    final Expr[] refs = new Expr[vs.length];
-    for(int i = 0; i < vs.length; i++)
-      refs[i] = new VarRef(ii, vs[i] = scp.uniqueVar(ctx, args[i], true));
-    return refs;
-  }
-
   @Override
   public ID id() {
     return Type.ID.FUN;
@@ -262,7 +245,7 @@ public class FuncType implements Type {
     if(this == ANY_FUN) {
       tb.add('*').add(')');
     } else {
-      tb.addSep(args, ", ").add(") as ").add(type.toString());
+      tb.addSep(args, ", ").add(") as ").add(ret.toString());
     }
     return tb.toString();
   }

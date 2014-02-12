@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * Dialog with a single text field.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DialogInput extends BaseXDialog {
@@ -63,7 +63,7 @@ public final class DialogInput extends BaseXDialog {
     p.add(info, BorderLayout.CENTER);
     set(p, BorderLayout.CENTER);
 
-    buttons = newButtons(B_OK, B_CANCEL);
+    buttons = newButtons(B_OK, CANCEL);
     set(buttons, BorderLayout.SOUTH);
     action(null);
     finish(null);
@@ -80,8 +80,8 @@ public final class DialogInput extends BaseXDialog {
   @Override
   public void action(final Object cmp) {
     final String in = input();
-    String msg = null;
     ok = type != 0 && (db.contains(in) || in.equals(old));
+    String msg = null;
     if(ok) msg = Util.info(DB_EXISTS_X, in);
     if(!ok) {
       ok = type == 0 ? MetaData.normPath(in) != null : Databases.validName(in);

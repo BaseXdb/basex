@@ -6,7 +6,7 @@ import org.basex.index.query.*;
  * This interface defines the methods which have to be implemented
  * by an index structure.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public interface Index {
@@ -36,11 +36,12 @@ public interface Index {
   IndexIterator iter(final IndexToken token);
 
   /**
-   * Returns the (approximate/estimated) number of hits for the specified token.
+   * Returns a cost estimation for searching the specified token.
+   * Smaller values are better, a value of zero indicates that no results will be returned.
    * @param token token to be found
-   * @return number of hits
+   * @return cost estimation
    */
-  int count(final IndexToken token);
+  int costs(final IndexToken token);
 
   /**
    * Closes the index.

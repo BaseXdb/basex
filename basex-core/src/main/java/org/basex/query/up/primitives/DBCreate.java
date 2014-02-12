@@ -13,12 +13,12 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
+import org.basex.util.options.*;
 
 /**
  * Update primitive for the {@link Function#_DB_CREATE} function.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class DBCreate extends DBNew {
@@ -30,17 +30,17 @@ public final class DBCreate extends DBNew {
    * @param ii input info
    * @param nm name for created database
    * @param in input (ANode and QueryInput references)
-   * @param map index options
+   * @param opts database options
    * @param c query context
    * @throws QueryException query exception
    */
   public DBCreate(final InputInfo ii, final String nm, final List<NewInput> in,
-      final TokenMap map, final QueryContext c) throws QueryException {
+      final Options opts, final QueryContext c) throws QueryException {
 
     super(TYPE.DBCREATE, null, c, ii);
     inputs = in;
     name = nm;
-    options = map;
+    options = opts.free();
     check(true);
   }
 
@@ -51,12 +51,12 @@ public final class DBCreate extends DBNew {
 
   @Override
   public void merge(final BasicOperation o) throws QueryException {
-    BXDB_CREATE.thrw(info, ((DBCreate) o).name);
+    throw BXDB_CREATE.get(info, ((DBCreate) o).name);
   }
 
   @Override
   public void prepare(final MemData tmp) throws QueryException {
-    if(inputs != null && !inputs.isEmpty()) addDocs(new MemData(qc.context.prop), name);
+    if(inputs != null && !inputs.isEmpty()) addDocs(new MemData(qc.context.options), name);
   }
 
   @Override
@@ -64,14 +64,14 @@ public final class DBCreate extends DBNew {
     // remove data instance from list of opened resources
     qc.resource.removeData(name);
     // check if addressed database is still pinned by any other process
-    if(qc.context.pinned(name)) BXDB_OPENED.thrw(info, name);
+    if(qc.context.pinned(name)) throw BXDB_OPENED.get(info, name);
 
     initOptions();
     assignOptions();
     try {
-      data = CreateDB.create(name, Parser.emptyParser(qc.context.prop), qc.context);
+      data = CreateDB.create(name, Parser.emptyParser(qc.context.options), qc.context);
     } catch(final IOException ex) {
-      UPDBOPTERR.thrw(info, ex);
+      throw UPDBOPTERR.get(info, ex);
     } finally {
       resetOptions();
     }
@@ -79,13 +79,13 @@ public final class DBCreate extends DBNew {
 
     // add initial documents
     if(md != null) {
-      if(!data.startUpdate()) BXDB_OPENED.thrw(null, data.meta.name);
+      if(!data.startUpdate()) throw BXDB_OPENED.get(null, data.meta.name);
       data.insert(data.meta.size, -1, new DataClip(md));
       try {
         Optimize.optimize(data, false, null);
       } catch(final IOException ex) {
         data.finishUpdate();
-        UPDBOPTERR.thrw(info, ex);
+        throw UPDBOPTERR.get(info, ex);
       }
     }
   }
@@ -97,6 +97,6 @@ public final class DBCreate extends DBNew {
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + inputs + ']';
+    return Util.className(this) + '[' + inputs + ']';
   }
 }

@@ -12,7 +12,7 @@ import org.basex.util.*;
  * This interface defines the functions which are needed for building
  * new index structures.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class IndexBuilder extends Proc {
@@ -21,7 +21,7 @@ public abstract class IndexBuilder extends Proc {
   /** Total parsing value. */
   protected final int size;
   /** Number of index operations to perform before writing a partial index to disk. */
-  protected final int splitSize;
+  private final int splitSize;
 
   /** Runtime for memory consumption. */
   private final Runtime rt = Runtime.getRuntime();
@@ -95,9 +95,9 @@ public abstract class IndexBuilder extends Proc {
     if(!Prop.debug) return;
 
     final StringBuilder sb = new StringBuilder();
-    if(splits > 1) sb.append(" " + splits + " splits,");
-    sb.append(" " + count + " operations, ");
-    sb.append(perf + " (" + Performance.getMemory() + ')');
+    if(splits > 1) sb.append(' ').append(splits).append(" splits,");
+    sb.append(' ').append(count).append(" operations, ");
+    sb.append(perf).append(" (").append(Performance.getMemory()).append(')');
     Util.errln(sb);
   }
 

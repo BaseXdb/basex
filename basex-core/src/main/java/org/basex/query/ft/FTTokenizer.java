@@ -4,6 +4,7 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -14,36 +15,43 @@ import org.basex.util.list.*;
 /**
  * This class performs the full-text tokenization.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class FTTokenizer {
-  /** Wildcard object cache. */
-  final TokenObjMap<FTWildcard> wcCache = new TokenObjMap<FTWildcard>();
-  /** Levenshtein reference. */
-  final Levenshtein ls = new Levenshtein();
-  /** Calling expression. */
-  final FTWords words;
   /** Full-text options. */
   final FTOpt opt;
-  /** Levenshtein error. */
-  final int lserr;
 
+  /** Wildcard object cache. */
+  private final TokenObjMap<FTWildcard> wcCache = new TokenObjMap<FTWildcard>();
+  /** Token cache. */
+  private final TokenObjMap<FTTokens> cache = new TokenObjMap<FTTokens>();
   /** Token comparator. */
   private final TokenComparator cmp;
-  /** Cache. */
-  private final TokenObjMap<FTTokens> cache = new TokenObjMap<FTTokens>();
+  /** Levenshtein reference. */
+  private final Levenshtein ls;
+  /** Calling expression. */
+  private final FTWords words;
+
+  /**
+   * Constructor.
+   * @param w full-text words
+   * @param ctx query context
+   */
+  FTTokenizer(final FTWords w, final QueryContext ctx) {
+    this(w, ctx.ftOpt(), new Levenshtein(ctx.context.options.get(MainOptions.LSERROR)));
+  }
 
   /**
    * Constructor.
    * @param w full-text words
    * @param o full-text options
-   * @param lsr Levenshtein error
+   * @param l Levenshtein distance calculation
    */
-  public FTTokenizer(final FTWords w, final FTOpt o, final int lsr) {
+  private FTTokenizer(final FTWords w, final FTOpt o, final Levenshtein l) {
     words = w;
     opt = o;
-    lserr = lsr;
+    ls = l;
 
     cmp = new TokenComparator() {
       @Override
@@ -53,7 +61,7 @@ final class FTTokenizer {
           ftw = wcCache.get(qu);
           if(ftw == null) {
             ftw = new FTWildcard(qu);
-            if(!ftw.parse()) FTREG.thrw(words.info, qu);
+            if(!ftw.parse()) throw FTREG.get(words.info, qu);
             wcCache.put(qu, ftw);
           }
         }
@@ -63,7 +71,7 @@ final class FTTokenizer {
           // it is always equal to the corresponding input token:
           opt.sw != null && opt.sw.contains(qu) ||
           // fuzzy search:
-          (opt.is(FZ) ? ls.similar(in, qu, lserr) :
+          (opt.is(FZ) ? ls.similar(in, qu) :
           // wild-card search:
           ftw != null ? ftw.match(in) :
           // simple search:
@@ -82,10 +90,12 @@ final class FTTokenizer {
     final FTOpt to = lex.ftOpt();
     to.set(ST, opt.is(ST));
     to.set(DC, opt.is(DC));
-    to.set(CS, opt.is(CS));
     to.ln = opt.ln;
     to.th = opt.th;
     to.sd = opt.sd;
+    // only change case in insensitive mode
+    to.cs = opt.cs != null && opt.cs != FTCase.INSENSITIVE ? FTCase.SENSITIVE :
+      FTCase.INSENSITIVE;
     return new FTLexer(to).init(lex.text());
   }
 
@@ -139,7 +149,7 @@ final class FTTokenizer {
       ++c;
     }
 
-    words.matches.sTokenNum++;
+    words.matches.pos++;
     words.first = false;
     return c;
   }
@@ -149,7 +159,7 @@ final class FTTokenizer {
    * @param ftw calling expression
    * @return copy
    */
-  protected FTTokenizer copy(final FTWords ftw) {
-    return new FTTokenizer(ftw, opt, lserr);
+  FTTokenizer copy(final FTWords ftw) {
+    return new FTTokenizer(ftw, opt, ls);
   }
 }

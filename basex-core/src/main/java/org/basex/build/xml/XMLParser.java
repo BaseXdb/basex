@@ -14,11 +14,11 @@ import org.basex.util.list.*;
 
 /**
  * This class parses the tokens that are delivered by the {@link XMLScanner} and
- * sends them to the specified database builder. This class offers a more
+ * sends them to the specified database builder. This class is a more
  * tolerant alternative to Java's internal SAX parser, which is used by the
  * {@link SAXWrapper} class.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class XMLParser extends SingleParser {
@@ -40,27 +40,25 @@ public class XMLParser extends SingleParser {
   /**
    * Constructor.
    * @param source document source
-   * @param pr database properties
+   * @param opts database options
    * @throws IOException I/O exception
    */
-  public XMLParser(final IO source, final Prop pr) throws IOException {
-    this(source, pr, false);
+  public XMLParser(final IO source, final MainOptions opts) throws IOException {
+    this(source, opts, false);
   }
 
   /**
    * Constructor.
    * @param source document source
-   * @param pr database properties
+   * @param opts database options
    * @param frag allow parsing of document fragment
    * @throws IOException I/O exception
    */
-  public XMLParser(final IO source, final Prop pr, final boolean frag)
-      throws IOException {
-
-    super(source, pr);
-    scanner = new XMLScanner(source, pr, frag);
-    stripNS = pr.is(Prop.STRIPNS);
-    chop = pr.is(Prop.CHOP);
+  public XMLParser(final IO source, final MainOptions opts, final boolean frag) throws IOException {
+    super(source, opts);
+    scanner = new XMLScanner(source, opts, frag);
+    stripNS = opts.get(MainOptions.STRIPNS);
+    chop = opts.get(MainOptions.CHOP);
     chops.push(chop);
     fragment = frag;
   }

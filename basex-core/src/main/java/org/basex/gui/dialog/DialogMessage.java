@@ -7,19 +7,19 @@ import javax.swing.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.*;
 import org.basex.util.*;
 
 /**
  * Dialog window for messages.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DialogMessage extends BaseXDialog {
   /** Ok/yes button. */
-  final BaseXButton yes;
+  private final BaseXButton yes;
 
   /** This flag indicates if the dialog was canceled. */
   private boolean canceled = true;
@@ -42,7 +42,7 @@ public final class DialogMessage extends BaseXDialog {
     b.setIcon(ic.large);
     back.add(b);
 
-    final Editor text = new Editor(false, this, Token.token(txt));
+    final TextPanel text = new TextPanel(Token.token(txt), false, this);
     text.setFont(b.getFont());
     back.add(text);
 
@@ -55,7 +55,7 @@ public final class DialogMessage extends BaseXDialog {
       if(ic == Msg.QUESTION) {
         buttons = newButtons(yes, no);
       } else {
-        buttons = newButtons(yes, no, new BaseXButton(Text.B_CANCEL, this));
+        buttons = newButtons(yes, no, new BaseXButton(Text.CANCEL, this));
       }
     } else {
       yes = new BaseXButton(Text.B_OK, this);

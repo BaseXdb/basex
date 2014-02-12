@@ -1,11 +1,13 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
 import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
@@ -18,7 +20,7 @@ import org.basex.util.hash.*;
 /**
  * Dynamic function call.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class DynFuncCall extends FuncCall {
@@ -28,23 +30,38 @@ public final class DynFuncCall extends FuncCall {
    * @param fun function expression
    * @param arg arguments
    */
-  public DynFuncCall(final InputInfo ii, final Expr fun, final Expr[] arg) {
+  public DynFuncCall(final InputInfo ii, final Expr fun, final Expr... arg) {
     super(ii, Array.add(arg, fun));
   }
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
+    return optimize(ctx, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     final int ar = expr.length - 1;
     final Expr f = expr[ar];
     final Type t = f.type().type;
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
-      if(ft.args != null && ft.args.length != ar) INVARITY.thrw(info, f, ar);
-      if(ft.type != null) type = ft.type;
+      if(ft.args != null && ft.args.length != ar) throw INVARITY.get(info, f, ar);
+      if(ft.ret != null) type = ft.ret;
     }
-    // maps can only contain fully evaluated Values, so this is safe
-    return allAreValues() && f instanceof Map ? optPre(value(ctx), ctx) : this;
+
+    if(f instanceof XQFunctionExpr) {
+      // maps can only contain fully evaluated Values, so this is safe
+      if(allAreValues() && f instanceof Map) return optPre(value(ctx), ctx);
+
+      // try to inline the function
+      final Expr[] args = Arrays.copyOf(expr, expr.length - 1);
+      final Expr inl = ((XQFunctionExpr) f).inlineExpr(args, ctx, scp, info);
+      if(inl != null) return inl;
+    }
+
+    return this;
   }
 
   @Override
@@ -55,8 +72,13 @@ public final class DynFuncCall extends FuncCall {
   }
 
   @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitor.dynFuncCall(this) && visitAll(visitor, expr);
+  }
+
+  @Override
   public void plan(final FElem plan) {
-    final FElem el = planElem(QueryText.TCL, tailCall);
+    final FElem el = planElem(TCL, tailCall);
     final int es = expr.length;
     addPlan(plan, el, expr[es - 1]);
     for(int e = 0; e < es - 1; e++) expr[e].plan(el);
@@ -82,9 +104,9 @@ public final class DynFuncCall extends FuncCall {
   FItem evalFunc(final QueryContext ctx) throws QueryException {
     final int ar = expr.length - 1;
     final Item it = checkItem(expr[ar], ctx);
-    if(!(it instanceof FItem)) INVCAST.thrw(info, it.type, "function item");
+    if(!(it instanceof FItem)) throw INVFUNCITEM.get(info, it.type);
     final FItem fit = (FItem) it;
-    if(fit.arity() != ar) INVARITY.thrw(info, fit, ar);
+    if(fit.arity() != ar) throw INVARITY.get(info, fit, ar);
     return fit;
   }
 

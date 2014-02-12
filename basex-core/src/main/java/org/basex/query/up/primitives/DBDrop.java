@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Update primitive for the {@link Function#_DB_DROP} function.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class DBDrop extends BasicOperation {
@@ -30,10 +30,10 @@ public final class DBDrop extends BasicOperation {
   }
 
   @Override
-  public void merge(final BasicOperation o) throws QueryException { }
+  public void merge(final BasicOperation o) { }
 
   @Override
-  public void prepare(final MemData tmp) throws QueryException { }
+  public void prepare(final MemData tmp) { }
 
   @Override
   public void apply() throws QueryException {
@@ -45,9 +45,9 @@ public final class DBDrop extends BasicOperation {
     // invalidate data instance to avoid repeated removal of locks
     data = null;
     // check if database is stilled pinned by another process
-    if(ctx.context.pinned(name)) BXDB_OPENED.thrw(info, name);
+    if(ctx.context.pinned(name)) throw BXDB_OPENED.get(info, name);
     // check if database files can be safely removed
-    if(!DropDB.drop(name, ctx.context)) UPDBDROP.thrw(info, name);
+    if(!DropDB.drop(name, ctx.context)) throw UPDBDROP.get(info, name);
   }
 
   @Override

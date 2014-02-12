@@ -13,6 +13,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -20,12 +21,12 @@ import org.basex.util.hash.*;
 /**
  * General FLWOR expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class GFLWOR extends ParseExpr {
   /** Return expression. */
-  Expr ret;
+  private Expr ret;
   /** FLWOR clauses. */
   private final LinkedList<Clause> clauses;
 
@@ -42,7 +43,7 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Iter iter(final QueryContext ctx) {
     // Start evaluator, doing nothing, once.
     Eval e = new Eval() {
       /** First-evaluation flag. */
@@ -106,7 +107,7 @@ public final class GFLWOR extends ParseExpr {
         final Where wh = (Where) c;
         if(wh.pred instanceof And) {
           iter.remove();
-          for(final Expr e : ((And) wh.pred).expr) iter.add(new Where(e, wh.info));
+          for(final Expr e : ((Arr) wh.pred).expr) iter.add(new Where(e, wh.info));
         }
       }
     }
@@ -117,6 +118,9 @@ public final class GFLWOR extends ParseExpr {
       // rewrite singleton for clauses to let
       changed = forToLet(ctx);
 
+      // slide let clauses out to avoid repeated evaluation
+      changed |= slideLetsOut(ctx);
+
       // inline let expressions if they are used only once (and not in a loop)
       changed |= inlineLets(ctx, scp);
 
@@ -125,9 +129,6 @@ public final class GFLWOR extends ParseExpr {
 
       // include the clauses of nested FLWR expressions into this one
       changed |= unnestFLWR(ctx, scp);
-
-      // slide let clauses out to avoid repeated evaluation
-      changed |= slideLetsOut(ctx);
 
       // float where expressions upwards to filter earlier
       changed |= optimizeWhere(ctx, scp);
@@ -150,32 +151,56 @@ public final class GFLWOR extends ParseExpr {
 
       if(!clauses.isEmpty() && clauses.getFirst() instanceof For) {
         final For fst = (For) clauses.getFirst();
-        if(!fst.empty && fst.expr instanceof GFLWOR) {
-          ctx.compInfo(QueryText.OPTFLAT, fst);
-          final GFLWOR sub = (GFLWOR) fst.expr;
-          clauses.set(0, new For(fst.var, null, fst.score, sub.ret, false, fst.info));
-          if(fst.pos != null) clauses.add(1, new Count(fst.pos, fst.info));
-          clauses.addAll(0, sub.clauses);
-          changed = true;
+        if(!fst.empty) {
+          if(fst.expr instanceof GFLWOR) {
+            ctx.compInfo(QueryText.OPTFLAT, fst);
+            final GFLWOR sub = (GFLWOR) fst.expr;
+            clauses.set(0, new For(fst.var, null, fst.score, sub.ret, false, fst.info));
+            if(fst.pos != null) clauses.add(1, new Count(fst.pos, fst.info));
+            clauses.addAll(0, sub.clauses);
+            changed = true;
+          } else if(clauses.size() > 1 && clauses.get(1) instanceof Count) {
+            final Count cnt = (Count) clauses.get(1);
+            if(fst.pos != null) {
+              final Let lt = new Let(cnt.count,
+                  new VarRef(cnt.info, fst.pos).optimize(ctx, scp), false, cnt.info);
+              clauses.set(1, lt.optimize(ctx, scp));
+            } else {
+              clauses.set(0, new For(fst.var, cnt.count, fst.score,
+                  fst.expr, false, fst.info).optimize(ctx, scp));
+              clauses.remove(1);
+            }
+            changed = true;
+          }
         }
       }
 
-      if(!clauses.isEmpty() && ret instanceof GFLWOR) {
-        final GFLWOR sub = (GFLWOR) ret;
-        if(sub.isFLWR()) {
-          // flatten nested FLWOR expressions
-          ctx.compInfo(QueryText.OPTFLAT, this);
-          clauses.addAll(sub.clauses);
-          ret = sub.ret;
-          changed = true;
-        } else if(sub.clauses.getFirst() instanceof Let) {
-          ctx.compInfo(QueryText.OPTFLAT, this);
-          final LinkedList<Clause> cls = sub.clauses;
-          // propagate all leading let bindings into outer clauses
-          do clauses.add(cls.removeFirst());
-          while(!cls.isEmpty() && cls.getFirst() instanceof Let);
-          ret = ret.optimize(ctx, scp);
-          changed = true;
+      if(!clauses.isEmpty()) {
+        if(ret instanceof GFLWOR) {
+          final GFLWOR sub = (GFLWOR) ret;
+          if(sub.isFLWR()) {
+            // flatten nested FLWOR expressions
+            ctx.compInfo(QueryText.OPTFLAT, this);
+            clauses.addAll(sub.clauses);
+            ret = sub.ret;
+            changed = true;
+          }
+        }
+
+        final TypeCheck tc = ret instanceof TypeCheck ? (TypeCheck) ret : null;
+        if(ret instanceof GFLWOR || tc != null && tc.expr instanceof GFLWOR) {
+          final GFLWOR sub = (GFLWOR) (tc == null ? ret : tc.expr);
+          if(sub.clauses.getFirst() instanceof Let) {
+            ctx.compInfo(QueryText.OPTFLAT, this);
+            final LinkedList<Clause> cls = sub.clauses;
+            // propagate all leading let bindings into outer clauses
+            do {
+              clauses.add(cls.removeFirst());
+            } while(!cls.isEmpty() && cls.getFirst() instanceof Let);
+            if(tc != null) tc.expr = sub.optimize(ctx, scp);
+            ret = ret.optimize(ctx, scp);
+            changed = true;
+          }
         }
       }
 
@@ -242,9 +267,7 @@ public final class GFLWOR extends ParseExpr {
    * @return change flag
    * @throws QueryException query exception
    */
-  private boolean inlineLets(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
-
+  private boolean inlineLets(final QueryContext ctx, final VarScope scp) throws QueryException {
     boolean change = false, thisRound;
     do {
       thisRound = false;
@@ -260,7 +283,7 @@ public final class GFLWOR extends ParseExpr {
           if(use == VarUsage.NEVER) {
             ctx.compInfo(QueryText.OPTVAR, lt.var);
             iter.remove();
-            change = true;
+            thisRound = change = true;
           } else if(
             // inline simple values
             expr.isValue()
@@ -274,6 +297,7 @@ public final class GFLWOR extends ParseExpr {
             || expr instanceof AxisPath && ((AxisPath) expr).cheap()) {
             ctx.compInfo(QueryText.OPTINLINE, lt);
             inline(ctx, scp, lt.var, lt.inlineExpr(ctx, scp), next);
+            iter.remove();
             thisRound = change = true;
             // continue from the beginning as clauses below could have been deleted
             break;
@@ -293,15 +317,14 @@ public final class GFLWOR extends ParseExpr {
    * @return change flag
    * @throws QueryException query exception
    */
-  private boolean unnestFLWR(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  private boolean unnestFLWR(final QueryContext ctx, final VarScope scp) throws QueryException {
     boolean change = false, thisRound;
     do {
       thisRound = false;
       final ListIterator<Clause> iter = clauses.listIterator();
       while(iter.hasNext()) {
         final Clause cl = iter.next();
-        final boolean isFor = cl instanceof For;
+        final boolean isFor = cl instanceof For, isLet = cl instanceof Let;
         if(isFor) {
           // for $x in (for $y in A (...) return B)  ===>  for $y in A (...) for $x in B
           final For fr = (For) cl;
@@ -318,7 +341,7 @@ public final class GFLWOR extends ParseExpr {
           }
         }
 
-        if(!thisRound && (isFor || cl instanceof Let)) {
+        if(!thisRound && (isFor || isLet)) {
           // let $x := (let $y := E return F)  ===>  let $y := E let $x := F
           final Expr e = isFor ? ((For) cl).expr : ((Let) cl).expr;
           if(e instanceof GFLWOR) {
@@ -429,7 +452,7 @@ public final class GFLWOR extends ParseExpr {
           wh.pred = Bln.get(wh.pred.ebv(ctx, wh.info).bool(wh.info));
 
         // predicate is always false: no results possible
-        if(!((Bln) wh.pred).bool(null)) break;
+        if(!((Item) wh.pred).bool(null)) break;
 
         // condition is always true
         clauses.remove(i--);
@@ -589,9 +612,7 @@ public final class GFLWOR extends ParseExpr {
    * @return {@code true} if the GFLWOR expression has to stay
    * @throws QueryException query exception if the whole expression fails
    */
-  private boolean clauseError(final QueryException qe, final int idx)
-      throws QueryException {
-
+  private boolean clauseError(final QueryException qe, final int idx) throws QueryException {
     final ListIterator<Clause> iter = clauses.listIterator(idx);
     while(iter.hasPrevious()) {
       final Clause b4 = iter.previous();
@@ -601,7 +622,7 @@ public final class GFLWOR extends ParseExpr {
           iter.next();
           iter.remove();
         }
-        ret = FNInfo.error(qe);
+        ret = FNInfo.error(qe, ret.type());
         return true;
       }
     }
@@ -653,10 +674,10 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public void markTailCalls() {
+  public void markTailCalls(final QueryContext ctx) {
     long n = 1;
     for(final Clause c : clauses) if((n = c.calcSize(n)) != 1) return;
-    ret.markTailCalls();
+    ret.markTailCalls(ctx);
   }
 
   @Override
@@ -666,10 +687,18 @@ public final class GFLWOR extends ParseExpr {
     return ret.exprSize() + sz;
   }
 
+  @Override
+  public Expr typeCheck(final TypeCheck tc, final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    if(tc.type.occ != Occ.ZERO_MORE) return null;
+    ret = tc.check(ret, ctx, scp);
+    return optimize(ctx, scp);
+  }
+
   /**
    * Evaluator for FLWOR clauses.
    *
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Leo Woerteler
    */
   interface Eval {
@@ -677,8 +706,7 @@ public final class GFLWOR extends ParseExpr {
      * Makes the next evaluation step if available. This method is guaranteed
      * to not be called again if it has once returned {@code false}.
      * @param ctx query context
-     * @return {@code true} if step was made, {@code false} if no more
-     * results exist
+     * @return {@code true} if step was made, {@code false} if no more results exist
      * @throws QueryException evaluation exception
      */
     boolean next(final QueryContext ctx) throws QueryException;
@@ -687,7 +715,7 @@ public final class GFLWOR extends ParseExpr {
   /**
    * A FLWOR clause.
    *
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Leo Woerteler
    */
   public abstract static class Clause extends ParseExpr {
@@ -698,7 +726,7 @@ public final class GFLWOR extends ParseExpr {
      * @param ii input info
      * @param vs declared variables
      */
-    protected Clause(final InputInfo ii, final Var... vs) {
+    Clause(final InputInfo ii, final Var... vs) {
       super(ii);
       vars = vs;
     }
@@ -724,8 +752,7 @@ public final class GFLWOR extends ParseExpr {
     abstract Eval eval(final Eval sub);
 
     @Override
-    public abstract Clause compile(QueryContext ctx, final VarScope scp)
-        throws QueryException;
+    public abstract Clause compile(QueryContext ctx, final VarScope scp) throws QueryException;
 
     @Override
     public abstract Clause optimize(final QueryContext ctx, final VarScope scp)
@@ -738,23 +765,23 @@ public final class GFLWOR extends ParseExpr {
     @Deprecated
     @Override
     public Iter iter(final QueryContext ctx) throws QueryException {
-      throw Util.notexpected();
+      throw Util.notExpected();
     }
 
     @Deprecated
     @Override
     public Value value(final QueryContext ctx) throws QueryException {
-      throw Util.notexpected();
+      throw Util.notExpected();
     }
 
     @Deprecated
     @Override
     public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-      throw Util.notexpected();
+      throw Util.notExpected();
     }
 
     @Override
-    public abstract GFLWOR.Clause copy(QueryContext ctx, VarScope scp, IntObjMap<Var> vs);
+    public abstract Clause copy(QueryContext ctx, VarScope scp, IntObjMap<Var> vs);
 
     /**
      * Checks if the given clause can be slided over this clause.

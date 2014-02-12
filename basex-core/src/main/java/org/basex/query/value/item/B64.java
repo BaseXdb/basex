@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Base64 item ({@code xs:base64Binary}).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class B64 extends Bin {
@@ -73,7 +73,7 @@ public class B64 extends Bin {
       return Base64.decode(d);
     } catch(final IllegalArgumentException ex) {
       final String chars = ex.getMessage().replaceAll("^.*?: |\\.$", "");
-      throw FUNCAST.thrw(ii, AtomType.B64, chars);
+      throw FUNCAST.get(ii, AtomType.B64, chars);
     }
   }
 

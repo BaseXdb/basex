@@ -11,7 +11,7 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'delete' command and deletes resources from a database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Delete extends ACreate {
@@ -33,9 +33,9 @@ public final class Delete extends ACreate {
 
     // delete all documents
     final IntList docs = data.resources.docs(target);
-    final AtomicUpdateList atomics = new AtomicUpdateList(data);
-    for(int d = docs.size() - 1; d >= 0; d--)
-      atomics.addDelete(docs.get(d));
+    final AtomicUpdateCache atomics = new AtomicUpdateCache(data);
+    final int ds = docs.size();
+    for(int d = 0; d < ds; d++) atomics.addDelete(docs.get(d));
     atomics.execute(false);
     context.update();
 

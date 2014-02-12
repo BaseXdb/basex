@@ -8,14 +8,32 @@ import static org.basex.util.Token.*;
  * and deletions of ones, and Damerau (1964): A technique for computer
  * detection and correction of spelling errors.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Levenshtein {
   /** Maximum token size. */
   private static final int MAX = 50;
+
+  /** Default number of allowed errors; dynamic calculation if value is 0. */
+  private final int error;
   /** Matrix for calculating Levenshtein distance. */
   private int[][] matrix;
+
+  /**
+   * Constructor.
+   */
+  public Levenshtein() {
+    this(0);
+  }
+
+  /**
+   * Constructor.
+   * @param err allowed errors
+   */
+  public Levenshtein(final int err) {
+    error = err;
+  }
 
   /**
    * Compares two character arrays for similarity.
@@ -24,7 +42,7 @@ public final class Levenshtein {
    * @return true if the arrays are similar
    */
   public boolean similar(final byte[] token, final byte[] sub) {
-    return similar(token, sub, 0);
+    return similar(token, sub, error);
   }
 
   /**
@@ -35,8 +53,9 @@ public final class Levenshtein {
    * @return true if the arrays are similar
    */
   public boolean similar(final byte[] token, final byte[] sub, final int err) {
-    int sl = 0, tl = 0;
+    int sl = 0;
     for(int s = 0; s < sub.length; s += cl(sub, s)) ++sl;
+    int tl = 0;
     for(int t = 0; t < token.length; t += cl(token, t)) ++tl;
     if(tl == 0) return false;
 
@@ -57,9 +76,7 @@ public final class Levenshtein {
    * @param k maximum number of accepted errors
    * @return true if the arrays are similar
    */
-  private boolean ls(final byte[] tk, final int tl, final byte[] sb, final int sl,
-      final int k) {
-
+  private boolean ls(final byte[] tk, final int tl, final byte[] sb, final int sl, final int k) {
     int[][] m = matrix;
     if(m == null) {
       m = new int[MAX + 2][MAX + 2];
@@ -107,8 +124,8 @@ public final class Levenshtein {
    * @return true if the arrays are equal
    */
   private static boolean same(final byte[] tk, final byte[] sb) {
-    int t = 0, s = 0;
-    for(; t < tk.length && s < sb.length; t += cl(tk, t), s += cl(sb, s)) {
+    int t = 0;
+    for(int s = 0; t < tk.length && s < sb.length; t += cl(tk, t), s += cl(sb, s)) {
       if(lc(norm(cp(tk, t))) != lc(norm(cp(sb, t)))) return false;
     }
     return true;

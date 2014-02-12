@@ -14,12 +14,12 @@ import org.basex.util.*;
  * This class can be used to build new sequences.
  * At the same time, it serves as an iterator.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class ValueBuilder extends ValueIter implements Result {
   /** Item container. */
-  public Item[] item;
+  private Item[] items;
   /** Number of items. */
   private int size;
   /** Current iterator position. */
@@ -37,7 +37,7 @@ public final class ValueBuilder extends ValueIter implements Result {
    * @param c initial capacity
    */
   public ValueBuilder(final int c) {
-    item = new Item[c];
+    items = new Item[c];
   }
 
   /**
@@ -46,7 +46,7 @@ public final class ValueBuilder extends ValueIter implements Result {
    * @param s initial size
    */
   public ValueBuilder(final Item[] arr, final int s) {
-    item = arr;
+    items = arr;
     size = s;
   }
 
@@ -56,8 +56,8 @@ public final class ValueBuilder extends ValueIter implements Result {
    * @return self reference
    */
   public ValueBuilder add(final Value val) {
-    for(final long sz = val.size(); item.length - size < sz;) item = extend(item);
-    size += val.writeTo(item, size);
+    for(final long sz = val.size(); items.length - size < sz;) items = extend(items);
+    size += val.writeTo(items, size);
     return this;
   }
 
@@ -67,8 +67,8 @@ public final class ValueBuilder extends ValueIter implements Result {
    * @return self reference
    */
   public ValueBuilder add(final Item it) {
-    if(size == item.length) item = extend(item);
-    item[size++] = it;
+    if(size == items.length) items = extend(items);
+    items[size++] = it;
     return this;
   }
 
@@ -79,7 +79,7 @@ public final class ValueBuilder extends ValueIter implements Result {
     final ValueBuilder vb = (ValueBuilder) v;
     if(size != vb.size) return false;
     for(int i = 0; i < size; ++i) {
-      if(item[i].type != vb.item[i].type || !item[i].sameAs(vb.item[i])) return false;
+      if(items[i].type != vb.items[i].type || !items[i].sameAs(vb.items[i])) return false;
     }
     return true;
   }
@@ -91,12 +91,12 @@ public final class ValueBuilder extends ValueIter implements Result {
 
   @Override
   public void serialize(final Serializer ser, final int n) throws IOException {
-    ser.serialize(item[n]);
+    ser.serialize(items[n]);
   }
 
   @Override
   public Item next() {
-    return ++pos < size ? item[pos] : null;
+    return ++pos < size ? items[pos] : null;
   }
 
   /**
@@ -118,9 +118,17 @@ public final class ValueBuilder extends ValueIter implements Result {
     return size;
   }
 
+  /**
+   * Returns the internal item container.
+   * @return items
+   */
+  public Item[] items() {
+    return items;
+  }
+
   @Override
   public Item get(final long i) {
-    return item[(int) i];
+    return items[(int) i];
   }
 
   /**
@@ -129,12 +137,12 @@ public final class ValueBuilder extends ValueIter implements Result {
    * @param p position
    */
   public void set(final Item i, final int p) {
-    item[p] = i;
+    items[p] = i;
   }
 
   @Override
   public Value value() {
-    return Seq.get(item, size);
+    return Seq.get(items, size);
   }
 
   @Override
@@ -149,7 +157,7 @@ public final class ValueBuilder extends ValueIter implements Result {
     try {
       return serialize().toString();
     } catch(final IOException ex) {
-      throw Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
   }
 }

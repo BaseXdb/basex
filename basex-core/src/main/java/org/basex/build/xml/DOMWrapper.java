@@ -15,7 +15,7 @@ import org.w3c.dom.Text;
 /**
  * This class converts an DOM document instance to a database representation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DOMWrapper extends Parser {
@@ -34,14 +34,14 @@ public final class DOMWrapper extends Parser {
    * Constructor.
    * @param doc document instance
    * @param fn filename
-   * @param pr database properties
+   * @param opts database options
    */
-  public DOMWrapper(final Document doc, final String fn, final Prop pr) {
-    super(fn, pr);
+  public DOMWrapper(final Document doc, final String fn, final MainOptions opts) {
+    super(fn, opts);
     root = doc;
     filename = fn;
-    chop = pr.is(Prop.CHOP);
-    stripNS = pr.is(Prop.STRIPNS);
+    chop = opts.get(MainOptions.CHOP);
+    stripNS = opts.get(MainOptions.STRIPNS);
   }
 
   @Override

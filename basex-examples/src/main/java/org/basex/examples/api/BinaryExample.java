@@ -10,7 +10,7 @@ import java.util.*;
  * This example required a running database server instance.
  * Documentation: http://docs.basex.org/wiki/Clients
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  */
 public final class BinaryExample {
   /**

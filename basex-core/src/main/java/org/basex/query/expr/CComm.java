@@ -14,17 +14,18 @@ import org.basex.util.hash.*;
 /**
  * Comment fragment.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class CComm extends CFrag {
+public final class CComm extends CNode {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param c comment
    */
-  public CComm(final InputInfo ii, final Expr c) {
-    super(ii, c);
+  public CComm(final StaticContext sctx, final InputInfo ii, final Expr c) {
+    super(sctx, ii, c);
     type = SeqType.COM;
   }
 
@@ -44,7 +45,7 @@ public final class CComm extends CFrag {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CComm(info, expr[0].copy(ctx, scp, vs));
+    return new CComm(sc, info, expr[0].copy(ctx, scp, vs));
   }
 
   @Override

@@ -8,12 +8,13 @@ import java.util.zip.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.util.*;
 
 /**
  * Archive writer.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class ArchiveOut {
@@ -29,16 +30,14 @@ public abstract class ArchiveOut {
    * @return writer
    * @throws QueryException query exception
    */
-  public static ArchiveOut get(final String format, final InputInfo info)
-      throws QueryException {
-
+  public static ArchiveOut get(final String format, final InputInfo info) throws QueryException {
     try {
-      if(format.equals("zip")) return new ZIPOut();
-      if(format.equals("gzip")) return new GZIPOut();
+      if(format.equals(FNArchive.ZIP)) return new ZIPOut();
+      if(format.equals(FNArchive.GZIP)) return new GZIPOut();
     } catch(final IOException ex) {
-      throw ARCH_FAIL.thrw(info, ex);
+      throw ARCH_FAIL.get(info, ex);
     }
-    throw ARCH_UNKNOWN.thrw(info);
+    throw ARCH_UNKNOWN.get(info);
   }
 
   /**

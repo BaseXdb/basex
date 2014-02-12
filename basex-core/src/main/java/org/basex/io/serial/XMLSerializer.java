@@ -5,12 +5,13 @@ import static org.basex.query.util.Err.*;
 
 import java.io.*;
 
+import org.basex.query.*;
 import org.basex.query.value.item.*;
 
 /**
  * This class serializes data as XML.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class XMLSerializer extends OutputSerializer {
@@ -20,11 +21,11 @@ public class XMLSerializer extends OutputSerializer {
   /**
    * Constructor, specifying serialization options.
    * @param os output stream reference
-   * @param p serialization properties
+   * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  XMLSerializer(final OutputStream os, final SerializerProp p) throws IOException {
-    super(os, p, V10, V11);
+  XMLSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
+    super(os, sopts, V10, V11);
   }
 
   @Override
@@ -50,10 +51,10 @@ public class XMLSerializer extends OutputSerializer {
 
   /**
    * Checks if document serialization is valid.
-   * @throws SerializerException serializer exception
+   * @throws QueryIOException query I/O exception
    */
-  private void check() throws SerializerException {
-    if(!saomit) SERSA.thrwSerial();
-    if(docsys != null) SERDT.thrwSerial();
+  private void check() throws QueryIOException {
+    if(!saomit) throw SERSA.getIO();
+    if(docsys != null) throw SERDT.getIO();
   }
 }

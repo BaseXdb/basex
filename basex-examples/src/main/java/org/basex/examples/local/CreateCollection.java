@@ -10,7 +10,7 @@ import org.basex.core.cmd.*;
  * For some XQuery examples in a collection context,
  * please see {@link QueryCollection}
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author BaseXTeam
  */
 public final class CreateCollection {

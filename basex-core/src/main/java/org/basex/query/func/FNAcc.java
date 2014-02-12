@@ -16,23 +16,24 @@ import org.basex.util.*;
 /**
  * Accessor functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNAcc extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNAcc(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNAcc(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Expr e = expr.length != 0 ? expr[0] : checkCtx(ctx);
+    final Expr e = expr.length == 0 ? checkCtx(ctx) : expr[0];
     switch(sig) {
       case POSITION:
         return Int.get(ctx.pos);
@@ -48,7 +49,7 @@ public final class FNAcc extends StandardFunc {
         return Str.get(norm(checkEStr(e, ctx)));
       case NAMESPACE_URI_FROM_QNAME:
         final Item it = e.item(ctx, info);
-        return it == null ? null : Uri.uri(checkQNm(it, ctx).uri());
+        return it == null ? null : Uri.uri(checkQNm(it, ctx, sc).uri());
       default:
         return super.item(ctx, ii);
     }
@@ -67,7 +68,7 @@ public final class FNAcc extends StandardFunc {
 
     final Item it = e.item(ctx, info);
     if(it == null) return Str.ZERO;
-    if(it instanceof FItem) FISTR.thrw(ii, this);
+    if(it instanceof FItem) throw FISTR.get(ii, it.type);
     return it.type == AtomType.STR ? it : Str.get(it.string(ii));
   }
 
@@ -81,9 +82,9 @@ public final class FNAcc extends StandardFunc {
   private Item number(final Iter ir, final QueryContext ctx) throws QueryException {
     final Item it = ir.next();
     if(it == null || ir.next() != null) return Dbl.NAN;
-    if(it instanceof FItem) FIATOM.thrw(info, this);
+    if(it instanceof FItem) throw FIATOM.get(info, it.type);
     try {
-      return it.type == AtomType.DBL ? it : AtomType.DBL.cast(it, ctx, info);
+      return it.type == AtomType.DBL ? it : AtomType.DBL.cast(it, ctx, sc, info);
     } catch(final QueryException ex) {
       return Dbl.NAN;
     }
@@ -96,8 +97,7 @@ public final class FNAcc extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    if(!oneOf(sig, POSITION, LAST) && 0 == expr.length && !visitor.lock(DBLocking.CTX))
-      return false;
-    return super.accept(visitor);
+    return !(!oneOf(sig, POSITION, LAST) && expr.length == 0 && !visitor.lock(DBLocking.CTX)) &&
+      super.accept(visitor);
   }
 }

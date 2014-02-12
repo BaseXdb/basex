@@ -20,14 +20,14 @@ import org.basex.util.hash.*;
 /**
  * FLWOR {@code order by}-expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class OrderBy extends GFLWOR.Clause {
   /** References to the variables to be sorted. */
-  VarRef[] refs;
+  private VarRef[] refs;
   /** Sort keys. */
-  final Key[] keys;
+  private final Key[] keys;
 
   /**
    * Constructor.
@@ -104,7 +104,7 @@ public final class OrderBy extends GFLWOR.Clause {
                   if(m == Dbl.NAN || m == Flt.NAN) m = null;
                   if(n == Dbl.NAN || n == Flt.NAN) n = null;
                   if(m != null && n != null && !m.comparable(n))
-                    Err.cast(or.info, m.type, n);
+                    throw Err.castError(or.info, m.type, n);
 
                   final int c = m == null
                       ? n == null ? 0                 : or.least ? -1 : 1
@@ -151,8 +151,7 @@ public final class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  public OrderBy optimize(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public OrderBy optimize(final QueryContext ctx, final VarScope scp) {
     return this;
   }
 
@@ -168,16 +167,15 @@ public final class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp, final Var v,
+      final Expr e) throws QueryException {
     for(int i = refs.length; --i >= 0;)
       if(v.is(refs[i].var)) refs = Array.delete(refs, i);
     return inlineAll(ctx, scp, keys, v, e) ? optimize(ctx, scp) : null;
   }
 
   @Override
-  public OrderBy copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public OrderBy copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new OrderBy(Arr.copyAll(ctx, scp, vs, refs),
         Arr.copyAll(ctx, scp, vs, keys), info);
   }
@@ -230,7 +228,7 @@ public final class OrderBy extends GFLWOR.Clause {
   /**
    * Sort key.
    *
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Leo Woerteler
    */
   public static final class Key extends Single {
@@ -272,12 +270,11 @@ public final class OrderBy extends GFLWOR.Clause {
 
     @Override
     public String toString() {
-      final StringBuilder sb = new StringBuilder(expr.toString());
-      if(desc) sb.append(' ').append(DESCENDING);
-      sb.append(' ').append(EMPTYORD).append(' ').append(least ? LEAST : GREATEST);
-      if(coll != null) sb.append(' ').append(COLLATION).append(" \"").
-        append(coll.uri()).append('"');
-      return sb.toString();
+      final TokenBuilder tb = new TokenBuilder(expr.toString());
+      if(desc) tb.add(' ').add(DESCENDING);
+      tb.add(' ').add(EMPTYORD).add(' ').add(least ? LEAST : GREATEST);
+      if(coll != null) tb.add(' ').add(COLLATION).add(" \"").add(coll.uri()).add('"');
+      return tb.toString();
     }
 
     @Override

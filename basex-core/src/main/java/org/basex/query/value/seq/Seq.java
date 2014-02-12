@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Sequence, containing at least two items.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Seq extends Value {
@@ -73,14 +73,12 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-    throw SEQCAST.thrw(ii, this);
+  public final Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+    throw SEQCAST.get(ii, this);
   }
 
   @Override
-  public final Item test(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public final Item test(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return ebv(ctx, ii);
   }
 
@@ -129,7 +127,7 @@ public abstract class Seq extends Value {
   public String toString() {
     final StringBuilder sb = new StringBuilder(PAR1);
     for(int i = 0; i < size; ++i) {
-      sb.append(i != 0 ? SEP : "").append(itemAt(i));
+      sb.append(i == 0 ? "" : SEP).append(itemAt(i));
       if(sb.length() <= 32 || i + 1 == size) continue;
       // output is chopped to prevent too long error strings
       sb.append(SEP + DOTS);

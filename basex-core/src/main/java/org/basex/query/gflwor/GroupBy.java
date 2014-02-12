@@ -22,18 +22,18 @@ import org.basex.util.hash.*;
 /**
  * The GFLWOR {@code group by} expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class GroupBy extends GFLWOR.Clause {
   /** Grouping specs. */
-  final Spec[] specs;
+  private final Spec[] specs;
   /** Non-grouping variable expressions. */
-  Expr[] preExpr;
+  private Expr[] preExpr;
   /** Non-grouping variables. */
-  Var[] post;
+  private Var[] post;
   /** Number of non-occluded grouping variables. */
-  final int nonOcc;
+  private final int nonOcc;
 
   /**
    * Constructor.
@@ -42,8 +42,7 @@ public final class GroupBy extends GFLWOR.Clause {
    * @param pst post-grouping variables
    * @param ii input info
    */
-  public GroupBy(final Spec[] gs, final VarRef[] pr, final Var[] pst,
-      final InputInfo ii) {
+  public GroupBy(final Spec[] gs, final VarRef[] pr, final Var[] pst, final InputInfo ii) {
     super(ii, vars(gs, pst));
     specs = gs;
     preExpr = new Expr[pr.length];
@@ -142,7 +141,8 @@ public final class GroupBy extends GFLWOR.Clause {
           }
 
           // find the group for this key
-          Group fst = null, grp = null;
+          final Group fst;
+          Group grp = null;
           // no collations, so we can use hashing
           for(Group g = fst = map.get(hash); g != null; g = g.next) {
             if(eq(key, g.key, colls)) {
@@ -186,9 +186,7 @@ public final class GroupBy extends GFLWOR.Clause {
    * @return {@code true} if the compare as equal, {@code false} otherwise
    * @throws QueryException query exception
    */
-  boolean eq(final Item[] as, final Item[] bs, final Collation[] coll)
-      throws QueryException {
-
+  boolean eq(final Item[] as, final Item[] bs, final Collation[] coll) throws QueryException {
     for(int i = 0; i < as.length; i++) {
       final Item a = as[i], b = bs[i];
       if(a == null ^ b == null || a != null && !a.equiv(b, coll[i], info)) return false;
@@ -205,7 +203,12 @@ public final class GroupBy extends GFLWOR.Clause {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(GROUP).append(' ').append(BY);
+    final StringBuilder sb = new StringBuilder();
+    for(int i = 0; i < post.length; i++) {
+      sb.append(LET).append(" (: post-group :) ").append(post[i]);
+      sb.append(' ').append(ASSIGN).append(' ').append(preExpr[i]).append(' ');
+    }
+    sb.append(GROUP).append(' ').append(BY);
     for(int i = 0; i < specs.length; i++) sb.append(i == 0 ? " " : SEP).append(specs[i]);
     return sb.toString();
   }
@@ -224,8 +227,7 @@ public final class GroupBy extends GFLWOR.Clause {
   }
 
   @Override
-  public GroupBy optimize(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public GroupBy optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     for(int i = 0; i < preExpr.length; i++) {
       final SeqType it = preExpr[i].type();
       post[i].refineType(it.withOcc(it.mayBeZero() ? Occ.ZERO_MORE : Occ.ONE_MORE),
@@ -319,7 +321,7 @@ public final class GroupBy extends GFLWOR.Clause {
   /**
    * Grouping spec.
    *
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Leo Woerteler
    */
   public static final class Spec extends Single {
@@ -354,11 +356,10 @@ public final class GroupBy extends GFLWOR.Clause {
 
     @Override
     public String toString() {
-      final StringBuilder sb = new StringBuilder().append(var).append(' ').append(ASSIGN);
-      sb.append(' ').append(expr);
-      if(coll != null) sb.append(' ').append(COLLATION).append(" \"").
-        append(coll.uri()).append('"');
-      return sb.toString();
+      final TokenBuilder tb = new TokenBuilder().add(var.toString()).add(' ').add(ASSIGN);
+      tb.add(' ').add(expr.toString());
+      if(coll != null) tb.add(' ').add(COLLATION).add(" \"").add(coll.uri()).add('"');
+      return tb.toString();
     }
 
     @Override
@@ -390,7 +391,7 @@ public final class GroupBy extends GFLWOR.Clause {
   /**
    * A group of tuples of post-grouping variables.
    *
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Leo Woerteler
    */
   private static final class Group {

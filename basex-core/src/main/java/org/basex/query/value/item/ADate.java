@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * Abstract super class for date items.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class ADate extends ADateDur {
@@ -28,14 +28,14 @@ public abstract class ADate extends ADateDur {
   private static final long ADD_NEG = (MAX_YEAR / 400 + 1) * 400;
 
   /** Pattern for two digits. */
-  protected static final String DD = "(\\d{2})";
+  static final String DD = "(\\d{2})";
   /** Year pattern. */
-  protected static final String YEAR =
+  static final String YEAR =
       "(-?(000[1-9]|00[1-9]\\d|0[1-9]\\d{2}|[1-9]\\d{3,}))";
   /** Date pattern. */
-  protected static final String ZONE = "((\\+|-)" + DD + ':' + DD + "|Z)?";
+  static final String ZONE = "((\\+|-)" + DD + ':' + DD + "|Z)?";
   /** Day per months. */
-  protected static final byte[] DAYS = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+  static final byte[] DAYS = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
   /** Date pattern. */
   private static final Pattern DATE = Pattern.compile(YEAR + '-' + DD + '-' + DD + ZONE);
   /** Time pattern. */
@@ -48,17 +48,17 @@ public abstract class ADate extends ADateDur {
    *   <li> 0 - {@link Long#MIN_VALUE}: BC, +1 added</li>
    *   <li> {@link Long#MAX_VALUE}: undefined</li>
    * </ul> */
-  protected long yea = Long.MAX_VALUE;
+  long yea = Long.MAX_VALUE;
   /** Month ({@code 0-11}). {@code -1}: undefined. */
-  protected byte mon = -1;
+  byte mon = -1;
   /** Day ({@code 0-30}). {@code -1}: undefined. */
-  protected byte day = -1;
+  byte day = -1;
   /** Hour ({@code 0-59}). {@code -1}: undefined. */
-  protected byte hou = -1;
+  byte hou = -1;
   /** Minute ({@code 0-59}). {@code -1}: undefined. */
-  protected byte min = -1;
+  byte min = -1;
   /** Timezone in minutes ({@code -14*60-14*60}). {@link Short#MAX_VALUE}: undefined. */
-  protected short zon = Short.MAX_VALUE;
+  short zon = Short.MAX_VALUE;
 
   /** Data factory. */
   public static DatatypeFactory df;
@@ -66,7 +66,7 @@ public abstract class ADate extends ADateDur {
     try {
       df = DatatypeFactory.newInstance();
     } catch(final Exception ex) {
-      Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
   }
 
@@ -101,9 +101,7 @@ public abstract class ADate extends ADateDur {
    * @param ii input info
    * @throws QueryException query exception
    */
-  final void date(final byte[] d, final String e, final InputInfo ii)
-      throws QueryException {
-
+  final void date(final byte[] d, final String e, final InputInfo ii) throws QueryException {
     final Matcher mt = DATE.matcher(Token.string(d).trim());
     if(!mt.matches()) dateErr(d, e, ii);
     yea = toLong(mt.group(1), false, ii);
@@ -113,7 +111,7 @@ public abstract class ADate extends ADateDur {
     day = (byte) (Token.toInt(mt.group(4)) - 1);
 
     if(mon < 0 || mon >= 12 || day < 0 || day >= dpm(yea, mon)) dateErr(d, e, ii);
-    if(yea <= MIN_YEAR || yea > MAX_YEAR) DATERANGE.thrw(ii, type, d);
+    if(yea <= MIN_YEAR || yea > MAX_YEAR) throw DATERANGE.get(ii, type, chop(d));
     zone(mt, 5, d, ii);
   }
 
@@ -124,9 +122,7 @@ public abstract class ADate extends ADateDur {
    * @param ii input info
    * @throws QueryException query exception
    */
-  final void time(final byte[] d, final String e, final InputInfo ii)
-      throws QueryException {
-
+  final void time(final byte[] d, final String e, final InputInfo ii) throws QueryException {
     final Matcher mt = TIME.matcher(Token.string(d).trim());
     if(!mt.matches()) dateErr(d, e, ii);
 
@@ -155,14 +151,14 @@ public abstract class ADate extends ADateDur {
 
     final String tz = mt.group(p);
     if(tz == null) return;
-    if(tz.equals("Z")) {
+    if("Z".equals(tz)) {
       zon = 0;
     } else {
       final int th = Token.toInt(mt.group(p + 2));
       final int tm = Token.toInt(mt.group(p + 3));
-      if(th > 14 || tm > 59 || th == 14 && tm != 0) INVALIDZONE.thrw(ii, val);
+      if(th > 14 || tm > 59 || th == 14 && tm != 0) throw INVALIDZONE.get(ii, val);
       final int mn = th * 60 + tm;
-      zon = (short) (mt.group(p + 1).equals("-") ? -mn : mn);
+      zon = (short) ("-".equals(mt.group(p + 1)) ? -mn : mn);
     }
   }
 
@@ -171,7 +167,7 @@ public abstract class ADate extends ADateDur {
    * @param dur duration
    * @param p plus/minus flag
    */
-  protected final void calc(final DTDur dur, final boolean p) {
+  final void calc(final DTDur dur, final boolean p) {
     add(p ? dur.sec : dur.sec.negate());
   }
 
@@ -182,16 +178,14 @@ public abstract class ADate extends ADateDur {
    * @param ii input info
    * @throws QueryException query exception
    */
-  final void calc(final YMDur dur, final boolean p, final InputInfo ii)
-      throws QueryException {
-
+  final void calc(final YMDur dur, final boolean p, final InputInfo ii) throws QueryException {
     final long m = p ? dur.mon : -dur.mon;
     final long mn = mon + m;
     mon = (byte) mod(mn, 12);
-    yea = yea + div(mn, 12);
+    yea += div(mn, 12);
     day = (byte) Math.min(dpm(yea, mon) - 1, day);
 
-    if(yea <= MIN_YEAR || yea > MAX_YEAR) DATEADDRANGE.thrw(ii, this);
+    if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE.get(ii, yea);
   }
 
   /**
@@ -253,9 +247,7 @@ public abstract class ADate extends ADateDur {
    * @param ii input info
    * @throws QueryException query exception
    */
-  protected void tz(final DTDur tz, final boolean spec, final InputInfo ii)
-      throws QueryException {
-
+  void tz(final DTDur tz, final boolean spec, final InputInfo ii) throws QueryException {
     final short t;
     if(spec && tz == null) {
       t = Short.MAX_VALUE;
@@ -265,8 +257,8 @@ public abstract class ADate extends ADateDur {
         t = (short) ((c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET)) / 60000);
       } else {
         t = (short) (tz.min() + tz.hou() * 60);
-        if(tz.sec().signum() != 0) ZONESEC.thrw(ii, tz);
-        if(Math.abs(t) > 60 * 14 || tz.day() != 0) INVALZONE.thrw(ii, tz);
+        if(tz.sec().signum() != 0) throw ZONESEC.get(ii, tz);
+        if(Math.abs(t) > 60 * 14 || tz.day() != 0) throw INVALZONE.get(ii, tz);
       }
 
       // change time if two competing time zones exist
@@ -342,7 +334,7 @@ public abstract class ADate extends ADateDur {
    * Adds the time zone to the specified token builder.
    * @param tb token builder
    */
-  protected void zone(final TokenBuilder tb) {
+  void zone(final TokenBuilder tb) {
     if(zon == Short.MAX_VALUE) return;
     if(zon == 0) {
       tb.add('Z');
@@ -360,7 +352,7 @@ public abstract class ADate extends ADateDur {
    * @param n number to be printed
    * @param z maximum number of zero digits
    */
-  protected static void prefix(final TokenBuilder tb, final long n, final int z) {
+  static void prefix(final TokenBuilder tb, final long n, final int z) {
     final byte[] t = Token.token(n);
     for(int i = t.length; i < z; i++) tb.add('0');
     tb.add(t);
@@ -369,7 +361,7 @@ public abstract class ADate extends ADateDur {
   @Override
   public final boolean eq(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
-    final ADate d = (ADate) (it instanceof ADate ? it : type.cast(it, null, ii));
+    final ADate d = (ADate) (it instanceof ADate ? it : type.cast(it, null, null, ii));
     final BigDecimal d1 = seconds().add(days().multiply(DAYSECONDS));
     final BigDecimal d2 = d.seconds().add(d.days().multiply(DAYSECONDS));
     return d1.compareTo(d2) == 0;
@@ -383,7 +375,7 @@ public abstract class ADate extends ADateDur {
   @Override
   public int diff(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
-    final ADate d = (ADate) (it instanceof ADate ? it : type.cast(it, null, ii));
+    final ADate d = (ADate) (it instanceof ADate ? it : type.cast(it, null, null, ii));
     final BigDecimal d1 = seconds().add(days().multiply(DAYSECONDS));
     final BigDecimal d2 = d.seconds().add(d.days().multiply(DAYSECONDS));
     return d1.compareTo(d2);
@@ -392,14 +384,14 @@ public abstract class ADate extends ADateDur {
   @Override
   public final XMLGregorianCalendar toJava() {
     return df.newXMLGregorianCalendar(
-      yea != Long.MAX_VALUE ? BigInteger.valueOf(yea > 0 ? yea : yea - 1) : null,
+      yea == Long.MAX_VALUE ? null : BigInteger.valueOf(yea > 0 ? yea : yea - 1),
       mon >= 0 ? mon + 1 : Integer.MIN_VALUE,
       day >= 0 ? day + 1 : Integer.MIN_VALUE,
       hou >= 0 ? hou : Integer.MIN_VALUE,
       min >= 0 ? min : Integer.MIN_VALUE,
       sec != null ? sec.intValue() : Integer.MIN_VALUE,
       sec != null ? sec.remainder(BigDecimal.ONE) : null,
-      zon != Short.MAX_VALUE ? zon : Integer.MIN_VALUE);
+      zon == Short.MAX_VALUE ? Integer.MIN_VALUE : zon);
   }
 
   /**
@@ -436,7 +428,7 @@ public abstract class ADate extends ADateDur {
    * @param day days
    * @return days
    */
-  public static BigDecimal days(final long yea, final int mon, final int day) {
+  private static BigDecimal days(final long yea, final int mon, final int day) {
     final long y = yea - (mon < 2 ? 1 : 0);
     final int m = mon + (mon < 2 ? 13 : 1);
     final int d = day + 1;

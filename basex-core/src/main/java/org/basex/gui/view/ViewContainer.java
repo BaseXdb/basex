@@ -6,7 +6,6 @@ import static org.basex.gui.GUIConstants.*;
 import java.awt.*;
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
@@ -16,7 +15,7 @@ import org.basex.util.*;
  * This class manages all visible and invisible views and allows drag and
  * drop operations inside the panel.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class ViewContainer extends BaseXBack {
@@ -59,15 +58,15 @@ public final class ViewContainer extends BaseXBack {
    */
   public ViewContainer(final AGUI main, final View... v) {
     layout(new BorderLayout()).mode(Fill.PLAIN);
-    logo = BaseXLayout.image("logo");
+    logo = BaseXImages.get("logo");
     setBackground(Color.white);
 
     views = new ViewPanel[v.length];
     for(int i = 0; i < v.length; ++i) views[i] = new ViewPanel(v[i]);
     gui = main;
     // build layout or use default if something goes wrong
-    if(!buildLayout(gui.gprop.get(GUIProp.VIEWS)) && !buildLayout(VIEWS)) {
-      Util.errln(Util.name(this) + ": could not build layout \"%\"", VIEWS);
+    if(!buildLayout(gui.gopts.get(GUIOptions.VIEWS)) && !buildLayout(VIEWS)) {
+      Util.errln(Util.className(this) + ": could not build layout \"%\"", VIEWS);
     }
   }
 
@@ -87,7 +86,7 @@ public final class ViewContainer extends BaseXBack {
     layout.createView(this);
     validate();
     repaint();
-    gui.gprop.set(GUIProp.VIEWS, layout.layoutString(true));
+    gui.gopts.set(GUIOptions.VIEWS, layout.layoutString(true));
     layoutString = ls;
   }
 
@@ -101,7 +100,7 @@ public final class ViewContainer extends BaseXBack {
     final int hh = Math.max(220, Math.min(700, h));
     final Insets i = getInsets();
 
-    if(gui.gprop.is(GUIProp.GRADIENT)) {
+    if(gui.gopts.get(GUIOptions.GRADIENT)) {
       BaseXLayout.fill(g, WHITE, color1, i.left, i.top, w - i.right, h - i.bottom);
     }
     if(w < 150 || h < 160) return;
@@ -111,7 +110,7 @@ public final class ViewContainer extends BaseXBack {
     g.drawImage(logo, (w - logo.getWidth(this)) / 2, y, this);
     if(w < 200 || h < 200) return;
 
-    g.setColor(GUIConstants.DGRAY);
+    g.setColor(DGRAY);
     g.setFont(lfont);
     BaseXLayout.drawCenter(g, VERSINFO + ' ' + Prop.VERSION, w, y + 20 + lh);
   }
@@ -253,11 +252,10 @@ public final class ViewContainer extends BaseXBack {
     if(source == null) return;
 
     ((Graphics2D) g).setStroke(STROKE);
-    final int ac = AlphaComposite.SRC_OVER;
     if(orient != null) {
       g.setColor(color(16));
       g.drawRect(pos[0], pos[1], pos[2] - 1, pos[3] - 1);
-      ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac, 0.3f));
+      ((Graphics2D) g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
       g.setColor(color(8));
       g.fillRect(pos[0], pos[1], pos[2], pos[3]);
     }
@@ -344,22 +342,22 @@ public final class ViewContainer extends BaseXBack {
    */
   private boolean buildLayout(final String cnstr) {
     try {
-      int nv = 0;
       layout = null;
       int lvl = -1;
       final ViewAlignment[] l = new ViewAlignment[16];
       final StringTokenizer st = new StringTokenizer(cnstr);
+      int nv = 0;
       while(st.hasMoreTokens()) {
         final String t = st.nextToken();
         if(Token.eq(t, "H", "V")) {
-          l[lvl + 1] = new ViewAlignment(t.equals("H"));
+          l[lvl + 1] = new ViewAlignment("H".equals(t));
           if(layout == null) {
             layout = l[0];
           } else {
             l[lvl].add(l[lvl + 1]);
           }
           ++lvl;
-        } else if(t.equals("-")) {
+        } else if("-".equals(t)) {
           --lvl;
         } else {
           final ViewPanel view = getView(t);
@@ -369,10 +367,10 @@ public final class ViewContainer extends BaseXBack {
         }
       }
       if(nv == views.length) return true;
-      Util.errln(Util.name(this) + ": initializing views: " + cnstr);
+      Util.errln(Util.className(this) + ": initializing views: " + cnstr);
     } catch(final Exception ex) {
       Util.debug(ex);
-      Util.errln(Util.name(this) + ": could not build layout: " + cnstr);
+      Util.errln(Util.className(this) + ": could not build layout: " + cnstr);
     }
     return false;
   }
@@ -387,7 +385,7 @@ public final class ViewContainer extends BaseXBack {
     for(final ViewPanel view : views) {
       if(view.toString().equals(name)) return view;
     }
-    Util.debug(Util.name(this) + ": Unknown view \"%\"", name);
+    Util.debug(Util.className(this) + ": Unknown view \"%\"", name);
     return null;
   }
 }

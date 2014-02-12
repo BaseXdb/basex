@@ -8,14 +8,14 @@ import org.basex.util.*;
 /**
  * Abstract string item.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class AStr extends Item {
   /**
    * Constructor.
    */
-  protected AStr() {
+  AStr() {
     super(AtomType.STR);
   }
 
@@ -23,7 +23,7 @@ public abstract class AStr extends Item {
    * Constructor, specifying a type.
    * @param t atomic type
    */
-  protected AStr(final AtomType t) {
+  AStr(final AtomType t) {
     super(t);
   }
 

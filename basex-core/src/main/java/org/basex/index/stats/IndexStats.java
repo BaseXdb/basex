@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * This class assembles some index statistics.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class IndexStats {
@@ -102,8 +102,8 @@ public final class IndexStats {
    * @param ocs occurrences
    * @param len text length
    */
-  private static void print(final TokenBuilder tb, final byte[][] txt,
-      final int[] ocs, final int len) {
+  private static void print(final TokenBuilder tb, final byte[][] txt, final int[] ocs,
+      final int len) {
 
     for(int o = 0; o < ocs.length; ++o) {
       if(txt[o].length == 0) continue;

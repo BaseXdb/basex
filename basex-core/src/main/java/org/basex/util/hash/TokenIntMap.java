@@ -34,7 +34,7 @@ public final class TokenIntMap extends TokenSet {
   }
 
   @Override
-  public void read(final DataInput in) throws IOException {
+  protected void read(final DataInput in) throws IOException {
     super.read(in);
     values = in.readNums();
   }

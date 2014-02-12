@@ -8,14 +8,16 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 
+import javax.swing.*;
+
 import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
+import org.basex.gui.text.*;
 import org.basex.gui.view.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
@@ -24,21 +26,21 @@ import org.basex.query.*;
 import org.basex.util.*;
 
 /**
- * This class offers a fast text view, using the {@link Editor} class.
+ * This class offers a fast text view, using the {@link TextPanel} class.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class TextView extends View {
   /** Search editor. */
-  final SearchEditor search;
+  private final SearchEditor search;
 
   /** Header string. */
   private final BaseXLabel label;
   /** Home button. */
-  private final BaseXButton home;
+  private final AbstractButton home;
   /** Text Area. */
-  private final Editor text;
+  private final TextPanel text;
 
   /** Result command. */
   private Command cmd;
@@ -54,29 +56,29 @@ public final class TextView extends View {
     border(5).layout(new BorderLayout(0, 5));
 
     label = new BaseXLabel(RESULT, true, false);
-    label.setForeground(GUIConstants.GRAY);
+    label.setForeground(GRAY);
 
-    home = BaseXButton.command(GUICommands.C_HOME, gui);
+    home = BaseXButton.command(GUIMenuCmd.C_HOME, gui);
     home.setEnabled(false);
 
-    final BaseXButton save = new BaseXButton(gui, "save", H_SAVE_RESULT);
-    final BaseXButton srch = new BaseXButton(gui, "search",
-        BaseXLayout.addShortcut(SEARCH, BaseXKeys.FIND.toString()));
+    text = new TextPanel(false, gui);
+    text.setSyntax(new SyntaxXML());
+    search = new SearchEditor(gui, text);
+
+    final AbstractButton save = BaseXButton.get("c_save", SAVE, false, gui);
+    final AbstractButton find = search.button(FIND);
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
     buttons.layout(new TableLayout(1, 3, 1, 0)).border(0, 0, 4, 0);
     buttons.add(save);
     buttons.add(home);
-    buttons.add(srch);
+    buttons.add(find);
 
     final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     b.add(buttons, BorderLayout.WEST);
     b.add(label, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
-    text = new Editor(false, gui);
-    text.setSyntax(new SyntaxXML());
-    search = new SearchEditor(gui, text).button(srch);
     add(search, BorderLayout.CENTER);
 
     save.addActionListener(new ActionListener() {
@@ -109,7 +111,7 @@ public final class TextView extends View {
 
   @Override
   public void refreshLayout() {
-    label.border(-6, 0, 0, 2).setFont(GUIConstants.lfont);
+    label.border(-6, 0, 0, 2).setFont(lfont);
     text.setFont(mfont);
     search.bar().refreshLayout();
   }
@@ -121,12 +123,12 @@ public final class TextView extends View {
 
   @Override
   public boolean visible() {
-    return gui.gprop.is(GUIProp.SHOWTEXT);
+    return gui.gopts.get(GUIOptions.SHOWTEXT);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gprop.set(GUIProp.SHOWTEXT, v);
+    gui.gopts.set(GUIOptions.SHOWTEXT, v);
   }
 
   @Override
@@ -141,7 +143,7 @@ public final class TextView extends View {
   private void setText(final Nodes n) {
     if(visible()) {
       try {
-        final ArrayOutput ao = new ArrayOutput().max(gui.gprop.num(GUIProp.MAXTEXT));
+        final ArrayOutput ao = new ArrayOutput().max(gui.gopts.get(GUIOptions.MAXTEXT));
         if(n != null) n.serialize(Serializer.get(ao));
         setText(ao);
         cmd = null;
@@ -168,7 +170,7 @@ public final class TextView extends View {
     cmd = null;
     ns = null;
 
-    final int mh = gui.context.prop.num(Prop.MAXHITS);
+    final int mh = gui.context.options.get(MainOptions.MAXHITS);
     boolean parse = false;
     if(mh >= 0 && r != null && r.size() >= mh) {
       parse = true;
@@ -201,19 +203,19 @@ public final class TextView extends View {
    */
   void save() {
     final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS,
-        gui.gprop.get(GUIProp.WORKPATH), gui).suffix(IO.XMLSUFFIX);
+        gui.gopts.get(GUIOptions.WORKPATH), gui).suffix(IO.XMLSUFFIX);
 
     final IO file = fc.select(Mode.FSAVE);
     if(file == null) return;
-    gui.gprop.set(GUIProp.WORKPATH, file.path());
+    gui.gopts.set(GUIOptions.WORKPATH, file.path());
+
+    gui.cursor(CURSORWAIT, true);
+    final MainOptions opts = gui.context.options;
+    final int mh = opts.get(MainOptions.MAXHITS);
+    opts.set(MainOptions.MAXHITS, -1);
+    opts.set(MainOptions.CACHEQUERY, false);
 
     PrintOutput out = null;
-    gui.cursor(CURSORWAIT, true);
-    final Prop prop = gui.context.prop;
-    final int mh = prop.num(Prop.MAXHITS);
-    prop.set(Prop.MAXHITS, -1);
-    prop.set(Prop.CACHEQUERY, false);
-
     try {
       out = new PrintOutput(file.toString());
       if(cmd != null) {
@@ -225,11 +227,11 @@ public final class TextView extends View {
         for(final byte t : txt) if(t < 0 || t > ' ' || ws(t)) out.write(t);
       }
     } catch(final IOException ex) {
-      BaseXDialog.error(gui, FILE_NOT_SAVED);
+      BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, file));
     } finally {
       if(out != null) try { out.close(); } catch(final IOException ignored) { }
-      prop.set(Prop.MAXHITS, mh);
-      prop.set(Prop.CACHEQUERY, true);
+      opts.set(MainOptions.MAXHITS, mh);
+      opts.set(MainOptions.CACHEQUERY, true);
       gui.cursor(CURSORARROW, true);
     }
   }

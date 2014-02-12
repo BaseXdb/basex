@@ -52,7 +52,7 @@ final class XdmSequence extends XdmValue {
 
       @Override
       public void remove() {
-        Util.notexpected();
+        throw Util.notExpected();
       }
     };
   }

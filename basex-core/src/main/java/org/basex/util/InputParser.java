@@ -3,13 +3,10 @@ package org.basex.util;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
-import org.basex.core.*;
-import org.basex.io.*;
-
 /**
  * Abstract class for parsing various inputs, such as database commands or queries.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class InputParser {
@@ -34,16 +31,7 @@ public class InputParser {
    */
   public InputParser(final String in) {
     input = in;
-    length = input.length();
-  }
-
-  /**
-   * Sets a file reference.
-   * @param f file
-   * @param c database context
-   */
-  protected void file(final IO f, final Context c) {
-    file = f == null ? null : c.user.has(Perm.ADMIN) ? f.path() : f.name();
+    length = in.length();
   }
 
   /**
@@ -114,7 +102,7 @@ public class InputParser {
    * @param ch character to be checked
    * @return result
    */
-  protected static final boolean quote(final int ch) {
+  protected static boolean quote(final int ch) {
     return ch == '"' || ch == '\'';
   }
 

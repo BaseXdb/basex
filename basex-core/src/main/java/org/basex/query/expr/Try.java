@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * Project specific try/catch expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Try extends Single {
@@ -33,7 +33,7 @@ public final class Try extends Single {
 
   @Override
   public void checkUp() throws QueryException {
-    // check if none or all try/catch expressions are updating
+    // check if no or all try/catch expressions are updating
     final Expr[] tmp = new Expr[ctch.length + 1];
     tmp[0] = expr;
     for(int c = 0; c < ctch.length; ++c) tmp[c + 1] = ctch[c].expr;
@@ -86,8 +86,8 @@ public final class Try extends Single {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
-      final Expr e) throws QueryException {
+  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
 
     boolean change = false;
     try {

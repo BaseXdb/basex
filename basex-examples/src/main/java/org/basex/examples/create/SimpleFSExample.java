@@ -7,7 +7,7 @@ import org.basex.core.cmd.*;
 /**
  * This example demonstrates a simple filesystem parser.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class SimpleFSExample {
@@ -31,7 +31,7 @@ public final class SimpleFSExample {
     final String path = ".";
     final String name = "fsexample";
 
-    final Parser parser = new SimpleFSParser(path, ctx.prop);
+    final Parser parser = new SimpleFSParser(path, ctx.options);
     final CreateDB create = new CreateDB(name);
     create.setParser(parser);
     create.execute(ctx);

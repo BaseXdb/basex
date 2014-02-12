@@ -7,13 +7,14 @@ import org.basex.index.path.*;
 import org.basex.index.value.*;
 import org.basex.io.random.*;
 import org.basex.util.*;
+import org.basex.util.hash.TokenSet;
 
 /**
  * This class stores and organizes the database table and the index structures
  * for textual content in a compressed memory structure.
  * The table mapping is documented in {@link Data}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class MemData extends Data {
@@ -21,10 +22,10 @@ public final class MemData extends Data {
    * Constructor.
    * @param ps path summary
    * @param ns namespaces
-   * @param pr database properties
+   * @param opts database options
    */
-  public MemData(final PathSummary ps, final Namespaces ns, final Prop pr) {
-    this(null, null, ps, ns, pr, null, null);
+  public MemData(final PathSummary ps, final Namespaces ns, final MainOptions opts) {
+    this(null, null, ps, ns, opts, null, null);
   }
 
   /**
@@ -33,14 +34,14 @@ public final class MemData extends Data {
    * @param att attribute name index
    * @param ps path summary
    * @param ns namespaces
-   * @param pr database properties
+   * @param opts database options
    * @param txt text index
    * @param atv attribute value index
    */
-  public MemData(final Names tag, final Names att, final PathSummary ps,
-      final Namespaces ns, final Prop pr, final Index txt, final Index atv) {
+  private MemData(final Names tag, final Names att, final PathSummary ps, final Namespaces ns,
+      final MainOptions opts, final Index txt, final Index atv) {
 
-    meta = new MetaData(pr);
+    meta = new MetaData(opts);
     table = new TableMemAccess(meta);
     if(meta.updindex) {
       idmap = new IdPreMap(meta.lastid);
@@ -61,16 +62,16 @@ public final class MemData extends Data {
    * @param data data reference
    */
   public MemData(final Data data) {
-    this(data.tagindex, data.atnindex, data.paths, null, data.meta.prop,
-        data.txtindex, data.atvindex);
+    this(data.tagindex, data.atnindex, data.paths, null, data.meta.options, data.txtindex,
+        data.atvindex);
   }
 
   /**
    * Constructor, creating a new, empty database.
-   * @param pr property reference
+   * @param opts database options
    */
-  public MemData(final Prop pr) {
-    this(null, null, pr);
+  public MemData(final MainOptions opts) {
+    this(null, null, opts);
   }
 
   @Override
@@ -90,7 +91,7 @@ public final class MemData extends Data {
 
   @Override
   public byte[] text(final int pre, final boolean text) {
-    return ((MemValues) (text ? txtindex : atvindex)).key((int) textOff(pre));
+    return ((TokenSet) (text ? txtindex : atvindex)).key((int) textOff(pre));
   }
 
   @Override
@@ -141,5 +142,10 @@ public final class MemData extends Data {
         ((MemValues) (isAttr ? atvindex : txtindex)).delete(key, id(p));
       }
     }
+  }
+
+  @Override
+  public boolean inMemory() {
+    return true;
   }
 }

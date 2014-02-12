@@ -3,7 +3,7 @@ package org.basex.core;
 /**
  * User permissions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public enum Perm {
@@ -34,8 +34,17 @@ public enum Perm {
    * @param p permission to be compared
    * @return permission
    */
-  Perm min(final Perm p) {
+  public Perm min(final Perm p) {
     return num < p.num ? this : p;
+  }
+
+  /**
+   * Returns the permission with more privileges.
+   * @param p permission to be compared
+   * @return permission
+   */
+  public Perm max(final Perm p) {
+    return num > p.num ? this : p;
   }
 
   /**

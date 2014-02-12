@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * FTWindow expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FTWindow extends FTFilter {
@@ -27,11 +27,9 @@ public final class FTWindow extends FTFilter {
    * @param w window
    * @param u unit
    */
-  public FTWindow(final InputInfo ii, final FTExpr e, final Expr w,
-      final FTUnit u) {
-    super(ii, e);
+  public FTWindow(final InputInfo ii, final FTExpr e, final Expr w, final FTUnit u) {
+    super(ii, e, u);
     win = w;
-    unit = u;
   }
 
   @Override
@@ -41,34 +39,33 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     win = win.compile(ctx, scp);
     return super.compile(ctx, scp);
   }
 
   @Override
-  protected boolean filter(final QueryContext ctx, final FTMatch mtc,
-      final FTLexer lex) throws QueryException {
+  protected boolean filter(final QueryContext ctx, final FTMatch mtc, final FTLexer lex)
+      throws QueryException {
 
     final int n = (int) checkItr(win, ctx) - 1;
     mtc.sort();
 
     FTStringMatch f = null;
     for(final FTStringMatch m : mtc) {
-      if(m.ex) continue;
+      if(m.exclude) continue;
       if(f == null) f = m;
-      f.g |= m.e - f.e > 1;
-      f.e = m.e;
-      if(pos(f.e, lex) - pos(f.s, lex) > n) return false;
+      f.gaps |= m.end - f.end > 1;
+      f.end = m.end;
+      if(pos(f.end, lex) - pos(f.start, lex) > n) return false;
     }
     if(f == null) return false;
 
-    final int w = n - pos(f.e, lex) + pos(f.s, lex);
-    for(int s = pos(f.s, lex) - w; s <= pos(f.s, lex); ++s) {
+    final int w = n - pos(f.end, lex) + pos(f.start, lex);
+    for(int s = pos(f.start, lex) - w; s <= pos(f.start, lex); ++s) {
       boolean h = false;
       for(final FTStringMatch m : mtc) {
-        h = m.ex && pos(m.s, lex) >= s && pos(m.e, lex) <= s + w;
+        h = m.exclude && pos(m.start, lex) >= s && pos(m.end, lex) <= s + w;
         if(h) break;
       }
       if(!h) {
@@ -96,8 +93,8 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public FTExpr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public FTExpr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
     final boolean ex = inlineAll(ctx, scp, expr, v, e);
     final Expr w = win.inline(ctx, scp, v, e);
     if(w != null) win = w;
@@ -105,19 +102,13 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new FTWindow(info, expr[0].copy(ctx, scp, vs), win.copy(ctx, scp, vs), unit);
   }
 
   @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(QueryText.WINDOW, unit), win, expr);
-  }
-
-  @Override
-  public String toString() {
-    return super.toString() + QueryText.WINDOW + ' ' + win + ' ' + unit;
   }
 
   @Override
@@ -130,5 +121,10 @@ public final class FTWindow extends FTFilter {
     int sz = 1;
     for(final FTExpr e : expr) sz += e.exprSize();
     return sz + win.exprSize();
+  }
+
+  @Override
+  public String toString() {
+    return super.toString() + QueryText.WINDOW + ' ' + win + ' ' + unit;
   }
 }

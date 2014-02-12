@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Abstract single expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Single extends ParseExpr {
@@ -53,8 +53,8 @@ public abstract class Single extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
     final Expr sub = expr.inline(ctx, scp, v, e);
     if(sub == null) return null;
     expr = sub;

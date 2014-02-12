@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Element constructor.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Constr {
@@ -32,8 +32,8 @@ public final class Constr {
   /** Error: duplicate namespace. */
   public byte[] duplNS;
 
-  /** Query context. */
-  private final QueryContext ctx;
+  /** Static context. */
+  private final StaticContext sc;
   /** Input information. */
   private final InputInfo info;
   /** Text cache. */
@@ -44,21 +44,22 @@ public final class Constr {
   /**
    * Creates the children of the constructor.
    * @param ii input info
-   * @param qc query context
+   * @param sctx static context
    */
-  public Constr(final InputInfo ii, final QueryContext qc) {
+  public Constr(final InputInfo ii, final StaticContext sctx) {
     info = ii;
-    ctx = qc;
+    sc = sctx;
   }
 
   /**
    * Constructs child and attribute nodes.
+   * @param ctx query context
    * @param expr input expressions
    * @return self reference
    * @throws QueryException query exception
    */
-  public Constr add(final Expr... expr) throws QueryException {
-    final int s = ctx.sc.ns.size();
+  public Constr add(final QueryContext ctx, final Expr... expr) throws QueryException {
+    final int s = sc.ns.size();
     try {
       for(final Expr e : expr) {
         more = false;
@@ -68,7 +69,7 @@ public final class Constr {
       if(!text.isEmpty()) children.add(new FTxt(text.finish()));
       return this;
     } finally {
-      ctx.sc.ns.size(s);
+      sc.ns.size(s);
     }
   }
 
@@ -80,15 +81,9 @@ public final class Constr {
    * @throws QueryException query exception
    */
   private boolean add(final Item it) throws QueryException {
-    if(it instanceof FItem) CONSFUNC.thrw(info, it);
+    if(it instanceof FItem) throw CONSFUNC.get(info, it);
 
-    if(!(it instanceof ANode)) {
-      // type: atomic value
-      if(more) text.add(' ');
-      text.add(it.string(info));
-      more = true;
-
-    } else {
+    if(it instanceof ANode) {
       // type: nodes
       ANode node = (ANode) it;
 
@@ -117,7 +112,7 @@ public final class Constr {
         // add attribute
         atts.add(new FAttr(name, node.string()));
         // add new namespace
-        if(name.hasURI()) ctx.sc.ns.add(name.prefix(), name.uri());
+        if(name.hasURI()) sc.ns.add(name.prefix(), name.uri());
 
       } else if(ip == NodeType.NSP) {
         // type: namespace node
@@ -160,6 +155,12 @@ public final class Constr {
         children.add(node);
       }
       more = false;
+    } else {
+      // type: atomic value
+      if(more) text.add(' ');
+      text.add(it.string(info));
+      more = true;
+
     }
     return true;
   }

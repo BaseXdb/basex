@@ -15,12 +15,12 @@ import org.basex.util.*;
 /**
  * This is the content area of the table view.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class TableContent extends BaseXBack {
   /** Scrollbar reference. */
-  private final BaseXBar scroll;
+  private final BaseXScrollBar scroll;
   /** View reference. */
   private final TableData tdata;
   /** GUI reference. */
@@ -33,12 +33,12 @@ final class TableContent extends BaseXBack {
    * @param d table data
    * @param scr scrollbar reference
    */
-  TableContent(final TableData d, final BaseXBar scr) {
+  TableContent(final TableData d, final BaseXScrollBar scr) {
     scroll = scr;
     tdata = d;
     gui = scr.gui;
     layout(new BorderLayout());
-    mode(gui.gprop.is(GUIProp.GRADIENT) ? Fill.GRADIENT : Fill.NONE);
+    mode(gui.gopts.get(GUIOptions.GRADIENT) ? Fill.GRADIENT : Fill.NONE);
     add(scroll, BorderLayout.EAST);
   }
 
@@ -60,7 +60,6 @@ final class TableContent extends BaseXBack {
     final Data data = context.data();
     final int focus = gui.context.focused;
     final int rfocus = tdata.getRoot(data, focus);
-    int mpos = 0;
 
     final int nCols = tdata.cols.length;
     final int nRows = tdata.rows.size();
@@ -75,6 +74,7 @@ final class TableContent extends BaseXBack {
     int l = scroll.pos() / rowH - 1;
     int posY = -scroll.pos() + l * rowH;
 
+    int mpos = 0;
     while(++l < nRows && marked != null) {
       // skip when all visible rows have been painted or if data has changed
       if(posY > h || l >= tdata.rows.size()) break;
@@ -138,8 +138,7 @@ final class TableContent extends BaseXBack {
               fx = (int) x;
               focusStr = str;
             }
-            BaseXLayout.chopString(g, str, (int) x + 1, posY + 2,
-                (int) cw - 4, fsz);
+            BaseXLayout.chopString(g, str, (int) x + 1, posY + 2, (int) cw - 4, fsz);
             tb[c].reset();
           }
         }

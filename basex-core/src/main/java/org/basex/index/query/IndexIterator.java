@@ -1,9 +1,9 @@
 package org.basex.index.query;
 
 /**
- * This interface provides methods for returning index results.
+ * Iterator for returning index results.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class IndexIterator {
@@ -12,31 +12,26 @@ public abstract class IndexIterator {
     @Override
     public boolean more() { return false; }
     @Override
-    public int next() { return 0; }
+    public int pre() { return 0; }
     @Override
     public int size() { return 0; }
   };
 
   /**
-   * Returns true if more results are found.
+   * Returns true if more results can be returned.
    * @return size
    */
   public abstract boolean more();
 
   /**
-   * Returns the next result.
+   * Returns the next pre value.
    * @return result
    */
-  public abstract int next();
+  public abstract int pre();
 
   /**
-   * Returns the total number of index results.
-   * The iterator may get exhausted by calling this method.
-   * @return result number of results
+   * Returns an approximate number of index results.
+   * @return result approximate number of results
    */
-  public int size() {
-    int c = 0;
-    while(more()) ++c;
-    return c;
-  }
+  public abstract int size();
 }

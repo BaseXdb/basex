@@ -19,18 +19,18 @@ import org.basex.gui.view.table.TableData.TableCol;
 /**
  * This is the header of the table view.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class TableHeader extends BaseXPanel {
   /** View reference. */
-  final TableView view;
+  private final TableView view;
   /** Table Data. */
-  final TableData tdata;
+  private final TableData tdata;
   /** Temporary Input Box. */
-  TableInput box;
+  private TableInput box;
   /** Current input column. */
-  int inputCol = -1;
+  private int inputCol = -1;
 
   /** Header flag. */
   private boolean header;
@@ -85,13 +85,13 @@ final class TableHeader extends BaseXPanel {
     }
 
     final int fsz = fontSize;
-    final int bs = BaseXBar.SIZE;
     int w = getWidth();
     final int h = getHeight();
     final int hh = h >> 1;
     g.setColor(color2);
     g.drawLine(0, h - 1, w, h - 1);
 
+    final int bs = BaseXScrollBar.SIZE;
     w -= bs;
     double x = 0;
     final int nc = tdata.cols.length;
@@ -114,12 +114,11 @@ final class TableHeader extends BaseXPanel {
       g.setFont(bfont);
 
       final int off = clicked ? 1 : 0;
-      BaseXLayout.chopString(g, tdata.cols[n].name, (int) x + 4 + off, 2 + off,
-          (int) cw, fsz);
+      BaseXLayout.chopString(g, tdata.cols[n].name, (int) x + 4 + off, 2 + off, (int) cw, fsz);
 
       if(n == tdata.sortCol) {
-        if(tdata.asc) g.fillPolygon(new int[] { (int) ce - 9 + off,
-            (int) ce - 3 + off, (int) ce - 6 + off },
+        if(tdata.asc) g.fillPolygon(new int[] { (int) ce - 9 + off, (int) ce - 3 + off,
+            (int) ce - 6 + off },
             new int[] { 4 + off, 4 + off, 8 + off }, 3);
         else g.fillPolygon(new int[] { (int) ce - 9 + off, (int) ce - 3 + off,
             (int) ce - 6 + off }, new int[] { 8 + off, 8 + off, 4 + off }, 3);
@@ -144,8 +143,8 @@ final class TableHeader extends BaseXPanel {
     smooth(g);
 
     int o = header && clicked ? 1 : 0;
-    g.fillPolygon(new int[] { (int) x + o + 4, (int) x + o + bs - 4,
-        (int) x + o + bs / 2 }, new int[] { o + 6, o + 6, o + bs - 3 }, 3);
+    g.fillPolygon(new int[] { (int) x + o + 4, (int) x + o + bs - 4, (int) x + o + bs / 2 },
+        new int[] { o + 6, o + 6, o + bs - 3 }, 3);
 
     o = !header && clicked ? 1 : 0;
     final byte[] reset = { 'x' };
@@ -160,14 +159,14 @@ final class TableHeader extends BaseXPanel {
     Cursor cursor = CURSORARROW;
     mouseX = e.getX();
 
-    final int w = getWidth() - BaseXBar.SIZE;
+    final int w = getWidth() - BaseXScrollBar.SIZE;
     if(header(e.getY())) {
       moveC = colSep(w, mouseX);
       if(moveC != -1) cursor = CURSORMOVEH;
     } else {
       moveC = -1;
       if(mouseX < w) cursor = CURSORTEXT;
-      if(gui.gprop.is(GUIProp.MOUSEFOCUS)) {
+      if(gui.gopts.get(GUIOptions.MOUSEFOCUS)) {
         final int c = tdata.column(w, mouseX);
         if(c != -1) filter(c);
       }
@@ -196,7 +195,7 @@ final class TableHeader extends BaseXPanel {
 
     if(moveC != -1) {
       final int x = e.getX();
-      final double p = (double) (x - mouseX) / (getWidth() - BaseXBar.SIZE);
+      final double p = (double) (x - mouseX) / (getWidth() - BaseXScrollBar.SIZE);
       final double[] ww = new double[tdata.cols.length];
       for(int w = 0; w < ww.length; ++w) ww[w] = tdata.cols[w].width;
 
@@ -212,7 +211,7 @@ final class TableHeader extends BaseXPanel {
 
       for(int w = 0; w < ww.length; ++w) tdata.cols[w].width = ww[w];
     } else if(clickCol != -1) {
-      int c = tdata.column(getWidth() - BaseXBar.SIZE, e.getX());
+      int c = tdata.column(getWidth() - BaseXScrollBar.SIZE, e.getX());
       if(c == -1) c = tdata.cols.length;
       if(c != clickCol || header != header(e.getY())) clickCol = -1;
     }
@@ -231,7 +230,7 @@ final class TableHeader extends BaseXPanel {
   public void mousePressed(final MouseEvent e) {
     if(tdata.rows == null || !SwingUtilities.isLeftMouseButton(e)) return;
 
-    clickCol = tdata.column(getWidth() - BaseXBar.SIZE, mouseX);
+    clickCol = tdata.column(getWidth() - BaseXScrollBar.SIZE, mouseX);
     if(clickCol == -1) clickCol = tdata.cols.length;
     header = header(e.getY());
     repaint();
@@ -241,9 +240,7 @@ final class TableHeader extends BaseXPanel {
   public void mouseReleased(final MouseEvent e) {
     if(tdata.rows == null) return;
 
-    if(!SwingUtilities.isLeftMouseButton(e)) {
-      chooseCols(e);
-    } else {
+    if(SwingUtilities.isLeftMouseButton(e)) {
       if(clickCol == -1) return;
       // header
       if(header(e.getY())) {
@@ -261,14 +258,16 @@ final class TableHeader extends BaseXPanel {
         }
       } else {
         // activate table filter
-        if(clickCol != tdata.cols.length) {
-          filter(clickCol);
-        } else {
+        if(clickCol == tdata.cols.length) {
           // reset table filter
           tdata.resetFilter();
           view.query();
+        } else {
+          filter(clickCol);
         }
       }
+    } else {
+      chooseCols(e);
     }
     clickCol = -1;
     view.repaint();

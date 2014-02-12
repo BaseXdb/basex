@@ -8,7 +8,7 @@ import org.basex.core.*;
  * This class assembles text string and tokens required by the XQuery processor
  * implementation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public interface QueryText {
@@ -150,8 +150,6 @@ public interface QueryText {
   String INTO = "into";
   /** Parser token. */
   String ITEMM = "item";
-  /** Parser token. */
-  String JSONSTR = "json";
   /** Parser token. */
   String LANGUAGE = "language";
   /** Parser token. */
@@ -301,6 +299,8 @@ public interface QueryText {
   /** Parser token. */
   String UNORDERED = "unordered";
   /** Parser token. */
+  String UPDATE = "update";
+  /** Parser token. */
   String UPDATING = "updating";
   /** Parser token. */
   String UPPERCASE = "uppercase";
@@ -389,8 +389,6 @@ public interface QueryText {
   String BRACE2 = "}";
   /** Parser token. */
   String CDATA = "<![CDATA[";
-  /** Parser token. */
-  String COL = ":";
   /** Parser token. */
   String COLS = "::";
   /** Parser token. */
@@ -505,7 +503,7 @@ public interface QueryText {
   /** HTML token. */
   byte[] HTML = token("html");
   /** JSON token. */
-  byte[] JSON = token(JSONSTR);
+  byte[] JSON = token("json");
   /** MAP token. */
   byte[] MAP = token(MAPSTR);
   /** Package token. */
@@ -516,6 +514,8 @@ public interface QueryText {
   byte[] SQL = token("sql");
   /** SQL token. */
   byte[] STREAM = token("stream");
+  /** Binary token. */
+  byte[] BIN = token("bin");
   /** Cryptography token. */
   byte[] CRYPTO = token("crypto");
   /** Random token. */
@@ -539,7 +539,6 @@ public interface QueryText {
 
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
-
 
   // URIS =====================================================================
 
@@ -575,17 +574,19 @@ public interface QueryText {
 
   /** EXPath URI. */
   String EXPATH = "http://expath.org/ns/";
-  /** Cryptographic module URI. */
+  /** URI of Binary Module. */
+  byte[] BINURI = token(EXPATH + "binary");
+  /** URI of Cryptographic Module. */
   byte[] CRYPTOURI = token(EXPATH + "crypto");
-  /** File module URI. */
+  /** URI of File Module. */
   byte[] FILEURI = token(EXPATH + "file");
-  /** HTTP Client URI. */
+  /** URI of HTTP Client Module. */
   byte[] HTTPURI = token(EXPATH + "http-client");
-  /** Package API URI. */
+  /** URI of Package API. */
   byte[] PKGURI = token(EXPATH + "pkg");
-  /** ZIP URI.*/
+  /** URI of ZIP Module.*/
   byte[] ZIPURI = token(EXPATH + "zip");
-  /** EXPath Error URI. */
+  /** URI of EXPath errors. */
   byte[] EXPERROR = token(EXPATH + "error");
 
   /** Project URI. */
@@ -650,8 +651,8 @@ public interface QueryText {
 
   /** Java prefix. */
   byte[] JAVAPREF = token("java:");
-  /** Default collation. */
-  byte[] URLCOLL = concat(FNURI, token("/collation/codepoint"));
+  /** URI of default collation. */
+  byte[] COLLATIONURI = concat(FNURI, token("/collation/codepoint"));
 
   /** Supported documentation tags. */
   byte[][] DOC_TAGS = tokens("description", "author", "version", "param",
@@ -755,7 +756,7 @@ public interface QueryText {
   /** Optimization info. */
   String OPTREMOVE = "%: removing %";
   /** Optimization info. */
-  String OPTTCE = "rewriting for tail calls: %";
+  String OPTTCE = "marking as tail call: %";
   /** Optimization info. */
   String OPTREMCTX = "removing context expression (.)";
   /** Optimization info. */
@@ -772,8 +773,6 @@ public interface QueryText {
   String OPTINLINEFN = "inlining function %";
   /** Optimization info. */
   String OPTINLINE = "inlining %";
-  /** Optimization info. */
-  String OPTWHERE = "rewriting where clause to predicate(s)";
   /** Optimization info. */
   String OPTWHERE2 = "rewriting where clause(s)";
   /** Optimization info. */
@@ -802,6 +801,8 @@ public interface QueryText {
   String OPTBIND = "binding static variable %";
   /** Optimization info. */
   String OPTCHILD = "converting % to child steps";
+  /** Optimization info. */
+  String OPTUNROLL = "unrolling %";
 
   /** Warning. */
   String WARNSELF = "Warning: '%' will never yield results.";

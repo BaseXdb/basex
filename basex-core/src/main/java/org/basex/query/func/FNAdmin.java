@@ -21,7 +21,7 @@ import org.basex.util.*;
 /**
  * Admin functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNAdmin extends StandardFunc {
@@ -52,12 +52,13 @@ public final class FNAdmin extends StandardFunc {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNAdmin(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNAdmin(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -112,7 +113,7 @@ public final class FNAdmin extends StandardFunc {
             nli.close();
           }
         } catch(final IOException ex) {
-          IOERR.thrw(info, ex);
+          throw IOERR.get(info, ex);
         }
       }
     }
@@ -157,9 +158,7 @@ public final class FNAdmin extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    if(oneOf(sig, _ADMIN_USERS, _ADMIN_SESSIONS) && !visitor.lock(DBLocking.ADMIN))
-      return false;
-    if(sig == _ADMIN_USERS && expr.length > 0 && !dataLock(visitor)) return false;
-    return super.accept(visitor);
+    return !(oneOf(sig, _ADMIN_USERS, _ADMIN_SESSIONS) && !visitor.lock(DBLocking.ADMIN)) &&
+      !(sig == _ADMIN_USERS && expr.length > 0 && !dataLock(visitor)) && super.accept(visitor);
   }
 }

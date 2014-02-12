@@ -19,7 +19,7 @@ import org.basex.util.*;
 /**
  * This is a parser for XML input, creating {@link Command} instances.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class XMLParser extends CmdParser {
@@ -41,7 +41,7 @@ final class XMLParser extends CmdParser {
   @Override
   protected void parse(final ArrayList<Command> cmds) throws QueryException {
     try {
-      final DBNode node = new DBNode(IO.get(input), ctx.prop);
+      final DBNode node = new DBNode(IO.get(input), ctx.options);
       String query = "/*";
       if(!execute(COMMANDS, node).isEmpty()) {
         query = COMMANDS + query;
@@ -268,7 +268,10 @@ final class XMLParser extends CmdParser {
     }
 
     // build validating query
-    final TokenBuilder tb = new TokenBuilder(".");
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add("declare variable $A external;");
+    tb.add("declare variable $O external;");
+    tb.add(".");
     // check existence of mandatory attributes
     tb.add("[every $e in $A satisfies @*/name() = $e]");
     // check existence of unknown attributes

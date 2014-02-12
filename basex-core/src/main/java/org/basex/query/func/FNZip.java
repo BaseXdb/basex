@@ -9,7 +9,6 @@ import java.util.*;
 import java.util.zip.*;
 
 import org.basex.build.*;
-import org.basex.build.file.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -27,7 +26,7 @@ import org.basex.util.list.*;
 /**
  * Functions on zip files.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNZip extends StandardFunc {
@@ -55,12 +54,13 @@ public final class FNZip extends StandardFunc {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNZip(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNZip(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -98,11 +98,11 @@ public final class FNZip extends StandardFunc {
   private Str textEntry(final QueryContext ctx) throws QueryException {
     final String enc = expr.length < 3 ? null : string(checkStr(expr[2], ctx));
     final IO io = new IOContent(entry(ctx));
-    final boolean val = ctx.context.prop.is(Prop.CHECKSTRINGS);
+    final boolean val = ctx.context.options.get(MainOptions.CHECKSTRINGS);
     try {
       return Str.get(new NewlineInput(io).encoding(enc).validate(val).content());
     } catch(final IOException ex) {
-      throw ZIP_FAIL.thrw(info, ex);
+      throw ZIP_FAIL.get(info, ex);
     }
   }
 
@@ -113,15 +113,13 @@ public final class FNZip extends StandardFunc {
    * @return binary result
    * @throws QueryException query exception
    */
-  private ANode xmlEntry(final QueryContext ctx, final boolean html)
-      throws QueryException {
-
-    final Prop prop = ctx.context.prop;
+  private ANode xmlEntry(final QueryContext ctx, final boolean html) throws QueryException {
+    final MainOptions opts = ctx.context.options;
     final IO io = new IOContent(entry(ctx));
     try {
-      return new DBNode(html ? new HTMLParser(io, prop) : Parser.xmlParser(io, prop));
+      return new DBNode(html ? new HtmlParser(io, opts) : Parser.xmlParser(io, opts));
     } catch(final IOException ex) {
-      throw SAXERR.thrw(info, ex);
+      throw SAXERR.get(info, ex);
     }
   }
 
@@ -136,7 +134,7 @@ public final class FNZip extends StandardFunc {
 
     // check file path
     final IOFile path = new IOFile(file);
-    if(!path.exists()) ZIP_NOTFOUND.thrw(info, file);
+    if(!path.exists()) throw ZIP_NOTFOUND.get(info, file);
     // loop through file
     ZipFile zf = null;
     try {
@@ -146,7 +144,7 @@ public final class FNZip extends StandardFunc {
       createEntries(paths(zf).iterator(), root, "");
       return root;
     } catch(final IOException ex) {
-      throw ZIP_FAIL.thrw(info, ex);
+      throw ZIP_FAIL.get(info, ex);
     } finally {
       if(zf != null) try { zf.close(); } catch(final IOException ignored) { }
     }
@@ -220,7 +218,7 @@ public final class FNZip extends StandardFunc {
   private Item zipFile(final QueryContext ctx) throws QueryException {
     // check argument
     final ANode elm = (ANode) checkType(expr[0].item(ctx, info), NodeType.ELM);
-    if(!elm.qname().eq(Q_FILE)) ZIP_UNKNOWN.thrw(info, elm.qname());
+    if(!elm.qname().eq(Q_FILE)) throw ZIP_UNKNOWN.get(info, elm.qname());
     // get file
     final String file = attribute(elm, HREF, true);
 
@@ -234,7 +232,7 @@ public final class FNZip extends StandardFunc {
       zos.close();
     } catch(final IOException ex) {
       ok = false;
-      ZIP_FAIL.thrw(info, ex);
+      throw ZIP_FAIL.get(info, ex);
     } finally {
       if(fos != null) {
         try { fos.close(); } catch(final IOException ignored) { }
@@ -263,7 +261,7 @@ public final class FNZip extends StandardFunc {
       // get entry type
       final QNm mode = node.qname();
       final boolean dir = mode.eq(Q_DIR);
-      if(!dir && !mode.eq(Q_ENTRY)) ZIP_UNKNOWN.thrw(info, mode);
+      if(!dir && !mode.eq(Q_ENTRY)) throw ZIP_UNKNOWN.get(info, mode);
 
       // file path: if null, the zip base name is used
       String name = attribute(node, NAME, false);
@@ -273,7 +271,7 @@ public final class FNZip extends StandardFunc {
 
       if(name == null) {
         // throw exception if both attributes are null
-        if(src == null) throw ZIP_INVALID.thrw(info, node.qname(), SRC);
+        if(src == null) throw ZIP_INVALID.get(info, node.qname(), SRC);
         name = src;
       }
       name = name.replaceAll(".*/", "");
@@ -287,7 +285,7 @@ public final class FNZip extends StandardFunc {
       } else {
         if(src != null) {
           // write file to zip archive
-          if(!new IOFile(src).exists()) ZIP_NOTFOUND.thrw(info, src);
+          if(!new IOFile(src).exists()) throw ZIP_NOTFOUND.get(info, src);
 
           BufferedInputStream bis = null;
           try {
@@ -328,7 +326,7 @@ public final class FNZip extends StandardFunc {
                   ser.serialize(DataBuilder.stripNS(n, ZIPURI, ctx.context));
                 } while((n = ch.next()) != null);
                 ser.close();
-              } catch(final SerializerException ex) {
+              } catch(final QueryIOException ex) {
                 throw ex.getCause(info);
               }
             }
@@ -342,19 +340,19 @@ public final class FNZip extends StandardFunc {
   /**
    * Returns serialization parameters.
    * @param node node with parameters
-   * @return properties
+   * @return parameters
+   * @throws BaseXException database exception
    */
-  private static SerializerProp serPar(final ANode node) {
+  private static SerializerOptions serPar(final ANode node) throws BaseXException {
     // interpret query parameters
-    final TokenBuilder tb = new TokenBuilder();
+    final SerializerOptions sopts = new SerializerOptions();
     final AxisIter ati = node.attributes();
     for(ANode at; (at = ati.next()) != null;) {
       final byte[] name = at.qname().string();
-      if(Token.eq(name, NAME) || Token.eq(name, SRC)) continue;
-      if(!tb.isEmpty()) tb.add(',');
-      tb.add(name).add('=').add(at.string());
+      if(eq(name, NAME, SRC)) continue;
+      sopts.assign(string(name), string(at.string()));
     }
-    return new SerializerProp(tb.toString());
+    return sopts;
   }
 
   /**
@@ -366,7 +364,7 @@ public final class FNZip extends StandardFunc {
   private Item updateEntries(final QueryContext ctx) throws QueryException {
     // check argument
     final ANode elm = (ANode) checkType(expr[0].item(ctx, info), NodeType.ELM);
-    if(!elm.qname().eq(Q_FILE)) ZIP_UNKNOWN.thrw(info, elm.qname());
+    if(!elm.qname().eq(Q_FILE)) throw ZIP_UNKNOWN.get(info, elm.qname());
 
     // sorted paths in original file
     final String in = attribute(elm, HREF, true);
@@ -379,7 +377,7 @@ public final class FNZip extends StandardFunc {
     } while(out.exists());
 
     // open zip file
-    if(!new IOFile(in).exists()) ZIP_NOTFOUND.thrw(info, in);
+    if(!new IOFile(in).exists()) throw ZIP_NOTFOUND.get(info, in);
     ZipFile zf = null;
     boolean ok = true;
     try {
@@ -394,12 +392,12 @@ public final class FNZip extends StandardFunc {
         zos.close();
       } catch(final IOException ex) {
         ok = false;
-        ZIP_FAIL.thrw(info, ex);
+        throw ZIP_FAIL.get(info, ex);
       } finally {
         if(fos != null) try { fos.close(); } catch(final IOException ignored) { }
       }
     } catch(final IOException ex) {
-      throw ZIP_FAIL.thrw(info, ex);
+      throw ZIP_FAIL.get(info, ex);
     } finally {
       if(zf != null) try { zf.close(); } catch(final IOException ignored) { }
       if(ok) {
@@ -453,7 +451,7 @@ public final class FNZip extends StandardFunc {
       throws QueryException {
 
     final byte[] val = elm.attribute(name);
-    if(val == null && force) throw ZIP_INVALID.thrw(info, elm.qname(), name);
+    if(val == null && force) throw ZIP_INVALID.get(info, elm.qname(), name);
     return val == null ? null : string(val);
   }
 
@@ -466,14 +464,14 @@ public final class FNZip extends StandardFunc {
   private byte[] entry(final QueryContext ctx) throws QueryException {
     final IOFile file = new IOFile(string(checkStr(expr[0], ctx)));
     final String path = string(checkStr(expr[1], ctx));
-    if(!file.exists()) ZIP_NOTFOUND.thrw(info, file);
+    if(!file.exists()) throw ZIP_NOTFOUND.get(info, file);
 
     try {
       return new Zip(file).read(path);
     } catch(final FileNotFoundException ex) {
-      throw ZIP_NOTFOUND.thrw(info, file + "/" + path);
+      throw ZIP_NOTFOUND.get(info, file + "/" + path);
     } catch(final IOException ex) {
-      throw ZIP_FAIL.thrw(info, ex);
+      throw ZIP_FAIL.get(info, ex);
     }
   }
 }

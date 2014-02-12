@@ -14,7 +14,7 @@ import org.basex.query.func.*;
 /**
  * This class caches information on a single XQuery module with RESTXQ annotations.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class RestXqModule {
@@ -22,29 +22,29 @@ final class RestXqModule {
   private final ArrayList<RestXqFunction> functions = new ArrayList<RestXqFunction>();
   /** File reference. */
   private final IOFile file;
-  /** Main module flag. */
-  private final boolean main;
+  /** Library module flag. */
+  private final boolean lib;
   /** Parsing timestamp. */
   private long time;
 
   /**
    * Constructor.
    * @param in xquery module
-   * @param m main module flag
+   * @param l library module flag
    */
-  RestXqModule(final IOFile in, final boolean m) {
+  RestXqModule(final IOFile in, final boolean l) {
     file = in;
     time = in.timeStamp();
-    main = m;
+    lib = l;
   }
 
   /**
    * Checks the module for RESTXQ annotations.
    * @param http http context
    * @return {@code true} if module contains relevant annotations
-   * @throws QueryException query exception
+   * @throws Exception exception (including unexpected ones)
    */
-  boolean parse(final HTTPContext http) throws QueryException {
+  boolean parse(final HTTPContext http) throws Exception {
     functions.clear();
 
     // loop through all functions
@@ -53,7 +53,7 @@ final class RestXqModule {
       // loop through all functions
       for(final StaticFunc uf : qc.funcs.funcs()) {
         // consider only functions that are defined in this module
-        if(!file.name().equals(new IOFile(uf.info.file()).name())) continue;
+        if(!file.name().equals(new IOFile(uf.info.path()).name())) continue;
         final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
         if(rxf.parse()) functions.add(rxf);
       }
@@ -93,8 +93,8 @@ final class RestXqModule {
    * @param error optional error reference
    * @throws Exception exception
    */
-  void process(final HTTPContext http, final RestXqFunction func,
-      final QueryException error) throws Exception {
+  void process(final HTTPContext http, final RestXqFunction func, final QueryException error)
+      throws Exception {
 
     // create new XQuery instance
     final QueryContext qc = parseModule(http);
@@ -124,13 +124,10 @@ final class RestXqModule {
   private QueryContext parseModule(final HTTPContext http) throws QueryException {
     final QueryContext qc = new QueryContext(http.context());
     try {
-      final String cont = string(file.read());
-      final String path = file.path();
-      if(main) qc.parseMain(cont, path);
-      else qc.parseLibrary(cont, path);
+      qc.parse(string(file.read()), lib, file.path(), null);
       return qc;
     } catch(final IOException ex) {
-      throw IOERR.thrw(null, ex);
+      throw IOERR.get(null, ex);
     }
   }
 }

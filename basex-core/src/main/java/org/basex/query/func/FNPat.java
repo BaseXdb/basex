@@ -21,7 +21,7 @@ import org.basex.util.list.*;
 /**
  * String pattern functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNPat extends StandardFunc {
@@ -49,12 +49,13 @@ public final class FNPat extends StandardFunc {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNPat(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNPat(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -102,11 +103,9 @@ public final class FNPat extends StandardFunc {
    * @return function result
    * @throws QueryException query exception
    */
-  private Item analyzeString(final byte[] val, final QueryContext ctx)
-      throws QueryException {
-
+  private Item analyzeString(final byte[] val, final QueryContext ctx) throws QueryException {
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
-    if(p.matcher("").matches()) REGROUP.thrw(info);
+    if(p.matcher("").matches()) throw REGROUP.get(info);
     final String str = string(val);
     final Matcher m = p.matcher(str);
 
@@ -129,9 +128,7 @@ public final class FNPat extends StandardFunc {
    * @param g group number
    * @return next group number and position in string
    */
-  private static int[] match(final Matcher m, final String str, final FElem par,
-      final int g) {
-
+  private static int[] match(final Matcher m, final String str, final FElem par, final int g) {
     final FElem nd = new FElem(g == 0 ? Q_MATCH : Q_MGROUP);
     if(g > 0) nd.add(NR, token(g));
 
@@ -173,15 +170,15 @@ public final class FNPat extends StandardFunc {
     for(int i = 0; i < rep.length; ++i) {
       if(rep[i] == '\\') {
         if(i + 1 == rep.length || rep[i + 1] != '\\' && rep[i + 1] != '$')
-          FUNREPBS.thrw(info);
+          throw FUNREPBS.get(info);
         ++i;
       }
       if(rep[i] == '$' && (i == 0 || rep[i - 1] != '\\') &&
-        (i + 1 == rep.length || !digit(rep[i + 1]))) FUNREPDOL.thrw(info);
+        (i + 1 == rep.length || !digit(rep[i + 1]))) throw FUNREPDOL.get(info);
     }
 
     final Pattern p = pattern(expr[1], expr.length == 4 ? expr[3] : null, ctx);
-    if(p.pattern().isEmpty()) REGROUP.thrw(info);
+    if(p.pattern().isEmpty()) throw REGROUP.get(info);
 
     String r = string(rep);
     if((p.flags() & Pattern.LITERAL) != 0) {
@@ -191,8 +188,8 @@ public final class FNPat extends StandardFunc {
     try {
       return Str.get(p.matcher(string(val)).replaceAll(r));
     } catch(final Exception ex) {
-      if(ex.getMessage().contains("No group")) REGROUP.thrw(info);
-      throw REGPAT.thrw(info, ex);
+      if(ex.getMessage().contains("No group")) throw REGROUP.get(info);
+      throw REGPAT.get(info, ex);
     }
   }
 
@@ -205,7 +202,7 @@ public final class FNPat extends StandardFunc {
   private Value tokenize(final QueryContext ctx) throws QueryException {
     final byte[] val = checkEStr(expr[0], ctx);
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
-    if(p.matcher("").matches()) REGROUP.thrw(info);
+    if(p.matcher("").matches()) throw REGROUP.get(info);
 
     final TokenList tl = new TokenList();
     final String str = string(val);
@@ -229,8 +226,8 @@ public final class FNPat extends StandardFunc {
    * @return pattern modifier
    * @throws QueryException query exception
    */
-  private Pattern pattern(final Expr pattern, final Expr modifier,
-      final QueryContext ctx) throws QueryException {
+  private Pattern pattern(final Expr pattern, final Expr modifier, final QueryContext ctx)
+      throws QueryException {
 
     final byte[] pat = checkStr(pattern, ctx);
     final byte[] mod = modifier != null ? checkStr(modifier, ctx) : null;
@@ -239,7 +236,7 @@ public final class FNPat extends StandardFunc {
     final byte[] key = tb.finish();
     Pattern p = patterns.get(key);
     if(p == null) {
-      p = RegExParser.parse(pat, mod, ctx.sc.xquery3(), info);
+      p = RegExParser.parse(pat, mod, sc.xquery3(), info);
       patterns.put(key, p);
     }
     return p;

@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Leaf that contains a collision list of keys with the same hash code.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 final class List extends TrieNode {
@@ -92,21 +92,20 @@ final class List extends TrieNode {
     final TrieNode[] ch = new TrieNode[KIDS];
     final int a = key(h, l), b = key(hash, l);
     final int used;
-    if(a != b) {
+    if(a == b) {
+      ch[a] = insert(h, k, v, l + 1, ii);
+      used = 1 << a;
+    } else {
       ch[a] = new Leaf(h, k, v);
       ch[b] = this;
       used = 1 << a | 1 << b;
-    } else {
-      ch[a] = insert(h, k, v, l + 1, ii);
-      used = 1 << a;
     }
     // we definitely inserted one value
     return new Branch(ch, used, size + 1);
   }
 
   @Override
-  Value get(final int h, final Item k, final int l, final InputInfo ii)
-      throws QueryException {
+  Value get(final int h, final Item k, final int l, final InputInfo ii) throws QueryException {
     if(h == hash) for(int i = keys.length; i-- != 0;)
       if(eq(k, keys[i], ii)) return values[i];
     return null;
@@ -132,8 +131,7 @@ final class List extends TrieNode {
   }
 
   @Override
-  TrieNode addAll(final TrieNode o, final int l, final InputInfo ii)
-      throws QueryException {
+  TrieNode addAll(final TrieNode o, final int l, final InputInfo ii) throws QueryException {
     return o.add(this, l, ii);
   }
 

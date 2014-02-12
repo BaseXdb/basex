@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.io.*;
-import org.basex.io.serial.*;
 import org.basex.util.*;
 
 /**
@@ -14,7 +13,7 @@ import org.basex.util.*;
  * it can also be explicitly set by calling {@link #encoding()}.
  * UTF-8 will be used as default encoding.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class TextInput extends BufferInput {
@@ -53,7 +52,7 @@ public class TextInput extends BufferInput {
       final int b = readByte();
       final int c = readByte();
       final int d = readByte();
-      String e = null;
+      String e = UTF8;
       int skip = 0;
       if(a == 0xFF && b == 0xFE) { // BOM: FF FE
         e = UTF16LE;
@@ -70,7 +69,7 @@ public class TextInput extends BufferInput {
       }
       reset();
       for(int s = 0; s < skip; s++) readByte();
-      decoder = TextDecoder.get(normEncoding(e));
+      decoder = TextDecoder.get(e);
     } catch(final IOException ex) {
       close();
       throw ex;
@@ -105,7 +104,9 @@ public class TextInput extends BufferInput {
    */
   public TextInput encoding(final String enc) throws IOException {
     if(enc != null) {
-      decoder = TextDecoder.get(normEncoding(enc, decoder.encoding));
+      String e = normEncoding(enc);
+      if(e == UTF16) e = decoder.encoding == UTF16LE ? UTF16LE : UTF16BE;
+      decoder = TextDecoder.get(e);
       decoder.valid = valid;
     }
     return this;

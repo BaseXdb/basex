@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * This class contains a single full-text token.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Jens Erat
  */
 public final class FTSpan {
@@ -32,6 +32,6 @@ public final class FTSpan {
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + string(text) + ']';
+    return Util.className(this) + '[' + string(text) + ']';
   }
 }

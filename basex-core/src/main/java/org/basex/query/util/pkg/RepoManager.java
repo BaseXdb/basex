@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * Repository manager.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  */
 public final class RepoManager {
@@ -63,7 +63,7 @@ public final class RepoManager {
       cont = io.read();
     } catch(final IOException ex) {
       Util.debug(ex);
-      BXRE_WHICH.thrw(info, path);
+      throw BXRE_WHICH.get(info, path);
     }
 
     try {
@@ -71,7 +71,7 @@ public final class RepoManager {
       if(io.hasSuffix(IO.JARSUFFIX)) return installJAR(cont);
       return installXAR(cont);
     } catch(final IOException ex) {
-      throw BXRE_PARSE.thrw(info, io.name(), ex);
+      throw BXRE_PARSE.get(info, io.name(), ex);
     }
   }
 
@@ -118,8 +118,8 @@ public final class RepoManager {
    * @param path package path
    * @return new entry
    */
-  private static TokenList entry(final String name, final String version,
-      final String type, final String path) {
+  private static TokenList entry(final String name, final String version, final String type,
+      final String path) {
 
     final TokenList tl = new TokenList();
     tl.add(name);
@@ -169,13 +169,13 @@ public final class RepoManager {
       if(eq(nextPkg, pp) || eq(Package.name(nextPkg), pp)) {
         // check if package to be deleted participates in a dependency
         final byte[] primPkg = primary(nextPkg);
-        if(primPkg != null) BXRE_DEP.thrw(info, string(primPkg), pkg);
+        if(primPkg != null) throw BXRE_DEP.get(info, string(primPkg), pkg);
 
         // clean package repository
         final IOFile f = repo.path(string(dict.get(nextPkg)));
         repo.delete(new PkgParser(repo, info).parse(new IOFile(f, DESCRIPTOR)));
         // package does not participate in a dependency => delete it
-        if(!f.delete()) BXRE_DELETE.thrw(info, f);
+        if(!f.delete()) throw BXRE_DELETE.get(info, f);
         found = true;
       }
     }
@@ -183,11 +183,11 @@ public final class RepoManager {
     // traverse all files
     final IOFile file = file(pkg, repo);
     if(file != null) {
-      if(!file.delete()) BXRE_DELETE.thrw(info, file);
+      if(!file.delete()) throw BXRE_DELETE.get(info, file);
       return;
     }
 
-    if(!found) BXRE_WHICH.thrw(info, pkg);
+    if(!found) throw BXRE_WHICH.get(info, pkg);
   }
 
   /**
@@ -226,13 +226,13 @@ public final class RepoManager {
 
     // parse module to find namespace uri
     final Context ctx = repo.context;
-    final byte[] uri = new QueryContext(ctx).parseLibrary(string(cont), path).name.uri();
+    final byte[] uri = new QueryContext(ctx).parseLibrary(string(cont), path, null).name.uri();
 
     // copy file to rewritten URI file path
     final String uriPath = ModuleLoader.uri2path(string(uri));
-    if(uriPath == null) BXRE_URI.thrw(info, uri);
+    if(uriPath == null) throw BXRE_URI.get(info, uri);
 
-    final IOFile rp = new IOFile(ctx.mprop.get(MainProp.REPOPATH));
+    final IOFile rp = new IOFile(ctx.globalopts.get(GlobalOptions.REPOPATH));
     final boolean exists = md(rp, uriPath);
     new IOFile(rp, uriPath + IO.XQMSUFFIX).write(cont);
     return exists;
@@ -253,7 +253,7 @@ public final class RepoManager {
       if(!m.find()) continue;
 
       // copy file to rewritten file path
-      final IOFile rp = new IOFile(repo.context.mprop.get(MainProp.REPOPATH));
+      final IOFile rp = new IOFile(repo.context.globalopts.get(GlobalOptions.REPOPATH));
       final String path = m.group(1).replace('.', '/');
       final boolean exists = md(rp, path);
       new IOFile(rp, path + IO.JARSUFFIX).write(cont);

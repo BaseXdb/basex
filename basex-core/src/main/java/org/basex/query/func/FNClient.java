@@ -11,7 +11,6 @@ import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -21,21 +20,22 @@ import org.basex.util.*;
 /**
  * Functions to connect remote database instances.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNClient extends StandardFunc {
   /** Query pattern. */
-  static final Pattern QUERYPAT = Pattern.compile("\\[(.*?)\\] (.*)", Pattern.MULTILINE);
+  private static final Pattern QUERYPAT = Pattern.compile("\\[(.*?)\\] (.*)", Pattern.MULTILINE);
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNClient(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNClient(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -81,7 +81,7 @@ public final class FNClient extends StandardFunc {
     try {
       return ctx.sessions().add(new ClientSession(host, port, user, pass));
     } catch(final IOException ex) {
-      throw BXCL_CONN.thrw(info, ex);
+      throw BXCL_CONN.get(info, ex);
     }
   }
 
@@ -102,9 +102,9 @@ public final class FNClient extends StandardFunc {
       cs.setOutputStream(null);
       return Str.get(ao.toArray());
     } catch(final BaseXException ex) {
-      throw BXCL_COMMAND.thrw(info, ex);
+      throw BXCL_COMMAND.get(info, ex);
     } catch(final IOException ex) {
-      throw BXCL_COMM.thrw(info, ex);
+      throw BXCL_COMM.get(info, ex);
     }
   }
 
@@ -136,7 +136,7 @@ public final class FNClient extends StandardFunc {
         final String k = it.getKey();
         final Value v = it.getValue();
         final ArrayOutput val = v.serialize();
-        if(!v.isItem()) BXCL_ITEM.thrw(info, v);
+        if(!v.isItem()) throw BXCL_ITEM.get(info, v);
         final String t = v.type().toString();
         if(k.isEmpty()) cq.context(val, t);
         else cq.bind(k, val, t);
@@ -144,20 +144,22 @@ public final class FNClient extends StandardFunc {
       // evaluate query
       while(cq.more()) {
         final String result = cq.next();
-        vb.add(cq.type().castString(result, ctx, info));
+        vb.add(cq.type().castString(result, ctx, sc, info));
       }
       return vb.value();
+    } catch(final QueryIOException ex) {
+      throw ex.getCause(info);
     } catch(final BaseXException ex) {
       final Matcher m = QUERYPAT.matcher(ex.getMessage());
       if(m.find()) {
-        Err.thrw(m.group(1), info, m.group(2));
-        throw new QueryException(info, new QNm(m.group(1)), m.group(2));
+        final QueryException exc = get(m.group(1), info, m.group(2));
+        throw exc == null ? new QueryException(info, new QNm(m.group(1)), m.group(2)) : exc;
       }
-      throw BXCL_QUERY.thrw(info, ex);
+      throw BXCL_QUERY.get(info, ex);
     } catch(final IOException ex) {
-      throw BXCL_COMM.thrw(info, ex);
+      throw BXCL_COMM.get(info, ex);
     } finally {
-      if(cq != null) try { cq.close(); } catch(final IOException ex) { }
+      if(cq != null) try { cq.close(); } catch(final IOException ignored) { }
     }
   }
 
@@ -172,7 +174,7 @@ public final class FNClient extends StandardFunc {
       session(ctx, true).close();
       return null;
     } catch(final IOException ex) {
-      throw BXCL_COMMAND.thrw(info, ex);
+      throw BXCL_COMMAND.get(info, ex);
     }
   }
 
@@ -184,12 +186,10 @@ public final class FNClient extends StandardFunc {
    * @return connection
    * @throws QueryException query exception
    */
-  private ClientSession session(final QueryContext ctx, final boolean del)
-      throws QueryException {
-
+  private ClientSession session(final QueryContext ctx, final boolean del) throws QueryException {
     final Uri id = (Uri) checkType(expr[0].item(ctx, info), AtomType.URI);
     final ClientSession cs = ctx.sessions().get(id);
-    if(cs == null) BXCL_NOTAVL.thrw(info, id);
+    if(cs == null) throw BXCL_NOTAVL.get(info, id);
     if(del) ctx.sessions().remove(id);
     return cs;
   }

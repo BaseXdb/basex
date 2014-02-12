@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
 /**
  * Element constructor.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class CElem extends CName {
@@ -28,13 +28,15 @@ public final class CElem extends CName {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param t tag
    * @param ns namespaces, or {@code null} if this is a computed constructor.
    * @param cont element contents
    */
-  public CElem(final InputInfo ii, final Expr t, final Atts ns, final Expr... cont) {
-    super(ELEMENT, ii, t, cont);
+  public CElem(final StaticContext sctx, final InputInfo ii, final Expr t, final Atts ns,
+      final Expr... cont) {
+    super(ELEMENT, sctx, ii, t, cont);
     nspaces = ns == null ? new Atts() : ns;
     comp = ns == null;
     type = SeqType.ELM;
@@ -42,15 +44,15 @@ public final class CElem extends CName {
 
   @Override
   public CElem compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    final int s = addNS(ctx);
+    final int s = addNS();
     super.compile(ctx, scp);
-    ctx.sc.ns.size(s);
+    sc.ns.size(s);
     return this;
   }
 
   @Override
   public FElem item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final int s = addNS(ctx);
+    final int s = addNS();
     try {
       // adds in-scope namespaces
       final Atts ns = new Atts();
@@ -61,20 +63,20 @@ public final class CElem extends CName {
       // create and check QName
       final QNm nm = qname(ctx, ii);
       final byte[] cp = nm.prefix(), cu = nm.uri();
-      if(eq(cp, XML) ^ eq(cu, XMLURI)) CEXML.thrw(info, cu, cp);
-      if(eq(cu, XMLNSURI)) CEINV.thrw(info, cu);
-      if(eq(cp, XMLNS)) CEINV.thrw(info, cp);
-      if(!nm.hasURI() && nm.hasPrefix()) INVPREF.thrw(info, nm);
+      if(eq(cp, XML) ^ eq(cu, XMLURI)) throw CEXML.get(info, cu, cp);
+      if(eq(cu, XMLNSURI)) throw CEINV.get(info, cu);
+      if(eq(cp, XMLNS)) throw CEINV.get(info, cp);
+      if(!nm.hasURI() && nm.hasPrefix()) throw INVPREF.get(info, nm);
 
       // analyze element namespace unless it is "xml"
       if(!eq(cp, XML)) {
         // request namespace for the specified uri
-        final byte[] uri = ctx.sc.ns.uri(cp);
+        final byte[] uri = sc.ns.uri(cp);
 
         // check if element has a namespace
         if(nm.hasURI()) {
           // add to statically known namespaces
-          if(!comp && (uri == null || !eq(uri, cu))) ctx.sc.ns.add(cp, cu);
+          if(!comp && (uri == null || !eq(uri, cu))) sc.ns.add(cp, cu);
           // add to in-scope namespaces
           if(!ns.contains(cp)) ns.add(cp, cu);
         } else {
@@ -84,18 +86,18 @@ public final class CElem extends CName {
       }
 
       // create node
-      final Constr constr = new Constr(ii, ctx);
+      final Constr constr = new Constr(ii, sc);
       final FElem node = new FElem(nm, ns, constr.children, constr.atts);
 
       // add child and attribute nodes
-      constr.add(expr);
-      if(constr.errAtt) NOATTALL.thrw(info);
-      if(constr.errNS) NONSALL.thrw(info);
-      if(constr.duplAtt != null) CATTDUPL.thrw(info, constr.duplAtt);
-      if(constr.duplNS != null) DUPLNSCONS.thrw(info, constr.duplNS);
+      constr.add(ctx, expr);
+      if(constr.errAtt) throw NOATTALL.get(info);
+      if(constr.errNS) throw NONSALL.get(info);
+      if(constr.duplAtt != null) throw CATTDUPL.get(info, constr.duplAtt);
+      if(constr.duplNS != null) throw DUPLNSCONS.get(info, constr.duplNS);
 
       // check namespaces
-      if(constr.nspaces.contains(EMPTY) && !nm.hasURI()) DUPLNSCONS.thrw(info, EMPTY);
+      if(constr.nspaces.contains(EMPTY) && !nm.hasURI()) throw DUPLNSCONS.get(info, EMPTY);
 
       // add namespaces from constructor
       final Atts cns = constr.nspaces;
@@ -121,7 +123,7 @@ public final class CElem extends CName {
       }
 
       // add inherited namespaces
-      final Atts stack = ctx.sc.ns.stack();
+      final Atts stack = sc.ns.stack();
       for(int a = stack.size() - 1; a >= 0; a--) {
         final byte[] pref = stack.name(a);
         if(!ns.contains(pref)) ns.add(pref, stack.value(a));
@@ -132,8 +134,8 @@ public final class CElem extends CName {
         final ANode child = constr.children.get(c);
         // add inherited and remove unused namespaces
         if(child.type == NodeType.ELM) {
-          if(ctx.sc.inheritNS) inherit(child, ns);
-          if(!ctx.sc.preserveNS) noPreserve(child);
+          if(sc.inheritNS) inherit(child, ns);
+          if(!sc.preserveNS) noPreserve(child);
           child.optimize();
         }
       }
@@ -142,13 +144,13 @@ public final class CElem extends CName {
       return node.optimize();
 
     } finally {
-      ctx.sc.ns.size(s);
+      sc.ns.size(s);
     }
   }
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CElem(info, name.copy(ctx, scp, vs), comp ? null : nspaces.copy(),
+    return new CElem(sc, info, name.copy(ctx, scp, vs), comp ? null : nspaces.copy(),
         copyAll(ctx, scp, vs, expr));
   }
 
@@ -163,7 +165,7 @@ public final class CElem extends CName {
       boolean f = eq(ns.name(i), pref);
       final AxisIter atts = node.attributes();
       for(ANode it; !f && (it = atts.next()) != null;) {
-        f |= eq(it.qname().prefix(), pref);
+        f = eq(it.qname().prefix(), pref);
       }
       if(!f) ns.delete(i);
     }
@@ -218,11 +220,10 @@ public final class CElem extends CName {
 
   /**
    * Adds namespaces to the namespace stack.
-   * @param ctx query context
    * @return old position in namespace stack
    */
-  private int addNS(final QueryContext ctx) {
-    final NSContext ns = ctx.sc.ns;
+  private int addNS() {
+    final NSContext ns = sc.ns;
     final int s = ns.size();
     for(int n = 0; n < nspaces.size(); n++) ns.add(nspaces.name(n), nspaces.value(n));
     return s;

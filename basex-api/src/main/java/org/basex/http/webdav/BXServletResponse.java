@@ -9,19 +9,17 @@ import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.Cookie;
 
 /**
- * Wrapper around {@link HttpServletResponse}, which in addition implements
- * {@link Response}. <br/>
- * This implementation is the same as the implementation of
- * {@code ServletResponse} found in {@code milton-servlet}. Since this is one of
- * the few classes which is needed from that library, the source was integrated
- * into BaseX.
+ * Wrapper around {@link HttpServletResponse}, which in addition implements {@link Response}.<br/>
+ * This implementation is the same as the implementation of {@code ServletResponse} found in
+ * {@code milton-servlet}. Since this is one of the few classes which is needed from that library,
+ * the source was integrated into BaseX.
  *
  * @author Milton Development Team
  * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public final class BXServletResponse extends AbstractResponse {
+final class BXServletResponse extends AbstractResponse {
   /** Thread local variable to hold the current response. */
   private static final ThreadLocal<HttpServletResponse> RESPONSE =
       new ThreadLocal<HttpServletResponse>();
@@ -37,7 +35,7 @@ public final class BXServletResponse extends AbstractResponse {
    * Constructor.
    * @param r HTTP servlet response
    */
-  public BXServletResponse(final HttpServletResponse r) {
+  BXServletResponse(final HttpServletResponse r) {
     res = r;
     RESPONSE.set(r);
   }

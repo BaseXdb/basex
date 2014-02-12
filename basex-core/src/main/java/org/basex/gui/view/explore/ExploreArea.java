@@ -15,10 +15,12 @@ import org.basex.index.stats.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
+import javax.swing.text.JTextComponent;
+
 /**
  * This view provides standard GUI components to browse the currently opened database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Bastian Lemke
  */
@@ -116,7 +118,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     for(int c = 0; c < cs; c += 2) {
       final BaseXCombo combo = (BaseXCombo) panel.getComponent(c);
       if(combo.getSelectedIndex() == 0) continue;
-      final String elem = combo.getSelectedItem().toString();
+      final String elem = combo.getSelectedItem();
       if(!elem.startsWith("@")) tl.add(Token.token(elem));
     }
 
@@ -149,8 +151,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    * @param pos position
    * @param itr integer flag
    */
-  private void addSlider(final double min, final double max, final int pos,
-      final boolean itr) {
+  private void addSlider(final double min, final double max, final int pos, final boolean itr) {
     final BaseXDSlider sl = new BaseXDSlider(min, max, gui, this);
     BaseXLayout.setWidth(sl, COMPW + BaseXDSlider.LABELW);
     sl.itr = itr;
@@ -176,7 +177,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
         final Data data = gui.context.data();
         final boolean selected = combo.getSelectedIndex() != 0;
         if(selected) {
-          final String item = combo.getSelectedItem().toString();
+          final String item = combo.getSelectedItem();
           final boolean att = item.startsWith("@");
           final Names names = att ? data.atnindex : data.tagindex;
           final byte[] key = Token.token(att ? item.substring(1) : item);
@@ -226,7 +227,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       final BaseXCombo com = (BaseXCombo) panel.getComponent(c);
       final int k = com.getSelectedIndex();
       if(k <= 0) continue;
-      String key = com.getSelectedItem().toString().replaceAll("^(@?)(.*):", "$1*:");
+      String key = com.getSelectedItem().replaceAll("^(@?)(.*):", "$1*:");
       final boolean attr = key.startsWith("@");
 
       final Component comp = panel.getComponent(c + 1);
@@ -234,7 +235,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       String val1 = null;
       String val2 = null;
       if(comp instanceof BaseXTextField) {
-        val1 = ((BaseXTextField) comp).getText();
+        val1 = ((JTextComponent) comp).getText();
         if(!val1.isEmpty()) {
           if(val1.startsWith("\"")) {
             val1 = val1.replaceAll("\"", "");
@@ -247,7 +248,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       } else if(comp instanceof BaseXCombo) {
         final BaseXCombo combo = (BaseXCombo) comp;
         if(combo.getSelectedIndex() != 0) {
-          val1 = combo.getSelectedItem().toString();
+          val1 = combo.getSelectedItem();
           pattern = PATEX;
         }
       } else if(comp instanceof BaseXDSlider) {
@@ -274,13 +275,13 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
 
     String qu = tb.toString();
     final boolean root = gui.context.root();
-    final boolean rt = gui.gprop.is(GUIProp.FILTERRT);
+    final boolean rt = gui.gopts.get(GUIOptions.FILTERRT);
     if(!qu.isEmpty() && !rt && !root) qu = '.' + qu;
 
     String simple = all.getText().trim();
     if(!simple.isEmpty()) {
       simple = Find.find(simple, gui.context, rt);
-      qu = !qu.isEmpty() ? simple + " | " + qu : simple;
+      qu = qu.isEmpty() ? simple : simple + " | " + qu;
     }
 
     if(qu.isEmpty()) qu = rt || root ? "/" : ".";

@@ -9,12 +9,12 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
+import org.basex.util.options.*;
 
 /**
  * Update primitive for the optimize function.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Dimitar Popov
  */
 public final class DBOptimize extends DBNew {
@@ -26,16 +26,16 @@ public final class DBOptimize extends DBNew {
    * @param dt data
    * @param ctx database context
    * @param al optimize all database structures flag
-   * @param map index options
+   * @param opts database options
    * @param ii input info
    * @throws QueryException query exception
    */
   public DBOptimize(final Data dt, final QueryContext ctx, final boolean al,
-      final TokenMap map, final InputInfo ii) throws QueryException {
+      final Options opts, final InputInfo ii) throws QueryException {
 
     super(TYPE.DBOPTIMIZE, dt, ctx, ii);
     all = al;
-    options = map;
+    options = opts.free();
     check(false);
   }
 
@@ -45,32 +45,32 @@ public final class DBOptimize extends DBNew {
   }
 
   @Override
-  public void prepare(final MemData tmp) throws QueryException { }
+  public void prepare(final MemData tmp) { }
 
   @Override
   public void apply() throws QueryException {
     final MetaData meta = data.meta;
-    final Prop prop = meta.prop;
+    final MainOptions opts = meta.options;
 
-    nprops.put(Prop.TEXTINDEX, meta.createtext);
-    nprops.put(Prop.ATTRINDEX, meta.createattr);
-    nprops.put(Prop.FTINDEX, meta.createftxt);
+    nprops.put(MainOptions.TEXTINDEX, meta.createtext);
+    nprops.put(MainOptions.ATTRINDEX, meta.createattr);
+    nprops.put(MainOptions.FTINDEX,   meta.createftxt);
     initOptions();
     assignOptions();
 
-    final boolean rebuild = prop.num(Prop.MAXCATS) != meta.maxcats ||
-        prop.num(Prop.MAXLEN) != meta.maxlen;
-    meta.maxcats = prop.num(Prop.MAXCATS);
-    meta.maxlen  = prop.num(Prop.MAXLEN);
-    meta.createtext = prop.is(Prop.TEXTINDEX);
-    meta.createattr = prop.is(Prop.ATTRINDEX);
-    meta.createftxt = prop.is(Prop.FTINDEX);
+    final boolean rebuild = opts.get(MainOptions.MAXCATS) != meta.maxcats ||
+        opts.get(MainOptions.MAXLEN) != meta.maxlen;
+    meta.maxcats = opts.get(MainOptions.MAXCATS);
+    meta.maxlen  = opts.get(MainOptions.MAXLEN);
+    meta.createtext = opts.get(MainOptions.TEXTINDEX);
+    meta.createattr = opts.get(MainOptions.ATTRINDEX);
+    meta.createftxt = opts.get(MainOptions.FTINDEX);
 
     try {
       if(all) OptimizeAll.optimizeAll(data, qc.context, null);
       else Optimize.optimize(data, rebuild, null);
     } catch(final IOException ex) {
-      UPDBOPTERR.thrw(info, ex);
+      throw UPDBOPTERR.get(info, ex);
     } finally {
       resetOptions();
     }

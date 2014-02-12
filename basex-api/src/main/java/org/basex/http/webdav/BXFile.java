@@ -45,7 +45,7 @@ public final class BXFile extends BXAbstractResource implements FileResource {
 
   @Override
   public String processForm(final Map<String, String> parameters,
-      final Map<String, FileItem> files) throws BadRequestException {
+      final Map<String, FileItem> files) {
     return null;
   }
 
@@ -56,8 +56,7 @@ public final class BXFile extends BXAbstractResource implements FileResource {
 
   @Override
   public void sendContent(final OutputStream out, final Range range,
-      final Map<String, String> params, final String contentType)
-      throws IOException, BadRequestException {
+      final Map<String, String> params, final String contentType) throws BadRequestException {
     new BXCode<Object>(this) {
       @Override
       public void run() throws IOException {

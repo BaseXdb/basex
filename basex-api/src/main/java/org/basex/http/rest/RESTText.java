@@ -6,7 +6,7 @@ import org.basex.query.value.item.*;
 /**
  * This class assembles texts which are used in the HTTP classes.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public interface RESTText {

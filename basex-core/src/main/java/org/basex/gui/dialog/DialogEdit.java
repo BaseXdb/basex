@@ -9,15 +9,15 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
  * Dialog window for editing XML nodes.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DialogEdit extends BaseXDialog {
@@ -35,7 +35,7 @@ public final class DialogEdit extends BaseXDialog {
   /** Text area. */
   private BaseXTextField input2;
   /** Text area. */
-  private Editor input3;
+  private TextPanel input3;
   /** Old content. */
   private String old1;
   /** Old content. */
@@ -86,7 +86,7 @@ public final class DialogEdit extends BaseXDialog {
       b.add(input2, BorderLayout.CENTER);
     }
     if(old3 != null) {
-      input3 = new Editor(true, this, old3);
+      input3 = new TextPanel(old3, true, this);
       input3.addKeyListener(keys);
       input3.setPreferredSize(new Dimension(500, 350));
       b.add(new SearchEditor(main, input3), BorderLayout.CENTER);
@@ -109,8 +109,8 @@ public final class DialogEdit extends BaseXDialog {
 
   @Override
   public void action(final Object cmp) {
-    String msg = null;
     ok = kind != Data.TEXT || input3.getText().length != 0;
+    String msg = null;
     if(kind != Data.TEXT && kind != Data.COMM) {
       ok = XMLToken.isQName(token(input1.getText()));
       if(!ok && !input1.getText().isEmpty()) msg = Util.info(INVALID_X, NAME);

@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
 /**
  * FTMildnot expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FTMildNot extends FTExpr {
@@ -26,10 +26,9 @@ public final class FTMildNot extends FTExpr {
    * @param e2 second expression
    * @throws QueryException query exception
    */
-  public FTMildNot(final InputInfo ii, final FTExpr e1, final FTExpr e2)
-      throws QueryException {
+  public FTMildNot(final InputInfo ii, final FTExpr e1, final FTExpr e2) throws QueryException {
     super(ii, e1, e2);
-    if(usesExclude()) FTMILD.thrw(info);
+    if(usesExclude()) throw FTMILD.get(info);
   }
 
   @Override
@@ -71,7 +70,7 @@ public final class FTMildNot extends FTExpr {
    * @param it2 second item
    * @return specified item
    */
-  static FTNode mildnot(final FTNode it1, final FTNode it2) {
+  private static FTNode mildnot(final FTNode it1, final FTNode it2) {
     it1.all = mildnot(it1.all, it2.all);
     return it1;
   }
@@ -83,7 +82,7 @@ public final class FTMildNot extends FTExpr {
    * @return resulting match
    */
   private static FTMatches mildnot(final FTMatches m1, final FTMatches m2) {
-    final FTMatches all = new FTMatches(m1.sTokenNum);
+    final FTMatches all = new FTMatches(m1.pos);
     for(final FTMatch s1 : m1) {
       boolean n = true;
       for(final FTMatch s2 : m2) n &= s1.notin(s2);
@@ -104,13 +103,12 @@ public final class FTMildNot extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     try {
       return new FTMildNot(info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs));
     } catch(final QueryException e) {
       // checks were already done
-      throw Util.notexpected(e);
+      throw Util.notExpected(e);
     }
   }
 

@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Class for constructing decorated full-text nodes.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class DataFTBuilder {
@@ -28,7 +28,7 @@ final class DataFTBuilder {
    * @param pos full-text position data
    * @param len length of extract
    */
-  public DataFTBuilder(final FTPosData pos, final int len) {
+  DataFTBuilder(final FTPosData pos, final int len) {
     ftpos = pos;
     ftlen = len;
   }

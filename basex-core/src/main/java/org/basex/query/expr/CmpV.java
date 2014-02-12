@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -16,7 +17,7 @@ import org.basex.util.hash.*;
 /**
  * Value comparison.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class CmpV extends Cmp {
@@ -151,17 +152,23 @@ public final class CmpV extends Cmp {
    * @param e1 first expression
    * @param e2 second expression
    * @param o operator
+   * @param coll collation
    * @param ii input info
    */
-  public CmpV(final Expr e1, final Expr e2, final OpV o, final InputInfo ii) {
-    super(ii, e1, e2);
+  public CmpV(final Expr e1, final Expr e2, final OpV o, final Collation coll,
+      final InputInfo ii) {
+    super(ii, e1, e2, coll);
     op = o;
   }
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
+    return this.optimize(ctx, scp);
+  }
 
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     // swap expressions
     if(swap()) {
       op = op.swap();
@@ -188,7 +195,7 @@ public final class CmpV extends Cmp {
     } else if(e1.type().eq(SeqType.BLN) && (op == OpV.EQ && e2 == Bln.FALSE ||
         op == OpV.NE && e2 == Bln.TRUE)) {
       // (A eq false()) -> not(A)
-      e = Function.NOT.get(info, e1);
+      e = Function.NOT.get(null, info, e1);
     }
     return e;
   }
@@ -208,22 +215,23 @@ public final class CmpV extends Cmp {
     if(a == null) return null;
     final Item b = expr[1].item(ctx, info);
     if(b == null) return null;
-    if(a.comparable(b)) return Bln.get(op.eval(a, b, ctx.sc.collation, info));
+    if(a.comparable(b)) return Bln.get(op.eval(a, b, collation, info));
 
-    if(a instanceof FItem) Err.FIEQ.thrw(info, a);
-    if(b instanceof FItem) Err.FIEQ.thrw(info, b);
-    throw Err.INVTYPECMP.thrw(info, a.type, b.type);
+    if(a instanceof FItem) throw FIEQ.get(info, a.type);
+    if(b instanceof FItem) throw FIEQ.get(info, b.type);
+    throw INVTYPECMP.get(info, a.type, b.type);
   }
 
   @Override
   public CmpV invert() {
     return expr[0].size() != 1 || expr[1].size() != 1 ? this :
-      new CmpV(expr[0], expr[1], op.invert(), info);
+      new CmpV(expr[0], expr[1], op.invert(), collation, info);
   }
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CmpV(expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs), op, info);
+    final Expr a = expr[0].copy(ctx, scp, vs), b = expr[1].copy(ctx, scp, vs);
+    return new CmpV(a, b, op, collation, info);
   }
 
   @Override
@@ -233,7 +241,7 @@ public final class CmpV extends Cmp {
 
   @Override
   public String description() {
-    return "'" + op + "' expression";
+    return "'" + op + "' operator";
   }
 
   @Override

@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Evaluates the 'run' command and processes an input file.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Run extends Execute {
@@ -43,7 +43,7 @@ public final class Run extends Execute {
           // retrieve file contents
           final String input = file.string();
           // interpret as commands if input ends with command script suffix
-          if(file.hasSuffix(IO.BXSSUFFIX)) return super.init(input, ctx);
+          if(file.hasSuffix(IO.BXSSUFFIX)) return init(input, ctx);
           // otherwise, interpret input as xquery
           list.add(new XQuery(input));
         } catch(final IOException ex) {
@@ -51,12 +51,12 @@ public final class Run extends Execute {
         }
       }
     }
-    ctx.prop.set(Prop.QUERYPATH, file.path());
+    ctx.options.set(MainOptions.QUERYPATH, file.path());
     return error == null;
   }
 
   @Override
   protected void finish(final Context ctx) {
-    ctx.prop.set(Prop.QUERYPATH, "");
+    ctx.options.set(MainOptions.QUERYPATH, "");
   }
 }

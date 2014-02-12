@@ -1,5 +1,7 @@
 package org.basex.query.value.item;
 
+import static org.basex.query.util.Err.*;
+
 import java.math.*;
 
 import org.basex.query.*;
@@ -11,7 +13,7 @@ import org.basex.util.*;
 /**
  * Integer item ({@code xs:int}, {@code xs:integer}, {@code xs:short}, etc.).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Int extends ANum {
@@ -89,7 +91,7 @@ public final class Int extends ANum {
   }
 
   @Override
-  public Item test(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item test(final QueryContext ctx, final InputInfo ii) {
     return val == ctx.pos ? this : null;
   }
 
@@ -151,7 +153,7 @@ public final class Int extends ANum {
     try {
       return Long.parseLong(Token.string(val).trim());
     } catch(final NumberFormatException ex) {
-      throw NUMS[0].castErr(val, ii);
+      throw FUNCAST.get(ii, NUMS[0].type, chop(val));
     }
   }
 }

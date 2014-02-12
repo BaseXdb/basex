@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 /**
  * Escape sequence.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class Escape extends RegExp {
@@ -39,7 +39,7 @@ public final class Escape extends RegExp {
   private static final String NOT_DIGIT = "\\P{Nd}";
 
   /** Image. */
-  final String img;
+  private final String img;
 
   /**
    * Constructor.
@@ -222,7 +222,7 @@ public final class Escape extends RegExp {
    * @param r range
    */
   private static void add(final Map<String, int[][]> m, final String n, final int[] r) {
-    final int[][] old = m.get(n), nw = new int[][] { r };
+    final int[][] old = m.get(n), nw = { r };
     m.put(n, old == null ? nw : merge(old, nw));
   }
 

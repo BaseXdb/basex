@@ -15,14 +15,14 @@ import org.basex.util.*;
 /**
  * Range sequence, containing at least two integers.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class RangeSeq extends Seq {
   /** Start value. */
-  public final long start;
+  private final long start;
   /** Ascending/descending. */
-  public final boolean asc;
+  private final boolean asc;
 
   /**
    * Constructor.
@@ -56,7 +56,7 @@ public final class RangeSeq extends Seq {
 
   @Override
   public Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    throw CONDTYPE.thrw(ii, this);
+    throw CONDTYPE.get(ii, this);
   }
 
   @Override

@@ -10,7 +10,7 @@ import org.basex.query.value.item.*;
 /**
  * This class assembles texts which are used in the HTTP classes.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public interface RestXqText {
@@ -116,7 +116,7 @@ public interface RestXqText {
   QNm Q_VALUE = QNm.get(VALUE);
 
   /** Serializer node test. */
-  NodeTest OUTPUT_SERIAL = new NodeTest(FuncParams.Q_SPARAM);
+  NodeTest OUTPUT_SERIAL = new NodeTest(FuncOptions.Q_SPARAM);
   /** HTTP Response test. */
   NodeTest HTTP_RESPONSE = new NodeTest(QNm.get(RESPONSE, HTTPURI));
   /** RESTXQ Response test. */

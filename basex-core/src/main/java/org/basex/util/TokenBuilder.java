@@ -4,13 +4,11 @@ import static org.basex.util.Token.*;
 
 import java.util.*;
 
-import org.basex.util.list.*;
-
 /**
  * This class serves as an efficient constructor for {@link Token Tokens}.
  * It bears some resemblance to Java's {@link StringBuilder}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class TokenBuilder {
@@ -236,8 +234,7 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds a byte to the token. {@link ByteList} instances should be preferred
-   * for the construction of pure byte arrays.
+   * Adds a single byte to the token.
    * @param value the byte to be added
    * @return self reference
    */
@@ -321,7 +318,7 @@ public final class TokenBuilder {
    * <ul>
    * <li> objects of type {@link Throwable} are converted to a string representation
    *      via {@link Util#message}.</li>
-   * <li> objects of type {@link Class} are converted via {@link Util#name(Class)}.</li>
+   * <li> objects of type {@link Class} are converted via {@link Util#className(Class)}.</li>
    * <li> {@code null} references are replaced by the string {@code "null"}.</li>
    * <li> byte arrays are directly inserted as tokens.</li>
    * <li> for all other typed, {@link Object#toString} is called.</li>
@@ -346,7 +343,7 @@ public final class TokenBuilder {
       } else if(object instanceof Throwable) {
         s = Util.message((Throwable) object);
       } else if(object instanceof Class<?>) {
-        s = Util.name((Class<?>) object);
+        s = Util.className((Class<?>) object);
       } else {
         s = object.toString();
       }
@@ -387,6 +384,15 @@ public final class TokenBuilder {
    */
   public byte[] finish() {
     return Arrays.copyOf(chars, size);
+  }
+
+  /**
+   * Returns the original byte array if its size matches the token size, or returns a copy
+   * as {@link #finish()} does.
+   * @return character array
+   */
+  public byte[] array() {
+    return size == chars.length ? chars : finish();
   }
 
   @Override

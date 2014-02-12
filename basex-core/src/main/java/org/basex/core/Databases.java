@@ -10,7 +10,7 @@ import org.basex.util.list.*;
 /**
  * Manages a two-way-map of all available databases and backups. Used for locking.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Jens Erat
  */
 public final class Databases {
@@ -32,15 +32,15 @@ public final class Databases {
   /** Regex indicator. */
   private static final Pattern REGEX = Pattern.compile(".*[*?,].*");
 
-  /** Main properties. */
-  final MainProp mprop;
+  /** Global options. */
+  private final GlobalOptions gopts;
 
   /**
    * Creates a new instance and loads available databases.
    * @param c Database context
    */
   Databases(final Context c) {
-    mprop = c.mprop;
+    gopts = c.globalopts;
   }
 
   /**
@@ -75,7 +75,7 @@ public final class Databases {
    */
   public StringList backups(final String prefix) {
     final StringList list = new StringList();
-    for(final IOFile f : mprop.dbpath().children()) {
+    for(final IOFile f : gopts.dbpath().children()) {
       final String name = f.name();
       if(name.endsWith(IO.ZIPSUFFIX) && (prefix == null || name.startsWith(prefix))) {
         list.add(name.replaceFirst("\\..*", ""));
@@ -102,7 +102,7 @@ public final class Databases {
       pt = null;
     }
 
-    final IOFile[] children = mprop.dbpath().children();
+    final IOFile[] children = gopts.dbpath().children();
     final StringList list = new StringList(children.length);
     final HashSet<String> map = new HashSet<String>(children.length);
     for(final IOFile f : children) {
@@ -132,7 +132,7 @@ public final class Databases {
     final StringList sl = new StringList();
     final String regex = db.replaceAll("([" + REGEXCHARS + "])", "\\\\$1") +
         DateTime.PATTERN + IO.ZIPSUFFIX;
-    for(final IOFile f : ctx.mprop.dbpath().children()) {
+    for(final IOFile f : ctx.globalopts.dbpath().children()) {
       if(f.name().matches(regex)) sl.add(f.path());
     }
     return sl;

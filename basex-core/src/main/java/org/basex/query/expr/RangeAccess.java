@@ -18,12 +18,12 @@ import org.basex.util.hash.*;
 /**
  * This index class retrieves range values from the index.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class RangeAccess extends IndexAccess {
   /** Index type. */
-  final NumericRange ind;
+  private final NumericRange ind;
 
   /**
    * Constructor.
@@ -44,7 +44,7 @@ public final class RangeAccess extends IndexAccess {
       final IndexIterator it = ictx.data.iter(ind);
       @Override
       public ANode next() {
-        return it.more() ? new DBNode(ictx.data, it.next(), kind) : null;
+        return it.more() ? new DBNode(ictx.data, it.pre(), kind) : null;
       }
     };
   }

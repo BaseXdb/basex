@@ -4,16 +4,16 @@ import static org.basex.util.Token.*;
 
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
  * <p>This index organizes binary files in a database.</p>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class Binaries {
@@ -55,9 +55,7 @@ final class Binaries {
    * @param dir returns directories instead of files
    * @param tbm map; values will be {@code true} to indicate raw files
    */
-  synchronized void children(final byte[] path, final boolean dir,
-      final TokenBoolMap tbm) {
-
+  synchronized void children(final byte[] path, final boolean dir, final TokenBoolMap tbm) {
     if(data.inMemory()) return;
     final IOFile file = data.meta.binary(string(path));
     if(file == null) return;

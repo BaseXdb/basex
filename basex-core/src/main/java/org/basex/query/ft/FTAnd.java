@@ -16,13 +16,13 @@ import org.basex.util.hash.*;
 /**
  * FTAnd expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */
 public final class FTAnd extends FTExpr {
   /** Flags for negative operators. */
-  boolean[] neg;
+  private boolean[] neg;
 
   /**
    * Constructor.
@@ -34,8 +34,7 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
     boolean not = true;
     for(final FTExpr e : expr) not &= e instanceof FTNot;
@@ -112,10 +111,8 @@ public final class FTAnd extends FTExpr {
    * @param i1 first item
    * @param i2 second item
    */
-  static void and(final FTNode i1, final FTNode i2) {
-    final FTMatches all = new FTMatches(
-        (byte) Math.max(i1.all.sTokenNum, i2.all.sTokenNum));
-
+  private static void and(final FTNode i1, final FTNode i2) {
+    final FTMatches all = new FTMatches((byte) Math.max(i1.all.pos, i2.all.pos));
     for(final FTMatch s1 : i1.all) {
       for(final FTMatch s2 : i2.all) {
         all.add(new FTMatch(s1.size() + s2.size()).add(s1).add(s2));
@@ -147,8 +144,7 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final FTAnd copy = new FTAnd(info, Arr.copyAll(ctx, scp, vs, expr));
     if(neg != null) copy.neg = neg.clone();
     return copy;

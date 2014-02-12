@@ -1,12 +1,12 @@
 package org.basex.io.serial;
 
-import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
-import static org.basex.io.serial.SerializerProp.*;
+import static org.basex.io.serial.SerializerOptions.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.nio.*;
 import java.nio.charset.*;
 
 import org.basex.data.*;
@@ -17,37 +17,37 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
+import org.basex.util.options.*;
 
 /**
  * This class serializes data to an output stream.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class OutputSerializer extends Serializer {
   /** System document type. */
-  protected String docsys;
+  String docsys;
   /** Public document type. */
   private String docpub;
   /** Flag for printing content type. */
-  protected int ct;
+  int ct;
   /** Separator flag (used for formatting). */
   protected boolean sep;
   /** Item separator flag (used for formatting). */
-  protected boolean isep;
+  private boolean isep;
   /** Script flag. */
-  protected boolean script;
+  boolean script;
 
   /** HTML5 flag. */
-  protected final boolean html5;
+  final boolean html5;
   /** URI escape flag. */
-  protected final boolean escape;
+  final boolean escuri;
   /** Standalone 'omit' flag. */
-  protected final boolean saomit;
+  final boolean saomit;
   /** Include content type flag. */
-  protected final boolean content;
-  /** WebDAV flag. */
-  protected final boolean webdav;
+  final boolean content;
+
   /** New line. */
   protected final byte[] nl;
   /** Output stream. */
@@ -55,6 +55,13 @@ public abstract class OutputSerializer extends Serializer {
 
   /** Item flag (used for formatting). */
   private boolean item;
+  /** Charset encoder. */
+  private CharsetEncoder encoder;
+  /** Encoding buffer. */
+  private TokenBuilder encbuffer;
+
+  /** Charset. */
+  private final Charset encoding;
   /** UTF8 flag. */
   private final boolean utf8;
   /** CData elements. */
@@ -63,12 +70,12 @@ public abstract class OutputSerializer extends Serializer {
   private final TokenSet suppress = new TokenSet();
   /** Media type. */
   private final String media;
-  /** Charset. */
-  private final Charset encoding;
   /** Item separator. */
   private final byte[] itemsep;
+  /** WebDAV flag. */
+  private final boolean webdav;
 
-  // project specific properties
+  // project specific parameters
 
   /** Number of spaces to indent. */
   protected final int indents;
@@ -83,58 +90,59 @@ public abstract class OutputSerializer extends Serializer {
   private final boolean wrap;
 
   /**
-   * Constructor, specifying serialization options.
+   * Constructor.
    * @param os output stream reference
-   * @param props serialization properties
+   * @param sopts serialization parameters
    * @param versions supported versions
    * @throws IOException I/O exception
    */
-  OutputSerializer(final OutputStream os, final SerializerProp props,
+  protected OutputSerializer(final OutputStream os, final SerializerOptions sopts,
       final String... versions) throws IOException {
 
-    final SerializerProp p = props == null ? PROPS : props;
-    final String ver = p.supported(S_VERSION, versions);
-    final String htmlver = p.supported(S_HTML_VERSION, V40, V401, V50);
+    final SerializerOptions opts = sopts == null ? OPTIONS : sopts;
+    final String ver = supported(VERSION, opts, versions);
+    final String htmlver = supported(HTML_VERSION, opts, V40, V401, V50);
     html5 = htmlver.equals(V50) || ver.equals(V50);
 
-    final boolean omitDecl = p.yes(S_OMIT_XML_DECLARATION);
-    final boolean bom  = p.yes(S_BYTE_ORDER_MARK);
-    final String sa = p.check(S_STANDALONE, YES, NO, OMIT);
-    saomit = sa.equals(OMIT);
-    p.check(S_NORMALIZATION_FORM, NFC, DataText.NONE);
+    final boolean omitDecl = opts.yes(OMIT_XML_DECLARATION);
+    final boolean bom  = opts.yes(BYTE_ORDER_MARK);
+    final YesNoOmit sa = opts.get(STANDALONE);
+    saomit = sa == YesNoOmit.OMIT;
 
-    final String maps = p.get(S_USE_CHARACTER_MAPS);
-    final String enc = normEncoding(p.get(S_ENCODING));
+    final String maps = opts.get(USE_CHARACTER_MAPS);
+    final String enc = normEncoding(opts.get(ENCODING), true);
     try {
       encoding = Charset.forName(enc);
     } catch(final Exception ex) {
-      throw SERENCODING.thrwSerial(enc);
+      throw SERENCODING.getIO(enc);
     }
     utf8 = enc == UTF8;
+    if(!utf8) {
+      encoder = encoding.newEncoder();
+      encbuffer = new TokenBuilder();
+    }
 
-    // project specific properties
-    indents = Math.max(0, toInt(p.get(S_INDENTS)));
-    format  = p.yes(S_FORMAT);
-    tab     = p.yes(S_TABULATOR) ? '\t' : ' ';
-    wPre    = token(p.get(S_WRAP_PREFIX));
+    // project specific options
+    indents = opts.get(INDENTS);
+    format  = opts.yes(FORMAT);
+    tab     = opts.yes(TABULATOR) ? '\t' : ' ';
+    wPre    = token(opts.get(WRAP_PREFIX));
     wrap    = wPre.length != 0;
-    final String eol = p.check(S_NEWLINE, S_NL, S_CR, S_CRNL);
-    nl = utf8(token(eol.equals(S_NL) ? "\n" : eol.equals(S_CR) ? "\r" : "\r\n"), enc);
-    String s = p.get(S_ITEM_SEPARATOR);
-    if(s.equals(UNDEFINED)) s = p.get(S_SEPARATOR);
-    itemsep = s.equals(UNDEFINED) ? null : token(s.indexOf('\\') != -1 ?
-      s.replace("\\n", "\n").replace("\\r", "\r").replace("\\t", "\t") : s);
 
-    docsys  = p.get(S_DOCTYPE_SYSTEM);
-    docpub  = p.get(S_DOCTYPE_PUBLIC);
-    media   = p.get(S_MEDIA_TYPE);
-    escape  = p.yes(S_ESCAPE_URI_ATTRIBUTES);
-    content = p.yes(S_INCLUDE_CONTENT_TYPE);
-    undecl  = p.yes(S_UNDECLARE_PREFIXES);
-    indent  = p.yes(S_INDENT) && format;
+    nl = utf8(token(opts.get(NEWLINE).newline()), enc);
+    itemsep = opts.contains(ITEM_SEPARATOR) ? token(opts.get(ITEM_SEPARATOR).replace("\\n", "\n").
+        replace("\\r", "\r").replace("\\t", "\t")) : null;
 
-    webdav = maps.equals("webdav");
-    if(!webdav && !maps.isEmpty()) SERMAP.thrwSerial(maps);
+    docsys  = opts.get(DOCTYPE_SYSTEM);
+    docpub  = opts.get(DOCTYPE_PUBLIC);
+    media   = opts.get(MEDIA_TYPE);
+    escuri  = opts.yes(ESCAPE_URI_ATTRIBUTES);
+    content = opts.yes(INCLUDE_CONTENT_TYPE);
+    undecl  = opts.yes(UNDECLARE_PREFIXES);
+    indent  = opts.yes(INDENT) && format;
+
+    webdav = "webdav".equals(maps);
+    if(!webdav && !maps.isEmpty()) throw SERMAP.getIO(maps);
 
     if(docsys.isEmpty()) docsys = null;
     if(docpub.isEmpty()) docpub = null;
@@ -152,7 +160,7 @@ public abstract class OutputSerializer extends Serializer {
       }
     }
 
-    final String supp = p.get(S_SUPPRESS_INDENTATION);
+    final String supp = opts.get(SUPPRESS_INDENTATION);
     if(!supp.isEmpty()) {
       for(final String c : supp.split("\\s+")) {
         if(!c.isEmpty()) suppress.add(c);
@@ -163,25 +171,25 @@ public abstract class OutputSerializer extends Serializer {
     final boolean html = this instanceof HTMLSerializer;
     final boolean xml = this instanceof XMLSerializer || this instanceof XHTMLSerializer;
     if(xml || html) {
-      final String cdse = p.get(S_CDATA_SECTION_ELEMENTS);
+      final String cdse = opts.get(CDATA_SECTION_ELEMENTS);
       for(final String c : cdse.split("\\s+")) {
         if(c.isEmpty()) continue;
         if(!html || c.contains(":") && (!html5 || !c.contains("html:"))) cdata.add(c);
       }
 
-      if(undecl && ver.equals(V10)) SERUNDECL.thrwSerial();
+      if(undecl && ver.equals(V10)) throw SERUNDECL.getIO();
       if(xml) {
         if(omitDecl) {
-          if(!saomit || !ver.equals(V10) && docsys != null) SERSTAND.thrwSerial();
+          if(!saomit || !ver.equals(V10) && docsys != null) throw SERSTAND.getIO();
         } else {
           print(PI_O);
           print(DOCDECL1);
           print(ver);
           print(DOCDECL2);
-          print(p.get(S_ENCODING));
+          print(opts.get(ENCODING));
           if(!saomit) {
             print(DOCDECL3);
-            print(sa);
+            print(sa.toString());
           }
           print(ATT2);
           print(PI_C);
@@ -193,7 +201,7 @@ public abstract class OutputSerializer extends Serializer {
     // open results element
     if(wrap) {
       startElement(concat(wPre, COLON, T_RESULTS));
-      namespace(wPre, token(p.get(S_WRAP_URI)));
+      namespace(wPre, token(opts.get(WRAP_URI)));
     }
   }
 
@@ -233,7 +241,7 @@ public abstract class OutputSerializer extends Serializer {
         isep = true;
       }
     }
-    if(wrap) startElement(wPre.length != 0 ? concat(wPre, COLON, T_RESULT) : T_RESULT);
+    if(wrap) startElement(wPre.length == 0 ? T_RESULT : concat(wPre, COLON, T_RESULT));
   }
 
   @Override
@@ -246,7 +254,8 @@ public abstract class OutputSerializer extends Serializer {
     print(' ');
     print(n);
     print(ATT1);
-    for(int k = 0; k < v.length; k += cl(v, k)) {
+    final int vl = v.length;
+    for(int k = 0; k < vl; k += cl(v, k)) {
       final int ch = cp(v, k);
       if(!format) {
         printChar(ch);
@@ -255,7 +264,7 @@ public abstract class OutputSerializer extends Serializer {
       } else if(ch == 0x9 || ch == 0xA) {
         hex(ch);
       } else {
-        code(ch);
+        encode(ch);
       }
     }
     print(ATT2);
@@ -263,8 +272,9 @@ public abstract class OutputSerializer extends Serializer {
 
   @Override
   protected void finishText(final byte[] b) throws IOException {
+    final int bl = b.length;
     if(cdata.isEmpty() || tags.isEmpty() || !cdata.contains(tags.peek())) {
-      for(int k = 0; k < b.length; k += cl(b, k)) code(cp(b, k));
+      for(int k = 0; k < bl; k += cl(b, k)) encode(cp(b, k));
     } else {
       print(CDATA_O);
       int c = 0;
@@ -293,7 +303,7 @@ public abstract class OutputSerializer extends Serializer {
       final FTSpan span = lex.next();
       if(!span.special && ftp.contains(span.pos)) print((char) TokenBuilder.MARK);
       final byte[] t = span.text;
-      for(int k = 0; k < t.length; k += cl(t, k)) code(cp(t, k));
+      for(int k = 0; k < t.length; k += cl(t, k)) encode(cp(t, k));
     }
     sep = false;
   }
@@ -326,16 +336,16 @@ public abstract class OutputSerializer extends Serializer {
       if(it instanceof StrStream) {
         final InputStream ni = ((StrStream) it).input(null);
         try {
-          for(int i; (i = ni.read()) != -1;) code(i);
+          for(int i; (i = ni.read()) != -1;) encode(i);
         } finally {
           ni.close();
         }
       } else {
         final byte[] atom = it.string(null);
-        for(int a = 0; a < atom.length; a += cl(atom, a)) code(cp(atom, a));
+        for(int a = 0; a < atom.length; a += cl(atom, a)) encode(cp(atom, a));
       }
     } catch(final QueryException ex) {
-      throw new SerializerException(ex);
+      throw new QueryIOException(ex);
     }
     sep = true;
     item = true;
@@ -369,7 +379,7 @@ public abstract class OutputSerializer extends Serializer {
   protected void finishClose() throws IOException {
     if(sep) indent();
     print(ELEM_OS);
-    print(elem);
+    print(tag);
     print(ELEM_C);
     sep = true;
   }
@@ -379,7 +389,7 @@ public abstract class OutputSerializer extends Serializer {
    * @param ch character to be encoded and printed
    * @throws IOException I/O exception
    */
-  protected void code(final int ch) throws IOException {
+  protected void encode(final int ch) throws IOException {
     if(!format) {
       printChar(ch);
     } else if(ch < ' ' && ch != '\n' && ch != '\t' || ch >= 0x7F && ch < 0xA0 ||
@@ -404,11 +414,11 @@ public abstract class OutputSerializer extends Serializer {
    * @return true if doctype was added
    * @throws IOException I/O exception
    */
-  protected boolean doctype(final byte[] dt) throws IOException {
+  boolean doctype(final byte[] dt) throws IOException {
     if(level != 0 || docsys == null && docpub == null) return false;
     if(sep) indent();
     print(DOCTYPE);
-    if(dt == null) print(M_HTML);
+    if(dt == null) print(HTML);
     else print(dt);
     if(docpub != null) print(' ' + PUBLIC + " \"" + docpub + '"');
     else print(' ' + SYSTEM);
@@ -422,7 +432,7 @@ public abstract class OutputSerializer extends Serializer {
    * Indents the next text.
    * @throws IOException I/O exception
    */
-  protected final void indent() throws IOException {
+  protected void indent() throws IOException {
     if(item) {
       item = false;
     } else if(indent) {
@@ -440,7 +450,7 @@ public abstract class OutputSerializer extends Serializer {
    * @param ch character
    * @throws IOException I/O exception
    */
-  protected final void hex(final int ch) throws IOException {
+  final void hex(final int ch) throws IOException {
     print("&#x");
     final int h = ch >> 4;
     if(h != 0) print(HEX[h]);
@@ -466,8 +476,14 @@ public abstract class OutputSerializer extends Serializer {
    */
   protected void print(final int ch) throws IOException {
     // comparison by reference
-    if(utf8) out.utf8(ch);
-    else out.write(new TokenBuilder(4).add(ch).toString().getBytes(encoding));
+    if(utf8) {
+      out.utf8(ch);
+    } else {
+      encbuffer.reset();
+      encoder.reset();
+      final ByteBuffer bb = encoder.encode(CharBuffer.wrap(encbuffer.add(ch).toString()));
+      out.write(bb.array(), 0, bb.limit());
+    }
   }
 
   /**
@@ -505,7 +521,7 @@ public abstract class OutputSerializer extends Serializer {
    * @return {@code true} if declaration was printed
    * @throws IOException I/O exception
    */
-  protected boolean ct(final boolean empty, final boolean html) throws IOException {
+  boolean ct(final boolean empty, final boolean html) throws IOException {
     if(ct != 1) return false;
     ct++;
     if(empty) finishOpen();
@@ -523,5 +539,24 @@ public abstract class OutputSerializer extends Serializer {
     level--;
     if(empty) finishClose();
     return true;
+  }
+
+  // PRIVATE METHODS ====================================================================
+
+  /**
+   * Retrieves a value from the specified option and checks for supported values.
+   * @param option option
+   * @param opts options
+   * @param allowed allowed values
+   * @return value
+   * @throws QueryIOException query I/O exception
+   */
+  private static String supported(final StringOption option, final Options opts,
+      final String... allowed) throws QueryIOException {
+
+    final String val = opts.get(option);
+    if(val.isEmpty()) return allowed.length > 0 ? allowed[0] : val;
+    for(final String a : allowed) if(a.equals(val)) return val;
+    throw SERNOTSUPP.getIO(Options.allowed(option, (Object[]) allowed));
   }
 }

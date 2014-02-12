@@ -5,16 +5,13 @@ import java.util.*;
 /**
  * Full-text units.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public enum FTUnit {
-  /** Word unit. */
-  WORD,
-  /** Sentence unit. */
-  SENTENCE,
-  /** Paragraph unit. */
-  PARAGRAPH;
+  /** Word unit. */      WORDS,
+  /** Sentence unit. */  SENTENCES,
+  /** Paragraph unit. */ PARAGRAPHS;
 
   /**
    * Returns a string representation.

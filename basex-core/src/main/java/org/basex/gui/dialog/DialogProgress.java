@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * Dialog window for displaying the progress of a command execution.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DialogProgress extends BaseXDialog implements ActionListener {
@@ -77,7 +77,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
     s.add(m, BorderLayout.WEST);
 
     if(cmd.stoppable()) {
-      final BaseXButton cancel = new BaseXButton(B_CANCEL, this);
+      final BaseXButton cancel = new BaseXButton(CANCEL, this);
       s.add(cancel, BorderLayout.EAST);
     }
     set(s, BorderLayout.SOUTH);
@@ -141,8 +141,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
    * @param post post-processing step
    * @param cmds commands to be run
    */
-  public static void execute(final BaseXDialog dialog, final Runnable post,
-      final Command... cmds) {
+  public static void execute(final BaseXDialog dialog, final Runnable post, final Command... cmds) {
     execute(dialog.gui, dialog, post, cmds);
   }
 
@@ -154,8 +153,8 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
    * @param post post-processing step
    * @param cmds commands to be run
    */
-  public static void execute(final GUI gui, final BaseXDialog dialog,
-      final Runnable post, final Command... cmds) {
+  private static void execute(final GUI gui, final BaseXDialog dialog, final Runnable post,
+      final Command... cmds) {
 
     for(final Command cmd : cmds) {
       // reset views
@@ -192,8 +191,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
 
           // close progress window and show error if command failed
           wait.dispose();
-          if(!ok) BaseXDialog.error(gui,
-              info.equals(INTERRUPTED) ? COMMAND_CANCELED : info);
+          if(!ok) BaseXDialog.error(gui, info.equals(INTERRUPTED) ? COMMAND_CANCELED : info);
         }
       }.start();
 

@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * This class contains the static context of an expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class StaticContext {
@@ -23,7 +23,7 @@ public final class StaticContext {
   /** Static and dynamic namespaces. */
   public final NSContext ns = new NSContext();
 
-  /** Default collation. */
+  /** Default collation (default collection ({@link QueryText#COLLATIONURI}): {@code null}). */
   public Collation collation;
   /** Default element/type namespace. */
   public byte[] elemNS;
@@ -109,7 +109,7 @@ public final class StaticContext {
    * @param uri uri to be set
    */
   public void baseURI(final String uri) {
-    if(uri.length() == 0) {
+    if(uri.isEmpty()) {
       baseURI = Uri.EMPTY;
     } else {
       final IO io = IO.get(uri);
@@ -127,6 +127,6 @@ public final class StaticContext {
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + baseIO() + ']';
+    return Util.className(this) + '[' + baseIO() + ']';
   }
 }

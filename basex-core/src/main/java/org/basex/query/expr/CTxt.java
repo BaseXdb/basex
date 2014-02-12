@@ -14,17 +14,18 @@ import org.basex.util.hash.*;
 /**
  * Text fragment.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class CTxt extends CFrag {
+public final class CTxt extends CNode {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param t text
    */
-  public CTxt(final InputInfo ii, final Expr t) {
-    super(ii, t);
+  public CTxt(final StaticContext sctx, final InputInfo ii, final Expr t) {
+    super(sctx, ii, t);
     type = SeqType.TXT_ZO;
   }
 
@@ -53,7 +54,7 @@ public final class CTxt extends CFrag {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CTxt(info, expr[0].copy(ctx, scp, vs));
+    return new CTxt(sc, info, expr[0].copy(ctx, scp, vs));
   }
 
   @Override

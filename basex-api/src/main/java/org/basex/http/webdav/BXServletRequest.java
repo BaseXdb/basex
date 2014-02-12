@@ -17,19 +17,17 @@ import com.bradmcevoy.http.Response.ContentType;
 import com.bradmcevoy.http.Cookie;
 
 /**
- * Wrapper around {@link HttpServletRequest}, which in addition implements
- * {@link Request}. <br/>
- * This implementation is the same as the implementation of
- * {@code ServletRequest} found in {@code milton-servlet}. Since this is one of
- * the few classes which is needed from that library, the source is integrated
- * into BaseX.
+ * Wrapper around {@link HttpServletRequest}, which in addition implements {@link Request}.<br/>
+ * This implementation is the same as the implementation of {@code ServletRequest} found in
+ * {@code milton-servlet}. Since this is one of the few classes which is needed from that library
+ * the source is integrated into BaseX.
  *
  * @author Milton Development Team
  * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public final class BXServletRequest extends AbstractRequest {
+final class BXServletRequest extends AbstractRequest {
   /** HTTP servlet request. */
   private final HttpServletRequest req;
   /** Request method. */
@@ -69,7 +67,7 @@ public final class BXServletRequest extends AbstractRequest {
    * Constructor.
    * @param r HTTP servlet request
    */
-  public BXServletRequest(final HttpServletRequest r) {
+  BXServletRequest(final HttpServletRequest r) {
     req = r;
     method = Method.valueOf(r.getMethod());
     url = r.getRequestURL().toString(); // MiltonUtils.stripContext(r);
@@ -207,7 +205,7 @@ public final class BXServletRequest extends AbstractRequest {
    * Request content type.
    * @return the content type of the current request
    */
-  protected ContentType getRequestContentType() {
+  ContentType getRequestContentType() {
     final String s = req.getContentType();
     if(s == null) return null;
     if(s.contains(Response.MULTIPART)) return ContentType.MULTIPART;
@@ -218,8 +216,8 @@ public final class BXServletRequest extends AbstractRequest {
    * Is the content type of the request a multi-part?
    * @return {@code true} if the request is multi-part
    */
-  protected boolean isMultiPart() {
-    return ContentType.MULTIPART.equals(getRequestContentType());
+  boolean isMultiPart() {
+    return getRequestContentType() == ContentType.MULTIPART;
   }
 }
 
@@ -231,7 +229,7 @@ public final class BXServletRequest extends AbstractRequest {
  * the few classes which is needed from that library, the source is integrated
  * into BaseX.
  * @author Milton Development Team
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
@@ -255,7 +253,7 @@ class FileItemWrapper implements com.bradmcevoy.http.FileItem {
    * Constructor.
    * @param f file item
    */
-  public FileItemWrapper(final FileItem f) {
+  FileItemWrapper(final FileItem f) {
     wrapped = f;
     name = fixIEFileName(wrapped.getName());
   }

@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Evaluates the 'drop user' command and drops a user.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DropUser extends AUser {
@@ -43,7 +43,7 @@ public final class DropUser extends AUser {
   @Override
   protected boolean run(final String user, final String db) {
     // admin cannot be dropped
-    if(user.equals(ADMIN)) return !info(ADMIN_STATIC_X);
+    if(user.equals(S_ADMIN)) return !info(ADMIN_STATIC_X);
 
     // drop global user
     if(db == null) {

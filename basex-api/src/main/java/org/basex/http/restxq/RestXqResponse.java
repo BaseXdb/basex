@@ -17,7 +17,7 @@ import org.basex.query.var.*;
 /**
  * This class creates a new HTTP response.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class RestXqResponse {
@@ -50,9 +50,6 @@ final class RestXqResponse {
    * @throws Exception exception (including unexpected ones)
    */
   void create() throws Exception {
-    String redirect = null, forward = null;
-    RestXqRespBuilder resp = null;
-
     // bind variables
     final StaticFunc uf = function.function;
     final Expr[] args = new Expr[uf.args.length];
@@ -60,13 +57,15 @@ final class RestXqResponse {
 
     // wrap function with a function call
     final StaticFuncCall sfc = new StaticFuncCall(uf.name, args, uf.sc, uf.info).init(uf);
-    final MainModule mm = new MainModule(sfc, new VarScope(), null);
+    final MainModule mm = new MainModule(sfc, new VarScope(uf.sc), null, uf.sc);
 
     // assign main module and http context and register process
     query.mainModule(mm);
-    query.context(http, null);
-
+    query.http(http);
     query.context.register(query);
+
+    String redirect = null, forward = null;
+    RestXqRespBuilder resp = null;
     try {
       // compile and evaluate query
       query.compile();
@@ -102,8 +101,9 @@ final class RestXqResponse {
         function.error(HEAD_METHOD);
 
       // serialize result
-      final SerializerProp sp = function.output;
-      http.initResponse(sp);
+      final SerializerOptions sp = function.output;
+      http.serialization = sp;
+      http.initResponse();
       final Serializer ser = Serializer.get(http.res.getOutputStream(), sp);
       for(; item != null; item = iter.next()) ser.serialize(item);
       ser.close();

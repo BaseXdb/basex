@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * Update primitive for the {@link Function#_DB_STORE} function.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DBStore extends BasicOperation {
@@ -48,14 +48,14 @@ public final class DBStore extends BasicOperation {
     for(final byte[] path : map) {
       try {
         final IOFile file = data.meta.binary(string(path));
-        if(file == null) UPDBPUTERR.thrw(info, path);
+        if(file == null) throw UPDBPUTERR.get(info, path);
         file.dir().md();
         final Object item = map.get(path);
         file.write(item instanceof Item ? ((Item) item).input(info) :
           ((QueryInput) item).input.inputStream());
       } catch(final IOException ex) {
         Util.debug(ex);
-        UPDBPUTERR.thrw(info, path);
+        throw UPDBPUTERR.get(info, path);
       }
     }
   }
@@ -66,5 +66,5 @@ public final class DBStore extends BasicOperation {
   }
 
   @Override
-  public void prepare(final MemData tmp) throws QueryException { }
+  public void prepare(final MemData tmp) { }
 }

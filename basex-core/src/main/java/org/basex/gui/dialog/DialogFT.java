@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * Full-text creation dialog.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class DialogFT extends BaseXBack {
@@ -54,23 +54,24 @@ final class DialogFT extends BaseXBack {
     dialog = d;
     layout(new TableLayout(create ? 9 : 15, 1));
 
-    final Prop prop = d.gui.context.prop;
+    final MainOptions opts = d.gui.context.options;
     add(new BaseXLabel(H_FULLTEXT_INDEX, true, false).border(0, 0, 6, 0));
 
-    final String sw = prop.get(Prop.STOPWORDS);
-    final String[] cb = { LANGUAGE, STEMMING, CASE_SENSITIVITY, DIACRITICS,
-        STOPWORD_LIST };
+    final String sw = opts.get(MainOptions.STOPWORDS);
+    final String[] cb = { LANGUAGE, STEMMING, CASE_SENSITIVITY, DIACRITICS, STOPWORD_LIST };
     final String[] desc = { H_LANGUAGE, H_STEMMING, H_CASE, H_DIACRITICS, H_STOPWORDS };
-    final boolean[] val = { !prop.get(Prop.LANGUAGE).isEmpty(), prop.is(Prop.STEMMING),
-        prop.is(Prop.CASESENS), prop.is(Prop.DIACRITICS), !sw.isEmpty() };
+    final boolean[] val = {
+      !opts.get(MainOptions.LANGUAGE).isEmpty(), opts.get(MainOptions.STEMMING),
+      opts.get(MainOptions.CASESENS), opts.get(MainOptions.DIACRITICS), !sw.isEmpty() };
 
     final BaseXLabel[] labels = new BaseXLabel[FLAGS];
     for(int f = 0; f < check.length; ++f) {
-      check[f] = new BaseXCheckBox(cb[f], val[f], create ? 1 : 0, d);
-      if(!create) {
-        labels[f] = new BaseXLabel(desc[f], true, false);
-      } else {
+      check[f] = new BaseXCheckBox(cb[f], val[f], d);
+      if(create) {
         check[f].setToolTipText(desc[f]);
+      } else {
+        check[f].bold();
+        labels[f] = new BaseXLabel(desc[f], true, false);
       }
     }
 
@@ -78,7 +79,7 @@ final class DialogFT extends BaseXBack {
     b1.add(check[F_LANG]);
     final StringList langs = FTLexer.languages();
     language = new BaseXCombo(d, langs.toArray());
-    final Language ln = Language.get(prop);
+    final Language ln = Language.get(opts);
     for(final String l : langs) {
       final String s = l.replaceFirst(" \\(.*", "");
       if(s.equals(ln.toString())) language.setSelectedItem(l);
@@ -96,7 +97,7 @@ final class DialogFT extends BaseXBack {
     add(check[F_STOP]);
     add(Box.createVerticalStrut(4));
     final BaseXBack b3 = new BaseXBack(new TableLayout(1, 2, 8, 0));
-    swpath = new BaseXTextField(sw.isEmpty() ? d.gui.gprop.get(GUIProp.DATAPATH) : sw, d);
+    swpath = new BaseXTextField(sw.isEmpty() ? d.gui.gopts.get(GUIOptions.DATAPATH) : sw, d);
     b3.add(swpath);
 
     swbrowse = new BaseXButton(BROWSE_D, d);
@@ -115,13 +116,13 @@ final class DialogFT extends BaseXBack {
    * Opens a file dialog to choose a stopword list.
    */
   void chooseStop() {
-    final GUIProp gprop = dialog.gui.gprop;
-    final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR,
-        gprop.get(GUIProp.DATAPATH), dialog.gui);
+    final GUIOptions gopts = dialog.gui.gopts;
+    final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR, gopts.get(GUIOptions.DATAPATH),
+        dialog.gui);
     final IO file = fc.select(Mode.FOPEN);
     if(file != null) {
       swpath.setText(file.path());
-      gprop.set(GUIProp.DATAPATH, file.path());
+      gopts.set(GUIOptions.DATAPATH, file.path());
     }
   }
 
@@ -139,7 +140,7 @@ final class DialogFT extends BaseXBack {
     final String sw = swpath.getText().trim();
     final IO file = IO.get(sw);
     final boolean exists = !sw.isEmpty() && file.exists();
-    if(exists) dialog.gui.gprop.set(GUIProp.DATAPATH, sw);
+    if(exists) dialog.gui.gopts.set(GUIOptions.DATAPATH, sw);
   }
 
   /**
@@ -147,12 +148,12 @@ final class DialogFT extends BaseXBack {
    */
   void setOptions() {
     final GUI gui = dialog.gui;
-    final String lang = language.getSelectedItem().toString();
-    gui.set(Prop.LANGUAGE, check[F_LANG].isSelected() ?
-        Language.get(lang.replaceFirst(" \\(.*", "")).toString() : "");
-    gui.set(Prop.STEMMING, check[F_STEM].isSelected());
-    gui.set(Prop.CASESENS, check[F_CASE].isSelected());
-    gui.set(Prop.DIACRITICS, check[F_DIA].isSelected());
-    gui.set(Prop.STOPWORDS, check[F_STOP].isSelected() ? swpath.getText() : "");
+    final String lang = language.getSelectedItem();
+    gui.set(MainOptions.LANGUAGE, check[F_LANG].isSelected() ?
+        Language.get(lang.replaceFirst(" \\(.*", "")).code() : "");
+    gui.set(MainOptions.STEMMING, check[F_STEM].isSelected());
+    gui.set(MainOptions.CASESENS, check[F_CASE].isSelected());
+    gui.set(MainOptions.DIACRITICS, check[F_DIA].isSelected());
+    gui.set(MainOptions.STOPWORDS, check[F_STOP].isSelected() ? swpath.getText() : "");
   }
 }

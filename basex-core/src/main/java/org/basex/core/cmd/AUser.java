@@ -6,12 +6,13 @@ import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
  * Abstract class for user commands.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 abstract class AUser extends Command {
@@ -20,7 +21,7 @@ abstract class AUser extends Command {
    * @param p required permission
    * @param a arguments
    */
-  protected AUser(final Perm p, final String... a) {
+  AUser(final Perm p, final String... a) {
     super(p, a);
   }
 
@@ -28,7 +29,7 @@ abstract class AUser extends Command {
    * Protected constructor, specifying command arguments.
    * @param a arguments
    */
-  protected AUser(final String... a) {
+  AUser(final String... a) {
     this(Perm.ADMIN, a);
   }
 
@@ -38,7 +39,7 @@ abstract class AUser extends Command {
    * @param opt indicates if user/database argument is optional
    * @return success flag
    */
-  protected boolean run(final int off, final boolean opt) {
+  boolean run(final int off, final boolean opt) {
     final String u = args[off];
     final String d = off + 1 < args.length ? args[off + 1] : null;
 
@@ -74,7 +75,7 @@ abstract class AUser extends Command {
    * @return success flag
    */
   @SuppressWarnings("unused")
-  protected boolean run(final String user, final String db) {
+  boolean run(final String user, final String db) {
     return true;
   }
 
@@ -83,7 +84,7 @@ abstract class AUser extends Command {
    * @param md5 string to be checked
    * @return result of check
    */
-  protected static boolean isMD5(final String md5) {
+  static boolean isMD5(final String md5) {
     return md5 != null && md5.matches("[0-9a-fA-F]{32}");
   }
 
@@ -97,8 +98,7 @@ abstract class AUser extends Command {
   private String[] users(final String name) {
     final String pat = name.matches(".*[*?,].*") ? IOFile.regex(name) :
       name.replaceAll("([" + Databases.REGEXCHARS + "])", "\\\\$1");
-    return context.users.find(Pattern.compile(pat,
-        Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE));
+    return context.users.find(Pattern.compile(pat, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE));
   }
 
   @Override

@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * Global namespaces.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class NSGlobal {
@@ -34,6 +34,7 @@ public final class NSGlobal {
     NS.add(ERR, ERRORURI);
     // EXPath namespaces
     NS.add(EXPERR, EXPERROR);
+    NS.add(BIN, BINURI);
     NS.add(CRYPTO, CRYPTOURI);
     NS.add(FILE, FILEURI);
     NS.add(HTTP, HTTPURI);

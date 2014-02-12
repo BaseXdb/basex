@@ -121,7 +121,7 @@ public abstract class W3CTS {
     input = nm + "Catalog" + IO.XMLSUFFIX;
     testid = nm.substring(0, 4);
     pathlog = testid.toLowerCase(Locale.ENGLISH) + ".log";
-    context.mprop.set(MainProp.DBPATH, sandbox().path() + "/data");
+    context.globalopts.set(GlobalOptions.DBPATH, sandbox().path() + "/data");
   }
 
   /**
@@ -147,13 +147,13 @@ public abstract class W3CTS {
     final String sources = path + "TestSources/";
 
     final Performance perf = new Performance();
-    context.prop.set(Prop.CHOP, false);
+    context.options.set(MainOptions.CHOP, false);
 
     //new Check(path + input).execute(context);
     data = CreateDB.mainMem(new IOFile(path + input), context);
 
     final Nodes root = new Nodes(0, data);
-    Util.outln(NL + Util.name(this) + " Test Suite " +
+    Util.outln(NL + Util.className(this) + " Test Suite " +
         text("/*:test-suite/@version", root));
 
     Util.outln("Caching Sources...");
@@ -276,7 +276,7 @@ public abstract class W3CTS {
 
       final String inname = text("*:query/@name", state);
       final IOFile query = new IOFile(queries + pth + inname + IO.XQSUFFIX);
-      context.prop.set(Prop.QUERYPATH, query.path());
+      context.options.set(MainOptions.QUERYPATH, query.path());
       final String in = read(query);
       String er = null;
       ValueBuilder iter = null;
@@ -290,9 +290,9 @@ public abstract class W3CTS {
         curr.root = true;
       }
 
-      context.prop.set(Prop.QUERYINFO, compile);
+      context.options.set(MainOptions.QUERYINFO, compile);
       final QueryProcessor xq = new QueryProcessor(in, context).context(curr);
-      context.prop.set(Prop.QUERYINFO, false);
+      context.options.set(MainOptions.QUERYINFO, false);
 
       final ArrayOutput ao = new ArrayOutput();
       final TokenBuilder files = new TokenBuilder();
@@ -317,8 +317,8 @@ public abstract class W3CTS {
         iter = xq.value().cache();
 
         // serialize query
-        final SerializerProp sp = new SerializerProp();
-        sp.set(SerializerProp.S_INDENT, NO);
+        final SerializerOptions sp = new SerializerOptions();
+        sp.set(SerializerOptions.INDENT, NO);
         final Serializer ser = Serializer.get(ao, sp);
         for(Item it; (it = iter.next()) != null;) ser.serialize(it);
         ser.close();
@@ -571,7 +571,7 @@ public abstract class W3CTS {
             src = dbname;
           }
         }
-        expr = def.get(Str.get(src));
+        expr = def.get(qp.sc, Str.get(src));
       }
       if(var != null) qp.bind(string(data.atom(var.pres[c])), expr);
     }
@@ -604,13 +604,12 @@ public abstract class W3CTS {
    * @throws QueryException query exception
    */
   private Uri coll(final byte[] name, final QueryProcessor qp) throws QueryException {
-    qp.ctx.resource.addCollection(string(name), colls.get(string(name)));
+    qp.ctx.resource.addCollection(string(name), colls.get(string(name)), qp.sc.baseIO());
     return Uri.uri(name);
   }
 
   /**
-   * Evaluates the the input files and assigns the result to the specified
-   * variables.
+   * Evaluates the the input files and assigns the result to the specified variables.
    * @param nod variables
    * @param var documents
    * @param pth file path
@@ -637,8 +636,7 @@ public abstract class W3CTS {
    * @param msg message
    * @throws IOException I/O exception
    */
-  private void addLog(final String pth, final String nm, final String msg)
-      throws IOException {
+  private void addLog(final String pth, final String nm, final String msg) throws IOException {
 
     if(reporting) {
       final File file = new File(results + pth);
@@ -731,8 +729,7 @@ public abstract class W3CTS {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  protected void parse(final QueryProcessor qp, final Nodes root)
-      throws QueryException { }
+  protected void parse(final QueryProcessor qp, final Nodes root) throws QueryException { }
 
   /**
    * Returns all query states.
@@ -770,7 +767,7 @@ public abstract class W3CTS {
         " -p     change path" + NL +
         " -r     create report" + NL +
         " -t[ms] list slowest queries" + NL +
-        " -v     verbose output", Util.info(CONSOLE, Util.name(this)));
+        " -v     verbose output", Util.info(S_CONSOLE, Util.className(this)));
 
     while(arg.more()) {
       if(arg.dash()) {
@@ -793,7 +790,7 @@ public abstract class W3CTS {
         } else if(c == 'v') {
           verbose = true;
         } else {
-          arg.usage();
+          throw arg.usage();
         }
       } else {
         single = arg.string();

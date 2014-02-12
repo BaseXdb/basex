@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Sequence of items, which are stored in their primitive/native representation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class NativeSeq extends Seq {
@@ -20,13 +20,13 @@ public abstract class NativeSeq extends Seq {
    * @param s number of items
    * @param t item type
    */
-  protected NativeSeq(final int s, final Type t) {
+  NativeSeq(final int s, final Type t) {
     super(s, t);
   }
 
   @Override
   public Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    throw CONDTYPE.thrw(ii, this);
+    throw CONDTYPE.get(ii, this);
   }
 
   @Override

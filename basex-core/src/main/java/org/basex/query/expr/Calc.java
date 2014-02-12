@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Calculation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public enum Calc {
@@ -25,7 +25,7 @@ public enum Calc {
       final Type ta = a.type, tb = b.type;
       final boolean t1 = ta.isNumberOrUntyped();
       final boolean t2 = tb.isNumberOrUntyped();
-      if(t1 ^ t2) errNum(ii, !t1 ? a : b);
+      if(t1 ^ t2) errNum(ii, t1 ? b : a);
 
       if(t1 && t2) {
         // numbers or untyped values
@@ -43,7 +43,7 @@ public enum Calc {
 
       // dates or durations
       if(ta == tb) {
-        if(!(a instanceof Dur)) errNum(ii, !t1 ? a : b);
+        if(!(a instanceof Dur)) errNum(ii, t1 ? b : a);
         if(ta == YMD) return new YMDur((YMDur) a, (YMDur) b, true, ii);
         if(ta == DTD) return new DTDur((DTDur) a, (DTDur) b, true, ii);
       }
@@ -64,7 +64,7 @@ public enum Calc {
       final Type ta = a.type, tb = b.type;
       final boolean t1 = ta.isNumberOrUntyped();
       final boolean t2 = tb.isNumberOrUntyped();
-      if(t1 ^ t2) errNum(ii, !t1 ? a : b);
+      if(t1 ^ t2) errNum(ii, t1 ? b : a);
 
       if(t1 && t2) {
         // numbers or untyped values
@@ -86,7 +86,7 @@ public enum Calc {
           return new DTDur((ADate) a, (ADate) b, ii);
         if(ta == YMD) return new YMDur((YMDur) a, (YMDur) b, false, ii);
         if(ta == DTD) return new DTDur((DTDur) a, (DTDur) b, false, ii);
-        errNum(ii, !t1 ? a : b);
+        errNum(ii, t1 ? b : a);
       }
       if(ta == DTM) return new Dtm((Dtm) a, checkDur(ii, b), false, ii);
       if(ta == DAT) return new Dat((Dat) a, checkDur(ii, b), false, ii);
@@ -132,7 +132,7 @@ public enum Calc {
         if(t == FLT) return Flt.get(a.flt(ii) * b.flt(ii));
         return Dec.get(a.dec(ii).multiply(b.dec(ii)));
       }
-      throw errNum(ii, !t1 ? a : b);
+      throw errNum(ii, t1 ? b : a);
     }
   },
 
@@ -144,13 +144,13 @@ public enum Calc {
       if(ta == tb) {
         if(ta == YMD) {
           final BigDecimal bd = BigDecimal.valueOf(((YMDur) b).ymd());
-          if(bd.doubleValue() == 0.0) DIVZERO.thrw(ii, a);
+          if(bd.doubleValue() == 0.0) throw DIVZERO.get(ii, chop(a));
           return Dec.get(BigDecimal.valueOf(((YMDur) a).ymd()).divide(
               bd, 20, BigDecimal.ROUND_HALF_EVEN));
         }
         if(ta == DTD) {
           final BigDecimal bd = ((DTDur) b).dtd();
-          if(bd.doubleValue() == 0.0) DIVZERO.thrw(ii, a);
+          if(bd.doubleValue() == 0.0) throw DIVZERO.get(ii, chop(a));
           return Dec.get(((DTDur) a).dtd().divide(bd, 20,
               BigDecimal.ROUND_HALF_EVEN));
         }
@@ -171,7 +171,7 @@ public enum Calc {
 
       final BigDecimal b1 = a.dec(ii);
       final BigDecimal b2 = b.dec(ii);
-      if(b2.signum() == 0) DIVZERO.thrw(ii, a);
+      if(b2.signum() == 0) throw DIVZERO.get(ii, chop(a));
       final int s = Math.max(18, Math.max(b1.scale(), b2.scale()));
       return Dec.get(b1.divide(b2, s, BigDecimal.ROUND_HALF_EVEN));
     }
@@ -184,10 +184,10 @@ public enum Calc {
       checkNum(ii, a, b);
       final double d1 = a.dbl(ii);
       final double d2 = b.dbl(ii);
-      if(d2 == 0) DIVZERO.thrw(ii, a);
+      if(d2 == 0) throw DIVZERO.get(ii, chop(a));
       final double d = d1 / d2;
-      if(Double.isNaN(d) || Double.isInfinite(d) || d > Long.MAX_VALUE)
-        DIVFLOW.thrw(ii, d1, d2);
+      if(Double.isNaN(d) || Double.isInfinite(d)) throw DIVFLOW.get(ii, d1, d2);
+      checkRange(ii, d);
       return Int.get(type(a.type, b.type) == ITR ? a.itr(ii) / b.itr(ii) : (long) d);
     }
   },
@@ -203,13 +203,13 @@ public enum Calc {
       if(t == ITR) {
         final long b1 = a.itr(ii);
         final long b2 = b.itr(ii);
-        if(b2 == 0) DIVZERO.thrw(ii, a);
+        if(b2 == 0) throw DIVZERO.get(ii, chop(a));
         return Int.get(b1 % b2);
       }
 
       final BigDecimal b1 = a.dec(ii);
       final BigDecimal b2 = b.dec(ii);
-      if(b2.signum() == 0) DIVZERO.thrw(ii, a);
+      if(b2.signum() == 0) throw DIVZERO.get(ii, chop(a));
       final BigDecimal q = b1.divide(b2, 0, BigDecimal.ROUND_DOWN);
       return Dec.get(b1.subtract(q.multiply(b2)));
     }
@@ -234,8 +234,7 @@ public enum Calc {
    * @return result type
    * @throws QueryException query exception
    */
-  public abstract Item ev(final InputInfo ii, final Item a, final Item b)
-    throws QueryException;
+  public abstract Item ev(final InputInfo ii, final Item a, final Item b) throws QueryException;
 
   /**
    * Returns the numeric type with the highest precedence.
@@ -243,7 +242,7 @@ public enum Calc {
    * @param b second item type
    * @return type
    */
-  static Type type(final Type a, final Type b) {
+  public static Type type(final Type a, final Type b) {
     if(a == DBL || b == DBL || a.isUntyped() || b.isUntyped()) return DBL;
     if(a == FLT || b == FLT) return FLT;
     if(a == DEC || b == DEC) return DEC;
@@ -260,7 +259,7 @@ public enum Calc {
    */
   final QueryException errType(final InputInfo ii, final Type ta, final Type tb)
       throws QueryException {
-    throw CALCTYPE.thrw(ii, info(), ta, tb);
+    throw CALCTYPE.get(ii, info(), ta, tb);
   }
 
   /**
@@ -271,7 +270,7 @@ public enum Calc {
    * @throws QueryException query exception
    */
   final QueryException errNum(final InputInfo ii, final Item it) throws QueryException {
-    throw NONUMBER.thrw(ii, info(), it.type);
+    throw NONUMBER.get(ii, info(), it.type);
   }
 
   /**
@@ -283,8 +282,8 @@ public enum Calc {
    */
   final Dur checkDur(final InputInfo ii, final Item it) throws QueryException {
     final Type ip = it.type;
-    if(!(it instanceof Dur)) NODUR.thrw(ii, info(), ip);
-    if(ip == DUR) throw NOSUBDUR.thrw(ii, info(), it);
+    if(!(it instanceof Dur)) throw NODUR.get(ii, info(), ip);
+    if(ip == DUR) throw NOSUBDUR.get(ii, info(), it);
     return (Dur) it;
   }
 
@@ -295,9 +294,7 @@ public enum Calc {
    * @param b second item
    * @throws QueryException query exception
    */
-  final void checkNum(final InputInfo ii, final Item a, final Item b)
-      throws QueryException {
-
+  final void checkNum(final InputInfo ii, final Item a, final Item b) throws QueryException {
     if(!a.type.isNumberOrUntyped()) errNum(ii, a);
     if(!b.type.isNumberOrUntyped()) errNum(ii, b);
   }
@@ -308,8 +305,8 @@ public enum Calc {
    * @param d value to be checked
    * @throws QueryException query exception
    */
-  static final void checkRange(final InputInfo ii, final double d) throws QueryException {
-    if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) RANGE.thrw(ii, d);
+  private static void checkRange(final InputInfo ii, final double d) throws QueryException {
+    if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw RANGE.get(ii, d);
   }
 
   /**

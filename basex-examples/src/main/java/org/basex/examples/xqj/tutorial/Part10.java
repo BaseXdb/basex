@@ -19,7 +19,7 @@ import org.xml.sax.helpers.*;
  *
  * Part 10: XML Pipelines.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  */
 public final class Part10 extends Main {
   /**

@@ -22,7 +22,7 @@ import org.basex.util.*;
 /**
  * Abstract axis path expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class AxisPath extends Path {
@@ -78,8 +78,8 @@ public abstract class AxisPath extends Path {
 
     // merge two axis paths
     if(root instanceof AxisPath) {
-      Expr[] st = ((AxisPath) root).steps;
-      root = ((AxisPath) root).root;
+      Expr[] st = ((Path) root).steps;
+      root = ((Path) root).root;
       for(final Expr s : steps) st = Array.add(st, s);
       steps = st;
       // refresh root context
@@ -100,7 +100,9 @@ public abstract class AxisPath extends Path {
 
   @Override
   public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.optimize(ctx, scp);
+    final Expr opt = super.optimize(ctx, scp);
+    if(opt != this) return opt;
+
     final Value v = ctx.value;
     try {
       ctx.value = root(ctx);
@@ -123,42 +125,41 @@ public abstract class AxisPath extends Path {
   }
 
   /**
-   * If possible, returns an expression which accesses the index.
-   * Otherwise, returns the original expression.
+   * Returns an equivalent expression which accesses an index.
+   * If the expression cannot be rewritten, the original expression is returned.
    * @param ctx query context
    * @param data data reference
    * @return resulting expression
    * @throws QueryException query exception
    */
   private Expr index(final QueryContext ctx, final Data data) throws QueryException {
-    // disallow relative paths and numeric predicates
-    if(root == null || has(Flag.FCS)) return this;
+    // only rewrite paths with root expression
+    if(root == null) return this;
 
     // cache index access costs
     IndexCosts ics = null;
     // cheapest predicate and step
-    int pmin = 0;
-    int smin = 0;
+    int pmin = 0, smin = 0;
 
     // check if path can be converted to an index access
     for(int s = 0; s < steps.length; ++s) {
-      // find cheapest index access
-      final Step stp = step(s);
-      if(!stp.axis.down) break;
+      // only accept descendant steps without positional predicates
+      final Step step = step(s);
+      if(!step.axis.down || step.has(Flag.FCS)) break;
 
       // check if resulting index path will be duplicate free
       final boolean i = pathNodes(data, s) != null;
       final IndexContext ictx = new IndexContext(data, i);
 
       // choose cheapest index access
-      for(int p = 0; p < stp.preds.length; ++p) {
-        final IndexCosts ic = new IndexCosts(ictx, ctx, stp);
-        if(!stp.preds[p].indexAccessible(ic)) continue;
+      for(int p = 0; p < step.preds.length; ++p) {
+        final IndexCosts ic = new IndexCosts(ictx, ctx, step);
+        if(!step.preds[p].indexAccessible(ic)) continue;
 
         if(ic.costs() == 0) {
           if(ic.not) {
             // not operator... accept all results
-            stp.preds[p] = Bln.TRUE;
+            step.preds[p] = Bln.TRUE;
             continue;
           }
           // no results...
@@ -218,13 +219,13 @@ public abstract class AxisPath extends Path {
         for(int j = smin; j >= 0; --j) {
           final Axis ax = step(j).axis.invert();
           if(ax == null) break;
-          if(j != 0) {
-            final Step prev = step(j - 1);
-            invSteps = Array.add(invSteps, Step.get(info, ax, prev.test, prev.preds));
-          } else {
+          if(j == 0) {
             // add document test for collections and axes other than ancestors
             if(test != Test.DOC || ax != Axis.ANC && ax != Axis.ANCORSELF)
               invSteps = Array.add(invSteps, Step.get(info, ax, test));
+          } else {
+            final Step prev = step(j - 1);
+            invSteps = Array.add(invSteps, Step.get(info, ax, prev.test, prev.preds));
           }
         }
       }
@@ -270,7 +271,7 @@ public abstract class AxisPath extends Path {
     int s = steps.length;
     final Expr[] e = new Expr[s--];
     // add predicates of last step to new root node
-    final Expr rt = step(s).preds.length != 0 ? Filter.get(info, r, step(s).preds) : r;
+    final Expr rt = step(s).preds.length == 0 ? r : Filter.get(info, r, step(s).preds);
 
     // add inverted steps in a backward manner
     int c = 0;
@@ -345,7 +346,7 @@ public abstract class AxisPath extends Path {
    * @return guess
    */
   public boolean cheap() {
-    if(!(root instanceof ANode) || ((ANode) root).type != NodeType.DOC) return false;
+    if(!(root instanceof ANode) || ((Value) root).type != NodeType.DOC) return false;
     final Axis[] expensive = { Axis.DESC, Axis.DESCORSELF, Axis.PREC, Axis.PRECSIBL,
         Axis.FOLL, Axis.FOLLSIBL };
     for(int i = 0; i < steps.length; i++) {

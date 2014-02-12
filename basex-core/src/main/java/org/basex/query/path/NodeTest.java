@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * Extended node test.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class NodeTest extends Test {
@@ -83,10 +83,12 @@ public class NodeTest extends Test {
       final boolean both = ext != null && o.ext != null;
       final Type e = ext == null ? o.ext : o.ext == null ? ext : ext.intersect(o.ext);
       return both && e == null ? null : new NodeTest(nt, n, e, strip || o.strip);
-    } else if(other instanceof KindTest) {
+    }
+    if(other instanceof KindTest) {
       return type.instanceOf(other.type) ? this : null;
-    } else if(other instanceof NameTest) {
-      throw Util.notexpected(other);
+    }
+    if(other instanceof NameTest) {
+      throw Util.notExpected(other);
     }
 
     return null;

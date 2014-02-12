@@ -5,7 +5,7 @@ import org.basex.util.list.*;
 /**
  * This is a simple container for attributes (name/value pairs).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Atts extends ElementList {
@@ -117,7 +117,7 @@ public final class Atts extends ElementList {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(Util.name(this) + '[');
+    final TokenBuilder tb = new TokenBuilder(Util.className(this) + '[');
     for(int i = 0; i < size; ++i) {
       if(i > 0) tb.add(", ");
       tb.add(nm[i]).add("=\"").add(vl[i]).add("\"");

@@ -11,7 +11,7 @@ import org.basex.query.value.type.*;
 /**
  * Sequence of items of type {@link Int xs:integer}, containing at least two of them.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class IntSeq extends NativeSeq {
@@ -41,7 +41,7 @@ public final class IntSeq extends NativeSeq {
   }
 
   @Override
-  public Object toJava() throws QueryException {
+  public Object toJava() {
     switch((AtomType) type) {
       case BYT:
         final byte[] t1 = new byte[(int) size];

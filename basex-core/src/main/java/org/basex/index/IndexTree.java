@@ -8,7 +8,7 @@ import org.basex.util.list.*;
  * This class indexes keys in a balanced binary tree, including their id
  * values. Iterator methods are available to traverse through the tree.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */
@@ -77,9 +77,7 @@ public class IndexTree {
         return n;
       }
       int ch = c < 0 ? l(n) : r(n);
-      if(ch != -1) {
-        n = ch;
-      } else {
+      if(ch == -1) {
         ch = n(key, value, n, exist);
         if(c < 0) {
           l(n, ch);
@@ -90,6 +88,7 @@ public class IndexTree {
         }
         return ch;
       }
+      n = ch;
     }
   }
 
@@ -125,16 +124,16 @@ public class IndexTree {
   public final int next() {
     /* Last iterator node. */
     final int ln = cn;
-    if(r(cn) != -1) {
-      cn = r(cn);
-      while(l(cn) != -1) cn = l(cn);
-    } else {
+    if(r(cn) == -1) {
       int t = cn;
       cn = p(cn);
       while(cn != -1 && t == r(cn)) {
         t = cn;
         cn = p(cn);
       }
+    } else {
+      cn = r(cn);
+      while(l(cn) != -1) cn = l(cn);
     }
     return ln;
   }

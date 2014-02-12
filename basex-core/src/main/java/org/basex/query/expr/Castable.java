@@ -13,21 +13,26 @@ import org.basex.util.hash.*;
 /**
  * Castable expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Castable extends Single {
+  /** Static context. */
+  private final StaticContext sc;
   /** Instance. */
   private final SeqType seq;
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param e expression
    * @param s sequence type
    */
-  public Castable(final InputInfo ii, final Expr e, final SeqType s) {
+  public Castable(final StaticContext sctx, final InputInfo ii, final Expr e,
+      final SeqType s) {
     super(ii, e);
+    sc = sctx;
     seq = s;
     type = SeqType.BLN;
   }
@@ -41,7 +46,7 @@ public final class Castable extends Single {
   @Override
   public Bln item(final QueryContext ctx, final InputInfo ii) {
     try {
-      seq.cast(expr.item(ctx, ii), ctx, ii, this);
+      seq.cast(expr.item(ctx, ii), ctx, sc, ii, this);
       return Bln.TRUE;
     } catch(final QueryException ex) {
       return Bln.FALSE;
@@ -50,7 +55,7 @@ public final class Castable extends Single {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Castable(info, expr.copy(ctx, scp, vs), seq);
+    return new Castable(sc, info, expr.copy(ctx, scp, vs), seq);
   }
 
   @Override

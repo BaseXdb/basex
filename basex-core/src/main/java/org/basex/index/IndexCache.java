@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * This class caches sizes and pointers from index results.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Dimitar Popov
  */
 public final class IndexCache {
@@ -230,7 +230,7 @@ public final class IndexCache {
      * @param v stored cache entry
      * @param rq reference queue
      */
-    public BucketEntry(final int h, final BucketEntry n, final IndexEntry v,
+    BucketEntry(final int h, final BucketEntry n, final IndexEntry v,
         final ReferenceQueue<IndexEntry> rq) {
       super(v, rq);
       hash = h;

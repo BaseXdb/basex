@@ -11,7 +11,7 @@ import org.basex.util.hash.*;
 /**
  * Single case of a switch expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class SwitchCase extends Arr {
@@ -31,7 +31,7 @@ public final class SwitchCase extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr compile(final QueryContext ctx, final VarScope scp) {
     // compile and simplify branches
     final int es = expr.length;
     for(int e = 0; e < es; e++) {
@@ -39,7 +39,7 @@ public final class SwitchCase extends Arr {
         expr[e] = expr[e].compile(ctx, scp);
       } catch(final QueryException ex) {
         // replace original expression with error
-        expr[e] = FNInfo.error(ex);
+        expr[e] = FNInfo.error(ex, expr[e].type());
       }
     }
     return this;
@@ -60,7 +60,7 @@ public final class SwitchCase extends Arr {
       try {
         nw = expr[i].inline(ctx, scp, v, e);
       } catch(final QueryException qe) {
-        nw = FNInfo.error(qe);
+        nw = FNInfo.error(qe, expr[i].type());
       }
       if(nw != null) {
         expr[i] = nw;
@@ -95,7 +95,7 @@ public final class SwitchCase extends Arr {
    * @param v variable to look for
    * @return number of occurrences
    */
-  protected VarUsage countCases(final Var v) {
+  VarUsage countCases(final Var v) {
     VarUsage all = VarUsage.NEVER;
     final int es = expr.length;
     for(int i = 1; i < es; i++)

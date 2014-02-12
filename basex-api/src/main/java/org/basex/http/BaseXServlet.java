@@ -18,14 +18,14 @@ import org.basex.util.*;
 /**
  * <p>Base class for all servlets.</p>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class BaseXServlet extends HttpServlet {
   /** Servlet-specific user. */
-  protected String user;
+  String user;
   /** Servlet-specific password. */
-  protected String pass;
+  String pass;
 
   @Override
   public void init(final ServletConfig config) throws ServletException {
@@ -37,9 +37,9 @@ public abstract class BaseXServlet extends HttpServlet {
         String key = en.nextElement().toLowerCase(Locale.ENGLISH);
         final String val = config.getInitParameter(key);
         if(key.startsWith(Prop.DBPREFIX)) key = key.substring(Prop.DBPREFIX.length());
-        if(key.equalsIgnoreCase(MainProp.USER[0].toString())) {
+        if(key.equalsIgnoreCase(GlobalOptions.USER.name())) {
           user = val;
-        } else if(key.equalsIgnoreCase(MainProp.PASSWORD[0].toString())) {
+        } else if(key.equalsIgnoreCase(GlobalOptions.PASSWORD.name())) {
           pass = val;
         }
       }
@@ -79,7 +79,6 @@ public abstract class BaseXServlet extends HttpServlet {
         }
         Util.out("_ RESPONSE ________________________________" + Prop.NL + res);
       }
-      http.close();
     }
   }
 

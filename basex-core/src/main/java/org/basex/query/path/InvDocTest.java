@@ -13,7 +13,7 @@ import org.basex.util.list.*;
 /**
  * Document test for inverted location paths.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class InvDocTest extends Test {
@@ -75,6 +75,6 @@ final class InvDocTest extends Test {
 
   @Override
   public Test intersect(final Test other) {
-    throw Util.notexpected(this);
+    throw Util.notExpected(this);
   }
 }

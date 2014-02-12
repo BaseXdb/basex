@@ -3,23 +3,25 @@ package org.basex.query.func;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
  * Streaming functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNStream extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNStream(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNStream(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -53,7 +55,7 @@ public final class FNStream extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx) throws QueryException {
+  protected Expr opt(final QueryContext ctx, final VarScope scp) {
     if(sig == Function._STREAM_MATERIALIZE) type = expr[0].type();
     return this;
   }

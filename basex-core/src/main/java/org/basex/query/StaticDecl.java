@@ -9,18 +9,16 @@ import org.basex.util.*;
 /**
  * Common superclass for static functions and variables.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public abstract class StaticDecl extends StaticScope {
-  /** Static context of this declaration. */
-  public final StaticContext sc;
   /** Annotations. */
   public final Ann ann;
   /** This declaration's name. */
   public final QNm name;
   /** Declared type, {@code null} if not specified. */
-  public final SeqType declType;
+  protected final SeqType declType;
 
   /** Flag that is set during compilation and execution and prevents infinite loops. */
   protected boolean dontEnter;
@@ -35,11 +33,10 @@ public abstract class StaticDecl extends StaticScope {
    * @param xqdoc documentation
    * @param ii input info
    */
-  public StaticDecl(final StaticContext sctx, final Ann a, final QNm nm, final SeqType t,
+  protected StaticDecl(final StaticContext sctx, final Ann a, final QNm nm, final SeqType t,
       final VarScope scp, final String xqdoc, final InputInfo ii) {
 
-    super(scp, xqdoc, ii);
-    sc = sctx;
+    super(scp, xqdoc, sctx, ii);
     ann = a == null ? new Ann() : a;
     name = nm;
     declType = t;

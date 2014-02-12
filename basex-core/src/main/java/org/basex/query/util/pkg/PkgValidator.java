@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
  * Package validator. This class executes some essential checks before the
  * installation of a package.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  */
 public final class PkgValidator {
@@ -62,10 +62,10 @@ public final class PkgValidator {
     for(final Dependency dep : pkg.dep) {
       // first check of dependency elements are consistently defined in the
       // descriptor
-      if(dep.pkg == null && dep.processor == null) BXRE_DESC.thrw(info, MISSSECOND);
+      if(dep.pkg == null && dep.processor == null) throw BXRE_DESC.get(info, MISSSECOND);
       // if dependency involves a package, check if this package or an
       // appropriate version of it is installed
-      if(dep.pkg != null && depPkg(dep) == null) BXRE_NOTINST.thrw(info, dep.pkg);
+      if(dep.pkg != null && depPkg(dep) == null) throw BXRE_NOTINST.get(info, dep.pkg);
       // if dependency involves a processor, add it to the list with processor
       // dependencies
       if(dep.processor != null) procs.add(dep);
@@ -91,24 +91,26 @@ public final class PkgValidator {
   }
 
   /**
-   * Checks if current version of BaseX is among the processor dependencies.
+   * Checks if current database version of is among the processor dependencies.
    * @param procs processor dependencies
    * @throws QueryException query exception
    */
   private void checkProcs(final ArrayList<Dependency> procs) throws QueryException {
     boolean supported = false;
+    // extract database version
+    final int i = Prop.VERSION.indexOf(' ');
+    final TokenSet versions = new TokenSet(token(i == -1 ? Prop.VERSION :
+      Prop.VERSION.substring(0, i)));
+    final byte[] name = token(Text.PROJECT_NAME);
     for(final Dependency d : procs) {
-      if(!eq(lc(d.processor), token(Text.NAMELC))) {
+      if(!eq(lc(d.processor), name)) {
         supported = false;
         break;
       }
-      // extract version
-      final int i = Prop.VERSION.indexOf(' ');
-      final String v = i == -1 ? Prop.VERSION : Prop.VERSION.substring(0, i);
       // check if current version is acceptable for the dependency
-      supported = availVersion(d, new TokenSet(token(v))) != null;
+      supported = availVersion(d, versions) != null;
     }
-    if(!supported) BXRE_VERSION.thrw(info);
+    if(!supported) throw BXRE_VERSION.get(info);
   }
 
   /**
@@ -176,7 +178,7 @@ public final class PkgValidator {
   private void checkComps(final Package pkg) throws QueryException {
     // modules other than xquery could be supported in future
     for(final Component comp : pkg.comps) {
-      if(isInstalled(comp, pkg.name)) BXRE_INST.thrw(info, comp.name());
+      if(isInstalled(comp, pkg.name)) throw BXRE_INST.get(info, comp.name());
     }
   }
 
@@ -188,9 +190,7 @@ public final class PkgValidator {
    * @return result
    * @throws QueryException query exception
    */
-  private boolean isInstalled(final Component comp, final byte[] name)
-      throws QueryException {
-
+  private boolean isInstalled(final Component comp, final byte[] name) throws QueryException {
     // get packages in which the module's namespace is found
     final TokenSet pkgs = repo.nsDict().get(comp.uri);
     if(pkgs == null) return false;

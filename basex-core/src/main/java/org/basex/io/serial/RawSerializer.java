@@ -11,18 +11,18 @@ import org.basex.query.value.item.*;
  * coding takes place, binary data is directly output as raw data,
  * and all nodes except for text nodes are skipped.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class RawSerializer extends TextSerializer {
   /**
    * Constructor, specifying serialization options.
    * @param os output stream reference
-   * @param sp serialization properties
+   * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  RawSerializer(final OutputStream os, final SerializerProp sp) throws IOException {
-    super(os, sp);
+  RawSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
+    super(os, sopts);
   }
 
   @Override
@@ -36,12 +36,12 @@ public final class RawSerializer extends TextSerializer {
         is.close();
       }
     } catch(final QueryException ex) {
-      throw new SerializerException(ex);
+      throw new QueryIOException(ex);
     }
   }
 
   @Override
-  protected void code(final int ch) throws IOException {
+  protected void encode(final int ch) throws IOException {
     print(ch);
   }
 }

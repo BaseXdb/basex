@@ -41,24 +41,26 @@ public final class Unit {
 
   /**
    * Performs the test function.
+   * @param sc static context
    * @return resulting value
    * @throws QueryException query exception
    */
-  public FElem test() throws QueryException {
+  public FElem test(final StaticContext sc) throws QueryException {
     final ArrayList<StaticFunc> funcs = new ArrayList<StaticFunc>();
-    for(final StaticFunc uf : ctx.funcs.funcs()) funcs.add(uf);
-    return test(funcs);
+    Collections.addAll(funcs, ctx.funcs.funcs());
+    return test(sc, funcs);
   }
 
   /**
    * Performs the test function.
+   * @param sc static context
    * @param funcs functions to test
    * @return resulting value
    * @throws QueryException query exception
    */
-  public FElem test(final ArrayList<StaticFunc> funcs) throws QueryException {
-    final FElem testsuite = new FElem(TESTSUITE).add(NAME, ctx.sc.baseURI().string());
-    int t = 0, e = 0, f = 0, s = 0;
+  public FElem test(final StaticContext sc, final ArrayList<StaticFunc> funcs)
+      throws QueryException {
+    final FElem testsuite = new FElem(TESTSUITE).add(NAME, sc.baseURI().string());
 
     final ArrayList<StaticFunc> before = new ArrayList<StaticFunc>(1);
     final ArrayList<StaticFunc> after = new ArrayList<StaticFunc>(1);
@@ -79,8 +81,8 @@ public final class Unit {
       if(!xq) continue;
 
       // Unit function:
-      if(uf.updating) UNIT_UPDATE.thrw(info, uf.name.local());
-      if(uf.args.length > 0) UNIT_ARGS.thrw(info, uf.name.local());
+      if(uf.updating) throw UNIT_UPDATE.get(info, uf.name.local());
+      if(uf.args.length > 0) throw UNIT_ARGS.get(info, uf.name.local());
 
       if(indexOf(uf, BEFORE) != -1) before.add(uf);
       if(indexOf(uf, AFTER) != -1) after.add(uf);
@@ -89,6 +91,10 @@ public final class Unit {
       if(indexOf(uf, TEST) != -1) tests.add(uf);
     }
 
+    int s = 0;
+    int f = 0;
+    int e = 0;
+    int t = 0;
     try {
       // call initializing functions before first test
       for(final StaticFunc uf : beforeModule) eval(uf);
@@ -104,7 +110,7 @@ public final class Unit {
           if(vs == 2 && eq(EXPECTED, values.itemAt(0).string(info))) {
             code = values.itemAt(1).string(info);
           } else {
-            UNIT_ANN.thrw(info, '%', uf.ann.names[0]);
+            throw UNIT_ANN.get(info, '%', uf.ann.names[0]);
           }
         }
 
@@ -113,14 +119,7 @@ public final class Unit {
 
         final Performance pt = new Performance();
         final int skip = indexOf(uf, IGNORE);
-        if(skip != -1) {
-          // skip test
-          final FElem skipped = new FElem(SKIPPED);
-          final Value sv = uf.ann.values[skip];
-          if(sv.size() > 0) skipped.add(MESSAGE, sv.itemAt(0).string(info));
-          testcase.add(skipped);
-          s++;
-        } else {
+        if(skip == -1) {
           try {
             // call functions marked with "before"
             for(final StaticFunc fn : before) eval(fn);
@@ -131,10 +130,7 @@ public final class Unit {
 
             if(code != null) {
               f++;
-              final FElem error = new FElem(FAILURE);
-              error.add(MESSAGE, "Error expected.");
-              error.add(TYPE, code);
-              testcase.add(error);
+              testcase.add(new FElem(FAILURE).add(new FElem(EXPECTED).add(code)));
             }
           } catch(final QueryException ex) {
             final QNm name = ex.qname();
@@ -142,13 +138,26 @@ public final class Unit {
               final boolean failure = eq(name.uri(), QueryText.UNITURI);
               if(failure) f++;
               else e++;
-
               final FElem error = new FElem(failure ? FAILURE : ERROR);
-              error.add(MESSAGE, ex.getLocalizedMessage());
-              error.add(TYPE, ex.qname().local());
+              error.add(LINE, token(ex.line()));
+              error.add(COLUMN, token(ex.column()));
+
+              if(ex instanceof UnitException) {
+                final UnitException ue = (UnitException) ex;
+                error.add(elem(ue.returned, RETURNED, ue.count));
+                error.add(elem(ue.expected, EXPECTED, ue.count));
+              } else {
+                error.add(TYPE, ex.qname().local());
+                error.add(ex.getLocalizedMessage());
+              }
               testcase.add(error);
             }
           }
+        } else {
+          // skip test
+          final Value sv = uf.ann.values[skip];
+          testcase.add(SKIPPED, sv.isEmpty() ? EMPTY : sv.itemAt(0).string(info));
+          s++;
         }
         testcase.add(TIME, time(pt));
         testsuite.add(testcase);
@@ -170,6 +179,25 @@ public final class Unit {
     testsuite.add(ERRORS, token(e));
     testsuite.add(SKIPPED, token(s));
     return testsuite;
+  }
+
+  /**
+   * Creates a new element.
+   * @param it item
+   * @param name name (expected/returned)
+   * @param c item count
+   * @return new element
+   * @throws QueryException query exception
+   */
+  private FElem elem(final Item it, final byte[] name, final int c) throws QueryException {
+    final FElem exp = new FElem(name);
+    if(it instanceof ANode) {
+      exp.add((ANode) it);
+    } else if(it != null) {
+      exp.add(it.string(info));
+    }
+    exp.add(ITEM, token(c));
+    return exp;
   }
 
   /**
@@ -199,7 +227,7 @@ public final class Unit {
     for(int a = 0; a < as; a++) {
       final QNm nm = ann.names[a];
       if(eq(nm.uri(), QueryText.UNITURI) && eq(nm.local(), name)) {
-        if(pos != -1) UNIT_TWICE.thrw(info, '%', nm.local());
+        if(pos != -1) throw UNIT_TWICE.get(info, '%', nm.local());
         pos = a;
       }
     }

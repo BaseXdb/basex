@@ -16,11 +16,10 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'backup' command and creates a backup of a database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class CreateBackup extends ABackup {
-
   /**
    * Default constructor.
    * @param arg optional argument
@@ -41,7 +40,7 @@ public final class CreateBackup extends ABackup {
     // loop through all databases
     boolean ok = true;
     for(final String db : dbs) {
-      if(!mprop.dbpath(db).isDir()) continue;
+      if(!goptions.dbpath(db).isDir()) continue;
       if(backup(db)) {
         // backup was successful
         info(DB_BACKUP_X, db, perf);
@@ -61,11 +60,11 @@ public final class CreateBackup extends ABackup {
   private boolean backup(final String db) {
     final String backup = db + '-' + DateTime.format(new Date(), DateTime.DATETIME) +
         IO.ZIPSUFFIX;
-    final IOFile zf = mprop.dbpath(backup);
+    final IOFile zf = goptions.dbpath(backup);
     final Zip zip = proc(new Zip(zf));
 
     try {
-      final IOFile path = mprop.dbpath(db);
+      final IOFile path = goptions.dbpath(db);
       zip.zip(path, path.descendants());
       return true;
     } catch(final IOException ex) {

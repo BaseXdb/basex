@@ -16,12 +16,12 @@ import org.basex.util.*;
 /**
  * Duration item ({@code xs:duration}).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class Dur extends ADateDur {
   /** Pattern for one or more digits. */
-  protected static final String DP = "(\\d+)";
+  static final String DP = "(\\d+)";
 
   /** Date pattern. */
   private static final Pattern DUR = Pattern.compile("(-?)P(" + DP + "Y)?(" + DP +
@@ -91,9 +91,7 @@ public class Dur extends ADateDur {
    * @param ii input info
    * @throws QueryException query exception
    */
-  protected void yearMonth(final byte[] vl, final Matcher mt, final InputInfo ii)
-      throws QueryException {
-
+  void yearMonth(final byte[] vl, final Matcher mt, final InputInfo ii) throws QueryException {
     final long y = mt.group(2) != null ? toLong(mt.group(3), true, ii) : 0;
     final long m = mt.group(4) != null ? toLong(mt.group(5), true, ii) : 0;
     mon = y * 12 + m;
@@ -102,7 +100,7 @@ public class Dur extends ADateDur {
       mon = -mon;
       v = -v;
     }
-    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) DURRANGE.thrw(ii, type, vl);
+    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE.get(ii, type, vl);
   }
 
   /**
@@ -113,8 +111,8 @@ public class Dur extends ADateDur {
    * @param ii input info
    * @throws QueryException query exception
    */
-  protected void dayTime(final byte[] vl, final Matcher mt, final int p,
-      final InputInfo ii) throws QueryException {
+  void dayTime(final byte[] vl, final Matcher mt, final int p, final InputInfo ii)
+      throws QueryException {
 
     final long d = mt.group(p) != null ? toLong(mt.group(p + 1), true, ii) : 0;
     final long h = mt.group(p + 3) != null ? toLong(mt.group(p + 4), true, ii) : 0;
@@ -126,7 +124,7 @@ public class Dur extends ADateDur {
         add(BigDecimal.valueOf(m).multiply(BD60));
     if(!mt.group(1).isEmpty()) sec = sec.negate();
     final double v = sec.doubleValue();
-    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) DURRANGE.thrw(ii, type, vl);
+    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE.get(ii, type, vl);
   }
 
   @Override
@@ -182,7 +180,7 @@ public class Dur extends ADateDur {
    * Adds the date to the specified token builder.
    * @param tb token builder
    */
-  protected final void date(final TokenBuilder tb) {
+  final void date(final TokenBuilder tb) {
     tb.add('P');
     final long y = yea();
     if(y != 0) { tb.addLong(Math.abs(y)); tb.add('Y'); }
@@ -196,7 +194,7 @@ public class Dur extends ADateDur {
    * Adds the time to the specified token builder.
    * @param tb token builder
    */
-  protected final void time(final TokenBuilder tb) {
+  final void time(final TokenBuilder tb) {
     if(sec.remainder(DAYSECONDS).signum() == 0) return;
     tb.add('T');
     final long h = hou();
@@ -211,16 +209,15 @@ public class Dur extends ADateDur {
   @Override
   public final boolean eq(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
-    final Dur d = (Dur) (it instanceof Dur ? it : type.cast(it, null, ii));
+    final Dur d = (Dur) (it instanceof Dur ? it : type.cast(it, null, null, ii));
     final BigDecimal s1 = sec == null ? BigDecimal.ZERO : sec;
     final BigDecimal s2 = d.sec == null ? BigDecimal.ZERO : d.sec;
     return mon == d.mon && s1.compareTo(s2) == 0;
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    throw Err.diff(ii, it, this);
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
+    throw diffError(ii, it, this);
   }
 
   @Override

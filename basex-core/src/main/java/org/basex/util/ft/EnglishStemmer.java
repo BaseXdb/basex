@@ -8,7 +8,7 @@ import java.util.*;
  * English stemming algorithm, based on the publication from
  * Porter (1980), "An algorithm for suffix stripping".
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class EnglishStemmer extends InternalStemmer {
@@ -96,7 +96,7 @@ final class EnglishStemmer extends InternalStemmer {
   protected byte[] stem(final byte[] str) {
     te = str.length;
     tok = str;
-    return !s() ? str : Arrays.copyOf(str, te);
+    return s() ? Arrays.copyOf(str, te) : str;
   }
 
   /**

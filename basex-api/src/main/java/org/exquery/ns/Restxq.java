@@ -47,7 +47,7 @@ public final class Restxq extends QueryModule {
    * @throws QueryException query exception
    */
   private HTTPContext http() throws QueryException {
-    if(context.http != null) return (HTTPContext) context.http;
+    if(queryContext.http != null) return (HTTPContext) queryContext.http;
     throw new QueryException("Servlet context required.");
   }
 }

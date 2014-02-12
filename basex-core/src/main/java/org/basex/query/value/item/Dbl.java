@@ -1,6 +1,7 @@
 package org.basex.query.value.item;
 
 import static java.lang.Double.*;
+import static org.basex.query.util.Err.*;
 
 import java.math.*;
 
@@ -13,12 +14,12 @@ import org.basex.util.*;
 /**
  * Double item ({@code xs:double}).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Dbl extends ANum {
   /** Value "NaN". */
-  public static final Dbl NAN = new Dbl(Double.NaN);
+  public static final Dbl NAN = new Dbl(NaN);
   /** Value "0". */
   private static final Dbl ZERO = new Dbl(0);
   /** Value "1". */
@@ -41,7 +42,7 @@ public final class Dbl extends ANum {
    * @return instance
    */
   public static Dbl get(final double d) {
-    return d == 0 && Double.doubleToRawLongBits(d) == 0 ? ZERO : d == 1 ? ONE :
+    return d == 0 && doubleToRawLongBits(d) == 0 ? ZERO : d == 1 ? ONE :
       isNaN(d) ? NAN : new Dbl(d);
   }
 
@@ -107,8 +108,7 @@ public final class Dbl extends ANum {
 
   @Override
   public boolean sameAs(final Expr cmp) {
-    return cmp instanceof Dbl && val == ((Dbl) cmp).val ||
-      this == NAN && cmp == NAN;
+    return cmp instanceof Dbl && val == ((Dbl) cmp).val || this == NAN && cmp == NAN;
   }
 
   /**
@@ -120,11 +120,11 @@ public final class Dbl extends ANum {
    */
   public static double parse(final byte[] val, final InputInfo ii) throws QueryException {
     try {
-      return Double.parseDouble(Token.string(val));
+      return parseDouble(Token.string(val));
     } catch(final NumberFormatException ex) {
-      if(Token.eq(Token.trim(val), Token.INF)) return Double.POSITIVE_INFINITY;
-      if(Token.eq(Token.trim(val), Token.NINF)) return Double.NEGATIVE_INFINITY;
-      throw ZERO.castErr(val, ii);
+      if(Token.eq(Token.trim(val), Token.INF)) return POSITIVE_INFINITY;
+      if(Token.eq(Token.trim(val), Token.NINF)) return NEGATIVE_INFINITY;
+      throw FUNCAST.get(ii, ZERO.type, chop(val));
     }
   }
 }

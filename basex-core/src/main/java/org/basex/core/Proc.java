@@ -9,7 +9,7 @@ import org.basex.util.*;
  * It gives feedback on the current process. Moreover, it allows to
  * interrupt the process by calling the {@link #stop()} method.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Proc {
@@ -17,9 +17,9 @@ public abstract class Proc {
   public InfoListener listen;
   /** This flag indicates that a command may perform updates. */
   public boolean updating;
-  /** Indicates if a process is currently registered. */
-  boolean registered;
 
+  /** Indicates if a process is currently registered. */
+  protected boolean registered;
   /** Stopped flag. */
   private boolean stopped;
   /** Timeout thread. */
@@ -130,10 +130,10 @@ public abstract class Proc {
 
   /**
    * Adds the names of the databases that may be touched by the process.
-   * @param lockResult Container for lock result to pass around
+   * @param lr container for lock result to pass around
    */
-  public void databases(final LockResult lockResult) {
-    lockResult.writeAll = true;
+  public void databases(final LockResult lr) {
+    lr.writeAll = true;
   }
 
   /**

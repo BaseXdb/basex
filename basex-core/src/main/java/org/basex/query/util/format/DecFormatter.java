@@ -15,12 +15,12 @@ import org.basex.util.list.*;
 /**
  * Formatter for decimal numbers.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DecFormatter extends FormatUtil {
   /** Decimal-digit-family (mandatory-digit-sign). */
-  public final byte[] digits;
+  private final byte[] digits;
   /** Active characters. */
   private final byte[] active;
   /** Zero digit sign. */
@@ -83,12 +83,12 @@ public final class DecFormatter extends FormatUtil {
           else if(k.equals(DF_PM)) permille = cp;
           else if(k.equals(DF_ZG)) {
             z = zeroes(cp);
-            if(z == -1) INVDECFORM.thrw(ii, k, v);
-            if(z != cp) INVDECZERO.thrw(ii, (char)  cp);
+            if(z == -1) throw INVDECFORM.get(ii, k, v);
+            if(z != cp) throw INVDECZERO.get(ii, (char)  cp);
           }
         } else {
           // signs must have single character
-          INVDECSINGLE.thrw(ii, k, v);
+          throw INVDECSINGLE.get(ii, k, v);
         }
       }
     }
@@ -97,7 +97,7 @@ public final class DecFormatter extends FormatUtil {
     zero = z;
     final IntSet is = new IntSet();
     final int[] ss = { decimal, grouping, percent, permille, zero, optional, pattern };
-    for(final int s : ss) if(!is.add(s)) DUPLDECFORM.thrw(ii, (char) s);
+    for(final int s : ss) if(!is.add(s)) throw DUPLDECFORM.get(ii, (char) s);
 
     // create auxiliary strings
     final TokenBuilder tb = new TokenBuilder();
@@ -126,13 +126,13 @@ public final class DecFormatter extends FormatUtil {
     } else {
       tl.add(substring(pic, 0, i));
       pic = substring(pic, i + cl(pic, i));
-      if(contains(pic, pattern)) PICNUM.thrw(ii, pict);
+      if(contains(pic, pattern)) throw PICNUM.get(ii, pict);
       tl.add(pic);
     }
     final byte[][] patterns = tl.toArray();
 
     // check and analyze patterns
-    if(!check(patterns)) PICNUM.thrw(ii, pict);
+    if(!check(patterns)) throw PICNUM.get(ii, pict);
     final Picture[] pics = analyze(patterns);
 
     // return formatted string
@@ -169,12 +169,12 @@ public final class DecFormatter extends FormatUtil {
         } else if(ch == permille) {
           if(++pm > 1) return false;
         } else if(ch == optional) {
-          if(!frac) {
+          if(frac) {
+            opt2 = true;
+          } else {
             // integer part, and optional sign after digit?
             if(dg) return false;
             opt1 = true;
-          } else {
-            opt2 = true;
           }
         } else if(contains(digits, ch)) {
           // fractional part, and digit after optional sign?

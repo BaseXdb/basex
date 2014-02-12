@@ -3,16 +3,16 @@ package org.basex.query.regex;
 /**
  * A quantifier, like {@code ?}, {@code *} or {@code &#x7b;17,123&#x7d;}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public class Quantifier extends RegExp {
   /** Minimum occurrence. */
-  public final int min;
+  private final int min;
   /** Maximum occurrence, {@code -1} for infinity. */
-  public final int max;
+  private final int max;
   /** Reluctance flag. */
-  public final boolean lazy;
+  private final boolean lazy;
 
   /**
    * Constructor.

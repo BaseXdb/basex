@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * Full-text iterator.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class FTIterator implements Iterator<FTSpan> {
@@ -27,6 +27,6 @@ public abstract class FTIterator implements Iterator<FTSpan> {
 
   @Override
   public final void remove() {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 }

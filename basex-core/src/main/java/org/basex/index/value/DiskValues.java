@@ -21,27 +21,27 @@ import org.basex.util.list.*;
  * This class provides access to attribute values and text contents stored on
  * disk. The data structure is described in the {@link ValueIndexBuilder} class.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class DiskValues implements Index {
   /** ID references. */
-  protected final DataAccess idxr;
+  final DataAccess idxr;
   /** ID lists. */
-  protected final DataAccess idxl;
+  final DataAccess idxl;
   /** Value type (texts/attributes). */
-  protected final boolean text;
+  private final boolean text;
   /** Data reference. */
-  protected final Data data;
+  final Data data;
   /** Cached tokens. */
-  protected final IndexCache cache = new IndexCache();
+  final IndexCache cache = new IndexCache();
   /** Cached texts. Increases used memory, but speeds up repeated queries. */
-  protected final IntObjMap<byte[]> ctext = new IntObjMap<byte[]>();
+  final IntObjMap<byte[]> ctext = new IntObjMap<byte[]>();
 
   /** Synchronization object. */
-  protected final Object monitor = new Object();
+  private final Object monitor = new Object();
   /** Number of current index entries. */
-  protected final AtomicInteger size = new AtomicInteger();
+  final AtomicInteger size = new AtomicInteger();
 
   /**
    * Constructor, initializing the index structure.
@@ -60,8 +60,7 @@ public class DiskValues implements Index {
    * @param pref file prefix
    * @throws IOException I/O Exception
    */
-  protected DiskValues(final Data d, final boolean txt, final String pref)
-      throws IOException {
+  DiskValues(final Data d, final boolean txt, final String pref) throws IOException {
     data = d;
     text = txt;
     idxl = new DataAccess(d.meta.dbfile(pref + 'l'));
@@ -76,7 +75,7 @@ public class DiskValues implements Index {
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(LI_STRUCTURE + SORTED_LIST + NL);
-    final IndexStats stats = new IndexStats(data.meta.prop.num(Prop.MAXSTAT));
+    final IndexStats stats = new IndexStats(data.meta.options.get(MainOptions.MAXSTAT));
 
     synchronized(monitor) {
       final long l = idxl.length() + idxr.length();
@@ -94,7 +93,7 @@ public class DiskValues implements Index {
   }
 
   @Override
-  public int count(final IndexToken it) {
+  public int costs(final IndexToken it) {
     if(it instanceof StringRange) return idRange((StringRange) it).size();
     if(it instanceof NumericRange) return idRange((NumericRange) it).size();
     final byte[] key = it.get();
@@ -344,7 +343,7 @@ public class DiskValues implements Index {
    * @param tok index term
    * @return results
    */
-  protected final IndexIterator idRange(final NumericRange tok) {
+  final IndexIterator idRange(final NumericRange tok) {
     final double min = tok.min;
     final double max = tok.max;
 
@@ -381,12 +380,12 @@ public class DiskValues implements Index {
 
   /**
    * Returns an iterator for the specified id list.
-   * @param ids id list
+   * @param pres pre values
    * @return iterator
    */
-  protected static IndexIterator iter(final IntList ids) {
+  private static IndexIterator iter(final IntList pres) {
     return new IndexIterator() {
-      final int s = ids.size();
+      final int s = pres.size();
       int p = -1;
 
       @Override
@@ -395,8 +394,8 @@ public class DiskValues implements Index {
       }
 
       @Override
-      public int next() {
-        return ids.get(p);
+      public int pre() {
+        return pres.get(p);
       }
 
       @Override
@@ -411,7 +410,7 @@ public class DiskValues implements Index {
    * @param id id value
    * @return pre value
    */
-  protected int pre(final int id) {
+  int pre(final int id) {
     return id;
   }
 
@@ -421,8 +420,8 @@ public class DiskValues implements Index {
    * @param key token to be found
    * @return if the key is found: index of the key else: (-(insertion point) - 1)
    */
-  protected int get(final byte[] key) {
-    return get(key, 0, size.get() - 1);
+  int get(final byte[] key) {
+    return get(key, 0, size.get());
   }
 
   /**
@@ -433,8 +432,8 @@ public class DiskValues implements Index {
    * @param last end of the search interval (exclusive)
    * @return if the key is found: index of the key else: (-(insertion point) - 1)
    */
-  protected int get(final byte[] key, final int first, final int last) {
-    int l = first, h = last;
+  int get(final byte[] key, final int first, final int last) {
+    int l = first, h = last - 1;
     synchronized(monitor) {
       while(l <= h) {
         final int m = l + h >>> 1;

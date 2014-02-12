@@ -10,18 +10,19 @@ import org.basex.util.*;
 /**
  * Date functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNDate extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNDate(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNDate(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -106,7 +107,7 @@ public final class FNDate extends StandardFunc {
    */
   private ADate checkDate(final Item it, final Type t, final QueryContext ctx)
       throws QueryException {
-    return (ADate) (it.type.isUntyped() ? t.cast(it, ctx, info) : checkType(it, t));
+    return (ADate) (it.type.isUntyped() ? t.cast(it, ctx, sc, info) : checkType(it, t));
   }
 
   /**
@@ -119,7 +120,7 @@ public final class FNDate extends StandardFunc {
   private Dur checkDur(final Item it) throws QueryException {
     if(it instanceof Dur) return (Dur) it;
     if(it.type.isUntyped()) return new Dur(it.string(info), info);
-    throw Err.type(this, AtomType.DUR, it);
+    throw Err.typeError(this, AtomType.DUR, it);
   }
 
   /**
@@ -147,12 +148,10 @@ public final class FNDate extends StandardFunc {
    * @return duration
    * @throws QueryException query exception
    */
-  private ADate adjust(final Item it, final Type t, final QueryContext ctx)
-      throws QueryException {
-
+  private ADate adjust(final Item it, final Type t, final QueryContext ctx) throws QueryException {
     final ADate ad;
     if(it.type.isUntyped()) {
-      ad = (ADate) t.cast(it, ctx, info);
+      ad = (ADate) t.cast(it, ctx, sc, info);
     } else {
       // clone item
       final ADate a = (ADate) checkType(it, t);

@@ -1,16 +1,17 @@
 package org.basex.query.value.item;
 
+import static org.basex.query.util.Err.*;
+
 import java.net.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
  * URI item ({@code xs:anyURI}).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Uri extends Str {
@@ -70,7 +71,7 @@ public final class Uri extends Str {
       final URI uri = base.resolve(res);
       return uri(Token.token(uri.toString()), false);
     } catch(final URISyntaxException ex) {
-      throw Err.URIINVRES.thrw(info, ex.getMessage());
+      throw URIINVRES.get(info, ex.getMessage());
     }
   }
 

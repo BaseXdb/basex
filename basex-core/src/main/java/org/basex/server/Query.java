@@ -14,15 +14,15 @@ import org.basex.util.list.*;
  * stream that has been specified via the constructor or via
  * {@link Session#setOutputStream(OutputStream)}.</p>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Query {
   /** Client output stream. */
-  protected OutputStream out;
+  OutputStream out;
 
   /** Cached results. */
-  protected TokenList cache;
+  TokenList cache;
   /** Cached result types. */
   private ByteList types;
   /** Cache pointer. */
@@ -111,7 +111,7 @@ public abstract class Query {
    * @param is input stream
    * @throws IOException I/O exception
    */
-  protected void cache(final InputStream is) throws IOException {
+  void cache(final InputStream is) throws IOException {
     cache = new TokenList();
     types = new ByteList();
     final ByteList bl = new ByteList();

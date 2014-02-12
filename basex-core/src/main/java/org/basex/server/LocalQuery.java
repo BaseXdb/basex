@@ -10,7 +10,7 @@ import org.basex.io.out.*;
  * This class defines all methods for iteratively evaluating queries locally.
  * All data is interpreted by the {@link QueryListener}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class LocalQuery extends Query {
@@ -24,7 +24,7 @@ public class LocalQuery extends Query {
    * @param ctx database context
    * @param o output stream to write query output
    */
-  protected LocalQuery(final String q, final Context ctx, final OutputStream o) {
+  LocalQuery(final String q, final Context ctx, final OutputStream o) {
     ql = new QueryListener(q, ctx);
     out = o;
   }
@@ -62,7 +62,7 @@ public class LocalQuery extends Query {
 
   @Override
   public String options() throws IOException {
-    return ql.options();
+    return ql.parameters();
   }
 
   @Override

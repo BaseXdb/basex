@@ -13,7 +13,7 @@ import org.basex.query.up.primitives.*;
  * expression. It especially keeps track of all nodes that are copied in the
  * 'copy' statement of a transform expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class TransformModifier extends ContextModifier {
@@ -38,11 +38,11 @@ public final class TransformModifier extends ContextModifier {
     /* Disallow side-effecting updates within transform expressions.
      * Currently, also fn:put() is rejected
      * (future discussion: https://www.w3.org/Bugs/Public/show_bug.cgi?id=13970). */
-    if(o instanceof BasicOperation) BASX_DBTRANSFORM.thrw(o.getInfo());
+    if(o instanceof BasicOperation) throw BASX_DBTRANSFORM.get(o.getInfo());
 
     add(o);
     /* check if the target node of the given primitive has been copied in the
      * 'copy' statement of this transform expression. */
-    if(!refs.contains(o.getData())) UPNOTCOPIED.thrw(o.getInfo(), o.getTargetNode());
+    if(!refs.contains(o.getData())) throw UPNOTCOPIED.get(o.getInfo(), o.getTargetNode());
   }
 }

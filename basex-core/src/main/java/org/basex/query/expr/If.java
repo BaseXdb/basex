@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
 /**
  * If expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class If extends Arr {
@@ -55,9 +55,17 @@ public final class If extends Arr {
         expr[e] = expr[e].compile(ctx, scp);
       } catch(final QueryException ex) {
         // replace original expression with error
-        expr[e] = FNInfo.error(ex);
+        expr[e] = FNInfo.error(ex, type);
       }
     }
+
+    return optimize(ctx, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+    // static condition: return branch in question
+    if(cond.isValue()) return optPre(eval(ctx), ctx);
 
     // if A then B else B -> B (errors in A will be ignored)
     if(expr[0].sameAs(expr[1])) return optPre(expr[0], ctx);
@@ -65,24 +73,50 @@ public final class If extends Arr {
     // if not(A) then B else C -> if A then C else B
     if(cond.isFunction(Function.NOT)) {
       ctx.compInfo(OPTWRITE, this);
-      cond = ((StandardFunc) cond).expr[0];
+      cond = ((Arr) cond).expr[0];
       final Expr tmp = expr[0];
       expr[0] = expr[1];
       expr[1] = tmp;
     }
 
-    // if A then true() else false() -> boolean(A)
-    if(expr[0] == Bln.TRUE && expr[1] == Bln.FALSE) {
-      ctx.compInfo(OPTWRITE, this);
-      return compBln(cond, info);
-    }
+    // rewritings for constant booleans
+    if(expr[0].type().eq(SeqType.BLN) && expr[1].type().eq(SeqType.BLN)) {
+      final Expr a = cond, b = expr[0], c = expr[1];
+      if(b == Bln.TRUE) {
+        if(c == Bln.FALSE) {
+          // if(A) then true() else false() -> xs:boolean(A)
+          ctx.compInfo(OPTPRE, this);
+          return compBln(a, info);
+        }
+        // if(A) then true() else C -> A or C
+        ctx.compInfo(OPTWRITE, this);
+        return new Or(info, a, c).optimize(ctx, scp);
+      }
 
-    // if A then false() else true() -> not(A)
-    // if A then B else true() -> not(A) or B
-    if(expr[0].type().eq(SeqType.BLN) && expr[1] == Bln.TRUE) {
-      ctx.compInfo(OPTWRITE, this);
-      final Expr e = Function.NOT.get(info, cond);
-      return expr[0] == Bln.FALSE ? e : new Or(info, e, expr[0]);
+      if(c == Bln.TRUE) {
+        if(b == Bln.FALSE) {
+          // if(A) then false() else true() -> not(A)
+          ctx.compInfo(OPTPRE, this);
+          return Function.NOT.get(null, a).optimize(ctx, scp);
+        }
+        // if(A) then B else true() -> not(A) or B
+        ctx.compInfo(OPTWRITE, this);
+        final Expr notA = Function.NOT.get(null, a).optimize(ctx, scp);
+        return new Or(info, notA, b).optimize(ctx, scp);
+      }
+
+      if(b == Bln.FALSE) {
+        // if(A) then false() else C -> not(A) and C
+        ctx.compInfo(OPTWRITE, this);
+        final Expr notA = Function.NOT.get(null, a).optimize(ctx, scp);
+        return new And(info, notA, c).optimize(ctx, scp);
+      }
+
+      if(c == Bln.FALSE) {
+        // if(A) then B else false() -> A and B
+        ctx.compInfo(OPTWRITE, this);
+        return new And(info, a, b).optimize(ctx, scp);
+      }
     }
 
     type = expr[0].type().union(expr[1].type());
@@ -141,7 +175,7 @@ public final class If extends Arr {
       try {
         nw = expr[i].inline(ctx, scp, v, e);
       } catch(final QueryException qe) {
-        nw = FNInfo.error(qe);
+        nw = FNInfo.error(qe, type);
       }
       if(nw != null) {
         expr[i] = nw;
@@ -170,9 +204,9 @@ public final class If extends Arr {
   }
 
   @Override
-  public void markTailCalls() {
-    expr[0].markTailCalls();
-    expr[1].markTailCalls();
+  public void markTailCalls(final QueryContext ctx) {
+    expr[0].markTailCalls(ctx);
+    expr[1].markTailCalls(ctx);
   }
 
   @Override
@@ -195,5 +229,19 @@ public final class If extends Arr {
     int sz = 1;
     for(final Expr e : expr) sz += e.exprSize();
     return sz + cond.exprSize();
+  }
+
+  @Override
+  public Expr typeCheck(final TypeCheck tc, final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    for(int i = 0; i < expr.length; i++) {
+      final SeqType tp = expr[i].type();
+      try {
+        expr[i] = tc.check(expr[i], ctx, scp);
+      } catch(final QueryException ex) {
+        expr[i] = FNInfo.error(ex, tp);
+      }
+    }
+    return optimize(ctx, scp);
   }
 }

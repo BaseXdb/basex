@@ -11,21 +11,22 @@ import org.basex.util.*;
 /**
  * Random functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Dirk Kirsten
  */
 public final class FNRandom extends StandardFunc {
   /** Random instance. */
-  static final Random RND = new Random();
+  private static final Random RND = new Random();
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNRandom(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNRandom(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -112,7 +113,7 @@ public final class FNRandom extends StandardFunc {
       final Random r = new Random(seed);
 
       @Override
-      public Item next() throws QueryException {
+      public Item next() {
         return ++count <= num ? Dbl.get(r.nextDouble()) : null;
       }
     };
@@ -131,7 +132,7 @@ public final class FNRandom extends StandardFunc {
       final int num = (int) checkItr(expr[0], ctx);
       int count;
       @Override
-      public Item next() throws QueryException {
+      public Item next() {
         return ++count <= num ? Dbl.get(RND.nextGaussian()) : null;
       }
     };

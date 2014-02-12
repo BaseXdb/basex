@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 /**
  * Panel for displaying information about global/local users.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Andreas Weiler
  */
 final class DialogUser extends BaseXBack {
@@ -133,9 +133,7 @@ final class DialogUser extends BaseXBack {
     String msg = null;
 
     try {
-      final Object di = databases.getSelectedItem();
-      final String db = di == null ? null : di.toString();
-
+      final String db = databases.getSelectedItem();
       if(cmp instanceof Object[]) {
         final Object[] o = (Object[]) cmp;
         final boolean g = o[0] == Boolean.TRUE;
@@ -171,9 +169,9 @@ final class DialogUser extends BaseXBack {
         pass.setText("");
         user.requestFocusInWindow();
       } else if(cmp == drop) {
-        String msg2 = "";
         final int[] rows = table.getSelectedRows();
         if(BaseXDialog.confirm(dia.gui, Util.info(S_DRQUESTION, rows.length))) {
+          String msg2 = "";
           for(final int r : rows) {
             sess.execute(new DropUser(table.data.value(r, 0), db));
             if(msg == null) msg = sess.info();
@@ -191,7 +189,7 @@ final class DialogUser extends BaseXBack {
           msg = sess.info();
         }
       } else if(cmp == add) {
-        final String us = addUser.getSelectedItem().toString();
+        final String us = addUser.getSelectedItem();
         for(int r = 0; r < users.contents.size(); ++r) {
           if(!users.value(r, 0).equals(us)) continue;
           int c = 3;
@@ -222,15 +220,15 @@ final class DialogUser extends BaseXBack {
     addUser.setEnabled(addUser.getSelectedIndex() > -1);
     boolean valdrop = true;
     for(final int r : table.getSelectedRows()) {
-      valdrop &= !table.data.value(r, 0).equals(ADMIN);
+      valdrop &= !table.data.value(r, 0).equals(S_ADMIN);
     }
     drop.setEnabled(valdrop && table.getSelectedRows().length > 0);
     valdrop |= table.getSelectedRows().length == 1;
 
     Msg icon = ok ? Msg.SUCCESS : Msg.ERROR;
     if(msg == null && !(valname && valpass && newname && valdrop)) {
-      msg = !newname ? Util.info(USER_EXISTS_X, user.getText()) : !valdrop ?
-          ADMIN_STATIC_X : Util.info(INVALID_X, !valname ? USERNAME : PASSWORD);
+      msg = newname ? valdrop ? Util.info(INVALID_X, valname ? PASSWORD : USERNAME) :
+        ADMIN_STATIC_X : Util.info(USER_EXISTS_X, user.getText());
       icon = Msg.WARN;
     }
     info.setText(msg, icon);
@@ -252,7 +250,7 @@ final class DialogUser extends BaseXBack {
       if(i == 0) table.update(new Table());
       if(i <= 0) return;
 
-      final Table data = table(databases.getSelectedItem().toString());
+      final Table data = table(databases.getSelectedItem());
       table.update(data);
 
       final StringList added = new StringList();
@@ -261,7 +259,7 @@ final class DialogUser extends BaseXBack {
       final StringList adding = new StringList();
       for(final TokenList l : users.contents) {
         final String s = Token.string(l.get(0));
-        if(!s.equals(ADMIN) && !added.contains(s)) adding.add(s);
+        if(!s.equals(S_ADMIN) && !added.contains(s)) adding.add(s);
       }
       addUser.addItem(numberof(USERS, adding.size()));
       for(final String s : adding) addUser.addItem(s);

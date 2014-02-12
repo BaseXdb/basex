@@ -3,32 +3,27 @@ package org.basex.gui;
 import java.awt.*;
 import java.lang.reflect.*;
 
-import org.basex.core.*;
 import org.basex.gui.layout.*;
+import org.basex.util.*;
 
 /**
  * Sets some Mac OS X specific interface options.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Bastian Lemke
  */
 public final class GUIMacOSX {
   /** Native class name. */
-  private static final String C_APPLICATION =
-    "com.apple.eawt.Application";
+  private static final String C_APPLICATION = "com.apple.eawt.Application";
   /** Native class name. */
-  private static final String C_APPLICATION_LISTENER =
-    "com.apple.eawt.ApplicationListener";
+  private static final String C_APPLICATION_LISTENER = "com.apple.eawt.ApplicationListener";
   /** Native class name. */
-  private static final String C_APPLICATION_EVENT =
-    "com.apple.eawt.ApplicationEvent";
+  private static final String C_APPLICATION_EVENT = "com.apple.eawt.ApplicationEvent";
 
   /** System property identifier. */
-  private static final String P_ABOUT_NAME =
-    "com.apple.mrj.application.apple.menu.about.name";
+  private static final String P_ABOUT_NAME = "com.apple.mrj.application.apple.menu.about.name";
   /** System property identifier. */
-  private static final String P_SCREEN_MENU_BAR =
-    "apple.laf.useScreenMenuBar";
+  private static final String P_SCREEN_MENU_BAR = "apple.laf.useScreenMenuBar";
 
   /** Empty class array. */
   private static final Class<?>[] EC = {};
@@ -86,7 +81,7 @@ public final class GUIMacOSX {
    * @throws Exception if any error occurs.
    */
   private void addDockIcon() throws Exception {
-    invoke(appObj, "setDockIconImage", Image.class, BaseXLayout.image("logo"));
+    invoke(appObj, "setDockIconImage", Image.class, BaseXImages.get("logo"));
   }
 
   /**
@@ -104,8 +99,8 @@ public final class GUIMacOSX {
    */
   class AppInvocationHandler implements InvocationHandler {
     @Override
-    public Object invoke(final Object proxy, final Method method,
-        final Object[] args) throws Throwable {
+    public Object invoke(final Object proxy, final Method method, final Object[] args)
+        throws Throwable {
       final Object obj = args[0];
       /*
        * Get the name of the method and call the method of this object that has
@@ -123,14 +118,14 @@ public final class GUIMacOSX {
       }
       // mark the current event as 'handled' if handler doesn't return a false boolean
       GUIMacOSX.invoke(obj, "setHandled",
-          null != result && Boolean.class.isInstance(result) ? (Boolean) result : true);
+        result != null && Boolean.class.isInstance(result) ? (Boolean) result : true);
       return null;
     }
 
     /** Called when the user selects the About item in the application menu. */
     public void handleAbout() {
       // explicit cast to circumvent Java compiler bug
-      ((GUICmd) GUICommands.C_ABOUT).execute(main);
+      ((GUICommand) GUIMenuCmd.C_ABOUT).execute(main);
     }
 
     /**
@@ -152,7 +147,7 @@ public final class GUIMacOSX {
     /** Called when the Preference item in the application menu is selected. */
     public void handlePreferences() {
       // explicit cast to circumvent Java compiler bug
-      ((GUICmd) GUICommands.C_PREFS).execute(main);
+      ((GUICommand) GUIMenuCmd.C_PREFS).execute(main);
     }
 
     /**
@@ -173,7 +168,7 @@ public final class GUIMacOSX {
     @SuppressWarnings({ "all" }) // ApplicationListener is deprecated
     public boolean handleQuit() {
       // explicit cast to circumvent Java compiler bug
-      ((GUICmd) GUICommands.C_EXIT).execute(main);
+      ((GUICommand) GUIMenuCmd.C_EXIT).execute(main);
       return false;
     }
 
@@ -204,7 +199,7 @@ public final class GUIMacOSX {
    * @param window the window
    */
   public static void enableOSXFullscreen(final Window window) {
-    if(null == window) return;
+    if(window == null) return;
     try {
       final Class<?> util = Class.forName("com.apple.eawt.FullScreenUtilities");
       final Class<?>[] params = { Window.class, Boolean.TYPE };

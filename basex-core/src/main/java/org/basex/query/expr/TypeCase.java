@@ -18,14 +18,14 @@ import org.basex.util.list.*;
 /**
  * Case expression for typeswitch.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class TypeCase extends Single {
   /** Variable. */
   final Var var;
   /** Matched sequence types. */
-  final SeqType[] types;
+  private final SeqType[] types;
 
   /**
    * Constructor.
@@ -41,8 +41,7 @@ public final class TypeCase extends Single {
   }
 
   @Override
-  public TypeCase compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public TypeCase compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     return compile(ctx, scp, null);
   }
 
@@ -61,7 +60,7 @@ public final class TypeCase extends Single {
       super.compile(ctx, scp);
     } catch(final QueryException ex) {
       // replace original expression with error
-      expr = FNInfo.error(ex);
+      expr = FNInfo.error(ex, expr.type());
     }
     type = expr.type();
     return this;
@@ -69,11 +68,11 @@ public final class TypeCase extends Single {
 
   @Override
   public Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
-      final Expr e) throws QueryException {
+      final Expr e) {
     try {
       return super.inline(ctx, scp, v, e);
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe);
+      expr = FNInfo.error(qe, expr.type());
       return this;
     }
   }
@@ -83,8 +82,7 @@ public final class TypeCase extends Single {
       final IntObjMap<Var> vs) {
     final Var v = var == null ? null : scp.newCopyOf(ctx, var);
     if(var != null) vs.put(var.id, v);
-    final TypeCase tc = new TypeCase(info, v, types.clone(), expr.copy(ctx, scp, vs));
-    return tc;
+    return new TypeCase(info, v, types.clone(), expr.copy(ctx, scp, vs));
   }
 
   /**
@@ -119,10 +117,10 @@ public final class TypeCase extends Single {
     if(types.length == 0) {
       e.add(planAttr(Token.token(DEFAULT), Token.TRUE));
     } else {
-      final byte[] or = new byte[] { ' ', '|', ' ' };
+      final byte[] or = { ' ', '|', ' ' };
       final ByteList bl = new ByteList();
       for(final SeqType t : types) {
-        if(bl.size() > 0) bl.add(or);
+        if(!bl.isEmpty()) bl.add(or);
         bl.add(Token.token(t.toString()));
       }
       e.add(planAttr(Token.token(TYPE), bl.toArray()));
@@ -145,12 +143,12 @@ public final class TypeCase extends Single {
         tb.add(' ').add(types[i].toString());
       }
     }
-    return tb.add(" " + RETURN + ' ' + expr).toString();
+    return tb.add(' ' + RETURN + ' ' + expr).toString();
   }
 
   @Override
-  public void markTailCalls() {
-    expr.markTailCalls();
+  public void markTailCalls(final QueryContext ctx) {
+    expr.markTailCalls(ctx);
   }
 
   @Override

@@ -11,12 +11,12 @@ import org.basex.util.*;
 /**
  * This class offers methods to locally execute database commands.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class LocalSession extends Session {
   /** Database context. */
-  protected final Context ctx;
+  private final Context ctx;
 
   /**
    * Default constructor.
@@ -46,13 +46,12 @@ public class LocalSession extends Session {
    * @param output output stream
    * @throws LoginException login exception
    */
-  public LocalSession(final Context context, final String user, final String pass,
+  private LocalSession(final Context context, final String user, final String pass,
       final OutputStream output) throws LoginException {
 
     this(context, output);
     ctx.user = ctx.users.get(user);
-    if(ctx.user == null || !ctx.user.password.equals(Token.md5(pass)))
-      throw new LoginException();
+    if(ctx.user == null || !ctx.user.password.equals(Token.md5(pass))) throw new LoginException();
   }
 
   /**
@@ -67,22 +66,22 @@ public class LocalSession extends Session {
   }
 
   @Override
-  public void create(final String name, final InputStream input) throws IOException {
+  public void create(final String name, final InputStream input) throws BaseXException {
     execute(new CreateDB(name), input);
   }
 
   @Override
-  public void add(final String path, final InputStream input) throws IOException {
+  public void add(final String path, final InputStream input) throws BaseXException {
     execute(new Add(path), input);
   }
 
   @Override
-  public void replace(final String path, final InputStream input) throws IOException {
+  public void replace(final String path, final InputStream input) throws BaseXException {
     execute(new Replace(path), input);
   }
 
   @Override
-  public void store(final String path, final InputStream input) throws IOException {
+  public void store(final String path, final InputStream input) throws BaseXException {
     execute(new Store(path), input);
   }
 

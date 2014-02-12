@@ -1,7 +1,7 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
-import static org.basex.io.serial.SerializerProp.*;
+import static org.basex.io.serial.SerializerOptions.*;
 import static org.basex.query.util.Err.*;
 
 import java.io.*;
@@ -17,15 +17,13 @@ import org.basex.util.*;
 /**
  * Server-side query session in the client-server architecture.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Andreas Weiler
  * @author Christian Gruen
  */
 final class QueryListener extends Proc {
   /** Performance. */
-  final Performance perf = new Performance();
-  /** Query info. */
-  private final QueryInfo qi = new QueryInfo();
+  private final Performance perf = new Performance();
   /** Query string. */
   private final String query;
   /** Database context. */
@@ -33,8 +31,8 @@ final class QueryListener extends Proc {
 
   /** Query processor. */
   private QueryProcessor qp;
-  /** Serialization options. */
-  private SerializerProp options;
+  /** Serialization parameters. */
+  private SerializerOptions parameters;
   /** Parsing flag. */
   private boolean parsed;
   /** Query info. */
@@ -88,13 +86,13 @@ final class QueryListener extends Proc {
   }
 
   /**
-   * Returns the serialization options.
-   * @return serialization options
+   * Returns the serialization parameters.
+   * @return serialization parameters
    * @throws IOException I/O Exception
    */
-  String options() throws IOException {
-    if(options == null) options = parse().ctx.serParams(false);
-    return options.toString();
+  String parameters() throws IOException {
+    if(parameters == null) parameters = parse().ctx.serParams();
+    return parameters.toString();
   }
 
   /**
@@ -114,8 +112,8 @@ final class QueryListener extends Proc {
    * @param full return full type information
    * @throws IOException I/O Exception
    */
-  void execute(final boolean iter, final OutputStream out, final boolean enc,
-      final boolean full) throws IOException {
+  void execute(final boolean iter, final OutputStream out, final boolean enc, final boolean full)
+      throws IOException {
 
     try {
       try {
@@ -124,17 +122,18 @@ final class QueryListener extends Proc {
 
         // create serializer
         qp.compile();
-        qi.cmpl = perf.time();
+        final QueryInfo qi = qp.ctx.info;
+        qi.compiling = perf.time();
         final Iter ir = qp.iter();
-        qi.evlt = perf.time();
-        options();
-        final boolean wrap = !options.get(S_WRAP_PREFIX).isEmpty();
+        qi.evaluating = perf.time();
+        parameters();
+        final boolean wrap = !parameters.get(WRAP_PREFIX).isEmpty();
 
         // iterate through results
         final PrintOutput po = PrintOutput.get(enc ? new EncodingOutput(out) : out);
         if(iter && wrap) po.write(1);
 
-        final Serializer ser = Serializer.get(po, full ? null : options);
+        final Serializer ser = Serializer.get(po, full ? null : parameters);
         int c = 0;
         for(Item it; (it = ir.next()) != null;) {
           if(iter && !wrap) {
@@ -145,7 +144,7 @@ final class QueryListener extends Proc {
             }
             ser.reset();
           }
-          ser.serialize(it);
+          ser.serialize(it, full);
           if(iter && !wrap) {
             po.flush();
             out.write(0);
@@ -154,10 +153,10 @@ final class QueryListener extends Proc {
         }
         ser.close();
         if(iter && wrap) out.write(0);
-        qi.srlz = perf.time();
+        qi.serializing = perf.time();
 
         // generate query info
-        info = qi.toString(qp, po, c, ctx.prop.is(Prop.QUERYINFO));
+        info = qi.toString(qp, po.size(), c, ctx.options.get(MainOptions.QUERYINFO));
 
       } catch(final QueryException ex) {
         throw new BaseXException(ex);
@@ -190,7 +189,7 @@ final class QueryListener extends Proc {
       try {
         perf.time();
         init().parse();
-        qi.pars = perf.time();
+        qp.ctx.info.parsing = perf.time();
         parsed = true;
       } catch(final QueryException ex) {
         throw new BaseXException(ex);

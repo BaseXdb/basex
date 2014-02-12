@@ -12,7 +12,7 @@ import org.basex.io.in.*;
 /**
  * Evaluates the 'retrieve' command and retrieves binary content.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Retrieve extends ACreate {
@@ -25,7 +25,7 @@ public final class Retrieve extends ACreate {
   }
 
   @Override
-  protected boolean run() throws IOException {
+  protected boolean run() {
     final String path = MetaData.normPath(args[0]);
     if(path == null) return error(NAME_INVALID_X, args[0]);
 
@@ -42,7 +42,7 @@ public final class Retrieve extends ACreate {
       }
       return info(QUERY_EXECUTED_X_X, "", perf);
     } catch(final IOException ex) {
-      return error(FILE_NOT_STORED_X, ex);
+      return error(ex.toString());
     }
   }
 

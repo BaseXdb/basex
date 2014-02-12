@@ -1,5 +1,7 @@
 package org.basex.query.var;
 
+import static org.basex.query.util.Err.*;
+
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -15,12 +17,12 @@ import org.basex.util.*;
 /**
  * Container of global variables of a module.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   /** The variables. */
-  public final HashMap<QNm, VarEntry> vars = new HashMap<QNm, VarEntry>();
+  private final HashMap<QNm, VarEntry> vars = new HashMap<QNm, VarEntry>();
 
   /**
    * Declares a new static variable.
@@ -37,8 +39,8 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * @throws QueryException query exception
    */
   public StaticVar declare(final QNm nm, final SeqType t, final Ann a, final Expr e,
-      final boolean ext, final StaticContext sctx, final VarScope scp,
-      final String xqdoc, final InputInfo ii) throws QueryException {
+      final boolean ext, final StaticContext sctx, final VarScope scp, final String xqdoc,
+      final InputInfo ii) throws QueryException {
 
     final StaticVar var = new StaticVar(sctx, scp, a, nm, t, e, ext, xqdoc, ii);
     final VarEntry ve = vars.get(nm);
@@ -57,17 +59,12 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
 
   /**
    * Checks if all variables were declared and are visible to all their references.
-   * @param ctx query context
    * @throws QueryException query exception
    */
-  public void check(final QueryContext ctx) throws QueryException {
+  public void check() throws QueryException {
     for(final Entry<QNm, VarEntry> e : vars.entrySet()) {
-      final QNm name = e.getKey();
       final VarEntry ve = e.getValue();
-      if(ve.var == null) {
-        if(name.uri().length != 0) throw Err.VARUNDEF.thrw(ve.refs[0].info, ve.refs[0]);
-        ve.setVar(new StaticVar(ctx, name, ve.refs[0].info));
-      }
+      if(ve.var == null) throw VARUNDEF.get(ve.refs[0].info, ve.refs[0]);
     }
   }
 
@@ -82,7 +79,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(final VarEntry v : vars.values()) v.var.fullDesc(sb);
+    for(final VarEntry v : vars.values()) sb.append(v.var);
     return sb.toString();
   }
 
@@ -97,8 +94,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   }
 
   /**
-   * returns a new reference to the (possibly not yet declared) variable
-   * with the given name.
+   * Returns a new reference to the (possibly not yet declared) variable with the given name.
    * @param ii input info
    * @param nm variable name
    * @param sctx static context
@@ -107,6 +103,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    */
   public StaticVarRef newRef(final QNm nm, final StaticContext sctx, final InputInfo ii)
       throws QueryException {
+
     final StaticVarRef ref = new StaticVarRef(ii, nm, sctx);
     final VarEntry e = vars.get(nm), entry = e != null ? e : new VarEntry(null);
     if(e == null) vars.put(nm, entry);
@@ -122,6 +119,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    */
   public void bindExternal(final QueryContext ctx, final HashMap<QNm, Expr> bindings)
       throws QueryException {
+
     for(final Entry<QNm, Expr> e : bindings.entrySet()) {
       final VarEntry ve = vars.get(e.getKey());
       if(ve != null) ve.var.bind(e.getValue(), ctx);
@@ -144,13 +142,13 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
 
       @Override
       public void remove() {
-        Util.notexpected();
+        throw Util.notExpected();
       }
     };
   }
 
   /** Entry for static variables and their references. */
-  private class VarEntry {
+  private static class VarEntry {
     /** The static variable. */
     StaticVar var;
     /** Variable references. */
@@ -170,7 +168,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
      * @throws QueryException if the variable was already declared
      */
     void setVar(final StaticVar vr) throws QueryException {
-      if(var != null) throw Err.VARDUPL.thrw(vr.info, var);
+      if(var != null) throw VARDUPL.get(vr.info, var);
       var = vr;
       for(final StaticVarRef ref : refs) ref.init(var);
     }
@@ -181,9 +179,8 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
      * @throws QueryException query exception
      */
     void addRef(final StaticVarRef ref) throws QueryException {
-      refs = Array.add(refs, ref);
+      refs = Array.add(refs, new StaticVarRef[refs.length + 1], ref);
       if(var != null) ref.init(var);
     }
   }
-
 }

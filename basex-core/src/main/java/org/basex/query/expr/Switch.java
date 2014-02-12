@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
 /**
  * Switch expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Switch extends ParseExpr {
@@ -176,8 +176,8 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public void markTailCalls() {
-    for(final SwitchCase sc : cases) sc.markTailCalls();
+  public void markTailCalls(final QueryContext ctx) {
+    for(final SwitchCase sc : cases) sc.markTailCalls(ctx);
   }
 
   @Override

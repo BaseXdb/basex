@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
  * Abstract class for representing XQuery expressions.
  * Expression are divided into {@link ParseExpr} and {@link Value} classes.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Expr extends ExprInfo {
@@ -33,6 +33,7 @@ public abstract class Expr extends ExprInfo {
     /** Focus-dependent. Example: position(). */             FCS,
     /** Performs updates. Example: insert expression. */     UPD,
     /** XQuery 3.0 function. Example: has-children(). */     X30,
+    /** Invokes user-supplied functions. Example: fold. */   HOF,
   }
 
   /**
@@ -61,7 +62,7 @@ public abstract class Expr extends ExprInfo {
   @SuppressWarnings("unused")
   public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     return this;
-  };
+  }
 
   /**
    * Evaluates the expression and returns an iterator on the resulting items.
@@ -103,8 +104,7 @@ public abstract class Expr extends ExprInfo {
    * @return item
    * @throws QueryException query exception
    */
-  public abstract Item ebv(final QueryContext ctx, final InputInfo ii)
-      throws QueryException;
+  public abstract Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException;
 
   /**
    * Performs a predicate test and returns the item if test was successful.
@@ -113,8 +113,7 @@ public abstract class Expr extends ExprInfo {
    * @return item
    * @throws QueryException query exception
    */
-  public abstract Item test(final QueryContext ctx, final InputInfo ii)
-      throws QueryException;
+  public abstract Item test(final QueryContext ctx, final InputInfo ii) throws QueryException;
 
   /**
    * Tests if this is an empty sequence. This function is only overwritten
@@ -158,8 +157,8 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Indicates if an expression has the specified compiler property. This method is
-   * called by numerous {@link #compile} methods to test properties of sub-expressions.
-   * It returns {@code true} if at least one test is successful.
+   * called by numerous {@link #compile(QueryContext, VarScope)} methods to test properties of
+   * sub-expressions. It returns {@code true} if at least one test is successful.
    * @param flag flag to be found
    * @return result of check
    */
@@ -188,8 +187,8 @@ public abstract class Expr extends ExprInfo {
    * <li>{@link Preds#removable}, if one of the variables is used within a predicate.</li>
    * <li>{@link MixedPath#removable}, if the variable occurs within the path.</li>
    * </ul>
-   * This method is called by {@link GFLWOR#compile} to rewrite where clauses
-   * into predicates.
+   * This method is called by {@link GFLWOR#compile(QueryContext, VarScope)} to rewrite where
+   * clauses into predicates.
    * @param v variable to be replaced
    * @return result of check
    */
@@ -211,8 +210,8 @@ public abstract class Expr extends ExprInfo {
    * @return resulting expression in something changed, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public abstract Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException;
+  public abstract Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
+                                 final Expr e) throws QueryException;
 
   /**
    * Inlines the given expression into all elements of the given array.
@@ -259,21 +258,13 @@ public abstract class Expr extends ExprInfo {
   public abstract Expr copy(QueryContext ctx, VarScope scp, IntObjMap<Var> vs);
 
   /**
-   * Adds the names of the databases that will be touched by the query.
-   * @param db set
-   * @param rootContext is in root context
-   * @return {@code false} if databases cannot be statically determined
-  public abstract boolean databases(final StringList db, final boolean rootContext);
-   */
-
-  /**
    * <p>This method is overwritten by {@link CmpG}, {@link CmpV} and {@link FNSimple}.
    * It is called at compile time by expressions that perform
    * effective boolean value tests (e.g. {@link If} or {@link Preds}).
    * If the arguments of the called expression return a boolean anyway,
    * the expression will be simplified.</p>
    * <p>Example in {@link CmpV}:
-   * {@code if($x eq true())} is rewritten to {@code if($x)}, if {@code $x}
+   * <code>if($x eq true())</code> is rewritten to <code>if($x)</code>, if <code>$x</code>
    * is known to return a single boolean.</p>
    * @param ctx query context
    * @return optimized expression
@@ -374,8 +365,11 @@ public abstract class Expr extends ExprInfo {
     });
   }
 
-  /** Finds and marks tail calls, enabling TCO. */
-  public void markTailCalls() { }
+  /**
+   * Finds and marks tail calls, enabling TCO.
+   * @param ctx query context, {@code null} if the changes should not be reported
+   */
+  public void markTailCalls(@SuppressWarnings("unused") final QueryContext ctx) { }
 
   /**
    * Traverses this expression, notifying the visitor of declared and used variables,
@@ -391,7 +385,7 @@ public abstract class Expr extends ExprInfo {
    * @param exprs expressions to visit
    * @return success flag
    */
-  protected static final boolean visitAll(final ASTVisitor visitor, final Expr...exprs) {
+  protected static boolean visitAll(final ASTVisitor visitor, final Expr...exprs) {
     for(final Expr e : exprs) if(!e.accept(visitor)) return false;
     return true;
   }
@@ -403,4 +397,18 @@ public abstract class Expr extends ExprInfo {
    * @return number of expressions
    */
   public abstract int exprSize();
+
+  /**
+   * Tries to push the given type check inside this expression.
+   * @param tc type check to push into the expression
+   * @param ctx query context
+   * @param scp variable scope
+   * @return the resulting expression if successful, {@code null} otherwise
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  protected Expr typeCheck(final TypeCheck tc, final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    return null;
+  }
 }

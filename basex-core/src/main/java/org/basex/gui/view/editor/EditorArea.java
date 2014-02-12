@@ -2,35 +2,30 @@ package org.basex.gui.view.editor;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.layout.BaseXKeys.*;
-import static org.basex.util.Token.*;
 
 import java.awt.event.*;
 import java.io.*;
 
 import javax.swing.*;
 
-import org.basex.build.*;
 import org.basex.core.*;
-import org.basex.core.cmd.*;
-import org.basex.core.parse.*;
 import org.basex.gui.*;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.*;
 import org.basex.io.*;
-import org.basex.query.*;
 import org.basex.util.*;
 
 /**
- * This class extends the text editor by XQuery features.
+ * This class extends the text panel by editor features.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-final class EditorArea extends Editor {
+public final class EditorArea extends TextPanel {
   /** File label. */
   final BaseXLabel label;
   /** File in tab. */
-  IO file;
+  IOFile file;
   /** Flag for modified content. */
   boolean modified;
   /** Last input. */
@@ -53,6 +48,7 @@ final class EditorArea extends Editor {
     view = v;
     file = f;
     label = new BaseXLabel(f.name());
+    label.setIcon(BaseXImages.file(new IOFile(IO.XQSUFFIX)));
     setSyntax(f, false);
 
     addFocusListener(new FocusAdapter() {
@@ -60,16 +56,14 @@ final class EditorArea extends Editor {
       public void focusGained(final FocusEvent e) {
         // refresh query path and work directory
         final String path = file.path();
-        gui.context.prop.set(Prop.QUERYPATH, path);
-        gui.gprop.set(GUIProp.WORKPATH, file.dirPath());
+        gui.context.options.set(MainOptions.QUERYPATH, path);
+        gui.gopts.set(GUIOptions.WORKPATH, file.dirPath());
 
         // reload file if it has been changed
         SwingUtilities.invokeLater(new Runnable() {
           @Override
           public void run() {
             if(reopen(false)) return;
-            // skip parsing if editor contains file marked as erroneous
-            if(view.errFile == null || file.eq(view.errFile)) release(Action.PARSE);
           }
         });
       }
@@ -91,7 +85,7 @@ final class EditorArea extends Editor {
   public void initText(final byte[] t) {
     last = t;
     super.setText(t);
-    hist = new History(text.text());
+    hist.init(getText());
   }
 
   @Override
@@ -108,79 +102,32 @@ final class EditorArea extends Editor {
 
   @Override
   public void keyPressed(final KeyEvent e) {
-    final byte[] t = text.text();
+    final byte[] text = editor.text();
     super.keyPressed(e);
-
-    if(FINDERROR.is(e)) view.jumpToError();
-
-    if(t != text.text()) resetError();
+    if(text != editor.text()) resetError();
     view.posCode.invokeLater();
   }
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    final byte[] t = text.text();
+    final byte[] text = editor.text();
     super.keyTyped(e);
-    if(t != text.text()) resetError();
+    if(text != editor.text()) resetError();
   }
 
   @Override
   public void keyReleased(final KeyEvent e) {
     super.keyReleased(e);
-    if(!e.isActionKey() && !modifier(e) && !FINDERROR.is(e)) {
-      release(EXEC.is(e) ? Action.EXECUTE : Action.CHECK);
+    if(EXEC1.is(e) || EXEC2.is(e)) {
+      release(Action.EXECUTE);
+    } else if((!e.isActionKey() || MOVEDOWN.is(e) || MOVEUP.is(e)) && !modifier(e)) {
+      release(Action.CHECK);
     }
   }
 
   @Override
   protected void release(final Action action) {
-    view.refreshControls(false);
-    final byte[] in = getText();
-    final boolean eq = eq(in, last);
-    if(eq && action == Action.CHECK) return;
-    last = in;
-
-    final String path = file.path();
-    final boolean xquery = file.hasSuffix(IO.XQSUFFIXES) || !path.contains(".");
-    script = !xquery && file.hasSuffix(IO.BXSSUFFIX);
-    String input = string(in);
-    if(action == Action.EXECUTE && script) {
-      // execute query if forced, or if realtime execution is activated
-      gui.execute(true, new Execute(input));
-    } else if(xquery || action == Action.EXECUTE) {
-      // check if input is/might be an xquery main module
-      if(input.isEmpty()) input = "()";
-      final boolean lib = QueryProcessor.isLibrary(string(in));
-      if(!lib && (action == Action.EXECUTE || gui.gprop.is(GUIProp.EXECRT))) {
-        // execute query if forced, or if realtime execution is activated
-        gui.execute(true, new XQuery(input));
-      } else {
-        // parse query
-        gui.context.prop.set(Prop.QUERYPATH, path);
-        final QueryContext qc = new QueryContext(gui.context);
-        try {
-          if(lib) qc.parseLibrary(input, null);
-          else qc.parseMain(input, null);
-          view.info(OK, true, false);
-        } catch(final QueryException ex) {
-          view.info(Util.message(ex), false, false);
-        } finally {
-          qc.close();
-        }
-      }
-    } else if(script || file.hasSuffix(IO.XMLSUFFIXES) ||
-        file.hasSuffix(IO.XSLSUFFIXES) || file.hasSuffix(IO.HTMLSUFFIXES)) {
-      try {
-        if(!script || input.trim().startsWith("<"))
-          new EmptyBuilder(new IOContent(in), gui.context).build();
-        if(script) new CommandParser(input, gui.context).parse();
-        view.info(OK, true, false);
-      } catch(final Exception ex) {
-        view.info(Util.message(ex), false, false);
-      }
-    } else if(action != Action.CHECK) {
-      view.info(OK, true, false);
-    }
+    view.run(this, action);
   }
 
   /**
@@ -199,7 +146,8 @@ final class EditorArea extends Editor {
           release(Action.PARSE);
           return true;
         } catch(final IOException ex) {
-          BaseXDialog.error(gui, FILE_NOT_OPENED);
+          Util.debug(ex);
+          BaseXDialog.error(gui, Util.info(FILE_NOT_OPENED_X, file));
         }
       }
       tstamp = ts;
@@ -208,24 +156,60 @@ final class EditorArea extends Editor {
   }
 
   /**
-   * Updates the file reference, timestamp and history.
-   * @param f file
+   * Saves the specified editor contents.
+   * @return success flag
    */
-  void file(final IO f) {
-    file = f;
-    tstamp = f.timeStamp();
-    setSyntax(file, true);
-    hist.save();
-    view.refreshHistory(file);
-    view.refreshControls(true);
+  boolean save() {
+    return save(file);
   }
 
   /**
-   * Highlights the error.
-   * @param pos error position
+   * Saves the editor contents.
+   * @param io file to save
+   * @return success flag
    */
-  void jumpError(final int pos) {
+  boolean save(final IOFile io) {
+    final boolean same = io == file;
+    if(same && !modified) return false;
+    try {
+      io.write(getText());
+      file(io);
+      view.project.refresh(io, true);
+      return true;
+    } catch(final Exception ex) {
+      BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, io));
+      return false;
+    }
+  }
+
+  /**
+   * Jumps to the specified string.
+   * @param string search string
+   */
+  public void jump(final String string) {
+    if(string != null) {
+      search.reset();
+      search.activate(string, false);
+      jump(SearchDir.CURRENT, true);
+    } else {
+      search.deactivate(true);
+    }
     requestFocusInWindow();
-    setCaret(pos);
+  }
+
+  /**
+   * Updates the file reference, timestamp and history.
+   * @param io file
+   */
+  void file(final IOFile io) {
+    if(io != file) {
+      file = io;
+      label.setIcon(BaseXImages.file(io));
+      setSyntax(io, true);
+    }
+    tstamp = file.timeStamp();
+    hist.save();
+    view.refreshHistory(file);
+    view.refreshControls(this, true);
   }
 }

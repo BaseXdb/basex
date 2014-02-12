@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.data.atomic.*;
 import org.basex.io.in.DataInput;
@@ -22,7 +21,7 @@ import org.basex.util.list.*;
  * new documents are performed). A tree structure could be introduced to
  * offer better general performance.</p>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Lukas Kircher
  */
@@ -241,7 +240,7 @@ final class Docs {
    * sorting can be disabled as it slows down bulk inserts/deletes/replaces.
    * @param path input path
    * @param sort sort paths before access
-   * @return root nodes
+   * @return pre value of document node
    */
   synchronized int doc(final String path, final boolean sort) {
     // invalid or empty path, or no documents: return -1
@@ -284,9 +283,7 @@ final class Docs {
    * @param dir returns directories instead of files
    * @param tbm map; values will be {@code false} to indicate documents
    */
-  synchronized void children(final byte[] path, final boolean dir,
-      final TokenBoolMap tbm) {
-
+  synchronized void children(final byte[] path, final boolean dir, final TokenBoolMap tbm) {
     final String pth = MetaData.normPath(string(path));
     if(pth == null) return;
 

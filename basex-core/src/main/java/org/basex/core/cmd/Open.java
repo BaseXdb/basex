@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Evaluates the 'open' command and opens a database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Open extends Command {
@@ -64,7 +64,7 @@ public final class Open extends Command {
       Data data = ctx.dbs.pin(name);
       if(data == null) {
         // check if database exists
-        if(!ctx.mprop.dbexists(name)) throw new BaseXException(DB_NOT_FOUND_X, name);
+        if(!ctx.globalopts.dbexists(name)) throw new BaseXException(dbnf(name));
         data = new DiskData(name, ctx);
         ctx.dbs.add(data);
       }
@@ -75,5 +75,14 @@ public final class Open extends Command {
       }
       return data;
     }
+  }
+
+  /**
+   * Returns an error message for an unknown database.
+   * @param name name of database
+   * @return error message
+   */
+  public static String dbnf(final String name) {
+    return Util.info(DB_NOT_FOUND_X, name);
   }
 }

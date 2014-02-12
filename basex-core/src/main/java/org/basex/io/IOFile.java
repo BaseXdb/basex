@@ -7,7 +7,6 @@ import java.util.regex.*;
 
 import javax.xml.transform.stream.*;
 
-import org.basex.core.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.util.*;
@@ -17,10 +16,13 @@ import org.xml.sax.*;
 /**
  * {@link IO} reference, representing a local file or directory path.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class IOFile extends IO {
+  /** Pattern for valid file names. */
+  private static final Pattern VALIDNAME =
+      Pattern.compile("^[^\\\\/" + (Prop.WIN ? ":*?\"<>\\|" : "") + "]+$");
   /** File reference. */
   private final File file;
 
@@ -34,11 +36,11 @@ public final class IOFile extends IO {
 
   /**
    * Constructor.
-   * @param f file reference
+   * @param fl file reference
    */
-  public IOFile(final File f) {
-    super(new PathList().create(f.getAbsolutePath()));
-    file = f;
+  public IOFile(final File fl) {
+    super(new PathList().create(fl.getAbsolutePath()));
+    file = fl.isAbsolute() ? fl : fl.getAbsoluteFile();
   }
 
   /**
@@ -77,7 +79,7 @@ public final class IOFile extends IO {
       try {
         if(file.createNewFile()) return true;
       } catch(final IOException ex) {
-        Performance.sleep(i * 10l);
+        Performance.sleep(i * 10L);
         Util.debug(ex);
       }
     }
@@ -242,42 +244,42 @@ public final class IOFile extends IO {
    * @return success flag
    */
   public boolean delete() {
-    boolean ok = true;
     if(file.exists()) {
+      boolean ok = true;
       if(isDir()) for(final IOFile ch : children()) ok &= ch.delete();
       // some file systems require several runs
       for(int i = 0; i < 5; i++) {
         if(file.delete() && !file.exists()) return ok;
-        Performance.sleep(i * 10l);
+        Performance.sleep(i * 10L);
       }
     }
     return false;
   }
 
   /**
-   * Renames the file to the specified name.
-   * @param trg target reference
+   * Renames a file to the specified path. The path must not exist yet.
+   * @param target target reference
    * @return success flag
    */
-  public boolean rename(final IOFile trg) {
-    return file.renameTo(trg.file);
+  public boolean rename(final IOFile target) {
+    return file.renameTo(target.file);
   }
 
   /**
    * Copies a file to another target.
-   * @param trg target
+   * @param target target
    * @throws IOException I/O exception
    */
-  public void copyTo(final IOFile trg) throws IOException {
+  public void copyTo(final IOFile target) throws IOException {
     // optimize buffer size
     final int bsize = (int) Math.max(1, Math.min(length(), 1 << 22));
     final byte[] buf = new byte[bsize];
 
     // create parent directory of target file
-    trg.dir().md();
+    target.dir().md();
     final FileInputStream fis = new FileInputStream(file);
     try {
-      final FileOutputStream fos = new FileOutputStream(trg.file);
+      final FileOutputStream fos = new FileOutputStream(target.file);
       try {
         // copy file buffer by buffer
         for(int i; (i = fis.read(buf)) != -1;) fos.write(buf, 0, i);
@@ -291,8 +293,8 @@ public final class IOFile extends IO {
 
   @Override
   public boolean eq(final IO io) {
-    if(!(io instanceof IOFile)) return false;
-    return Prop.CASE ? path.equals(io.path) : path.equalsIgnoreCase(io.path);
+    return io instanceof IOFile && (Prop.CASE ? path.equals(io.path) :
+      path.equalsIgnoreCase(io.path));
   }
 
   @Override
@@ -308,6 +310,33 @@ public final class IOFile extends IO {
     }
     if(isDir()) tb.add('/');
     return tb.toString();
+  }
+
+  /**
+   * Opens the file externally.
+   * @throws IOException I/O exception
+   */
+  public void open() throws IOException {
+    final String[] args;
+    if(Prop.WIN) {
+      args = new String[] { "rundll32", "url.dll,FileProtocolHandler", path };
+    } else if(Prop.MAC) {
+      args = new String[] { "/usr/bin/open", path };
+    } else {
+      args = new String[] { "xdg-open", path };
+    }
+    new ProcessBuilder(args).directory(dir().file).start();
+  }
+
+  // STATIC METHODS ===============================================================================
+
+  /**
+   * Checks if the specified sting is a valid file name.
+   * @param name file name
+   * @return result of check
+   */
+  public static boolean isValidName(final String name) {
+    return VALIDNAME.matcher(name).matches();
   }
 
   /**
@@ -341,14 +370,10 @@ public final class IOFile extends IO {
   public static String regex(final String glob, final boolean sub) {
     final StringBuilder sb = new StringBuilder();
     for(final String g : glob.split(",")) {
-      boolean suf = false;
       final String gl = g.trim();
-      if(sb.length() != 0) {
-        if(suf) sb.append(".*");
-        suf = false;
-        sb.append('|');
-      }
+      if(sb.length() != 0) sb.append('|');
       // loop through single pattern
+      boolean suf = false;
       for(int f = 0; f < gl.length(); f++) {
         char ch = gl.charAt(f);
         if(ch == '*') {
@@ -374,7 +399,7 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Normalizes the specified URL and creates a new {@link IOFile} instance.
+   * Normalizes the specified URL and creates a new instance of this class.
    * @param url url to be converted
    * @return file path
    */
@@ -413,8 +438,7 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Path constructor. Resolves parent and self references and normalizes the
-   * path.
+   * Path constructor. Resolves parent and self references and normalizes the path.
    */
   static class PathList extends StringList {
     /**
@@ -449,10 +473,10 @@ public final class IOFile extends IO {
       if(s.length() > 1 && s.charAt(1) == ':' && size == 0) {
         s = Character.toUpperCase(s.charAt(0)) + s.substring(1);
       }
-      if(s.equals("..") && size > 0) {
+      if("..".equals(s) && size > 0) {
         // parent step
         if(list[size - 1].indexOf(':') == -1) deleteAt(size - 1);
-      } else if(!s.equals(".") && !s.isEmpty()) {
+      } else if(!".".equals(s) && !s.isEmpty()) {
         // skip self and empty steps
         add(s);
       }

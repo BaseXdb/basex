@@ -1,14 +1,18 @@
 package org.basex.io.serial;
 
 import static org.basex.data.DataText.*;
-import static org.basex.io.serial.SerializerProp.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.build.*;
+import org.basex.build.CsvOptions.CsvFormat;
+import org.basex.build.JsonOptions.JsonFormat;
 import org.basex.data.*;
+import org.basex.io.serial.csv.*;
+import org.basex.io.serial.json.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -20,21 +24,21 @@ import org.basex.util.list.*;
 /**
  * This is an interface for serializing XQuery values.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Serializer {
   /** Default serialization parameters. */
-  public static final SerializerProp PROPS = new SerializerProp();
+  public static final SerializerOptions OPTIONS = new SerializerOptions();
 
-  /** Stack with opened tag names. */
+  /** Stack with names of opened elements. */
   protected final TokenList tags = new TokenList();
   /** Current level. */
   protected int level;
-  /** Current tag. */
-  protected byte[] elem;
+  /** Current element name. */
+  protected byte[] tag;
   /** Undeclare prefixes. */
-  protected boolean undecl;
+  boolean undecl;
   /** Indentation flag. */
   protected boolean indent;
 
@@ -53,47 +57,72 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   public static XMLSerializer get(final OutputStream os) throws IOException {
-    return new XMLSerializer(os, PROPS);
+    return new XMLSerializer(os, OPTIONS);
   }
 
   /**
    * Returns a specific serializer.
    * @param os output stream reference
-   * @param props serialization properties (can be {@code null})
+   * @param sopts serialization parameters (can be {@code null})
    * @return serializer
    * @throws IOException I/O exception
    */
-  public static Serializer get(final OutputStream os, final SerializerProp props)
+  public static Serializer get(final OutputStream os, final SerializerOptions sopts)
       throws IOException {
 
-    if(props == null) return get(os);
-    final String m = props.check(S_METHOD, METHODS);
-    if(M_XHTML.equals(m))  return new XHTMLSerializer(os, props);
-    if(M_HTML.equals(m))   return new HTMLSerializer(os, props);
-    if(M_TEXT.equals(m))   return new TextSerializer(os, props);
-    if(M_JSON.equals(m))   return new JsonCGSerializer(os, props);
-    if(M_JSONML.equals(m)) return new JsonMLSerializer(os, props);
-    if(M_CSV.equals(m))    return new CsvSerializer(os, props);
-    if(M_RAW.equals(m))    return new RawSerializer(os, props);
-    return new XMLSerializer(os, props);
+    // no parameters given: serialize as XML
+    if(sopts == null) return get(os);
+
+    // standard types: XHTML, HTML, text
+    switch(sopts.get(SerializerOptions.METHOD)) {
+      case XHTML: return new XHTMLSerializer(os, sopts);
+      case HTML:  return new HTMLSerializer(os, sopts);
+      case TEXT:  return new TextSerializer(os, sopts);
+      case RAW:   return new RawSerializer(os, sopts);
+      case CSV:
+        final CsvOptions copts = sopts.get(SerializerOptions.CSV);
+        final CsvFormat cform = copts.get(CsvOptions.FORMAT);
+        return cform == CsvFormat.MAP ? new CsvMapSerializer(os, sopts) :
+               new CsvDirectSerializer(os, sopts);
+      case JSON:
+        final JsonSerialOptions jopts = sopts.get(SerializerOptions.JSON);
+        final JsonFormat jform = jopts.get(JsonOptions.FORMAT);
+        return jform == JsonFormat.JSONML ? new JsonMLSerializer(os, sopts) :
+               jform == JsonFormat.MAP ? new JsonMapSerializer(os, sopts) :
+               new JsonDirectSerializer(os, sopts);
+      default: return new XMLSerializer(os, sopts);
+    }
   }
 
   // PUBLIC METHODS =====================================================================
+
 
   /**
    * Serializes the specified item, which may be a node or an atomic value.
    * @param item item to be serialized
    * @throws IOException I/O exception
    */
-  public final void serialize(final Item item) throws IOException {
+  public void serialize(final Item item) throws IOException {
+    serialize(item, false);
+  }
+
+  /**
+   * Serializes the specified item, which may be a node or an atomic value.
+   * @param item item to be serialized
+   * @param atts also serialize attributes and namespaces
+   * @throws IOException I/O exception
+   */
+  public void serialize(final Item item, final boolean atts) throws IOException {
     openResult();
     if(item instanceof ANode) {
       final Type type = item.type;
-      if(type == NodeType.ATT) SERATTR.thrwSerial(item);
-      if(type == NodeType.NSP) SERNS.thrwSerial(item);
+      if(!atts) {
+        if(type == NodeType.ATT) throw SERATTR.getIO(item);
+        if(type == NodeType.NSP) throw SERNS.getIO(item);
+      }
       serialize((ANode) item);
     } else if(item instanceof FItem) {
-      SERFUNC.thrwSerial(item.description());
+      throw SERFUNC.getIO(item.type());
     } else {
       finishElement();
       atomic(item);
@@ -128,11 +157,11 @@ public abstract class Serializer {
    * @param name element name
    * @throws IOException I/O exception
    */
-  protected final void startElement(final byte[] name) throws IOException {
+  final void startElement(final byte[] name) throws IOException {
     finishElement();
     nstack.push(nspaces.size());
     opening = true;
-    elem = name;
+    tag = name;
     startOpen(name);
   }
 
@@ -140,13 +169,13 @@ public abstract class Serializer {
    * Closes an element.
    * @throws IOException I/O exception
    */
-  protected final void closeElement() throws IOException {
+  final void closeElement() throws IOException {
     nspaces.size(nstack.pop());
     if(opening) {
       finishEmpty();
       opening = false;
     } else {
-      elem = tags.pop();
+      tag = tags.pop();
       level--;
       finishClose();
     }
@@ -159,7 +188,7 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void finishText(final byte[] value, final FTPos ftp) throws IOException {
+  void finishText(final byte[] value, final FTPos ftp) throws IOException {
     text(value);
   }
   /**
@@ -167,7 +196,7 @@ public abstract class Serializer {
    * @param pref namespace prefix
    * @return URI if found, {@code null} otherwise
    */
-  protected final byte[] nsUri(final byte[] pref) {
+  final byte[] nsUri(final byte[] pref) {
     for(int n = nspaces.size() - 1; n >= 0; n--) {
       if(eq(nspaces.name(n), pref)) return nspaces.value(n);
     }
@@ -195,14 +224,14 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void openResult() throws IOException { }
+  void openResult() throws IOException { }
 
   /**
    * Closes a result.
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void closeResult() throws IOException { }
+  void closeResult() throws IOException { }
 
   /**
    * Opens a document.
@@ -210,14 +239,14 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void openDoc(final byte[] name) throws IOException { }
+  void openDoc(final byte[] name) throws IOException { }
 
   /**
    * Closes a document.
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void closeDoc() throws IOException { }
+  void closeDoc() throws IOException { }
 
   /**
    * Serializes an attribute.
@@ -225,8 +254,7 @@ public abstract class Serializer {
    * @param value value
    * @throws IOException I/O exception
    */
-  protected abstract void attribute(final byte[] name, final byte[] value)
-      throws IOException;
+  protected abstract void attribute(final byte[] name, final byte[] value) throws IOException;
 
   /**
    * Starts an element.
@@ -273,8 +301,7 @@ public abstract class Serializer {
    * @param value value
    * @throws IOException I/O exception
    */
-  protected abstract void finishPi(final byte[] name, final byte[] value)
-      throws IOException;
+  protected abstract void finishPi(final byte[] name, final byte[] value) throws IOException;
 
   /**
    * Serializes an atomic value.
@@ -301,6 +328,8 @@ public abstract class Serializer {
         text(node.string());
       } else if(type == NodeType.PI) {
         pi(node.name(), node.string());
+      } else if(type == NodeType.ATT) {
+        attribute(node.name(), node.string());
       } else if(type == NodeType.NSP) {
         namespace(node.name(), node.string());
       } else if(type == NodeType.DOC) {
@@ -348,10 +377,10 @@ public abstract class Serializer {
     final Data data = node.data;
     int p = node.pre;
     int k = data.kind(p);
-    if(k == Data.ATTR) SERATTR.thrwSerial(node);
+    if(k == Data.ATTR) throw SERATTR.getIO(node);
 
     boolean doc = false;
-    final TokenSet nsp = data.nspaces.size() != 0 ? new TokenSet() : null;
+    final TokenSet nsp = data.nspaces.size() == 0 ? null : new TokenSet();
     final IntList pars = new IntList();
     final BoolList indt = new BoolList();
 
@@ -378,46 +407,48 @@ public abstract class Serializer {
         else text(data.text(p++, true));
       } else if(k == Data.COMM) {
         comment(data.text(p++, true));
-      } else if(k == Data.PI) {
-        pi(data.name(p, k), data.atom(p++));
       } else {
-        // add element node
-        final byte[] name = data.name(p, k);
-        startElement(name);
+        if(k == Data.PI) {
+          pi(data.name(p, Data.PI), data.atom(p++));
+        } else {
+          // add element node
+          final byte[] name = data.name(p, k);
+          startElement(name);
 
-        // add namespace definitions
-        if(nsp != null) {
-          // add namespaces from database
-          nsp.clear();
-          int pp = p;
+          // add namespace definitions
+          if(nsp != null) {
+            // add namespaces from database
+            nsp.clear();
+            int pp = p;
 
-          // check namespace of current element
-          final byte[] u = data.nspaces.uri(data.uri(p, k));
-          namespace(prefix(name), u == null ? EMPTY : u);
+            // check namespace of current element
+            final byte[] u = data.nspaces.uri(data.uri(p, k));
+            namespace(prefix(name), u == null ? EMPTY : u);
 
-          do {
-            final Atts ns = data.ns(pp);
-            for(int n = 0; n < ns.size(); ++n) {
-              final byte[] pref = ns.name(n);
-              if(nsp.add(pref)) namespace(pref, ns.value(n));
-            }
-            // check ancestors only on top level
-            if(level != 0) break;
+            do {
+              final Atts ns = data.ns(pp);
+              for(int n = 0; n < ns.size(); ++n) {
+                final byte[] pref = ns.name(n);
+                if(nsp.add(pref)) namespace(pref, ns.value(n));
+              }
+              // check ancestors only on top level
+              if(level != 0) break;
 
-            pp = data.parent(pp, data.kind(pp));
-          } while(pp >= 0 && data.kind(pp) == Data.ELEM);
+              pp = data.parent(pp, data.kind(pp));
+            } while(pp >= 0 && data.kind(pp) == Data.ELEM);
+          }
+
+          // serialize attributes
+          indt.push(indent);
+          final int as = p + data.attSize(p, k);
+          while(++p != as) {
+            final byte[] n = data.name(p, Data.ATTR);
+            final byte[] v = data.text(p, false);
+            attribute(n, v);
+            if(eq(n, XML_SPACE)) indent &= eq(v, DataText.DEFAULT);
+          }
+          pars.push(r);
         }
-
-        // serialize attributes
-        indt.push(indent);
-        final int as = p + data.attSize(p, k);
-        while(++p != as) {
-          final byte[] n = data.name(p, Data.ATTR);
-          final byte[] v = data.text(p, false);
-          attribute(n, v);
-          if(eq(n, XML_SPACE)) indent &= eq(v, DataText.DEFAULT);
-        }
-        pars.push(r);
       }
     }
 
@@ -480,7 +511,7 @@ public abstract class Serializer {
     if(!opening) return;
     opening = false;
     finishOpen();
-    tags.push(elem);
+    tags.push(tag);
     level++;
   }
 }

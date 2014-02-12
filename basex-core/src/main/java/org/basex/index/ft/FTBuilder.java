@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * This class contains common methods for full-text index builders.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FTBuilder extends IndexBuilder {
@@ -25,8 +25,6 @@ public final class FTBuilder extends IndexBuilder {
   private final FTIndexTrees tree;
   /** Word parser. */
   private final FTLexer lex;
-  /** Current lexer position. */
-  int pos;
   /** Number of indexed tokens. */
   private long ntok;
 
@@ -36,20 +34,20 @@ public final class FTBuilder extends IndexBuilder {
    * @throws IOException IOException
    */
   public FTBuilder(final Data d) throws IOException {
-    super(d, d.meta.prop.num(Prop.FTINDEXSPLITSIZE));
+    super(d, d.meta.options.get(MainOptions.FTINDEXSPLITSIZE));
     tree = new FTIndexTrees(d.meta.maxlen);
 
-    final Prop prop = d.meta.prop;
+    final MainOptions opts = d.meta.options;
     final FTOpt fto = new FTOpt();
-    fto.set(FTFlag.DC, prop.is(Prop.DIACRITICS));
-    fto.set(FTFlag.CS, prop.is(Prop.CASESENS));
-    fto.set(FTFlag.ST, prop.is(Prop.STEMMING));
-    fto.sw = new StopWords(d, prop.get(Prop.STOPWORDS));
-    fto.ln = Language.get(prop);
+    fto.set(FTFlag.DC, opts.get(MainOptions.DIACRITICS));
+    fto.set(FTFlag.ST, opts.get(MainOptions.STEMMING));
+    fto.cs = opts.get(MainOptions.CASESENS) ? FTCase.SENSITIVE : FTCase.INSENSITIVE;
+    fto.sw = new StopWords(d, opts.get(MainOptions.STOPWORDS));
+    fto.ln = Language.get(opts);
 
     if(!Tokenizer.supportFor(fto.ln))
       throw new BaseXException(NO_TOKENIZER_X, fto.ln);
-    if(prop.is(Prop.STEMMING) && !Stemmer.supportFor(fto.ln))
+    if(opts.get(MainOptions.STEMMING) && !Stemmer.supportFor(fto.ln))
       throw new BaseXException(NO_STEMMER_X, fto.ln);
 
     lex = new FTLexer(fto);
@@ -72,9 +70,10 @@ public final class FTBuilder extends IndexBuilder {
       final int k = data.kind(pre);
       if(k != Data.TEXT) continue;
 
-      pos = -1;
+      /* Current lexer position. */
       final StopWords sw = lex.ftOpt().sw;
       lex.init(data.text(pre, true));
+      int pos = -1;
       while(lex.hasNext()) {
         final byte[] tok = lex.nextToken();
         ++pos;
@@ -125,8 +124,8 @@ public final class FTBuilder extends IndexBuilder {
 
     final IntList il = new IntList();
     while(check(v)) {
-      int m = 0;
       il.reset();
+      int m = 0;
       il.add(m);
       // find next token to write on disk
       for(int i = 0; i < splits; ++i) {
@@ -194,10 +193,10 @@ public final class FTBuilder extends IndexBuilder {
     final DataOutput outZ = new DataOutput(data.meta.dbfile(name + 'z'));
 
     final IntList ind = new IntList();
+    tree.init();
     long dr = 0;
     int tr = 0;
     int j = 0;
-    tree.init();
     while(tree.more(splits)) {
       final FTIndexTree t = tree.nextTree();
       t.next();
@@ -242,12 +241,12 @@ public final class FTBuilder extends IndexBuilder {
   private static int merge(final DataOutput out, final IntList il, final FTList[] v)
       throws IOException {
 
-    int s = 0;
     final TokenBuilder tbp = new TokenBuilder();
     final TokenBuilder tbo = new TokenBuilder();
     tbp.add(new byte[4]);
     tbo.add(new byte[4]);
     // merge full-text data of all sorted lists with the same token
+    int s = 0;
     for(int j = 0; j < il.size(); ++j) {
       final int m = il.get(j);
       for(final int p : v[m].prv) tbp.add(Num.num(p));
@@ -274,8 +273,8 @@ public final class FTBuilder extends IndexBuilder {
    * @param vpos compressed pos values
    * @throws IOException IOException
    */
-  private static void writeFTData(final DataOutput out, final byte[] vpre,
-                                  final byte[] vpos) throws IOException {
+  private static void writeFTData(final DataOutput out, final byte[] vpre, final byte[] vpos)
+      throws IOException {
 
     int np = 4, pp = 4;
     final int ns = Num.size(vpre);
@@ -300,7 +299,7 @@ public final class FTBuilder extends IndexBuilder {
   }
 
   @Override
-  public void abort() {
+  protected void abort() {
     data.meta.drop(DATAFTX + ".*");
     data.meta.ftxtindex = false;
   }

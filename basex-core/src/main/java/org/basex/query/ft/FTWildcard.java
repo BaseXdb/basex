@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * Wildcard expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Dimitar Popov
  */
@@ -106,7 +106,7 @@ public final class FTWildcard {
     int c = 0;
     for(int s = 0; s < size; s++) {
       final int m = max[s];
-      if(m == Integer.MAX_VALUE) return m;
+      if(m == Integer.MAX_VALUE) return Integer.MAX_VALUE;
       c += m;
     }
     return c;

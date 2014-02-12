@@ -2,7 +2,6 @@ package org.basex.query.up.primitives;
 
 import org.basex.core.cmd.*;
 import org.basex.data.*;
-import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -10,7 +9,7 @@ import org.basex.util.list.*;
 /**
  * Update primitive for the {@link Function#_DB_DELETE} function.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DBDelete extends BasicOperation {
@@ -48,5 +47,5 @@ public final class DBDelete extends BasicOperation {
   }
 
   @Override
-  public void prepare(final MemData tmp) throws QueryException { }
+  public void prepare(final MemData tmp) { }
 }

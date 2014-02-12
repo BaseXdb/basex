@@ -56,4 +56,18 @@ public final class TokenObjMap<E> extends TokenSet {
     super.rehash(s);
     values = Array.copy(values, new Object[s]);
   }
+
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder();
+    for(final byte[] key : this) {
+      if(!tb.isEmpty()) tb.add(", ");
+      if(key != null) {
+        final Object val = values[id(key)];
+        tb.add('{').add(key).add(',').add(val == null ? "null" :  val.toString()).add('}');
+      }
+    }
+    return new TokenBuilder(Util.className(getClass())).add('[').add(tb.finish()).
+      add(']').toString();
+  }
 }

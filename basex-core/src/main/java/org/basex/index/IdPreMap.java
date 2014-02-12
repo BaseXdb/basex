@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * ID -> PRE mapping.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Dimitar Popov
  */
 public class IdPreMap {
@@ -221,7 +221,7 @@ public class IdPreMap {
       endIndex = removeStart;
       remove(removeStart, removeEnd);
     } else {
-      inc = 0 < startIndex ? incs[startIndex - 1] : 0;
+      inc = startIndex > 0 ? incs[startIndex - 1] : 0;
       oid = id;
       endIndex = startIndex;
     }

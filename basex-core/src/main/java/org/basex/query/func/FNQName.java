@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -16,18 +15,19 @@ import org.basex.util.*;
 /**
  * QName functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNQName extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNQName(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNQName(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -44,12 +44,12 @@ public final class FNQName extends StandardFunc {
     final Item it = expr[0].item(ctx, info);
     final Item it2 = expr.length == 2 ? expr[1].item(ctx, info) : null;
     switch(sig) {
-      case RESOLVE_QNAME:            return resolveQName(ctx, it, it2);
+      case RESOLVE_QNAME:            return resolveQName(it, it2);
       case QNAME:                    return qName(it, it2);
       case LOCAL_NAME_FROM_QNAME:    return lnFromQName(ctx, it);
       case PREFIX_FROM_QNAME:        return prefixFromQName(ctx, it);
       case NAMESPACE_URI_FOR_PREFIX: return nsUriForPrefix(it, it2);
-      case RESOLVE_URI:              return resolveUri(ctx, it, it2);
+      case RESOLVE_URI:              return resolveUri(it, it2);
       default:                       return super.item(ctx, ii);
     }
   }
@@ -83,15 +83,15 @@ public final class FNQName extends StandardFunc {
    */
   private Item qName(final Item it, final Item it2) throws QueryException {
     final byte[] uri = checkEStr(it);
-    if(it2 == null) INVEMPTYEX.thrw(info, description(), AtomType.STR);
+    if(it2 == null) throw INVEMPTYEX.get(info, description(), AtomType.STR);
 
     final byte[] name = checkEStr(it2);
     final byte[] str = !contains(name, ':') && eq(uri, XMLURI) ?
         concat(XMLC, name) : name;
-    if(!XMLToken.isQName(str)) Err.value(info, AtomType.QNM, Str.get(name));
+    if(!XMLToken.isQName(str)) throw valueError(info, AtomType.QNM, Str.get(name));
     final QNm nm = new QNm(str, uri);
     if(nm.hasPrefix() && uri.length == 0)
-      Err.value(info, AtomType.URI, Str.get(nm.uri()));
+      throw valueError(info, AtomType.URI, Str.get(nm.uri()));
     return nm;
   }
 
@@ -104,8 +104,8 @@ public final class FNQName extends StandardFunc {
    */
   private Item lnFromQName(final QueryContext ctx, final Item it) throws QueryException {
     if(it == null) return null;
-    final QNm nm = checkQNm(it, ctx);
-    return AtomType.NCN.cast(Str.get(nm.local()), ctx, info);
+    final QNm nm = checkQNm(it, ctx, sc);
+    return AtomType.NCN.cast(Str.get(nm.local()), ctx, sc, info);
   }
 
   /**
@@ -115,35 +115,30 @@ public final class FNQName extends StandardFunc {
    * @return prefix sequence
    * @throws QueryException query exception
    */
-  private Item prefixFromQName(final QueryContext ctx, final Item it)
-      throws QueryException {
-
+  private Item prefixFromQName(final QueryContext ctx, final Item it) throws QueryException {
     if(it == null) return null;
-    final QNm nm = checkQNm(it, ctx);
-    return nm.hasPrefix() ? AtomType.NCN.cast(Str.get(nm.prefix()), ctx, info) : null;
+    final QNm nm = checkQNm(it, ctx, sc);
+    return nm.hasPrefix() ? AtomType.NCN.cast(Str.get(nm.prefix()), ctx, sc, info) : null;
   }
 
   /**
    * Returns a new QName.
-   * @param ctx query context
    * @param it qname
    * @param it2 item
    * @return prefix sequence
    * @throws QueryException query exception
    */
-  private Item resolveQName(final QueryContext ctx, final Item it,
-      final Item it2) throws QueryException {
-
+  private Item resolveQName(final Item it, final Item it2) throws QueryException {
     final ANode base = (ANode) checkType(it2, NodeType.ELM);
     if(it == null) return null;
 
     final byte[] name = checkEStr(it);
-    if(!XMLToken.isQName(name)) Err.value(info, AtomType.QNM, it);
+    if(!XMLToken.isQName(name)) throw valueError(info, AtomType.QNM, it);
 
     final QNm nm = new QNm(name);
     final byte[] pref = nm.prefix();
-    final byte[] uri = base.uri(pref, ctx);
-    if(uri == null) NSDECL.thrw(info, pref);
+    final byte[] uri = base.uri(pref);
+    if(uri == null) throw NSDECL.get(info, pref);
     nm.uri(uri);
     return nm;
   }
@@ -166,26 +161,23 @@ public final class FNQName extends StandardFunc {
 
   /**
    * Resolves a URI.
-   * @param ctx query context
    * @param it item
    * @param it2 second item
    * @return prefix sequence
    * @throws QueryException query exception
    */
-  private Item resolveUri(final QueryContext ctx, final Item it, final Item it2)
-      throws QueryException {
-
+  private Item resolveUri(final Item it, final Item it2) throws QueryException {
     if(it == null) return null;
     // check relative uri
     final Uri rel = Uri.uri(checkEStr(it));
-    if(!rel.isValid()) URIINVRES.thrw(info, rel);
+    if(!rel.isValid()) throw URIINVRES.get(info, rel);
     if(rel.isAbsolute()) return rel;
 
     // check base uri
-    final Uri base = it2 == null ? ctx.sc.baseURI() : Uri.uri(checkEStr(it2));
-    if(!base.isAbsolute()) URIABS.thrw(info, base);
+    final Uri base = it2 == null ? sc.baseURI() : Uri.uri(checkEStr(it2));
+    if(!base.isAbsolute()) throw URIABS.get(info, base);
     if(!base.isValid() || contains(base.string(), '#') || !contains(base.string(), '/'))
-      URIINVRES.thrw(info, base);
+      throw URIINVRES.get(info, base);
 
     return base.resolve(rel, info);
   }

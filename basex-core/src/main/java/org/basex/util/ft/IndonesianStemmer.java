@@ -10,7 +10,7 @@ import org.basex.util.*;
  * Information Retrieval in Bahasa Indonesia" by Fadillah Z Tala.
  * http://www.illc.uva.nl/Publications/ResearchReports/MoL-2003-02.text.pdf
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Andria Arisal
  */
 final class IndonesianStemmer extends InternalStemmer {
@@ -236,8 +236,8 @@ final class IndonesianStemmer extends InternalStemmer {
         tb.delete(0, 4);
       } else if(c1 == 'm' && c2 == 'e' && c3 == 'n' && c4 == 'y'
           && tl > 4 && isVowel(tb.get(4))) {
-        final byte setS = 's';
         flags |= REMOVED_MENG;
+        final byte setS = 's';
         tb.set(3, setS);
         numSyllables--;
         tb.delete(0, 3);
@@ -247,8 +247,8 @@ final class IndonesianStemmer extends InternalStemmer {
         tb.delete(0, 3);
       } else if(c1 == 'm' && c2 == 'e' && c3 == 'm' && tl > 3
           && isVowel(tb.get(3))) {
-        final byte setP = 'p';
         flags |= REMOVED_MENG;
+        final byte setP = 'p';
         tb.set(2, setP);
         numSyllables--;
         tb.delete(0, 2);
@@ -326,15 +326,13 @@ final class IndonesianStemmer extends InternalStemmer {
         flags |= REMOVED_BER;
         numSyllables--;
         tb.delete(0, 3);
-      } else if(c1 == 'b' && c2 == 'e' && c3 == 'l' && c4 == 'a'
-          && tl > 7) {
+      } else if(c1 == 'b' && c2 == 'e' && c3 == 'l' && c4 == 'a' && tl > 7) {
         if(tb.get(4) == 'j' && tb.get(5) == 'a' && tb.get(6) == 'r') {
           flags |= REMOVED_BER;
           numSyllables--;
           tb.delete(0, 3);
         }
-      } else if(c1 == 'b' && c2 == 'e' && !isVowel(tb.get(2))
-          && c4 == 'e' && tl > 4) {
+      } else if(c1 == 'b' && c2 == 'e' && !isVowel(tb.get(2)) && c4 == 'e' && tl > 4) {
         if(tb.get(4) == 'r') {
           flags |= REMOVED_BER;
           numSyllables--;
@@ -344,8 +342,7 @@ final class IndonesianStemmer extends InternalStemmer {
         flags |= REMOVED_PE;
         numSyllables--;
         tb.delete(0, 3);
-      } else if(c1 == 'b' && c2 == 'e' && c3 == 'l' && c4 == 'a'
-          && tl > 7) {
+      } else if(c1 == 'b' && c2 == 'e' && c3 == 'l' && c4 == 'a' && tl > 7) {
         if(tb.get(4) == 'j' && tb.get(5) == 'a' && tb.get(6) == 'r') {
           flags |= REMOVED_PE;
           numSyllables--;

@@ -14,13 +14,12 @@ import org.basex.util.*;
 /**
  * YearMonth duration ({@code xs:yearMonthDuration}).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class YMDur extends Dur {
   /** YearMonth pattern. */
-  private static final Pattern DUR =
-      Pattern.compile("(-?)P(" + DP + "Y)?(" + DP + "M)?");
+  private static final Pattern DUR = Pattern.compile("(-?)P(" + DP + "Y)?(" + DP + "M)?");
 
   /**
    * Constructor.
@@ -40,12 +39,12 @@ public final class YMDur extends Dur {
    * @param ii input info
    * @throws QueryException query exception
    */
-  public YMDur(final YMDur it, final YMDur a, final boolean p,
-      final InputInfo ii) throws QueryException {
+  public YMDur(final YMDur it, final YMDur a, final boolean p, final InputInfo ii)
+      throws QueryException {
 
     this(it);
     final double d = (double) mon + (p ? a.mon : -a.mon);
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) DURADDRANGE.thrw(ii, type);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw MONTHRANGE.get(ii, d);
     mon += p ? a.mon : -a.mon;
   }
 
@@ -61,10 +60,10 @@ public final class YMDur extends Dur {
       throws QueryException {
 
     this(it);
-    if(Double.isNaN(f)) DATECALC.thrw(ii, description(), f);
-    if(m ? Double.isInfinite(f) : f == 0) DATEZERO.thrw(ii, description());
+    if(Double.isNaN(f)) throw DATECALC.get(ii, description(), f);
+    if(m ? Double.isInfinite(f) : f == 0) throw DATEZERO.get(ii, type);
     final double d = m ? mon * f : mon / f;
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) DURADDRANGE.thrw(ii, type);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw MONTHRANGE.get(ii, d);
     mon = StrictMath.round(d);
   }
 
@@ -101,9 +100,8 @@ public final class YMDur extends Dur {
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    if(it.type != type) Err.diff(ii, it, this);
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
+    if(it.type != type) throw diffError(ii, it, this);
     final long m = mon - ((Dur) it).mon;
     return m < 0 ? -1 : m > 0 ? 1 : 0;
   }

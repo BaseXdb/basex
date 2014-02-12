@@ -3,14 +3,14 @@ package org.basex.query.regex;
 /**
  * Character group.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public class CharGroup extends RegExp {
   /** Negation flag, set after construction. */
   public boolean negative;
   /** Sub-ranges. */
-  public final RegExp[] subs;
+  private final RegExp[] subs;
   /**
    * Constructor.
    * @param sub sub-ranges

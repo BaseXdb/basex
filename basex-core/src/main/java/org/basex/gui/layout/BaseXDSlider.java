@@ -11,7 +11,7 @@ import org.basex.gui.GUIConstants.Fill;
 /**
  * DoubleSlider implementation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class BaseXDSlider extends BaseXPanel {
@@ -66,7 +66,7 @@ public final class BaseXDSlider extends BaseXPanel {
     min = mn;
     max = mx;
     // choose logarithmic scaling for larger ranges
-    log = Math.log(totMax) - Math.log(totMin) > 5 && totMax - totMin > 100;
+    log = StrictMath.log(totMax) - StrictMath.log(totMin) > 5 && totMax - totMin > 100;
     mode(Fill.NONE).setFocusable(true);
 
     BaseXLayout.setHeight(this, getFont().getSize() + 9);
@@ -151,10 +151,10 @@ public final class BaseXDSlider extends BaseXPanel {
     oldMax = min;
     double diffMin = 0;
     double diffMax = 0;
-    if(PREV.is(e)) {
+    if(PREVCHAR.is(e)) {
       diffMin = -1;
       diffMax = -1;
-    } else if(NEXT.is(e)) {
+    } else if(NEXTCHAR.is(e)) {
       diffMin = 1;
       diffMax = 1;
     } else if(PREVLINE.is(e)) {
@@ -263,7 +263,7 @@ public final class BaseXDSlider extends BaseXPanel {
    * @return new value
    */
   double encode(final double v) {
-    return log ? Math.log(v + 1) : v;
+    return log ? StrictMath.log(v + 1) : v;
   }
 
   /**
@@ -272,7 +272,7 @@ public final class BaseXDSlider extends BaseXPanel {
    * @return new value
    */
   private double decode(final double v) {
-    return log ? Math.exp(v) - 1 : v;
+    return log ? StrictMath.exp(v) - 1 : v;
   }
 
   /**
@@ -282,8 +282,7 @@ public final class BaseXDSlider extends BaseXPanel {
    * @param val value
    * @return new value
    */
-  private static double limit(final double mn, final double mx,
-      final double val) {
+  private static double limit(final double mn, final double mx, final double val) {
     return Math.max(mn, Math.min(mx, val));
   }
 

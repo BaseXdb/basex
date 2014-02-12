@@ -82,21 +82,33 @@ public final class XQDoc extends Inspect {
     // functions
     final FElem functions = elem("functions", xqdoc);
     for(final StaticFunc sf : qp.funcs) {
-      final int al = sf.args.length;
+      final int al = sf.arity();
+      final QNm name = sf.funcName();
+      final FuncType t = sf.funcType();
       final FElem function = elem("function", functions).add("arity", token(al));
       comment(sf, function);
-      elem("name", function).add(sf.name.string());
-      if(sf.name.hasPrefix()) nsCache.put(sf.name.prefix(), sf.name.uri());
+      elem("name", function).add(name.string());
+      if(name.hasPrefix()) nsCache.put(name.prefix(), name.uri());
       annotations(sf.ann, function);
 
-      elem("signature", function).add(sf.toString().replaceAll(" \\{.*| \\w+;.*", ""));
+      final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(sf.ann);
+      tb.add(FUNCTION).add(' ').add(name.string()).add(PAR1);
+      for(int i = 0; i < al; i++) {
+        final Var v = sf.args[i];
+        if(i > 0) tb.add(SEP);
+        tb.add(DOLLAR).add(v.name.string()).add(' ').add(AS).add(' ').addExt(t.args[i]);
+      }
+      tb.add(PAR2).add(' ' + AS + ' ' + t.ret);
+      if(sf.expr == null) tb.add(" external");
+
+      elem("signature", function).add(tb.toString());
       if(al != 0) {
         final FElem fparameters = elem("parameters", function);
         for(int a = 0; a < al; a++) {
           final FElem fparameter = elem("parameter", fparameters);
           final Var v = sf.args[a];
           elem("name", fparameter).add(v.name.string());
-          type(v.declType, fparameter);
+          type(t.args[a], fparameter);
         }
       }
       type(sf.type(), elem("return", function));
@@ -153,7 +165,7 @@ public final class XQDoc extends Inspect {
    * @param st sequence type
    * @param parent parent node
    */
-  protected void type(final SeqType st, final FElem parent) {
+  void type(final SeqType st, final FElem parent) {
     if(st == null) return;
     final FElem type = elem("type", parent).add(st.typeString());
     final String occ = st.occ.toString();

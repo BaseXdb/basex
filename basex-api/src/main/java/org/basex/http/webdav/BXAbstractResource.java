@@ -5,7 +5,6 @@ import static com.bradmcevoy.http.LockResult.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.core.Prop;
 import org.basex.http.webdav.impl.ResourceMetaData;
 import org.basex.http.webdav.impl.WebDAVService;
 import org.basex.util.*;
@@ -26,20 +25,20 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public abstract class BXAbstractResource implements
-    CopyableResource, DeletableResource, MoveableResource, LockableResource {
+public abstract class BXAbstractResource implements CopyableResource, DeletableResource,
+    MoveableResource, LockableResource {
+
   /** Resource meta data. */
-  protected final ResourceMetaData meta;
+  final ResourceMetaData meta;
   /** WebDAV service implementation. */
-  protected final WebDAVService<BXAbstractResource> service;
+  final WebDAVService<BXAbstractResource> service;
 
   /**
    * Constructor.
    * @param m resource meta data
    * @param s service
    */
-  protected BXAbstractResource(final ResourceMetaData m,
-      final WebDAVService<BXAbstractResource> s) {
+  BXAbstractResource(final ResourceMetaData m, final WebDAVService<BXAbstractResource> s) {
     meta = m;
     service = s;
   }
@@ -199,7 +198,7 @@ public abstract class BXAbstractResource implements
    * Delete document or folder.
    * @throws IOException I/O exception
    */
-  protected void del() throws IOException {
+  void del() throws IOException {
     service.delete(meta.db, meta.path);
   }
 
@@ -208,7 +207,7 @@ public abstract class BXAbstractResource implements
    * @param n new name
    * @throws IOException I/O exception
    */
-  protected void rename(final String n) throws IOException {
+  void rename(final String n) throws IOException {
     service.rename(meta.db, meta.path, n);
   }
 
@@ -232,7 +231,7 @@ public abstract class BXAbstractResource implements
    * @param n new name of the folder (database)
    * @throws IOException I/O exception
    */
-  protected void moveToRoot(final String n) throws IOException {
+  void moveToRoot(final String n) throws IOException {
     // folder is moved to the root: create new database with it
     copyToRoot(n);
     del();
@@ -244,7 +243,7 @@ public abstract class BXAbstractResource implements
    * @param n new name of the folder
    * @throws IOException I/O exception
    */
-  void moveTo(final BXFolder f, final String n) throws IOException {
+  final void moveTo(final BXFolder f, final String n) throws IOException {
     if(f.meta.db.equals(meta.db)) {
       // folder is moved to a folder in the same database
       rename(f.meta.path + SEP + n);
@@ -262,7 +261,7 @@ public abstract class BXAbstractResource implements
    * @return lock result
    * @throws IOException I/O exception
    */
-  LockResult lockResource(final LockTimeout timeout, final LockInfo lockInfo)
+  final LockResult lockResource(final LockTimeout timeout, final LockInfo lockInfo)
       throws IOException {
 
     final String tokenId = service.locking.lock(meta.db, meta.path,
@@ -281,7 +280,7 @@ public abstract class BXAbstractResource implements
    * @return the token of the active lock or {@code null} if resource is not locked
    * @throws IOException I/O exception
    */
-  LockToken getCurrentActiveLock() throws IOException {
+  final LockToken getCurrentActiveLock() throws IOException {
     final String lockInfoStr = service.locking.lock(meta.db, meta.path);
     return lockInfoStr == null ? null : parseLockInfo(lockInfoStr);
   }
@@ -292,7 +291,7 @@ public abstract class BXAbstractResource implements
    * @return lock result
    * @throws IOException I/O exception
    */
-  LockResult refresh(final String token) throws IOException {
+  final LockResult refresh(final String token) throws IOException {
     service.locking.refreshLock(token);
     final String lockInfoStr = service.locking.lock(token);
     final LockToken lockToken = lockInfoStr == null ? null : parseLockInfo(lockInfoStr);
@@ -341,9 +340,7 @@ public abstract class BXAbstractResource implements
     }
 
     @Override
-    public void characters(final char[] ch, final int start, final int length)
-        throws SAXException {
-
+    public void characters(final char[] ch, final int start, final int length) {
       final String v = String.valueOf(ch, start, length);
       if("token".equals(elementName))
         lockToken.tokenId = v;

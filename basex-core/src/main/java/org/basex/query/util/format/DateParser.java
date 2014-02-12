@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * Parser for formatting dates.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class DateParser extends TokenParser {
@@ -33,10 +33,10 @@ final class DateParser extends TokenParser {
   int literal() throws QueryException {
     final int ch = next();
     if(ch == '[') { // check begin of variable marker
-      if(!more()) PICDATE.thrw(info, token); // [$
-      if(!consume(ch)) return -1; // [...
+      if(!more()) throw PICDATE.get(info, token); // [$
+      if(!consume('[')) return -1; // [...
     } else if(ch == ']') { // check end of variable marker
-      if(!consume(ch)) PICDATE.thrw(info, token); // ]$ or ]...
+      if(!consume(']')) throw PICDATE.get(info, token); // ]$ or ]...
     }
     return ch;
   }
@@ -53,6 +53,6 @@ final class DateParser extends TokenParser {
       if(ch == ']') return tb.finish();
       if(!Character.isWhitespace(ch)) tb.add(ch);
     }
-    throw PICDATE.thrw(info, token);
+    throw PICDATE.get(info, token);
   }
 }

@@ -2,7 +2,6 @@ package org.basex.query.up.primitives;
 
 import org.basex.data.*;
 import org.basex.data.atomic.*;
-import org.basex.query.*;
 import org.basex.query.up.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
@@ -11,7 +10,7 @@ import org.basex.util.*;
 /**
  * Insert into as first primitive.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class InsertIntoAsFirst extends NodeCopy {
@@ -28,13 +27,13 @@ public final class InsertIntoAsFirst extends NodeCopy {
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) throws QueryException {
+  public void merge(final UpdatePrimitive p) {
     final ANodeList newInsert = ((NodeCopy) p).insert;
     for(final ANode n : newInsert) insert.add(n);
   }
 
   @Override
-  public void addAtomics(final AtomicUpdateList l) {
+  public void addAtomics(final AtomicUpdateCache l) {
     l.addInsert(targetPre + data.attSize(targetPre, data.kind(targetPre)), targetPre,
         insseq, false);
   }

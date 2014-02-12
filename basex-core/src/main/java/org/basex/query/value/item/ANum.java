@@ -10,7 +10,7 @@ import org.basex.util.*;
  * Abstract super class for all numeric items.
  * Useful for removing exceptions and unifying hash values.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public abstract class ANum extends Item {
@@ -48,7 +48,7 @@ public abstract class ANum extends Item {
    * Returns a string representation of the value.
    * @return string value
    */
-  public abstract byte[] string();
+  protected abstract byte[] string();
 
   /**
    * Returns an integer (long) representation of the value.
@@ -66,7 +66,7 @@ public abstract class ANum extends Item {
    * Returns an float representation of the value.
    * @return float value
    */
-  public abstract float flt();
+  protected abstract float flt();
 
   @Override
   public Item test(final QueryContext ctx, final InputInfo ii) throws QueryException {

@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * Simple Thesaurus for full-text requests.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Thesaurus {
@@ -25,7 +25,7 @@ public final class Thesaurus {
   private final TokenObjMap<ThesNode> nodes = new TokenObjMap<ThesNode>();
   /** Relationships. */
   private static final TokenMap RSHIPS = new TokenMap();
-  /** Database properties. */
+  /** Database context. */
   private final Context ctx;
 
   static {
@@ -109,13 +109,13 @@ public final class Thesaurus {
    */
   private void init(final InputInfo ii) throws QueryException {
     try {
-      final Data data = MemBuilder.build(Parser.xmlParser(file, ctx.prop));
+      final Data data = MemBuilder.build(Parser.xmlParser(file, ctx.options));
       final Nodes result = nodes("//*:entry", new Nodes(0, data));
       for(int n = 0; n < result.size(); ++n) {
         build(new Nodes(result.pres[n], data));
       }
     } catch(final IOException ex) {
-      NOTHES.thrw(ii, file);
+      throw NOTHES.get(ii, file);
     }
   }
 
@@ -185,9 +185,8 @@ public final class Thesaurus {
    * @param ft token
    * @throws QueryException query exception
    */
-  void find(final InputInfo ii, final TokenList list, final byte[] ft)
-      throws QueryException {
-    if(nodes.size() == 0) init(ii);
+  void find(final InputInfo ii, final TokenList list, final byte[] ft) throws QueryException {
+    if(nodes.isEmpty()) init(ii);
     find(list, nodes.get(ft), 1);
   }
 

@@ -4,8 +4,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import javax.xml.parsers.*;
-
 import org.basex.api.dom.*;
 import org.basex.build.*;
 import org.basex.build.Parser;
@@ -13,7 +11,9 @@ import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.io.out.*;
+import org.basex.io.parse.xml.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.node.*;
@@ -25,7 +25,7 @@ import org.xmldb.api.modules.*;
 /**
  * Implementation of the XMLResource Interface for the XMLDB:API.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class BXXMLResource implements XMLResource, BXXMLDBText {
@@ -170,24 +170,17 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
   @Override
   public void getContentAsSAX(final ContentHandler handler) throws XMLDBException {
     if(handler == null) throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
-
-    final SAXParserFactory factory = SAXParserFactory.newInstance();
-    factory.setNamespaceAware(true);
-    factory.setValidating(false);
     try {
-      // caching should be avoided and replaced by a stream reader...
-      final XMLReader reader = factory.newSAXParser().getXMLReader();
-      reader.setContentHandler(handler);
-      reader.parse(new InputSource(new StringReader(getContent().toString())));
+      new XmlParser().contentHandler(handler).parse(new ArrayInput(getContent().toString()));
     } catch(final Exception pce) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, pce.getMessage());
     }
   }
 
   @Override
-  public ContentHandler setContentAsSAX() throws XMLDBException {
+  public ContentHandler setContentAsSAX() {
     // ..might be replaced by a custom SAX content handler in future
-    final MemBuilder mb = new MemBuilder("", Parser.emptyParser(new Prop()));
+    final MemBuilder mb = new MemBuilder("", Parser.emptyParser(new MainOptions()));
     mb.init();
     return new BXSAXContentHandler(this, mb);
   }
@@ -211,7 +204,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     public void endDocument() throws SAXException {
       try {
         res.content = new DBNode(((MemBuilder) builder).data()).serialize().toArray();
-      } catch(final QueryException ex) {
+      } catch(final QueryIOException ex) {
         error(new BaseXException(ex));
       }
     }

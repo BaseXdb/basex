@@ -25,10 +25,10 @@ import org.basex.util.hash.*;
  * Abstract value.
  *
  * This class also implements the {@link Iterable} interface, which is why all of its
- * values can also be retrieved via enhanced for (for-each) loops. The default
+ * values can also be retrieved via enhanced for(for-each) loops. The default
  * {@link #iter()} method will provide better performance.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Value extends Expr implements Iterable<Item> {
@@ -39,7 +39,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * Constructor.
    * @param t data type
    */
-  public Value(final Type t) {
+  protected Value(final Type t) {
     type = t;
   }
 
@@ -113,15 +113,14 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
     // values do not contain variable references
     return null;
   }
 
   @Override
-  public Value copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public Value copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return this;
   }
 
@@ -153,7 +152,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
    */
   public final ValueBuilder cache() {
     final ValueBuilder vb = new ValueBuilder((int) size());
-    vb.size(writeTo(vb.item, 0));
+    vb.size(writeTo(vb.items(), 0));
     return vb;
   }
 
@@ -161,19 +160,17 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * Serializes the value, using the standard XML serializer,
    * and returns the cached result.
    * @return serialized value
-   * @throws QueryException query exception
+   * @throws QueryIOException query I/O exception
    */
-  public final ArrayOutput serialize() throws QueryException {
+  public final ArrayOutput serialize() throws QueryIOException {
     final ArrayOutput ao = new ArrayOutput();
     try {
       final Serializer ser = Serializer.get(ao);
       final ValueIter vi = iter();
       for(Item it; (it = vi.next()) != null;) ser.serialize(it);
       ser.close();
-    } catch(final SerializerException ex) {
-      throw ex.getCause(null);
     } catch(final IOException ex) {
-      SERANY.thrw(null, ex);
+      throw SERANY.getIO(ex);
     }
     return ao;
   }

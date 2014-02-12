@@ -8,7 +8,7 @@ import org.basex.util.list.*;
 /**
  * This class determines nodes per level and caches them.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Wolfgang Miller
  */
 final class TreeNodeCache implements TreeConstants {
@@ -59,7 +59,7 @@ final class TreeNodeCache implements TreeConstants {
     final int l = 0;
     final int r = nodes[lv].size() - 1;
     int min = searchPreIndex(lv, lp, rp, l, r);
-    if(min == -1) return min;
+    if(min == -1) return -1;
     final int[] n = nodes[lv].toArray();
     while(min-- > 0 && n[min] > lp);
     return min + 1;
@@ -147,9 +147,7 @@ final class TreeNodeCache implements TreeConstants {
    * @param r right array TreeBorder
    * @return result index
    */
-  int searchPreIndex(final int lv, final int lb, final int rb, final int l,
-      final int r) {
-
+  int searchPreIndex(final int lv, final int lb, final int rb, final int l, final int r) {
     int index = -1;
     int ll = l;
     int rr = r;

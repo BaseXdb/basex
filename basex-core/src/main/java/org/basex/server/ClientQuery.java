@@ -10,7 +10,7 @@ import org.basex.io.in.*;
  * client/server architecture. All sent data is received by the
  * {@link ClientListener} and interpreted by the {@link QueryListener}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class ClientQuery extends Query {
@@ -26,8 +26,8 @@ public class ClientQuery extends Query {
    * @param os output stream
    * @throws IOException I/O exception
    */
-  public ClientQuery(final String query, final ClientSession session,
-      final OutputStream os) throws IOException {
+  public ClientQuery(final String query, final ClientSession session, final OutputStream os)
+      throws IOException {
 
     cs = session;
     id = cs.exec(ServerCmd.QUERY, query, null);

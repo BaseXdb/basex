@@ -19,7 +19,7 @@ import org.basex.util.*;
 /**
  * Parses the package descriptors and performs schema checks.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  */
 public final class PkgParser {
@@ -49,18 +49,18 @@ public final class PkgParser {
     try {
       final byte[] content = io.read();
 
-      final DBNode doc = new DBNode(new IOContent(content), repo.context.prop);
+      final DBNode doc = new DBNode(new IOContent(content), repo.context.options);
       final ANode node = childElements(doc).next();
 
       // checks root node
       if(!eqNS(PACKAGE, node.qname()))
-        BXRE_DESC.thrw(info, Util.info(WHICHELEM, node.qname()));
+        throw BXRE_DESC.get(info, Util.info(WHICHELEM, node.qname()));
 
       parseAttributes(node, pkg, PACKAGE);
       parseChildren(node, pkg);
       return pkg;
     } catch(final IOException ex) {
-      throw BXRE_PARSE.thrw(info, io.name(), ex);
+      throw BXRE_PARSE.get(info, io.name(), ex);
     }
   }
 
@@ -81,18 +81,18 @@ public final class PkgParser {
       else if(eq(A_ABBREV, name))  p.abbrev = next.string();
       else if(eq(A_VERSION, name)) p.version = next.string();
       else if(eq(A_SPEC, name))    p.spec = next.string();
-      else BXRE_DESC.thrw(info, Util.info(WHICHATTR, name));
+      else throw BXRE_DESC.get(info, Util.info(WHICHATTR, name));
     }
 
     // check mandatory attributes
     if(p.name == null)
-      BXRE_DESC.thrw(info, Util.info(MISSATTR, A_NAME, root));
+      throw BXRE_DESC.get(info, Util.info(MISSATTR, A_NAME, root));
     if(p.version == null)
-      BXRE_DESC.thrw(info, Util.info(MISSATTR, A_VERSION, root));
+      throw BXRE_DESC.get(info, Util.info(MISSATTR, A_VERSION, root));
     if(p.abbrev == null)
-      BXRE_DESC.thrw(info, Util.info(MISSATTR, A_ABBREV, root));
+      throw BXRE_DESC.get(info, Util.info(MISSATTR, A_ABBREV, root));
     if(p.spec == null)
-      BXRE_DESC.thrw(info, Util.info(MISSATTR, A_SPEC, root));
+      throw BXRE_DESC.get(info, Util.info(MISSATTR, A_SPEC, root));
   }
 
   /**
@@ -127,7 +127,7 @@ public final class PkgParser {
       else if(eq(A_SEMVER, name))    d.semver = next.string();
       else if(eq(A_SEMVER_MIN, name)) d.semverMin = next.string();
       else if(eq(A_SEMVER_MAX, name)) d.semverMax = next.string();
-      else BXRE_DESC.thrw(info, Util.info(WHICHATTR, name));
+      else throw BXRE_DESC.get(info, Util.info(WHICHATTR, name));
     }
     return d;
   }
@@ -145,12 +145,12 @@ public final class PkgParser {
       final QNm name = next.qname();
       if(eqNS(A_NAMESPACE, name)) c.uri = next.string();
       else if(eqNS(A_FILE, name)) c.file = next.string();
-      else BXRE_DESC.thrw(info, Util.info(WHICHELEM, name));
+      else throw BXRE_DESC.get(info, Util.info(WHICHELEM, name));
     }
 
     // check mandatory children
-    if(c.uri == null) BXRE_DESC.thrw(info, Util.info(MISSCOMP, A_NAMESPACE));
-    if(c.file == null) BXRE_DESC.thrw(info, Util.info(MISSCOMP, A_FILE));
+    if(c.uri == null) throw BXRE_DESC.get(info, Util.info(MISSCOMP, A_NAMESPACE));
+    if(c.file == null) throw BXRE_DESC.get(info, Util.info(MISSCOMP, A_FILE));
     return c;
   }
 

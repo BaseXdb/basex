@@ -46,11 +46,11 @@ import org.basex.util.list.*;
  * <li> Before applying the updates the {@link UpdatePrimitiveComparator} helps to order
  *      {@link UpdatePrimitive} for execution. Each primitive then creates a sequence of
  *      {@link BasicUpdate} which are passed to the {@link Data} layer via an
- *      {@link AtomicUpdateList}. This list takes care of optimization and also text node
+ *      {@link AtomicUpdateCache}. This list takes care of optimization and also text node
  *      merging.</li>
  * </ol>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class Updates {
@@ -100,7 +100,7 @@ public final class Updates {
     MemData data = fragmentIDs.get(ancID);
     // if data doesn't exist, create a new one
     if(data == null) {
-      data =  (MemData) anc.dbCopy(ctx.context.prop).data;
+      data =  (MemData) anc.dbCopy(ctx.context.options).data;
       // create a mapping between the fragment id and the data reference
       fragmentIDs.put(ancID, data);
     }
@@ -146,8 +146,7 @@ public final class Updates {
    * @return pre value
    */
   private static int preSteps(final ANode node, final int trgID) {
-    if(node.id == trgID)
-      return 0;
+    if(node.id == trgID) return 0;
 
     int s = 1;
     AxisIter it = node.attributes();
@@ -158,7 +157,8 @@ public final class Updates {
     }
 
     it = node.children();
-    for(ANode n; (n = it.next()) != null && n.id <= trgID;) {
+    // n.id <= trgID: rewritten to catch ID overflow
+    for(ANode n; (n = it.next()) != null && trgID - n.id >= 0;) {
       s += preSteps(n, trgID);
     }
     return s;

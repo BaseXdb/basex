@@ -11,7 +11,7 @@ import org.xml.sax.*;
 /**
  * XML Schemas for REST requests.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 enum RESTSchema {
@@ -22,13 +22,13 @@ enum RESTSchema {
   private final Schema schema;
 
   /** Constructor. */
-  private RESTSchema() {
+  RESTSchema() {
     Schema s = null;
     try {
       s = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).
           newSchema(new StreamSource(new ArrayInput(Token.token(SCHEMA_CONTENT))));
     } catch(final SAXException ex) {
-      Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
     schema = s;
   }

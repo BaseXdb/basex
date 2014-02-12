@@ -11,10 +11,10 @@ import org.basex.util.*;
 /**
  * Parser for formatting integers in dates and times.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class DateFormat extends FormatParser {
+final class DateFormat extends FormatParser {
   /** With pattern: ","  min-width ("-" max-width)?. */
   private static final Pattern WIDTH = Pattern.compile("^(\\*|\\d+)(-(\\*|\\d+))?$");
 
@@ -25,9 +25,7 @@ public final class DateFormat extends FormatParser {
    * @param ii input info
    * @throws QueryException query exception
    */
-  public DateFormat(final byte[] pic, final byte[] df, final InputInfo ii)
-      throws QueryException {
-
+  DateFormat(final byte[] pic, final byte[] df, final InputInfo ii) throws QueryException {
     super(ii);
 
     // split variable marker
@@ -51,7 +49,7 @@ public final class DateFormat extends FormatParser {
     final byte[] width = comma == -1 ? null : substring(pic, comma + 1);
     if(width != null) {
       final Matcher m = WIDTH.matcher(string(width));
-      if(!m.find()) PICDATE.thrw(ii, width);
+      if(!m.find()) throw PICDATE.get(ii, width);
       int i = toInt(m.group(1));
       if(i != Integer.MIN_VALUE) min = i;
       final String mc = m.group(3);

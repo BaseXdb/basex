@@ -6,14 +6,14 @@ import java.io.*;
 import java.nio.*;
 import java.nio.charset.*;
 
-import org.basex.io.serial.*;
+import org.basex.util.*;
 
 /**
  * This abstract class specifies a single method for decoding input to UTF-8.
  * The inheriting classes are optimized for performance and faster than Java's
  * default decoders.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 abstract class TextDecoder {
@@ -32,17 +32,17 @@ abstract class TextDecoder {
 
   /**
    * Returns a decoder for the specified encoding.
-   * @param enc encoding
+   * @param enc encoding, normalized via {@link Token#normEncoding}.
    * @return decoder
    * @throws IOException I/O exception
    */
   static TextDecoder get(final String enc) throws IOException {
     final TextDecoder td;
-    if(enc == UTF8) td = new TextDecoder.UTF8();
-    else if(enc == UTF32) td = new TextDecoder.UTF32();
-    else if(enc == UTF16LE) td = new TextDecoder.UTF16LE();
-    else if(enc == UTF16BE) td = new TextDecoder.UTF16BE();
-    else td = new TextDecoder.Generic(enc);
+    if(enc == UTF8) td = new UTF8();
+    else if(enc == UTF32) td = new UTF32();
+    else if(enc == UTF16LE) td = new UTF16LE();
+    else if(enc == UTF16 || enc == UTF16BE) td = new UTF16BE();
+    else td = new Generic(enc);
     td.encoding = enc;
     return td;
   }

@@ -53,8 +53,7 @@ public final class BXRoot extends BXFolder {
       @Override
       public BXAbstractResource get() throws IOException {
         return service.dbExists(name) ?
-          new BXDatabase(new ResourceMetaData(name, service.timestamp(name)), service) :
-          null;
+          new BXDatabase(new ResourceMetaData(name, service.timestamp(name)), service) : null;
       }
     }.evalNoEx();
   }

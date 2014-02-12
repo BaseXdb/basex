@@ -15,18 +15,19 @@ import org.basex.util.hash.*;
 /**
  * PI fragment.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class CPI extends CName {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param n name
    * @param v value
    */
-  public CPI(final InputInfo ii, final Expr n, final Expr v) {
-    super(PI, ii, n, v);
+  public CPI(final StaticContext sctx, final InputInfo ii, final Expr n, final Expr v) {
+    super(PI, sctx, ii, n, v);
     type = SeqType.PI;
   }
 
@@ -34,11 +35,11 @@ public final class CPI extends CName {
   public FPI item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Item it = checkItem(name, ctx);
     final Type ip = it.type;
-    if(!ip.isStringOrUntyped() && ip != AtomType.QNM) CPIWRONG.thrw(info, it);
+    if(!ip.isStringOrUntyped() && ip != AtomType.QNM) throw CPIWRONG.get(info, it);
 
     final byte[] nm = trim(it.string(ii));
-    if(eq(lc(nm), XML)) CPIXML.thrw(info, nm);
-    if(!XMLToken.isNCName(nm)) CPIINVAL.thrw(info, nm);
+    if(eq(lc(nm), XML)) throw CPIXML.get(info, nm);
+    if(!XMLToken.isNCName(nm)) throw CPIINVAL.get(info, nm);
 
     byte[] v = value(ctx, ii);
     int i = -1;
@@ -49,6 +50,6 @@ public final class CPI extends CName {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CPI(info, name.copy(ctx, scp, vs), expr[0].copy(ctx, scp, vs));
+    return new CPI(sc, info, name.copy(ctx, scp, vs), expr[0].copy(ctx, scp, vs));
   }
 }

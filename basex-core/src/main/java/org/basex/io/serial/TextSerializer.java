@@ -5,18 +5,18 @@ import java.io.*;
 /**
  * This class serializes data as text.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class TextSerializer extends OutputSerializer {
   /**
    * Constructor, specifying serialization options.
    * @param os output stream reference
-   * @param p serialization properties
+   * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  TextSerializer(final OutputStream os, final SerializerProp p) throws IOException {
-    super(os, p);
+  TextSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
+    super(os, sopts);
   }
 
   @Override
@@ -41,7 +41,7 @@ public class TextSerializer extends OutputSerializer {
   protected void finishClose() throws IOException { }
 
   @Override
-  protected void code(final int ch) throws IOException {
+  protected void encode(final int ch) throws IOException {
     printChar(ch);
   }
 }

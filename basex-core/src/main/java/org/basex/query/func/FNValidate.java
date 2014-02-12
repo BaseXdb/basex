@@ -30,19 +30,21 @@ import org.xml.sax.helpers.*;
 /**
  * Functions for validating documents.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Michael Seiferle
  * @author Marco Lettere (greedy/verbose validation)
  */
 public final class FNValidate extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNValidate(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNValidate(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -83,7 +85,7 @@ public final class FNValidate extends StandardFunc {
   private Item xsd(final QueryContext ctx) throws QueryException {
     final Value seq = xsdInfo(ctx);
     if(seq == Empty.SEQ) return null;
-    throw BXVA_FAIL.thrw(info, seq.iter().next());
+    throw BXVA_FAIL.get(info, seq.iter().next());
   }
 
   /**
@@ -117,12 +119,9 @@ public final class FNValidate extends StandardFunc {
   private Value xsdInfo(final QueryContext ctx) throws QueryException {
     return process(new Validate() {
       @Override
-      void process(final ErrorHandler handler)
-          throws IOException, SAXException, QueryException {
-
+      void process(final ErrorHandler handler) throws IOException, SAXException, QueryException {
         final IO in = read(checkItem(expr[0], ctx), ctx, null);
-        final SchemaFactory sf = SchemaFactory.newInstance(
-            XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         final Schema schema;
         if(expr.length < 2) {
           // assume that schema declaration is included in document
@@ -130,11 +129,10 @@ public final class FNValidate extends StandardFunc {
         } else {
           final Item it = checkItem(expr[1], ctx);
           // schema specified as string
-          IO sc = read(it, ctx, null);
-          if(!sc.exists()) WHICHRES.thrw(info, sc);
-          tmp = createTmp(sc);
-          if(tmp != null) sc = tmp;
-          schema = sf.newSchema(new URL(sc.url()));
+          IO scio = read(it, ctx, null);
+          tmp = createTmp(scio);
+          if(tmp != null) scio = tmp;
+          schema = sf.newSchema(new URL(scio.url()));
         }
 
         final Validator v = schema.newValidator();
@@ -153,7 +151,7 @@ public final class FNValidate extends StandardFunc {
   private Item dtd(final QueryContext ctx) throws QueryException {
     final Value seq = dtdInfo(ctx);
     if(seq == Empty.SEQ) return null;
-    throw BXVA_FAIL.thrw(info, seq.iter().next());
+    throw BXVA_FAIL.get(info, seq.iter().next());
   }
 
   /**
@@ -186,17 +184,15 @@ public final class FNValidate extends StandardFunc {
           throws IOException, ParserConfigurationException, SAXException, QueryException {
 
         final Item it = checkItem(expr[0], ctx);
-        SerializerProp sp = null;
+        SerializerOptions sp = null;
 
-        // integrate doctype declaration via serialization properties
+        // integrate doctype declaration via serialization parameters
         if(expr.length > 1) {
-          sp = new SerializerProp();
-          final String dtd = string(checkStr(expr[1], ctx));
-          IO sc = IO.get(dtd);
-          if(!sc.exists()) WHICHRES.thrw(info, dtd);
-          tmp = createTmp(sc);
-          if(tmp != null) sc = tmp;
-          sp.set(SerializerProp.S_DOCTYPE_SYSTEM, sc.url());
+          sp = new SerializerOptions();
+          IO dtd = checkPath(expr[1], ctx);
+          tmp = createTmp(dtd);
+          if(tmp != null) dtd = tmp;
+          sp.set(SerializerOptions.DOCTYPE_SYSTEM, dtd.url());
         }
 
         final IO in = read(it, ctx, sp);
@@ -217,12 +213,10 @@ public final class FNValidate extends StandardFunc {
     final ErrorHandler handler = new ErrorHandler();
     try {
       v.process(handler);
-    } catch(final QueryException ex) {
-      throw ex;
     } catch(final IOException ex) {
-      throw BXVA_START.thrw(info, ex);
+      throw BXVA_START.get(info, ex);
     } catch(final ParserConfigurationException ex) {
-      throw BXVA_START.thrw(info, ex);
+      throw BXVA_START.get(info, ex);
     } catch(final SAXException ex) {
       // fatal exception: get original message
       Throwable e = ex;
@@ -230,7 +224,7 @@ public final class FNValidate extends StandardFunc {
         Util.debug(e);
         e = e.getCause();
       }
-      return Str.get(Text.FATAL_C + ex.getLocalizedMessage());
+      return Str.get("Fatal" + Text.COL + ex.getLocalizedMessage());
     } finally {
       if(v.tmp != null) v.tmp.delete();
     }
@@ -245,7 +239,7 @@ public final class FNValidate extends StandardFunc {
    * @return resulting file
    * @throws IOException I/O exception
    */
-  static IOFile createTmp(final IO in) throws IOException {
+  private static IOFile createTmp(final IO in) throws IOException {
     if(!(in instanceof IOContent || in instanceof IOStream)) return null;
     final IOFile tmp = new IOFile(File.createTempFile("validate", IO.BASEXSUFFIX));
     tmp.write(in.read());
@@ -256,37 +250,35 @@ public final class FNValidate extends StandardFunc {
    * Returns an input reference (possibly cached) to the first argument.
    * @param it item
    * @param ctx query context
-   * @param sp serializer properties
+   * @param sopts serializer parameters
    * @return item
    * @throws QueryException query exception
    * @throws IOException exception
    */
-  IO read(final Item it, final QueryContext ctx, final SerializerProp sp)
+  IO read(final Item it, final QueryContext ctx, final SerializerOptions sopts)
       throws QueryException, IOException {
 
     if(it.type.isNode()) {
       // return node in string representation
       final ArrayOutput ao = new ArrayOutput();
-      Serializer.get(ao, sp).serialize(it);
+      Serializer.get(ao, sopts).serialize(it);
       final IOContent io = new IOContent(ao.toArray());
       io.name(string(((ANode) it).baseURI()));
       return io;
     }
 
     if(it.type.isStringOrUntyped()) {
-      final String path = string(it.string(info));
-      IO io = IO.get(path);
-      if(!io.exists()) WHICHRES.thrw(info, path);
-      if(sp != null) {
+      IO io = checkPath(it, ctx);
+      if(sopts != null) {
         // add doctype declaration if specified
         final ArrayOutput ao = new ArrayOutput();
-        Serializer.get(ao, sp).serialize(new DBNode(io, ctx.context.prop));
+        Serializer.get(ao, sopts).serialize(new DBNode(io, ctx.context.options));
         io = new IOContent(ao.toArray());
-        io.name(path);
+        io.name(io.path());
       }
       return io;
     }
-    throw STRNODTYPE.thrw(info, this, it.type);
+    throw STRNODTYPE.get(info, this, it.type);
   }
 
   /** Schema error handler. */
@@ -296,17 +288,17 @@ public final class FNValidate extends StandardFunc {
 
     @Override
     public void fatalError(final SAXParseException ex) {
-      error(ex, Text.FATAL_C);
+      error(ex, "Fatal");
     }
 
     @Override
     public void error(final SAXParseException ex) {
-      error(ex, Text.ERROR_C);
+      error(ex, "Error");
     }
 
     @Override
     public void warning(final SAXParseException ex) {
-      error(ex, Text.WARNING_C);
+      error(ex, "Warning");
     }
 
     /**
@@ -329,14 +321,14 @@ public final class FNValidate extends StandardFunc {
         report.add(": ").add(msg);
         msg = report.toString();
       }
-      exceptions.add(type + msg);
+      exceptions.add(type + Text.COL + msg);
     }
 
     /**
      * Returns the exception messages.
      * @return exception messages
      */
-    protected TokenList getExceptions() {
+    TokenList getExceptions() {
       return exceptions;
     }
   }

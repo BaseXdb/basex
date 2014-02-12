@@ -1,13 +1,11 @@
 package org.basex.query.func;
 
-import static org.basex.util.Token.*;
-
-import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.inspect.*;
 import org.basex.query.value.item.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -19,19 +17,21 @@ import org.basex.util.*;
 public final class FNInspect extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNInspect(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNInspect(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case _INSPECT_FUNCTIONS: return contextFunctions(ctx);
-      default:                         return super.iter(ctx);
+      case _INSPECT_FUNCTIONS: return functions(ctx);
+      default:                 return super.iter(ctx);
     }
   }
 
@@ -46,6 +46,15 @@ public final class FNInspect extends StandardFunc {
     }
   }
 
+  @Override
+  protected Expr opt(final QueryContext ctx, final VarScope scp) throws QueryException {
+    if(sig == Function._INSPECT_FUNCTIONS) {
+      for(final StaticFunc sf : ctx.funcs.funcs()) sf.compile(ctx);
+      return functions(ctx).value();
+    }
+    return this;
+  }
+
   /**
    * Performs the function function.
    * @param ctx query context
@@ -54,8 +63,9 @@ public final class FNInspect extends StandardFunc {
    */
   private Item function(final QueryContext ctx) throws QueryException {
     final FItem f = checkFunc(expr[0], ctx);
-    final StaticFunc sf = f instanceof FuncItem ? ((FuncItem) f).func : null;
-    return new PlainDoc(ctx, info).function(f.fName(), sf, f.funcType(), null);
+    final StaticFunc sf = f.funcName() == null ? null :
+      ctx.funcs.get(f.funcName(), f.arity(), null);
+    return new PlainDoc(ctx, info).function(f.funcName(), sf, f.funcType(), null);
   }
 
   /**
@@ -76,7 +86,7 @@ public final class FNInspect extends StandardFunc {
    */
   private Item module(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    return new PlainDoc(ctx, info).parse(IO.get(string(checkStr(expr[0], ctx))));
+    return new PlainDoc(ctx, info).parse(checkPath(expr[0], ctx));
   }
 
   /**
@@ -87,18 +97,20 @@ public final class FNInspect extends StandardFunc {
    */
   private Item xqdoc(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    return new XQDoc(ctx, info).parse(IO.get(string(checkStr(expr[0], ctx))));
+    return new XQDoc(ctx, info).parse(checkPath(expr[0], ctx));
   }
 
   /**
-   * Performs the context-functions function.
+   * Performs the functions function.
    * @param ctx query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  private ValueBuilder contextFunctions(final QueryContext ctx) throws QueryException {
+  private ValueBuilder functions(final QueryContext ctx) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
-    for(final StaticFunc sf : ctx.funcs.funcs()) vb.add(Functions.getUser(sf, ctx, info));
+    for(final StaticFunc sf : ctx.funcs.funcs()) {
+      vb.add(Functions.getUser(sf, ctx, sf.sc, info));
+    }
     return vb;
   }
 }

@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 /**
  * Version according to the SemVer syntax.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  */
 public final class Version implements Comparable<Version> {
@@ -49,8 +49,8 @@ public final class Version implements Comparable<Version> {
 
   @Override
   public int compareTo(final Version ver) {
-    return major != ver.major ? major - ver.major :
-           minor != ver.minor ? minor - ver.minor : patch - ver.patch;
+    return major == ver.major ? minor == ver.minor ? patch - ver.patch : minor - ver.minor :
+      major - ver.major;
   }
 
   @Override

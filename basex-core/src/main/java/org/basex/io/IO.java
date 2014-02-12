@@ -18,7 +18,7 @@ import org.xml.sax.*;
  * be a local file ({@link IOFile}), a URL ({@link IOUrl}), a byte array
  * ({@link IOContent}), or a stream ({@link IOStream}).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class IO {
@@ -46,6 +46,8 @@ public abstract class IO {
   public static final String XARSUFFIX = ".xar";
   /** XQuery log suffix. */
   public static final String LOGSUFFIX = ".log";
+  /** Directory for raw files. */
+  public static final String RAW = "raw";
   /** File prefix. */
   public static final String FILEPREF = "file:";
 
@@ -57,12 +59,12 @@ public abstract class IO {
     { ZIPSUFFIX, GZSUFFIX, XARSUFFIX, ".docx", ".pptx", ".xslx", ".odt", ".odp", ".ods" };
   /** XML suffixes. */
   public static final String[] XMLSUFFIXES =
-    { XMLSUFFIX, ".xsd", ".svg", ".rdf", ".rss", ".rng", ".sch" };
-  /** XML suffixes. */
+    { XMLSUFFIX, ".xsd", ".svg", ".rdf", ".rss", ".rng", ".sch", ".xhtml" };
+  /** XSL suffixes. */
   public static final String[] XSLSUFFIXES =
     { ".xsl", ".xslt", ".fo", ".fob" };
   /** HTML suffixes. */
-  public static final String[] HTMLSUFFIXES = { ".xhtml", ".html", ".htm" };
+  public static final String[] HTMLSUFFIXES = { ".html", ".htm" };
   /** Text suffixes. */
   public static final String[] TXTSUFFIXES = {
     ".txt", ".text", ".ini", ".conf", ".md", ".log" };
@@ -86,7 +88,7 @@ public abstract class IO {
   /** File path. The path uses forward slashes, no matter which OS is used. */
   String path;
   /** File name. */
-  String name;
+  private String name;
   /** File length. */
   long len = -1;
 
@@ -106,8 +108,8 @@ public abstract class IO {
     path = p;
     final String n = p.substring(p.lastIndexOf('/') + 1);
     // use current time if no name is given
-    name = n.isEmpty() ? Long.toString(System.currentTimeMillis()) + IO.BASEXSUFFIX +
-                       IO.XMLSUFFIX : n;
+    name = n.isEmpty() ? Long.toString(System.currentTimeMillis()) + BASEXSUFFIX +
+                       XMLSUFFIX : n;
   }
 
   /**
@@ -236,7 +238,7 @@ public abstract class IO {
    * @return resulting reference
    */
   public IO merge(final String in) {
-    return IO.get(in);
+    return get(in);
   }
 
   /**

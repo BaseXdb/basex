@@ -21,12 +21,12 @@ import org.basex.util.list.*;
  * the currently opened database. This effectively eliminates all fragmentation
  * and can lead to significant space savings after updates.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class OptimizeAll extends ACreate {
   /** Current pre value. */
-  int pre;
+  private int pre;
   /** Data size. */
   private int size;
 
@@ -80,7 +80,7 @@ public final class OptimizeAll extends ACreate {
 
   @Override
   public void build(final CmdBuilder cb) {
-    cb.init(Cmd.OPTIMIZE + " " + C_ALL);
+    cb.init(Cmd.OPTIMIZE + " " + S_ALL);
   }
 
   /**
@@ -92,8 +92,8 @@ public final class OptimizeAll extends ACreate {
    * @throws IOException I/O Exception during index rebuild
    * @throws BaseXException database exception
    */
-  public static void optimizeAll(final Data data, final Context ctx,
-      final OptimizeAll cmd) throws IOException {
+  public static void optimizeAll(final Data data, final Context ctx, final OptimizeAll cmd)
+      throws IOException {
 
     if(data.inMemory()) throw new BaseXException(NO_MAINMEM);
 
@@ -105,20 +105,20 @@ public final class OptimizeAll extends ACreate {
     if(ctx.dbs.pins(m.name) > 1) throw new BaseXException(DB_PINNED_X, m.name);
 
     // find unique temporary database name
-    final String tname = ctx.mprop.random(m.name);
+    final String tname = ctx.globalopts.random(m.name);
 
     // adopt original meta information
-    ctx.prop.set(Prop.CHOP, m.chop);
+    ctx.options.set(MainOptions.CHOP, m.chop);
     // adopt original index options
-    ctx.prop.set(Prop.UPDINDEX, m.updindex);
-    ctx.prop.set(Prop.MAXCATS,  m.maxcats);
-    ctx.prop.set(Prop.MAXLEN,   m.maxlen);
+    ctx.options.set(MainOptions.UPDINDEX, m.updindex);
+    ctx.options.set(MainOptions.MAXCATS,  m.maxcats);
+    ctx.options.set(MainOptions.MAXLEN,   m.maxlen);
     // adopt original full-text index options
-    ctx.prop.set(Prop.STEMMING,   m.stemming);
-    ctx.prop.set(Prop.CASESENS,   m.casesens);
-    ctx.prop.set(Prop.DIACRITICS, m.diacritics);
-    ctx.prop.set(Prop.LANGUAGE,   m.language.toString());
-    ctx.prop.set(Prop.STOPWORDS,  m.stopwords);
+    ctx.options.set(MainOptions.STEMMING,   m.stemming);
+    ctx.options.set(MainOptions.CASESENS,   m.casesens);
+    ctx.options.set(MainOptions.DIACRITICS, m.diacritics);
+    ctx.options.set(MainOptions.LANGUAGE,   m.language.toString());
+    ctx.options.set(MainOptions.STOPWORDS,  m.stopwords);
 
     // build database and index structures
     final DiskBuilder builder = new DiskBuilder(tname, new DBParser(old, cmd), ctx);
@@ -160,7 +160,7 @@ public final class OptimizeAll extends ACreate {
   /**
    * Parser for rebuilding existing databases.
    *
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Leo Woerteler
    */
   private static final class DBParser extends Parser {
@@ -175,7 +175,7 @@ public final class OptimizeAll extends ACreate {
      * @param c calling command (can be {@code null})
      */
     DBParser(final DiskData d, final OptimizeAll c) {
-      super(d.meta.original.isEmpty() ? null : IO.get(d.meta.original), d.meta.prop);
+      super(d.meta.original.isEmpty() ? null : IO.get(d.meta.original), d.meta.options);
       data = d;
       cmd = c;
     }
@@ -190,7 +190,7 @@ public final class OptimizeAll extends ACreate {
         }
 
         @Override
-        public void openDoc(final byte[] name) throws IOException {
+        protected void openDoc(final byte[] name) throws IOException {
           super.openDoc(name);
           if(cmd != null) cmd.pre++;
         }

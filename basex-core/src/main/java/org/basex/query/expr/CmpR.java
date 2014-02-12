@@ -22,7 +22,7 @@ import org.basex.util.hash.*;
 /**
  * Numeric range expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class CmpR extends Single {
@@ -48,8 +48,8 @@ public final class CmpR extends Single {
    * @param ix include maximum value
    * @param ii input info
    */
-  private CmpR(final Expr e, final double mn, final boolean in, final double mx,
-      final boolean ix, final InputInfo ii) {
+  private CmpR(final Expr e, final double mn, final boolean in, final double mx, final boolean ix,
+      final InputInfo ii) {
 
     super(ii, e);
     min = mn;
@@ -114,7 +114,8 @@ public final class CmpR extends Single {
     if(mn > mx) return Bln.FALSE;
     if(mn == mx) {
       // return simplified comparison for exact hit, or false if value is not included
-      return mni && mxi ? new CmpG(expr, Dbl.get(mn), CmpG.OpG.EQ, info) : Bln.FALSE;
+      return mni && mxi ? new CmpG(expr, Dbl.get(mn), CmpG.OpG.EQ, null, info)
+                        : Bln.FALSE;
     }
 
     return new CmpR(c.expr, mn, mni && c.mni, mx, mxi && c.mxi, info);
@@ -171,7 +172,7 @@ public final class CmpR extends Single {
     final Step step;
     if(text) {
       step = st == 1 ? ic.step : path.step(st - 2);
-      if(!(step.test.mode == Mode.LN)) return null;
+      if(step.test.mode != Mode.LN) return null;
     } else {
       step = path.step(st - 1);
       if(!step.simple(Axis.ATTR, true)) return null;

@@ -10,7 +10,7 @@ import org.basex.util.hash.*;
 /**
  * Iterative step expression with numeric predicates.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class IterPosStep extends Step {
@@ -36,10 +36,10 @@ final class IterPosStep extends Step {
         if(skip) return null;
         if(ai == null) ai = axis.iter(checkNode(ctx));
 
-        ANode lnode = null, node;
+        ANode lnode = null;
         while(true) {
           ctx.checkStop();
-          node = ai.next();
+          final ANode node = ai.next();
           if(node == null) {
             skip = last;
             return lnode;

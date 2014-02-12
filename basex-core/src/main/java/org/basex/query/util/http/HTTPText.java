@@ -8,7 +8,7 @@ import org.basex.query.value.item.*;
 /**
  * HTTP strings.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  */
 public interface HTTPText {
@@ -16,9 +16,6 @@ public interface HTTPText {
   String AUTHORIZATION = "Authorization";
   /** HTTP basic authentication. */
   String BASIC = "Basic";
-
-  /** Payload string. */
-  String PAYLOAD = "payload";
 
   /** Content-Disposition. */
   byte[] CONTENT_DISPOSITION = token("Content-Disposition");
@@ -88,14 +85,11 @@ public interface HTTPText {
   /** Response attribute: message. */
   byte[] MESSAGE = token("message");
 
-  // Serialization methods defined by the EXPath specification.
-  /** Method http:base64Binary. */
-  byte[] BASE64 = token("http:base64Binary");
-  /** Method http:hexBinary. */
-  byte[] HEXBIN = token("http:hexBinary");
-
   /** Header attribute: name. */
   byte[] NAME = token("name");
   /** Header attribute: value. */
   byte[] VALUE = token("value");
+
+  /** Method binary. */
+  String BINARY = "binary";
 }

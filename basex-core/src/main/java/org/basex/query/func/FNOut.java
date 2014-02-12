@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Output functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNOut extends StandardFunc {
@@ -22,12 +22,13 @@ public final class FNOut extends StandardFunc {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNOut(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNOut(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -57,7 +58,7 @@ public final class FNOut extends StandardFunc {
     try {
       return Str.get(String.format(form, args));
     } catch(final RuntimeException ex) {
-      throw ERRFORM.thrw(info, Util.name(ex), ex);
+      throw ERRFORM.get(info, Util.className(ex), ex);
     }
   }
 }

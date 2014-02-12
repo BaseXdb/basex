@@ -19,21 +19,14 @@ import org.xml.sax.*;
  * DBLP documents contain too many entities and cause an out of memory error.
  * The internal {@link XMLParser} can be used as alternative.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class SAXWrapper extends SingleParser {
-  /** External DTD parsing. */
-  private static final String EXTDTD =
-    "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-  /** Lexical handler. */
-  private static final String LEXHANDLER =
-    "http://xml.org/sax/properties/lexical-handler";
-
   /** File counter. */
-  long counter;
+  private long counter;
   /** Current line. */
-  int line = 1;
+  private int line = 1;
 
   /** SAX handler reference. */
   private SAXHandler saxh;
@@ -45,10 +38,10 @@ public final class SAXWrapper extends SingleParser {
   /**
    * Constructor.
    * @param source sax source
-   * @param pr Properties
+   * @param opts database options
    */
-  public SAXWrapper(final IO source, final Prop pr) {
-    super(source, pr);
+  public SAXWrapper(final IO source, final MainOptions opts) {
+    super(source, opts);
     saxs = new SAXSource(source.inputSource());
   }
 
@@ -60,22 +53,26 @@ public final class SAXWrapper extends SingleParser {
     try {
       XMLReader r = saxs.getXMLReader();
       if(r == null) {
+        final boolean dtd = options.get(MainOptions.DTD);
         final SAXParserFactory f = SAXParserFactory.newInstance();
-        f.setFeature(EXTDTD, prop.is(Prop.DTD));
+        f.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", dtd);
+        f.setFeature("http://xml.org/sax/features/external-parameter-entities", dtd);
         f.setFeature("http://xml.org/sax/features/use-entity-resolver2", false);
+
         f.setNamespaceAware(true);
         f.setValidating(false);
         f.setXIncludeAware(true);
         r = f.newSAXParser().getXMLReader();
       }
 
-      saxh = new SAXHandler(builder, prop.is(Prop.CHOP), prop.is(Prop.STRIPNS));
-      final String cat = prop.get(Prop.CATFILE);
+      saxh = new SAXHandler(builder, options.get(MainOptions.CHOP),
+          options.get(MainOptions.STRIPNS));
+      final String cat = options.get(MainOptions.CATFILE);
       if(!cat.isEmpty()) CatalogWrapper.set(r, cat);
 
       r.setDTDHandler(saxh);
       r.setContentHandler(saxh);
-      r.setProperty(LEXHANDLER, saxh);
+      r.setProperty("http://xml.org/sax/properties/lexical-handler", saxh);
       r.setErrorHandler(saxh);
 
       if(is != null) r.parse(is);
@@ -125,7 +122,7 @@ public final class SAXWrapper extends SingleParser {
       return is;
     } else if(src instanceof IOFile) {
       in = new FileInputStream(src.path());
-    } else if(src instanceof IOContent) {
+    } else if(src instanceof IOContent || src instanceof IOUrl) {
       in = new ByteArrayInputStream(src.read());
     } else {
       return is;

@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * This is a container for the table data.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class TableData {
@@ -50,8 +50,8 @@ final class TableData {
   /** ID of the table root tag. */
   int root;
 
-  /** Window properties. */
-  private final GUIProp gprop;
+  /** GUI options. */
+  private final GUIOptions gopts;
   /** Last query. */
   private String last = "";
 
@@ -74,11 +74,11 @@ final class TableData {
   /**
    * Initializes the table data.
    * @param ctx database context
-   * @param pr gui properties
+   * @param opts gui options
    */
-  TableData(final Context ctx, final GUIProp pr) {
+  TableData(final Context ctx, final GUIOptions opts) {
     context = ctx;
-    gprop = pr;
+    gopts = opts;
   }
 
   /**
@@ -278,7 +278,7 @@ final class TableData {
     int k = data.kind(p);
     while(p != -1 && (k != Data.ELEM || data.name(p) != root)) {
       p = data.parent(p, k);
-      k = p != -1 ? data.kind(p) : 0;
+      k = p == -1 ? 0 : data.kind(p);
     }
     return p;
   }
@@ -322,8 +322,8 @@ final class TableData {
       names.add(col.name);
       elems.add(col.elem);
     }
-    final String query = Find.findTable(filters, names, elems,
-        data.tagindex.key(root), gprop.is(GUIProp.FILTERRT) || r);
+    final String query = Find.findTable(filters, names, elems, data.tagindex.key(root),
+        gopts.get(GUIOptions.FILTERRT) || r);
     if(query.equals(last)) return null;
     last = query;
     return query;

@@ -12,23 +12,25 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
  * Simple functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNSimple extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNSimple(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNSimple(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -37,7 +39,7 @@ public final class FNSimple extends StandardFunc {
       case ONE_OR_MORE:
         final Iter ir = expr[0].iter(ctx);
         final long len = ir.size();
-        if(len == 0) throw EXPECTOM.thrw(info);
+        if(len == 0) throw EXPECTOM.get(info);
         if(len > 0) return ir;
         return new Iter() {
           private boolean first = true;
@@ -45,7 +47,7 @@ public final class FNSimple extends StandardFunc {
           public Item next() throws QueryException {
             final Item it = ir.next();
             if(first) {
-              if(it == null) throw EXPECTOM.thrw(info);
+              if(it == null) throw EXPECTOM.get(info);
               first = false;
             }
             return it;
@@ -63,7 +65,7 @@ public final class FNSimple extends StandardFunc {
     switch(sig) {
       case ONE_OR_MORE:
         final Value val = ctx.value(expr[0]);
-        if(val.isEmpty()) throw EXPECTOM.thrw(info);
+        if(val.isEmpty()) throw EXPECTOM.get(info);
         return val;
       case UNORDERED:
         return ctx.value(expr[0]);
@@ -95,12 +97,12 @@ public final class FNSimple extends StandardFunc {
       case ZERO_OR_ONE:
         Iter ir = e.iter(ctx);
         Item it = ir.next();
-        if(it != null && ir.next() != null) EXPECTZ0.thrw(info);
+        if(it != null && ir.next() != null) throw EXPECTZ0.get(info);
         return it;
       case EXACTLY_ONE:
         ir = e.iter(ctx);
         it = ir.next();
-        if(it == null || ir.next() != null) EXPECTO.thrw(info);
+        if(it == null || ir.next() != null) throw EXPECTO.get(info);
         return it;
       default:
         return super.item(ctx, ii);
@@ -108,7 +110,7 @@ public final class FNSimple extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx) throws QueryException {
+  protected Expr opt(final QueryContext ctx, final VarScope scp) {
     if(expr.length == 0) return this;
     final Expr e = expr[0];
 
@@ -117,7 +119,7 @@ public final class FNSimple extends StandardFunc {
       case EXISTS:
         // ignore non-deterministic expressions (e.g.: error())
         return e.size() == -1 || e.has(Flag.NDT) || e.has(Flag.CNS) ? this :
-          Bln.get(sig == Function.EMPTY ^ e.size() != 0);
+          Bln.get(sig == Function.EMPTY ^ !e.isEmpty());
       case BOOLEAN:
         // simplify, e.g.: if(boolean(A)) -> if(A)
         return e.type().eq(SeqType.BLN) ? e : this;
@@ -125,12 +127,12 @@ public final class FNSimple extends StandardFunc {
         if(e.isFunction(Function.EMPTY)) {
           // simplify: not(empty(A)) -> exists(A)
           ctx.compInfo(QueryText.OPTWRITE, this);
-          expr = ((StandardFunc) e).expr;
+          expr = ((Arr) e).expr;
           sig = Function.EXISTS;
         } else if(e.isFunction(Function.EXISTS)) {
           // simplify: not(exists(A)) -> empty(A)
           ctx.compInfo(QueryText.OPTWRITE, this);
-          expr = ((StandardFunc) e).expr;
+          expr = ((Arr) e).expr;
           sig = Function.EMPTY;
         } else if(e instanceof CmpV || e instanceof CmpG) {
           // simplify: not('a' = 'b') -> 'a' != 'b'
@@ -138,7 +140,7 @@ public final class FNSimple extends StandardFunc {
           return c == e ? this : c;
         } else if(e.isFunction(Function.NOT)) {
           // simplify: not(not(A)) -> boolean(A)
-          return compBln(((StandardFunc) e).expr[0], info);
+          return compBln(((Arr) e).expr[0], info);
         } else {
           // simplify, e.g.: not(boolean(A)) -> not(A)
           expr[0] = e.compEbv(ctx);
@@ -152,7 +154,7 @@ public final class FNSimple extends StandardFunc {
         return e.type().one() ? e : this;
       case ONE_OR_MORE:
         type = SeqType.get(e.type().type, Occ.ONE_MORE);
-        return !e.type().mayBeZero() ? e : this;
+        return e.type().mayBeZero() ? this : e;
       case UNORDERED:
         return e;
       default:
@@ -184,7 +186,7 @@ public final class FNSimple extends StandardFunc {
    * @throws QueryException query exception
    */
   private boolean deep(final QueryContext ctx) throws QueryException {
-    final Collation coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
+    final Collation coll = checkColl(expr.length == 3 ? expr[2] : null, ctx, sc);
     return new Compare(info).collation(coll).deep(ctx.iter(expr[0]), ctx.iter(expr[1]));
   }
 
@@ -209,7 +211,7 @@ public final class FNSimple extends StandardFunc {
             break;
           }
         }
-        if(!found) ELMOPTION.thrw(info, key);
+        if(!found) throw INVALIDOPTX.get(info, key);
       }
     }
     return cmp.deep(ctx.iter(expr[0]), ctx.iter(expr[1]));

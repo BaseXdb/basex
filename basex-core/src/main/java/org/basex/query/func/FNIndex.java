@@ -23,38 +23,39 @@ import org.basex.util.*;
 /**
  * Index functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Andreas Weiler
  */
 public final class FNIndex extends StandardFunc {
   /** Name: name. */
-  static final String NAME = "name";
+  private static final String NAME = "name";
   /** Name: type. */
-  static final String TYPE = "type";
+  private static final String TYPE = "type";
   /** Name: count. */
-  static final String COUNT = "count";
+  private static final String COUNT = "count";
   /** Name: value. */
-  static final String ENTRY = "entry";
+  private static final String ENTRY = "entry";
   /** Name: min. */
-  static final String MIN = "min";
+  private static final String MIN = "min";
   /** Name: max. */
-  static final String MAX = "max";
+  private static final String MAX = "max";
   /** Name: elements. */
-  static final byte[] ELM = NodeType.ELM.string();
+  private static final byte[] ELM = NodeType.ELM.string();
   /** Name: attributes. */
-  static final byte[] ATT = NodeType.ATT.string();
+  private static final byte[] ATT = NodeType.ATT.string();
   /** Flag: flat output. */
-  static final byte[] FLAT = token("flat");
+  private static final byte[] FLAT = token("flat");
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNIndex(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNIndex(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -97,8 +98,8 @@ public final class FNIndex extends StandardFunc {
    */
   private Iter values(final QueryContext ctx, final IndexType it) throws QueryException {
     final Data data = checkData(ctx);
-    final byte[] entry = expr.length < 2 ? Token.EMPTY : checkStr(expr[1], ctx);
-    if(data.inMemory()) BXDB_MEM.thrw(info, data.meta.name);
+    final byte[] entry = expr.length < 2 ? EMPTY : checkStr(expr[1], ctx);
+    if(data.inMemory()) throw BXDB_MEM.get(info, data.meta.name);
 
     final IndexEntries et = expr.length < 3 ? new IndexEntries(entry, it) :
       new IndexEntries(entry, checkBln(expr[2], ctx), it);
@@ -113,8 +114,8 @@ public final class FNIndex extends StandardFunc {
    * @return text entries
    * @throws QueryException query exception
    */
-  static Iter entries(final Data data, final IndexEntries entries,
-      final StandardFunc call) throws QueryException {
+  static Iter entries(final Data data, final IndexEntries entries, final StandardFunc call)
+      throws QueryException {
 
     final Index index;
     final boolean avl;
@@ -129,7 +130,7 @@ public final class FNIndex extends StandardFunc {
       index = data.ftxindex;
       avl = data.meta.ftxtindex;
     }
-    if(!avl) BXDB_INDEX.thrw(call.info, data.meta.name,
+    if(!avl) throw BXDB_INDEX.get(call.info, data.meta.name,
         it.toString().toLowerCase(Locale.ENGLISH));
     return entries(index, entries);
   }
@@ -144,7 +145,7 @@ public final class FNIndex extends StandardFunc {
   private Iter names(final QueryContext ctx, final IndexType it) throws QueryException {
     final Data data = checkData(ctx);
     return entries(it == IndexType.TAG ? data.tagindex : data.atnindex,
-      new IndexEntries(Token.EMPTY, it));
+      new IndexEntries(EMPTY, it));
   }
 
   /**

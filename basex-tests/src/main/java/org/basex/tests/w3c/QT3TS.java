@@ -1,7 +1,8 @@
 package org.basex.tests.w3c;
 
-import static org.basex.core.Prop.NL;
 import static org.basex.tests.w3c.QT3Constants.*;
+import static org.basex.tests.w3c.QT3Constants.ENCODING;
+import static org.basex.util.Prop.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -15,6 +16,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
+import org.basex.io.serial.SerializerOptions.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.Compare.Mode;
@@ -105,14 +107,18 @@ public final class QT3TS {
    * @throws Exception exception
    */
   private void run(final String[] args) throws Exception {
-    ctx.mprop.set(MainProp.DBPATH, sandbox().path() + "/data");
+    ctx.globalopts.set(GlobalOptions.DBPATH, sandbox().path() + "/data");
     parseArguments(args);
     init();
 
     final Performance perf = new Performance();
-    ctx.prop.set(Prop.CHOP, false);
-    ctx.prop.set(Prop.INTPARSE, false);
-    ctx.prop.set(Prop.SERIALIZER, "omit-xml-declaration=no,indent=no");
+    ctx.options.set(MainOptions.CHOP, false);
+    ctx.options.set(MainOptions.INTPARSE, false);
+
+    final SerializerOptions sopts = new SerializerOptions();
+    sopts.set(SerializerOptions.INDENT, YesNo.NO);
+    sopts.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.NO);
+    ctx.options.set(MainOptions.SERIALIZER, sopts);
 
     final XdmValue doc = new XQuery("doc('" + file(false, CATALOG) + "')", ctx).value();
     final String version = asString("*:catalog/@version", doc);
@@ -235,7 +241,7 @@ public final class QT3TS {
 
     // use XQuery 1.0 if XQ10 or XP20 is specified
     if(new XQuery("*:dependency[@type='spec'][matches(@value,'(XQ10)([^+]|$)')]", ctx).
-        context(test).next() != null) ctx.prop.set(Prop.XQUERY3, false);
+        context(test).next() != null) ctx.options.set(MainOptions.XQUERY3, false);
 
     // check if environment is defined in test-case
     QT3Env e = null;
@@ -271,6 +277,24 @@ public final class QT3TS {
     }
 
     if(verbose) Util.outln(name);
+
+    // bind variables
+    if(e != null) {
+      for(final HashMap<String, String> par : e.params) {
+        final String decl = par.get(DECLARED);
+        if(decl == null || decl.equals("false")) {
+          string = "declare variable $" + par.get(NNAME) + " external;" + string;
+        }
+      }
+      // bind documents
+      for(final HashMap<String, String> src : e.sources) {
+        final String role = src.get(ROLE);
+        if(role != null && role.startsWith("$")) {
+          string = "declare variable " + role + " external;" + string;
+        }
+      }
+    }
+    
     final XQuery query = new XQuery(string, ctx);
     if(base) query.baseURI(baseURI);
 
@@ -303,7 +327,7 @@ public final class QT3TS {
           query.addDocument(src.get(URI), file);
           final String role = src.get(ROLE);
           if(role == null) continue;
-          final Object call = Function.DOC.get(Str.get(file));
+          final Object call = query.funcCall("fn:doc", Str.get(file));
           if(role.equals(".")) query.context(call);
           else query.bind(role, call);
         }
@@ -314,7 +338,7 @@ public final class QT3TS {
         // bind collections
         query.addCollection(e.collURI, e.collSources.toArray());
         if(e.collContext) {
-          query.context(Function.COLLECTION.get(Str.get(e.collURI)));
+          query.context(query.funcCall("fn:collection", Str.get(e.collURI)));
         }
         // bind context item
         if(e.context != null) {
@@ -348,7 +372,7 @@ public final class QT3TS {
     }
 
     // revert to XQuery as default
-    ctx.prop.set(Prop.XQUERY3, true);
+    ctx.options.set(MainOptions.XQUERY3, true);
 
     final String exp = test(result, expected);
     final TokenBuilder tmp = new TokenBuilder();
@@ -363,7 +387,7 @@ public final class QT3TS {
       } else if(result.err != null) {
         res = result.err.getCode() + ": " + result.err.getLocalizedMessage();
       } else {
-        result.sprop.set(SerializerProp.S_OMIT_XML_DECLARATION, "yes");
+        result.sprop.set(SerializerOptions.OMIT_XML_DECLARATION, "yes");
         res = serialize(result.value, result.sprop);
       }
     } catch(final XQueryException ex) {
@@ -418,6 +442,8 @@ public final class QT3TS {
       "@type = 'unicode-normalization-form' and @value = 'FULLY-NORMALIZED' or " +
       // skip xml/xsd 1.1 tests
       "@type = ('xml-version', 'xsd-version') and @value = ('1.1', '1.0:4-') or " +
+      // skip limits
+      "@type = 'limits' and @value = ('big_integer') or " +
       // skip non-XQuery tests
       "@type = 'spec' and not(contains(@value, 'XQ'))" +
       "]", ctx).context(test).value().size() == 0;
@@ -555,7 +581,8 @@ public final class QT3TS {
   private String assertQuery(final XdmValue value, final XdmValue expect) {
     final String exp = expect.getString();
     try {
-      return new XQuery(exp, ctx).bind("result", value).value().getBoolean() ? null : exp;
+      final String qu = "declare variable $result external; " + exp;
+      return new XQuery(qu, ctx).bind("result", value).value().getBoolean() ? null : exp;
     } catch(final XQueryException ex) {
       // should not occur
       return ex.getException().getMessage();
@@ -673,7 +700,7 @@ public final class QT3TS {
    * @return optional expected test suite result
    */
   private String serializationMatches(final XdmValue value, final XdmValue expect,
-      final SerializerProp sprop) {
+      final SerializerOptions sprop) {
 
     final String exp = expect.getString();
     final String flags = asString("@flags", expect);
@@ -697,13 +724,13 @@ public final class QT3TS {
    * @return optional expected test suite result
    */
   private String assertSerializationError(final XdmValue value, final XdmValue expect,
-      final SerializerProp sprop) {
+      final SerializerOptions sprop) {
 
     final String exp = asString('@' + CODE, expect);
     try {
       serialize(value, sprop);
       return exp;
-    } catch(final SerializerException ex) {
+    } catch(final QueryIOException ex) {
       if(!errors || exp.equals("*")) return null;
       final QueryException qe = ex.getCause();
       final String code = string(qe.qname().local());
@@ -721,7 +748,7 @@ public final class QT3TS {
    * @return optional expected test suite result
    * @throws IOException I/O exception
    */
-  private String serialize(final XdmValue value, final SerializerProp sprop)
+  private String serialize(final XdmValue value, final SerializerOptions sprop)
       throws IOException {
 
     final ArrayOutput ao = new ArrayOutput();
@@ -785,7 +812,8 @@ public final class QT3TS {
     final String exp = expect.getString();
 
     try {
-      final XQuery query = new XQuery("$result instance of " + exp, ctx);
+      final String qu = "declare variable $result external; $result instance of " + exp;
+      final XQuery query = new XQuery(qu, ctx);
       return query.bind("result", value).value().getBoolean() ? null :
         Util.info("Type '%' (found: '%')", exp, value.getType().toString());
     } catch(final XQueryException ex) {
@@ -861,7 +889,7 @@ public final class QT3TS {
         " -r  generate report file" + NL +
         " -s  print slow queries" + NL +
         " -v  verbose output",
-        Util.info(Text.CONSOLE, Util.name(this)));
+        Util.info(Text.S_CONSOLE, Util.className(this)));
 
     while(arg.more()) {
       if(arg.dash()) {
@@ -871,7 +899,7 @@ public final class QT3TS {
         } else if(c == 'a') {
           all = true;
         } else if(c == 'd') {
-          ctx.mprop.set(MainProp.DEBUG, true);
+          ctx.globalopts.set(GlobalOptions.DEBUG, true);
         } else if(c == 'i') {
           ignoring = true;
         } else if(c == 'e') {
@@ -882,10 +910,10 @@ public final class QT3TS {
           slow = new TreeMap<Long, String>();
         } else if(c == 'p') {
           final File f = new File(arg.string());
-          if(!f.isDirectory()) arg.usage();
+          if(!f.isDirectory()) throw arg.usage();
           basePath = f.getCanonicalPath();
         } else {
-          arg.usage();
+          throw arg.usage();
         }
       } else {
         single = arg.string();
@@ -934,7 +962,7 @@ public final class QT3TS {
    */
   static class QT3Result {
     /** Serialization parameters. */
-    SerializerProp sprop;
+    SerializerOptions sprop;
     /** Query result. */
     XdmValue value;
     /** Query exception. */

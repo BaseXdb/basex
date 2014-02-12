@@ -6,11 +6,12 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Evaluates the 'info' command and returns general database information.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Info extends AInfo {
@@ -39,20 +40,20 @@ public final class Info extends AInfo {
    */
   public static String info(final Context context) {
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(GENERAL_INFO + NL);
+    tb.add(GENERAL_INFO + COL + NL);
     info(tb, VERSINFO, Prop.VERSION);
     if(context.user.has(Perm.CREATE)) {
       Performance.gc(2);
       info(tb, USED_MEM, Performance.getMemory());
     }
     if(context.user.has(Perm.ADMIN)) {
-      final AProp prop = context.mprop;
-      tb.add(NL + MAIN_OPTIONS + NL);
-      for(final String s : prop) info(tb, s, prop.get(s));
+      final GlobalOptions gopts = context.globalopts;
+      tb.add(NL + GLOBAL_OPTIONS + COL + NL);
+      for(final Option<?> o : gopts) info(tb, o.name(), gopts.get(o));
     }
-    final AProp prop = context.prop;
-    tb.add(NL + OPTIONS + NL);
-    for(final String s : prop) info(tb, s, prop.get(s));
+    final MainOptions opts = context.options;
+    tb.add(NL + LOCAL_OPTIONS + NL);
+    for(final Option<?> o : opts) info(tb, o.name(), opts.get(o));
     return tb.toString();
   }
 }

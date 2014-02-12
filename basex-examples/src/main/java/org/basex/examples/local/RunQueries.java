@@ -14,7 +14,7 @@ import org.basex.query.value.item.*;
  * This example demonstrates three variants how XQuery expressions can be
  * evaluated.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  */
 public final class RunQueries {
   /** Database context. */

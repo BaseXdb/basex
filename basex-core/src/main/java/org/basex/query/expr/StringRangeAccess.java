@@ -18,12 +18,12 @@ import org.basex.util.hash.*;
 /**
  * This index class retrieves ranges from a value index.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class StringRangeAccess extends IndexAccess {
   /** Index token. */
-  final StringRange sr;
+  private final StringRange sr;
 
   /**
    * Constructor.
@@ -49,7 +49,7 @@ public final class StringRangeAccess extends IndexAccess {
     return new AxisIter() {
       @Override
       public ANode next() {
-        return ii.more() ? new DBNode(data, ii.next(), kind) : null;
+        return ii.more() ? new DBNode(data, ii.pre(), kind) : null;
       }
     };
   }
@@ -65,7 +65,7 @@ public final class StringRangeAccess extends IndexAccess {
       int pre = -1;
 
       @Override
-      public int next() {
+      public int pre() {
         return pre;
       }
       @Override
@@ -79,6 +79,10 @@ public final class StringRangeAccess extends IndexAccess {
           if(mn >= (sr.mni ? 0 : 1) && mx <= (sr.mxi ? 0 : 1)) return true;
         }
         return false;
+      }
+      @Override
+      public int size() {
+        return Math.max(1, ictx.data.meta.size >>> 2);
       }
     };
   }
@@ -97,7 +101,7 @@ public final class StringRangeAccess extends IndexAccess {
   @Override
   public String toString() {
     return (sr.type == IndexType.TEXT ? Function._DB_TEXT_RANGE :
-      Function._DB_ATTRIBUTE_RANGE).get(info, Str.get(ictx.data.meta.name),
+      Function._DB_ATTRIBUTE_RANGE).get(null, info, Str.get(ictx.data.meta.name),
           Str.get(sr.min), Str.get(sr.max)).toString();
   }
 }

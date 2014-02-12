@@ -10,17 +10,17 @@ import org.basex.gui.view.*;
 /**
  * Adds default paint operations to TreeMap.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class MapDefault extends MapPainter {
   /**
    * Constructor.
    * @param m map reference
-   * @param pr gui properties
+   * @param opts gui options
    */
-  MapDefault(final MapView m, final GUIProp pr) {
-    super(m, pr);
+  MapDefault(final MapView m, final GUIOptions opts) {
+    super(m, opts);
   }
 
   @Override
@@ -35,7 +35,7 @@ final class MapDefault extends MapPainter {
     final Data data = view.gui.context.data();
     final int fsz = GUIConstants.fontSize;
 
-    final int off = prop.num(GUIProp.MAPOFFSETS);
+    final int off = gopts.get(GUIOptions.MAPOFFSETS);
     final int rs = rects.size;
     for(int ri = 0; ri < rs; ++ri) {
       // get rectangle information
@@ -54,7 +54,7 @@ final class MapDefault extends MapPainter {
       g.setColor(mark ? col : GUIConstants.color(lvl));
 
       if(r.w < l.x + l.w || r.h < l.y + l.h || off < 2 ||
-          ViewData.leaf(prop, data, pre)) {
+          ViewData.leaf(gopts, data, pre)) {
         g.fillRect(r.x, r.y, r.w, r.h);
       } else {
         // painting only border for non-leaf nodes..
@@ -85,7 +85,7 @@ final class MapDefault extends MapPainter {
       if(kind == Data.ELEM || kind == Data.DOC) {
         g.setColor(Color.black);
         g.setFont(GUIConstants.font);
-        BaseXLayout.chopString(g, ViewData.name(prop, data, pre), r.x, r.y, r.w, fsz);
+        BaseXLayout.chopString(g, ViewData.name(gopts, data, pre), r.x, r.y, r.w, fsz);
       } else {
         g.setColor(GUIConstants.color(r.level * 2 + 8));
         g.setFont(GUIConstants.mfont);

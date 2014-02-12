@@ -19,18 +19,20 @@ import org.basex.util.hash.*;
 /**
  * Rename expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class Rename extends Update {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param tg target expression
    * @param n new name expression
    */
-  public Rename(final InputInfo ii, final Expr tg, final Expr n) {
-    super(ii, tg, n);
+  public Rename(final StaticContext sctx, final InputInfo ii, final Expr tg,
+      final Expr n) {
+    super(sctx, ii, tg, n);
   }
 
   @Override
@@ -39,18 +41,18 @@ public final class Rename extends Update {
     final Item i = t.next();
 
     // check target constraints
-    if(i == null) throw UPSEQEMP.thrw(info, Util.name(this));
-    if(t.next() != null) UPWRTRGTYP.thrw(info);
+    if(i == null) throw UPSEQEMP.get(info, Util.className(this));
+    if(t.next() != null) throw UPWRTRGTYP.get(info);
 
-    final CFrag ex;
+    final CNode ex;
     if(i.type == NodeType.ELM) {
-      ex = new CElem(info, expr[1], null);
+      ex = new CElem(sc, info, expr[1], null);
     } else if(i.type == NodeType.ATT) {
-      ex = new CAttr(info, false, expr[1], Empty.SEQ);
+      ex = new CAttr(sc, info, false, expr[1], Empty.SEQ);
     } else if(i.type == NodeType.PI) {
-      ex = new CPI(info, expr[1], Empty.SEQ);
+      ex = new CPI(sc, info, expr[1], Empty.SEQ);
     } else {
-      throw UPWRTRGTYP.thrw(info);
+      throw UPWRTRGTYP.get(info);
     }
 
     final QNm rename = ex.item(ctx, info).qname();
@@ -63,7 +65,7 @@ public final class Rename extends Update {
       final Atts at = targ.nsScope();
       final int as = at.size();
       for(int a = 0; a < as; a++) {
-        if(eq(at.name(a), rp) && !eq(at.value(a), ru)) UPNSCONFL.thrw(info);
+        if(eq(at.name(a), rp) && !eq(at.value(a), ru)) throw UPNSCONFL.get(info);
       }
     }
 
@@ -74,7 +76,7 @@ public final class Rename extends Update {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Rename(info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs));
+    return new Rename(sc, info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs));
   }
 
   @Override

@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * This index class retrieves texts and attribute values from the index.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class ValueAccess extends IndexAccess {
@@ -75,7 +75,7 @@ public final class ValueAccess extends IndexAccess {
 
       @Override
       public ANode next() {
-        return ii.more() ? new DBNode(data, ii.next(), kind) : null;
+        return ii.more() ? new DBNode(data, ii.pre(), kind) : null;
       }
     };
   }
@@ -93,7 +93,7 @@ public final class ValueAccess extends IndexAccess {
       int pre = -1;
 
       @Override
-      public int next() {
+      public int pre() {
         return pre;
       }
       @Override
@@ -102,6 +102,10 @@ public final class ValueAccess extends IndexAccess {
           if(data.kind(pre) == kind && eq(data.text(pre, text), val)) return true;
         }
         return false;
+      }
+      @Override
+      public int size() {
+        return Math.max(1, data.meta.size >>> 1);
       }
     };
   }
@@ -143,7 +147,7 @@ public final class ValueAccess extends IndexAccess {
   @Override
   public String toString() {
     return (itype == IndexType.TEXT ? Function._DB_TEXT : Function._DB_ATTRIBUTE).get(
-        info, Str.get(ictx.data.meta.name), expr).toString();
+        null, info, Str.get(ictx.data.meta.name), expr).toString();
   }
 
   @Override

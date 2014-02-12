@@ -16,7 +16,7 @@ import org.basex.util.list.*;
 /**
  * This class organizes all users.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Users {
@@ -34,13 +34,10 @@ public final class Users {
 
     // try to find permission file in database and home directory
     final String perm = IO.BASEXSUFFIX + "perm";
-    file = new IOFile(ctx.mprop.dbpath(), perm);
+    file = new IOFile(ctx.globalopts.dbpath(), perm);
     if(!file.exists()) file = new IOFile(Prop.HOME, perm);
 
-    if(!file.exists()) {
-      // define default admin user with all rights
-      list.add(new User(ADMIN, md5(ADMIN), Perm.ADMIN));
-    } else {
+    if(file.exists()) {
       DataInput in = null;
       try {
         in = new DataInput(file);
@@ -48,8 +45,13 @@ public final class Users {
       } catch(final IOException ex) {
         Util.errln(ex);
       } finally {
-        if(in != null) try { in.close(); } catch(final IOException ignored) { }
+        if(in != null) try {
+          in.close();
+        } catch (final IOException ignored) { }
       }
+    } else {
+      // define default admin user with all rights
+      list.add(new User(S_ADMIN, md5(S_ADMIN), Perm.ADMIN));
     }
   }
 
@@ -178,7 +180,7 @@ public final class Users {
     table.description = USERS_X;
 
     final int sz = file == null ? 3 : 5;
-    for(int u = 0; u < sz; ++u) table.header.add(USERHEAD[u]);
+    for(int u = 0; u < sz; ++u) table.header.add(S_USERINFO[u]);
 
     for(final User user : users(users)) {
       final TokenList tl = new TokenList();
@@ -191,7 +193,7 @@ public final class Users {
       }
       table.contents.add(tl);
     }
-    return table.sort().toTop(token(ADMIN));
+    return table.sort().toTop(token(S_ADMIN));
   }
 
   /**

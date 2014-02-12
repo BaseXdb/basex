@@ -14,8 +14,8 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.*;
 import org.basex.io.*;
 import org.basex.server.*;
 import org.basex.util.*;
@@ -24,7 +24,7 @@ import org.basex.util.list.*;
 /**
  * Dialog window for displaying information about the server.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Andreas Weiler
  */
 public final class DialogServer extends BaseXDialog {
@@ -34,27 +34,27 @@ public final class DialogServer extends BaseXDialog {
   /** Tabulators. */
   final BaseXTabs tabs;
   /** User panel. */
-  final DialogUser user = new DialogUser(true, this);
+  private final DialogUser user = new DialogUser(true, this);
   /** Databases panel. */
-  final DialogUser dbsP = new DialogUser(false, this);
+  private final DialogUser dbsP = new DialogUser(false, this);
   /** Databases panel. */
-  final BaseXBack databases = dbsP.getTablePanel();
+  private final BaseXBack databases = dbsP.getTablePanel();
   /** Sessions/Databases panel. */
-  final BaseXBack sess = new BaseXBack();
+  private final BaseXBack sess = new BaseXBack();
   /** Log panel. */
-  final BaseXBack logs = new BaseXBack();
+  private final BaseXBack logs = new BaseXBack();
   /** Username textfield. */
   final BaseXTextField admuser;
   /** Disconnect button. */
   final BaseXButton disconnect;
   /** Refresh button. */
-  final BaseXButton refreshSess;
+  private final BaseXButton refreshSess;
   /** Connect button. */
-  final BaseXButton connect;
+  private final BaseXButton connect;
   /** Start button. */
-  final BaseXButton start;
+  private final BaseXButton start;
   /** Indicates which tab is activated. */
-  int tab;
+  private int tab;
 
   /** Context. */
   private final Context ctx = gui.context;
@@ -73,9 +73,9 @@ public final class DialogServer extends BaseXDialog {
   /** Server port. */
   private final BaseXTextField portc;
   /** Current sessions. */
-  private final Editor sese;
+  private final TextPanel sese;
   /** Log text. */
-  private final Editor logt;
+  private final TextPanel logt;
   /** Info label. */
   private final BaseXLabel infoC;
   /** Info label. */
@@ -83,7 +83,7 @@ public final class DialogServer extends BaseXDialog {
   /** Combobox for log files. */
   private final BaseXCombo logc;
   /** String for log dir. */
-  private final IOFile logd = ctx.mprop.dbpath(".logs");
+  private final IOFile logd = ctx.globalopts.dbpath(".logs");
   /** ClientSession. */
   private ClientSession cs;
   /** Boolean for check is server is running. */
@@ -106,11 +106,11 @@ public final class DialogServer extends BaseXDialog {
     connect = new BaseXButton(CONNECT, this);
     disconnect = new BaseXButton(DISCONNECT, this);
 
-    final GUIProp gprop = gui.gprop;
-    host = new BaseXTextField(gprop.get(GUIProp.S_HOST), this);
-    ports = new BaseXTextField(Integer.toString(gprop.num(GUIProp.S_SERVERPORT)), this);
-    portc = new BaseXTextField(Integer.toString(gprop.num(GUIProp.S_PORT)), this);
-    admuser = new BaseXTextField(gprop.get(GUIProp.S_USER), this);
+    final GUIOptions gopts = gui.gopts;
+    host = new BaseXTextField(gopts.get(GUIOptions.S_HOST), this);
+    ports = new BaseXTextField(Integer.toString(gopts.get(GUIOptions.S_SERVERPORT)), this);
+    portc = new BaseXTextField(Integer.toString(gopts.get(GUIOptions.S_PORT)), this);
+    admuser = new BaseXTextField(gopts.get(GUIOptions.S_USER), this);
     admpass = new BaseXPassword(this);
     infoC = new BaseXLabel(" ").border(12, 0, 0, 0);
 
@@ -153,16 +153,16 @@ public final class DialogServer extends BaseXDialog {
 
     p = new BaseXBack(new TableLayout(2, 1));
     BaseXLabel l = new BaseXLabel(S_INFO1);
-    l.setForeground(GUIConstants.DGRAY);
+    l.setForeground(DGRAY);
     p.add(l);
     l = new BaseXLabel(S_INFO2);
-    l.setForeground(GUIConstants.DGRAY);
+    l.setForeground(DGRAY);
     p.add(l);
     conn.add(p, BorderLayout.SOUTH);
 
     // session tab
     sess.border(8).layout(new BorderLayout());
-    sese = new Editor(false, this);
+    sese = new TextPanel(false, this);
     sese.setFont(start.getFont());
     refreshSess = new BaseXButton(REFRESH, this);
 
@@ -182,7 +182,7 @@ public final class DialogServer extends BaseXDialog {
     deleteAll = new BaseXButton(DELETE_ALL, this);
 
     logc = new BaseXCombo(this);
-    logt = new Editor(false, this);
+    logt = new TextPanel(false, this);
     logt.setFont(start.getFont());
     BaseXLayout.setHeight(logt, 100);
 
@@ -261,28 +261,27 @@ public final class DialogServer extends BaseXDialog {
    * @return boolean success
    */
   private boolean ping(final boolean local) {
-    final GUIProp gprop = gui.gprop;
-    return BaseXServer.ping(local ? LOCALHOST : gprop.get(GUIProp.S_HOST),
-      gprop.num(local ? GUIProp.S_SERVERPORT : GUIProp.S_PORT));
+    final GUIOptions gopts = gui.gopts;
+    return BaseXServer.ping(local ? S_LOCALHOST : gopts.get(GUIOptions.S_HOST),
+      gopts.get(local ? GUIOptions.S_SERVERPORT : GUIOptions.S_PORT));
   }
 
   @Override
   public void action(final Object cmp) {
-    Msg icon = Msg.SUCCESS;
-    String msg = null;
-    String msg2 = null;
-
     final boolean wait = cmp == start || cmp == stop || cmp == connect;
     if(wait) setCursor(CURSORWAIT);
 
+    String msg2 = null;
+    String msg = null;
+    Msg icon = Msg.SUCCESS;
     try {
       if(cmp == start) {
         try {
           final int p = Integer.parseInt(ports.getText());
-          gui.gprop.set(GUIProp.S_SERVERPORT, p);
-          if(host.getText().equals(LOCALHOST)) {
-            gui.gprop.set(GUIProp.S_PORT, p);
-            gui.gprop.set(GUIProp.S_EVENTPORT, p + 1);
+          gui.gopts.set(GUIOptions.S_SERVERPORT, p);
+          if(host.getText().equals(S_LOCALHOST)) {
+            gui.gopts.set(GUIOptions.S_PORT, p);
+            gui.gopts.set(GUIOptions.S_EVENTPORT, p + 1);
             portc.setText(String.valueOf(p));
           }
           BaseXServer.start(p, "-p", Integer.toString(p), "-e", Integer.toString(p + 1));
@@ -293,8 +292,8 @@ public final class DialogServer extends BaseXDialog {
           icon = Msg.ERROR;
         }
       } else if(cmp == stop) {
-        final int p = gui.gprop.num(GUIProp.S_SERVERPORT);
-        if(running) BaseXServer.stop(p, gui.gprop.num(GUIProp.S_EVENTPORT));
+        final int p = gui.gopts.get(GUIOptions.S_SERVERPORT);
+        if(running) BaseXServer.stop(p, gui.gopts.get(GUIOptions.S_EVENTPORT));
         running = ping(true);
         connected = connected && ping(false);
         if(!connected) msg = Util.info(SRV_STOPPED_PORT_X, p);
@@ -304,10 +303,10 @@ public final class DialogServer extends BaseXDialog {
         final String us = admuser.getText();
         final String hs = host.getText();
         final int pc = Integer.parseInt(portc.getText());
-        gui.gprop.set(GUIProp.S_HOST, hs);
-        gui.gprop.set(GUIProp.S_PORT, pc);
-        gui.gprop.set(GUIProp.S_USER, us);
-        gui.gprop.set(GUIProp.S_PASSWORD, pw);
+        gui.gopts.set(GUIOptions.S_HOST, hs);
+        gui.gopts.set(GUIOptions.S_PORT, pc);
+        gui.gopts.set(GUIOptions.S_USER, us);
+        gui.gopts.set(GUIOptions.S_PASSWORD, pw);
         cs = new ClientSession(hs, pc, us, pw);
         user.setSess(cs);
         dbsP.setSess(cs);
@@ -325,14 +324,11 @@ public final class DialogServer extends BaseXDialog {
         refreshSess();
       } else if(cmp == refreshLog || cmp == logc) {
         byte[] cont = Token.EMPTY;
-        if(logc.getSelectedIndex() != -1) {
-          final IOFile f = new IOFile(logd, logc.getSelectedItem().toString());
-          cont = f.read();
-        }
+        if(logc.getSelectedIndex() != -1) cont = new IOFile(logd, logc.getSelectedItem()).read();
         logt.setText(cont);
         logt.scrollToEnd();
       } else if(cmp == delete) {
-        final IOFile f = new IOFile(logd, logc.getSelectedItem().toString());
+        final IOFile f = new IOFile(logd, logc.getSelectedItem());
         if(f.delete()) {
           logc.setSelectedIndex(-1);
           refreshLog();
@@ -377,10 +373,9 @@ public final class DialogServer extends BaseXDialog {
     final boolean vallp = new String(admpass.getPassword()).matches("[^ ;'\"]*");
     final boolean valh = host.getText().matches("([\\w]+://)?[\\w.-]+");
 
-    if(msg == null && msg2 == null &&
-        !(valpl && valh && valp && vallu && vallp)) {
-      msg = Util.info(INVALID_X, !valpl ? S_LOCALPORT : !valh ? S_HOST :
-        !valp ? S_PORT : !vallu ? USERNAME : PASSWORD);
+    if(msg == null && msg2 == null && !(valpl && valh && valp && vallu && vallp)) {
+      msg = Util.info(INVALID_X, valpl ? valh ? valp ? vallu ?
+        PASSWORD : USERNAME : S_PORT : S_HOST : S_LOCALPORT);
       icon = Msg.WARN;
     }
     infoC.setText(msg, icon);

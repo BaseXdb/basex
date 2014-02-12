@@ -12,18 +12,19 @@ import org.basex.util.*;
 /**
  * Hashing functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNHash extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNHash(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNHash(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -69,7 +70,7 @@ public final class FNHash extends StandardFunc {
     try {
       return new B64(MessageDigest.getInstance(algo).digest(val));
     } catch(final NoSuchAlgorithmException ex) {
-      throw HASH_ALG.thrw(info, algo);
+      throw HASH_ALG.get(info, algo);
     }
   }
 }

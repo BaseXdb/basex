@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
 import java.math.*;
+import java.util.Date;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -13,7 +14,7 @@ import org.basex.util.*;
 /**
  * DateTime item ({@code xs:dateTime}).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Dtm extends ADate {
@@ -46,7 +47,7 @@ public final class Dtm extends ADate {
     if(zon == Short.MAX_VALUE) {
       zon = time.zon;
     } else if(zon != time.zon && time.zon != Short.MAX_VALUE) {
-      FUNZONE.thrw(ii, date, time);
+      throw FUNZONE.get(ii, date, time);
     }
   }
 
@@ -71,7 +72,7 @@ public final class Dtm extends ADate {
    * @throws QueryException query exception
    */
   public Dtm(final long ms, final InputInfo ii) throws QueryException {
-    this(Token.token(DateTime.format(new java.util.Date(ms), DateTime.FULL)), ii);
+    this(Token.token(DateTime.format(new Date(ms), DateTime.FULL)), ii);
   }
 
   /**
@@ -88,7 +89,7 @@ public final class Dtm extends ADate {
     this(date);
     if(dur instanceof DTDur) {
       calc((DTDur) dur, plus);
-      if(yea <= MIN_YEAR || yea > MAX_YEAR) DATEADDRANGE.thrw(ii, this);
+      if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE.get(ii, yea);
     } else {
       calc((YMDur) dur, plus, ii);
     }

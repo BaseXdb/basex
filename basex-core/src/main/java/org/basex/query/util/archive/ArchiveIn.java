@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Archive reader.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class ArchiveIn {
@@ -28,18 +28,16 @@ public abstract class ArchiveIn {
    * @return reader
    * @throws QueryException query exception
    */
-  public static ArchiveIn get(final BufferInput bi, final InputInfo info)
-      throws QueryException {
-
+  public static ArchiveIn get(final BufferInput bi, final InputInfo info) throws QueryException {
     try {
       final LookupInput li = new LookupInput(bi);
       if(li.lookup() == 0x50) return new ZIPIn(li);
       if(li.lookup() == 0x1f) return new GZIPIn(li);
     } catch(final IOException ex) {
       try { bi.close(); } catch(final IOException ignored) { }
-      throw ARCH_FAIL.thrw(info, ex);
+      throw ARCH_FAIL.get(info, ex);
     }
-    throw ARCH_UNKNOWN.thrw(info);
+    throw ARCH_UNKNOWN.get(info);
   }
 
   /**

@@ -10,7 +10,7 @@ import org.basex.gui.layout.*;
 /**
  * This panel is added to each view to allow drag and drop operations.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class ViewMover extends BaseXPanel {
@@ -34,13 +34,10 @@ final class ViewMover extends BaseXPanel {
     setCursor(GUIConstants.CURSORMOVE);
     refreshLayout();
 
-    new BaseXPopup(this, new GUICmd[] {
-      new GUIBaseCmd() {
-        @Override
-        public String label() { return Text.CLOSE; }
-        @Override
-        public void execute(final GUI g) { ((ViewPanel) getParent()).delete(); }
-      }});
+    new BaseXPopup(this, new GUIPopupCmd(Text.CLOSE) {
+      @Override
+      public void execute() { ((ViewPanel) getParent()).delete(); }
+    });
    }
 
   @Override

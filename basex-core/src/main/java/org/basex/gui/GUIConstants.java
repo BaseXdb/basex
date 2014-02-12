@@ -1,7 +1,7 @@
 package org.basex.gui;
 
-import static org.basex.gui.GUIBaseCmd.*;
-import static org.basex.gui.GUICommands.*;
+import static org.basex.gui.GUIPopupCmd.*;
+import static org.basex.gui.GUIMenuCmd.*;
 
 import java.awt.*;
 
@@ -11,6 +11,7 @@ import org.basex.core.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
 import org.basex.gui.view.map.*;
+import org.basex.util.*;
 
 /**
  * GUI Constants used in different views.
@@ -34,18 +35,16 @@ import org.basex.gui.view.map.*;
  *
  * <ul>
  *  <li> add a boolean visibility flag with the view name included
- *    in the {@link GUIProp} class {@link GUIProp#SHOWMAP})</li>
- *  <li> add strings for the menu text and command description in the
- *    {@link Text} class (e.g. {@link Text#MAP} an
- *    {@link Text#H_MAP}).
+ *    in the {@link GUIOptions} class {@link GUIOptions#SHOWMAP})</li>
+ *  <li> add strings for the menu text.</li>
  *  <li> optionally add localized translations in the .lang files
- *    (e.g. {@code c_showmap} and {@code c_showmaptt})
- *  <li> add a corresponding command in the {@link GUICommands} class
- *   (e.g. {@link GUICommands#C_SHOWMAP})and add a reference in the
+ *    (e.g. {@code c_showmap} and {@code c_showmaptt})</li>
+ *  <li> add a corresponding command in the {@link GUIMenuCmd} class
+ *   (e.g. {@link GUIMenuCmd#C_SHOWMAP})and add a reference in the
  *   {@link #MENUITEMS} menu structure</li>
  * </ul>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class GUIConstants {
@@ -84,10 +83,10 @@ public final class GUIConstants {
   // TOOLBAR ==================================================================
 
   /** Toolbar entries, containing the button commands. */
-  static final GUICommands[] TOOLBAR = {
+  static final GUIMenuCmd[] TOOLBAR = {
     C_CREATE, C_OPEN_MANAGE, C_INFO, C_CLOSE, null,
     C_GOHOME, C_GOBACK, C_GOUP, C_GOFORWARD, null,
-    C_SHOWEDITOR, C_SHOWINFO, null, C_SHOWRESULT, C_SHOWMAP, C_SHOWTREE,
+    C_SHOWEDITOR, C_SHOWRESULT, C_SHOWINFO, null, C_SHOWMAP, C_SHOWTREE,
     C_SHOWFOLDER, C_SHOWPLOT, C_SHOWTABLE, C_SHOWEXPLORE
   };
 
@@ -95,32 +94,31 @@ public final class GUIConstants {
 
   /** Top menu entries. */
   static final String[] MENUBAR = {
-    Text.DATABASE, Text.EDITOR, Text.VIEW, Text.NODES, Text.OPTIONS, Text.HELP
+    Text.DATABASE, Text.EDITOR, Text.VIEW, Text.VISUALIZATION, Text.OPTIONS, Text.HELP
   };
 
   /**
    * Two-dimensional menu entries, containing the menu item commands.
-   * {@link GUIBaseCmd#SEPARATOR} references serve as menu separators.
+   * {@link GUIPopupCmd#SEPARATOR} references serve as menu separators.
    */
-  static final GUICmd[][] MENUITEMS = { {
+  static final GUICommand[][] MENUITEMS = { {
     C_CREATE, C_OPEN_MANAGE, SEPARATOR,
     C_INFO, C_EXPORT, C_CLOSE, SEPARATOR,
     C_SERVER, Prop.MAC ? null : SEPARATOR,
     Prop.MAC ? null : C_EXIT
   }, {
     C_EDITNEW, C_EDITOPEN, C_EDITREOPEN, C_EDITSAVE, C_EDITSAVEAS, C_EDITCLOSE,
-    SEPARATOR, C_EDIT_GOTO, SEPARATOR, C_SHOWEDITOR, C_SHOWINFO
+    C_FORMAT, C_COMMENT, SEPARATOR, C_NEXTERROR, C_JUMPFILE
   }, {
-    C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS, SEPARATOR,
-    C_SHOWRESULT, C_SHOWMAP, C_SHOWTREE, C_SHOWFOLDER, C_SHOWPLOT, C_SHOWTABLE,
-    C_SHOWEXPLORE, GUIMacOSX.nativeFullscreen() ? null : SEPARATOR,
+    C_SHOWEDITOR, C_SHOWPROJECT, C_FILESEARCH, SEPARATOR,
+    C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
     GUIMacOSX.nativeFullscreen() ? null : C_FULL
   }, {
-    C_COPY, C_PASTE, C_DELETE, C_INSERT, C_EDIT, SEPARATOR,
-    C_COPYPATH, C_FILTER
+    C_SHOWMAP, C_SHOWTREE, C_SHOWFOLDER, C_SHOWPLOT, C_SHOWTABLE,
+    C_SHOWEXPLORE,
   }, {
     C_RTEXEC, C_RTFILTER, SEPARATOR,
-    C_COLOR, C_FONTS, C_MAPLAYOUT, C_TREEOPTIONS, Prop.MAC ? null : SEPARATOR,
+    C_COLOR, C_FONTS, Prop.MAC ? null : SEPARATOR,
     C_PACKAGES, Prop.MAC ? null : C_PREFS
   }, {
     C_HELP, Prop.MAC ? null : SEPARATOR,
@@ -129,9 +127,8 @@ public final class GUIConstants {
   }};
 
   /** Context menu entries. */
-  public static final GUICommands[] POPUP = {
-    C_GOBACK, C_FILTER, null, C_COPY, C_PASTE, C_DELETE, C_INSERT, C_EDIT, null,
-    C_COPYPATH
+  public static final GUIMenuCmd[] POPUP = {
+    C_GOBACK, C_FILTER, null, C_COPY, C_PASTE, C_DELETE, C_INSERT, C_EDIT, null, C_COPYPATH
   };
 
   // CURSORS ==================================================================
@@ -175,7 +172,7 @@ public final class GUIConstants {
      * @param l large icon
      */
     Msg(final String s, final String l) {
-      small = BaseXLayout.icon(s);
+      small = BaseXImages.icon(s);
       large = UIManager.getIcon("OptionPane." + l + "Icon");
     }
   }
@@ -231,6 +228,8 @@ public final class GUIConstants {
   public static Color color2A;
   /** Transparent frame color. */
   public static Color color3A;
+  /** Cursor background color. */
+  public static Color color4A;
   /** Mark color, custom alpha value. */
   public static Color colormark1A;
   /** Second mark color, custom alpha value. */
@@ -242,7 +241,7 @@ public final class GUIConstants {
   // FONTS ====================================================================
 
   /** Font of text area. */
-  public static final Font TFONT = UIManager.getFont("TextArea.font");
+  private static final Font TFONT = UIManager.getFont("TextArea.font");
   /** Large font. */
   public static Font lfont;
   /** Font. */
@@ -270,25 +269,25 @@ public final class GUIConstants {
   // KEYS =====================================================================
 
   /** Shift key. */
-  public static final int SHF = Event.SHIFT_MASK;
+  public static final int SHIFT = Event.SHIFT_MASK;
   /** Alt key. */
   public static final int ALT = Event.ALT_MASK;
   /** Control key. */
   public static final int CTRL = Event.CTRL_MASK;
   /** Shortcut key (CTRL/META). */
-  public static final int SC = Prop.MAC ? Event.META_MASK : Event.CTRL_MASK;
+  public static final int META = Prop.MAC ? Event.META_MASK : Event.CTRL_MASK;
 
   /** Private constructor, preventing class instantiation. */
   private GUIConstants() { }
 
   /**
    * Initializes colors.
-   * @param prop gui properties
+   * @param opts gui options
    */
-  public static void init(final GUIProp prop) {
-    final int r = prop.num(GUIProp.COLORRED);
-    final int g = prop.num(GUIProp.COLORGREEN);
-    final int b = prop.num(GUIProp.COLORBLUE);
+  public static void init(final GUIOptions opts) {
+    final int r = opts.get(GUIOptions.COLORRED);
+    final int g = opts.get(GUIOptions.COLORGREEN);
+    final int b = opts.get(GUIOptions.COLORBLUE);
 
     // calculate color c:
     // c = (255 - expectedColor) * 10 / factor (= GUIRED/BLUE/GREEN)
@@ -299,7 +298,7 @@ public final class GUIConstants {
     color1A = new Color(col(r, 110), col(g, 150), col(b, 160), 100);
 
     colormark1A = new Color(col(r, 32), col(g, 160), col(b, 320), 100);
-    colormark2A = new Color(col(r, 16), col(g, 80), col(b, 160), 100);
+    colormark2A = new Color(col(r, 12), col(g, 60), col(b, 120), 100);
     colormark1 = new Color(col(r, 16), col(g, 120), col(b, 240));
     colormark2 = new Color(col(r, 16), col(g, 80), col(b, 160));
     colormark3 = new Color(col(r, 32), col(g, 160), col(b, 320));
@@ -313,15 +312,16 @@ public final class GUIConstants {
     final Color c = COLORS[16];
     color2A = new Color(c.getRed(), c.getGreen(), c.getBlue(), 40);
     color3A = new Color(c.getRed(), c.getGreen(), c.getBlue(), 100);
+    color4A = new Color(c.getRed(), c.getGreen(), c.getBlue(), 20);
 
-    final String f = prop.get(GUIProp.FONT);
-    final int type = prop.num(GUIProp.FONTTYPE);
-    fontSize = prop.num(GUIProp.FONTSIZE);
+    final String f = opts.get(GUIOptions.FONT);
+    final int type = opts.get(GUIOptions.FONTTYPE);
+    fontSize = opts.get(GUIOptions.FONTSIZE);
     font  = new Font(f, type, fontSize);
-    mfont = new Font(prop.get(GUIProp.MONOFONT), type, fontSize);
+    mfont = new Font(opts.get(GUIOptions.MONOFONT), type, fontSize);
     bfont = new Font(f, Font.BOLD, fontSize);
     lfont = new Font(f, type, 18 + (fontSize >> 1));
-    dmfont = new Font(prop.get(GUIProp.MONOFONT), 0, TFONT.getSize() - 1);
+    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, TFONT.getSize() - 1);
 
     final Container comp = new Container();
     dwidth  = comp.getFontMetrics(dmfont).getWidths();

@@ -4,13 +4,13 @@ package org.basex.index.ft;
  * This class provides an array with several {@link FTIndexTree} instances,
  * one for each token length.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */
 final class FTIndexTrees {
   /** For each key length, an extra tree is created. */
-  final FTIndexTree[] trees;
+  private final FTIndexTree[] trees;
   /** Pointer on current tree. */
   private int ctree;
 

@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
-import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
 import java.util.*;
@@ -21,42 +20,37 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
  * Full-text functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNFt extends StandardFunc {
   /** Element: options. */
   private static final QNm Q_OPTIONS = QNm.get("options");
   /** Marker element. */
-  private static final byte[] MARK = token("mark");
-  /** Fuzzy option. */
-  private static final byte[] FUZZY = token("fuzzy");
-  /** Wildcards option. */
-  private static final byte[] WILDCARDS = token("wildcards");
-  /** Search mode. */
-  private static final byte[] MODE = token("mode");
+  private static final byte[] MARK = Token.token("mark");
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNFt(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNFt(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case _FT_COUNT: return count(ctx);
-      default:        return super.item(ctx, ii);
+      case _FT_CONTAINS: return contains(ctx);
+      case _FT_COUNT:    return count(ctx);
+      default:           return super.item(ctx, ii);
     }
   }
 
@@ -80,12 +74,13 @@ public final class FNFt extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item count(final QueryContext ctx) throws QueryException {
-    final FTPosData tmp = ctx.ftpos;
-    ctx.ftpos = new FTPosData();
+    final FTPosData tmp = ctx.ftPosData;
+    ctx.ftPosData = new FTPosData();
     final Iter ir = ctx.iter(expr[0]);
-    for(Item it; (it = ir.next()) != null;) checkDBNode(it);
-    final int s = ctx.ftpos.size();
-    ctx.ftpos = tmp;
+    for(Item it; (it = ir.next()) != null;)
+      checkDBNode(it);
+    final int s = ctx.ftPosData.size();
+    ctx.ftPosData = tmp;
     return Int.get(s);
   }
 
@@ -103,7 +98,7 @@ public final class FNFt extends StandardFunc {
     if(expr.length > 1) {
       // name of the marker element; default is <mark/>
       m = checkStr(expr[1], ctx);
-      if(!XMLToken.isQName(m)) Err.value(info, AtomType.QNM, m);
+      if(!XMLToken.isQName(m)) throw valueError(info, AtomType.QNM, m);
     }
     if(expr.length > 2) {
       l = (int) checkItr(expr[2], ctx);
@@ -124,23 +119,23 @@ public final class FNFt extends StandardFunc {
             if(it != null) return it;
             vi = null;
           }
-          final FTPosData tmp = ctx.ftpos;
+          final FTPosData tmp = ctx.ftPosData;
           try {
-            ctx.ftpos = ftd;
+            ctx.ftPosData = ftd;
             if(ir == null) ir = ctx.iter(expr[0]);
             final Item it = ir.next();
             if(it == null) return null;
 
             // copy node to main memory data instance
-            final MemData md = new MemData(ctx.context.prop);
+            final MemData md = new MemData(ctx.context.options);
             final DataBuilder db = new DataBuilder(md);
-            db.ftpos(mark, ctx.ftpos, len).build(checkDBNode(it));
+            db.ftpos(mark, ctx.ftPosData, len).build(checkDBNode(it));
 
             final IntList il = new IntList();
             for(int p = 0; p < md.meta.size; p += md.size(p, md.kind(p))) il.add(p);
             vi = DBNodeSeq.get(il, md, false, false).iter();
           } finally {
-            ctx.ftpos = tmp;
+            ctx.ftPosData = tmp;
           }
         }
       }
@@ -166,6 +161,34 @@ public final class FNFt extends StandardFunc {
   }
 
   /**
+   * Performs the contains function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Bln contains(final QueryContext ctx) throws QueryException {
+    final Value input = ctx.value(expr[0]);
+    final Value query = ctx.value(expr[1]);
+    final FTOptions opts = checkOptions(2, Q_OPTIONS, new FTOptions(), ctx);
+
+    final FTOpt opt = new FTOpt();
+    final FTMode mode = opts.get(FTIndexOptions.MODE);
+    opt.set(FZ, opts.get(FTIndexOptions.FUZZY));
+    opt.set(WC, opts.get(FTIndexOptions.WILDCARDS));
+    opt.set(DC, opts.get(FTOptions.DIACRITICS) == FTDiacritics.SENSITIVE);
+    opt.set(ST, opts.get(FTOptions.STEMMING));
+    opt.ln = Language.get(opts.get(FTOptions.LANGUAGE));
+    opt.cs = opts.get(FTOptions.CASE);
+    if(opt.is(FZ) && opt.is(WC)) throw BXFT_MATCH.get(info, this);
+
+    final FTOpt tmp = ctx.ftOpt();
+    ctx.ftOpt(opt);
+    final FTExpr fte = new FTWords(info, query, mode, null).compile(ctx, null);
+    ctx.ftOpt(tmp);
+    return new FTContainsExpr(input, options(fte, opts), info).item(ctx, info);
+  }
+
+  /**
    * Performs the search function.
    * @param ctx query context
    * @return iterator
@@ -174,54 +197,62 @@ public final class FNFt extends StandardFunc {
   private Iter search(final QueryContext ctx) throws QueryException {
     final Data data = checkData(ctx);
     final Value terms = ctx.value(expr[1]);
-    final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
-    final TokenMap tm = new FuncParams(Q_OPTIONS, info).parse(opt);
-    return search(data, terms, tm, this, ctx);
+    final FTOptions opts = checkOptions(2, Q_OPTIONS, new FTOptions(), ctx);
+
+    final IndexContext ic = new IndexContext(data, false);
+    if(!data.meta.ftxtindex) throw BXDB_INDEX.get(info, data.meta.name,
+        IndexType.FULLTEXT.toString().toLowerCase(Locale.ENGLISH));
+
+    final FTOpt opt = new FTOpt().copy(data.meta);
+    final FTMode mode = opts.get(FTIndexOptions.MODE);
+    opt.set(FZ, opts.get(FTIndexOptions.FUZZY));
+    opt.set(WC, opts.get(FTIndexOptions.WILDCARDS));
+    if(opt.is(FZ) && opt.is(WC)) throw BXFT_MATCH.get(info, this);
+
+    final FTOpt tmp = ctx.ftOpt();
+    ctx.ftOpt(opt);
+    final FTExpr fte = new FTWords(info, ic, terms, mode).compile(ctx, null);
+    ctx.ftOpt(tmp);
+    return new FTIndexAccess(info, options(fte, opts), ic).iter(ctx);
   }
 
   /**
-   * Performs an index-based search.
-   * @param data data reference
-   * @param terms query terms
-   * @param map map with full-text options
-   * @param fun calling function
-   * @param ctx query context
-   * @return iterator
-   * @throws QueryException query exception
+   * Performs the search function.
+   * @param ftexpr full-text expression
+   * @param opts full-text options
+   * @return expressions
    */
-  static Iter search(final Data data, final Value terms, final TokenMap map,
-      final StandardFunc fun, final QueryContext ctx) throws QueryException {
-
-    final InputInfo info = fun.info;
-    final IndexContext ic = new IndexContext(data, false);
-    if(!data.meta.ftxtindex) BXDB_INDEX.thrw(info, data.meta.name,
-        IndexType.FULLTEXT.toString().toLowerCase(Locale.ENGLISH));
-
-    final FTOpt tmp = ctx.ftOpt();
-    final FTOpt opt = new FTOpt().copy(data.meta);
-    FTMode m = FTMode.ANY;
-    if(map != null) {
-      for(final byte[] k : map) {
-        final byte[] v = map.get(k);
-        if(eq(k, FUZZY)) {
-          final boolean t = v.length == 0 || Util.yes(string(v));
-          opt.set(FZ, t);
-        } else if(eq(k, WILDCARDS)) {
-          final boolean t = v.length == 0 || Util.yes(string(v));
-          opt.set(WC, t);
-        } else if(eq(k, MODE)) {
-          m = FTMode.get(v);
-          if(m == null) ELMOPTION.thrw(info, v);
-        } else {
-          ELMOPTION.thrw(info, k);
-        }
+  private FTExpr options(final FTExpr ftexpr, final FTOptions opts) {
+    FTExpr fte = ftexpr;
+    if(opts != null) {
+      if(opts.get(FTIndexOptions.ORDERED)) {
+        fte = new FTOrder(info, fte);
+      }
+      if(opts.contains(FTIndexOptions.DISTANCE)) {
+        final FTDistanceOptions fopts = opts.get(FTIndexOptions.DISTANCE);
+        final Int min = Int.get(fopts.get(FTDistanceOptions.MIN));
+        final Int max = Int.get(fopts.get(FTDistanceOptions.MAX));
+        final FTUnit unit = fopts.get(FTDistanceOptions.UNIT);
+        fte = new FTDistance(info, fte, min, max, unit);
+      }
+      if(opts.contains(FTIndexOptions.WINDOW)) {
+        final FTWindowOptions fopts = opts.get(FTIndexOptions.WINDOW);
+        final Int sz = Int.get(fopts.get(FTWindowOptions.SIZE));
+        final FTUnit unit = fopts.get(FTWindowOptions.UNIT);
+        fte = new FTWindow(info, fte, sz, unit);
+      }
+      if(opts.contains(FTIndexOptions.SCOPE)) {
+        final FTScopeOptions fopts = opts.get(FTIndexOptions.SCOPE);
+        final boolean same = fopts.get(FTScopeOptions.SAME);
+        final FTUnit unit = fopts.get(FTScopeOptions.UNIT).unit();
+        fte = new FTScope(info, fte, same, unit);
+      }
+      if(opts.contains(FTIndexOptions.CONTENT)) {
+        final FTContents cont = opts.get(FTIndexOptions.CONTENT);
+        fte = new FTContent(info, fte, cont);
       }
     }
-
-    ctx.ftOpt(opt);
-    final FTWords words = new FTWords(info, ic, terms, m, ctx);
-    ctx.ftOpt(tmp);
-    return new FTIndexAccess(info, words, ic).iter(ctx);
+    return fte;
   }
 
   /**
@@ -261,12 +292,11 @@ public final class FNFt extends StandardFunc {
   @Override
   public boolean iterable() {
     // index functions will always yield ordered and duplicate-free results
-    return sig == Function._FT_SEARCH || super.iterable();
+    return sig == _FT_SEARCH || super.iterable();
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    if(oneOf(sig, _FT_SEARCH, _FT_TOKENS) && !dataLock(visitor)) return false;
-    return super.accept(visitor);
+    return !(oneOf(sig, _FT_SEARCH, _FT_TOKENS) && !dataLock(visitor)) && super.accept(visitor);
   }
 }

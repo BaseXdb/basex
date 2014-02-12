@@ -13,7 +13,7 @@ import org.basex.gui.layout.*;
  * View observer pattern. All inheriting classes are attached to the
  * views array
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class View extends BaseXPanel {
@@ -24,7 +24,7 @@ public abstract class View extends BaseXPanel {
    */
   protected View(final String name, final ViewNotifier man) {
     super(man.gui);
-    mode(man.gui.gprop.is(GUIProp.GRADIENT) ? Fill.GRADIENT : Fill.PLAIN);
+    mode(man.gui.gopts.get(GUIOptions.GRADIENT) ? Fill.GRADIENT : Fill.PLAIN);
     setFocusable(true);
     setBackground(Color.white);
     setName(name);
@@ -89,8 +89,7 @@ public abstract class View extends BaseXPanel {
 
   @Override
   public void mouseEntered(final MouseEvent e) {
-    if(!gui.updating && gui.gprop.is(GUIProp.MOUSEFOCUS))
-      requestFocusInWindow();
+    if(!gui.updating && gui.gopts.get(GUIOptions.MOUSEFOCUS)) requestFocusInWindow();
   }
 
   @Override
@@ -114,9 +113,9 @@ public abstract class View extends BaseXPanel {
     if(SPACE.is(e)) {
       gui.notify.mark(sc(e) ? 2 : e.isShiftDown() ? 1 : 0, null);
     } else if(ENTER.is(e)) {
-      GUICommands.C_FILTER.execute(gui);
+      GUIMenuCmd.C_FILTER.execute(gui);
     } else if(GOBACK2.is(e)) {
-      GUICommands.C_GOBACK.execute(gui);
+      GUIMenuCmd.C_GOBACK.execute(gui);
     }
   }
 

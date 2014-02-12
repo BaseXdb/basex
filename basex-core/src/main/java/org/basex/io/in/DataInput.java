@@ -10,7 +10,7 @@ import org.basex.util.list.*;
  * This is an input stream for project specific data types.
  * It bears resemblance to Java's {@link DataInputStream}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DataInput extends BufferInput {

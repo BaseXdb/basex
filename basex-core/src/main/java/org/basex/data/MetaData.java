@@ -18,14 +18,14 @@ import org.basex.util.ft.*;
 /**
  * This class provides meta information on a database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class MetaData {
   /** Database path. Set to {@code null} if database is in main memory. */
   public final IOFile path;
-  /** Properties. */
-  public final Prop prop;
+  /** Database options. */
+  public final MainOptions options;
 
   /** Database name. */
   public volatile String name;
@@ -98,11 +98,11 @@ public final class MetaData {
   private volatile int scoring;
 
   /**
-   * Constructor, specifying the database properties.
-   * @param pr database properties
+   * Constructor, specifying the database options.
+   * @param opts database options
    */
-  public MetaData(final Prop pr) {
-    this("", pr, null);
+  public MetaData(final MainOptions opts) {
+    this("", opts, null);
   }
 
   /**
@@ -111,31 +111,31 @@ public final class MetaData {
    * @param ctx database context
    */
   public MetaData(final String db, final Context ctx) {
-    this(db, ctx.prop, ctx.mprop);
+    this(db, ctx.options, ctx.globalopts);
   }
 
   /**
    * Constructor, specifying the database name.
    * @param db name of the database
-   * @param pr database properties
-   * @param mprop main properties
+   * @param opts database options
+   * @param gopts global options
    */
-  private MetaData(final String db, final Prop pr, final MainProp mprop) {
-    path = mprop != null ? mprop.dbpath(db) : null;
-    prop = pr;
+  private MetaData(final String db, final MainOptions opts, final GlobalOptions gopts) {
+    path = gopts != null ? gopts.dbpath(db) : null;
+    options = opts;
     name = db;
-    chop = prop.is(Prop.CHOP);
-    createtext = prop.is(Prop.TEXTINDEX);
-    createattr = prop.is(Prop.ATTRINDEX);
-    createftxt = prop.is(Prop.FTINDEX);
-    diacritics = prop.is(Prop.DIACRITICS);
-    stemming = prop.is(Prop.STEMMING);
-    casesens = prop.is(Prop.CASESENS);
-    updindex = prop.is(Prop.UPDINDEX);
-    maxlen = prop.num(Prop.MAXLEN);
-    maxcats = prop.num(Prop.MAXCATS);
-    stopwords = prop.get(Prop.STOPWORDS);
-    language = Language.get(prop);
+    chop = options.get(MainOptions.CHOP);
+    createtext = options.get(MainOptions.TEXTINDEX);
+    createattr = options.get(MainOptions.ATTRINDEX);
+    createftxt = options.get(MainOptions.FTINDEX);
+    diacritics = options.get(MainOptions.DIACRITICS);
+    stemming = options.get(MainOptions.STEMMING);
+    casesens = options.get(MainOptions.CASESENS);
+    updindex = options.get(MainOptions.UPDINDEX);
+    maxlen = options.get(MainOptions.MAXLEN);
+    maxcats = options.get(MainOptions.MAXCATS);
+    stopwords = options.get(MainOptions.STOPWORDS);
+    language = Language.get(options);
     users = new Users(null);
   }
 
@@ -231,7 +231,7 @@ public final class MetaData {
    * @return binary directory
    */
   public IOFile binaries() {
-    return new IOFile(path, M_RAW);
+    return new IOFile(path, IO.RAW);
   }
 
   /**
@@ -266,8 +266,6 @@ public final class MetaData {
     try {
       di = new DataInput(dbfile(DATAINF));
       read(di);
-    } catch(final IOException ex) {
-      throw ex;
     } finally {
       if(di != null) try { di.close(); } catch(final IOException ignored) { }
     }
@@ -369,7 +367,7 @@ public final class MetaData {
   /**
    * Notifies the meta structures of an update and invalidates the indexes.
    */
-  void update() {
+  public void update() {
     // update database timestamp
     time = System.currentTimeMillis();
     uptodate = false;
@@ -389,42 +387,42 @@ public final class MetaData {
    * @return result
    */
   private static boolean toBool(final String v) {
-    return v.equals("1");
+    return "1".equals(v);
   }
 
   /**
-   * Writes a boolean property to the specified output.
-   * @param out output stream
-   * @param k key
-   * @param pr property to write
-   * @throws IOException I/O exception
-   */
-  private static void writeInfo(final DataOutput out, final String k,
-      final boolean pr) throws IOException {
-    writeInfo(out, k, pr ? "1" : "0");
-  }
-
-  /**
-   * Writes a numeric property to the specified output.
+   * Writes a boolean option to the specified output.
    * @param out output stream
    * @param k key
    * @param v value
    * @throws IOException I/O exception
    */
-  private static void writeInfo(final DataOutput out, final String k,
-      final long v) throws IOException {
+  private static void writeInfo(final DataOutput out, final String k, final boolean v)
+      throws IOException {
+    writeInfo(out, k, v ? "1" : "0");
+  }
+
+  /**
+   * Writes a numeric option to the specified output.
+   * @param out output stream
+   * @param k key
+   * @param v value
+   * @throws IOException I/O exception
+   */
+  private static void writeInfo(final DataOutput out, final String k, final long v)
+      throws IOException {
     writeInfo(out, k, Long.toString(v));
   }
 
   /**
-   * Writes a string property to the specified output.
+   * Writes a string option to the specified output.
    * @param out output stream
    * @param k key
    * @param v value
    * @throws IOException I/O exception
    */
-  private static void writeInfo(final DataOutput out, final String k,
-      final String v) throws IOException {
+  private static void writeInfo(final DataOutput out, final String k, final String v)
+      throws IOException {
     out.writeToken(token(k));
     out.writeToken(token(v));
   }

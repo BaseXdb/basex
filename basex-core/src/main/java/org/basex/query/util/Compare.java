@@ -17,7 +17,7 @@ import org.basex.util.*;
 /**
  * Utility class for comparing XQuery values.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Compare {
@@ -108,7 +108,7 @@ public final class Compare {
           if(!((Map) it1).deep(info, (Map) it2)) return false;
           continue;
         }
-        FICMP.thrw(info, it1 instanceof FItem ? it1 : it2);
+        throw FICMP.get(info, it1 instanceof FItem ? it1.type : it2.type);
       }
 
       // identical items are also equal

@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * FTExtensionSelection expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class FTExtensionSelection extends FTExpr {
@@ -42,8 +42,7 @@ public final class FTExtensionSelection extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final Pragma[] prag = pragmas.clone();
     for(int i = 0; i < prag.length; i++) prag[i] = prag[i].copy();
     return copyType(new FTExtensionSelection(info, prag, expr[0].copy(ctx, scp, vs)));
@@ -58,6 +57,6 @@ public final class FTExtensionSelection extends FTExpr {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     for(final Pragma p : pragmas) sb.append(p).append(' ');
-    return sb.append(BRACE1 + ' ' + expr[0] + ' ' + BRACE2).toString();
+    return sb.append(BRACE1 + ' ').append(expr[0]).append(' ').append(BRACE2).toString();
   }
 }

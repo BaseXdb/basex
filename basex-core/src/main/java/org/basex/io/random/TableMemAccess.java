@@ -1,6 +1,5 @@
 package org.basex.io.random;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.data.*;
@@ -12,7 +11,7 @@ import org.basex.util.*;
  *
  * NOTE: this class is not thread-safe.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class TableMemAccess extends TableAccess {
@@ -33,7 +32,7 @@ public final class TableMemAccess extends TableAccess {
   public void flush() { }
 
   @Override
-  public void close() throws IOException { }
+  public void close() { }
 
   @Override
   public boolean lock(final boolean lock) {
@@ -62,7 +61,7 @@ public final class TableMemAccess extends TableAccess {
 
   @Override
   public void write1(final int p, final int o, final int v) {
-    dirty = true;
+    dirty();
     final long[] buf = o < 8 ? buf1 : buf2;
     final long d = (o < 8 ? 7 : 15) - o << 3;
     buf[p] = buf[p] & ~(0xFFL << d) | (long) v << d;
@@ -70,7 +69,7 @@ public final class TableMemAccess extends TableAccess {
 
   @Override
   public void write2(final int p, final int o, final int v) {
-    dirty = true;
+    dirty();
     final long[] buf = o < 8 ? buf1 : buf2;
     final long d = (o < 8 ? 6 : 14) - o << 3;
     buf[p] = buf[p] & ~(0xFFFFL << d) | (long) v << d;
@@ -78,7 +77,7 @@ public final class TableMemAccess extends TableAccess {
 
   @Override
   public void write4(final int p, final int o, final int v) {
-    dirty = true;
+    dirty();
     final long[] buf = o < 8 ? buf1 : buf2;
     final long d = (o < 8 ? 4 : 12) - o << 3;
     buf[p] = buf[p] & ~(0xFFFFFFFFL << d) | (long) v << d;
@@ -86,7 +85,7 @@ public final class TableMemAccess extends TableAccess {
 
   @Override
   public void write5(final int p, final int o, final long v) {
-    dirty = true;
+    dirty();
     final long[] buf = o < 8 ? buf1 : buf2;
     final long d = (o < 8 ? 3 : 11) - o << 3;
     buf[p] = buf[p] & ~(0xFFFFFFFFFFL << d) | v << d;
@@ -94,11 +93,11 @@ public final class TableMemAccess extends TableAccess {
 
   @Override
   protected void copy(final byte[] entries, final int pre, final int last) {
+    dirty();
     for(int o = 0, i = pre; i < last; ++i, o += IO.NODESIZE) {
       buf1[i] = getLong(entries, o);
       buf2[i] = getLong(entries, o + 8);
     }
-    dirty = true;
   }
 
   @Override
@@ -114,6 +113,11 @@ public final class TableMemAccess extends TableAccess {
     set(pre, entries);
   }
 
+  @Override
+  protected void dirty() {
+    dirty = true;
+  }
+
   // PRIVATE METHODS ==========================================================
 
   /**
@@ -122,7 +126,7 @@ public final class TableMemAccess extends TableAccess {
    * @param np destination position
    */
   private void move(final int op, final int np) {
-    dirty = true;
+    dirty();
     final int l = meta.size - op;
     while(l + np >= buf1.length) {
       final int s = Array.newSize(buf1.length);

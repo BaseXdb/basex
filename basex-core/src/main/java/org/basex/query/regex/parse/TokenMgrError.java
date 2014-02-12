@@ -4,7 +4,6 @@ package org.basex.query.regex.parse;
 
 /** Token Manager Error. */
 public class TokenMgrError extends Error {
-
   /**
    * The version identifier for this Serializable class.
    * Increment only if the <i>serialized</i> form of the
@@ -48,10 +47,10 @@ public class TokenMgrError extends Error {
    * @param str string to be escaped
    * @return escaped string
    */
-  protected static final String addEscapes(final String str) {
+  protected static String addEscapes(final String str) {
     final StringBuilder retval = new StringBuilder();
-    char ch;
     for (int i = 0; i < str.length(); i++) {
+      char ch;
       switch (str.charAt(i)) {
         case 0 :
           continue;
@@ -109,7 +108,7 @@ public class TokenMgrError extends Error {
       final int col, final String after, final char curr) {
     return "Lexical error at line " + line + ", column " + col + ".  Encountered: " +
       (eof ? "<EOF> " : '"' + addEscapes(String.valueOf(curr)) + '"' +
-        " (" + (int) curr + "), ") + "after : \"" + addEscapes(after) + '"';
+        " (" + curr + "), ") + "after : \"" + addEscapes(after) + '"';
   }
 
   /**

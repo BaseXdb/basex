@@ -3,9 +3,13 @@ package org.basex.data.atomic;
 import org.basex.data.*;
 
 /**
- * Data container with start and end offset.
+ * Data container with start and end offset. Used mostly to save memory with insertion
+ * sequence caching (only one {@link Data} instance).
  *
- * @author BaseX Team 2005-12, BSD License
+ * Arbitrary trees can be stored in this clip. To distinguish between two insertion
+ * sequences, the root node of each sequence points to the parent PRE==-1.
+ *
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DataClip {

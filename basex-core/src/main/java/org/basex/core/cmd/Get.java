@@ -6,11 +6,12 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.util.options.*;
 
 /**
- * Evaluates the 'get' command and return the value of a database property.
+ * Evaluates the 'get' command and return the value of a database option.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Get extends AGet {
@@ -18,17 +19,23 @@ public final class Get extends AGet {
    * Empty constructor.
    */
   public Get() {
-    this(null);
+    this((String) null);
   }
 
   /**
    * Default constructor.
-   * @param key property
+   * @param option option to be found
    */
-  public Get(final Object key) {
-    super(Perm.NONE, key == null ? null :
-      (key instanceof Object[] ? ((Object[]) key)[0] : key).toString()
-    );
+  public Get(final Option<?> option) {
+    this(option.name());
+  }
+
+  /**
+   * Default constructor.
+   * @param key key to be found
+   */
+  public Get(final String key) {
+    super(key);
   }
 
   @Override
@@ -36,19 +43,38 @@ public final class Get extends AGet {
     if(args[0] == null) {
       // retrieve values of all options
       if(context.user.has(Perm.ADMIN)) {
-        out.println(MAIN_OPTIONS + COL);
-        for(final String s : mprop) out.println(s + COLS + mprop.get(s));
+        out.println(GLOBAL_OPTIONS + COL);
+        for(final Option<?> o : goptions) out.println(o.name() + COLS + goptions.get(o));
       }
-      out.println(NL + OPTIONS + COL);
-      for(final String s : prop) out.println(s + COLS + prop.get(s));
+      out.println(NL + LOCAL_OPTIONS + COL);
+      for(final Option<?> o : options) out.println(o.name() + COLS + options.get(o));
     } else {
       // retrieve value of specific option
-      final String key = args[0].toUpperCase(Locale.ENGLISH);
-      Object type = prop.get(key);
-      if(type == null && context.user.has(Perm.ADMIN)) type = mprop.get(key);
-      if(type == null) return error(prop.unknown(key));
-      out.println(key + COLS + type);
+      final String name = args[0].toUpperCase(Locale.ENGLISH);
+      try {
+        out.println(name + COLS + get(name, context));
+      } catch(final BaseXException ex) {
+        return error(ex.getMessage());
+      }
     }
     return true;
+  }
+
+  /**
+   * Returns the value of the specified option.
+   * @param name name of option
+   * @param ctx database context
+   * @return value
+   * @throws BaseXException database exception
+   */
+  public static String get(final String name, final Context ctx) throws BaseXException {
+    Options opts = ctx.options;
+    Option<?> opt = opts.option(name);
+    if(opt == null && ctx.user.has(Perm.ADMIN)) {
+      opts = ctx.globalopts;
+      opt = opts.option(name);
+    }
+    if(opt == null) throw new BaseXException(ctx.options.error(name));
+    return opts.get(opt).toString();
   }
 }

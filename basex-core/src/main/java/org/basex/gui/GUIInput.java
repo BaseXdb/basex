@@ -13,21 +13,22 @@ import org.basex.data.*;
 import org.basex.gui.layout.*;
 import org.basex.query.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * This class offers a text field for keyword and XQuery input.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Andreas Weiler
  */
 public final class GUIInput extends BaseXTextField {
   /** Reference to main window. */
-  final GUI gui;
+  private final GUI gui;
   /** JComboBox. */
-  final BaseXCombo box;
+  private final BaseXCombo box;
   /** BasicComboPopup Menu. */
-  ComboPopup pop;
+  private ComboPopup pop;
 
   /** String for temporary input. */
   private String pre = "";
@@ -62,9 +63,9 @@ public final class GUIInput extends BaseXTextField {
           } else {
             // store current input in history
             final Data data = main.context.data();
-            final int i = data == null ? 2 : gui.gprop.num(GUIProp.SEARCHMODE);
-            final Object[] options = i == 0 ? GUIProp.SEARCH : i == 1 ?
-              GUIProp.XQUERY : GUIProp.COMMANDS;
+            final int i = data == null ? 2 : gui.gopts.get(GUIOptions.SEARCHMODE);
+            final StringsOption options = i == 0 ? GUIOptions.SEARCH : i == 1 ?
+              GUIOptions.XQUERY : GUIOptions.COMMANDS;
             new BaseXHistory(main, options).store(getText());
 
             // evaluate the input
@@ -76,16 +77,16 @@ public final class GUIInput extends BaseXTextField {
 
         int bi = box.getSelectedIndex();
         if(NEXTLINE.is(e)) {
-          if(!pop.isVisible()) {
-            showPopup();
-          } else {
+          if(pop.isVisible()) {
             if(++bi == count) bi = 0;
+          } else {
+            showPopup();
           }
         } else if(PREVLINE.is(e)) {
-          if(!pop.isVisible()) {
-            showPopup();
-          } else {
+          if(pop.isVisible()) {
             if(--bi < 0) bi = count - 1;
+          } else {
+            showPopup();
           }
         }
         if(bi != box.getSelectedIndex()) box.setSelectedIndex(bi);
@@ -101,7 +102,7 @@ public final class GUIInput extends BaseXTextField {
           if(modifier(e) || control(e)) return;
           showPopup();
           // skip commands
-          if(gui.gprop.is(GUIProp.EXECRT) && !cmdMode()) main.execute();
+          if(gui.gopts.get(GUIOptions.EXECRT) && !cmdMode()) main.execute();
         }
       }
     });
@@ -115,11 +116,20 @@ public final class GUIInput extends BaseXTextField {
   }
 
   /**
+   * Sets the input mode.
+   * @param mode mode
+   */
+  void mode(final String mode) {
+    setText("");
+    hint(mode);
+  }
+
+  /**
    * Checks if the query is a command.
    * @return result of check
    */
   boolean cmdMode() {
-    return gui.gprop.num(GUIProp.SEARCHMODE) == 2 ||
+    return gui.gopts.get(GUIOptions.SEARCHMODE) == 2 ||
       gui.context.data() == null || getText().startsWith("!");
   }
 
@@ -127,15 +137,14 @@ public final class GUIInput extends BaseXTextField {
    * Completes the input with the current combobox choice.
    */
   void completeInput() {
-    final Object sel = box.getSelectedItem();
-    if(sel == null) return;
-    final String suf = sel.toString();
+    final String suf = box.getSelectedItem();
+    if(suf == null) return;
     final int pl = pre.length();
     final int ll = pl > 0 ? pre.charAt(pl - 1) : ' ';
     if(Character.isLetter(ll) && Character.isLetter(suf.charAt(0))) pre += " ";
-    setText(pre + sel);
+    setText(pre + suf);
     showPopup();
-    if(gui.gprop.is(GUIProp.EXECRT) && !cmdMode()) gui.execute();
+    if(gui.gopts.get(GUIOptions.EXECRT) && !cmdMode()) gui.execute();
   }
 
   /**
@@ -143,7 +152,7 @@ public final class GUIInput extends BaseXTextField {
    */
   void showPopup() {
     final String query = getText();
-    final int mode = gui.gprop.num(GUIProp.SEARCHMODE);
+    final int mode = gui.gopts.get(GUIOptions.SEARCHMODE);
     if(cmdMode()) {
       cmdPopup(query);
     } else if(mode == 1 || mode == 0 && query.startsWith("/")) {
@@ -166,8 +175,8 @@ public final class GUIInput extends BaseXTextField {
       new CommandParser(suf, gui.context).suggest();
     } catch(final QueryException ex) {
       sl = ex.suggest();
-      final int marked = ex.markedCol() + (excl ? 2 : 1);
-      if(ex.markedCol() > -1 && marked <= query.length()) {
+      final int marked = ex.markedColumn() + (excl ? 2 : 1);
+      if(ex.markedColumn() > -1 && marked <= query.length()) {
         pre = query.substring(0, marked);
       }
     }
@@ -191,7 +200,7 @@ public final class GUIInput extends BaseXTextField {
       pre = query.substring(0, qs.mark);
     } catch(final QueryException ex) {
       sl = ex.suggest();
-      pre = query.substring(0, ex.col() - (ex.col() == 1 ? 1 : 0));
+      pre = query.substring(0, ex.column() - 1);
     } finally {
       qc.close();
     }
@@ -241,8 +250,7 @@ public final class GUIInput extends BaseXTextField {
     ComboPopup(final JComboBox combo) {
       super(combo);
       final int h = combo.getMaximumRowCount();
-      setPreferredSize(new Dimension(getPreferredSize().width,
-          getPopupHeightForRowCount(h) + 2));
+      setPreferredSize(new Dimension(getPreferredSize().width, getPopupHeightForRowCount(h) + 2));
     }
   }
 }

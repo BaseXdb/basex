@@ -12,25 +12,25 @@ import org.basex.gui.layout.*;
 /**
  * Abstract class for GUI windows.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class AGUI extends JFrame {
   /** Database Context. */
   public final Context context;
-  /** GUI properties. */
-  public final GUIProp gprop;
+  /** GUI options. */
+  public final GUIOptions gopts;
 
   /**
    * Default constructor.
    * @param ctx database context
-   * @param gprops gui properties
+   * @param opts gui options
    */
-  AGUI(final Context ctx, final GUIProp gprops) {
-    setIconImage(BaseXLayout.image("icon"));
+  AGUI(final Context ctx, final GUIOptions opts) {
+    setIconImage(BaseXImages.get("icon"));
     setTitle(null);
     context = ctx;
-    gprop = gprops;
+    gopts = opts;
   }
 
   @Override

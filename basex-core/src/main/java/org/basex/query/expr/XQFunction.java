@@ -3,34 +3,15 @@ package org.basex.query.expr;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
  * Interface for XQuery functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
-public interface XQFunction {
-
-  /**
-   * Number of arguments this function takes.
-   * @return function arity
-   */
-  int arity();
-
-  /**
-   * Name of this function, {@code null} means anonymous function.
-   * @return name or {@code null}
-   */
-  QNm fName();
-
-  /**
-   * Type of this function.
-   * @return this function's type
-   */
-  FuncType funcType();
+public interface XQFunction extends XQFunctionExpr {
 
   /**
    * Internally invokes this function with the given arguments.

@@ -20,10 +20,10 @@ import com.vividsolutions.jts.io.gml2.*;
 /**
  * This module contains geo spatial functions for the Geo module.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Masoumeh Seydi
  */
-public class Geo extends QueryModule {
+public final class Geo extends QueryModule {
   /** GML URI. */
   private static final byte[] URI = token("http://www.opengis.net/gml");
   /** Prefix: "gml". */
@@ -479,9 +479,7 @@ public class Geo extends QueryModule {
     if(geo == null && checkGeo(node) != null)
       throw GeoErrors.geoType(node.qname().local(), "Line");
 
-    return gmlWriter(geo instanceof LineString ?
-       ((LineString) geo).getStartPoint() :
-       ((LinearRing) geo).getStartPoint());
+    return gmlWriter(((LineString) geo).getStartPoint());
   }
 
   /**
@@ -496,9 +494,7 @@ public class Geo extends QueryModule {
     if(geo == null && checkGeo(node) != null)
       throw GeoErrors.geoType(node.qname().local(), "Line");
 
-    return gmlWriter(geo instanceof LineString ?
-       ((LineString) geo).getEndPoint() :
-       ((LinearRing) geo).getEndPoint());
+    return gmlWriter(((LineString) geo).getEndPoint());
   }
 
   /**
@@ -510,15 +506,12 @@ public class Geo extends QueryModule {
    */
   @Deterministic
   public Bln isClosed(final ANode node) throws QueryException {
-    final Geometry geo = geo(node,
-        Q_GML_LINEARRING, Q_GML_LINESTRING, Q_GML_MULTILINESTRING);
+    final Geometry geo = geo(node, Q_GML_LINEARRING, Q_GML_LINESTRING, Q_GML_MULTILINESTRING);
     if(geo == null && checkGeo(node) != null)
       throw GeoErrors.geoType(node.qname().local(), "Line");
 
-    return Bln.get(geo instanceof LineString ?
-       ((LineString) geo).isClosed() : geo instanceof LinearRing ?
-       ((LinearRing) geo).isClosed() :
-       ((MultiLineString) geo).isClosed());
+    return Bln.get(geo instanceof LineString ? ((LineString) geo).isClosed() :
+      ((MultiLineString) geo).isClosed());
   }
 
   /**
@@ -534,9 +527,7 @@ public class Geo extends QueryModule {
     if(geo == null && checkGeo(node) != null)
       throw GeoErrors.geoType(node.qname().local(), "Line");
 
-    return Bln.get(geo instanceof LineString ?
-       ((LineString) geo).isRing() :
-       ((LinearRing) geo).isRing());
+    return Bln.get(((LineString) geo).isRing());
   }
 
   /**
@@ -567,9 +558,7 @@ public class Geo extends QueryModule {
     final long n = number.itr();
     if(n < 1 || n > max) throw GeoErrors.outOfRangeIdx(number);
 
-    return gmlWriter(geo instanceof LineString ?
-       ((LineString) geo).getPointN((int) n - 1) :
-       ((LinearRing) geo).getPointN((int) n - 1));
+    return gmlWriter(((LineString) geo).getPointN((int) n - 1));
   }
 
   /**
@@ -681,7 +670,7 @@ public class Geo extends QueryModule {
    * @throws QueryException query exception
    */
   private Geometry geo(final ANode node, final QNm... names) throws QueryException {
-    if(node.type != NodeType.ELM) Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
+    if(node.type != NodeType.ELM) throw Err.FUNCMP.get(null, this, NodeType.ELM, node.type);
 
     final QNm qname = node.qname();
     for(final QNm geo : names) {
@@ -706,7 +695,7 @@ public class Geo extends QueryModule {
    * @throws QueryException exception
    */
   private DBNode gmlWriter(final Geometry geometry) throws QueryException {
-    String geo;
+    final String geo;
     try {
       // write geometry and add namespace declaration
       geo = new GMLWriter().write(geometry).replaceAll(
@@ -717,9 +706,9 @@ public class Geo extends QueryModule {
 
     try {
       final IO io = new IOContent(geo);
-      return new DBNode(MemBuilder.build(new XMLParser(io, context.context.prop)));
+      return new DBNode(MemBuilder.build(new XMLParser(io, queryContext.context.options)));
     } catch(final IOException ex) {
-      throw Err.IOERR.thrw(null, ex);
+      throw Err.IOERR.get(null, ex);
     }
   }
 }

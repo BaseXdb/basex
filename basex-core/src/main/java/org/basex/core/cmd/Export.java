@@ -18,7 +18,7 @@ import org.basex.util.list.*;
  * Evaluates the 'export' command and saves the currently opened database
  * to disk.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Export extends Command {
@@ -41,7 +41,7 @@ public final class Export extends Command {
   protected boolean run() {
     try {
       final Data data = context.data();
-      export(data, args[0], new SerializerProp(data.meta.prop.get(Prop.EXPORTER)), this);
+      export(data, args[0], this);
       return info(DB_EXPORTED_X, data.meta.name, perf);
     } catch(final IOException ex) {
       return error(Util.message(ex));
@@ -58,12 +58,25 @@ public final class Export extends Command {
    * Files and directories in {@code path} will be possibly overwritten.
    * @param data data reference
    * @param path directory
-   * @param sp serialization properties
-   * @param e calling instance
+   * @param export calling instance
    * @throws IOException I/O exception
    */
-  public static void export(final Data data, final String path, final SerializerProp sp,
-      final Export e) throws IOException {
+  public static void export(final Data data, final String path, final Export export)
+      throws IOException {
+    export(data, path, data.meta.options.get(MainOptions.EXPORTER), export);
+  }
+
+  /**
+   * Exports the current database to the specified path.
+   * Files and directories in {@code path} will be possibly overwritten.
+   * @param data data reference
+   * @param path directory
+   * @param sopts serialization parameters
+   * @param export calling instance
+   * @throws IOException I/O exception
+   */
+  public static void export(final Data data, final String path, final SerializerOptions sopts,
+      final Export export) throws IOException {
 
     final IOFile root = new IOFile(path);
     root.md();
@@ -83,9 +96,9 @@ public final class Export extends Command {
       desc = bin.descendants();
     }
 
-    if(e != null) {
-      e.progPos = 0;
-      e.progSize = il.size() + desc.size();
+    if(export != null) {
+      export.progPos = 0;
+      export.progSize = il.size() + desc.size();
     }
 
     // XML documents
@@ -94,10 +107,10 @@ public final class Export extends Command {
       final int pre = il.get(i);
       // create file path
       final IO f = root.merge(Token.string(data.text(pre, true)));
-      if(e != null) {
-        e.checkStop();
-        e.progFile = f;
-        e.progPos++;
+      if(export != null) {
+        export.checkStop();
+        export.progFile = f;
+        export.progPos++;
       }
       // create dir if necessary
       final IOFile dir = new IOFile(f.dirPath());
@@ -105,7 +118,7 @@ public final class Export extends Command {
 
       // serialize file
       final PrintOutput po = new PrintOutput(unique(exported, f.path()));
-      final Serializer ser = Serializer.get(po, sp);
+      final Serializer ser = Serializer.get(po, sopts);
       ser.serialize(new DBNode(data, pre));
       ser.close();
       po.close();
@@ -114,10 +127,10 @@ public final class Export extends Command {
     // export raw files
     for(final String s : desc) {
       final IOFile f = new IOFile(root.path(), s);
-      if(e != null) {
-        e.checkStop();
-        e.progFile = f;
-        e.progPos++;
+      if(export != null) {
+        export.checkStop();
+        export.progFile = f;
+        export.progPos++;
       }
       final String u = unique(exported, f.path());
       new IOFile(bin, s).copyTo(new IOFile(u));

@@ -14,7 +14,7 @@ import org.w3c.dom.*;
 /**
  * DOM - Node implementation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class BXNode implements Node {
@@ -26,17 +26,16 @@ public abstract class BXNode implements Node {
   };
   /** Node name mapping (see {@link Data} interface). */
   private static final String[] NAMES = {
-    "#document", null, "#text", null, "#comment", null, "#cdata-section",
-    "#document-fragment"
+    "#document", null, "#text", null, "#comment", null, "#cdata-section", "#document-fragment"
   };
   /** Node reference. */
-  protected final ANode node;
+  final ANode node;
 
   /**
    * Constructor.
    * @param n node reference
    */
-  protected BXNode(final ANode n) {
+  BXNode(final ANode n) {
     node = n;
   }
 
@@ -46,7 +45,7 @@ public abstract class BXNode implements Node {
    * @param node input node
    * @return DOM node
    */
-  public static final BXNode get(final ANode node) {
+  public static BXNode get(final ANode node) {
     if(node == null) return null;
     switch(node.nodeType()) {
       case DOC: return new BXDoc(node);
@@ -73,7 +72,7 @@ public abstract class BXNode implements Node {
    * Returns a numeric value for the node kind.
    * @return node kind
    */
-  protected int kind() {
+  int kind() {
     return node.kind();
   }
 
@@ -159,7 +158,7 @@ public abstract class BXNode implements Node {
   public BXDoc getOwnerDocument() {
     ANode n = node;
     for(ANode p; (p = n.parent()) != null;) n = p;
-    return n.type == NodeType.DOC ? (BXDoc) BXNode.get(n) : null;
+    return n.type == NodeType.DOC ? (BXDoc) get(n) : null;
   }
 
   @Override
@@ -204,22 +203,22 @@ public abstract class BXNode implements Node {
 
   @Override
   public final boolean isDefaultNamespace(final String namespaceURI) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
   public final boolean isEqualNode(final Node cmp) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
   public final String lookupNamespaceURI(final String prefix) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
   public final String lookupPrefix(final String namespaceURI) {
-    throw Util.notimplemented();
+    throw Util.notImplemented();
   }
 
   @Override
@@ -268,10 +267,10 @@ public abstract class BXNode implements Node {
    * @param tag tag name
    * @return nodes
    */
-  protected final BXNList getElements(final String tag) {
+  final BXNList getElements(final String tag) {
     final ANodeList nb = new ANodeList();
     final AxisIter ai = node.descendant();
-    final byte[] nm = tag.equals("*") ? null : token(tag);
+    final byte[] nm = "*".equals(tag) ? null : token(tag);
     for(ANode n; (n = ai.next()) != null;) {
       if(n.type == NodeType.ELM && (nm == null || eq(nm, n.name()))) nb.add(n.finish());
     }
@@ -283,7 +282,7 @@ public abstract class BXNode implements Node {
    * @param ai axis iterator
    * @return node cache
    */
-  protected static ANodeList finish(final AxisIter ai) {
+  static ANodeList finish(final AxisIter ai) {
     final ANodeList nl = new ANodeList();
     for(ANode n; (n = ai.next()) != null;) nl.add(n.finish());
     return nl;
@@ -301,8 +300,8 @@ public abstract class BXNode implements Node {
    * Throws a DOM modification exception.
    * @return DOM exception
    */
-  protected static final DOMException readOnly() {
-    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+  static DOMException readOnly() {
+    return new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
         "DOM implementation is read-only.");
   }
 }

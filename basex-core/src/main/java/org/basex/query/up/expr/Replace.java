@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * Replace expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class Replace extends Update {
@@ -28,30 +28,31 @@ public final class Replace extends Update {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param t target expression
    * @param r source expression
    * @param v replace value of
    */
-  public Replace(final InputInfo ii, final Expr t, final Expr r,
+  public Replace(final StaticContext sctx, final InputInfo ii, final Expr t, final Expr r,
       final boolean v) {
-    super(ii, t, r);
+    super(sctx, ii, t, r);
     value = v;
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Constr c = new Constr(ii, ctx).add(expr[1]);
-    if(c.errAtt) UPNOATTRPER.thrw(info);
-    if(c.duplAtt != null) UPATTDUPL.thrw(info, new QNm(c.duplAtt));
+    final Constr c = new Constr(ii, sc).add(ctx, expr[1]);
+    if(c.errAtt) throw UPNOATTRPER.get(info);
+    if(c.duplAtt != null) throw UPATTDUPL.get(info, new QNm(c.duplAtt));
 
     final Iter t = ctx.iter(expr[0]);
     final Item i = t.next();
     // check target constraints
-    if(i == null) throw UPSEQEMP.thrw(info, Util.name(this));
+    if(i == null) throw UPSEQEMP.get(info, Util.className(this));
     final Type tp = i.type;
     if(!(i instanceof ANode) || tp == NodeType.DOC || t.next() != null)
-      UPTRGMULT.thrw(info);
+      throw UPTRGMULT.get(info);
     final ANode targ = (ANode) i;
     final DBNode dbn = ctx.updates.determineDataRef(targ, ctx);
 
@@ -69,14 +70,14 @@ public final class Replace extends Update {
       ctx.updates.add(new ReplaceValue(dbn.pre, dbn.data, info, txt), ctx);
     } else {
       final ANode par = targ.parent();
-      if(par == null) UPNOPAR.thrw(info, i);
+      if(par == null) throw UPNOPAR.get(info, i);
       if(tp == NodeType.ATT) {
         // replace attribute node
-        if(list.size() > 0) UPWRATTR.thrw(info);
-        list = checkNS(aList, par, ctx);
+        if(!list.isEmpty()) throw UPWRATTR.get(info);
+        list = checkNS(aList, par);
       } else {
         // replace non-attribute node
-        if(aList.size() > 0) UPWRELM.thrw(info);
+        if(!aList.isEmpty()) throw UPWRELM.get(info);
       }
       // conforms to specification: insertion sequence may be empty
       ctx.updates.add(new ReplaceNode(dbn.pre, dbn.data, info, list), ctx);
@@ -86,7 +87,7 @@ public final class Replace extends Update {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Replace(info, expr[0].copy(ctx, scp, vs),
+    return new Replace(sc, info, expr[0].copy(ctx, scp, vs),
         expr[1].copy(ctx, scp, vs), value);
   }
 

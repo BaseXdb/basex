@@ -21,24 +21,24 @@ import org.basex.gui.layout.TreeNode;
  * content including raw files and documents. The search field allows to
  * quickly access specific files/documents.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
-public class DialogResources extends BaseXBack {
+public final class DialogResources extends BaseXBack {
   /** Search text field. */
-  final BaseXTextField filterText;
+  private final BaseXTextField filterText;
   /** Database/root node. */
-  final TreeFolder root;
+  private final TreeFolder root;
   /** Dialog reference. */
-  final BaseXDialog dialog;
+  private final BaseXDialog dialog;
   /** Resource tree. */
-  final BaseXTree tree;
+  private final BaseXTree tree;
   /** Filter button. */
-  final BaseXButton filter;
+  private final BaseXButton filter;
   /** Clear button. */
-  final BaseXButton clear;
+  private final BaseXButton clear;
   /** Avoids superfluous filtering steps. */
-  boolean filtered;
+  private boolean filtered;
 
   /**
    * Constructor.
@@ -55,9 +55,7 @@ public class DialogResources extends BaseXBack {
     tree.setRootVisible(false);
     tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
-    final ImageIcon xml = BaseXLayout.icon("file_xml");
-    final ImageIcon raw = BaseXLayout.icon("file_raw");
-    tree.setCellRenderer(new TreeNodeRenderer(xml, raw));
+    tree.setCellRenderer(new TreeNodeRenderer());
     tree.addTreeSelectionListener(new TreeSelectionListener() {
       @Override
       public void valueChanged(final TreeSelectionEvent e) {
@@ -158,7 +156,7 @@ public class DialogResources extends BaseXBack {
       filtered = true;
     } else if(comp == clear) {
       filterText.setText("/");
-      filterText.requestFocus();
+      filterText.requestFocusInWindow();
       refreshFolder(root);
       filtered = false;
     }
@@ -182,16 +180,15 @@ public class DialogResources extends BaseXBack {
     // check if there's a directory
     // create a folder if there's either a raw or document folder
     if(data.resources.isDir(filterPath)) {
-      root.add(new TreeFolder(TreeFolder.name(filterPath),
-          TreeFolder.path(filterPath), tree, data));
+      root.add(new TreeFolder(TreeFolder.name(filterPath), TreeFolder.path(filterPath),
+          tree, data));
       cmax--;
     }
 
     // now add the actual files (if there are any)
     final byte[] name = TreeFolder.name(filterPath);
     final byte[] sub = TreeFolder.path(filterPath);
-    final TreeFolder f = new TreeFolder(TreeFolder.name(sub), TreeFolder.path(sub),
-        tree, data);
+    final TreeFolder f = new TreeFolder(TreeFolder.name(sub), TreeFolder.path(sub), tree, data);
     cmax = f.addLeaves(name, cmax, root);
 
     // add dummy node if maximum number of nodes is exceeded
@@ -231,43 +228,28 @@ public class DialogResources extends BaseXBack {
 
   /**
    * Custom tree cell renderer to distinguish between raw and xml leaf nodes.
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Lukas Kircher
    */
   private static final class TreeNodeRenderer extends DefaultTreeCellRenderer {
-    /** Icon for xml files. */
-    private final Icon xmlIcon;
-    /** Icon for raw files. */
-    private final Icon rawIcon;
-
-    /**
-     * Constructor.
-     * @param xml xml icon
-     * @param raw raw icon
-     */
-    TreeNodeRenderer(final Icon xml, final Icon raw) {
-      xmlIcon = xml;
-      rawIcon = raw;
-    }
-
     @Override
-    public Component getTreeCellRendererComponent(final JTree tree,
-        final Object val, final boolean sel, final boolean exp,
-        final boolean leaf, final int row, final boolean focus) {
+    public Component getTreeCellRendererComponent(final JTree tree, final Object val,
+        final boolean sel, final boolean exp, final boolean leaf, final int row,
+        final boolean focus) {
 
       super.getTreeCellRendererComponent(tree, val, sel, exp, leaf, row, focus);
-      if(leaf) {
-        final TreeLeaf l = (TreeLeaf) val;
-        setIcon(l.raw ? rawIcon : l.abbr ? null : xmlIcon);
-      }
+      if(leaf) setIcon(BaseXImages.text(((TreeLeaf) val).raw));
       return this;
     }
   }
 
   /** Delete command. */
-  final class DeleteCmd extends GUIBaseCmd {
+  final class DeleteCmd extends GUIPopupCmd {
+    /** Constructor. */
+    DeleteCmd() { super(DELETE + DOTS, BaseXKeys.DELNEXT); }
+
     @Override
-    public void execute(final GUI g) {
+    public void execute() {
       final TreeNode n = selection();
       if(n == null || !BaseXDialog.confirm(dialog.gui, DELETE_NODES)) return;
 
@@ -281,23 +263,19 @@ public class DialogResources extends BaseXBack {
     }
 
     @Override
-    public String label() {
-      return DELETE + DOTS;
-    }
-
-    @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
+    public boolean enabled(final GUI main) {
       final TreeNode n = selection();
-      if(n instanceof TreeLeaf)
-        button.setEnabled(!((TreeLeaf) n).abbr);
-      else button.setEnabled(n != null && !n.equals(root));
+      return n instanceof TreeLeaf ? !((TreeLeaf) n).abbr : n != null && !n.equals(root);
     }
   }
 
   /** Rename command. */
-  final class RenameCmd extends GUIBaseCmd {
+  final class RenameCmd extends GUIPopupCmd {
+    /** Constructor. */
+    RenameCmd() { super(RENAME + DOTS, BaseXKeys.RENAME); }
+
     @Override
-    public void execute(final GUI g) {
+    public void execute() {
       final TreeNode n = selection();
       if(n == null) return;
 
@@ -315,15 +293,9 @@ public class DialogResources extends BaseXBack {
     }
 
     @Override
-    public String label() {
-      return RENAME + DOTS;
-    }
-
-    @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
+    public boolean enabled(final GUI main) {
       final TreeNode n = selection();
-      if(n instanceof TreeLeaf) button.setEnabled(!((TreeLeaf) n).abbr);
-      else button.setEnabled(n != null && !n.equals(root));
+      return n instanceof TreeLeaf ? !((TreeLeaf) n).abbr : n != null && !n.equals(root);
     }
   }
 }

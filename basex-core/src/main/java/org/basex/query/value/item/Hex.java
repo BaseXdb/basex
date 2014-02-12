@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * HexBinary item ({@code xs:hexBinary}).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Hex extends Bin {
@@ -48,8 +48,7 @@ public final class Hex extends Bin {
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public boolean eq(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     return Token.eq(binary(ii), it instanceof Bin ? ((Bin) it).binary(ii) :
       decode(it.string(ii), ii));
   }
@@ -61,8 +60,8 @@ public final class Hex extends Bin {
    * @return decoded string
    * @throws QueryException query exception
    */
-  private static byte[] decode(final byte[] d, final InputInfo ii) throws QueryException {
-    if((d.length & 1) != 0) throw FUNCAST.thrw(ii, AtomType.HEX, (char) d[0]);
+  public static byte[] decode(final byte[] d, final InputInfo ii) throws QueryException {
+    if((d.length & 1) != 0) throw FUNCAST.get(ii, AtomType.HEX, (char) d[0]);
     final int l = d.length >>> 1;
     final byte[] v = new byte[l];
     for(int i = 0; i < l; ++i) {
@@ -81,7 +80,7 @@ public final class Hex extends Bin {
   private static int dec(final byte b, final InputInfo ii) throws QueryException {
     if(b >= '0' && b <= '9') return b - '0';
     if(b >= 'a' && b <= 'f' || b >= 'A' && b <= 'F') return (b & 0x0F) + 9;
-    throw FUNCAST.thrw(ii, AtomType.HEX, (char) b);
+    throw FUNCAST.get(ii, AtomType.HEX, (char) b);
   }
 
   @Override

@@ -10,7 +10,6 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.data.atomic.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.value.item.*;
@@ -23,7 +22,7 @@ import org.basex.util.list.*;
  * operations that are initiated within a snapshot. Regarding the XQUF specification it
  * fulfills the purpose of a 'pending update list'.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 final class DatabaseUpdates {
@@ -136,7 +135,7 @@ final class DatabaseUpdates {
 
       final int k = data.kind(pre);
       if(k == Data.ATTR) {
-        par = data.parent(pre, k);
+        par = data.parent(pre, Data.ATTR);
         final IntList il = new IntList();
         while(p >= 0 && (pre = nodes.get(p)) > par) {
           il.add(pre);
@@ -156,7 +155,7 @@ final class DatabaseUpdates {
    * @throws QueryException query exception
    */
   void startUpdate() throws QueryException {
-    if(!data.startUpdate()) BXDB_OPENED.thrw(null, data.meta.name);
+    if(!data.startUpdate()) throw BXDB_OPENED.get(null, data.meta.name);
   }
 
   /**
@@ -190,12 +189,13 @@ final class DatabaseUpdates {
     // execute fn:put operations
     for(final Put p : puts.values()) p.apply();
 
-    if(data.meta.prop.is(Prop.WRITEBACK) && !data.meta.original.isEmpty()) {
+    // optional: write main memory databases of file instances back to disk
+    if(data.inMemory() && !data.meta.original.isEmpty() &&
+        data.meta.options.get(MainOptions.WRITEBACK)) {
       try {
-        final SerializerProp sp = new SerializerProp(data.meta.prop.get(Prop.EXPORTER));
-        Export.export(data, data.meta.original, sp, null);
+        Export.export(data, data.meta.original, null);
       } catch(final IOException ex) {
-        UPPUTERR.thrw(null, data.meta.original);
+        throw UPPUTERR.get(null, data.meta.original);
       }
     }
   }
@@ -229,10 +229,10 @@ final class DatabaseUpdates {
    * @param l list of ordered {@link UpdatePrimitive}
    * @return list of atomic updates ready for execution
    */
-  private AtomicUpdateList createAtomicUpdates(final List<UpdatePrimitive> l) {
-    final AtomicUpdateList atomics = new AtomicUpdateList(data);
-    // from the highest to the lowest score
-    for(int i = l.size() - 1; i >= 0; i--) {
+  private AtomicUpdateCache createAtomicUpdates(final List<UpdatePrimitive> l) {
+    final AtomicUpdateCache atomics = new AtomicUpdateCache(data);
+    //  from the lowest to the highest score, corresponds w/ from lowest to highest PRE
+    for(int i = 0; i < l.size(); i++) {
       final UpdatePrimitive u = l.get(i);
       u.addAtomics(atomics);
       l.set(i, null);
@@ -262,7 +262,7 @@ final class DatabaseUpdates {
       if(ups != null) for(final UpdatePrimitive up : ups.prim) up.update(pool);
     }
     // check namespaces
-    if(!pool.nsOK()) UPNSCONFL2.thrw(null);
+    if(!pool.nsOK()) throw UPNSCONFL2.get(null);
 
     // add the already existing attributes to the name pool
     final IntSet il = new IntSet();
@@ -289,6 +289,6 @@ final class DatabaseUpdates {
       }
     }
     final QNm dup = pool.duplicate();
-    if(dup != null) UPATTDUPL.thrw(null, dup);
+    if(dup != null) throw UPATTDUPL.get(null, dup);
   }
 }

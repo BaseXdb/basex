@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * This class stores a single namespace node.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class NSNode {
@@ -215,8 +215,8 @@ final class NSNode {
    * @param s start pre value
    * @param e end pre value
    */
-  private void print(final TokenBuilder tb, final int l, final Namespaces ns,
-      final int s, final int e) {
+  private void print(final TokenBuilder tb, final int l, final Namespaces ns, final int s,
+      final int e) {
 
     if(pre >= s && pre <= e) {
       tb.add(NL);

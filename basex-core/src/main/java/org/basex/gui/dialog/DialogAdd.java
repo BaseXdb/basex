@@ -13,12 +13,12 @@ import org.basex.util.*;
 /**
  * Panel for adding new resources.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 class DialogAdd extends BaseXBack {
   /** Dialog reference. */
-  final DialogProps dialog;
+  private final DialogProps dialog;
   /** Target path. */
   final BaseXTextField target;
 
@@ -33,7 +33,7 @@ class DialogAdd extends BaseXBack {
    * Constructor.
    * @param d dialog reference
    */
-  public DialogAdd(final DialogProps d) {
+  DialogAdd(final DialogProps d) {
     dialog = d;
     setLayout(new BorderLayout());
 
@@ -59,7 +59,7 @@ class DialogAdd extends BaseXBack {
     optimize = new BaseXButton(OPTIMIZE + DOTS, d);
 
     add(d.newButtons(add, optimize), BorderLayout.SOUTH);
-    action(general.parser);
+    action(general.parsers);
   }
 
   /**
@@ -87,14 +87,15 @@ class DialogAdd extends BaseXBack {
       boolean ok = general.action(comp, false);
       if(comp == general.browse || comp == general.input) target.setText(general.dbname);
 
-      String inf = ok ? null : RES_NOT_FOUND;
-      final Msg icon = Msg.ERROR;
+      final String inf;
       if(ok) {
         // check if target path is valid
         ok = MetaData.normPath(trg) != null;
-        if(!ok) inf = Util.info(INVALID_X, TARGET_PATH);
+        inf = ok ? null : Util.info(INVALID_X, TARGET_PATH);
+      } else {
+        inf = RES_NOT_FOUND;
       }
-      general.info.setText(inf, icon);
+      general.info.setText(inf, Msg.ERROR);
       add.setEnabled(ok);
       optimize.setEnabled(!dialog.gui.context.data().meta.uptodate);
     }

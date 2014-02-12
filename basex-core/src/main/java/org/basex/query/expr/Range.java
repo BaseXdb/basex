@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
 /**
  * Range expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Range extends Arr {
@@ -33,7 +33,11 @@ public final class Range extends Arr {
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
+    return optimize(ctx, scp);
+  }
 
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     Expr e = this;
     if(oneIsEmpty()) {
       e = Empty.SEQ;

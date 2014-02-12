@@ -7,7 +7,7 @@ import org.basex.gui.view.*;
 /**
  * Defines shared things of TreeMap layout algorithms.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Joerg Hauser
  */
 final class MapLayout {
@@ -21,8 +21,8 @@ final class MapLayout {
   private final MapAlgo algo;
   /** Text lengths. */
   private final int[] textLen;
-  /** Widow properties. */
-  private final GUIProp prop;
+  /** GUI options. */
+  private final GUIOptions gopts;
 
   /** Layout rectangle. */
   final MapRect layout;
@@ -31,15 +31,15 @@ final class MapLayout {
    * Constructor.
    * @param d data reference to use in this layout
    * @param tl text lengths array
-   * @param pr gui properties
+   * @param opts gui options
    */
-  MapLayout(final Data d, final int[] tl, final GUIProp pr) {
+  MapLayout(final Data d, final int[] tl, final GUIOptions opts) {
     data = d;
     textLen = tl;
-    prop = pr;
+    gopts = opts;
     off = GUIConstants.fontSize + 4;
 
-    switch(prop.num(GUIProp.MAPOFFSETS)) {
+    switch(gopts.get(GUIOptions.MAPOFFSETS)) {
       // no title, small border
       case 1 :
         layout = new MapRect(0, 2, 0, 2); break;
@@ -57,7 +57,7 @@ final class MapLayout {
         layout = new MapRect(0, 0, 0, 0); break;
     }
 
-    switch(prop.num(GUIProp.MAPALGO)) {
+    switch(gopts.get(GUIOptions.MAPALGO)) {
       // select method to construct this treemap
       // may should be placed in makeMap to define different method for
       // different levels
@@ -77,7 +77,7 @@ final class MapLayout {
   private MapList children(final int par) {
     final MapList list = new MapList();
     final int last = par + ViewData.size(data, par);
-    final boolean atts = prop.is(GUIProp.MAPATTS);
+    final boolean atts = gopts.get(GUIOptions.MAPATTS);
     int p = par + (atts ? 1 : data.attSize(par, data.kind(par)));
     while(p < last) {
       list.add(p);
@@ -106,7 +106,7 @@ final class MapLayout {
       } else {
         nn = l.get(ne) - l.get(ns) + ViewData.size(data, l.get(ne));
       }
-      l.initWeights(textLen, nn, data, prop.num(GUIProp.MAPWEIGHT));
+      l.initWeights(textLen, nn, data, gopts.get(GUIOptions.MAPWEIGHT));
 
       // call recursion for next deeper levels
       final MapRects rects = algo.calcMap(r, l, ns, ne);

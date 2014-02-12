@@ -5,7 +5,7 @@ import org.basex.core.*;
 /**
  * Abstract class for database events.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 abstract class AEvent extends Command {
@@ -13,7 +13,7 @@ abstract class AEvent extends Command {
    * Protected constructor.
    * @param a arguments
    */
-  protected AEvent(final String... a) {
+  AEvent(final String... a) {
     super(Perm.ADMIN, false, a);
   }
 

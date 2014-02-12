@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * Map for quickly indexing items.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class ItemValueMap extends HashItemSet {
@@ -23,8 +23,7 @@ public class ItemValueMap extends HashItemSet {
    * @param ii input info
    * @throws QueryException query exception
    */
-  public void add(final Item key, final Value value, final InputInfo ii)
-      throws QueryException {
+  public void add(final Item key, final Value value, final InputInfo ii) throws QueryException {
     // array bounds are checked before array is resized..
     final int i = put(key, ii);
     values[Math.abs(i)] = value;

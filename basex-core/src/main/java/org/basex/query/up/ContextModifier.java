@@ -11,7 +11,7 @@ import org.basex.util.list.*;
  * Base class for the different context modifiers. A context modifier aggregates
  * all updates for a specific context.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public abstract class ContextModifier {
@@ -22,7 +22,7 @@ public abstract class ContextModifier {
   /** Holds DBCreate primitives which are not associated with a database. */
   private final Map<String, DBCreate> dbCreates = new HashMap<String, DBCreate>();
   /** Temporary data reference, containing all XML fragments to be inserted. */
-  MemData tmp;
+  private MemData tmp;
 
   /**
    * Adds an update primitive to this context modifier.
@@ -55,7 +55,7 @@ public abstract class ContextModifier {
     }
 
     // create temporary mem data instance if not available yet
-    if(tmp == null) tmp = new MemData(data.meta.prop);
+    if(tmp == null) tmp = new MemData(data.meta.options);
     dbp.add(p, tmp);
   }
 
@@ -81,10 +81,10 @@ public abstract class ContextModifier {
     final Collection<DatabaseUpdates> updates = pendingUpdates.values();
     final Collection<DBCreate> creates = dbCreates.values();
 
-    // create temporary mem data instance if not available yet
+    // create temporary mem data instance if not available yet (break after first operation)
     if(tmp == null) {
       for(final DatabaseUpdates c : updates) {
-        tmp = new MemData(c.data().meta.prop);
+        tmp = new MemData(c.data().meta.options);
         break;
       }
     }

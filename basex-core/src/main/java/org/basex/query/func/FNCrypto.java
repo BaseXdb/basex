@@ -11,19 +11,19 @@ import org.basex.util.*;
 
 /**
  * EXPath Cryptographic Module.
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class FNCrypto extends StandardFunc {
-
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
-   * @param fd function
-   * @param args function arguments
+   * @param f function definition
+   * @param e arguments
    */
-  public FNCrypto(final InputInfo ii, final Function fd, final Expr[] args) {
-    super(ii, fd, args);
+  public FNCrypto(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -49,7 +49,7 @@ public final class FNCrypto extends StandardFunc {
           arg6 = checkItem(expr[6], ctx);
 
           if(arg6 instanceof AStr) arg6Str = true;
-          else if(!(arg6 instanceof ANode)) Err.type(this, AtomType.STR, arg6);
+          else if(!(arg6 instanceof ANode)) throw Err.typeError(this, AtomType.STR, arg6);
         }
         return new DigitalSignature(ii).generateSignature(
             checkNode(expr[0].item(ctx, ii)), checkStr(expr[1], ctx),

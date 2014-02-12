@@ -17,14 +17,14 @@ import org.basex.util.*;
 /**
  * Abstract super class for all items.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Item extends Value {
   /** Undefined item. */
   public static final int UNDEF = Integer.MIN_VALUE;
   /** Score value. {@code null} reference takes less memory on 32bit than a double. */
-  public Double score;
+  protected Double score;
 
   /**
    * Constructor.
@@ -91,7 +91,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public boolean bool(final InputInfo ii) throws QueryException {
-    throw CONDTYPE.thrw(ii, type, this);
+    throw CONDTYPE.get(ii, type, this);
   }
 
   /**
@@ -156,8 +156,8 @@ public abstract class Item extends Value {
    * @return result of check
    * @throws QueryException query exception
    */
-  public abstract boolean eq(final Item it, final Collation coll,
-      final InputInfo ii) throws QueryException;
+  public abstract boolean eq(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException;
 
   /**
    * Checks the items for equivalence.
@@ -167,8 +167,8 @@ public abstract class Item extends Value {
    * @return result of check
    * @throws QueryException query exception
    */
-  public final boolean equiv(final Item it, final Collation coll,
-      final InputInfo ii) throws QueryException {
+  public final boolean equiv(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
     // check if both values are NaN, or if values are equal..
     return (this == Dbl.NAN || this == Flt.NAN) && it instanceof ANum &&
         Double.isNaN(it.dbl(ii)) || comparable(it) && eq(it, coll, ii);
@@ -183,9 +183,8 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    throw (this == it ? TYPECMP : INVTYPECMP).thrw(ii, type, it.type);
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
+    throw (this == it ? TYPECMP : INVTYPECMP).get(ii, type, it.type);
   }
 
   /**
@@ -240,18 +239,6 @@ public abstract class Item extends Value {
     if(score != null || s != 0) score = s;
   }
 
-  /**
-   * Throws a cast error.
-   * @param val cast value
-   * @param ii input info
-   * @return never
-   * @throws QueryException query exception
-   */
-  protected final QueryException castErr(final Object val, final InputInfo ii)
-      throws QueryException {
-    return FUNCAST.thrw(ii, type, val);
-  }
-
   @Override
   public String description() {
     return type.toString();
@@ -264,7 +251,7 @@ public abstract class Item extends Value {
     } catch(final QueryException ex) {
       // only function items throw exceptions in atomization, and they should
       // override plan(Serializer) sensibly
-      Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
   }
 

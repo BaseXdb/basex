@@ -9,17 +9,17 @@ import org.basex.util.list.*;
 /**
  * This is a simple container for values.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class ValueList extends ElementList {
+final class ValueList extends ElementList {
   /** List entries. */
   private Value[] list;
 
   /**
    * Default constructor.
    */
-  public ValueList() {
+  ValueList() {
     this(Array.CAPACITY);
   }
 
@@ -51,6 +51,6 @@ public final class ValueList extends ElementList {
 
   @Override
   public String toString() {
-    return Util.name(this) + Arrays.toString(Arrays.copyOf(list, size));
+    return Util.className(this) + Arrays.toString(Arrays.copyOf(list, size));
   }
 }

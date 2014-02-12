@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Streamable string item ({@code xs:string}).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class StrStream extends AStr {
@@ -37,7 +37,7 @@ public final class StrStream extends AStr {
     input = io;
     encoding = enc;
     error = err;
-    validate = ctx.context.prop.is(Prop.CHECKSTRINGS);
+    validate = ctx.context.options.get(MainOptions.CHECKSTRINGS);
   }
 
   @Override
@@ -45,7 +45,7 @@ public final class StrStream extends AStr {
     try {
       return input(ii).content();
     } catch(final IOException ex) {
-      throw error.thrw(ii, ex);
+      throw error.get(ii, ex);
     }
   }
 
@@ -63,7 +63,7 @@ public final class StrStream extends AStr {
       return nli;
     } catch(final IOException ex) {
       if(nli != null) try { nli.close(); } catch(final IOException ignored) { }
-      throw error.thrw(ii, ex);
+      throw error.get(ii, ex);
     }
   }
 

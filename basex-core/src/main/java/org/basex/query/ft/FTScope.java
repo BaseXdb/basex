@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * FTScope expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FTScope extends FTFilter {
@@ -25,24 +25,21 @@ public final class FTScope extends FTFilter {
    * Constructor.
    * @param ii input info
    * @param e expression
-   * @param u unit
-   * @param s same flag
+   * @param sm same flag
+   * @param un unit
    */
-  public FTScope(final InputInfo ii, final FTExpr e, final FTUnit u, final boolean s) {
-    super(ii, e);
-    unit = u;
-    same = s;
+  public FTScope(final InputInfo ii, final FTExpr e, final boolean sm, final FTUnit un) {
+    super(ii, e, un);
+    same = sm;
   }
 
   @Override
-  protected boolean filter(final QueryContext ctx, final FTMatch mtc,
-      final FTLexer lex) {
-
+  protected boolean filter(final QueryContext ctx, final FTMatch mtc, final FTLexer lex) {
     if(same) {
       int s = -1;
       for(final FTStringMatch sm : mtc) {
-        if(sm.ex) continue;
-        final int p = pos(sm.s, lex);
+        if(sm.exclude) continue;
+        final int p = pos(sm.start, lex);
         if(s == -1) s = p;
         else if(s != p) return false;
       }
@@ -51,20 +48,19 @@ public final class FTScope extends FTFilter {
     int c = 0;
     final BoolList bl = new BoolList();
     for(final FTStringMatch sm : mtc) {
-      if(sm.ex) continue;
+      if(sm.exclude) continue;
       c++;
-      final int p = pos(sm.s, lex);
+      final int p = pos(sm.start, lex);
       final int s = bl.size();
-      if(p < s && bl.get(p) && p == pos(sm.e, lex)) return false;
+      if(p < s && bl.get(p) && p == pos(sm.end, lex)) return false;
       bl.set(p, true);
     }
     return c > 1;
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
-    return new FTScope(info, expr[0].copy(ctx, scp, vs), unit, same);
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+    return new FTScope(info, expr[0].copy(ctx, scp, vs), same, unit);
   }
 
   @Override

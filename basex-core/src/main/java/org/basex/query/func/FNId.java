@@ -16,18 +16,19 @@ import org.basex.util.list.*;
 /**
  * ID functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNId extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNId(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNId(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -80,7 +81,7 @@ public final class FNId extends StandardFunc {
    */
   private NodeSeqBuilder id(final Iter it, final ANode node) throws QueryException {
     final NodeSeqBuilder nc = new NodeSeqBuilder().check();
-    add(ids(it), nc, checkRoot(node));
+    add(ids(it), nc, checkRoot(node), false);
     return nc;
   }
 
@@ -93,7 +94,7 @@ public final class FNId extends StandardFunc {
    */
   private Iter idref(final Iter it, final ANode node) throws QueryException {
     final NodeSeqBuilder nb = new NodeSeqBuilder().check();
-    addRef(ids(it), nb, checkRoot(node));
+    add(ids(it), nb, checkRoot(node), true);
     return nb;
   }
 
@@ -134,45 +135,25 @@ public final class FNId extends StandardFunc {
   /**
    * Adds nodes with the specified id.
    * @param ids ids to be found
+   * @param idref idref flag
    * @param nc node cache
    * @param node node
    */
-  private static void add(final byte[][] ids, final NodeSeqBuilder nc, final ANode node) {
+  private static void add(final byte[][] ids, final NodeSeqBuilder nc, final ANode node,
+      final boolean idref) {
     AxisIter ai = node.attributes();
     for(ANode at; (at = ai.next()) != null;) {
-      final byte[] val = at.string();
+      final byte[][] val = split(at.string(), ' ');
       // [CG] XQuery: ID-IDREF Parsing
       for(final byte[] id : ids) {
-        if(!eq(val, id)) continue;
+        if(!eq(id, val)) continue;
         final byte[] nm = lc(at.qname().string());
-        if(contains(nm, ID) && !contains(nm, IDREF)) nc.add(node);
+        final boolean ii = contains(nm, ID), ir = contains(nm, IDREF);
+        if(idref ? ir : ii && !ir) nc.add(idref ? at.finish() : node);
       }
     }
     ai = node.children();
-    for(ANode att; (att = ai.next()) != null;) add(ids, nc, att.finish());
-  }
-
-  /**
-   * Adds nodes with the specified id.
-   * @param ids ids to be found
-   * @param nc node cache
-   * @param node node
-   */
-  private static void addRef(final byte[][] ids, final NodeSeqBuilder nc,
-      final ANode node) {
-
-    AxisIter ai = node.attributes();
-    for(ANode at; (at = ai.next()) != null;) {
-      final byte[] val = at.string();
-      // [CG] XQuery: ID-IDREF Parsing
-      for(final byte[] id : ids) {
-        if(!eq(val, id)) continue;
-        final byte[] nm = lc(at.qname().string());
-        if(contains(nm, IDREF)) nc.add(at.finish());
-      }
-    }
-    ai = node.children();
-    for(ANode att; (att = ai.next()) != null;) addRef(ids, nc, att.finish());
+    for(ANode att; (att = ai.next()) != null;) add(ids, nc, att.finish(), idref);
   }
 
   /**
@@ -186,7 +167,7 @@ public final class FNId extends StandardFunc {
       ANode n = node;
       while(n.type != NodeType.DOC) {
         n = n.parent();
-        if(n == null) throw IDDOC.thrw(info);
+        if(n == null) throw IDDOC.get(info);
       }
     }
     return node;

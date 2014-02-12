@@ -23,31 +23,37 @@ public interface Constants {
   byte[] AFTER_MODULE = token("after-module");
   /** Annotation: expected. */
   byte[] EXPECTED = token("expected");
+  /** Name: returned. */
+  byte[] RETURNED = token("returned");
 
   /** Name: testsuites. */
-  String TESTSUITES = "testsuites";
+  byte[] TESTSUITES = token("testsuites");
   /** Name: testsuite. */
-  String TESTSUITE = "testsuite";
+  byte[] TESTSUITE = token("testsuite");
   /** Name: testcase. */
-  String TESTCASE = "testcase";
+  byte[] TESTCASE = token("testcase");
   /** Name: failure. */
-  String FAILURE = "failure";
+  byte[] FAILURE = token("failure");
+  /** Name: line. */
+  byte[] LINE = token("line");
+  /** Name: column. */
+  byte[] COLUMN = token("column");
   /** Name: error. */
-  String ERROR = "error";
-  /** Name: failure. */
-  String FAILURES = "failures";
+  byte[] ERROR = token("error");
+  /** Name: failures. */
+  byte[] FAILURES = token("failures");
   /** Name: error. */
-  String ERRORS = "errors";
+  byte[] ERRORS = token("errors");
   /** Name: skipped. */
-  String SKIPPED = "skipped";
+  byte[] SKIPPED = token("skipped");
   /** Name: error. */
-  String TESTS = "tests";
+  byte[] TESTS = token("tests");
   /** Name: name. */
-  String NAME = "name";
-  /** Name: message. */
-  String MESSAGE = "message";
+  byte[] NAME = token("name");
+  /** Name: item. */
+  byte[] ITEM = token("item");
   /** Name: type. */
-  String TYPE = "type";
+  byte[] TYPE = token("type");
   /** Name: time. */
-  String TIME = "time";
+  byte[] TIME = token("time");
 }

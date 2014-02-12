@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * This module contains functions for processing global sessions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Sessions extends QueryModule {
@@ -86,11 +86,11 @@ public final class Sessions extends QueryModule {
    * @return session attribute
    * @throws QueryException query exception
    */
-  public Item get(final Str id, final Str key, final Item def) throws QueryException {
+  Item get(final Str id, final Str key, final Item def) throws QueryException {
     final Object o = session(id).getAttribute(key.toJava());
     if(o == null) return def;
     if(o instanceof Item) return (Item) o;
-    throw SessionErrors.noAttribute(Util.name(o));
+    throw SessionErrors.noAttribute(Util.className(o));
   }
 
   /**
@@ -105,7 +105,7 @@ public final class Sessions extends QueryModule {
     final Data d = it.data();
     if(d != null && !d.inMemory()) {
       // convert database node to main memory data instance
-      it = ((ANode) it).dbCopy(context.context.prop);
+      it = ((ANode) it).dbCopy(queryContext.context.options);
     } else if(it instanceof FItem) {
       throw SessionErrors.functionItem();
     }
@@ -138,7 +138,7 @@ public final class Sessions extends QueryModule {
    * @throws QueryException query exception
    */
   private HttpSession session(final Str id) throws QueryException {
-    if(context.http == null) throw SessionErrors.noContext();
+    if(queryContext.http == null) throw SessionErrors.noContext();
     final HashMap<String, HttpSession> http = SessionListener.sessions();
     final HttpSession session = http.get(id.toJava());
     if(session == null) throw SessionErrors.whichSession(id);

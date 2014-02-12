@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.nio.charset.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -18,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * Functions to execute system commands.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNProc extends StandardFunc {
@@ -33,12 +32,13 @@ public final class FNProc extends StandardFunc {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNProc(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNProc(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -57,7 +57,7 @@ public final class FNProc extends StandardFunc {
     try {
       cs = Charset.forName(c);
     } catch(final Exception ex) {
-      BXPR_ENC.thrw(info, c);
+      throw BXPR_ENC.get(info, c);
     }
 
     final String[] args = tl.toStringArray();

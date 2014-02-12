@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * This class organizes the namespaces of a database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Namespaces {
@@ -312,7 +312,7 @@ public final class Namespaces {
       nd.delete(pre, size);
       nd = nd.parent;
     }
-    delete(root, pre, size);
+    shiftPreAfterDelete(root, pre, size);
   }
 
   /**
@@ -321,9 +321,9 @@ public final class Namespaces {
    * @param pre update location
    * @param size size of inserted/deleted node
    */
-  private static void delete(final NSNode node, final int pre, final int size) {
+  private static void shiftPreAfterDelete(final NSNode node, final int pre, final int size) {
     if(node.pre >= pre + size) node.pre -= size;
-    for(int c = 0; c < node.size; c++) delete(node.children[c], pre, size);
+    for(int c = 0; c < node.size; c++) shiftPreAfterDelete(node.children[c], pre, size);
   }
 
   /**
@@ -333,8 +333,8 @@ public final class Namespaces {
    * @param size size of inserted/deleted node
    * @param cache added nodes
    */
-  void insert(final int pre, final int size, final Set<NSNode> cache) {
-    insert(root, pre, size, cache);
+  void shiftPreAfterInsert(final int pre, final int size, final Set<NSNode> cache) {
+    shiftPreAfterInsert(root, pre, size, cache);
   }
 
   /**
@@ -344,10 +344,10 @@ public final class Namespaces {
    * @param size size of inserted/deleted node
    * @param cache added nodes
    */
-  private static void insert(final NSNode node, final int pre, final int size,
+  private static void shiftPreAfterInsert(final NSNode node, final int pre, final int size,
       final Set<NSNode> cache) {
     if(!cache.contains(node) && node.pre >= pre) node.pre += size;
-    for(int c = 0; c < node.size; c++) insert(node.children[c], pre, size, cache);
+    for(int c = 0; c < node.size; c++) shiftPreAfterInsert(node.children[c], pre, size, cache);
   }
 
   /**
@@ -386,14 +386,14 @@ public final class Namespaces {
    * @return reference, or {@code 0}
    */
   public int uri(final byte[] uri) {
-    return uri.length != 0 ? uris.id(uri) : 0;
+    return uri.length == 0 ? 0 : uris.id(uri);
   }
 
   /**
    * Returns the current namespaces node.
    * @return current namespace node
    */
-  NSNode current() {
+  NSNode getCurrent() {
     return current;
   }
 
@@ -401,7 +401,7 @@ public final class Namespaces {
    * Setter for namespaces root node.
    * @param node new root
    */
-  void root(final NSNode node) {
+  void setCurrent(final NSNode node) {
     current = node;
   }
 

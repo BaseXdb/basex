@@ -1,36 +1,37 @@
 package org.basex.http.rest;
 
-import static org.basex.util.Token.*;
-
 import java.io.*;
 
 import org.basex.core.cmd.*;
 import org.basex.http.*;
-import org.basex.server.*;
 
 /**
  * REST-based evaluation of DELETE operations.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public class RESTDelete extends RESTCode {
-  @Override
-  void run(final HTTPContext http) throws IOException {
-    // parse database options
-    parseOptions(http);
-    // open addressed database
-    open(http);
+final class RESTDelete {
+  /** Private constructor. */
+  private RESTDelete() { }
 
-    final LocalSession session = http.session();
-    if(http.depth() == 0) {
-      HTTPErr.NO_PATH.thrw();
-    } else if(http.depth() == 1) {
-      session.execute(new DropDB(http.db()));
-    } else {
-      session.execute(new Delete(http.dbpath()));
-    }
-    // return command info
-    http.res.getOutputStream().write(token(session.info()));
+  /**
+   * Creates a new instance of this command.
+   * @param rs REST session
+   * @return command
+   * @throws IOException I/O exception
+   */
+  static RESTExec get(final RESTSession rs) throws IOException {
+    RESTCmd.parseOptions(rs);
+
+    final HTTPContext http = rs.http;
+    if(http.depth() == 0) throw HTTPCode.NO_PATH.get();
+
+    // open database to ensure it exists
+    rs.add(new Open(http.db()));
+    if(http.depth() == 1) rs.add(new DropDB(http.db()));
+    else rs.add(new Delete(http.dbpath()));
+
+    return new RESTExec(rs);
   }
 }

@@ -31,7 +31,7 @@ import org.basex.util.list.*;
  * </li>
  * </ul>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class ValueIndexBuilder extends IndexBuilder {
@@ -46,7 +46,7 @@ public final class ValueIndexBuilder extends IndexBuilder {
    * @param txt value type (text/attribute)
    */
   public ValueIndexBuilder(final Data d, final boolean txt) {
-    super(d, d.meta.prop.num(Prop.INDEXSPLITSIZE));
+    super(d, d.meta.options.get(MainOptions.INDEXSPLITSIZE));
     text = txt;
   }
 
@@ -210,8 +210,8 @@ public final class ValueIndexBuilder extends IndexBuilder {
    * @param il values
    * @throws IOException I/O exception
    */
-  private static void write(final DataOutput outL, final DataOutput outR,
-      final IntList il) throws IOException {
+  private static void write(final DataOutput outL, final DataOutput outR, final IntList il)
+      throws IOException {
 
     // sort values before writing
     il.sort();
@@ -227,7 +227,7 @@ public final class ValueIndexBuilder extends IndexBuilder {
   }
 
   @Override
-  public void abort() {
+  protected void abort() {
     data.meta.drop((text ? DATATXT : DATAATV) + ".+");
     if(text) data.meta.textindex = false;
     else data.meta.attrindex = false;

@@ -64,7 +64,7 @@ public abstract class XdmItem extends XdmValue {
 
       @Override
       public void remove() {
-        Util.notexpected();
+        throw Util.notExpected();
       }
     };
   }

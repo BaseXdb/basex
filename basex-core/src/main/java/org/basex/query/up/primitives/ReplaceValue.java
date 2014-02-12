@@ -26,12 +26,12 @@ import org.basex.util.*;
  *
  * <p>If T is a text node and the new text value is empty, T is deleted.</p>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class ReplaceValue extends UpdatePrimitive {
   /** New value. */
-  public final byte[] value;
+  private final byte[] value;
   /** States if this primitive represents a replaceElementContent expression. */
   public final boolean rec;
 
@@ -50,7 +50,7 @@ public final class ReplaceValue extends UpdatePrimitive {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    UPMULTREPV.thrw(info, getTargetNode());
+    throw UPMULTREPV.get(info, getTargetNode());
   }
 
   @Override
@@ -60,7 +60,7 @@ public final class ReplaceValue extends UpdatePrimitive {
 
   @Override
   public String toString() {
-    return Util.info("%[%, %]", Util.name(this), getTargetNode(), value);
+    return Util.info("%[%, %]", Util.className(this), getTargetNode(), value);
   }
 
   /**
@@ -86,9 +86,9 @@ public final class ReplaceValue extends UpdatePrimitive {
   }
 
   @Override
-  public void addAtomics(final AtomicUpdateList l) {
+  public void addAtomics(final AtomicUpdateCache l) {
     if(!substituted())
-      l.addUpdateValue(targetPre, data.kind(targetPre), value);
+      l.addUpdateValue(targetPre, value);
   }
 
   @Override

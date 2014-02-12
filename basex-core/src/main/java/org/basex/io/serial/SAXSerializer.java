@@ -19,7 +19,7 @@ import org.xml.sax.helpers.*;
  *   <li>notify endDocument()</li>
  * </ol>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Michael Hedenus
  */
 public final class SAXSerializer extends Serializer implements XMLReader {
@@ -123,13 +123,13 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
   @Override
   public void setFeature(final String name, final boolean value)
-      throws SAXNotRecognizedException, SAXNotSupportedException {
+      throws SAXNotRecognizedException {
     throw new SAXNotRecognizedException();
   }
 
   @Override
   public void setProperty(final String name, final Object value)
-      throws SAXNotRecognizedException, SAXNotSupportedException {
+      throws SAXNotRecognizedException {
     throw new SAXNotRecognizedException();
   }
 
@@ -141,13 +141,13 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   private NSDecl namespaces;
 
   @Override
-  protected void startOpen(final byte[] n) throws IOException {
+  protected void startOpen(final byte[] n) {
     namespaces = new NSDecl(namespaces);
     attributes.clear();
   }
 
   @Override
-  protected void attribute(final byte[] n, final byte[] v) throws IOException {
+  protected void attribute(final byte[] n, final byte[] v) {
     byte[] prefix = null;
     if(startsWith(n, XMLNS)) {
       if(n.length == 5) {
@@ -178,9 +178,9 @@ public final class SAXSerializer extends Serializer implements XMLReader {
         attrs.addAttribute(uri, lname, rname, null, value);
       }
 
-      final String uri = string(namespaces.get(prefix(elem)));
-      final String lname = string(local(elem));
-      final String rname = string(elem);
+      final String uri = string(namespaces.get(prefix(tag)));
+      final String lname = string(local(tag));
+      final String rname = string(tag);
       contentHandler.startElement(uri, lname, rname, attrs);
 
     } catch(final SAXException ex) {
@@ -197,7 +197,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   @Override
   protected void finishClose() throws IOException {
     try {
-      final String name = string(elem);
+      final String name = string(tag);
       contentHandler.endElement("", name, name);
       namespaces = namespaces.getParent();
     } catch(final SAXException ex) {
@@ -239,7 +239,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  protected void atomic(final Item i) throws IOException {
+  protected void atomic(final Item i) {
     // ignored
   }
 

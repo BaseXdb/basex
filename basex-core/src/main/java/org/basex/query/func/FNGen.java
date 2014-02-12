@@ -11,7 +11,6 @@ import org.basex.core.*;
 import org.basex.core.Context;
 import org.basex.io.*;
 import org.basex.io.in.*;
-import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -23,29 +22,31 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
  * Generating functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNGen extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNGen(final InputInfo ii, final Function f, final Expr[] e) {
-    super(ii, f, e);
+  public FNGen(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case DATA:                return dataa(ctx);
+      case DATA:                return data(ctx);
       case COLLECTION:          return collection(ctx).iter();
       case URI_COLLECTION:      return uriCollection(ctx);
       case UNPARSED_TEXT_LINES: return unparsedTextLines(ctx);
@@ -77,8 +78,8 @@ public final class FNGen extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx) throws QueryException {
-    if(sig == Function.DATA && expr.length == 1) {
+  protected Expr opt(final QueryContext ctx, final VarScope scp) {
+    if(sig == DATA && expr.length == 1) {
       final SeqType t = expr[0].type();
       type = t.type.isNode() ? SeqType.get(AtomType.ATM, t.occ) : t;
     }
@@ -91,15 +92,15 @@ public final class FNGen extends StandardFunc {
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  private Iter dataa(final QueryContext ctx) throws QueryException {
-    final Iter ir = ctx.iter(expr.length != 0 ? expr[0] : checkCtx(ctx));
+  private Iter data(final QueryContext ctx) throws QueryException {
+    final Iter ir = ctx.iter(expr.length == 0 ? checkCtx(ctx) : expr[0]);
 
     return new Iter() {
       @Override
       public Item next() throws QueryException {
         final Item it = ir.next();
         if(it == null) return null;
-        if(it instanceof FItem) FIATOM.thrw(info, FNGen.this);
+        if(it instanceof FItem) throw FIATOM.get(info, it.type);
         return atom(it, info);
       }
     };
@@ -113,12 +114,13 @@ public final class FNGen extends StandardFunc {
    */
   private Value collection(final QueryContext ctx) throws QueryException {
     // return default collection
-    if(expr.length == 0) return ctx.resource.collection(info);
+    final Item it = expr.length == 0 ? null : expr[0].item(ctx, info);
+    if(it == null) return ctx.resource.collection(info);
 
     // check if reference is valid
-    final byte[] in = checkEStr(expr[0].item(ctx, info));
-    if(!Uri.uri(in).isValid()) INVCOLL.thrw(info, in);
-    return ctx.resource.collection(string(in), info);
+    final byte[] in = checkEStr(it);
+    if(!Uri.uri(in).isValid()) throw INVCOLL.get(info, in);
+    return ctx.resource.collection(new QueryInput(string(in)), sc.baseIO(), info);
   }
 
   /**
@@ -149,15 +151,15 @@ public final class FNGen extends StandardFunc {
     checkCreate(ctx);
     final byte[] file = checkEStr(expr[1], ctx);
     final ANode nd = checkNode(expr[0], ctx);
-    if(nd.type != NodeType.DOC && nd.type != NodeType.ELM) UPFOTYPE.thrw(info, expr[0]);
+    if(nd.type != NodeType.DOC && nd.type != NodeType.ELM) throw UPFOTYPE.get(info, expr[0]);
 
     final Uri u = Uri.uri(file);
-    if(u == Uri.EMPTY || !u.isValid()) UPFOURI.thrw(info, file);
+    if(u == Uri.EMPTY || !u.isValid()) throw UPFOURI.get(info, file);
     final DBNode target = ctx.updates.determineDataRef(nd, ctx);
 
     final String uri = IO.get(u.toJava()).path();
     // check if all target paths are unique
-    if(!ctx.updates.putPaths.add(uri)) UPURIDUP.thrw(info, uri);
+    if(!ctx.updates.putPaths.add(uri)) throw UPURIDUP.get(info, uri);
 
     ctx.updates.add(new Put(info, target.pre, target.data, uri), ctx);
     return null;
@@ -173,8 +175,8 @@ public final class FNGen extends StandardFunc {
     final Item it = expr[0].item(ctx, info);
     if(it == null) return null;
     final byte[] in = checkEStr(it);
-    if(!Uri.uri(in).isValid()) INVDOC.thrw(info, in);
-    return ctx.resource.doc(new QueryInput(string(in)), info);
+    if(!Uri.uri(in).isValid()) throw INVDOC.get(info, in);
+    return ctx.resource.doc(new QueryInput(string(in)), sc.baseIO(), info);
   }
 
   /**
@@ -188,8 +190,8 @@ public final class FNGen extends StandardFunc {
       return Bln.get(doc(ctx) != null);
     } catch(final QueryException ex) {
       final Err err = ex.err();
-      if(err != null && err.type == ErrType.FODC &&
-          (err.num == 2 || err.num == 4)) return Bln.FALSE;
+      if(err != null && err.is(ErrType.FODC) &&
+          (err.code.endsWith("0002") || err.code.endsWith("0004"))) return Bln.FALSE;
       throw ex;
     }
   }
@@ -201,21 +203,19 @@ public final class FNGen extends StandardFunc {
    * @return content
    * @throws QueryException query exception
    */
-  private Item unparsedText(final QueryContext ctx, final boolean check)
-      throws QueryException {
-
+  private Item unparsedText(final QueryContext ctx, final boolean check) throws QueryException {
     checkCreate(ctx);
     final byte[] path = checkStr(expr[0], ctx);
-    final IO base = ctx.sc.baseIO();
-    if(base == null) throw STBASEURI.thrw(info);
+    final IO base = sc.baseIO();
+    if(base == null) throw STBASEURI.get(info);
 
     String enc = null;
     try {
       enc = encoding(1, WHICHENC, ctx);
 
       final String p = string(path);
-      if(p.indexOf('#') != -1) FRAGID.thrw(info, p);
-      if(!Uri.uri(p).isValid()) INVURL.thrw(info, p);
+      if(p.indexOf('#') != -1) throw FRAGID.get(info, p);
+      if(!Uri.uri(p).isValid()) throw INVURL.get(info, p);
 
       IO io = base.merge(p);
       final String[] rp = ctx.resource.resources.get(io.path());
@@ -223,7 +223,7 @@ public final class FNGen extends StandardFunc {
         io = IO.get(rp[0]);
         if(rp.length > 1) enc = rp[1];
       }
-      if(!io.exists()) RESNF.thrw(info, p);
+      if(!io.exists()) throw RESNF.get(info, p);
 
       final InputStream is = io.inputStream();
       try {
@@ -235,15 +235,15 @@ public final class FNGen extends StandardFunc {
         is.close();
       }
     } catch(final QueryException ex) {
-      if(check && ex.err().type != ErrType.XPTY) return Bln.FALSE;
+      if(check && !ex.err().is(ErrType.XPTY)) return Bln.FALSE;
       throw ex;
     } catch(final IOException ex) {
       if(check) return Bln.FALSE;
       if(ex instanceof InputException) {
-        if(ex instanceof EncodingException || enc != null) INVCHARS.thrw(info, ex);
-        else WHICHCHARS.thrw(info, ex);
+        final boolean inv = ex instanceof EncodingException || enc != null;
+        throw (inv ? INVCHARS : WHICHCHARS).get(info, ex);
       }
-      throw RESNF.thrw(info, path);
+      throw RESNF.get(info, path);
     }
   }
 
@@ -273,12 +273,12 @@ public final class FNGen extends StandardFunc {
           try {
             return nli.readLine(tb) ? Str.get(tb.finish()) : null;
           } catch(final IOException ex) {
-            throw Util.notexpected(ex);
+            throw Util.notExpected(ex);
           }
         }
       };
     } catch(final IOException ex) {
-      throw Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
   }
 
@@ -289,16 +289,14 @@ public final class FNGen extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  private ANode parseXml(final QueryContext ctx, final boolean frag)
-      throws QueryException {
-
+  private ANode parseXml(final QueryContext ctx, final boolean frag) throws QueryException {
     final Item item = expr[0].item(ctx, info);
     if(item == null) return null;
     try {
-      final IO io = new IOContent(checkStr(item), string(ctx.sc.baseURI().string()));
+      final IO io = new IOContent(checkStr(item), string(sc.baseURI().string()));
       return parseXml(io, ctx.context, frag);
     } catch(final IOException ex) {
-      throw SAXERR.thrw(info, ex);
+      throw SAXERR.get(info, ex);
     }
   }
 
@@ -309,20 +307,9 @@ public final class FNGen extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str serialize(final QueryContext ctx) throws QueryException {
-    final ArrayOutput ao = new ArrayOutput();
-    try {
-      // run serialization
-      Item it = expr.length > 1 ? expr[1].item(ctx, info) : null;
-      final Serializer ser = Serializer.get(ao, FuncParams.serializerProp(it, info));
-      final Iter ir = expr[0].iter(ctx);
-      while((it = ir.next()) != null) ser.serialize(it);
-      ser.close();
-    } catch(final SerializerException ex) {
-      throw ex.getCause(info);
-    } catch(final IOException ex) {
-      SERANY.thrw(info, ex);
-    }
-    return Str.get(ao.toArray());
+    final Item it = expr.length > 1 ? expr[1].item(ctx, info) : null;
+    final SerializerOptions sopts = FuncOptions.serializer(it, info);
+    return Str.get(serialize(expr[0].iter(ctx), sopts, SERANY));
   }
 
   @Override
@@ -367,14 +354,14 @@ public final class FNGen extends StandardFunc {
   public static ANode parseXml(final IO input, final Context ctx, final boolean frag)
       throws IOException {
 
-    final Prop prop = ctx.prop;
-    final boolean chop = prop.is(Prop.CHOP);
+    final MainOptions opts = ctx.options;
+    final boolean chop = opts.get(MainOptions.CHOP);
     try {
-      prop.set(Prop.CHOP, false);
-      return new DBNode(frag || prop.is(Prop.INTPARSE) ?
-        new XMLParser(input, ctx.prop, frag) : new SAXWrapper(input, ctx.prop));
+      opts.set(MainOptions.CHOP, false);
+      return new DBNode(frag || opts.get(MainOptions.INTPARSE) ?
+        new XMLParser(input, ctx.options, frag) : new SAXWrapper(input, ctx.options));
     } finally {
-      prop.set(Prop.CHOP, chop);
+      opts.set(MainOptions.CHOP, chop);
     }
   }
 }

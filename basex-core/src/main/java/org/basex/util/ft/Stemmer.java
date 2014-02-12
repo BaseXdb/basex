@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * Implementation of common stemmer methods.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Dimitar Popov
  */
 public abstract class Stemmer extends LanguageImpl {
@@ -99,6 +99,6 @@ public abstract class Stemmer extends LanguageImpl {
 
   @Override
   public String toString() {
-    return Util.name(this).replace("Stemmer", "");
+    return Util.className(this).replace("Stemmer", "");
   }
 }

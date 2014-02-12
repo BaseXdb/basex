@@ -14,7 +14,7 @@ import org.basex.util.*;
  * Evaluates the 'info database' command and returns information on the
  * currently opened database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class InfoDB extends AInfo {
@@ -45,8 +45,8 @@ public final class InfoDB extends AInfo {
    * @param create create permissions
    * @return info string
    */
-  public static String db(final MetaData meta, final boolean bold,
-      final boolean index, final boolean create) {
+  public static String db(final MetaData meta, final boolean bold, final boolean index,
+      final boolean create) {
 
     final TokenBuilder tb = new TokenBuilder();
     final String header = (bold ?
@@ -79,9 +79,9 @@ public final class InfoDB extends AInfo {
         info(tb, TEXT_INDEX, Util.flag(meta.textindex));
         info(tb, ATTRIBUTE_INDEX, Util.flag(meta.attrindex));
         info(tb, FULLTEXT_INDEX, Util.flag(meta.ftxtindex));
-        info(tb, Prop.UPDINDEX[0], Util.flag(meta.updindex));
-        info(tb, Prop.MAXCATS[0], meta.maxcats);
-        info(tb, Prop.MAXLEN[0], meta.maxlen);
+        info(tb, MainOptions.UPDINDEX.name(), Util.flag(meta.updindex));
+        info(tb, MainOptions.MAXCATS.name(), meta.maxcats);
+        info(tb, MainOptions.MAXLEN.name(), meta.maxlen);
       }
     }
     return tb.toString();

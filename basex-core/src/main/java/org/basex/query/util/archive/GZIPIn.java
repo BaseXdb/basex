@@ -3,12 +3,13 @@ package org.basex.query.util.archive;
 import java.io.*;
 import java.util.zip.*;
 
+import org.basex.query.func.*;
 import org.basex.util.*;
 
 /**
  * GZIP reader.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class GZIPIn extends ArchiveIn {
@@ -27,7 +28,7 @@ public final class GZIPIn extends ArchiveIn {
   }
 
   @Override
-  public boolean more() throws IOException {
+  public boolean more() {
     return more ^= true;
   }
 
@@ -45,7 +46,7 @@ public final class GZIPIn extends ArchiveIn {
 
   @Override
   public String format() {
-    return "gzip";
+    return FNArchive.GZIP;
   }
 
   @Override

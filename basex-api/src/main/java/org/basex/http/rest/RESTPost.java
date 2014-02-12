@@ -9,7 +9,6 @@ import javax.xml.parsers.*;
 import javax.xml.transform.dom.*;
 
 import org.basex.core.*;
-import org.basex.core.cmd.Set;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -23,91 +22,89 @@ import org.basex.util.*;
 /**
  * REST-based evaluation of POST operations.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public class RESTPost extends RESTCode {
-  @Override
-  void run(final HTTPContext http) throws IOException {
-    parseOptions(http);
+final class RESTPost {
+  /** Private constructor. */
+  private RESTPost() { }
 
+  /**
+   * Creates REST code.
+   * @param rs REST session
+   * @return code
+   * @throws IOException I/O exception
+   */
+  public static RESTCmd get(final RESTSession rs) throws IOException {
+    final HTTPContext http = rs.http;
     String enc = http.req.getCharacterEncoding();
     if(enc == null) enc = Token.UTF8;
 
     // perform queries
-    final byte[] in = new NewlineInput(http.req.getInputStream()).encoding(enc).content();
-    validate(in);
+    final byte[] input = new NewlineInput(http.req.getInputStream()).encoding(enc).content();
+    validate(input);
 
-    final Context ctx = http.context();
-    DBNode doc;
+    final Context ctx = rs.context;
+    final DBNode doc;
     try {
-      doc = new DBNode(new IOContent(in), ctx.prop);
+      doc = new DBNode(new IOContent(input), ctx.options);
     } catch(final IOException ex) {
-      throw HTTPErr.BAD_REQUEST_X.thrw(ex);
+      throw HTTPCode.BAD_REQUEST_X.get(ex);
     }
-
-    final SerializerProp sp = new SerializerProp();
-    QueryProcessor qp;
-    RESTCode code;
 
     try {
       // handle serialization parameters
-      final TokenBuilder ser = new TokenBuilder();
-      qp = new QueryProcessor("*/*:parameter", ctx).context(doc);
+      final SerializerOptions sopts = http.serialization;
+      QueryProcessor qp = new QueryProcessor("*/*:parameter", ctx).context(doc);
       for(final Item param : qp.value()) {
-        final String name = value("data(@name)", param, ctx);
-        final String value = value("data(@value)", param, ctx);
-        if(sp.get(name) != null) {
-          ser.add(name).add('=').add(value).add(',');
+        final String name = value("@name", param, ctx);
+        final String value = value("@value", param, ctx);
+        if(sopts.option(name) != null) {
+          sopts.assign(name, value);
         } else if(name.equals(WRAP)) {
-          wrap(value, http);
+          http.wrapping = Util.yes(value);
         } else {
-          HTTPErr.UNKNOWN_PARAM_X.thrw(name);
+          throw HTTPCode.UNKNOWN_PARAM_X.get(name);
         }
       }
-      http.serialization = ser.toString();
 
       // handle database options
       qp = new QueryProcessor("*/*:option", ctx).context(doc);
       for(final Item it : qp.value()) {
-        final String name = value("data(@name)", it, ctx);
-        final String value = value("data(@value)", it, ctx);
-        http.session().execute(new Set(name, value));
+        final String name = value("@name", it, ctx).toUpperCase(Locale.ENGLISH);
+        final String value = value("@value", it, ctx);
+        ctx.options.assign(name, value);
       }
 
       // handle variables
       final Map<String, String[]> vars = new HashMap<String, String[]>();
       qp = new QueryProcessor("*/*:variable", ctx).context(doc);
       for(final Item it : qp.value()) {
-        final String name = value("data(@name)", it, ctx);
-        final String value = value("data(@value)", it, ctx);
-        final String type = value("data(@type)", it, ctx);
+        final String name = value("@name", it, ctx);
+        final String value = value("@value", it, ctx);
+        final String type = value("@type", it, ctx);
         vars.put(name, new String[] { value, type });
       }
 
       // handle input
-      byte[] item = null;
       qp = new QueryProcessor("*/*:context/node()", ctx).context(doc);
+      String value = null;
       for(final Item it : qp.value()) {
-        if(item != null) HTTPErr.MULTIPLE_CONTEXT_X.thrw();
+        if(value != null) throw HTTPCode.MULTIPLE_CONTEXT_X.get();
         // create main memory instance of the specified node
-        item = DataBuilder.stripNS((ANode) it, Token.token(RESTURI), ctx).
-            serialize().toArray();
+        value = DataBuilder.stripNS((ANode) it, Token.token(RESTURI), ctx).serialize().toString();
       }
 
       // handle request
       final String request = value("local-name(*)", doc, ctx);
       final String text = value("*/*:text/text()", doc, ctx);
-      if(request.equals(COMMAND)) {
-        code = new RESTCommand(text);
-      } else if(request.equals(RUN)) {
-        code = new RESTRun(text, vars, item);
-      } else {
-        code = new RESTQuery(text, vars, item);
-      }
-      code.run(http);
+
+      if(request.equals(COMMAND)) return RESTCommand.get(rs, text);
+      if(request.equals(RUN)) return RESTRun.get(rs, text, vars, value);
+      return RESTQuery.get(rs, text, vars, value);
+
     } catch(final QueryException ex) {
-      HTTPErr.BAD_REQUEST_X.thrw(ex);
+      throw HTTPCode.BAD_REQUEST_X.get(ex);
     }
   }
 
@@ -141,7 +138,7 @@ public class RESTPost extends RESTCode {
     } catch(final Exception ex) {
       Util.debug("Error while validating \"" + Token.string(input) + '"');
       // validation fails
-      HTTPErr.BAD_REQUEST_X.thrw(ex);
+      throw HTTPCode.BAD_REQUEST_X.get(ex);
     }
   }
 }

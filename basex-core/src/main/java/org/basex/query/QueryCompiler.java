@@ -1,9 +1,12 @@
 package org.basex.query;
 
+import static org.basex.query.util.Err.*;
+
 import java.util.*;
 
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -12,10 +15,10 @@ import org.basex.util.list.*;
  * This class compiles all components of the query that are needed in an order that
  * maximizes the amount of inlining possible.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
-public final class QueryCompiler {
+final class QueryCompiler {
   /** Number of scopes from which on linear search is replaced by a hash map. */
   private static final int MAP_THRESHOLD = 16;
 
@@ -32,9 +35,9 @@ public final class QueryCompiler {
   private int next;
 
   /** Adjacency list. */
-  final ArrayList<int[]> adjacent = new ArrayList<int[]>();
+  private final ArrayList<int[]> adjacent = new ArrayList<int[]>();
   /** Declaration list. */
-  final ArrayList<Scope> scopes = new ArrayList<Scope>();
+  private final ArrayList<Scope> scopes = new ArrayList<Scope>();
   /** Declaration list. */
   private IdentityHashMap<Scope, Integer> ids;
 
@@ -46,6 +49,49 @@ public final class QueryCompiler {
   private QueryCompiler(final QueryContext cx, final Scope root) {
     ctx = cx;
     add(root);
+  }
+
+  /**
+   * Gathers all declarations (functions and static variables) used by the given main module.
+   * @param main the main module to start from
+   * @return list of all declarations that the main module uses
+   */
+  public static List<StaticDecl> usedDecls(final MainModule main) {
+    final List<StaticDecl> scopes = new ArrayList<StaticDecl>();
+    final IdentityHashMap<Scope, Object> map = new IdentityHashMap<Scope, Object>();
+    main.visit(new ASTVisitor() {
+      @Override
+      public boolean staticVar(final StaticVar var) {
+        if(map.put(var, var) == null) {
+          var.visit(this);
+          scopes.add(var);
+        }
+        return true;
+      }
+
+      @Override
+      public boolean staticFuncCall(final StaticFuncCall call) {
+        final StaticFunc f = call.func();
+        if(map.put(f, f) == null) {
+          f.visit(this);
+          scopes.add(f);
+        }
+        return true;
+      }
+
+      @Override
+      public boolean inlineFunc(final Scope sub) {
+        if(map.put(sub, sub) == null) sub.visit(this);
+        return true;
+      }
+
+      @Override
+      public boolean funcItem(final FuncItem func) {
+        if(map.put(func, func) == null) func.visit(this);
+        return true;
+      }
+    });
+    return scopes;
   }
 
   /**
@@ -68,9 +114,9 @@ public final class QueryCompiler {
     for(final Scope[] comp : components(0)) circCheck(comp).compile(ctx);
 
     // check for circular variable declarations without compiling the unused scopes
-    for(final StaticVar v : ctx.vars)
-      if(id(v) == -1)
-        for(final Scope[] comp : components(add(v))) circCheck(comp);
+    for(final StaticVar v : ctx.vars) {
+      if(id(v) == -1) for(final Scope[] comp : components(add(v))) circCheck(comp);
+    }
   }
 
   /**
@@ -79,10 +125,12 @@ public final class QueryCompiler {
    * @return scope to be compiled, the others are compiled recursively
    * @throws QueryException query exception
    */
-  private Scope circCheck(final Scope[] comp) throws QueryException {
-    if(comp.length > 1)
-      for(final Scope scp : comp)
-        if(scp instanceof StaticVar) throw Err.circVar(ctx, (StaticVar) scp);
+  private static Scope circCheck(final Scope[] comp) throws QueryException {
+    if(comp.length > 1) {
+      for(final Scope scp : comp) {
+        if(scp instanceof StaticVar) throw circVarError((StaticVar) scp);
+      }
+    }
     return comp[0];
   }
 
@@ -199,13 +247,18 @@ public final class QueryCompiler {
       }
 
       @Override
-      public boolean funcCall(final StaticFuncCall call) {
+      public boolean staticFuncCall(final StaticFuncCall call) {
         return neighbor(call.func());
       }
 
       @Override
       public boolean inlineFunc(final Scope sub) {
         return sub.visit(this);
+      }
+
+      @Override
+      public boolean funcItem(final FuncItem func) {
+        return neighbor(func);
       }
 
       /**
@@ -219,7 +272,7 @@ public final class QueryCompiler {
         return true;
       }
     });
-    if(!ok) throw Err.VARUNDEF.thrw(((StaticVar) curr).info, curr);
+    if(!ok) throw Err.VARUNDEF.get(((StaticScope) curr).info, curr);
     return adj.toArray();
   }
 }

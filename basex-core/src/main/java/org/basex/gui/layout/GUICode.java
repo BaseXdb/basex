@@ -6,18 +6,18 @@ import javax.swing.*;
  * This class can be overwritten to define code snippets that are to be evaluated
  * after all pending events.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class GUICode {
   /** Counter. */
-  int counter;
+  private int counter;
 
   /**
    * Code to be run.
    * @param arg argument (may be {@code null})
    */
-  public abstract void eval(final Object arg);
+  public abstract void execute(final Object arg);
 
   /**
    * Invokes the specified thread after all other threads.
@@ -35,7 +35,7 @@ public abstract class GUICode {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        if(c == counter) eval(arg);
+        if(c == counter) execute(arg);
       }
     });
   }

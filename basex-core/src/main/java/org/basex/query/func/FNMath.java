@@ -13,18 +13,19 @@ import org.basex.util.*;
 /**
  * Math functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNMath extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNMath(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNMath(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -70,7 +71,7 @@ public final class FNMath extends StandardFunc {
   private static double power(final double b, final double e) {
     if(b == 1) return 1;
     if(b == -1) {
-      if(Double.isNaN(e)) return b;
+      if(Double.isNaN(e)) return -1;
       if(Double.isInfinite(e)) return 1;
     }
     return pow(b, e);

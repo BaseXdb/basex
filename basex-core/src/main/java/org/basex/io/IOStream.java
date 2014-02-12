@@ -10,7 +10,7 @@ import org.xml.sax.*;
 /**
  * {@link IO} stream.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class IOStream extends IO {
@@ -51,7 +51,7 @@ public final class IOStream extends IO {
   }
 
   @Override
-  public InputStream inputStream() throws IOException {
+  public InputStream inputStream() {
     return input;
   }
 }

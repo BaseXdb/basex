@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * This module contains functions for processing server-side session data.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Session extends QueryModule {
@@ -87,7 +87,7 @@ public final class Session extends QueryModule {
     final Object o = session().getAttribute(key.toJava());
     if(o == null) return def;
     if(o instanceof Item) return (Item) o;
-    throw SessionErrors.noAttribute(Util.name(o));
+    throw SessionErrors.noAttribute(Util.className(o));
   }
 
   /**
@@ -102,7 +102,7 @@ public final class Session extends QueryModule {
     final Data d = it.data();
     if(d != null && !d.inMemory()) {
       // convert database node to main memory data instance
-      it = ((ANode) it).dbCopy(context.context.prop);
+      it = ((ANode) it).dbCopy(queryContext.context.options);
     } else if(it instanceof FItem) {
       throw SessionErrors.functionItem();
     }
@@ -134,7 +134,7 @@ public final class Session extends QueryModule {
    * @throws QueryException query exception
    */
   private HttpSession session() throws QueryException {
-    if(context.http == null) throw SessionErrors.noContext();
-    return ((HTTPContext) context.http).req.getSession();
+    if(queryContext.http == null) throw SessionErrors.noContext();
+    return ((HTTPContext) queryContext.http).req.getSession();
   }
 }

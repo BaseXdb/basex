@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * Transform expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class Transform extends Arr {
@@ -43,7 +43,7 @@ public final class Transform extends Arr {
     for(final Let c : copies) c.checkUp();
     final Expr m = expr[0];
     m.checkUp();
-    if(!m.isVacuous() && !m.has(Flag.UPD)) UPMODIFY.thrw(info);
+    if(!m.isVacuous() && !m.has(Flag.UPD)) throw UPMODIFY.get(info);
     checkNoUp(expr[1]);
   }
 
@@ -71,11 +71,10 @@ public final class Transform extends Arr {
       for(final Let fo : copies) {
         final Iter ir = ctx.iter(fo.expr);
         Item i = ir.next();
-        if(!(i instanceof ANode) || ir.next() != null)
-          UPCOPYMULT.thrw(fo.info, fo.var.name);
+        if(!(i instanceof ANode) || ir.next() != null) throw UPCOPYMULT.get(fo.info, fo.var.name);
 
         // copy node to main memory data instance
-        i = ((ANode) i).dbCopy(ctx.context.prop);
+        i = ((ANode) i).dbCopy(ctx.context.options);
         // add resulting node to variable
         ctx.set(fo.var, i, info);
         pu.addData(i.data());
@@ -126,7 +125,8 @@ public final class Transform extends Arr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(COPY + ' ');
-    for(final Let t : copies) sb.append(t.var + " " + ASSIGN + ' ' + t.expr + ' ');
+    for(final Let t : copies)
+      sb.append(t.var).append(' ').append(ASSIGN).append(' ').append(t.expr).append(' ');
     return sb.append(MODIFY + ' ' + expr[0] + ' ' + RETURN + ' ' + expr[1]).toString();
   }
 

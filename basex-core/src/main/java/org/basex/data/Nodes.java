@@ -15,7 +15,7 @@ import org.basex.util.list.*;
  * Instances of this class are used in the {@link Context} class to
  * reference the currently used, marked, and copied nodes.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Nodes implements Result {
@@ -67,7 +67,7 @@ public final class Nodes implements Result {
     data = d;
     ftpos = ft;
     set(n);
-    if(d == null) Util.notexpected("No data available");
+    if(d == null) throw Util.notExpected("No data available");
   }
 
   /**
@@ -146,7 +146,7 @@ public final class Nodes implements Result {
    * @param p pre value
    */
   public void toggle(final int p) {
-    final int[] n = new int[] { p };
+    final int[] n = { p };
     set(contains(p) ? except(pres, n) : union(pres, n));
   }
 
@@ -249,7 +249,7 @@ public final class Nodes implements Result {
     try {
       return serialize().toString();
     } catch(final IOException ex) {
-      throw Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
   }
 }

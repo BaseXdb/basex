@@ -14,7 +14,7 @@ import org.w3c.dom.*;
 /**
  * Element node fragment.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FElem extends FNode {
@@ -53,7 +53,7 @@ public final class FElem extends FNode {
    * @param uri namespace uri
    */
   public FElem(final byte[] local, final byte[] uri) {
-    this(Token.EMPTY, local, uri);
+    this(EMPTY, local, uri);
   }
 
   /**
@@ -63,7 +63,7 @@ public final class FElem extends FNode {
    * @param uri namespace uri
    */
   public FElem(final String local, final String uri) {
-    this(Token.EMPTY, Token.token(local), Token.token(uri));
+    this(EMPTY, token(local), token(uri));
   }
 
   /**
@@ -74,7 +74,7 @@ public final class FElem extends FNode {
    * @param uri namespace uri
    */
   public FElem(final String prefix, final String local, final String uri) {
-    this(Token.token(prefix), Token.token(local), Token.token(uri));
+    this(token(prefix), token(local), token(uri));
   }
 
   /**

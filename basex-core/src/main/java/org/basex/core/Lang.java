@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  * This class loads language specific texts when the {@link #lang}
  * method is called for the first time.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Andreas Weiler
  */
@@ -52,8 +52,8 @@ public final class Lang {
             if(i == -1 || line.startsWith("#")) continue;
             final String key = line.substring(0, i).trim();
             String val = line.substring(i + 1).trim();
-            if(key.equals("langright")) {
-              Prop.langright = val.equals("true");
+            if("langright".equals(key)) {
+              Prop.langright = "true".equals(val);
             } else {
               if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
               if(Prop.langkeys) val = '[' + key + ": " + val + ']';
@@ -115,7 +115,7 @@ public final class Lang {
     try {
       // supported protocols: jar and file
       final URL url = Lang.class.getResource('/' + SUFFIX);
-      if(url.getProtocol().equals("jar")) {
+      if("jar".equals(url.getProtocol())) {
         final JarURLConnection conn = (JarURLConnection) url.openConnection();
         final String pre = conn.getEntryName();
         final JarFile jar = conn.getJarFile();
@@ -164,9 +164,9 @@ public final class Lang {
     final IOFile[] files = new IOFile("src/main/resources/lang").children();
     for(final IOFile f : files) {
       final String lang = f.name().replace('.' + SUFFIX, "");
-      if(lang.equals("English")) continue;
+      if("English".equals(lang)) continue;
       read(lang);
-      for(final Object o : set.toArray()) {
+      for(final String o : set.toArray(new String[set.size()])) {
         if(TEXTS.remove(o) == null) sb.append("- ").append(o).append('\n');
       }
       if(sb.length() != 0) {

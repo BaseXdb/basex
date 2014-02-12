@@ -56,6 +56,6 @@ public final class ArrayIterator<E> implements Iterator<E>, Iterable<E> {
 
   @Override
   public void remove() {
-    Util.notexpected();
+    throw Util.notExpected();
   }
 }

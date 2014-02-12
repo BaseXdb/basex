@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
 import org.xmldb.api.base.*;
 import org.xmldb.api.base.Collection;
@@ -12,7 +13,7 @@ import org.xmldb.api.base.Collection;
 /**
  * Implementation of the Database Interface for the XMLDB:API.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class BXDatabase implements Database, BXXMLDBText {
@@ -31,7 +32,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
 
     // create database context
     final String name = getCollectionName(uri);
-    final boolean exists = ctx.mprop.dbexists(name);
+    final boolean exists = ctx.globalopts.dbexists(name);
     return exists ? new BXCollection(name, true, this) : null;
   }
 
@@ -42,15 +43,14 @@ public final class BXDatabase implements Database, BXXMLDBText {
 
   @Override
   public String getName() {
-    return NAMELC;
+    return PROJECT_NAME;
   }
 
   @Override
   public String getProperty(final String key) {
     try {
-      final String prop = key.toUpperCase(Locale.ENGLISH);
-      return ((Object[]) Prop.class.getField(prop).get(null))[1].toString();
-    } catch(final Exception ex) {
+      return Get.get(key.toUpperCase(Locale.ENGLISH), ctx);
+    } catch(final BaseXException ex) {
       return null;
     }
   }
@@ -76,8 +76,9 @@ public final class BXDatabase implements Database, BXXMLDBText {
       final String main = uri.startsWith(XMLDBC) ? uri : XMLDBC + uri;
       if(main.startsWith(XMLDBURI)) {
         final String host = main.substring(XMLDBURI.length());
-        final String lh = LOCALHOST + ':' + ctx.mprop.num(MainProp.SERVERPORT) + '/';
-        if(host.startsWith(lh)) return host.substring(lh.length());
+        final String localhost = S_LOCALHOST + ':' +
+            ctx.globalopts.get(GlobalOptions.SERVERPORT) + '/';
+        if(host.startsWith(localhost)) return host.substring(localhost.length());
       }
     }
     throw new XMLDBException(ErrorCodes.INVALID_URI, ERR_URI + uri);

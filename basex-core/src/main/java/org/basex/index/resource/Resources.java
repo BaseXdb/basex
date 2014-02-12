@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * <p>This index organizes the resources of a database (XML documents and raw files).</p>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Resources implements Index {
@@ -168,21 +168,21 @@ public final class Resources implements Index {
 
   @Override
   public IndexIterator iter(final IndexToken token) {
-    throw Util.notexpected();
+    throw Util.notExpected();
   }
 
   @Override
-  public int count(final IndexToken token) {
-    throw Util.notexpected();
+  public int costs(final IndexToken token) {
+    throw Util.notExpected();
   }
 
   @Override
   public byte[] info() {
-    throw Util.notexpected();
+    throw Util.notExpected();
   }
 
   @Override
   public EntryIterator entries(final IndexEntries entries) {
-    throw Util.notexpected();
+    throw Util.notExpected();
   }
 }

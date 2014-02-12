@@ -14,16 +14,16 @@ import org.basex.util.list.*;
 /**
  * Annotations.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Ann extends ElementList {
   /** Annotation "private". */
-  public static final QNm Q_PRIVATE = new QNm(QueryText.PRIVATE, XQURI);
+  public static final QNm Q_PRIVATE = new QNm(PRIVATE, XQURI);
   /** Annotation "public". */
-  public static final QNm Q_PUBLIC = new QNm(QueryText.PUBLIC, XQURI);
+  public static final QNm Q_PUBLIC = new QNm(PUBLIC, XQURI);
   /** Annotation "updating". */
-  public static final QNm Q_UPDATING = new QNm(QueryText.UPDATING, XQURI);
+  public static final QNm Q_UPDATING = new QNm(UPDATING, XQURI);
 
   /** Supported REST annotations. */
   private static final byte[][] ANN_REST = tokens("error", "path", "produces", "consumes",
@@ -84,34 +84,34 @@ public final class Ann extends ElementList {
       return false;
     } catch(final QueryException e) {
       // should never happen because annotations can only contain simple literals
-      throw Util.notexpected(e);
+      throw Util.notExpected(e);
     }
   }
 
   /**
    * Returns the union of these annotations and the given ones.
    * @param ann other annotations
-   * @return a n {@link Ann} instance containing all annotations
+   * @return a new instance, containing all annotations
    */
   public Ann union(final Ann ann) {
     final Ann o = new Ann();
     boolean pub = false, priv = false, up = false;
     for(int i = 0; i < size; i++) {
-      if(names[i].eq(Ann.Q_PUBLIC)) pub = true;
-      else if(names[i].eq(Ann.Q_PRIVATE)) priv = true;
-      else if(names[i].eq(Ann.Q_UPDATING)) up = true;
+      if(names[i].eq(Q_PUBLIC)) pub = true;
+      else if(names[i].eq(Q_PRIVATE)) priv = true;
+      else if(names[i].eq(Q_UPDATING)) up = true;
       o.add(names[i], values[i], infos[i]);
     }
 
     for(int i = 0; i < ann.size; i++) {
       final QNm name = ann.names[i];
-      if(name.eq(Ann.Q_PUBLIC)) {
+      if(name.eq(Q_PUBLIC)) {
         if(pub) continue;
         if(priv) return null;
-      } else if(name.eq(Ann.Q_PRIVATE)) {
+      } else if(name.eq(Q_PRIVATE)) {
         if(pub) return null;
         if(priv) continue;
-      } else if(name.eq(Ann.Q_UPDATING) && up) {
+      } else if(name.eq(Q_UPDATING) && up) {
         continue;
       }
       o.add(ann.names[i], ann.values[i], ann.infos[i]);
@@ -136,7 +136,7 @@ public final class Ann extends ElementList {
         }
       } catch(final QueryException ex) {
         // should never happen because annotations can only contain simple literals
-        Util.notexpected(ex);
+        throw Util.notExpected(ex);
       }
     }
     return o;
@@ -154,25 +154,25 @@ public final class Ann extends ElementList {
       final byte[] local = name.local();
       final byte[] uri = name.uri();
       if(name.eq(Q_UPDATING)) {
-        if(up) DUPLUPD.thrw(infos[a]);
+        if(up) throw DUPLUPD.get(infos[a]);
         up = true;
       } else if(name.eq(Q_PUBLIC) || name.eq(Q_PRIVATE)) {
         // only one visibility modifier allowed
-        if(vis) (var ? DUPLVARVIS : DUPLVIS).thrw(infos[a]);
+        if(vis) throw (var ? DUPLVARVIS : DUPLVIS).get(infos[a]);
         vis = true;
       } else if(NSGlobal.reserved(name.uri())) {
         // no global namespaces allowed
-        ANNRES.thrw(infos[a], '%', name.string());
+        throw ANNRES.get(infos[a], '%', name.string());
       } else if(eq(uri, OUTPUTURI)) {
-        if(Serializer.PROPS.get(string(local)) == null)
-          BASX_ANNOT.thrw(infos[a], '%', name.string());
+        if(Serializer.OPTIONS.option(string(local)) == null)
+          throw BASX_ANNOT.get(infos[a], '%', name.string());
         if(values[a].size() != 1 || !values[a].itemAt(0).type.isStringOrUntyped()) {
-          BASX_ANNOTARGS.thrw(infos[a], '%', name.string());
+          throw BASX_ANNOTARGS.get(infos[a], '%', name.string());
         }
       } else if(eq(uri, RESTURI)) {
-        if(!eq(local, ANN_REST)) BASX_ANNOT.thrw(infos[a], '%', name.string());
+        if(!eq(local, ANN_REST)) throw BASX_ANNOT.get(infos[a], '%', name.string());
       } else if(eq(uri, UNITURI)) {
-        if(!eq(local, ANN_UNIT)) BASX_ANNOT.thrw(infos[a], '%', name.string());
+        if(!eq(local, ANN_UNIT)) throw BASX_ANNOT.get(infos[a], '%', name.string());
       }
     }
   }

@@ -110,7 +110,7 @@ public class StringList extends ElementList implements Iterable<String> {
     int i = 0;
     for(final String e : elements) {
       int result;
-      while(0 != (result = list[i].compareTo(e))) {
+      while((result = list[i].compareTo(e)) != 0) {
         if(++i >= size() || result > 0) return false;
       }
     }
@@ -179,30 +179,6 @@ public class StringList extends ElementList implements Iterable<String> {
       size = s + 1;
     }
     return this;
-  }
-
-  /**
-   * Returns the uppermost element from the stack.
-   * @return the uppermost element
-   */
-  public final String peek() {
-    return list[size - 1];
-  }
-
-  /**
-   * Pops the uppermost element from the stack.
-   * @return the popped element
-   */
-  public final String pop() {
-    return list[--size];
-  }
-
-  /**
-   * Pushes an element onto the stack.
-   * @param element element
-   */
-  public final void push(final String element) {
-    add(element);
   }
 
   @Override

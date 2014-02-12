@@ -26,7 +26,7 @@ import org.basex.util.list.*;
  * for textual content in a compressed disk structure.
  * The table mapping is documented in {@link Data}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Tim Petrowsky
  */
@@ -101,8 +101,8 @@ public final class DiskData extends Data {
    * @param n namespaces
    * @throws IOException I/O Exception
    */
-  public DiskData(final MetaData md, final Names nm, final Names at,
-      final PathSummary ps, final Namespaces n) throws IOException {
+  public DiskData(final MetaData md, final Names nm, final Names at, final PathSummary ps,
+      final Namespaces n) throws IOException {
 
     meta = md;
     tagindex = nm;
@@ -118,7 +118,7 @@ public final class DiskData extends Data {
    * Initializes the database.
    * @throws IOException I/O exception
    */
-  public void init() throws IOException {
+  void init() throws IOException {
     table = new TableDiskAccess(meta, false);
     texts = new DataAccess(meta.dbfile(DATATXT));
     values = new DataAccess(meta.dbfile(DATAATV));
@@ -205,7 +205,7 @@ public final class DiskData extends Data {
   @Override
   public synchronized void finishUpdate() {
     // skip all flush operations if auto flush is off, or file has already been closed
-    if(!meta.prop.is(Prop.AUTOFLUSH) || closed) return;
+    if(!meta.options.get(MainOptions.AUTOFLUSH) || closed) return;
 
     try {
       write();
@@ -420,5 +420,10 @@ public final class DiskData extends Data {
     }
     if(!txts.isEmpty()) ((DiskValues) txtindex).delete(txts);
     if(!atvs.isEmpty()) ((DiskValues) atvindex).delete(atvs);
+  }
+
+  @Override
+  public boolean inMemory() {
+    return false;
   }
 }

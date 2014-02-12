@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * This class represents a node of the path summary.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class PathNode {
@@ -43,7 +43,7 @@ public final class PathNode {
    * @param k node kind
    * @param p parent node
    */
-  PathNode(final int n, final byte k, final PathNode p) {
+  private PathNode(final int n, final byte k, final PathNode p) {
     this(n, k, p, 1);
   }
 
@@ -54,7 +54,7 @@ public final class PathNode {
    * @param p parent node
    * @param c counter
    */
-  PathNode(final int n, final byte k, final PathNode p, final int c) {
+  private PathNode(final int n, final byte k, final PathNode p, final int c) {
     ch = new PathNode[0];
     name = (short) n;
     kind = k;
@@ -167,7 +167,7 @@ public final class PathNode {
       case Data.ELEM: return data.tagindex.key(name);
       case Data.ATTR: return Token.concat(ATT, data.atnindex.key(name));
       case Data.TEXT: return TEXT;
-      case Data.COMM: return COMM;
+      case Data.COMM: return COMMENT;
       case Data.PI:   return PI;
       default:        return Token.EMPTY;
     }
@@ -202,7 +202,7 @@ public final class PathNode {
       case Data.ELEM: tb.add(data.tagindex.key(name)); break;
       case Data.TEXT: tb.add(TEXT); break;
       case Data.ATTR: tb.add(ATT); tb.add(data.atnindex.key(name)); break;
-      case Data.COMM: tb.add(COMM); break;
+      case Data.COMM: tb.add(COMMENT); break;
       case Data.PI:   tb.add(PI); break;
     }
     tb.add(": " + stats);

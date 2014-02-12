@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Abstract node test.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Test {
@@ -22,7 +22,7 @@ public abstract class Test {
   /** Static document node test. */
   public static final KindTest DOC = new KindTest(NodeType.DOC);
   /** Static attribute node test. */
-  public static final KindTest ATT = new KindTest(NodeType.ATT);
+  private static final KindTest ATT = new KindTest(NodeType.ATT);
   /** Static comment node test. */
   public static final KindTest COM = new KindTest(NodeType.COM);
   /** Static comment node test. */
@@ -66,7 +66,7 @@ public abstract class Test {
       case COM: return COM;
       case NOD: return NOD;
       case NSP: return NSP;
-      default: throw Util.notexpected();
+      default: throw Util.notExpected();
     }
   }
 
@@ -115,7 +115,7 @@ public abstract class Test {
    * Checks if this test is namespace-sensitive.
    * @return result of check
    */
-  public boolean nsSensitive() {
+  boolean nsSensitive() {
     return name != null;
   }
 

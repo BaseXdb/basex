@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * This abstract class retrieves values from an index.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class IndexAccess extends Simple {
@@ -21,7 +21,7 @@ public abstract class IndexAccess extends Simple {
    * @param ic index context
    * @param ii input info
    */
-  protected IndexAccess(final IndexContext ic, final InputInfo ii) {
+  IndexAccess(final IndexContext ic, final InputInfo ii) {
     super(ii);
     ictx = ic;
     type = SeqType.NOD_ZM;

@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.*;
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -16,7 +15,7 @@ import org.xml.sax.helpers.*;
 /**
  * SAX Parser wrapper.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class SAXHandler extends DefaultHandler implements LexicalHandler {
@@ -42,9 +41,9 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
 
   static {
     // needed for XMLEntityManager: increase entity limit
-    AProp.setSystem("entityExpansionLimit", "536870912");
+    System.setProperty("entityExpansionLimit", "536870912");
     // needed for frequently visited sites: modify user agent
-    AProp.setSystem("http.agent", "sax");
+    System.setProperty("http.agent", "sax");
   }
 
   /**
@@ -61,8 +60,8 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   }
 
   @Override
-  public void startElement(final String uri, final String ln, final String qn,
-      final Attributes at) throws SAXException {
+  public void startElement(final String uri, final String ln, final String qn, final Attributes at)
+      throws SAXException {
 
     try {
       finishText();
@@ -96,9 +95,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   }
 
   @Override
-  public void endElement(final String uri, final String ln, final String qn)
-      throws SAXException {
-
+  public void endElement(final String uri, final String ln, final String qn) throws SAXException {
     try {
       finishText();
       builder.closeElem();
@@ -114,9 +111,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   }
 
   @Override
-  public void processingInstruction(final String nm, final String cont)
-      throws SAXException {
-
+  public void processingInstruction(final String nm, final String cont) throws SAXException {
     if(dtd) return;
     try {
       finishText();

@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 /**
  * Java module signature.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 @Retention(RetentionPolicy.RUNTIME)

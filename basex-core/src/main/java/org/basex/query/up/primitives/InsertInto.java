@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Insert into primitive.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public class InsertInto extends NodeCopy {
@@ -32,7 +32,7 @@ public class InsertInto extends NodeCopy {
   }
 
   @Override
-  public final void addAtomics(final AtomicUpdateList l) {
+  public final void addAtomics(final AtomicUpdateCache l) {
     final int s = data.size(targetPre, data.kind(targetPre));
     l.addInsert(targetPre + s, targetPre, insseq, false);
   }

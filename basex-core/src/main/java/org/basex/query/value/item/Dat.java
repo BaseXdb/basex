@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Date item ({@code xs:date}).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Dat extends ADate {
@@ -48,7 +48,7 @@ public final class Dat extends ADate {
     this(date);
     if(dur instanceof DTDur) {
       calc((DTDur) dur, plus);
-      if(yea <= MIN_YEAR || yea > MAX_YEAR) DATEADDRANGE.thrw(ii, this);
+      if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE.get(ii, yea);
     } else {
       calc((YMDur) dur, plus, ii);
     }

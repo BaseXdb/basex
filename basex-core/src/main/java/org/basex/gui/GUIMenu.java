@@ -7,7 +7,6 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import org.basex.core.*;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
 
@@ -16,7 +15,7 @@ import org.basex.util.*;
  * The menu structure is defined in {@link GUIConstants#MENUBAR} and
  * {@link GUIConstants#MENUITEMS}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class GUIMenu extends JMenuBar {
@@ -33,9 +32,6 @@ public final class GUIMenu extends JMenuBar {
     gui = main;
     if(Prop.langright) setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 
-    final String sm = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ==
-      Event.META_MASK ? "meta" : "ctrl";
-
     // create menu for each top level menu entries
     int c = 0;
     for(int b = 0; b < MENUBAR.length; ++b) {
@@ -51,19 +47,16 @@ public final class GUIMenu extends JMenuBar {
       BaseXLayout.setMnemonic(menu, gmnem);
 
       // create menu point for each sub menu entry
-      final StringBuilder mnem = new StringBuilder();
+      final StringBuilder mnemCache = new StringBuilder();
       for(int i = 0; i < MENUITEMS[b].length; ++i) {
         // add a separator
-        final GUICmd cmd = MENUITEMS[b][i];
-        if(cmd == GUIBaseCmd.SEPARATOR) {
+        final GUICommand cmd = MENUITEMS[b][i];
+        if(cmd == GUICommand.SEPARATOR) {
           menu.addSeparator();
         } else if(cmd != null) {
           // add a menu entry
-          final JMenuItem item = newItem(cmd, gui, mnem);
-          final String sc = cmd.key();
-          if(sc != null) {
-            item.setAccelerator(KeyStroke.getKeyStroke(Util.info(sc, sm)));
-          }
+          final JMenuItem item = newItem(cmd, gui, mnemCache);
+          item.setAccelerator(BaseXLayout.keyStroke(cmd));
           items[c++] = item;
           if(Prop.langright) {
             item.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
@@ -82,13 +75,9 @@ public final class GUIMenu extends JMenuBar {
    * @param mnem assigned mnenomics
    * @return menu item
    */
-  public static JMenuItem newItem(final GUICmd cmd, final GUI gui,
-      final StringBuilder mnem) {
-
+  public static JMenuItem newItem(final GUICommand cmd, final GUI gui, final StringBuilder mnem) {
     final String desc = cmd.label();
-    final JMenuItem item = cmd.checked() ?
-        new JCheckBoxMenuItem(desc) : new JMenuItem(desc);
-
+    final JMenuItem item = cmd.toggle() ? new JCheckBoxMenuItem(desc) : new JMenuItem(desc);
     item.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -96,7 +85,6 @@ public final class GUIMenu extends JMenuBar {
       }
     });
     BaseXLayout.setMnemonic(item, mnem);
-    item.setToolTipText(cmd.help());
     return item;
   }
 
@@ -107,9 +95,10 @@ public final class GUIMenu extends JMenuBar {
     int c = 0;
     for(int b = 0; b < MENUBAR.length; ++b) {
       for(int i = 0; i < MENUITEMS[b].length; ++i) {
-        final GUICmd item = MENUITEMS[b][i];
-        if(item != GUIBaseCmd.SEPARATOR && item != null) {
-          item.refresh(gui, items[c++]);
+        final GUICommand item = MENUITEMS[b][i];
+        if(item != GUICommand.SEPARATOR && item != null) {
+          items[c].setEnabled(item.enabled(gui));
+          items[c++].setSelected(item.selected(gui));
         }
       }
     }

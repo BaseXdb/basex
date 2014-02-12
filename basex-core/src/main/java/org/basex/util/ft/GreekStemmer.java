@@ -8,7 +8,7 @@ import org.basex.util.*;
  * German stemming algorithm, derived from the Apache Lucene project and the report
  * "Development of a Stemmer for the Greek Language" by Georgios Ntais.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class GreekStemmer extends InternalStemmer {
@@ -338,7 +338,7 @@ public class GreekStemmer extends InternalStemmer {
    */
   private static int rule7(final char[] s, final int l) {
     int len = l;
-    if(len == 5 && e(s, len, "\u03b1\u03b3\u03b1\u03bc\u03b5")) return len - 1;
+    if(len == 5 && e(s, len, "\u03b1\u03b3\u03b1\u03bc\u03b5")) return 5 - 1;
 
     if(len > 7 && e(s, len, "\u03b7\u03b8\u03b7\u03ba\u03b1\u03bc\u03b5"))
       len -= 7;

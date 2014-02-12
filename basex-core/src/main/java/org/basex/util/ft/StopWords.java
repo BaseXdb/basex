@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * Simple stop words set for full-text requests.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class StopWords extends TokenSet {
@@ -33,7 +33,7 @@ public final class StopWords extends TokenSet {
    * @throws IOException I/O exception
    */
   public StopWords(final Data data, final String file) throws IOException {
-    if(!data.meta.prop.get(Prop.STOPWORDS).isEmpty()) read(IO.get(file), false);
+    if(!data.meta.options.get(MainOptions.STOPWORDS).isEmpty()) read(IO.get(file), false);
     final DataOutput out = new DataOutput(data.meta.dbfile(DATASWL));
     write(out);
     out.close();

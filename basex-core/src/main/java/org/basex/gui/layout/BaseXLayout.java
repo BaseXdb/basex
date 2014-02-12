@@ -9,28 +9,32 @@ import java.awt.datatransfer.*;
 import java.awt.dnd.*;
 import java.awt.event.*;
 import java.io.*;
-import java.net.*;
 import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
 
-import org.basex.core.*;
 import org.basex.gui.*;
-import org.basex.gui.editor.*;
+import org.basex.gui.text.*;
 import org.basex.util.*;
 
 /**
  * This class provides static layout and paint helper methods which are used all over
  * the GUI.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class BaseXLayout {
-  /** Cached images. */
-  private static final HashMap<String, ImageIcon> IMAGES =
-    new HashMap<String, ImageIcon>();
+  /** Desktop hints. */
+  private static final Map<?, ?> HINTS = (Map<?, ?>)
+    Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints");
+  /** Flag for adding rendering hints. */
+  private static boolean hints = true;
+
+  /** Shortcut string for meta key. */
+  private static final String META = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ==
+      Event.META_MASK ? "meta" : "ctrl";
   /** Key listener for global shortcuts. */
   private static KeyAdapter keys;
 
@@ -44,8 +48,22 @@ public final class BaseXLayout {
   static void focus(final Component cont) {
     final GUI gui = gui(cont);
     if(gui == null) return;
-    if(gui.gprop.is(GUIProp.MOUSEFOCUS) && cont.isEnabled())
-      cont.requestFocusInWindow();
+    if(gui.gopts.get(GUIOptions.MOUSEFOCUS) && cont.isEnabled()) cont.requestFocusInWindow();
+  }
+
+  /**
+   * Set desktop hints (not supported by all platforms).
+   * @param g graphics reference
+   */
+  public static void hints(final Graphics g) {
+    if(hints) {
+      try {
+        ((Graphics2D) g).addRenderingHints(HINTS);
+      } catch(final Exception ex) {
+        Util.debug(ex);
+        hints = false;
+      }
+    }
   }
 
   /**
@@ -92,8 +110,7 @@ public final class BaseXLayout {
    * @param dnd drag and drop handler
    */
   public static void addDrop(final JComponent comp, final DropHandler dnd) {
-    comp.setDropTarget(new DropTarget(comp,
-        DnDConstants.ACTION_COPY_OR_MOVE, null, true, null) {
+    comp.setDropTarget(new DropTarget(comp, DnDConstants.ACTION_COPY_OR_MOVE, null, true, null) {
       @Override
       public synchronized void drop(final DropTargetDropEvent dtde) {
         dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
@@ -102,6 +119,28 @@ public final class BaseXLayout {
         comp.requestFocusInWindow();
       }
     });
+  }
+
+  /**
+   * Returns a keystroke for the specified string.
+   * @param cmd command
+   * @return keystroke
+   */
+  public static KeyStroke keyStroke(final GUICommand cmd) {
+    final Object sc = cmd.shortcuts();
+    if(sc == null) return null;
+
+    final String scut;
+    if(sc instanceof BaseXKeys[]) {
+      final BaseXKeys[] scs = (BaseXKeys[]) sc;
+      if(scs.length == 0) return null;
+      scut = scs[0].shortCut();
+    } else {
+      scut = Util.info(sc, META);
+    }
+    final KeyStroke ks = KeyStroke.getKeyStroke(scut);
+    if(ks == null) Util.errln("Could not assign shortcut: " + sc + " / " + scut);
+    return ks;
   }
 
   /**
@@ -117,7 +156,7 @@ public final class BaseXLayout {
     final String label = b.getText();
     for(int l = 0; l < label.length(); l++) {
       final char ch = Character.toLowerCase(label.charAt(l));
-      if(!Token.letter(ch) || mnem.indexOf(Character.toString(ch)) != -1)
+      if(!letter(ch) || mnem.indexOf(Character.toString(ch)) != -1)
         continue;
       b.setMnemonic(ch);
       mnem.append(ch);
@@ -147,8 +186,16 @@ public final class BaseXLayout {
   }
 
   /**
+   * Copies the specified string to the clipboard.
+   * @param text text
+   */
+  public static void copy(final String text) {
+    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
+  }
+
+  /**
    * Drag and drop handler.
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Christian Gruen
    */
   public interface DropHandler {
@@ -164,7 +211,7 @@ public final class BaseXLayout {
    * @param comp component
    * @param win parent window
    */
-  static void addInteraction(final Component comp, final Window win) {
+  public static void addInteraction(final Component comp, final Window win) {
     comp.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseEntered(final MouseEvent e) {
@@ -179,16 +226,16 @@ public final class BaseXLayout {
         @Override
         public void keyPressed(final KeyEvent e) {
           final Object s = e.getSource();
-          if(s instanceof BaseXCombo && ((BaseXCombo) s).isPopupVisible()) return;
+          if(s instanceof BaseXCombo && ((JComboBox) s).isPopupVisible()) return;
 
           // do not key close dialog of button or editor is focused
-          if(ENTER.is(e) && !(s instanceof BaseXButton || s instanceof Editor)) {
+          if(ENTER.is(e) && !(s instanceof BaseXButton || s instanceof TextPanel)) {
             d.close();
           } else if(ESCAPE.is(e)) {
             // do not cancel dialog if search bar is opened
             boolean close = true;
-            if(s instanceof Editor) {
-              final SearchBar bar = ((Editor) s).getSearch();
+            if(s instanceof TextPanel) {
+              final SearchBar bar = ((TextPanel) s).getSearch();
               close = bar == null || !bar.deactivate(true);
             }
             if(close) d.cancel();
@@ -201,7 +248,7 @@ public final class BaseXLayout {
     if(win instanceof GUI) {
       comp.addKeyListener(globalShortcuts((GUI) win));
     } else {
-      Util.notexpected("Reference to main window expected.");
+      throw Util.notExpected("Reference to main window expected.");
     }
   }
 
@@ -218,13 +265,13 @@ public final class BaseXLayout {
           // browse back/forward
           if(gui.context.data() != null) {
             if(GOBACK.is(e)) {
-              GUICommands.C_GOBACK.execute(gui);
+              GUIMenuCmd.C_GOBACK.execute(gui);
             } else if(GOFORWARD.is(e)) {
-              GUICommands.C_GOFORWARD.execute(gui);
+              GUIMenuCmd.C_GOFORWARD.execute(gui);
             } else if(GOUP.is(e)) {
-              GUICommands.C_GOUP.execute(gui);
+              GUIMenuCmd.C_GOUP.execute(gui);
             } else if(GOHOME.is(e)) {
-              GUICommands.C_GOHOME.execute(gui);
+              GUIMenuCmd.C_GOHOME.execute(gui);
             }
           }
 
@@ -232,7 +279,7 @@ public final class BaseXLayout {
           if(INPUTBAR.is(e)) gui.input.requestFocusInWindow();
 
           // change font size
-          final int fs = gui.gprop.num(GUIProp.FONTSIZE);
+          final int fs = gui.gopts.get(GUIOptions.FONTSIZE);
           int nfs = fs;
           if(INCFONT1.is(e) || INCFONT2.is(e)) {
             nfs = fs + 1;
@@ -242,7 +289,7 @@ public final class BaseXLayout {
             nfs = 13;
           }
           if(fs != nfs) {
-            gui.gprop.set(GUIProp.FONTSIZE, nfs);
+            gui.gopts.set(GUIOptions.FONTSIZE, nfs);
             gui.updateLayout();
           }
         }
@@ -258,53 +305,14 @@ public final class BaseXLayout {
    * @return tooltip
    */
   public static String addShortcut(final String str, final String sc) {
-    if(sc == null) return str;
+    if(sc == null || str == null) return str;
     final StringBuilder sb = new StringBuilder();
     for(final String s : sc.split(" ")) {
-      String t = s.equals("%") ? Prop.MAC ? "meta" : "control" : s;
+      String t = "%".equals(s) ? Prop.MAC ? "meta" : "control" : s;
       if(t.length() != 1) t = Toolkit.getProperty("AWT." + t.toLowerCase(), t);
       sb.append('+').append(t);
     }
-    int i = str.lastIndexOf('.');
-    if(i == -1) i = str.length();
-    return str.substring(0, i) + " (" + sb.substring(1) + ')' + str.substring(i);
-  }
-
-  /**
-   * Returns the specified image as icon.
-   * @param name name of icon
-   * @return icon
-   */
-  public static ImageIcon icon(final String name) {
-    ImageIcon img = IMAGES.get(name);
-    if(img != null) return img;
-    img = new ImageIcon(image(name));
-    IMAGES.put(name, img);
-    return img;
-  }
-
-  /**
-   * Returns the specified image.
-   * @param name name of image
-   * @return image
-   */
-  public static Image image(final String name) {
-    return Toolkit.getDefaultToolkit().getImage(imageURL(name));
-  }
-
-  /**
-   * Returns the image url.
-   * @param name name of image
-   * @return url
-   */
-  private static URL imageURL(final String name) {
-    final String path = "/img/" + name + ".png";
-    URL url = GUI.class.getResource(path);
-    if(url == null) {
-      Util.errln("Not found: " + path);
-      url = GUI.class.getResource("/img/" + Prop.NAME + ".png");
-    }
-    return url;
+    return str + " (" + sb.substring(1) + ')';
   }
 
   /**
@@ -329,22 +337,17 @@ public final class BaseXLayout {
   public static void fill(final Graphics gg, final Color c1, final Color c2, final int xs,
       final int ys, final int xe, final int ye) {
 
-    final int w = xe - xs;
-    final int h = ye - ys;
-    final int r = c1.getRed();
-    final int g = c1.getGreen();
-    final int b = c1.getBlue();
+    final int w = xe - xs, h = ye - ys;
+    final int r = c1.getRed(), g = c1.getGreen(), b = c1.getBlue();
     final float rf = (c2.getRed() - r) / (float) h;
     final float gf = (c2.getGreen() - g) / (float) h;
     final float bf = (c2.getBlue() - b) / (float) h;
 
-    int nr, ng, nb;
-    int cr = 0, cg = 0, cb = 0;
     int hh = 0;
-    for(int y = 0; y < h; ++y) {
-      nr = r + (int) (rf * y);
-      ng = g + (int) (gf * y);
-      nb = b + (int) (bf * y);
+    for(int y = 0, cr = 0, cg = 0, cb = 0; y < h; ++y) {
+      final int nr = r + (int) (rf * y);
+      final int ng = g + (int) (gf * y);
+      final int nb = b + (int) (bf * y);
       if(nr != cr || ng != cg || nb != cb) {
         gg.setColor(new Color(nr, ng, nb));
         gg.fillRect(xs, ys + y - hh, w, hh);
@@ -385,8 +388,7 @@ public final class BaseXLayout {
    * @param w panel width
    * @param y vertical position
    */
-  public static void drawCenter(final Graphics g, final String text,
-      final int w, final int y) {
+  public static void drawCenter(final Graphics g, final String text, final int w, final int y) {
     g.drawString(text, (w - width(g, text)) / 2, y);
   }
 
@@ -399,8 +401,8 @@ public final class BaseXLayout {
    * @param w width
    * @param c color color depth
    */
-  public static void drawTooltip(final Graphics g, final String tt,
-      final int x, final int y, final int w, final int c) {
+  public static void drawTooltip(final Graphics g, final String tt, final int x, final int y,
+      final int w, final int c) {
     final int tw = width(g, tt);
     final int th = g.getFontMetrics().getHeight();
     final int xx = Math.min(w - tw - 8, x);
@@ -430,16 +432,16 @@ public final class BaseXLayout {
    * @param w width
    * @param fs font size
    */
-  public static void chopString(final Graphics g, final byte[] s,
-      final int x, final int y, final int w, final int fs) {
+  public static void chopString(final Graphics g, final byte[] s, final int x, final int y,
+      final int w, final int fs) {
 
     if(w < 12) return;
     final int[] cw = fontWidths(g.getFont());
 
     int j = s.length;
-    int fw = 0;
-    int l = 0;
     try {
+      int l = 0;
+      int fw = 0;
       for(int k = 0; k < j; k += l) {
         final int ww = width(g, cw, cp(s, k));
         if(fw + ww >= w - 4) {

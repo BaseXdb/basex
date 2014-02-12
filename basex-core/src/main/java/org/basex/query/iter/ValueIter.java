@@ -10,10 +10,10 @@ import org.basex.util.*;
  * Value iterator interface, throwing no exceptions.
  *
  * This class also implements the {@link Iterable} interface, which is why all of its
- * values can also be retrieved via enhanced for (for-each) loops. Note, however, that
+ * values can also be retrieved via enhanced for(for-each) loops. Note, however, that
  * using the {@link #next()} method will give you better performance.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class ValueIter extends Iter implements Iterable<Item> {
@@ -51,7 +51,7 @@ public abstract class ValueIter extends Iter implements Iterable<Item> {
 
       @Override
       public void remove() {
-        Util.notexpected();
+        throw Util.notExpected();
       }
     };
   }

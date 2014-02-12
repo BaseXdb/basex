@@ -8,16 +8,16 @@ import org.basex.query.*;
 /**
  * This is an interface for parsing database commands.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 abstract class CmdParser {
   /** Suggest possible completions. */
-  protected boolean suggest;
+  boolean suggest;
   /** Single command flag. */
-  protected boolean single;
+  boolean single;
   /** Password reader. */
-  protected PasswordReader pwReader;
+  PasswordReader pwReader;
 
   /**
    * Attaches a password reader.

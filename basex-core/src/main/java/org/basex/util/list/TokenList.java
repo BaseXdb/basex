@@ -44,24 +44,6 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   }
 
   /**
-   * Lightweight constructor, adopting the specified array.
-   * @param tokens initial array
-   */
-  public TokenList(final byte[][] tokens) {
-    list = tokens;
-    size = list.length;
-  }
-
-  /**
-   * Constructor, adopting the elements from the specified array.
-   * @param strings initial array
-   */
-  public TokenList(final String[] strings) {
-    this(strings.length);
-    for(final String s : strings) add(s);
-  }
-
-  /**
    * Constructor, adopting the elements from the specified set.
    * @param set set to be added
    */
@@ -209,7 +191,7 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(Util.name(this) + '[');
+    final TokenBuilder tb = new TokenBuilder(Util.className(this) + '[');
     for(int i = 0; i < size; ++i) {
       if(i != 0) tb.add(", ");
       tb.add(list[i]);

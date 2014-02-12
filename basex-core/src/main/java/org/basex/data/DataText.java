@@ -5,18 +5,16 @@ import static org.basex.util.Token.*;
 /**
  * This class assembles texts which are used in the data classes.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public interface DataText {
-  // META DATA ================================================================
+  // META DATA ====================================================================================
 
-  /** Database version; if it's modified, old database instances can't
-   * be parsed anymore. */
-  String STORAGE = "7.1";
-  /** Index version; if it's modified, new indexes can't be parsed anymore
-   * by older versions. */
-  String ISTORAGE = "7.1";
+  /** Database version; older version cannot open these instances. */
+  String STORAGE = "7.8";
+  /** Index version; older version cannot open indexes of these instances. */
+  String ISTORAGE = "7.8";
 
   /** Database version. */
   String DBSTR = "STORAGE";
@@ -89,7 +87,7 @@ public interface DataText {
   /** Namespace. */
   String DBNS = "NS";
 
-  // DATABASE FILES ===========================================================
+  // DATABASE FILES ===============================================================================
 
   /** Database - Info. */
   String DATAINF = "inf";
@@ -108,17 +106,7 @@ public interface DataText {
   /** Database - Updating flag. */
   String DATAUPD = "upd";
 
-  // XML SERIALIZATION ========================================================
-
-  /** Omit flag. */
-  String OMIT = "omit";
-
-  /** NL flag. */
-  String S_NL = "\\n";
-  /** CR flag. */
-  String S_CR = "\\r";
-  /** CRNL flag. */
-  String S_CRNL = "\\r\\n";
+  // XML SERIALIZATION ============================================================================
 
   /** Version. */
   String V10 = "1.0";
@@ -131,33 +119,6 @@ public interface DataText {
   /** Version. */
   String V50 = "5.0";
 
-  /** Method. */
-  String M_CSV = "csv";
-  /** Method. */
-  String M_MAB2 = "mab2";
-
-  /** Method. */
-  String M_XML = "xml";
-  /** Method. */
-  String M_XHTML = "xhtml";
-  /** Method. */
-  String M_HTML = "html";
-  /** Method. */
-  String M_TEXT = "text";
-  /** Method. */
-  String M_JSON = "json";
-  /** Method. */
-  String M_JSONML = "jsonml";
-  /** Method. */
-  String M_RAW = "raw";
-  /** Methods. */
-  String[] METHODS = { M_XML, M_XHTML, M_HTML, M_TEXT, M_JSON, M_JSONML, M_CSV, M_RAW };
-
-  /** Normalization. */
-  String NFC = "NFC";
-  /** Normalization. */
-  String NONE = "none";
-
   /** Document declaration. */
   String DOCDECL1 = "xml version=\"";
   /** Document declaration. */
@@ -165,6 +126,8 @@ public interface DataText {
   /** Document declaration. */
   String DOCDECL3 = "\" standalone=\"";
 
+  /** HTML. */
+  String HTML = "html";
   /** Doctype output. */
   String DOCTYPE = "<!DOCTYPE ";
   /** Doctype system keyword. */
@@ -193,24 +156,6 @@ public interface DataText {
   byte[] T_NAME = token("name");
   /** Token: size. */
   byte[] T_SIZE = token("size");
-
-  /** Token: json. */
-  byte[] T_JSON = token("json");
-  /** Token: type. */
-  byte[] T_TYPE = token("type");
-  /** Token: value. */
-  byte[] T_VALUE = token("value");
-
-  /** Token: string. */
-  byte[] T_STRING = token("string");
-  /** Token: number. */
-  byte[] T_NUMBER = token("number");
-  /** Token: boolean. */
-  byte[] T_BOOLEAN = token("boolean");
-  /** Token: array. */
-  byte[] T_ARRAY = token("array");
-  /** Token: object. */
-  byte[] T_OBJECT = token("object");
 
   /** Comment output. */
   byte[] COMM_O = token("<!--");
@@ -245,7 +190,7 @@ public interface DataText {
   /** Text output. */
   byte[] TEXT = token("text()");
   /** Comment output. */
-  byte[] COMM = token("comment()");
+  byte[] COMMENT = token("comment()");
   /** Processing instruction output. */
   byte[] PI = token("processing-instruction()");
   /** Attribute output. */
@@ -273,16 +218,7 @@ public interface DataText {
   /** HTML: charset attribute value. */
   byte[] CHARSET = token("; charset=");
 
-  // ERRORS ===================================================================
-
-  /** Serialization error. */
-  String SERVAL = "Parameter '%' must be [%";
-  /** Serialization error. */
-  String SERVAL2 = "|%";
-  /** Serialization error. */
-  String SERVAL3 = "]; '%' found";
-
-  // TABLE SERIALIZATION ======================================================
+  // TABLE SERIALIZATION ==========================================================================
 
   /** First table Header. */
   byte[] TABLEID = token("ID");

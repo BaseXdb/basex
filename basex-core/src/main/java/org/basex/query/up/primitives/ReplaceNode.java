@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Replace node primitive.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class ReplaceNode extends NodeCopy {
@@ -36,11 +36,11 @@ public final class ReplaceNode extends NodeCopy {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    UPMULTREPL.thrw(info, getTargetNode());
+    throw UPMULTREPL.get(info, getTargetNode());
   }
 
   @Override
-  public void addAtomics(final AtomicUpdateList l) {
+  public void addAtomics(final AtomicUpdateCache l) {
     l.addReplace(targetPre, insseq);
   }
 

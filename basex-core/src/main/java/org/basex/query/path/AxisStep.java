@@ -12,11 +12,10 @@ import org.basex.util.hash.*;
 /**
  * Axis step expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class AxisStep extends Step {
-
   /**
    * Constructor.
    * @param ii input info
@@ -58,8 +57,7 @@ final class AxisStep extends Step {
   }
 
   @Override
-  public Step copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public Step copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final Expr[] pred = new Expr[preds.length];
     for(int i = 0; i < pred.length; i++) pred[i] = preds[i].copy(ctx, scp, vs);
     return copy(new AxisStep(info, axis, test.copy(), pred));

@@ -6,11 +6,12 @@ import java.awt.*;
 
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.util.options.*;
 
 /**
  * Dialog window for changing the used colors.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DialogColors extends BaseXDialog {
@@ -30,50 +31,49 @@ public final class DialogColors extends BaseXDialog {
   public DialogColors(final GUI main) {
     super(main, COLOR_SCHEMA, false);
 
-    final GUIProp gprop = gui.gprop;
+    final GUIOptions gopts = gui.gopts;
     final BaseXBack p = new BaseXBack(new TableLayout(3, 2, 16, 8));
 
     p.add(new BaseXLabel(RED));
-    sliderRed = newSlider(gprop.num(GUIProp.COLORRED));
+    sliderRed = newSlider(GUIOptions.COLORRED);
     p.add(sliderRed);
 
     p.add(new BaseXLabel(GREEN));
-    sliderGreen = newSlider(gprop.num(GUIProp.COLORGREEN));
+    sliderGreen = newSlider(GUIOptions.COLORGREEN);
     p.add(sliderGreen);
 
     p.add(new BaseXLabel(BLUE));
-    sliderBlue = newSlider(gprop.num(GUIProp.COLORBLUE));
+    sliderBlue = newSlider(GUIOptions.COLORBLUE);
     p.add(sliderBlue);
 
     set(p, BorderLayout.CENTER);
     set(newButtons(RESET), BorderLayout.SOUTH);
 
-    finish(gprop.nums(GUIProp.COLORSLOC));
+    finish(gopts.get(GUIOptions.COLORSLOC));
   }
 
   /**
    * Creates a slider.
-   * @param v initial value
+   * @param option option
    * @return slider reference
    */
-  private BaseXSlider newSlider(final int v) {
-    final BaseXSlider slider = new BaseXSlider(0, MAXCOLOR, MAXCOLOR - v, this);
+  private BaseXSlider newSlider(final NumberOption option) {
+    final BaseXSlider slider = new BaseXSlider(0, MAXCOLOR, option, gui.gopts, this);
     BaseXLayout.setWidth(slider, 150);
     return slider;
   }
 
   @Override
   public void action(final Object comp) {
-    final GUIProp gprop = gui.gprop;
     if(comp instanceof BaseXButton) {
-      sliderRed.value(MAXCOLOR - (Integer) GUIProp.COLORRED[1]);
-      sliderGreen.value(MAXCOLOR - (Integer) GUIProp.COLORGREEN[1]);
-      sliderBlue.value(MAXCOLOR - (Integer) GUIProp.COLORBLUE[1]);
+      // reset default values
+      sliderRed.setValue(GUIOptions.COLORRED.value);
+      sliderGreen.setValue(GUIOptions.COLORGREEN.value);
+      sliderBlue.setValue(GUIOptions.COLORBLUE.value);
     }
-
-    gprop.set(GUIProp.COLORRED, MAXCOLOR - sliderRed.value());
-    gprop.set(GUIProp.COLORGREEN, MAXCOLOR - sliderGreen.value());
-    gprop.set(GUIProp.COLORBLUE, MAXCOLOR - sliderBlue.value());
+    sliderRed.assign();
+    sliderGreen.assign();
+    sliderBlue.assign();
     gui.updateLayout();
   }
 }

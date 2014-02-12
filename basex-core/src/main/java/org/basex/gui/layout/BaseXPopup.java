@@ -12,34 +12,33 @@ import org.basex.gui.*;
 /**
  * Project specific Popup menu implementation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Lukas Kircher
  */
 public final class BaseXPopup extends JPopupMenu {
   /** Reference to main window. */
-  final GUI gui;
-
-  /** Popup reference. */
-  private final GUICmd[] popup;
+  private final GUI gui;
+  /** Popup commands. */
+  private final GUICommand[] commands;
 
   /**
    * Constructor.
    * @param comp component reference
-   * @param pop popup reference
+   * @param cmds popup reference
    */
-  public BaseXPopup(final BaseXPanel comp, final GUICmd... pop) {
-    this(comp, comp.gui, pop);
+  public BaseXPopup(final BaseXPanel comp, final GUICommand... cmds) {
+    this(comp, comp.gui, cmds);
   }
 
   /**
    * Constructor.
    * @param comp component reference
    * @param g gui reference
-   * @param pop popup reference
+   * @param cmds popup reference
    */
-  public BaseXPopup(final JComponent comp, final GUI g, final GUICmd... pop) {
-    popup = pop;
+  public BaseXPopup(final JComponent comp, final GUI g, final GUICommand... cmds) {
+    commands = cmds;
     gui = g;
 
     // both listeners must be implemented to support different platforms
@@ -57,31 +56,50 @@ public final class BaseXPopup extends JPopupMenu {
     comp.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        if(!gui.updating && CONTEXT.is(e)) show(e.getComponent(), 10, 10);
+        if(!gui.updating && CONTEXT.is(e)) {
+          show(e.getComponent(), 10, 10);
+        } else {
+          for(final GUICommand cmd : cmds) {
+            if(cmd instanceof GUIPopupCmd) {
+              for(final BaseXKeys sc : ((GUIPopupCmd) cmd).shortcuts()) {
+                if(sc.is(e)) {
+                  cmd.execute(g);
+                  e.consume();
+                  return;
+                }
+              }
+            }
+          }
+        }
       }
     });
 
-    for(final GUICmd c : pop) {
-      if(c == null) {
+    final StringBuilder mnemCache = new StringBuilder();
+    for(final GUICommand cmd : cmds) {
+      if(cmd == null) {
         addSeparator();
       } else {
-        final JMenuItem item = add(c.label());
+        final JMenuItem item = add(cmd.label());
         item.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(final ActionEvent e) {
-            if(!gui.updating) c.execute(gui);
+            if(!gui.updating) cmd.execute(gui);
           }
         });
-        item.setMnemonic(c.label().charAt(0));
-        item.setToolTipText(c.help());
+        BaseXLayout.setMnemonic(item, mnemCache);
+        item.setAccelerator(BaseXLayout.keyStroke(cmd));
       }
     }
   }
 
   @Override
   public void show(final Component comp, final int x, final int y) {
-    for(int b = 0; b < popup.length; ++b) {
-      if(popup[b] != null) popup[b].refresh(gui, (JMenuItem) getComponent(b));
+    for(int b = 0; b < commands.length; ++b) {
+      if(commands[b] != null) {
+        final AbstractButton button = (AbstractButton) getComponent(b);
+        button.setEnabled(commands[b].enabled(gui));
+        button.setSelected(commands[b].selected(gui));
+      }
     }
     super.show(comp, x, y);
   }

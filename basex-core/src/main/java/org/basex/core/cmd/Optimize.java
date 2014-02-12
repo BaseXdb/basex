@@ -15,7 +15,7 @@ import org.basex.util.list.*;
  * the currently opened database. Indexes and statistics are refreshed,
  * which is especially helpful after updates.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Optimize extends ACreate {
@@ -95,21 +95,21 @@ public final class Optimize extends ACreate {
         }
         final int level = pars.size();
         if(kind == Data.DOC) {
-          data.paths.put(0, kind, level);
+          data.paths.put(0, Data.DOC, level);
           pars.push(pre);
           tags.push(0);
           ++n;
         } else if(kind == Data.ELEM) {
           final int id = data.name(pre);
           data.tagindex.index(data.tagindex.key(id), null, true);
-          data.paths.put(id, kind, level);
+          data.paths.put(id, Data.ELEM, level);
           pars.push(pre);
           tags.push(id);
         } else if(kind == Data.ATTR) {
           final int id = data.name(pre);
           final byte[] val = data.text(pre, false);
           data.atnindex.index(data.atnindex.key(id), val, true);
-          data.paths.put(id, kind, level, val, md);
+          data.paths.put(id, Data.ATTR, level, val, md);
         } else {
           final byte[] val = data.text(pre, true);
           if(kind == Data.TEXT && level > 1) data.tagindex.index(tags.peek(), val);

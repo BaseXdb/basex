@@ -7,7 +7,7 @@ import org.basex.data.*;
  * the name of the database and has basically an artificial path ('/')
  * which leads to problems if treated like an ordinary folder node.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public class TreeRootFolder extends TreeFolder {
@@ -18,8 +18,7 @@ public class TreeRootFolder extends TreeFolder {
    * @param bxt tree reference
    * @param d data reference
    */
-  public TreeRootFolder(final byte[] nm, final byte[] pth, final BaseXTree bxt,
-      final Data d) {
+  public TreeRootFolder(final byte[] nm, final byte[] pth, final BaseXTree bxt, final Data d) {
     super(nm, pth, bxt, d);
   }
 

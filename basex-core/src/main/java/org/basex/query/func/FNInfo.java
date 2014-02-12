@@ -8,23 +8,26 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
  * Info functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNInfo extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNInfo(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNInfo(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -46,8 +49,8 @@ public final class FNInfo extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx) throws QueryException {
-    if(sig == Function.TRACE) type = expr[0].type();
+  protected Expr opt(final QueryContext ctx, final VarScope scp) {
+    if(sig == TRACE) type = expr[0].type();
     return this;
   }
 
@@ -59,16 +62,16 @@ public final class FNInfo extends StandardFunc {
    */
   private Iter error(final QueryContext ctx) throws QueryException {
     final int al = expr.length;
-    if(al == 0) FUNERR1.thrw(info);
+    if(al == 0) throw FUNERR1.get(info);
 
     QNm name = FUNERR1.qname();
     String msg = FUNERR1.desc;
 
     final Item it = expr[0].item(ctx, info);
     if(it == null) {
-      if(al == 1) INVEMPTY.thrw(info, description());
+      if(al == 1) throw INVEMPTY.get(info, description());
     } else {
-      name = checkQNm(it, ctx);
+      name = checkQNm(it, ctx, sc);
     }
     if(al > 1) msg = Token.string(checkEStr(expr[1], ctx));
     final Value val = al > 2 ? ctx.value(expr[2]) : null;
@@ -84,11 +87,17 @@ public final class FNInfo extends StandardFunc {
   private Iter trace(final QueryContext ctx) throws QueryException {
     return new Iter() {
       final Iter ir = expr[0].iter(ctx);
-      final byte[] s = checkStr(expr[1], ctx);
+      final byte[] label = checkStr(expr[1], ctx);
+      boolean empty = true;
       @Override
       public Item next() throws QueryException {
         final Item it = ir.next();
-        if(it != null) dump(it.serialize().toArray(), s, ctx);
+        if(it != null) {
+          dump(it, label, info, ctx);
+          empty = false;
+        } else if(empty) {
+          dump(null, label, info, ctx);
+        }
         return it;
       }
     };
@@ -116,14 +125,37 @@ public final class FNInfo extends StandardFunc {
   }
 
   /**
+   * Dumps the specified item.
+   * @param it item to be dumped
+   * @param label label
+   * @param info input info
+   * @param ctx query context
+   * @throws QueryException query exception
+   */
+  public static void dump(final Item it, final byte[] label, final InputInfo info,
+      final QueryContext ctx) throws QueryException {
+    try {
+      final byte[] value;
+      if(it == null) {
+        value = Token.token(SeqType.EMP.toString());
+      } else if(it.type == NodeType.ATT || it.type == NodeType.NSP) {
+        value = Token.token(it.toString());
+      } else {
+        value = it.serialize().toArray();
+      }
+      dump(value, label, ctx);
+    } catch(final QueryIOException ex) {
+      throw ex.getCause(info);
+    }
+  }
+
+  /**
    * Dumps the specified info to standard error or the info view of the GUI.
    * @param value traced value
    * @param label additional label to display (can be {@code null})
    * @param ctx query context
    */
-  public static void dump(final byte[] value, final byte[] label,
-      final QueryContext ctx) {
-
+  public static void dump(final byte[] value, final byte[] label, final QueryContext ctx) {
     final TokenBuilder tb = new TokenBuilder();
     if(label != null) tb.add(label);
     tb.add(value);
@@ -141,9 +173,13 @@ public final class FNInfo extends StandardFunc {
   /**
    * Creates an error function instance.
    * @param ex query exception
+   * @param tp type of the expression
    * @return function
    */
-  public static FNInfo error(final QueryException ex) {
-    return new FNInfo(ex.info(), ERROR, ex.qname(), Str.get(ex.getLocalizedMessage()));
+  public static FNInfo error(final QueryException ex, final SeqType tp) {
+    final FNInfo err = new FNInfo(null, ex.info(), ERROR, ex.qname(),
+        Str.get(ex.getLocalizedMessage()));
+    err.type = tp;
+    return err;
   }
 }

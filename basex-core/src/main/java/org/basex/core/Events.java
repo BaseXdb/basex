@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * This class organizes all known events.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Roman Raedle
  * @author Andreas Weiler
@@ -84,7 +84,7 @@ public final class Events extends HashMap<String, Sessions> {
    */
   public synchronized String info() {
     final TokenBuilder tb = new TokenBuilder();
-    tb.addExt(EVENTS_X, size()).add(size() != 0 ? COL : DOT);
+    tb.addExt(EVENTS_X, size()).add(size() == 0 ? DOT : COL);
 
     final String[] names = keySet().toArray(new String[size()]);
     Arrays.sort(names);
@@ -99,9 +99,7 @@ public final class Events extends HashMap<String, Sessions> {
    * @param msg message
    * @return success flag
    */
-  public synchronized boolean notify(final Context ctx, final byte[] name,
-      final byte[] msg) {
-
+  public synchronized boolean notify(final Context ctx, final byte[] name, final byte[] msg) {
     final Sessions sess = get(string(name));
     // event was not found
     if(sess == null) return false;

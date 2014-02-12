@@ -13,7 +13,7 @@ import org.basex.util.list.*;
 /**
  * Sequence, containing at least two ordered database nodes.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DBNodeSeq extends NativeSeq {
@@ -96,7 +96,7 @@ public final class DBNodeSeq extends NativeSeq {
    * @param c indicates if values include all document nodes of a database
    * @return resulting item or sequence
    */
-  public static Value get(final int[] v, final Data d, final Type t, final boolean c) {
+  private static Value get(final int[] v, final Data d, final Type t, final boolean c) {
     return v.length == 0 ? Empty.SEQ : v.length == 1 ? new DBNode(d, v[0]) :
       new DBNodeSeq(v, d, t, c);
   }

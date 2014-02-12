@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Sequence, containing at least two items.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class ItemSeq extends Seq {
@@ -47,7 +47,7 @@ public final class ItemSeq extends Seq {
   @Override
   public Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
     if(item[0] instanceof ANode) return item[0];
-    throw CONDTYPE.thrw(ii, this);
+    throw CONDTYPE.get(ii, this);
   }
 
   @Override

@@ -15,7 +15,7 @@ import org.basex.util.list.*;
  * This class analyzes the current path and gives suggestions for code
  * completions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class QuerySuggest extends QueryParser {
@@ -41,7 +41,7 @@ public final class QuerySuggest extends QueryParser {
    */
   public QuerySuggest(final String q, final QueryContext c, final Data d)
       throws QueryException {
-    super(q, null, c);
+    super(q, null, c, null);
     data = d;
     checkInit();
   }
@@ -63,7 +63,7 @@ public final class QuerySuggest extends QueryParser {
   }
 
   @Override
-  protected void checkInit() {
+  void checkInit() {
     if(stack != null && !stack.empty()) return;
     all = data.paths.root();
     curr = all;
@@ -125,7 +125,7 @@ public final class QuerySuggest extends QueryParser {
   }
 
   @Override
-  public QueryException error(final Err err, final Object... arg) throws QueryException {
-    throw new QueryException(info(), err, arg).suggest(this, complete());
+  public QueryException error(final Err err, final Object... arg) {
+    return new QueryException(info(), err, arg).suggest(this, complete());
   }
 }

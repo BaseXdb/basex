@@ -11,7 +11,7 @@ import org.basex.io.in.DataInput;
 /**
  * This class provides data for merging temporary value indexes.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class ValueIndexMerger {
@@ -51,12 +51,12 @@ final class ValueIndexMerger {
    */
   void next() throws IOException {
     values = nextValues();
-    if(values.length != 0) {
-      key = dk.readToken();
-    } else {
+    if(values.length == 0) {
       dv.close();
       dk.close();
       data.meta.drop(pref + '.');
+    } else {
+      key = dk.readToken();
     }
   }
 

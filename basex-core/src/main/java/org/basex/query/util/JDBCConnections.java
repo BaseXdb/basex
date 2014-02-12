@@ -8,7 +8,7 @@ import org.basex.util.hash.*;
 /**
  * Opened JDBC connections.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  */
 public final class JDBCConnections {
@@ -54,7 +54,7 @@ public final class JDBCConnections {
       if(obj == null) continue;
       try {
         if(obj instanceof Connection) ((Connection) obj).close();
-        else ((PreparedStatement) obj).close();
+        else ((Statement) obj).close();
       } catch(final SQLException ex) {
         Util.debug(ex);
       }

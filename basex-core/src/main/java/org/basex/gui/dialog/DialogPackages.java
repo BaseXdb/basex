@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * Open database dialog.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DialogPackages extends BaseXDialog {
@@ -81,7 +81,7 @@ public final class DialogPackages extends BaseXDialog {
     p.add(packages, BorderLayout.CENTER);
     final BaseXBack ss = new BaseXBack(new TableLayout(1, 2, 8, 0)).border(8, 0, 0, 0);
     ss.add(new BaseXLabel(PATH + COL, true, true), BorderLayout.NORTH);
-    ss.add(new BaseXLabel(main.context.mprop.get(MainProp.REPOPATH)));
+    ss.add(new BaseXLabel(main.context.globalopts.get(GlobalOptions.REPOPATH)));
     p.add(ss, BorderLayout.SOUTH);
     set(p, BorderLayout.CENTER);
 
@@ -111,14 +111,14 @@ public final class DialogPackages extends BaseXDialog {
     final ArrayList<Command> cmds = new ArrayList<Command>();
 
     if(cmp == install) {
-      final String pp = gui.gprop.get(GUIProp.WORKPATH);
+      final String pp = gui.gopts.get(GUIOptions.WORKPATH);
       final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR, pp, gui);
       fc.filter(XML_ARCHIVES, IO.XARSUFFIX);
       fc.filter(JAVA_ARCHIVES, IO.JARSUFFIX);
       fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
       final IOFile file = fc.select(Mode.FDOPEN);
       if(file == null) return;
-      gui.gprop.set(GUIProp.WORKPATH, file.path());
+      gui.gopts.set(GUIOptions.WORKPATH, file.path());
       refresh = true;
       cmds.add(new RepoInstall(file.path(), null));
 
@@ -146,7 +146,7 @@ public final class DialogPackages extends BaseXDialog {
         path.setText(pp.replace('.', '/'));
       }
       // enable or disable buttons
-      delete.setEnabled(pkgs.size() > 0);
+      delete.setEnabled(!pkgs.isEmpty());
     }
 
     // run all commands

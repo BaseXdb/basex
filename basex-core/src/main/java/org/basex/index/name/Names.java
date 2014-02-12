@@ -16,13 +16,13 @@ import org.basex.util.hash.*;
  * This class indexes and organizes the tags or attribute names,
  * used in an XML document.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Lukas Kircher
  */
 public final class Names extends TokenSet implements Index {
   /** Statistical information. */
-  Stats[] stats;
+  private Stats[] stats;
   /** Meta data. */
   private final MetaData meta;
 
@@ -102,8 +102,8 @@ public final class Names extends TokenSet implements Index {
   @Override
   public byte[] info() {
     final int[] tl = new int[size];
-    int len = 0;
     tl[0] = 0;
+    int len = 0;
     for(int i = 1; i < size; ++i) {
       if(len < keys[i].length) len = keys[i].length;
       if(stats[i] == null) continue;
@@ -151,11 +151,11 @@ public final class Names extends TokenSet implements Index {
 
   @Override
   public IndexIterator iter(final IndexToken token) {
-    throw Util.notexpected();
+    throw Util.notExpected();
   }
 
   @Override
-  public int count(final IndexToken token) {
-    throw Util.notexpected();
+  public int costs(final IndexToken token) {
+    throw Util.notExpected();
   }
 }

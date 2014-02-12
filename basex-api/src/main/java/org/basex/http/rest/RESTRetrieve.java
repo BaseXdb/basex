@@ -1,105 +1,85 @@
 package org.basex.http.rest;
 
-import static org.basex.http.rest.RESTText.*;
+import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.List;
-import org.basex.core.cmd.Set;
 import org.basex.http.*;
 import org.basex.io.serial.*;
-import org.basex.query.value.item.*;
+import org.basex.query.func.*;
 import org.basex.query.value.node.*;
-import org.basex.server.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
- * This class retrieves resources.
+ * Retrieve resources via REST.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-final class RESTRetrieve extends RESTQuery {
+final class RESTRetrieve extends RESTCmd {
   /**
    * Constructor.
-   * @param in input file to be executed
-   * @param vars external variables
-   * @param it context item
+   * @param rs REST session
    */
-  RESTRetrieve(final String in, final Map<String, String[]> vars, final byte[] it) {
-    super(in, vars, it);
+  private RESTRetrieve(final RESTSession rs) {
+    super(rs);
   }
 
   @Override
-  void run(final HTTPContext http) throws IOException {
+  protected void run0() throws IOException {
     // open addressed database
-    open(http);
+    for(final Command c : cmds) run(c);
 
-    final LocalSession session = http.session();
-    if(http.depth() == 0) {
-      // list databases
-      final Table table = new Table(session.execute(new List()));
-      final SerializerProp sprop = new SerializerProp(http.serialization);
-      final Serializer ser = Serializer.get(http.res.getOutputStream(), sprop);
-      http.initResponse(sprop);
+    final HTTPContext http = session.http;
+    if(run(query(_DB_EXISTS)).equals(Text.TRUE)) {
+      // return database resource
+      final boolean raw = run(query(_DB_IS_RAW)).equals(Text.TRUE);
+      if(raw) {
+        http.serialization.set(SerializerOptions.METHOD, SerialMethod.RAW);
+        http.serialization.set(SerializerOptions.MEDIA_TYPE, run(query(_DB_CONTENT_TYPE)));
+      }
+      http.initResponse();
 
-      final FElem el = new FElem(Q_DATABASES).declareNS();
-      el.add(RESOURCES, token(table.contents.size()));
-      list(table, el, Q_DATABASE, 1);
-      ser.serialize(el);
-      ser.close();
-    } else if(!exists(http)) {
-      // list database resources
-      final Table table = new Table(session.execute(new List(http.db(), http.dbpath())));
-      final String serial = http.serialization;
-      final SerializerProp sprop = new SerializerProp(serial);
-      final Serializer ser = Serializer.get(http.res.getOutputStream(), sprop);
-      http.initResponse(sprop);
+      context.options.set(MainOptions.SERIALIZER, serial(http));
+      run(query(raw ? _DB_RETRIEVE : _DB_OPEN), http.res.getOutputStream());
 
-      final FElem el = new FElem(Q_DATABASE).declareNS();
-      el.add(NAME, http.db());
-      el.add(RESOURCES, token(table.contents.size()));
-      list(table, el, Q_RESOURCE, 0);
-      ser.serialize(el);
-      ser.close();
-    } else if(isRaw(http)) {
-      // retrieve raw file; prefix user parameters with media type
-      final String ct = SerializerProp.S_MEDIA_TYPE[0] + "=" + contentType(http);
-      http.initResponse(new SerializerProp(ct + ',' + http.serialization));
-      session.setOutputStream(http.res.getOutputStream());
-      session.execute(new Retrieve(http.dbpath()));
     } else {
-      // retrieve xml file
-      http.initResponse(new SerializerProp(http.serialization));
-      session.execute(new Set(Prop.SERIALIZER, serial(http)));
-      session.setOutputStream(http.res.getOutputStream());
-      session.query(".").execute();
+      // list database resources
+      final Table table = new Table(run(new List(http.db(), http.dbpath())));
+      final FElem el = new FElem(RESTText.Q_DATABASE).declareNS();
+      el.add(RESTText.NAME, http.db()).add(RESTText.RESOURCES, token(table.contents.size()));
+      list(table, el, RESTText.Q_RESOURCE, 0);
+
+      http.initResponse();
+      final Serializer ser = Serializer.get(http.res.getOutputStream(), http.serialization);
+      ser.serialize(el);
+      ser.close();
     }
   }
 
   /**
-   * Lists the table contents.
-   * @param table table reference
-   * @param root root node
-   * @param header table header
-   * @param skip number of columns to skip
+   * Creates a query instance.
+   * @param f function
+   * @return query
    */
-  private static void list(final Table table, final FElem root, final QNm header,
-      final int skip) {
+  private AQuery query(final Function f) {
+    final HTTPContext http = session.http;
+    final String query = "declare variable $d external;" +
+        "declare variable $p external;" + f.args("$d", "$p");
+    return new XQuery(query).bind("d", http.db()).bind("p", http.dbpath());
+  }
 
-    for(final TokenList l : table.contents) {
-      final FElem el = new FElem(header);
-      // don't show last attribute (input path)
-      for(int i = 1; i < l.size() - skip; i++) {
-        el.add(new QNm(lc(table.header.get(i))), l.get(i));
-      }
-      el.add(l.get(0));
-      root.add(el);
-    }
+  /**
+   * Creates a new instance of this command.
+   * @param rs REST session
+   * @return command
+   */
+  static RESTCmd get(final RESTSession rs) {
+    final HTTPContext http = rs.http;
+    if(http.depth() == 0) return new RESTList(rs.add(new List()));
+    return new RESTRetrieve(rs.add(new Open(http.db())));
   }
 }

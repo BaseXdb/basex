@@ -1,5 +1,7 @@
 package org.basex.core.cmd;
 
+import static org.basex.core.Text.*;
+
 import java.util.*;
 
 import org.basex.core.*;
@@ -11,14 +13,14 @@ import org.basex.util.*;
  * Evaluates the 'execute' command and runs a command script.
  * This command can be used to run multiple commands as a single transaction.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class Execute extends Command {
   /** Commands to execute. */
-  protected final ArrayList<Command> list = new ArrayList<Command>();
+  final ArrayList<Command> list = new ArrayList<Command>();
   /** Error message. */
-  protected String error;
+  String error;
 
   /**
    * Default constructor.
@@ -45,10 +47,14 @@ public class Execute extends Command {
 
       final StringBuilder sb = new StringBuilder();
       for(final Command c : list) {
+        if(c.openDB && context.data() == null) return error(NO_DB_OPENED);
         final boolean ok = proc(c).run(context, out);
         proc(null);
         sb.append(c.info());
-        if(!ok) return error(sb.toString());
+        if(!ok) {
+          cause = c.cause;
+          return error(sb.toString());
+        }
       }
       return info(sb.toString().replaceAll("\r?\n?$", ""));
     } finally {
@@ -70,7 +76,7 @@ public class Execute extends Command {
    * @param ctx database context
    * @return success flag
    */
-  protected boolean init(final Context ctx) {
+  boolean init(final Context ctx) {
     return init(args[0], ctx);
   }
 
@@ -80,7 +86,7 @@ public class Execute extends Command {
    * @param ctx database context
    * @return success flag
    */
-  protected final boolean init(final String input, final Context ctx) {
+  final boolean init(final String input, final Context ctx) {
     if(list.isEmpty() && error == null) {
       try {
         Collections.addAll(list, new CommandParser(input, ctx).parse());
@@ -97,7 +103,7 @@ public class Execute extends Command {
    * @param ctx database context
    */
   @SuppressWarnings("unused")
-  protected void finish(final Context ctx) {
+  void finish(final Context ctx) {
   }
 
   @Override

@@ -3,51 +3,52 @@ package org.basex.query.expr;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Pragma for database options.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class DBPragma extends Pragma {
   /** Option key. */
-  private final String key;
+  private final Option<?> option;
   /** Cached value. */
   private Object old;
 
   /**
    * Constructor.
    * @param n name of pragma
+   * @param o option
    * @param v optional value
    */
-  public DBPragma(final QNm n, final byte[] v) {
-   super(n, v);
-    key = string(n.local());
+  public DBPragma(final QNm n, final Option<?> o, final byte[] v) {
+    super(n, v);
+    option = o;
   }
 
   @Override
   void init(final QueryContext ctx, final InputInfo info) throws QueryException {
-    old = ctx.context.prop.get(key);
+    old = ctx.context.options.get(option);
     try {
-      ctx.context.prop.set(key.toUpperCase(Locale.ENGLISH), string(value));
-    } catch(final Exception ex) {
-      BASX_VALUE.thrw(info, ex.getMessage());
+      ctx.context.options.assign(option.name(), string(value));
+    } catch(final BaseXException ex) {
+      throw BASX_VALUE.get(info, option.name(), value);
     }
   }
 
   @Override
   void finish(final QueryContext ctx) {
-    ctx.context.prop.setObject(key, old);
+    ctx.context.options.put(option, old);
   }
 
   @Override
   public Pragma copy() {
-    return new DBPragma(name, value);
+    return new DBPragma(name, option, value);
   }
 }

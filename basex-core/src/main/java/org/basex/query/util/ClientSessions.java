@@ -11,7 +11,7 @@ import org.basex.util.hash.*;
 /**
  * Opened database client sessions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class ClientSessions {
@@ -26,7 +26,7 @@ public final class ClientSessions {
    * @return session id
    */
   public Uri add(final ClientSession cs) {
-    final byte[] uri = Token.token(Text.NAMELC + "://" + cs + '/' + ++lastId);
+    final byte[] uri = Token.token(Text.PROJECT_NAME + "://" + cs + '/' + ++lastId);
     conns.put(uri, cs);
     return Uri.uri(uri);
   }

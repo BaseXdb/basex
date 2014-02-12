@@ -11,18 +11,17 @@ import org.basex.util.hash.*;
 /**
  * Filter expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class CachedFilter extends Filter {
-
   /**
    * Constructor.
    * @param ii input info
    * @param r expression
    * @param p predicates
    */
-  public CachedFilter(final InputInfo ii, final Expr r, final Expr... p) {
+  CachedFilter(final InputInfo ii, final Expr r, final Expr... p) {
     super(ii, r, p);
   }
 
@@ -76,9 +75,8 @@ final class CachedFilter extends Filter {
   }
 
   @Override
-  public Filter addPred(final QueryContext ctx, final VarScope scp, final Expr p)
-      throws QueryException {
-    preds = Array.add(preds, p);
+  public Filter addPred(final QueryContext ctx, final VarScope scp, final Expr p) {
+    preds = Array.add(preds, new Expr[preds.length + 1], p);
     return this;
   }
 

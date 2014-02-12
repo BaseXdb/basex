@@ -89,7 +89,7 @@ declare function w:lock-db-exists() as xs:boolean {
  : Creates the database for the WebDAV locks, if it does not exist.
  :)
 declare %updating function w:init-lock-db() {
-  if (w:lock-db-exists()) then
+  if(w:lock-db-exists()) then
     ()
   else
     db:create($w:locks-db, <w:locks/>, $w:locks-db)

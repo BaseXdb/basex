@@ -1,7 +1,5 @@
 package org.basex.query.value.map;
 
-import static org.basex.query.QueryText.*;
-
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -12,7 +10,7 @@ import org.basex.util.*;
 /**
  * A single binding of a {@link Map}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 final class Leaf extends TrieNode {
@@ -48,13 +46,13 @@ final class Leaf extends TrieNode {
     final TrieNode[] ch = new TrieNode[KIDS];
     final int a = key(h, l), b = key(hash, l);
     final int used;
-    if(a != b) {
+    if(a == b) {
+      ch[a] = insert(h, k, v, l + 1, ii);
+      used = 1 << a;
+    } else {
       ch[a] = new Leaf(h, k, v);
       ch[b] = this;
       used = 1 << a | 1 << b;
-    } else {
-      ch[a] = insert(h, k, v, l + 1, ii);
-      used = 1 << a;
     }
     return new Branch(ch, used, 2);
   }
@@ -66,8 +64,7 @@ final class Leaf extends TrieNode {
   }
 
   @Override
-  Value get(final int h, final Item k, final int l, final InputInfo ii)
-      throws QueryException {
+  Value get(final int h, final Item k, final int l, final InputInfo ii) throws QueryException {
     return h == hash && eq(key, k, ii) ? value : null;
   }
 
@@ -84,8 +81,7 @@ final class Leaf extends TrieNode {
   }
 
   @Override
-  TrieNode addAll(final TrieNode o, final int l, final InputInfo ii)
-      throws QueryException {
+  TrieNode addAll(final TrieNode o, final int l, final InputInfo ii) throws QueryException {
     return o.add(this, l, ii);
   }
 
@@ -113,7 +109,6 @@ final class Leaf extends TrieNode {
 
   @Override
   TrieNode add(final List o, final int l, final InputInfo ii) throws QueryException {
-
     // same hash? insert binding
     if(hash == o.hash) {
       for(int i = 0; i < o.size; i++) {
@@ -188,6 +183,6 @@ final class Leaf extends TrieNode {
 
   @Override
   StringBuilder toString(final StringBuilder sb) {
-    return sb.append(key).append(COL).append(value).append(", ");
+    return sb.append(key).append(": ").append(value).append(", ");
   }
 }

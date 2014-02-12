@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Go to line dialog.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DialogLine extends BaseXDialog {
@@ -40,7 +40,7 @@ public final class DialogLine extends BaseXDialog {
     p.add(info, BorderLayout.CENTER);
     set(p, BorderLayout.CENTER);
 
-    buttons = newButtons(B_OK, B_CANCEL);
+    buttons = newButtons(B_OK, CANCEL);
     set(buttons, BorderLayout.SOUTH);
     action(null);
     finish(null);

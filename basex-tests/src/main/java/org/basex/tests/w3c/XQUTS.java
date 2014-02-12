@@ -25,8 +25,8 @@ public final class XQUTS extends W3CTS {
    * Constructor.
    */
   public XQUTS() {
-    super(Util.name(XQUTS.class));
-    context.prop.set(Prop.FORCECREATE, true);
+    super(Util.className(XQUTS.class));
+    context.options.set(MainOptions.FORCECREATE, true);
   }
 
   @Override

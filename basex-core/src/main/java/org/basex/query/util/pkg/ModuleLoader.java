@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * Module loader.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class ModuleLoader {
@@ -86,7 +86,7 @@ public final class ModuleLoader {
 
     if(!java) {
       // no "java:" prefix: first try to import module as XQuery
-      final String path = context.mprop.get(MainProp.REPOPATH) + uriPath;
+      final String path = context.globalopts.get(GlobalOptions.REPOPATH) + uriPath;
       // check for any file with XQuery suffix
       for(final String suf : IO.XQSUFFIXES) {
         if(addModule(new IOFile(path + suf), uri, qp)) return true;
@@ -95,23 +95,23 @@ public final class ModuleLoader {
 
     // "java:" prefix, or no XQuery package found: try to load Java module
     uriPath = capitalize(uriPath);
-    final String path = context.mprop.get(MainProp.REPOPATH) + uriPath;
+    final String path = context.globalopts.get(GlobalOptions.REPOPATH) + uriPath;
     final IOFile file = new IOFile(path + IO.JARSUFFIX);
     if(file.exists()) addURL(file);
 
     // try to create Java class instance
-    addJava(uriPath, uri, ii);
+    addJava(uriPath, ii);
     return true;
   }
 
   /**
    * Returns a reference to the specified class.
-   * @param clz fully classified class name
+   * @param name fully classified class name
    * @return found class, or {@code null}
    * @throws Throwable any exception or error: {@link ClassNotFoundException},
    *   {@link LinkageError} or {@link ExceptionInInitializerError}.
    */
-  public Class<?> findClass(final String clz) throws Throwable {
+  public Class<?> findClass(final String name) throws Throwable {
     // add cached URLs to class loader
     final int us = urls.size();
     if(us != 0) {
@@ -119,7 +119,7 @@ public final class ModuleLoader {
       urls.clear();
     }
     // no external classes added: use default class loader
-    return loader == LOADER ? Reflect.forName(clz) : Class.forName(clz, true, loader);
+    return loader == LOADER ? Reflect.forName(name) : Class.forName(name, true, loader);
   }
 
   /**
@@ -203,8 +203,8 @@ public final class ModuleLoader {
    * @return {@code true} if file exists and was successfully parsed
    * @throws QueryException query exception
    */
-  private static boolean addModule(final IOFile file, final byte[] uri,
-      final QueryParser qp) throws QueryException {
+  private static boolean addModule(final IOFile file, final byte[] uri, final QueryParser qp)
+      throws QueryException {
 
     if(!file.exists()) return false;
     qp.module(token(file.path()), uri);
@@ -214,27 +214,24 @@ public final class ModuleLoader {
   /**
    * Loads a Java class.
    * @param path file path
-   * @param uri original URI
    * @param ii input info
    * @throws QueryException query exception
    */
-  private void addJava(final String path, final byte[] uri, final InputInfo ii)
-      throws QueryException {
-
-    final String cp = path.replace('/', '.').substring(1);
+  private void addJava(final String path, final InputInfo ii) throws QueryException {
+    final String cp = camelCase(path.replace('/', '.').substring(1));
     Class<?> clz = null;
     try {
       clz = findClass(cp);
     } catch(final ClassNotFoundException ex) {
-      NOMODULE.thrw(ii, uri);
+      throw WHICHCLASS.get(ii, ex.getMessage());
       // expected exception
     } catch(final Throwable th) {
-      MODINIT.thrw(ii, th);
+      throw MODINITERR.get(ii, th);
     }
 
     final boolean qm = clz.getSuperclass() == QueryModule.class;
     final Object jm = Reflect.get(clz);
-    if(jm == null) NOINST.thrw(ii, cp);
+    if(jm == null) throw INSTERR.get(ii, cp);
 
     // add all public methods of the class (ignore methods from super classes)
     final ArrayList<Method> list = new ArrayList<Method>();
@@ -265,7 +262,7 @@ public final class ModuleLoader {
 
     // find package in package dictionary
     final byte[] pDir = context.repo.pkgDict().get(name);
-    if(pDir == null) BXRE_NOTINST.thrw(ii, name);
+    if(pDir == null) throw BXRE_NOTINST.get(ii, name);
     final IOFile pkgDir = context.repo.path(string(pDir));
 
     // parse package descriptor
@@ -283,15 +280,12 @@ public final class ModuleLoader {
     if(!pkg.dep.isEmpty()) toLoad.add(name);
     for(final Dependency d : pkg.dep) {
       if(d.pkg != null) {
-      // we consider only package dependencies here
-      final byte[] depPkg = new PkgValidator(context.repo, ii).depPkg(d);
-      if(depPkg == null) {
-        BXRE_NOTINST.thrw(ii, string(d.pkg));
-      } else {
-        if(toLoad.contains(depPkg)) CIRCMODULE.thrw(ii);
+        // we consider only package dependencies here
+        final byte[] depPkg = new PkgValidator(context.repo, ii).depPkg(d);
+        if(depPkg == null) throw BXRE_NOTINST.get(ii, string(d.pkg));
+        if(toLoad.contains(depPkg)) throw CIRCMODULE.get(ii);
         addRepo(depPkg, toLoad, loaded, ii, qp);
       }
-     }
     }
     for(final Component comp : pkg.comps) {
       final String p = new IOFile(new IOFile(pkgDir, string(pkg.abbrev)),

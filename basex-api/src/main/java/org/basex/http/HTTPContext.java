@@ -13,17 +13,20 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.basex.*;
+import org.basex.build.JsonOptions.JsonFormat;
+import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * This class bundles context-based information on a single HTTP operation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class HTTPContext {
@@ -35,13 +38,15 @@ public final class HTTPContext {
   public final HTTPMethod method;
 
   /** Serialization parameters. */
-  public String serialization = "";
+  public SerializerOptions serialization = new SerializerOptions();
   /** Result wrapping. */
   public boolean wrapping;
   /** User name. */
   public String user;
+  /** Password. */
+  public String pass;
 
-  /** Singleton database context. */
+  /** Global static database context. */
   private static Context context;
   /** Initialization flag. */
   private static boolean init;
@@ -50,10 +55,6 @@ public final class HTTPContext {
   private final Performance perf = new Performance();
   /** Segments. */
   private final String[] segments;
-  /** Current user session. */
-  private LocalSession session;
-  /** Password. */
-  private String pass;
 
   /**
    * Constructor.
@@ -80,9 +81,9 @@ public final class HTTPContext {
     segments = toSegments(req.getPathInfo());
 
     // adopt servlet-specific credentials or use global ones
-    final MainProp mprop = context().mprop;
-    user = servlet.user != null ? servlet.user : mprop.get(MainProp.USER);
-    pass = servlet.pass != null ? servlet.pass : mprop.get(MainProp.PASSWORD);
+    final GlobalOptions mprop = context().globalopts;
+    user = servlet.user != null ? servlet.user : mprop.get(GlobalOptions.USER);
+    pass = servlet.pass != null ? servlet.pass : mprop.get(GlobalOptions.PASSWORD);
 
     // overwrite credentials with session-specific data
     final String auth = req.getHeader(AUTHORIZATION);
@@ -127,32 +128,34 @@ public final class HTTPContext {
 
   /**
    * Initializes the output. Sets the expected encoding and content type.
-   * @param sprop serialization properties
    */
-  public void initResponse(final SerializerProp sprop) {
+  public void initResponse() {
     // set content type and encoding
-    final String enc = sprop.get(SerializerProp.S_ENCODING);
+    final String enc = serialization.get(SerializerOptions.ENCODING);
     res.setCharacterEncoding(enc);
-    final String ct = mediaType(sprop);
+    final String ct = mediaType(serialization);
     res.setContentType(new TokenBuilder(ct).add(CHARSET).add(enc).toString());
   }
 
   /**
-   * Returns the media type defined in the specified serialization properties.
-   * @param sprop serialization properties
+   * Returns the media type defined in the specified serialization parameters.
+   * @param sopts serialization parameters
    * @return media type
    */
-  public static String mediaType(final SerializerProp sprop) {
+  public static String mediaType(final SerializerOptions sopts) {
     // set content type
-    final String type = sprop.get(SerializerProp.S_MEDIA_TYPE);
+    final String type = sopts.get(SerializerOptions.MEDIA_TYPE);
     if(!type.isEmpty()) return type;
 
     // determine content type dependent on output method
-    final String mt = sprop.get(SerializerProp.S_METHOD);
-    if(mt.equals(M_RAW)) return APP_OCTET;
-    if(mt.equals(M_XML)) return APP_XML;
-    if(eq(mt, M_JSON, M_JSONML)) return APP_JSON;
-    if(eq(mt, M_XHTML, M_HTML)) return TEXT_HTML;
+    final SerialMethod sm = sopts.get(SerializerOptions.METHOD);
+    if(sm == SerialMethod.RAW) return APP_OCTET;
+    if(sm == SerialMethod.XML) return APP_XML;
+    if(sm == SerialMethod.XHTML || sm == SerialMethod.HTML) return TEXT_HTML;
+    if(sm == SerialMethod.JSON) {
+      final JsonSerialOptions jprop = sopts.get(SerializerOptions.JSON);
+      return jprop.get(JsonOptions.FORMAT) == JsonFormat.JSONML ? APP_JSONML : APP_JSON;
+    }
     return TEXT_PLAIN;
   }
 
@@ -179,7 +182,8 @@ public final class HTTPContext {
    */
   public String dbpath() {
     final TokenBuilder tb = new TokenBuilder();
-    for(int p = 1; p < segments.length; p++) {
+    final int ps = segments.length;
+    for(int p = 1; p < ps; p++) {
       if(!tb.isEmpty()) tb.add('/');
       tb.add(segments[p]);
     }
@@ -201,8 +205,12 @@ public final class HTTPContext {
    * @return database
    */
   public String[] produces() {
-    final String[] acc = req.getHeader("Accept").split("\\s*,\\s*");
-    for(int a = 0; a < acc.length; a++) {
+    final String accept = req.getHeader("Accept");
+    if(accept == null) return new String[0];
+
+    final String[] acc = accept.split("\\s*,\\s*");
+    final int as = acc.length;
+    for(int a = 0; a < as; a++) {
       if(acc[a].indexOf(';') != -1) acc[a] = acc[a].replaceAll("\\w*;.*", "");
     }
     return acc;
@@ -215,15 +223,13 @@ public final class HTTPContext {
    * @param error treat as error (use web server standard output)
    * @throws IOException I/O exception
    */
-  public void status(final int code, final String message, final boolean error)
-      throws IOException {
-
+  public void status(final int code, final String message, final boolean error) throws IOException {
     try {
       log(message, code);
       res.resetBuffer();
       if(code == SC_UNAUTHORIZED) res.setHeader(WWW_AUTHENTICATE, BASIC);
 
-      if(error && code >= 400) {
+      if(error && code >= SC_BAD_REQUEST) {
         res.sendError(code, message);
       } else {
         res.setStatus(code);
@@ -245,32 +251,26 @@ public final class HTTPContext {
   }
 
   /**
-   * Creates a new {@link LocalSession} instance.
-   * @return database session
-   * @throws IOException I/O exception
+   * Authenticate the user and returns a new client {@link Context} instance.
+   * @return client context
+   * @throws LoginException login exception
    */
-  public LocalSession session() throws IOException {
-    if(session == null) {
-      final byte[] address = token(req.getRemoteAddr());
-      try {
-        if(user == null || user.isEmpty() || pass == null || pass.isEmpty())
-          throw new LoginException(NOPASSWD);
-        session = new LocalSession(context(), user, pass);
-        context.blocker.remove(address);
-      } catch(final LoginException ex) {
-        // delay users with wrong passwords
-        for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(1000);
-        throw ex;
-      }
-    }
-    return session;
-  }
+  public Context authenticate() throws LoginException {
+    final byte[] address = token(req.getRemoteAddr());
+    try {
+      if(user == null || user.isEmpty() || pass == null || pass.isEmpty())
+        throw new LoginException(NOPASSWD);
+      final Context ctx = new Context(context(), null);
+      ctx.user = ctx.users.get(user);
+      if(ctx.user == null || !ctx.user.password.equals(md5(pass))) throw new LoginException();
 
-  /**
-   * Closes an open database session.
-   */
-  public void close() {
-    if(session != null) session.close();
+      context.blocker.remove(address);
+      return ctx;
+    } catch(final LoginException ex) {
+      // delay users with wrong passwords
+      for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(1000);
+      throw ex;
+    }
   }
 
   /**
@@ -317,8 +317,8 @@ public final class HTTPContext {
 
     // set web application path as home directory and HTTPPATH
     final String webapp = sc.getRealPath("/");
-    AProp.setSystem(Prop.PATH, webapp);
-    AProp.setSystem(MainProp.WEBPATH, webapp);
+    Options.setSystem(Prop.PATH, webapp);
+    Options.setSystem(GlobalOptions.WEBPATH, webapp);
 
     // bind all parameters that start with "org.basex." to system properties
     final Enumeration<String> en = sc.getInitParameterNames();
@@ -326,22 +326,22 @@ public final class HTTPContext {
       final String key = en.nextElement();
       if(!key.startsWith(Prop.DBPREFIX)) continue;
 
-      // legacy: rewrite obsolete properties. will be removed some versions later
+      // legacy: rewrite obsolete options. will be removed some versions later
       final String val = sc.getInitParameter(key);
       String k = key;
       String v = val;
       if(key.equals(Prop.DBPREFIX + "httppath")) {
-        k = Prop.DBPREFIX + MainProp.RESTXQPATH[0];
+        k = Prop.DBPREFIX + GlobalOptions.RESTXQPATH.name();
       } else if(key.equals(Prop.DBPREFIX + "mode")) {
-        k = Prop.DBPREFIX + MainProp.HTTPLOCAL[0];
-        v = Boolean.toString(v.equals("local"));
+        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.name();
+        v = Boolean.toString("local".equals(v));
       } else if(key.equals(Prop.DBPREFIX + "server")) {
-        k = Prop.DBPREFIX + MainProp.HTTPLOCAL[0];
+        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.name();
         v = Boolean.toString(!Boolean.parseBoolean(v));
       }
       k = k.toLowerCase(Locale.ENGLISH);
       if(!k.equals(key) || !v.equals(val)) {
-        Util.errln("Warning! Outdated property: " +
+        Util.errln("Warning! Outdated option: " +
           key + '=' + val + " => " + k + '=' + v);
       }
 
@@ -350,19 +350,19 @@ public final class HTTPContext {
         Util.debug(k.toUpperCase(Locale.ENGLISH) + ": " + v);
         v = new IOFile(webapp, v).path();
       }
-      AProp.setSystem(k, v);
+      Options.setSystem(k, v);
     }
 
-    // create context, update property instances
+    // create context, update options
     if(context == null) {
       context = new Context(false);
     } else {
-      context.mprop.setSystem();
-      context.prop.setSystem();
+      context.globalopts.setSystem();
+      context.options.setSystem();
     }
 
     // start server instance
-    if(!context.mprop.is(MainProp.HTTPLOCAL)) new BaseXServer(context);
+    if(!context.globalopts.get(GlobalOptions.HTTPLOCAL)) new BaseXServer(context);
   }
 
   /**

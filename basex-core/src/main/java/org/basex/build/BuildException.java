@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * This class indicates building exceptions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class BuildException extends IOException {

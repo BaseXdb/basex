@@ -3,6 +3,7 @@ package org.basex.util.ft;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.util.*;
 
 /**
  * This class contains language tokens which are valid for the xml:lang
@@ -17,7 +18,7 @@ import org.basex.core.*;
  * @see <a href="http://www.iana.org/assignments/language-subtag-registry"
  *      >http://www.iana.org/assignments/language-subtag-registry</a>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Dimitar Popov
  * @author Jens Erat
  */
@@ -58,13 +59,12 @@ public final class Language implements Comparable<Language> {
   }
 
   /**
-   * Returns an instance for the current language property,
-   * or English as default language.
-   * @param prop properties
+   * Returns an instance for the current language option, or English as default language.
+   * @param opts database options
    * @return language code
    */
-  public static Language get(final Prop prop) {
-    final Language lang = get(prop.get(Prop.LANGUAGE));
+  public static Language get(final MainOptions opts) {
+    final Language lang = get(opts.get(MainOptions.LANGUAGE));
     return lang == null ? get("en") : lang;
   }
 
@@ -82,7 +82,7 @@ public final class Language implements Comparable<Language> {
    * Returns the language code (ISO 639).
    * @return code
    */
-  String code() {
+  public String code() {
     return locale.getLanguage();
   }
 

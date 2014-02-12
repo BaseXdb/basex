@@ -10,23 +10,28 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
  * Functions on functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class FNFunc extends StandardFunc {
+  /** Minimum size of a loop that should not be unrolled. */
+  static final int UNROLL_LIMIT = 10;
+
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNFunc(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNFunc(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -45,10 +50,46 @@ public final class FNFunc extends StandardFunc {
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case FUNCTION_ARITY:  return Int.get(checkFunc(expr[0], ctx).arity());
-      case FUNCTION_NAME:   return checkFunc(expr[0], ctx).fName();
+      case FUNCTION_NAME:   return checkFunc(expr[0], ctx).funcName();
       case FUNCTION_LOOKUP: return lookup(ctx, ii);
       default:              return super.item(ctx, ii);
     }
+  }
+
+  @Override
+  Expr opt(final QueryContext ctx, final VarScope scp) throws QueryException {
+    if(oneOf(sig, Function.FOLD_LEFT, Function.FOLD_RIGHT, Function.FOR_EACH)
+        && allAreValues() && expr[0].size() < UNROLL_LIMIT) {
+      // unroll the loop
+      ctx.compInfo(QueryText.OPTUNROLL, this);
+      final Value seq = (Value) expr[0];
+      final int len = (int) seq.size();
+
+      // fn:for-each(...)
+      if (sig == Function.FOR_EACH) {
+        final Expr[] results = new Expr[len];
+        for(int i = 0; i < len; i++) {
+          results[i] = new DynFuncCall(info, expr[1], seq.itemAt(i)).optimize(ctx, scp);
+        }
+        return new List(info, results).optimize(ctx, scp);
+      }
+
+      // folds
+      Expr e = expr[1];
+      if (sig == Function.FOLD_LEFT) {
+        for (final Item it : seq)
+          e = new DynFuncCall(info, expr[2], e, it).optimize(ctx, scp);
+      } else {
+        for (int i = len; --i >= 0;)
+          e = new DynFuncCall(info, expr[2], seq.itemAt(i), e).optimize(ctx, scp);
+      }
+      return e;
+    }
+
+    if(sig == Function.FUNCTION_LOOKUP) {
+      for(final StaticFunc sf : ctx.funcs.funcs()) sf.compile(ctx);
+    }
+    return this;
   }
 
   /**
@@ -59,12 +100,12 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item lookup(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final QNm name = checkQNm(expr[0], ctx);
+    final QNm name = checkQNm(expr[0], ctx, sc);
     final long arity = checkItr(expr[1], ctx);
-    if(arity < 0 || arity > Integer.MAX_VALUE) FUNCUNKNOWN.thrw(ii, name);
+    if(arity < 0 || arity > Integer.MAX_VALUE) throw FUNCUNKNOWN.get(ii, name);
 
     try {
-      final Expr lit = Functions.getLiteral(name, (int) arity, ctx, ii);
+      final Expr lit = Functions.getLiteral(name, (int) arity, ctx, sc, ii);
       return lit == null ? null : lit.item(ctx, ii);
     } catch(final QueryException e) {
       // function not found (in most cases: XPST0017)
@@ -191,14 +232,12 @@ public final class FNFunc extends StandardFunc {
    * @return function item
    * @throws QueryException query exception
    */
-  private FItem withArity(final int p, final int a, final QueryContext ctx)
-      throws QueryException {
-
+  private FItem withArity(final int p, final int a, final QueryContext ctx) throws QueryException {
     final Item it = checkItem(expr[p], ctx);
     if(it instanceof FItem) {
       final FItem fi = (FItem) it;
       if(fi.arity() == a) return fi;
     }
-    throw Err.type(this, FuncType.arity(a), it);
+    throw Err.typeError(this, FuncType.arity(a), it);
   }
 }

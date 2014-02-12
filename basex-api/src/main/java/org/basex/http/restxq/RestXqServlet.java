@@ -12,20 +12,21 @@ import org.basex.query.*;
  * <p>The implementation is based on Adam Retter's paper presented at XMLPrague 2012,
  * titled "RESTful XQuery - Standardised XQuery 3.0 Annotations for REST".</p>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class RestXqServlet extends BaseXServlet {
   @Override
   protected void run(final HTTPContext http) throws Exception {
     // authenticate user
-    http.session();
+    http.authenticate();
 
     // analyze input path
     final RestXqModules rxm = RestXqModules.get();
     // select XQuery function
     RestXqFunction func = rxm.find(http, null);
-    if(func == null) HTTPErr.NO_XQUERY.thrw();
+    if(func == null) throw HTTPCode.NO_XQUERY.get();
+
     try {
       // process function that matches the current request
       func.process(http, null);

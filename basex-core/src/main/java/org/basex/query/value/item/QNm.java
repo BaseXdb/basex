@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * QName item ({@code xs:QName}).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class QNm extends Item {
@@ -86,11 +86,11 @@ public final class QNm extends Item {
    * Constructor, binding a statically known namespace.
    * If no namespace is found, the namespace uri is set to {@code null}.
    * @param n name
-   * @param ctx query context
+   * @param sc static context
    */
-  public QNm(final byte[] n, final QueryContext ctx) {
+  public QNm(final byte[] n, final StaticContext sc) {
     this(n);
-    uri(ctx.sc.ns.uri(prefix()));
+    uri(sc.ns.uri(prefix()));
   }
 
   /**
@@ -143,7 +143,7 @@ public final class QNm extends Item {
   public boolean eq(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
     if(it instanceof QNm) return eq((QNm) it);
-    throw INVTYPECMP.thrw(ii, it.type, type);
+    throw INVTYPECMP.get(ii, it.type, type);
   }
 
   /**
@@ -156,9 +156,8 @@ public final class QNm extends Item {
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    throw Err.diff(ii, it, this);
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
+    throw diffError(ii, it, this);
   }
 
   /**
@@ -216,7 +215,7 @@ public final class QNm extends Item {
   }
 
   @Override
-  public int hash(final InputInfo ii) throws QueryException {
+  public int hash(final InputInfo ii) {
     return Token.hash(local());
   }
 
@@ -247,7 +246,7 @@ public final class QNm extends Item {
    */
   public static QNm get(final String local) {
     return CACHE.index(null, token(local), null);
-  };
+  }
 
   /**
    * Returns a cached QName with the specified local name.
@@ -256,7 +255,7 @@ public final class QNm extends Item {
    */
   public static QNm get(final byte[] local) {
     return CACHE.index(null, local, null);
-  };
+  }
 
   /**
    * Returns a cached QName with the specified local name and uri.
@@ -266,7 +265,7 @@ public final class QNm extends Item {
    */
   public static QNm get(final String local, final byte[] uri) {
     return CACHE.index(null, token(local), uri);
-  };
+  }
 
   /**
    * Returns a cached QName with the specified local name and uri.
@@ -276,7 +275,7 @@ public final class QNm extends Item {
    */
   public static QNm get(final byte[] local, final byte[] uri) {
     return CACHE.index(null, local, uri);
-  };
+  }
 
   /**
    * Returns a cached QName with the specified prefix, local name and uri.
@@ -287,7 +286,7 @@ public final class QNm extends Item {
    */
   public static QNm get(final String prefix, final String local, final byte[] uri) {
     return CACHE.index(token(prefix), token(local), uri);
-  };
+  }
 
   /**
    * Returns a cached QName with the specified prefix, local name and uri.
@@ -298,7 +297,7 @@ public final class QNm extends Item {
    */
   public static QNm get(final String prefix, final String local, final String uri) {
     return CACHE.index(token(prefix), token(local), token(uri));
-  };
+  }
 
   /**
    * Returns a cached QName with the specified prefix, local name and uri.
@@ -309,7 +308,7 @@ public final class QNm extends Item {
    */
   public static QNm get(final byte[] prefix, final byte[] local, final byte[] uri) {
     return CACHE.index(prefix, local, uri);
-  };
+  }
 
   /**
    * Constructs an internal string representation for the components of a QName.
@@ -318,9 +317,7 @@ public final class QNm extends Item {
    * @param uri uri
    * @return EQName representation
    */
-  public static byte[] internal(final byte[] prefix, final byte[] local,
-      final byte[] uri) {
-
+  public static byte[] internal(final byte[] prefix, final byte[] local, final byte[] uri) {
     // optimized for speed, as it is called quite frequently
     final int ul = uri == null ? 0 : uri.length;
     final int pl = prefix == null ? 0 : prefix.length;

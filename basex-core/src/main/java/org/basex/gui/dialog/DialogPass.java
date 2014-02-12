@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Password dialog.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DialogPass extends BaseXDialog {
@@ -46,7 +46,7 @@ public final class DialogPass extends BaseXDialog {
     p.add(info, BorderLayout.CENTER);
     set(p, BorderLayout.CENTER);
 
-    buttons = newButtons(B_OK, B_CANCEL);
+    buttons = newButtons(B_OK, CANCEL);
     set(buttons, BorderLayout.SOUTH);
     action(null);
     finish(null);

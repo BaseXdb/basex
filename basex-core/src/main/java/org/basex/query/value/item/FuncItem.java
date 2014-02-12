@@ -3,11 +3,12 @@ package org.basex.query.value.item;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
-import java.util.Map.Entry;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.gflwor.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -15,17 +16,15 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Function item.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class FuncItem extends FItem implements Scope {
-  /** Original function. */
-  public final StaticFunc func;
-
   /** Static context. */
   private final StaticContext sc;
   /** Variables. */
@@ -44,93 +43,55 @@ public final class FuncItem extends FItem implements Scope {
   /** Context length. */
   private final long size;
 
-  /** The closure of this function item. */
-  private final Map<Var, Value> closure;
   /** Size of the stack frame needed for this function. */
   private final int stackSize;
 
   /**
    * Constructor.
+   * @param sctx static context
+   * @param annotations function annotations
    * @param n function name
    * @param arg function arguments
-   * @param body function body
    * @param t function type
-   * @param scp variable scope
-   * @param sctx static context
-   * @param sf original function
+   * @param body function body
+   * @param cst cast flag
+   * @param stSize stack-frame size
    */
-  public FuncItem(final QNm n, final Var[] arg, final Expr body, final FuncType t,
-      final VarScope scp, final StaticContext sctx, final StaticFunc sf) {
-    this(n, arg, body, t, false, null, 0, 0, null, scp, sctx, sf);
+  public FuncItem(final StaticContext sctx, final Ann annotations, final QNm n, final Var[] arg,
+      final FuncType t, final Expr body, final boolean cst, final int stSize) {
+    this(sctx, annotations, n, arg, t, body, cst, null, 0, 0, stSize);
   }
 
   /**
    * Constructor.
+   * @param sctx static context
+   * @param annotations function annotations
    * @param n function name
    * @param arg function arguments
-   * @param body function body
    * @param t function type
-   * @param cst cast flag
-   * @param cls closure
-   * @param scp variable scope
-   * @param sctx static context
-   * @param sf original function
-   */
-  public FuncItem(final QNm n, final Var[] arg, final Expr body, final FuncType t,
-      final boolean cst, final Map<Var, Value> cls, final VarScope scp,
-      final StaticContext sctx, final StaticFunc sf) {
-    this(n, arg, body, t, cst, null, 0, 0, cls, scp, sctx, sf);
-  }
-
-  /**
-   * Constructor for anonymous functions.
-   * @param arg function arguments
    * @param body function body
-   * @param t function type
-   * @param cl variables in the closure
-   * @param cst cast flag
-   * @param scp variable scope
-   * @param sctx static context
-   */
-  public FuncItem(final Var[] arg, final Expr body, final FuncType t,
-      final Map<Var, Value> cl, final boolean cst, final VarScope scp,
-      final StaticContext sctx) {
-    this(null, arg, body, t, cst, cl, scp, sctx, null);
-  }
-
-  /**
-   * Constructor.
-   * @param n function name
-   * @param arg function arguments
-   * @param body function body
-   * @param t function type
    * @param cst cast flag
    * @param vl context value
    * @param ps context position
    * @param sz context size
-   * @param cls closure
-   * @param scp variable scope
-   * @param sctx static context
-   * @param sf original function
+   * @param stSize stack-frame size
    */
-  public FuncItem(final QNm n, final Var[] arg, final Expr body, final FuncType t,
-      final boolean cst, final Value vl, final long ps, final long sz,
-      final Map<Var, Value> cls, final VarScope scp, final StaticContext sctx,
-      final StaticFunc sf) {
+  public FuncItem(final StaticContext sctx, final Ann annotations, final QNm n, final Var[] arg,
+      final FuncType t, final Expr body, final boolean cst, final Value vl,
+      final long ps, final long sz, final int stSize) {
 
-    super(t);
+    super(t, annotations);
     name = n;
     vars = arg;
     expr = body;
-    cast = cst && t.type != null ? t.type : null;
-    closure = cls != null ? cls : Collections.<Var, Value>emptyMap();
-    stackSize = scp.stackSize();
+
+    cast = cst && t.ret != null ? t.ret : null;
+    stackSize = stSize;
     sc = sctx;
 
     ctxVal = vl;
     pos = ps;
     size = sz;
-    func = sf;
   }
 
   @Override
@@ -139,8 +100,13 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public QNm fName() {
+  public QNm funcName() {
     return name;
+  }
+
+  @Override
+  public QNm argName(final int ps) {
+    return vars[ps].name;
   }
 
   @Override
@@ -148,103 +114,73 @@ public final class FuncItem extends FItem implements Scope {
     return (FuncType) type;
   }
 
-  /**
-   * Binds all variables to the context.
-   * @param ctx query context
-   * @param ii input info
-   * @param arg argument values
-   * @throws QueryException if the arguments can't be bound
-   */
-  private void bindVars(final QueryContext ctx, final InputInfo ii, final Value[] arg)
-      throws QueryException {
-    for(final Entry<Var, Value> e : closure.entrySet())
-      ctx.set(e.getKey(), e.getValue(), ii);
-    for(int v = vars.length; --v >= 0;) ctx.set(vars[v], arg[v], ii);
-  }
-
   @Override
-  public Value invValue(final QueryContext ctx, final InputInfo ii,
-      final Value... args) throws QueryException {
+  public Value invValue(final QueryContext ctx, final InputInfo ii, final Value... args)
+      throws QueryException {
 
     // bind variables and cache context
-    final StaticContext cs = ctx.sc;
-    ctx.sc = sc;
     final int fp = ctx.stack.enterFrame(stackSize);
     final Value cv = ctx.value;
     final long ps = ctx.pos, sz = ctx.size;
     try {
-      bindVars(ctx, ii, args);
       ctx.value = ctxVal;
       ctx.pos = pos;
       ctx.size = size;
+      for(int i = 0; i < vars.length; i++) ctx.set(vars[i], args[i], ii);
       final Value v = ctx.value(expr);
       // optionally cast return value to target type
-      return cast != null ? cast.funcConvert(ctx, ii, v) : v;
+      return cast != null ? cast.funcConvert(ctx, sc, ii, v, false) : v;
     } finally {
       ctx.value = cv;
       ctx.pos = ps;
       ctx.size = sz;
       ctx.stack.exitFrame(fp);
-      ctx.sc = cs;
     }
   }
 
   @Override
-  public Item invItem(final QueryContext ctx, final InputInfo ii,
-      final Value... args) throws QueryException {
+  public Item invItem(final QueryContext ctx, final InputInfo ii, final Value... args)
+      throws QueryException {
 
     // bind variables and cache context
-    final StaticContext cs = ctx.sc;
-    ctx.sc = sc;
     final int fp = ctx.stack.enterFrame(stackSize);
     final Value cv = ctx.value;
     final long ps = ctx.pos, sz = ctx.size;
     try {
-      bindVars(ctx, ii, args);
       ctx.value = ctxVal;
       ctx.pos = pos;
       ctx.size = size;
+      for(int i = 0; i < vars.length; i++) ctx.set(vars[i], args[i], ii);
       final Item it = expr.item(ctx, ii);
       final Value v = it == null ? Empty.SEQ : it;
       // optionally cast return value to target type
-      return cast != null ? cast.funcConvert(ctx, ii, v).item(ctx, ii) : it;
+      return cast != null ? cast.funcConvert(ctx, sc, ii, v, false).item(ctx, ii) : it;
     } finally {
       ctx.value = cv;
       ctx.pos = ps;
       ctx.size = sz;
       ctx.stack.exitFrame(fp);
-      ctx.sc = cs;
     }
-  }
-
-  /**
-   * Coerces a function item to the given type.
-   * @param ctx query context
-   * @param ii input info
-   * @param fun function item to coerce
-   * @param t type to coerce to
-   * @return coerced function item
-   */
-  private static FuncItem coerce(final QueryContext ctx, final InputInfo ii,
-      final FuncItem fun, final FuncType t) {
-    final VarScope sc = new VarScope();
-    final Var[] vs = new Var[fun.vars.length];
-    final Expr[] refs = new Expr[vs.length];
-    for(int i = vs.length; i-- > 0;) {
-      vs[i] = sc.uniqueVar(ctx, t.args[i], true);
-      refs[i] = new VarRef(ii, vs[i]);
-    }
-    final Expr e = new DynFuncCall(ii, fun, refs);
-    e.markTailCalls();
-    return new FuncItem(fun.name, vs, e, t, fun.cast != null, null, sc, ctx.sc, fun.func);
   }
 
   @Override
-  public FItem coerceTo(final FuncType ft, final QueryContext ctx,
-      final InputInfo ii) throws QueryException {
+  public FItem coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii,
+      final boolean opt) throws QueryException {
+    if(vars.length != ft.args.length) throw Err.castError(ii, ft, this);
+    final FuncType tp = funcType();
+    if(tp.instanceOf(ft)) return this;
 
-    if(vars.length != ft.args.length) throw Err.cast(ii, ft, this);
-    return type.instanceOf(ft) ? this : coerce(ctx, ii, this, ft);
+    final VarScope vsc = new VarScope(sc);
+    final Var[] vs = new Var[vars.length];
+    final Expr[] refs = new Expr[vs.length];
+    for(int i = vs.length; i-- > 0;) {
+      vs[i] = vsc.newLocal(ctx, vars[i].name, ft.args[i], true);
+      refs[i] = new VarRef(ii, vs[i]);
+    }
+    final Expr e = new DynFuncCall(ii, this, refs);
+    e.markTailCalls(null);
+    return new FuncItem(sc, ann, name,
+        vs, ft, opt ? e.optimize(ctx, vsc) : e, !tp.ret.instanceOf(ft.ret), vsc.stackSize());
   }
 
   @Override
@@ -260,12 +196,11 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public boolean visit(final ASTVisitor visitor) {
     for(final Var var : vars) if(!visitor.declared(var)) return false;
-    for(final Var var : closure.keySet()) if(!visitor.declared(var)) return false;
     return expr.accept(visitor);
   }
 
   @Override
-  public void compile(final QueryContext ctx) throws QueryException {
+  public void compile(final QueryContext ctx) {
     // nothing to do here
   }
 
@@ -275,8 +210,8 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Object toJava() throws QueryException {
-    throw Util.notexpected();
+  public Object toJava() {
+    throw Util.notExpected();
   }
 
   @Override
@@ -284,7 +219,63 @@ public final class FuncItem extends FItem implements Scope {
     final FuncType ft = (FuncType) type;
     final TokenBuilder tb = new TokenBuilder(FUNCTION).add('(');
     for(final Var v : vars) tb.addExt(v).add(v == vars[vars.length - 1] ? "" : ", ");
-    return tb.add(')').add(ft.type != null ? " as " + ft.type : "").add(" { ").
-        addExt(expr).add(" }").toString();
+    tb.add(')').add(ft.ret != null ? " as " + ft.ret : "").add(" { ").addExt(expr).add(" }");
+    return tb.toString();
+  }
+
+  @Override
+  public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
+      final InputInfo ii) throws QueryException {
+    if(!inline(exprs, ctx)) return null;
+    ctx.compInfo(OPTINLINEFN, this);
+    // create let bindings for all variables
+    final LinkedList<GFLWOR.Clause> cls =
+        exprs.length == 0 ? null : new LinkedList<GFLWOR.Clause>();
+    final IntObjMap<Var> vs = new IntObjMap<Var>();
+    for(int i = 0; i < vars.length; i++) {
+      final Var old = vars[i], v = scp.newCopyOf(ctx, old);
+      vs.put(old.id, v);
+      cls.add(new Let(v, exprs[i], false, ii).optimize(ctx, scp));
+    }
+
+    // copy the function body
+    final Expr cpy = expr.copy(ctx, scp, vs), rt = cast == null ? cpy :
+      new TypeCheck(sc, ii, cpy, cast, true).optimize(ctx, scp);
+
+    return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(ctx, scp);
+  }
+
+  /**
+   * Checks if this function item should be inlined.
+   * @param as argument expressions
+   * @param ctx query context
+   * @return result of check
+   */
+  private boolean inline(final Expr[] as, final QueryContext ctx) {
+    if(expr.isValue() || expr.exprSize() < ctx.context.options.get(MainOptions.INLINELIMIT) &&
+        !expr.has(Flag.CTX)) {
+      // check if the function item does not introduce new function calls
+      final ASTVisitor self = new ASTVisitor() {
+        @Override
+        public boolean dynFuncCall(final DynFuncCall call) {
+          return false;
+        }
+      };
+      if(expr.accept(self)) return true;
+
+      // checks if the arguments don't contain this function item
+      final ASTVisitor args = new ASTVisitor() {
+        @Override
+        public boolean funcItem(final FuncItem f) {
+          return f != FuncItem.this && f.visit(this);
+        }
+        @Override
+        public boolean inlineFunc(final Scope sub) {
+          return sub.visit(this);
+        }
+      };
+      return Expr.visitAll(args, as);
+    }
+    return false;
   }
 }

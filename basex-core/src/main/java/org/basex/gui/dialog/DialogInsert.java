@@ -11,15 +11,15 @@ import javax.swing.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
  * Dialog window for inserting new database nodes.
 
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class DialogInsert extends BaseXDialog {
@@ -37,7 +37,7 @@ public final class DialogInsert extends BaseXDialog {
   /** Text area. */
   private final BaseXTextField input1;
   /** Text area. */
-  private final Editor input2;
+  private final TextPanel input2;
   /** First label. */
   private final BaseXLabel label1;
   /** Second label. */
@@ -58,7 +58,7 @@ public final class DialogInsert extends BaseXDialog {
     input1 = new BaseXTextField(this);
     BaseXLayout.setWidth(input1, 500);
 
-    input2 = new Editor(true, this);
+    input2 = new TextPanel(true, this);
     input2.addKeyListener(keys);
     BaseXLayout.setWidth(input2, 500);
 
@@ -72,7 +72,7 @@ public final class DialogInsert extends BaseXDialog {
       }
     };
 
-    final int lkind = gui.gprop.num(GUIProp.LASTINSERT);
+    final int lkind = gui.gopts.get(GUIOptions.LASTINSERT);
     radio = new BaseXRadio[NODE_KINDS.length];
     for(int i = 1; i < NODE_KINDS.length; ++i) {
       radio[i] = new BaseXRadio(NODE_KINDS[i], false, this);
@@ -84,7 +84,7 @@ public final class DialogInsert extends BaseXDialog {
     }
     set(knd, BorderLayout.NORTH);
 
-    back = new BaseXBack(10, 0, 0, 0);
+    back = new BaseXBack().border(10, 0, 0, 0);
     set(back, BorderLayout.CENTER);
 
     final BaseXBack pp = new BaseXBack(new BorderLayout());
@@ -133,10 +133,10 @@ public final class DialogInsert extends BaseXDialog {
     for(int i = 1; i < NODE_KINDS.length; ++i) {
       if(radio[i].isSelected()) kind = i;
     }
-    gui.gprop.set(GUIProp.LASTINSERT, kind);
+    gui.gopts.set(GUIOptions.LASTINSERT, kind);
 
-    String msg = null;
     ok = kind != Data.TEXT || input2.getText().length != 0;
+    String msg = null;
     if(kind != Data.TEXT && kind != Data.COMM) {
       ok = XMLToken.isQName(token(input1.getText()));
       if(!ok && !input1.getText().isEmpty()) msg = Util.info(INVALID_X, NAME);

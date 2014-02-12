@@ -3,7 +3,6 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 
 import java.io.*;
-import java.net.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
@@ -14,18 +13,19 @@ import org.basex.util.*;
 /**
  * Functions for fetching resources.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNFetch extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNFetch(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNFetch(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -75,18 +75,16 @@ public final class FNFetch extends StandardFunc {
     final String mt;
     if(io instanceof IOUrl) {
       try {
-        final URL url = new URL(path);
-        final URLConnection hc = url.openConnection();
-        mt = hc.getContentType();
+        mt = ((IOUrl) io).connection().getContentType();
       } catch(final IOException ex) {
-        throw BXFE_IO.thrw(info, ex);
+        throw BXFE_IO.get(info, ex);
       }
     } else if(io instanceof IOContent) {
       mt = MimeTypes.APP_XML;
     } else {
       mt = io.exists() ? MimeTypes.get(path) : null;
     }
-    if(mt == null) throw BXFE_IO.thrw(info, new FileNotFoundException(path));
+    if(mt == null) throw BXFE_IO.get(info, new FileNotFoundException(path));
     return Str.get(mt);
   }
 }

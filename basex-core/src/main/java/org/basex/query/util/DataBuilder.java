@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * Class for building memory-based database nodes.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DataBuilder {
@@ -59,6 +59,7 @@ public final class DataBuilder {
    * @param nodes node list
    */
   public void build(final ANodeList nodes) {
+    data.meta.update();
     int ds = data.meta.size;
     for(final ANode n : nodes) ds = addNode(n, ds, -1, null);
   }
@@ -115,7 +116,7 @@ public final class DataBuilder {
     final byte[] uri = q.uri();
     int u = 0;
     if(uri.length != 0) {
-      if(par == -1) data.nspaces.add(ds, pre - par, q.prefix(), uri, data);
+      if(par == -1) data.nspaces.add(ds, pre + 1, q.prefix(), uri, data);
       u = data.nspaces.uri(uri);
     }
     final int n = data.atnindex.index(q.string(), null, false);
@@ -141,13 +142,13 @@ public final class DataBuilder {
     if(tl == null) return pre + addText(node.string(), dist);
 
     // adopt namespace from parent
-    int u = 0;
     ANode p = pNode;
     while(p != null) {
       final QNm n = p.qname();
       if(n != null && !n.hasPrefix()) break;
       p = p.parent();
     }
+    int u = 0;
     if(p != null) u = data.nspaces.uri(p.name(), true);
 
     final int ts = tl.size();
@@ -279,7 +280,7 @@ public final class DataBuilder {
   public static ANode stripNS(final ANode node, final byte[] ns, final Context ctx) {
     if(node.type != NodeType.ELM) return node;
 
-    final MemData md = new MemData(ctx.prop);
+    final MemData md = new MemData(ctx.options);
     final DataBuilder db = new DataBuilder(md);
     db.build(node);
 
@@ -298,7 +299,7 @@ public final class DataBuilder {
       if(prefix(name).length == 0) {
         // no prefix: remove namespace from element
         if(kind == Data.ELEM) {
-          md.update(pre, kind, name, EMPTY);
+          md.update(pre, Data.ELEM, name, EMPTY);
           md.nsFlag(pre, false);
         }
       } else {

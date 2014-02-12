@@ -1,6 +1,7 @@
 package org.basex.query.value.node;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.func.Function.*;
 
 import java.io.*;
 
@@ -25,7 +26,7 @@ import org.basex.util.list.*;
 /**
  * Database nodes.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class DBNode extends ANode {
@@ -80,11 +81,11 @@ public class DBNode extends ANode {
   /**
    * Constructor, specifying an XML input reference.
    * @param input input reference
-   * @param prop database properties
+   * @param opts database options
    * @throws IOException I/O exception
    */
-  public DBNode(final IO input, final Prop prop) throws IOException {
-    this(Parser.xmlParser(input, prop));
+  public DBNode(final IO input, final MainOptions opts) throws IOException {
+    this(Parser.xmlParser(input, opts));
   }
 
   /**
@@ -101,7 +102,7 @@ public class DBNode extends ANode {
    * @param p pre value
    * @param k node kind
    */
-  public final void set(final int p, final int k) {
+  final void set(final int p, final int k) {
     type = type(k);
     par = null;
     val = null;
@@ -224,15 +225,15 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final DBNode dbCopy(final Prop prop) {
-    final MemData md = data.inMemory() ? new MemData(data) : new MemData(prop);
+  public final DBNode dbCopy(final MainOptions opts) {
+    final MemData md = data.inMemory() ? new MemData(data) : new MemData(opts);
     new DataBuilder(md).build(this);
     return new DBNode(md).parent(par);
   }
 
   @Override
   public final DBNode deepCopy() {
-    return dbCopy(data.meta.prop);
+    return dbCopy(data.meta.options);
   }
 
   @Override
@@ -253,7 +254,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final DBNode parent(final ANode p) {
+  protected final DBNode parent(final ANode p) {
     par = p;
     return this;
   }
@@ -466,7 +467,7 @@ public class DBNode extends ANode {
   @Override
   public final ID typeId() {
     // check if a document has a single element as child
-    Type.ID t = type.id();
+    ID t = type.id();
     if(type == NodeType.DOC) {
       final AxisMoreIter ai = children();
       if(ai.more() && ai.next().type == NodeType.ELM && !ai.more()) t = NodeType.DEL.id();
@@ -476,22 +477,6 @@ public class DBNode extends ANode {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(type.string()).add(' ');
-    switch((NodeType) type) {
-      case ATT:
-      case PI:
-        tb.add(name()).add(" { \"").add(Token.chop(string(), 64)).add("\" }");
-        break;
-      case ELM:
-        tb.add(name()).add(" { ... }");
-        break;
-      case DOC:
-        tb.add("{ \"").add(data.text(pre, true)).add("\" }");
-        break;
-      default:
-        tb.add("{ \"").add(Token.chop(string(), 64)).add("\" }");
-        break;
-    }
-    return tb.toString();
+    return _DB_OPEN_PRE.args(data.meta.name, pre);
   }
 }

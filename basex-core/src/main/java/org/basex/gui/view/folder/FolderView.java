@@ -18,7 +18,7 @@ import org.basex.gui.view.*;
 /**
  * This view offers a folder visualization of the database contents.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FolderView extends View {
@@ -38,7 +38,7 @@ public final class FolderView extends View {
   private BufferedImage openedMarker;
 
   /** Scroll Bar. */
-  private final BaseXBar scroll;
+  private final BaseXScrollBar scroll;
 
   /** Vertical mouse position. */
   private int totalW;
@@ -59,7 +59,7 @@ public final class FolderView extends View {
     super(FOLDERVIEW, man);
     createBoxes();
     layout(new BorderLayout());
-    scroll = new BaseXBar(this);
+    scroll = new BaseXScrollBar(this);
     add(scroll, BorderLayout.EAST);
     new BaseXPopup(this, POPUP);
   }
@@ -146,12 +146,12 @@ public final class FolderView extends View {
 
   @Override
   public boolean visible() {
-    return gui.gprop.is(GUIProp.SHOWFOLDER);
+    return gui.gopts.get(GUIOptions.SHOWFOLDER);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gprop.set(GUIProp.SHOWFOLDER, v);
+    gui.gopts.set(GUIOptions.SHOWFOLDER, v);
   }
 
   @Override
@@ -416,10 +416,10 @@ public final class FolderView extends View {
     final Data data = gui.context.data();
     final int kind = data.kind(focusPre);
 
-    final boolean right = NEXT.is(e);
+    final boolean right = NEXTCHAR.is(e);
     boolean down = NEXTLINE.is(e);
     boolean up = PREVLINE.is(e);
-    if(right || PREV.is(e)) {
+    if(right || PREVCHAR.is(e)) {
       // open/close subtree
       if(e.isShiftDown()) {
         opened[focusPre] = right;
@@ -433,7 +433,7 @@ public final class FolderView extends View {
         return;
       }
 
-      if(right ^ opened[focusPre] && (!ViewData.leaf(gui.gprop, data, focusPre)
+      if(right ^ opened[focusPre] && (!ViewData.leaf(gui.gopts, data, focusPre)
           || data.attSize(focusPre, kind) > 1)) {
         opened[focusPre] = right;
         refreshHeight();

@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
  * This class provides a main memory access to attribute values and
  * text contents.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class MemValues extends TokenSet implements Index {
@@ -52,10 +52,12 @@ public class MemValues extends TokenSet implements Index {
           @Override
           public boolean more() { return p < s; }
           @Override
-          public int next() {
+          public int pre() {
             while(more() && data.kind(pres[p++]) != k);
             return pres[p - 1];
           }
+          @Override
+          public int size() { return s; }
         };
       }
     }
@@ -63,7 +65,7 @@ public class MemValues extends TokenSet implements Index {
   }
 
   @Override
-  public int count(final IndexToken it) {
+  public int costs(final IndexToken it) {
     final int i = id(it.get());
     return i == 0 ? 0 : len[i];
   }
@@ -90,7 +92,7 @@ public class MemValues extends TokenSet implements Index {
   @Override
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder(LI_STRUCTURE).add(SORTED_LIST).add(NL);
-    final IndexStats stats = new IndexStats(data.meta.prop.num(Prop.MAXSTAT));
+    final IndexStats stats = new IndexStats(data.meta.options.get(MainOptions.MAXSTAT));
     for(int m = 1; m < size; m++) {
       if(stats.adding(len[m])) stats.add(key(m));
     }

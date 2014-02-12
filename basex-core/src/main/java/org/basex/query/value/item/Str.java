@@ -11,10 +11,9 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * String item ({@code xs:string}, {@code xs:normalizedString}, {@code xs:language},
- * etc.).
+ * String item ({@code xs:string}, {@code xs:normalizedString}, {@code xs:language}, etc.).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class Str extends AStr {
@@ -56,7 +55,7 @@ public class Str extends AStr {
    * @return instance
    */
   public static Str get(final String s) {
-    return get(Token.token(s.toString()));
+    return get(Token.token(s));
   }
 
   /**
@@ -71,11 +70,11 @@ public class Str extends AStr {
       throws QueryException {
 
     final byte[] bytes = Token.token(v.toString());
-    if(ctx.context.prop.is(Prop.CHECKSTRINGS)) {
+    if(ctx.context.options.get(MainOptions.CHECKSTRINGS)) {
       final int bl = bytes.length;
       for(int b = 0; b < bl; b += Token.cl(bytes, b)) {
         final int cp = Token.cp(bytes, b);
-        if(!XMLToken.valid(cp)) INVCODE.thrw(ii, Integer.toHexString(cp));
+        if(!XMLToken.valid(cp)) throw INVCODE.get(ii, Integer.toHexString(cp));
       }
     }
     return get(bytes);
@@ -113,7 +112,7 @@ public class Str extends AStr {
     for(final byte v : val) {
       if(v == '&') tb.add(E_AMP);
       else tb.add(v);
-      if(v == '"') tb.add(v);
+      if(v == '"') tb.add('"');
     }
     return tb.add('"').toString();
   }

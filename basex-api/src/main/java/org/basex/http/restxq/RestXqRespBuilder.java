@@ -11,17 +11,16 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.util.hash.*;
 
 /**
  * This class holds information on a custom RESTXQ response.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class RestXqRespBuilder {
   /** Output cache. */
-  final ArrayOutput cache = new ArrayOutput();;
+  final ArrayOutput cache = new ArrayOutput();
   /** Show error. */
   boolean error;
   /** Status code. */
@@ -37,14 +36,14 @@ final class RestXqRespBuilder {
    * @param http http context
    * @throws Exception exception (including unexpected ones)
    */
-  void build(final ANode response, final RestXqFunction func,
-      final Iter iter, final HTTPContext http) throws Exception {
+  void build(final ANode response, final RestXqFunction func, final Iter iter,
+      final HTTPContext http) throws Exception {
 
     // don't allow attributes
     for(final ANode a : response.attributes()) func.error(UNEXP_NODE, a);
 
     // parse response and serialization parameters
-    SerializerProp sp = func.output;
+    SerializerOptions sp = func.output;
     String cType = null;
     for(final ANode n : response.children()) {
       // process http:response element
@@ -82,17 +81,15 @@ final class RestXqRespBuilder {
         }
       } else if(OUTPUT_SERIAL.eq(n)) {
         // parse output:serialization-parameters
-        sp = FuncParams.serializerProp(n, func.function.info);
-        // loop through single values
-        final TokenMap tm = FuncParams.serializerMap(n, func.function.info);
-        for(final byte[] key : tm) func.output.set(string(key), string(tm.get(key)));
+        sp = FuncOptions.serializer(n, func.function.info);
+        FuncOptions.serializer(n, func.output, func.function.info);
       } else {
         func.error(UNEXP_NODE, n);
       }
     }
 
     // set content type
-    if(cType != null) sp.set(SerializerProp.S_MEDIA_TYPE, cType);
+    if(cType != null) sp.set(SerializerOptions.MEDIA_TYPE, cType);
 
     // check next item
     Item item = iter.next();
@@ -103,7 +100,8 @@ final class RestXqRespBuilder {
     }
 
     // cache result
-    http.initResponse(sp);
+    http.serialization = sp;
+    http.initResponse();
     final Serializer ser = Serializer.get(cache, sp);
     for(; item != null; item = iter.next()) ser.serialize(item);
     ser.close();

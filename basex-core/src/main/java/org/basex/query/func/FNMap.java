@@ -11,18 +11,19 @@ import org.basex.util.*;
 /**
  * Functions on maps.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class FNMap extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNMap(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNMap(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -52,6 +53,7 @@ public final class FNMap extends StandardFunc {
       case _MAP_SIZE:      return Int.get(map(ctx).mapSize());
       case _MAP_REMOVE:    return remove(ctx, ii);
       case _MAP_COLLATION: return map(ctx).collation();
+      case _MAP_SERIALIZE: return Str.get(map(ctx).serialize(info));
       default:             return super.item(ctx, ii);
     }
   }
@@ -88,7 +90,7 @@ public final class FNMap extends StandardFunc {
   private Map newMap(final QueryContext ctx, final InputInfo ii) throws QueryException {
     if(expr.length == 0) return Map.EMPTY;
     // collations are ignored here as they may disappear in a future version
-    checkColl(expr.length == 2 ? expr[1] : null, ctx);
+    checkColl(expr.length == 2 ? expr[1] : null, ctx, sc);
 
     Map map = Map.EMPTY;
     final Iter maps = expr[0].iter(ctx);
@@ -114,8 +116,7 @@ public final class FNMap extends StandardFunc {
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean contains(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  private boolean contains(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return map(ctx).contains(expr[1].item(ctx, ii), ii);
   }
 

@@ -30,7 +30,7 @@ import org.w3c.dom.Text;
  * This class contains common methods for executing Java code and mapping
  * Java objects to XQuery values.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class JavaMapping extends Arr {
@@ -53,13 +53,18 @@ public abstract class JavaMapping extends Arr {
     AtomType.URI, AtomType.URI
   };
 
+  /** Static context. */
+  final StaticContext sc;
+
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param a arguments
    */
-  JavaMapping(final InputInfo ii, final Expr[] a) {
+  JavaMapping(final StaticContext sctx, final InputInfo ii, final Expr[] a) {
     super(ii, a);
+    sc = sctx;
   }
 
   @Override
@@ -72,7 +77,7 @@ public abstract class JavaMapping extends Arr {
     final int es = expr.length;
     final Value[] args = new Value[es];
     for(int e = 0; e < es; ++e) args[e] = ctx.value(expr[e]);
-    return toValue(eval(args, ctx), ctx);
+    return toValue(eval(args, ctx), ctx, sc);
   }
 
   /**
@@ -89,10 +94,11 @@ public abstract class JavaMapping extends Arr {
    * Converts the specified result to an XQuery value.
    * @param obj result object
    * @param ctx query context
+   * @param sc static context
    * @return value
    * @throws QueryException query exception
    */
-  public static Value toValue(final Object obj, final QueryContext ctx)
+  public static Value toValue(final Object obj, final QueryContext ctx, final StaticContext sc)
       throws QueryException {
 
     if(obj == null) return Empty.SEQ;
@@ -100,7 +106,7 @@ public abstract class JavaMapping extends Arr {
     if(obj instanceof Iter) return ((Iter) obj).value();
     // find XQuery mapping for specified type
     final Type type = type(obj);
-    if(type != null) return type.cast(obj, ctx, null);
+    if(type != null) return type.cast(obj, ctx, sc, null);
 
     // primitive arrays
     if(obj instanceof byte[])    return BytSeq.get((byte[]) obj);
@@ -112,21 +118,22 @@ public abstract class JavaMapping extends Arr {
 
     // no array: return Java type
     if(!obj.getClass().isArray()) return new Jav(obj, ctx);
-    final int s = Array.getLength(obj);
+
     // empty array
+    final int s = Array.getLength(obj);
     if(s == 0) return Empty.SEQ;
     // string array
     if(obj instanceof String[]) {
       final String[] r = (String[]) obj;
       final byte[][] b = new byte[r.length][];
-      for(int v = 0; v < s; v++) b[v] = Token.token(r[v]);
+      for(int v = 0; v < s; v++) b[v] = token(r[v]);
       return StrSeq.get(b);
     }
     // character array
     if(obj instanceof char[][]) {
       final char[][] r = (char[][]) obj;
       final byte[][] b = new byte[r.length][];
-      for(int v = 0; v < s; v++) b[v] = Token.token(new String(r[v]));
+      for(int v = 0; v < s; v++) b[v] = token(new String(r[v]));
       return StrSeq.get(b);
     }
     // short array
@@ -146,7 +153,7 @@ public abstract class JavaMapping extends Arr {
     // any other array (also nested ones)
     final Object[] objs = (Object[]) obj;
     final ValueBuilder vb = new ValueBuilder(objs.length);
-    for(final Object o : objs) vb.add(toValue(o, ctx));
+    for(final Object o : objs) vb.add(toValue(o, ctx, sc));
     return vb.value();
   }
 
@@ -161,29 +168,37 @@ public abstract class JavaMapping extends Arr {
    * @return method if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  private static Method getModMethod(final Object mod, final String path,
-      final String name, final long arity, final QueryContext ctx, final InputInfo ii)
-          throws QueryException {
+  private static Method getModMethod(final Object mod, final String path, final String name,
+      final long arity, final QueryContext ctx, final InputInfo ii) throws QueryException {
+
     // find method with identical name and arity
     Method meth = null;
     for(final Method m : mod.getClass().getMethods()) {
       if(m.getName().equals(name) && m.getParameterTypes().length == arity) {
-        if(meth != null) throw JAVAAMBIG.thrw(ii, path + ':' + name);
+        if(meth != null) throw JAVAAMBIG.get(ii, "Q{" + path + '}' + name + '#' + arity);
         meth = m;
       }
     }
-    if(meth == null) throw FUNCJAVA.thrw(ii, path + ':' + name);
+    if(meth == null) throw FUNCJAVA.get(ii, path + ':' + name);
 
     // check if user has sufficient permissions to call the function
     Perm perm = Perm.ADMIN;
     final QueryModule.Requires req = meth.getAnnotation(QueryModule.Requires.class);
     if(req != null) perm = Perm.get(req.value().name());
     if(!ctx.context.user.has(perm)) return null;
+
+    // Add module locks to QueryContext.
+    final QueryModule.Lock lock = meth.getAnnotation(QueryModule.Lock.class);
+    if(lock != null) {
+      for(final String read : lock.read()) ctx.readLocks.add(DBLocking.MODULE_PREFIX + read);
+      for(final String write : lock.write()) ctx.writeLocks.add(DBLocking.MODULE_PREFIX + write);
+    }
+
     return meth;
   }
 
   /**
-   * Converts a module URI to a path.
+   * Converts a module URI to a Java path.
    * @param uri module URI
    * @return module path
    */
@@ -193,52 +208,32 @@ public abstract class JavaMapping extends Arr {
   }
 
   /**
-   * Converts the given name to camel case.
-   * @param ln name to convert
-   * @return resulting name
-   */
-  private static String camelCase(final byte[] ln) {
-    final TokenBuilder tb = new TokenBuilder();
-    boolean dash = false;
-    for(int p = 0; p < ln.length; p += cl(ln, p)) {
-      final int ch = cp(ln, p);
-      if(dash) {
-        tb.add(Character.toUpperCase(ch));
-        dash = false;
-      } else {
-        dash = ch == '-';
-        if(!dash) tb.add(ch);
-      }
-    }
-    return tb.toString();
-  }
-
-  /**
    * Returns a new Java function instance.
    * @param qname function name
    * @param args arguments
    * @param ctx query context
+   * @param sctx static context
    * @param ii input info
    * @return Java function, or {@code null}
    * @throws QueryException query exception
    */
   static JavaMapping get(final QNm qname, final Expr[] args, final QueryContext ctx,
-      final InputInfo ii) throws QueryException {
+      final StaticContext sctx, final InputInfo ii) throws QueryException {
 
     final byte[] uri = qname.uri();
     // check if URI starts with "java:" prefix (if yes, module must be Java code)
     final boolean java = startsWith(uri, JAVAPREF);
 
     // rewrite function name: convert dashes to upper-case initials
-    final String name = camelCase(qname.local());
+    final String name = camelCase(string(qname.local()));
 
     // check imported Java modules
-    final String path = toPath(java ? substring(uri, JAVAPREF.length) : uri);
+    final String path = camelCase(toPath(java ? substring(uri, JAVAPREF.length) : uri));
 
     final Object jm  = ctx.modules.findImport(path);
     if(jm != null) {
       final Method meth = getModMethod(jm, path, name, args.length, ctx, ii);
-      if(meth != null) return new JavaModuleFunc(ii, jm, meth, args);
+      if(meth != null) return new JavaModuleFunc(sctx, ii, jm, meth, args);
     }
 
     // only allowed with administrator permissions
@@ -246,13 +241,12 @@ public abstract class JavaMapping extends Arr {
 
     // check addressed class
     try {
-      final Class<?> clz = ctx.modules.findClass(path);
-      return new JavaFunc(ii, clz, name, args);
+      return new JavaFunc(sctx, ii, ctx.modules.findClass(path), name, args);
     } catch(final ClassNotFoundException ex) {
       // only throw exception if "java:" prefix was explicitly specified
-      if(java) throw FUNCJAVA.thrw(ii, uri);
+      if(java) throw FUNCJAVA.get(ii, path);
     } catch(final Throwable th) {
-      throw JAVAINIT.thrw(ii, th);
+      throw JAVAINIT.get(ii, th);
     }
 
     // no function found
@@ -264,7 +258,7 @@ public abstract class JavaMapping extends Arr {
    * @param o object
    * @return xquery type, or {@code null} if no appropriate type was found
    */
-  public static Type type(final Object o) {
+  private static Type type(final Object o) {
     final Type t = type(o.getClass());
     if(t != null) return t;
 
@@ -303,9 +297,9 @@ public abstract class JavaMapping extends Arr {
    * @param type Java type
    * @return xquery type
    */
-  protected static Type type(final Class<?> type) {
+  static Type type(final Class<?> type) {
     for(int j = 0; j < JAVA.length; ++j) {
-      if(JAVA[j].isAssignableFrom(type)) return XQUERY[j];
+      if(JAVA[j] == type) return XQUERY[j];
     }
     return null;
   }
@@ -315,13 +309,12 @@ public abstract class JavaMapping extends Arr {
    * @param args array with arguments
    * @return string representation
    */
-  protected static String foundArgs(final Value[] args) {
+  static String foundArgs(final Value[] args) {
     // compose found arguments
     final StringBuilder sb = new StringBuilder();
     for(final Value v : args) {
       if(sb.length() != 0) sb.append(", ");
-      sb.append(v instanceof Jav ? ((Jav) v).toJava().getClass().getSimpleName() :
-        v.type());
+      sb.append(v instanceof Jav ? Util.className(((Jav) v).toJava()) : v.type());
     }
     return sb.toString();
   }

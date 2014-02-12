@@ -40,7 +40,7 @@ public final class XQFTTS extends W3CTS {
    * Constructor.
    */
   public XQFTTS() {
-    super(Util.name(XQFTTS.class));
+    super(Util.className(XQFTTS.class));
     //context.prop.set(Prop.FTINDEX, true);
     //context.prop.set(Prop.FORCECREATE, true);
   }

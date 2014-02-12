@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Insert into as last primitive.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public class InsertIntoAsLast extends NodeCopy {
@@ -33,7 +33,7 @@ public class InsertIntoAsLast extends NodeCopy {
   }
 
   @Override
-  public void addAtomics(final AtomicUpdateList l) {
+  public void addAtomics(final AtomicUpdateCache l) {
     final int s = data.size(targetPre, data.kind(targetPre));
     l.addInsert(targetPre + s, targetPre, insseq, false);
   }

@@ -6,11 +6,12 @@ import static org.basex.util.Reflect.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
 
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
@@ -18,12 +19,12 @@ import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
+import org.basex.util.options.*;
 
 /**
  * Functions for performing XSLT transformations.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNXslt extends StandardFunc {
@@ -64,18 +65,19 @@ public final class FNXslt extends StandardFunc {
    * @param name name flag
    * @return string
    */
-  static String get(final boolean name) {
+  private static String get(final boolean name) {
     return IMPL[OFFSET + (name ? 1 : 2)];
   }
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNXslt(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNXslt(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -96,27 +98,24 @@ public final class FNXslt extends StandardFunc {
    * @return item
    * @throws QueryException query exception
    */
-  private Item transform(final QueryContext ctx, final boolean node)
-      throws QueryException {
-
+  private Item transform(final QueryContext ctx, final boolean node) throws QueryException {
     checkCreate(ctx);
-    final IO in = read(checkItem(expr[0], ctx));
-    final IO xsl = read(checkItem(expr[1], ctx));
-    final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
-    final TokenMap map = new FuncParams(Q_PARAMETERS, info).parse(opt);
+    final IO in = read(expr[0], ctx);
+    final IO xsl = read(expr[1], ctx);
+    final Options opts = checkOptions(2, Q_PARAMETERS, new Options(), ctx);
 
     final PrintStream tmp = System.err;
     final ArrayOutput ao = new ArrayOutput();
     try {
       System.setErr(new PrintStream(ao));
-      final byte[] result = transform(in, xsl, map);
-      return node ? new DBNode(new IOContent(result), ctx.context.prop) : Str.get(result);
+      final byte[] result = transform(in, xsl, opts.free());
+      return node ? new DBNode(new IOContent(result), ctx.context.options) : Str.get(result);
     } catch(final IOException ex) {
       System.setErr(tmp);
-      throw IOERR.thrw(info, ex);
+      throw IOERR.get(info, ex);
     } catch(final TransformerException ex) {
       System.setErr(tmp);
-      throw BXSL_ERROR.thrw(info, Token.trim(Token.utf8(ao.toArray(), Prop.ENCODING)));
+      throw BXSL_ERROR.get(info, trim(utf8(ao.toArray(), Prop.ENCODING)));
     } finally {
       System.setErr(tmp);
     }
@@ -124,24 +123,26 @@ public final class FNXslt extends StandardFunc {
 
   /**
    * Returns an input reference (possibly cached) to the specified input.
-   * @param it item to be evaluated
+   * @param e expressio nto be evaluated
+   * @param ctx query context
    * @return item
    * @throws QueryException query exception
    */
-  private IO read(final Item it) throws QueryException {
+  private IO read(final Expr e, final QueryContext ctx) throws QueryException {
+    final Item it = checkItem(e, ctx);
     if(it.type.isNode()) {
-      final IO io = new IOContent(it.serialize().toArray());
-      io.name(string(((ANode) it).baseURI()));
-      return io;
+      try {
+        final IO io = new IOContent(it.serialize().toArray());
+        io.name(string(((ANode) it).baseURI()));
+        return io;
+      } catch(final QueryIOException ex) {
+        ex.getCause(info);
+      }
     }
-
     if(it.type.isStringOrUntyped()) {
-      final String path = string(it.string(info));
-      final IO io = IO.get(path);
-      if(!io.exists()) WHICHRES.thrw(info, path);
-      return io;
+      return checkPath(it, ctx);
     }
-    throw STRNODTYPE.thrw(info, this, it.type);
+    throw STRNODTYPE.get(info, this, it.type);
   }
 
   /**
@@ -152,7 +153,7 @@ public final class FNXslt extends StandardFunc {
    * @return transformed result
    * @throws TransformerException transformer exception
    */
-  private static byte[] transform(final IO in, final IO xsl, final TokenMap par)
+  private static byte[] transform(final IO in, final IO xsl, final HashMap<String, String> par)
       throws TransformerException {
 
     // create transformer
@@ -160,7 +161,8 @@ public final class FNXslt extends StandardFunc {
     final Transformer tr =  tc.newTransformer(xsl.streamSource());
 
     // bind parameters
-    for(final byte[] key : par) tr.setParameter(string(key), string(par.get(key)));
+    for(final Entry<String, String> entry : par.entrySet())
+      tr.setParameter(entry.getKey(), entry.getValue());
 
     // do transformation and return result
     final ArrayOutput ao = new ArrayOutput();

@@ -9,7 +9,7 @@ import org.basex.gui.layout.*;
  * This class contains a view reference and adds a {@link ViewMover}
  * on top of the view.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class ViewPanel extends BaseXBack implements ViewLayout {
@@ -46,7 +46,8 @@ final class ViewPanel extends BaseXBack implements ViewLayout {
    * Makes the view invisible.
    */
   public void delete() {
-    view.gui.gprop.setObject("SHOW" + view.getName().toUpperCase(Locale.ENGLISH), false);
+    final String name = "SHOW" + view.getName().toUpperCase(Locale.ENGLISH);
+    view.gui.gopts.put(view.gui.gopts.option(name), false);
     view.gui.layoutViews();
   }
 

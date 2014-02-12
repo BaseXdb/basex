@@ -13,19 +13,21 @@ import org.basex.util.list.StringList;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.UUID;
+import java.util.*;
+import java.util.Map.Entry;
 
 import static org.basex.http.webdav.impl.Utils.SEP;
 import static org.basex.util.Token.string;
 
 /**
  * Service managing the WebDAV locks.
+ *
  * @author BaseX Team 2005-13, BSD License
  * @author Dimitar Popov
  */
 public final class WebDAVLockService {
-  /** Name of the database with the WebDAV locks. */
-  static final String WEBDAV_LOCKS_DB = "~webdav";
+  /** Path to WebDAV module. */
+  private static final String FILE = "xquery/webdav.xqm";
   /** HTTP context. */
   private final HTTPContext http;
 
@@ -40,12 +42,10 @@ public final class WebDAVLockService {
   /**
    * Releases the lock for the given token.
    * @param token lock token
-   * @throws java.io.IOException I/O exception
+   * @throws IOException I/O exception
    */
   public void unlock(final String token) throws IOException {
-    new LockQuery(http, "w:delete-lock($lock-token)").
-      bind("lock-token", token).
-      execute();
+    execute(new WebDAVQuery("w:delete-lock($token)").bind("token", token));
   }
 
   /**
@@ -54,9 +54,7 @@ public final class WebDAVLockService {
    * @throws IOException I/O exception
    */
   public void refreshLock(final String token) throws IOException {
-    new LockQuery(http, "w:refresh-lock($lock-token)").
-      bind("lock-token", token).
-      execute();
+    execute(new WebDAVQuery("w:refresh-lock($token)").bind("token", token));
   }
 
   /**
@@ -67,32 +65,26 @@ public final class WebDAVLockService {
    * @param type lock type
    * @param depth lock depth
    * @param user lock user
-   * @param timeout lock timeout
+   * @param to lock timeout
    * @return lock token
    * @throws IOException I/O exception
    */
-  public String lock(final String db, final String p, final String scope,
-      final String type, final String depth, final String user, final Long timeout)
-      throws IOException {
+  public String lock(final String db, final String p, final String scope, final String type,
+      final String depth, final String user, final Long to) throws IOException {
 
     initLockDb();
     final String token = UUID.randomUUID().toString();
-    new LockQuery(http, "w:create-lock(" +
-      "$path," +
-      "$lock-token," +
-      "$lock-scope," +
-      "$lock-type," +
-      "$lock-depth," +
-      "$lock-owner," +
-      "$lock-timeout)").
-      bind("path", db + SEP + p).
-      bind("lock-token", token).
-      bind("lock-scope", scope).
-      bind("lock-type", type).
-      bind("lock-depth", depth).
-      bind("lock-owner", user).
-      bind("lock-timeout", timeout == null ? Long.MAX_VALUE : timeout).
-      execute();
+
+    final WebDAVQuery query = new WebDAVQuery("w:create-lock(" +
+        "$path, $token, $scope, $type, $depth, $owner,$timeout)");
+    query.bind("path", db + SEP + p);
+    query.bind("token", token);
+    query.bind("scope", scope);
+    query.bind("type", type);
+    query.bind("depth", depth);
+    query.bind("owner", user);
+    query.bind("timeout", to == null ? Long.toString(Long.MAX_VALUE) : to.toString());
+    execute(query);
     return token;
   }
 
@@ -103,24 +95,21 @@ public final class WebDAVLockService {
    * @throws IOException I/O exception
    */
   public String lock(final String token) throws IOException {
-    final StringList locks = new LockQuery(http, "w:lock($lock-token)").
-      bind("$lock-token", token).
-      execute();
+    final StringList locks = execute(new WebDAVQuery("w:lock($token)").bind("token", token));
     return locks.isEmpty() ? null : locks.get(0);
   }
 
   /**
    * Gets active locks for the given resource.
    * @param db database
-   * @param p path
+   * @param path path
    * @return locks
    * @throws IOException I/O exception
    */
-  public String lock(final String db, final String p) throws IOException {
-    final StringList locks = new LockQuery(http, "w:locks-on($path)").
-      bind("path", db + SEP + p).
-      execute();
-    return locks.isEmpty() ? null : locks.get(0);
+  public String lock(final String db, final String path) throws IOException {
+    final WebDAVQuery query = new WebDAVQuery("w:locks-on($path)").bind("path", db + SEP + path);
+    final StringList sl = execute(query);
+    return sl.isEmpty() ? null : sl.get(0);
   }
 
   /**
@@ -131,18 +120,13 @@ public final class WebDAVLockService {
    * @throws IOException I/O exception
    */
   public boolean conflictingLocks(final String db, final String p) throws IOException {
-    return new LockQuery(http,
-      "w:conflicting-locks(" +
+    return execute(new WebDAVQuery("w:conflicting-locks(" +
         "<w:lockinfo>" +
         "<w:path>{ $path }</w:path>" +
         "<w:scope>exclusive</w:scope>" +
         "<w:depth>infinite</w:depth>" +
         "<w:owner>{ $owner }</w:owner>" +
-        "</w:lockinfo>)").
-      bind("path", db + SEP + p).
-      bind("owner", http.user).
-      execute().
-      size() > 0;
+        "</w:lockinfo>)").bind("path", db + SEP + p).bind("owner", http.user)).isEmpty();
   }
 
   /**
@@ -150,88 +134,44 @@ public final class WebDAVLockService {
    * @throws IOException I/O exception
    */
   private void initLockDb() throws IOException {
-    new LockQuery(http, "w:init-lock-db()").execute();
+    execute(new WebDAVQuery("w:init-lock-db()"));
   }
 
-  /** Class abstracting the underlying query mechanism. */
-  private static final class LockQuery {
-    /** Query processor. */
-    private final QueryProcessor p;
+  /**
+   * Executes a query.
+   * @param query query to be executed
+   * @return list of serialized result items
+   * @throws IOException error during query execution
+   */
+  private StringList execute(final WebDAVQuery query) throws IOException {
+    final ClassLoader cl = getClass().getClassLoader();
+    final InputStream s = cl.getResourceAsStream(FILE);
+    if(s == null) throw new IOException("WebDAV module not found");
+    final byte[] module = new IOStream(s).read();
 
-    /**
-     * Constructor.
-     * @param h HTTP context
-     * @param q query  text
-     */
-    LockQuery(final HTTPContext h, final String q) {
-      p = new QueryProcessor(q, h.context());
-    }
-
-    /**
-     * Binds a new query parameter.
-     * @param n parameter name
-     * @param v parameter value
-     * @return {@code this}
-     * @throws IOException error during binding
-     */
-    LockQuery bind(final String n, final Object v) throws IOException {
-      try {
-        p.bind(n, v);
-      } catch(final QueryException ex) {
-        throw new BaseXException(ex);
+    final QueryProcessor qp = new QueryProcessor(query.toString(), http.context());
+    try {
+      for(final Entry<String, String> entry : query.entries()) {
+        qp.bind(entry.getKey(), entry.getValue());
       }
-      return this;
-    }
+      qp.ctx.parseLibrary(string(module), FILE, qp.sc);
 
-    /**
-     * Executes the query.
-     * @return list of serialized result items
-     * @throws IOException error during query execution
-     */
-    StringList execute() throws IOException {
-      registerModule();
-      try {
-        final Result r = p.execute();
-        final int n = (int) r.size();
-        final StringList items = new StringList(n);
-        for(int i = 0; i < n; i++) {
-          final ArrayOutput o = new ArrayOutput();
-          r.serialize(Serializer.get(o), 0);
-          items.add(o.toString());
-        }
-        return items;
-      } catch(final QueryException ex) {
-        throw new BaseXException(ex);
-      } catch(final Exception ex) {
-        Util.debug(ex);
-        throw new BaseXException(ex);
-      } finally {
-        p.close();
+      final Result r = qp.execute();
+      final int n = (int) r.size();
+      final StringList items = new StringList(n);
+      for(int i = 0; i < n; i++) {
+        final ArrayOutput ao = new ArrayOutput();
+        r.serialize(Serializer.get(ao), 0);
+        items.add(ao.toString());
       }
-    }
-
-    /**
-     * Registers the WebDAV XQuery module.
-     * @throws IOException error during parsing the module
-     */
-    private void registerModule() throws IOException {
-      try {
-        p.ctx.parseLibrary(string(readModule()), null);
-      } catch(final QueryException ex) {
-        throw new BaseXException(ex);
-      }
-    }
-
-    /**
-     * Reads the WebDAV XQuery module from the classpath.
-     * @return the content of the module
-     * @throws IOException error during reading the module
-     */
-    private byte[] readModule() throws IOException {
-      final ClassLoader cl = getClass().getClassLoader();
-      final InputStream s = cl.getResourceAsStream("xquery/webdav.xqm");
-      if(s == null) throw new IOException("WebDAV module not found");
-      return new IOStream(s).read();
+      return items;
+    } catch(final QueryException ex) {
+      throw new BaseXException(ex);
+    } catch(final Exception ex) {
+      Util.debug(ex);
+      throw new BaseXException(ex);
+    } finally {
+      qp.close();
     }
   }
 }

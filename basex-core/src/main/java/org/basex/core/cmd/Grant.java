@@ -13,12 +13,12 @@ import org.basex.util.*;
 /**
  * Evaluates the 'grant' command and grants permissions to users.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Grant extends AUser {
   /** Permission. */
-  private Perm perm;
+  private Perm prm;
 
   /**
    * Default constructor.
@@ -44,17 +44,17 @@ public final class Grant extends AUser {
     // find permission
     final CmdPerm cmd = getOption(CmdPerm.class);
     if(cmd == CmdPerm.NONE) {
-      perm = Perm.NONE;
+      prm = Perm.NONE;
     } else if(cmd == CmdPerm.READ) {
-      perm = Perm.READ;
+      prm = Perm.READ;
     } else if(cmd == CmdPerm.WRITE) {
-      perm = Perm.WRITE;
+      prm = Perm.WRITE;
     } else if(cmd == CmdPerm.CREATE && args[2] == null) {
-      perm = Perm.CREATE;
+      prm = Perm.CREATE;
     } else if(cmd == CmdPerm.ADMIN && args[2] == null) {
-      perm = Perm.ADMIN;
+      prm = Perm.ADMIN;
     }
-    if(perm == null) return error(PERM_UNKNOWN_X, args[0]);
+    if(prm == null) return error(PERM_UNKNOWN_X, args[0]);
 
     return run(1, false);
   }
@@ -62,11 +62,11 @@ public final class Grant extends AUser {
   @Override
   protected boolean run(final String user, final String db) {
     // admin cannot be modified
-    if(user.equals(ADMIN)) return !info(ADMIN_STATIC_X);
+    if(user.equals(S_ADMIN)) return !info(ADMIN_STATIC_X);
 
     // set global permissions
     if(db == null) {
-      context.users.get(user).perm = perm;
+      context.users.get(user).perm = prm;
       context.users.write();
       return info(GRANTED_X_X, args[0], user);
     }
@@ -88,7 +88,7 @@ public final class Grant extends AUser {
       u = context.users.get(user).copy();
       data.meta.users.create(u);
     }
-    u.perm = perm;
+    u.perm = prm;
     data.meta.dirty = true;
     data.finishUpdate();
     Close.close(data, context);
@@ -98,12 +98,11 @@ public final class Grant extends AUser {
   @Override
   public void databases(final LockResult lr) {
     super.databases(lr);
-    if (!databases(lr.write, 2))
-      lr.writeAll = true;
+    if(!databases(lr.write, 2)) lr.writeAll = true;
   }
 
   @Override
   public void build(final CmdBuilder cb) {
-    cb.init().arg(0).arg(ON, 2).arg(C_TO, 1);
+    cb.init().arg(0).arg(ON, 2).arg(S_TO, 1);
   }
 }

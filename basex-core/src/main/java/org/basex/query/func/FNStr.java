@@ -20,18 +20,19 @@ import org.basex.util.*;
 /**
  * String functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNStr extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNStr(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNStr(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -67,7 +68,7 @@ public final class FNStr extends StandardFunc {
       case CODEPOINTS_TO_STRING:
         return cp2str(ctx.iter(e));
       case COMPARE:
-        Collation coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
+        Collation coll = checkColl(expr.length == 3 ? expr[2] : null, ctx, sc);
         Item it1 = e.item(ctx, info);
         Item it2 = expr[1].item(ctx, info);
         if(it1 == null || it2 == null) return null;
@@ -100,36 +101,36 @@ public final class FNStr extends StandardFunc {
       case CONCAT:
         return concat(ctx);
       case CONTAINS:
-        coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
+        coll = checkColl(expr.length == 3 ? expr[2] : null, ctx, sc);
         byte[] ss = checkEStr(e, ctx);
         byte[] sb = checkEStr(expr[1], ctx);
         return Bln.get(coll == null ? contains(ss, sb) : coll.contains(ss, sb, info));
       case STARTS_WITH:
-        coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
+        coll = checkColl(expr.length == 3 ? expr[2] : null, ctx, sc);
         ss = checkEStr(e, ctx);
         sb = checkEStr(expr[1], ctx);
         return Bln.get(coll == null ? startsWith(ss, sb) : coll.startsWith(ss, sb, info));
       case ENDS_WITH:
-        coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
+        coll = checkColl(expr.length == 3 ? expr[2] : null, ctx, sc);
         ss = checkEStr(e, ctx);
         sb = checkEStr(expr[1], ctx);
         return Bln.get(coll == null ? endsWith(ss, sb) : coll.endsWith(ss, sb, info));
       case SUBSTRING_AFTER:
-        coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
+        coll = checkColl(expr.length == 3 ? expr[2] : null, ctx, sc);
         ss = checkEStr(e, ctx);
         sb = checkEStr(expr[1], ctx);
         if(coll == null) {
           final int p = indexOf(ss, sb);
-          return p != -1 ? Str.get(substring(ss, p + sb.length)) : Str.ZERO;
+          return p == -1 ? Str.ZERO : Str.get(substring(ss, p + sb.length));
         }
         return Str.get(coll.after(ss, sb, info));
       case SUBSTRING_BEFORE:
-        coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
+        coll = checkColl(expr.length == 3 ? expr[2] : null, ctx, sc);
         ss = checkEStr(e, ctx);
         sb = checkEStr(expr[1], ctx);
         if(coll == null) {
           final int p = indexOf(ss, sb);
-          return p != -1 ? Str.get(substring(ss, 0, p)) : Str.ZERO;
+          return p == -1 ? Str.ZERO : Str.get(substring(ss, 0, p));
         }
         return Str.get(coll.before(ss, sb, info));
       default:
@@ -150,7 +151,7 @@ public final class FNStr extends StandardFunc {
       final int i = (int) n;
       // check int boundaries before casting
       if(n < Integer.MIN_VALUE || n > Integer.MAX_VALUE || !XMLToken.valid(i))
-        INVCODE.thrw(info, Long.toHexString(n));
+        throw INVCODE.get(info, Long.toHexString(n));
       tb.add(i);
     }
     return Str.get(tb.finish());
@@ -294,7 +295,7 @@ public final class FNStr extends StandardFunc {
       try {
         form = Form.valueOf(string(n));
       } catch(final IllegalArgumentException ex) {
-        NORMUNI.thrw(info, n);
+        throw NORMUNI.get(info, n);
       }
     }
     return ascii(str) ? Str.get(str) : Str.get(Normalizer.normalize(string(str), form));

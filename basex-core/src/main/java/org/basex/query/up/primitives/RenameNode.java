@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Rename node primitive.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class RenameNode extends UpdatePrimitive {
@@ -35,7 +35,7 @@ public final class RenameNode extends UpdatePrimitive {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    UPMULTREN.thrw(info, getTargetNode());
+    throw UPMULTREN.get(info, getTargetNode());
   }
 
   @Override
@@ -47,7 +47,7 @@ public final class RenameNode extends UpdatePrimitive {
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + getTargetNode() + ", " + name + ']';
+    return Util.className(this) + '[' + getTargetNode() + ", " + name + ']';
   }
 
   @Override
@@ -56,8 +56,8 @@ public final class RenameNode extends UpdatePrimitive {
   }
 
   @Override
-  public void addAtomics(final AtomicUpdateList l) {
-    l.addRename(targetPre, data.kind(targetPre), name.string(), name.uri());
+  public void addAtomics(final AtomicUpdateCache l) {
+    l.addRename(targetPre, name.string(), name.uri());
   }
 
   @Override

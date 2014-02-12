@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * Abstract class for formatting data in different languages.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Formatter extends FormatUtil {
@@ -52,7 +52,7 @@ public abstract class Formatter extends FormatUtil {
     // check if formatter has already been created
     Formatter form = MAP.get(ln);
     if(form == null) {
-      final String clz = Util.name(Formatter.class) + string(uc(ln));
+      final String clz = Util.className(Formatter.class) + string(uc(ln));
       form = (Formatter) Reflect.get(Reflect.find(clz));
       // instantiation not successful: return default formatter
       if(form == null) form = MAP.get(EN);
@@ -133,7 +133,7 @@ public abstract class Formatter extends FormatUtil {
     boolean iso = false;
     if(cal.length != 0) {
       final Matcher m = CALENDAR.matcher(string(cal));
-      if(!m.matches()) CALQNAME.thrw(ii, cal);
+      if(!m.matches()) throw CALQNAME.get(ii, cal);
       final QNm qnm = new QNm(m.group(3), m.group(1) == null ||
           m.group(2).isEmpty() ? null : m.group(2));
       if(!qnm.hasURI()) {
@@ -141,7 +141,7 @@ public abstract class Formatter extends FormatUtil {
         final byte[] ln = qnm.local();
         final int cl = CALENDARS.length;
         while(++c < cl && !eq(CALENDARS[c], ln));
-        if(c == cl) CALWHICH.thrw(ii, cal);
+        if(c == cl) throw CALWHICH.get(ii, cal);
         if(c > 1) tb.add("[Calendar: AD]");
         iso = c == 0;
       }
@@ -151,13 +151,10 @@ public abstract class Formatter extends FormatUtil {
     final DateParser dp = new DateParser(ii, pic);
     while(dp.more()) {
       final int ch = dp.literal();
-      if(ch != -1) {
-        // print literal
-        tb.add(ch);
-      } else {
+      if(ch == -1) {
         // retrieve variable marker
         final byte[] marker = dp.marker();
-        if(marker.length == 0) PICDATE.thrw(ii, pic);
+        if(marker.length == 0) throw PICDATE.get(ii, pic);
 
         // parse component specifier
         final int compSpec = ch(marker, 0);
@@ -247,9 +244,9 @@ public abstract class Formatter extends FormatUtil {
             err = tim;
             break;
           default:
-            INVCOMPSPEC.thrw(ii, marker);
+            throw INVCOMPSPEC.get(ii, marker);
         }
-        if(err) PICINVCOMP.thrw(ii, marker, date.type);
+        if(err) throw PICINVCOMP.get(ii, marker, date.type);
         if(pres == null) continue;
 
         // parse presentation modifier(s) and width modifier
@@ -301,10 +298,13 @@ public abstract class Formatter extends FormatUtil {
               final int fl = fp.primary.length;
               if(fl != 1 && fl != sl) s = frac(frac, fl);
             }
-            num = Token.toLong(s);
+            num = toLong(s);
           }
           tb.add(formatInt(num, fp));
         }
+      } else {
+        // print literal
+        tb.add(ch);
       }
     }
     return tb.finish();
@@ -316,7 +316,7 @@ public abstract class Formatter extends FormatUtil {
    * @param len length of fractional part
    * @return string representation
    */
-  private String frac(final BigDecimal num, final int len) {
+  private static String frac(final BigDecimal num, final int len) {
     final String s = num.setScale(len, BigDecimal.ROUND_HALF_UP).toString();
     final int d = s.indexOf('.');
     return d == -1 ? s : s.substring(d + 1);
@@ -367,8 +367,8 @@ public abstract class Formatter extends FormatUtil {
    * @return string representation
    * @throws QueryException query exception
    */
-  public final byte[] formatZone(final int num, final FormatParser fp,
-      final byte[] marker) throws QueryException {
+  final byte[] formatZone(final int num, final FormatParser fp, final byte[] marker)
+      throws QueryException {
 
     final boolean uc = ch(marker, 0) == 'Z';
     final boolean mil = uc && ch(marker, 1) == 'Z';
@@ -411,7 +411,7 @@ public abstract class Formatter extends FormatUtil {
             if(z4 != -1 && z5 != -1) t.add(z5);
             tb.add(c3).add(addZone(num % 60, 1, t));
           }
-        } else if (z4 == -1) {
+        } else if(z4 == -1) {
           tb.add(addZone(num, 0, new TokenBuilder().add(c1)));
           tb.add(addZone(num, 1, new TokenBuilder().add(c2).add(c3)));
         } else {
@@ -445,7 +445,7 @@ public abstract class Formatter extends FormatUtil {
    * @param tb token builder
    * @return {@code true} if timezone was added
    */
-  private boolean addMilZone(final int num, final TokenBuilder tb) {
+  private static boolean addMilZone(final int num, final TokenBuilder tb) {
     final int n = num / 60;
     if(num % 60 != 0 || n < -12 || n > 12) return false;
     tb.add(MIL[n + 12]);

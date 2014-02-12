@@ -136,10 +136,10 @@ public final class PlainDoc extends Inspect {
       }
     }
 
-    final SeqType rt = sf != null ? sf.type() : ftype.type;
+    final SeqType rt = sf != null ? sf.type() : ftype.ret;
     final FElem ret = type(rt, elem("return", function));
     final TokenList returns = doc != null ? doc.get(DOC_RETURN) : null;
-    if(returns != null) for(final byte[] val : returns) ret.add(val);
+    if(returns != null) for(final byte[] val : returns) add(val, ctx.context, ret);
     return function;
   }
 
@@ -178,7 +178,7 @@ public final class PlainDoc extends Inspect {
    * @param elem element
    * @return element
    */
-  private FElem type(final SeqType st, final FElem elem) {
+  private static FElem type(final SeqType st, final FElem elem) {
     if(st != null) {
       elem.add("type", st.typeString());
       final String occ = st.occ.toString();

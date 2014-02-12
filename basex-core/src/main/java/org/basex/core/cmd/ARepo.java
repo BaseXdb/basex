@@ -5,7 +5,7 @@ import org.basex.core.*;
 /**
  * Abstract class for repository commands.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Jens Erat
  */
 abstract class ARepo extends Command {
@@ -14,7 +14,7 @@ abstract class ARepo extends Command {
    * @param p required permission
    * @param arg arguments
    */
-  public ARepo(final Perm p, final String... arg) {
+  protected ARepo(final Perm p, final String... arg) {
     super(p, arg);
   }
 

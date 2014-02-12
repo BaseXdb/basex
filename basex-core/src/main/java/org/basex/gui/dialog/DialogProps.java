@@ -11,8 +11,8 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.gui.*;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.*;
 import org.basex.index.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -20,16 +20,16 @@ import org.basex.util.list.*;
 /**
  * Database properties dialog.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DialogProps extends BaseXDialog {
   /** Index types. */
-  static final String[] HELP = {
+  private static final String[] HELP = {
     "", "", H_PATH_INDEX, H_TEXT_INDEX, H_ATTR_INDEX, ""
   };
   /** Index types. */
-  static final IndexType[] TYPES = {
+  private static final IndexType[] TYPES = {
     IndexType.TAG, IndexType.ATTNAME, IndexType.PATH,
     IndexType.TEXT, IndexType.ATTRIBUTE, IndexType.FULLTEXT
   };
@@ -39,23 +39,23 @@ public final class DialogProps extends BaseXDialog {
   };
 
   /** Full-text tab. */
-  final BaseXBack tabFT;
+  private final BaseXBack tabFT;
   /** Name tab. */
-  final BaseXBack tabNames;
+  private final BaseXBack tabNames;
   /** Name tab. */
-  final BaseXBack tabPath;
+  private final BaseXBack tabPath;
   /** Name tab. */
-  final BaseXBack tabValues;
+  private final BaseXBack tabValues;
   /** Contains the panels that are currently being updated. */
-  final IntList updated = new IntList();
+  private final IntList updated = new IntList();
   /** Tabbed pane. */
-  final BaseXTabs tabs;
+  private final BaseXTabs tabs;
   /** Resource panel. */
   final DialogResources resources;
   /** Add panel. */
   final DialogAdd add;
   /** Index information. */
-  final Editor[] infos = new Editor[LABELS.length];
+  private final TextPanel[] infos = new TextPanel[LABELS.length];
 
   /** Index labels. */
   private final BaseXLabel[] labels = new BaseXLabel[LABELS.length];
@@ -88,7 +88,7 @@ public final class DialogProps extends BaseXDialog {
     for(int i = 0; i < LABELS.length; ++i) {
       labels[i] = new BaseXLabel(LABELS[i]).large();
       panels[i] = new BaseXBack(new BorderLayout(0, 4));
-      infos[i] = new Editor(false, this, Token.token(PLEASE_WAIT_D));
+      infos[i] = new TextPanel(Token.token(PLEASE_WAIT_D), false, this);
       BaseXLayout.setHeight(infos[i], 200);
       if(i != 1) {
         indxs[i] = new BaseXButton(" ", this);
@@ -127,7 +127,7 @@ public final class DialogProps extends BaseXDialog {
       info.bold().add(NL + NAMESPACES + NL).norm().add(data.nspaces.info());
     }
 
-    final Editor text = new Editor(false, this, info.finish());
+    final TextPanel text = new TextPanel(info.finish(), false, this);
     text.setFont(f);
     BaseXLayout.setHeight(text, 200);
     tabGeneral.add(new SearchEditor(main, text), BorderLayout.CENTER);
@@ -152,7 +152,6 @@ public final class DialogProps extends BaseXDialog {
 
     action(this);
     setResizable(true);
-    setMinimumSize(getPreferredSize());
 
     main.setCursor(CURSORARROW);
     finish(null);
@@ -177,8 +176,8 @@ public final class DialogProps extends BaseXDialog {
     }
 
     final Data data = gui.context.data();
-    final boolean[] val = { true, true, true, data.meta.textindex,
-        data.meta.attrindex, data.meta.ftxtindex };
+    final boolean[] val = { true, true, true, data.meta.textindex, data.meta.attrindex,
+        data.meta.ftxtindex };
     for(int i = 0; i < il.size(); i++) {
       final int idx = il.get(i);
       if(updated.contains(idx)) continue;
@@ -225,7 +224,7 @@ public final class DialogProps extends BaseXDialog {
           cmd = new CreateIndex(TYPES[i]);
           ft.setOptions();
         }
-        infos[i].setText(Token.token(PLEASE_WAIT_D));
+        infos[i].setText(PLEASE_WAIT_D);
         DialogProgress.execute(this, cmd);
         return;
       }
@@ -255,8 +254,8 @@ public final class DialogProps extends BaseXDialog {
         }
       }
       // full-text options
-      final int f = 5;
       tabFT.removeAll();
+      final int f = 5;
       panels[f].removeAll();
       add(f, tabFT, val[f] ? null : ft);
       panels[f].revalidate();

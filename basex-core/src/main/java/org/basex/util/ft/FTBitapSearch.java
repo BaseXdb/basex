@@ -12,7 +12,7 @@ import org.basex.util.list.*;
  * {@link BitSet} for fast bit operation. This version works with a set of
  * needles and each one of it can be matched in the haystack.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Dimitar Popov
  * @see <a href="http://en.wikipedia.org/wiki/Bitap_algorithm"
  *      >http://en.wikipedia.org/wiki/Bitap_algorithm</a>
@@ -52,7 +52,7 @@ public final class FTBitapSearch {
     // skip empty needles:
     int count = -1;
     for(int i = 0; i < sorted.length; i++) {
-      if(n.get(i) != null && n.get(i).size() > 0) sorted[++count] = i;
+      if(n.get(i) != null && !n.get(i).isEmpty()) sorted[++count] = i;
     }
 
     masks = new BitSet[++count];
@@ -126,7 +126,7 @@ public final class FTBitapSearch {
   /**
    * Token comparator.
    *
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Dimitar Popov
    */
   public interface TokenComparator {

@@ -9,7 +9,7 @@ import org.basex.util.*;
  * This class simplifies the composition of the string representation of
  * a database command.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class CmdBuilder {
@@ -31,7 +31,7 @@ public final class CmdBuilder {
    * @return self instance
    */
   public CmdBuilder init() {
-    init(Util.name(cmd).toUpperCase(Locale.ENGLISH));
+    init(Util.className(cmd).toUpperCase(Locale.ENGLISH));
     return this;
   }
 

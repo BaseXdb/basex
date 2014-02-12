@@ -10,7 +10,7 @@ import org.basex.util.list.*;
  * This class provides a container for query full-text positions,
  * which is evaluated by the visualizations.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */
@@ -37,7 +37,7 @@ public final class FTPosData {
     final IntSet set = new IntSet();
     for(final FTMatch m : all) {
       for(final FTStringMatch sm : m) {
-        for(int s = sm.s; s <= sm.e; ++s) set.add(s);
+        for(int s = sm.start; s <= sm.end; ++s) set.add(s);
       }
     }
 

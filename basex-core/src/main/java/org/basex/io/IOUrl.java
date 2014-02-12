@@ -15,7 +15,7 @@ import org.xml.sax.*;
 /**
  * {@link IO} reference, representing a URL.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class IOUrl extends IO {
@@ -49,28 +49,20 @@ public final class IOUrl extends IO {
 
   @Override
   public InputStream inputStream() throws IOException {
-    final URL url = new URL(path);
-
     URLConnection conn = null;
     try {
-      conn = url.openConnection();
-      conn.setConnectTimeout(TIMEOUT * 1000);
-      // use basic authentication if credentials are contained in the url
-      final String ui = url.getUserInfo();
-      if(ui != null) conn.setRequestProperty(AUTHORIZATION, "Basic " + Base64.encode(ui));
+      conn = connection();
       return conn.getInputStream();
     } catch(final IOException ex) {
       final TokenBuilder msg = new TokenBuilder(Util.message(ex));
-      try {
-        // try to retrieve more information on why the request failed
-        if(conn instanceof HttpURLConnection) {
-          final InputStream es = ((HttpURLConnection) conn).getErrorStream();
-          if(es != null) {
-            final byte[] err = new IOStream(es).read();
-            if(err.length != 0) msg.add(NL).add(INFORMATION).add(COL).add(NL).add(err);
-          }
+      // try to retrieve more information on why the request failed
+      if(conn instanceof HttpURLConnection) {
+        final InputStream es = ((HttpURLConnection) conn).getErrorStream();
+        if(es != null) {
+          final byte[] err = new IOStream(es).read();
+          if(err.length != 0) msg.add(NL).add(INFORMATION).add(COL).add(NL).add(err);
         }
-      } finally { /* ignored */ }
+      }
       final IOException io = new IOException(msg.toString());
       io.setStackTrace(ex.getStackTrace());
       throw io;
@@ -79,6 +71,21 @@ public final class IOUrl extends IO {
       Util.debug(ex);
       throw new BaseXException(NOT_PARSED_X, path);
     }
+  }
+
+  /**
+   * Returns a connection to the URL.
+   * @return connection
+   * @throws IOException I/O exception
+   */
+  public URLConnection connection() throws IOException {
+    final URL url = new URL(path);
+    final URLConnection conn = url.openConnection();
+    conn.setConnectTimeout(TIMEOUT * 1000);
+    // use basic authentication if credentials are contained in the url
+    final String ui = url.getUserInfo();
+    if(ui != null) conn.setRequestProperty(AUTHORIZATION, "Basic " + Base64.encode(ui));
+    return conn;
   }
 
   @Override

@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'drop database' command and deletes a database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DropDB extends ACreate {
@@ -59,7 +59,7 @@ public final class DropDB extends ACreate {
    * @return success flag
    */
   public static synchronized boolean drop(final String db, final Context ctx) {
-    final IOFile dbpath = ctx.mprop.dbpath(db);
+    final IOFile dbpath = ctx.globalopts.dbpath(db);
     return dbpath.exists() && drop(dbpath);
   }
 
@@ -68,7 +68,7 @@ public final class DropDB extends ACreate {
    * @param path database path
    * @return success of operation
    */
-  public static synchronized boolean drop(final IOFile path) {
+  private static synchronized boolean drop(final IOFile path) {
     return path.exists() && path.delete();
   }
 
@@ -91,8 +91,7 @@ public final class DropDB extends ACreate {
 
   @Override
   public void databases(final LockResult lr) {
-    if (!databases(lr.write, 0))
-      lr.writeAll = true;
+    if(!databases(lr.write, 0)) lr.writeAll = true;
   }
 
   @Override

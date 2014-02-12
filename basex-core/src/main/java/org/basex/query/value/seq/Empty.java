@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Empty sequence.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Empty extends Value {
@@ -111,7 +111,7 @@ public final class Empty extends Value {
 
   @Override
   public Item itemAt(final long pos) {
-    throw Util.notexpected();
+    throw Util.notExpected();
   }
 
   @Override

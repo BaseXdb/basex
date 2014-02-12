@@ -8,7 +8,7 @@ import org.basex.data.*;
 /**
  * Evaluates the 'flush' command and flushes the database buffers.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Flush extends Command {
@@ -22,10 +22,10 @@ public final class Flush extends Command {
   @Override
   protected boolean run() {
     final Data data = context.data();
-    if(!prop.is(Prop.AUTOFLUSH)) {
-      prop.set(Prop.AUTOFLUSH, true);
+    if(!options.get(MainOptions.AUTOFLUSH)) {
+      options.set(MainOptions.AUTOFLUSH, true);
       data.finishUpdate();
-      prop.set(Prop.AUTOFLUSH, false);
+      options.set(MainOptions.AUTOFLUSH, false);
     }
     return info(DB_FLUSHED_X, data.meta.name, perf);
   }

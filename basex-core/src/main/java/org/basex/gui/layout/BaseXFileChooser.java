@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * Project specific File Chooser implementation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class BaseXFileChooser {
@@ -45,7 +45,7 @@ public final class BaseXFileChooser {
    * @param main reference to main window
    */
   public BaseXFileChooser(final String title, final String path, final GUI main) {
-    if(main.gprop.is(GUIProp.SIMPLEFD)) {
+    if(main.gopts.get(GUIOptions.SIMPLEFD)) {
       fd = new FileDialog(main, title);
       fd.setDirectory(new File(path).getPath());
     } else {

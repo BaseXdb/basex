@@ -21,7 +21,7 @@ import org.basex.util.list.*;
 /**
  * This class offers a real tree view.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Wolfgang Miller
  */
 public final class TreeView extends View implements TreeConstants {
@@ -129,7 +129,7 @@ public final class TreeView extends View implements TreeConstants {
 
   @Override
   public boolean visible() {
-    final boolean v = gui.gprop.is(GUIProp.SHOWTREE);
+    final boolean v = gui.gopts.get(GUIOptions.SHOWTREE);
     if(!v) {
       sub = null;
       tr = null;
@@ -140,7 +140,7 @@ public final class TreeView extends View implements TreeConstants {
 
   @Override
   public void visible(final boolean v) {
-    gui.gprop.set(GUIProp.SHOWTREE, v);
+    gui.gopts.set(GUIOptions.SHOWTREE, v);
   }
 
   @Override
@@ -305,8 +305,8 @@ public final class TreeView extends View implements TreeConstants {
    * @param w width
    * @param ss square-size
    */
-  private void drawBigRectSquares(final Graphics g, final int lv, final int x,
-      final int w, final int ss) {
+  private void drawBigRectSquares(final Graphics g, final int lv, final int x, final int w,
+      final int ss) {
 
     int xx = x;
     final int y = getYperLevel(lv);
@@ -334,7 +334,7 @@ public final class TreeView extends View implements TreeConstants {
     if(markedImage != null) {
       final int h = markedImage.getHeight();
       final int w = markedImage.getWidth();
-      if(y >= h || 0 > y || x >= w || 0 > x) return false;
+      if(y >= h || y < 0 || x >= w || x < 0) return false;
       final Color markc = new Color(markedImage.getRGB(x, y));
       return markc.getRed() > 0 && markc.getBlue() == 0 && markc.getGreen()
       == 0;
@@ -351,8 +351,8 @@ public final class TreeView extends View implements TreeConstants {
    * @param pre pre
    * @param t draw type
    */
-  private void drawRectangle(final Graphics g, final int rn, final int lv,
-      final TreeRect r, final int pre, final Draw t) {
+  private void drawRectangle(final Graphics g, final int rn, final int lv, final TreeRect r,
+      final int pre, final Draw t) {
 
     final int y = getYperLevel(lv);
     final int h = nodeHeight;
@@ -438,9 +438,7 @@ public final class TreeView extends View implements TreeConstants {
    * @param r rectangle
    * @param pre pre
    */
-  private void drawRectangleText(final Graphics g, final int lv, final TreeRect r,
-      final int pre) {
-
+  private void drawRectangleText(final Graphics g, final int lv, final TreeRect r, final int pre) {
     String s = Token.string(tr.getText(pre)).trim();
     if(r.w < BaseXLayout.width(g, s) && r.w < BaseXLayout.width(
         g, ".." + s.substring(s.length() - 1)) + MIN_TXT_SPACE) return;
@@ -501,7 +499,6 @@ public final class TreeView extends View implements TreeConstants {
           final int s = sub.levelSize(r, i);
 
           if(tr.bigRect(sub, r, i)) {
-
             if(rl > 1) {
               final TreeBorder tb = sub.treeBorder(r, i);
               final int si = tb.size;
@@ -537,8 +534,7 @@ public final class TreeView extends View implements TreeConstants {
    * @return new translucent BufferedImage
    */
   private BufferedImage createImage() {
-    return new BufferedImage(Math.max(1, wwidth), Math.max(1, wheight),
-        Transparency.TRANSLUCENT);
+    return new BufferedImage(Math.max(1, wwidth), Math.max(1, wheight), Transparency.TRANSLUCENT);
   }
 
   /**
@@ -555,18 +551,15 @@ public final class TreeView extends View implements TreeConstants {
 
     int rn = 0;
     while(rn < roots.length) {
-
       final LinkedList<Integer> marklink = new LinkedList<Integer>();
       for(int i = 0; i < mark.length; ++i)
         marklink.add(i, mark[i]);
 
       for(int lv = 0; lv < sub.subtreeHeight(rn); ++lv) {
-
         final int y = getYperLevel(lv);
         final ListIterator<Integer> li = marklink.listIterator();
 
         if(tr.bigRect(sub, rn, lv)) {
-
           while(li.hasNext()) {
             final int pre = li.next();
 
@@ -606,9 +599,7 @@ public final class TreeView extends View implements TreeConstants {
    * @param r rectangle
    * @return position
    */
-  private int getBigRectPosition(final int rn, final int lv, final int pre,
-      final TreeRect r) {
-
+  private int getBigRectPosition(final int rn, final int lv, final int pre, final TreeRect r) {
     final int idx = sub.preIndex(rn, lv, pre);
     final double ratio = idx / (double) sub.levelSize(rn, lv);
     return r.x + (int) Math.round(r.w * ratio) + 1;
@@ -623,8 +614,8 @@ public final class TreeView extends View implements TreeConstants {
    * @param pre pre
    * @return node center
    */
-  private int drawNodeInBigRectangle(final Graphics g, final int rn, final int lv,
-      final TreeRect r, final int pre) {
+  private int drawNodeInBigRectangle(final Graphics g, final int rn, final int lv, final TreeRect r,
+      final int pre) {
 
     final int y = getYperLevel(lv);
     final int np = getBigRectPosition(rn, lv, pre, r);
@@ -641,8 +632,8 @@ public final class TreeView extends View implements TreeConstants {
    * @param px parent x
    * @param brx bigrect x
    */
-  private void drawParentConnection(final Graphics g, final int lv, final TreeRect r,
-      final int px, final int brx) {
+  private void drawParentConnection(final Graphics g, final int lv, final TreeRect r, final int px,
+      final int brx) {
 
     final int y = getYperLevel(lv);
     g.setColor(color(7));
@@ -660,8 +651,8 @@ public final class TreeView extends View implements TreeConstants {
    * @param px parent's x value
    * @param t highlight type
    */
-  private void highlightNode(final Graphics g, final int rn, final int lv,
-      final TreeRect r, final int pre, final int px, final Draw t) {
+  private void highlightNode(final Graphics g, final int rn, final int lv, final TreeRect r,
+      final int pre, final int px, final Draw t) {
 
     if(lv == -1) return;
 
@@ -684,8 +675,7 @@ public final class TreeView extends View implements TreeConstants {
     }
 
     // draw parent node connection
-    if(px > -1 && MIN_NODE_DIST_CONN <= levelDistance) drawParentConnection(g,
-        lv, r, px, rc);
+    if(px > -1 && levelDistance >= MIN_NODE_DIST_CONN) drawParentConnection(g, lv, r, px, rc);
 
     // if there are ancestors draw them
     if(!root) {
@@ -712,8 +702,8 @@ public final class TreeView extends View implements TreeConstants {
    * @param r rectangle
    * @param root root flag
    */
-  private void drawThumbnails(final Graphics g, final int lv, final int pre,
-      final TreeRect r, final boolean root) {
+  private void drawThumbnails(final Graphics g, final int lv, final int pre, final TreeRect r,
+      final boolean root) {
 
     final int x = r.x;
     final int y = getYperLevel(lv);
@@ -749,8 +739,8 @@ public final class TreeView extends View implements TreeConstants {
    * @param px parent's x value
    * @param t draw type
    */
-  private void highlightDescendants(final Graphics g, final int rn, final int lv,
-      final TreeRect r, final int pre, final int px, final Draw t) {
+  private void highlightDescendants(final Graphics g, final int rn, final int lv, final TreeRect r,
+      final int pre, final int px, final Draw t) {
 
     final Data d = gui.context.data();
     final boolean br = tr.bigRect(sub, rn, lv);
@@ -773,7 +763,6 @@ public final class TreeView extends View implements TreeConstants {
             : bo.start;
 
         for(int j = 0; j < bo.size; ++j) {
-
           final int dp = sub.prePerIndex(rn, lvd, j + start);
 
           final TreeRect dr = tr.getTreeRectPerIndex(rn, lvd, j + start);
@@ -811,9 +800,8 @@ public final class TreeView extends View implements TreeConstants {
 
     int lvv = lv;
     int cen = parc;
-    int i;
 
-    for(i = 1; i < subt.length && tr.bigRect(sub, rn, lvv); ++i) {
+    for(int i = 1; i < subt.length && tr.bigRect(sub, rn, lvv); ++i) {
       final TreeBorder bos = sub.treeBorder(rn, lvv);
       final TreeBorder bo = subt[i];
 
@@ -826,7 +814,7 @@ public final class TreeView extends View implements TreeConstants {
       final int dt = r.x + (int) (r.w * eni);
       final int ww = Math.max(dt - df, 2);
 
-      if(MIN_NODE_DIST_CONN <= levelDistance) drawDescendantsConn(g, lvv,
+      if(levelDistance >= MIN_NODE_DIST_CONN) drawDescendantsConn(g, lvv,
           new TreeRect(df, ww), cen, t);
       cen = (2 * df + ww) / 2;
       switch(t) {
@@ -853,8 +841,7 @@ public final class TreeView extends View implements TreeConstants {
           final int k = d.kind(pre);
           final int s = d.size(pre, k);
           if(s > 1) highlightDescendants(g, rn, lvv, r, pre, pos,
-              t == Draw.HIGHLIGHT || t == Draw.DESCENDANTS ?
-                  Draw.DESCENDANTS : Draw.CONNECTION);
+              t == Draw.HIGHLIGHT || t == Draw.DESCENDANTS ? Draw.DESCENDANTS : Draw.CONNECTION);
         }
       }
       ++lvv;
@@ -890,8 +877,8 @@ public final class TreeView extends View implements TreeConstants {
    * @param parc parent center
    * @param t draw type
    */
-  private void drawDescendantsConn(final Graphics g, final int lv, final TreeRect r,
-      final int parc, final Draw t) {
+  private void drawDescendantsConn(final Graphics g, final int lv, final TreeRect r, final int parc,
+      final Draw t) {
 
     final int pary = getYperLevel(lv - 1) + nodeHeight;
     final int prey = getYperLevel(lv) - 1;
@@ -903,8 +890,7 @@ public final class TreeView extends View implements TreeConstants {
 
     g.setColor(c);
     if(boRight - boLeft > 2) {
-      g.fillPolygon(new int[] { parc, boRight, boLeft}, new int[] { pary,
-          boTop, boTop}, 3);
+      g.fillPolygon(new int[] { parc, boRight, boLeft}, new int[] { pary, boTop, boTop}, 3);
     } else {
       g.drawLine((boRight + boLeft) / 2, boTop, parc, pary);
     }
@@ -920,7 +906,6 @@ public final class TreeView extends View implements TreeConstants {
 
       for(int r = 0; r < roots.length; ++r) {
         for(int i = 0; i < sub.subtreeHeight(r); ++i) {
-
           if(tr.bigRect(sub, r, i)) {
             final int index = sub.preIndex(r, i, fpre);
 
@@ -931,7 +916,6 @@ public final class TreeView extends View implements TreeConstants {
               return true;
             }
           } else {
-
             final TreeRect rect = tr.searchRect(sub, r, i, fpre);
 
             if(rect != null) {
@@ -1037,8 +1021,8 @@ public final class TreeView extends View implements TreeConstants {
    * @return show attributes has changed
    */
   private boolean showAttsChanged() {
-    final GUIProp gprop = gui.gprop;
-    if(gprop.is(GUIProp.TREEATTS) == showAtts) return false;
+    final GUIOptions gopts = gui.gopts;
+    if(gopts.get(GUIOptions.TREEATTS) == showAtts) return false;
     showAtts =  !showAtts;
     return true;
   }
@@ -1048,8 +1032,8 @@ public final class TreeView extends View implements TreeConstants {
    * @return slim to text has changed
    */
   private boolean slimToTextChanged() {
-    final GUIProp gprop = gui.gprop;
-    if(gprop.is(GUIProp.TREESLIMS) == slimToText) return false;
+    final GUIOptions gopts = gui.gopts;
+    if(gopts.get(GUIOptions.TREESLIMS) == slimToText) return false;
     slimToText = !slimToText;
     return true;
   }
@@ -1165,18 +1149,18 @@ public final class TreeView extends View implements TreeConstants {
   public void mouseDragged(final MouseEvent e) {
     if(gui.updating || e.isShiftDown()) return;
 
-    if(!selection) {
+    if(selection) {
+      final int x = e.getX();
+      final int y = e.getY();
+      selectRect.w = x - selectRect.x;
+      selectRect.h = y - selectRect.y;
+    } else {
       selection = true;
       selectRect = new ViewRect();
       selectRect.x = e.getX();
       selectRect.y = e.getY();
       selectRect.h = 1;
       selectRect.w = 1;
-    } else {
-      final int x = e.getX();
-      final int y = e.getY();
-      selectRect.w = x - selectRect.x;
-      selectRect.h = y - selectRect.y;
     }
     markSelectedNodes();
     repaint();

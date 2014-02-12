@@ -10,8 +10,8 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.gui.*;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 /**
  * Open database dialog.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DialogManage extends BaseXDialog {
@@ -30,7 +30,7 @@ public final class DialogManage extends BaseXDialog {
   /** Name of current database. */
   private final BaseXLabel doc2;
   /** Information panel. */
-  private final Editor detail;
+  private final TextPanel detail;
   /** Rename button. */
   private final BaseXButton rename;
   /** Drop button. */
@@ -70,7 +70,7 @@ public final class DialogManage extends BaseXDialog {
     doc1 = new BaseXLabel(" ").large();
     doc1.setSize(420, doc1.getHeight());
 
-    detail = new Editor(false, this);
+    detail = new TextPanel(false, this);
     detail.setFont(panel.getFont());
 
     // database buttons
@@ -144,7 +144,7 @@ public final class DialogManage extends BaseXDialog {
 
     } else if(cmp == drop) {
       for(final String s : dbs) {
-        if(ctx.mprop.dbexists(s)) cmds.add(new DropDB(s));
+        if(ctx.globalopts.dbexists(s)) cmds.add(new DropDB(s));
       }
       if(!BaseXDialog.confirm(gui, Util.info(DROPPING_DB_X, cmds.size()))) return;
       refresh = true;
@@ -166,8 +166,8 @@ public final class DialogManage extends BaseXDialog {
 
     } else if(cmp == restore) {
       // show warning if existing database would be overwritten
-      if(!gui.context.mprop.dbexists(db) ||
-          BaseXDialog.confirm(gui, OVERWRITE_DB_QUESTION)) cmds.add(new Restore(db));
+      if(!gui.context.globalopts.dbexists(db) || BaseXDialog.confirm(gui, OVERWRITE_DB_QUESTION))
+        cmds.add(new Restore(backups.getValue()));
 
     } else if(cmp == backups) {
       // don't reset the combo box after selecting an item
@@ -184,12 +184,12 @@ public final class DialogManage extends BaseXDialog {
       for(final String b : back) cmds.add(new DropBackup(b));
       refresh = true;
 
-    } else if(cmp != backups) {
+    } else {
       final String title = dbs.size() == 1 ? db : dbs.size() + " " + DATABASES;
       doc1.setText(title);
       doc2.setText(BACKUPS + COLS + title);
 
-      boolean active = ctx.mprop.dbexists(db);
+      boolean active = ctx.globalopts.dbexists(db);
       String info = "";
       if(active) {
         // refresh info view
@@ -203,7 +203,7 @@ public final class DialogManage extends BaseXDialog {
       } else if(dbs.size() == 1) {
         info = ONLY_BACKUP;
       }
-      detail.setText(Token.token(info));
+      detail.setText(info);
 
       // enable or disable buttons
       rename.setEnabled(active);
@@ -212,7 +212,7 @@ public final class DialogManage extends BaseXDialog {
       restore.setEnabled(active);
 
       active = false;
-      for(final String d : dbs) active |= ctx.mprop.dbexists(d);
+      for(final String d : dbs) active |= ctx.globalopts.dbexists(d);
       drop.setEnabled(active);
       backup.setEnabled(active);
 
@@ -241,7 +241,7 @@ public final class DialogManage extends BaseXDialog {
   @Override
   public void close() {
     final String db = choice.getValue();
-    if(gui.context.mprop.dbexists(db)) {
+    if(gui.context.globalopts.dbexists(db)) {
       DialogProgress.execute(this, new Open(db));
       dispose();
     }

@@ -12,7 +12,7 @@ import java.util.*;
  * <p>Note that, to guarantee a consistent string representation, all string
  * conversions should be done via the methods of this class.</p>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Token {
@@ -41,7 +41,7 @@ public final class Token {
   /** Token 'null'. */
   public static final byte[] NULL = token("null");
   /** Token 'NaN'. */
-  private static final byte[] NAN = token("NaN");
+  public static final byte[] NAN = token("NaN");
   /** Token 'INF'. */
   public static final byte[] INF = token("INF");
   /** Token '-INF'. */
@@ -68,20 +68,21 @@ public final class Token {
 
   /** UTF8 encoding string. */
   public static final String UTF8 = "UTF-8";
-  /** UTF8 encoding string (variant). */
-  public static final String UTF82 = "UTF8";
   /** UTF16 encoding string. */
   public static final String UTF16 = "UTF-16";
-  /** UTF16 encoding string. */
-  public static final String UTF162 = "UTF16";
-  /** UTF16BE (=UTF16) encoding string. */
+  /** UTF16BE encoding string. */
   public static final String UTF16BE = "UTF-16BE";
   /** UTF16 encoding string. */
   public static final String UTF16LE = "UTF-16LE";
   /** UTF16 encoding string. */
   public static final String UTF32 = "UTF-32";
-  /** UTF16 encoding string. */
-  public static final String UTF322 = "UTF32";
+
+  /** UTF8 encoding strings. */
+  private static final String[] ALL_UTF8 = { UTF8, "UTF8" };
+  /** UTF16-LE encoding strings. */
+  private static final String[] ALL_UTF16 = { UTF16, "UTF16" };
+  /** UTF32 encoding strings. */
+  private static final String[] ALL_UTF32 = { UTF32, "UTF32" };
 
   /** Comparator for byte arrays. */
   public static final Comparator<byte[]> COMP = new Comparator<byte[]>() {
@@ -237,23 +238,23 @@ public final class Token {
    * @return encoding
    */
   public static String normEncoding(final String encoding) {
-    return normEncoding(encoding, null);
+    return normEncoding(encoding, false);
   }
 
   /**
    * Returns a unified representation of the specified encoding.
    * @param encoding input encoding (UTF-8 is returned for a {@code null} reference)
-   * @param old previous encoding (optional)
+   * @param utf16 normalize UTF-16 encoding
    * @return encoding
    */
-  public static String normEncoding(final String encoding, final String old) {
+  public static String normEncoding(final String encoding, final boolean utf16) {
     if(encoding == null) return UTF8;
     final String e = encoding.toUpperCase(Locale.ENGLISH);
-    if(eq(e, UTF8, UTF82))   return UTF8;
-    if(e.equals(UTF16BE))    return UTF16BE;
-    if(e.equals(UTF16LE))    return UTF16LE;
-    if(eq(e, UTF16, UTF162)) return old == UTF16BE || old == UTF16LE ? old : UTF16BE;
-    if(eq(e, UTF32, UTF322)) return UTF32;
+    if(eq(e, ALL_UTF8)) return UTF8;
+    if(e.equals(UTF16LE)) return UTF16LE;
+    if(e.equals(UTF16BE)) return UTF16BE;
+    if(eq(e, ALL_UTF16))  return utf16 ? UTF16BE : UTF16;
+    if(eq(e, ALL_UTF32))  return UTF32;
     return encoding;
   }
 
@@ -481,8 +482,7 @@ public final class Token {
    * @return token
    */
   public static byte[] chopNumber(final byte[] token) {
-    if(!contains(token, '.') || contains(token, 'e') ||
-        contains(token, 'E')) return token;
+    if(!contains(token, '.') || contains(token, 'e') || contains(token, 'E')) return token;
     // remove trailing zeroes
     int l = token.length;
     while(--l > 0 && token[l] == '0');
@@ -678,7 +678,17 @@ public final class Token {
   }
 
   /**
-   * Compares several strings for equality.
+   * Compares two strings for equality. The arguments may be {@code null}.
+   * @param str1 first string
+   * @param str2 strings to be compared
+   * @return true if one test is successful
+   */
+  public static boolean eq(final String str1, final String str2) {
+    return str1 == null ? str2 == null : str1.equals(str2);
+  }
+
+  /**
+   * Compares several strings for equality. The arguments may be {@code null}.
    * @param str first string
    * @param strings strings to be compared
    * @return true if one test is successful
@@ -748,7 +758,18 @@ public final class Token {
    * @return result of test
    */
   public static boolean contains(final byte[] token, final byte[] sub) {
-    return indexOf(token, sub) != -1;
+    return contains(token, sub, 0);
+  }
+
+  /**
+   * Checks if the first token contains the second token.
+   * @param token token
+   * @param sub token to be found
+   * @param pos start position
+   * @return result of test
+   */
+  public static boolean contains(final byte[] token, final byte[] sub, final int pos) {
+    return indexOf(token, sub, pos) != -1;
   }
 
   /**
@@ -813,7 +834,7 @@ public final class Token {
    */
   public static int indexOf(final byte[] token, final byte[] sub, final int pos) {
     final int sl = sub.length;
-    if(sl == 0) return 0;
+    if(sl == 0) return pos;
     final int tl = token.length - sl;
     if(pos > tl) return -1;
 
@@ -832,7 +853,18 @@ public final class Token {
    * @return result of test
    */
   public static boolean startsWith(final byte[] token, final int ch) {
-    return token.length != 0 && token[0] == ch;
+    return startsWith(token, ch, 0);
+  }
+
+  /**
+   * Checks if the first token starts with the specified character.
+   * @param token token
+   * @param ch character to be found
+   * @param pos start position
+   * @return result of test
+   */
+  public static boolean startsWith(final byte[] token, final int ch, final int pos) {
+    return pos < token.length && token[pos] == ch;
   }
 
   /**
@@ -842,9 +874,22 @@ public final class Token {
    * @return result of test
    */
   public static boolean startsWith(final byte[] token, final byte[] sub) {
+    return startsWith(token, sub, 0);
+  }
+
+  /**
+   * Checks if the first token starts with the second token.
+   * @param token token
+   * @param sub token to be found
+   * @param pos start position
+   * @return result of test
+   */
+  public static boolean startsWith(final byte[] token, final byte[] sub, final int pos) {
     final int sl = sub.length;
-    if(sl > token.length) return false;
-    for(int s = 0; s < sl; ++s) if(sub[s] != token[s]) return false;
+    if(sl > token.length - pos) return false;
+    for(int s = 0, p = pos; s < sl; ++s, ++p) {
+      if(sub[s] != token[p]) return false;
+    }
     return true;
   }
 
@@ -959,18 +1004,6 @@ public final class Token {
   }
 
   /**
-   * Performs a regular expression on the specified string.
-   * @param token token to match
-   * @param pattern regular expression
-   * @param replace replacement string
-   * @return resulting string
-   */
-  public static byte[] replaceAll(final byte[] token, final String pattern,
-      final String replace) {
-    return token(string(token).replaceAll(pattern, replace));
-  }
-
-  /**
    * Checks if the specified token has only whitespaces.
    * @param token token
    * @return true if all characters are whitespaces
@@ -1049,9 +1082,7 @@ public final class Token {
    * @param token3 third token
    * @return resulting array
    */
-  public static byte[] concat(final byte[] token1, final byte[] token2,
-      final byte[] token3) {
-
+  public static byte[] concat(final byte[] token1, final byte[] token2, final byte[] token3) {
     final int t1 = token1.length;
     final int t2 = token2.length;
     final int t3 = token3.length;
@@ -1278,8 +1309,29 @@ public final class Token {
       final MessageDigest md = MessageDigest.getInstance("MD5");
       return string(hex(md.digest(token(string)), false));
     } catch(final Exception ex) {
-      throw Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
+  }
+
+  /**
+   * Converts the given string to camel case.
+   * @param string string to convert
+   * @return resulting string
+   */
+  public static String camelCase(final String string) {
+    final StringBuilder sb = new StringBuilder(string.length());
+    boolean dash = false;
+    for(int p = 0; p < string.length(); p++) {
+      final char ch = string.charAt(p);
+      if(dash) {
+        sb.append(Character.toUpperCase(ch));
+        dash = false;
+      } else {
+        dash = ch == '-';
+        if(!dash) sb.append(ch);
+      }
+    }
+    return sb.toString();
   }
 
   /**

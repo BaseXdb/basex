@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 /**
  * This view creates a flat table view on the database contents.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class TableView extends View implements Runnable {
@@ -35,7 +35,7 @@ public final class TableView extends View implements Runnable {
   /** Table content area. */
   private final TableContent content;
   /** Table scrollbar. */
-  private final BaseXBar scroll;
+  private final BaseXScrollBar scroll;
 
   /**
    * Default constructor.
@@ -43,11 +43,11 @@ public final class TableView extends View implements Runnable {
    */
   public TableView(final ViewNotifier man) {
     super(TABLEVIEW, man);
-    tdata = new TableData(gui.context, gui.gprop);
+    tdata = new TableData(gui.context, gui.gopts);
     layout(new BorderLayout());
     header = new TableHeader(this);
     add(header, BorderLayout.NORTH);
-    scroll = new BaseXBar(this);
+    scroll = new BaseXScrollBar(this);
     content = new TableContent(tdata, scroll);
     add(content, BorderLayout.CENTER);
     new BaseXPopup(this, POPUP);
@@ -119,12 +119,12 @@ public final class TableView extends View implements Runnable {
 
   @Override
   public boolean visible() {
-    return gui.gprop.is(GUIProp.SHOWTABLE);
+    return gui.gopts.get(GUIOptions.SHOWTABLE);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gprop.set(GUIProp.SHOWTABLE, v);
+    gui.gopts.set(GUIOptions.SHOWTABLE, v);
   }
 
   @Override
@@ -200,7 +200,7 @@ public final class TableView extends View implements Runnable {
     if(valid) {
       final int pre = tdata.rows.get(l);
       final TableIterator it = new TableIterator(data, tdata);
-      final int c = tdata.column(getWidth() - BaseXBar.SIZE, tdata.mouseX);
+      final int c = tdata.column(getWidth() - BaseXScrollBar.SIZE, tdata.mouseX);
       it.init(pre);
       while(it.more()) {
         if(it.col == c) {
@@ -238,7 +238,7 @@ public final class TableView extends View implements Runnable {
 
     if(SwingUtilities.isLeftMouseButton(e)) {
       if(e.getClickCount() == 1) {
-        final int c = tdata.column(getWidth() - BaseXBar.SIZE, e.getX());
+        final int c = tdata.column(getWidth() - BaseXScrollBar.SIZE, e.getX());
         final String str = content.focusedString;
         if(str == null || str.length() > data.meta.maxlen) return;
         if(!e.isShiftDown()) tdata.resetFilter();
@@ -254,7 +254,7 @@ public final class TableView extends View implements Runnable {
       }
     } else {
       final TableIterator it = new TableIterator(data, tdata);
-      final int c = tdata.column(getWidth() - BaseXBar.SIZE, e.getX());
+      final int c = tdata.column(getWidth() - BaseXScrollBar.SIZE, e.getX());
       it.init(pre);
       while(it.more()) {
         if(it.col == c) {

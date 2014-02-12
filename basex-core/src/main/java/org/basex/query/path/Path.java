@@ -24,7 +24,7 @@ import org.basex.util.*;
 /**
  * Path expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Path extends ParseExpr {
@@ -58,29 +58,29 @@ public abstract class Path extends ParseExpr {
     for(int p = 0; p < path.length; p++) {
       Expr e = path[p];
       if(e instanceof Context) {
-        e = Step.get(((Context) e).info, Axis.SELF, Test.NOD);
+        e = Step.get(((ParseExpr) e).info, SELF, Test.NOD);
       } else if(e instanceof Filter) {
         final Filter f = (Filter) e;
         if(f.root instanceof Context) {
-          e = Step.get(f.info, Axis.SELF, Test.NOD, f.preds);
+          e = Step.get(f.info, SELF, Test.NOD, f.preds);
         }
       }
       axes &= e instanceof Step;
       path[p] = e;
     }
-    return axes ? new CachedPath(ii, r, path).finish(null) :
-      new MixedPath(ii, r, path);
+    return axes ? new CachedPath(ii, r, path).finish(null) : new MixedPath(ii, r, path);
   }
 
   @Override
   public final void checkUp() throws QueryException {
     checkNoUp(root);
-    checkNoneUp(steps);
+    final int ss = steps.length;
+    for(int s = 0; s < ss - 1; ++s) checkNoUp(steps[s]);
+    steps[ss - 1].checkUp();
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public final Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     if(root != null) setRoot(ctx, root.compile(ctx, scp));
 
     final Value v = ctx.value;
@@ -98,6 +98,12 @@ public abstract class Path extends ParseExpr {
       ctx.compInfo(OPTREMCTX);
       root = null;
     }
+
+    for(final Expr e : steps) {
+      // check for empty steps
+      if(e.isEmpty()) return optPre(null, ctx);
+    }
+
     return this;
   }
 
@@ -126,7 +132,7 @@ public abstract class Path extends ParseExpr {
     // no root reference, no context: return null
     if(!(root instanceof Root) || v == null) return null;
     // return context sequence or root of current context
-    return v.size() != 1 ? v : Root.root(v);
+    return v.size() == 1 ? Root.root(v) : v;
   }
 
   /**
@@ -250,10 +256,10 @@ public abstract class Path extends ParseExpr {
           }
         }
       } else {
-        boolean warning = true;
         final Step ls = axisStep(l - 1);
         if(ls == null) continue;
         final Axis lsa = ls.axis;
+        boolean warning = true;
         if(sa == SELF || sa == DESCORSELF) {
           // .../self:: / .../descendant-or-self::
           if(s.test == Test.NOD) continue;
@@ -332,10 +338,10 @@ public abstract class Path extends ParseExpr {
       final Expr[] stps = new Expr[ts + steps.length - s - 1];
       for(int t = 0; t < ts; ++t) {
         final Expr[] preds = t == ts - 1 ?
-            ((Step) steps[s]).preds : new Expr[0];
+            ((Preds) steps[s]).preds : new Expr[0];
         final QNm nm = qnm.get(ts - t - 1);
         final NameTest nt = nm == null ? new NameTest(false) :
-          new NameTest(nm, Mode.LN, false);
+          new NameTest(nm, Mode.LN, false, null);
         stps[t] = Step.get(info, CHILD, nt, preds);
       }
       while(++s < steps.length) stps[ts++] = steps[s];
@@ -436,8 +442,8 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public final Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
 
     final Value oldVal = ctx.value;
     try {
@@ -448,7 +454,16 @@ public abstract class Path extends ParseExpr {
         ctx.value = oldVal;
         ctx.value = root(ctx);
       }
-      return inlineAll(ctx, scp, steps, v, e) || rt != null ? optimize(ctx, scp) : null;
+
+      boolean change = rt != null;
+      for(int i = 0; i < steps.length; i++) {
+        final Expr nw = steps[i].inline(ctx, scp, v, e);
+        if(nw != null) {
+          steps[i] = nw;
+          change = true;
+        }
+      }
+      return change ? optimize(ctx, scp) : null;
     } finally {
       ctx.value = oldVal;
     }

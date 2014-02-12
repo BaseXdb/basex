@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Arithmetic expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Arith extends Arr {
@@ -66,7 +66,8 @@ public final class Arith extends Arr {
 
   @Override
   public Arith copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Arith(info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs), calc);
+    final Expr a = expr[0].copy(ctx, scp, vs), b = expr[1].copy(ctx, scp, vs);
+    return copyType(new Arith(info, a, b, calc));
   }
 
   @Override
@@ -76,7 +77,7 @@ public final class Arith extends Arr {
 
   @Override
   public String description() {
-    return '\'' + calc.name + "' expression";
+    return '\'' + calc.name + "' operator";
   }
 
   @Override

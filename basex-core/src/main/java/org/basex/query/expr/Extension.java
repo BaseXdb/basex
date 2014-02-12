@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * Pragma extension.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class Extension extends Single {
@@ -80,11 +80,6 @@ public final class Extension extends Single {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     for(final Pragma p : pragmas) sb.append(p).append(' ');
-    return sb.append(BRACE1 + ' ' + expr + ' ' + BRACE2).toString();
-  }
-
-  @Override
-  public void markTailCalls() {
-    // cannot be tail-call optimized because otherwise pragmas could be finished too early
+    return sb.append(BRACE1 + ' ').append(expr).append(' ').append(BRACE2).toString();
   }
 }

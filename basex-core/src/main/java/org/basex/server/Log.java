@@ -14,7 +14,7 @@ import org.basex.util.*;
  * This class writes daily log files to disk.
  * The log format has been updated in Version 7.4; it now has the following columns:
  * <ul>
- *   <li><b>Time</b>: timestamp (format: <code>xs:time</code>)</li>
+ *   <li><b>Time</b>: timestamp (format: {@code xs:time})</li>
  *   <li><b>Address</b>: host name and port of the requesting client</li>
  *   <li><b>User</b>: user name</li>
  *   <li><b>Type</b>: Type of logging message: REQUEST, OK or ERROR</li>
@@ -22,19 +22,19 @@ import org.basex.util.*;
  *   <li><b>Performance</b>: Measured time in milliseconds</li>
  * </ul>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Log {
   /** SERVER string. */
   public static final String SERVER = "SERVER";
   /** ERROR string. */
-  public static final String ERROR = "ERROR";
+  private static final String ERROR = "ERROR";
   /** REQUEST string. */
-  public static final String REQUEST = "REQUEST";
+  private static final String REQUEST = "REQUEST";
 
-  /** Main properties. */
-  private final MainProp mprop;
+  /** Global options. */
+  private final GlobalOptions gopts;
   /** Start date of log. */
   private String start;
   /** Output stream. */
@@ -45,7 +45,7 @@ public final class Log {
    * @param ctx database context
    */
   public Log(final Context ctx) {
-    mprop = ctx.mprop;
+    gopts = ctx.globalopts;
   }
 
   /**
@@ -63,7 +63,7 @@ public final class Log {
   public synchronized void writeServer(final Object... str) {
     final Object[] tmp = new Object[str.length + 2];
     tmp[0] = SERVER;
-    tmp[1] = Text.ADMIN;
+    tmp[1] = S_ADMIN;
     System.arraycopy(str, 0, tmp, 2, str.length);
     write(tmp);
   }
@@ -73,7 +73,7 @@ public final class Log {
    * @param str strings to be written
    */
   public synchronized void write(final Object... str) {
-    if(!mprop.is(MainProp.LOG)) {
+    if(!gopts.get(GlobalOptions.LOG)) {
       close();
       return;
     }
@@ -94,11 +94,11 @@ public final class Log {
       }
 
       // construct log text
-      final int ml = mprop.num(MainProp.LOGMSGMAXLEN);
+      final int ml = gopts.get(GlobalOptions.LOGMSGMAXLEN);
       final TokenBuilder tb = new TokenBuilder(DateTime.format(date, DateTime.TIME));
       for(final Object s : str) {
         tb.add('\t');
-        String st;
+        final String st;
         if(s == null) st = REQUEST;
         else if(s instanceof Boolean) st = (Boolean) s ? OK : ERROR;
         else if(s instanceof Throwable) st = Util.message((Throwable) s);
@@ -134,7 +134,7 @@ public final class Log {
    */
   public synchronized IOFile dir() {
     // log suffix, plural
-    return mprop.dbpath(IO.LOGSUFFIX + 's');
+    return gopts.dbpath(IO.LOGSUFFIX + 's');
   }
 
   /**

@@ -26,12 +26,12 @@ import org.basex.util.*;
  * command to the server.</li>
  * </ul>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class ClientSession extends Session {
   /** Event notifications. */
-  protected final Map<String, EventNotifier> notifiers =
+  private final Map<String, EventNotifier> notifiers =
     Collections.synchronizedMap(new HashMap<String, EventNotifier>());
   /** Server output (buffered). */
   protected final PrintOutput sout;
@@ -68,8 +68,8 @@ public class ClientSession extends Session {
    */
   public ClientSession(final Context context, final String user, final String pass,
       final OutputStream output) throws IOException {
-    this(context.mprop.get(MainProp.HOST), context.mprop.num(MainProp.PORT),
-        user, pass, output);
+    this(context.globalopts.get(GlobalOptions.HOST),
+         context.globalopts.get(GlobalOptions.PORT), user, pass, output);
   }
 
   /**
@@ -80,8 +80,8 @@ public class ClientSession extends Session {
    * @param pass password
    * @throws IOException I/O exception
    */
-  public ClientSession(final String host, final int port, final String user,
-      final String pass) throws IOException {
+  public ClientSession(final String host, final int port, final String user, final String pass)
+      throws IOException {
     this(host, port, user, pass, null);
   }
 
@@ -96,8 +96,8 @@ public class ClientSession extends Session {
    * be returned as strings.
    * @throws IOException I/O exception
    */
-  public ClientSession(final String host, final int port, final String user,
-      final String pass, final OutputStream output) throws IOException {
+  public ClientSession(final String host, final int port, final String user, final String pass,
+      final OutputStream output) throws IOException {
 
     super(output);
     ehost = host;
@@ -173,9 +173,7 @@ public class ClientSession extends Session {
    * @param notifier event notification
    * @throws IOException I/O exception
    */
-  public void watch(final String name, final EventNotifier notifier)
-      throws IOException {
-
+  public void watch(final String name, final EventNotifier notifier) throws IOException {
     sout.write(ServerCmd.WATCH.code);
     if(esocket == null) {
       sout.flush();
@@ -276,8 +274,8 @@ public class ClientSession extends Session {
    * @param strings string arguments
    * @throws IOException I/O exception
    */
-  protected void send(final ServerCmd cmd, final InputStream input,
-      final String... strings) throws IOException {
+  void send(final ServerCmd cmd, final InputStream input, final String... strings)
+      throws IOException {
 
     sout.write(cmd.code);
     for(final String s : strings) send(s);
@@ -314,16 +312,14 @@ public class ClientSession extends Session {
    * @return string
    * @throws IOException I/O exception
    */
-  protected String exec(final ServerCmd cmd, final String arg, final OutputStream os)
-      throws IOException {
-
+  String exec(final ServerCmd cmd, final String arg, final OutputStream os) throws IOException {
     final OutputStream o = os == null ? new ArrayOutput() : os;
     sout.write(cmd.code);
     send(arg);
     sout.flush();
     final BufferInput bi = new BufferInput(sin);
-    ClientSession.receive(bi, o);
-    if(!ClientSession.ok(bi)) throw new BaseXException(bi.readString());
+    receive(bi, o);
+    if(!ok(bi)) throw new BaseXException(bi.readString());
     return o.toString();
   }
 

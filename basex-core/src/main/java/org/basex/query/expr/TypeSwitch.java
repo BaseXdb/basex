@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Typeswitch expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class TypeSwitch extends ParseExpr {
@@ -81,7 +81,7 @@ public final class TypeSwitch extends ParseExpr {
       if(iter != null) return iter;
     }
     // will never happen
-    throw Util.notexpected();
+    throw Util.notExpected();
   }
 
   @Override
@@ -138,8 +138,8 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public void markTailCalls() {
-    for(final TypeCase t : cases) t.markTailCalls();
+  public void markTailCalls(final QueryContext ctx) {
+    for(final TypeCase t : cases) t.markTailCalls(ctx);
   }
 
   @Override

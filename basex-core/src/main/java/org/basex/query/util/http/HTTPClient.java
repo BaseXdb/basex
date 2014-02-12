@@ -1,7 +1,6 @@
 package org.basex.query.util.http;
 
 import static java.net.HttpURLConnection.*;
-import static org.basex.data.DataText.*;
 import static org.basex.io.MimeTypes.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.query.util.http.HTTPText.*;
@@ -13,6 +12,8 @@ import java.net.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -25,23 +26,23 @@ import org.basex.util.hash.*;
 /**
  * HTTP Client.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  */
 public final class HTTPClient {
   /** Input information. */
   private final InputInfo info;
-  /** Database properties. */
-  private final Prop prop;
+  /** Database options. */
+  private final MainOptions options;
 
   /**
    * Constructor.
    * @param ii input info
-   * @param pr database properties
+   * @param opts database options
    */
-  public HTTPClient(final InputInfo ii, final Prop pr) {
+  public HTTPClient(final InputInfo ii, final MainOptions opts) {
     info = ii;
-    prop = pr;
+    options = opts;
   }
 
   /**
@@ -52,15 +53,15 @@ public final class HTTPClient {
    * @return HTTP response
    * @throws QueryException query exception
    */
-  public Iter sendRequest(final byte[] href, final ANode request,
-      final ValueBuilder bodies) throws QueryException {
+  public Iter sendRequest(final byte[] href, final ANode request, final ValueBuilder bodies)
+      throws QueryException {
 
     try {
       if(request == null) {
-        if(href == null || href.length == 0) HC_PARAMS.thrw(info);
+        if(href == null || href.length == 0) throw HC_PARAMS.get(info);
         final HttpURLConnection conn = openConnection(string(href));
         try {
-          return new HTTPResponse(info, prop).getResponse(conn, Bln.FALSE.string(), null);
+          return new HTTPResponse(info, options).getResponse(conn, Bln.FALSE.string(), null);
         } finally {
           conn.disconnect();
         }
@@ -68,43 +69,40 @@ public final class HTTPClient {
 
       final HTTPRequest r = new HTTPRequestParser(info).parse(request, bodies);
       final byte[] dest = href == null ? r.attrs.get(HREF) : href;
-      if(dest == null) HC_URL.thrw(info);
+      if(dest == null) throw HC_URL.get(info);
 
       final HttpURLConnection conn = openConnection(string(dest));
       try {
         setConnectionProps(conn, r);
         setRequestHeaders(conn, r);
 
-        if(r.bodyContent.size() != 0 || r.parts.size() != 0) {
+        if(r.bodyContent.size() != 0 || !r.parts.isEmpty()) {
           setContentType(conn, r);
           setRequestContent(conn.getOutputStream(), r);
         }
         final byte[] mt = r.attrs.get(OVERRIDE_MEDIA_TYPE);
-        return new HTTPResponse(info, prop).getResponse(conn, r.attrs.get(STATUS_ONLY),
+        return new HTTPResponse(info, options).getResponse(conn, r.attrs.get(STATUS_ONLY),
             mt == null ? null : string(mt));
       } finally {
         conn.disconnect();
       }
     } catch(final IOException ex) {
-      throw HC_ERROR.thrw(info, ex);
+      throw HC_ERROR.get(info, ex);
     }
   }
 
   /**
    * Opens an HTTP connection.
-   * @param dest HTTP URI to open connection to
+   * @param url HTTP URL to open connection to
    * @return HHTP connection
    * @throws QueryException query exception
    * @throws IOException I/O Exception
    * @throws MalformedURLException incorrect url
    */
-  private HttpURLConnection openConnection(final String dest)
-      throws QueryException, IOException {
-
-    final URL url = new URL(dest);
-    if(!eqic(url.getProtocol(), "HTTP", "HTTPS"))
-      HC_ERROR.thrw(info, "Invalid URL: " + url);
-    return (HttpURLConnection) url.openConnection();
+  private HttpURLConnection openConnection(final String url) throws QueryException, IOException {
+    final URLConnection conn = new IOUrl(url).connection();
+    if(conn instanceof HttpURLConnection) return (HttpURLConnection) conn;
+    throw HC_ERROR.get(info, "Invalid URL: " + url);
   }
 
   /**
@@ -117,7 +115,7 @@ public final class HTTPClient {
   private void setConnectionProps(final HttpURLConnection conn, final HTTPRequest r)
       throws ProtocolException, QueryException {
 
-    if(r.bodyContent != null || r.parts.size() != 0) conn.setDoOutput(true);
+    conn.setDoOutput(true);
     final String method = string(r.attrs.get(METHOD)).toUpperCase(Locale.ENGLISH);
     try {
       // set field via reflection to circumvent string check
@@ -140,7 +138,7 @@ public final class HTTPClient {
    * @param r request data
    */
   private static void setContentType(final HttpURLConnection conn, final HTTPRequest r) {
-    String mt = null;
+    String mt;
     final byte[] contTypeHdr = r.headers.get(lc(token(CONTENT_TYPE)));
     if(contTypeHdr != null) {
       // if header "Content-Type" is set explicitly by the user, its value is used
@@ -181,11 +179,8 @@ public final class HTTPClient {
    * @param out output stream
    * @param r request data
    * @throws IOException I/O exception
-   * @throws QueryException query exception
    */
-  public void setRequestContent(final OutputStream out, final HTTPRequest r)
-      throws IOException, QueryException {
-
+  public void setRequestContent(final OutputStream out, final HTTPRequest r) throws IOException {
     if(r.isMultipart) {
       writeMultipart(r, out);
     } else {
@@ -211,84 +206,42 @@ public final class HTTPClient {
    * @param payloadAtts payload attributes
    * @param out output stream
    * @throws IOException I/O exception
-   * @throws QueryException query exception
    */
   private void writePayload(final ValueBuilder payload, final TokenMap payloadAtts,
-      final OutputStream out) throws IOException, QueryException {
+      final OutputStream out) throws IOException {
 
-    final byte[] t = payloadAtts.get(MEDIA_TYPE);
-    final String type = t == null ? null : string(t);
-
-    // no resource to set the content from
-    final byte[] src = payloadAtts.get(SRC);
-    if(src == null) {
-      // default value @method is determined by @media-type
-      byte[] m = payloadAtts.get(METHOD);
-      if(m == null) {
-        if(eq(type, APP_HTML_XML)) {
-          m = token(M_XHTML);
-        } else if(eq(type, TEXT_HTML)) {
-          m = token(M_HTML);
-        } else if(type != null && isXML(type)) {
-          m = token(M_XML);
-        } else if(type != null && isText(type)) {
-          m = token(M_TEXT);
-        } else {
-          // default serialization method is XML
-          m = token(M_XML);
-        }
-      }
-      // write content depending on the method
-      if(eq(m, BASE64)) {
-        writeBase64(payload, out);
-      } else if(eq(m, HEXBIN)) {
-        writeHex(payload, out);
+    // detect method (specified by @method or derived from @media-type)
+    final byte[] m = payloadAtts.get(METHOD);
+    final String method;
+    if(m == null) {
+      final String type = string(payloadAtts.get(MEDIA_TYPE));
+      if(eq(type, APP_HTML_XML)) {
+        method = SerialMethod.XHTML.toString();
+      } else if(eq(type, TEXT_HTML)) {
+        method = SerialMethod.HTML.toString();
+      } else if(type != null && isXML(type)) {
+        method = SerialMethod.XML.toString();
+      } else if(type != null && isText(type)) {
+        method = SerialMethod.TEXT.toString();
       } else {
-        write(payload, payloadAtts, m, out);
+        // default serialization method is XML
+        method = SerialMethod.XML.toString();
       }
     } else {
-      // if the src attribute is present, the content is set as the content of
-      // the linked resource
-      writeResource(src, out);
+      method = string(m);
     }
-  }
 
-  /**
-   * Writes the payload of a body in case method is base64Binary.
-   * @param payload payload
-   * @param out connection output stream
-   * @throws IOException I/O Exception
-   * @throws QueryException query exception
-   */
-  private void writeBase64(final ValueBuilder payload, final OutputStream out)
-      throws IOException, QueryException {
-
-    for(int i = 0; i < payload.size(); i++) {
-      final Item item = payload.get(i);
-      if(item instanceof B64) {
-        out.write(((B64) item).toJava());
+    // write content depending on the method
+    final byte[] src = payloadAtts.get(SRC);
+    if(src == null) {
+      write(payload, payloadAtts, method, out);
+    } else {
+      final IOUrl io = new IOUrl(string(src));
+      if(eq(method, BINARY)) {
+        out.write(io.read());
       } else {
-        out.write(new B64(item.string(info)).toJava());
-      }
-    }
-  }
-
-  /**
-   * Writes the payload of a body in case method is hexBinary.
-   * @param payload payload
-   * @param out connection output stream
-   * @throws IOException I/O Exception
-   * @throws QueryException query exception
-   */
-  private void writeHex(final ValueBuilder payload, final OutputStream out)
-      throws IOException, QueryException {
-
-    for(int i = 0; i < payload.size(); i++) {
-      final Item item = payload.get(i);
-      if(item instanceof Hex) {
-        out.write(((Hex) item).toJava());
-      } else {
-        out.write(new Hex(item.string(info)).toJava());
+        final ValueBuilder vb = new ValueBuilder().add(Str.get(new TextInput(io).content()));
+        write(vb, payloadAtts, method, out);
       }
     }
   }
@@ -302,43 +255,21 @@ public final class HTTPClient {
    * @throws IOException I/O Exception
    */
   private static void write(final ValueBuilder payload, final TokenMap attrs,
-      final byte[] method, final OutputStream out) throws IOException {
+      final String method, final OutputStream out) throws IOException {
 
     // extract serialization parameters
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(METHOD).add('=').add(method);
+    final SerializerOptions sopts = new SerializerOptions();
+    sopts.set(SerializerOptions.METHOD, method);
     for(final byte[] key : attrs) {
-      if(!eq(key, SRC)) tb.add(',').add(key).add('=').add(attrs.get(key));
+      if(!eq(key, SRC)) sopts.assign(string(key), string(attrs.get(key)));
     }
 
     // serialize items according to the parameters
-    final SerializerProp sp = new SerializerProp(tb.toString());
-    final Serializer ser = Serializer.get(out, sp);
+    final Serializer ser = Serializer.get(out, sopts);
     try {
       payload.serialize(ser);
     } finally {
       ser.close();
-    }
-  }
-
-  /**
-   * Reads the content of the linked resource.
-   * @param src resource link
-   * @param out output stream
-   * @throws IOException I/O Exception
-   */
-  private static void writeResource(final byte[] src, final OutputStream out)
-      throws IOException {
-    final InputStream bis = new URL(string(src)).openStream();
-    try {
-      final byte[] buf = new byte[256];
-      while(true) {
-        final int len = bis.read(buf, 0, buf.length);
-        if(len <= 0) break;
-        out.write(buf, 0, len);
-      }
-    } finally {
-      bis.close();
     }
   }
 
@@ -348,11 +279,8 @@ public final class HTTPClient {
    * @param r request data
    * @param out output stream
    * @throws IOException I/O exception
-   * @throws QueryException query exception
    */
-  private void writeMultipart(final HTTPRequest r, final OutputStream out)
-      throws IOException, QueryException {
-
+  private void writeMultipart(final HTTPRequest r, final OutputStream out) throws IOException {
     final byte[] boundary = r.payloadAttrs.get(BOUNDARY);
     for(final Part part : r.parts) writePart(part, out, boundary);
     out.write(new TokenBuilder("--").add(boundary).add("--").add(CRLF).finish());
@@ -364,10 +292,9 @@ public final class HTTPClient {
    * @param out connection output stream
    * @param boundary boundary
    * @throws IOException I/O exception
-   * @throws QueryException query exception
    */
-  private void writePart(final Part part, final OutputStream out,
-      final byte[] boundary) throws IOException, QueryException {
+  private void writePart(final Part part, final OutputStream out, final byte[] boundary)
+      throws IOException {
 
     // write boundary preceded by "--"
     final TokenBuilder boundTb = new TokenBuilder();

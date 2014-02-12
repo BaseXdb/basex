@@ -8,7 +8,7 @@ import org.basex.io.*;
 /**
  * This class assembles textual information for package handling.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public interface PkgText {
@@ -18,7 +18,7 @@ public interface PkgText {
   /** Package descriptor. */
   String DESCRIPTOR = "expath-pkg" + IO.XMLSUFFIX;
   /** Jar descriptor. */
-  String JARDESC = Text.NAMELC + IO.XMLSUFFIX;
+  String JARDESC = Text.PROJECT_NAME + IO.XMLSUFFIX;
 
   /** EXPath type. */
   String EXPATH = "EXPath";
@@ -86,5 +86,5 @@ public interface PkgText {
   /** No jars registered. */
   String NOJARS = "No jars specified";
   /** No public classes registered. */
-  String NOCLASS = "No public classes specified";
+  String NOCLASSES = "No public classes specified";
 }

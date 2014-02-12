@@ -1,6 +1,6 @@
 package org.basex.query.func;
 
-import static org.basex.query.func.Function.*;
+import static org.basex.query.util.Err.*;
 
 import java.util.*;
 
@@ -12,23 +12,25 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
  * Implementation-specific functions on functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class FNHof extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNHof(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNHof(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -69,8 +71,26 @@ public final class FNHof extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx) throws QueryException {
-    return oneOf(sig, _HOF_ID, _HOF_CONST) ? expr[0] : this;
+  protected Expr opt(final QueryContext ctx, final VarScope scp) throws QueryException {
+    switch(sig) {
+      case _HOF_ID:
+      case _HOF_CONST:
+        return expr[0];
+      case _HOF_FOLD_LEFT1:
+        if(allAreValues() && expr[0].size() < FNFunc.UNROLL_LIMIT) {
+          ctx.compInfo(QueryText.OPTUNROLL, this);
+          final Value seq = (Value) expr[0];
+          if(seq.isEmpty()) throw INVEMPTY.get(info, description());
+          final FItem f = withArity(1, 2, ctx);
+          Expr e = seq.itemAt(0);
+          for(int i = 1, len = (int) seq.size(); i < len; i++)
+            e = new DynFuncCall(info, f, e, seq.itemAt(i)).optimize(ctx, scp);
+          return e;
+        }
+        return this;
+      default:
+        return this;
+    }
   }
 
   /**
@@ -101,7 +121,7 @@ public final class FNHof extends StandardFunc {
     if(v.size() < 2) return v;
     final ValueBuilder vb = v.cache();
     try {
-      Arrays.sort(vb.item, 0, (int) vb.size(), cmp);
+      Arrays.sort(vb.items(), 0, (int) vb.size(), cmp);
     } catch(final QueryRTException ex) {
       throw ex.getCause();
     }
@@ -141,7 +161,7 @@ public final class FNHof extends StandardFunc {
       @Override
       public int compare(final Item it1, final Item it2) {
         try {
-          return CmpV.OpV.LT.eval(it1, it2, ctx.sc.collation, info) ? -1 : 1;
+          return CmpV.OpV.LT.eval(it1, it2, sc.collation, info) ? -1 : 1;
         } catch(final QueryException qe) {
           throw new QueryRTException(qe);
         }
@@ -219,12 +239,9 @@ public final class FNHof extends StandardFunc {
    * @return function item
    * @throws QueryException query exception
    */
-  private FItem withArity(final int p, final int a, final QueryContext ctx)
-      throws QueryException {
+  private FItem withArity(final int p, final int a, final QueryContext ctx) throws QueryException {
     final Item f = checkItem(expr[p], ctx);
-    if(!(f instanceof FItem) || ((FItem) f).arity() != a)
-      Err.type(this, FuncType.arity(a), f);
-
-    return (FItem) f;
+    if(f instanceof FItem && ((XQFunction) f).arity() == a) return (FItem) f;
+    throw Err.typeError(this, FuncType.arity(a), f);
   }
 }

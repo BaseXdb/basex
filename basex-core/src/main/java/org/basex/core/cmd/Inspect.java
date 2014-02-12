@@ -10,7 +10,7 @@ import org.basex.util.*;
  * Evaluates the 'inspect' command: checks if the currently opened database has
  * inconsistent data structures.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Inspect extends Command {
@@ -38,7 +38,7 @@ public final class Inspect extends Command {
    * @param data data
    * @return info string
    */
-  public static String inspect(final Data data) {
+  private static String inspect(final Data data) {
     final MetaData md = data.meta;
     final Check invKind = new Check();
     final Check parRef = new Check();

@@ -12,12 +12,12 @@ import org.basex.util.list.*;
 /**
  * Untyped atomic item ({@code xs:untypedAtomic}).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Atm extends Item {
   /** String data. */
-  final byte[] val;
+  private final byte[] val;
 
   /**
    * Constructor.
@@ -42,7 +42,7 @@ public final class Atm extends Item {
   }
 
   @Override
-  public boolean bool(final InputInfo ii) throws QueryException {
+  public boolean bool(final InputInfo ii) {
     return val.length != 0;
   }
 
@@ -77,7 +77,7 @@ public final class Atm extends Item {
     for(final byte v : val) {
       if(v == '&') tb.add(E_AMP);
       else tb.add(v);
-      if(v == '"') tb.add(v);
+      if(v == '"') tb.add('"');
     }
     return tb.add('"').toString();
   }

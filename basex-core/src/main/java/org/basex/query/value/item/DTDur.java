@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * DayTime Duration item ({@code xs:dayTimeDuration}).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DTDur extends Dur {
@@ -64,7 +64,7 @@ public final class DTDur extends Dur {
     this(it);
     sec = p ? sec.add(a.sec) : sec.subtract(a.sec);
     final double d = sec.doubleValue();
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) DURADDRANGE.thrw(ii, type);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECDURRANGE.get(ii, d);
   }
 
   /**
@@ -79,8 +79,8 @@ public final class DTDur extends Dur {
       throws QueryException {
 
     this(it);
-    if(Double.isNaN(f)) DATECALC.thrw(ii, description(), f);
-    if(m ? Double.isInfinite(f) : f == 0) DATEZERO.thrw(ii, description());
+    if(Double.isNaN(f)) throw DATECALC.get(ii, description(), f);
+    if(m ? Double.isInfinite(f) : f == 0) throw DATEZERO.get(ii, type);
     if(m ? f == 0 : Double.isInfinite(f)) {
       sec = BigDecimal.ZERO;
     } else {
@@ -104,14 +104,12 @@ public final class DTDur extends Dur {
    * @param ii input info
    * @throws QueryException query exception
    */
-  public DTDur(final ADate dat, final ADate sub, final InputInfo ii)
-      throws QueryException {
-
+  public DTDur(final ADate dat, final ADate sub, final InputInfo ii) throws QueryException {
     super(AtomType.DTD);
     sec = dat.days().subtract(sub.days()).multiply(DAYSECONDS).add(
         dat.seconds().subtract(sub.seconds()));
     final double d = sec.doubleValue();
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) DATEADDRANGE.thrw(ii, type);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECRANGE.get(ii, d);
   }
 
   /**
@@ -152,7 +150,7 @@ public final class DTDur extends Dur {
   @Override
   public int diff(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
-    if(it.type != type) Err.diff(ii, it, this);
-    return sec.subtract(((Dur) it).sec).signum();
+    if(it.type != type) throw diffError(ii, it, this);
+    return sec.subtract(((ADateDur) it).sec).signum();
   }
 }

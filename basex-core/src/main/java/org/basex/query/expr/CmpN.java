@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Node comparison.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class CmpN extends Cmp {
@@ -82,7 +82,7 @@ public final class CmpN extends Cmp {
    * @param ii input info
    */
   public CmpN(final Expr e1, final Expr e2, final OpN o, final InputInfo ii) {
-    super(ii, e1, e2);
+    super(ii, e1, e2, null);
     op = o;
     type = SeqType.BLN_ZO;
   }
@@ -112,7 +112,7 @@ public final class CmpN extends Cmp {
 
   @Override
   public CmpN invert() {
-    throw Util.notexpected();
+    throw Util.notExpected();
   }
 
   @Override

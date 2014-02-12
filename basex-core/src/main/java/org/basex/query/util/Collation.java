@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
  * This class organizes collations.
  * Some of the core functions have been inspired by the Saxon HE source code.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Collation {
@@ -61,25 +61,26 @@ public final class Collation {
    * Returns a collation instance for the specified uri.
    * @param uri collation uri
    * @param ctx query context
+   * @param sc static context
    * @param info input info
    * @param err error code for unknown collation uris
    * @return collator instance or {@code null} for unicode point collation
    * @throws QueryException query exception
    */
-  public static Collation get(final byte[] uri, final QueryContext ctx,
+  public static Collation get(final byte[] uri, final QueryContext ctx, final StaticContext sc,
       final InputInfo info, final Err err) throws QueryException {
 
     // return default collation
-    if(uri == null) return ctx.sc.collation;
+    if(uri == null) return sc.collation;
 
     byte[] args = uri;
     final Uri u = Uri.uri(args);
-    if(!u.isValid()) INVURI.thrw(info, args);
+    if(!u.isValid()) throw INVURI.get(info, args);
     if(!u.isAbsolute() && !Token.startsWith(args, '?')) {
-      args = ctx.sc.baseURI().resolve(u, info).string();
+      args = sc.baseURI().resolve(u, info).string();
     }
     // return unicode point collation
-    if(eq(URLCOLL, args)) return null;
+    if(eq(COLLATIONURI, args)) return null;
 
     // normalize arguments
     if(Token.startsWith(args, URL)) args = substring(args, URL.length);
@@ -92,7 +93,7 @@ public final class Collation {
     Collation coll = ctx.collations.get(full);
     if(coll == null) {
       final Collator cl = get(args);
-      if(cl == null) err.thrw(info, uri);
+      if(cl == null) throw err.get(info, uri);
       coll = new Collation(cl, full);
       ctx.collations.put(full, coll);
     }
@@ -249,11 +250,11 @@ public final class Collation {
     do {
       final int cs = next(is);
       if(cs == -1) return 0;
+      int c;
       do {
-        final int c = next(i);
+        c = next(i);
         if(c == -1) return -1;
-        if(c == cs) break;
-      } while(true);
+      } while(c != cs);
 
       final int s = i.getOffset();
       if(startsWith(i, is) && (!ends || next(i) == -1))
@@ -298,6 +299,6 @@ public final class Collation {
    */
   private RuleBasedCollator rbc(final InputInfo info) throws QueryException {
     if(coll instanceof RuleBasedCollator) return (RuleBasedCollator) coll;
-    throw CHARCOLL.thrw(info);
+    throw CHARCOLL.get(info);
   }
 }

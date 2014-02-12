@@ -1,5 +1,7 @@
 package org.basex.query.value.node;
 
+import java.util.concurrent.atomic.*;
+
 import org.basex.api.dom.*;
 import org.basex.core.*;
 import org.basex.data.*;
@@ -13,7 +15,7 @@ import org.basex.util.*;
 /**
  * Abstract node type.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class ANode extends Item {
@@ -24,9 +26,9 @@ public abstract class ANode extends Item {
   /** Static node counter. */
   // [CG] XQuery, node id: move to query context to reduce chance of overflow, or
   // move to FNode to reduce memory usage of DBNode instances
-  private static int sid;
+  private static AtomicInteger sid = new AtomicInteger();
   /** Unique node id. */
-  public final int id = ++sid;
+  public final int id = sid.incrementAndGet();
 
   /** Cached string value. */
   byte[] val;
@@ -85,11 +87,11 @@ public abstract class ANode extends Item {
 
   /**
    * Returns a database node representation of the node.
-   * @param prop properties
+   * @param opts database options
    * @return database node
    */
-  public DBNode dbCopy(final Prop prop) {
-    final MemData md = new MemData(prop);
+  public DBNode dbCopy(final MainOptions opts) {
+    final MemData md = new MemData(opts);
     new DataBuilder(md).build(this);
     return new DBNode(md);
   }
@@ -165,16 +167,15 @@ public abstract class ANode extends Item {
   /**
    * Recursively finds the uri for the specified prefix.
    * @param pref prefix
-   * @param ctx query context
    * @return uri
    */
-  public final byte[] uri(final byte[] pref, final QueryContext ctx) {
+  public final byte[] uri(final byte[] pref) {
     final Atts at = namespaces();
     if(at != null) {
       final byte[] s = at.value(pref);
       if(s != null) return s;
       final ANode n = parent();
-      if(n != null) return n.uri(pref, ctx);
+      if(n != null) return n.uri(pref);
     }
     return pref.length == 0 ? Token.EMPTY : null;
   }
@@ -209,7 +210,7 @@ public abstract class ANode extends Item {
    * @return {@code 0} if the nodes are identical, or {@code 1}/{@code -1}
    * if the first node appears after/before the second
    */
-  protected static int diff(final ANode node1, final ANode node2) {
+  static int diff(final ANode node1, final ANode node2) {
     // cache parents of first node
     final ANodeList nl = new ANodeList();
     for(ANode n = node1; n != null; n = n.parent()) {
@@ -235,7 +236,8 @@ public abstract class ANode extends Item {
       }
       c2 = n;
     }
-    return node1.id < node2.id ? -1 : 1;
+    // subtraction is used instead of comparison to support overflow of node id
+    return node1.id - node2.id < 0 ? -1 : 1;
   }
 
   /**
@@ -258,7 +260,7 @@ public abstract class ANode extends Item {
    * @param p parent node
    * @return self reference
    */
-  public abstract ANode parent(final ANode p);
+  protected abstract ANode parent(final ANode p);
 
   /**
    * Returns true if the node has children.
@@ -440,7 +442,7 @@ public abstract class ANode extends Item {
    * @param ch child nodes
    * @param nc node cache
    */
-  static final void addDesc(final AxisMoreIter ch, final NodeSeqBuilder nc) {
+  static void addDesc(final AxisMoreIter ch, final NodeSeqBuilder nc) {
     for(ANode n; (n = ch.next()) != null;) {
       nc.add(n.finish());
       addDesc(n.children(), nc);

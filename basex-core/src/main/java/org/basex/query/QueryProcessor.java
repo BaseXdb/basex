@@ -9,17 +9,17 @@ import java.util.regex.*;
 import org.basex.core.*;
 import org.basex.core.Context;
 import org.basex.data.*;
+import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.json.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 
 /**
  * This class is an entry point for evaluating XQuery implementations.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class QueryProcessor extends Proc {
@@ -27,6 +27,8 @@ public final class QueryProcessor extends Proc {
   private static final Pattern LIBMOD_PATTERN = Pattern.compile(
   "^(xquery( version ['\"].*?['\"])?( encoding ['\"].*?['\"])? ?; ?)?module namespace.*");
 
+  /** Static context. */
+  public final StaticContext sc;
   /** Expression context. */
   public final QueryContext ctx;
   /** Query. */
@@ -44,6 +46,7 @@ public final class QueryProcessor extends Proc {
   public QueryProcessor(final String qu, final Context cx) {
     query = qu;
     ctx = proc(new QueryContext(cx));
+    sc = new StaticContext(cx.options.get(MainOptions.XQUERY3));
   }
 
   /**
@@ -53,7 +56,7 @@ public final class QueryProcessor extends Proc {
   public void parse() throws QueryException {
     if(parsed) return;
     parsed = true;
-    ctx.parseMain(query, null);
+    ctx.parseMain(query, null, sc);
     updating = ctx.updating;
   }
 
@@ -123,8 +126,7 @@ public final class QueryProcessor extends Proc {
    * @return self reference
    * @throws QueryException query exception
    */
-  public QueryProcessor bind(final String name, final Object value)
-      throws QueryException {
+  public QueryProcessor bind(final String name, final Object value) throws QueryException {
     return bind(name, value, null);
   }
 
@@ -139,6 +141,16 @@ public final class QueryProcessor extends Proc {
   }
 
   /**
+   * Binds the HTTP context to the query processor.
+   * @param value HTTP context
+   * @return self reference
+   */
+  public QueryProcessor http(final Object value) {
+    ctx.http(value);
+    return this;
+  }
+
+  /**
    * Binds a value with the specified data type to the context item,
    * using the same rules as for {@link #bind binding variables}.
    * @param value value to be bound
@@ -146,9 +158,8 @@ public final class QueryProcessor extends Proc {
    * @return self reference
    * @throws QueryException query exception
    */
-  public QueryProcessor context(final Object value, final String type)
-      throws QueryException {
-    ctx.context(value, type);
+  public QueryProcessor context(final Object value, final String type) throws QueryException {
+    ctx.context(value, type, sc);
     return this;
   }
 
@@ -171,9 +182,8 @@ public final class QueryProcessor extends Proc {
    * @return self reference
    * @throws QueryException query exception
    */
-  public QueryProcessor namespace(final String prefix, final String uri)
-      throws QueryException {
-    ctx.sc.namespace(prefix, uri);
+  public QueryProcessor namespace(final String prefix, final String uri) throws QueryException {
+    sc.namespace(prefix, uri);
     return this;
   }
 
@@ -186,13 +196,11 @@ public final class QueryProcessor extends Proc {
    * @throws IOException query exception
    * @throws QueryException query exception
    */
-  public Serializer getSerializer(final OutputStream os)
-      throws IOException, QueryException {
-
+  public Serializer getSerializer(final OutputStream os) throws IOException, QueryException {
     compile();
     try {
-      return Serializer.get(os, ctx.serParams(true));
-    } catch(final SerializerException ex) {
+      return Serializer.get(os, ctx.serParams());
+    } catch(final QueryIOException ex) {
       throw ex.getCause();
     }
   }
@@ -206,7 +214,7 @@ public final class QueryProcessor extends Proc {
     final Result res = execute();
     if(res instanceof Nodes) return (Nodes) res;
     // throw error
-    if(res.size() != 0) BXDB_DBRETURN.thrw(null);
+    if(res.size() != 0) throw BXDB_DBRETURN.get(null);
     // return empty result set
     return new Nodes(ctx.nodes.data);
   }
@@ -249,8 +257,8 @@ public final class QueryProcessor extends Proc {
   }
 
   /**
-   * Returns query background information.
-   * @return background information
+   * Returns query information.
+   * @return query information
    */
   public String info() {
     return ctx.info();

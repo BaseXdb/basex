@@ -12,7 +12,7 @@ import org.basex.index.*;
  * Evaluates the 'drop index' command and deletes indexes in the currently
  * opened database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DropIndex extends ACreate {

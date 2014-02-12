@@ -7,11 +7,12 @@ import java.awt.event.*;
 
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
+import org.basex.util.options.*;
 
 /**
  * Project specific slider implementation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class BaseXSlider extends BaseXPanel {
@@ -20,20 +21,38 @@ public final class BaseXSlider extends BaseXPanel {
   /** Slider width. */
   private static final double SLIDERW = 20;
   /** Listener. */
-  private final BaseXDialog dl;
+  private final BaseXDialog dialog;
   /** Minimum slider value. */
   private final int min;
   /** Maximum slider value. */
   private final int max;
-  /** Listener. */
-  private final ActionListener al;
+
+  /** Options. */
+  private Options options;
+  /** Number option. */
+  private NumberOption option;
 
   /** Current slider value. */
-  private int curr;
-  /** Current slider value. */
-  private int oldCurr = -1;
+  private int value;
+  /** Old slider value. */
+  private int oldValue = -1;
   /** Mouse position for dragging operations. */
   private int mouseX;
+
+  /**
+   * Checkbox.
+   * @param mn min value
+   * @param mx max value
+   * @param opt option
+   * @param opts options
+   * @param win parent window
+   */
+  public BaseXSlider(final int mn, final int mx, final NumberOption opt, final Options opts,
+      final Window win) {
+    this(mn, mx, opts.get(opt), win);
+    options = opts;
+    option = opt;
+  }
 
   /**
    * Constructor.
@@ -43,26 +62,11 @@ public final class BaseXSlider extends BaseXPanel {
    * @param w parent window
    */
   public BaseXSlider(final int mn, final int mx, final int i, final Window w) {
-    this(mn, mx, i, w, null);
-  }
-
-  /**
-   * Constructor.
-   * @param mn min value
-   * @param mx max value
-   * @param i initial value
-   * @param w reference to the main window
-   * @param list listener
-   */
-  public BaseXSlider(final int mn, final int mx, final int i, final Window w,
-      final ActionListener list) {
-
     super(w);
     min = mn;
     max = mx;
-    curr = i;
-    dl = w instanceof BaseXDialog ? (BaseXDialog) w : null;
-    al = list;
+    value = i;
+    dialog = w instanceof BaseXDialog ? (BaseXDialog) w : null;
     mode(Fill.NONE).setFocusable(true);
 
     setPreferredSize(new Dimension(DWIDTH, getFont().getSize() + 3));
@@ -85,16 +89,16 @@ public final class BaseXSlider extends BaseXPanel {
    * Returns the current value.
    * @return current value
    */
-  public int value() {
-    return curr;
+  public int getValue() {
+    return value;
   }
 
   /**
    * Sets a slider value.
    * @param v new value
    */
-  public void value(final int v) {
-    curr = v;
+  public void setValue(final int v) {
+    value = v;
     repaint();
   }
 
@@ -115,8 +119,8 @@ public final class BaseXSlider extends BaseXPanel {
     g.drawLine(w - 1, hh - 3, w - 1, hh + 2);
     g.drawLine(0, hh + 2, w, hh + 2);
 
-    final double x = (curr - min) * (w - SLIDERW) / (max - min);
-    BaseXLayout.drawCell(g, (int) x, (int) (x + SLIDERW), hh - 6, hh + 6, oldCurr != -1);
+    final double x = (value - min) * (w - SLIDERW) / (max - min);
+    BaseXLayout.drawCell(g, (int) x, (int) (x + SLIDERW), hh - 6, hh + 6, oldValue != -1);
   }
 
   @Override
@@ -130,15 +134,15 @@ public final class BaseXSlider extends BaseXPanel {
     mouseX = e.getX();
     final double w = getWidth() - SLIDERW;
     final double r = max - min;
-    final double x = (curr - min) * w / r;
-    if(mouseX < x || mouseX >= x + SLIDERW) curr = (int) (mouseX * r / w + min);
-    oldCurr = curr;
+    final double x = (value - min) * w / r;
+    if(mouseX < x || mouseX >= x + SLIDERW) value = (int) (mouseX * r / w + min);
+    oldValue = value;
     repaint();
   }
 
   @Override
   public void mouseReleased(final MouseEvent e) {
-    oldCurr = -1;
+    oldValue = -1;
     repaint();
   }
 
@@ -147,36 +151,55 @@ public final class BaseXSlider extends BaseXPanel {
     final double prop = (max - min) * (mouseX - e.getX()) /
       (getWidth() - SLIDERW);
 
-    final int old = curr;
-    curr = Math.max(min, Math.min(max, (int) (oldCurr - prop)));
+    final int old = value;
+    value = Math.max(min, Math.min(max, (int) (oldValue - prop)));
 
-    if(curr != old) {
-      if(dl != null) dl.action(null);
-      else al.actionPerformed(null);
+    if(value != old) {
+      if(dialog != null) dialog.action(null);
+      for(final ActionListener al : listenerList.getListeners(ActionListener.class)) {
+        al.actionPerformed(null);
+      }
       repaint();
     }
   }
 
   @Override
   public void keyPressed(final KeyEvent e) {
-    final int old = curr;
-    if(PREV.is(e) || PREVLINE.is(e)) {
-      curr = Math.max(min, curr - 1);
-    } else if(NEXT.is(e) || NEXTLINE.is(e)) {
-      curr = Math.min(max, curr + 1);
+    final int old = value;
+    if(PREVCHAR.is(e) || PREVLINE.is(e)) {
+      value = Math.max(min, value - 1);
+    } else if(NEXTCHAR.is(e) || NEXTLINE.is(e)) {
+      value = Math.min(max, value + 1);
     } else if(NEXTPAGE.is(e)) {
-      curr = Math.max(min, curr + 10);
+      value = Math.max(min, value + 10);
     } else if(PREVPAGE.is(e)) {
-      curr = Math.min(max, curr - 10);
+      value = Math.min(max, value - 10);
     } else if(LINESTART.is(e)) {
-      curr = min;
+      value = min;
     } else if(LINEEND.is(e)) {
-      curr = max;
+      value = max;
     }
-    if(curr != old) {
-      if(dl != null) dl.action(null);
-      else al.actionPerformed(null);
+    if(value != old) {
+      if(dialog != null) dialog.action(null);
+      for(final ActionListener al : listenerList.getListeners(ActionListener.class)) {
+        al.actionPerformed(null);
+      }
       repaint();
     }
+  }
+
+  /**
+   * Adds an action listener.
+   * @param l listener
+   */
+  public void addActionListener(final ActionListener l) {
+    listenerList.add(ActionListener.class, l);
+  }
+
+  /**
+   * Assigns the current checkbox value to the option specified in the constructor.
+   */
+  public void assign() {
+    options.set(option, getValue());
   }
 }

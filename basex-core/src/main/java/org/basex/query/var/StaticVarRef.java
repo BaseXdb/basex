@@ -1,5 +1,6 @@
 package org.basex.query.var;
 
+import static org.basex.query.util.Err.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -13,14 +14,14 @@ import org.basex.util.hash.*;
 /**
  * Reference to a static variable.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class StaticVarRef extends ParseExpr {
   /** Variable name. */
   private final QNm name;
   /** Referenced variable. */
-  StaticVar var;
+  private StaticVar var;
   /** URI of the enclosing module. */
   private final StaticContext sc;
 
@@ -37,12 +38,13 @@ public final class StaticVarRef extends ParseExpr {
   }
 
   @Override
-  public void checkUp() throws QueryException {
+  public void checkUp() {
   }
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope o) throws QueryException {
     var.compile(ctx);
+    type = var.type();
     return var.value != null ? var.value : this;
   }
 
@@ -96,7 +98,7 @@ public final class StaticVarRef extends ParseExpr {
 
   @Override
   public Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
-      final Expr e) throws QueryException {
+      final Expr e) {
     return null;
   }
 
@@ -112,7 +114,7 @@ public final class StaticVarRef extends ParseExpr {
    */
   public void init(final StaticVar vr) throws QueryException {
     if(vr.ann.contains(Ann.Q_PRIVATE) && !Token.eq(sc.baseURI().string(),
-       vr.sc.baseURI().string())) throw Err.VARPRIVATE.thrw(info, vr);
+       vr.sc.baseURI().string())) throw VARPRIVATE.get(info, vr);
     var = vr;
   }
 }

@@ -8,7 +8,6 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
-import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -16,7 +15,7 @@ import org.basex.util.*;
 /**
  * This class caches RESTXQ modules found in the HTTP root directory.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class RestXqModules {
@@ -52,10 +51,10 @@ public final class RestXqModules {
    * Returns {@code null} if no function matches.
    * @param http HTTP context
    * @param error error code (optional)
-   * @throws QueryException query exception
    * @return function
+   * @throws Exception exception (including unexpected ones)
    */
-  RestXqFunction find(final HTTPContext http, final QNm error) throws QueryException {
+  RestXqFunction find(final HTTPContext http, final QNm error) throws Exception {
     cache(http);
     // collect all functions
     final ArrayList<RestXqFunction> list = new ArrayList<RestXqFunction>();
@@ -90,14 +89,14 @@ public final class RestXqModules {
   /**
    * Updates the module cache. Parses new modules and discards obsolete ones.
    * @param http http context
-   * @throws QueryException query exception
+   * @throws Exception exception (including unexpected ones)
    */
-  private synchronized void cache(final HTTPContext http) throws QueryException {
+  private synchronized void cache(final HTTPContext http) throws Exception {
     // initialize RESTXQ directory (may be relative against WEBPATH)
     if(restxq == null) {
-      final File fl = new File(http.context().mprop.get(MainProp.RESTXQPATH));
+      final File fl = new File(http.context().globalopts.get(GlobalOptions.RESTXQPATH));
       restxq = fl.isAbsolute() ? new IOFile(fl) :
-        new IOFile(http.context().mprop.get(MainProp.WEBPATH), fl.getPath());
+        new IOFile(http.context().globalopts.get(GlobalOptions.WEBPATH), fl.getPath());
     }
     // create new cache
     final HashMap<String, RestXqModule> cache = new HashMap<String, RestXqModule>();
@@ -110,28 +109,26 @@ public final class RestXqModules {
    * @param root root path
    * @param http http context
    * @param cache cached modules
-   * @throws QueryException query exception
+   * @throws Exception exception (including unexpected ones)
    */
   private synchronized void cache(final HTTPContext http, final IOFile root,
-      final HashMap<String, RestXqModule> cache) throws QueryException {
+      final HashMap<String, RestXqModule> cache) throws Exception {
 
     for(final IOFile file : root.children()) {
       if(file.isDir()) {
         cache(http, file, cache);
       } else {
         final String path = file.path();
-        final boolean main = path.endsWith(IO.XQSUFFIX);
-        if(main || path.endsWith(IO.XQMSUFFIX)) {
-          // all files with .xqm suffix will be parsed for RESTXQ annotations
+        final boolean lib = path.endsWith(IO.XQMSUFFIX);
+        if(lib || path.endsWith(IO.XQSUFFIX)) {
           RestXqModule module = modules.get(path);
-
           boolean parsed = false;
           if(module != null) {
             // check if module has been modified
             parsed = module.uptodate();
           } else {
             // create new module
-            module = new RestXqModule(file, main);
+            module = new RestXqModule(file, lib);
           }
           // add module if it has been parsed, and if it contains annotations
           if(parsed || module.parse(http)) {

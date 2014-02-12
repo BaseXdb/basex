@@ -3,11 +3,10 @@ package org.basex.gui.view.map;
 /**
  * SplitLayout algorithm.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Joerg Hauser
  */
 final class SplitAlgo extends MapAlgo {
-
   @Override
   MapRects calcMap(final MapRect r, final MapList ml, final int ns, final int ne) {
     return calcMap(r, ml, ns, ne, 1);
@@ -22,8 +21,8 @@ final class SplitAlgo extends MapAlgo {
    * @param sw weight of this recursion level
    * @return rectangles
    */
-  private static MapRects calcMap(final MapRect r, final MapList ml,
-      final int ns, final int ne, final double sw) {
+  private static MapRects calcMap(final MapRect r, final MapList ml, final int ns, final int ne,
+      final double sw) {
 
     if(ne - ns == 0) {
       final MapRects rects = new MapRects();
@@ -44,7 +43,7 @@ final class SplitAlgo extends MapAlgo {
 
     int xx = r.x;
     int yy = r.y;
-    int ww = !(r.w > r.h) ? r.w : (int) (r.w / sw * w);
+    int ww = r.w > r.h ? (int) (r.w / sw * w) : r.w;
     int hh = r.w > r.h ? r.h : (int) (r.h / sw * w);
     // paint both rectangles if enough space is left
     if(ww > 0 && hh > 0 && w > 0) rects.add(calcMap(
@@ -58,8 +57,7 @@ final class SplitAlgo extends MapAlgo {
     }
 
     if(ww > 0 && hh > 0 && sw - w > 0 && ni + 1 <= ne)
-      rects.add(calcMap(new MapRect(xx, yy, ww, hh, 0, r.level),
-      ml, ni + 1, ne, sw - w));
+      rects.add(calcMap(new MapRect(xx, yy, ww, hh, 0, r.level), ml, ni + 1, ne, sw - w));
 
     return rects;
   }

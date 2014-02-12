@@ -8,13 +8,14 @@ import javax.swing.tree.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
  * JTree node which represents a folder.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public class TreeFolder extends TreeNode {

@@ -7,7 +7,7 @@ import org.basex.query.*;
 /**
  * This example demonstrates how Java classes can be imported as XQuery modules.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  */
 public final class FruitsExample {
   /**
@@ -35,7 +35,7 @@ public final class FruitsExample {
         "  for $i in 1 to 4\n" +
         "  return fruits:fast($i)\n" +
         "},\n" +
-        "element functions { fruits:functionNamespace() }";
+        "element user { fruits:user() }";
 
     System.out.println("\n* Query:");
     System.out.println(query);

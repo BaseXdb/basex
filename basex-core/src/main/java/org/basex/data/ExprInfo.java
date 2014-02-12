@@ -6,7 +6,7 @@ import org.basex.util.*;
 /**
  * Expression information, used for debugging and logging.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class ExprInfo {
@@ -24,8 +24,17 @@ public abstract class ExprInfo {
    * Returns the simplified class name.
    * @return class name
    */
-  public byte[] info() {
-    return Token.token(Util.name(this));
+  byte[] info() {
+    return Token.token(Util.className(this));
+  }
+
+  /**
+   * Returns a string representation of the expression that can be embedded in error messages.
+   * Defaults to {@link #toString()}.
+   * @return class name
+   */
+  public String toErrorString() {
+    return toString();
   }
 
   @Override

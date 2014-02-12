@@ -3,7 +3,7 @@ package org.basex.gui.view.map;
 /**
  * Slice-and-Dice layout algorithm.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Joerg Hauser
  */
 final class SliceDiceAlgo extends MapAlgo {
@@ -36,8 +36,7 @@ final class SliceDiceAlgo extends MapAlgo {
 
       if(ww > 0 && hh > 0 && (tx != (int) xx || ty != (int) yy ||
           th != (int) hh || tw != (int) ww))
-        rects.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
-            ml.get(i), r.level));
+        rects.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh, ml.get(i), r.level));
       tx = (int) xx;
       ty = (int) yy;
       th = (int) hh;

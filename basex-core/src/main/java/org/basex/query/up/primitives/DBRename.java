@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Update primitive for the {@link Function#_DB_RENAME} function.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DBRename extends BasicOperation {
@@ -37,7 +37,7 @@ public final class DBRename extends BasicOperation {
   public void merge(final BasicOperation o) throws QueryException {
     for(final Entry<String, String> e : ((DBRename) o).map.entrySet()) {
       final String src = e.getKey();
-      if(map.containsKey(src)) UPPATHREN.thrw(info, src);
+      if(map.containsKey(src)) throw UPPATHREN.get(info, src);
       map.put(src, e.getValue());
     }
   }
@@ -57,5 +57,5 @@ public final class DBRename extends BasicOperation {
   }
 
   @Override
-  public void prepare(final MemData tmp) throws QueryException { }
+  public void prepare(final MemData tmp) { }
 }

@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.gflwor.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -21,10 +22,10 @@ import org.basex.util.hash.*;
 /**
  * Inline function.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
-public final class InlineFunc extends Single implements Scope {
+public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
   /** Function name. */
   private final QNm name;
   /** Arguments. */
@@ -37,7 +38,7 @@ public final class InlineFunc extends Single implements Scope {
   private final boolean updating;
 
   /** Map with requested function properties. */
-  private final EnumMap<Flag, Boolean> map = new EnumMap<Expr.Flag, Boolean>(Flag.class);
+  private final EnumMap<Flag, Boolean> map = new EnumMap<Flag, Boolean>(Flag.class);
   /** Static context. */
   private final StaticContext sc;
   /** Compilation flag. */
@@ -84,6 +85,32 @@ public final class InlineFunc extends Single implements Scope {
   }
 
   @Override
+  public int arity() {
+    return args.length;
+  }
+
+  @Override
+  public QNm funcName() {
+    // inline functions have no name
+    return null;
+  }
+
+  @Override
+  public QNm argName(final int pos) {
+    return args[pos].name;
+  }
+
+  @Override
+  public FuncType funcType() {
+    return FuncType.get(ann, args, ret);
+  }
+
+  @Override
+  public Ann annotations() {
+    return ann;
+  }
+
+  @Override
   public void compile(final QueryContext ctx) throws QueryException {
     compile(ctx, null);
   }
@@ -92,19 +119,21 @@ public final class InlineFunc extends Single implements Scope {
    * Removes and returns all static bindings from this function's closure.
    * @return static variable bindings
    */
-  private Collection<Entry<Var, Expr>> staticBindings() {
-    Collection<Entry<Var, Expr>> propagate = null;
+  private Collection<Entry<Var, Value>> staticBindings() {
+    Collection<Entry<Var, Value>> propagate = null;
     final Iterator<Entry<Var, Expr>> cls = scope.closure().entrySet().iterator();
     while(cls.hasNext()) {
       final Entry<Var, Expr> e = cls.next();
       final Expr c = e.getValue();
-      if(c.isValue()) {
-        if(propagate == null) propagate = new ArrayList<Entry<Var, Expr>>();
-        propagate.add(e);
+      if(c instanceof Value) {
+        @SuppressWarnings({ "unchecked", "rawtypes"})
+        final Entry<Var, Value> e2 = (Entry) e;
+        if(propagate == null) propagate = new ArrayList<Entry<Var, Value>>();
+        propagate.add(e2);
         cls.remove();
       }
     }
-    return propagate == null ? Collections.<Entry<Var, Expr>>emptyList() : propagate;
+    return propagate == null ? Collections.<Entry<Var, Value>>emptyList() : propagate;
   }
 
   @Override
@@ -113,38 +142,53 @@ public final class InlineFunc extends Single implements Scope {
     compiled = true;
 
     // compile closure
-    for(final Entry<Var, Expr> e : scope.closure().entrySet())
-      e.setValue(e.getValue().compile(ctx, scp));
-
-    final StaticContext cs = ctx.sc;
-    ctx.sc = sc;
+    for(final Entry<Var, Expr> e : scope.closure().entrySet()) {
+      final Expr bound = e.getValue().compile(ctx, scp);
+      e.setValue(bound);
+      e.getKey().refineType(bound.type(), ctx, info);
+    }
 
     final int fp = scope.enter(ctx);
     try {
       // constant propagation
-      for(final Entry<Var, Expr> e : staticBindings())
-        ctx.set(e.getKey(), e.getValue().value(ctx), info);
+      for(final Entry<Var, Value> e : staticBindings())
+        ctx.set(e.getKey(), e.getValue(), info);
 
       expr = expr.compile(ctx, scope);
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe);
+      expr = FNInfo.error(qe, ret != null ? ret : expr.type());
     } finally {
       scope.cleanUp(this);
       scope.exit(ctx, fp);
-      ctx.sc = cs;
     }
 
     // convert all function calls in tail position to proper tail calls
-    ctx.compInfo(OPTTCE, this);
-    expr.markTailCalls();
+    expr.markTailCalls(ctx);
 
     return optimize(ctx, scp);
   }
 
   @Override
   public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
-    type = FuncType.get(ann, args, ret).seqType();
+    final SeqType r = expr.type();
+    final SeqType retType = ret == null || r.instanceOf(ret) ? r : ret;
+    type = FuncType.get(ann, args, retType).seqType();
     size = 1;
+
+    final int fp = scope.enter(ctx);
+    try {
+      // inline all values in the closure
+      for(final Entry<Var, Value> e : staticBindings()) {
+        final Expr inlined = expr.inline(ctx, scope, e.getKey(), e.getValue());
+        if (inlined != null) expr = inlined;
+      }
+    } catch(final QueryException qe) {
+      expr = FNInfo.error(qe, ret != null ? ret : expr.type());
+    } finally {
+      scope.cleanUp(this);
+      scope.exit(ctx, fp);
+    }
+
     // only evaluate if the closure is empty, so we don't lose variables
     return scope.closure().isEmpty() ? preEval(ctx) : this;
   }
@@ -160,33 +204,13 @@ public final class InlineFunc extends Single implements Scope {
   @Override
   public Expr inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
-    boolean change = false, val = false;
+    boolean change = false;
 
     for(final Entry<Var, Expr> entry : scope.closure().entrySet()) {
       final Expr ex = entry.getValue().inline(ctx, scp, v, e);
       if(ex != null) {
         change = true;
-        val |= ex.isValue();
         entry.setValue(ex);
-      }
-    }
-
-    final StaticContext cs = ctx.sc;
-    ctx.sc = sc;
-
-    if(val) {
-      final int fp = scope.enter(ctx);
-      try {
-        for(final Entry<Var, Expr> entry : staticBindings()) {
-          final Expr inl = expr.inline(ctx, scope, entry.getKey(), entry.getValue());
-          if(inl != null) expr = inl;
-        }
-      } catch(final QueryException qe) {
-        expr = FNInfo.error(qe);
-      } finally {
-        scope.cleanUp(this);
-        scope.exit(ctx, fp);
-        ctx.sc = cs;
       }
     }
 
@@ -198,20 +222,57 @@ public final class InlineFunc extends Single implements Scope {
     final VarScope v = scope.copy(cx, scp, vs);
     final Var[] a = args.clone();
     for(int i = 0; i < a.length; i++) a[i] = vs.get(a[i].id);
-    return copyType(new InlineFunc(info, name, ret, a, expr.copy(cx, v, vs), ann, sc, v));
+    final Expr e = expr.copy(cx, v, vs);
+    e.markTailCalls(null);
+    return copyType(new InlineFunc(info, name, ret, a, e, ann, sc, v));
+  }
+
+  @Override
+  public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
+      final InputInfo ii) throws QueryException {
+    if(expr.has(Flag.CTX)) return null;
+    ctx.compInfo(OPTINLINEFN, this);
+    // create let bindings for all variables
+    final Map<Var, Expr> closure = scope.closure();
+    final LinkedList<GFLWOR.Clause> cls =
+        exprs.length == 0 && closure.isEmpty() ? null : new LinkedList<GFLWOR.Clause>();
+    final IntObjMap<Var> vs = new IntObjMap<Var>();
+    for(int i = 0; i < args.length; i++) {
+      final Var old = args[i], v = scp.newCopyOf(ctx, old);
+      vs.put(old.id, v);
+      cls.add(new Let(v, exprs[i], false, ii).optimize(ctx, scp));
+    }
+
+    for(final Entry<Var, Expr> e : closure.entrySet()) {
+      final Var old = e.getKey(), v = scp.newCopyOf(ctx, old);
+      vs.put(old.id, v);
+      cls.add(new Let(v, e.getValue(), false, ii).optimize(ctx, scp));
+    }
+
+    // copy the function body
+    final Expr cpy = expr.copy(ctx, scp, vs), rt = ret == null ? cpy :
+      new TypeCheck(sc, ii, cpy, ret, true).optimize(ctx, scp);
+
+    return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(ctx, scp);
   }
 
   @Override
   public FuncItem item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final FuncType ft = FuncType.get(ann, args, ret);
-    final boolean c = ft.type != null && !expr.type().instanceOf(ft.type);
+    final FuncType ft = (FuncType) type().type;
+    final boolean c = ret != null && !expr.type().instanceOf(ret);
 
-    // collect closure
-    final Map<Var, Value> clos = new HashMap<Var, Value>();
-    for(final Entry<Var, Expr> e : scope.closure().entrySet())
-      clos.put(e.getKey(), e.getValue().value(ctx));
+    final Expr body;
+    if(!scope.closure().isEmpty()) {
+      // collect closure
+      final LinkedList<GFLWOR.Clause> cls = new LinkedList<GFLWOR.Clause>();
+      for(final Entry<Var, Expr> e : scope.closure().entrySet())
+        cls.add(new Let(e.getKey(), e.getValue().value(ctx), false, ii));
+      body = new GFLWOR(ii, cls, expr);
+    } else {
+      body = expr;
+    }
 
-    return new FuncItem(args, expr, ft, clos, c, scope, ctx.sc);
+    return new FuncItem(sc, ann, null, args, ft, body, c, scope.stackSize());
   }
 
   @Override
@@ -238,8 +299,9 @@ public final class InlineFunc extends Single implements Scope {
 
   @Override
   public boolean removable(final Var v) {
-    // [LW] Variables are removable from the closure.
-    return false;
+    for(final Entry<Var, Expr> e : scope.closure().entrySet())
+      if(!e.getValue().removable(v)) return false;
+    return true;
   }
 
   @Override
@@ -262,14 +324,23 @@ public final class InlineFunc extends Single implements Scope {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(FUNCTION).append(PAR1);
+    final StringBuilder sb = new StringBuilder();
+    if (!scope.closure().isEmpty()) {
+      sb.append("((: inline-closure :) ");
+      for (final Entry<Var, Expr> e : scope.closure().entrySet())
+        sb.append("let ").append(e.getKey()).append(" := ").append(e.getValue()).append(' ');
+      sb.append(RETURN).append(' ');
+    }
+    sb.append(FUNCTION).append(PAR1);
     for(int i = 0; i < args.length; i++) {
       if(i > 0) sb.append(", ");
       sb.append(args[i].toString());
     }
     sb.append(PAR2).append(' ');
     if(ret != null) sb.append("as ").append(ret.toString()).append(' ');
-    return sb.append("{ ").append(expr).append(" }").toString();
+    sb.append("{ ").append(expr).append(" }");
+    if(!scope.closure().isEmpty()) sb.append(')');
+    return sb.toString();
   }
 
   @Override
@@ -278,11 +349,11 @@ public final class InlineFunc extends Single implements Scope {
     if(u) expr.checkUp();
     if(updating) {
       // updating function
-      if(ret != null) UPFUNCTYPE.thrw(info);
-      if(!u && !expr.isVacuous()) UPEXPECTF.thrw(info);
+      if(ret != null) throw UPFUNCTYPE.get(info);
+      if(!u && !expr.isVacuous()) throw UPEXPECTF.get(info);
     } else if(u) {
       // uses updates, but is not declared as such
-      UPNOT.thrw(info, description());
+      throw UPNOT.get(info, description());
     }
   }
 

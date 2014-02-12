@@ -13,11 +13,10 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'replace' command and replaces documents in a collection.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Replace extends ACreate {
-
   /**
    * Constructor.
    * The input needs to be set via {@link #setInput(InputStream)}.
@@ -68,8 +67,9 @@ public final class Replace extends ACreate {
         ok = add.run(context) || error(add.info());
         // delete old documents if addition was successful
         if(ok) {
-          final AtomicUpdateList atomics = new AtomicUpdateList(data);
-          for(int p = pre.size() - 1; p >= 0; p--) atomics.addDelete(pre.get(p));
+          final AtomicUpdateCache atomics = new AtomicUpdateCache(data);
+          final int ps = pre.size();
+          for(int p = 0; p < ps; p++) atomics.addDelete(pre.get(p));
           atomics.execute(false);
         }
       }

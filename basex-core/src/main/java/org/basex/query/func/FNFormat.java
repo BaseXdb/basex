@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Formatting functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNFormat extends StandardFunc {
@@ -23,12 +23,13 @@ public final class FNFormat extends StandardFunc {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNFormat(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNFormat(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -74,14 +75,14 @@ public final class FNFormat extends StandardFunc {
     // evaluate arguments
     Item it = expr[0].item(ctx, info);
     if(it == null) it = Dbl.NAN;
-    else if(!it.type.isNumberOrUntyped()) number(this, it);
+    else if(!it.type.isNumberOrUntyped()) throw numberError(this, it);
     // retrieve picture
     final byte[] pic = checkStr(expr[1], ctx);
     // retrieve format declaration
-    final QNm frm = expr.length == 3 ? new QNm(trim(checkEStr(expr[2], ctx)), ctx) :
+    final QNm frm = expr.length == 3 ? new QNm(trim(checkEStr(expr[2], ctx)), sc) :
       new QNm(EMPTY);
-    final DecFormatter df = ctx.sc.decFormats.get(frm.id());
-    if(df == null) throw FORMNUM.thrw(info, frm);
+    final DecFormatter df = sc.decFormats.get(frm.id());
+    if(df == null) throw FORMNUM.get(info, frm);
 
     return Str.get(df.format(info, it, pic));
   }

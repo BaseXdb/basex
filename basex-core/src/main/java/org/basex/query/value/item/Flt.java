@@ -1,6 +1,7 @@
 package org.basex.query.value.item;
 
 import static java.lang.Double.*;
+import static org.basex.query.util.Err.*;
 
 import java.math.*;
 
@@ -13,7 +14,7 @@ import org.basex.util.*;
 /**
  * Float item ({@code xs:float}).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Flt extends ANum {
@@ -113,7 +114,7 @@ public final class Flt extends ANum {
     } catch(final NumberFormatException ex) {
       if(Token.eq(Token.trim(val), Token.INF)) return Float.POSITIVE_INFINITY;
       if(Token.eq(Token.trim(val), Token.NINF)) return Float.NEGATIVE_INFINITY;
-      throw ZERO.castErr(val, ii);
+      throw FUNCAST.get(ii, ZERO.type, chop(val));
     }
   }
 }

@@ -62,7 +62,7 @@ import org.basex.util.list.*;
  * NOTE: the class is not thread-safe. It is imperative that all read/write accesses
  * are synchronized over a single context's read/write lock.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Data {
@@ -147,12 +147,13 @@ public abstract class Data {
   }
 
   /**
-   * Returns the number of indexed pre references for the specified token.
+   * Returns a cost estimation for searching the specified token.
+   * Smaller values are better, a value of zero indicates that no results will be returned.
    * @param token text to be found
-   * @return number of hits
+   * @return cost estimation
    */
-  public final int count(final IndexToken token) {
-    return index(token.type()).count(token);
+  public final int costs(final IndexToken token) {
+    return index(token.type()).costs(token);
   }
 
   /**
@@ -177,7 +178,7 @@ public abstract class Data {
       case ATTRIBUTE: return atvindex;
       case FULLTEXT:  return ftxindex;
       case PATH:      return paths;
-      default:        throw Util.notexpected();
+      default:        throw Util.notExpected();
     }
   }
 
@@ -462,13 +463,11 @@ public abstract class Data {
    * @param name new tag, attribute or pi name
    * @param uri uri
    */
-  public final void update(final int pre, final int kind, final byte[] name,
-      final byte[] uri) {
-
+  public final void update(final int pre, final int kind, final byte[] name, final byte[] uri) {
     meta.update();
 
     if(kind == PI) {
-      updateText(pre, trim(concat(name, SPACE, atom(pre))), kind);
+      updateText(pre, trim(concat(name, SPACE, atom(pre))), PI);
     } else {
       // update/set namespace reference
       final int ouri = nspaces.uri(name, pre, this);
@@ -504,7 +503,8 @@ public abstract class Data {
   }
 
   /**
-   * Replaces parts of the database with the specified data instance.
+   * Rapid Replace implementation. Replaces parts of the database with the specified
+   * data instance.
    * @param tpre pre value of target node to be replaced
    * @param source clip with source data
    */
@@ -555,8 +555,8 @@ public abstract class Data {
         case ELEM:
           // add element
           byte[] nm = data.name(spre, kind);
-          elem(dist, tagindex.index(nm, null, false), data.attSize(spre, kind),
-              ssize, nspaces.uri(nm, true), false);
+          elem(dist, tagindex.index(nm, null, false), data.attSize(spre, kind), ssize,
+              nspaces.uri(nm, true), false);
           break;
         case TEXT:
         case COMM:
@@ -567,8 +567,8 @@ public abstract class Data {
         case ATTR:
           // add attribute
           nm = data.name(spre, kind);
-          attr(pre, dist, atnindex.index(nm, null, false),
-              data.text(spre, false), nspaces.uri(nm, false), false);
+          attr(pre, dist, atnindex.index(nm, null, false), data.text(spre, false),
+              nspaces.uri(nm, false), false);
           break;
       }
     }
@@ -604,7 +604,7 @@ public abstract class Data {
     if(data.kind(spre) == ATTR) {
       int d = 0;
       while(spre < source.end && data.kind(spre++) == ATTR) d++;
-      if(d > 1) attSize(tpar, kind(tpar), d + 1);
+      if(d > 1) attSize(tpar, kind(tpar), d + attSize(tpar, ELEM) - 1);
     }
   }
 
@@ -697,7 +697,7 @@ public abstract class Data {
 
     // loop through all entries
     final IntList preStack = new IntList();
-    final NSNode nsRoot = nspaces.current();
+    final NSNode nsRoot = nspaces.getCurrent();
     final HashSet<NSNode> newNodes = new HashSet<NSNode>();
     final IntList flagPres = new IntList();
 
@@ -726,7 +726,7 @@ public abstract class Data {
       }
 
       // documents: use -1 as namespace root
-      final int nsPre = kind == Data.DOC ? -1 : pre - dist;
+      final int nsPre = kind == DOC ? -1 : pre - dist;
       if(c == 0) nspaces.root(nsPre, this);
       while(!preStack.isEmpty() && preStack.peek() > nsPre) nspaces.close(preStack.pop());
 
@@ -760,8 +760,8 @@ public abstract class Data {
             }
           }
           byte[] nm = data.name(spre, kind);
-          elem(dist, tagindex.index(nm, null, false), data.attSize(spre, kind),
-              ssize, nspaces.uri(nm, true), ne);
+          elem(dist, tagindex.index(nm, null, false), data.attSize(spre, kind), ssize,
+              nspaces.uri(nm, true), ne);
           preStack.push(pre);
           break;
         case TEXT:
@@ -778,19 +778,21 @@ public abstract class Data {
           if(data.nsFlag(spre) && nsScope.get(attPref) == null) {
             // add declaration to parent node
             nspaces.add(nsPre, preStack.isEmpty() ? -1 : preStack.peek(), attPref,
-                data.nspaces.uri(data.uri(spre, kind)), this);
+            data.nspaces.uri(data.uri(spre, kind)), this);
             // save pre value to set ns flag later for this node. can't be done
             // here as direct table access would interfere with the buffer
             flagPres.add(nsPre);
           }
-          attr(pre, dist, atnindex.index(nm, null, false),
-              data.text(spre, false), nspaces.uri(nm, false), false);
+          attr(pre, dist, atnindex.index(nm, null, false), data.text(spre, false),
+              nspaces.uri(nm, false), false);
           break;
       }
+      // propagate PRE value shifts to keep namespace structure valid
+      nspaces.shiftPreAfterInsert(tpre, 1, newNodes);
     }
     // finalize and update namespace structure
     while(!preStack.isEmpty()) nspaces.close(preStack.pop());
-    nspaces.root(nsRoot);
+    nspaces.setCurrent(nsRoot);
 
     if(bp != 0) insert(tpre + c - 1 - (c - 1) % buf);
     // reset buffer to old size
@@ -817,9 +819,6 @@ public abstract class Data {
     }
 
     if(!cache) updateDist(tpre + size, size);
-
-    // propagate PRE value shifts to namespaces
-    if(tpar != -1) nspaces.insert(tpre, size, newNodes);
   }
 
   /**
@@ -953,8 +952,8 @@ public abstract class Data {
    * @param uri namespace uri reference
    * @param ne namespace flag
    */
-  public final void elem(final int dist, final int name, final int asize,
-      final int size, final int uri, final boolean ne) {
+  public final void elem(final int dist, final int name, final int asize, final int size,
+      final int uri, final boolean ne) {
 
     // build and insert new entry
     final int i = newID();
@@ -973,9 +972,7 @@ public abstract class Data {
    * @param value string value
    * @param kind node kind
    */
-  public final void text(final int pre, final int dist, final byte[] value,
-      final int kind) {
-
+  public final void text(final int pre, final int dist, final byte[] value, final int kind) {
     // build and insert new entry
     final int i = newID();
     final long v = index(pre, i, value, kind);
@@ -994,8 +991,8 @@ public abstract class Data {
    * @param uri namespace uri reference
    * @param ne namespace flag (only {@code true} if this is a stand-alone attribute)
    */
-  public final void attr(final int pre, final int dist, final int name,
-      final byte[] value, final int uri, final boolean ne) {
+  public final void attr(final int pre, final int dist, final int name, final byte[] value,
+      final int uri, final boolean ne) {
 
     // add attribute to text storage
     final int i = newID();
@@ -1050,8 +1047,7 @@ public abstract class Data {
    * @param kind node kind
    * @return reference
    */
-  protected abstract long index(final int pre, final int id, final byte[] value,
-      final int kind);
+  protected abstract long index(final int pre, final int id, final byte[] value, final int kind);
 
   /** Notify the index structures that an update operation is started. */
   void indexBegin() { }
@@ -1072,9 +1068,7 @@ public abstract class Data {
    * Indicates if this data instance is in main memory or on disk.
    * @return result of check
    */
-  public final boolean inMemory() {
-    return this instanceof MemData;
-  }
+  public abstract boolean inMemory();
 
   /**
    * Returns a string representation of the specified table range. Can be called

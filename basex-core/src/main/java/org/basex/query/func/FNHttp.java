@@ -10,18 +10,19 @@ import org.basex.util.*;
 
 /**
  * HTTP Client Module.
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  */
 public final class FNHttp extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNHttp(final InputInfo ii, final Function f, final Expr[] e) {
-    super(ii, f, e);
+  public FNHttp(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -44,6 +45,6 @@ public final class FNHttp extends StandardFunc {
     }
 
     // send HTTP request
-    return new HTTPClient(info, ctx.context.prop).sendRequest(href, request, cache);
+    return new HTTPClient(info, ctx.context.options).sendRequest(href, request, cache);
   }
 }

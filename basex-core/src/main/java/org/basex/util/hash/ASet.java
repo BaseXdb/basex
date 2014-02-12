@@ -36,7 +36,7 @@ public abstract class ASet {
   /**
    * Resets the data structure. Must be called when data structure is initialized.
    */
-  public void clear() {
+  void clear() {
     Arrays.fill(bucket, 0);
     size = 1;
   }

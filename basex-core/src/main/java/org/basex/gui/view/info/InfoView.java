@@ -1,18 +1,19 @@
 package org.basex.gui.view.info;
 
 import static org.basex.core.Text.*;
-import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.util.regex.*;
 
+import javax.swing.*;
+
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.*;
 import org.basex.gui.view.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -20,12 +21,12 @@ import org.basex.util.list.*;
 /**
  * This view displays query information.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class InfoView extends View implements LinkListener {
   /** Searchable editor. */
-  final SearchEditor editor;
+  private final SearchEditor editor;
 
   /** Current text. */
   private final TokenBuilder text = new TokenBuilder();
@@ -34,9 +35,7 @@ public final class InfoView extends View implements LinkListener {
   /** Timer label. */
   private final BaseXLabel timer;
   /** Text Area. */
-  private final Editor area;
-  /** Buttons. */
-  final BaseXBack buttons;
+  private final TextPanel area;
 
   /** Query statistics. */
   private IntList stat = new IntList(4);
@@ -62,7 +61,7 @@ public final class InfoView extends View implements LinkListener {
    * @param man view manager
    */
   public InfoView(final ViewNotifier man) {
-    super(INFOVIEW, man);
+    super(GUIConstants.INFOVIEW, man);
     border(5).layout(new BorderLayout(0, 5));
 
     label = new BaseXLabel(QUERY_INFO);
@@ -71,11 +70,14 @@ public final class InfoView extends View implements LinkListener {
     timer = new BaseXLabel(" ", true, false);
     timer.setForeground(GUIConstants.DGRAY);
 
-    final BaseXButton srch = new BaseXButton(gui, "search",
-        BaseXLayout.addShortcut(SEARCH, BaseXKeys.FIND.toString()));
-    buttons = new BaseXBack(Fill.NONE);
+    area = new TextPanel(false, gui);
+    area.setLinkListener(this);
+    editor = new SearchEditor(gui, area);
+
+    final AbstractButton find = editor.button(FIND);
+    final BaseXBack buttons = new BaseXBack(Fill.NONE);
     buttons.layout(new TableLayout(1, 3, 8, 0)).border(0, 0, 4, 0);
-    buttons.add(srch);
+    buttons.add(find);
     buttons.add(timer);
 
     final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
@@ -84,9 +86,6 @@ public final class InfoView extends View implements LinkListener {
     add(b, BorderLayout.NORTH);
 
     final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout());
-    area = new Editor(false, gui);
-    area.setLinkListener(this);
-    editor = new SearchEditor(gui, area).button(srch);
     add(editor, BorderLayout.CENTER);
 
     center.add(area, BorderLayout.CENTER);
@@ -113,19 +112,19 @@ public final class InfoView extends View implements LinkListener {
   @Override
   public void refreshLayout() {
     label.border(-6, 0, 0, 2).setFont(GUIConstants.lfont);
-    timer.setFont(font);
-    area.setFont(font);
+    timer.setFont(GUIConstants.font);
+    area.setFont(GUIConstants.font);
     editor.bar().refreshLayout();
   }
 
   @Override
   public boolean visible() {
-    return gui.gprop.is(GUIProp.SHOWINFO);
+    return gui.gopts.get(GUIOptions.SHOWINFO);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gprop.set(GUIProp.SHOWINFO, v);
+    gui.gopts.set(GUIOptions.SHOWINFO, v);
   }
 
   @Override
@@ -140,8 +139,7 @@ public final class InfoView extends View implements LinkListener {
    * @param ok indicates if evaluation was successful
    * @param reset clear text area when method is called next time
    */
-  public void setInfo(final String info, final Command cmd, final boolean ok,
-      final boolean reset) {
+  public void setInfo(final String info, final Command cmd, final boolean ok, final boolean reset) {
     setInfo(info, cmd, null, ok, reset);
   }
 
@@ -153,8 +151,8 @@ public final class InfoView extends View implements LinkListener {
    * @param ok indicates if evaluation was successful
    * @param reset clear text area when method is called next time
    */
-  public void setInfo(final String info, final Command cmd, final String time,
-      final boolean ok, final boolean reset) {
+  public void setInfo(final String info, final Command cmd, final String time, final boolean ok,
+      final boolean reset) {
 
     final StringList eval = new StringList(1);
     final StringList comp = new StringList(1);
@@ -169,7 +167,7 @@ public final class InfoView extends View implements LinkListener {
     final StringList timings = new StringList(5);
     final IntList times = new IntList(5);
 
-    final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
+    final int runs = Math.max(1, gui.context.options.get(MainOptions.RUNS));
     final String[] split = info.split(NL);
     for(int i = 0; i < split.length; ++i) {
       final String line = split[i];
@@ -198,7 +196,7 @@ public final class InfoView extends View implements LinkListener {
           line.startsWith(PRINTED_CC) || line.startsWith(READ_LOCKING_CC) ||
           line.startsWith(WRITE_LOCKING_CC)) {
         result.add(LI + line);
-      } else if(line.startsWith(ERROR_C)) {
+      } else if(line.startsWith(Text.ERROR + COL)) {
         while(i + 1 < split.length && !split[++i].isEmpty()) {
           final Pattern p = Pattern.compile(STOPPED_AT + "(.*)" + COL);
           final Matcher m = p.matcher(split[i]);
@@ -209,7 +207,7 @@ public final class InfoView extends View implements LinkListener {
           }
           err.add(split[i]);
         }
-      } else if(line.startsWith(STACK_TRACE_C)) {
+      } else if(line.startsWith(STACK_TRACE + COL)) {
         while(i + 1 < split.length && !split[++i].isEmpty()) {
           final TokenBuilder tb = new TokenBuilder();
           final String sp = split[i].replaceAll("<.*", "");
@@ -242,15 +240,15 @@ public final class InfoView extends View implements LinkListener {
     }
 
     add(COMMAND + COL, command);
-    add(ERROR_C, err);
-    add(STACK_TRACE_C, stack);
-    add(EVALUATING + COLS, eval);
-    add(COMPILING + COLS, comp);
-    add(QUERY + COLS, origqu);
-    add(OPTIMIZED_QUERY + COLS, optqu);
-    add(RESULT + COLS, result);
-    add(TIMING + COLS, timings);
-    add(QUERY_PLAN + COLS, plan);
+    add(Text.ERROR + COL, err);
+    add(STACK_TRACE + COL, stack);
+    add(EVALUATING + COL, eval);
+    add(COMPILING + COL, comp);
+    add(QUERY + COL, origqu);
+    add(OPTIMIZED_QUERY + COL, optqu);
+    add(RESULT + COL, result);
+    add(TIMING + COL, timings);
+    add(QUERY_PLAN + COL, plan);
     if(inf != null) text.add(inf).nline();
     changed = true;
     clear = reset;
@@ -278,7 +276,7 @@ public final class InfoView extends View implements LinkListener {
 
   @Override
   public void linkClicked(final String link) {
-    gui.editor.error(link + COL, true);
+    gui.editor.jump(link);
   }
 
   @Override
@@ -310,14 +308,14 @@ public final class InfoView extends View implements LinkListener {
     final int l = stat.size();
     if(l == 0) return;
 
-    final int fs = fontSize;
+    final int fs = GUIConstants.fontSize;
     h = label.getHeight() + 4;
     w = (int) (getWidth() * .98 - fs / 2 - label.getWidth());
     bw = fs * 2 + w / 10;
     bs = bw / (l - 1);
 
     // find maximum value
-    int m = 0;
+    int m = 1;
     for(int i = 0; i < l - 1; ++i) m = Math.max(m, stat.get(i));
 
     // draw focused bar
@@ -327,17 +325,17 @@ public final class InfoView extends View implements LinkListener {
     for(int i = 0; i < l - 1; ++i) {
       if(i != focus) continue;
       final int bx = w - bw + bs * i;
-      g.setColor(color3);
+      g.setColor(GUIConstants.color3);
       g.fillRect(bx, by, bs + 1, bh);
     }
 
     // draw all bars
     for(int i = 0; i < l - 1; ++i) {
       final int bx = w - bw + bs * i;
-      g.setColor(color((i == focus ? 3 : 2) + i * 2));
+      g.setColor(GUIConstants.color((i == focus ? 3 : 2) + i * 2));
       final int p = Math.max(1, stat.get(i) * bh / m);
       g.fillRect(bx, by + bh - p, bs, p);
-      g.setColor(color(8));
+      g.setColor(GUIConstants.color(8));
       g.drawRect(bx, by + bh - p, bs, p - 1);
     }
   }

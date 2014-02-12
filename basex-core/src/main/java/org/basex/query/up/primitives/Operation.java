@@ -7,12 +7,12 @@ import org.basex.util.*;
 /**
  * Abstract class for update operations.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public abstract class Operation {
   /** Input info. */
-  protected final InputInfo info;
+  final InputInfo info;
   /** Target data reference. */
   public Data data;
 
@@ -21,7 +21,7 @@ public abstract class Operation {
    * @param d target data reference
    * @param ii input info
    */
-  protected Operation(final Data d, final InputInfo ii) {
+  Operation(final Data d, final InputInfo ii) {
     data = d;
     info = ii;
   }

@@ -1,7 +1,6 @@
 package org.basex.build;
 
 import static org.basex.core.Text.*;
-import static org.basex.data.DataText.*;
 
 import java.io.*;
 import java.util.*;
@@ -9,8 +8,8 @@ import java.util.regex.*;
 import java.util.zip.*;
 
 import org.basex.core.*;
+import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
-import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -19,7 +18,7 @@ import org.basex.util.list.*;
  * This class recursively scans files and directories and parses all
  * relevant files.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DirParser extends Parser {
@@ -55,24 +54,24 @@ public final class DirParser extends Parser {
   /**
    * Constructor.
    * @param source source path
-   * @param pr database properties
+   * @param opts database options
    * @param path future database path
    */
-  public DirParser(final IO source, final Prop pr, final IOFile path) {
-    super(source, pr);
+  public DirParser(final IO source, final MainOptions opts, final IOFile path) {
+    super(source, opts);
     final String parent = source.dirPath();
     root = parent.endsWith("/") ? parent : parent + '/';
-    skipCorrupt = prop.is(Prop.SKIPCORRUPT);
-    archives = prop.is(Prop.ADDARCHIVES);
-    addRaw = prop.is(Prop.ADDRAW);
-    dtd = prop.is(Prop.DTD);
-    rawParser = prop.get(Prop.PARSER).toLowerCase(Locale.ENGLISH).equals(DataText.M_RAW);
+    skipCorrupt = options.get(MainOptions.SKIPCORRUPT);
+    archives = options.get(MainOptions.ADDARCHIVES);
+    addRaw = options.get(MainOptions.ADDRAW);
+    dtd = options.get(MainOptions.DTD);
+    rawParser = options.get(MainOptions.PARSER) == MainParser.RAW;
 
     filter = !source.isDir() && !source.isArchive() ? null :
-      Pattern.compile(IOFile.regex(pr.get(Prop.CREATEFILTER)));
-    // choose binary storage if (disk-based) database path is known and
+      Pattern.compile(IOFile.regex(opts.get(MainOptions.CREATEFILTER)));
+    // choose binary storage if disk-based database path is known and
     // if raw parser or "add raw" option were chosen
-    rawPath = path != null && (addRaw || rawParser) ? new IOFile(path, M_RAW) : null;
+    rawPath = path != null && (addRaw || rawParser) ? new IOFile(path, IO.RAW) : null;
   }
 
   @Override
@@ -168,7 +167,7 @@ public final class DirParser extends Parser {
               in = new IOContent(src.read());
               in.name(src.name());
             }
-            parser = Parser.singleParser(in, prop, targ);
+            parser = Parser.singleParser(in, options, targ);
             MemBuilder.build("", parser);
           } catch(final IOException ex) {
             Util.debug(ex);
@@ -179,7 +178,7 @@ public final class DirParser extends Parser {
 
         // parse file
         if(ok) {
-          parser = Parser.singleParser(in, prop, targ);
+          parser = Parser.singleParser(in, options, targ);
           parser.parse(b);
         }
         parser = null;

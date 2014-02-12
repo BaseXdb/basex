@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * This class allows positional read and write access to a database file.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DataAccess {
@@ -25,12 +25,19 @@ public final class DataAccess {
 
   /**
    * Constructor, initializing the file reader.
-   * @param f the file to be read
+   * @param fl the file to be read
    * @throws IOException I/O Exception
    */
-  public DataAccess(final IOFile f) throws IOException {
-    file = new RandomAccessFile(f.file(), "rw");
-    len = file.length();
+  public DataAccess(final IOFile fl) throws IOException {
+    RandomAccessFile f = null;
+    try {
+      f = new RandomAccessFile(fl.file(), "rw");
+      len = f.length();
+    } catch(final IOException ex) {
+      if(f != null) f.close();
+      throw ex;
+    }
+    file = f;
     cursor(0);
   }
 
@@ -92,6 +99,15 @@ public final class DataAccess {
    */
   public boolean more() {
     return cursor() < len;
+  }
+
+  /**
+   * Reads the next byte.
+   * @return next byte
+   */
+  public int read() {
+    final Buffer bf = buffer(off == IO.BLOCKSIZE);
+    return bf.data[off++] & 0xFF;
   }
 
   /**
@@ -253,6 +269,18 @@ public final class DataAccess {
   }
 
   /**
+   * Writes the next byte.
+   * @param b byte to be written
+   */
+  public void write(final int b) {
+    final Buffer bf = buffer(off == IO.BLOCKSIZE);
+    bf.dirty = true;
+    bf.data[off++] = (byte) b;
+    final long nl = bf.pos + off;
+    if(nl > len) length(nl);
+  }
+
+  /**
    * Writes a 5-byte value to the specified position.
    * @param p position in the file
    * @param v value to be written
@@ -335,7 +363,7 @@ public final class DataAccess {
    * @param offset offset in the buffer where the token starts
    * @param length token length
    */
-  public void writeToken(final byte[] buf, final int offset, final int length) {
+  void writeToken(final byte[] buf, final int offset, final int length) {
     writeNum(length);
 
     final int last = offset + length;
@@ -425,35 +453,12 @@ public final class DataAccess {
   }
 
   /**
-   * Reads the next byte.
-   * @return next byte
-   */
-  private int read() {
-    final Buffer bf = buffer(off == IO.BLOCKSIZE);
-    return bf.data[off++] & 0xFF;
-  }
-
-  /**
-   * Writes the next byte.
-   * @param b byte to be written
-   */
-  private void write(final int b) {
-    final Buffer bf = buffer(off == IO.BLOCKSIZE);
-    bf.dirty = true;
-    bf.data[off++] = (byte) b;
-    final long nl = bf.pos + off;
-    if(nl > len) length(nl);
-  }
-
-  /**
    * Returns the current or next buffer.
    * @param next next block
    * @return buffer
    */
   private Buffer buffer(final boolean next) {
-    if(next) {
-      cursor(bm.current().pos + IO.BLOCKSIZE);
-    }
+    if(next) cursor(bm.current().pos + IO.BLOCKSIZE);
     return bm.current();
   }
 }

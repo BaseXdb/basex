@@ -16,10 +16,10 @@ import org.basex.util.*;
 /**
  * Parses the jar descriptors and performs schema checks.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  */
-public final class JarParser {
+final class JarParser {
   /** Context. */
   private final Context context;
   /** Input info. */
@@ -30,7 +30,7 @@ public final class JarParser {
    * @param ctx database context
    * @param ii input info
    */
-  public JarParser(final Context ctx, final InputInfo ii) {
+  JarParser(final Context ctx, final InputInfo ii) {
     context = ctx;
     info = ii;
   }
@@ -44,7 +44,7 @@ public final class JarParser {
   public JarDesc parse(final IO io) throws QueryException {
     final JarDesc desc = new JarDesc();
     try {
-      final ANode node = new DBNode(io, context.prop).children().next();
+      final ANode node = new DBNode(io, context.options).children().next();
       for(final ANode next : node.children()) {
         final QNm name = next.qname();
         // ignore namespace to improve compatibility
@@ -52,11 +52,11 @@ public final class JarParser {
         else if(eq(CLASS, name.local())) desc.classes.add(next.string());
         // [CG] Packaging: add warning if unknown elements are encountered
       }
-      if(desc.jars.isEmpty()) BXRE_JARDESC.thrw(info, NOJARS);
-      else if(desc.classes.isEmpty()) BXRE_JARDESC.thrw(info, NOCLASS);
+      if(desc.jars.isEmpty()) throw BXRE_JARDESC.get(info, NOJARS);
+      else if(desc.classes.isEmpty()) throw BXRE_JARDESC.get(info, NOCLASSES);
       return desc;
     } catch(final IOException ex) {
-      throw BXRE_JARFAIL.thrw(info, ex);
+      throw BXRE_JARFAIL.get(info, ex);
     }
   }
 }

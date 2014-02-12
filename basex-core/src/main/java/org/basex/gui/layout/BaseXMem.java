@@ -1,22 +1,24 @@
 package org.basex.gui.layout;
 
-import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 import java.awt.event.*;
 
+import org.basex.gui.dialog.*;
 import org.basex.util.*;
 
 /**
  * This component visualizes the current memory consumption.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class BaseXMem extends BaseXPanel {
   /** Default width of the memory status box. */
   private static final int DWIDTH = 70;
+  /** Dialog window with memory consumption. */
+  private static DialogMem mem;
 
   /**
    * Constructor.
@@ -36,8 +38,10 @@ public final class BaseXMem extends BaseXPanel {
     final Thread t = new Thread() {
       @Override
       public void run() {
-        repaint();
-        Performance.sleep(500);
+        while(true) {
+          repaint();
+          Performance.sleep(5000);
+        }
       }
     };
     t.setDaemon(true);
@@ -75,27 +79,17 @@ public final class BaseXMem extends BaseXPanel {
 
     // print current memory usage
     final FontMetrics fm = g.getFontMetrics();
-    final String mem = Performance.format(used, true);
-    final int fw = (ww - fm.stringWidth(mem)) / 2;
+    final String sz = Performance.format(used, true);
+    final int fw = (ww - fm.stringWidth(sz)) / 2;
     final int h = fm.getHeight() - 3;
     g.setColor(full ? colormark3 : DGRAY);
-    g.drawString(mem, fw, h);
+    g.drawString(sz, fw, h);
   }
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    Performance.gc(3);
+    if(mem == null) mem = new DialogMem(gui);
+    else mem.setVisible(true);
     repaint();
-
-    final Runtime rt = Runtime.getRuntime();
-    final long max = rt.maxMemory();
-    final long total = rt.totalMemory();
-    final long used = total - rt.freeMemory();
-
-    final String inf = TOTAL_MEM_C + Performance.format(max, true) + NL
-        + RESERVED_MEM_C + Performance.format(total, true) + NL + MEMUSED_C
-        + Performance.format(used, true) + NL + NL + H_USED_MEM;
-
-    BaseXDialog.info(gui, inf);
   }
 }

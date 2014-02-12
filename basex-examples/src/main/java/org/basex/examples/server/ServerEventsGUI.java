@@ -16,11 +16,11 @@ import org.basex.util.*;
 /**
  * This class tests the event mechanism with a gui.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  */
 public final class ServerEventsGUI extends JFrame {
   /** Name of test database and user. */
-  static final String NAME = Util.name(ServerEventsGUI.class);
+  static final String NAME = Util.className(ServerEventsGUI.class);
   /** Number of clients. */
   static final int CLIENTS = 2;
   /** Color. */
@@ -49,7 +49,7 @@ public final class ServerEventsGUI extends JFrame {
     server = new BaseXServer("-z");
 
     // initialization
-    final ClientSession cs = new ClientSession(server.context, ADMIN, ADMIN);
+    final ClientSession cs = new ClientSession(server.context, S_ADMIN, S_ADMIN);
     cs.execute("create event " + NAME);
     cs.execute("create db " + NAME + " <Application><Background/></Application>");
     cs.close();
@@ -101,7 +101,7 @@ public final class ServerEventsGUI extends JFrame {
     };
 
     // create session, open database and register event watcher
-    session = new ClientSession(server.context, ADMIN, ADMIN);
+    session = new ClientSession(server.context, S_ADMIN, S_ADMIN);
     session.execute("open " + NAME);
     session.watch(NAME, en);
 
@@ -148,7 +148,7 @@ public final class ServerEventsGUI extends JFrame {
       if(--open == 0) {
         // no sessions left: drop event and database and stop server
         final ClientSession css =
-          new ClientSession(server.context, ADMIN, ADMIN);
+          new ClientSession(server.context, S_ADMIN, S_ADMIN);
         css.execute("drop event " + NAME);
         css.execute("drop db " + NAME);
         css.close();

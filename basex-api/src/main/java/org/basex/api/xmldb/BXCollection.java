@@ -21,7 +21,7 @@ import org.xmldb.api.modules.*;
 /**
  * Implementation of the Collection Interface for the XMLDB:API.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class BXCollection implements Collection, BXXMLDBText {
@@ -44,7 +44,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     ctx = db.ctx;
     try {
       ctx.openDB(open ? Open.open(name, ctx) :
-        CreateDB.create(name, Parser.emptyParser(ctx.prop), ctx));
+        CreateDB.create(name, Parser.emptyParser(ctx.options), ctx));
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }
@@ -67,7 +67,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   @Override
   public Service getService(final String nm, final String ver) throws XMLDBException {
     check();
-    if(ver.equals("1.0")) {
+    if("1.0".equals(ver)) {
       if(Token.eq(nm, BXQueryService.XPATH, BXQueryService.XQUERY))
         return new BXQueryService(this, nm, ver);
       if(nm.equals(BXCollectionManagementService.MANAGEMENT))
@@ -118,10 +118,9 @@ public final class BXCollection implements Collection, BXXMLDBText {
   }
 
   @Override
-  public BXXMLResource createResource(final String id, final String type)
-      throws XMLDBException {
-
+  public BXXMLResource createResource(final String id, final String type) throws XMLDBException {
     check();
+
     if(type.equals(XMLResource.RESOURCE_TYPE)) {
       // create new id, if necessary
       final String uid = id == null || id.isEmpty() ? createId() : id;
@@ -175,8 +174,8 @@ public final class BXCollection implements Collection, BXXMLDBText {
     final Data md;
     try {
       final Parser p = cont instanceof Document ?
-        new DOMWrapper((Document) cont, id, ctx.prop) :
-        Parser.singleParser(new IOContent((byte[]) cont, id), ctx.prop, "");
+        new DOMWrapper((Document) cont, id, ctx.options) :
+        Parser.singleParser(new IOContent((byte[]) cont, id), ctx.options, "");
       md = MemBuilder.build(id, p);
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.INVALID_RESOURCE, ex.getMessage());

@@ -10,19 +10,19 @@ import org.basex.util.*;
 /**
  * An XQuery function call, either static or dynamic.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public abstract class FuncCall extends Arr {
   /** Tail-call flag. */
-  protected boolean tailCall;
+  boolean tailCall;
 
   /**
    * Constructor.
    * @param ii input info
    * @param e sub-expressions
    */
-  protected FuncCall(final InputInfo ii, final Expr[] e) {
+  FuncCall(final InputInfo ii, final Expr[] e) {
     super(ii, e);
   }
 
@@ -43,8 +43,7 @@ public abstract class FuncCall extends Arr {
   abstract Value[] evalArgs(final QueryContext ctx) throws QueryException;
 
   @Override
-  public final Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public final Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return (Item) invoke(evalFunc(ctx), evalArgs(ctx), true, tailCall, ctx, info);
   }
 
@@ -59,7 +58,8 @@ public abstract class FuncCall extends Arr {
   }
 
   @Override
-  public final void markTailCalls() {
+  public final void markTailCalls(final QueryContext ctx) {
+    if (ctx != null) ctx.compInfo(QueryText.OPTTCE, this);
     tailCall = true;
   }
 
@@ -74,9 +74,8 @@ public abstract class FuncCall extends Arr {
    * @return result of the function call
    * @throws QueryException query exception
    */
-  private static Value invoke(final XQFunction fun, final Value[] arg,
-      final boolean itm, final boolean tc, final QueryContext ctx, final InputInfo ii)
-          throws QueryException {
+  private static Value invoke(final XQFunction fun, final Value[] arg, final boolean itm,
+      final boolean tc, final QueryContext ctx, final InputInfo ii) throws QueryException {
 
     final int calls = ctx.tailCalls, max = ctx.maxCalls;
     if(tc && max >= 0 && ++ctx.tailCalls >= max) {
@@ -92,11 +91,10 @@ public abstract class FuncCall extends Arr {
       // non-tail-calls have to catch the continuations and resume from there
       XQFunction func = fun;
       Value[] args = arg;
-      for(;;) {
+      while(true) {
         try {
-          return itm ? func.invItem(ctx, ii, args)
-                     : func.invValue(ctx, ii, args);
-        } catch(final Continuation c) {
+          return itm ? func.invItem(ctx, ii, args) : func.invValue(ctx, ii, args);
+        } catch (final Continuation c) {
           func = c.func;
           args = c.args;
           ctx.tailCalls = calls;

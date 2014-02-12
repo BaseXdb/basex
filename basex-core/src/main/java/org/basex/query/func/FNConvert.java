@@ -7,6 +7,7 @@ import java.io.*;
 import java.math.*;
 import java.nio.*;
 import java.nio.charset.*;
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.io.in.*;
@@ -23,18 +24,20 @@ import org.basex.util.list.*;
 /**
  * Functions for converting data to other formats.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNConvert extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNConvert(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNConvert(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -107,11 +110,9 @@ public final class FNConvert extends StandardFunc {
    * @return string representation of the given number
    * @throws QueryException query exception
    */
-  private Str integerToBase(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  private Str integerToBase(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final long num = checkItr(expr[0], ctx), base = checkItr(expr[1], ctx);
-    if(base < 2 || base > 36) INVBASE.thrw(ii, base);
+    if(base < 2 || base > 36) throw INVBASE.get(ii, base);
 
     // use fast variant for powers of two
     for(int i = 1, p = 2; i < 6; i++, p <<= 1)
@@ -147,19 +148,17 @@ public final class FNConvert extends StandardFunc {
    * @return read integer
    * @throws QueryException exception
    */
-  private Int integerFromBase(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  private Int integerFromBase(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final byte[] str = checkStr(expr[0], ctx);
     final long base = checkItr(expr[1], ctx);
-    if(base < 2 || base > 36) INVBASE.thrw(ii, base);
+    if(base < 2 || base > 36) throw INVBASE.get(ii, base);
 
     long res = 0;
     for(final byte b : str) {
       final int num = b <= '9' ? b - 0x30 : (b & 0xDF) - 0x37;
       if(!(b >= '0' && b <= '9' || b >= 'a' && b <= 'z' ||
           b >= 'A' && b <= 'Z') || num >= base)
-        INVDIG.thrw(ii, base, (char) (b & 0xff));
+        throw INVDIG.get(ii, base, (char) (b & 0xff));
 
       res = res * base + num;
     }
@@ -177,7 +176,7 @@ public final class FNConvert extends StandardFunc {
     try {
       return BytSeq.get(checkItem(expr[0], ctx).input(info).content());
     } catch(final IOException ex) {
-      throw BXCO_STRING.thrw(info, ex);
+      throw BXCO_STRING.get(info, ex);
     }
   }
 
@@ -220,7 +219,7 @@ public final class FNConvert extends StandardFunc {
   private Int dayTimeToInteger(final QueryContext ctx) throws QueryException {
     final DTDur dur = (DTDur) checkType(checkItem(expr[0], ctx), AtomType.DTD);
     final BigDecimal ms = dur.sec.multiply(BigDecimal.valueOf(1000));
-    if(ms.compareTo(ADateDur.BDMAXLONG) > 0) INTRANGE.thrw(info, dur);
+    if(ms.compareTo(ADateDur.BDMAXLONG) > 0) throw INTRANGE.get(info, dur);
     return Int.get(ms.longValue());
   }
 
@@ -237,7 +236,7 @@ public final class FNConvert extends StandardFunc {
     try {
       return Str.get(toString(bin.input(info), enc, ctx));
     } catch(final IOException ex) {
-      throw BXCO_STRING.thrw(info, ex);
+      throw BXCO_STRING.get(info, ex);
     }
   }
 
@@ -249,12 +248,23 @@ public final class FNConvert extends StandardFunc {
    * @return resulting value
    * @throws IOException I/O exception
    */
-  public static byte[] toString(final InputStream is, final String enc,
-      final QueryContext ctx) throws IOException {
+  public static byte[] toString(final InputStream is, final String enc, final QueryContext ctx)
+      throws IOException {
+    return toString(is, enc, ctx.context.options.get(MainOptions.CHECKSTRINGS));
+  }
 
-    final boolean val = ctx.context.prop.is(Prop.CHECKSTRINGS);
+  /**
+   * Converts the specified input to a string in the specified encoding.
+   * @param is input stream
+   * @param enc encoding
+   * @param val validate string
+   * @return resulting value
+   * @throws IOException I/O exception
+   */
+  public static byte[] toString(final InputStream is, final String enc, final boolean val)
+      throws IOException {
     try {
-      return new NewlineInput(is).encoding(enc).validate(val).content();
+      return new TextInput(is).encoding(enc).validate(val).content();
     } finally {
       is.close();
     }
@@ -269,14 +279,27 @@ public final class FNConvert extends StandardFunc {
   private byte[] stringToBinary(final QueryContext ctx) throws QueryException {
     final byte[] in = checkStr(expr[0], ctx);
     final String enc = encoding(1, BXCO_ENCODING, ctx);
-    if(enc == null || enc == Token.UTF8) return in;
+    if(enc == null || enc == UTF8) return in;
     try {
-      final CharsetEncoder ce = Charset.forName(enc).newEncoder();
-      final CharBuffer cb = CharBuffer.wrap(Token.string(in));
-      return ce.encode(cb).array();
+      return toBinary(in, enc);
     } catch(final CharacterCodingException ex) {
-      throw BXCO_BASE64.thrw(info);
+      throw BXCO_BASE64.get(info);
     }
+  }
+
+  /**
+   * Converts the first argument from a string to a byte array.
+   * @param in input string
+   * @param enc encoding
+   * @return resulting value
+   * @throws CharacterCodingException character coding exception
+   */
+  public static byte[] toBinary(final byte[] in, final String enc) throws CharacterCodingException {
+    if(enc == UTF8) return in;
+    final ByteBuffer bb = Charset.forName(enc).newEncoder().encode(CharBuffer.wrap(string(in)));
+    final int il = bb.limit();
+    final byte[] tmp = bb.array();
+    return tmp.length == il  ? tmp : Arrays.copyOf(tmp, il);
   }
 
   /**
@@ -294,7 +317,7 @@ public final class FNConvert extends StandardFunc {
     final Iter ir = v.iter();
     final ByteList bl = new ByteList(Math.max(Array.CAPACITY, (int) v.size()));
     for(Item it; (it = ir.next()) != null;) {
-      bl.add((int) ((Int) checkType(it, AtomType.BYT)).itr());
+      bl.add((int) ((ANum) checkType(it, AtomType.BYT)).itr());
     }
     return bl.toArray();
   }

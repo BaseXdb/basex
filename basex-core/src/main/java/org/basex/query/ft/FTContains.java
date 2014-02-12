@@ -15,16 +15,16 @@ import org.basex.util.ft.*;
 /**
  * Abstract FTContains expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class FTContains extends ParseExpr {
+  /** Full-text parser. */
+  final FTLexer lex;
   /** Expression. */
   Expr expr;
   /** Full-text expression. */
   FTExpr ftexpr;
-  /** Full-text parser. */
-  FTLexer lex;
 
   /**
    * Constructor.
@@ -32,11 +32,12 @@ public abstract class FTContains extends ParseExpr {
    * @param fte full-text expression
    * @param ii input info
    */
-  public FTContains(final Expr e, final FTExpr fte, final InputInfo ii) {
+  protected FTContains(final Expr e, final FTExpr fte, final InputInfo ii) {
     super(ii);
     expr = e;
     ftexpr = fte;
     type = SeqType.BLN;
+    lex = new FTLexer(new FTOpt());
   }
 
   @Override
@@ -45,11 +46,9 @@ public abstract class FTContains extends ParseExpr {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public final Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     expr = expr.compile(ctx, scp).addText(ctx);
     ftexpr = ftexpr.compile(ctx, scp);
-    if(lex == null) lex = new FTLexer(new FTOpt());
     return expr.isEmpty() ? optPre(Bln.FALSE, ctx) : this;
   }
 
@@ -69,13 +68,13 @@ public abstract class FTContains extends ParseExpr {
   }
 
   @Override
-  public final Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public final Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
+
     final Expr ex = expr.inline(ctx, scp, v, e);
     if(ex != null) expr = ex;
     final FTExpr fte = ftexpr.inline(ctx, scp, v, e);
     if(fte != null) ftexpr = fte;
-
     return ex != null || fte != null ? optimize(ctx, scp) : null;
   }
 

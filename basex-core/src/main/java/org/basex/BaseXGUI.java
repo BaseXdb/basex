@@ -6,11 +6,13 @@ import java.awt.*;
 import java.util.*;
 
 import javax.swing.*;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.gui.*;
 import org.basex.gui.dialog.*;
+import org.basex.gui.layout.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -18,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * This is the starter class for the graphical frontend.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class BaseXGUI {
@@ -50,7 +52,7 @@ public final class BaseXGUI {
   public BaseXGUI(final String... args) throws BaseXException {
     parseArguments(args);
 
-    // set mac specific properties
+    // set Mac-specific properties
     if(Prop.MAC) {
       try {
         osxGUI = new GUIMacOSX();
@@ -59,41 +61,37 @@ public final class BaseXGUI {
       }
     }
 
-    // read properties
-    final GUIProp gprop = new GUIProp();
+    // read options
+    final GUIOptions gopts = new GUIOptions();
     // cache results to pass them on to all visualizations
-    context.prop.set(Prop.CACHEQUERY, true);
+    context.options.set(MainOptions.CACHEQUERY, true);
     // reduce number of results to save memory
-    context.prop.set(Prop.MAXHITS, gprop.num(GUIProp.MAXHITS));
+    context.options.set(MainOptions.MAXHITS, gopts.get(GUIOptions.MAXHITS));
 
     // initialize fonts and colors
-    GUIConstants.init(gprop);
+    GUIConstants.init(gopts);
 
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
         // initialize look and feel
-        init(gprop);
+        init(gopts);
         // open main window
-        final GUI gui = new GUI(context, gprop);
+        final GUI gui = new GUI(context, gopts);
         if(osxGUI != null) osxGUI.init(gui);
 
         // open specified document or database
-        boolean xml = false;
         for(final String file : files) {
           if(file.matches("^.*\\" + IO.BASEXSUFFIX + "[^.]*$")) continue;
 
           final IOFile io = new IOFile(file);
-          boolean xq = file.endsWith(IO.BXSSUFFIX);
-          for(final String suf : IO.XQSUFFIXES) xq |= file.endsWith(suf);
-          if(xq) {
-            gui.editor.open(io, true);
-          } else if(!xml) {
-            // only parse first xml file
-            gprop.set(GUIProp.INPUTPATH, io.path());
-            gprop.set(GUIProp.DBNAME, io.dbname());
+          final boolean xml = file.endsWith(IO.XMLSUFFIX);
+          if(xml && BaseXDialog.confirm(gui, Util.info(Text.CREATE_DB_FILE, io))) {
+            gopts.set(GUIOptions.INPUTPATH, io.path());
+            gopts.set(GUIOptions.DBNAME, io.dbname());
             DialogProgress.execute(gui, new Check(file));
-            xml = true;
+          } else {
+            gui.editor.open(io);
           }
         }
       }
@@ -110,16 +108,18 @@ public final class BaseXGUI {
 
   /**
    * Initializes the GUI.
-   * @param prop gui properties
+   * @param opts gui options
    */
-  static void init(final GUIProp prop) {
+  private static void init(final GUIOptions opts) {
+    // added to handle possible JDK 1.6 bug (thanks to Makoto Yui)
+    final LookAndFeelInfo[] lafis = UIManager.getInstalledLookAndFeels();
+
+    final String laf = opts.get(GUIOptions.LOOKANDFEEL);
     try {
-      // added to handle possible JDK 1.6 bug (thanks to Makoto Yui)
-      UIManager.getInstalledLookAndFeels();
       // refresh views when windows are resized
       Toolkit.getDefaultToolkit().setDynamicLayout(true);
       // set specified look & feel
-      if(prop.is(GUIProp.JAVALOOK)) {
+      if(laf.equals("Metal")) {
         // use non-bold fonts in Java's look & feel
         final UIDefaults def = UIManager.getDefaults();
         final Enumeration<?> en = def.keys();
@@ -128,8 +128,15 @@ public final class BaseXGUI {
           final Object v = def.get(k);
           if(v instanceof Font) def.put(k, ((Font) v).deriveFont(Font.PLAIN));
         }
-      } else {
+      } else if(laf.isEmpty()) {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      } else {
+        for(final LookAndFeelInfo lafi : lafis) {
+          if(lafi.getName().equals(laf)) {
+            UIManager.setLookAndFeel(lafi.getClassName());
+            break;
+          }
+        }
       }
     } catch(final Exception ex) {
       Util.stack(ex);
@@ -142,9 +149,9 @@ public final class BaseXGUI {
    * @throws BaseXException database exception
    */
   private void parseArguments(final String[] args) throws BaseXException {
-    final Args arg = new Args(args, this, GUIINFO, Util.info(CONSOLE, GUIMODE));
+    final Args arg = new Args(args, this, S_GUIINFO, Util.info(S_CONSOLE, S_GUI));
     while(arg.more()) {
-      if(arg.dash()) arg.usage();
+      if(arg.dash()) throw arg.usage();
       files.add(arg.string());
     }
   }

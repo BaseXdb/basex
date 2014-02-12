@@ -17,7 +17,7 @@ import org.basex.util.list.*;
  * This class stores the path summary of a database.
  * It contains all unique location paths.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class PathSummary implements Index {
@@ -104,9 +104,7 @@ public final class PathSummary implements Index {
    * @param v value
    * @param md meta data
    */
-  public void put(final int n, final byte k, final int l, final byte[] v,
-      final MetaData md) {
-
+  public void put(final int n, final byte k, final int l, final byte[] v, final MetaData md) {
     if(l == 0) {
       if(v != null) root.stats.add(v, md);
       root.stats.count++;
@@ -147,9 +145,7 @@ public final class PathSummary implements Index {
    * @param desc if false, return only children
    * @return descendant nodes
    */
-  public static ArrayList<PathNode> desc(final ArrayList<PathNode> in,
-      final boolean desc) {
-
+  public static ArrayList<PathNode> desc(final ArrayList<PathNode> in, final boolean desc) {
     final ArrayList<PathNode> out = new ArrayList<PathNode>();
     for(final PathNode n : in) {
       for(final PathNode c : n.ch) {
@@ -244,17 +240,17 @@ public final class PathSummary implements Index {
 
   @Override
   public IndexIterator iter(final IndexToken token) {
-    throw Util.notexpected();
+    throw Util.notExpected();
   }
 
   @Override
-  public int count(final IndexToken token) {
-    throw Util.notexpected();
+  public int costs(final IndexToken token) {
+    throw Util.notExpected();
   }
 
   @Override
   public EntryIterator entries(final IndexEntries entries) {
-    throw Util.notexpected();
+    throw Util.notExpected();
   }
 
   @Override

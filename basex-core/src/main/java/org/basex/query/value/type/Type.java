@@ -8,12 +8,12 @@ import org.basex.util.*;
 /**
  * XQuery data types.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public interface Type {
   /** Type IDs for client/server communication. */
-  public static enum ID {
+  enum ID {
     // function types
     /** function(*).              */ FUN(7),
 
@@ -96,7 +96,7 @@ public interface Type {
      * Constructor.
      * @param i type id
      */
-    private ID(final int i) {
+    ID(final int i) {
       id = (byte) i;
     }
 
@@ -136,33 +136,37 @@ public interface Type {
    * Casts the specified item to the XQuery data type.
    * @param it item to be converted
    * @param ctx query context
+   * @param sc static context
    * @param ii input info
    * @return new item
    * @throws QueryException query exception
    */
-  Value cast(final Item it, final QueryContext ctx, final InputInfo ii)
-      throws QueryException;
+  Value cast(final Item it, final QueryContext ctx, final StaticContext sc,
+      final InputInfo ii) throws QueryException;
 
   /**
    * Casts the specified Java object to the XQuery data type.
    * @param o Java object
-   * @param ctx TODO
+   * @param ctx query context
+   * @param sc static context
    * @param ii input info
    * @return new item
    * @throws QueryException query exception
    */
-  Value cast(final Object o, QueryContext ctx, final InputInfo ii) throws QueryException;
+  Value cast(final Object o, QueryContext ctx, final StaticContext sc,
+      final InputInfo ii) throws QueryException;
 
   /**
    * Casts the specified string to the XQuery data type.
    * @param s string object
-   * @param ctx TODO
+   * @param ctx query context
+   * @param sc static context
    * @param ii input info
    * @return new item
    * @throws QueryException query exception
    */
-  Value castString(final String s, QueryContext ctx, final InputInfo ii)
-      throws QueryException;
+  Value castString(final String s, QueryContext ctx, final StaticContext sc,
+      final InputInfo ii) throws QueryException;
 
   /**
    * Returns the sequence type of this data type.

@@ -9,14 +9,14 @@ import org.basex.io.*;
  * This abstract class defines the methods for accessing the
  * database table representation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class TableAccess {
   /** Meta data. */
-  protected final MetaData meta;
+  final MetaData meta;
   /** Dirty index flag. */
-  protected boolean dirty;
+  boolean dirty;
 
   /**
    * Constructor.
@@ -116,7 +116,7 @@ public abstract class TableAccess {
    * @param sub size of the subtree that is replaced
    */
   public final void replace(final int pre, final byte[] entries, final int sub) {
-    dirty = true;
+    dirty();
     final int nsize = entries.length >>> IO.NODEPOWER;
     final int diff = sub - nsize;
     final int last = diff <= 0 ? pre + nsize - Math.abs(diff) : pre + nsize;
@@ -140,10 +140,15 @@ public abstract class TableAccess {
    * @param pre pre value
    * @param entries array of bytes containing the entries to insert
    */
-  public final void set(final int pre, final byte[] entries) {
-    dirty = true;
+  final void set(final int pre, final byte[] entries) {
+    dirty();
     copy(entries, pre, pre + (entries.length >>> IO.NODEPOWER));
   }
+
+  /**
+   * Marks the data structures as dirty.
+   */
+  protected abstract void dirty();
 
   /**
    * Copies the specified values into the database.

@@ -2,14 +2,13 @@ package org.basex.query.up.primitives;
 
 import org.basex.core.*;
 import org.basex.data.*;
-import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
 
 /**
  * Update primitive for the {@link Function#_DB_FLUSH} function.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DBFlush extends BasicOperation {
@@ -27,11 +26,11 @@ public final class DBFlush extends BasicOperation {
 
   @Override
   public void apply() {
-    final Prop prop = data.meta.prop;
-    if(prop.is(Prop.AUTOFLUSH)) return;
-    prop.set(Prop.AUTOFLUSH, true);
+    final MainOptions opts = data.meta.options;
+    if(opts.get(MainOptions.AUTOFLUSH)) return;
+    opts.set(MainOptions.AUTOFLUSH, true);
     data.finishUpdate();
-    prop.set(Prop.AUTOFLUSH, false);
+    opts.set(MainOptions.AUTOFLUSH, false);
   }
 
   @Override
@@ -40,5 +39,5 @@ public final class DBFlush extends BasicOperation {
   }
 
   @Override
-  public void prepare(final MemData tmp) throws QueryException { }
+  public void prepare(final MemData tmp) { }
 }

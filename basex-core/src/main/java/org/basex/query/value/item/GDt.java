@@ -14,7 +14,7 @@ import org.basex.util.*;
  * Simple date item, used for {@code xs:gYearMonth}, {@code xs:gYear},
  * {@code xs:gMonthDay}, {@code xs:gDay} and {@code xs:gMonth}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class GDt extends ADate {
@@ -69,7 +69,7 @@ public final class GDt extends ADate {
       yea = toLong(mt.group(1), false, ii);
       // +1 is added to BC values to simplify computations
       if(yea < 0) yea++;
-      if(yea < MIN_YEAR || yea >= MAX_YEAR) DATERANGE.thrw(ii, type, d);
+      if(yea < MIN_YEAR || yea >= MAX_YEAR) throw DATERANGE.get(ii, type, chop(d));
     }
     if(i > 0 && i < 4) {
       mon = (byte) (Token.toLong(mt.group(i == 1 ? 3 : 1)) - 1);
@@ -90,29 +90,27 @@ public final class GDt extends ADate {
    */
   private static int type(final Type type) {
     for(int t = 0; t < TYPES.length; ++t) if(TYPES[t] == type) return t;
-    throw Util.notexpected();
+    throw Util.notExpected();
   }
 
   @Override
-  public void timeZone(final DTDur tz, final boolean d, final InputInfo ii)
-      throws QueryException {
-    Util.notexpected();
+  public void timeZone(final DTDur tz, final boolean d, final InputInfo ii) {
+    throw Util.notExpected();
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    throw Err.diff(ii, it, this);
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
+    throw diffError(ii, it, this);
   }
 
   @Override
   public byte[] string(final InputInfo ii) {
     final TokenBuilder tb = new TokenBuilder();
-    if(yea != Long.MAX_VALUE) {
+    if(yea == Long.MAX_VALUE) {
+      tb.add('-');
+    } else {
       if(yea <= 0) tb.add('-');
       prefix(tb, Math.abs(yea()), 4);
-    } else {
-      tb.add('-');
     }
     if(mon >= 0 || day >= 0) tb.add('-');
     if(mon >= 0) prefix(tb, mon + 1, 2);

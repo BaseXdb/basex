@@ -1,10 +1,11 @@
 package org.basex.query.func;
 
+import static org.basex.query.util.Err.*;
+
 import java.math.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -12,18 +13,19 @@ import org.basex.util.*;
 /**
  * Numeric functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNNum extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNNum(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNNum(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -32,7 +34,7 @@ public final class FNNum extends StandardFunc {
     if(it == null) return null;
 
     final Type ip = it.type;
-    if(!ip.isNumberOrUntyped()) Err.number(this, it);
+    if(!ip.isNumberOrUntyped()) throw numberError(this, it);
     final double d = it.dbl(info);
     switch(sig) {
       case ABS:                return abs(it, info);
@@ -53,8 +55,8 @@ public final class FNNum extends StandardFunc {
    * @return absolute item
    * @throws QueryException query exception
    */
-  private Item rnd(final Item it, final double d, final boolean h2e,
-      final QueryContext ctx) throws QueryException {
+  private Item rnd(final Item it, final double d, final boolean h2e, final QueryContext ctx)
+      throws QueryException {
 
     final long p = expr.length == 1 ? 0 : checkItr(expr[1], ctx);
     return round(it, d, p, h2e, info);
@@ -95,8 +97,8 @@ public final class FNNum extends StandardFunc {
    * @return absolute item
    * @throws QueryException query exception
    */
-  public static Item round(final Item it, final double d, final long prec,
-      final boolean h2e, final InputInfo ii) throws QueryException {
+  public static Item round(final Item it, final double d, final long prec, final boolean h2e,
+      final InputInfo ii) throws QueryException {
 
     // take care of untyped items
     final Item num = it.type.isUntyped() ? Dbl.get(it.dbl(ii)) : it;

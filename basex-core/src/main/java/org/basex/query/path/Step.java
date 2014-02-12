@@ -22,7 +22,7 @@ import org.basex.util.hash.*;
 /**
  * Abstract axis step expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Step extends Preds {
@@ -39,9 +39,7 @@ public abstract class Step extends Preds {
    * @param p predicates
    * @return step
    */
-  public static Step get(final InputInfo ii, final Axis a, final Test t,
-      final Expr... p) {
-
+  public static Step get(final InputInfo ii, final Axis a, final Test t, final Expr... p) {
     boolean num = false;
     for(final Expr pr : p) num |= pr.type().mayBeNumber() || pr.has(Flag.FCS);
     return num ? new AxisStep(ii, a, t, p) : new IterStep(ii, a, t, p);
@@ -62,9 +60,7 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
-
+  public final Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     // return empty sequence if test will yield no results
     if(!test.compile(ctx)) return Empty.SEQ;
 
@@ -89,7 +85,7 @@ public abstract class Step extends Preds {
       if(e != this || e instanceof IterStep) return e;
 
     } finally {
-      if(ct == NodeType.DOC) ctx.value.type = ct;
+      if(ct == NodeType.DOC) ctx.value.type = NodeType.DOC;
       ctx.leaf = leaf;
     }
 
@@ -97,7 +93,7 @@ public abstract class Step extends Preds {
     if(!has(Flag.FCS)) return new IterStep(info, axis, test, preds);
 
     // use iterator for simple numeric predicate
-    return this instanceof IterPosStep || !useIterator() ? this : new IterPosStep(this);
+    return this instanceof IterPosStep || !posIterator() ? this : new IterPosStep(this);
   }
 
   @Override
@@ -163,8 +159,8 @@ public abstract class Step extends Preds {
    * @param name name id, or {@code 0} as wildcard
    * @param kind node kind, or {@code -1} for all types
    */
-  private void add(final PathNode node, final ArrayList<PathNode> nodes,
-      final int name, final int kind) {
+  private void add(final PathNode node, final ArrayList<PathNode> nodes, final int name,
+      final int kind) {
 
     for(final PathNode n : node.ch) {
       if(axis == Axis.DESC || axis == Axis.DESCORSELF) {
@@ -200,11 +196,6 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return super.count(v);
-  }
-
-  @Override
   public Expr inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
     // leaf flag indicates that a context node can be replaced by a text() step
@@ -217,7 +208,7 @@ public abstract class Step extends Preds {
       if(ct == NodeType.DOC) ctx.value.type = NodeType.NOD;
       return super.inline(ctx, scp, v, e);
     } finally {
-      if(ct == NodeType.DOC) ctx.value.type = ct;
+      if(ct == NodeType.DOC) ctx.value.type = NodeType.DOC;
       ctx.leaf = leaf;
     }
   }

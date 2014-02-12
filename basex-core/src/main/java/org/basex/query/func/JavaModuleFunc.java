@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * Java function binding.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class JavaModuleFunc extends JavaMapping {
@@ -26,28 +26,38 @@ public final class JavaModuleFunc extends JavaMapping {
   private final Object module;
   /** Method to be called. */
   private final Method mth;
+  /** Method parameters. */
+  private final Class<?>[] params;
+  /** Indicates if function parameters are of (sub)class {@link Value}. */
+  private final boolean[] vTypes;
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param jm Java module
    * @param m Java method/field
    * @param a arguments
    */
-  JavaModuleFunc(final InputInfo ii, final Object jm, final Method m, final Expr[] a) {
-    super(ii, a);
+  JavaModuleFunc(final StaticContext sctx, final InputInfo ii, final Object jm, final Method m,
+      final Expr[] a) {
+    super(sctx, ii, a);
     module = jm;
     mth = m;
+    params = m.getParameterTypes();
+    vTypes = JavaFunc.values(params);
   }
 
   @Override
-  protected Object eval(final Value[] vals, final QueryContext ctx)
-      throws QueryException {
-
+  protected Object eval(final Value[] vals, final QueryContext ctx) throws QueryException {
     // assign context if module is inheriting {@link QueryModule}
-    if(module instanceof QueryModule) ((QueryModule) module).context = ctx;
+    if(module instanceof QueryModule) {
+      final QueryModule mod = (QueryModule) module;
+      mod.staticContext = sc;
+      mod.queryContext = ctx;
+    }
 
-    final Object[] args = JavaFunc.args(mth.getParameterTypes(), vals, true);
+    final Object[] args = JavaFunc.args(params, vTypes, vals, true);
     if(args != null) {
       try {
         return mth.invoke(module, args);
@@ -58,7 +68,7 @@ public final class JavaModuleFunc extends JavaMapping {
           e = e.getCause();
         }
         throw e instanceof QueryException ? ((QueryException) e).info(info) :
-          JAVAERR.thrw(info, e);
+          JAVAERR.get(info, e);
       }
     }
 
@@ -66,15 +76,15 @@ public final class JavaModuleFunc extends JavaMapping {
     final TokenBuilder expect = new TokenBuilder();
     for(final Class<?> c : mth.getParameterTypes()) {
       if(!expect.isEmpty()) expect.add(", ");
-      expect.add(c.getSimpleName());
+      expect.add(Util.className(c));
     }
-    throw JAVAMOD.thrw(info, mth.getName() + '(' + expect + ')',
+    throw JAVAMOD.get(info, mth.getName() + '(' + expect + ')',
         mth.getName() + '(' + foundArgs(vals) + ')');
   }
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new JavaModuleFunc(info, module, mth, copyAll(ctx, scp, vs, expr));
+    return new JavaModuleFunc(sc, info, module, mth, copyAll(ctx, scp, vs, expr));
   }
 
   @Override
@@ -92,7 +102,7 @@ public final class JavaModuleFunc extends JavaMapping {
    * @return string
    */
   private String name() {
-    return module.getClass().getSimpleName() + ':' + mth.getName();
+    return Util.className(module) + ':' + mth.getName();
   }
 
   @Override

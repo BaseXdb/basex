@@ -17,23 +17,25 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
  * Sequence functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNSeq extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNSeq(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNSeq(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -63,10 +65,10 @@ public final class FNSeq extends StandardFunc {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case SUBSEQUENCE:     return subseqValue(ctx);
-      case TAIL:            final Value seq = ctx.value(expr[0]);
-                            return SubSeq.get(seq, 1, seq.size() - 1);
-      default:              return super.value(ctx);
+      case SUBSEQUENCE: return subseqValue(ctx);
+      case TAIL:        final Value seq = ctx.value(expr[0]);
+                        return SubSeq.get(seq, 1, seq.size() - 1);
+      default:          return super.value(ctx);
     }
   }
 
@@ -140,7 +142,7 @@ public final class FNSeq extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx) throws QueryException {
+  protected Expr opt(final QueryContext ctx, final VarScope scp) throws QueryException {
     // static typing:
     // index-of will create integers, insert-before might add new types
     if(sig == Function.INDEX_OF || sig == Function.INSERT_BEFORE) return this;
@@ -243,7 +245,7 @@ public final class FNSeq extends StandardFunc {
    */
   private Iter indexOf(final QueryContext ctx) throws QueryException {
     final Item it = checkItem(expr[1], ctx);
-    final Collation coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
+    final Collation coll = checkColl(expr.length == 3 ? expr[2] : null, ctx, sc);
 
     return new Iter() {
       final Iter ir = expr[0].iter(ctx);
@@ -268,7 +270,7 @@ public final class FNSeq extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter distinctValues(final QueryContext ctx) throws QueryException {
-    final Collation coll = checkColl(expr.length == 2 ? expr[1] : null, ctx);
+    final Collation coll = checkColl(expr.length == 2 ? expr[1] : null, ctx, sc);
     if(expr[0] instanceof RangeSeq) return expr[0].iter(ctx);
 
     return new Iter() {
@@ -483,7 +485,7 @@ public final class FNSeq extends StandardFunc {
       // estimate result size (could be known in the original expression)
       final ValueBuilder vb = new ValueBuilder(Math.max((int) expr[0].size(), 1));
       for(Item it; (it = iter.next()) != null;) vb.add(it);
-      Array.reverse(vb.item, 0, (int) vb.size());
+      Array.reverse(vb.items(), 0, (int) vb.size());
       return vb;
     }
 

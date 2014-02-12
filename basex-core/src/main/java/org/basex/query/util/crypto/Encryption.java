@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * This class encrypts and decrypts textual inputs.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class Encryption {
@@ -77,32 +77,27 @@ public final class Encryption {
     final byte[] aa = a.length == 0 ? DES : a;
     final byte[] tivl = ALGE.get(lc(aa));
     if(!symmetric)
-      CX_ENCTYP.thrw(info, ec);
+      throw CX_ENCTYP.get(info, ec);
     if(tivl == null)
-      CX_INVALGO.thrw(info, s);
+      throw CX_INVALGO.get(info, s);
     // initialization vector length
     final int ivl = toInt(tivl);
 
     byte[] t = null;
     try {
-
-      if(ec)
-        t = encrypt(in, k, aa, ivl);
-      else
-        t = decrypt(in, k, aa, ivl);
-
+      t = ec ? encrypt(in, k, aa, ivl) : decrypt(in, k, aa, ivl);
     } catch(final NoSuchPaddingException e) {
-      CX_NOPAD.thrw(info, e);
+      throw CX_NOPAD.get(info, e);
     } catch(final BadPaddingException e) {
-      CX_BADPAD.thrw(info, e);
+      throw CX_BADPAD.get(info, e);
     } catch(final NoSuchAlgorithmException e) {
-      CX_INVALGO.thrw(info, e);
+      throw CX_INVALGO.get(info, e);
     } catch(final InvalidKeyException e) {
-      CX_KEYINV.thrw(info, e);
+      throw CX_KEYINV.get(info, e);
     } catch(final IllegalBlockSizeException e) {
-      CX_ILLBLO.thrw(info, e);
+      throw CX_ILLBLO.get(info, e);
     } catch(final InvalidAlgorithmParameterException e) {
-      CX_INVALGO.thrw(info, e);
+      throw CX_INVALGO.get(info, e);
     }
 
     return Str.get(t);
@@ -123,10 +118,9 @@ public final class Encryption {
    * @throws IllegalBlockSizeException ex
    * @throws BadPaddingException ex
    */
-  static byte[] encrypt(final byte[] in, final byte[] k, final byte[] a, final int ivl)
-      throws InvalidKeyException, InvalidAlgorithmParameterException,
-      NoSuchAlgorithmException, NoSuchPaddingException,
-      IllegalBlockSizeException, BadPaddingException {
+  private static byte[] encrypt(final byte[] in, final byte[] k, final byte[] a, final int ivl)
+      throws InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException,
+      NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 
     final Cipher cipher = Cipher.getInstance(string(ALGN.get(lc(a))));
     final SecretKeySpec kspec = new SecretKeySpec(k, string(a));
@@ -160,10 +154,9 @@ public final class Encryption {
    * @throws IllegalBlockSizeException ex
    * @throws BadPaddingException ex
    */
-  static byte[] decrypt(final byte[] in, final byte[] k,
-      final byte[] a, final int ivl) throws NoSuchAlgorithmException,
-      NoSuchPaddingException, InvalidKeyException,
-      InvalidAlgorithmParameterException, IllegalBlockSizeException,
+  private static byte[] decrypt(final byte[] in, final byte[] k,
+      final byte[] a, final int ivl) throws NoSuchAlgorithmException, NoSuchPaddingException,
+      InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException,
       BadPaddingException {
 
     final SecretKeySpec keySpec = new SecretKeySpec(k, string(a));
@@ -185,18 +178,18 @@ public final class Encryption {
    * @return MAC
    * @throws QueryException query exception
    */
-  public Item hmac(final byte[] msg, final byte[] k, final byte[] a,
-      final byte[] enc) throws QueryException {
+  public Item hmac(final byte[] msg, final byte[] k, final byte[] a, final byte[] enc)
+      throws QueryException {
 
     // create hash value from input message
     final Key key = new SecretKeySpec(k, string(a));
 
     final byte[] aa = a.length == 0 ? DEFA : a;
-    if(!ALGHMAC.contains(lc(aa))) CX_INVHASH.thrw(info, aa);
+    if(!ALGHMAC.contains(lc(aa))) throw CX_INVHASH.get(info, aa);
 
     final boolean b64 = eq(lc(enc), BASE64) || enc.length == 0;
     if(!b64 && !eq(lc(enc), HEX))
-      CX_ENC.thrw(info, enc);
+      throw CX_ENC.get(info, enc);
 
     try {
       final Mac mac = Mac.getInstance(string(ALGHMAC.get(lc(aa))));
@@ -205,9 +198,9 @@ public final class Encryption {
       // convert to specified encoding, base64 as a standard, else use hex
       return Str.get(b64 ? Base64.encode(hash) : hex(hash, true));
     } catch(final NoSuchAlgorithmException e) {
-      throw CX_INVHASH.thrw(info, e);
+      throw CX_INVHASH.get(info, e);
     } catch(final InvalidKeyException e) {
-      throw CX_KEYINV.thrw(info, e);
+      throw CX_KEYINV.get(info, e);
     }
   }
 }

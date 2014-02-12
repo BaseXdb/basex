@@ -12,18 +12,19 @@ import org.basex.util.*;
 /**
  * Profiling functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNProf extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNProf(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNProf(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -88,10 +89,13 @@ public final class FNProf extends StandardFunc {
    */
   private Item dump(final QueryContext ctx) throws QueryException {
     final Iter ir = expr[0].iter(ctx);
-    final byte[] s = expr.length > 1 ? checkStr(expr[1], ctx) : null;
+    final byte[] label = expr.length > 1 ? checkStr(expr[1], ctx) : null;
+    boolean empty = true;
     for(Item it; (it = ir.next()) != null;) {
-      FNInfo.dump(it.serialize().toArray(), s, ctx);
+      FNInfo.dump(it, label, info, ctx);
+      empty = false;
     }
+    if(empty) FNInfo.dump(null, label, info, ctx);
     return null;
   }
 
@@ -113,7 +117,7 @@ public final class FNProf extends StandardFunc {
    * @param msg message (can be {@code null})
    * @param ctx query context
    */
-  static void dump(final long min, final byte[] msg, final QueryContext ctx) {
+  private static void dump(final long min, final byte[] msg, final QueryContext ctx) {
     Performance.gc(2);
     final long max = Performance.memory();
     final long mb = Math.max(0, max - min);

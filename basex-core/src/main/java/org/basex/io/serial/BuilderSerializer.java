@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * A serializer that pipes the events directly through to a builder.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public class BuilderSerializer extends Serializer {
@@ -45,20 +45,20 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  protected final void atomic(final Item b) throws IOException {
-    Util.notexpected();
+  protected final void atomic(final Item b) {
+    throw Util.notExpected();
   }
 
   @Override
   protected final void finishOpen() throws IOException {
-    build.openElem(elem, atts, nsp);
+    build.openElem(tag, atts, nsp);
     atts.clear();
     nsp.clear();
   }
 
   @Override
   protected void finishEmpty() throws IOException {
-    build.emptyElem(elem, atts, nsp);
+    build.emptyElem(tag, atts, nsp);
     atts.clear();
     nsp.clear();
   }
@@ -74,7 +74,7 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  protected final void attribute(final byte[] n, final byte[] v) throws IOException {
+  protected final void attribute(final byte[] n, final byte[] v) {
     if(startsWith(n, XMLNS)) {
       if(n.length == 5) {
         nsp.add(EMPTY, v);

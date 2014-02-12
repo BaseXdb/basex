@@ -1,6 +1,7 @@
 package org.basex.query.gflwor;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
@@ -23,22 +24,22 @@ import org.basex.util.hash.*;
 /**
  * the GFLWOR {@code window} clause.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
-public final class Window extends GFLWOR.Clause {
+public final class Window extends Clause {
   /** {@code sliding window} flag. */
-  final boolean sliding;
+  private final boolean sliding;
   /** The window variable. */
-  final Var var;
+  private final Var var;
   /** The sequence. */
-  Expr expr;
+  private Expr expr;
   /** The start condition. */
-  Condition start;
+  private Condition start;
   /** the {@code only} flag. */
-  final boolean only;
+  private final boolean only;
   /** The end condition, possibly {@code null}. */
-  Condition end;
+  private Condition end;
 
   /**
    * Constructor.
@@ -86,7 +87,7 @@ public final class Window extends GFLWOR.Clause {
     for(int i = 0; i < vs.length; i++) {
       final Var v = vs[i];
       for(int j = i; --j >= 0;)
-        if(v.name.eq(vs[j].name)) throw Err.WINDOWUNIQ.thrw(ii, vs[j]);
+        if(v.name.eq(vs[j].name)) throw WINDOWUNIQ.get(ii, vs[j]);
     }
     return vs;
   }
@@ -278,11 +279,11 @@ public final class Window extends GFLWOR.Clause {
   @Override
   public VarUsage count(final Var v) {
     final VarUsage us = end == null ? start.count(v) : start.count(v).plus(end.count(v));
-    return us != VarUsage.NEVER ? VarUsage.MORE_THAN_ONCE : expr.count(v);
+    return us == VarUsage.NEVER ? expr.count(v) : VarUsage.MORE_THAN_ONCE;
   }
 
   @Override
-  public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp,
+  public Clause inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
     final Expr ex = expr.inline(ctx, scp, v, e);
     final Condition st = start.inline(ctx, scp, v, e),
@@ -303,7 +304,7 @@ public final class Window extends GFLWOR.Clause {
           start.copy(ctx, scp, vs), only, end != null ? end.copy(ctx, scp, vs) : null);
     } catch(final QueryException e) {
       // checks have already been done
-      throw Util.notexpected(e);
+      throw Util.notExpected(e);
     }
   }
 
@@ -342,7 +343,7 @@ public final class Window extends GFLWOR.Clause {
 
   @Override
   long calcSize(final long cnt) {
-    return expr.size() == 0 ? 0 : -1;
+    return expr.isEmpty() ? 0 : -1;
   }
 
   @Override
@@ -353,7 +354,7 @@ public final class Window extends GFLWOR.Clause {
   /**
    * A window {@code start} of {@code end} condition.
    *
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Leo Woerteler
    */
   public static final class Condition extends Single {
@@ -395,8 +396,7 @@ public final class Window extends GFLWOR.Clause {
     }
 
     @Override
-    public Condition optimize(final QueryContext ctx, final VarScope scp)
-        throws QueryException {
+    public Condition optimize(final QueryContext ctx, final VarScope scp) {
       return this;
     }
 
@@ -443,17 +443,16 @@ public final class Window extends GFLWOR.Clause {
 
     /**
      * Write all non-{@code null} variables in this condition to the given array.
+     *
      * @param arr array to write to
      * @param p start position
-     * @return the array for convenience
      */
-    Var[] writeVars(final Var[] arr, final int p) {
+    void writeVars(final Var[] arr, final int p) {
       int i = p;
       if(item != null) arr[i++] = item;
       if(pos  != null) arr[i++] = pos;
       if(prev != null) arr[i++] = prev;
-      if(next != null) arr[i++] = next;
-      return arr;
+      if(next != null) arr[i]   = next;
     }
 
     /**
@@ -540,7 +539,7 @@ public final class Window extends GFLWOR.Clause {
   /**
    * Evaluator for the Window clause.
    *
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Leo Woerteler
    */
   abstract class WindowEval implements Eval {
@@ -584,7 +583,7 @@ public final class Window extends GFLWOR.Clause {
   /**
    * Evaluator for the Tumbling Window clause.
    *
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Leo Woerteler
    */
   abstract class TumblingEval extends WindowEval {

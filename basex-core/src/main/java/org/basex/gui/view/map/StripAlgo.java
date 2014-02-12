@@ -3,7 +3,7 @@ package org.basex.gui.view.map;
 /**
  * StripLayout algorithm.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Joerg Hauser
  */
 final class StripAlgo extends MapAlgo {
@@ -24,15 +24,13 @@ final class StripAlgo extends MapAlgo {
     double ww = r.w;
 
     MapRects row = new MapRects();
-    int width;
     double weight = 0;
     double sumweight = 1;
-    double tmpratio;
     double rowratio = Double.MAX_VALUE;
 
     while(ni <= ne && xx + ww <= r.x + r.w && yy + hh <= r.y + r.h) {
       weight += ml.weight[ni];
-      width = (int) (weight / sumweight * ww);
+      int width = (int) (weight / sumweight * ww);
       width = width > 0 ? width : 1;
 
       final MapRects tmp = new MapRects();
@@ -44,12 +42,11 @@ final class StripAlgo extends MapAlgo {
         h = h > 0 ? h : 1;
 
         if(yy <= yy + hh)
-          tmp.add(new MapRect((int) xx, (int) y, width, h, ml.get(i),
-              r.level));
+          tmp.add(new MapRect((int) xx, (int) y, width, h, ml.get(i), r.level));
         else break;
         y += h;
       }
-      tmpratio = lineRatio(tmp);
+      final double tmpratio = lineRatio(tmp);
 
       // if ar has increased discard tmp and add row
       if(tmpratio > rowratio) {
@@ -66,8 +63,7 @@ final class StripAlgo extends MapAlgo {
         weight = 0;
         // sometimes there has to be one rectangles to fill the left space
         if(ne == ni) {
-          row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
-              ml.get(ni), r.level));
+          row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh, ml.get(ni), r.level));
           break;
         }
       } else {

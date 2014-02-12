@@ -11,7 +11,7 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'find' command and processes a simplified request as XQuery.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Find extends AQuery {
@@ -41,7 +41,7 @@ public final class Find extends AQuery {
     final String query = find(args[0], context, root);
     final boolean ok = query(query);
     final StringBuilder sb = new StringBuilder();
-    if(prop.is(Prop.QUERYINFO)) {
+    if(options.get(MainOptions.QUERYINFO)) {
       sb.append(NL).append(QUERY_CC).append(NL).append(query).append(NL);
     }
     sb.append(info());
@@ -79,7 +79,6 @@ public final class Find extends AQuery {
 
     String pre = "";
     String preds = "";
-    final String tag = "*";
     for(String term : terms) {
       if(term.startsWith("@=")) {
         preds += "[@* = \"" + term.substring(2) + "\"]";
@@ -108,6 +107,7 @@ public final class Find extends AQuery {
 
     // create final string
     final TokenBuilder tb = new TokenBuilder();
+    final String tag = "*";
     tb.add(pre + (r ? "/" : "") + Axis.DESCORSELF + "::" + tag + preds);
     return tb.toString();
   }
@@ -121,8 +121,8 @@ public final class Find extends AQuery {
    * @param root root flag
    * @return query
    */
-  public static String findTable(final StringList filter, final TokenList cols,
-      final BoolList elem, final byte[] tag, final boolean root) {
+  public static String findTable(final StringList filter, final TokenList cols, final BoolList elem,
+      final byte[] tag, final boolean root) {
 
     final TokenBuilder tb = new TokenBuilder();
     final int is = filter.size();

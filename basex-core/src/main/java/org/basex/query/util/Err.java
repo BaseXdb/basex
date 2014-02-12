@@ -1,9 +1,8 @@
-
 package org.basex.query.util;
 
 import static org.basex.query.util.Err.ErrType.*;
 
-import org.basex.io.serial.*;
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
@@ -15,7 +14,7 @@ import org.basex.util.*;
 /**
  * This class contains all query error messages.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public enum Err {
@@ -29,7 +28,7 @@ public enum Err {
   /** BASX0002. */
   BASX_OPTIONS(BASX, 2, "Unknown database option '%'."),
   /** BASX0002. */
-  BASX_VALUE(BASX, 2, "Database option '%' has invalid value '%'."),
+  BASX_VALUE(BASX, 2, "Database option '%' cannot be set to '%'."),
   /** BASX0003. */
   BASX_RESTXQ(BASX, 3, "%"),
   /** BASX0004. */
@@ -63,7 +62,7 @@ public enum Err {
   /** BXCO0001. */
   BXCO_BASE64(BXCO, 1, "String cannot be converted to the supplied encoding."),
   /** BXCO0002. */
-  BXCO_ENCODING(BXCO, 2, "Encoding '%' is not supported."),
+  BXCO_ENCODING(BXCO, 2, "Unknown encoding '%'."),
 
   // CSV module
 
@@ -71,8 +70,6 @@ public enum Err {
   BXCS_PARSE(BXCS, 1, "CSV parser: %."),
   /** BXCS0002. */
   BXCS_SERIAL(BXCS, 2, "CSV serializer: %."),
-  /** BXCS0003. */
-  BXCS_CONFIG(BXCS, 3, "CSV configuration: separator must be single character."),
 
   // Database module
 
@@ -113,12 +110,12 @@ public enum Err {
   /** BXFE0001. */
   BXFE_IO(BXFE, 1, "%"),
   /** BXFE0002. */
-  BXFE_ENCODING(BXFE, 2, "Encoding not supported: '%'."),
+  BXFE_ENCODING(BXFE, 2, "Unknown encoding '%'."),
 
   // Fulltext module
 
   /** BXFT0001. */
-  BXFT_MATCH(BXFT, 1, "Either wildcards or fuzzy search supported."),
+  BXFT_MATCH(BXFT, 1, "Wildcards and fuzzy option cannot be both specified."),
 
   // HTML module
 
@@ -133,13 +130,11 @@ public enum Err {
   BXJS_PARSEML(BXJS, 1, "JsonML parser: %."),
   /** BXJS0002. */
   BXJS_SERIAL(BXJS, 2, "JSON serializer: %."),
-  /** BXJS0003. */
-  BXJS_CONFIG(BXJS, 3, "JSON parser configuration: %."),
 
   // Process module
 
   /** BXPR9999. */
-  BXPR_ENC(BXPR, 9999, "Encoding not supported: '%'."),
+  BXPR_ENC(BXPR, 9999, "Unknown encoding '%'."),
 
   // Repository module
 
@@ -201,11 +196,15 @@ public enum Err {
 
   /** BXXQ0001. */
   BXXQ_UPDATING(BXXQ, 1, "No updating expression allowed."),
+  /** BXXQ0002. */
+  BXXQ_NEWDB(BXXQ, 2, "Database '%' cannot be opened."),
 
   // Unit module
 
   /** UNIT0001. */
   UNIT_ASSERT(UNIT, 1, "Assertion failed."),
+  /** UNIT0001. */
+  UNIT_ASSERT_EQUALS(UNIT, 1, "Item %: % expected, % returned."),
   /** UNIT0001. */
   UNIT_MESSAGE(UNIT, 1, "%"),
   /** UNIT0002. */
@@ -232,7 +231,7 @@ public enum Err {
   /** ARCH0003. */
   ARCH_DATETIME(ARCH, 3, "xs:dateTime value is invalid : '%'."),
   /** ARCH0004. */
-  ARCH_ENCODING(ARCH, 4, "Encoding is not supported: '%'."),
+  ARCH_ENCODING(ARCH, 4, "Unknown encoding '%'."),
   /** ARCH0004. */
   ARCH_ENCODE(ARCH, 4, "String conversion: %."),
   /** ARCH0005. */
@@ -241,6 +240,23 @@ public enum Err {
   ARCH_ONE(ARCH, 6, "% archives are limited to a single entry."),
    /** ARCH9999. */
   ARCH_FAIL(ARCH, 9999, "Operation failed: %."),
+
+  /** Binary error. */
+  BIN_DLA_X_X(BIN, "differing-length-arguments", "Inputs are of different length (%/%)."),
+  /** Binary error. */
+  BIN_IOOR_X_X(BIN, "index-out-of-range", "Index '%' is out of range (0-%)."),
+  /** Binary error. */
+  BIN_NS_X(BIN, "negative-size", "Size '%' is negative."),
+  /** Binary error. */
+  BIN_OOR_X(BIN, "octet-out-of-range", "Octet '%' is out of range."),
+  /** Binary error. */
+  BIN_NNC(BIN, "non-numeric-character", "Invalid character in constructor string."),
+  /** Binary error. */
+  BIN_UE_X(BIN, "unknown-encoding", "Unknown encoding '%'."),
+  /** Binary error. */
+  BIN_CE(BIN, "conversion-error", "%."),
+  /** Binary error. */
+  BIN_USO_X(BIN, "unknown-significance-order", "Unknown octet-order value: '%'."),
 
   /** CX0001. */
   CX_CANINV(CX, 1, "Canonicalization algorithm is not supported."),
@@ -287,30 +303,32 @@ public enum Err {
   /** CX0028. */
   CX_SIGTYPINV(CX, 28, "Signature type is not supported."),
 
-  /** FILE0001. */
-  FILE_WHICH(FILE, 1, "Path '%' does not exist."),
-  /** FILE0002. */
-  FILE_EXISTS(FILE, 2, "File '%' already exists."),
-  /** FILE0003. */
-  FILE_NODIR(FILE, 3, "Path '%' is no directory."),
-  /** FILE0004. */
-  FILE_DIR(FILE, 4, "Path '%' is a directory."),
-  /** FILE0004. */
-  FILE_NEDIR(FILE, 4, "Path '%' is a non-empty directory."),
-  /** FILE0005. */
-  FILE_ENCODING(FILE, 5, "Encoding '%' is not supported."),
-  /** FILE9999. */
-  FILE_IO(FILE, 9999, "%"),
-  /** FILE9999. */
-  FILE_CREATE(FILE, 9999, "Directory '%' cannot be created."),
-  /** FILE9999. */
-  FILE_DEL(FILE, 9999, "Path '%' cannot be deleted."),
-  /** FILE9999. */
-  FILE_MOVE(FILE, 9999, "Moving '%' to '%' failed."),
-  /** FILE9999. */
-  FILE_LIST(FILE, 9999, "Files of '%' cannot be accessed."),
-  /** FILE9999. */
-  FILE_PATH(FILE, 9999, "Invalid file path: '%'."),
+  /** File error. */
+  FILE_NF(FILE, "not-found", "File '%' does not exist."),
+  /** File error. */
+  FILE_E(FILE, "exists", "File '%' already exists."),
+  /** File error. */
+  FILE_ND(FILE, "no-dir", "Path '%' is no directory."),
+  /** File error. */
+  FILE_ID(FILE, "is-dir", "Path '%' is a directory."),
+  /** File error. */
+  FILE_ID_FULL(FILE, "is-dir", "Path '%' is a non-empty directory."),
+  /** File error. */
+  FILE_UE(FILE, "unknown-encoding", "Unknown encoding '%'."),
+  /** File error. */
+  FILE_OOR(FILE, "out-of-range", "Requested file chunk [%,%] exceeds file bounds."),
+  /** File error. */
+  FILE_IE(FILE, "io-error", "%"),
+  /** File error. */
+  FILE_IE_DIR(FILE, "io-error", "Directory '%' cannot be created."),
+  /** File error. */
+  FILE_IE_DEL(FILE, "io-error", "Path '%' cannot be deleted."),
+  /** File error. */
+  FILE_IE_MOVE(FILE, "io-error", "Moving '%' to '%' failed."),
+  /** File error. */
+  FILE_IE_ACCESS(FILE, "io-error", "Files of '%' cannot be accessed."),
+  /** File error. */
+  FILE_IE_PATH(FILE, "io-error", "Invalid file path: '%'."),
 
   /** HASH0001. */
   HASH_ALG(HASH, 1, "Algorithm not supported: '%'."),
@@ -356,32 +374,32 @@ public enum Err {
   /** FOCH0001. */
   INVCODE(FOCH, 1, "Invalid XML character '&#x%;'."),
   /** FOCH0002. */
-  WHICHCOLL(FOCH, 2, "Unknown collation '%'."),
+  WHICHCOLL(FOCH, 2, "Unknown collation \"%\"."),
   /** FOCH0003. */
-  NORMUNI(FOCH, 3, "Unsupported normalization form (%)."),
+  NORMUNI(FOCH, 3, "Unsupported normalization form (\"%\")."),
   /** FOCH0004. */
   CHARCOLL(FOCH, 4, "Collation does not support function."),
 
   /** FODC0001. */
-  IDDOC(FODC, 1, "Root must be a document node."),
+  IDDOC(FODC, 1, "Specified node has no document node as root."),
   /** FODC0002. */
-  NODEERR(FODC, 2, "% could not be created (%)."),
+  NODEERR(FODC, 2, "% could not be created: %."),
   /** FODC0002. */
   NODEFCOLL(FODC, 2, "No default collection available."),
   /** FODC0002. */
   IOERR(FODC, 2, "%"),
   /** FODC0002. */
-  WHICHRES(FODC, 2, "Resource '%' does not exist."),
+  WHICHRES(FODC, 2, "Resource \"%\" does not exist."),
   /** FODC0004. */
-  INVCOLL(FODC, 4, "Invalid collection URI '%'."),
+  INVCOLL(FODC, 4, "Invalid collection URI \"%\"."),
   /** FODC0005. */
-  INVDOC(FODC, 5, "Invalid document URI '%'."),
+  INVDOC(FODC, 5, "Invalid document URI \"%\"."),
   /** FODC0006. */
   SAXERR(FODC, 6, "SAX: %"),
   /** FODC0007. */
-  RESINV(FODC, 7, "Resource path '%' is invalid."),
+  RESINV(FODC, 7, "Resource path \"%\" is invalid."),
   /** FODC0007. */
-  INVDB(FODC, 7, "Invalid database name: '%'."),
+  INVDB(FODC, 7, "Invalid database name: \"%\"."),
 
   /** FODF1280. */
   FORMNUM(FODF, 1280, "Unknown decimal format: %."),
@@ -403,11 +421,15 @@ public enum Err {
   /** FODT0001. */
   DATERANGE(FODT, 1, "%: '%' out of range."),
   /** FODT0001. */
-  DATEADDRANGE(FODT, 1, "%: out of range."),
+  YEARRANGE(FODT, 1, "Year '%' out of range."),
+  /** FODT0001. */
+  SECRANGE(FODT, 1, "Seconds '%' out of range."),
   /** FODT0002. */
   DURRANGE(FODT, 2, "%: '%' out of range."),
   /** FODT0002. */
-  DURADDRANGE(FODT, 2, "%: out of range."),
+  MONTHRANGE(FODT, 2, "Months '%' out of range."),
+  /** FODT0002. */
+  SECDURRANGE(FODT, 2, "Seconds '%' out of range."),
   /** FODT0002. */
   DATEZERO(FODT, 2, "Invalid % calculation: infinity/zero."),
   /** FODT0003. */
@@ -435,7 +457,7 @@ public enum Err {
   /** FORG0001. */
   INVALIDZONE(FORG, 1, "Invalid timezone: %."),
   /** FORG0001. */
-  FUNCAST(FORG, 1, "Invalid % cast: %."),
+  FUNCAST(FORG, 1, "Invalid % cast: \"%\"."),
   /** FORG0001. */
   FUNCCASTEX(FORG, 1, "Invalid cast from % to %: %."),
   /** FORG0001. */
@@ -490,7 +512,9 @@ public enum Err {
   /** FORG0006. */
   STRBINTYPE(FORG, 6, "String or binary type expected, % found"),
   /** FORG0006. */
-  ELMOPTION(FORG, 6, "Unknown option: %."),
+  INVALIDOPT(FORG, 6, "%"),
+  /** FORG0006. */
+  INVALIDOPTX(FORG, 6, Text.UNKNOWN_OPTION_X),
 
   /** FORG0008. */
   FUNZONE(FORG, 8, "% and % have different timezones."),
@@ -507,15 +531,15 @@ public enum Err {
   FUNREPDOL(FORX, 4, "Replacement string: invalid dollar sign."),
 
   /** FOTY0013. */
-  FIVALUE(FOTY, 13, "Item has no typed value: %."),
+  FIVALUE(FOTY, 13, "Items of type % have no typed value."),
   /** FOTY0013. */
-  FIATOM(FOTY, 13, "Function items cannot be atomized: %."),
+  FIATOM(FOTY, 13, "Items of type % cannot be atomized."),
   /** FOTY0013. */
-  FIEQ(FOTY, 13, "Function items have no defined equality: %."),
+  FIEQ(FOTY, 13, "Items of type % have no defined equality."),
   /** FOTY0013. */
-  FISTR(FOTY, 14, "Function items have no string representation: %."),
+  FISTR(FOTY, 14, "Items of type % have no string representation."),
   /** FOTY0013. */
-  FICMP(FOTY, 15, "Function items cannot be compared: %."),
+  FICMP(FOTY, 15, "Items of type % cannot be compared."),
 
   /** FOUP0001. */
   UPFOTYPE(FOUP, 1, "Document or element expected, % found."),
@@ -543,7 +567,7 @@ public enum Err {
   /** FOUT1170. */
   INVURL(FOUT, 1170, "URI is invalid: %"),
   /** FOUT1190. */
-  WHICHENC(FOUT, 1190, "Encoding '%' is not supported."),
+  WHICHENC(FOUT, 1190, "Unknown encoding '%'."),
   /** FOUT1190. */
   INVCHARS(FOUT, 1190, "%."),
   /** FOUT1200. */
@@ -574,19 +598,19 @@ public enum Err {
   /** SENR0001. */
   SERNS(SENR, 1, "Namespaces cannot be serialized:%."),
   /** SENR0001. */
-  SERFUNC(SENR, 1, "Functions cannot be serialized: %."),
+  SERFUNC(SENR, 1, "Items of type % cannot be serialized."),
   /** SEPM0004. */
   SERSA(SEPM, 4, "If 'standalone' is specified, the root must be a single element."),
   /** SEPM0004. */
   SERDT(SEPM, 4, "If 'doctype-system' is specified, the root must be a single element."),
   /** SESU0007. */
-  SERENCODING(SESU, 7, "Encoding not supported: '%'."),
+  SERENCODING(SESU, 7, "Unknown encoding '%'."),
   /** SEPM0009. */
   SERSTAND(SEPM, 9, "Invalid combination of 'omit-xml-declaration'."),
   /** SEPM0010. */
   SERUNDECL(SEPM, 10, "XML 1.0: undeclaring prefixes not allowed."),
   /** SESU0013. */
-  SERNOTSUPP(SESU, 13, "%."),
+  SERNOTSUPP(SESU, 13, "%"),
   /** SERE0014. */
   SERILL(SERE, 14, "Illegal HTML character found: #x%;."),
   /** SERE0015. */
@@ -594,11 +618,11 @@ public enum Err {
   /** SEPM0016. */
   SERMAP(SEPM, 16, "Character map '%' is not defined."),
   /** SEPM0016. */
-  SERANY(SEPM, 16, "%."),
+  SERANY(SEPM, 16, "%"),
   /** SEPM0017. */
   SEROPT(SEPM, 17, "%."),
   /** SEPM0017. */
-  SERWHICH(SEPM, 17, "Unknown serialization parameter: '%'."),
+  SERWHICH(SEPM, 17, "Serialization parameter '%' is invalid."),
 
   /** XPDY0002. */
   NOCTX(XPDY, 2, "No context item defined to evaluate '%'."),
@@ -624,7 +648,9 @@ public enum Err {
   /** XPST0003. */
   NUMBERWS(XPST, 3, "Expecting separator after number."),
   /** XPST0003. */
-  NUMBERINC(XPST, 3, "Incomplete double value: '%'."),
+  NUMBERDBL(XPST, 3, "Incomplete double value: '%'."),
+  /** XPST0003. */
+  NUMBERDEC(XPST, 3, "Incomplete decimal value: '%'."),
   /** XPST0003. */
   NUMBERITR(XPST, 3, "Unexpected decimal point."),
   /** XPST0003. */
@@ -635,6 +661,8 @@ public enum Err {
   MAINMOD(XPST, 3, "Library modules cannot be evaluated."),
   /** XPST0003. */
   CMPEXPR(XPST, 3, "Comparison is incomplete."),
+  /** XPST0003. */
+  COPYEXPR(XPST, 3, "Copy expression is incomplete."),
   /** XPST0003. */
   NOTAG(XPST, 3, "Expecting tag name."),
   /** XPST0003. */
@@ -690,7 +718,7 @@ public enum Err {
   /** XPST0003. */
   TYPEINVALID(XPST, 3, "Expecting type declaration."),
   /** XPST0003. */
-  NODECLFORM(XPST, 3, "Unknown decimal-format property: '%'."),
+  NODECLFORM(XPST, 3, "Decimal-format property '%' is invalid."),
   /** XPST0003. */
   NOTYPESWITCH(XPST, 3, "Incomplete typeswitch expression."),
   /** XPST0003. */
@@ -786,17 +814,17 @@ public enum Err {
   /** XPST0017. */
   FUNCARGPL(XPST, 17, "%: % arguments supplied."),
   /** XPST0017. */
-  FUNCTYPESG(XPST, 17, "Function '%': % argument supplied; expected: %."),
+  FUNCTYPESG(XPST, 17, "Function '%': % argument supplied, % expected."),
   /** XPST0017. */
-  FUNCTYPEPL(XPST, 17, "Function '%': % arguments supplied; expected: %."),
+  FUNCTYPEPL(XPST, 17, "Function '%': % arguments supplied, % expected."),
   /** XPST0017. */
-  FUNCUNKNOWN(XPST, 17, "Unknown function '%'."),
+  FUNCUNKNOWN(XPST, 17, "Function '%' is unknown."),
   /** XPST0017. */
-  FUNCNOIMPL(XPST, 17, "Function v not implemented."),
+  FUNCNOIMPL(XPST, 17, "Function '%' is not implemented."),
   /** XPST0017. */
-  FUNCJAVA(XPST, 17, "Java function '%' not found."),
+  FUNCJAVA(XPST, 17, "Java function '%' is not found."),
   /** XPST0017. */
-  JAVAAMBIG(XPST, 17, "Signature '%' is ambiguous."),
+  JAVAAMBIG(XPST, 17, "Several implementations found for '%'."),
   /** XPST0017. */
   JAVAINIT(XPST, 17, "Class cannot be initialized: %."),
   /** XPST0003. */
@@ -821,6 +849,8 @@ public enum Err {
   INVTREAT(XPTY, 4, "Cannot treat % as %: %."),
   /** XPTY0004. */
   CALCTYPE(XPTY, 4, "% not defined for % and %."),
+  /** XPTY0004. */
+  INVFUNCITEM(XPTY, 4, "Function item required for function call, % found."),
 
   /** XPTY0004. */
   NOSUBDUR(XPTY, 4, "%: only supported on subtypes of xs:duration, not %."),
@@ -879,7 +909,9 @@ public enum Err {
   /** XQDY0072. */
   COMINVALID(XQDY, 72, "Invalid comment."),
   /** XQDY0074. */
-  INVNAME(XQDY, 74, "Invalid name: '%'."),
+  INVNSNAME(XQDY, 74, "Invalid namespace prefix: '%'."),
+  /** XQDY0074. */
+  INVNAME(XQDY, 74, "Invalid QName: '%'."),
   /** XQDY0074. */
   INVPREF(XQDY, 74, "No namespace declared for %."),
   /** XQDY0096. */
@@ -908,7 +940,7 @@ public enum Err {
   /** XQST0038. */
   DUPLCOLL(XQST, 38, "Duplicate 'collation' declaration."),
   /** XQST0038. */
-  WHICHDEFCOLL(XQST, 38, "Unknown collation '%'."),
+  WHICHDEFCOLL(XQST, 38, "Unknown collation \"%\"."),
   /** XQST0039. */
   FUNCDUPL(XQST, 39, "Duplicate function argument %."),
   /** XQST0040. */
@@ -934,13 +966,15 @@ public enum Err {
   /** XQST0057. */
   NSEMPTY(XQST, 57, "Namespace URI cannot be empty."),
   /** XQST0059. */
-  NOINST(XQST, 59, "Could not instantiate module '%'."),
+  INSTERR(XQST, 59, "Could not instantiate module '%'."),
   /** XQST0059. */
-  NOMODULE(XQST, 59, "Module \"%\" not found."),
+  WHICHMODULE(XQST, 59, "Module '%' not found."),
   /** XQST0059. */
-  MODINIT(XQST, 59, "Module '%' not initialized."),
+  WHICHCLASS(XQST, 59, "Class not found: '%'."),
   /** XQST0059. */
-  NOMODULEFILE(XQST, 59, "Could not retrieve module '%'."),
+  MODINITERR(XQST, 59, "Module not initialized: %."),
+  /** XQST0059. */
+  WHICHMODFILE(XQST, 59, "Could not retrieve module '%'."),
   /** XQST0059. */
   WRONGMODULE(XQST, 59, "Wrong URI '%' in imported module '%'."),
   /** XQST0060. */
@@ -966,7 +1000,7 @@ public enum Err {
   /** XQST0075. */
   IMPLVAL(XQST, 75, "Validation not supported."),
   /** XQST0076. */
-  FLWORCOLL(XQST, 76, "Unknown collation '%'."),
+  FLWORCOLL(XQST, 76, "Unknown collation \"%\"."),
   /** XQST0079. */
   NOPRAGMA(XQST, 79, "Expecting pragma expression."),
   /** XQST0085. */
@@ -1002,7 +1036,7 @@ public enum Err {
   /** XQST0108. */
   MODOUT(XQST, 108, "No output declarations allowed in library modules."),
   /** XPST0109. */
-  OUTWHICH(XQST, 109, "Unknown serialization parameter: '%'."),
+  OUTINVALID(XQST, 109, "%"),
   /** XPST0110. */
   OUTDUPL(XQST, 110, "Duplicate declaration of 'output:%'."),
   /** XPST0111. */
@@ -1017,14 +1051,8 @@ public enum Err {
   TAGWRONG(XQST, 118, "Start and end tag are different: <%>...</%>."),
   /** XQST0119. */
   OUTDOC(XQST, 119, "Serialization document '%' cannot be parsed."),
-  /** XQST0120. */
-  FEATNOTSUPP(XQST, 120, "Feature '%' is not supported by the implementation."),
-  /** XQST0122. */
-  DECLQNAME(XQST, 122, "Invalid QName: '%'."),
   /** XQST0123. */
   DECLOPTION(XQST, 123, "Unknown option: %."),
-  /** XQST0123. */
-  DECLFEAT(XQST, 123, "Unknown feature: '%'."),
   /** XPST0125. */
   INVISIBLE(XQST, 125, "No visibility annotation allowed in inline function."),
 
@@ -1099,29 +1127,51 @@ public enum Err {
   UPWRTRGTYP(XUTY, 12, "Single element, attribute or pi expected as rename target."),
   /** XUTY0013. */
   UPCOPYMULT(XUTY, 13, "Value assigned to $% must be a single node."),
+  /** XUTY0013. */
+  UPSOURCE(XUTY, 13, "Source of copy expression must be a single node."),
   /** XUTY0022. */
   UPATTELM2(XUTY, 22, "Insert target must be an element.");
 
   /** Cached enums (faster). */
-  public static final Err[] VALUES = values();
+  private static final Err[] VALUES = values();
 
-  /** Error type. */
-  public final ErrType type;
-  /** Error number. */
-  public final int num;
+  /** Error code. */
+  public final String code;
+  /** Error URI. */
+  public final byte[] uri;
+  /** Error prefix. */
+  public final String prefix;
   /** Error description. */
   public final String desc;
 
   /**
    * Constructor.
-   * @param t error type
-   * @param n error number
-   * @param d description
+   * @param type error type
+   * @param msg error message
+   * @param dsc description
    */
-  Err(final ErrType t, final int n, final String d) {
-    type = t;
-    num = n;
-    desc = d;
+  Err(final ErrType type, final String msg, final String dsc) {
+    code = new StringBuilder().append(msg).toString();
+    uri = type.uri;
+    prefix = type.prefix;
+    desc = dsc;
+  }
+
+  /**
+   * Constructor.
+   * @param type error type
+   * @param nr error number
+   * @param dsc description
+   */
+  Err(final ErrType type, final int nr, final String dsc) {
+    final StringBuilder sb = new StringBuilder(8).append(type);
+    final String n = Integer.toString(nr);
+    final int s  = 4 - n.length();
+    for(int i = 0; i < s; i++) sb.append('0');
+    code = sb.append(n).toString();
+    uri = type.uri;
+    prefix = type.prefix;
+    desc = dsc;
   }
 
   /**
@@ -1129,27 +1179,23 @@ public enum Err {
    * @param ii input info
    * @param ext extended info
    * @return query exception (indicates that an error is raised)
-   * @throws QueryException query exception
    */
-  public QueryException thrw(final InputInfo ii, final Object... ext)
-      throws QueryException {
-    throw new QueryException(ii, this, ext);
+  public QueryException get(final InputInfo ii, final Object... ext) {
+    return new QueryException(ii, this, ext);
   }
 
   /**
-   * Throws a serializer exception. Might be merged with {@link #thrw} in
-   * future.
+   * Throws a query I/O exception without {@link InputInfo} reference.
    * @param ext extended info
-   * @return serializer exception (indicates that an error is raised)
-   * @throws SerializerException serializer exception
+   * @return query I/O exception (indicates that an error is raised)
    */
-  public SerializerException thrwSerial(final Object... ext) throws SerializerException {
-    throw new SerializerException(new QueryException(null, this, ext));
+  public QueryIOException getIO(final Object... ext) {
+    return new QueryIOException(get(null, ext));
   }
 
   /**
    * Error types.
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Leo Woerteler
    */
   public enum ErrType {
@@ -1172,15 +1218,16 @@ public enum Err {
     /** BXVA Error type. */ BXVA(QueryText.BXERR, QueryText.BXERRORS),
     /** BXXQ Error type. */ BXXQ(QueryText.BXERR, QueryText.BXERRORS),
     /** HASH Error type. */ HASH(QueryText.BXERR, QueryText.BXERRORS),
-    /** UNIT Error type. */ UNIT(QueryText.UNIT, QueryText.UNITURI),
+    /** UNIT Error type. */ UNIT(QueryText.UNIT,  QueryText.UNITURI),
 
     // EXPath errors
 
-    /** CX Error type.   */ CX(QueryText.EXPERR, QueryText.EXPERROR),
-    /** FILE Error type. */ FILE(QueryText.EXPERR, QueryText.EXPERROR),
-    /** HC Error type.   */ HC(QueryText.EXPERR, QueryText.EXPERROR),
-    /** ZIP Error type. */  ZIP(QueryText.EXPERR, QueryText.EXPERROR),
     /** ARCH Error type. */ ARCH(QueryText.EXPERR, QueryText.EXPERROR),
+    /** BIN  Error type. */ BIN(QueryText.BIN,     QueryText.BINURI),
+    /** CX   Error type. */ CX(QueryText.EXPERR,   QueryText.EXPERROR),
+    /** FILE Error type. */ FILE(QueryText.FILE,   QueryText.FILEURI),
+    /** HC   Error type. */ HC(QueryText.EXPERR,   QueryText.EXPERROR),
+    /** ZIP  Error type. */ ZIP(QueryText.EXPERR,  QueryText.EXPERROR),
 
     // W3 errors
 
@@ -1236,15 +1283,6 @@ public enum Err {
     ErrType() {
       this(QueryText.ERR, QueryText.ERRORURI);
     }
-
-    /**
-     * Creates a QName for the given error number.
-     * @param num error number
-     * @return constructed QName
-     */
-    public final QNm qname(final int num) {
-      return new QNm(String.format("%s:%s%04d", prefix, name(), num), uri);
-    }
   }
 
   /**
@@ -1252,7 +1290,16 @@ public enum Err {
    * @return function
    */
   public final QNm qname() {
-    return type.qname(num);
+    return new QNm(new StringBuilder().append(prefix).append(':').append(code).toString(), uri);
+  }
+
+  /**
+   * Checks if the error code is of the specified type.
+   * @param type type
+   * @return result of check
+   */
+  public final boolean is(final ErrType type) {
+    return code.startsWith(type.name());
   }
 
   /**
@@ -1261,17 +1308,13 @@ public enum Err {
    * @param ii input info
    * @param msg error message
    * @return exception or null
-   * @throws QueryException query exception
    */
-  public static QueryException thrw(final String name, final InputInfo ii,
-      final String msg) throws QueryException {
-
+  public static QueryException get(final String name, final InputInfo ii, final String msg) {
     for(final Err e : VALUES) {
-      if(e.toString().equals(name)) throw new QueryException(ii, e.qname(), msg).err(e);
+      if(e.toString().equals(name)) return new QueryException(ii, e.qname(), msg).err(e);
     }
     return null;
   }
-
 
   /**
    * Throws a comparison exception.
@@ -1279,11 +1322,9 @@ public enum Err {
    * @param it1 first item
    * @param it2 second item
    * @return query exception (indicates that an error is raised)
-   * @throws QueryException query exception
    */
-  public static QueryException diff(final InputInfo ii, final Item it1, final Item it2)
-      throws QueryException {
-    throw (it1 == it2 ? TYPECMP : INVTYPECMP).thrw(ii, it1.type, it2.type);
+  public static QueryException diffError(final InputInfo ii, final Item it1, final Item it2) {
+    return (it1 == it2 ? TYPECMP : INVTYPECMP).get(ii, it1.type, it2.type);
   }
 
   /**
@@ -1292,11 +1333,9 @@ public enum Err {
    * @param t expression cast type
    * @param v value
    * @return query exception (indicates that an error is raised)
-   * @throws QueryException query exception
    */
-  public static QueryException cast(final InputInfo ii, final Type t, final Value v)
-      throws QueryException {
-    throw INVCASTEX.thrw(ii, v.type, t, v);
+  public static QueryException castError(final InputInfo ii, final Type t, final Value v) {
+    return INVCASTEX.get(ii, v.type, t, v);
   }
 
   /**
@@ -1305,11 +1344,9 @@ public enum Err {
    * @param t expression cast type
    * @param e expression
    * @return query exception (indicates that an error is raised)
-   * @throws QueryException query exception
    */
-  public static QueryException treat(final InputInfo ii, final SeqType t, final Expr e)
-      throws QueryException {
-    throw INVTREAT.thrw(ii, e.description(), t, e);
+  public static QueryException treatError(final InputInfo ii, final SeqType t, final Expr e) {
+    return INVTREAT.get(ii, e.description(), t, e);
   }
 
   /**
@@ -1318,11 +1355,9 @@ public enum Err {
    * @param t expected type
    * @param it found item
    * @return query exception (indicates that an error is raised)
-   * @throws QueryException query exception
    */
-  public static QueryException type(final ParseExpr e, final Type t, final Item it)
-      throws QueryException {
-    throw INVCAST.thrw(e.info, it.type, t);
+  public static QueryException typeError(final ParseExpr e, final Type t, final Item it) {
+    return INVCAST.get(e.info, it.type, t);
   }
 
   /**
@@ -1330,11 +1365,9 @@ public enum Err {
    * @param e parsing expression
    * @param it found item
    * @return query exception (indicates that an error is raised)
-   * @throws QueryException query exception
    */
-  public static QueryException number(final ParseExpr e, final Item it)
-      throws QueryException {
-    throw NONUMBER.thrw(e.info, e.description(), it.type);
+  public static QueryException numberError(final ParseExpr e, final Item it) {
+    return NONUMBER.get(e.info, e.description(), it.type);
   }
 
   /**
@@ -1343,27 +1376,49 @@ public enum Err {
    * @param t expected type
    * @param v value
    * @return query exception (indicates that an error is raised)
-   * @throws QueryException query exception
    */
-  public static QueryException value(final InputInfo ii, final Type t, final Object v)
-      throws QueryException {
-    throw INVALUE.thrw(ii, t, v);
+  public static QueryException valueError(final InputInfo ii, final Type t, final Object v) {
+    return INVALUE.get(ii, t, v);
   }
 
   /**
    * Throws an exception for circular static variables.
-   * @param ctx query context
    * @param var variable expression
    * @return never
+   */
+  public static QueryException circVarError(final StaticVar var) {
+    return (var.sc.xquery3() ? CIRCVAR30 : CIRCVAR).get(var.info, var);
+  }
+
+  /** Maximum size of chopped error string. */
+  private static final int MAX = 64;
+
+  /**
+   * Chops the specified object to a maximum size.
+   * @param object object
+   * @return exception or null
    * @throws QueryException query exception
    */
-  public static QueryException circVar(final QueryContext ctx, final StaticVar var)
-      throws QueryException {
-    throw (ctx.sc.xquery3() ? CIRCVAR30 : CIRCVAR).thrw(var.info, var);
+  public static byte[] chop(final Object object) throws QueryException {
+    final TokenBuilder tb = new TokenBuilder();
+    byte l = 0;
+    final byte[] string = object instanceof byte[] ? (byte[]) object : object instanceof Item ?
+      ((Item) object).string(null) : Token.token(object.toString());
+    for(byte b : string) {
+      final int ts = tb.size();
+      if(ts == MAX) {
+        tb.add(Text.DOTS);
+        break;
+      }
+      if(b == '\n' || b == '\r') b = ' ';
+      if(b != ' ' || l != ' ') tb.addByte(b);
+      l = b;
+    }
+    return tb.array();
   }
 
   @Override
   public String toString() {
-    return String.format("%s%04d", type, num);
+    return code;
   }
 }

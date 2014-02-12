@@ -13,7 +13,7 @@ import org.basex.util.list.*;
 /**
  * An additional layer which prepares the data for the scatter plot.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 final class PlotData {
@@ -109,7 +109,7 @@ final class PlotData {
         final int kind = data.kind(p);
         if(kind == Data.ELEM) {
           if(data.name(p) == itmID) tmpPres.add(p);
-          p += data.attSize(p, kind);
+          p += data.attSize(p, Data.ELEM);
         } else {
           ++p;
         }

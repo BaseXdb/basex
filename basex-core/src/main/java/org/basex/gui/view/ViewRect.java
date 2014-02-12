@@ -5,7 +5,7 @@ import org.basex.util.*;
 /**
  * View rectangle.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class ViewRect {
@@ -54,7 +54,7 @@ public class ViewRect {
 
   @Override
   public final String toString() {
-    return Util.name(this) + "[x=" + x + ",y=" + y + ",h=" + h +
+    return Util.className(this) + "[x=" + x + ",y=" + y + ",h=" + h +
       ",w=" + w + ",h=" + h + ",pre=" + pre + ",level=" + level + ']';
   }
 }

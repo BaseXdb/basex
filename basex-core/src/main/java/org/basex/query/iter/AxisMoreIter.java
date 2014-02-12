@@ -9,7 +9,7 @@ import org.basex.query.value.seq.*;
  * Iterator interface, extending the default iterator with a {@link #more}
  * method.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class AxisMoreIter extends AxisIter {

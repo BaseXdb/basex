@@ -1,12 +1,11 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <!-- Artifact information -->
   <groupId>org.basex</groupId>
   <artifactId>basex-parent</artifactId>
-  <version>7.7.3-SNAPSHOT</version>
+  <version>7.8-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -19,7 +18,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
-    <jettyVersion>8.1.11.v20130520</jettyVersion>
+    <jettyVersion>8.1.14.v20131031</jettyVersion>
   </properties>
 
   <dependencyManagement>
@@ -68,7 +67,7 @@
       <dependency>
         <groupId>net.xqj</groupId>
         <artifactId>basex-xqj</artifactId>
-        <version>1.2.3</version>
+        <version>1.3.0</version>
       </dependency>
       <dependency>
         <groupId>org.xmldb</groupId>
@@ -126,11 +125,6 @@
         <version>1.2.2</version>
       </dependency>
       <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-nop</artifactId>
-        <version>1.5.8</version>
-      </dependency>
-      <dependency>
         <groupId>com.vividsolutions</groupId>
         <artifactId>jts</artifactId>
         <version>1.13</version>
@@ -183,6 +177,7 @@
     <connection>scm:git:git://github.com/BaseXdb/basex.git</connection>
     <developerConnection>scm:git:git@github.com:BaseXdb/basex.git</developerConnection>
     <url>https://github.com/BaseXdb/basex</url>
+    <tag>HEAD</tag>
   </scm>
 
   <repositories>
@@ -192,9 +187,9 @@
       <url>http://files.basex.org/maven</url>
     </repository>
     <repository>
-      <id>karatachi</id>
-      <name>Karatachi Maven Repository</name>
-      <url>http://repo.karatachi.org/mvn/</url>
+      <id>central</id>
+      <name>Central Maven Repository</name>
+      <url>http://repo2.maven.org/maven2/</url>
     </repository>
     <repository>
       <id>xqj</id>
@@ -202,24 +197,16 @@
       <url>http://xqj.net/maven</url>
     </repository>
     <repository>
+      <id>karatachi</id>
+      <name>Karatachi Maven Repository</name>
+      <url>http://repo.karatachi.org/mvn/</url>
+    </repository>
+    <repository>
       <id>milton</id>
       <name>Milton Maven Repository</name>
       <url>http://milton.io/maven</url>
     </repository>
-    <repository>
-      <id>central</id>
-      <name>Central Maven Repository</name>
-      <url>http://repo2.maven.org/maven2/</url>
-    </repository>
   </repositories>
-
-  <distributionManagement>
-    <repository>
-      <id>basex.mvn</id>
-      <name>BaseX Maven Repository</name>
-      <url>ftp://basex.org/</url> <!-- TODO: fix the path; use sftp or ssh -->
-    </repository>
-  </distributionManagement>
 
   <prerequisites>
     <maven>3.0.0</maven>
@@ -227,7 +214,39 @@
 
   <ciManagement><!-- TODO --></ciManagement>
   <pluginRepositories><!-- TODO --></pluginRepositories>
-  <profiles><!-- TODO --></profiles>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.4</version>
+            <inherited>true</inherited>
+            <executions>
+              <execution>
+                <id>create-executable-jar</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <descriptorRefs>
+                <descriptorRef>src</descriptorRef>
+              </descriptorRefs>
+              <appendAssemblyId>false</appendAssemblyId>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 
 
@@ -266,10 +285,39 @@
         </plugin>
 
         <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>buildnumber-maven-plugin</artifactId>
+          <version>1.2</version>
+          <executions>
+            <execution>
+              <phase>validate</phase>
+              <goals>
+                <goal>create</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <doCheck>false</doCheck>
+            <doUpdate>false</doUpdate>
+            <shortRevisionLength>7</shortRevisionLength>
+          </configuration>
+        </plugin>
+
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <version>2.4</version>
           <inherited>true</inherited>
+          <configuration>
+            <archive>
+              <manifest>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+              <manifestEntries>
+                <Implementation-Build>${buildNumber}</Implementation-Build>
+              </manifestEntries>
+            </archive>
+          </configuration>
         </plugin>
 
         <plugin>
@@ -300,6 +348,17 @@
               </goals>
             </execution>
           </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.4.1</version>
+          <configuration>
+            <tagNameFormat>@{project.version}</tagNameFormat>
+            <releaseProfiles>release</releaseProfiles>
+            <scmCommentPrefix>Release: </scmCommentPrefix>
+          </configuration>
         </plugin>
 
         <plugin>
@@ -431,11 +490,6 @@
     </pluginManagement>
 
     <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ftp</artifactId>
-        <version>2.4</version>
-      </extension>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh</artifactId>

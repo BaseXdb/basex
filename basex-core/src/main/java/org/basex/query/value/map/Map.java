@@ -6,19 +6,21 @@ import static org.basex.query.util.Err.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * The map item.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class Map extends FItem {
@@ -37,7 +39,7 @@ public final class Map extends FItem {
    * @param m map
    */
   private Map(final TrieNode m) {
-    super(SeqType.ANY_MAP);
+    super(SeqType.ANY_MAP, new Ann());
     root = m;
   }
 
@@ -47,8 +49,13 @@ public final class Map extends FItem {
   }
 
   @Override
-  public QNm fName() {
+  public QNm funcName() {
     return null;
+  }
+
+  @Override
+  public QNm argName(final int pos) {
+    return new QNm("key", "");
   }
 
   @Override
@@ -57,14 +64,14 @@ public final class Map extends FItem {
   }
 
   @Override
-  public Item invItem(final QueryContext ctx, final InputInfo ii,
-      final Value... args) throws QueryException {
+  public Item invItem(final QueryContext ctx, final InputInfo ii, final Value... args)
+      throws QueryException {
     return get(args[0].item(ctx, ii), ii).item(ctx, ii);
   }
 
   @Override
-  public Value invValue(final QueryContext ctx, final InputInfo ii,
-      final Value... args) throws QueryException {
+  public Value invValue(final QueryContext ctx, final InputInfo ii, final Value... args)
+      throws QueryException {
     return get(args[0].item(ctx, ii), ii);
   }
 
@@ -77,10 +84,10 @@ public final class Map extends FItem {
    */
   private Item key(final Item it, final InputInfo ii) throws QueryException {
     // no empty sequence allowed
-    if(it == null) throw INVEMPTY.thrw(ii, description());
+    if(it == null) throw INVEMPTY.get(ii, description());
 
     // function items can't be keys
-    if(it instanceof FItem) throw FIATOM.thrw(ii, it.description());
+    if(it instanceof FItem) throw FIATOM.get(ii, it.type);
 
     // NaN can't be stored as key, as it isn't equal to anything
     if(it == Flt.NAN || it == Dbl.NAN) return null;
@@ -151,14 +158,13 @@ public final class Map extends FItem {
    */
   public boolean hasType(final MapType t) {
     return root.hasType(t.keyType == AtomType.AAT ? null : t.keyType,
-        t.type.eq(SeqType.ITEM_ZM) ? null : t.type);
+        t.ret.eq(SeqType.ITEM_ZM) ? null : t.ret);
   }
 
   @Override
-  public Map coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
-    if(!(ft instanceof MapType) || !hasType((MapType) ft)) throw cast(ii, ft, this);
+  public Map coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii,
+      final boolean opt) throws QueryException {
+    if(!(ft instanceof MapType) || !hasType((MapType) ft)) throw castError(ii, ft, this);
     return this;
   }
 
@@ -170,9 +176,7 @@ public final class Map extends FItem {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public Map insert(final Item k, final Value v, final InputInfo ii)
-      throws QueryException {
-
+  public Map insert(final Item k, final Value v, final InputInfo ii) throws QueryException {
     final Item key = key(k, ii);
     if(key == null) return this;
     final TrieNode ins = root.insert(key.hash(ii), key, v, 0, ii);
@@ -205,7 +209,7 @@ public final class Map extends FItem {
    * @return collation
    */
   public Str collation() {
-    return Str.get(URLCOLL);
+    return Str.get(COLLATIONURI);
   }
 
   /**
@@ -220,25 +224,15 @@ public final class Map extends FItem {
   }
 
   /**
-   * Converts the map to a map with keys and values represented as tokens.
+   * Returns a string representation of the map.
    * @param ii input info
-   * @return token map
+   * @return string
    * @throws QueryException query exception
    */
-  public TokenMap tokenMap(final InputInfo ii) throws QueryException {
-    final TokenMap tm = new TokenMap();
-    final ValueIter vi = keys().iter();
-    for(Item it; (it = vi.next()) != null;) {
-      if(!(it instanceof AStr)) FUNCMP.thrw(ii, description(), AtomType.STR, it.type);
-      final Value v = get(it, ii);
-      if(!v.isItem()) FUNCMP.thrw(ii, description(), AtomType.ITEM, v);
-      final byte[] key = it.string(null);
-      byte[] val = ((Item) v).string(ii);
-      final byte[] o = tm.get(key);
-      if(o != null) val = new TokenBuilder(o).add(',').add(val).finish();
-      tm.put(key, val);
-    }
-    return tm;
+  public byte[] serialize(final InputInfo ii) throws QueryException {
+    final TokenBuilder tb = new TokenBuilder();
+    string(tb, 0, ii);
+    return tb.finish();
   }
 
   @Override
@@ -258,7 +252,7 @@ public final class Map extends FItem {
 
   @Override
   public String description() {
-    return MAPSTR + BRACE1 + DOTS + BRACE2;
+    return BRACE1 + DOTS + BRACE2;
   }
 
   @Override
@@ -275,16 +269,64 @@ public final class Map extends FItem {
         val.plan(el);
       }
     } catch(final QueryException ex) {
-      Util.notexpected(ex);
+      throw Util.notExpected(ex);
     }
     addPlan(plan, el);
   }
 
+  /**
+   * Returns a string representation of the map.
+   * @param tb token builder
+   * @param level current level
+   * @param ii input info
+   * @throws QueryException query exception
+   */
+  private void string(final TokenBuilder tb, final int level, final InputInfo ii)
+      throws QueryException {
+
+    tb.add("{");
+    int c = 0;
+    for(final Item key : keys()) {
+      if(c++ > 0) tb.add(',');
+      tb.add('\n');
+      indent(tb, level + 1);
+      tb.add(key.toString());
+      tb.add(": ");
+      final Value v = get(key, ii);
+      if(v.size() != 1) tb.add('(');
+      int cc = 0;
+      for(final Item it : v) {
+        if(cc++ > 0) tb.add(", ");
+        if(it instanceof Map) ((Map) it).string(tb, level + 1, ii);
+        else tb.add(it.toString());
+      }
+      if(v.size() != 1) tb.add(')');
+    }
+    tb.add('\n');
+    indent(tb, level);
+    tb.add('}');
+  }
+
+  /**
+   * Adds some indentation.
+   * @param tb token builder
+   * @param level level
+   */
+  private static void indent(final TokenBuilder tb, final int level) {
+    for(int l = 0; l < level; l++) tb.add("  ");
+  }
+
   @Override
   public String toString() {
-    final StringBuilder sb = root.toString(new StringBuilder("{ "));
+    final StringBuilder sb = root.toString(new StringBuilder(MAPSTR).append(" { "));
     // remove superfluous comma
     if(root.size > 0) sb.deleteCharAt(sb.length() - 2);
     return sb.append('}').toString();
+  }
+
+  @Override
+  public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
+      final InputInfo ii) {
+    return null;
   }
 }

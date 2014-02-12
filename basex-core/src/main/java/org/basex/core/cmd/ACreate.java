@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * Abstract class for database creation commands.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class ACreate extends Command {
@@ -27,7 +27,7 @@ public abstract class ACreate extends Command {
    * Protected constructor, specifying command arguments.
    * @param arg arguments
    */
-  protected ACreate(final String... arg) {
+  ACreate(final String... arg) {
     this(Perm.CREATE, false, arg);
     newData = true;
   }
@@ -38,7 +38,7 @@ public abstract class ACreate extends Command {
    * @param d requires opened database
    * @param arg arguments
    */
-  protected ACreate(final Perm p, final boolean d, final String... arg) {
+  ACreate(final Perm p, final boolean d, final String... arg) {
     super(p, d, arg);
   }
 
@@ -49,7 +49,7 @@ public abstract class ACreate extends Command {
    * @return IO reference
    * @throws IOException I/O exception
    */
-  protected IO sourceToIO(final String name) throws IOException {
+  IO sourceToIO(final String name) throws IOException {
     IO io = null;
     if(args[1] != null && !args[1].isEmpty()) {
       io = IO.get(args[1]);
@@ -72,7 +72,7 @@ public abstract class ACreate extends Command {
     // update name if not given by the IO reference anyway
     if(io instanceof IOContent || io instanceof IOStream) {
       if(name.endsWith("/")) throw new BaseXException(NAME_INVALID_X, name);
-      io.name(name.isEmpty() ? "" : name + '.' + prop.get(Prop.PARSER));
+      io.name(name.isEmpty() ? "" : name + '.' + options.get(MainOptions.PARSER));
     }
     return io;
   }
@@ -84,9 +84,7 @@ public abstract class ACreate extends Command {
    * @param cmd calling command
    * @throws IOException I/O exception
    */
-  protected static void create(final IndexType index, final Data data, final ACreate cmd)
-      throws IOException {
-
+  static void create(final IndexType index, final Data data, final ACreate cmd) throws IOException {
     if(data.inMemory()) return;
 
     final IndexBuilder ib;
@@ -94,7 +92,7 @@ public abstract class ACreate extends Command {
       case TEXT:      ib = new ValueIndexBuilder(data, true); break;
       case ATTRIBUTE: ib = new ValueIndexBuilder(data, false); break;
       case FULLTEXT:  ib = new FTBuilder(data); break;
-      default:        throw Util.notexpected();
+      default:        throw Util.notExpected();
     }
     data.closeIndex(index);
     data.setIndex(index, (cmd == null ? ib : cmd.proc(ib)).build());
@@ -106,7 +104,7 @@ public abstract class ACreate extends Command {
    * @param data data reference
    * @return success of operation
    */
-  protected static boolean drop(final IndexType index, final Data data) {
+  static boolean drop(final IndexType index, final Data data) {
     String pat = null;
     switch(index) {
       case TEXT:

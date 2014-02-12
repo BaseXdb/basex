@@ -1,27 +1,20 @@
 package org.basex.gui.layout;
 
 import java.awt.*;
-import java.util.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
 
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.util.*;
 
 /**
  * Panel background, extending the {@link JPanel}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class BaseXBack extends JPanel {
-  /** Desktop hints. */
-  private static final Map<?, ?> HINTS = (Map<?, ?>)
-    Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints");
-  /** Flag for adding rendering hints. */
-  private static boolean hints = true;
   /** Fill mode. */
   private Fill mode;
 
@@ -38,18 +31,6 @@ public class BaseXBack extends JPanel {
    */
   public BaseXBack(final Fill m) {
     mode(m);
-  }
-
-  /**
-   * Constructor, specifying an empty border.
-   * @param t top distance
-   * @param l left distance
-   * @param b bottom distance
-   * @param r right distance
-   */
-  public BaseXBack(final int t, final int l, final int b, final int r) {
-    this();
-    border(t, l, b, r);
   }
 
   /**
@@ -82,16 +63,7 @@ public class BaseXBack extends JPanel {
     } else {
       super.paintComponent(g);
     }
-
-    // rendering hints are not supported by all platforms
-    if(hints) {
-      try {
-        ((Graphics2D) g).addRenderingHints(HINTS);
-      } catch(final Exception ex) {
-        Util.debug(ex);
-        hints = false;
-      }
-    }
+    BaseXLayout.hints(g);
   }
 
   /**
@@ -130,7 +102,7 @@ public class BaseXBack extends JPanel {
    * Activates graphics anti-aliasing.
    * @param g graphics reference
    */
-  protected static final void smooth(final Graphics g) {
+  protected static void smooth(final Graphics g) {
     ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
         RenderingHints.VALUE_ANTIALIAS_ON);
   }

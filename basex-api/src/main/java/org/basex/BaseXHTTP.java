@@ -13,6 +13,7 @@ import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.server.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.nio.*;
 import org.eclipse.jetty.server.ssl.*;
@@ -22,17 +23,17 @@ import org.eclipse.jetty.xml.*;
 /**
  * This is the main class for the starting the database HTTP services.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Dirk Kirsten
  */
 public final class BaseXHTTP {
   /** Database context. */
   private final Context context;
-  /** HTTP port. */
-  private int httpPort;
   /** HTTP server. */
   private final Server jetty;
+  /** HTTP port. */
+  private int httpPort;
   /** Start as daemon. */
   private boolean service;
   /** Stopped flag. */
@@ -64,8 +65,8 @@ public final class BaseXHTTP {
     context = HTTPContext.init();
 
     // create jetty instance and set default context to HTTP path
-    final MainProp mprop = context.mprop;
-    final String webapp = mprop.get(MainProp.WEBPATH);
+    final GlobalOptions gopts = context.globalopts;
+    final String webapp = gopts.get(GlobalOptions.WEBPATH);
     final WebAppContext wac = new WebAppContext(webapp, "/");
     jetty = (Server) new XmlConfiguration(initJetty(webapp).inputStream()).configure();
     jetty.setHandler(wac);
@@ -107,10 +108,10 @@ public final class BaseXHTTP {
     }
 
     // request password on command line if only the user was specified
-    if(!AProp.getSystem(MainProp.USER).isEmpty()) {
-      while(AProp.getSystem(MainProp.PASSWORD).isEmpty()) {
+    if(!Options.getSystem(GlobalOptions.USER).isEmpty()) {
+      while(Options.getSystem(GlobalOptions.PASSWORD).isEmpty()) {
         Util.out(PASSWORD + COLS);
-        AProp.setSystem(MainProp.PASSWORD, Util.password());
+        Options.setSystem(GlobalOptions.PASSWORD, Util.password());
       }
     }
 
@@ -125,8 +126,8 @@ public final class BaseXHTTP {
     HTTPContext.init(wac.getServletContext());
 
     // start daemon for stopping web server
-    final int stop = mprop.num(MainProp.STOPPORT);
-    if(stop >= 0) new StopServer(mprop.get(MainProp.SERVERHOST), stop).start();
+    final int stop = gopts.get(GlobalOptions.STOPPORT);
+    if(stop >= 0) new StopServer(gopts.get(GlobalOptions.SERVERHOST), stop).start();
 
     // show info when HTTP server is aborted
     Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -157,14 +158,14 @@ public final class BaseXHTTP {
    */
   public void stop() throws Exception {
     // notify the jetty monitor to stop
-    final MainProp mprop = context.mprop;
-    final int stop = num(MainProp.STOPPORT, mprop);
+    final GlobalOptions mprop = context.globalopts;
+    final int stop = num(GlobalOptions.STOPPORT, mprop);
     if(stop >= 0) stop(stop);
 
     // server has been started in a separate process and needs to be stopped
-    if(!bool(MainProp.HTTPLOCAL, mprop)) {
-      final int port = num(MainProp.SERVERPORT, mprop);
-      final int eport = num(MainProp.EVENTPORT, mprop);
+    if(!bool(GlobalOptions.HTTPLOCAL, mprop)) {
+      final int port = num(GlobalOptions.SERVERPORT, mprop);
+      final int eport = num(GlobalOptions.EVENTPORT, mprop);
       BaseXServer.stop(port, eport);
     }
   }
@@ -172,23 +173,23 @@ public final class BaseXHTTP {
   /**
    * Returns a numeric value for the specified option.
    * @param option option to be retrieved
-   * @param mprop main properties
+   * @param gopts global options
    * @return numeric value
    */
-  private static int num(final Object[] option, final MainProp mprop) {
-    final String val = AProp.getSystem(option);
-    return val.isEmpty() ? mprop.num(option) : Token.toInt(val);
+  private static int num(final NumberOption option, final GlobalOptions gopts) {
+    final String val = Options.getSystem(option);
+    return val.isEmpty() ? gopts.get(option) : Token.toInt(val);
   }
 
   /**
    * Returns a boolean value for the specified option.
    * @param option option to be retrieved
-   * @param mprop main properties
+   * @param gopts global options
    * @return boolean value
    */
-  private static boolean bool(final Object[] option, final MainProp mprop) {
-    final String val = AProp.getSystem(option);
-    return val.isEmpty() ? mprop.is(option) : Boolean.parseBoolean(val);
+  private static boolean bool(final BooleanOption option, final GlobalOptions gopts) {
+    final String val = Options.getSystem(option);
+    return val.isEmpty() ? gopts.get(option) : Boolean.parseBoolean(val);
   }
 
   /**
@@ -253,57 +254,57 @@ public final class BaseXHTTP {
    * @throws IOException I/O exception
    */
   private void parseArguments(final String[] args) throws IOException {
-    /* command-line properties not be stored in system properties (instead of
-     * context.mprop). this way, they will not be overwritten by web.xml settings. */
-    final Args arg = new Args(args, this, HTTPINFO, Util.info(CONSOLE, HTTP));
-    boolean daemon = false;
+    /* command-line properties will be stored in system properties;
+     * this way, they will not be overwritten by the settings specified in web.xml. */
+    final Args arg = new Args(args, this, S_HTTPINFO, Util.info(S_CONSOLE, HTTP));
+    boolean serve = true;
     while(arg.more()) {
       if(arg.dash()) {
         switch(arg.next()) {
           case 'd': // activate debug mode
-            AProp.setSystem(MainProp.DEBUG, true);
+            Options.setSystem(GlobalOptions.DEBUG, true);
             Prop.debug = true;
             break;
           case 'D': // hidden flag: daemon mode
-            daemon = true;
+            serve = false;
             break;
           case 'e': // parse event port
-            AProp.setSystem(MainProp.EVENTPORT, arg.number());
+            Options.setSystem(GlobalOptions.EVENTPORT, arg.number());
             break;
           case 'h': // parse HTTP port
             httpPort = arg.number();
             break;
           case 'l': // use local mode
-            AProp.setSystem(MainProp.HTTPLOCAL, true);
+            Options.setSystem(GlobalOptions.HTTPLOCAL, true);
             break;
           case 'n': // parse host name
-            AProp.setSystem(MainProp.HOST, arg.string());
+            Options.setSystem(GlobalOptions.HOST, arg.string());
             break;
           case 'p': // parse server port
             final int p = arg.number();
-            AProp.setSystem(MainProp.PORT, p);
-            AProp.setSystem(MainProp.SERVERPORT, p);
+            Options.setSystem(GlobalOptions.PORT, p);
+            Options.setSystem(GlobalOptions.SERVERPORT, p);
             break;
           case 'P': // specify password
-            AProp.setSystem(MainProp.PASSWORD, arg.string());
+            Options.setSystem(GlobalOptions.PASSWORD, arg.string());
             break;
           case 's': // parse stop port
-            AProp.setSystem(MainProp.STOPPORT, arg.number());
+            Options.setSystem(GlobalOptions.STOPPORT, arg.number());
             break;
           case 'S': // set service flag
-            service = !daemon;
+            service = serve;
             break;
           case 'U': // specify user name
-            AProp.setSystem(MainProp.USER, arg.string());
+            Options.setSystem(GlobalOptions.USER, arg.string());
             break;
           case 'z': // suppress logging
-            AProp.setSystem(MainProp.LOG, false);
+            Options.setSystem(GlobalOptions.LOG, false);
             break;
           default:
-            arg.usage();
+            throw arg.usage();
         }
       } else {
-        if(!arg.string().equalsIgnoreCase("stop")) arg.usage();
+        if(!"stop".equalsIgnoreCase(arg.string())) throw arg.usage();
         stopped = true;
       }
     }
@@ -324,8 +325,8 @@ public final class BaseXHTTP {
     Util.start(BaseXHTTP.class, args);
     // try to connect to the new server instance
     for(int c = 1; c < 10; ++c) {
-      if(ping(LOCALHOST, port, ssl)) return;
-      Performance.sleep(c * 100);
+      if(ping(S_LOCALHOST, port, ssl)) return;
+      Performance.sleep(c * 100L);
     }
     throw new BaseXException(CONNECTION_ERROR);
   }
@@ -336,7 +337,7 @@ public final class BaseXHTTP {
    * @return stop file
    */
   private static File stopFile(final int port) {
-    return new File(Prop.TMP, Util.name(BaseXHTTP.class) + port);
+    return new File(Prop.TMP, Util.className(BaseXHTTP.class) + port);
   }
 
   /**
@@ -348,7 +349,7 @@ public final class BaseXHTTP {
     final File stop = stopFile(port);
     try {
       stop.createNewFile();
-      new Socket(LOCALHOST, port).close();
+      new Socket(S_LOCALHOST, port).close();
       // give the notified process some time to quit
       Performance.sleep(100);
     } catch(final IOException ex) {
@@ -367,8 +368,7 @@ public final class BaseXHTTP {
   private static boolean ping(final String host, final int port, final boolean ssl) {
     try {
       // create connection
-      final URL url = new URL((ssl ? "https://" : "http://") + host + ':' + port);
-      url.openConnection().getInputStream();
+      new URL((ssl ? "https://" : "http://") + host + ':' + port).openConnection().getInputStream();
       return true;
     } catch(final IOException ex) {
       // if page is not found, server is running
@@ -378,7 +378,6 @@ public final class BaseXHTTP {
   }
 
   /** Monitor for stopping the Jetty server. */
-  @SuppressWarnings("synthetic-access")
   private final class StopServer extends Thread {
     /** Server socket. */
     private final ServerSocket ss;

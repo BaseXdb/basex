@@ -6,14 +6,13 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.lang.reflect.*;
 
-import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.io.*;
 
 /**
  * Console reader.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Dimitar Popov
  */
 public abstract class ConsoleReader {
@@ -40,7 +39,7 @@ public abstract class ConsoleReader {
    * Reads a password.
    * @return password as plain text
    */
-  public abstract String readPassword();
+  protected abstract String readPassword();
 
   /**
    * Create a new password reader for this console.
@@ -54,7 +53,7 @@ public abstract class ConsoleReader {
    * Creates a new instance.
    * @return instance of console reader
    */
-  public static final ConsoleReader get() {
+  public static ConsoleReader get() {
     if(JLineConsoleReader.isAvailable()) {
       try {
         return new JLineConsoleReader();

@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Boolean item ({@code xs:boolean}).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Bln extends Item {
@@ -109,7 +109,7 @@ public final class Bln extends Item {
   public int diff(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
     final boolean n = it.type == type ? it.bool(ii) : parse(it.string(ii), ii);
-    return val ? !n ? 1 : 0 : n ? -1 : 0;
+    return val ? n ? 0 : 1 : n ? -1 : 0;
   }
 
   @Override
@@ -129,18 +129,15 @@ public final class Bln extends Item {
    * @return result of check
    * @throws QueryException query exception
    */
-  public static boolean parse(final byte[] str, final InputInfo ii)
-      throws QueryException {
-
+  public static boolean parse(final byte[] str, final InputInfo ii) throws QueryException {
     final byte[] s = Token.trim(str);
     if(Token.eq(s, Token.TRUE) || Token.eq(s, Token.ONE)) return true;
     if(Token.eq(s, Token.FALSE) || Token.eq(s, Token.ZERO)) return false;
-    throw FUNCAST.thrw(ii, AtomType.BLN, str);
+    throw FUNCAST.get(ii, AtomType.BLN, chop(str));
   }
 
   @Override
   public String toString() {
-    return new TokenBuilder(val ? Token.TRUE : Token.FALSE).
-        add("()").toString();
+    return new TokenBuilder(val ? Token.TRUE : Token.FALSE).add("()").toString();
   }
 }

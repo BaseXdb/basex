@@ -5,10 +5,13 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
+import java.io.*;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
+import java.util.Map.Entry;
 
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -16,17 +19,17 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
+import org.basex.util.options.*;
 
 /**
  * Functions on relational databases.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  */
 public final class FNSql extends StandardFunc {
   /** Module prefix. */
-  private static final String PREFIX = "zip";
+  private static final String PREFIX = "sql";
   /** QName. */
   private static final QNm Q_ROW = QNm.get(PREFIX, "row", SQLURI);
   /** QName. */
@@ -60,7 +63,7 @@ public final class FNSql extends StandardFunc {
   /** Name. */
   private static final String NAME = "name";
   /** Auto-commit mode. */
-  private static final byte[] AUTO_COMM = token("autocommit");
+  private static final String AUTO_COMM = "autocommit";
   /** User. */
   private static final String USER = "user";
   /** Password. */
@@ -71,12 +74,13 @@ public final class FNSql extends StandardFunc {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNSql(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNSql(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -111,7 +115,7 @@ public final class FNSql extends StandardFunc {
    */
   private Item init(final QueryContext ctx) throws QueryException {
     final String driver = string(checkStr(expr[0], ctx));
-    if(Reflect.find(driver) == null) BXSQ_DRIVER.thrw(info, driver);
+    if(Reflect.find(driver) == null) throw BXSQ_DRIVER.get(info, driver);
     return null;
   }
 
@@ -131,14 +135,14 @@ public final class FNSql extends StandardFunc {
         final String pass = string(checkStr(expr[2], ctx));
         if(expr.length == 4) {
           // connection options
-          final Item opt = checkItem(expr[3], ctx);
-          final TokenMap options = new FuncParams(Q_OPTIONS, info).parse(opt);
+          final Options opts = checkOptions(3, Q_OPTIONS, new Options(), ctx);
           // extract auto-commit mode from options
           boolean ac = true;
-          final byte[] commit = options.get(AUTO_COMM);
+          final HashMap<String, String> options = opts.free();
+          final String commit = options.get(AUTO_COMM);
           if(commit != null) {
-            ac = eq(commit, TRUE);
-            options.delete(AUTO_COMM);
+            ac = Util.yes(commit);
+            options.remove(AUTO_COMM);
           }
           // connection properties
           final Properties props = connProps(options);
@@ -155,7 +159,7 @@ public final class FNSql extends StandardFunc {
       }
       return Int.get(ctx.jdbc().add(getConnection(url)));
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR.thrw(info, ex);
+      throw BXSQ_ERROR.get(info, ex);
     }
   }
 
@@ -164,10 +168,10 @@ public final class FNSql extends StandardFunc {
    * @param options options
    * @return connection properties
    */
-  private static Properties connProps(final TokenMap options) {
+  private static Properties connProps(final HashMap<String, String> options) {
     final Properties props = new Properties();
-    for(final byte[] next : options) {
-      if(next != null) props.setProperty(string(next), string(options.get(next)));
+    for(final Entry<String, String> entry : options.entrySet()) {
+      props.setProperty(entry.getKey(), entry.getValue());
     }
     return props;
   }
@@ -187,7 +191,7 @@ public final class FNSql extends StandardFunc {
       final PreparedStatement prep = conn.prepareStatement(string(prepStmt));
       return Int.get(ctx.jdbc().add(prep));
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR.thrw(info, ex);
+      throw BXSQ_ERROR.get(info, ex);
     }
   }
 
@@ -200,16 +204,16 @@ public final class FNSql extends StandardFunc {
   private NodeSeqBuilder execute(final QueryContext ctx) throws QueryException {
     final int id = (int) checkItr(expr[0], ctx);
     final Object obj = ctx.jdbc().get(id);
-    if(!(obj instanceof Connection)) BXSQ_CONN.thrw(info, id);
+    if(!(obj instanceof Connection)) throw BXSQ_CONN.get(info, id);
 
     final String query = string(checkStr(expr[1], ctx));
     Statement stmt = null;
     try {
       stmt = ((Connection) obj).createStatement();
       final boolean result = stmt.execute(query);
-      return result ? buildResult(stmt.getResultSet()) : new NodeSeqBuilder();
+      return result ? buildResult(stmt.getResultSet(), ctx) : new NodeSeqBuilder();
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR.thrw(info, ex);
+      throw BXSQ_ERROR.get(info, ex);
     } finally {
       if(stmt != null) try { stmt.close(); } catch(final SQLException ignored) { }
     }
@@ -224,25 +228,25 @@ public final class FNSql extends StandardFunc {
   private NodeSeqBuilder executePrepared(final QueryContext ctx) throws QueryException {
     final int id = (int) checkItr(expr[0], ctx);
     final Object obj = ctx.jdbc().get(id);
-    if(!(obj instanceof PreparedStatement)) BXSQ_STATE.thrw(info, id);
+    if(!(obj instanceof PreparedStatement)) throw BXSQ_STATE.get(info, id);
 
     // Get parameters for prepared statement
     long c = 0;
     ANode params = null;
     if(expr.length > 1) {
       params = (ANode) checkType(checkItem(expr[1], ctx), NodeType.ELM);
-      if(!params.qname().eq(Q_PARAMETERS)) ELMOPTION.thrw(info, params.qname());
+      if(!params.qname().eq(Q_PARAMETERS)) throw INVALIDOPTX.get(info, params.qname().local());
       c = countParams(params);
     }
 
     try {
       final PreparedStatement stmt = (PreparedStatement) obj;
       // Check if number of parameters equals number of place holders
-      if(c != stmt.getParameterMetaData().getParameterCount()) BXSQ_PARAMS.thrw(info);
+      if(c != stmt.getParameterMetaData().getParameterCount()) throw BXSQ_PARAMS.get(info);
       if(params != null) setParameters(params.children(), stmt);
-      return stmt.execute() ? buildResult(stmt.getResultSet()) : new NodeSeqBuilder();
+      return stmt.execute() ? buildResult(stmt.getResultSet(), ctx) : new NodeSeqBuilder();
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR.thrw(info, ex);
+      throw BXSQ_ERROR.get(info, ex);
     }
   }
 
@@ -271,7 +275,7 @@ public final class FNSql extends StandardFunc {
     int i = 0;
     for(ANode next; (next = params.next()) != null;) {
       // Check name
-      if(!next.qname().eq(Q_PARAMETER)) ELMOPTION.thrw(info, next.qname());
+      if(!next.qname().eq(Q_PARAMETER)) throw INVALIDOPTX.get(info, next.qname().local());
       final AxisIter attrs = next.attributes();
       byte[] paramType = null;
       boolean isNull = false;
@@ -282,9 +286,9 @@ public final class FNSql extends StandardFunc {
         else if(eq(attr.name(), NULL))
           isNull = attr.string() != null && Bln.parse(attr.string(), info);
         // Not expected attribute
-        else throw BXSQ_ATTR.thrw(info, string(attr.name()));
+        else throw BXSQ_ATTR.get(info, string(attr.name()));
       }
-      if(paramType == null) BXSQ_TYPE.thrw(info);
+      if(paramType == null) throw BXSQ_TYPE.get(info);
       final byte[] v = next.string();
       setParam(++i, stmt, paramType, isNull ? null : string(v), isNull);
     }
@@ -300,8 +304,7 @@ public final class FNSql extends StandardFunc {
    * @throws QueryException query exception
    */
   private void setParam(final int index, final PreparedStatement stmt,
-      final byte[] paramType, final String value, final boolean isNull)
-      throws QueryException {
+      final byte[] paramType, final String value, final boolean isNull) throws QueryException {
     try {
       if(eq(BOOL, paramType)) {
         if(isNull) stmt.setNull(index, Types.BOOLEAN);
@@ -331,23 +334,26 @@ public final class FNSql extends StandardFunc {
         if(isNull) stmt.setNull(index, Types.TIMESTAMP);
         else stmt.setTimestamp(index, Timestamp.valueOf(value));
       } else {
-        throw BXSQ_ERROR.thrw(info, "unsupported type: " + string(paramType));
+        throw BXSQ_ERROR.get(info, "unsupported type: " + string(paramType));
       }
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR.thrw(info, ex);
+      throw BXSQ_ERROR.get(info, ex);
     } catch(final IllegalArgumentException ex) {
-      throw BXSQ_FORMAT.thrw(info, string(paramType));
+      throw BXSQ_FORMAT.get(info, string(paramType));
     }
   }
 
   /**
    * Builds a sequence of elements from a query's result set.
    * @param rs result set
+   * @param ctx query context
    * @return sequence of elements <tuple/> each of which represents a row from
    *         the result set
    * @throws QueryException query exception
    */
-  private NodeSeqBuilder buildResult(final ResultSet rs) throws QueryException {
+  private NodeSeqBuilder buildResult(final ResultSet rs, final QueryContext ctx)
+      throws QueryException {
+
     try {
       final ResultSetMetaData metadata = rs.getMetaData();
       final int cc = metadata.getColumnCount();
@@ -356,18 +362,34 @@ public final class FNSql extends StandardFunc {
         final FElem row = new FElem(Q_ROW);
         rows.add(row);
         for(int k = 1; k <= cc; k++) {
-          // For each row add column values as children
-          final String label = metadata.getColumnLabel(k);
-          final Object value = rs.getObject(label);
-          // Null values are ignored
+          // for each row add column values as children
+          final String name = metadata.getColumnLabel(k);
+          final Object value = rs.getObject(k);
+          // null values are ignored
           if(value == null) continue;
-          // Element <sql:column name='...'>...</sql:column>
-          row.add(new FElem(Q_COLUMN).add(NAME, label).add(value.toString()));
+
+          // element <sql:column name='...'>...</sql:column>
+          final FElem col = new FElem(Q_COLUMN).add(NAME, name);
+          row.add(col);
+
+          if(value instanceof SQLXML) {
+            // add XML value as child element
+            final String xml = ((SQLXML) value).getString();
+            try {
+              col.add(new DBNode(new IOContent(xml), ctx.context.options).children().next());
+            } catch(final IOException ex) {
+              // fallback: add string representation
+              col.add(xml);
+            }
+          } else {
+            // add string representation of other values
+            col.add(value.toString());
+          }
         }
       }
       return rows;
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR.thrw(info, ex);
+      throw BXSQ_ERROR.get(info, ex);
     }
   }
 
@@ -382,7 +404,7 @@ public final class FNSql extends StandardFunc {
       connection(ctx, true).close();
       return null;
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR.thrw(info, ex);
+      throw BXSQ_ERROR.get(info, ex);
     }
   }
 
@@ -397,7 +419,7 @@ public final class FNSql extends StandardFunc {
       connection(ctx, false).commit();
       return null;
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR.thrw(info, ex);
+      throw BXSQ_ERROR.get(info, ex);
     }
   }
 
@@ -412,7 +434,7 @@ public final class FNSql extends StandardFunc {
       connection(ctx, false).rollback();
       return null;
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR.thrw(info, ex);
+      throw BXSQ_ERROR.get(info, ex);
     }
   }
 
@@ -428,7 +450,7 @@ public final class FNSql extends StandardFunc {
       throws QueryException {
     final int id = (int) checkItr(expr[0], ctx);
     final Object obj = ctx.jdbc().get(id);
-    if(!(obj instanceof Connection)) BXSQ_CONN.thrw(info, id);
+    if(!(obj instanceof Connection)) throw BXSQ_CONN.get(info, id);
     if(del) ctx.jdbc().remove(id);
     return (Connection) obj;
   }

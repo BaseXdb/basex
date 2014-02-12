@@ -13,7 +13,7 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'restore' command and restores a backup of a database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class Restore extends ABackup {
@@ -34,13 +34,13 @@ public class Restore extends ABackup {
     if(!Databases.validName(db)) return error(NAME_INVALID_X, db);
 
     // find backup file with or without date suffix
-    IOFile file = mprop.dbpath(db + IO.ZIPSUFFIX);
-    if(!file.exists()) {
-      final StringList list = Databases.backupPaths(db, context).sort(Prop.CASE, false);
-      if(!list.isEmpty()) file = new IOFile(list.get(0));
-    } else {
+    IOFile file = goptions.dbpath(db + IO.ZIPSUFFIX);
+    if(file.exists()) {
       // db is already the name of a backup -> extract db name
       db = Pattern.compile(DateTime.PATTERN + '$').split(db)[0];
+    } else {
+      final StringList list = Databases.backupPaths(db, context).sort(Prop.CASE, false);
+      if(!list.isEmpty()) file = new IOFile(list.get(0));
     }
     if(!file.exists()) return error(BACKUP_NOT_FOUND_X, db);
 
@@ -70,7 +70,7 @@ public class Restore extends ABackup {
    */
   private boolean restore(final IOFile file) {
     try {
-      proc(new Zip(file)).unzip(mprop.dbpath());
+      proc(new Zip(file)).unzip(goptions.dbpath());
       return true;
     } catch(final IOException ex) {
       Util.debug(ex);

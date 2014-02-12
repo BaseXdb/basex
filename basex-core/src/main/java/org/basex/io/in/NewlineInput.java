@@ -11,7 +11,7 @@ import org.basex.util.*;
  * newline characters {@code \n}, and the input encoding will be guessed by
  * analyzing the first bytes.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class NewlineInput extends TextInput {
@@ -45,10 +45,10 @@ public final class NewlineInput extends TextInput {
   @Override
   public int read() throws IOException {
     int n = next;
-    if(n != -2) {
-      next = -2;
-    } else {
+    if(n == -2) {
       n = super.read();
+    } else {
+      next = -2;
     }
     if(n != '\r') return n;
     n = super.read();

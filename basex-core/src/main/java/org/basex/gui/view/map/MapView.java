@@ -21,7 +21,7 @@ import org.basex.util.list.*;
 /**
  * This view is a TreeMap implementation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Joerg Hauser
  * @author Bastian Lemke
@@ -101,9 +101,9 @@ public final class MapView extends View implements Runnable {
     zoomStep = 0;
 
     final Data data = gui.context.data();
-    final GUIProp gprop = gui.gprop;
+    final GUIOptions gopts = gui.gopts;
     if(data != null && visible()) {
-      painter = new MapDefault(this, gprop);
+      painter = new MapDefault(this, gopts);
       mainMap = createImage();
       zoomMap = createImage();
       refreshLayout();
@@ -164,12 +164,12 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public boolean visible() {
-    return gui.gprop.is(GUIProp.SHOWMAP);
+    return gui.gopts.get(GUIOptions.SHOWMAP);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gprop.set(GUIProp.SHOWMAP, v);
+    gui.gopts.set(GUIOptions.SHOWMAP, v);
   }
 
   @Override
@@ -207,8 +207,8 @@ public final class MapView extends View implements Runnable {
 
     // calculate zooming speed (slower for large zooming scales)
     if(mainRect.w > 0 && mainRect.h > 0) {
-      zoomSpeed = (int) (Math.log(64d * getWidth() / mainRect.w) +
-          Math.log(64d * getHeight() / mainRect.h));
+      zoomSpeed = (int) (StrictMath.log(64d * getWidth() / mainRect.w) +
+        StrictMath.log(64d * getHeight() / mainRect.h));
     }
 
     if(quick) {
@@ -280,7 +280,7 @@ public final class MapView extends View implements Runnable {
     gui.cursor(CURSORWAIT);
 
     initLen();
-    layout = new MapLayout(nodes.data, textLen, gui.gprop);
+    layout = new MapLayout(nodes.data, textLen, gui.gopts);
     layout.makeMap(rect, new MapList(nodes.pres.clone()), 0, (int) nodes.size() - 1);
     // rectangles are copied to avoid synchronization issues
     mainRects = layout.rectangles.copy();
@@ -325,8 +325,8 @@ public final class MapView extends View implements Runnable {
       if(f == null || !f.thumb) return;
     }
 
-    final GUIProp gprop = gui.gprop;
-    if(gprop.num(GUIProp.MAPOFFSETS) == 0) {
+    final GUIOptions gopts = gui.gopts;
+    if(gopts.get(GUIOptions.MAPOFFSETS) == 0) {
       g.setColor(color(32));
       int pre = mainRects.size;
       int par = ViewData.parent(data, f.pre);
@@ -362,7 +362,7 @@ public final class MapView extends View implements Runnable {
       g.setFont(font);
       smooth(g);
       if(data.kind(f.pre) == Data.ELEM) {
-        String tt = Token.string(ViewData.name(gprop, data, f.pre));
+        String tt = Token.string(ViewData.name(gopts, data, f.pre));
         if(tt.length() > 32) tt = tt.substring(0, 30) + DOTS;
         BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), f.level + 5);
       }
@@ -375,8 +375,7 @@ public final class MapView extends View implements Runnable {
         final byte[] text = MapPainter.content(data, f);
         // calculate tooltip
         final int[][] info = new FTLexer().init(text).info();
-        final TokenList tl = MapRenderer.calculateToolTip(f, info, mouseX, mouseY,
-            getWidth(), g);
+        final TokenList tl = MapRenderer.calculateToolTip(f, info, mouseX, mouseY, getWidth(), g);
         final MapRect mr = new MapRect(getX(), getY(), getWidth(), getHeight());
         // draw calculated tooltip
         MapRenderer.drawToolTip(g, mouseX, mouseY, mr, tl, fontSize);
@@ -397,8 +396,7 @@ public final class MapView extends View implements Runnable {
     if(img == null) return;
     final MapRect r = new MapRect(0, 0, getWidth(), getHeight());
     zoom(r, zi);
-    g.drawImage(img, r.x, r.y, r.x + r.w, r.y + r.h, 0, 0, getWidth(),
-        getHeight(), this);
+    g.drawImage(img, r.x, r.y, r.x + r.w, r.y + r.h, 0, 0, getWidth(), getHeight(), this);
   }
 
   /**
@@ -485,8 +483,7 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void mouseDragged(final MouseEvent e) {
-    if(gui.updating || ++dragTol < 8 || mainRects.sorted != mainRects.list)
-      return;
+    if(gui.updating || ++dragTol < 8 || mainRects.sorted != mainRects.list) return;
 
     // refresh mouse focus
     int mx = mouseX;
@@ -539,7 +536,7 @@ public final class MapView extends View implements Runnable {
     if(gui.updating || mainRects == null || control(e)) return;
 
     final boolean cursor = PREVLINE.is(e) || NEXTLINE.is(e) ||
-        PREV.is(e) || NEXT.is(e);
+        PREVCHAR.is(e) || NEXTCHAR.is(e);
     if(!cursor) return;
 
     if(focused == null) focused = mainRects.get(0);
@@ -553,10 +550,10 @@ public final class MapView extends View implements Runnable {
     } else if(NEXTLINE.is(e)) {
       mouseY = focused.y + (shift ? o : focused.h + 1);
       if(shift) mouseX = focused.x + (focused.w >> 1);
-    } else if(PREV.is(e)) {
+    } else if(PREVCHAR.is(e)) {
       mouseX = focused.x + (shift ? focused.w - fs : 0) - 1;
       if(shift) mouseY = focused.y + (focused.h >> 1);
-    } else if(NEXT.is(e)) {
+    } else if(NEXTCHAR.is(e)) {
       mouseX = focused.x + (shift ? o : focused.w + 1);
       if(shift) mouseY = focused.y + (focused.h >> 1);
     }
@@ -582,7 +579,7 @@ public final class MapView extends View implements Runnable {
    */
   private void initLen() {
     final Data data = gui.context.data();
-    if(textLen != null || gui.gprop.num(GUIProp.MAPWEIGHT) == 0) return;
+    if(textLen != null || gui.gopts.get(GUIOptions.MAPWEIGHT) == 0) return;
 
     final int size = data.meta.size;
     textLen = new int[size];

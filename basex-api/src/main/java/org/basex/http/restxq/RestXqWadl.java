@@ -19,7 +19,7 @@ import org.basex.util.list.*;
  * This class returns a Web Application Description Language (WADL) file,
  * listing all available RESTXQ services.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class RestXqWadl {
@@ -49,13 +49,15 @@ final class RestXqWadl {
     final TreeMap<String, FElem> map = new TreeMap<String, FElem>();
     for(final RestXqModule mod : modules.values()) {
       for(final RestXqFunction func : mod.functions()) {
+        if(func.path == null) continue;
+
         final TokenObjMap<TokenList> xqdoc = func.function.doc();
         final String path = func.path.toString();
         final String methods = func.methods.toString().replaceAll("[^A-Z ]", "");
 
         // create resource
         final FElem resource = new FElem(WADL + "resource", WADL_URI).add("path", path);
-        map.put(path + "?" + methods, resource);
+        map.put(path + '?' + methods, resource);
 
         // add documentation for path variables
         final Matcher var = Pattern.compile("\\$[^}]*").matcher(path);
@@ -116,7 +118,7 @@ final class RestXqWadl {
    * @param parent parent node
    * @return element node
    */
-  private FElem elem(final String name, final FElem parent) {
+  private static FElem elem(final String name, final FElem parent) {
     final FElem elem = new FElem(WADL + name, WADL_URI);
     if(parent != null) parent.add(elem);
     return elem;

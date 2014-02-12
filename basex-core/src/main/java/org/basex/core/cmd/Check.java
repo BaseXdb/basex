@@ -4,13 +4,13 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
-import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * Evaluates the 'check' command: opens an existing database or
  * creates a new one.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Check extends Command {
@@ -55,7 +55,7 @@ public final class Check extends Command {
     // minimum permissions: create
     if(!context.user.has(Perm.CREATE)) return true;
     // database with given name does not exist
-    if(!mprop.dbpath(qi.db).exists()) return false;
+    if(!goptions.dbpath(qi.db).exists()) return false;
     // open database if addressed file does not exist
     if(!qi.input.exists()) return true;
 

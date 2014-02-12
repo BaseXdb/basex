@@ -5,7 +5,7 @@ import org.basex.query.*;
 /**
  * This module contains functions for handling servlet responses.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Response extends QueryModule {

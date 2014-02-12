@@ -3,7 +3,7 @@ package org.basex.http;
 /**
  * This class assembles texts which are used in the HTTP classes.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public interface HTTPText {
@@ -13,8 +13,6 @@ public interface HTTPText {
   String AUTHORIZATION = "Authorization";
   /** HTTP basic authentication. */
   String BASIC = "Basic";
-  /** Location string. */
-  String LOCATION = "location";
 
   /** HTTP String. */
   String HTTP = "HTTP";

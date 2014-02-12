@@ -15,7 +15,7 @@ import org.basex.util.ft.*;
 /**
  * Evaluates the 'create db' command and creates a new index.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class CreateIndex extends ACreate {
@@ -32,9 +32,9 @@ public final class CreateIndex extends ACreate {
     final Data data = context.data();
     if(data.inMemory()) return error(NO_MAINMEM);
 
-    final IndexType index;
     final CmdIndex ci = getOption(CmdIndex.class);
     if(ci == null) return error(UNKNOWN_CMD_X, this);
+    final IndexType index;
     switch(ci) {
       case TEXT:
         data.meta.createtext = true;
@@ -46,11 +46,11 @@ public final class CreateIndex extends ACreate {
         break;
       case FULLTEXT:
         data.meta.createftxt = true;
-        data.meta.stemming = prop.is(Prop.STEMMING);
-        data.meta.casesens = prop.is(Prop.CASESENS);
-        data.meta.diacritics = prop.is(Prop.DIACRITICS);
-        data.meta.language = Language.get(prop);
-        data.meta.stopwords = prop.get(Prop.STOPWORDS);
+        data.meta.stemming = options.get(MainOptions.STEMMING);
+        data.meta.casesens = options.get(MainOptions.CASESENS);
+        data.meta.diacritics = options.get(MainOptions.DIACRITICS);
+        data.meta.language = Language.get(options);
+        data.meta.stopwords = options.get(MainOptions.STOPWORDS);
         index = IndexType.FULLTEXT;
         break;
       default:

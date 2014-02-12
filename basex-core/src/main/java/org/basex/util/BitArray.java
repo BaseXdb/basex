@@ -1,21 +1,23 @@
 package org.basex.util;
 
+import java.util.BitSet;
+
 import static java.lang.Long.*;
 
 /**
  * Bit array that grows when needed. The implementation is similar to
- * {@link java.util.BitSet}.
+ * {@link BitSet}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Dimitar Popov
  */
 public final class BitArray {
   /** Number of bits needed to address a bit in a word; 2<sup>6</sup> = 64. */
-  private static final int WORD_POWER = 6;
+  static final int WORD_POWER = 6;
   /** Size of a word = 2<sup>{@link #WORD_POWER}</sup>. */
-  private static final int WORD_SIZE = 1 << WORD_POWER;
+  static final int WORD_SIZE = 1 << WORD_POWER;
   /** A bit mask of 64 bits set to 1. */
-  private static final long WORD_MASK = -1L;
+  static final long WORD_MASK = -1L;
 
   /** Bit storage. */
   private long[] words;
@@ -24,15 +26,29 @@ public final class BitArray {
 
   /** Construct a new bit array. */
   public BitArray() {
-    this(WORD_SIZE);
+    init();
   }
 
   /**
    * Construct a new bit array with the specified number of bits.
-   * @param n initial number of bits (> 0)
+   * @param n initial number of bits
    */
   public BitArray(final int n) {
-    init(n);
+    init(new long[(Math.max(0, n - 1) >>> WORD_POWER) + 1], n);
+  }
+
+  /**
+   * Construct a new bit array and an initial value.
+   * @param n initial number of bits
+   * @param set sets or clears all values
+   */
+  public BitArray(final int n, final boolean set) {
+    this(n);
+    if(set) {
+      final int p = Math.max(0, n - 1) >>> WORD_POWER;
+      for(int i = 0; i < p; i++) words[i] = 0XFFFFFFFFFFFFFFFFL;
+      for(int i = p << WORD_POWER; i < n; i++) set(i);
+    }
   }
 
   /**
@@ -42,19 +58,11 @@ public final class BitArray {
    */
   public BitArray(final long[] a, final int l) {
     init(a, l);
-}
+  }
 
   /** Initialize the bit array with an empty array. */
   public void init() {
     init(new long[1], 0);
-  }
-
-  /**
-   * Initialize the bit array with a new size. All bits will be set to 0.
-   * @param n initial number of bits (> 0)
-   */
-  void init(final int n) {
-    init(new long[(Math.max(0, n - 1) >>> WORD_POWER) + 1], n);
   }
 
   /**
@@ -84,19 +92,19 @@ public final class BitArray {
 
   /**
    * Returns the number of bits set to {@code true}.
-   * @return  the number of bits set to {@code true}
+   * @return number of bits set to {@code true}
    */
   public int cardinality() {
     int sum = 0;
     final int inUse = size + WORD_SIZE - 1 >>> WORD_POWER;
-    for (int i = 0; i < inUse; i++) sum += bitCount(words[i]);
+    for(int i = 0; i < inUse; i++) sum += bitCount(words[i]);
     return sum;
   }
 
   /**
    * Get the value of the i<sup>th</sup> bit.
    * @param i index of the bit
-   * @return <code>true</code> if the i<sup>th</sup> bit is set
+   * @return {@code true} if the i<sup>th</sup> bit is set
    */
   public boolean get(final int i) {
     if(i >= size) return false;
@@ -167,8 +175,8 @@ public final class BitArray {
     int wi = i >>> WORD_POWER;
     long word = words[wi] & WORD_MASK << i;
     while(true) {
-      if (word != 0) return (wi << WORD_POWER) + numberOfTrailingZeros(word);
-      if (++wi == inUse) return -1;
+      if(word != 0) return (wi << WORD_POWER) + numberOfTrailingZeros(word);
+      if(++wi == inUse) return -1;
       word = words[wi];
     }
   }

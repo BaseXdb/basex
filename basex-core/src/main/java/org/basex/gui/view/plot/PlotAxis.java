@@ -10,7 +10,7 @@ import org.basex.util.hash.*;
 /**
  * Axis component of the scatter plot visualization.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 final class PlotAxis {
@@ -174,7 +174,7 @@ final class PlotAxis {
       // calculating positions for all items with value b in current category
       while(i < l) {
         // centering items if only a single category exists (.5d)
-        final double d = nrCats != 1 ? 1.0d / (nrCats - 1) * p : .5d;
+        final double d = nrCats == 1 ? .5d : 1.0d / (nrCats - 1) * p;
         co[tmpI[i++]] = d;
       }
       ++p;
@@ -236,7 +236,7 @@ final class PlotAxis {
    * @return base e logarithm for d
    */
   private static double ln(final double d) {
-    return d == 0 ? 0 : Math.log1p(Math.abs(d));
+    return d == 0 ? 0 : StrictMath.log1p(Math.abs(d));
   }
 
   /**
@@ -296,21 +296,21 @@ final class PlotAxis {
     // small ranges between min and max value
     if(range < 1) {
       final double dec = 1.0d / range;
-      double pow = (int) (Math.floor(Math.log10(dec) + .5d) + 1) * 2;
-      final double fac = (int) Math.pow(10, pow);
+      double pow = (int) (Math.floor(StrictMath.log10(dec) + .5d) + 1) * 2;
+      final double fac = (int) StrictMath.pow(10, pow);
       final double tmin = min * fac;
       final double tmax = max * fac;
       range = Math.abs(tmax - tmin);
 
-      pow = range < 10 ? 0 : (int) Math.floor(Math.log10(range) + .5d) - 1;
-      calculatedCaptionStep = (int) Math.pow(10, pow);
+      pow = range < 10 ? 0 : (int) Math.floor(StrictMath.log10(range) + .5d) - 1;
+      calculatedCaptionStep = (int) StrictMath.pow(10, pow);
       calculatedCaptionStep /= fac;
       return;
     }
 
     final int pow = range < 10 ? 0 :
-      (int) Math.floor(Math.log10(range) + .5d) - 1;
-    calculatedCaptionStep = (int) Math.pow(10, pow);
+      (int) Math.floor(StrictMath.log10(range) + .5d) - 1;
+    calculatedCaptionStep = (int) StrictMath.pow(10, pow);
   }
 
   /**

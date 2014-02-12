@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
 /**
  * FTUnaryNot expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */
@@ -30,8 +30,7 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
     return expr[0] instanceof FTNot ? expr[0].expr[0] : this;
   }
@@ -58,7 +57,7 @@ public final class FTNot extends FTExpr {
    * @param item item
    * @return specified item
    */
-  static FTNode not(final FTNode item) {
+  private static FTNode not(final FTNode item) {
     if(item != null) {
       item.all = not(item.all);
       item.score(Scoring.not(item.score()));
@@ -82,12 +81,12 @@ public final class FTNot extends FTExpr {
    * @return resulting match
    */
   private static FTMatches not(final FTMatches m, final int i) {
-    final FTMatches all = new FTMatches(m.sTokenNum);
+    final FTMatches all = new FTMatches(m.pos);
     if(i == m.size()) {
       all.add(new FTMatch());
     } else {
       for(final FTStringMatch s : m.match[i]) {
-        s.ex ^= true;
+        s.exclude ^= true;
         for(final FTMatch tmp : not(m, i + 1)) {
           all.add(new FTMatch(1 + tmp.size()).add(s).add(tmp));
         }
@@ -104,8 +103,7 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new FTNot(info, expr[0].copy(ctx, scp, vs));
   }
 

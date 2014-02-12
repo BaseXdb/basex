@@ -4,7 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.util.*;
 
-import org.basex.core.*;
+import org.basex.data.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -13,18 +13,18 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * This class indicates exceptions during the parsing or evaluation of a query.
+ * Thrown to indicate an exception during the parsing or evaluation of a query.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class QueryException extends Exception {
+public class QueryException extends Exception {
   /** Stack. */
   private final ArrayList<InputInfo> stack = new ArrayList<InputInfo>();
   /** Error QName. */
   private final QNm name;
   /** Error value. */
-  private transient Value value = Empty.SEQ;
+  private Value value = Empty.SEQ;
   /** Error reference. */
   private Err err;
   /** Code suggestions. */
@@ -72,10 +72,8 @@ public final class QueryException extends Exception {
    * @param msg error message
    * @param ext error extension
    */
-  public QueryException(final InputInfo ii, final QNm errc, final String msg,
-      final Object... ext) {
-
-    super(BaseXException.message(msg, ext));
+  public QueryException(final InputInfo ii, final QNm errc, final String msg, final Object... ext) {
+    super(message(msg, ext));
     name = errc;
     if(ii != null) info(ii);
     for(final Object o : ext) {
@@ -90,15 +88,15 @@ public final class QueryException extends Exception {
    * Returns the error column.
    * @return error column
    */
-  public int col() {
-    return info == null ? 0 : info.lineCol()[1];
+  public int column() {
+    return info == null ? 0 : info.column();
   }
 
   /**
    * Returns the marked error column.
    * @return marked error column
    */
-  public int markedCol() {
+  public int markedColumn() {
     return markedCol;
   }
 
@@ -107,7 +105,7 @@ public final class QueryException extends Exception {
    * @return error line
    */
   public int line() {
-    return info == null ? 0 : info.lineCol()[0];
+    return info == null ? 0 : info.line();
   }
 
   /**
@@ -115,7 +113,7 @@ public final class QueryException extends Exception {
    * @return error line
    */
   public String file() {
-    return info == null ? null : info.file();
+    return info == null ? null : info.path();
   }
 
   /**
@@ -233,7 +231,7 @@ public final class QueryException extends Exception {
     if(code.length != 0) tb.add('[').add(code).add("] ");
     tb.add(getLocalizedMessage());
     if(!stack.isEmpty()) {
-      tb.add(NL).add(NL).add(STACK_TRACE_C);
+      tb.add(NL).add(NL).add(STACK_TRACE).add(COL);
       for(final InputInfo ii : stack) tb.add(NL).add(LI).add(ii.toString());
     }
     return tb.toString();
@@ -254,5 +252,29 @@ public final class QueryException extends Exception {
   public QueryException notCatchable() {
     catchable = false;
     return this;
+  }
+
+  /**
+   * Creates the error message from the specified text and extension array.
+   * @param text text message with optional placeholders
+   * @param ext info extensions
+   * @return argument
+   */
+  private static String message(final String text, final Object[] ext) {
+    final int es = ext.length;
+    for(int e = 0; e < es; e++) {
+      Object o = ext[e];
+      if(o instanceof byte[]) {
+        o = Token.string((byte[]) o);
+      } else if(o instanceof ExprInfo) {
+        o = ((ExprInfo) o).toErrorString();
+      } else if(o instanceof Throwable) {
+        o = Util.message((Throwable) o);
+      } else if(!(o instanceof String)) {
+        o = String.valueOf(o);
+      }
+      ext[e] = o;
+    }
+    return Util.info(text, ext);
   }
 }

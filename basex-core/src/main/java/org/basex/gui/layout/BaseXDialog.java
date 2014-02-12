@@ -18,7 +18,7 @@ import org.basex.util.*;
 /**
  * This superclass in inherited by all dialog windows.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class BaseXDialog extends JDialog {
@@ -27,9 +27,9 @@ public abstract class BaseXDialog extends JDialog {
   /** Reference to main window. */
   public GUI gui;
   /** Remembers if the window was correctly closed. */
-  public boolean ok;
+  protected boolean ok;
   /** Reference to the root panel. */
-  public BaseXBack panel;
+  protected BaseXBack panel;
 
   /** Dialog position. */
   private int[] loc;
@@ -39,7 +39,7 @@ public abstract class BaseXDialog extends JDialog {
     @Override
     public void keyReleased(final KeyEvent e) {
       // don't trigger any action for modifier keys
-      if(!modifier(e)) action(e.getSource());
+      if(!modifier(e) && e.getKeyChar() != KeyEvent.CHAR_UNDEFINED) action(e.getSource());
     }
   };
 
@@ -48,7 +48,7 @@ public abstract class BaseXDialog extends JDialog {
    * @param d calling dialog
    * @param title dialog title
    */
-  public BaseXDialog(final BaseXDialog d, final String title) {
+  protected BaseXDialog(final BaseXDialog d, final String title) {
     super(d, title, true);
     init(d.gui);
   }
@@ -58,7 +58,7 @@ public abstract class BaseXDialog extends JDialog {
    * @param main reference to main window
    * @param title dialog title
    */
-  public BaseXDialog(final GUI main, final String title) {
+  protected BaseXDialog(final GUI main, final String title) {
     this(main, title, true);
   }
 
@@ -68,7 +68,7 @@ public abstract class BaseXDialog extends JDialog {
    * @param title dialog title
    * @param modal modal flag
    */
-  public BaseXDialog(final GUI main, final String title, final boolean modal) {
+  protected BaseXDialog(final GUI main, final String title, final boolean modal) {
     super(main, title, modal);
     init(main);
   }
@@ -95,7 +95,7 @@ public abstract class BaseXDialog extends JDialog {
    * @param comp component to be added
    * @param pos layout position
    */
-  public final void set(final Component comp, final String pos) {
+  protected final void set(final Component comp, final String pos) {
     panel.add(comp, pos);
   }
 
@@ -103,8 +103,9 @@ public abstract class BaseXDialog extends JDialog {
    * Finalizes the dialog layout and sets it visible.
    * @param l optional dialog location, relative to main window
    */
-  public final void finish(final int[] l) {
+  protected final void finish(final int[] l) {
     pack();
+    setMinimumSize(getPreferredSize());
     if(l == null) setLocationRelativeTo(gui);
     else setLocation(gui.getX() + l[0], gui.getY() + l[1]);
     loc = l;
@@ -121,10 +122,10 @@ public abstract class BaseXDialog extends JDialog {
 
   /**
    * Reacts on user input; can be overwritten.
-   * @param comp the action component
+   * @param source source
    */
   @SuppressWarnings("unused")
-  public void action(final Object comp) { }
+  public void action(final Object source) { }
 
   /**
    * Cancels the dialog; can be overwritten.
@@ -149,7 +150,7 @@ public abstract class BaseXDialog extends JDialog {
       final Container par = getParent();
       loc[0] = getX() - par.getX();
       loc[1] = getY() - par.getY();
-      gui.gprop.write();
+      gui.gopts.write();
     }
     super.dispose();
   }
@@ -166,8 +167,8 @@ public abstract class BaseXDialog extends JDialog {
    * Creates a OK and CANCEL button.
    * @return button list
    */
-  public BaseXBack okCancel() {
-    return newButtons(B_OK, B_CANCEL);
+  protected BaseXBack okCancel() {
+    return newButtons(B_OK, CANCEL);
   }
 
   /**
@@ -201,15 +202,14 @@ public abstract class BaseXDialog extends JDialog {
    * @param label button label
    * @param enabled enabled/disabled
    */
-  public static void enableOK(final JComponent panel, final String label,
+  protected static void enableOK(final JComponent panel, final String label,
       final boolean enabled) {
 
     for(final Component c : panel.getComponents()) {
-      if(!(c instanceof JComponent)) {
-      } else if(c instanceof BaseXButton) {
+      if(c instanceof BaseXButton) {
         final BaseXButton b = (BaseXButton) c;
         if(b.getText().equals(label)) b.setEnabled(enabled);
-      } else {
+      } else if(c instanceof JComponent) {
         enableOK((JComponent) c, label, enabled);
       }
     }
@@ -235,15 +235,6 @@ public abstract class BaseXDialog extends JDialog {
    */
   public static boolean confirm(final GUI gui, final String text) {
     return new DialogMessage(gui, text.trim(), Msg.QUESTION).ok();
-  }
-
-  /**
-   * Static information dialog.
-   * @param gui parent reference
-   * @param text text
-   */
-  public static void info(final GUI gui, final String text) {
-    new DialogMessage(gui, text.trim(), Msg.SUCCESS);
   }
 
   /**

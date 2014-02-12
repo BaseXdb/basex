@@ -21,7 +21,7 @@ import org.basex.util.*;
  * Abstract predicate expression, implemented by {@link Filter} and
  * {@link Step}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Preds extends ParseExpr {
@@ -49,9 +49,15 @@ public abstract class Preds extends ParseExpr {
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    for(int p = 0; p < preds.length; ++p)
+      preds[p] = preds[p].compile(ctx, scp).compEbv(ctx);
+    return optimize(ctx, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     for(int p = 0; p < preds.length; ++p) {
-      Expr pr = preds[p].compile(ctx, scp).compEbv(ctx);
-      pr = Pos.get(OpV.EQ, pr, pr, info);
+      Expr pr = Pos.get(OpV.EQ, preds[p], preds[p], info);
 
       // position() = last() -> last()
       if(pr instanceof CmpG || pr instanceof CmpV) {
@@ -76,13 +82,13 @@ public abstract class Preds extends ParseExpr {
       } else if(pr instanceof And && !pr.has(Flag.FCS)) {
         // replace AND expression with predicates (don't swap position tests)
         ctx.compInfo(OPTPRED, pr);
-        final Expr[] and = ((And) pr).expr;
+        final Expr[] and = ((Arr) pr).expr;
         final int m = and.length - 1;
         final ExprList tmp = new ExprList(preds.length + m);
         for(final Expr e : Arrays.asList(preds).subList(0, p)) tmp.add(e);
         for(final Expr a : and) {
           // wrap test with boolean() if the result is numeric
-          tmp.add(Function.BOOLEAN.get(info, a).compEbv(ctx));
+          tmp.add(Function.BOOLEAN.get(null, info, a).compEbv(ctx));
         }
         for(final Expr e : Arrays.asList(preds).subList(p + 1, preds.length)) tmp.add(e);
         preds = tmp.finish();
@@ -94,24 +100,21 @@ public abstract class Preds extends ParseExpr {
   }
 
   /**
-   * Checks if this expression can be evaluated in an iterative manner.
-   * This is possible if no predicate, or only the first, is positional, or
-   * if a single {@code last()} predicate is specified.
+   * Prepares this expression for iterative evaluation. The expression can be iteratively
+   * evaluated if no predicate or only the first is positional.
    * @return result of check
    */
-  protected boolean useIterator() {
-    // numeric predicate
-    pos = preds[0] instanceof Pos ? (Pos) preds[0] : null;
-    last = preds[0].isFunction(Function.LAST);
-
-    boolean np1 = true;
-    boolean np2 = true;
-    for(int p = 0; p < preds.length; p++) {
-      final boolean np = !preds[p].type().mayBeNumber() && !preds[p].has(Flag.FCS);
-      np1 &= np;
-      if(p > 0) np2 &= np;
+  protected final boolean posIterator() {
+    // check if first predicate is numeric
+    if(preds.length == 1) {
+      if(preds[0] instanceof Int) {
+        final long p = ((Int) preds[0]).itr();
+        preds[0] = Pos.get(p, p, info);
+      }
+      pos = preds[0] instanceof Pos ? (Pos) preds[0] : null;
+      last = preds[0].isFunction(Function.LAST);
     }
-    return np1 || pos != null && np2 || last && preds.length == 1;
+    return pos != null || last;
   }
 
   /**
@@ -121,13 +124,13 @@ public abstract class Preds extends ParseExpr {
    * @return result of check
    * @throws QueryException query exception
    */
-  public boolean preds(final Item it, final QueryContext ctx) throws QueryException {
+  protected final boolean preds(final Item it, final QueryContext ctx) throws QueryException {
     if(preds.length == 0) return true;
 
     // set context item and position
-    Item i = null;
     final Value cv = ctx.value;
     try {
+      Item i = null;
       for(final Expr p : preds) {
         ctx.value = it;
         i = p.test(ctx, info);
@@ -161,8 +164,8 @@ public abstract class Preds extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
     return inlineAll(ctx, scp, preds, v, e) ? optimize(ctx, scp) : null;
   }
 
@@ -174,7 +177,7 @@ public abstract class Preds extends ParseExpr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(final Expr e : preds) sb.append("[" + e + ']');
+    for(final Expr e : preds) sb.append('[').append(e).append(']');
     return sb.toString();
   }
 
@@ -184,7 +187,7 @@ public abstract class Preds extends ParseExpr {
    * @param p copy
    * @return the copy
    */
-  protected <T extends Preds> T copy(final T p) {
+  protected final <T extends Preds> T copy(final T p) {
     p.last = last;
     p.pos = pos;
     return copyType(p);

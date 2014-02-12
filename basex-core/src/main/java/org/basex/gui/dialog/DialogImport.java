@@ -9,10 +9,11 @@ import java.util.*;
 import javax.swing.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
+import org.basex.core.MainOptions.MainParser;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
+import org.basex.gui.layout.BaseXLayout.DropHandler;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -21,24 +22,18 @@ import org.basex.util.list.*;
 /**
  * Panel for importing new database resources.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
-public final class DialogImport extends BaseXBack {
-  /** Available parsers. */
-  private static final String[] PARSING = {
-    DataText.M_XML, DataText.M_JSON, DataText.M_HTML,
-    DataText.M_CSV, DataText.M_TEXT, DataText.M_RAW
-  };
-
+final class DialogImport extends BaseXBack {
   /** User feedback. */
   final BaseXLabel info;
   /** Resource to add. */
   final BaseXTextField input;
   /** Browse button. */
   final BaseXButton browse;
-  /** Parser. */
-  final BaseXCombo parser;
+  /** Chosen parser. */
+  final BaseXCombo parsers;
   /** DB name. */
   String dbname;
 
@@ -61,9 +56,7 @@ public final class DialogImport extends BaseXBack {
    * @param panel feature panel
    * @param parse parsing dialog
    */
-  public DialogImport(final BaseXDialog dial, final BaseXBack panel,
-      final DialogParsing parse) {
-
+  DialogImport(final BaseXDialog dial, final BaseXBack panel, final DialogParsing parse) {
     gui = dial.gui;
     parsing = parse;
 
@@ -73,12 +66,12 @@ public final class DialogImport extends BaseXBack {
     // add options
     add(new BaseXLabel(FILE_OR_DIR + COL, true, true).border(0, 0, 6, 0));
 
-    final String in = gui.gprop.get(GUIProp.INPUTPATH);
-    input = new BaseXTextField(gui.gprop.get(GUIProp.INPUTPATH), dial);
-    input.history(gui, GUIProp.INPUTS);
+    final String path = gui.gopts.get(GUIOptions.INPUTPATH);
+    input = new BaseXTextField(path, dial);
+    input.history(GUIOptions.INPUTS, dial);
 
-    final IO io = IO.get(in);
-    if(io instanceof IOFile && !in.isEmpty()) dbname = io.dbname();
+    final IO io = IO.get(path);
+    if(io instanceof IOFile && !path.isEmpty()) dbname = io.dbname();
 
     browse = new BaseXButton(BROWSE_D, dial);
     browse.addActionListener(new ActionListener() {
@@ -94,23 +87,24 @@ public final class DialogImport extends BaseXBack {
     add(panel);
     add(Box.createVerticalStrut(12));
 
-    final Prop prop = gui.context.prop;
-    final StringList parsers = new StringList(PARSING.length);
-    for(final String p : PARSING) parsers.add(p.toUpperCase(Locale.ENGLISH));
+    final MainOptions opts = gui.context.options;
+    final StringList ps = new StringList();
+    for(final MainParser mp : MainParser.values()) ps.add(mp.name());
 
-    parser = new BaseXCombo(dial, parsers.toArray());
-    parser.setSelectedItem(prop.get(Prop.PARSER).toUpperCase(Locale.ENGLISH));
-    filter = new BaseXTextField(prop.get(Prop.CREATEFILTER), dial);
+    parsers = new BaseXCombo(dial, ps.toArray());
+    parsers.setSelectedItem(opts.get(MainOptions.PARSER).name());
+
+    filter = new BaseXTextField(opts.get(MainOptions.CREATEFILTER), dial);
     BaseXLayout.setWidth(filter, 200);
 
-    addRaw = new BaseXCheckBox(ADD_RAW_FILES, prop.is(Prop.ADDRAW), dial);
-    skipCorrupt = new BaseXCheckBox(SKIP_CORRUPT_FILES, prop.is(Prop.SKIPCORRUPT), dial);
-    archives = new BaseXCheckBox(PARSE_ARCHIVES, prop.is(Prop.ADDARCHIVES), dial);
+    addRaw = new BaseXCheckBox(ADD_RAW_FILES, MainOptions.ADDRAW, opts, dial);
+    skipCorrupt = new BaseXCheckBox(SKIP_CORRUPT_FILES, MainOptions.SKIPCORRUPT, opts, dial);
+    archives = new BaseXCheckBox(PARSE_ARCHIVES, MainOptions.ADDARCHIVES, opts, dial);
 
     final BaseXBack p = new BaseXBack(new TableLayout(2, 2, 20, 0));
     p.add(new BaseXLabel(INPUT_FORMAT, false, true).border(0, 0, 6, 0));
     p.add(new BaseXLabel(FILE_PATTERNS + COL, false, true).border(0, 0, 6, 0));
-    p.add(parser);
+    p.add(parsers);
     p.add(filter);
     add(p);
     add(Box.createVerticalStrut(8));
@@ -119,8 +113,19 @@ public final class DialogImport extends BaseXBack {
     add(archives);
 
     // add info label
-    info = new BaseXLabel(" ").border(24, 0, 6, 0);
+    info = new BaseXLabel(" ").border(32, 0, 6, 0);
     add(info);
+
+    final DropHandler dh = new DropHandler() {
+      @Override
+      public void drop(final Object object) {
+        input.setText(object.toString());
+        action(input, dial instanceof DialogNew);
+      }
+    };
+
+    BaseXLayout.addDrop(this, dh);
+    BaseXLayout.addDrop(input, dh);
   }
 
   /**
@@ -136,12 +141,12 @@ public final class DialogImport extends BaseXBack {
    * @return file chooser
    */
   IOFile inputFile() {
-    final String path = gui.gprop.get(GUIProp.INPUTPATH);
+    final String path = gui.gopts.get(GUIOptions.INPUTPATH);
     final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR, path, gui);
     fc.textFilters();
     fc.filter(ZIP_ARCHIVES, IO.ZIPSUFFIXES);
     final IOFile file = fc.select(Mode.FDOPEN);
-    if(file != null) gui.gprop.set(GUIProp.INPUTPATH, file.path());
+    if(file != null) gui.gopts.set(GUIOptions.INPUTPATH, file.path());
     return file;
   }
 
@@ -156,21 +161,21 @@ public final class DialogImport extends BaseXBack {
 
     final String in = input.getText().trim();
     final IO io = IO.get(in);
-    gui.gprop.set(GUIProp.INPUTPATH, in);
+    gui.gopts.set(GUIOptions.INPUTPATH, in);
 
     boolean multi = io.isDir() || io.isArchive();
     archives.setEnabled(multi);
     multi &= archives.isSelected();
     filter.setEnabled(multi);
 
-    final String type = parser();
-    final boolean raw = type.equals(DataText.M_RAW);
-    addRaw.setEnabled(multi && !raw && !gui.context.prop.is(Prop.MAINMEM));
+    final MainParser parser = MainParser.valueOf(parsers.getSelectedItem());
+    final boolean raw = parser == MainParser.RAW;
+    addRaw.setEnabled(multi && !raw && !gui.context.options.get(MainOptions.MAINMEM));
     skipCorrupt.setEnabled(!raw);
 
-    if(comp == parser) {
-      parsing.updateType(type);
-      if(multi) filter.setText(raw ? "*" : "*." + type);
+    if(comp == parsers) {
+      parsing.setType(parser);
+      if(multi) filter.setText(raw ? "*" : "*." + parser);
     }
 
     ok &= empty ? in.isEmpty() || io.exists() : !in.isEmpty() && io.exists();
@@ -184,14 +189,13 @@ public final class DialogImport extends BaseXBack {
    * Sets the parsing options.
    */
   void setOptions() {
-    final String type = parser();
-    gui.set(Prop.PARSER, type);
-    gui.set(Prop.CREATEFILTER, filter.getText());
-    gui.set(Prop.ADDARCHIVES, archives.isSelected());
-    gui.set(Prop.SKIPCORRUPT, skipCorrupt.isSelected());
-    gui.set(Prop.ADDRAW, addRaw.isSelected());
+    gui.set(MainOptions.PARSER, MainParser.valueOf(parsers.getSelectedItem()));
+    gui.set(MainOptions.CREATEFILTER, filter.getText());
+    gui.set(MainOptions.ADDARCHIVES, archives.isSelected());
+    gui.set(MainOptions.SKIPCORRUPT, skipCorrupt.isSelected());
+    gui.set(MainOptions.ADDRAW, addRaw.isSelected());
     input.store();
-    parsing.setOptions(type);
+    parsing.setOptions();
   }
 
   /**
@@ -207,8 +211,8 @@ public final class DialogImport extends BaseXBack {
   }
 
   /**
-   * Chooses the correct input type.
-   * @param in input
+   * Sets the correct input type.
+   * @param in input path
    */
   void setType(final String in) {
     // get file path, update input path and database name
@@ -217,41 +221,32 @@ public final class DialogImport extends BaseXBack {
 
     final boolean dir = io.isDir();
     final boolean archive = io.isArchive();
-    if(dir || archive) filter.setText('*' + IO.XMLSUFFIX);
+    if(dir || archive) {
+      return;
+      //filter.setText('*' + IO.XMLSUFFIX);
+    }
 
     // evaluate input type
-    String type = null;
-    if(!dir && !archive) {
-      // input type of single file
-      final String path = io.path();
-      final int i = path.lastIndexOf('.');
-      if(i != -1) {
-        // analyze file suffix
-        final String suf = path.substring(i).toLowerCase(Locale.ENGLISH);
-        if(Token.eq(suf, IO.XMLSUFFIXES)) type = DataText.M_XML;
-        else if(Token.eq(suf, IO.XSLSUFFIXES)) type = DataText.M_XML;
-        else if(Token.eq(suf, IO.HTMLSUFFIXES)) type = DataText.M_HTML;
-        else if(Token.eq(suf, IO.CSVSUFFIX)) type = DataText.M_CSV;
-        else if(Token.eq(suf, IO.TXTSUFFIXES)) type = DataText.M_TEXT;
-        else if(Token.eq(suf, IO.JSONSUFFIX)) type = DataText.M_JSON;
-      }
-      // unknown suffix: analyze first bytes
-      if(type == null) type = guess(io);
+    MainParser type = null;
+    // input type of single file
+    final String path = io.path();
+    final int i = path.lastIndexOf('.');
+    if(i != -1) {
+      // analyze file suffix
+      final String suf = path.substring(i).toLowerCase(Locale.ENGLISH);
+      if(Token.eq(suf, IO.XMLSUFFIXES) || Token.eq(suf, IO.XSLSUFFIXES)) type = MainParser.XML;
+      else if(Token.eq(suf, IO.HTMLSUFFIXES)) type = MainParser.HTML;
+      else if(Token.eq(suf, IO.CSVSUFFIX)) type = MainParser.CSV;
+      else if(Token.eq(suf, IO.TXTSUFFIXES)) type = MainParser.TEXT;
+      else if(Token.eq(suf, IO.JSONSUFFIX)) type = MainParser.JSON;
     }
+    // unknown suffix: analyze first bytes
+    if(type == null) type = guess(io);
     // default parser: XML
-    if(type == null) type = DataText.M_XML;
+    if(type == null) type = MainParser.XML;
 
     // choose correct parser (default: XML)
-    parser.setSelectedItem(type.toUpperCase(Locale.ENGLISH));
-    parsing.updateType(type);
-  }
-
-  /**
-   * Returns the parsing type.
-   * @return type
-   */
-  String parser() {
-    return parser.getSelectedItem().toString().toLowerCase(Locale.ENGLISH);
+    parsers.setSelectedItem(type.name());
   }
 
   /**
@@ -259,23 +254,23 @@ public final class DialogImport extends BaseXBack {
    * @param in input stream
    * @return type
    */
-  static String guess(final IO in) {
-    if(!in.exists()) return null;
+  private static MainParser guess(final IO in) {
+    if(!in.exists() || in instanceof IOUrl) return null;
 
     BufferInput ti = null;
     try {
       ti = new BufferInput(in);
       int b = ti.read();
       // input starts with opening bracket: may be xml
-      if(b == '<') return DataText.M_XML;
+      if(b == '<') return MainParser.XML;
 
       for(int c = 0; b >= 0 && ++c < IO.BLOCKSIZE;) {
         // treat as raw data if characters are no ascii
-        if(b < ' ' && !Token.ws(b) || b >= 128) return DataText.M_RAW;
+        if(b < ' ' && !Token.ws(b) || b >= 128) return MainParser.RAW;
         b = ti.read();
       }
       // all characters were of type ascii
-      return DataText.M_TEXT;
+      return MainParser.TEXT;
     } catch(final IOException ignored) {
     } finally {
       if(ti != null) try { ti.close(); } catch(final IOException ignored) { }

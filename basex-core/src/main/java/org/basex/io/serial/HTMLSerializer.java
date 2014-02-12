@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * This class serializes data as HTML.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class HTMLSerializer extends OutputSerializer {
@@ -31,23 +31,24 @@ public class HTMLSerializer extends OutputSerializer {
   /**
    * Constructor, specifying serialization options.
    * @param os output stream reference
-   * @param p serialization properties
+   * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  HTMLSerializer(final OutputStream os, final SerializerProp p) throws IOException {
-    super(os, p, V40, V401, V50);
+  HTMLSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
+    super(os, sopts, V40, V401, V50);
   }
 
   @Override
   protected void attribute(final byte[] n, final byte[] v) throws IOException {
-    // don't append value for boolean attributes
-    final byte[] tagatt = concat(lc(elem), COLON, lc(n));
-    if(BOOLEAN.contains(tagatt) && eq(n, v)) return;
-    // escape URI attributes
-    final byte[] val = escape && URIS.contains(tagatt) ? escape(v) : v;
-
     print(' ');
     print(n);
+
+    // don't append value for boolean attributes
+    final byte[] tagatt = concat(lc(tag), COLON, lc(n));
+    if(BOOLEAN.contains(tagatt) && eq(n, v)) return;
+    // escape URI attributes
+    final byte[] val = escuri && URIS.contains(tagatt) ? escape(v) : v;
+
     print(ATT1);
     for(int k = 0; k < val.length; k += cl(val, k)) {
       final int ch = cp(val, k);
@@ -58,7 +59,7 @@ public class HTMLSerializer extends OutputSerializer {
       } else if(ch == 0x9 || ch == 0xA) {
         hex(ch);
       } else {
-        code(ch);
+        encode(ch);
       }
     }
     print(ATT2);
@@ -75,7 +76,7 @@ public class HTMLSerializer extends OutputSerializer {
   @Override
   protected void finishPi(final byte[] n, final byte[] v) throws IOException {
     if(sep) indent();
-    if(contains(v, '>')) SERPI.thrwSerial();
+    if(contains(v, '>')) throw SERPI.getIO();
     print(PI_O);
     print(n);
     print(' ');
@@ -84,11 +85,11 @@ public class HTMLSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void code(final int ch) throws IOException {
+  protected void encode(final int ch) throws IOException {
     if(script) printChar(ch);
-    else if(ch > 0x7F && ch < 0xA0 && !html5) SERILL.thrwSerial(Integer.toHexString(ch));
+    else if(ch > 0x7F && ch < 0xA0 && !html5) throw SERILL.getIO(Integer.toHexString(ch));
     else if(ch == 0xA0) print(E_NBSP);
-    else super.code(ch);
+    else super.encode(ch);
   }
 
   @Override
@@ -99,7 +100,7 @@ public class HTMLSerializer extends OutputSerializer {
     print(t);
     sep = indent;
     script = SCRIPTS.contains(lc(t));
-    if(content && eq(lc(elem), HEAD)) ct++;
+    if(content && eq(lc(tag), HEAD)) ct++;
   }
 
   @Override
@@ -113,9 +114,9 @@ public class HTMLSerializer extends OutputSerializer {
     if(ct(true, true)) return;
     print(ELEM_C);
     if(html5) {
-      if(EMPTIES5.contains(lc(elem))) return;
+      if(EMPTIES5.contains(lc(tag))) return;
     } else {
-      if(EMPTIES.contains(lc(elem))) {
+      if(EMPTIES.contains(lc(tag))) {
         final byte[] u = nsUri(EMPTY);
         if(u == null || u.length == 0) return;
       }
@@ -127,16 +128,16 @@ public class HTMLSerializer extends OutputSerializer {
   @Override
   protected void finishClose() throws IOException {
     super.finishClose();
-    script = script && !SCRIPTS.contains(lc(elem));
+    script = script && !SCRIPTS.contains(lc(tag));
   }
 
   @Override
-  protected boolean doctype(final byte[] dt) throws IOException {
+  boolean doctype(final byte[] dt) throws IOException {
     if(level != 0) return false;
     if(!super.doctype(dt) && html5) {
       if(sep) indent();
       print(DOCTYPE);
-      if(dt == null) print(M_HTML);
+      if(dt == null) print(HTML);
       else print(dt);
       print(ELEM_C);
       if(indent) print(nl);

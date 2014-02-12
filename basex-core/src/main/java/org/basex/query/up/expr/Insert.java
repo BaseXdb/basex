@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * Insert expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class Insert extends Update {
@@ -33,17 +33,18 @@ public final class Insert extends Update {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param src source expression
    * @param f first flag
    * @param l last
    * @param b before
    * @param a after
-   * @param trg target expression
+   * @param tr target expression
    */
-  public Insert(final InputInfo ii, final Expr src, final boolean f,
-      final boolean l, final boolean b, final boolean a, final Expr trg) {
-    super(ii, trg, src);
+  public Insert(final StaticContext sctx, final InputInfo ii, final Expr src,
+      final boolean f, final boolean l, final boolean b, final boolean a, final Expr tr) {
+    super(sctx, ii, tr, src);
     first = f;
     last = l;
     before = b;
@@ -52,45 +53,44 @@ public final class Insert extends Update {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Constr c = new Constr(ii, ctx).add(expr[1]);
+    final Constr c = new Constr(ii, sc).add(ctx, expr[1]);
     final ANodeList cList = c.children;
     final ANodeList aList = c.atts;
-    if(c.errAtt) UPNOATTRPER.thrw(info);
-    if(c.duplAtt != null) UPATTDUPL.thrw(info, new QNm(c.duplAtt));
+    if(c.errAtt) throw UPNOATTRPER.get(info);
+    if(c.duplAtt != null) throw UPATTDUPL.get(info, new QNm(c.duplAtt));
 
     // check target constraints
     final Iter t = ctx.iter(expr[0]);
     final Item i = t.next();
-    if(i == null) UPSEQEMP.thrw(info, Util.name(this));
+    if(i == null) throw UPSEQEMP.get(info, Util.className(this));
     if(!(i instanceof ANode) || t.next() != null)
-      (before || after ? UPTRGTYP2 : UPTRGTYP).thrw(info);
+      throw (before || after ? UPTRGTYP2 : UPTRGTYP).get(info);
 
     final ANode n = (ANode) i;
     final ANode par = n.parent();
     if(before || after) {
       if(n.type == NodeType.ATT || n.type == NodeType.DOC)
-        UPTRGTYP2.thrw(info);
-      if(par == null) UPPAREMPTY.thrw(info);
+        throw UPTRGTYP2.get(info);
+      if(par == null) throw UPPAREMPTY.get(info);
     } else {
       if(n.type != NodeType.ELM && n.type != NodeType.DOC)
-        UPTRGTYP.thrw(info);
+        throw UPTRGTYP.get(info);
     }
 
     UpdatePrimitive up;
     DBNode dbn;
     // no update primitive is created if node list is empty
-    if(aList.size() > 0) {
+    if(!aList.isEmpty()) {
       final ANode targ = before || after ? par : n;
-      if(targ.type != NodeType.ELM)
-        (before || after ? UPATTELM : UPATTELM2).thrw(info);
+      if(targ.type != NodeType.ELM) throw (before || after ? UPATTELM : UPATTELM2).get(info);
 
       dbn = ctx.updates.determineDataRef(targ, ctx);
-      up = new InsertAttribute(dbn.pre, dbn.data, info, checkNS(aList, targ, ctx));
+      up = new InsertAttribute(dbn.pre, dbn.data, info, checkNS(aList, targ));
       ctx.updates.add(up, ctx);
     }
 
     // no update primitive is created if node list is empty
-    if(cList.size() > 0) {
+    if(!cList.isEmpty()) {
       dbn = ctx.updates.determineDataRef(n, ctx);
       if(before) up = new InsertBefore(dbn.pre, dbn.data, info, cList);
       else if(after) up = new InsertAfter(dbn.pre, dbn.data, info, cList);
@@ -104,7 +104,7 @@ public final class Insert extends Update {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Insert(info, expr[1].copy(ctx, scp, vs), first, last, before, after,
+    return new Insert(sc, info, expr[1].copy(ctx, scp, vs), first, last, before, after,
         expr[0].copy(ctx, scp, vs));
   }
 

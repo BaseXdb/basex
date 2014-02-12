@@ -18,7 +18,7 @@ import org.basex.util.*;
  *
  * NOTE: this class is not thread-safe.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Tim Petrowsky
  */
@@ -27,18 +27,18 @@ public final class TableDiskAccess extends TableAccess {
   private final Buffers bm = new Buffers();
   /** File storing all blocks. */
   private final RandomAccessFile file;
-  /** Bitmap storing free (=0) and occupied (=1) pages. */
-  private final BitArray freePages;
+  /** Bitmap storing free (=0) and used (=1) pages. */
+  private BitArray usedPages;
   /** File lock. */
   private FileLock fl;
 
-  /** FirstPre values (sorted ascending; length: {@link #blocks}). */
+  /** First pre values (ascending order); will be initialized with the first update. */
   private int[] fpres;
-  /** Page index (length: {@link #blocks}). */
+  /** Page index; will be initialized with the first update. */
   private int[] pages;
+
   /** Page index. */
   private int page = -1;
-
   /** Pre value of the first entry in the current block. */
   private int fpre = -1;
   /** First pre value of the next block. */
@@ -60,20 +60,25 @@ public final class TableDiskAccess extends TableAccess {
 
     // read meta and index data
     final DataInput in = new DataInput(meta.dbfile(DATATBL + 'i'));
-    blocks = in.readNum();
-    used   = in.readNum();
-    fpres  = in.readNums();
-    pages  = in.readNums();
+    final int b = in.readNum();
+    blocks = b;
 
-    final int psize = in.readNum();
-    // check if the page map has been stored
-    if(psize == 0) {
-      // init the map with empty pages
-      freePages = new BitArray(blocks);
-      for(final int p : pages) freePages.set(p);
-      dirty = true;
+    // check if page index is regular and can be calculated (0: no pages)
+    final int u = in.readNum();
+    final boolean regular = u == 0 || u == Integer.MAX_VALUE;
+    if(regular) {
+      used = u == 0 ? 0 : b;
     } else {
-      freePages = new BitArray(in.readLongs(psize), blocks);
+      // read page index and first pre values from disk
+      used = u;
+      fpres = in.readNums();
+      pages = in.readNums();
+    }
+
+    // read block bitmap
+    if(!regular) {
+      final int psize = in.readNum();
+      usedPages = new BitArray(in.readLongs(psize), used);
     }
     in.close();
 
@@ -91,7 +96,7 @@ public final class TableDiskAccess extends TableAccess {
    * @return result of check
    */
   public static boolean locked(final String db, final Context ctx) {
-    final IOFile table = MetaData.file(ctx.mprop.dbpath(db), DATATBL);
+    final IOFile table = MetaData.file(ctx.globalopts.dbpath(db), DATATBL);
     if(!table.exists()) return false;
 
     try {
@@ -125,7 +130,7 @@ public final class TableDiskAccess extends TableAccess {
     out.writeNum(blocks);
     for(int a = 0; a < blocks; a++) out.writeNum(pages[a]);
 
-    out.writeLongs(freePages.toArray());
+    out.writeLongs(usedPages.toArray());
     out.close();
     dirty = false;
   }
@@ -148,7 +153,7 @@ public final class TableDiskAccess extends TableAccess {
     } catch(final IOException ex) {
       Util.stack(ex);
     }
-    throw Util.notexpected((lock ? "Exclusive" : "Shared") +
+    throw Util.notExpected((lock ? "Exclusive" : "Shared") +
         " lock could not be acquired.");
   }
 
@@ -271,7 +276,7 @@ public final class TableDiskAccess extends TableAccess {
   @Override
   public void delete(final int pre, final int nr) {
     if(nr == 0) return;
-    dirty = true;
+    dirty();
 
     // get first block
     cursor(pre);
@@ -289,7 +294,7 @@ public final class TableDiskAccess extends TableAccess {
       // if whole block was deleted, remove it from the index
       if(npre == fpre) {
         // mark the block as empty
-        freePages.clear(pages[page]);
+        usedPages.clear(pages[page]);
 
         Array.move(fpres, page + 1, -1, used - page - 1);
         Array.move(pages, page + 1, -1, used - page - 1);
@@ -309,7 +314,7 @@ public final class TableDiskAccess extends TableAccess {
         ++unused;
         // mark the blocks as empty; range clear cannot be used because the
         // blocks may not be consecutive
-        freePages.clear(pages[page]);
+        usedPages.clear(pages[page]);
       }
       setPage(page + 1);
       from = 0;
@@ -319,7 +324,7 @@ public final class TableDiskAccess extends TableAccess {
     readBlock(pages[page]);
     final Buffer bf = bm.current();
     if(npre == last) {
-      freePages.clear((int) bf.pos);
+      usedPages.clear((int) bf.pos);
       ++unused;
       if(page < used - 1) readPage(page + 1);
       else ++page;
@@ -346,7 +351,7 @@ public final class TableDiskAccess extends TableAccess {
   public void insert(final int pre, final byte[] entries) {
     final int nnew = entries.length;
     if(nnew == 0) return;
-    dirty = true;
+    dirty();
 
     // number of records to be inserted
     final int nr = nnew >>> IO.NODEPOWER;
@@ -355,7 +360,7 @@ public final class TableDiskAccess extends TableAccess {
     if(used == 0) {
       // special case: insert new data into first block if database is empty
       readPage(0);
-      freePages.set(0);
+      usedPages.set(0);
       ++used;
     } else if(pre > 0) {
       // find the offset within the block where the new records will be inserted
@@ -363,7 +368,7 @@ public final class TableDiskAccess extends TableAccess {
     } else {
       // all insert operations will add data after first node.
       // i.e., there is no "insert before first document" statement
-      Util.notexpected("Insertion at beginning of populated table.");
+      throw Util.notExpected("Insertion at beginning of populated table.");
     }
 
     // number of bytes occupied by old records in the current block
@@ -457,8 +462,23 @@ public final class TableDiskAccess extends TableAccess {
 
     // update cached variables
     fpre = fpres[page];
-    npre = page + 1 < used && fpres[page + 1] < meta.size ?
-        fpres[page + 1] : meta.size;
+    npre = page + 1 < used && fpres[page + 1] < meta.size ? fpres[page + 1] : meta.size;
+  }
+
+  @Override
+  protected void dirty() {
+    // initialize data structures required for performing updates
+    if(fpres == null) {
+      final int b = blocks;
+      fpres = new int[b];
+      pages = new int[b];
+      for(int i = 0; i < b; i++) {
+        fpres[i] = i * IO.ENTRIES;
+        pages[i] = i;
+      }
+      usedPages = new BitArray(used, true);
+    }
+    dirty = true;
   }
 
   // PRIVATE METHODS ==========================================================
@@ -482,10 +502,10 @@ public final class TableDiskAccess extends TableAccess {
         else if(pre >= np) l = m + 1;
         else break;
         m = h + l >>> 1;
-        fp = fpres[m];
-        np = m == last ? meta.size : fpres[m + 1];
+        fp = fpre(m);
+        np = m == last ? meta.size : fpre(m + 1);
       }
-      if(l > h) Util.notexpected(
+      if(l > h) throw Util.notExpected(
           "Data Access out of bounds:" +
           "\n- pre value: " + pre +
           "\n- #used blocks: " + used +
@@ -502,8 +522,8 @@ public final class TableDiskAccess extends TableAccess {
    */
   private void setPage(final int p) {
     page = p;
-    fpre = fpres[p];
-    npre = p + 1 >= used ? meta.size : fpres[p + 1];
+    fpre = fpre(p);
+    npre = p + 1 >= used ? meta.size : fpre(p + 1);
   }
 
   /**
@@ -512,7 +532,25 @@ public final class TableDiskAccess extends TableAccess {
    */
   private void readPage(final int p) {
     setPage(p);
-    readBlock(pages[p]);
+    readBlock(page(p));
+  }
+
+  /**
+   * Return the specified page index.
+   * @param p index of the block to fetch
+   * @return pre value
+   */
+  private int page(final int p) {
+    return pages == null ? p : pages[p];
+  }
+
+  /**
+   * Return the specified pre value.
+   * @param p index of the block to fetch
+   * @return pre value
+   */
+  private int fpre(final int p) {
+    return fpres == null ? p * IO.ENTRIES : fpres[p];
   }
 
   /**
@@ -541,8 +579,8 @@ public final class TableDiskAccess extends TableAccess {
    * Moves the cursor to a free block (either new or existing empty one).
    */
   private void freeBlock() {
-    final int b = freePages.nextFree(0);
-    freePages.set(b);
+    final int b = usedPages.nextFree(0);
+    usedPages.set(b);
     readBlock(b);
     ++used;
     ++page;
@@ -567,8 +605,7 @@ public final class TableDiskAccess extends TableAccess {
     // update index entries for all following blocks and reduce counter
     for(int i = page + 1; i < used; ++i) fpres[i] -= nr;
     meta.size -= nr;
-    npre = page + 1 < used && fpres[page + 1] < meta.size ? fpres[page + 1] :
-      meta.size;
+    npre = page + 1 < used && fpres[page + 1] < meta.size ? fpres[page + 1] : meta.size;
   }
 
   /**
@@ -579,10 +616,8 @@ public final class TableDiskAccess extends TableAccess {
    * @param dp destination position
    * @param l source length
    */
-  private void copy(final byte[] s, final int sp, final byte[] d,
-      final int dp, final int l) {
-    System.arraycopy(s, sp << IO.NODEPOWER, d, dp << IO.NODEPOWER,
-        l << IO.NODEPOWER);
+  private void copy(final byte[] s, final int sp, final byte[] d, final int dp, final int l) {
+    System.arraycopy(s, sp << IO.NODEPOWER, d, dp << IO.NODEPOWER, l << IO.NODEPOWER);
     bm.current().dirty = true;
   }
 

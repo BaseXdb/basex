@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Delete primitive.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class DeleteNode extends UpdatePrimitive {
@@ -53,7 +53,7 @@ public final class DeleteNode extends UpdatePrimitive {
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + getTargetNode() + ']';
+    return Util.className(this) + '[' + getTargetNode() + ']';
   }
 
   @Override
@@ -67,7 +67,7 @@ public final class DeleteNode extends UpdatePrimitive {
   }
 
   @Override
-  public void addAtomics(final AtomicUpdateList l) {
+  public void addAtomics(final AtomicUpdateCache l) {
     l.addDelete(targetPre);
   }
 }

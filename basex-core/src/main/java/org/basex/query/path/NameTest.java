@@ -12,19 +12,21 @@ import org.basex.util.*;
 /**
  * Name test.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class NameTest extends Test {
   /** Local name. */
   public final byte[] ln;
+  /** Default element namespace. */
+  private final byte[] defElemNS;
 
   /**
    * Empty constructor ('*').
    * @param att attribute flag
    */
   public NameTest(final boolean att) {
-    this(null, Mode.ALL, att);
+    this(null, Mode.ALL, att, null);
   }
 
   /**
@@ -32,10 +34,12 @@ public final class NameTest extends Test {
    * @param nm name
    * @param t type of name test
    * @param att attribute flag
+   * @param elemNS default element namespace
    */
-  public NameTest(final QNm nm, final Mode t, final boolean att) {
+  public NameTest(final QNm nm, final Mode t, final boolean att, final byte[] elemNS) {
     type = att ? NodeType.ATT : NodeType.ELM;
     ln = nm != null ? nm.local() : null;
+    defElemNS = elemNS != null ? elemNS : Token.EMPTY;
     name = nm;
     mode = t;
   }
@@ -53,8 +57,7 @@ public final class NameTest extends Test {
     // check if test may yield results
     boolean results = true;
     if(mode == Mode.STD && !name.hasURI()) {
-      final byte[] elemNS = ctx.sc.elemNS != null ? ctx.sc.elemNS : Token.EMPTY;
-      if(type == NodeType.ATT || Token.eq(dataNS, elemNS)) {
+      if(type == NodeType.ATT || Token.eq(dataNS, defElemNS)) {
         // namespace is irrelevant/identical: only check local name
         mode = Mode.LN;
       } else {
@@ -123,6 +126,6 @@ public final class NameTest extends Test {
 
   @Override
   public Test intersect(final Test other) {
-    throw Util.notexpected(other);
+    throw Util.notExpected(other);
   }
 }

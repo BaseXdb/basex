@@ -6,16 +6,16 @@ import org.basex.util.*;
 /**
  * Atomic update operation that renames a node.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 final class Rename extends BasicUpdate {
   /** Kind of updated node. */
-  final int targetkind;
+  private final int targetkind;
   /** The new name of the node. */
-  final byte[] name;
+  private final byte[] name;
   /** Name URI. */
-  final byte[] uri;
+  private final byte[] uri;
 
   /**
    * Constructor.
@@ -23,13 +23,27 @@ final class Rename extends BasicUpdate {
    * @param k target node kind
    * @param n new name for the target node
    * @param u new name uri for the target node
+   * @param p parent node PRE
    */
-  Rename(final int l, final int k, final byte[] n, final byte[] u) {
-    super(l, 0, -1);
-    if(n.length == 0) Util.notexpected("New name must not be empty.");
+  private Rename(final int l, final int k, final byte[] n, final byte[] u, final int p) {
+    super(l, p);
+    if(n.length == 0) throw Util.notExpected("New name must not be empty.");
     targetkind = k;
     name = n;
     uri = u;
+  }
+
+  /**
+   * Factory.
+   * @param data data reference
+   * @param pre target node PRE
+   * @param n new name
+   * @param u new uri
+   * @return instance
+   */
+  static Rename getInstance(final Data data, final int pre, final byte[] n,
+      final byte[] u) {
+    return new Rename(pre, data.kind(pre), n, u, data.parent(pre, data.kind(pre)));
   }
 
   @Override
@@ -39,13 +53,7 @@ final class Rename extends BasicUpdate {
 
   @Override
   DataClip getInsertionData() {
-    Util.notexpected("No insertion sequence needed for atomic rename operation.");
-    return null;
-  }
-
-  @Override
-  int parent() {
-    return -1;
+    throw Util.notExpected("No insertion sequence needed for atomic rename operation.");
   }
 
   @Override
@@ -55,6 +63,6 @@ final class Rename extends BasicUpdate {
 
   @Override
   public String toString() {
-    return "Rename: " + location;
+    return "\n Rename: " + super.toString();
   }
 }

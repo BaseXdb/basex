@@ -3,14 +3,14 @@ package org.basex.util;
 import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
-import java.util.jar.*;
+import java.util.zip.*;
 
 /**
  * Custom class loader for loading jar files. This class is needed because JDK
  * does not offer a fine and easy way to delete open jars:
  * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5041014
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Rositsa Shadura
  */
@@ -38,7 +38,7 @@ public final class JarLoader extends URLClassLoader {
         try {
           final Field jar = jl.getClass().getDeclaredField("jar");
           jar.setAccessible(true);
-          ((JarFile) jar.get(jl)).close();
+          ((ZipFile) jar.get(jl)).close();
         } catch(final Throwable th) {
           Util.errln(th);
         }

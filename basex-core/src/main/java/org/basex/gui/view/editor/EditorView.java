@@ -11,78 +11,73 @@ import java.util.*;
 import java.util.regex.*;
 
 import javax.swing.*;
+import javax.swing.border.*;
 import javax.swing.event.*;
 
+import org.basex.build.*;
 import org.basex.core.*;
-import org.basex.data.*;
+import org.basex.core.cmd.*;
+import org.basex.core.parse.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.dialog.*;
-import org.basex.gui.editor.Editor.Action;
-import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
+import org.basex.gui.text.*;
+import org.basex.gui.text.TextPanel.Action;
 import org.basex.gui.view.*;
+import org.basex.gui.view.project.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
+import org.basex.io.parse.json.*;
+import org.basex.io.parse.xml.*;
+import org.basex.query.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.xml.sax.*;
 
 /**
  * This view allows the input and evaluation of queries and documents.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class EditorView extends View {
+  /** Link pattern. */
+  private static final Pattern LINK = Pattern.compile("(.*?), ([0-9]+)/([0-9]+)");
   /** Number of files in the history. */
   private static final int HISTORY = 18;
   /** Number of files in the compact history. */
   private static final int HISTCOMP = 7;
-  /** XQuery error pattern. */
-  private static final Pattern XQERROR = Pattern.compile(
-      "(.*?), ([0-9]+)/([0-9]+)" + COL);
-  /** XML error pattern. */
-  private static final Pattern XMLERROR = Pattern.compile(
-      LINE_X.replaceAll("%", "(.*?)") + COL + ".*");
-  /** Error information pattern. */
-  private static final Pattern ERRORINFO = Pattern.compile(
-      "^.*\r?\n\\[.*?\\] |" + LINE_X.replaceAll("%", "\\d+") + COLS + "|\r?\n.*",
-      Pattern.DOTALL);
-  /** Error tooltip pattern. */
-  private static final Pattern ERRORTT = Pattern.compile(
-      "^.*\r?\n" + STOPPED_AT + "|\r?\n" + STACK_TRACE_C + ".*", Pattern.DOTALL);
 
-  /** Search bar. */
-  final SearchBar search;
   /** History Button. */
-  final BaseXButton hist;
-  /** Execute Button. */
-  final BaseXButton stop;
+  private final AbstractButton hist;
+  /** Stop Button. */
+  private final AbstractButton stop;
+  /** Go button. */
+  private final AbstractButton go;
+  /** Search bar. */
+  private final SearchBar search;
   /** Info label. */
-  final BaseXLabel info;
+  private final BaseXLabel info;
   /** Position label. */
-  final BaseXLabel pos;
-  /** Query area. */
-  final BaseXTabs tabs;
-  /** Execute button. */
-  final BaseXButton go;
-
-  /** Thread counter. */
-  int threadID;
-  /** File in which the most recent error occurred. */
-  IO errFile;
-
-  /** Last error message. */
-  private String errMsg;
-  /** Most recent error position; used for clicking on error message. */
-  private int errPos;
-
+  private final BaseXLabel pos;
+  /** Splitter. */
+  private final BaseXSplit split;
   /** Header string. */
   private final BaseXLabel label;
-  /** Filter button. */
-  private final BaseXButton filter;
+  /** Query area. */
+  private final BaseXTabs tabs;
+  /** Query file that has last been evaluated. */
+  private IOFile execFile;
+  /** Thread counter. */
+  private int threadID;
+
+  /** Project files. */
+  final ProjectView project;
+  /** Input info. */
+  InputInfo errorInfo;
 
   /**
    * Default constructor.
@@ -90,51 +85,45 @@ public final class EditorView extends View {
    */
   public EditorView(final ViewNotifier man) {
     super(EDITORVIEW, man);
-    border(5).layout(new BorderLayout());
+    layout(new BorderLayout());
 
     label = new BaseXLabel(EDITOR, true, false);
-    label.setForeground(GUIConstants.GRAY);
-
-    final BaseXButton openB = BaseXButton.command(GUICommands.C_EDITOPEN, gui);
-    final BaseXButton saveB = new BaseXButton(gui, "save", H_SAVE);
-    hist = new BaseXButton(gui, "hist", H_RECENTLY_OPEN);
-    final BaseXButton srch = new BaseXButton(gui, "search",
-        BaseXLayout.addShortcut(H_REPLACE, BaseXKeys.FIND.toString()));
-
-    stop = new BaseXButton(gui, "stop", H_STOP_PROCESS);
-    stop.addKeyListener(this);
-    stop.setEnabled(false);
-
-    go = new BaseXButton(gui, "go",
-        BaseXLayout.addShortcut(H_EXECUTE_QUERY, BaseXKeys.EXEC.toString()));
-    go.addKeyListener(this);
-
-    filter = BaseXButton.command(GUICommands.C_FILTER, gui);
-    filter.addKeyListener(this);
-    filter.setEnabled(false);
-
-    final BaseXBack buttons = new BaseXBack(Fill.NONE);
-    buttons.layout(new TableLayout(1, 8, 1, 0)).border(0, 0, 8, 0);
-    buttons.add(openB);
-    buttons.add(saveB);
-    buttons.add(hist);
-    buttons.add(srch);
-    buttons.add(Box.createHorizontalStrut(6));
-    buttons.add(stop);
-    buttons.add(go);
-    buttons.add(filter);
-
-    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
-    b.add(buttons, BorderLayout.WEST);
-    b.add(label, BorderLayout.EAST);
-    add(b, BorderLayout.NORTH);
+    label.setForeground(GRAY);
 
     tabs = new BaseXTabs(gui);
     tabs.setFocusable(Prop.MAC);
-    final SearchEditor se = new SearchEditor(gui, tabs, null).button(srch);
-    search = se.bar();
+    tabs.addDragDrop(false);
     addCreateTab();
-    add(se, BorderLayout.CENTER);
+
+    final SearchEditor center = new SearchEditor(gui, tabs, null);
+    search = center.bar();
+
+    final AbstractButton openB = BaseXButton.command(GUIMenuCmd.C_EDITOPEN, gui);
+    final AbstractButton saveB = BaseXButton.get("c_save", SAVE, false, gui);
+    final AbstractButton find = search.button(FIND_REPLACE);
+    hist = BaseXButton.get("c_hist", RECENTLY_OPENED, false, gui);
+
+    stop = BaseXButton.get("c_stop", STOP, false, gui);
+    stop.addKeyListener(this);
+    stop.setEnabled(false);
+
+    go = BaseXButton.get("c_go", BaseXLayout.addShortcut(EXECUTE_QUERY, BaseXKeys.EXEC1.toString()),
+        false, gui);
+    go.addKeyListener(this);
+
+    final BaseXBack buttons = new BaseXBack(Fill.NONE);
+    buttons.layout(new TableLayout(1, 7, 1, 0)).border(0, 0, 8, 0);
+    buttons.add(openB);
+    buttons.add(saveB);
+    buttons.add(hist);
+    buttons.add(find);
+    buttons.add(Box.createHorizontalStrut(6));
+    buttons.add(stop);
+    buttons.add(go);
+
+    final BaseXBack north = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    north.add(buttons, BorderLayout.WEST);
+    north.add(label, BorderLayout.EAST);
 
     // status and query pane
     search.editor(addTab(), false);
@@ -147,7 +136,21 @@ public final class EditorView extends View {
     south.layout(new BorderLayout(4, 0));
     south.add(info, BorderLayout.CENTER);
     south.add(pos, BorderLayout.EAST);
-    add(south, BorderLayout.SOUTH);
+
+    final BaseXBack main = new BaseXBack().border(5).mode(Fill.NONE);
+    main.layout(new BorderLayout());
+    main.add(north, BorderLayout.NORTH);
+    main.add(center, BorderLayout.CENTER);
+    main.add(south, BorderLayout.SOUTH);
+
+    project = new ProjectView(this);
+    split = new BaseXSplit(true);
+    split.mode(Fill.NONE);
+    split.add(project);
+    split.add(main);
+    split.init(new double[] { 0.3, 0.7 }, new double[] { 0, 1 });
+    project();
+    add(split, BorderLayout.CENTER);
 
     refreshLayout();
 
@@ -157,10 +160,10 @@ public final class EditorView extends View {
       public void actionPerformed(final ActionEvent e) {
         final JPopupMenu pop = new JPopupMenu();
         final StringBuilder mnem = new StringBuilder();
-        final JMenuItem sa = GUIMenu.newItem(GUICommands.C_EDITSAVE, gui, mnem);
-        final JMenuItem sas = GUIMenu.newItem(GUICommands.C_EDITSAVEAS, gui, mnem);
-        GUICommands.C_EDITSAVE.refresh(gui, sa);
-        GUICommands.C_EDITSAVEAS.refresh(gui, sas);
+        final JMenuItem sa = GUIMenu.newItem(GUIMenuCmd.C_EDITSAVE, gui, mnem);
+        final JMenuItem sas = GUIMenu.newItem(GUIMenuCmd.C_EDITSAVEAS, gui, mnem);
+        sa.setEnabled(GUIMenuCmd.C_EDITSAVE.enabled(gui));
+        sas.setEnabled(GUIMenuCmd.C_EDITSAVEAS.enabled(gui));
         pop.add(sa);
         pop.add(sas);
         pop.show(saveB, 0, saveB.getHeight());
@@ -174,8 +177,7 @@ public final class EditorView extends View {
           @Override
           public void actionPerformed(final ActionEvent ac) {
             // rewrite and open chosen file
-            final String s = ac.getActionCommand().replaceAll("(.*) \\[(.*)\\]", "$2/$1");
-            open(new IOFile(s), true);
+            open(new IOFile(ac.getActionCommand().replaceAll("(.*) \\[(.*)\\]", "$2/$1")));
           }
         };
 
@@ -183,13 +185,13 @@ public final class EditorView extends View {
         final StringList opened = new StringList();
         for(final EditorArea ea : editors()) opened.add(ea.file.path());
 
-        final StringList files = new StringList(HISTORY);
-        final StringList all = new StringList(gui.gprop.strings(GUIProp.EDITOR));
+        final StringList hst = new StringList(HISTORY);
+        final StringList all = new StringList(gui.gopts.get(GUIOptions.EDITOR));
         final int fl = Math.min(all.size(), e == null ? HISTORY : HISTCOMP);
-        for(int f = 0; f < fl; f++) files.add(all.get(f));
+        for(int f = 0; f < fl; f++) hst.add(all.get(f));
 
         Font f = null;
-        for(final String en : files.sort(Prop.CASE)) {
+        for(final String en : hst.sort(Prop.CASE)) {
           // disable opened files
           final JMenuItem it = new JMenuItem(en.replaceAll("(.*)[/\\\\](.*)", "$2 [$1]"));
           if(opened.contains(en)) {
@@ -221,7 +223,7 @@ public final class EditorView extends View {
     });
     stop.addActionListener(new ActionListener() {
       @Override
-     public void actionPerformed(final ActionEvent e) {
+      public void actionPerformed(final ActionEvent e) {
         stop.setEnabled(false);
         go.setEnabled(false);
         gui.stop();
@@ -230,7 +232,7 @@ public final class EditorView extends View {
     go.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        getEditor().release(Action.EXECUTE);
+        run(getEditor(), Action.EXECUTE);
       }
     });
     tabs.addChangeListener(new ChangeListener() {
@@ -241,13 +243,24 @@ public final class EditorView extends View {
         search.editor(ea, true);
         gui.refreshControls();
         posCode.invokeLater();
+        run(ea, Action.PARSE);
       }
     });
 
     BaseXLayout.addDrop(this, new DropHandler() {
       @Override
       public void drop(final Object file) {
-        if(file instanceof File) open(new IOFile((File) file), true);
+        if(file instanceof File) open(new IOFile((File) file));
+      }
+    });
+
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        // remember opened files; don't complain about missing files
+        for(final String file : gui.gopts.get(GUIOptions.OPEN)) {
+          open(new IOFile(file), false, false);
+        }
       }
     });
   }
@@ -260,10 +273,7 @@ public final class EditorView extends View {
 
   @Override
   public void refreshMark() {
-    final EditorArea edit = getEditor();
-    go.setEnabled(edit.script || !gui.gprop.is(GUIProp.EXECRT));
-    final Nodes mrk = gui.context.marked;
-    filter.setEnabled(!gui.gprop.is(GUIProp.FILTERRT) && mrk != null && mrk.size() != 0);
+    go.setEnabled(getEditor().script || !gui.gopts.get(GUIOptions.EXECRT));
   }
 
   @Override
@@ -271,10 +281,10 @@ public final class EditorView extends View {
 
   @Override
   public void refreshLayout() {
-    label.border(-6, 0, 0, 2).setFont(GUIConstants.lfont);
-    for(final EditorArea edit : editors()) edit.setFont(GUIConstants.mfont);
+    label.border(-6, 0, 0, 2).setFont(lfont);
+    for(final EditorArea edit : editors()) edit.setFont(mfont);
     search.refreshLayout();
-    final Font ef = GUIConstants.font.deriveFont(7f + (GUIConstants.fontSize >> 1));
+    final Font ef = GUIConstants.font.deriveFont(7f + (fontSize >> 1));
     info.setFont(ef);
     pos.setFont(ef);
   }
@@ -284,12 +294,12 @@ public final class EditorView extends View {
 
   @Override
   public boolean visible() {
-    return gui.gprop.is(GUIProp.SHOWEDITOR);
+    return gui.gopts.get(GUIOptions.SHOWEDITOR);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gprop.set(GUIProp.SHOWEDITOR, v);
+    gui.gopts.set(GUIOptions.SHOWEDITOR, v);
   }
 
   @Override
@@ -298,18 +308,65 @@ public final class EditorView extends View {
   }
 
   /**
+   * Shows or hides the project view.
+   */
+  public void showProject() {
+    if(!gui.gopts.get(GUIOptions.SHOWPROJECT)) {
+      gui.gopts.invert(GUIOptions.SHOWPROJECT);
+      split.visible(true);
+    }
+  }
+
+  /**
+   * Toggles the project view.
+   */
+  public void project() {
+    final boolean show = gui.gopts.get(GUIOptions.SHOWPROJECT);
+    split.visible(show);
+    if(show) {
+      project.focus();
+    } else {
+      getEditor().requestFocusInWindow();
+    }
+  }
+
+  /**
+   * Focuses the project view.
+   */
+  public void focusFilter() {
+    project.focusFilter(getEditor().searchString());
+  }
+
+  /**
+   * Focuses the currently edited file in the project view.
+   */
+  public void jumpToFile() {
+    final EditorArea editor = getEditor();
+    if(editor.opened()) project.jump(editor.file);
+  }
+
+  /**
+   * Switches the current editor tab.
+   * @param next next next/previous tag
+   */
+  public void tab(final boolean next) {
+    final int s = tabs.getTabCount() - 1;
+    final int i = (s + tabs.getSelectedIndex() + (next ? 1 : -1)) % s;
+    tabs.setSelectedIndex(i);
+  }
+
+  /**
    * Opens a new file.
    */
   public void open() {
     // open file chooser for XML creation
-    final BaseXFileChooser fc = new BaseXFileChooser(OPEN,
-        gui.gprop.get(GUIProp.WORKPATH), gui);
+    final BaseXFileChooser fc = new BaseXFileChooser(OPEN, gui.gopts.get(GUIOptions.WORKPATH), gui);
     fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
     fc.filter(BXS_FILES, IO.BXSSUFFIX);
     fc.textFilters();
 
-    final IOFile[] files = fc.multi().selectAll(Mode.FOPEN);
-    for(final IOFile f : files) open(f, true);
+    final IOFile[] open = fc.multi().selectAll(Mode.FOPEN);
+    for(final IOFile f : open) open(f);
   }
 
   /**
@@ -325,7 +382,7 @@ public final class EditorView extends View {
    */
   public boolean save() {
     final EditorArea edit = getEditor();
-    return edit.opened() ? save(edit.file) : saveAs();
+    return edit.opened() ? edit.save() : saveAs();
   }
 
   /**
@@ -335,34 +392,59 @@ public final class EditorView extends View {
   public boolean saveAs() {
     // open file chooser for XML creation
     final EditorArea edit = getEditor();
-    final String path = edit.opened() ? edit.file.path() :
-      gui.gprop.get(GUIProp.WORKPATH);
+    final String path = edit.opened() ? edit.file.path() : gui.gopts.get(GUIOptions.WORKPATH);
     final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS, path, gui);
     fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
     fc.filter(BXS_FILES, IO.BXSSUFFIX);
     fc.textFilters();
     fc.suffix(IO.XQSUFFIX);
 
+    // save new file
     final IOFile file = fc.select(Mode.FSAVE);
-    return file != null && save(file);
+    if(file == null) return false;
+
+    // success: display new file in project view
+    edit.save(file);
+    return true;
   }
 
   /**
    * Creates a new file.
    */
   public void newFile() {
-    addTab();
-    refreshControls(true);
+    if(!visible()) GUIMenuCmd.C_SHOWEDITOR.execute(gui);
+    refreshControls(addTab(), true);
+  }
+
+  /**
+   * Deletes a file.
+   * @param file file to be deleted
+   * @return success flag
+   */
+  public boolean delete(final IOFile file) {
+    final EditorArea edit = find(file, true);
+    if(edit != null) close(edit);
+    return file.delete();
+  }
+
+  /**
+   * Opens and parses the specified query file.
+   * @param file query file
+   * @return opened editor, or {@code null} if file could not be opened
+   */
+  public EditorArea open(final IOFile file) {
+    return open(file, true, true);
   }
 
   /**
    * Opens the specified query file.
    * @param file query file
    * @param parse parse contents
+   * @param error display error if file does not exist
    * @return opened editor, or {@code null} if file could not be opened
    */
-  public EditorArea open(final IO file, final boolean parse) {
-    if(!visible()) GUICommands.C_SHOWEDITOR.execute(gui);
+  private EditorArea open(final IOFile file, final boolean parse, final boolean error) {
+    if(!visible()) GUIMenuCmd.C_SHOWEDITOR.execute(gui);
 
     EditorArea edit = find(file, true);
     if(edit != null) {
@@ -371,7 +453,9 @@ public final class EditorView extends View {
       edit.reopen(true);
     } else {
       try {
-        final byte[] text = file.read();
+        // check and retrieve content
+        final byte[] text = read(file);
+        if(text == null) return null;
 
         // get current editor
         edit = getEditor();
@@ -379,14 +463,157 @@ public final class EditorView extends View {
         if(edit.opened() || edit.modified) edit = addTab();
         edit.initText(text);
         edit.file(file);
-        if(parse) edit.release(Action.PARSE);
+        if(parse) run(edit, Action.PARSE);
       } catch(final IOException ex) {
         refreshHistory(null);
-        BaseXDialog.error(gui, FILE_NOT_OPENED);
+        Util.debug(ex);
+        if(error) BaseXDialog.error(gui, Util.info(FILE_NOT_OPENED_X, file));
         return null;
       }
     }
     return edit;
+  }
+
+  /**
+   * Parses or evaluates the current file.
+   * @param action action
+   * @param editor current editor
+   */
+  void run(final EditorArea editor, final Action action) {
+    refreshControls(editor, false);
+
+    final byte[] in = editor.getText();
+    final boolean eq = eq(in, editor.last);
+    if(eq && action == Action.CHECK) return;
+
+    if(action == Action.EXECUTE && gui.gopts.get(GUIOptions.SAVERUN)) {
+      for(final EditorArea edit : editors()) {
+        if(edit.opened()) edit.save();
+      }
+    }
+
+    IOFile file = editor.file;
+    editor.last = in;
+
+    final boolean xquery = file.hasSuffix(IO.XQSUFFIXES) || !file.path().contains(".");
+    editor.script = !xquery && file.hasSuffix(IO.BXSSUFFIX);
+    if(action == Action.EXECUTE && editor.script) {
+      // execute query if forced, or if realtime execution is activated
+      gui.execute(true, new Execute(string(in)));
+    } else if(xquery || action == Action.EXECUTE) {
+      // check if input is/might be an xquery main module
+      String input = in.length == 0 ? "()" : string(in);
+      boolean lib = QueryProcessor.isLibrary(input);
+      final boolean exec = action == Action.EXECUTE || gui.gopts.get(GUIOptions.EXECRT);
+      if(exec && lib) {
+        final EditorArea ea = execEditor();
+        if(ea != null) {
+          file = ea.file;
+          input = string(ea.getText());
+          lib = false;
+        }
+      }
+
+      gui.context.options.set(MainOptions.QUERYPATH, file.path());
+      if(!lib && exec) {
+        // execute query if forced, or if realtime execution is activated
+        gui.execute(true, new XQuery(input));
+        execFile = file;
+      } else {
+        // parse query
+        final QueryContext qc = new QueryContext(gui.context);
+        try {
+          qc.parse(input, lib, null, null);
+          info(null);
+        } catch(final QueryException ex) {
+          info(ex);
+        } finally {
+          qc.close();
+        }
+      }
+    } else if(file.hasSuffix(IO.JSONSUFFIX)) {
+      try {
+        final IOContent io = new IOContent(in);
+        io.name(file.path());
+        JsonConverter.get(new JsonParserOptions()).convert(io);
+        info(null);
+      } catch(final IOException ex) {
+        info(ex);
+      }
+    } else if(editor.script || file.hasSuffix(IO.XMLSUFFIXES) || file.hasSuffix(IO.XSLSUFFIXES)) {
+      final ArrayInput ai = new ArrayInput(in);
+      try {
+        // check XML syntax
+        if(startsWith(in, '<') || !editor.script) new XmlParser().parse(ai);
+        // check command script
+        if(editor.script) new CommandParser(string(in), gui.context).parse();
+        info(null);
+      } catch(final Exception ex) {
+        info(ex);
+      }
+    } else if(action != Action.CHECK) {
+      info(null);
+    }
+  }
+
+  /**
+   * Evaluates the info message resulting from command or query parsing.
+   * @param ex exception, or {@code null}
+   */
+  private void info(final Exception ex) {
+    info(ex, false, false);
+  }
+
+  /**
+   * Returns the editor that has been executed last.
+   * @return editor
+   */
+  private EditorArea execEditor() {
+    if(execFile != null) {
+      for(final EditorArea edit : editors()) {
+        if(edit.file.path().equals(execFile.path())) return edit;
+      }
+    }
+    execFile = null;
+    return null;
+  }
+
+  /**
+   * Retrieves the contents of the specified file, or opens it externally.
+   * @param file query file
+   * @return contents, or {@code null} reference
+   * @throws IOException I/O exception
+   */
+  private byte[] read(final IOFile file) throws IOException {
+    // check content
+    final TokenBuilder text = new TokenBuilder((int) Math.min(Integer.MAX_VALUE, file.length()));
+    final TextInput ti = new NewlineInput(file).validate(true);
+    boolean valid = true;
+    try {
+      while(true) {
+        try {
+          final int cp = ti.read();
+          if(cp == -1) return text.array();
+          text.add(cp);
+        } catch(final InputException ex) {
+          if(valid) {
+            valid = false;
+            final Boolean binary = BaseXDialog.yesNoCancel(gui, H_FILE_BINARY);
+            if(binary == null) return null;
+            if(binary) {
+              try {
+                file.open();
+              } catch(final IOException ioex) {
+                Desktop.getDesktop().open(file.file());
+              }
+              return null;
+            }
+          }
+        }
+      }
+    } finally {
+      ti.close();
+    }
   }
 
   /**
@@ -395,69 +622,54 @@ public final class EditorView extends View {
    */
   void refreshHistory(final IO file) {
     final StringList paths = new StringList();
-    String path = null;
     if(file != null) {
-      path = file.path();
-      gui.gprop.set(GUIProp.WORKPATH, file.dirPath());
+      final String path = file.path();
+      gui.gopts.set(GUIOptions.WORKPATH, file.dirPath());
       paths.add(path);
       tabs.setToolTipTextAt(tabs.getSelectedIndex(), path);
     }
-    final String[] old = gui.gprop.strings(GUIProp.EDITOR);
+    final String[] old = gui.gopts.get(GUIOptions.EDITOR);
     for(int p = 0; paths.size() < HISTORY && p < old.length; p++) {
       final IO fl = IO.get(old[p]);
       if(fl.exists() && !fl.eq(file)) paths.add(fl.path());
     }
     // store sorted history
-    gui.gprop.set(GUIProp.EDITOR, paths.toArray());
+    gui.gopts.set(GUIOptions.EDITOR, paths.toArray());
     hist.setEnabled(!paths.isEmpty());
   }
 
   /**
    * Closes an editor.
-   * @param edit editor to be closed. {@code null} closes the currently
-   * opened editor.
+   * @param edit editor to be closed. {@code null} closes the currently opened editor.
    * @return {@code true} if editor was closed
    */
   public boolean close(final EditorArea edit) {
     final EditorArea ea = edit != null ? edit : getEditor();
     if(!confirm(ea)) return false;
 
+    // remove reference to last executed file
+    if(execFile != null && ea.file.path().equals(execFile.path())) execFile = null;
     tabs.remove(ea);
     final int t = tabs.getTabCount();
     final int i = tabs.getSelectedIndex();
     if(t == 1) {
-      // reopen single tab
+      // no panels left: close search bar
+      search.deactivate(true);
+      // reopen single tab and focus project listener
       addTab();
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() { project(); }
+      });
     } else if(i + 1 == t) {
       // if necessary, activate last editor tab
       tabs.setSelectedIndex(i - 1);
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() { getEditor().requestFocusInWindow(); }
+      });
     }
     return true;
-  }
-
-  /**
-   * Jumps to a specific line.
-   */
-  public void gotoLine() {
-    final EditorArea edit = getEditor();
-    final int ll = edit.last.length;
-    final int cr = edit.getCaret();
-    int l = 1;
-    for(int e = 0; e < ll && e < cr; e += cl(edit.last, e)) {
-      if(edit.last[e] == '\n') ++l;
-    }
-    final DialogLine dl = new DialogLine(gui, l);
-    if(!dl.ok()) return;
-    final int el = dl.line();
-    int p = 0;
-    l = 1;
-    for(int e = 0; e < ll && l < el; e += cl(edit.last, e)) {
-      if(edit.last[e] != '\n') continue;
-      p = e + 1;
-      ++l;
-    }
-    edit.setCaret(p);
-    posCode.invokeLater();
   }
 
   /**
@@ -478,19 +690,16 @@ public final class EditorView extends View {
   }
 
   /**
-   * Evaluates the info message resulting from a parsed or executed query.
-   * @param msg info message
-   * @param ok {@code true} if evaluation was successful
+   * Processes the result from a command or query execution.
+   * @param th exception, or {@code null}
+   * @param stopped {@code true} if evaluation was interrupted
    * @param refresh refresh buttons
    */
-  public void info(final String msg, final boolean ok, final boolean refresh) {
+  public void info(final Throwable th, final boolean stopped, final boolean refresh) {
     // do not refresh view when query is running
     if(!refresh && stop.isEnabled()) return;
 
     ++threadID;
-    errPos = -1;
-    errFile = null;
-    errMsg = null;
     getEditor().resetError();
 
     if(refresh) {
@@ -498,102 +707,121 @@ public final class EditorView extends View {
       refreshMark();
     }
 
-    if(ok) {
-      info.setCursor(GUIConstants.CURSORARROW);
-      info.setText(msg, Msg.SUCCESS).setToolTipText(null);
+    if(stopped || th == null) {
+      info.setCursor(CURSORARROW);
+      info.setText(stopped ? INTERRUPTED : OK, Msg.SUCCESS);
+      info.setToolTipText(null);
+      errorInfo = null;
     } else {
-      error(msg, false);
-      info.setCursor(GUIConstants.CURSORHAND);
-      info.setText(ERRORINFO.matcher(msg).replaceAll(""), Msg.ERROR);
-      final String tt = ERRORTT.matcher(msg).replaceAll("").
-          replace("<", "&lt;").replace(">", "&gt;").
-          replaceAll("\r?\n", "<br/>").replaceAll("(<br/>.*?)<br/>.*", "$1");
+      info.setCursor(CURSORHAND);
+      info.setText(th.getLocalizedMessage(), Msg.ERROR);
+      final String tt = th.getMessage().replace("<", "&lt;").replace(">", "&gt;").replaceAll(
+          "\r?\n", "<br/>").replaceAll("(<br/>.*?)<br/>.*", "$1");
       info.setToolTipText("<html>" + tt + "</html>");
+
+      if(th instanceof QueryIOException) {
+        errorInfo = ((QueryIOException) th).getCause().info();
+      } else if(th instanceof QueryException) {
+        errorInfo = ((QueryException) th).info();
+      } else if(th instanceof SAXParseException) {
+        final SAXParseException ex = (SAXParseException) th;
+        final String path = getEditor().file.path();
+        errorInfo = new InputInfo(path, ex.getLineNumber(), ex.getColumnNumber());
+      } else {
+        errorInfo = new InputInfo(getEditor().file.path(), 1, 1);
+      }
+      error(false);
     }
   }
 
   /**
    * Jumps to the current error.
    */
-  void jumpToError() {
-    if(errMsg != null) error(true);
+  public void jumpToError() {
+    error(true);
   }
 
   /**
-   * Handles info messages resulting from a query execution.
-   * @param jump jump to error position
-   * @param msg info message
+   * Jumps to the specified file and position.
+   * @param link link
    */
-  public void error(final String msg, final boolean jump) {
-    errMsg = msg;
-    for(final String s : msg.split("\r?\n")) {
-      if(XQERROR.matcher(s).matches()) {
-        errMsg = s.replace(STOPPED_AT, "");
-        break;
-      }
+  public void jump(final String link) {
+    final Matcher m = LINK.matcher(link);
+    if(m.matches()) {
+      errorInfo = new InputInfo(m.group(1), toInt(m.group(2)), toInt(m.group(3)));
+      error(true);
+    } else {
+      Util.stack("No match found: " + link);
     }
-    error(jump);
   }
 
   /**
-   * Handles info messages resulting from a query execution.
+   * Jumps to the current error.
    * @param jump jump to error position
    */
   private void error(final boolean jump) {
-    Matcher m = XQERROR.matcher(errMsg);
-    int el, ec = 2;
-    if(m.matches()) {
-      errFile = new IOFile(m.group(1));
-      el = Token.toInt(m.group(2));
-      ec = Token.toInt(m.group(3));
-    } else {
-      m = XMLERROR.matcher(errMsg);
-      if(!m.matches()) return;
-      el = Token.toInt(m.group(1));
-      errFile = getEditor().file;
-    }
+    final InputInfo ei = errorInfo;
+    if(ei == null) return;
 
-    EditorArea edit = find(errFile, false);
+    final IOFile file = new IOFile(ei.path());
+    EditorArea edit = find(file, false);
     if(jump) {
-      if(edit == null) edit = open(errFile, false);
+      if(edit == null) edit = open(file, false, true);
       if(edit != null) tabs.setSelectedComponent(edit);
     }
     if(edit == null) return;
 
-    // find approximate error position
-    final int ll = edit.last.length;
-    int ep = ll;
-    for(int p = 0, l = 1, c = 1; p < ll; ++c, p += cl(edit.last, p)) {
-      if(l > el || l == el && c == ec) {
-        ep = p;
-        break;
-      }
-      if(edit.last[p] == '\n') {
-        ++l;
-        c = 0;
-      }
-    }
-    if(ep < ll && Character.isLetterOrDigit(cp(edit.last, ep))) {
-      while(ep > 0 && Character.isLetterOrDigit(cp(edit.last, ep - 1))) ep--;
-    }
+    // mark and jump to error position
+    final int ep = pos(edit.last, ei.line(), ei.column());
     edit.error(ep);
-    errPos = ep;
-
     if(jump) {
-      edit.jumpError(errPos);
+      edit.setCaret(ep);
       posCode.invokeLater();
     }
   }
 
   /**
+   * Returns an editor offset for the specified line and column.
+   * @param text text
+   * @param line line
+   * @param col column
+   * @return position
+   */
+  private int pos(final byte[] text, final int line, final int col) {
+    final int ll = text.length;
+    int ep = ll;
+    for(int p = 0, l = 1, c = 1; p < ll; ++c, p += cl(text, p)) {
+      if(l > line || l == line && c == col) {
+        ep = p;
+        break;
+      }
+      if(text[p] == '\n') {
+        ++l;
+        c = 0;
+      }
+    }
+    if(ep < ll && Character.isLetterOrDigit(cp(text, ep))) {
+      while(ep > 0 && Character.isLetterOrDigit(cp(text, ep - 1))) ep--;
+    }
+    return ep;
+  }
+
+  /**
    * Shows a quit dialog for all modified query files.
-   * @return {@code false} if confirmation was canceled
+   * @return result of check
    */
   public boolean confirm() {
+    // save modified files
     for(final EditorArea edit : editors()) {
       tabs.setSelectedComponent(edit);
-      if(!close(edit)) return false;
+      if(!confirm(edit)) return false;
     }
+    // remember opened files
+    final StringList files = new StringList();
+    for(final EditorArea edit : editors()) {
+      if(edit.opened()) files.add(edit.file.path());
+    }
+    gui.gopts.set(GUIOptions.OPEN, files.toArray());
     return true;
   }
 
@@ -616,12 +844,47 @@ public final class EditorView extends View {
   }
 
   /**
+   * Updates the references to renamed files.
+   * @param old old file file reference
+   * @param renamed updated file reference
+   */
+  public void rename(final IOFile old, final IOFile renamed) {
+    try {
+      // use canonical representation and add slash to names of directories
+      final boolean dir = renamed.isDir();
+      final String oldPath = old.file().getCanonicalPath() + (dir ? File.separator : "");
+      // iterate through all tabs
+      final int s = tabs.getTabCount() - 1;
+      for(int i = 0; i < s; i++) {
+        final Component c = tabs.getComponentAt(i);
+        if(!(c instanceof EditorArea)) continue;
+
+        final EditorArea ea = (EditorArea) c;
+        final String editPath = ea.file.file().getCanonicalPath();
+        if(dir) {
+          // change path to files in a renamed directory
+          if(editPath.startsWith(oldPath)) {
+            ea.file = new IOFile(renamed + File.separator + editPath.substring(oldPath.length()));
+          }
+        } else if(oldPath.equals(editPath)) {
+          // update file reference and label of editor tab
+          ea.file = renamed;
+          ea.label.setText(renamed.name());
+          break;
+        }
+      }
+    } catch(final IOException ex) {
+      Util.errln(ex);
+    }
+  }
+
+  /**
    * Refreshes the query modification flag.
+   * @param edit editor
    * @param force action
    */
-  void refreshControls(final boolean force) {
+  void refreshControls(final EditorArea edit, final boolean force) {
     // update modification flag
-    final EditorArea edit = getEditor();
     final boolean oe = edit.modified;
     edit.modified = edit.hist != null && edit.hist.modified();
     if(edit.modified == oe && !force) return;
@@ -637,9 +900,9 @@ public final class EditorView extends View {
   }
 
   /** Code for setting cursor position. */
-  final GUICode posCode = new GUICode() {
+  public final GUICode posCode = new GUICode() {
     @Override
-    public void eval(final Object arg) {
+    public void execute(final Object arg) {
       final int[] lc = getEditor().pos();
       pos.setText(lc[0] + " : " + lc[1]);
     }
@@ -659,23 +922,6 @@ public final class EditorView extends View {
   }
 
   /**
-   * Saves the specified editor contents.
-   * @param file file to write
-   * @return {@code false} if confirmation was canceled
-   */
-  private boolean save(final IO file) {
-    try {
-      final EditorArea edit = getEditor();
-      ((IOFile) file).write(edit.getText());
-      edit.file(file);
-      return true;
-    } catch(final Exception ex) {
-      BaseXDialog.error(gui, FILE_NOT_SAVED);
-      return false;
-    }
-  }
-
-  /**
    * Choose a unique tab file.
    * @return io reference
    */
@@ -691,7 +937,7 @@ public final class EditorView extends View {
     int c = 0;
     while(++c < bl.size() && bl.get(c));
     // create io reference
-    return new IOFile(gui.gprop.get(GUIProp.WORKPATH), FILE + (c == 1 ? "" : c));
+    return new IOFile(gui.gopts.get(GUIOptions.WORKPATH), FILE + (c == 1 ? "" : c));
   }
 
   /**
@@ -700,13 +946,12 @@ public final class EditorView extends View {
    */
   EditorArea addTab() {
     final EditorArea edit = new EditorArea(this, newTabFile());
-    edit.setFont(GUIConstants.mfont);
+    edit.setFont(mfont);
 
     final BaseXBack tab = new BaseXBack(new BorderLayout(10, 0)).mode(Fill.NONE);
     tab.add(edit.label, BorderLayout.CENTER);
 
-    final BaseXButton close = tabButton("e_close");
-    close.setRolloverIcon(BaseXLayout.icon("e_close2"));
+    final AbstractButton close = tabButton("e_close", "e_close2");
     close.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -723,13 +968,11 @@ public final class EditorView extends View {
    * Adds a tab for creating new tabs.
    */
   private void addCreateTab() {
-    final BaseXButton add = tabButton("e_new");
-    add.setRolloverIcon(BaseXLayout.icon("e_new2"));
+    final AbstractButton add = tabButton("e_new", "e_new2");
     add.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        addTab();
-        refreshControls(true);
+        refreshControls(addTab(), true);
       }
     });
     tabs.add(new BaseXBack(), add, 0);
@@ -738,13 +981,16 @@ public final class EditorView extends View {
 
   /**
    * Adds a new tab button.
-   * @param icon button icon
+   * @param icon name of button icon
+   * @param rollover rollover icon
    * @return button
    */
-  private BaseXButton tabButton(final String icon) {
-    final BaseXButton b = new BaseXButton(gui, icon, null);
-    b.border(2, 2, 2, 2).setContentAreaFilled(false);
+  private AbstractButton tabButton(final String icon, final String rollover) {
+    final AbstractButton b = BaseXButton.get(icon, null, false, gui);
+    b.setBorder(new EmptyBorder(2, 0, 2, 0));
+    b.setContentAreaFilled(false);
     b.setFocusable(false);
+    b.setRolloverIcon(BaseXImages.icon(rollover));
     return b;
   }
 
@@ -755,8 +1001,7 @@ public final class EditorView extends View {
    */
   private boolean confirm(final EditorArea edit) {
     if(edit.modified && (edit.opened() || edit.getText().length != 0)) {
-      final Boolean ok = BaseXDialog.yesNoCancel(gui,
-          Util.info(CLOSE_FILE_X, edit.file.name()));
+      final Boolean ok = BaseXDialog.yesNoCancel(gui, Util.info(CLOSE_FILE_X, edit.file.name()));
       if(ok == null || ok && !save()) return false;
     }
     return true;

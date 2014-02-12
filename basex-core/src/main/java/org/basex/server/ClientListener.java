@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * Server-side client session in the client-server architecture.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Andreas Weiler
  * @author Christian Gruen
  */
@@ -77,11 +77,11 @@ public final class ClientListener extends Thread {
   public void run() {
     if(!authenticate()) return;
 
-    ServerCmd sc;
-    String cmd;
     try {
       while(running) {
         command = null;
+        String cmd;
+        final ServerCmd sc;
         try {
           final int b = in.read();
           if(b == -1) {
@@ -281,9 +281,7 @@ public final class ClientListener extends Thread {
    * @param msg event message
    * @throws IOException I/O exception
    */
-  public synchronized void notify(final byte[] name, final byte[] msg)
-      throws IOException {
-
+  public synchronized void notify(final byte[] name, final byte[] msg) throws IOException {
     last = System.currentTimeMillis();
     eout.print(name);
     eout.write(0);
@@ -400,7 +398,7 @@ public final class ClientListener extends Thread {
 
     // initialize server-based event handling
     if(!events) {
-      out.writeString(Integer.toString(context.mprop.num(MainProp.EVENTPORT)));
+      out.writeString(Integer.toString(context.globalopts.get(GlobalOptions.EVENTPORT)));
       out.writeString(Long.toString(getId()));
       out.flush();
       events = true;
@@ -492,7 +490,7 @@ public final class ClientListener extends Thread {
         } else if(sc == ServerCmd.INFO) {
           out.print(qp.info());
         } else if(sc == ServerCmd.OPTIONS) {
-          out.print(qp.options());
+          out.print(qp.parameters());
         } else if(sc == ServerCmd.UPDATING) {
           out.print(Boolean.toString(qp.updating()));
         } else if(sc == ServerCmd.CLOSE) {

@@ -11,7 +11,7 @@ import org.basex.core.*;
  * This class serves as a simple filesystem parser and creates an XML
  * representation, which resembles the DeepFS markup.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class SimpleFSParser extends Parser {
@@ -35,7 +35,7 @@ public final class SimpleFSParser extends Parser {
    * @param path file path
    * @param pr database properties
    */
-  public SimpleFSParser(final String path, final Prop pr) {
+  public SimpleFSParser(final String path, final MainOptions pr) {
     super(path, pr);
   }
 

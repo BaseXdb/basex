@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * This class allows simple text input for the table headers.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class TableInput implements Runnable {
@@ -52,8 +52,7 @@ final class TableInput implements Runnable {
    * @param w width
    * @param h height
    */
-  void paint(final Graphics g, final int x, final int y, final int w,
-      final int h) {
+  void paint(final Graphics g, final int x, final int y, final int w, final int h) {
     g.setColor(GUIConstants.color4);
     g.drawRect(x, y - 1, w - 1, h);
     g.setColor(Color.black);
@@ -75,9 +74,9 @@ final class TableInput implements Runnable {
       pos = 0;
     } else if(LINEEND.is(e)) {
       pos = text.length();
-    } else if(PREV.is(e)) {
+    } else if(PREVCHAR.is(e)) {
       pos = Math.max(0, pos - 1);
-    } else if(NEXT.is(e)) {
+    } else if(NEXTCHAR.is(e)) {
       pos = Math.min(text.length(), pos + 1);
     } else if(DELPREV.is(e)) {
       if(pos > 0) text = text.substring(0, pos - 1) + text.substring(pos--);

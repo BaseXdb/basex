@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
 /**
  * Root node.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Root extends Simple {
@@ -41,7 +41,7 @@ public final class Root extends Simple {
     final NodeSeqBuilder nc = new NodeSeqBuilder().check();
     for(Item i; (i = iter.next()) != null;) {
       final ANode n = root(i);
-      if(n == null || n.type != NodeType.DOC) CTXNODE.thrw(info);
+      if(n == null || n.type != NodeType.DOC) throw CTXNODE.get(info);
       nc.add(n);
     }
     return nc;

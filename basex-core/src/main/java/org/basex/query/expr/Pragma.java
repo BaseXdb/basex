@@ -11,21 +11,21 @@ import org.basex.util.*;
 /**
  * Abstract pragma expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public abstract class Pragma extends ExprInfo {
   /** QName. */
-  protected final QNm name;
+  final QNm name;
   /** Pragma value. */
-  protected final byte[] value;
+  final byte[] value;
 
   /**
    * Constructor.
    * @param n name of pragma
    * @param v optional value
    */
-  public Pragma(final QNm n, final byte[] v) {
+  Pragma(final QNm n, final byte[] v) {
     name = n;
     value = v;
   }

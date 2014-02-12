@@ -29,7 +29,7 @@ import org.basex.util.list.*;
  * This is a parser for command strings, creating {@link Command} instances.
  * Several commands can be formulated in one string and separated by semicolons.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class StringParser extends CmdParser {
@@ -103,10 +103,10 @@ public final class StringParser extends CmdParser {
       case CHECK:
         return new Check(string(cmd));
       case ADD:
-        String arg = key(C_TO, null) ? string(cmd) : null;
+        String arg = key(S_TO, null) ? string(cmd) : null;
         return new Add(arg, single ? remaining(cmd) : string(cmd));
       case STORE:
-        arg = key(C_TO, null) ? string(cmd) : null;
+        arg = key(S_TO, null) ? string(cmd) : null;
         return new Store(arg, single ? remaining(cmd) : string(cmd));
       case RETRIEVE:
         return new Retrieve(string(cmd));
@@ -197,14 +197,13 @@ public final class StringParser extends CmdParser {
             return new ShowBackups();
           case EVENTS:
             return new ShowEvents();
-          default:
         }
         break;
       case GRANT:
         final CmdPerm perm = consume(CmdPerm.class, cmd);
         if(perm == null) throw help(null, cmd);
         final String db = key(ON, null) ? glob(cmd) : null;
-        key(C_TO, cmd);
+        key(S_TO, cmd);
         return new Grant(perm, glob(cmd), db);
       case REPO:
         switch(consume(CmdRepo.class, cmd)) {
@@ -214,12 +213,10 @@ public final class StringParser extends CmdParser {
             return new RepoDelete(string(cmd), new InputInfo(parser));
           case LIST:
             return new RepoList();
-          default:
         }
         break;
-      default:
     }
-    throw Util.notexpected("command specified, but not implemented yet");
+    throw Util.notExpected("command specified, but not implemented yet");
   }
 
   /**
@@ -275,7 +272,7 @@ public final class StringParser extends CmdParser {
     if(!eoc()) {
       final QueryContext qc = new QueryContext(ctx);
       try {
-        final QueryParser p = new QueryParser(parser.input, null, qc);
+        final QueryParser p = new QueryParser(parser.input, null, qc, null);
         p.pos = parser.pos;
         p.parseMain();
         sb.append(parser.input.substring(parser.pos, p.pos));
@@ -402,7 +399,7 @@ public final class StringParser extends CmdParser {
   }
 
   /**
-   * Returns the found command or throws an error.
+   * Returns the found command or throws an exception.
    * @param cmp possible completions
    * @param par parent command
    * @param <E> token type
@@ -416,8 +413,7 @@ public final class StringParser extends CmdParser {
     if(!suggest || token == null || !token.isEmpty()) {
       try {
         // return command reference; allow empty strings as input ("NULL")
-        final String t = token == null ? "NULL" : token.toUpperCase(Locale.ENGLISH);
-        return Enum.valueOf(cmp, t);
+        return Enum.valueOf(cmp, token == null ? "NULL" : token.toUpperCase(Locale.ENGLISH));
       } catch(final IllegalArgumentException ignore) { }
     }
 
@@ -461,8 +457,7 @@ public final class StringParser extends CmdParser {
    * @param prefix user input
    * @return completions
    */
-  private static <T extends Enum<T>> Enum<?>[] startWith(final Class<T> en,
-      final String prefix) {
+  private static <T extends Enum<T>> Enum<?>[] startWith(final Class<T> en, final String prefix) {
     Enum<?>[] list = new Enum<?>[0];
     final String t = prefix == null ? "" : prefix.toUpperCase(Locale.ENGLISH);
     for(final Enum<?> e : en.getEnumConstants()) {

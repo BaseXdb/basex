@@ -7,7 +7,7 @@ import org.basex.query.value.type.*;
 /**
  * Document kind test.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DocTest extends Test {
@@ -51,16 +51,12 @@ public final class DocTest extends Test {
   public Test intersect(final Test other) {
     if(other instanceof DocTest) {
       final DocTest o = (DocTest) other;
-      if(test == null || o.test == null || test.sameAs(o.test))
-        return test != null ? this : other;
+      if(test == null || o.test == null || test.sameAs(o.test)) return test != null ? this : other;
       final Test t = test.intersect(o.test);
       return t == null ? null : new DocTest(t);
-    } else if(other instanceof KindTest) {
-      return NodeType.DOC.instanceOf(other.type) ? this : null;
-    } else if(other instanceof InvDocTest) {
-      return this;
     }
-
+    if(other instanceof KindTest) return NodeType.DOC.instanceOf(other.type) ? this : null;
+    if(other instanceof InvDocTest) return this;
     return null;
   }
 }

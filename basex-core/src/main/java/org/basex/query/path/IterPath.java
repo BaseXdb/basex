@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
  * Iterative path expression for location paths which return sorted and
  * duplicate-free results.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class IterPath extends AxisPath {
@@ -29,8 +29,7 @@ final class IterPath extends AxisPath {
    * @param t return type
    * @param c cardinality
    */
-  IterPath(final InputInfo ii, final Expr r, final Expr[] s, final SeqType t,
-      final long c) {
+  IterPath(final InputInfo ii, final Expr r, final Expr[] s, final SeqType t, final long c) {
     super(ii, r, s);
     type = t;
     size = c;
@@ -75,7 +74,7 @@ final class IterPath extends AxisPath {
               }
             } else if(p < iter.length - 1) {
               // ensure that root only returns nodes
-              if(r && p == 0 && !(it instanceof ANode)) PATHNODE.thrw(info, it.type);
+              if(r && p == 0 && !(it instanceof ANode)) throw PATHNODE.get(info, it.type);
               ctx.value = it;
               ++p;
               if(iter[p] == null || !iter[p].reset()) iter[p] = ctx.iter(expr[p]);
@@ -108,8 +107,7 @@ final class IterPath extends AxisPath {
   }
 
   @Override
-  public IterPath copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public IterPath copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return copyType(new IterPath(info, root == null ? null : root.copy(ctx, scp, vs),
         Arr.copyAll(ctx, scp, vs, steps), type, size));
   }

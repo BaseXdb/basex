@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  * access is needed, it is advisable to directly work on the {@link Data}
  * class.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class ViewData {
@@ -24,17 +24,16 @@ public final class ViewData {
   /**
    * Checks if the specified node is a leaf node
    * (text node or file element or file tag).
-   * @param prop gui properties
+   * @param opts gui options
    * @param d data reference
    * @param pre pre value
    * @return result of check
    */
-  public static boolean leaf(final GUIProp prop, final Data d,
-      final int pre) {
+  public static boolean leaf(final GUIOptions opts, final Data d, final int pre) {
     final int kind = d.kind(pre);
     if(kind == Data.ATTR) return true;
 
-    final boolean atts = prop.is(GUIProp.MAPATTS);
+    final boolean atts = opts.get(GUIOptions.MAPATTS);
     final int last = pre + (atts ? 1 : d.attSize(pre, kind));
     return last == d.meta.size || d.parent(pre, kind) >=
       d.parent(last, d.kind(last));
@@ -82,7 +81,7 @@ public final class ViewData {
       case Data.ELEM: return data.name(p, k);
       case Data.DOC:  return data.text(p, true);
       case Data.TEXT: return s ? TEXT : data.text(p, true);
-      case Data.COMM: return s ? COMM : data.text(p, true);
+      case Data.COMM: return s ? COMMENT : data.text(p, true);
       case Data.PI:   return s ? PI : data.text(p, true);
     }
 
@@ -100,15 +99,15 @@ public final class ViewData {
   /**
    * Returns the tag name of the specified node.
    * Note that the pre value must reference an element node.
-   * @param prop gui properties
+   * @param opts gui options
    * @param data data reference
    * @param pre pre value
    * @return name
    */
-  public static byte[] name(final GUIProp prop, final Data data, final int pre) {
+  public static byte[] name(final GUIOptions opts, final Data data, final int pre) {
     if(data.kind(pre) == Data.ELEM) {
-      final int id = ViewData.nameID(data);
-      if(id != 0 && prop.is(GUIProp.SHOWNAME)) {
+      final int id = nameID(data);
+      if(id != 0 && opts.get(GUIOptions.SHOWNAME)) {
         final byte[] att = data.attValue(id, pre);
         if(att != null) return att;
       }
@@ -122,7 +121,7 @@ public final class ViewData {
    * @return name id
    */
   public static int nameID(final Data data) {
-    return data.atnindex.id(DataText.T_NAME);
+    return data.atnindex.id(T_NAME);
   }
 
   /**
@@ -131,7 +130,7 @@ public final class ViewData {
    * @return name id
    */
   public static int sizeID(final Data data) {
-    return data.atnindex.id(DataText.T_SIZE);
+    return data.atnindex.id(T_SIZE);
   }
 
   /**

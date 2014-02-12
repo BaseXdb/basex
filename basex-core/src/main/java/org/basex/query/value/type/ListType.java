@@ -14,39 +14,39 @@ import org.basex.util.*;
 /**
  * XQuery list types.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public enum ListType implements Type {
   /** NMTOKENS type. */
   NMT("NMTOKENS") {
     @Override
-    public Value cast(final Item it, final QueryContext ctx, final InputInfo ii)
-        throws QueryException {
-      return create(it, ctx, ii, AtomType.NMT);
+    public Value cast(final Item it, final QueryContext ctx, final StaticContext sc,
+        final InputInfo ii) throws QueryException {
+      return create(it, ctx, sc, ii, AtomType.NMT);
     }
   },
 
   /** ENTITIES type. */
   ENT("ENTITIES") {
     @Override
-    public Value cast(final Item it, final QueryContext ctx, final InputInfo ii)
-        throws QueryException {
-      return create(it, ctx, ii, AtomType.ENT);
+    public Value cast(final Item it, final QueryContext ctx, final StaticContext sc,
+        final InputInfo ii) throws QueryException {
+      return create(it, ctx, sc, ii, AtomType.ENT);
     }
   },
 
   /** IDREFS type. */
   IDR("IDREFS") {
     @Override
-    public Value cast(final Item it, final QueryContext ctx, final InputInfo ii)
-        throws QueryException {
-      return create(it, ctx, ii, AtomType.IDR);
+    public Value cast(final Item it, final QueryContext ctx, final StaticContext sc,
+        final InputInfo ii) throws QueryException {
+      return create(it, ctx, sc, ii, AtomType.IDR);
     }
   };
 
   /** Cached enums (faster). */
-  public static final ListType[] VALUES = values();
+  private static final ListType[] VALUES = values();
 
   /** Name. */
   private final QNm name;
@@ -65,17 +65,18 @@ public enum ListType implements Type {
    * Creates a sequence with the resulting list items.
    * @param it item
    * @param ctx query context
+   * @param sc static context
    * @param ii input info
    * @param type result type
    * @return created value
    * @throws QueryException query exception
    */
-  protected static Value create(final Item it, final QueryContext ctx, final InputInfo ii,
-      final AtomType type) throws QueryException {
+  private static Value create(final Item it, final QueryContext ctx, final StaticContext sc,
+      final InputInfo ii, final AtomType type) throws QueryException {
 
     final byte[][] values = split(norm(it.string(ii)), ' ');
     final ValueBuilder vb = new ValueBuilder(values.length);
-    for(final byte[] v : values) vb.add(type.cast(Str.get(v), ctx, ii));
+    for(final byte[] v : values) vb.add(type.cast(Str.get(v), ctx, sc, ii));
     return vb.value();
   }
 
@@ -115,19 +116,19 @@ public enum ListType implements Type {
   }
 
   @Override
-  public abstract Value cast(final Item it, final QueryContext ctx, final InputInfo ii)
-      throws QueryException;
+  public abstract Value cast(final Item it, final QueryContext ctx,
+      final StaticContext sc, final InputInfo ii) throws QueryException;
 
   @Override
-  public Value cast(final Object o, final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-    return cast(Str.get(o, ctx, ii), null, ii);
+  public Value cast(final Object o, final QueryContext ctx, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
+    return cast(Str.get(o, ctx, ii), ctx, sc, ii);
   }
 
   @Override
-  public Value castString(final String o, final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-    return cast(o, ctx, ii);
+  public Value castString(final String o, final QueryContext ctx, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
+    return cast(o, ctx, sc, ii);
   }
 
   @Override
@@ -162,7 +163,7 @@ public enum ListType implements Type {
   }
 
   @Override
-  public Type.ID id() {
+  public ID id() {
     return null;
   }
 

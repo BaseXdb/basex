@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  * are to be added or closed. The builder implementation decides whether
  * the nodes are stored on disk or kept in memory.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Builder extends Proc {
@@ -105,9 +105,7 @@ public abstract class Builder extends Proc {
    * @param nsp namespaces
    * @throws IOException I/O exception
    */
-  public final void openElem(final byte[] nm, final Atts att, final Atts nsp)
-      throws IOException {
-
+  public final void openElem(final byte[] nm, final Atts att, final Atts nsp) throws IOException {
     addElem(nm, att, nsp);
     ++level;
   }
@@ -119,9 +117,7 @@ public abstract class Builder extends Proc {
    * @param nsp namespaces
    * @throws IOException I/O exception
    */
-  public final void emptyElem(final byte[] nm, final Atts att, final Atts nsp)
-      throws IOException {
-
+  public final void emptyElem(final byte[] nm, final Atts att, final Atts nsp) throws IOException {
     addElem(nm, att, nsp);
     final int pre = pstack.get(level);
     ns.close(pre);
@@ -172,7 +168,7 @@ public abstract class Builder extends Proc {
    * @param enc encoding
    */
   public final void encoding(final String enc) {
-    meta.encoding = eq(enc, UTF8, UTF82) ? UTF8 : enc;
+    meta.encoding = normEncoding(enc);
   }
 
   // PROGRESS INFORMATION =====================================================
@@ -236,8 +232,7 @@ public abstract class Builder extends Proc {
    * @param uri namespace uri reference
    * @throws IOException I/O exception
    */
-  protected abstract void addAttr(int nm, byte[] value, int dist, int uri)
-      throws IOException;
+  protected abstract void addAttr(int nm, byte[] value, int dist, int uri) throws IOException;
 
   /**
    * Adds a text node to the database.
@@ -265,9 +260,7 @@ public abstract class Builder extends Proc {
    * @param nsp namespaces
    * @throws IOException I/O exception
    */
-  private void addElem(final byte[] name, final Atts att, final Atts nsp)
-      throws IOException {
-
+  private void addElem(final byte[] name, final Atts att, final Atts nsp) throws IOException {
     // get tag reference
     int n = tags.index(name, null, true);
     path.put(n, Data.ELEM, level);
@@ -284,7 +277,7 @@ public abstract class Builder extends Proc {
     for(int nx = 0; nx < nl; nx++) ns.add(nsp.name(nx), nsp.value(nx), meta.size);
 
     // get and store element references
-    final int dis = level != 0 ? pre - pstack.get(level - 1) : 1;
+    final int dis = level == 0 ? 1 : pre - pstack.get(level - 1);
     final int as = att.size();
     int u = ns.uri(name, true);
     if(u == 0 && indexOf(name, ':') != -1 && !eq(prefix(name), XML))
@@ -322,8 +315,7 @@ public abstract class Builder extends Proc {
    * @param msg message
    * @throws IOException I/O exception
    */
-  private void limit(final int value, final int limit, final String msg)
-      throws IOException {
+  private void limit(final int value, final int limit, final String msg) throws IOException {
     if(value >= limit) throw new BuildException(msg, parser.detail(), limit);
   }
 

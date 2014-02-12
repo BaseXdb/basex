@@ -17,24 +17,25 @@ import org.basex.util.list.*;
 /**
  * Node functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNNode extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNNode(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNNode(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     // functions have 0 or 1 arguments...
-    final Item it = (expr.length != 0 ? expr[0] : checkCtx(ctx)).item(ctx, info);
+    final Item it = (expr.length == 0 ? checkCtx(ctx) : expr[0]).item(ctx, info);
     final ANode node = it == null ? null : checkNode(it);
 
     switch(sig) {
@@ -56,9 +57,9 @@ public final class FNNode extends StandardFunc {
         Uri base = Uri.EMPTY;
         ANode n = node;
         do {
-          if(n == null) return ctx.sc.baseURI().resolve(base, info);
+          if(n == null) return sc.baseURI().resolve(base, info);
           final Uri bu = Uri.uri(n.baseURI(), false);
-          if(!bu.isValid()) FUNCAST.thrw(ii, bu.type, bu);
+          if(!bu.isValid()) throw FUNCAST.get(ii, bu.type, bu);
           base = bu.resolve(base, info);
           if(n.type == NodeType.DOC && n instanceof DBNode) break;
           n = n.parent();
@@ -98,7 +99,7 @@ public final class FNNode extends StandardFunc {
    * @param node node to start from
    * @return resulting iterator
    */
-  private Str path(final ANode node) {
+  private static Str path(final ANode node) {
     ANode n = node;
     final TokenList tl = new TokenList();
     while(n.parent() != null) {

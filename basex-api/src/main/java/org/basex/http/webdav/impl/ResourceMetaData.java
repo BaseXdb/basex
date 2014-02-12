@@ -6,6 +6,7 @@ import static org.basex.http.webdav.impl.Utils.stripLeadingSlash;
 
 /**
  * Resource meta data.
+ *
  * @author BaseX Team 2005-13, BSD License
  * @author Dimitar Popov
  */
@@ -14,8 +15,6 @@ public final class ResourceMetaData {
   public final String db;
   /** Resource path. */
   public final String path;
-  /** Resource last modification date in milliseconds. */
-  public final long mod;
   /** Resource last modification date. */
   public final Date mdate;
   /** Raw binary file flag. */
@@ -24,8 +23,6 @@ public final class ResourceMetaData {
   public final String ctype;
   /** Resource size in bytes. */
   public final Long size;
-  /** Folder flag. */
-  public final boolean folder;
 
   /** Default constructor. */
   public ResourceMetaData() {
@@ -48,7 +45,7 @@ public final class ResourceMetaData {
    * @param m resource last modification date in milliseconds
    */
   public ResourceMetaData(final String d, final String p, final long m) {
-    this(d, p, m, false, null,  null, true);
+    this(d, p, m, false, null,  null);
   }
 
   /**
@@ -60,30 +57,13 @@ public final class ResourceMetaData {
    * @param c resource content type
    * @param s resource size in bytes
    */
-  public ResourceMetaData(final String d, final String p, final long m,
-      final boolean r, final String c, final Long s) {
-    this(d, p, m, r, c,  s, false);
-  }
-
-  /**
-   * Constructor.
-   * @param d database owning the resource
-   * @param p resource path
-   * @param m resource last modification date in milliseconds
-   * @param r raw binary file flag
-   * @param c resource content type
-   * @param s resource size in bytes
-   * @param f folder flag
-   */
-  public ResourceMetaData(final String d, final String p, final long m,
-      final boolean r, final String c, final Long s, final boolean f) {
+  public ResourceMetaData(final String d, final String p, final long m, final boolean r,
+      final String c, final Long s) {
     db = d;
     path = stripLeadingSlash(p);
-    mod = m;
     raw = r;
     ctype = c;
     size = s;
-    folder = f;
-    mdate = mod == -1 ? null : new Date(mod);
+    mdate = m == -1 ? null : new Date(m);
   }
 }

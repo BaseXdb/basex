@@ -9,23 +9,23 @@ import org.basex.gui.view.*;
 /**
  * Provides an interface for data specific TreeMap visualizations.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 abstract class MapPainter {
   /** Graphics reference. */
   final MapView view;
-  /** Window properties. */
-  final GUIProp prop;
+  /** GUI options. */
+  final GUIOptions gopts;
 
   /**
    * Constructor.
    * @param m map reference
-   * @param pr gui properties
+   * @param opts gui options
    */
-  MapPainter(final MapView m, final GUIProp pr) {
+  MapPainter(final MapView m, final GUIOptions opts) {
     view = m;
-    prop = pr;
+    gopts = opts;
   }
 
   /**
@@ -37,13 +37,17 @@ abstract class MapPainter {
   final Color color(final MapRects rects, final int ri) {
     // find marked node
     final Nodes marked = view.gui.context.marked;
-    final int p = marked == null ? -1 : -marked.find(rects.get(ri).pre) - 1;
-    if(p < 0) return GUIConstants.colormark1;
-
-    // mark ancestor of invisible node;
-    final int i = rects.find(rects.get(ri));
-    return p < marked.size() && i + 1 < rects.size && marked.sorted[p] <
-      rects.sorted[i + 1].pre ? GUIConstants.colormark2 : null;
+    if(marked != null) {
+      final int p = -marked.find(rects.get(ri).pre) - 1;
+      if(p >= 0) {
+        // mark ancestor of invisible node;
+        final int i = rects.find(rects.get(ri));
+        return p < marked.size() && i + 1 < rects.size && marked.sorted[p] <
+          rects.sorted[i + 1].pre ? GUIConstants.colormark2 : null;
+      }
+    }
+    // no mark found
+    return GUIConstants.colormark1;
   }
 
   /**
@@ -52,8 +56,7 @@ abstract class MapPainter {
    * @param r rectangle array
    * @param scale scale boarders using this factor
    */
-  abstract void drawRectangles(final Graphics g, final MapRects r,
-      final float scale);
+  abstract void drawRectangles(final Graphics g, final MapRects r, final float scale);
 
   /**
    * Returns the content for the specified pre value.
@@ -61,7 +64,7 @@ abstract class MapPainter {
    * @param mr map rectangle
    * @return byte[] content
    */
-  static final byte[] content(final Data data, final MapRect mr) {
+  static byte[] content(final Data data, final MapRect mr) {
     return ViewData.content(data, mr.pre, false);
   }
 }

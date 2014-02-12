@@ -15,13 +15,13 @@ import org.basex.util.hash.*;
 /**
  * Local Variable Reference expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  */
 public final class VarRef extends ParseExpr {
   /** Variable name. */
-  public Var var;
+  public final Var var;
 
   /**
    * Constructor.
@@ -34,13 +34,17 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    type = var.type();
-    size = var.size;
-
+  public Expr compile(final QueryContext ctx, final VarScope scp) {
     // constant propagation
     final Value v = ctx.get(var);
-    return v != null ? v : this;
+    return v != null ? v : optimize(ctx, scp);
+  }
+
+  @Override
+  public VarRef optimize(final QueryContext ctx, final VarScope scp) {
+    type = var.type();
+    size = var.size;
+    return this;
   }
 
   @Override
@@ -49,12 +53,12 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Iter iter(final QueryContext ctx) {
     return ctx.get(var).iter();
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
+  public Value value(final QueryContext ctx) {
     return ctx.get(var);
   }
 
@@ -70,16 +74,16 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+      final Var v, final Expr e) {
     // [LW] Is copying always necessary?
-    return !v.is(var) ? null : e.isValue() ? e : e.copy(ctx, scp);
+    return v.is(var) ? e.isValue() ? e : e.copy(ctx, scp) : null;
   }
 
   @Override
   public VarRef copy(final QueryContext ctx, final VarScope scp,
       final IntObjMap<Var> vs) {
     final Var nw = vs.get(var.id);
-    return new VarRef(info, nw != null ? nw : var);
+    return new VarRef(info, nw != null ? nw : var).optimize(ctx, scp);
   }
 
   @Override
@@ -105,12 +109,13 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public void checkUp() throws QueryException {
+  public void checkUp() {
   }
 
   @Override
   public String toString() {
-    return new TokenBuilder(DOLLAR).add(var.name.toString()).toString();
+    return new TokenBuilder(DOLLAR).add(
+        var.name.toString()).add('_').addInt(var.id).toString();
   }
 
   @Override

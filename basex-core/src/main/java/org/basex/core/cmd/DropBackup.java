@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'drop backup' command and deletes backups of a database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class DropBackup extends ABackup {
@@ -43,18 +43,16 @@ public class DropBackup extends ABackup {
 
   /**
    * Drops one or more backups of the specified database.
+   *
    * @param db database
    * @param ctx database context
-   * @return number of dropped backups
    */
-  private static int drop(final String db, final Context ctx) {
-    final IOFile dir = ctx.mprop.dbpath();
-    int c = 0;
+  private static void drop(final String db, final Context ctx) {
+    final IOFile dir = ctx.globalopts.dbpath();
     for(final IOFile f : dir.children()) {
       final String n = f.name();
-      if(n.startsWith(db) && n.endsWith(IO.ZIPSUFFIX) && f.delete()) c++;
+      if(n.startsWith(db) && n.endsWith(IO.ZIPSUFFIX)) f.delete();
     }
-    return c;
   }
 
   @Override

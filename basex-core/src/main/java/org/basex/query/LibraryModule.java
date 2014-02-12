@@ -7,10 +7,10 @@ import org.basex.query.value.node.*;
 /**
  * An XQuery main module.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
-public class LibraryModule extends StaticScope {
+public final class LibraryModule extends StaticScope {
   /** Library name. */
   public final QNm name;
 
@@ -18,9 +18,10 @@ public class LibraryModule extends StaticScope {
    * Constructor.
    * @param nm of library
    * @param xqdoc documentation
+   * @param sctx static context
    */
-  public LibraryModule(final QNm nm, final String xqdoc) {
-    super(null, xqdoc, null);
+  public LibraryModule(final QNm nm, final String xqdoc, final StaticContext sctx) {
+    super(null, xqdoc, sctx, null);
     name = nm;
   }
 

@@ -7,13 +7,12 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.util.*;
 
 /**
  * Japanese lexer using igo (http://igo.sourceforge.jp/).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Toshio HIRAI
  */
 public class JapaneseTokenizer extends Tokenizer {
@@ -75,14 +74,10 @@ public class JapaneseTokenizer extends Tokenizer {
   /** Current token. */
   private Morpheme currToken;
 
+  /** Case option. */
+  private final FTCase cs;
   /** Diacritics flag. */
   private final boolean dc;
-  /** Sensitivity flag. */
-  private final boolean cs;
-  /** Uppercase flag. */
-  private final boolean uc;
-  /** Lowercase flag. */
-  private final boolean lc;
   /** Wildcard flag. */
   private final boolean wc;
   /** Stemming flag. */
@@ -94,9 +89,7 @@ public class JapaneseTokenizer extends Tokenizer {
 
   static {
     File dic = null;
-    if(!Reflect.available(PATTERN)) {
-      available = false;
-    } else {
+    if(Reflect.available(PATTERN)) {
       dic = new File(LANG);
       if(!dic.exists()) {
         dic = new File(Prop.HOME, "etc/" + LANG);
@@ -104,6 +97,8 @@ public class JapaneseTokenizer extends Tokenizer {
           available = false;
         }
       }
+    } else {
+      available = false;
     }
 
     if(available) {
@@ -144,9 +139,7 @@ public class JapaneseTokenizer extends Tokenizer {
    * @param fto (optional) full-text options
    */
   public JapaneseTokenizer(final FTOpt fto) {
-    lc = fto != null && fto.is(LC);
-    uc = fto != null && fto.is(UC);
-    cs = fto != null && fto.is(CS);
+    cs = fto != null && fto.cs != null ? fto.cs : FTCase.INSENSITIVE;
     wc = fto != null && fto.is(WC);
     dc = fto != null && fto.is(DC);
     st = fto != null && fto.is(ST);
@@ -199,7 +192,7 @@ public class JapaneseTokenizer extends Tokenizer {
         else list.add(new Morpheme(srfc, ftr));
       }
     } catch(final Exception ex) {
-      Util.errln(Util.name(this) + ": " + ex);
+      Util.errln(Util.className(this) + ": " + ex);
     }
     tokenList = list;
     tokens = list.iterator();
@@ -213,8 +206,8 @@ public class JapaneseTokenizer extends Tokenizer {
    * @return result of check
    */
   private static boolean isFtChar(final String s) {
-    return s.equals(".") || s.equals("?") || s.equals("*") || s.equals("+") ||
-           s.equals("\\") || s.equals("{") || s.equals("}");
+    return ".".equals(s) || "?".equals(s) || "*".equals(s) || "+".equals(s) ||
+      "\\".equals(s) || "{".equals(s) || "}".equals(s);
   }
 
   /**
@@ -224,9 +217,7 @@ public class JapaneseTokenizer extends Tokenizer {
   private boolean moreWC() {
     final StringBuilder word = new StringBuilder();
     final int size = tokenList.size();
-    boolean period = false;
-    boolean bs = false;
-    boolean more = false;
+    boolean period = false, bs = false, more = false;
 
     for(; cpos < size; cpos++) {
       String cSrfc = tokenList.get(cpos).getSurface();
@@ -239,39 +230,38 @@ public class JapaneseTokenizer extends Tokenizer {
       }
 
       if(nSrfc != null) {
-        if(cSrfc.equals("\\")) bs = true;
+        if("\\".equals(cSrfc)) bs = true;
 
         // delimiter
-        if(cMark && !isFtChar(cSrfc) ||
-          cSrfc.equals("\\") && nMark) {
-            period = false;
-            bs = false;
-            if(word.length() != 0) {
-              more = true;
-              break;
-            }
-            if(cSrfc.equals("\\") && nMark) cpos++;
-            continue;
+        if(cMark && !isFtChar(cSrfc) || "\\".equals(cSrfc) && nMark) {
+          period = false;
+          bs = false;
+          if(word.length() != 0) {
+            more = true;
+            break;
+          }
+          if("\\".equals(cSrfc) && nMark) cpos++;
+          continue;
         }
 
         word.append(cSrfc);
 
-        if(bs || nSrfc.equals("\\")) {
+        if(bs || "\\".equals(nSrfc)) {
           more = true;
           continue;
         }
 
-        if(cSrfc.equals(".") || nSrfc.equals(".")) {
+        if(".".equals(cSrfc) || ".".equals(nSrfc)) {
           period = true;
           continue;
         }
         if(period) {
-          if(cSrfc.equals("{")) {
+          if("{".equals(cSrfc)) {
             cpos++;
             for(; cpos < size; cpos++) {
               cSrfc = tokenList.get(cpos).getSurface();
               word.append(cSrfc);
-              if(cSrfc.equals("}")) {
+              if("}".equals(cSrfc)) {
                 more = true;
                 break;
               }
@@ -284,7 +274,7 @@ public class JapaneseTokenizer extends Tokenizer {
       } else {
         // last token.
         if(cMark) {
-          if(cSrfc.equals("\\")) continue;
+          if("\\".equals(cSrfc)) continue;
           if(word.length() != 0) {
             word.append(cSrfc);
           }
@@ -306,8 +296,8 @@ public class JapaneseTokenizer extends Tokenizer {
       break;
     }
     if(more) {
-      currToken = word.length() != 0 ?
-        new Morpheme(word.toString(), MEISHI_FEATURE) : tokenList.get(cpos - 1);
+      currToken = word.length() == 0 ? tokenList.get(cpos - 1) :
+        new Morpheme(word.toString(), MEISHI_FEATURE);
     }
     return more;
   }
@@ -354,8 +344,8 @@ public class JapaneseTokenizer extends Tokenizer {
     byte[] token = token(n);
     final boolean a = ascii(token);
     if(!a && !dc) token = WesternTokenizer.dia(token);
-    if(uc) token = WesternTokenizer.upper(token, a);
-    if(lc || !cs) token = WesternTokenizer.lower(token, a);
+    if(cs == FTCase.UPPER) token = WesternTokenizer.upper(token, a);
+    else if(cs != FTCase.SENSITIVE) token = WesternTokenizer.lower(token, a);
     return toHankaku(token);
   }
 

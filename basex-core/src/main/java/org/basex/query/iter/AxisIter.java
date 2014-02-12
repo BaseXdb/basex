@@ -9,14 +9,14 @@ import org.basex.util.*;
  * Interface for light-weight axis iterators, throwing no exceptions.
  *
  * This class also implements the {@link Iterable} interface, which is why all of its
- * values can also be retrieved via enhanced for (for-each) loops. Note, however, that
+ * values can also be retrieved via enhanced for(for-each) loops. Note, however, that
  * using the {@link #next()} method will give you better performance.
  *
  * <b>Important</b>: to improve performance, this iterator may return the same node
  * instance with updated values. If resulting nodes are to be further processed,
  * they need to be finalized via {@link ANode#finish()}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class AxisIter extends NodeIter implements Iterable<ANode> {
@@ -42,7 +42,7 @@ public abstract class AxisIter extends NodeIter implements Iterable<ANode> {
 
       @Override
       public void remove() {
-        Util.notexpected();
+        throw Util.notExpected();
       }
     };
   }

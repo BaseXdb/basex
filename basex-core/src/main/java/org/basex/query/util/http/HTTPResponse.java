@@ -17,23 +17,23 @@ import org.basex.util.*;
  * HTTP response handler. Reads HTTP response and constructs the
  * {@code <http:response/>} element.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  */
 public final class HTTPResponse {
   /** Input information. */
   private final InputInfo info;
-  /** Database properties. */
-  private final Prop prop;
+  /** Database options. */
+  private final MainOptions options;
 
   /**
    * Constructor.
    * @param ii input info
-   * @param pr database properties
+   * @param opts database options
    */
-  public HTTPResponse(final InputInfo ii, final Prop pr) {
+  public HTTPResponse(final InputInfo ii, final MainOptions opts) {
     info = ii;
-    prop = pr;
+    options = opts;
   }
 
   /**
@@ -53,13 +53,19 @@ public final class HTTPResponse {
     final String type = conn.getContentType();
     InputStream is = conn.getErrorStream();
     final boolean error = is != null;
-    if(!error) is = conn.getInputStream();
+    try {
+      if(!error) is = conn.getInputStream();
+    } catch(final IOException ex) {
+      Util.debug(ex);
+    }
+
+    // result
+    final ValueBuilder vb = new ValueBuilder();
 
     // construct <http:response/>
     final FElem response = new FElem(Q_RESPONSE).declareNS();
     response.add(STATUS, token(conn.getResponseCode()));
     response.add(MESSAGE, conn.getResponseMessage());
-
     for(final String header : conn.getHeaderFields().keySet()) {
       if(header != null) {
         final FElem hdr = new FElem(Q_HEADER);
@@ -68,15 +74,15 @@ public final class HTTPResponse {
         response.add(hdr);
       }
     }
+    vb.add(response);
 
     // construct <http:body/>
-    final boolean st = status != null && Bln.parse(status, info);
-    final HTTPPayload hp = new HTTPPayload(is, st, info, prop);
-    response.add(hp.parse(error, type, utype));
-
-    // result
-    final ValueBuilder vb = new ValueBuilder().add(response);
-    if(!st) vb.add(hp.payloads());
+    final boolean body = status == null || !Bln.parse(status, info);
+    if(is != null) {
+      final HTTPPayload hp = new HTTPPayload(is, body, info, options);
+      response.add(hp.parse(error, type, utype));
+      if(body) vb.add(hp.payloads());
+    }
     return vb;
   }
 }
