@@ -193,7 +193,7 @@ final class DatabaseUpdates {
     if(data.inMemory() && !data.meta.original.isEmpty() &&
         data.meta.options.get(MainOptions.WRITEBACK)) {
       try {
-        Export.export(data, data.meta.original, data.meta.options.get(MainOptions.EXPORTER), null);
+        Export.export(data, data.meta.original, null);
       } catch(final IOException ex) {
         throw UPPUTERR.get(null, data.meta.original);
       }

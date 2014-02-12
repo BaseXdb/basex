@@ -34,8 +34,6 @@ public interface Constants {
   byte[] TESTCASE = token("testcase");
   /** Name: failure. */
   byte[] FAILURE = token("failure");
-  /** Name: URI. */
-  byte[] URI = token("uri");
   /** Name: line. */
   byte[] LINE = token("line");
   /** Name: column. */

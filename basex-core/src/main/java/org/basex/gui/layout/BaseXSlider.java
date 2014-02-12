@@ -27,8 +27,6 @@ public final class BaseXSlider extends BaseXPanel {
   /** Maximum slider value. */
   private final int max;
 
-  /** Initial value. */
-  private final int initial;
   /** Options. */
   private Options options;
   /** Number option. */
@@ -68,7 +66,6 @@ public final class BaseXSlider extends BaseXPanel {
     min = mn;
     max = mx;
     value = i;
-    initial = i;
     dialog = w instanceof BaseXDialog ? (BaseXDialog) w : null;
     mode(Fill.NONE).setFocusable(true);
 
@@ -204,12 +201,5 @@ public final class BaseXSlider extends BaseXPanel {
    */
   public void assign() {
     options.set(option, getValue());
-  }
-
-  /**
-   * Assigns the original value to the option specified in the constructor.
-   */
-  public void reset() {
-    options.set(option, initial);
   }
 }

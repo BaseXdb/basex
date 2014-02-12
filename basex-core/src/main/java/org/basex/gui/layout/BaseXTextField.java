@@ -21,8 +21,6 @@ public class BaseXTextField extends JTextField {
   /** Default width of text fields. */
   public static final int DWIDTH = 350;
 
-  /** Initial value. */
-  private String initial;
   /** Options. */
   private Options options;
   /** Option. */
@@ -69,21 +67,10 @@ public class BaseXTextField extends JTextField {
    * @param opts options
    * @param dialog dialog window
    */
-  public BaseXTextField(final StringOption opt, final Options opts, final BaseXDialog dialog) {
-    this((Option<?>) opt, opts, dialog);
-  }
-
-  /**
-   * Constructor.
-   * @param opt option
-   * @param opts options
-   * @param dialog dialog window
-   */
   private BaseXTextField(final Option<?> opt, final Options opts, final BaseXDialog dialog) {
     this(opts.get(opt).toString(), dialog, dialog);
     options = opts;
     option = opt;
-    initial = getText();
   }
 
   /**
@@ -205,17 +192,6 @@ public class BaseXTextField extends JTextField {
       } catch(final NumberFormatException ignored) { }
     } else {
       options.set((StringOption) option, getText());
-    }
-  }
-
-  /**
-   * Assigns the original value to the option specified in the constructor.
-   */
-  public void reset() {
-    if(option instanceof NumberOption) {
-      options.set((NumberOption) option, Integer.parseInt(initial));
-    } else {
-      options.set((StringOption) option, initial);
     }
   }
 }

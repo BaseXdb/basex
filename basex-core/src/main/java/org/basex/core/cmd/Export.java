@@ -41,7 +41,7 @@ public final class Export extends Command {
   protected boolean run() {
     try {
       final Data data = context.data();
-      export(data, args[0], data.meta.options.get(MainOptions.EXPORTER), this);
+      export(data, args[0], this);
       return info(DB_EXPORTED_X, data.meta.name, perf);
     } catch(final IOException ex) {
       return error(Util.message(ex));
@@ -51,6 +51,19 @@ public final class Export extends Command {
   @Override
   public void databases(final LockResult lr) {
     lr.read.add(DBLocking.CTX);
+  }
+
+  /**
+   * Exports the current database to the specified path.
+   * Files and directories in {@code path} will be possibly overwritten.
+   * @param data data reference
+   * @param path directory
+   * @param export calling instance
+   * @throws IOException I/O exception
+   */
+  public static void export(final Data data, final String path, final Export export)
+      throws IOException {
+    export(data, path, data.meta.options.get(MainOptions.EXPORTER), export);
   }
 
   /**
