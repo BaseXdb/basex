@@ -3,6 +3,40 @@
  Welcome to the changelog. This file contains all code changes since
  BaseX 6.5:
 
+VERSION 7.8 (February 12, 2014) ----------------------------------------
+
+ GUI
+ - new project view for organizing and opening project files
+ - realtime search of project files and contents
+ - various new editor shortcuts and code completions, code formatting
+
+ UPDATES
+ - improved performance of delete and insert operations
+ - faster in-place value updates
+ - 'update': convenience keyword for transform expressions
+
+ XQUERY OPTIMIZATIONS
+ - XQuery functions are now inlined and further optimized
+ - closure optimizations, better static typing
+ - improved detection and rewriting of tail calls
+ - faster processing of (sub)sequences
+
+ XQUERY MODULES
+ - JSON and CSV Module: updated and enhanced conversion rules
+ - Unit Module: enhanced test report output
+ - Map Module: map:serialize added; syntax aligned with latest spec.
+ - File Module: aligned with changes in EXPath spec.
+ - XQuery Module: xquery:evaluate (operates on opened databases)
+ - Full-Text Module: ft:contains added, ft:search: more options
+ - EXPath Binary Module added
+ - Java modules: support for locking annotations
+
+ API
+ - New options: INLINELIMIT, TAILCALLS, DEFAULTDB, RUNQUERY
+ - New command-line flag: -R only parse query
+ - Russian translation added (thanks to Oleksandr Shpak!)
+ - Spanish translation added (thanks to Carlos Marcos!)
+
 VERSION 7.7.2 (October 7, 2013) ----------------------------------------
 
  XQUERY
@@ -55,7 +89,7 @@ VERSION 7.7 (August 7, 2013) -------------------------------------------
  - we have new options for simplifying the creation of large databases
    http://docs.basex.org/wiki/Options
  
- WEB/HTTP SERVICES:
+ WEB/HTTP SERVICES
  - WebDAV has been enriched with locking features (sponsored feature!)
    http://docs.basex.org/wiki/WebDAV#Locking
  - RESTXQ has been improved and extended:
