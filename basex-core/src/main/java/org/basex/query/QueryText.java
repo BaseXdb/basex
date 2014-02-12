@@ -25,8 +25,6 @@ public interface QueryText {
   /** Parser token. */
   String ANY = "any";
   /** Parser token. */
-  String ARRAY = "array";
-  /** Parser token. */
   String AS = "as";
   /** Parser token. */
   String ASCENDING = "ascending";
