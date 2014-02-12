@@ -697,7 +697,7 @@ public abstract class Data {
 
     // loop through all entries
     final IntList preStack = new IntList();
-    final NSNode nsRoot = nspaces.current();
+    final NSNode nsRoot = nspaces.getCurrent();
     final HashSet<NSNode> newNodes = new HashSet<NSNode>();
     final IntList flagPres = new IntList();
 
@@ -787,10 +787,12 @@ public abstract class Data {
               nspaces.uri(nm, false), false);
           break;
       }
+      // propagate PRE value shifts to keep namespace structure valid
+      nspaces.shiftPreAfterInsert(tpre, 1, newNodes);
     }
     // finalize and update namespace structure
     while(!preStack.isEmpty()) nspaces.close(preStack.pop());
-    nspaces.root(nsRoot);
+    nspaces.setCurrent(nsRoot);
 
     if(bp != 0) insert(tpre + c - 1 - (c - 1) % buf);
     // reset buffer to old size
@@ -817,9 +819,6 @@ public abstract class Data {
     }
 
     if(!cache) updateDist(tpre + size, size);
-
-    // propagate PRE value shifts to namespaces
-    if(tpar != -1) nspaces.insert(tpre, size, newNodes);
   }
 
   /**

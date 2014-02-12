@@ -423,11 +423,22 @@ public final class NamespaceTest extends AdvancedQueryTest {
    * Detects general problems with namespace references.
    */
   @Test
-  public void insertTransformX() {
+  public void insertTransform2() {
     query(
         "copy $foo := <foo/> modify insert nodes (<bar/>)" +
         "into $foo return $foo",
         "<foo><bar/></foo>");
+  }
+
+  /**
+   * Tests, whether the PRE values of the namespace structure nodes are correctly adjusted after
+   * inserts.
+   */
+  @Test
+  public void insertTransform3() {
+    query(transform("document { <X><C xmlns:c='NS'/></X> }",
+        "insert node <B><B b:b='B' xmlns:b='B'/></B> before $input/X/*:C"),
+        "<X><B><B xmlns:b='B' b:b='B'/></B><C xmlns:c='NS'/></X>");
   }
 
   /**
@@ -436,14 +447,6 @@ public final class NamespaceTest extends AdvancedQueryTest {
    */
   @Test
   public void uriStack() throws Exception {
-    /*
-     * [LK] problem:
-     * - XMLParser.java l.146 calls ns.add before ns.open
-     * - for this TC sequence of ns operations should be:
-     *  doc:open, a:open, b:open, b:add, b:close, c:open ...
-     *  BUT IS
-     *  doc:open, a:open, *b:add, b:open* ...
-     */
     create(8);
     query(
         "doc('d8')",

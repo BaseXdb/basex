@@ -23,7 +23,6 @@ import org.basex.util.hash.*;
  *        the descendants of a deleted node).</li>
  *   <li> Resolution of text node adjacency.</li>
  *   <li> Merging of atomic updates to reduce number of I/Os. </li>
- *   // [LK] Lazy Replace..
  * </ol>
  *
  * <p>To avoid ambiguity it is not allowed to add:</p>
