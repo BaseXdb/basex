@@ -202,15 +202,16 @@ public class FNBin extends StandardFunc {
     final B64 b = b64(expr[0], false, ctx);
     final byte[] bytes = b.binary(info);
     return new ValueIter() {
+      final int s = bytes.length;
       int c;
       @Override
       public Int get(final long i) { return Int.get(bytes[(int) i] & 0xFF); }
       @Override
-      public Int next() { return c < size ? get(c++) : null; }
+      public Int next() { return c < s ? get(c++) : null; }
       @Override
       public boolean reset() { c = 0; return true; }
       @Override
-      public long size() { return size; }
+      public long size() { return s; }
       @Override
       public Value value() {
         final long[] vals = new long[bytes.length];
