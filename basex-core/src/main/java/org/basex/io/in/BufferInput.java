@@ -1,7 +1,6 @@
 package org.basex.io.in;
 
 import java.io.*;
-import java.util.zip.*;
 
 import org.basex.io.*;
 import org.basex.util.list.*;
@@ -141,7 +140,7 @@ public class BufferInput extends InputStream {
 
   @Override
   public final void close() throws IOException {
-    if(in != null && !(in instanceof ZipInputStream)) in.close();
+    if(in != null && !(in instanceof FilterInputStream)) in.close();
   }
 
   /**

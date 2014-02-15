@@ -11,6 +11,7 @@ import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -90,22 +91,36 @@ public final class DirParser extends Parser {
   private void parse(final Builder b, final IO io) throws IOException {
     if(io instanceof IOFile && io.isDir()) {
       for(final IO f : ((IOFile) io).children()) parse(b, f);
-    } else if(archives && io.name().toLowerCase(Locale.ENGLISH).endsWith(IO.GZSUFFIX)) {
-      // process GZIP archive
-      final GZIPInputStream is = new GZIPInputStream(io.inputStream());
-      src = new IOStream(is, io.name().replaceAll("\\..*", IO.XMLSUFFIX));
-      parseResource(b);
-      is.close();
     } else if(archives && io.isArchive()) {
-      // process ZIP archive
-      final ZipInputStream is = new ZipInputStream(io.inputStream());
-      for(ZipEntry ze; (ze = is.getNextEntry()) != null;) {
-        if(ze.isDirectory()) continue;
-        src = new IOStream(is, ze.getName());
-        src.length(ze.getSize());
+      final String name = io.name().toLowerCase(Locale.ENGLISH);
+      final InputStream in = io.inputStream();
+      if(name.endsWith(IO.GZSUFFIX)) {
+        // process GZIP archive
+        final GZIPInputStream is = new GZIPInputStream(in);
+        src = new IOStream(is, io.name().replaceAll("\\..*", IO.XMLSUFFIX));
         parseResource(b);
+        is.close();
+      } else if(name.endsWith(IO.TARSUFFIX)) {
+        // process TAR files
+        final TarInputStream is = new TarInputStream(in);
+        for(TarEntry ze; (ze = is.getNextEntry()) != null;) {
+          if(ze.isDirectory()) continue;
+          src = new IOStream(is, ze.getName());
+          src.length(ze.getSize());
+          parseResource(b);
+        }
+        is.close();
+      } else {
+        // process ZIP archive
+        final ZipInputStream is = new ZipInputStream(in);
+        for(ZipEntry ze; (ze = is.getNextEntry()) != null;) {
+          if(ze.isDirectory()) continue;
+          src = new IOStream(is, ze.getName());
+          src.length(ze.getSize());
+          parseResource(b);
+        }
+        is.close();
       }
-      is.close();
     } else {
       // process regular file
       src = io;
