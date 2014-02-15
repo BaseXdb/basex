@@ -347,13 +347,14 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
   public void checkUp() throws QueryException {
     final boolean u = expr.has(Flag.UPD);
     if(u) expr.checkUp();
+    final InputInfo ii = (expr instanceof ParseExpr ? (ParseExpr) expr : this).info;
     if(updating) {
       // updating function
       if(ret != null) throw UPFUNCTYPE.get(info);
-      if(!u && !expr.isVacuous()) throw UPEXPECTF.get(info);
+      if(!u && !expr.isVacuous()) throw UPEXPECTF.get(ii);
     } else if(u) {
       // uses updates, but is not declared as such
-      throw UPNOT.get(info, description());
+      throw UPNOT.get(ii, description());
     }
   }
 
