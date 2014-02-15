@@ -16,7 +16,7 @@ import org.basex.util.*;
  * Functions on EXPath packages.
  * [JE] install() and delete() should be updating functions
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Rositsa Shadura
  */
 public final class FNRepo extends StandardFunc {

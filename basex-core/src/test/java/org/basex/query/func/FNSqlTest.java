@@ -7,7 +7,7 @@ import org.junit.*;
  * This class tests the functions of the SQL Module.
  * Due to the lack of a default JDBC driver, this class contains only tests signatures.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class FNSqlTest extends AdvancedQueryTest {

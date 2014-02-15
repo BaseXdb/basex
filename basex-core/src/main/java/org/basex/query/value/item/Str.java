@@ -13,7 +13,7 @@ import org.basex.util.list.*;
 /**
  * String item ({@code xs:string}, {@code xs:normalizedString}, {@code xs:language}, etc.).
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public class Str extends AStr {

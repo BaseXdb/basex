@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Writes the parsed JSON file to the given {@link TokenBuilder}.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 public final class JsonStringConverter extends JsonConverter {

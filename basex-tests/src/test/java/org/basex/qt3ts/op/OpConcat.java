@@ -7,7 +7,7 @@ import org.basex.tests.qt3ts.*;
  * Tests for the "||" concatenation operator (new in XPath 3.0). 
  *     Tests adapted from the fn:concat() tests by Michael Kay.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")

@@ -22,7 +22,7 @@ import org.basex.util.hash.*;
 /**
  * The GFLWOR {@code group by} expression.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 public final class GroupBy extends GFLWOR.Clause {
@@ -321,7 +321,7 @@ public final class GroupBy extends GFLWOR.Clause {
   /**
    * Grouping spec.
    *
-   * @author BaseX Team 2005-13, BSD License
+   * @author BaseX Team 2005-14, BSD License
    * @author Leo Woerteler
    */
   public static final class Spec extends Single {
@@ -391,7 +391,7 @@ public final class GroupBy extends GFLWOR.Clause {
   /**
    * A group of tuples of post-grouping variables.
    *
-   * @author BaseX Team 2005-13, BSD License
+   * @author BaseX Team 2005-14, BSD License
    * @author Leo Woerteler
    */
   private static final class Group {

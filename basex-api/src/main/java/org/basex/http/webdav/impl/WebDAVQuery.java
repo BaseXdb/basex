@@ -7,7 +7,7 @@ import java.util.Map.*;
 /**
  * Query builder.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 final class WebDAVQuery {

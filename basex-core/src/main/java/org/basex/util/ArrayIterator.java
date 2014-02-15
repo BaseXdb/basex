@@ -6,7 +6,7 @@ import java.util.*;
  * This class is used to iterate through objects of an array.
  * @param <E> generic object type
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class ArrayIterator<E> implements Iterator<E>, Iterable<E> {

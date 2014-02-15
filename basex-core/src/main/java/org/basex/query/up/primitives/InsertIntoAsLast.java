@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Insert into as last primitive.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
 public class InsertIntoAsLast extends NodeCopy {

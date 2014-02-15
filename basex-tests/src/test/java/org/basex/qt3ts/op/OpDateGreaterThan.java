@@ -6,7 +6,7 @@ import org.basex.tests.qt3ts.*;
 /**
  * Tests for the date-greater-than() function.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")
@@ -777,7 +777,7 @@ public class OpDateGreaterThan extends QT3TestSet {
   @org.junit.Test
   public void opDateGreaterThan3() {
     final XQuery query = new XQuery(
-      "fn:not((xs:date(\"2005-13-26Z\") gt xs:date(\"2005-13-25Z\")))",
+      "fn:not((xs:date(\"2005-14-26Z\") gt xs:date(\"2005-14-25Z\")))",
       ctx);
     try {
       result = new QT3Result(query.value());

@@ -9,7 +9,7 @@ import org.basex.data.*;
  * Arbitrary trees can be stored in this clip. To distinguish between two insertion
  * sequences, the root node of each sequence points to the parent PRE==-1.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class DataClip {

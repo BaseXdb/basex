@@ -6,7 +6,7 @@ import org.basex.tests.qt3ts.*;
 /**
  * Tests for the math:exp10 function introduced in XPath 3.0.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")

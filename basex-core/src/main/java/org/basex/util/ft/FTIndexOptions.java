@@ -5,7 +5,7 @@ import org.basex.util.options.*;
 /**
  * Full-text index options.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public class FTIndexOptions extends Options {

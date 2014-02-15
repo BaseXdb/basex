@@ -7,7 +7,7 @@ import org.xmldb.api.base.*;
 /**
  * Implementation of the ResourceIterator Interface for the XMLDB:API.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 final class BXResourceIterator implements ResourceIterator, BXXMLDBText,

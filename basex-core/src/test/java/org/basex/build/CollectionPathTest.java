@@ -11,7 +11,7 @@ import org.junit.*;
 /**
  * Tests queries on collections.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Michael Seiferle
  */
 public final class CollectionPathTest extends SandboxTest {

@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Inspect functions.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class FNInspect extends StandardFunc {

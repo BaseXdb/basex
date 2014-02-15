@@ -23,7 +23,7 @@ import org.basex.util.list.*;
 /**
  * Service handling the various WebDAV operations.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  * @param <T> the type of resource
  */

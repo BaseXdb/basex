@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * An XQuery function call, either static or dynamic.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 public abstract class FuncCall extends Arr {

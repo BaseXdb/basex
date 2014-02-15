@@ -17,7 +17,7 @@ import org.junit.runners.model.*;
 /**
  * Test if index and non-index full-text queries behave the same way.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  */
 @InputData("<x>A x B</x>")

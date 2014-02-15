@@ -6,7 +6,7 @@ import org.basex.data.*;
 /**
  * Evaluates the 'cs' command and sets a new initial context set.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class Cs extends AQuery {

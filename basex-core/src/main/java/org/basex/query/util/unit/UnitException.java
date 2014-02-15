@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * Thrown to indicate an XQyery unit exception.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public class UnitException extends QueryException {

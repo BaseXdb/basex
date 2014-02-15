@@ -6,7 +6,7 @@ import org.basex.server.*;
 /**
  * This class demonstrates query execution via the client/server architecture.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  */
 public final class ServerQueries {
   /** Session reference. */

@@ -3,7 +3,7 @@ package org.basex.http.webdav.impl;
 /**
  * Factory interface for generating different WebDAV resources.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  * @param <T> generated resource type
  */

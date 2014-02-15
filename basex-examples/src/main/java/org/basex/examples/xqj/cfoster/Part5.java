@@ -12,7 +12,7 @@ import javax.xml.xquery.*;
  *
  * Part 5: Stream massive amounts of XML to XQuery expressions.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  */
 public final class Part5 extends Main {
   /**

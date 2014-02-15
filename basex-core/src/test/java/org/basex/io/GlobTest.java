@@ -7,7 +7,7 @@ import org.junit.*;
 /**
  * Test class for glob patterns.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class GlobTest {

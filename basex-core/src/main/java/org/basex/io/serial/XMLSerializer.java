@@ -11,7 +11,7 @@ import org.basex.query.value.item.*;
 /**
  * This class serializes data as XML.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public class XMLSerializer extends OutputSerializer {

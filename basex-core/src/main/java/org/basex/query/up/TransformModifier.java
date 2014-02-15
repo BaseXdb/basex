@@ -13,7 +13,7 @@ import org.basex.query.up.primitives.*;
  * expression. It especially keeps track of all nodes that are copied in the
  * 'copy' statement of a transform expression.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
 public final class TransformModifier extends ContextModifier {

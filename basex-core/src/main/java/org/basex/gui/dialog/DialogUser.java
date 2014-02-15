@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 /**
  * Panel for displaying information about global/local users.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Andreas Weiler
  */
 final class DialogUser extends BaseXBack {

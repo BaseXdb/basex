@@ -3,7 +3,7 @@ package org.basex.core.parse;
 /**
    * Reads a password from a specified source (eg. command line or GUI).
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public interface PasswordReader {

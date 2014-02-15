@@ -12,7 +12,7 @@ import org.basex.server.*;
  * Database information will be shown before and after the
  * clients have been run.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  */
 public final class ServerConcurrency {
   /**

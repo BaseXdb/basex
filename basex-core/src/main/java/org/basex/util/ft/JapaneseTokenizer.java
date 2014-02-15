@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Japanese lexer using igo (http://igo.sourceforge.jp/).
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Toshio HIRAI
  */
 public class JapaneseTokenizer extends Tokenizer {

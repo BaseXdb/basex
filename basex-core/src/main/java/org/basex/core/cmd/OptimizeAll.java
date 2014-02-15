@@ -21,7 +21,7 @@ import org.basex.util.list.*;
  * the currently opened database. This effectively eliminates all fragmentation
  * and can lead to significant space savings after updates.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 public final class OptimizeAll extends ACreate {
@@ -160,7 +160,7 @@ public final class OptimizeAll extends ACreate {
   /**
    * Parser for rebuilding existing databases.
    *
-   * @author BaseX Team 2005-13, BSD License
+   * @author BaseX Team 2005-14, BSD License
    * @author Leo Woerteler
    */
   private static final class DBParser extends Parser {

@@ -4,7 +4,7 @@
  * expressions. All files are under BSD license, although proper headers can't always be
  * guaranteed.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 package org.basex.query.regex.parse;

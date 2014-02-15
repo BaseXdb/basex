@@ -8,7 +8,7 @@ import org.w3c.dom.*;
 /**
  * DOM - Attribute implementation.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class BXAttr extends BXNode implements Attr {

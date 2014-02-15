@@ -13,7 +13,7 @@ import org.basex.util.*;
  * The inheriting classes are optimized for performance and faster than Java's
  * default decoders.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 abstract class TextDecoder {

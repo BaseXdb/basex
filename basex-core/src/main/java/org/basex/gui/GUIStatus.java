@@ -10,7 +10,7 @@ import org.basex.gui.layout.*;
  * This is the status bar of the main window. It displays progress information
  * and includes a memory status.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class GUIStatus extends BaseXPanel {

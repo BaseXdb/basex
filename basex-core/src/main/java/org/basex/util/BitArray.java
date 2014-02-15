@@ -8,7 +8,7 @@ import static java.lang.Long.*;
  * Bit array that grows when needed. The implementation is similar to
  * {@link BitSet}.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  */
 public final class BitArray {

@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
 /**
  * FLWOR {@code order by}-expression.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 public final class OrderBy extends GFLWOR.Clause {
@@ -228,7 +228,7 @@ public final class OrderBy extends GFLWOR.Clause {
   /**
    * Sort key.
    *
-   * @author BaseX Team 2005-13, BSD License
+   * @author BaseX Team 2005-14, BSD License
    * @author Leo Woerteler
    */
   public static final class Key extends Single {

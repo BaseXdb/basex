@@ -11,7 +11,7 @@ import org.basex.util.*;
  * of the {@link TYPE}. Hence changes made during a snapshot will be reflected by this
  * task.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
 public abstract class BasicOperation extends Operation implements Comparable<BasicOperation>  {

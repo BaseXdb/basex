@@ -13,7 +13,7 @@ import org.basex.util.list.*;
  * Text renderer, supporting syntax highlighting and highlighting of selected, erroneous
  * or linked text.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 final class TextRenderer extends BaseXBack {

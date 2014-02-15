@@ -9,7 +9,7 @@ import org.basex.core.parse.Commands.*;
 /**
  * Evaluates the 'show events' command and lists all existing events.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Roman Raedle
  * @author Andreas Weiler
  */

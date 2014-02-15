@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * Class for testing the (un)marshalling and serialization of objects.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Michael Hedenus
  */
 @XmlRootElement(name = "domain-object")

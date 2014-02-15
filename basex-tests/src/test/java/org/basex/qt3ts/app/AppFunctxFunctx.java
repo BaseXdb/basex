@@ -6,7 +6,7 @@ import org.basex.tests.qt3ts.*;
 /**
  * Tests derived from the functx library .
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")
@@ -266,7 +266,7 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    (:~ : Construct a yearMonthDuration from a number of years and months : : @author Priscilla Walmsley, Datypic : @version 1.0 : @see http://www.xqueryfunctions.com/xq/functx_yearmonthduration.html : @param $years the number of years : @param $months the number of months :)\n" +
       "         declare function functx:yearMonthDuration ( $years as xs:decimal? , $months as xs:integer? ) as xs:yearMonthDuration { (xs:yearMonthDuration('P1M') * functx:if-empty($months,0)) + (xs:yearMonthDuration('P1Y') * functx:if-empty($years,0)) } ;\n" +
-      "                    (functx:add-months( xs:dateTime('2005-13-31T12:00:13'),2))",
+      "                    (functx:add-months( xs:dateTime('2005-14-31T12:00:13'),2))",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -293,7 +293,7 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    (:~ : Construct a yearMonthDuration from a number of years and months : : @author Priscilla Walmsley, Datypic : @version 1.0 : @see http://www.xqueryfunctions.com/xq/functx_yearmonthduration.html : @param $years the number of years : @param $months the number of months :)\n" +
       "         declare function functx:yearMonthDuration ( $years as xs:decimal? , $months as xs:integer? ) as xs:yearMonthDuration { (xs:yearMonthDuration('P1M') * functx:if-empty($months,0)) + (xs:yearMonthDuration('P1Y') * functx:if-empty($years,0)) } ;\n" +
-      "                    (functx:add-months('2005-13-31',-3))",
+      "                    (functx:add-months('2005-14-31',-3))",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -320,7 +320,7 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    (:~ : Construct a yearMonthDuration from a number of years and months : : @author Priscilla Walmsley, Datypic : @version 1.0 : @see http://www.xqueryfunctions.com/xq/functx_yearmonthduration.html : @param $years the number of years : @param $months the number of months :)\n" +
       "         declare function functx:yearMonthDuration ( $years as xs:decimal? , $months as xs:integer? ) as xs:yearMonthDuration { (xs:yearMonthDuration('P1M') * functx:if-empty($months,0)) + (xs:yearMonthDuration('P1Y') * functx:if-empty($years,0)) } ;\n" +
-      "                    (functx:add-months(xs:date('2004-01-23'),1), functx:add-months( xs:dateTime('2005-13-31T12:00:13'),2), functx:add-months('2005-13-31',-3))",
+      "                    (functx:add-months(xs:date('2004-01-23'),1), functx:add-months( xs:dateTime('2005-14-31T12:00:13'),2), functx:add-months('2005-14-31',-3))",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -786,7 +786,7 @@ public class AppFunctxFunctx extends QT3TestSet {
       "declare namespace functx = \"http://www.example.com/\";\n" +
       "                    (:~ : The built-in type of an atomic value : : @author Priscilla Walmsley, Datypic : @version 1.0 : @see http://www.xqueryfunctions.com/xq/functx_atomic-type.html : @param $values the value(s) whose type you want to determine :)\n" +
       "         declare function functx:atomic-type ( $values as xs:anyAtomicType* ) as xs:string* { for $val in $values return (if ($val instance of xs:untypedAtomic) then 'xs:untypedAtomic' else if ($val instance of xs:anyURI) then 'xs:anyURI' else if ($val instance of xs:ENTITY) then 'xs:ENTITY' else if ($val instance of xs:ID) then 'xs:ID' else if ($val instance of xs:NMTOKEN) then 'xs:NMTOKEN' else if ($val instance of xs:language) then 'xs:language' else if ($val instance of xs:NCName) then 'xs:NCName' else if ($val instance of xs:Name) then 'xs:Name' else if ($val instance of xs:token) then 'xs:token' else if ($val instance of xs:normalizedString) then 'xs:normalizedString' else if ($val instance of xs:string) then 'xs:string' else if ($val instance of xs:QName) then 'xs:QName' else if ($val instance of xs:boolean) then 'xs:boolean' else if ($val instance of xs:base64Binary) then 'xs:base64Binary' else if ($val instance of xs:hexBinary) then 'xs:hexBinary' else if ($val instance of xs:byte) then 'xs:byte' else if ($val instance of xs:short) then 'xs:short' else if ($val instance of xs:int) then 'xs:int' else if ($val instance of xs:long) then 'xs:long' else if ($val instance of xs:unsignedByte) then 'xs:unsignedByte' else if ($val instance of xs:unsignedShort) then 'xs:unsignedShort' else if ($val instance of xs:unsignedInt) then 'xs:unsignedInt' else if ($val instance of xs:unsignedLong) then 'xs:unsignedLong' else if ($val instance of xs:positiveInteger) then 'xs:positiveInteger' else if ($val instance of xs:nonNegativeInteger) then 'xs:nonNegativeInteger' else if ($val instance of xs:negativeInteger) then 'xs:negativeInteger' else if ($val instance of xs:nonPositiveInteger) then 'xs:nonPositiveInteger' else if ($val instance of xs:integer) then 'xs:integer' else if ($val instance of xs:decimal) then 'xs:decimal' else if ($val instance of xs:float) then 'xs:float' else if ($val instance of xs:double) then 'xs:double' else if ($val instance of xs:date) then 'xs:date' else if ($val instance of xs:time) then 'xs:time' else if ($val instance of xs:dateTime) then 'xs:dateTime' else if ($val instance of xs:dayTimeDuration) then 'xs:dayTimeDuration' else if ($val instance of xs:yearMonthDuration) then 'xs:yearMonthDuration' else if ($val instance of xs:duration) then 'xs:duration' else if ($val instance of xs:gMonth) then 'xs:gMonth' else if ($val instance of xs:gYear) then 'xs:gYear' else if ($val instance of xs:gYearMonth) then 'xs:gYearMonth' else if ($val instance of xs:gDay) then 'xs:gDay' else if ($val instance of xs:gMonthDay) then 'xs:gMonthDay' else 'unknown') } ;\n" +
-      "                    (functx:atomic-type(xs:date('2005-13-15')))",
+      "                    (functx:atomic-type(xs:date('2005-14-15')))",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -809,7 +809,7 @@ public class AppFunctxFunctx extends QT3TestSet {
       "declare namespace functx = \"http://www.example.com/\";\n" +
       "                    (:~ : The built-in type of an atomic value : : @author Priscilla Walmsley, Datypic : @version 1.0 : @see http://www.xqueryfunctions.com/xq/functx_atomic-type.html : @param $values the value(s) whose type you want to determine :)\n" +
       "         declare function functx:atomic-type ( $values as xs:anyAtomicType* ) as xs:string* { for $val in $values return (if ($val instance of xs:untypedAtomic) then 'xs:untypedAtomic' else if ($val instance of xs:anyURI) then 'xs:anyURI' else if ($val instance of xs:ENTITY) then 'xs:ENTITY' else if ($val instance of xs:ID) then 'xs:ID' else if ($val instance of xs:NMTOKEN) then 'xs:NMTOKEN' else if ($val instance of xs:language) then 'xs:language' else if ($val instance of xs:NCName) then 'xs:NCName' else if ($val instance of xs:Name) then 'xs:Name' else if ($val instance of xs:token) then 'xs:token' else if ($val instance of xs:normalizedString) then 'xs:normalizedString' else if ($val instance of xs:string) then 'xs:string' else if ($val instance of xs:QName) then 'xs:QName' else if ($val instance of xs:boolean) then 'xs:boolean' else if ($val instance of xs:base64Binary) then 'xs:base64Binary' else if ($val instance of xs:hexBinary) then 'xs:hexBinary' else if ($val instance of xs:byte) then 'xs:byte' else if ($val instance of xs:short) then 'xs:short' else if ($val instance of xs:int) then 'xs:int' else if ($val instance of xs:long) then 'xs:long' else if ($val instance of xs:unsignedByte) then 'xs:unsignedByte' else if ($val instance of xs:unsignedShort) then 'xs:unsignedShort' else if ($val instance of xs:unsignedInt) then 'xs:unsignedInt' else if ($val instance of xs:unsignedLong) then 'xs:unsignedLong' else if ($val instance of xs:positiveInteger) then 'xs:positiveInteger' else if ($val instance of xs:nonNegativeInteger) then 'xs:nonNegativeInteger' else if ($val instance of xs:negativeInteger) then 'xs:negativeInteger' else if ($val instance of xs:nonPositiveInteger) then 'xs:nonPositiveInteger' else if ($val instance of xs:integer) then 'xs:integer' else if ($val instance of xs:decimal) then 'xs:decimal' else if ($val instance of xs:float) then 'xs:float' else if ($val instance of xs:double) then 'xs:double' else if ($val instance of xs:date) then 'xs:date' else if ($val instance of xs:time) then 'xs:time' else if ($val instance of xs:dateTime) then 'xs:dateTime' else if ($val instance of xs:dayTimeDuration) then 'xs:dayTimeDuration' else if ($val instance of xs:yearMonthDuration) then 'xs:yearMonthDuration' else if ($val instance of xs:duration) then 'xs:duration' else if ($val instance of xs:gMonth) then 'xs:gMonth' else if ($val instance of xs:gYear) then 'xs:gYear' else if ($val instance of xs:gYearMonth) then 'xs:gYearMonth' else if ($val instance of xs:gDay) then 'xs:gDay' else if ($val instance of xs:gMonthDay) then 'xs:gMonthDay' else 'unknown') } ;\n" +
-      "                    (functx:atomic-type( (2,'abc',xs:date('2005-13-15'))))",
+      "                    (functx:atomic-type( (2,'abc',xs:date('2005-14-15'))))",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -832,7 +832,7 @@ public class AppFunctxFunctx extends QT3TestSet {
       "declare namespace functx = \"http://www.example.com/\";\n" +
       "                    (:~ : The built-in type of an atomic value : : @author Priscilla Walmsley, Datypic : @version 1.0 : @see http://www.xqueryfunctions.com/xq/functx_atomic-type.html : @param $values the value(s) whose type you want to determine :)\n" +
       "         declare function functx:atomic-type ( $values as xs:anyAtomicType* ) as xs:string* { for $val in $values return (if ($val instance of xs:untypedAtomic) then 'xs:untypedAtomic' else if ($val instance of xs:anyURI) then 'xs:anyURI' else if ($val instance of xs:ENTITY) then 'xs:ENTITY' else if ($val instance of xs:ID) then 'xs:ID' else if ($val instance of xs:NMTOKEN) then 'xs:NMTOKEN' else if ($val instance of xs:language) then 'xs:language' else if ($val instance of xs:NCName) then 'xs:NCName' else if ($val instance of xs:Name) then 'xs:Name' else if ($val instance of xs:token) then 'xs:token' else if ($val instance of xs:normalizedString) then 'xs:normalizedString' else if ($val instance of xs:string) then 'xs:string' else if ($val instance of xs:QName) then 'xs:QName' else if ($val instance of xs:boolean) then 'xs:boolean' else if ($val instance of xs:base64Binary) then 'xs:base64Binary' else if ($val instance of xs:hexBinary) then 'xs:hexBinary' else if ($val instance of xs:byte) then 'xs:byte' else if ($val instance of xs:short) then 'xs:short' else if ($val instance of xs:int) then 'xs:int' else if ($val instance of xs:long) then 'xs:long' else if ($val instance of xs:unsignedByte) then 'xs:unsignedByte' else if ($val instance of xs:unsignedShort) then 'xs:unsignedShort' else if ($val instance of xs:unsignedInt) then 'xs:unsignedInt' else if ($val instance of xs:unsignedLong) then 'xs:unsignedLong' else if ($val instance of xs:positiveInteger) then 'xs:positiveInteger' else if ($val instance of xs:nonNegativeInteger) then 'xs:nonNegativeInteger' else if ($val instance of xs:negativeInteger) then 'xs:negativeInteger' else if ($val instance of xs:nonPositiveInteger) then 'xs:nonPositiveInteger' else if ($val instance of xs:integer) then 'xs:integer' else if ($val instance of xs:decimal) then 'xs:decimal' else if ($val instance of xs:float) then 'xs:float' else if ($val instance of xs:double) then 'xs:double' else if ($val instance of xs:date) then 'xs:date' else if ($val instance of xs:time) then 'xs:time' else if ($val instance of xs:dateTime) then 'xs:dateTime' else if ($val instance of xs:dayTimeDuration) then 'xs:dayTimeDuration' else if ($val instance of xs:yearMonthDuration) then 'xs:yearMonthDuration' else if ($val instance of xs:duration) then 'xs:duration' else if ($val instance of xs:gMonth) then 'xs:gMonth' else if ($val instance of xs:gYear) then 'xs:gYear' else if ($val instance of xs:gYearMonth) then 'xs:gYearMonth' else if ($val instance of xs:gDay) then 'xs:gDay' else if ($val instance of xs:gMonthDay) then 'xs:gMonthDay' else 'unknown') } ;\n" +
-      "                    (functx:atomic-type(2), functx:atomic-type('abc'), functx:atomic-type(xs:date('2005-13-15')), functx:atomic-type( (2,'abc',xs:date('2005-13-15'))))",
+      "                    (functx:atomic-type(2), functx:atomic-type('abc'), functx:atomic-type(xs:date('2005-14-15')), functx:atomic-type( (2,'abc',xs:date('2005-14-15'))))",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -9159,7 +9159,7 @@ public class AppFunctxFunctx extends QT3TestSet {
       "declare namespace functx = \"http://www.example.com/\";\n" +
       "                    (:~ : The next day : : @author Priscilla Walmsley, Datypic : @version 1.0 : @see http://www.xqueryfunctions.com/xq/functx_next-day.html : @param $date the date :)\n" +
       "         declare function functx:next-day ( $date as xs:anyAtomicType? ) as xs:date? { xs:date($date) + xs:dayTimeDuration('P1D') } ;\n" +
-      "                    (functx:next-day( xs:dateTime('2005-13-31T12:00:13')))",
+      "                    (functx:next-day( xs:dateTime('2005-14-31T12:00:13')))",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -9182,7 +9182,7 @@ public class AppFunctxFunctx extends QT3TestSet {
       "declare namespace functx = \"http://www.example.com/\";\n" +
       "                    (:~ : The next day : : @author Priscilla Walmsley, Datypic : @version 1.0 : @see http://www.xqueryfunctions.com/xq/functx_next-day.html : @param $date the date :)\n" +
       "         declare function functx:next-day ( $date as xs:anyAtomicType? ) as xs:date? { xs:date($date) + xs:dayTimeDuration('P1D') } ;\n" +
-      "                    (functx:next-day(xs:date('2004-01-23')), functx:next-day( xs:dateTime('2005-13-31T12:00:13')))",
+      "                    (functx:next-day(xs:date('2004-01-23')), functx:next-day( xs:dateTime('2005-14-31T12:00:13')))",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -10901,7 +10901,7 @@ public class AppFunctxFunctx extends QT3TestSet {
       query.close();
     }
     test(
-      assertStringValue(false, "2005-13-05")
+      assertStringValue(false, "2005-14-05")
     );
   }
 
@@ -10924,7 +10924,7 @@ public class AppFunctxFunctx extends QT3TestSet {
       query.close();
     }
     test(
-      assertStringValue(false, "xxxdef def xbc 2005-13-05")
+      assertStringValue(false, "xxxdef def xbc 2005-14-05")
     );
   }
 

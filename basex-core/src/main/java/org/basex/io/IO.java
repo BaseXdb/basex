@@ -18,7 +18,7 @@ import org.xml.sax.*;
  * be a local file ({@link IOFile}), a URL ({@link IOUrl}), a byte array
  * ({@link IOContent}), or a stream ({@link IOStream}).
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public abstract class IO {

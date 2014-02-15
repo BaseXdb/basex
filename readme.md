@@ -73,4 +73,4 @@ You are as well invited to contribute to our [bug tracker](https://github.com/Ba
 
 All the best,
 
-BaseX Team, 2013
+BaseX Team, 2014

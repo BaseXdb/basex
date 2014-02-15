@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
 /**
  * Function item.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 public final class FuncItem extends FItem implements Scope {

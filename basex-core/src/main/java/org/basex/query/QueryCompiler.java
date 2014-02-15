@@ -15,7 +15,7 @@ import org.basex.util.list.*;
  * This class compiles all components of the query that are needed in an order that
  * maximizes the amount of inlining possible.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 final class QueryCompiler {

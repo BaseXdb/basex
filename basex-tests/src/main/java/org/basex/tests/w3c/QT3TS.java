@@ -31,7 +31,7 @@ import org.basex.util.*;
  * {@code http://dev.w3.org/2011/QT3-test-suite/}. The driver needs to be
  * executed from the test suite directory.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class QT3TS {

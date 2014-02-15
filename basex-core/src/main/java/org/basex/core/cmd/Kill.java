@@ -8,7 +8,7 @@ import org.basex.server.*;
 /**
  * Evaluates the 'kill' command and stops user sessions.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class Kill extends AUser {

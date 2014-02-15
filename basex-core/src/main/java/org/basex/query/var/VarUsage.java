@@ -5,7 +5,7 @@ import org.basex.query.expr.*;
 /**
  * A tri-state encoding the number of usages of a variable.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 public enum VarUsage {

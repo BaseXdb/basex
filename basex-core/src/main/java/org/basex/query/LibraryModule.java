@@ -7,7 +7,7 @@ import org.basex.query.value.node.*;
 /**
  * An XQuery main module.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 public final class LibraryModule extends StaticScope {

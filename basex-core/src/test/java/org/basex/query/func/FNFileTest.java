@@ -15,7 +15,7 @@ import org.junit.*;
 /**
  * This class tests the functions of the File Module.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Rositsa Shadura
  */
 public final class FNFileTest extends AdvancedQueryTest {

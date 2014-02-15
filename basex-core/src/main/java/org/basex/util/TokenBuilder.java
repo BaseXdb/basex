@@ -8,7 +8,7 @@ import java.util.*;
  * This class serves as an efficient constructor for {@link Token Tokens}.
  * It bears some resemblance to Java's {@link StringBuilder}.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class TokenBuilder {

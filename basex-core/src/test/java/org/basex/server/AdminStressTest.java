@@ -13,7 +13,7 @@ import org.junit.*;
 /**
  * Admin stress test.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  */
 public final class AdminStressTest extends SandboxTest {

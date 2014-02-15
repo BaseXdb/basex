@@ -19,7 +19,7 @@ import org.junit.*;
 /**
  * Concurrency tests of BaseX REST API.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  */
 public class RESTConcurrencyTest {

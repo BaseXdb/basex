@@ -26,7 +26,7 @@ import org.basex.util.list.*;
 /**
  * Database nodes.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public class DBNode extends ANode {

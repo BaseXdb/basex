@@ -6,7 +6,7 @@ import org.basex.tests.qt3ts.*;
 /**
  * Tests for the CastExpr production: cast expressions casting to/from built-in derived types.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")

@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * A CSV parser generating parse events similar to a SAX XML parser.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 final class CsvParser extends InputParser {

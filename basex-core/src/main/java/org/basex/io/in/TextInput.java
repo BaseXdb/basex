@@ -13,7 +13,7 @@ import org.basex.util.*;
  * it can also be explicitly set by calling {@link #encoding()}.
  * UTF-8 will be used as default encoding.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public class TextInput extends BufferInput {

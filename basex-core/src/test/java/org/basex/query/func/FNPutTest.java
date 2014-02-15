@@ -8,7 +8,7 @@ import org.junit.Test;
 /**
  * This class tests the XQuery fn:put() function.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  */
 public class FNPutTest extends AdvancedQueryTest {

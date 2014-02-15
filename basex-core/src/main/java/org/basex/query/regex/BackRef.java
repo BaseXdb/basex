@@ -3,7 +3,7 @@ package org.basex.query.regex;
 /**
  * Back-reference.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 public class BackRef extends RegExp {

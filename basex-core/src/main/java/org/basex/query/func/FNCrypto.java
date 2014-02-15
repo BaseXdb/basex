@@ -11,7 +11,7 @@ import org.basex.util.*;
 
 /**
  * EXPath Cryptographic Module.
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
 public final class FNCrypto extends StandardFunc {

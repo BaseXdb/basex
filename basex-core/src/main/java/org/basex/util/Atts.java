@@ -5,7 +5,7 @@ import org.basex.util.list.*;
 /**
  * This is a simple container for attributes (name/value pairs).
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class Atts extends ElementList {

@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * A JSON parser generating parse events similar to a SAX XML parser.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 public final class JsonParser extends InputParser {

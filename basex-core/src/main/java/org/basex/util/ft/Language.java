@@ -18,7 +18,7 @@ import org.basex.util.*;
  * @see <a href="http://www.iana.org/assignments/language-subtag-registry"
  *      >http://www.iana.org/assignments/language-subtag-registry</a>
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  * @author Jens Erat
  */

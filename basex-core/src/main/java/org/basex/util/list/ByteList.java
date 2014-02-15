@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * This is a simple container for byte values.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public class ByteList extends ElementList {

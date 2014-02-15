@@ -11,7 +11,7 @@ import org.basex.util.list.*;
 /**
  * This class converts CSV data to XML, using direct or attributes conversion.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 final class CsvDirectConverter extends CsvConverter {

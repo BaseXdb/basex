@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
  * This class organizes collations.
  * Some of the core functions have been inspired by the Saxon HE source code.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class Collation {

@@ -16,7 +16,7 @@ import org.basex.util.list.*;
 /**
  * Superclass for static functions, variables and the main expression.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 public abstract class StaticScope extends ExprInfo implements Scope {

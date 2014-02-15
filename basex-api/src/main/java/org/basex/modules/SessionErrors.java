@@ -6,7 +6,7 @@ import org.basex.query.value.item.*;
 /**
  * This module contains static error functions for the Session module.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 final class SessionErrors {

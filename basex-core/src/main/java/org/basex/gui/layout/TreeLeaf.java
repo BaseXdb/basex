@@ -6,7 +6,7 @@ import org.basex.data.*;
  * JTree node which represents a leaf (which represents either a raw file
  * or a document).
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
 public final class TreeLeaf extends TreeNode {

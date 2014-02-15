@@ -6,7 +6,7 @@ import org.junit.*;
 /**
  * Tests for inlining.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 public class InlineTest extends QueryPlanTest {

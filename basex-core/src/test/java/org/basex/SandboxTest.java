@@ -17,7 +17,7 @@ import org.junit.*;
 /**
  * If this class is extended, tests will be run in a sandbox.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public abstract class SandboxTest {

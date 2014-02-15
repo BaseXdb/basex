@@ -10,7 +10,7 @@ import org.basex.query.up.primitives.*;
  * This container holds all update primitives for a specific database node.
  * It is identified by its target node's PRE value and data reference.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
 final class NodeUpdates {

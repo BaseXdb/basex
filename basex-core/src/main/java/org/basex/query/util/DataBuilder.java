@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * Class for building memory-based database nodes.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class DataBuilder {

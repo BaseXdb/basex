@@ -62,7 +62,7 @@ import org.basex.util.list.*;
  * NOTE: the class is not thread-safe. It is imperative that all read/write accesses
  * are synchronized over a single context's read/write lock.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public abstract class Data {

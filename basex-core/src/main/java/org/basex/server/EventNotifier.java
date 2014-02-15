@@ -3,7 +3,7 @@ package org.basex.server;
 /**
  * Notification interface for handling database events.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Roman Raedle
  */
 public interface EventNotifier {

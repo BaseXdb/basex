@@ -1,7 +1,7 @@
 (:~
  : This module contains helper functions for locking documents in WebDAV.
  :
- : @author BaseX Team 2005-13, BSD License
+ : @author BaseX Team 2005-14, BSD License
  :)
 module namespace w = 'http://basex.org/modules/webdav';
 

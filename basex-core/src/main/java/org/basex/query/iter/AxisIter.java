@@ -16,7 +16,7 @@ import org.basex.util.*;
  * instance with updated values. If resulting nodes are to be further processed,
  * they need to be finalized via {@link ANode#finish()}.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public abstract class AxisIter extends NodeIter implements Iterable<ANode> {

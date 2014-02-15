@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * Server-side client session in the client-server architecture.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Andreas Weiler
  * @author Christian Gruen
  */

@@ -8,7 +8,7 @@ import org.basex.util.*;
  * This is an efficient and memory-saving hash map for storing primitive integers.
  * It is related to the {@link TokenSet} class.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public class IntSet extends ASet {

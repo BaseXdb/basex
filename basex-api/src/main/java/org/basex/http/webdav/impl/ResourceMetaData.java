@@ -7,7 +7,7 @@ import static org.basex.http.webdav.impl.Utils.stripLeadingSlash;
 /**
  * Resource meta data.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  */
 public final class ResourceMetaData {

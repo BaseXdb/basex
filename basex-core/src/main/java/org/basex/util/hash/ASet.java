@@ -6,7 +6,7 @@ import java.util.*;
  * This is the basic structure of an efficient and memory-saving hash set.
  * The first entry of the token set (offset 0) will always be kept empty.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public abstract class ASet {

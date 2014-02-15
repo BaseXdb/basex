@@ -15,7 +15,7 @@ import org.basex.util.list.*;
  * the currently opened database. Indexes and statistics are refreshed,
  * which is especially helpful after updates.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class Optimize extends ACreate {

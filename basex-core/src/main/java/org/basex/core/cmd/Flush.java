@@ -8,7 +8,7 @@ import org.basex.data.*;
 /**
  * Evaluates the 'flush' command and flushes the database buffers.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class Flush extends Command {

@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Abstract super class for function items.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 public abstract class FItem extends Item implements XQFunction {

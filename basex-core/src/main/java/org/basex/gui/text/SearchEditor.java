@@ -11,7 +11,7 @@ import org.basex.gui.layout.*;
 /**
  * This class displays editor components with an integrated search bar.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class SearchEditor extends BaseXBack {

@@ -10,7 +10,7 @@ import org.basex.util.list.*;
 /**
  * Contains methods for zipping and unzipping archives.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class Zip extends Proc {

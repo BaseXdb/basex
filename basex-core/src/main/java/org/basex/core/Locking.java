@@ -5,7 +5,7 @@ import org.basex.util.list.*;
 /**
  * Lock interface; will get obsolete after database locking has been finalized.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public interface Locking {

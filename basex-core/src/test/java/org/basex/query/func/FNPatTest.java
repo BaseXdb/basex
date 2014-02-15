@@ -7,7 +7,7 @@ import org.junit.*;
 /**
  * This class tests XQuery functions placed in the {@link FNPat} class.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 public final class FNPatTest extends AdvancedQueryTest {

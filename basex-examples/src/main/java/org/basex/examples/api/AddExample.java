@@ -9,7 +9,7 @@ import java.io.*;
  * This example required a running database server instance.
  * Documentation: http://docs.basex.org/wiki/Clients
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  */
 public final class AddExample {
   /**

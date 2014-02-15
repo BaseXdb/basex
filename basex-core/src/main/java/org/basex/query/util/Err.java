@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * This class contains all query error messages.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public enum Err {
@@ -1195,7 +1195,7 @@ public enum Err {
 
   /**
    * Error types.
-   * @author BaseX Team 2005-13, BSD License
+   * @author BaseX Team 2005-14, BSD License
    * @author Leo Woerteler
    */
   public enum ErrType {

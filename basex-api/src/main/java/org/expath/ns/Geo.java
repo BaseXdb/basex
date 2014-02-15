@@ -20,7 +20,7 @@ import com.vividsolutions.jts.io.gml2.*;
 /**
  * This module contains geo spatial functions for the Geo module.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Masoumeh Seydi
  */
 public final class Geo extends QueryModule {

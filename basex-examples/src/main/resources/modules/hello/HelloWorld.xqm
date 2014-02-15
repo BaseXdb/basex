@@ -1,6 +1,6 @@
 (:~
  : This is an example for a module that can be added to the BaseX repository.
- : @author BaseX Team 2005-13, BSD License
+ : @author BaseX Team 2005-14, BSD License
  :)
 module namespace m = 'http://basex.org/modules/Hello';
 

@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * Function call for user-defined functions.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class StaticFuncCall extends FuncCall {

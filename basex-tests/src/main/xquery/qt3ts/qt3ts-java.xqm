@@ -35,7 +35,7 @@ import org.basex.qt3ts.', $suite, '.*;
 /**
  * Test suite for the "', $suite, '" test group.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 @RunWith(Suite.class)
@@ -80,7 +80,7 @@ import ', $package, '.QT3TestSet;
   ),
   '.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")

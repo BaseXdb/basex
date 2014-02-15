@@ -6,7 +6,7 @@ import org.basex.*;
  * This class runs all REST examples.
  * It shows the function of the HTTP DELETE method.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  */
 public final class RESTAll {
   /**

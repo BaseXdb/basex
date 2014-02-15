@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * This class serializes data as HTML.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public class HTMLSerializer extends OutputSerializer {

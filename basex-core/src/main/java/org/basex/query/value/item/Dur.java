@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * Duration item ({@code xs:duration}).
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public class Dur extends ADateDur {

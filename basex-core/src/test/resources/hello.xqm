@@ -1,6 +1,6 @@
 (:~
  : This XQuery module is evaluated by some JUnit tests.
- : @author BaseX Team 2005-13, BSD License
+ : @author BaseX Team 2005-14, BSD License
  : @version 1.0
  : @unknown tag
  :)

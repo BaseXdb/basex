@@ -4,7 +4,7 @@ package org.basex;
  * This class contains a main method for starting the GUI from the API package.
  * This way, all API dependencies will be available in the visual frontend.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 final class StartGUI {

@@ -10,7 +10,7 @@ import org.basex.util.*;
  * Evaluates the 'inspect' command: checks if the currently opened database has
  * inconsistent data structures.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class Inspect extends Command {

@@ -15,7 +15,7 @@ import org.basex.util.*;
  * The menu structure is defined in {@link GUIConstants#MENUBAR} and
  * {@link GUIConstants#MENUITEMS}.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class GUIMenu extends JMenuBar {

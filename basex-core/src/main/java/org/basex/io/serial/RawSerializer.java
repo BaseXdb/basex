@@ -11,7 +11,7 @@ import org.basex.query.value.item.*;
  * coding takes place, binary data is directly output as raw data,
  * and all nodes except for text nodes are skipped.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class RawSerializer extends TextSerializer {

@@ -6,7 +6,7 @@ import org.basex.index.query.*;
  * This interface defines the methods which have to be implemented
  * by an index structure.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public interface Index {

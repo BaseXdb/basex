@@ -36,7 +36,7 @@ import java.lang.annotation.*;
  * <a href="http://www.w3.org/TR/xpath-functions-30/#properties-of-functions">function
  * properties</a>.</p>
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public abstract class QueryModule {

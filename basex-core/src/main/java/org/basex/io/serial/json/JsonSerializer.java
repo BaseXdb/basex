@@ -9,7 +9,7 @@ import org.basex.io.serial.*;
 /**
  * Abstract JSON serializer class.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public abstract class JsonSerializer extends OutputSerializer {

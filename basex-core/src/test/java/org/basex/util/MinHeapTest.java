@@ -9,7 +9,7 @@ import org.junit.*;
 /**
  * Tests for the {@link MinHeap} implementation.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 public final class MinHeapTest {

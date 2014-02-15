@@ -22,7 +22,7 @@ import static org.basex.util.Token.string;
 /**
  * Service managing the WebDAV locks.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  */
 public final class WebDAVLockService {

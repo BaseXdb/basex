@@ -9,7 +9,7 @@ import org.xmldb.api.modules.*;
  * the XML:DB API.
  * You first need to run {@link XMLDBCreate} in order to create the addressed database.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  */
 public final class XMLDBInsert {
   /** Database driver. */

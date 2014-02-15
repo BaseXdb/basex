@@ -15,7 +15,7 @@ import org.basex.query.value.node.*;
 /**
  * This class holds information on a custom RESTXQ response.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 final class RestXqRespBuilder {

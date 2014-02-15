@@ -9,7 +9,7 @@ import org.basex.query.*;
 /**
  * This class contains some methods for performing advanced query tests.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public abstract class AdvancedQueryTest extends SandboxTest {

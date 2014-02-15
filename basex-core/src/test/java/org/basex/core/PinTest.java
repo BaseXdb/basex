@@ -21,7 +21,7 @@ import org.junit.*;
  * Currently, all tests are disabled, as the concurrent process instances would have
  * to run in different JVMs.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 @Ignore("OverlappingLocking")

@@ -10,7 +10,7 @@ import org.junit.*;
 
 /**
  * Base class with common functionality for all ID -> PRE mapping tests.
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  */
 public abstract class IdPreMapBulkTestBase {
@@ -88,7 +88,7 @@ public abstract class IdPreMapBulkTestBase {
 
   /**
    * Dummy implementation of ID -> PRE map: very slow, but simple and correct.
-   * @author BaseX Team 2005-13, BSD License
+   * @author BaseX Team 2005-14, BSD License
    * @author Dimitar Popov
    */
   protected static class DummyIdPreMap extends IdPreMap {

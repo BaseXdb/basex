@@ -3,7 +3,7 @@ package org.basex.query.regex;
 /**
  * A quantifier, like {@code ?}, {@code *} or {@code &#x7b;17,123&#x7d;}.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 public class Quantifier extends RegExp {

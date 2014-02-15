@@ -11,7 +11,7 @@ import javax.xml.xquery.*;
  *
  * Part 7: XQuery Type System.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  */
 public final class Part7 extends Main {
   /**

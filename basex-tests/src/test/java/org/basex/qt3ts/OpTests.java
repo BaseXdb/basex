@@ -9,7 +9,7 @@ import org.basex.qt3ts.op.*;
 /**
  * Test suite for the "op" test group.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
 @RunWith(Suite.class)

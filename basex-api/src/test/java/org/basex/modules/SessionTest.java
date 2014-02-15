@@ -12,7 +12,7 @@ import org.junit.*;
 /**
  * This class tests the Session Module.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public class SessionTest extends HTTPTest {

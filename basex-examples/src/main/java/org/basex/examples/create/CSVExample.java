@@ -7,7 +7,7 @@ import org.basex.core.cmd.*;
  * This example demonstrates how to import a file in the CSV format
  * into the database.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class CSVExample {

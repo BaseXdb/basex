@@ -21,7 +21,7 @@ import org.basex.util.list.*;
 /**
  * This class offers a real tree view.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Wolfgang Miller
  */
 public final class TreeView extends View implements TreeConstants {

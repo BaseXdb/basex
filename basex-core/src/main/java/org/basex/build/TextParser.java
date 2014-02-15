@@ -16,7 +16,7 @@ import org.basex.util.*;
  * <p>The parser provides some options, which can be specified via the
  * {@link MainOptions#TEXTPARSER} option.</p>
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class TextParser extends SingleParser {

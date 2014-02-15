@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * This component visualizes the current memory consumption.
  *
- * @author BaseX Team 2005-13, BSD License
+ * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class BaseXMem extends BaseXPanel {
