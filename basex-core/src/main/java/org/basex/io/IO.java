@@ -40,6 +40,8 @@ public abstract class IO {
   public static final String JSONSUFFIX = ".json";
   /** JAR file suffix. */
   public static final String JARSUFFIX = ".jar";
+  /** TGZIP file suffix. */
+  public static final String TGZSUFFIX = ".tgz";
   /** GZIP file suffix. */
   public static final String GZSUFFIX = ".gz";
   /** TAR file suffix. */
@@ -56,9 +58,10 @@ public abstract class IO {
   /** XQuery suffixes. */
   public static final String[] XQSUFFIXES =
     { XQSUFFIX, XQMSUFFIX, ".xqy", ".xql", ".xqu", ".xquery" };
-  /** ZIP suffixes. */
+  /** Archive suffixes. */
   public static final String[] ZIPSUFFIXES = {
-    ZIPSUFFIX, GZSUFFIX, TARSUFFIX, XARSUFFIX, ".docx", ".pptx", ".xslx", ".odt", ".odp", ".ods"
+    ZIPSUFFIX, GZSUFFIX, TGZSUFFIX, TARSUFFIX, XARSUFFIX,
+    ".docx", ".pptx", ".xslx", ".odt", ".odp", ".ods"
   };
   /** XML suffixes. */
   public static final String[] XMLSUFFIXES =

@@ -93,15 +93,16 @@ public final class DirParser extends Parser {
       for(final IO f : ((IOFile) io).children()) parse(b, f);
     } else if(archives && io.isArchive()) {
       final String name = io.name().toLowerCase(Locale.ENGLISH);
-      final InputStream in = io.inputStream();
+      InputStream in = io.inputStream();
       if(name.endsWith(IO.GZSUFFIX)) {
         // process GZIP archive
         final GZIPInputStream is = new GZIPInputStream(in);
         src = new IOStream(is, io.name().replaceAll("\\..*", IO.XMLSUFFIX));
         parseResource(b);
         is.close();
-      } else if(name.endsWith(IO.TARSUFFIX)) {
+      } else if(name.endsWith(IO.TARSUFFIX) || name.endsWith(IO.TGZSUFFIX)) {
         // process TAR files
+        if(name.endsWith(IO.TGZSUFFIX)) in = new GZIPInputStream(in);
         final TarInputStream is = new TarInputStream(in);
         for(TarEntry ze; (ze = is.getNextEntry()) != null;) {
           if(ze.isDirectory()) continue;
