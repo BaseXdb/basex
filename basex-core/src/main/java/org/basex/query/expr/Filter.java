@@ -172,8 +172,9 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
+
     final boolean pr = super.inline(ctx, scp, v, e) != null;
     final Expr rt = root == null ? null : root.inline(ctx, scp, v, e);
     if(rt != null) root = rt;

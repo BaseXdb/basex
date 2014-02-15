@@ -207,11 +207,11 @@ public abstract class Expr extends ExprInfo {
    * @param scp variable scope for recompilation
    * @param v variable to replace
    * @param e expression to inline
-   * @return resulting expression in something changed, {@code null} otherwise
+   * @return resulting expression if something changed, {@code null} otherwise
    * @throws QueryException query exception
    */
   public abstract Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
-                                 final Expr e) throws QueryException;
+      final Expr e) throws QueryException;
 
   /**
    * Inlines the given expression into all elements of the given array.
@@ -225,6 +225,7 @@ public abstract class Expr extends ExprInfo {
    */
   protected static boolean inlineAll(final QueryContext ctx, final VarScope scp,
       final Expr[] arr, final Var v, final Expr e) throws QueryException {
+
     boolean change = false;
     for(int i = 0; i < arr.length; i++) {
       final Expr nw = arr[i].inline(ctx, scp, v, e);

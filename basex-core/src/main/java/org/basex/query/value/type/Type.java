@@ -141,8 +141,8 @@ public interface Type {
    * @return new item
    * @throws QueryException query exception
    */
-  Value cast(final Item it, final QueryContext ctx, final StaticContext sc,
-      final InputInfo ii) throws QueryException;
+  Value cast(final Item it, final QueryContext ctx, final StaticContext sc, final InputInfo ii)
+      throws QueryException;
 
   /**
    * Casts the specified Java object to the XQuery data type.
@@ -153,8 +153,8 @@ public interface Type {
    * @return new item
    * @throws QueryException query exception
    */
-  Value cast(final Object o, QueryContext ctx, final StaticContext sc,
-      final InputInfo ii) throws QueryException;
+  Value cast(final Object o, QueryContext ctx, final StaticContext sc, final InputInfo ii)
+      throws QueryException;
 
   /**
    * Casts the specified string to the XQuery data type.
@@ -165,8 +165,8 @@ public interface Type {
    * @return new item
    * @throws QueryException query exception
    */
-  Value castString(final String s, QueryContext ctx, final StaticContext sc,
-      final InputInfo ii) throws QueryException;
+  Value castString(final String s, QueryContext ctx, final StaticContext sc, final InputInfo ii)
+      throws QueryException;
 
   /**
    * Returns the sequence type of this data type.

@@ -73,15 +73,13 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) {
+  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e) {
     // [LW] Is copying always necessary?
     return v.is(var) ? e.isValue() ? e : e.copy(ctx, scp) : null;
   }
 
   @Override
-  public VarRef copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public VarRef copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final Var nw = vs.get(var.id);
     return new VarRef(info, nw != null ? nw : var).optimize(ctx, scp);
   }
