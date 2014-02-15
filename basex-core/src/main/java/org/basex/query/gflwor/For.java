@@ -221,25 +221,28 @@ public final class For extends Clause {
    * Tries to add the given expression as an attribute to this loop's sequence.
    * @param ctx query context
    * @param scp variable scope
-   * @param p expression to add
+   * @param prd expression to add as predicate
    * @return success
    * @throws QueryException query exception
    */
-  boolean toPred(final QueryContext ctx, final VarScope scp, final Expr p)
-      throws QueryException {
-    if(empty || !(vars.length == 1 && p.uses(var) && p.removable(var))) return false;
-    final Expr r = p.inline(ctx, scp, var, new Context(info)), e = r == null ? p : r;
+  boolean toPred(final QueryContext ctx, final VarScope scp, final Expr prd) throws QueryException {
+    if(empty || !(vars.length == 1 && prd.uses(var) && prd.removable(var))) return false;
+
+    // assign type of iterated items to context expression
+    final Context c = new Context(info);
+    c.type = expr.type().type.seqType();
+    final Expr r = prd.inline(ctx, scp, var, c), inl = r == null ? prd : r;
 
     // attach predicates to axis path or filter, or create a new filter
-    final Expr a = e.type().mayBeNumber() ? Function.BOOLEAN.get(null, info, e) : e;
+    final Expr pred = inl.type().mayBeNumber() ? Function.BOOLEAN.get(null, info, inl) : inl;
 
     // add to clause expression
     if(expr instanceof AxisPath) {
-      expr = ((Path) expr).addPreds(ctx, scp, a);
+      expr = ((Path) expr).addPreds(ctx, scp, pred);
     } else if(expr instanceof Filter) {
-      expr = ((Filter) expr).addPred(ctx, scp, a);
+      expr = ((Filter) expr).addPred(ctx, scp, pred);
     } else {
-      expr = Filter.get(info, expr, a).optimize(ctx, scp);
+      expr = Filter.get(info, expr, pred).optimize(ctx, scp);
     }
 
     return true;
