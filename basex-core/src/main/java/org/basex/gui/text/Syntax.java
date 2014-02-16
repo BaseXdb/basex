@@ -14,8 +14,6 @@ import org.basex.gui.*;
  * @author Christian Gruen
  */
 abstract class Syntax {
-  /** Standard color. */
-  static final Color TEXT = Color.BLACK;
   /** Comment color. */
   static final Color COMMENT = new Color(0, 160, 160);
   /** String color. */
@@ -26,19 +24,22 @@ abstract class Syntax {
   static final Color FUNCTION = new Color(160, 0, 160);
   /** Variable color. */
   static final Color VARIABLE = GUIConstants.GREEN;
+  /** Standard color. */
+  Color plain;
 
   /** Simple syntax. */
   static final Syntax SIMPLE = new Syntax() {
     @Override
-    public void init() { }
-    @Override
-    public Color getColor(final TextIterator iter) { return TEXT; }
+    public Color getColor(final TextIterator iter) { return plain; }
   };
 
   /**
    * Initializes the highlighter.
+   * @param color default color
    */
-  public abstract void init();
+  public void init(final Color color) {
+    plain = color;
+  }
 
   /**
    * Returns the color for the current token.

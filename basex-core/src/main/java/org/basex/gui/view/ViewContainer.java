@@ -59,7 +59,7 @@ public final class ViewContainer extends BaseXBack {
   public ViewContainer(final AGUI main, final View... v) {
     layout(new BorderLayout()).mode(Fill.PLAIN);
     logo = BaseXImages.get("logo");
-    setBackground(Color.white);
+    //setBackground(Color.white);
 
     views = new ViewPanel[v.length];
     for(int i = 0; i < v.length; ++i) views[i] = new ViewPanel(v[i]);
@@ -101,7 +101,7 @@ public final class ViewContainer extends BaseXBack {
     final Insets i = getInsets();
 
     if(gui.gopts.get(GUIOptions.GRADIENT)) {
-      BaseXLayout.fill(g, WHITE, color1, i.left, i.top, w - i.right, h - i.bottom);
+      BaseXLayout.fill(g, Color.white, color1, i.left, i.top, w - i.right, h - i.bottom);
     }
     if(w < 150 || h < 160) return;
 

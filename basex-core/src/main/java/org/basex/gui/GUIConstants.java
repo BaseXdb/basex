@@ -193,8 +193,6 @@ public final class GUIConstants {
   /** Background color. */
   public static final Color DGRAY = new Color(64, 64, 64);
 
-  /** Bright GUI color. */
-  public static final Color WHITE = Color.white;
   /** Color for control characters. */
   public static final Color RED = new Color(208, 0, 0);
   /** Color for highlighting errors. */

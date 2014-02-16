@@ -120,7 +120,6 @@ public class TextPanel extends BaseXPanel {
     hist = new History(edit ? editor.text() : null);
 
     if(edit) {
-      setBackground(Color.white);
       setBorder(new MatteBorder(1, 1, 0, 0, GUIConstants.color(6)));
     } else {
       mode(Fill.NONE);

@@ -278,8 +278,7 @@ final class TextRenderer extends BaseXBack {
    */
   private TextIterator init(final Graphics g, final boolean start) {
     font = defaultFont;
-    color = Color.black;
-    syntax.init();
+    syntax.init(getForeground());
 
     final TextIterator iter = new TextIterator(text);
     link = false;

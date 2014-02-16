@@ -204,7 +204,6 @@ public final class BaseXDSlider extends BaseXPanel {
     final int hh = h / 2;
 
     final boolean focus = hasFocus();
-    g.setColor(focus ? Color.white : WHITE);
     g.fillRect(0, hh - 4, w, 8);
     g.setColor(Color.black);
     g.drawLine(0, hh - 4, w - 1, hh - 4);

@@ -408,7 +408,7 @@ public final class BaseXLayout {
     final int xx = Math.min(w - tw - 8, x);
     g.setColor(color(c));
     g.fillRect(xx - 1, y - th, tw + 4, th);
-    g.setColor(WHITE);
+    g.setColor(Color.white);
     g.drawString(tt, xx, y - 4);
   }
 

@@ -279,7 +279,7 @@ public final class SearchBar extends BaseXBack {
     final boolean nohits = sc.nr == 0;
     final boolean empty = sc.search.isEmpty();
     rplc.setEnabled(!nohits && !empty);
-    search.setBackground(nohits && !empty ? GUIConstants.LRED : GUIConstants.WHITE);
+    search.setBackground(nohits && !empty ? GUIConstants.LRED : Color.white);
   }
 
   // PRIVATE METHODS ====================================================================
