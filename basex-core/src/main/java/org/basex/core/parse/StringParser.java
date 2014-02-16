@@ -79,7 +79,7 @@ public final class StringParser extends CmdParser {
           case BACKUP:
             return new CreateBackup(glob(cmd));
           case DATABASE: case DB:
-            return new CreateDB(name(cmd), single ? remaining(null) : string(null));
+            return new CreateDB(name(cmd), remaining(null));
           case INDEX:
             return new CreateIndex(consume(CmdIndex.class, cmd));
           case USER:
@@ -104,10 +104,10 @@ public final class StringParser extends CmdParser {
         return new Check(string(cmd));
       case ADD:
         String arg = key(S_TO, null) ? string(cmd) : null;
-        return new Add(arg, single ? remaining(cmd) : string(cmd));
+        return new Add(arg, remaining(cmd));
       case STORE:
         arg = key(S_TO, null) ? string(cmd) : null;
-        return new Store(arg, single ? remaining(cmd) : string(cmd));
+        return new Store(arg, remaining(cmd));
       case RETRIEVE:
         return new Retrieve(string(cmd));
       case DELETE:
@@ -115,7 +115,7 @@ public final class StringParser extends CmdParser {
       case RENAME:
         return new Rename(string(cmd), string(cmd));
       case REPLACE:
-        return new Replace(string(cmd), single ? remaining(cmd) : string(cmd));
+        return new Replace(string(cmd), remaining(cmd));
       case INFO:
         switch(consume(CmdInfo.class, cmd)) {
           case NULL:
@@ -136,7 +136,7 @@ public final class StringParser extends CmdParser {
       case CLOSE:
         return new Close();
       case LIST:
-        return new List(string(null), string(null));
+        return new List(name(null), string(null));
       case DROP:
         switch(consume(CmdDrop.class, cmd)) {
           case DATABASE: case DB:
@@ -166,15 +166,15 @@ public final class StringParser extends CmdParser {
       case RUN:
         return new Run(string(cmd));
       case EXECUTE:
-        return new Execute(string(cmd));
+        return new Execute(string(cmd, false));
       case FIND:
-        return new Find(string(cmd));
+        return new Find(string(cmd, false));
       case CS:
         return new Cs(xquery(cmd));
       case GET:
         return new Get(name(null));
       case SET:
-        return new Set(name(cmd), string(null));
+        return new Set(name(cmd), string(null, false));
       case PASSWORD:
         return new Password(password());
       case HELP:
@@ -227,12 +227,24 @@ public final class StringParser extends CmdParser {
    * @throws QueryException query exception
    */
   private String string(final Cmd cmd) throws QueryException {
+    return string(cmd, true);
+  }
+
+  /**
+   * Parses and returns a string, delimited by a semicolon or, optionally, a space.
+   * Quotes can be used to include spaces.
+   * @param cmd referring command; if specified, the result must not be empty
+   * @param space stop when encountering space
+   * @return string
+   * @throws QueryException query exception
+   */
+  private String string(final Cmd cmd, final boolean space) throws QueryException {
     final StringBuilder sb = new StringBuilder();
     consumeWS();
     boolean q = false;
     while(parser.more()) {
       final char c = parser.curr();
-      if(!q && (c <= ' ' || eoc())) break;
+      if(!q && ((space ? c <= ' ' : c < ' ') || eoc())) break;
       if(c == '"') q ^= true;
       else sb.append(c);
       parser.consume();
@@ -248,16 +260,19 @@ public final class StringParser extends CmdParser {
    * @throws QueryException query exception
    */
   private String remaining(final Cmd cmd) throws QueryException {
-    final StringBuilder sb = new StringBuilder();
-    consumeWS();
-    while(parser.more()) sb.append(parser.consume());
-    String arg = finish(sb, cmd);
-    if(arg != null) {
-      // chop quotes; substrings are faster than replaces...
-      if(arg.startsWith("\"")) arg = arg.substring(1);
-      if(arg.endsWith("\"")) arg = arg.substring(0, arg.length() - 1);
+    if(single) {
+      final StringBuilder sb = new StringBuilder();
+      consumeWS();
+      while(parser.more()) sb.append(parser.consume());
+      String arg = finish(sb, cmd);
+      if(arg != null) {
+        // chop quotes; substrings are faster than replaces...
+        if(arg.startsWith("\"")) arg = arg.substring(1);
+        if(arg.endsWith("\"")) arg = arg.substring(0, arg.length() - 1);
+      }
+      return arg;
     }
-    return arg;
+    return string(cmd, false);
   }
 
   /**
@@ -300,8 +315,8 @@ public final class StringParser extends CmdParser {
   }
 
   /**
-   * Parses and returns a name. A name is limited to letters, digits,
-   * underscores, dashes, and periods: {@code [A-Za-z0-9_-]+}.
+   * Parses and returns a name. A name may contain letters, numbers and any of the special
+   * characters <code>!#$%&'()+-=@[]^_`{}~</code>.
    * @param cmd referring command; if specified, the result must not be empty
    * @return name
    * @throws QueryException query exception
