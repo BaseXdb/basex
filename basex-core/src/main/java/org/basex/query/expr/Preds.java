@@ -130,14 +130,12 @@ public abstract class Preds extends ParseExpr {
     // set context item and position
     final Value cv = ctx.value;
     try {
-      Item i = null;
       for(final Expr p : preds) {
         ctx.value = it;
-        i = p.test(ctx, info);
+        final Item i = p.test(ctx, info);
         if(i == null) return false;
+        it.score(i.score());
       }
-      // item accepted.. adopt last scoring value
-      it.score(i.score());
       return true;
     } finally {
       ctx.value = cv;

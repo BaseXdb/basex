@@ -19,7 +19,6 @@ import org.basex.query.value.type.*;
 import org.basex.query.value.type.Type.ID;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
@@ -162,8 +161,7 @@ public class DBNode extends ANode {
     if(pref || data.nspaces.size() != 0) {
       final int n = pref ? data.nspaces.uri(nm, pre, data) :
         data.uri(pre, data.kind(pre));
-      final byte[] u = n > 0 ? data.nspaces.uri(n) : pref ?
-          NSGlobal.uri(Token.prefix(nm)) : null;
+      final byte[] u = n > 0 ? data.nspaces.uri(n) : pref ? NSGlobal.uri(Token.prefix(nm)) : null;
       if(u != null) uri = u;
     }
     name.set(nm, uri);
@@ -249,7 +247,6 @@ public class DBNode extends ANode {
 
     final DBNode node = copy();
     node.set(p, data.kind(p));
-    node.score(Scoring.step(node.score()));
     return node;
   }
 
@@ -269,9 +266,7 @@ public class DBNode extends ANode {
   public final AxisIter ancestor() {
     return new AxisIter() {
       private final DBNode node = copy();
-      int p = pre;
-      int k = data.kind(p);
-      final double sc = node.score();
+      int p = pre, k = data.kind(p);
 
       @Override
       public ANode next() {
@@ -279,7 +274,6 @@ public class DBNode extends ANode {
         if(p == -1) return null;
         k = data.kind(p);
         node.set(p, k);
-        node.score(Scoring.step(sc));
         return node;
       }
     };
@@ -289,16 +283,13 @@ public class DBNode extends ANode {
   public final AxisIter ancestorOrSelf() {
     return new AxisIter() {
       private final DBNode node = copy();
-      int p = pre;
-      int k = data.kind(p);
-      final double sc = node.score();
+      int p = pre, k = data.kind(p);
 
       @Override
       public ANode next() {
         if(p == -1) return null;
         k = data.kind(p);
         node.set(p, k);
-        node.score(Scoring.step(sc));
         p = data.parent(p, k);
         return node;
       }
@@ -329,11 +320,9 @@ public class DBNode extends ANode {
   @Override
   public final AxisMoreIter children() {
     return new AxisMoreIter() {
-      int k = data.kind(pre);
-      int p = pre + data.attSize(pre, k);
+      int k = data.kind(pre), p = pre + data.attSize(pre, k);
       final int s = pre + data.size(pre, k);
       final DBNode node = copy();
-      final double sc = node.score();
 
       @Override
       public boolean more() {
@@ -345,7 +334,6 @@ public class DBNode extends ANode {
         if(!more()) return null;
         k = data.kind(p);
         node.set(p, k);
-        node.score(Scoring.step(sc));
         p += data.size(p, k);
         return node;
       }
@@ -355,11 +343,9 @@ public class DBNode extends ANode {
   @Override
   public final AxisIter descendant() {
     return new AxisIter() {
-      int k = data.kind(pre);
-      int p = pre + data.attSize(pre, k);
+      int k = data.kind(pre), p = pre + data.attSize(pre, k);
       final int s = pre + data.size(pre, k);
       final DBNode node = copy();
-      final double sc = node.score();
 
       @Override
       public DBNode next() {
@@ -367,7 +353,6 @@ public class DBNode extends ANode {
         k = data.kind(p);
         node.set(p, k);
         p += data.attSize(p, k);
-        node.score(Scoring.step(sc));
         return node;
       }
     };

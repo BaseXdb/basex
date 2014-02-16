@@ -135,6 +135,12 @@ public final class Try extends Single {
   }
 
   @Override
+  public void markTailCalls(final QueryContext ctx) {
+    for(final Catch c : ctch) c.markTailCalls(ctx);
+    expr.markTailCalls(ctx);
+  }
+
+  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("try { " + expr + " }");
     for(final Catch c : ctch) sb.append(' ').append(c);

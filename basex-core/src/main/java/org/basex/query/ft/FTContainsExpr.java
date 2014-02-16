@@ -48,7 +48,7 @@ public final class FTContainsExpr extends FTContains {
         // no scoring found - use default value
         if(d == 0) d = 1;
       }
-      s = Scoring.and(s, d);
+      s = s == 0 ? d : Scoring.merge(s, d);
 
       // cache entry for visualizations or ft:mark/ft:extract
       if(d > 0 && ctx.ftPosData != null && it instanceof DBNode) {
@@ -86,7 +86,6 @@ public final class FTContainsExpr extends FTContains {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTContainsExpr(expr.copy(ctx, scp, vs),
-        ftexpr.copy(ctx, scp, vs), info);
+    return new FTContainsExpr(expr.copy(ctx, scp, vs), ftexpr.copy(ctx, scp, vs), info);
   }
 }

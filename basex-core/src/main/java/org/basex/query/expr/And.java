@@ -104,7 +104,7 @@ public final class And extends Logical {
     for(final Expr e : expr) {
       final Item it = e.ebv(ctx, info);
       if(!it.bool(info)) return Bln.FALSE;
-      s = Scoring.and(s, it.score());
+      s = Scoring.merge(s, it.score());
     }
     // no scoring - return default boolean
     return s == 0 ? Bln.TRUE : Bln.get(s);

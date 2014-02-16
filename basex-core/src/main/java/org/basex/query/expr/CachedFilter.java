@@ -42,7 +42,11 @@ final class CachedFilter extends Filter {
       for(int s = 0; s < is; ++s) {
         final Item it = val.itemAt(s);
         ctx.value = it;
-        if(p.test(ctx, info) != null) vb.add(it);
+        final Item i = p.test(ctx, info);
+        if(i != null) {
+          it.score(i.score());
+          vb.add(it);
+        }
         ctx.pos++;
       }
       // save memory

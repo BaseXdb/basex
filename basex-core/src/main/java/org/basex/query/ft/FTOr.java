@@ -99,7 +99,7 @@ public final class FTOr extends FTExpr {
     final FTMatches all = new FTMatches((byte) Math.max(i1.all.pos, i2.all.pos));
     for(final FTMatch m : i1.all) all.add(m);
     for(final FTMatch m : i2.all) all.add(m);
-    i1.score(Scoring.or(i1.score(), i2.score()));
+    i1.score(Scoring.merge(i1.score(), i2.score()));
     i1.all = all;
   }
 

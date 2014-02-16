@@ -230,6 +230,7 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
   @Override
   public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
       final InputInfo ii) throws QueryException {
+
     if(expr.has(Flag.CTX)) return null;
     ctx.compInfo(OPTINLINEFN, this);
     // create let bindings for all variables
