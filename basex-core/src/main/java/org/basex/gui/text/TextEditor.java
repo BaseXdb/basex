@@ -616,73 +616,73 @@ public final class TextEditor {
    * @return returns the number spaces to move forward
    */
   int add(final StringBuilder sb, final boolean selected) {
+    if(sb.length() == 0) return 0;
+
     int move = 0;
-    if(sb.length() != 0) {
-      if(gopts.get(GUIOptions.AUTO)) {
-        final char ch = sb.charAt(0);
-        final int next = pos + 1 < size() ? text[pos + 1] : 0;
-        final int curr = pos < size() ? text[pos] : 0;
-        final int prev = pos > 0 ? text[pos - 1] : 0;
-        final int pprv = pos > 1 ? text[pos - 2] : 0;
-        final int open = OPENING.indexOf(ch);
-        if(open != -1) {
-          // adds a closing to an opening bracket
-          if(!selected && !XMLToken.isChar(curr)) {
-            sb.append(CLOSING.charAt(open));
-            move = 1;
-          }
-        } else if(CLOSING.indexOf(ch) != -1) {
-          // closing bracket: ignore if it equals next character
-          if(ch == curr) {
-            sb.setLength(0);
-            move = 1;
-          }
-          close();
-        } else if(ch == '"' || ch == '\'') {
-          // quote: ignore if it equals next character
-          if(ch == curr) sb.setLength(0);
-          // add second quote
-          else if(!selected && !XMLToken.isNCChar(prev)) sb.append(ch);
+    if(!selected && gopts.get(GUIOptions.AUTO)) {
+      final char ch = sb.charAt(0);
+      final int next = pos + 1 < size() ? text[pos + 1] : 0;
+      final int curr = pos < size() ? text[pos] : 0;
+      final int prev = pos > 0 ? text[pos - 1] : 0;
+      final int pprv = pos > 1 ? text[pos - 2] : 0;
+      final int open = OPENING.indexOf(ch);
+      if(open != -1) {
+        // adds a closing to an opening bracket
+        if(!XMLToken.isChar(curr)) {
+          sb.append(CLOSING.charAt(open));
           move = 1;
-        } else if(ch == '>') {
-          // closes an opening element
-          closeElem(sb);
+        }
+      } else if(CLOSING.indexOf(ch) != -1) {
+        // closing bracket: ignore if it equals next character
+        if(ch == curr) {
+          sb.setLength(0);
           move = 1;
-        } else if(ch == ':') {
-          // closes XQuery comments
-          if(prev == '(') {
-            sb.append(":");
+        }
+        close();
+      } else if(ch == '"' || ch == '\'') {
+        // quote: ignore if it equals next character
+        if(ch == curr) sb.setLength(0);
+        // add second quote
+        else if(!XMLToken.isNCChar(prev)) sb.append(ch);
+        move = 1;
+      } else if(ch == '>') {
+        // closes an opening element
+        closeElem(sb);
+        move = 1;
+      } else if(ch == ':') {
+        // closes XQuery comments
+        if(prev == '(') {
+          sb.append(":");
+          if(curr != ')') sb.append(')');
+          move = 1;
+        }
+      } else if(ch == '~') {
+        // closes XQuery comments
+        if(prev == ':' && pprv == '(') {
+          sb.append("\n : \n ");
+          if(curr != ':') {
+            sb.append(':');
             if(curr != ')') sb.append(')');
-            move = 1;
+          } else if(next != ')') {
+            sb.append(')');
           }
-        } else if(ch == '~') {
-          // closes XQuery comments
-          if(prev == ':' && pprv == '(') {
-            sb.append("\n : \n ");
-            if(curr != ':') {
-              sb.append(':');
-              if(curr != ')') sb.append(')');
-            } else if(next != ')') {
-              sb.append(')');
-            }
-            move = 5;
-          }
-        } else if(ch == '-') {
-          // closes XML comments
-          if(prev == '-' && pprv == '!' && pos > 2 && text[pos - 3] == '<') {
-            sb.append("  -->\n");
-            move = 2;
-          }
-        } else if(ch == '?') {
-          // closes XML processing instructions
-          if(prev == '<') {
-            sb.append(" ?>\n");
-            move = 1;
-          }
+          move = 5;
+        }
+      } else if(ch == '-') {
+        // closes XML comments
+        if(prev == '-' && pprv == '!' && pos > 2 && text[pos - 3] == '<') {
+          sb.append("  -->\n");
+          move = 2;
+        }
+      } else if(ch == '?') {
+        // closes XML processing instructions
+        if(prev == '<') {
+          sb.append(" ?>\n");
+          move = 1;
         }
       }
-      add(sb.toString());
     }
+    add(sb.toString());
     return move;
   }
 

@@ -2,6 +2,7 @@ package org.basex.gui.view;
 
 import static org.basex.gui.layout.BaseXKeys.*;
 
+import java.awt.*;
 import java.awt.event.*;
 
 import org.basex.gui.*;
@@ -25,7 +26,7 @@ public abstract class View extends BaseXPanel {
     super(man.gui);
     mode(man.gui.gopts.get(GUIOptions.GRADIENT) ? Fill.GRADIENT : Fill.PLAIN);
     setFocusable(true);
-    //setBackground(Color.white);
+    setBackground(Color.white);
     setName(name);
     addMouseListener(this);
     addMouseMotionListener(this);
