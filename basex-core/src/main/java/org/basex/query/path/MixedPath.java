@@ -56,6 +56,11 @@ public final class MixedPath extends Path {
   }
 
   @Override
+  public boolean isVacuous() {
+    return steps[steps.length - 1].isVacuous();
+  }
+
+  @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     // creates an iterator from the root value
     final Value v = root != null ? ctx.value(root) : checkCtx(ctx);

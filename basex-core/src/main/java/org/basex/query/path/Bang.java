@@ -47,6 +47,11 @@ public final class Bang extends Single {
   }
 
   @Override
+  public boolean isVacuous() {
+    return expr.isVacuous();
+  }
+
+  @Override
   public void checkUp() throws QueryException {
     expr.checkUp();
   }
