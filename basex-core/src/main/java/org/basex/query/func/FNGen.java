@@ -190,8 +190,10 @@ public final class FNGen extends StandardFunc {
       return Bln.get(doc(ctx) != null);
     } catch(final QueryException ex) {
       final Err err = ex.err();
-      if(err != null && err.is(ErrType.FODC) &&
-          (err.code.endsWith("0002") || err.code.endsWith("0004"))) return Bln.FALSE;
+      if(err != null) {
+        if(err.is(ErrType.FODC) && (err.code.endsWith("0002") || err.code.endsWith("0004")) ||
+           err.is(ErrType.BXDB) && (err.code.endsWith("0006"))) return Bln.FALSE;
+      }
       throw ex;
     }
   }
