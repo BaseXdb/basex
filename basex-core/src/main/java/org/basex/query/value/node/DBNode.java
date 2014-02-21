@@ -224,7 +224,7 @@ public class DBNode extends ANode {
 
   @Override
   public final DBNode dbCopy(final MainOptions opts) {
-    final MemData md = data.inMemory() ? new MemData(data) : new MemData(opts);
+    final MemData md = new MemData(opts);
     new DataBuilder(md).build(this);
     return new DBNode(md).parent(par);
   }
