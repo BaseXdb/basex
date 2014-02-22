@@ -89,7 +89,7 @@ public abstract class Serializer {
         final JsonFormat jform = jopts.get(JsonOptions.FORMAT);
         return jform == JsonFormat.JSONML ? new JsonMLSerializer(os, sopts) :
                jform == JsonFormat.MAP ? new JsonMapSerializer(os, sopts) :
-               new JsonDirectSerializer(os, sopts);
+               new JsonNodeSerializer(os, sopts);
       default: return new XMLSerializer(os, sopts);
     }
   }

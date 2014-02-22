@@ -7,7 +7,8 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.*;
-import org.basex.build.JsonOptions.*;
+import org.basex.build.JsonOptions.JsonFormat;
+import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.value.item.*;
@@ -17,12 +18,12 @@ import org.basex.util.list.*;
 
 /**
  * This class serializes data as JSON. The input must conform to the rules
- * defined in the {@link JsonDirectConverter} class.
+ * defined in the {@link JsonDirectConverter} and {@link JsonAttsConverter} class.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class JsonDirectSerializer extends JsonSerializer {
+public final class JsonNodeSerializer extends JsonSerializer {
   /** Cached data types. */
   private final TokenSet[] typeCache = new TokenSet[TYPES.length];
   /** Comma flags. */
@@ -43,13 +44,13 @@ public final class JsonDirectSerializer extends JsonSerializer {
    * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  public JsonDirectSerializer(final OutputStream os, final SerializerOptions opts)
+  public JsonNodeSerializer(final OutputStream os, final SerializerOptions opts)
       throws IOException {
 
     super(os, opts);
     for(int t = 0; t < typeCache.length; t++) typeCache[t] = new TokenMap();
-    lax = jopts.get(JsonOptions.LAX);
     atts = jopts.get(JsonOptions.FORMAT) == JsonFormat.ATTRIBUTES;
+    lax = jopts.get(JsonOptions.LAX) || atts;
   }
 
   @Override
@@ -97,7 +98,7 @@ public final class JsonDirectSerializer extends JsonSerializer {
         if(atts && !eq(tag, PAIR)) error("<%> found, <%> expected", tag, PAIR);
         if(key == null) error("<%> has no name attribute", tag);
         print('"');
-        final byte[] name = XMLToken.decode(key, lax);
+        final byte[] name = atts ? key : XMLToken.decode(key, lax);
         if(name == null) error("Name of element <%> is invalid", key);
         print(name);
         print("\":");

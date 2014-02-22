@@ -13,7 +13,7 @@ import org.basex.query.value.node.*;
  * @author Christian Gruen
  * @author Leo Woerteler
  */
-final class JsonAttsConverter extends JsonXmlConverter {
+public final class JsonAttsConverter extends JsonXmlConverter {
   /** Current name of a pair. */
   private byte[] name;
 

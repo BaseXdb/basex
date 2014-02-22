@@ -46,8 +46,8 @@ public final class CsvDirectSerializer extends CsvSerializer {
     super(os, opts);
     header = copts.get(CsvOptions.HEADER);
     headers = header ? new TokenList() : null;
-    lax = copts.get(CsvOptions.LAX);
     atts = copts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
+    lax = copts.get(CsvOptions.LAX) || atts;
   }
 
   @Override
