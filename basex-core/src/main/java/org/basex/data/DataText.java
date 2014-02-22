@@ -162,9 +162,9 @@ public interface DataText {
   /** Comment output. */
   byte[] COMM_C = token("-->");
   /** XQuery comment. */
-  byte[] XQCOMM_O = token("(:");
+  byte[] XQCOMM_O = token("(: ");
   /** XQuery comment. */
-  byte[] XQCOMM_C = token(":)");
+  byte[] XQCOMM_C = token(" :)");
 
   /** PI output. */
   byte[] PI_O = token("<?");
