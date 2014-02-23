@@ -2854,7 +2854,7 @@ public class QueryParser extends InputParser {
     if(wsConsumeWs(EMPTY_SEQUENCE, PAR1, null)) {
       wsCheck(PAR1);
       wsCheck(PAR2);
-      return SeqType.get(AtomType.ITEM, Occ.ZERO, null);
+      return SeqType.get(AtomType.ITEM, Occ.ZERO);
     }
 
     // parse item type and occurrence indicator

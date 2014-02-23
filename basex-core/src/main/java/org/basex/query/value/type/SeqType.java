@@ -275,7 +275,7 @@ public final class SeqType {
    * @return sequence type
    */
   public static SeqType get(final Type t, final Occ o) {
-    return o == Occ.ONE ? t.seqType() : new SeqType(t, o);
+    return o == Occ.ONE ? t.seqType() : o == Occ.ZERO ? EMP : new SeqType(t, o);
   }
 
   /**
@@ -285,8 +285,7 @@ public final class SeqType {
    * @return sequence type
    */
   public static SeqType get(final Type t, final long o) {
-    return get(t, o == 0 ? Occ.ZERO : o == 1 ? Occ.ONE : o > 1 ?
-        Occ.ONE_MORE : Occ.ZERO_MORE);
+    return get(t, o == 0 ? Occ.ZERO : o == 1 ? Occ.ONE : o > 1 ? Occ.ONE_MORE : Occ.ZERO_MORE);
   }
 
   /**
@@ -297,7 +296,7 @@ public final class SeqType {
    * @return sequence type
    */
   public static SeqType get(final Type t, final Occ o, final Test k) {
-    return new SeqType(t, o, k);
+    return k == null ? get(t, o) : new SeqType(t, o, k);
   }
 
   /**
@@ -318,7 +317,6 @@ public final class SeqType {
     final long size = val.size();
     if(!occ.check(size)) return false;
     for(long i = 0; i < size; i++) {
-      // maps don't have type information attached to them, you have to look...
       if(!instance(val.itemAt(i), true)) return false;
       if(i == 0 && val.homogeneous()) break;
     }
@@ -434,8 +432,7 @@ public final class SeqType {
       }
 
       final Type at = atom.type, tt = type;
-      if(tt == AtomType.DBL
-          && (at.instanceOf(AtomType.FLT) || at.instanceOf(AtomType.DEC)))
+      if(tt == AtomType.DBL && (at.instanceOf(AtomType.FLT) || at.instanceOf(AtomType.DEC)))
         return Dbl.get(atom.dbl(ii));
       if(tt == AtomType.FLT && at.instanceOf(AtomType.DEC))
         return Flt.get(atom.flt(ii));
@@ -593,8 +590,8 @@ public final class SeqType {
   }
 
   /**
-   * Checks if the specified SeqType is an instance of the current SeqType.
-   * @param t SeqType to check
+   * Checks if this sequence type is an instance of the specified sequence type.
+   * @param t sequence type to check
    * @return result of check
    */
   public boolean instanceOf(final SeqType t) {

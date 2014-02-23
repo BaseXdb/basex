@@ -137,10 +137,9 @@ public final class Var extends ExprInfo {
    * @return checked expression
    * @throws QueryException query exception
    */
-  public Expr checked(final Expr e, final QueryContext ctx, final VarScope scp,
-      final InputInfo ii) throws QueryException {
-    return checksType()
-        ? new TypeCheck(sc, ii, e, declType, promote).optimize(ctx, scp) : e;
+  public Expr checked(final Expr e, final QueryContext ctx, final VarScope scp, final InputInfo ii)
+      throws QueryException {
+    return checksType() ? new TypeCheck(sc, ii, e, declType, promote).optimize(ctx, scp) : e;
   }
 
   /**
@@ -154,6 +153,7 @@ public final class Var extends ExprInfo {
    */
   public Value checkType(final Value val, final QueryContext ctx, final InputInfo ii,
       final boolean opt) throws QueryException {
+
     if(!checksType() || declType.instance(val)) return val;
     if(promote) return declType.funcConvert(ctx, sc, ii, val, opt);
     throw INVCAST.get(ii, val.type(), declType);
