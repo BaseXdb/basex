@@ -462,6 +462,24 @@ public class DBNode extends ANode {
 
   @Override
   public String toString() {
-    return _DB_OPEN_PRE.args(data.meta.name, pre);
+    if(!data.inMemory()) return _DB_OPEN_PRE.args(data.meta.name, pre);
+
+    final TokenBuilder tb = new TokenBuilder(type.string()).add(' ');
+    switch((NodeType) type) {
+      case ATT:
+      case PI:
+        tb.add(name()).add(" { \"").add(Token.chop(string(), 64)).add("\" }");
+        break;
+      case ELM:
+        tb.add(name()).add(" { ... }");
+        break;
+      case DOC:
+        tb.add("{ \"").add(data.text(pre, true)).add("\" }");
+        break;
+      default:
+        tb.add("{ \"").add(Token.chop(string(), 64)).add("\" }");
+        break;
+    }
+    return tb.toString();
   }
 }
