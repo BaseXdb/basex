@@ -62,7 +62,7 @@ public final class FuncLit extends Single implements Scope {
     compiled = true;
 
     if(check) {
-      final StaticFunc sf = ctx.funcs.get(name, args.length, info);
+      final StaticFunc sf = ctx.funcs.get(name, args.length, info, true);
       if(sf == null) throw FUNCUNKNOWN.get(info, name.string());
       ann = sf.ann;
       type = sf.funcType().seqType();

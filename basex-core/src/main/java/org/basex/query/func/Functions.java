@@ -164,7 +164,7 @@ public final class Functions extends TokenSet {
     }
 
     // user-defined function
-    final StaticFunc sf = ctx.funcs.get(name, arity, ii);
+    final StaticFunc sf = ctx.funcs.get(name, arity, ii, true);
     if(sf != null) return getUser(sf, ctx, sc, ii);
 
     // Java function (only allowed with administrator permissions)

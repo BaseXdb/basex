@@ -171,18 +171,21 @@ public final class StaticFuncs extends ExprInfo {
    * @param name function name
    * @param arity function arity
    * @param ii input info
+   * @param error raise error if function is not found
    * @return function if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public StaticFunc get(final QNm name, final long arity, final InputInfo ii)
-      throws QueryException {
+  public StaticFunc get(final QNm name, final long arity, final InputInfo ii,
+      final boolean error) throws QueryException {
 
-    if(NSGlobal.reserved(name.uri())) {
+    final FuncCache fc = funcs.get(sig(name, arity));
+    if(fc != null) return fc.func;
+
+    if(error && NSGlobal.reserved(name.uri())) {
       final QueryException qe = similarError(name, ii);
       if(qe != null) throw qe;
     }
-    final FuncCache fc = funcs.get(sig(name, arity));
-    return fc == null ? null : fc.func;
+    return null;
   }
 
   /**
