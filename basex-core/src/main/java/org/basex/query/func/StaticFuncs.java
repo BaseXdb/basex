@@ -134,8 +134,10 @@ public final class StaticFuncs extends ExprInfo {
           final int a = call.expr.length;
           throw (a == 1 ? FUNCTYPESG : FUNCTYPEPL).get(call.info, call.name.string(), a, exp);
         }
+
         // if not, indicate that function is unknown
-        throw FUNCUNKNOWN.get(call.info, call.name.string());
+        final QueryException qe = similarError(call.name, call.info);
+        throw qe == null ? FUNCUNKNOWN.get(call.info, call.name.string()) : qe;
       }
       if(call != null) {
         if(fc.func.expr == null) throw FUNCNOIMPL.get(call.info, call.name.string());
@@ -204,7 +206,7 @@ public final class StaticFuncs extends ExprInfo {
         }
       }
     }
-    return null;
+    return qe;
   }
 
   @Override
