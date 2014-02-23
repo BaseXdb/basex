@@ -83,7 +83,7 @@ public final class TypeCheck extends Single {
   public Value value(final QueryContext ctx) throws QueryException {
     final Value val = expr.value(ctx);
     if(type.instance(val)) return val;
-    if(promote) return type.funcConvert(ctx, sc, info, val, false);
+    if(promote) return type.promote(ctx, sc, info, val, false);
     throw INVCAST.get(info, val.type(), type);
   }
 

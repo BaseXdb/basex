@@ -408,7 +408,7 @@ public final class SeqType {
   }
 
   /**
-   * Tries to promote an item to this type's element type.
+   * Promotes an item to the type of this sequence type.
    * @param ctx query context
    * @param sc static context
    * @param ii input info
@@ -417,7 +417,7 @@ public final class SeqType {
    * @return promoted item
    * @throws QueryException query exception
    */
-  private Value funcConv(final QueryContext ctx, final StaticContext sc, final InputInfo ii,
+  private Value promote(final QueryContext ctx, final StaticContext sc, final InputInfo ii,
       final Item it, final boolean opt) throws QueryException {
 
     if(type instanceof AtomType) {
@@ -446,7 +446,7 @@ public final class SeqType {
   }
 
   /**
-   * Performs function conversion on the given value.
+   * Promotes a value to the type of this sequence type.
    * @param ctx query context
    * @param sc static context
    * @param ii input info
@@ -455,19 +455,20 @@ public final class SeqType {
    * @return converted value
    * @throws QueryException if the conversion was not possible
    */
-  public Value funcConvert(final QueryContext ctx, final StaticContext sc,
-      final InputInfo ii, final Value val, final boolean opt) throws QueryException {
+  public Value promote(final QueryContext ctx, final StaticContext sc, final InputInfo ii,
+      final Value val, final boolean opt) throws QueryException {
+
     final long n = val.size();
     if(!occ.check(n)) throw Err.treatError(ii, this, val);
     if(n == 0) return Empty.SEQ;
     if(val.isItem())
-      return instance((Item) val, true) ? val : funcConv(ctx, sc, ii, (Item) val, opt);
+      return instance((Item) val, true) ? val : promote(ctx, sc, ii, (Item) val, opt);
 
     ValueBuilder vb = null;
     final Item fst = val.itemAt(0);
     if(!instance(fst, true)) {
       vb = new ValueBuilder(new Item[(int) val.size()], 0);
-      vb.add(funcConv(ctx, sc, ii, fst, opt));
+      vb.add(promote(ctx, sc, ii, fst, opt));
     } else if(val.homogeneous()) {
       return val;
     }
@@ -475,11 +476,11 @@ public final class SeqType {
     for(int i = 1; i < n; i++) {
       final Item it = val.itemAt(i);
       if(vb != null) {
-        vb.add(instance(it, true) ? it : funcConv(ctx, sc, ii, it, opt));
+        vb.add(instance(it, true) ? it : promote(ctx, sc, ii, it, opt));
       } else if(!instance(it, true)) {
         vb = new ValueBuilder(new Item[(int) val.size()], 0);
         for(int j = 0; j < i; j++) vb.add(val.itemAt(j));
-        vb.add(funcConv(ctx, sc, ii, it, opt));
+        vb.add(promote(ctx, sc, ii, it, opt));
       }
     }
     return vb != null ? Seq.get(vb.items(), (int) vb.size(), type) : val;
@@ -490,7 +491,7 @@ public final class SeqType {
    * @param t type to convert to
    * @return result of check
    */
-  public boolean convertibleTo(final SeqType t) {
+  public boolean promotable(final SeqType t) {
     if(intersect(t) != null) return true;
     if(occ.intersect(t.occ) == null) return false;
     final Type to = t.type;

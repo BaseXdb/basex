@@ -105,7 +105,7 @@ public final class Var extends ExprInfo {
     if(t == null) return;
     if(declType != null) {
       if(declType.occ.intersect(t.occ) == null) throw INVCAST.get(ii, t, declType);
-      if(!t.convertibleTo(declType)) return;
+      if(!t.promotable(declType)) return;
     }
 
     if(!inType.eq(t) && !inType.instanceOf(t)) {
@@ -155,13 +155,36 @@ public final class Var extends ExprInfo {
       final boolean opt) throws QueryException {
 
     if(!checksType() || declType.instance(val)) return val;
-    if(promote) return declType.funcConvert(ctx, sc, ii, val, opt);
+    if(promote) return declType.promote(ctx, sc, ii, val, opt);
     throw INVCAST.get(ii, val.type(), declType);
   }
 
   /**
-   * Checks whether the given variable is identical to this one, i.e. has the
-   * same ID.
+   * Checks if the type of the specified expression could be converted to the sequence type
+   * of this variable.
+   *
+   * Due to insufficient typing, the check will only be performed if:
+   * - the variable type is an instance of the specified type.
+   *   This way, expressions with super types like item() will not be rejected
+   * - the expression is to be promoted, and it is not of type node (eg: function-declaration-016)
+   *
+   * @param expr expression
+   * @param info input info
+   * @throws QueryException query exception
+   */
+  public void checkType(final Expr expr, final InputInfo info) throws QueryException {
+    final SeqType et = expr.type(), vt = type();
+    if(!checksType() || vt.type.instanceOf(et.type) ||
+        et.type.instanceOf(vt.type) && et.occ.instanceOf(vt.occ)) return;
+
+    if(!promote || (!et.type.isNode() && !et.promotable(vt))) {
+      if(vt.type.nsSensitive() && sc.xquery3()) throw NSSENS.get(info, et, vt);
+      throw INVCAST.get(info, et, vt);
+    }
+  }
+
+  /**
+   * Checks whether the given variable is identical to this one, i.e. has the same ID.
    * @param v variable to check
    * @return {@code true}, if the IDs are equal, {@code false} otherwise
    */

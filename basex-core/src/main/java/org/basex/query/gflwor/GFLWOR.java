@@ -279,6 +279,10 @@ public final class GFLWOR extends ParseExpr {
           final Let lt = (Let) c;
           final Expr expr = lt.expr;
           if(expr.has(Flag.NDT)) continue;
+
+          // check type before removing variable (see {@link FuncType#funcConv})
+          lt.var.checkType(expr, lt.info);
+
           final VarUsage use = count(lt.var, next);
           if(use == VarUsage.NEVER) {
             ctx.compInfo(QueryText.OPTVAR, lt.var);

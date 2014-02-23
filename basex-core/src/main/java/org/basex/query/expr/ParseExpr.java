@@ -412,8 +412,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression has the specified type; if no, throws
-   * an exception.
+   * Checks if the specified expression has the specified type; if no, throws an exception.
    * @param e expression to be checked
    * @param ctx query context
    * @param sc static context

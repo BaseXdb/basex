@@ -127,6 +127,9 @@ public final class SimpleTest extends QueryTest {
 
       { "DeclFun 1", itr(0, 1), "declare function local:x($x as xs:integer) { $x }; " +
         "let $a := 0, $b := 1 return try { local:x( (1 to 20) ) } catch * { ($a,$b) }" },
+      { "DeclFun 2",
+        "declare function local:b($p as element()) { element a {} };" +
+        "declare function local:a($s as xs:string) { local:b($s) }; local:a('x')" },
 
       { "Catch 1", "try { 1+'' } catch XPTY0004 { 1 }" },
       { "Catch 2", itr(1), "try { 1+'' } catch err:XPTY0004 { 1 }" },

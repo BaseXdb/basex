@@ -129,7 +129,7 @@ public final class FuncItem extends FItem implements Scope {
       for(int i = 0; i < vars.length; i++) ctx.set(vars[i], args[i], ii);
       final Value v = ctx.value(expr);
       // optionally cast return value to target type
-      return cast != null ? cast.funcConvert(ctx, sc, ii, v, false) : v;
+      return cast != null ? cast.promote(ctx, sc, ii, v, false) : v;
     } finally {
       ctx.value = cv;
       ctx.pos = ps;
@@ -154,7 +154,7 @@ public final class FuncItem extends FItem implements Scope {
       final Item it = expr.item(ctx, ii);
       final Value v = it == null ? Empty.SEQ : it;
       // optionally cast return value to target type
-      return cast != null ? cast.funcConvert(ctx, sc, ii, v, false).item(ctx, ii) : it;
+      return cast != null ? cast.promote(ctx, sc, ii, v, false).item(ctx, ii) : it;
     } finally {
       ctx.value = cv;
       ctx.pos = ps;
