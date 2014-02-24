@@ -51,12 +51,14 @@ public abstract class FuncCall extends Arr {
 
   @Override
   public final Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return (Item) invoke(evalFunc(ctx), evalArgs(ctx), true, tailCall, ctx, info);
+    return tailCall ? (Item) invokeTail(evalFunc(ctx), evalArgs(ctx), true, ctx, info)
+                    : (Item) invoke(evalFunc(ctx), evalArgs(ctx), true, ctx, info);
   }
 
   @Override
   public final Value value(final QueryContext ctx) throws QueryException {
-    return invoke(evalFunc(ctx), evalArgs(ctx), false, tailCall, ctx, info);
+    return tailCall ? invokeTail(evalFunc(ctx), evalArgs(ctx), false, ctx, info)
+                    : invoke(evalFunc(ctx), evalArgs(ctx), false, ctx, info);
   }
 
   @Override
@@ -70,42 +72,55 @@ public abstract class FuncCall extends Arr {
    * @param arg arguments for the call
    * @param ctx query context
    * @param itm flag for requesting a single item
-   * @param tail tail-call flag
    * @param ii input info
    * @return result of the function call
    * @throws QueryException query exception
    */
   private static Value invoke(final XQFunction fun, final Value[] arg, final boolean itm,
-      final boolean tail, final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final int calls = ctx.tailCalls, max = ctx.maxCalls;
-    if(!tail) {
-      XQFunction func = fun;
-      Value[] args = arg;
-      final int fp = ctx.stack.enterFrame(func.stackFrameSize());
-      try {
-        while(true) {
-          final Value ret = itm ? func.invItem(ctx, ii, args) : func.invValue(ctx, ii, args);
-          func = ctx.pollTailCall();
-          if(func == null) return ret;
-          ctx.stack.reuseFrame(func.stackFrameSize());
-          args = ctx.pollTailArgs();
-        }
-      } finally {
-        ctx.stack.exitFrame(fp);
+      final QueryContext ctx, final InputInfo ii) throws QueryException {
+    XQFunction func = fun;
+    Value[] args = arg;
+    final int fp = ctx.stack.enterFrame(func.stackFrameSize());
+    try {
+      while(true) {
+        final Value ret = itm ? func.invItem(ctx, ii, args) : func.invValue(ctx, ii, args);
+        func = ctx.pollTailCall();
+        if(func == null) return ret;
+        ctx.stack.reuseFrame(func.stackFrameSize());
+        args = ctx.pollTailArgs();
       }
-    } else if(max >= 0 && ctx.tailCalls >= max) {
+    } finally {
+      ctx.stack.exitFrame(fp);
+    }
+  }
+
+  /**
+   * Tail-calls the given function with the given arguments.
+   * @param fun function to call
+   * @param arg arguments for the call
+   * @param ctx query context
+   * @param itm flag for requesting a single item
+   * @param ii input info
+   * @return result of the function call
+   * @throws QueryException query exception
+   */
+  private static Value invokeTail(final XQFunction fun, final Value[] arg, final boolean itm,
+      final QueryContext ctx, final InputInfo ii) throws QueryException {
+    final int calls = ctx.tailCalls, max = ctx.maxCalls;
+
+    if(max >= 0 && calls >= max) {
       // there are at least `ctx.maxCalls` tail-calls on the stack, eliminate them
       ctx.registerTailCall(fun, arg);
       return itm ? null : Empty.SEQ;
-    } else {
-      ctx.tailCalls++;
-      final int fp = ctx.stack.enterFrame(fun.stackFrameSize());
-      try {
-        return itm ? fun.invItem(ctx, ii, arg) : fun.invValue(ctx, ii, arg);
-      } finally {
-        ctx.tailCalls = calls;
-        ctx.stack.exitFrame(fp);
-      }
+    }
+
+    ctx.tailCalls++;
+    final int fp = ctx.stack.enterFrame(fun.stackFrameSize());
+    try {
+      return itm ? fun.invItem(ctx, ii, arg) : fun.invValue(ctx, ii, arg);
+    } finally {
+      ctx.tailCalls = calls;
+      ctx.stack.exitFrame(fp);
     }
   }
 
@@ -121,7 +136,7 @@ public abstract class FuncCall extends Arr {
    */
   public static Item item(final XQFunction fun, final Value[] arg,
       final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return (Item) invoke(fun, arg, true, false, ctx, ii);
+    return (Item) invoke(fun, arg, true, ctx, ii);
   }
 
   /**
@@ -136,6 +151,6 @@ public abstract class FuncCall extends Arr {
    */
   public static Value value(final XQFunction fun, final Value[] arg,
       final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return invoke(fun, arg, false, false, ctx, ii);
+    return invoke(fun, arg, false, ctx, ii);
   }
 }
