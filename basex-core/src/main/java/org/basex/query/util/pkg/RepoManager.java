@@ -215,77 +215,68 @@ public final class RepoManager {
 
   /**
    * Installs an XQuery module.
-   * @param cont package content
+   * @param content package content
    * @param path package path
    * @return {@code true} if existing package was replaced
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private boolean installXQ(final byte[] cont, final String path)
+  private boolean installXQ(final byte[] content, final String path)
       throws QueryException, IOException {
 
     // parse module to find namespace uri
     final Context ctx = repo.context;
-    final byte[] uri = new QueryContext(ctx).parseLibrary(string(cont), path, null).name.uri();
+    final byte[] uri = new QueryContext(ctx).parseLibrary(string(content), path, null).name.uri();
 
     // copy file to rewritten URI file path
     final String uriPath = ModuleLoader.uri2path(string(uri));
     if(uriPath == null) throw BXRE_URI.get(info, uri);
-
-    final IOFile rp = new IOFile(ctx.globalopts.get(GlobalOptions.REPOPATH));
-    final boolean exists = md(rp, uriPath);
-    new IOFile(rp, uriPath + IO.XQMSUFFIX).write(cont);
-    return exists;
+    return write(uriPath + IO.XQMSUFFIX, content);
   }
 
   /**
    * Installs a JAR package.
-   * @param cont package content
+   * @param content package content
    * @return {@code true} if existing package was replaced
    * @throws IOException I/O exception
    */
-  private boolean installJAR(final byte[] cont) throws IOException {
-    final Zip zip = new Zip(new IOContent(cont));
+  private boolean installJAR(final byte[] content) throws IOException {
+    final Zip zip = new Zip(new IOContent(content));
     final IOContent mf = new IOContent(zip.read(MANIFEST_MF));
     final NewlineInput nli = new NewlineInput(mf);
     for(String s; (s = nli.readLine()) != null;) {
+      // write file to rewritten file path
       final Matcher m = MAIN_CLASS.matcher(s);
-      if(!m.find()) continue;
-
-      // copy file to rewritten file path
-      final IOFile rp = new IOFile(repo.context.globalopts.get(GlobalOptions.REPOPATH));
-      final String path = m.group(1).replace('.', '/');
-      final boolean exists = md(rp, path);
-      new IOFile(rp, path + IO.JARSUFFIX).write(cont);
-      return exists;
+      if(m.find()) return write(m.group(1).replace('.', '/') + IO.JARSUFFIX, content);
     }
     return false;
   }
 
   /**
-   * Creates the package directory and deletes existing packages.
-   * @param rp path to the repository
+   * Writes a package to disk.
    * @param path file path
-   * @return {@code true} if a package already existed
+   * @param content package content
+   * @return {@code true} if existing package was replaced
+   * @throws IOException I/O exception
    */
-  private static boolean md(final IOFile rp, final String path) {
+  private boolean write(final String path, final byte[] content) throws IOException {
+    final IOFile rp = new IOFile(repo.context.globalopts.get(GlobalOptions.REPOPATH));
     final IOFile target = new IOFile(rp, path);
-    final IOFile dir = target.dir();
-    dir.md();
-    final IOFile[] ch = dir.children(target.name() + ".*");
-    for(final IOFile c : ch) c.delete();
-    return ch.length != 0;
+    final boolean exists = target.exists();
+    target.dir().md();
+    target.write(content);
+    return exists;
   }
 
   /**
    * Installs a XAR package.
-   * @param cont package content
+   * @param content package content
    * @return {@code true} if existing package was replaced
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private boolean installXAR(final byte[] cont) throws QueryException, IOException {
-    final Zip zip = new Zip(new IOContent(cont));
+  private boolean installXAR(final byte[] content) throws QueryException, IOException {
+    final Zip zip = new Zip(new IOContent(content));
     // parse and validate descriptor file
     final IOContent dsc = new IOContent(zip.read(DESCRIPTOR));
     final Package pkg = new PkgParser(repo, info).parse(dsc);
@@ -305,16 +296,16 @@ public final class RepoManager {
 
   /**
    * Returns a unique directory for the specified package.
-   * @param n name
+   * @param name name
    * @return unique directory
    */
-  private IOFile uniqueDir(final String n) {
-    String nm = n;
+  private IOFile uniqueDir(final String name) {
+    String nm = name;
     int c = 0;
     do {
       final IOFile io = repo.path(nm);
       if(!io.exists()) return io;
-      nm = n + '-' + ++c;
+      nm = name + '-' + ++c;
     } while(true);
   }
 
