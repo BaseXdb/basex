@@ -103,20 +103,21 @@ public final class Var extends ExprInfo {
       throws QueryException {
 
     if(t == null) return;
+
     if(declType != null) {
       if(declType.occ.intersect(t.occ) == null) throw INVCAST.get(ii, t, declType);
-      if(!t.promotable(declType)) return;
+      if(t.instanceOf(declType)) {
+        ctx.compInfo(QueryText.OPTCAST, this);
+        declType = null;
+      } else if(!t.promotable(declType)) {
+        return;
+      }
     }
 
     if(!inType.eq(t) && !inType.instanceOf(t)) {
+      // the new type provides new information
       final SeqType is = inType.intersect(t);
-      if(is != null) {
-        inType = is;
-        if(declType != null && inType.instanceOf(declType)) {
-          ctx.compInfo(QueryText.OPTCAST, this);
-          declType = null;
-        }
-      }
+      if(is != null) inType = is;
     }
   }
 

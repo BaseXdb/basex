@@ -36,7 +36,7 @@ public final class StaticFuncCall extends FuncCall {
    */
   public StaticFuncCall(final QNm nm, final Expr[] arg, final StaticContext sctx,
       final InputInfo ii) {
-    this(nm, arg, sctx, null, false, ii);
+    this(nm, arg, sctx, null, ii);
   }
 
   /**
@@ -46,15 +46,13 @@ public final class StaticFuncCall extends FuncCall {
    * @param arg arguments
    * @param sctx static context
    * @param fun referenced function
-   * @param tail tail-call flag
    */
   private StaticFuncCall(final QNm nm, final Expr[] arg, final StaticContext sctx,
-      final StaticFunc fun, final boolean tail, final InputInfo ii) {
+      final StaticFunc fun, final InputInfo ii) {
     super(ii, arg);
     sc = sctx;
     name = nm;
     func = fun;
-    tailCall = tail;
   }
 
   @Override
@@ -80,7 +78,7 @@ public final class StaticFuncCall extends FuncCall {
       final IntObjMap<Var> vs) {
     final Expr[] arg = new Expr[expr.length];
     for(int i = 0; i < arg.length; i++) arg[i] = expr[i].copy(ctx, scp, vs);
-    final StaticFuncCall call = new StaticFuncCall(name, arg, sc, func, false, info);
+    final StaticFuncCall call = new StaticFuncCall(name, arg, sc, func, info);
     call.type = type;
     call.size = size;
     return call;

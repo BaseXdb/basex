@@ -89,7 +89,7 @@ public final class PartFunc extends Arr {
 
     final Expr call = new DynFuncCall(info, f, args);
     final FuncType tp = FuncType.get(f.annotations(), vars, ft.ret);
-    return new FuncItem(sc, f.annotations(), null, vars, tp, call, false,
+    return new FuncItem(sc, f.annotations(), null, vars, tp, call,
         ctx.value, ctx.pos, ctx.size, scp.stackSize());
   }
 

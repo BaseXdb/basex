@@ -56,4 +56,10 @@ public interface XQFunction extends XQFunctionExpr {
    * @throws QueryException query exception
    */
   Item invokeItem(QueryContext ctx, InputInfo ii, Value... args) throws QueryException;
+
+  /**
+   * Size of this function's stack frame.
+   * @return stack frame size
+   */
+  int stackFrameSize();
 }

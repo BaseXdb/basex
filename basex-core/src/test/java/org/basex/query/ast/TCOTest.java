@@ -27,7 +27,7 @@ public class TCOTest extends QueryPlanTest {
         "14721860295199062616467307339074198149529600000000000000000000000000" +
         "00",
 
-        "exists(//" + Util.className(StaticFuncCall.class) + "[@tailCall = 'true'])"
+        "exists(//" + Util.className(StaticFuncCall.class) + "[@tailCall eq 'true'])"
     );
   }
 
