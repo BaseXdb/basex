@@ -10,6 +10,7 @@ import java.util.regex.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.view.editor.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -195,13 +196,21 @@ final class ProjectFilter extends BaseXBack {
 
   /**
    * Filters the file search field.
-   * @param string string to be found
+   * @param ea calling editor
    */
-  void focus(final String string) {
-    files.requestFocusInWindow();
+  void find(final EditorArea ea) {
+    final String string = ea.searchString();
     if(string != null) {
+      contents.requestFocusInWindow();
       contents.setText(string);
+      if(ea.opened()) {
+        final String name = ea.file().name();
+        final int i = name.lastIndexOf('.');
+        if(i != -1) files.setText("*" + name.substring(i));
+      }
       refresh(false);
+    } else {
+      files.requestFocusInWindow();
     }
   }
 

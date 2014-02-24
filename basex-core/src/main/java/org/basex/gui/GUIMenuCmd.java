@@ -423,7 +423,7 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       gui.editor.showProject();
-      gui.editor.focusFilter();
+      gui.editor.findFiles();
     }
 
     @Override

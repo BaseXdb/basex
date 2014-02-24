@@ -326,16 +326,4 @@ public abstract class IO {
   public String toString() {
     return path;
   }
-
-  /**
-   * Returns the suffix of the specified path in lower case.
-   * An empty string is returned if the last path segment has no suffix.
-   * @param path path to be checked
-   * @return mime-type
-   */
-  public static String suffix(final String path) {
-    final int s = path.lastIndexOf('/');
-    final int d = path.lastIndexOf('.');
-    return d <= s ? "" : path.substring(d + 1).toLowerCase(Locale.ENGLISH);
-  }
 }

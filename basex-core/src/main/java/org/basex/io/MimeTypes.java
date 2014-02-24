@@ -69,7 +69,10 @@ public final class MimeTypes {
    * @return mime-type
    */
   public static String get(final String path) {
-    final String ct = TYPES.get(IO.suffix(path));
+    final int s = path.lastIndexOf('/');
+    final int d = path.lastIndexOf('.');
+    final String suffix = d <= s ? "" : path.substring(d + 1).toLowerCase(Locale.ENGLISH);
+    final String ct = TYPES.get(suffix);
     return ct != null ? ct : APP_OCTET;
   }
 

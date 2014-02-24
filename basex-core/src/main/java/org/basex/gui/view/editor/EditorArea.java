@@ -74,8 +74,16 @@ public final class EditorArea extends TextPanel {
    * Returns {@code true} if the file was opened from disk, or was saved to disk.
    * @return result of check
    */
-  boolean opened() {
+  public boolean opened() {
     return tstamp != 0;
+  }
+
+  /**
+   * Returns the file reference.
+   * @return file reference
+   */
+  public IOFile file() {
+    return file;
   }
 
   /**

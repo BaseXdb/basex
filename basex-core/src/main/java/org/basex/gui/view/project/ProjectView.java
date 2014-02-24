@@ -79,7 +79,7 @@ public final class ProjectView extends BaseXPanel {
 
     final BaseXButton browse = new BaseXButton(DOTS, gui);
     browse.setMargin(new Insets(0, 2, 0, 2));
-    browse.setToolTipText(CHOOSE_DIR);
+    browse.setToolTipText(CHOOSE_DIR + DOTS);
     browse.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -174,10 +174,10 @@ public final class ProjectView extends BaseXPanel {
 
   /**
    * Focuses the project filter.
-   * @param string string to be found
+   * @param ea calling editor
    */
-  public void focusFilter(final String string) {
-    filter.focus(string);
+  public void findFiles(final EditorArea ea) {
+    filter.find(ea);
   }
 
   /**

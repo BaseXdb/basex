@@ -333,8 +333,8 @@ public final class EditorView extends View {
   /**
    * Focuses the project view.
    */
-  public void focusFilter() {
-    project.focusFilter(getEditor().searchString());
+  public void findFiles() {
+    project.findFiles(getEditor());
   }
 
   /**
