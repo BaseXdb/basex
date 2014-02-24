@@ -71,6 +71,28 @@ public final class UpdateTest extends AdvancedQueryTest {
   }
 
   /**
+   * Checks whether existing indexes etc. are NOT recycled for the copy of a transform expression.
+   * @throws BaseXException BaseX exception.
+   */
+  @Test
+  public void transform2() throws BaseXException {
+    new Set("mainmem", "on").execute(context);
+    new CreateDB(
+        "DBtransform", "<instance><data><vocable hits='1'/></data></instance>").execute(context);
+    query(
+        "for $voc in 1 to 2 " +
+        "let $xml := doc('DBtransform') " +
+        "return (" +
+        "$xml update (" +
+        "for $i in 1 to 2 return " +
+        "insert node $xml/instance/data/vocable[@hits = '1'] into ./instance))",
+        "<instance><data><vocable hits=\"1\"/></data><vocable hits=\"1\"/>" +
+        "<vocable hits=\"1\"/></instance><instance><data>" +
+        "<vocable hits=\"1\"/></data><vocable hits=\"1\"/><vocable hits=\"1\"/></instance>");
+    new Set("mainmem", "off").execute(context);
+  }
+
+  /**
    * Basic insert into.
    */
   @Test
@@ -1046,10 +1068,11 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void delayedDistanceAdjustment26() {
-    query(transform("<n><x at1='0' at2='0'/><y at3='0'/><b/></n>",
-        "delete node $input//@at1," +
-        "delete node $input//@at3," +
-        "rename node ($input//@at2)[1] as 'at2x'"),
+    query(
+        "<n><x at1='0' at2='0'/><y at3='0'/><b/></n> update (" +
+        "delete node .//@at1," +
+        "delete node .//@at3," +
+        "rename node (.//@at2)[1] as 'at2x')",
         "<n><x at2x=\"0\"/><y/><b/></n>");
   }
 
