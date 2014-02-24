@@ -407,9 +407,9 @@ public final class TextEditor {
    * @return {@code true} if text has changed
    */
   boolean comment(final Syntax syntax) {
-    final byte[] st = syntax.commentOpen();
-    final byte[] en = syntax.commentEnd();
-    final int sl = st.length, el = en.length;
+    final byte[] st = syntax.commentOpen(), en = syntax.commentEnd();
+    final byte[] ste = concat(st, SPACE), ene = concat(SPACE, en);
+    final int sl = st.length, el = en.length, sle = ste.length, ele = ene.length;
 
     // no selection: select line
     if(!selected()) {
@@ -426,14 +426,19 @@ public final class TextEditor {
     // create new text with or without comment
     final TokenBuilder tb = new TokenBuilder();
     final int mx = Math.max(min + sl, max - el), off;
-    if(indexOf(text, st, min) == min && indexOf(text, en, mx) == mx) {
+    final int mxe = Math.max(min + sle, max - ele);
+    if(indexOf(text, ste, min) == min && indexOf(text, ene, mxe) == mxe) {
+      // remove existing comment
+      tb.add(text, min + sle, max - ele);
+      off = -sle - ele;
+    } else if(indexOf(text, st, min) == min && indexOf(text, en, mx) == mx) {
       // remove existing comment
       tb.add(text, min + sl, max - el);
       off = -sl - el;
     } else {
       // add new comment
-      tb.add(st).add(text, min, max).add(en);
-      off = sl + el;
+      tb.add(ste).add(text, min, max).add(ene);
+      off = sle + ele;
     }
     final boolean added = add(tb.finish(), min, max);
     select(min, max + off);
