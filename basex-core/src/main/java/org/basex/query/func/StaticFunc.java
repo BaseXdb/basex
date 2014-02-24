@@ -14,7 +14,6 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -31,8 +30,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   public final Var[] args;
   /** Updating flag. */
   public final boolean updating;
-  /** Cast flag. */
-  private boolean cast;
 
   /** Map with requested function properties. */
   private final EnumMap<Flag, Boolean> map = new EnumMap<Flag, Boolean>(Flag.class);
@@ -57,7 +54,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     super(stc, a, n, r, scp, xqdoc, ii);
     args = v;
     expr = e;
-    cast = r != null && !r.eq(SeqType.ITEM_ZM);
     updating = ann.contains(Ann.Q_UPDATING);
   }
 
@@ -72,6 +68,17 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final int fp = scope.enter(ctx);
     try {
       expr = expr.compile(ctx, scope);
+
+      if(declType != null) {
+        // remove redundant casts
+        if((declType.type == AtomType.BLN || declType.type == AtomType.FLT ||
+            declType.type == AtomType.DBL || declType.type == AtomType.QNM ||
+            declType.type == AtomType.URI) && declType.eq(expr.type())) {
+          ctx.compInfo(OPTCAST, declType);
+        } else {
+          expr = new TypeCheck(sc, info, expr, declType, true).optimize(ctx, scope);
+        }
+      }
     } catch(final QueryException qe) {
       expr = FNInfo.error(qe, expr.type());
     } finally {
@@ -83,15 +90,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     // convert all function calls in tail position to proper tail calls
     expr.markTailCalls(ctx);
 
-    if(declType != null) {
-      // remove redundant casts
-      if((declType.type == AtomType.BLN || declType.type == AtomType.FLT ||
-          declType.type == AtomType.DBL || declType.type == AtomType.QNM ||
-          declType.type == AtomType.URI) && declType.eq(expr.type())) {
-        ctx.compInfo(OPTCAST, declType);
-        cast = false;
-      }
-    }
     compiling = false;
   }
 
@@ -166,6 +164,11 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
+  public int stackFrameSize() {
+    return scope.stackSize();
+  }
+
+  @Override
   public Ann annotations() {
     return ann;
   }
@@ -177,15 +180,10 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     // reset context and evaluate function
     final Value cv = ctx.value;
     ctx.value = null;
-    final int fp = scope.enter(ctx);
     try {
-      addArgs(ctx, ii, arg);
-      final Item it = expr.item(ctx, ii);
-      final Value v = it == null ? Empty.SEQ : it;
-      // optionally promote return value to target type
-      return cast ? declType.promote(ctx, sc, ii, v, false).item(ctx, ii) : it;
+      for(int i = 0; i < args.length; i++) ctx.set(args[i], arg[i], ii);
+      return expr.item(ctx, ii);
     } finally {
-      scope.exit(ctx, fp);
       ctx.value = cv;
     }
   }
@@ -197,14 +195,10 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     // reset context and evaluate function
     final Value cv = ctx.value;
     ctx.value = null;
-    final int fp = scope.enter(ctx);
     try {
-      addArgs(ctx, ii, arg);
-      final Value v = ctx.value(expr);
-      // optionally promote return value to target type
-      return cast ? declType.promote(ctx, sc, info, v, false) : v;
+      for(int i = 0; i < args.length; i++) ctx.set(args[i], arg[i], ii);
+      return ctx.value(expr);
     } finally {
-      scope.exit(ctx, fp);
       ctx.value = cv;
     }
   }
@@ -219,19 +213,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   public Item invokeItem(final QueryContext ctx, final InputInfo ii, final Value... arg)
       throws QueryException {
     return FuncCall.item(this, arg, ctx, ii);
-  }
-
-  /**
-   * Adds the given arguments to the variable stack.
-   * @param ctx query context
-   * @param ii input info
-   * @param vals values to add
-   * @throws QueryException if the arguments can't be bound
-   */
-  private void addArgs(final QueryContext ctx, final InputInfo ii, final Value[] vals)
-      throws QueryException {
-    // move variables to stack
-    for(int i = 0; i < args.length; i++) ctx.set(args[i], vals[i], ii);
   }
 
   /**
@@ -304,9 +285,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     }
 
     // copy the function body
-    final Expr cpy = expr.copy(ctx, scp, vs), rt = cast ? new TypeCheck(sc, info, cpy, declType,
-        true).optimize(ctx, scp) : cpy;
+    final Expr cpy = expr.copy(ctx, scp, vs);
 
-    return cls == null ? rt : new GFLWOR(info, cls, rt).optimize(ctx, scp);
+    return cls == null ? cpy : new GFLWOR(info, cls, cpy).optimize(ctx, scp);
   }
 }

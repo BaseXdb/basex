@@ -6,10 +6,8 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 
 /**
@@ -86,30 +84,15 @@ public final class Or extends Logical {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    double d = 0;
-    boolean f = false;
-    for(final Expr e : expr) {
-      final Item it = e.ebv(ctx, info);
-      if(it.bool(info)) {
-        final double s = it.score();
-        if(s == 0) return Bln.TRUE;
-        d = Scoring.merge(d, s);
-        f = true;
-      }
-    }
-    return d == 0 ? Bln.get(f) : Bln.get(d);
+    for(int i = 0; i < expr.length - 1; i++)
+      if(expr[i].ebv(ctx, info).bool(info)) return Bln.TRUE;
+    final Expr last = expr[expr.length - 1];
+    return tailCall ? last.item(ctx, ii) : last.ebv(ctx, ii).bool(ii) ? Bln.TRUE : Bln.FALSE;
   }
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new Or(info, copyAll(ctx, scp, vs, expr));
-  }
-
-  @Override
-  public void markTailCalls(final QueryContext ctx) {
-    // if the last expression surely returns a boolean, we can jump to it
-    final Expr last = expr[expr.length - 1];
-    if(last.type().eq(SeqType.BLN)) last.markTailCalls(ctx);
   }
 
   @Override

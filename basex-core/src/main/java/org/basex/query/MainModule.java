@@ -74,12 +74,12 @@ public final class MainModule extends StaticScope {
    * @throws QueryException evaluation exception
    */
   public Value value(final QueryContext ctx) throws QueryException {
+    final int fp = scope.enter(ctx);
     try {
-      scope.enter(ctx);
       final Value v = ctx.value(expr);
       return declType != null ? declType.treat(v, info) : v;
     } finally {
-      scope.exit(ctx, 0);
+      scope.exit(ctx, fp);
     }
   }
 
@@ -92,13 +92,13 @@ public final class MainModule extends StaticScope {
   public Iter iter(final QueryContext ctx) throws QueryException {
     if(declType != null) return value(ctx).iter();
 
-    scope.enter(ctx);
+    final int fp = scope.enter(ctx);
     final Iter iter = expr.iter(ctx);
     return new Iter() {
       @Override
       public Item next() throws QueryException {
         final Item it = iter.next();
-        if(it == null) scope.exit(ctx, 0);
+        if(it == null) scope.exit(ctx, fp);
         return it;
       }
 

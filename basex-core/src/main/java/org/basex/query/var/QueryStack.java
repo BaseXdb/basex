@@ -28,17 +28,21 @@ public final class QueryStack {
    */
   public int enterFrame(final int size) {
     final int nsl = sl + size;
-    if(nsl > stack.length) {
-      int len = stack.length;
-      do len <<= 1; while(nsl > len);
-      final Value[] nst = new Value[len];
-      System.arraycopy(stack, 0, nst, 0, sl);
-      stack = nst;
-    }
+    ensureCapacity(nsl);
     final int ret = fp;
     fp = sl;
     sl = nsl;
     return ret;
+  }
+
+  /**
+   * Prepares the current stack frame to be reused.
+   * @param newFrameSize new frame size
+   */
+  public void reuseFrame(final int newFrameSize) {
+    ensureCapacity(fp + newFrameSize);
+    while(--sl >= fp) stack[sl] = null;
+    sl = fp + newFrameSize;
   }
 
   /**
@@ -52,6 +56,20 @@ public final class QueryStack {
     if(stack.length > INIT && sl <= stack.length / 4) {
       int len = stack.length;
       do len /= 2; while(len > INIT && sl <= len / 4);
+      final Value[] nst = new Value[len];
+      System.arraycopy(stack, 0, nst, 0, sl);
+      stack = nst;
+    }
+  }
+
+  /**
+   * Ensures that the query stack has at least the given size.
+   * @param newSize required size of the stack
+   */
+  private void ensureCapacity(final int newSize) {
+    if(newSize > stack.length) {
+      int len = stack.length;
+      do len <<= 1; while(newSize > len);
       final Value[] nst = new Value[len];
       System.arraycopy(stack, 0, nst, 0, sl);
       stack = nst;

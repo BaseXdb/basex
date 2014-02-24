@@ -119,6 +119,12 @@ public final class QueryContext extends Proc {
   public int tailCalls;
   /** Maximum number of successive tail calls (will be set before compilation). */
   public int maxCalls;
+
+  /** Function for the next tail call. */
+  private XQFunction tailFunc;
+  /** Arguments for the next tail call. */
+  private Value[] args;
+
   /** Counter for variable IDs. */
   public int varIDs;
 
@@ -694,6 +700,36 @@ public final class QueryContext extends Proc {
    */
   public void set(final Var vr, final Value vl, final InputInfo ii) throws QueryException {
     stack.set(vr, vl, this, ii);
+  }
+
+  /**
+   * Registers a tail-called function and its arguments to this query context.
+   * @param fn function to call
+   * @param arg arguments to pass to {@code fn}
+   */
+  public void registerTailCall(final XQFunction fn, final Value[] arg) {
+    tailFunc = fn;
+    args = arg;
+  }
+
+  /**
+   * Returns and clears the currently registered tail-call function.
+   * @return function to call if present, {@code null} otherwise
+   */
+  public XQFunction pollTailCall() {
+    final XQFunction fn = tailFunc;
+    tailFunc = null;
+    return fn;
+  }
+
+  /**
+   * Returns and clears registered arguments of a tail-called function.
+   * @return argument values if a tail call was registered, {@code null} otherwise
+   */
+  public Value[] pollTailArgs() {
+    final Value[] as = args;
+    args = null;
+    return as;
   }
 
   /**
