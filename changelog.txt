@@ -3,6 +3,25 @@
  Welcome to the changelog. This file contains all code changes since
  BaseX 6.5:
 
+VERSION 7.8.1 (February 26, 2014) --------------------------------------
+
+ ADDED
+ * Editor, Ctrl-H: filter by opened file type and selected text
+ * XML Parsing: support for TAR & TGZ
+
+ UPDATED
+ * XQuery errors: function not found -> suggest similar one
+ * Commands: improved parsing (allow more whitespaces)
+ * French translation (thanks to Maud Ingarao!)
+
+ FIXED
+ * XQuery Update: nested transform expressions
+ * XQuery: always return boolean when calling doc-available()
+ * XQuery: disallow impossible casts before removing variables
+ * Binary Module: iterative evaluation of bin:octets()
+ * Commands, REPO INSTALL: install packages in same directory
+ * CSV/JSON: serialization of underscores
+
 VERSION 7.8 (February 12, 2014) ----------------------------------------
 
  GUI
@@ -82,13 +101,13 @@ VERSION 7.7 (August 7, 2013) -------------------------------------------
    http://docs.basex.org/wiki/Full-Text#Collations
  - we have extended the Database, Archive, File and other Modules
    http://docs.basex.org/wiki/Module_Library
- 
+
  COMMANDS
  - database names have got more flexible
    http://docs.basex.org/wiki/Commands#Valid_Names
  - we have new options for simplifying the creation of large databases
    http://docs.basex.org/wiki/Options
- 
+
  WEB/HTTP SERVICES
  - WebDAV has been enriched with locking features (sponsored feature!)
    http://docs.basex.org/wiki/WebDAV#Locking
