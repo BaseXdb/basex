@@ -171,7 +171,7 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
   @Override
   public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     final SeqType r = expr.type();
-    final SeqType retType = ret == null || r.instanceOf(ret) ? r : ret;
+    final SeqType retType = updating ? SeqType.EMP : ret == null || r.instanceOf(ret) ? r : ret;
     type = FuncType.get(ann, args, retType).seqType();
     size = 1;
 
@@ -363,11 +363,6 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
   @Override
   public boolean isVacuous() {
     return !has(Flag.UPD) && ret != null && ret.eq(SeqType.EMP);
-  }
-
-  @Override
-  public SeqType type() {
-    return updating ? SeqType.EMP : super.type();
   }
 
   @Override
