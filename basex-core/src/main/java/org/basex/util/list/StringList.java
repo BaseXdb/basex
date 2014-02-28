@@ -126,6 +126,18 @@ public class StringList extends ElementList implements Iterable<String> {
   }
 
   /**
+   * Removes all occurrences of the specified element from the list.
+   * @param element element to be removed
+   */
+  public final void delete(final String element) {
+    int s = 0;
+    for(int i = 0; i < size; ++i) {
+      if(!list[i].equals(element)) list[s++] = list[i];
+    }
+    size = s;
+  }
+
+  /**
    * Returns an array with all elements.
    * @return array
    */
