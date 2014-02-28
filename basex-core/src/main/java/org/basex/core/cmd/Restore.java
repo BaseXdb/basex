@@ -50,8 +50,13 @@ public class Restore extends ABackup {
     if(context.pinned(db)) return error(DB_PINNED_X, db);
 
     // try to restore database
-    return restore(file) && (!closed || new Open(db).run(context)) ?
+    try {
+      restore(file, this);
+      return !closed || new Open(db).run(context) ?
         info(DB_RESTORED_X, file.name(), perf) : error(DB_NOT_RESTORED_X, db);
+    } catch(final IOException ex) {
+      return error(DB_NOT_RESTORED_X, db);
+    }
   }
 
   @Override
@@ -66,16 +71,13 @@ public class Restore extends ABackup {
   /**
    * Restores the specified database.
    * @param file file
-   * @return success flag
+   * @param cmd calling command instance
+   * @throws IOException I/O exception
    */
-  private boolean restore(final IOFile file) {
-    try {
-      proc(new Zip(file)).unzip(goptions.dbpath());
-      return true;
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      return false;
-    }
+  private void restore(final IOFile file, final Restore cmd) throws IOException {
+    final Zip zip = new Zip(file);
+    if(cmd != null) cmd.proc(zip);
+    zip.unzip(goptions.dbpath());
   }
 
   @Override
