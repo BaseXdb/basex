@@ -556,6 +556,8 @@ public enum Err {
   /** FOUP0002. */
   UPDBDROP(FOUP, 2, "Database \"%\" could not be dropped."),
   /** FOUP0002. */
+  UPDBRESTOREMRG(FOUP, 2, "Database could not be restored. Backup files ambiguous \"%\""),
+  /** FOUP0002. */
   UPDBPUTERR(FOUP, 2, "Resource \"%\" could not be written."),
   /** FOUP0002. */
   UPDBDELERR(FOUP, 2, "Resource \"%\" could not be deleted."),

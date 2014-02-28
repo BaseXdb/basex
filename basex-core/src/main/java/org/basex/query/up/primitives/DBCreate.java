@@ -23,7 +23,7 @@ import org.basex.util.options.*;
  */
 public final class DBCreate extends DBNew {
   /** Name of new database. */
-  public final String name;
+  public final String dbName;
 
   /**
    * Constructor.
@@ -39,7 +39,7 @@ public final class DBCreate extends DBNew {
 
     super(TYPE.DBCREATE, null, c, ii);
     inputs = in;
-    name = nm;
+    dbName = nm;
     options = opts.free();
     check(true);
   }
@@ -51,25 +51,25 @@ public final class DBCreate extends DBNew {
 
   @Override
   public void merge(final BasicOperation o) throws QueryException {
-    throw BXDB_CREATE.get(info, ((DBCreate) o).name);
+    throw BXDB_CREATE.get(info, ((DBCreate) o).dbName);
   }
 
   @Override
   public void prepare(final MemData tmp) throws QueryException {
-    if(inputs != null && !inputs.isEmpty()) addDocs(new MemData(qc.context.options), name);
+    if(inputs != null && !inputs.isEmpty()) addDocs(new MemData(qc.context.options), dbName);
   }
 
   @Override
   public void apply() throws QueryException {
     // remove data instance from list of opened resources
-    qc.resource.removeData(name);
+    qc.resource.removeData(dbName);
     // check if addressed database is still pinned by any other process
-    if(qc.context.pinned(name)) throw BXDB_OPENED.get(info, name);
+    if(qc.context.pinned(dbName)) throw BXDB_OPENED.get(info, dbName);
 
     initOptions();
     assignOptions();
     try {
-      data = CreateDB.create(name, Parser.emptyParser(qc.context.options), qc.context);
+      data = CreateDB.create(dbName, Parser.emptyParser(qc.context.options), qc.context);
     } catch(final IOException ex) {
       throw UPDBOPTERR.get(info, ex);
     } finally {

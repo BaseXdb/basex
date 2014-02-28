@@ -644,6 +644,10 @@ public enum Function {
   /** XQuery function. */
   _DB_BACKUPS(FNDb.class, "backups([database])", arg(ITEM), ELM_ZM),
   /** XQuery function. */
+  _DB_BACKUP(FNDb.class, "backup(database)", arg(STR), EMP, flag(UPD, NDT)),
+  /** XQuery function. */
+  _DB_RESTORE(FNDb.class, "restore(backup)", arg(STR), EMP, flag(UPD, NDT)),
+  /** XQuery function. */
   _DB_SYSTEM(FNDb.class, "system()", arg(), STR),
   /** XQuery function. */
   _DB_INFO(FNDb.class, "info(database)", arg(ITEM), STR),
