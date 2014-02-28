@@ -99,8 +99,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @return result of check
    */
   private boolean inline(final QueryContext ctx) {
-    return expr.isValue() ||
-        expr.exprSize() < ctx.context.options.get(MainOptions.INLINELIMIT) &&
+    return expr.isValue() || expr.exprSize() < ctx.context.options.get(MainOptions.INLINELIMIT) &&
         !(compiling || has(Flag.CTX) || selfRecursive());
   }
 
@@ -272,8 +271,9 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   @Override
   public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
       final InputInfo ii) throws QueryException {
+
     if(!inline(ctx)) return null;
-    ctx.compInfo(OPTINLINEFN, name);
+    ctx.compInfo(OPTINLINE, name);
     // create let bindings for all variables
     final LinkedList<GFLWOR.Clause> cls = exprs.length == 0 ? null :
       new LinkedList<GFLWOR.Clause>();

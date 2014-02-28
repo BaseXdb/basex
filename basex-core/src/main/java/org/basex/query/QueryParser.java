@@ -2055,9 +2055,7 @@ public class QueryParser extends InputParser {
         final ExprList argList = new ExprList();
         final int[] holes = argumentList(argList, e);
         final Expr[] args = argList.finish();
-
-        e = holes == null ? new DynFuncCall(ii, e, args) :
-          new PartFunc(sc, ii, e, args, holes);
+        e = holes == null ? new DynFuncCall(ii, e, args) : new PartFunc(sc, ii, e, args, holes);
       }
     } while(e != old);
     return e;
@@ -2147,12 +2145,14 @@ public class QueryParser extends InputParser {
     final Ann ann = curr('%') ? annotations() : null;
     // inline function
     if(wsConsume(FUNCTION) && wsConsume(PAR1)) {
+      if(ann != null) {
+        if(ann.contains(Ann.Q_UPDATING)) throw error(UPFUNCITEM);
+        if(ann.contains(Ann.Q_PRIVATE) || ann.contains(Ann.Q_PUBLIC)) throw error(INVISIBLE);
+      }
       pushVarContext();
       final Var[] args = paramList();
       wsCheck(PAR2);
       final SeqType type = optAsType();
-      if(ann != null && (ann.contains(Ann.Q_PRIVATE) || ann.contains(Ann.Q_PUBLIC)))
-        throw error(INVISIBLE);
       final Expr body = enclosed(NOFUNBODY);
       final VarScope scope = popVarContext();
       return new InlineFunc(info(), type, args, body, ann, sc, scope);

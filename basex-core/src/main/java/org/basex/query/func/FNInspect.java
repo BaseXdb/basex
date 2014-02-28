@@ -3,6 +3,7 @@ package org.basex.query.func;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.inspect.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
@@ -109,7 +110,8 @@ public final class FNInspect extends StandardFunc {
   private ValueBuilder functions(final QueryContext ctx) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
     for(final StaticFunc sf : ctx.funcs.funcs()) {
-      vb.add(Functions.getUser(sf, ctx, sf.sc, info));
+      final FuncItem fi = Functions.getUser(sf, ctx, sf.sc, info);
+      if(!fi.annotations().contains(Ann.Q_UPDATING)) vb.add(fi);
     }
     return vb;
   }

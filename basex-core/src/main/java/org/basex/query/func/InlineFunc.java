@@ -232,7 +232,7 @@ public final class InlineFunc extends Single implements Scope, XQFunctionExpr {
       final InputInfo ii) throws QueryException {
 
     if(expr.has(Flag.CTX)) return null;
-    ctx.compInfo(OPTINLINEFN, this);
+    ctx.compInfo(OPTINLINE, this);
     // create let bindings for all variables
     final Map<Var, Expr> closure = scope.closure();
     final LinkedList<GFLWOR.Clause> cls =

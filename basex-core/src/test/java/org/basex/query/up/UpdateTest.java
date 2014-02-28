@@ -1162,4 +1162,20 @@ public final class UpdateTest extends AdvancedQueryTest {
     query("<X/>/(delete node .)");
     query("(<X/>,<Y/>)/(insert node <Z/> into .)");
   }
+
+
+  /**
+   * Reject updating function items.
+   */
+  @Test
+  public void updatingFuncItems() {
+    error("db:output(?)", Err.UPFUNCITEM);
+    error("db:output#1", Err.UPFUNCITEM);
+    error("declare %updating function local:a() { () }; local:a#0()", Err.UPFUNCITEM);
+    error("declare function local:a() { local:b#0 };"
+        + "declare %updating function local:b() { db:output('1') }; local:a()", Err.UPFUNCITEM);
+    // is still accepted (should also be rejected in future):
+    //error("declare function local:not-used() { local:b#0 };"
+    //    + "declare %updating function local:b() { db:output('1') }; local:b()", Err.UPFUNCITEM);
+  }
 }

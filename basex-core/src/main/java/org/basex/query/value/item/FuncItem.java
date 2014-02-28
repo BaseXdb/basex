@@ -220,8 +220,9 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
       final InputInfo ii) throws QueryException {
+
     if(!inline(exprs, ctx)) return null;
-    ctx.compInfo(OPTINLINEFN, this);
+    ctx.compInfo(OPTINLINE, this);
     // create let bindings for all variables
     final LinkedList<GFLWOR.Clause> cls =
         exprs.length == 0 ? null : new LinkedList<GFLWOR.Clause>();

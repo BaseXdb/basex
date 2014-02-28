@@ -1090,6 +1090,8 @@ public enum Err {
   /** XUDY0031. */
   UPURIDUP(XUDY, 31, "URI '%' is addressed multiple times."),
 
+  /** BASX0007. */
+  UPFUNCITEM(XUST, 1, "Updating function items are not supported yet."),
   /** XUST0001. */
   UPNOT(XUST, 1, "%: no updating expression allowed."),
   /** XUST0001. */
