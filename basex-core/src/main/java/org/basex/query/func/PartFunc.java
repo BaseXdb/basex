@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -87,9 +88,9 @@ public final class PartFunc extends Arr {
     }
     while(++p < args.length) args[p] = expr[p - holes.length].value(ctx);
 
-    final Expr call = new DynFuncCall(info, f, args);
-    final FuncType tp = FuncType.get(f.annotations(), vars, ft.ret);
-    return new FuncItem(sc, f.annotations(), null, vars, tp, call,
+    final Ann ann = f.annotations();
+    final FuncType tp = FuncType.get(ann, vars, ft.ret);
+    return new FuncItem(sc, ann, null, vars, tp, new DynFuncCall(info, f, args),
         ctx.value, ctx.pos, ctx.size, scp.stackSize());
   }
 

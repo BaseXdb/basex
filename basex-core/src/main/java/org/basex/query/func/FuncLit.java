@@ -68,6 +68,10 @@ public final class FuncLit extends Single implements Scope {
       type = sf.funcType().seqType();
     }
 
+    // Reject updating function items. Happens at compile because the function may not be known
+    // at parse time. This check could possibly be moved to StaticFuncs#check.
+    if(ann.contains(Ann.Q_UPDATING)) throw UPFUNCITEM.get(info);
+
     final int fp = scope.enter(ctx);
     try {
       expr = expr.compile(ctx, scope);
@@ -119,6 +123,7 @@ public final class FuncLit extends Single implements Scope {
    */
   public static FuncLit unknown(final QNm nm, final long ar, final QueryContext ctx,
       final StaticContext sctx, final InputInfo ii) throws QueryException {
+
     final VarScope scp = new VarScope(sctx);
     final Var[] arg = new Var[(int) ar];
     final Expr[] refs = new Expr[arg.length];

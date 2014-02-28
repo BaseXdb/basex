@@ -139,6 +139,7 @@ public final class StaticFuncs extends ExprInfo {
         final QueryException qe = similarError(call.name, call.info);
         throw qe == null ? FUNCUNKNOWN.get(call.info, call.name.string()) : qe;
       }
+
       if(call != null) {
         if(fc.func.expr == null) throw FUNCNOIMPL.get(call.info, call.name.string());
         qc.updating |= fc.func.updating;

@@ -770,8 +770,6 @@ public interface QueryText {
   /** Optimization info. */
   String OPTFLWOR = "simplifying flwor expression";
   /** Optimization info. */
-  String OPTINLINEFN = "inlining function %";
-  /** Optimization info. */
   String OPTINLINE = "inlining %";
   /** Optimization info. */
   String OPTWHERE2 = "rewriting where clause(s)";

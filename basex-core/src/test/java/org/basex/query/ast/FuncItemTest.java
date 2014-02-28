@@ -218,13 +218,4 @@ public final class FuncItemTest extends QueryPlanTest {
         + "function-lookup(xs:QName('local:f'), 0)()(),"
         + "inspect:functions()()()", "");
   }
-
-  /** Tests if updating function items can be compiled. */
-  @Test
-  public void gh867() {
-    check("%updating function() { delete node <a/> }",
-        (String) null,
-        "exists(//" + Util.className(FuncItem.class) + ")"
-    );
-  }
 }
