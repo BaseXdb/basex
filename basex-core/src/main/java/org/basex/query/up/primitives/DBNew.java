@@ -48,7 +48,7 @@ abstract class DBNew extends BasicOperation {
   }
 
   /** Query context. */
-  final QueryContext qc;
+  public final QueryContext qc;
   /** Inputs to add. */
   List<NewInput> inputs;
   /** Optimization options. */

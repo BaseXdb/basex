@@ -17,6 +17,7 @@ import org.basex.util.*;
 public abstract class BasicOperation extends Operation implements Comparable<BasicOperation>  {
   /** Basic Operation types. Carried out in the given order. */
   public enum TYPE {
+    /** DBBackup.   */ DBBACKUP,
     /** DBAdd.      */ DBADD,
     /** DBStore.    */ DBSTORE,
     /** DBRename.   */ DBRENAME,
@@ -26,6 +27,7 @@ public abstract class BasicOperation extends Operation implements Comparable<Bas
     /** FnPut.      */ FNPUT,
     /** DBDrop.     */ DBDROP,
     /** DBCreate.   */ DBCREATE,
+    /** DBRestore.  */ DBRESTORE,
   }
 
   /** Type of this operation. */

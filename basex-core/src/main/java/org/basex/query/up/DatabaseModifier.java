@@ -19,7 +19,8 @@ final class DatabaseModifier extends ContextModifier {
   void add(final Operation o, final QueryContext ctx) throws QueryException {
     add(o);
     // check permissions
-    if(o instanceof DBCreate || o instanceof DBDrop) {
+    if(o instanceof DBBackup || o instanceof DBCreate || o instanceof DBRestore ||
+        o instanceof DBDrop) {
       if(!ctx.context.perm(Perm.CREATE, null)) throw BASX_PERM.get(o.getInfo(), Perm.CREATE);
     } else if(!ctx.context.perm(Perm.WRITE, o.getData().meta)) {
       throw BASX_PERM.get(o.getInfo(), Perm.WRITE);

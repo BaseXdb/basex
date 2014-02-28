@@ -12,7 +12,7 @@ import org.basex.util.*;
  */
 public abstract class Operation {
   /** Input info. */
-  final InputInfo info;
+  public final InputInfo info;
   /** Target data reference. */
   public Data data;
 
