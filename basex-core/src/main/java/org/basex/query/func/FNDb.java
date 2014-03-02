@@ -279,7 +279,7 @@ public final class FNDb extends StandardFunc {
       public Item next() {
         if(++up >= list.size()) return null;
         final String name = list.get(up);
-        final long length = new IOFile(dbpath, name).length();
+        final long length = new IOFile(dbpath, name + IO.ZIPSUFFIX).length();
         return new FElem(BACKUP).add(name).add(SIZE, token(length));
       }
     };
