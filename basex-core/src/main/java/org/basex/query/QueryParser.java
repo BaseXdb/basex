@@ -195,7 +195,7 @@ public class QueryParser extends InputParser {
       prolog1();
       prolog2();
 
-      pushVarContext();
+      pushVarContext(null);
       final Expr e = expr();
       if(e == null) throw alter == null ? error(EXPREMPTY) : error();
       final VarScope scope = popVarContext();
@@ -859,7 +859,7 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(EXTERNAL)) wsCheck(ASSIGN);
     else if(!wsConsumeWs(ASSIGN)) return;
 
-    pushVarContext();
+    pushVarContext(null);
     final Expr e = check(single(), NOVARDECL);
     final SeqType type = sc.initType == null ? SeqType.ITEM : sc.initType;
     final VarScope scope = popVarContext();
@@ -879,7 +879,7 @@ public class QueryParser extends InputParser {
     final SeqType tp = optAsType();
     if(module != null && !eq(vn.uri(), module.uri())) throw error(MODNS, vn);
 
-    pushVarContext();
+    pushVarContext(null);
     final boolean external = wsConsumeWs(EXTERNAL);
     final Expr bind;
     if(external) {
@@ -925,7 +925,7 @@ public class QueryParser extends InputParser {
     if(module != null && !eq(name.uri(), module.uri())) throw error(MODNS, name);
 
     wsCheck(PAR1);
-    pushVarContext();
+    pushVarContext(null);
     final Var[] args = paramList();
     wsCheck(PAR2);
     final SeqType tp = optAsType();
@@ -2149,13 +2149,14 @@ public class QueryParser extends InputParser {
         if(ann.contains(Ann.Q_UPDATING)) throw error(UPFUNCITEM);
         if(ann.contains(Ann.Q_PRIVATE) || ann.contains(Ann.Q_PUBLIC)) throw error(INVISIBLE);
       }
-      pushVarContext();
+      final HashMap<Var, Expr> nonLocal = new HashMap<Var, Expr>();
+      pushVarContext(nonLocal);
       final Var[] args = paramList();
       wsCheck(PAR2);
       final SeqType type = optAsType();
       final Expr body = enclosed(NOFUNBODY);
       final VarScope scope = popVarContext();
-      return new InlineFunc(info(), type, args, body, ann, sc, scope);
+      return new Closure(info(), type, args, body, ann, nonLocal, sc, scope);
     }
     // annotations not allowed here
     if(ann != null) throw error(NOANN);
@@ -3829,7 +3830,7 @@ public class QueryParser extends InputParser {
     while(++i < localVars.size()) {
       final VarContext vctx = localVars.get(i);
       final Var local = vctx.addVar(var.name, var.type(), false);
-      vctx.scope.closure().put(local, new VarRef(ii, var));
+      vctx.nonLocal.put(local, new VarRef(ii, var));
       var = local;
     }
 
@@ -3865,9 +3866,10 @@ public class QueryParser extends InputParser {
 
   /**
    * Pushes a new variable context onto the stack.
+   * @param nonLocal mapping for non-local variables
    */
-  private void pushVarContext() {
-    localVars.add(new VarContext());
+  private void pushVarContext(final HashMap<Var, Expr> nonLocal) {
+    localVars.add(new VarContext(nonLocal));
   }
 
   /**
@@ -4114,6 +4116,16 @@ public class QueryParser extends InputParser {
     final VarStack stack = new VarStack();
     /** Current scope containing all variables and the closure. */
     final VarScope scope = new VarScope(sc);
+    /** Non-local variable bindings for closures. */
+    final HashMap<Var, Expr> nonLocal;
+
+    /**
+     * Constructor.
+     * @param bindings non-local variable bindings for closures
+     */
+    public VarContext(final HashMap<Var, Expr> bindings) {
+      nonLocal = bindings;
+    }
 
     /**
      * Adds a new variable to this context.

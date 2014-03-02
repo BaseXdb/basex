@@ -19,7 +19,7 @@ public final class FuncItemTest extends QueryPlanTest {
   public void idTest() {
     check("function($x) { $x }(42)",
         "42",
-        "empty(//" + Util.className(InlineFunc.class) + ')'
+        "empty(//" + Util.className(Closure.class) + ')'
     );
   }
 
@@ -60,7 +60,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "}(function($f) { 42 })",
         "42",
         // both outer inline functions are pre-compiled
-        "empty(//" + Util.className(InlineFunc.class) + ')',
+        "empty(//" + Util.className(Closure.class) + ')',
         "/*/" + Util.className(Int.class) + "/@value = '42'"
     );
   }
@@ -101,7 +101,7 @@ public final class FuncItemTest extends QueryPlanTest {
   @Test
   public void noLoopTest() {
     check("declare function local:Y($f) { $f(function() { $f }) };" +
-        "let $f := local:Y(function($x) { $x() }) return $f[2]",
+        "let $f := local:Y(function($x) { $x() }) return ($f ! .)[2]",
         "",
         "exists(//" + Util.className(FuncItem.class) + ')'
     );
@@ -134,7 +134,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "declare function local:bar($f) { $f(function($_) { $f }) };" +
         "let $a := local:foo(local:foo(function($e) { $e() })) " +
         "let $b := local:bar($a) " +
-        "return $b[2]",
+        "return ($b ! .)[2]",
         "",
         "exists(//" + Util.className(FuncItem.class) + ')'
     );
@@ -177,7 +177,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "5000050000",
 
         // all inline functions are pre-compiled
-        "empty(//" + Util.className(InlineFunc.class) + ')',
+        "empty(//" + Util.className(Closure.class) + ')',
         // the outer function item was inlined and removed
         "every $f in //" + Util.className(FuncItem.class) + " satisfies $f/*[1]/@name = '$go'",
         // the addition function was inlined
@@ -217,5 +217,27 @@ public final class FuncItemTest extends QueryPlanTest {
     check("declare function local:f() { function() { () } };"
         + "function-lookup(xs:QName('local:f'), 0)()(),"
         + "inspect:functions()()()", "");
+  }
+
+  /** Tests if recursive function items are inlined only once. */
+  @Test
+  public void gh879() {
+    check("declare function local:foo($root) {" +
+        "  let $go :=" +
+        "    function($go, $e) {" +
+        "      fold-left(" +
+        "        $e/foo, (), function($acc, $e) {" +
+        "          ($acc, xs:string($e/@ID), $go($go, $e))" +
+        "        }" +
+        "      )" +
+        "    }" +
+        "  return $go($go, $root)" +
+        "};" +
+        "local:foo(document { <foo ID=\"a\"><foo ID=\"b\"/></foo> })",
+
+        "a b",
+        "empty(//" + Util.className(StaticFuncCall.class) + ")",
+        "exists(//" + Util.className(DynFuncCall.class) + ")",
+        "exists(//" + Util.className(FuncItem.class) + ")");
   }
 }

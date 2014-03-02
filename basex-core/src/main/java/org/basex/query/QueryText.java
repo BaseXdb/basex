@@ -709,11 +709,11 @@ public interface QueryText {
   byte[] TEST = token("test");
   /** Minimum. */
   byte[] MIN = token("min");
-  /** Attribute name. */
+  /** Maximum. */
   byte[] MAX = token("max");
   /** Infinity. */
   byte[] INF = token("inf");
-  /** Infinity. */
+  /** Tailcall. */
   byte[] TCL = token("tailCall");
 
   /** Example for a Date format. */
