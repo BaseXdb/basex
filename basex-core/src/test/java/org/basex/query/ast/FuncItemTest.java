@@ -218,4 +218,26 @@ public final class FuncItemTest extends QueryPlanTest {
         + "function-lookup(xs:QName('local:f'), 0)()(),"
         + "inspect:functions()()()", "");
   }
+
+  /** Tests if recursive function items are inlined only once. */
+  @Test
+  public void gh879() {
+    check("declare function local:foo($root) {" +
+        "  let $go :=" +
+        "    function($go, $e) {" +
+        "      fold-left(" +
+        "        $e/foo, (), function($acc, $e) {" +
+        "          ($acc, xs:string($e/@ID), $go($go, $e))" +
+        "        }" +
+        "      )" +
+        "    }" +
+        "  return $go($go, $root)" +
+        "};" +
+        "local:foo(document { <foo ID=\"a\"><foo ID=\"b\"/></foo> })",
+
+        "a b",
+        "empty(//" + Util.className(StaticFuncCall.class) + ")",
+        "exists(//" + Util.className(DynFuncCall.class) + ")",
+        "exists(//" + Util.className(FuncItem.class) + ")");
+  }
 }
