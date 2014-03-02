@@ -102,7 +102,8 @@ public final class Try extends Single {
       for(final Catch c : ctch) {
         if(c.matches(qe)) {
           // found a matching clause, inline variable and error message
-          return optPre(c.inline(ctx, scp, v, e).asExpr(qe, ctx, scp), ctx);
+          final Catch ca = c.inline(ctx, scp, v, e);
+          if(ca != null) return optPre(ca.asExpr(qe, ctx, scp), ctx);
         }
       }
       throw qe;
