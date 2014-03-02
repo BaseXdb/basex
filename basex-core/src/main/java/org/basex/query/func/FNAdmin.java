@@ -33,6 +33,8 @@ public final class FNAdmin extends StandardFunc {
   private static final String SESSION = "session";
   /** QName: permission. */
   private static final String PERMISSION = "permission";
+  /** QName: password. */
+  private static final String PASSWORD = "password";
   /** QName: entry. */
   private static final String ENTRY = "entry";
   /** Size element name. */
@@ -131,7 +133,7 @@ public final class FNAdmin extends StandardFunc {
     for(final User u : expr.length == 0 ? ctx.context.users.users(null) :
       checkData(ctx).meta.users.users(ctx.context.users)) {
       vb.add(new FElem(USER).add(u.name).add(PERMISSION,
-          u.perm.toString().toLowerCase(Locale.ENGLISH)));
+          u.perm.toString().toLowerCase(Locale.ENGLISH)).add(PASSWORD, u.password));
     }
     return vb;
   }
