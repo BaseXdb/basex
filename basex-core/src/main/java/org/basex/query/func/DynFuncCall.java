@@ -24,6 +24,8 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class DynFuncCall extends FuncCall {
+  /** Hash values of all function items that this call was copied from, possibly {@code null}. */
+  private int[] inlinedFrom;
   /**
    * Function constructor.
    * @param ii input info
@@ -56,19 +58,47 @@ public final class DynFuncCall extends FuncCall {
       if(allAreValues() && f instanceof Map) return optPre(value(ctx), ctx);
 
       // try to inline the function
-      final Expr[] args = Arrays.copyOf(expr, expr.length - 1);
-      final Expr inl = ((XQFunctionExpr) f).inlineExpr(args, ctx, scp, info);
-      if(inl != null) return inl;
+      if(!(f instanceof FuncItem && comesFrom((FuncItem) f))) {
+        final Expr[] args = Arrays.copyOf(expr, expr.length - 1);
+        final Expr inl = ((XQFunctionExpr) f).inlineExpr(args, ctx, scp, info);
+        if(inl != null) return inl;
+      }
     }
 
     return this;
+  }
+
+  /**
+   * Marks this call after it was inlined from the given function item.
+   * @param it the function item
+   */
+  public void markInlined(final FuncItem it) {
+    final int hash = it.hashCode();
+    inlinedFrom = inlinedFrom == null ? new int[] { hash } : Array.add(inlinedFrom, hash);
+  }
+
+  /**
+   * Checks if this call was inlined from the body of the given function item.
+   * @param it function item
+   * @return result of check
+   */
+  private boolean comesFrom(final FuncItem it) {
+    if(inlinedFrom != null) {
+      final int hash = it.hashCode();
+      for(final int h : inlinedFrom) if(hash == h) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final Expr[] copy = copyAll(ctx, scp, vs, expr);
     final int last = copy.length - 1;
-    return copyType(new DynFuncCall(info, copy[last], Arrays.copyOf(copy, last)));
+    final DynFuncCall call = new DynFuncCall(info, copy[last], Arrays.copyOf(copy, last));
+    if(inlinedFrom != null) call.inlinedFrom = inlinedFrom.clone();
+    return copyType(call);
   }
 
   @Override

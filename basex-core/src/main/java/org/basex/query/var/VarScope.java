@@ -7,12 +7,13 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * The scope of variables, either the query, a use-defined or an inline function.
+ * The scope of variables, either the query, a user-defined or an inline function.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
@@ -23,8 +24,6 @@ public final class VarScope {
 
   /** Local variables in this scope. */
   private final ArrayList<Var> vars = new ArrayList<Var>();
-  /** This scope's closure. */
-  private final Map<Var, Expr> closure = new HashMap<Var, Expr>();
 
   /**
    * Constructor for a top-level module.
@@ -66,14 +65,6 @@ public final class VarScope {
    */
   public Var newCopyOf(final QueryContext ctx, final Var var) {
     return add(new Var(ctx, sc, var));
-  }
-
-  /**
-   * Get the closure of this scope.
-   * @return mapping from non-local to local variables
-   */
-  public Map<Var, Expr> closure() {
-    return closure;
   }
 
   /**
@@ -127,14 +118,16 @@ public final class VarScope {
     }
 
     // remove unused entries from the closure
-    final Iterator<Entry<Var, Expr>> cls = closure.entrySet().iterator();
-    while(cls.hasNext()) {
-      final Entry<Var, Expr> e = cls.next();
-      final Var v = e.getKey();
-      if(!used.get(v.id)) {
-        cls.remove();
-        v.slot = -1;
-        vars.remove(v);
+    if(expr instanceof Closure) {
+      final Iterator<Entry<Var, Expr>> cls = ((Closure) expr).nonLocalBindings();
+      while(cls.hasNext()) {
+        final Entry<Var, Expr> e = cls.next();
+        final Var v = e.getKey();
+        if(!used.get(v.id)) {
+          cls.remove();
+          v.slot = -1;
+          vars.remove(v);
+        }
       }
     }
 
@@ -158,19 +151,12 @@ public final class VarScope {
   /**
    * Copies this VarScope.
    * @param ctx query context
-   * @param scp new parent scope
    * @param vs variable mapping
    * @return copied scope
    */
-  public VarScope copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public VarScope copy(final QueryContext ctx, final IntObjMap<Var> vs) {
     final VarScope cscp = new VarScope(sc);
     for(final Var v : vars) vs.put(v.id, cscp.newCopyOf(ctx, v));
-    for(final Entry<Var, Expr> e : closure.entrySet()) {
-      final Var v = vs.get(e.getKey().id);
-      final Expr ex = e.getValue().copy(ctx, scp, vs);
-      cscp.closure.put(v, ex);
-    }
     return cscp;
   }
 }
