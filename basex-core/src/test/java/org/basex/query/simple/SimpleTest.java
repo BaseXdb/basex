@@ -136,6 +136,8 @@ public final class SimpleTest extends QueryTest {
       { "Catch 3", itr(1), "try { 1+'' } catch *:XPTY0004 { 1 }" },
       { "Catch 4", itr(1), "try { 1+'' } catch err:* { 1 }" },
       { "Catch 5", itr(1), "try { 1+'' } catch * { 1 }" },
+      { "Catch 6", itr(1),
+        "declare function local:f($x) { try { 1 idiv $x } catch * { 1 } }; local:f(0)" },
 
       { "FuncTest 1", itr(1), "xquery version '1.0';" +
         "declare function local:foo() { count(local:bar()) };" +
