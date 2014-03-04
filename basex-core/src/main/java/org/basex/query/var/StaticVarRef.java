@@ -60,7 +60,7 @@ public final class StaticVarRef extends ParseExpr {
 
   @Override
   public boolean has(final Flag flag) {
-    return var != null && var.expr != null && var.expr.has(flag);
+    return var != null && var.has(flag);
   }
 
   @Override

@@ -213,4 +213,17 @@ public final class StaticVar extends StaticDecl {
   public byte[] id() {
     return Token.concat(new byte[] { '$' }, name.id());
   }
+
+  /**
+   * Checks if the expression bound to this variable has the given flag.
+   * @param flag flag to check for
+   * @return {@code true} if the expression has the given flag, {@code false} otherwise
+   */
+  public boolean has(final Flag flag) {
+    if(dontEnter || expr == null) return false;
+    dontEnter = true;
+    final boolean res = expr.has(flag);
+    dontEnter = false;
+    return res;
+  }
 }
