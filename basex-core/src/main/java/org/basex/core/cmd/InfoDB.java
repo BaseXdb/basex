@@ -58,8 +58,7 @@ public final class InfoDB extends AInfo {
 
     // count number of raw files
     info(tb, DOCUMENTS, meta.ndocs);
-    final int b = meta.path != null ? meta.binaries().descendants().size() : 0;
-    info(tb, BINARIES, b);
+    info(tb, BINARIES, meta.path != null ? meta.binaries().descendants().size() : 0);
     info(tb, TIMESTAMP, DateTime.format(new Date(meta.dbtime()), DateTime.DATETIME));
     if(meta.corrupt) tb.add(' ' + DB_CORRUPT + NL);
 
@@ -76,15 +75,15 @@ public final class InfoDB extends AInfo {
         tb.add(' ' + H_INDEX_FORMAT + NL);
       } else {
         info(tb, UP_TO_DATE, meta.uptodate);
-        info(tb, TEXT_INDEX, Util.flag(meta.textindex));
-        info(tb, ATTRIBUTE_INDEX, Util.flag(meta.attrindex));
-        info(tb, FULLTEXT_INDEX, Util.flag(meta.ftxtindex));
-        info(tb, STEMMING, Util.flag(meta.stemming));
-        info(tb, CASE_SENSITIVITY, Util.flag(meta.casesens));
-        info(tb, DIACRITICS, Util.flag(meta.diacritics));
-        info(tb, STOPWORD_LIST, meta.stopwords);
-        info(tb, LANGUAGE, meta.language);
-        info(tb, MainOptions.UPDINDEX.name(), Util.flag(meta.updindex));
+        info(tb, MainOptions.TEXTINDEX.name(), meta.textindex);
+        info(tb, MainOptions.ATTRINDEX.name(), meta.attrindex);
+        info(tb, MainOptions.FTINDEX.name(), meta.ftxtindex);
+        info(tb, MainOptions.LANGUAGE.name(), meta.language);
+        info(tb, MainOptions.STEMMING.name(), meta.stemming);
+        info(tb, MainOptions.CASESENS.name(), meta.casesens);
+        info(tb, MainOptions.DIACRITICS.name(), meta.diacritics);
+        info(tb, MainOptions.STOPWORDS.name(), meta.stopwords);
+        info(tb, MainOptions.UPDINDEX.name(), meta.updindex);
         info(tb, MainOptions.MAXCATS.name(), meta.maxcats);
         info(tb, MainOptions.MAXLEN.name(), meta.maxlen);
       }
