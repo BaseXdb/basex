@@ -272,7 +272,7 @@ final class QueryCompiler {
         return true;
       }
     });
-    if(!ok) throw Err.VARUNDEF.get(((StaticScope) curr).info, curr);
+    if(!ok) throw Err.CIRCREF.get(((StaticVar) curr).info, curr);
     return adj.toArray();
   }
 }
