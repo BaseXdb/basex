@@ -79,6 +79,11 @@ public final class InfoDB extends AInfo {
         info(tb, TEXT_INDEX, Util.flag(meta.textindex));
         info(tb, ATTRIBUTE_INDEX, Util.flag(meta.attrindex));
         info(tb, FULLTEXT_INDEX, Util.flag(meta.ftxtindex));
+        info(tb, STEMMING, Util.flag(meta.stemming));
+        info(tb, CASE_SENSITIVITY, Util.flag(meta.casesens));
+        info(tb, DIACRITICS, Util.flag(meta.diacritics));
+        info(tb, STOPWORD_LIST, meta.stopwords);
+        info(tb, LANGUAGE, meta.language);
         info(tb, MainOptions.UPDINDEX.name(), Util.flag(meta.updindex));
         info(tb, MainOptions.MAXCATS.name(), meta.maxcats);
         info(tb, MainOptions.MAXLEN.name(), meta.maxlen);
