@@ -272,7 +272,10 @@ final class QueryCompiler {
         return true;
       }
     });
-    if(!ok) throw Err.CIRCREF.get(((StaticVar) curr).info, curr);
+    if(!ok) {
+      final StaticVar var = (StaticVar) curr;
+      throw Err.CIRCREF.get(var.info, "$" + var.name);
+    }
     return adj.toArray();
   }
 }
