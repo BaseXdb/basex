@@ -82,7 +82,7 @@ public final class DBCreate extends DBNew {
       if(!data.startUpdate()) throw BXDB_OPENED.get(null, data.meta.name);
       data.insert(data.meta.size, -1, new DataClip(md));
       try {
-        Optimize.optimize(data, false, null);
+        Optimize.optimize(data, null);
       } catch(final IOException ex) {
         data.finishUpdate();
         throw UPDBOPTERR.get(info, ex);

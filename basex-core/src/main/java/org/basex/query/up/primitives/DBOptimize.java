@@ -9,6 +9,7 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.util.*;
+import org.basex.util.ft.*;
 import org.basex.util.options.*;
 
 /**
@@ -58,17 +59,33 @@ public final class DBOptimize extends DBNew {
     initOptions();
     assignOptions();
 
-    final boolean rebuild = opts.get(MainOptions.MAXCATS) != meta.maxcats ||
-        opts.get(MainOptions.MAXLEN) != meta.maxlen;
-    meta.maxcats = opts.get(MainOptions.MAXCATS);
-    meta.maxlen  = opts.get(MainOptions.MAXLEN);
     meta.createtext = opts.get(MainOptions.TEXTINDEX);
     meta.createattr = opts.get(MainOptions.ATTRINDEX);
     meta.createftxt = opts.get(MainOptions.FTINDEX);
 
+    final int mc = opts.get(MainOptions.MAXCATS);
+    final int ml = opts.get(MainOptions.MAXLEN);
+    final boolean rebuild = mc != meta.maxcats || ml != meta.maxlen;
+
+    final boolean st = opts.get(MainOptions.STEMMING);
+    final boolean cs = opts.get(MainOptions.CASESENS);
+    final boolean dc = opts.get(MainOptions.DIACRITICS);
+    final String sw = opts.get(MainOptions.STOPWORDS);
+    final Language ln = Language.get(opts);
+    final boolean rebuildFT = rebuild || !ln.equals(meta.language) || st != meta.stemming ||
+        cs != meta.casesens ||  dc != meta.diacritics || !sw.equals(meta.stopwords);
+
+    meta.language   = ln;
+    meta.stemming   = st;
+    meta.casesens   = cs;
+    meta.diacritics = dc;
+    meta.stopwords  = sw;
+    meta.maxcats    = mc;
+    meta.maxlen     = ml;
+
     try {
       if(all) OptimizeAll.optimizeAll(data, qc.context, null);
-      else Optimize.optimize(data, rebuild, null);
+      else Optimize.optimize(data, rebuild, rebuildFT, null);
     } catch(final IOException ex) {
       throw UPDBOPTERR.get(info, ex);
     } finally {

@@ -39,7 +39,7 @@ public final class Optimize extends ACreate {
 
     if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
     try {
-      optimize(data, false, this);
+      optimize(data, this);
       return info(DB_OPTIMIZED_X, m.name, perf);
     } catch(final IOException ex) {
       return error(Util.message(ex));
@@ -66,12 +66,23 @@ public final class Optimize extends ACreate {
   /**
    * Optimizes the structures of a database.
    * @param data data
-   * @param rebuild rebuild all index structures
    * @param cmd calling command instance (can be {@code null})
    * @throws IOException I/O Exception during index rebuild
    */
-  public static void optimize(final Data data, final boolean rebuild, final Optimize cmd)
-      throws IOException {
+  public static void optimize(final Data data, final Optimize cmd) throws IOException {
+    optimize(data, false, false, cmd);
+  }
+
+  /**
+   * Optimizes the structures of a database.
+   * @param data data
+   * @param rebuild rebuild all index structures
+   * @param rebuildFT rebuild full-text index
+   * @param cmd calling command instance (can be {@code null})
+   * @throws IOException I/O Exception during index rebuild
+   */
+  public static void optimize(final Data data, final boolean rebuild, final boolean rebuildFT,
+      final Optimize cmd) throws IOException {
 
     // initialize structural indexes
     final MetaData md = data.meta;
@@ -124,7 +135,7 @@ public final class Optimize extends ACreate {
     // rebuild value indexes
     optimize(IndexType.ATTRIBUTE, data, md.createattr, md.attrindex, rebuild, cmd);
     optimize(IndexType.TEXT,      data, md.createtext, md.textindex, rebuild, cmd);
-    optimize(IndexType.FULLTEXT,  data, md.createftxt, md.ftxtindex, rebuild, cmd);
+    optimize(IndexType.FULLTEXT,  data, md.createftxt, md.ftxtindex, rebuild || rebuildFT, cmd);
   }
 
   /**
