@@ -799,6 +799,8 @@ public enum Err {
   /** XPST0008. */
   VARUNDEF(XPST, 8, "Undefined variable %."),
   /** XPST0008. */
+  CIRCREF(XPST, 8, "Static variable references itself: %"),
+  /** XPST0008. */
   VARPRIVATE(XPST, 8, "Variable % is not visible from this module."),
   /** XPST0008. */
   TYPEUNDEF(XPST, 8, "Undefined type '%'."),
@@ -901,7 +903,7 @@ public enum Err {
   /** XQDY0044. */
   CAINV(XQDY, 44, "Invalid attribute prefix/namespace '%'."),
   /** XQDY0054. */
-  CIRCVAR30(XQDY, 54, "Global variable depends on itself: %"),
+  CIRCVAR30(XQDY, 54, "Static variable depends on itself: %"),
   /** XQDY0054. */
   CIRCCTX(XQDY, 54, "Context item is not defined."),
   /** XQDY0064. */
