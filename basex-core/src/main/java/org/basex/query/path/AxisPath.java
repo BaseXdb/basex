@@ -53,7 +53,7 @@ public abstract class AxisPath extends Path {
    * @return resulting operator
    */
   private boolean useIterator() {
-    if(root == null || root.hasFreeVars() || !root.iterable()) return false;
+    if(root == null || !root.iterable()) return false;
 
     final int sl = steps.length;
     for(int s = 0; s < sl; ++s) {

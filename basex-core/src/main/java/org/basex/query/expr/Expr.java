@@ -283,8 +283,9 @@ public abstract class Expr extends ExprInfo {
   public abstract SeqType type();
 
   /**
-   * Indicates if the items returned by this expression are iterable, i.e., if returned
-   * node are in document order and contain no duplicates.
+   * Indicates if the items returned by this expression are iterable, i.e., if returned nodes are
+   * in document order and contain no duplicates. This will also be guaranteed if zero or one
+   * item is returned.
    * It is e.g. called by {@link AxisPath}.
    * @return result of check
    */
