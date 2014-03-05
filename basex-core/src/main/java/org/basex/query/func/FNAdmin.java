@@ -39,8 +39,6 @@ public final class FNAdmin extends StandardFunc {
   private static final String ENTRY = "entry";
   /** Size element name. */
   private static final String SIZE = "size";
-  /** QName: date. */
-  private static final String DATE = "date";
   /** QName: time. */
   private static final String TIME = "time";
   /** QName: address. */
@@ -86,7 +84,7 @@ public final class FNAdmin extends StandardFunc {
       // return list of all log files
       for(final IOFile f : ctx.context.log.files()) {
         final String date = f.name().replace(IO.LOGSUFFIX, "");
-        vb.add(new FElem(FILE).add(DATE, date).add(SIZE, Token.token(f.length())));
+        vb.add(new FElem(FILE).add(date).add(SIZE, Token.token(f.length())));
       }
     } else {
       // return log file contents
