@@ -136,11 +136,11 @@ final class ProjectFilter extends BaseXBack {
 
   /**
    * Filters the entries.
-   * @param pattern files pattern
-   * @param content contents pattern
+   * @param file file search string
+   * @param content content search string
    * @param thread thread id
    */
-  void filter(final String pattern, final String content, final int thread) {
+  void filter(final String file, final String content, final int thread) {
     // wait when command is still running
     while(running) {
       Thread.yield();
@@ -155,12 +155,12 @@ final class ProjectFilter extends BaseXBack {
     init(thread);
 
     // collect matches
-    final TokenSet matches = new TokenSet();
+    final TokenSet results = new TokenSet();
     final IntList il = new IntList();
     final TokenParser tp = new TokenParser(Token.token(content));
     while(tp.more()) il.add(Token.lc(tp.next()));
-    if(filter(pattern, il.toArray(), thread, matches)) {
-      project.list.setElements(matches, content.isEmpty() ? null : content);
+    if(filter(file, il.toArray(), thread, results)) {
+      project.list.setElements(results, content.isEmpty() ? null : content);
     }
 
     files.setCursor(CURSORTEXT);
@@ -219,13 +219,13 @@ final class ProjectFilter extends BaseXBack {
   /**
    * Chooses tokens from the file cache that match the specified pattern.
    * @param pattern file pattern
-   * @param content content pattern
+   * @param search search string
    * @param thread current thread id
-   * @param matches set with matches
+   * @param results search result
    * @return success flag
    */
-  private boolean filter(final String pattern, final int[] content, final int thread,
-      final TokenSet matches) {
+  private boolean filter(final String pattern, final int[] search, final int thread,
+      final TokenSet results) {
 
     // glob pattern
     if(pattern.contains("*") || pattern.contains("?")) {
@@ -233,14 +233,16 @@ final class ProjectFilter extends BaseXBack {
       for(final byte[] input : cache) {
         final int offset = offset(input, true);
         if(pt.matcher(Token.string(Token.substring(input, offset))).matches() &&
-            filterContent(input, content, matches)) return true;
+            filterContent(input, search, results)) return true;
         if(thread != threadID) return false;
       }
     }
+
     // starts-with, contains, camel case
     final byte[] patt = Token.token(pattern);
+    final TokenSet exclude = new TokenSet();
     for(int i = 0; i < 3; i++) {
-      if(!filter(patt, content, thread, i, matches)) return false;
+      if(!filter(patt, search, thread, i, results, exclude)) return false;
     }
     return true;
   }
@@ -248,16 +250,17 @@ final class ProjectFilter extends BaseXBack {
   /**
    * Chooses tokens from the file cache that match the specified pattern.
    * @param pattern file pattern
-   * @param cont content pattern
+   * @param search search string
    * @param thread current thread id
    * @param mode search mode (0-2)
-   * @param matches set with matches
+   * @param results search result
+   * @param exclude exclude file from content search
    * @return success flag
    */
-  private boolean filter(final byte[] pattern, final int[] cont, final int thread, final int mode,
-      final TokenSet matches) {
+  private boolean filter(final byte[] pattern, final int[] search, final int thread, final int mode,
+      final TokenSet results, final TokenSet exclude) {
 
-    if(matches.size() < MAXHITS) {
+    if(results.size() < MAXHITS) {
       final boolean path = Token.indexOf(pattern, '\\') != -1 || Token.indexOf(pattern, '/') != -1;
       for(final byte[] input : cache) {
         // check if current file matches the pattern
@@ -265,7 +268,10 @@ final class ProjectFilter extends BaseXBack {
         if(mode == 0 && Token.startsWith(input, pattern, offset) ||
            mode == 1 && Token.contains(input, pattern, offset) ||
            matches(input, pattern, offset)) {
-          if(filterContent(input, cont, matches)) return true;
+          if(!exclude.contains(input)) {
+            exclude.add(input);
+            if(filterContent(input, search, results)) return true;
+          }
         }
         if(thread != threadID) return false;
       }
@@ -274,17 +280,18 @@ final class ProjectFilter extends BaseXBack {
   }
 
   /**
+   * Adds a file to the matches if the specified string is found.
    * Checks the file contents.
-   * @param input input path
-   * @param content content pattern
-   * @param matches set with matches
+   * @param path file path
+   * @param search search string
+   * @param results search result
    * @return maximum number of results reached
    */
-  private boolean filterContent(final byte[] input, final int[] content, final TokenSet matches) {
+  private boolean filterContent(final byte[] path, final int[] search, final TokenSet results) {
     // accept file; check file contents
-    if(filterContent(input, content) && !matches.contains(input)) {
-      matches.add(input);
-      if(matches.size() >= MAXHITS) return true;
+    if(filterContent(path, search) && !results.contains(path)) {
+      results.add(path);
+      if(results.size() >= MAXHITS) return true;
     }
     return false;
   }
@@ -292,31 +299,44 @@ final class ProjectFilter extends BaseXBack {
   /**
    * Searches a string in a file.
    * @param path file path
-   * @param cont file contents
-   * @return result of check
+   * @param search search string
+   * @return success flag
    */
-  private boolean filterContent(final byte[] path, final int[] cont) {
-    final int cl = cont.length;
+  private boolean filterContent(final byte[] path, final int[] search) {
+    final int cl = search.length;
     if(cl == 0) return true;
 
-    TextInput ti = null;
     try {
-      ti = new TextInput(new IOFile(Token.string(path)));
-      for(int c = 0, cp = 0; (cp = ti.read()) != -1;) {
-        if(!XMLToken.valid(cp)) break;
-        if(Token.lc(cp) == cont[c]) {
-          if(++c == cl) return true;
-        } else {
-          c = 0;
+      final TextInput ti = new TextInput(new IOFile(Token.string(path)));
+      try {
+        final IntList il = new IntList(cl - 1);
+        int c = 0;
+        while(true) {
+          if(!il.isEmpty()) {
+            if(il.deleteAt(0) == search[c++]) continue;
+            c = 0;
+          }
+          while(true) {
+            final int cp = ti.read();
+            if(cp == -1 || !XMLToken.valid(cp)) return false;
+            final int lc = Token.lc(cp);
+            if(c > 0) il.add(lc);
+            if(lc == search[c]) {
+              if(++c == cl) return true;
+            } else {
+              c = 0;
+              break;
+            }
+          }
         }
+      } finally {
+        ti.close();
       }
     } catch(final IOException ex) {
       // file may not be accessible
       Util.debug(ex);
-    } finally {
-      if(ti != null) try { ti.close(); } catch(final IOException ignored) { }
+      return false;
     }
-    return false;
   }
 
   /**

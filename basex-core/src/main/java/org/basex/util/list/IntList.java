@@ -116,9 +116,12 @@ public class IntList extends ElementList {
   /**
    * Deletes the element at the specified position.
    * @param index index of the element to delete
+   * @return deleted element
    */
-  public final void deleteAt(final int index) {
+  public final int deleteAt(final int index) {
+    final int l = list[index];
     Array.move(list, index + 1, -1, --size - index);
+    return l;
   }
 
   /**

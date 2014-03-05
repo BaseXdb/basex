@@ -118,11 +118,14 @@ public class StringList extends ElementList implements Iterable<String> {
   }
 
   /**
-   * Deletes the specified element.
-   * @param index index of element to be deleted
+   * Deletes the element at the specified position.
+   * @param index index of the element to delete
+   * @return deleted element
    */
-  public final void deleteAt(final int index) {
+  public final String deleteAt(final int index) {
+    final String l = list[index];
     Array.move(list, index + 1, -1, --size - index);
+    return l;
   }
 
   /**

@@ -95,9 +95,12 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   /**
    * Deletes the element at the specified position.
    * @param index index of the element to delete
+   * @return deleted element
    */
-  public void deleteAt(final int index) {
+  public byte[] deleteAt(final int index) {
+    final byte[] l = list[index];
     Array.move(list, index + 1, -1, --size - index);
+    return l;
   }
 
   /**
