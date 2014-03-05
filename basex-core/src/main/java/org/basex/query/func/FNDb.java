@@ -631,6 +631,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item create(final QueryContext ctx) throws QueryException {
+    //checkCreate(ctx);
     final String name = string(checkStr(expr[0], ctx));
     if(!Databases.validName(name)) throw BXDB_NAME.get(info, name);
 
@@ -665,15 +666,13 @@ public final class FNDb extends StandardFunc {
   }
 
   /**
-   * Performs the create function.
+   * Performs the drop function.
    * @param ctx query context
    * @return {@code null}
    * @throws QueryException query exception
    */
   private Item drop(final QueryContext ctx) throws QueryException {
-    checkAdmin(ctx);
-    final Data data = checkWrite(checkData(ctx), ctx);
-    ctx.updates.add(new DBDrop(data, info, ctx), ctx);
+    ctx.updates.add(new DBDrop(checkData(ctx), info, ctx), ctx);
     return null;
   }
 

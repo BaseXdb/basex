@@ -168,9 +168,9 @@ public abstract class RESTCmd extends Command {
    * Parses and sets database options.
    * @param rs REST session
    * Throws an exception if an option is unknown.
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
-  static void parseOptions(final RESTSession rs) throws BaseXException {
+  static void parseOptions(final RESTSession rs) throws IOException {
     for(final Entry<String, String[]> param : rs.http.params().entrySet())
       parseOption(rs, param, true);
   }
