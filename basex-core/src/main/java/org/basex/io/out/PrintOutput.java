@@ -49,9 +49,19 @@ public class PrintOutput extends OutputStream {
    */
   public static PrintOutput get(final OutputStream out) {
     return out instanceof PrintOutput ? (PrintOutput) out : new PrintOutput(
-        out instanceof ByteArrayOutputStream ||
-        out instanceof BufferedOutputStream ||
-        out instanceof BufferOutput ? out : new BufferOutput(out));
+           out instanceof ByteArrayOutputStream ||
+           out instanceof BufferedOutputStream ||
+           out instanceof BufferOutput ? out : new BufferOutput(out));
+  }
+
+  /**
+   * Sets the maximum number of bytes to be written.
+   * If the number is negative, all bytes will be written.
+   * Note that the limit might break unicode characters.
+   * @param m maximum
+   */
+  public void setLimit(final int m) {
+    max = m < 0 ? Long.MAX_VALUE : m;
   }
 
   @Override

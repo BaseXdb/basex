@@ -99,6 +99,9 @@ public final class SerializerOptions extends Options {
   /** Specific serialization parameter. */
   public static final OptionsOption<JsonSerialOptions> JSON =
       new OptionsOption<JsonSerialOptions>("json", new JsonSerialOptions());
+  /** Specific serialization parameter: limit. */
+  public static final NumberOption LIMIT =
+      new NumberOption("limit", -1);
 
   /** Yes/No enumeration. */
   public enum YesNo {

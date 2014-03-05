@@ -143,7 +143,8 @@ public final class TextView extends View {
   private void setText(final Nodes n) {
     if(visible()) {
       try {
-        final ArrayOutput ao = new ArrayOutput().max(gui.gopts.get(GUIOptions.MAXTEXT));
+        final ArrayOutput ao = new ArrayOutput();
+        ao.setLimit(gui.gopts.get(GUIOptions.MAXTEXT));
         if(n != null) n.serialize(Serializer.get(ao));
         setText(ao);
         cmd = null;

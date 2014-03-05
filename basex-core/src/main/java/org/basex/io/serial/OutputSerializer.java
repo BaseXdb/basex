@@ -149,6 +149,8 @@ public abstract class OutputSerializer extends Serializer {
 
     // print byte-order-mark
     out = PrintOutput.get(os);
+    out.setLimit(opts.get(LIMIT));
+
     if(bom) {
       // comparison by reference
       if(enc == UTF8) {
