@@ -66,8 +66,8 @@ abstract class Set extends Arr {
   protected abstract NodeIter iter(final Iter[] iter);
 
   @Override
-  public boolean iterable() {
-    return true;
+  public final boolean iterable() {
+    return iterable;
   }
 
   /**

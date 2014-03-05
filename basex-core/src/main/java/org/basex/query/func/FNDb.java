@@ -900,8 +900,7 @@ public final class FNDb extends StandardFunc {
 
   @Override
   public boolean iterable() {
-    // index functions will always yield ordered and duplicate-free results
-    return oneOf(sig, _DB_OPEN, _DB_TEXT, _DB_ATTRIBUTE) || super.iterable();
+    return oneOf(sig, _DB_OPEN) || super.iterable();
   }
 
   /**
