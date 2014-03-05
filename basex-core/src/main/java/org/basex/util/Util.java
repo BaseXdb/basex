@@ -294,13 +294,4 @@ public final class Util {
   public static boolean no(final String string) {
     return Token.eqic(string, NO, FALSE, OFF);
   }
-
-  /**
-   * Returns an info message for the specified flag.
-   * @param flag current flag status
-   * @return ON/OFF message
-   */
-  public static String flag(final boolean flag) {
-    return flag ? INFOON : INFOOFF;
-  }
 }

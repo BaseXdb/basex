@@ -392,7 +392,6 @@ visualization        = Visualization
 watching_event_%     = Guarda l'evento '%'.
 whole_word           = Parola Intera
 write_locking        = Write Locking
-ws_chopping          = Rimozione spazi
 xquery               = XQuery
 yes                  = Sì
 

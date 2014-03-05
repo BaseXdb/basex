@@ -392,7 +392,6 @@ visualization        = ビジュアライゼーション
 watching_event_%     = イベント '%' を監視しています.
 whole_word           = 単語全体
 write_locking        = 書き込みロック
-ws_chopping          = 空白の除去
 xquery               = XQuery
 yes                  = はい
 

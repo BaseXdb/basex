@@ -392,7 +392,6 @@ visualization        = Visualisatie
 watching_event_%     = Monitor event '%'.
 whole_word           = Heel woord
 write_locking        = Write Locking
-ws_chopping          = Whitespace afkappen
 xquery               = XQuery
 yes                  = Ja
 
