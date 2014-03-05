@@ -922,9 +922,9 @@ public class QueryParser extends InputParser {
     final InputInfo ii = info();
     final QNm name = eQName(FUNCNAME, sc.funcNS);
     if(sc.xquery3() && keyword(name)) throw error(RESERVED, name.local());
+    wsCheck(PAR1);
     if(module != null && !eq(name.uri(), module.uri())) throw error(MODNS, name);
 
-    wsCheck(PAR1);
     pushVarContext(null);
     final Var[] args = paramList();
     wsCheck(PAR2);
