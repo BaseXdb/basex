@@ -958,7 +958,7 @@ public enum Err {
   /** XQST0047. */
   MODNS(XQST, 48, "Declaration % does not match the module namespace."),
   /** XQST0049. */
-  VARDUPL(XQST, 49, "Duplicate declaration of %."),
+  VARDUPL(XQST, 49, "Duplicate declaration of static variable $%."),
   /** XQST0052. */
   TYPEUNKNOWN30(XQST, 52, "Unknown cast type '%'."),
   /** XQST0054. */
