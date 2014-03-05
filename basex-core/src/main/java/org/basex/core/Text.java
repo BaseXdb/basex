@@ -837,8 +837,6 @@ public interface Text {
   /** "Strings were replaced.". */
   String STRINGS_REPLACED = lang("strings_replaced");
 
-  /** Info on whitespace chopping. */
-  String WS_CHOPPING = lang("ws_chopping");
   /** Info on text indexing. */
   String TEXT_INDEX = lang("text_index");
   /** Info on attribute indexing. */

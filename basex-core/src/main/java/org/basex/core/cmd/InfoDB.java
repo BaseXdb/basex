@@ -67,7 +67,7 @@ public final class InfoDB extends AInfo {
     if(meta.filesize != 0) info(tb, INPUT_SIZE, Performance.format(meta.filesize));
     info(tb, TIMESTAMP, DateTime.format(new Date(meta.time), DateTime.DATETIME));
     info(tb, ENCODING, meta.encoding);
-    info(tb, WS_CHOPPING, Util.flag(meta.chop));
+    info(tb, MainOptions.CHOP.name(), meta.chop);
 
     if(index) {
       tb.add(NL).addExt(header, INDEXES);

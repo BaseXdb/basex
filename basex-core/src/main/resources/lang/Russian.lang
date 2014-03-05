@@ -392,7 +392,6 @@ visualization        = Визуализация
 watching_event_%     = Слушается событие '%'
 whole_word           = Слово целиком
 write_locking        = Блокировка на запись
-ws_chopping          = Игнорирование пробелов
 xquery               = XQuery
 yes                  = Да
 
