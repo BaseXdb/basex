@@ -69,11 +69,11 @@ public abstract class AQuery extends Command {
           qp(query, context);
           parse(p);
           if(r == 0) plan(false);
-          if(!run) continue;
 
           qp.compile();
           info.compiling += p.time();
           if(r == 0) plan(true);
+          if(!run) continue;
 
           final PrintOutput po = r == 0 && serial ? out : new NullOutput();
           final Serializer ser;

@@ -4,6 +4,7 @@ import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 
 import java.io.*;
+import java.math.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -16,6 +17,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.server.*;
+import org.basex.server.Log.LogEntry;
 import org.basex.util.*;
 
 /**
@@ -87,37 +89,86 @@ public final class FNAdmin extends StandardFunc {
         vb.add(new FElem(FILE).add(date).add(SIZE, Token.token(f.length())));
       }
     } else {
-      // return log file contents
+      // return content of single log file
+      final boolean merge = expr.length > 1 && checkBln(expr[1], ctx);
       final String name = Token.string(checkStr(expr[0], ctx)) + IO.LOGSUFFIX;
       final IOFile file = new IOFile(ctx.context.log.dir(), name);
-      if(file.exists()) {
-        try {
-          final NewlineInput nli = new NewlineInput(file);
-          try {
-            for(String l; (l = nli.readLine()) != null;) {
-              final FElem elem = new FElem(ENTRY);
-              final String[] cols = l.split("\t");
-              if(cols.length > 2 && (cols[1].matches(".*:\\d+") ||
-                  cols[1].equals(Log.SERVER))) {
-                // new format (more specific)
-                elem.add(TIME, cols[0]).add(ADDRESS, cols[1]).add(USER, cols[2]);
-                if(cols.length > 3) elem.add(TYPE, cols[3].toLowerCase(Locale.ENGLISH));
-                if(cols.length > 4) elem.add(cols[4]);
-                if(cols.length > 5) elem.add(MS, cols[5].replace(" ms", ""));
-              } else {
-                elem.add(l);
+      final ArrayList<LogEntry> logs = logs(file);
+      for(int s = 0; s < logs.size(); s++) {
+        final LogEntry l1 = logs.get(s);
+        final FElem elem = new FElem(ENTRY);
+        if(l1.address != null) {
+          if(merge && l1.ms.equals(BigDecimal.ZERO) && !Log.SERVER.equals(l1.address)) {
+            for(int l = s + 1; l < logs.size(); l++) {
+              final LogEntry l2 = logs.get(l);
+              if(l2 != null && l1.address.equals(l2.address)) {
+                if(l2.type.equals(Log.REQUEST)) continue;
+                if(l1.type.equals(Log.REQUEST)) l1.type = "";
+                l1.type = merge(l1.type, l2.type);
+                l1.message = merge(l1.message, l2.message);
+                l1.ms = l1.ms.add(l2.ms);
+                logs.remove(l--);
+                if(!l2.message.equals(Log.REQUEST)) break;
               }
-              vb.add(elem);
             }
-          } finally {
-            nli.close();
           }
-        } catch(final IOException ex) {
-          throw IOERR.get(info, ex);
+          elem.add(TIME, l1.time).add(ADDRESS, l1.address).add(USER, l1.user);
+          if(l1.type != null) elem.add(TYPE, l1.type);
+          if(!l1.ms.equals(BigDecimal.ZERO)) elem.add(MS, l1.ms.toString());
+          if(l1.message != null) elem.add(l1.message);
+        } else {
+          elem.add(l1.message);
         }
+        vb.add(elem);
       }
     }
     return vb;
+  }
+
+  /**
+   * Merges two strings.
+   * @param s1 first string
+   * @param s2 second string
+   * @return merged string
+   */
+  private static String merge(final String s1, final String s2) {
+    return s2.isEmpty() ? s1 : s1.isEmpty() ? s2 : s1 + "; " + s2;
+  }
+
+  /**
+   * Returns all log entries.
+   * @param file log file
+   * @return list
+   * @throws QueryException query exception
+   */
+  private ArrayList<LogEntry> logs(final IOFile file) throws QueryException {
+    try {
+      final ArrayList<LogEntry> logs = new ArrayList<LogEntry>();
+      final NewlineInput nli = new NewlineInput(file);
+      try {
+        for(String line; (line = nli.readLine()) != null;) {
+          final LogEntry log = new LogEntry();
+          final String[] cols = line.split("\t");
+          if(cols.length > 2 && (cols[1].matches(".*:\\d+") || cols[1].equals(Log.SERVER))) {
+            log.time = cols[0];
+            log.address = cols[1];
+            log.user = cols[2];
+            log.type = cols.length > 3 ? cols[3] : "";
+            log.message = cols.length > 4 ? cols[4] : "";
+            log.ms = cols.length > 5 ? new BigDecimal(cols[5].replace(" ms", "")) : BigDecimal.ZERO;
+          } else {
+            // legacy format
+            log.message = line;
+          }
+          logs.add(log);
+        }
+        return logs;
+      } finally {
+        nli.close();
+      }
+    } catch(final IOException ex) {
+      throw IOERR.get(info, ex);
+    }
   }
 
   /**

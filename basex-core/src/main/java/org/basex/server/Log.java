@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.math.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -29,9 +30,9 @@ public final class Log {
   /** SERVER string. */
   public static final String SERVER = "SERVER";
   /** ERROR string. */
-  private static final String ERROR = "ERROR";
+  public static final String ERROR = "ERROR";
   /** REQUEST string. */
-  private static final String REQUEST = "REQUEST";
+  public static final String REQUEST = "REQUEST";
 
   /** Global options. */
   private final GlobalOptions gopts;
@@ -143,5 +144,23 @@ public final class Log {
    */
   public synchronized IOFile[] files() {
     return dir().children(".*\\" + IO.LOGSUFFIX);
+  }
+
+  /**
+   * Log entry.
+   */
+  public static class LogEntry {
+    /** Time. */
+    public String time;
+    /** Address. */
+    public String address;
+    /** User. */
+    public String user;
+    /** Type. */
+    public String type;
+    /** Milliseconds. */
+    public BigDecimal ms;
+    /** Message. */
+    public String message;
   }
 }

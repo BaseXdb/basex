@@ -103,9 +103,14 @@ public final class HTTPContext {
   /**
    * Returns an immutable map with all query parameters.
    * @return parameters
+   * @throws IOException I/O exception
    */
-  public Map<String, String[]> params() {
-    return req.getParameterMap();
+  public Map<String, String[]> params() throws IOException {
+    try {
+      return req.getParameterMap();
+    } catch(final IllegalStateException ex) {
+      throw new IOException(ex);
+    }
   }
 
   /**
