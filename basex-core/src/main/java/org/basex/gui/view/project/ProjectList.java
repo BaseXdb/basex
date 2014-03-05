@@ -70,24 +70,24 @@ public class ProjectList extends JList {
 
   /**
    * Assigns the specified list entries and selects the first entry.
-   * @param matches entries to set
+   * @param elements result elements
    * @param srch content search string
    */
-  void setElements(final TokenSet matches, final String srch) {
+  void setElements(final TokenSet elements, final String srch) {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
         // set new values and selections
-        final int is = matches.size();
+        final int is = elements.size();
         final String[] list = new String[is];
-        for(int i = 0; i < is; i++) list[i] = Token.string(matches.key(i + 1));
+        for(int i = 0; i < is; i++) list[i] = Token.string(elements.key(i + 1));
         if(changed(list)) {
           // check which old values had been selected
           final Object[] old = getSelectedValues();
           final IntList il = new IntList();
           for(final Object o : old) {
             for(int i = 0; i < is; i++) {
-              if(o.equals(matches.key(i + 1))) {
+              if(o.equals(elements.key(i + 1))) {
                 il.add(i);
                 break;
               }
