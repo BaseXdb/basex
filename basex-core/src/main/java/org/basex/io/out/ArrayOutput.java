@@ -17,17 +17,6 @@ public final class ArrayOutput extends PrintOutput {
   /** Byte buffer. */
   private byte[] buf = new byte[8];
 
-  /**
-   * Sets the maximum number of bytes to be written.
-   * Note that the limit might break unicode characters.
-   * @param m maximum
-   * @return self reference
-   */
-  public ArrayOutput max(final int m) {
-    max = m;
-    return this;
-  }
-
   @Override
   public void write(final int b) {
     final int s = (int) size;

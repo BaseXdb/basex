@@ -398,7 +398,8 @@ public final class GUI extends AGUI {
       command = cmd;
 
       // execute command and cache result
-      final ArrayOutput ao = new ArrayOutput().max(gopts.get(GUIOptions.MAXTEXT));
+      final ArrayOutput ao = new ArrayOutput();
+      ao.setLimit(gopts.get(GUIOptions.MAXTEXT));
       updating = cmd.updating(context);
 
       // updates the query editor
