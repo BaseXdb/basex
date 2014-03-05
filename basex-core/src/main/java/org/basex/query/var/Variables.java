@@ -168,7 +168,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
      * @throws QueryException if the variable was already declared
      */
     void setVar(final StaticVar vr) throws QueryException {
-      if(var != null) throw VARDUPL.get(vr.info, var);
+      if(var != null) throw VARDUPL.get(vr.info, var.name.string());
       var = vr;
       for(final StaticVarRef ref : refs) ref.init(var);
     }
