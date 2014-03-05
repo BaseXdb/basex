@@ -290,12 +290,6 @@ public final class FNFt extends StandardFunc {
   }
 
   @Override
-  public boolean iterable() {
-    // index functions will always yield ordered and duplicate-free results
-    return sig == _FT_SEARCH || super.iterable();
-  }
-
-  @Override
   public boolean accept(final ASTVisitor visitor) {
     return !(oneOf(sig, _FT_SEARCH, _FT_TOKENS) && !dataLock(visitor)) && super.accept(visitor);
   }
