@@ -266,7 +266,7 @@ public abstract class StandardFunc extends Arr {
     final HashMap<String, Value> hm = new HashMap<String, Value>();
     final int es = expr.length;
     if(i < es) {
-      final Map map = checkMap(expr[i].item(ctx, info));
+      final Map map = checkMap(checkItem(expr[i], ctx));
       for(final Item it : map.keys()) {
         final byte[] key;
         if(it instanceof Str) {

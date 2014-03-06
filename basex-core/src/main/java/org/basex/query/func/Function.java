@@ -869,7 +869,7 @@ public enum Function {
   /** XQuery function. */
   _INSPECT_CONTEXT(FNInspect.class, "context()", arg(), ELM),
   /** XQuery function. */
-  _INSPECT_FUNCTIONS(FNInspect.class, "functions()", arg(), FUN_ZM, flag(Flag.HOF)),
+  _INSPECT_FUNCTIONS(FNInspect.class, "functions([path])", arg(STR), FUN_ZM, flag(Flag.HOF)),
   /** XQuery function. */
   _INSPECT_XQDOC(FNInspect.class, "xqdoc(path)", arg(STR), ELM),
 
@@ -1002,12 +1002,14 @@ public enum Function {
   /* FNXQuery functions. */
 
   /** XQuery function. */
-  _XQUERY_EVAL(FNXQuery.class, "eval(string[,bindings])", arg(STR, ITEM), ITEM_ZM, flag(NDT)),
+  _XQUERY_EVAL(FNXQuery.class, "eval(string[,bindings[,options]])",
+      arg(STR, ITEM, ITEM), ITEM_ZM, flag(NDT)),
   /** XQuery function. */
-  _XQUERY_EVALUATE(FNXQuery.class, "evaluate(string[,bindings])",
-      arg(STR, ITEM), ITEM_ZM, flag(NDT)),
+  _XQUERY_EVALUATE(FNXQuery.class, "evaluate(string[,bindings[,options]])",
+      arg(STR, ITEM, ITEM), ITEM_ZM, flag(NDT)),
   /** XQuery function. */
-  _XQUERY_INVOKE(FNXQuery.class, "invoke(uri[,bindings])", arg(STR, ITEM), ITEM_ZM, flag(NDT)),
+  _XQUERY_INVOKE(FNXQuery.class, "invoke(uri[,bindings[,options]])",
+      arg(STR, ITEM, ITEM), ITEM_ZM, flag(NDT)),
   /** XQuery function. */
   _XQUERY_TYPE(FNXQuery.class, "type(value)", arg(ITEM_ZM), ITEM_ZM),
 

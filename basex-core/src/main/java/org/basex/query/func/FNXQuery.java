@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
@@ -17,6 +18,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * XQuery functions.
@@ -25,6 +27,19 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FNXQuery extends StandardFunc {
+  /** Module prefix. */
+  private static final String PREFIX = "xquery";
+  /** QName. */
+  private static final QNm Q_OPTIONS = QNm.get(PREFIX, "options", XQUERYURI);
+
+  /** XQuery options. */
+  public static class XQueryOptions extends Options {
+    /** Permission. */
+    public static final StringOption PERMISSION = new StringOption("permission", Perm.ADMIN.name());
+    /** Timeout. */
+    public static final NumberOption TIMEOUT = new NumberOption("timeout", 0);
+  }
+
   /**
    * Constructor.
    * @param sctx static context
@@ -97,6 +112,26 @@ public final class FNXQuery extends StandardFunc {
       if(k.isEmpty()) qc.context(v, null, sctx);
       else qc.bind(k, v, null);
     }
+
+    Thread to = null;
+    final Perm tmp = ctx.context.user.perm;
+    if(expr.length > 2) {
+      final Options opts = checkOptions(2, Q_OPTIONS, new XQueryOptions(), ctx);
+      ctx.context.user.perm = Perm.get(opts.get(XQueryOptions.PERMISSION));
+      final long ms = opts.get(XQueryOptions.TIMEOUT) * 1000l;
+      if(ms != 0) {
+        to = new Thread() {
+          @Override
+          public void run() {
+            Performance.sleep(ms);
+            qc.stop();
+          }
+        };
+        to.setDaemon(false);
+        to.start();
+      }
+    }
+
     // evaluate query
     try {
       qc.parseMain(string(qu), path, sctx);
@@ -114,8 +149,14 @@ public final class FNXQuery extends StandardFunc {
         }
       }
       return vb;
+    } catch(final ProcException ex) {
+      throw BXXQ_STOPPED.get(info);
+    } catch(final QueryException ex) {
+      throw ex.err() == BASX_PERM ? BXXQ_PERM.get(info, ex.getLocalizedMessage()) : ex;
     } finally {
+      ctx.context.user.perm = tmp;
       qc.close();
+      if(to != null) to.interrupt();
     }
   }
 
