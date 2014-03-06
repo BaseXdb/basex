@@ -115,6 +115,7 @@ public abstract class Proc {
         Proc.this.stop();
       }
     };
+    timeout.setDaemon(false);
     timeout.start();
   }
 

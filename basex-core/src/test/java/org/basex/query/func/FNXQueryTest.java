@@ -36,6 +36,11 @@ public final class FNXQueryTest extends AdvancedQueryTest {
         Err.BXXQ_UPDATING);
     query(_XQUERY_EVAL.args("declare %updating function local:x() {()}; 1"));
     query(_XQUERY_EVAL.args("\"" + DOC.args(PATH).replace('"', '\'') + "\""));
+    // check updating expressions
+    error(_XQUERY_EVAL.args("\"file:exists('x')\"", " map{}", " map{ 'permission':'none'}"),
+        Err.BXXQ_PERM);
+    error(_XQUERY_EVAL.args("\"(1 to 10000000000000)[.=0]\"", " map{}", " map{ 'timeout':'1'}"),
+        Err.BXXQ_STOPPED);
   }
 
   /** Test method. */
