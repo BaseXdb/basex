@@ -12,7 +12,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 
 /**
  * This class creates a new HTTP response.
@@ -55,12 +54,8 @@ final class RestXqResponse {
     final Expr[] args = new Expr[uf.args.length];
     function.bind(http, args, error);
 
-    // wrap function with a function call
-    final StaticFuncCall sfc = new StaticFuncCall(uf.name, args, uf.sc, uf.info).init(uf);
-    final MainModule mm = new MainModule(sfc, new VarScope(uf.sc), null, uf.sc);
-
-    // assign main module and http context and register process
-    query.mainModule(mm);
+    // assign function call and http context and register process
+    query.mainModule(MainModule.get(uf, args));
     query.http(http);
     query.context.register(query);
 

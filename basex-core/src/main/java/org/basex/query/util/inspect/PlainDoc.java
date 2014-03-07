@@ -50,7 +50,7 @@ public final class PlainDoc extends Inspect {
 
   @Override
   public FElem parse(final IO io) throws QueryException {
-    final QueryParser qp = parseQuery(io);
+    parseQuery(io);
     final FElem mod = elem("module", null);
     if(module instanceof LibraryModule) {
       final QNm name = ((LibraryModule) module).name;
@@ -61,8 +61,8 @@ public final class PlainDoc extends Inspect {
     final TokenObjMap<TokenList> doc = module.doc();
     if(doc != null) comment(doc, mod);
 
-    for(final StaticVar sv : qp.vars) variable(sv, mod);
-    for(final StaticFunc sf : qp.funcs) function(sf.name, sf, sf.funcType(), mod);
+    for(final StaticVar sv : module.vars().values()) variable(sv, mod);
+    for(final StaticFunc sf : module.funcs().values()) function(sf.name, sf, sf.funcType(), mod);
     return mod;
   }
 

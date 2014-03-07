@@ -70,7 +70,7 @@ public final class XQDoc extends Inspect {
 
     // variables
     final FElem variables = elem("variables", xqdoc);
-    for(final StaticVar sv : qp.vars) {
+    for(final StaticVar sv : module.vars().values()) {
       final FElem variable = elem("variable", variables);
       elem("name", variable).add(sv.name.string());
       if(sv.name.hasPrefix()) nsCache.put(sv.name.prefix(), sv.name.uri());
@@ -81,7 +81,7 @@ public final class XQDoc extends Inspect {
 
     // functions
     final FElem functions = elem("functions", xqdoc);
-    for(final StaticFunc sf : qp.funcs) {
+    for(final StaticFunc sf : module.funcs().values()) {
       final int al = sf.arity();
       final QNm name = sf.funcName();
       final FuncType t = sf.funcType();

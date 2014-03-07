@@ -47,6 +47,8 @@ public final class QueryContext extends Proc {
   /** URL pattern (matching Clark and EQName notation). */
   private static final Pattern BIND = Pattern.compile("^((\"|')(.*?)\\2:|Q?(\\{(.*?)\\}))(.+)$");
 
+  /** Imported modules. */
+  private final TokenObjMap<Module> modules = new TokenObjMap<Module>();
   /** The evaluation stack. */
   public final QueryStack stack = new QueryStack();
   /** Static variables. */
@@ -140,7 +142,7 @@ public final class QueryContext extends Proc {
   /** Initial context value. */
   public MainModule ctxItem;
   /** Module loader. */
-  public final ModuleLoader modules;
+  public final ModuleLoader modLoader;
   /** Opened connections to relational databases. */
   private JDBCConnections jdbc;
   /** Opened connections to relational databases. */
@@ -172,7 +174,7 @@ public final class QueryContext extends Proc {
   public QueryContext(final Context ctx) {
     context = ctx;
     nodes = ctx.current();
-    modules = new ModuleLoader(ctx);
+    modLoader = new ModuleLoader(ctx);
     info = new QueryInfo(this);
   }
 
@@ -269,7 +271,7 @@ public final class QueryContext extends Proc {
       } catch(final QueryException ex) {
         if(ex.err() != NOCTX) throw ex;
         // only {@link ParseExpr} instances may cause this error
-        throw CIRCCTX.get(ctxItem.info);
+        throw NOCTXDECL.get(ctxItem.info);
       }
     } else if(nodes != null) {
       // add full-text container reference
@@ -409,7 +411,7 @@ public final class QueryContext extends Proc {
    */
   public void context(final Object val, final String type, final StaticContext sc)
       throws QueryException {
-    ctxItem = new MainModule(cast(val, type), new VarScope(sc), null, sc);
+    ctxItem = MainModule.get(cast(val, type), new VarScope(sc), null, null, sc, null);
   }
 
   /**
@@ -527,7 +529,7 @@ public final class QueryContext extends Proc {
     // close client sessions
     if(sessions != null) sessions.close();
     // close dynamically loaded JAR files
-    modules.close();
+    modLoader.close();
   }
 
   @Override

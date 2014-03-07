@@ -31,7 +31,7 @@ public abstract class Inspect {
   final InputInfo info;
 
   /** Parsed main module. */
-  StaticScope module;
+  Module module;
 
   /**
    * Constructor.

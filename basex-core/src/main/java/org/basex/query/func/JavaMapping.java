@@ -230,7 +230,7 @@ public abstract class JavaMapping extends Arr {
     // check imported Java modules
     final String path = camelCase(toPath(java ? substring(uri, JAVAPREF.length) : uri));
 
-    final Object jm  = ctx.modules.findImport(path);
+    final Object jm  = ctx.modLoader.findImport(path);
     if(jm != null) {
       final Method meth = getModMethod(jm, path, name, args.length, ctx, ii);
       if(meth != null) return new JavaModuleFunc(sctx, ii, jm, meth, args);
@@ -241,7 +241,7 @@ public abstract class JavaMapping extends Arr {
 
     // check addressed class
     try {
-      return new JavaFunc(sctx, ii, ctx.modules.findClass(path), name, args);
+      return new JavaFunc(sctx, ii, ctx.modLoader.findClass(path), name, args);
     } catch(final ClassNotFoundException ex) {
       // only throw exception if "java:" prefix was explicitly specified
       if(java) throw FUNCJAVA.get(ii, path);

@@ -71,12 +71,15 @@ public class QueryParser extends InputParser {
     KEYWORDS30.add(SWITCH);
   }
 
+  /** Imported modules. */
+  final TokenSet imports = new TokenSet();
   /** Modules loaded by the current file. */
   public final TokenSet modules = new TokenSet();
   /** Parsed variables. */
-  public final ArrayList<StaticVar> vars = new ArrayList<StaticVar>();
+  public final TokenObjMap<StaticVar> vars = new TokenObjMap<StaticVar>();
   /** Parsed functions. */
-  public final ArrayList<StaticFunc> funcs = new ArrayList<StaticFunc>();
+  public final TokenObjMap<StaticFunc> funcs = new TokenObjMap<StaticFunc>();
+
   /** Namespaces. */
   public final TokenMap namespaces = new TokenMap();
 
@@ -200,7 +203,8 @@ public class QueryParser extends InputParser {
       if(e == null) throw alter == null ? error(EXPREMPTY) : error();
       final VarScope scope = popVarContext();
 
-      final MainModule mm = new MainModule(e, scope, moduleDoc, sc);
+      final MainModule mm = new MainModule(
+          e, scope, null, moduleDoc, funcs, vars, imports, sc, null);
       finish(mm, true);
       return mm;
     } catch(final QueryException ex) {
@@ -246,7 +250,9 @@ public class QueryParser extends InputParser {
       finish(null, check);
 
       ctx.modStack.pop();
-      return new LibraryModule(module, moduleDoc, sc);
+
+      return new LibraryModule(module, moduleDoc, funcs, vars, imports, sc);
+
     } catch(final QueryException ex) {
       mark();
       ex.pos(this);
@@ -773,7 +779,7 @@ public class QueryParser extends InputParser {
     for(final byte[] u : Function.URIS.values()) if(eq(uri, u)) return;
 
     // resolve module uri
-    if(ctx.modules.addImport(uri, info(), this)) return;
+    if(ctx.modLoader.addImport(uri, info(), this)) return;
 
     throw error(WHICHMODULE, uri);
   }
@@ -797,19 +803,21 @@ public class QueryParser extends InputParser {
    */
   private void module(final byte[] path, final byte[] uri, final boolean imprt)
       throws QueryException {
+
     // get absolute path
     final IO io = sc.io(string(path));
-    final byte[] p = token(io.path());
+    final byte[] pth = token(io.path());
 
     // check if module has already been parsed
-    final byte[] u = ctx.modParsed.get(p);
+    final byte[] u = ctx.modParsed.get(pth);
     if(u != null) {
       if(!eq(uri, u)) throw error(WRONGMODULE, uri,
           ctx.context.user.has(Perm.ADMIN) ? io.path() : io.name());
-      if(!sc.xquery3() && ctx.modStack.contains(p)) throw error(CIRCMODULE);
+      if(!sc.xquery3() && ctx.modStack.contains(pth)) throw error(CIRCMODULE);
       return;
     }
-    ctx.modParsed.put(p, uri);
+    ctx.modParsed.put(pth, uri);
+    imports.put(uri);
 
     // read module
     String qu = null;
@@ -819,10 +827,9 @@ public class QueryParser extends InputParser {
       throw error(WHICHMODFILE, ctx.context.user.has(Perm.ADMIN) ? io.path() : io.name());
     }
 
-    ctx.modStack.push(p);
+    ctx.modStack.push(pth);
     final StaticContext sub = new StaticContext(sc.xquery3());
-    final LibraryModule lib =
-        new QueryParser(qu, io.path(), ctx, sub).parseLibrary(!imprt);
+    final LibraryModule lib = new QueryParser(qu, io.path(), ctx, sub).parseLibrary(!imprt);
     final byte[] muri = lib.name.uri();
 
     // check if import and declaration uri match
@@ -860,13 +867,13 @@ public class QueryParser extends InputParser {
     else if(!wsConsumeWs(ASSIGN)) return;
 
     pushVarContext(null);
-    final Expr e = check(single(), NOVARDECL);
+    final Expr expr = check(single(), NOVARDECL);
     final SeqType type = sc.initType == null ? SeqType.ITEM : sc.initType;
     final VarScope scope = popVarContext();
-    ctx.ctxItem = new MainModule(e, scope, type, currDoc.toString(), sc, info());
+    ctx.ctxItem = MainModule.get(expr, scope, type, currDoc.toString(), sc, info());
 
     if(module != null) throw error(DECITEM);
-    if(e.has(Flag.UPD)) throw error(UPCTX, e);
+    if(expr.has(Flag.UPD)) throw error(UPCTX, expr);
   }
 
   /**
@@ -890,8 +897,9 @@ public class QueryParser extends InputParser {
     }
 
     final VarScope scope = popVarContext();
-    vars.add(ctx.vars.declare(vn, tp, ann, bind, external, sc, scope,
-        currDoc.toString(), info()));
+    final StaticVar var = ctx.vars.declare(vn, tp, ann, bind, external, sc, scope,
+        currDoc.toString(), info());
+    vars.put(var.id(), var);
   }
 
   /**
@@ -933,8 +941,9 @@ public class QueryParser extends InputParser {
     final Expr body = wsConsumeWs(EXTERNAL) ? null : enclosed(NOFUNBODY);
     final VarScope scope = popVarContext();
 
-    funcs.add(ctx.funcs.declare(ann, name, args, tp, body, sc, scope,
-        currDoc.toString(), ii));
+    final StaticFunc func = ctx.funcs.declare(ann, name, args, tp, body, sc, scope,
+        currDoc.toString(), ii);
+    funcs.put(func.id(), func);
   }
 
   /**

@@ -1,5 +1,12 @@
 package org.basex.query.func;
 
+import static org.basex.query.util.Err.*;
+import static org.basex.util.Token.*;
+
+import java.io.*;
+import java.util.*;
+
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -109,9 +116,25 @@ public final class FNInspect extends StandardFunc {
    */
   private ValueBuilder functions(final QueryContext ctx) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
+    final ArrayList<StaticFunc> ignore = new ArrayList<StaticFunc>();
+
+    if(expr.length > 0) {
+      try {
+        // add existing functions to ignore list
+        for(final StaticFunc sf : ctx.funcs.funcs()) ignore.add(sf);
+        final IO path = checkPath(expr[0], ctx);
+        ctx.parse(string(path.read()), path.path(), sc);
+        ctx.compile();
+      } catch(final IOException ex) {
+        throw IOERR.get(info, ex);
+      }
+    }
+
     for(final StaticFunc sf : ctx.funcs.funcs()) {
-      final FuncItem fi = Functions.getUser(sf, ctx, sf.sc, info);
-      if(!fi.annotations().contains(Ann.Q_UPDATING)) vb.add(fi);
+      if(!ignore.contains(sf)) {
+        final FuncItem fi = Functions.getUser(sf, ctx, sf.sc, info);
+        if(!fi.annotations().contains(Ann.Q_UPDATING)) vb.add(fi);
+      }
     }
     return vb;
   }

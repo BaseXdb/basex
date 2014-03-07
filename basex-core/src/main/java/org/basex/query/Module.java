@@ -14,11 +14,11 @@ import org.basex.util.hash.*;
  */
 public abstract class Module extends StaticScope {
   /** User-defined functions. */
-  final TokenObjMap<StaticFunc> funcs;
+  private final TokenObjMap<StaticFunc> funcs;
   /** Static variables. */
-  final TokenObjMap<StaticVar> vars;
-  /** Imported modules. */
-  final TokenObjMap<LibraryModule> modules;
+  private final TokenObjMap<StaticVar> vars;
+  /** Namespace URIs of imported modules. */
+  private final TokenSet imports;
 
   /**
    * Constructor.
@@ -26,18 +26,17 @@ public abstract class Module extends StaticScope {
    * @param xqdoc documentation
    * @param funcs user-defined functions
    * @param vars static variables
-   * @param modules imported modules
+   * @param imports namespace URIs of imported modules
    * @param sctx static context
-   * @param ii input info
+   * @param info input info
    */
   public Module(final VarScope scp, final String xqdoc, final TokenObjMap<StaticFunc> funcs,
-      final TokenObjMap<StaticVar> vars, final TokenObjMap<LibraryModule> modules,
-      final StaticContext sctx, final InputInfo ii) {
-
-    super(scp, xqdoc, sctx, ii);
+      final TokenObjMap<StaticVar> vars, final TokenSet imports, final StaticContext sctx,
+      final InputInfo info) {
+    super(scp, xqdoc, sctx, info);
     this.funcs = funcs;
     this.vars = vars;
-    this.modules = modules;
+    this.imports = imports;
   }
 
   /**
