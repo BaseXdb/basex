@@ -83,7 +83,7 @@ public final class WebDAVLockService {
     query.bind("type", type);
     query.bind("depth", depth);
     query.bind("owner", user);
-    query.bind("timeout", to == null ? Long.toString(Long.MAX_VALUE) : to.toString());
+    query.bind("timeout", to == null ? Long.MAX_VALUE : to);
     execute(query);
     return token;
   }
@@ -151,7 +151,7 @@ public final class WebDAVLockService {
 
     final QueryProcessor qp = new QueryProcessor(query.toString(), http.context());
     try {
-      for(final Entry<String, String> entry : query.entries()) {
+      for(final Entry<String, Object> entry : query.entries()) {
         qp.bind(entry.getKey(), entry.getValue());
       }
       qp.ctx.parseLibrary(string(module), FILE, qp.sc);

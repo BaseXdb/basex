@@ -1,8 +1,6 @@
 package org.basex.http.webdav.impl;
 
 import java.util.*;
-import java.util.Map.*;
-
 
 /**
  * Query builder.
@@ -14,7 +12,7 @@ final class WebDAVQuery {
   /** String query. */
   private final String query;
   /** Bindings. */
-  private final HashMap<String, String> bindings = new HashMap<String, String>();
+  private final HashMap<String, Object> bindings = new HashMap<String, Object>();
 
   /**
    * Constructor.
@@ -30,7 +28,7 @@ final class WebDAVQuery {
    * @param value value of variable
    * @return self reference
    */
-  WebDAVQuery bind(final String name, final String value) {
+  WebDAVQuery bind(final String name, final Object value) {
     bindings.put(name, value);
     return this;
   }
@@ -39,15 +37,15 @@ final class WebDAVQuery {
    * Returns the hash map entries.
    * @return self reference
    */
-  Set<Map.Entry<String, String>> entries() {
+  Set<Map.Entry<String, Object>> entries() {
     return bindings.entrySet();
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(final Entry<String, String> entry : entries()) {
-      sb.append("declare variable $").append(entry.getKey()).append(" external;");
+    for(final String v : bindings.keySet()) {
+      sb.append("declare variable $").append(v).append(" external;");
     }
     return sb.append(query).toString();
   }
