@@ -75,7 +75,7 @@ public final class TarInputStream extends FilterInputStream {
     // close entry
     if(entry != null) {
       long ln = entry.getSize() - size + BLOCK - (size & (BLOCK - 1));
-      while(ln > 0) ln -= skip(ln);
+      while(ln != BLOCK && ln > 0) ln -= skip(ln);
       entry = null;
       size = 0;
     }
