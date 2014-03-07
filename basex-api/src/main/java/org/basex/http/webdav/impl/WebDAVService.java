@@ -553,7 +553,7 @@ public final class WebDAVService<T> {
    */
   private StringList execute(final WebDAVQuery query) throws IOException {
     final LocalQuery lq = session.query(query.toString());
-    for(final Entry<String, String> entry : query.entries()) {
+    for(final Entry<String, Object> entry : query.entries()) {
       lq.bind(entry.getKey(), entry.getValue());
     }
     final StringList sl = new StringList();
