@@ -152,14 +152,6 @@ final class DatabaseUpdates {
 
   /**
    * Locks the database for write operations.
-   * @throws QueryException query exception
-   */
-  void startUpdate() throws QueryException {
-    if(!data.startUpdate()) throw BXDB_OPENED.get(null, data.meta.name);
-  }
-
-  /**
-   * Locks the database for write operations.
    */
   void finishUpdate() {
     // may have been invalidated by db:drop
