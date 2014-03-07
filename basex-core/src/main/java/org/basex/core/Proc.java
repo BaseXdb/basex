@@ -67,7 +67,7 @@ public abstract class Proc {
    * @param proc process
    * @return passed on process reference
    */
-  protected final <P extends Proc> P proc(final P proc) {
+  public final <P extends Proc> P proc(final P proc) {
     sub = proc;
     if(proc != null) {
       proc.listen = listen;
@@ -115,7 +115,7 @@ public abstract class Proc {
         Proc.this.stop();
       }
     };
-    timeout.setDaemon(false);
+    timeout.setDaemon(true);
     timeout.start();
   }
 

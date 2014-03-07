@@ -36,8 +36,10 @@ public final class FNXQuery extends StandardFunc {
   public static class XQueryOptions extends Options {
     /** Permission. */
     public static final StringOption PERMISSION = new StringOption("permission", Perm.ADMIN.name());
-    /** Timeout. */
+    /** Timeout in seconds. */
     public static final NumberOption TIMEOUT = new NumberOption("timeout", 0);
+    /** Maximum amount of megabytes that may be allocated by the query. */
+    public static final NumberOption MEMORY = new NumberOption("memory", 0);
   }
 
   /**
@@ -113,27 +115,41 @@ public final class FNXQuery extends StandardFunc {
       else qc.bind(k, v, null);
     }
 
-    Thread to = null;
+    final Timer to = new Timer(true);
     final Perm tmp = ctx.context.user.perm;
     if(expr.length > 2) {
       final Options opts = checkOptions(2, Q_OPTIONS, new XQueryOptions(), ctx);
       ctx.context.user.perm = Perm.get(opts.get(XQueryOptions.PERMISSION));
-      final long ms = opts.get(XQueryOptions.TIMEOUT) * 1000l;
-      if(ms != 0) {
-        to = new Thread() {
+      // initial memory consumption: perform garbage collection and calculate usage
+      Performance.gc(2);
+      final long mb = opts.get(XQueryOptions.MEMORY);
+      if(mb != 0) {
+        final long limit = Performance.memory() + (mb << 20);
+        to.schedule(new TimerTask() {
           @Override
           public void run() {
-            Performance.sleep(ms);
+            // limit reached: perform garbage collection and check again
+            if(Performance.memory() > limit) {
+              Performance.gc(1);
+              if(Performance.memory() > limit) qc.stop();
+            }
+          }
+        }, 500, 500);
+      }
+      final long ms = opts.get(XQueryOptions.TIMEOUT) * 1000l;
+      if(ms != 0) {
+        to.schedule(new TimerTask() {
+          @Override
+          public void run() {
             qc.stop();
           }
-        };
-        to.setDaemon(false);
-        to.start();
+        }, ms);
       }
     }
 
     // evaluate query
     try {
+      ctx.proc(qc);
       qc.parseMain(string(qu), path, sctx);
       if(qc.updating) throw BXXQ_UPDATING.get(info);
       qc.compile();
@@ -155,8 +171,9 @@ public final class FNXQuery extends StandardFunc {
       throw ex.err() == BASX_PERM ? BXXQ_PERM.get(info, ex.getLocalizedMessage()) : ex;
     } finally {
       ctx.context.user.perm = tmp;
+      ctx.proc(null);
       qc.close();
-      if(to != null) to.interrupt();
+      to.cancel();
     }
   }
 
