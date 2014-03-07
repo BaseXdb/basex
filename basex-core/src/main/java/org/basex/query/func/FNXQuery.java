@@ -131,7 +131,7 @@ public final class FNXQuery extends StandardFunc {
             // limit reached: perform garbage collection and check again
             if(Performance.memory() > limit) {
               Performance.gc(1);
-              if(Performance.memory() > limit) qc.stop();
+              if(Performance.memory() > limit) ctx.stop();
             }
           }
         }, 500, 500);
@@ -140,9 +140,7 @@ public final class FNXQuery extends StandardFunc {
       if(ms != 0) {
         to.schedule(new TimerTask() {
           @Override
-          public void run() {
-            qc.stop();
-          }
+          public void run() { ctx.stop(); }
         }, ms);
       }
     }
