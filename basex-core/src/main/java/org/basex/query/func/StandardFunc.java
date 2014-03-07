@@ -294,6 +294,7 @@ public abstract class StandardFunc extends Arr {
       throws QueryException {
 
     for(Item it; (it = ir.next()) != null;) {
+      ctx.checkStop();
       if(it instanceof FItem) throw FIVALUE.get(info, it.type);
       // cache database nodes
       final Data d = it.data();

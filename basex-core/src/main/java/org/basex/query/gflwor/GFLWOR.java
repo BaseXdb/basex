@@ -69,6 +69,7 @@ public final class GFLWOR extends ParseExpr {
         if(drained) return null;
         while(true) {
           final Item it = sub.next();
+          ctx.checkStop();
           if(it != null) return it;
           if(!ev.next(ctx)) {
             drained = true;
