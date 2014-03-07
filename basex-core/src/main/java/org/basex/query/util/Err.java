@@ -201,7 +201,7 @@ public enum Err {
   /** BXXQ0002. */
   BXXQ_PERM(BXXQ, 3, "%"),
   /** BXXQ0004. */
-  BXXQ_STOPPED(BXXQ, 4, "Query execution exceeded timeout."),
+  BXXQ_STOPPED(BXXQ, 4, "Timeout or assigned memory was exceeded."),
 
   // Unit module
 
