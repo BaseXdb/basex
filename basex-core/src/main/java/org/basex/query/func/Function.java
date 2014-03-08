@@ -873,7 +873,7 @@ public enum Function {
   /** XQuery function. */
   _INSPECT_CONTEXT(FNInspect.class, "context()", arg(), ELM),
   /** XQuery function. */
-  _INSPECT_FUNCTIONS(FNInspect.class, "functions([path])", arg(STR), FUN_ZM, flag(Flag.HOF)),
+  _INSPECT_FUNCTIONS(FNInspect.class, "functions()", arg(), FUN_ZM, flag(Flag.HOF)),
   /** XQuery function. */
   _INSPECT_XQDOC(FNInspect.class, "xqdoc(path)", arg(STR), ELM),
 

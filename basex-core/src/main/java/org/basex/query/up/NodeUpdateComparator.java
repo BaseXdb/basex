@@ -1,6 +1,6 @@
 package org.basex.query.up;
 
-import static org.basex.query.up.primitives.PrimitiveType.*;
+import static org.basex.query.up.primitives.UpdateType.*;
 
 import java.util.*;
 
@@ -8,20 +8,20 @@ import org.basex.data.*;
 import org.basex.query.up.primitives.*;
 import org.basex.util.*;
 /**
- * <p>Comparator for {@link UpdatePrimitive}.</p>
+ * <p>Comparator for {@link NodeUpdate}.</p>
  *
  * <p>In general, a list of updates is applied from the highest to the lowest PRE value in
  * BaseX. The higher the actual location of an update the sooner it is applied, hence
- * the 'greater' {@link UpdatePrimitive} is applied first. The order further relies on
- * the definition of {@link PrimitiveType}.</p>
+ * the 'greater' {@link NodeUpdate} is applied first. The order further relies on
+ * the definition of {@link UpdateType}.</p>
  *
- * <p>{@link UpdatePrimitive}s are identified by their target node's PRE values (T).
- * Depending on the {@link PrimitiveType} of the update, a specific PRE value on the
+ * <p>{@link NodeUpdate}s are identified by their target node's PRE values (T).
+ * Depending on the {@link UpdateType} of the update, a specific PRE value on the
  * table is affected (L). Hence it is not sufficient to order primitives based on T
  * (see case 2,3 below). It is also not sufficient to order them based on L (see case
  * 2,3 below).</p>
  *
- * <p>The first {@link UpdatePrimitive} is referred to as P1, the target node of P1 is
+ * <p>The first {@link NodeUpdate} is referred to as P1, the target node of P1 is
  * referred to as T1, the (optional) insertion sequence for P1 is S1, the actually
  * affected PRE value on disk is L1. For the second P2, T2, S2, L2.</p>
  *
@@ -55,16 +55,16 @@ import org.basex.util.*;
  * T1 and P2 is i.e. a {@link ReplaceNode} on an attribute T2 of T1. To get the desired
  * order of insertion sequences (S2,S1) P1 must be executed first, hence P1>P2.</li>
  *
- * <li> The {@link PrimitiveType} of P1, P2.
+ * <li> The {@link UpdateType} of P1, P2.
  * Consider D the document <DOC><N1/><DOC> with T=N1. P1 is an {@link InsertBefore}
  * on T and P2 is an {@link InsertIntoAsFirst} on the same target T. As they both operate
  * on the same target, both have not to be re-located because of their type (see case 2),
- * hence only differ in their {@link PrimitiveType}, it follows that P2>P1 as nodes
+ * hence only differ in their {@link UpdateType}, it follows that P2>P1 as nodes
  * S2 are to be inserted on the following axis of S1.<br/>
  *
  * Another case: P2 a {@link DeleteNode} on T and P1 an {@link InsertBefore} on T. As
  * L2=L1, P2, the execution sequence must be (P2,P1). for(P1,P2) S1 would be deleted by
- * P2. The correct order is also determined by the order of {@link PrimitiveType}. Here
+ * P2. The correct order is also determined by the order of {@link UpdateType}. Here
  * we see that ordering updates simply by the actually affected PRE value L is not
  * sufficient.</li>
  * </ol>
@@ -72,11 +72,11 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public class UpdatePrimitiveComparator implements Comparator<UpdatePrimitive> {
+public class NodeUpdateComparator implements Comparator<NodeUpdate> {
   @Override
-  public int compare(final UpdatePrimitive a, final UpdatePrimitive b) {
+  public int compare(final NodeUpdate a, final NodeUpdate b) {
     // data the same for both primitives
-    final Data data = a.data;
+    final Data data = a.data();
 
     /* Step 1: Calculate actual locations correctly. Location is only changed for
      * - InsertInto, InsertAfter, as they must be executed before anything on the
@@ -90,8 +90,8 @@ public class UpdatePrimitiveComparator implements Comparator<UpdatePrimitive> {
         b.type == INSERTAFTER;
     final boolean aIsInsertIntoAsFirst = a.type == INSERTINTOFIRST;
     final boolean bIsInsertIntoAsFirst = b.type == INSERTINTOFIRST;
-    final int aPre = a.targetPre;
-    final int bPre = b.targetPre;
+    final int aPre = a.pre;
+    final int bPre = b.pre;
     final int aKind = data.kind(aPre);
     final int bKind = data.kind(bPre);
     final int aSize = data.size(aPre, aKind);
@@ -121,7 +121,7 @@ public class UpdatePrimitiveComparator implements Comparator<UpdatePrimitive> {
     if(a.type.ordinal() > b.type.ordinal()) return 1;
     if(b.type.ordinal() > a.type.ordinal()) return -1;
 
-    // Two UpdatePrimitives cannot be equal!
+    // Two update primitives cannot be equal!
     throw Util.notExpected("Ambiguous order of UpdatePrimitives: " + a + ", " + b);
   }
 }

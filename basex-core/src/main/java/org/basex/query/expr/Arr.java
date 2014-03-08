@@ -21,12 +21,12 @@ public abstract class Arr extends ParseExpr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression list
+   * @param info input info
+   * @param expr expression list
    */
-  protected Arr(final InputInfo ii, final Expr... e) {
-    super(ii);
-    expr = e;
+  protected Arr(final InputInfo info, final Expr... expr) {
+    super(info);
+    this.expr = expr;
   }
 
   @Override

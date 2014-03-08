@@ -13,38 +13,41 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  */
-public final class DBAdd extends DBNew {
+public final class DBAdd extends DBUpdate {
+  /** Container for new database documents. */
+  private final DBNew add;
   /** Size. */
   private int size;
 
   /**
    * Constructor.
-   * @param d target database
-   * @param it document to add (IO or ANode instance)
-   * @param c database context
-   * @param ii input info
+   * @param data target database
+   * @param input document to add (IO or ANode instance)
+   * @param qc query context
+   * @param info input info
    */
-  public DBAdd(final Data d, final NewInput it, final QueryContext c, final InputInfo ii) {
-    super(TYPE.DBADD, d, c, ii);
-    inputs = new ArrayList<NewInput>();
-    inputs.add(it);
+  public DBAdd(final Data data, final NewInput input, final QueryContext qc, final InputInfo info) {
+    super(UpdateType.DBADD, data, info);
+    final ArrayList<NewInput> docs = new ArrayList<NewInput>();
+    docs.add(input);
+    add = new DBNew(qc, docs, info);
   }
 
   @Override
-  public void merge(final BasicOperation o) {
-    final DBAdd a = (DBAdd) o;
-    for(final NewInput input : a.inputs) inputs.add(input);
+  public void merge(final Update up) {
+    final DBAdd a = (DBAdd) up;
+    for(final NewInput input : a.add.inputs) add.inputs.add(input);
   }
 
   @Override
   public void apply() {
-    data.insert(data.meta.size, -1, new DataClip(md));
+    data.insert(data.meta.size, -1, new DataClip(add.md));
   }
 
   @Override
   public void prepare(final MemData tmp) throws QueryException {
-    size = inputs.size();
-    addDocs(new MemData(tmp), data.meta.name);
+    size = add.inputs.size();
+    add.addDocs(new MemData(tmp), data.meta.name);
   }
 
   @Override
@@ -54,6 +57,6 @@ public final class DBAdd extends DBNew {
 
   @Override
   public String toString() {
-    return Util.className(this) + '[' + inputs + ']';
+    return Util.className(this) + '[' + add.inputs + ']';
   }
 }

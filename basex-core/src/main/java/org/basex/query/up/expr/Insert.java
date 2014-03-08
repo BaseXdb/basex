@@ -34,17 +34,17 @@ public final class Insert extends Update {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
+   * @param info input info
    * @param src source expression
    * @param f first flag
    * @param l last
    * @param b before
    * @param a after
-   * @param tr target expression
+   * @param trg target expression
    */
-  public Insert(final StaticContext sctx, final InputInfo ii, final Expr src,
-      final boolean f, final boolean l, final boolean b, final boolean a, final Expr tr) {
-    super(sctx, ii, tr, src);
+  public Insert(final StaticContext sctx, final InputInfo info, final Expr src,
+      final boolean f, final boolean l, final boolean b, final boolean a, final Expr trg) {
+    super(sctx, info, trg, src);
     first = f;
     last = l;
     before = b;
@@ -77,7 +77,7 @@ public final class Insert extends Update {
         throw UPTRGTYP.get(info);
     }
 
-    UpdatePrimitive up;
+    NodeUpdate up;
     DBNode dbn;
     // no update primitive is created if node list is empty
     if(!aList.isEmpty()) {

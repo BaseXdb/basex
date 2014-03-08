@@ -23,7 +23,7 @@ public final class InsertAttribute extends NodeCopy {
    */
   public InsertAttribute(final int p, final Data d, final InputInfo i,
       final ANodeList c) {
-    super(PrimitiveType.INSERTATTR, p, d, i, c);
+    super(UpdateType.INSERTATTR, p, d, i, c);
   }
 
   @Override
@@ -33,18 +33,18 @@ public final class InsertAttribute extends NodeCopy {
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) {
-    final ANodeList newInsert = ((NodeCopy) p).insert;
+  public void merge(final Update up) {
+    final ANodeList newInsert = ((NodeCopy) up).insert;
     for(final ANode n : newInsert) insert.add(n);
   }
 
   @Override
   public void addAtomics(final AtomicUpdateCache l) {
-    l.addInsert(targetPre + 1, targetPre, insseq, true);
+    l.addInsert(pre + 1, pre, insseq, true);
   }
 
   @Override
-  public UpdatePrimitive[] substitute(final MemData tmp) {
-    return new UpdatePrimitive[] { this };
+  public NodeUpdate[] substitute(final MemData tmp) {
+    return new NodeUpdate[] { this };
   }
 }

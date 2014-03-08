@@ -23,11 +23,11 @@ public final class Delete extends Update {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param r return expression
+   * @param info input info
+   * @param expr return expression
    */
-  public Delete(final StaticContext sctx, final InputInfo ii, final Expr r) {
-    super(sctx, ii, r);
+  public Delete(final StaticContext sctx, final InputInfo info, final Expr expr) {
+    super(sctx, info, expr);
   }
 
   @Override

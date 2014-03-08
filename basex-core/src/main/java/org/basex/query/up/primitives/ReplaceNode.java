@@ -24,28 +24,28 @@ public final class ReplaceNode extends NodeCopy {
    * @param c node copy insertion sequence
    */
   public ReplaceNode(final int p, final Data d, final InputInfo i, final ANodeList c) {
-    super(PrimitiveType.REPLACENODE, p, d, i, c);
+    super(UpdateType.REPLACENODE, p, d, i, c);
   }
 
   @Override
   public void update(final NamePool pool) {
     if(insseq == null) return;
     add(pool);
-    pool.remove(getTargetNode());
+    pool.remove(node());
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) throws QueryException {
-    throw UPMULTREPL.get(info, getTargetNode());
+  public void merge(final Update up) throws QueryException {
+    throw UPMULTREPL.get(info, node());
   }
 
   @Override
   public void addAtomics(final AtomicUpdateCache l) {
-    l.addReplace(targetPre, insseq);
+    l.addReplace(pre, insseq);
   }
 
   @Override
-  public UpdatePrimitive[] substitute(final MemData tmp) {
-    return new UpdatePrimitive[] { this };
+  public NodeUpdate[] substitute(final MemData tmp) {
+    return new NodeUpdate[] { this };
   }
 }

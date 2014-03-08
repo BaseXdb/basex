@@ -445,6 +445,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item export(final QueryContext ctx) throws QueryException {
+    checkCreate(ctx);
     final Data data = checkData(ctx);
     final String path = string(checkStr(expr[1], ctx));
     final Item it = expr.length > 2 ? expr[2].item(ctx, info) : null;
@@ -563,7 +564,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item add(final QueryContext ctx) throws QueryException {
-    final Data data = checkWrite(checkData(ctx), ctx);
+    final Data data = checkData(ctx);
     final byte[] path = expr.length < 3 ? Token.EMPTY : token(path(2, ctx));
     final NewInput input = checkInput(checkItem(expr[1], ctx), path);
     ctx.updates.add(new DBAdd(data, input, ctx, info), ctx);
@@ -577,7 +578,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item replace(final QueryContext ctx) throws QueryException {
-    final Data data = checkWrite(checkData(ctx), ctx);
+    final Data data = checkData(ctx);
     final String path = path(1, ctx);
     final NewInput input = checkInput(checkItem(expr[2], ctx), token(path));
 
@@ -608,7 +609,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item delete(final QueryContext ctx) throws QueryException {
-    final Data data = checkWrite(checkData(ctx), ctx);
+    final Data data = checkData(ctx);
     final String path = path(1, ctx);
 
     // delete XML resources
@@ -633,7 +634,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item create(final QueryContext ctx) throws QueryException {
-    //checkCreate(ctx);
+    checkCreate(ctx);
     final String name = string(checkStr(expr[0], ctx));
     if(!Databases.validName(name)) throw BXDB_NAME.get(info, name);
 
@@ -674,7 +675,12 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item drop(final QueryContext ctx) throws QueryException {
-    ctx.updates.add(new DBDrop(checkData(ctx), info, ctx), ctx);
+    checkCreate(ctx);
+
+    final String name = string(checkStr(expr[0], ctx));
+    if(!Databases.validName(name)) throw BXDB_NAME.get(info, name);
+    if(!ctx.context.globalopts.dbexists(name)) throw BXDB_WHICH.get(info, name);
+    ctx.updates.add(new DBDrop(name, info, ctx), ctx);
     return null;
   }
 
@@ -686,8 +692,11 @@ public final class FNDb extends StandardFunc {
    */
   private Item backup(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    final Data data = checkData(ctx);
-    ctx.updates.add(new DBBackup(data, info, ctx), ctx);
+    final String name = string(checkStr(expr[0], ctx));
+    if(!Databases.validName(name)) throw BXDB_NAME.get(info, name);
+    if(!ctx.context.globalopts.dbexists(name)) throw BXDB_WHICH.get(info, name);
+
+    ctx.updates.add(new DBBackup(name, info, ctx), ctx);
     return null;
   }
 
@@ -699,13 +708,15 @@ public final class FNDb extends StandardFunc {
    */
   private Item restore(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    // database may not yet exist, so we can only pass the name
-    final String backupName = string(checkStr(expr[0], ctx));
     // extract database name from backup file
-    final String dbName = Restore.dbName(backupName);
-    if(!Databases.validName(dbName))
-      throw BXDB_NAME.get(info, dbName);
-    ctx.updates.add(new DBRestore(dbName, backupName, info, ctx), ctx);
+    final String name = string(checkStr(expr[0], ctx));
+    final String db = Restore.dbName(name);
+    if(!Databases.validName(db)) throw BXDB_NAME.get(info, db);
+
+    final IOFile backup = Restore.backupFile(name, ctx.context);
+    if(backup == null) throw BXDB_NOBACKUP.get(info, name);
+
+    ctx.updates.add(new DBRestore(db, backup, ctx, info), ctx);
     return null;
   }
 
@@ -716,7 +727,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item rename(final QueryContext ctx) throws QueryException {
-    final Data data = checkWrite(checkData(ctx), ctx);
+    final Data data = checkData(ctx);
     final String source = path(1, ctx);
     final String target = path(2, ctx);
 
@@ -726,8 +737,7 @@ public final class FNDb extends StandardFunc {
     for(int i = 0; i < is; i++) {
       final int pre = il.get(i);
       final String trg = Rename.target(data, pre, source, target);
-      if(trg.isEmpty() || trg.endsWith("/") || trg.endsWith("."))
-        throw BXDB_RENAME.get(info, this);
+      if(trg.isEmpty() || trg.endsWith("/") || trg.endsWith(".")) throw BXDB_RENAME.get(info, this);
       ctx.updates.add(new ReplaceValue(pre, data, info, token(trg)), ctx);
     }
     // rename files
@@ -747,10 +757,10 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item optimize(final QueryContext ctx) throws QueryException {
-    final Data data = checkWrite(checkData(ctx), ctx);
+    final Data data = checkData(ctx);
     final boolean all = expr.length > 1 && checkBln(expr[1], ctx);
     final Options opts = checkOptions(2, Q_OPTIONS, new Options(), ctx);
-    ctx.updates.add(new DBOptimize(data, ctx, all, opts, info), ctx);
+    ctx.updates.add(new DBOptimize(data, all, opts, ctx, info), ctx);
     return null;
   }
 
@@ -761,7 +771,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item store(final QueryContext ctx) throws QueryException {
-    final Data data = checkWrite(checkData(ctx), ctx);
+    final Data data = checkData(ctx);
     final String path = path(1, ctx);
     if(data.inMemory()) throw BXDB_MEM.get(info, data.meta.name);
     final IOFile file = data.meta.binary(path);
@@ -779,7 +789,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item flush(final QueryContext ctx) throws QueryException {
-    ctx.updates.add(new DBFlush(checkWrite(checkData(ctx), ctx), info), ctx);
+    ctx.updates.add(new DBFlush(checkData(ctx), info), ctx);
     return null;
   }
 

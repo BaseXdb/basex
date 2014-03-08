@@ -289,9 +289,9 @@ public final class UpdateTest extends AdvancedQueryTest {
    * multiple operations of the same type on the same node. Deleting a PRE value twice
    * would lead to deleting another node due to PRE shifts after the first delete.
    *
-   * If another {@link UpdatePrimitive} leads to the deletion of a node (i.e.
+   * If another {@link NodeUpdate} leads to the deletion of a node (i.e.
    * {@link ReplaceValue} it must be substituted first by a sequence of other
-   * {@link UpdatePrimitive} that contains the {@link DeleteNode} primitive.
+   * {@link NodeUpdate} that contains the {@link DeleteNode} primitive.
    *
    */
   @Test
@@ -304,7 +304,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Tests if the substitution of a {@link ReplaceNode} primitive does not interfere with
-   * the primitive types used for substitution that are actually called by the user.
+   * the update types used for substitution that are actually called by the user.
    */
   @Test
   public void replaceSubstitution() {

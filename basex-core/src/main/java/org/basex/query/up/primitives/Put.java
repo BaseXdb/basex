@@ -19,7 +19,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public final class Put extends BasicOperation {
+public final class Put extends DBUpdate {
   /** Target paths. The same node can be stored in multiple locations. */
   private final StringList paths = new StringList(1);
   /** Node id of the target node. Target nodes are identified via their ID, as structural
@@ -30,15 +30,15 @@ public final class Put extends BasicOperation {
 
   /**
    * Constructor.
-   * @param i input info
    * @param id target node id
-   * @param d target data reference
-   * @param u location path URI
+   * @param data target data reference
+   * @param path target path
+   * @param info input info
    */
-  public Put(final InputInfo i, final int id, final Data d, final String u) {
-    super(TYPE.FNPUT, d, i);
+  public Put(final int id, final Data data, final String path, final InputInfo info) {
+    super(UpdateType.FNPUT, data, info);
     nodeid = id;
-    paths.add(u);
+    paths.add(path);
   }
 
   @Override
@@ -66,8 +66,8 @@ public final class Put extends BasicOperation {
   }
 
   @Override
-  public void merge(final BasicOperation o) {
-    for(final String u : ((Put) o).paths) paths.add(u);
+  public void merge(final Update up) {
+    for(final String path : ((Put) up).paths) paths.add(path);
   }
 
   @Override
@@ -77,14 +77,9 @@ public final class Put extends BasicOperation {
 
   @Override
   public String toString() {
-    return Util.className(this) + '[' + getTargetNode() + ", " + paths.get(0) + ']';
+    return Util.className(this) + '[' + nodeid + ", " + paths.get(0) + ']';
   }
 
   @Override
   public void prepare(final MemData tmp) { }
-
-  @Override
-  public DBNode getTargetNode() {
-    return new DBNode(data, data.pre(nodeid));
-  }
 }

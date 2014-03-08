@@ -17,69 +17,49 @@ import org.basex.util.list.*;
  * @author Lukas Kircher
  */
 public abstract class ContextModifier {
-  /** Update primitives, aggregated separately for each database which is
-   * referenced during a snapshot. */
-  private final Map<Data, DatabaseUpdates> pendingUpdates =
-    new HashMap<Data, DatabaseUpdates>();
-  /** Holds DBBackup operations which are applied before any other update operation. */
-  private final Map<Data, DBBackup> dbBackups = new HashMap<Data, DBBackup>();
-  /** Holds DBCreate operations which are not associated with a database. */
-  private final Map<String, DBCreate> dbCreates = new HashMap<String, DBCreate>();
-  /** Holds DBRestore operations which are applied after all other update operations. They may not
-   * be associated with a database. */
-  private final Map<String, DBRestore> dbRestores = new HashMap<String, DBRestore>();
+  /** Update primitives, aggregated separately for each database. */
+  private final Map<Data, DataUpdates> dbUpdates = new HashMap<Data, DataUpdates>();
+  /** Update primitives, aggregated separately for each database name. */
+  private final Map<String, NameUpdates> nameUpdates = new HashMap<String, NameUpdates>();
   /** Temporary data reference, containing all XML fragments to be inserted. */
   private MemData tmp;
 
   /**
    * Adds an update primitive to this context modifier.
-   * @param p update primitive
+   * @param up update primitive
    * @param ctx query context
    * @throws QueryException query exception
    */
-  abstract void add(final Operation p, final QueryContext ctx) throws QueryException;
+  abstract void add(final Update up, final QueryContext ctx) throws QueryException;
 
   /**
    * Adds an update primitive to this context modifier.
-   * Will be called by {@link #add(Operation, QueryContext)}.
-   * @param p update primitive
+   * Will be called by {@link #add(Update, QueryContext)}.
+   * @param up update primitive
    * @throws QueryException query exception
    */
-  final void add(final Operation p) throws QueryException {
-    if(p instanceof DBBackup) {
-      final DBBackup c = (DBBackup) p;
-      final DBBackup o = dbBackups.get(c.data);
-      if(o != null) o.merge(c);
-      dbBackups.put(c.data, c);
-      return;
+  protected final void add(final Update up) throws QueryException {
+    if(up instanceof DataUpdate) {
+      final DataUpdate dataUp = (DataUpdate) up;
+      final Data data = dataUp.data();
+      DataUpdates ups = dbUpdates.get(data);
+      if(ups == null) {
+        ups = new DataUpdates(data);
+        dbUpdates.put(data, ups);
+      }
+      // create temporary mem data instance if not available yet
+      if(tmp == null) tmp = new MemData(data.meta.options);
+      ups.add(dataUp, tmp);
+    } else {
+      final NameUpdate nameUp = (NameUpdate) up;
+      final String name = nameUp.name();
+      NameUpdates ups = nameUpdates.get(name);
+      if(ups == null) {
+        ups = new NameUpdates();
+        nameUpdates.put(name, ups);
+      }
+      ups.add(nameUp);
     }
-
-    if(p instanceof DBCreate) {
-      final DBCreate c = (DBCreate) p;
-      final DBCreate o = dbCreates.get(c.dbName);
-      if(o != null) o.merge(c);
-      dbCreates.put(c.dbName, c);
-      return;
-    }
-
-    if(p instanceof DBRestore) {
-      final DBRestore c = (DBRestore) p;
-      final DBRestore o = dbRestores.get(c.backupName);
-      if(o != null) o.merge(c);
-      dbRestores.put(c.backupName, c);
-      return;
-    }
-
-    final Data data = p.getData();
-    DatabaseUpdates dbp = pendingUpdates.get(data);
-    if(dbp == null) {
-      dbp = new DatabaseUpdates(data);
-      pendingUpdates.put(data, dbp);
-    }
-
-    // create temporary mem data instance if not available yet
-    if(tmp == null) tmp = new MemData(data.meta.options);
-    dbp.add(p, tmp);
   }
 
   /**
@@ -87,96 +67,54 @@ public abstract class ContextModifier {
    * @param db databases
    */
   void databases(final StringList db) {
-    for(final DatabaseUpdates du : pendingUpdates.values()) {
-      final Data d = du.data();
-      if(!d.inMemory()) db.add(d.meta.name);
+    for(final Data data : dbUpdates.keySet()) {
+      if(!data.inMemory()) db.add(data.meta.name);
     }
-    for(final DBBackup ba : dbBackups.values()) db.add(ba.data.meta.name);
-    for(final DBCreate cr : dbCreates.values()) db.add(cr.dbName);
-    for(final DBRestore re : dbRestores.values()) db.add(re.dbName);
+    for(final NameUpdates up : nameUpdates.values()) {
+      up.databases(db);
+    }
   }
 
   /**
-   * Checks constraints and applies all update primitives to the databases if
-   * no constraints are hurt.
+   * Checks constraints and applies all updates.
    * @throws QueryException query exception
    */
   final void apply() throws QueryException {
-    final Collection<DatabaseUpdates> updates = pendingUpdates.values();
-    final Collection<DBBackup> backups = dbBackups.values();
-    final Collection<DBCreate> creates = dbCreates.values();
-    final Collection<DBRestore> restores = dbRestores.values();
+    // prepare updates
+    for(final DataUpdates up : dbUpdates.values()) {
+      // create temporary mem data instance if not available yet
+      if(tmp == null) tmp = new MemData(up.data().meta.options);
+      up.prepare(tmp);
+    }
+    for(final NameUpdates up : nameUpdates.values()) up.prepare();
 
-    // create temporary mem data instance if not available yet (break after first operation)
-    if(tmp == null) {
-      for(final DatabaseUpdates c : updates) {
-        tmp = new MemData(c.data().meta.options);
-        break;
-      }
-    }
+    // apply initial updates based on database names
+    for(final NameUpdates up : nameUpdates.values()) up.apply(true);
 
-    // gather databases that have to be write-locked and check constraints
-    final Set<Data> dataWriteLocks = new HashSet<Data>();
-    for(final DatabaseUpdates c : updates) {
-      c.check(tmp);
-      dataWriteLocks.add(c.data());
-    }
-    for(final DBBackup b : backups) {
-      b.prepare(null);
-      dataWriteLocks.add(b.data);
-    }
-    for(final DBCreate c : creates) {
-      c.prepare(null);
-      try {
-        dataWriteLocks.add(c.qc.resource.database(c.dbName, c.info));
-      // if the database doesn't exist, we don't have to lock it
-      } catch(QueryException e) { }
-    }
-    for(final DBRestore r : restores) {
-      r.prepare(null);
-      try {
-        dataWriteLocks.add(r.qc.resource.database(r.dbName, r.info));
-      // if the database doesn't exist, we don't have to lock it
-      } catch(QueryException e) { }
-    }
+    // collect data references to be locked
+    final Set<Data> datas = new HashSet<Data>();
+    for(final Data data : dbUpdates.keySet()) datas.add(data);
 
     // try to acquire write locks and keep track of the number of acquired locks in order to
-    // release them in case of error
+    // release them in case of error. write locks prevent other JVMs from accessing currently
+    // updated databases, but they cannot provide perfect safety.
     int i = 0;
     try {
-      for(final Data d : dataWriteLocks) {
-        if(!d.startUpdate())
-          throw BXDB_OPENED.get(null, d.meta.name);
+      for(final Data data : datas) {
+        if(!data.startUpdate()) throw BXDB_OPENED.get(null, data.meta.name);
         i++;
       }
-
-      // first backup databases
-      for(final DBBackup b : backups) b.apply();
-      // apply update primitives and other database operations
-      for(final DatabaseUpdates c : updates) c.apply();
-      // create databases and lock them afterwards
-      for(final DBCreate c : creates) {
-        c.apply();
-        // the created database should exist now, so we want to lock it - also to be able to release
-        // the write lock afterwards. If we'd release the lock now, we cannot know whether the
-        // lock has also been acquired by another update. We'd have to track this as well..
-        final Data d = c.qc.resource.database(c.dbName, c.info);
-        if(dataWriteLocks.add(d)) {
-          d.startUpdate();
-          i++;
-        }
-      }
-      // restore databases
-      for(final DBRestore r : restores) r.apply();
-
+      // apply node and database update
+      for(final DataUpdates c : dbUpdates.values()) c.apply();
     } finally {
-      // remove write locks/updating files
-      for(final Data d : dataWriteLocks) {
-        // in case of crash remove only the already acquired write locks
-        if(i-- == 0) break;
-        d.finishUpdate();
+      // remove locks: in case of a crash, remove only already acquired write locks
+      for(final Data data : datas) {
+        if(i-- > 0) data.finishUpdate();
       }
     }
+
+    // apply remaining updates based on database names
+    for(final NameUpdates up : nameUpdates.values()) up.apply(false);
   }
 
   /**
@@ -185,10 +123,8 @@ public abstract class ContextModifier {
    */
   final int size() {
     int s = 0;
-    for(final DatabaseUpdates c : pendingUpdates.values()) s += c.size();
-    for(final DBBackup b : dbBackups.values()) s += b.size();
-    for(final DBCreate c : dbCreates.values()) s += c.size();
-    for(final DBRestore c : dbRestores.values()) s += c.size();
+    for(final DataUpdates c : dbUpdates.values()) s += c.size();
+    for(final NameUpdates c : nameUpdates.values()) s += c.size();
     return s;
   }
 }

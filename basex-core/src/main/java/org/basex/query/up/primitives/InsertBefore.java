@@ -22,24 +22,24 @@ public final class InsertBefore extends NodeCopy {
    * @param c node copy
    */
   public InsertBefore(final int p, final Data d, final InputInfo i, final ANodeList c) {
-    super(PrimitiveType.INSERTBEFORE, p, d, i, c);
+    super(UpdateType.INSERTBEFORE, p, d, i, c);
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) {
-    final InsertBefore newOne = (InsertBefore) p;
+  public void merge(final Update up) {
+    final InsertBefore newOne = (InsertBefore) up;
     final ANodeList newInsert = newOne.insert;
     for(final ANode n : newInsert) insert.add(n);
   }
 
   @Override
   public void addAtomics(final AtomicUpdateCache l) {
-    l.addInsert(targetPre, data.parent(targetPre, data.kind(targetPre)), insseq, false);
+    l.addInsert(pre, data.parent(pre, data.kind(pre)), insseq, false);
   }
 
   @Override
-  public UpdatePrimitive[] substitute(final MemData tmp) {
-    return new UpdatePrimitive[] { this };
+  public NodeUpdate[] substitute(final MemData tmp) {
+    return new NodeUpdate[] { this };
   }
 
   @Override
