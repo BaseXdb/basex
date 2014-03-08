@@ -21,7 +21,7 @@ import org.junit.*;
  */
 public final class FNDbServerTest extends AdvancedQueryTest {
   /** Number of clients. */
-  private static final int NUM = 10;
+  private static final int NUM = 5;
   /** Test file. */
   private static final String FILE = "src/test/resources/input.xml";
   /** Server reference. */
@@ -89,12 +89,14 @@ public final class FNDbServerTest extends AdvancedQueryTest {
 
     // create
     runClients(new XQuery(
+      _DB_DROP.args(NAME) + ',' +
       _DB_CREATE.args(NAME, FILE, "in/")
     ));
 
     // add, create
     runClients(new XQuery(
-      _DB_ADD.args(NAME, "<X/>", "x.xml") + ',' +
+        _DB_ADD.args(NAME, "<X/>", "x.xml") + ',' +
+      _DB_DROP.args(NAME) + ',' +
       _DB_CREATE.args(NAME, FILE)));
 
     check.execute(new DropDB(NAME));

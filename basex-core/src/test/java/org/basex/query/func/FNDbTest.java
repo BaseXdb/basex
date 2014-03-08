@@ -363,7 +363,6 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_DB_CREATE.args(NAME, "<dummy/>", "t1.xml") +
         ", insert node <dummy/> into " + _DB_OPEN.args(NAME) + ',' +
         _DB_DROP.args(NAME));
-    query(_DB_CREATE.args(NAME, "<dummy/>", "t1.xml"));
     query(_DB_OPEN.args(NAME) + "/root()", "<dummy/>");
 
     // eventually drop database
