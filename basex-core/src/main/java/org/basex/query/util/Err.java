@@ -208,7 +208,7 @@ public enum Err {
   /** BXXQ0001. */
   BXXQ_UPDATING(BXXQ, 1, "No updating expression allowed."),
   /** BXXQ0002. */
-  BXXQ_NEWDB(BXXQ, 2, "Database '%' cannot be opened."),
+  BXXQ_NEWDB(BXXQ, 2, "Opening new resources is not permitted."),
   /** BXXQ0002. */
   BXXQ_PERM(BXXQ, 3, "%"),
   /** BXXQ0004. */

@@ -38,6 +38,11 @@ public final class FNXQueryTest extends AdvancedQueryTest {
     query(_XQUERY_EVAL.args("\"" + DOC.args(PATH).replace('"', '\'') + "\""));
 
     // check additional options
+    query(_DB_CREATE.args("\"" + NAME + "\""));
+    error(_XQUERY_EVAL.args("\"doc('" + NAME + "')\"", " map{}", " map{ 'permission':'none'}"),
+        Err.BXXQ_PERM);
+    error(_XQUERY_EVAL.args("\"db:open('" + NAME + "')\"", " map{}", " map{ 'permission':'none'}"),
+        Err.BXDB_OPEN);
     error(_XQUERY_EVAL.args("\"file:exists('x')\"", " map{}", " map{ 'permission':'none'}"),
         Err.BXXQ_PERM);
     error(_XQUERY_EVAL.args("\"(1 to 10000000000000)[.=0]\"", " map{}", " map{ 'timeout':'1'}"),
