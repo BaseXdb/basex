@@ -1,5 +1,7 @@
 package org.basex.query.up;
 
+import static org.basex.query.util.Err.*;
+
 import java.util.*;
 
 import org.basex.query.*;
@@ -22,10 +24,12 @@ final class NameUpdates {
    * @throws QueryException query exception
    */
   void add(final NameUpdate up) throws QueryException {
+    final boolean alter = up.type == UpdateType.DBALTER;
+    final boolean drop = up.type == UpdateType.DBDROP;
     for(final NameUpdate o : nameUpdates) {
-      if(o.type == up.type) {
-        o.merge(up);
-        return;
+      if(o.type == up.type) o.merge(up);
+      if(drop && o.type == UpdateType.DBALTER || alter && o.type == UpdateType.DBDROP) {
+        throw BXDB_ALTERDROP.get(o.info(), o.name());
       }
     }
     nameUpdates.add(up);
