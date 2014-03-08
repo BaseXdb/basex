@@ -103,17 +103,8 @@ public final class FNXQuery extends StandardFunc {
   private ValueBuilder eval(final QueryContext ctx, final byte[] qu, final String path,
       final boolean openDB) throws QueryException {
 
-    final QueryContext qc = new QueryContext(ctx);
-    qc.resource.openDB = openDB;
-    final StaticContext sctx = new StaticContext(qc.context.options.get(MainOptions.XQUERY3));
-
     // bind variables and context item
-    for(final Map.Entry<String, Value> it : bindings(1, ctx).entrySet()) {
-      final String k = it.getKey();
-      final Value v = it.getValue();
-      if(k.isEmpty()) qc.context(v, null, sctx);
-      else qc.bind(k, v, null);
-    }
+    final HashMap<String, Value> bindings = bindings(1, ctx);
 
     final Timer to = new Timer(true);
     final Perm tmp = ctx.context.user.perm;
@@ -145,9 +136,19 @@ public final class FNXQuery extends StandardFunc {
       }
     }
 
+    final QueryContext qc = ctx.proc(new QueryContext(ctx));
+    qc.resource.openDB = openDB;
+
     // evaluate query
     try {
-      ctx.proc(qc);
+      final StaticContext sctx = new StaticContext(qc.context.options.get(MainOptions.XQUERY3));
+      for(final Map.Entry<String, Value> it : bindings.entrySet()) {
+        final String k = it.getKey();
+        final Value v = it.getValue();
+        if(k.isEmpty()) qc.context(v, null, sctx);
+        else qc.bind(k, v, null);
+      }
+
       qc.parseMain(string(qu), path, sctx);
       if(qc.updating) throw BXXQ_UPDATING.get(info);
       qc.compile();

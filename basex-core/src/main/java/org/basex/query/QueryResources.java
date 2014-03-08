@@ -25,7 +25,7 @@ import org.basex.util.list.*;
 public final class QueryResources {
   /** Resources. */
   public final HashMap<String, String[]> resources = new HashMap<String, String[]>();
-  /** Allow opening new databases. */
+  /** Allow opening of new databases. */
   public boolean openDB = true;
 
   /** Database context. */
@@ -92,7 +92,7 @@ public final class QueryResources {
       final String n = data[d].meta.name;
       if(Prop.CASE ? n.equals(name) : n.equalsIgnoreCase(name)) return data[d];
     }
-    if(!openDB) throw BXXQ_NEWDB.get(info, name);
+    if(!openDB) throw BXXQ_NEWDB.get(info);
 
     try {
       // open and add new data reference
@@ -281,11 +281,14 @@ public final class QueryResources {
   private Data create(final QueryInput input, final boolean single, final IO baseIO,
       final InputInfo info) throws QueryException {
 
+    // check if new databases can be created
+    final boolean createDB = ctx.context.options.get(MainOptions.FORCECREATE);
+    if(createDB && !openDB) throw BXXQ_NEWDB.get(info);
+    if(!ctx.context.user.has(Perm.READ))
+      throw BXXQ_PERM.get(info, Util.info(Text.PERM_REQUIRED_X, Perm.READ));
+
     // check if input is an existing file
     final IO source = checkPath(input, baseIO, info);
-    final boolean createDB = ctx.context.options.get(MainOptions.FORCECREATE);
-    // check if new databases can be created
-    if(createDB && !openDB) throw BXXQ_NEWDB.get(info, input.original);
 
     if(single && source.isDir()) WHICHRES.get(info, baseIO);
     try {
