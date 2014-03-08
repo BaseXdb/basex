@@ -26,13 +26,12 @@ public final class Rename extends Update {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param tg target expression
-   * @param n new name expression
+   * @param info input info
+   * @param trg target expression
+   * @param name new name expression
    */
-  public Rename(final StaticContext sctx, final InputInfo ii, final Expr tg,
-      final Expr n) {
-    super(sctx, ii, tg, n);
+  public Rename(final StaticContext sctx, final InputInfo info, final Expr trg, final Expr name) {
+    super(sctx, info, trg, name);
   }
 
   @Override

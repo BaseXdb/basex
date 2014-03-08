@@ -18,31 +18,33 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  */
-public final class DBOptimize extends DBNew {
+public final class DBOptimize extends DBUpdate {
+  /** Database update options. */
+  private final DBOptions updates;
   /** Flag to optimize all database structures. */
   private boolean all;
 
   /**
    * Constructor.
-   * @param dt data
-   * @param ctx database context
-   * @param al optimize all database structures flag
+   * @param data data
+   * @param all optimize all database structures flag
    * @param opts database options
-   * @param ii input info
+   * @param qc database context
+   * @param info input info
    * @throws QueryException query exception
    */
-  public DBOptimize(final Data dt, final QueryContext ctx, final boolean al,
-      final Options opts, final InputInfo ii) throws QueryException {
+  public DBOptimize(final Data data, final boolean all, final Options opts,
+      final QueryContext qc, final InputInfo info) throws QueryException {
 
-    super(TYPE.DBOPTIMIZE, dt, ctx, ii);
-    all = al;
-    options = opts.free();
-    check(false);
+    super(UpdateType.DBOPTIMIZE, data, info);
+    this.all = all;
+    updates = new DBOptions(qc, opts.free(), info);
+    updates.check(false);
   }
 
   @Override
-  public void merge(final BasicOperation o) {
-    all |= ((DBOptimize) o).all;
+  public void merge(final Update up) {
+    all |= ((DBOptimize) up).all;
   }
 
   @Override
@@ -53,11 +55,11 @@ public final class DBOptimize extends DBNew {
     final MetaData meta = data.meta;
     final MainOptions opts = meta.options;
 
-    nprops.put(MainOptions.TEXTINDEX, meta.createtext);
-    nprops.put(MainOptions.ATTRINDEX, meta.createattr);
-    nprops.put(MainOptions.FTINDEX,   meta.createftxt);
-    initOptions();
-    assignOptions();
+    updates.nprops.put(MainOptions.TEXTINDEX, meta.createtext);
+    updates.nprops.put(MainOptions.ATTRINDEX, meta.createattr);
+    updates.nprops.put(MainOptions.FTINDEX,   meta.createftxt);
+    updates.initOptions();
+    updates.assignOptions();
 
     meta.createtext = opts.get(MainOptions.TEXTINDEX);
     meta.createattr = opts.get(MainOptions.ATTRINDEX);
@@ -84,16 +86,16 @@ public final class DBOptimize extends DBNew {
     meta.maxlen     = ml;
 
     try {
-      if(all) OptimizeAll.optimizeAll(data, qc.context, null);
+      if(all) OptimizeAll.optimizeAll(data, updates.qc.context, null);
       else Optimize.optimize(data, rebuild, rebuildFT, null);
     } catch(final IOException ex) {
       throw UPDBOPTERR.get(info, ex);
     } finally {
-      resetOptions();
+      updates.resetOptions();
     }
 
     // remove old database reference
-    if(all) qc.resource.removeData(data.meta.name);
+    if(all) updates.qc.resource.removeData(data.meta.name);
   }
 
   @Override

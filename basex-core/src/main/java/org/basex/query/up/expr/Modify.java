@@ -22,12 +22,12 @@ import org.basex.util.hash.*;
 public final class Modify extends Arr {
   /**
    * Constructor.
-   * @param ii input info
-   * @param s source expression
-   * @param m modify expression
+   * @param info input info
+   * @param src source expression
+   * @param mod modify expression
    */
-  public Modify(final InputInfo ii, final Expr s, final Expr m) {
-    super(ii, s, m);
+  public Modify(final InputInfo info, final Expr src, final Expr mod) {
+    super(info, src, mod);
   }
 
   @Override

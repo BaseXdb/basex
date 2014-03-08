@@ -3,7 +3,6 @@ package org.basex.query.up.primitives;
 import static org.basex.query.util.Err.*;
 
 import org.basex.core.cmd.*;
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
@@ -14,44 +13,24 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public final class DBDrop extends BasicOperation {
-  /** Query Context. */
-  private final QueryContext ctx;
-
+public final class DBDrop extends NameUpdate {
   /**
    * Constructor.
-   * @param d target data reference
-   * @param ii input info
-   * @param c query context
+   * @param name name of database
+   * @param info input info
+   * @param qc query context
    */
-  public DBDrop(final Data d, final InputInfo ii, final QueryContext c) {
-    super(TYPE.DBDROP, d, ii);
-    ctx = c;
+  public DBDrop(final String name, final InputInfo info, final QueryContext qc) {
+    super(UpdateType.DBDROP, name, info, qc);
   }
 
   @Override
-  public void merge(final BasicOperation o) { }
-
-  @Override
-  public void prepare(final MemData tmp) { }
+  public void prepare() { }
 
   @Override
   public void apply() throws QueryException {
-    // trigger early removal of database locks
-    data.finishUpdate();
-    // close data instance in query processor
-    final String name = data.meta.name;
-    ctx.resource.removeData(name);
-    // invalidate data instance to avoid repeated removal of locks
-    data = null;
-    // check if database is stilled pinned by another process
-    if(ctx.context.pinned(name)) throw BXDB_OPENED.get(info, name);
+    close();
     // check if database files can be safely removed
-    if(!DropDB.drop(name, ctx.context)) throw UPDBDROP.get(info, name);
-  }
-
-  @Override
-  public int size() {
-    return 1;
+    if(!DropDB.drop(name, qc.context)) throw UPDBDROP.get(info, name);
   }
 }

@@ -127,7 +127,7 @@ public abstract class Data {
 
   /**
    * Starts an update operation: writes a file to disk to indicate that an update is
-   * going on, and exclusively locks the table.
+   * going on, and exclusively locks the table file.
    * @return success flag
    */
   public abstract boolean startUpdate();

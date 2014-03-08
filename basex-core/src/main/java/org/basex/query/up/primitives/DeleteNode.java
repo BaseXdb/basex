@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public final class DeleteNode extends UpdatePrimitive {
+public final class DeleteNode extends NodeUpdate {
   /** States if the deletion of the target node T is part of a replaceElementContent
    * call on the parent of T, see {@link ReplaceValue}. */
   public final boolean rec;
@@ -36,24 +36,24 @@ public final class DeleteNode extends UpdatePrimitive {
    * @param r this delete is a product of a replaceElementContent substitution
    */
   public DeleteNode(final int p, final Data d, final InputInfo i, final boolean r) {
-    super(PrimitiveType.DELETENODE, p, d, i);
+    super(UpdateType.DELETENODE, p, d, i);
     rec = r;
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) {
+  public void merge(final Update up) {
     /* Multiple delete primitives can operate on the same
      * target node, see XQUF. */
   }
 
   @Override
   public void update(final NamePool pool) {
-    pool.remove(new DBNode(data, targetPre));
+    pool.remove(new DBNode(data, pre));
   }
 
   @Override
   public String toString() {
-    return Util.className(this) + '[' + getTargetNode() + ']';
+    return Util.className(this) + '[' + node() + ']';
   }
 
   @Override
@@ -62,12 +62,12 @@ public final class DeleteNode extends UpdatePrimitive {
   }
 
   @Override
-  public UpdatePrimitive[] substitute(final MemData tmp) {
-    return new UpdatePrimitive[] { this };
+  public NodeUpdate[] substitute(final MemData tmp) {
+    return new NodeUpdate[] { this };
   }
 
   @Override
   public void addAtomics(final AtomicUpdateCache l) {
-    l.addDelete(targetPre);
+    l.addDelete(pre);
   }
 }

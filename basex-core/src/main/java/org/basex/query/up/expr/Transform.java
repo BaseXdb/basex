@@ -28,14 +28,14 @@ public final class Transform extends Arr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param c copy expressions
-   * @param m modify expression
-   * @param r return expression
+   * @param info input info
+   * @param copies copy expressions
+   * @param mod modify expression
+   * @param ret return expression
    */
-  public Transform(final InputInfo ii, final Let[] c, final Expr m, final Expr r) {
-    super(ii, m, r);
-    copies = c;
+  public Transform(final InputInfo info, final Let[] copies, final Expr mod, final Expr ret) {
+    super(info, mod, ret);
+    this.copies = copies;
   }
 
   @Override

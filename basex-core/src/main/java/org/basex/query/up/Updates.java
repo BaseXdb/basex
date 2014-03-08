@@ -28,12 +28,12 @@ import org.basex.util.list.*;
  * <p>Updates work like the following:</p>
  *
  * <ol>
- * <li> Each call of an updating expression creates an {@link UpdatePrimitive}.</li>
+ * <li> Each call of an updating expression creates an {@link NodeUpdate}.</li>
  * <li> All update primitives for a snapshot/query are collected here.</li>
  * <li> Primitives are kept separately for each database that is addressed. This
  *      way we can operate on PRE values instead of node IDs, skip mapping
  *      overhead and further optimize the process.
- *      {@link DatabaseUpdates}</li>
+ *      {@link DataUpdates}</li>
  * <li> Primitives are further kept separately for each database node - each
  *      individual target PRE value. There's a specific container for this:
  *      {@link NodeUpdates}</li>
@@ -43,8 +43,8 @@ import org.basex.util.list.*;
  * <li> After the query has been parsed and all update primitives have been added
  *      to the list, constraints, which cannot be taken care of on the fly, are
  *      checked. If no problems occur, updates are TO BE carried out.</li>
- * <li> Before applying the updates the {@link UpdatePrimitiveComparator} helps to order
- *      {@link UpdatePrimitive} for execution. Each primitive then creates a sequence of
+ * <li> Before applying the updates the {@link NodeUpdateComparator} helps to order
+ *      {@link NodeUpdate} for execution. Each primitive then creates a sequence of
  *      {@link BasicUpdate} which are passed to the {@link Data} layer via an
  *      {@link AtomicUpdateCache}. This list takes care of optimization and also text node
  *      merging.</li>
@@ -69,7 +69,7 @@ public final class Updates {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  public void add(final Operation up, final QueryContext ctx) throws QueryException {
+  public void add(final Update up, final QueryContext ctx) throws QueryException {
     if(mod == null) mod = new DatabaseModifier();
     mod.add(up, ctx);
   }
@@ -106,9 +106,7 @@ public final class Updates {
     }
 
     // determine the pre value of the target node within its database
-    final int trgID = target.id;
-    final int pre = preSteps(anc, trgID);
-
+    final int pre = preSteps(anc, target.id);
     return new DBNode(data, pre);
   }
 

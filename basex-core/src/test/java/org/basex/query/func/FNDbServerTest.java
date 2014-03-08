@@ -21,7 +21,7 @@ import org.junit.*;
  */
 public final class FNDbServerTest extends AdvancedQueryTest {
   /** Number of clients. */
-  private static final int NUM = 1;
+  private static final int NUM = 10;
   /** Test file. */
   private static final String FILE = "src/test/resources/input.xml";
   /** Server reference. */
@@ -78,25 +78,23 @@ public final class FNDbServerTest extends AdvancedQueryTest {
     final ClientSession check = createClient();
 
     // same DB name, which is 2 x NUM times
-    runTwoClients(new XQuery(_DB_CREATE.args(NAME)));
+    runClients(new XQuery(_DB_CREATE.args(NAME)));
     assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
-    runTwoClients(new XQuery(_DB_CREATE.args(NAME)));
+    runClients(new XQuery(_DB_CREATE.args(NAME)));
     assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
 
     // same DB name and files
-    runTwoClients(new XQuery(_DB_CREATE.args(NAME, FILE, "in/")));
+    runClients(new XQuery(_DB_CREATE.args(NAME, FILE, "in/")));
     assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
 
-    // drop, create
-    runTwoClients(new XQuery(
-      _DB_DROP.args(NAME) + ',' +
+    // create
+    runClients(new XQuery(
       _DB_CREATE.args(NAME, FILE, "in/")
     ));
 
-    // add, drop, create
-    runTwoClients(new XQuery(
+    // add, create
+    runClients(new XQuery(
       _DB_ADD.args(NAME, "<X/>", "x.xml") + ',' +
-      _DB_DROP.args(NAME) + ',' +
       _DB_CREATE.args(NAME, FILE)));
 
     check.execute(new DropDB(NAME));
@@ -108,7 +106,7 @@ public final class FNDbServerTest extends AdvancedQueryTest {
    * @throws IOException I/O exception
    * @throws InterruptedException interrupted exception
    */
-  private static void runTwoClients(final Command cmd) throws IOException, InterruptedException {
+  private static void runClients(final Command cmd) throws IOException, InterruptedException {
     final CountDownLatch start = new CountDownLatch(1);
     final CountDownLatch stop = new CountDownLatch(NUM);
     final Client[] clients = new Client[NUM];

@@ -161,7 +161,7 @@ public final class FNGen extends StandardFunc {
     // check if all target paths are unique
     if(!ctx.updates.putPaths.add(uri)) throw UPURIDUP.get(info, uri);
 
-    ctx.updates.add(new Put(info, target.pre, target.data, uri), ctx);
+    ctx.updates.add(new Put(target.pre, target.data, uri, info), ctx);
     return null;
   }
 

@@ -30,16 +30,13 @@ public class Restore extends ABackup {
 
   @Override
   protected boolean run() {
-    String db = args[0];
-    if(!Databases.validName(db)) return error(NAME_INVALID_X, db);
+    String name = args[0];
+    final String db = dbName(name);
+    if(!Databases.validName(db)) return error(NAME_INVALID_X, name);
 
     // find backup file with or without date suffix
-    IOFile file = backupFile(db, context);
-    // db is already the name of a backup -> extract db name
-    if(file != null)
-      db = dbName(db);
-    else
-      return error(BACKUP_NOT_FOUND_X, db);
+    final IOFile file = backupFile(name, context);
+    if(file == null) return error(BACKUP_NOT_FOUND_X, name);
 
     // close database if it's currently opened and not opened by others
     if(!closed) closed = close(context, db);
@@ -59,11 +56,10 @@ public class Restore extends ABackup {
   /**
    * Extracts the name of a database from the name of a backup file. E.g. for the backup name
    * backup-2014-03-04-09-02-33, the method returns 'backup' as the database name.
-   * @param backupName Name of the backup file.
-   *                   Valid formats:
-   *                    <dbname>-yyyy-mm-dd-hh-mm-ss
-   *                    <dbname>
-   * @return name of the database (<dbname>)
+   * @param backupName Name of the backup file. Valid formats:
+   *                   {@code [dbname]-yyyy-mm-dd-hh-mm-ss},
+   *                   {@code [dbname]}
+   * @return name of the database ({@code [dbname]})
    */
   public static String dbName(final String backupName) {
     return Pattern.compile(DateTime.PATTERN + '$').split(backupName)[0];
@@ -77,14 +73,13 @@ public class Restore extends ABackup {
    * @return IOFile backup file, or {@code null} if there is no backup for the given database
    */
   public static IOFile backupFile(final String name, final Context ctx) {
-    String n = name;
+    final String n = name;
 
     // find backup file with date suffix
-    IOFile file = ctx.globalopts.dbpath(n + IO.ZIPSUFFIX);
-    if(file.exists())
-      return file;
+    final IOFile file = ctx.globalopts.dbpath(n + IO.ZIPSUFFIX);
+    if(file.exists()) return file;
 
-    // in case only the database name is given, find the latest backup
+    // if only the database name is given, return the most recent backup
     final StringList list = Databases.backupPaths(n, ctx).sort(Prop.CASE, false);
     return !list.isEmpty() ? new IOFile(list.get(0)) : null;
   }
@@ -92,23 +87,23 @@ public class Restore extends ABackup {
   @Override
   public void databases(final LockResult lr) {
     super.databases(lr);
+    // Not sure whether database or name of backup file is provided: lock both
     final String name = args[0];
-    // Not sure whether database or backup name is provided, lock both
     lr.write.add(name).add(dbName(name));
   }
 
   /**
    * Restores the specified database.
-   * @param file          file
-   * @param cmd calling   command instance
-   * @param glblOptions   global options
+   * @param file file
+   * @param cmd calling command instance
+   * @param gopts global options
    * @throws IOException  I/O exception
    */
-  public static void restore(final IOFile file, final Restore cmd, final GlobalOptions glblOptions)
+  public static void restore(final IOFile file, final Restore cmd, final GlobalOptions gopts)
       throws IOException {
     final Zip zip = new Zip(file);
     if(cmd != null) cmd.proc(zip);
-    zip.unzip(glblOptions.dbpath());
+    zip.unzip(gopts.dbpath());
   }
 
   @Override

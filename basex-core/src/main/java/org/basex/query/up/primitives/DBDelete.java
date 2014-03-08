@@ -12,28 +12,28 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class DBDelete extends BasicOperation {
-  /** Keys. */
+public final class DBDelete extends DBUpdate {
+  /** Resources to be deleted. */
   private final StringList paths = new StringList(1);
   /** Number of keys. */
   private int size;
 
   /**
    * Constructor.
-   * @param d data
-   * @param p entries to be deleted
-   * @param ii input info
+   * @param data data
+   * @param path target path
+   * @param info input info
    */
-  public DBDelete(final Data d, final String p, final InputInfo ii) {
-    super(TYPE.DBDELETE, d, ii);
-    paths.add(p);
-    size = d.resources.binaries(p).size();
+  public DBDelete(final Data data, final String path, final InputInfo info) {
+    super(UpdateType.DBDELETE, data, info);
+    paths.add(path);
+    size = data.resources.binaries(path).size();
   }
 
   @Override
-  public void merge(final BasicOperation o) {
-    for(final String path : ((DBDelete) o).paths) paths.add(path);
-    size += o.size();
+  public void merge(final Update up) {
+    for(final String path : ((DBDelete) up).paths) paths.add(path);
+    size += up.size();
   }
 
   @Override

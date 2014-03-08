@@ -77,6 +77,8 @@ public enum Err {
   BXDB_NODB(BXDB, 1, "%: database node expected."),
   /** BXDB0002. */
   BXDB_OPEN(BXDB, 2, "%"),
+  /** BXDB0002. */
+  BXDB_WHICH(BXDB, 2, "Database not found: %."),
   /** BXDB0003. */
   BXDB_MEM(BXDB, 3, "Operation requires database '%' to be persistent."),
   /** BXDB0004. */
@@ -88,8 +90,7 @@ public enum Err {
   /** BXDB0006. */
   BXDB_SINGLE(BXDB, 6, "Database path '%' points to more than one document."),
   /** BXDB0007. */
-  BXDB_OPENED(BXDB, 7,
-      "Database '%' cannot be updated, as it is opened by another process."),
+  BXDB_OPENED(BXDB, 7, "Database '%' cannot be updated, as it is opened by another process."),
   /** BXDB0008. */
   BXDB_RENAME(BXDB, 8, "%: Invalid target path."),
   /** BXDB0009. */
@@ -99,11 +100,13 @@ public enum Err {
   /** BXDB0011. */
   BXDB_NAME(BXDB, 11, "Invalid database name: '%'."),
   /** BXDB0012. */
-  BXDB_CREATE(BXDB, 12, "Database '%' can only be created once."),
+  BXDB_ONCE(BXDB, 12, "Operation is only allowed once on database '%'."),
   /** BXDB0013. */
   BXDB_CREATEARGS(BXDB, 13, "Number of specified inputs and paths differs: % vs. %."),
   /** BXDB0014. */
   BXDB_DIR(BXDB, 14, "Database path '%' points to a directory."),
+  /** BXDB0015. */
+  BXDB_NOBACKUP(BXDB, 15, "No backup found: %."),
 
   // Fetch module
 
@@ -555,8 +558,6 @@ public enum Err {
   UPPUTERR(FOUP, 2, "\"%\" could not be written."),
   /** FOUP0002. */
   UPDBDROP(FOUP, 2, "Database \"%\" could not be dropped."),
-  /** FOUP0002. */
-  UPDBRESTOREMRG(FOUP, 2, "Database could not be restored. Backup files ambiguous \"%\""),
   /** FOUP0002. */
   UPDBPUTERR(FOUP, 2, "Resource \"%\" could not be written."),
   /** FOUP0002. */

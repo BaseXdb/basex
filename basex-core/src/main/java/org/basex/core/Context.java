@@ -276,6 +276,6 @@ public final class Context {
         else sl.set(d, data.meta.name);
       }
     }
-    return sl;
+    return sl.sort(true).unique();
   }
 }

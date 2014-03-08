@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public abstract class NodeCopy extends UpdatePrimitive {
+public abstract class NodeCopy extends NodeUpdate {
   /** Nodes to be inserted. */
   ANodeList insert;
   /** Insertion sequence data clip. */
@@ -29,7 +29,7 @@ public abstract class NodeCopy extends UpdatePrimitive {
    * @param i input info
    * @param n node copy
    */
-  NodeCopy(final PrimitiveType t, final int p, final Data d, final InputInfo i, final ANodeList n) {
+  NodeCopy(final UpdateType t, final int p, final Data d, final InputInfo i, final ANodeList n) {
     super(t, p, d, i);
     insert = n;
   }
@@ -105,6 +105,6 @@ public abstract class NodeCopy extends UpdatePrimitive {
 
   @Override
   public final String toString() {
-    return Util.className(this) + '[' + getTargetNode() + ", " + size() + " ops]";
+    return Util.className(this) + '[' + node() + ", " + size() + " ops]";
   }
 }

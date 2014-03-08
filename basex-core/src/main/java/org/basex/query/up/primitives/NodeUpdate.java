@@ -8,47 +8,33 @@ import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
- * Base class for all update primitives.
+ * Base class for all update primitives that operate on a specific node.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public abstract class UpdatePrimitive extends Operation {
-  /** Target node pre value. */
-  public final int targetPre;
-  /** Primitive Type. */
-  public final PrimitiveType type;
+public abstract class NodeUpdate extends DataUpdate {
+  /** Pre value of target node. */
+  public final int pre;
 
   /**
    * Constructor.
-   * @param t primitive type
-   * @param p target node pre value
-   * @param d target data reference
-   * @param ii input info
+   * @param type update type
+   * @param pre target node pre value
+   * @param data target data reference
+   * @param info input info
    */
-  UpdatePrimitive(final PrimitiveType t, final int p, final Data d, final InputInfo ii) {
-    super(d, ii);
-    targetPre = p;
-    type = t;
+  NodeUpdate(final UpdateType type, final int pre, final Data data, final InputInfo info) {
+    super(type, data, info);
+    this.pre = pre;
   }
 
   /**
    * Creates a {@link DBNode} instance from the target node information.
-   * @return DBNode
+   * @return new node instance
    */
-  @Override
-  public final DBNode getTargetNode() {
-    return new DBNode(data, targetPre);
-  }
-
-  @Override
-  public Data getData() {
-    return data;
-  }
-
-  @Override
-  public InputInfo getInfo() {
-    return info;
+  public final DBNode node() {
+    return new DBNode(data, pre);
   }
 
   /**
@@ -56,7 +42,8 @@ public abstract class UpdatePrimitive extends Operation {
    * @param p primitive to merge with
    * @throws QueryException exception
    */
-  public abstract void merge(final UpdatePrimitive p) throws QueryException;
+  @Override
+  public abstract void merge(final Update p) throws QueryException;
 
   /**
    * Updates the name pool, which is used to find duplicate attributes
@@ -87,5 +74,5 @@ public abstract class UpdatePrimitive extends Operation {
    * @return An array that contains the substituting primitives or this update primitive
    * if no substitution is necessary.
    */
-  public abstract UpdatePrimitive[] substitute(final MemData tmp);
+  public abstract NodeUpdate[] substitute(final MemData tmp);
 }

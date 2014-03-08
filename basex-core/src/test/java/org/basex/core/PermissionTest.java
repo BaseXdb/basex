@@ -152,8 +152,8 @@ public final class PermissionTest extends SandboxTest {
     no(new RepoDelete("http://www.pkg3.com", null), testSession);
 
     // XQuery update
-    no(new XQuery("for $item in doc('" + NAME + "')//xml " +
-      "return rename node $item as 'null'"), testSession);
+    no(new XQuery("for $item in doc('" + NAME + "')//xml return delete node $item"), testSession);
+    no(new XQuery("db:create('" + NAME + "')"), testSession);
     no(new Optimize(), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
     no(new Replace(RENAMED, "<xml />"), testSession);
@@ -196,6 +196,8 @@ public final class PermissionTest extends SandboxTest {
     // XQuery Update
     ok(new XQuery("for $item in doc('" + NAME + "')//xml " +
         "return rename node $item as 'null'"), testSession);
+    no(new XQuery("db:create('" + NAME + "')"), testSession);
+
     ok(new Optimize(), testSession);
     for(final CmdIndex cmd : CmdIndex.values()) {
       ok(new CreateIndex(cmd), testSession);
@@ -222,6 +224,7 @@ public final class PermissionTest extends SandboxTest {
   @Test
   public void createPermsNeeded() {
     ok(new Grant("create", NAME), adminSession);
+    ok(new XQuery("db:create('" + NAME + "')"), testSession);
 
     ok(new Close(), testSession);
     ok(new CreateDB(NAME, "<xml/>"), testSession);

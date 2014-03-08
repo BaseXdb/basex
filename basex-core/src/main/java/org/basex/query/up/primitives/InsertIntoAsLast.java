@@ -21,26 +21,25 @@ public class InsertIntoAsLast extends NodeCopy {
    * @param i input info
    * @param n node copy insertion sequence
    */
-  public InsertIntoAsLast(final int p, final Data d, final InputInfo i,
-      final ANodeList n) {
-    super(PrimitiveType.INSERTINTOLAST, p, d, i, n);
+  public InsertIntoAsLast(final int p, final Data d, final InputInfo i, final ANodeList n) {
+    super(UpdateType.INSERTINTOLAST, p, d, i, n);
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) {
-    final ANodeList newInsert = ((NodeCopy) p).insert;
+  public void merge(final Update up) {
+    final ANodeList newInsert = ((NodeCopy) up).insert;
     for(final ANode n : newInsert) insert.add(n);
   }
 
   @Override
   public void addAtomics(final AtomicUpdateCache l) {
-    final int s = data.size(targetPre, data.kind(targetPre));
-    l.addInsert(targetPre + s, targetPre, insseq, false);
+    final int s = data.size(pre, data.kind(pre));
+    l.addInsert(pre + s, pre, insseq, false);
   }
 
   @Override
-  public UpdatePrimitive[] substitute(final MemData tmp) {
-    return new UpdatePrimitive[] { this };
+  public NodeUpdate[] substitute(final MemData tmp) {
+    return new NodeUpdate[] { this };
   }
 
   @Override

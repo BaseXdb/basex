@@ -22,25 +22,25 @@ public final class InsertAfter extends NodeCopy {
    * @param c node copy insertion sequence
    */
   public InsertAfter(final int p, final Data d, final InputInfo i, final ANodeList c) {
-    super(PrimitiveType.INSERTAFTER, p, d, i, c);
+    super(UpdateType.INSERTAFTER, p, d, i, c);
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) {
+  public void merge(final Update p) {
     final ANodeList newInsert = ((NodeCopy) p).insert;
     for(final ANode n : newInsert) insert.add(n);
   }
 
   @Override
   public void addAtomics(final AtomicUpdateCache l) {
-    final int k = data.kind(targetPre);
-    final int s = data.size(targetPre, k);
-    l.addInsert(targetPre + s, data.parent(targetPre, k), insseq, false);
+    final int k = data.kind(pre);
+    final int s = data.size(pre, k);
+    l.addInsert(pre + s, data.parent(pre, k), insseq, false);
   }
 
   @Override
-  public UpdatePrimitive[] substitute(final MemData tmp) {
-    return new UpdatePrimitive[] { this };
+  public NodeUpdate[] substitute(final MemData tmp) {
+    return new NodeUpdate[] { this };
   }
 
   @Override

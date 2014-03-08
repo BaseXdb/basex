@@ -29,15 +29,15 @@ public final class Replace extends Update {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param t target expression
-   * @param r source expression
-   * @param v replace value of
+   * @param info input info
+   * @param trg target expression
+   * @param src source expression
+   * @param value replace value of
    */
-  public Replace(final StaticContext sctx, final InputInfo ii, final Expr t, final Expr r,
-      final boolean v) {
-    super(sctx, ii, t, r);
-    value = v;
+  public Replace(final StaticContext sctx, final InputInfo info, final Expr trg, final Expr src,
+      final boolean value) {
+    super(sctx, info, trg, src);
+    this.value = value;
   }
 
   @Override

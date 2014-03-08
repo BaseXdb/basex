@@ -15,13 +15,13 @@ import org.junit.*;
 import org.junit.rules.*;
 
 /**
- * Tests {@link UpdatePrimitiveComparator} that creates an order on update primitives
+ * Tests {@link NodeUpdateComparator} that creates an order on update primitives
  * and is part of the XQuery Update Facility implementation.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
+public class NodeUpdateComparatorTest extends AdvancedQueryTest {
   /** Expected exception. */
   @Rule
   public final ExpectedException thrown = ExpectedException.none();
@@ -46,7 +46,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     final String doc = "<a><b/></a>";
     final Data d = data(doc);
     compare(
-        new UpdatePrimitive[] {
+        new NodeUpdate[] {
         new DeleteNode(2, d, null)
     });
     query(transform(doc, "delete node $input//b"), "<a/>");
@@ -60,7 +60,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     final String doc = "<a><b/><c/><d/></a>";
     final Data d = data(doc);
     compare(
-        new UpdatePrimitive[] {
+        new NodeUpdate[] {
         new DeleteNode(4, d, null),
         new DeleteNode(2, d, null)
     });
@@ -75,7 +75,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     final String doc = "<a><b/><c/><d/></a>";
     final Data d = data(doc);
     compare(
-        new UpdatePrimitive[] {
+        new NodeUpdate[] {
         new DeleteNode(4, d, null),
         new DeleteNode(3, d, null),
         new DeleteNode(2, d, null)
@@ -91,7 +91,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     final String doc = "<a><b/></a>";
     final Data d = data(doc);
     compare(
-        new UpdatePrimitive[] {
+        new NodeUpdate[] {
         new InsertAfter(2, d, null, null),
         new InsertBefore(2, d, null, null)
     });
@@ -111,7 +111,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     final String doc = "<a><b/></a>";
     final Data d = data(doc);
     compare(
-        new UpdatePrimitive[] {
+        new NodeUpdate[] {
         new InsertInto(1, d, null, null),
         new InsertInto(2, d, null, null),
     });
@@ -130,7 +130,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     final String doc = "<a><b/></a>";
     final Data d = data(doc);
     compare(
-        new UpdatePrimitive[] {
+        new NodeUpdate[] {
         new InsertInto(1, d, null, null),
         new InsertAfter(2, d, null, null),
     });
@@ -151,7 +151,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     final String doc = "<a><b><c/></b></a>";
     final Data d = data(doc);
     compare(
-        new UpdatePrimitive[] {
+        new NodeUpdate[] {
         new InsertAfter(2, d, null, null),
         new InsertInto(2, d, null, null),
     });
@@ -170,7 +170,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     final String doc = "<a id=\"0\"/>";
     final Data d = data(doc);
     compare(
-        new UpdatePrimitive[] {
+        new NodeUpdate[] {
         new DeleteNode(2, d, null),
         new InsertAttribute(1, d, null, null),
     });
@@ -181,7 +181,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test if an exception is thrown for duplicate {@link UpdatePrimitive}.
+   * Test if an exception is thrown for duplicate {@link NodeUpdate}.
    */
   @Test
   public void duplicateScore() {
@@ -190,14 +190,14 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     final String doc = "<a><b/></a>";
     final Data d = data(doc);
     compare(
-        new UpdatePrimitive[] {
+        new NodeUpdate[] {
         new DeleteNode(2, d, null),
         new DeleteNode(2, d, null),
     });
   }
 
   /**
-   * Simple tests for the {@link UpdatePrimitive} comparator.
+   * Simple tests for the {@link NodeUpdate} comparator.
    *
    * Compares two primitives A and B based on the triple (LOCATION, SHIFTED,
    * SUBTREE, TYPE);
@@ -205,7 +205,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
    * - SHIFTED states if the primitives location has been updated to support
    *   InsertInto, InsertAfter statements
    * - SUBTREE states if one update takes place in the subtree of the other's target node
-   * - TYPE relates to the {@link PrimitiveType} hierarchy
+   * - TYPE relates to the {@link UpdateType} hierarchy
    */
   @Test
   public void comparatorTest() {
@@ -214,66 +214,66 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
 
     // ****** Tests on single target node T and on the single descendant of T
     //(A=B, A=B, A=B, A>B)
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new InsertIntoAsFirst(3, d, null, null),
         new InsertBefore(3, d, null, null)
     });
     //(A=B, A>B, A>B, A=B)
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new InsertInto(2, d, null, null),
         new InsertInto(3, d, null, null),
     });
     //(A=B, A>B, A=B, A>B, A<B)
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new InsertInto(2, d, null, null),
         new InsertAfter(3, d, null, null),
     });
     //(A=B, A>B, A>B, A>B)
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new InsertAfter(2, d, null, null),
         new InsertInto(3, d, null, null),
     });
     //(A>B, A>B, A>B, A<B)
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new InsertInto(2, d, null, null),
         new InsertAfter(3, d, null, null),
     });
 
     // ****** Tests on target node T and on the subtree of T
     //(A=B, A=B, A=B, A>B)
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new InsertIntoAsFirst(5, d, null, null),
         new InsertBefore(5, d, null, null)
     });
     //(A=B, A=B, A>B, A=B)
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new InsertInto(4, d, null, null),
         new InsertInto(5, d, null, null),
     });
     //(A=B, A=B, A>B, A<B)
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new InsertInto(4, d, null, null),
         new InsertAfter(5, d, null, null),
     });
     //(A=B, A=B, A>B, A>B)
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new InsertAfter(4, d, null, null),
         new InsertInto(5, d, null, null),
     });
 
     // ***** Tests on neighboring target nodes
     //(A=B, A=B, A=B, A>B)
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new InsertAfter(7, d, null, null),
         new InsertInto(7, d, null, null),
     });
     //(A=B, A>B, A=B, A=B)
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new InsertInto(7, d, null, null),
         new InsertInto(4, d, null, null),
     });
     //(A>B, A=B, A=B, A=B)
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new DeleteNode(9, d, null),
         new DeleteNode(8, d, null),
     });
@@ -285,19 +285,19 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
   @Test
   public void shiftInsertIntoAsFirst() {
     final Data d = data(TESTDOCUMENT);
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
        new InsertIntoAsFirst(22, d, null, null),
        new DeleteNode(23, d, null),
     });
   }
 
   /**
-   * Tests if {@link UpdatePrimitive} are ordered correctly for a target node T.
+   * Tests if {@link NodeUpdate} are ordered correctly for a target node T.
    */
   @Test
   public void compareOnSingleNode() {
     final Data d = data(TESTDOCUMENT);
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new InsertAfter(10, d, null, null),
         new InsertInto(10, d, null, null),
         new InsertIntoAsFirst(10, d, null, null),
@@ -311,12 +311,12 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
   }
 
   /**
-   * Tests if {@link UpdatePrimitive} are ordered correctly for two sibling nodes.
+   * Tests if {@link NodeUpdate} are ordered correctly for two sibling nodes.
    */
   @Test
   public void compareOnSiblings() {
     final Data d = data(TESTDOCUMENT);
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new InsertAfter(8, d, null, null),
         new InsertInto(8, d, null, null),
         new InsertIntoAsFirst(8, d, null, null),
@@ -339,12 +339,12 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
   }
 
   /**
-   * Tests if {@link UpdatePrimitive} are ordered correctly for a target node T.
+   * Tests if {@link NodeUpdate} are ordered correctly for a target node T.
    */
   @Test
   public void compareComplexRelationships() {
     final Data d = data(TESTDOCUMENT);
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         // 25
         new InsertAfter(18, d, null, null),
         new InsertInto(18, d, null, null),
@@ -414,13 +414,13 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
   }
 
   /**
-   * Tests order of {@link UpdatePrimitive} for 2 siblings with the first sibling having
+   * Tests order of {@link NodeUpdate} for 2 siblings with the first sibling having
    * a single child node.
    */
   @Test
   public void compareSiblingsComplex() {
     final Data d = data(TESTDOCUMENT);
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         // node 28
         new InsertAfter(28, d, null, null),
         new InsertInto(28, d, null, null),
@@ -445,37 +445,37 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
   }
 
   /**
-   * Tests order of {@link UpdatePrimitive} for 2 siblings with the first sibling having
+   * Tests order of {@link NodeUpdate} for 2 siblings with the first sibling having
    * a single child node.
    */
   @Test
   public void compareSiblingsSimple() {
     final Data d = data(TESTDOCUMENT);
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new InsertInto(28, d, null, null),
         new InsertInto(26, d, null, null),
     });
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new InsertInto(31, d, null, null),
         new InsertInto(29, d, null, null),
     });
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new DeleteNode(28, d, null),
         new InsertInto(26, d, null, null),
     });
     // two empty siblings
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new InsertInto(8, d, null, null),
         new InsertInto(7, d, null, null),
     });
     // first sibling has attribute, second one is empty
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new DeleteNode(35, d, null),
         new InsertIntoAsFirst(33, d, null, null),
         new DeleteNode(34, d, null),
     });
     // two empty siblings
-    compare(new UpdatePrimitive[] {
+    compare(new NodeUpdate[] {
         new DeleteNode(8, d, null),
         new InsertInto(7, d, null, null),
     });
@@ -502,14 +502,14 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
    * @param order update primitives (ordered as expected, that means the first given
    * primitive is the first to be executed, hence has the highest score)
    */
-  private static void compare(final UpdatePrimitive[] order) {
-    final List<UpdatePrimitive> l = new ArrayList<UpdatePrimitive>();
+  private static void compare(final NodeUpdate[] order) {
+    final List<NodeUpdate> l = new ArrayList<NodeUpdate>();
     Collections.addAll(l, order);
-    final List<UpdatePrimitive> l2 = new ArrayList<UpdatePrimitive>();
-    for(final UpdatePrimitive p : order) l2.add(0, p);
+    final List<NodeUpdate> l2 = new ArrayList<NodeUpdate>();
+    for(final NodeUpdate p : order) l2.add(0, p);
 
     // primitives are sorted ASCENDING
-    final UpdatePrimitiveComparator c = new UpdatePrimitiveComparator();
+    final NodeUpdateComparator c = new NodeUpdateComparator();
     Collections.sort(l, c);
     Collections.sort(l2, c);
 
@@ -518,8 +518,8 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     // check if primitives are ordered as expected
     for(int i = 0; i < s; i++) {
       // ordered list must be traversed back-to-front as elements are sorted ascending
-      final UpdatePrimitive p = l.get(s - i - 1);
-      final UpdatePrimitive p2 = l2.get(s - i - 1);
+      final NodeUpdate p = l.get(s - i - 1);
+      final NodeUpdate p2 = l2.get(s - i - 1);
       if(!p.equals(order[i]) || !p2.equals(order[i]))
         fail("Unexpected order of updates at position: " + i);
     }

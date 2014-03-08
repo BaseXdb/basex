@@ -18,23 +18,23 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This class 'caches' all updates, fn:put operations and other database related
- * operations that are initiated within a snapshot. Regarding the XQUF specification it
- * fulfills the purpose of a 'pending update list'.
+ * This class 'caches' all updates, fn:put operations and other database related operations that
+ * are initiated within a snapshot. Regarding the XQUF specification it fulfills the purpose of
+ * a 'pending update list'.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-final class DatabaseUpdates {
+final class DataUpdates {
   /** Data reference. */
   private final Data data;
   /** Pre values of target nodes. */
   private IntList nodes = new IntList(0);
-  /** Mapping between pre values of the target nodes and all update primitives
+  /** Mapping between pre values of the target nodes and all node updates
    * which operate on this target. */
-  private IntObjMap<NodeUpdates> updatePrimitives = new IntObjMap<NodeUpdates>();
-  /** Database operations which are applied after all updates have been executed. */
-  private final List<BasicOperation> dbops = new LinkedList<BasicOperation>();
+  private IntObjMap<NodeUpdates> nodeUpdates = new IntObjMap<NodeUpdates>();
+  /** Database updates. */
+  private final List<DBUpdate> dbUpdates = new LinkedList<DBUpdate>();
   /** Put operations which reflect all changes made during the snapshot, hence executed
    * after updates have been carried out. */
   private final IntObjMap<Put> puts = new IntObjMap<Put>();
@@ -45,56 +45,45 @@ final class DatabaseUpdates {
    * Constructor.
    * @param d data reference
    */
-  DatabaseUpdates(final Data d) {
+  DataUpdates(final Data d) {
     data = d;
   }
 
   /**
    * Adds an update primitive to the list.
-   * @param o update primitive
+   * @param up update primitive
    * @param tmp temporary mem data
    * @throws QueryException query exception
    */
-  void add(final Operation o, final MemData tmp) throws QueryException {
-    if(o instanceof UpdatePrimitive) {
-      for(final UpdatePrimitive subp : ((UpdatePrimitive) o).substitute(tmp)) {
-        final int pre = subp.targetPre;
-        NodeUpdates pc = updatePrimitives.get(pre);
+  void add(final DataUpdate up, final MemData tmp) throws QueryException {
+    if(up instanceof NodeUpdate) {
+      for(final NodeUpdate nodeUp : ((NodeUpdate) up).substitute(tmp)) {
+        final int pre = nodeUp.pre;
+        NodeUpdates pc = nodeUpdates.get(pre);
         if(pc == null) {
           pc = new NodeUpdates();
-          updatePrimitives.put(pre, pc);
+          nodeUpdates.put(pre, pc);
         }
-        pc.add(subp);
+        pc.add(nodeUp);
       }
 
-    } else if(o instanceof Put) {
-      final Put p = (Put) o;
+    } else if(up instanceof Put) {
+      final Put p = (Put) up;
       final int id = p.nodeid;
       final Put old = puts.get(id);
-      if(old == null)
-        puts.put(id, p);
-      else
-        old.merge(p);
+      if(old == null) puts.put(id, p);
+      else old.merge(p);
 
     } else {
-      final BasicOperation oo = (BasicOperation) o;
-      final BasicOperation d = find(oo);
-      if(d == null) dbops.add(oo);
-      else d.merge(oo);
+      final DBUpdate dbUp = (DBUpdate) up;
+      for(final DBUpdate o : dbUpdates) {
+        if(o.type == dbUp.type) {
+          o.merge(dbUp);
+          return;
+        }
+      }
+      dbUpdates.add(dbUp);
     }
-  }
-
-  /**
-   * Finds a {@link BasicOperation} of the same
-   * {@link org.basex.query.up.primitives.BasicOperation.TYPE} in the operations list if
-   * there is any.
-   * @param oo DBOperation of a specific type
-   * @return DBOperation of the same type, or null if there is none
-   */
-  private BasicOperation find(final BasicOperation oo) {
-    for(final BasicOperation o : dbops)
-      if(o.type == oo.type) return o;
-    return null;
   }
 
   /**
@@ -103,21 +92,19 @@ final class DatabaseUpdates {
    * @param tmp temporary mem data
    * @throws QueryException query exception
    */
-  void check(final MemData tmp) throws QueryException {
+  void prepare(final MemData tmp) throws QueryException {
     // Prepare/check database operations
-    for(final BasicOperation d : dbops)
-      d.prepare(tmp);
+    for(final DBUpdate d : dbUpdates) d.prepare(tmp);
 
     // Prepare/check XQUP primitives:
-    final int s = updatePrimitives.size();
+    final int s = nodeUpdates.size();
     nodes = new IntList(s);
-    for(int i = 1; i <= s; i++)
-      nodes.add(updatePrimitives.key(i));
+    for(int i = 1; i <= s; i++) nodes.add(nodeUpdates.key(i));
     nodes.sort();
 
     for(int i = 0; i < s; ++i) {
-      final NodeUpdates ups = updatePrimitives.get(nodes.get(i));
-      for(final UpdatePrimitive p : ups.prim) {
+      final NodeUpdates ups = nodeUpdates.get(nodes.get(i));
+      for(final NodeUpdate p : ups.updates) {
         if(p instanceof NodeCopy) ((NodeCopy) p).prepare(tmp);
       }
     }
@@ -154,8 +141,7 @@ final class DatabaseUpdates {
    * Locks the database for write operations.
    */
   void finishUpdate() {
-    // may have been invalidated by db:drop
-    if(data != null) data.finishUpdate();
+    data.finishUpdate();
   }
 
   /**
@@ -175,11 +161,11 @@ final class DatabaseUpdates {
     createAtomicUpdates(preparePrimitives()).execute(true);
 
     // execute database operations
-    Collections.sort(dbops);
-    for(final BasicOperation d : dbops) d.apply();
+    Collections.sort(dbUpdates);
+    for(final DBUpdate bo : dbUpdates) bo.apply();
 
     // execute fn:put operations
-    for(final Put p : puts.values()) p.apply();
+    for(final Put put : puts.values()) put.apply();
 
     // optional: write main memory databases of file instances back to disk
     if(data.inMemory() && !data.meta.original.isEmpty() &&
@@ -193,39 +179,39 @@ final class DatabaseUpdates {
   }
 
   /**
-   * Prepares the {@link UpdatePrimitive} for execution incl. ordering,
+   * Prepares the {@link NodeUpdate} for execution incl. ordering,
    * and removes the update primitive references to save memory.
    * @return ordered list of update primitives
    */
-  private List<UpdatePrimitive> preparePrimitives() {
-    final List<UpdatePrimitive> upd = new ArrayList<UpdatePrimitive>();
+  private List<NodeUpdate> preparePrimitives() {
+    final List<NodeUpdate> upd = new ArrayList<NodeUpdate>();
     for(int i = nodes.size() - 1; i >= 0; i--) {
       final int pre = nodes.get(i);
-      final NodeUpdates n = updatePrimitives.get(pre);
-      for(final UpdatePrimitive p : n.finish()) {
+      final NodeUpdates n = nodeUpdates.get(pre);
+      for(final NodeUpdate p : n.finish()) {
         upd.add(p);
         size += p.size();
       }
     }
-    for(int i = dbops.size() - 1; i >= 0; i--) {
-      size += dbops.get(i).size();
+    for(int i = dbUpdates.size() - 1; i >= 0; i--) {
+      size += dbUpdates.get(i).size();
     }
-    updatePrimitives = null;
+    nodeUpdates = null;
     nodes = null;
-    Collections.sort(upd, new UpdatePrimitiveComparator());
+    Collections.sort(upd, new NodeUpdateComparator());
     return upd;
   }
 
   /**
    * Creates a list of atomic updates that can be applied to the database.
-   * @param l list of ordered {@link UpdatePrimitive}
+   * @param l list of ordered {@link NodeUpdate}
    * @return list of atomic updates ready for execution
    */
-  private AtomicUpdateCache createAtomicUpdates(final List<UpdatePrimitive> l) {
+  private AtomicUpdateCache createAtomicUpdates(final List<NodeUpdate> l) {
     final AtomicUpdateCache atomics = new AtomicUpdateCache(data);
     //  from the lowest to the highest score, corresponds w/ from lowest to highest PRE
     for(int i = 0; i < l.size(); i++) {
-      final UpdatePrimitive u = l.get(i);
+      final NodeUpdate u = l.get(i);
       u.addAtomics(atomics);
       l.set(i, null);
     }
@@ -249,9 +235,9 @@ final class DatabaseUpdates {
     // check for namespace conflicts
     final NamePool pool = new NamePool();
     for(final int pre : pres) {
-      final NodeUpdates ups = updatePrimitives.get(pre);
+      final NodeUpdates ups = nodeUpdates.get(pre);
       // add changes introduced by updates to check namespaces and duplicate attributes
-      if(ups != null) for(final UpdatePrimitive up : ups.prim) up.update(pool);
+      if(ups != null) for(final NodeUpdate up : ups.updates) up.update(pool);
     }
     // check namespaces
     if(!pool.nsOK()) throw UPNSCONFL2.get(null);
