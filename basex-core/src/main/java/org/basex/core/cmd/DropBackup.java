@@ -29,30 +29,45 @@ public class DropBackup extends ABackup {
     final String name = args[0];
     if(!Databases.validName(name, true)) return error(NAME_INVALID_X, name);
 
-    // retrieve all databases
+    // loop through all databases and collect databases to be dropped
     final StringList dbs = context.databases.listDBs(name);
-    // loop through all databases and drop backups
-    for(final String db : dbs) drop(db.contains("-") ? db : db + '-', context);
+    // if the given argument is not a database name, it could be the name of a backup file
+    if(dbs.isEmpty()) dbs.add(name);
 
-    // if the given argument is not a database name, it could be the name
-    // of a backup file
-    if(dbs.isEmpty()) drop(name, context);
+    // drop all backups
+    for(final String db : dbs) {
+      for(final String file : backups(db.contains("-") ? db : db + '-', context))
+        drop(file, context);
+    }
 
     return info(BACKUP_DROPPED_X, name + '*' + IO.ZIPSUFFIX);
   }
 
   /**
-   * Drops one or more backups of the specified database.
-   *
-   * @param db database
+   * Returns the backups found for the specified database prefix.
+   * @param db database prefix
    * @param ctx database context
+   * @return names of backup files to be dropped
    */
-  private static void drop(final String db, final Context ctx) {
+  public static StringList backups(final String db, final Context ctx) {
+    final StringList names = new StringList();
     final IOFile dir = ctx.globalopts.dbpath();
     for(final IOFile f : dir.children()) {
       final String n = f.name();
-      if(n.startsWith(db) && n.endsWith(IO.ZIPSUFFIX)) f.delete();
+      if(n.startsWith(db) && n.endsWith(IO.ZIPSUFFIX)) names.add(n);
     }
+    return names;
+  }
+
+  /**
+   * Drops one or more backups of the specified database.
+   * @param name name of database file
+   * @param ctx database context
+   * @return success flag
+   */
+  public static boolean drop(final String name, final Context ctx) {
+    final IOFile dir = ctx.globalopts.dbpath();
+    return new IOFile(dir, name).delete();
   }
 
   @Override

@@ -47,35 +47,45 @@ public final class Copy extends Command {
     if(goptions.dbexists(trg)) return error(DB_EXISTS_X, trg);
 
     // try to copy database
-    return copy(src, trg) ? info(DB_COPIED_X, src, perf) : error(DB_NOT_COPIED_X, src);
+    try {
+      copy(src, trg, context, this);
+      return info(DB_COPIED_X, src, perf);
+    } catch(final IOException ex) {
+      return error(DB_NOT_COPIED_X, src);
+    }
   }
 
   /**
    * Copies the specified database.
    * @param source name of the database
    * @param target new database name
-   * @return success flag
+   * @param context database context
+   * @param cmd calling command
+   * @throws IOException I/O exception
    */
-  private boolean copy(final String source, final String target) {
+  public static void copy(final String source, final String target, final Context context,
+      final Copy cmd) throws IOException {
+
+    final GlobalOptions goptions = context.globalopts;
     final IOFile src = goptions.dbpath(source);
     final IOFile trg = goptions.dbpath(target);
 
+    // drop target database
+    DropDB.drop(target, context);
+
     // return false if source cannot be opened, or target cannot be created
     final StringList files = src.descendants();
-    tf = files.size();
+    if(cmd != null) cmd.tf = files.size();
     try {
       for(final String file : files) {
-        if(FILES.matcher(file).matches()) {
-          new IOFile(src, file).copyTo(new IOFile(trg, file));
-        }
-        of++;
+        if(FILES.matcher(file).matches()) new IOFile(src, file).copyTo(new IOFile(trg, file));
+        if(cmd != null) cmd.of++;
       }
-      return true;
     } catch(final IOException ex) {
       // drop new database if error occurred
       Util.debug(ex);
       DropDB.drop(target, context);
-      return false;
+      throw ex;
     }
   }
 

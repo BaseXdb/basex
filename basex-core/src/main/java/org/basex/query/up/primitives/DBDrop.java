@@ -31,6 +31,9 @@ public final class DBDrop extends NameUpdate {
   public void apply() throws QueryException {
     close();
     // check if database files can be safely removed
-    if(!DropDB.drop(name, qc.context)) throw UPDBDROP.get(info, name);
+    if(!DropDB.drop(name, qc.context)) throw UPDBERROR.get(info, name, operation());
   }
+
+  @Override
+  public String operation() { return "dropped"; }
 }

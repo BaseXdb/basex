@@ -651,20 +651,76 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * db:backup test method.
+   * db:create-backup test method.
    * @throws BaseXException exception
    */
   @Test
-  public void backup() throws BaseXException {
+  public void createBackup() throws BaseXException {
     query(COUNT.args(_DB_BACKUPS.args(NAME)), "0");
-    query(_DB_BACKUP.args(NAME));
+    query(_DB_CREATE_BACKUP.args(NAME));
     query(COUNT.args(_DB_BACKUPS.args(NAME)), "1");
 
     // try to backup non-existing database
-    error(_DB_BACKUP.args(NAME + 'x'), Err.BXDB_WHICH);
+    error(_DB_CREATE_BACKUP.args(NAME + 'x'), Err.BXDB_WHICH);
     // cleanup
     new DropBackup(NAME).execute(context);
     query(COUNT.args(_DB_BACKUPS.args(NAME)), "0");
+  }
+
+  /**
+   * db:drop-backup test method.
+   */
+  @Test
+  public void dropBackup() {
+    // create and drop backup does not exist
+    query(_DB_CREATE_BACKUP.args(NAME));
+    query(_DB_DROP_BACKUP.args(NAME));
+    // backup file does not exist
+    error(_DB_DROP_BACKUP.args(NAME), Err.BXDB_WHICHBACK);
+    // check if drop is called before create
+    error(_DB_CREATE_BACKUP.args(NAME) + ',' + _DB_DROP_BACKUP.args(NAME), Err.BXDB_WHICHBACK);
+
+    // [LK] more tests... EclEmma may help
+  }
+
+  /**
+   * db:copy test method.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void copy() throws BaseXException {
+    // close database in global context
+    new Close().execute(context);
+
+    // copy database to new name and vice versa
+    query(_DB_COPY.args(NAME, NAME + 'x'));
+    query(_DB_COPY.args(NAME + 'x', NAME));
+    // same name is disallowed
+    error(_DB_COPY.args(NAME, NAME), Err.BXDB_SAME);
+    // source database does not exist
+    error(_DB_COPY.args(NAME + "xx", NAME), Err.BXDB_WHICH);
+
+    // [LK] more tests... EclEmma may help
+  }
+
+  /**
+   * db:alter test method.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void alter() throws BaseXException {
+    // close database in global context
+    new Close().execute(context);
+
+    // rename database to new name and vice versa
+    query(_DB_ALTER.args(NAME, NAME + 'x'));
+    query(_DB_ALTER.args(NAME + 'x', NAME));
+    // same name is disallowed
+    error(_DB_ALTER.args(NAME, NAME), Err.BXDB_SAME);
+    // source database does not exist
+    error(_DB_ALTER.args(NAME + "xx", NAME), Err.BXDB_WHICH);
+
+    // [LK] more tests... EclEmma may help
   }
 
   /**
@@ -676,7 +732,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     new Close().execute(context);
 
     // backup and restore file
-    query(_DB_BACKUP.args(NAME));
+    query(_DB_CREATE_BACKUP.args(NAME));
     query(_DB_RESTORE.args(NAME));
 
     // [LK] more tests! E.g. combination of restore, create, ...

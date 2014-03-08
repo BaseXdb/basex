@@ -79,6 +79,8 @@ public enum Err {
   BXDB_OPEN(BXDB, 2, "%"),
   /** BXDB0002. */
   BXDB_WHICH(BXDB, 2, "Database not found: %."),
+  /** BXDB0002. */
+  BXDB_WHICHBACK(BXDB, 2, "No backup file found: %."),
   /** BXDB0003. */
   BXDB_MEM(BXDB, 3, "Operation requires database '%' to be persistent."),
   /** BXDB0004. */
@@ -100,13 +102,19 @@ public enum Err {
   /** BXDB0011. */
   BXDB_NAME(BXDB, 11, "Invalid database name: '%'."),
   /** BXDB0012. */
-  BXDB_ONCE(BXDB, 12, "Operation is only allowed once on database '%'."),
+  BXDB_ALTERDROP(BXDB, 12, "Database '%' cannot be both altered and dropped."),
+  /** BXDB0012. */
+  BXDB_ONCE(BXDB, 12, "Database '%' can only be % once."),
+  /** BXDB0012. */
+  BXDB_ONCEBACK(BXDB, 12, "Backup '%' can only be % once."),
   /** BXDB0013. */
   BXDB_CREATEARGS(BXDB, 13, "Number of specified inputs and paths differs: % vs. %."),
   /** BXDB0014. */
   BXDB_DIR(BXDB, 14, "Database path '%' points to a directory."),
   /** BXDB0015. */
   BXDB_NOBACKUP(BXDB, 15, "No backup found: %."),
+  /** BXDB0016. */
+  BXDB_SAME(BXDB, 16, "Name of source and target database is equal: %."),
 
   // Fetch module
 
@@ -557,7 +565,9 @@ public enum Err {
   /** FOUP0002. */
   UPPUTERR(FOUP, 2, "\"%\" could not be written."),
   /** FOUP0002. */
-  UPDBDROP(FOUP, 2, "Database \"%\" could not be dropped."),
+  UPDROPBACK(FOUP, 2, "Backup \"%\" could not be %."),
+  /** FOUP0002. */
+  UPDBERROR(FOUP, 2, "Database \"%\" could not be %."),
   /** FOUP0002. */
   UPDBPUTERR(FOUP, 2, "Resource \"%\" could not be written."),
   /** FOUP0002. */

@@ -47,4 +47,7 @@ public class DBRestore extends NameUpdate {
 
   @Override
   public void prepare() throws QueryException { }
+
+  @Override
+  public String operation() { return "restored"; }
 }

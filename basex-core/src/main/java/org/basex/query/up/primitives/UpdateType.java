@@ -23,7 +23,7 @@ public enum UpdateType {
 
   // Backup operation
 
-  /** DBBackup.             */ DBBACKUP,
+  /** Create backup.        */ BACKUPCREATE,
 
   // Operations on nodes of existing databases
 
@@ -43,16 +43,19 @@ public enum UpdateType {
 
   // Operations on resources of existing databases
 
-  /** DBAdd.                */ DBADD,
-  /** DBStore.              */ DBSTORE,
-  /** DBRename.             */ DBRENAME,
-  /** DBDelete.             */ DBDELETE,
-  /** DBOptimize.           */ DBOPTIMIZE,
-  /** DBFlush.              */ DBFLUSH,
+  /** Add document.         */ DBADD,
+  /** Add binary resource.  */ DBSTORE,
+  /** Rename resource.      */ DBRENAME,
+  /** Delete resource.      */ DBDELETE,
+  /** Optimize database.    */ DBOPTIMIZE,
+  /** Flush database.       */ DBFLUSH,
 
   // Database operations
 
-  /** DBDrop.               */ DBDROP,
-  /** DBCreate.             */ DBCREATE,
-  /** DBRestore.            */ DBRESTORE,
+  /** Copy database.        */ DBCOPY,
+  /** Alter database.       */ DBALTER,
+  /** Drop database.        */ DBDROP,
+  /** Create database.      */ DBCREATE,
+  /** Restore database.     */ DBRESTORE,
+  /** Drop backup.          */ BACKUPDROP,
 }

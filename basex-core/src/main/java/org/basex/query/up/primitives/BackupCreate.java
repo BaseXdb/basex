@@ -10,20 +10,20 @@ import org.basex.query.func.*;
 import org.basex.util.*;
 
 /**
- * Update primitive for the {@link Function#_DB_BACKUP} function.
+ * Update primitive for the {@link Function#_DB_CREATE_BACKUP} function.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public class DBBackup extends NameUpdate {
+public class BackupCreate extends NameUpdate {
   /**
    * Constructor.
    * @param name name of database to be backed up
    * @param info input info
    * @param qc query context
    */
-  public DBBackup(final String name, final InputInfo info, final QueryContext qc) {
-    super(UpdateType.DBBACKUP, name, info, qc);
+  public BackupCreate(final String name, final InputInfo info, final QueryContext qc) {
+    super(UpdateType.BACKUPCREATE, name, info, qc);
   }
 
   @Override
@@ -37,4 +37,7 @@ public class DBBackup extends NameUpdate {
 
   @Override
   public void prepare() throws QueryException { }
+
+  @Override
+  public String operation() { return "backed up"; }
 }

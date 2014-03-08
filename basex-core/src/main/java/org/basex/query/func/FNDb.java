@@ -104,32 +104,35 @@ public final class FNDb extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case _DB_EVENT:        return event(ctx);
-      case _DB_OUTPUT:       return output(ctx);
-      case _DB_OPEN_ID:      return open(ctx, true);
-      case _DB_OPEN_PRE:     return open(ctx, false);
-      case _DB_SYSTEM:       return system(ctx);
-      case _DB_INFO:         return info(ctx);
-      case _DB_ADD:          return add(ctx);
-      case _DB_DELETE:       return delete(ctx);
-      case _DB_CREATE:       return create(ctx);
-      case _DB_DROP:         return drop(ctx);
-      case _DB_RENAME:       return rename(ctx);
-      case _DB_REPLACE:      return replace(ctx);
-      case _DB_OPTIMIZE:     return optimize(ctx);
-      case _DB_STORE:        return store(ctx);
-      case _DB_RETRIEVE:     return retrieve(ctx);
-      case _DB_FLUSH:        return flush(ctx);
-      case _DB_IS_RAW:       return isRaw(ctx);
-      case _DB_EXISTS:       return exists(ctx);
-      case _DB_IS_XML:       return isXML(ctx);
-      case _DB_CONTENT_TYPE: return contentType(ctx);
-      case _DB_EXPORT:       return export(ctx);
-      case _DB_NAME:         return name(ctx);
-      case _DB_PATH:         return path(ctx);
-      case _DB_BACKUP:       return backup(ctx);
-      case _DB_RESTORE:      return restore(ctx);
-      default:               return super.item(ctx, ii);
+      case _DB_ADD:           return add(ctx);
+      case _DB_ALTER:         return copy(ctx, false);
+      case _DB_CONTENT_TYPE:  return contentType(ctx);
+      case _DB_COPY:          return copy(ctx, true);
+      case _DB_CREATE:        return create(ctx);
+      case _DB_CREATE_BACKUP: return createBackup(ctx);
+      case _DB_DELETE:        return delete(ctx);
+      case _DB_DROP:          return drop(ctx);
+      case _DB_DROP_BACKUP:   return dropBackup(ctx);
+      case _DB_EVENT:         return event(ctx);
+      case _DB_EXISTS:        return exists(ctx);
+      case _DB_EXPORT:        return export(ctx);
+      case _DB_FLUSH:         return flush(ctx);
+      case _DB_INFO:          return info(ctx);
+      case _DB_IS_RAW:        return isRaw(ctx);
+      case _DB_IS_XML:        return isXML(ctx);
+      case _DB_NAME:          return name(ctx);
+      case _DB_OPEN_ID:       return open(ctx, true);
+      case _DB_OPEN_PRE:      return open(ctx, false);
+      case _DB_OPTIMIZE:      return optimize(ctx);
+      case _DB_OUTPUT:        return output(ctx);
+      case _DB_PATH:          return path(ctx);
+      case _DB_RENAME:        return rename(ctx);
+      case _DB_REPLACE:       return replace(ctx);
+      case _DB_RESTORE:       return restore(ctx);
+      case _DB_RETRIEVE:      return retrieve(ctx);
+      case _DB_STORE:         return store(ctx);
+      case _DB_SYSTEM:        return system(ctx);
+      default:                return super.item(ctx, ii);
     }
   }
 
@@ -628,13 +631,36 @@ public final class FNDb extends StandardFunc {
   }
 
   /**
+   * Performs the copy function.
+   * @param ctx query context
+   * @param keep keep copied database
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item copy(final QueryContext ctx, final boolean keep) throws QueryException {
+    final String name = string(checkStr(expr[0], ctx));
+    final String newname = string(checkStr(expr[1], ctx));
+
+    if(!Databases.validName(name)) throw BXDB_NAME.get(info, name);
+    if(!Databases.validName(newname)) throw BXDB_NAME.get(info, newname);
+
+    // source database does not exist
+    final GlobalOptions goptions = ctx.context.globalopts;
+    if(!goptions.dbexists(name)) throw BXDB_WHICH.get(info, name);
+    if(name.equals(newname)) throw BXDB_SAME.get(info, name, newname);
+
+    ctx.updates.add(keep ? new DBCopy(name, newname, info, ctx) :
+      new DBAlter(name, newname, info, ctx), ctx);
+    return null;
+  }
+
+  /**
    * Performs the create function.
    * @param ctx query context
    * @return {@code null}
    * @throws QueryException query exception
    */
   private Item create(final QueryContext ctx) throws QueryException {
-    checkCreate(ctx);
     final String name = string(checkStr(expr[0], ctx));
     if(!Databases.validName(name)) throw BXDB_NAME.get(info, name);
 
@@ -675,8 +701,6 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item drop(final QueryContext ctx) throws QueryException {
-    checkCreate(ctx);
-
     final String name = string(checkStr(expr[0], ctx));
     if(!Databases.validName(name)) throw BXDB_NAME.get(info, name);
     if(!ctx.context.globalopts.dbexists(name)) throw BXDB_WHICH.get(info, name);
@@ -685,18 +709,36 @@ public final class FNDb extends StandardFunc {
   }
 
   /**
-   * Performs the backup function.
+   * Performs the create-backup function.
    * @param ctx query context
    * @return {@code null}
    * @throws QueryException query exception
    */
-  private Item backup(final QueryContext ctx) throws QueryException {
-    checkCreate(ctx);
+  private Item createBackup(final QueryContext ctx) throws QueryException {
     final String name = string(checkStr(expr[0], ctx));
     if(!Databases.validName(name)) throw BXDB_NAME.get(info, name);
     if(!ctx.context.globalopts.dbexists(name)) throw BXDB_WHICH.get(info, name);
 
-    ctx.updates.add(new DBBackup(name, info, ctx), ctx);
+    ctx.updates.add(new BackupCreate(name, info, ctx), ctx);
+    return null;
+  }
+
+  /**
+   * Performs the drop-backup function.
+   * @param ctx query context
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item dropBackup(final QueryContext ctx) throws QueryException {
+    final String name = string(checkStr(expr[0], ctx));
+    if(!Databases.validName(name)) throw BXDB_NAME.get(info, name);
+
+    final StringList files = DropBackup.backups(name, ctx.context);
+    if(files.isEmpty()) throw BXDB_WHICHBACK.get(info, name);
+
+    for(final String file : files) {
+      ctx.updates.add(new BackupDrop(file, info, ctx), ctx);
+    }
     return null;
   }
 
@@ -707,7 +749,6 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item restore(final QueryContext ctx) throws QueryException {
-    checkCreate(ctx);
     // extract database name from backup file
     final String name = string(checkStr(expr[0], ctx));
     final String db = Restore.dbName(name);

@@ -83,4 +83,7 @@ public final class DBCreate extends NameUpdate {
   public String toString() {
     return Util.className(this) + '[' + add.inputs + ']';
   }
+
+  @Override
+  public String operation() { return "created"; }
 }

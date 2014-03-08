@@ -644,7 +644,13 @@ public enum Function {
   /** XQuery function. */
   _DB_BACKUPS(FNDb.class, "backups([database])", arg(ITEM), ELM_ZM),
   /** XQuery function. */
-  _DB_BACKUP(FNDb.class, "backup(database)", arg(STR), EMP, flag(UPD, NDT)),
+  _DB_CREATE_BACKUP(FNDb.class, "create-backup(database)", arg(STR), EMP, flag(UPD, NDT)),
+  /** XQuery function. */
+  _DB_COPY(FNDb.class, "copy(database, new-name)", arg(STR, STR), EMP, flag(UPD, NDT)),
+  /** XQuery function. */
+  _DB_ALTER(FNDb.class, "alter(database, new-name)", arg(STR, STR), EMP, flag(UPD, NDT)),
+  /** XQuery function. */
+  _DB_DROP_BACKUP(FNDb.class, "drop-backup(name)", arg(STR), EMP, flag(UPD, NDT)),
   /** XQuery function. */
   _DB_RESTORE(FNDb.class, "restore(backup)", arg(STR), EMP, flag(UPD, NDT)),
   /** XQuery function. */
@@ -669,7 +675,7 @@ public enum Function {
   /** XQuery function. */
   _DB_DROP(FNDb.class, "drop(database)", arg(ITEM), EMP, flag(UPD, NDT)),
   /** XQuery function. */
-  _DB_RENAME(FNDb.class, "rename(database,path,newpath)", arg(STR, STR, STR), EMP, flag(UPD, NDT)),
+  _DB_RENAME(FNDb.class, "rename(database,path,new-path)", arg(STR, STR, STR), EMP, flag(UPD, NDT)),
   /** XQuery function. */
   _DB_REPLACE(FNDb.class, "replace(database,path,item)", arg(STR, STR, ITEM), EMP, flag(UPD, NDT)),
   /** XQuery function. */
