@@ -34,15 +34,12 @@ public class Restore extends ABackup {
     if(!Databases.validName(db)) return error(NAME_INVALID_X, db);
 
     // find backup file with or without date suffix
-    IOFile file = goptions.dbpath(db + IO.ZIPSUFFIX);
-    if(file.exists()) {
-      // db is already the name of a backup -> extract db name
-      db = Pattern.compile(DateTime.PATTERN + '$').split(db)[0];
-    } else {
-      final StringList list = Databases.backupPaths(db, context).sort(Prop.CASE, false);
-      if(!list.isEmpty()) file = new IOFile(list.get(0));
-    }
-    if(!file.exists()) return error(BACKUP_NOT_FOUND_X, db);
+    IOFile file = backupFile(db, context);
+    // db is already the name of a backup -> extract db name
+    if(file != null)
+      db = dbName(db);
+    else
+      return error(BACKUP_NOT_FOUND_X, db);
 
     // close database if it's currently opened and not opened by others
     if(!closed) closed = close(context, db);
@@ -51,7 +48,7 @@ public class Restore extends ABackup {
 
     // try to restore database
     try {
-      restore(file, this);
+      restore(file, this, goptions);
       return !closed || new Open(db).run(context) ?
         info(DB_RESTORED_X, file.name(), perf) : error(DB_NOT_RESTORED_X, db);
     } catch(final IOException ex) {
@@ -59,25 +56,59 @@ public class Restore extends ABackup {
     }
   }
 
+  /**
+   * Extracts the name of a database from the name of a backup file. E.g. for the backup name
+   * backup-2014-03-04-09-02-33, the method returns 'backup' as the database name.
+   * @param backupName Name of the backup file.
+   *                   Valid formats:
+   *                    <dbname>-yyyy-mm-dd-hh-mm-ss
+   *                    <dbname>
+   * @return name of the database (<dbname>)
+   */
+  public static String dbName(final String backupName) {
+    return Pattern.compile(DateTime.PATTERN + '$').split(backupName)[0];
+  }
+
+  /**
+   * Finds either a specific backup file if the complete name is given or the latest backup file
+   * otherwise.
+   * @param name name of backup file or database name
+   * @param ctx context
+   * @return IOFile backup file, or {@code null} if there is no backup for the given database
+   */
+  public static IOFile backupFile(final String name, final Context ctx) {
+    String n = name;
+
+    // find backup file with date suffix
+    IOFile file = ctx.globalopts.dbpath(n + IO.ZIPSUFFIX);
+    if(file.exists())
+      return file;
+
+    // in case only the database name is given, find the latest backup
+    final StringList list = Databases.backupPaths(n, ctx).sort(Prop.CASE, false);
+    return !list.isEmpty() ? new IOFile(list.get(0)) : null;
+  }
+
   @Override
   public void databases(final LockResult lr) {
     super.databases(lr);
     final String name = args[0];
     // Not sure whether database or backup name is provided, lock both
-    final String dbName = Pattern.compile(DateTime.PATTERN + '$').split(name)[0];
-    lr.write.add(name).add(dbName);
+    lr.write.add(name).add(dbName(name));
   }
 
   /**
    * Restores the specified database.
-   * @param file file
-   * @param cmd calling command instance
-   * @throws IOException I/O exception
+   * @param file          file
+   * @param cmd calling   command instance
+   * @param glblOptions   global options
+   * @throws IOException  I/O exception
    */
-  private void restore(final IOFile file, final Restore cmd) throws IOException {
+  public static void restore(final IOFile file, final Restore cmd, final GlobalOptions glblOptions)
+      throws IOException {
     final Zip zip = new Zip(file);
     if(cmd != null) cmd.proc(zip);
-    zip.unzip(goptions.dbpath());
+    zip.unzip(glblOptions.dbpath());
   }
 
   @Override

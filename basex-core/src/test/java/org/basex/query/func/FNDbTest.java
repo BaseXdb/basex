@@ -195,7 +195,6 @@ public final class FNDbTest extends AdvancedQueryTest {
     error(_DB_LIST_DETAILS.args("mostProbablyNotAvailable"), Err.BXDB_OPEN);
   }
 
-
   /** Test method.
    * @throws BaseXException database exception */
   @Test
@@ -649,5 +648,29 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void path() {
     query(_DB_PATH.args(_DB_OPEN.args(NAME)), FILE.replaceAll(".*/", ""));
+  }
+
+  /** FN db:backup test method. 
+   * @throws BaseXException exception
+   */
+  @Test
+  public void backup() throws BaseXException {
+    query(COUNT.args(_DB_BACKUPS.args(NAME)), "0");
+    query(_DB_BACKUP.args(NAME));
+    query(COUNT.args(_DB_BACKUPS.args(NAME)), "1");
+
+    // try to backup non existing database
+    error(_DB_BACKUP.args(NAME + new Object().hashCode()), Err.BXDB_OPEN);
+
+    // cleanup
+    new DropBackup(NAME).execute(context);
+    query(COUNT.args(_DB_BACKUPS.args(NAME)), "0");
+  }
+
+  /** FN db:restore test method. */
+  @Test
+  public void restore() {
+    // [LK] more tests! E.g. combination of restore, create, ...
+//    query(_DB_RESTORE.args(NAME));
   }
 }

@@ -127,6 +127,8 @@ public final class FNDb extends StandardFunc {
       case _DB_EXPORT:       return export(ctx);
       case _DB_NAME:         return name(ctx);
       case _DB_PATH:         return path(ctx);
+      case _DB_BACKUP:       return backup(ctx);
+      case _DB_RESTORE:      return restore(ctx);
       default:               return super.item(ctx, ii);
     }
   }
@@ -673,6 +675,37 @@ public final class FNDb extends StandardFunc {
    */
   private Item drop(final QueryContext ctx) throws QueryException {
     ctx.updates.add(new DBDrop(checkData(ctx), info, ctx), ctx);
+    return null;
+  }
+
+  /**
+   * Performs the backup function.
+   * @param ctx query context
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item backup(final QueryContext ctx) throws QueryException {
+    checkCreate(ctx);
+    final Data data = checkData(ctx);
+    ctx.updates.add(new DBBackup(data, info, ctx), ctx);
+    return null;
+  }
+
+  /**
+   * Performs the restore function.
+   * @param ctx query context
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item restore(final QueryContext ctx) throws QueryException {
+    checkCreate(ctx);
+    // database may not yet exist, so we can only pass the name
+    final String backupName = string(checkStr(expr[0], ctx));
+    // extract database name from backup file
+    final String dbName = Restore.dbName(backupName);
+    if(!Databases.validName(dbName))
+      throw BXDB_NAME.get(info, dbName);
+    ctx.updates.add(new DBRestore(dbName, backupName, info, ctx), ctx);
     return null;
   }
 
