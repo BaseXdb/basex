@@ -52,7 +52,7 @@ public enum UpdateType {
 
   // Database operations
 
+  /** DBDrop.               */ DBDROP,
   /** DBCreate.             */ DBCREATE,
   /** DBRestore.            */ DBRESTORE,
-  /** DBDrop.               */ DBDROP,
 }
