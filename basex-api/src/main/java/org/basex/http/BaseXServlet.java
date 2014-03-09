@@ -63,6 +63,8 @@ public abstract class BaseXServlet extends HttpServlet {
       http.status(SC_UNAUTHORIZED, Util.message(ex), restxq);
     } catch(final IOException ex) {
       http.status(SC_BAD_REQUEST, Util.message(ex), restxq);
+    } catch(final ProcException ex) {
+      http.status(SC_BAD_REQUEST, Text.INTERRUPTED, restxq);
     } catch(final QueryException ex) {
       http.status(SC_BAD_REQUEST, Util.message(ex), restxq);
     } catch(final Exception ex) {

@@ -94,7 +94,7 @@ public enum Err {
   /** BXDB0007. */
   BXDB_OPENED(BXDB, 7, "Database '%' cannot be updated, as it is opened by another process."),
   /** BXDB0008. */
-  BXDB_RENAME(BXDB, 8, "%: Invalid target path."),
+  BXDB_RENAME(BXDB, 8, "Invalid target path: %."),
   /** BXDB0009. */
   BXDB_RANGE(BXDB, 9, "%: value '%' is out of range."),
   /** BXDB0010. */

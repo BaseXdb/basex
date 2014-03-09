@@ -350,7 +350,7 @@ public final class SeqType {
       final InputInfo ii, final ExprInfo e) throws QueryException {
 
     if(it == null) {
-      if(!occ.check(0)) throw INVEMPTYEX.get(ii, e.description(), this);
+      if(!occ.check(0)) throw INVEMPTYEX.get(ii, e, this);
       return Empty.SEQ;
     }
 
