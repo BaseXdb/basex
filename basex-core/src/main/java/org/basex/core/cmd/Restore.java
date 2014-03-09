@@ -45,7 +45,7 @@ public class Restore extends ABackup {
 
     // try to restore database
     try {
-      restore(file, this, goptions);
+      restore(db, file, this, context);
       return !closed || new Open(db).run(context) ?
         info(DB_RESTORED_X, file.name(), perf) : error(DB_NOT_RESTORED_X, db);
     } catch(final IOException ex) {
@@ -94,16 +94,21 @@ public class Restore extends ABackup {
 
   /**
    * Restores the specified database.
+   * @param db name of database
    * @param file file
    * @param cmd calling command instance
-   * @param gopts global options
+   * @param context database context
    * @throws IOException  I/O exception
    */
-  public static void restore(final IOFile file, final Restore cmd, final GlobalOptions gopts)
-      throws IOException {
+  public static void restore(final String db, final IOFile file, final Restore cmd,
+      final Context context) throws IOException {
+
+    // drop target database
+    DropDB.drop(db, context);
+
     final Zip zip = new Zip(file);
     if(cmd != null) cmd.proc(zip);
-    zip.unzip(gopts.dbpath());
+    zip.unzip(context.globalopts.dbpath());
   }
 
   @Override

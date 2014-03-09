@@ -39,7 +39,7 @@ public class DBRestore extends NameUpdate {
     close();
     // restore backup
     try {
-      Restore.restore(backup, null, qc.context.globalopts);
+      Restore.restore(name, backup, null, qc.context);
     } catch(final IOException ex) {
       throw UPDBOPTERR.get(info, ex);
     }
