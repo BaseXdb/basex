@@ -130,29 +130,14 @@ public final class StaticVar extends StaticDecl {
    * @throws QueryException query exception
    */
   public boolean bind(final Expr e, final QueryContext ctx) throws QueryException {
-    return bind(e, true, ctx, info);
-  }
-
-  /**
-   * Binds the specified expression to the variable.
-   * @param e expression to be set
-   * @param ext if the value is bound from outside the query
-   * @param ctx query context
-   * @param ii input info
-   * @return if the value could be bound
-   * @throws QueryException query exception
-   */
-  private boolean bind(final Expr e, final boolean ext, final QueryContext ctx,
-      final InputInfo ii) throws QueryException {
     if(!external || compiled) return false;
 
     if(e instanceof Value) {
       Value v = (Value) e;
-      if(ext && declType != null && !declType.instance(v))
-        v = declType.cast(v, ctx, sc, ii, e);
+      if(declType != null && !declType.instance(v)) v = declType.cast(v, ctx, sc, info, e);
       bind(v);
     } else {
-      expr = checkType(e, ii);
+      expr = checkType(e, info);
       value = null;
     }
     return true;
