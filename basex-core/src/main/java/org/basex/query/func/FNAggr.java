@@ -3,12 +3,15 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 import static org.basex.query.value.type.AtomType.*;
 
+import java.math.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -49,6 +52,17 @@ public final class FNAggr extends StandardFunc {
       case MAX:
         return minmax(iter, OpV.LT, ctx);
       case SUM:
+        // partial sum calculation (Little Gauss)
+        if(expr[0] instanceof RangeSeq) {
+          final RangeSeq rs = (RangeSeq) expr[0];
+          final long s = rs.itemAt(0).itr(ii);
+          if(s == 0 || s == 1) {
+            final long n = rs.size();
+            return Int.get(n < 3037000500l ? n * (n + 1) / 2 : BigInteger.valueOf(n).multiply(
+                BigInteger.valueOf(n + 1)).divide(BigInteger.valueOf(2)).longValue());
+          }
+        }
+
         Item it = iter.next();
         return it != null ? sum(iter, it, false) :
           expr.length == 2 ? expr[1].item(ctx, info) : Int.get(0);
@@ -74,9 +88,7 @@ public final class FNAggr extends StandardFunc {
       case SUM:
         if(c == 0) return expr.length == 2 ? expr[1] : Int.get(0);
         final Type a = e.type().type, b = expr.length == 2 ? expr[1].type().type : a;
-        if(a.isNumberOrUntyped() && b.isNumberOrUntyped()) {
-          type = Calc.type(a, b).seqType();
-        }
+        if(a.isNumberOrUntyped() && b.isNumberOrUntyped()) type = Calc.type(a, b).seqType();
         break;
       default:
         break;
