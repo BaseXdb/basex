@@ -109,7 +109,7 @@ public final class CsvDirectSerializer extends CsvSerializer {
   protected void finishPi(final byte[] n, final byte[] v) { }
 
   @Override
-  protected void atomic(final Item value) throws IOException {
+  protected void atomic(final Item value, final boolean iter) throws IOException {
     error("Atomic values cannot be serialized");
   }
 

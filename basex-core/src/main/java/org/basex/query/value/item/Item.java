@@ -276,7 +276,7 @@ public abstract class Item extends Value {
    * @return type string
    */
   public byte[] xdmInfo() {
-    return new byte[] { typeId().asByte() };
+    return typeId().bytes();
   }
 
   /**

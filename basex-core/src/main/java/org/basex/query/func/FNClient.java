@@ -132,14 +132,17 @@ public final class FNClient extends StandardFunc {
     try {
       cq = cs.query(query);
       // bind variables and context item
-      for(final Map.Entry<String, Value> it : bindings(2, ctx).entrySet()) {
-        final String k = it.getKey();
-        final Value v = it.getValue();
-        final ArrayOutput val = v.serialize();
+      for(final Map.Entry<String, Value> binding : bindings(2, ctx).entrySet()) {
+        final String k = binding.getKey();
+        final Value v = binding.getValue();
         if(!v.isItem()) throw BXCL_ITEM.get(info, v);
-        final String t = v.type().toString();
-        if(k.isEmpty()) cq.context(val, t);
-        else cq.bind(k, val, t);
+        final Item it = (Item) v;
+        final Type t = v.type;
+        if(it instanceof FuncItem) throw FIVALUE.get(info, t);
+
+        final Object value = t instanceof NodeType ? v.serialize() : Token.string(it.string(info));
+        if(k.isEmpty()) cq.context(value, t.toString());
+        else cq.bind(k, value, t.toString());
       }
       // evaluate query
       while(cq.more()) {

@@ -101,11 +101,19 @@ public interface Type {
     }
 
     /**
-     * returns the type ID as a byte.
+     * Returns the type ID as a byte.
      * @return type ID
      */
     public byte asByte() {
       return id;
+    }
+
+    /**
+     * Wraps the type ID in a byte array.
+     * @return type ID
+     */
+    public byte[] bytes() {
+      return new byte[] { id };
     }
 
     /**

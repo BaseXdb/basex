@@ -12,6 +12,7 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -131,23 +132,22 @@ final class QueryListener extends Proc {
 
         // iterate through results
         final PrintOutput po = PrintOutput.get(enc ? new EncodingOutput(out) : out);
-        if(iter && wrap) po.write(1);
+        if(iter && wrap) {
+          final FElem elem = new FElem("");
+          po.write(full ? elem.xdmInfo() : elem.typeId().bytes());
+        }
 
         final Serializer ser = Serializer.get(po, full ? null : parameters);
         int c = 0;
         for(Item it; (it = ir.next()) != null;) {
           if(iter && !wrap) {
-            if(full) {
-              po.write(it.xdmInfo());
-            } else {
-              po.write(it.typeId().asByte());
-            }
+            po.write(full ? it.xdmInfo() : it.typeId().bytes());
             ser.reset();
-          }
-          ser.serialize(it, full);
-          if(iter && !wrap) {
+            ser.serialize(it, full, true);
             po.flush();
             out.write(0);
+          } else {
+            ser.serialize(it, full, false);
           }
           c++;
         }
