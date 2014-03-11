@@ -193,7 +193,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void atomic(final Item value) throws IOException {
+  protected void atomic(final Item value, final boolean iter) throws IOException {
     error("Atomic values cannot be serialized");
   }
 

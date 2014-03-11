@@ -605,6 +605,14 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
+  /** Runs a query and retrieves XML entities as string.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryEntities() throws IOException {
+    final Query query = session.query("'&amp;&lt;&gt;&apos;&quot;'");
+    assertEqual("&<>'\"", query.next());
+  }
+
   /**
    * Checks if the most recent output equals the specified string.
    * @param exp expected string

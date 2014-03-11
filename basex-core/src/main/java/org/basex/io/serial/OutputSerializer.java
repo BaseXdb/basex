@@ -331,20 +331,25 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   @Override
-  protected void atomic(final Item it) throws IOException {
+  protected void atomic(final Item it, final boolean iter) throws IOException {
     if(sep && item) print(' ');
 
     try {
       if(it instanceof StrStream) {
         final InputStream ni = ((StrStream) it).input(null);
         try {
-          for(int i; (i = ni.read()) != -1;) encode(i);
+          for(int cp; (cp = ni.read()) != -1;) {
+            if(iter) print(cp); else encode(cp);
+          }
         } finally {
           ni.close();
         }
       } else {
         final byte[] atom = it.string(null);
-        for(int a = 0; a < atom.length; a += cl(atom, a)) encode(cp(atom, a));
+        for(int a = 0; a < atom.length; a += cl(atom, a)) {
+          final int cp = cp(atom, a);
+          if(iter) print(cp); else encode(cp);
+        }
       }
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);

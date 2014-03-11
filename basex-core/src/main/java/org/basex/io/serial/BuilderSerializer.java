@@ -45,7 +45,7 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  protected final void atomic(final Item b) {
+  protected final void atomic(final Item b, final boolean iter) {
     throw Util.notExpected();
   }
 

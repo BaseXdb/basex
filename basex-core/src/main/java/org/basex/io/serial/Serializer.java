@@ -96,7 +96,6 @@ public abstract class Serializer {
 
   // PUBLIC METHODS =====================================================================
 
-
   /**
    * Serializes the specified item, which may be a node or an atomic value.
    * @param item item to be serialized
@@ -113,6 +112,19 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   public void serialize(final Item item, final boolean atts) throws IOException {
+    serialize(item, atts, false);
+  }
+
+  /**
+   * Serializes the specified item, which may be a node or an atomic value.
+   * @param item item to be serialized
+   * @param atts also serialize attributes and namespaces
+   * @param iter iterative evaluation
+   * @throws IOException I/O exception
+   */
+  public void serialize(final Item item, final boolean atts, final boolean iter)
+      throws IOException {
+
     openResult();
     if(item instanceof ANode) {
       final Type type = item.type;
@@ -125,7 +137,7 @@ public abstract class Serializer {
       throw SERFUNC.getIO(item.type());
     } else {
       finishElement();
-      atomic(item);
+      atomic(item, iter);
     }
     closeResult();
   }
@@ -306,9 +318,10 @@ public abstract class Serializer {
   /**
    * Serializes an atomic value.
    * @param item item
+   * @param iter iterative evaluation
    * @throws IOException I/O exception
    */
-  protected abstract void atomic(final Item item) throws IOException;
+  protected abstract void atomic(final Item item, final boolean iter) throws IOException;
 
   // PRIVATE METHODS ==========================================================
 
