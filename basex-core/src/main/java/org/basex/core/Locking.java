@@ -23,12 +23,6 @@ public interface Locking {
 
   /**
    * Unlock all string locked by a transaction.
-   * @param write write locks to keep
-   */
-  void downgrade(final StringList write);
-
-  /**
-   * Unlock all string locked by a transaction.
    * @param pr process
    */
   void release(final Proc pr);
