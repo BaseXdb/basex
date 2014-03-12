@@ -79,7 +79,7 @@ public final class FNClient extends StandardFunc {
     final String pass = Token.string(checkStr(expr[3], ctx));
     final int port = (int) checkItr(expr[1], ctx);
     try {
-      return ctx.sessions().add(new ClientSession(host, port, user, pass));
+      return ctx.resources.sessions().add(new ClientSession(host, port, user, pass));
     } catch(final IOException ex) {
       throw BXCL_CONN.get(info, ex);
     }
@@ -191,9 +191,9 @@ public final class FNClient extends StandardFunc {
    */
   private ClientSession session(final QueryContext ctx, final boolean del) throws QueryException {
     final Uri id = (Uri) checkType(expr[0].item(ctx, info), AtomType.URI);
-    final ClientSession cs = ctx.sessions().get(id);
+    final ClientSession cs = ctx.resources.sessions().get(id);
     if(cs == null) throw BXCL_NOTAVL.get(info, id);
-    if(del) ctx.sessions().remove(id);
+    if(del) ctx.resources.sessions().remove(id);
     return cs;
   }
 }

@@ -24,7 +24,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.util.*;
-import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -57,7 +56,7 @@ public final class QueryContext extends Proc {
   private final HashMap<QNm, Expr> bindings = new HashMap<QNm, Expr>();
 
   /** Query resources. */
-  public final QueryResources resource = new QueryResources(this);
+  public QueryResources resources;
   /** Database context. */
   public final Context context;
 
@@ -141,17 +140,11 @@ public final class QueryContext extends Proc {
   SerializerOptions serialOpts;
   /** Initial context value. */
   public MainModule ctxItem;
-  /** Module loader. */
-  public final ModuleLoader modules;
-  /** Opened connections to relational databases. */
-  private JDBCConnections jdbc;
-  /** Opened connections to relational databases. */
-  private ClientSessions sessions;
   /** Root expression of the query. */
   MainModule root;
 
   /** Parent query context. */
-  private QueryContext parentCtx;
+  private final QueryContext parentCtx;
   /** Query info. */
   public final QueryInfo info;
   /** Indicates if the query context has been closed. */
@@ -162,9 +155,9 @@ public final class QueryContext extends Proc {
    * @param parent parent context
    */
   public QueryContext(final QueryContext parent) {
-    this(parent.context);
-    parentCtx = parent;
+    this(parent.context, parent);
     listen = parent.listen;
+    resources = parent.resources;
   }
 
   /**
@@ -172,9 +165,19 @@ public final class QueryContext extends Proc {
    * @param ctx database context
    */
   public QueryContext(final Context ctx) {
-    context = ctx;
-    nodes = ctx.current();
-    modules = new ModuleLoader(ctx);
+    this(ctx, null);
+    resources = new QueryResources(this);
+  }
+
+  /**
+   * Constructor.
+   * @param context database context
+   * @param parent parent context (optional)
+   */
+  private QueryContext(final Context context, final QueryContext parent) {
+    this.context = context;
+    this.parentCtx = parent;
+    nodes = context.current();
     info = new QueryInfo(this);
     onlyUpdates = context.options.get(MainOptions.ONLYUPDATES);
   }
@@ -299,7 +302,7 @@ public final class QueryContext extends Proc {
       // add full-text container reference
       if(nodes.ftpos != null) ftPosData = new FTPosData();
       // cache the initial context nodes
-      resource.compile(nodes);
+      resources.compile(nodes);
     }
 
     // if specified, convert context item to specified type
@@ -481,24 +484,6 @@ public final class QueryContext extends Proc {
   }
 
   /**
-   * Returns JDBC connections.
-   * @return jdbc connections
-   */
-  public JDBCConnections jdbc() {
-    if(jdbc == null) jdbc = new JDBCConnections();
-    return jdbc;
-  }
-
-  /**
-   * Returns client sessions.
-   * @return client session
-   */
-  public ClientSessions sessions() {
-    if(sessions == null) sessions = new ClientSessions();
-    return sessions;
-  }
-
-  /**
    * Returns the query-specific or global serialization parameters.
    * @return serialization parameters
    */
@@ -545,20 +530,15 @@ public final class QueryContext extends Proc {
   public void close() {
     // close only once
     if(closed) return;
-    closed = true;
+
+    if(parentCtx == null) {
+      closed = true;
+      resources.close();
+    }
 
     // reassign original database options
     for(final Entry<Option<?>, Object> e : staticOpts.entrySet())
       context.options.put(e.getKey(), e.getValue());
-
-    // close database connections
-    resource.close();
-    // close JDBC connections
-    if(jdbc != null) jdbc.close();
-    // close client sessions
-    if(sessions != null) sessions.close();
-    // close dynamically loaded JAR files
-    modules.close();
   }
 
   @Override

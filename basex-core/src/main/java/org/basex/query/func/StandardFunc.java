@@ -168,7 +168,7 @@ public abstract class StandardFunc extends Arr {
   protected final Data checkData(final QueryContext ctx) throws QueryException {
     final String name = string(checkStr(expr[0], ctx));
     if(!Databases.validName(name)) throw INVDB.get(info, name);
-    return ctx.resource.database(name, info);
+    return ctx.resources.database(name, info);
   }
 
   /**

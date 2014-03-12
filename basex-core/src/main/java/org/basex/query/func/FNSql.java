@@ -15,6 +15,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -128,6 +129,7 @@ public final class FNSql extends StandardFunc {
   private Int connect(final QueryContext ctx) throws QueryException {
     // URL to relational database
     final String url = string(checkStr(expr[0], ctx));
+    final JDBCConnections jdbc = ctx.resources.jdbc();
     try {
       if(expr.length > 2) {
         // credentials
@@ -153,11 +155,11 @@ public final class FNSql extends StandardFunc {
           final Connection conn = getConnection(url, props);
           // set auto/commit mode
           conn.setAutoCommit(ac);
-          return Int.get(ctx.jdbc().add(conn));
+          return Int.get(jdbc.add(conn));
         }
-        return Int.get(ctx.jdbc().add(getConnection(url, user, pass)));
+        return Int.get(jdbc.add(getConnection(url, user, pass)));
       }
-      return Int.get(ctx.jdbc().add(getConnection(url)));
+      return Int.get(jdbc.add(getConnection(url)));
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.get(info, ex);
     }
@@ -189,7 +191,7 @@ public final class FNSql extends StandardFunc {
     try {
       // Keep prepared statement
       final PreparedStatement prep = conn.prepareStatement(string(prepStmt));
-      return Int.get(ctx.jdbc().add(prep));
+      return Int.get(ctx.resources.jdbc().add(prep));
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.get(info, ex);
     }
@@ -203,7 +205,7 @@ public final class FNSql extends StandardFunc {
    */
   private NodeSeqBuilder execute(final QueryContext ctx) throws QueryException {
     final int id = (int) checkItr(expr[0], ctx);
-    final Object obj = ctx.jdbc().get(id);
+    final Object obj = ctx.resources.jdbc().get(id);
     if(!(obj instanceof Connection)) throw BXSQ_CONN.get(info, id);
 
     final String query = string(checkStr(expr[1], ctx));
@@ -227,7 +229,7 @@ public final class FNSql extends StandardFunc {
    */
   private NodeSeqBuilder executePrepared(final QueryContext ctx) throws QueryException {
     final int id = (int) checkItr(expr[0], ctx);
-    final Object obj = ctx.jdbc().get(id);
+    final Object obj = ctx.resources.jdbc().get(id);
     if(!(obj instanceof PreparedStatement)) throw BXSQ_STATE.get(info, id);
 
     // Get parameters for prepared statement
@@ -449,9 +451,9 @@ public final class FNSql extends StandardFunc {
   private Connection connection(final QueryContext ctx, final boolean del)
       throws QueryException {
     final int id = (int) checkItr(expr[0], ctx);
-    final Object obj = ctx.jdbc().get(id);
+    final Object obj = ctx.resources.jdbc().get(id);
     if(!(obj instanceof Connection)) throw BXSQ_CONN.get(info, id);
-    if(del) ctx.jdbc().remove(id);
+    if(del) ctx.resources.jdbc().remove(id);
     return (Connection) obj;
   }
 }

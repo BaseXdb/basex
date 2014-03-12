@@ -137,7 +137,7 @@ public final class FNXQuery extends StandardFunc {
     }
 
     final QueryContext qc = ctx.proc(new QueryContext(ctx));
-    qc.resource.openDB = openDB;
+    qc.resources.openDB = openDB;
 
     // evaluate query
     try {

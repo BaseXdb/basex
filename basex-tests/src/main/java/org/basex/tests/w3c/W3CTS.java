@@ -604,7 +604,7 @@ public abstract class W3CTS {
    * @throws QueryException query exception
    */
   private Uri coll(final byte[] name, final QueryProcessor qp) throws QueryException {
-    qp.ctx.resource.addCollection(string(name), colls.get(string(name)), qp.sc.baseIO());
+    qp.ctx.resources.addCollection(string(name), colls.get(string(name)), qp.sc.baseIO());
     return Uri.uri(name);
   }
 
