@@ -55,10 +55,19 @@ public final class QueryContext extends Proc {
   /** Externally bound variables. */
   private final HashMap<QNm, Expr> bindings = new HashMap<QNm, Expr>();
 
-  /** Query resources. */
-  public QueryResources resources;
+  /** Parent query context. */
+  private final QueryContext parentCtx;
+  /** Query info. */
+  public final QueryInfo info;
   /** Database context. */
   public final Context context;
+
+  /** Query resources. */
+  public QueryResources resources;
+  /** Pending output. */
+  public ValueBuilder output;
+  /** Pending updates. */
+  private Updates updates;
 
   /** HTTP context. */
   public Object http;
@@ -106,9 +115,6 @@ public final class QueryContext extends Proc {
   /** Strings to lock defined by lock:write option. */
   public final StringList writeLocks = new StringList(0);
 
-  /** Pending output. */
-  public final ValueBuilder output = new ValueBuilder();
-
   /** Compilation flag: current node has leaves. */
   public boolean leaf;
 
@@ -121,11 +127,8 @@ public final class QueryContext extends Proc {
 
   /** Function for the next tail call. */
   private XQFunction tailFunc;
-  /** Pending updates. */
-  private Updates updates;
   /** Arguments for the next tail call. */
   private Value[] args;
-
   /** Counter for variable IDs. */
   public int varIDs;
 
@@ -143,10 +146,6 @@ public final class QueryContext extends Proc {
   /** Root expression of the query. */
   MainModule root;
 
-  /** Parent query context. */
-  private final QueryContext parentCtx;
-  /** Query info. */
-  public final QueryInfo info;
   /** Indicates if the query context has been closed. */
   private boolean closed;
 
@@ -158,6 +157,8 @@ public final class QueryContext extends Proc {
     this(parent.context, parent);
     listen = parent.listen;
     resources = parent.resources;
+    updates = parent.updates;
+    output = parent.output;
   }
 
   /**
@@ -167,6 +168,7 @@ public final class QueryContext extends Proc {
   public QueryContext(final Context ctx) {
     this(ctx, null);
     resources = new QueryResources(this);
+    output = new ValueBuilder();
   }
 
   /**
