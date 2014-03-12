@@ -3,18 +3,21 @@ package org.basex.server;
 import static org.junit.Assert.*;
 
 import java.io.*;
+import java.util.*;
+
 import org.basex.*;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.util.*;
 import org.junit.*;
 
 /**
- * This class tests the order of incoming commands.
+ * This class tests the execution of parallel commands.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Andreas Weiler
  */
-public final class SemaphoreTest extends SandboxTest {
+public final class ConcurrencyTest extends SandboxTest {
   /** Test file. */
   private static final String FILE = "src/test/resources/factbook.zip";
   /** Test queries. */
@@ -22,8 +25,6 @@ public final class SemaphoreTest extends SandboxTest {
     "(db:open('" + NAME + "')//province)[position() < 10] ! (insert node <test/> into .)",
     "(1 to 100000)[. = 0]"
   };
-  /** Number of clients. */
-  private static final int CLIENTS = 50;
 
   /** Server reference. */
   private BaseXServer server;
@@ -57,16 +58,16 @@ public final class SemaphoreTest extends SandboxTest {
    * @throws Exception exception
    */
   @Test
-  public void runClients() throws Exception {
-    final Client[] cl = new Client[CLIENTS];
-    for(int i = 0; i < CLIENTS; ++i) cl[i] = new Client(i);
-    for(final Client c : cl) c.start();
-    for(final Client c : cl) c.join();
-    for(final Client c : cl) c.session.close();
+  public void runQueries() throws Exception {
+    final QueryClient[] cl = new QueryClient[50];
+    for(int i = 0; i < cl.length; ++i) cl[i] = new QueryClient(i);
+    for(final QueryClient c : cl) c.start();
+    for(final QueryClient c : cl) c.join();
+    for(final QueryClient c : cl) c.session.close();
   }
 
   /** Single client. */
-  static class Client extends Thread {
+  static class QueryClient extends Thread {
     /** Client session. */
     ClientSession session;
     /** Query number. */
@@ -76,7 +77,7 @@ public final class SemaphoreTest extends SandboxTest {
      * Default constructor.
      * @param nr query number
      */
-    Client(final int nr) {
+    QueryClient(final int nr) {
       number = nr;
       try {
         session = createClient();
@@ -89,6 +90,37 @@ public final class SemaphoreTest extends SandboxTest {
     public void run() {
       try {
         session.query(QUERIES[number % QUERIES.length]).execute();
+      } catch(final IOException ex) {
+        fail(Util.message(ex));
+      }
+    }
+  }
+
+  /**
+   * Efficiency test.
+   * @throws Exception exception
+   */
+  @Test
+  public void runCommands() throws Exception {
+    final Thread[] th = new Thread[100];
+    for(int i = 0; i < th.length; ++i) th[i] = new CommandClient();
+    for(final Thread c : th) c.start();
+    for(final Thread c : th) c.join();
+  }
+
+  /** Random counter. */
+  private static final Random RANDOM = new Random();
+
+  /** Single client. */
+  static class CommandClient extends Thread {
+    @Override
+    public void run() {
+      try {
+        final int i = RANDOM.nextInt(2);
+        final Command cmd;
+        if(i == 0) cmd = new CreateDB(NAME);
+        else cmd = new DropDB(NAME);
+        cmd.execute(context);
       } catch(final IOException ex) {
         fail(Util.message(ex));
       }
