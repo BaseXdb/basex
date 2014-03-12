@@ -224,7 +224,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final InputInfo ii = expr instanceof ParseExpr ? ((ParseExpr) expr).info : info;
     if(updating) {
       // updating function
-      if(declType != null) throw UPFUNCTYPE.get(info);
+      if(declType != null) throw UUPFUNCTYPE.get(info);
       if(!u && !expr.isVacuous()) throw UPEXPECTF.get(ii);
     } else if(u) {
       // uses updates, but is not declared as such

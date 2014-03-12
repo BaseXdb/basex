@@ -33,11 +33,15 @@ final class DataUpdates {
   /** Mapping between pre values of the target nodes and all node updates
    * which operate on this target. */
   private IntObjMap<NodeUpdates> nodeUpdates = new IntObjMap<NodeUpdates>();
+  /** Atomic update cache. */
+  private AtomicUpdateCache auc;
+
   /** Database updates. */
   private final List<DBUpdate> dbUpdates = new LinkedList<DBUpdate>();
   /** Put operations which reflect all changes made during the snapshot, hence executed
    * after updates have been carried out. */
   private final IntObjMap<Put> puts = new IntObjMap<Put>();
+
   /** Number of updates. */
   private int size;
 
@@ -87,8 +91,7 @@ final class DataUpdates {
   }
 
   /**
-   * Checks updates for violations. If a violation is found the complete update
-   * process is aborted.
+   * Checks updates for violations. If a violation is found, the complete update process is aborted.
    * @param tmp temporary mem data
    * @throws QueryException query exception
    */
@@ -118,7 +121,7 @@ final class DataUpdates {
       int pre = nodes.get(p);
 
       // catching optimize statements which have PRE == -1 as a target
-      if(pre == -1) return;
+      if(pre == -1) break;
 
       final int k = data.kind(pre);
       if(k == Data.ATTR) {
@@ -135,6 +138,9 @@ final class DataUpdates {
         --p;
       }
     }
+
+    // build atomic update cache
+    auc = createAtomicUpdates(preparePrimitives());
   }
 
   /**
@@ -158,11 +164,16 @@ final class DataUpdates {
    */
   void apply() throws QueryException {
     // execute database updates
-    createAtomicUpdates(preparePrimitives()).execute(true);
+    auc.execute(true);
+    auc = null;
 
     // execute database operations
     Collections.sort(dbUpdates);
-    for(final DBUpdate bo : dbUpdates) bo.apply();
+    final int s = dbUpdates.size();
+    for(int i = 0; i < s; i++) {
+      dbUpdates.get(i).apply();
+      dbUpdates.set(i, null);
+    }
 
     // execute fn:put operations
     for(final Put put : puts.values()) put.apply();
@@ -210,7 +221,8 @@ final class DataUpdates {
   private AtomicUpdateCache createAtomicUpdates(final List<NodeUpdate> l) {
     final AtomicUpdateCache atomics = new AtomicUpdateCache(data);
     //  from the lowest to the highest score, corresponds w/ from lowest to highest PRE
-    for(int i = 0; i < l.size(); i++) {
+    final int s = l.size();
+    for(int i = 0; i < s; i++) {
       final NodeUpdate u = l.get(i);
       u.addAtomics(atomics);
       l.set(i, null);

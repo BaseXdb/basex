@@ -1118,8 +1118,7 @@ public enum Err {
   /** XUST0001. */
   UPCTX(XUST, 1, "Context item may not declare an updating expression."),
   /** XUST0002. */
-  UPMODIFY(XUST, 2,
-      "Modify clause: all expressions must be updating or return an empty sequence."),
+  UPMODIFY(XUST, 2, "Modify clause: all expressions must be updating or return an empty sequence."),
   /** XUST0002. */
   UPEXPECTF(XUST, 2, "Function body must be an updating expression."),
   /** XUST0003. */
@@ -1127,7 +1126,7 @@ public enum Err {
   /** XUST0026. */
   NOREVAL(XUST, 26, "Revalidation mode not supported."),
   /** XUST0028. */
-  UPFUNCTYPE(XUST, 28, "No return type allowed in updating functions."),
+  UUPFUNCTYPE(XUST, 28, "No return type allowed in updating functions."),
 
   /** XUTY0004. */
   UPNOATTRPER(XUTY, 4, "Attribute must follow the root element."),

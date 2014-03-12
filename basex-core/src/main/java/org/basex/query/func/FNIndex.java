@@ -236,6 +236,6 @@ public final class FNIndex extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return dataLock(visitor) && super.accept(visitor);
+    return dataLock(visitor, 1) && super.accept(visitor);
   }
 }

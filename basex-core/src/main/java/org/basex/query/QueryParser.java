@@ -308,7 +308,7 @@ public class QueryParser extends InputParser {
       ctx.vars.check();
 
       // check placement of updating expressions if any have been found
-      if(ctx.updates != null) {
+      if(ctx.onlyUpdates && ctx.updates != null) {
         ctx.funcs.checkUp();
         ctx.vars.checkUp();
         if(mm != null) mm.expr.checkUp();
@@ -821,8 +821,7 @@ public class QueryParser extends InputParser {
 
     ctx.modStack.push(p);
     final StaticContext sub = new StaticContext(sc.xquery3());
-    final LibraryModule lib =
-        new QueryParser(qu, io.path(), ctx, sub).parseLibrary(!imprt);
+    final LibraryModule lib = new QueryParser(qu, io.path(), ctx, sub).parseLibrary(!imprt);
     final byte[] muri = lib.name.uri();
 
     // check if import and declaration uri match
@@ -866,7 +865,7 @@ public class QueryParser extends InputParser {
     ctx.ctxItem = new MainModule(e, scope, type, currDoc.toString(), sc, info());
 
     if(module != null) throw error(DECITEM);
-    if(e.has(Flag.UPD)) throw error(UPCTX, e);
+    if(ctx.onlyUpdates && e.has(Flag.UPD)) throw error(UPCTX, e);
   }
 
   /**
@@ -2146,7 +2145,7 @@ public class QueryParser extends InputParser {
     // inline function
     if(wsConsume(FUNCTION) && wsConsume(PAR1)) {
       if(ann != null) {
-        if(ann.contains(Ann.Q_UPDATING)) throw error(UPFUNCITEM);
+        if(ctx.onlyUpdates && ann.contains(Ann.Q_UPDATING)) throw error(UPFUNCITEM);
         if(ann.contains(Ann.Q_PRIVATE) || ann.contains(Ann.Q_PUBLIC)) throw error(INVISIBLE);
       }
       final HashMap<Var, Expr> nonLocal = new HashMap<Var, Expr>();

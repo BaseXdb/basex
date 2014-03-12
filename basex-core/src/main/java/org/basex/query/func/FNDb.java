@@ -977,7 +977,7 @@ public final class FNDb extends StandardFunc {
       if(expr.length == 0) {
         if(!visitor.lock(null)) return false;
       } else {
-        if(!dataLock(visitor)) return false;
+        if(!dataLock(visitor, oneOf(sig, _DB_COPY, _DB_ALTER) ? 2 : 1)) return false;
       }
     }
     return super.accept(visitor);

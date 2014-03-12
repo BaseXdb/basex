@@ -64,6 +64,7 @@ public final class Modify extends Arr {
       pu.addData(i.data());
 
       ctx.value(expr[1]);
+      ctx.updates.prepare();
       ctx.updates.apply();
       return ctx.value;
     } finally {

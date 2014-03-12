@@ -6,6 +6,7 @@ import org.basex.core.cmd.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Update primitive for the {@link Function#_DB_ALTER} function.
@@ -43,4 +44,10 @@ public class DBAlter extends NameUpdate {
 
   @Override
   public String operation() { return "renamed"; }
+
+  @Override
+  public void databases(final StringList db) {
+    super.databases(db);
+    db.add(newName);
+  }
 }

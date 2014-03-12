@@ -781,7 +781,7 @@ public enum GUIMenuCmd implements GUICommand {
       for(final int pre : ctx.current().pres) doc &= data.kind(pre) == Data.DOC;
       if(doc) {
         // if yes, jump to database root
-        ctx.update();
+        ctx.invalidate();
         gui.notify.context(ctx.current(), false, null);
       } else {
         // otherwise, jump to parent nodes
@@ -804,7 +804,7 @@ public enum GUIMenuCmd implements GUICommand {
       final Context ctx = gui.context;
       if(ctx.root()) return;
       // jump to database root
-      ctx.update();
+      ctx.invalidate();
       gui.notify.context(ctx.current(), false, null);
     }
 

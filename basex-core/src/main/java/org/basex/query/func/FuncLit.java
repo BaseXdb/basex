@@ -70,7 +70,7 @@ public final class FuncLit extends Single implements Scope {
 
     // Reject updating function items. Happens at compile because the function may not be known
     // at parse time. This check could possibly be moved to StaticFuncs#check.
-    if(ann.contains(Ann.Q_UPDATING)) throw UPFUNCITEM.get(info);
+    if(ctx.onlyUpdates && ann.contains(Ann.Q_UPDATING)) throw UPFUNCITEM.get(info);
 
     final int fp = scope.enter(ctx);
     try {

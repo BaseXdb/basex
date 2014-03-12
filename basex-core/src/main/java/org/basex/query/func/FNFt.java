@@ -291,6 +291,6 @@ public final class FNFt extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return !(oneOf(sig, _FT_SEARCH, _FT_TOKENS) && !dataLock(visitor)) && super.accept(visitor);
+    return !(oneOf(sig, _FT_SEARCH, _FT_TOKENS) && !dataLock(visitor, 1)) && super.accept(visitor);
   }
 }

@@ -115,6 +115,8 @@ public final class QueryContext extends Proc {
   /** Compilation flag: current node has leaves. */
   public boolean leaf;
 
+  /** Strict XQUF. */
+  public final boolean onlyUpdates;
   /** Number of successive tail calls. */
   public int tailCalls;
   /** Maximum number of successive tail calls (will be set before compilation). */
@@ -174,6 +176,7 @@ public final class QueryContext extends Proc {
     nodes = ctx.current();
     modules = new ModuleLoader(ctx);
     info = new QueryInfo(this);
+    onlyUpdates = context.options.get(MainOptions.ONLYUPDATES);
   }
 
   /**
@@ -264,9 +267,8 @@ public final class QueryContext extends Proc {
     if(ctxItem != null) {
       // evaluate initial expression
       try {
-
         ctxItem.compile(this);
-        value = ctxItem.value(this);
+        value = ctxItem.cache(this).value();
       } catch(final QueryException ex) {
         if(ex.err() != NOCTX) throw ex;
         // only {@link ParseExpr} instances may cause this error
@@ -313,43 +315,40 @@ public final class QueryContext extends Proc {
    */
   public Iter iter() throws QueryException {
     try {
-      // evaluate lazily if query will perform no updates
-      return updating ? value().iter() : root.iter(this);
-    } catch(final StackOverflowError ex) {
-      Util.debug(ex);
-      throw BASX_STACKOVERFLOW.get(null);
-    }
-  }
+      if(!updating) return root.iter(this);
 
-  /**
-   * Returns the result value.
-   * @return result value
-   * @throws QueryException query exception
-   */
-  public Value value() throws QueryException {
-    try {
-      final Value v = root.value(this);
-      final Value u = update();
-      return u != null ? u : v;
-    } catch(final StackOverflowError ex) {
-      Util.debug(ex);
-      throw BASX_STACKOVERFLOW.get(null);
-    }
-  }
+      // handle updating queries
+      ValueBuilder cache = root.cache(this);
+      final long cs = cache.size();
 
-  /**
-   * Performs updates.
-   * @return resulting value
-   * @throws QueryException query exception
-   */
-  Value update() throws QueryException {
-    if(updating) {
-      //context.downgrade(this, updates.databases());
+      final StringList dbs = updates.databases();
+      final HashSet<Data> datas = updates.prepare();
+
+      // copy nodes that will be affected by an update operation
+      for(int c = 0; c < cs; c++) {
+        final Item it = cache.get(c);
+        if(!(it instanceof DBNode)) continue;
+        final Data data = it.data();
+        if(datas.contains(data) || !data.inMemory() && dbs.contains(data.meta.name)) {
+          cache.set(((DBNode) it).dbCopy(context.options), c);
+        }
+      }
+
+      //context.downgrade(this, dbs);
       updates.apply();
-      if(updates.size() != 0 && context.data() != null) context.update();
-      if(output.size() != 0) return output.value();
+      if(updates.size() != 0 && context.data() != null) context.invalidate();
+
+      // append cached outputs
+      if(output.size() != 0) {
+        if(cache.size() == 0) cache = output;
+        else cache.add(output.value());
+      }
+      return cache;
+
+    } catch(final StackOverflowError ex) {
+      Util.debug(ex);
+      throw BASX_STACKOVERFLOW.get(null);
     }
-    return null;
   }
 
   /**
@@ -364,9 +363,9 @@ public final class QueryContext extends Proc {
   }
 
   /**
-   * Evaluates the specified expression and returns an iterator.
+   * Evaluates the specified expression and returns a value.
    * @param expr expression to be evaluated
-   * @return iterator
+   * @return value
    * @throws QueryException query exception
    */
   public Value value(final Expr expr) throws QueryException {

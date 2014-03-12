@@ -247,8 +247,15 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_DB_OUTPUT.args("x"), "x");
     query(_DB_OUTPUT.args("('x','y')"), "x y");
     query(_DB_OUTPUT.args("<a/>"), "<a/>");
-    error(_DB_OUTPUT.args("x") + ",1", Err.UPALL);
     error(_DB_OUTPUT.args(" count#1"), Err.FIVALUE);
+
+    final boolean ou = context.options.get(MainOptions.ONLYUPDATES);
+    try {
+      context.options.set(MainOptions.ONLYUPDATES, true);
+      error(_DB_OUTPUT.args("x") + ",1", Err.UPALL);
+    } finally {
+      context.options.set(MainOptions.ONLYUPDATES, ou);
+    }
   }
 
   /** Test method. */

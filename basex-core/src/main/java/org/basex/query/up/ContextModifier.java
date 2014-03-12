@@ -76,18 +76,27 @@ public abstract class ContextModifier {
   }
 
   /**
-   * Checks constraints and applies all updates.
+   * Prepares update operations.
+   * @return updated data references
    * @throws QueryException query exception
    */
-  final void apply() throws QueryException {
-    // prepare updates
+  final HashSet<Data> prepare() throws QueryException {
+    final HashSet<Data> datas = new HashSet<Data>(dbUpdates.size());
     for(final DataUpdates up : dbUpdates.values()) {
       // create temporary mem data instance if not available yet
       if(tmp == null) tmp = new MemData(up.data().meta.options);
       up.prepare(tmp);
+      datas.add(up.data());
     }
     for(final NameUpdates up : nameUpdates.values()) up.prepare();
+    return datas;
+  }
 
+  /**
+   * Applies all updates.
+   * @throws QueryException query exception
+   */
+  final void apply() throws QueryException {
     // apply initial updates based on database names
     for(final NameUpdates up : nameUpdates.values()) up.apply(true);
 
@@ -105,7 +114,7 @@ public abstract class ContextModifier {
         i++;
       }
       // apply node and database update
-      for(final DataUpdates c : dbUpdates.values()) c.apply();
+      for(final DataUpdates up : dbUpdates.values()) up.apply();
     } finally {
       // remove locks: in case of a crash, remove only already acquired write locks
       for(final Data data : datas) {

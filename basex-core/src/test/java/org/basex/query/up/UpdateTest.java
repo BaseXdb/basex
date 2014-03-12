@@ -1118,19 +1118,6 @@ public final class UpdateTest extends AdvancedQueryTest {
       "xquery:eval('declare variable $c external; $c()', map { 'c': local:c#0 })", "<a/>");
   }
 
-  /**
-   * Tests the expressions in modify clauses for updates.
-   */
-  @Test
-  public void modifyCheck() {
-    error("copy $c:= <a>X</a> modify 'a' return $c", Err.UPMODIFY);
-    error("copy $c:= <a>X</a> modify(delete node $c/text(),'a') return $c", Err.UPALL);
-
-    error("text { <a/> update (delete node <a/>,<b/>) }", Err.UPALL);
-    error("1[<a/> update (delete node <a/>,<b/>)]", Err.UPALL);
-    error("for $i in 1 order by (<a/> update (delete node <a/>,<b/>)) return $i", Err.UPALL);
-  }
-
   /** Tests adding an attribute and thus crossing the {@link IO#MAXATTS} line (GH-752). */
   @Test
   public void insertAttrMaxAtt() {
@@ -1163,19 +1150,43 @@ public final class UpdateTest extends AdvancedQueryTest {
     query("(<X/>,<Y/>)/(insert node <Z/> into .)");
   }
 
+  /**
+   * Tests the expressions in modify clauses for updates.
+   */
+  @Test
+  public void modifyCheck() {
+    final boolean ou = context.options.get(MainOptions.ONLYUPDATES);
+    try {
+      context.options.set(MainOptions.ONLYUPDATES, true);
+      error("copy $c:= <a>X</a> modify 'a' return $c", Err.UPMODIFY);
+      error("copy $c:= <a>X</a> modify(delete node $c/text(),'a') return $c", Err.UPALL);
+
+      error("text { <a/> update (delete node <a/>,<b/>) }", Err.UPALL);
+      error("1[<a/> update (delete node <a/>,<b/>)]", Err.UPALL);
+      error("for $i in 1 order by (<a/> update (delete node <a/>,<b/>)) return $i", Err.UPALL);
+    } finally {
+      context.options.set(MainOptions.ONLYUPDATES, ou);
+    }
+  }
 
   /**
    * Reject updating function items.
    */
   @Test
   public void updatingFuncItems() {
-    error("db:output(?)", Err.UPFUNCITEM);
-    error("db:output#1", Err.UPFUNCITEM);
-    error("declare %updating function local:a() { () }; local:a#0()", Err.UPFUNCITEM);
-    error("declare function local:a() { local:b#0 };"
-        + "declare %updating function local:b() { db:output('1') }; local:a()", Err.UPFUNCITEM);
-    // is still accepted (should also be rejected in future):
-    //error("declare function local:not-used() { local:b#0 };"
-    //    + "declare %updating function local:b() { db:output('1') }; local:b()", Err.UPFUNCITEM);
+    final boolean ou = context.options.get(MainOptions.ONLYUPDATES);
+    try {
+      context.options.set(MainOptions.ONLYUPDATES, true);
+      error("db:output(?)", Err.UPFUNCITEM);
+      error("db:output#1", Err.UPFUNCITEM);
+      error("declare %updating function local:a() { () }; local:a#0()", Err.UPFUNCITEM);
+      error("declare function local:a() { local:b#0 };"
+          + "declare %updating function local:b() { db:output('1') }; local:a()", Err.UPFUNCITEM);
+      // is still accepted (should also be rejected in future):
+      //error("declare function local:not-used() { local:b#0 };"
+      //    + "declare %updating function local:b() { db:output('1') }; local:b()", Err.UPFUNCITEM);
+    } finally {
+      context.options.set(MainOptions.ONLYUPDATES, ou);
+    }
   }
 }

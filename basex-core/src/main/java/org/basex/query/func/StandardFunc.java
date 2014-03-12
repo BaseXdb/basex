@@ -201,10 +201,15 @@ public abstract class StandardFunc extends Arr {
    * first argument of the tested function is a static string.
    * This method assumes that the function has at least one argument.
    * @param visitor visitor
+   * @param dbs database arguments
    * @return result of check
    */
-  final boolean dataLock(final ASTVisitor visitor) {
-    return visitor.lock(expr[0] instanceof Str ? string(((Str) expr[0]).string()) : null);
+  final boolean dataLock(final ASTVisitor visitor, final int dbs) {
+    boolean more = true;
+    for(int db = 0; db < dbs; db++) {
+      more &= visitor.lock(expr[db] instanceof Str ? string(((Str) expr[db]).string()) : null);
+    }
+    return more;
   }
 
   /**

@@ -88,7 +88,7 @@ public final class QueryProcessor extends Proc {
    */
   public Value value() throws QueryException {
     compile();
-    return ctx.value();
+    return ctx.iter().value();
   }
 
   /**
