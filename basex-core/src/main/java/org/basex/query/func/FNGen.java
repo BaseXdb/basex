@@ -15,6 +15,7 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.up.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.util.*;
 import org.basex.query.util.Err.ErrType;
@@ -155,13 +156,14 @@ public final class FNGen extends StandardFunc {
 
     final Uri u = Uri.uri(file);
     if(u == Uri.EMPTY || !u.isValid()) throw UPFOURI.get(info, file);
-    final DBNode target = ctx.updates.determineDataRef(nd, ctx);
+    final Updates updates = ctx.updates();
+    final DBNode target = updates.determineDataRef(nd, ctx);
 
     final String uri = IO.get(u.toJava()).path();
     // check if all target paths are unique
-    if(!ctx.updates.putPaths.add(uri)) throw UPURIDUP.get(info, uri);
+    if(!updates.putPaths.add(uri)) throw UPURIDUP.get(info, uri);
 
-    ctx.updates.add(new Put(target.pre, target.data, uri, info), ctx);
+    updates.add(new Put(target.pre, target.data, uri, info), ctx);
     return null;
   }
 

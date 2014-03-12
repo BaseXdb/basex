@@ -165,7 +165,7 @@ public abstract class StandardFunc extends Arr {
    * @return data instance
    * @throws QueryException query exception
    */
-  final Data checkData(final QueryContext ctx) throws QueryException {
+  protected final Data checkData(final QueryContext ctx) throws QueryException {
     final String name = string(checkStr(expr[0], ctx));
     if(!Databases.validName(name)) throw INVDB.get(info, name);
     return ctx.resource.database(name, info);
@@ -178,7 +178,7 @@ public abstract class StandardFunc extends Arr {
    * @return file instance
    * @throws QueryException query exception
    */
-  File checkFile(final int i, final QueryContext ctx) throws QueryException {
+  protected File checkFile(final int i, final QueryContext ctx) throws QueryException {
     if(i >= expr.length) return null;
     final String file = string(checkStr(expr[i], ctx));
     return IOUrl.isFileURL(file) ? IOFile.get(file).file() : new File(file);
@@ -192,19 +192,17 @@ public abstract class StandardFunc extends Arr {
    * @return input source, or exception
    * @throws QueryException query exception
    */
-  public IO checkPath(final Expr path, final QueryContext ctx) throws QueryException {
+  protected IO checkPath(final Expr path, final QueryContext ctx) throws QueryException {
     return QueryResources.checkPath(new QueryInput(string(checkStr(path, ctx))), sc.baseIO(), info);
   }
 
   /**
-   * Checks if the specified database can be detected for locking, i.e., if the
-   * first argument of the tested function is a static string.
-   * This method assumes that the function has at least one argument.
+   * Checks if one of the specified arguments point to databases that need to be locked.
    * @param visitor visitor
    * @param dbs database arguments
    * @return result of check
    */
-  final boolean dataLock(final ASTVisitor visitor, final int dbs) {
+  protected final boolean dataLock(final ASTVisitor visitor, final int dbs) {
     boolean more = true;
     for(int db = 0; db < dbs; db++) {
       more &= visitor.lock(expr[db] instanceof Str ? string(((Str) expr[db]).string()) : null);
@@ -220,7 +218,9 @@ public abstract class StandardFunc extends Arr {
    * @return text entry
    * @throws QueryException query exception
    */
-  final String encoding(final int i, final Err err, final QueryContext ctx) throws QueryException {
+  protected final String encoding(final int i, final Err err, final QueryContext ctx)
+      throws QueryException {
+
     if(i >= expr.length) return null;
     final String enc = string(checkStr(expr[i], ctx));
     try {
@@ -241,7 +241,7 @@ public abstract class StandardFunc extends Arr {
    * @return passed on options
    * @throws QueryException query exception
    */
-  <E extends Options> E checkOptions(final int i, final QNm qnm, final E opts,
+  protected <E extends Options> E checkOptions(final int i, final QNm qnm, final E opts,
       final QueryContext ctx) throws QueryException {
     if(i < expr.length) new FuncOptions(qnm, info).parse(expr[i].item(ctx, info), opts);
     return opts;
@@ -254,7 +254,7 @@ public abstract class StandardFunc extends Arr {
    * @return resulting value
    * @throws QueryException query exception
    */
-  final long dateTimeToMs(final Expr e, final QueryContext ctx) throws QueryException {
+  protected final long dateTimeToMs(final Expr e, final QueryContext ctx) throws QueryException {
     final Dtm dtm = (Dtm) checkType(checkItem(e, ctx), AtomType.DTM);
     if(dtm.yea() > 292278993) throw INTRANGE.get(info, dtm);
     return dtm.toJava().toGregorianCalendar().getTimeInMillis();
@@ -267,7 +267,9 @@ public abstract class StandardFunc extends Arr {
    * @return resulting map
    * @throws QueryException query exception
    */
-  final HashMap<String, Value> bindings(final int i, final QueryContext ctx) throws QueryException {
+  protected final HashMap<String, Value> bindings(final int i, final QueryContext ctx)
+      throws QueryException {
+
     final HashMap<String, Value> hm = new HashMap<String, Value>();
     final int es = expr.length;
     if(i < es) {
@@ -295,7 +297,7 @@ public abstract class StandardFunc extends Arr {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  final void cache(final Iter ir, final ValueBuilder vb, final QueryContext ctx)
+  protected final void cache(final Iter ir, final ValueBuilder vb, final QueryContext ctx)
       throws QueryException {
 
     for(Item it; (it = ir.next()) != null;) {
@@ -315,7 +317,7 @@ public abstract class StandardFunc extends Arr {
    * @param sigs signatures to be compared
    * @return result of check
    */
-  static boolean oneOf(final Function sig, final Function... sigs) {
+  protected static boolean oneOf(final Function sig, final Function... sigs) {
     for(final Function s : sigs) if(sig == s) return true;
     return false;
   }

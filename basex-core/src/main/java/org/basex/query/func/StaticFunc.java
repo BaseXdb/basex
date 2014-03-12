@@ -115,7 +115,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(ann);
-    if(updating) tb.add(UPDATING).add(' ');
     tb.add(FUNCTION).add(' ').add(name.string());
     tb.add(PAR1).addSep(args, SEP).add(PAR2);
     if(declType != null) tb.add(' ' + AS + ' ' + declType);

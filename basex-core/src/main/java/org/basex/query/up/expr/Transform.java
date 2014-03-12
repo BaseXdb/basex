@@ -62,10 +62,10 @@ public final class Transform extends Arr {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     final int o = (int) ctx.output.size();
-    if(ctx.updates == null) ctx.updates = new Updates();
-    final ContextModifier tmp = ctx.updates.mod;
+    final Updates updates = ctx.updates();
+    final ContextModifier tmp = updates.mod;
     final TransformModifier pu = new TransformModifier();
-    ctx.updates.mod = pu;
+    updates.mod = pu;
 
     try {
       for(final Let fo : copies) {
@@ -83,12 +83,12 @@ public final class Transform extends Arr {
       final Value v = ctx.value(expr[0]);
       if(!v.isEmpty()) throw UPMODIFY.get(info);
 
-      ctx.updates.prepare();
-      ctx.updates.apply();
+      updates.prepare();
+      updates.apply();
       return ctx.value(expr[1]);
     } finally {
       ctx.output.size(o);
-      ctx.updates.mod = tmp;
+      updates.mod = tmp;
     }
   }
 

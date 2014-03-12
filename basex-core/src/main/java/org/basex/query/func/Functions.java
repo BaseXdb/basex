@@ -238,13 +238,13 @@ public final class Functions extends TokenSet {
       return TypedFunc.constr(new Cast(sc, ii, args[0], to), to);
     }
 
-    // pre-defined functions
+    // built-in functions
     final StandardFunc fun = get().get(name, args, sc, ii);
     if(fun != null) {
       if(!sc.xquery3() && fun.has(Flag.X30)) throw FUNC30.get(ii);
-      if(fun.sig.has(Flag.UPD)) ctx.updating(true);
-      // [LW] correct annotations
-      return new TypedFunc(fun, new Ann(), fun.sig.type(args.length));
+      final Ann ann = new Ann();
+      ann.add(Ann.Q_UPDATING, Empty.SEQ, ii);
+      return new TypedFunc(fun, ann, fun.sig.type(args.length));
     }
 
     // user-defined function

@@ -571,7 +571,7 @@ public final class FNDb extends StandardFunc {
     final Data data = checkData(ctx);
     final byte[] path = expr.length < 3 ? Token.EMPTY : token(path(2, ctx));
     final NewInput input = checkInput(checkItem(expr[1], ctx), path);
-    ctx.updates.add(new DBAdd(data, input, ctx, info), ctx);
+    ctx.updates().add(new DBAdd(data, input, ctx, info), ctx);
     return null;
   }
 
@@ -589,8 +589,9 @@ public final class FNDb extends StandardFunc {
     // remove old documents
     final Resources res = data.resources;
     final IntList pre = res.docs(path, true);
+    final Updates updates = ctx.updates();
     for(int p = 0; p < pre.size(); p++) {
-      ctx.updates.add(new DeleteNode(pre.get(p), data, info), ctx);
+      updates.add(new DeleteNode(pre.get(p), data, info), ctx);
     }
 
     // delete binary resources
@@ -598,9 +599,9 @@ public final class FNDb extends StandardFunc {
     if(bin != null) {
       if(bin.exists()) {
         if(bin.isDir()) throw BXDB_DIR.get(info, path);
-        ctx.updates.add(new DBStore(data, path, input, info), ctx);
+        updates.add(new DBStore(data, path, input, info), ctx);
       } else {
-        ctx.updates.add(new DBAdd(data, input, ctx, info), ctx);
+        updates.add(new DBAdd(data, input, ctx, info), ctx);
       }
     }
     return null;
@@ -619,14 +620,15 @@ public final class FNDb extends StandardFunc {
     // delete XML resources
     final IntList docs = data.resources.docs(path);
     final int is = docs.size();
+    final Updates updates = ctx.updates();
     for(int i = 0; i < is; i++) {
-      ctx.updates.add(new DeleteNode(docs.get(i), data, info), ctx);
+      updates.add(new DeleteNode(docs.get(i), data, info), ctx);
     }
     // delete raw resources
     if(!data.inMemory()) {
       final IOFile bin = data.meta.binary(path);
       if(bin == null) throw UPDBDELERR.get(info, path);
-      ctx.updates.add(new DBDelete(data, path, info), ctx);
+      updates.add(new DBDelete(data, path, info), ctx);
     }
     return null;
   }
@@ -650,7 +652,7 @@ public final class FNDb extends StandardFunc {
     if(!goptions.dbexists(name)) throw BXDB_WHICH.get(info, name);
     if(name.equals(newname)) throw BXDB_SAME.get(info, name, newname);
 
-    ctx.updates.add(keep ? new DBCopy(name, newname, info, ctx) :
+    ctx.updates().add(keep ? new DBCopy(name, newname, info, ctx) :
       new DBAlter(name, newname, info, ctx), ctx);
     return null;
   }
@@ -691,7 +693,7 @@ public final class FNDb extends StandardFunc {
     }
 
     final Options opts = checkOptions(3, Q_OPTIONS, new Options(), ctx);
-    ctx.updates.add(new DBCreate(info, name, inputs, opts, ctx), ctx);
+    ctx.updates().add(new DBCreate(info, name, inputs, opts, ctx), ctx);
     return null;
   }
 
@@ -705,7 +707,7 @@ public final class FNDb extends StandardFunc {
     final String name = string(checkStr(expr[0], ctx));
     if(!Databases.validName(name)) throw BXDB_NAME.get(info, name);
     if(!ctx.context.globalopts.dbexists(name)) throw BXDB_WHICH.get(info, name);
-    ctx.updates.add(new DBDrop(name, info, ctx), ctx);
+    ctx.updates().add(new DBDrop(name, info, ctx), ctx);
     return null;
   }
 
@@ -720,7 +722,7 @@ public final class FNDb extends StandardFunc {
     if(!Databases.validName(name)) throw BXDB_NAME.get(info, name);
     if(!ctx.context.globalopts.dbexists(name)) throw BXDB_WHICH.get(info, name);
 
-    ctx.updates.add(new BackupCreate(name, info, ctx), ctx);
+    ctx.updates().add(new BackupCreate(name, info, ctx), ctx);
     return null;
   }
 
@@ -737,8 +739,9 @@ public final class FNDb extends StandardFunc {
     final StringList files = DropBackup.backups(name, ctx.context);
     if(files.isEmpty()) throw BXDB_WHICHBACK.get(info, name);
 
+    final Updates updates = ctx.updates();
     for(final String file : files) {
-      ctx.updates.add(new BackupDrop(file, info, ctx), ctx);
+      updates.add(new BackupDrop(file, info, ctx), ctx);
     }
     return null;
   }
@@ -758,7 +761,7 @@ public final class FNDb extends StandardFunc {
     final IOFile backup = Restore.backupFile(name, ctx.context);
     if(backup == null) throw BXDB_NOBACKUP.get(info, name);
 
-    ctx.updates.add(new DBRestore(db, backup, ctx, info), ctx);
+    ctx.updates().add(new DBRestore(db, backup, ctx, info), ctx);
     return null;
   }
 
@@ -774,20 +777,21 @@ public final class FNDb extends StandardFunc {
     final String target = path(2, ctx);
 
     // the first step of the path should be the database name
+    final Updates updates = ctx.updates();
     final IntList il = data.resources.docs(source);
     final int is = il.size();
     for(int i = 0; i < is; i++) {
       final int pre = il.get(i);
       final String trg = Rename.target(data, pre, source, target);
       if(trg.isEmpty() || trg.endsWith("/") || trg.endsWith(".")) throw BXDB_RENAME.get(info, trg);
-      ctx.updates.add(new ReplaceValue(pre, data, info, token(trg)), ctx);
+      updates.add(new ReplaceValue(pre, data, info, token(trg)), ctx);
     }
     // rename files
     if(!data.inMemory()) {
       final IOFile src = data.meta.binary(source);
       final IOFile trg = data.meta.binary(target);
       if(src == null || trg == null) throw UPDBRENAMEERR.get(info, src);
-      ctx.updates.add(new DBRename(data, src.path(), trg.path(), info), ctx);
+      updates.add(new DBRename(data, src.path(), trg.path(), info), ctx);
     }
     return null;
   }
@@ -802,7 +806,7 @@ public final class FNDb extends StandardFunc {
     final Data data = checkData(ctx);
     final boolean all = expr.length > 1 && checkBln(expr[1], ctx);
     final Options opts = checkOptions(2, Q_OPTIONS, new Options(), ctx);
-    ctx.updates.add(new DBOptimize(data, all, opts, ctx, info), ctx);
+    ctx.updates().add(new DBOptimize(data, all, opts, ctx, info), ctx);
     return null;
   }
 
@@ -820,7 +824,7 @@ public final class FNDb extends StandardFunc {
     if(file == null || file.isDir()) throw RESINV.get(info, path);
 
     final Item it = checkItem(expr[2], ctx);
-    ctx.updates.add(new DBStore(data, path, it, info), ctx);
+    ctx.updates().add(new DBStore(data, path, it, info), ctx);
     return null;
   }
 
@@ -831,7 +835,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item flush(final QueryContext ctx) throws QueryException {
-    ctx.updates.add(new DBFlush(checkData(ctx), info), ctx);
+    ctx.updates().add(new DBFlush(checkData(ctx), info), ctx);
     return null;
   }
 
@@ -899,7 +903,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item output(final QueryContext ctx) throws QueryException {
-    if(ctx.updates.mod instanceof TransformModifier) throw BASX_DBTRANSFORM.get(info);
+    if(ctx.updates().mod instanceof TransformModifier) throw BASX_DBTRANSFORM.get(info);
     cache(ctx.iter(expr[0]), ctx.output, ctx);
     return null;
   }

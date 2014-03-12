@@ -107,8 +107,6 @@ public final class QueryContext extends Proc {
   /** Strings to lock defined by lock:write option. */
   public final StringList writeLocks = new StringList(0);
 
-  /** Pending updates. */
-  public Updates updates;
   /** Pending output. */
   public final ValueBuilder output = new ValueBuilder();
 
@@ -124,6 +122,8 @@ public final class QueryContext extends Proc {
 
   /** Function for the next tail call. */
   private XQFunction tailFunc;
+  /** Pending updates. */
+  private Updates updates;
   /** Arguments for the next tail call. */
   private Value[] args;
 
@@ -216,8 +216,10 @@ public final class QueryContext extends Proc {
    */
   public MainModule parseMain(final String qu, final String path, final StaticContext sc)
       throws QueryException {
+
     info.query = qu;
     root = new QueryParser(qu, path, this, sc).parseMain();
+    updating = root.expr.has(Flag.UPD);
     return root;
   }
 
@@ -231,6 +233,7 @@ public final class QueryContext extends Proc {
    */
   public LibraryModule parseLibrary(final String qu, final String path, final StaticContext sc)
       throws QueryException {
+
     info.query = qu;
     return new QueryParser(qu, path, this, sc).parseLibrary(true);
   }
@@ -242,6 +245,24 @@ public final class QueryContext extends Proc {
   public void mainModule(final MainModule rt) {
     root = rt;
     updating = rt.expr.has(Flag.UPD);
+  }
+
+  /**
+   * Checks function calls and variable references.
+   * @param main main module
+   * @throws QueryException query exception
+   */
+  void check(final MainModule main) throws QueryException {
+    // check function calls and variable references
+    funcs.check(this);
+    vars.check();
+
+    // check placement of updating expressions if any have been found
+    if(onlyUpdates && updating) {
+      funcs.checkUp();
+      vars.checkUp();
+      if(main != null) main.expr.checkUp();
+    }
   }
 
   /**
@@ -315,33 +336,34 @@ public final class QueryContext extends Proc {
    */
   public Iter iter() throws QueryException {
     try {
+      // no updates: iterate through results
       if(!updating) return root.iter(this);
 
-      // handle updating queries
+      // cache results
       ValueBuilder cache = root.cache(this);
-      final long cs = cache.size();
+      // perform updates
+      if(updates != null) {
+        final StringList dbs = updates.databases();
+        final HashSet<Data> datas = updates.prepare();
 
-      final StringList dbs = updates.databases();
-      final HashSet<Data> datas = updates.prepare();
-
-      // copy nodes that will be affected by an update operation
-      for(int c = 0; c < cs; c++) {
-        final Item it = cache.get(c);
-        if(!(it instanceof DBNode)) continue;
-        final Data data = it.data();
-        if(datas.contains(data) || !data.inMemory() && dbs.contains(data.meta.name)) {
-          cache.set(((DBNode) it).dbCopy(context.options), c);
+        // copy nodes that will be affected by an update operation
+        final long cs = cache.size();
+        for(int c = 0; c < cs; c++) {
+          final Item it = cache.get(c);
+          if(!(it instanceof DBNode)) continue;
+          final Data data = it.data();
+          if(datas.contains(data) || !data.inMemory() && dbs.contains(data.meta.name)) {
+            cache.set(((DBNode) it).dbCopy(context.options), c);
+          }
         }
-      }
+        updates.apply();
+        if(updates.size() != 0 && context.data() != null) context.invalidate();
 
-      //context.downgrade(this, dbs);
-      updates.apply();
-      if(updates.size() != 0 && context.data() != null) context.invalidate();
-
-      // append cached outputs
-      if(output.size() != 0) {
-        if(cache.size() == 0) cache = output;
-        else cache.add(output.value());
+        // append cached outputs
+        if(output.size() != 0) {
+          if(cache.size() == 0) cache = output;
+          else cache.add(output.value());
+        }
       }
       return cache;
 
@@ -502,12 +524,19 @@ public final class QueryContext extends Proc {
   }
 
   /**
-   * Sets the updating flag.
-   * @param up updating flag
+   * Indicates that the query contains any updating expressions.
    */
-  public void updating(final boolean up) {
+  public void updating() {
+    updating = true;
+  }
+
+  /**
+   * Returns a reference to the updates.
+   * @return updates
+   */
+  public Updates updates() {
     if(updates == null) updates = new Updates();
-    updating = up;
+    return updates;
   }
 
   /**

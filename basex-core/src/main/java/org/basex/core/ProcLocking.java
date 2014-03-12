@@ -78,10 +78,6 @@ final class ProcLocking implements Locking {
   }
 
   @Override
-  public void downgrade(final StringList write) {
-  }
-
-  @Override
   public void release(final Proc pr) {
     synchronized(mutex) {
       if(pr.updating) {

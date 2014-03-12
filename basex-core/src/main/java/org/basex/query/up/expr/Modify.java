@@ -46,10 +46,10 @@ public final class Modify extends Arr {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     final int o = (int) ctx.output.size();
-    if(ctx.updates == null) ctx.updates = new Updates();
-    final ContextModifier tmp = ctx.updates.mod;
+    final Updates updates = ctx.updates();
+    final ContextModifier tmp = updates.mod;
     final TransformModifier pu = new TransformModifier();
-    ctx.updates.mod = pu;
+    updates.mod = pu;
 
     final Value cv = ctx.value;
     try {
@@ -64,12 +64,12 @@ public final class Modify extends Arr {
       pu.addData(i.data());
 
       ctx.value(expr[1]);
-      ctx.updates.prepare();
-      ctx.updates.apply();
+      updates.prepare();
+      updates.apply();
       return ctx.value;
     } finally {
       ctx.output.size(o);
-      ctx.updates.mod = tmp;
+      updates.mod = tmp;
       ctx.value = cv;
     }
   }

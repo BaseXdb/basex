@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.up.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -54,7 +55,8 @@ public final class Replace extends Update {
     if(!(i instanceof ANode) || tp == NodeType.DOC || t.next() != null)
       throw UPTRGMULT.get(info);
     final ANode targ = (ANode) i;
-    final DBNode dbn = ctx.updates.determineDataRef(targ, ctx);
+    final Updates updates = ctx.updates();
+    final DBNode dbn = updates.determineDataRef(targ, ctx);
 
     // replace node
     final ANodeList aList = c.atts;
@@ -67,7 +69,7 @@ public final class Replace extends Update {
       if(tp == NodeType.COM) FComm.parse(txt, info);
       if(tp == NodeType.PI) FPI.parse(txt, info);
 
-      ctx.updates.add(new ReplaceValue(dbn.pre, dbn.data, info, txt), ctx);
+      updates.add(new ReplaceValue(dbn.pre, dbn.data, info, txt), ctx);
     } else {
       final ANode par = targ.parent();
       if(par == null) throw UPNOPAR.get(info, i);
@@ -80,7 +82,7 @@ public final class Replace extends Update {
         if(!aList.isEmpty()) throw UPWRELM.get(info);
       }
       // conforms to specification: insertion sequence may be empty
-      ctx.updates.add(new ReplaceNode(dbn.pre, dbn.data, info, list), ctx);
+      updates.add(new ReplaceNode(dbn.pre, dbn.data, info, list), ctx);
     }
     return null;
   }

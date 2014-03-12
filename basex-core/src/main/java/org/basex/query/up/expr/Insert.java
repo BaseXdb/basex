@@ -6,6 +6,7 @@ import static org.basex.query.util.Err.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.up.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -80,24 +81,25 @@ public final class Insert extends Update {
     NodeUpdate up;
     DBNode dbn;
     // no update primitive is created if node list is empty
+    final Updates updates = ctx.updates();
     if(!aList.isEmpty()) {
       final ANode targ = before || after ? par : n;
       if(targ.type != NodeType.ELM) throw (before || after ? UPATTELM : UPATTELM2).get(info);
 
-      dbn = ctx.updates.determineDataRef(targ, ctx);
+      dbn = updates.determineDataRef(targ, ctx);
       up = new InsertAttribute(dbn.pre, dbn.data, info, checkNS(aList, targ));
-      ctx.updates.add(up, ctx);
+      updates.add(up, ctx);
     }
 
     // no update primitive is created if node list is empty
     if(!cList.isEmpty()) {
-      dbn = ctx.updates.determineDataRef(n, ctx);
+      dbn = updates.determineDataRef(n, ctx);
       if(before) up = new InsertBefore(dbn.pre, dbn.data, info, cList);
       else if(after) up = new InsertAfter(dbn.pre, dbn.data, info, cList);
       else if(first) up = new InsertIntoAsFirst(dbn.pre, dbn.data, info, cList);
       else if(last) up = new InsertIntoAsLast(dbn.pre, dbn.data, info, cList);
       else up = new InsertInto(dbn.pre, dbn.data, info, cList);
-      ctx.updates.add(up, ctx);
+      updates.add(up, ctx);
     }
     return null;
   }
