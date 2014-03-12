@@ -385,7 +385,9 @@ public final class QueryContext extends Proc {
   public void databases(final LockResult lr) {
     lr.read.add(readLocks);
     lr.write.add(writeLocks);
-    if(root == null || !root.databases(lr, this)) {
+    if(root == null || !root.databases(lr, this) ||
+       ctxItem != null && !ctxItem.databases(lr, this)) {
+
       if(updating) lr.writeAll = true;
       else lr.readAll = true;
     }
