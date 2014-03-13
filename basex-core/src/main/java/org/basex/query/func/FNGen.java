@@ -222,7 +222,7 @@ public final class FNGen extends StandardFunc {
       if(!Uri.uri(p).isValid()) throw INVURL.get(info, p);
 
       IO io = base.merge(p);
-      final String[] rp = ctx.resources.resources.get(io.path());
+      final String[] rp = ctx.resources.texts.get(io.path());
       if(rp != null && rp.length > 0) {
         io = IO.get(rp[0]);
         if(rp.length > 1) enc = rp[1];

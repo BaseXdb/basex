@@ -3,6 +3,7 @@ package org.basex.query.util;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.server.*;
 import org.basex.util.*;
@@ -14,7 +15,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class ClientSessions {
+public final class ClientSessions implements DataResources {
   /** Last inserted id. */
   private int lastId = -1;
   /** Map with all open sessions and their ids. */
@@ -48,9 +49,7 @@ public final class ClientSessions {
     conns.delete(id.string());
   }
 
-  /**
-   * Closes all opened sessions.
-   */
+  @Override
   public void close() {
     for(final byte[] c : conns) {
       final ClientSession cs = conns.get(c);

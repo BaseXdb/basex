@@ -129,7 +129,7 @@ public final class FNSql extends StandardFunc {
   private Int connect(final QueryContext ctx) throws QueryException {
     // URL to relational database
     final String url = string(checkStr(expr[0], ctx));
-    final JDBCConnections jdbc = ctx.resources.jdbc();
+    final JDBCConnections jdbc = jdbc(ctx);
     try {
       if(expr.length > 2) {
         // credentials
@@ -191,7 +191,7 @@ public final class FNSql extends StandardFunc {
     try {
       // Keep prepared statement
       final PreparedStatement prep = conn.prepareStatement(string(prepStmt));
-      return Int.get(ctx.resources.jdbc().add(prep));
+      return Int.get(jdbc(ctx).add(prep));
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.get(info, ex);
     }
@@ -205,7 +205,7 @@ public final class FNSql extends StandardFunc {
    */
   private NodeSeqBuilder execute(final QueryContext ctx) throws QueryException {
     final int id = (int) checkItr(expr[0], ctx);
-    final Object obj = ctx.resources.jdbc().get(id);
+    final Object obj = jdbc(ctx).get(id);
     if(!(obj instanceof Connection)) throw BXSQ_CONN.get(info, id);
 
     final String query = string(checkStr(expr[1], ctx));
@@ -229,7 +229,7 @@ public final class FNSql extends StandardFunc {
    */
   private NodeSeqBuilder executePrepared(final QueryContext ctx) throws QueryException {
     final int id = (int) checkItr(expr[0], ctx);
-    final Object obj = ctx.resources.jdbc().get(id);
+    final Object obj = jdbc(ctx).get(id);
     if(!(obj instanceof PreparedStatement)) throw BXSQ_STATE.get(info, id);
 
     // Get parameters for prepared statement
@@ -451,9 +451,23 @@ public final class FNSql extends StandardFunc {
   private Connection connection(final QueryContext ctx, final boolean del)
       throws QueryException {
     final int id = (int) checkItr(expr[0], ctx);
-    final Object obj = ctx.resources.jdbc().get(id);
+    final Object obj = jdbc(ctx).get(id);
     if(!(obj instanceof Connection)) throw BXSQ_CONN.get(info, id);
-    if(del) ctx.resources.jdbc().remove(id);
+    if(del) jdbc(ctx).remove(id);
     return (Connection) obj;
+  }
+
+  /**
+   * Returns the JDBC connection handler.
+   * @param ctx query context
+   * @return connection handler
+   */
+  private JDBCConnections jdbc(final QueryContext ctx) {
+    JDBCConnections res = ctx.resources.get(JDBCConnections.class);
+    if(res == null) {
+      res = new JDBCConnections();
+      ctx.resources.add(res);
+    }
+    return res;
   }
 }

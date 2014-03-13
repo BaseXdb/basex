@@ -11,7 +11,6 @@ import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
-import org.basex.query.util.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -28,8 +27,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class QueryResources {
-  /** Resources. */
-  public final HashMap<String, String[]> resources = new HashMap<String, String[]>();
+  /** Textual resources. */
+  public final HashMap<String, String[]> texts = new HashMap<String, String[]>();
 
   /** Database context. */
   private final QueryContext qc;
@@ -40,10 +39,9 @@ public final class QueryResources {
 
   /** Module loader. */
   public final ModuleLoader modules;
-  /** Opened connections to relational databases. */
-  private JDBCConnections jdbc;
-  /** Opened connections to relational databases. */
-  private ClientSessions sessions;
+  /** External resources. */
+  private HashMap<Class<? extends DataResources>, DataResources> external =
+      new HashMap<Class<? extends DataResources>, DataResources>();
 
   /** Pending output. */
   public final ValueBuilder output = new ValueBuilder();;
@@ -88,18 +86,35 @@ public final class QueryResources {
   }
 
   /**
+   * Adds an external resource.
+   * @param ext external resource
+   */
+  public void add(final DataResources ext) {
+    external.put(ext.getClass(), ext);
+  }
+
+  /**
+   * Returns an external resource of the specified class.
+   * @param <R> resource
+   * @param resource external resource
+   * @return resource
+   */
+  @SuppressWarnings("unchecked")
+  public <R extends DataResources> R get(final Class<? extends R> resource) {
+    return (R) external.get(resource);
+  }
+
+  /**
    * Closes all opened data references that have not been added by the global context.
    */
   void close() {
     for(int d = 0; d < datas; d++) Close.close(data[d], qc.context);
     datas = 0;
 
-    // close JDBC connections
-    if(jdbc != null) jdbc.close();
-    // close client sessions
-    if(sessions != null) sessions.close();
     // close dynamically loaded JAR files
     modules.close();
+    // close external resources
+    for(final DataResources c : external.values()) c.close();
   }
 
   /**
@@ -247,7 +262,7 @@ public final class QueryResources {
    * @param strings resource strings (path, encoding)
    */
   public void addResource(final String uri, final String... strings) {
-    resources.put(uri, strings);
+    texts.put(uri, strings);
   }
 
   /**
@@ -267,24 +282,6 @@ public final class QueryResources {
       nodes[n] = new DBNode(create(qi, true, baseIO, null), 0, Data.DOC);
     }
     addCollection(Seq.get(nodes, ns, NodeType.DOC), name);
-  }
-
-  /**
-   * Returns JDBC connections.
-   * @return jdbc connections
-   */
-  public JDBCConnections jdbc() {
-    if(jdbc == null) jdbc = new JDBCConnections();
-    return jdbc;
-  }
-
-  /**
-   * Returns client sessions.
-   * @return client session
-   */
-  public ClientSessions sessions() {
-    if(sessions == null) sessions = new ClientSessions();
-    return sessions;
   }
 
   /**

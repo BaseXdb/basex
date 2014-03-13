@@ -11,6 +11,7 @@ import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -79,7 +80,7 @@ public final class FNClient extends StandardFunc {
     final String pass = Token.string(checkStr(expr[3], ctx));
     final int port = (int) checkItr(expr[1], ctx);
     try {
-      return ctx.resources.sessions().add(new ClientSession(host, port, user, pass));
+      return sessions(ctx).add(new ClientSession(host, port, user, pass));
     } catch(final IOException ex) {
       throw BXCL_CONN.get(info, ex);
     }
@@ -191,9 +192,23 @@ public final class FNClient extends StandardFunc {
    */
   private ClientSession session(final QueryContext ctx, final boolean del) throws QueryException {
     final Uri id = (Uri) checkType(expr[0].item(ctx, info), AtomType.URI);
-    final ClientSession cs = ctx.resources.sessions().get(id);
+    final ClientSession cs = sessions(ctx).get(id);
     if(cs == null) throw BXCL_NOTAVL.get(info, id);
-    if(del) ctx.resources.sessions().remove(id);
+    if(del) sessions(ctx).remove(id);
     return cs;
+  }
+
+  /**
+   * Returns the sessions handler.
+   * @param ctx query context
+   * @return connection handler
+   */
+  private ClientSessions sessions(final QueryContext ctx) {
+    ClientSessions res = ctx.resources.get(ClientSessions.class);
+    if(res == null) {
+      res = new ClientSessions();
+      ctx.resources.add(res);
+    }
+    return res;
   }
 }
