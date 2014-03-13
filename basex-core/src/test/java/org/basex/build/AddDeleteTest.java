@@ -33,7 +33,7 @@ public final class AddDeleteTest extends SandboxTest {
   /** Test XML fragment. */
   private static final String XMLFRAG = "<xml a='blu'><foo /></xml>";
   /** Temporary XML file. */
-  private static final String TEMP = NAME + IO.XMLSUFFIX;
+  private static final String TEMP = Prop.TMP + NAME + IO.XMLSUFFIX;
 
   /** Number of XML files for folder. */
   private static final int NFLDR;
