@@ -39,6 +39,8 @@ public enum Err {
   BASX_ANNOT(BASX, 6, "Annotation %% is invalid or not supported."),
   /** BASX0006. */
   BASX_ANNOTARGS(BASX, 6, "Annotation %% has invalid arguments."),
+  /** XUST0002. */
+  BASEX_MOD(XUST, 2, "All transform expressions must be updating or return an empty sequence."),
 
   // Client module
 
@@ -1148,7 +1150,7 @@ public enum Err {
   /** XUTY0013. */
   UPCOPYMULT(XUTY, 13, "Value assigned to $% must be a single node."),
   /** XUTY0013. */
-  UPSOURCE(XUTY, 13, "Source of copy expression must be a single node."),
+  UPSOURCE(XUTY, 13, "Source of transform expression must be a single node."),
   /** XUTY0022. */
   UPATTELM2(XUTY, 22, "Insert target must be an element.");
 

@@ -79,9 +79,8 @@ public final class Transform extends Arr {
         ctx.set(fo.var, i, info);
         pu.addData(i.data());
       }
-      // new check (may only happen if ONLYUPDATES = false)
       final Value v = ctx.value(expr[0]);
-      if(!v.isEmpty()) throw UPMODIFY.get(info);
+      if(!v.isEmpty()) throw BASEX_MOD.get(info);
 
       updates.prepare();
       updates.apply();

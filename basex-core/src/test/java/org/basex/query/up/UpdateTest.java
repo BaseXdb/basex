@@ -70,6 +70,22 @@ public final class UpdateTest extends AdvancedQueryTest {
     query("declare variable $d := document{ <x/> } update (); $d/x", "<x/>");
   }
 
+  /** Transform expression containing a simple expression. */
+  @Test
+  public void transSimple() {
+    final boolean ou = context.options.get(MainOptions.ONLYUPDATES);
+    try {
+      context.options.set(MainOptions.ONLYUPDATES, false);
+      error("<a/> update ('')", Err.BASEX_MOD);
+      error("copy $a := <a/> modify ('') return $a", Err.BASEX_MOD);
+      context.options.set(MainOptions.ONLYUPDATES, true);
+      error("<a/> update ('')", Err.UPMODIFY);
+      error("copy $a := <a/> modify ('') return $a", Err.UPMODIFY);
+    } finally {
+      context.options.set(MainOptions.ONLYUPDATES, ou);
+    }
+  }
+
   /**
    * Checks whether existing indexes etc. are NOT recycled for the copy of a transform expression.
    * @throws BaseXException BaseX exception.

@@ -63,7 +63,9 @@ public final class Modify extends Arr {
       ctx.value = i;
       pu.addData(i.data());
 
-      ctx.value(expr[1]);
+      final Value v = ctx.value(expr[1]);
+      if(!v.isEmpty()) throw BASEX_MOD.get(info);
+
       updates.prepare();
       updates.apply();
       return ctx.value;
@@ -91,7 +93,7 @@ public final class Modify extends Arr {
 
   @Override
   public String toString() {
-    return toString(" update ");
+    return toString(" " + QueryText.UPDATE + " ");
   }
 
   @Override
