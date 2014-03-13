@@ -61,8 +61,8 @@ public final class Transform extends Arr {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    final int o = (int) ctx.output.size();
-    final Updates updates = ctx.updates();
+    final int o = (int) ctx.resources.output.size();
+    final Updates updates = ctx.resources.updates();
     final ContextModifier tmp = updates.mod;
     final TransformModifier pu = new TransformModifier();
     updates.mod = pu;
@@ -87,7 +87,7 @@ public final class Transform extends Arr {
       updates.apply();
       return ctx.value(expr[1]);
     } finally {
-      ctx.output.size(o);
+      ctx.resources.output.size(o);
       updates.mod = tmp;
     }
   }

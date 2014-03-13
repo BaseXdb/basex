@@ -64,11 +64,6 @@ public final class QueryContext extends Proc {
 
   /** Query resources. */
   public QueryResources resources;
-  /** Pending output. */
-  public ValueBuilder output;
-  /** Pending updates. */
-  private Updates updates;
-
   /** HTTP context. */
   public Object http;
 
@@ -144,7 +139,7 @@ public final class QueryContext extends Proc {
   /** Initial context value. */
   public MainModule ctxItem;
   /** Root expression of the query. */
-  MainModule root;
+  public MainModule root;
 
   /** Indicates if the query context has been closed. */
   private boolean closed;
@@ -157,8 +152,6 @@ public final class QueryContext extends Proc {
     this(parent.context, parent);
     listen = parent.listen;
     resources = parent.resources;
-    updates = parent.updates;
-    output = parent.output;
   }
 
   /**
@@ -168,7 +161,6 @@ public final class QueryContext extends Proc {
   public QueryContext(final Context ctx) {
     this(ctx, null);
     resources = new QueryResources(this);
-    output = new ValueBuilder();
   }
 
   /**
@@ -346,28 +338,27 @@ public final class QueryContext extends Proc {
 
       // cache results
       ValueBuilder cache = root.cache(this);
-      // perform updates
+
+      final Updates updates = resources.updates;
       if(updates != null) {
-        final StringList dbs = updates.databases();
-        final HashSet<Data> datas = updates.prepare();
+        // if parent context exists, updates will be performed by main context
+        if(parentCtx == null) {
+          final ValueBuilder output = resources.output;
+          final StringList dbs = updates.databases();
+          final HashSet<Data> datas = updates.prepare();
 
-        // copy nodes that will be affected by an update operation
-        final long cs = cache.size();
-        for(int c = 0; c < cs; c++) {
-          final Item it = cache.get(c);
-          if(!(it instanceof DBNode)) continue;
-          final Data data = it.data();
-          if(datas.contains(data) || !data.inMemory() && dbs.contains(data.meta.name)) {
-            cache.set(((DBNode) it).dbCopy(context.options), c);
+          // copy nodes that will be affected by an update operation
+          copy(cache, datas, dbs);
+          copy(output, datas, dbs);
+
+          if(context.data() != null) context.invalidate();
+          updates.apply();
+
+          // append cached outputs
+          if(output.size() != 0) {
+            if(cache.size() == 0) cache = output;
+            else cache.add(output.value());
           }
-        }
-        updates.apply();
-        if(updates.size() != 0 && context.data() != null) context.invalidate();
-
-        // append cached outputs
-        if(output.size() != 0) {
-          if(cache.size() == 0) cache = output;
-          else cache.add(output.value());
         }
       }
       return cache;
@@ -375,6 +366,24 @@ public final class QueryContext extends Proc {
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
       throw BASX_STACKOVERFLOW.get(null);
+    }
+  }
+
+  /**
+   * Creates copies of nodes that will be affected by an update operation.
+   * @param cache node cache
+   * @param datas data references
+   * @param dbs database names
+   */
+  private void copy(final ValueBuilder cache, final HashSet<Data> datas, final StringList dbs) {
+    final long cs = cache.size();
+    for(int c = 0; c < cs; c++) {
+      final Item it = cache.get(c);
+      if(!(it instanceof DBNode)) continue;
+      final Data data = it.data();
+      if(datas.contains(data) || !data.inMemory() && dbs.contains(data.meta.name)) {
+        cache.set(((DBNode) it).dbCopy(context.options), c);
+      }
     }
   }
 
@@ -515,15 +524,6 @@ public final class QueryContext extends Proc {
    */
   public void updating() {
     updating = true;
-  }
-
-  /**
-   * Returns a reference to the updates.
-   * @return updates
-   */
-  public Updates updates() {
-    if(updates == null) updates = new Updates();
-    return updates;
   }
 
   /**

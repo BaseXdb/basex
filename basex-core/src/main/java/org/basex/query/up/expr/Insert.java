@@ -81,7 +81,7 @@ public final class Insert extends Update {
     NodeUpdate up;
     DBNode dbn;
     // no update primitive is created if node list is empty
-    final Updates updates = ctx.updates();
+    final Updates updates = ctx.resources.updates();
     if(!aList.isEmpty()) {
       final ANode targ = before || after ? par : n;
       if(targ.type != NodeType.ELM) throw (before || after ? UPATTELM : UPATTELM2).get(info);

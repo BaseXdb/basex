@@ -2,6 +2,7 @@ package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
 
+import org.basex.core.*;
 import org.basex.query.util.*;
 import org.basex.query.*;
 import org.junit.*;
@@ -53,11 +54,18 @@ public final class FNXQueryTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
-  public void evaluate() {
-    query(_XQUERY_EVALUATE.args("1"), 1);
-    query(_XQUERY_EVALUATE.args("\"" + DOC.args(PATH).replace('"', '\'') + "\""));
-    error(_XQUERY_EVALUATE.args("\"" + _DB_OPEN.args("X").replace('"', '\'') + "\""),
-        Err.BXXQ_NEWDB);
+  public void update() {
+    query(_XQUERY_UPDATE.args("delete node <a/>"));
+    query(_XQUERY_UPDATE.args("\"db:output('1')\""), "1");
+    query(_XQUERY_UPDATE.args(" '()'"));
+
+    final boolean ou = context.options.get(MainOptions.ONLYUPDATES);
+    try {
+      context.options.set(MainOptions.ONLYUPDATES, true);
+      error(_XQUERY_UPDATE.args("1"), Err.BXXQ_NOUPDATE);
+    } finally {
+      context.options.set(MainOptions.ONLYUPDATES, ou);
+    }
   }
 
   /** Test method. */

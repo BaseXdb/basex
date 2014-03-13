@@ -142,6 +142,7 @@ public final class StaticFuncs extends ExprInfo {
 
       if(call != null) {
         if(fc.func.expr == null) throw FUNCNOIMPL.get(call.info, call.name.string());
+        // set updating flag; this will trigger checks in {@link QueryContext#check}
         qc.updating |= fc.func.updating;
       }
       id++;

@@ -253,7 +253,7 @@ public final class QueryProcessor extends Proc {
    * @return number of updates
    */
   public int updates() {
-    return updating ? ctx.updates().size() : 0;
+    return updating ? ctx.resources.updates().size() : 0;
   }
 
   /**

@@ -140,6 +140,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
       if(err != null) {
         int c = 0;
         for(final Err er : error) tb.add(c++ == 0 ? "" : "/").add(er.name());
+        ex.printStackTrace();
         fail(tb.add("\nResult: ").add(err.name() + " (" + err.qname() + ')').toString());
       } else {
         int c = 0;

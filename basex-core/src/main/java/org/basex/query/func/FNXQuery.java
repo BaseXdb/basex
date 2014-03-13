@@ -56,22 +56,22 @@ public final class FNXQuery extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case _XQUERY_EVAL:     return eval(ctx, true);
-      case _XQUERY_EVALUATE: return eval(ctx, false);
-      case _XQUERY_INVOKE:   return invoke(ctx);
-      case _XQUERY_TYPE:     return value(ctx).iter();
-      default:               return super.iter(ctx);
+      case _XQUERY_EVAL:   return eval(ctx, false);
+      case _XQUERY_UPDATE: return eval(ctx, true);
+      case _XQUERY_INVOKE: return invoke(ctx);
+      case _XQUERY_TYPE:   return value(ctx).iter();
+      default:             return super.iter(ctx);
     }
   }
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case _XQUERY_EVAL:     return eval(ctx, true).value();
-      case _XQUERY_EVALUATE: return eval(ctx, false).value();
-      case _XQUERY_INVOKE:   return invoke(ctx).value();
-      case _XQUERY_TYPE:     return type(ctx).value(ctx);
-      default:               return super.value(ctx);
+      case _XQUERY_EVAL:   return eval(ctx, false).value();
+      case _XQUERY_UPDATE: return eval(ctx, true).value();
+      case _XQUERY_INVOKE: return invoke(ctx).value();
+      case _XQUERY_TYPE:   return type(ctx).value(ctx);
+      default:             return super.value(ctx);
     }
   }
 
@@ -83,12 +83,12 @@ public final class FNXQuery extends StandardFunc {
   /**
    * Performs the eval function.
    * @param ctx query context
-   * @param openDB allow opening new databases
+   * @param updating updating
    * @return resulting value
    * @throws QueryException query exception
    */
-  private ValueBuilder eval(final QueryContext ctx, final boolean openDB) throws QueryException {
-    return eval(ctx, checkStr(expr[0], ctx), null, openDB);
+  private ValueBuilder eval(final QueryContext ctx, final boolean updating) throws QueryException {
+    return eval(ctx, checkStr(expr[0], ctx), null, updating);
   }
 
   /**
@@ -96,12 +96,12 @@ public final class FNXQuery extends StandardFunc {
    * @param ctx query context
    * @param qu query string
    * @param path path to query file (may be {@code null})
-   * @param openDB allow opening new databases
+   * @param updating updating query
    * @return resulting value
    * @throws QueryException query exception
    */
   private ValueBuilder eval(final QueryContext ctx, final byte[] qu, final String path,
-      final boolean openDB) throws QueryException {
+      final boolean updating) throws QueryException {
 
     // bind variables and context item
     final HashMap<String, Value> bindings = bindings(1, ctx);
@@ -137,7 +137,6 @@ public final class FNXQuery extends StandardFunc {
     }
 
     final QueryContext qc = ctx.proc(new QueryContext(ctx));
-    qc.resources.openDB = openDB;
 
     // evaluate query
     try {
@@ -150,19 +149,17 @@ public final class FNXQuery extends StandardFunc {
       }
 
       qc.parseMain(string(qu), path, sctx);
-      if(qc.updating) throw BXXQ_UPDATING.get(info);
+
+      if(updating) {
+        if(qc.onlyUpdates && !qc.updating && !qc.root.expr.isVacuous())
+          throw BXXQ_NOUPDATE.get(info);
+      } else {
+        if(qc.updating) throw BXXQ_UPDATING.get(info);
+      }
       qc.compile();
 
       final ValueBuilder vb = new ValueBuilder();
-      final Iter iter = qc.iter();
-      if(openDB) {
-        cache(iter, vb, ctx);
-      } else {
-        for(Item it; (it = iter.next()) != null;) {
-          if(it instanceof FItem) throw FIVALUE.get(info, it.type);
-          vb.add(it);
-        }
-      }
+      cache(qc.iter(), vb, ctx);
       return vb;
     } catch(final ProcException ex) {
       throw BXXQ_STOPPED.get(info);
@@ -186,7 +183,7 @@ public final class FNXQuery extends StandardFunc {
     checkCreate(ctx);
     final IO io = checkPath(expr[0], ctx);
     try {
-      return eval(ctx, io.read(), io.path(), true);
+      return eval(ctx, io.read(), io.path(), false);
     } catch(final IOException ex) {
       throw IOERR.get(info, ex);
     }
@@ -205,7 +202,7 @@ public final class FNXQuery extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return !(oneOf(sig, _XQUERY_EVAL, _XQUERY_INVOKE) && !visitor.lock(null)) &&
+    return !(oneOf(sig, _XQUERY_EVAL, _XQUERY_UPDATE, _XQUERY_INVOKE) && !visitor.lock(null)) &&
       super.accept(visitor);
   }
 }

@@ -292,21 +292,17 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Caches and materializes all items of the specified iterator.
-   * @param ir iterator
+   * @param iter iterator
    * @param vb value builder
    * @param ctx query context
    * @throws QueryException query exception
    */
-  protected final void cache(final Iter ir, final ValueBuilder vb, final QueryContext ctx)
+  protected final void cache(final Iter iter, final ValueBuilder vb, final QueryContext ctx)
       throws QueryException {
 
-    for(Item it; (it = ir.next()) != null;) {
+    for(Item it; (it = iter.next()) != null;) {
       ctx.checkStop();
       if(it instanceof FItem) throw FIVALUE.get(info, it.type);
-      // cache database nodes
-      final Data d = it.data();
-      if(d != null && !d.inMemory()) it = ((ANode) it).dbCopy(ctx.context.options);
-      // add materialized version of nodes
       vb.add(it.materialize(info));
     }
   }

@@ -55,7 +55,7 @@ public final class Replace extends Update {
     if(!(i instanceof ANode) || tp == NodeType.DOC || t.next() != null)
       throw UPTRGMULT.get(info);
     final ANode targ = (ANode) i;
-    final Updates updates = ctx.updates();
+    final Updates updates = ctx.resources.updates();
     final DBNode dbn = updates.determineDataRef(targ, ctx);
 
     // replace node

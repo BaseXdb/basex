@@ -9,6 +9,8 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.query.iter.*;
+import org.basex.query.up.*;
 import org.basex.query.util.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
@@ -28,8 +30,6 @@ import org.basex.util.list.*;
 public final class QueryResources {
   /** Resources. */
   public final HashMap<String, String[]> resources = new HashMap<String, String[]>();
-  /** Allow opening of new databases. */
-  public boolean openDB = true;
 
   /** Database context. */
   private final QueryContext qc;
@@ -44,6 +44,11 @@ public final class QueryResources {
   private JDBCConnections jdbc;
   /** Opened connections to relational databases. */
   private ClientSessions sessions;
+
+  /** Pending output. */
+  public final ValueBuilder output = new ValueBuilder();;
+  /** Pending updates. */
+  Updates updates;
 
   /** Collections: single nodes and sequences. */
   private Value[] coll = new Value[1];
@@ -110,8 +115,6 @@ public final class QueryResources {
       final String n = data[d].meta.name;
       if(Prop.CASE ? n.equals(name) : n.equalsIgnoreCase(name)) return data[d];
     }
-    if(!openDB) throw BXXQ_NEWDB.get(info);
-
     try {
       // open and add new data reference
       final Data d = Open.open(name, qc.context);
@@ -284,6 +287,15 @@ public final class QueryResources {
     return sessions;
   }
 
+  /**
+   * Returns a reference to the updates.
+   * @return updates
+   */
+  public Updates updates() {
+    if(updates == null) updates = new Updates();
+    return updates;
+  }
+
   // PRIVATE METHODS ====================================================================
 
   /**
@@ -292,7 +304,7 @@ public final class QueryResources {
    * @return data reference
    */
   private Data open(final QueryInput input) {
-    if(openDB && input.db != null) {
+    if(input.db != null) {
       try {
         // try to open database
         final Data d = Open.open(input.db, qc.context);
@@ -319,7 +331,6 @@ public final class QueryResources {
 
     // check if new databases can be created
     final boolean createDB = qc.context.options.get(MainOptions.FORCECREATE);
-    if(createDB && !openDB) throw BXXQ_NEWDB.get(info);
     if(!qc.context.user.has(Perm.READ))
       throw BXXQ_PERM.get(info, Util.info(Text.PERM_REQUIRED_X, Perm.READ));
 

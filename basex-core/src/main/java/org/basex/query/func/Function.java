@@ -1015,8 +1015,8 @@ public enum Function {
   _XQUERY_EVAL(FNXQuery.class, "eval(string[,bindings[,options]])",
       arg(STR, ITEM, ITEM), ITEM_ZM, flag(NDT)),
   /** XQuery function. */
-  _XQUERY_EVALUATE(FNXQuery.class, "evaluate(string[,bindings[,options]])",
-      arg(STR, ITEM, ITEM), ITEM_ZM, flag(NDT)),
+  _XQUERY_UPDATE(FNXQuery.class, "update(string[,bindings[,options]])",
+      arg(STR, ITEM, ITEM), ITEM_ZM, flag(UPD, NDT)),
   /** XQuery function. */
   _XQUERY_INVOKE(FNXQuery.class, "invoke(uri[,bindings[,options]])",
       arg(STR, ITEM, ITEM), ITEM_ZM, flag(NDT)),
