@@ -273,19 +273,20 @@ public final class FNDb extends StandardFunc {
    */
   private Iter backups(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    final String prefix = expr.length == 0 ? null : string(checkStr(expr[0], ctx)) + '-';
+    final String name = expr.length == 0 ? null : string(checkStr(expr[0], ctx));
 
-    final StringList list = ctx.context.databases.backups(prefix);
+    final StringList backups = name == null ? ctx.context.databases.backups() :
+      ctx.context.databases.backups(name);
     final IOFile dbpath = ctx.context.globalopts.dbpath();
     return new Iter() {
       int up = -1;
 
       @Override
       public Item next() {
-        if(++up >= list.size()) return null;
-        final String name = list.get(up);
-        final long length = new IOFile(dbpath, name + IO.ZIPSUFFIX).length();
-        return new FElem(BACKUP).add(name).add(SIZE, token(length));
+        if(++up >= backups.size()) return null;
+        final String backup = backups.get(up);
+        final long length = new IOFile(dbpath, backup + IO.ZIPSUFFIX).length();
+        return new FElem(BACKUP).add(backup).add(SIZE, token(length));
       }
     };
   }
@@ -734,11 +735,11 @@ public final class FNDb extends StandardFunc {
     final String name = string(checkStr(expr[0], ctx));
     if(!Databases.validName(name)) throw BXDB_NAME.get(info, name);
 
-    final StringList files = DropBackup.backups(name, ctx.context);
-    if(files.isEmpty()) throw BXDB_WHICHBACK.get(info, name);
+    final StringList backups = ctx.context.databases.backups(name);
+    if(backups.isEmpty()) throw BXDB_WHICHBACK.get(info, name);
 
-    for(final String file : files) {
-      ctx.updates.add(new BackupDrop(file, info, ctx), ctx);
+    for(final String backup : backups) {
+      ctx.updates.add(new BackupDrop(backup, info, ctx), ctx);
     }
     return null;
   }
@@ -752,12 +753,14 @@ public final class FNDb extends StandardFunc {
   private Item restore(final QueryContext ctx) throws QueryException {
     // extract database name from backup file
     final String name = string(checkStr(expr[0], ctx));
-    final String db = Restore.dbName(name);
-    if(!Databases.validName(db)) throw BXDB_NAME.get(info, db);
+    if(!Databases.validName(name)) throw BXDB_NAME.get(info, name);
 
-    final IOFile backup = Restore.backupFile(name, ctx.context);
-    if(backup == null) throw BXDB_NOBACKUP.get(info, name);
+    // find backup with or without date suffix
+    final StringList backups = ctx.context.databases.backups(name);
+    if(backups.isEmpty()) throw BXDB_NOBACKUP.get(info, name);
 
+    final String backup = backups.get(0);
+    final String db = Databases.name(backup);
     ctx.updates.add(new DBRestore(db, backup, ctx, info), ctx);
     return null;
   }

@@ -3,6 +3,7 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import java.io.*;
+
 import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
@@ -24,12 +25,11 @@ public final class ShowBackups extends ABackup {
     table.header.add(NAME);
     table.header.add(SIZE);
 
-    final StringList list = context.databases.backups(null);
     final IOFile dbpath = context.globalopts.dbpath();
-    for(final String name : list) {
+    for(final String name : context.databases.backups()) {
       final TokenList tl = new TokenList();
       tl.add(name);
-      tl.add(new IOFile(dbpath, name).length());
+      tl.add(new IOFile(dbpath, name + IO.ZIPSUFFIX).length());
       table.contents.add(tl);
     }
     out.println(table.sort().finish());
