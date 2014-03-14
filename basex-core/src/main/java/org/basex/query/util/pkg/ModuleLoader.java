@@ -88,7 +88,11 @@ public final class ModuleLoader {
       final String path = context.globalopts.get(GlobalOptions.REPOPATH) + uriPath;
       // check for any file with XQuery suffix
       for(final String suf : IO.XQSUFFIXES) {
-        if(addModule(new IOFile(path + suf), uri, qp)) return true;
+        final IOFile file = new IOFile(path + suf);
+        if(file.exists()) {
+          qp.module(token(file.path()), uri);
+          return true;
+        }
       }
     }
 
@@ -195,22 +199,6 @@ public final class ModuleLoader {
   // PRIVATE METHODS ====================================================================
 
   /**
-   * Parses the specified file as module if it exists.
-   * @param file file to be added
-   * @param uri namespace uri
-   * @param qp query parser
-   * @return {@code true} if file exists and was successfully parsed
-   * @throws QueryException query exception
-   */
-  private static boolean addModule(final IOFile file, final byte[] uri, final QueryParser qp)
-      throws QueryException {
-
-    if(!file.exists()) return false;
-    qp.module(token(file.path()), uri);
-    return true;
-  }
-
-  /**
    * Loads a Java class.
    * @param path file path
    * @param ii input info
@@ -287,8 +275,7 @@ public final class ModuleLoader {
       }
     }
     for(final Component comp : pkg.comps) {
-      final String p = new IOFile(new IOFile(pkgDir, string(pkg.abbrev)),
-          string(comp.file)).path();
+      final String p = new IOFile(new IOFile(pkgDir, string(pkg.abbrev)), string(comp.file)).path();
       qp.module(token(p), comp.uri);
     }
     if(toLoad.contains(name)) toLoad.delete(name);
