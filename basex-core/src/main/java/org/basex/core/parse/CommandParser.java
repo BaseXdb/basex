@@ -5,7 +5,6 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * This is a parser for command strings, creating {@link Command} instances.
@@ -14,7 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class CommandParser extends InputParser {
+public final class CommandParser {
   /** Context. */
   private final CmdParser parser;
 
@@ -24,7 +23,6 @@ public final class CommandParser extends InputParser {
    * @param c context
    */
   public CommandParser(final String in, final Context c) {
-    super(in);
     parser = in.startsWith("<") ? new XMLParser(in, c) : new StringParser(in, c);
   }
 

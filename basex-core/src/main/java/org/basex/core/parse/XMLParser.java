@@ -23,19 +23,13 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class XMLParser extends CmdParser {
-  /** Context. */
-  private final String input;
-  /** Context. */
-  private final Context ctx;
-
   /**
    * Constructor.
-   * @param in input
-   * @param c context
+   * @param input input
+   * @param context context
    */
-  XMLParser(final String in, final Context c) {
-    input = in;
-    ctx = c;
+  XMLParser(final String input, final Context context) {
+    super(input, context);
   }
 
   @Override
