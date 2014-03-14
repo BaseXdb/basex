@@ -757,7 +757,7 @@ public class QueryParser extends InputParser {
     // check modules at specified locations
     if(wsConsumeWs(AT)) {
       do {
-        module(stringLiteral(), uri, true);
+        module(stringLiteral(), uri);
       } while(wsConsumeWs(COMMA));
       return;
     }
@@ -765,7 +765,7 @@ public class QueryParser extends InputParser {
     // check pre-declared module files
     final byte[] path = ctx.modDeclared.get(uri);
     if(path != null) {
-      module(path, uri, true);
+      module(path, uri);
       return;
     }
 
@@ -785,18 +785,6 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   public void module(final byte[] path, final byte[] uri) throws QueryException {
-    module(path, uri, false);
-  }
-
-  /**
-   * Parses the specified module, checking function and variable references at the end.
-   * @param path file path
-   * @param uri module uri
-   * @param imprt if this is an imported module
-   * @throws QueryException query exception
-   */
-  private void module(final byte[] path, final byte[] uri, final boolean imprt)
-      throws QueryException {
     // get absolute path
     final IO io = sc.io(string(path));
     final byte[] p = token(io.path());
@@ -821,8 +809,7 @@ public class QueryParser extends InputParser {
 
     ctx.modStack.push(p);
     final StaticContext sub = new StaticContext(sc.xquery3());
-    final LibraryModule lib =
-        new QueryParser(qu, io.path(), ctx, sub).parseLibrary(!imprt);
+    final LibraryModule lib = new QueryParser(qu, io.path(), ctx, sub).parseLibrary(false);
     final byte[] muri = lib.name.uri();
 
     // check if import and declaration uri match

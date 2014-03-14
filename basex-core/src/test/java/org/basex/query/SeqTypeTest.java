@@ -14,7 +14,7 @@ import org.junit.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class SeqTypeTest {
+public final class SeqTypeTest {
   /** Tests for {@link Occ#intersect(Occ)}. */
   @Test public void occIntersectTest() {
     final Occ[] occs = { ZERO, ZERO_ONE, ONE, ZERO_MORE, ONE_MORE };
