@@ -5,7 +5,6 @@ import static org.basex.query.util.Err.*;
 import java.io.*;
 
 import org.basex.core.cmd.*;
-import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
@@ -17,8 +16,8 @@ import org.basex.util.*;
  * @author Lukas Kircher
  */
 public class DBRestore extends NameUpdate {
-  /** Backup file to restore. */
-  public final IOFile backup;
+  /** Backup to restore. */
+  public final String backup;
 
   /**
    * Constructor.
@@ -27,7 +26,7 @@ public class DBRestore extends NameUpdate {
    * @param qc query context
    * @param info input info
    */
-  public DBRestore(final String name, final IOFile backup, final QueryContext qc,
+  public DBRestore(final String name, final String backup, final QueryContext qc,
       final InputInfo info) {
 
     super(UpdateType.DBRESTORE, name, info, qc);
