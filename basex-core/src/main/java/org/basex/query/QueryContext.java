@@ -113,8 +113,6 @@ public final class QueryContext extends Proc {
   /** Compilation flag: current node has leaves. */
   public boolean leaf;
 
-  /** Strict XQUF. */
-  public final boolean onlyUpdates;
   /** Number of successive tail calls. */
   public int tailCalls;
   /** Maximum number of successive tail calls (will be set before compilation). */
@@ -173,7 +171,6 @@ public final class QueryContext extends Proc {
     this.parentCtx = parent;
     nodes = context.current();
     info = new QueryInfo(this);
-    onlyUpdates = context.options.get(MainOptions.ONLYUPDATES);
   }
 
   /**
@@ -216,7 +213,7 @@ public final class QueryContext extends Proc {
 
     info.query = qu;
     root = new QueryParser(qu, path, this, sc).parseMain();
-    updating = root.expr.has(Flag.UPD);
+    updating = updating && root.expr.has(Flag.UPD);
     return root;
   }
 
@@ -247,15 +244,16 @@ public final class QueryContext extends Proc {
   /**
    * Checks function calls and variable references.
    * @param main main module
+   * @param sc static context
    * @throws QueryException query exception
    */
-  void check(final MainModule main) throws QueryException {
+  void check(final MainModule main, final StaticContext sc) throws QueryException {
     // check function calls and variable references
     funcs.check(this);
     vars.check();
 
     // check placement of updating expressions if any have been found
-    if(onlyUpdates && updating) {
+    if(!sc.mixUpdates && updating) {
       funcs.checkUp();
       vars.checkUp();
       if(main != null) main.expr.checkUp();
@@ -659,7 +657,7 @@ public final class QueryContext extends Proc {
    * @throws QueryException query exception
    */
   private Expr cast(final Object val, final String type) throws QueryException {
-    final StaticContext sc = root != null ? root.sc : new StaticContext(true);
+    final StaticContext sc = root != null ? root.sc : new StaticContext(context);
 
     // return original value
     if(type == null || type.isEmpty())

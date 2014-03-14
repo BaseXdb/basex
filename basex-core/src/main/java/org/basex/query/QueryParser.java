@@ -128,7 +128,7 @@ public class QueryParser extends InputParser {
     // set path to query file
     final MainOptions opts = c.context.options;
     final String bi = path != null ? path : opts.get(MainOptions.QUERYPATH);
-    sc = sctx != null ? sctx : new StaticContext(opts.get(MainOptions.XQUERY3));
+    sc = sctx != null ? sctx : new StaticContext(c.context);
     if(!bi.isEmpty()) sc.baseURI(bi);
 
     // parse pre-defined external variables
@@ -302,7 +302,7 @@ public class QueryParser extends InputParser {
       sc.decFormats.put(empty, new DecFormatter());
     }
 
-    if(check) ctx.check(mm);
+    if(check) ctx.check(mm, sc);
   }
 
   /**
@@ -317,8 +317,8 @@ public class QueryParser extends InputParser {
     if(version) {
       // parse xquery version
       final String ver = string(stringLiteral());
-      if(ver.equals(XQ10)) sc.xquery3 = false;
-      else if(eq(ver, XQ11, XQ30)) sc.xquery3 = true;
+      if(ver.equals(XQ10)) sc.xquery3(false);
+      else if(eq(ver, XQ11, XQ30)) sc.xquery3(true);
       else throw error(XQUERYVER, ver);
     }
     // parse xquery encoding (ignored, as input always comes in as string)
@@ -810,7 +810,7 @@ public class QueryParser extends InputParser {
     }
 
     ctx.modStack.push(p);
-    final StaticContext sub = new StaticContext(sc.xquery3());
+    final StaticContext sub = new StaticContext(ctx.context);
     final LibraryModule lib = new QueryParser(qu, io.path(), ctx, sub).parseLibrary(!imprt);
     final byte[] muri = lib.name.uri();
 
@@ -855,7 +855,7 @@ public class QueryParser extends InputParser {
     ctx.ctxItem = new MainModule(e, scope, type, currDoc.toString(), sc, info());
 
     if(module != null) throw error(DECITEM);
-    if(ctx.onlyUpdates && e.has(Flag.UPD)) throw error(UPCTX, e);
+    if(!sc.mixUpdates && e.has(Flag.UPD)) throw error(UPCTX, e);
   }
 
   /**
@@ -2130,7 +2130,7 @@ public class QueryParser extends InputParser {
     // inline function
     if(wsConsume(FUNCTION) && wsConsume(PAR1)) {
       if(ann != null) {
-        if(ctx.onlyUpdates && ann.contains(Ann.Q_UPDATING)) throw error(UPFUNCITEM);
+        if(!sc.mixUpdates && ann.contains(Ann.Q_UPDATING)) throw error(UPFUNCITEM);
         if(ann.contains(Ann.Q_PRIVATE) || ann.contains(Ann.Q_PUBLIC)) throw error(INVISIBLE);
       }
       final HashMap<Var, Expr> nonLocal = new HashMap<Var, Expr>();
@@ -2818,7 +2818,7 @@ public class QueryParser extends InputParser {
       t = AtomType.find(name, false);
       if(t == null) {
         if(wsConsume(PAR1)) throw error(SIMPLETYPE, name);
-        if(sc.xquery3) {
+        if(sc.xquery3()) {
           if(!AtomType.AST.name.eq(name)) throw error(TYPEUNKNOWN30, name);
           t = AtomType.AST;
         } else {
@@ -2973,7 +2973,7 @@ public class QueryParser extends InputParser {
     wsCheck(PAR2);
     if(tp != null) return tp;
     tp = Test.get(t);
-    if(tp == Test.NSP && !sc.xquery3) throw error(NSNOTALL);
+    if(tp == Test.NSP && !sc.xquery3()) throw error(NSNOTALL);
     return tp;
   }
 

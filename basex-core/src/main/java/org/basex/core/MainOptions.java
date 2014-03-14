@@ -124,8 +124,8 @@ public final class MainOptions extends Options {
   public static final BooleanOption RUNQUERY = new BooleanOption("RUNQUERY", true);
   /** Number of query executions. */
   public static final NumberOption RUNS = new NumberOption("RUNS", 1);
-  /** Flag for allowing updates and returned items in the same query. */
-  public static final BooleanOption ONLYUPDATES = new BooleanOption("ONLYUPDATES", false);
+  /** Flag for mixing updates and items. */
+  public static final BooleanOption MIXUPDATES = new BooleanOption("MIXUPDATES", false);
 
   // Serialize
 

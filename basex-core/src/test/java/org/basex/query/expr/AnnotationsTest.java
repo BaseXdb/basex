@@ -1,6 +1,5 @@
 package org.basex.query.expr;
 
-import org.basex.core.*;
 import org.basex.query.util.*;
 import org.basex.query.*;
 import org.junit.*;
@@ -43,15 +42,7 @@ public final class AnnotationsTest extends AdvancedQueryTest {
         "{ insert node <a/> into <b/> }; local:x()", Err.DUPLUPD);
     error("declare updating %updating function local:x() " +
         "{ insert node <a/> into <b/> }; local:x()", Err.DUPLUPD);
-
-
-    final boolean ou = context.options.get(MainOptions.ONLYUPDATES);
-    try {
-      context.options.set(MainOptions.ONLYUPDATES, true);
-      error("declare %updating function local:x() { 1 }; local:x()", Err.UPEXPECTF);
-    } finally {
-      context.options.set(MainOptions.ONLYUPDATES, ou);
-    }
+    error("declare %updating function local:x() { 1 }; local:x()", Err.UPEXPECTF);
   }
 
   /** Parsing errors and conflicts. */

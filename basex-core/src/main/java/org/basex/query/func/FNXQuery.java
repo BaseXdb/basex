@@ -140,7 +140,7 @@ public final class FNXQuery extends StandardFunc {
 
     // evaluate query
     try {
-      final StaticContext sctx = new StaticContext(qc.context.options.get(MainOptions.XQUERY3));
+      final StaticContext sctx = new StaticContext(qc.context);
       for(final Map.Entry<String, Value> it : bindings.entrySet()) {
         final String k = it.getKey();
         final Value v = it.getValue();
@@ -151,7 +151,7 @@ public final class FNXQuery extends StandardFunc {
       qc.parseMain(string(qu), path, sctx);
 
       if(updating) {
-        if(qc.onlyUpdates && !qc.updating && !qc.root.expr.isVacuous())
+        if(!sc.mixUpdates && !qc.updating && !qc.root.expr.isVacuous())
           throw BXXQ_NOUPDATE.get(info);
       } else {
         if(qc.updating) throw BXXQ_UPDATING.get(info);

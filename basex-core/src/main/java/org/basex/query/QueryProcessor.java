@@ -46,7 +46,7 @@ public final class QueryProcessor extends Proc {
   public QueryProcessor(final String qu, final Context cx) {
     query = qu;
     ctx = proc(new QueryContext(cx));
-    sc = new StaticContext(cx.options.get(MainOptions.XQUERY3));
+    sc = new StaticContext(cx);
   }
 
   /**

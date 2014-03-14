@@ -3,6 +3,7 @@ package org.basex.query;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.util.*;
 import org.basex.query.util.format.*;
@@ -22,6 +23,8 @@ public final class StaticContext {
   public final TokenObjMap<DecFormatter> decFormats = new TokenObjMap<DecFormatter>();
   /** Static and dynamic namespaces. */
   public final NSContext ns = new NSContext();
+  /** Mix updates flag. */
+  public final boolean mixUpdates;
 
   /** Default collation (default collection ({@link QueryText#COLLATIONURI}): {@code null}). */
   public Collation collation;
@@ -44,18 +47,20 @@ public final class StaticContext {
   public boolean preserveNS = true;
   /** Copy-namespaces mode: (no-)inherit. */
   public boolean inheritNS = true;
-  /** XQuery version flag. */
-  boolean xquery3;
 
+  /** XQuery version flag. */
+  private boolean xquery3;
   /** Static Base URI. */
   private Uri baseURI = Uri.EMPTY;
 
   /**
    * Constructor setting the XQuery version.
-   * @param xq30 XQuery 3.0 flag
+   * @param ctx database context
    */
-  public StaticContext(final boolean xq30) {
-    xquery3 = xq30;
+  public StaticContext(final Context ctx) {
+    final MainOptions opts = ctx.options;
+    mixUpdates = opts.get(MainOptions.MIXUPDATES);
+    xquery3 = opts.get(MainOptions.XQUERY3);
   }
 
   /**
@@ -115,6 +120,14 @@ public final class StaticContext {
       final IO io = IO.get(uri);
       baseURI = Uri.uri(io instanceof IOFile ? io.url() : uri);
     }
+  }
+
+  /**
+   * Assigns the XQuery 3.0 flag.
+   * @param xq30 XQuery 3.0 flag
+   */
+  public void xquery3(final boolean xq30) {
+    xquery3 = xq30;
   }
 
   /**

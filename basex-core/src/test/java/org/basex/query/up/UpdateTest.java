@@ -73,17 +73,8 @@ public final class UpdateTest extends AdvancedQueryTest {
   /** Transform expression containing a simple expression. */
   @Test
   public void transSimple() {
-    final boolean ou = context.options.get(MainOptions.ONLYUPDATES);
-    try {
-      context.options.set(MainOptions.ONLYUPDATES, false);
-      error("<a/> update ('')", Err.BASEX_MOD);
-      error("copy $a := <a/> modify ('') return $a", Err.BASEX_MOD);
-      context.options.set(MainOptions.ONLYUPDATES, true);
-      error("<a/> update ('')", Err.UPMODIFY);
-      error("copy $a := <a/> modify ('') return $a", Err.UPMODIFY);
-    } finally {
-      context.options.set(MainOptions.ONLYUPDATES, ou);
-    }
+    error("<a/> update ('')", Err.UPMODIFY);
+    error("copy $a := <a/> modify ('') return $a", Err.UPMODIFY);
   }
 
   /**
@@ -1171,18 +1162,12 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void modifyCheck() {
-    final boolean ou = context.options.get(MainOptions.ONLYUPDATES);
-    try {
-      context.options.set(MainOptions.ONLYUPDATES, true);
-      error("copy $c:= <a>X</a> modify 'a' return $c", Err.UPMODIFY);
-      error("copy $c:= <a>X</a> modify(delete node $c/text(),'a') return $c", Err.UPALL);
+    error("copy $c:= <a>X</a> modify 'a' return $c", Err.UPMODIFY);
+    error("copy $c:= <a>X</a> modify(delete node $c/text(),'a') return $c", Err.UPALL);
 
-      error("text { <a/> update (delete node <a/>,<b/>) }", Err.UPALL);
-      error("1[<a/> update (delete node <a/>,<b/>)]", Err.UPALL);
-      error("for $i in 1 order by (<a/> update (delete node <a/>,<b/>)) return $i", Err.UPALL);
-    } finally {
-      context.options.set(MainOptions.ONLYUPDATES, ou);
-    }
+    error("text { <a/> update (delete node <a/>,<b/>) }", Err.UPALL);
+    error("1[<a/> update (delete node <a/>,<b/>)]", Err.UPALL);
+    error("for $i in 1 order by (<a/> update (delete node <a/>,<b/>)) return $i", Err.UPALL);
   }
 
   /**
@@ -1190,19 +1175,13 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void updatingFuncItems() {
-    final boolean ou = context.options.get(MainOptions.ONLYUPDATES);
-    try {
-      context.options.set(MainOptions.ONLYUPDATES, true);
-      error("db:output(?)", Err.UPFUNCITEM);
-      error("db:output#1", Err.UPFUNCITEM);
-      error("declare %updating function local:a() { () }; local:a#0()", Err.UPFUNCITEM);
-      error("declare function local:a() { local:b#0 };"
-          + "declare %updating function local:b() { db:output('1') }; local:a()", Err.UPFUNCITEM);
-      // is still accepted (should also be rejected in future):
-      //error("declare function local:not-used() { local:b#0 };"
-      //    + "declare %updating function local:b() { db:output('1') }; local:b()", Err.UPFUNCITEM);
-    } finally {
-      context.options.set(MainOptions.ONLYUPDATES, ou);
-    }
+    error("db:output(?)", Err.UPFUNCITEM);
+    error("db:output#1", Err.UPFUNCITEM);
+    error("declare %updating function local:a() { () }; local:a#0()", Err.UPFUNCITEM);
+    error("declare function local:a() { local:b#0 };"
+        + "declare %updating function local:b() { db:output('1') }; local:a()", Err.UPFUNCITEM);
+    // is still accepted (should also be rejected in future):
+    //error("declare function local:not-used() { local:b#0 };"
+    //    + "declare %updating function local:b() { db:output('1') }; local:b()", Err.UPFUNCITEM);
   }
 }
