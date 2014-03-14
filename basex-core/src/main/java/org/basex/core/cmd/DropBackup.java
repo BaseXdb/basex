@@ -36,38 +36,20 @@ public class DropBackup extends ABackup {
 
     // drop all backups
     for(final String db : dbs) {
-      for(final String file : backups(db.contains("-") ? db : db + '-', context))
-        drop(file, context);
+      for(final String backup : context.databases.backups(db)) drop(backup, context);
     }
 
     return info(BACKUP_DROPPED_X, name + '*' + IO.ZIPSUFFIX);
   }
 
   /**
-   * Returns the backups found for the specified database prefix.
-   * @param db database prefix
-   * @param ctx database context
-   * @return names of backup files to be dropped
-   */
-  public static StringList backups(final String db, final Context ctx) {
-    final StringList names = new StringList();
-    final IOFile dir = ctx.globalopts.dbpath();
-    for(final IOFile f : dir.children()) {
-      final String n = f.name();
-      if(n.startsWith(db) && n.endsWith(IO.ZIPSUFFIX)) names.add(n);
-    }
-    return names;
-  }
-
-  /**
-   * Drops one or more backups of the specified database.
-   * @param name name of database file
+   * Drops a backup with the specified name.
+   * @param name name of backup file
    * @param ctx database context
    * @return success flag
    */
   public static boolean drop(final String name, final Context ctx) {
-    final IOFile dir = ctx.globalopts.dbpath();
-    return new IOFile(dir, name).delete();
+    return new IOFile(ctx.globalopts.dbpath(), name + IO.ZIPSUFFIX).delete();
   }
 
   @Override

@@ -69,22 +69,6 @@ public final class Databases {
   }
 
   /**
-   * Lists all available backups matching the specified prefix.
-   * @param prefix prefix (may be {@code null})
-   * @return database list
-   */
-  public StringList backups(final String prefix) {
-    final StringList list = new StringList();
-    for(final IOFile f : gopts.dbpath().children()) {
-      final String name = f.name();
-      if(name.endsWith(IO.ZIPSUFFIX) && (prefix == null || name.startsWith(prefix))) {
-        list.add(name.replaceFirst("\\..*", ""));
-      }
-    }
-    return list;
-  }
-
-  /**
    * Returns the sorted names of all available databases and, optionally, backups.
    * Filters for {@code name} if not {@code null} with glob support.
    * @param db return databases?
@@ -123,19 +107,49 @@ public final class Databases {
   }
 
   /**
-   * Returns the paths of all backups of the specified database.
-   * @param db database
-   * @param ctx database context
-   * @return paths of available backups
+   * Returns the names of all backups.
+   * @return backups
    */
-  public static StringList backupPaths(final String db, final Context ctx) {
-    final StringList sl = new StringList();
-    final String regex = db.replaceAll("([" + REGEXCHARS + "])", "\\\\$1") +
-        DateTime.PATTERN + IO.ZIPSUFFIX;
-    for(final IOFile f : ctx.globalopts.dbpath().children()) {
-      if(f.name().matches(regex)) sl.add(f.path());
+  public StringList backups() {
+    final StringList backups = new StringList();
+    for(final IOFile f : gopts.dbpath().children()) {
+      final String n = f.name();
+      if(n.endsWith(IO.ZIPSUFFIX)) backups.add(n.substring(0, n.lastIndexOf('.')));
     }
-    return sl;
+    return backups;
+  }
+
+  /**
+   * Returns the name of a specific backup, or all backups found for a specific database,
+   * in a descending order.
+   * @param db database
+   * @return names of specified backups
+   */
+  public StringList backups(final String db) {
+    final StringList backups = new StringList();
+    final IOFile file = gopts.dbpath(db + IO.ZIPSUFFIX);
+    if(file.exists()) {
+      backups.add(db);
+    } else {
+      final String regex = db.replaceAll("([" + REGEXCHARS + "])", "\\\\$1") +
+          DateTime.PATTERN + IO.ZIPSUFFIX;
+      for(final IOFile f : gopts.dbpath().children()) {
+        final String n = f.name();
+        if(n.matches(regex)) backups.add(n.substring(0, n.lastIndexOf('.')));
+      }
+    }
+    return backups.sort(Prop.CASE, false);
+  }
+
+  /**
+   * Extracts the name of a database from the name of a backup.
+   * @param backup Name of the backup file. Valid formats:
+   *               {@code [dbname]-yyyy-mm-dd-hh-mm-ss},
+   *               {@code [dbname]}
+   * @return name of the database ({@code [dbname]})
+   */
+  public static String name(final String backup) {
+    return Pattern.compile(DateTime.PATTERN + '$').split(backup)[0];
   }
 
   /**
