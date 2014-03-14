@@ -364,9 +364,7 @@ public final class EditorView extends View {
     fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
     fc.filter(BXS_FILES, IO.BXSSUFFIX);
     fc.textFilters();
-
-    final IOFile[] open = fc.multi().selectAll(Mode.FOPEN);
-    for(final IOFile f : open) open(f);
+    for(final IOFile f : fc.multi().selectAll(Mode.FOPEN)) open(f);
   }
 
   /**
