@@ -361,7 +361,9 @@ public class Options implements Iterable<Option<?>> {
     for(final String key : sl) {
       final String v = System.getProperty(key);
       try {
-        assign(key.substring(DBPREFIX.length()).toUpperCase(Locale.ENGLISH), v);
+        final String k = key.substring(DBPREFIX.length()).toUpperCase(Locale.ENGLISH);
+        assign(k, v);
+        Util.debug(k + Text.COLS + v);
       } catch(final BaseXException ignore) { /* may belong to another Options instance */ }
     }
   }
