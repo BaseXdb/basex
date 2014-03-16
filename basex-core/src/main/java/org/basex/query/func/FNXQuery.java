@@ -106,6 +106,9 @@ public final class FNXQuery extends StandardFunc {
     // bind variables and context item
     final HashMap<String, Value> bindings = bindings(1, ctx);
 
+    final QueryContext qc = ctx.proc(new QueryContext(ctx));
+    qc.resource.openDB = openDB;
+
     final Timer to = new Timer(true);
     final Perm tmp = ctx.context.user.perm;
     if(expr.length > 2) {
@@ -122,7 +125,7 @@ public final class FNXQuery extends StandardFunc {
             // limit reached: perform garbage collection and check again
             if(Performance.memory() > limit) {
               Performance.gc(1);
-              if(Performance.memory() > limit) ctx.stop();
+              if(Performance.memory() > limit) qc.stop();
             }
           }
         }, 500, 500);
@@ -131,13 +134,10 @@ public final class FNXQuery extends StandardFunc {
       if(ms != 0) {
         to.schedule(new TimerTask() {
           @Override
-          public void run() { ctx.stop(); }
+          public void run() { qc.stop(); }
         }, ms);
       }
     }
-
-    final QueryContext qc = ctx.proc(new QueryContext(ctx));
-    qc.resource.openDB = openDB;
 
     // evaluate query
     try {
