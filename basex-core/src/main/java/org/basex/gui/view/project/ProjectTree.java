@@ -118,6 +118,19 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   // PRIVATE METHOS ===============================================================================
 
   /**
+   * Returns a single selected node, or {@code null} if zero or more than node is selected.
+   * @return selected node
+   */
+  ProjectNode selectedNode() {
+    final TreePath tp = selectedPath();
+    if(tp != null) {
+      final Object node = tp.getLastPathComponent();
+      if(node instanceof ProjectNode) return (ProjectNode) node;
+    }
+    return null;
+  }
+
+  /**
    * Returns the selected nodes.
    * @return selected node
    */
@@ -131,19 +144,6 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
       }
     }
     return nodes;
-  }
-
-  /**
-   * Returns a single selected node, or {@code null} if zero or more than node is selected.
-   * @return selected node
-   */
-  ProjectNode selectedNode() {
-    final TreePath tp = selectedPath();
-    if(tp != null) {
-      final Object node = tp.getLastPathComponent();
-      if(node instanceof ProjectNode) return (ProjectNode) node;
-    }
-    return null;
   }
 
   /**
