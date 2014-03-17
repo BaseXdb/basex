@@ -47,7 +47,7 @@ public final class ProjectView extends BaseXPanel {
   /** Remembers the last focused component. */
   final FocusAdapter lastfocus = new FocusAdapter() {
     @Override
-    public void focusLost(final FocusEvent ev) {
+    public void focusGained(final FocusEvent ev) {
       last = ev.getComponent();
     }
   };
@@ -138,6 +138,7 @@ public final class ProjectView extends BaseXPanel {
   public void jump(final IOFile file) {
     final IOFile fl = new IOFile(canonical(file.file()));
     if(fl.path().startsWith(root.file.path())) tree.expand(root, fl.path());
+    tree.requestFocusInWindow();
   }
 
   /**
@@ -177,7 +178,11 @@ public final class ProjectView extends BaseXPanel {
    * @param ea calling editor
    */
   public void findFiles(final EditorArea ea) {
-    filter.find(ea);
+    if(isFocusOwner()) {
+      filter.find(tree.selectedNode());
+    } else {
+      filter.find(ea);
+    }
   }
 
   /**

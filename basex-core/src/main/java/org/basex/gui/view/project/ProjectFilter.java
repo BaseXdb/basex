@@ -206,12 +206,26 @@ final class ProjectFilter extends BaseXBack {
       if(ea.opened()) {
         final String name = ea.file().name();
         final int i = name.lastIndexOf('.');
-        if(i != -1) files.setText("*" + name.substring(i));
+        final String pattern = files.getText();
+        if(i != -1 && (!pattern.contains("*") && !pattern.contains("?")) ||
+            !Pattern.compile(IOFile.regex(pattern)).matcher(name).matches()) {
+          files.setText("*" + name.substring(i));
+        }
       }
       refresh(false);
     } else {
       files.requestFocusInWindow();
     }
+  }
+
+  /**
+   * Filters the file search field.
+   * @param node node
+   */
+  void find(final ProjectNode node) {
+    if(node != null) files.setText(node.file.path());
+    refresh(false);
+    files.requestFocusInWindow();
   }
 
   // PRIVATE METHODS ==============================================================================
@@ -241,8 +255,9 @@ final class ProjectFilter extends BaseXBack {
     // starts-with, contains, camel case
     final byte[] patt = Token.token(pattern);
     final TokenSet exclude = new TokenSet();
-    for(int i = 0; i < 3; i++) {
-      if(!filter(patt, search, thread, i, results, exclude)) return false;
+    final boolean path = Token.indexOf(patt, '\\') != -1 || Token.indexOf(patt, '/') != -1;
+    for(int i = 0; i < (path ? 2 : 3); i++) {
+      if(!filter(patt, search, thread, i, results, exclude, path)) return false;
     }
     return true;
   }
@@ -255,18 +270,18 @@ final class ProjectFilter extends BaseXBack {
    * @param mode search mode (0-2)
    * @param results search result
    * @param exclude exclude file from content search
+   * @param path path flag
    * @return success flag
    */
   private boolean filter(final byte[] pattern, final int[] search, final int thread, final int mode,
-      final TokenSet results, final TokenSet exclude) {
+      final TokenSet results, final TokenSet exclude, final boolean path) {
 
     if(results.size() < MAXHITS) {
-      final boolean path = Token.indexOf(pattern, '\\') != -1 || Token.indexOf(pattern, '/') != -1;
       for(final byte[] input : cache) {
         // check if current file matches the pattern
         final int offset = offset(input, path);
-        if(mode == 0 && Token.startsWith(input, pattern, offset) ||
-           mode == 1 && Token.contains(input, pattern, offset) ||
+        if(mode == 0 ? Token.startsWith(input, pattern, offset) :
+           mode == 1 ? Token.contains(input, pattern, offset) :
            matches(input, pattern, offset)) {
           if(!exclude.contains(input)) {
             exclude.add(input);
