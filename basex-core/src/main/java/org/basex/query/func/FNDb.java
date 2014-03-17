@@ -738,9 +738,7 @@ public final class FNDb extends StandardFunc {
     final StringList backups = ctx.context.databases.backups(name);
     if(backups.isEmpty()) throw BXDB_WHICHBACK.get(info, name);
 
-    for(final String backup : backups) {
-      ctx.updates.add(new BackupDrop(backup, info, ctx), ctx);
-    }
+    for(final String backup : backups) ctx.updates.add(new BackupDrop(backup, info, ctx), ctx);
     return null;
   }
 
