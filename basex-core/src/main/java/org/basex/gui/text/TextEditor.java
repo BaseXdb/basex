@@ -630,11 +630,11 @@ public final class TextEditor {
       final int curr = pos < size() ? text[pos] : 0;
       final int prev = pos > 0 ? text[pos - 1] : 0;
       final int pprv = pos > 1 ? text[pos - 2] : 0;
-      final int open = OPENING.indexOf(ch);
-      if(open != -1) {
+      final int opening = OPENING.indexOf(ch);
+      if(opening != -1) {
         // adds a closing to an opening bracket
-        if(!XMLToken.isChar(curr)) {
-          sb.append(CLOSING.charAt(open));
+        if(CLOSING.indexOf(curr) != -1 || curr == 0 || ws(curr)) {
+          sb.append(CLOSING.charAt(opening));
           move = 1;
         }
       } else if(CLOSING.indexOf(ch) != -1) {
