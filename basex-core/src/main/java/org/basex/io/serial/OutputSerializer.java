@@ -149,7 +149,8 @@ public abstract class OutputSerializer extends Serializer {
 
     // print byte-order-mark
     out = PrintOutput.get(os);
-    out.setLimit(opts.get(LIMIT));
+    final int l = opts.get(LIMIT);
+    if(l != -1) out.setLimit(l);
 
     if(bom) {
       // comparison by reference

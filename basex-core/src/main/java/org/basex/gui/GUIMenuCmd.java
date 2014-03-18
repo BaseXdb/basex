@@ -221,6 +221,19 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
+  /** Sorts text. */
+  C_SORT(SORT, "% U", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().sort();
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+  },
+
   /** Exits the application. */
   C_EXIT(EXIT, "% Q", false, false) {
     @Override

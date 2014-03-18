@@ -1118,14 +1118,21 @@ public interface Text {
   /** Full-text index information. */
   String LANGUAGE = lang("language");
   /** Full-text index information. */
-  String CASE_SENSITIVITY = lang("case_sensitivity");
+  String CASE_SENSITIVE = lang("case_sensitive");
   /** Full-text index information. */
   String DIACRITICS = lang("diacritics");
   /** Full-text index using stopword list. */
   String STOPWORD_LIST = lang("stopword_list");
 
+  /** Ascending order. */
+  String ASCENDING_ORDER = lang("ascending_order");
+  /** Merge duplicate lines. */
+  String MERGE_DUPLICATES = lang("merge_duplicates");
+
   /** Format. */
   String FORMAT = lang("format");
+  /** Sort. */
+  String SORT = lang("sort");
   /** Split input lines. */
   String SPLIT_INPUT_LINES = lang("split_input_lines");
   /** Treat first line as header. */

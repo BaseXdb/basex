@@ -88,7 +88,7 @@ public final class TextEditor {
    */
   int[] replace(final ReplaceContext rc) {
     // only adopt selection if it extends over more than one line
-    final int tl = size();
+    final int ts = size();
     int s = Math.min(start, end), e = Math.max(start, end);
     boolean sel = selected();
     if(sel) {
@@ -98,7 +98,7 @@ public final class TextEditor {
     }
     if(!sel) {
       s = 0;
-      e = tl;
+      e = ts;
     }
     return rc.replace(search, text, s, e);
   }
@@ -397,7 +397,7 @@ public final class TextEditor {
       }
       tb.add(ch);
     }
-    add(tb.finish(), pos, pos);
+    insert(tb.finish(), pos, pos);
     pos += tb.size();
   }
 
@@ -440,7 +440,7 @@ public final class TextEditor {
       tb.add(ste).add(text, min, max).add(ene);
       off = sle + ele;
     }
-    final boolean added = add(tb.finish(), min, max);
+    final boolean added = insert(tb.finish(), min, max);
     select(min, max + off);
     return added;
   }
@@ -452,12 +452,12 @@ public final class TextEditor {
    * @param rem offset of remaining text
    * @return {@code true} if text has changed
    */
-  private boolean add(final byte[] string, final int offset, final int rem) {
-    final int tl = size(), al = string.length;
-    final byte[] tmp = new byte[offset + al + tl - rem];
+  private boolean insert(final byte[] string, final int offset, final int rem) {
+    final int ts = size(), al = string.length;
+    final byte[] tmp = new byte[offset + al + ts - rem];
     System.arraycopy(text, 0, tmp, 0, offset);
     System.arraycopy(string, 0, tmp, offset, al);
-    System.arraycopy(text, rem, tmp, offset + al, tl - rem);
+    System.arraycopy(text, rem, tmp, offset + al, ts - rem);
     return text(tmp);
   }
 
@@ -468,10 +468,10 @@ public final class TextEditor {
   void move(final boolean down) {
     if(!extend()) return;
 
-    final int s = start, e = end, tl = size();
-    final byte[] tmp = Arrays.copyOf(text, tl);
+    final int s = start, e = end, ts = size();
+    final byte[] tmp = Arrays.copyOf(text, ts);
     if(down) {
-      if(e == tl) return;
+      if(e == ts) return;
       pos = e;
       lineEnd(true);
       int c = s;
@@ -479,7 +479,7 @@ public final class TextEditor {
       tmp[c++] = '\n';
       for(int i = s; i < e - 1; i++) tmp[c++] = text[i];
       text(tmp);
-      select(s + pos - e + 1, Math.min(tl, pos + 1));
+      select(s + pos - e + 1, Math.min(ts, pos + 1));
     } else {
       if(s == 0) return;
       pos = s - 1;
@@ -487,7 +487,7 @@ public final class TextEditor {
       int c = pos;
       for(int i = s; i < e; i++) tmp[c++] = text[i];
       if(tmp[c - 1] != '\n') tmp[c++] = '\n';
-      for(int i = pos; i < s && c < tl; i++) tmp[c++] = text[i];
+      for(int i = pos; i < s && c < ts; i++) tmp[c++] = text[i];
       text(tmp);
       select(pos, pos + e - s);
     }
@@ -548,8 +548,49 @@ public final class TextEditor {
     final int s = sel ? Math.min(start, end) : 0;
     final int e = sel ? Math.max(start, end) : size();
     final byte[] format = syntax.format(Arrays.copyOfRange(text, s, e), spaces());
-    final boolean changed = add(format, s, e);
+    final boolean changed = insert(format, s, e);
     select(s, s + format.length);
+    return changed;
+  }
+
+  /**
+   * Sorts the selected text.
+   * @return {@code true} if text has changed
+   */
+  boolean sort() {
+    if(!extend()) return false;
+
+    // collect lines to be sorted
+    final int s = start, e = end, ts = size();
+    final byte[] tmp = Arrays.copyOf(text, ts);
+    final TokenList tl = new TokenList();
+    final ByteList bl = new ByteList();
+    for(int i = s; i < e; i++) {
+      final byte ch = tmp[i];
+      if(ch == '\n') {
+        tl.add(bl.toArray());
+        bl.reset();
+      } else {
+        bl.add(ch);
+      }
+    }
+
+    // sort data and merge duplicate lines
+    if(!bl.isEmpty()) tl.add(bl.toArray());
+    tl.sort(gopts.get(GUIOptions.CASESORT), gopts.get(GUIOptions.ASCSORT));
+    if(gopts.get(GUIOptions.MERGEDUPL)) tl.unique();
+
+    // copy lines back to text
+    int i = s;
+    for(final byte[] line : tl) {
+      final int ll = line.length;
+      System.arraycopy(line, 0, tmp, i, ll);
+      i += ll;
+      if(i < e) tmp[i++] = '\n';
+    }
+    if(i < e) System.arraycopy(tmp, e, tmp, i, ts - e);
+    final boolean changed = text(i == e ? tmp : Arrays.copyOf(tmp, ts - e + i));
+    select(s, i);
     return changed;
   }
 
@@ -630,11 +671,11 @@ public final class TextEditor {
       final int curr = pos < size() ? text[pos] : 0;
       final int prev = pos > 0 ? text[pos - 1] : 0;
       final int pprv = pos > 1 ? text[pos - 2] : 0;
-      final int open = OPENING.indexOf(ch);
-      if(open != -1) {
+      final int opening = OPENING.indexOf(ch);
+      if(opening != -1) {
         // adds a closing to an opening bracket
-        if(!XMLToken.isChar(curr)) {
-          sb.append(CLOSING.charAt(open));
+        if(CLOSING.indexOf(curr) != -1 || curr == 0 || ws(curr)) {
+          sb.append(CLOSING.charAt(opening));
           move = 1;
         }
       } else if(CLOSING.indexOf(ch) != -1) {
@@ -769,10 +810,10 @@ public final class TextEditor {
    * Deletes the current selection.
    */
   private void del() {
-    final int s = Math.min(start, end), e = Math.max(start, end), tl = size();
-    final byte[] tmp = new byte[tl - e + s];
+    final int s = Math.min(start, end), e = Math.max(start, end), ts = size();
+    final byte[] tmp = new byte[ts - e + s];
     System.arraycopy(text, 0, tmp, 0, s);
-    System.arraycopy(text, e, tmp, s, tl - e);
+    System.arraycopy(text, e, tmp, s, ts - e);
     text(tmp);
     pos = s;
   }
@@ -851,9 +892,9 @@ public final class TextEditor {
     }
 
     int s = Math.min(start, end), e = Math.max(start, end);
-    final int tl = size();
+    final int ts = size();
     while(s > 0 && text[s - 1] != '\n') s--;
-    if(e > 0) while(e < tl && text[e - 1] != '\n') e++;
+    if(e > 0) while(e < ts && text[e - 1] != '\n') e++;
     start = s;
     end = e;
     return true;
@@ -894,7 +935,7 @@ public final class TextEditor {
       if(p < e) tb.addByte(text[p]);
     }
 
-    add(tb.finish(), s, e);
+    insert(tb.finish(), s, e);
     select(s, s + tb.size());
   }
 

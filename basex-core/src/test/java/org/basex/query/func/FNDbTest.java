@@ -71,6 +71,9 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(COUNT.args(_DB_OPEN.args(NAME, "unknown")), "0");
     query(_DB_OPEN.args(NAME) + "//title/text()", "XML");
 
+    // reference invalid path
+    error(_DB_OPEN.args(NAME, "*"), Err.RESINV);
+
     // run function on non-existing database
     new DropDB(NAME).execute(context);
     error(_DB_OPEN.args(NAME), Err.BXDB_OPEN);
@@ -81,6 +84,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void openPre() {
     query(_DB_OPEN_PRE.args(NAME, 0) + "//title/text()", "XML");
     error(_DB_OPEN_PRE.args(NAME, -1), Err.BXDB_RANGE);
+    error(_DB_OPEN_PRE.args(NAME, Integer.MAX_VALUE), Err.BXDB_RANGE);
   }
 
   /** Test method. */
@@ -88,6 +92,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void openId() {
     query(_DB_OPEN_ID.args(NAME, 0) + "//title/text()", "XML");
     error(_DB_OPEN_ID.args(NAME, -1), Err.BXDB_RANGE);
+    error(_DB_OPEN_ID.args(NAME, Integer.MAX_VALUE), Err.BXDB_RANGE);
   }
 
   /**
@@ -173,6 +178,8 @@ public final class FNDbTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void listDetails() {
+    query(_DB_LIST_DETAILS.args() + "/@resources/string()", "1");
+
     query(_DB_ADD.args(NAME, "\"<a/>\"", "xml"));
     query(_DB_STORE.args(NAME, "raw", "bla"));
 
@@ -255,6 +262,10 @@ public final class FNDbTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void add() {
+    query(COUNT.args(COLLECTION.args(NAME)), "1");
+    query(_DB_ADD.args(NAME, FILE));
+    query(COUNT.args(COLLECTION.args(NAME)), "2");
+
     query(_DB_ADD.args(NAME, "\"<root/>\"", "t1.xml"));
     query(COUNT.args(COLLECTION.args(NAME + "/t1.xml") + "/root"), "1");
 
@@ -410,6 +421,8 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_DB_DROP.args(dbname));
     query(_DB_EXISTS.args(dbname), "false");
 
+    // invalid name
+    error(_DB_DROP.args(" ''"), Err.BXDB_NAME);
     // try to drop non-existing DB
     error(_DB_DROP.args(dbname), Err.BXDB_WHICH);
   }
@@ -454,6 +467,11 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_DB_RENAME.args(NAME, "one", "two"));
     query(_DB_RETRIEVE.args(NAME, "two"));
     error(_DB_RETRIEVE.args(NAME, "one"), Err.WHICHRES);
+
+    // invalid target
+    error(_DB_RENAME.args(NAME, "x/input.xml", " ''"), Err.BXDB_RENAME);
+    error(_DB_RENAME.args(NAME, "x/input.xml", " '/'"), Err.BXDB_RENAME);
+    error(_DB_RENAME.args(NAME, "x/input.xml", " '.'"), Err.BXDB_RENAME);
   }
 
   /**
@@ -643,29 +661,29 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void name() {
     query(_DB_NAME.args(_DB_OPEN.args(NAME)), NAME);
+    query(_DB_NAME.args(_DB_OPEN.args(NAME) + "/*"), NAME);
   }
 
   /** Test method. */
   @Test
   public void path() {
     query(_DB_PATH.args(_DB_OPEN.args(NAME)), FILE.replaceAll(".*/", ""));
+    query(_DB_PATH.args(_DB_OPEN.args(NAME) + "/*"), FILE.replaceAll(".*/", ""));
   }
 
   /**
    * db:create-backup test method.
-   * @throws BaseXException exception
    */
   @Test
-  public void createBackup() throws BaseXException {
+  public void createBackup() {
     query(COUNT.args(_DB_BACKUPS.args(NAME)), "0");
     query(_DB_CREATE_BACKUP.args(NAME));
     query(COUNT.args(_DB_BACKUPS.args(NAME)), "1");
 
+    // invalid name
+    error(_DB_CREATE_BACKUP.args(" ''"), Err.BXDB_NAME);
     // try to backup non-existing database
     error(_DB_CREATE_BACKUP.args(NAME + 'x'), Err.BXDB_WHICH);
-    // cleanup
-    new DropBackup(NAME).execute(context);
-    query(COUNT.args(_DB_BACKUPS.args(NAME)), "0");
   }
 
   /**
@@ -673,15 +691,21 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dropBackup() {
-    // create and drop backup does not exist
+    // create and drop backup
     query(_DB_CREATE_BACKUP.args(NAME));
     query(_DB_DROP_BACKUP.args(NAME));
+    query(COUNT.args(_DB_BACKUPS.args(NAME)), "0");
+
+    // create and drop backup file
+    query(_DB_CREATE_BACKUP.args(NAME));
+    query(_DB_DROP_BACKUP.args(query(_DB_BACKUPS.args(NAME))));
+
+    // invalid name
+    error(_DB_DROP_BACKUP.args(" ''"), Err.BXDB_NAME);
     // backup file does not exist
     error(_DB_DROP_BACKUP.args(NAME), Err.BXDB_WHICHBACK);
     // check if drop is called before create
     error(_DB_CREATE_BACKUP.args(NAME) + ',' + _DB_DROP_BACKUP.args(NAME), Err.BXDB_WHICHBACK);
-
-    // [LK] more tests... EclEmma may help
   }
 
   /**
@@ -696,12 +720,15 @@ public final class FNDbTest extends AdvancedQueryTest {
     // copy database to new name and vice versa
     query(_DB_COPY.args(NAME, NAME + 'x'));
     query(_DB_COPY.args(NAME + 'x', NAME));
+
+    // invalid names
+    error(_DB_COPY.args("x", " ''"), Err.BXDB_NAME);
+    error(_DB_COPY.args(" ''", "x"), Err.BXDB_NAME);
+
     // same name is disallowed
     error(_DB_COPY.args(NAME, NAME), Err.BXDB_SAME);
     // source database does not exist
     error(_DB_COPY.args(NAME + "xx", NAME), Err.BXDB_WHICH);
-
-    // [LK] more tests... EclEmma may help
   }
 
   /**
@@ -716,12 +743,15 @@ public final class FNDbTest extends AdvancedQueryTest {
     // rename database to new name and vice versa
     query(_DB_ALTER.args(NAME, NAME + 'x'));
     query(_DB_ALTER.args(NAME + 'x', NAME));
+
+    // invalid names
+    error(_DB_ALTER.args("x", " ''"), Err.BXDB_NAME);
+    error(_DB_ALTER.args(" ''", "x"), Err.BXDB_NAME);
+
     // same name is disallowed
     error(_DB_ALTER.args(NAME, NAME), Err.BXDB_SAME);
     // source database does not exist
     error(_DB_ALTER.args(NAME + "xx", NAME), Err.BXDB_WHICH);
-
-    // [LK] more tests... EclEmma may help
   }
 
   /**
@@ -735,7 +765,13 @@ public final class FNDbTest extends AdvancedQueryTest {
     // backup and restore file
     query(_DB_CREATE_BACKUP.args(NAME));
     query(_DB_RESTORE.args(NAME));
+    query(_DB_RESTORE.args(NAME));
 
-    // [LK] more tests! E.g. combination of restore, create, ...
+    // drop backups
+    query(_DB_DROP_BACKUP.args(NAME));
+    error(_DB_RESTORE.args(NAME), Err.BXDB_NOBACKUP);
+
+    // invalid names
+    error(_DB_RESTORE.args(" ''"), Err.BXDB_NAME);
   }
 }
