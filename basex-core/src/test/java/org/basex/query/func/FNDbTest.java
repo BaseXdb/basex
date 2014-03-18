@@ -247,8 +247,9 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_DB_OUTPUT.args("x"), "x");
     query(_DB_OUTPUT.args("('x','y')"), "x y");
     query(_DB_OUTPUT.args("<a/>"), "<a/>");
-    error(_DB_OUTPUT.args(" count#1"), Err.FIVALUE);
     error(_DB_OUTPUT.args("x") + ",1", Err.UPALL);
+    error(_DB_OUTPUT.args(" count#1"), Err.FIVALUE);
+    error("copy $c := <a/> modify " + _DB_OUTPUT.args("x") + " return $c", Err.BASX_DBTRANSFORM);
   }
 
   /** Test method. */
