@@ -226,7 +226,7 @@ public final class BaseXLayout {
         @Override
         public void keyPressed(final KeyEvent e) {
           final Object s = e.getSource();
-          if(s instanceof BaseXCombo && ((JComboBox) s).isPopupVisible()) return;
+          if(s instanceof BaseXCombo && ((BaseXCombo) s).isPopupVisible()) return;
 
           // do not key close dialog of button or editor is focused
           if(ENTER.is(e) && !(s instanceof BaseXButton || s instanceof TextPanel)) {

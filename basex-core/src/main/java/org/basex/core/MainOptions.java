@@ -102,6 +102,8 @@ public final class MainOptions extends Options {
   public static final BooleanOption QUERYINFO = new BooleanOption("QUERYINFO", false);
   /** Default XQuery version. */
   public static final BooleanOption XQUERY3 = new BooleanOption("XQUERY3", true);
+  /** Flag for mixing updates and items. */
+  public static final BooleanOption MIXUPDATES = new BooleanOption("MIXUPDATES", false);
   /** External variables, separated by commas. */
   public static final StringOption BINDINGS = new StringOption("BINDINGS", "");
   /** Path to current query. */
@@ -124,8 +126,6 @@ public final class MainOptions extends Options {
   public static final BooleanOption RUNQUERY = new BooleanOption("RUNQUERY", true);
   /** Number of query executions. */
   public static final NumberOption RUNS = new NumberOption("RUNS", 1);
-  /** Flag for mixing updates and items. */
-  public static final BooleanOption MIXUPDATES = new BooleanOption("MIXUPDATES", false);
 
   // Serialize
 

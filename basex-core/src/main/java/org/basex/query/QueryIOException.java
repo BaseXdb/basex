@@ -25,7 +25,7 @@ public final class QueryIOException extends IOException {
   }
 
   @Override
-  public QueryException getCause() {
+  public synchronized QueryException getCause() {
     return exception;
   }
 

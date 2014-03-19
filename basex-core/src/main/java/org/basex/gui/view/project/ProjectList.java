@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -23,7 +24,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class ProjectList extends JList {
+public class ProjectList extends JList<String> {
   /** Font metrics. */
   private static FontMetrics fm;
 
@@ -83,11 +84,11 @@ public class ProjectList extends JList {
         for(int i = 0; i < is; i++) list[i] = Token.string(elements.key(i + 1));
         if(changed(list)) {
           // check which old values had been selected
-          final Object[] old = getSelectedValues();
+          final List<String> vals = getSelectedValuesList();
           final IntList il = new IntList();
-          for(final Object o : old) {
+          for(final String val : vals) {
             for(int i = 0; i < is; i++) {
-              if(o.equals(elements.key(i + 1))) {
+              if(val.equals(elements.key(i + 1))) {
                 il.add(i);
                 break;
               }
@@ -172,7 +173,7 @@ public class ProjectList extends JList {
     }
 
     @Override
-    public Component getListCellRendererComponent(final JList list, final Object value,
+    public Component getListCellRendererComponent(final JList<?> list, final Object value,
         final int index, final boolean selected, final boolean expanded) {
 
       file = new IOFile(value.toString());
@@ -196,8 +197,8 @@ public class ProjectList extends JList {
    * @return selected node
    */
   private String selectedValue() {
-    final Object[] old = getSelectedValues();
-    return old.length == 1 ? old[0].toString() : null;
+    final List<String> vals = getSelectedValuesList();
+    return vals.size() == 1 ? vals.get(0) : null;
   }
 
   /**
@@ -208,7 +209,7 @@ public class ProjectList extends JList {
     // nothing selected: select first entry
     if(isSelectionEmpty() && getModel().getSize() != 0) setSelectedIndex(0);
     final ArrayList<IOFile> list = new ArrayList<IOFile>();
-    for(final Object o : getSelectedValues()) list.add(new IOFile(o.toString()));
+    for(final String val : getSelectedValuesList()) list.add(new IOFile(val));
     return list.toArray(new IOFile[list.size()]);
   }
 }

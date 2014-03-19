@@ -5,6 +5,7 @@ import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -28,7 +29,7 @@ public final class BaseXList extends BaseXBack {
   /** Text field. */
   private final BaseXTextField text;
   /** List. */
-  private final JList list;
+  private final JList<String> list;
   /** Scroll pane. */
   private final JScrollPane scroll;
 
@@ -162,8 +163,8 @@ public final class BaseXList extends BaseXBack {
       }
       @Override
       public void mousePressed(final MouseEvent e) {
-        final Object[] i = list.getSelectedValues();
-        text.setText(i.length == 1 ? i[0].toString() : "");
+        final List<String> vals = list.getSelectedValuesList();
+        text.setText(vals.size() == 1 ? vals.get(0) : "");
         text.requestFocusInWindow();
         text.selectAll();
         d.action(BaseXList.this);
@@ -180,7 +181,7 @@ public final class BaseXList extends BaseXBack {
       }
     };
 
-    list = new JList(choice);
+    list = new JList<String>(choice);
     list.setFocusable(false);
     if(s) list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     list.addMouseListener(mouse);
@@ -233,8 +234,8 @@ public final class BaseXList extends BaseXBack {
    * @return text field value
    */
   public String getValue() {
-    final Object[] vals = list.getSelectedValues();
-    return vals.length == 1 ? vals[0].toString() : "";
+    final List<String> vals = list.getSelectedValuesList();
+    return vals.size() == 1 ? vals.get(0) : "";
   }
 
   /**
@@ -243,7 +244,7 @@ public final class BaseXList extends BaseXBack {
    */
   public StringList getValues() {
     final StringList sl = new StringList();
-    for(final Object o : list.getSelectedValues()) sl.add(o.toString());
+    for(final String val : list.getSelectedValuesList()) sl.add(val);
     return sl;
   }
 
