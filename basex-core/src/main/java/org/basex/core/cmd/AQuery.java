@@ -268,18 +268,19 @@ public abstract class AQuery extends Command {
     if(comp != options.get(MainOptions.COMPPLAN)) return;
 
     // show dot plan
-    BufferOutput bo = null;
     try {
       if(options.get(MainOptions.DOTPLAN)) {
         final String path = context.options.get(MainOptions.QUERYPATH);
         final String dot = path.isEmpty() ? "plan.dot" :
             new IOFile(path).name().replaceAll("\\..*?$", ".dot");
 
-        bo = new BufferOutput(dot);
-        final DOTSerializer d = new DOTSerializer(bo, options.get(MainOptions.DOTCOMPACT));
-        d.serialize(qp.plan());
-        d.close();
+        try(final BufferOutput bo = new BufferOutput(dot)) {
+          final DOTSerializer d = new DOTSerializer(bo, options.get(MainOptions.DOTCOMPACT));
+          d.serialize(qp.plan());
+          d.close();
+        }
       }
+
       // show XML plan
       if(options.get(MainOptions.XMLPLAN)) {
         info(NL + QUERY_PLAN + COL);
@@ -287,8 +288,6 @@ public abstract class AQuery extends Command {
       }
     } catch(final Exception ex) {
       Util.stack(ex);
-    } finally {
-      if(bo != null) try { bo.close(); } catch(final IOException ignored) { }
     }
   }
 

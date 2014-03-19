@@ -33,12 +33,12 @@ public final class DataAccess {
     try {
       f = new RandomAccessFile(fl.file(), "rw");
       len = f.length();
+      file = f;
+      cursor(0);
     } catch(final IOException ex) {
       if(f != null) f.close();
       throw ex;
     }
-    file = f;
-    cursor(0);
   }
 
   /**

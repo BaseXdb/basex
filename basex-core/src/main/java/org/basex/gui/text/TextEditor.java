@@ -1186,16 +1186,13 @@ public final class TextEditor {
       if(is == null) {
         Util.errln(file + " not found.");
       } else {
-        final NewlineInput nli = new NewlineInput(is);
-        try {
+        try(final NewlineInput nli = new NewlineInput(is)) {
           for(String line; (line = nli.readLine()) != null;) {
             final int i = line.indexOf('=');
             if(i == -1 || line.startsWith("#")) continue;
             REPLACE.add(line.substring(0, i));
             REPLACE.add(line.substring(i + 1).replace("\\n", "\n"));
           }
-        } finally {
-          nli.close();
         }
       }
     } catch(final IOException ex) {

@@ -89,8 +89,7 @@ public final class Store extends ACreate {
     // add directory if it does not exist anyway
     file.dir().md();
 
-    final PrintOutput po = new PrintOutput(file.path());
-    try {
+    try(final PrintOutput po = new PrintOutput(file.path())) {
       final Reader r = in.getCharacterStream();
       final InputStream is = in.getByteStream();
       final String id = in.getSystemId();
@@ -99,15 +98,10 @@ public final class Store extends ACreate {
       } else if(is != null) {
         for(int b; (b = is.read()) != -1;) po.write(b);
       } else if(id != null) {
-        final BufferInput bi = new BufferInput(IO.get(id));
-        try {
+        try(final BufferInput bi = new BufferInput(IO.get(id))) {
           for(int b; (b = bi.read()) != -1;) po.write(b);
-        } finally {
-          bi.close();
         }
       }
-    } finally {
-      po.close();
     }
   }
 

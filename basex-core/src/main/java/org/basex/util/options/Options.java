@@ -503,9 +503,7 @@ public class Options implements Iterable<Option<?>> {
     final StringList errs = new StringList();
     final boolean exists = file.exists();
     if(exists) {
-      NewlineInput nli = null;
-      try {
-        nli = new NewlineInput(opts);
+      try(final NewlineInput nli = new NewlineInput(opts)) {
         boolean local = false;
         for(String line; (line = nli.readLine()) != null;) {
           line = line.trim();
@@ -553,8 +551,6 @@ public class Options implements Iterable<Option<?>> {
       } catch(final IOException ex) {
         errs.add("file could not be parsed.");
         Util.errln(ex);
-      } finally {
-        if(nli != null) try { nli.close(); } catch(final IOException ignored) { }
       }
     }
 

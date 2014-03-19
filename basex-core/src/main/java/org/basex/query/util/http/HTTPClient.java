@@ -207,7 +207,7 @@ public final class HTTPClient {
    * @param out output stream
    * @throws IOException I/O exception
    */
-  private void writePayload(final ValueBuilder payload, final TokenMap payloadAtts,
+  private static void writePayload(final ValueBuilder payload, final TokenMap payloadAtts,
       final OutputStream out) throws IOException {
 
     // detect method (specified by @method or derived from @media-type)
@@ -293,7 +293,7 @@ public final class HTTPClient {
    * @param boundary boundary
    * @throws IOException I/O exception
    */
-  private void writePart(final Part part, final OutputStream out, final byte[] boundary)
+  private static void writePart(final Part part, final OutputStream out, final byte[] boundary)
       throws IOException {
 
     // write boundary preceded by "--"

@@ -141,20 +141,20 @@ public final class QT3TS {
 
     // save log data
     Util.outln(NL + "Writing log file '" + testid + ".log'...");
-    final PrintOutput po = new PrintOutput(testid + ".log");
-    po.println("QT3TS RESULTS __________________________" + NL);
-    po.println(result.toString());
-    po.println("WRONG __________________________________" + NL);
-    po.print(wrong.finish());
-    if(all || !single.isEmpty()) {
-      po.println("CORRECT ________________________________" + NL);
-      po.print(right.finish());
+    try(final PrintOutput po = new PrintOutput(testid + ".log")) {
+      po.println("QT3TS RESULTS __________________________" + NL);
+      po.println(result.toString());
+      po.println("WRONG __________________________________" + NL);
+      po.print(wrong.finish());
+      if(all || !single.isEmpty()) {
+        po.println("CORRECT ________________________________" + NL);
+        po.print(right.finish());
+      }
+      if(ignoring) {
+        po.println("IGNORED ________________________________" + NL);
+        po.print(ignore.finish());
+      }
     }
-    if(ignoring) {
-      po.println("IGNORED ________________________________" + NL);
-      po.print(ignore.finish());
-    }
-    po.close();
 
     // save report
     if(report != null) {

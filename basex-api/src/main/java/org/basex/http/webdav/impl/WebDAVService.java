@@ -499,8 +499,7 @@ public final class WebDAVService<T> {
    */
   private T addFile(final String db, final String path, final InputStream in) throws IOException {
     // use 4MB as buffer input
-    final BufferInput bi = new BufferInput(in, 1 << 22);
-    try {
+    try(final BufferInput bi = new BufferInput(in, 1 << 22)) {
       // guess the content type from the first character
       if(peek(bi) == '<') {
         try {
@@ -526,8 +525,6 @@ public final class WebDAVService<T> {
         d = db;
       }
       return store(d, path, bi);
-    } finally {
-      bi.close();
     }
   }
 

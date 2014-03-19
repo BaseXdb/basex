@@ -78,11 +78,8 @@ public class DataAccessTest {
   @Before
   public void setUp() throws IOException {
     file = new IOFile(File.createTempFile("page", IO.BASEXSUFFIX));
-    final RandomAccessFile f = new RandomAccessFile(file.file(), "rw");
-    try {
+    try(final RandomAccessFile f = new RandomAccessFile(file.file(), "rw")) {
       initialContent(f);
-    } finally {
-      f.close();
     }
     da = new DataAccess(file);
   }
@@ -356,13 +353,9 @@ public class DataAccessTest {
    * @throws IOException I/O exception
    */
   void assertContent(final long pos, final int[] bytes) throws IOException {
-    final RandomAccessFile f = new RandomAccessFile(file.file(), "r");
-    try {
+    try(final RandomAccessFile f = new RandomAccessFile(file.file(), "r")) {
       f.seek(pos);
-      for(final int b : bytes)
-        assertEquals(b, f.read());
-    } finally {
-      f.close();
+      for(final int b : bytes) assertEquals(b, f.read());
     }
   }
 

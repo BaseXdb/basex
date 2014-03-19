@@ -206,30 +206,30 @@ public abstract class W3CTS {
 
     final String time = perf.getTime();
     Util.outln("Writing log file..." + NL);
-    PrintOutput po = new PrintOutput(path + pathlog);
-    po.println("TEST RESULTS ________________________________________________");
-    po.println(NL + "Total #Queries: " + total);
-    po.println("Correct / Empty Results: " + ok + " / " + ok2);
-    po.print("Conformance (w/Empty Results): ");
-    po.println(pc(ok, total) + " / " + pc(ok + ok2, total));
-    po.println("Wrong Results / Errors: " + err + " / " + err2 + NL);
-    po.println("WRONG _______________________________________________________");
-    po.print(NL + logErr);
-    po.println("WRONG (ERRORS) ______________________________________________");
-    po.print(NL + logErr2);
-    po.println("CORRECT? (EMPTY) ____________________________________________");
-    po.print(NL + logOK2);
-    po.println("CORRECT _____________________________________________________");
-    po.print(NL + logOK);
-    po.println("_____________________________________________________________");
-    po.close();
+    try(final PrintOutput po = new PrintOutput(path + pathlog)) {
+      po.println("TEST RESULTS ________________________________________________");
+      po.println(NL + "Total #Queries: " + total);
+      po.println("Correct / Empty Results: " + ok + " / " + ok2);
+      po.print("Conformance (w/Empty Results): ");
+      po.println(pc(ok, total) + " / " + pc(ok + ok2, total));
+      po.println("Wrong Results / Errors: " + err + " / " + err2 + NL);
+      po.println("WRONG _______________________________________________________");
+      po.print(NL + logErr);
+      po.println("WRONG (ERRORS) ______________________________________________");
+      po.print(NL + logErr2);
+      po.println("CORRECT? (EMPTY) ____________________________________________");
+      po.print(NL + logOK2);
+      po.println("CORRECT _____________________________________________________");
+      po.print(NL + logOK);
+      po.println("_____________________________________________________________");
+    }
 
     if(reporting) {
-      po = new PrintOutput(report + Prop.NAME + IO.XMLSUFFIX);
-      print(po, report + Prop.NAME + "Pre" + IO.XMLSUFFIX);
-      po.print(logReport.toString());
-      print(po, report + Prop.NAME + "Pos" + IO.XMLSUFFIX);
-      po.close();
+      try(final PrintOutput po = new PrintOutput(report + Prop.NAME + IO.XMLSUFFIX)) {
+        print(po, report + Prop.NAME + "Pre" + IO.XMLSUFFIX);
+        po.print(logReport.toString());
+        print(po, report + Prop.NAME + "Pos" + IO.XMLSUFFIX);
+      }
     }
 
     Util.outln("Total #Queries: " + total);
@@ -641,10 +641,10 @@ public abstract class W3CTS {
     if(reporting) {
       final File file = new File(results + pth);
       if(!file.exists()) file.mkdirs();
-      final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-          new FileOutputStream(results + pth + nm), UTF8));
-      bw.write(msg);
-      bw.close();
+      try(final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
+          new FileOutputStream(results + pth + nm), UTF8))) {
+        bw.write(msg);
+      }
     }
   }
 
@@ -695,9 +695,9 @@ public abstract class W3CTS {
    * @throws IOException I/O exception
    */
   private static void print(final PrintOutput po, final String f) throws IOException {
-    final BufferedReader br = new BufferedReader(new FileReader(f));
-    for(String line; (line = br.readLine()) != null;) po.println(line);
-    br.close();
+    try(final BufferedReader br = new BufferedReader(new FileReader(f))) {
+      for(String line; (line = br.readLine()) != null;) po.println(line);
+    }
   }
 
   /**

@@ -68,11 +68,9 @@ public final class Events extends HashMap<String, Sessions> {
    * Writes global permissions to disk.
    */
   private void write() {
-    try {
-      final DataOutput out = new DataOutput(file);
+    try(final DataOutput out = new DataOutput(file)) {
       out.writeNum(size());
       for(final String name : keySet()) out.writeToken(token(name));
-      out.close();
     } catch(final IOException ex) {
       Util.debug(ex);
     }

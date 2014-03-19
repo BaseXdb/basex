@@ -53,8 +53,7 @@ public class IdPreMap {
    * @throws IOException I/O error while reading from the file
    */
   public IdPreMap(final IOFile f) throws IOException {
-    final DataInput in = new DataInput(f);
-    try {
+    try(final DataInput in = new DataInput(f)) {
       baseid = in.readNum();
       rows = in.readNum();
       pres = in.readNums();
@@ -62,8 +61,6 @@ public class IdPreMap {
       nids = in.readNums();
       incs = in.readNums();
       oids = in.readNums();
-    } finally {
-      in.close();
     }
   }
 
@@ -73,8 +70,7 @@ public class IdPreMap {
    * @throws IOException I/O error while writing to the file
    */
   public void write(final IOFile f) throws IOException {
-    final DataOutput out = new DataOutput(f);
-    try {
+    try(final DataOutput out = new DataOutput(f)) {
       out.writeNum(baseid);
       out.writeNum(rows);
       out.writeNums(pres);
@@ -82,8 +78,6 @@ public class IdPreMap {
       out.writeNums(nids);
       out.writeNums(incs);
       out.writeNums(oids);
-    } finally {
-      out.close();
     }
   }
 

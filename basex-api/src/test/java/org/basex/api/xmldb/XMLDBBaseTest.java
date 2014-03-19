@@ -64,10 +64,9 @@ public abstract class XMLDBBaseTest {
   static byte[] read(final String fn) throws IOException {
     final File file = new File(fn);
     final byte[] buffer = new byte[(int) file.length()];
-    final FileInputStream fis = new FileInputStream(file);
-    final DataInputStream dis = new DataInputStream(fis);
-    dis.readFully(buffer);
-    dis.close();
+    try(final DataInputStream dis = new DataInputStream(new FileInputStream(file))) {
+      dis.readFully(buffer);
+    }
     return buffer;
   }
 }

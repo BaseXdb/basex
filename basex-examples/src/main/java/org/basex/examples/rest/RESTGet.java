@@ -39,14 +39,14 @@ public final class RESTGet {
       System.out.println("\n* Result:");
 
       // Get and cache input as UTF-8 encoded stream
-      BufferedReader br = new BufferedReader(new InputStreamReader(
-          conn.getInputStream(), "UTF-8"));
+      try(final BufferedReader br = new BufferedReader(
+          new InputStreamReader(conn.getInputStream(), "UTF-8"))) {
 
-      // Print all lines of the result
-      for(String line; (line = br.readLine()) != null;) {
-        System.out.println(line);
+        // Print all lines of the result
+        for(String line; (line = br.readLine()) != null;) {
+          System.out.println(line);
+        }
       }
-      br.close();
     }
 
     // Close connection

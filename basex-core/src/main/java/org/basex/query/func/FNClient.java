@@ -203,7 +203,7 @@ public final class FNClient extends StandardFunc {
    * @param ctx query context
    * @return connection handler
    */
-  private ClientSessions sessions(final QueryContext ctx) {
+  private static ClientSessions sessions(final QueryContext ctx) {
     ClientSessions res = ctx.resources.get(ClientSessions.class);
     if(res == null) {
       res = new ClientSessions();

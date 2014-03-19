@@ -585,9 +585,8 @@ public final class EditorView extends View {
   private byte[] read(final IOFile file) throws IOException {
     // check content
     final TokenBuilder text = new TokenBuilder((int) Math.min(Integer.MAX_VALUE, file.length()));
-    final TextInput ti = new NewlineInput(file).validate(true);
-    boolean valid = true;
-    try {
+    try(final TextInput ti = new NewlineInput(file).validate(true)) {
+      boolean valid = true;
       while(true) {
         try {
           final int cp = ti.read();
@@ -609,8 +608,6 @@ public final class EditorView extends View {
           }
         }
       }
-    } finally {
-      ti.close();
     }
   }
 
@@ -785,7 +782,7 @@ public final class EditorView extends View {
    * @param col column
    * @return position
    */
-  private int pos(final byte[] text, final int line, final int col) {
+  private static int pos(final byte[] text, final int line, final int col) {
     final int ll = text.length;
     int ep = ll;
     for(int p = 0, l = 1, c = 1; p < ll; ++c, p += cl(text, p)) {

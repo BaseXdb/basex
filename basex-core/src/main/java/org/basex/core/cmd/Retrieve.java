@@ -33,13 +33,8 @@ public final class Retrieve extends ACreate {
     if(bin == null || !bin.exists() || bin.isDir())
       return error(RES_NOT_FOUND_X, path);
 
-    try {
-      final BufferInput bi = new BufferInput(bin);
-      try {
-        for(int b; (b = bi.read()) != -1;) out.write(b);
-      } finally {
-        bi.close();
-      }
+    try(final BufferInput bi = new BufferInput(bin)) {
+      for(int b; (b = bi.read()) != -1;) out.write(b);
       return info(QUERY_EXECUTED_X_X, "", perf);
     } catch(final IOException ex) {
       return error(ex.toString());

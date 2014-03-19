@@ -47,18 +47,13 @@ public final class Put extends DBUpdate {
       final int pre = data.pre(nodeid);
       if(pre == -1) return;
       final DBNode node = new DBNode(data, pre);
-      try {
-        final PrintOutput po = new PrintOutput(u);
-        try {
-          // try to reproduce non-chopped documents correctly
-          final SerializerOptions pr = new SerializerOptions();
-          pr.set(SerializerOptions.INDENT, node.data.meta.chop ? YesNo.YES : YesNo.NO);
-          final Serializer ser = Serializer.get(po, pr);
-          ser.serialize(node);
-          ser.close();
-        } finally {
-          po.close();
-        }
+      try(final PrintOutput po = new PrintOutput(u)) {
+        // try to reproduce non-chopped documents correctly
+        final SerializerOptions pr = new SerializerOptions();
+        pr.set(SerializerOptions.INDENT, node.data.meta.chop ? YesNo.YES : YesNo.NO);
+        final Serializer ser = Serializer.get(po, pr);
+        ser.serialize(node);
+        ser.close();
       } catch(final IOException ex) {
         throw UPPUTERR.get(info, u);
       }

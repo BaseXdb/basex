@@ -302,7 +302,9 @@ final class ProjectFilter extends BaseXBack {
    * @param results search result
    * @return maximum number of results reached
    */
-  private boolean filterContent(final byte[] path, final int[] search, final TokenSet results) {
+  private static boolean filterContent(final byte[] path, final int[] search,
+      final TokenSet results) {
+
     // accept file; check file contents
     if(filterContent(path, search) && !results.contains(path)) {
       results.add(path);
@@ -317,35 +319,30 @@ final class ProjectFilter extends BaseXBack {
    * @param search search string
    * @return success flag
    */
-  private boolean filterContent(final byte[] path, final int[] search) {
+  private static boolean filterContent(final byte[] path, final int[] search) {
     final int cl = search.length;
     if(cl == 0) return true;
 
-    try {
-      final TextInput ti = new TextInput(new IOFile(Token.string(path)));
-      try {
-        final IntList il = new IntList(cl - 1);
-        int c = 0;
+    try(final TextInput ti = new TextInput(new IOFile(Token.string(path)))) {
+      final IntList il = new IntList(cl - 1);
+      int c = 0;
+      while(true) {
+        if(!il.isEmpty()) {
+          if(il.deleteAt(0) == search[c++]) continue;
+          c = 0;
+        }
         while(true) {
-          if(!il.isEmpty()) {
-            if(il.deleteAt(0) == search[c++]) continue;
+          final int cp = ti.read();
+          if(cp == -1 || !XMLToken.valid(cp)) return false;
+          final int lc = Token.lc(cp);
+          if(c > 0) il.add(lc);
+          if(lc == search[c]) {
+            if(++c == cl) return true;
+          } else {
             c = 0;
-          }
-          while(true) {
-            final int cp = ti.read();
-            if(cp == -1 || !XMLToken.valid(cp)) return false;
-            final int lc = Token.lc(cp);
-            if(c > 0) il.add(lc);
-            if(lc == search[c]) {
-              if(++c == cl) return true;
-            } else {
-              c = 0;
-              break;
-            }
+            break;
           }
         }
-      } finally {
-        ti.close();
       }
     } catch(final IOException ex) {
       // file may not be accessible

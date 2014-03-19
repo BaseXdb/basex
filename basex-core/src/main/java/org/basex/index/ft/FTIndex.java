@@ -384,7 +384,7 @@ public final class FTIndex implements Index {
    * @param token index token
    * @return iterator
    */
-  private FTIndexIterator iter(final long off, final int size, final DataAccess da,
+  private static FTIndexIterator iter(final long off, final int size, final DataAccess da,
       final byte[] token) {
     da.cursor(off);
     final IntList pr = new IntList(size);
@@ -402,7 +402,7 @@ public final class FTIndex implements Index {
    * @param token index token
    * @return iterator
    */
-  private synchronized FTIndexIterator iter(final FTCache ftc, final byte[] token) {
+  private static synchronized FTIndexIterator iter(final FTCache ftc, final byte[] token) {
     final int size = ftc.pre.size();
 
     return new FTIndexIterator() {

@@ -429,15 +429,12 @@ public final class FNFile extends StandardFunc {
     final SerializerOptions sopts = FuncOptions.serializer(
         expr.length > 2 ? expr[2].item(ctx, info) : null, info);
 
-    final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append));
-    try {
+    try(final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append))) {
       final Serializer ser = Serializer.get(out, sopts);
       for(Item it; (it = ir.next()) != null;) ser.serialize(it);
       ser.close();
     } catch(final QueryIOException ex) {
       throw ex.getCause(info);
-    } finally {
-      out.close();
     }
     return null;
   }
@@ -458,11 +455,8 @@ public final class FNFile extends StandardFunc {
     final String enc = encoding(2, FILE_UE, ctx);
     final Charset cs = enc == null || enc == UTF8 ? null : Charset.forName(enc);
 
-    final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append));
-    try {
+    try(final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append))) {
       out.write(cs == null ? s : string(s).getBytes(cs));
-    } finally {
-      out.close();
     }
     return null;
   }
@@ -483,16 +477,13 @@ public final class FNFile extends StandardFunc {
     final String enc = encoding(2, FILE_UE, ctx);
     final Charset cs = enc == null || enc == UTF8 ? null : Charset.forName(enc);
 
-    final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append));
-    try {
+    try(final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append))) {
       for(Item it; (it = ir.next()) != null;) {
         if(!it.type.isStringOrUntyped()) throw Err.typeError(this, AtomType.STR, it);
         final byte[] s = it.string(info);
         out.write(cs == null ? s : string(s).getBytes(cs));
         out.write(cs == null ? NL : Prop.NL.getBytes(cs));
       }
-    } finally {
-      out.close();
     }
     return null;
   }
@@ -514,27 +505,17 @@ public final class FNFile extends StandardFunc {
 
     // write full file
     if(expr.length == 2) {
-      final BufferOutput out = new BufferOutput(new FileOutputStream(path, append));
-      try {
-        final InputStream is = bin.input(info);
-        try {
-          for(int i; (i = is.read()) != -1;)  out.write(i);
-        } finally {
-          is.close();
-        }
-      } finally {
-        out.close();
+      try(final BufferOutput out = new BufferOutput(new FileOutputStream(path, append));
+          final InputStream is = bin.input(info)) {
+        for(int i; (i = is.read()) != -1;)  out.write(i);
       }
     } else {
       // write file chunk
-      final RandomAccessFile raf = new RandomAccessFile(path, "rw");
-      try {
+      try(final RandomAccessFile raf = new RandomAccessFile(path, "rw")) {
         final long dlen = raf.length();
         if(off < 0 || off > dlen) throw FILE_OOR.get(info, off, dlen);
         raf.seek(off);
         raf.write(bin.binary(info));
-      } finally {
-        raf.close();
       }
     }
     return null;

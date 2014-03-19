@@ -257,9 +257,7 @@ final class DialogImport extends BaseXBack {
   private static MainParser guess(final IO in) {
     if(!in.exists() || in instanceof IOUrl) return null;
 
-    BufferInput ti = null;
-    try {
-      ti = new BufferInput(in);
+    try(final BufferInput ti = new BufferInput(in)) {
       int b = ti.read();
       // input starts with opening bracket: may be xml
       if(b == '<') return MainParser.XML;
@@ -271,10 +269,7 @@ final class DialogImport extends BaseXBack {
       }
       // all characters were of type ascii
       return MainParser.TEXT;
-    } catch(final IOException ignored) {
-    } finally {
-      if(ti != null) try { ti.close(); } catch(final IOException ignored) { }
-    }
+    } catch(final IOException ignored) { }
     // could not evaluate type
     return null;
   }

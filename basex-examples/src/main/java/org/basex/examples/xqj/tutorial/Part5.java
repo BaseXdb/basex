@@ -32,11 +32,10 @@ public final class Part5 extends Main {
     info("Serialize output to disk");
 
     String path = new File("src/main/resources/xml").getAbsolutePath();
-    FileOutputStream fos = new FileOutputStream("result.xml");
-    XQSequence xqs = xqe.executeQuery(
-        "doc('" + path + "/orders.xml')//order[id='174']");
-    xqs.writeSequence(fos, new Properties());
-    fos.close();
+    try(FileOutputStream fos = new FileOutputStream("result.xml")) {
+      XQSequence xqs = xqe.executeQuery("doc('" + path + "/orders.xml')//order[id='174']");
+      xqs.writeSequence(fos, new Properties());
+    }
 
     /* Remaining examples from the tutorial are skipped, as
      * serialization in BaseX uses defaults. */

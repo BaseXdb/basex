@@ -153,9 +153,9 @@ public abstract class HTTPTest extends SandboxTest {
     final String encoded = Base64.encode(Text.S_ADMIN + ':' + Text.S_ADMIN);
     conn.setRequestProperty(HTTPText.AUTHORIZATION, HTTPText.BASIC + ' ' + encoded);
     // send query
-    final OutputStream out = conn.getOutputStream();
-    out.write(token(request));
-    out.close();
+    try(final OutputStream out = conn.getOutputStream()) {
+      out.write(token(request));
+    }
 
     try {
       return read(conn.getInputStream()).replaceAll("\r?\n *", "");
@@ -189,9 +189,9 @@ public abstract class HTTPTest extends SandboxTest {
   public static String read(final InputStream is) throws IOException {
     final ArrayOutput ao = new ArrayOutput();
     if(is != null) {
-      final BufferInput bi = new BufferInput(is);
-      for(int i; (i = bi.read()) != -1;) ao.write(i);
-      bi.close();
+      try(final BufferInput bi = new BufferInput(is)) {
+        for(int i; (i = bi.read()) != -1;) ao.write(i);
+      }
     }
     return ao.toString();
   }
@@ -221,13 +221,13 @@ public abstract class HTTPTest extends SandboxTest {
     conn.setDoOutput(true);
     conn.setRequestMethod(PUT.name());
     if(ctype != null) conn.setRequestProperty(MimeTypes.CONTENT_TYPE, ctype);
-    final OutputStream bos = new BufferedOutputStream(conn.getOutputStream());
-    if(is != null) {
-      // send input stream if it not empty
-      final BufferedInputStream bis = new BufferedInputStream(is);
-      for(int i; (i = bis.read()) != -1;) bos.write(i);
-      bis.close();
-      bos.close();
+    try(final OutputStream bos = new BufferedOutputStream(conn.getOutputStream())) {
+      if(is != null) {
+        // send input stream if it not empty
+        try(final BufferedInputStream bis = new BufferedInputStream(is)) {
+          for(int i; (i = bis.read()) != -1;) bos.write(i);
+        }
+      }
     }
     try {
       read(conn.getInputStream());

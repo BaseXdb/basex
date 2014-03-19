@@ -38,16 +38,10 @@ public final class Users {
     if(!file.exists()) file = new IOFile(Prop.HOME, perm);
 
     if(file.exists()) {
-      DataInput in = null;
-      try {
-        in = new DataInput(file);
+      try(DataInput in = new DataInput(file)) {
         read(in);
       } catch(final IOException ex) {
         Util.errln(ex);
-      } finally {
-        if(in != null) try {
-          in.close();
-        } catch (final IOException ignored) { }
       }
     } else {
       // define default admin user with all rights
@@ -74,10 +68,8 @@ public final class Users {
    */
   public synchronized void write() {
     if(file == null) return;
-    try {
-      final DataOutput out = new DataOutput(file);
+    try(final DataOutput out = new DataOutput(file)) {
       write(out);
-      out.close();
     } catch(final IOException ex) {
       Util.debug(ex);
     }

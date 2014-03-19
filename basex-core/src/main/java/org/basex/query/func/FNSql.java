@@ -209,15 +209,11 @@ public final class FNSql extends StandardFunc {
     if(!(obj instanceof Connection)) throw BXSQ_CONN.get(info, id);
 
     final String query = string(checkStr(expr[1], ctx));
-    Statement stmt = null;
-    try {
-      stmt = ((Connection) obj).createStatement();
+    try(final Statement stmt = ((Connection) obj).createStatement()) {
       final boolean result = stmt.execute(query);
       return result ? buildResult(stmt.getResultSet(), ctx) : new NodeSeqBuilder();
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.get(info, ex);
-    } finally {
-      if(stmt != null) try { stmt.close(); } catch(final SQLException ignored) { }
     }
   }
 
@@ -462,7 +458,7 @@ public final class FNSql extends StandardFunc {
    * @param ctx query context
    * @return connection handler
    */
-  private JDBCConnections jdbc(final QueryContext ctx) {
+  private static JDBCConnections jdbc(final QueryContext ctx) {
     JDBCConnections res = ctx.resources.get(JDBCConnections.class);
     if(res == null) {
       res = new JDBCConnections();

@@ -136,17 +136,13 @@ public final class FNZip extends StandardFunc {
     final IOFile path = new IOFile(file);
     if(!path.exists()) throw ZIP_NOTFOUND.get(info, file);
     // loop through file
-    ZipFile zf = null;
-    try {
-      zf = new ZipFile(file);
+    try(final ZipFile zf = new ZipFile(file)) {
       // create result node
       final FElem root = new FElem(Q_FILE).declareNS().add(HREF, path.path());
       createEntries(paths(zf).iterator(), root, "");
       return root;
     } catch(final IOException ex) {
       throw ZIP_FAIL.get(info, ex);
-    } finally {
-      if(zf != null) try { zf.close(); } catch(final IOException ignored) { }
     }
   }
 
@@ -223,21 +219,15 @@ public final class FNZip extends StandardFunc {
     final String file = attribute(elm, HREF, true);
 
     // write zip file
-    FileOutputStream fos = null;
     boolean ok = true;
-    try {
-      fos = new FileOutputStream(file);
-      final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(fos));
+    try(final FileOutputStream fos = new FileOutputStream(file);
+        final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(fos))) {
       create(zos, elm.children(), "", null, ctx);
-      zos.close();
     } catch(final IOException ex) {
       ok = false;
       throw ZIP_FAIL.get(info, ex);
     } finally {
-      if(fos != null) {
-        try { fos.close(); } catch(final IOException ignored) { }
-        if(!ok) new IOFile(file).delete();
-      }
+      if(!ok) new IOFile(file).delete();
     }
     return null;
   }
@@ -378,28 +368,20 @@ public final class FNZip extends StandardFunc {
 
     // open zip file
     if(!new IOFile(in).exists()) throw ZIP_NOTFOUND.get(info, in);
-    ZipFile zf = null;
     boolean ok = true;
-    try {
-      zf = new ZipFile(in);
+    try(final ZipFile zf = new ZipFile(in)) {
       // write zip file
-      FileOutputStream fos = null;
-      try {
-        fos = new FileOutputStream(out.path());
-        final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(fos));
+      try(final FileOutputStream fos = new FileOutputStream(out.path());
+          final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(fos))) {
         // fill new zip file with entries from old file and description
         create(zos, elm.children(), "", zf, ctx);
-        zos.close();
       } catch(final IOException ex) {
         ok = false;
         throw ZIP_FAIL.get(info, ex);
-      } finally {
-        if(fos != null) try { fos.close(); } catch(final IOException ignored) { }
       }
     } catch(final IOException ex) {
       throw ZIP_FAIL.get(info, ex);
     } finally {
-      if(zf != null) try { zf.close(); } catch(final IOException ignored) { }
       if(ok) {
         // rename temporary file to final target
         target.delete();

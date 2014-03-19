@@ -30,17 +30,14 @@ public final class RESTPut {
     // Set as PUT request
     conn.setRequestMethod("PUT");
 
-    // Get and cache output stream
-    OutputStream out = new BufferedOutputStream(conn.getOutputStream());
-    // Create and cache file input stream
-    InputStream in = new BufferedInputStream(
-        new FileInputStream("src/main/resources/xml/factbook.xml"));
-
-    // Send document to server
-    System.out.println("\n* Send document...");
-    for(int i; (i = in.read()) != -1;) out.write(i);
-    in.close();
-    out.close();
+    // Get and cache output stream; create and cache file input stream
+    try(OutputStream out = new BufferedOutputStream(conn.getOutputStream());
+        InputStream in = new BufferedInputStream(
+            new FileInputStream("src/main/resources/xml/factbook.xml"))) {
+      // Send document to server
+      System.out.println("\n* Send document...");
+      for(int i; (i = in.read()) != -1;) out.write(i);
+    }
 
     // Print the HTTP response code
     System.out.println("\n* HTTP response: " + conn.getResponseCode() +

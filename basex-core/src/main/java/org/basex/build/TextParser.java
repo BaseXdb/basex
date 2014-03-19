@@ -47,8 +47,7 @@ public final class TextParser extends SingleParser {
     builder.openElem(TEXT, atts, nsp);
 
     final TokenBuilder tb = new TokenBuilder();
-    final NewlineInput nli = new NewlineInput(src).encoding(encoding);
-    try {
+    try(final NewlineInput nli = new NewlineInput(src).encoding(encoding)) {
       for(int ch; (ch = nli.read()) != -1;) {
         if(ch == '\n' && lines) {
           builder.openElem(LINE, atts, nsp);
@@ -59,8 +58,6 @@ public final class TextParser extends SingleParser {
           tb.add(XMLToken.valid(ch) ? ch : '?');
         }
       }
-    } finally {
-      nli.close();
     }
     if(!lines) builder.text(tb.finish());
     builder.closeElem();

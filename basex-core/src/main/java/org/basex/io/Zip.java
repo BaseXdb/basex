@@ -35,13 +35,10 @@ public final class Zip extends Proc {
    * @throws IOException I/O exception
    */
   private int size() throws IOException {
-    final ZipInputStream in = new ZipInputStream(archive.inputStream());
-    try {
+    try(final ZipInputStream in = new ZipInputStream(archive.inputStream())) {
       int c = 0;
       while(in.getNextEntry() != null) c++;
       return c;
-    } finally {
-      in.close();
     }
   }
 
@@ -52,13 +49,10 @@ public final class Zip extends Proc {
    * @throws IOException I/O exception
    */
   public byte[] read(final String path) throws IOException {
-    final ZipInputStream in = new ZipInputStream(archive.inputStream());
-    try {
+    try(final ZipInputStream in = new ZipInputStream(archive.inputStream())) {
       final byte[] cont = getEntry(in, path);
       if(cont == null) throw new FileNotFoundException(path);
       return cont;
-    } finally {
-      in.close();
     }
   }
 
@@ -68,10 +62,9 @@ public final class Zip extends Proc {
    * @throws IOException I/O exception
    */
   public void unzip(final IOFile target) throws IOException {
-    final ZipInputStream in = new ZipInputStream(archive.inputStream());
     total = size();
     curr = 0;
-    try {
+    try(final ZipInputStream in = new ZipInputStream(archive.inputStream())) {
       final byte[] data = new byte[IO.BLOCKSIZE];
       for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
         curr++;
@@ -80,16 +73,11 @@ public final class Zip extends Proc {
           trg.md();
         } else {
           trg.dir().md();
-          final OutputStream out = new FileOutputStream(trg.path());
-          try {
+          try(final OutputStream out = new FileOutputStream(trg.path())) {
             for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
-          } finally {
-            out.close();
           }
         }
       }
-    } finally {
-      in.close();
     }
   }
 
@@ -102,11 +90,9 @@ public final class Zip extends Proc {
   public void zip(final IOFile root, final StringList files) throws IOException {
     if(!(archive instanceof IOFile)) throw new FileNotFoundException(archive.path());
 
-    final ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(
-        new FileOutputStream(archive.path())));
     curr = 0;
-
-    try {
+    try(final ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(
+        new FileOutputStream(archive.path())))) {
       // use simple, fast compression
       out.setLevel(1);
       // loop through all files
@@ -114,18 +100,13 @@ public final class Zip extends Proc {
       final byte[] data = new byte[IO.BLOCKSIZE];
       for(final String file : files) {
         curr++;
-        final FileInputStream in = new FileInputStream(new File(root.file(), file));
-        try {
+        try(final FileInputStream in = new FileInputStream(new File(root.file(), file))) {
           final String fl = Prop.WIN ? file.replace('\\', '/') : file;
           out.putNextEntry(new ZipEntry(root.name() + '/' + fl));
           for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
           out.closeEntry();
-        } finally {
-          in.close();
         }
       }
-    } finally {
-      out.close();
     }
   }
 

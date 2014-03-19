@@ -401,14 +401,13 @@ public abstract class QT3TestSet {
     if(!qt3.canRead()) return null;
     try {
       f.createNewFile();
-      final BufferedInputStream in = new BufferedInputStream(new FileInputStream(qt3));
-      final BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(f));
-      final byte[] buffer = new byte[1 << 13];
-      for(int len; (len = in.read(buffer)) >= 0;) {
-        out.write(buffer, 0, len);
+      try(final BufferedInputStream in = new BufferedInputStream(new FileInputStream(qt3));
+          final BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(f))) {
+        final byte[] buffer = new byte[1 << 13];
+        for(int len; (len = in.read(buffer)) >= 0;) {
+          out.write(buffer, 0, len);
+        }
       }
-      in.close();
-      out.close();
       return f.getPath();
     } catch(IOException e) {
       e.printStackTrace();

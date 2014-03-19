@@ -146,15 +146,12 @@ public final class MimeTypes {
       if(is == null) {
         Util.errln(file + " not found.");
       } else {
-        final NewlineInput nli = new NewlineInput(is);
-        try {
+        try(final NewlineInput nli = new NewlineInput(is)) {
           for(String line; (line = nli.readLine()) != null;) {
             final int i = line.indexOf('=');
             if(i == -1 || line.startsWith("#")) continue;
             TYPES.put(line.substring(0, i), line.substring(i + 1));
           }
-        } finally {
-          nli.close();
         }
       }
     } catch(final IOException ex) {

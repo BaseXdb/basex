@@ -241,7 +241,7 @@ public final class ProjectView extends BaseXPanel {
    * @param f file reference
    * @return file
    */
-  private File canonical(final File f) {
+  private static File canonical(final File f) {
     try {
       return f.getCanonicalFile();
     } catch(final IOException ex) {

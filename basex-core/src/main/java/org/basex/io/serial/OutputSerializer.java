@@ -337,13 +337,10 @@ public abstract class OutputSerializer extends Serializer {
 
     try {
       if(it instanceof StrStream) {
-        final InputStream ni = ((StrStream) it).input(null);
-        try {
+        try(final InputStream ni = ((StrStream) it).input(null)) {
           for(int cp; (cp = ni.read()) != -1;) {
             if(iter) print(cp); else encode(cp);
           }
-        } finally {
-          ni.close();
         }
       } else {
         final byte[] atom = it.string(null);

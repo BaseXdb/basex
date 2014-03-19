@@ -117,11 +117,11 @@ public final class Export extends Command {
       if(!dir.exists()) dir.md();
 
       // serialize file
-      final PrintOutput po = new PrintOutput(unique(exported, f.path()));
-      final Serializer ser = Serializer.get(po, sopts);
-      ser.serialize(new DBNode(data, pre));
-      ser.close();
-      po.close();
+      try(final PrintOutput po = new PrintOutput(unique(exported, f.path()))) {
+        final Serializer ser = Serializer.get(po, sopts);
+        ser.serialize(new DBNode(data, pre));
+        ser.close();
+      }
     }
 
     // export raw files

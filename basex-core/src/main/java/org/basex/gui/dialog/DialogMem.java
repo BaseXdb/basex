@@ -78,7 +78,7 @@ public class DialogMem extends BaseXDialog {
    * Returns the info text.
    * @return text
    */
-  private String info() {
+  private static String info() {
     final Runtime rt = Runtime.getRuntime();
     final long max = rt.maxMemory();
     final long total = rt.totalMemory();

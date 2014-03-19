@@ -72,10 +72,10 @@ public final class Part3 extends Main {
     if(xqs.next()) print("Query: " + query, xqs);
 
     // Execute a query from a file input stream
-    InputStream is = new FileInputStream(path + "/orders.xq");
-    xqs = xqe.executeQuery(is);
-    if(xqs.next()) print("Query from input stream", xqs);
-    is.close();
+    try(InputStream is = new FileInputStream(path + "/orders.xq")) {
+      xqs = xqe.executeQuery(is);
+      if(xqs.next()) print("Query from input stream", xqs);
+    }
 
     // Close the connection
     close(xqc);

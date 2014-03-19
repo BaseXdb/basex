@@ -213,11 +213,8 @@ public final class IOFile extends IO {
    * @throws IOException I/O exception
    */
   public void write(final byte[] c) throws IOException {
-    final FileOutputStream out = new FileOutputStream(path);
-    try {
+    try(final FileOutputStream out = new FileOutputStream(path)) {
       out.write(c);
-    } finally {
-      out.close();
     }
   }
 
@@ -227,13 +224,8 @@ public final class IOFile extends IO {
    * @throws IOException I/O exception
    */
   public void write(final InputStream in) throws IOException {
-    try {
-      final BufferOutput out = new BufferOutput(path);
-      try {
-        for(int i; (i = in.read()) != -1;) out.write(i);
-      } finally {
-        out.close();
-      }
+    try(final BufferOutput out = new BufferOutput(path)) {
+      for(int i; (i = in.read()) != -1;) out.write(i);
     } finally {
       in.close();
     }
@@ -277,17 +269,10 @@ public final class IOFile extends IO {
 
     // create parent directory of target file
     target.dir().md();
-    final FileInputStream fis = new FileInputStream(file);
-    try {
-      final FileOutputStream fos = new FileOutputStream(target.file);
-      try {
-        // copy file buffer by buffer
-        for(int i; (i = fis.read(buf)) != -1;) fos.write(buf, 0, i);
-      } finally {
-        fos.close();
-      }
-    } finally {
-      fis.close();
+    // copy file buffer by buffer
+    try(final FileInputStream fis = new FileInputStream(file);
+        final FileOutputStream fos = new FileOutputStream(target.file)) {
+      for(int i; (i = fis.read(buf)) != -1;) fos.write(buf, 0, i);
     }
   }
 

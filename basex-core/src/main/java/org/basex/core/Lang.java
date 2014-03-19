@@ -44,27 +44,22 @@ public final class Lang {
     if(is == null) {
       Util.errln(path + " not found.");
     } else {
-      try {
-        final NewlineInput nli = new NewlineInput(is);
-        try {
-          for(String line; (line = nli.readLine()) != null;) {
-            final int i = line.indexOf('=');
-            if(i == -1 || line.startsWith("#")) continue;
-            final String key = line.substring(0, i).trim();
-            String val = line.substring(i + 1).trim();
-            if("langright".equals(key)) {
-              Prop.langright = "true".equals(val);
-            } else {
-              if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
-              if(Prop.langkeys) val = '[' + key + ": " + val + ']';
-              if(TEXTS.put(key, val) != null) {
-                Util.errln("%." + SUFFIX + ": '%' is declared twice", lang, key);
-              }
-              CHECK.put(key, true);
+      try(final NewlineInput nli = new NewlineInput(is)) {
+        for(String line; (line = nli.readLine()) != null;) {
+          final int i = line.indexOf('=');
+          if(i == -1 || line.startsWith("#")) continue;
+          final String key = line.substring(0, i).trim();
+          String val = line.substring(i + 1).trim();
+          if("langright".equals(key)) {
+            Prop.langright = "true".equals(val);
+          } else {
+            if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
+            if(Prop.langkeys) val = '[' + key + ": " + val + ']';
+            if(TEXTS.put(key, val) != null) {
+              Util.errln("%." + SUFFIX + ": '%' is declared twice", lang, key);
             }
+            CHECK.put(key, true);
           }
-        } finally {
-          nli.close();
         }
       } catch(final IOException ex) {
         Util.errln(ex);
