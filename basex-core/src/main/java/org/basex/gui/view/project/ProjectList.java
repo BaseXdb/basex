@@ -153,7 +153,7 @@ public class ProjectList extends JList {
           BaseXLayout.hints(g);
 
           if(fm == null) fm = g.getFontMetrics(label.getFont());
-          final int y = fm.getHeight() - 2;
+          final int y = Math.min(fm.getHeight(), (int) label.getPreferredSize().getHeight()) - 2;
           int x = (int) label.getPreferredSize().getWidth() + 2;
 
           final String s = file.name();
