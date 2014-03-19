@@ -65,9 +65,7 @@ public abstract class Inspect {
       final QueryParser qp = new QueryParser(input, io.path(), qc, null);
       module = QueryProcessor.isLibrary(input) ? qp.parseLibrary(true) : qp.parseMain();
       return qp;
-    } catch(final IOException ex) {
-      throw IOERR.get(info, ex);
-    } catch(final QueryException ex) {
+    } catch(final IOException | QueryException ex) {
       throw IOERR.get(info, ex);
     } finally {
       qc.close();

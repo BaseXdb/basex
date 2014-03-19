@@ -271,25 +271,15 @@ public final class DigitalSignature {
 
     } catch(final XPathExpressionException e) {
       throw CX_XPINV.get(info, e);
-    } catch(final SAXException e) {
-      throw CX_IOEXC.get(info, e);
-    } catch(final IOException e) {
-      throw CX_IOEXC.get(info, e);
-    } catch(final ParserConfigurationException e) {
+    } catch(final SAXException | IOException | ParserConfigurationException e) {
       throw CX_IOEXC.get(info, e);
     } catch(final KeyStoreException e) {
       throw CX_KSEXC.get(info, e);
-    } catch(final MarshalException e) {
+    } catch(final MarshalException |  XMLSignatureException e) {
       throw CX_SIGEXC.get(info, e);
-    } catch(final XMLSignatureException e) {
-      throw CX_SIGEXC.get(info, e);
-    } catch(final NoSuchAlgorithmException e) {
+    } catch(final NoSuchAlgorithmException | CertificateException e) {
       throw CX_ALGEXC.get(info, e);
-    } catch(final CertificateException e) {
-      throw CX_ALGEXC.get(info, e);
-    } catch(final UnrecoverableKeyException e) {
-      throw CX_NOKEY.get(info, e);
-    } catch(final KeyException e) {
+    } catch(final UnrecoverableKeyException | KeyException e) {
       throw CX_NOKEY.get(info, e);
     } catch(final InvalidAlgorithmParameterException e) {
       throw CX_ALGEXC.get(info, e);
@@ -320,13 +310,8 @@ public final class DigitalSignature {
       final XMLSignature signature = fac.unmarshalXMLSignature(valContext);
       coreVal = signature.validate(valContext);
 
-    } catch(final XMLSignatureException e) {
-      throw CX_IOEXC.get(info, e);
-    } catch(final SAXException e) {
-      throw CX_IOEXC.get(info, e);
-    } catch(final ParserConfigurationException e) {
-      throw CX_IOEXC.get(info, e);
-    } catch(final IOException e) {
+    } catch(final XMLSignatureException | SAXException | ParserConfigurationException |
+        IOException e) {
       throw CX_IOEXC.get(info, e);
     } catch(final MarshalException e) {
       throw CX_SIGEXC.get(info, e);

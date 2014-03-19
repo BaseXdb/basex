@@ -110,10 +110,7 @@ public abstract class AQuery extends Command {
         }
         return info(info.toString(qp, out.size(), hits, options.get(MainOptions.QUERYINFO)));
 
-      } catch(final QueryException ex) {
-        cause = ex;
-        err = Util.message(ex);
-      } catch(final IOException ex) {
+      } catch(final QueryException | IOException ex) {
         cause = ex;
         err = Util.message(ex);
       } catch(final ProcException ex) {

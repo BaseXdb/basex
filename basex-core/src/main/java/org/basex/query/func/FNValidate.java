@@ -213,9 +213,7 @@ public final class FNValidate extends StandardFunc {
     final ErrorHandler handler = new ErrorHandler();
     try {
       v.process(handler);
-    } catch(final IOException ex) {
-      throw BXVA_START.get(info, ex);
-    } catch(final ParserConfigurationException ex) {
+    } catch(final IOException | ParserConfigurationException ex) {
       throw BXVA_START.get(info, ex);
     } catch(final SAXException ex) {
       // fatal exception: get original message

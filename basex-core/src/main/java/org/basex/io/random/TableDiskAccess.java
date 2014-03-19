@@ -101,11 +101,9 @@ public final class TableDiskAccess extends TableAccess {
 
     try(final RandomAccessFile file = new RandomAccessFile(table.file(), "rw")) {
       return file.getChannel().tryLock() == null;
-    } catch(final OverlappingFileLockException ex) {
-      return true;
     } catch(final ClosedChannelException ex) {
       return false;
-    } catch(final IOException ex) {
+    } catch(final OverlappingFileLockException | IOException ex) {
       return true;
     }
   }
