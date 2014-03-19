@@ -136,7 +136,7 @@ public final class MimeTypes {
   }
 
   /** Hash map containing all assignments. */
-  private static final HashMap<String, String> TYPES = new HashMap<String, String>();
+  private static final HashMap<String, String> TYPES = new HashMap<>();
 
   /** Reads in the mime-types. */
   static {

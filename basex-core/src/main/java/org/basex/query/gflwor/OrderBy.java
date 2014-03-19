@@ -69,7 +69,7 @@ public final class OrderBy extends GFLWOR.Clause {
        */
       private void sort(final QueryContext ctx) throws QueryException {
         // keys are stored at odd positions, values at even ones
-        List<Value[]> tuples = new ArrayList<Value[]>();
+        List<Value[]> tuples = new ArrayList<>();
         while(sub.next(ctx)) {
           final Item[] key = new Item[keys.length];
           for(int i = 0; i < keys.length; i++)

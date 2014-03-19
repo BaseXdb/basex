@@ -19,10 +19,10 @@ import org.basex.util.*;
  */
 public final class BaseXImages {
   /** Cached image icons. */
-  private static final HashMap<String, ImageIcon> ICONS = new HashMap<String, ImageIcon>();
+  private static final HashMap<String, ImageIcon> ICONS = new HashMap<>();
 
   /** File icon cache. */
-  private static final HashMap<String, Icon> FILES = new HashMap<String, Icon>();
+  private static final HashMap<String, Icon> FILES = new HashMap<>();
   /** System icons. */
   private static final FileSystemView FS = FileSystemView.getFileSystemView();
 

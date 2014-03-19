@@ -208,7 +208,7 @@ public class ProjectList extends JList<String> {
   private IOFile[] selectedValues() {
     // nothing selected: select first entry
     if(isSelectionEmpty() && getModel().getSize() != 0) setSelectedIndex(0);
-    final ArrayList<IOFile> list = new ArrayList<IOFile>();
+    final ArrayList<IOFile> list = new ArrayList<>();
     for(final String val : getSelectedValuesList()) list.add(new IOFile(val));
     return list.toArray(new IOFile[list.size()]);
   }

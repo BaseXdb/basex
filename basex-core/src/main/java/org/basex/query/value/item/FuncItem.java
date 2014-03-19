@@ -226,7 +226,7 @@ public final class FuncItem extends FItem implements Scope {
     // create let bindings for all variables
     final LinkedList<GFLWOR.Clause> cls =
         exprs.length == 0 ? null : new LinkedList<GFLWOR.Clause>();
-    final IntObjMap<Var> vs = new IntObjMap<Var>();
+    final IntObjMap<Var> vs = new IntObjMap<>();
     for(int i = 0; i < params.length; i++) {
       final Var old = params[i], v = scp.newCopyOf(ctx, old);
       vs.put(old.id, v);

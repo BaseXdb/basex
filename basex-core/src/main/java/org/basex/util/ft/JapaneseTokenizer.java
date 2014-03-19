@@ -68,7 +68,7 @@ public class JapaneseTokenizer extends Tokenizer {
   /** Token iterator. */
   private Iterator<Morpheme> tokens;
   /** Token list. */
-  private ArrayList<Morpheme> tokenList = new ArrayList<Morpheme>();
+  private ArrayList<Morpheme> tokenList = new ArrayList<>();
   /** Current position of the Token list. */
   private int cpos;
   /** Current token. */
@@ -156,9 +156,8 @@ public class JapaneseTokenizer extends Tokenizer {
     if(wc) { // convert wide-space to space
       source = source.replace('\u3000', '\u0020');
     }
-    final ArrayList<?> morpheme =
-        (ArrayList<?>) Reflect.invoke(parse, tagger, source);
-    final ArrayList<Morpheme> list = new ArrayList<Morpheme>();
+    final ArrayList<?> morpheme = (ArrayList<?>) Reflect.invoke(parse, tagger, source);
+    final ArrayList<Morpheme> list = new ArrayList<>();
     try {
       int prev = 0;
       for(int i = 0; i < morpheme.size(); i++) {
@@ -178,7 +177,7 @@ public class JapaneseTokenizer extends Tokenizer {
 
         // separates continuous mark (ASCII)
         boolean cont = true;
-        final ArrayList<Morpheme> marks = new ArrayList<Morpheme>();
+        final ArrayList<Morpheme> marks = new ArrayList<>();
         for(int j = 0; j < srfc.length(); j++) {
           final String c = String.valueOf(srfc.charAt(j));
           final byte[] t = token(c);

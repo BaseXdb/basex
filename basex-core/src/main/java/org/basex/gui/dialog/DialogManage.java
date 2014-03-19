@@ -136,7 +136,7 @@ public final class DialogManage extends BaseXDialog {
 
     final StringList dbs = choice.getValues();
     final String db = choice.getValue();
-    final ArrayList<Command> cmds = new ArrayList<Command>();
+    final ArrayList<Command> cmds = new ArrayList<>();
 
     if(cmp == open) {
       close();

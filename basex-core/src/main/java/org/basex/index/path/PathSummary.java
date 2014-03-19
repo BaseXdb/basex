@@ -22,7 +22,7 @@ import org.basex.util.list.*;
  */
 public final class PathSummary implements Index {
   /** Node stack for building the summary. */
-  private final ArrayList<PathNode> stack = new ArrayList<PathNode>();
+  private final ArrayList<PathNode> stack = new ArrayList<>();
   /** Data reference. */
   private Data data;
   /** Root node. */
@@ -121,7 +121,7 @@ public final class PathSummary implements Index {
    * @return root node
    */
   public ArrayList<PathNode> root() {
-    final ArrayList<PathNode> out = new ArrayList<PathNode>();
+    final ArrayList<PathNode> out = new ArrayList<>();
     out.add(root);
     return out;
   }
@@ -133,7 +133,7 @@ public final class PathSummary implements Index {
    * @return parent nodes
    */
   public static ArrayList<PathNode> parent(final ArrayList<PathNode> in) {
-    final ArrayList<PathNode> out = new ArrayList<PathNode>();
+    final ArrayList<PathNode> out = new ArrayList<>();
     for(final PathNode n : in) if(!out.contains(n.par)) out.add(n.par);
     return out;
   }
@@ -146,7 +146,7 @@ public final class PathSummary implements Index {
    * @return descendant nodes
    */
   public static ArrayList<PathNode> desc(final ArrayList<PathNode> in, final boolean desc) {
-    final ArrayList<PathNode> out = new ArrayList<PathNode>();
+    final ArrayList<PathNode> out = new ArrayList<>();
     for(final PathNode n : in) {
       for(final PathNode c : n.ch) {
         if(desc) c.addDesc(out);
@@ -164,7 +164,7 @@ public final class PathSummary implements Index {
    * @return descendant nodes
    */
   public ArrayList<PathNode> desc(final int n, final int k) {
-    final ArrayList<PathNode> out = new ArrayList<PathNode>();
+    final ArrayList<PathNode> out = new ArrayList<>();
     for(final PathNode c : root.ch) c.addDesc(out, n, k);
     return out;
   }
@@ -200,7 +200,7 @@ public final class PathSummary implements Index {
       final byte kind = att ? Data.ATTR : Data.ELEM;
       final int id = att ? data.atnindex.id(substring(i, 1)) : data.tagindex.id(i);
 
-      final ArrayList<PathNode> out = new ArrayList<PathNode>();
+      final ArrayList<PathNode> out = new ArrayList<>();
       for(final PathNode n : in) {
         if(n.name != id || n.kind != kind) continue;
         for(final PathNode c : n.ch) {

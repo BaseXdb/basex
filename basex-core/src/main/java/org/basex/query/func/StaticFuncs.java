@@ -26,7 +26,7 @@ import org.basex.util.list.*;
  */
 public final class StaticFuncs extends ExprInfo {
   /** User-defined functions. */
-  private final TokenObjMap<FuncCache> funcs = new TokenObjMap<FuncCache>();
+  private final TokenObjMap<FuncCache> funcs = new TokenObjMap<>();
 
   /**
    * returns the signature of the function with the given name and arity.
@@ -250,7 +250,7 @@ public final class StaticFuncs extends ExprInfo {
   /** Function cache. */
   private static class FuncCache {
     /** Function calls. */
-    final ArrayList<StaticFuncCall> calls = new ArrayList<StaticFuncCall>(0);
+    final ArrayList<StaticFuncCall> calls = new ArrayList<>(0);
     /** Function. */
     StaticFunc func;
 

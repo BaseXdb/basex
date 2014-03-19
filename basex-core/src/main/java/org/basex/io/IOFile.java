@@ -173,7 +173,7 @@ public final class IOFile extends IO {
     final File[] ch = file.listFiles();
     if(ch == null) return new IOFile[] {};
 
-    final ArrayList<IOFile> io = new ArrayList<IOFile>(ch.length);
+    final ArrayList<IOFile> io = new ArrayList<>(ch.length);
     final Pattern p = Pattern.compile(regex, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
     for(final File f : ch) {
       if(p.matcher(f.getName()).matches()) io.add(new IOFile(f));

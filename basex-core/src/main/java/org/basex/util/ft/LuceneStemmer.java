@@ -19,8 +19,7 @@ final class LuceneStemmer extends Stemmer {
   /** Name of the package with all Lucene stemmers. */
   private static final String PATTERN = "org.apache.lucene.analysis.%Stemmer";
   /** Stemmer classes which the Lucene library provides. */
-  private static final HashMap<Language, StemmerClass> CLASSES =
-      new HashMap<Language, StemmerClass>();
+  private static final HashMap<Language, StemmerClass> CLASSES = new HashMap<>();
 
   /** Stemmer class corresponding to the required properties. */
   private StemmerClass clazz;

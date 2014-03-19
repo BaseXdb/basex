@@ -17,15 +17,15 @@ import org.basex.util.ft.*;
  */
 public final class XQFTTS extends W3CTS {
   /** Cached stop word files. */
-  private final HashMap<String, IO> stop = new HashMap<String, IO>();
+  private final HashMap<String, IO> stop = new HashMap<>();
   /** Cached stop word files. */
-  private final HashMap<String, IO> stop2 = new HashMap<String, IO>();
+  private final HashMap<String, IO> stop2 = new HashMap<>();
   /** Cached stemming dictionaries. */
-  private final HashMap<String, IO> stem = new HashMap<String, IO>();
+  private final HashMap<String, IO> stem = new HashMap<>();
   /** Cached thesaurus. */
-  private final HashMap<String, IO> thes = new HashMap<String, IO>();
+  private final HashMap<String, IO> thes = new HashMap<>();
   /** Cached thesaurus. */
-  private final HashMap<String, IO> thes2 = new HashMap<String, IO>();
+  private final HashMap<String, IO> thes2 = new HashMap<>();
 
   /**
    * Main method of the test class.

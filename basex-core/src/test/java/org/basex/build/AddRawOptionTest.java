@@ -67,7 +67,7 @@ public class AddRawOptionTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   private static void assertAllFilesExist() throws IOException {
-    final HashSet<String> files = new HashSet<String>();
+    final HashSet<String> files = new HashSet<>();
     final Session session = new LocalSession(context);
     try {
       final Query q = session.query(Function._DB_LIST.args(NAME));

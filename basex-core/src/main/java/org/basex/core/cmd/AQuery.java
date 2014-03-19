@@ -29,7 +29,7 @@ public abstract class AQuery extends Command {
   Result result;
 
   /** Variables. */
-  private final HashMap<String, String[]> vars = new HashMap<String, String[]>();
+  private final HashMap<String, String[]> vars = new HashMap<>();
   /** HTTP context. */
   private Object http;
   /** Query processor. */

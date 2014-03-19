@@ -30,7 +30,7 @@ public final class BaseXServer extends Main implements Runnable {
   private IOFile stop;
 
   /** New sessions. */
-  private final HashSet<ClientListener> auth = new HashSet<ClientListener>();
+  private final HashSet<ClientListener> auth = new HashSet<>();
   /** Stopped flag. */
   private volatile boolean stopped;
   /** EventsListener. */

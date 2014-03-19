@@ -26,9 +26,9 @@ public final class SyntaxXQuery extends Syntax {
   private static final String CLOSING = "})";
 
   /** Keywords. */
-  private static final HashSet<String> KEYWORDS = new HashSet<String>();
+  private static final HashSet<String> KEYWORDS = new HashSet<>();
   /** Functions. */
-  private static final HashSet<String> FUNCTIONS = new HashSet<String>();
+  private static final HashSet<String> FUNCTIONS = new HashSet<>();
 
   /** Comment. */
   private int comment;

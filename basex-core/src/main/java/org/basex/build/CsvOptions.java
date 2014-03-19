@@ -18,7 +18,7 @@ public class CsvOptions extends Options {
       new StringOption("separator", CsvSep.COMMA.toString());
   /** Option: format. */
   public static final EnumOption<CsvFormat> FORMAT =
-      new EnumOption<CsvFormat>("format", CsvFormat.DIRECT);
+      new EnumOption<>("format", CsvFormat.DIRECT);
   /** Option: header line. */
   public static final BooleanOption HEADER =
       new BooleanOption("header", false);

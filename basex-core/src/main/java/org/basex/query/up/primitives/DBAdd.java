@@ -28,7 +28,7 @@ public final class DBAdd extends DBUpdate {
    */
   public DBAdd(final Data data, final NewInput input, final QueryContext qc, final InputInfo info) {
     super(UpdateType.DBADD, data, info);
-    final ArrayList<NewInput> docs = new ArrayList<NewInput>();
+    final ArrayList<NewInput> docs = new ArrayList<>();
     docs.add(input);
     add = new DBNew(qc, docs, info);
   }

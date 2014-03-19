@@ -156,7 +156,7 @@ public final class FNHof extends StandardFunc {
     if(k < 1 || k > Integer.MAX_VALUE / 2) return Empty.SEQ;
 
     final Iter iter = expr[0].iter(ctx);
-    final MinHeap<Item, Item> heap = new MinHeap<Item, Item>((int) k,
+    final MinHeap<Item, Item> heap = new MinHeap<>((int) k,
         new Comparator<Item>() {
       @Override
       public int compare(final Item it1, final Item it2) {
@@ -192,7 +192,7 @@ public final class FNHof extends StandardFunc {
     if(k < 1 || k > Integer.MAX_VALUE / 2) return Empty.SEQ;
 
     final Iter iter = expr[0].iter(ctx);
-    final MinHeap<Item, Item> heap = new MinHeap<Item, Item>((int) k, cmp);
+    final MinHeap<Item, Item> heap = new MinHeap<>((int) k, cmp);
 
     try {
       for(Item it; (it = iter.next()) != null;) {

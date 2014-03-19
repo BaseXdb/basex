@@ -23,7 +23,7 @@ public final class VarScope {
   private final StaticContext sc;
 
   /** Local variables in this scope. */
-  private final ArrayList<Var> vars = new ArrayList<Var>();
+  private final ArrayList<Var> vars = new ArrayList<>();
 
   /**
    * Constructor for a top-level module.

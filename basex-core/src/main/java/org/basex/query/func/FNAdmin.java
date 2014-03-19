@@ -143,7 +143,7 @@ public final class FNAdmin extends StandardFunc {
    */
   private ArrayList<LogEntry> logs(final IOFile file) throws QueryException {
     try {
-      final ArrayList<LogEntry> logs = new ArrayList<LogEntry>();
+      final ArrayList<LogEntry> logs = new ArrayList<>();
       final NewlineInput nli = new NewlineInput(file);
       try {
         for(String line; (line = nli.readLine()) != null;) {

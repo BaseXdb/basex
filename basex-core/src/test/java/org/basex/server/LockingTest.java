@@ -61,7 +61,7 @@ public final class LockingTest extends SandboxTest {
    */
   @Parameters
   public static Collection<Object[]> generateParams() {
-    final List<Object[]> params = new ArrayList<Object[]>();
+    final List<Object[]> params = new ArrayList<>();
     for(int i = 1; i <= REPEAT; i++) {
       params.add(new Object[0]);
     }
@@ -202,7 +202,7 @@ public final class LockingTest extends SandboxTest {
   @Test
   public void loadTests() throws Exception {
     final int totalQueries = RUN_COUNT * QUERIES.length;
-    final ArrayList<Client> clients = new ArrayList<Client>(totalQueries);
+    final ArrayList<Client> clients = new ArrayList<>(totalQueries);
     final CountDownLatch allDone = new CountDownLatch(totalQueries);
 
     for(int i = 0; i < RUN_COUNT; i++)

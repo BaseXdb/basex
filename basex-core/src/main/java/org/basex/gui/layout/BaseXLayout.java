@@ -171,7 +171,7 @@ public final class BaseXLayout {
    */
   @SuppressWarnings("unchecked")
   public static ArrayList<Object> contents(final Transferable tr) {
-    final ArrayList<Object> list = new ArrayList<Object>();
+    final ArrayList<Object> list = new ArrayList<>();
     try {
       if(tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
         for(final File fl : (List<File>)

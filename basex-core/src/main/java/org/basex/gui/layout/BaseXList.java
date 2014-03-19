@@ -181,7 +181,7 @@ public final class BaseXList extends BaseXBack {
       }
     };
 
-    list = new JList<String>(choice);
+    list = new JList<>(choice);
     list.setFocusable(false);
     if(s) list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     list.addMouseListener(mouse);

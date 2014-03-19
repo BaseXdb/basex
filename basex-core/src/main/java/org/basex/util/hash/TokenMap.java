@@ -55,7 +55,7 @@ public class TokenMap extends TokenSet {
    * @return iterator
    */
   public final Iterable<byte[]> values() {
-    return new ArrayIterator<byte[]>(values, 1, size);
+    return new ArrayIterator<>(values, 1, size);
   }
 
   @Override

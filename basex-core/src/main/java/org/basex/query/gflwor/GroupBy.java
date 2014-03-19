@@ -117,8 +117,8 @@ public final class GroupBy extends GFLWOR.Clause {
        * @throws QueryException query exception
        */
       private Group[] init(final QueryContext ctx) throws QueryException {
-        final ArrayList<Group> grps = new ArrayList<Group>();
-        final IntObjMap<Group> map = new IntObjMap<Group>();
+        final ArrayList<Group> grps = new ArrayList<>();
+        final IntObjMap<Group> map = new IntObjMap<>();
         final Collation[] colls = new Collation[nonOcc];
         for(int i = 0, p = 0; i < specs.length; i++)
           if(!specs[i].occluded) colls[p++] = specs[i].coll;

@@ -236,7 +236,7 @@ public final class Namespaces {
    */
   void root(final int pre, final Data data) {
     // collect possible candidates for namespace root
-    final List<NSNode> cand = new LinkedList<NSNode>();
+    final List<NSNode> cand = new LinkedList<>();
     NSNode node = root;
     cand.add(node);
     for(int p; (p = node.find(pre)) > -1;) {
@@ -453,7 +453,7 @@ public final class Namespaces {
    * @return info string
    */
   public byte[] info() {
-    final TokenObjMap<TokenList> map = new TokenObjMap<TokenList>();
+    final TokenObjMap<TokenList> map = new TokenObjMap<>();
     info(map, root);
     final TokenBuilder tb = new TokenBuilder();
     for(final byte[] key : map) {

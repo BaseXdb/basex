@@ -128,7 +128,7 @@ public final class Compare {
       if(s1.is(s2)) continue;
       AxisIter ch1 = s1.children(), ch2 = s2.children();
 
-      final Stack<AxisIter> stack = new Stack<AxisIter>();
+      final Stack<AxisIter> stack = new Stack<>();
       stack.push(ch1);
       stack.push(ch2);
 

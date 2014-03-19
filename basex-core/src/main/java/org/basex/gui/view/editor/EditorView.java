@@ -1010,7 +1010,7 @@ public final class EditorView extends View {
    * @return editors
    */
   EditorArea[] editors() {
-    final ArrayList<EditorArea> edits = new ArrayList<EditorArea>();
+    final ArrayList<EditorArea> edits = new ArrayList<>();
     for(final Component c : tabs.getComponents()) {
       if(c instanceof EditorArea) edits.add((EditorArea) c);
     }

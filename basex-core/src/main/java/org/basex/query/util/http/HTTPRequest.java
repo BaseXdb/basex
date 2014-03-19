@@ -21,7 +21,7 @@ public final class HTTPRequest {
   /** Body content. */
   public final ValueBuilder bodyContent = new ValueBuilder();
   /** Parts in case of multipart request. */
-  public final ArrayList<Part> parts = new ArrayList<Part>();
+  public final ArrayList<Part> parts = new ArrayList<>();
   /** Indicator for multipart request. */
   public boolean isMultipart;
 

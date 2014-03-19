@@ -19,7 +19,7 @@ public final class ClientSessions implements DataResources {
   /** Last inserted id. */
   private int lastId = -1;
   /** Map with all open sessions and their ids. */
-  private final TokenObjMap<ClientSession> conns = new TokenObjMap<ClientSession>();
+  private final TokenObjMap<ClientSession> conns = new TokenObjMap<>();
 
   /**
    * Adds a session.

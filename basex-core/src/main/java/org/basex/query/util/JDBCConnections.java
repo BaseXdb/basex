@@ -16,7 +16,7 @@ public final class JDBCConnections implements DataResources {
   /** Last inserted id. */
   private int lastId = -1;
   /** Map with all open connections and prepared statements with unique ids. */
-  private final IntObjMap<Object> conns = new IntObjMap<Object>();
+  private final IntObjMap<Object> conns = new IntObjMap<>();
 
   /**
    * Adds a connection or prepared statement to depot.

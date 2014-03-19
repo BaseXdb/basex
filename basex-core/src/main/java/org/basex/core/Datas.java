@@ -12,7 +12,7 @@ import org.basex.data.*;
  */
 public final class Datas {
   /** List of data references. */
-  private final ArrayList<Data> list = new ArrayList<Data>();
+  private final ArrayList<Data> list = new ArrayList<>();
 
   /**
    * Pins and returns an existing data reference for the specified database, or

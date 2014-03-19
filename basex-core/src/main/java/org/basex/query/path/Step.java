@@ -140,7 +140,7 @@ public abstract class Step extends Preds {
     if(axis != Axis.ATTR && axis != Axis.CHILD && axis != Axis.DESC &&
        axis != Axis.DESCORSELF && axis != Axis.SELF) return null;
 
-    final ArrayList<PathNode> tmp = new ArrayList<PathNode>();
+    final ArrayList<PathNode> tmp = new ArrayList<>();
     for(final PathNode n : nodes) {
       if(axis == Axis.SELF || axis == Axis.DESCORSELF) {
         if(kind == -1 || kind == n.kind && (name == 0 || name == n.name)) {

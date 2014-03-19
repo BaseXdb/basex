@@ -91,7 +91,7 @@ public final class EventTest extends SandboxTest {
       for(final String e : events) session.execute("create event " + e);
 
       // query must return all events
-      final HashSet<String> names = new HashSet<String>();
+      final HashSet<String> names = new HashSet<>();
       final String result = session.execute("show events");
       for(final String line : result.split("\\r?\\n|\\r"))
         if(line.startsWith("- ")) names.add(line.substring(2));

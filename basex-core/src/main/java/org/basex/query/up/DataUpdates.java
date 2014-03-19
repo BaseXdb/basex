@@ -32,15 +32,15 @@ final class DataUpdates {
   private IntList nodes = new IntList(0);
   /** Mapping between pre values of the target nodes and all node updates
    * which operate on this target. */
-  private IntObjMap<NodeUpdates> nodeUpdates = new IntObjMap<NodeUpdates>();
+  private IntObjMap<NodeUpdates> nodeUpdates = new IntObjMap<>();
   /** Atomic update cache. */
   private AtomicUpdateCache auc;
 
   /** Database updates. */
-  private final List<DBUpdate> dbUpdates = new LinkedList<DBUpdate>();
+  private final List<DBUpdate> dbUpdates = new LinkedList<>();
   /** Put operations which reflect all changes made during the snapshot, hence executed
    * after updates have been carried out. */
-  private final IntObjMap<Put> puts = new IntObjMap<Put>();
+  private final IntObjMap<Put> puts = new IntObjMap<>();
 
   /** Number of updates. */
   private int size;
@@ -195,7 +195,7 @@ final class DataUpdates {
    * @return ordered list of update primitives
    */
   private List<NodeUpdate> preparePrimitives() {
-    final List<NodeUpdate> upd = new ArrayList<NodeUpdate>();
+    final List<NodeUpdate> upd = new ArrayList<>();
     for(int i = nodes.size() - 1; i >= 0; i--) {
       final int pre = nodes.get(i);
       final NodeUpdates n = nodeUpdates.get(pre);

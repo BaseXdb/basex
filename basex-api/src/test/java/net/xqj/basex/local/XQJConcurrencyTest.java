@@ -43,7 +43,7 @@ public class XQJConcurrencyTest extends XQJBaseTest {
    */
   @Test
   public void testConcurrentXQuery1to1024() throws Throwable {
-    final ArrayList<SimpleQueryThread> sqtList = new ArrayList<SimpleQueryThread>();
+    final ArrayList<SimpleQueryThread> sqtList = new ArrayList<>();
 
     for(int i = 0; i < CONCURRENT_READ_THREADS; i++)
       sqtList.add(new SimpleQueryThread());
@@ -65,7 +65,7 @@ public class XQJConcurrencyTest extends XQJBaseTest {
       xqpe.executeCommand("OPEN xqj-concurrent-insert-test");
       xqpe.executeCommand("SET DEFAULTDB true");
 
-      HashMap<String, XQItem> docs = new HashMap<String, XQItem>();
+      HashMap<String, XQItem> docs = new HashMap<>();
 
       ThreadPoolExecutor tpe =
         new ThreadPoolExecutor(
@@ -74,7 +74,7 @@ public class XQJConcurrencyTest extends XQJBaseTest {
           new ArrayBlockingQueue<Runnable>(CONCURRENT_READ_THREADS),
           new ThreadPoolExecutor.CallerRunsPolicy());
 
-      ArrayList<Future<?>> futures = new ArrayList<Future<?>>();
+      ArrayList<Future<?>> futures = new ArrayList<>();
 
       for(int i = 0; i < DOCS_TO_INSERT; i++) {
         String uri = i + "-" + UUID.randomUUID().toString() + ".xml";

@@ -281,7 +281,7 @@ public final class HTTPPayload {
     // parse boundary, create helper arrays
     final byte[] bound = concat(DASHES, boundary(ext)), last = concat(bound, DASHES);
 
-    final HashMap<String, Value> map = new HashMap<String, Value>();
+    final HashMap<String, Value> map = new HashMap<>();
 
     final ByteList cont = new ByteList();
     int lines = -1;

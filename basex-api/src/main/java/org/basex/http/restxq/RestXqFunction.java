@@ -55,16 +55,16 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   /** Error. */
   RestXqError error;
   /** Query parameters. */
-  private final ArrayList<RestXqParam> errorParams = new ArrayList<RestXqParam>();
+  private final ArrayList<RestXqParam> errorParams = new ArrayList<>();
 
   /** Query parameters. */
-  final ArrayList<RestXqParam> queryParams = new ArrayList<RestXqParam>();
+  final ArrayList<RestXqParam> queryParams = new ArrayList<>();
   /** Form parameters. */
-  final ArrayList<RestXqParam> formParams = new ArrayList<RestXqParam>();
+  final ArrayList<RestXqParam> formParams = new ArrayList<>();
   /** Header parameters. */
-  final ArrayList<RestXqParam> headerParams = new ArrayList<RestXqParam>();
+  final ArrayList<RestXqParam> headerParams = new ArrayList<>();
   /** Cookie parameters. */
-  private final ArrayList<RestXqParam> cookieParams = new ArrayList<RestXqParam>();
+  private final ArrayList<RestXqParam> cookieParams = new ArrayList<>();
 
   /** Query context. */
   private final QueryContext context;
@@ -242,7 +242,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     }
 
     // convert parameters to XQuery values
-    final Map<String, Value> params = new HashMap<String, Value>();
+    final Map<String, Value> params = new HashMap<>();
     for(final Map.Entry<String, String[]> entry : http.params().entrySet()) {
       final String[] values = entry.getValue();
       final ValueBuilder vb = new ValueBuilder(values.length);
@@ -288,7 +288,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     }
 
     // bind errors
-    final Map<String, Value> errs = new HashMap<String, Value>();
+    final Map<String, Value> errs = new HashMap<>();
     if(err != null) {
       final Value[] values = Catch.values(err);
       for(int v = 0; v < Catch.NAMES.length; v++) {

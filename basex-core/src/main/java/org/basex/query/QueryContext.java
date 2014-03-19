@@ -53,7 +53,7 @@ public final class QueryContext extends Proc {
   /** Functions. */
   public final StaticFuncs funcs = new StaticFuncs();
   /** Externally bound variables. */
-  private final HashMap<QNm, Expr> bindings = new HashMap<QNm, Expr>();
+  private final HashMap<QNm, Expr> bindings = new HashMap<>();
 
   /** Parent query context. */
   private final QueryContext parentCtx;
@@ -72,7 +72,7 @@ public final class QueryContext extends Proc {
   /** Cached thesaurus files. */
   public HashMap<String, IO> thes;
   /** Global database options (will be reassigned after query execution). */
-  public final HashMap<Option<?>, Object> staticOpts = new HashMap<Option<?>, Object>();
+  public final HashMap<Option<?>, Object> staticOpts = new HashMap<>();
   /** Temporary query options (key/value pairs), supplied by option declarations. */
   public final StringList tempOpts = new StringList();
 

@@ -17,7 +17,7 @@ import org.basex.util.list.*;
  */
 abstract class JsonXmlConverter extends JsonConverter {
   /** Map from element name to a pair of all its nodes and the collective node type. */
-  private final TokenObjMap<TypeCache> names = new TokenObjMap<TypeCache>();
+  private final TokenObjMap<TypeCache> names = new TokenObjMap<>();
   /** Store types in root. */
   private final boolean merge;
   /** Include string type. */

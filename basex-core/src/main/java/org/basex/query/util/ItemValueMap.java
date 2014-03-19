@@ -45,7 +45,7 @@ public class ItemValueMap extends HashItemSet {
    * @return iterator
    */
   public final Iterable<Value> values() {
-    return new ArrayIterator<Value>(values, 1, size);
+    return new ArrayIterator<>(values, 1, size);
   }
 
   @Override

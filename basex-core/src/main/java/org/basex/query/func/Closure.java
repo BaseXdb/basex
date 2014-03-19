@@ -38,7 +38,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   private final boolean updating;
 
   /** Map with requested function properties. */
-  private final EnumMap<Flag, Boolean> map = new EnumMap<Flag, Boolean>(Flag.class);
+  private final EnumMap<Flag, Boolean> map = new EnumMap<>(Flag.class);
   /** Static context. */
   private final StaticContext sc;
   /** Compilation flag. */
@@ -136,7 +136,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       if(c instanceof Value) {
         @SuppressWarnings({ "unchecked", "rawtypes"})
         final Entry<Var, Value> e2 = (Entry) e;
-        if(propagate == null) propagate = new ArrayList<Entry<Var, Value>>();
+        if(propagate == null) propagate = new ArrayList<>();
         propagate.add(e2);
         cls.remove();
       }
@@ -228,7 +228,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   @Override
   public Expr copy(final QueryContext cx, final VarScope scp, final IntObjMap<Var> vs) {
     final VarScope v = scope.copy(cx, vs);
-    final HashMap<Var, Expr> nl = new HashMap<Var, Expr>();
+    final HashMap<Var, Expr> nl = new HashMap<>();
     for(final Entry<Var, Expr> e : nonLocal.entrySet()) {
       final Var var = vs.get(e.getKey().id);
       final Expr ex = e.getValue().copy(cx, scp, vs);
@@ -250,7 +250,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     // create let bindings for all variables
     final LinkedList<GFLWOR.Clause> cls =
         exprs.length == 0 && nonLocal.isEmpty() ? null : new LinkedList<GFLWOR.Clause>();
-    final IntObjMap<Var> vs = new IntObjMap<Var>();
+    final IntObjMap<Var> vs = new IntObjMap<>();
     for(int i = 0; i < args.length; i++) {
       final Var old = args[i], v = scp.newCopyOf(ctx, old);
       vs.put(old.id, v);
@@ -277,7 +277,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final Expr body;
     if(!nonLocal.isEmpty()) {
       // collect closure
-      final LinkedList<GFLWOR.Clause> cls = new LinkedList<GFLWOR.Clause>();
+      final LinkedList<GFLWOR.Clause> cls = new LinkedList<>();
       for(final Entry<Var, Expr> e : nonLocal.entrySet())
         cls.add(new Let(e.getKey(), e.getValue().value(ctx), false, ii));
       body = new GFLWOR(ii, cls, expr);

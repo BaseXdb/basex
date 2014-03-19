@@ -231,7 +231,7 @@ public final class IdPreMapTest {
      */
     DummyIdPreMap(final int[] i) {
       super(i.length - 1);
-      ids = new ArrayList<Integer>(i.length);
+      ids = new ArrayList<>(i.length);
       for(final int id : i) ids.add(id);
     }
 

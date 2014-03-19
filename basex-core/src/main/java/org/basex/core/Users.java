@@ -21,7 +21,7 @@ import org.basex.util.list.*;
  */
 public final class Users {
   /** User array. */
-  private final ArrayList<User> list = new ArrayList<User>(0);
+  private final ArrayList<User> list = new ArrayList<>(0);
   /** Filename; set to {@code null} if the instance handles local users. */
   private IOFile file;
 
@@ -202,7 +202,7 @@ public final class Users {
    * @return user information
    */
   public synchronized User[] users(final Users users) {
-    final ArrayList<User> al = new ArrayList<User>();
+    final ArrayList<User> al = new ArrayList<>();
     for(final User user : list) {
       if(users == null || users.get(user.name) != null) al.add(user);
     }

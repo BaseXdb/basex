@@ -346,8 +346,8 @@ public final class DiskData extends Data {
 
   @Override
   protected void indexBegin() {
-    txts = new TokenObjMap<IntList>();
-    atvs = new TokenObjMap<IntList>();
+    txts = new TokenObjMap<>();
+    atvs = new TokenObjMap<>();
   }
 
   @Override
@@ -397,8 +397,8 @@ public final class DiskData extends Data {
     if(!(meta.textindex || meta.attrindex)) return;
 
     // collect all keys and ids
-    txts = new TokenObjMap<IntList>();
-    atvs = new TokenObjMap<IntList>();
+    txts = new TokenObjMap<>();
+    atvs = new TokenObjMap<>();
     final int l = pre + size;
     for(int p = pre; p < l; ++p) {
       final int k = kind(p);

@@ -26,7 +26,7 @@ public final class ModuleLoader {
   /** Default class loader. */
   private static final ClassLoader LOADER = Thread.currentThread().getContextClassLoader();
   /** Cached URLs to be added to the class loader. */
-  private final ArrayList<URL> urls = new ArrayList<URL>();
+  private final ArrayList<URL> urls = new ArrayList<>();
   /** Current class loader. */
   private ClassLoader loader = LOADER;
   /** Java modules. */
@@ -221,14 +221,14 @@ public final class ModuleLoader {
     if(jm == null) throw INSTERR.get(ii, cp);
 
     // add all public methods of the class (ignore methods from super classes)
-    final ArrayList<Method> list = new ArrayList<Method>();
+    final ArrayList<Method> list = new ArrayList<>();
     for(final Method m : clz.getMethods()) {
       // if class is inherited from {@link QueryModule}, no super methods are accepted
       if(!qm || m.getDeclaringClass() == clz) list.add(m);
     }
 
     // add class and its methods to module cache
-    if(javaModules == null) javaModules = new HashMap<Object, ArrayList<Method>>();
+    if(javaModules == null) javaModules = new HashMap<>();
     javaModules.put(jm, list);
   }
 

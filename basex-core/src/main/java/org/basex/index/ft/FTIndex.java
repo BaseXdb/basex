@@ -51,7 +51,7 @@ public final class FTIndex implements Index {
   private static final int ENTRY = 9;
 
   /** Cached texts. Increases used memory, but speeds up repeated queries. */
-  private final IntObjMap<byte[]> ctext = new IntObjMap<byte[]>();
+  private final IntObjMap<byte[]> ctext = new IntObjMap<>();
   /** Levenshtein reference. */
   private final Levenshtein ls = new Levenshtein();
   /** Data reference. */

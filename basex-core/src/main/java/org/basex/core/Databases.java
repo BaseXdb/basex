@@ -88,7 +88,7 @@ public final class Databases {
 
     final IOFile[] children = gopts.dbpath().children();
     final StringList list = new StringList(children.length);
-    final HashSet<String> map = new HashSet<String>(children.length);
+    final HashSet<String> map = new HashSet<>(children.length);
     for(final IOFile f : children) {
       final String fn = f.name();
       String add = null;

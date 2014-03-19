@@ -69,7 +69,7 @@ public class TreeFolder extends TreeNode {
    */
   public int addLeaves(final byte[] filter, final int cmax, final TreeFolder target) {
     final TokenBoolMap tbm = data.resources.children(subfolder(), false);
-    final List<byte[]> keys = new ArrayList<byte[]>(tbm.size());
+    final List<byte[]> keys = new ArrayList<>(tbm.size());
 
     // get desired leaves, depending on the given filter
     for(final byte[] b : tbm) {

@@ -18,7 +18,7 @@ public class BaseXClient {
   /** UTF-8 charset. */
   static final Charset UTF8 = Charset.forName("UTF-8");
   /** Event notifications. */
-  final Map<String, EventNotifier> notifiers = new HashMap<String, EventNotifier>();
+  final Map<String, EventNotifier> notifiers = new HashMap<>();
   /** Output stream. */
   final OutputStream out;
   /** Socket. */
@@ -390,7 +390,7 @@ public class BaseXClient {
       if(cache == null) {
         out.write(4);
         send(id);
-        cache = new ArrayList<byte[]>();
+        cache = new ArrayList<>();
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         while(in.read() > 0) {
           receive(in, os);

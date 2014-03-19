@@ -29,11 +29,11 @@ public class Options implements Iterable<Option<?>> {
   private static final String PROPUSER = "# Local Options";
 
   /** Map with option names and definition. */
-  protected final TreeMap<String, Option<?>> options = new TreeMap<String, Option<?>>();
+  protected final TreeMap<String, Option<?>> options = new TreeMap<>();
   /** Map with option names and values. */
-  private final TreeMap<String, Object> values = new TreeMap<String, Object>();
+  private final TreeMap<String, Object> values = new TreeMap<>();
   /** Free option definitions. */
-  private final HashMap<String, String> free = new HashMap<String, String>();
+  private final HashMap<String, String> free = new HashMap<>();
   /** Options, cached from an input file. */
   private final StringBuilder user = new StringBuilder();
 
@@ -446,7 +446,7 @@ public class Options implements Iterable<Option<?>> {
   public static Option<?>[] options(final Class<? extends Options> clz)
       throws IllegalAccessException {
 
-    final ArrayList<Option<?>> opts = new ArrayList<Option<?>>();
+    final ArrayList<Option<?>> opts = new ArrayList<>();
     for(final Field f : clz.getFields()) {
       if(!Modifier.isStatic(f.getModifiers())) continue;
       final Object obj = f.get(null);

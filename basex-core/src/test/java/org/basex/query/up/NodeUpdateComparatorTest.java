@@ -503,9 +503,9 @@ public class NodeUpdateComparatorTest extends AdvancedQueryTest {
    * primitive is the first to be executed, hence has the highest score)
    */
   private static void compare(final NodeUpdate[] order) {
-    final List<NodeUpdate> l = new ArrayList<NodeUpdate>();
+    final List<NodeUpdate> l = new ArrayList<>();
     Collections.addAll(l, order);
-    final List<NodeUpdate> l2 = new ArrayList<NodeUpdate>();
+    final List<NodeUpdate> l2 = new ArrayList<>();
     for(final NodeUpdate p : order) l2.add(0, p);
 
     // primitives are sorted ASCENDING

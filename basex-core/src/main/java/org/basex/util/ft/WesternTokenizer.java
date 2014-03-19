@@ -16,7 +16,7 @@ import org.basex.util.list.*;
  */
 public final class WesternTokenizer extends Tokenizer {
   /** Supported languages. */
-  private static final HashSet<Language> SUPPORTED = new HashSet<Language>();
+  private static final HashSet<Language> SUPPORTED = new HashSet<>();
 
   static {
     final String[] nonw = { "ar", "ja", "ko", "th", "zh" };

@@ -32,7 +32,7 @@ abstract class LanguageImpl extends FTIterator implements Comparable<LanguageImp
    * @return collection
    */
   static Collection<Language> collection(final String ln) {
-    final HashSet<Language> coll = new HashSet<Language>();
+    final HashSet<Language> coll = new HashSet<>();
     final Language lang = Language.get(ln);
     if(lang != null) coll.add(lang);
     return coll;

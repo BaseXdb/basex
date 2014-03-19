@@ -32,7 +32,7 @@ public abstract class QT3TestSet {
   public Context ctx;
 
   /** Expected results. */
-  public final ArrayList<String> expected = new ArrayList<String>();
+  public final ArrayList<String> expected = new ArrayList<>();
 
   /** QT3TS path, possibly {@code null}. */
   public static final String QT3TS = System.getenv("QT3TS");
@@ -135,10 +135,10 @@ public abstract class QT3TestSet {
     final XdmValue value = result.value;
     if(value == null) return fail(Util.info("Permutation of: '%'", expect));
     // cache expected results
-    final HashSet<String> exp = new HashSet<String>();
+    final HashSet<String> exp = new HashSet<>();
     for(final XdmItem it : new XQuery(expect, ctx)) exp.add(it.getString());
     // cache actual results
-    final HashSet<String> res = new HashSet<String>();
+    final HashSet<String> res = new HashSet<>();
     for(final XdmItem it : value) res.add(it.getString());
 
     if(exp.size() != res.size())

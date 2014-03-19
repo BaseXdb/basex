@@ -43,9 +43,9 @@ final class DBOptions {
   }
 
   /** New options. */
-  protected final HashMap<Option<?>, Object> nprops = new HashMap<Option<?>, Object>();
+  protected final HashMap<Option<?>, Object> nprops = new HashMap<>();
   /** Original options. */
-  private final HashMap<Option<?>, Object> oprops = new HashMap<Option<?>, Object>();
+  private final HashMap<Option<?>, Object> oprops = new HashMap<>();
   /** Optimization options. */
   protected final HashMap<String, String> options;
   /** Query context. */

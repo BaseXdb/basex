@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
  */
 public final class FNFormat extends StandardFunc {
   /** Pattern cache. */
-  private final TokenObjMap<FormatParser> formats = new TokenObjMap<FormatParser>();
+  private final TokenObjMap<FormatParser> formats = new TokenObjMap<>();
 
   /**
    * Constructor.

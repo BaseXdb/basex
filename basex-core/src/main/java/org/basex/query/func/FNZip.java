@@ -421,7 +421,7 @@ public final class FNZip extends StandardFunc {
     // traverse all zip entries and create intermediate map,
     // as zip entries are not sorted
     //final StringList paths = new StringList();
-    final TreeSet<String> paths = new TreeSet<String>();
+    final TreeSet<String> paths = new TreeSet<>();
 
     final Enumeration<? extends ZipEntry> en = zf.entries();
     // loop through all files

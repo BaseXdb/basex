@@ -74,9 +74,9 @@ public class QueryParser extends InputParser {
   /** Modules loaded by the current file. */
   public final TokenSet modules = new TokenSet();
   /** Parsed variables. */
-  public final ArrayList<StaticVar> vars = new ArrayList<StaticVar>();
+  public final ArrayList<StaticVar> vars = new ArrayList<>();
   /** Parsed functions. */
-  public final ArrayList<StaticFunc> funcs = new ArrayList<StaticFunc>();
+  public final ArrayList<StaticFunc> funcs = new ArrayList<>();
   /** Namespaces. */
   public final TokenMap namespaces = new TokenMap();
 
@@ -103,13 +103,11 @@ public class QueryParser extends InputParser {
   private int alterPos;
 
   /** Declared flags. */
-  private final HashSet<String> decl = new HashSet<String>();
-
+  private final HashSet<String> decl = new HashSet<>();
   /** Cached QNames. */
-  private final ArrayList<QNmCheck> names = new ArrayList<QNmCheck>();
-
+  private final ArrayList<QNmCheck> names = new ArrayList<>();
   /** Stack of variable contexts. */
-  private final ArrayList<VarContext> localVars = new ArrayList<VarContext>();
+  private final ArrayList<VarContext> localVars = new ArrayList<>();
 
   /**
    * Constructor.
@@ -1010,7 +1008,7 @@ public class QueryParser extends InputParser {
     final LinkedList<Clause> clauses = initialClause(null);
     if(clauses == null) return null;
 
-    final TokenObjMap<Var> curr = new TokenObjMap<Var>();
+    final TokenObjMap<Var> curr = new TokenObjMap<>();
     for(final Clause fl : clauses)
       for(final Var v : fl.vars()) curr.put(v.name.id(), v);
 
@@ -1036,7 +1034,7 @@ public class QueryParser extends InputParser {
         final GroupBy.Spec[] specs = groupSpecs(clauses);
 
         // find all non-grouping variables that aren't shadowed
-        final ArrayList<VarRef> ng = new ArrayList<VarRef>();
+        final ArrayList<VarRef> ng = new ArrayList<>();
         for(final GroupBy.Spec spec : specs) curr.put(spec.var.name.id(), spec.var);
         vars:
         for(final Var v : curr.values()) {
@@ -1108,14 +1106,14 @@ public class QueryParser extends InputParser {
     // ForClause / LetClause
     final boolean let = wsConsumeWs(LET, SCORE, NOLET) || wsConsumeWs(LET, DOLLAR, NOLET);
     if(let || wsConsumeWs(FOR, DOLLAR, NOFOR)) {
-      if(cls == null) cls = new LinkedList<Clause>();
+      if(cls == null) cls = new LinkedList<>();
       if(let) letClause(cls);
       else    forClause(cls);
     } else if(sc.xquery3()) {
       // WindowClause
       final boolean slide = wsConsumeWs(FOR, SLIDING, NOWINDOW);
       if(slide || wsConsumeWs(FOR, TUMBLING, NOWINDOW)) {
-        if(cls == null) cls = new LinkedList<Clause>();
+        if(cls == null) cls = new LinkedList<>();
         cls.add(windowClause(slide));
       }
     }
@@ -1375,7 +1373,7 @@ public class QueryParser extends InputParser {
     wsCheck(PAR2);
 
     TypeCase[] cases = { };
-    final ArrayList<SeqType> types = new ArrayList<SeqType>();
+    final ArrayList<SeqType> types = new ArrayList<>();
     final int s = openSubScope();
     boolean cs;
     do {
@@ -1741,7 +1739,7 @@ public class QueryParser extends InputParser {
   private Pragma[] pragma() throws QueryException {
     if(!wsConsumeWs(PRAGMA)) return null;
 
-    final ArrayList<Pragma> el = new ArrayList<Pragma>();
+    final ArrayList<Pragma> el = new ArrayList<>();
     do {
       final QNm name = eQName(QNAMEINV, URICHECK);
       char c = curr();
@@ -2120,7 +2118,7 @@ public class QueryParser extends InputParser {
         if(!sc.mixUpdates && ann.contains(Ann.Q_UPDATING)) throw error(UPFUNCITEM);
         if(ann.contains(Ann.Q_PRIVATE) || ann.contains(Ann.Q_PUBLIC)) throw error(INVISIBLE);
       }
-      final HashMap<Var, Expr> nonLocal = new HashMap<Var, Expr>();
+      final HashMap<Var, Expr> nonLocal = new HashMap<>();
       pushVarContext(nonLocal);
       final Var[] args = paramList();
       wsCheck(PAR2);
@@ -2464,7 +2462,7 @@ public class QueryParser extends InputParser {
         }
       } else {
         final QNm attn = new QNm(atn);
-        if(atts == null) atts = new ArrayList<QNm>(1);
+        if(atts == null) atts = new ArrayList<>(1);
         atts.add(attn);
         names.add(new QNmCheck(attn, false));
         add(cont, new CAttr(sc, info(), false, attn, attv.finish()));

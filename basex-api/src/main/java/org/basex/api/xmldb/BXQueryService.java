@@ -23,7 +23,7 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
   static final String XQUERY = "XQueryQueryService";
 
   /** Namespaces. */
-  private final HashMap<String, String> ns = new HashMap<String, String>();
+  private final HashMap<String, String> ns = new HashMap<>();
   /** Service name. */
   private final String name;
   /** Service version. */

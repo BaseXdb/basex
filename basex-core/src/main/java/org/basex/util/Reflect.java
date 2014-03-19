@@ -12,11 +12,11 @@ import java.util.*;
  */
 public final class Reflect {
   /** Cached constructors. */
-  private static final HashMap<String, Constructor<?>> CONS = new HashMap<String, Constructor<?>>();
+  private static final HashMap<String, Constructor<?>> CONS = new HashMap<>();
   /** Cached classes. */
-  private static final HashMap<String, Class<?>> CLASSES = new HashMap<String, Class<?>>();
+  private static final HashMap<String, Class<?>> CLASSES = new HashMap<>();
   /** Cached fields. */
-  private static final HashMap<String, Field> FIELDS = new HashMap<String, Field>();
+  private static final HashMap<String, Field> FIELDS = new HashMap<>();
 
   /** Hidden constructor. */
   private Reflect() { }

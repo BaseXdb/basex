@@ -31,8 +31,7 @@ public final class ClientListener extends Thread {
   public long last;
 
   /** Active queries. */
-  private final HashMap<String, QueryListener> queries =
-    new HashMap<String, QueryListener>();
+  private final HashMap<String, QueryListener> queries = new HashMap<>();
   /** Performance measurement. */
   private final Performance perf = new Performance();
   /** Database context. */

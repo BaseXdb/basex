@@ -128,7 +128,7 @@ public abstract class Compare {
    */
   private static String execute(final String[] proc) {
     try {
-      final ArrayList<String> al = new ArrayList<String>();
+      final ArrayList<String> al = new ArrayList<>();
       al.addAll(Arrays.asList(proc).subList(1, proc.length));
 
       final ProcessBuilder pb = new ProcessBuilder(al);

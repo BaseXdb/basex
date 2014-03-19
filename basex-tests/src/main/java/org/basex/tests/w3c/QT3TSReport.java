@@ -55,7 +55,7 @@ public final class QT3TSReport {
   private static final String URI = "http://www.w3.org/2012/08/qt-fots-results";
   /** List of test sets and test cases (test sets only consist of a name; test cases
    * consist of a name and a result (pass/fail). */
-  private final ArrayList<String[]> tests = new ArrayList<String[]>();
+  private final ArrayList<String[]> tests = new ArrayList<>();
 
   /**
    * Adds the name of a test set.

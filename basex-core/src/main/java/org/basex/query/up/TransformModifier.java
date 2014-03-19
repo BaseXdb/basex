@@ -22,7 +22,7 @@ public final class TransformModifier extends ContextModifier {
    * clause of this transform expression will cause a query exception
    * (XUDY0014) if the data reference of the corresponding target node is not
    * part of this set, hence the target node has not been copied. */
-  private final Set<Data> refs = new HashSet<Data>();
+  private final Set<Data> refs = new HashSet<>();
 
   /**
    * Adds a data reference to list which keeps track of the nodes copied

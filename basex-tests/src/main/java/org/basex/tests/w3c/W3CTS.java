@@ -87,11 +87,11 @@ public abstract class W3CTS {
   private String group;
 
   /** Cached source files. */
-  private final HashMap<String, String> srcs = new HashMap<String, String>();
+  private final HashMap<String, String> srcs = new HashMap<>();
   /** Cached module files. */
-  private final HashMap<String, String> mods = new HashMap<String, String>();
+  private final HashMap<String, String> mods = new HashMap<>();
   /** Cached collections. */
-  private final HashMap<String, String[]> colls = new HashMap<String, String[]>();
+  private final HashMap<String, String[]> colls = new HashMap<>();
 
   /** OK log. */
   private final StringBuilder logOK = new StringBuilder();

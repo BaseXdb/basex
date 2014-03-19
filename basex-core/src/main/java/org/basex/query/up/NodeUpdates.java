@@ -15,7 +15,7 @@ import org.basex.query.up.primitives.*;
  */
 final class NodeUpdates {
   /** Container for update primitives. */
-  List<NodeUpdate> updates = new ArrayList<NodeUpdate>(1);
+  List<NodeUpdate> updates = new ArrayList<>(1);
 
   /**
    * Adds an update to this container.
@@ -82,7 +82,7 @@ final class NodeUpdates {
    * This method can only be once, as the internal update list will eventually be removed.
    */
   List<NodeUpdate> finish() {
-    List<NodeUpdate> primnew = new ArrayList<NodeUpdate>();
+    List<NodeUpdate> primnew = new ArrayList<>();
 
     /* Check if target node T is deleted and remove superfluous primitives. */
     final DeleteNode del = (DeleteNode) find(DELETENODE);

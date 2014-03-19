@@ -85,7 +85,7 @@ public final class QT3TS {
   /** Database context. */
   protected final Context ctx = new Context();
   /** Global environments. */
-  private final ArrayList<QT3Env> genvs = new ArrayList<QT3Env>();
+  private final ArrayList<QT3Env> genvs = new ArrayList<>();
 
   /**
    * Main method of the test class.
@@ -192,7 +192,7 @@ public final class QT3TS {
 
     if(supported(set)) {
       // parse environment of test-set
-      final ArrayList<QT3Env> envs = new ArrayList<QT3Env>();
+      final ArrayList<QT3Env> envs = new ArrayList<>();
       for(final XdmItem ienv : new XQuery("*:environment", ctx).context(set))
         envs.add(new QT3Env(ctx, ienv));
 
@@ -294,7 +294,7 @@ public final class QT3TS {
         }
       }
     }
-    
+
     final XQuery query = new XQuery(string, ctx);
     if(base) query.baseURI(baseURI);
 
@@ -638,11 +638,11 @@ public final class QT3TS {
    */
   private String assertPermutation(final XdmValue value, final XdmValue expect) {
     // cache expected results
-    final HashSet<String> exp = new HashSet<String>();
+    final HashSet<String> exp = new HashSet<>();
     for(final XdmItem it : new XQuery(expect.getString(), ctx))
       exp.add(it.getString());
     // cache actual results
-    final HashSet<String> res = new HashSet<String>();
+    final HashSet<String> res = new HashSet<>();
     for(final XdmItem it : value) res.add(it.getString());
 
     if(exp.size() != res.size())
@@ -907,7 +907,7 @@ public final class QT3TS {
         } else if(c == 'r') {
           report = new QT3TSReport();
         } else if(c == 's') {
-          slow = new TreeMap<Long, String>();
+          slow = new TreeMap<>();
         } else if(c == 'p') {
           final File f = new File(arg.string());
           if(!f.isDirectory()) throw arg.usage();
@@ -928,7 +928,7 @@ public final class QT3TS {
    */
   @SuppressWarnings("unchecked")
   private static void init() {
-    final Map<String, String> ne = new HashMap<String, String>();
+    final Map<String, String> ne = new HashMap<>();
     ne.put("QTTEST", "42");
     ne.put("QTTEST2", "other");
     ne.put("QTTESTEMPTY", "");

@@ -216,7 +216,7 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
 
   @Override
   public Iterator<byte[]> iterator() {
-    return new ArrayIterator<byte[]>(list, size);
+    return new ArrayIterator<>(list, size);
   }
 
   @Override

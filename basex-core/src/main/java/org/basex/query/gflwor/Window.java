@@ -189,7 +189,7 @@ public final class Window extends Clause {
   private Eval slidingEval(final Eval sub) {
     return new WindowEval() {
       /** Queue holding the items of the current window. */
-      private final ArrayDeque<Item> queue = new ArrayDeque<Item>();
+      private final ArrayDeque<Item> queue = new ArrayDeque<>();
       @Override
       public boolean next(final QueryContext ctx) throws QueryException {
         while(true) {

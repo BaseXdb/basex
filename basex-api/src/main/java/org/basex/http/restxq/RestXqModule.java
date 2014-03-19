@@ -19,7 +19,7 @@ import org.basex.query.func.*;
  */
 final class RestXqModule {
   /** Supported methods. */
-  private final ArrayList<RestXqFunction> functions = new ArrayList<RestXqFunction>();
+  private final ArrayList<RestXqFunction> functions = new ArrayList<>();
   /** File reference. */
   private final IOFile file;
   /** Library module flag. */

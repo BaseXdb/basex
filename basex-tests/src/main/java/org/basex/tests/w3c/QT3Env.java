@@ -78,14 +78,14 @@ final class QT3Env {
     for(final XdmItem iatt : new XQuery("*:collection/*:source/@file", ctx).context(env))
       collSources.add(iatt.getString());
 
-    decFormats = new HashMap<QName, HashMap<String, String>>();
+    decFormats = new HashMap<>();
     for(final XdmItem it : new XQuery("*:decimal-format", ctx).context(env)) {
       final XdmValue it1 = new XQuery(
         "for $n in @name " +
         "let $b := substring-before($n, ':') " +
         "return QName(if($b) then namespace-uri-for-prefix($b, .) else '', $n)",
         ctx).context(it).value();
-      final HashMap<String, String> hm = new HashMap<String, String>();
+      final HashMap<String, String> hm = new HashMap<>();
       final QNm qnm = it1.size() != 0 ? (QNm) it1.internal() : new QNm(Token.EMPTY);
       decFormats.put(qnm.toJava(), hm);
       for(final XdmItem it2 : new XQuery("@*[name() != 'name']", ctx).context(it)) {
@@ -107,8 +107,7 @@ final class QT3Env {
   static ArrayList<HashMap<String, String>> list(final Context ctx, final XdmValue env,
       final String elem) {
 
-    final ArrayList<HashMap<String, String>> list =
-        new ArrayList<HashMap<String, String>>();
+    final ArrayList<HashMap<String, String>> list = new ArrayList<>();
     for(final XdmItem it : new XQuery("*:" + elem, ctx).context(env)) {
       list.add(map(ctx, it));
     }
@@ -122,7 +121,7 @@ final class QT3Env {
    * @return map
    */
   static HashMap<String, String> map(final Context ctx, final XdmValue env) {
-    final HashMap<String, String> map = new HashMap<String, String>();
+    final HashMap<String, String> map = new HashMap<>();
     for(final XdmItem it : new XQuery("@*", ctx).context(env))
       map.put(it.getName().getLocalPart(), it.getString());
     return map;

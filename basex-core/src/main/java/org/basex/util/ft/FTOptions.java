@@ -10,10 +10,10 @@ import org.basex.util.options.*;
  */
 public final class FTOptions extends FTIndexOptions {
   /** Option: case. */
-  public static final EnumOption<FTCase> CASE = new EnumOption<FTCase>("case", FTCase.class);
+  public static final EnumOption<FTCase> CASE = new EnumOption<>("case", FTCase.class);
   /** Option: case. */
   public static final EnumOption<FTDiacritics> DIACRITICS =
-      new EnumOption<FTDiacritics>("diacritics", FTDiacritics.INSENSITIVE);
+      new EnumOption<>("diacritics", FTDiacritics.INSENSITIVE);
   /** Option: stemming. */
   public static final BooleanOption STEMMING = new BooleanOption("stemming", false);
   /** Option: language. */

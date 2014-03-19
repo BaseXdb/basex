@@ -267,7 +267,7 @@ public final class FNArchive extends StandardFunc {
   private B64 update(final QueryContext ctx) throws QueryException {
     final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
     // entries to be updated
-    final TokenObjMap<Item[]> hm = new TokenObjMap<Item[]>();
+    final TokenObjMap<Item[]> hm = new TokenObjMap<>();
 
     final Iter entr = ctx.iter(expr[1]);
     final Iter cont = ctx.iter(expr[2]);
@@ -318,7 +318,7 @@ public final class FNArchive extends StandardFunc {
   private B64 delete(final QueryContext ctx) throws QueryException {
     final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
     // entries to be deleted
-    final TokenObjMap<Item[]> hm = new TokenObjMap<Item[]>();
+    final TokenObjMap<Item[]> hm = new TokenObjMap<>();
     final Iter names = ctx.iter(expr[1]);
     for(Item en; (en = names.next()) != null;) {
       hm.put(checkElmStr(en).string(info), null);

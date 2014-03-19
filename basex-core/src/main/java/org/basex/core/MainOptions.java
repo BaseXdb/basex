@@ -34,19 +34,19 @@ public final class MainOptions extends Options {
   public static final BooleanOption ADDCACHE = new BooleanOption("ADDCACHE", false);
   /** Define CSV parser options. */
   public static final OptionsOption<CsvParserOptions> CSVPARSER =
-      new OptionsOption<CsvParserOptions>("CSVPARSER", new CsvParserOptions());
+      new OptionsOption<>("CSVPARSER", new CsvParserOptions());
   /** Define text parser options. */
   public static final OptionsOption<TextOptions> TEXTPARSER =
-      new OptionsOption<TextOptions>("TEXTPARSER", new TextOptions());
+      new OptionsOption<>("TEXTPARSER", new TextOptions());
   /** Define JSON parser options. */
   public static final OptionsOption<JsonParserOptions> JSONPARSER =
-      new OptionsOption<JsonParserOptions>("JSONPARSER", new JsonParserOptions());
+      new OptionsOption<>("JSONPARSER", new JsonParserOptions());
   /** Define TagSoup HTML options. */
   public static final OptionsOption<HtmlOptions> HTMLPARSER =
-      new OptionsOption<HtmlOptions>("HTMLPARSER", new HtmlOptions());
+      new OptionsOption<>("HTMLPARSER", new HtmlOptions());
   /** Define import parser. */
   public static final EnumOption<MainParser> PARSER =
-      new EnumOption<MainParser>("PARSER", MainParser.XML);
+      new EnumOption<>("PARSER", MainParser.XML);
 
   // XML Parsing
 
@@ -133,10 +133,10 @@ public final class MainOptions extends Options {
   public static final BooleanOption SERIALIZE = new BooleanOption("SERIALIZE", true);
   /** Serialization parameters. */
   public static final OptionsOption<SerializerOptions> SERIALIZER =
-      new OptionsOption<SerializerOptions>("SERIALIZER", new SerializerOptions());
+      new OptionsOption<>("SERIALIZER", new SerializerOptions());
   /** Exporter serialization parameters. */
   public static final OptionsOption<SerializerOptions> EXPORTER =
-      new OptionsOption<SerializerOptions>("EXPORTER", new SerializerOptions());
+      new OptionsOption<>("EXPORTER", new SerializerOptions());
 
   /** Prints an XML plan. */
   public static final BooleanOption XMLPLAN = new BooleanOption("XMLPLAN", false);

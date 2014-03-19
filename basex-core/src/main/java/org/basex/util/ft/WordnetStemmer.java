@@ -100,7 +100,7 @@ final class WordnetStemmer extends Stemmer {
 
   @Override
   Collection<Language> languages() {
-    final HashSet<Language> ln = new HashSet<Language>();
+    final HashSet<Language> ln = new HashSet<>();
     ln.add(Language.get("en"));
     return ln;
   }

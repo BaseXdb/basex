@@ -46,7 +46,7 @@ final class RestXqWadl {
     final FElem resources = elem("resources", application).add("base", base);
 
     // create children
-    final TreeMap<String, FElem> map = new TreeMap<String, FElem>();
+    final TreeMap<String, FElem> map = new TreeMap<>();
     for(final RestXqModule mod : modules.values()) {
       for(final RestXqFunction func : mod.functions()) {
         if(func.path == null) continue;

@@ -79,7 +79,7 @@ final class Replace extends StructuralUpdate {
     // check for equal subtree size
     if(srcSize != trg.size(location, trg.kind(location))) return false;
 
-    final List<BasicUpdate> valueUpdates = new ArrayList<BasicUpdate>();
+    final List<BasicUpdate> valueUpdates = new ArrayList<>();
     for(int c = 0; c < srcSize; c++) {
       final int s = insseq.start + c;
       final int t = location + c;

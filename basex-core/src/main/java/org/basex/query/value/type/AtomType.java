@@ -832,7 +832,7 @@ public enum AtomType implements Type {
     if(t.instanceOf(this)) return this;
 
     if(t instanceof AtomType) {
-      final List<AtomType> arr = new ArrayList<AtomType>();
+      final List<AtomType> arr = new ArrayList<>();
       for(AtomType at = (AtomType) t; (at = at.par) != null;) arr.add(at);
       for(AtomType p = this; (p = p.par) != null;)
         if(arr.contains(p)) return p;

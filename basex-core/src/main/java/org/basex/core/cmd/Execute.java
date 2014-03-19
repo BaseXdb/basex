@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public class Execute extends Command {
   /** Commands to execute. */
-  final ArrayList<Command> list = new ArrayList<Command>();
+  final ArrayList<Command> list = new ArrayList<>();
   /** Error message. */
   String error;
 

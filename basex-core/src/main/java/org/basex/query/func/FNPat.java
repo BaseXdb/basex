@@ -26,7 +26,7 @@ import org.basex.util.list.*;
  */
 public final class FNPat extends StandardFunc {
   /** Pattern cache. */
-  private final TokenObjMap<Pattern> patterns = new TokenObjMap<Pattern>();
+  private final TokenObjMap<Pattern> patterns = new TokenObjMap<>();
 
   /** Slash pattern. */
   private static final Pattern SLASH = Pattern.compile("\\$");

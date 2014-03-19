@@ -19,7 +19,7 @@ import org.basex.util.*;
  */
 public final class DBRename extends DBUpdate {
   /** Source and target paths. */
-  private final HashMap<String, String> map = new HashMap<String, String>();
+  private final HashMap<String, String> map = new HashMap<>();
 
   /**
    * Constructor.

@@ -64,8 +64,8 @@ public final class AtomicUpdateCache {
    * @param d target data reference
    */
   public AtomicUpdateCache(final Data d) {
-    struct = new ArrayList<StructuralUpdate>();
-    val = new ArrayList<BasicUpdate>();
+    struct = new ArrayList<>();
+    val = new ArrayList<>();
     data = d;
   }
 
@@ -456,7 +456,7 @@ public final class AtomicUpdateCache {
    */
   private void resolveTextAdjacency() {
     // Text node merges are also gathered on a separate list to leverage optimizations.
-    final List<Delete> deletes = new LinkedList<Delete>();
+    final List<Delete> deletes = new LinkedList<>();
 
     // keep track of the visited locations to avoid superfluous checks
     int smallestVisited = Integer.MAX_VALUE;

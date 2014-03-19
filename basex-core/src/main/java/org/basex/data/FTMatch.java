@@ -81,7 +81,7 @@ public final class FTMatch extends ElementList implements Iterable<FTStringMatch
 
   @Override
   public Iterator<FTStringMatch> iterator() {
-    return new ArrayIterator<FTStringMatch>(match, size);
+    return new ArrayIterator<>(match, size);
   }
 
   @Override

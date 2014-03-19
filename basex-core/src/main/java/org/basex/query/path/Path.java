@@ -320,7 +320,7 @@ public abstract class Path extends ParseExpr {
       if(pn == null) continue;
 
       // cache child steps
-      final ArrayList<QNm> qnm = new ArrayList<QNm>();
+      final ArrayList<QNm> qnm = new ArrayList<>();
       while(pn.get(0).par != null) {
         QNm nm = new QNm(data.tagindex.key(pn.get(0).name));
         // skip children with prefixes
@@ -402,7 +402,7 @@ public abstract class Path extends ParseExpr {
 
       final int name = data.tagindex.id(curr.test.name.local());
 
-      final ArrayList<PathNode> al = new ArrayList<PathNode>();
+      final ArrayList<PathNode> al = new ArrayList<>();
       for(final PathNode pn : PathSummary.desc(in, desc)) {
         if(pn.kind == Data.ELEM && name == pn.name) {
           // skip test if a tag is found on different levels

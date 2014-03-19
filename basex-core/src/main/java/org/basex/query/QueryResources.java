@@ -28,7 +28,7 @@ import org.basex.util.list.*;
  */
 public final class QueryResources {
   /** Textual resources. */
-  public final HashMap<String, String[]> texts = new HashMap<String, String[]>();
+  public final HashMap<String, String[]> texts = new HashMap<>();
 
   /** Database context. */
   private final QueryContext qc;
@@ -40,8 +40,7 @@ public final class QueryResources {
   /** Module loader. */
   public final ModuleLoader modules;
   /** External resources. */
-  private HashMap<Class<? extends DataResources>, DataResources> external =
-      new HashMap<Class<? extends DataResources>, DataResources>();
+  private HashMap<Class<? extends DataResources>, DataResources> external = new HashMap<>();
 
   /** Pending output. */
   public final ValueBuilder output = new ValueBuilder();;

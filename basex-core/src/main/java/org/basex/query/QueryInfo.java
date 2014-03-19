@@ -149,7 +149,7 @@ public final class QueryInfo {
    * @return the string representation
    */
   private String usedDecls(final MainModule mod) {
-    final IdentityHashMap<Scope, Object> map = new IdentityHashMap<Scope, Object>();
+    final IdentityHashMap<Scope, Object> map = new IdentityHashMap<>();
     final StringBuilder sb = new StringBuilder();
     mod.visit(new ASTVisitor() {
       @Override

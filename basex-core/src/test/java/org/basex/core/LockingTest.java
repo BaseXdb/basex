@@ -38,7 +38,7 @@ public final class LockingTest extends SandboxTest {
    */
   @Parameters
   public static Collection<Object[]> generateParams() {
-    final List<Object[]> params = new ArrayList<Object[]>();
+    final List<Object[]> params = new ArrayList<>();
     for(int i = 1; i <= REPEAT; i++) {
       params.add(new Object[0]);
     }

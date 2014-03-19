@@ -19,8 +19,7 @@ final class SnowballStemmer extends Stemmer {
   /** Name of the package with all Snowball stemmers. */
   private static final String PATTERN = "org.tartarus.snowball.ext.%Stemmer";
   /** Stemmer classes which the Snowball library provides. */
-  private static final HashMap<Language, StemmerClass> CLASSES =
-      new HashMap<Language, StemmerClass>();
+  private static final HashMap<Language, StemmerClass> CLASSES = new HashMap<>();
 
   /** Stemmer class corresponding to the required properties. */
   private StemmerClass clazz;

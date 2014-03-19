@@ -45,7 +45,7 @@ public class SignatureTest extends AdvancedQueryTest {
     assertTrue(def + Arrays.toString(names),
         names.length == (def.max == Integer.MAX_VALUE ? def.min : def.max));
     // all variable names must be distinct
-    final Set<String> set = new HashSet<String>(Arrays.asList(names));
+    final Set<String> set = new HashSet<>(Arrays.asList(names));
     assertEquals("Duplicate argument names: " + def, names.length, set.size());
     // var-arg functions must have a number at the end
     if(def.max == Integer.MAX_VALUE) assertTrue(names[names.length - 1].matches(".*\\d+$"));

@@ -160,7 +160,7 @@ public final class MainModule extends StaticScope {
    */
   static class LockVisitor extends ASTVisitor {
     /** Already visited scopes. */
-    private final IdentityHashMap<Scope, Object> funcs = new IdentityHashMap<Scope, Object>();
+    private final IdentityHashMap<Scope, Object> funcs = new IdentityHashMap<>();
     /** List of databases to be locked. */
     private final StringList sl;
     /** Focus level. */

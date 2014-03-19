@@ -198,7 +198,7 @@ public class StringList extends ElementList implements Iterable<String> {
 
   @Override
   public final Iterator<String> iterator() {
-    return new ArrayIterator<String>(list, size);
+    return new ArrayIterator<>(list, size);
   }
 
   @Override

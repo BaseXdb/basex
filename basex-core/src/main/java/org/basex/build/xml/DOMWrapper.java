@@ -48,7 +48,7 @@ public final class DOMWrapper extends Parser {
   public void parse(final Builder builder) throws IOException {
     builder.openDoc(token(filename));
 
-    final Stack<NodeIterator> stack = new Stack<NodeIterator>();
+    final Stack<NodeIterator> stack = new Stack<>();
     stack.push(new NodeIterator(root));
 
     while(!stack.empty()) {

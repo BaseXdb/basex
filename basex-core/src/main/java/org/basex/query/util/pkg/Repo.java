@@ -22,7 +22,7 @@ public final class Repo {
 
   /** Namespace-dictionary with all namespaces (unique names) available
    * in the repository, and the packages in which they are found. */
-  private final TokenObjMap<TokenSet> nsDict = new TokenObjMap<TokenSet>();
+  private final TokenObjMap<TokenSet> nsDict = new TokenObjMap<>();
   /** Package dictionary with installed packages and their directories. */
   private final TokenMap pkgDict = new TokenMap();
   /** Repository path; will be initialized after first call. */

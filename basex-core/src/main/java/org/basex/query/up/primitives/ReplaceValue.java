@@ -96,7 +96,7 @@ public final class ReplaceValue extends NodeUpdate {
     final int k = data.kind(pre);
     // else substitute if target is an element
     if(rec) {
-      final List<NodeUpdate> l = new LinkedList<NodeUpdate>();
+      final List<NodeUpdate> l = new LinkedList<>();
       // add the primitive to catch forbidden primitive merges (same target node)
       l.add(this);
       // add the delete primitives for the child nodes of the target

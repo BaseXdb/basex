@@ -698,7 +698,7 @@ public abstract class Data {
     // loop through all entries
     final IntList preStack = new IntList();
     final NSNode nsRoot = nspaces.getCurrent();
-    final HashSet<NSNode> newNodes = new HashSet<NSNode>();
+    final HashSet<NSNode> newNodes = new HashSet<>();
     final IntList flagPres = new IntList();
 
     // indicates if database only contains a dummy node

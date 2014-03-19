@@ -15,7 +15,7 @@ import org.basex.util.options.*;
 public final class SerializerOptions extends Options {
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> BYTE_ORDER_MARK =
-      new EnumOption<YesNo>("byte-order-mark", YesNo.NO);
+      new EnumOption<>("byte-order-mark", YesNo.NO);
   /** Serialization parameter: list of QNames. */
   public static final StringOption CDATA_SECTION_ELEMENTS =
       new StringOption("cdata-section-elements", "");
@@ -30,13 +30,13 @@ public final class SerializerOptions extends Options {
       new StringOption("encoding", Token.UTF8);
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> ESCAPE_URI_ATTRIBUTES =
-      new EnumOption<YesNo>("escape-uri-attributes", YesNo.NO);
+      new EnumOption<>("escape-uri-attributes", YesNo.NO);
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> INCLUDE_CONTENT_TYPE =
-      new EnumOption<YesNo>("include-content-type", YesNo.NO);
+      new EnumOption<>("include-content-type", YesNo.NO);
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> INDENT =
-      new EnumOption<YesNo>("indent", YesNo.YES);
+      new EnumOption<>("indent", YesNo.YES);
   /** Serialization parameter. */
   public static final StringOption SUPPRESS_INDENTATION =
       new StringOption("suppress-indentation", "");
@@ -45,19 +45,19 @@ public final class SerializerOptions extends Options {
       new StringOption("media-type", "");
   /** Serialization parameter: xml/xhtml/html/text. */
   public static final EnumOption<SerialMethod> METHOD =
-      new EnumOption<SerialMethod>("method", SerialMethod.XML);
+      new EnumOption<>("method", SerialMethod.XML);
   /** Serialization parameter: NFC/NFD/NFKC/NKFD/fully-normalized/none. */
   public static final EnumOption<Norm> NORMALIZATION_FORM =
-      new EnumOption<Norm>("normalization-form", Norm.NFC);
+      new EnumOption<>("normalization-form", Norm.NFC);
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> OMIT_XML_DECLARATION =
-      new EnumOption<YesNo>("omit-xml-declaration", YesNo.YES);
+      new EnumOption<>("omit-xml-declaration", YesNo.YES);
   /** Serialization parameter: yes/no/omit. */
   public static final EnumOption<YesNoOmit> STANDALONE =
-      new EnumOption<YesNoOmit>("standalone", YesNoOmit.OMIT);
+      new EnumOption<>("standalone", YesNoOmit.OMIT);
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> UNDECLARE_PREFIXES =
-      new EnumOption<YesNo>("undeclare-prefixes", YesNo.NO);
+      new EnumOption<>("undeclare-prefixes", YesNo.NO);
   /** Serialization parameter. */
   public static final StringOption USE_CHARACTER_MAPS =
       new StringOption("use-character-maps", "");
@@ -76,14 +76,14 @@ public final class SerializerOptions extends Options {
 
   /** Specific serialization parameter: newline. */
   public static final EnumOption<Newline> NEWLINE =
-      new EnumOption<Newline>("newline",
+      new EnumOption<>("newline",
         "\r".equals(Prop.NL) ? Newline.CR : "\n".equals(Prop.NL) ? Newline.NL : Newline.CRNL);
   /** Specific serialization parameter: formatting. */
   public static final EnumOption<YesNo> FORMAT =
-      new EnumOption<YesNo>("format", YesNo.YES);
+      new EnumOption<>("format", YesNo.YES);
   /** Specific serialization parameter: indent with spaces or tabs. */
   public static final EnumOption<YesNo> TABULATOR =
-      new EnumOption<YesNo>("tabulator", YesNo.NO);
+      new EnumOption<>("tabulator", YesNo.NO);
   /** Specific serialization parameter: number of spaces to indent. */
   public static final NumberOption INDENTS =
       new NumberOption("indents", 2);
@@ -95,10 +95,10 @@ public final class SerializerOptions extends Options {
       new StringOption("wrap-uri", "");
   /** Specific serialization parameter. */
   public static final OptionsOption<CsvOptions> CSV =
-      new OptionsOption<CsvOptions>("csv", new CsvOptions());
+      new OptionsOption<>("csv", new CsvOptions());
   /** Specific serialization parameter. */
   public static final OptionsOption<JsonSerialOptions> JSON =
-      new OptionsOption<JsonSerialOptions>("json", new JsonSerialOptions());
+      new OptionsOption<>("json", new JsonSerialOptions());
   /** Specific serialization parameter: limit. */
   public static final NumberOption LIMIT =
       new NumberOption("limit", -1);

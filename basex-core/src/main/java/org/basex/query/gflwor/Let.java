@@ -217,7 +217,7 @@ public final class Let extends GFLWOR.Clause {
      * @param subEval sub-evaluator
      */
     LetEval(final Let let, final Eval subEval) {
-      lets = new ArrayList<Let>();
+      lets = new ArrayList<>();
       lets.add(let);
       sub = subEval;
     }

@@ -99,7 +99,7 @@ public final class FNUnit extends StandardFunc {
     final Unit unit = new Unit(ctx, info);
     if(expr.length == 0) return unit.test(sc);
 
-    final ArrayList<StaticFunc> funcs = new ArrayList<StaticFunc>();
+    final ArrayList<StaticFunc> funcs = new ArrayList<>();
     final Iter ir = ctx.iter(expr[0]);
     for(Item it; (it = ir.next()) != null;) {
       final FItem fi = checkFunc(it, ctx);
@@ -119,7 +119,7 @@ public final class FNUnit extends StandardFunc {
    */
   private Item testUris(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    final ArrayList<IO> inputs = new ArrayList<IO>();
+    final ArrayList<IO> inputs = new ArrayList<>();
     final Iter ir = ctx.iter(expr[0]);
     for(Item it; (it = ir.next()) != null;) inputs.add(checkPath(it, ctx));
     return new Suite(ctx, info).test(inputs);

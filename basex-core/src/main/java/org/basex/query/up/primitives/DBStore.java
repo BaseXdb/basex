@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
  */
 public final class DBStore extends DBUpdate {
   /** Keys. */
-  private final TokenObjMap<Object> map = new TokenObjMap<Object>();
+  private final TokenObjMap<Object> map = new TokenObjMap<>();
 
   /**
    * Constructor.

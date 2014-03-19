@@ -36,7 +36,7 @@ public final class BXResourceFactory implements ResourceFactory,
    */
   BXResourceFactory(final HTTPContext ht) throws LoginException {
     http = ht;
-    service = new WebDAVService<BXAbstractResource>(this, http);
+    service = new WebDAVService<>(this, http);
   }
 
   /**

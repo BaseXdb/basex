@@ -27,7 +27,7 @@ final class RESTGet {
    * @throws IOException I/O exception
    */
   public static RESTCmd get(final RESTSession rs) throws IOException {
-    final Map<String, String[]> vars = new HashMap<String, String[]>();
+    final Map<String, String[]> vars = new HashMap<>();
 
     // parse query string
     String op = null, input = null, value = null;

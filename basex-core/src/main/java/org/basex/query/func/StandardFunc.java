@@ -270,7 +270,7 @@ public abstract class StandardFunc extends Arr {
   protected final HashMap<String, Value> bindings(final int i, final QueryContext ctx)
       throws QueryException {
 
-    final HashMap<String, Value> hm = new HashMap<String, Value>();
+    final HashMap<String, Value> hm = new HashMap<>();
     final int es = expr.length;
     if(i < es) {
       final Map map = checkMap(checkItem(expr[i], ctx));

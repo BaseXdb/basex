@@ -26,7 +26,7 @@ final class BXResourceSet implements ResourceSet, BXXMLDBText {
    */
   BXResourceSet(final Result r, final Collection c) {
     // convert result into resource instances
-    res = new ArrayList<Resource>((int) r.size());
+    res = new ArrayList<>((int) r.size());
     for(int s = 0; s < r.size(); ++s) res.add(new BXXMLResource(r, s, c));
     coll = c;
   }

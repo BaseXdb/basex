@@ -46,7 +46,7 @@ public final class Unit {
    * @throws QueryException query exception
    */
   public FElem test(final StaticContext sc) throws QueryException {
-    final ArrayList<StaticFunc> funcs = new ArrayList<StaticFunc>();
+    final ArrayList<StaticFunc> funcs = new ArrayList<>();
     Collections.addAll(funcs, ctx.funcs.funcs());
     return test(sc, funcs);
   }
@@ -62,11 +62,11 @@ public final class Unit {
       throws QueryException {
     final FElem testsuite = new FElem(TESTSUITE).add(NAME, sc.baseURI().string());
 
-    final ArrayList<StaticFunc> before = new ArrayList<StaticFunc>(1);
-    final ArrayList<StaticFunc> after = new ArrayList<StaticFunc>(1);
-    final ArrayList<StaticFunc> beforeModule = new ArrayList<StaticFunc>(1);
-    final ArrayList<StaticFunc> afterModule = new ArrayList<StaticFunc>(1);
-    final ArrayList<StaticFunc> tests = new ArrayList<StaticFunc>(1);
+    final ArrayList<StaticFunc> before = new ArrayList<>(1);
+    final ArrayList<StaticFunc> after = new ArrayList<>(1);
+    final ArrayList<StaticFunc> beforeModule = new ArrayList<>(1);
+    final ArrayList<StaticFunc> afterModule = new ArrayList<>(1);
+    final ArrayList<StaticFunc> tests = new ArrayList<>(1);
 
     // loop through all functions
     final Performance p = new Performance();

@@ -32,7 +32,7 @@ public abstract class IdPreMapBulkTestBase {
     for(int i = 0; i < map.length; ++i) map[i] = i;
     basemap = new DummyIdPreMap(map);
     testedmap = new IdPreMap(baseid);
-    ops = new ArrayList<int[]>(baseid + opcount);
+    ops = new ArrayList<>(baseid + opcount);
   }
 
   /**
@@ -101,7 +101,7 @@ public abstract class IdPreMapBulkTestBase {
      */
     public DummyIdPreMap(final int[] list) {
       super(list.length - 1);
-      idlist = new ArrayList<Integer>(list.length);
+      idlist = new ArrayList<>(list.length);
       for(final int l : list) idlist.add(l);
     }
 

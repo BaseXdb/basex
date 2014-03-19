@@ -551,7 +551,7 @@ public final class TreeView extends View implements TreeConstants {
 
     int rn = 0;
     while(rn < roots.length) {
-      final LinkedList<Integer> marklink = new LinkedList<Integer>();
+      final LinkedList<Integer> marklink = new LinkedList<>();
       for(int i = 0; i < mark.length; ++i)
         marklink.add(i, mark[i]);
 

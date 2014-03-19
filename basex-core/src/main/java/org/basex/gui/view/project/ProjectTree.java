@@ -135,7 +135,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
    * @return selected node
    */
   private ArrayList<ProjectNode> selectedNodes() {
-    final ArrayList<ProjectNode> nodes = new ArrayList<ProjectNode>();
+    final ArrayList<ProjectNode> nodes = new ArrayList<>();
     final TreePath[] paths = getSelectionPaths();
     if(paths != null) {
       for(final TreePath tp : paths) {

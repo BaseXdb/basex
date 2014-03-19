@@ -680,7 +680,7 @@ public final class FNDb extends StandardFunc {
     }
 
     final int ps = paths.size();
-    final List<NewInput> inputs = new ArrayList<NewInput>(ps);
+    final List<NewInput> inputs = new ArrayList<>(ps);
     if(expr.length > 1) {
       final Value val = ctx.value(expr[1]);
       // number of specified inputs and paths must be identical

@@ -24,7 +24,7 @@ public final class Table {
   /** Alignment (false: left, true: right alignment). */
   public final BoolList align = new BoolList();
   /** Table contents. */
-  public final ArrayList<TokenList> contents = new ArrayList<TokenList>();
+  public final ArrayList<TokenList> contents = new ArrayList<>();
   /** Data description; if available, will be added as footer. */
   public String description;
 

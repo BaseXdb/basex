@@ -313,8 +313,8 @@ public final class WebDAVService<T> {
     final StringList result = execute(query);
     final int rs = result.size();
 
-    final HashSet<String> paths = new HashSet<String>();
-    final List<T> ch = new ArrayList<T>(rs / 5);
+    final HashSet<String> paths = new HashSet<>();
+    final List<T> ch = new ArrayList<>(rs / 5);
     for(int r = 0; r < rs; r += 5) {
       final boolean raw  = Boolean.parseBoolean(result.get(r));
       final String ctype = result.get(r + 1);
@@ -346,7 +346,7 @@ public final class WebDAVService<T> {
 
     final StringList result = execute(query);
     final int rs = result.size();
-    final List<T> dbs = new ArrayList<T>(rs >>> 1);
+    final List<T> dbs = new ArrayList<>(rs >>> 1);
     for(int r = 0; r < rs; r += 2) {
       final String name = result.get(r);
       final long mod = DateTime.parse(result.get(r + 1));

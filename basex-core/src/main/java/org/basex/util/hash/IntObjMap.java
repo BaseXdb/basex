@@ -41,7 +41,7 @@ public final class IntObjMap<E> extends IntSet {
    * @return iterator
    */
   public Iterable<E> values() {
-    return new ArrayIterator<E>(values, 1, size);
+    return new ArrayIterator<>(values, 1, size);
   }
 
   @Override

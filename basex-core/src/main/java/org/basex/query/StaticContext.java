@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
  */
 public final class StaticContext {
   /** Decimal formats. */
-  public final TokenObjMap<DecFormatter> decFormats = new TokenObjMap<DecFormatter>();
+  public final TokenObjMap<DecFormatter> decFormats = new TokenObjMap<>();
   /** Static and dynamic namespaces. */
   public final NSContext ns = new NSContext();
   /** Mix updates flag. */

@@ -108,7 +108,7 @@ public final class DialogPackages extends BaseXDialog {
     }
 
     final StringList pkgs = packages.getValues();
-    final ArrayList<Command> cmds = new ArrayList<Command>();
+    final ArrayList<Command> cmds = new ArrayList<>();
 
     if(cmp == install) {
       final String pp = gui.gopts.get(GUIOptions.WORKPATH);

@@ -35,7 +35,7 @@ public abstract class Formatter extends FormatUtil {
   /** Default language: English. */
   private static final byte[] EN = token("en");
   /** Formatter instances. */
-  private static final TokenObjMap<Formatter> MAP = new TokenObjMap<Formatter>();
+  private static final TokenObjMap<Formatter> MAP = new TokenObjMap<>();
 
   // initialize hash map with English formatter as default
   static {

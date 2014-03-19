@@ -10,7 +10,7 @@ import org.basex.util.options.*;
  */
 public class FTIndexOptions extends Options {
   /** Option: wildcards. */
-  public static final EnumOption<FTMode> MODE = new EnumOption<FTMode>("mode", FTMode.ANY);
+  public static final EnumOption<FTMode> MODE = new EnumOption<>("mode", FTMode.ANY);
   /** Option: fuzzy. */
   public static final BooleanOption FUZZY = new BooleanOption("fuzzy", false);
   /** Option: wildcards. */
@@ -19,14 +19,14 @@ public class FTIndexOptions extends Options {
   public static final BooleanOption ORDERED = new BooleanOption("ordered", false);
   /** Option: distance. */
   public static final OptionsOption<FTDistanceOptions> DISTANCE =
-      new OptionsOption<FTDistanceOptions>("distance", FTDistanceOptions.class);
+      new OptionsOption<>("distance", FTDistanceOptions.class);
   /** Option: window. */
   public static final OptionsOption<FTWindowOptions> WINDOW =
-      new OptionsOption<FTWindowOptions>("window", FTWindowOptions.class);
+      new OptionsOption<>("window", FTWindowOptions.class);
   /** Option: scope. */
   public static final OptionsOption<FTScopeOptions> SCOPE =
-      new OptionsOption<FTScopeOptions>("scope", FTScopeOptions.class);
+      new OptionsOption<>("scope", FTScopeOptions.class);
   /** Option: content. */
   public static final EnumOption<FTContents> CONTENT =
-      new EnumOption<FTContents>("content", FTContents.class);
+      new EnumOption<>("content", FTContents.class);
 }

@@ -77,7 +77,7 @@ final class RESTPost {
       }
 
       // handle variables
-      final Map<String, String[]> vars = new HashMap<String, String[]>();
+      final Map<String, String[]> vars = new HashMap<>();
       qp = new QueryProcessor("*/*:variable", ctx).context(doc);
       for(final Item it : qp.value()) {
         final String name = value("@name", it, ctx);

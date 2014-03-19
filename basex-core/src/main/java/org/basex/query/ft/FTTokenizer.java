@@ -23,9 +23,9 @@ final class FTTokenizer {
   final FTOpt opt;
 
   /** Wildcard object cache. */
-  private final TokenObjMap<FTWildcard> wcCache = new TokenObjMap<FTWildcard>();
+  private final TokenObjMap<FTWildcard> wcCache = new TokenObjMap<>();
   /** Token cache. */
-  private final TokenObjMap<FTTokens> cache = new TokenObjMap<FTTokens>();
+  private final TokenObjMap<FTTokens> cache = new TokenObjMap<>();
   /** Token comparator. */
   private final TokenComparator cmp;
   /** Levenshtein reference. */

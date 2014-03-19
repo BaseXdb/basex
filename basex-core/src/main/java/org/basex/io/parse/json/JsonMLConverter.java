@@ -22,7 +22,7 @@ import org.basex.util.*;
  */
 public class JsonMLConverter extends JsonXmlConverter {
   /** Element stack. */
-  private final Stack<FElem> stack = new Stack<FElem>();
+  private final Stack<FElem> stack = new Stack<>();
   /** Current attribute name. */
   private byte[] attName;
 

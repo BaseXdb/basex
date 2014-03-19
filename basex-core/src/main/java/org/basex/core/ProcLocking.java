@@ -18,7 +18,7 @@ import org.basex.util.list.*;
  */
 final class ProcLocking implements Locking {
   /** Queue for all waiting processes. */
-  private final LinkedList<Object> queue = new LinkedList<Object>();
+  private final LinkedList<Object> queue = new LinkedList<>();
   /** Mutex object. */
   private final Object mutex = new Object();
   /** Database context. */

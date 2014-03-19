@@ -87,7 +87,7 @@ public class HashItemSet extends ASet implements ItemSet {
 
   @Override
   public Iterator<Item> iterator() {
-    return new ArrayIterator<Item>(keys, 1, size);
+    return new ArrayIterator<>(keys, 1, size);
   }
 
   @Override

@@ -30,7 +30,7 @@ public final class SessionListener implements HttpSessionListener {
    * @return context;
    */
   public static synchronized HashMap<String, HttpSession> sessions() {
-    if(sessions == null) sessions = new HashMap<String, HttpSession>();
+    if(sessions == null) sessions = new HashMap<>();
     return sessions;
   }
 }

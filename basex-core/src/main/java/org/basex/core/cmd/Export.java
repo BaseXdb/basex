@@ -81,7 +81,7 @@ public final class Export extends Command {
     final IOFile root = new IOFile(path);
     root.md();
 
-    final HashSet<String> exported = new HashSet<String>();
+    final HashSet<String> exported = new HashSet<>();
 
     // XML documents
     final IntList il = data.resources.docs();

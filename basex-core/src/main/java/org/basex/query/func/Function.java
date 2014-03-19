@@ -1058,8 +1058,7 @@ public enum Function {
    * Mapping between function classes and namespace URIs.
    * If no mapping exists, {@link QueryText#FNURI} will be assumed as default mapping.
    */
-  public static final HashMap<Class<? extends StandardFunc>, byte[]> URIS =
-    new HashMap<Class<? extends StandardFunc>, byte[]>();
+  public static final HashMap<Class<? extends StandardFunc>, byte[]> URIS = new HashMap<>();
 
   // initialization of class/uri mappings and statically known modules
   static {

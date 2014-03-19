@@ -111,7 +111,7 @@ public final class Part4 extends Main {
     // Create and bind XQuery sequences
     info("Create and bind XQuery sequences");
 
-    List<Object> list = new ArrayList<Object>();
+    List<Object> list = new ArrayList<>();
     list.add(conn.createItemFromInt(1, null));
     list.add(conn.createItemFromInt(2, null));
     list.add(conn.createItemFromInt(3, null));

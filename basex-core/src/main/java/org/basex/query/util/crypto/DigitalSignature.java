@@ -188,9 +188,9 @@ public final class DigitalSignature {
         final PublicKey puk = x509ce.getPublicKey();
         final KeyInfoFactory kifactory = fac.getKeyInfoFactory();
         final KeyValue keyValue = kifactory.newKeyValue(puk);
-        final Vector<XMLStructure> kiCont = new Vector<XMLStructure>();
+        final Vector<XMLStructure> kiCont = new Vector<>();
         kiCont.add(keyValue);
-        final List<Object> x509Content = new ArrayList<Object>();
+        final List<Object> x509Content = new ArrayList<>();
         final X509IssuerSerial issuer = kifactory.newX509IssuerSerial(x509ce.
             getIssuerX500Principal().getName(), x509ce.getSerialNumber());
         x509Content.add(x509ce.getSubjectX500Principal().getName());
@@ -223,7 +223,7 @@ public final class DigitalSignature {
             XPathConstants.NODESET);
         if(xRes.getLength() < 1)
           throw CX_XPINV.get(info, expr);
-        tfList = new ArrayList<Transform>(2);
+        tfList = new ArrayList<>(2);
         tfList.add(fac.newTransform(Transform.XPATH,
             new XPathFilterParameterSpec(string(expr))));
         tfList.add(fac.newTransform(Transform.ENVELOPED,

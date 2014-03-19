@@ -64,11 +64,9 @@ public final class DBLocking implements Locking {
    */
   private final ReentrantReadWriteLock writeAll = new ReentrantReadWriteLock();
   /** Stores one lock for each object used for locking. */
-  private final Map<String, ReentrantReadWriteLock> locks =
-      new HashMap<String, ReentrantReadWriteLock>();
+  private final Map<String, ReentrantReadWriteLock> locks = new HashMap<>();
   /** Stores lock usage counters for each object used for locking. */
-  private final Map<String, Integer> lockUsage =
-      new HashMap<String, Integer>();
+  private final Map<String, Integer> lockUsage = new HashMap<>();
   /**
    * Currently running transactions.
    * Used as monitor for atomizing access to {@link #queue}.
@@ -79,19 +77,17 @@ public final class DBLocking implements Locking {
    *
    * Used as monitor for waiting threads in queue.
    */
-  private final Queue<Long> queue = new LinkedList<Long>();
+  private final Queue<Long> queue = new LinkedList<>();
   /**
    * Stores a list of objects each transaction has write-locked.
    * Null means lock everything, an empty array lock nothing.
    */
-  private final ConcurrentMap<Long, StringList> writeLocked =
-      new ConcurrentHashMap<Long, StringList>();
+  private final ConcurrentMap<Long, StringList> writeLocked = new ConcurrentHashMap<>();
   /**
    * Stores a list of objects each transaction has read-locked. Null means lock
    * everything, an empty array lock nothing.
    */
-  private final ConcurrentMap<Long, StringList> readLocked =
-      new ConcurrentHashMap<Long, StringList>();
+  private final ConcurrentMap<Long, StringList> readLocked = new ConcurrentHashMap<>();
   /** BaseX database context. */
   private final GlobalOptions gopts;
 

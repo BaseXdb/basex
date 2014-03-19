@@ -71,7 +71,7 @@ public final class CommandParser {
    * @throws QueryException query exception
    */
   private Command[] parse(final boolean single, final boolean suggest) throws QueryException {
-    final ArrayList<Command> cmds = new ArrayList<Command>();
+    final ArrayList<Command> cmds = new ArrayList<>();
     parser.parse(cmds, single, suggest);
     if(!single || cmds.size() == 1) return cmds.toArray(new Command[cmds.size()]);
     throw new QueryException(null, new QNm(), Text.SINGLE_CMD);

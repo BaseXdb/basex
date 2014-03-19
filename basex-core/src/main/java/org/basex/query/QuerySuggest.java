@@ -67,7 +67,7 @@ public final class QuerySuggest extends QueryParser {
     if(stack != null && !stack.empty()) return;
     all = data.paths.root();
     curr = all;
-    stack = new Stack<ArrayList<PathNode>>();
+    stack = new Stack<>();
   }
 
   @Override
@@ -95,7 +95,7 @@ public final class QuerySuggest extends QueryParser {
   private void checkTest(final boolean eq) {
     if(tag == null) return;
 
-    final ArrayList<PathNode> tmp = new ArrayList<PathNode>();
+    final ArrayList<PathNode> tmp = new ArrayList<>();
     boolean s = false;
     for(final PathNode p : all) {
       final byte[] nm = p.token(data);
@@ -113,7 +113,7 @@ public final class QuerySuggest extends QueryParser {
     if(stack == null) return;
     if(open) {
       checkTest(true);
-      final ArrayList<PathNode> tmp = new ArrayList<PathNode>();
+      final ArrayList<PathNode> tmp = new ArrayList<>();
       for(final PathNode p : curr) tmp.add(p);
       stack.add(tmp);
       checkAxis(Axis.CHILD);

@@ -33,8 +33,8 @@ final class ProjectDir extends ProjectNode {
   void expand() {
     removeAllChildren();
     // cache and sort directories and files
-    final ArrayList<IOFile> dirs = new ArrayList<IOFile>();
-    final ArrayList<IOFile> files = new ArrayList<IOFile>();
+    final ArrayList<IOFile> dirs = new ArrayList<>();
+    final ArrayList<IOFile> files = new ArrayList<>();
     for(final IOFile f : file.children()) (f.isDir() ? dirs : files).add(f);
     Collections.sort(dirs, COMP);
     Collections.sort(files, COMP);

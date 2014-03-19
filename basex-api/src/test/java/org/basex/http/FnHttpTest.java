@@ -345,7 +345,7 @@ public class FnHttpTest extends HTTPTest {
   public void errors() throws IOException {
 
     // Incorrect requests
-    final List<byte[]> falseReqs = new ArrayList<byte[]>();
+    final List<byte[]> falseReqs = new ArrayList<>();
 
     // Request without method
     final byte[] falseReq1 = token("<http:request "
@@ -636,20 +636,20 @@ public class FnHttpTest extends HTTPTest {
   public void multipartResponse() throws IOException, QueryException {
     // Create fake HTTP connection
     final FakeHttpConnection conn = new FakeHttpConnection(new URL("http://www.test.com"));
-    final Map<String, List<String>> hdrs = new HashMap<String, List<String>>();
-    final List<String> fromVal = new ArrayList<String>();
+    final Map<String, List<String>> hdrs = new HashMap<>();
+    final List<String> fromVal = new ArrayList<>();
     fromVal.add("Nathaniel Borenstein <nsb@bellcore.com>");
     // From: Nathaniel Borenstein <nsb@bellcore.com>
     hdrs.put("From", fromVal);
-    final List<String> mimeVal = new ArrayList<String>();
+    final List<String> mimeVal = new ArrayList<>();
     mimeVal.add("1.0");
     // MIME-Version: 1.0
     hdrs.put("MIME-version", mimeVal);
-    final List<String> subjVal = new ArrayList<String>();
+    final List<String> subjVal = new ArrayList<>();
     subjVal.add("Formatted text mail");
     // Subject: Formatted text mail
     hdrs.put("Subject", subjVal);
-    final List<String> contTypeVal = new ArrayList<String>();
+    final List<String> contTypeVal = new ArrayList<>();
     contTypeVal.add("multipart/alternative");
     contTypeVal.add("boundary=\"boundary42\"");
     // Content-Type: multipart/alternative; boundary=boundary42
@@ -718,24 +718,24 @@ public class FnHttpTest extends HTTPTest {
     // Create fake HTTP connection
     final FakeHttpConnection conn = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    final Map<String, List<String>> hdrs = new HashMap<String, List<String>>();
-    final List<String> fromVal = new ArrayList<String>();
+    final Map<String, List<String>> hdrs = new HashMap<>();
+    final List<String> fromVal = new ArrayList<>();
     fromVal.add("Nathaniel Borenstein <nsb@bellcore.com>");
     // From: Nathaniel Borenstein <nsb@bellcore.com>
     hdrs.put("From", fromVal);
-    final List<String> mimeVal = new ArrayList<String>();
+    final List<String> mimeVal = new ArrayList<>();
     mimeVal.add("1.0");
-    final List<String> toVal = new ArrayList<String>();
+    final List<String> toVal = new ArrayList<>();
     toVal.add("Ned Freed <ned@innosoft.com>");
     // To: Ned Freed <ned@innosoft.com>
     hdrs.put("To", toVal);
     // MIME-Version: 1.0
     hdrs.put("MIME-version", mimeVal);
-    final List<String> subjVal = new ArrayList<String>();
+    final List<String> subjVal = new ArrayList<>();
     subjVal.add("Formatted text mail");
     // Subject: Formatted text mail
     hdrs.put("Subject", subjVal);
-    final List<String> contTypeVal = new ArrayList<String>();
+    final List<String> contTypeVal = new ArrayList<>();
     contTypeVal.add("multipart/mixed");
     contTypeVal.add("boundary=\"simple boundary\"");
     // Content-Type: multipart/alternative; boundary=boundary42
@@ -845,7 +845,7 @@ final class FakeHttpConnection extends HttpURLConnection {
   FakeHttpConnection(final URL u) {
     super(u);
     out = new ByteArrayOutputStream();
-    headers = new HashMap<String, List<String>>();
+    headers = new HashMap<>();
   }
 
   @Override

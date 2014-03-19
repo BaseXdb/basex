@@ -24,7 +24,7 @@ public final class Collation {
   /** Implementation-defined collation URL. */
   private static final byte[] URL = token(Text.URL + "/collation");
   /** Available locales, indexed by language code. */
-  private static final HashMap<String, Locale> LOCALES = new HashMap<String, Locale>();
+  private static final HashMap<String, Locale> LOCALES = new HashMap<>();
   /** Strengths. */
   private static final byte[][] STRENGTHS = tokens(
     "primary", "secondary", "tertiary", "identical");
@@ -89,7 +89,7 @@ public final class Collation {
 
     // create new collation or return cached instance
     final byte[] full = new TokenBuilder(URL).add('?').add(args).finish();
-    if(ctx.collations == null) ctx.collations = new TokenObjMap<Collation>();
+    if(ctx.collations == null) ctx.collations = new TokenObjMap<>();
     Collation coll = ctx.collations.get(full);
     if(coll == null) {
       final Collator cl = get(args);

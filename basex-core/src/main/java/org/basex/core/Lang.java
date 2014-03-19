@@ -22,9 +22,9 @@ public final class Lang {
   /** Language suffix. */
   private static final String SUFFIX = "lang";
   /** Cached source files. */
-  private static final HashMap<String, String> TEXTS = new HashMap<String, String>();
+  private static final HashMap<String, String> TEXTS = new HashMap<>();
   /** Checks which strings have been applied. */
-  private static final HashMap<String, Boolean> CHECK = new HashMap<String, Boolean>();
+  private static final HashMap<String, Boolean> CHECK = new HashMap<>();
 
   /** Private constructor. */
   private Lang() { }
@@ -158,7 +158,7 @@ public final class Lang {
   public static void check() {
     read("English");
     final StringBuilder sb = new StringBuilder();
-    final HashSet<String> set = new HashSet<String>();
+    final HashSet<String> set = new HashSet<>();
     for(final String s : TEXTS.keySet()) set.add(s);
 
     final IOFile[] files = new IOFile("src/main/resources/lang").children();

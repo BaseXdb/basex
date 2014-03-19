@@ -24,7 +24,7 @@ final class CsvMapConverter extends CsvConverter {
   /** Headers. */
   private final TokenList headers = new TokenList();
   /** All records. */
-  private final ArrayList<ValueBuilder> records = new ArrayList<ValueBuilder>();
+  private final ArrayList<ValueBuilder> records = new ArrayList<>();
 
   /** Current record. */
   private ValueBuilder record = new ValueBuilder();

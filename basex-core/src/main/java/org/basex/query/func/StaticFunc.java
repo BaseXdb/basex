@@ -32,7 +32,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   public final boolean updating;
 
   /** Map with requested function properties. */
-  private final EnumMap<Flag, Boolean> map = new EnumMap<Flag, Boolean>(Flag.class);
+  private final EnumMap<Flag, Boolean> map = new EnumMap<>(Flag.class);
   /** Flag that is turned on during compilation and prevents premature inlining. */
   private boolean compiling;
 
@@ -276,7 +276,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     // create let bindings for all variables
     final LinkedList<GFLWOR.Clause> cls = exprs.length == 0 ? null :
       new LinkedList<GFLWOR.Clause>();
-    final IntObjMap<Var> vs = new IntObjMap<Var>();
+    final IntObjMap<Var> vs = new IntObjMap<>();
     for(int i = 0; i < args.length; i++) {
       final Var old = args[i], v = scp.newCopyOf(ctx, old);
       vs.put(old.id, v);

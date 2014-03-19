@@ -26,7 +26,7 @@ final class QueryCompiler {
   private final QueryContext ctx;
 
   /** Result list. */
-  private final ArrayList<Scope[]> result = new ArrayList<Scope[]>();
+  private final ArrayList<Scope[]> result = new ArrayList<>();
   /** Node stack. */
   private final IntList stack = new IntList();
   /** Index and lowlink list. */
@@ -35,9 +35,9 @@ final class QueryCompiler {
   private int next;
 
   /** Adjacency list. */
-  private final ArrayList<int[]> adjacent = new ArrayList<int[]>();
+  private final ArrayList<int[]> adjacent = new ArrayList<>();
   /** Declaration list. */
-  private final ArrayList<Scope> scopes = new ArrayList<Scope>();
+  private final ArrayList<Scope> scopes = new ArrayList<>();
   /** Declaration list. */
   private IdentityHashMap<Scope, Integer> ids;
 
@@ -57,8 +57,8 @@ final class QueryCompiler {
    * @return list of all declarations that the main module uses
    */
   public static List<StaticDecl> usedDecls(final MainModule main) {
-    final List<StaticDecl> scopes = new ArrayList<StaticDecl>();
-    final IdentityHashMap<Scope, Object> map = new IdentityHashMap<Scope, Object>();
+    final List<StaticDecl> scopes = new ArrayList<>();
+    final IdentityHashMap<Scope, Object> map = new IdentityHashMap<>();
     main.visit(new ASTVisitor() {
       @Override
       public boolean staticVar(final StaticVar var) {
@@ -207,7 +207,7 @@ final class QueryCompiler {
   int add(final Scope scp) {
     final int id = scopes.size();
     if(id == MAP_THRESHOLD) {
-      ids = new IdentityHashMap<Scope, Integer>();
+      ids = new IdentityHashMap<>();
       for(final Scope s : scopes) ids.put(s, ids.size());
     }
 

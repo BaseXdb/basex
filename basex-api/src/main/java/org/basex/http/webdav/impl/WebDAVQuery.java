@@ -12,7 +12,7 @@ final class WebDAVQuery {
   /** String query. */
   private final String query;
   /** Bindings. */
-  private final HashMap<String, Object> bindings = new HashMap<String, Object>();
+  private final HashMap<String, Object> bindings = new HashMap<>();
 
   /**
    * Constructor.

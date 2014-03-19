@@ -16,7 +16,7 @@ public final class RESTSession {
   /** HTTP context. */
   public final HTTPContext http;
   /** Commands to be executed. */
-  public final ArrayList<Command> cmds = new ArrayList<Command>();
+  public final ArrayList<Command> cmds = new ArrayList<>();
   /** Database context. */
   public final Context context;
 

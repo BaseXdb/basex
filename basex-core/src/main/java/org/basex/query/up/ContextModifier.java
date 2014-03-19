@@ -18,9 +18,9 @@ import org.basex.util.list.*;
  */
 public abstract class ContextModifier {
   /** Update primitives, aggregated separately for each database. */
-  private final Map<Data, DataUpdates> dbUpdates = new HashMap<Data, DataUpdates>();
+  private final Map<Data, DataUpdates> dbUpdates = new HashMap<>();
   /** Update primitives, aggregated separately for each database name. */
-  private final Map<String, NameUpdates> nameUpdates = new HashMap<String, NameUpdates>();
+  private final Map<String, NameUpdates> nameUpdates = new HashMap<>();
   /** Temporary data reference, containing all XML fragments to be inserted. */
   private MemData tmp;
 
@@ -81,7 +81,7 @@ public abstract class ContextModifier {
    * @throws QueryException query exception
    */
   final HashSet<Data> prepare() throws QueryException {
-    final HashSet<Data> datas = new HashSet<Data>(dbUpdates.size());
+    final HashSet<Data> datas = new HashSet<>(dbUpdates.size());
     for(final DataUpdates up : dbUpdates.values()) {
       // create temporary mem data instance if not available yet
       if(tmp == null) tmp = new MemData(up.data().meta.options);
@@ -101,7 +101,7 @@ public abstract class ContextModifier {
     for(final NameUpdates up : nameUpdates.values()) up.apply(true);
 
     // collect data references to be locked
-    final Set<Data> datas = new HashSet<Data>();
+    final Set<Data> datas = new HashSet<>();
     for(final Data data : dbUpdates.keySet()) datas.add(data);
 
     // try to acquire write locks and keep track of the number of acquired locks in order to

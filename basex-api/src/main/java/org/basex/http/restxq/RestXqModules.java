@@ -23,7 +23,7 @@ public final class RestXqModules {
   private static final RestXqModules INSTANCE = new RestXqModules();
 
   /** Module cache. */
-  private HashMap<String, RestXqModule> modules = new HashMap<String, RestXqModule>();
+  private HashMap<String, RestXqModule> modules = new HashMap<>();
   /** RESTXQ path. */
   private IOFile restxq;
   /** Private constructor. */
@@ -57,7 +57,7 @@ public final class RestXqModules {
   RestXqFunction find(final HTTPContext http, final QNm error) throws Exception {
     cache(http);
     // collect all functions
-    final ArrayList<RestXqFunction> list = new ArrayList<RestXqFunction>();
+    final ArrayList<RestXqFunction> list = new ArrayList<>();
     for(final RestXqModule mod : modules.values()) {
       for(final RestXqFunction rxf : mod.functions()) {
         if(rxf.matches(http, error)) list.add(rxf);
@@ -99,7 +99,7 @@ public final class RestXqModules {
         new IOFile(http.context().globalopts.get(GlobalOptions.WEBPATH), fl.getPath());
     }
     // create new cache
-    final HashMap<String, RestXqModule> cache = new HashMap<String, RestXqModule>();
+    final HashMap<String, RestXqModule> cache = new HashMap<>();
     cache(http, restxq, cache);
     modules = cache;
   }
