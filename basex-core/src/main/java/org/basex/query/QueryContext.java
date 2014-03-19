@@ -24,7 +24,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.util.*;
-import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -56,11 +55,15 @@ public final class QueryContext extends Proc {
   /** Externally bound variables. */
   private final HashMap<QNm, Expr> bindings = new HashMap<QNm, Expr>();
 
-  /** Query resources. */
-  public final QueryResources resource = new QueryResources(this);
+  /** Parent query context. */
+  private final QueryContext parentCtx;
+  /** Query info. */
+  public final QueryInfo info;
   /** Database context. */
   public final Context context;
 
+  /** Query resources. */
+  public QueryResources resources;
   /** HTTP context. */
   public Object http;
 
@@ -107,11 +110,6 @@ public final class QueryContext extends Proc {
   /** Strings to lock defined by lock:write option. */
   public final StringList writeLocks = new StringList(0);
 
-  /** Pending updates. */
-  public Updates updates;
-  /** Pending output. */
-  public final ValueBuilder output = new ValueBuilder();
-
   /** Compilation flag: current node has leaves. */
   public boolean leaf;
 
@@ -124,7 +122,6 @@ public final class QueryContext extends Proc {
   private XQFunction tailFunc;
   /** Arguments for the next tail call. */
   private Value[] args;
-
   /** Counter for variable IDs. */
   public int varIDs;
 
@@ -139,19 +136,9 @@ public final class QueryContext extends Proc {
   SerializerOptions serialOpts;
   /** Initial context value. */
   public MainModule ctxItem;
-  /** Module loader. */
-  public final ModuleLoader modules;
-  /** Opened connections to relational databases. */
-  private JDBCConnections jdbc;
-  /** Opened connections to relational databases. */
-  private ClientSessions sessions;
   /** Root expression of the query. */
-  MainModule root;
+  public MainModule root;
 
-  /** Parent query context. */
-  private QueryContext parentCtx;
-  /** Query info. */
-  public final QueryInfo info;
   /** Indicates if the query context has been closed. */
   private boolean closed;
 
@@ -160,9 +147,9 @@ public final class QueryContext extends Proc {
    * @param parent parent context
    */
   public QueryContext(final QueryContext parent) {
-    this(parent.context);
-    parentCtx = parent;
+    this(parent.context, parent);
     listen = parent.listen;
+    resources = parent.resources;
   }
 
   /**
@@ -170,9 +157,19 @@ public final class QueryContext extends Proc {
    * @param ctx database context
    */
   public QueryContext(final Context ctx) {
-    context = ctx;
-    nodes = ctx.current();
-    modules = new ModuleLoader(ctx);
+    this(ctx, null);
+    resources = new QueryResources(this);
+  }
+
+  /**
+   * Constructor.
+   * @param context database context
+   * @param parent parent context (optional)
+   */
+  private QueryContext(final Context context, final QueryContext parent) {
+    this.context = context;
+    this.parentCtx = parent;
+    nodes = context.current();
     info = new QueryInfo(this);
   }
 
@@ -213,8 +210,10 @@ public final class QueryContext extends Proc {
    */
   public MainModule parseMain(final String qu, final String path, final StaticContext sc)
       throws QueryException {
+
     info.query = qu;
     root = new QueryParser(qu, path, this, sc).parseMain();
+    updating = updating && root.expr.has(Flag.UPD);
     return root;
   }
 
@@ -228,6 +227,7 @@ public final class QueryContext extends Proc {
    */
   public LibraryModule parseLibrary(final String qu, final String path, final StaticContext sc)
       throws QueryException {
+
     info.query = qu;
     return new QueryParser(qu, path, this, sc).parseLibrary(true);
   }
@@ -239,6 +239,25 @@ public final class QueryContext extends Proc {
   public void mainModule(final MainModule rt) {
     root = rt;
     updating = rt.expr.has(Flag.UPD);
+  }
+
+  /**
+   * Checks function calls and variable references.
+   * @param main main module
+   * @param sc static context
+   * @throws QueryException query exception
+   */
+  void check(final MainModule main, final StaticContext sc) throws QueryException {
+    // check function calls and variable references
+    funcs.check(this);
+    vars.check();
+
+    // check placement of updating expressions if any have been found
+    if(!sc.mixUpdates && updating) {
+      funcs.checkUp();
+      vars.checkUp();
+      if(main != null) main.expr.checkUp();
+    }
   }
 
   /**
@@ -264,9 +283,8 @@ public final class QueryContext extends Proc {
     if(ctxItem != null) {
       // evaluate initial expression
       try {
-
         ctxItem.compile(this);
-        value = ctxItem.value(this);
+        value = ctxItem.cache(this).value();
       } catch(final QueryException ex) {
         if(ex.err() != NOCTX) throw ex;
         // only {@link ParseExpr} instances may cause this error
@@ -276,7 +294,7 @@ public final class QueryContext extends Proc {
       // add full-text container reference
       if(nodes.ftpos != null) ftPosData = new FTPosData();
       // cache the initial context nodes
-      resource.compile(nodes);
+      resources.compile(nodes);
     }
 
     // if specified, convert context item to specified type
@@ -313,8 +331,36 @@ public final class QueryContext extends Proc {
    */
   public Iter iter() throws QueryException {
     try {
-      // evaluate lazily if query will perform no updates
-      return updating ? value().iter() : root.iter(this);
+      // no updates: iterate through results
+      if(!updating) return root.iter(this);
+
+      // cache results
+      ValueBuilder cache = root.cache(this);
+
+      final Updates updates = resources.updates;
+      if(updates != null) {
+        // if parent context exists, updates will be performed by main context
+        if(parentCtx == null) {
+          final ValueBuilder output = resources.output;
+          final StringList dbs = updates.databases();
+          final HashSet<Data> datas = updates.prepare();
+
+          // copy nodes that will be affected by an update operation
+          copy(cache, datas, dbs);
+          copy(output, datas, dbs);
+
+          if(context.data() != null) context.invalidate();
+          updates.apply();
+
+          // append cached outputs
+          if(output.size() != 0) {
+            if(cache.size() == 0) cache = output;
+            else cache.add(output.value());
+          }
+        }
+      }
+      return cache;
+
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
       throw BASX_STACKOVERFLOW.get(null);
@@ -322,33 +368,21 @@ public final class QueryContext extends Proc {
   }
 
   /**
-   * Returns the result value.
-   * @return result value
-   * @throws QueryException query exception
+   * Creates copies of nodes that will be affected by an update operation.
+   * @param cache node cache
+   * @param datas data references
+   * @param dbs database names
    */
-  public Value value() throws QueryException {
-    try {
-      final Value v = root.value(this);
-      final Value u = update();
-      return u != null ? u : v;
-    } catch(final StackOverflowError ex) {
-      Util.debug(ex);
-      throw BASX_STACKOVERFLOW.get(null);
+  private void copy(final ValueBuilder cache, final HashSet<Data> datas, final StringList dbs) {
+    final long cs = cache.size();
+    for(int c = 0; c < cs; c++) {
+      final Item it = cache.get(c);
+      if(!(it instanceof DBNode)) continue;
+      final Data data = it.data();
+      if(datas.contains(data) || !data.inMemory() && dbs.contains(data.meta.name)) {
+        cache.set(((DBNode) it).dbCopy(context.options), c);
+      }
     }
-  }
-
-  /**
-   * Performs updates.
-   * @return resulting value
-   * @throws QueryException query exception
-   */
-  Value update() throws QueryException {
-    if(updating) {
-      updates.apply();
-      if(updates.size() != 0 && context.data() != null) context.update();
-      if(output.size() != 0) return output.value();
-    }
-    return null;
   }
 
   /**
@@ -363,9 +397,9 @@ public final class QueryContext extends Proc {
   }
 
   /**
-   * Evaluates the specified expression and returns an iterator.
+   * Evaluates the specified expression and returns a value.
    * @param expr expression to be evaluated
-   * @return iterator
+   * @return value
    * @throws QueryException query exception
    */
   public Value value(final Expr expr) throws QueryException {
@@ -459,24 +493,6 @@ public final class QueryContext extends Proc {
   }
 
   /**
-   * Returns JDBC connections.
-   * @return jdbc connections
-   */
-  public JDBCConnections jdbc() {
-    if(jdbc == null) jdbc = new JDBCConnections();
-    return jdbc;
-  }
-
-  /**
-   * Returns client sessions.
-   * @return client session
-   */
-  public ClientSessions sessions() {
-    if(sessions == null) sessions = new ClientSessions();
-    return sessions;
-  }
-
-  /**
    * Returns the query-specific or global serialization parameters.
    * @return serialization parameters
    */
@@ -502,12 +518,10 @@ public final class QueryContext extends Proc {
   }
 
   /**
-   * Sets the updating flag.
-   * @param up updating flag
+   * Indicates that the query contains any updating expressions.
    */
-  public void updating(final boolean up) {
-    if(updates == null) updates = new Updates();
-    updating = up;
+  public void updating() {
+    updating = true;
   }
 
   /**
@@ -516,20 +530,15 @@ public final class QueryContext extends Proc {
   public void close() {
     // close only once
     if(closed) return;
-    closed = true;
+
+    if(parentCtx == null) {
+      closed = true;
+      resources.close();
+    }
 
     // reassign original database options
     for(final Entry<Option<?>, Object> e : staticOpts.entrySet())
       context.options.put(e.getKey(), e.getValue());
-
-    // close database connections
-    resource.close();
-    // close JDBC connections
-    if(jdbc != null) jdbc.close();
-    // close client sessions
-    if(sessions != null) sessions.close();
-    // close dynamically loaded JAR files
-    modules.close();
   }
 
   @Override
@@ -648,7 +657,7 @@ public final class QueryContext extends Proc {
    * @throws QueryException query exception
    */
   private Expr cast(final Object val, final String type) throws QueryException {
-    final StaticContext sc = root != null ? root.sc : new StaticContext(true);
+    final StaticContext sc = root != null ? root.sc : new StaticContext(context);
 
     // return original value
     if(type == null || type.isEmpty())

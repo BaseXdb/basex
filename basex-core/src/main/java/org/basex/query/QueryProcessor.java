@@ -46,7 +46,7 @@ public final class QueryProcessor extends Proc {
   public QueryProcessor(final String qu, final Context cx) {
     query = qu;
     ctx = proc(new QueryContext(cx));
-    sc = new StaticContext(cx.options.get(MainOptions.XQUERY3));
+    sc = new StaticContext(cx);
   }
 
   /**
@@ -88,7 +88,7 @@ public final class QueryProcessor extends Proc {
    */
   public Value value() throws QueryException {
     compile();
-    return ctx.value();
+    return ctx.iter().value();
   }
 
   /**
@@ -253,7 +253,7 @@ public final class QueryProcessor extends Proc {
    * @return number of updates
    */
   public int updates() {
-    return updating ? ctx.updates.size() : 0;
+    return updating ? ctx.resources.updates().size() : 0;
   }
 
   /**

@@ -15,6 +15,7 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.up.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.util.*;
 import org.basex.query.util.Err.ErrType;
@@ -115,12 +116,12 @@ public final class FNGen extends StandardFunc {
   private Value collection(final QueryContext ctx) throws QueryException {
     // return default collection
     final Item it = expr.length == 0 ? null : expr[0].item(ctx, info);
-    if(it == null) return ctx.resource.collection(info);
+    if(it == null) return ctx.resources.collection(info);
 
     // check if reference is valid
     final byte[] in = checkEStr(it);
     if(!Uri.uri(in).isValid()) throw INVCOLL.get(info, in);
-    return ctx.resource.collection(new QueryInput(string(in)), sc.baseIO(), info);
+    return ctx.resources.collection(new QueryInput(string(in)), sc.baseIO(), info);
   }
 
   /**
@@ -155,13 +156,14 @@ public final class FNGen extends StandardFunc {
 
     final Uri u = Uri.uri(file);
     if(u == Uri.EMPTY || !u.isValid()) throw UPFOURI.get(info, file);
-    final DBNode target = ctx.updates.determineDataRef(nd, ctx);
+    final Updates updates = ctx.resources.updates();
+    final DBNode target = updates.determineDataRef(nd, ctx);
 
     final String uri = IO.get(u.toJava()).path();
     // check if all target paths are unique
-    if(!ctx.updates.putPaths.add(uri)) throw UPURIDUP.get(info, uri);
+    if(!updates.putPaths.add(uri)) throw UPURIDUP.get(info, uri);
 
-    ctx.updates.add(new Put(target.pre, target.data, uri, info), ctx);
+    updates.add(new Put(target.pre, target.data, uri, info), ctx);
     return null;
   }
 
@@ -176,7 +178,7 @@ public final class FNGen extends StandardFunc {
     if(it == null) return null;
     final byte[] in = checkEStr(it);
     if(!Uri.uri(in).isValid()) throw INVDOC.get(info, in);
-    return ctx.resource.doc(new QueryInput(string(in)), sc.baseIO(), info);
+    return ctx.resources.doc(new QueryInput(string(in)), sc.baseIO(), info);
   }
 
   /**
@@ -220,7 +222,7 @@ public final class FNGen extends StandardFunc {
       if(!Uri.uri(p).isValid()) throw INVURL.get(info, p);
 
       IO io = base.merge(p);
-      final String[] rp = ctx.resource.resources.get(io.path());
+      final String[] rp = ctx.resources.texts.get(io.path());
       if(rp != null && rp.length > 0) {
         io = IO.get(rp[0]);
         if(rp.length > 1) enc = rp[1];

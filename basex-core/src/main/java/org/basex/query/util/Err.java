@@ -39,6 +39,8 @@ public enum Err {
   BASX_ANNOT(BASX, 6, "Annotation %% is invalid or not supported."),
   /** BASX0006. */
   BASX_ANNOTARGS(BASX, 6, "Annotation %% has invalid arguments."),
+  /** XUST0002. */
+  BASEX_MOD(XUST, 2, "All transform expressions must be updating or return an empty sequence."),
 
   // Client module
 
@@ -208,7 +210,7 @@ public enum Err {
   /** BXXQ0001. */
   BXXQ_UPDATING(BXXQ, 1, "No updating expression allowed."),
   /** BXXQ0002. */
-  BXXQ_NEWDB(BXXQ, 2, "Opening new resources is not permitted."),
+  BXXQ_NOUPDATE(BXXQ, 2, "Updating expression expected."),
   /** BXXQ0002. */
   BXXQ_PERM(BXXQ, 3, "%"),
   /** BXXQ0004. */
@@ -1118,8 +1120,7 @@ public enum Err {
   /** XUST0001. */
   UPCTX(XUST, 1, "Context item may not declare an updating expression."),
   /** XUST0002. */
-  UPMODIFY(XUST, 2,
-      "Modify clause: all expressions must be updating or return an empty sequence."),
+  UPMODIFY(XUST, 2, "Modify clause: all expressions must be updating or return an empty sequence."),
   /** XUST0002. */
   UPEXPECTF(XUST, 2, "Function body must be an updating expression."),
   /** XUST0003. */
@@ -1127,7 +1128,7 @@ public enum Err {
   /** XUST0026. */
   NOREVAL(XUST, 26, "Revalidation mode not supported."),
   /** XUST0028. */
-  UPFUNCTYPE(XUST, 28, "No return type allowed in updating functions."),
+  UUPFUNCTYPE(XUST, 28, "No return type allowed in updating functions."),
 
   /** XUTY0004. */
   UPNOATTRPER(XUTY, 4, "Attribute must follow the root element."),
@@ -1149,7 +1150,7 @@ public enum Err {
   /** XUTY0013. */
   UPCOPYMULT(XUTY, 13, "Value assigned to $% must be a single node."),
   /** XUTY0013. */
-  UPSOURCE(XUTY, 13, "Source of copy expression must be a single node."),
+  UPSOURCE(XUTY, 13, "Source of transform expression must be a single node."),
   /** XUTY0022. */
   UPATTELM2(XUTY, 22, "Insert target must be an element.");
 

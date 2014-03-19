@@ -101,7 +101,7 @@ public final class Add extends ACreate {
       if(tmp.meta.size > 1) {
         if(lock && !data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
         data.insert(data.meta.size, -1, new DataClip(tmp));
-        context.update();
+        context.invalidate();
         if(lock) data.finishUpdate();
       }
       // return info message

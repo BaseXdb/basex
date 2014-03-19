@@ -70,6 +70,13 @@ public final class UpdateTest extends AdvancedQueryTest {
     query("declare variable $d := document{ <x/> } update (); $d/x", "<x/>");
   }
 
+  /** Transform expression containing a simple expression. */
+  @Test
+  public void transSimple() {
+    error("<a/> update ('')", Err.UPMODIFY);
+    error("copy $a := <a/> modify ('') return $a", Err.UPMODIFY);
+  }
+
   /**
    * Checks whether existing indexes etc. are NOT recycled for the copy of a transform expression.
    * @throws BaseXException BaseX exception.
@@ -1118,19 +1125,6 @@ public final class UpdateTest extends AdvancedQueryTest {
       "xquery:eval('declare variable $c external; $c()', map { 'c': local:c#0 })", "<a/>");
   }
 
-  /**
-   * Tests the expressions in modify clauses for updates.
-   */
-  @Test
-  public void modifyCheck() {
-    error("copy $c:= <a>X</a> modify 'a' return $c", Err.UPMODIFY);
-    error("copy $c:= <a>X</a> modify(delete node $c/text(),'a') return $c", Err.UPALL);
-
-    error("text { <a/> update (delete node <a/>,<b/>) }", Err.UPALL);
-    error("1[<a/> update (delete node <a/>,<b/>)]", Err.UPALL);
-    error("for $i in 1 order by (<a/> update (delete node <a/>,<b/>)) return $i", Err.UPALL);
-  }
-
   /** Tests adding an attribute and thus crossing the {@link IO#MAXATTS} line (GH-752). */
   @Test
   public void insertAttrMaxAtt() {
@@ -1163,6 +1157,18 @@ public final class UpdateTest extends AdvancedQueryTest {
     query("(<X/>,<Y/>)/(insert node <Z/> into .)");
   }
 
+  /**
+   * Tests the expressions in modify clauses for updates.
+   */
+  @Test
+  public void modifyCheck() {
+    error("copy $c:= <a>X</a> modify 'a' return $c", Err.UPMODIFY);
+    error("copy $c:= <a>X</a> modify(delete node $c/text(),'a') return $c", Err.UPALL);
+
+    error("text { <a/> update (delete node <a/>,<b/>) }", Err.UPALL);
+    error("1[<a/> update (delete node <a/>,<b/>)]", Err.UPALL);
+    error("for $i in 1 order by (<a/> update (delete node <a/>,<b/>)) return $i", Err.UPALL);
+  }
 
   /**
    * Reject updating function items.

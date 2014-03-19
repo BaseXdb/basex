@@ -195,7 +195,7 @@ public final class Context {
   /**
    * Invalidates the current node set.
    */
-  public void update() {
+  public void invalidate() {
     current = null;
   }
 

@@ -7,7 +7,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -68,16 +67,26 @@ public final class MainModule extends StaticScope {
   }
 
   /**
-   * Evaluates this module and returns the result as a value.
+   * Evaluates this module and returns the result as a cached value iterator.
    * @param ctx query context
    * @return result
    * @throws QueryException evaluation exception
    */
-  public Value value(final QueryContext ctx) throws QueryException {
+  public ValueBuilder cache(final QueryContext ctx) throws QueryException {
     final int fp = scope.enter(ctx);
     try {
-      final Value v = ctx.value(expr);
-      return declType != null ? declType.treat(v, info) : v;
+      final Iter iter = expr.iter(ctx);
+
+      final ValueBuilder cache;
+      if(iter instanceof ValueBuilder) {
+        cache = (ValueBuilder) iter;
+      } else {
+        cache = new ValueBuilder();
+        for(Item it; (it = iter.next()) != null;) cache.add(it);
+      }
+      if(declType != null) declType.treat(cache.value(), info);
+      return cache;
+
     } finally {
       scope.exit(ctx, fp);
     }
@@ -90,7 +99,7 @@ public final class MainModule extends StaticScope {
    * @throws QueryException query exception
    */
   public Iter iter(final QueryContext ctx) throws QueryException {
-    if(declType != null) return value(ctx).iter();
+    if(declType != null) return cache(ctx);
 
     final int fp = scope.enter(ctx);
     final Iter iter = expr.iter(ctx);

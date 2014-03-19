@@ -61,11 +61,11 @@ public final class Transform extends Arr {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    final int o = (int) ctx.output.size();
-    if(ctx.updates == null) ctx.updates = new Updates();
-    final ContextModifier tmp = ctx.updates.mod;
+    final int o = (int) ctx.resources.output.size();
+    final Updates updates = ctx.resources.updates();
+    final ContextModifier tmp = updates.mod;
     final TransformModifier pu = new TransformModifier();
-    ctx.updates.mod = pu;
+    updates.mod = pu;
 
     try {
       for(final Let fo : copies) {
@@ -79,12 +79,15 @@ public final class Transform extends Arr {
         ctx.set(fo.var, i, info);
         pu.addData(i.data());
       }
-      ctx.value(expr[0]);
-      ctx.updates.apply();
+      final Value v = ctx.value(expr[0]);
+      if(!v.isEmpty()) throw BASEX_MOD.get(info);
+
+      updates.prepare();
+      updates.apply();
       return ctx.value(expr[1]);
     } finally {
-      ctx.output.size(o);
-      ctx.updates.mod = tmp;
+      ctx.resources.output.size(o);
+      updates.mod = tmp;
     }
   }
 

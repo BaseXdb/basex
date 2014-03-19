@@ -163,7 +163,7 @@ public final class PermissionTest extends SandboxTest {
     no(new DropIndex("SUMMARY"), testSession);
     no(new CreateUser(NAME, Token.md5(NAME)), testSession);
     no(new DropUser(NAME), testSession);
-    no(new Export("."), testSession);
+    no(new Export(Prop.TMP + NAME), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
@@ -212,7 +212,7 @@ public final class PermissionTest extends SandboxTest {
     no(new DropDB(NAME), testSession);
     no(new CreateUser(NAME, Token.md5(NAME)), testSession);
     no(new DropUser(NAME), testSession);
-    no(new Export("."), testSession);
+    no(new Export(Prop.TMP + NAME), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
@@ -231,7 +231,7 @@ public final class PermissionTest extends SandboxTest {
     for(final CmdIndex cmd : CmdIndex.values()) {
       ok(new CreateIndex(cmd), testSession);
     }
-    ok(new Export("."), testSession);
+    ok(new Export(Prop.TMP + NAME), testSession);
 
     // repo Stuff
     ok(new RepoInstall(REPO + "/pkg3.xar", null), testSession);

@@ -9,6 +9,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Flag;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
@@ -144,8 +145,8 @@ public final class Functions extends TokenSet {
     if(fn != null) {
       final Ann a = new Ann();
       if(fn.has(Flag.UPD)) {
-        throw UPFUNCITEM.get(ii);
-        //a.add(Ann.Q_UPDATING, Empty.SEQ, ii);
+        if(!sc.mixUpdates) throw UPFUNCITEM.get(ii);
+        a.add(Ann.Q_UPDATING, Empty.SEQ, ii);
       }
       final VarScope scp = new VarScope(sc);
       final FuncType ft = fn.type(arity);
@@ -169,7 +170,7 @@ public final class Functions extends TokenSet {
     final StaticFunc sf = ctx.funcs.get(name, arity, ii, true);
     if(sf != null) {
       final FuncItem fi = getUser(sf, ctx, sc, ii);
-      if(fi.annotations().contains(Ann.Q_UPDATING)) throw UPFUNCITEM.get(ii);
+      if(!sc.mixUpdates && fi.annotations().contains(Ann.Q_UPDATING)) throw UPFUNCITEM.get(ii);
       return fi;
     }
 
@@ -237,13 +238,13 @@ public final class Functions extends TokenSet {
       return TypedFunc.constr(new Cast(sc, ii, args[0], to), to);
     }
 
-    // pre-defined functions
+    // built-in functions
     final StandardFunc fun = get().get(name, args, sc, ii);
     if(fun != null) {
       if(!sc.xquery3() && fun.has(Flag.X30)) throw FUNC30.get(ii);
-      if(fun.sig.has(Flag.UPD)) ctx.updating(true);
-      // [LW] correct annotations
-      return new TypedFunc(fun, new Ann(), fun.sig.type(args.length));
+      final Ann ann = new Ann();
+      ann.add(Ann.Q_UPDATING, Empty.SEQ, ii);
+      return new TypedFunc(fun, ann, fun.sig.type(args.length));
     }
 
     // user-defined function

@@ -37,7 +37,7 @@ public final class Delete extends ACreate {
     final int ds = docs.size();
     for(int d = 0; d < ds; d++) atomics.addDelete(docs.get(d));
     atomics.execute(false);
-    context.update();
+    context.invalidate();
 
     // delete binaries
     final TokenList bins = data.resources.binaries(target);

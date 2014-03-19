@@ -210,6 +210,6 @@ public final class FNAdmin extends StandardFunc {
   @Override
   public boolean accept(final ASTVisitor visitor) {
     return !(oneOf(sig, _ADMIN_USERS, _ADMIN_SESSIONS) && !visitor.lock(DBLocking.ADMIN)) &&
-      !(sig == _ADMIN_USERS && expr.length > 0 && !dataLock(visitor)) && super.accept(visitor);
+      !(sig == _ADMIN_USERS && expr.length > 0 && !dataLock(visitor, 1)) && super.accept(visitor);
   }
 }

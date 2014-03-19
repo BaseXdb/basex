@@ -45,11 +45,11 @@ public final class Modify extends Arr {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    final int o = (int) ctx.output.size();
-    if(ctx.updates == null) ctx.updates = new Updates();
-    final ContextModifier tmp = ctx.updates.mod;
+    final int o = (int) ctx.resources.output.size();
+    final Updates updates = ctx.resources.updates();
+    final ContextModifier tmp = updates.mod;
     final TransformModifier pu = new TransformModifier();
-    ctx.updates.mod = pu;
+    updates.mod = pu;
 
     final Value cv = ctx.value;
     try {
@@ -63,12 +63,15 @@ public final class Modify extends Arr {
       ctx.value = i;
       pu.addData(i.data());
 
-      ctx.value(expr[1]);
-      ctx.updates.apply();
+      final Value v = ctx.value(expr[1]);
+      if(!v.isEmpty()) throw BASEX_MOD.get(info);
+
+      updates.prepare();
+      updates.apply();
       return ctx.value;
     } finally {
-      ctx.output.size(o);
-      ctx.updates.mod = tmp;
+      ctx.resources.output.size(o);
+      updates.mod = tmp;
       ctx.value = cv;
     }
   }
@@ -90,7 +93,7 @@ public final class Modify extends Arr {
 
   @Override
   public String toString() {
-    return toString(" update ");
+    return toString(" " + QueryText.UPDATE + " ");
   }
 
   @Override

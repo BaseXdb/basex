@@ -9,6 +9,9 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.query.iter.*;
+import org.basex.query.up.*;
+import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -17,23 +20,33 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * This class provides access to resources used by an XQuery expression.
+ * This class provides access to all kinds of resources (databases, documents, database connections,
+ * sessions) used by an XQuery expression.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public final class QueryResources {
-  /** Resources. */
-  public final HashMap<String, String[]> resources = new HashMap<String, String[]>();
-  /** Allow opening of new databases. */
-  public boolean openDB = true;
+  /** Textual resources. */
+  public final HashMap<String, String[]> texts = new HashMap<String, String[]>();
 
   /** Database context. */
-  private final QueryContext ctx;
+  private final QueryContext qc;
   /** Opened databases. */
   private Data[] data = new Data[1];
   /** Number of databases. */
   private int datas;
+
+  /** Module loader. */
+  public final ModuleLoader modules;
+  /** External resources. */
+  private HashMap<Class<? extends DataResources>, DataResources> external =
+      new HashMap<Class<? extends DataResources>, DataResources>();
+
+  /** Pending output. */
+  public final ValueBuilder output = new ValueBuilder();;
+  /** Pending updates. */
+  Updates updates;
 
   /** Collections: single nodes and sequences. */
   private Value[] coll = new Value[1];
@@ -47,7 +60,8 @@ public final class QueryResources {
    * @param qc query context
    */
   QueryResources(final QueryContext qc) {
-    ctx = qc;
+    this.qc = qc;
+    modules = new ModuleLoader(qc.context);
   }
 
   /**
@@ -57,26 +71,50 @@ public final class QueryResources {
    */
   void compile(final Nodes nodes) throws QueryException {
     final Data d = nodes.data;
-    if(!ctx.context.perm(Perm.READ, d.meta)) throw BASX_PERM.get(null, Perm.READ);
+    if(!qc.context.perm(Perm.READ, d.meta)) throw BASX_PERM.get(null, Perm.READ);
 
     // assign initial context value
     final boolean root = nodes.root;
-    ctx.value = DBNodeSeq.get(new IntList(nodes.pres), d, root, root);
+    qc.value = DBNodeSeq.get(new IntList(nodes.pres), d, root, root);
 
     // create default collection: use initial node set if it contains all
     // documents of the database. otherwise, create new node set
-    addCollection(root ? ctx.value : DBNodeSeq.get(d.resources.docs(), d, true, true), d.meta.name);
+    addCollection(root ? qc.value : DBNodeSeq.get(d.resources.docs(), d, true, true), d.meta.name);
 
     addData(d);
-    synchronized(ctx.context.dbs) { ctx.context.dbs.pin(d); }
+    synchronized(qc.context.dbs) { qc.context.dbs.pin(d); }
+  }
+
+  /**
+   * Adds an external resource.
+   * @param ext external resource
+   */
+  public void add(final DataResources ext) {
+    external.put(ext.getClass(), ext);
+  }
+
+  /**
+   * Returns an external resource of the specified class.
+   * @param <R> resource
+   * @param resource external resource
+   * @return resource
+   */
+  @SuppressWarnings("unchecked")
+  public <R extends DataResources> R get(final Class<? extends R> resource) {
+    return (R) external.get(resource);
   }
 
   /**
    * Closes all opened data references that have not been added by the global context.
    */
   void close() {
-    for(int d = 0; d < datas; d++) Close.close(data[d], ctx.context);
+    for(int d = 0; d < datas; d++) Close.close(data[d], qc.context);
     datas = 0;
+
+    // close dynamically loaded JAR files
+    modules.close();
+    // close external resources
+    for(final DataResources c : external.values()) c.close();
   }
 
   /**
@@ -92,11 +130,9 @@ public final class QueryResources {
       final String n = data[d].meta.name;
       if(Prop.CASE ? n.equals(name) : n.equalsIgnoreCase(name)) return data[d];
     }
-    if(!openDB) throw BXXQ_NEWDB.get(info);
-
     try {
       // open and add new data reference
-      final Data d = Open.open(name, ctx.context);
+      final Data d = Open.open(name, qc.context);
       addData(d);
       return d;
     } catch(final IOException ex) {
@@ -117,7 +153,7 @@ public final class QueryResources {
       throws QueryException {
 
     // favor default database
-    if(ctx.context.options.get(MainOptions.DEFAULTDB) && ctx.nodes != null) {
+    if(qc.context.options.get(MainOptions.DEFAULTDB) && qc.nodes != null) {
       final Data dt = data[0];
       final int pre = dt.resources.doc(qi.original);
       if(pre != -1) return new DBNode(dt, pre, Data.DOC);
@@ -166,7 +202,7 @@ public final class QueryResources {
       throws QueryException {
 
     // favor default database
-    if(ctx.context.options.get(MainOptions.DEFAULTDB) && ctx.nodes != null) {
+    if(qc.context.options.get(MainOptions.DEFAULTDB) && qc.nodes != null) {
       final Data dt = data[0];
       final IntList pres = dt.resources.docs(qi.original);
       return DBNodeSeq.get(pres, dt, true, qi.original.isEmpty());
@@ -226,7 +262,7 @@ public final class QueryResources {
    * @param strings resource strings (path, encoding)
    */
   public void addResource(final String uri, final String... strings) {
-    resources.put(uri, strings);
+    texts.put(uri, strings);
   }
 
   /**
@@ -248,6 +284,15 @@ public final class QueryResources {
     addCollection(Seq.get(nodes, ns, NodeType.DOC), name);
   }
 
+  /**
+   * Returns a reference to the updates.
+   * @return updates
+   */
+  public Updates updates() {
+    if(updates == null) updates = new Updates();
+    return updates;
+  }
+
   // PRIVATE METHODS ====================================================================
 
   /**
@@ -256,10 +301,10 @@ public final class QueryResources {
    * @return data reference
    */
   private Data open(final QueryInput input) {
-    if(openDB && input.db != null) {
+    if(input.db != null) {
       try {
         // try to open database
-        final Data d = Open.open(input.db, ctx.context);
+        final Data d = Open.open(input.db, qc.context);
         addData(d);
         return d;
       } catch(final IOException ex) {
@@ -282,9 +327,8 @@ public final class QueryResources {
       final InputInfo info) throws QueryException {
 
     // check if new databases can be created
-    final boolean createDB = ctx.context.options.get(MainOptions.FORCECREATE);
-    if(createDB && !openDB) throw BXXQ_NEWDB.get(info);
-    if(!ctx.context.user.has(Perm.READ))
+    final boolean createDB = qc.context.options.get(MainOptions.FORCECREATE);
+    if(!qc.context.user.has(Perm.READ))
       throw BXXQ_PERM.get(info, Util.info(Text.PERM_REQUIRED_X, Perm.READ));
 
     // check if input is an existing file
@@ -292,8 +336,8 @@ public final class QueryResources {
 
     if(single && source.isDir()) WHICHRES.get(info, baseIO);
     try {
-      final Data dt = createDB ? CreateDB.create(source, ctx.context) :
-        CreateDB.mainMem(source, ctx.context);
+      final Data dt = createDB ? CreateDB.create(source, qc.context) :
+        CreateDB.mainMem(source, qc.context);
       input.path = "";
       addData(dt);
       return dt;
@@ -355,9 +399,9 @@ public final class QueryResources {
    * @param name name of database to be removed
    */
   public void removeData(final String name) {
-    for(int d = ctx.nodes != null ? 1 : 0; d < datas; d++) {
+    for(int d = qc.nodes != null ? 1 : 0; d < datas; d++) {
       if(data[d].meta.name.equals(name)) {
-        Close.close(data[d], ctx.context);
+        Close.close(data[d], qc.context);
         Array.move(data, d + 1, -1, --datas - d);
         data[datas] = null;
         break;

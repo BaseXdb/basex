@@ -383,20 +383,19 @@ public final class SeqType {
   }
 
   /**
-   * Treats the specified value as this sequence type.
-   * @param val value to promote
+   * Checks the specified value for this sequence type.
+   * @param val value to be checked
    * @param ii input info
-   * @return the value
    * @throws QueryException query exception
    */
-  public Value treat(final Value val, final InputInfo ii) throws QueryException {
-    if(val.type().instanceOf(this)) return val;
+  public void treat(final Value val, final InputInfo ii) throws QueryException {
+    if(val.type().instanceOf(this)) return;
 
     final int size = (int) val.size();
     if(!occ.check(size)) throw Err.treatError(ii, this, val);
 
     // empty sequence has all types
-    if(size == 0) return Empty.SEQ;
+    if(size == 0) return;
     // check first item
     boolean ins = instance(val.itemAt(0), true);
 
@@ -404,7 +403,6 @@ public final class SeqType {
     if(!val.homogeneous())
       for(int i = 1; ins && i < size; i++) ins = instance(val.itemAt(i), true);
     if(!ins) throw Err.treatError(ii, this, val);
-    return val;
   }
 
   /**

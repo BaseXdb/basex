@@ -391,7 +391,7 @@ public final class GUI extends AGUI {
 
       final Data data = context.data();
       // reset current context if realtime filter is activated
-      if(gopts.get(GUIOptions.FILTERRT) && data != null && !context.root()) context.update();
+      if(gopts.get(GUIOptions.FILTERRT) && data != null && !context.root()) context.invalidate();
 
       // remember current command and context nodes
       final Nodes current = context.current();

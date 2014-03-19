@@ -45,7 +45,7 @@ public final class Suite {
     final FElem suites = new FElem(TESTSUITES);
     for(final IO io : libs) {
       try {
-        final QueryContext qc = new QueryContext(ctx);
+        final QueryContext qc = new QueryContext(ctx.context);
         try {
           final StaticScope mod = qc.parse(string(io.read()), io.path(), null);
           qc.compile();

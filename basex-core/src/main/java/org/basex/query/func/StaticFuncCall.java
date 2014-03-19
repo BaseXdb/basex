@@ -122,7 +122,7 @@ public final class StaticFuncCall extends FuncCall {
     // function code: position or context references will have no effect on calling code
     if(flag == Flag.FCS || flag == Flag.CTX) return false;
     // pass on check to function code
-    return func == null || (flag == Flag.UPD ? func.updating : func.has(flag));
+    return func == null || (flag == Flag.UPD && !sc.mixUpdates ? func.updating : func.has(flag));
   }
 
   @Override

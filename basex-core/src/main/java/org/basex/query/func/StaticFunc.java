@@ -115,7 +115,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(ann);
-    if(updating) tb.add(UPDATING).add(' ');
     tb.add(FUNCTION).add(' ').add(name.string());
     tb.add(PAR1).addSep(args, SEP).add(PAR2);
     if(declType != null) tb.add(' ' + AS + ' ' + declType);
@@ -224,7 +223,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final InputInfo ii = expr instanceof ParseExpr ? ((ParseExpr) expr).info : info;
     if(updating) {
       // updating function
-      if(declType != null) throw UPFUNCTYPE.get(info);
+      if(declType != null) throw UUPFUNCTYPE.get(info);
       if(!u && !expr.isVacuous()) throw UPEXPECTF.get(ii);
     } else if(u) {
       // uses updates, but is not declared as such

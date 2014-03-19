@@ -1,5 +1,7 @@
 package org.basex.query.up;
 
+import java.util.*;
+
 import org.basex.data.*;
 import org.basex.data.atomic.*;
 import org.basex.query.*;
@@ -108,6 +110,15 @@ public final class Updates {
     // determine the pre value of the target node within its database
     final int pre = preSteps(anc, target.id);
     return new DBNode(data, pre);
+  }
+
+  /**
+   * Prepares update operations.
+   * @return updated data references
+   * @throws QueryException query exception
+   */
+  public HashSet<Data> prepare() throws QueryException {
+    return mod == null ? null : mod.prepare();
   }
 
   /**

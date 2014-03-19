@@ -100,8 +100,8 @@ public final class FNClientTest extends AdvancedQueryTest {
     // BXCL0002: session not available
     error(_CLIENT_CLOSE.args("xs:anyURI('unknown')"), Err.BXCL_NOTAVL);
     // BXCL0002: session has already been closed
-    error(conn() + " ! (" + _CLIENT_CLOSE.args(" .") + ", " +
-        _CLIENT_CLOSE.args(" .") + ')', Err.BXCL_NOTAVL);
+    error(conn() + " ! (" + _CLIENT_CLOSE.args(" .") + ", " + _CLIENT_CLOSE.args(" .") + ')',
+        Err.BXCL_NOTAVL);
   }
 
   /**
