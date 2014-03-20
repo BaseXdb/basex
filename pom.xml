@@ -14,7 +14,7 @@
   </modules>
 
   <properties>
-    <compileSource>1.6</compileSource>
+    <compileSource>1.7</compileSource>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
