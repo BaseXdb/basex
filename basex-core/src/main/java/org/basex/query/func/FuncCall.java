@@ -89,7 +89,10 @@ public abstract class FuncCall extends Arr {
         ctx.stack.reuseFrame(func.stackFrameSize());
         args = ctx.pollTailArgs();
       }
-    } finally {
+    } catch(final QueryException ex) {
+      ex.add(ii);
+      throw ex;
+   } finally {
       ctx.stack.exitFrame(fp);
     }
   }
@@ -118,6 +121,9 @@ public abstract class FuncCall extends Arr {
     final int fp = ctx.stack.enterFrame(fun.stackFrameSize());
     try {
       return itm ? fun.invItem(ctx, ii, arg) : fun.invValue(ctx, ii, arg);
+    } catch(final QueryException ex) {
+      ex.add(ii);
+      throw ex;
     } finally {
       ctx.tailCalls = calls;
       ctx.stack.exitFrame(fp);
