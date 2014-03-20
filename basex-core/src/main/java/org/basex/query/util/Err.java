@@ -321,31 +321,27 @@ public enum Err {
   CX_SIGTYPINV(CX, 28, "Signature type is not supported."),
 
   /** File error. */
-  FILE_NF(FILE, "not-found", "File '%' does not exist."),
+  FILE_NOT_FOUND(FILE, "not-found", "File '%' does not exist."),
   /** File error. */
-  FILE_E(FILE, "exists", "File '%' already exists."),
+  FILE_EXISTS(FILE, "exists", "File '%' already exists."),
   /** File error. */
-  FILE_ND(FILE, "no-dir", "Path '%' is no directory."),
+  FILE_NO_DIR(FILE, "no-dir", "Path '%' is no directory."),
   /** File error. */
-  FILE_ID(FILE, "is-dir", "Path '%' is a directory."),
+  FILE_IS_DIR(FILE, "is-dir", "Path '%' is a directory."),
   /** File error. */
-  FILE_ID_FULL(FILE, "is-dir", "Path '%' is a non-empty directory."),
+  FILE_ID_DIR2(FILE, "is-dir", "Path '%' is a non-empty directory."),
   /** File error. */
-  FILE_UE(FILE, "unknown-encoding", "Unknown encoding '%'."),
+  FILE_UNKNOWN_ENCODING(FILE, "unknown-encoding", "Unknown encoding '%'."),
   /** File error. */
-  FILE_OOR(FILE, "out-of-range", "Requested file chunk [%,%] exceeds file bounds."),
+  FILE_OUT_OF_RANGE(FILE, "out-of-range", "Requested file chunk [%,%] exceeds file bounds."),
   /** File error. */
-  FILE_IE(FILE, "io-error", "%"),
+  FILE_INVALID_PATH(FILE, "invalid-path", "Invalid file path: '%'."),
   /** File error. */
-  FILE_IE_DIR(FILE, "io-error", "Directory '%' cannot be created."),
+  FILE_IO_ERROR(FILE, "io-error", "%"),
   /** File error. */
-  FILE_IE_DEL(FILE, "io-error", "Path '%' cannot be deleted."),
+  FILE_IO_ERROR_DEL(FILE, "io-error", "Path '%' cannot be deleted."),
   /** File error. */
-  FILE_IE_MOVE(FILE, "io-error", "Moving '%' to '%' failed."),
-  /** File error. */
-  FILE_IE_ACCESS(FILE, "io-error", "Files of '%' cannot be accessed."),
-  /** File error. */
-  FILE_IE_PATH(FILE, "io-error", "Invalid file path: '%'."),
+  FILE_IE_ERROR_ACCESS(FILE, "io-error", "Access to '%' is denied."),
 
   /** HASH0001. */
   HASH_ALG(HASH, 1, "Algorithm not supported: '%'."),

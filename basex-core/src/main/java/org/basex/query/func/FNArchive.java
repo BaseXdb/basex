@@ -6,10 +6,10 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.nio.charset.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.zip.*;
 
-import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -372,7 +372,7 @@ public final class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item write(final QueryContext ctx) throws QueryException {
-    final File path = checkFile(0, ctx);
+    final java.nio.file.Path path = checkPath(0, ctx);
     final B64 archive = (B64) checkType(checkItem(expr[1], ctx), AtomType.B64);
     final TokenSet hs = entries(2, ctx);
 
@@ -382,12 +382,12 @@ public final class FNArchive extends StandardFunc {
         final ZipEntry ze = in.entry();
         final String name = ze.getName();
         if(hs == null || hs.delete(token(name)) != 0) {
-          final IOFile file = new IOFile(path.getPath(), name);
+          final java.nio.file.Path file = path.resolve(name);
           if(ze.isDirectory()) {
-            file.md();
+            Files.createDirectory(file);
           } else {
-            file.dir().md();
-            file.write(in.read());
+            Files.createDirectory(file.getParent());
+            Files.write(file, in.read());
           }
         }
       }

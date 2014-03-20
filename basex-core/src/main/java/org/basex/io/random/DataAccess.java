@@ -11,7 +11,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class DataAccess {
+public final class DataAccess implements AutoCloseable {
   /** Buffer manager. */
   private final Buffers bm = new Buffers();
   /** Reference to the data input stream. */
@@ -56,9 +56,7 @@ public final class DataAccess {
     }
   }
 
-  /**
-   * Closes the data access.
-   */
+  @Override
   public synchronized void close() {
     flush();
     try {

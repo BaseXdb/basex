@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.nio.charset.*;
+import java.nio.file.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -172,16 +173,20 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Converts the specified argument to a file instance.
+   * Converts the specified argument to a file path.
    * @param i argument index
    * @param ctx query context
    * @return file instance
    * @throws QueryException query exception
    */
-  protected File checkFile(final int i, final QueryContext ctx) throws QueryException {
+  protected Path checkPath(final int i, final QueryContext ctx) throws QueryException {
     if(i >= expr.length) return null;
     final String file = string(checkStr(expr[i], ctx));
-    return IOUrl.isFileURL(file) ? IOFile.get(file).file() : new File(file);
+    try {
+      return Paths.get(IOUrl.isFileURL(file) ? IOUrl.toFile(file) : file);
+    } catch(final InvalidPathException ex) {
+      throw FILE_INVALID_PATH.get(info, file);
+    }
   }
 
   /**

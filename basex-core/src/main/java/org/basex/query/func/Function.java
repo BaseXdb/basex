@@ -787,6 +787,12 @@ public enum Function {
   _FILE_COPY(FNFile.class, "copy(source,target)", arg(STR, STR), EMP, flag(NDT)),
   /** XQuery function. */
   _FILE_MOVE(FNFile.class, "move(source,target)", arg(STR, STR), EMP, flag(NDT)),
+  /** XQuery function. */
+  _FILE_CURRENT_DIR(FNFile.class, "current-dir()", arg(), STR),
+  /** XQuery function. */
+  _FILE_BASE_DIR(FNFile.class, "base-dir()", arg(), STR),
+  /** XQuery function. */
+  _FILE_CHILDREN(FNFile.class, "children(path)", arg(STR), STR_ZM, flag(NDT)),
 
   /* FNFt functions. */
 

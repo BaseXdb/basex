@@ -137,7 +137,7 @@ public abstract class IO {
     if(source == null) return new IOContent("");
     final String s = source.trim();
     return s.indexOf('<') == 0 ? new IOContent(s) :
-           IOUrl.isFileURL(s)  ? IOFile.get(s) :
+           IOUrl.isFileURL(s)  ? new IOFile(IOUrl.toFile(s)) :
            IOFile.isValid(s)   ? new IOFile(s) :
            IOUrl.isValid(s)    ? new IOUrl(s) :
            new IOContent(s);
