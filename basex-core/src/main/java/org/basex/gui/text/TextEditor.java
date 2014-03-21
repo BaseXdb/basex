@@ -674,7 +674,7 @@ public final class TextEditor {
       final int opening = OPENING.indexOf(ch);
       if(opening != -1) {
         // adds a closing to an opening bracket
-        if(CLOSING.indexOf(curr) != -1 || curr == 0 || ws(curr)) {
+        if(CLOSING.indexOf(curr) != -1 || curr == 0 || ws(curr) || curr == '<') {
           sb.append(CLOSING.charAt(opening));
           move = 1;
         }
