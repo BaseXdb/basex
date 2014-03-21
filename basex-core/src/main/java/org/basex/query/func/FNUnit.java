@@ -11,6 +11,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.unit.*;
 import org.basex.query.value.item.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -41,6 +42,22 @@ public final class FNUnit extends StandardFunc {
       case _UNIT_TEST_URIS:     return testUris(ctx);
       default:                  return super.item(ctx, ii);
     }
+  }
+
+  @Override
+  Expr opt(final QueryContext ctx, final VarScope scp) throws QueryException {
+    if(sig == Function._UNIT_TEST_URIS || sig == Function._UNIT_TEST && expr.length == 0) {
+      for(StaticFunc fn : ctx.funcs.funcs()) {
+        if(fn.compiled()) continue;
+        for(final QNm ann : fn.ann.names) {
+          if(Token.eq(ann.uri(), QueryText.UNITURI)) {
+            fn.compile(ctx);
+            break;
+          }
+        }
+      }
+    }
+    return super.opt(ctx, scp);
   }
 
   /**
