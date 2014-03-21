@@ -50,5 +50,8 @@ public final class FNUnitTest extends AdvancedQueryTest {
     func = "declare %unit:test function local:x() { 1+<a/> }; ";
     query(func + COUNT.args(_UNIT_TEST.args(_INSPECT_FUNCTIONS.args()) + "//error"), "1");
     query(func + _UNIT_TEST.args("()") + "/*/*", "");
+
+    func = "declare %unit:test function unit:test() { function() { () }() }; ";
+    query(func + COUNT.args(_UNIT_TEST.args()), "1");
   }
 }
