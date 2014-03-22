@@ -42,22 +42,13 @@ abstract class CsvSerializer extends OutputSerializer {
    * @throws IOException I/O exception
    */
   void record(final TokenList fields) throws IOException {
-    // check if all fields are empty
-    int d = -1;
+    // print fields, skip trailing empty contents
     final int fs = fields.size();
     for(int i = 0; i < fs; i++) {
       final byte[] v = fields.get(i);
-      if(v != null && v.length != 0) d = i;
-    }
-    if(d == -1) return;
-
-    // print fields, skip trailing empty contents
-    for(int i = 0; i <= d; i++) {
-      final byte[] v = fields.get(i);
       if(i != 0) print(separator);
 
-      if(v == null) continue;
-      byte[] txt = v;
+      byte[] txt = v == null ? EMPTY : v;
       if(contains(txt, separator) || quotes && (contains(txt, '\n') || contains(txt, '"'))) {
         final TokenBuilder tb = new TokenBuilder().add('"');
         final int len = txt.length;
