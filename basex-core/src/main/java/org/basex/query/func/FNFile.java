@@ -226,8 +226,7 @@ public final class FNFile extends StandardFunc {
    */
   private Iter children(final QueryContext ctx) throws QueryException, IOException {
     final TokenList children = new TokenList();
-    Path dir = checkPath(0, ctx).toRealPath();
-    try(DirectoryStream<Path> paths = Files.newDirectoryStream(dir)) {
+    try(DirectoryStream<Path> paths = Files.newDirectoryStream(checkPath(0, ctx))) {
       for(final Path child : paths) children.add(get(child, Files.isDirectory(child)).string());
     }
     return StrSeq.get(children).iter();
@@ -553,7 +552,7 @@ public final class FNFile extends StandardFunc {
   private Path checkParentDir(final Path path) throws QueryException {
     if(Files.isDirectory(path)) throw FILE_IS_DIR.get(info, path);
     final Path parent = path.getParent();
-    if(!Files.exists(parent)) throw FILE_NO_DIR.get(info, parent);
+    if(parent != null && !Files.exists(parent)) throw FILE_NO_DIR.get(info, parent);
     return path;
   }
 
