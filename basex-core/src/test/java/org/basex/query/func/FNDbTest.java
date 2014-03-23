@@ -719,7 +719,11 @@ public final class FNDbTest extends AdvancedQueryTest {
 
     // copy database to new name and vice versa
     query(_DB_COPY.args(NAME, NAME + 'x'));
-    query(_DB_COPY.args(NAME + 'x', NAME));
+    try {
+      query(_DB_COPY.args(NAME + 'x', NAME));
+    } finally {
+      query(_DB_DROP.args(NAME + 'x'));
+    }
 
     // invalid names
     error(_DB_COPY.args("x", " ''"), Err.BXDB_NAME);
