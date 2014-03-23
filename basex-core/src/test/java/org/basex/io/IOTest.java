@@ -16,10 +16,10 @@ public final class IOTest {
   @Test
   public void urlToFile() {
     if(Prop.WIN) {
-      assertEquals("C:/x y", IOUrl.toFile("file:/c:/x%20y"));
-      assertEquals("C:/x y", IOUrl.toFile("file://c:/x y"));
-      assertEquals("D:/x+y", IOUrl.toFile("file:///D:/x%2By"));
-      assertEquals("G:/X", IOUrl.toFile("file:///G:/X"));
+      assertEquals("C:/x y", IO.get("file:/c:/x%20y").path());
+      assertEquals("C:/x y", IO.get("file://C:/x y").path());
+      assertEquals("D:/x+y", IO.get("file:///D:/x%2By").path());
+      assertEquals("G:/X", IO.get("file:///G:/X").path());
     } else {
       assertEquals("/x y", IOUrl.toFile("file:///x%20y"));
     }

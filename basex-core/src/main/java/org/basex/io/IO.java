@@ -90,11 +90,11 @@ public abstract class IO {
   public static final long OFFCOMP = 0x4000000000L;
 
   /** File path. The path uses forward slashes, no matter which OS is used. */
-  String path;
+  protected String path;
+  /** File length. */
+  protected long len = -1;
   /** File name. */
   private String name;
-  /** File length. */
-  long len = -1;
 
   /**
    * Protected constructor.

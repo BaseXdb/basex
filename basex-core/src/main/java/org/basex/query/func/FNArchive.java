@@ -384,9 +384,9 @@ public final class FNArchive extends StandardFunc {
         if(hs == null || hs.delete(token(name)) != 0) {
           final java.nio.file.Path file = path.resolve(name);
           if(ze.isDirectory()) {
-            Files.createDirectory(file);
+            Files.createDirectories(file);
           } else {
-            Files.createDirectory(file.getParent());
+            Files.createDirectories(file.getParent());
             Files.write(file, in.read());
           }
         }
