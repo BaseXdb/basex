@@ -47,4 +47,14 @@ public class InlineTest extends QueryPlanTest {
         "x",
         "exists(//Str)");
   }
+
+  /**
+   * Tests if variables directly inside an FTDistanceExpr are correctly inlined.
+   */
+  @Test public void gh907() {
+    check("let $n := 0 return 'x y' contains text 'x y' distance exactly $n paragraphs",
+        "true",
+        "empty(//GFLWOR)",
+        "empty(//Var)");
+  }
 }
