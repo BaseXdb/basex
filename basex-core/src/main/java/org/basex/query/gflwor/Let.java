@@ -134,18 +134,6 @@ public final class Let extends GFLWOR.Clause {
     return this;
   }
 
-  /**
-   * Binds the the value of this let clause to the context if it is statically known.
-   * @param ctx query context
-   * @throws QueryException evaluation exception
-   */
-  void bindConst(final QueryContext ctx) throws QueryException {
-    if(expr.isValue()) {
-      ctx.compInfo(OPTBIND, var);
-      ctx.set(var, score ? score(expr.iter(ctx)) : (Value) expr, info);
-    }
-  }
-
   @Override
   public boolean removable(final Var v) {
     return expr.removable(v);

@@ -100,4 +100,14 @@ public final class MixedTest extends AdvancedQueryTest {
     query(COUNT.args(_DB_OPEN.args(NAME, "a") + "/a"), "1");
     query(COUNT.args(_DB_OPEN.args(NAME) + "/a"), "2");
   }
+
+  /**
+   * Tests constant-propagating variables that were introduced by inlining.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void gh907() throws BaseXException {
+    new CreateDB(NAME, "<x/>").execute(context);
+    query("declare function local:a($a) { contains($a, 'a') }; //x[local:a(.)]", "");
+  }
 }

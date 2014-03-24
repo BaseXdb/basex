@@ -35,9 +35,7 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) {
-    // constant propagation
-    final Value v = ctx.get(var);
-    return v != null ? v : optimize(ctx, scp);
+    return optimize(ctx, scp);
   }
 
   @Override
