@@ -72,13 +72,11 @@ public final class FuncLit extends Single implements Scope {
     // at parse time. This check could possibly be moved to StaticFuncs#check.
     if(!sc.mixUpdates && ann.contains(Ann.Q_UPDATING)) throw UPFUNCITEM.get(info);
 
-    final int fp = scope.enter(ctx);
     try {
       expr = expr.compile(ctx, scope);
       expr.markTailCalls(null);
     } finally {
       scope.cleanUp(this);
-      scope.exit(ctx, fp);
     }
   }
 

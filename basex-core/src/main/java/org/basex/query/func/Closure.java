@@ -156,18 +156,12 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       e.getKey().refineType(bound.type(), ctx, info);
     }
 
-    final int fp = scope.enter(ctx);
     try {
-      // constant propagation
-      for(final Entry<Var, Value> e : staticBindings())
-        ctx.set(e.getKey(), e.getValue(), info);
-
       expr = expr.compile(ctx, scope);
     } catch(final QueryException qe) {
       expr = FNInfo.error(qe, ret != null ? ret : expr.type());
     } finally {
       scope.cleanUp(this);
-      scope.exit(ctx, fp);
     }
 
     // convert all function calls in tail position to proper tail calls
@@ -183,18 +177,17 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     type = FuncType.get(ann, args, retType).seqType();
     size = 1;
 
-    final int fp = scope.enter(ctx);
     try {
       // inline all values in the closure
       for(final Entry<Var, Value> e : staticBindings()) {
-        final Expr inlined = expr.inline(ctx, scope, e.getKey(), e.getValue());
+        final Var v = e.getKey();
+        final Expr inlined = expr.inline(ctx, scope, v, v.checkType(e.getValue(), ctx, info, true));
         if (inlined != null) expr = inlined;
       }
     } catch(final QueryException qe) {
       expr = FNInfo.error(qe, ret != null ? ret : expr.type());
     } finally {
       scope.cleanUp(this);
-      scope.exit(ctx, fp);
     }
 
     // only evaluate if the closure is empty, so we don't lose variables

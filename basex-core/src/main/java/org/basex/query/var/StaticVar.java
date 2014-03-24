@@ -58,7 +58,6 @@ public final class StaticVar extends StaticDecl {
 
     if(!compiled) {
       dontEnter = true;
-      final int fp = scope.enter(ctx);
       try {
         expr = expr.compile(ctx, scope);
       } catch(final QueryException qe) {
@@ -70,7 +69,6 @@ public final class StaticVar extends StaticDecl {
         throw qe.notCatchable();
       } finally {
         scope.cleanUp(this);
-        scope.exit(ctx, fp);
         dontEnter = false;
       }
 
