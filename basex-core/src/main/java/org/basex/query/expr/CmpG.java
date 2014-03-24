@@ -253,11 +253,11 @@ public final class CmpG extends Cmp {
     if(!ir2.reset()) {
       // cache items for next comparisons
       final ValueBuilder vb = new ValueBuilder();
-      if((it1 = ir1.next()) != null) {
-        while((it2 = ir2.next()) != null) {
-          if(eval(it1, it2, collation)) return Bln.TRUE;
-          vb.add(it2);
-        }
+      it1 = ir1.next();
+      if(it1 == null) return Bln.FALSE;
+      while((it2 = ir2.next()) != null) {
+        if(eval(it1, it2, collation)) return Bln.TRUE;
+        vb.add(it2);
       }
       ir2 = vb;
     }
