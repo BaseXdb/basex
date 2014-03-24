@@ -75,6 +75,8 @@ public final class FuncLit extends Single implements Scope {
     try {
       expr = expr.compile(ctx, scope);
       expr.markTailCalls(null);
+    } catch(final QueryException e) {
+      expr = FNInfo.error(e, type);
     } finally {
       scope.cleanUp(this);
     }
