@@ -87,8 +87,6 @@ public final class GFLWOR extends ParseExpr {
     try {
       for(final Clause c : clauses) {
         c.compile(ctx, scp);
-        // the first round of constant propagation is free
-        if(c instanceof Let) ((Let) c).bindConst(ctx);
         i++;
       }
       ret = ret.compile(ctx, scp);

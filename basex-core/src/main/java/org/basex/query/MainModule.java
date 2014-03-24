@@ -59,11 +59,9 @@ public final class MainModule extends StaticScope {
     if(compiled) return;
     try {
       compiled = true;
-      scope.enter(ctx);
       expr = expr.compile(ctx, scope);
-      scope.cleanUp(this);
     } finally {
-      scope.exit(ctx, 0);
+      scope.cleanUp(this);
     }
   }
 

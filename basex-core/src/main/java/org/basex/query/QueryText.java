@@ -796,8 +796,6 @@ public interface QueryText {
   /** Optimization info. */
   String OPTNOINDEX = "removing path with no index results";
   /** Optimization info. */
-  String OPTBIND = "binding static variable %";
-  /** Optimization info. */
   String OPTCHILD = "converting % to child steps";
   /** Optimization info. */
   String OPTUNROLL = "unrolling %";
