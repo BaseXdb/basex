@@ -21,6 +21,7 @@ public final class SimpleTest extends QueryTest {
       { "Annotation 3", "declare %local:x(.) variable $a := 1; $a" },
 
       { "Compare 1", "xs:QName('a') = attribute a { 'b' }" },
+      { "Compare 2", bool(false), "<a/>/x = (c, ())" },
 
       { "FLWOR 1", itr(3), "(for $i in 1 to 5 return $i)[3]" },
       { "FLWOR 2", itr(4),
