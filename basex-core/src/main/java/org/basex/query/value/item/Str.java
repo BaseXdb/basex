@@ -111,6 +111,8 @@ public class Str extends AStr {
     tb.add('"');
     for(final byte v : val) {
       if(v == '&') tb.add(E_AMP);
+      else if(v == '\r') tb.add(E_0D);
+      else if(v == '\n') tb.add(E_0A);
       else tb.add(v);
       if(v == '"') tb.add('"');
     }
