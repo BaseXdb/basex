@@ -49,8 +49,9 @@ public final class FNUnit extends StandardFunc {
     if(sig == Function._UNIT_TEST_URIS || sig == Function._UNIT_TEST && expr.length == 0) {
       for(StaticFunc fn : ctx.funcs.funcs()) {
         if(fn.compiled()) continue;
-        for(final QNm ann : fn.ann.names) {
-          if(Token.eq(ann.uri(), QueryText.UNITURI)) {
+        final Ann ann = fn.ann;
+        for(int i = ann.size(); --i >= 0;) {
+          if(Token.eq(ann.names[i].uri(), QueryText.UNITURI)) {
             fn.compile(ctx);
             break;
           }
