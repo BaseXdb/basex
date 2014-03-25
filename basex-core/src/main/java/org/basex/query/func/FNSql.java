@@ -377,6 +377,7 @@ public final class FNSql extends StandardFunc {
               col.add(new DBNode(new IOContent(xml), ctx.context.options).children().next());
             } catch(final IOException ex) {
               // fallback: add string representation
+              Util.debug(ex);
               col.add(xml);
             }
           } else {
