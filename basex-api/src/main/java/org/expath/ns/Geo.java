@@ -681,8 +681,8 @@ public final class Geo extends QueryModule {
         final GMLReader gmlReader = new GMLReader();
         final GeometryFactory geoFactory = new GeometryFactory();
         return gmlReader.read(input, geoFactory);
-      } catch (final Throwable e) {
-        throw GeoErrors.gmlReaderErr(e);
+      } catch(final Throwable ex) {
+        throw GeoErrors.gmlReaderErr(ex);
       }
     }
     return null;
