@@ -134,6 +134,27 @@ final class NSNode {
   }
 
   /**
+   * Finds a specific pre value in the child array utilizing binary search
+   * and returns its position, if it is contained.
+   * If it is not contained, it returns the position of the biggest element in
+   * the array that is still smaller than p. If all elements in the array are
+   * bigger, it returns -1.
+   * @param p pre value
+   * @return position of node in child array.
+   */
+  int find(final int p) {
+    int l = 0, h = size - 1;
+    while(l <= h) { // binary search
+      final int m = l + h >>> 1;
+      final int v = children[m].pre;
+      if(v == p) return m;
+      if(v < p) l = m + 1;
+      else h = m - 1;
+    }
+    return l - 1;
+  }
+
+  /**
    * Returns the namespace URI reference for the specified prefix.
    * @param p prefix reference
    * @return u uri reference or 0
@@ -172,24 +193,6 @@ final class NSNode {
 
     // otherwise remove nodes from the child array
     else if(num > 0) System.arraycopy(children, s + num, children, s, size - s);
-  }
-
-  /**
-   * Finds a specific pre value in the child array utilizing binary search
-   * and returns its position.
-   * @param p pre value
-   * @return node
-   */
-  int find(final int p) {
-    int l = 0, h = size - 1;
-    while(l <= h) { // binary search
-      final int m = l + h >>> 1;
-      final int v = children[m].pre;
-      if(v == p) return m;
-      if(v < p) l = m + 1;
-      else h = m - 1;
-    }
-    return l - 1;
   }
 
   // Printing Namespaces ======================================================

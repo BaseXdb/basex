@@ -110,21 +110,6 @@ public final class Namespaces {
     --level;
   }
 
-  /**
-   * Returns the namespace URI reference for the specified name,
-   * or {@code 0} if no namespace is found.
-   * @param name tag/attribute name
-   * @param elem element flag
-   * @return namespace
-   */
-  public int uri(final byte[] name, final boolean elem) {
-    if(uris.isEmpty()) return 0;
-    final byte[] pref = Token.prefix(name);
-    int nu = elem ? defaults.get(level) : 0;
-    if(pref.length != 0) nu = uri(pref, current);
-    return nu;
-  }
-
   // Requesting Namespaces ==============================================================
 
   /**
@@ -179,12 +164,36 @@ public final class Namespaces {
   }
 
   /**
-   * Deletes the specified namespace URI from the root node.
-   * @param uri namespace URI reference
+   * Returns a reference to the specified namespace URI,
+   * or {@code 0} if the URI is empty or no namespace is found.
+   * @param uri namespace URI
+   * @return reference, or {@code 0}
    */
-  public void delete(final byte[] uri) {
-    final int id = uris.id(uri);
-    if(id != 0) current.delete(id);
+  public int uri(final byte[] uri) {
+    return uri.length == 0 ? 0 : uris.id(uri);
+  }
+
+  /**
+   * Returns the namespace URI reference for the specified name,
+   * or {@code 0} if no namespace is found.
+   * @param name tag/attribute name
+   * @param elem element flag
+   * @return namespace
+   */
+  public int uri(final byte[] name, final boolean elem) {
+    if(uris.isEmpty()) return 0;
+    final byte[] pref = Token.prefix(name);
+    int nu = elem ? defaults.get(level) : 0;
+    if(pref.length != 0) nu = uri(pref, current);
+    return nu;
+  }
+
+  /**
+   * Returns the current namespaces node.
+   * @return current namespace node
+   */
+  NSNode getCurrent() {
+    return current;
   }
 
   /**
@@ -297,7 +306,44 @@ public final class Namespaces {
     return 0;
   }
 
+  /**
+   * Returns all namespace nodes in the namespace structure with a minimum
+   * PRE value.
+   * @param pre minimum PRE value of a namespace node.
+   * @param data data reference
+   * @return List of namespace nodes with a minimum PRE value of pre
+   */
+  List<NSNode> getNSNodes(final int pre, final Data data) {
+    final List<NSNode> l = new ArrayList<NSNode>();
+    addNSNodes(root, l, pre);
+    return l;
+  }
+
+  /**
+   * Recursively adds namespace nodes to the given list, starting at the children of
+   * the given node.
+   * @param current current namespace node
+   * @param l list with namespace nodes
+   * @return list with namespace nodes
+   */
+  private List<NSNode> addNSNodes(final NSNode current, final List<NSNode> l, final int pre) {
+    for(int i = 0; i < current.size; i++) {
+      final NSNode ch = current.children[i];
+      if(ch.pre >= pre) l.add(ch);
+      addNSNodes(ch, l, pre);
+    }
+    return l;
+  }
+
   // Updating Namespaces ================================================================
+  /**
+   * Deletes the specified namespace URI from the root node.
+   * @param uri namespace URI reference
+   */
+  public void delete(final byte[] uri) {
+    final int id = uris.id(uri);
+    if(id != 0) current.delete(id);
+  }
 
   /**
    * Deletes the specified number of entries from the namespace structure.
@@ -312,7 +358,8 @@ public final class Namespaces {
       nd.delete(pre, size);
       nd = nd.parent;
     }
-    shiftPreAfterDelete(root, pre, size);
+
+    decrementPre(root, pre, size);
   }
 
   /**
@@ -321,33 +368,18 @@ public final class Namespaces {
    * @param pre update location
    * @param size size of inserted/deleted node
    */
-  private static void shiftPreAfterDelete(final NSNode node, final int pre, final int size) {
+  private static void decrementPre(final NSNode node, final int pre, final int size) {
     if(node.pre >= pre + size) node.pre -= size;
-    for(int c = 0; c < node.size; c++) shiftPreAfterDelete(node.children[c], pre, size);
+    for(int c = 0; c < node.size; c++) decrementPre(node.children[c], pre, size);
   }
 
   /**
-   * Updates the pre values of all nodes on the following axis after a
-   * structural update at location pre.
-   * @param pre update location
-   * @param size size of inserted/deleted node
-   * @param cache added nodes
+   * Increments the PRE value of all namespace nodes in the given list by the given size.
+   * @param l list of namespace nodes
+   * @param s increment size
    */
-  void shiftPreAfterInsert(final int pre, final int size, final Set<NSNode> cache) {
-    shiftPreAfterInsert(root, pre, size, cache);
-  }
-
-  /**
-   * Recursive shifting of pre values after insert operations.
-   * @param node current namespace node
-   * @param pre update location
-   * @param size size of inserted/deleted node
-   * @param cache added nodes
-   */
-  private static void shiftPreAfterInsert(final NSNode node, final int pre, final int size,
-      final Set<NSNode> cache) {
-    if(!cache.contains(node) && node.pre >= pre) node.pre += size;
-    for(int c = 0; c < node.size; c++) shiftPreAfterInsert(node.children[c], pre, size, cache);
+  void incrementPre(final List<NSNode> l, final int s) {
+    for(final NSNode n : l) n.pre += s;
   }
 
   /**
@@ -377,24 +409,6 @@ public final class Namespaces {
       nd.add(t);
     }
     return v;
-  }
-
-  /**
-   * Returns a reference to the specified namespace URI,
-   * or {@code 0} if the URI is empty or no namespace is found.
-   * @param uri namespace URI
-   * @return reference, or {@code 0}
-   */
-  public int uri(final byte[] uri) {
-    return uri.length == 0 ? 0 : uris.id(uri);
-  }
-
-  /**
-   * Returns the current namespaces node.
-   * @return current namespace node
-   */
-  NSNode getCurrent() {
-    return current;
   }
 
   /**
