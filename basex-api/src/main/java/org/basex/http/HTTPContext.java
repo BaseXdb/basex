@@ -20,6 +20,7 @@ import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.server.*;
 import org.basex.util.*;
+import org.basex.util.Base64;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
 
