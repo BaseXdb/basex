@@ -21,6 +21,7 @@ import org.basex.query.util.http.HTTPRequest.Part;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.Base64;
 import org.basex.util.hash.*;
 
 /**
