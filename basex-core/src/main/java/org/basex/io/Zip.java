@@ -72,7 +72,7 @@ public final class Zip extends Proc {
         if(ze.isDirectory()) {
           trg.md();
         } else {
-          trg.dir().md();
+          trg.parent().md();
           try(final OutputStream out = new FileOutputStream(trg.path())) {
             for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
           }

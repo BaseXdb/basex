@@ -106,15 +106,14 @@ public final class Export extends Command {
     for(int i = 0; i < is; i++) {
       final int pre = il.get(i);
       // create file path
-      final IO f = root.merge(Token.string(data.text(pre, true)));
+      final IOFile f = root.resolve(Token.string(data.text(pre, true)));
       if(export != null) {
         export.checkStop();
         export.progFile = f;
         export.progPos++;
       }
       // create dir if necessary
-      final IOFile dir = new IOFile(f.dirPath());
-      if(!dir.exists()) dir.md();
+      f.parent().md();
 
       // serialize file
       try(final PrintOutput po = new PrintOutput(unique(exported, f.path()))) {

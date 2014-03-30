@@ -60,7 +60,7 @@ public final class DirParser extends Parser {
    */
   public DirParser(final IO source, final MainOptions opts, final IOFile path) {
     super(source, opts);
-    final String parent = source.dirPath();
+    final String parent = source.dir();
     root = parent.endsWith("/") ? parent : parent + '/';
     skipCorrupt = options.get(MainOptions.SKIPCORRUPT);
     archives = options.get(MainOptions.ADDARCHIVES);

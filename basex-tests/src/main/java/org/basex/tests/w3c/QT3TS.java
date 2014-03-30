@@ -188,7 +188,7 @@ public final class QT3TS {
     final XdmValue set = new XQuery("*:test-set", ctx).context(doc).value();
     final IO base = IO.get(doc.getBaseURI());
     baseURI = base.path();
-    baseDir = base.dirPath();
+    baseDir = base.dir();
 
     if(supported(set)) {
       // parse environment of test-set

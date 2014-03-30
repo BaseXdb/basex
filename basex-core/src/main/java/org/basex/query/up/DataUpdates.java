@@ -14,6 +14,7 @@ import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
@@ -184,6 +185,7 @@ final class DataUpdates {
       try {
         Export.export(data, data.meta.original, null);
       } catch(final IOException ex) {
+        Util.debug(ex);
         throw UPPUTERR.get(null, data.meta.original);
       }
     }

@@ -57,7 +57,7 @@ public final class EditorArea extends TextPanel {
         // refresh query path and work directory
         final String path = file.path();
         gui.context.options.set(MainOptions.QUERYPATH, path);
-        gui.gopts.set(GUIOptions.WORKPATH, file.dirPath());
+        gui.gopts.set(GUIOptions.WORKPATH, file.dir());
 
         // reload file if it has been changed
         SwingUtilities.invokeLater(new Runnable() {

@@ -199,13 +199,13 @@ public final class RepoManager {
   public static IOFile file(final String name, final Repo repo) {
     // traverse all files, find exact matches
     IOFile path = new IOFile(repo.path(), name);
-    for(final IOFile ch : path.dir().children()) {
+    for(final IOFile ch : path.parent().children()) {
       if(ch.name().equals(path.name())) return ch;
     }
     // traverse all files, find prefix matches
     path = new IOFile(repo.path(), name.replace('.', '/'));
     final String start = path.name() + '.';
-    for(final IOFile ch : path.dir().children()) {
+    for(final IOFile ch : path.parent().children()) {
       if(ch.name().startsWith(start)) return ch;
     }
     return null;
@@ -263,7 +263,7 @@ public final class RepoManager {
     final IOFile rp = new IOFile(repo.context.globalopts.get(GlobalOptions.REPOPATH));
     final IOFile target = new IOFile(rp, path);
     final boolean exists = target.exists();
-    target.dir().md();
+    target.parent().md();
     target.write(content);
     return exists;
   }

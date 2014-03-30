@@ -619,7 +619,7 @@ public final class EditorView extends View {
     final StringList paths = new StringList();
     if(file != null) {
       final String path = file.path();
-      gui.gopts.set(GUIOptions.WORKPATH, file.dirPath());
+      gui.gopts.set(GUIOptions.WORKPATH, file.dir());
       paths.add(path);
       tabs.setToolTipTextAt(tabs.getSelectedIndex(), path);
     }

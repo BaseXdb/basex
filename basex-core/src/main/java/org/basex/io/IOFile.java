@@ -1,13 +1,12 @@
 package org.basex.io;
 
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
 
 import javax.xml.transform.stream.*;
 
-import org.basex.io.in.*;
-import org.basex.io.out.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.xml.sax.*;
@@ -73,21 +72,18 @@ public final class IOFile extends IO {
    * @return success flag
    */
   public boolean touch() {
-    // some file systems require several runs
-    for(int i = 0; i < 5; i++) {
-      try {
-        if(file.createNewFile()) return true;
-      } catch(final IOException ex) {
-        Performance.sleep(i * 10L);
-        Util.debug(ex);
-      }
+    try {
+      Files.createFile(toPath());
+      return true;
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      return false;
     }
-    return false;
   }
 
   @Override
   public byte[] read() throws IOException {
-    return new BufferInput(this).content();
+    return Files.readAllBytes(toPath());
   }
 
   @Override
@@ -125,33 +121,42 @@ public final class IOFile extends IO {
     return new FileInputStream(file);
   }
 
+  /**
+   * Resolves two paths.
+   * @param pth file path (relative or absolute)
+   * @return resulting path
+   */
+  public IOFile resolve(final String pth) {
+    final File f = new File(pth);
+    return f.isAbsolute() ? new IOFile(f) : new IOFile(dir(), pth);
+  }
+
   @Override
-  public IO merge(final String f) {
-    final IO io = IO.get(f);
-    if(!(io instanceof IOFile) || f.contains(":") || f.startsWith("/")) return io;
-    return new IOFile(dir(), f);
+  public IO merge(final String pth) {
+    final IO io = IO.get(pth);
+    if(!(io instanceof IOFile) || pth.contains(":") || pth.startsWith("/")) return io;
+    return new IOFile(dir(), pth);
   }
 
   /**
-   * Recursively creates the directory.
-   * @return success flag
+   * Recursively creates the directory if it does not exist yet.
+   * @return {@code true} if the directory exists or has been created.
    */
   public boolean md() {
-    return !file.exists() && file.mkdirs();
+    return file.exists() || file.mkdirs();
   }
 
   @Override
-  public String dirPath() {
+  public String dir() {
     return isDir() ? path : path.substring(0, path.lastIndexOf('/') + 1);
   }
 
   /**
-   * Returns a directory reference. If the file points to a directory, a self reference
-   * is returned
+   * Returns the parent of this file or directory.
    * @return directory
    */
-  public IOFile dir() {
-    return isDir() ? this : new IOFile(path.substring(0, path.lastIndexOf('/') + 1));
+  public IOFile parent() {
+    return new IOFile(file.getParentFile());
   }
 
   /**
@@ -202,49 +207,35 @@ public final class IOFile extends IO {
     if(io.isDir()) {
       for(final IOFile f : io.children()) add(f, files, off);
     } else {
-      files.add(io.path().substring(off).replace('\\', '/'));
+      files.add(io.path().substring(off));
     }
   }
 
   /**
    * Writes the specified byte array.
-   * @param c contents
+   * @param bytes bytes
    * @throws IOException I/O exception
    */
-  public void write(final byte[] c) throws IOException {
-    try(final FileOutputStream out = new FileOutputStream(path)) {
-      out.write(c);
-    }
+  public void write(final byte[] bytes) throws IOException {
+    Files.write(toPath(), bytes);
   }
 
   /**
-   * Writes the specified input. The specified input stream is eventually closed.
-   * @param in input stream
-   * @throws IOException I/O exception
-   */
-  public void write(final InputStream in) throws IOException {
-    try(final BufferOutput out = new BufferOutput(path)) {
-      for(int i; (i = in.read()) != -1;) out.write(i);
-    } finally {
-      in.close();
-    }
-  }
-
-  /**
-   * Deletes the IO reference.
-   * @return success flag
+   * Deletes the file or directory.
+   * @return {@code true} if the file does not exist or has been deleted.
    */
   public boolean delete() {
+    boolean ok = true;
     if(file.exists()) {
-      boolean ok = true;
       if(isDir()) for(final IOFile ch : children()) ok &= ch.delete();
-      // some file systems require several runs
-      for(int i = 0; i < 5; i++) {
-        if(file.delete() && !file.exists()) return ok;
-        Performance.sleep(i * 10L);
+      try {
+        Files.delete(toPath());
+      } catch(final IOException ex) {
+        Util.debug(ex);
+        return false;
       }
     }
-    return false;
+    return ok;
   }
 
   /**
@@ -262,17 +253,9 @@ public final class IOFile extends IO {
    * @throws IOException I/O exception
    */
   public void copyTo(final IOFile target) throws IOException {
-    // optimize buffer size
-    final int bsize = (int) Math.max(1, Math.min(length(), 1 << 22));
-    final byte[] buf = new byte[bsize];
-
     // create parent directory of target file
-    target.dir().md();
-    // copy file buffer by buffer
-    try(final FileInputStream fis = new FileInputStream(file);
-        final FileOutputStream fos = new FileOutputStream(target.file)) {
-      for(int i; (i = fis.read(buf)) != -1;) fos.write(buf, 0, i);
-    }
+    target.parent().md();
+    Files.copy(toPath(), target.toPath());
   }
 
   @Override
@@ -309,7 +292,21 @@ public final class IOFile extends IO {
     } else {
       args = new String[] { "xdg-open", path };
     }
-    new ProcessBuilder(args).directory(dir().file).start();
+    new ProcessBuilder(args).directory(parent().file).start();
+  }
+
+  /**
+   * Returns a {@link Path} instance of this file.
+   * @return path
+   * @throws IOException I/O exception
+   */
+  private Path toPath() throws IOException {
+    try {
+      return Paths.get(path);
+    } catch(final InvalidPathException ex) {
+      Util.debug(ex);
+      throw new IOException(ex);
+    }
   }
 
   // STATIC METHODS ===============================================================================

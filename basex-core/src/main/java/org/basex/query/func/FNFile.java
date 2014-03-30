@@ -170,7 +170,7 @@ public final class FNFile extends StandardFunc {
    */
   private Str baseDir() {
     final IO base = sc.baseIO();
-    return base instanceof IOFile ? get(absolute(Paths.get(base.dirPath())), true) : null;
+    return base instanceof IOFile ? get(absolute(Paths.get(base.dir())), true) : null;
   }
 
   /**

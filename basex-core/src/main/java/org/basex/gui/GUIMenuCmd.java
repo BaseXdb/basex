@@ -70,13 +70,13 @@ public enum GUIMenuCmd implements GUICommand {
 
       // check if existing files will be overwritten
       if(root.exists()) {
-        IO file = null;
+        IOFile file = null;
         boolean overwrite = false;
         final Data d = gui.context.data();
         final IntList il = d.resources.docs();
         final int is = il.size();
         for(int i = 0; i < is; i++) {
-          file = root.merge(Token.string(d.text(il.get(i), true)));
+          file = root.resolve(Token.string(d.text(il.get(i), true)));
           if(file.exists()) {
             if(overwrite) {
               // more than one file will be overwritten; check remaining tests

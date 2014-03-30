@@ -226,7 +226,7 @@ public final class BaseXHTTP {
         // update file in resource path if it has changed
         if(!res.exists() || !Token.eq(data, res.read())) {
           Util.errln("Updating " +  res);
-          res.dir().md();
+          res.parent().md();
           res.write(in.read());
         }
       }
@@ -242,7 +242,7 @@ public final class BaseXHTTP {
     if(create) {
       // create configuration file
       Util.errln("Creating " +  trg);
-      trg.dir().md();
+      trg.parent().md();
       trg.write(data);
     }
     return trg;
