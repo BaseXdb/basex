@@ -32,18 +32,18 @@ public final class BXResourceFactory implements ResourceFactory,
   /**
    * Constructor.
    * @param ht http context
-   * @throws LoginException login exception
    */
-  BXResourceFactory(final HTTPContext ht) throws LoginException {
+  BXResourceFactory(final HTTPContext ht) {
     http = ht;
     service = new WebDAVService<BXAbstractResource>(this, http);
   }
 
   /**
    * Closes the database session.
+   * @throws LoginException login exception
    */
-  void close() {
-    service.session.close();
+  void close() throws LoginException {
+    service.session().close();
   }
 
   @Override
