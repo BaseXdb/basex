@@ -274,7 +274,7 @@ public final class HTTPContext {
       return ctx;
     } catch(final LoginException ex) {
       // delay users with wrong passwords
-      for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(1000);
+      for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(100);
       throw ex;
     }
   }
