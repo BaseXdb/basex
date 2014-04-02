@@ -402,6 +402,7 @@ public abstract class ANode extends Item {
       @Override
       public ANode next() {
         if(nc == null) {
+          if(type == NodeType.ATT) return null;
           final ANode r = parent();
           if(r == null) return null;
 
