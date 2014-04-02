@@ -5,7 +5,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -122,24 +121,8 @@ public final class CElem extends CName {
         }
       }
 
-      // add inherited namespaces
-      final Atts stack = sc.ns.stack();
-      for(int a = stack.size() - 1; a >= 0; a--) {
-        final byte[] pref = stack.name(a);
-        if(!ns.contains(pref)) ns.add(pref, stack.value(a));
-      }
-
-      // update parent references of children
-      for(int c = 0; c < constr.children.size(); ++c) {
-        final ANode child = constr.children.get(c);
-        // add inherited and remove unused namespaces
-        if(child.type == NodeType.ELM) {
-          if(sc.inheritNS) inherit(child, ns);
-          if(!sc.preserveNS) noPreserve(child);
-          child.optimize();
-        }
-      }
-
+      // update and optimize child nodes
+      for(int c = 0; c < constr.children.size(); ++c) constr.children.get(c).optimize();
       // return generated and optimized node
       return node.optimize();
 
@@ -152,36 +135,6 @@ public final class CElem extends CName {
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new CElem(sc, info, name.copy(ctx, scp, vs), comp ? null : nspaces.copy(),
         copyAll(ctx, scp, vs, expr));
-  }
-
-  /**
-   * Removes unused namespaces.
-   * @param node to be modified
-   */
-  private static void noPreserve(final ANode node) {
-    final Atts ns = node.namespaces();
-    final byte[] pref = node.qname().prefix();
-    for(int i = ns.size() - 1; i >= 0; i--) {
-      boolean f = eq(ns.name(i), pref);
-      final AxisIter atts = node.attributes();
-      for(ANode it; !f && (it = atts.next()) != null;) {
-        f = eq(it.qname().prefix(), pref);
-      }
-      if(!f) ns.delete(i);
-    }
-  }
-
-  /**
-   * Inherits namespaces.
-   * @param node to be modified
-   * @param nsp in-scope namespaces
-   */
-  private static void inherit(final ANode node, final Atts nsp) {
-    final Atts ns = node.namespaces();
-    for(int a = nsp.size() - 1; a >= 0; a--) {
-      final byte[] pref = nsp.name(a);
-      if(!ns.contains(pref)) ns.add(pref, nsp.value(a));
-    }
   }
 
   /**

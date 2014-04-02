@@ -310,11 +310,10 @@ public final class Namespaces {
    * Returns all namespace nodes in the namespace structure with a minimum
    * PRE value.
    * @param pre minimum PRE value of a namespace node.
-   * @param data data reference
    * @return List of namespace nodes with a minimum PRE value of pre
    */
-  List<NSNode> getNSNodes(final int pre, final Data data) {
-    final List<NSNode> l = new ArrayList<NSNode>();
+  List<NSNode> getNSNodes(final int pre) {
+    final List<NSNode> l = new ArrayList<>();
     addNSNodes(root, l, pre);
     return l;
   }
@@ -322,13 +321,14 @@ public final class Namespaces {
   /**
    * Recursively adds namespace nodes to the given list, starting at the children of
    * the given node.
-   * @param current current namespace node
+   * @param curr current namespace node
    * @param l list with namespace nodes
+   * @param pre pre value
    * @return list with namespace nodes
    */
-  private List<NSNode> addNSNodes(final NSNode current, final List<NSNode> l, final int pre) {
-    for(int i = 0; i < current.size; i++) {
-      final NSNode ch = current.children[i];
+  private List<NSNode> addNSNodes(final NSNode curr, final List<NSNode> l, final int pre) {
+    for(int i = 0; i < curr.size; i++) {
+      final NSNode ch = curr.children[i];
       if(ch.pre >= pre) l.add(ch);
       addNSNodes(ch, l, pre);
     }
