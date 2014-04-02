@@ -3,6 +3,7 @@ package org.basex.data;
 import static org.basex.util.Token.*;
 
 import java.util.*;
+import java.util.List;
 
 import org.basex.core.cmd.*;
 import org.basex.data.atomic.*;
@@ -658,7 +659,7 @@ public abstract class Data {
 
     if(!cache) updateDist(pre, -s);
 
-    // propagate PRE value shifts to namespaces
+    // delete namespace nodes and propagate PRE value shifts
     nspaces.delete(pre, s, this);
   }
 
@@ -700,6 +701,8 @@ public abstract class Data {
     final NSNode nsRoot = nspaces.getCurrent();
     final HashSet<NSNode> newNodes = new HashSet<>();
     final IntList flagPres = new IntList();
+    // track existing NSNodes - their PRE values have to be shifted after each tuple insertion
+    final List<NSNode> nsNodesShift = nspaces.getNSNodes(tpre, this);
 
     // indicates if database only contains a dummy node
     final Data data = source.data;
@@ -788,7 +791,7 @@ public abstract class Data {
           break;
       }
       // propagate PRE value shifts to keep namespace structure valid
-      nspaces.shiftPreAfterInsert(tpre, 1, newNodes);
+      nspaces.incrementPre(nsNodesShift, 1);
     }
     // finalize and update namespace structure
     while(!preStack.isEmpty()) nspaces.close(preStack.pop());
