@@ -112,18 +112,18 @@ public final class Prop {
     // not found; check working directory for property file
     dir = System.getProperty("user.dir");
     final String home = IO.BASEXSUFFIX + "home";
-    File file = new File(dir, home);
-    if(!file.exists()) file = new File(dir, IO.BASEXSUFFIX);
-    if(file.exists()) return file.getParent();
+    IOFile file = new IOFile(dir, home);
+    if(!file.exists()) file = new IOFile(dir, IO.BASEXSUFFIX);
+    if(file.exists()) return file.parent().path();
 
     // not found; check application directory
     dir = applicationPath();
     if(dir != null) {
-      file = new File(dir);
-      dir = file.isFile() ? file.getParent() : file.getPath();
-      file = new File(dir, home);
-      if(!file.exists()) file = new File(dir, IO.BASEXSUFFIX);
-      if(file.exists()) return file.getParent();
+      file = new IOFile(dir);
+      dir = file.dir();
+      file = new IOFile(dir, home);
+      if(!file.exists()) file = new IOFile(dir, IO.BASEXSUFFIX);
+      if(file.exists()) return file.parent().path();
     }
 
     // not found; choose user home directory as default

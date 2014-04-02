@@ -2,7 +2,6 @@ package org.basex.http.restxq;
 
 import static org.basex.http.restxq.RestXqText.*;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -94,9 +93,9 @@ public final class RestXqModules {
   private synchronized void cache(final HTTPContext http) throws Exception {
     // initialize RESTXQ directory (may be relative against WEBPATH)
     if(restxq == null) {
-      final File fl = new File(http.context().globalopts.get(GlobalOptions.RESTXQPATH));
-      restxq = fl.isAbsolute() ? new IOFile(fl) :
-        new IOFile(http.context().globalopts.get(GlobalOptions.WEBPATH), fl.getPath());
+      final GlobalOptions gopts = http.context().globalopts;
+      restxq = new IOFile(gopts.get(GlobalOptions.WEBPATH)).resolve(
+          gopts.get(GlobalOptions.RESTXQPATH));
     }
     // create new cache
     final HashMap<String, RestXqModule> cache = new HashMap<>();

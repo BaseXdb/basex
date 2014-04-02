@@ -300,12 +300,24 @@ public final class IOFile extends IO {
    * @return path
    * @throws IOException I/O exception
    */
-  private Path toPath() throws IOException {
+  public Path toPath() throws IOException {
     try {
       return Paths.get(path);
     } catch(final InvalidPathException ex) {
       Util.debug(ex);
       throw new IOException(ex);
+    }
+  }
+
+  /**
+   * Returns a native file path representation. If normalization fails, returns the original path.
+   * @return path
+   */
+  public IOFile normalize() {
+    try {
+      return new IOFile(toPath().toRealPath().toFile());
+    } catch(final IOException ex) {
+      return this;
     }
   }
 

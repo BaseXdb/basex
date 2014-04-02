@@ -336,8 +336,8 @@ public final class BaseXHTTP {
    * @param port server port
    * @return stop file
    */
-  private static File stopFile(final int port) {
-    return new File(Prop.TMP, Util.className(BaseXHTTP.class) + port);
+  private static IOFile stopFile(final int port) {
+    return new IOFile(Prop.TMP, Util.className(BaseXHTTP.class) + port);
   }
 
   /**
@@ -346,9 +346,9 @@ public final class BaseXHTTP {
    * @throws IOException I/O exception
    */
   private static void stop(final int port) throws IOException {
-    final File stop = stopFile(port);
+    final IOFile stop = stopFile(port);
     try {
-      stop.createNewFile();
+      stop.touch();
       new Socket(S_LOCALHOST, port).close();
       // give the notified process some time to quit
       Performance.sleep(100);
@@ -382,7 +382,7 @@ public final class BaseXHTTP {
     /** Server socket. */
     private final ServerSocket ss;
     /** Stop file. */
-    private final File stop;
+    private final IOFile stop;
 
     /**
      * Constructor.

@@ -3,10 +3,10 @@ package org.basex.util.ft;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
-import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 
+import org.basex.io.*;
 import org.basex.util.*;
 
 /**
@@ -88,11 +88,11 @@ public class JapaneseTokenizer extends Tokenizer {
   private boolean sc;
 
   static {
-    File dic = null;
+    IOFile dic = null;
     if(Reflect.available(PATTERN)) {
-      dic = new File(LANG);
+      dic = new IOFile(LANG);
       if(!dic.exists()) {
-        dic = new File(Prop.HOME, "etc/" + LANG);
+        dic = new IOFile(Prop.HOME, "etc/" + LANG);
         if(!dic.exists()) {
           available = false;
         }

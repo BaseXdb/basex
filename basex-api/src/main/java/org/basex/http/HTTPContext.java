@@ -332,31 +332,13 @@ public final class HTTPContext {
       final String key = en.nextElement();
       if(!key.startsWith(Prop.DBPREFIX)) continue;
 
-      // legacy: rewrite obsolete options. will be removed some versions later
-      final String val = sc.getInitParameter(key);
-      String k = key;
-      String v = val;
-      if(key.equals(Prop.DBPREFIX + "httppath")) {
-        k = Prop.DBPREFIX + GlobalOptions.RESTXQPATH.name();
-      } else if(key.equals(Prop.DBPREFIX + "mode")) {
-        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.name();
-        v = Boolean.toString("local".equals(v));
-      } else if(key.equals(Prop.DBPREFIX + "server")) {
-        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.name();
-        v = Boolean.toString(!Boolean.parseBoolean(v));
+      String val = sc.getInitParameter(key);
+      if(key.endsWith("path") && !new File(val).isAbsolute()) {
+        // prefix relative path with absolute servlet path
+        Util.debug(key.toUpperCase(Locale.ENGLISH) + ": " + val);
+        val = new IOFile(webapp, val).path();
       }
-      k = k.toLowerCase(Locale.ENGLISH);
-      if(!k.equals(key) || !v.equals(val)) {
-        Util.errln("Warning! Outdated option: " +
-          key + '=' + val + " => " + k + '=' + v);
-      }
-
-      // prefix relative paths with absolute servlet path
-      if(k.endsWith("path") && !new File(v).isAbsolute()) {
-        Util.debug(k.toUpperCase(Locale.ENGLISH) + ": " + v);
-        v = new IOFile(webapp, v).path();
-      }
-      Options.setSystem(k, v);
+      Options.setSystem(key, val);
     }
 
     // create context, update options

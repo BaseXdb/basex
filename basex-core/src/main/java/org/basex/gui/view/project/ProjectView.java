@@ -136,7 +136,7 @@ public final class ProjectView extends BaseXPanel {
    * @param file file to be focused
    */
   public void jump(final IOFile file) {
-    final IOFile fl = new IOFile(canonical(file.file()));
+    final IOFile fl = file.normalize();
     if(fl.path().startsWith(root.file.path())) tree.expand(root, fl.path());
     tree.requestFocusInWindow();
   }
@@ -162,7 +162,7 @@ public final class ProjectView extends BaseXPanel {
    * @return node, or {@code null}
    */
   private ProjectNode find(final IOFile file) {
-    final IOFile fl = new IOFile(canonical(file.file()));
+    final IOFile fl = file.normalize();
     if(fl.path().startsWith(root.file.path())) {
       final Enumeration<?> en = root.depthFirstEnumeration();
       while(en.hasMoreElements()) {
@@ -224,29 +224,15 @@ public final class ProjectView extends BaseXPanel {
     final String proj = gui.gopts.get(GUIOptions.PROJECTPATH);
     if(!proj.isEmpty()) return proj;
 
-    final File io1 = new File(gopts.get(GlobalOptions.REPOPATH));
-    final File io2 = new File(gopts.get(GlobalOptions.WEBPATH));
-    final File fl = new File(gopts.get(GlobalOptions.RESTXQPATH));
-    final File io3 = fl.isAbsolute() ? fl : new File(io2, fl.getPath());
+    final IOFile dir1 = new IOFile(gopts.get(GlobalOptions.REPOPATH));
+    final IOFile dir2 = new IOFile(gopts.get(GlobalOptions.WEBPATH));
+    final IOFile dir3 = dir2.resolve(gopts.get(GlobalOptions.RESTXQPATH));
     final StringList sl = new StringList();
-    for(final File f : new File[] { io1, io2, io3}) {
-      final String p = canonical(f).getParent();
+    for(final IOFile f : new IOFile[] { dir1, dir2, dir3}) {
+      final String p = f.normalize().parent().path();
       if(!sl.contains(p)) sl.add(p);
     }
-    return sl.unique().get(0);
-  }
-
-  /**
-   * Returns the canonical or (if not possible) the absolute file reference.
-   * @param f file reference
-   * @return file
-   */
-  private static File canonical(final File f) {
-    try {
-      return f.getCanonicalFile();
-    } catch(final IOException ex) {
-      return f.getAbsoluteFile();
-    }
+    return sl.unique().sort().get(0);
   }
 
   /**

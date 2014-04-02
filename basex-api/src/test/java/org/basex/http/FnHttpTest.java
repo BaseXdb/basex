@@ -584,14 +584,12 @@ public class FnHttpTest extends HTTPTest {
   @Test
   public void writeFromResource() throws IOException {
     // Create a file form which will be read
-    final File f = new File(Prop.TMP + Util.className(FnHttpTest.class));
-    try(final FileOutputStream out = new FileOutputStream(f)) {
-      out.write(token("test"));
-    }
+    final IOFile file = new IOFile(Prop.TMP, Util.className(FnHttpTest.class));
+    file.write(token("test"));
 
     // Request
     final HTTPRequest req = new HTTPRequest();
-    req.payloadAttrs.put("src", new IOFile(f).url());
+    req.payloadAttrs.put("src", file.url());
     req.payloadAttrs.put("method", "binary");
     // HTTP connection
     final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL("http://www.test.com"));
@@ -599,7 +597,7 @@ public class FnHttpTest extends HTTPTest {
     hc.setRequestContent(fakeConn.getOutputStream(), req);
 
     // Delete file
-    f.delete();
+    file.delete();
 
     assertEquals(fakeConn.out.toString(), "test");
   }

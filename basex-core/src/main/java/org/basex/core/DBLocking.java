@@ -153,14 +153,14 @@ public final class DBLocking implements Locking {
     // Local locking
     final StringList writeObjects;
     if(write != null) {
-      writeObjects = write.sort(true).unique();
+      writeObjects = write.sort().unique();
       writeLocked.put(thread, writeObjects);
     } else {
       writeObjects = new StringList(0);
     }
     final StringList readObjects;
     if(read != null) {
-      readObjects = read.sort(true).unique();
+      readObjects = read.sort().unique();
       readLocked.put(thread, readObjects);
     } else {
       readObjects = new StringList(0);

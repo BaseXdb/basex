@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 import java.nio.file.*;
-import java.util.*;
 
 import org.basex.io.*;
 import org.basex.query.util.*;
@@ -34,10 +33,10 @@ public final class FNFileTest extends AdvancedQueryTest {
   /** Initializes the test. */
   @After
   public void init() {
-    new File(PATH4).delete();
-    new File(PATH3).delete();
-    new File(PATH2).delete();
-    new File(PATH1).delete();
+    new IOFile(PATH4).delete();
+    new IOFile(PATH3).delete();
+    new IOFile(PATH2).delete();
+    new IOFile(PATH1).delete();
   }
 
   /** Test method. */
@@ -419,8 +418,8 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void resolvePath() {
     final String path = query(_FILE_RESOLVE_PATH.args(PATH1));
-    final String can = new File(PATH1).getAbsolutePath();
-    assertEquals(path.toLowerCase(Locale.ENGLISH), can.toLowerCase(Locale.ENGLISH));
+    final String can = Paths.get(PATH1).normalize().toAbsolutePath().toString();
+    assertEquals(path, can);
     query(ENDS_WITH.args(_FILE_RESOLVE_PATH.args("."), File.separator), "true");
   }
 

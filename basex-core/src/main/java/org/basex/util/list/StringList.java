@@ -149,6 +149,14 @@ public class StringList extends ElementList implements Iterable<String> {
   }
 
   /**
+   * Sorts the elements in ascending order, using the standard options.
+   * @return self reference
+   */
+  public final StringList sort() {
+    return sort(true);
+  }
+
+  /**
    * Sorts the elements in ascending order.
    * @param cs respect case sensitivity
    * @return self reference

@@ -57,7 +57,7 @@ public final class QuerySuggest extends QueryParser {
         final String nm = string(n.token(data));
         if(!nm.isEmpty() && !sl.contains(nm)) sl.add(nm);
       }
-      sl.sort(true);
+      sl.sort();
     }
     return sl;
   }
