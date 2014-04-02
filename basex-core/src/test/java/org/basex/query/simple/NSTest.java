@@ -33,8 +33,6 @@ public final class NSTest extends QueryTest {
         "namespace-uri-for-prefix('n', <n:x/>) }'/>/@a)" },
       { "NUFP 8", str("U"), "string(<x a='{ " +
         "namespace-uri-for-prefix('n', <n:x/>) }' xmlns:n='U'/>/@a)" },
-      { "NUFP 9", str("O"),
-        "string(<a xmlns:o='O'>{ namespace-uri-for-prefix('o', <e/>) }</a>)" },
 
       { "NU 1", str("u"),
         "string(<e xmlns:p='u'>{ namespace-uri(<p:e/>) }</e>)" },
@@ -58,8 +56,6 @@ public final class NSTest extends QueryTest {
         "count(in-scope-prefixes(<a/>)), " +
         "count(in-scope-prefixes(<a xmlns=''/>)), " +
         "count(in-scope-prefixes(<a xmlns=''/>))" },
-      { "ISP 4", dbl(2),
-        "number(<e xmlns:n='O'> { count( in-scope-prefixes(<e/>) ) } </e>)" },
 
       { "EC1", bool(true), "exists(<e xmlns:p='u'>{ <a/>/p:x }</e>)" },
 
@@ -90,7 +86,12 @@ public final class NSTest extends QueryTest {
       // element namespace declaration
       { "VarDecl X1", "declare namespace x='a'; " +
         "let $x:x := 1 return <x a='{ $x:x }' xmlns:x='b'/>" },
-        */
+
+      { "NUFP 9", str("O"),
+        "string(<a xmlns:o='O'>{ namespace-uri-for-prefix('o', <e/>) }</a>)" },
+      { "ISP 4", dbl(2),
+        "number(<e xmlns:n='O'> { count( in-scope-prefixes(<e/>) ) } </e>)" }
+      */
     };
   }
 }

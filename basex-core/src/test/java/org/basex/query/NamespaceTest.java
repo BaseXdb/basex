@@ -656,7 +656,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
    */
   @Test
   public void nsInAtt() {
-    query("data(<a a='{namespace-uri-for-prefix('x', <b/>)}' xmlns:x='X'/>/@a)",
+    query("data(<a a='{namespace-uri-for-prefix('x', <x:a/>)}' xmlns:x='X'/>/@a)",
         "X");
   }
 
@@ -666,7 +666,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
    */
   @Test
   public void nsInBraces() {
-    query("<a xmlns:x='X'>{namespace-uri-for-prefix('x', <b/>)}</a>/text()",
+    query("<a xmlns:x='X'>{namespace-uri-for-prefix('x', <x:b/>)}</a>/text()",
         "X");
   }
 

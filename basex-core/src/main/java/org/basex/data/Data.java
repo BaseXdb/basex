@@ -702,7 +702,7 @@ public abstract class Data {
     final HashSet<NSNode> newNodes = new HashSet<>();
     final IntList flagPres = new IntList();
     // track existing NSNodes - their PRE values have to be shifted after each tuple insertion
-    final List<NSNode> nsNodesShift = nspaces.getNSNodes(tpre, this);
+    final List<NSNode> nsNodesShift = nspaces.getNSNodes(tpre);
 
     // indicates if database only contains a dummy node
     final Data data = source.data;
