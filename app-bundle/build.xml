@@ -1,16 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="BaseX" default="default" basedir=".">
+<project name="BaseX" default="default" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+    <!-- POM task for maven, used to deduplicate Version Information while building. -->
+    <path id="maven-ant-tasks.classpath" path="third-party/maven-ant-tasks-2.1.3.jar" />
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+             uri="antlib:org.apache.maven.artifact.ant"
+             classpathref="maven-ant-tasks.classpath" />
+    <artifact:pom id="basexpom" file="../basex-core/pom.xml" />
+
+    <!-- Actual application bundling: -->
     <taskdef name="bundleapp"
              classname="com.oracle.appbundler.AppBundlerTask"
-             classpath="third-party/appbundler-1.0.jar" />
+             classpath="third-party/appbundler-1.0.jar"/>
 
-    <target name="default">
+    <target name="bundle">
         <bundleapp outputdirectory="dist"
-            name="BaseX"
-            displayname="BaseX"
-            identifier="org.basex.BaseXGUI"
-            mainclassname="org.basex.BaseXGUI">
-            <classpath file="../basex-core/target/basex-*.jar" />
+                   name="BaseX"
+                   displayname="BaseX"
+                   applicationCategory="public.app-category.developer-tools"
+                   shortversion="${basexpom.version}"
+                   copyright="BaseX Team, see http://www.basex.org"
+                   identifier="org.basex.BaseXGUI"
+                   icon="BaseX.icns"
+                   mainclassname="org.basex.BaseXGUI">
+            <classpath dir="../basex-core" casesensitive="yes">
+                <patternset id="basex-jar">
+                    <include name="*/*.jar"/>
+                    <exclude name="target/*sources*"/>
+                </patternset>
+            </classpath>
+            <option value="-Dapple.laf.useScreenMenuBar=true"/>
         </bundleapp>
+    </target>
+    <!-- Modify Info.plist to support Retina Display -->
+    <target name="addOptions" depends="bundle">
+        <exec executable="java">
+            <arg value="-cp"/>
+            <arg value="dist/BaseX.app/Contents/Java/basex-${basexpom.version}.jar"/>
+            <arg value="org.basex.BaseX"/>
+            <arg value="-odist/BaseX.app/Contents/Info2.plist"/>
+            <arg value="addOptions.xq"/>
+        </exec>
+    </target>
+    <!-- move modified plist -->
+    <target name="default" depends="addOptions">
+        <exec executable="mv">
+            <arg value="dist/BaseX.app/Contents/Info2.plist"/>
+            <arg value="dist/BaseX.app/Contents/Info.plist"/>
+        </exec>
     </target>
 </project>
