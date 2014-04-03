@@ -8,3 +8,5 @@ org.maven.ide.eclipse.prefs
 .idea/
 *.class
 /target
+
+/app-bundle/dist/BaseX.app/
