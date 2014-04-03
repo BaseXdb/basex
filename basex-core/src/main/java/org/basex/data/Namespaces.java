@@ -313,7 +313,7 @@ public final class Namespaces {
    * @return List of namespace nodes with a minimum PRE value of pre
    */
   List<NSNode> getNSNodes(final int pre) {
-    final List<NSNode> l = new ArrayList<>();
+    final List<NSNode> l = new ArrayList<NSNode>();
     addNSNodes(root, l, pre);
     return l;
   }
