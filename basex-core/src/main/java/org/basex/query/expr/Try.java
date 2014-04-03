@@ -138,7 +138,6 @@ public final class Try extends Single {
   @Override
   public void markTailCalls(final QueryContext ctx) {
     for(final Catch c : ctch) c.markTailCalls(ctx);
-    expr.markTailCalls(ctx);
   }
 
   @Override
