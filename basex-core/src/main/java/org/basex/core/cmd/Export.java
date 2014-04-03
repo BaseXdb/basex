@@ -106,17 +106,17 @@ public final class Export extends Command {
     for(int i = 0; i < is; i++) {
       final int pre = il.get(i);
       // create file path
-      final IOFile f = root.resolve(Token.string(data.text(pre, true)));
+      final IOFile fl = root.resolve(Token.string(data.text(pre, true)));
       if(export != null) {
         export.checkStop();
-        export.progFile = f;
+        export.progFile = fl;
         export.progPos++;
       }
       // create dir if necessary
-      f.parent().md();
+      fl.parent().md();
 
       // serialize file
-      try(final PrintOutput po = new PrintOutput(unique(exported, f.path()))) {
+      try(final PrintOutput po = new PrintOutput(unique(exported, fl.path()))) {
         final Serializer ser = Serializer.get(po, sopts);
         ser.serialize(new DBNode(data, pre));
         ser.close();
@@ -125,13 +125,13 @@ public final class Export extends Command {
 
     // export raw files
     for(final String s : desc) {
-      final IOFile f = new IOFile(root.path(), s);
+      final IOFile fl = new IOFile(root.path(), s);
       if(export != null) {
         export.checkStop();
-        export.progFile = f;
+        export.progFile = fl;
         export.progPos++;
       }
-      final String u = unique(exported, f.path());
+      final String u = unique(exported, fl.path());
       new IOFile(bin, s).copyTo(new IOFile(u));
     }
   }

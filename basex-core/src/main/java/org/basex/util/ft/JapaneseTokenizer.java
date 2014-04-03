@@ -108,7 +108,7 @@ public class JapaneseTokenizer extends Tokenizer {
       } else {
         /* Igo constructor. */
         final Constructor<?> tgr = Reflect.find(clz, String.class);
-        tagger = Reflect.get(tgr, dic.toString());
+        tagger = Reflect.get(tgr, dic.path());
         if(tagger == null) {
           available = false;
           Util.debug("Could not initialize Igo Japanese lexer.");

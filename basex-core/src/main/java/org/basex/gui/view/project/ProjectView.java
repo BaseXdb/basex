@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 import java.util.*;
 
 import javax.swing.*;
@@ -150,9 +149,8 @@ public final class ProjectView extends BaseXPanel {
     if(node != null) {
       node.refresh();
     } else {
-      final File parent = file.file().getParentFile();
-      if(parent == null) return;
-      refresh(new IOFile(parent));
+      final IOFile parent = file.parent();
+      if(parent != null) refresh(parent);
     }
   }
 
@@ -232,7 +230,7 @@ public final class ProjectView extends BaseXPanel {
       final String p = f.normalize().parent().path();
       if(!sl.contains(p)) sl.add(p);
     }
-    return sl.unique().sort().get(0);
+    return sl.sort().unique().get(0);
   }
 
   /**

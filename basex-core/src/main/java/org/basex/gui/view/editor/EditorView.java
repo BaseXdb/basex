@@ -615,7 +615,7 @@ public final class EditorView extends View {
    * Refreshes the list of recent query files and updates the query path.
    * @param file new file
    */
-  void refreshHistory(final IO file) {
+  void refreshHistory(final IOFile file) {
     final StringList paths = new StringList();
     if(file != null) {
       final String path = file.path();

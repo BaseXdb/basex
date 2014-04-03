@@ -91,7 +91,7 @@ public final class GlobalOptions extends Options {
    * @param file if {@code true}, options will be read from disk
    */
   GlobalOptions(final boolean file) {
-    super(file ? new IOFile(HOME + IO.BASEXSUFFIX) : null);
+    super(file ? new IOFile(HOME, IO.BASEXSUFFIX) : null);
     setSystem();
 
     // set some static options

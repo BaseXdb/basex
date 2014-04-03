@@ -7,6 +7,7 @@ import java.util.regex.*;
 
 import javax.xml.transform.stream.*;
 
+import org.basex.io.out.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.xml.sax.*;
@@ -152,11 +153,12 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Returns the parent of this file or directory.
-   * @return directory
+   * Returns the parent of this file or directory, or {@code null} if there is no parent directory.
+   * @return directory, or {@code null}
    */
   public IOFile parent() {
-    return new IOFile(file.getParentFile());
+    final String parent = file.getParent();
+    return parent == null ? null : new IOFile(parent);
   }
 
   /**
@@ -218,6 +220,19 @@ public final class IOFile extends IO {
    */
   public void write(final byte[] bytes) throws IOException {
     Files.write(toPath(), bytes);
+  }
+
+  /**
+   * Writes the specified input. The specified input stream is eventually closed.
+   * @param in input stream
+   * @throws IOException I/O exception
+   */
+  public void write(final InputStream in) throws IOException {
+    try(final BufferOutput out = new BufferOutput(path)) {
+      for(int i; (i = in.read()) != -1;) out.write(i);
+    } finally {
+      in.close();
+    }
   }
 
   /**

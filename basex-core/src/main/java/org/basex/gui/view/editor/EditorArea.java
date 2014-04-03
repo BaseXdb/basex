@@ -54,9 +54,8 @@ public final class EditorArea extends TextPanel {
     addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(final FocusEvent e) {
-        // refresh query path and work directory
-        final String path = file.path();
-        gui.context.options.set(MainOptions.QUERYPATH, path);
+        // refresh query path and working directory
+        gui.context.options.set(MainOptions.QUERYPATH, file.path());
         gui.gopts.set(GUIOptions.WORKPATH, file.dir());
 
         // reload file if it has been changed

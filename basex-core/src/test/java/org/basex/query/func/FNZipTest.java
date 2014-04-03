@@ -153,7 +153,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   private static String paramsPrefix(final String name, final String entry) {
     return "<zip:file xmlns:zip='http://expath.org/ns/zip' href='" +
-        new IOFile(TMPZIP).normalize() + "'>" +
+        new IOFile(TMPZIP).path() + "'>" +
         "<zip:entry name='" + name + "'>" + entry + "</zip:entry></zip:file>";
   }
 
@@ -180,7 +180,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   private static String params(final String arg) {
     return "<file xmlns='http://expath.org/ns/zip' href='" +
-        new IOFile(TMPZIP).normalize() + "'>" + arg + "</file>";
+        new IOFile(TMPZIP).path() + "'>" + arg + "</file>";
   }
 
   /**

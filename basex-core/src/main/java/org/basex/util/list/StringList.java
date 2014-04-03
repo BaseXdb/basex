@@ -189,8 +189,7 @@ public class StringList extends ElementList implements Iterable<String> {
   }
 
   /**
-   * Removes duplicates from the list.
-   * The list must be sorted.
+   * Removes duplicates, provided that the entries are sorted.
    * @return self reference
    */
   public StringList unique() {

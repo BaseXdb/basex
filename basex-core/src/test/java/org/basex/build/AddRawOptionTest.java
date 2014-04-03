@@ -83,7 +83,6 @@ public class AddRawOptionTest extends SandboxTest {
       final String fname = f.name();
       assertTrue("File " + fname + " is not imported", files.contains(fname));
     }
-    assertEquals("Expected number of imported files is different",
-        FILES.length, files.size());
+    assertEquals("Expected number of imported files is different", FILES.length, files.size());
   }
 }

@@ -2,6 +2,7 @@ package org.basex.util;
 
 import java.io.*;
 import java.net.*;
+import java.nio.file.*;
 import java.security.*;
 
 import org.basex.core.*;
@@ -114,51 +115,25 @@ public final class Prop {
     final String home = IO.BASEXSUFFIX + "home";
     IOFile file = new IOFile(dir, home);
     if(!file.exists()) file = new IOFile(dir, IO.BASEXSUFFIX);
-    if(file.exists()) return file.parent().path();
+    if(file.exists()) return file.dir();
 
     // not found; check application directory
-    dir = applicationPath();
-    if(dir != null) {
-      file = new IOFile(dir);
-      dir = file.dir();
-      file = new IOFile(dir, home);
-      if(!file.exists()) file = new IOFile(dir, IO.BASEXSUFFIX);
-      if(file.exists()) return file.parent().path();
+    if(LOCATION != null) {
+      try {
+        dir = Paths.get(LOCATION.toURI()).toString();
+        if(dir != null) {
+          dir = new IOFile(dir).dir();
+          file = new IOFile(dir, home);
+          if(!file.exists()) file = new IOFile(dir, IO.BASEXSUFFIX);
+          if(file.exists()) return file.dir();
+        }
+      } catch(final Exception ex) {
+        Util.stack(ex);
+      }
     }
 
     // not found; choose user home directory as default
     return USERHOME;
-  }
-
-  /**
-   * Returns the absolute path to this application, or {@code null} if the
-   * path cannot be evaluated.
-   * @return application path.
-   */
-  private static String applicationPath() {
-    if(LOCATION == null) return null;
-
-    // decode path; URLDecode returns wrong results
-    final String path = LOCATION.getPath();
-    final TokenBuilder tb = new TokenBuilder();
-    final int pl = path.length();
-    for(int p = 0; p < pl; ++p) {
-      final char ch = path.charAt(p);
-      if(ch == '%' && p + 2 < pl) {
-        tb.addByte((byte) Integer.parseInt(path.substring(p + 1, p + 3), 16));
-        p += 2;
-      } else {
-        tb.add(ch);
-      }
-    }
-    try {
-      // return path, using the correct encoding
-      return new String(tb.finish(), ENCODING);
-    } catch(final Exception ex) {
-      // return default path; not expected to occur
-      Util.stack(ex);
-      return tb.toString();
-    }
   }
 
   /**

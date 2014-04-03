@@ -7,7 +7,6 @@ import java.io.*;
 
 import org.basex.data.*;
 import org.basex.io.*;
-import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -50,11 +49,8 @@ public final class DBStore extends DBUpdate {
         if(file == null) throw UPDBPUTERR.get(info, path);
         file.parent().md();
         final Object item = map.get(path);
-        try(final InputStream in = item instanceof Item ? ((Item) item).input(info) :
-          ((QueryInput) item).input.inputStream();
-            final BufferOutput out = new BufferOutput(file.path())) {
-          for(int i; (i = in.read()) != -1;) out.write(i);
-        }
+        file.write(item instanceof Item ? ((Item) item).input(info) :
+          ((QueryInput) item).input.inputStream());
       } catch(final IOException ex) {
         Util.debug(ex);
         throw UPDBPUTERR.get(info, path);
