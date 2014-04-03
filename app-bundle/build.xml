@@ -6,13 +6,14 @@
              uri="antlib:org.apache.maven.artifact.ant"
              classpathref="maven-ant-tasks.classpath" />
     <artifact:pom id="basexpom" file="../basex-core/pom.xml" />
-
+	<!-- Check if basex-$VERSION$.jar is available -->
+	<available file="../basex-core/target/basex-${basexpom.version}.jar" type="file" property="basexpresent"/>
     <!-- Actual application bundling: -->
     <taskdef name="bundleapp"
              classname="com.oracle.appbundler.AppBundlerTask"
              classpath="third-party/appbundler-1.0.jar"/>
 
-    <target name="bundle">
+    <target name="bundle" if="basexpresent">
         <bundleapp outputdirectory="dist"
                    name="BaseX"
                    displayname="BaseX"
@@ -32,7 +33,7 @@
         </bundleapp>
     </target>
     <!-- Modify Info.plist to support Retina Display -->
-    <target name="addOptions" depends="bundle">
+    <target name="addOptions" depends="bundle" if="basexpresent">
         <exec executable="java">
             <arg value="-cp"/>
             <arg value="dist/BaseX.app/Contents/Java/basex-${basexpom.version}.jar"/>
@@ -41,9 +42,13 @@
             <arg value="addOptions.xq"/>
         </exec>
     </target>
+	<target name="checkbasexjar" unless="basexpresent">
+		<echo>BaseX.jar at ../basex-core/target/basex-${basexpom.version}.jar could not be found</echo>
+		<echo>Make sure you built ../basex-core</echo>
+	</target>
     <!-- move modified plist -->
-    <target name="default" depends="addOptions">
-        <exec executable="mv">
+    <target name="default" depends="checkbasexjar,addOptions" if="basexpresent">
+		<exec executable="mv">
             <arg value="dist/BaseX.app/Contents/Info2.plist"/>
             <arg value="dist/BaseX.app/Contents/Info.plist"/>
         </exec>
