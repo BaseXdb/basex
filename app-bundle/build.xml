@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="BaseX" default="default" basedir=".">
+    <taskdef name="bundleapp"
+             classname="com.oracle.appbundler.AppBundlerTask"
+             classpath="third-party/appbundler-1.0.jar" />
+
+    <target name="default">
+        <bundleapp outputdirectory="dist"
+            name="BaseX"
+            displayname="BaseX"
+            identifier="org.basex.BaseXGUI"
+            mainclassname="org.basex.BaseXGUI">
+            <classpath file="../basex-core/target/basex-*.jar" />
+        </bundleapp>
+    </target>
+</project>
