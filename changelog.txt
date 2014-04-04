@@ -3,6 +3,33 @@
  Welcome to the changelog. This file contains all code changes since
  BaseX 6.5:
 
+VERSION 7.8.2 (April 4, 2014) ------------------------------------------
+
+ GUI
+ - Ctrl-U: efficiently sort large texts
+ - Ctrl-H, Ctrl-J: context-sensitive behavior
+ - tweaked code automatisms
+
+ STORAGE, UPDATES
+ - faster processing of documents with namespaces
+
+ XQUERY MODULES
+ - Database Module: alter, copy, create-backup, drop-backup, restore
+ - Admin Module: new merge option, existing functions revised
+ - XQuery Module: new evaluation options (memory, timeout, permissions)
+
+ XQUERY OPTIMIZATIONS
+ - always show full stack trace (enforce it with INLINELIMIT=0)
+ - show stack trace again
+ - better error messages
+ - improved function inlining
+ - prevent pre-evaluation of try/catch
+ - Easter egg: partial sums (little Gauss) calculation
+
+ API
+ - WebDAV: improved password processing
+ - Client/Server: reduce waiting time if password is wrong
+
 VERSION 7.8.1 (February 26, 2014) --------------------------------------
 
  ADDED

@@ -283,6 +283,7 @@ public final class QueryContext extends Proc {
     if(ctxItem != null) {
       // evaluate initial expression
       try {
+
         ctxItem.compile(this);
         value = ctxItem.cache(this).value();
       } catch(final QueryException ex) {
