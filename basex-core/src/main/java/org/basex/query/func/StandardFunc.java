@@ -160,7 +160,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Returns a data instance for the first string argument of the function.
+   * Returns a database instance for the first string argument of the function.
    * This method assumes that the function has at least one argument.
    * @param ctx query context
    * @return data instance
