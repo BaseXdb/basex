@@ -69,7 +69,7 @@ public final class BXRoot extends BXFolder {
   }
 
   @Override
-  public BXDatabase createCollection(final String name) throws BadRequestException {
+  public BXDatabase createCollection(final String name) throws BadRequestException, NotAuthorizedException {
     return new BXCode<BXDatabase>(this) {
       @Override
       public BXDatabase get() throws IOException {
@@ -79,8 +79,8 @@ public final class BXRoot extends BXFolder {
   }
 
   @Override
-  public BXAbstractResource createNew(final String name, final InputStream input,
-      final Long length, final String contentType) throws BadRequestException {
+  public BXAbstractResource createNew(final String name, final InputStream input, final Long length,
+      final String contentType) throws BadRequestException, NotAuthorizedException {
     return new BXCode<BXAbstractResource>(this) {
       @Override
       public BXAbstractResource get() throws IOException {

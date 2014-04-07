@@ -57,13 +57,17 @@ public final class WebDAVService<T> {
     if(ls != null) ls.close();
   }
 
+  public void closeSession() {
+    if (ls != null) ls.close();
+  }
+
   /**
    * Authenticates the user with the given password.
    * @param user user name
    * @param pass password
-   * @throws IOException if the login is invalid
+   * @throws LoginException if the login is invalid
    */
-  public void authenticate(final String user, final String pass) throws IOException {
+  public void authenticate(final String user, final String pass) throws LoginException {
     http.credentials(user, pass);
     http.authenticate();
   }
