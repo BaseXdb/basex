@@ -40,10 +40,9 @@ public final class BXResourceFactory implements ResourceFactory,
 
   /**
    * Closes the database session.
-   * @throws LoginException login exception
    */
-  void close() throws LoginException {
-    service.session().close();
+  void close() {
+    service.close();
   }
 
   @Override

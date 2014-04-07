@@ -51,15 +51,11 @@ public final class WebDAVService<T> {
   }
 
   /**
-   * Constructor.
-   * @return local session
-   * @throws LoginException login exception
+   * Closes an open session.
    */
-  public LocalSession session() throws LoginException {
-    if(ls == null) ls = new LocalSession(http.authenticate(), http.user, http.pass);
-    return ls;
+  public void close() {
+    if(ls != null) ls.close();
   }
-
 
   /**
    * Authenticates the user with the given password.
@@ -571,5 +567,15 @@ public final class WebDAVService<T> {
     final StringList sl = new StringList();
     while(lq.more()) sl.add(lq.next());
     return sl;
+  }
+
+  /**
+   * Constructor.
+   * @return local session
+   * @throws LoginException login exception
+   */
+  private LocalSession session() throws LoginException {
+    if(ls == null) ls = new LocalSession(http.authenticate(), http.user, http.pass);
+    return ls;
   }
 }
