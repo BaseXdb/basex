@@ -5,6 +5,9 @@ import java.util.*;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.Request.Method;
+import com.bradmcevoy.http.exceptions.LockedException;
+import com.bradmcevoy.http.exceptions.NotAuthorizedException;
+import com.bradmcevoy.http.exceptions.PreConditionFailedException;
 import org.basex.util.*;
 
 /**
@@ -14,7 +17,7 @@ import org.basex.util.*;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-final class BXNotAuthorizedResource implements FolderResource {
+final class BXNotAuthorizedResource implements FolderResource, LockableResource {
   /** The only instance of this class. */
   public static final Resource NOAUTH = new BXNotAuthorizedResource();
 
@@ -112,6 +115,26 @@ final class BXNotAuthorizedResource implements FolderResource {
 
   @Override
   public String checkRedirect(final Request request) {
+    return null;
+  }
+
+  @Override
+  public LockResult lock(LockTimeout lockTimeout, LockInfo lockInfo) throws NotAuthorizedException, PreConditionFailedException, LockedException {
+    return null;
+  }
+
+  @Override
+  public LockResult refreshLock(String s) throws NotAuthorizedException, PreConditionFailedException {
+    return null;
+  }
+
+  @Override
+  public void unlock(String s) throws NotAuthorizedException, PreConditionFailedException {
+
+  }
+
+  @Override
+  public LockToken getCurrentLock() {
     return null;
   }
 }

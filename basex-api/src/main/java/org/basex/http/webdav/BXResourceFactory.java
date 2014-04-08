@@ -4,6 +4,7 @@ import static org.basex.http.webdav.BXServletRequest.*;
 
 import javax.servlet.http.*;
 
+import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 import org.basex.http.*;
 import org.basex.http.webdav.impl.ResourceMetaData;
 import org.basex.http.webdav.impl.ResourceMetaDataFactory;
@@ -40,9 +41,10 @@ public final class BXResourceFactory implements ResourceFactory,
 
   /**
    * Closes the database session.
+   * @throws LoginException login exception
    */
-  void close() {
-    service.close();
+  void close() throws LoginException {
+    service.closeSession();
   }
 
   @Override

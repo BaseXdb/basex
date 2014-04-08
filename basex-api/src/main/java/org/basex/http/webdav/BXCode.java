@@ -2,6 +2,7 @@ package org.basex.http.webdav;
 
 import java.io.*;
 
+import org.basex.server.LoginException;
 import org.basex.util.*;
 
 import com.bradmcevoy.http.exceptions.*;
@@ -30,11 +31,13 @@ abstract class BXCode<E> {
    * @return result
    * @throws BadRequestException bad request exception
    */
-  public E eval() throws BadRequestException {
+  public final E eval() throws BadRequestException, NotAuthorizedException {
     try {
       final E ret = get();
-      if(ret == null) run();
+      if (ret == null) run();
       return ret;
+    } catch(final LoginException ex) {
+      throw new NotAuthorizedException(resource);
     } catch(final IOException ex) {
       Util.errln(ex);
       throw new BadRequestException(resource, ex.getMessage());
@@ -45,10 +48,10 @@ abstract class BXCode<E> {
    * Runs the contained code, throwing no exception.
    * @return result
    */
-  public E evalNoEx() {
+  public final E evalNoEx() {
     try {
       return eval();
-    } catch(final BadRequestException ex) {
+    } catch(final Exception ex) {
       Util.errln(ex);
       return null;
     }
