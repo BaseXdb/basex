@@ -39,7 +39,7 @@ public enum Function {
   /** XQuery function. */
   NUMBER(FNAcc.class, "number([item])", arg(AAT_ZO), DBL),
   /** XQuery function. */
-  STRING_LENGTH(FNAcc.class, "string-length([item])", arg(STR_ZO), ITR),
+  STRING_LENGTH(FNAcc.class, "string-length([string])", arg(STR_ZO), ITR),
   /** XQuery function. */
   NORMALIZE_SPACE(FNAcc.class, "normalize-space([string])", arg(STR_ZO), STR),
   /** XQuery function. */
@@ -48,15 +48,15 @@ public enum Function {
   /* FNAggr functions. */
 
   /** XQuery function. */
-  AVG(FNAggr.class, "avg(item)", arg(AAT_ZM), AAT_ZO),
+  AVG(FNAggr.class, "avg(items)", arg(AAT_ZM), AAT_ZO),
   /** XQuery function. */
-  COUNT(FNAggr.class, "count(item)", arg(ITEM_ZM), ITR),
+  COUNT(FNAggr.class, "count(items)", arg(ITEM_ZM), ITR),
   /** XQuery function. */
-  MAX(FNAggr.class, "max(item[,coll])", arg(AAT_ZM, STR), AAT_ZO),
+  MAX(FNAggr.class, "max(items[,coll])", arg(AAT_ZM, STR), AAT_ZO),
   /** XQuery function. */
-  MIN(FNAggr.class, "min(item[,coll])", arg(AAT_ZM, STR), AAT_ZO),
+  MIN(FNAggr.class, "min(items[,coll])", arg(AAT_ZM, STR), AAT_ZO),
   /** XQuery function. */
-  SUM(FNAggr.class, "sum(item[,zero])", arg(AAT_ZM, AAT_ZO), AAT_ZO),
+  SUM(FNAggr.class, "sum(items[,zero])", arg(AAT_ZM, AAT_ZO), AAT_ZO),
 
   /* FNContext functions. */
 
@@ -76,7 +76,7 @@ public enum Function {
   /* FNDate functions. */
 
   /** XQuery function. */
-  DAY_FROM_DATE(FNDate.class, "day-from-date(item)", arg(DAT_ZO), ITR_ZO),
+  DAY_FROM_DATE(FNDate.class, "day-from-date(date)", arg(DAT_ZO), ITR_ZO),
   /** XQuery function. */
   DAY_FROM_DATETIME(FNDate.class, "day-from-dateTime(datetime)", arg(DTM_ZO), ITR_ZO),
   /** XQuery function. */
@@ -86,15 +86,15 @@ public enum Function {
   /** XQuery function. */
   HOURS_FROM_DURATION(FNDate.class, "hours-from-duration(duration)", arg(DUR_ZO), ITR_ZO),
   /** XQuery function. */
-  HOURS_FROM_TIME(FNDate.class, "hours-from-time(item)", arg(TIM_ZO), ITR_ZO),
+  HOURS_FROM_TIME(FNDate.class, "hours-from-time(time)", arg(TIM_ZO), ITR_ZO),
   /** XQuery function. */
   MINUTES_FROM_DATETIME(FNDate.class, "minutes-from-dateTime(datetime)", arg(DTM_ZO), ITR_ZO),
   /** XQuery function. */
   MINUTES_FROM_DURATION(FNDate.class, "minutes-from-duration(duration)", arg(DUR_ZO), ITR_ZO),
   /** XQuery function. */
-  MINUTES_FROM_TIME(FNDate.class, "minutes-from-time(item)", arg(TIM_ZO), ITR_ZO),
+  MINUTES_FROM_TIME(FNDate.class, "minutes-from-time(time)", arg(TIM_ZO), ITR_ZO),
   /** XQuery function. */
-  MONTH_FROM_DATE(FNDate.class, "month-from-date(item)", arg(DAT_ZO), ITR_ZO),
+  MONTH_FROM_DATE(FNDate.class, "month-from-date(date)", arg(DAT_ZO), ITR_ZO),
   /** XQuery function. */
   MONTH_FROM_DATETIME(FNDate.class, "month-from-dateTime(datetime)", arg(DTM_ZO), ITR_ZO),
   /** XQuery function. */
@@ -104,15 +104,15 @@ public enum Function {
   /** XQuery function. */
   SECONDS_FROM_DURATION(FNDate.class, "seconds-from-duration(duration)", arg(DUR_ZO), DEC_ZO),
   /** XQuery function. */
-  SECONDS_FROM_TIME(FNDate.class, "seconds-from-time(item)", arg(TIM_ZO), DEC_ZO),
+  SECONDS_FROM_TIME(FNDate.class, "seconds-from-time(time)", arg(TIM_ZO), DEC_ZO),
   /** XQuery function. */
-  TIMEZONE_FROM_DATE(FNDate.class, "timezone-from-date(item)", arg(DAT_ZO), DTD_ZO),
+  TIMEZONE_FROM_DATE(FNDate.class, "timezone-from-date(date)", arg(DAT_ZO), DTD_ZO),
   /** XQuery function. */
-  TIMEZONE_FROM_DATETIME(FNDate.class, "timezone-from-dateTime(item)", arg(DTM_ZO), DTD_ZO),
+  TIMEZONE_FROM_DATETIME(FNDate.class, "timezone-from-dateTime(dateTime)", arg(DTM_ZO), DTD_ZO),
   /** XQuery function. */
-  TIMEZONE_FROM_TIME(FNDate.class, "timezone-from-time(item)", arg(TIM_ZO), DTD_ZO),
+  TIMEZONE_FROM_TIME(FNDate.class, "timezone-from-time(time)", arg(TIM_ZO), DTD_ZO),
   /** XQuery function. */
-  YEAR_FROM_DATE(FNDate.class, "year-from-date(item)", arg(DAT_ZO), ITR_ZO),
+  YEAR_FROM_DATE(FNDate.class, "year-from-date(date)", arg(DAT_ZO), ITR_ZO),
   /** XQuery function. */
   YEAR_FROM_DATETIME(FNDate.class, "year-from-dateTime(datetime)", arg(DTM_ZO), ITR_ZO),
   /** XQuery function. */
@@ -151,7 +151,7 @@ public enum Function {
   /* FNFunc functions. */
 
   /** XQuery function. */
-  FILTER(FNFunc.class, "filter(seq,function)",
+  FILTER(FNFunc.class, "filter(items,function)",
       arg(ITEM_ZM, FuncType.get(BLN, ITEM).seqType()), ITEM_ZM, flag(X30, Flag.HOF)),
   /** XQuery function. */
   FUNCTION_NAME(FNFunc.class, "function-name(function)", arg(FUN_O), QNM_ZO, flag(X30)),
@@ -161,25 +161,25 @@ public enum Function {
   FUNCTION_LOOKUP(FNFunc.class, "function-lookup(name,arity)",
       arg(QNM, ITR), FUN_OZ, flag(CTX, FCS, NDT, X30, Flag.HOF)),
   /** XQuery function. */
-  FOR_EACH(FNFunc.class, "for-each(seq,function)",
+  FOR_EACH(FNFunc.class, "for-each(items,function)",
       arg(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM).seqType()), ITEM_ZM, flag(X30, Flag.HOF)),
   /** XQuery function. */
-  FOR_EACH_PAIR(FNFunc.class, "for-each-pair(seq1,seq2,function)",
+  FOR_EACH_PAIR(FNFunc.class, "for-each-pair(items1,items2,function)",
       arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM, ITEM).seqType()), ITEM_ZM,
       flag(X30, Flag.HOF)),
   /** XQuery function. */
-  FOLD_LEFT(FNFunc.class, "fold-left(seq,zero,function)",
+  FOLD_LEFT(FNFunc.class, "fold-left(items,zero,function)",
       arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM).seqType()), ITEM_ZM,
       flag(X30, Flag.HOF)),
   /** XQuery function. */
-  FOLD_RIGHT(FNFunc.class, "fold-right(seq,zero,function)",
+  FOLD_RIGHT(FNFunc.class, "fold-right(items,zero,function)",
       arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM, ITEM_ZM).seqType()), ITEM_ZM,
       flag(X30, Flag.HOF)),
 
   /* FNGen functions. */
 
   /** XQuery function. */
-  DATA(FNGen.class, "data([item])", arg(ITEM_ZM), AAT_ZM),
+  DATA(FNGen.class, "data([items])", arg(ITEM_ZM), AAT_ZM),
   /** XQuery function. */
   COLLECTION(FNGen.class, "collection([uri])", arg(STR_ZO), NOD_ZM),
   /** XQuery function. */
@@ -208,13 +208,13 @@ public enum Function {
   /* FNId functions. */
 
   /** XQuery function. */
-  ID(FNId.class, "id(string[,item])", arg(STR_ZM, NOD), ELM_ZM),
+  ID(FNId.class, "id(ids[,node])", arg(STR_ZM, NOD), ELM_ZM),
   /** XQuery function. */
-  IDREF(FNId.class, "idref(string[,item])", arg(STR_ZM, NOD), NOD_ZM),
+  IDREF(FNId.class, "idref(ids[,node])", arg(STR_ZM, NOD), NOD_ZM),
   /** XQuery function. */
-  LANG(FNId.class, "lang(string[,item])", arg(STR_ZO, NOD), BLN),
+  LANG(FNId.class, "lang(ids[,node])", arg(STR_ZO, NOD), BLN),
   /** XQuery function. */
-  ELEMENT_WITH_ID(FNId.class, "element-with-id(string[,item])",
+  ELEMENT_WITH_ID(FNId.class, "element-with-id(string[,node])",
       arg(STR_ZM, NOD), ELM_ZM, flag(X30)),
 
   /* FNInfo functions. */
@@ -271,11 +271,11 @@ public enum Function {
   /* FNPat functions. */
 
   /** XQuery function. */
-  MATCHES(FNPat.class, "matches(item,pattern[,mod])", arg(STR_ZO, STR, STR), BLN),
+  MATCHES(FNPat.class, "matches(string,pattern[,mod])", arg(STR_ZO, STR, STR), BLN),
   /** XQuery function. */
-  REPLACE(FNPat.class, "replace(item,pattern,replace[,mod])", arg(STR_ZO, STR, STR, STR), STR),
+  REPLACE(FNPat.class, "replace(string,pattern,replace[,mod])", arg(STR_ZO, STR, STR, STR), STR),
   /** XQuery function. */
-  TOKENIZE(FNPat.class, "tokenize(item,pattern[,mod])", arg(STR_ZO, STR, STR), STR_ZM),
+  TOKENIZE(FNPat.class, "tokenize(string,pattern[,mod])", arg(STR_ZO, STR, STR), STR_ZM),
   /** XQuery function. */
   ANALYZE_STRING(FNPat.class, "analyze-string(input,pattern[,mod])",
       arg(STR_ZO, STR, STR), ELM, flag(X30, CNS)),
@@ -294,7 +294,7 @@ public enum Function {
   /** XQuery function. */
   PREFIX_FROM_QNAME(FNQName.class, "prefix-from-QName(qname)", arg(QNM_ZO), NCN_ZO),
   /** XQuery function. */
-  RESOLVE_QNAME(FNQName.class, "resolve-QName(item,base)", arg(STR_ZO, ELM), QNM_ZO),
+  RESOLVE_QNAME(FNQName.class, "resolve-QName(name,base)", arg(STR_ZO, ELM), QNM_ZO),
   /** XQuery function. */
   RESOLVE_URI(FNQName.class, "resolve-uri(name[,elem])", arg(STR_ZO, STR), URI_ZO),
 
@@ -329,25 +329,25 @@ public enum Function {
   /** XQuery function. */
   TRUE(FNSimple.class, "true()", arg(), BLN),
   /** XQuery function. */
-  BOOLEAN(FNSimple.class, "boolean(item)", arg(ITEM_ZM), BLN),
+  BOOLEAN(FNSimple.class, "boolean(items)", arg(ITEM_ZM), BLN),
   /** XQuery function. */
-  NOT(FNSimple.class, "not(item)", arg(ITEM_ZM), BLN),
+  NOT(FNSimple.class, "not(items)", arg(ITEM_ZM), BLN),
   /** XQuery function. */
-  EMPTY(FNSimple.class, "empty(item)", arg(ITEM_ZM), BLN),
+  EMPTY(FNSimple.class, "empty(items)", arg(ITEM_ZM), BLN),
   /** XQuery function. */
-  EXISTS(FNSimple.class, "exists(item)", arg(ITEM_ZM), BLN),
+  EXISTS(FNSimple.class, "exists(items)", arg(ITEM_ZM), BLN),
   /** XQuery function. */
-  UNORDERED(FNSimple.class, "unordered(item)", arg(ITEM_ZM), ITEM_ZM),
+  UNORDERED(FNSimple.class, "unordered(items)", arg(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
-  ZERO_OR_ONE(FNSimple.class, "zero-or-one(item)", arg(ITEM_ZM), ITEM_ZO),
+  ZERO_OR_ONE(FNSimple.class, "zero-or-one(items)", arg(ITEM_ZM), ITEM_ZO),
   /** XQuery function. */
-  EXACTLY_ONE(FNSimple.class, "exactly-one(item)", arg(ITEM_ZM), ITEM),
+  EXACTLY_ONE(FNSimple.class, "exactly-one(items)", arg(ITEM_ZM), ITEM),
   /** XQuery function. */
-  ONE_OR_MORE(FNSimple.class, "one-or-more(item)", arg(ITEM_ZM), ITEM_OM),
+  ONE_OR_MORE(FNSimple.class, "one-or-more(items)", arg(ITEM_ZM), ITEM_OM),
   /** XQuery function. */
-  DEEP_EQUAL(FNSimple.class, "deep-equal(seq1,seq2[,coll])", arg(ITEM_ZM, ITEM_ZM, STR), BLN),
+  DEEP_EQUAL(FNSimple.class, "deep-equal(items1,items2[,coll])", arg(ITEM_ZM, ITEM_ZM, STR), BLN),
   /** XQuery function (project specific). */
-  DEEP_EQUAL_OPT(FNSimple.class, "deep-equal-opt(seq1,seq2[,options])",
+  DEEP_EQUAL_OPT(FNSimple.class, "deep-equal-opt(items1,items2[,options])",
       arg(ITEM_ZM, ITEM_ZM, ITEM), BLN),
 
   /* FNStr functions. */
@@ -677,7 +677,7 @@ public enum Function {
   /** XQuery function. */
   _DB_RENAME(FNDb.class, "rename(database,path,new-path)", arg(STR, STR, STR), EMP, flag(UPD, NDT)),
   /** XQuery function. */
-  _DB_REPLACE(FNDb.class, "replace(database,path,item)", arg(STR, STR, ITEM), EMP, flag(UPD, NDT)),
+  _DB_REPLACE(FNDb.class, "replace(database,path,input)", arg(STR, STR, ITEM), EMP, flag(UPD, NDT)),
   /** XQuery function. */
   _DB_OPTIMIZE(FNDb.class, "optimize(database[,all[,options]])",
       arg(STR, BLN, ITEM), EMP, flag(UPD, NDT)),
@@ -823,7 +823,7 @@ public enum Function {
   /* FNHof functions. */
 
   /** XQuery function. */
-  _HOF_SORT_WITH(FNHof.class, "sort-with(seq,lt-fun)",
+  _HOF_SORT_WITH(FNHof.class, "sort-with(items,lt-fun)",
       arg(ITEM_ZM, FuncType.get(BLN, ITEM, ITEM).seqType()), ITEM_ZM),
   /** XQuery function. */
   _HOF_ID(FNHof.class, "id(value)", arg(ITEM_ZM), ITEM_ZM),
@@ -833,13 +833,13 @@ public enum Function {
   _HOF_UNTIL(FNHof.class, "until(pred,function,start)", arg(FuncType.get(BLN, ITEM_ZM).seqType(),
       FuncType.get(ITEM_ZM, ITEM_ZM).seqType(), ITEM_ZM), ITEM_ZM, flag(Flag.HOF)),
   /** XQuery function. */
-  _HOF_FOLD_LEFT1(FNHof.class, "fold-left1(non-empty-seq,function)",
+  _HOF_FOLD_LEFT1(FNHof.class, "fold-left1(non-empty-items,function)",
       arg(ITEM_OM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM).seqType()), ITEM_ZM, flag(Flag.HOF)),
   /** XQuery function. */
-  _HOF_TOP_K_BY(FNHof.class, "top-k-by(seq,key-fun,k)",
+  _HOF_TOP_K_BY(FNHof.class, "top-k-by(items,key-fun,k)",
       arg(ITEM_ZM, FuncType.arity(1).seqType(), ITR), ITEM_ZM, flag(Flag.HOF)),
   /** XQuery function. */
-  _HOF_TOP_K_WITH(FNHof.class, "top-k-with(seq,less-than,k)",
+  _HOF_TOP_K_WITH(FNHof.class, "top-k-with(items,less-than,k)",
       arg(ITEM_ZM, FuncType.get(BLN, ITEM_ZO, ITEM_ZO).seqType(), ITR), ITEM_ZM, flag(Flag.HOF)),
 
   /* FNHtml functions. */
@@ -888,7 +888,7 @@ public enum Function {
   /** XQuery function. */
   _JSON_PARSE(FNJson.class, "parse(string[,config])", arg(STR, MAP_O), ITEM),
   /** XQuery function. */
-  _JSON_SERIALIZE(FNJson.class, "serialize(item[,params])", arg(ITEM_ZO, ITEM_ZO), STR),
+  _JSON_SERIALIZE(FNJson.class, "serialize(items[,params])", arg(ITEM_ZO, ITEM_ZO), STR),
 
   /* FNOut functions. */
 
