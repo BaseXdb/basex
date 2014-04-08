@@ -67,8 +67,7 @@ public final class JavaModuleFunc extends JavaMapping {
           Util.debug(e);
           e = e.getCause();
         }
-        throw e instanceof QueryException ? ((QueryException) e).info(info) :
-          JAVAERR.get(info, e);
+        throw e instanceof QueryException ? ((QueryException) e).info(info) : JAVAERR.get(info, e);
       }
     }
 

@@ -1,14 +1,17 @@
 package org.exquery.ns;
 
+import java.io.*;
 import java.util.*;
 
 import javax.servlet.http.*;
 
 import org.basex.http.*;
 import org.basex.query.*;
+import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -146,9 +149,17 @@ public final class Request extends QueryModule {
    */
   @Deterministic @Requires(Permission.NONE)
   public Value parameterNames() throws QueryException {
-    final TokenList tl = new TokenList();
-    for(final String s : request().getParameterMap().keySet()) tl.add(s);
-    return StrSeq.get(tl);
+    try {
+      final HTTPParams params = context().params;
+      final TokenSet cache = new TokenSet();
+      for(final String name : params.query().keySet()) cache.add(name);
+      for(final String name : params.form().keySet()) cache.add(name);
+      final TokenList names = new TokenList(cache.size());
+      for(final byte[] name : cache) names.add(name);
+      return StrSeq.get(names);
+    } catch(final IOException ex) {
+      throw new QueryException(ex);
+    }
   }
 
   /**
@@ -171,11 +182,18 @@ public final class Request extends QueryModule {
    */
   @Deterministic @Requires(Permission.NONE)
   public Value parameter(final Str key, final Value def) throws QueryException {
-    final String[] val = request().getParameterValues(key.toJava());
-    if(val == null) return def;
-    final TokenList tl = new TokenList(val.length);
-    for(final String v : val) tl.add(v);
-    return StrSeq.get(tl);
+    try {
+      final String name = key.toJava();
+      final HTTPParams params = context().params;
+      final Value query = params.query().get(name);
+      final Value form = params.form().get(name);
+      if(query == null && form == null) return def;
+      if(query == null) return form;
+      if(form == null) return query;
+      return new ValueBuilder().add(query).add(form).value();
+    } catch(final IOException ex) {
+      throw new QueryException(ex);
+    }
   }
 
   /**
@@ -266,13 +284,24 @@ public final class Request extends QueryModule {
     return query == null ? null : Str.get(query.toString());
   }
 
+  // PRIVATE FUNCTIONS ============================================================================
+
   /**
    * Returns the servlet request instance.
    * @return request
    * @throws QueryException query exception
    */
   private HttpServletRequest request() throws QueryException {
-    if(queryContext.http != null) return ((HTTPContext) queryContext.http).req;
+    return context().req;
+  }
+
+  /**
+   * Returns the servlet HTTP context.
+   * @return context
+   * @throws QueryException query exception
+   */
+  private HTTPContext context() throws QueryException {
+    if(queryContext.http != null) return (HTTPContext) queryContext.http;
     throw new QueryException("Servlet context required.");
   }
 }

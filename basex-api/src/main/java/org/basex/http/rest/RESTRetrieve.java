@@ -38,8 +38,9 @@ final class RESTRetrieve extends RESTCmd {
       // return database resource
       final boolean raw = run(query(_DB_IS_RAW)).equals(Text.TRUE);
       if(raw) {
-        http.serialization.set(SerializerOptions.METHOD, SerialMethod.RAW);
-        http.serialization.set(SerializerOptions.MEDIA_TYPE, run(query(_DB_CONTENT_TYPE)));
+        final SerializerOptions sopts = http.sopts();
+        sopts.set(SerializerOptions.METHOD, SerialMethod.RAW);
+        sopts.set(SerializerOptions.MEDIA_TYPE, run(query(_DB_CONTENT_TYPE)));
       }
       http.initResponse();
 
@@ -54,7 +55,7 @@ final class RESTRetrieve extends RESTCmd {
       list(table, el, RESTText.Q_RESOURCE, 0);
 
       http.initResponse();
-      final Serializer ser = Serializer.get(http.res.getOutputStream(), http.serialization);
+      final Serializer ser = Serializer.get(http.res.getOutputStream(), http.sopts());
       ser.serialize(el);
       ser.close();
     }

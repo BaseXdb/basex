@@ -25,7 +25,7 @@ import org.basex.util.list.*;
 import org.basex.util.options.*;
 
 /**
- * This class bundles context-based information on a single HTTP operation.
+ * Bundles context-based information on a single HTTP operation.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
@@ -37,9 +37,11 @@ public final class HTTPContext {
   public final HttpServletResponse res;
   /** Request method. */
   public final HTTPMethod method;
+  /** Request method. */
+  public final HTTPParams params;
 
   /** Serialization parameters. */
-  public SerializerOptions serialization = new SerializerOptions();
+  private SerializerOptions sopts;
   /** Result wrapping. */
   public boolean wrapping;
   /** User name. */
@@ -48,9 +50,9 @@ public final class HTTPContext {
   public String pass;
 
   /** Global static database context. */
-  private static Context context;
+  static Context context;
   /** Initialization flag. */
-  private static boolean init;
+  static boolean init;
 
   /** Performance. */
   private final Performance perf = new Performance();
@@ -69,6 +71,8 @@ public final class HTTPContext {
 
     req = rq;
     res = rs;
+    params = new HTTPParams(this);
+
     final String mth = rq.getMethod();
     method = HTTPMethod.get(mth);
 
@@ -102,19 +106,6 @@ public final class HTTPContext {
   }
 
   /**
-   * Returns an immutable map with all query parameters.
-   * @return parameters
-   * @throws IOException I/O exception
-   */
-  public Map<String, String[]> params() throws IOException {
-    try {
-      return req.getParameterMap();
-    } catch(final IllegalStateException ex) {
-      throw new IOException(ex);
-    }
-  }
-
-  /**
    * Returns the content type of a request (without an optional encoding).
    * @return content type
    */
@@ -137,9 +128,10 @@ public final class HTTPContext {
    */
   public void initResponse() {
     // set content type and encoding
-    final String enc = serialization.get(SerializerOptions.ENCODING);
+    final SerializerOptions opts = sopts();
+    final String enc = opts.get(SerializerOptions.ENCODING);
     res.setCharacterEncoding(enc);
-    final String ct = mediaType(serialization);
+    final String ct = mediaType(opts);
     res.setContentType(new TokenBuilder(ct).add(CHARSET).add(enc).toString());
   }
 
@@ -281,10 +273,27 @@ public final class HTTPContext {
 
   /**
    * Returns the database context.
-   * @return context;
+   * @return context
    */
   public Context context() {
     return context;
+  }
+
+  /**
+   * Assigns serialization parameters.
+   * @param opts serialization parameters.
+   */
+  public void sopts(final SerializerOptions opts) {
+    sopts = opts;
+  }
+
+  /**
+   * Returns the serialization parameters.
+   * @return serialization parameters.
+   */
+  public SerializerOptions sopts() {
+    if(sopts == null) sopts = new SerializerOptions();
+    return sopts;
   }
 
   /**
