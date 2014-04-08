@@ -460,24 +460,39 @@ public class DBNode extends ANode {
     return t;
   }
 
+
+  @Override
+  public String toErrorString() {
+    return toString(false);
+  }
+
   @Override
   public String toString() {
-    if(!data.inMemory()) return _DB_OPEN_PRE.args(data.meta.name, pre);
+    return toString(!data.inMemory());
+  }
+
+  /**
+   * Returns a string representation of the sequence.
+   * @param func display function representation
+   * @return string
+   */
+  private String toString(final boolean func) {
+    if(func) return _DB_OPEN_PRE.args(data.meta.name, pre);
 
     final TokenBuilder tb = new TokenBuilder(type.string()).add(' ');
     switch((NodeType) type) {
       case ATT:
       case PI:
-        tb.add(name()).add(" { \"").add(Token.chop(string(), 64)).add("\" }");
+        tb.add(name()).add(" {\"").add(Token.chop(string(), 32)).add("\"}");
         break;
       case ELM:
-        tb.add(name()).add(" { ... }");
+        tb.add(name()).add(" {...}");
         break;
       case DOC:
-        tb.add("{ \"").add(data.text(pre, true)).add("\" }");
+        tb.add("{\"").add(data.text(pre, true)).add("\"}");
         break;
       default:
-        tb.add("{ \"").add(Token.chop(string(), 64)).add("\" }");
+        tb.add("{\"").add(Token.chop(string(), 32)).add("\"}");
         break;
     }
     return tb.toString();
