@@ -273,8 +273,7 @@ public final class RestXqTest extends HTTPTest {
     get("declare %R:path('') function m:f() {" +
         "<R:response><http:response status='200'/></R:response> };", "", "");
     get("declare %R:path('') function m:f() {" +
-        "<R:response><http:response status='200' message='OK'/></R:response>, 'OK'};",
-        "", "OKOK");
+        "<R:response><http:response status='200' message='OK'/></R:response>, 'OK'};", "", "OKOK");
 
     // wrong syntax
     getE("declare %R:path('') function m:f() {" +
@@ -325,9 +324,10 @@ public final class RestXqTest extends HTTPTest {
   }
 
   /**
-   * Form parameters (same as %query-param if GET is used).
+   * Form parameters (no longer applicable: "same as %query-param if GET is used").
    * @throws Exception exception
    */
+  @Ignore
   @Test public void formParams() throws Exception {
     // correct syntax
     get("declare %R:path('') %R:form-param('a','{$v}') " +

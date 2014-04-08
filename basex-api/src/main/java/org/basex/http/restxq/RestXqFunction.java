@@ -5,7 +5,6 @@ import static org.basex.http.restxq.RestXqText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.net.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -14,14 +13,12 @@ import javax.servlet.http.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
-import org.basex.io.in.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.util.http.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -38,8 +35,7 @@ import org.basex.util.list.*;
  */
 final class RestXqFunction implements Comparable<RestXqFunction> {
   /** Pattern for a single template. */
-  private static final Pattern TEMPLATE =
-      Pattern.compile("\\s*\\{\\s*\\$(.+?)\\s*\\}\\s*");
+  private static final Pattern TEMPLATE = Pattern.compile("\\s*\\{\\s*\\$(.+?)\\s*\\}\\s*");
 
   /** Supported methods. */
   EnumSet<HTTPMethod> methods = EnumSet.allOf(HTTPMethod.class);
@@ -226,44 +222,18 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       }
     }
 
-    // cache request body
-    final String ct = http.contentType();
-    IOContent body = null;
-
+    // bind request body in the correct format
     if(requestBody != null) {
-      // bind request body in the correct format
-      body = cache(http, null);
       try {
-        final String ext = http.contentTypeExt();
-        bind(requestBody, arg, HTTPPayload.value(body, context.context.options, ct, ext));
+        bind(requestBody, arg, http.params.content());
       } catch(final IOException ex) {
         error(INPUT_CONV, ex);
       }
     }
 
-    // convert parameters to XQuery values
-    final Map<String, Value> params = new HashMap<String, Value>();
-    for(final Map.Entry<String, String[]> entry : http.params().entrySet()) {
-      final String[] values = entry.getValue();
-      final ValueBuilder vb = new ValueBuilder(values.length);
-      for(final String v : values) vb.add(new Atm(v));
-      params.put(entry.getKey(), vb.value());
-    }
-
-    // bind query parameters
-    for(final RestXqParam rxp : queryParams) bind(rxp, arg, params.get(rxp.key));
-
-    // bind form parameters
-    if(!formParams.isEmpty()) {
-      if(MimeTypes.MULTIPART_FORM_DATA.equals(ct)) {
-        // convert multipart parameters encoded in a form
-        addMultipart(cache(http, body), params, http.contentTypeExt());
-      } else if(MimeTypes.APP_FORM_URLENCODED.equals(ct)) {
-        // convert URL-encoded parameters
-        addURLEncoded(cache(http, body), params);
-      }
-      for(final RestXqParam rxp : formParams) bind(rxp, arg, params.get(rxp.key));
-    }
+    // bind query and form parameters
+    for(final RestXqParam rxp : queryParams) bind(rxp, arg, http.params.query().get(rxp.key));
+    for(final RestXqParam rxp : formParams) bind(rxp, arg, http.params.form().get(rxp.key));
 
     // bind header parameters
     for(final RestXqParam rxp : headerParams) {
@@ -509,58 +479,5 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     }
     // message
     return new RestXqError(code);
-  }
-
-  /**
-   * Adds multipart form-data from the passed on request body.
-   * @param body request body
-   * @param pars map parameters
-   * @param ext content type extension (may be {@code null})
-   * @throws IOException I/O exception
-   * @throws QueryException query exception
-   */
-  private void addMultipart(final IOContent body, final Map<String, Value> pars, final String ext)
-      throws IOException, QueryException {
-
-    final MainOptions opts = context.context.options;
-    final HTTPPayload hp = new HTTPPayload(body.inputStream(), true, null, opts);
-    final HashMap<String, Value> map = hp.multiForm(ext);
-    for(final Map.Entry<String, Value> entry : map.entrySet()) {
-      pars.put(entry.getKey(), entry.getValue());
-    }
-  }
-
-  // PRIVATE STATIC METHODS =============================================================
-
-  /**
-   * Caches the request body, if not done yet.
-   * @param http http context
-   * @param cache cache existing cache reference
-   * @return cache
-   * @throws IOException I/O exception
-   */
-  private static IOContent cache(final HTTPContext http, final IOContent cache) throws IOException {
-    if(cache != null) return cache;
-    final BufferInput bi = new BufferInput(http.req.getInputStream());
-    final IOContent io = new IOContent(bi.content());
-    io.name(http.method + IO.XMLSUFFIX);
-    return io;
-  }
-
-  /**
-   * Adds URL-encoded parameters from the passed on request body.
-   * @param body request body
-   * @param pars map parameters
-   */
-  private static void addURLEncoded(final IOContent body, final Map<String, Value> pars) {
-    for(final String nv : body.toString().split("&")) {
-      final String[] parts = nv.split("=", 2);
-      if(parts.length < 2) continue;
-      try {
-        pars.put(parts[0], Str.get(URLDecoder.decode(parts[1], UTF8)));
-      } catch(final Exception ex) {
-        throw Util.notExpected(ex);
-      }
-    }
   }
 }

@@ -145,7 +145,7 @@ public abstract class RESTCmd extends Command {
    * @return serialization parameters
    */
   static SerializerOptions serial(final HTTPContext http) {
-    final SerializerOptions sopts = http.serialization;
+    final SerializerOptions sopts = http.sopts();
     if(http.wrapping) {
       sopts.set(SerializerOptions.WRAP_PREFIX, REST);
       sopts.set(SerializerOptions.WRAP_URI, RESTURI);
@@ -171,7 +171,7 @@ public abstract class RESTCmd extends Command {
    * @throws IOException I/O exception
    */
   static void parseOptions(final RESTSession rs) throws IOException {
-    for(final Entry<String, String[]> param : rs.http.params().entrySet())
+    for(final Entry<String, String[]> param : rs.http.params.map().entrySet())
       parseOption(rs, param, true);
   }
 
