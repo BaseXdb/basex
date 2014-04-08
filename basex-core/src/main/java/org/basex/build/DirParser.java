@@ -94,15 +94,10 @@ public final class DirParser extends Parser {
     } else if(archives && io.isArchive()) {
       final String name = io.name().toLowerCase(Locale.ENGLISH);
       InputStream in = io.inputStream();
-      if(name.endsWith(IO.GZSUFFIX)) {
-        // process GZIP archive
-        try(final GZIPInputStream is = new GZIPInputStream(in)) {
-          src = new IOStream(is, io.name().replaceAll("\\..*", IO.XMLSUFFIX));
-          parseResource(b);
-        }
-      } else if(name.endsWith(IO.TARSUFFIX) || name.endsWith(IO.TGZSUFFIX)) {
+      if(name.endsWith(IO.TARSUFFIX) || name.endsWith(IO.TGZSUFFIX) ||
+          name.endsWith(IO.TARGZSUFFIX)) {
         // process TAR files
-        if(name.endsWith(IO.TGZSUFFIX)) in = new GZIPInputStream(in);
+        if(!name.endsWith(IO.TARSUFFIX)) in = new GZIPInputStream(in);
         try(final TarInputStream is = new TarInputStream(in)) {
           for(TarEntry ze; (ze = is.getNextEntry()) != null;) {
             if(ze.isDirectory()) continue;
@@ -110,6 +105,12 @@ public final class DirParser extends Parser {
             src.length(ze.getSize());
             parseResource(b);
           }
+        }
+      } else if(name.endsWith(IO.GZSUFFIX)) {
+        // process GZIP archive
+        try(final GZIPInputStream is = new GZIPInputStream(in)) {
+          src = new IOStream(is, io.name().replaceAll("\\..*", IO.XMLSUFFIX));
+          parseResource(b);
         }
       } else {
         // process ZIP archive
