@@ -41,6 +41,8 @@ public abstract class IO {
   /** JAR file suffix. */
   public static final String JARSUFFIX = ".jar";
   /** TGZIP file suffix. */
+  public static final String TARGZSUFFIX = ".tar.gz";
+  /** TGZIP file suffix. */
   public static final String TGZSUFFIX = ".tgz";
   /** GZIP file suffix. */
   public static final String GZSUFFIX = ".gz";
