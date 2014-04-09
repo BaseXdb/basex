@@ -7,6 +7,7 @@ import java.util.*;
 
 import org.basex.http.webdav.impl.ResourceMetaData;
 import org.basex.http.webdav.impl.WebDAVService;
+import org.basex.server.LoginException;
 import org.basex.util.*;
 
 import com.bradmcevoy.http.*;
@@ -45,21 +46,20 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
 
   @Override
   public Object authenticate(final String user, final String pass) {
-    if(user != null)
-      new BXCode<Object>(this) {
-        @Override
-        public void run() throws IOException {
-          service.authenticate(user, pass);
-        }
-      }.evalNoEx();
-    return user;
+    if(user == null) return null;
+    return new BXCode<Object>(this) {
+      @Override
+      public String get() throws LoginException {
+        service.authenticate(user, pass);
+        return user;
+      }
+    }.evalNoEx();
   }
 
   @Override
-  public boolean authorise(final Request request, final Request.Method method,
-      final Auth auth) {
-    return auth != null && auth.getTag() != null && service.authorize(auth.getUser(),
-      "any", meta.db, meta.path);
+  public boolean authorise(final Request request, final Request.Method method, final Auth auth) {
+    return auth != null && auth.getTag() != null &&
+        service.authorize(auth.getUser(), "any", meta.db, meta.path);
   }
 
   @Override
@@ -88,7 +88,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
   }
 
   @Override
-  public void delete() throws BadRequestException {
+  public void delete() throws BadRequestException, NotAuthorizedException {
     new BXCode<Object>(this) {
       @Override
       public void run() throws IOException {
@@ -98,8 +98,8 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
   }
 
   @Override
-  public void copyTo(final CollectionResource target, final String name)
-      throws BadRequestException {
+  public void copyTo(final CollectionResource target, final String name) throws BadRequestException,
+      NotAuthorizedException {
 
     new BXCode<Object>(this) {
       @Override
@@ -113,8 +113,8 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
   }
 
   @Override
-  public void moveTo(final CollectionResource target, final String name)
-      throws BadRequestException {
+  public void moveTo(final CollectionResource target, final String name) throws BadRequestException,
+      NotAuthorizedException {
 
     new BXCode<Object>(this) {
       @Override
@@ -136,8 +136,9 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
    * otherwise a failure reason code
    */
   @Override
-  public LockResult lock(final LockTimeout timeout, final LockInfo lockInfo) throws
-    NotAuthorizedException, PreConditionFailedException, LockedException {
+  public LockResult lock(final LockTimeout timeout, final LockInfo lockInfo)
+      throws NotAuthorizedException, PreConditionFailedException, LockedException {
+
     return new BXCode<LockResult>(this) {
       @Override
       public LockResult get() throws IOException {
@@ -154,7 +155,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
    */
   @Override
   public LockResult refreshLock(final String token) throws NotAuthorizedException,
-    PreConditionFailedException {
+      PreConditionFailedException {
     return new BXCode<LockResult>(this) {
       @Override
       public LockResult get() throws IOException {
@@ -171,7 +172,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
    */
   @Override
   public void unlock(final String tokenId) throws NotAuthorizedException,
-    PreConditionFailedException {
+      PreConditionFailedException {
     new BXCode<Object>(this) {
       @Override
       public void run() throws IOException {
@@ -313,7 +314,8 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
       reader.parse(new InputSource(new StringReader(lockInfo)));
       return handler.lockToken;
     } catch(final SAXException ex) {
-      Util.err("Error while parsing lock info", ex);
+      Util.errln("Error while parsing lock info.");
+      Util.debug(ex);
       return null;
     }
   }
@@ -343,17 +345,25 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
     public void characters(final char[] ch, final int start, final int length) {
       final String v = String.valueOf(ch, start, length);
       if("token".equals(elementName))
+
+
         lockToken.tokenId = v;
       else if("scope".equals(elementName))
+
         lockToken.info.scope = LockInfo.LockScope.valueOf(v.toUpperCase(Locale.ENGLISH));
       else if("type".equals(elementName))
+
         lockToken.info.type = LockInfo.LockType.valueOf(v.toUpperCase(Locale.ENGLISH));
       else if("depth".equals(elementName))
+
         lockToken.info.depth = LockInfo.LockDepth.valueOf(v.toUpperCase(Locale.ENGLISH));
       else if("owner".equals(elementName))
+
         lockToken.info.lockedByUser = v;
       else if("timeout".equals(elementName))
+
         lockToken.timeout = LockTimeout.parseTimeout(v);
+
     }
   }
 }
