@@ -47,6 +47,7 @@ public class CollectionTest extends XMLDBBaseTest {
   public void testGetServices() throws Exception {
     // get all services
     final Code code = new Code() {
+      @Override
       Object run() throws XMLDBException { return coll.getServices(); }
     };
 
@@ -70,6 +71,7 @@ public class CollectionTest extends XMLDBBaseTest {
 
     // get unknown service
     final Code code = new Code() {
+      @Override
       Object run() throws XMLDBException {
         return coll.getService("Unknown", "0.0");
       }
@@ -82,6 +84,7 @@ public class CollectionTest extends XMLDBBaseTest {
   public void testGetParentCollection() throws Exception {
     // assume there's no parent collection
     final Code code = new Code() {
+      @Override
       Object run() throws XMLDBException { return coll.getParentCollection(); }
     };
     assertNull("No parent collection expected.", code.run());
@@ -92,6 +95,7 @@ public class CollectionTest extends XMLDBBaseTest {
   public void testGetChildCollectionCount() throws Exception {
     // assume there's no child collection
     final Code code = new Code() {
+      @Override
       Object run() throws XMLDBException {
         return coll.getChildCollectionCount();
       }
@@ -104,6 +108,7 @@ public class CollectionTest extends XMLDBBaseTest {
   public void testListChildCollections() throws Exception {
     // assume there's no child collection
     final Code code = new Code() {
+      @Override
       Object run() throws XMLDBException { return coll.listChildCollections(); }
     };
     assertEquals("No child collection expected.", 0, code.strings().length);
@@ -114,6 +119,7 @@ public class CollectionTest extends XMLDBBaseTest {
   public void testGetChildCollection() throws Exception {
     // assume there's no child collection
     final Code code = new Code() {
+      @Override
       Object run() throws XMLDBException {
         return coll.getChildCollection("X");
       }
@@ -126,6 +132,7 @@ public class CollectionTest extends XMLDBBaseTest {
   public void testGetResourceCount() throws Exception {
     // tests could be added for here multiple documents
     final Code code = new Code() {
+      @Override
       Object run() throws XMLDBException { return coll.getResourceCount(); }
     };
     assertEquals("One document expected.", 1, code.num());
@@ -135,6 +142,7 @@ public class CollectionTest extends XMLDBBaseTest {
   @Test
   public void testListResources() throws Exception {
     final Code code = new Code() {
+      @Override
       Object run() throws XMLDBException { return coll.listResources(); }
     };
     final String[] res = code.strings();
@@ -163,6 +171,7 @@ public class CollectionTest extends XMLDBBaseTest {
 
     // tests could be added for here multiple documents
     final Code code = new Code() {
+      @Override
       Object run() throws XMLDBException {
         return coll.createResource(null, BinaryResource.RESOURCE_TYPE);
       }
@@ -231,6 +240,7 @@ public class CollectionTest extends XMLDBBaseTest {
     assertEquals("Wrong number of documents.", 4, coll.getResourceCount());
 
     checkClosed(new Code() {
+      @Override
       Object run() throws XMLDBException {
         return coll.createResource("id", null);
       }
@@ -263,6 +273,7 @@ public class CollectionTest extends XMLDBBaseTest {
     }
 
     checkClosed(new Code() {
+      @Override
       Object run() throws XMLDBException {
         coll.removeResource(null); return null;
       }
@@ -272,6 +283,7 @@ public class CollectionTest extends XMLDBBaseTest {
   @Test
   public void testCreateId() throws Exception {
     final Code code = new Code() {
+      @Override
       Object run() throws XMLDBException { return coll.createId(); }
     };
 

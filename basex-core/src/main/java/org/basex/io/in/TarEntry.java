@@ -10,11 +10,11 @@ import org.basex.util.list.*;
  */
 public final class TarEntry {
   /** Name of an entry. */
-  private String name;
+  private final String name;
   /** Entry size. */
-  private long size;
+  private final long size;
   /** File type. */
-  private byte type;
+  private final byte type;
 
   /**
    * Constructor.
