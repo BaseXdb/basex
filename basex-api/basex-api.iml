@@ -13,8 +13,14 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: net.xqj:basex-xqj:1.3.0" level="project" />
+    <orderEntry type="library" name="Maven: javax.xml.xquery:xqj-api:1.0" level="project" />
     <orderEntry type="library" name="Maven: com.xqj2:xqj2:0.2.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.thoughtworks.xstream:xstream:1.4.2" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: xmlpull:xmlpull:1.1.3.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: xpp3:xpp3_min:1.1.4c" level="project" />
+    <orderEntry type="library" name="Maven: org.xmldb:xmldb-api:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-server:8.1.14.v20131031" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty.orbit:javax.servlet:3.0.0.v201112011016" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-continuation:8.1.14.v20131031" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-http:8.1.14.v20131031" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-io:8.1.14.v20131031" level="project" />
@@ -23,8 +29,16 @@
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-security:8.1.14.v20131031" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-webapp:8.1.14.v20131031" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-xml:8.1.14.v20131031" level="project" />
+    <orderEntry type="library" name="Maven: com.ettrema:milton-api:1.8.1.4" level="project" />
+    <orderEntry type="library" name="Maven: org.jdom:jdom:1.1" level="project" />
+    <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.4" level="project" />
+    <orderEntry type="library" name="Maven: commons-io:commons-io:1.4" level="project" />
+    <orderEntry type="library" name="Maven: eu.medsea.mimeutil:mime-util:2.1.3" level="project" />
+    <orderEntry type="library" name="Maven: commons-fileupload:commons-fileupload:1.2.2" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-nop:1.7.5" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.5" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="Maven: junit:junit:4.8.2" level="project" />
+    <orderEntry type="library" name="Maven: com.vividsolutions:jts:1.13" level="project" />
     <orderEntry type="module" module-name="basex" />
     <orderEntry type="library" name="Maven: net.xqj:basex-xqj:1.3.0" level="project" />
     <orderEntry type="library" name="Maven: javax.xml.xquery:xqj-api:1.0" level="project" />
