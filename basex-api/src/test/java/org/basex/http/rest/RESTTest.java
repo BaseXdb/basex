@@ -159,7 +159,7 @@ public class RESTTest extends HTTPTest {
     try {
       get("?query=()&method=xxx");
       fail("Error expected.");
-    } catch(final IOException ex) {
+    } catch(final IOException ignored) {
     }
   }
 
@@ -386,7 +386,7 @@ public class RESTTest extends HTTPTest {
     try {
       put(NAME + "?xxx=yyy", new FileInputStream(FILE));
       fail("Error expected.");
-    } catch(final IOException ex) {
+    } catch(final IOException ignored) {
     }
   }
 
@@ -403,7 +403,7 @@ public class RESTTest extends HTTPTest {
       // no database left
       delete(NAME);
       fail("Error expected.");
-    } catch(final BaseXException ex) {
+    } catch(final BaseXException ignored) {
     }
   }
 
@@ -428,7 +428,7 @@ public class RESTTest extends HTTPTest {
       // no database left
       delete(NAME);
       fail("Error expected.");
-    } catch(final BaseXException ex) {
+    } catch(final BaseXException ignored) {
     }
   }
 
@@ -443,7 +443,7 @@ public class RESTTest extends HTTPTest {
     try {
       delete(NAME + "/a?xxx=true");
       fail("Error expected.");
-    } catch(final IOException ex) {
+    } catch(final IOException ignored) {
     }
   }
 

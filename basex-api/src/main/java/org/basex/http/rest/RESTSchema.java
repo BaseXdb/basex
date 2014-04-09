@@ -23,14 +23,12 @@ enum RESTSchema {
 
   /** Constructor. */
   RESTSchema() {
-    Schema s = null;
     try {
-      s = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).
+      schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).
           newSchema(new StreamSource(new ArrayInput(Token.token(SCHEMA_CONTENT))));
     } catch(final SAXException ex) {
       throw Util.notExpected(ex);
     }
-    schema = s;
   }
 
   /**

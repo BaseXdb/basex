@@ -433,7 +433,7 @@ public final class RestXqTest extends HTTPTest {
     try {
       get(query);
       fail("Error expected: " + query);
-    } catch(final BaseXException ex) {
+    } catch(final BaseXException ignored) {
     }
   }
 
@@ -459,7 +459,7 @@ public final class RestXqTest extends HTTPTest {
     try {
       head("");
       fail("Error expected: " + "");
-    } catch(final BaseXException ex) {
+    } catch(final BaseXException ignored) {
     }
   }
 

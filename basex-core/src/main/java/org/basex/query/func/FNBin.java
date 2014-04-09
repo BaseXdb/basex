@@ -674,7 +674,7 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private int[] bounds(final Long off, final Long len, final int sz) throws QueryException {
-    int o = 0, s = sz;
+    int o = 0, s;
     if(off != null) {
       if(off < 0 || off > sz || off > Integer.MAX_VALUE) throw BIN_IOOR_X_X.get(info, off, sz);
       o = (int) off.longValue();

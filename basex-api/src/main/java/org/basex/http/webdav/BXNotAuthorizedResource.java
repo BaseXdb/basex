@@ -119,19 +119,17 @@ final class BXNotAuthorizedResource implements FolderResource, LockableResource 
   }
 
   @Override
-  public LockResult lock(final LockTimeout lockTimeout, final LockInfo lockInfo)
-      throws NotAuthorizedException, PreConditionFailedException, LockedException {
+  public LockResult lock(final LockTimeout lockTimeout, final LockInfo lockInfo) {
     return null;
   }
 
   @Override
-  public LockResult refreshLock(final String s) throws NotAuthorizedException,
-      PreConditionFailedException {
+  public LockResult refreshLock(final String s) {
     return null;
   }
 
   @Override
-  public void unlock(final String s) throws NotAuthorizedException, PreConditionFailedException {
+  public void unlock(final String s) {
 
   }
 

@@ -1172,7 +1172,7 @@ public enum Err {
    * @param dsc description
    */
   Err(final ErrType type, final String msg, final String dsc) {
-    code = new StringBuilder().append(msg).toString();
+    code = msg;
     uri = type.uri;
     prefix = type.prefix;
     desc = dsc;
@@ -1311,7 +1311,7 @@ public enum Err {
    * @return function
    */
   public final QNm qname() {
-    return new QNm(new StringBuilder().append(prefix).append(':').append(code).toString(), uri);
+    return new QNm(prefix + ':' + code, uri);
   }
 
   /**

@@ -78,14 +78,14 @@ final class RestXqResponse {
         // send redirect to browser
         if(REST_REDIRECT.eq(node)) {
           final ANode ch = node.children().next();
-          if(ch == null || ch.type != NodeType.TXT) function.error(NO_VALUE, node.name());
+          if(ch == null || ch.type != NodeType.TXT) throw function.error(NO_VALUE, node.name());
           redirect = string(ch.string()).trim();
           return;
         }
         // server-side forwarding
         if(REST_FORWARD.eq(node)) {
           final ANode ch = node.children().next();
-          if(ch == null || ch.type != NodeType.TXT) function.error(NO_VALUE, node.name());
+          if(ch == null || ch.type != NodeType.TXT) throw function.error(NO_VALUE, node.name());
           forward = string(ch.string()).trim();
           return;
         }
@@ -98,7 +98,7 @@ final class RestXqResponse {
 
       // HEAD method must return a single response element
       if(function.methods.size() == 1 && function.methods.contains(HTTPMethod.HEAD))
-        function.error(HEAD_METHOD);
+        throw function.error(HEAD_METHOD);
 
       // serialize result
       final SerializerOptions sp = function.output;

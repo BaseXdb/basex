@@ -59,7 +59,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
   @Override
   public boolean authorise(final Request request, final Request.Method method, final Auth auth) {
     return auth != null && auth.getTag() != null &&
-        service.authorize(auth.getUser(), "any", meta.db, meta.path);
+        service.authorize(meta.db);
   }
 
   @Override

@@ -253,7 +253,7 @@ public final class BaseXHTTP {
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
-  private void parseArguments(final String[] args) throws IOException {
+  private void parseArguments(final String... args) throws IOException {
     /* command-line properties will be stored in system properties;
      * this way, they will not be overwritten by the settings specified in web.xml. */
     final Args arg = new Args(args, this, S_HTTPINFO, Util.info(S_CONSOLE, HTTP));

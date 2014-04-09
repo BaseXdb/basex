@@ -132,11 +132,11 @@ public final class CmpSR extends Single {
       if(d > 0) return Bln.FALSE;
       if(d == 0) {
         // return simplified comparison for exact hit, or false if value is not included
-        return mni && mxi ? new CmpG(expr, Str.get(mn), CmpG.OpG.EQ, collation, info)
+        return mni && mxi ? new CmpG(expr, Str.get(mn), CmpG.OpG.EQ, null, info)
                           : Bln.FALSE;
       }
     }
-    return new CmpSR(c.expr, mn, mni && c.mni, mx, mxi && c.mxi, collation, info);
+    return new CmpSR(c.expr, mn, mni && c.mni, mx, mxi && c.mxi, null, info);
   }
 
   @Override

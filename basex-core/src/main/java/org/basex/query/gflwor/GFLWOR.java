@@ -511,7 +511,7 @@ public final class GFLWOR extends ParseExpr {
             final And and = (And) e;
             and.expr = Array.add(and.expr, wh.pred);
           } else {
-            before.pred = new And(before.info, new Expr[] { e, wh.pred });
+            before.pred = new And(before.info, e, wh.pred);
           }
         } else {
           before = wh;

@@ -800,7 +800,7 @@ public class QueryParser extends InputParser {
     ctx.modParsed.put(p, uri);
 
     // read module
-    String qu = null;
+    String qu;
     try {
       qu = string(io.read());
     } catch(final IOException ex) {
@@ -3131,7 +3131,7 @@ public class QueryParser extends InputParser {
         final boolean same = wsConsumeWs(SAME);
         final boolean diff = !same && wsConsumeWs(DIFFERENT);
         if(same || diff) {
-          FTUnit unit = null;
+          FTUnit unit;
           if(wsConsumeWs(SENTENCE)) unit = FTUnit.SENTENCES;
           else if(wsConsumeWs(PARAGRAPH)) unit = FTUnit.PARAGRAPHS;
           else throw error(INCOMPLETE);
@@ -3257,7 +3257,7 @@ public class QueryParser extends InputParser {
     }
 
     skipWs();
-    Expr e = null;
+    Expr e;
     if(quote(curr())) {
       e = Str.get(stringLiteral());
     } else if(curr('{')) {
