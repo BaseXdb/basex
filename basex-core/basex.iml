@@ -12,12 +12,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" scope="TEST" name="Maven: junit:junit:4.8.2" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: jp.sourceforge.igo:igo:0.4.3" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache:lucene-stemmers:3.4.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.ccil.cowan.tagsoup:tagsoup:1.2" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: xml-resolver:xml-resolver:1.2" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: jline:jline:1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.8.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: jp.sourceforge.igo:igo:0.4.3" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache:lucene-stemmers:3.4.0" level="project" />
