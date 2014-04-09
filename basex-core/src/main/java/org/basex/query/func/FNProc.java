@@ -53,7 +53,7 @@ public final class FNProc extends StandardFunc {
     }
 
     final String c = expr.length > 2 ? string(checkStr(expr[2], ctx)) : Prop.ENCODING;
-    Charset cs = null;
+    Charset cs;
     try {
       cs = Charset.forName(c);
     } catch(final Exception ex) {

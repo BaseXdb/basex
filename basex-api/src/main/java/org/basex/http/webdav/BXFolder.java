@@ -114,7 +114,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
 
   @Override
   public final LockToken createAndLock(final String name, final LockTimeout timeout,
-      final LockInfo lockInfo) throws NotAuthorizedException {
+      final LockInfo lockInfo) {
     try {
       final BXAbstractResource r = createNew(name, new ArrayInput(Token.EMPTY), 0L, null);
       final LockResult lockResult = r.lock(timeout, lockInfo);

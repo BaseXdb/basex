@@ -77,8 +77,8 @@ public class Options implements Iterable<Option<?>> {
    */
   public final synchronized void write() {
     final TokenBuilder tmp = new TokenBuilder();
-    boolean first = true;
     try {
+      boolean first = true;
       for(final Option<?> opt : options(getClass())) {
         final String name = opt.name();
         if(opt instanceof Comment) {

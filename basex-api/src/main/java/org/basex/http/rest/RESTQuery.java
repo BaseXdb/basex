@@ -84,7 +84,7 @@ class RESTQuery extends RESTCmd {
    */
   @SuppressWarnings("unused")
   static RESTQuery get(final RESTSession rs, final String query, final Map<String, String[]> vars,
-      final String val) throws IOException {
+      final String val) {
 
     open(rs);
     rs.add(new XQuery(query));
