@@ -77,8 +77,9 @@ public final class RestXqModules {
           if(first.compareTo(rxf) != 0) break;
           tb.add(Prop.NL).add(rxf.function.info.toString());
         }
-        if(first.path != null) first.error(PATH_CONFLICT, first.path, tb);
-        first.error(ERROR_CONFLICT, first.error, tb);
+        throw first.path == null ?
+          first.error(ERROR_CONFLICT, first.error, tb) :
+          first.error(PATH_CONFLICT, first.path, tb);
       }
     }
     // choose most specific function
