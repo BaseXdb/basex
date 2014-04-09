@@ -70,15 +70,10 @@ public final class WebDAVService<T> {
 
   /**
    * Checks if the user is authorized to perform the given action.
-   * @param user user name
-   * @param action action
    * @param db database
-   * @param path path
    * @return {@code true} if the user is authorized
    */
-  @SuppressWarnings("unused")
-  public boolean authorize(final String user, final String action, final String db,
-      final String path) {
+  public boolean authorize(final String db) {
     return !WEBDAV_DB.equals(db);
   }
 
@@ -206,7 +201,7 @@ public final class WebDAVService<T> {
 
     final WebDAVQuery query = new WebDAVQuery(
       "declare option db:chop 'false';" +
-      "if(" + _DB_IS_RAW.args("$db", "$path") + ")" +
+      "if(" + _DB_IS_RAW.args("$db", "$path") + ')' +
       " then " + _DB_STORE.args("$tdb", "$tpath", _DB_RETRIEVE.args("$db", "$path")) +
       " else " + _DB_ADD.args("$tdb", _DB_OPEN.args("$db", "$path"), "$tpath"));
     query.bind("db", db);

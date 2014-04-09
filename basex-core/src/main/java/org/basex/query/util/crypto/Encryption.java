@@ -83,9 +83,8 @@ public final class Encryption {
     // initialization vector length
     final int ivl = toInt(tivl);
 
-    byte[] t = null;
     try {
-      t = ec ? encrypt(in, k, aa, ivl) : decrypt(in, k, aa, ivl);
+      return Str.get(ec ? encrypt(in, k, aa, ivl) : decrypt(in, k, aa, ivl));
     } catch(final NoSuchPaddingException e) {
       throw CX_NOPAD.get(info, e);
     } catch(final BadPaddingException e) {
@@ -97,8 +96,6 @@ public final class Encryption {
     } catch(final GeneralSecurityException e) {
       throw CX_INVALGO.get(info, e);
     }
-
-    return Str.get(t);
   }
 
   /**

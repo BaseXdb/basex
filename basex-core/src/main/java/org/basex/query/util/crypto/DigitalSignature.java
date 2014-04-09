@@ -135,8 +135,7 @@ public final class DigitalSignature {
     if(!TYPES.contains(lc(b))) throw CX_SIGTYPINV.get(info, t);
     final byte[] type = b;
 
-    Item signedNode = null;
-
+    Item signedNode;
     try {
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
 
@@ -173,7 +172,7 @@ public final class DigitalSignature {
         }
 
         // initialize the keystore
-        KeyStore ks = null;
+        KeyStore ks;
         try {
           ks = KeyStore.getInstance(ksTY);
         } catch(final KeyStoreException ex) {
@@ -295,8 +294,6 @@ public final class DigitalSignature {
    * @throws QueryException query exception
    */
   public Item validateSignature(final ANode node) throws QueryException {
-    boolean coreVal = false;
-
     try {
       final Document doc = toDOMNode(node);
       final DOMValidateContext valContext =
@@ -308,7 +305,7 @@ public final class DigitalSignature {
       valContext.setNode(signl.item(0));
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
       final XMLSignature signature = fac.unmarshalXMLSignature(valContext);
-      coreVal = signature.validate(valContext);
+      return Bln.get(signature.validate(valContext));
 
     } catch(final XMLSignatureException | SAXException | ParserConfigurationException |
         IOException e) {
@@ -316,8 +313,6 @@ public final class DigitalSignature {
     } catch(final MarshalException e) {
       throw CX_SIGEXC.get(info, e);
     }
-
-    return Bln.get(coreVal);
   }
 
   /**

@@ -65,7 +65,7 @@ public abstract class Logical extends Arr {
   @Override
   public void plan(final FElem plan) {
     final FElem el = planElem();
-    if(tailCall) el.add(planAttr(TCL, tailCall));
+    if(tailCall) el.add(planAttr(TCL, true));
     plan.add(el);
     for(final ExprInfo e : expr) {
       if(e != null) e.plan(el);

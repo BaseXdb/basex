@@ -3,12 +3,10 @@ package org.basex.http.webdav;
 import java.io.*;
 import java.util.*;
 
+import org.basex.util.*;
+
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.Request.Method;
-import com.bradmcevoy.http.exceptions.LockedException;
-import com.bradmcevoy.http.exceptions.NotAuthorizedException;
-import com.bradmcevoy.http.exceptions.PreConditionFailedException;
-import org.basex.util.*;
 
 /**
  * Dummy resource to be returned when no authorization is provided.
@@ -119,19 +117,17 @@ final class BXNotAuthorizedResource implements FolderResource, LockableResource 
   }
 
   @Override
-  public LockResult lock(final LockTimeout lockTimeout, final LockInfo lockInfo)
-      throws NotAuthorizedException, PreConditionFailedException, LockedException {
+  public LockResult lock(final LockTimeout lockTimeout, final LockInfo lockInfo) {
     return null;
   }
 
   @Override
-  public LockResult refreshLock(final String s) throws NotAuthorizedException,
-      PreConditionFailedException {
+  public LockResult refreshLock(final String s) {
     return null;
   }
 
   @Override
-  public void unlock(final String s) throws NotAuthorizedException, PreConditionFailedException {
+  public void unlock(final String s) {
 
   }
 

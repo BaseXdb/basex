@@ -685,7 +685,7 @@ final class XMLScanner extends Proc {
         while((ch = nextChar()) != qu) tok.add(ch);
         if(!f) return null;
         final String name = string(tok.finish());
-        if(!dtd && r) return cont;
+        if(!dtd && r) return null;
 
         final XMLInput tin = input;
         if(dtd) {

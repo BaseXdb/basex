@@ -27,7 +27,7 @@ public final class TarEntry {
       if(buffer[i] == 0) break;
       result.add(buffer[i]);
     }
-    String n = null;
+    String n;
     try {
       n = new String(result.toArray());
     } catch(final Exception ex) {

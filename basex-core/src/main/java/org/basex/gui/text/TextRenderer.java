@@ -468,7 +468,7 @@ final class TextRenderer extends BaseXBack {
           }
           n = n.substring(0, c);
         }
-        if(ch != ' ') g.drawString(n, x, y);
+        g.drawString(n, x, y);
       } else if(ch <= TokenBuilder.ULINE) {
         g.setFont(font);
       }

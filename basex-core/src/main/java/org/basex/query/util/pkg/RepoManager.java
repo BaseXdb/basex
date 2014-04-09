@@ -58,7 +58,7 @@ public final class RepoManager {
   public boolean install(final String path) throws QueryException {
     // check if package exists, and cache contents
     final IO io = IO.get(path);
-    byte[] cont = null;
+    byte[] cont;
     try {
       cont = io.read();
     } catch(final IOException ex) {
