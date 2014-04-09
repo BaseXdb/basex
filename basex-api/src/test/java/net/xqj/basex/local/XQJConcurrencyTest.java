@@ -59,36 +59,36 @@ public class XQJConcurrencyTest extends XQJBaseTest {
    */
   @Test
   public void testConcurrentInsert() throws Exception {
-    XQExpression xqpe = xqc.createExpression();
+    final XQExpression xqpe = xqc.createExpression();
     try {
       xqpe.executeCommand("CREATE DB xqj-concurrent-insert-test");
       xqpe.executeCommand("OPEN xqj-concurrent-insert-test");
       xqpe.executeCommand("SET DEFAULTDB true");
 
-      HashMap<String, XQItem> docs = new HashMap<>();
+      final HashMap<String, XQItem> docs = new HashMap<>();
 
-      ThreadPoolExecutor tpe =
+      final ThreadPoolExecutor tpe =
         new ThreadPoolExecutor(
           CONCURRENT_WRITE_THREADS, CONCURRENT_WRITE_THREADS, 4l,
           TimeUnit.SECONDS,
           new ArrayBlockingQueue<Runnable>(CONCURRENT_READ_THREADS),
           new ThreadPoolExecutor.CallerRunsPolicy());
 
-      ArrayList<Future<?>> futures = new ArrayList<>();
+      final ArrayList<Future<?>> futures = new ArrayList<>();
 
       for(int i = 0; i < DOCS_TO_INSERT; i++) {
-        String uri = i + "-" + UUID.randomUUID().toString() + ".xml";
-        XQItem item = createDocument("<e>" + uri + "</e>");
+        final String uri = i + "-" + UUID.randomUUID().toString() + ".xml";
+        final XQItem item = createDocument("<e>" + uri + "</e>");
         docs.put(uri, item);
       }
 
-      for(String uri : docs.keySet())
+      for(final String uri : docs.keySet())
         futures.add(tpe.submit(new InsertItemThread(uri, docs.get(uri))));
 
-      for(Future<?> future : futures)
+      for(final Future<?> future : futures)
         future.get();
 
-      for(String uri : docs.keySet())
+      for(final String uri : docs.keySet())
         assertTrue(docAvailable(uri));
     } finally {
       xqpe.executeCommand("DROP DB xqj-concurrent-insert-test");
@@ -157,7 +157,7 @@ public class XQJConcurrencyTest extends XQJBaseTest {
     @Override
     public void run() {
       try {
-        XQConnection2 xqc2 = (XQConnection2) xqc;
+        final XQConnection2 xqc2 = (XQConnection2) xqc;
         xqc2.insertItem(uri, item, INSERT_STRATEGY);
       } catch(final Throwable th) {
         // a JUnit assertion WILL fail later because of this happening.

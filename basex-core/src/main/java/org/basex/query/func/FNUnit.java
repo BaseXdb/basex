@@ -47,7 +47,7 @@ public final class FNUnit extends StandardFunc {
   @Override
   Expr opt(final QueryContext ctx, final VarScope scp) throws QueryException {
     if(sig == Function._UNIT_TEST_URIS || sig == Function._UNIT_TEST && expr.length == 0) {
-      for(StaticFunc fn : ctx.funcs.funcs()) {
+      for(final StaticFunc fn : ctx.funcs.funcs()) {
         if(fn.compiled()) continue;
         final Ann ann = fn.ann;
         for(int i = ann.size(); --i >= 0;) {

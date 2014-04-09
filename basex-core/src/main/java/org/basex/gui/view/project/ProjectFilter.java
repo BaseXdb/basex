@@ -207,7 +207,7 @@ final class ProjectFilter extends BaseXBack {
         final String name = ea.file().name();
         final int i = name.lastIndexOf('.');
         final String pattern = files.getText();
-        if(i != -1 && (!pattern.contains("*") && !pattern.contains("?")) ||
+        if(i != -1 && !pattern.contains("*") && !pattern.contains("?") ||
             !Pattern.compile(IOFile.regex(pattern)).matcher(name).matches()) {
           files.setText("*" + name.substring(i));
         }

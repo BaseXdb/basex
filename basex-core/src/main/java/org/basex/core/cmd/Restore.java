@@ -29,7 +29,7 @@ public class Restore extends ABackup {
 
   @Override
   protected boolean run() {
-    String name = args[0];
+    final String name = args[0];
     if(!Databases.validName(name)) return error(NAME_INVALID_X, name);
 
     // find backup with or without date suffix

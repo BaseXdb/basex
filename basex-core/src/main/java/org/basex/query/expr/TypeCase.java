@@ -55,11 +55,11 @@ public final class TypeCase extends Single {
    */
   TypeCase compile(final QueryContext ctx, final VarScope scp, final Value v)
       throws QueryException {
-    Value val = var != null && v != null ? var.checkType(v, ctx, info, true) : null;
+    final Value val = var != null && v != null ? var.checkType(v, ctx, info, true) : null;
     try {
       super.compile(ctx, scp);
       if(val != null) {
-        Expr inlined = expr.inline(ctx, scp, var, val);
+        final Expr inlined = expr.inline(ctx, scp, var, val);
         if(inlined != null) expr = inlined;
       }
     } catch(final QueryException ex) {

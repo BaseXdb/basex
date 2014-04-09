@@ -66,7 +66,7 @@ public abstract class XQJBaseTest {
    * @throws XQException query exception
    */
   public boolean docAvailable(final String uri) throws XQException {
-    XQResultSequence rs =
+    final XQResultSequence rs =
       xqc.createExpression().executeQuery(
         "fn:doc-available('" + uri + "')"
       );
@@ -80,7 +80,7 @@ public abstract class XQJBaseTest {
    * @return options
    */
   static final BaseXXQInsertOptions options(final int strategy) {
-    BaseXXQInsertOptions options = new BaseXXQInsertOptions();
+    final BaseXXQInsertOptions options = new BaseXXQInsertOptions();
     options.setInsertStrategy(strategy);
     return options;
   }
