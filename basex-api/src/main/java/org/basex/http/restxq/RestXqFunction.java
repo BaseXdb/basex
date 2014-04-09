@@ -177,7 +177,8 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     if(!mth.isEmpty()) methods = mth;
 
     if(found) {
-      if(path == null && error == null) throw error(function.info, ANN_MISSING, '%', PATH, '%', ERROR);
+      if(path == null && error == null)
+        throw error(function.info, ANN_MISSING, '%', PATH, '%', ERROR);
 
       for(int i = 0; i < declared.length; i++) {
         if(declared[i]) continue;

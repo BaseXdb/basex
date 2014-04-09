@@ -3,12 +3,10 @@ package org.basex.http.webdav;
 import java.io.*;
 import java.util.*;
 
+import org.basex.util.*;
+
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.Request.Method;
-import com.bradmcevoy.http.exceptions.LockedException;
-import com.bradmcevoy.http.exceptions.NotAuthorizedException;
-import com.bradmcevoy.http.exceptions.PreConditionFailedException;
-import org.basex.util.*;
 
 /**
  * Dummy resource to be returned when no authorization is provided.

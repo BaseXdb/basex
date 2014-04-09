@@ -73,7 +73,6 @@ public final class WebDAVService<T> {
    * @param db database
    * @return {@code true} if the user is authorized
    */
-  @SuppressWarnings("unused")
   public boolean authorize(final String db) {
     return !WEBDAV_DB.equals(db);
   }
