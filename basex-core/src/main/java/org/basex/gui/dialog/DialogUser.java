@@ -238,7 +238,7 @@ final class DialogUser extends BaseXBack {
    * Sets new data.
    * @throws IOException I/O exception
    */
-  void setData() throws IOException {
+  private void setData() throws IOException {
     users = table(null);
 
     if(global) {

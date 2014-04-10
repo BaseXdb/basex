@@ -79,7 +79,7 @@ public class Dur extends ADateDur {
 
     final String val = Token.string(vl).trim();
     final Matcher mt = DUR.matcher(val);
-    if(!mt.matches() || val.endsWith("P") || val.endsWith("T")) dateErr(vl, XDURR, ii);
+    if(!mt.matches() || val.endsWith("P") || val.endsWith("T")) throw dateError(vl, XDURR, ii);
     yearMonth(vl, mt, ii);
     dayTime(vl, mt, 6, ii);
   }

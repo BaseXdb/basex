@@ -3,7 +3,6 @@ package org.basex;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
-import java.util.*;
 
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -122,9 +121,7 @@ public final class BaseXGUI {
       if(laf.equals("Metal")) {
         // use non-bold fonts in Java's look & feel
         final UIDefaults def = UIManager.getDefaults();
-        final Enumeration<?> en = def.keys();
-        while(en.hasMoreElements()) {
-          final Object k = en.nextElement();
+        for(final Object k : def.keySet()) {
           final Object v = def.get(k);
           if(v instanceof Font) def.put(k, ((Font) v).deriveFont(Font.PLAIN));
         }

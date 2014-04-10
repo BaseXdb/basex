@@ -168,8 +168,8 @@ public final class JsonSerializerTest extends SandboxTest {
    * @param format format
    * @param spec spec
    */
-  private void serialize(final String query, final String expected, final JsonFormat format,
-      final JsonSpec spec) {
+  private static void serialize(final String query, final String expected, final JsonFormat format,
+                                final JsonSpec spec) {
     try {
       final String actual = serialize(query, format, spec);
       assertEquals("\n[E] " + expected + "\n[F] " + actual + '\n', expected, actual);
@@ -193,7 +193,7 @@ public final class JsonSerializerTest extends SandboxTest {
    * @param format format
    * @param spec spec
    */
-  private void error(final String query, final JsonFormat format, final JsonSpec spec) {
+  private static void error(final String query, final JsonFormat format, final JsonSpec spec) {
     try {
       serialize(query, format, spec);
       fail("Error expected: " + Err.BXJS_SERIAL);

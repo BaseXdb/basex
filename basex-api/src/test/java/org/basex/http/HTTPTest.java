@@ -40,7 +40,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @param local local flag
    * @throws Exception exception
    */
-  public static void init(final String rt, final boolean local) throws Exception {
+  protected static void init(final String rt, final boolean local) throws Exception {
     initContext(CONTEXT);
     assertTrue(new IOFile(CONTEXT.globalopts.get(GlobalOptions.WEBPATH)).md());
     root = rt;
@@ -87,7 +87,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  public static String get(final String query) throws IOException {
+  protected static String get(final String query) throws IOException {
     return request(query, GET);
   }
 
@@ -97,7 +97,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @return response code
    * @throws IOException I/O exception
    */
-  public static String delete(final String query) throws IOException {
+  protected static String delete(final String query) throws IOException {
     return request(query, DELETE);
   }
 
@@ -107,7 +107,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  public static String head(final String query) throws IOException {
+  protected static String head(final String query) throws IOException {
     return request(query, HEAD);
   }
 
@@ -141,7 +141,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  public static String post(final String query, final String request, final String type)
+  protected static String post(final String query, final String request, final String type)
       throws IOException {
 
     // create connection
@@ -174,7 +174,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @return exception
    * @throws IOException I/O exception
    */
-  public static IOException error(final HttpURLConnection conn, final IOException ex)
+  protected static IOException error(final HttpURLConnection conn, final IOException ex)
       throws IOException {
 
     final String msg = read(conn.getErrorStream());
@@ -187,7 +187,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @return string
    * @throws IOException I/O exception
    */
-  public static String read(final InputStream is) throws IOException {
+  protected static String read(final InputStream is) throws IOException {
     final ArrayOutput ao = new ArrayOutput();
     if(is != null) {
       try(final BufferInput bi = new BufferInput(is)) {
@@ -203,7 +203,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @param is input stream
    * @throws IOException I/O exception
    */
-  public static void put(final String u, final InputStream is) throws IOException {
+  protected static void put(final String u, final InputStream is) throws IOException {
     put(u, is, null);
   }
 
@@ -214,7 +214,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @param ctype content type (optional, may be {@code null})
    * @throws IOException I/O exception
    */
-  public static void put(final String u, final InputStream is, final String ctype)
+  protected static void put(final String u, final InputStream is, final String ctype)
       throws IOException {
 
     final URL url = new URL(root + u);

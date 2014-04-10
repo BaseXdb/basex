@@ -140,7 +140,7 @@ final class DialogImport extends BaseXBack {
    * Returns an XML file chosen by the user.
    * @return file chooser
    */
-  IOFile inputFile() {
+  private IOFile inputFile() {
     final String path = gui.gopts.get(GUIOptions.INPUTPATH);
     final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR, path, gui);
     fc.textFilters();
@@ -202,7 +202,7 @@ final class DialogImport extends BaseXBack {
    * Opens a file dialog to choose an input file or directory,
    * and updates the panel.
    */
-  void choose() {
+  private void choose() {
     // get user input (may be canceled)
     final IOFile in = inputFile();
     if(in == null) return;

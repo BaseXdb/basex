@@ -200,7 +200,7 @@ public final class FTIndex implements Index {
    * @param ti entry length
    * @return position where the key was found, or would have been found
    */
-  int find(final byte[] token, final int i, final int e, final int ti) {
+  private int find(final byte[] token, final int i, final int e, final int ti) {
     final int tl = ti + ENTRY;
     int l = 0, h = (e - i) / tl;
     while(l <= h) {

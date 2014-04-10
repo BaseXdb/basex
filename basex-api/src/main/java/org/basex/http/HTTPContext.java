@@ -50,9 +50,9 @@ public final class HTTPContext {
   public String pass;
 
   /** Global static database context. */
-  static Context context;
+  private static Context context;
   /** Initialization flag. */
-  static boolean init;
+  private static boolean init;
 
   /** Performance. */
   private final Performance perf = new Performance();

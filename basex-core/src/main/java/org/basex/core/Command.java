@@ -339,7 +339,7 @@ public abstract class Command extends Proc {
         Util.debug(ex);
         return error(OUT_OF_MEM + (perm == Perm.CREATE ? H_OUT_OF_MEM : ""));
       }
-      return error(Util.bug(ex) + NL + info.toString());
+      return error(Util.bug(ex) + NL + info);
     } finally {
       // flushes the output
       try { if(out != null) out.flush(); } catch(final IOException ignored) { }

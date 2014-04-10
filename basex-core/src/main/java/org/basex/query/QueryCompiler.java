@@ -189,7 +189,7 @@ final class QueryCompiler {
    * @param scp scope
    * @return id if existing, {@code null} otherwise
    */
-  int id(final Scope scp) {
+  private int id(final Scope scp) {
     if(ids != null) {
       final Integer id = ids.get(scp);
       return id == null ? -1 : id;
@@ -204,7 +204,7 @@ final class QueryCompiler {
    * @param scp scope to add
    * @return the scope's ID
    */
-  int add(final Scope scp) {
+  private int add(final Scope scp) {
     final int id = scopes.size();
     if(id == MAP_THRESHOLD) {
       ids = new IdentityHashMap<>();

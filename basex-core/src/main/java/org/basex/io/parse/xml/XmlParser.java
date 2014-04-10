@@ -15,7 +15,7 @@ import org.xml.sax.helpers.*;
  */
 public final class XmlParser {
   /** Reader. */
-  final XMLReader reader;
+  private final XMLReader reader;
 
   /**
    * Constructor.

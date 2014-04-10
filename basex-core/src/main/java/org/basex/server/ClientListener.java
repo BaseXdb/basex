@@ -527,7 +527,7 @@ public final class ClientListener extends Thread {
    * @param ok success flag
    * @throws IOException I/O exception
    */
-  void send(final boolean ok) throws IOException {
+  private void send(final boolean ok) throws IOException {
     out.write(ok ? 0 : 1);
     out.flush();
   }

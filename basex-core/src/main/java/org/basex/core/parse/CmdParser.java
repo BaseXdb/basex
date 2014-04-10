@@ -13,9 +13,9 @@ import org.basex.query.*;
  */
 abstract class CmdParser {
   /** Input lines. */
-  protected final String input;
+  final String input;
   /** Context. */
-  protected final Context ctx;
+  final Context ctx;
 
   /** Suggest possible completions. */
   boolean suggest;
@@ -29,8 +29,8 @@ abstract class CmdParser {
    * @param input input
    * @param context context
    */
-  protected CmdParser(final String input, final Context context) {
-    this.ctx = context;
+  CmdParser(final String input, final Context context) {
+    ctx = context;
     this.input = input;
   }
 

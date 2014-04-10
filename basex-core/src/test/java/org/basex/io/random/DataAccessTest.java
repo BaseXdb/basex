@@ -352,7 +352,7 @@ public class DataAccessTest {
    * @param bytes expected unsigned bytes
    * @throws IOException I/O exception
    */
-  void assertContent(final long pos, final int[] bytes) throws IOException {
+  private void assertContent(final long pos, final int[] bytes) throws IOException {
     try(final RandomAccessFile f = new RandomAccessFile(file.file(), "r")) {
       f.seek(pos);
       for(final int b : bytes) assertEquals(b, f.read());

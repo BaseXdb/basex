@@ -236,8 +236,9 @@ public final class FuncItemTest extends QueryPlanTest {
         "local:foo(document { <foo ID=\"a\"><foo ID=\"b\"/></foo> })",
 
         "a b",
-        "empty(//" + Util.className(StaticFuncCall.class) + ")",
-        "exists(//" + Util.className(DynFuncCall.class) + ")",
-        "exists(//" + Util.className(FuncItem.class) + ")");
+        "empty(//" + Util.className(StaticFuncCall.class) + ')',
+        "exists(//" + Util.className(DynFuncCall.class) + ')',
+        "exists(//" + Util.className(FuncItem.class) + ')'
+    );
   }
 }

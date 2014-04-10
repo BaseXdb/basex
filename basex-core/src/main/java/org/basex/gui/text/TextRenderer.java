@@ -18,7 +18,7 @@ import org.basex.util.list.*;
  */
 final class TextRenderer extends BaseXBack {
   /** Reference to the main window. */
-  public final GUI gui;
+  private final GUI gui;
   /** Offset. */
   private static final int OFFSET = 5;
 
@@ -55,8 +55,6 @@ final class TextRenderer extends BaseXBack {
   private boolean showLines;
   /** Mark current line. */
   private boolean markline;
-  /** Color. */
-  private Color color;
 
   /** Border offset. */
   private int offset;
@@ -402,13 +400,12 @@ final class TextRenderer extends BaseXBack {
     if(x == offset) markLine(g);
 
     // choose color for enabled text, depending on highlighting, link, or current syntax
-    color = isEnabled() ? highlighted ? GUIConstants.GREEN : link ? GUIConstants.color4 :
-      syntax.getColor(iter) : Color.gray;
-    highlighted = false;
+    final Color color = isEnabled() ? highlighted ? GUIConstants.GREEN : link ?
+      GUIConstants.color4 : syntax.getColor(iter) : Color.gray;
 
     // retrieve first character of current token
     final int ch = iter.curr();
-    if(ch == TokenBuilder.MARK) highlighted = true;
+    highlighted = ch == TokenBuilder.MARK;
 
     final int cp = iter.pos();
     final int cc = iter.caret();
@@ -457,6 +454,7 @@ final class TextRenderer extends BaseXBack {
         g.drawLine(xe - as, yy - as, xe, yy);
         g.drawLine(xe - as, yy + as, xe, yy);
       } else if(ch > ' ') {
+        // choose color for enabled text, depending on highlighting, link, or current syntax
         g.setColor(color);
         String n = iter.nextString();
         int ww = width - x;

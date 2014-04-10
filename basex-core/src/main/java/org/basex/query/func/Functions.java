@@ -111,8 +111,8 @@ public final class Functions extends TokenSet {
    * @return function instance
    * @throws QueryException query exception
    */
-  public StandardFunc get(final QNm name, final Expr[] args, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+  private StandardFunc get(final QNm name, final Expr[] args, final StaticContext sc,
+                           final InputInfo ii) throws QueryException {
     final Function fl = getBuiltIn(name, args.length, ii);
     return fl == null ? null : fl.get(sc, ii, args);
   }
@@ -235,7 +235,7 @@ public final class Functions extends TokenSet {
     if(eq(name.uri(), XSURI)) {
       final Type type = getCast(name, args.length, ii);
       final SeqType to = SeqType.get(type, Occ.ZERO_ONE);
-      return TypedFunc.constr(new Cast(sc, ii, args[0], to), to);
+      return TypedFunc.constr(new Cast(sc, ii, args[0], to));
     }
 
     // built-in functions
@@ -244,7 +244,7 @@ public final class Functions extends TokenSet {
       if(!sc.xquery3() && fun.has(Flag.X30)) throw FUNC30.get(ii);
       final Ann ann = new Ann();
       ann.add(Ann.Q_UPDATING, Empty.SEQ, ii);
-      return new TypedFunc(fun, ann, fun.sig.type(args.length));
+      return new TypedFunc(fun, ann);
     }
 
     // user-defined function

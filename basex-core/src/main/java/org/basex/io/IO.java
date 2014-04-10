@@ -110,7 +110,7 @@ public abstract class IO {
    * Sets the file path and name.
    * @param p file path
    */
-  final void init(final String p) {
+  private void init(final String p) {
     path = p;
     final String n = p.substring(p.lastIndexOf('/') + 1);
     // use current time if no name is given

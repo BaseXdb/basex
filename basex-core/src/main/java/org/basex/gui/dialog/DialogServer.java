@@ -412,7 +412,7 @@ public final class DialogServer extends BaseXDialog {
   /**
    * Refreshes the log panel.
    */
-  void refreshLog() {
+  private void refreshLog() {
     logc.removeAllItems();
     final StringList sl = new StringList();
     for(final IOFile s : logd.children()) {

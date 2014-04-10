@@ -69,7 +69,7 @@ public class XQJConcurrencyTest extends XQJBaseTest {
 
       final ThreadPoolExecutor tpe =
         new ThreadPoolExecutor(
-          CONCURRENT_WRITE_THREADS, CONCURRENT_WRITE_THREADS, 4l,
+          CONCURRENT_WRITE_THREADS, CONCURRENT_WRITE_THREADS, 4L,
           TimeUnit.SECONDS,
           new ArrayBlockingQueue<Runnable>(CONCURRENT_READ_THREADS),
           new ThreadPoolExecutor.CallerRunsPolicy());
@@ -77,7 +77,7 @@ public class XQJConcurrencyTest extends XQJBaseTest {
       final ArrayList<Future<?>> futures = new ArrayList<>();
 
       for(int i = 0; i < DOCS_TO_INSERT; i++) {
-        final String uri = i + "-" + UUID.randomUUID().toString() + ".xml";
+        final String uri = i + "-" + UUID.randomUUID() + ".xml";
         final XQItem item = createDocument("<e>" + uri + "</e>");
         docs.put(uri, item);
       }

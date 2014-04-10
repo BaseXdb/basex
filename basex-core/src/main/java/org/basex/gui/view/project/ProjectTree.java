@@ -23,7 +23,7 @@ import org.basex.util.*;
  */
 public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   /** Project view. */
-  final ProjectView view;
+  private final ProjectView view;
 
   /**
    * Constructor.

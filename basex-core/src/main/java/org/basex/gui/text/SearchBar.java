@@ -39,9 +39,9 @@ public final class SearchBar extends BaseXBack {
   /** Mode: multi-line. */
   final AbstractButton multi;
   /** Action: replace text. */
-  final AbstractButton rplc;
+  private final AbstractButton rplc;
   /** Action: close panel. */
-  final AbstractButton cls;
+  private final AbstractButton cls;
 
   /** GUI reference. */
   private final GUI gui;
@@ -258,7 +258,7 @@ public final class SearchBar extends BaseXBack {
   /**
    * Searches text in the current editor.
    */
-  void search() {
+  private void search() {
     search(true);
   }
 
@@ -266,7 +266,7 @@ public final class SearchBar extends BaseXBack {
    * Searches text in the current editor.
    * @param jump jump to next hit
    */
-  void search(final boolean jump) {
+  private void search(final boolean jump) {
     final String text = isVisible() ? search.getText() : "";
     editor.search(new SearchContext(this, text), jump);
   }

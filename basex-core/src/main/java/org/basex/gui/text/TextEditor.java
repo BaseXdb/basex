@@ -120,7 +120,7 @@ public final class TextEditor {
    * Moves one character forward.
    * @param select selection flag
    */
-  void forward(final boolean select) {
+  private void forward(final boolean select) {
     if(select || !selected()) {
       next();
     } else {
@@ -254,7 +254,7 @@ public final class TextEditor {
    * @param select selection flag
    * @return number of passed characters
    */
-  int bol(final boolean select) {
+  private int bol(final boolean select) {
     if(pos == 0) {
       if(!select) noSelect();
       return 0;
@@ -301,7 +301,7 @@ public final class TextEditor {
    * @param select selection flag
    * @return previous character
    */
-  int back(final boolean select) {
+  private int back(final boolean select) {
     if(select || !selected()) return prev();
     pos(Math.min(start, end));
     return curr();
@@ -312,7 +312,7 @@ public final class TextEditor {
    * returned if the cursor is placed at the beginning of the text.
    * @return character
    */
-  int prev() {
+  private int prev() {
     if(pos == 0) return '\n';
     // UTF-8 encoded bytes: move to first byte
     while(--pos > 0 && text[pos] < -64 && text[pos] >= -128);
@@ -324,7 +324,7 @@ public final class TextEditor {
    * @param p position to move to
    * @param select selection flag
    */
-  void forward(final int p, final boolean select) {
+  private void forward(final int p, final boolean select) {
     final int ind = indent();
     int nc = 0;
     while(curr() != '\n') {
@@ -698,7 +698,7 @@ public final class TextEditor {
       } else if(ch == ':') {
         // closes XQuery comments
         if(prev == '(') {
-          sb.append(":");
+          sb.append(':');
           if(curr != ')') sb.append(')');
           move = 1;
         }
@@ -735,7 +735,7 @@ public final class TextEditor {
   /**
    * Closes a bracket and unindents leading whitespaces.
    */
-  void close() {
+  private void close() {
     int p = pos - 1;
     for(; p >= 0; p--) {
       final byte b = text[p];
@@ -752,7 +752,7 @@ public final class TextEditor {
    * Checks if an opening element can automatically be closed.
    * @param sb string builder
    */
-  void closeElem(final StringBuilder sb) {
+  private void closeElem(final StringBuilder sb) {
     int p = pos - 1;
     for(; p >= 0; p--) {
       final byte b = text[p];

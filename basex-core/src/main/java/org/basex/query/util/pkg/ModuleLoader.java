@@ -206,7 +206,7 @@ public final class ModuleLoader {
    */
   private void addJava(final String path, final InputInfo ii) throws QueryException {
     final String cp = camelCase(path.replace('/', '.').substring(1));
-    Class<?> clz;
+    final Class<?> clz;
     try {
       clz = findClass(cp);
     } catch(final ClassNotFoundException ex) {

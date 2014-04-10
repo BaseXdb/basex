@@ -12,9 +12,6 @@ import org.basex.gui.layout.*;
  * @author Christian Gruen
  */
 final class DialogEditorPrefs extends BaseXBack {
-  /** Main window reference. */
-  private final GUI gui;
-
   /** Show line margin. */
   private final BaseXCheckBox showmargin;
   /** Line margin. */
@@ -42,9 +39,7 @@ final class DialogEditorPrefs extends BaseXBack {
    */
   DialogEditorPrefs(final BaseXDialog d) {
     border(8).setLayout(new TableLayout(1, 2, 40, 0));
-    gui = d.gui;
-
-    final GUIOptions gopts = gui.gopts;
+    final GUIOptions gopts = d.gui.gopts;
     showmargin = new BaseXCheckBox(SHOW_LINE_MARGIN + COL, GUIOptions.SHOWMARGIN, gopts, d);
     margin = new BaseXTextField(GUIOptions.MARGIN, gopts, d);
     invisible = new BaseXCheckBox(SHOW_INVISIBLE, GUIOptions.SHOWINVISIBLE, gopts, d);

@@ -77,7 +77,7 @@ public final class EditorView extends View {
   /** Project files. */
   final ProjectView project;
   /** Input info. */
-  InputInfo errorInfo;
+  private InputInfo errorInfo;
 
   /**
    * Default constructor.
@@ -909,7 +909,7 @@ public final class EditorView extends View {
    * @param opened considers only opened files
    * @return editor
    */
-  EditorArea find(final IO file, final boolean opened) {
+  private EditorArea find(final IO file, final boolean opened) {
     for(final EditorArea edit : editors()) {
       if(edit.file.eq(file) && (!opened || edit.opened())) return edit;
     }
@@ -939,7 +939,7 @@ public final class EditorView extends View {
    * Adds a new editor tab.
    * @return editor reference
    */
-  EditorArea addTab() {
+  private EditorArea addTab() {
     final EditorArea edit = new EditorArea(this, newTabFile());
     edit.setFont(mfont);
 
@@ -1006,7 +1006,7 @@ public final class EditorView extends View {
    * Returns all editors.
    * @return editors
    */
-  EditorArea[] editors() {
+  private EditorArea[] editors() {
     final ArrayList<EditorArea> edits = new ArrayList<>();
     for(final Component c : tabs.getComponents()) {
       if(c instanceof EditorArea) edits.add((EditorArea) c);

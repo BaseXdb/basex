@@ -174,7 +174,7 @@ public final class Array {
    * @param size array size
    * @return number list
    */
-  public static IntList number(final int size) {
+  private static IntList number(final int size) {
     final int[] tmp = new int[size];
     for(int i = 0; i < size; ++i) tmp[i] = i;
     return new IntList(tmp);
@@ -194,7 +194,7 @@ public final class Array {
    * @param pos position of first element of the interval
    * @param len length of the interval
    */
-  public static void reverse(final byte[] array, final int pos, final int len) {
+  private static void reverse(final byte[] array, final int pos, final int len) {
     for(int l = pos, r = pos + len - 1; l < r; l++, r--) {
       final byte tmp = array[l];
       array[l] = array[r];

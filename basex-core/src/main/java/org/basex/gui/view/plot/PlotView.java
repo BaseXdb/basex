@@ -199,7 +199,7 @@ public final class PlotView extends View {
    * @param ax plot axis
    * @param cb combo box
    */
-  void setAxis(final PlotAxis ax, final BaseXCombo cb) {
+  private void setAxis(final PlotAxis ax, final BaseXCombo cb) {
     final String cs = cb.getSelectedItem();
     if(!ax.setAxis(cs)) return;
     plotChanged = true;

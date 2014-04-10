@@ -101,7 +101,7 @@ public final class NSContext {
    * Returns the namespace stack.
    * @return stack
    */
-  public Atts stack() {
+  private Atts stack() {
     if(stack == null) stack = new Atts();
     return stack;
   }

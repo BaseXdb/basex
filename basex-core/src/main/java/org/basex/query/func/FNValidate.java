@@ -253,7 +253,7 @@ public final class FNValidate extends StandardFunc {
    * @throws QueryException query exception
    * @throws IOException exception
    */
-  IO read(final Item it, final QueryContext ctx, final SerializerOptions sopts)
+  private IO read(final Item it, final QueryContext ctx, final SerializerOptions sopts)
       throws QueryException, IOException {
 
     if(it.type.isNode()) {

@@ -225,7 +225,7 @@ public final class Util {
    * @param message message
    * @param depth number of steps to print
    */
-  public static void stack(final String message, final int depth) {
+  private static void stack(final String message, final int depth) {
     errln(message);
     final String[] stack = toArray(new Throwable());
     final int l = Math.min(Math.max(2, depth + 2), stack.length);

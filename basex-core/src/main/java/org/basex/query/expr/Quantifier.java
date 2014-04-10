@@ -80,8 +80,7 @@ public final class Quantifier extends Single {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(every ? EVERY : SOME);
-    return sb.append('(').append(expr).append(')').toString();
+    return every ? EVERY : SOME + '(' + expr + ')';
   }
 
   @Override

@@ -227,7 +227,7 @@ public final class PinTest extends SandboxTest {
     try {
       cmd.execute(ctx);
       fail("\"" + cmd + "\" was supposed to fail.");
-    } catch(final IOException ex) {
+    } catch(final IOException ignored) {
     }
   }
 

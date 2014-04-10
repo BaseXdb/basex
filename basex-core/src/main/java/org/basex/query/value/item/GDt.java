@@ -63,7 +63,7 @@ public final class GDt extends ADate {
     final String dt = Token.string(d).trim();
     final int i = type(t);
     final Matcher mt = PATTERNS[i].matcher(dt);
-    if(!mt.matches()) dateErr(d, EXAMPLES[i], ii);
+    if(!mt.matches()) throw dateError(d, EXAMPLES[i], ii);
 
     if(i < 2) {
       yea = toLong(mt.group(1), false, ii);
@@ -73,12 +73,12 @@ public final class GDt extends ADate {
     }
     if(i > 0 && i < 4) {
       mon = (byte) (Token.toLong(mt.group(i == 1 ? 3 : 1)) - 1);
-      if(mon < 0 || mon > 11) dateErr(d, EXAMPLES[i], ii);
+      if(mon < 0 || mon > 11) throw dateError(d, EXAMPLES[i], ii);
     }
     if(i > 2) {
       day = (byte) (Token.toLong(mt.group(i == 3 ? 2 : 1)) - 1);
       final int m = Math.max(mon, 0);
-      if(day < 0 || day >= DAYS[m] + (m == 1 ? 1 : 0)) dateErr(d, EXAMPLES[i], ii);
+      if(day < 0 || day >= DAYS[m] + (m == 1 ? 1 : 0)) throw dateError(d, EXAMPLES[i], ii);
     }
     zone(mt, ZONES[i], d, ii);
   }

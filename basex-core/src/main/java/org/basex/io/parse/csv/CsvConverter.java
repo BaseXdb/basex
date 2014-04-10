@@ -16,7 +16,7 @@ import org.basex.query.value.item.*;
  */
 public abstract class CsvConverter {
   /** CSV options. */
-  final CsvParserOptions copts;
+  private final CsvParserOptions copts;
 
   /**
    * Constructor.

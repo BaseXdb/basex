@@ -55,7 +55,7 @@ public class TextPanel extends BaseXPanel {
   /** Undo history. */
   public final History hist;
   /** Search bar. */
-  public SearchBar search;
+  protected SearchBar search;
 
   /** Renderer reference. */
   private final TextRenderer rend;
@@ -237,7 +237,7 @@ public class TextPanel extends BaseXPanel {
    * Returns the current text cursor.
    * @return cursor position
    */
-  public final int getCaret() {
+  private int getCaret() {
     return editor.pos();
   }
 
@@ -348,7 +348,7 @@ public class TextPanel extends BaseXPanel {
   /**
    * Selects the whole text.
    */
-  final void selectAll() {
+  private void selectAll() {
     editor.select(0, editor.size());
     rend.repaint();
   }
@@ -652,7 +652,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Updates the scroll bar. */
-  public final GUICode scrollCode = new GUICode() {
+  private final GUICode scrollCode = new GUICode() {
     @Override
     public void execute(final Object down) {
       rend.updateScrollbar();
@@ -717,7 +717,7 @@ public class TextPanel extends BaseXPanel {
    * Copies the selected text to the clipboard.
    * @return true if text was copied
    */
-  final boolean copy() {
+  private boolean copy() {
     final String txt = editor.copy();
     if(txt.isEmpty()) return false;
 
@@ -742,7 +742,7 @@ public class TextPanel extends BaseXPanel {
    * Finishes a command.
    * @param old old cursor position; store entry to history if position != -1
    */
-  void finish(final int old) {
+  private void finish(final int old) {
     if(old != -1) hist.store(editor.text(), old, editor.pos());
     scrollCode.invokeLater(true);
     release(Action.CHECK);
@@ -760,7 +760,7 @@ public class TextPanel extends BaseXPanel {
    * Stops an old text cursor thread and, if requested, starts a new one.
    * @param start start/stop flag
    */
-  final void caret(final boolean start) {
+  private void caret(final boolean start) {
     caretTimer.stop();
     if(start) caretTimer.start();
     rend.caret(start);

@@ -71,7 +71,7 @@ public final class MinHeap<K, V> {
    * @return value of the smallest key
    */
   @SuppressWarnings("unchecked")
-  V minValue() {
+  private V minValue() {
     return (V) vals[1];
   }
 

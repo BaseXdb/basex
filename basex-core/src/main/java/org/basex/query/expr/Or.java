@@ -54,7 +54,7 @@ public final class Or extends Logical {
     }
 
     // all arguments were false()
-    if(el.size() == 0) return optPre(Bln.FALSE, ctx);
+    if(el.isEmpty()) return optPre(Bln.FALSE, ctx);
 
     if(expr.length != el.size()) {
       ctx.compInfo(OPTWRITE, this);

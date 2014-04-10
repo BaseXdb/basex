@@ -72,6 +72,6 @@ public final class TarEntry {
    * @return result of check
    */
   public boolean isDirectory() {
-    return type == '5' || name.toString().endsWith("/");
+    return type == '5' || name.endsWith("/");
   }
 }

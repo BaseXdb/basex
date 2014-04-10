@@ -35,10 +35,10 @@ public final class FNXQueryTest extends AdvancedQueryTest {
     error(_XQUERY_EVAL.args("declare %updating function local:x() {()}; local:x()"),
         Err.BXXQ_UPDATING);
     query(_XQUERY_EVAL.args("declare %updating function local:x() {()}; 1"));
-    query(_XQUERY_EVAL.args("\"" + DOC.args(PATH).replace('"', '\'') + "\""));
+    query(_XQUERY_EVAL.args('"' + DOC.args(PATH).replace('"', '\'') + '"'));
 
     // check additional options
-    query(_DB_CREATE.args("\"" + NAME + "\""));
+    query(_DB_CREATE.args('"' + NAME + '"'));
     query("try{ " + _XQUERY_EVAL.args("\"(1 to 10000000000000)[.=0]\"", " map{}",
         " map{ 'timeout':'1'}") + " } catch * { () }", "");
     error(_XQUERY_EVAL.args("\"doc('" + NAME + "')\"", " map{}", " map{ 'permission':'none'}"),

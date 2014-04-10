@@ -178,7 +178,7 @@ public final class FTWords extends FTExpr {
    * @return node iterator
    * @throws QueryException query exception
    */
-  FTIndexIterator scan(final FTLexer lex) throws QueryException {
+  private FTIndexIterator scan(final FTLexer lex) throws QueryException {
     final Data data = ictx.data;
     final FTLexer input = new FTLexer(ftt.opt);
     final FTTokens tokens = ftt.cache(lex.get());
@@ -226,7 +226,7 @@ public final class FTWords extends FTExpr {
    * @return token list
    * @throws QueryException query exception
    */
-  TokenList tokens(final QueryContext ctx) throws QueryException {
+  private TokenList tokens(final QueryContext ctx) throws QueryException {
     final TokenList tl = new TokenList();
     final Iter ir = ctx.iter(query);
     for(byte[] qu; (qu = nextToken(ir)) != null;) {
@@ -280,7 +280,7 @@ public final class FTWords extends FTExpr {
    * @param list token list
    * @return token set
    */
-  TokenSet unique(final TokenList list) {
+  private TokenSet unique(final TokenList list) {
     // cache all query tokens in a set (duplicates are removed)
     final TokenSet ts = new TokenSet();
     switch(mode) {
@@ -310,7 +310,7 @@ public final class FTWords extends FTExpr {
    * @return item
    * @throws QueryException query exception
    */
-  byte[] nextToken(final Iter iter) throws QueryException {
+  private byte[] nextToken(final Iter iter) throws QueryException {
     final Item it = iter.next();
     return it == null ? null : checkEStr(it);
   }

@@ -115,7 +115,7 @@ public final class DiskData extends Data {
    * Initializes the database.
    * @throws IOException I/O exception
    */
-  void init() throws IOException {
+  private void init() throws IOException {
     table = new TableDiskAccess(meta, false);
     texts = new DataAccess(meta.dbfile(DATATXT));
     values = new DataAccess(meta.dbfile(DATAATV));

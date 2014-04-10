@@ -26,9 +26,9 @@ public abstract class ANode extends Item {
   /** Static node counter. */
   // [CG] XQuery, node id: move to query context to reduce chance of overflow, or
   // move to FNode to reduce memory usage of DBNode instances
-  private static AtomicInteger sid = new AtomicInteger();
+  private static final AtomicInteger ID = new AtomicInteger();
   /** Unique node id. */
-  public final int id = sid.incrementAndGet();
+  public final int id = ID.incrementAndGet();
 
   /** Cached string value. */
   byte[] val;

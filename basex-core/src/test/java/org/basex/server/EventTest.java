@@ -53,7 +53,7 @@ public final class EventTest extends SandboxTest {
     // drop event, if not done yet
     try {
       session.execute("drop event " + NAME);
-    } catch(final IOException ex) { }
+    } catch(final IOException ignored) { }
 
     for(int i = 0; i < sessions.length; i++) sessions[i] = createClient();
   }

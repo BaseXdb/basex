@@ -13,7 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class MainTest extends SandboxTest {
+abstract class MainTest extends SandboxTest {
   /** Input file. */
   static final IOFile INPUT = new IOFile(Prop.TMP + NAME + ".in");
 
@@ -31,7 +31,7 @@ public abstract class MainTest extends SandboxTest {
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
-  protected final void equals(final String exp, final String... args) throws IOException {
+  final void equals(final String exp, final String... args) throws IOException {
     assertEquals(exp, run(args));
   }
 

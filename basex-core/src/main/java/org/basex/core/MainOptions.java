@@ -178,7 +178,6 @@ public final class MainOptions extends Options {
    * Constructor.
    */
   public MainOptions() {
-    super();
     setSystem();
   }
 }

@@ -1156,9 +1156,9 @@ public enum Err {
   /** Error code. */
   public final String code;
   /** Error URI. */
-  public final byte[] uri;
+  private final byte[] uri;
   /** Error prefix. */
-  public final String prefix;
+  private final String prefix;
   /** Error description. */
   public final String desc;
 

@@ -9,7 +9,7 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public interface RESTText {
+interface RESTText {
   /** REST string.  */
   String REST = "rest";
   /** REST URI. */

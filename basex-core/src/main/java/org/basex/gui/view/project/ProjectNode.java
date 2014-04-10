@@ -10,11 +10,11 @@ import org.basex.io.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class ProjectNode extends DefaultMutableTreeNode {
+abstract class ProjectNode extends DefaultMutableTreeNode {
   /** Project view. */
-  protected final ProjectView project;
+  final ProjectView project;
   /** Path. */
-  protected IOFile file;
+  IOFile file;
 
   /**
    * Constructor.

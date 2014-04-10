@@ -313,7 +313,7 @@ public final class QueryContext extends Proc {
    * Compiles all used functions and the root expression.
    * @throws QueryException query exception
    */
-  void analyze() throws QueryException {
+  private void analyze() throws QueryException {
     try {
       // compile the expression
       if(root != null) QueryCompiler.compile(this, root);

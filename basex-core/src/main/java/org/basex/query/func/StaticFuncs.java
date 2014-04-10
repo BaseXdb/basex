@@ -241,7 +241,7 @@ public final class StaticFuncs extends ExprInfo {
     final StringBuilder sb = new StringBuilder();
     for(final FuncCache fc : funcs.values()) {
       if(fc.func != null && fc.func.compiled()) {
-        sb.append(fc.func.toString()).append(Text.NL);
+        sb.append(fc.func).append(Text.NL);
       }
     }
     return sb.toString();
@@ -289,9 +289,9 @@ public final class StaticFuncs extends ExprInfo {
 
       if(func == null) {
         // [LW] should be deferred until the actual types are known (i.e. compile time)
-        return new TypedFunc(call, new Ann(), FuncType.arity(args.length));
+        return new TypedFunc(call, new Ann());
       }
-      return new TypedFunc(call.init(func), func.ann, func.funcType());
+      return new TypedFunc(call.init(func), func.ann);
     }
 
     /**

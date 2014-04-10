@@ -229,7 +229,7 @@ public abstract class Data {
    * @param id unique node id
    * @return pre value or -1 if id was not found
    */
-  final int preold(final int id) {
+  private int preold(final int id) {
     // find pre value in table
     for(int p = Math.max(0, id); p < meta.size; ++p)
       if(id == id(p)) return p;
@@ -791,7 +791,7 @@ public abstract class Data {
           break;
       }
       // propagate PRE value shifts to keep namespace structure valid
-      nspaces.incrementPre(nsNodesShift, 1);
+      Namespaces.incrementPre(nsNodesShift, 1);
     }
     // finalize and update namespace structure
     while(!preStack.isEmpty()) nspaces.close(preStack.pop());
@@ -926,7 +926,7 @@ public abstract class Data {
    * Sets the update buffer to a new size.
    * @param size number of table entries
    */
-  final void buffer(final int size) {
+  private void buffer(final int size) {
     final int bs = size << IO.NODEPOWER;
     if(b.length != bs) b = new byte[bs];
   }
@@ -1080,7 +1080,7 @@ public abstract class Data {
    * @param end end pre value
    * @return table
    */
-  final String toString(final int start, final int end) {
+  private String toString(final int start, final int end) {
     return string(InfoStorage.table(this, start, end));
   }
 

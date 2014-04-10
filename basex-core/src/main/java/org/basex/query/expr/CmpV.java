@@ -164,7 +164,7 @@ public final class CmpV extends Cmp {
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
-    return this.optimize(ctx, scp);
+    return optimize(ctx, scp);
   }
 
   @Override

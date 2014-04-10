@@ -13,7 +13,7 @@ public abstract class Update {
   /** Type of update primitive. */
   public final UpdateType type;
   /** Input info. */
-  protected final InputInfo info;
+  final InputInfo info;
 
   /**
    * Constructor.

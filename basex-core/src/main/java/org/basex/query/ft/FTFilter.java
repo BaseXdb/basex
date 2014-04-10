@@ -68,7 +68,7 @@ public abstract class FTFilter extends FTExpr {
    * @return result of check
    * @throws QueryException query exception
    */
-  final boolean filter(final QueryContext ctx, final FTNode item, final FTLexer lex)
+  private boolean filter(final QueryContext ctx, final FTNode item, final FTLexer lex)
       throws QueryException {
 
     final FTMatches all = item.all;

@@ -30,7 +30,7 @@ public final class Log {
   /** SERVER string. */
   public static final String SERVER = "SERVER";
   /** ERROR string. */
-  public static final String ERROR = "ERROR";
+  private static final String ERROR = "ERROR";
   /** REQUEST string. */
   public static final String REQUEST = "REQUEST";
 

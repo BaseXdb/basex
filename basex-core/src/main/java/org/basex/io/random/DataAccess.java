@@ -78,7 +78,7 @@ public final class DataAccess implements AutoCloseable {
    * Sets the file length.
    * @param l file length
    */
-  synchronized void length(final long l) {
+  private synchronized void length(final long l) {
     changed |= l != len;
     len = l;
   }
@@ -103,7 +103,7 @@ public final class DataAccess implements AutoCloseable {
    * Reads the next byte.
    * @return next byte
    */
-  public int read() {
+  private int read() {
     final Buffer bf = buffer(off == IO.BLOCKSIZE);
     return bf.data[off++] & 0xFF;
   }
@@ -270,7 +270,7 @@ public final class DataAccess implements AutoCloseable {
    * Writes the next byte.
    * @param b byte to be written
    */
-  public void write(final int b) {
+  private void write(final int b) {
     final Buffer bf = buffer(off == IO.BLOCKSIZE);
     bf.dirty = true;
     bf.data[off++] = (byte) b;
@@ -361,7 +361,7 @@ public final class DataAccess implements AutoCloseable {
    * @param offset offset in the buffer where the token starts
    * @param length token length
    */
-  void writeToken(final byte[] buf, final int offset, final int length) {
+  private void writeToken(final byte[] buf, final int offset, final int length) {
     writeNum(length);
 
     final int last = offset + length;

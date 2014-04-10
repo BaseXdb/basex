@@ -261,7 +261,7 @@ public final class BaseXDSlider extends BaseXPanel {
    * @param v value to be normalized
    * @return new value
    */
-  double encode(final double v) {
+  private double encode(final double v) {
     return log ? StrictMath.log(v + 1) : v;
   }
 

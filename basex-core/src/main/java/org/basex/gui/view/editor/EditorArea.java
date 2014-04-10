@@ -62,7 +62,7 @@ public final class EditorArea extends TextPanel {
         SwingUtilities.invokeLater(new Runnable() {
           @Override
           public void run() {
-            if(reopen(false)) return;
+            reopen(false);
           }
         });
       }

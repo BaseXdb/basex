@@ -135,7 +135,7 @@ public final class DigitalSignature {
     if(!TYPES.contains(lc(b))) throw CX_SIGTYPINV.get(info, t);
     final byte[] type = b;
 
-    Item signedNode;
+    final Item signedNode;
     try {
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
 
@@ -172,7 +172,7 @@ public final class DigitalSignature {
         }
 
         // initialize the keystore
-        KeyStore ks;
+        final KeyStore ks;
         try {
           ks = KeyStore.getInstance(ksTY);
         } catch(final KeyStoreException ex) {

@@ -268,7 +268,7 @@ public class DiskValues implements Index {
    * @param index key position
    * @return key
    */
-  IndexEntry readKeyAt(final int index) {
+  private IndexEntry readKeyAt(final int index) {
     // try the cache first
     byte[] key = ctext.get(index);
     if(key != null) {
@@ -343,7 +343,7 @@ public class DiskValues implements Index {
    * @param tok index term
    * @return results
    */
-  final IndexIterator idRange(final NumericRange tok) {
+  private IndexIterator idRange(final NumericRange tok) {
     final double min = tok.min;
     final double max = tok.max;
 

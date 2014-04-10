@@ -18,9 +18,9 @@ import org.junit.Before;
  */
 public abstract class XQJBaseTest {
   /** Data source. */
-  protected BaseXXQDataSource xqds;
+  BaseXXQDataSource xqds;
   /** Connection. */
-  protected XQConnection xqc;
+  XQConnection xqc;
 
   /**
    * Initializes a test.
@@ -48,7 +48,7 @@ public abstract class XQJBaseTest {
    * @return a XQItem representing a document-node(element()) item
    * @throws XQException query exception
    */
-  public final XQItem createDocument(final String content) throws XQException {
+  final XQItem createDocument(final String content) throws XQException {
     return
       xqc.createItemFromDocument(
         content,
@@ -65,7 +65,7 @@ public abstract class XQJBaseTest {
    * @return result of check
    * @throws XQException query exception
    */
-  public boolean docAvailable(final String uri) throws XQException {
+  boolean docAvailable(final String uri) throws XQException {
     final XQResultSequence rs =
       xqc.createExpression().executeQuery(
         "fn:doc-available('" + uri + "')"
@@ -79,7 +79,7 @@ public abstract class XQJBaseTest {
    * @param strategy insert strategy
    * @return options
    */
-  static final BaseXXQInsertOptions options(final int strategy) {
+  static BaseXXQInsertOptions options(final int strategy) {
     final BaseXXQInsertOptions options = new BaseXXQInsertOptions();
     options.setInsertStrategy(strategy);
     return options;

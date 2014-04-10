@@ -202,7 +202,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
    * @param lvl level
    * @throws IOException I/O exception
    */
-  void indent(final int lvl) throws IOException {
+  private void indent(final int lvl) throws IOException {
     if(!indent) return;
     print(nl);
     final int ls = lvl * indents;

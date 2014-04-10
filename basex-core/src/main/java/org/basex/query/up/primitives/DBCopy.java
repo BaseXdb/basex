@@ -18,7 +18,7 @@ import org.basex.util.list.*;
  */
 public class DBCopy extends NameUpdate {
   /** Name of the new database. */
-  protected final String newName;
+  private final String newName;
 
   /**
    * Constructor.

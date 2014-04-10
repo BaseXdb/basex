@@ -22,14 +22,14 @@ import org.basex.util.*;
  */
 final class DBNew {
   /** Query context. */
-  protected final QueryContext qc;
+  private final QueryContext qc;
   /** Input info. */
   private final InputInfo info;
 
   /** Inputs to add. */
-  protected List<NewInput> inputs;
+  List<NewInput> inputs;
   /** Insertion sequence. */
-  protected Data md;
+  Data md;
 
   /**
    * Constructor.

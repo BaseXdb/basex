@@ -216,7 +216,7 @@ public final class AtomicUpdateCache {
    * @param a first update in sequence
    * @param b second update in sequence
    */
-  static void check(final BasicUpdate a, final BasicUpdate b) {
+  private static void check(final BasicUpdate a, final BasicUpdate b) {
     // check order of location PRE, must be strictly ordered low-to-high
     if(b.location < a.location)
       throw Util.notExpected("Invalid order at location " + a.location);

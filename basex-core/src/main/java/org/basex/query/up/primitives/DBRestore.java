@@ -17,7 +17,7 @@ import org.basex.util.*;
  */
 public class DBRestore extends NameUpdate {
   /** Backup to restore. */
-  public final String backup;
+  private final String backup;
 
   /**
    * Constructor.
