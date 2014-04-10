@@ -96,7 +96,7 @@ public class ClientSession extends Session {
    * be returned as strings.
    * @throws IOException I/O exception
    */
-  private ClientSession(final String host, final int port, final String user, final String pass,
+  public ClientSession(final String host, final int port, final String user, final String pass,
                         final OutputStream output) throws IOException {
 
     super(output);

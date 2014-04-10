@@ -110,7 +110,7 @@ public final class Functions extends TokenSet {
    * @return function instance
    * @throws QueryException query exception
    */
-  private StandardFunc get(final QNm name, final Expr[] args, final StaticContext sc,
+  public StandardFunc get(final QNm name, final Expr[] args, final StaticContext sc,
                            final InputInfo ii) throws QueryException {
     final Function fl = getBuiltIn(name, args.length, ii);
     return fl == null ? null : fl.get(sc, ii, args);

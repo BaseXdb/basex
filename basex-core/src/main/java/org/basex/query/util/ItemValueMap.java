@@ -11,7 +11,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class ItemValueMap extends HashItemSet {
+public final class ItemValueMap extends HashItemSet {
   /** Values. */
   private Value[] values = new Value[Array.CAPACITY];
 
@@ -44,7 +44,7 @@ public class ItemValueMap extends HashItemSet {
    * Returns a value iterator.
    * @return iterator
    */
-  public final Iterable<Value> values() {
+  public Iterable<Value> values() {
     return new ArrayIterator<Value>(values, 1, size);
   }
 
