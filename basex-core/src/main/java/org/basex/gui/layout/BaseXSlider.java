@@ -200,6 +200,6 @@ public final class BaseXSlider extends BaseXPanel {
    * Assigns the current checkbox value to the option specified in the constructor.
    */
   public void assign() {
-    options.set(option, getValue());
+    options.set(option, value);
   }
 }

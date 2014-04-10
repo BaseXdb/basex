@@ -36,7 +36,7 @@ public class FNBin extends StandardFunc {
   private enum Bit {
     /** Or.  */ OR,
     /** Xor. */ XOR,
-    /** And. */ AND;
+    /** And. */ AND
   }
   /**
    * Constructor.
@@ -442,8 +442,7 @@ public class FNBin extends StandardFunc {
     long b = checkItr(expr[0], ctx);
     final long sz = checkItr(expr[1], ctx);
     final ByteOrder bo = order(2, ctx);
-
-    if(sz < 0 || sz > Long.MAX_VALUE) throw BIN_NS_X.get(info, sz);
+    if(sz < 0) throw BIN_NS_X.get(info, sz);
 
     final byte[] tmp = new byte[(int) sz];
     final int tl = tmp.length;
@@ -509,9 +508,8 @@ public class FNBin extends StandardFunc {
       if(neg) for(int i = 0; i < s; i++) tmp[i] = (byte) 0xFF;
       System.arraycopy(bytes, o, tmp, s, l);
     } else {
-      final int s = l;
       System.arraycopy(bytes, o, tmp, 0, l);
-      if(neg) for(int i = s; i < 8; i++) tmp[i] = (byte) 0xFF;
+      if(neg) for(int i = l; i < 8; i++) tmp[i] = (byte) 0xFF;
     }
     return Int.get(ByteBuffer.wrap(tmp).order(bo).getLong());
   }
@@ -674,7 +672,8 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private int[] bounds(final Long off, final Long len, final int sz) throws QueryException {
-    int o = 0, s;
+    int o = 0;
+    final int s;
     if(off != null) {
       if(off < 0 || off > sz || off > Integer.MAX_VALUE) throw BIN_IOOR_X_X.get(info, off, sz);
       o = (int) off.longValue();

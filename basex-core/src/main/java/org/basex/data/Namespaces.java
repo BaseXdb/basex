@@ -326,7 +326,7 @@ public final class Namespaces {
    * @param pre pre value
    * @return list with namespace nodes
    */
-  private List<NSNode> addNSNodes(final NSNode curr, final List<NSNode> l, final int pre) {
+  private static List<NSNode> addNSNodes(final NSNode curr, final List<NSNode> l, final int pre) {
     for(int i = 0; i < curr.size; i++) {
       final NSNode ch = curr.children[i];
       if(ch.pre >= pre) l.add(ch);
@@ -378,7 +378,7 @@ public final class Namespaces {
    * @param l list of namespace nodes
    * @param s increment size
    */
-  void incrementPre(final List<NSNode> l, final int s) {
+  static void incrementPre(final List<NSNode> l, final int s) {
     for(final NSNode n : l) n.pre += s;
   }
 

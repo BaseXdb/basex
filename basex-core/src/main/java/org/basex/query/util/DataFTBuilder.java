@@ -54,7 +54,7 @@ final class DataFTBuilder {
    * @param str string value
    * @return number of added nodes
    */
-  TokenList build(final Data d, final int p, final byte[] str) {
+  private TokenList build(final Data d, final int p, final byte[] str) {
     final FTPos ftp = ftpos.get(d, p);
     if(ftp == null) return null;
 

@@ -828,7 +828,7 @@ public enum AtomType implements Type {
 
   @Override
   public Type union(final Type t) {
-    if(this.instanceOf(t)) return t;
+    if(instanceOf(t)) return t;
     if(t.instanceOf(this)) return this;
 
     if(t instanceof AtomType) {
@@ -842,7 +842,7 @@ public enum AtomType implements Type {
 
   @Override
   public Type intersect(final Type t) {
-    return this.instanceOf(t) ? this : t.instanceOf(this) ? t : null;
+    return instanceOf(t) ? this : t.instanceOf(this) ? t : null;
   }
 
   @Override

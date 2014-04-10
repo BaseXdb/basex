@@ -93,8 +93,8 @@ public class Token implements Serializable {
    * @param img token image string
    */
   private Token(final int k, final String img) {
-    this.kind = k;
-    this.image = img;
+    kind = k;
+    image = img;
   }
 
   @Override

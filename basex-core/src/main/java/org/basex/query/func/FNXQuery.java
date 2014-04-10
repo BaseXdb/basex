@@ -130,7 +130,7 @@ public final class FNXQuery extends StandardFunc {
           }
         }, 500, 500);
       }
-      final long ms = opts.get(XQueryOptions.TIMEOUT) * 1000l;
+      final long ms = opts.get(XQueryOptions.TIMEOUT) * 1000L;
       if(ms != 0) {
         to.schedule(new TimerTask() {
           @Override

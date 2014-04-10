@@ -38,7 +38,7 @@ public abstract class ContextModifier {
    * @param up update primitive
    * @throws QueryException query exception
    */
-  protected final void add(final Update up) throws QueryException {
+  final void add(final Update up) throws QueryException {
     if(up instanceof DataUpdate) {
       final DataUpdate dataUp = (DataUpdate) up;
       final Data data = dataUp.data();

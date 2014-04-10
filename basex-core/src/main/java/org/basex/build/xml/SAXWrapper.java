@@ -86,7 +86,7 @@ public final class SAXWrapper extends SingleParser {
     } catch(final Exception ex) {
       // occurs, e.g. if document encoding is invalid:
       // prefix message with source id
-      String msg = '"' + in + '"' + COLS + Util.message(ex);
+      final String msg = '"' + in + '"' + COLS + Util.message(ex);
       // wrap and return original message
       throw new IOException(msg, ex);
     } finally {

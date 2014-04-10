@@ -341,10 +341,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     sb.append(FUNCTION).append(PAR1);
     for(int i = 0; i < args.length; i++) {
       if(i > 0) sb.append(", ");
-      sb.append(args[i].toString());
+      sb.append(args[i]);
     }
     sb.append(PAR2).append(' ');
-    if(ret != null) sb.append("as ").append(ret.toString()).append(' ');
+    if(ret != null) sb.append("as ").append(ret).append(' ');
     sb.append("{ ").append(expr).append(" }");
     if(!nonLocal.isEmpty()) sb.append(')');
     return sb.toString();

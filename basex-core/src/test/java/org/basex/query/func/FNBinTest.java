@@ -420,7 +420,7 @@ public final class FNBinTest extends AdvancedQueryTest {
    * @param result expected query result
    */
   private static void hexQuery(final String query, final String result) {
-    query("xs:hexBinary(" + query + ")", result);
+    query("xs:hexBinary(" + query + ')', result);
   }
 
   /**

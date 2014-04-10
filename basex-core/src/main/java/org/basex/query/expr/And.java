@@ -70,7 +70,7 @@ public final class And extends Logical {
     if(cs != null) el.add(cs);
 
     // all arguments were true()
-    if(el.size() == 0) return optPre(Bln.TRUE, ctx);
+    if(el.isEmpty()) return optPre(Bln.TRUE, ctx);
 
     if(es != el.size()) ctx.compInfo(OPTWRITE, this);
     expr = el.finish();

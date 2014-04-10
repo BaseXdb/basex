@@ -13,12 +13,13 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "domain-object")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class SAXSerializerObject {
+class SAXSerializerObject {
   /** Name of the object. */
   @XmlAttribute
+  private
   String name;
   /** Value. */
-  long value;
+  private long value;
 
   /**
    * Empty constructor.

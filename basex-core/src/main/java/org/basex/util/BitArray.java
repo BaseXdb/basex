@@ -13,11 +13,11 @@ import static java.lang.Long.*;
  */
 public final class BitArray {
   /** Number of bits needed to address a bit in a word; 2<sup>6</sup> = 64. */
-  static final int WORD_POWER = 6;
+  private static final int WORD_POWER = 6;
   /** Size of a word = 2<sup>{@link #WORD_POWER}</sup>. */
   static final int WORD_SIZE = 1 << WORD_POWER;
   /** A bit mask of 64 bits set to 1. */
-  static final long WORD_MASK = -1L;
+  private static final long WORD_MASK = -1L;
 
   /** Bit storage. */
   private long[] words;
@@ -33,7 +33,7 @@ public final class BitArray {
    * Construct a new bit array with the specified number of bits.
    * @param n initial number of bits
    */
-  public BitArray(final int n) {
+  private BitArray(final int n) {
     init(new long[(Math.max(0, n - 1) >>> WORD_POWER) + 1], n);
   }
 

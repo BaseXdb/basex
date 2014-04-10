@@ -22,7 +22,7 @@ import org.junit.*;
  */
 public abstract class SandboxTest {
   /** Default output stream. */
-  protected static final PrintStream OUT = System.out;
+  static final PrintStream OUT = System.out;
   /** Default error stream. */
   protected static final PrintStream ERR = System.err;
   /** Null output stream. */

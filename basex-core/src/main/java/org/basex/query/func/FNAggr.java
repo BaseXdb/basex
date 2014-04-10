@@ -58,7 +58,7 @@ public final class FNAggr extends StandardFunc {
           final long s = rs.itemAt(0).itr(ii);
           if(s == 0 || s == 1) {
             final long n = rs.size();
-            return Int.get(n < 3037000500l ? n * (n + 1) / 2 : BigInteger.valueOf(n).multiply(
+            return Int.get(n < 3037000500L ? n * (n + 1) / 2 : BigInteger.valueOf(n).multiply(
                 BigInteger.valueOf(n + 1)).divide(BigInteger.valueOf(2)).longValue());
           }
         }

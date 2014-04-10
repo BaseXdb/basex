@@ -77,7 +77,7 @@ public abstract class BaseXDialog extends JDialog {
    * Initializes the dialog.
    * @param main reference to the main window
    */
-  void init(final GUI main) {
+  private void init(final GUI main) {
     gui = main;
     panel = new BaseXBack(new BorderLayout()).border(10, 10, 10, 10);
     add(panel, BorderLayout.CENTER);

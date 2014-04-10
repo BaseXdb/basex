@@ -58,8 +58,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
 
   @Override
   public boolean authorise(final Request request, final Request.Method method, final Auth auth) {
-    return auth != null && auth.getTag() != null &&
-        service.authorize(meta.db);
+    return auth != null && auth.getTag() != null && WebDAVService.authorize(meta.db);
   }
 
   @Override
@@ -244,7 +243,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
    * @param n new name of the folder
    * @throws IOException I/O exception
    */
-  final void moveTo(final BXFolder f, final String n) throws IOException {
+  private void moveTo(final BXFolder f, final String n) throws IOException {
     if(f.meta.db.equals(meta.db)) {
       // folder is moved to a folder in the same database
       rename(f.meta.path + SEP + n);
@@ -262,7 +261,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
    * @return lock result
    * @throws IOException I/O exception
    */
-  final LockResult lockResource(final LockTimeout timeout, final LockInfo lockInfo)
+  private LockResult lockResource(final LockTimeout timeout, final LockInfo lockInfo)
       throws IOException {
 
     final String tokenId = service.locking.lock(meta.db, meta.path,
@@ -281,7 +280,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
    * @return the token of the active lock or {@code null} if resource is not locked
    * @throws IOException I/O exception
    */
-  final LockToken getCurrentActiveLock() throws IOException {
+  private LockToken getCurrentActiveLock() throws IOException {
     final String lockInfoStr = service.locking.lock(meta.db, meta.path);
     return lockInfoStr == null ? null : parseLockInfo(lockInfoStr);
   }
@@ -292,7 +291,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
    * @return lock result
    * @throws IOException I/O exception
    */
-  final LockResult refresh(final String token) throws IOException {
+  private LockResult refresh(final String token) throws IOException {
     service.locking.refreshLock(token);
     final String lockInfoStr = service.locking.lock(token);
     final LockToken lockToken = lockInfoStr == null ? null : parseLockInfo(lockInfoStr);

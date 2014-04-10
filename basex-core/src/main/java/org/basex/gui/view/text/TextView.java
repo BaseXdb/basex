@@ -202,7 +202,7 @@ public final class TextView extends View {
   /**
    * Saves the displayed text.
    */
-  void save() {
+  private void save() {
     final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS,
         gui.gopts.get(GUIOptions.WORKPATH), gui).suffix(IO.XMLSUFFIX);
 

@@ -22,7 +22,7 @@ public class FuncType implements Type {
   public static final FuncType ANY_FUN = new FuncType(null, null, null);
 
   /** Annotations. */
-  public final Ann ann;
+  private final Ann ann;
   /** Argument types. */
   public final SeqType[] args;
   /** Return type. */
@@ -157,7 +157,7 @@ public class FuncType implements Type {
     if(t instanceof MapType) return t.intersect(this);
 
     // the easy cases
-    if(this.instanceOf(t)) return this;
+    if(instanceOf(t)) return this;
     if(t.instanceOf(this)) return t;
 
     if(t instanceof FuncType) {

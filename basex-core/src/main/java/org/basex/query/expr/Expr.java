@@ -211,7 +211,7 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   public abstract Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
-      final Expr e) throws QueryException;
+                                 final Expr e) throws QueryException;
 
   /**
    * Inlines the given expression into all elements of the given array.
@@ -351,7 +351,7 @@ public abstract class Expr extends ExprInfo {
    * @return {@code true} if there are variables which are used but not declared
    *         in this expression, {@code false} otherwise
    */
-  public boolean hasFreeVars() {
+  protected boolean hasFreeVars() {
     final BitSet declared = new BitSet();
     return !accept(new ASTVisitor() {
       @Override

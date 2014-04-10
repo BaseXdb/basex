@@ -19,7 +19,7 @@ public abstract class Proc {
   public boolean updating;
 
   /** Indicates if a process is currently registered. */
-  protected boolean registered;
+  private boolean registered;
   /** Stopped flag. */
   private boolean stopped;
   /** Timeout thread. */

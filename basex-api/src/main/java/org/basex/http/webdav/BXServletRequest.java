@@ -205,7 +205,7 @@ final class BXServletRequest extends AbstractRequest {
    * Request content type.
    * @return the content type of the current request
    */
-  ContentType getRequestContentType() {
+  private ContentType getRequestContentType() {
     final String s = req.getContentType();
     if(s == null) return null;
     if(s.contains(Response.MULTIPART)) return ContentType.MULTIPART;
@@ -216,7 +216,7 @@ final class BXServletRequest extends AbstractRequest {
    * Is the content type of the request a multi-part?
    * @return {@code true} if the request is multi-part
    */
-  boolean isMultiPart() {
+  private boolean isMultiPart() {
     return getRequestContentType() == ContentType.MULTIPART;
   }
 }

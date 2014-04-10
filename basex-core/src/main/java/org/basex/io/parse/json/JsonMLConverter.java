@@ -55,7 +55,7 @@ public class JsonMLConverter extends JsonXmlConverter {
    * @return cached QName
    * @throws QueryIOException query I/O exception
    */
-  byte[] check(final byte[] name) throws QueryIOException {
+  private static byte[] check(final byte[] name) throws QueryIOException {
     // retrieve name from cache, or create new instance
     if(!XMLToken.isNCName(name)) error("Invalid name: \"%\"", name);
     return name;

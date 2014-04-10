@@ -15,9 +15,9 @@ import org.basex.util.list.*;
  */
 public abstract class NameUpdate extends Update implements Comparable<NameUpdate> {
   /** Name of the database. */
-  protected final String name;
+  final String name;
   /** Query context. */
-  protected final QueryContext qc;
+  final QueryContext qc;
 
   /**
    * Constructor.
@@ -26,8 +26,8 @@ public abstract class NameUpdate extends Update implements Comparable<NameUpdate
    * @param info input info
    * @param qc query context
    */
-  protected NameUpdate(final UpdateType type, final String name, final InputInfo info,
-      final QueryContext qc) {
+  NameUpdate(final UpdateType type, final String name, final InputInfo info,
+             final QueryContext qc) {
 
     super(type, info);
     this.name = name;
@@ -50,7 +50,7 @@ public abstract class NameUpdate extends Update implements Comparable<NameUpdate
    * Returns an info string.
    * @return info string
    */
-  public abstract String operation();
+  protected abstract String operation();
 
   @Override
   public void merge(final Update up) throws QueryException {
@@ -87,7 +87,7 @@ public abstract class NameUpdate extends Update implements Comparable<NameUpdate
    * Closes an existing database.
    * @throws QueryException query exception
    */
-  public final void close() throws QueryException {
+  final void close() throws QueryException {
     close(name, qc, info);
   }
 
@@ -98,7 +98,7 @@ public abstract class NameUpdate extends Update implements Comparable<NameUpdate
    * @param info input info
    * @throws QueryException query exception
    */
-  static final void close(final String name, final QueryContext qc, final InputInfo info)
+  static void close(final String name, final QueryContext qc, final InputInfo info)
       throws QueryException {
 
     // close data instance in query processor

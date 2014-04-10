@@ -86,7 +86,7 @@ public final class Sessions extends QueryModule {
    * @return session attribute
    * @throws QueryException query exception
    */
-  Item get(final Str id, final Str key, final Item def) throws QueryException {
+  private Item get(final Str id, final Str key, final Item def) throws QueryException {
     final Object o = session(id).getAttribute(key.toJava());
     if(o == null) return def;
     if(o instanceof Item) return (Item) o;

@@ -34,9 +34,9 @@ public class ClientSession extends Session {
   private final Map<String, EventNotifier> notifiers =
     Collections.synchronizedMap(new HashMap<String, EventNotifier>());
   /** Server output (buffered). */
-  protected final PrintOutput sout;
+  final PrintOutput sout;
   /** Server input. */
-  protected final InputStream sin;
+  final InputStream sin;
 
   /** Socket reference. */
   private final Socket socket;
@@ -96,8 +96,8 @@ public class ClientSession extends Session {
    * be returned as strings.
    * @throws IOException I/O exception
    */
-  public ClientSession(final String host, final int port, final String user, final String pass,
-      final OutputStream output) throws IOException {
+  private ClientSession(final String host, final int port, final String user, final String pass,
+                        final OutputStream output) throws IOException {
 
     super(output);
     ehost = host;
@@ -263,7 +263,7 @@ public class ClientSession extends Session {
    * @return value of check
    * @throws IOException I/O exception
    */
-  protected static boolean ok(final BufferInput bi) throws IOException {
+  static boolean ok(final BufferInput bi) throws IOException {
     return bi.read() == 0;
   }
 
@@ -274,7 +274,7 @@ public class ClientSession extends Session {
    * @param strings string arguments
    * @throws IOException I/O exception
    */
-  void send(final ServerCmd cmd, final InputStream input, final String... strings)
+  private void send(final ServerCmd cmd, final InputStream input, final String... strings)
       throws IOException {
 
     sout.write(cmd.code);
@@ -288,7 +288,7 @@ public class ClientSession extends Session {
    * @param os output stream
    * @throws IOException I/O exception
    */
-  protected static void receive(final BufferInput bi, final OutputStream os)
+  static void receive(final BufferInput bi, final OutputStream os)
       throws IOException {
     final DecodingInput di = new DecodingInput(bi);
     for(int b; (b = di.read()) != -1;) os.write(b);
@@ -299,7 +299,7 @@ public class ClientSession extends Session {
    * @param s string to be sent
    * @throws IOException I/O exception
    */
-  protected void send(final String s) throws IOException {
+  void send(final String s) throws IOException {
     sout.write(Token.token(s));
     sout.write(0);
   }

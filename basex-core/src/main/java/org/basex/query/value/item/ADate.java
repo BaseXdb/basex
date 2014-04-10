@@ -103,14 +103,14 @@ public abstract class ADate extends ADateDur {
    */
   final void date(final byte[] d, final String e, final InputInfo ii) throws QueryException {
     final Matcher mt = DATE.matcher(Token.string(d).trim());
-    if(!mt.matches()) dateErr(d, e, ii);
+    if(!mt.matches()) throw dateError(d, e, ii);
     yea = toLong(mt.group(1), false, ii);
     // +1 is added to BC values to simplify computations
     if(yea < 0) yea++;
     mon = (byte) (Token.toInt(mt.group(3)) - 1);
     day = (byte) (Token.toInt(mt.group(4)) - 1);
 
-    if(mon < 0 || mon >= 12 || day < 0 || day >= dpm(yea, mon)) dateErr(d, e, ii);
+    if(mon < 0 || mon >= 12 || day < 0 || day >= dpm(yea, mon)) throw dateError(d, e, ii);
     if(yea <= MIN_YEAR || yea > MAX_YEAR) throw DATERANGE.get(ii, type, chop(d));
     zone(mt, 5, d, ii);
   }
@@ -124,13 +124,13 @@ public abstract class ADate extends ADateDur {
    */
   final void time(final byte[] d, final String e, final InputInfo ii) throws QueryException {
     final Matcher mt = TIME.matcher(Token.string(d).trim());
-    if(!mt.matches()) dateErr(d, e, ii);
+    if(!mt.matches()) throw dateError(d, e, ii);
 
     hou = (byte) Token.toInt(mt.group(1));
     min = (byte) Token.toInt(mt.group(2));
     sec = toDecimal(mt.group(3), false, ii);
     if(min >= 60 || sec.compareTo(BD60) >= 0 || hou > 24 ||
-       hou == 24 && (min > 0 || sec.compareTo(BigDecimal.ZERO) > 0)) dateErr(d, e, ii);
+       hou == 24 && (min > 0 || sec.compareTo(BigDecimal.ZERO) > 0)) throw dateError(d, e, ii);
     zone(mt, 5, d, ii);
     if(hou == 24) {
       hou = 0;

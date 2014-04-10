@@ -154,7 +154,7 @@ public final class DialogExport extends BaseXDialog {
   /**
    * Opens a file dialog to choose an XML document or directory.
    */
-  void choose() {
+  private void choose() {
     final IOFile io = new BaseXFileChooser(CHOOSE_DIR, path.getText(), gui).select(Mode.DOPEN);
     if(io != null) path.setText(io.path());
   }

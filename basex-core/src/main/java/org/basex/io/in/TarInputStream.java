@@ -62,7 +62,7 @@ public final class TarInputStream extends FilterInputStream {
   }
 
   @Override
-  public synchronized void reset() throws IOException {
+  public synchronized void reset() {
     Util.notImplemented();
   }
 

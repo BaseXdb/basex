@@ -35,7 +35,7 @@ public final class BackupDrop extends NameUpdate {
   }
 
   @Override
-  public void prepare() throws QueryException { }
+  public void prepare() { }
 
   @Override
   public String operation() { return "dropped"; }

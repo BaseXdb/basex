@@ -38,7 +38,7 @@ public final class ProjectView extends BaseXPanel {
   /** Filter list. */
   final ProjectList list;
   /** Root path. */
-  final BaseXTextField path;
+  private final BaseXTextField path;
   /** Splitter. */
   private final BaseXSplit split;
   /** Last focused component. */
@@ -241,7 +241,7 @@ public final class ProjectView extends BaseXPanel {
    * @param f file reference
    * @return file
    */
-  private File canonical(final File f) {
+  private static File canonical(final File f) {
     try {
       return f.getCanonicalFile();
     } catch(final IOException ex) {
@@ -270,7 +270,7 @@ public final class ProjectView extends BaseXPanel {
   /**
    * Changes the root directory.
    */
-  void change() {
+  private void change() {
     final ProjectNode child = tree.selectedNode();
     final BaseXFileChooser fc = new BaseXFileChooser(CHOOSE_DIR, child.file.path(), gui);
     final IOFile io = fc.select(Mode.DOPEN);

@@ -14,8 +14,6 @@ import org.basex.gui.layout.*;
  * @author Christian Gruen
  */
 public final class DialogSort extends BaseXDialog {
-  /** Buttons. */
-  private final BaseXBack buttons;
   /** Case sensitive. */
   private final BaseXCheckBox cs;
   /** Sort ascending. */
@@ -41,8 +39,7 @@ public final class DialogSort extends BaseXDialog {
     p.add(merge);
     set(p, BorderLayout.CENTER);
 
-    buttons = newButtons(B_OK, CANCEL);
-    set(buttons, BorderLayout.SOUTH);
+    set(newButtons(B_OK, CANCEL), BorderLayout.SOUTH);
     action(null);
     finish(null);
   }

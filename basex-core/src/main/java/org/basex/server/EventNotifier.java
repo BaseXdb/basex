@@ -6,7 +6,7 @@ package org.basex.server;
  * @author BaseX Team 2005-14, BSD License
  * @author Roman Raedle
  */
-public interface EventNotifier {
+interface EventNotifier {
   /**
    * Invoked when a database event was fired.
    * @param value event string

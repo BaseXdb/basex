@@ -10,7 +10,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Masoumeh Seydi
  */
-public final class GeoErrors {
+final class GeoErrors {
   /** Error namespace. */
   private static final byte[] NS = QueryText.EXPERROR;
   /** Namespace and error code prefix. */

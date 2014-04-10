@@ -101,7 +101,7 @@ public class DBNode extends ANode {
    * @param p pre value
    * @param k node kind
    */
-  final void set(final int p, final int k) {
+  private void set(final int p, final int k) {
     type = type(k);
     par = null;
     val = null;

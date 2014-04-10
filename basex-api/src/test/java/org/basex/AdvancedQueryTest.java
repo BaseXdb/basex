@@ -41,7 +41,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
    * @param query query string
    * @param result query result
    */
-  public static void query(final String query, final Object result) {
+  protected static void query(final String query, final Object result) {
     final String res = query(query);
     final String exp = result.toString();
     if(!res.equals(exp))

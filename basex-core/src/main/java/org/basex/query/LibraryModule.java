@@ -31,7 +31,7 @@ public final class LibraryModule extends StaticScope {
   }
 
   @Override
-  public void compile(final QueryContext ctx) throws QueryException {
+  public void compile(final QueryContext ctx) {
   }
 
   @Override

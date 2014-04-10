@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class ProjectList extends JList {
+class ProjectList extends JList {
   /** Font metrics. */
   private static FontMetrics fm;
 
@@ -106,7 +106,7 @@ public class ProjectList extends JList {
    * @param list entries to set
    * @return result of check
    */
-  boolean changed(final String[] list) {
+  private boolean changed(final String[] list) {
     final int sl = list.length, el = getModel().getSize();
     if(sl != el) return true;
     for(int i = 0; i < sl; i++) {
@@ -118,14 +118,14 @@ public class ProjectList extends JList {
   /**
    * Open all selected files.
    */
-  void open() {
+  private void open() {
     for(final IOFile file : selectedValues()) project.open(file, search);
   }
 
   /**
    * Open all selected files externally.
    */
-  void openExternal() {
+  private void openExternal() {
     for(final IOFile file : selectedValues())  {
       try {
         file.open();

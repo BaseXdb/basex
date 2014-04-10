@@ -73,7 +73,7 @@ public final class WebDAVService<T> {
    * @param db database
    * @return {@code true} if the user is authorized
    */
-  public boolean authorize(final String db) {
+  public static boolean authorize(final String db) {
     return !WEBDAV_DB.equals(db);
   }
 
@@ -130,7 +130,7 @@ public final class WebDAVService<T> {
    * @return resource meta data
    * @throws IOException I/O exception
    */
-  ResourceMetaData metaData(final String db, final String path) throws IOException {
+  private ResourceMetaData metaData(final String db, final String path) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(
       "let $a := " + _DB_LIST_DETAILS.args("$db", "$path") +
       "return (" +

@@ -160,7 +160,7 @@ public final class DialogProps extends BaseXDialog {
   /**
    * Updates the currently visible index panel.
    */
-  synchronized void updateInfo() {
+  private synchronized void updateInfo() {
     final Object o = tabs.getSelectedComponent();
     final IntList il = new IntList();
     if(o == tabNames) {

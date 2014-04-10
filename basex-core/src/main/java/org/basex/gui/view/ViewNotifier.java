@@ -34,7 +34,7 @@ public final class ViewNotifier {
   /** Command history. */
   private final String[] queries = new String[MAXHIST];
   /** Attached views. */
-  private View[] view = new View[0];
+  private View[] view = {};
   /** Number of history entries. */
   private int histsize;
 

@@ -14,7 +14,7 @@ abstract class ARepo extends Command {
    * @param p required permission
    * @param arg arguments
    */
-  protected ARepo(final Perm p, final String... arg) {
+  ARepo(final Perm p, final String... arg) {
     super(p, arg);
   }
 

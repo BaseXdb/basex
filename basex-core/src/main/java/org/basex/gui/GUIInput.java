@@ -128,7 +128,7 @@ public final class GUIInput extends BaseXTextField {
    * Checks if the query is a command.
    * @return result of check
    */
-  boolean cmdMode() {
+  private boolean cmdMode() {
     return gui.gopts.get(GUIOptions.SEARCHMODE) == 2 ||
       gui.context.data() == null || getText().startsWith("!");
   }
@@ -136,7 +136,7 @@ public final class GUIInput extends BaseXTextField {
   /**
    * Completes the input with the current combobox choice.
    */
-  void completeInput() {
+  private void completeInput() {
     final String suf = box.getSelectedItem();
     if(suf == null) return;
     final int pl = pre.length();
@@ -150,7 +150,7 @@ public final class GUIInput extends BaseXTextField {
   /**
    * Shows the command popup menu.
    */
-  void showPopup() {
+  private void showPopup() {
     final String query = getText();
     final int mode = gui.gopts.get(GUIOptions.SEARCHMODE);
     if(cmdMode()) {

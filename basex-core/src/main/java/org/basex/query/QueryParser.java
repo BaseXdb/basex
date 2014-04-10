@@ -800,7 +800,7 @@ public class QueryParser extends InputParser {
     ctx.modParsed.put(p, uri);
 
     // read module
-    String qu;
+    final String qu;
     try {
       qu = string(io.read());
     } catch(final IOException ex) {
@@ -1838,7 +1838,7 @@ public class QueryParser extends InputParser {
    * @param el expression list
    * @throws QueryException query exception
    */
-  void relativePath(final ExprList el) throws QueryException {
+  private void relativePath(final ExprList el) throws QueryException {
     while(true) {
       boolean map = false;
       if(consume('/')) {
@@ -1881,7 +1881,7 @@ public class QueryParser extends InputParser {
    * @param axis axis
    */
   @SuppressWarnings("unused")
-  protected void checkAxis(final Axis axis) { }
+  void checkAxis(final Axis axis) { }
 
   /**
    * Performs an optional test check.
@@ -1889,14 +1889,14 @@ public class QueryParser extends InputParser {
    * @param attr attribute flag
    */
   @SuppressWarnings("unused")
-  protected void checkTest(final Test test, final boolean attr) { }
+  void checkTest(final Test test, final boolean attr) { }
 
   /**
    * Checks a predicate.
    * @param open open flag
    */
   @SuppressWarnings("unused")
-  protected void checkPred(final boolean open) { }
+  void checkPred(final boolean open) { }
 
   /**
    * Parses the "StepExpr" rule.
@@ -3131,7 +3131,7 @@ public class QueryParser extends InputParser {
         final boolean same = wsConsumeWs(SAME);
         final boolean diff = !same && wsConsumeWs(DIFFERENT);
         if(same || diff) {
-          FTUnit unit;
+          final FTUnit unit;
           if(wsConsumeWs(SENTENCE)) unit = FTUnit.SENTENCES;
           else if(wsConsumeWs(PARAGRAPH)) unit = FTUnit.PARAGRAPHS;
           else throw error(INCOMPLETE);
@@ -3257,7 +3257,7 @@ public class QueryParser extends InputParser {
     }
 
     skipWs();
-    Expr e;
+    final Expr e;
     if(quote(curr())) {
       e = Str.get(stringLiteral());
     } else if(curr('{')) {

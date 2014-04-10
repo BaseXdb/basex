@@ -68,7 +68,7 @@ public final class FTWeight extends FTExpr {
    * @return item
    * @throws QueryException query exception
    */
-  FTNode weight(final FTNode item, final QueryContext ctx) throws QueryException {
+  private FTNode weight(final FTNode item, final QueryContext ctx) throws QueryException {
     // evaluate weight
     if(item == null) return null;
     final double d = checkDbl(weight, ctx);

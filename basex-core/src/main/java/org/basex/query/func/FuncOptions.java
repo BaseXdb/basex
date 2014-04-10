@@ -64,7 +64,9 @@ public final class FuncOptions {
    * @param error raise error if parameter is unknown
    * @throws QueryException query exception
    */
-  void parse(final Item item, final Options options, final Err error) throws QueryException {
+  private void parse(final Item item, final Options options, final Err error)
+      throws QueryException {
+
     final TokenBuilder tb = new TokenBuilder();
     if(item != null) {
       try {

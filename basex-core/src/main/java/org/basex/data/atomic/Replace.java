@@ -73,7 +73,7 @@ final class Replace extends StructuralUpdate {
    * @param trg destination data reference
    * @return true if substitution successful
    */
-  boolean lazyReplace(final Data trg) {
+  private boolean lazyReplace(final Data trg) {
     final Data src = insseq.data;
     final int srcSize = insseq.size();
     // check for equal subtree size

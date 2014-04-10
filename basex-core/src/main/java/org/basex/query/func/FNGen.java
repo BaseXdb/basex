@@ -255,7 +255,7 @@ public final class FNGen extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  Iter unparsedTextLines(final QueryContext ctx) throws QueryException {
+  private Iter unparsedTextLines(final QueryContext ctx) throws QueryException {
     return textIter(unparsedText(ctx, false).string(info));
   }
 

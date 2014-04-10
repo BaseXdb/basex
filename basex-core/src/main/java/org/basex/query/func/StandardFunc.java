@@ -192,7 +192,7 @@ public abstract class StandardFunc extends Arr {
    * @return input source, or exception
    * @throws QueryException query exception
    */
-  public IO checkPath(final Expr path, final QueryContext ctx) throws QueryException {
+  IO checkPath(final Expr path, final QueryContext ctx) throws QueryException {
     return QueryResources.checkPath(new QueryInput(string(checkStr(path, ctx))), sc.baseIO(), info);
   }
 

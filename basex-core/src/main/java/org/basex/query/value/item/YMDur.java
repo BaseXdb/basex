@@ -77,7 +77,7 @@ public final class YMDur extends Dur {
     super(AtomType.YMD);
     final String val = Token.string(vl).trim();
     final Matcher mt = DUR.matcher(val);
-    if(!mt.matches() || val.endsWith("P")) dateErr(vl, XYMD, ii);
+    if(!mt.matches() || val.endsWith("P")) throw dateError(vl, XYMD, ii);
     yearMonth(vl, mt, ii);
     sec = BigDecimal.ZERO;
   }

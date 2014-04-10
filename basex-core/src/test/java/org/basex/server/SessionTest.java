@@ -618,7 +618,7 @@ public abstract class SessionTest extends SandboxTest {
    * @param exp expected string
    * @param ret string returned from the client API
    */
-  final void assertEqual(final Object exp, final Object ret) {
+  private void assertEqual(final Object exp, final Object ret) {
     final String result = (out != null ? out : ret).toString();
     if(out != null) out.reset();
     assertEquals(exp.toString(), result.replaceAll("\\r|\\n", ""));

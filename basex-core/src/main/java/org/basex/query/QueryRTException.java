@@ -18,7 +18,7 @@ public final class QueryRTException extends RuntimeException {
   }
 
   @Override
-  public QueryException getCause() {
+  public synchronized QueryException getCause() {
     return (QueryException) super.getCause();
   }
 

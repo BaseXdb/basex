@@ -51,7 +51,7 @@ public abstract class OutputSerializer extends Serializer {
   /** New line. */
   protected final byte[] nl;
   /** Output stream. */
-  protected final PrintOutput out;
+  final PrintOutput out;
 
   /** Item flag (used for formatting). */
   private boolean item;

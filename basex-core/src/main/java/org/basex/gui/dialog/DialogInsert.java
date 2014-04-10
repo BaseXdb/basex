@@ -106,7 +106,7 @@ public final class DialogInsert extends BaseXDialog {
    * Activates the specified radio button.
    * @param src button reference
    */
-  void change(final Object src) {
+  private void change(final Object src) {
     int n = 0;
     for(int r = 0; r < radio.length; ++r) if(src == radio[r]) n = r;
     BaseXLayout.setHeight(input2, n == Data.ATTR ? 25 : 350);

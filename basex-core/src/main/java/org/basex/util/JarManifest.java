@@ -11,7 +11,7 @@ import java.util.jar.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  */
-public final class JarManifest {
+final class JarManifest {
   /** The main attributes of the JAR manifest. */
   private static final Attributes MAP;
 

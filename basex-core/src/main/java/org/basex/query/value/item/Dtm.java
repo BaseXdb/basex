@@ -60,7 +60,7 @@ public final class Dtm extends ADate {
   public Dtm(final byte[] date, final InputInfo ii) throws QueryException {
     super(AtomType.DTM);
     final int i = Token.indexOf(date, 'T');
-    if(i == -1) dateErr(date, XDTM, ii);
+    if(i == -1) throw dateError(date, XDTM, ii);
     date(Token.substring(date, 0, i), XDTM, ii);
     time(Token.substring(date, i + 1), XDTM, ii);
   }

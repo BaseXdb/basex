@@ -207,8 +207,8 @@ public final class HTTPClient {
    * @param out output stream
    * @throws IOException I/O exception
    */
-  private void writePayload(final ValueBuilder payload, final TokenMap payloadAtts,
-      final OutputStream out) throws IOException {
+  private static void writePayload(final ValueBuilder payload, final TokenMap payloadAtts,
+                                   final OutputStream out) throws IOException {
 
     // detect method (specified by @method or derived from @media-type)
     final byte[] m = payloadAtts.get(METHOD);

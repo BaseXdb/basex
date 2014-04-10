@@ -15,7 +15,7 @@ import org.basex.util.*;
  */
 public class DBAlter extends NameUpdate {
   /** Name of the new database. */
-  protected final String newName;
+  private final String newName;
 
   /**
    * Constructor.

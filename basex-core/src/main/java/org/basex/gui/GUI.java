@@ -60,7 +60,7 @@ public final class GUI extends AGUI {
   /** Fullscreen flag. */
   public boolean fullscreen;
   /** Result panel. */
-  public final GUIMenu menu;
+  private final GUIMenu menu;
   /** Button panel. */
   public final BaseXBack buttons;
   /** Navigation/input panel. */
@@ -371,7 +371,7 @@ public final class GUI extends AGUI {
    * @param edit call from editor panel
    * @return success flag
    */
-  boolean exec(final Command cmd, final boolean edit) {
+  private boolean exec(final Command cmd, final boolean edit) {
     // wait when command is still running
     final int thread = ++threadID;
     while(true) {
@@ -681,7 +681,7 @@ public final class GUI extends AGUI {
   /**
    * Checks for a new version and shows a confirmation dialog.
    */
-  void checkVersion() {
+  private void checkVersion() {
     final Version disk = new Version(gopts.get(GUIOptions.UPDATEVERSION));
     final Version used = new Version(Prop.VERSION.replaceAll(" .*", ""));
 

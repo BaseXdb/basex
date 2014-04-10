@@ -115,7 +115,7 @@ final class DialogFT extends BaseXBack {
   /**
    * Opens a file dialog to choose a stopword list.
    */
-  void chooseStop() {
+  private void chooseStop() {
     final GUIOptions gopts = dialog.gui.gopts;
     final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR, gopts.get(GUIOptions.DATAPATH),
         dialog.gui);

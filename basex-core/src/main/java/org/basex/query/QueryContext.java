@@ -294,7 +294,7 @@ public final class QueryContext extends Proc {
    * Compiles all used functions and the root expression.
    * @throws QueryException query exception
    */
-  void analyze() throws QueryException {
+  private void analyze() throws QueryException {
     try {
       // compile the expression
       if(root != null) QueryCompiler.compile(this, root);
@@ -342,7 +342,7 @@ public final class QueryContext extends Proc {
    * @return resulting value
    * @throws QueryException query exception
    */
-  Value update() throws QueryException {
+  private Value update() throws QueryException {
     if(updating) {
       updates.apply();
       if(updates.size() != 0 && context.data() != null) context.update();

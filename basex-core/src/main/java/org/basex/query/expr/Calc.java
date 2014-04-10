@@ -25,7 +25,7 @@ public enum Calc {
       final Type ta = a.type, tb = b.type;
       final boolean t1 = ta.isNumberOrUntyped();
       final boolean t2 = tb.isNumberOrUntyped();
-      if(t1 ^ t2) errNum(ii, t1 ? b : a);
+      if(t1 ^ t2) throw numError(ii, t1 ? b : a);
 
       if(t1 && t2) {
         // numbers or untyped values
@@ -43,7 +43,7 @@ public enum Calc {
 
       // dates or durations
       if(ta == tb) {
-        if(!(a instanceof Dur)) errNum(ii, t1 ? b : a);
+        if(!(a instanceof Dur)) throw numError(ii, t1 ? b : a);
         if(ta == YMD) return new YMDur((YMDur) a, (YMDur) b, true, ii);
         if(ta == DTD) return new DTDur((DTDur) a, (DTDur) b, true, ii);
       }
@@ -53,7 +53,7 @@ public enum Calc {
       if(tb == DAT) return new Dat((Dat) b, checkDur(ii, a), true, ii);
       if(ta == TIM && tb == DTD) return new Tim((Tim) a, (DTDur) b, true);
       if(tb == TIM && ta == DTD) return new Tim((Tim) b, (DTDur) a, true);
-      throw errType(ii, ta, tb);
+      throw typeError(ii, ta, tb);
     }
   },
 
@@ -64,7 +64,7 @@ public enum Calc {
       final Type ta = a.type, tb = b.type;
       final boolean t1 = ta.isNumberOrUntyped();
       final boolean t2 = tb.isNumberOrUntyped();
-      if(t1 ^ t2) errNum(ii, t1 ? b : a);
+      if(t1 ^ t2) throw numError(ii, t1 ? b : a);
 
       if(t1 && t2) {
         // numbers or untyped values
@@ -86,12 +86,12 @@ public enum Calc {
           return new DTDur((ADate) a, (ADate) b, ii);
         if(ta == YMD) return new YMDur((YMDur) a, (YMDur) b, false, ii);
         if(ta == DTD) return new DTDur((DTDur) a, (DTDur) b, false, ii);
-        errNum(ii, t1 ? b : a);
+        throw numError(ii, t1 ? b : a);
       }
       if(ta == DTM) return new Dtm((Dtm) a, checkDur(ii, b), false, ii);
       if(ta == DAT) return new Dat((Dat) a, checkDur(ii, b), false, ii);
       if(ta == TIM && tb == DTD) return new Tim((Tim) a, (DTDur) b, false);
-      throw errType(ii, ta, tb);
+      throw typeError(ii, ta, tb);
     }
   },
 
@@ -102,24 +102,24 @@ public enum Calc {
       final Type ta = a.type, tb = b.type;
       if(ta == YMD) {
         if(b instanceof ANum) return new YMDur((Dur) a, b.dbl(ii), true, ii);
-        errNum(ii, b);
+        throw numError(ii, b);
       }
       if(tb == YMD) {
         if(a instanceof ANum) return new YMDur((Dur) b, a.dbl(ii), true, ii);
-        errNum(ii, a);
+        throw numError(ii, a);
       }
       if(ta == DTD) {
         if(b instanceof ANum) return new DTDur((Dur) a, b.dbl(ii), true, ii);
-        errNum(ii, b);
+        throw numError(ii, b);
       }
       if(tb == DTD) {
         if(a instanceof ANum) return new DTDur((Dur) b, a.dbl(ii), true, ii);
-        errNum(ii, a);
+        throw numError(ii, a);
       }
 
       final boolean t1 = ta.isNumberOrUntyped();
       final boolean t2 = tb.isNumberOrUntyped();
-      if(t1 ^ t2) errType(ii, ta, tb);
+      if(t1 ^ t2) throw typeError(ii, ta, tb);
       if(t1 && t2) {
         final Type t = type(ta, tb);
         if(t == ITR) {
@@ -132,7 +132,7 @@ public enum Calc {
         if(t == FLT) return Flt.get(a.flt(ii) * b.flt(ii));
         return Dec.get(a.dec(ii).multiply(b.dec(ii)));
       }
-      throw errNum(ii, t1 ? b : a);
+      throw numError(ii, t1 ? b : a);
     }
   },
 
@@ -157,11 +157,11 @@ public enum Calc {
       }
       if(ta == YMD) {
         if(b instanceof ANum) return new YMDur((Dur) a, b.dbl(ii), false, ii);
-        errNum(ii, b);
+        throw numError(ii, b);
       }
       if(ta == DTD) {
         if(b instanceof ANum) return new DTDur((Dur) a, b.dbl(ii), false, ii);
-        errNum(ii, b);
+        throw numError(ii, b);
       }
 
       checkNum(ii, a, b);
@@ -255,11 +255,9 @@ public enum Calc {
    * @param ta first type
    * @param tb second type
    * @return query exception
-   * @throws QueryException query exception
    */
-  final QueryException errType(final InputInfo ii, final Type ta, final Type tb)
-      throws QueryException {
-    throw CALCTYPE.get(ii, info(), ta, tb);
+  final QueryException typeError(final InputInfo ii, final Type ta, final Type tb) {
+    return CALCTYPE.get(ii, info(), ta, tb);
   }
 
   /**
@@ -267,10 +265,9 @@ public enum Calc {
    * @param ii input info
    * @param it item
    * @return query exception
-   * @throws QueryException query exception
    */
-  final QueryException errNum(final InputInfo ii, final Item it) throws QueryException {
-    throw NONUMBER.get(ii, info(), it.type);
+  final QueryException numError(final InputInfo ii, final Item it) {
+    return NONUMBER.get(ii, info(), it.type);
   }
 
   /**
@@ -295,8 +292,8 @@ public enum Calc {
    * @throws QueryException query exception
    */
   final void checkNum(final InputInfo ii, final Item a, final Item b) throws QueryException {
-    if(!a.type.isNumberOrUntyped()) errNum(ii, a);
-    if(!b.type.isNumberOrUntyped()) errNum(ii, b);
+    if(!a.type.isNumberOrUntyped()) throw numError(ii, a);
+    if(!b.type.isNumberOrUntyped()) throw numError(ii, b);
   }
 
   /**

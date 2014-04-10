@@ -64,7 +64,7 @@ final class BaseXSplitSep extends BaseXBack {
    * @param e mouse event
    * @return absolute cursor position
    */
-  double pos(final MouseEvent e) {
+  private double pos(final MouseEvent e) {
     final Point p = getLocationOnScreen();
     return l ? p.x + e.getX() : p.y + e.getY();
   }

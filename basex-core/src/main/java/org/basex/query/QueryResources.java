@@ -346,7 +346,7 @@ public final class QueryResources {
    * Adds a data reference.
    * @param d data reference to be added
    */
-  public void addData(final Data d) {
+  private void addData(final Data d) {
     if(datas == data.length) data = Array.copy(data, new Data[Array.newSize(datas)]);
     data[datas++] = d;
   }

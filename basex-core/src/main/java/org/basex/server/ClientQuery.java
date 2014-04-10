@@ -15,9 +15,9 @@ import org.basex.io.in.*;
  */
 public class ClientQuery extends Query {
   /** Client session. */
-  protected final ClientSession cs;
+  final ClientSession cs;
   /** Query id. */
-  protected final String id;
+  final String id;
 
   /**
    * Standard constructor.

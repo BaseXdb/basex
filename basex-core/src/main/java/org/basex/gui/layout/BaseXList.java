@@ -271,7 +271,7 @@ public final class BaseXList extends BaseXBack {
    * Sets the specified list index.
    * @param i list entry
    */
-  void setIndex(final int i) {
+  private void setIndex(final int i) {
     if(i < values.length) setValue(values[i]);
     else text.setText("");
   }

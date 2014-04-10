@@ -345,7 +345,7 @@ final class TableHeader extends BaseXPanel {
    * Handles the filter columns.
    * @param col current column
    */
-  void filter(final int col) {
+  private void filter(final int col) {
     // activate table filter
     if(inputCol != col && tdata.cols.length != 0) {
       if(box != null) box.stop();

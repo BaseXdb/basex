@@ -38,11 +38,11 @@ final class ProjectFilter extends BaseXBack {
   private final TokenList cache = new TokenList();
 
   /** Last file search. */
-  String lastFiles = "";
+  private String lastFiles = "";
   /** Last content search. */
-  String lastContents = "";
+  private String lastContents = "";
   /** Running flag. */
-  boolean running;
+  private boolean running;
   /** Current filter id. */
   private int threadID;
 
@@ -105,7 +105,7 @@ final class ProjectFilter extends BaseXBack {
    * Initializes the file cache.
    * @param thread current thread id
    */
-  void init(final int thread) {
+  private void init(final int thread) {
     if(cache.isEmpty()) {
       final TokenSet set = new TokenSet();
       set.add(Text.PLEASE_WAIT_D);
@@ -119,7 +119,7 @@ final class ProjectFilter extends BaseXBack {
    * @param thread current thread id
    * @param root root directory
    */
-  void add(final IOFile root, final int thread) {
+  private void add(final IOFile root, final int thread) {
     for(final IOFile file : root.children()) {
       if(file.isDir()) {
         add(file, thread);
@@ -140,7 +140,7 @@ final class ProjectFilter extends BaseXBack {
    * @param content content search string
    * @param thread thread id
    */
-  void filter(final String file, final String content, final int thread) {
+  private void filter(final String file, final String content, final int thread) {
     // wait when command is still running
     while(running) {
       Thread.yield();
@@ -209,7 +209,7 @@ final class ProjectFilter extends BaseXBack {
         final String pattern = files.getText();
         if(i != -1 && !pattern.contains("*") && !pattern.contains("?") ||
             !Pattern.compile(IOFile.regex(pattern)).matcher(name).matches()) {
-          files.setText("*" + name.substring(i));
+          files.setText('*' + name.substring(i));
         }
       }
       refresh(false);
@@ -317,7 +317,7 @@ final class ProjectFilter extends BaseXBack {
    * @param search search string
    * @return success flag
    */
-  private boolean filterContent(final byte[] path, final int[] search) {
+  private static boolean filterContent(final byte[] path, final int[] search) {
     final int cl = search.length;
     if(cl == 0) return true;
 

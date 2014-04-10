@@ -367,7 +367,7 @@ public abstract class Formatter extends FormatUtil {
    * @return string representation
    * @throws QueryException query exception
    */
-  final byte[] formatZone(final int num, final FormatParser fp, final byte[] marker)
+  private byte[] formatZone(final int num, final FormatParser fp, final byte[] marker)
       throws QueryException {
 
     final boolean uc = ch(marker, 0) == 'Z';

@@ -21,12 +21,12 @@ public class FNFuncTest extends QueryPlanTest {
     check("fn:fold-left(2 to 10, 1, function($a,$b) {$a+$b})",
         "55",
         "empty(//" + Util.className(FNFunc.class) + "[contains(@name, 'fold-left')])",
-        "exists(*/" + Util.className(Int.class) + ")");
+        "exists(*/" + Util.className(Int.class) + ')');
     // should be unrolled but not evaluated at compile time
     check("fn:fold-left(2 to 10, 1, function($a,$b) {0*random:integer($a)+$b})",
         "10",
         "empty(//" + Util.className(FNFunc.class) + "[contains(@name, 'fold-left')])",
-        "empty(*/" + Util.className(Int.class) + ")",
+        "empty(*/" + Util.className(Int.class) + ')',
         "count(//" + Util.className(Arith.class) + "[@op = '+']) eq 9");
     // should not be unrolled
     check("fn:fold-left(1 to 10, 0, function($a,$b) {$a+$b})",
@@ -40,13 +40,13 @@ public class FNFuncTest extends QueryPlanTest {
     // should be unrolled and evaluated at compile time
     check("fn:fold-right(1 to 9, 10, function($a,$b) {$a+$b})",
         "55",
-        "empty(//" + Util.className(FNFunc.class) + ")",
-        "exists(*/" + Util.className(Int.class) + ")");
+        "empty(//" + Util.className(FNFunc.class) + ')',
+        "exists(*/" + Util.className(Int.class) + ')');
     // should be unrolled but not evaluated at compile time
     check("fn:fold-right(1 to 9, 10, function($a,$b) {0*random:integer($a)+$b})",
         "10",
-        "empty(//" + Util.className(FNFunc.class) + ")",
-        "empty(*/" + Util.className(Int.class) + ")",
+        "empty(//" + Util.className(FNFunc.class) + ')',
+        "empty(*/" + Util.className(Int.class) + ')',
         "count(//" + Util.className(Arith.class) + "[@op = '+']) eq 9");
     // should not be unrolled
     check("fn:fold-right(0 to 9, 10, function($a,$b) {$a+$b})",
@@ -60,13 +60,13 @@ public class FNFuncTest extends QueryPlanTest {
     // should be unrolled and evaluated at compile time
     check("fn:for-each(0 to 8, function($x) {$x+1})",
         "1 2 3 4 5 6 7 8 9",
-        "empty(//" + Util.className(FNFunc.class) + ")",
-        "exists(*/" + Util.className(IntSeq.class) + ")");
+        "empty(//" + Util.className(FNFunc.class) + ')',
+        "exists(*/" + Util.className(IntSeq.class) + ')');
     // should be unrolled but not evaluated at compile time
     check("fn:for-each(1 to 9, function($x) {0*random:integer()+$x})",
         "1 2 3 4 5 6 7 8 9",
-        "empty(//" + Util.className(FNFunc.class) + ")",
-        "empty(*/" + Util.className(IntSeq.class) + ")",
+        "empty(//" + Util.className(FNFunc.class) + ')',
+        "empty(*/" + Util.className(IntSeq.class) + ')',
         "count(//" + Util.className(Arith.class) + "[@op = '+']) eq 9");
     // should not be unrolled
     check("fn:for-each(0 to 9, function($x) {$x+1})",
