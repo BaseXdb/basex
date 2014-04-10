@@ -36,7 +36,7 @@ public final class Performance {
    * @param runs number of runs
    * @return execution time
    */
-  private String getTime(final int runs) {
+  public String getTime(final int runs) {
     final long time2 = System.nanoTime();
     final String t = getTime(time2 - time, runs);
     time = time2;
