@@ -699,7 +699,6 @@ public abstract class Data {
     // loop through all entries
     final IntList preStack = new IntList();
     final NSNode nsRoot = nspaces.getCurrent();
-    final HashSet<NSNode> newNodes = new HashSet<>();
     final IntList flagPres = new IntList();
     // track existing NSNodes - their PRE values have to be shifted after each tuple insertion
     final List<NSNode> nsNodesShift = nspaces.getNSNodes(tpre);
@@ -751,13 +750,7 @@ public abstract class Data {
               // see if prefix has been declared/ is part of current ns scope
               final byte[] old = nsScope.get(at.name(a));
               if(old == null || !eq(old, at.value(a))) {
-                // we have to keep track of all new NSNodes that are added
-                // to the Namespace structure, as their pre values must not
-                // be updated. I.e. if an NSNode N with pre value 3 existed
-                // prior to inserting and two new nodes are inserted at
-                // location pre == 3 we have to make sure N and only N gets
-                // updated.
-                newNodes.add(nspaces.add(at.name(a), at.value(a), pre));
+                nspaces.add(at.name(a), at.value(a), pre);
                 ne = true;
               }
             }
