@@ -158,7 +158,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
           if(!value.isEmpty()) {
             // remember post/put variable
             if(requestBody != null) throw error(info, ANN_TWICE, "%", name.string());
-            if(m != POST && m != PUT) throw error(info, METHOD_VALUE, m);
+            if(!m.bodyAllowed) throw error(info, METHOD_VALUE, m);
             requestBody = checkVariable(toString(value, name), declared);
           }
           if(mth.contains(m)) throw error(info, ANN_TWICE, "%", name.string());
