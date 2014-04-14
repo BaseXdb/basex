@@ -14,7 +14,6 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.util.*;
-import org.basex.util.Base64;
 import org.basex.util.list.*;
 import org.junit.*;
 
