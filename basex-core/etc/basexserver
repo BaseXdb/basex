@@ -10,8 +10,7 @@ done
 BX="$( cd -P "$(dirname "$FILE")/.." && pwd )"
 
 # Core and library classes
-CP="$BX/target/classes"
-CP="$CP$(for JAR in "$BX"/lib/*.jar; do echo -n ":$JAR"; done)"
+CP="$BX/target/classes$(printf ":%s" "$BX/lib/"*.jar)"
 
 # Options for virtual machine
 VM=-Xmx512m
