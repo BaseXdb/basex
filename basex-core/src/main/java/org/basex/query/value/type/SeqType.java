@@ -577,7 +577,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeNumber() {
-    return type.isNumber() || type == AtomType.ITEM;
+    return type.isNumber() || AtomType.AAT.instanceOf(type);
   }
 
   /**
