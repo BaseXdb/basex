@@ -10,15 +10,31 @@ public enum HTTPMethod {
   /** GET method. */
   GET,
   /** POST method. */
-  POST,
+  POST(true),
   /** PUT method. */
-  PUT,
+  PUT(true),
   /** DELETE method. */
   DELETE,
   /** HEAD method. */
   HEAD,
   /** OPTIONS method. */
   OPTIONS;
+
+  /** Flag showing, if body can be present in the HTTP request with the current method. */
+  public final boolean body;
+
+  /** Default constructor. */
+  private HTTPMethod() {
+    this(false);
+  }
+
+  /**
+   * Constructor, specifying a body flag.
+   * @param body body flag
+   */
+  private HTTPMethod(final boolean body) {
+    this.body = body;
+  }
 
   /**
    * Finds the specified method, or returns {@code null}.
