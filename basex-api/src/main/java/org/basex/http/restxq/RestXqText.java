@@ -62,6 +62,8 @@ public interface RestXqText {
   /** Error message. */
   String ANN_MISSING = "Annotation %% or %% missing.";
   /** Error message. */
+  String ANN_BODYVAR = "More than one body request variable specified.";
+  /** Error message. */
   String ANN_TWICE = "Annotation %% is specified more than once.";
   /** Error message. */
   String ANN_UNKNOWN = "Annotation %% is invalid or not supported.";
