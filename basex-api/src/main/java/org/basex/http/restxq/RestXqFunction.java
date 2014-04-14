@@ -216,10 +216,11 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     if(path != null) {
       for(int s = 0; s < path.size; s++) {
         final Matcher m = TEMPLATE.matcher(path.segment[s]);
-        if(!m.find()) continue;
-        final QNm qnm = new QNm(token(m.group(1)), function.sc);
-        if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
-        bind(qnm, arg, new Atm(http.segment(s)));
+        if(m.find()) {
+          final QNm qnm = new QNm(token(m.group(1)), function.sc);
+          if (function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
+          bind(qnm, arg, new Atm(http.segment(s)));
+        }
       }
     }
 
@@ -397,13 +398,14 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
     for(int i = 0; i < function.args.length; i++) {
       final Var var = function.args[i];
-      if(!var.name.eq(name)) continue;
-      // casts and binds the value
-      final SeqType decl = var.declaredType();
-      final Value val = value.type().instanceOf(decl) ? value :
-        decl.cast(value, context, function.sc, null, var);
-      args[i] = var.checkType(val, context, null, false);
-      break;
+      if(var.name.eq(name)) {
+        // casts and binds the value
+        final SeqType decl = var.declaredType();
+        final Value val = value.type().instanceOf(decl) ? value :
+                decl.cast(value, context, function.sc, null, var);
+        args[i] = var.checkType(val, context, null, false);
+        break;
+      }
     }
   }
 

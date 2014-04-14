@@ -102,11 +102,12 @@ final class RestXqModule {
       // loop through all functions
       for(final StaticFunc uf : qc.funcs.funcs()) {
         // compare input info
-        if(!func.function.info.equals(uf.info)) continue;
-        final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
-        rxf.parse();
-        new RestXqResponse(rxf, qc, http, error).create();
-        break;
+        if(func.function.info.equals(uf.info)) {
+          final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
+          rxf.parse();
+          new RestXqResponse(rxf, qc, http, error).create();
+          break;
+        }
       }
     } finally {
       qc.close();

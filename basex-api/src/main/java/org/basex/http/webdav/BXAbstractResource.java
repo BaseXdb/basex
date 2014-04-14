@@ -344,25 +344,17 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
     public void characters(final char[] ch, final int start, final int length) {
       final String v = String.valueOf(ch, start, length);
       if("token".equals(elementName))
-
-
         lockToken.tokenId = v;
       else if("scope".equals(elementName))
-
         lockToken.info.scope = LockInfo.LockScope.valueOf(v.toUpperCase(Locale.ENGLISH));
       else if("type".equals(elementName))
-
         lockToken.info.type = LockInfo.LockType.valueOf(v.toUpperCase(Locale.ENGLISH));
       else if("depth".equals(elementName))
-
         lockToken.info.depth = LockInfo.LockDepth.valueOf(v.toUpperCase(Locale.ENGLISH));
       else if("owner".equals(elementName))
-
         lockToken.info.lockedByUser = v;
       else if("timeout".equals(elementName))
-
         lockToken.timeout = LockTimeout.parseTimeout(v);
-
     }
   }
 }
