@@ -8,10 +8,10 @@ while [ -h "$FILE" ] ; do
            cd -P "$(dirname "$SRC")" && pwd )/$(basename "$SRC")"
 done
 BX="$( cd -P "$(dirname "$FILE")/.." && pwd )"
-BXCORE="$( cd -P "$BX/../basex" && pwd )"
+BXCORE="$( cd -P "$BX/../basex-core" && pwd )"
 
 # API, core, and library classes
-CP="$BX/target/classes$(printf ":%s" "$BX/BaseX.jar" "$BX/lib/"*.jar "$BXCORE/target/classes" "$BXCORE/lib/"*.jar)"
+CP="$BX/target/classes$(printf ":%s" "$BX/lib/"*.jar "$BXCORE/lib/"*.jar)"
 
 # Options for virtual machine
 VM=
