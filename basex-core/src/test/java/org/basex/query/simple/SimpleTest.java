@@ -103,6 +103,7 @@ public final class SimpleTest extends QueryTest {
       { "ContextItem 6", itr(1),
         "declare function local:x() {1+<x/>};1[try { local:x() } catch *{.}]" },
       { "ContextItem 7", node(0), "try { <a/>/(1+'') } catch * {.}" },
+      { "ContextItem 8", itr(1, 1), "('a', 'b') ! count(.)" },
 
       { "Path 1", empty(), "<a/>[./(@*)]" },
 
