@@ -15,7 +15,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Context item.
+ * Context item (or value).
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
@@ -27,16 +27,12 @@ public final class Context extends Simple {
    */
   public Context(final InputInfo ii) {
     super(ii);
-    type = SeqType.ITEM;
-    size = 1;
+    type = SeqType.ITEM_ZM;
   }
 
   @Override
   public Context compile(final QueryContext ctx, final VarScope scp) {
-    if(ctx.value != null) {
-      type = ctx.value.type();
-      size = ctx.value.size();
-    }
+    if(ctx.value != null) type = ctx.value.type();
     return this;
   }
 
