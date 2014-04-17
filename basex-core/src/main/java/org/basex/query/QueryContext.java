@@ -140,7 +140,7 @@ public final class QueryContext extends Proc {
   /** Initial context value. */
   public MainModule ctxItem;
   /** Module loader. */
-  public final ModuleLoader modules;
+  private ModuleLoader modules;
   /** Opened connections to relational databases. */
   private JDBCConnections jdbc;
   /** Opened connections to relational databases. */
@@ -171,8 +171,6 @@ public final class QueryContext extends Proc {
    */
   public QueryContext(final Context ctx) {
     context = ctx;
-    nodes = ctx.current();
-    modules = new ModuleLoader(ctx);
     info = new QueryInfo(this);
   }
 
@@ -246,6 +244,8 @@ public final class QueryContext extends Proc {
    * @throws QueryException query exception
    */
   public void compile() throws QueryException {
+    if(nodes == null) nodes = context.current();
+
     // set database options
     final StringList o = tempOpts;
     for(int s = 0; s < o.size(); s += 2) {
@@ -459,6 +459,15 @@ public final class QueryContext extends Proc {
   }
 
   /**
+   * Returns the module loader.
+   * @return module loader
+   */
+  public ModuleLoader modules() {
+    if(modules == null) modules = new ModuleLoader(context);
+    return modules;
+  }
+
+  /**
    * Returns JDBC connections.
    * @return jdbc connections
    */
@@ -529,7 +538,7 @@ public final class QueryContext extends Proc {
     // close client sessions
     if(sessions != null) sessions.close();
     // close dynamically loaded JAR files
-    modules.close();
+    if(modules != null) modules.close();
   }
 
   @Override

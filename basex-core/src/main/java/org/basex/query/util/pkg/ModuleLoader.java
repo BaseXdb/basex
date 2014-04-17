@@ -24,8 +24,7 @@ import org.basex.util.hash.*;
  */
 public final class ModuleLoader {
   /** Default class loader. */
-  private static final ClassLoader LOADER =
-      Thread.currentThread().getContextClassLoader();
+  private static final ClassLoader LOADER = Thread.currentThread().getContextClassLoader();
   /** Cached URLs to be added to the class loader. */
   private final ArrayList<URL> urls = new ArrayList<URL>();
   /** Current class loader. */
