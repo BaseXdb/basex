@@ -760,7 +760,7 @@ public class QueryParser extends InputParser {
     for(final byte[] u : Function.URIS.values()) if(eq(uri, u)) return;
 
     // resolve module uri
-    if(ctx.resources.modules.addImport(uri, info(), this)) return;
+    if(ctx.resources.modules().addImport(uri, info(), this)) return;
 
     throw error(WHICHMODULE, uri);
   }

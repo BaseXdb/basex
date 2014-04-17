@@ -38,7 +38,7 @@ public final class QueryResources {
   private int datas;
 
   /** Module loader. */
-  public final ModuleLoader modules;
+  private ModuleLoader modules;
   /** External resources. */
   private HashMap<Class<? extends DataResources>, DataResources> external = new HashMap<>();
 
@@ -60,7 +60,6 @@ public final class QueryResources {
    */
   QueryResources(final QueryContext qc) {
     this.qc = qc;
-    modules = new ModuleLoader(qc.context);
   }
 
   /**
@@ -111,7 +110,7 @@ public final class QueryResources {
     datas = 0;
 
     // close dynamically loaded JAR files
-    modules.close();
+    if(modules != null) modules.close();
     // close external resources
     for(final DataResources c : external.values()) c.close();
   }
@@ -291,6 +290,15 @@ public final class QueryResources {
   public Updates updates() {
     if(updates == null) updates = new Updates();
     return updates;
+  }
+
+  /**
+   * Returns the module loader.
+   * @return module loader
+   */
+  public ModuleLoader modules() {
+    if(modules == null) modules = new ModuleLoader(qc.context);
+    return modules;
   }
 
   // PRIVATE METHODS ====================================================================

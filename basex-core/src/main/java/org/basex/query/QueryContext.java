@@ -136,6 +136,7 @@ public final class QueryContext extends Proc {
   SerializerOptions serialOpts;
   /** Initial context value. */
   public MainModule ctxItem;
+
   /** Root expression of the query. */
   public MainModule root;
 
@@ -169,7 +170,6 @@ public final class QueryContext extends Proc {
   private QueryContext(final Context context, final QueryContext parent) {
     this.context = context;
     this.parentCtx = parent;
-    nodes = context.current();
     info = new QueryInfo(this);
   }
 
@@ -265,6 +265,8 @@ public final class QueryContext extends Proc {
    * @throws QueryException query exception
    */
   public void compile() throws QueryException {
+    if(nodes == null) nodes = context.current();
+
     // set database options
     final StringList o = tempOpts;
     for(int s = 0; s < o.size(); s += 2) {
