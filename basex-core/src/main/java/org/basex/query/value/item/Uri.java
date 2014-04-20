@@ -3,6 +3,8 @@ package org.basex.query.value.item;
 import static org.basex.query.util.Err.*;
 
 import java.net.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.basex.query.*;
 import org.basex.query.value.type.*;
@@ -17,6 +19,9 @@ import org.basex.util.*;
 public final class Uri extends Str {
   /** Empty URI. */
   public static final Uri EMPTY = new Uri(Token.EMPTY);
+
+  /** URI validation regex as specified by RFC 3986: Appendix B. */
+  private static Pattern VALID_URI = Pattern.compile("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
 
   /**
    * Constructor.
@@ -80,7 +85,9 @@ public final class Uri extends Str {
    * @return result of check
    */
   public boolean isAbsolute() {
-    return Token.contains(val, ':');
+    final Matcher m = getRegexMatcher();
+    // absolute URI has schema and doesn't have fragment
+    return m.matches() && m.group(2) != null && m.group(9) == null;
   }
 
   /**
@@ -88,11 +95,11 @@ public final class Uri extends Str {
    * @return result of check
    */
   public boolean isValid() {
-    try {
-      new URI(Token.string(Token.uri(val, true)));
-      return true;
-    } catch(final URISyntaxException ex) {
-      return false;
-    }
+    return getRegexMatcher().matches();
+  }
+
+  /** Create a regex matcher for the current URI. */
+  private Matcher getRegexMatcher() {
+    return VALID_URI.matcher(Token.string(Token.uri(val, true)));
   }
 }
