@@ -13,8 +13,8 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.basex.*;
-import org.basex.build.JsonOptions.JsonFormat;
 import org.basex.build.*;
+import org.basex.build.JsonOptions.JsonFormat;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
