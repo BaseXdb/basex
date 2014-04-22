@@ -568,8 +568,8 @@ public final class FNFile extends StandardFunc {
       throws QueryException, IOException {
 
     final Path source = checkPath(0, ctx);
-    if(!Files.exists(source)) throw FILE_NOT_FOUND.get(info, source);
-    Path src = absolute(source);
+    final Path src = absolute(source);
+    if(!Files.exists(src)) throw FILE_NOT_FOUND.get(info, source);
     Path trg = absolute(checkPath(1, ctx));
 
     if(Files.isDirectory(trg)) {
