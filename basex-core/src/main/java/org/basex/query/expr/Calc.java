@@ -33,7 +33,8 @@ public enum Calc {
         if(t == ITR) {
           final long l1 = a.itr(ii);
           final long l2 = b.itr(ii);
-          checkRange(ii, l1 + (double) l2);
+          if(l2 > 0 ? l1 > Long.MAX_VALUE - l2
+                    : l1 < Long.MIN_VALUE - l2) throw RANGE.get(ii, l1 + " + " + l2);
           return Int.get(l1 + l2);
         }
         if(t == DBL) return Dbl.get(a.dbl(ii) + b.dbl(ii));
@@ -72,7 +73,8 @@ public enum Calc {
         if(t == ITR) {
           final long l1 = a.itr(ii);
           final long l2 = b.itr(ii);
-          checkRange(ii, l1 - (double) l2);
+          if(l2 < 0 ? l1 > Long.MAX_VALUE + l2
+                    : l1 < Long.MIN_VALUE + l2) throw RANGE.get(ii, l1 + " - " + l2);
           return Int.get(l1 - l2);
         }
         if(t == DBL) return Dbl.get(a.dbl(ii) - b.dbl(ii));
@@ -125,7 +127,10 @@ public enum Calc {
         if(t == ITR) {
           final long l1 = a.itr(ii);
           final long l2 = b.itr(ii);
-          checkRange(ii, l1 * (double) l2);
+          if(l2 > 0 ? l1 > Long.MAX_VALUE / l2 || l1 < Long.MIN_VALUE / l2
+                    : (l2 < -1 ? l1 > Long.MIN_VALUE / l2 || l1 < Long.MAX_VALUE / l2
+                               : l2 == -1 && l1 == Long.MIN_VALUE))
+            throw RANGE.get(ii, l1 + " * " + l2);
           return Int.get(l1 * l2);
         }
         if(t == DBL) return Dbl.get(a.dbl(ii) * b.dbl(ii));
@@ -173,7 +178,7 @@ public enum Calc {
       final BigDecimal b2 = b.dec(ii);
       if(b2.signum() == 0) throw DIVZERO.get(ii, chop(a));
       final int s = Math.max(18, Math.max(b1.scale(), b2.scale()));
-      return Dec.get(b1.divide(b2, s, BigDecimal.ROUND_HALF_EVEN));
+      return Dec.get(b1.divide(b2, s, RoundingMode.HALF_EVEN));
     }
   },
 
@@ -182,13 +187,32 @@ public enum Calc {
     @Override
     public Item ev(final InputInfo ii, final Item a, final Item b) throws QueryException {
       checkNum(ii, a, b);
-      final double d1 = a.dbl(ii);
-      final double d2 = b.dbl(ii);
-      if(d2 == 0) throw DIVZERO.get(ii, chop(a));
-      final double d = d1 / d2;
-      if(Double.isNaN(d) || Double.isInfinite(d)) throw DIVFLOW.get(ii, d1, d2);
-      checkRange(ii, d);
-      return Int.get(type(a.type, b.type) == ITR ? a.itr(ii) / b.itr(ii) : (long) d);
+      final Type t = type(a.type, b.type);
+      if(t == DBL || t == FLT) {
+        final double d1 = a.dbl(ii);
+        final double d2 = b.dbl(ii);
+        if(d2 == 0) throw DIVZERO.get(ii, chop(a));
+        final double d = d1 / d2;
+        if(Double.isNaN(d) || Double.isInfinite(d)) throw DIVFLOW.get(ii, d1, d2);
+        if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw RANGE.get(ii, d1 + " idiv " + d2);
+        return Int.get((long) d);
+      }
+
+      if(t == ITR) {
+        final long b1 = a.itr(ii);
+        final long b2 = b.itr(ii);
+        if(b2 == 0) throw DIVZERO.get(ii, chop(a));
+        if(b1 == Integer.MIN_VALUE && b2 == -1) throw RANGE.get(ii, b1 + " idiv " + b2);
+        return Int.get(b1 / b2);
+      }
+
+      final BigDecimal b1 = a.dec(ii);
+      final BigDecimal b2 = b.dec(ii);
+      if(b2.signum() == 0) throw DIVZERO.get(ii, chop(a));
+      final BigDecimal res = b1.divideToIntegralValue(b2);
+      if(!(MIN_LONG.compareTo(res) <= 0 && res.compareTo(MAX_LONG) <= 0))
+        throw RANGE.get(ii, b1 + " idiv " + b2);
+      return Int.get(res.longValueExact());
     }
   },
 
@@ -214,6 +238,11 @@ public enum Calc {
       return Dec.get(b1.subtract(q.multiply(b2)));
     }
   };
+
+  /** {@link Long#MIN_VALUE} as a {@link BigDecimal}. */
+  private static final BigDecimal MIN_LONG = BigDecimal.valueOf(Long.MIN_VALUE);
+  /** {@link Long#MAX_VALUE} as a {@link BigDecimal}. */
+  private static final BigDecimal MAX_LONG = BigDecimal.valueOf(Long.MAX_VALUE);
 
   /** Name of operation. */
   final String name;
@@ -294,16 +323,6 @@ public enum Calc {
   final void checkNum(final InputInfo ii, final Item a, final Item b) throws QueryException {
     if(!a.type.isNumberOrUntyped()) throw numError(ii, a);
     if(!b.type.isNumberOrUntyped()) throw numError(ii, b);
-  }
-
-  /**
-   * Checks if the specified value is outside the integer range.
-   * @param ii input info
-   * @param d value to be checked
-   * @throws QueryException query exception
-   */
-  private static void checkRange(final InputInfo ii, final double d) throws QueryException {
-    if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw RANGE.get(ii, d);
   }
 
   /**
