@@ -19,7 +19,7 @@ public final class Uri extends Str {
   /** Empty URI. */
   public static final Uri EMPTY = new Uri(Token.EMPTY);
   /** URI validation regex as specified by RFC 3986: Appendix B. */
-  private static Pattern VALID_URI = Pattern.compile(
+  private static final Pattern VALID_URI = Pattern.compile(
       "^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
 
   /**

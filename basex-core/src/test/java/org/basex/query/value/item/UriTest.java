@@ -1,4 +1,4 @@
-﻿package org.basex.query.value.item;
+package org.basex.query.value.item;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -52,6 +52,7 @@ public class UriTest {
    * @param expected expected value
    */
   private static void assertUriIsAbsolute(final String uri, final boolean expected) {
-    assertEquals("Uri absolute check failed for '" + uri + "'", expected, Uri.uri(uri).isAbsolute());
+    assertEquals("Uri absolute check failed for '" + uri + "'", expected,
+        Uri.uri(uri).isAbsolute());
   }
 }
