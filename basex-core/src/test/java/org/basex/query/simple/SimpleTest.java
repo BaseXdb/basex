@@ -152,7 +152,19 @@ public final class SimpleTest extends QueryTest {
         "local:foo()')" },
       { "FuncTest 3", "local:a(), local:a(1)" },
 
-      { "StaticVar 1", "declare variable $CONFIG := $CONFIG; delete node <a/>" }
+      { "StaticVar 1", "declare variable $CONFIG := $CONFIG; delete node <a/>" },
+
+      { "Limits 1", itr(9223372036854775806L), "2 * 4611686018427387903" },
+      { "Limits 2", "2 * 4611686018427387904" }, // overflow
+      { "Limits 3", itr(-9223372036854775808L), "-2 * 4611686018427387904" },
+      { "Limits 4", "4611686018427387905 * -2" }, // underflow
+      { "Limits 5", itr(-9223372036854775808L), "xs:decimal('18446744073709551616') idiv -2" },
+      { "Limits 6", "xs:decimal('18446744073709551616') idiv 2" }, // does not fit
+      { "Limits 7", itr(9223372036854775806L), "xs:decimal('18446744073709551612') idiv 2" },
+      { "Limits 8", "-9223372036854775808 idiv -1" },
+      { "Limits 9", "-9223372036854775807 - 1024" },
+      { "Limits 10", "-9223372036854775808 - 1" },
+      // { "Limits 11", itr(-9223372036854775808L), "-9223372036854775808" },
     };
   }
 }
