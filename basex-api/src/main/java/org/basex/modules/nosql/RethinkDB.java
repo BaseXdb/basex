@@ -116,7 +116,6 @@ public class RethinkDB extends Nosql {
         RqlConnection r = getRethikClient(handler);
         try {
            RqlCursor result = r.run(q);
-           System.out.println(result);
            return processRqlCursor(handler, result);
         } catch (RqlDriverException e) {
            throw new QueryException(e);

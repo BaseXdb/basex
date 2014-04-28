@@ -4,24 +4,56 @@ import org.basex.query.*;
 import org.junit.*;
 
 /**
- * This class tests the functions of the MongoDB Module.
+ * This class tests the functions of the RethinkDB Module.
  * This class contains only tests signatures.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Prakash Thapa
  */
-public final class MongoDBTest extends AdvancedQueryTest {
+public final class RethinkDBTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void connection() {
   }
   /** Test method. */
   @Test
-  public void find() {
+  public void dbCreate() {
   }
   /** Test method. */
   @Test
-  public void findOne() {
+  public void dbDrop() {
+  }
+  /** Test method. */
+  @Test
+  public void dbList() {
+  }
+  /** Test method. */
+  @Test
+  public void tableCreate() {
+  }
+  /** Test method. */
+  @Test
+  public void tableList() {
+  }
+  /** Test method. */
+  @Test
+  public void table() {
+  }
+  /** Test method. */
+  @Test
+  public void dropTable() {
+  }
+  /** Test method. */
+  @Test
+  public void indexCreate() {
+  }
+  /** Test method. */
+  @Test
+  public void indexList() {
+  }
+  /** Test method. */
+  @Test
+  public void indexDrop() {
   }
   /** Test method. */
   @Test
@@ -33,46 +65,14 @@ public final class MongoDBTest extends AdvancedQueryTest {
   }
   /** Test method. */
   @Test
-  public void save() {
+  public void get() {
   }
   /** Test method. */
   @Test
-  public void aggregate() {
+  public void getAll() {
   }
   /** Test method. */
   @Test
-  public void copy() {
-  }
-  /** Test method. */
-  @Test
-  public void count() {
-  }
-  /** Test method. */
-  @Test
-  public void ensureIndex() {
-  }
-  /** Test method. */
-  @Test
-  public void dropIndex() {
-  }
-  /** Test method. */
-  @Test
-  public void mapreduce() {
-  }
-  /** Test method. */
-  @Test
-  public void runCommand() {
-  }
-  /** Test method. */
-  @Test
-  public void drop() {
-  }
-  /** Test method. */
-  @Test
-  public void remove() {
-  }
-  /** Test method. */
-  @Test
-  public void close() {
+  public void delete() {
   }
 }

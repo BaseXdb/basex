@@ -1,11 +1,9 @@
 package org.basex.modules.nosql;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+
 import net.spy.memcached.internal.OperationFuture;
 
 import org.basex.query.QueryException;
@@ -416,19 +414,7 @@ public class Couchbase extends Nosql {
         }
     }
     /**
-     * Get data from view without any option.
-     * @param handler database handler
-     * @param doc document name
-     * @param viewName view name
-     * @return Item
-     * @throws QueryException query exception
-     */
-    public Item getview(final Str handler, final Str doc, final Str viewName)
-            throws QueryException {
-        return getview(handler, doc, viewName, null);
-    }
-    /**
-     * Map.
+     * convert Map of Basex to the query object of Couchbase.
      * @param options Query in map  like {'limit':1}
      * @return Query
      * @throws QueryException query exception
@@ -533,6 +519,18 @@ public class Couchbase extends Nosql {
         return q;
     }
     /**
+     * Get data from view without any option.
+     * @param handler database handler
+     * @param doc document name
+     * @param viewName view name
+     * @return Item
+     * @throws QueryException query exception
+     */
+    public Item getview(final Str handler, final Str doc, final Str viewName)
+            throws QueryException {
+        return getview(handler, doc, viewName, null);
+    }
+    /**
      * view with mode Option.
      * @param handler database handler
      * @param doc document name
@@ -544,8 +542,8 @@ public class Couchbase extends Nosql {
     public Item getview(final Str handler, final Str doc, final Str viewName,
             final Map query) throws QueryException {
         final CouchbaseClient client = getClient(handler);
+        valueOnly = false;
         Query q = this.query(query);
-        valueOnly = true;
         try {
             View view = client.getView(doc.toJava(), viewName.toJava());
             ViewResponse response = client.query(view, q);
@@ -611,9 +609,7 @@ public class Couchbase extends Nosql {
      */
     protected Str viewResponseToJsonValueOnly(final ViewResponse viewResponse) {
         final StringBuilder json = new StringBuilder();
-        if(viewResponse.size() > 1) {
-            json.append("[ ");
-        }
+        json.append("[ ");
         for (ViewRow v: viewResponse) {
             if(json.length() > 2) json.append(", ");
             //json.append('"').append(v.getKey()).append('"').append(" : ");
@@ -629,9 +625,7 @@ public class Couchbase extends Nosql {
                 json.append('"').append("").append('"');
             }
         }
-        if(viewResponse.size() > 1) {
-            json.append(" ] ");
-        }
+        json.append(" ] ");
         return Str.get(json.toString());
     }
     /**
