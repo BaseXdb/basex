@@ -130,6 +130,7 @@ explorer             = Обозреватель
 export               = Экспорт
 file                 = файл
 file_exists_%        = "%" уже существует.\nЗаменить его?
+file_filter          = File Filter
 file_not_deleted_%   = Не получилось удалить файл "%".
 file_not_opened_%    = Не удалось открыть файл "%".
 file_not_renamed_%   = Не удалось переименовать файл "%".

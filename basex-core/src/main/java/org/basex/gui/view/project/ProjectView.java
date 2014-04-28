@@ -174,6 +174,13 @@ public final class ProjectView extends BaseXPanel {
   }
 
   /**
+   * Called when GUI design has changed.
+   */
+  public void refreshLayout() {
+    filter.refreshLayout();
+  }
+
+  /**
    * Focuses the project filter.
    * @param ea calling editor
    */

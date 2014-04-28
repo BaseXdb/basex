@@ -8,6 +8,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.plaf.basic.*;
 
+import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.data.*;
 import org.basex.gui.layout.*;
@@ -121,7 +122,7 @@ public final class GUIInput extends BaseXTextField {
    */
   void mode(final String mode) {
     setText("");
-    hint(mode);
+    hint(mode + Text.DOTS);
   }
 
   /**

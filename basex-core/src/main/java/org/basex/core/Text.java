@@ -1263,6 +1263,8 @@ public interface Text {
   String SAVE_BEFORE_EXECUTE = lang("save_before_execute");
   /** Automatically add characters. */
   String AUTO_ADD_CHARS = lang("auto_add_chars");
+  /** Default file filter. */
+  String FILE_FILTER = lang("file_filter");
 
   /** Comment. */
   String COMMENT = lang("comment");

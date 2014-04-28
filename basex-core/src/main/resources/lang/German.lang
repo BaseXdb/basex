@@ -130,6 +130,7 @@ explorer             = Explorer
 export               = Exportieren
 file                 = Datei
 file_exists_%        = "%" besteht bereits.\nMöchten Sie sie ersetzen?
+file_filter          = Datei-Filter
 file_not_deleted_%   = "%" konnte nicht gelöscht werden.
 file_not_opened_%    = "%" konnte nicht geöffnet werden.
 file_not_renamed_%   = "%" konnte nicht umbenannt werden.

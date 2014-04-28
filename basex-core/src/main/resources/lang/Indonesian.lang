@@ -130,6 +130,7 @@ explorer             = Penelusur
 export               = Ekspor
 file                 = Berkas
 file_exists_%        = "%" sudah ada.\nApakah anda ingin menggantinya?
+file_filter          = File Filter
 file_not_deleted_%   = "%" tidak dapat dihapus.
 file_not_opened_%    = "%" tidak dapat dibuka.
 file_not_renamed_%   = "%" tidak dapat diganti nana.

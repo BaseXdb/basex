@@ -130,6 +130,7 @@ explorer             = Нээгч
 export               = экспортлох
 file                 = Файл
 file_exists_%        = "%" аль хэдийнэ үүссэн байна.\nҮүнийг шинээр үүсгэх үү?
+file_filter          = File Filter
 file_not_deleted_%   = Файл "%" нь устгагдаагүй байна.
 file_not_opened_%    = Файл "%" нээгдэхгүй байна.
 file_not_renamed_%   = "%" could not be renamed.

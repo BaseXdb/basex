@@ -287,6 +287,7 @@ public final class EditorView extends View {
     final Font ef = GUIConstants.font.deriveFont(7f + (fontSize >> 1));
     info.setFont(ef);
     pos.setFont(ef);
+    project.refreshLayout();
   }
 
   @Override
