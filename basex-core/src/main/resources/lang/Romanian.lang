@@ -130,6 +130,7 @@ explorer             = Explorer
 export               = Exporta
 file                 = Fișier
 file_exists_%        = "%" deja există. \n Doriţi să-l înlocuiasc?
+file_filter          = File Filter
 file_not_deleted_%   = "%" nu a putut fi şters.
 file_not_opened_%    = "%" nu a putut fi deschis.
 file_not_renamed_%   = "%" could not be renamed.

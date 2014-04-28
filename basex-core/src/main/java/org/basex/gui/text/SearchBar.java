@@ -68,12 +68,12 @@ public final class SearchBar extends BaseXBack {
     search = new BaseXTextField(main);
     search.history(GUIOptions.SEARCHED, gui);
     search.setPreferredSize(null);
-    search.hint(Text.FIND);
+    search.hint(Text.FIND + Text.DOTS);
 
     replace = new BaseXTextField(main);
     replace.history(GUIOptions.REPLACED, gui);
     replace.setPreferredSize(null);
-    replace.hint(Text.REPLACE_WITH);
+    replace.hint(Text.REPLACE_WITH + Text.DOTS);
 
     regex = onOffButton("f_regex", Text.REGULAR_EXPR, GUIOptions.SR_REGEX);
     mcase = onOffButton("f_case", Text.MATCH_CASE, GUIOptions.SR_CASE);

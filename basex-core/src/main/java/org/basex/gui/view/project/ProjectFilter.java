@@ -55,11 +55,10 @@ final class ProjectFilter extends BaseXBack {
 
     layout(new BorderLayout(0, 2));
     files = new BaseXTextField(view.gui);
-    files.hint(Text.FIND_FILES);
     files.addFocusListener(project.lastfocus);
 
     contents = new BaseXTextField(view.gui);
-    contents.hint(Text.FIND_CONTENTS);
+    contents.hint(Text.FIND_CONTENTS + Text.DOTS);
     contents.addFocusListener(project.lastfocus);
 
     add(files, BorderLayout.NORTH);
@@ -91,6 +90,7 @@ final class ProjectFilter extends BaseXBack {
     };
     files.addKeyListener(refreshKeys);
     contents.addKeyListener(refreshKeys);
+    refreshLayout();
   }
 
   /**
@@ -228,20 +228,29 @@ final class ProjectFilter extends BaseXBack {
     files.requestFocusInWindow();
   }
 
+  /**
+   * Called when GUI design has changed.
+   */
+  public void refreshLayout() {
+    final String filter = project.gui.gopts.get(GUIOptions.FILES).trim();
+    files.hint(filter.isEmpty() ? Text.FIND_FILES + Text.DOTS : filter);
+  }
+
   // PRIVATE METHODS ==============================================================================
 
   /**
    * Chooses tokens from the file cache that match the specified pattern.
-   * @param pattern file pattern
+   * @param file file pattern
    * @param search search string
    * @param thread current thread id
    * @param results search result
    * @return success flag
    */
-  private boolean filter(final String pattern, final int[] search, final int thread,
+  private boolean filter(final String file, final int[] search, final int thread,
       final TokenSet results) {
 
     // glob pattern
+    final String pattern = file.isEmpty() ? project.gui.gopts.get(GUIOptions.FILES) : file;
     if(pattern.contains("*") || pattern.contains("?")) {
       final Pattern pt = Pattern.compile(IOFile.regex(pattern));
       for(final byte[] input : cache) {

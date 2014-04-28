@@ -130,6 +130,7 @@ explorer             = Verkenner
 export               = Exporteer
 file                 = bestand
 file_exists_%        = "%" bestaat al.\nWil je het vervangen?
+file_filter          = File Filter
 file_not_deleted_%   = "%" kon niet verwijderd worden.
 file_not_opened_%    = "%" kon niet geopend worden.
 file_not_renamed_%   = "%" kon niet hernoemd worden.
