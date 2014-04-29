@@ -99,6 +99,17 @@ public final class RestXqTest extends HTTPTest {
     getE(f, "2/x");
   }
 
+  /** Retrieve path with encoded URI.
+   * @throws Exception exception */
+  @Test public void getEncodedURI() throws Exception {
+    get("declare %R:path('%7b') function m:f() {1};", "%7b", "1");
+    get("declare %R:path('%7b') function m:f() {1};", "%7B", "1");
+    get("declare %R:path('%7B') function m:f() {1};", "%7b", "1");
+    get("declare %R:path('%7C') function m:f() {1};", "%7C", "1");
+    getE("declare %R:path('%F') function m:f() {1};", "");
+    getE("declare %R:path('%') function m:f() {1};", "");
+  }
+
   /** Checks if undeclared functions are reported. */
   @Test public void unknownFunction() {
     try {
