@@ -36,7 +36,7 @@ public final class HTTPContext {
   /** Servlet response. */
   public final HttpServletResponse res;
   /** Request method. */
-  public final HTTPMethod method;
+  public final String method;
   /** Request method. */
   public final HTTPParams params;
 
@@ -74,7 +74,7 @@ public final class HTTPContext {
     params = new HTTPParams(this);
 
     final String mth = rq.getMethod();
-    method = HTTPMethod.get(mth);
+    method = mth;
 
     final StringBuilder uri = new StringBuilder(req.getRequestURL());
     final String qs = req.getQueryString();

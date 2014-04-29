@@ -37,11 +37,12 @@ public final class RESTServlet extends BaseXServlet {
    * @throws IOException I/O exception
    */
   private static RESTCmd code(final RESTSession rs) throws IOException {
-    final HTTPMethod mth = rs.http.method;
-    if(mth == HTTPMethod.GET)    return RESTGet.get(rs);
-    if(mth == HTTPMethod.POST)   return RESTPost.get(rs);
-    if(mth == HTTPMethod.PUT)    return RESTPut.get(rs);
-    if(mth == HTTPMethod.DELETE) return RESTDelete.get(rs);
-    throw HTTPCode.NOT_IMPLEMENTED_X.get(rs.http.req.getMethod());
+    switch(rs.http.method.toUpperCase()) {
+      case "GET":    return RESTGet.get(rs);
+      case "POST":   return RESTPost.get(rs);
+      case "PUT":    return RESTPut.get(rs);
+      case "DELETE": return RESTDelete.get(rs);
+      default: throw HTTPCode.NOT_IMPLEMENTED_X.get(rs.http.method);
+    }
   }
 }

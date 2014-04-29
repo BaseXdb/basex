@@ -38,7 +38,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   private static final Pattern TEMPLATE = Pattern.compile("\\s*\\{\\s*\\$(.+?)\\s*\\}\\s*");
 
   /** Supported methods. */
-  EnumSet<HTTPMethod> methods = EnumSet.allOf(HTTPMethod.class);
+  final Set<String> methods = new HashSet<>();
   /** Serialization parameters. */
   final SerializerOptions output;
   /** Associated function. */
@@ -107,7 +107,6 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    */
   boolean parse() throws QueryException {
     // parse all annotations
-    final EnumSet<HTTPMethod> mth = EnumSet.noneOf(HTTPMethod.class);
     final boolean[] declared = new boolean[function.args.length];
     boolean found = false;
     final int as = function.ann.size();
@@ -151,18 +150,19 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         } else if(eq(ERROR_PARAM, local)) {
           // annotation "error-param"
           errorParams.add(param(value, name, declared));
+        } else if(eq(HTTP_METHOD, local)) {
+          // annotation "http-method"
+          if(value.size() < 1) throw error(function.info, ANN_ATLEAST, "%", name.string(), 1);
+          final String methodString = toString(value.itemAt(0), name);
+          final HTTPMethod m = get(methodString);
+          final Value bodyVar = value.size() > 1 ? value.itemAt(1) : null;
+          addMethod(methodString, m, bodyVar, name, declared, info);
         } else {
           // method annotations
-          final HTTPMethod m = get(string(local));
+          final String methodString = string(local);
+          final HTTPMethod m = get(methodString);
           if(m == null) throw error(info, ANN_UNKNOWN, "%", name.string());
-          if(!value.isEmpty()) {
-            // remember post/put variable
-            if(!m.body) throw error(info, METHOD_VALUE, m);
-            if(requestBody != null) throw error(info, ANN_BODYVAR);
-            requestBody = checkVariable(toString(value, name), declared);
-          }
-          if(mth.contains(m)) throw error(info, ANN_TWICE, "%", name.string());
-          mth.add(m);
+          addMethod(methodString, m, value, name, declared, info);
         }
       } else if(eq(uri, QueryText.OUTPUTURI)) {
         // serialization parameters
@@ -174,7 +174,6 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       }
       found |= rexq;
     }
-    if(!mth.isEmpty()) methods = mth;
 
     if(found) {
       if(path == null && error == null)
@@ -189,6 +188,27 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   }
 
   /**
+   * Add a HTTP method to the list of supported methods by this RESTXQ function.
+   * @param methodString HTTP method as a string
+   * @param m HTTP method as an enum value (optional)
+   * @param bodyVar variable to which the HTTP request body to be bound (optional)
+   * @param annotation RESTXQ annotation specifying the HTTP method
+   * @param declared variable declaration flags
+   * @param info input info
+   * @throws QueryException
+   */
+  private void addMethod(final String methodString, final HTTPMethod m, final Value bodyVar, final QNm annotation,
+      final boolean[] declared, final InputInfo info) throws QueryException {
+    if (bodyVar != null && !bodyVar.isEmpty()) {
+      if (m != null && !m.body) throw error(info, METHOD_VALUE, m);
+      if(requestBody != null) throw error(info, ANN_BODYVAR);
+      requestBody = checkVariable(toString(bodyVar, annotation), declared);
+    }
+    if(methods.contains(methodString)) throw error(info, ANN_TWICE, "%", annotation.string());
+    methods.add(methodString);
+  }
+
+  /**
    * Checks if an HTTP request matches this function and its constraints.
    * @param http http context
    * @param err error code
@@ -196,7 +216,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    */
   boolean matches(final HTTPContext http, final QNm err) {
     // check method, consumed and produced media type, and path or error
-    return methods.contains(http.method) && consumes(http) && produces(http) &&
+    return (methods.isEmpty() || methods.contains(http.method)) && consumes(http) && produces(http) &&
         (err == null ? path != null && path.matches(http) :
           error != null && error.matches(err));
   }

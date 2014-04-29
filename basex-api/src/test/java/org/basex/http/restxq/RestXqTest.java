@@ -392,6 +392,37 @@ public final class RestXqTest extends HTTPTest {
         "function m:b($x) { $x };", "", "!!!");
   }
 
+  @Test public void httpMethod() throws Exception {
+    // standard HTTP method without body
+    get("declare %R:http-method('GET') %R:path('') function m:f() {'x'};", "", "x");
+    // standard HTTP method specified twice
+    getE("declare %R:http-method('GET') %R:GET %R:path('') function m:f() {'x'};", "");
+    // standard HTTP method without body, body provided in request
+    getE("declare %R:http-method('GET', '{$b}') %R:path('') function m:f($b) {$b};", "");
+    // standard HTTP method with body, body provided in request
+    post("declare %R:http-method('POST', '{$b}') %R:path('') function m:f($b) {$b};", "12", "12", MimeTypes.TEXT_PLAIN);
+
+    // custom HTTP method without body
+    install("declare %R:http-method('RETRIEVE') %R:path('') function m:f() {'x'};");
+    // TODO java.net.HttpUrlConnection does not support custom HTTP methods
+    // assertEquals("x", request("", "RETRIEVE"));
+
+    // custom HTTP method with body
+    install("declare %R:http-method('RETRIEVE', '{$b}') %R:path('') function m:f($b) {$b};");
+    // TODO java.net.HttpUrlConnection does not support custom HTTP methods
+    // assertEquals("12", request("", "RETRIEVE", "12", MimeTypes.TEXT_PLAIN));
+
+    // custom HTTP method specified twice
+    final String q = "declare %R:http-method('RETRIEVE') %R:http-method('RETRIEVE') %R:path('') function m:f() {'x'};";
+    install(q);
+    try {
+      // TODO java.net.HttpUrlConnection does not support custom HTTP methods
+      request("", "RETRIEVE");
+      fail("Error expected: " + q);
+    } catch (final BaseXException ignored) {
+    }
+  }
+
   // PRIVATE METHODS ==========================================================
 
   /**
@@ -404,7 +435,7 @@ public final class RestXqTest extends HTTPTest {
    * @throws IOException I/O exception
    */
   private static void post(final String function, final String exp,
-                           final String request, final String type) throws IOException {
+      final String request, final String type) throws IOException {
     install(function);
     assertEquals(exp, post("", request, type));
   }

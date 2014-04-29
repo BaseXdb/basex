@@ -95,7 +95,7 @@ final class RestXqRespBuilder {
     Item item = iter.next();
     if(item == null) {
       error = true;
-    } else if(func.methods.size() == 1 && func.methods.contains(HTTPMethod.HEAD)) {
+    } else if(func.methods.size() == 1 && func.methods.contains(HTTPMethod.HEAD.toString())) {
       throw func.error(HEAD_METHOD);
     }
 

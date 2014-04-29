@@ -112,7 +112,7 @@ public abstract class HTTPTest extends SandboxTest {
   }
 
   /**
-   * Executes the specified GET request and returns the result.
+   * Executes the specified HTTP request and returns the result.
    * @param query request
    * @param method HTTP method
    * @return string result, or {@code null} for a failure.
@@ -120,12 +120,59 @@ public abstract class HTTPTest extends SandboxTest {
    */
   private static String request(final String query, final HTTPMethod method)
       throws IOException {
+    return request(query, method.name());
+  }
+
+  /**
+   * Executes the specified HTTP request and returns the result.
+   * @param query request
+   * @param method HTTP method
+   * @return string result, or {@code null} for a failure.
+   * @throws IOException I/O exception
+   */
+  protected static String request(final String query, final String method)
+      throws IOException {
 
     final URL url = new URL(root + query);
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     try {
-      conn.setRequestMethod(method.name());
+      conn.setRequestMethod(method);
       return read(new BufferInput(conn.getInputStream())).replaceAll("\r?\n *", "");
+    } catch(final IOException ex) {
+      throw error(conn, ex);
+    } finally {
+      conn.disconnect();
+    }
+  }
+
+  /**
+   * Executes the specified PUT request.
+   * @param query path
+   * @param method HTTP method
+   * @param request request
+   * @param type content type
+   * @return string result, or {@code null} for a failure.
+   * @throws IOException I/O exception
+   */
+  protected static String request(final String query, final String method, final String request, final String type)
+      throws IOException {
+
+    // create connection
+    final URL url = new URL(root + query);
+    final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    conn.setDoOutput(true);
+    conn.setRequestMethod(method);
+    conn.setRequestProperty(MimeTypes.CONTENT_TYPE, type);
+    // basic authentication
+    final String encoded = Base64.encode(Text.S_ADMIN + ':' + Text.S_ADMIN);
+    conn.setRequestProperty(HTTPText.AUTHORIZATION, HTTPText.BASIC + ' ' + encoded);
+    // send query
+    try(final OutputStream out = conn.getOutputStream()) {
+      out.write(token(request));
+    }
+
+    try {
+      return read(conn.getInputStream()).replaceAll("\r?\n *", "");
     } catch(final IOException ex) {
       throw error(conn, ex);
     } finally {
@@ -143,28 +190,7 @@ public abstract class HTTPTest extends SandboxTest {
    */
   protected static String post(final String query, final String request, final String type)
       throws IOException {
-
-    // create connection
-    final URL url = new URL(root + query);
-    final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-    conn.setDoOutput(true);
-    conn.setRequestMethod(POST.name());
-    conn.setRequestProperty(MimeTypes.CONTENT_TYPE, type);
-    // basic authentication
-    final String encoded = Base64.encode(Text.S_ADMIN + ':' + Text.S_ADMIN);
-    conn.setRequestProperty(HTTPText.AUTHORIZATION, HTTPText.BASIC + ' ' + encoded);
-    // send query
-    try(final OutputStream out = conn.getOutputStream()) {
-      out.write(token(request));
-    }
-
-    try {
-      return read(conn.getInputStream()).replaceAll("\r?\n *", "");
-    } catch(final IOException ex) {
-      throw error(conn, ex);
-    } finally {
-      conn.disconnect();
-    }
+    return request(query, POST.name(), request, type);
   }
 
   /**

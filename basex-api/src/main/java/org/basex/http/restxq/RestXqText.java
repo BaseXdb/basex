@@ -18,6 +18,8 @@ public interface RestXqText {
   byte[] ERROR = token("error");
   /** Token "path". */
   byte[] PATH = token("path");
+  /** Token "http-method". */
+  byte[] HTTP_METHOD = token("http-method");
   /** Token "produces". */
   byte[] PRODUCES = token("produces");
   /** Token "consumes". */
