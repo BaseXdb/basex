@@ -521,61 +521,58 @@ public class FnHttpTest extends HTTPTest {
     assertEquals("a<b>b</b>", fakeConn3.out.toString());
   }
 
-  /*
-   * Tests writing of body content when @method is http:base64Binary.
+  /**
+   * Tests writing of body content when @method is raw and output is xs:base64Binary.
    * @throws IOException I/O Exception
+   */
   @Test
   public void writeBase64() throws IOException {
     // Case 1: content is xs:base64Binary
     final HTTPRequest req1 = new HTTPRequest();
-    req1.payloadAttrs.put(METHOD, token("http:base64Binary"));
+    req1.payloadAttrs.put("method", "raw");
+
     req1.bodyContent.add(new B64(token("dGVzdA==")));
-    final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
-        "http://www.test.com"));
+    final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL("http://www.test.com"));
     HTTPClient hc = new HTTPClient(null, ctx.options);
     hc.setRequestContent(fakeConn1.getOutputStream(), req1);
     assertEquals(fakeConn1.out.toString(), "dGVzdA==");
 
     // Case 2: content is a node
     final HTTPRequest req2 = new HTTPRequest();
-    req2.payloadAttrs.put(METHOD, token("http:base64Binary"));
+    req2.payloadAttrs.put("method", "raw");
     final FElem e3 = new FElem("a").add("dGVzdA==");
     req2.bodyContent.add(e3);
-    final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
-        "http://www.test.com"));
+    final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL("http://www.test.com"));
     hc = new HTTPClient(null, ctx.options);
     hc.setRequestContent(fakeConn2.getOutputStream(), req2);
     assertEquals(fakeConn2.out.toString(), "dGVzdA==");
   }
-   */
 
-  /*
-   * Tests writing of body content when @method is http:hexBinary.
+  /**
+   * Tests writing of body content when @method is raw and output is xs:hexBinary.
    * @throws IOException I/O Exception
+   */
   @Test
   public void writeHex() throws IOException {
     // Case 1: content is xs:hexBinary
     final HTTPRequest req1 = new HTTPRequest();
-    req1.payloadAttrs.put(METHOD, token("http:hexBinary"));
+    req1.payloadAttrs.put("method", "raw");
     req1.bodyContent.add(new Hex(token("74657374")));
-    final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
-        "http://www.test.com"));
+    final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL("http://www.test.com"));
     HTTPClient hc = new HTTPClient(null, ctx.options);
     hc.setRequestContent(fakeConn1.getOutputStream(), req1);
     assertEquals(fakeConn1.out.toString(), "74657374");
 
     // Case 2: content is a node
     final HTTPRequest req2 = new HTTPRequest();
-    req2.payloadAttrs.put(METHOD, token("http:base64Binary"));
+    req2.payloadAttrs.put("method", "raw");
     final FElem e3 = new FElem("a").add("74657374");
     req2.bodyContent.add(e3);
-    final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
-        "http://www.test.com"));
+    final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL("http://www.test.com"));
     hc = new HTTPClient(null, ctx.options);
     hc.setRequestContent(fakeConn2.getOutputStream(), req2);
     assertEquals(fakeConn2.out.toString(), "74657374");
   }
-   */
 
   /**
    * Tests writing of request content when @src is set.
