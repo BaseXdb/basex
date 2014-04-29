@@ -7,6 +7,7 @@ import static org.basex.io.MimeTypes.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.net.*;
 import java.util.*;
 
 import javax.servlet.*;
@@ -82,7 +83,7 @@ public final class HTTPContext {
 
     // set UTF8 as default encoding (can be overwritten)
     res.setCharacterEncoding(UTF8);
-    segments = toSegments(req.getPathInfo());
+    segments = decode(toSegments(req.getPathInfo()));
 
     // adopt servlet-specific credentials or use global ones
     final GlobalOptions mprop = context().globalopts;
@@ -401,6 +402,24 @@ public final class HTTPContext {
       if(!tb.isEmpty()) sl.add(tb.toString());
     }
     return sl.toArray();
+  }
+
+  /**
+   * Decodes the specified path segments.
+   * @param segments strings to be decoded
+   * @return argument
+   * @throws IllegalArgumentException invalid path segments
+   */
+  public static String[] decode(final String[] segments) {
+    try {
+      final int sl = segments.length;
+      for(int s = 0; s < sl; s++) {
+        segments[s] = URLDecoder.decode(segments[s], Prop.ENCODING);
+      }
+      return segments;
+    } catch(final UnsupportedEncodingException ex) {
+      throw new IllegalArgumentException(ex);
+    }
   }
 
   // PRIVATE METHODS ====================================================================
