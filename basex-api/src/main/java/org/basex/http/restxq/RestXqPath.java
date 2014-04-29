@@ -1,10 +1,6 @@
 package org.basex.http.restxq;
 
-import java.io.*;
-import java.net.*;
-
 import org.basex.http.*;
-import org.basex.util.*;
 
 /**
  * This class represents the path of a RESTXQ function.
@@ -28,14 +24,8 @@ final class RestXqPath implements Comparable<RestXqPath> {
     segment = HTTPContext.toSegments(path);
     size = segment.length;
     template = new boolean[size];
-    try {
-      for(int s = 0; s < size; s++) {
-        template[s] = segment[s].trim().startsWith("{");
-        segment[s] = URLDecoder.decode(segment[s], Prop.ENCODING);
-      }
-    } catch(final UnsupportedEncodingException ex) {
-      throw new IllegalArgumentException(ex);
-    }
+    for(int s = 0; s < size; s++) template[s] = segment[s].trim().startsWith("{");
+    HTTPContext.decode(segment);
   }
 
   /**
