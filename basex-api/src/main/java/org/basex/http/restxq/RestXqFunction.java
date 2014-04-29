@@ -122,9 +122,13 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         if(eq(PATH, local)) {
           // annotation "path"
           if(path != null) throw error(info, ANN_TWICE, "%", name.string());
-          path = new RestXqPath(toString(value, name));
-          for(final String s : path) {
-            if(s.trim().startsWith("{")) checkVariable(s, AtomType.AAT, declared);
+          try {
+            path = new RestXqPath(toString(value, name));
+          } catch(final IllegalArgumentException ex) {
+            throw error(info, ex.getMessage());
+          }
+          for(int s = 0; s < path.size; s++) {
+            if(path.isTemplate(s)) checkVariable(path.segment[s], AtomType.AAT, declared);
           }
         } else if(eq(ERROR, local)) {
           // annotation "error"
@@ -197,8 +201,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   boolean matches(final HTTPContext http, final QNm err) {
     // check method, consumed and produced media type, and path or error
     return methods.contains(http.method) && consumes(http) && produces(http) &&
-        (err == null ? path != null && path.matches(http) :
-          error != null && error.matches(err));
+        (err == null ? path != null && path.matches(http) : error != null && error.matches(err));
   }
 
   /**
