@@ -36,7 +36,7 @@ public final class HTTPContext {
   /** Servlet response. */
   public final HttpServletResponse res;
   /** Request method. */
-  public final HTTPMethod method;
+  public final String method;
   /** Request method. */
   public final HTTPParams params;
 
@@ -73,13 +73,12 @@ public final class HTTPContext {
     res = rs;
     params = new HTTPParams(this);
 
-    final String mth = rq.getMethod();
-    method = HTTPMethod.get(mth);
+    method = rq.getMethod();
 
     final StringBuilder uri = new StringBuilder(req.getRequestURL());
     final String qs = req.getQueryString();
     if(qs != null) uri.append('?').append(qs);
-    log('[' + mth + "] " + uri, null);
+    log('[' + method + "] " + uri, null);
 
     // set UTF8 as default encoding (can be overwritten)
     res.setCharacterEncoding(UTF8);
