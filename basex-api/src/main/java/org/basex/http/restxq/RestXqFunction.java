@@ -39,7 +39,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   private static final Pattern TEMPLATE = Pattern.compile("\\s*\\{\\s*\\$(.+?)\\s*\\}\\s*");
 
   /** Supported methods. */
-  final Set<String> methods = new HashSet<String>();
+  final Set<String> methods = new HashSet<>();
   /** Serialization parameters. */
   final SerializerOptions output;
   /** Associated function. */
