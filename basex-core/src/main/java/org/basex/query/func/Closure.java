@@ -60,9 +60,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * @param stc static context
    * @param scp scope
    */
-  public Closure(final InputInfo ii, final SeqType r, final Var[] v,
-      final Expr e, final Ann a, final HashMap<Var, Expr> bindings,
-      final StaticContext stc, final VarScope scp) {
+  public Closure(final InputInfo ii, final SeqType r, final Var[] v, final Expr e, final Ann a,
+      final HashMap<Var, Expr> bindings, final StaticContext stc, final VarScope scp) {
     this(ii, null, r, v, e, a, bindings, stc, scp);
   }
 
@@ -78,9 +77,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * @param stc static context
    * @param scp variable scope
    */
-  Closure(final InputInfo ii, final QNm nm, final SeqType r, final Var[] v,
-      final Expr e, final Ann a, final HashMap<Var, Expr> bindings,
-      final StaticContext stc, final VarScope scp) {
+  Closure(final InputInfo ii, final QNm nm, final SeqType r, final Var[] v, final Expr e,
+      final Ann a, final HashMap<Var, Expr> bindings, final StaticContext stc, final VarScope scp) {
     super(ii, e);
     name = nm;
     args = v;

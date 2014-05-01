@@ -47,6 +47,8 @@ public final class FNInspectTest extends AdvancedQueryTest {
     query(func + "/annotation/@uri/data()", "http://www.w3.org/2012/xquery");
     query(func + "/return/@type/data()", "xs:integer");
     query(func + "/return/@occurrence/data()", "");
+
+    query(_INSPECT_FUNCTION.args(" %db:f function() {()}") + "/annotation/@name = 'db:f'", "true");
   }
 
   /** Test method. */

@@ -63,10 +63,10 @@ public final class FNInspect extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item function(final QueryContext ctx) throws QueryException {
-    final FItem f = checkFunc(expr[0], ctx);
-    final StaticFunc sf = f.funcName() == null ? null :
-      ctx.funcs.get(f.funcName(), f.arity(), null, false);
-    return new PlainDoc(ctx, info).function(f.funcName(), sf, f.funcType(), null);
+    final FItem func = checkFunc(expr[0], ctx);
+    final QNm name = func.funcName();
+    final StaticFunc sf = name == null ? null : ctx.funcs.get(name, func.arity(), null, false);
+    return new PlainDoc(ctx, info).function(name, sf, func.funcType(), func.annotations(), null);
   }
 
   /**

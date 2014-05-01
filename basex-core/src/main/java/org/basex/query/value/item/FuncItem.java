@@ -46,22 +46,22 @@ public final class FuncItem extends FItem implements Scope {
   /**
    * Constructor.
    * @param sctx static context
-   * @param annotations function annotations
+   * @param ann function annotations
    * @param n function name
    * @param arg function arguments
    * @param t function type
    * @param body function body
    * @param stSize stack-frame size
    */
-  public FuncItem(final StaticContext sctx, final Ann annotations, final QNm n, final Var[] arg,
+  public FuncItem(final StaticContext sctx, final Ann ann, final QNm n, final Var[] arg,
       final FuncType t, final Expr body, final int stSize) {
-    this(sctx, annotations, n, arg, t, body, null, 0, 0, stSize);
+    this(sctx, ann, n, arg, t, body, null, 0, 0, stSize);
   }
 
   /**
    * Constructor.
    * @param sctx static context
-   * @param annotations function annotations
+   * @param ann function annotations
    * @param n function name
    * @param arg function arguments
    * @param t function type
@@ -71,11 +71,11 @@ public final class FuncItem extends FItem implements Scope {
    * @param sz context size
    * @param stSize stack-frame size
    */
-  public FuncItem(final StaticContext sctx, final Ann annotations, final QNm n, final Var[] arg,
+  public FuncItem(final StaticContext sctx, final Ann ann, final QNm n, final Var[] arg,
       final FuncType t, final Expr body, final Value vl,
       final long ps, final long sz, final int stSize) {
 
-    super(t, annotations);
+    super(t, ann);
     name = n;
     params = arg;
     expr = body;
