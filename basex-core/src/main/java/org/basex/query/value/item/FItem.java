@@ -24,11 +24,11 @@ public abstract class FItem extends Item implements XQFunction {
   /**
    * Constructor.
    * @param t type
-   * @param annotations this function item's annotations
+   * @param ann this function item's annotations
    */
-  protected FItem(final FuncType t, final Ann annotations) {
+  protected FItem(final FuncType t, final Ann ann) {
     super(t);
-    ann = annotations;
+    this.ann = ann;
   }
 
   @Override
