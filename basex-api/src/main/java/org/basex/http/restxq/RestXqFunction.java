@@ -158,7 +158,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         } else if(eq(METHOD, local)) {
           // annotation "method"
           if(value.size() < 1) throw error(function.info, ANN_ATLEAST, "%", name.string(), 1);
-          final String mth = toString(value.itemAt(0), name);
+          final String mth = toString(value.itemAt(0), name).toUpperCase(Locale.ENGLISH);
           final Value body = value.size() > 1 ? value.itemAt(1) : null;
           addMethod(mth, body, name, declared, info);
         } else {

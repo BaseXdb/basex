@@ -421,6 +421,11 @@ public final class RestXqTest extends HTTPTest {
     post("declare %R:method('POST', '{$b}') %R:path('') function m:f($b) {$b};", "12", "12",
         MimeTypes.TEXT_PLAIN);
 
+    // ignore case
+    get("declare %R:method('get') %R:path('') function m:f() {'x'};", "", "x");
+    getE("declare %R:method('get') declare %R:method('GET') %R:path('') "
+        + "function m:f() {'x'};", "");
+
     // custom HTTP method without body
     install("declare %R:method('RETRIEVE') %R:path('') function m:f() {'x'};");
     // TODO java.net.HttpUrlConnection does not support custom HTTP methods
