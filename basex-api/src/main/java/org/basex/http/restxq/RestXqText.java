@@ -32,6 +32,8 @@ public interface RestXqText {
   byte[] COOKIE_PARAM = token("cookie-param");
   /** Token "query-param". */
   byte[] ERROR_PARAM = token("error-param");
+  /** Token "method". */
+  byte[] METHOD = token("method");
 
   /** Token "header". */
   byte[] HEADER = token("header");

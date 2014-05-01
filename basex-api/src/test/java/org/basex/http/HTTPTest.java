@@ -112,7 +112,7 @@ public abstract class HTTPTest extends SandboxTest {
   }
 
   /**
-   * Executes the specified GET request and returns the result.
+   * Executes the specified HTTP request and returns the result.
    * @param query request
    * @param method HTTP method
    * @return string result, or {@code null} for a failure.
@@ -120,11 +120,23 @@ public abstract class HTTPTest extends SandboxTest {
    */
   private static String request(final String query, final HTTPMethod method)
       throws IOException {
+    return request(query, method.name());
+  }
+
+  /**
+   * Executes the specified HTTP request and returns the result.
+   * @param query request
+   * @param method HTTP method
+   * @return string result, or {@code null} for a failure.
+   * @throws IOException I/O exception
+   */
+  protected static String request(final String query, final String method)
+      throws IOException {
 
     final URL url = new URL(root + query);
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     try {
-      conn.setRequestMethod(method.name());
+      conn.setRequestMethod(method);
       return read(new BufferInput(conn.getInputStream())).replaceAll("\r?\n *", "");
     } catch(final IOException ex) {
       throw error(conn, ex);
