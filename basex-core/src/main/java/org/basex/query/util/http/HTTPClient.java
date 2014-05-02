@@ -201,8 +201,7 @@ public final class HTTPClient {
   }
 
   /**
-   * Writes the payload of a body or part in the output stream of the
-   * connection.
+   * Writes the payload of a body or part in the output stream of the connection.
    * @param payload body/part payload
    * @param payloadAtts payload attributes
    * @param out output stream
@@ -215,7 +214,8 @@ public final class HTTPClient {
     final byte[] m = payloadAtts.get(METHOD);
     final String method;
     if(m == null) {
-      final String type = string(payloadAtts.get(MEDIA_TYPE));
+      final byte[] tp = payloadAtts.get(MEDIA_TYPE);
+      final String type = tp == null ? "" : string(tp);
       if(eq(type, APP_HTML_XML)) {
         method = SerialMethod.XHTML.toString();
       } else if(eq(type, TEXT_HTML)) {

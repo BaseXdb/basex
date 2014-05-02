@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.Set;
 import java.util.regex.*;
 
 import javax.servlet.http.*;
@@ -38,7 +39,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   private static final Pattern TEMPLATE = Pattern.compile("\\s*\\{\\s*\\$(.+?)\\s*\\}\\s*");
 
   /** Supported methods. */
-  EnumSet<HTTPMethod> methods = EnumSet.allOf(HTTPMethod.class);
+  final Set<String> methods = new HashSet<>();
   /** Serialization parameters. */
   final SerializerOptions output;
   /** Associated function. */
@@ -107,7 +108,6 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    */
   boolean parse() throws QueryException {
     // parse all annotations
-    final EnumSet<HTTPMethod> mth = EnumSet.noneOf(HTTPMethod.class);
     final boolean[] declared = new boolean[function.args.length];
     boolean found = false;
     final int as = function.ann.size();
@@ -122,9 +122,13 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         if(eq(PATH, local)) {
           // annotation "path"
           if(path != null) throw error(info, ANN_TWICE, "%", name.string());
-          path = new RestXqPath(toString(value, name));
-          for(final String s : path) {
-            if(s.trim().startsWith("{")) checkVariable(s, AtomType.AAT, declared);
+          try {
+            path = new RestXqPath(toString(value, name));
+          } catch(final IllegalArgumentException ex) {
+            throw error(info, ex.getMessage());
+          }
+          for(int s = 0; s < path.size; s++) {
+            if(path.isTemplate(s)) checkVariable(path.segment[s], AtomType.AAT, declared);
           }
         } else if(eq(ERROR, local)) {
           // annotation "error"
@@ -151,18 +155,17 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         } else if(eq(ERROR_PARAM, local)) {
           // annotation "error-param"
           errorParams.add(param(value, name, declared));
+        } else if(eq(METHOD, local)) {
+          // annotation "method"
+          if(value.size() < 1) throw error(function.info, ANN_ATLEAST, "%", name.string(), 1);
+          final String mth = toString(value.itemAt(0), name).toUpperCase(Locale.ENGLISH);
+          final Value body = value.size() > 1 ? value.itemAt(1) : null;
+          addMethod(mth, body, name, declared, info);
         } else {
           // method annotations
-          final HTTPMethod m = get(string(local));
-          if(m == null) throw error(info, ANN_UNKNOWN, "%", name.string());
-          if(!value.isEmpty()) {
-            // remember post/put variable
-            if(!m.body) throw error(info, METHOD_VALUE, m);
-            if(requestBody != null) throw error(info, ANN_BODYVAR);
-            requestBody = checkVariable(toString(value, name), declared);
-          }
-          if(mth.contains(m)) throw error(info, ANN_TWICE, "%", name.string());
-          mth.add(m);
+          final String mth = string(local);
+          if(get(mth) == null) throw error(info, ANN_UNKNOWN, "%", name.string());
+          addMethod(mth, value, name, declared, info);
         }
       } else if(eq(uri, QueryText.OUTPUTURI)) {
         // serialization parameters
@@ -174,7 +177,6 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       }
       found |= rexq;
     }
-    if(!mth.isEmpty()) methods = mth;
 
     if(found) {
       if(path == null && error == null)
@@ -189,6 +191,28 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   }
 
   /**
+   * Add a HTTP method to the list of supported methods by this RESTXQ function.
+   * @param method HTTP method as a string
+   * @param body variable to which the HTTP request body to be bound (optional)
+   * @param ann RESTXQ annotation specifying the HTTP method
+   * @param declared variable declaration flags
+   * @param info input info
+   * @throws QueryException query exception
+   */
+  private void addMethod(final String method, final Value body, final QNm ann,
+      final boolean[] declared, final InputInfo info) throws QueryException {
+
+    if(body != null && !body.isEmpty()) {
+      final HTTPMethod m = get(method);
+      if(m != null && !m.body) throw error(info, METHOD_VALUE, m);
+      if(requestBody != null) throw error(info, ANN_BODYVAR);
+      requestBody = checkVariable(toString(body, ann), declared);
+    }
+    if(methods.contains(method)) throw error(info, ANN_TWICE, "%", ann.string());
+    methods.add(method);
+  }
+
+  /**
    * Checks if an HTTP request matches this function and its constraints.
    * @param http http context
    * @param err error code
@@ -196,8 +220,8 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    */
   boolean matches(final HTTPContext http, final QNm err) {
     // check method, consumed and produced media type, and path or error
-    return methods.contains(http.method) && consumes(http) && produces(http) &&
-        (err == null ? path != null && path.matches(http) :
+    return (methods.isEmpty() || methods.contains(http.method)) && consumes(http) &&
+        produces(http) && (err == null ? path != null && path.matches(http) :
           error != null && error.matches(err));
   }
 

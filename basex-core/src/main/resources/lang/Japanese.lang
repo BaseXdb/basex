@@ -130,6 +130,7 @@ explorer             = エクスプローラ
 export               = エクスポート
 file                 = ファイル
 file_exists_%        = ファイル "%" は既に存在します。\n置換してよろしいですか？
+file_filter          = File Filter
 file_not_deleted_%   = ファイル "%" を削除できませんでした。
 file_not_opened_%    = ファイル "%" が開けませんでした。
 file_not_renamed_%   = "%" はリネームできませんでした。

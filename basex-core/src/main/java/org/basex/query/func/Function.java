@@ -696,7 +696,7 @@ public enum Function {
   /** XQuery function. */
   _DB_FLUSH(FNDb.class, "flush(database)", arg(ITEM), EMP, flag(UPD, NDT)),
   /** XQuery function. */
-  _DB_EXPORT(FNDb.class, "export(database,path[,param]])", arg(STR, STR, ITEM), EMP),
+  _DB_EXPORT(FNDb.class, "export(database,path[,param]])", arg(STR, STR, ITEM), EMP, flag(NDT)),
   /** XQuery function. */
   _DB_NAME(FNDb.class, "name(node)", arg(NOD), STR),
   /** XQuery function. */

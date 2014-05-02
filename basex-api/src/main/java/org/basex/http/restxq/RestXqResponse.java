@@ -97,7 +97,7 @@ final class RestXqResponse {
       }
 
       // HEAD method must return a single response element
-      if(function.methods.size() == 1 && function.methods.contains(HTTPMethod.HEAD))
+      if(function.methods.size() == 1 && function.methods.contains(HTTPMethod.HEAD.name()))
         throw function.error(HEAD_METHOD);
 
       // serialize result

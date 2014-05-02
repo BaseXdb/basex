@@ -49,20 +49,21 @@ final class IterPosStep extends Step {
           if(!test.eq(node)) continue;
 
           // evaluate predicates
-          final long cp = ctx.pos;
-          final long cs = ctx.size;
+          final long cp = ctx.pos, cs = ctx.size;
           ctx.size = 0;
           ctx.pos = ++cpos;
-          final boolean p = preds(node, ctx);
-          ctx.pos = cp;
-          ctx.size = cs;
-          if(p) {
-            // check if more results can be expected
-            skip = pos != null && pos.skip(ctx);
-            return node.finish();
+          try {
+            if(preds(node, ctx)) {
+              // check if more results can be expected
+              skip = pos != null && pos.skip(ctx);
+              return node.finish();
+            }
+            // remember last node
+            if(last) lnode = node.finish();
+          } finally {
+            ctx.pos = cp;
+            ctx.size = cs;
           }
-          // remember last node
-          if(last) lnode = node.finish();
         }
       }
 

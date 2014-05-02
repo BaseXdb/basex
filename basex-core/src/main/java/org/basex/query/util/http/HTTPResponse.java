@@ -64,8 +64,9 @@ public final class HTTPResponse {
 
     // construct <http:response/>
     final FElem response = new FElem(Q_RESPONSE).declareNS();
+    final String msg = conn.getResponseMessage();
     response.add(STATUS, token(conn.getResponseCode()));
-    response.add(MESSAGE, conn.getResponseMessage());
+    response.add(MESSAGE, msg == null ? "" : msg);
     for(final String header : conn.getHeaderFields().keySet()) {
       if(header != null) {
         final FElem hdr = new FElem(Q_HEADER);

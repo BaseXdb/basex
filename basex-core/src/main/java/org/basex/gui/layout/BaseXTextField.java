@@ -7,7 +7,6 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.util.options.*;
 
@@ -58,6 +57,16 @@ public class BaseXTextField extends JTextField {
    * @param dialog dialog window
    */
   public BaseXTextField(final NumberOption opt, final Options opts, final BaseXDialog dialog) {
+    this((Option<?>) opt, opts, dialog);
+  }
+
+  /**
+   * Constructor.
+   * @param opt option
+   * @param opts options
+   * @param dialog dialog window
+   */
+  public BaseXTextField(final StringOption opt, final Options opts, final BaseXDialog dialog) {
     this((Option<?>) opt, opts, dialog);
   }
 
@@ -169,11 +178,11 @@ public class BaseXTextField extends JTextField {
    */
   public void hint(final String label) {
     if(hint == null) {
-      hint = new BaseXTextHint(label + Text.DOTS, this);
+      hint = new BaseXTextHint(label, this);
     } else {
-      hint.setText(label + Text.DOTS);
+      hint.setText(label);
     }
-    setToolTipText(label);
+    setToolTipText(label.replaceAll("\\.\\.\\.$", ""));
   }
 
   @Override
