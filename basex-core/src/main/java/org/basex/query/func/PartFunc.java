@@ -29,17 +29,18 @@ public final class PartFunc extends Arr {
 
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param ii input info
    * @param fn function expression
    * @param arg argument expressions
-   * @param hl positions of the placeholders
+   * @param holes positions of the placeholders
    */
-  public PartFunc(final StaticContext sctx, final InputInfo ii, final Expr fn,
-      final Expr[] arg, final int[] hl) {
+  public PartFunc(final StaticContext sc, final InputInfo ii, final Expr fn, final Expr[] arg,
+      final int[] holes) {
+
     super(ii, Array.add(arg, fn));
-    sc = sctx;
-    holes = hl;
+    this.sc = sc;
+    this.holes = holes;
     type = SeqType.FUN_O;
   }
 
@@ -90,8 +91,8 @@ public final class PartFunc extends Arr {
 
     final Ann ann = f.annotations();
     final FuncType tp = FuncType.get(ann, vars, ft.ret);
-    return new FuncItem(sc, ann, null, vars, tp, new DynFuncCall(info, f, args),
-        ctx.value, ctx.pos, ctx.size, scp.stackSize());
+    final DynFuncCall fc = new DynFuncCall(info, sc, ann.contains(Ann.Q_UPDATING), f, args);
+    return new FuncItem(sc, ann, null, vars, tp, fc, ctx.value, ctx.pos, ctx.size, scp.stackSize());
   }
 
   @Override

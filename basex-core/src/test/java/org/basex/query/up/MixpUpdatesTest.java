@@ -14,7 +14,7 @@ import org.junit.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public final class MixpUdatesTest extends AdvancedQueryTest {
+public final class MixpUpdatesTest extends AdvancedQueryTest {
   /**
    * Prepare tests.
    * @throws BaseXException database exception
@@ -63,5 +63,29 @@ public final class MixpUdatesTest extends AdvancedQueryTest {
   @Test
   public void annotations() {
     query("declare %updating function local:x() { 1 }; local:x()", "1");
+  }
+
+  /** Updating functions. */
+  @Test
+  public void updatingFunctions() {
+    error("db:output(?)", Err.SERFUNC);
+    error("db:output#1", Err.SERFUNC);
+    error("declare updating function local:a() { () }; local:a#0", Err.SERFUNC);
+    error("declare function local:a() { local:b#0 };"
+        + "declare updating function local:b() { db:output('1') }; local:a()", Err.SERFUNC);
+    query("declare function local:not-used() { local:b#0 };"
+        + "declare updating function local:b() { db:output('1') }; local:b()", "1");
+
+    query("db:output(?)(1)", "1");
+    query("db:output#1(1)", "1");
+    query("declare updating function local:a() { () }; local:a#0()", "");
+    query("declare function local:a() { local:b#0 };"
+        + "declare updating function local:b() { db:output('1') }; local:a()()", "1");
+
+    query("updating count(?)(1)", "1");
+    query("updating count#1(1)", "1");
+    query("declare function local:a() { () }; updating local:a#0()", "");
+    query("declare function local:a() { local:b#0 };"
+        + "declare function local:b() { count('1') }; updating local:a()()", "1");
   }
 }

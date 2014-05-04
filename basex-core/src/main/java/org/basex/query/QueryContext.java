@@ -213,7 +213,7 @@ public final class QueryContext extends Proc {
 
     info.query = qu;
     root = new QueryParser(qu, path, this, sc).parseMain();
-    updating = updating && root.expr.has(Flag.UPD);
+    updating = root.expr.has(Flag.UPD);
     return root;
   }
 

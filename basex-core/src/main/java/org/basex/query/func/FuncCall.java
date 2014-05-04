@@ -78,6 +78,7 @@ public abstract class FuncCall extends Arr {
    */
   private static Value invoke(final XQFunction fun, final Value[] arg, final boolean itm,
       final QueryContext ctx, final InputInfo ii) throws QueryException {
+
     XQFunction func = fun;
     Value[] args = arg;
     final int fp = ctx.stack.enterFrame(func.stackFrameSize());
@@ -109,8 +110,8 @@ public abstract class FuncCall extends Arr {
    */
   private static Value invokeTail(final XQFunction fun, final Value[] arg, final boolean itm,
       final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final int calls = ctx.tailCalls, max = ctx.maxCalls;
 
+    final int calls = ctx.tailCalls, max = ctx.maxCalls;
     if(max >= 0 && calls >= max) {
       // there are at least `ctx.maxCalls` tail-calls on the stack, eliminate them
       ctx.registerTailCall(fun, arg);

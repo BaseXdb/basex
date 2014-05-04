@@ -69,7 +69,7 @@ public final class FNFunc extends StandardFunc {
       if (sig == Function.FOR_EACH) {
         final Expr[] results = new Expr[len];
         for(int i = 0; i < len; i++) {
-          results[i] = new DynFuncCall(info, expr[1], seq.itemAt(i)).optimize(ctx, scp);
+          results[i] = new DynFuncCall(info, sc, false, expr[1], seq.itemAt(i)).optimize(ctx, scp);
         }
         return new List(info, results).optimize(ctx, scp);
       }
@@ -78,10 +78,10 @@ public final class FNFunc extends StandardFunc {
       Expr e = expr[1];
       if (sig == Function.FOLD_LEFT) {
         for (final Item it : seq)
-          e = new DynFuncCall(info, expr[2], e, it).optimize(ctx, scp);
+          e = new DynFuncCall(info, sc, false, expr[2], e, it).optimize(ctx, scp);
       } else {
         for (int i = len; --i >= 0;)
-          e = new DynFuncCall(info, expr[2], seq.itemAt(i), e).optimize(ctx, scp);
+          e = new DynFuncCall(info, sc, false, expr[2], seq.itemAt(i), e).optimize(ctx, scp);
       }
       return e;
     }

@@ -68,10 +68,6 @@ public final class FuncLit extends Single implements Scope {
       type = sf.funcType().seqType();
     }
 
-    // Reject updating function items. Happens at compile because the function may not be known
-    // at parse time. This check could possibly be moved to StaticFuncs#check.
-    if(!sc.mixUpdates && ann.contains(Ann.Q_UPDATING)) throw UPFUNCITEM.get(info);
-
     try {
       expr = expr.compile(ctx, scope);
       expr.markTailCalls(null);
@@ -154,5 +150,13 @@ public final class FuncLit extends Single implements Scope {
   @Override
   public String toString() {
     return new TokenBuilder(name.string()).add('#').addExt(args.length).toString();
+  }
+
+  /**
+   * Returns annotations.
+   * @return annotations
+   */
+  public Ann annotations() {
+    return ann;
   }
 }
