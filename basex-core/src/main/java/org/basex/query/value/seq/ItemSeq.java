@@ -101,4 +101,14 @@ public final class ItemSeq extends Seq {
     for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = item[r];
     return get(tmp, s, type);
   }
+
+  @Override
+  public boolean has(final Flag flag) {
+    if(flag == Flag.UPD) {
+      for(int l = 0; l < size; l++) {
+        if(item[l].has(Flag.UPD)) return true;
+      }
+    }
+    return false;
+  }
 }

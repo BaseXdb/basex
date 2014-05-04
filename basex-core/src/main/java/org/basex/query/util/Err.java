@@ -1112,8 +1112,6 @@ public enum Err {
   /** XUDY0032 (WIP). */
   UPFUNCUP(XUDY, 32, "Function is updating."),
 
-  /** BASX0007. */
-  //UPFUNCITEM(XUST, 1, "Updating function items are not supported yet."),
   /** XUST0001. */
   UPNOT(XUST, 1, "%: no updating expression allowed."),
   /** XUST0001. */

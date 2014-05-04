@@ -143,8 +143,11 @@ public final class Functions extends TokenSet {
     // pre-defined functions
     final Function fn = get().getBuiltIn(name, arity, ii);
     if(fn != null) {
-      final Ann a = new Ann();
-      if(fn.has(Flag.UPD)) a.add(Ann.Q_UPDATING, Empty.SEQ, ii);
+      final Ann ann = new Ann();
+      if(fn.has(Flag.UPD)) {
+        ctx.updating();
+        ann.add(Ann.Q_UPDATING, Empty.SEQ, ii);
+      }
       final VarScope scp = new VarScope(sc);
       final FuncType ft = fn.type(arity);
       final QNm[] argNames = fn.argNames(arity);
@@ -158,14 +161,18 @@ public final class Functions extends TokenSet {
 
       final StandardFunc f = fn.get(sc, calls);
       if(!f.has(Flag.CTX) && !f.has(Flag.FCS))
-        return new FuncItem(sc, a, name, args, ft, f, scp.stackSize());
+        return new FuncItem(sc, ann, name, args, ft, f, scp.stackSize());
 
-      return new FuncLit(a, name, args, f, ft, scp, sc, ii);
+      return new FuncLit(ann, name, args, f, ft, scp, sc, ii);
     }
 
     // user-defined function
     final StaticFunc sf = ctx.funcs.get(name, arity, ii, true);
-    if(sf != null) return getUser(sf, ctx, sc, ii);
+    if(sf != null) {
+      final FuncItem fi = getUser(sf, ctx, sc, ii);
+      if(fi.annotations().contains(Ann.Q_UPDATING)) ctx.updating();
+      return fi;
+    }
 
     // Java function (only allowed with administrator permissions)
     final VarScope scp = new VarScope(sc);
@@ -236,7 +243,10 @@ public final class Functions extends TokenSet {
     if(fun != null) {
       if(!sc.xquery3() && fun.has(Flag.X30)) throw FUNC30.get(ii);
       final Ann ann = new Ann();
-      ann.add(Ann.Q_UPDATING, Empty.SEQ, ii);
+      if(fun.sig.has(Flag.UPD)) {
+        ann.add(Ann.Q_UPDATING, Empty.SEQ, ii);
+        ctx.updating();
+      }
       return new TypedFunc(fun, ann);
     }
 

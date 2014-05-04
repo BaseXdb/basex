@@ -1185,12 +1185,14 @@ public final class UpdateTest extends AdvancedQueryTest {
 
     error("db:output(?)(<a/>)", Err.UPFUNCUP);
     error("db:output#1(<a/>)", Err.UPFUNCUP);
+    error("%updating function($a) { db:output($a) }(1)", Err.UPFUNCUP);
     error("declare updating function local:a() { () }; local:a#0()", Err.UPFUNCUP);
     error("declare function local:a() { local:b#0 };"
         + "declare updating function local:b() { db:output('1') }; local:a()()", Err.UPFUNCUP);
 
     error("updating count(?)(1)", Err.UPFUNCNOTUP);
     error("updating count#1(1)", Err.UPFUNCNOTUP);
+    error("updating function($a) { count($a) }(1)", Err.UPFUNCNOTUP);
     error("declare function local:a() { () }; updating local:a#0()", Err.UPFUNCNOTUP);
     error("declare function local:a() { local:b#0 };"
         + "declare function local:b() { count('1') }; updating local:a()()", Err.UPFUNCNOTUP);

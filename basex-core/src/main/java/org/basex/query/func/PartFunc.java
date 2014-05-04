@@ -96,6 +96,11 @@ public final class PartFunc extends Arr {
   }
 
   @Override
+  public void checkUp() throws QueryException {
+    checkNoneUp(Arrays.copyOf(expr, expr.length - 1));
+  }
+
+  @Override
   public Value value(final QueryContext ctx) throws QueryException {
     return item(ctx, info);
   }
@@ -133,5 +138,15 @@ public final class PartFunc extends Arr {
     }
     while(++p < es + hs - 1) tb.add(QueryText.SEP).add(expr[p - hs].toString());
     return tb.add(')').toString();
+  }
+
+  /**
+   * Returns the function annotations.
+   * @return annotations
+   */
+  public Ann annotations() {
+    final Expr fn = expr[expr.length - 1];
+    if(!(fn instanceof FItem)) return null;
+    return ((FItem) fn).annotations();
   }
 }

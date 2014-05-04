@@ -75,8 +75,12 @@ public final class DynFuncCall extends FuncCall {
         if(inl != null) return inl;
       }
     }
-
     return this;
+  }
+
+  @Override
+  public void checkUp() throws QueryException {
+    checkNoneUp(Arrays.copyOf(expr, expr.length - 1));
   }
 
   /**
@@ -165,6 +169,7 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public boolean has(final Flag flag) {
-    return flag == Flag.UPD ? updating : super.has(flag);
+    // assume worst case if mixed updates are allowed
+    return flag == Flag.UPD ? sc.mixUpdates || updating : super.has(flag);
   }
 }

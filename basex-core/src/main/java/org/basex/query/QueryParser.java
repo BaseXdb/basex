@@ -2025,7 +2025,14 @@ public class QueryParser extends InputParser {
         final ExprList argList = new ExprList();
         final int[] holes = argumentList(argList, e);
         final Expr[] args = argList.finish();
-        e = holes == null ? new DynFuncCall(ii, sc, false, e, args) :
+        // only set updating flag if updating and non-updating expressions are mixed
+        Ann ann = null;
+        if(e instanceof FuncItem) ann = ((FuncItem) e).annotations();
+        else if(e instanceof FuncLit) ann = ((FuncLit) e).annotations();
+        else if(e instanceof PartFunc) ann = ((PartFunc) e).annotations();
+        final boolean up = sc.mixUpdates && ann != null && ann.contains(Ann.Q_UPDATING);
+        if(up) ctx.updating();
+        e = holes == null ? new DynFuncCall(ii, sc, up, e, args) :
           new PartFunc(sc, ii, e, args, holes);
       }
     } while(e != old);

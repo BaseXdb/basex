@@ -76,16 +76,11 @@ public final class MixpUpdatesTest extends AdvancedQueryTest {
     query("declare function local:not-used() { local:b#0 };"
         + "declare updating function local:b() { db:output('1') }; local:b()", "1");
 
+    query("function($a) { db:output($a) }(1)", "1");
     query("db:output(?)(1)", "1");
     query("db:output#1(1)", "1");
-    query("declare updating function local:a() { () }; local:a#0()", "");
+    query("declare function local:a() { 1 }; local:a#0()", "1");
     query("declare function local:a() { local:b#0 };"
-        + "declare updating function local:b() { db:output('1') }; local:a()()", "1");
-
-    query("updating count(?)(1)", "1");
-    query("updating count#1(1)", "1");
-    query("declare function local:a() { () }; updating local:a#0()", "");
-    query("declare function local:a() { local:b#0 };"
-        + "declare function local:b() { count('1') }; updating local:a()()", "1");
+        + "declare function local:b() { db:output('1') }; local:a()()", "1");
   }
 }

@@ -72,5 +72,10 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
+  public boolean has(final Flag flag) {
+    return flag == Flag.UPD && annotations().contains(Ann.Q_UPDATING) || super.has(flag);
+  }
+
+  @Override
   public abstract void plan(final FElem root);
 }
