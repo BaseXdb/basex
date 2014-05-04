@@ -9,6 +9,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Flag;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
@@ -143,10 +144,7 @@ public final class Functions extends TokenSet {
     final Function fn = get().getBuiltIn(name, arity, ii);
     if(fn != null) {
       final Ann a = new Ann();
-      if(fn.has(Flag.UPD)) {
-        throw UPFUNCITEM.get(ii);
-        //a.add(Ann.Q_UPDATING, Empty.SEQ, ii);
-      }
+      if(fn.has(Flag.UPD)) a.add(Ann.Q_UPDATING, Empty.SEQ, ii);
       final VarScope scp = new VarScope(sc);
       final FuncType ft = fn.type(arity);
       final QNm[] argNames = fn.argNames(arity);
@@ -167,11 +165,7 @@ public final class Functions extends TokenSet {
 
     // user-defined function
     final StaticFunc sf = ctx.funcs.get(name, arity, ii, true);
-    if(sf != null) {
-      final FuncItem fi = getUser(sf, ctx, sc, ii);
-      if(fi.annotations().contains(Ann.Q_UPDATING)) throw UPFUNCITEM.get(ii);
-      return fi;
-    }
+    if(sf != null) return getUser(sf, ctx, sc, ii);
 
     // Java function (only allowed with administrator permissions)
     final VarScope scp = new VarScope(sc);

@@ -31,7 +31,7 @@ public final class FuncItem extends FItem implements Scope {
   /** Formal parameters. */
   private final Var[] params;
   /** Function expression. */
-  private final Expr expr;
+  public final Expr expr;
 
   /** Context value. */
   private final Value ctxVal;
@@ -153,6 +153,7 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public FItem coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii,
       final boolean opt) throws QueryException {
+
     if(params.length != ft.args.length) throw Err.castError(ii, ft, this);
     final FuncType tp = funcType();
     if(tp.instanceOf(ft)) return this;
@@ -165,7 +166,7 @@ public final class FuncItem extends FItem implements Scope {
       refs[i] = new VarRef(ii, vs[i]);
     }
 
-    final Expr e = new DynFuncCall(ii, this, refs),
+    final Expr e = new DynFuncCall(ii, false, this, refs),
         optimized = opt ? e.optimize(ctx, vsc) : e, checked;
     if(ft.ret == null || tp.ret != null && tp.ret.instanceOf(ft.ret)) {
       checked = optimized;
@@ -220,9 +221,11 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
       final InputInfo ii) throws QueryException {
+
     if(!(expr.isValue() || expr.exprSize() < ctx.context.options.get(MainOptions.INLINELIMIT)
-        && !expr.has(Flag.CTX))) return null;
+        && !expr.has(Flag.CTX) && !expr.has(Flag.UPD))) return null;
     ctx.compInfo(OPTINLINE, this);
+
     // create let bindings for all variables
     final LinkedList<GFLWOR.Clause> cls =
         exprs.length == 0 ? null : new LinkedList<GFLWOR.Clause>();
@@ -248,7 +251,6 @@ public final class FuncItem extends FItem implements Scope {
         return true;
       }
     });
-
     return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(ctx, scp);
   }
 }

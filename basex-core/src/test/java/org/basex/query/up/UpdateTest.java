@@ -1169,13 +1169,24 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void updatingFuncItems() {
-    error("db:output(?)", Err.UPFUNCITEM);
-    error("db:output#1", Err.UPFUNCITEM);
-    error("declare %updating function local:a() { () }; local:a#0()", Err.UPFUNCITEM);
+    error("db:output(?)", Err.SERFUNC);
+    error("db:output#1", Err.SERFUNC);
+    error("declare updating function local:a() { () }; local:a#0", Err.SERFUNC);
     error("declare function local:a() { local:b#0 };"
-        + "declare %updating function local:b() { db:output('1') }; local:a()", Err.UPFUNCITEM);
-    // is still accepted (should also be rejected in future):
-    //error("declare function local:not-used() { local:b#0 };"
-    //    + "declare %updating function local:b() { db:output('1') }; local:b()", Err.UPFUNCITEM);
+        + "declare updating function local:b() { db:output('1') }; local:a()", Err.SERFUNC);
+    query("declare function local:not-used() { local:b#0 };"
+        + "declare updating function local:b() { db:output('1') }; local:b()", "1");
+
+    error("db:output(?)(<a/>)", Err.UPFUNCUP);
+    error("db:output#1(<a/>)", Err.UPFUNCUP);
+    error("declare updating function local:a() { () }; local:a#0()", Err.UPFUNCUP);
+    error("declare function local:a() { local:b#0 };"
+        + "declare updating function local:b() { db:output('1') }; local:a()()", Err.UPFUNCUP);
+
+    error("updating count(?)(1)", Err.UPFUNCNOTUP);
+    error("updating count#1(1)", Err.UPFUNCNOTUP);
+    error("declare function local:a() { () }; updating local:a#0()", Err.UPFUNCNOTUP);
+    error("declare function local:a() { local:b#0 };"
+        + "declare function local:b() { count('1') }; updating local:a()()", Err.UPFUNCNOTUP);
   }
 }

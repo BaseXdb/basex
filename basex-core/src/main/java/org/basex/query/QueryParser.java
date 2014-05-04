@@ -1006,6 +1006,7 @@ public class QueryParser extends InputParser {
     if(e == null) e = rename();
     if(e == null) e = replace();
     if(e == null) e = transform();
+    if(e == null) e = updatingFunctionCall();
     if(e == null) e = or();
     return e;
   }
@@ -2042,7 +2043,8 @@ public class QueryParser extends InputParser {
         final ExprList argList = new ExprList();
         final int[] holes = argumentList(argList, e);
         final Expr[] args = argList.finish();
-        e = holes == null ? new DynFuncCall(ii, e, args) : new PartFunc(sc, ii, e, args, holes);
+        e = holes == null ? new DynFuncCall(ii, false, e, args) :
+          new PartFunc(sc, ii, e, args, holes);
       }
     } while(e != old);
     return e;
@@ -2133,7 +2135,6 @@ public class QueryParser extends InputParser {
     // inline function
     if(wsConsume(FUNCTION) && wsConsume(PAR1)) {
       if(ann != null) {
-        if(ann.contains(Ann.Q_UPDATING)) throw error(UPFUNCITEM);
         if(ann.contains(Ann.Q_PRIVATE) || ann.contains(Ann.Q_PUBLIC)) throw error(INVISIBLE);
       }
       final HashMap<Var, Expr> nonLocal = new HashMap<Var, Expr>();
@@ -3588,6 +3589,35 @@ public class QueryParser extends InputParser {
   }
 
   /**
+   * Parses the "UpdatingFunctionCall" rule.
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private Expr updatingFunctionCall() throws QueryException {
+    final int p = pos;
+    if(wsConsumeWs(UPDATING)) {
+      final Expr func = primary();
+      if(wsConsume(PAR1)) {
+        final InputInfo ii = info();
+        final ExprList argList = new ExprList();
+
+        if(!wsConsume(PAR2)) {
+          do {
+            final Expr e = single();
+            if(e == null) throw error(FUNCMISS, func);
+            argList.add(e);
+          } while(wsConsume(COMMA));
+          if(!wsConsume(PAR2)) throw error(FUNCMISS, func);
+        }
+        ctx.updating(true);
+        return new DynFuncCall(ii, true, func, argList.finish());
+      }
+    }
+    pos = p;
+    return null;
+  }
+
+  /**
    * Parses the "NCName" rule.
    * @param err optional error message
    * @return string
@@ -3907,8 +3937,7 @@ public class QueryParser extends InputParser {
   private boolean wsConsumeWs(final String t) throws QueryException {
     final int i = pos;
     if(!wsConsume(t)) return false;
-    if(skipWs() || !XMLToken.isNCStartChar(t.charAt(0))
-        || !XMLToken.isNCChar(curr())) return true;
+    if(skipWs() || !XMLToken.isNCStartChar(t.charAt(0)) || !XMLToken.isNCChar(curr())) return true;
     pos = i;
     return false;
   }
