@@ -92,6 +92,8 @@ public final class SimpleTest extends QueryTest {
       { "Filter 6", bool(true), "empty((1,2,3)[3][2])" },
       { "Filter 7", bool(true), "empty((1,2,3)[position() = 3][2])" },
       { "Filter 8", itr(1), "1[boolean(max((<a>1</a>, <b>2</b>)))]" },
+      { "Filter 9", str("x"), "string(<n><a/><a>x</a></n>/a/text()[.][.])" },
+      { "Filter 10", str("x"), "string(<n><a/><a>x</a></n>/a/text()[1][1])" },
 
       { "ContextItem 0", node(0), "." },
       { "ContextItem 1", node(0), "42[not(.)], ." },
