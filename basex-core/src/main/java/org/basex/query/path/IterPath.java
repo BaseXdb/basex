@@ -68,6 +68,7 @@ final class IterPath extends AxisPath {
           while(true) {
             final Item it = iter[p].next();
             if(it == null) {
+              iter[p] = null;
               if(--p == -1) {
                 node = null;
                 break;
