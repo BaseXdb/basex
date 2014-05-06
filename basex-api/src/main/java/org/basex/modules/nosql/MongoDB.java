@@ -71,13 +71,13 @@ public class MongoDB extends Nosql {
      * connection instances.
      * @throws QueryException query exception
      */
-    public Str connection(final Map connectionMap) throws QueryException {
+    public Str connect(final Map connectionMap) throws QueryException {
         final NosqlOptions opts = new NosqlOptions();
         if(connectionMap != null) {
             new FuncOptions(Q_MONGODB, null).parse(connectionMap, opts);
         }
         if(opts.get(NosqlOptions.URL) != null) {
-            return connection(Str.get(opts.get(NosqlOptions.URL)), connectionMap);
+            return connect(Str.get(opts.get(NosqlOptions.URL)), connectionMap);
         }
         String handler = "Client" + mongoClients.size();
         try {
@@ -101,7 +101,7 @@ public class MongoDB extends Nosql {
      * @return Str
      * @throws QueryException query exception
      */
-    public Str connection(final Str url, final Map options)
+    public Str connect(final Str url, final Map options)
             throws QueryException {
         MongoClientURI uri = new MongoClientURI(url.toJava());
         String handler = "mongoClient" + mongoClients.size();
@@ -124,7 +124,7 @@ public class MongoDB extends Nosql {
      * @return Str key of Hashmap that contains all DB Instances
      * @throws QueryException query exception
      */
-    public Str connection(final Str host, final Int port, final Str database)
+    public Str connect(final Str host, final Int port, final Str database)
             throws QueryException {
         return connection(host, port, database, null, null, null);
     }
