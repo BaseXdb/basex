@@ -16,6 +16,6 @@ declare
   %output:method("json")
 function _:hello($name) {
   <json type="object">
-    <result>Welcome to RestXQ, {$name}!</result>
+    <greeting>Welcome to RestXQ, {$name}!</greeting>
   </json>
 };

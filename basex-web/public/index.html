@@ -13,19 +13,25 @@
 <script language="javascript">
   var app = angular.module("hello", []);
   app.controller("HelloCtrl",
-      function HelloCtrl($scope, $http, $log) {
+      function HelloCtrl($scope, $http) {
         $scope.send = function (name) {
-          $scope.ok = {};
-          $scope.error = {};
-          $http({method: 'GET', url: '/restxq/hello?name=' + name}).
-              success(function (data) {
-                $scope.ok = data;
-              }).
-              error(function (data) {
-                $scope.error.result = data;
-              });
+          $scope.response = {};
+          $http.get('/restxq/hello?name=' + name).then(
+              function (successResult) {
+                $scope.response = {
+                  text: successResult.data.greeting,
+                  error: false
+                }
+              },
+              function (errorResult) {
+                $scope.response = {
+                  text: errorResult.statusText,
+                  error: true
+                }
+              })
         }
       });
+
 
 </script>
 
@@ -43,34 +49,38 @@
     </h2>
 
     <p class="lead">
-      <ul>
-        <li><code>index.html</code>: Bootstrap & AngularJS stub</li>
-        <li>
-          <button class="btn btn-primary btn-xs disabled">Send …</button>
-          triggers submission of input field RestXQ service
-        </li>
-        <li>the service <code>/restxq/hello</code> is defined in <code>$project/restxq/hello.xqm</code></li>
-      </ul>
+    <ul>
+      <li>File contents</li>
+      <li><code>index.html</code>: Bootstrap & AngularJS application stub</li>
+      <li>
+        <button class="btn btn-primary btn-xs disabled">Send</button>
+        submits the content of the input field to a RestXQ service
+      </li>
+      <li>the service <code>/restxq/hello</code> is defined in <code>$project/restxq/hello.xqm</code></li>
+    </ul>
     </p>
 
     <form class="form-horizontal" role="form">
       <div class="form-group">
         <label class="col-sm-3 control-label">Your Name:</label>
+
         <div class="col-sm-7">
           <input name="name" type="text" class="form-control" ng-model="name">
         </div>
         <div class="col-sm-2">
-          <button class="btn btn-primary btn-group-sm" href="#" role="button" ng-disabled="!name" ng-click="send(name)">
-            Send …
+          <button class="btn btn-primary btn-group-sm" role="button" ng-disabled="!name" ng-click="send(name)">
+            Send
           </button>
         </div>
       </div>
       <div class="form-group">
-        <label class="col-sm-3 control-label" >Server says:</label>
+        <label class="col-sm-3 control-label">Server says:</label>
+
         <div class="col-sm-7">
-          <p ng-show="ok.result" class="alert alert-success form-control-static"> {{ ok.result }}</p>
+          <p ng-show="response.text"
+             ng-class="{'alert-warning': response.error, 'alert-success': !response.error}"
+             class="alert form-control-static"> {{ response.text }}</p>
         </div>
-        <pre ng-show="error.result" ng-bind="error.result"></pre>
       </div>
     </form>
 
