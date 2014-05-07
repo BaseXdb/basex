@@ -822,6 +822,25 @@ public class MongoDB extends Nosql {
         }
     }
     /**
+     * rename collection.
+     * @param handler database handler
+     * @param col collection name
+     * @param newCollection new collection name.
+     * @throws QueryException query exception
+     */
+    public void rename(final Str handler, final Item col, final Str newCollection)
+        throws QueryException {
+        final DB db = getDbHandler(handler);
+        db.requestStart();
+        try {
+            db.getCollection(itemToString(col)).rename(itemToString(newCollection));
+       } catch (MongoException e) {
+           throw MongoDBErrors.generalExceptionError(e);
+        } finally {
+           db.requestDone();
+        }
+    }
+    /**
      * Drop collection from a database.
      * @param handler database handler
      * @param col collection name
@@ -912,7 +931,7 @@ public class MongoDB extends Nosql {
         final DB db = getDbHandler(handler);
         db.requestStart();
         try {
-             db.getCollection(itemToString(col)).createIndex(
+             db.getCollection(itemToString(col)).dropIndex(
                     getDbObjectFromStr(indexStr));
            //return returnResult(handler, Str.get(result.toString()));
        } catch (MongoException e) {

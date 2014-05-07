@@ -82,18 +82,27 @@ abstract class Nosql extends QueryModule {
      * convert Str to java string.
      * @param item Str.
      * @return String
+     */
+    protected String itemToString(final Item item){
+      return ((Str) item).toJava();
+    }
+    /**
+     * check json string and if valid return java string as result.
+     * @param json json string
+     * @return Item
      * @throws QueryException query exception
      */
-    protected String itemToString(final Item item) throws QueryException {
-        if(item instanceof Str) {
+    protected String itemToJsonString(final Item json) throws QueryException {
+        if(json instanceof Str) {
             try {
-                String string = ((Str) item).toJava();
+                checkJson(json);
+                String string = ((Str) json).toJava();
                 return string;
             } catch (Exception e) {
                 throw new QueryException("Item is not in well format");
             }
         }
-        throw new QueryException("Item is not in Str format");
+        throw NosqlErrors.generalExceptionError("Item is not in xs:string format");
     }
     /**
      * string format for json.
@@ -110,28 +119,6 @@ abstract class Nosql extends QueryModule {
         return x;
     }
     /**
-     * check json string and if valid return java string as result.
-     * @param json json string
-     * @return Item
-     * @throws QueryException query exception
-     */
-    protected String itemToJsonString(final Item json) throws QueryException {
-        if(json instanceof Str) {
-            try {
-                boolean jsoncheck = checkJson(json);
-                if(jsoncheck) {
-                    String string = ((Str) json).toJava();
-                    return string;
-                }
-            } catch (Exception e) {
-                throw new QueryException("Item is not in well format");
-            }
-        } else {
-            throw new QueryException("Item is not in Str format");
-        }
-        return null;
-    }
-    /**
      *check if Item is valid json not.
      * @param doc Item (string)
      * @return boolean
@@ -143,7 +130,7 @@ abstract class Nosql extends QueryModule {
                     doc).item(queryContext, null);
             return true;
         } catch (Exception e) {
-            throw new QueryException("document is not in json format");
+            throw NosqlErrors.jsonFormatError();
         }
     }
     /**

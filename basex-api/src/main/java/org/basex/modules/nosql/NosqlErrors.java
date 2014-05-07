@@ -15,18 +15,25 @@ public final class NosqlErrors {
   private static final byte[] NS = QueryText.EXPERROR;
   /** Namespace and error code prefix. */
   private static final String PREFIX =
-      new TokenBuilder(QueryText.EXPERR).add(":NOSQL").toString();
+      new TokenBuilder(QueryText.EXPERR).add("nosql").toString();
 
   /** Private constructor, preventing instantiation. */
   private NosqlErrors() { }
 
   /**
-   * CB0001: General Exceptions.
+   * JSON0001: General Exceptions.
    * @param e error Object
    * @return query exception
    */
   public static QueryException generalExceptionError(final Object e) {
-      return thrw(1, "%s", e);
+      return thrw(1, "%", e);
+  }
+  /**
+   * JSON0002: JSON error.
+   * @return query exception
+   */
+  public static QueryException jsonFormatError() {
+      return thrw(2, "Document is not in JSON format");
   }
   /**
    * Returns a query exception.

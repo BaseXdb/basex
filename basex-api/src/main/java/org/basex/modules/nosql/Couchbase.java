@@ -1,17 +1,14 @@
 package org.basex.modules.nosql;
 
-import java.net.URI;
+import java.net.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-
 import net.spy.memcached.internal.OperationFuture;
 
 import org.basex.query.QueryException;
 import org.basex.query.func.FuncOptions;
 import org.basex.query.value.Value;
-import org.basex.query.value.item.Item;
-import org.basex.query.value.item.QNm;
-import org.basex.query.value.item.Str;
+import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.type.SeqType;
 import org.codehaus.jettison.json.JSONArray;
@@ -51,6 +48,28 @@ public class Couchbase extends Nosql {
     //protected ArrayList<URI> nodes = new ArrayList<URI>();
     /** URL of this module. */
     protected boolean valueOnly;
+    /** connection parameters in map like {'url':'localhost','bucket':'basex'}.
+     * @param options mapoptions.
+     * @return connetion string.
+     * @throws QueryException  query exception.
+     */
+    public Str connect(final Map options) throws QueryException {
+    final NosqlOptions opts = new NosqlOptions();
+    if(options != null) {
+        new FuncOptions(Q_COUCHBASE, null).parse(options, opts);
+    }
+    try {
+      String url = opts.get(NosqlOptions.URL);
+      String password = (opts.get(NosqlOptions.PASSWORD) != null) ?
+                             opts.get(NosqlOptions.PASSWORD):"";
+      String bucket = opts.get(NosqlOptions.BUCKET);
+      return connect(Str.get(url), Str.get(bucket), Str.get(password), options);
+    } catch(URISyntaxException e) {
+      throw CouchbaseErrors.generalExceptionError(e);
+    } catch(Exception e) {
+      throw CouchbaseErrors.generalExceptionError(e);
+    }
+   }
     /**
      * Couchbase connection with url host bucket.
      * @param url coucnbase url
@@ -59,9 +78,9 @@ public class Couchbase extends Nosql {
      * @return Connection handler of Couchbase url
      * @throws Exception exception
      */
-    public Str connection(final Str url, final Str bucket, final Str password)
+    public Str connect(final Str url, final Str bucket, final Str password)
             throws Exception {
-        return connection(url, bucket, password, null);
+        return connect(url, bucket, password, null);
     }
     /**
      * Couchbase connection with url host bucket and with option.
@@ -72,14 +91,14 @@ public class Couchbase extends Nosql {
      * @return Connection handler of Couchbase url
      * @throws Exception exception
      */
-    public Str connection(final Str url, final Str bucket, final Str password,
+    public Str connect(final Str url, final Str bucket, final Str password,
             final Map options) throws Exception {
         final NosqlOptions opts = new NosqlOptions();
         if(options != null) {
             new FuncOptions(Q_COUCHBASE, null).parse(options, opts);
         }
         try {
-            String handler = "cbClient" + couchbaseclients.size();
+            String handler = "cb" + couchbaseclients.size();
             List<URI> hosts = Arrays.asList(new URI(url.toJava()));
 //            CouchbaseClient client = new CouchbaseClient(hosts,
 //                    bucket.toJava(), password.toJava());
@@ -105,14 +124,11 @@ public class Couchbase extends Nosql {
      */
     protected CouchbaseClient getClient(final Str handler) throws QueryException {
         String ch = handler.toJava();
-        try {
-            final CouchbaseClient client = couchbaseclients.get(ch);
-            if(client == null)
-                throw CouchbaseErrors.couchbaseClientError(ch);
-            return client;
-        } catch (final Exception ex) {
-            throw CouchbaseErrors.generalExceptionError(ex);
-        }
+        final CouchbaseClient client = couchbaseclients.get(ch);
+        if(client == null)
+          throw CouchbaseErrors.couchbaseClientError(ch);
+        return client;
+
     }
     /**
      * get Couchbase option from particular db handler.
@@ -202,7 +218,7 @@ public class Couchbase extends Nosql {
      * @return Item
      * @throws QueryException query exception
      */
-    public Item put(final Str handler, final Item key, final Item doc,
+    private Item put(final Str handler, final Item key, final Item doc,
             final String type) throws QueryException {
         CouchbaseClient client = getClient(handler);
         OperationFuture<Boolean> result = null;
@@ -219,11 +235,11 @@ public class Couchbase extends Nosql {
                            itemToString(key), itemToJsonString(doc));
                 } else {
                    result = client.append(
-                           itemToString(key), itemToString(doc));
+                           itemToString(key), itemToJsonString(doc));
                 }
             } else {
                 result = client.append(
-                        itemToString(key), itemToString(doc));
+                        itemToString(key), itemToJsonString(doc));
                 //return append(handler, key, doc);
             }
             String msg = result.getStatus().getMessage();
@@ -250,7 +266,11 @@ public class Couchbase extends Nosql {
                 result = "{}";
             }
             Str json = Str.get((String) result);
-            return returnResult(handler, json);
+            if(checkJson(json)) {
+              return returnResult(handler, json);
+            }
+            throw CouchbaseErrors.generalExceptionError("invalid json");
+
         } catch (Exception ex) {
             throw CouchbaseErrors.generalExceptionError(ex);
         }
@@ -373,9 +393,9 @@ public class Couchbase extends Nosql {
      * @return Item
      * @throws QueryException query exception
      */
-    public Item createView(final Str handler, final Str doc, final Str viewName,
+    public Item createview(final Str handler, final Str doc, final Str viewName,
             final Str map) throws QueryException {
-        return createView(handler, doc, viewName, map, null);
+        return createview(handler, doc, viewName, map, null);
     }
     /**
      * Create view with reduce method.
@@ -387,11 +407,11 @@ public class Couchbase extends Nosql {
      * @return Item
      * @throws QueryException query exception
      */
-    public Item createView(final Str handler, final Str doc, final Str viewName,
+    public Item createview(final Str handler, final Str doc, final Str viewName,
             final Str map, final Str reduce) throws QueryException {
         CouchbaseClient client = getClient(handler);
         if(map == null) {
-            throw CouchbaseErrors.generalExceptionError("map function is empty");
+            throw CouchbaseErrors.mapEmpty();
         }
         try {
             DesignDocument designDoc = new DesignDocument(doc.toJava());
@@ -629,20 +649,20 @@ public class Couchbase extends Nosql {
         return Str.get(json.toString());
     }
     /**
-     *  close database instanses.
+     * close database instanses.
      * @param handler database handler
      * @throws QueryException query exception
      */
-    public void shutdown(final Str handler) throws QueryException {
-        shutdown(handler, null);
+    public void disconnect(final Str handler) throws QueryException {
+      disconnect(handler, null);
     }
     /**
-     *  close database connection after certain time.
+     * close database connection after certain time.
      * @param handler database handler
      * @param time in seconds
      * @throws QueryException query exception
      */
-    public void shutdown(final Str handler, final Item time)
+    public void disconnect(final Str handler, final Item time)
             throws QueryException {
         CouchbaseClient client = getClient(handler);
         if(time != null) {
@@ -657,6 +677,19 @@ public class Couchbase extends Nosql {
         } else {
             client.shutdown();
         }
+    }
+    /**
+     * This method check if the database handler is still connected or not.
+     * @param handler database handler.
+     * @return Bln true or false
+     * @throws QueryException query exception
+     */
+    public Bln isconnected(final Str handler) throws QueryException {
+        CouchbaseClient client = getClient(handler);
+        if(client == null){
+          return Bln.FALSE;
+        }
+        return Bln.TRUE;
     }
     /**
      * Convert viewresponse to JSON in pattern of Key Value like {key:value} or

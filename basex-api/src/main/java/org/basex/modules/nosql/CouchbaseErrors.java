@@ -15,7 +15,7 @@ public final class CouchbaseErrors {
   private static final byte[] NS = QueryText.EXPERROR;
   /** Namespace and error code prefix. */
   private static final String PREFIX =
-      new TokenBuilder(QueryText.EXPERR).add(":COUCHBASE").toString();
+      new TokenBuilder(QueryText.EXPERR).add("cb").toString();
 
   /** Private constructor, preventing instantiation. */
   private CouchbaseErrors() { }
@@ -26,22 +26,22 @@ public final class CouchbaseErrors {
    * @return query exception
    */
   public static QueryException generalExceptionError(final Object e) {
-      return thrw(1, "%s", e);
+      return thrw(1, "%", e);
   }
   /**
-   * CB0001: JSON format error.
+   * CB0002: JSON format error.
    * @param e error object
    * @return query exception
    */
   static QueryException jsonFormatError(final Object e) {
-      return thrw(2, "Invalid JSON syntax: '%s'", e);
+      return thrw(2, "Invalid JSON syntax: '%'", e);
   }
   /**
    * CB0003: Incorrect username or password or server is is not working.
    * @return query exception
    */
   public static QueryException unAuthorised() {
-    return thrw(3, "Invalid Authentication parameters");
+    return thrw(3, " Server connection failed ");
   }
   /**
    * CB0004: Couchbase's database handler handler don't exists.
@@ -49,7 +49,7 @@ public final class CouchbaseErrors {
    * @return query exception
    */
   public static QueryException couchbaseClientError(final Object cbClient) {
-    return thrw(4, "Unknown CouchbaseClient handler: '%s'", cbClient);
+    return thrw(4, "Unknown CouchbaseClient handler: '%'", cbClient);
   }
   /**
    * CB0005: Couchbase Operation failed like "add", "update".
@@ -59,7 +59,7 @@ public final class CouchbaseErrors {
    */
   public static QueryException couchbaseOperationFail(final Object type,
           final Object msg) {
-    return thrw(5, "operation '%s' failed: '%s'", type, msg);
+    return thrw(5, "operation '%' failed: '%'", type, msg);
   }
   /**
    * CB0006: Message with one parameter.
@@ -91,6 +91,13 @@ public final class CouchbaseErrors {
    */
   public static QueryException timeInvalid() {
     return thrw(9, "Given time is not valid. It should be Integer value, second");
+  }
+  /**
+   * CB00010: Map function cannot be empty in create view.
+   * @return query exception
+   */
+  public static QueryException mapEmpty() {
+    return thrw(10, "Map function cannot be empty");
   }
   /**
    * Returns a query exception.

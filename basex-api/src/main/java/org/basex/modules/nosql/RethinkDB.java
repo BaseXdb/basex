@@ -1,8 +1,6 @@
 package org.basex.modules.nosql;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
+import java.util.*;
 import org.basex.query.QueryException;
 import org.basex.query.func.FuncOptions;
 import org.basex.query.value.Value;
@@ -11,27 +9,26 @@ import org.basex.query.value.item.QNm;
 import org.basex.query.value.item.Str;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.seq.StrSeq;
-import org.basex.query.value.type.SeqType;
-import com.dkhenry.RethinkDB.RqlConnection;
-import com.dkhenry.RethinkDB.RqlCursor;
+import org.basex.query.value.type.*;
+
+import com.dkhenry.RethinkDB.*;
 import com.dkhenry.RethinkDB.RqlMethodQuery.Delete;
 import com.dkhenry.RethinkDB.RqlMethodQuery.Update;
-import com.dkhenry.RethinkDB.RqlObject;
-import com.dkhenry.RethinkDB.RqlQuery;
-import com.dkhenry.RethinkDB.RqlQuery.Table;
+import com.dkhenry.RethinkDB.RqlQuery.*;
 import com.dkhenry.RethinkDB.errors.RqlDriverException;
 import com.mongodb.util.JSON;
 
 /**
  * This is the primary class for RethinkDB processing in Basex.
+ * This is very early version, without official Java driver.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Prakash Thapa
  */
 public class RethinkDB extends Nosql {
-    /** URL of MongDB module. */
+    /** URL of Rethinkdb module. */
     private static final String RETHINKDB_URL = "http://basex.org/modules/nosql/rethinkdb";
-    /** QName of MongoDB options. */
+    /** QName of Rethinkdb options. */
     private static final QNm Q_RETHINKDB = QNm.get("rethinkdb", "options",
             RETHINKDB_URL);
     /** Rethinkdb instances. */
@@ -43,7 +40,7 @@ public class RethinkDB extends Nosql {
      * Connect parameters in map like: {"host":"localhost","port":27017,
      * "database":"test", "username":"user", "password":"pass"}.
      * @param connectionMap Map
-     * @return Str Key of HashMap that contains all DB Object of Mongodb
+     * @return Str Key of HashMap that contains all DB Object of Rethinkdb
      * connection instances.
      * @throws QueryException query exception
      */
@@ -144,10 +141,19 @@ public class RethinkDB extends Nosql {
     private Item processRqlCursor(final Str handler, final RqlCursor cursor)
             throws Exception {
         ArrayList<Object> array = new ArrayList<>();
-        for(RqlObject o : cursor) {
+        for(RqlObject c : cursor) {
             try {
-                java.util.Map<String, Object> map = o.getMap();
-                array.add(map);
+              Object o = c.as();
+              if (o instanceof java.util.List<?>) {
+                   List<Object> list = c.getList();
+                   array.add(list);
+               }else if (o instanceof ListIterator<?>) {
+                   List<Object> list = c.getList();
+                   array.add(list);
+               }else {
+                   java.util.Map<String, Object> map = c.getMap();
+                   array.add(map);
+               }
             } catch (RqlDriverException e) {
                 throw new QueryException(e.getMessage());
             }
@@ -399,11 +405,11 @@ public class RethinkDB extends Nosql {
                     throw new QueryException("Key " + key.toJava() + " should be string");
                 }
                 final Value value = filter.get(key, null);
-                final String v = (String) value.toJava();
                 final String k = (String) key.toJava();
+                Object vl = (value.type.isNumber())? (Number) value.toJava() : value.toJava();
                 if(value instanceof Str) {
                     if(k.toLowerCase().equals(ID)) {
-                        db.table(table.toJava()).get(v).update(json.toJava());
+                     u = db.table(table.toJava()).get(vl).update(json.toJava());
                         break;
                     }
                 }
@@ -435,8 +441,9 @@ public class RethinkDB extends Nosql {
         if(id == null) {
             throw new QueryException("id should not be empty");
         }
-        if(id.type().instanceOf(SeqType.ITR_OM) ||  id.type().mayBeNumber()) {
+        if(id.type().instanceOf(SeqType.ITR_OM) || id.type.isNumber() || id.type().mayBeNumber()) {
             long l = id.itr(null);
+            System.out.println((int) l);
             return run(handler, getTable(handler, table).get((int) l));
         }
         String s = ((Str) id).toJava();
@@ -453,15 +460,24 @@ public class RethinkDB extends Nosql {
      */
     public Item getAll(final Str handler, final Str table, final Value ids)
             throws QueryException {
-        Object s;
+        Object[] idSeq = null;
         if(ids instanceof Str) {
-            s = ((Str) ids).toJava();
+          idSeq  = new String[1];
+          idSeq[0] = ((Str) ids).toJava();
        } else if(ids instanceof StrSeq) {
-             s = ((StrSeq) ids).toJava();
+             int length = (int) ids.size();
+             if(length > 0) {
+               idSeq = new String[length];
+               int i = 0;
+               for (Item x: ids) {
+                   idSeq[i++] = ((Str) x).toJava();
+               }
+           }
         } else  {
-            s = ids.toJava();
+          idSeq  = new String[1];
+          idSeq[0] = ((Str) ids).toJava();
         }
-        return run(handler, getTable(handler, table).get_all(s));
+        return run(handler, getTable(handler, table).get_all(idSeq));
     }
     /**
      * check if row has field or not.
@@ -561,4 +577,24 @@ public class RethinkDB extends Nosql {
             throw new QueryException(e.getMessage());
         }
     }
+    @SuppressWarnings("javadoc")
+    public Function lambda(final String method, final String param) {
+      Function f = new Function() {
+
+        @Override
+        public RqlQuery apply(final RqlQuery.Var var) {
+          // TODO Auto-generated method stub
+          switch(method) {
+            case "add":
+                var.has_fields(param);
+              break;
+
+            default:
+              break;
+          }
+          return null;
+        }
+      };
+     return f;
+  }
 }
