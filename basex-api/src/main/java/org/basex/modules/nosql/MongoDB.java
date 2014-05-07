@@ -352,6 +352,25 @@ public class MongoDB extends Nosql {
         return  null;
     }
     /**
+     * Convert collection List<DBObject>  into Item {@link Item} element.
+     * @param handler database handler
+     * @param result DBcursor
+     * @return Item
+     * @throws QueryException query exception
+     */
+    private Item cursorListToItem(final Str handler, final List<DBObject> result)
+            throws QueryException {
+              if(result != null) {
+                try {
+                    final Str json = Str.get(JSON.serialize(result));
+                    return returnResult(handler, json);
+                } catch (final Exception ex) {
+                    throw MongoDBErrors.generalExceptionError(ex);
+                }
+            }
+        return  null;
+     }
+    /**
      * Convert collection DBObject into Item {@link Item} element.
      * @param handler databse handler
      * @param object DBObject  (one row result)
@@ -377,7 +396,7 @@ public class MongoDB extends Nosql {
      * @return DBObject
      * @throws QueryException query exception
      */
-    protected DBObject getDbObjectFromStr(final Item item) throws QueryException {
+    protected DBObject getDbObjectFromItem(final Item item) throws QueryException {
         try {
             if(item instanceof Map) {
                 return mapToDBObject((Map) item);
@@ -460,12 +479,12 @@ public class MongoDB extends Nosql {
               try {
                   DBObject p = null;
                   if(opt != null && opt instanceof Str) {
-                      p = getDbObjectFromStr(opt);
+                      p = getDbObjectFromItem(opt);
                   } else if (projection != null && projection instanceof Str) {
-                      p = getDbObjectFromStr(projection);
+                      p = getDbObjectFromItem(projection);
                   }
                 final DBObject q = query != null ?
-                        getDbObjectFromStr(query) : null;
+                        getDbObjectFromItem(query) : null;
                 final DBCollection coll = db.getCollection(itemToString(col));
                 final DBCursor cursor = coll.find(q, p);
                 Map options = null;
@@ -557,9 +576,9 @@ public class MongoDB extends Nosql {
         db.requestStart();
         try {
             final DBObject p = projection != null ?
-                    getDbObjectFromStr(projection) : null;
+                    getDbObjectFromItem(projection) : null;
             final DBObject q = query != null ?
-                    getDbObjectFromStr(query) : null;
+                    getDbObjectFromItem(query) : null;
             final DBCollection coll = db.getCollection(itemToString(col));
             final DBObject cursor = coll.findOne(q, p);
             return  objectToItem(handler, cursor);
@@ -582,7 +601,7 @@ public class MongoDB extends Nosql {
         final DB db = getDbHandler(handler);
         db.requestStart();
         try {
-            DBObject obj = getDbObjectFromStr(insertString);
+            DBObject obj = getDbObjectFromItem(insertString);
             WriteResult wr = db.getCollection(col.toJava()).insert(obj);
            return returnResult(handler, Str.get(wr.toString()));
         } catch (MongoException e) {
@@ -621,8 +640,8 @@ public class MongoDB extends Nosql {
         final DB db = getDbHandler(handler);
         db.requestStart();
         try {
-            DBObject q =  getDbObjectFromStr(query);
-            DBObject updateValue = getDbObjectFromStr(updatestring);
+            DBObject q =  getDbObjectFromItem(query);
+            DBObject updateValue = getDbObjectFromItem(updatestring);
             WriteResult wr;
             if(upsert != null && multi != null) {
                 wr = db.getCollection(itemToString(col)).
@@ -666,12 +685,12 @@ public class MongoDB extends Nosql {
         try {
           if(options == null){
             WriteResult wr = db.getCollection(col.toJava()).
-                save(getDbObjectFromStr(saveStr));
+                save(getDbObjectFromItem(saveStr));
             return returnResult(handler, Str.get(wr.toString()));
           }
          //TODO write concern from the options
           WriteResult wr = db.getCollection(col.toJava()).
-                save(getDbObjectFromStr(saveStr), WriteConcern.SAFE);
+                save(getDbObjectFromItem(saveStr), WriteConcern.SAFE);
             return returnResult(handler, Str.get(wr.toString()));
 
 
@@ -694,7 +713,7 @@ public class MongoDB extends Nosql {
         db.requestStart();
         try {
           //TODO write concern.
-            db.getCollection(itemToString(col)).remove(getDbObjectFromStr(query));
+            db.getCollection(itemToString(col)).remove(getDbObjectFromItem(query));
             DBObject err = db.getLastError();
             if(err != null) {
                 throw MongoDBErrors.generalExceptionError(err.get("err").toString());
@@ -741,7 +760,7 @@ public class MongoDB extends Nosql {
                     pipeline = new BasicDBObject[length];
                     int i = 0;
                     for (Item x: additionalOps) {
-                        pipeline[i++] = getDbObjectFromStr(x);
+                        pipeline[i++] = getDbObjectFromItem(x);
                     }
                 }
             }
@@ -750,10 +769,10 @@ public class MongoDB extends Nosql {
         try {
             if(additionalOps != null && (!additionalOps.isEmpty())) {
                 agg =  db.getCollection(itemToString(col)).
-                        aggregate(getDbObjectFromStr(first), pipeline);
+                        aggregate(getDbObjectFromItem(first), pipeline);
             } else {
                 agg =  db.getCollection(itemToString(col)).
-                        aggregate(getDbObjectFromStr(first));
+                        aggregate(getDbObjectFromItem(first));
             }
            final Iterable<DBObject> d = agg.results();
           return returnResult(handler, Str.get(JSON.serialize(d)));
@@ -881,17 +900,32 @@ public class MongoDB extends Nosql {
         db.requestStart();
         try {
             CommandResult result = null;
-            if(command instanceof Map) {
-                DBObject  cmd = mapToDBObject((Map) command);
-                if(options != null) {
-                    result = db.command(cmd, (DBEncoder) options.toJava());
-                } else {
-                    result = db.command(cmd);
-                }
-            } else {
-                result = db.command(((Str) command).toJava());
-            }
+            DBObject cmd = getDbObjectFromItem(command);
+            if(options != null) {
+              result = db.command(cmd, (DBEncoder) options.toJava());
+          } else {
+              result = db.command(cmd);
+          }
            return returnResult(handler, Str.get(result.toString()));
+       } catch (MongoException e) {
+           throw MongoDBErrors.generalExceptionError(e);
+        } finally {
+           db.requestDone();
+        }
+    }
+    /**
+     * list all the indexes of cursor.
+     * @param handler database handler
+     * @param col collection name of collection
+     * @return Item
+     * @throws QueryException query exception
+     */
+    public Item getindexes(final Str handler, final Str col)throws QueryException {
+        final DB db = getDbHandler(handler);
+        db.requestStart();
+        try {
+             List<DBObject> result = db.getCollection(itemToString(col)).getIndexInfo();
+             return cursorListToItem(handler, result);
        } catch (MongoException e) {
            throw MongoDBErrors.generalExceptionError(e);
         } finally {
@@ -911,7 +945,7 @@ public class MongoDB extends Nosql {
         db.requestStart();
         try {
              db.getCollection(itemToString(col)).ensureIndex(
-                    getDbObjectFromStr(indexStr));
+                    getDbObjectFromItem(indexStr));
            //return returnResult(handler, Str.get(result.toString()));
        } catch (MongoException e) {
            throw MongoDBErrors.generalExceptionError(e);
@@ -932,7 +966,7 @@ public class MongoDB extends Nosql {
         db.requestStart();
         try {
              db.getCollection(itemToString(col)).dropIndex(
-                    getDbObjectFromStr(indexStr));
+                    getDbObjectFromItem(indexStr));
            //return returnResult(handler, Str.get(result.toString()));
        } catch (MongoException e) {
            throw MongoDBErrors.generalExceptionError(e);
@@ -1019,7 +1053,7 @@ public class MongoDB extends Nosql {
             generalExceptionError("Map function cannot be empty in Mapreduce");
         }
         final DBObject q = query != null ?
-                getDbObjectFromStr(query) : null;
+                getDbObjectFromItem(query) : null;
         final DBCollection collection = db.getCollection(itemToString(col));
         String out = null;
         String outType = null;
@@ -1105,9 +1139,9 @@ public class MongoDB extends Nosql {
                     generalExceptionError(" Expected integer Value");
                 }
             } else if(key.toLowerCase().equals(SORT)) {
-                sort = getDbObjectFromStr(Str.get(value));
+                sort = getDbObjectFromItem(Str.get(value));
             } else if(key.toLowerCase().equals(QUERY)) {
-                query = getDbObjectFromStr(Str.get(value));
+                query = getDbObjectFromItem(Str.get(value));
             } else if(key.toLowerCase().equals(FINALIZE)) {
                 finalalize = value;
             }

@@ -477,8 +477,7 @@ public class Couchbase extends Nosql {
                 } else if(k.equals(DEBUG)) {
                     q.setDebug(((Item) v).bool(null));
                 } else if(k.equals(REDUCE)) {
-                    boolean d = ((Item) v).bool(null);
-                    q.setReduce(d);
+                    q.setReduce(((Item) v).bool(null));
                 } else if(k.equals(GROUP)) {
                     boolean d = ((Item) v).bool(null);
                     q.setGroup(d);
