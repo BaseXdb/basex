@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+  <Call name="addConnector">
+    <Arg>
+      <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
+        <Set name="host"><SystemProperty name="org.basex.serverhost" default="0.0.0.0"/></Set>
+        <Set name="port"><SystemProperty name="org.basex.serverport" default="8989"/></Set>
+        <Set name="maxIdleTime">60000</Set>
+        <Set name="reuseAddress">true</Set>
+        <Set name="Acceptors">2</Set>
+      </New>
+    </Arg>
+  </Call>
+</Configure>
