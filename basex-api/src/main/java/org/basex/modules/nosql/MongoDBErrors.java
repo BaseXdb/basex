@@ -15,7 +15,7 @@ public final class MongoDBErrors {
   private static final byte[] NS = QueryText.EXPERROR;
   /** Namespace and error code prefix. */
   private static final String PREFIX =
-      new TokenBuilder(QueryText.EXPERR).add(":MONGODB").toString();
+      new TokenBuilder(QueryText.EXPERR).add(":mongo").toString();
 
   /** Private constructor, preventing instantiation. */
   private MongoDBErrors() { }
@@ -26,7 +26,7 @@ public final class MongoDBErrors {
    * @return query exception
    */
   public static QueryException generalExceptionError(final Object e) {
-      return thrw(1, "%s", e);
+      return thrw(1, "%", e);
   }
   /**
    * MONGODB0002: JSON format error.
@@ -34,7 +34,7 @@ public final class MongoDBErrors {
    * @return query exception
    */
   public static QueryException jsonFormatError(final Object e) {
-      return thrw(2, "Invalid JSON syntax: '%s'", e);
+      return thrw(2, "Invalid JSON syntax: '%'", e);
   }
   /**
    * MONGODB0003: Incorrect username or password.
@@ -49,7 +49,7 @@ public final class MongoDBErrors {
    * @return query exception
    */
   public static QueryException mongoExceptionError(final Object e) {
-    return thrw(4, "%s", e);
+    return thrw(4, "%", e);
   }
   /**
    * MONGODB0005: Mongodb handler don't exists.
@@ -57,7 +57,7 @@ public final class MongoDBErrors {
    * @return query exception
    */
   public static QueryException mongoClientError(final Object mongoClient) {
-    return thrw(5, "Unknown MongoDB handler: '%s'", mongoClient);
+    return thrw(5, "Unknown MongoDB handler: '%'", mongoClient);
   }
   /**
    * MONGODB0006: Mongodb DB handler don't exists.
@@ -65,7 +65,7 @@ public final class MongoDBErrors {
    * @return query exception
    */
   public static QueryException mongoDBError(final Object db) {
-    return thrw(6, "Unknown database handler: '%s'", db);
+    return thrw(6, "Invalid database identifier: '%'", db);
   }
   /**
    * take two parameters.

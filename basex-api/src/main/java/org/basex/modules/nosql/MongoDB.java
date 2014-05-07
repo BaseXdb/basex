@@ -16,21 +16,8 @@ import org.basex.query.value.item.QNm;
 import org.basex.query.value.item.Str;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.type.SeqType;
-import com.mongodb.AggregationOutput;
-import com.mongodb.BasicDBObject;
-import com.mongodb.CommandResult;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBEncoder;
-import com.mongodb.DBObject;
-import com.mongodb.MapReduceCommand;
+import com.mongodb.*;
 import com.mongodb.MapReduceCommand.OutputType;
-import com.mongodb.MapReduceOutput;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-import com.mongodb.MongoException;
-import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
 import com.mongodb.util.JSONParseException;
 
@@ -168,6 +155,23 @@ public class MongoDB extends Nosql {
         } catch (UnknownHostException ex) {
           throw MongoDBErrors.generalExceptionError(ex);
         }
+    }
+    /**
+     * This method check if the database handler is still connected or not.
+     * @param handler database handler.
+     * @return Bln true or false
+     * @throws QueryException query exception
+     */
+    public Bln isconnected(final Str handler) throws QueryException {
+      try {
+          final MongoClient client = (MongoClient) getDbHandler(handler).getMongo();
+          if(client == null){
+            return Bln.FALSE;
+          }
+          return Bln.TRUE;
+      } catch (MongoException e) {
+          throw MongoDBErrors.generalExceptionError(e);
+      }
     }
     /**
      * This method take key of Hashmap, create DB object and store to another
@@ -597,7 +601,7 @@ public class MongoDB extends Nosql {
      * @throws Exception exception
      */
     public Item update(final Str handler, final Item col, final Item query,
-            final Str updatestring) throws Exception {
+            final Item updatestring) throws Exception {
         return update(handler, col, query, updatestring, null, null);
     }
     /**
@@ -612,7 +616,7 @@ public class MongoDB extends Nosql {
      * @throws Exception exception
      */
     public Item update(final Str handler, final Item col, final Item query,
-            final Str updatestring, final Bln upsert, final Bln multi)
+            final Item updatestring, final Bln upsert, final Bln multi)
                     throws Exception {
         final DB db = getDbHandler(handler);
         db.requestStart();
@@ -644,12 +648,33 @@ public class MongoDB extends Nosql {
      */
     public Item save(final Str handler, final Str col, final Item saveStr)
             throws Exception {
+      return save(handler, col, saveStr, null);
+    }
+    /**
+     * Mongodb Save function.
+     * @param handler database handler DB handler
+     * @param col collection name
+     * @param saveStr string to save(Map or Josn)
+     * @param options other writeconcern options
+     * @return Item result as item
+     * @throws Exception exception
+     */
+    public Item save(final Str handler, final Str col, final Item saveStr, final Map options)
+            throws Exception {
         final DB db = getDbHandler(handler);
         db.requestStart();
         try {
-           WriteResult wr = db.getCollection(col.toJava()).
-                   save(getDbObjectFromStr(saveStr));
-           return returnResult(handler, Str.get(wr.toString()));
+          if(options == null){
+            WriteResult wr = db.getCollection(col.toJava()).
+                save(getDbObjectFromStr(saveStr));
+            return returnResult(handler, Str.get(wr.toString()));
+          }
+         //TODO write concern from the options
+          WriteResult wr = db.getCollection(col.toJava()).
+                save(getDbObjectFromStr(saveStr), WriteConcern.SAFE);
+            return returnResult(handler, Str.get(wr.toString()));
+
+
         } catch (MongoException e) {
             throw MongoDBErrors.generalExceptionError(db.getLastError().getString("err"));
         } finally {
@@ -668,6 +693,7 @@ public class MongoDB extends Nosql {
         final DB db = getDbHandler(handler);
         db.requestStart();
         try {
+          //TODO write concern.
             db.getCollection(itemToString(col)).remove(getDbObjectFromStr(query));
             DBObject err = db.getLastError();
             if(err != null) {
@@ -900,7 +926,7 @@ public class MongoDB extends Nosql {
      * @param handler database handler DB handler
      * @throws QueryException query exception
      */
-    public void close(final Str handler) throws QueryException {
+    public void disconnect(final Str handler) throws QueryException {
         String ch = handler.toJava();
         try {
             final MongoClient client = (MongoClient) getDbHandler(handler).getMongo();
@@ -908,7 +934,7 @@ public class MongoDB extends Nosql {
                 throw MongoDBErrors.mongoDBError(ch);
             client.close();
         } catch (MongoException e) {
-            throw MongoDBErrors.mongoDBError(e);
+            throw MongoDBErrors.generalExceptionError(e);
         }
     }
     /**
