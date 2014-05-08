@@ -30,12 +30,13 @@ public final class FNMath extends StandardFunc {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+    final double e = expr.length == 2 ? checkDbl(expr[1], ctx) : 0;
     double d = 0;
     if(expr.length > 0 && sig != _MATH_CRC32) {
-      if(expr[0].isEmpty()) return null;
-      d = checkDbl(expr[0], ctx);
+      final Item it = expr[0].item(ctx, info);
+      if(it == null) return null;
+      d = checkDbl(it, ctx);
     }
-    final double e = expr.length == 2 ? checkDbl(expr[1], ctx) : 0;
 
     switch(sig) {
       case _MATH_PI:     return Dbl.get(PI);
