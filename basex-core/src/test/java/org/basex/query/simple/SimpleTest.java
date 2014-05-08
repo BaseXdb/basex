@@ -168,6 +168,10 @@ public final class SimpleTest extends QueryTest {
       { "Limits 10", "-9223372036854775808 - 1" },
       // { "Limits 11", itr(-9223372036854775808L), "-9223372036854775808" },
 
+      { "Empty 1", str(""), "format-integer(let $x := random:integer() return (), '0')" },
+      { "Empty 2", empty(), "math:sin(let $x := random:integer() return ())" },
+      { "Empty 3", bool(true), "let $a := () return empty($a)" },
+      { "Empty 4", bool(false), "let $a := () return exists($a)" },
       { "Empty 5", bool(true), "declare function local:foo($x as empty-sequence())"
           + "as xs:boolean { empty($x) }; local:foo(())" }
     };
