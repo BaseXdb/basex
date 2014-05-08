@@ -54,8 +54,9 @@ public final class FNFormat extends StandardFunc {
     final byte[] pic = checkStr(expr[1], ctx);
     final byte[] lng = expr.length == 2 ? EMPTY : checkStr(expr[2], ctx);
 
-    if(expr[0].isEmpty()) return Str.ZERO;
-    final long num = checkItr(expr[0], ctx);
+    final Item it = expr[0].item(ctx, info);
+    if(it == null) return Str.ZERO;
+    final long num = checkItr(it);
 
     FormatParser fp = formats.get(pic);
     if(fp == null) {
