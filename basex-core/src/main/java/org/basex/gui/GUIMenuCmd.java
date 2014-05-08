@@ -432,7 +432,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Finds files. */
-  C_FILESEARCH(FIND_FILES + DOTS, "% H", false, false) {
+  C_FILESEARCH(FIND_FILES + DOTS, Prop.MAC ? "% shift H" : "% H", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.showProject();
