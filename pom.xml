@@ -78,16 +78,20 @@
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-server</artifactId>
         <version>${jettyVersion}</version>
+        <!-- 'provided': Jetty will be excluded from WAR file -->
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-servlet</artifactId>
         <version>${jettyVersion}</version>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-webapp</artifactId>
         <version>${jettyVersion}</version>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>com.ettrema</groupId>
