@@ -11,9 +11,7 @@ import org.basex.query.value.Value;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.type.SeqType;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.*;
 
 import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.CouchbaseConnectionFactory;
@@ -331,9 +329,8 @@ public class Couchbase extends Nosql {
                 String s = (String) v.toJava();
                 keys.add(s);
              }
-             java.util.Map<String, Object> bulkset = client.getBulk(keys);
-             Str json = getBulkJson(bulkset);
-             return returnResult(handler, json);
+              java.util.Map<String, Object> bulkset = client.getBulk(keys);
+             return returnResult(handler, getBulkJson(bulkset));
          } catch (Exception ex) {
             throw new QueryException(ex);
         }

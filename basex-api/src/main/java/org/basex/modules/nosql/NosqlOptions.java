@@ -7,7 +7,7 @@ import org.basex.util.options.EnumOption;
 import org.basex.util.options.NumberOption;
 import org.basex.util.options.StringOption;
 /**
- * Options for MongoDB.
+ * Options for all nosql databases.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Prakash Thapa

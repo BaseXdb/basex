@@ -1,7 +1,6 @@
 package org.basex.modules.nosql;
 
-import org.basex.build.JsonOptions;
-import org.basex.build.JsonParserOptions;
+import org.basex.build.*;
 import org.basex.io.parse.json.JsonConverter;
 import org.basex.io.serial.SerialMethod;
 import org.basex.io.serial.SerializerOptions;
