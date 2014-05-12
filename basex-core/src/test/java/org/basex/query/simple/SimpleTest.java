@@ -92,6 +92,8 @@ public final class SimpleTest extends QueryTest {
       { "Filter 6", bool(true), "empty((1,2,3)[3][2])" },
       { "Filter 7", bool(true), "empty((1,2,3)[position() = 3][2])" },
       { "Filter 8", itr(1), "1[boolean(max((<a>1</a>, <b>2</b>)))]" },
+      { "Filter 9", str("x"), "string(<n><a/><a>x</a></n>/a/text()[.][.])" },
+      { "Filter 10", str("x"), "string(<n><a/><a>x</a></n>/a/text()[1][1])" },
 
       { "ContextItem 0", node(0), "." },
       { "ContextItem 1", node(0), "42[not(.)], ." },
@@ -165,6 +167,13 @@ public final class SimpleTest extends QueryTest {
       { "Limits 9", "-9223372036854775807 - 1024" },
       { "Limits 10", "-9223372036854775808 - 1" },
       // { "Limits 11", itr(-9223372036854775808L), "-9223372036854775808" },
+
+      { "Empty 1", str(""), "format-integer(let $x := random:integer() return (), '0')" },
+      { "Empty 2", empty(), "math:sin(let $x := random:integer() return ())" },
+      { "Empty 3", bool(true), "let $a := () return empty($a)" },
+      { "Empty 4", bool(false), "let $a := () return exists($a)" },
+      { "Empty 5", bool(true), "declare function local:foo($x as empty-sequence())"
+          + "as xs:boolean { empty($x) }; local:foo(())" }
     };
   }
 }

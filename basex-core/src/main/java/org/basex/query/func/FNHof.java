@@ -84,7 +84,7 @@ public final class FNHof extends StandardFunc {
           final FItem f = withArity(1, 2, ctx);
           Expr e = seq.itemAt(0);
           for(int i = 1, len = (int) seq.size(); i < len; i++)
-            e = new DynFuncCall(info, f, e, seq.itemAt(i)).optimize(ctx, scp);
+            e = new DynFuncCall(info, sc, false, f, e, seq.itemAt(i)).optimize(ctx, scp);
           return e;
         }
         return this;

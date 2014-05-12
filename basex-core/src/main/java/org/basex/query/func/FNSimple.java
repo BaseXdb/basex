@@ -119,7 +119,7 @@ public final class FNSimple extends StandardFunc {
       case EXISTS:
         // ignore non-deterministic expressions (e.g.: error())
         return e.size() == -1 || e.has(Flag.NDT) || e.has(Flag.CNS) ? this :
-          Bln.get(sig == Function.EMPTY ^ !e.isEmpty());
+          Bln.get(sig == Function.EMPTY ^ e.size() != 0);
       case BOOLEAN:
         // simplify, e.g.: if(boolean(A)) -> if(A)
         return e.type().eq(SeqType.BLN) ? e : this;

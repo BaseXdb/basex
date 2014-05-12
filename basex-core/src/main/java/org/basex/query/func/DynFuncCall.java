@@ -24,16 +24,27 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class DynFuncCall extends FuncCall {
+  /** Static context. */
+  private final StaticContext sc;
   /** Hash values of all function items that this call was copied from, possibly {@code null}. */
   private int[] inlinedFrom;
+  /** Updating flag. */
+  private boolean updating;
+
   /**
    * Function constructor.
    * @param ii input info
+   * @param sc static context
+   * @param updating updating flag
    * @param fun function expression
    * @param arg arguments
    */
-  public DynFuncCall(final InputInfo ii, final Expr fun, final Expr... arg) {
+  public DynFuncCall(final InputInfo ii, final StaticContext sc, final boolean updating,
+      final Expr fun, final Expr... arg) {
+
     super(ii, Array.add(arg, fun));
+    this.sc = sc;
+    this.updating = updating;
   }
 
   @Override
@@ -58,14 +69,18 @@ public final class DynFuncCall extends FuncCall {
       if(allAreValues() && f instanceof Map) return optPre(value(ctx), ctx);
 
       // try to inline the function
-      if(!(f instanceof FuncItem && comesFrom((FuncItem) f))) {
+      if(!(f instanceof FuncItem && comesFrom((FuncItem) f)) && !updating) {
         final Expr[] args = Arrays.copyOf(expr, expr.length - 1);
         final Expr inl = ((XQFunctionExpr) f).inlineExpr(args, ctx, scp, info);
         if(inl != null) return inl;
       }
     }
-
     return this;
+  }
+
+  @Override
+  public void checkUp() throws QueryException {
+    checkNoneUp(Arrays.copyOf(expr, expr.length - 1));
   }
 
   /**
@@ -96,7 +111,8 @@ public final class DynFuncCall extends FuncCall {
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final Expr[] copy = copyAll(ctx, scp, vs, expr);
     final int last = copy.length - 1;
-    final DynFuncCall call = new DynFuncCall(info, copy[last], Arrays.copyOf(copy, last));
+    final Expr[] args = Arrays.copyOf(copy, last);
+    final DynFuncCall call = new DynFuncCall(info, sc, updating, copy[last], args);
     if(inlinedFrom != null) call.inlinedFrom = inlinedFrom.clone();
     return copyType(call);
   }
@@ -137,6 +153,9 @@ public final class DynFuncCall extends FuncCall {
     if(!(it instanceof FItem)) throw INVFUNCITEM.get(info, it.type);
     final FItem fit = (FItem) it;
     if(fit.arity() != ar) throw INVARITY.get(info, fit, ar);
+    if(!sc.mixUpdates && updating != fit.annotations().contains(Ann.Q_UPDATING))
+      throw (updating ? UPFUNCNOTUP : UPFUNCUP).get(info);
+
     return fit;
   }
 
@@ -146,5 +165,11 @@ public final class DynFuncCall extends FuncCall {
     final Value[] args = new Value[al];
     for(int a = 0; a < al; ++a) args[a] = ctx.value(expr[a]);
     return args;
+  }
+
+  @Override
+  public boolean has(final Flag flag) {
+    // assume worst case if mixed updates are allowed
+    return flag == Flag.UPD ? sc.mixUpdates || updating : super.has(flag);
   }
 }
