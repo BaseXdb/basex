@@ -2312,7 +2312,7 @@ public class QueryParser extends InputParser {
           final Expr lit = Functions.getLiteral(name, card, ctx, sc, ii);
           final Expr f = lit != null ? lit : FuncLit.unknown(name, card, ctx, sc, ii);
           ret = new PartFunc(sc, ii, f, args, holes);
-          if((lit instanceof FuncItem ? ((FuncItem) lit).annotations() :
+          if(lit != null && (lit instanceof FuncItem ? ((FuncItem) f).annotations() :
             ((FuncLit) lit).annotations()).contains(Ann.Q_UPDATING)) ctx.updating();
         } else {
           final TypedFunc f = Functions.get(name, args, false, ctx, sc, ii);
