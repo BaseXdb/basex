@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -66,7 +65,7 @@ public final class List extends Command {
     table.description = DATABASES_X;
 
     final boolean create = context.user.has(Perm.CREATE);
-    table.header.add(T_NAME);
+    table.header.add(NAME);
     table.header.add(RESOURCES);
     table.header.add(SIZE);
     if(create) table.header.add(INPUT_PATH);
