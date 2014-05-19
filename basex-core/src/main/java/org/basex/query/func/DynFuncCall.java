@@ -169,7 +169,7 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public boolean has(final Flag flag) {
-    // assume worst case if mixed updates are allowed
+    // MIXUPDATES: all function calls may be updating
     return flag == Flag.UPD ? sc.mixUpdates || updating : super.has(flag);
   }
 }

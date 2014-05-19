@@ -83,4 +83,11 @@ public final class MixpUpdatesTest extends AdvancedQueryTest {
     query("declare function local:a() { local:b#0 };"
         + "declare function local:b() { db:output('1') }; local:a()()", "1");
   }
+
+  /** Test method. */
+  @Test
+  public void functionLookup() {
+    query("declare function local:a() { db:output(1) };"
+        + "function-lookup(xs:QName('local:a'), 0)()", "1");
+  }
 }

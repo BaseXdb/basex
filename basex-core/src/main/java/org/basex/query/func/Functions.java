@@ -144,12 +144,8 @@ public final class Functions extends TokenSet {
     final Function fn = get().getBuiltIn(name, arity, ii);
     if(fn != null) {
       final Ann ann = new Ann();
-      if(fn.has(Flag.UPD)) {
-        ctx.updating();
-        ann.add(Ann.Q_UPDATING, Empty.SEQ, ii);
-      }
       final VarScope scp = new VarScope(sc);
-      final FuncType ft = fn.type(arity);
+      final FuncType ft = fn.type(arity, ann);
       final QNm[] argNames = fn.argNames(arity);
 
       final Var[] args = new Var[arity];
@@ -159,11 +155,15 @@ public final class Functions extends TokenSet {
         calls[i] = new VarRef(ii, args[i]);
       }
 
-      final StandardFunc f = fn.get(sc, calls);
-      if(!f.has(Flag.CTX) && !f.has(Flag.FCS))
-        return new FuncItem(sc, ann, name, args, ft, f, scp.stackSize());
+      final StandardFunc sf = fn.get(sc, calls);
+      if(sf.has(Flag.UPD)) {
+        ctx.updating();
+        ann.add(Ann.Q_UPDATING, Empty.SEQ, ii);
+      }
+      if(!sf.has(Flag.CTX) && !sf.has(Flag.FCS))
+        return new FuncItem(sc, ann, name, args, ft, sf, scp.stackSize());
 
-      return new FuncLit(ann, name, args, f, ft, scp, sc, ii);
+      return new FuncLit(ann, name, args, sf, ft, scp, sc, ii);
     }
 
     // user-defined function
@@ -243,7 +243,7 @@ public final class Functions extends TokenSet {
     if(fun != null) {
       if(!sc.xquery3() && fun.has(Flag.X30)) throw FUNC30.get(ii);
       final Ann ann = new Ann();
-      if(fun.sig.has(Flag.UPD)) {
+      if(fun.has(Flag.UPD)) {
         ann.add(Ann.Q_UPDATING, Empty.SEQ, ii);
         ctx.updating();
       }

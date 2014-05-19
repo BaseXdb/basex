@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
@@ -58,7 +59,7 @@ public final class FNFunc extends StandardFunc {
 
   @Override
   Expr opt(final QueryContext ctx, final VarScope scp) throws QueryException {
-    if(oneOf(sig, Function.FOLD_LEFT, Function.FOLD_RIGHT, Function.FOR_EACH)
+    if(oneOf(sig, FOLD_LEFT, FOLD_RIGHT, FOR_EACH)
         && allAreValues() && expr[0].size() < UNROLL_LIMIT) {
       // unroll the loop
       ctx.compInfo(QueryText.OPTUNROLL, this);
@@ -66,7 +67,7 @@ public final class FNFunc extends StandardFunc {
       final int len = (int) seq.size();
 
       // fn:for-each(...)
-      if (sig == Function.FOR_EACH) {
+      if (sig == FOR_EACH) {
         final Expr[] results = new Expr[len];
         for(int i = 0; i < len; i++) {
           results[i] = new DynFuncCall(info, sc, false, expr[1], seq.itemAt(i)).optimize(ctx, scp);
@@ -76,7 +77,7 @@ public final class FNFunc extends StandardFunc {
 
       // folds
       Expr e = expr[1];
-      if (sig == Function.FOLD_LEFT) {
+      if (sig == FOLD_LEFT) {
         for (final Item it : seq)
           e = new DynFuncCall(info, sc, false, expr[2], e, it).optimize(ctx, scp);
       } else {
@@ -86,7 +87,7 @@ public final class FNFunc extends StandardFunc {
       return e;
     }
 
-    if(sig == Function.FUNCTION_LOOKUP) {
+    if(sig == FUNCTION_LOOKUP) {
       for(final StaticFunc sf : ctx.funcs.funcs()) sf.compile(ctx);
     }
     return this;

@@ -14,7 +14,6 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Flag;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -1123,7 +1122,7 @@ public enum Function {
   /** Return type. */
   final SeqType ret;
   /** Compiler flags. */
-  private final EnumSet<Flag> flags;
+  final EnumSet<Flag> flags;
 
   /** Function classes. */
   private final Class<? extends StandardFunc> func;
@@ -1207,23 +1206,12 @@ public enum Function {
   }
 
   /**
-   * Indicates if an expression has the specified compiler property.
-   * @param flag flag to be found
-   * @return result of check
-   * @see Expr#has(Flag)
-   */
-  public boolean has(final Flag flag) {
-    return flags.contains(flag);
-  }
-
-  /**
    * Returns the function type of this function with the given arity.
    * @param arity number of arguments
+   * @param ann annotations
    * @return function type
    */
-  final FuncType type(final int arity) {
-    final Ann ann = new Ann();
-    if(has(UPD)) ann.add(Ann.Q_UPDATING, Empty.SEQ, null);
+  final FuncType type(final int arity, final Ann ann) {
     final SeqType[] arg = new SeqType[arity];
     if(arity != 0 && max == Integer.MAX_VALUE) {
       System.arraycopy(args, 0, arg, 0, args.length);

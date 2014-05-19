@@ -176,13 +176,13 @@ public class FuncType implements Type {
 
   /**
    * Getter for function types.
-   * @param a annotations
+   * @param ann annotations
    * @param ret return type
    * @param args argument types
    * @return function type
    */
-  public static FuncType get(final Ann a, final SeqType ret, final SeqType... args) {
-    return args == null || ret == null ? ANY_FUN : new FuncType(a, args, ret);
+  public static FuncType get(final Ann ann, final SeqType ret, final SeqType... args) {
+    return args == null || ret == null ? ANY_FUN : new FuncType(ann, args, ret);
   }
 
   /**
