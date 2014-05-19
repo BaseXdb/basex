@@ -1,5 +1,11 @@
 package org.basex.query.func;
 
+import static org.basex.query.util.Err.*;
+
+import java.io.*;
+import java.util.*;
+
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -49,7 +55,7 @@ public final class FNInspect extends StandardFunc {
 
   @Override
   protected Expr opt(final QueryContext ctx, final VarScope scp) throws QueryException {
-    if(sig == Function._INSPECT_FUNCTIONS) {
+    if(sig == Function._INSPECT_FUNCTIONS && expr.length == 0) {
       for(final StaticFunc sf : ctx.funcs.funcs()) sf.compile(ctx);
       return functions(ctx).value();
     }
@@ -108,11 +114,35 @@ public final class FNInspect extends StandardFunc {
    * @throws QueryException query exception
    */
   private ValueBuilder functions(final QueryContext ctx) throws QueryException {
+    // about to be updated in a future version
+    final ArrayList<StaticFunc> old = new ArrayList<>();
+    if(expr.length > 0) {
+      // cache existing functions
+      for(final StaticFunc sf : ctx.funcs.funcs()) old.add(sf);
+      try {
+        final IO io = checkPath(expr[0], ctx);
+        ctx.parse(Token.string(io.read()), io.path(), sc);
+        ctx.compile();
+      } catch(final IOException ex) {
+        throw IOERR.get(info, ex);
+      } finally {
+        ctx.close();
+      }
+    }
+
     final ValueBuilder vb = new ValueBuilder();
     for(final StaticFunc sf : ctx.funcs.funcs()) {
+      if(old.contains(sf)) continue;
       final FuncItem fi = Functions.getUser(sf, ctx, sf.sc, info);
       if(sc.mixUpdates || !fi.annotations().contains(Ann.Q_UPDATING)) vb.add(fi);
     }
     return vb;
+  }
+
+  @Override
+  public boolean has(final Flag flag) {
+    // do not relocate function, as it introduces new code
+    return flag == Flag.NDT && sig == Function._INSPECT_FUNCTIONS && expr.length == 1 ||
+        super.has(flag);
   }
 }
