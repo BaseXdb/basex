@@ -30,6 +30,15 @@ public final class UpdateTest extends AdvancedQueryTest {
     new CreateDB(NAME, input == null ? DOC : input).execute(context);
   }
 
+  /**
+   * Closes the currently opened database.
+   * @throws BaseXException database exception
+   */
+  @After
+  public void finish() throws BaseXException {
+    new Close().execute(context);
+  }
+
   // BASIC XQUF TESTS *********************************************
   /**
    * Basic delete.

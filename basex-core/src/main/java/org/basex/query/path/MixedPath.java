@@ -36,9 +36,16 @@ public final class MixedPath extends Path {
   protected Expr compilePath(final QueryContext ctx, final VarScope scp) throws QueryException {
     voidStep(steps, ctx);
 
-    for(int s = 0; s != steps.length; ++s) {
-      steps[s] = steps[s].compile(ctx, scp);
-      if(steps[s].isEmpty()) return optPre(Empty.SEQ, ctx);
+    final Value v = ctx.value;
+    try {
+      for(int s = 0; s < steps.length; s++) {
+        steps[s] = steps[s].compile(ctx, scp);
+        if(steps[s].isEmpty()) return optPre(Empty.SEQ, ctx);
+        // invalidate reference to initial context value
+        ctx.value = null;
+      }
+    } finally {
+      ctx.value = v;
     }
     optSteps(ctx);
 

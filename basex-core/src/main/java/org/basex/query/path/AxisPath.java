@@ -38,7 +38,7 @@ public abstract class AxisPath extends Path {
 
   /**
    * If possible, converts this path expression to a path iterator.
-   * @param ctx query context
+   * @param ctx query context (may be @code null)
    * @return resulting operator
    */
   final AxisPath finish(final QueryContext ctx) {
@@ -84,14 +84,16 @@ public abstract class AxisPath extends Path {
       steps = st;
       // refresh root context
       ctx.compInfo(OPTMERGE);
-      ctx.value = root(ctx);
+      ctx.value = initial(ctx);
     }
     voidStep(steps, ctx);
 
-    for(int i = 0; i != steps.length; ++i) {
-      final Expr e = steps[i].compile(ctx, scp);
+    // context value will not be invalidated after the first step because its value is
+    // currently evaluated by optimizations in {@link Step#compile}.
+    for(int s = 0; s < steps.length; s++) {
+      final Expr e = steps[s].compile(ctx, scp);
       if(!(e instanceof Step)) return e;
-      steps[i] = e;
+      steps[s] = e;
     }
     optSteps(ctx);
 
@@ -105,7 +107,7 @@ public abstract class AxisPath extends Path {
 
     final Value v = ctx.value;
     try {
-      ctx.value = root(ctx);
+      ctx.value = initial(ctx);
       // retrieve data reference
       final Data data = ctx.data();
       if(data != null && ctx.value.type == NodeType.DOC) {
@@ -315,8 +317,8 @@ public abstract class AxisPath extends Path {
    * @return path nodes, or {@code null} if nodes cannot be evaluated
    */
   public ArrayList<PathNode> nodes(final QueryContext ctx) {
-    final Value rt = root(ctx);
-    final Data data = rt != null && rt.type == NodeType.DOC ? rt.data() : null;
+    final Value init = initial(ctx);
+    final Data data = init != null && init.type == NodeType.DOC ? init.data() : null;
     if(data == null || !data.meta.uptodate) return null;
 
     ArrayList<PathNode> nodes = data.paths.root();

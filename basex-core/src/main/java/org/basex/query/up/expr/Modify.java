@@ -31,6 +31,18 @@ public final class Modify extends Arr {
   }
 
   @Override
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    final Value v = ctx.value;
+    try {
+      ctx.value = null;
+      super.compile(ctx, scp);
+      return this;
+    } finally {
+      ctx.value = v;
+    }
+  }
+
+  @Override
   public void checkUp() throws QueryException {
     checkNoUp(expr[0]);
     final Expr m = expr[1];
