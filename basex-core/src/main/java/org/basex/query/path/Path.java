@@ -84,8 +84,11 @@ public abstract class Path extends ParseExpr {
     if(root != null) setRoot(ctx, root.compile(ctx, scp));
 
     final Value v = ctx.value;
+    // add leading root expression if context value includes documents
+    if(root == null && v != null && v.type == NodeType.DOC) root = new Root(info);
+
     try {
-      ctx.value = root(ctx);
+      ctx.value = initial(ctx);
       return compilePath(ctx, scp);
     } finally {
       ctx.value = v;
@@ -118,20 +121,21 @@ public abstract class Path extends ParseExpr {
       throws QueryException;
 
   /**
-   * Returns the root of the current context or {@code null}.
-   * @param ctx query context
+   * Returns the initial context value of a path or {@code null}.
+   * @param ctx query context (may be @code null)
    * @return root
    */
-  final Value root(final QueryContext ctx) {
+  protected final Value initial(final QueryContext ctx) {
+    // current context value
     final Value v = ctx != null ? ctx.value : null;
-    // no root specified: return context, if it does not reference a document
-    // as e.g. happens in //a(b|c)
+    // no root specified: return context if it does not reference a document
+    // happens e.g. in //a(b|c)
     if(root == null) return v == null || v.type != NodeType.DOC ? v : null;
     // root is value: return root
     if(root.isValue()) return (Value) root;
-    // no root reference, no context: return null
+    // no root reference, no context value: return null
     if(!(root instanceof Root) || v == null) return null;
-    // return context sequence or root of current context
+    // return current context value or root of current context
     return v.size() == 1 ? Root.root(v) : v;
   }
 
@@ -197,11 +201,11 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Computes the number of results.
-   * @param ctx query context
+   * @param ctx query context (may be @code null)
    * @return number of results
    */
   long size(final QueryContext ctx) {
-    final Value rt = root(ctx);
+    final Value rt = initial(ctx);
     // skip computation if value contains document nodes
     if(rt == null || rt.type != NodeType.DOC) return -1;
     final Data data = rt.data();
@@ -447,12 +451,12 @@ public abstract class Path extends ParseExpr {
 
     final Value oldVal = ctx.value;
     try {
-      ctx.value = root(ctx);
+      ctx.value = initial(ctx);
       final Expr rt = root == null ? null : root.inline(ctx, scp, v, e);
       if(rt != null) {
         setRoot(ctx, rt);
         ctx.value = oldVal;
-        ctx.value = root(ctx);
+        ctx.value = initial(ctx);
       }
 
       boolean change = rt != null;

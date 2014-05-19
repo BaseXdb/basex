@@ -1440,20 +1440,20 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr and() throws QueryException {
-    final Expr e = modify();
+    final Expr e = update();
     if(!wsConsumeWs(AND)) return e;
 
     final ExprList el = new ExprList(e);
-    do add(el, modify()); while(wsConsumeWs(AND));
+    do add(el, update()); while(wsConsumeWs(AND));
     return new And(info(), el.finish());
   }
 
   /**
-   * Parses the "CopyExpr" rule.
+   * Parses the "UpdateExpr" rule.
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr modify() throws QueryException {
+  private Expr update() throws QueryException {
     final Expr e = comparison();
     if(e != null) {
       if(wsConsumeWs(UPDATE)) {
