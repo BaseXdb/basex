@@ -8,6 +8,7 @@ import javax.swing.*;
 
 import org.basex.core.*;
 import org.basex.gui.layout.*;
+import org.basex.util.*;
 
 /**
  * Abstract class for GUI windows.
@@ -36,7 +37,7 @@ public abstract class AGUI extends JFrame {
   @Override
   public final void setTitle(final String title) {
     final String t = title == null || title.isEmpty() ? "" : " - " + title;
-    super.setTitle(Text.TITLE + t);
+    super.setTitle(Prop.TITLE + t);
   }
 
   /**

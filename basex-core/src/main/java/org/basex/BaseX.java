@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class BaseX extends Main {
+public class BaseX extends CLI {
   /** Commands to be executed. */
   private IntList ops;
   /** Command arguments. */
@@ -190,12 +190,11 @@ public class BaseX extends Main {
   }
 
   @Override
-  protected final void parseArguments(final String... args) throws IOException {
+  protected final void parseArgs() throws IOException {
     ops = new IntList();
     vals = new StringList();
 
-    final Args arg = new Args(args, this, sa() ? S_LOCALINFO : S_CLIENTINFO,
-        Util.info(S_CONSOLE, sa() ? S_STANDALONE : S_CLIENT));
+    final MainParser arg = new MainParser(this);
     while(arg.more()) {
       final char c;
       String v = null;
@@ -239,5 +238,15 @@ public class BaseX extends Main {
         vals.add(v);
       }
     }
+  }
+
+  @Override
+  public String header() {
+    return Util.info(S_CONSOLE, sa() ? S_STANDALONE : S_CLIENT);
+  }
+
+  @Override
+  public String usage() {
+    return sa() ? S_LOCALINFO : S_CLIENTINFO;
   }
 }

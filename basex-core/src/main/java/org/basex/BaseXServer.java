@@ -21,7 +21,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  * @author Andreas Weiler
  */
-public final class BaseXServer extends Main implements Runnable {
+public final class BaseXServer extends CLI implements Runnable {
   /** Flag for server activity. */
   private volatile boolean running;
   /** Event server socket. */
@@ -73,6 +73,7 @@ public final class BaseXServer extends Main implements Runnable {
    */
   public BaseXServer(final Context ctx, final String... args) throws IOException {
     super(args, ctx);
+
     final GlobalOptions gopts = context.globalopts;
     final int port = gopts.get(GlobalOptions.SERVERPORT);
     final int eport = gopts.get(GlobalOptions.EVENTPORT);
@@ -222,8 +223,8 @@ public final class BaseXServer extends Main implements Runnable {
   }
 
   @Override
-  protected void parseArguments(final String... args) throws IOException {
-    final Args arg = new Args(args, this, S_SERVERINFO, Util.info(S_CONSOLE, S_SERVER));
+  protected void parseArgs() throws IOException {
+    final MainParser arg = new MainParser(this);
     commands = new StringList();
     boolean daemon = false;
 
@@ -390,5 +391,15 @@ public final class BaseXServer extends Main implements Runnable {
         }
       }
     }
+  }
+
+  @Override
+  public String header() {
+    return Util.info(S_CONSOLE, S_SERVER);
+  }
+
+  @Override
+  public String usage() {
+    return S_SERVERINFO;
   }
 }

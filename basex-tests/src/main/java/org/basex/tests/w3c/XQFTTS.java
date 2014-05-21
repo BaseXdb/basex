@@ -33,16 +33,15 @@ public final class XQFTTS extends W3CTS {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    new XQFTTS().run(args);
+    new XQFTTS(args).run();
   }
 
   /**
    * Constructor.
+   * @param args command-line arguments
    */
-  public XQFTTS() {
-    super(Util.className(XQFTTS.class));
-    //context.prop.set(Prop.FTINDEX, true);
-    //context.prop.set(Prop.FORCECREATE, true);
+  public XQFTTS(final String[] args) {
+    super(args, Util.className(XQFTTS.class));
   }
 
   @Override

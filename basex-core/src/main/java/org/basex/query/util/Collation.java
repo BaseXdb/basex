@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 import java.text.*;
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -22,7 +21,7 @@ import org.basex.util.hash.*;
  */
 public final class Collation {
   /** Implementation-defined collation URL. */
-  private static final byte[] URL = token(Text.URL + "/collation");
+  private static final byte[] URL = token(Prop.URL + "/collation");
   /** Available locales, indexed by language code. */
   private static final HashMap<String, Locale> LOCALES = new HashMap<>();
   /** Strengths. */

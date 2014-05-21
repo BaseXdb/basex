@@ -255,7 +255,7 @@ public abstract class BaseXDialog extends JDialog {
     try {
       Desktop.getDesktop().browse(new URI(url));
     } catch(final Exception ex) {
-      error(gui, Util.info(H_BROWSER_ERROR_X, URL));
+      error(gui, Util.info(H_BROWSER_ERROR_X, Prop.URL));
     }
   }
 }

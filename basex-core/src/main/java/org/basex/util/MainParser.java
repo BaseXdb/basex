@@ -5,20 +5,14 @@ import java.util.*;
 import org.basex.core.*;
 
 /**
- * This class parses command-line arguments.
+ * This class parses command-line arguments provided by a class with main method.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class Args {
-  /** Calling object. */
-  private final Object obj;
-  /** Program header. */
-  private final String header;
-  /** Usage info. */
-  private final String usage;
-  /** Command-line arguments. */
-  private final String[] args;
+public final class MainParser {
+  /** User interface. */
+  private final Main main;
 
   /** Dash flag. */
   private boolean dash;
@@ -29,16 +23,10 @@ public final class Args {
 
   /**
    * Default constructor.
-   * @param a arguments
-   * @param o calling object
-   * @param u usage info
-   * @param h header
+   * @param main calling object
    */
-  public Args(final String[] a, final Object o, final String u, final String h) {
-    args = a;
-    usage = u;
-    obj = o;
-    header = h;
+  public MainParser(final Main main) {
+    this.main = main;
   }
 
   /**
@@ -47,6 +35,7 @@ public final class Args {
    */
   public boolean more() {
     // parse all arguments
+    final String[] args = main.args();
     while(arg < args.length) {
       // analyze current argument
       final String a = args[arg];
@@ -95,8 +84,8 @@ public final class Args {
    * @return next flag
    */
   public char next() {
-    return arg < args.length && pos < args[arg].length() ?
-        args[arg].charAt(pos++) : 0;
+    final String[] args = main.args();
+    return arg < args.length && pos < args[arg].length() ? args[arg].charAt(pos++) : 0;
   }
 
   /**
@@ -104,6 +93,7 @@ public final class Args {
    * @return string
    */
   public String string() {
+    final String[] args = main.args();
     while(arg < args.length) {
       final String a = args[arg++];
       int p = pos;
@@ -129,18 +119,11 @@ public final class Args {
   }
 
   /**
-   * Throws an exception with the command usage info.
+   * Returns an exception with the command usage info.
    * @return database exception
    */
   public BaseXException usage() {
-    final String name = Util.className(obj).toLowerCase(Locale.ENGLISH);
-    return new BaseXException(header + "Usage: " + name + usage);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    for(final String s : args) sb.append(s).append(' ');
-    return sb.toString();
+    final String name = Util.className(main).toLowerCase(Locale.ENGLISH);
+    return new BaseXException(main.header() + "Usage: " + name + main.usage());
   }
 }

@@ -18,7 +18,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class Main {
+public abstract class CLI extends Main {
   /** Database context. */
   public final Context context;
 
@@ -46,7 +46,7 @@ public abstract class Main {
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
-  protected Main(final String[] args) throws IOException {
+  protected CLI(final String[] args) throws IOException {
     this(args, null);
   }
 
@@ -56,9 +56,10 @@ public abstract class Main {
    * @param ctx database context, or {@code null}
    * @throws IOException I/O exception
    */
-  protected Main(final String[] args, final Context ctx) throws IOException {
+  protected CLI(final String[] args, final Context ctx) throws IOException {
+    super(args);
     context = ctx != null ? ctx : new Context();
-    parseArguments(args);
+    parseArgs();
 
     // console: turn on verbose mode
     verbose |= console;
@@ -154,11 +155,4 @@ public abstract class Main {
    * @throws IOException I/O exception
    */
   protected abstract Session session() throws IOException;
-
-  /**
-   * Parses the command-line arguments, specified by the user.
-   * @param args command-line arguments
-   * @throws IOException I/O exception
-   */
-  protected abstract void parseArguments(final String... args) throws IOException;
 }

@@ -313,7 +313,7 @@ public class Options implements Iterable<Option<?>> {
     if(options.isEmpty()) {
       free.put(name, val);
     } else {
-      assign(name, val, -1);
+      assign(name, val, -1, true);
     }
   }
 
@@ -362,7 +362,7 @@ public class Options implements Iterable<Option<?>> {
       final String v = System.getProperty(key);
       try {
         final String k = key.substring(DBPREFIX.length()).toUpperCase(Locale.ENGLISH);
-        assign(k, v);
+        assign(k, v, -1, false);
         Util.debug(k + Text.COLS + v);
       } catch(final BaseXException ignore) { /* may belong to another Options instance */ }
     }
@@ -541,7 +541,7 @@ public class Options implements Iterable<Option<?>> {
             setSystem(name, val);
           } else {
             try {
-              assign(name, val, num);
+              assign(name, val, num, true);
               read.add(name);
             } catch(final BaseXException ex) {
               errs.add(ex.getMessage());
@@ -578,15 +578,19 @@ public class Options implements Iterable<Option<?>> {
    * @param name name of option
    * @param val value of option
    * @param num number (optional)
+   * @param error raise error if option is unknown
    * @throws BaseXException database exception
    */
-  private synchronized void assign(final String name, final String val, final int num)
-      throws BaseXException {
+  private synchronized void assign(final String name, final String val, final int num,
+      final boolean error) throws BaseXException {
 
     final Option<?> option = options.get(name);
     if(option == null) {
-      throw new BaseXException(error(name));
-    } else if(option instanceof BooleanOption) {
+      if(error) throw new BaseXException(error(name));
+      return;
+    }
+
+    if(option instanceof BooleanOption) {
       final boolean v;
       if(val == null || val.isEmpty()) {
         final Boolean b = get((BooleanOption) option);

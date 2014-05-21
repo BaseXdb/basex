@@ -12,9 +12,9 @@ import org.junit.*;
  * Tests for the {@link MainOptions#MIXUPDATES} flag.
  *
  * @author BaseX Team 2005-14, BSD License
- * @author Lukas Kircher
+ * @author Christian Gruen
  */
-public final class MixpUpdatesTest extends AdvancedQueryTest {
+public final class MixUpdatesTest extends AdvancedQueryTest {
   /**
    * Prepare tests.
    * @throws BaseXException database exception
