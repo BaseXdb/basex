@@ -2,7 +2,7 @@ package org.basex.query;
 
 import static org.basex.util.Token.*;
 
-import org.basex.core.*;
+import org.basex.util.*;
 
 /**
  * This class assembles text string and tokens required by the XQuery processor
@@ -590,11 +590,11 @@ public interface QueryText {
   byte[] EXPERROR = token(EXPATH + "error");
 
   /** Project URI. */
-  byte[] BASEXURI = token(Text.URL);
+  byte[] BASEXURI = token(Prop.URL);
   /** Project modules. */
-  String BXMODULES = Text.URL + "/modules/";
+  String BXMODULES = Prop.URL + "/modules/";
   /** Project errors. */
-  byte[] BXERRORS = token(Text.URL + "/errors");
+  byte[] BXERRORS = token(Prop.URL + "/errors");
 
   /** Database module URI. */
   byte[] ADMINURI = token(BXMODULES + "admin");

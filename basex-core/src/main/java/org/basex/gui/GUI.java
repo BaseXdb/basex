@@ -690,14 +690,14 @@ public final class GUI extends AGUI {
       gopts.set(GUIOptions.UPDATEVERSION, used.toString());
     } else {
       try {
-        final String page = Token.string(new IOUrl(VERSION_URL).read());
+        final String page = Token.string(new IOUrl(Prop.VERSION_URL).read());
         final Matcher m = Pattern.compile("^(Version )?([\\w\\d.]*?)( .*|$)",
             Pattern.DOTALL).matcher(page);
         if(m.matches()) {
           final Version latest = new Version(m.group(2));
           if(disk.compareTo(latest) < 0) {
             if(BaseXDialog.confirm(this, Util.info(H_NEW_VERSION, Prop.NAME, latest))) {
-              BaseXDialog.browse(this, UPDATE_URL);
+              BaseXDialog.browse(this, Prop.UPDATE_URL);
             } else {
               // don't show update dialog anymore if it has been rejected once
               gopts.set(GUIOptions.UPDATEVERSION, latest.toString());

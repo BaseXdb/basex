@@ -27,7 +27,7 @@ import org.eclipse.jetty.xml.*;
  * @author Christian Gruen
  * @author Dirk Kirsten
  */
-public final class BaseXHTTP {
+public final class BaseXHTTP extends Main {
   /** Database context. */
   private final Context context;
   /** HTTP server. */
@@ -59,7 +59,8 @@ public final class BaseXHTTP {
    * @throws Exception exception
    */
   public BaseXHTTP(final String... args) throws Exception {
-    parseArguments(args);
+    super(args);
+    parseArgs();
 
     // context must be initialized after parsing of arguments
     context = HTTPContext.init();
@@ -248,15 +249,11 @@ public final class BaseXHTTP {
     return trg;
   }
 
-  /**
-   * Parses the command-line arguments, specified by the user.
-   * @param args command-line arguments
-   * @throws IOException I/O exception
-   */
-  private void parseArguments(final String... args) throws IOException {
+  @Override
+  protected void parseArgs() throws IOException {
     /* command-line properties will be stored in system properties;
      * this way, they will not be overwritten by the settings specified in web.xml. */
-    final Args arg = new Args(args, this, S_HTTPINFO, Util.info(S_CONSOLE, HTTP));
+    final MainParser arg = new MainParser(this);
     boolean serve = true;
     while(arg.more()) {
       if(arg.dash()) {
@@ -415,5 +412,15 @@ public final class BaseXHTTP {
         Util.errln(ex);
       }
     }
+  }
+
+  @Override
+  public String header() {
+    return Util.info(S_CONSOLE, HTTP);
+  }
+
+  @Override
+  public String usage() {
+    return S_HTTPINFO;
   }
 }

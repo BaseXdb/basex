@@ -2,8 +2,6 @@ package org.basex.core;
 
 import static org.basex.core.Lang.*;
 
-import java.util.*;
-
 import org.basex.core.parse.Commands.*;
 import org.basex.util.*;
 
@@ -45,23 +43,6 @@ public interface Text {
   String TRUE = "true";
   /** False flag. */
   String FALSE = "false";
-
-  /** Project namespace. */
-  String PROJECT_NAME = Prop.NAME.toLowerCase(Locale.ENGLISH);
-  /** URL. */
-  String URL = "http://" + PROJECT_NAME + ".org";
-  /** URL of the community page. */
-  String COMMUNITY_URL = URL + "/community";
-  /** URL of the documentation. */
-  String DOC_URL = "http://docs." + PROJECT_NAME + ".org";
-  /** URL of the update page. */
-  String UPDATE_URL = URL + "/products/download/all-downloads/";
-  /** Version URL. */
-  String VERSION_URL = "http://files." + PROJECT_NAME + ".org/version.txt";
-  /** Mail. */
-  String MAILING_LIST = PROJECT_NAME + "-talk@mailman.uni-konstanz.de";
-  /** Title and version. */
-  String TITLE = Prop.NAME + ' ' + Prop.VERSION;
 
   /** Local (standalone) mode. */
   String S_STANDALONE = "Standalone";
@@ -153,7 +134,7 @@ public interface Text {
   /** Bug info. */
   String S_BUGINFO = "Improper use? Potential bug? Your feedback is welcome:";
   /** Console text. */
-  String S_CONSOLE = TITLE + " [%]" + NL;
+  String S_CONSOLE = Prop.TITLE + " [%]" + NL;
 
   /** Localhost. */
   String S_LOCALHOST = "localhost";

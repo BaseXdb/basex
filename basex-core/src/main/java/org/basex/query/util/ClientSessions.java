@@ -2,7 +2,6 @@ package org.basex.query.util;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.query.value.item.*;
 import org.basex.server.*;
 import org.basex.util.*;
@@ -26,7 +25,7 @@ public final class ClientSessions {
    * @return session id
    */
   public Uri add(final ClientSession cs) {
-    final byte[] uri = Token.token(Text.PROJECT_NAME + "://" + cs + '/' + ++lastId);
+    final byte[] uri = Token.token(Prop.PROJECT_NAME + "://" + cs + '/' + ++lastId);
     conns.put(uri, cs);
     return Uri.uri(uri);
   }

@@ -1,7 +1,7 @@
 package org.basex.http.rest;
 
-import org.basex.core.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * This class assembles texts which are used in the HTTP classes.
@@ -13,7 +13,7 @@ interface RESTText {
   /** REST string.  */
   String REST = "rest";
   /** REST URI. */
-  String RESTURI = Text.URL + '/' + REST;
+  String RESTURI = Prop.URL + '/' + REST;
 
   /** Name. */
   QNm Q_DATABASES = QNm.get(REST, "databases", RESTURI);

@@ -31,7 +31,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class W3CTS {
+public abstract class W3CTS extends Main {
   // Try "ulimit -n 65536" if Linux tells you "Too many open files."
 
   /** Inspect flag. */
@@ -115,9 +115,11 @@ public abstract class W3CTS {
 
   /**
    * Constructor.
+   * @param args command-line arguments
    * @param nm name of test
    */
-  protected W3CTS(final String nm) {
+  protected W3CTS(final String[] args, final String nm) {
+    super(args);
     input = nm + "Catalog" + IO.XMLSUFFIX;
     testid = nm.substring(0, 4);
     pathlog = testid.toLowerCase(Locale.ENGLISH) + ".log";
@@ -126,13 +128,12 @@ public abstract class W3CTS {
 
   /**
    * Runs the test suite.
-   * @param args command-line arguments
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  void run(final String[] args) throws QueryException, IOException {
+  void run() throws QueryException, IOException {
     try {
-      parseArguments(args);
+      parseArgs();
     } catch(final IOException ex) {
       Util.errln(ex);
       System.exit(1);
@@ -750,25 +751,9 @@ public abstract class W3CTS {
     return false;
   }
 
-  /**
-   * Parses the command-line arguments, specified by the user.
-   * @param args command-line arguments
-   * @throws IOException I/O exception
-   */
-  protected final void parseArguments(final String[] args) throws IOException {
-    final Args arg = new Args(args, this,
-        " [options] [pat]" + NL +
-        " [pat] perform tests starting with a pattern" + NL +
-        " -c     print compilation steps" + NL +
-        " -C     run tests depending on current time" + NL +
-        " -g     <test-group> test group to test" + NL +
-        " -h     show this help" + NL +
-        " -m     minimum conformance" + NL +
-        " -p     change path" + NL +
-        " -r     create report" + NL +
-        " -t[ms] list slowest queries" + NL +
-        " -v     verbose output", Util.info(S_CONSOLE, Util.className(this)));
-
+  @Override
+  protected final void parseArgs() throws IOException {
+    final MainParser arg = new MainParser(this);
     while(arg.more()) {
       if(arg.dash()) {
         final char c = arg.next();
@@ -805,5 +790,25 @@ public abstract class W3CTS {
    */
   private IOFile sandbox() {
     return new IOFile(Prop.TMP, testid);
+  }
+
+  @Override
+  public String header() {
+    return Util.info(S_CONSOLE, Util.className(this));
+  }
+
+  @Override
+  public String usage() {
+    return " [options] [pat]" + NL +
+        " [pat] perform tests starting with a pattern" + NL +
+        " -c     print compilation steps" + NL +
+        " -C     run tests depending on current time" + NL +
+        " -g     <test-group> test group to test" + NL +
+        " -h     show this help" + NL +
+        " -m     minimum conformance" + NL +
+        " -p     change path" + NL +
+        " -r     create report" + NL +
+        " -t[ms] list slowest queries" + NL +
+        " -v     verbose output";
   }
 }

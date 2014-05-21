@@ -3,6 +3,7 @@ package org.basex.util;
 import java.io.*;
 import java.net.*;
 import java.security.*;
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
@@ -49,6 +50,22 @@ public final class Prop {
   public static final String TEAM2 = "Lukas Kircher, Leo W\u00F6rteler";
   /** Entity. */
   public static final String ENTITY = NAME + " Team";
+  /** Project namespace. */
+  public static final String PROJECT_NAME = NAME.toLowerCase(Locale.ENGLISH);
+  /** URL. */
+  public static final String URL = "http://" + PROJECT_NAME + ".org";
+  /** URL of the community page. */
+  public static final String COMMUNITY_URL = URL + "/community";
+  /** URL of the documentation. */
+  public static final String DOC_URL = "http://docs." + PROJECT_NAME + ".org";
+  /** URL of the update page. */
+  public static final String UPDATE_URL = URL + "/products/download/all-downloads/";
+  /** Version URL. */
+  public static final String VERSION_URL = "http://files." + PROJECT_NAME + ".org/version.txt";
+  /** Mail. */
+  public static final String MAILING_LIST = PROJECT_NAME + "-talk@mailman.uni-konstanz.de";
+  /** Title and version. */
+  public static final String TITLE = NAME + ' ' + VERSION;
 
   /** New line string. */
   public static final String NL = System.getProperty("line.separator");

@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.util.*;
 
 /**
  * Base class for all XMLDB tests.
@@ -19,7 +20,7 @@ public abstract class XMLDBBaseTest {
   static final String DRIVER = BXDatabase.class.getName();
   /** Database/document path. */
   static final String URL =
-      "xmldb:" + PROJECT_NAME + "://" + S_LOCALHOST + ':' + GlobalOptions.PORT.value + '/';
+      "xmldb:" + Prop.PROJECT_NAME + "://" + S_LOCALHOST + ':' + GlobalOptions.PORT.value + '/';
   /** Name of the collection. */
   static final String COLL = "XMLDB";
   /** Database/document path. */

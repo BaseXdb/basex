@@ -1,7 +1,6 @@
 package org.basex.tests.w3c;
 
 import static org.basex.tests.w3c.QT3Constants.*;
-import static org.basex.tests.w3c.QT3Constants.ENCODING;
 import static org.basex.util.Prop.*;
 import static org.basex.util.Token.*;
 
@@ -16,7 +15,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.io.serial.SerializerOptions.*;
+import org.basex.io.serial.SerializerOptions.YesNo;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.Compare.Mode;
@@ -34,7 +33,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class QT3TS {
+public final class QT3TS extends Main {
   /** EQName pattern. */
   private static final Pattern BIND = Pattern.compile("^Q\\{(.*?)\\}(.+)$");
 
@@ -94,7 +93,7 @@ public final class QT3TS {
    */
   public static void main(final String[] args) throws Exception {
     try {
-      new QT3TS().run(args);
+      new QT3TS(args).run();
     } catch(final IOException ex) {
       Util.errln(ex);
       System.exit(1);
@@ -102,13 +101,21 @@ public final class QT3TS {
   }
 
   /**
-   * Runs all tests.
+   * Constructor.
    * @param args command-line arguments
+   */
+  protected QT3TS(String[] args) {
+    super(args);
+  }
+
+
+  /**
+   * Runs all tests.
    * @throws Exception exception
    */
-  private void run(final String[] args) throws Exception {
+  private void run() throws Exception {
     ctx.globalopts.set(GlobalOptions.DBPATH, sandbox().path() + "/data");
-    parseArguments(args);
+    parseArgs();
     init();
 
     final Performance perf = new Performance();
@@ -294,7 +301,7 @@ public final class QT3TS {
         }
       }
     }
-    
+
     final XQuery query = new XQuery(string, ctx);
     if(base) query.baseURI(baseURI);
 
@@ -333,7 +340,7 @@ public final class QT3TS {
         }
         // bind resources
         for(final HashMap<String, String> src : e.resources) {
-          query.addResource(src.get(URI), file(base, src.get(FILE)), src.get(ENCODING));
+          query.addResource(src.get(URI), file(base, src.get(FILE)), src.get(Prop.ENCODING));
         }
         // bind collections
         query.addCollection(e.collURI, e.collSources.toArray());
@@ -873,24 +880,9 @@ public final class QT3TS {
     return in.replaceAll("\r\n|\r|\n", NL);
   }
 
-  /**
-   * Parses the command-line arguments, specified by the user.
-   * @param args command-line arguments
-   * @throws IOException I/O exception
-   */
-  private void parseArguments(final String[] args) throws IOException {
-    final Args arg = new Args(args, this, " -v [pat]" + NL +
-        " [pat] perform tests starting with a pattern" + NL +
-        " -a  save all tests" + NL +
-        " -d  debugging mode" + NL +
-        " -e  ignore error codes" + NL +
-        " -i  also save ignored files" + NL +
-        " -p  path to the test suite" + NL +
-        " -r  generate report file" + NL +
-        " -s  print slow queries" + NL +
-        " -v  verbose output",
-        Util.info(Text.S_CONSOLE, Util.className(this)));
-
+  @Override
+  protected void parseArgs() throws IOException {
+    final MainParser arg = new MainParser(this);
     while(arg.more()) {
       if(arg.dash()) {
         final char c = arg.next();
@@ -977,5 +969,24 @@ public final class QT3TS {
    */
   private IOFile sandbox() {
     return new IOFile(Prop.TMP, testid);
+  }
+
+  @Override
+  public String header() {
+    return Util.info(Text.S_CONSOLE, Util.className(this));
+  }
+
+  @Override
+  public String usage() {
+    return " -v [pat]" + NL +
+        " [pat] perform tests starting with a pattern" + NL +
+        " -a  save all tests" + NL +
+        " -d  debugging mode" + NL +
+        " -e  ignore error codes" + NL +
+        " -i  also save ignored files" + NL +
+        " -p  path to the test suite" + NL +
+        " -r  generate report file" + NL +
+        " -s  print slow queries" + NL +
+        " -v  verbose output";
   }
 }

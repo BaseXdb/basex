@@ -12,6 +12,7 @@ import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
+import org.basex.util.*;
 
 /**
  * Dialog window for displaying information about the project.
@@ -38,14 +39,14 @@ public final class DialogAbout extends BaseXDialog {
 
     final BaseXBack pp = new BaseXBack(Fill.NONE).layout(new TableLayout(17, 1));
 
-    pp.add(new BaseXLabel(TITLE, false, true));
-    final BaseXLabel url = new BaseXLabel("<html><u>" + URL + "</u></html>");
+    pp.add(new BaseXLabel(Prop.TITLE, false, true));
+    final BaseXLabel url = new BaseXLabel("<html><u>" + Prop.URL + "</u></html>");
     url.setForeground(GUIConstants.BLUE);
     url.setCursor(GUIConstants.CURSORHAND);
     url.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(final MouseEvent e) {
-        BaseXDialog.browse(gui, URL);
+        BaseXDialog.browse(gui, Prop.URL);
       }
     });
 

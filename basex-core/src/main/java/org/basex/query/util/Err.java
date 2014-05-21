@@ -529,7 +529,7 @@ public enum Err {
   /** FORG0006. */
   INVALIDOPT(FORG, 6, "%"),
   /** FORG0006. */
-  INVALIDOPTX(FORG, 6, Text.UNKNOWN_OPTION_X),
+  INVALIDOPTX(FORG, 6, "Unknown option '%'."),
 
   /** FORG0008. */
   FUNZONE(FORG, 8, "% and % have different timezones."),

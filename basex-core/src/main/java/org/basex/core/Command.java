@@ -254,7 +254,7 @@ public abstract class Command extends Proc {
    * @return {@code true}
    */
   protected final boolean info(final String str, final Object... ext) {
-    if(!str.isEmpty()) info.addExt(str, ext).add(NL);
+    if(!str.isEmpty()) info.addExt(str, ext).add(Prop.NL);
     return true;
   }
 
@@ -339,7 +339,7 @@ public abstract class Command extends Proc {
         Util.debug(ex);
         return error(OUT_OF_MEM + (perm == Perm.CREATE ? H_OUT_OF_MEM : ""));
       }
-      return error(Util.bug(ex) + NL + info);
+      return error(Util.bug(ex) + Prop.NL + info);
     } finally {
       // flushes the output
       try { if(out != null) out.flush(); } catch(final IOException ignored) { }

@@ -2,8 +2,8 @@ package org.basex.query.util.pkg;
 
 import static org.basex.util.Token.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * This class assembles textual information for package handling.
@@ -18,7 +18,7 @@ public interface PkgText {
   /** Package descriptor. */
   String DESCRIPTOR = "expath-pkg" + IO.XMLSUFFIX;
   /** Jar descriptor. */
-  String JARDESC = Text.PROJECT_NAME + IO.XMLSUFFIX;
+  String JARDESC = Prop.PROJECT_NAME + IO.XMLSUFFIX;
 
   /** EXPath type. */
   String EXPATH = "EXPath";

@@ -7,6 +7,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
+import org.basex.util.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.base.Collection;
 
@@ -43,7 +44,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
 
   @Override
   public String getName() {
-    return PROJECT_NAME;
+    return Prop.PROJECT_NAME;
   }
 
   @Override

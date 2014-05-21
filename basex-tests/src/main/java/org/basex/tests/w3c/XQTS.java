@@ -16,14 +16,15 @@ public final class XQTS extends W3CTS {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    new XQTS().run(args);
+    new XQTS(args).run();
   }
 
   /**
    * Constructor.
+   * @param args command-line arguments
    */
-  public XQTS() {
-    super(Util.className(XQTS.class));
+  public XQTS(final String[] args) {
+    super(args, Util.className(XQTS.class));
     context.options.set(MainOptions.XQUERY3, false);
   }
 }
