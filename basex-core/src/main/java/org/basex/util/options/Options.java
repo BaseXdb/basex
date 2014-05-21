@@ -362,8 +362,7 @@ public class Options implements Iterable<Option<?>> {
       final String v = System.getProperty(key);
       try {
         final String k = key.substring(DBPREFIX.length()).toUpperCase(Locale.ENGLISH);
-        assign(k, v, -1, false);
-        Util.debug(k + Text.COLS + v);
+        if(assign(k, v, -1, false)) Util.debug(k + Text.COLS + v);
       } catch(final BaseXException ignore) { /* may belong to another Options instance */ }
     }
   }
@@ -580,14 +579,15 @@ public class Options implements Iterable<Option<?>> {
    * @param num number (optional)
    * @param error raise error if option is unknown
    * @throws BaseXException database exception
+   * @return success flag
    */
-  private synchronized void assign(final String name, final String val, final int num,
+  private synchronized boolean assign(final String name, final String val, final int num,
       final boolean error) throws BaseXException {
 
     final Option<?> option = options.get(name);
     if(option == null) {
       if(error) throw new BaseXException(error(name));
-      return;
+      return false;
     }
 
     if(option instanceof BooleanOption) {
@@ -647,6 +647,7 @@ public class Options implements Iterable<Option<?>> {
         ss[num - 1] = val;
       }
     }
+    return true;
   }
 
   /**
