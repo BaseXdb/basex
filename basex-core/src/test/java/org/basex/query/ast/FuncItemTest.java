@@ -251,4 +251,16 @@ public final class FuncItemTest extends QueryPlanTest {
         String.format("<a>%n  <b/>%n</a>%n<b/>")
     );
   }
+
+  /** Tests if {@code fn:error()} is allowed with impossible types. */
+  @Test
+  public void gh958() {
+    error("declare function local:f() as item()+ { error() }; local:f()",
+        Err.FUNERR1
+    );
+
+    error("function() as item()+ { error() }()",
+        Err.FUNERR1
+    );
+  }
 }
