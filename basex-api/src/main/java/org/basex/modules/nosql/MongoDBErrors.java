@@ -78,6 +78,20 @@ public final class MongoDBErrors {
     return thrw(7, msg, key);
   }
   /**
+   * MONGODB0008: Query parameter does not exists in findAndModify().
+   * @return query exception
+   */
+  public static QueryException findAndModifyQuery() {
+    return thrw(8, "'query' parameter cannot be empty in findAndModify()");
+  }
+  /**
+   * MONGODB0009: Query parameter does not exists in findAndModify().
+   * @return query exception
+   */
+  public static QueryException findAndModifyUpdate() {
+    return thrw(9, "'update' parameter cannot be empty in findAndModify()");
+  }
+  /**
    * Returns a query exception.
    * @param code code
    * @param msg message

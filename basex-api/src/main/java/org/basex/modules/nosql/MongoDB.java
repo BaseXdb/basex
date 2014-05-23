@@ -539,6 +539,88 @@ public class MongoDB extends Nosql {
               }
         }
     /**
+     * Mongodb findAndUpdate().
+     * @param handler database handler Database handler
+     * @param col collection collection
+     * @param query Query parameters
+     * @param update update parameters
+     * @return Item
+     * @throws QueryException Query exception.
+     */
+    public Item findAndModify(final Str handler, final Item col, final Item query,
+        final Item update) throws QueryException{
+      final DB db = getDbHandler(handler);
+      try {
+        final DBObject q = query != null ? getDbObjectFromItem(query) : null;
+        final DBObject u = query != null ? getDbObjectFromItem(update) : null;
+        final DBObject result =  db.getCollection(itemToString(col)).findAndModify(q, u);
+        return  objectToItem(handler, result);
+      } catch (MongoException e) {
+        throw MongoDBErrors.generalExceptionError(e.getMessage());
+      } finally {
+        db.requestDone();
+      }
+    }
+    /**
+     * Modifies and returns a single document. By default, the returned document
+     * does not include the modifications made on the update.
+     * @param handler database handler Database handler
+     * @param col collection collection
+     * @param options Map
+     * @return Item.
+     * @throws QueryException Query exception.
+     */
+    public Item findAndModify(final Str handler, final Item col, final Map options)
+        throws QueryException{
+      final DB db = getDbHandler(handler);
+      DBObject query = null;
+      DBObject fields = null;
+      DBObject sort = null;
+      DBObject update = null;
+      boolean returnNew = false;
+      boolean upsert = false;
+      boolean remove = false;
+      for(Item key : options.keys()) {
+        final String k = ((Str) key).toJava();
+        final Value v = options.get(key, null);
+        if(k.toLowerCase().equals(QUERY)) {
+          query = getDbObjectFromItem((Item) v);
+        } else if(k.toLowerCase().equals(FIELDS)) {
+          fields = getDbObjectFromItem((Item) v);
+        } else if(k.toLowerCase().equals(SORT)) {
+          sort = getDbObjectFromItem((Item) v);
+        } else if(k.toLowerCase().equals(UPDATE)) {
+          update = getDbObjectFromItem((Item) v);
+        } else if(k.toLowerCase().equals(NEW)) {
+          if(v instanceof Bln) {
+            returnNew = ((Bln) v).toJava();
+          } else {
+            throw MongoDBErrors.generalExceptionError("xs:boolean is expected for 'returnnew'");
+          }
+        } else if(k.toLowerCase().equals(UPSERT)) {
+          if(v instanceof Bln) {
+            returnNew = ((Bln) v).toJava();
+          } else {
+            throw MongoDBErrors.generalExceptionError("xs:boolean is expected for 'upsert'");
+          }
+        }
+      }
+      if(query == null)
+        throw MongoDBErrors.findAndModifyQuery();
+      if(update == null)
+        throw MongoDBErrors.findAndModifyUpdate();
+      db.requestStart();
+      try {
+        DBObject result = db.getCollection(itemToString(col)).
+        findAndModify(query, fields, sort, remove, update, returnNew, upsert);
+        return  objectToItem(handler, result);
+      } catch (MongoException e) {
+        throw MongoDBErrors.generalExceptionError(e.getMessage());
+      } finally {
+        db.requestDone();
+      }
+    }
+    /**
      * Mongodb's findOne() function.
      * @param handler database handler
      * @param col collection
@@ -1122,15 +1204,15 @@ public class MongoDB extends Nosql {
             String key = (String) k.toJava();
             Value val = options.get(k, null);
             String value = (String) val.toJava();
-            if(key.toLowerCase().equals("map")) {
+            if(key.toLowerCase().equals(MAP)) {
                map = value;
-            } else if(key.toLowerCase().equals("reduce")) {
+            } else if(key.toLowerCase().equals(REDUCE)) {
                 reduce = value;
-            } else  if(key.toLowerCase().equals("outputs")) {
+            } else  if(key.toLowerCase().equals(OUTPUTS)) {
                 out = value;
-            } else if(key.toLowerCase().equals("outputype")) {
+            } else if(key.toLowerCase().equals(OUTPUTTYPE)) {
                 outType = value;
-            } else if(key.toLowerCase().equals("limit")) {
+            } else if(key.toLowerCase().equals(LIMIT)) {
                 if(val.type().instanceOf(SeqType.ITR_OM)) {
                     long l = ((Item) val).itr(null);
                     limit = (int) l;

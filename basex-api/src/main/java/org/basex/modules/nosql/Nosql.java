@@ -73,6 +73,18 @@ abstract class Nosql extends QueryModule {
   protected static final String QUERY = "query";
   /** finalalize. */
   protected static final String FINALIZE = "finalalize";
+  /** fields findAndModify. */
+  protected static final String FIELDS = "fields";
+  /** update findAndModify. */
+  protected static final String UPDATE = "update";
+  /** returnnew findAndModify. */
+  protected static final String NEW = "new";
+  /** outputs. */
+  protected static final String OUTPUTS = "outputs";
+  /** outputtype. */
+  protected static final String OUTPUTTYPE = "outputtype";
+  /** upsert. */
+  protected static final String UPSERT = "upsert";
   /** for rethink **/
   /** id. */
   protected static final String ID = "id";
