@@ -222,7 +222,7 @@ public final class GUI extends AGUI {
       }
     });
 
-    go = BaseXButton.get("c_go", EXECUTE_QUERY, false, this);
+    go = BaseXButton.get("c_go", RUN_QUERY, false, this);
     go.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -417,6 +417,7 @@ public final class GUI extends AGUI {
         cmd.execute(context, ao);
         inf = cmd.info();
       } catch(final BaseXException ex) {
+        System.out.println("=> " + ex);
         cause = ex.getCause();
         if(cause == null) cause = ex;
         ok = false;
@@ -436,6 +437,7 @@ public final class GUI extends AGUI {
       // check if query feedback was evaluated in the query view
       if(!ok && !stopped) {
         // display error in info view
+        text.setText(ao);
         if((!edit || inf.startsWith(S_BUGINFO)) && !info.visible()) {
           GUIMenuCmd.C_SHOWINFO.execute(this);
         }

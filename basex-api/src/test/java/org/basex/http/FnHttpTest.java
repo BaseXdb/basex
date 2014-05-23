@@ -26,6 +26,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests the server-based HTTP Client.

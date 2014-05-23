@@ -5,10 +5,10 @@ import static org.junit.Assert.*;
 
 import java.nio.charset.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.*;
-import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests String <-> Token conversions.

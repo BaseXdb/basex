@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.basex.core.cmd.*;
 import org.basex.query.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * Stress Testing the fast replace feature where blocks on disk are directly

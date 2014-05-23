@@ -10,6 +10,7 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import org.basex.core.cmd.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.io.*;
@@ -34,6 +35,10 @@ class ProjectList extends JList {
     },
     new GUIPopupCmd(OPEN_EXTERNALLY, BaseXKeys.OPEN) {
       @Override public void execute() { openExternal(); }
+    }, null,
+    new GUIPopupCmd(RUN_TESTS, BaseXKeys.UNIT) {
+      @Override public void execute() { test(); }
+      @Override public boolean enabled(final GUI main) { return selectedValue() != null; }
     }, null,
     new GUIPopupCmd(REFRESH, BaseXKeys.REFRESH) {
       @Override public void execute() { project.filter.refresh(true); }
@@ -132,6 +137,15 @@ class ProjectList extends JList {
       } catch(final IOException ex) {
         BaseXDialog.error(project.gui, Util.info(FILE_NOT_OPENED_X, file));
       }
+    }
+  }
+
+  /**
+   * Tests all files.
+   */
+  private void test() {
+    for(final IOFile file : selectedValues())  {
+      project.gui.execute(new Test(file.path()));
     }
   }
 

@@ -7,6 +7,7 @@ import org.basex.core.cmd.*;
 import org.basex.query.*;
 import org.basex.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * Tests queries on collections.

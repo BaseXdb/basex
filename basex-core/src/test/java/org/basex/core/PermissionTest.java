@@ -7,10 +7,11 @@ import java.io.*;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
-import org.basex.core.parse.Commands.*;
+import org.basex.core.parse.Commands.CmdIndex;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests user permissions.
@@ -21,8 +22,10 @@ import org.junit.*;
 public final class PermissionTest extends SandboxTest {
   /** Name of the database to be renamed. */
   private static final String RENAMED = Util.className(PermissionTest.class) + 'r';
+  /** Test folder. */
+  private static final String FOLDER = "src/test/resources/";
   /** Test repository. **/
-  private static final String REPO = "src/test/resources/repo/";
+  private static final String REPO = FOLDER + "repo/";
 
   /** Server reference. */
   private static BaseXServer server;
@@ -102,6 +105,7 @@ public final class PermissionTest extends SandboxTest {
     no(new Get("DBPATH"), testSession);
     ok(new Get(MainOptions.QUERYINFO), testSession);
     ok(new Set(MainOptions.QUERYINFO, false), testSession);
+    ok(new org.basex.core.cmd.Test(FOLDER + "tests-ok.xqm"), testSession);
 
     // repo Stuff
     no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);

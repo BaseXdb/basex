@@ -1,16 +1,16 @@
 package org.basex.query.func;
 
+import static org.junit.Assert.*;
+
 import java.util.*;
 import java.util.Set;
 
 import org.basex.core.cmd.*;
 import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.type.*;
-import org.basex.query.*;
-import org.junit.*;
-
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests all function signatures.

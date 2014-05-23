@@ -47,7 +47,9 @@ public class TextPanel extends BaseXPanel {
     /** Enforce parsing of input. */
     PARSE,
     /** Enforce execution of input. */
-    EXECUTE
+    EXECUTE,
+    /** Enforce testing of input. */
+    TEST
   }
 
   /** Text editor. */

@@ -6,7 +6,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class performs a local stress tests with a specified

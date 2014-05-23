@@ -13,6 +13,7 @@ import org.basex.server.*;
 import org.basex.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests the database commands.
@@ -24,9 +25,9 @@ public class CommandTest extends SandboxTest {
   /** Test file name. */
   private static final String FN = "input.xml";
   /** Test folder. */
-  private static final String FLDR = "src/test/resources";
+  private static final String FOLDER = "src/test/resources/";
   /** Test file. */
-  private static final String FILE = FLDR + '/' + FN;
+  private static final String FILE = FOLDER + FN;
   /** Test name. */
   static final String NAME2 = NAME + '2';
   /** Socket reference. */
@@ -563,6 +564,14 @@ public class CommandTest extends SandboxTest {
     ok(new XQuery("/"));
     ok(new XQuery("1"));
     no(new XQuery("1+"));
+  }
+
+  /** Command test. */
+  @Test
+  public final void test() {
+    no(new org.basex.core.cmd.Test("sfsdssdf"));
+    no(new org.basex.core.cmd.Test(FOLDER + "tests.xqm"));
+    ok(new org.basex.core.cmd.Test(FOLDER + "tests-ok.xqm"));
   }
 
   /**

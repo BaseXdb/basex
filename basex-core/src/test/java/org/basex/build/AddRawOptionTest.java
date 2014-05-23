@@ -12,6 +12,7 @@ import org.basex.query.func.*;
 import org.basex.server.*;
 import org.basex.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * Tests for the {@link MainOptions#ADDRAW} option.

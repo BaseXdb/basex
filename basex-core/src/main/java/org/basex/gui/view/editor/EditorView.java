@@ -57,6 +57,8 @@ public final class EditorView extends View {
   private final AbstractButton stop;
   /** Go button. */
   private final AbstractButton go;
+  /** Test button. */
+  private final AbstractButton test;
   /** Search bar. */
   private final SearchBar search;
   /** Info label. */
@@ -107,12 +109,15 @@ public final class EditorView extends View {
     stop.addKeyListener(this);
     stop.setEnabled(false);
 
-    go = BaseXButton.get("c_go", BaseXLayout.addShortcut(EXECUTE_QUERY, BaseXKeys.EXEC1.toString()),
-        false, gui);
+    go = BaseXButton.get("c_go", BaseXLayout.addShortcut(RUN_QUERY,
+        BaseXKeys.EXEC1.toString()), false, gui);
     go.addKeyListener(this);
+    test = BaseXButton.get("c_test", BaseXLayout.addShortcut(RUN_TESTS,
+        BaseXKeys.UNIT.toString()), false, gui);
+    test.addKeyListener(this);
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
-    buttons.layout(new TableLayout(1, 7, 1, 0)).border(0, 0, 8, 0);
+    buttons.layout(new TableLayout(1, 8, 1, 0)).border(0, 0, 8, 0);
     buttons.add(openB);
     buttons.add(saveB);
     buttons.add(hist);
@@ -120,6 +125,7 @@ public final class EditorView extends View {
     buttons.add(Box.createHorizontalStrut(6));
     buttons.add(stop);
     buttons.add(go);
+    buttons.add(test);
 
     final BaseXBack north = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     north.add(buttons, BorderLayout.WEST);
@@ -226,6 +232,7 @@ public final class EditorView extends View {
       public void actionPerformed(final ActionEvent e) {
         stop.setEnabled(false);
         go.setEnabled(false);
+        test.setEnabled(false);
         gui.stop();
       }
     });
@@ -233,6 +240,12 @@ public final class EditorView extends View {
       @Override
       public void actionPerformed(final ActionEvent e) {
         run(getEditor(), Action.EXECUTE);
+      }
+    });
+    test.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent e) {
+        run(getEditor(), Action.TEST);
       }
     });
     tabs.addChangeListener(new ChangeListener() {
@@ -243,6 +256,7 @@ public final class EditorView extends View {
         search.editor(ea, true);
         gui.refreshControls();
         posCode.invokeLater();
+        refreshMark();
         run(ea, Action.PARSE);
       }
     });
@@ -273,7 +287,9 @@ public final class EditorView extends View {
 
   @Override
   public void refreshMark() {
-    go.setEnabled(getEditor().script || !gui.gopts.get(GUIOptions.EXECRT));
+    final boolean script = getEditor().script;
+    go.setEnabled(script || !gui.gopts.get(GUIOptions.EXECRT));
+    test.setEnabled(!script);
   }
 
   @Override
@@ -485,7 +501,8 @@ public final class EditorView extends View {
     final boolean eq = eq(in, editor.last);
     if(eq && action == Action.CHECK) return;
 
-    if(action == Action.EXECUTE && gui.gopts.get(GUIOptions.SAVERUN)) {
+    final boolean run = action == Action.EXECUTE || action == Action.TEST;
+    if(run && gui.gopts.get(GUIOptions.SAVERUN)) {
       for(final EditorArea edit : editors()) {
         if(edit.opened()) edit.save();
       }
@@ -496,10 +513,10 @@ public final class EditorView extends View {
 
     final boolean xquery = file.hasSuffix(IO.XQSUFFIXES) || !file.path().contains(".");
     editor.script = !xquery && file.hasSuffix(IO.BXSSUFFIX);
-    if(action == Action.EXECUTE && editor.script) {
-      // execute query if forced, or if realtime execution is activated
+    if(editor.script && run) {
+      // run query if forced, or if realtime execution is activated
       gui.execute(true, new Execute(string(in)));
-    } else if(xquery || action == Action.EXECUTE) {
+    } else if(xquery || run) {
       // check if input is/might be an xquery main module
       String input = in.length == 0 ? "()" : string(in);
       boolean lib = QueryProcessor.isLibrary(input);
@@ -515,8 +532,12 @@ public final class EditorView extends View {
 
       gui.context.options.set(MainOptions.QUERYPATH, file.path());
       if(!lib && exec) {
-        // execute query if forced, or if realtime execution is activated
+        // run query if forced, or if realtime execution is activated
         gui.execute(true, new XQuery(input));
+        execFile = file;
+      } else if(action == Action.TEST) {
+        // run query if forced, or if realtime execution is activated
+        gui.execute(true, new Test(file.path()));
         execFile = file;
       } else {
         // parse query

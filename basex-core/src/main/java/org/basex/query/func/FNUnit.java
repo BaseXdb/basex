@@ -2,16 +2,12 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 
-import java.util.*;
-
-import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.unit.*;
 import org.basex.query.value.item.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -38,27 +34,8 @@ public final class FNUnit extends StandardFunc {
       case _UNIT_ASSERT:        return assrt(ctx);
       case _UNIT_ASSERT_EQUALS: return assertEquals(ctx);
       case _UNIT_FAIL:          return fail(ctx);
-      case _UNIT_TEST:          return test(ctx);
-      case _UNIT_TEST_URIS:     return testUris(ctx);
       default:                  return super.item(ctx, ii);
     }
-  }
-
-  @Override
-  Expr opt(final QueryContext ctx, final VarScope scp) throws QueryException {
-    if(sig == Function._UNIT_TEST_URIS || sig == Function._UNIT_TEST && expr.length == 0) {
-      for(final StaticFunc fn : ctx.funcs.funcs()) {
-        if(fn.compiled()) continue;
-        final Ann ann = fn.ann;
-        for(int i = ann.size(); --i >= 0;) {
-          if(Token.eq(ann.names[i].uri(), QueryText.UNITURI)) {
-            fn.compile(ctx);
-            break;
-          }
-        }
-      }
-    }
-    return super.opt(ctx, scp);
   }
 
   /**
@@ -105,41 +82,5 @@ public final class FNUnit extends StandardFunc {
    */
   private Item fail(final QueryContext ctx) throws QueryException {
     throw UNIT_MESSAGE.get(info, checkStr(expr[0], ctx));
-  }
-
-  /**
-   * Performs the test function.
-   * @param ctx query context
-   * @return resulting value
-   * @throws QueryException query exception
-   */
-  private Item test(final QueryContext ctx) throws QueryException {
-    final Unit unit = new Unit(ctx, info);
-    if(expr.length == 0) return unit.test(sc);
-
-    final ArrayList<StaticFunc> funcs = new ArrayList<StaticFunc>();
-    final Iter ir = ctx.iter(expr[0]);
-    for(Item it; (it = ir.next()) != null;) {
-      final FItem fi = checkFunc(it, ctx);
-      if(fi.funcName() != null) {
-        final StaticFunc sf = ctx.funcs.get(fi.funcName(), fi.arity(), null, true);
-        if(sf != null) funcs.add(sf);
-      }
-    }
-    return unit.test(sc, funcs);
-  }
-
-  /**
-   * Performs the test-uris function.
-   * @param ctx query context
-   * @return resulting value
-   * @throws QueryException query exception
-   */
-  private Item testUris(final QueryContext ctx) throws QueryException {
-    checkCreate(ctx);
-    final ArrayList<IO> inputs = new ArrayList<IO>();
-    final Iter ir = ctx.iter(expr[0]);
-    for(Item it; (it = ir.next()) != null;) inputs.add(checkPath(it, ctx));
-    return new Suite(ctx, info).test(inputs);
   }
 }

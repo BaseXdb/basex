@@ -14,6 +14,7 @@ import org.basex.query.ft.*;
 import org.basex.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests if queries are rewritten for index access.

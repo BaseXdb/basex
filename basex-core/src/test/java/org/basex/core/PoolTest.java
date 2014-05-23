@@ -9,6 +9,7 @@ import org.basex.core.cmd.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests transaction and locking cases.

@@ -4,10 +4,11 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.parse.Commands.*;
+import org.basex.core.parse.Commands.CmdIndex;
 import org.basex.query.expr.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests if string range queries are correctly evaluated with(out) the index.

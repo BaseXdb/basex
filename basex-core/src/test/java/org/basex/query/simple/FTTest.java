@@ -4,7 +4,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.*;
 import org.basex.util.options.*;
-import org.junit.*;
+import org.junit.Test;
 
 /**
  * Full-text test queries.

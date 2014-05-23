@@ -160,6 +160,8 @@ final class XMLParser extends CmdParser {
       return new ShowUsers(value(root, DATABASE));
     if(e.equals(STORE) && check(root, PATH + '?', '<' + INPUT))
       return new Store(value(root, PATH), xml(root));
+    if(e.equals(TEST) && check(root, PATH))
+      return new Test(value(root, PATH));
     if(e.equals(XQUERY) && check(root, '#' + QUERY))
       return new XQuery(value(root));
     throw error(Text.UNKNOWN_CMD_X, '<' + e + "/>");

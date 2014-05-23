@@ -12,6 +12,7 @@ import org.basex.query.up.primitives.*;
 import org.basex.query.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 import org.junit.rules.*;
 
 /**
