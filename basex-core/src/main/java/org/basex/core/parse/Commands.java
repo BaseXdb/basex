@@ -115,6 +115,8 @@ public interface Commands {
   String SHOW_USERS = "show-users";
   /** Command string: "store". */
   String STORE = "store";
+  /** Command string: "test". */
+  String TEST = "test";
   /** Command string: "xquery". */
   String XQUERY = "xquery";
 
@@ -177,7 +179,7 @@ public interface Commands {
     OPEN(HELPOPEN), OPTIMIZE(HELPOPTIMIZE), PASSWORD(HELPPASSWORD), RENAME(HELPRENAME),
     REPLACE(HELPREPLACE), REPO(HELPREPO), RESTORE(HELPRESTORE), RETRIEVE(HELPRETRIEVE),
     RUN(HELPRUN), EXECUTE(HELPEXECUTE), SET(HELPSET), SHOW(HELPSHOW), STORE(HELPSTORE),
-    XQUERY(HELPXQUERY);
+    TEST(HELPTEST), XQUERY(HELPXQUERY);
 
     /** Help texts. */
     private final String[] help;

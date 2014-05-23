@@ -60,6 +60,7 @@ public interface Text {
     "  -r<num>     Set number of query executions" + NL +
     "  -R          Turn query execution on/off" + NL +
     "  -s<pars>    Set serialization parameter(s)" + NL +
+    "  -t[path]    Run tests in file or directory" + NL +
     "  -u          Write updates back to original files" + NL +
     "  -v/V        Show (all) process info" + NL +
     "  -w          Preserve whitespaces from input files" + NL +
@@ -381,6 +382,10 @@ public interface Text {
   /** Command help. */
   String[] HELPRUN = {
     '[' + S_PATH + ']', lang("c_run1"), lang("c_run2", S_PATH)
+  };
+  /** Command help. */
+  String[] HELPTEST = {
+    '[' + S_PATH + ']', lang("c_test1"), lang("c_test2", S_PATH)
   };
   /** Command help. */
   String[] HELPEXECUTE = {
@@ -795,7 +800,9 @@ public interface Text {
   /** Command info. */
   String RECENTLY_OPENED = lang("recently_opened");
   /** Command info. */
-  String EXECUTE_QUERY = lang("execute_query");
+  String RUN_QUERY = lang("run_query");
+  /** Command info. */
+  String RUN_TESTS = lang("run_tests");
   /** Command info. */
   String INPUT_HISTORY = lang("input_history");
 

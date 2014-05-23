@@ -99,6 +99,7 @@ public enum BaseXKeys {
 
   /** Execute.               */ EXEC1(META, VK_ENTER, true),
   /** Execute.               */ EXEC2(META, VK_F11, true),
+  /** Test.                  */ UNIT(META | SHIFT, VK_ENTER, true),
 
   /** Escape.                */ ESCAPE(VK_ESCAPE, true),
   /** Context menu.          */ CONTEXT(VK_CONTEXT_MENU, true),

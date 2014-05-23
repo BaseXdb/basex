@@ -12,6 +12,7 @@ import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * CSV Parser Test.

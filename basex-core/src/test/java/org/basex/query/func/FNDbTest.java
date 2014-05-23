@@ -15,6 +15,7 @@ import org.basex.query.util.*;
 import org.basex.query.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests the functions of the Database Module.

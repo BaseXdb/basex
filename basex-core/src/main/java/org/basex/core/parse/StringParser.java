@@ -160,6 +160,8 @@ public final class StringParser extends CmdParser {
         return new XQuery(xquery(cmd));
       case RUN:
         return new Run(string(cmd));
+      case TEST:
+        return new Test(string(cmd));
       case EXECUTE:
         return new Execute(string(cmd, false));
       case FIND:

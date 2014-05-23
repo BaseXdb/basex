@@ -131,6 +131,10 @@ public class BaseX extends CLI {
           final String[] kv = val.split("=", 2);
           sopts.assign(kv[0], kv.length > 1  ? kv[1] : "");
           execute(new Set(MainOptions.SERIALIZER, sopts), false);
+        } else if(c == 't') {
+          // evaluate query
+          execute(new Test(val), verbose);
+          console = false;
         } else if(c == 'u') {
           // (de)activate write-back for updates
           execute(new Set(MainOptions.WRITEBACK, null), false);
@@ -201,11 +205,11 @@ public class BaseX extends CLI {
       if(arg.dash()) {
         c = arg.next();
         if(c == 'b' || c == 'c' || c == 'C' || c == 'i' || c == 'o' || c == 'q' ||
-           c == 'r' || c == 's') {
+            c == 'r' || c == 's' || (c == 't' && sa())) {
           // options followed by a string
           v = arg.string();
-        } else if(c == 'd' || c == 'D' && sa() || c == 'L' || c == 'u' || c == 'R' || c == 'v' ||
-           c == 'V' || c == 'w' || c == 'W' || c == 'x' || c == 'X' || c == 'z') {
+        } else if(c == 'd' || c == 'D' && sa() || c == 'L' || (c == 'u' && sa()) || c == 'R' ||
+            c == 'v' || c == 'V' || c == 'w' || c == 'W' || c == 'x' || c == 'X' || c == 'z') {
           // options to be toggled
           v = "";
         } else if(!sa()) {

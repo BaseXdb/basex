@@ -3,13 +3,14 @@ package org.basex.performance;
 import java.io.*;
 import java.util.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
-import org.basex.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class benchmarks simple table scans.

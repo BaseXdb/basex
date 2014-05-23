@@ -13,6 +13,7 @@ import org.basex.util.*;
 import org.junit.*;
 import org.junit.rules.*;
 import org.junit.runners.model.*;
+import org.junit.Test;
 
 /**
  * Test if index and non-index full-text queries behave the same way.

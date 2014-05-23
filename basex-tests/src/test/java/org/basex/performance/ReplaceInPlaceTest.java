@@ -2,10 +2,10 @@ package org.basex.performance;
 
 import java.util.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.*;
-import org.junit.*;
+import org.junit.Test;
 
 /**
  * This test replaces texts in-place and checks if the database text files increase

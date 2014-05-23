@@ -8,6 +8,7 @@ import org.basex.core.cmd.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests the functions of the Admin Module.

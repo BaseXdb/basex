@@ -14,6 +14,7 @@ import org.junit.*;
 import org.junit.runner.*;
 import org.junit.runners.*;
 import org.junit.runners.Parameterized.Parameters;
+import org.junit.Test;
 
 /**
  * This class tests database locking inside BaseX. For this purpose, two queries are

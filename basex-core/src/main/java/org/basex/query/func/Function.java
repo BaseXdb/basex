@@ -996,10 +996,6 @@ public enum Function {
       arg(ITEM_ZM, ITEM_ZM, STR), EMP, flag(NDT)),
   /** XQuery function. */
   _UNIT_FAIL(FNUnit.class, "fail(message)", arg(STR), EMP, flag(NDT)),
-  /** XQuery function. */
-  _UNIT_TEST(FNUnit.class, "test([functions])", arg(FUN_ZM), ELM, flag(NDT)),
-  /** XQuery function. */
-  _UNIT_TEST_URIS(FNUnit.class, "test-uris(uris)", arg(STR_ZM), ELM, flag(NDT)),
 
   /* FNValidate functions. */
 

@@ -1,15 +1,12 @@
 package org.basex.query.util.unit;
 
-import static org.basex.query.util.Err.*;
 import static org.basex.query.util.unit.Constants.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.io.*;
-import org.basex.query.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -20,43 +17,46 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class Suite {
-  /** Query context. */
-  private final QueryContext ctx;
-  /** Input info. */
-  private final InputInfo info;
+  /** Failures. */
+  public int failures;
+  /** Errors. */
+  public int errors;
+  /** Skipped. */
+  public int skipped;
+  /** Tests. */
+  public int tests;
 
   /**
-   * Constructor.
-   * @param ii input info
-   * @param qc query context
-   */
-  public Suite(final QueryContext qc, final InputInfo ii) {
-    info = ii;
-    ctx = qc;
-  }
-
-  /**
-   * Tests all specified libraries.
-   * @param libs locations of library modules
+   * Tests all test functions in the specified path.
+   * @param ctx database context
+   * @param root path to test modules
    * @return resulting value
-   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  public Item test(final ArrayList<IO> libs) throws QueryException {
+  public FElem test(final IOFile root, final Context ctx) throws IOException {
+    final ArrayList<IOFile> files = new ArrayList<>();
+
+    final Performance perf = new Performance();
     final FElem suites = new FElem(TESTSUITES);
-    for(final IO io : libs) {
-      try {
-        final QueryContext qc = new QueryContext(ctx.context);
-        try {
-          final StaticScope mod = qc.parse(string(io.read()), io.path(), null);
-          qc.compile();
-          suites.add(new Unit(qc, info).test(mod.sc));
-        } finally {
-          qc.close();
-        }
-      } catch(final IOException ex) {
-        throw IOERR.get(info, ex);
+    if(root.isDir()) {
+      for(final String path : root.descendants()) {
+        final IOFile file = new IOFile(root, path);
+        if(file.hasSuffix(IO.XQSUFFIXES)) files.add(file);
       }
+    } else {
+      files.add(root);
     }
+
+    for(final IOFile file : files) {
+      final Unit unit = new Unit(file, ctx);
+      unit.test(suites);
+      errors += unit.errors;
+      failures += unit.failures;
+      skipped += unit.skipped;
+      tests += unit.tests;
+    }
+
+    suites.add(TIME, Unit.time(perf));
     return suites;
   }
 }

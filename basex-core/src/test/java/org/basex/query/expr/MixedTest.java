@@ -4,9 +4,10 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.query.util.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * Mixed XQuery tests.

@@ -14,6 +14,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests namespaces.

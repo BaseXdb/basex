@@ -127,6 +127,8 @@ public final class EditorArea extends TextPanel {
     super.keyReleased(e);
     if(EXEC1.is(e) || EXEC2.is(e)) {
       release(Action.EXECUTE);
+    } else if(UNIT.is(e)) {
+      release(Action.TEST);
     } else if((!e.isActionKey() || MOVEDOWN.is(e) || MOVEUP.is(e)) && !modifier(e)) {
       release(Action.CHECK);
     }

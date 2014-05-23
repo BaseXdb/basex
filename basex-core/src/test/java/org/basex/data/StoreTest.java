@@ -2,10 +2,11 @@ package org.basex.data;
 
 import static org.junit.Assert.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests the stability of the database text store.

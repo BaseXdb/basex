@@ -5,7 +5,7 @@ import org.basex.core.cmd.*;
 import org.basex.server.*;
 import org.basex.SandboxTest;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.Test;
 
 /**
  * Testing concurrent XQUF statements on a single database.

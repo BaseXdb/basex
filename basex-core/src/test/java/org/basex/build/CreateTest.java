@@ -8,6 +8,7 @@ import org.basex.io.*;
 import org.basex.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * Tests for creating databases and adding documents.

@@ -13,6 +13,7 @@ import org.basex.io.random.*;
 import org.basex.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests the update functionality of the block storage.

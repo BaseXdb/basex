@@ -13,6 +13,7 @@ import org.basex.query.util.pkg.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests the EXPath package API.

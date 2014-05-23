@@ -6,10 +6,11 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.atomic.*;
 import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.util.*;
-import org.basex.query.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * General test of the XQuery Update Facility implementation.

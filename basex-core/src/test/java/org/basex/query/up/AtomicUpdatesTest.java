@@ -13,6 +13,7 @@ import org.basex.query.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.rules.*;
+import org.junit.Test;
 
 /**
  * Test the {@link AtomicUpdateCache}.

@@ -2,15 +2,16 @@ package org.basex.query;
 
 import static org.junit.Assert.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.item.*;
-import org.basex.*;
 import org.basex.query.simple.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests the database commands.

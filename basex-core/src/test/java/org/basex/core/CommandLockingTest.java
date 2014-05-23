@@ -7,7 +7,7 @@ import org.basex.index.*;
 import org.basex.*;
 import org.basex.query.func.*;
 import org.basex.util.list.*;
-import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests commands and XQueries for correct identification of databases

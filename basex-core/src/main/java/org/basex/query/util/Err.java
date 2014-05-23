@@ -227,11 +227,13 @@ public enum Err {
   /** UNIT0002. */
   UNIT_ARGS(UNIT, 2, "Test function '%' must have no arguments."),
   /** UNIT0003. */
-  UNIT_UPDATE(UNIT, 3, "Function '%' is updating."),
+  UNIT_PRIVATE(UNIT, 3, "Test function '%' must be public."),
   /** UNIT0004. */
   UNIT_TWICE(UNIT, 4, "Annotation %:% was declare twice."),
   /** UNIT0005. */
   UNIT_ANN(UNIT, 5, "Annotation '%%' has invalid arguments."),
+  /** UNIT0006. */
+  UNIT_EMPTY(UNIT, 6, "Test function '%' returns items."),
 
   // EXPath modules
 

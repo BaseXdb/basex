@@ -10,6 +10,7 @@ import org.basex.io.*;
 import org.basex.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * Test index updates when using memory storage ({@link MemData}).

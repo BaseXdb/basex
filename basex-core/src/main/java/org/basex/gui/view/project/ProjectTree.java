@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
 
+import org.basex.core.cmd.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.io.*;
@@ -50,9 +51,11 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     setEditable(true);
 
     // add popup
-    new BaseXPopup(this, pv.gui, new OpenCmd(), new OpenExternalCmd(), null,
-        new DeleteCmd(), new RenameCmd(), new NewDirCmd(), null,
-        new RefreshCmd(), new CopyPathCmd());
+    new BaseXPopup(this, pv.gui,
+      new OpenCmd(), new OpenExternalCmd(), new TestCmd(), null,
+      new DeleteCmd(), new RenameCmd(), new NewDirCmd(), null,
+      new RefreshCmd(), new CopyPathCmd()
+    );
   }
 
   /**
@@ -278,6 +281,18 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
         } catch(final IOException ex) {
           BaseXDialog.error(view.gui, Util.info(FILE_NOT_OPENED_X, node.file));
         }
+      }
+    }
+  }
+
+  /** Test command. */
+  final class TestCmd extends GUIPopupCmd {
+    /** Constructor. */
+    TestCmd() { super(RUN_TESTS, BaseXKeys.UNIT); }
+
+    @Override public void execute() {
+      for(final ProjectNode node : selectedNodes()) {
+        view.gui.execute(new Test(node.file.path()));
       }
     }
   }

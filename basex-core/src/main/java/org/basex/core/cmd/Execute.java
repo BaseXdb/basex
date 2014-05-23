@@ -31,12 +31,12 @@ public class Execute extends Command {
   }
 
   @Override
-  public boolean newData(final Context ctx) {
+  public final boolean newData(final Context ctx) {
     return new Close().run(ctx);
   }
 
   @Override
-  public void databases(final LockResult lr) {
+  public final void databases(final LockResult lr) {
     lr.writeAll = true;
   }
 
@@ -63,7 +63,7 @@ public class Execute extends Command {
   }
 
   @Override
-  public boolean updating(final Context ctx) {
+  public final boolean updating(final Context ctx) {
     if(!init(ctx)) return true;
     for(final Command c : list) {
       if(!c.updating(ctx)) return true;
