@@ -241,4 +241,26 @@ public final class FuncItemTest extends QueryPlanTest {
         "exists(//" + Util.className(FuncItem.class) + ')'
     );
   }
+
+  /** Tests if not-yet-known function references are parsed correctly. */
+  @Test
+  public void gh953() {
+    check("declare function local:go ($n) { $n, for-each($n/*, local:go(?)) };" +
+        "let $source := <a><b/></a> return local:go($source)",
+
+        String.format("<a>%n  <b/>%n</a>%n<b/>")
+    );
+  }
+
+  /** Tests if {@code fn:error()} is allowed with impossible types. */
+  @Test
+  public void gh958() {
+    error("declare function local:f() as item()+ { error() }; local:f()",
+        Err.FUNERR1
+    );
+
+    error("function() as item()+ { error() }()",
+        Err.FUNERR1
+    );
+  }
 }

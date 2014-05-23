@@ -63,7 +63,7 @@ public final class TypeCheck extends Single {
       return optPre(value(ctx), ctx);
     }
 
-    if(argType.type.instanceOf(type.type)) {
+    if(argType.type.instanceOf(type.type) && !expr.has(Flag.NDT)) {
       final SeqType.Occ occ = argType.occ.intersect(type.occ);
       if(occ == null) throw INVCAST.get(info, argType, type);
     }
