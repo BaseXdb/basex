@@ -105,7 +105,6 @@ public final class PermissionTest extends SandboxTest {
     no(new Get("DBPATH"), testSession);
     ok(new Get(MainOptions.QUERYINFO), testSession);
     ok(new Set(MainOptions.QUERYINFO, false), testSession);
-    ok(new org.basex.core.cmd.Test(FOLDER + "tests-ok.xqm"), testSession);
 
     // repo Stuff
     no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
@@ -249,6 +248,7 @@ public final class PermissionTest extends SandboxTest {
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
     no(new AlterUser(NAME, Token.md5(NAME)), testSession);
+    no(new org.basex.core.cmd.Test(FOLDER + "tests-ok.xqm"), testSession);
   }
 
   /** Tests all commands where admin permission is needed. */
@@ -273,6 +273,7 @@ public final class PermissionTest extends SandboxTest {
     ok(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
     ok(new RepoList(), testSession);
     ok(new RepoDelete("http://www.pkg3.com", null), testSession);
+    ok(new org.basex.core.cmd.Test(FOLDER + "tests-ok.xqm"), testSession);
   }
 
   /** Drops users. */
