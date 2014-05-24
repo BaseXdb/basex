@@ -1217,6 +1217,15 @@ public enum Err {
   }
 
   /**
+   * Checks if the error code equals the specified QName.
+   * @param name name to compare
+   * @return result of check
+   */
+  public final boolean eq(final QNm name) {
+    return Token.eq(name.uri(), uri) && Token.eq(name.local(), Token.token(code));
+  }
+
+  /**
    * Error types.
    * @author BaseX Team 2005-14, BSD License
    * @author Leo Woerteler

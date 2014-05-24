@@ -268,7 +268,7 @@ public final class Functions extends TokenSet {
   }
 
   /**
-   * Returns an exception if the name of a pre-defined functions is similar to the
+   * Returns an exception if the name of a pre-defined function is similar to the
    * specified function name.
    * @param name function name
    * @param ii input info
@@ -283,9 +283,8 @@ public final class Functions extends TokenSet {
       final byte[] u = substring(keys[k], 2, i);
       final byte[] l = substring(keys[k], i + 1);
       if(eq(ln, l)) {
-        final byte[] prefix = NSGlobal.prefix(name.uri());
-        return FUNCSIMILAR.get(ii, prefix.length != 0 ? concat(prefix, token(":"), l) : name.id(),
-          new TokenBuilder(NSGlobal.prefix(u)).add(':').add(l));
+        return FUNCSIMILAR.get(ii, name.prefixId(FNURI),
+            new TokenBuilder(NSGlobal.prefix(u)).add(':').add(l));
       } else if(ls.similar(ln, l)) {
         return FUNCSIMILAR.get(ii, name.string(), l);
       }
