@@ -197,16 +197,32 @@ public final class QNm extends Item {
   }
 
   /**
-   * Returns a unique representation of the QName:
+   * Returns a unique representation of the QName.
    * <ul>
-   * <li> if a URI exists, the EQName notation is used.</li>
-   * <li> otherwise, if a prefix exists, the prefix and local name is returned.</li>
-   * <li> otherwise, the local name is returned.</li>
+   * <li> If a URI exists, the EQName notation is used.</li>
+   * <li> Otherwise, if a prefix exists, the prefix and local name is returned.</li>
+   * <li> Otherwise, the local name is returned.</li>
    * </ul>
    * @return unique representation
    */
   public byte[] id() {
     return uri == null ? name : internal(null, local(), uri);
+  }
+
+  /**
+   * Returns a unique representation of the QName.
+   * <ul>
+   *   <li> Skips the prefix if the namespace of the QName equals the specified one.</li>
+   *   <li> Uses a prefix if its namespace URI is statically known.</li>
+   *   <li> Otherwise, {@link #id()} is called.</li>
+   * </ul>
+   * @param ns default uri (optional)
+   * @return unique representation
+   */
+  public byte[] prefixId(final byte[] ns) {
+    if(Token.eq(uri(), ns)) return local();
+    final byte[] p = NSGlobal.prefix(uri());
+    return p.length == 0 ? id() : concat(p, token(":"), local());
   }
 
   @Override

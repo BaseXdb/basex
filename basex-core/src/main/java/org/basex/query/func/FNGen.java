@@ -191,8 +191,9 @@ public final class FNGen extends StandardFunc {
     } catch(final QueryException ex) {
       final Err err = ex.err();
       if(err != null) {
-        if(err.is(ErrType.FODC) && (err.code.endsWith("0002") || err.code.endsWith("0004")) ||
-           err.is(ErrType.BXDB) && err.code.endsWith("0006")) return Bln.FALSE;
+        final String num = err.code.length() == 8 ? err.code.substring(4) : "";
+        if(err.is(ErrType.FODC) && (num.equals("0002") || num.equals("0004")) ||
+           err.is(ErrType.BXDB) && num.equals("0006")) return Bln.FALSE;
       }
       throw ex;
     }

@@ -139,7 +139,7 @@ public final class Unit {
             final QNm name = ex.qname();
             if(code == null || !eq(code, name.local())) {
               final FElem error;
-              final boolean failure = eq(name.uri(), QueryText.UNITURI);
+              final boolean failure = Err.UNIT_ASSERT.eq(name);
               if(failure) {
                 failures++;
                 error = new FElem(FAILURE);
@@ -155,7 +155,7 @@ public final class Unit {
                 error.add(elem(ue.returned, RETURNED, ue.count));
                 error.add(elem(ue.expected, EXPECTED, ue.count));
               } else {
-                if(!failure) error.add(TYPE, ex.qname().local());
+                if(!failure) error.add(TYPE, ex.qname().prefixId(QueryText.ERRORURI));
                 error.add(ex.getLocalizedMessage());
               }
               testcase.add(error);
@@ -180,7 +180,7 @@ public final class Unit {
         final FElem error = new FElem(ERROR);
         error.add(LINE, token(ex.line()));
         error.add(COLUMN, token(ex.column()));
-        error.add(TYPE, ex.qname().local());
+        error.add(TYPE, ex.qname().prefixId(QueryText.ERRORURI));
         error.add(ex.getLocalizedMessage());
         suite.add(error);
       } else {
