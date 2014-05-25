@@ -115,6 +115,25 @@ public final class NameTest extends Test {
     }
   }
 
+  /**
+   * Checks if the specified test is equals to this test.
+   * @param test test to be compared
+   * @return result of check
+   */
+  public boolean eq(final NameTest test) {
+    if(kind != test.kind) return false;
+    switch(kind) {
+      // wildcard: accept all nodes
+      case WILDCARD: return true;
+      // namespaces wildcard: only check local name
+      case NAME: return Token.eq(local, test.local);
+      // name wildcard: only check namespace
+      case URI: return Token.eq(name.uri(), test.name.uri());
+      // check everything
+      default: return name.eq(test.name);
+    }
+  }
+
   @Override
   public Test intersect(final Test other) {
     throw Util.notExpected(other);

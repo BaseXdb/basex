@@ -1,24 +1,38 @@
 package org.basex.http.restxq;
 
+import java.util.*;
+
 import org.basex.query.path.*;
 import org.basex.query.value.item.*;
 
 /**
- * This class contains a RESTXQ error.
+ * This class catches RESTXQ errors with the same priority.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 final class RestXqError implements Comparable<RestXqError> {
-  /** Error code ({@code null}: wildcard). */
-  private final NameTest test;
+  /** Error tests. */
+  private final ArrayList<NameTest> tests = new ArrayList<NameTest>(1);
 
   /**
-   * Constructor.
-   * @param test name test ({@code null}: wildcard)
+   * Adds a test if it has not been specified before.
+   * @param test test to be added
+   * @return success flag
    */
-  RestXqError(final NameTest test) {
-    this.test = test;
+  boolean add(final NameTest test) {
+    for(final NameTest t : tests) if(t.eq(test)) return false;
+    tests.add(test);
+    return true;
+  }
+
+  /**
+   * Returns the test at the specified position, or {@code null}.
+   * @param index test index
+   * @return test
+   */
+  NameTest get(final int index) {
+    return index < tests.size() ? tests.get(index) : null;
   }
 
   /**
@@ -27,16 +41,23 @@ final class RestXqError implements Comparable<RestXqError> {
    * @return result of check
    */
   boolean matches(final QNm name) {
-    return test.eq(name);
+    for(final NameTest test : tests) if(test.eq(name)) return true;
+    return false;
   }
 
   @Override
   public int compareTo(final RestXqError error) {
-    return test.kind.ordinal() - error.test.kind.ordinal();
+    final NameTest nt1 = tests.get(0), nt2 = error.tests.get(0);
+    return nt1 == null || nt2 == null ? 0 : nt2.kind.ordinal() - nt1.kind.ordinal();
   }
 
   @Override
   public String toString() {
-    return test.toString();
+    final StringBuilder sb = new StringBuilder();
+    for(final NameTest test : tests) {
+      if(sb.length() != 0) sb.append(", ");
+      sb.append(test);
+    }
+    return sb.toString();
   }
 }
