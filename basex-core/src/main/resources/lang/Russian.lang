@@ -187,6 +187,7 @@ input_path           = Путь к исходным данным
 input_size           = Исходный размер
 insert_new_data      = Вставить новые данные
 install              = Установить
+install_from_url     = Install from URL
 int_parser           = Использовать встроенный парсер XML
 interrupted          = Прервано
 invalid_%            = % введено неверно

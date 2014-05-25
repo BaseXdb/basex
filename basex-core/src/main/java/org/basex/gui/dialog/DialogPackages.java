@@ -28,6 +28,8 @@ public final class DialogPackages extends BaseXDialog {
   private final BaseXList packages;
   /** Title of package. */
   private final BaseXLabel title;
+  /** Install from button. */
+  private final BaseXButton installURL;
   /** Install button. */
   private final BaseXButton install;
   /** Delete button. */
@@ -74,6 +76,7 @@ public final class DialogPackages extends BaseXDialog {
     table.add(path);
 
     // database buttons
+    installURL = new BaseXButton(INSTALL_FROM_URL + DOTS, this);
     install = new BaseXButton(INSTALL + DOTS, this);
     delete = new BaseXButton(DELETE + DOTS, this);
 
@@ -88,7 +91,7 @@ public final class DialogPackages extends BaseXDialog {
     p = new BaseXBack(new BorderLayout());
     p.add(title, BorderLayout.NORTH);
     p.add(table, BorderLayout.CENTER);
-    p.add(newButtons(install, delete), BorderLayout.SOUTH);
+    p.add(newButtons(installURL, install, delete), BorderLayout.SOUTH);
     BaseXLayout.setWidth(p, 430);
     set(p, BorderLayout.EAST);
 
@@ -110,7 +113,13 @@ public final class DialogPackages extends BaseXDialog {
     final StringList pkgs = packages.getValues();
     final ArrayList<Command> cmds = new ArrayList<Command>();
 
-    if(cmp == install) {
+    if(cmp == installURL) {
+      final DialogInstallURL dialog = new DialogInstallURL(this);
+      if(!dialog.ok()) return;
+      refresh = true;
+      cmds.add(new RepoInstall(dialog.url(), null));
+
+    } else if(cmp == install) {
       final String pp = gui.gopts.get(GUIOptions.WORKPATH);
       final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR, pp, gui);
       fc.filter(XML_ARCHIVES, IO.XARSUFFIX);

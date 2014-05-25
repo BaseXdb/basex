@@ -187,6 +187,7 @@ input_path           = Ruta de entrada
 input_size           = Tamaño de entrada
 insert_new_data      = Insertar nuevos datos
 install              = Instalar
+install_from_url     = Install from URL
 int_parser           = Utilice el analizador sintáctico (parser) de XML interno
 interrupted          = Interrumpido.
 invalid_%            = % es inválido.

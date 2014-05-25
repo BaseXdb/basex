@@ -898,6 +898,8 @@ public interface Text {
   /** Command info. */
   String DELETE = lang("delete");
   /** Command info. */
+  String INSTALL_FROM_URL = lang("install_from_url");
+  /** Command info. */
   String INSTALL = lang("install");
   /** Command info. */
   String OPEN_MANAGE = lang("open_manage");

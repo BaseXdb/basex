@@ -187,6 +187,7 @@ input_path           = Оролтын зам
 input_size           = Оролтын хэмжээ
 insert_new_data      = Өгөгдөл оруулах
 install              = Install
+install_from_url     = Install from URL
 int_parser           = Дотоод XML Parser-р хөрвүүлэх
 interrupted          = Interrupted.
 invalid_%            = % нь хүчинтэй.

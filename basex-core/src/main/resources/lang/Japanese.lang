@@ -187,6 +187,7 @@ input_path           = 文書のパス
 input_size           = 文書のサイズ
 insert_new_data      = 新規データの作成
 install              = インストール
+install_from_url     = Install from URL
 int_parser           = 内部XMLパーサーを使用
 interrupted          = 中断されました。
 invalid_%            = % は不正です。
