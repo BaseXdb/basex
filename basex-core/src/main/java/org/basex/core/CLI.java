@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.util.*;
 
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
@@ -24,14 +23,11 @@ public abstract class CLI extends Main {
 
   /** Output file for queries. */
   protected OutputStream out = System.out;
-  /** Console mode. May be set to {@code false} during execution. */
-  protected boolean console;
-  /** Session. */
-  protected Session session;
   /** Verbose mode. */
   protected boolean verbose;
   /** Separate serialized items with newlines. */
   protected boolean newline;
+
   /** Password reader. */
   private final PasswordReader pwReader = new PasswordReader() {
     @Override
@@ -40,6 +36,8 @@ public abstract class CLI extends Main {
       return md5(Util.password());
     }
   };
+  /** Session. */
+  private Session session;
 
   /**
    * Constructor.
@@ -61,9 +59,6 @@ public abstract class CLI extends Main {
     context = ctx != null ? ctx : new Context();
     parseArgs();
 
-    // console: turn on verbose mode
-    verbose |= console;
-
     // guarantee correct shutdown of database context
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
@@ -71,42 +66,6 @@ public abstract class CLI extends Main {
         context.close();
       }
     });
-  }
-
-  /**
-   * Launches the console mode, which reads and executes user input.
-   */
-  protected final void console() {
-    // create console reader
-    final ConsoleReader cr = ConsoleReader.get();
-    // loop until console is set to false (may happen in server mode)
-    while(console) {
-      // get next line
-      final String in = cr.readLine();
-      // end of input: break loop
-      if(in == null) break;
-      // skip empty lines
-      if(in.isEmpty()) continue;
-      try {
-        if(!execute(new CommandParser(in, context).pwReader(cr.pwReader()))) {
-          // show goodbye message if method returns false
-          Util.outln(BYE[new Random().nextInt(4)]);
-          return;
-        }
-      } catch(final IOException ex) {
-        // output error messages
-        Util.errln(ex);
-      }
-    }
-  }
-
-  /**
-   * Quits the console mode.
-   * @throws IOException I/O exception
-   */
-  protected void quit() throws IOException {
-    if(out == System.out || out == System.err) out.flush();
-    else out.close();
   }
 
   /**
@@ -124,7 +83,7 @@ public abstract class CLI extends Main {
    * @return {@code false} if the exit command was sent
    * @throws IOException database exception
    */
-  private boolean execute(final CommandParser parser) throws IOException {
+  protected final boolean execute(final CommandParser parser) throws IOException {
     try {
       for(final Command cmd : parser.parse()) {
         if(cmd instanceof Exit) return false;
@@ -154,5 +113,19 @@ public abstract class CLI extends Main {
    * @return session
    * @throws IOException I/O exception
    */
-  protected abstract Session session() throws IOException;
+  protected final Session session() throws IOException {
+    if(session == null) session = init();
+    session.setOutputStream(out);
+    return session;
+  }
+
+  /**
+   * Initializes and returns a session.
+   * @return session instance
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected Session init() throws IOException {
+    return new LocalSession(context, out);
+  }
 }

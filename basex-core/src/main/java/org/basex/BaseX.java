@@ -3,13 +3,15 @@ package org.basex;
 import static org.basex.core.Text.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.cmd.Set;
+import org.basex.core.parse.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -27,6 +29,8 @@ public class BaseX extends CLI {
   private StringList vals;
   /** Flag for writing options to disk. */
   private boolean writeOptions;
+  /** Console mode. May be set to {@code false} during execution. */
+  protected boolean console;
 
   /**
    * Main method, launching the standalone mode.
@@ -164,13 +168,7 @@ public class BaseX extends CLI {
         }
         verbose = qi || qp || v;
       }
-
-      if(console) {
-        verbose = true;
-        // enter interactive mode
-        Util.outln(S_CONSOLE + TRY_MORE_X, sa() ? S_STANDALONE : S_CLIENT);
-        console();
-      }
+      if(console) console();
 
       if(writeOptions) context.globalopts.write();
     } finally {
@@ -179,18 +177,50 @@ public class BaseX extends CLI {
   }
 
   /**
+   * Launches the console mode, which reads and executes user input.
+   */
+  private void console() {
+    Util.outln(S_CONSOLE + TRY_MORE_X, sa() ? S_STANDALONE : S_CLIENT);
+    verbose = true;
+
+    // create console reader
+    final ConsoleReader cr = ConsoleReader.get();
+    // loop until console is set to false (may happen in server mode)
+    while(console) {
+      // get next line
+      final String in = cr.readLine();
+      // end of input: break loop
+      if(in == null) break;
+      // skip empty lines
+      if(in.isEmpty()) continue;
+      try {
+        if(!execute(new CommandParser(in, context).pwReader(cr.pwReader()))) {
+          // show goodbye message if method returns false
+          Util.outln(BYE[new Random().nextInt(4)]);
+          return;
+        }
+      } catch(final IOException ex) {
+        // output error messages
+        Util.errln(ex);
+      }
+    }
+  }
+
+  /**
+   * Quits the console mode.
+   * @throws IOException I/O exception
+   */
+  protected final void quit() throws IOException {
+    if(out == System.out || out == System.err) out.flush();
+    else out.close();
+  }
+
+  /**
    * Tests if this client is stand-alone.
    * @return stand-alone flag
    */
   boolean sa() {
     return true;
-  }
-
-  @Override
-  protected Session session() throws IOException {
-    if(session == null) session = new LocalSession(context, out);
-    session.setOutputStream(out);
-    return session;
   }
 
   @Override
