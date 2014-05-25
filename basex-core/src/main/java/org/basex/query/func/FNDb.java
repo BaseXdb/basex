@@ -212,7 +212,7 @@ public final class FNDb extends StandardFunc {
     final QNm nm = new QNm(checkStr(expr[a], ctx), sc);
     if(!nm.hasPrefix()) nm.uri(sc.ns.uri(Token.EMPTY));
 
-    final NameTest nt = new NameTest(nm, NameTest.Mode.STD, true, sc.elemNS);
+    final NameTest nt = new NameTest(nm, NameTest.Kind.URI_NAME, true, sc.elemNS);
     // return empty sequence if test will yield no results
     if(!nt.compile(ctx)) return Empty.ITER;
 

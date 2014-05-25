@@ -1,7 +1,7 @@
 package org.basex.http.restxq;
 
+import org.basex.query.path.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * This class contains a RESTXQ error.
@@ -11,32 +11,32 @@ import org.basex.util.*;
  */
 final class RestXqError implements Comparable<RestXqError> {
   /** Error code ({@code null}: wildcard). */
-  private final QNm code;
+  private final NameTest test;
 
   /**
    * Constructor.
-   * @param error error code ({@code null}: wildcard)
+   * @param test name test ({@code null}: wildcard)
    */
-  RestXqError(final QNm error) {
-    code = error;
+  RestXqError(final NameTest test) {
+    this.test = test;
   }
 
   /**
    * Checks if the specified name matches the test.
-   * @param nm name
+   * @param name name
    * @return result of check
    */
-  boolean matches(final QNm nm) {
-    return code == null || code.eq(nm);
+  boolean matches(final QNm name) {
+    return test.eq(name);
   }
 
   @Override
-  public int compareTo(final RestXqError rxe) {
-    return code == null ? rxe.code == null ? 0 : -1 : 1;
+  public int compareTo(final RestXqError error) {
+    return test.kind.ordinal() - error.test.kind.ordinal();
   }
 
   @Override
   public String toString() {
-    return code == null ? "*" : Token.string(code.string());
+    return test.toString();
   }
 }

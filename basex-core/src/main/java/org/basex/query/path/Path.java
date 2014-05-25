@@ -11,7 +11,7 @@ import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.Context;
-import org.basex.query.path.Test.Mode;
+import org.basex.query.path.Test.Kind;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -194,7 +194,7 @@ public abstract class Path extends ParseExpr {
     // set atomic type for single attribute steps to speedup predicate tests
     if(root == null && st.length == 1 && st[0] instanceof Step) {
       final Step curr = (Step) st[0];
-      if(curr.axis == ATTR && curr.test.mode == Mode.STD) curr.type = SeqType.NOD_ZO;
+      if(curr.axis == ATTR && curr.test.kind == Kind.URI_NAME) curr.type = SeqType.NOD_ZO;
     }
     steps = st;
   }
@@ -345,7 +345,7 @@ public abstract class Path extends ParseExpr {
             ((Preds) steps[s]).preds : new Expr[0];
         final QNm nm = qnm.get(ts - t - 1);
         final NameTest nt = nm == null ? new NameTest(false) :
-          new NameTest(nm, Mode.LN, false, null);
+          new NameTest(nm, Kind.NAME, false, null);
         stps[t] = Step.get(info, CHILD, nt, preds);
       }
       while(++s < steps.length) stps[ts++] = steps[s];
@@ -360,8 +360,8 @@ public abstract class Path extends ParseExpr {
         // only verify child steps; ignore namespaces
         final Step st = path.axisStep(s);
         if(st == null || st.axis != CHILD) break;
-        if(st.test.mode == Mode.ALL || st.test.mode == null) continue;
-        if(st.test.mode != Mode.LN) break;
+        if(st.test.kind == Kind.WILDCARD || st.test.kind == null) continue;
+        if(st.test.kind != Kind.NAME) break;
 
         // check if one of the addressed nodes is on the correct level
         final int name = data.tagindex.id(st.test.name.local());
@@ -401,7 +401,7 @@ public abstract class Path extends ParseExpr {
       final Step curr = axisStep(s);
       if(curr == null) return null;
       final boolean desc = curr.axis == DESC;
-      if(!desc && curr.axis != CHILD || curr.test.mode != Mode.LN)
+      if(!desc && curr.axis != CHILD || curr.test.kind != Kind.NAME)
         return null;
 
       final int name = data.tagindex.id(curr.test.name.local());

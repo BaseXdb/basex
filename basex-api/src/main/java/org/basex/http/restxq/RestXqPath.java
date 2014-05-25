@@ -57,8 +57,7 @@ final class RestXqPath implements Comparable<RestXqPath> {
     final int d = size - rxs.size;
     if(d != 0) return d;
     for(int s = 0; s < size; s++) {
-      final boolean wc1 = isTemplate(s);
-      final boolean wc2 = rxs.isTemplate(s);
+      final boolean wc1 = isTemplate(s), wc2 = rxs.isTemplate(s);
       if(wc1 != wc2) return wc1 ? 1 : -1;
     }
     return 0;

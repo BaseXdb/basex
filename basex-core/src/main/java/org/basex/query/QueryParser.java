@@ -1979,7 +1979,7 @@ public class QueryParser extends InputParser {
       // name test: *
       if(!consume(':')) return new NameTest(att);
       // name test: *:name
-      return new NameTest(new QNm(ncName(QNAMEINV)), NameTest.Mode.LN, att, sc.elemNS);
+      return new NameTest(new QNm(ncName(QNAMEINV)), NameTest.Kind.NAME, att, sc.elemNS);
     }
 
     if(sc.xquery3() && consume(EQNAME)) {
@@ -1987,7 +1987,7 @@ public class QueryParser extends InputParser {
       final byte[] uri = bracedURILiteral();
       if(consume('*')) {
         final QNm nm = new QNm(COLON, uri);
-        return new NameTest(nm, NameTest.Mode.NS, att, sc.elemNS);
+        return new NameTest(nm, NameTest.Kind.URI, att, sc.elemNS);
       }
     }
     pos = i;
@@ -2004,13 +2004,13 @@ public class QueryParser extends InputParser {
         if(name.hasPrefix() || !consume(':')) {
           skipWs();
           names.add(new QNmCheck(name, !att));
-          return new NameTest(name, NameTest.Mode.STD, att, sc.elemNS);
+          return new NameTest(name, NameTest.Kind.URI_NAME, att, sc.elemNS);
         }
         // name test: prefix:*
         if(consume('*')) {
           final QNm nm = new QNm(concat(name.string(), COLON));
           names.add(new QNmCheck(nm, !att));
-          return new NameTest(nm, NameTest.Mode.NS, att, sc.elemNS);
+          return new NameTest(nm, NameTest.Kind.URI, att, sc.elemNS);
         }
       }
     }

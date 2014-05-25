@@ -10,7 +10,7 @@ import org.basex.index.path.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.path.Test.Mode;
+import org.basex.query.path.Test.Kind;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -70,9 +70,9 @@ public abstract class Step extends Preds {
     ctx.leaf = false;
     try {
       final Data data = ctx.data();
-      if(data != null && test.mode == Mode.LN && test.type != NodeType.ATT &&
+      if(data != null && test.kind == Kind.NAME && test.type != NodeType.ATT &&
           axis.down && data.meta.uptodate && data.nspaces.size() == 0) {
-        final Stats s = data.tagindex.stat(data.tagindex.id(((NameTest) test).ln));
+        final Stats s = data.tagindex.stat(data.tagindex.id(((NameTest) test).local));
         ctx.leaf = s != null && s.isLeaf();
       }
 
@@ -107,7 +107,7 @@ public abstract class Step extends Preds {
    */
   public final boolean simple(final Axis ax, final boolean name) {
     return axis == ax && preds.length == 0 &&
-      (name ? test.mode == Mode.LN : test == Test.NOD);
+      (name ? test.kind == Kind.NAME : test == Test.NOD);
   }
 
   /**
@@ -126,11 +126,11 @@ public abstract class Step extends Preds {
       kind = ANode.kind(test.type);
       if(kind == Data.PI) return null;
 
-      if(test.mode == Mode.LN) {
+      if(test.kind == Kind.NAME) {
         // element/attribute test (*:ln)
         final Names names = kind == Data.ATTR ? data.atnindex : data.tagindex;
-        name = names.id(((NameTest) test).ln);
-      } else if(test.mode != null && test.mode != Mode.ALL) {
+        name = names.id(((NameTest) test).local);
+      } else if(test.kind != null && test.kind != Kind.WILDCARD) {
         // skip namespace and standard tests
         return null;
       }

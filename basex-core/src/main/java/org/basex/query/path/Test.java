@@ -33,18 +33,18 @@ public abstract class Test {
     public boolean eq(final ANode it) { return true; }
   };
 
-  /** Name test types. */
-  public enum Mode {
-    /** Accept all nodes (*).     */ ALL,
-    /** Test names (*:tag).       */ LN,
-    /** Test namespaces (pre:*).  */ NS,
-    /** Test all nodes (pre:tag). */ STD
+  /** Kind of name test. */
+  public enum Kind {
+    /** Accept all nodes (*).            */ WILDCARD,
+    /** Test name (*:name).              */ NAME,
+    /** Test uri (prefix:*).             */ URI,
+    /** Test uri and name (prefix:name). */ URI_NAME
   }
 
-  /** Type of node test. */
+  /** Node kind. */
   public NodeType type;
   /** Type of name test. Set to {@code null} for other kind tests. */
-  public Mode mode;
+  public Kind kind;
   /** Name test. Set to {@code null} for other kind tests. */
   public QNm name;
 
@@ -102,7 +102,7 @@ public abstract class Test {
    * @return result of check
    */
   public final boolean sameAs(final Test t) {
-    return mode == t.mode && type == t.type && (name == t.name || name.eq(t.name));
+    return kind == t.kind && type == t.type && (name == t.name || name.eq(t.name));
   }
 
   /**
