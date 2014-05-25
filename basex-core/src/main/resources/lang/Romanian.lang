@@ -187,6 +187,7 @@ input_path           = Calea de intrare
 input_size           = Marime intrari
 insert_new_data      = Inserare de noi date
 install              = Instalare
+install_from_url     = Install from URL
 int_parser           = Utilizare parser XML intern
 interrupted          = Intrerupt.
 invalid_%            = % este invalid.

@@ -63,6 +63,8 @@ public final class Prop {
   public static final String UPDATE_URL = URL + "/products/download/all-downloads/";
   /** Version URL. */
   public static final String VERSION_URL = "http://files." + PROJECT_NAME + ".org/version.txt";
+  /** Repository URL. */
+  public static final String REPO_URL = "http://files." + PROJECT_NAME + ".org/modules";
   /** Mail. */
   public static final String MAILING_LIST = PROJECT_NAME + "-talk@mailman.uni-konstanz.de";
   /** Title and version. */
