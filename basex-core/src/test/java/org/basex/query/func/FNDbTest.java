@@ -73,7 +73,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_DB_OPEN.args(NAME) + "//title/text()", "XML");
 
     // reference invalid path
-    error(_DB_OPEN.args(NAME, "*"), Err.RESINV);
+    if(Prop.WIN) error(_DB_OPEN.args(NAME, "*"), Err.RESINV);
 
     // run function on non-existing database
     new DropDB(NAME).execute(context);
