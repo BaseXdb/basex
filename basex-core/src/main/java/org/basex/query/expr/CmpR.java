@@ -10,7 +10,7 @@ import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
-import org.basex.query.path.Test.Mode;
+import org.basex.query.path.Test.Kind;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -172,14 +172,14 @@ public final class CmpR extends Single {
     final Step step;
     if(text) {
       step = st == 1 ? ic.step : path.step(st - 2);
-      if(step.test.mode != Mode.LN) return null;
+      if(step.test.kind != Kind.NAME) return null;
     } else {
       step = path.step(st - 1);
       if(!step.simple(Axis.ATTR, true)) return null;
     }
 
     final Names names = text ? data.tagindex : data.atnindex;
-    final Stats key = names.stat(names.id(((NameTest) step.test).ln));
+    final Stats key = names.stat(names.id(((NameTest) step.test).local));
     return key == null || key.type == StatsType.INTEGER ||
         key.type == StatsType.DOUBLE ? key : null;
   }

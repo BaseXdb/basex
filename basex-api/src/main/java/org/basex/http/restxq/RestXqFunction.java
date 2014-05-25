@@ -19,6 +19,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -494,14 +495,28 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
     // name of parameter
     final String err = toString(value.itemAt(0), name);
-    QNm code = null;
-    if(!"*".equals(err)) {
-      final byte[] c = token(err);
-      if(!XMLToken.isQName(c)) throw error(INV_CODE, c);
-      code = new QNm(c, function.sc);
-      if(!code.hasURI() && code.hasPrefix()) throw error(INV_NONS, code);
+    final NameTest test;
+    QNm qnm = null;
+    if(err.equals("*")) {
+      test = new NameTest(false);
+    } else if(err.startsWith("*:")) {
+      final byte[] local = token(err.substring(2));
+      if(!XMLToken.isNCName(local)) throw error(INV_CODE, err);
+      test = new NameTest(new QNm(local), NameTest.Kind.NAME, false, null);
+    } else if(err.endsWith(":*")) {
+      final byte[] prefix = token(err.substring(0, err.length() - 2));
+      if(!XMLToken.isNCName(prefix)) throw error(INV_CODE, err);
+      qnm = new QNm(concat(prefix, COLON), function.sc);
+      test = new NameTest(qnm, NameTest.Kind.URI, false, null);
+    } else {
+      final byte[] nm = token(err);
+      if(!XMLToken.isQName(nm)) throw error(INV_CODE, err);
+      qnm = new QNm(nm, function.sc);
+      test = new NameTest(qnm, NameTest.Kind.URI_NAME, false, null);
     }
     // message
-    return new RestXqError(code);
+    if(qnm != null && qnm.hasPrefix() && !qnm.hasURI()) throw error(INV_NONS, qnm);
+
+    return new RestXqError(test);
   }
 }

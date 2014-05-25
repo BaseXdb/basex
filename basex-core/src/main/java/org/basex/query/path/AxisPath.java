@@ -9,7 +9,7 @@ import org.basex.index.path.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.path.Test.Mode;
+import org.basex.query.path.Test.Kind;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -205,7 +205,7 @@ public abstract class AxisPath extends Path {
         for(; j <= smin; ++j) {
           final Step s = axisStep(j);
           // step must use child axis and name test, and have no predicates
-          if(s == null || s.test.mode != Mode.LN || s.axis != Axis.CHILD ||
+          if(s == null || s.test.kind != Kind.NAME || s.axis != Axis.CHILD ||
               j != smin && s.preds.length > 0) break;
 
           // support only unique paths with nodes on the correct level
@@ -289,7 +289,7 @@ public abstract class AxisPath extends Path {
     final Step s = step(steps.length - 1);
 
     if(s.preds.length != 0 || !s.axis.down || s.test.type == NodeType.ATT ||
-        s.test.mode != Mode.LN && s.test.mode != Mode.STD) return this;
+        s.test.kind != Kind.NAME && s.test.kind != Kind.URI_NAME) return this;
 
     final Data data = ctx.data();
     if(data == null || !data.meta.uptodate) return this;
