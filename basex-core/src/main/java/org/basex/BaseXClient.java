@@ -45,21 +45,18 @@ public final class BaseXClient extends BaseX {
   }
 
   @Override
-  protected Session session() throws IOException {
-    if(session == null) {
-      // user/password input
-      String user = context.globalopts.get(GlobalOptions.USER);
-      String pass = context.globalopts.get(GlobalOptions.PASSWORD);
-      while(user.isEmpty()) {
-        Util.out(USERNAME + COLS);
-        user = Util.input();
-      }
-      while(pass.isEmpty()) {
-        Util.out(PASSWORD + COLS);
-        pass = Util.password();
-      }
-      session = new ClientSession(context, user, pass, out);
+  protected Session init() throws IOException {
+    // user/password input
+    String user = context.globalopts.get(GlobalOptions.USER);
+    String pass = context.globalopts.get(GlobalOptions.PASSWORD);
+    while(user.isEmpty()) {
+      Util.out(USERNAME + COLS);
+      user = Util.input();
     }
-    return session;
+    while(pass.isEmpty()) {
+      Util.out(PASSWORD + COLS);
+      pass = Util.password();
+    }
+    return new ClientSession(context, user, pass, out);
   }
 }
