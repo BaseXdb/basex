@@ -512,7 +512,6 @@ public final class EditorView extends View {
     editor.last = in;
 
     final boolean xquery = file.hasSuffix(IO.XQSUFFIXES) || !file.path().contains(".");
-    editor.script = !xquery && file.hasSuffix(IO.BXSSUFFIX);
     if(editor.script && run) {
       // run query if forced, or if realtime execution is activated
       gui.execute(true, new Execute(string(in)));
@@ -910,10 +909,12 @@ public final class EditorView extends View {
     String title = edit.file.name();
     if(edit.modified) title += '*';
     edit.label.setText(title);
+    edit.script = edit.file.hasSuffix(IO.BXSSUFFIX);
 
     // update components
     gui.refreshControls();
     posCode.invokeLater();
+    refreshMark();
   }
 
   /** Code for setting cursor position. */
