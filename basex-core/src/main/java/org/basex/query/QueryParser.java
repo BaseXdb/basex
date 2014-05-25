@@ -1983,7 +1983,7 @@ public class QueryParser extends InputParser {
     }
 
     if(sc.xquery3() && consume(EQNAME)) {
-      // name test: Q{...}*
+      // name test: Q{uri}*
       final byte[] uri = bracedURILiteral();
       if(consume('*')) {
         final QNm nm = new QNm(COLON, uri);
@@ -2000,7 +2000,7 @@ public class QueryParser extends InputParser {
         if(type != null) return kindTest(type);
       } else {
         pos = i2;
-        // name test: prefix:name, name
+        // name test: prefix:name, name, Q{uri}name
         if(name.hasPrefix() || !consume(':')) {
           skipWs();
           names.add(new QNmCheck(name, !att));
