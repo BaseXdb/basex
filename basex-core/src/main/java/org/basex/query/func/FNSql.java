@@ -185,7 +185,7 @@ public final class FNSql extends StandardFunc {
    * @throws QueryException query exception
    */
   private Int prepare(final QueryContext ctx) throws QueryException {
-    final Connection conn = connection(ctx, false);
+    final Connection conn = connection(ctx);
     // Prepared statement
     final byte[] prepStmt = checkStr(expr[1], ctx);
     try {
@@ -393,14 +393,22 @@ public final class FNSql extends StandardFunc {
   }
 
   /**
-   * Closes a connection to a relational database.
+   * Closes a connection or a prepared statement.
    * @param ctx query context
    * @return {@code null}
    * @throws QueryException query exception
    */
   private Item close(final QueryContext ctx) throws QueryException {
     try {
-      connection(ctx, true).close();
+      final int id = (int) checkItr(expr[0], ctx);
+      final JDBCConnections jdbc = jdbc(ctx);
+      final Object obj = jdbc.get(id);
+      if(obj instanceof Connection) {
+        ((Connection) obj).close();
+      } else {
+        ((PreparedStatement) obj).close();
+      }
+      jdbc.remove(id);
       return null;
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.get(info, ex);
@@ -415,7 +423,7 @@ public final class FNSql extends StandardFunc {
    */
   private Item commit(final QueryContext ctx) throws QueryException {
     try {
-      connection(ctx, false).commit();
+      connection(ctx).commit();
       return null;
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.get(info, ex);
@@ -430,7 +438,7 @@ public final class FNSql extends StandardFunc {
    */
   private Item rollback(final QueryContext ctx) throws QueryException {
     try {
-      connection(ctx, false).rollback();
+      connection(ctx).rollback();
       return null;
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.get(info, ex);
@@ -438,20 +446,16 @@ public final class FNSql extends StandardFunc {
   }
 
   /**
-   * Returns a connection and removes it from list with opened connections if
-   * requested.
+   * Returns a connection.
    * @param ctx query context
-   * @param del flag indicating if connection has to be removed
    * @return connection
    * @throws QueryException query exception
    */
-  private Connection connection(final QueryContext ctx, final boolean del)
-      throws QueryException {
+  private Connection connection(final QueryContext ctx) throws QueryException {
     final int id = (int) checkItr(expr[0], ctx);
     final Object obj = jdbc(ctx).get(id);
-    if(!(obj instanceof Connection)) throw BXSQ_CONN.get(info, id);
-    if(del) jdbc(ctx).remove(id);
-    return (Connection) obj;
+    if(obj instanceof Connection) return (Connection) obj;
+    throw BXSQ_CONN.get(info, id);
   }
 
   /**
