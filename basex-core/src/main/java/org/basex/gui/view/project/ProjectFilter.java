@@ -254,6 +254,7 @@ final class ProjectFilter extends BaseXBack {
     final String pattern = file.isEmpty() ? project.gui.gopts.get(GUIOptions.FILES) : file;
     if(pattern.contains("*") || pattern.contains("?")) {
       final Pattern pt = Pattern.compile(IOFile.regex(pattern));
+
       for(final byte[] input : cache) {
         final int offset = offset(input, true);
         if(pt.matcher(Token.string(Token.substring(input, offset))).matches() &&
@@ -263,11 +264,11 @@ final class ProjectFilter extends BaseXBack {
     }
 
     // starts-with, contains, camel case
-    final byte[] patt = Token.token(pattern);
+    final byte[] pttrn = Token.replace(Token.lc(Token.token(pattern)), '\\', '/');
     final TokenSet exclude = new TokenSet();
-    final boolean path = Token.indexOf(patt, '\\') != -1 || Token.indexOf(patt, '/') != -1;
+    final boolean path = Token.indexOf(pttrn, '/') != -1;
     for(int i = 0; i < (path ? 2 : 3); i++) {
-      if(!filter(patt, search, thread, i, results, exclude, path)) return false;
+      if(!filter(pttrn, search, thread, i, results, exclude, path)) return false;
     }
     return true;
   }
@@ -287,8 +288,9 @@ final class ProjectFilter extends BaseXBack {
       final TokenSet results, final TokenSet exclude, final boolean path) {
 
     if(results.size() < MAXHITS) {
-      for(final byte[] input : cache) {
+      for(final byte[] in : cache) {
         // check if current file matches the pattern
+        final byte[] input = Token.replace(Token.lc(in), '\\', '/');
         final int offset = offset(input, path);
         if(mode == 0 ? Token.startsWith(input, pattern, offset) :
            mode == 1 ? Token.contains(input, pattern, offset) :
@@ -385,10 +387,7 @@ final class ProjectFilter extends BaseXBack {
     final int il = input.length, pl = pattern.length;
     int p = 0;
     for(int i = off; i < il && p < pl; i++) {
-      final byte ic = input[i];
-      final byte pc = pattern[p];
-      if(pc == ic || pc > 0x61 && pc < 0x7a && pc == (ic | 0x20) ||
-        (pc == '/' || pc == '\\') && (ic == '/' || ic == '\\')) p++;
+      if(pattern[p] == input[i]) p++;
     }
     return p == pl;
   }

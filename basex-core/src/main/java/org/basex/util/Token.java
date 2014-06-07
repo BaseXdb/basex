@@ -1021,6 +1021,8 @@ public final class Token {
    * @return resulting token
    */
   public static byte[] replace(final byte[] token, final int search, final int replace) {
+    if(!contains(token, search)) return token;
+
     final TokenBuilder tb = new TokenBuilder(token.length);
     final int tl = token.length;
     for(int i = 0; i < tl; i += cl(token, i)) {
