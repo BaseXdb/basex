@@ -288,13 +288,13 @@ final class ProjectFilter extends BaseXBack {
       final TokenSet results, final TokenSet exclude, final boolean path) {
 
     if(results.size() < MAXHITS) {
-      for(final byte[] in : cache) {
+      for(final byte[] input : cache) {
         // check if current file matches the pattern
-        final byte[] input = Token.replace(Token.lc(in), '\\', '/');
-        final int offset = offset(input, path);
-        if(mode == 0 ? Token.startsWith(input, pattern, offset) :
-           mode == 1 ? Token.contains(input, pattern, offset) :
-           matches(input, pattern, offset)) {
+        final byte[] lc = Token.replace(Token.lc(input), '\\', '/');
+        final int offset = offset(lc, path);
+        if(mode == 0 ? Token.startsWith(lc, pattern, offset) :
+           mode == 1 ? Token.contains(lc, pattern, offset) :
+           matches(lc, pattern, offset)) {
           if(!exclude.contains(input)) {
             exclude.add(input);
             if(filterContent(input, search, results)) return true;
