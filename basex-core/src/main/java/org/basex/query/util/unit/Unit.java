@@ -218,6 +218,7 @@ public final class Unit {
       exp.add(it.string(null));
     }
     exp.add(ITEM, token(c));
+    exp.add(TYPE, it.type.toString());
     return exp;
   }
 
