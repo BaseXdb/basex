@@ -20,7 +20,6 @@ public abstract class AdvancedQueryTest extends SandboxTest {
    */
   private static String query(final String query) {
     final QueryProcessor qp = new QueryProcessor(query, context);
-    qp.sc.baseURI(".");
     try {
       final ArrayOutput ao = new ArrayOutput();
       final Serializer ser = qp.getSerializer(ao);

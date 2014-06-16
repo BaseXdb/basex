@@ -109,11 +109,15 @@ public final class StaticContext {
    * @param uri uri to be set
    */
   public void baseURI(final String uri) {
+    final IO base = IO.get(uri);
     if(uri.isEmpty()) {
       baseURI = Uri.EMPTY;
+    } else if(base instanceof IOContent) {
+      baseURI = Uri.uri(uri);
+    } else if(baseURI == Uri.EMPTY) {
+      baseURI = Uri.uri(base.url());
     } else {
-      final IO io = IO.get(uri);
-      baseURI = Uri.uri(io instanceof IOFile ? io.url() : uri);
+      baseURI = Uri.uri(baseIO().merge(uri).url());
     }
   }
 

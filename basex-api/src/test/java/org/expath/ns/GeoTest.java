@@ -878,7 +878,6 @@ public final class GeoTest extends AdvancedQueryTest {
         "declare namespace gml='http://www.opengis.net/gml';" + query;
 
     final QueryProcessor qp = new QueryProcessor(q, context);
-    qp.sc.baseURI(".");
     try {
       final String res = qp.execute().toString().replaceAll("(\\r|\\n) *", "");
       fail("Query did not fail:\n" + query + "\n[E] " +
