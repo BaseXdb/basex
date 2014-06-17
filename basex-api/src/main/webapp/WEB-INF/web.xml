@@ -74,7 +74,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>RESTXQ</servlet-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>/restxq/*</url-pattern>
   </servlet-mapping>
 
   <!-- REST Service (can be deactivated by removing this entry) -->
