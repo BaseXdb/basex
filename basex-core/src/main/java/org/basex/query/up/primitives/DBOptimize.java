@@ -95,7 +95,7 @@ public final class DBOptimize extends DBUpdate {
     }
 
     // remove old database reference
-    if(all) updates.qc.resource.removeData(data.meta.name);
+    if(all) updates.qc.resource.remove(data.meta.name);
   }
 
   @Override

@@ -43,7 +43,7 @@ public final class DirParser extends Parser {
   /** Raw parsing. */
   private final boolean rawParser;
   /** Database path for storing binary files. */
-  private final IOFile rawPath;
+  private IOFile rawPath;
 
   /** Last source. */
   private IO lastSrc;
@@ -55,11 +55,11 @@ public final class DirParser extends Parser {
   /**
    * Constructor.
    * @param source source path
-   * @param opts database options
-   * @param path future database path
+   * @param options main options
    */
-  public DirParser(final IO source, final MainOptions opts, final IOFile path) {
-    super(source, opts);
+  public DirParser(final IO source, final MainOptions options) {
+    super(source, options);
+
     final String parent = source.dirPath();
     root = parent.endsWith("/") ? parent : parent + '/';
     skipCorrupt = options.get(MainOptions.SKIPCORRUPT);
@@ -67,12 +67,19 @@ public final class DirParser extends Parser {
     addRaw = options.get(MainOptions.ADDRAW);
     dtd = options.get(MainOptions.DTD);
     rawParser = options.get(MainOptions.PARSER) == MainParser.RAW;
-
     filter = !source.isDir() && !source.isArchive() ? null :
-      Pattern.compile(IOFile.regex(opts.get(MainOptions.CREATEFILTER)));
-    // choose binary storage if disk-based database path is known and
-    // if raw parser or "add raw" option were chosen
-    rawPath = path != null && (addRaw || rawParser) ? new IOFile(path, IO.RAW) : null;
+      Pattern.compile(IOFile.regex(options.get(MainOptions.CREATEFILTER)));
+  }
+
+  /**
+   * Constructor.
+   * @param source source path
+   * @param context database context
+   * @param path future database path
+   */
+  public DirParser(final IO source, final Context context, final IOFile path) {
+    this(source, context.options);
+    if(path != null && (addRaw || rawParser)) rawPath = new IOFile(path, IO.RAW);
   }
 
   @Override

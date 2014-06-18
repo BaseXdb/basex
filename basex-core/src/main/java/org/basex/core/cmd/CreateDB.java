@@ -7,7 +7,8 @@ import java.io.*;
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.parse.*;
-import org.basex.core.parse.Commands.*;
+import org.basex.core.parse.Commands.Cmd;
+import org.basex.core.parse.Commands.CmdCreate;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.ft.*;
@@ -73,7 +74,7 @@ public final class CreateDB extends ACreate {
       // create parser instance
       if(io != null) {
         if(!io.exists()) return error(RES_NOT_FOUND_X, io);
-        parser = new DirParser(io, options, goptions.dbpath(name));
+        parser = new DirParser(io, context, goptions.dbpath(name));
       } else if(parser == null) {
         parser = Parser.emptyParser(context.options);
       }
@@ -137,13 +138,26 @@ public final class CreateDB extends ACreate {
    */
   public static synchronized Data create(final String name, final Parser parser, final Context ctx)
       throws IOException {
+    return create(name, parser, ctx, ctx.options.get(MainOptions.MAINMEM));
+  }
+
+  /**
+   * Creates a new database instance, using the specified parser.
+   * @param name name of the database
+   * @param parser input parser
+   * @param ctx database context
+   * @param mem create main-memory instance
+   * @return new database instance
+   * @throws IOException I/O exception
+   */
+  public static synchronized Data create(final String name, final Parser parser, final Context ctx,
+      final boolean mem) throws IOException {
 
     // check permissions
     if(!ctx.user.has(Perm.CREATE)) throw new BaseXException(PERM_REQUIRED_X, Perm.CREATE);
 
     // create main memory database instance
-    final MainOptions opts = ctx.options;
-    if(opts.get(MainOptions.MAINMEM)) return MemBuilder.build(name, parser);
+    if(mem) return MemBuilder.build(name, parser);
 
     // database is currently locked by another process
     if(ctx.pinned(name)) throw new BaseXException(DB_PINNED_X, name);
@@ -165,45 +179,6 @@ public final class CreateDB extends ACreate {
       builder.close();
     }
     return Open.open(name, ctx);
-  }
-
-  /**
-   * Returns a main memory database instance from the specified parser.
-   * @param parser input parser
-   * @param ctx database context
-   * @return new database instance
-   * @throws IOException I/O exception
-   */
-  private static synchronized MemData mainMem(final Parser parser, final Context ctx)
-      throws IOException {
-    if(ctx.user.has(Perm.CREATE)) return MemBuilder.build(parser);
-    throw new BaseXException(PERM_REQUIRED_X, Perm.CREATE);
-  }
-
-  /**
-   * Returns a main memory database instance for the specified input reference.
-   * @param source document source
-   * @param ctx database context
-   * @return new database instance
-   * @throws IOException I/O exception
-   */
-  public static synchronized MemData mainMem(final IO source, final Context ctx)
-      throws IOException {
-    if(!source.exists()) throw new BaseXException(RES_NOT_FOUND_X, source);
-    return mainMem(new DirParser(source, ctx.options, null), ctx);
-  }
-
-  /**
-   * Creates a new database from the specified source.
-   * @param source source path
-   * @param ctx database context
-   * @return data reference
-   * @throws IOException I/O exception
-   */
-  public static synchronized Data create(final IO source, final Context ctx) throws IOException {
-    final String nm = source.dbname();
-    final DirParser dp = new DirParser(source, ctx.options, ctx.globalopts.dbpath(nm));
-    return create(nm, dp, ctx);
   }
 
   @Override

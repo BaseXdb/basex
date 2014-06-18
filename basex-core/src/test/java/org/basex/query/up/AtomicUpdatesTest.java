@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.core.cmd.*;
+import org.basex.build.*;
 import org.basex.data.*;
 import org.basex.data.atomic.*;
 import org.basex.io.*;
@@ -557,12 +557,11 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    * @return atomic update list
    */
   private static AtomicUpdateCache atomics(final String doc) {
-    Data d = null;
     try {
-      d = CreateDB.mainMem(new IOContent(doc), context);
+      return new AtomicUpdateCache(MemBuilder.build(new IOContent(doc), context));
     } catch(final IOException ex) {
       fail(Util.message(ex));
+      return null;
     }
-    return new AtomicUpdateCache(d);
   }
 }

@@ -85,7 +85,7 @@ public final class Add extends ACreate {
     String db = null;
     Data tmp = null;
     try {
-      final Parser parser = new DirParser(io, options, data.meta.path);
+      final Parser parser = new DirParser(io, context, data.meta.path);
       parser.target(target);
 
       // create random database name for disk-based creation
