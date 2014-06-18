@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 
+import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
@@ -32,7 +33,7 @@ public class MemDataTest extends SandboxTest {
    */
   @Before
   public void setUp() throws IOException {
-    data = CreateDB.mainMem(new IOContent(XML), context);
+    data = MemBuilder.build(new IOContent(XML), context);
     context.openDB(data);
   }
 

@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
+import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.Context;
 import org.basex.core.cmd.*;
@@ -150,8 +151,7 @@ public abstract class W3CTS extends Main {
     final Performance perf = new Performance();
     context.options.set(MainOptions.CHOP, false);
 
-    //new Check(path + input).execute(context);
-    data = CreateDB.mainMem(new IOFile(path + input), context);
+    data = MemBuilder.build(new IOFile(path + input), context);
 
     final Nodes root = new Nodes(0, data);
     Util.outln(NL + Util.className(this) + " Test Suite " +
@@ -286,7 +286,7 @@ public abstract class W3CTS extends Main {
       Nodes curr = null;
       if(cont.size() != 0) {
         final String p = srcs.get(string(data.atom(cont.pres[0])));
-        final Data d = CreateDB.mainMem(IO.get(p), context);
+        final Data d = MemBuilder.build(IO.get(p), context);
         curr = new Nodes(d.resources.docs().toArray(), d);
         curr.root = true;
       }
@@ -515,7 +515,7 @@ public abstract class W3CTS extends Main {
   private ValueIter toIter(final String xml, final boolean frag) {
     try {
       final String str = frag ? "<X>" + xml + "</X>" : xml;
-      final Data d = CreateDB.mainMem(IO.get(str), context);
+      final Data d = MemBuilder.build(IO.get(str), context);
       final IntList il = new IntList();
       for(int p = frag ? 2 : 0; p < d.meta.size; p += d.size(p, d.kind(p))) {
         il.add(p);

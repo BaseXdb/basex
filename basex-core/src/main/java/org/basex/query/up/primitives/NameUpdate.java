@@ -102,7 +102,7 @@ public abstract class NameUpdate extends Update implements Comparable<NameUpdate
       throws QueryException {
 
     // close data instance in query processor
-    qc.resources.removeData(name);
+    qc.resources.remove(name);
     // check if database is stilled pinned by another process
     if(qc.context.pinned(name)) throw BXDB_OPENED.get(info, name);
   }

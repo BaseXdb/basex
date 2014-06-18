@@ -5,6 +5,7 @@ import static org.basex.query.util.Err.*;
 import java.io.*;
 import java.util.*;
 
+import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
@@ -18,6 +19,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * This class provides access to all kinds of resources (databases, documents, database connections,
@@ -79,7 +81,7 @@ public final class QueryResources {
     // documents of the database. otherwise, create new node set
     addCollection(root ? qc.value : DBNodeSeq.get(d.resources.docs(), d, true, true), d.meta.name);
 
-    addData(d);
+    add(d);
     synchronized(qc.context.dbs) { qc.context.dbs.pin(d); }
   }
 
@@ -131,9 +133,7 @@ public final class QueryResources {
     }
     try {
       // open and add new data reference
-      final Data d = Open.open(name, qc.context);
-      addData(d);
-      return d;
+      return add(Open.open(name, qc.context));
     } catch(final IOException ex) {
       throw BXDB_OPEN.get(info, ex);
     }
@@ -312,9 +312,7 @@ public final class QueryResources {
     if(input.db != null) {
       try {
         // try to open database
-        final Data d = Open.open(input.db, qc.context);
-        addData(d);
-        return d;
+        return add(Open.open(input.db, qc.context));
       } catch(final IOException ex) {
         /* ignored */
       }
@@ -335,22 +333,36 @@ public final class QueryResources {
       final InputInfo info) throws QueryException {
 
     // check if new databases can be created
-    final boolean createDB = qc.context.options.get(MainOptions.FORCECREATE);
+    final Context context = qc.context;
+
+    // do not check input if no read permissions are given
     if(!qc.context.user.has(Perm.READ))
       throw BXXQ_PERM.get(info, Util.info(Text.PERM_REQUIRED_X, Perm.READ));
 
     // check if input is an existing file
     final IO source = checkPath(input, baseIO, info);
-
     if(single && source.isDir()) WHICHRES.get(info, baseIO);
+
+    // overwrite parsing options with default values
+    final MainOptions opts = context.options;
+    final Option<?>[] options = { MainOptions.SKIPCORRUPT, MainOptions.ADDARCHIVES,
+        MainOptions.ADDRAW, MainOptions.PARSER, MainOptions.CREATEFILTER };
+    final Object[] values = new Object[options.length];
+    final int ol = options.length;
+    for(int o = 0; o < ol; o++) {
+      final Option<?> option = options[o];
+      values[o] = opts.get(option);
+      opts.put(option, option.value());
+    }
     try {
-      final Data dt = createDB ? CreateDB.create(source, qc.context) :
-        CreateDB.mainMem(source, qc.context);
-      input.path = "";
-      addData(dt);
-      return dt;
+      final boolean force = context.options.get(MainOptions.FORCECREATE);
+      return add(CreateDB.create(source.dbname(), new DirParser(source, opts), context, !force));
     } catch(final IOException ex) {
       throw IOERR.get(info, ex);
+    } finally {
+      // reset original values
+      for(int o = 0; o < ol; o++) opts.put(options[o], values[o]);
+      input.path = "";
     }
   }
 
@@ -396,17 +408,19 @@ public final class QueryResources {
   /**
    * Adds a data reference.
    * @param d data reference to be added
+   * @return argument
    */
-  private void addData(final Data d) {
+  private Data add(final Data d) {
     if(datas == data.length) data = Array.copy(data, new Data[Array.newSize(datas)]);
     data[datas++] = d;
+    return d;
   }
 
   /**
    * Removes and closes a database if it has not been added by the global context.
    * @param name name of database to be removed
    */
-  public void removeData(final String name) {
+  public void remove(final String name) {
     for(int d = qc.nodes != null ? 1 : 0; d < datas; d++) {
       if(data[d].meta.name.equals(name)) {
         Close.close(data[d], qc.context);

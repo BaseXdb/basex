@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import java.util.*;
 import java.util.Set;
 
-import org.basex.core.cmd.*;
+import org.basex.build.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
@@ -25,7 +25,7 @@ public class SignatureTest extends AdvancedQueryTest {
    */
   @Test
   public void signatures() throws Exception {
-    context.openDB(CreateDB.mainMem(new IOContent("<a/>"), context));
+    context.openDB(MemBuilder.build(new IOContent("<a/>"), context));
     context.data().meta.name = "X";
     for(final Function f : Function.values()) check(f);
   }
