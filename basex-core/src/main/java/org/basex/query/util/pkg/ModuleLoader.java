@@ -173,6 +173,7 @@ public final class ModuleLoader {
       // add remaining path
       String path = u.getPath();
       if(path == null) return null;
+
       path = path.replace('.', '/');
       // add slash or path
       tb.add(path.isEmpty() ? "/" : path);
