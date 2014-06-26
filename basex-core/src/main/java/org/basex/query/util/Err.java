@@ -152,7 +152,7 @@ public enum Err {
   /** BXRE0001. */
   BXRE_WHICH(BXRE, 1, "Package '%' does not exist."),
   /** BXRE0002. */
-  BXRE_URI(BXRE, 2, "Namespace URI is invalid: '%'."),
+  BXRE_URI(BXRE, 2, "URI is invalid or has no path component: '%'."),
   /** BXRE0003. */
   BXRE_NOTINST(BXRE, 3, "Required package '%' is not installed."),
   /** BXRE0004. */
