@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.List;
 
 import org.basex.build.*;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.data.atomic.*;
@@ -39,7 +40,7 @@ public final class DBCreate extends NameUpdate {
       final Options opts, final QueryContext qc) throws QueryException {
 
     super(UpdateType.DBCREATE, name, info, qc);
-    updates = new DBOptions(qc, opts.free(), info);
+    updates = new DBOptions(opts.free(), info);
     add = new DBNew(qc, input, info);
     updates.check(true);
   }
@@ -47,18 +48,17 @@ public final class DBCreate extends NameUpdate {
   @Override
   public void prepare() throws QueryException {
     if(add.inputs != null && !add.inputs.isEmpty())
-      add.addDocs(new MemData(updates.qc.context.options), name);
+      add.addDocs(new MemData(qc.context.options), name);
   }
 
   @Override
   public void apply() throws QueryException {
     close();
 
-    updates.initOptions();
-    updates.assignOptions();
+    final MainOptions opts = qc.context.options;
+    updates.assign(opts);
     try {
-      final Data data = CreateDB.create(name, Parser.emptyParser(updates.qc.context.options),
-          updates.qc.context);
+      final Data data = CreateDB.create(name, Parser.emptyParser(opts), qc.context);
 
       // add initial documents and optimize database
       if(add.md != null) {
@@ -75,7 +75,7 @@ public final class DBCreate extends NameUpdate {
     } catch(final IOException ex) {
       throw UPDBOPTERR.get(info, ex);
     } finally {
-      updates.resetOptions();
+      updates.reset(opts);
     }
   }
 

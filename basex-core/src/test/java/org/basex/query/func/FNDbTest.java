@@ -561,10 +561,11 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_DB_INFO.args(NAME) + "//ftindex/text()", "false");
 
     query(_DB_OPTIMIZE.args(NAME, "true()",
-        " map { 'textindex':=true(),'attrindex':=true(),'ftindex':=true() }"));
+        " map { 'textindex':=true(),'attrindex':=true(),'ftindex':=true(),'updindex':=true() }"));
     query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
     query(_DB_INFO.args(NAME) + "//attrindex/text()", "true");
     query(_DB_INFO.args(NAME) + "//ftindex/text()", "true");
+    query(_DB_INFO.args(NAME) + "//updindex/text()", "true");
   }
 
   /** Test method. */

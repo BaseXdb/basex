@@ -20,7 +20,9 @@ import org.basex.util.options.*;
  */
 public final class DBOptimize extends DBUpdate {
   /** Database update options. */
-  private final DBOptions updates;
+  private final DBOptions options;
+  /** Query context. */
+  private final QueryContext qc;
   /** Flag to optimize all database structures. */
   private boolean all;
 
@@ -33,13 +35,14 @@ public final class DBOptimize extends DBUpdate {
    * @param info input info
    * @throws QueryException query exception
    */
-  public DBOptimize(final Data data, final boolean all, final Options opts,
-      final QueryContext qc, final InputInfo info) throws QueryException {
+  public DBOptimize(final Data data, final boolean all, final Options opts, final QueryContext qc,
+      final InputInfo info) throws QueryException {
 
     super(UpdateType.DBOPTIMIZE, data, info);
     this.all = all;
-    updates = new DBOptions(qc, opts.free(), info);
-    updates.check(false);
+    this.qc = qc;
+    options = new DBOptions(opts.free(), info);
+    options.check(all);
   }
 
   @Override
@@ -52,23 +55,27 @@ public final class DBOptimize extends DBUpdate {
 
   @Override
   public void apply() throws QueryException {
+    // assign database and query options to runtime options
     final MetaData meta = data.meta;
     final MainOptions opts = meta.options;
+    options.tOptions.put(MainOptions.TEXTINDEX, meta.createtext);
+    options.tOptions.put(MainOptions.ATTRINDEX, meta.createattr);
+    options.tOptions.put(MainOptions.FTINDEX,   meta.createftxt);
+    options.tOptions.put(MainOptions.UPDINDEX,  meta.updindex);
+    options.assign(opts);
 
-    updates.nprops.put(MainOptions.TEXTINDEX, meta.createtext);
-    updates.nprops.put(MainOptions.ATTRINDEX, meta.createattr);
-    updates.nprops.put(MainOptions.FTINDEX,   meta.createftxt);
-    updates.initOptions();
-    updates.assignOptions();
-
+    // adopt runtime options
     meta.createtext = opts.get(MainOptions.TEXTINDEX);
     meta.createattr = opts.get(MainOptions.ATTRINDEX);
     meta.createftxt = opts.get(MainOptions.FTINDEX);
+    meta.updindex = opts.get(MainOptions.UPDINDEX);
 
+    // check if indexing options have changed
     final int mc = opts.get(MainOptions.MAXCATS);
     final int ml = opts.get(MainOptions.MAXLEN);
     final boolean rebuild = mc != meta.maxcats || ml != meta.maxlen;
 
+    // check if fulltext indexing options have changed
     final boolean st = opts.get(MainOptions.STEMMING);
     final boolean cs = opts.get(MainOptions.CASESENS);
     final boolean dc = opts.get(MainOptions.DIACRITICS);
@@ -86,16 +93,17 @@ public final class DBOptimize extends DBUpdate {
     meta.maxlen     = ml;
 
     try {
-      if(all) OptimizeAll.optimizeAll(data, updates.qc.context, null);
+      if(all) OptimizeAll.optimizeAll(data, qc.context, null);
       else Optimize.optimize(data, rebuild, rebuildFT, null);
     } catch(final IOException ex) {
       throw UPDBOPTERR.get(info, ex);
     } finally {
-      updates.resetOptions();
+      // reset runtime options to original values
+      options.reset(opts);
     }
 
     // remove old database reference
-    if(all) updates.qc.resource.remove(data.meta.name);
+    if(all) qc.resource.remove(data.meta.name);
   }
 
   @Override
