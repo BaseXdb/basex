@@ -1207,4 +1207,11 @@ public final class UpdateTest extends AdvancedQueryTest {
     error("declare function local:a() { local:b#0 };"
         + "declare function local:b() { count('1') }; updating local:a()()", Err.UPFUNCNOTUP);
   }
+
+  /** Test method. */
+  @Test
+  public void updateCheck() {
+    query("declare function local:a() { fold-left((), (), function($a, $b) { local:a() }) };"
+        + "declare function local:b() { () }; ()", "");
+  }
 }

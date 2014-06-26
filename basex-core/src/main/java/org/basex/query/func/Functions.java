@@ -140,7 +140,7 @@ public final class Functions extends TokenSet {
       return new FuncItem(sc, new Ann(), name, args, tp, e, scp.stackSize());
     }
 
-    // pre-defined functions
+    // built-in functions
     final Function fn = get().getBuiltIn(name, arity, ii);
     if(fn != null) {
       final Ann ann = new Ann();
@@ -243,7 +243,7 @@ public final class Functions extends TokenSet {
     if(fun != null) {
       if(!sc.xquery3() && fun.has(Flag.X30)) throw FUNC30.get(ii);
       final Ann ann = new Ann();
-      if(fun.has(Flag.UPD)) {
+      if(fun.sig.has(Flag.UPD)) {
         ann.add(Ann.Q_UPDATING, Empty.SEQ, ii);
         ctx.updating();
       }

@@ -1117,9 +1117,9 @@ public enum Function {
   final String desc;
   /** Return type. */
   final SeqType ret;
-  /** Compiler flags. */
-  final EnumSet<Flag> flags;
 
+  /** Compiler flags. */
+  private final EnumSet<Flag> flags;
   /** Function classes. */
   private final Class<? extends StandardFunc> func;
 
@@ -1199,6 +1199,16 @@ public enum Function {
   final byte[] uri() {
     final byte[] u = URIS.get(func);
     return u == null ? FNURI : u;
+  }
+
+  /**
+   * Indicates if an expression has the specified compiler property.
+   * @param flag flag to be found
+   * @return result of check
+   * @see Expr#has(Flag)
+    */
+  public boolean has(final Flag flag) {
+    return flags.contains(flag);
   }
 
   /**
