@@ -235,10 +235,10 @@ public class BaseX extends CLI {
       if(arg.dash()) {
         c = arg.next();
         if(c == 'b' || c == 'c' || c == 'C' || c == 'i' || c == 'o' || c == 'q' ||
-            c == 'r' || c == 's' || (c == 't' && sa())) {
+            c == 'r' || c == 's' || c == 't' && sa()) {
           // options followed by a string
           v = arg.string();
-        } else if(c == 'd' || c == 'D' && sa() || c == 'L' || (c == 'u' && sa()) || c == 'R' ||
+        } else if(c == 'd' || c == 'D' && sa() || c == 'L' || c == 'u' && sa() || c == 'R' ||
             c == 'v' || c == 'V' || c == 'w' || c == 'W' || c == 'x' || c == 'X' || c == 'z') {
           // options to be toggled
           v = "";

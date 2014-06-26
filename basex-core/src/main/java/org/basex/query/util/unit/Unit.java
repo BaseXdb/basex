@@ -244,7 +244,7 @@ public final class Unit {
       query.compile();
 
       final Iter iter = query.iter();
-      while((iter.next()) != null) throw UNIT_EMPTY.get(null, func.name.local());
+      while(iter.next() != null) throw UNIT_EMPTY.get(null, func.name.local());
 
     } finally {
       query.close();

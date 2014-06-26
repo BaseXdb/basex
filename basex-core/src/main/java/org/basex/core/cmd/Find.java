@@ -129,7 +129,7 @@ public final class Find extends AQuery {
     for(int i = 0; i < is; ++i) {
       final String[] spl = split(filter.get(i));
       for(final String s : spl) {
-        byte[] term = trim(replace(token(s), '"', ' '));
+        final byte[] term = trim(replace(token(s), '"', ' '));
         if(term.length == 0) continue;
         tb.add('[');
 

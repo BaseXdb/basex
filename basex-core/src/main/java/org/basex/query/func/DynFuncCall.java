@@ -29,7 +29,7 @@ public final class DynFuncCall extends FuncCall {
   /** Hash values of all function items that this call was copied from, possibly {@code null}. */
   private int[] inlinedFrom;
   /** Updating flag. */
-  private boolean updating;
+  private final boolean updating;
 
   /**
    * Function constructor.
