@@ -41,8 +41,8 @@ public final class DBOptimize extends DBUpdate {
     super(UpdateType.DBOPTIMIZE, data, info);
     this.all = all;
     this.qc = qc;
-    options = new DBOptions(opts.free(), info);
-    options.check(all);
+    final Option<?>[] exclude = all ? new Option[0] : new Option[] { MainOptions.UPDINDEX };
+    options = new DBOptions(opts.free(), info, exclude);
   }
 
   @Override
@@ -58,10 +58,11 @@ public final class DBOptimize extends DBUpdate {
     // assign database and query options to runtime options
     final MetaData meta = data.meta;
     final MainOptions opts = meta.options;
-    options.tOptions.put(MainOptions.TEXTINDEX, meta.createtext);
-    options.tOptions.put(MainOptions.ATTRINDEX, meta.createattr);
-    options.tOptions.put(MainOptions.FTINDEX,   meta.createftxt);
-    options.tOptions.put(MainOptions.UPDINDEX,  meta.updindex);
+
+    options.assign(MainOptions.TEXTINDEX, meta.createtext);
+    options.assign(MainOptions.ATTRINDEX, meta.createattr);
+    options.assign(MainOptions.FTINDEX,   meta.createftxt);
+    options.assign(MainOptions.UPDINDEX,  meta.updindex);
     options.assign(opts);
 
     // adopt runtime options
