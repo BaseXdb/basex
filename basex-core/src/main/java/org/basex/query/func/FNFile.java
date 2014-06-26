@@ -240,7 +240,7 @@ public final class FNFile extends StandardFunc {
    * @throws IOException I/O exception
    */
   private Iter list(final QueryContext ctx) throws QueryException, IOException {
-    Path dir = checkPath(0, ctx).toRealPath();
+    final Path dir = checkPath(0, ctx).toRealPath();
     final boolean rec = optionalBool(1, ctx);
     final Pattern pat = expr.length == 3 ? Pattern.compile(IOFile.regex(
         string(checkStr(expr[2], ctx))), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE) : null;
@@ -569,7 +569,7 @@ public final class FNFile extends StandardFunc {
 
     final Path source = checkPath(0, ctx);
     if(!Files.exists(source)) throw FILE_NOT_FOUND.get(info, source);
-    Path src = absolute(source);
+    final Path src = absolute(source);
     Path trg = absolute(checkPath(1, ctx));
 
     if(Files.isDirectory(trg)) {

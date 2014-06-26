@@ -42,7 +42,7 @@ public final class QueryResources {
   /** Module loader. */
   private ModuleLoader modules;
   /** External resources. */
-  private HashMap<Class<? extends DataResources>, DataResources> external = new HashMap<>();
+  private final HashMap<Class<? extends DataResources>, DataResources> external = new HashMap<>();
 
   /** Pending output. */
   public final ValueBuilder output = new ValueBuilder();;
