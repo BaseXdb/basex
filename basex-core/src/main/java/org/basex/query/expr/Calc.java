@@ -128,8 +128,8 @@ public enum Calc {
           final long l1 = a.itr(ii);
           final long l2 = b.itr(ii);
           if(l2 > 0 ? l1 > Long.MAX_VALUE / l2 || l1 < Long.MIN_VALUE / l2
-                    : (l2 < -1 ? l1 > Long.MIN_VALUE / l2 || l1 < Long.MAX_VALUE / l2
-                               : l2 == -1 && l1 == Long.MIN_VALUE))
+                    : l2 < -1 ? l1 > Long.MIN_VALUE / l2 || l1 < Long.MAX_VALUE / l2
+                               : l2 == -1 && l1 == Long.MIN_VALUE)
             throw RANGE.get(ii, l1 + " * " + l2);
           return Int.get(l1 * l2);
         }
