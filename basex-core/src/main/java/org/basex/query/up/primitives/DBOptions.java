@@ -18,83 +18,76 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 final class DBOptions {
-  /** Numeric index options. */
-  private static final NumberOption[] N_OPT = { MainOptions.MAXCATS, MainOptions.MAXLEN,
-    MainOptions.INDEXSPLITSIZE, MainOptions.FTINDEXSPLITSIZE };
-  /** Boolean index options. */
-  private static final BooleanOption[] B_OPT = { MainOptions.TEXTINDEX, MainOptions.ATTRINDEX,
-    MainOptions.FTINDEX, MainOptions.STEMMING, MainOptions.CASESENS, MainOptions.DIACRITICS,
-    MainOptions.UPDINDEX };
-  /** String index options. */
-  private static final StringOption[] S_OPT = { MainOptions.LANGUAGE, MainOptions.STOPWORDS };
-  /** Names of numeric index options. */
-  private static final String[] K_N_OPT = new String[N_OPT.length];
-  /** Names of boolean index options. */
-  private static final String[] K_B_OPT = new String[B_OPT.length];
-  /** NAmes of numeric index options. */
-  private static final String[] K_S_OPT = new String[S_OPT.length];
+  /** Index options. */
+  private static final Option<?>[] OPTIONS = { MainOptions.MAXCATS, MainOptions.MAXLEN,
+    MainOptions.INDEXSPLITSIZE, MainOptions.FTINDEXSPLITSIZE, MainOptions.LANGUAGE,
+    MainOptions.STOPWORDS, MainOptions.TEXTINDEX, MainOptions.ATTRINDEX, MainOptions.FTINDEX,
+    MainOptions.STEMMING, MainOptions.CASESENS, MainOptions.DIACRITICS, MainOptions.UPDINDEX };
 
-  static {
-    // initialize options arrays
-    final int n = N_OPT.length, b = B_OPT.length, s = S_OPT.length;
-    for(int o = 0; o < n; o++) K_N_OPT[o] = N_OPT[o].name().toLowerCase(Locale.ENGLISH);
-    for(int o = 0; o < b; o++) K_B_OPT[o] = B_OPT[o].name().toLowerCase(Locale.ENGLISH);
-    for(int o = 0; o < s; o++) K_S_OPT[o] = S_OPT[o].name().toLowerCase(Locale.ENGLISH);
-  }
-
-  /** Temporary options. */
-  final HashMap<Option<?>, Object> tOptions = new HashMap<Option<?>, Object>();
+  /** Runtime options. */
+  private final HashMap<Option<?>, Object> rOptions = new HashMap<Option<?>, Object>();
   /** Original options. */
   private final HashMap<Option<?>, Object> oOptions = new HashMap<Option<?>, Object>();
-  /** Query options. */
-  private final HashMap<String, String> qOptions;
-  /** Input info. */
-  private final InputInfo info;
 
   /**
    * Constructor.
-   * @param qOptions options
+   * @param options options
    * @param info input info
-   */
-  DBOptions(final HashMap<String, String> qOptions, final InputInfo info) {
-    this.qOptions = qOptions;
-    this.info = info;
-  }
-
-  /**
-   * Checks the validity of the assigned database options.
-   * @param create create or optimize database
+   * @param exclude options to be excluded
    * @throws QueryException query exception
    */
-  void check(final boolean create) throws QueryException {
-    for(final Entry<String, String> entry : qOptions.entrySet()) {
+  DBOptions(final HashMap<String, String> options, final InputInfo info,
+      final Option<?>... exclude) throws QueryException {
+
+    final HashMap<String, Option<?>> opts = new HashMap<String, Option<?>>();
+    final int n = OPTIONS.length;
+    for(int o = 0; o < n; o++) opts.put(OPTIONS[o].name().toLowerCase(Locale.ENGLISH), OPTIONS[o]);
+
+    for(final Entry<String, String> entry : options.entrySet()) {
       final String key = entry.getKey();
-      if(!eq(key, K_N_OPT) && !eq(key, K_B_OPT) && !eq(key, K_S_OPT) ||
-         !create && eq(key, K_B_OPT[K_B_OPT.length - 1])) throw BASX_OPTIONS.get(info, key);
+      final Option<?> opt = opts.get(key);
+      boolean valid = opt != null;
+      if(valid) {
+        for(final Option<?> ex : exclude) {
+          if(opt == ex) valid = false;
+        }
+      }
+      if(!valid) throw BASX_OPTIONS.get(info, key);
 
       final String value = entry.getValue();
-      if(eq(key, K_N_OPT)) {
-        if(toInt(value) < 0) throw BASX_VALUE.get(info, key, value);
-      } else if(eq(key, K_B_OPT)) {
-        if(!Util.yes(value) && !Util.no(value)) throw BASX_VALUE.get(info, key, value);
+      if(opt instanceof NumberOption) {
+        final int v = toInt(value);
+        if(v < 0) throw BASX_VALUE.get(info, key, value);
+        rOptions.put(opt, v);
+      } else if(opt instanceof BooleanOption) {
+        final boolean yes = Util.yes(value);
+        if(!yes && !Util.no(value)) throw BASX_VALUE.get(info, key, value);
+        rOptions.put(opt, yes);
+      } else {
+        rOptions.put(opt, value);
       }
     }
   }
 
   /**
-   * Caches original options and assigns cached options.
+   * Assigns the specified option if it has not been assigned before.
+   * @param option option
+   * @param value value
+   */
+  void assign(final Option<?> option, final Object value) {
+    if(!rOptions.containsKey(option)) rOptions.put(option, value);
+  }
+
+  /**
+   * Caches original options and assigns runtime options.
    * @param opts main options
    */
   void assign(final MainOptions opts) {
-    for(int o = 0; o < K_N_OPT.length; o++) if(qOptions.containsKey(K_N_OPT[o]))
-      tOptions.put(N_OPT[o], toInt(qOptions.get(K_N_OPT[o])));
-    for(int o = 0; o < K_B_OPT.length; o++) if(qOptions.containsKey(K_B_OPT[o]))
-      tOptions.put(B_OPT[o], Util.yes(qOptions.get(K_B_OPT[o])));
-    for(int o = 0; o < K_S_OPT.length; o++) if(qOptions.containsKey(K_S_OPT[o]))
-      tOptions.put(S_OPT[o], qOptions.get(K_S_OPT[o]));
-
-    for(final Option<?> option : tOptions.keySet()) oOptions.put(option, opts.get(option));
-    setOptions(tOptions, opts);
+    for(final Map.Entry<Option<?>, Object> entry : rOptions.entrySet()) {
+      final Option<?> option = entry.getKey();
+      oOptions.put(option, opts.get(option));
+      opts.put(option, entry.getValue());
+    }
   }
 
   /**
@@ -102,15 +95,8 @@ final class DBOptions {
    * @param opts main options
    */
   void reset(final MainOptions opts) {
-    setOptions(oOptions, opts);
-  }
-
-  /**
-   * Assigns the specified options.
-   * @param map options to be assigned
-   * @param opts main options
-   */
-  private void setOptions(final HashMap<Option<?>, Object> map, final MainOptions opts) {
-    for(final Entry<Option<?>, Object> e : map.entrySet()) opts.put(e.getKey(), e.getValue());
+    for(final Entry<Option<?>, Object> e : oOptions.entrySet()) {
+      opts.put(e.getKey(), e.getValue());
+    }
   }
 }

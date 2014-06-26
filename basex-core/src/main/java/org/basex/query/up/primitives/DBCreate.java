@@ -42,7 +42,6 @@ public final class DBCreate extends NameUpdate {
     super(UpdateType.DBCREATE, name, info, qc);
     updates = new DBOptions(opts.free(), info);
     add = new DBNew(qc, input, info);
-    updates.check(true);
   }
 
   @Override
