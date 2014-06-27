@@ -11,7 +11,7 @@ import org.junit.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public final class FlworOptimizeTest extends QueryPlanTest {
+public final class GFLWOROptimizeTest extends QueryPlanTest {
   /** Tests the relocation of a static let clause. */
   @Test public void moveTop() {
     check("let $b := <x>a</x> " +

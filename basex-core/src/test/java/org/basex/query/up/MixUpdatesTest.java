@@ -91,4 +91,11 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
     query("declare function local:a() { db:output(1) };"
         + "function-lookup(xs:QName('local:a'), 0)()", "1");
   }
+
+  /** Test method. */
+  @Test
+  public void flwor() {
+    query("<x>X</x> update (let $_ := delete node text() where 0 return $_)", "<x/>");
+    query("<x>X</x> update (let $_ := delete node text() return ())", "<x/>");
+  }
 }

@@ -13,7 +13,7 @@ import org.junit.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public final class FLWORTest extends AdvancedQueryTest {
+public final class GFLWORTest extends AdvancedQueryTest {
   /** Tests shadowing of outer variables. */
   @Test
   public void shadowTest() {

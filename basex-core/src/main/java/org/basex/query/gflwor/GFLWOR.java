@@ -213,7 +213,7 @@ public final class GFLWOR extends ParseExpr {
     mergeWheres();
 
     size = calcSize();
-    if(size == 0 && !(has(Flag.NDT) || has(Flag.UPD))) {
+    if(size == 0 && !has(Flag.NDT) && !has(Flag.UPD)) {
       ctx.compInfo(QueryText.OPTWRITE, this);
       return Empty.SEQ;
     }
@@ -277,7 +277,7 @@ public final class GFLWOR extends ParseExpr {
         if(c instanceof Let) {
           final Let lt = (Let) c;
           final Expr expr = lt.expr;
-          if(expr.has(Flag.NDT)) continue;
+          if(expr.has(Flag.NDT) || expr.has(Flag.UPD)) continue;
 
           // check type before removing variable (see {@link FuncType#funcConv})
           lt.var.checkType(expr, lt.info);
@@ -298,6 +298,7 @@ public final class GFLWOR extends ParseExpr {
             || use == VarUsage.ONCE && !expr.has(Flag.CTX) && !expr.has(Flag.CNS)
             // inline only cheap axis paths
             || expr instanceof AxisPath && ((AxisPath) expr).cheap()) {
+
             ctx.compInfo(QueryText.OPTINLINE, lt);
             inline(ctx, scp, lt.var, lt.inlineExpr(ctx, scp), next);
             iter.remove();
@@ -412,7 +413,7 @@ public final class GFLWOR extends ParseExpr {
     boolean change = false;
     for(int i = 1; i < clauses.size(); i++) {
       final Clause l = clauses.get(i);
-      if(!(l instanceof Let) || l.has(Flag.NDT) || l.has(Flag.CNS)) continue;
+      if(!(l instanceof Let) || l.has(Flag.NDT) || l.has(Flag.CNS) || l.has(Flag.UPD)) continue;
       final Let let = (Let) l;
 
       // find insertion position
@@ -447,7 +448,7 @@ public final class GFLWOR extends ParseExpr {
     boolean change = false;
     for(int i = 0; i < clauses.size(); i++) {
       final Clause c = clauses.get(i);
-      if(!(c instanceof Where) || c.has(Flag.NDT)) continue;
+      if(!(c instanceof Where) || c.has(Flag.NDT) || c.has(Flag.UPD)) continue;
       final Where wh = (Where) c;
 
       if(wh.pred.isValue()) {
@@ -465,7 +466,7 @@ public final class GFLWOR extends ParseExpr {
         int insert = -1;
         for(int j = i; --j >= 0;) {
           final Clause curr = clauses.get(j);
-          if(curr.has(Flag.NDT) || !curr.skippable(wh)) break;
+          if(curr.has(Flag.NDT) || curr.has(Flag.UPD) || !curr.skippable(wh)) break;
           // where clauses are always moved to avoid unnecessary computations,
           // but skipping only other where clauses can cause infinite loops
           if(!(curr instanceof Where)) insert = j;

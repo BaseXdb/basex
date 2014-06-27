@@ -334,7 +334,7 @@ public final class CmpG extends Cmp {
          //*[text() = .]
          //*[text() = (if(random:double() < .5) then 'X' else 'Y')]
        */
-      if(!t.type.isStringOrUntyped() || arg.has(Flag.CTX) || arg.has(Flag.NDT))
+      if(!t.type.isStringOrUntyped() || arg.has(Flag.CTX) || arg.has(Flag.NDT) || arg.has(Flag.UPD))
         return false;
 
       ic.addCosts(data.meta.size / 10);
