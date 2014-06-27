@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -29,8 +30,7 @@ public final class Castable extends Single {
    * @param e expression
    * @param s sequence type
    */
-  public Castable(final StaticContext sctx, final InputInfo ii, final Expr e,
-      final SeqType s) {
+  public Castable(final StaticContext sctx, final InputInfo ii, final Expr e, final SeqType s) {
     super(ii, e);
     sc = sctx;
     seq = s;
@@ -44,9 +44,10 @@ public final class Castable extends Single {
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii) {
+  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+    final Value v = expr.value(ctx);
     try {
-      seq.cast(expr.item(ctx, ii), ctx, sc, ii, this);
+      seq.cast(v.item(ctx, info), ctx, sc, ii, this);
       return Bln.TRUE;
     } catch(final QueryException ex) {
       return Bln.FALSE;
