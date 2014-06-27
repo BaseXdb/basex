@@ -47,7 +47,7 @@ public final class Castable extends Single {
   public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Value v = expr.value(ctx);
     try {
-      seq.cast(v.item(ctx, info), ctx, sc, ii, this);
+      seq.cast(v, ctx, sc, ii, this);
       return Bln.TRUE;
     } catch(final QueryException ex) {
       return Bln.FALSE;
