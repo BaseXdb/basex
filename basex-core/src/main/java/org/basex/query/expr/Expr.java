@@ -156,9 +156,9 @@ public abstract class Expr extends ExprInfo {
   public abstract long size();
 
   /**
-   * Indicates if an expression has the specified compiler property. This method is
-   * called by numerous {@link #compile(QueryContext, VarScope)} methods to test properties of
-   * sub-expressions. It returns {@code true} if at least one test is successful.
+   * Indicates if an expression has the specified compiler property. This method must only be
+   * called at compile time. It is invoked to test properties of sub-expressions.
+   * It returns {@code true} if at least one test is successful.
    * @param flag flag to be found
    * @return result of check
    */
