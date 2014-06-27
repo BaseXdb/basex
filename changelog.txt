@@ -3,6 +3,26 @@
  Welcome to the changelog. This file contains all code changes since
  BaseX 6.5:
 
+VERSION 7.9 (June 27, 2014) --------------------------------------------
+
+ XQUNIT
+ - Unit testing has been improved a lot. All test functions will now be
+   evaluated separately; this way, updates can be performed within test.
+ - with the new TEST command, all test modules in a specified directory
+   can be evaluated.
+ - tests can be invoked from within the GUI editor and project view.
+ - on command-line, the -t flag can be used for the same purpose.
+
+ RESTXQ
+ - Custom HTTP methods can be defined via %rest:method
+ - Error handling has been improved and aligned with try/catch
+
+ XQUERY MODULES
+ - Database Module: parsing options for db:create/db:add
+
+ REST
+ - The "run" operation allows execution of server-side command scripts
+
 VERSION 7.8.2 (April 4, 2014) ------------------------------------------
 
  GUI
@@ -33,21 +53,21 @@ VERSION 7.8.2 (April 4, 2014) ------------------------------------------
 VERSION 7.8.1 (February 26, 2014) --------------------------------------
 
  ADDED
- * Editor, Ctrl-H: filter by opened file type and selected text
- * XML Parsing: support for TAR & TGZ
+ - Editor, Ctrl-H: filter by opened file type and selected text
+ - XML Parsing: support for TAR & TGZ
 
  UPDATED
- * XQuery errors: function not found -> suggest similar one
- * Commands: improved parsing (allow more whitespaces)
- * French translation (thanks to Maud Ingarao!)
+ - XQuery errors: function not found -> suggest similar one
+ - Commands: improved parsing (allow more whitespaces)
+ - French translation (thanks to Maud Ingarao!)
 
  FIXED
- * XQuery Update: nested transform expressions
- * XQuery: always return boolean when calling doc-available()
- * XQuery: disallow impossible casts before removing variables
- * Binary Module: iterative evaluation of bin:octets()
- * Commands, REPO INSTALL: install packages in same directory
- * CSV/JSON: serialization of underscores
+ - XQuery Update: nested transform expressions
+ - XQuery: always return boolean when calling doc-available()
+ - XQuery: disallow impossible casts before removing variables
+ - Binary Module: iterative evaluation of bin:octets()
+ - Commands, REPO INSTALL: install packages in same directory
+ - CSV/JSON: serialization of underscores
 
 VERSION 7.8 (February 12, 2014) ----------------------------------------
 
