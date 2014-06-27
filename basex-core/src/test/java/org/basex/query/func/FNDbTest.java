@@ -293,6 +293,12 @@ public final class FNDbTest extends AdvancedQueryTest {
         _DB_ADD.args(NAME, "\"<root/>\"", "\"doc\" || $i"));
     query(COUNT.args(" for $i in 1 to 3 return " +
         COLLECTION.args('"' + NAME + "/doc\" || $i")), 3);
+
+    // specify parsing options
+    query(_DB_ADD.args(NAME, " '<a> </a>'", "chop.xml", " map { 'chop':true() }"));
+    query(_DB_OPEN.args(NAME, "chop.xml"), "<a/>");
+    query(_DB_ADD.args(NAME, " '<a> </a>'", "nochop.xml", " map { 'chop':false() }"));
+    query(_DB_OPEN.args(NAME, "nochop.xml"), "<a> </a>");
   }
 
   /** Test method. */
@@ -381,7 +387,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     // eventually drop database
     query(_DB_DROP.args(NAME));
 
-    // specify additional index options
+    // specify index options
     for(final boolean b : new boolean[] { false, true }) {
       query(_DB_CREATE.args(NAME, "()", "()", " map { 'updindex':" + b + "() }"));
       query(_DB_INFO.args(NAME) + "//updindex/text()", b);
@@ -404,9 +410,17 @@ public final class FNDbTest extends AdvancedQueryTest {
       query(_DB_CREATE.args(NAME, "()", "()", " map { '" + k + "':'' }"));
     }
 
+    // specify parsing options
+    query(_DB_CREATE.args(NAME, " '<a> </a>'", "a.xml", " map { 'chop':true() }"));
+    query(_DB_OPEN.args(NAME), "<a/>");
+    query(_DB_CREATE.args(NAME, " '<a> </a>'", "a.xml", " map { 'chop':false() }"));
+    query(_DB_OPEN.args(NAME), "<a> </a>");
+
+    // specify unknown or invalid options
     error(_DB_CREATE.args(NAME, "()", "()", " map { 'xyz':'abc' }"), Err.BASX_OPTIONS);
     error(_DB_CREATE.args(NAME, "()", "()", " map { 'maxlen':-1 }"), Err.BASX_VALUE);
     error(_DB_CREATE.args(NAME, "()", "()", " map { 'maxlen':'a' }"), Err.BASX_VALUE);
+    error(_DB_CREATE.args(NAME, "()", "()", " map { 'textindex':'nope' }"), Err.BASX_VALUE);
   }
 
   /**
@@ -531,6 +545,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     error(_DB_OPTIMIZE.args(NAME, "false()", " map { 'updindex': 1 }"), Err.BASX_OPTIONS);
     error(_DB_OPTIMIZE.args(NAME, "false()", " map { 'maxlen': -1 }"), Err.BASX_VALUE);
     error(_DB_OPTIMIZE.args(NAME, "false()", " map { 'maxlen': 'a' }"), Err.BASX_VALUE);
+    error(_DB_OPTIMIZE.args(NAME, "false()", " map { 'textindex':'nope' }"), Err.BASX_VALUE);
 
     // check if optimize call preserves original options
     query(_DB_OPTIMIZE.args(NAME));

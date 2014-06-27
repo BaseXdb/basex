@@ -666,7 +666,8 @@ public enum Function {
   /** XQuery function. */
   _DB_OUTPUT(FNDb.class, "output(result)", arg(ITEM_ZM), EMP, flag(UPD, NDT)),
   /** XQuery function. */
-  _DB_ADD(FNDb.class, "add(database,input[,path])", arg(STR, NOD, STR), EMP, flag(UPD, NDT)),
+  _DB_ADD(FNDb.class, "add(database,input[,path[,options]])",
+      arg(STR, NOD, STR, ITEM), EMP, flag(UPD, NDT)),
   /** XQuery function. */
   _DB_DELETE(FNDb.class, "delete(database,path)", arg(STR, STR), EMP, flag(UPD, NDT)),
   /** XQuery function. */
@@ -677,7 +678,8 @@ public enum Function {
   /** XQuery function. */
   _DB_RENAME(FNDb.class, "rename(database,path,new-path)", arg(STR, STR, STR), EMP, flag(UPD, NDT)),
   /** XQuery function. */
-  _DB_REPLACE(FNDb.class, "replace(database,path,input)", arg(STR, STR, ITEM), EMP, flag(UPD, NDT)),
+  _DB_REPLACE(FNDb.class, "replace(database,path,input[,options])",
+      arg(STR, STR, ITEM, ITEM), EMP, flag(UPD, NDT)),
   /** XQuery function. */
   _DB_OPTIMIZE(FNDb.class, "optimize(database[,all[,options]])",
       arg(STR, BLN, ITEM), EMP, flag(UPD, NDT)),

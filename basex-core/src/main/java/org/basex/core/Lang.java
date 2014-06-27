@@ -16,7 +16,6 @@ import org.basex.util.list.*;
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
- * @author Andreas Weiler
  */
 public final class Lang {
   /** Language suffix. */

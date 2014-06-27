@@ -21,7 +21,6 @@ import org.basex.util.options.*;
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
- * @author Andreas Weiler
  */
 public final class GUIInput extends BaseXTextField {
   /** Reference to main window. */

@@ -3,6 +3,7 @@ package org.basex.query.up.primitives;
 import static org.basex.query.util.Err.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -41,8 +42,12 @@ public final class DBOptimize extends DBUpdate {
     super(UpdateType.DBOPTIMIZE, data, info);
     this.all = all;
     this.qc = qc;
-    final Option<?>[] exclude = all ? new Option[0] : new Option[] { MainOptions.UPDINDEX };
-    options = new DBOptions(opts.free(), info, exclude);
+
+    final ArrayList<Option<?>> supported = new ArrayList<Option<?>>();
+    for(final Option<?> option : DBOptions.INDEXING) {
+      if(all || option != MainOptions.UPDINDEX) supported.add(option);
+    }
+    options = new DBOptions(opts.free(), supported, info);
   }
 
   @Override

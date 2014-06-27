@@ -25,7 +25,6 @@ import org.basex.util.*;
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
- * @author Andreas Weiler
  */
 public final class FNIndex extends StandardFunc {
   /** Name: name. */
