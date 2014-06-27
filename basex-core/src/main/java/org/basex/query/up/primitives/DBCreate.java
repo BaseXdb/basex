@@ -3,6 +3,7 @@ package org.basex.query.up.primitives;
 import static org.basex.query.util.Err.*;
 
 import java.io.*;
+import java.util.*;
 import java.util.List;
 
 import org.basex.build.*;
@@ -29,25 +30,35 @@ public final class DBCreate extends NameUpdate {
 
   /**
    * Constructor.
-   * @param info input info
    * @param name name for created database
    * @param input input (ANode and QueryInput references)
    * @param opts database options
    * @param qc query context
+   * @param info input info
    * @throws QueryException query exception
    */
-  public DBCreate(final InputInfo info, final String name, final List<NewInput> input,
-      final Options opts, final QueryContext qc) throws QueryException {
+  public DBCreate(final String name, final List<NewInput> input, final Options opts,
+      final QueryContext qc, final InputInfo info) throws QueryException {
 
     super(UpdateType.DBCREATE, name, info, qc);
-    updates = new DBOptions(opts.free(), info);
+    final ArrayList<Option<?>> supported = new ArrayList<>();
+    for(final Option<?> option : DBOptions.INDEXING) supported.add(option);
+    for(final Option<?> option : DBOptions.PARSING) supported.add(option);
+    updates = new DBOptions(opts.free(), supported, info);
     add = new DBNew(qc, input, info);
   }
 
   @Override
   public void prepare() throws QueryException {
-    if(add.inputs != null && !add.inputs.isEmpty())
-      add.addDocs(new MemData(qc.context.options), name);
+    if(add.inputs == null || add.inputs.isEmpty()) return;
+
+    final MainOptions opts = qc.context.options;
+    updates.assign(opts);
+    try {
+      add.addDocs(new MemData(opts), name);
+    } finally {
+      updates.reset(opts);
+    }
   }
 
   @Override

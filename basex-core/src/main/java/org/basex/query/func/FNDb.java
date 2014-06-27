@@ -572,7 +572,8 @@ public final class FNDb extends StandardFunc {
     final Data data = checkData(ctx);
     final byte[] path = expr.length < 3 ? Token.EMPTY : token(path(2, ctx));
     final NewInput input = checkInput(checkItem(expr[1], ctx), path);
-    ctx.resources.updates().add(new DBAdd(data, input, ctx, info), ctx);
+    final Options opts = checkOptions(3, Q_OPTIONS, new Options(), ctx);
+    ctx.resources.updates().add(new DBAdd(data, input, opts, ctx, info), ctx);
     return null;
   }
 
@@ -586,6 +587,7 @@ public final class FNDb extends StandardFunc {
     final Data data = checkData(ctx);
     final String path = path(1, ctx);
     final NewInput input = checkInput(checkItem(expr[2], ctx), token(path));
+    final Options opts = checkOptions(3, Q_OPTIONS, new Options(), ctx);
 
     // remove old documents
     final Resources res = data.resources;
@@ -602,7 +604,7 @@ public final class FNDb extends StandardFunc {
         if(bin.isDir()) throw BXDB_DIR.get(info, path);
         updates.add(new DBStore(data, path, input, info), ctx);
       } else {
-        updates.add(new DBAdd(data, input, ctx, info), ctx);
+        updates.add(new DBAdd(data, input, opts, ctx, info), ctx);
       }
     }
     return null;
@@ -694,7 +696,7 @@ public final class FNDb extends StandardFunc {
     }
 
     final Options opts = checkOptions(3, Q_OPTIONS, new Options(), ctx);
-    ctx.resources.updates().add(new DBCreate(info, name, inputs, opts, ctx), ctx);
+    ctx.resources.updates().add(new DBCreate(name, inputs, opts, ctx, info), ctx);
     return null;
   }
 
@@ -930,8 +932,7 @@ public final class FNDb extends StandardFunc {
         name = nd.baseURI();
         final Data d = nd.data();
         // adopt path if node is part of disk database. otherwise, only adopt file name
-        final int i = d == null || d.inMemory() ? lastIndexOf(name, '/') :
-          indexOf(name, '/');
+        final int i = d == null || d.inMemory() ? lastIndexOf(name, '/') : indexOf(name, '/');
         if(i != -1) name = substring(name, i + 1);
         if(name.length == 0) throw RESINV.get(info, name);
       }

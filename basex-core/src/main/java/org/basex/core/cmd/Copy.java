@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  * Evaluates the 'copy' command and creates a copy of a database.
  *
  * @author BaseX Team 2005-14, BSD License
- * @author Andreas Weiler
+ * @author Christian Gruen
  */
 public final class Copy extends Command {
   /** Pattern to exclude locking files from database transfer operations. */

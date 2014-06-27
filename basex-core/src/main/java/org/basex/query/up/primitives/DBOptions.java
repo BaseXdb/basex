@@ -19,10 +19,16 @@ import org.basex.util.options.*;
  */
 final class DBOptions {
   /** Index options. */
-  private static final Option<?>[] OPTIONS = { MainOptions.MAXCATS, MainOptions.MAXLEN,
+  static final Option<?>[] INDEXING = { MainOptions.MAXCATS, MainOptions.MAXLEN,
     MainOptions.INDEXSPLITSIZE, MainOptions.FTINDEXSPLITSIZE, MainOptions.LANGUAGE,
     MainOptions.STOPWORDS, MainOptions.TEXTINDEX, MainOptions.ATTRINDEX, MainOptions.FTINDEX,
     MainOptions.STEMMING, MainOptions.CASESENS, MainOptions.DIACRITICS, MainOptions.UPDINDEX };
+  /** Parsing options. */
+  static final Option<?>[] PARSING = { MainOptions.CREATEFILTER, MainOptions.ADDARCHIVES,
+    MainOptions.SKIPCORRUPT, MainOptions.ADDRAW, MainOptions.ADDCACHE, MainOptions.CSVPARSER,
+    MainOptions.TEXTPARSER, MainOptions.JSONPARSER, MainOptions.HTMLPARSER, MainOptions.PARSER,
+    MainOptions.CHOP, MainOptions.INTPARSE, MainOptions.STRIPNS, MainOptions.DTD,
+    MainOptions.CATFILE };
 
   /** Runtime options. */
   private final HashMap<Option<?>, Object> rOptions = new HashMap<>();
@@ -31,40 +37,35 @@ final class DBOptions {
 
   /**
    * Constructor.
-   * @param options options
+   * @param options query options
+   * @param supported supported options
    * @param info input info
-   * @param exclude options to be excluded
    * @throws QueryException query exception
    */
-  DBOptions(final HashMap<String, String> options, final InputInfo info,
-      final Option<?>... exclude) throws QueryException {
+  DBOptions(final HashMap<String, String> options, final List<Option<?>> supported,
+      final InputInfo info) throws QueryException {
 
     final HashMap<String, Option<?>> opts = new HashMap<>();
-    final int n = OPTIONS.length;
-    for(int o = 0; o < n; o++) opts.put(OPTIONS[o].name().toLowerCase(Locale.ENGLISH), OPTIONS[o]);
+    for(final Option<?> option : supported) {
+      opts.put(option.name().toLowerCase(Locale.ENGLISH), option);
+    }
 
     for(final Entry<String, String> entry : options.entrySet()) {
       final String key = entry.getKey();
-      final Option<?> opt = opts.get(key);
-      boolean valid = opt != null;
-      if(valid) {
-        for(final Option<?> ex : exclude) {
-          if(opt == ex) valid = false;
-        }
-      }
-      if(!valid) throw BASX_OPTIONS.get(info, key);
+      final Option<?> option = opts.get(key);
+      if(option == null) throw BASX_OPTIONS.get(info, key);
 
       final String value = entry.getValue();
-      if(opt instanceof NumberOption) {
+      if(option instanceof NumberOption) {
         final int v = toInt(value);
         if(v < 0) throw BASX_VALUE.get(info, key, value);
-        rOptions.put(opt, v);
-      } else if(opt instanceof BooleanOption) {
+        rOptions.put(option, v);
+      } else if(option instanceof BooleanOption) {
         final boolean yes = Util.yes(value);
         if(!yes && !Util.no(value)) throw BASX_VALUE.get(info, key, value);
-        rOptions.put(opt, yes);
+        rOptions.put(option, yes);
       } else {
-        rOptions.put(opt, value);
+        rOptions.put(option, value);
       }
     }
   }
