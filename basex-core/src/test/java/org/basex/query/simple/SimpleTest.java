@@ -112,6 +112,8 @@ public final class SimpleTest extends QueryTest {
       { "Cast 1", itr(1), "xs:integer('+1')" },
       { "Cast 2", "xs:integer('++1')" },
       { "Cast 3", bool(false), "string('/') castable as xs:QName" },
+      { "Cast 4", str("error"),
+        "try { '1999-12-31'/. castable as xs:date } catch err:XPTY0019 { 'error' }" },
 
       { "Div 1", "xs:dayTimeDuration('PT0S') div xs:dayTimeDuration('PT0S')" },
       { "Div 2", "xs:yearMonthDuration('P0M') div xs:yearMonthDuration('P0M')" },
