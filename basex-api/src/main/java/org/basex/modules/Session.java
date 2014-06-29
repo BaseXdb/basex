@@ -83,7 +83,7 @@ public final class Session extends QueryModule {
    * @throws QueryException query exception
    */
   @Requires(Permission.NONE)
-  public Item get(final Str key, final Str def) throws QueryException {
+  public Item get(final Str key, final Item def) throws QueryException {
     final Object o = session().getAttribute(key.toJava());
     if(o == null) return def;
     if(o instanceof Item) return (Item) o;
