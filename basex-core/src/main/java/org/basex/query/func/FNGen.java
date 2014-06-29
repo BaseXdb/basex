@@ -157,7 +157,7 @@ public final class FNGen extends StandardFunc {
     if(u == Uri.EMPTY || !u.isValid()) throw UPFOURI.get(info, file);
     final DBNode target = ctx.updates.determineDataRef(nd, ctx);
 
-    final String uri = IO.get(u.toJava()).path();
+    final String uri = IO.get(string(u.string())).path();
     // check if all target paths are unique
     if(!ctx.updates.putPaths.add(uri)) throw UPURIDUP.get(info, uri);
 

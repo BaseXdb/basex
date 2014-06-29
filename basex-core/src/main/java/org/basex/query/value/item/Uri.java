@@ -14,16 +14,19 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class Uri extends Str {
+public final class Uri extends AStr {
   /** Empty URI. */
   public static final Uri EMPTY = new Uri(Token.EMPTY);
+  /** String data. */
+  final byte[] val;
 
   /**
    * Constructor.
    * @param v value
    */
   private Uri(final byte[] v) {
-    super(v, AtomType.URI);
+    super(AtomType.URI);
+    val = v;
   }
 
   /**
@@ -93,6 +96,28 @@ public final class Uri extends Str {
       return true;
     } catch(final URISyntaxException ex) {
       return false;
+    }
+  }
+
+  @Override
+  public byte[] string(final InputInfo ii) {
+    return val;
+  }
+
+  /**
+   * Returns the string value.
+   * @return string value
+   */
+  public byte[] string() {
+    return val;
+  }
+
+  @Override
+  public URI toJava() throws QueryException {
+    try {
+      return new URI(Token.string(val));
+    } catch(final URISyntaxException ex) {
+      throw new QueryException(ex);
     }
   }
 }

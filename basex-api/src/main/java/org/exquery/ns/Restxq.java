@@ -27,7 +27,7 @@ public final class Restxq extends QueryModule {
    * @return base uri
    * @throws QueryException query exception
    */
-  public Str baseUri() throws QueryException {
+  public Uri baseUri() throws QueryException {
     final HTTPContext http = http();
     return Uri.uri(http.req.getRequestURI().replaceAll(http.req.getPathInfo(), ""));
   }
@@ -37,7 +37,7 @@ public final class Restxq extends QueryModule {
    * @return base uri
    * @throws QueryException query exception
    */
-  public Str uri() throws QueryException {
+  public Uri uri() throws QueryException {
     return Uri.uri(http().req.getRequestURI());
   }
 

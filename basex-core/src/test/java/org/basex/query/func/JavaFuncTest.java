@@ -110,6 +110,13 @@ public class JavaFuncTest extends AdvancedQueryTest {
     query("declare function db:f($x) { $x }; db:f#1(Q{java:java.io.File}new('x'))", "x");
   }
 
+  /** URI test. */
+  @Test
+  public void uri() {
+    query("declare namespace uri = 'java.net.URI'; uri:get-host(uri:new('http://a'))", "a");
+    query("declare namespace uri = 'java.net.URI'; uri:get-path(uri:new('http://a/b'))", "/b");
+  }
+
   /** Atomizing Java items. */
   @Test
   public void data() {

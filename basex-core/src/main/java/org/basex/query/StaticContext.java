@@ -81,7 +81,7 @@ public final class StaticContext {
    * @return IO reference
    */
   public IO baseIO() {
-    return baseURI == Uri.EMPTY ? null : IO.get(baseURI.toJava());
+    return baseURI == Uri.EMPTY ? null : IO.get(Token.string(baseURI.string()));
   }
 
   /**

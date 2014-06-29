@@ -2,10 +2,10 @@ package org.basex.build;
 
 import static org.junit.Assert.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.*;
-import org.basex.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -80,11 +80,12 @@ public final class CollectionPathTest extends SandboxTest {
    */
   @Test
   public void baseUri() throws Exception {
-    final String find =
-      "for $x in collection('" + NAME + '/' + DIR + "xmark.xml') " +
-      "return base-uri($x)";
+    final String find = "base-uri(collection('" + NAME + '/' + DIR + "xmark.xml'))";
     final QueryProcessor qp = new QueryProcessor(find, context);
-    assertEquals(NAME + '/' + FILES[1], qp.iter().next().toJava());
-    qp.close();
+    try {
+      assertEquals(NAME + '/' + FILES[1], qp.execute().toString());
+    } finally {
+      qp.close();
+    }
   }
 }
