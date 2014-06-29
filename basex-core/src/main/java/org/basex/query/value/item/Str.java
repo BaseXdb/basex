@@ -1,6 +1,5 @@
 package org.basex.query.value.item;
 
-import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 
 import org.basex.core.*;
@@ -8,7 +7,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * String item ({@code xs:string}, {@code xs:normalizedString}, {@code xs:language}, etc.).
@@ -103,19 +101,5 @@ public class Str extends AStr {
   @Override
   public final String toJava() {
     return Token.string(val);
-  }
-
-  @Override
-  public final String toString() {
-    final ByteList tb = new ByteList();
-    tb.add('"');
-    for(final byte v : val) {
-      if(v == '&') tb.add(E_AMP);
-      else if(v == '\r') tb.add(E_0D);
-      else if(v == '\n') tb.add(E_0A);
-      else tb.add(v);
-      if(v == '"') tb.add('"');
-    }
-    return tb.add('"').toString();
   }
 }
