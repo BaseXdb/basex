@@ -23,18 +23,19 @@ public final class FNAcc extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNAcc(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNAcc(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Expr e = expr.length == 0 ? checkCtx(ctx) : expr[0];
-    switch(sig) {
+    final Expr e = exprs.length == 0 ? checkCtx(ctx) : exprs[0];
+    switch(func) {
       case POSITION:
         return Int.get(ctx.pos);
       case LAST:
@@ -44,7 +45,7 @@ public final class FNAcc extends StandardFunc {
       case NUMBER:
         return number(ctx.iter(e), ctx);
       case STRING_LENGTH:
-        return Int.get(len(checkEStr(expr.length == 0 ? string(e, ii, ctx) : e, ctx)));
+        return Int.get(len(checkEStr(exprs.length == 0 ? string(e, ii, ctx) : e, ctx)));
       case NORMALIZE_SPACE:
         return Str.get(norm(checkEStr(e, ctx)));
       case NAMESPACE_URI_FROM_QNAME:
@@ -92,12 +93,12 @@ public final class FNAcc extends StandardFunc {
 
   @Override
   public boolean has(final Flag flag) {
-    return flag == Flag.CTX && expr.length == 0 || super.has(flag);
+    return flag == Flag.CTX && exprs.length == 0 || super.has(flag);
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return !(!oneOf(sig, POSITION, LAST) && expr.length == 0 && !visitor.lock(DBLocking.CTX)) &&
+    return !(!oneOf(func, POSITION, LAST) && exprs.length == 0 && !visitor.lock(DBLocking.CTX)) &&
       super.accept(visitor);
   }
 }

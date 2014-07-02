@@ -23,17 +23,18 @@ public final class FNOut extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNOut(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNOut(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _OUT_NL:     return NL;
       case _OUT_TAB:    return TAB;
       case _OUT_FORMAT: return format(ctx);
@@ -48,11 +49,11 @@ public final class FNOut extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str format(final QueryContext ctx) throws QueryException {
-    final String form = string(checkStr(expr[0], ctx));
-    final int es = expr.length;
+    final String form = string(checkStr(exprs[0], ctx));
+    final int es = exprs.length;
     final Object[] args = new Object[es - 1];
     for(int e = 1; e < es; e++) {
-      final Item it = expr[e].item(ctx, info);
+      final Item it = exprs[e].item(ctx, info);
       args[e - 1] = it.type.isUntyped() ? string(it.string(info)) : it.toJava();
     }
     try {

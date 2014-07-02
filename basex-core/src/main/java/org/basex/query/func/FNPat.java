@@ -50,17 +50,18 @@ public final class FNPat extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNPat(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNPat(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case TOKENIZE: return tokenize(ctx).iter();
       default:       return super.iter(ctx);
     }
@@ -68,7 +69,7 @@ public final class FNPat extends StandardFunc {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case TOKENIZE: return tokenize(ctx);
       default:       return super.value(ctx);
     }
@@ -76,10 +77,10 @@ public final class FNPat extends StandardFunc {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
-      case MATCHES:        return matches(checkEStr(expr[0], ctx), ctx);
-      case REPLACE:        return replace(checkEStr(expr[0], ctx), ctx);
-      case ANALYZE_STRING: return analyzeString(checkEStr(expr[0], ctx), ctx);
+    switch(func) {
+      case MATCHES:        return matches(checkEStr(exprs[0], ctx), ctx);
+      case REPLACE:        return replace(checkEStr(exprs[0], ctx), ctx);
+      case ANALYZE_STRING: return analyzeString(checkEStr(exprs[0], ctx), ctx);
       default:             return super.item(ctx, ii);
     }
   }
@@ -92,7 +93,7 @@ public final class FNPat extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item matches(final byte[] val, final QueryContext ctx) throws QueryException {
-    final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
+    final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, ctx);
     return Bln.get(p.matcher(string(val)).find());
   }
 
@@ -104,7 +105,7 @@ public final class FNPat extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item analyzeString(final byte[] val, final QueryContext ctx) throws QueryException {
-    final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
+    final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, ctx);
     if(p.matcher("").matches()) throw REGROUP.get(info);
     final String str = string(val);
     final Matcher m = p.matcher(str);
@@ -166,7 +167,7 @@ public final class FNPat extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item replace(final byte[] val, final QueryContext ctx) throws QueryException {
-    final byte[] rep = checkStr(expr[2], ctx);
+    final byte[] rep = checkStr(exprs[2], ctx);
     for(int i = 0; i < rep.length; ++i) {
       if(rep[i] == '\\') {
         if(i + 1 == rep.length || rep[i + 1] != '\\' && rep[i + 1] != '$')
@@ -177,7 +178,7 @@ public final class FNPat extends StandardFunc {
         (i + 1 == rep.length || !digit(rep[i + 1]))) throw FUNREPDOL.get(info);
     }
 
-    final Pattern p = pattern(expr[1], expr.length == 4 ? expr[3] : null, ctx);
+    final Pattern p = pattern(exprs[1], exprs.length == 4 ? exprs[3] : null, ctx);
     if(p.pattern().isEmpty()) throw REGROUP.get(info);
 
     String r = string(rep);
@@ -200,8 +201,8 @@ public final class FNPat extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value tokenize(final QueryContext ctx) throws QueryException {
-    final byte[] val = checkEStr(expr[0], ctx);
-    final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
+    final byte[] val = checkEStr(exprs[0], ctx);
+    final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, ctx);
     if(p.matcher("").matches()) throw REGROUP.get(info);
 
     final TokenList tl = new TokenList();

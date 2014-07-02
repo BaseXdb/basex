@@ -44,8 +44,8 @@ public final class Modify extends Arr {
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoUp(expr[0]);
-    final Expr m = expr[1];
+    checkNoUp(exprs[0]);
+    final Expr m = exprs[1];
     m.checkUp();
     if(!m.isVacuous() && !m.has(Flag.UPD)) throw UPMODIFY.get(info);
   }
@@ -65,7 +65,7 @@ public final class Modify extends Arr {
 
     final Value cv = ctx.value;
     try {
-      final Iter ir = ctx.iter(expr[0]);
+      final Iter ir = ctx.iter(exprs[0]);
       Item i = ir.next();
       if(!(i instanceof ANode) || ir.next() != null) throw UPSOURCE.get(info);
 
@@ -75,7 +75,7 @@ public final class Modify extends Arr {
       ctx.value = i;
       pu.addData(i.data());
 
-      final Value v = ctx.value(expr[1]);
+      final Value v = ctx.value(exprs[1]);
       if(!v.isEmpty()) throw BASEX_MOD.get(info);
 
       updates.prepare();
@@ -95,12 +95,12 @@ public final class Modify extends Arr {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Modify(info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs));
+    return new Modify(info, exprs[0].copy(ctx, scp, vs), exprs[1].copy(ctx, scp, vs));
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(), expr);
+    addPlan(plan, planElem(), exprs);
   }
 
   @Override
@@ -111,7 +111,7 @@ public final class Modify extends Arr {
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final Expr e : expr) sz += e.exprSize();
+    for(final Expr e : exprs) sz += e.exprSize();
     return sz;
   }
 }

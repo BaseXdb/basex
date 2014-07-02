@@ -23,33 +23,33 @@ import org.basex.util.hash.*;
 public final class FTOr extends FTExpr {
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression list
+   * @param info input info
+   * @param exprs expressions
    */
-  public FTOr(final InputInfo ii, final FTExpr[] e) {
-    super(ii, e);
+  public FTOr(final InputInfo info, final FTExpr[] exprs) {
+    super(info, exprs);
   }
 
   @Override
   public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
     boolean not = true;
-    for(final FTExpr e : expr) not &= e instanceof FTNot;
+    for(final FTExpr e : exprs) not &= e instanceof FTNot;
     if(not) {
       // convert (!A or !B or ...) to !(A and B and ...)
-      final int es = expr.length;
-      for(int e = 0; e < es; e++) expr[e] = expr[e].expr[0];
-      return new FTNot(info, new FTAnd(info, expr));
+      final int es = exprs.length;
+      for(int e = 0; e < es; e++) exprs[e] = exprs[e].exprs[0];
+      return new FTNot(info, new FTAnd(info, exprs));
     }
     return this;
   }
 
   @Override
   public FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final FTNode item = expr[0].item(ctx, info);
-    final int es = expr.length;
+    final FTNode item = exprs[0].item(ctx, info);
+    final int es = exprs.length;
     for(int e = 1; e < es; e++) {
-      or(item, expr[e].item(ctx, info));
+      or(item, exprs[e].item(ctx, info));
     }
     return item;
   }
@@ -57,11 +57,11 @@ public final class FTOr extends FTExpr {
   @Override
   public FTIter iter(final QueryContext ctx) throws QueryException {
     // initialize iterators
-    final int es = expr.length;
+    final int es = exprs.length;
     final FTIter[] ir = new FTIter[es];
     final FTNode[] it = new FTNode[es];
     for(int e = 0; e < es; e++) {
-      ir[e] = expr[e].iter(ctx);
+      ir[e] = exprs[e].iter(ctx);
       it[e] = ir[e].next();
     }
 
@@ -106,7 +106,7 @@ public final class FTOr extends FTExpr {
   @Override
   public boolean indexAccessible(final IndexCosts ic) throws QueryException {
     int is = 0;
-    for(final FTExpr e : expr) {
+    for(final FTExpr e : exprs) {
       // no index access if negative operators is found
       if(!e.indexAccessible(ic) || ic.not) return false;
       ic.not = false;
@@ -118,7 +118,7 @@ public final class FTOr extends FTExpr {
 
   @Override
   public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTOr(info, Arr.copyAll(ctx, scp, vs, expr));
+    return new FTOr(info, Arr.copyAll(ctx, scp, vs, exprs));
   }
 
   @Override

@@ -19,17 +19,18 @@ public final class FNProf extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNProf(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNProf(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _PROF_MEM:  return mem(ctx);
       case _PROF_TIME: return time(ctx);
       default:         return super.iter(ctx);
@@ -38,7 +39,7 @@ public final class FNProf extends StandardFunc {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _PROF_SLEEP:      return sleep(ctx);
       case _PROF_CURRENT_MS: return Int.get(System.currentTimeMillis());
       case _PROF_CURRENT_NS: return Int.get(System.nanoTime());
@@ -61,17 +62,17 @@ public final class FNProf extends StandardFunc {
     final long min = Performance.memory();
 
     // optional message
-    final byte[] msg = expr.length > 2 ? checkStr(expr[2], ctx) : null;
+    final byte[] msg = exprs.length > 2 ? checkStr(exprs[2], ctx) : null;
 
     // check caching flag
-    if(expr.length > 1 && checkBln(expr[1], ctx)) {
-      final Value v = ctx.value(expr[0]).cache().value();
+    if(exprs.length > 1 && checkBln(exprs[1], ctx)) {
+      final Value v = ctx.value(exprs[0]).cache().value();
       dump(min, msg, ctx);
       return v.iter();
     }
 
     return new Iter() {
-      final Iter ir = expr[0].iter(ctx);
+      final Iter ir = exprs[0].iter(ctx);
       @Override
       public Item next() throws QueryException {
         final Item it = ir.next();
@@ -88,8 +89,8 @@ public final class FNProf extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item dump(final QueryContext ctx) throws QueryException {
-    final Iter ir = expr[0].iter(ctx);
-    final byte[] label = expr.length > 1 ? checkStr(expr[1], ctx) : null;
+    final Iter ir = exprs[0].iter(ctx);
+    final byte[] label = exprs.length > 1 ? checkStr(exprs[1], ctx) : null;
     boolean empty = true;
     for(Item it; (it = ir.next()) != null;) {
       FNInfo.dump(it, label, info, ctx);
@@ -106,7 +107,7 @@ public final class FNProf extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item voidd(final QueryContext ctx) throws QueryException {
-    final Iter ir = expr[0].iter(ctx);
+    final Iter ir = exprs[0].iter(ctx);
     for(Item it; (it = ir.next()) != null;) it.materialize(info);
     return null;
   }
@@ -131,7 +132,7 @@ public final class FNProf extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item human(final QueryContext ctx) throws QueryException {
-    return Str.get(Performance.format(checkItr(expr[0], ctx), true));
+    return Str.get(Performance.format(checkItr(exprs[0], ctx), true));
   }
 
   /**
@@ -145,17 +146,17 @@ public final class FNProf extends StandardFunc {
     final Performance p = new Performance();
 
     // optional message
-    final byte[] msg = expr.length > 2 ? checkStr(expr[2], ctx) : null;
+    final byte[] msg = exprs.length > 2 ? checkStr(exprs[2], ctx) : null;
 
     // check caching flag
-    if(expr.length > 1 && checkBln(expr[1], ctx)) {
-      final Value v = ctx.value(expr[0]).cache().value();
+    if(exprs.length > 1 && checkBln(exprs[1], ctx)) {
+      final Value v = ctx.value(exprs[0]).cache().value();
       FNInfo.dump(token(p.getTime()), msg, ctx);
       return v.iter();
     }
 
     return new Iter() {
-      final Iter ir = expr[0].iter(ctx);
+      final Iter ir = exprs[0].iter(ctx);
       @Override
       public Item next() throws QueryException {
         final Item it = ir.next();
@@ -172,7 +173,7 @@ public final class FNProf extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item sleep(final QueryContext ctx) throws QueryException {
-    Performance.sleep(checkItr(expr[0], ctx));
+    Performance.sleep(checkItr(exprs[0], ctx));
     return null;
   }
 }

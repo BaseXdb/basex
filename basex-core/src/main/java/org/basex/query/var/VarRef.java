@@ -25,12 +25,12 @@ public final class VarRef extends ParseExpr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param v variable
+   * @param info input info
+   * @param var variable
    */
-  public VarRef(final InputInfo ii, final Var v) {
-    super(ii);
-    var = v;
+  public VarRef(final InputInfo info, final Var var) {
+    super(info);
+    this.var = var;
   }
 
   @Override

@@ -1,8 +1,8 @@
 package org.basex.query.path;
 
 import org.basex.data.*;
-import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -32,24 +32,24 @@ final class InvDocTest extends Test {
   /**
    * Returns a document test. This test will only be utilized by
    * {@link AxisPath#index} if all context values are database nodes.
-   * @param ctx query context
-   * @param data data reference
+   * @param rt root value
    * @return document test
    */
-  static Test get(final QueryContext ctx, final Data data) {
+  static Test get(final Value rt) {
     // use simple test if database contains only one document
+    final Data data = rt.data();
     if(data.resources.docs().size() == 1) return Test.DOC;
 
     // adopt nodes from existing sequence
-    if(ctx.value instanceof DBNodeSeq) {
-      final DBNodeSeq seq = (DBNodeSeq) ctx.value;
+    if(rt instanceof DBNodeSeq) {
+      final DBNodeSeq seq = (DBNodeSeq) rt;
       return seq.complete ? Test.DOC : new InvDocTest(new Nodes(seq.pres, data));
     }
 
     // loop through all documents and add pre values of documents
     // not more than 2^31 documents supported
-    final IntList il = new IntList((int) ctx.value.size());
-    final ValueIter ir = ctx.value.iter();
+    final IntList il = new IntList((int) rt.size());
+    final ValueIter ir = rt.iter();
     for(Item it; (it = ir.next()) != null;) il.add(((DBNode) it).pre);
     return new InvDocTest(new Nodes(il.toArray(), data));
   }

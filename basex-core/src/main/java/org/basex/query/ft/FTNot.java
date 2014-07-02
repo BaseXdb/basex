@@ -22,28 +22,28 @@ import org.basex.util.hash.*;
 public final class FTNot extends FTExpr {
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
+   * @param info input info
+   * @param expr expression
    */
-  public FTNot(final InputInfo ii, final FTExpr e) {
-    super(ii, e);
+  public FTNot(final InputInfo info, final FTExpr expr) {
+    super(info, expr);
   }
 
   @Override
   public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
-    return expr[0] instanceof FTNot ? expr[0].expr[0] : this;
+    return exprs[0] instanceof FTNot ? exprs[0].exprs[0] : this;
   }
 
   @Override
   public FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return not(expr[0].item(ctx, info));
+    return not(exprs[0].item(ctx, info));
   }
 
   @Override
   public FTIter iter(final QueryContext ctx) throws QueryException {
     return new FTIter() {
-      final FTIter ir = expr[0].iter(ctx);
+      final FTIter ir = exprs[0].iter(ctx);
 
       @Override
       public FTNode next() throws QueryException {
@@ -97,14 +97,14 @@ public final class FTNot extends FTExpr {
 
   @Override
   public boolean indexAccessible(final IndexCosts ic) throws QueryException {
-    final boolean ia = expr[0].indexAccessible(ic);
+    final boolean ia = exprs[0].indexAccessible(ic);
     ic.not ^= true;
     return ia;
   }
 
   @Override
   public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTNot(info, expr[0].copy(ctx, scp, vs));
+    return new FTNot(info, exprs[0].copy(ctx, scp, vs));
   }
 
   @Override
@@ -114,6 +114,6 @@ public final class FTNot extends FTExpr {
 
   @Override
   public String toString() {
-    return FTNOT + ' ' + expr[0];
+    return FTNOT + ' ' + exprs[0];
   }
 }

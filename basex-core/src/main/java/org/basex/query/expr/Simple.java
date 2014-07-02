@@ -15,10 +15,10 @@ import org.basex.util.*;
 public abstract class Simple extends ParseExpr {
   /**
    * Constructor.
-   * @param ii input info
+   * @param info input info
    */
-  protected Simple(final InputInfo ii) {
-    super(ii);
+  protected Simple(final InputInfo info) {
+    super(info);
   }
 
   @Override

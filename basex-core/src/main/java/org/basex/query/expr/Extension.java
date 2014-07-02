@@ -22,13 +22,13 @@ public final class Extension extends Single {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param prag pragmas
-   * @param e enclosed expression
+   * @param info input info
+   * @param pragmas pragmas
+   * @param expr enclosed expression
    */
-  public Extension(final InputInfo ii, final Pragma[] prag, final Expr e) {
-    super(ii, e);
-    pragmas = prag;
+  public Extension(final InputInfo info, final Pragma[] pragmas, final Expr expr) {
+    super(info, expr);
+    this.pragmas = pragmas;
   }
 
   @Override

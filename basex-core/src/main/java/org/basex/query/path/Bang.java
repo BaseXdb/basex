@@ -17,11 +17,11 @@ import org.basex.util.hash.*;
 public final class Bang extends Single {
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
+   * @param info input info
+   * @param expr expression
    */
-  public Bang(final InputInfo ii, final Expr e) {
-    super(ii, e);
+  public Bang(final InputInfo info, final Expr expr) {
+    super(info, expr);
   }
 
   @Override

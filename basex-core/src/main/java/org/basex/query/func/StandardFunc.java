@@ -36,23 +36,23 @@ import org.basex.util.options.*;
  */
 public abstract class StandardFunc extends Arr {
   /** Function signature. */
-  Function sig;
+  Function func;
   /** Static context. */
   final StaticContext sc;
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param s function definition
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
    * @param args arguments
    */
-  protected StandardFunc(final StaticContext sctx, final InputInfo ii, final Function s,
+  protected StandardFunc(final StaticContext sc, final InputInfo info, final Function func,
       final Expr... args) {
-    super(ii, args);
-    sc = sctx;
-    sig = s;
-    type = sig.ret;
+    super(info, args);
+    this.sc = sc;
+    this.func = func;
+    this.type = func.ret;
   }
 
   @Override
@@ -66,7 +66,7 @@ public abstract class StandardFunc extends Arr {
   public final Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     // skip context-based or non-deterministic functions, and non-values
     return optPre(has(Flag.CTX) || has(Flag.NDT) || has(Flag.HOF) || has(Flag.UPD) ||
-        !allAreValues() ? opt(ctx, scp) : sig.ret.zeroOrOne() ? item(ctx, info) : value(ctx), ctx);
+        !allAreValues() ? opt(ctx, scp) : func.ret.zeroOrOne() ? item(ctx, info) : value(ctx), ctx);
   }
 
   /**
@@ -84,10 +84,10 @@ public abstract class StandardFunc extends Arr {
   @Override
   public final StandardFunc copy(final QueryContext ctx, final VarScope scp,
       final IntObjMap<Var> vs) {
-    final int es = expr.length;
+    final int es = exprs.length;
     final Expr[] arg = new Expr[es];
-    for(int e = 0; e < es; e++) arg[e] = expr[e].copy(ctx, scp, vs);
-    return sig.get(sc, info, arg);
+    for(int e = 0; e < es; e++) arg[e] = exprs[e].copy(ctx, scp, vs);
+    return func.get(sc, info, arg);
   }
 
   /**
@@ -129,12 +129,12 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public boolean has(final Flag flag) {
-    return sig.has(flag) || flag != Flag.X30 && flag != Flag.HOF && super.has(flag);
+    return func.has(flag) || flag != Flag.X30 && flag != Flag.HOF && super.has(flag);
   }
 
   @Override
   public final boolean isFunction(final Function f) {
-    return sig == f;
+    return func == f;
   }
 
   @Override
@@ -144,19 +144,19 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final String description() {
-    return sig.toString();
+    return func.toString();
   }
 
   @Override
   public final void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, sig.desc), expr);
+    addPlan(plan, planElem(NAM, func.desc), exprs);
   }
 
   @Override
   public final String toString() {
-    final String desc = sig.toString();
+    final String desc = func.toString();
     return new TokenBuilder(desc.substring(0,
-        desc.indexOf('(') + 1)).addSep(expr, SEP).add(PAR2).toString();
+        desc.indexOf('(') + 1)).addSep(exprs, SEP).add(PAR2).toString();
   }
 
   /**
@@ -167,7 +167,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final Data checkData(final QueryContext ctx) throws QueryException {
-    final String name = string(checkStr(expr[0], ctx));
+    final String name = string(checkStr(exprs[0], ctx));
     if(!Databases.validName(name)) throw INVDB.get(info, name);
     return ctx.resources.database(name, info);
   }
@@ -180,8 +180,8 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected Path checkPath(final int i, final QueryContext ctx) throws QueryException {
-    if(i >= expr.length) return null;
-    final String file = string(checkStr(expr[i], ctx));
+    if(i >= exprs.length) return null;
+    final String file = string(checkStr(exprs[i], ctx));
     try {
       return Paths.get(IOUrl.isFileURL(file) ? IOUrl.toFile(file) : file);
     } catch(final InvalidPathException ex) {
@@ -210,7 +210,7 @@ public abstract class StandardFunc extends Arr {
   protected final boolean dataLock(final ASTVisitor visitor, final int dbs) {
     boolean more = true;
     for(int db = 0; db < dbs; db++) {
-      more &= visitor.lock(expr[db] instanceof Str ? string(((Str) expr[db]).string()) : null);
+      more &= visitor.lock(exprs[db] instanceof Str ? string(((Str) exprs[db]).string()) : null);
     }
     return more;
   }
@@ -226,8 +226,8 @@ public abstract class StandardFunc extends Arr {
   protected final String encoding(final int i, final Err err, final QueryContext ctx)
       throws QueryException {
 
-    if(i >= expr.length) return null;
-    final String enc = string(checkStr(expr[i], ctx));
+    if(i >= exprs.length) return null;
+    final String enc = string(checkStr(exprs[i], ctx));
     try {
       if(Charset.isSupported(enc)) return normEncoding(enc);
     } catch(final IllegalArgumentException ignored) {
@@ -248,7 +248,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected <E extends Options> E checkOptions(final int i, final QNm qnm, final E opts,
       final QueryContext ctx) throws QueryException {
-    if(i < expr.length) new FuncOptions(qnm, info).parse(expr[i].item(ctx, info), opts);
+    if(i < exprs.length) new FuncOptions(qnm, info).parse(exprs[i].item(ctx, info), opts);
     return opts;
   }
 
@@ -276,9 +276,9 @@ public abstract class StandardFunc extends Arr {
       throws QueryException {
 
     final HashMap<String, Value> hm = new HashMap<>();
-    final int es = expr.length;
+    final int es = exprs.length;
     if(i < es) {
-      final Map map = checkMap(checkItem(expr[i], ctx));
+      final Map map = checkMap(checkItem(exprs[i], ctx));
       for(final Item it : map.keys()) {
         final byte[] key;
         if(it instanceof Str) {

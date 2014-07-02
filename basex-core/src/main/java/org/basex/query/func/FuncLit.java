@@ -35,25 +35,25 @@ public final class FuncLit extends Single implements Scope {
 
   /**
    * Constructor.
-   * @param a annotations
-   * @param nm function name
+   * @param ann annotations
+   * @param name function name
    * @param arg formal parameters
-   * @param fn function body
+   * @param expr function body
    * @param ft function type
-   * @param scp variable scope
-   * @param sctx static context
-   * @param ii input info
+   * @param scope variable scope
+   * @param sc static context
+   * @param info input info
    */
-  public FuncLit(final Ann a, final QNm nm, final Var[] arg, final Expr fn, final FuncType ft,
-      final VarScope scp, final StaticContext sctx, final InputInfo ii) {
-    super(ii, fn);
-    ann = a;
-    name = nm;
-    args = arg;
+  public FuncLit(final Ann ann, final QNm name, final Var[] arg, final Expr expr, final FuncType ft,
+      final VarScope scope, final StaticContext sc, final InputInfo info) {
+    super(info, expr);
+    this.ann = ann;
+    this.name = name;
+    this.args = arg;
+    this.scope = scope;
+    this.sc = sc;
     check = ft == null;
     type = (ft == null ? FuncType.arity(args.length) : ft).seqType();
-    scope = scp;
-    sc = sctx;
   }
 
   @Override

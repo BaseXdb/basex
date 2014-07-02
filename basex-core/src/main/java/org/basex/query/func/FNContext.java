@@ -16,18 +16,18 @@ public final class FNContext extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNContext(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNContext(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case CURRENT_DATE:      return ctx.initDateTime().date;
       case CURRENT_DATETIME:  return ctx.initDateTime().dtm;
       case CURRENT_TIME:      return ctx.initDateTime().time;

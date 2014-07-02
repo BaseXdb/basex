@@ -24,13 +24,13 @@ import org.basex.util.hash.*;
 public final class Treat extends Single {
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
-   * @param s sequence type
+   * @param info input info
+   * @param expr expression
+   * @param type sequence type
    */
-  public Treat(final InputInfo ii, final Expr e, final SeqType s) {
-    super(ii, e);
-    type = s;
+  public Treat(final InputInfo info, final Expr expr, final SeqType type) {
+    super(info, expr);
+    this.type = type;
   }
 
   @Override

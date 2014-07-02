@@ -23,12 +23,12 @@ public final class Where extends GFLWOR.Clause {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e predicate expression
+   * @param pred predicate expression
+   * @param info input info
    */
-  public Where(final Expr e, final InputInfo ii) {
-    super(ii);
-    pred = e;
+  public Where(final Expr pred, final InputInfo info) {
+    super(info);
+    this.pred = pred;
   }
 
   @Override
@@ -82,8 +82,8 @@ public final class Where extends GFLWOR.Clause {
   }
 
   @Override
-  public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
     final Expr sub = pred.inline(ctx, scp, v, e);
     if(sub == null) return null;
     pred = sub;

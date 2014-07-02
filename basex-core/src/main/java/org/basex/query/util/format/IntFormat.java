@@ -15,21 +15,21 @@ import org.basex.util.*;
 public final class IntFormat extends FormatParser {
   /**
    * Constructor.
-   * @param p picture
-   * @param ii input info
+   * @param picture picture
+   * @param info input info
    * @throws QueryException query exception
    */
-  public IntFormat(final byte[] p, final InputInfo ii) throws QueryException {
-    super(ii);
+  public IntFormat(final byte[] picture, final InputInfo info) throws QueryException {
+    super(info);
 
-    final int sc = lastIndexOf(p, ';');
-    final byte[] pres = sc == -1 ? p : substring(p, 0, sc);
-    if(pres.length == 0) throw PICEMPTY.get(info, p);
+    final int sc = lastIndexOf(picture, ';');
+    final byte[] pres = sc == -1 ? picture : substring(picture, 0, sc);
+    if(pres.length == 0) throw PICEMPTY.get(info, picture);
     finish(presentation(pres, ONE, false));
     if(sc == -1) return;
 
     // parses the format modifier
-    final byte[] mod = substring(p, sc + 1);
+    final byte[] mod = substring(picture, sc + 1);
 
     final TokenParser tp = new TokenParser(mod);
     // parse cardinal/ordinal flag

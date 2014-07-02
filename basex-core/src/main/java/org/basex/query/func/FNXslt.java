@@ -72,17 +72,18 @@ public final class FNXslt extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNXslt(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNXslt(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _XSLT_PROCESSOR:      return Str.get(get(true));
       case _XSLT_VERSION:        return Str.get(get(false));
       case _XSLT_TRANSFORM:      return transform(ctx, true);
@@ -100,8 +101,8 @@ public final class FNXslt extends StandardFunc {
    */
   private Item transform(final QueryContext ctx, final boolean node) throws QueryException {
     checkCreate(ctx);
-    final IO in = read(expr[0], ctx);
-    final IO xsl = read(expr[1], ctx);
+    final IO in = read(exprs[0], ctx);
+    final IO xsl = read(exprs[1], ctx);
     final Options opts = checkOptions(2, Q_PARAMETERS, new Options(), ctx);
 
     final PrintStream tmp = System.err;

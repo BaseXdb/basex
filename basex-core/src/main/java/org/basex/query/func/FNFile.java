@@ -38,19 +38,20 @@ public final class FNFile extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNFile(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNFile(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
     try {
-      switch(sig) {
+      switch(func) {
         case _FILE_CHILDREN:        return children(ctx);
         case _FILE_LIST:            return list(ctx);
         case _FILE_READ_TEXT_LINES: return readTextLines(ctx);
@@ -71,7 +72,7 @@ public final class FNFile extends StandardFunc {
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     checkCreate(ctx);
     try {
-      switch(sig) {
+      switch(func) {
         case _FILE_APPEND:            return write(true, ctx);
         case _FILE_APPEND_BINARY:     return writeBinary(true, ctx);
         case _FILE_APPEND_TEXT:       return writeText(true, ctx);
@@ -242,8 +243,8 @@ public final class FNFile extends StandardFunc {
   private Iter list(final QueryContext ctx) throws QueryException, IOException {
     final Path dir = checkPath(0, ctx).toRealPath();
     final boolean rec = optionalBool(1, ctx);
-    final Pattern pat = expr.length == 3 ? Pattern.compile(IOFile.regex(
-        string(checkStr(expr[2], ctx))), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE) : null;
+    final Pattern pat = exprs.length == 3 ? Pattern.compile(IOFile.regex(
+        string(checkStr(exprs[2], ctx))), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE) : null;
 
     final TokenList list = new TokenList();
     list(dir.getNameCount(), dir, list, rec, pat);
@@ -322,10 +323,10 @@ public final class FNFile extends StandardFunc {
   private synchronized Item createTemp(final boolean dir, final QueryContext ctx)
       throws QueryException, IOException {
 
-    final String pref = string(checkStr(expr[0], ctx));
-    final String suf = expr.length > 1 ? string(checkStr(expr[1], ctx)) : "";
+    final String pref = string(checkStr(exprs[0], ctx));
+    final String suf = exprs.length > 1 ? string(checkStr(exprs[1], ctx)) : "";
     final Path root;
-    if(expr.length > 2) {
+    if(exprs.length > 2) {
       root = checkPath(2, ctx);
       if(Files.isRegularFile(root)) throw FILE_NO_DIR.get(info, root);
     } else {
@@ -389,19 +390,19 @@ public final class FNFile extends StandardFunc {
    */
   private B64 readBinary(final QueryContext ctx) throws QueryException, IOException {
     final Path path = checkPath(0, ctx);
-    final long off = expr.length > 1 ? checkItr(expr[1], ctx) : 0;
-    long len = expr.length > 2 ? checkItr(expr[2], ctx) : 0;
+    final long off = exprs.length > 1 ? checkItr(exprs[1], ctx) : 0;
+    long len = exprs.length > 2 ? checkItr(exprs[2], ctx) : 0;
 
     if(!Files.exists(path)) throw FILE_NOT_FOUND.get(info, path);
     if(Files.isDirectory(path)) throw FILE_IS_DIR.get(info, path);
 
     // read full file
-    if(expr.length == 1) return new B64Stream(new IOFile(path.toFile()), FILE_IO_ERROR);
+    if(exprs.length == 1) return new B64Stream(new IOFile(path.toFile()), FILE_IO_ERROR);
 
     // read file chunk
     try(final DataAccess da = new DataAccess(new IOFile(path.toFile()))) {
       final long dlen = da.length();
-      if(expr.length == 2) len = dlen - off;
+      if(exprs.length == 2) len = dlen - off;
       if(off < 0 || off > dlen || len < 0 || off + len > dlen)
         throw FILE_OUT_OF_RANGE.get(info, off, off + len);
       da.cursor(off);
@@ -445,9 +446,9 @@ public final class FNFile extends StandardFunc {
       throws QueryException, IOException {
 
     final Path path = checkParentDir(checkPath(0, ctx));
-    final Iter ir = expr[1].iter(ctx);
+    final Iter ir = exprs[1].iter(ctx);
     final SerializerOptions sopts = FuncOptions.serializer(
-        expr.length > 2 ? expr[2].item(ctx, info) : null, info);
+        exprs.length > 2 ? exprs[2].item(ctx, info) : null, info);
 
     //Files.newOutputStream(path, append ? StandardOpenOption.APPEND : StandardOpenOption.CREATE);
 
@@ -473,7 +474,7 @@ public final class FNFile extends StandardFunc {
       throws QueryException, IOException {
 
     final Path path = checkParentDir(checkPath(0, ctx));
-    final byte[] s = checkStr(expr[1], ctx);
+    final byte[] s = checkStr(exprs[1], ctx);
     final String enc = encoding(2, FILE_UNKNOWN_ENCODING, ctx);
     final Charset cs = enc == null || enc == UTF8 ? null : Charset.forName(enc);
 
@@ -495,7 +496,7 @@ public final class FNFile extends StandardFunc {
       throws QueryException, IOException {
 
     final Path path = checkParentDir(checkPath(0, ctx));
-    final Iter ir = expr[1].iter(ctx);
+    final Iter ir = exprs[1].iter(ctx);
     final String enc = encoding(2, FILE_UNKNOWN_ENCODING, ctx);
     final Charset cs = enc == null || enc == UTF8 ? null : Charset.forName(enc);
 
@@ -522,11 +523,11 @@ public final class FNFile extends StandardFunc {
       throws QueryException, IOException {
 
     final Path path = checkParentDir(checkPath(0, ctx));
-    final Bin bin = checkBinary(expr[1], ctx);
-    final long off = expr.length > 2 ? checkItr(expr[2], ctx) : 0;
+    final Bin bin = checkBinary(exprs[1], ctx);
+    final long off = exprs.length > 2 ? checkItr(exprs[2], ctx) : 0;
 
     // write full file
-    if(expr.length == 2) {
+    if(exprs.length == 2) {
       try(final BufferOutput out = new BufferOutput(new FileOutputStream(path.toFile(), append));
           final InputStream is = bin.input(info)) {
         for(int i; (i = is.read()) != -1;)  out.write(i);
@@ -621,7 +622,7 @@ public final class FNFile extends StandardFunc {
    * @throws QueryException query exception
    */
   private boolean optionalBool(final int i, final QueryContext ctx) throws QueryException {
-    return i < expr.length && checkBln(expr[i], ctx);
+    return i < exprs.length && checkBln(exprs[i], ctx);
   }
 
   /**

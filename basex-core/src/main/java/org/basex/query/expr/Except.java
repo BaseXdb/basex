@@ -20,20 +20,24 @@ import org.basex.util.hash.*;
 public final class Except extends Set {
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression list
+   * @param info input info
+   * @param exprs expressions
    */
-  public Except(final InputInfo ii, final Expr[] e) {
-    super(ii, e);
+  public Except(final InputInfo info, final Expr[] exprs) {
+    super(info, exprs);
   }
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
+    return optimize(ctx, scp);
+  }
 
-    final int es = expr.length;
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+    final int es = exprs.length;
     final ExprList el = new ExprList(es);
-    for(final Expr ex : expr) {
+    for(final Expr ex : exprs) {
       if(ex.isEmpty()) {
         // remove empty operands (return empty sequence if first value is empty)
         if(el.isEmpty()) return optPre(null, ctx);
@@ -45,13 +49,13 @@ public final class Except extends Set {
     // ensure that results are always sorted
     if(el.size() == 1 && iterable) return el.get(0);
     // replace expressions with optimized list
-    if(el.size() != es) expr = el.finish();
+    if(el.size() != es) exprs = el.finish();
     return this;
   }
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final Except ex = new Except(info, copyAll(ctx, scp, vs, expr));
+    final Except ex = new Except(info, copyAll(ctx, scp, vs, exprs));
     ex.iterable = iterable;
     return copyType(ex);
   }
@@ -63,7 +67,7 @@ public final class Except extends Set {
     for(Item it; (it = iter[0].next()) != null;) nc.add(checkNode(it));
     final boolean db = nc.dbnodes();
 
-    for(int e = 1; e != expr.length && nc.size() != 0; ++e) {
+    for(int e = 1; e != exprs.length && nc.size() != 0; ++e) {
       final Iter ir = iter[e];
       for(Item it; (it = ir.next()) != null;) {
         final int i = nc.indexOf(checkNode(it), db);

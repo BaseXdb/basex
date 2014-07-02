@@ -18,17 +18,18 @@ public final class FNMap extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNMap(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNMap(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _MAP_GET:  return get(ctx).iter();
       case _MAP_KEYS: return map(ctx).keys().iter();
       default:        return super.iter(ctx);
@@ -37,7 +38,7 @@ public final class FNMap extends StandardFunc {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _MAP_GET:  return get(ctx);
       case _MAP_KEYS: return map(ctx).keys();
       default:        return super.value(ctx);
@@ -46,7 +47,7 @@ public final class FNMap extends StandardFunc {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _MAP_NEW:       return newMap(ctx, ii);
       case _MAP_ENTRY:     return entry(ctx, ii);
       case _MAP_CONTAINS:  return Bln.get(contains(ctx, ii));
@@ -66,7 +67,7 @@ public final class FNMap extends StandardFunc {
    * @throws QueryException query exception
    */
   private Map remove(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return map(ctx).delete(expr[1].item(ctx, ii), ii);
+    return map(ctx).delete(exprs[1].item(ctx, ii), ii);
   }
 
   /**
@@ -77,7 +78,7 @@ public final class FNMap extends StandardFunc {
    * @throws QueryException query exception
    */
   private Map entry(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return Map.EMPTY.insert(expr[0].item(ctx, ii), ctx.value(expr[1]), ii);
+    return Map.EMPTY.insert(exprs[0].item(ctx, ii), ctx.value(exprs[1]), ii);
   }
 
   /**
@@ -88,12 +89,12 @@ public final class FNMap extends StandardFunc {
    * @throws QueryException query exception
    */
   private Map newMap(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    if(expr.length == 0) return Map.EMPTY;
+    if(exprs.length == 0) return Map.EMPTY;
     // collations are ignored here as they may disappear in a future version
-    checkColl(expr.length == 2 ? expr[1] : null, ctx, sc);
+    checkColl(exprs.length == 2 ? exprs[1] : null, ctx, sc);
 
     Map map = Map.EMPTY;
-    final Iter maps = expr[0].iter(ctx);
+    final Iter maps = exprs[0].iter(ctx);
     for(Item m; (m = maps.next()) != null;)
       map = map.addAll(checkMap(m), ii);
     return map;
@@ -106,7 +107,7 @@ public final class FNMap extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value get(final QueryContext ctx) throws QueryException {
-    return map(ctx).get(expr[1].item(ctx, info), info);
+    return map(ctx).get(exprs[1].item(ctx, info), info);
   }
 
   /**
@@ -117,7 +118,7 @@ public final class FNMap extends StandardFunc {
    * @throws QueryException query exception
    */
   private boolean contains(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return map(ctx).contains(expr[1].item(ctx, ii), ii);
+    return map(ctx).contains(exprs[1].item(ctx, ii), ii);
   }
 
   /**
@@ -127,6 +128,6 @@ public final class FNMap extends StandardFunc {
    * @throws QueryException query exception
    */
   private Map map(final QueryContext ctx) throws QueryException {
-    return checkMap(checkItem(expr[0], ctx));
+    return checkMap(checkItem(exprs[0], ctx));
   }
 }

@@ -21,11 +21,11 @@ public final class CTxt extends CNode {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param t text
+   * @param info input info
+   * @param text text
    */
-  public CTxt(final StaticContext sctx, final InputInfo ii, final Expr t) {
-    super(sctx, ii, t);
+  public CTxt(final StaticContext sctx, final InputInfo info, final Expr text) {
+    super(sctx, info, text);
     type = SeqType.TXT_ZO;
   }
 
@@ -37,7 +37,7 @@ public final class CTxt extends CNode {
 
   @Override
   public FTxt item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Iter iter = ctx.iter(expr[0]);
+    final Iter iter = ctx.iter(exprs[0]);
     Item it = iter.next();
     if(it == null) return null;
 
@@ -54,7 +54,7 @@ public final class CTxt extends CNode {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CTxt(sc, info, expr[0].copy(ctx, scp, vs));
+    return new CTxt(sc, info, exprs[0].copy(ctx, scp, vs));
   }
 
   @Override

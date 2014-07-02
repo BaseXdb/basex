@@ -24,15 +24,15 @@ public final class Cast extends Single {
 
   /**
    * Function constructor.
-   * @param sx static context
-   * @param ii input info
-   * @param e expression
-   * @param t data type
+   * @param sc static context
+   * @param info input info
+   * @param expr expression
+   * @param type data type
    */
-  public Cast(final StaticContext sx, final InputInfo ii, final Expr e, final SeqType t) {
-    super(ii, e);
-    sc = sx;
-    type = t;
+  public Cast(final StaticContext sc, final InputInfo info, final Expr expr, final SeqType type) {
+    super(info, expr);
+    this.sc = sc;
+    this.type = type;
   }
 
   @Override

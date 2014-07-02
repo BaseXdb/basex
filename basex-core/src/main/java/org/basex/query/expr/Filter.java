@@ -23,13 +23,13 @@ public abstract class Filter extends Preds {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param r expression
-   * @param p predicates
+   * @param info input info
+   * @param root root expression
+   * @param preds predicates
    */
-  Filter(final InputInfo ii, final Expr r, final Expr... p) {
-    super(ii, p);
-    root = r;
+  Filter(final InputInfo info, final Expr root, final Expr... preds) {
+    super(info, preds);
+    this.root = root;
   }
 
   /**
@@ -182,18 +182,6 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final void plan(final FElem plan) {
-    final FElem el = planElem();
-    addPlan(plan, el, root);
-    super.plan(el);
-  }
-
-  @Override
-  public final String toString() {
-    return root + super.toString();
-  }
-
-  @Override
   public boolean accept(final ASTVisitor visitor) {
     for(final Expr e : preds) {
       visitor.enterFocus();
@@ -208,5 +196,17 @@ public abstract class Filter extends Preds {
     int sz = 1;
     for(final Expr e : preds) sz += e.exprSize();
     return sz + root.exprSize();
+  }
+
+  @Override
+  public final void plan(final FElem plan) {
+    final FElem el = planElem();
+    addPlan(plan, el, root);
+    super.plan(el);
+  }
+
+  @Override
+  public final String toString() {
+    return root + super.toString();
   }
 }

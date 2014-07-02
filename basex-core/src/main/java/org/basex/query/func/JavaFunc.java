@@ -22,29 +22,29 @@ import org.basex.util.hash.*;
  */
 public final class JavaFunc extends JavaMapping {
   /** Java class. */
-  private final Class<?> cls;
+  private final Class<?> clazz;
   /** Java method. */
-  private final String mth;
+  private final String method;
 
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param c Java class
-   * @param m Java method/field
-   * @param a arguments
+   * @param info input info
+   * @param clazz Java class
+   * @param method Java method/field
+   * @param args arguments
    */
-  JavaFunc(final StaticContext sctx, final InputInfo ii, final Class<?> c, final String m,
-      final Expr[] a) {
-    super(sctx, ii, a);
-    cls = c;
-    mth = m;
+  JavaFunc(final StaticContext sctx, final InputInfo info, final Class<?> clazz,
+      final String method, final Expr[] args) {
+    super(sctx, info, args);
+    this.clazz = clazz;
+    this.method = method;
   }
 
   @Override
   protected Object eval(final Value[] args, final QueryContext ctx) throws QueryException {
     try {
-      return mth.equals(NEW) ? constructor(args) : method(args, ctx);
+      return method.equals(NEW) ? constructor(args) : method(args, ctx);
     } catch(final InvocationTargetException ex) {
       final Throwable cause = ex.getCause();
       throw cause instanceof QueryException ? ((QueryException) cause).info(info) :
@@ -59,7 +59,7 @@ public final class JavaFunc extends JavaMapping {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new JavaFunc(sc, info, cls, mth, copyAll(ctx, scp, vs, expr));
+    return new JavaFunc(sc, info, clazz, method, copyAll(ctx, scp, vs, exprs));
   }
 
   /**
@@ -69,7 +69,7 @@ public final class JavaFunc extends JavaMapping {
    * @throws Exception exception
    */
   private Object constructor(final Value[] ar) throws Exception {
-    for(final Constructor<?> con : cls.getConstructors()) {
+    for(final Constructor<?> con : clazz.getConstructors()) {
       final Object[] arg = args(con.getParameterTypes(), null, ar, true);
       if(arg != null) return con.newInstance(arg);
     }
@@ -86,15 +86,15 @@ public final class JavaFunc extends JavaMapping {
   private Object method(final Value[] ar, final QueryContext ctx) throws Exception {
     // check if a field with the specified name exists
     try {
-      final Field f = cls.getField(mth);
+      final Field f = clazz.getField(method);
       final boolean st = Modifier.isStatic(f.getModifiers());
       if(ar.length == (st ? 0 : 1)) {
         return f.get(st ? null : instObj(ar[0]));
       }
     } catch(final NoSuchFieldException ex) { /* ignored */ }
 
-    for(final Method meth : cls.getMethods()) {
-      if(!meth.getName().equals(mth)) continue;
+    for(final Method meth : clazz.getMethods()) {
+      if(!meth.getName().equals(method)) continue;
       final boolean st = Modifier.isStatic(meth.getModifiers());
       final Object[] arg = args(meth.getParameterTypes(), null, ar, st);
       if(arg != null) {
@@ -121,7 +121,7 @@ public final class JavaFunc extends JavaMapping {
    * @throws QueryException query exception
    */
   private Object instObj(final Value v) throws QueryException {
-    return cls.isInstance(v) ? v : v.toJava();
+    return clazz.isInstance(v) ? v : v.toJava();
   }
 
   /**
@@ -178,13 +178,13 @@ public final class JavaFunc extends JavaMapping {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, cls.getName() + '.' + mth), expr);
+    addPlan(plan, planElem(NAM, clazz.getName() + '.' + method), exprs);
   }
 
   @Override
   public String description() {
     final StringBuilder sb = new StringBuilder();
-    if(mth.equals(NEW)) sb.append(NEW).append(' ').append(Util.className(cls));
+    if(method.equals(NEW)) sb.append(NEW).append(' ').append(Util.className(clazz));
     else sb.append(name());
     return sb.append("(...)").toString();
   }
@@ -194,11 +194,11 @@ public final class JavaFunc extends JavaMapping {
    * @return string
    */
   private String name() {
-    return Util.className(cls) + '.' + mth;
+    return Util.className(clazz) + '.' + method;
   }
 
   @Override
   public String toString() {
-    return cls + "." + mth + PAR1 + toString(SEP) + PAR2;
+    return clazz + "." + method + PAR1 + toString(SEP) + PAR2;
   }
 }

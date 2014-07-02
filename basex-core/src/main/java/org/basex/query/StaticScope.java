@@ -36,17 +36,17 @@ public abstract class StaticScope extends ExprInfo implements Scope {
 
   /**
    * Constructor.
-   * @param scp variable scope
-   * @param ii input info
-   * @param xqdoc documentation (may be {@code null} or empty)
-   * @param sctx static context
+   * @param scope variable scope
+   * @param info input info
+   * @param doc xqdoc documentation (may be {@code null} or empty)
+   * @param sc static context
    */
-  StaticScope(final VarScope scp, final String xqdoc, final StaticContext sctx,
-              final InputInfo ii) {
-    sc = sctx;
-    scope = scp;
-    info = ii;
-    doc = xqdoc != null && !xqdoc.isEmpty() ? Token.token(xqdoc) : null;
+  StaticScope(final VarScope scope, final String doc, final StaticContext sc,
+      final InputInfo info) {
+    this.sc = sc;
+    this.scope = scope;
+    this.info = info;
+    this.doc = doc != null && !doc.isEmpty() ? Token.token(doc) : null;
   }
 
   @Override

@@ -20,17 +20,18 @@ public final class FNUnit extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNUnit(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNUnit(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _UNIT_ASSERT:        return assrt(ctx);
       case _UNIT_ASSERT_EQUALS: return assertEquals(ctx);
       case _UNIT_FAIL:          return fail(ctx);
@@ -45,8 +46,8 @@ public final class FNUnit extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item assrt(final QueryContext ctx) throws QueryException {
-    final byte[] str = expr.length < 2 ? null : checkStr(expr[1], ctx);
-    if(expr[0].ebv(ctx, info).bool(info)) return null;
+    final byte[] str = exprs.length < 2 ? null : checkStr(exprs[1], ctx);
+    if(exprs[0].ebv(ctx, info).bool(info)) return null;
     throw str == null ? UNIT_ASSERT.get(info) : UNIT_MESSAGE.get(info, str);
   }
 
@@ -57,8 +58,8 @@ public final class FNUnit extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item assertEquals(final QueryContext ctx) throws QueryException {
-    final byte[] str = expr.length < 3 ? null : checkStr(expr[2], ctx);
-    final Iter iter1 = ctx.iter(expr[0]), iter2 = ctx.iter(expr[1]);
+    final byte[] str = exprs.length < 3 ? null : checkStr(exprs[2], ctx);
+    final Iter iter1 = ctx.iter(exprs[0]), iter2 = ctx.iter(exprs[1]);
     final Compare comp = new Compare(info);
     Item it1, it2;
     int c = 1;
@@ -81,6 +82,6 @@ public final class FNUnit extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item fail(final QueryContext ctx) throws QueryException {
-    throw UNIT_MESSAGE.get(info, checkStr(expr[0], ctx));
+    throw UNIT_MESSAGE.get(info, checkStr(exprs[0], ctx));
   }
 }

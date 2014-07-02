@@ -26,17 +26,18 @@ public final class FNHtml extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNHtml(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNHtml(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _HTML_PARSER: return Str.get(HtmlParser.parser());
       case _HTML_PARSE:  return parse(ctx);
       default:           return super.item(ctx, ii);
@@ -50,7 +51,7 @@ public final class FNHtml extends StandardFunc {
    * @throws QueryException query exception
    */
   private DBNode parse(final QueryContext ctx) throws QueryException {
-    final byte[] in = checkStrBin(checkItem(expr[0], ctx));
+    final byte[] in = checkStrBin(checkItem(exprs[0], ctx));
     final HtmlOptions opts = checkOptions(1, Q_OPTIONS, new HtmlOptions(), ctx);
     try {
       return new DBNode(new HtmlParser(new IOContent(in), ctx.context.options, opts));

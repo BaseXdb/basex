@@ -17,20 +17,21 @@ public final class FNDate extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNDate(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNDate(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Item it = expr[0].item(ctx, info);
+    final Item it = exprs[0].item(ctx, info);
     if(it == null) return null;
 
-    switch(sig) {
+    switch(func) {
       case YEARS_FROM_DURATION:
         return Int.get(checkDur(it).yea());
       case YEAR_FROM_DATETIME:
@@ -131,7 +132,7 @@ public final class FNDate extends StandardFunc {
    * @throws QueryException query exception
    */
   private ADate dateTime(final Item date, final QueryContext ctx) throws QueryException {
-    final Item zon = expr.length == 2 ? expr[1].item(ctx, info) : null;
+    final Item zon = exprs.length == 2 ? exprs[1].item(ctx, info) : null;
     if(zon == null) return null;
     final Dat d = date.type.isUntyped() ? new Dat(date.string(info), info) :
       (Dat) checkType(date, AtomType.DAT);
@@ -157,8 +158,8 @@ public final class FNDate extends StandardFunc {
       final ADate a = (ADate) checkType(it, t);
       ad = t == AtomType.TIM ? new Tim(a) : t == AtomType.DAT ? new Dat(a) : new Dtm(a);
     }
-    final boolean spec = expr.length == 2;
-    final Item zon = spec ? expr[1].item(ctx, info) : null;
+    final boolean spec = exprs.length == 2;
+    final Item zon = spec ? exprs[1].item(ctx, info) : null;
     ad.timeZone(zon == null ? null : (DTDur) checkType(zon, AtomType.DTD), spec, info);
     return ad;
   }

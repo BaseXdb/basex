@@ -24,9 +24,9 @@ public final class PathNode {
   /** Node kind, defined in the {@link Data} class. */
   public final byte kind;
   /** Parent. */
-  public final PathNode par;
+  public final PathNode parent;
   /** Children. */
-  public PathNode[] ch;
+  public PathNode[] children;
   /** Node kind. */
   public final Stats stats;
 
@@ -39,79 +39,79 @@ public final class PathNode {
 
   /**
    * Default constructor.
-   * @param n node name
-   * @param k node kind
-   * @param p parent node
+   * @param name node name
+   * @param kind node kind
+   * @param parent parent node
    */
-  private PathNode(final int n, final byte k, final PathNode p) {
-    this(n, k, p, 1);
+  private PathNode(final int name, final byte kind, final PathNode parent) {
+    this(name, kind, parent, 1);
   }
 
   /**
    * Default constructor.
-   * @param n node name
-   * @param k node kind
-   * @param p parent node
-   * @param c counter
+   * @param name node name
+   * @param kind node kind
+   * @param parent parent node
+   * @param count counter
    */
-  private PathNode(final int n, final byte k, final PathNode p, final int c) {
-    ch = new PathNode[0];
-    name = (short) n;
-    kind = k;
-    par = p;
+  private PathNode(final int name, final byte kind, final PathNode parent, final int count) {
+    this.children = new PathNode[0];
+    this.name = (short) name;
+    this.kind = kind;
+    this.parent = parent;
     stats = new Stats();
-    stats.count = c;
+    stats.count = count;
   }
 
   /**
    * Constructor, specifying an input stream.
    * @param in input stream
-   * @param p parent node
+   * @param node parent node
    * @throws IOException I/O exception
    */
-  PathNode(final DataInput in, final PathNode p) throws IOException {
+  PathNode(final DataInput in, final PathNode node) throws IOException {
     name = (short) in.readNum();
     kind = (byte) in.read();
-    final int s = in.readNum();
-    ch = new PathNode[in.readNum()];
+    final int count = in.readNum();
+    children = new PathNode[in.readNum()];
     if(in.readDouble() == 1) {
       // "1" indicates the format introduced with Version 7.1
       stats = new Stats(in);
     } else {
       // create old format
       stats = new Stats();
-      stats.count = s;
+      stats.count = count;
     }
-    par = p;
-    for(int i = 0; i < ch.length; ++i) ch[i] = new PathNode(in, this);
+    parent = node;
+    for(int c = 0; c < children.length; ++c) children[c] = new PathNode(in, this);
   }
 
   /**
-   * Indexes the specified name along with its kind.
-   * @param n name id
-   * @param k node kind
-   * @param v value
-   * @param md meta data
+   * Indexes the specified name and its kind.
+   * @param nm name id
+   * @param knd node kind
+   * @param val value
+   * @param meta meta data
    * @return node reference
    */
-  PathNode index(final int n, final byte k, final byte[] v, final MetaData md) {
-    for(final PathNode c : ch) {
-      if(c.kind == k && c.name == n) {
-        if(v != null) c.stats.add(v, md);
+  PathNode index(final int nm, final byte knd, final byte[] val, final MetaData meta) {
+    for(final PathNode c : children) {
+      if(c.kind == knd && c.name == nm) {
+        if(val != null) c.stats.add(val, meta);
         c.stats.count++;
         return c;
       }
     }
 
-    final PathNode pn = new PathNode(n, k, this);
-    if(v != null) pn.stats.add(v, md);
+    final PathNode node = new PathNode(nm, knd, this);
+    if(val != null) node.stats.add(val, meta);
 
-    final int cs = ch.length;
-    final PathNode[] tmp = new PathNode[cs + 1];
-    System.arraycopy(ch, 0, tmp, 0, cs);
-    tmp[cs] = pn;
-    ch = tmp;
-    return pn;
+    final int cs = children.length;
+    final PathNode[] nodes = new PathNode[cs + 1];
+    System.arraycopy(children, 0, nodes, 0, cs);
+    nodes[cs] = node;
+    children = nodes;
+    return node;
   }
 
   /**
@@ -123,17 +123,17 @@ public final class PathNode {
     out.writeNum(name);
     out.write1(kind);
     out.writeNum(0);
-    out.writeNum(ch.length);
+    out.writeNum(children.length);
     out.writeDouble(1);
 
     // update leaf flag
     boolean leaf = stats.isLeaf();
-    for(final PathNode c : ch) {
-      leaf &= c.kind == Data.TEXT || c.kind == Data.ATTR;
+    for(final PathNode child : children) {
+      leaf &= child.kind == Data.TEXT || child.kind == Data.ATTR;
     }
     stats.setLeaf(leaf);
     stats.write(out);
-    for(final PathNode c : ch) c.write(out);
+    for(final PathNode child : children) child.write(out);
   }
 
   /**
@@ -142,19 +142,19 @@ public final class PathNode {
    */
   void addDesc(final ArrayList<PathNode> nodes) {
     nodes.add(this);
-    for(final PathNode n : ch) n.addDesc(nodes);
+    for(final PathNode child : children) child.addDesc(nodes);
   }
 
   /**
    * Recursively adds the node and its descendants to the specified list
    * with the specified name.
    * @param nodes node list
-   * @param n name id
-   * @param k node kind
+   * @param nm name id
+   * @param knd node kind
    */
-  void addDesc(final ArrayList<PathNode> nodes, final int n, final int k) {
-    if(n == name && k == kind) nodes.add(this);
-    for(final PathNode pn : ch) pn.addDesc(nodes, n, k);
+  void addDesc(final ArrayList<PathNode> nodes, final int nm, final int knd) {
+    if(nm == name && knd == kind) nodes.add(this);
+    for(final PathNode child : children) child.addDesc(nodes, nm, knd);
   }
 
   /**
@@ -178,10 +178,10 @@ public final class PathNode {
    * @return level
    */
   public int level() {
-    PathNode pn = par;
+    PathNode pn = parent;
     int c = 0;
     while(pn != null) {
-      pn = pn.par;
+      pn = pn.parent;
       ++c;
     }
     return c;
@@ -190,13 +190,13 @@ public final class PathNode {
   /**
    * Returns a string representation of a path summary node.
    * @param data data reference
-   * @param l level
+   * @param level level
    * @return string representation
    */
-  byte[] info(final Data data, final int l) {
+  byte[] info(final Data data, final int level) {
     final TokenBuilder tb = new TokenBuilder();
-    if(l != 0) tb.add(Text.NL);
-    for(int i = 0; i < l << 1; ++i) tb.add(' ');
+    if(level != 0) tb.add(Text.NL);
+    for(int i = 0; i < level << 1; ++i) tb.add(' ');
     switch(kind) {
       case Data.DOC:  tb.add(DOC); break;
       case Data.ELEM: tb.add(data.tagindex.key(name)); break;
@@ -206,7 +206,7 @@ public final class PathNode {
       case Data.PI:   tb.add(PI); break;
     }
     tb.add(": " + stats);
-    for(final PathNode p : ch) tb.add(p.info(data, l + 1));
+    for(final PathNode p : children) tb.add(p.info(data, level + 1));
     return tb.finish();
   }
 }

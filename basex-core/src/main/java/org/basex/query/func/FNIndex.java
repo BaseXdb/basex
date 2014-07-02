@@ -49,17 +49,18 @@ public final class FNIndex extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNIndex(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNIndex(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _INDEX_FACETS: return facets(ctx);
       default: return super.item(ctx, ii);
     }
@@ -67,7 +68,7 @@ public final class FNIndex extends StandardFunc {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _INDEX_TEXTS: return values(ctx, IndexType.TEXT);
       case _INDEX_ATTRIBUTES: return values(ctx, IndexType.ATTRIBUTE);
       case _INDEX_ELEMENT_NAMES: return names(ctx, IndexType.TAG);
@@ -84,7 +85,7 @@ public final class FNIndex extends StandardFunc {
    */
   private Item facets(final QueryContext ctx) throws QueryException {
     final Data data = checkData(ctx);
-    final boolean flat = expr.length == 2 && eq(checkStr(expr[1], ctx), FLAT);
+    final boolean flat = exprs.length == 2 && eq(checkStr(exprs[1], ctx), FLAT);
     return new FDoc().add(flat ? flat(data) : tree(data, data.paths.root().get(0)));
   }
 
@@ -97,11 +98,11 @@ public final class FNIndex extends StandardFunc {
    */
   private Iter values(final QueryContext ctx, final IndexType it) throws QueryException {
     final Data data = checkData(ctx);
-    final byte[] entry = expr.length < 2 ? EMPTY : checkStr(expr[1], ctx);
+    final byte[] entry = exprs.length < 2 ? EMPTY : checkStr(exprs[1], ctx);
     if(data.inMemory()) throw BXDB_MEM.get(info, data.meta.name);
 
-    final IndexEntries et = expr.length < 3 ? new IndexEntries(entry, it) :
-      new IndexEntries(entry, checkBln(expr[2], ctx), it);
+    final IndexEntries et = exprs.length < 3 ? new IndexEntries(entry, it) :
+      new IndexEntries(entry, checkBln(exprs[2], ctx), it);
     return entries(data, et, this);
   }
 
@@ -204,7 +205,7 @@ public final class FNIndex extends StandardFunc {
     final Names names = elm ? data.tagindex : data.atnindex;
     if(root.kind == Data.ATTR || elm) elem.add(NAME, names.key(root.name));
     stats(root.stats, elem);
-    for(final PathNode p : root.ch) elem.add(tree(data, p));
+    for(final PathNode p : root.children) elem.add(tree(data, p));
     return elem;
   }
 

@@ -40,14 +40,14 @@ public final class Catch extends Single {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param c supported error codes
-   * @param vs variables to be bound
+   * @param info input info
+   * @param codes supported error codes
+   * @param vars variables to be bound
    */
-  public Catch(final InputInfo ii, final NameTest[] c, final Var[] vs) {
-    super(ii, null);
-    vars = vs;
-    codes = c;
+  public Catch(final InputInfo info, final NameTest[] codes, final Var[] vars) {
+    super(info, null);
+    this.vars = vars;
+    this.codes = codes;
   }
 
   @Override

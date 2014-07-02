@@ -17,12 +17,12 @@ final class DateParser extends TokenParser {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param p picture
+   * @param info input info
+   * @param picture picture
    */
-  DateParser(final InputInfo ii, final byte[] p) {
-    super(p);
-    info = ii;
+  DateParser(final InputInfo info, final byte[] picture) {
+    super(picture);
+    this.info = info;
   }
 
   /**

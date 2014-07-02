@@ -43,12 +43,12 @@ public final class Constr {
 
   /**
    * Creates the children of the constructor.
-   * @param ii input info
-   * @param sctx static context
+   * @param info input info
+   * @param sc static context
    */
-  public Constr(final InputInfo ii, final StaticContext sctx) {
-    info = ii;
-    sc = sctx;
+  public Constr(final InputInfo info, final StaticContext sc) {
+    this.info = info;
+    this.sc = sc;
   }
 
   /**

@@ -50,30 +50,31 @@ public final class FTWords extends FTExpr {
 
   /**
    * Constructor for scan-based evaluation.
-   * @param ii input info
-   * @param e expression
-   * @param m search mode
-   * @param o occurrences
+   * @param info input info
+   * @param query query expression
+   * @param mode search mode
+   * @param occ occurrences
    */
-  public FTWords(final InputInfo ii, final Expr e, final FTMode m, final Expr[] o) {
-    super(ii);
-    query = e;
-    mode = m;
-    occ = o;
+  public FTWords(final InputInfo info, final Expr query, final FTMode mode, final Expr[] occ) {
+    super(info);
+    this.query = query;
+    this.mode = mode;
+    this.occ = occ;
   }
 
   /**
    * Constructor for index-based evaluation.
-   * @param ii input info
-   * @param ic index context
-   * @param t query terms
-   * @param m search mode
+   * @param info input info
+   * @param ictx index context
+   * @param query query terms
+   * @param mode search mode
    */
-  public FTWords(final InputInfo ii, final IndexContext ic, final Value t, final FTMode m) {
-    super(ii);
-    query = t;
-    mode = m;
-    ictx = ic;
+  public FTWords(final InputInfo info, final IndexContext ictx, final Value query,
+      final FTMode mode) {
+    super(info);
+    this.query = query;
+    this.mode = mode;
+    this.ictx = ictx;
   }
 
   @Override
@@ -449,7 +450,7 @@ public final class FTWords extends FTExpr {
   public int exprSize() {
     int sz = 1;
     if(occ != null) for(final Expr o : occ) sz += o.exprSize();
-    for(final Expr e : expr) sz += e.exprSize();
+    for(final Expr e : exprs) sz += e.exprSize();
     return sz + query.exprSize();
   }
 

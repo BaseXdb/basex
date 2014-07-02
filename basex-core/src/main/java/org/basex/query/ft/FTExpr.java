@@ -17,29 +17,29 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public abstract class FTExpr extends ParseExpr {
-  /** Expression list. */
-  public final FTExpr[] expr;
+  /** Expressions. */
+  public final FTExpr[] exprs;
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
+   * @param info input info
+   * @param exprs expressions
    */
-  FTExpr(final InputInfo ii, final FTExpr... e) {
-    super(ii);
-    expr = e;
+  FTExpr(final InputInfo info, final FTExpr... exprs) {
+    super(info);
+    this.exprs = exprs;
     type = SeqType.BLN;
   }
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoneUp(expr);
+    checkNoneUp(exprs);
   }
 
   @Override
   public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    final int es = expr.length;
-    for(int e = 0; e < es; e++) expr[e] = expr[e].compile(ctx, scp);
+    final int es = exprs.length;
+    for(int e = 0; e < es; e++) exprs[e] = exprs[e].compile(ctx, scp);
     return this;
   }
 
@@ -68,25 +68,25 @@ public abstract class FTExpr extends ParseExpr {
 
   @Override
   public boolean has(final Flag flag) {
-    for(final FTExpr e : expr) if(e.has(flag)) return true;
+    for(final FTExpr e : exprs) if(e.has(flag)) return true;
     return false;
   }
 
   @Override
   public boolean removable(final Var v) {
-    for(final Expr e : expr) if(!e.removable(v)) return false;
+    for(final Expr e : exprs) if(!e.removable(v)) return false;
     return true;
   }
 
   @Override
   public VarUsage count(final Var v) {
-    return VarUsage.sum(v, expr);
+    return VarUsage.sum(v, exprs);
   }
 
   @Override
   public FTExpr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
       throws QueryException {
-    return inlineAll(ctx, scp, expr, v, e) ? optimize(ctx, scp) : null;
+    return inlineAll(ctx, scp, exprs, v, e) ? optimize(ctx, scp) : null;
   }
 
   @Override
@@ -94,8 +94,8 @@ public abstract class FTExpr extends ParseExpr {
 
   @Override
   public FTExpr indexEquivalent(final IndexCosts ic) throws QueryException {
-    final int es = expr.length;
-    for(int e = 0; e < es; e++) expr[e] = expr[e].indexEquivalent(ic);
+    final int es = exprs.length;
+    for(int e = 0; e < es; e++) exprs[e] = exprs[e].indexEquivalent(ic);
     return this;
   }
 
@@ -104,24 +104,24 @@ public abstract class FTExpr extends ParseExpr {
    * @return result of check
    */
   boolean usesExclude() {
-    for(final FTExpr e : expr) if(e.usesExclude()) return true;
+    for(final FTExpr e : exprs) if(e.usesExclude()) return true;
     return false;
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(), expr);
+    addPlan(plan, planElem(), exprs);
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, expr);
+    return visitAll(visitor, exprs);
   }
 
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final Expr e : expr) sz += e.exprSize();
+    for(final Expr e : exprs) sz += e.exprSize();
     return sz;
   }
 
@@ -132,8 +132,8 @@ public abstract class FTExpr extends ParseExpr {
    */
   final String toString(final Object sep) {
     final StringBuilder sb = new StringBuilder();
-    final int es = expr.length;
-    for(int e = 0; e < es; e++) sb.append(e == 0 ? "" : sep.toString()).append(expr[e]);
+    final int es = exprs.length;
+    for(int e = 0; e < es; e++) sb.append(e == 0 ? "" : sep.toString()).append(exprs[e]);
     return sb.toString();
   }
 }

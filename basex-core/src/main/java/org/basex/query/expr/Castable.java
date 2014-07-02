@@ -25,21 +25,26 @@ public final class Castable extends Single {
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
+   * @param sc static context
+   * @param info input info
    * @param e expression
-   * @param s sequence type
+   * @param seq sequence type
    */
-  public Castable(final StaticContext sctx, final InputInfo ii, final Expr e, final SeqType s) {
-    super(ii, e);
-    sc = sctx;
-    seq = s;
+  public Castable(final StaticContext sc, final InputInfo info, final Expr e, final SeqType seq) {
+    super(info, e);
+    this.sc = sc;
+    this.seq = seq;
     type = SeqType.BLN;
   }
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
+    return optimize(ctx, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     return expr.isValue() ? preEval(ctx) : this;
   }
 

@@ -30,16 +30,16 @@ public final class ValueAccess extends IndexAccess {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e index expression
-   * @param t access type
-   * @param ic index context
+   * @param info input info
+   * @param expr index expression
+   * @param type access type
+   * @param ictx index context
    */
-  public ValueAccess(final InputInfo ii, final Expr e, final IndexType t,
-      final IndexContext ic) {
-    super(ic, ii);
-    expr = e;
-    itype = t;
+  public ValueAccess(final InputInfo info, final Expr expr, final IndexType type,
+      final IndexContext ictx) {
+    super(ictx, info);
+    this.expr = expr;
+    this.itype = type;
   }
 
   @Override

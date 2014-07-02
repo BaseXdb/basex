@@ -612,10 +612,8 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void textMerging04() throws Exception {
     createDB(null);
-    query("let $i := //item[@id='item0'] return insert node 'foo' " +
-      "before $i/location/text()");
-    query("let $i := //item[@id='item0'] return " +
-      "($i/location/text())[1]", "fooUnited States");
+    query("let $i := //item[@id='item0'] return insert node 'foo' before $i/location/text()");
+    query("let $i := //item[@id='item0'] return ($i/location/text())[1]", "fooUnited States");
   }
 
   /**
@@ -640,8 +638,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     createDB(null);
     query("let $i := //item[@id='item0']/location return " +
       "(insert node <n/> into $i, insert node 'foo' as last into $i)");
-    query("let $i := //item[@id='item0']/location return " +
-      "delete node $i/n");
+    query("let $i := //item[@id='item0']/location return delete node $i/n");
     query("(//item[@id='item0']/location/text())[1]", "United Statesfoo");
   }
 
@@ -652,8 +649,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void textMerging07() throws Exception {
     createDB(null);
-    query("let $i := //item[@id='item0']/location return " +
-      "insert node 'foo' after $i/text()");
+    query("let $i := //item[@id='item0']/location return insert node 'foo' after $i/text()");
     query("(//item[@id='item0']/location/text())[1]", "United Statesfoo");
   }
 
@@ -664,13 +660,12 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void textMerging08() throws Exception {
     createDB(null);
-    query("let $i := //item[@id='item0'] return " +
-      "(insert node 'foo' after $i/location)");
+    query("let $i := //item[@id='item0'] return (insert node 'foo' after $i/location)");
     query("let $i := //item[@id='item0']/location return " +
       "(insert node 'foo' after $i, insert node 'faa' before $i, insert " +
       "node 'faa' into $i, delete node $i/text())");
-    query("let $i := //item[@id='item0']/location " +
-      "return ($i/text(), ($i/../text())[2])", "faafoofoo");
+    query("let $i := //item[@id='item0']/location return ($i/text(), ($i/../text())[2])",
+        "faafoofoo");
   }
 
   /**

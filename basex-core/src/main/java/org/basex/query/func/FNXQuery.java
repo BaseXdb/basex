@@ -45,17 +45,18 @@ public final class FNXQuery extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNXQuery(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNXQuery(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _XQUERY_EVAL:   return eval(ctx, false);
       case _XQUERY_UPDATE: return eval(ctx, true);
       case _XQUERY_INVOKE: return invoke(ctx);
@@ -66,7 +67,7 @@ public final class FNXQuery extends StandardFunc {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _XQUERY_EVAL:   return eval(ctx, false).value();
       case _XQUERY_UPDATE: return eval(ctx, true).value();
       case _XQUERY_INVOKE: return invoke(ctx).value();
@@ -77,7 +78,7 @@ public final class FNXQuery extends StandardFunc {
 
   @Override
   protected Expr opt(final QueryContext ctx, final VarScope scp) {
-    return sig == _XQUERY_TYPE ? type(ctx) : this;
+    return func == _XQUERY_TYPE ? type(ctx) : this;
   }
 
   /**
@@ -88,7 +89,7 @@ public final class FNXQuery extends StandardFunc {
    * @throws QueryException query exception
    */
   private ValueBuilder eval(final QueryContext ctx, final boolean updating) throws QueryException {
-    return eval(ctx, checkStr(expr[0], ctx), null, updating);
+    return eval(ctx, checkStr(exprs[0], ctx), null, updating);
   }
 
   /**
@@ -110,7 +111,7 @@ public final class FNXQuery extends StandardFunc {
 
     final Timer to = new Timer(true);
     final Perm tmp = ctx.context.user.perm;
-    if(expr.length > 2) {
+    if(exprs.length > 2) {
       final Options opts = checkOptions(2, Q_OPTIONS, new XQueryOptions(), ctx);
       ctx.context.user.perm = Perm.get(opts.get(XQueryOptions.PERMISSION));
       // initial memory consumption: perform garbage collection and calculate usage
@@ -181,7 +182,7 @@ public final class FNXQuery extends StandardFunc {
    */
   private ValueBuilder invoke(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    final IO io = checkPath(expr[0], ctx);
+    final IO io = checkPath(exprs[0], ctx);
     try {
       return eval(ctx, io.read(), io.path(), false);
     } catch(final IOException ex) {
@@ -195,14 +196,14 @@ public final class FNXQuery extends StandardFunc {
    * @return the argument expression
    */
   private Expr type(final QueryContext ctx) {
-    FNInfo.dump(Util.inf("{ type: %, size: %, exprSize: % }", expr[0].type(), expr[0].size(),
-        expr[0].exprSize()), token(expr[0].toString()), ctx);
-    return expr[0];
+    FNInfo.dump(Util.inf("{ type: %, size: %, exprSize: % }", exprs[0].type(), exprs[0].size(),
+        exprs[0].exprSize()), token(exprs[0].toString()), ctx);
+    return exprs[0];
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return !(oneOf(sig, _XQUERY_EVAL, _XQUERY_UPDATE, _XQUERY_INVOKE) && !visitor.lock(null)) &&
+    return !(oneOf(func, _XQUERY_EVAL, _XQUERY_UPDATE, _XQUERY_INVOKE) && !visitor.lock(null)) &&
       super.accept(visitor);
   }
 }

@@ -19,11 +19,11 @@ import org.basex.util.hash.*;
 public final class And extends Logical {
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression list
+   * @param info input info
+   * @param exprs expressions
    */
-  public And(final InputInfo ii, final Expr... e) {
-    super(ii, e);
+  public And(final InputInfo info, final Expr... exprs) {
+    super(info, exprs);
   }
 
   @Override
@@ -36,12 +36,12 @@ public final class And extends Logical {
   @Override
   public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     // merge predicates if possible
-    final int es = expr.length;
+    final int es = exprs.length;
     final ExprList el = new ExprList(es);
     Pos ps = null;
     CmpR cr = null;
     CmpSR cs = null;
-    for(final Expr e : expr) {
+    for(final Expr e : exprs) {
       Expr tmp = null;
       if(e instanceof Pos) {
         // merge numeric predicates
@@ -73,11 +73,11 @@ public final class And extends Logical {
     if(el.isEmpty()) return optPre(Bln.TRUE, ctx);
 
     if(es != el.size()) ctx.compInfo(OPTWRITE, this);
-    expr = el.finish();
+    exprs = el.finish();
     compFlatten(ctx);
 
     boolean not = true;
-    for(final Expr e : expr) {
+    for(final Expr e : exprs) {
       if(!e.isFunction(Function.NOT)) {
         not = false;
         break;
@@ -86,40 +86,40 @@ public final class And extends Logical {
 
     if(not) {
       ctx.compInfo(OPTWRITE, this);
-      final Expr[] inner = new Expr[expr.length];
-      for(int i = 0; i < inner.length; i++) inner[i] = ((Arr) expr[i]).expr[0];
+      final Expr[] inner = new Expr[exprs.length];
+      for(int i = 0; i < inner.length; i++) inner[i] = ((Arr) exprs[i]).exprs[0];
       final Expr or = new Or(info, inner).optimize(ctx, scp);
       return Function.NOT.get(null, or).optimize(ctx, scp);
     }
 
     // return single expression if it yields a boolean
-    return expr.length == 1 ? compBln(expr[0], info) : this;
+    return exprs.length == 1 ? compBln(exprs[0], info) : this;
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    for(int i = 0; i < expr.length - 1; i++)
-      if(!expr[i].ebv(ctx, info).bool(info)) return Bln.FALSE;
-    final Expr last = expr[expr.length - 1];
+    for(int i = 0; i < exprs.length - 1; i++)
+      if(!exprs[i].ebv(ctx, info).bool(info)) return Bln.FALSE;
+    final Expr last = exprs[exprs.length - 1];
     return tailCall ? last.item(ctx, ii) : last.ebv(ctx, ii).bool(ii) ? Bln.TRUE : Bln.FALSE;
   }
 
   @Override
   public And copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vars) {
-    final int es = expr.length;
+    final int es = exprs.length;
     final Expr[] ex = new Expr[es];
-    for(int i = 0; i < es; i++) ex[i] = expr[i].copy(ctx, scp, vars);
+    for(int i = 0; i < es; i++) ex[i] = exprs[i].copy(ctx, scp, vars);
     return new And(info, ex);
   }
 
   @Override
   public boolean indexAccessible(final IndexCosts ic) throws QueryException {
     int is = 0;
-    final int es = expr.length;
+    final int es = exprs.length;
     final int[] ics = new int[es];
     boolean ia = true;
     for(int e = 0; e < es; ++e) {
-      if(expr[e].indexAccessible(ic) && !ic.seq) {
+      if(exprs[e].indexAccessible(ic) && !ic.seq) {
         // skip queries with no results
         if(ic.costs() == 0) return true;
         // summarize costs
@@ -134,8 +134,8 @@ public final class And extends Logical {
       // evaluate arguments with high selectivity first
       final int[] ord = Array.createOrder(ics, true);
       final Expr[] ex = new Expr[es];
-      for(int e = 0; e < es; ++e) ex[e] = expr[ord[e]];
-      expr = ex;
+      for(int e = 0; e < es; ++e) ex[e] = exprs[ord[e]];
+      exprs = ex;
     }
 
     ic.costs(is);
@@ -145,7 +145,7 @@ public final class And extends Logical {
   @Override
   public Expr indexEquivalent(final IndexCosts ic) throws QueryException {
     super.indexEquivalent(ic);
-    return new InterSect(info, expr);
+    return new InterSect(info, exprs);
   }
 
   @Override

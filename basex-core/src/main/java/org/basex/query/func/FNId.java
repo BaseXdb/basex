@@ -23,23 +23,24 @@ public final class FNId extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNId(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNId(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     // functions have 1 or 2 arguments...
-    final ANode node = checkNode(expr.length == 2 ? expr[1] : checkCtx(ctx), ctx);
+    final ANode node = checkNode(exprs.length == 2 ? exprs[1] : checkCtx(ctx), ctx);
 
-    switch(sig) {
-      case ID:              return id(ctx.iter(expr[0]), node);
-      case IDREF:           return idref(ctx.iter(expr[0]), node);
-      case ELEMENT_WITH_ID: return elid(ctx.iter(expr[0]), node);
+    switch(func) {
+      case ID:              return id(ctx.iter(exprs[0]), node);
+      case IDREF:           return idref(ctx.iter(exprs[0]), node);
+      case ELEMENT_WITH_ID: return elid(ctx.iter(exprs[0]), node);
       default:              return super.iter(ctx);
     }
   }
@@ -47,10 +48,10 @@ public final class FNId extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     // functions have 1 or 2 arguments...
-    final ANode node = checkNode(expr.length == 2 ? expr[1] : checkCtx(ctx), ctx);
+    final ANode node = checkNode(exprs.length == 2 ? exprs[1] : checkCtx(ctx), ctx);
 
-    switch(sig) {
-      case LANG:  return lang(lc(checkEStr(expr[0], ctx)), node);
+    switch(func) {
+      case LANG:  return lang(lc(checkEStr(exprs[0], ctx)), node);
       default:    return super.item(ctx, ii);
     }
   }
@@ -175,6 +176,6 @@ public final class FNId extends StandardFunc {
 
   @Override
   public boolean has(final Flag flag) {
-    return flag == Flag.CTX && expr.length == 1 || super.has(flag);
+    return flag == Flag.CTX && exprs.length == 1 || super.has(flag);
   }
 }

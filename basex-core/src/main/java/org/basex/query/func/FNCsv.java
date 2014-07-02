@@ -29,17 +29,18 @@ public class FNCsv extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNCsv(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNCsv(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _CSV_PARSE:     return parse(ctx);
       case _CSV_SERIALIZE: return serialize(ctx);
       default:             return super.item(ctx, ii);
@@ -53,7 +54,7 @@ public class FNCsv extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item parse(final QueryContext ctx) throws QueryException {
-    final byte[] input = checkStr(expr[0], ctx);
+    final byte[] input = checkStr(exprs[0], ctx);
     final CsvParserOptions opts = checkOptions(1, Q_OPTIONS, new CsvParserOptions(), ctx);
     try {
       final CsvConverter conv = CsvConverter.get(opts);
@@ -71,7 +72,7 @@ public class FNCsv extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str serialize(final QueryContext ctx) throws QueryException {
-    final Iter iter = ctx.iter(expr[0]);
+    final Iter iter = ctx.iter(exprs[0]);
     final CsvOptions copts = checkOptions(1, Q_OPTIONS, new CsvOptions(), ctx);
 
     final SerializerOptions sopts = new SerializerOptions();

@@ -17,13 +17,13 @@ import org.basex.util.hash.*;
 final class IterStep extends Step {
   /**
    * Constructor.
-   * @param ii input info
-   * @param a axis
-   * @param t node test
-   * @param p predicates
+   * @param info input info
+   * @param axis axis
+   * @param test node test
+   * @param preds predicates
    */
-  IterStep(final InputInfo ii, final Axis a, final Test t, final Expr[] p) {
-    super(ii, a, t, p);
+  IterStep(final InputInfo info, final Axis axis, final Test test, final Expr[] preds) {
+    super(info, axis, test, preds);
   }
 
   @Override

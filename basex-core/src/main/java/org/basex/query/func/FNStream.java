@@ -16,17 +16,18 @@ public final class FNStream extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNStream(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNStream(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _STREAM_MATERIALIZE:   return materialize(ctx);
       case _STREAM_IS_STREAMABLE: return isStreamable(ctx);
       default:                    return super.item(ctx, ii);
@@ -40,7 +41,7 @@ public final class FNStream extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item materialize(final QueryContext ctx) throws QueryException {
-    return checkItem(expr[0], ctx).materialize(info);
+    return checkItem(exprs[0], ctx).materialize(info);
   }
 
   /**
@@ -50,13 +51,13 @@ public final class FNStream extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item isStreamable(final QueryContext ctx) throws QueryException {
-    final Item it = checkItem(expr[0], ctx);
+    final Item it = checkItem(exprs[0], ctx);
     return Bln.get(it instanceof StrStream || it instanceof B64Stream);
   }
 
   @Override
   protected Expr opt(final QueryContext ctx, final VarScope scp) {
-    if(sig == Function._STREAM_MATERIALIZE) type = expr[0].type();
+    if(func == Function._STREAM_MATERIALIZE) type = exprs[0].type();
     return this;
   }
 }

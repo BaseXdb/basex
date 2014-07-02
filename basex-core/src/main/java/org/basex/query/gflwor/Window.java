@@ -43,24 +43,24 @@ public final class Window extends Clause {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param slide {@code sliding window} flag
-   * @param v window variable
-   * @param in sequence
-   * @param st start condition
-   * @param o {@code only} flag
-   * @param nd end condition
+   * @param info input info
+   * @param sliding {@code sliding window} flag
+   * @param var window variable
+   * @param expr sequence
+   * @param start start condition
+   * @param only {@code only} flag
+   * @param end end condition
    * @throws QueryException query exception
    */
-  public Window(final InputInfo ii, final boolean slide, final Var v, final Expr in,
-      final Condition st, final boolean o, final Condition nd) throws QueryException {
-    super(ii, vars(v, st, nd, ii));
-    sliding = slide;
-    var = v;
-    expr = in;
-    start = st;
-    only = o;
-    end = nd;
+  public Window(final InputInfo info, final boolean sliding, final Var var, final Expr expr,
+      final Condition start, final boolean only, final Condition end) throws QueryException {
+    super(info, vars(var, start, end, info));
+    this.sliding = sliding;
+    this.var = var;
+    this.expr = expr;
+    this.start = start;
+    this.only = only;
+    this.end = end;
   }
 
   /**
@@ -68,12 +68,12 @@ public final class Window extends Clause {
    * @param vr window variable
    * @param st start condition
    * @param nd end condition, might be {@code null}
-   * @param ii input info for the error message
+   * @param info input info for the error message
    * @return non-{@code null} variables
    * @throws QueryException query exception if the variable names aren't unique
    */
   private static Var[] vars(final Var vr, final Condition st, final Condition nd,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
     // determine the size of the array beforehand
     final int stn = st.nVars();
     final Var[] vs = new Var[1 + stn + (nd == null ? 0 : nd.nVars())];
@@ -87,15 +87,14 @@ public final class Window extends Clause {
     for(int i = 0; i < vs.length; i++) {
       final Var v = vs[i];
       for(int j = i; --j >= 0;)
-        if(v.name.eq(vs[j].name)) throw WINDOWUNIQ.get(ii, vs[j]);
+        if(v.name.eq(vs[j].name)) throw WINDOWUNIQ.get(info, vs[j]);
     }
     return vs;
   }
 
   @Override
   Eval eval(final Eval sub) {
-    return sliding ? slidingEval(sub) : end == null ? tumblingEval(sub)
-        : tumblingEndEval(sub);
+    return sliding ? slidingEval(sub) : end == null ? tumblingEval(sub) : tumblingEndEval(sub);
   }
 
   /**
@@ -283,8 +282,9 @@ public final class Window extends Clause {
   }
 
   @Override
-  public Clause inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public Clause inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
+
     final Expr ex = expr.inline(ctx, scp, v, e);
     final Condition st = start.inline(ctx, scp, v, e),
         en = end == null ? null : end.inline(ctx, scp, v, e);
@@ -371,22 +371,22 @@ public final class Window extends Clause {
 
     /**
      * Constructor.
-     * @param st start condition flag
-     * @param it item variable
-     * @param p position variable
-     * @param pr previous variable
-     * @param nx next variable
+     * @param start start condition flag
+     * @param item item variable
+     * @param pos position variable
+     * @param prev previous variable
+     * @param next next variable
      * @param cond condition expression
-     * @param ii input info
+     * @param info input info
      */
-    public Condition(final boolean st, final Var it, final Var p, final Var pr,
-        final Var nx, final Expr cond, final InputInfo ii) {
-      super(ii, cond);
-      start = st;
-      item = it;
-      pos = p;
-      prev = pr;
-      next = nx;
+    public Condition(final boolean start, final Var item, final Var pos, final Var prev,
+        final Var next, final Expr cond, final InputInfo info) {
+      super(info, cond);
+      this.start = start;
+      this.item = item;
+      this.pos = pos;
+      this.prev = prev;
+      this.next = next;
     }
 
     @Override

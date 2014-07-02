@@ -37,7 +37,7 @@ public final class Rename extends Update {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Iter t = ctx.iter(expr[0]);
+    final Iter t = ctx.iter(exprs[0]);
     final Item i = t.next();
 
     // check target constraints
@@ -46,11 +46,11 @@ public final class Rename extends Update {
 
     final CNode ex;
     if(i.type == NodeType.ELM) {
-      ex = new CElem(sc, info, expr[1], null);
+      ex = new CElem(sc, info, exprs[1], null);
     } else if(i.type == NodeType.ATT) {
-      ex = new CAttr(sc, info, false, expr[1], Empty.SEQ);
+      ex = new CAttr(sc, info, false, exprs[1], Empty.SEQ);
     } else if(i.type == NodeType.PI) {
-      ex = new CPI(sc, info, expr[1], Empty.SEQ);
+      ex = new CPI(sc, info, exprs[1], Empty.SEQ);
     } else {
       throw UPWRTRGTYP.get(info);
     }
@@ -77,11 +77,11 @@ public final class Rename extends Update {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Rename(sc, info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs));
+    return new Rename(sc, info, exprs[0].copy(ctx, scp, vs), exprs[1].copy(ctx, scp, vs));
   }
 
   @Override
   public String toString() {
-    return RENAME + ' ' + NODE + ' ' + expr[0] + ' ' + AS + ' ' + expr[1];
+    return RENAME + ' ' + NODE + ' ' + exprs[0] + ' ' + AS + ' ' + exprs[1];
   }
 }

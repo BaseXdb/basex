@@ -20,17 +20,17 @@ final class DateFormat extends FormatParser {
 
   /**
    * Constructor.
-   * @param pic variable marker (info picture)
-   * @param df default presentation modifier
-   * @param ii input info
+   * @param picture variable marker (info picture)
+   * @param def default presentation modifier
+   * @param info input info
    * @throws QueryException query exception
    */
-  DateFormat(final byte[] pic, final byte[] df, final InputInfo ii) throws QueryException {
-    super(ii);
+  DateFormat(final byte[] picture, final byte[] def, final InputInfo info) throws QueryException {
+    super(info);
 
     // split variable marker
-    final int comma = lastIndexOf(pic, ',');
-    byte[] pres = comma == -1 ? pic : substring(pic, 0, comma);
+    final int comma = lastIndexOf(picture, ',');
+    byte[] pres = comma == -1 ? picture : substring(picture, 0, comma);
     // extract second presentation modifier
     final int pl = pres.length;
     if(pl > 1) {
@@ -43,13 +43,13 @@ final class DateFormat extends FormatParser {
     }
 
     // choose first character and case
-    finish(pres.length == 0 ? df : presentation(pres, df, true));
+    finish(pres.length == 0 ? def : presentation(pres, def, true));
 
     // check width modifier
-    final byte[] width = comma == -1 ? null : substring(pic, comma + 1);
+    final byte[] width = comma == -1 ? null : substring(picture, comma + 1);
     if(width != null) {
       final Matcher m = WIDTH.matcher(string(width));
-      if(!m.find()) throw PICDATE.get(ii, width);
+      if(!m.find()) throw PICDATE.get(info, width);
       int i = toInt(m.group(1));
       if(i != Integer.MIN_VALUE) min = i;
       final String mc = m.group(3);

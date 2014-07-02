@@ -41,23 +41,23 @@ public final class CmpR extends Single {
 
   /**
    * Constructor.
-   * @param e (compiled) expression
-   * @param mn minimum value
-   * @param in include minimum value
-   * @param mx maximum value
-   * @param ix include maximum value
-   * @param ii input info
+   * @param expr (compiled) expression
+   * @param min minimum value
+   * @param mni include minimum value
+   * @param max maximum value
+   * @param mxi include maximum value
+   * @param info input info
    */
-  private CmpR(final Expr e, final double mn, final boolean in, final double mx, final boolean ix,
-      final InputInfo ii) {
+  private CmpR(final Expr expr, final double min, final boolean mni, final double max,
+      final boolean mxi, final InputInfo info) {
 
-    super(ii, e);
-    min = mn;
-    mni = in;
-    max = mx;
-    mxi = ix;
+    super(info, expr);
+    this.min = min;
+    this.mni = mni;
+    this.max = max;
+    this.mxi = mxi;
     type = SeqType.BLN;
-    atomic = e.type().zeroOrOne();
+    atomic = expr.type().zeroOrOne();
   }
 
   /**
@@ -66,9 +66,9 @@ public final class CmpR extends Single {
    * @return new or original expression
    */
   static Expr get(final CmpG ex) {
-    if(!(ex.expr[1] instanceof ANum)) return ex;
-    final double d = ((ANum) ex.expr[1]).dbl();
-    final Expr e = ex.expr[0];
+    if(!(ex.exprs[1] instanceof ANum)) return ex;
+    final double d = ((ANum) ex.exprs[1]).dbl();
+    final Expr e = ex.exprs[0];
     switch(ex.op.op) {
       case GE: return new CmpR(e, d, true, Double.POSITIVE_INFINITY, true, ex.info);
       case GT: return new CmpR(e, d, false, Double.POSITIVE_INFINITY, true, ex.info);
@@ -117,21 +117,20 @@ public final class CmpR extends Single {
       return mni && mxi ? new CmpG(expr, Dbl.get(mn), CmpG.OpG.EQ, null, info)
                         : Bln.FALSE;
     }
-
     return new CmpR(c.expr, mn, mni && c.mni, mx, mxi && c.mxi, info);
   }
 
   @Override
   public boolean indexAccessible(final IndexCosts ic) {
     // accept only location path, string and equality expressions
-    final Step s = CmpG.indexStep(expr);
-    // sequential main memory is assumed to be faster than range index access
     final Data data = ic.ictx.data;
-    if(s == null || data.inMemory()) return false;
+    final Step step = ic.indexStep(expr);
+    // sequential main memory scan is assumed to be faster than range index access
+    if(step == null || data.inMemory()) return false;
 
     // check which index applies
-    final boolean text = s.test.type == NodeType.TXT && data.meta.textindex;
-    final boolean attr = s.test.type == NodeType.ATT && data.meta.attrindex;
+    final boolean text = step.test.type == NodeType.TXT && data.meta.textindex;
+    final boolean attr = step.test.type == NodeType.ATT && data.meta.attrindex;
     if(!text && !attr || !mni || !mxi) return false;
 
     final Stats key = key(ic, text);
@@ -144,15 +143,14 @@ public final class CmpR extends Single {
       Math.max(1, data.meta.size / 5));
 
     // use index if costs are zero, or if min/max is not infinite
-    return ic.costs() == 0 || min != Double.NEGATIVE_INFINITY &&
-        max != Double.POSITIVE_INFINITY;
+    return ic.costs() == 0 || min != Double.NEGATIVE_INFINITY && max != Double.POSITIVE_INFINITY;
   }
 
   @Override
   public Expr indexEquivalent(final IndexCosts ic) {
-    final boolean text = rt.type() == IndexType.TEXT;
     ic.ctx.compInfo(OPTRNGINDEX);
-    return ic.invert(expr, new RangeAccess(info, rt, ic.ictx), text);
+    final ParseExpr root = new RangeAccess(info, rt, ic.ictx);
+    return ic.invert(expr, root, rt.type() == IndexType.TEXT);
   }
 
   /**

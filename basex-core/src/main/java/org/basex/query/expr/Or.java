@@ -19,11 +19,11 @@ import org.basex.util.hash.*;
 public final class Or extends Logical {
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression list
+   * @param info input info
+   * @param exprs expressions
    */
-  public Or(final InputInfo ii, final Expr... e) {
-    super(ii, e);
+  public Or(final InputInfo info, final Expr... exprs) {
+    super(info, exprs);
   }
 
   @Override
@@ -37,8 +37,8 @@ public final class Or extends Logical {
   public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     // merge predicates if possible
     CmpG cmpg = null;
-    final ExprList el = new ExprList(expr.length);
-    for(final Expr e : expr) {
+    final ExprList el = new ExprList(exprs.length);
+    for(final Expr e : exprs) {
       boolean merged = false;
       if(e instanceof CmpG) {
         // merge general comparisons
@@ -56,14 +56,14 @@ public final class Or extends Logical {
     // all arguments were false()
     if(el.isEmpty()) return optPre(Bln.FALSE, ctx);
 
-    if(expr.length != el.size()) {
+    if(exprs.length != el.size()) {
       ctx.compInfo(OPTWRITE, this);
-      expr = el.finish();
+      exprs = el.finish();
     }
     compFlatten(ctx);
 
     boolean not = true;
-    for(final Expr e : expr) {
+    for(final Expr e : exprs) {
       if(!e.isFunction(Function.NOT)) {
         not = false;
         break;
@@ -72,53 +72,53 @@ public final class Or extends Logical {
 
     if(not) {
       ctx.compInfo(OPTWRITE, this);
-      final Expr[] inner = new Expr[expr.length];
-      for(int i = 0; i < inner.length; i++) inner[i] = ((Arr) expr[i]).expr[0];
+      final Expr[] inner = new Expr[exprs.length];
+      for(int i = 0; i < inner.length; i++) inner[i] = ((Arr) exprs[i]).exprs[0];
       final Expr and = new And(info, inner).optimize(ctx, scp);
       return Function.NOT.get(null, and).optimize(ctx, scp);
     }
 
     // return single expression if it yields a boolean
-    return expr.length == 1 ? compBln(expr[0], info) : this;
+    return exprs.length == 1 ? compBln(exprs[0], info) : this;
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    for(int i = 0; i < expr.length - 1; i++)
-      if(expr[i].ebv(ctx, info).bool(info)) return Bln.TRUE;
-    final Expr last = expr[expr.length - 1];
+    for(int i = 0; i < exprs.length - 1; i++)
+      if(exprs[i].ebv(ctx, info).bool(info)) return Bln.TRUE;
+    final Expr last = exprs[exprs.length - 1];
     return tailCall ? last.item(ctx, ii) : last.ebv(ctx, ii).bool(ii) ? Bln.TRUE : Bln.FALSE;
   }
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Or(info, copyAll(ctx, scp, vs, expr));
+    return new Or(info, copyAll(ctx, scp, vs, exprs));
   }
 
   @Override
   public boolean indexAccessible(final IndexCosts ic) throws QueryException {
     int is = 0;
-    Expr[] exprs = {};
+    Expr[] ex = {};
     boolean ia = true;
-    for(final Expr e : expr) {
-      if(e.indexAccessible(ic) && !ic.seq) {
+    for(final Expr expr : exprs) {
+      if(expr.indexAccessible(ic) && !ic.seq) {
         // skip expressions without results
         if(ic.costs() == 0) continue;
         is += ic.costs();
       } else {
         ia = false;
       }
-      exprs = Array.add(exprs, e);
+      ex = Array.add(ex, expr);
     }
     ic.costs(is);
-    expr = exprs;
+    exprs = ex;
     return ia;
   }
 
   @Override
   public Expr indexEquivalent(final IndexCosts ic) throws QueryException {
     super.indexEquivalent(ic);
-    return new Union(info, expr);
+    return new Union(info, exprs);
   }
 
   @Override

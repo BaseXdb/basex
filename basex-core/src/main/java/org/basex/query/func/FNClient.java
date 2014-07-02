@@ -31,18 +31,19 @@ public final class FNClient extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNClient(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNClient(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    switch(sig) {
+    switch(func) {
       case _CLIENT_QUERY: return query(ctx).iter(ctx);
       default:            return super.iter(ctx);
     }
@@ -50,7 +51,7 @@ public final class FNClient extends StandardFunc {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _CLIENT_QUERY: return query(ctx);
       default:            return super.value(ctx);
     }
@@ -59,7 +60,7 @@ public final class FNClient extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     checkCreate(ctx);
-    switch(sig) {
+    switch(func) {
       case _CLIENT_CONNECT: return connect(ctx);
       case _CLIENT_EXECUTE: return execute(ctx);
       case _CLIENT_INFO:    return info(ctx);
@@ -75,10 +76,10 @@ public final class FNClient extends StandardFunc {
    * @throws QueryException query exception
    */
   private Uri connect(final QueryContext ctx) throws QueryException {
-    final String host = Token.string(checkStr(expr[0], ctx));
-    final String user = Token.string(checkStr(expr[2], ctx));
-    final String pass = Token.string(checkStr(expr[3], ctx));
-    final int port = (int) checkItr(expr[1], ctx);
+    final String host = Token.string(checkStr(exprs[0], ctx));
+    final String user = Token.string(checkStr(exprs[2], ctx));
+    final String pass = Token.string(checkStr(exprs[3], ctx));
+    final int port = (int) checkItr(exprs[1], ctx);
     try {
       return sessions(ctx).add(new ClientSession(host, port, user, pass));
     } catch(final IOException ex) {
@@ -94,7 +95,7 @@ public final class FNClient extends StandardFunc {
    */
   private Str execute(final QueryContext ctx) throws QueryException {
     final ClientSession cs = session(ctx, false);
-    final String cmd = Token.string(checkStr(expr[1], ctx));
+    final String cmd = Token.string(checkStr(exprs[1], ctx));
 
     try {
       final ArrayOutput ao = new ArrayOutput();
@@ -127,7 +128,7 @@ public final class FNClient extends StandardFunc {
    */
   private Value query(final QueryContext ctx) throws QueryException {
     final ClientSession cs = session(ctx, false);
-    final String query = Token.string(checkStr(expr[1], ctx));
+    final String query = Token.string(checkStr(exprs[1], ctx));
     final ValueBuilder vb = new ValueBuilder();
     ClientQuery cq = null;
     try {
@@ -191,7 +192,7 @@ public final class FNClient extends StandardFunc {
    * @throws QueryException query exception
    */
   private ClientSession session(final QueryContext ctx, final boolean del) throws QueryException {
-    final Uri id = (Uri) checkType(expr[0].item(ctx, info), AtomType.URI);
+    final Uri id = (Uri) checkType(exprs[0].item(ctx, info), AtomType.URI);
     final ClientSession cs = sessions(ctx).get(id);
     if(cs == null) throw BXCL_NOTAVL.get(info, id);
     if(del) sessions(ctx).remove(id);

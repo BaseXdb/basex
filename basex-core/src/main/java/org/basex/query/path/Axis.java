@@ -2,6 +2,7 @@ package org.basex.query.path;
 
 import org.basex.query.iter.*;
 import org.basex.query.value.node.*;
+import org.basex.util.*;
 
 /**
  * XPath axes.
@@ -156,7 +157,7 @@ public enum Axis {
       case PRECSIBL:   return FOLLSIBL;
       case PREC:       return FOLL;
       case SELF:       return SELF;
-      default:         return null;
+      default:         throw Util.notExpected();
     }
   }
 }

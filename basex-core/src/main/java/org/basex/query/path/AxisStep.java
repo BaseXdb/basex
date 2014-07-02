@@ -18,13 +18,13 @@ import org.basex.util.hash.*;
 final class AxisStep extends Step {
   /**
    * Constructor.
-   * @param ii input info
-   * @param a axis
-   * @param t node test
-   * @param p predicates
+   * @param info input info
+   * @param axis axis
+   * @param test node test
+   * @param preds predicates
    */
-  AxisStep(final InputInfo ii, final Axis a, final Test t, final Expr[] p) {
-    super(ii, a, t, p);
+  AxisStep(final InputInfo info, final Axis axis, final Test test, final Expr[] preds) {
+    super(info, axis, test, preds);
   }
 
   @Override

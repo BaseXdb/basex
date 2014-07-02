@@ -17,13 +17,13 @@ public abstract class CNode extends Arr {
   final StaticContext sc;
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param n name
+   * @param sc static context
+   * @param info input info
+   * @param name name
    */
-  CNode(final StaticContext sctx, final InputInfo ii, final Expr... n) {
-    super(ii, n);
-    sc = sctx;
+  CNode(final StaticContext sc, final InputInfo info, final Expr... name) {
+    super(info, name);
+    this.sc = sc;
     size = 1;
   }
 
@@ -46,6 +46,6 @@ public abstract class CNode extends Arr {
 
   @Override
   protected String toString(final String pref) {
-    return pref + " { " + (expr.length == 0 ? "()" : super.toString(SEP)) + " }";
+    return pref + " { " + (exprs.length == 0 ? "()" : super.toString(SEP)) + " }";
   }
 }

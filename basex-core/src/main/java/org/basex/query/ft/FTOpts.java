@@ -20,13 +20,13 @@ public final class FTOpts extends FTExpr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
-   * @param o ft options
+   * @param info input info
+   * @param expr expression
+   * @param opt ft options
    */
-  public FTOpts(final InputInfo ii, final FTExpr e, final FTOpt o) {
-    super(ii, e);
-    opt = o;
+  public FTOpts(final InputInfo info, final FTExpr expr, final FTOpt opt) {
+    super(info, expr);
+    this.opt = opt;
   }
 
   @Override
@@ -35,19 +35,19 @@ public final class FTOpts extends FTExpr {
     ctx.ftOpt(opt.copy(tmp));
     if(opt.sw != null && ctx.value != null && ctx.value.data() != null)
       opt.sw.comp(ctx.value.data());
-    expr[0] = expr[0].compile(ctx, scp);
+    exprs[0] = exprs[0].compile(ctx, scp);
     ctx.ftOpt(tmp);
-    return expr[0];
+    return exprs[0];
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(), opt, expr[0]);
+    addPlan(plan, planElem(), opt, exprs[0]);
   }
 
   @Override
   public String toString() {
-    return expr[0].toString() + opt;
+    return exprs[0].toString() + opt;
   }
 
   @Override
@@ -64,6 +64,6 @@ public final class FTOpts extends FTExpr {
 
   @Override
   public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTOpts(info, expr[0].copy(ctx, scp, vs), new FTOpt().copy(opt));
+    return new FTOpts(info, exprs[0].copy(ctx, scp, vs), new FTOpt().copy(opt));
   }
 }

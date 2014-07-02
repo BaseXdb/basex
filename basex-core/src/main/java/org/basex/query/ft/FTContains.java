@@ -28,14 +28,14 @@ public abstract class FTContains extends ParseExpr {
 
   /**
    * Constructor.
-   * @param e expression
-   * @param fte full-text expression
-   * @param ii input info
+   * @param expr expression
+   * @param ftexpr full-text expression
+   * @param info input info
    */
-  protected FTContains(final Expr e, final FTExpr fte, final InputInfo ii) {
-    super(ii);
-    expr = e;
-    ftexpr = fte;
+  protected FTContains(final Expr expr, final FTExpr ftexpr, final InputInfo info) {
+    super(info);
+    this.expr = expr;
+    this.ftexpr = ftexpr;
     type = SeqType.BLN;
     lex = new FTLexer(new FTOpt());
   }
@@ -47,7 +47,7 @@ public abstract class FTContains extends ParseExpr {
 
   @Override
   public final Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    expr = expr.compile(ctx, scp).addText(ctx);
+    expr = expr.compile(ctx, scp);
     ftexpr = ftexpr.compile(ctx, scp);
     return expr.isEmpty() ? optPre(Bln.FALSE, ctx) : this;
   }

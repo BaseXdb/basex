@@ -131,7 +131,7 @@ public final class StaticFuncs extends ExprInfo {
             if(a != 0) exp.append(a + 1 < as ? "," : " or ");
             exp.append(al.get(a));
           }
-          final int a = call.expr.length;
+          final int a = call.exprs.length;
           throw (a == 1 ? FUNCTYPESG : FUNCTYPEPL).get(call.info, call.name.string(), a, exp);
         }
 
@@ -177,8 +177,8 @@ public final class StaticFuncs extends ExprInfo {
    * @return function if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public StaticFunc get(final QNm name, final long arity, final InputInfo ii,
-      final boolean error) throws QueryException {
+  public StaticFunc get(final QNm name, final long arity, final InputInfo ii, final boolean error)
+      throws QueryException {
 
     final FuncCache fc = funcs.get(sig(name, arity));
     if(fc != null) return fc.func;

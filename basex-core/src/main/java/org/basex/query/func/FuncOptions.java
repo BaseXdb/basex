@@ -38,13 +38,13 @@ public final class FuncOptions {
 
   /**
    * Constructor.
-   * @param name name of root node
-   * @param ii input info
+   * @param root name of root node
+   * @param info input info
    */
-  public FuncOptions(final QNm name, final InputInfo ii) {
-    test = new NodeTest(name);
-    root = name;
-    info = ii;
+  public FuncOptions(final QNm root, final InputInfo info) {
+    test = new NodeTest(root);
+    this.root = root;
+    this.info = info;
   }
 
   /**

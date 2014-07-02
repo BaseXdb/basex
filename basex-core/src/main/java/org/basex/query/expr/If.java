@@ -26,20 +26,20 @@ public final class If extends Arr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param c condition
-   * @param t then clause
-   * @param e else clause
+   * @param info input info
+   * @param cond condition
+   * @param branch1 then branch
+   * @param branch2 else branch
    */
-  public If(final InputInfo ii, final Expr c, final Expr t, final Expr e) {
-    super(ii, t, e);
-    cond = c;
+  public If(final InputInfo info, final Expr cond, final Expr branch1, final Expr branch2) {
+    super(info, branch1, branch2);
+    this.cond = cond;
   }
 
   @Override
   public void checkUp() throws QueryException {
     checkNoUp(cond);
-    checkAllUp(expr);
+    checkAllUp(exprs);
   }
 
   @Override
@@ -49,16 +49,15 @@ public final class If extends Arr {
     if(cond.isValue()) return optPre(eval(ctx).compile(ctx, scp), ctx);
 
     // compile and simplify branches
-    final int es = expr.length;
+    final int es = exprs.length;
     for(int e = 0; e < es; e++) {
       try {
-        expr[e] = expr[e].compile(ctx, scp);
+        exprs[e] = exprs[e].compile(ctx, scp);
       } catch(final QueryException ex) {
         // replace original expression with error
-        expr[e] = FNInfo.error(ex, type);
+        exprs[e] = FNInfo.error(ex, type);
       }
     }
-
     return optimize(ctx, scp);
   }
 
@@ -68,20 +67,20 @@ public final class If extends Arr {
     if(cond.isValue()) return optPre(eval(ctx), ctx);
 
     // if A then B else B -> B (errors in A will be ignored)
-    if(expr[0].sameAs(expr[1])) return optPre(expr[0], ctx);
+    if(exprs[0].sameAs(exprs[1])) return optPre(exprs[0], ctx);
 
     // if not(A) then B else C -> if A then C else B
     if(cond.isFunction(Function.NOT)) {
       ctx.compInfo(OPTWRITE, this);
-      cond = ((Arr) cond).expr[0];
-      final Expr tmp = expr[0];
-      expr[0] = expr[1];
-      expr[1] = tmp;
+      cond = ((Arr) cond).exprs[0];
+      final Expr tmp = exprs[0];
+      exprs[0] = exprs[1];
+      exprs[1] = tmp;
     }
 
     // rewritings for constant booleans
-    if(expr[0].type().eq(SeqType.BLN) && expr[1].type().eq(SeqType.BLN)) {
-      final Expr a = cond, b = expr[0], c = expr[1];
+    if(exprs[0].type().eq(SeqType.BLN) && exprs[1].type().eq(SeqType.BLN)) {
+      final Expr a = cond, b = exprs[0], c = exprs[1];
       if(b == Bln.TRUE) {
         if(c == Bln.FALSE) {
           // if(A) then true() else false() -> xs:boolean(A)
@@ -119,7 +118,7 @@ public final class If extends Arr {
       }
     }
 
-    type = expr[0].type().union(expr[1].type());
+    type = exprs[0].type().union(exprs[1].type());
     return this;
   }
 
@@ -145,7 +144,7 @@ public final class If extends Arr {
    * @throws QueryException query exception
    */
   private Expr eval(final QueryContext ctx) throws QueryException {
-    return expr[cond.ebv(ctx, info).bool(info) ? 0 : 1];
+    return exprs[cond.ebv(ctx, info).bool(info) ? 0 : 1];
   }
 
   @Override
@@ -160,7 +159,7 @@ public final class If extends Arr {
 
   @Override
   public VarUsage count(final Var v) {
-    return cond.count(v).plus(VarUsage.maximum(v, expr));
+    return cond.count(v).plus(VarUsage.maximum(v, exprs));
   }
 
   @Override
@@ -170,16 +169,16 @@ public final class If extends Arr {
     final Expr sub = cond.inline(ctx, scp, v, e);
     if(sub != null) cond = sub;
     boolean te = false;
-    final int es = expr.length;
+    final int es = exprs.length;
     for(int i = 0; i < es; i++) {
       Expr nw;
       try {
-        nw = expr[i].inline(ctx, scp, v, e);
+        nw = exprs[i].inline(ctx, scp, v, e);
       } catch(final QueryException qe) {
         nw = FNInfo.error(qe, type);
       }
       if(nw != null) {
-        expr[i] = nw;
+        exprs[i] = nw;
         te = true;
       }
     }
@@ -189,35 +188,28 @@ public final class If extends Arr {
   @Override
   public If copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return copyType(new If(info, cond.copy(ctx, scp, vs),
-        expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs)));
-  }
-
-  @Override
-  public Expr indexEquivalent(final IndexCosts ic) throws QueryException {
-    final int es = expr.length;
-    for(int e = 0; e < es; ++e) expr[e] = expr[e].indexEquivalent(ic);
-    return this;
+        exprs[0].copy(ctx, scp, vs), exprs[1].copy(ctx, scp, vs)));
   }
 
   @Override
   public boolean isVacuous() {
-    return expr[0].isVacuous() && expr[1].isVacuous();
+    return exprs[0].isVacuous() && exprs[1].isVacuous();
   }
 
   @Override
   public void markTailCalls(final QueryContext ctx) {
-    expr[0].markTailCalls(ctx);
-    expr[1].markTailCalls(ctx);
+    exprs[0].markTailCalls(ctx);
+    exprs[1].markTailCalls(ctx);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(), cond, expr);
+    addPlan(plan, planElem(), cond, exprs);
   }
 
   @Override
   public String toString() {
-    return IF + '(' + cond + ") " + THEN + ' ' + expr[0] + ' ' + ELSE + ' ' + expr[1];
+    return IF + '(' + cond + ") " + THEN + ' ' + exprs[0] + ' ' + ELSE + ' ' + exprs[1];
   }
 
   @Override
@@ -228,19 +220,19 @@ public final class If extends Arr {
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final Expr e : expr) sz += e.exprSize();
+    for(final Expr e : exprs) sz += e.exprSize();
     return sz + cond.exprSize();
   }
 
   @Override
   public Expr typeCheck(final TypeCheck tc, final QueryContext ctx, final VarScope scp)
       throws QueryException {
-    for(int i = 0; i < expr.length; i++) {
-      final SeqType tp = expr[i].type();
+    for(int i = 0; i < exprs.length; i++) {
+      final SeqType tp = exprs[i].type();
       try {
-        expr[i] = tc.check(expr[i], ctx, scp);
+        exprs[i] = tc.check(exprs[i], ctx, scp);
       } catch(final QueryException ex) {
-        expr[i] = FNInfo.error(ex, tp);
+        exprs[i] = FNInfo.error(ex, tp);
       }
     }
     return optimize(ctx, scp);

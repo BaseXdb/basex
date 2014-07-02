@@ -38,19 +38,19 @@ public final class FNValidate extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNValidate(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNValidate(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    switch(sig) {
+    switch(func) {
       case _VALIDATE_XSD_INFO: return xsdInfo(ctx).iter();
       case _VALIDATE_DTD_INFO: return dtdInfo(ctx).iter();
       default:                 return super.iter(ctx);
@@ -59,7 +59,7 @@ public final class FNValidate extends StandardFunc {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _VALIDATE_XSD_INFO: return xsdInfo(ctx);
       case _VALIDATE_DTD_INFO: return dtdInfo(ctx);
       default:                 return super.value(ctx);
@@ -69,7 +69,7 @@ public final class FNValidate extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     checkCreate(ctx);
-    switch(sig) {
+    switch(func) {
       case _VALIDATE_XSD: return xsd(ctx);
       case _VALIDATE_DTD: return dtd(ctx);
       default:            return super.item(ctx, ii);
@@ -120,14 +120,14 @@ public final class FNValidate extends StandardFunc {
     return process(new Validate() {
       @Override
       void process(final ErrorHandler handler) throws IOException, SAXException, QueryException {
-        final IO in = read(checkItem(expr[0], ctx), ctx, null);
+        final IO in = read(checkItem(exprs[0], ctx), ctx, null);
         final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         final Schema schema;
-        if(expr.length < 2) {
+        if(exprs.length < 2) {
           // assume that schema declaration is included in document
           schema = sf.newSchema();
         } else {
-          final Item it = checkItem(expr[1], ctx);
+          final Item it = checkItem(exprs[1], ctx);
           // schema specified as string
           IO scio = read(it, ctx, null);
           tmp = createTmp(scio);
@@ -183,13 +183,13 @@ public final class FNValidate extends StandardFunc {
       void process(final ErrorHandler handler)
           throws IOException, ParserConfigurationException, SAXException, QueryException {
 
-        final Item it = checkItem(expr[0], ctx);
+        final Item it = checkItem(exprs[0], ctx);
         SerializerOptions sp = null;
 
         // integrate doctype declaration via serialization parameters
-        if(expr.length > 1) {
+        if(exprs.length > 1) {
           sp = new SerializerOptions();
-          IO dtd = checkPath(expr[1], ctx);
+          IO dtd = checkPath(exprs[1], ctx);
           tmp = createTmp(dtd);
           if(tmp != null) dtd = tmp;
           sp.set(SerializerOptions.DOCTYPE_SYSTEM, dtd.url());

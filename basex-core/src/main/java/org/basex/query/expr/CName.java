@@ -25,17 +25,17 @@ public abstract class CName extends CNode {
 
   /**
    * Constructor.
-   * @param d description
+   * @param desc description
    * @param sctx static context
-   * @param ii input info
-   * @param n name
+   * @param info input info
+   * @param name name
    * @param v attribute values
    */
-  CName(final String d, final StaticContext sctx, final InputInfo ii, final Expr n,
+  CName(final String desc, final StaticContext sctx, final InputInfo info, final Expr name,
       final Expr... v) {
-    super(sctx, ii, v);
-    name = n;
-    desc = d;
+    super(sctx, info, v);
+    this.name = name;
+    this.desc = desc;
   }
 
   @Override
@@ -59,7 +59,7 @@ public abstract class CName extends CNode {
    */
   final byte[] value(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
-    for(final Expr e : expr) {
+    for(final Expr e : exprs) {
       final Iter ir = ctx.iter(e);
       boolean m = false;
       for(Item it; (it = ir.next()) != null;) {
@@ -101,7 +101,7 @@ public abstract class CName extends CNode {
 
   @Override
   public final void plan(final FElem plan) {
-    addPlan(plan, planElem(), name, expr);
+    addPlan(plan, planElem(), name, exprs);
   }
 
   @Override
@@ -117,7 +117,7 @@ public abstract class CName extends CNode {
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
-    return name.accept(visitor) && visitAll(visitor, expr);
+    return name.accept(visitor) && visitAll(visitor, exprs);
   }
 
   @Override
@@ -126,9 +126,10 @@ public abstract class CName extends CNode {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
-    final boolean ex = inlineAll(ctx, scp, expr, v, e);
+  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
+
+    final boolean ex = inlineAll(ctx, scp, exprs, v, e);
     final Expr sub = name.inline(ctx, scp, v, e);
     if(sub != null) name = sub;
     return sub != null || ex ? optimize(ctx, scp) : null;
@@ -137,7 +138,7 @@ public abstract class CName extends CNode {
   @Override
   public final int exprSize() {
     int sz = 1;
-    for(final Expr e : expr) sz += e.exprSize();
+    for(final Expr e : exprs) sz += e.exprSize();
     return sz + name.exprSize();
   }
 }

@@ -28,16 +28,16 @@ public final class CElem extends CName {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param t tag
-   * @param ns namespaces, or {@code null} if this is a computed constructor.
+   * @param info input info
+   * @param name name
+   * @param nspaces namespaces, or {@code null} if this is a computed constructor.
    * @param cont element contents
    */
-  public CElem(final StaticContext sctx, final InputInfo ii, final Expr t, final Atts ns,
+  public CElem(final StaticContext sctx, final InputInfo info, final Expr name, final Atts nspaces,
       final Expr... cont) {
-    super(ELEMENT, sctx, ii, t, cont);
-    nspaces = ns == null ? new Atts() : ns;
-    comp = ns == null;
+    super(ELEMENT, sctx, info, name, cont);
+    this.nspaces = nspaces == null ? new Atts() : nspaces;
+    comp = nspaces == null;
     type = SeqType.ELM;
   }
 
@@ -89,7 +89,7 @@ public final class CElem extends CName {
       final FElem node = new FElem(nm, ns, constr.children, constr.atts);
 
       // add child and attribute nodes
-      constr.add(ctx, expr);
+      constr.add(ctx, exprs);
       if(constr.errAtt) throw NOATTALL.get(info);
       if(constr.errNS) throw NONSALL.get(info);
       if(constr.duplAtt != null) throw CATTDUPL.get(info, constr.duplAtt);
@@ -134,7 +134,7 @@ public final class CElem extends CName {
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new CElem(sc, info, name.copy(ctx, scp, vs), comp ? null : nspaces.copy(),
-        copyAll(ctx, scp, vs, expr));
+        copyAll(ctx, scp, vs, exprs));
   }
 
   /**

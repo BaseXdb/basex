@@ -32,17 +32,18 @@ public final class FNRepo extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNRepo(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNRepo(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _REPO_LIST: return list(ctx);
       default:         return super.iter(ctx);
     }
@@ -54,8 +55,8 @@ public final class FNRepo extends StandardFunc {
 
     final RepoManager rm = new RepoManager(ctx.context, ii);
     // either path to package or package name
-    final String pkg = expr.length == 0 ? null : Token.string(checkStr(expr[0], ctx));
-    switch(sig) {
+    final String pkg = exprs.length == 0 ? null : Token.string(checkStr(exprs[0], ctx));
+    switch(func) {
       case _REPO_INSTALL:
         rm.install(pkg);
         return null;

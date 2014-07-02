@@ -22,17 +22,18 @@ public final class FNQName extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNQName(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNQName(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case IN_SCOPE_PREFIXES: return inscope(ctx);
       default:                return super.iter(ctx);
     }
@@ -41,9 +42,9 @@ public final class FNQName extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     // functions have 1 or 2 arguments...
-    final Item it = expr[0].item(ctx, info);
-    final Item it2 = expr.length == 2 ? expr[1].item(ctx, info) : null;
-    switch(sig) {
+    final Item it = exprs[0].item(ctx, info);
+    final Item it2 = exprs.length == 2 ? exprs[1].item(ctx, info) : null;
+    switch(func) {
       case RESOLVE_QNAME:            return resolveQName(it, it2);
       case QNAME:                    return qName(it, it2);
       case LOCAL_NAME_FROM_QNAME:    return lnFromQName(ctx, it);
@@ -61,7 +62,7 @@ public final class FNQName extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter inscope(final QueryContext ctx) throws QueryException {
-    final ANode node = (ANode) checkType(expr[0].item(ctx, info),
+    final ANode node = (ANode) checkType(exprs[0].item(ctx, info),
         NodeType.ELM);
 
     final Atts ns = node.nsScope().add(XML, XMLURI);

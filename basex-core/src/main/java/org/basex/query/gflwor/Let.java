@@ -7,6 +7,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.gflwor.GFLWOR.Clause;
 import org.basex.query.gflwor.GFLWOR.Eval;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -24,26 +25,20 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public final class Let extends GFLWOR.Clause {
-  /** Variable. */
-  public final Var var;
-  /** Bound expression. */
-  public Expr expr;
+public final class Let extends ForLet {
   /** Score flag. */
   private final boolean score;
 
   /**
    * Constructor.
-   * @param v variable
-   * @param e expression
-   * @param scr score flag
-   * @param ii input info
+   * @param var variable
+   * @param expr expression
+   * @param score score flag
+   * @param info input info
    */
-  public Let(final Var v, final Expr e, final boolean scr, final InputInfo ii) {
-    super(ii, v);
-    var = v;
-    expr = e;
-    score = scr;
+  public Let(final Var var, final Expr expr, final boolean score, final InputInfo info) {
+    super(info, var, expr, var);
+    this.score = score;
   }
 
   /**
@@ -89,29 +84,9 @@ public final class Let extends GFLWOR.Clause {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem e = planElem();
-    if(score) e.add(planAttr(Token.token(SCORE), Token.TRUE));
-    var.plan(e);
-    expr.plan(e);
-    plan.add(e);
-  }
-
-  @Override
-  public String toString() {
-    return LET + ' ' + (score ? SCORE + ' ' : "") + var + ' ' + ASSIGN + ' ' + expr;
-  }
-
-  @Override
-  public boolean has(final Flag flag) {
-    return expr.has(flag);
-  }
-
-  @Override
-  public Let compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Clause compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     var.refineType(score ? SeqType.DBL : expr.type(), ctx, info);
-    expr = expr.compile(ctx, scp);
-    return optimize(ctx, scp);
+    return super.compile(ctx, scp);
   }
 
   @Override
@@ -135,25 +110,6 @@ public final class Let extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    return expr.removable(v);
-  }
-
-  @Override
-  public VarUsage count(final Var v) {
-    return expr.count(v);
-  }
-
-  @Override
-  public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
-    final Expr sub = expr.inline(ctx, scp, v, e);
-    if(sub == null) return null;
-    expr = sub;
-    return optimize(ctx, scp);
-  }
-
-  @Override
   public Let copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final Var v = scp.newCopyOf(ctx, var);
     vs.put(var.id, v);
@@ -163,11 +119,6 @@ public final class Let extends GFLWOR.Clause {
   @Override
   public boolean accept(final ASTVisitor visitor) {
     return expr.accept(visitor) && visitor.declared(var);
-  }
-
-  @Override
-  public void checkUp() throws QueryException {
-    checkNoUp(expr);
   }
 
   @Override
@@ -188,8 +139,17 @@ public final class Let extends GFLWOR.Clause {
   }
 
   @Override
-  public int exprSize() {
-    return expr.exprSize();
+  public void plan(final FElem plan) {
+    final FElem e = planElem();
+    if(score) e.add(planAttr(Token.token(SCORE), Token.TRUE));
+    var.plan(e);
+    expr.plan(e);
+    plan.add(e);
+  }
+
+  @Override
+  public String toString() {
+    return LET + ' ' + (score ? SCORE + ' ' : "") + var + ' ' + ASSIGN + ' ' + expr;
   }
 
   /** Evaluator for a block of {@code let} expressions. */

@@ -23,28 +23,28 @@ import org.basex.util.hash.*;
  */
 public final class StringRangeAccess extends IndexAccess {
   /** Index token. */
-  private final StringRange sr;
+  private final StringRange index;
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param t index reference
-   * @param ic index context
+   * @param info input info
+   * @param index index reference
+   * @param ictx index context
    */
-  public StringRangeAccess(final InputInfo ii, final StringRange t,
-      final IndexContext ic) {
-    super(ic, ii);
-    sr = t;
+  public StringRangeAccess(final InputInfo info, final StringRange index,
+      final IndexContext ictx) {
+    super(ictx, info);
+    this.index = index;
   }
 
   @Override
   public AxisIter iter(final QueryContext ctx) {
-    final boolean text = sr.type == IndexType.TEXT;
+    final boolean text = index.type == IndexType.TEXT;
     final byte kind = text ? Data.TEXT : Data.ATTR;
     final Data data = ictx.data;
     final int ml = data.meta.maxlen;
-    final IndexIterator ii = sr.min.length <= ml && sr.max.length <= ml &&
-        (text ? data.meta.textindex : data.meta.attrindex) ? data.iter(sr) : scan();
+    final IndexIterator ii = index.min.length <= ml && index.max.length <= ml &&
+        (text ? data.meta.textindex : data.meta.attrindex) ? data.iter(index) : scan();
 
     return new AxisIter() {
       @Override
@@ -60,7 +60,7 @@ public final class StringRangeAccess extends IndexAccess {
    */
   private IndexIterator scan() {
     return new IndexIterator() {
-      final boolean text = sr.type == IndexType.TEXT;
+      final boolean text = index.type == IndexType.TEXT;
       final byte kind = text ? Data.TEXT : Data.ATTR;
       int pre = -1;
 
@@ -74,9 +74,9 @@ public final class StringRangeAccess extends IndexAccess {
         while(++pre < data.meta.size) {
           if(data.kind(pre) != kind) continue;
           final byte[] t = data.text(pre, text);
-          final int mn = Token.diff(t, sr.min);
-          final int mx = Token.diff(t, sr.max);
-          if(mn >= (sr.mni ? 0 : 1) && mx <= (sr.mxi ? 0 : 1)) return true;
+          final int mn = Token.diff(t, index.min);
+          final int mx = Token.diff(t, index.max);
+          if(mn >= (index.mni ? 0 : 1) && mx <= (index.mxi ? 0 : 1)) return true;
         }
         return false;
       }
@@ -89,19 +89,19 @@ public final class StringRangeAccess extends IndexAccess {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new StringRangeAccess(info, sr, ictx);
+    return new StringRangeAccess(info, index, ictx);
   }
 
   @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(DATA, ictx.data.meta.name,
-        MIN, sr.min, MAX, sr.max, TYP, sr.type));
+        MIN, index.min, MAX, index.max, TYP, index.type));
   }
 
   @Override
   public String toString() {
-    return (sr.type == IndexType.TEXT ? Function._DB_TEXT_RANGE :
+    return (index.type == IndexType.TEXT ? Function._DB_TEXT_RANGE :
       Function._DB_ATTRIBUTE_RANGE).get(null, info, Str.get(ictx.data.meta.name),
-          Str.get(sr.min), Str.get(sr.max)).toString();
+          Str.get(index.min), Str.get(index.max)).toString();
   }
 }

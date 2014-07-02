@@ -22,13 +22,13 @@ public final class Instance extends Single {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
-   * @param s sequence type
+   * @param info input info
+   * @param expr expression
+   * @param seq sequence type
    */
-  public Instance(final InputInfo ii, final Expr e, final SeqType s) {
-    super(ii, e);
-    seq = s;
+  public Instance(final InputInfo info, final Expr expr, final SeqType seq) {
+    super(info, expr);
+    this.seq = seq;
     type = SeqType.BLN;
   }
 

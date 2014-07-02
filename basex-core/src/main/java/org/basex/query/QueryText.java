@@ -742,7 +742,7 @@ public interface QueryText {
   // OPTIMIZATIONS
 
   /** Optimization info. */
-  String OPTDESC = "simplifying descendant-or-self step(s)";
+  String OPTDESC = "rewriting descendant-or-self step(s)";
   /** Optimization info. */
   String OPTATOMIC = "atomic evaluation of %";
   /** Optimization info. */
@@ -799,11 +799,4 @@ public interface QueryText {
   String OPTCHILD = "converting % to child steps";
   /** Optimization info. */
   String OPTUNROLL = "unrolling %";
-
-  /** Warning. */
-  String WARNSELF = "Warning: '%' will never yield results.";
-  /** Warning. */
-  String WARNDESC = "Warning: '%' cannot have descendants.";
-  /** Warning. */
-  String WARNDOC = "Warning: '%' cannot have % nodes.";
 }

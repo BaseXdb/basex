@@ -57,11 +57,11 @@ public final class DecFormatter extends FormatUtil {
 
   /**
    * Constructor.
-   * @param ii input info
+   * @param info input info
    * @param map decimal format
    * @throws QueryException query exception
    */
-  public DecFormatter(final InputInfo ii, final TokenMap map) throws QueryException {
+  public DecFormatter(final InputInfo info, final TokenMap map) throws QueryException {
     // assign map values
     int z = '0';
     if(map != null) {
@@ -83,12 +83,12 @@ public final class DecFormatter extends FormatUtil {
           else if(k.equals(DF_PM)) permille = cp;
           else if(k.equals(DF_ZG)) {
             z = zeroes(cp);
-            if(z == -1) throw INVDECFORM.get(ii, k, v);
-            if(z != cp) throw INVDECZERO.get(ii, (char)  cp);
+            if(z == -1) throw INVDECFORM.get(info, k, v);
+            if(z != cp) throw INVDECZERO.get(info, (char)  cp);
           }
         } else {
           // signs must have single character
-          throw INVDECSINGLE.get(ii, k, v);
+          throw INVDECSINGLE.get(info, k, v);
         }
       }
     }
@@ -97,7 +97,7 @@ public final class DecFormatter extends FormatUtil {
     zero = z;
     final IntSet is = new IntSet();
     final int[] ss = { decimal, grouping, percent, permille, zero, optional, pattern };
-    for(final int s : ss) if(!is.add(s)) throw DUPLDECFORM.get(ii, (char) s);
+    for(final int s : ss) if(!is.add(s)) throw DUPLDECFORM.get(info, (char) s);
 
     // create auxiliary strings
     final TokenBuilder tb = new TokenBuilder();
@@ -108,35 +108,35 @@ public final class DecFormatter extends FormatUtil {
 
   /**
    * Returns a formatted number.
-   * @param ii input info
+   * @param info input info
    * @param number number to be formatted
-   * @param pict picture
+   * @param picture picture
    * @return string representation
    * @throws QueryException query exception
    */
-  public byte[] format(final InputInfo ii, final Item number, final byte[] pict)
+  public byte[] format(final InputInfo info, final Item number, final byte[] picture)
       throws QueryException {
 
     // find pattern separator and sub-patterns
     final TokenList tl = new TokenList();
-    byte[] pic = pict;
+    byte[] pic = picture;
     final int i = indexOf(pic, pattern);
     if(i == -1) {
       tl.add(pic);
     } else {
       tl.add(substring(pic, 0, i));
       pic = substring(pic, i + cl(pic, i));
-      if(contains(pic, pattern)) throw PICNUM.get(ii, pict);
+      if(contains(pic, pattern)) throw PICNUM.get(info, picture);
       tl.add(pic);
     }
     final byte[][] patterns = tl.toArray();
 
     // check and analyze patterns
-    if(!check(patterns)) throw PICNUM.get(ii, pict);
+    if(!check(patterns)) throw PICNUM.get(info, picture);
     final Picture[] pics = analyze(patterns);
 
     // return formatted string
-    return format(number, pics, ii);
+    return format(number, pics, info);
   }
 
   /**

@@ -20,34 +20,34 @@ public abstract class FTFilter extends FTExpr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
+   * @param info input info
+   * @param expr expression
    */
-  FTFilter(final InputInfo ii, final FTExpr e) {
-    this(ii, e, FTUnit.WORDS);
+  FTFilter(final InputInfo info, final FTExpr expr) {
+    this(info, expr, FTUnit.WORDS);
   }
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
-   * @param u unit
+   * @param info input info
+   * @param expr expression
+   * @param unit unit
    */
-  FTFilter(final InputInfo ii, final FTExpr e, final FTUnit u) {
-    super(ii, e);
-    unit = u;
+  FTFilter(final InputInfo info, final FTExpr expr, final FTUnit unit) {
+    super(info, expr);
+    this.unit = unit;
   }
 
   @Override
   public final FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final FTNode it = expr[0].item(ctx, info);
+    final FTNode it = exprs[0].item(ctx, info);
     filter(ctx, it, ctx.ftToken);
     return it;
   }
 
   @Override
   public final FTIter iter(final QueryContext ctx) throws QueryException {
-    final FTIter ir = expr[0].iter(ctx);
+    final FTIter ir = exprs[0].iter(ctx);
     return new FTIter() {
       @Override
       public FTNode next() throws QueryException {
@@ -111,11 +111,11 @@ public abstract class FTFilter extends FTExpr {
 
   @Override
   public final boolean indexAccessible(final IndexCosts ic) throws QueryException {
-    return expr[0].indexAccessible(ic);
+    return exprs[0].indexAccessible(ic);
   }
 
   @Override
   public String toString() {
-    return expr[0] + " ";
+    return exprs[0] + " ";
   }
 }

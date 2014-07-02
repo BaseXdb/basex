@@ -17,12 +17,12 @@ import org.basex.util.hash.*;
 final class CachedFilter extends Filter {
   /**
    * Constructor.
-   * @param ii input info
-   * @param r expression
-   * @param p predicates
+   * @param info input info
+   * @param root root expression
+   * @param preds predicates
    */
-  CachedFilter(final InputInfo ii, final Expr r, final Expr... p) {
-    super(ii, r, p);
+  CachedFilter(final InputInfo info, final Expr root, final Expr... preds) {
+    super(info, root, preds);
   }
 
   @Override

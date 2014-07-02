@@ -24,18 +24,18 @@ abstract class Set extends Arr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param l expression list
+   * @param info input info
+   * @param exprs expressions
    */
-  Set(final InputInfo ii, final Expr[] l) {
-    super(ii, l);
+  Set(final InputInfo info, final Expr[] exprs) {
+    super(info, exprs);
     type = SeqType.NOD_ZM;
   }
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
-    for(final Expr e : expr) {
+    for(final Expr e : exprs) {
       if(e.iterable()) continue;
       iterable = false;
       break;
@@ -45,8 +45,8 @@ abstract class Set extends Arr {
 
   @Override
   public final NodeIter iter(final QueryContext ctx) throws QueryException {
-    final Iter[] iter = new Iter[expr.length];
-    for(int e = 0; e != expr.length; ++e) iter[e] = ctx.iter(expr[e]);
+    final Iter[] iter = new Iter[exprs.length];
+    for(int e = 0; e != exprs.length; ++e) iter[e] = ctx.iter(exprs[e]);
     return iterable ? iter(iter) : eval(iter).sort();
   }
 

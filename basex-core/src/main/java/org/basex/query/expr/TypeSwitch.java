@@ -25,14 +25,14 @@ public final class TypeSwitch extends ParseExpr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param t typeswitch expression
-   * @param c case expressions
+   * @param info input info
+   * @param ts typeswitch expression
+   * @param cases case expressions
    */
-  public TypeSwitch(final InputInfo ii, final Expr t, final TypeCase[] c) {
-    super(ii);
-    ts = t;
-    cases = c;
+  public TypeSwitch(final InputInfo info, final Expr ts, final TypeCase[] cases) {
+    super(info);
+    this.ts = ts;
+    this.cases = cases;
   }
 
   @Override

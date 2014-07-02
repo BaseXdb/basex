@@ -30,12 +30,12 @@ public final class PkgParser {
 
   /**
    * Constructor.
-   * @param r repository context
-   * @param ii input info
+   * @param repo repository context
+   * @param info input info
    */
-  public PkgParser(final Repo r, final InputInfo ii) {
-    repo = r;
-    info = ii;
+  public PkgParser(final Repo repo, final InputInfo info) {
+    this.repo = repo;
+    this.info = info;
   }
 
   /**

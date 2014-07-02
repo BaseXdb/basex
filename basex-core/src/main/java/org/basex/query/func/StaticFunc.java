@@ -38,23 +38,24 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   /**
    * Function constructor.
-   * @param a annotations
-   * @param n function name
-   * @param v arguments
-   * @param r return type
-   * @param e function body
-   * @param stc static context
-   * @param scp variable scope
-   * @param xqdoc current xqdoc cache
-   * @param ii input info
+   * @param ann annotations
+   * @param name function name
+   * @param args arguments
+   * @param type type
+   * @param expr function body
+   * @param sc static context
+   * @param scope variable scope
+   * @param doc current xqdoc cache
+   * @param info input info
    */
-  public StaticFunc(final Ann a, final QNm n, final Var[] v, final SeqType r, final Expr e,
-      final StaticContext stc, final VarScope scp, final String xqdoc, final InputInfo ii) {
+  public StaticFunc(final Ann ann, final QNm name, final Var[] args, final SeqType type,
+      final Expr expr, final StaticContext sc, final VarScope scope, final String doc,
+      final InputInfo info) {
 
-    super(stc, a, n, r, scp, xqdoc, ii);
-    args = v;
-    expr = e;
-    updating = ann.contains(Ann.Q_UPDATING);
+    super(sc, ann, name, type, scope, doc, info);
+    this.args = args;
+    this.expr = expr;
+    updating = ann != null && ann.contains(Ann.Q_UPDATING);
   }
 
   @Override
@@ -283,7 +284,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
     // copy the function body
     final Expr cpy = expr.copy(ctx, scp, vs);
-
     return cls == null ? cpy : new GFLWOR(info, cls, cpy).optimize(ctx, scp);
   }
 }

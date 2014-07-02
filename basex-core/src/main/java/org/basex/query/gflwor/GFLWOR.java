@@ -25,21 +25,21 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class GFLWOR extends ParseExpr {
-  /** Return expression. */
-  private Expr ret;
   /** FLWOR clauses. */
   private final LinkedList<Clause> clauses;
+  /** Return expression. */
+  private Expr ret;
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param cls FLWOR clauses
-   * @param rt return expression
+   * @param info input info
+   * @param clauses FLWOR clauses
+   * @param ret return expression
    */
-  public GFLWOR(final InputInfo ii, final LinkedList<Clause> cls, final Expr rt) {
-    super(ii);
-    clauses = cls;
-    ret = rt;
+  public GFLWOR(final InputInfo info, final LinkedList<Clause> clauses, final Expr ret) {
+    super(info);
+    this.clauses = clauses;
+    this.ret = ret;
   }
 
   @Override
@@ -106,7 +106,7 @@ public final class GFLWOR extends ParseExpr {
         final Where wh = (Where) c;
         if(wh.pred instanceof And) {
           iter.remove();
-          for(final Expr e : ((Arr) wh.pred).expr) iter.add(new Where(e, wh.info));
+          for(final Expr e : ((Arr) wh.pred).exprs) iter.add(new Where(e, wh.info));
         }
       }
     }
@@ -161,11 +161,11 @@ public final class GFLWOR extends ParseExpr {
           } else if(clauses.size() > 1 && clauses.get(1) instanceof Count) {
             final Count cnt = (Count) clauses.get(1);
             if(fst.pos != null) {
-              final Let lt = new Let(cnt.count,
+              final Let lt = new Let(cnt.var,
                   new VarRef(cnt.info, fst.pos).optimize(ctx, scp), false, cnt.info);
               clauses.set(1, lt.optimize(ctx, scp));
             } else {
-              clauses.set(0, new For(fst.var, cnt.count, fst.score,
+              clauses.set(0, new For(fst.var, cnt.var, fst.score,
                   fst.expr, false, fst.info).optimize(ctx, scp));
               clauses.remove(1);
             }
@@ -510,7 +510,7 @@ public final class GFLWOR extends ParseExpr {
           final Expr e = before.pred;
           if(e instanceof And) {
             final And and = (And) e;
-            and.expr = Array.add(and.expr, wh.pred);
+            and.exprs = Array.add(and.exprs, wh.pred);
           } else {
             before.pred = new And(before.info, e, wh.pred);
           }
@@ -579,8 +579,9 @@ public final class GFLWOR extends ParseExpr {
    * @return if changes occurred
    * @throws QueryException query exception
    */
-  private boolean inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e, final int p) throws QueryException {
+  private boolean inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e,
+      final int p) throws QueryException {
+
     boolean change = false;
     final ListIterator<Clause> iter = clauses.listIterator(p);
     while(iter.hasNext()) {
@@ -727,12 +728,12 @@ public final class GFLWOR extends ParseExpr {
     final Var[] vars;
     /**
      * Constructor.
-     * @param ii input info
-     * @param vs declared variables
+     * @param info input info
+     * @param vars declared variables
      */
-    Clause(final InputInfo ii, final Var... vs) {
-      super(ii);
-      vars = vs;
+    protected Clause(final InputInfo info, final Var... vars) {
+      super(info);
+      this.vars = vars;
     }
 
     /**

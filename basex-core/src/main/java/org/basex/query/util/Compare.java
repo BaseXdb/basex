@@ -36,29 +36,29 @@ public final class Compare {
 
   /**
    * Constructor.
-   * @param ii input info
+   * @param info input info
    */
-  public Compare(final InputInfo ii) {
-    info = ii;
+  public Compare(final InputInfo info) {
+    this.info = info;
   }
 
   /**
    * Sets the specified flag.
-   * @param f flag
+   * @param flag flag
    * @return self reference
    */
-  public Compare flag(final Mode f) {
-    flags.add(f);
+  public Compare flag(final Mode flag) {
+    flags.add(flag);
     return this;
   }
 
   /**
    * Sets a collation.
-   * @param c collation
+   * @param cl collation
    * @return self reference
    */
-  public Compare collation(final Collation c) {
-    coll = c;
+  public Compare collation(final Collation cl) {
+    coll = cl;
     return this;
   }
 

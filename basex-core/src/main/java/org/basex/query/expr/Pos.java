@@ -25,14 +25,14 @@ public final class Pos extends Simple {
 
   /**
    * Constructor.
-   * @param mn minimum value
-   * @param mx minimum value
-   * @param ii input info
+   * @param min minimum value
+   * @param max minimum value
+   * @param info input info
    */
-  private Pos(final long mn, final long mx, final InputInfo ii) {
-    super(ii);
-    min = mn;
-    max = mx;
+  private Pos(final long min, final long max, final InputInfo info) {
+    super(info);
+    this.min = min;
+    this.max = max;
     type = SeqType.BLN;
   }
 

@@ -28,14 +28,14 @@ public final class FTIndexAccess extends Simple {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param ex contains, select and optional ignore expression
-   * @param ic index context
+   * @param info input info
+   * @param ftexpr contains, select and optional ignore expression
+   * @param ictx index context
    */
-  public FTIndexAccess(final InputInfo ii, final FTExpr ex, final IndexContext ic) {
-    super(ii);
-    ftexpr = ex;
-    ictx = ic;
+  public FTIndexAccess(final InputInfo info, final FTExpr ftexpr, final IndexContext ictx) {
+    super(info);
+    this.ftexpr = ftexpr;
+    this.ictx = ictx;
   }
 
   @Override

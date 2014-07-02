@@ -100,8 +100,7 @@ final class QueryCompiler {
    * @param root root expression
    * @throws QueryException compilation errors
    */
-  public static void compile(final QueryContext ctx, final MainModule root)
-      throws QueryException {
+  public static void compile(final QueryContext ctx, final MainModule root) throws QueryException {
     if(!root.compiled()) new QueryCompiler(ctx, root).compile();
   }
 

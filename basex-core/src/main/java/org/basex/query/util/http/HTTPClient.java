@@ -38,12 +38,12 @@ public final class HTTPClient {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param opts database options
+   * @param info input info
+   * @param options database options
    */
-  public HTTPClient(final InputInfo ii, final MainOptions opts) {
-    info = ii;
-    options = opts;
+  public HTTPClient(final InputInfo info, final MainOptions options) {
+    this.info = info;
+    this.options = options;
   }
 
   /**

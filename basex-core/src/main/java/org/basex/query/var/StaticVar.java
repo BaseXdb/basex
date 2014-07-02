@@ -33,22 +33,23 @@ public final class StaticVar extends StaticDecl {
 
   /**
    * Constructor for a variable declared in a query.
-   * @param sctx static context
-   * @param scp variable scope
-   * @param a annotations
-   * @param n variable name
-   * @param t variable type
-   * @param e expression to be bound
-   * @param ext external flag
-   * @param xqdoc current xqdoc cache
-   * @param ii input info
+   * @param sc static context
+   * @param scope variable scope
+   * @param ann annotations
+   * @param name variable name
+   * @param type variable type
+   * @param expr expression to be bound
+   * @param external external flag
+   * @param doc current xqdoc cache
+   * @param info input info
    */
-  StaticVar(final StaticContext sctx, final VarScope scp, final Ann a, final QNm n,
-      final SeqType t, final Expr e, final boolean ext, final String xqdoc, final InputInfo ii) {
-    super(sctx, a, n, t, scp, xqdoc, ii);
-    expr = e;
-    external = ext;
-    lazy = ann.contains(LAZY);
+  StaticVar(final StaticContext sc, final VarScope scope, final Ann ann, final QNm name,
+      final SeqType type, final Expr expr, final boolean external, final String doc,
+      final InputInfo info) {
+    super(sc, ann, name, type, scope, doc, info);
+    this.expr = expr;
+    this.external = external;
+    lazy = ann != null && ann.contains(LAZY);
   }
 
   @Override

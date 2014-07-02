@@ -22,13 +22,13 @@ public final class FTContent extends FTFilter {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param ex expression
-   * @param cont contents type
+   * @param info input info
+   * @param expr expression
+   * @param content contents type
    */
-  public FTContent(final InputInfo ii, final FTExpr ex, final FTContents cont) {
-    super(ii, ex);
-    content = cont;
+  public FTContent(final InputInfo info, final FTExpr expr, final FTContents content) {
+    super(info, expr);
+    this.content = content;
   }
 
   @Override
@@ -58,12 +58,12 @@ public final class FTContent extends FTFilter {
 
   @Override
   public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTContent(info, expr[0].copy(ctx, scp, vs), content);
+    return new FTContent(info, exprs[0].copy(ctx, scp, vs), content);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(CONTENT, content.toString()), expr);
+    addPlan(plan, planElem(CONTENT, content.toString()), exprs);
   }
 
   @Override

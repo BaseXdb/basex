@@ -37,17 +37,17 @@ public final class GroupBy extends GFLWOR.Clause {
 
   /**
    * Constructor.
-   * @param gs grouping specs
-   * @param pr references to pre-grouping variables
-   * @param pst post-grouping variables
-   * @param ii input info
+   * @param specs grouping specs
+   * @param pre references to pre-grouping variables
+   * @param post post-grouping variables
+   * @param info input info
    */
-  public GroupBy(final Spec[] gs, final VarRef[] pr, final Var[] pst, final InputInfo ii) {
-    super(ii, vars(gs, pst));
-    specs = gs;
-    preExpr = new Expr[pr.length];
-    System.arraycopy(pr, 0, preExpr, 0, pr.length);
-    post = pst;
+  public GroupBy(final Spec[] specs, final VarRef[] pre, final Var[] post, final InputInfo info) {
+    super(info, vars(specs, post));
+    this.specs = specs;
+    this.post = post;
+    preExpr = new Expr[pre.length];
+    System.arraycopy(pre, 0, preExpr, 0, pre.length);
     int n = 0;
     for(final Spec spec : specs) if(!spec.occluded) n++;
     nonOcc = n;
@@ -55,19 +55,19 @@ public final class GroupBy extends GFLWOR.Clause {
 
   /**
    * Copy constructor.
-   * @param gs grouping specs
-   * @param pe pre-grouping expressions
-   * @param pst post-grouping variables
-   * @param no number of non-occluded grouping variables
-   * @param ii input info
+   * @param specs grouping specs
+   * @param pre pre-grouping expressions
+   * @param post post-grouping variables
+   * @param nonOcc number of non-occluded grouping variables
+   * @param info input info
    */
-  private GroupBy(final Spec[] gs, final Expr[] pe, final Var[] pst,
-      final int no, final InputInfo ii) {
-    super(ii, vars(gs, pst));
-    specs = gs;
-    preExpr = pe;
-    post = pst;
-    nonOcc = no;
+  private GroupBy(final Spec[] specs, final Expr[] pre, final Var[] post, final int nonOcc,
+      final InputInfo info) {
+    super(info, vars(specs, post));
+    this.specs = specs;
+    this.preExpr = pre;
+    this.post = post;
+    this.nonOcc = nonOcc;
   }
 
   /**
@@ -337,15 +337,15 @@ public final class GroupBy extends GFLWOR.Clause {
     /**
      * Constructor.
      *
-     * @param ii input info
-     * @param v grouping variable
-     * @param e grouping expression
-     * @param cl collation
+     * @param info input info
+     * @param var grouping variable
+     * @param expr grouping expression
+     * @param coll collation
      */
-    public Spec(final InputInfo ii, final Var v, final Expr e, final Collation cl) {
-      super(ii, e);
-      var = v;
-      coll = cl;
+    public Spec(final InputInfo info, final Var var, final Expr expr, final Collation coll) {
+      super(info, expr);
+      this.var = var;
+      this.coll = coll;
     }
 
     @Override

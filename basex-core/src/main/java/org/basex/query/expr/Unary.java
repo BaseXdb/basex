@@ -23,18 +23,23 @@ public final class Unary extends Single {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
-   * @param min minus flag
+   * @param info input info
+   * @param expr expression
+   * @param minus minus flag
    */
-  public Unary(final InputInfo ii, final Expr e, final boolean min) {
-    super(ii, e);
-    minus = min;
+  public Unary(final InputInfo info, final Expr expr, final boolean minus) {
+    super(info, expr);
+    this.minus = minus;
   }
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
+    return optimize(ctx, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     type = expr.type();
     if(!type.type.isNumber()) {
       // expression will always yield a number, empty sequence or error

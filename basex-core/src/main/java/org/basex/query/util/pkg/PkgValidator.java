@@ -29,12 +29,12 @@ public final class PkgValidator {
 
   /**
    * Constructor.
-   * @param r repository context
-   * @param ii input info
+   * @param repo repository context
+   * @param info input info
    */
-  public PkgValidator(final Repo r, final InputInfo ii) {
-    repo = r;
-    info = ii;
+  public PkgValidator(final Repo repo, final InputInfo info) {
+    this.repo = repo;
+    this.info = info;
   }
 
   /**

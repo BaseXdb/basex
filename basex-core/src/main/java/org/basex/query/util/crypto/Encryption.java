@@ -54,10 +54,10 @@ public final class Encryption {
   /**
    * Constructor.
    *
-   * @param ii input info
+   * @param info input info
    */
-  public Encryption(final InputInfo ii) {
-    info = ii;
+  public Encryption(final InputInfo info) {
+    this.info = info;
   }
 
   /**

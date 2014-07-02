@@ -83,19 +83,18 @@ public abstract class QueryTest extends SandboxTest {
             types.add(Util.className(val));
           }
           s = val.size() == 1 ? "" : "#" + val.size();
-          sb.append("\n[F" + s + "] '" + val + "', " + types +
-            details() + '\n');
+          sb.append("\n[F" + s + "] '" + val + "', " + types + details() + '\n');
           ++fail;
         }
-      } catch(final QueryException ex) {
+      } catch(final Exception ex) {
         final String msg = ex.getMessage();
         if(correct || msg == null || msg.contains("mailman")) {
-          final String cp = correct && (!(cmp instanceof Nodes) ||
-              ((Nodes) cmp).data != null) ? cmp.toString() : "()";
-          sb.append("[" + qu[0] + "] " + query + "\n[E] " +
-              cp + "\n[F] " +
-              (msg == null ? Util.className(ex) : msg.replaceAll("\r\n?|\n", " ")) + ' ' +
-              details() + '\n');
+          final String cp = correct && (!(cmp instanceof Nodes) || ((Nodes) cmp).data != null)
+              ? cmp.toString() : "()";
+          sb.append("[" + qu[0] + "] " + query + "\n[E] " + cp + "\n[F] "
+              + (msg == null ? Util.className(ex) : msg.replaceAll("\r\n?|\n", " ")) + ' '
+              + details() + '\n');
+          ex.printStackTrace();
           ++fail;
         }
       } finally {

@@ -33,20 +33,20 @@ public final class RepoManager {
 
   /**
    * Constructor.
-   * @param ctx database context
+   * @param context database context
    */
-  public RepoManager(final Context ctx) {
-    repo = ctx.repo;
+  public RepoManager(final Context context) {
+    repo = context.repo;
   }
 
   /**
    * Constructor.
-   * @param ctx database context
-   * @param ii input info
+   * @param context database context
+   * @param info input info
    */
-  public RepoManager(final Context ctx, final InputInfo ii) {
-    this(ctx);
-    info = ii;
+  public RepoManager(final Context context, final InputInfo info) {
+    this(context);
+    this.info = info;
   }
 
   /**

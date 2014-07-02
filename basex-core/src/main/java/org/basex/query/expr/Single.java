@@ -18,12 +18,12 @@ public abstract class Single extends ParseExpr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
+   * @param info input info
+   * @param expr expression
    */
-  protected Single(final InputInfo ii, final Expr e) {
-    super(ii);
-    expr = e;
+  protected Single(final InputInfo info, final Expr expr) {
+    super(info);
+    this.expr = expr;
   }
 
   @Override

@@ -8,7 +8,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -23,16 +22,12 @@ import org.basex.util.hash.*;
 final class IterPath extends AxisPath {
   /**
    * Constructor.
-   * @param ii input info
-   * @param r root expression
-   * @param s axis steps
-   * @param t return type
-   * @param c cardinality
+   * @param info input info
+   * @param root root expression
+   * @param steps axis steps
    */
-  IterPath(final InputInfo ii, final Expr r, final Expr[] s, final SeqType t, final long c) {
-    super(ii, r, s);
-    type = t;
-    size = c;
+  IterPath(final InputInfo info, final Expr root, final Expr... steps) {
+    super(info, root, steps);
   }
 
   @Override
@@ -109,7 +104,7 @@ final class IterPath extends AxisPath {
 
   @Override
   public IterPath copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return copyType(new IterPath(info, root == null ? null : root.copy(ctx, scp, vs),
-        Arr.copyAll(ctx, scp, vs, steps), type, size));
+    final Expr rt = root == null ? null : root.copy(ctx, scp, vs);
+    return copyType(new IterPath(info, rt,  Arr.copyAll(ctx, scp, vs, steps)));
   }
 }

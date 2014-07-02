@@ -110,9 +110,6 @@ public final class QueryContext extends Proc {
   /** Strings to lock defined by lock:write option. */
   public final StringList writeLocks = new StringList(0);
 
-  /** Compilation flag: current node has leaves. */
-  public boolean leaf;
-
   /** Number of successive tail calls. */
   public int tailCalls;
   /** Maximum number of successive tail calls (will be set before compilation). */
@@ -285,7 +282,6 @@ public final class QueryContext extends Proc {
     if(ctxItem != null) {
       // evaluate initial expression
       try {
-
         ctxItem.compile(this);
         value = ctxItem.cache(this).value();
       } catch(final QueryException ex) {

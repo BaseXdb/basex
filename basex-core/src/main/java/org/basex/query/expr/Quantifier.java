@@ -26,25 +26,26 @@ public final class Quantifier extends Single {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param f variable inputs
-   * @param s satisfier
-   * @param e every flag
+   * @param info input info
+   * @param inputs variable inputs
+   * @param expr satisfier
+   * @param every every flag
    */
-  public Quantifier(final InputInfo ii, final For[] f, final Expr s, final boolean e) {
-    this(ii, new GFLWOR(ii, new LinkedList<GFLWOR.Clause>(Arrays.asList(f)),
-        compBln(s, ii)), e);
+  public Quantifier(final InputInfo info, final For[] inputs, final Expr expr,
+      final boolean every) {
+    this(info, new GFLWOR(info, new LinkedList<GFLWOR.Clause>(Arrays.asList(inputs)),
+        compBln(expr, info)), every);
   }
 
   /**
    * Copy constructor.
-   * @param ii input info
+   * @param info input info
    * @param tests expression
-   * @param e every flag
+   * @param every every flag
    */
-  private Quantifier(final InputInfo ii, final Expr tests, final boolean e) {
-    super(ii, tests);
-    every = e;
+  private Quantifier(final InputInfo info, final Expr tests, final boolean every) {
+    super(info, tests);
+    this.every = every;
     type = SeqType.BLN;
   }
 

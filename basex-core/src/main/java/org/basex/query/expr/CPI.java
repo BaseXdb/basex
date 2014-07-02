@@ -22,12 +22,12 @@ public final class CPI extends CName {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param n name
-   * @param v value
+   * @param info input info
+   * @param name name
+   * @param value value
    */
-  public CPI(final StaticContext sctx, final InputInfo ii, final Expr n, final Expr v) {
-    super(PI, sctx, ii, n, v);
+  public CPI(final StaticContext sctx, final InputInfo info, final Expr name, final Expr value) {
+    super(PI, sctx, info, name, value);
     type = SeqType.PI;
   }
 
@@ -50,6 +50,6 @@ public final class CPI extends CName {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CPI(sc, info, name.copy(ctx, scp, vs), expr[0].copy(ctx, scp, vs));
+    return new CPI(sc, info, name.copy(ctx, scp, vs), exprs[0].copy(ctx, scp, vs));
   }
 }

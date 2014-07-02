@@ -82,10 +82,10 @@ public final class DigitalSignature {
 
   /**
    * Constructor.
-   * @param ii input info
+   * @param info input info
    */
-  public DigitalSignature(final InputInfo ii) {
-    info = ii;
+  public DigitalSignature(final InputInfo info) {
+    this.info = info;
   }
 
   /**

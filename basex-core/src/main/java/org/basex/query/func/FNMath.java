@@ -20,25 +20,26 @@ public final class FNMath extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNMath(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNMath(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final double e = expr.length == 2 ? checkDbl(expr[1], ctx) : 0;
+    final double e = exprs.length == 2 ? checkDbl(exprs[1], ctx) : 0;
     double d = 0;
-    if(expr.length > 0 && sig != _MATH_CRC32) {
-      final Item it = expr[0].item(ctx, info);
+    if(exprs.length > 0 && func != _MATH_CRC32) {
+      final Item it = exprs[0].item(ctx, info);
       if(it == null) return null;
       d = checkDbl(it, ctx);
     }
 
-    switch(sig) {
+    switch(func) {
       case _MATH_PI:     return Dbl.get(PI);
       case _MATH_E:      return Dbl.get(E);
       case _MATH_SQRT:   return Dbl.get(sqrt(d));
@@ -86,7 +87,7 @@ public final class FNMath extends StandardFunc {
    */
   private Hex crc32(final QueryContext ctx) throws QueryException {
     final CRC32 crc = new CRC32();
-    crc.update(checkStr(expr[0], ctx));
+    crc.update(checkStr(exprs[0], ctx));
     final byte[] r = new byte[4];
     for(int i = r.length, c = (int) crc.getValue(); i-- > 0; c >>>= 8) r[i] = (byte) c;
     return new Hex(r);

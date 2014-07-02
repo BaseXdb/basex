@@ -31,14 +31,14 @@ public final class OrderBy extends GFLWOR.Clause {
 
   /**
    * Constructor.
-   * @param vs variables to sort
-   * @param ks sort keys
-   * @param ii input info
+   * @param refs variables to sort
+   * @param keys sort keys
+   * @param info input info
    */
-  public OrderBy(final VarRef[] vs, final Key[] ks, final InputInfo ii) {
-    super(ii);
-    refs = vs;
-    keys = ks;
+  public OrderBy(final VarRef[] refs, final Key[] keys, final InputInfo info) {
+    super(info);
+    this.refs = refs;
+    this.keys = keys;
   }
 
   @Override
@@ -241,18 +241,18 @@ public final class OrderBy extends GFLWOR.Clause {
 
     /**
      * Constructor.
-     * @param ii input info
-     * @param k sort key expression
-     * @param dsc descending order
-     * @param lst empty least
-     * @param cl collation
+     * @param info input info
+     * @param key sort key expression
+     * @param desc descending order
+     * @param least empty least
+     * @param coll collation
      */
-    public Key(final InputInfo ii, final Expr k, final boolean dsc, final boolean lst,
-        final Collation cl) {
-      super(ii, k);
-      desc = dsc;
-      least = lst;
-      coll = cl;
+    public Key(final InputInfo info, final Expr key, final boolean desc, final boolean least,
+        final Collation coll) {
+      super(info, key);
+      this.desc = desc;
+      this.least = least;
+      this.coll = coll;
     }
 
     @Override

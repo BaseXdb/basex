@@ -25,10 +25,10 @@ public final class PlainDoc extends Inspect {
   /**
    * Constructor.
    * @param qc query context
-   * @param ii input info
+   * @param info input info
    */
-  public PlainDoc(final QueryContext qc, final InputInfo ii) {
-    super(qc, ii);
+  public PlainDoc(final QueryContext qc, final InputInfo info) {
+    super(qc, info);
   }
 
   /**
@@ -39,10 +39,10 @@ public final class PlainDoc extends Inspect {
   public FElem context() throws QueryException {
     final FElem context = elem("context", null);
 
-    for(final StaticVar sv : ctx.vars) {
+    for(final StaticVar sv : qc.vars) {
       variable(sv, context);
     }
-    for(final StaticFunc sf : ctx.funcs.funcs()) {
+    for(final StaticFunc sf : qc.funcs.funcs()) {
       function(sf.name, sf, sf.funcType(), sf.ann, context);
     }
 
@@ -120,7 +120,7 @@ public final class PlainDoc extends Inspect {
         if(uri.length != 0) argument.add("uri", uri);
 
         final byte[] pdoc = doc(doc, name);
-        if(pdoc != null) add(pdoc, ctx.context, argument);
+        if(pdoc != null) add(pdoc, qc.context, argument);
       }
       type(ftype.args[a], argument);
     }
@@ -133,7 +133,7 @@ public final class PlainDoc extends Inspect {
         for(final byte[] value : doc.get(key)) {
           final FElem elem = eq(key, DOC_TAGS) ? elem(string(key), function) :
             elem("tag", function).add("name", key);
-          add(value, ctx.context, elem);
+          add(value, qc.context, elem);
         }
       }
     }
@@ -141,7 +141,7 @@ public final class PlainDoc extends Inspect {
     final SeqType rt = sf != null ? sf.type() : ftype.ret;
     final FElem ret = type(rt, elem("return", function));
     final TokenList returns = doc != null ? doc.get(DOC_RETURN) : null;
-    if(returns != null) for(final byte[] val : returns) add(val, ctx.context, ret);
+    if(returns != null) for(final byte[] val : returns) add(val, qc.context, ret);
     return function;
   }
 

@@ -21,14 +21,13 @@ import org.basex.util.hash.*;
 public final class CNSpace extends CName {
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param n name
-   * @param v attribute values
+   * @param sc static context
+   * @param info input info
+   * @param name name
+   * @param value value
    */
-  public CNSpace(final StaticContext sctx, final InputInfo ii, final Expr n,
-      final Expr v) {
-    super(NSPACE, sctx, ii, n, v);
+  public CNSpace(final StaticContext sc, final InputInfo info, final Expr name, final Expr value) {
+    super(NSPACE, sc, info, name, value);
     type = SeqType.NSP;
   }
 
@@ -48,6 +47,6 @@ public final class CNSpace extends CName {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CNSpace(sc, info, name.copy(ctx, scp, vs), expr[0].copy(ctx, scp, vs));
+    return new CNSpace(sc, info, name.copy(ctx, scp, vs), exprs[0].copy(ctx, scp, vs));
   }
 }

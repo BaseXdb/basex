@@ -23,11 +23,11 @@ public abstract class Logical extends Arr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression list
+   * @param info input info
+   * @param exprs expressions
    */
-  Logical(final InputInfo ii, final Expr[] e) {
-    super(ii, e);
+  Logical(final InputInfo info, final Expr[] exprs) {
+    super(info, exprs);
     type = SeqType.BLN;
   }
 
@@ -35,9 +35,9 @@ public abstract class Logical extends Arr {
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
     final boolean and = this instanceof And;
-    final int es = expr.length;
+    final int es = exprs.length;
     final ExprList el = new ExprList(es);
-    for(final Expr e : expr) {
+    for(final Expr e : exprs) {
       final Expr ex = e.compEbv(ctx);
       if(ex.isValue()) {
         // atomic items can be pre-evaluated
@@ -48,14 +48,14 @@ public abstract class Logical extends Arr {
       }
     }
     if(el.isEmpty()) return Bln.get(and);
-    expr = el.finish();
+    exprs = el.finish();
     return this;
   }
 
   @Override
   public final void markTailCalls(final QueryContext ctx) {
     // if the last expression surely returns a boolean, we can jump to it
-    final Expr last = expr[expr.length - 1];
+    final Expr last = exprs[exprs.length - 1];
     if(last.type().eq(SeqType.BLN)) {
       tailCall = true;
       last.markTailCalls(ctx);
@@ -67,7 +67,7 @@ public abstract class Logical extends Arr {
     final FElem el = planElem();
     if(tailCall) el.add(planAttr(TCL, true));
     plan.add(el);
-    for(final ExprInfo e : expr) {
+    for(final ExprInfo e : exprs) {
       if(e != null) e.plan(el);
     }
   }
@@ -78,18 +78,18 @@ public abstract class Logical extends Arr {
    */
   final void compFlatten(final QueryContext ctx) {
     // flatten nested expressions
-    final int es = expr.length;
+    final int es = exprs.length;
     final ExprList tmp = new ExprList(es);
     final boolean and = this instanceof And;
     final boolean or = this instanceof Or;
-    for(final Expr ex : expr) {
+    for(final Expr ex : exprs) {
       if(and && ex instanceof And || or && ex instanceof Or) {
-        for(final Expr e : ((Arr) ex).expr) tmp.add(e);
+        for(final Expr e : ((Arr) ex).exprs) tmp.add(e);
         ctx.compInfo(OPTFLAT, ex);
       } else {
         tmp.add(ex);
       }
     }
-    if(es != tmp.size()) expr = tmp.finish();
+    if(es != tmp.size()) exprs = tmp.finish();
   }
 }

@@ -7,9 +7,11 @@ import java.util.*;
 import org.basex.data.*;
 import org.basex.index.name.*;
 import org.basex.index.path.*;
-import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.CmpG.OpG;
+import org.basex.query.expr.CmpV.OpV;
+import org.basex.query.func.*;
 import org.basex.query.path.Test.Kind;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
@@ -33,63 +35,79 @@ public abstract class Step extends Preds {
 
   /**
    * This method creates a step instance.
-   * @param ii input info
-   * @param a axis
-   * @param t node test
-   * @param p predicates
+   * @param info input info
+   * @param axis axis
+   * @param test node test
+   * @param preds predicates
    * @return step
    */
-  public static Step get(final InputInfo ii, final Axis a, final Test t, final Expr... p) {
+  public static Step get(final InputInfo info, final Axis axis, final Test test,
+      final Expr... preds) {
     boolean num = false;
-    for(final Expr pr : p) num |= pr.type().mayBeNumber() || pr.has(Flag.FCS);
-    return num ? new AxisStep(ii, a, t, p) : new IterStep(ii, a, t, p);
+    for(final Expr pr : preds) num |= pr.type().mayBeNumber() || pr.has(Flag.FCS);
+    return num ? new AxisStep(info, axis, test, preds) : new IterStep(info, axis, test, preds);
   }
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param a axis
-   * @param t node test
-   * @param p predicates
+   * @param info input info
+   * @param axis axis
+   * @param test node test
+   * @param preds predicates
    */
-  Step(final InputInfo ii, final Axis a, final Test t, final Expr... p) {
-    super(ii, p);
-    axis = a;
-    test = t;
+  Step(final InputInfo info, final Axis axis, final Test test, final Expr... preds) {
+    super(info, preds);
+    this.axis = axis;
+    this.test = test;
     type = SeqType.NOD_ZM;
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    // return empty sequence if test will yield no results
-    if(!test.compile(ctx)) return Empty.SEQ;
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+    // check if test will yield no results
+    if(!test.optimize(ctx)) return Empty.SEQ;
 
-    // leaf flag indicates that a context node can be replaced by a text() step
-    final Type ct = ctx.value != null ? ctx.value.type : null;
-    final boolean leaf = ctx.leaf;
-    ctx.leaf = false;
-    try {
-      final Data data = ctx.data();
-      if(data != null && test.kind == Kind.NAME && test.type != NodeType.ATT &&
-          axis.down && data.meta.uptodate && data.nspaces.size() == 0) {
-        final Stats s = data.tagindex.stat(data.tagindex.id(((NameTest) test).local));
-        ctx.leaf = s != null && s.isLeaf();
+    for(int p = 0; p < preds.length; ++p) {
+      Expr pr = Pos.get(OpV.EQ, preds[p], preds[p], info);
+
+      // position() = last() -> last()
+      if(pr instanceof CmpG || pr instanceof CmpV) {
+        final Cmp cmp = (Cmp) pr;
+        if(cmp.exprs[0].isFunction(Function.POSITION) && cmp.exprs[1].isFunction(Function.LAST)) {
+          if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
+             cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
+            ctx.compInfo(OPTWRITE, pr);
+            pr = cmp.exprs[1];
+          }
+        }
       }
 
-      // as predicates will not necessarily start from the document node,
-      // the context item type is temporarily generalized
-      if(ct == NodeType.DOC) ctx.value.type = NodeType.NOD;
-      final Expr e = super.compile(ctx, scp);
-
-      // return optimized step / don't re-optimize step
-      if(e != this || e instanceof IterStep) return e;
-
-    } finally {
-      if(ct == NodeType.DOC) ctx.value.type = NodeType.DOC;
-      ctx.leaf = leaf;
+      if(pr.isValue()) {
+        if(!pr.ebv(ctx, info).bool(info)) {
+          ctx.compInfo(OPTREMOVE, this, pr);
+          return Empty.SEQ;
+        }
+        ctx.compInfo(OPTREMOVE, this, pr);
+        preds = Array.delete(preds, p--);
+      } else if(pr instanceof And && !pr.has(Flag.FCS)) {
+        // replace AND expression with predicates (don't swap position tests)
+        ctx.compInfo(OPTPRED, pr);
+        final Expr[] and = ((Arr) pr).exprs;
+        final int m = and.length - 1;
+        final ExprList tmp = new ExprList(preds.length + m);
+        for(final Expr e : Arrays.asList(preds).subList(0, p)) tmp.add(e);
+        for(final Expr a : and) {
+          // wrap test with boolean() if the result is numeric
+          tmp.add(Function.BOOLEAN.get(null, info, a).compEbv(ctx));
+        }
+        for(final Expr e : Arrays.asList(preds).subList(p + 1, preds.length)) tmp.add(e);
+        preds = tmp.finish();
+      } else {
+        preds[p] = pr;
+      }
     }
 
-    // no numeric predicates.. use simple iterator
+    // no numeric predicates: use simple iterator
     if(!has(Flag.FCS)) return new IterStep(info, axis, test, preds);
 
     // use iterator for simple numeric predicate
@@ -106,8 +124,7 @@ public abstract class Step extends Preds {
    * @return result of check
    */
   public final boolean simple(final Axis ax, final boolean name) {
-    return axis == ax && preds.length == 0 &&
-      (name ? test.kind == Kind.NAME : test == Test.NOD);
+    return axis == ax && preds.length == 0 && (name ? test.kind == Kind.NAME : test == Test.NOD);
   }
 
   /**
@@ -162,7 +179,7 @@ public abstract class Step extends Preds {
   private void add(final PathNode node, final ArrayList<PathNode> nodes, final int name,
       final int kind) {
 
-    for(final PathNode n : node.ch) {
+    for(final PathNode n : node.children) {
       if(axis == Axis.DESC || axis == Axis.DESCORSELF) {
         add(n, nodes, name, kind);
       }
@@ -196,21 +213,20 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
-    // leaf flag indicates that a context node can be replaced by a text() step
-    final Type ct = ctx.value != null ? ctx.value.type : null;
-    final boolean leaf = ctx.leaf;
-    ctx.leaf = false;
-    try {
-      // as predicates will not necessarily start from the document node,
-      // the context item type is temporarily generalized
-      if(ct == NodeType.DOC) ctx.value.type = NodeType.NOD;
-      return super.inline(ctx, scp, v, e);
-    } finally {
-      if(ct == NodeType.DOC) ctx.value.type = NodeType.DOC;
-      ctx.leaf = leaf;
+  public boolean accept(final ASTVisitor visitor) {
+    for(final Expr e : preds) {
+      visitor.enterFocus();
+      if(!e.accept(visitor)) return false;
+      visitor.exitFocus();
     }
+    return true;
+  }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Expr e : preds) sz += e.exprSize();
+    return sz;
   }
 
   @Override
@@ -233,22 +249,5 @@ public abstract class Step extends Preds {
       sb.append(test);
     }
     return sb.append(super.toString()).toString();
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    for(final Expr e : preds) {
-      visitor.enterFocus();
-      if(!e.accept(visitor)) return false;
-      visitor.exitFocus();
-    }
-    return true;
-  }
-
-  @Override
-  public int exprSize() {
-    int sz = 1;
-    for(final Expr e : preds) sz += e.exprSize();
-    return sz;
   }
 }

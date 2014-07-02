@@ -26,14 +26,14 @@ public final class Switch extends ParseExpr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param c condition
-   * @param sc cases (last one is default case)
+   * @param info input info
+   * @param cond condition
+   * @param cases cases (last one is default case)
    */
-  public Switch(final InputInfo ii, final Expr c, final SwitchCase[] sc) {
-    super(ii);
-    cases = sc;
-    cond = c;
+  public Switch(final InputInfo info, final Expr cond, final SwitchCase[] cases) {
+    super(info);
+    this.cases = cases;
+    this.cond = cond;
   }
 
   @Override
@@ -42,7 +42,7 @@ public final class Switch extends ParseExpr {
     for(final SwitchCase sc : cases) sc.checkUp();
     // check if none or all return expressions are updating
     final Expr[] tmp = new Expr[cases.length];
-    for(int i = 0; i < tmp.length; ++i) tmp[i] = cases[i].expr[0];
+    for(int i = 0; i < tmp.length; ++i) tmp[i] = cases[i].exprs[0];
     checkAllUp(tmp);
   }
 
@@ -57,26 +57,26 @@ public final class Switch extends ParseExpr {
       final Item it = cond.item(ctx, info);
       LOOP:
       for(final SwitchCase sc : cases) {
-        final int sl = sc.expr.length;
+        final int sl = sc.exprs.length;
         for(int e = 1; e < sl; e++) {
-          if(!sc.expr[e].isValue()) break LOOP;
+          if(!sc.exprs[e].isValue()) break LOOP;
 
           // includes check for empty sequence (null reference)
-          final Item cs = sc.expr[e].item(ctx, info);
+          final Item cs = sc.exprs[e].item(ctx, info);
           if(it == cs || cs != null && it != null && it.equiv(cs, null, info)) {
-            ex = sc.expr[0];
+            ex = sc.exprs[0];
             break LOOP;
           }
         }
-        if(sl == 1) ex = sc.expr[0];
+        if(sl == 1) ex = sc.exprs[0];
       }
     }
     if(ex != this) return optPre(ex, ctx);
 
     // expression could not be pre-evaluated
-    type = cases[0].expr[0].type();
+    type = cases[0].exprs[0].type();
     for(int c = 1; c < cases.length; c++) {
-      type = type.union(cases[c].expr[0].type());
+      type = type.union(cases[c].exprs[0].type());
     }
     return ex;
   }
@@ -98,7 +98,7 @@ public final class Switch extends ParseExpr {
 
   @Override
   public boolean isVacuous() {
-    for(final SwitchCase sc : cases) if(!sc.expr[0].isVacuous()) return false;
+    for(final SwitchCase sc : cases) if(!sc.exprs[0].isVacuous()) return false;
     return true;
   }
 
@@ -145,14 +145,14 @@ public final class Switch extends ParseExpr {
   private Expr getCase(final QueryContext ctx) throws QueryException {
     final Item it = cond.item(ctx, info);
     for(final SwitchCase sc : cases) {
-      final int sl = sc.expr.length;
+      final int sl = sc.exprs.length;
       for(int e = 1; e < sl; e++) {
         // includes check for empty sequence (null reference)
-        final Item cs = sc.expr[e].item(ctx, info);
+        final Item cs = sc.exprs[e].item(ctx, info);
         if(it == cs || it != null && cs != null && it.equiv(cs, null, info))
-          return sc.expr[0];
+          return sc.exprs[0];
       }
-      if(sl == 1) return sc.expr[0];
+      if(sl == 1) return sc.exprs[0];
     }
     // will never be evaluated
     return null;

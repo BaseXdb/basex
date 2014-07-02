@@ -55,18 +55,19 @@ public final class FNAdmin extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNAdmin(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNAdmin(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     checkAdmin(ctx);
-    switch(sig) {
+    switch(func) {
       case _ADMIN_LOGS:     return logs(ctx);
       case _ADMIN_USERS:    return users(ctx);
       case _ADMIN_SESSIONS: return sessions(ctx);
@@ -82,7 +83,7 @@ public final class FNAdmin extends StandardFunc {
    */
   private Iter logs(final QueryContext ctx) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
-    if(expr.length == 0) {
+    if(exprs.length == 0) {
       // return list of all log files
       for(final IOFile f : ctx.context.log.files()) {
         final String date = f.name().replace(IO.LOGSUFFIX, "");
@@ -90,8 +91,8 @@ public final class FNAdmin extends StandardFunc {
       }
     } else {
       // return content of single log file
-      final boolean merge = expr.length > 1 && checkBln(expr[1], ctx);
-      final String name = Token.string(checkStr(expr[0], ctx)) + IO.LOGSUFFIX;
+      final boolean merge = exprs.length > 1 && checkBln(exprs[1], ctx);
+      final String name = Token.string(checkStr(exprs[0], ctx)) + IO.LOGSUFFIX;
       final IOFile file = new IOFile(ctx.context.log.dir(), name);
       final ArrayList<LogEntry> logs = logs(file);
       for(int s = 0; s < logs.size(); s++) {
@@ -174,7 +175,7 @@ public final class FNAdmin extends StandardFunc {
    */
   private Iter users(final QueryContext ctx) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
-    for(final User u : expr.length == 0 ? ctx.context.users.users(null) :
+    for(final User u : exprs.length == 0 ? ctx.context.users.users(null) :
       checkData(ctx).meta.users.users(ctx.context.users)) {
       vb.add(new FElem(USER).add(u.name).add(PERMISSION,
           u.perm.toString().toLowerCase(Locale.ENGLISH)).add(PASSWORD, u.password));
@@ -204,7 +205,7 @@ public final class FNAdmin extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return !(oneOf(sig, _ADMIN_USERS, _ADMIN_SESSIONS) && !visitor.lock(DBLocking.ADMIN)) &&
-      !(sig == _ADMIN_USERS && expr.length > 0 && !dataLock(visitor, 1)) && super.accept(visitor);
+    return !(oneOf(func, _ADMIN_USERS, _ADMIN_SESSIONS) && !visitor.lock(DBLocking.ADMIN)) &&
+      !(func == _ADMIN_USERS && exprs.length > 0 && !dataLock(visitor, 1)) && super.accept(visitor);
   }
 }

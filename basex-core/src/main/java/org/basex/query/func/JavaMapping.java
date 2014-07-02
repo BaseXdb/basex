@@ -58,13 +58,13 @@ public abstract class JavaMapping extends Arr {
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param a arguments
+   * @param sc static context
+   * @param info input info
+   * @param args arguments
    */
-  JavaMapping(final StaticContext sctx, final InputInfo ii, final Expr[] a) {
-    super(ii, a);
-    sc = sctx;
+  JavaMapping(final StaticContext sc, final InputInfo info, final Expr[] args) {
+    super(info, args);
+    this.sc = sc;
   }
 
   @Override
@@ -74,9 +74,9 @@ public abstract class JavaMapping extends Arr {
 
   @Override
   public final Value value(final QueryContext ctx) throws QueryException {
-    final int es = expr.length;
+    final int es = exprs.length;
     final Value[] args = new Value[es];
-    for(int e = 0; e < es; ++e) args[e] = ctx.value(expr[e]);
+    for(int e = 0; e < es; ++e) args[e] = ctx.value(exprs[e]);
     return toValue(eval(args, ctx), ctx, sc);
   }
 

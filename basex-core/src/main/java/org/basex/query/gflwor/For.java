@@ -12,6 +12,7 @@ import org.basex.query.gflwor.GFLWOR.Eval;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -27,35 +28,29 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public final class For extends Clause {
-  /** Item variable. */
-  final Var var;
+public final class For extends ForLet {
   /** Position variable. */
   final Var pos;
   /** Score variable. */
   final Var score;
-  /** Bound expression. */
-  Expr expr;
   /** {@code allowing empty} flag. */
   final boolean empty;
 
   /**
    * Constructor.
-   * @param v item variable
-   * @param p position variable or {@code null}
-   * @param s score variable or {@code null}
-   * @param e bound expression
-   * @param emp {@code allowing empty} flag
-   * @param ii input info
+   * @param var item variable
+   * @param pos position variable or {@code null}
+   * @param score score variable or {@code null}
+   * @param expr bound expression
+   * @param empty {@code allowing empty} flag
+   * @param info input info
    */
-  public For(final Var v, final Var p, final Var s, final Expr e, final boolean emp,
-      final InputInfo ii) {
-    super(ii, vars(v, p, s));
-    var = v;
-    pos = p;
-    score = s;
-    expr = e;
-    empty = emp;
+  public For(final Var var, final Var pos, final Var score, final Expr expr, final boolean empty,
+      final InputInfo info) {
+    super(info, var, expr, vars(var, pos, score));
+    this.pos = pos;
+    this.score = score;
+    this.empty = empty;
   }
 
   @Override
@@ -97,47 +92,6 @@ public final class For extends Clause {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem e = planElem();
-    if(empty) e.add(planAttr(Token.token(EMPTYORD), Token.TRUE));
-    var.plan(e);
-    if(pos != null) {
-      final FElem e2 = new FElem(AT);
-      pos.plan(e2);
-      e.add(e2);
-    }
-
-    if(score != null) {
-      final FElem e2 = new FElem(SCORE);
-      score.plan(e2);
-      e.add(e2);
-    }
-
-    expr.plan(e);
-    plan.add(e);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(FOR).append(' ').append(var);
-    if(empty) sb.append(' ').append(ALLOWING).append(' ').append(EMPTYORD);
-    if(pos != null) sb.append(' ').append(AT).append(' ').append(pos);
-    if(score != null) sb.append(' ').append(SCORE).append(' ').append(score);
-    return sb.append(' ').append(IN).append(' ').append(expr).toString();
-  }
-
-  @Override
-  public boolean has(final Flag flag) {
-    return expr.has(flag);
-  }
-
-  @Override
-  public For compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    expr = expr.compile(ctx, scp);
-    return optimize(ctx, scp);
-  }
-
-  @Override
   public For optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     final SeqType tp = expr.type();
     final boolean emp = empty && tp.mayBeZero();
@@ -147,25 +101,6 @@ public final class For extends Clause {
     if(score != null) score.refineType(SeqType.DBL, ctx, info);
     size = emp ? -1 : 1;
     return this;
-  }
-
-  @Override
-  public boolean removable(final Var v) {
-    return expr.removable(v);
-  }
-
-  @Override
-  public VarUsage count(final Var v) {
-    return expr.count(v);
-  }
-
-  @Override
-  public Clause inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
-    final Expr sub = expr.inline(ctx, scp, v, e);
-    if(sub == null) return null;
-    expr = sub;
-    return optimize(ctx, scp);
   }
 
   @Override
@@ -198,11 +133,6 @@ public final class For extends Clause {
       s == null ? new Var[] { v, p } : new Var[] { v, p, s };
   }
 
-  @Override
-  public void checkUp() throws QueryException {
-    checkNoUp(expr);
-  }
-
   /**
    * Tries to convert this for loop into a let binding.
    * @param clauses FLWOR clauses
@@ -221,20 +151,29 @@ public final class For extends Clause {
    * Tries to add the given expression as an attribute to this loop's sequence.
    * @param ctx query context
    * @param scp variable scope
-   * @param prd expression to add as predicate
+   * @param ex expression to add as predicate
    * @return success
    * @throws QueryException query exception
    */
-  boolean toPred(final QueryContext ctx, final VarScope scp, final Expr prd) throws QueryException {
-    if(empty || !(vars.length == 1 && prd.uses(var) && prd.removable(var))) return false;
+  boolean toPred(final QueryContext ctx, final VarScope scp, final Expr ex) throws QueryException {
+    if(empty || !(vars.length == 1 && ex.uses(var) && ex.removable(var))) return false;
 
-    // assign type of iterated items to context expression
-    final Context c = new Context(info);
-    c.type = expr.type().type.seqType();
-    final Expr r = prd.inline(ctx, scp, var, c), inl = r == null ? prd : r;
+    // reset context value (will not be accessible within predicate)
+    final Value cv = ctx.value;
+    Expr pred = ex;
+    try {
+      ctx.value = null;
+      // assign type of iterated items to context expression
+      final Context c = new Context(info);
+      c.type = expr.type().type.seqType();
+      final Expr r = ex.inline(ctx, scp, var, c);
+      if(r != null) pred = r;
+    } finally {
+      ctx.value = cv;
+    }
 
     // attach predicates to axis path or filter, or create a new filter
-    final Expr pred = inl.type().mayBeNumber() ? Function.BOOLEAN.get(null, info, inl) : inl;
+    if(pred.type().mayBeNumber()) pred = Function.BOOLEAN.get(null, info, pred);
 
     // add to clause expression
     if(expr instanceof AxisPath) {
@@ -255,7 +194,32 @@ public final class For extends Clause {
   }
 
   @Override
-  public int exprSize() {
-    return expr.exprSize();
+  public void plan(final FElem plan) {
+    final FElem e = planElem();
+    if(empty) e.add(planAttr(Token.token(EMPTYORD), Token.TRUE));
+    var.plan(e);
+    if(pos != null) {
+      final FElem e2 = new FElem(AT);
+      pos.plan(e2);
+      e.add(e2);
+    }
+
+    if(score != null) {
+      final FElem e2 = new FElem(SCORE);
+      score.plan(e2);
+      e.add(e2);
+    }
+
+    expr.plan(e);
+    plan.add(e);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(FOR).append(' ').append(var);
+    if(empty) sb.append(' ').append(ALLOWING).append(' ').append(EMPTYORD);
+    if(pos != null) sb.append(' ').append(AT).append(' ').append(pos);
+    if(score != null) sb.append(' ').append(SCORE).append(' ').append(score);
+    return sb.append(' ').append(IN).append(' ').append(expr).toString();
   }
 }

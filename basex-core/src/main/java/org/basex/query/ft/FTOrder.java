@@ -19,11 +19,11 @@ import org.basex.util.hash.*;
 public final class FTOrder extends FTFilter {
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
+   * @param info input info
+   * @param expr expression
    */
-  public FTOrder(final InputInfo ii, final FTExpr e) {
-    super(ii, e);
+  public FTOrder(final InputInfo info, final FTExpr expr) {
+    super(info, expr);
   }
 
   @Override
@@ -40,12 +40,12 @@ public final class FTOrder extends FTFilter {
 
   @Override
   public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTOrder(info, expr[0].copy(ctx, scp, vs));
+    return new FTOrder(info, exprs[0].copy(ctx, scp, vs));
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(QueryText.ORDERED, TRUE), expr);
+    addPlan(plan, planElem(QueryText.ORDERED, TRUE), exprs);
   }
 
   @Override

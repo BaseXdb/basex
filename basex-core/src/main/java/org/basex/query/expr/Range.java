@@ -21,12 +21,12 @@ import org.basex.util.hash.*;
 public final class Range extends Arr {
   /**
    * Constructor.
-   * @param ii input info
-   * @param e1 first expression
-   * @param e2 second expression
+   * @param info input info
+   * @param expr1 first expression
+   * @param expr2 second expression
    */
-  public Range(final InputInfo ii, final Expr e1, final Expr e2) {
-    super(ii, e1, e2);
+  public Range(final InputInfo info, final Expr expr1, final Expr expr2) {
+    super(info, expr1, expr2);
     type = SeqType.ITR_ZM;
   }
 
@@ -60,7 +60,7 @@ public final class Range extends Arr {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Range(info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs));
+    return new Range(info, exprs[0].copy(ctx, scp, vs), exprs[1].copy(ctx, scp, vs));
   }
 
   /**
@@ -71,9 +71,9 @@ public final class Range extends Arr {
    * @throws QueryException query exception
    */
   private long[] rng(final QueryContext ctx) throws QueryException {
-    final Item a = expr[0].item(ctx, info);
+    final Item a = exprs[0].item(ctx, info);
     if(a == null) return null;
-    final Item b = expr[1].item(ctx, info);
+    final Item b = exprs[1].item(ctx, info);
     if(b == null) return null;
     return new long[] { checkItr(a), checkItr(b) };
   }

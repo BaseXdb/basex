@@ -27,12 +27,12 @@ final class JarParser {
 
   /**
    * Constructor.
-   * @param ctx database context
-   * @param ii input info
+   * @param context database context
+   * @param info input info
    */
-  JarParser(final Context ctx, final InputInfo ii) {
-    context = ctx;
-    info = ii;
+  JarParser(final Context context, final InputInfo info) {
+    this.context = context;
+    this.info = info;
   }
 
   /**

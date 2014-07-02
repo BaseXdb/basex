@@ -24,12 +24,12 @@ import org.basex.util.hash.*;
 public final class FTContainsExpr extends FTContains {
   /**
    * Constructor.
-   * @param e expression
-   * @param fte full-text expression
-   * @param ii input info
+   * @param expr expression
+   * @param ftexpr full-text expression
+   * @param info input info
    */
-  public FTContainsExpr(final Expr e, final FTExpr fte, final InputInfo ii) {
-    super(e, fte, ii);
+  public FTContainsExpr(final Expr expr, final FTExpr ftexpr, final InputInfo info) {
+    super(expr, ftexpr, info);
   }
 
   @Override
@@ -64,9 +64,9 @@ public final class FTContainsExpr extends FTContains {
   @Override
   public boolean indexAccessible(final IndexCosts ic) throws QueryException {
     // return if step is no text node, or if no index is available
-    final Step s = expr instanceof Context ? ic.step : CmpG.indexStep(expr);
-    final boolean ok = s != null && ic.ictx.data.meta.ftxtindex &&
-      s.test.type == NodeType.TXT && ftexpr.indexAccessible(ic);
+    final Step step = ic.indexStep(expr);
+    final boolean ok = step != null && ic.ictx.data.meta.ftxtindex &&
+      step.test.type == NodeType.TXT && ftexpr.indexAccessible(ic);
     ic.seq |= ic.not;
     return ok;
   }

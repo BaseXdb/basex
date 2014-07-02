@@ -20,11 +20,11 @@ public abstract class FuncCall extends Arr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e sub-expressions
+   * @param info input info
+   * @param exprs sub-expressions
    */
-  FuncCall(final InputInfo ii, final Expr[] e) {
-    super(ii, e);
+  FuncCall(final InputInfo info, final Expr[] exprs) {
+    super(info, exprs);
   }
 
   /**

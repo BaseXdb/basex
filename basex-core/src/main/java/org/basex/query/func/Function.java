@@ -1185,13 +1185,13 @@ public enum Function {
   /**
    * Creates a new instance of the function.
    * @param sc static context
-   * @param ii input info
-   * @param arg arguments
+   * @param info input info
+   * @param exprs arguments
    * @return function
    */
-  public StandardFunc get(final StaticContext sc, final InputInfo ii, final Expr... arg) {
+  public StandardFunc get(final StaticContext sc, final InputInfo info, final Expr... exprs) {
     return Reflect.get(Reflect.find(func, StaticContext.class, InputInfo.class, Function.class,
-        Expr[].class), sc, ii, this, arg);
+        Expr[].class), sc, info, this, exprs);
   }
 
   /**

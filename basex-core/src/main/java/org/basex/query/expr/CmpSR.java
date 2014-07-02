@@ -25,7 +25,7 @@ import org.basex.util.hash.*;
  */
 public final class CmpSR extends Single {
   /** Collation. */
-  private final Collation collation;
+  private final Collation coll;
   /** Minimum. */
   private final byte[] min;
   /** Include minimum value. */
@@ -41,25 +41,25 @@ public final class CmpSR extends Single {
 
   /**
    * Constructor.
-   * @param e (compiled) expression
-   * @param mn minimum value
-   * @param in include minimum value
-   * @param mx maximum value
-   * @param ix include maximum value
+   * @param expr (compiled) expression
+   * @param min minimum value
+   * @param mni include minimum value
+   * @param max maximum value
+   * @param mxi include maximum value
    * @param coll collation
-   * @param ii input info
+   * @param info input info
    */
-  private CmpSR(final Expr e, final byte[] mn, final boolean in, final byte[] mx, final boolean ix,
-      final Collation coll, final InputInfo ii) {
+  private CmpSR(final Expr expr, final byte[] min, final boolean mni, final byte[] max,
+      final boolean mxi, final Collation coll, final InputInfo info) {
 
-    super(ii, e);
-    collation = coll;
-    min = mn;
-    mni = in;
-    max = mx;
-    mxi = ix;
+    super(info, expr);
+    this.coll = coll;
+    this.min = min;
+    this.mni = mni;
+    this.max = max;
+    this.mxi = mxi;
     type = SeqType.BLN;
-    atomic = e.type().zeroOrOne();
+    atomic = expr.type().zeroOrOne();
   }
 
   /**
@@ -69,14 +69,14 @@ public final class CmpSR extends Single {
    * @throws QueryException query exception
    */
   static Expr get(final CmpG ex) throws QueryException {
-    if(!(ex.expr[1] instanceof AStr)) return ex;
-    final byte[] d = ((Item) ex.expr[1]).string(ex.info);
-    final Expr e = ex.expr[0];
+    if(!(ex.exprs[1] instanceof AStr)) return ex;
+    final byte[] d = ((Item) ex.exprs[1]).string(ex.info);
+    final Expr e = ex.exprs[0];
     switch(ex.op.op) {
-      case GE: return new CmpSR(e, d, true, null, true, ex.collation, ex.info);
-      case GT: return new CmpSR(e, d, false, null, true, ex.collation, ex.info);
-      case LE: return new CmpSR(e, null, true, d, true, ex.collation, ex.info);
-      case LT: return new CmpSR(e, null, true, d, false, ex.collation, ex.info);
+      case GE: return new CmpSR(e, d, true, null, true, ex.coll, ex.info);
+      case GT: return new CmpSR(e, d, false, null, true, ex.coll, ex.info);
+      case LE: return new CmpSR(e, null, true, d, true, ex.coll, ex.info);
+      case LT: return new CmpSR(e, null, true, d, false, ex.coll, ex.info);
       default: return ex;
     }
   }
@@ -107,9 +107,9 @@ public final class CmpSR extends Single {
     if(!it.type.isStringOrUntyped()) throw INVTYPECMP.get(info, it.type, AtomType.STR);
     final byte[] s = it.string(info);
     final int mn = min == null ?  1 :
-      collation == null ? Token.diff(s, min) : collation.compare(s, min);
+      coll == null ? Token.diff(s, min) : coll.compare(s, min);
     final int mx = max == null ? -1 :
-      collation == null ? Token.diff(s, max) : collation.compare(s, max);
+      coll == null ? Token.diff(s, max) : coll.compare(s, max);
     return (mni ? mn >= 0 : mn > 0) && (mxi ? mx <= 0 : mx < 0);
   }
 
@@ -120,7 +120,7 @@ public final class CmpSR extends Single {
    */
   Expr intersect(final CmpSR c) {
     // skip intersection if expressions to be compared are different
-    if(!(collation == null && c.expr.sameAs(expr))) return null;
+    if(!(coll == null && c.expr.sameAs(expr))) return null;
 
     // find common minimum and maximum value
     final byte[] mn = min == null ? c.min : c.min == null ? min : Token.max(min, c.min);
@@ -141,15 +141,18 @@ public final class CmpSR extends Single {
 
   @Override
   public boolean indexAccessible(final IndexCosts ic) {
+    // only default collation is supported
+    if(coll != null) return false;
+
     // accept only location path, string and equality expressions
-    final Step s = CmpG.indexStep(expr);
-    // no range index support in main-memory index structures
     final Data data = ic.ictx.data;
-    if(collation != null || s == null || data.inMemory()) return false;
+    final Step step = ic.indexStep(expr);
+    // no range index support in main-memory index structures
+    if(step == null || data.inMemory()) return false;
 
     // check which index applies
-    final boolean text = s.test.type == NodeType.TXT && data.meta.textindex;
-    final boolean attr = s.test.type == NodeType.ATT && data.meta.attrindex;
+    final boolean text = step.test.type == NodeType.TXT && data.meta.textindex;
+    final boolean attr = step.test.type == NodeType.ATT && data.meta.attrindex;
     if(!text && !attr || min == null || max == null) return false;
 
     // create range access
@@ -160,15 +163,15 @@ public final class CmpSR extends Single {
 
   @Override
   public Expr indexEquivalent(final IndexCosts ic) {
-    final boolean text = rt.type() == IndexType.TEXT;
     ic.ctx.compInfo(OPTSRNGINDEX);
-    return ic.invert(expr, new StringRangeAccess(info, rt, ic.ictx), text);
+    final ParseExpr root = new StringRangeAccess(info, rt, ic.ictx);
+    return ic.invert(expr, root, rt.type() == IndexType.TEXT);
   }
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final CmpSR res =
-        new CmpSR(expr.copy(ctx, scp, vs), min, mni, max, mxi, collation, info);
+        new CmpSR(expr.copy(ctx, scp, vs), min, mni, max, mxi, coll, info);
     res.rt = rt;
     return res;
   }

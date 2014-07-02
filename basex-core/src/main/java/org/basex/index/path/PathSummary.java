@@ -38,22 +38,22 @@ public final class PathSummary implements Index {
 
   /**
    * Constructor, specifying a data reference.
-   * @param d data reference
+   * @param data data reference
    */
-  public PathSummary(final Data d) {
+  public PathSummary(final Data data) {
     this();
-    data = d;
+    this.data = data;
   }
 
   /**
    * Constructor, specifying an input file.
-   * @param d data reference
+   * @param data data reference
    * @param in input stream
    * @throws IOException I/O exception
    */
-  public PathSummary(final Data d, final DataInput in) throws IOException {
-    root = in.readBool() ? new PathNode(in, null) : new PathNode();
-    data = d;
+  public PathSummary(final Data data, final DataInput in) throws IOException {
+    this.root = in.readBool() ? new PathNode(in, null) : new PathNode();
+    this.data = data;
   }
 
   /**
@@ -68,10 +68,10 @@ public final class PathSummary implements Index {
 
   /**
    * Sets the data reference.
-   * @param d reference
+   * @param dt reference
    */
-  public void data(final Data d) {
-    data = d;
+  public void data(final Data dt) {
+    data = dt;
   }
 
   @Override
@@ -88,29 +88,31 @@ public final class PathSummary implements Index {
 
   /**
    * Adds an entry.
-   * @param n name reference (0 for nodes other than element and attributes)
-   * @param k node kind
-   * @param l current level
+   * @param name name reference (0 for nodes other than element and attributes)
+   * @param kind node kind
+   * @param level current level
    */
-  public void put(final int n, final byte k, final int l) {
-    put(n, k, l, null, null);
+  public void put(final int name, final byte kind, final int level) {
+    put(name, kind, level, null, null);
   }
 
   /**
    * Adds an entry, including its value.
-   * @param n name reference (0 for nodes other than element and attributes)
-   * @param k node kind
-   * @param l current level
-   * @param v value
-   * @param md meta data
+   * @param name name reference (0 for nodes other than element and attributes)
+   * @param kind node kind
+   * @param level current level
+   * @param value value
+   * @param meta meta data
    */
-  public void put(final int n, final byte k, final int l, final byte[] v, final MetaData md) {
-    if(l == 0) {
-      if(v != null) root.stats.add(v, md);
+  public void put(final int name, final byte kind, final int level, final byte[] value,
+      final MetaData meta) {
+
+    if(level == 0) {
+      if(value != null) root.stats.add(value, meta);
       root.stats.count++;
     } else {
-      while(l >= stack.size()) stack.add(null);
-      stack.set(l, stack.get(l - 1).index(n, k, v, md));
+      while(level >= stack.size()) stack.add(null);
+      stack.set(level, stack.get(level - 1).index(name, kind, value, meta));
     }
   }
 
@@ -129,28 +131,28 @@ public final class PathSummary implements Index {
   /**
    * Returns all parents of the specified nodes.
    * Used by the query optimizers.
-   * @param in input nodes
+   * @param nodes input nodes
    * @return parent nodes
    */
-  public static ArrayList<PathNode> parent(final ArrayList<PathNode> in) {
+  public static ArrayList<PathNode> parent(final ArrayList<PathNode> nodes) {
     final ArrayList<PathNode> out = new ArrayList<>();
-    for(final PathNode n : in) if(!out.contains(n.par)) out.add(n.par);
+    for(final PathNode node : nodes) if(!out.contains(node.parent)) out.add(node.parent);
     return out;
   }
 
   /**
    * Returns all children or descendants of the specified nodes.
    * Called from the query parser and optimizer.
-   * @param in input nodes
+   * @param nodes input nodes
    * @param desc if false, return only children
    * @return descendant nodes
    */
-  public static ArrayList<PathNode> desc(final ArrayList<PathNode> in, final boolean desc) {
+  public static ArrayList<PathNode> desc(final ArrayList<PathNode> nodes, final boolean desc) {
     final ArrayList<PathNode> out = new ArrayList<>();
-    for(final PathNode n : in) {
-      for(final PathNode c : n.ch) {
-        if(desc) c.addDesc(out);
-        else if(!out.contains(c)) out.add(c);
+    for(final PathNode node : nodes) {
+      for(final PathNode child : node.children) {
+        if(desc) child.addDesc(out);
+        else if(!out.contains(child)) out.add(child);
       }
     }
     return out;
@@ -159,74 +161,75 @@ public final class PathSummary implements Index {
   /**
    * Returns all children or descendants of the specified nodes with the
    * specified tag or attribute value. Called from the query optimizer.
-   * @param n name reference
-   * @param k node kind
+   * @param name name reference
+   * @param kind node kind
    * @return descendant nodes
    */
-  public ArrayList<PathNode> desc(final int n, final int k) {
-    final ArrayList<PathNode> out = new ArrayList<>();
-    for(final PathNode c : root.ch) c.addDesc(out, n, k);
-    return out;
+  public ArrayList<PathNode> desc(final int name, final int kind) {
+    final ArrayList<PathNode> nodes = new ArrayList<>();
+    for(final PathNode child : root.children) child.addDesc(nodes, name, kind);
+    return nodes;
   }
 
   /**
-   * Returns descendant tags and attributes for the specified start key.
+   * Returns descendant element and attribute names for the specified start key.
    * Used by the GUI.
-   * @param k input key
-   * @param d if false, return only children
-   * @param o true/false: sort by occurrence/lexicographically
-   * @return children
+   * @param name input key
+   * @param desc if false, return only children
+   * @param occ true/false: sort by occurrence/lexicographically
+   * @return names
    */
-  public TokenList desc(final byte[] k, final boolean d, final boolean o) {
-    final TokenList tl = new TokenList();
-    if(k.length != 0) tl.add(k);
-    return desc(tl, d, o);
+  public TokenList desc(final byte[] name, final boolean desc, final boolean occ) {
+    final TokenList names = new TokenList();
+    if(name.length != 0) names.add(name);
+    return desc(names, desc, occ);
   }
 
   /**
-   * Returns descendant tags and attributes for the specified descendant path.
+   * Returns descendant element and attribute names for the specified descendant path.
    * Used by the GUI.
-   * @param tl input steps
-   * @param d if false, return only children
-   * @param o true/false: sort by occurrence/lexicographically
+   * @param names input steps
+   * @param desc if false, return only children
+   * @param occ true/false: sort by occurrence/lexicographically
    * @return children
    */
-  public TokenList desc(final TokenList tl, final boolean d, final boolean o) {
+  public TokenList desc(final TokenList names, final boolean desc, final boolean occ) {
     // follow the specified descendant/child steps
-    ArrayList<PathNode> in = desc(root(), true);
+    ArrayList<PathNode> nodes = desc(root(), true);
 
-    for(final byte[] i : tl) {
-      final boolean att = startsWith(i, '@');
-      final byte kind = att ? Data.ATTR : Data.ELEM;
-      final int id = att ? data.atnindex.id(substring(i, 1)) : data.tagindex.id(i);
+    for(final byte[] name : names) {
+      final boolean attr = startsWith(name, '@');
+      final byte kind = attr ? Data.ATTR : Data.ELEM;
+      final int id = attr ? data.atnindex.id(substring(name, 1)) : data.tagindex.id(name);
 
-      final ArrayList<PathNode> out = new ArrayList<>();
-      for(final PathNode n : in) {
-        if(n.name != id || n.kind != kind) continue;
-        for(final PathNode c : n.ch) {
-          if(d) c.addDesc(out);
-          else out.add(c);
+      final ArrayList<PathNode> tmp = new ArrayList<>();
+      for(final PathNode node : nodes) {
+        if(node.name != id || node.kind != kind) continue;
+        for(final PathNode child : node.children) {
+          if(desc) child.addDesc(tmp);
+          else tmp.add(child);
         }
       }
-      in = out;
+      nodes = tmp;
     }
 
     // sort by number of occurrences
-    final int[] tmp = new int[in.size()];
-    for(int i = 0; i < in.size(); ++i) tmp[i] = in.get(i).stats.count;
-    final int[] occ = Array.createOrder(tmp, false);
+    final int[] tmp = new int[nodes.size()];
+    for(int i = 0; i < nodes.size(); ++i) tmp[i] = nodes.get(i).stats.count;
+    final int[] occs = Array.createOrder(tmp, false);
 
     // remove non-text/attribute nodes
-    final TokenList out = new TokenList();
-    for(int i = 0; i < in.size(); ++i) {
-      final PathNode r = in.get(o ? occ[i] : i);
-      final byte[] name = r.token(data);
-      if(name.length != 0 && !out.contains(name) && !contains(name, '(')) {
-        out.add(name);
+    final TokenList list = new TokenList();
+    final int ns = nodes.size();
+    for(int n = 0; n < ns; n++) {
+      final PathNode node = nodes.get(occ ? occs[n] : n);
+      final byte[] name = node.token(data);
+      if(name.length != 0 && !list.contains(name) && !contains(name, '(')) {
+        list.add(name);
       }
     }
-    if(!o) out.sort(false);
-    return out;
+    if(!occ) list.sort(false);
+    return list;
   }
 
   // Info =====================================================================

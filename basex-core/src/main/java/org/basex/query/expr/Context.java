@@ -1,11 +1,8 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
-
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -23,10 +20,10 @@ import org.basex.util.hash.*;
 public final class Context extends Simple {
   /**
    * Constructor.
-   * @param ii input info
+   * @param info input info
    */
-  public Context(final InputInfo ii) {
-    super(ii);
+  public Context(final InputInfo info) {
+    super(info);
     type = SeqType.ITEM_ZM;
   }
 
@@ -69,14 +66,6 @@ public final class Context extends Simple {
   @Override
   public boolean accept(final ASTVisitor visitor) {
     return visitor.lock(DBLocking.CTX) && super.accept(visitor);
-  }
-
-  @Override
-  public Expr addText(final QueryContext ctx) {
-    // replacing context node with text() node to facilitate index rewritings
-    if(!ctx.leaf) return this;
-    ctx.compInfo(OPTTEXT);
-    return Path.get(info, null, Step.get(info, Axis.CHILD, Test.TXT));
   }
 
   @Override

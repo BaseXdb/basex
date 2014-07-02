@@ -25,20 +25,21 @@ public final class FNHof extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNHof(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNHof(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _HOF_SORT_WITH:  return sortWith(ctx).iter();
       case _HOF_ID:
-      case _HOF_CONST:      return ctx.iter(expr[0]);
+      case _HOF_CONST:      return ctx.iter(exprs[0]);
       case _HOF_FOLD_LEFT1: return foldLeft1(ctx).iter();
       case _HOF_UNTIL:      return until(ctx).iter();
       case _HOF_TOP_K_BY:   return topKBy(ctx).iter();
@@ -49,12 +50,12 @@ public final class FNHof extends StandardFunc {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _HOF_SORT_WITH:  return sortWith(ctx);
       case _HOF_FOLD_LEFT1: return foldLeft1(ctx);
       case _HOF_UNTIL:      return until(ctx);
       case _HOF_ID:
-      case _HOF_CONST:      return ctx.value(expr[0]);
+      case _HOF_CONST:      return ctx.value(exprs[0]);
       case _HOF_TOP_K_BY:   return topKBy(ctx);
       case _HOF_TOP_K_WITH: return topKWith(ctx);
       default:              return super.value(ctx);
@@ -63,23 +64,23 @@ public final class FNHof extends StandardFunc {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _HOF_ID:
-      case _HOF_CONST: return expr[0].item(ctx, ii);
+      case _HOF_CONST: return exprs[0].item(ctx, ii);
       default:         return super.item(ctx, ii);
     }
   }
 
   @Override
   protected Expr opt(final QueryContext ctx, final VarScope scp) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _HOF_ID:
       case _HOF_CONST:
-        return expr[0];
+        return exprs[0];
       case _HOF_FOLD_LEFT1:
-        if(allAreValues() && expr[0].size() < FNFunc.UNROLL_LIMIT) {
+        if(allAreValues() && exprs[0].size() < FNFunc.UNROLL_LIMIT) {
           ctx.compInfo(QueryText.OPTUNROLL, this);
-          final Value seq = (Value) expr[0];
+          final Value seq = (Value) exprs[0];
           if(seq.isEmpty()) throw INVEMPTY.get(info, description());
           final FItem f = withArity(1, 2, ctx);
           Expr e = seq.itemAt(0);
@@ -102,7 +103,7 @@ public final class FNHof extends StandardFunc {
    */
   private Value foldLeft1(final QueryContext ctx) throws QueryException {
     final FItem f = withArity(1, 2, ctx);
-    final Iter xs = expr[0].iter(ctx);
+    final Iter xs = exprs[0].iter(ctx);
 
     Value sum = checkNoEmpty(xs.next());
     for(Item x; (x = xs.next()) != null;) sum = f.invokeValue(ctx, info, sum, x);
@@ -116,7 +117,7 @@ public final class FNHof extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value sortWith(final QueryContext ctx) throws QueryException {
-    final Value v = expr[0].value(ctx);
+    final Value v = exprs[0].value(ctx);
     final Comparator<Item> cmp = getComp(1, ctx);
     if(v.size() < 2) return v;
     final ValueBuilder vb = v.cache();
@@ -137,7 +138,7 @@ public final class FNHof extends StandardFunc {
   private Value until(final QueryContext ctx) throws QueryException {
     final FItem pred = withArity(0, 1, ctx);
     final FItem fun = withArity(1, 1, ctx);
-    Value v = ctx.value(expr[2]);
+    Value v = ctx.value(exprs[2]);
     while(!checkBln(checkNoEmpty(pred.invokeItem(ctx, info, v)), ctx)) {
       v = fun.invokeValue(ctx, info, v);
     }
@@ -152,10 +153,10 @@ public final class FNHof extends StandardFunc {
    */
   private Value topKBy(final QueryContext ctx) throws QueryException {
     final FItem getKey = withArity(1, 1, ctx);
-    final long k = checkItr(expr[2], ctx);
+    final long k = checkItr(exprs[2], ctx);
     if(k < 1 || k > Integer.MAX_VALUE / 2) return Empty.SEQ;
 
-    final Iter iter = expr[0].iter(ctx);
+    final Iter iter = exprs[0].iter(ctx);
     final MinHeap<Item, Item> heap = new MinHeap<>((int) k,
         new Comparator<Item>() {
       @Override
@@ -188,10 +189,10 @@ public final class FNHof extends StandardFunc {
    */
   private Value topKWith(final QueryContext ctx) throws QueryException {
     final Comparator<Item> cmp = getComp(1, ctx);
-    final long k = checkItr(expr[2], ctx);
+    final long k = checkItr(exprs[2], ctx);
     if(k < 1 || k > Integer.MAX_VALUE / 2) return Empty.SEQ;
 
-    final Iter iter = expr[0].iter(ctx);
+    final Iter iter = exprs[0].iter(ctx);
     final MinHeap<Item, Item> heap = new MinHeap<>((int) k, cmp);
 
     try {
@@ -240,7 +241,7 @@ public final class FNHof extends StandardFunc {
    * @throws QueryException query exception
    */
   private FItem withArity(final int p, final int a, final QueryContext ctx) throws QueryException {
-    final Item f = checkItem(expr[p], ctx);
+    final Item f = checkItem(exprs[p], ctx);
     if(f instanceof FItem && ((XQFunction) f).arity() == a) return (FItem) f;
     throw Err.typeError(this, FuncType.arity(a), f);
   }

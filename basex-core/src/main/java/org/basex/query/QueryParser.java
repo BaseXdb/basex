@@ -3140,7 +3140,7 @@ public class QueryParser extends InputParser {
 
     if(ordered) {
       if(first == null) return new FTOrder(info(), expr);
-      first.expr[0] = new FTOrder(info(), first.expr[0]);
+      first.exprs[0] = new FTOrder(info(), first.exprs[0]);
     }
     return expr;
   }

@@ -26,17 +26,17 @@ public final class FTDistance extends FTFilter {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
-   * @param mn minimum
-   * @param mx maximum
-   * @param u unit
+   * @param info input info
+   * @param expr expression
+   * @param min minimum
+   * @param max maximum
+   * @param unit unit
    */
-  public FTDistance(final InputInfo ii, final FTExpr e, final Expr mn, final Expr mx,
-      final FTUnit u) {
-    super(ii, e, u);
-    min = mn;
-    max = mx;
+  public FTDistance(final InputInfo info, final FTExpr expr, final Expr min, final Expr max,
+      final FTUnit unit) {
+    super(info, expr, unit);
+    this.min = min;
+    this.max = max;
   }
 
   @Override
@@ -104,19 +104,19 @@ public final class FTDistance extends FTFilter {
     if(mn != null) min = mn;
     if(mx != null) max = mx;
 
-    return inlineAll(ctx, scp, expr, v, e) || mn != null || mx != null
+    return inlineAll(ctx, scp, exprs, v, e) || mn != null || mx != null
         ? optimize(ctx, scp) : null;
   }
 
   @Override
   public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTDistance(info, expr[0].copy(ctx, scp, vs),
+    return new FTDistance(info, exprs[0].copy(ctx, scp, vs),
         min.copy(ctx, scp, vs), max.copy(ctx, scp, vs), unit);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(DISTANCE, min + "-" + max + ' ' + unit), expr);
+    addPlan(plan, planElem(DISTANCE, min + "-" + max + ' ' + unit), exprs);
   }
 
   @Override
@@ -132,7 +132,7 @@ public final class FTDistance extends FTFilter {
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final FTExpr e : expr) sz += e.exprSize();
+    for(final FTExpr e : exprs) sz += e.exprSize();
     return min.exprSize() + max.exprSize() + sz;
   }
 }

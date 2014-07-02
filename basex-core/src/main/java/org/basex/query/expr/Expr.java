@@ -45,6 +45,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Compiles and optimizes the expression, assigns data types and cardinalities.
+   * This method will be initially called by {@link QueryContext#compile}.
    * @param ctx query context
    * @param scp variable scope
    * @return optimized expression
@@ -203,15 +204,17 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Inlines an expression into this one, replacing all references to the given variable.
-   * @param ctx query context for recompilation
-   * @param scp variable scope for recompilation
+   * This function is e.g. called by {@link GFLWOR#inlineLets} and {@link For#toPred},
+   * and the variable reference is replaced in {@link VarRef#inline}.
+   * @param ctx query context for reoptimization
+   * @param scp variable scope for reoptimization
    * @param v variable to replace
    * @param e expression to inline
    * @return resulting expression if something changed, {@code null} otherwise
    * @throws QueryException query exception
    */
   public abstract Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
-                                 final Expr e) throws QueryException;
+      final Expr e) throws QueryException;
 
   /**
    * Inlines the given expression into all elements of the given array.
@@ -294,8 +297,9 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Checks if an expression can be rewritten to an index access. If this method is
-   * implemented, {@link #indexEquivalent} must be implemented as well.
+   * Checks if an expression can be rewritten to an index access. This method will be called by
+   * by {@link Path#index}. If it is overwritten by a class, {@link #indexEquivalent}
+   * must be implemented as well.
    * @param ic index costs analyzer
    * @return true if an index can be used
    * @throws QueryException query exception
@@ -306,8 +310,8 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Returns an equivalent expression which accesses an index structure. Will be called
-   * if {@link #indexAccessible} is returns true for an expression.
+   * Returns an equivalent expression which accesses an index structure. This method will be called
+   * by {@link Path#index} if {@link #indexAccessible} returns true.
    * @param ic index costs analyzer
    * @return equivalent index-expression
    * @throws QueryException query exception
@@ -328,22 +332,12 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Checks if this expression is a certain function.
-   * @param f function definition
+   * @param func function definition
    * @return result of check
    */
   @SuppressWarnings("unused")
-  public boolean isFunction(final Function f) {
+  public boolean isFunction(final Function func) {
     return false;
-  }
-
-  /**
-   * Optionally adds a text node to an expression for potential index rewriting.
-   * @param ctx query context
-   * @return expression
-   */
-  @SuppressWarnings("unused")
-  public Expr addText(final QueryContext ctx) {
-    return this;
   }
 
   /**

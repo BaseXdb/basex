@@ -23,10 +23,10 @@ import org.basex.util.hash.*;
 public final class Root extends Simple {
   /**
    * Constructor.
-   * @param ii input info
+   * @param info input info
    */
-  public Root(final InputInfo ii) {
-    super(ii);
+  public Root(final InputInfo info) {
+    super(info);
     type = SeqType.DOC_ZM;
   }
 

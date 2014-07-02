@@ -26,43 +26,43 @@ public final class FTAnd extends FTExpr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression list
+   * @param info input info
+   * @param exprs expressions
    */
-  public FTAnd(final InputInfo ii, final FTExpr[] e) {
-    super(ii, e);
+  public FTAnd(final InputInfo info, final FTExpr[] exprs) {
+    super(info, exprs);
   }
 
   @Override
   public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
     boolean not = true;
-    for(final FTExpr e : expr) not &= e instanceof FTNot;
+    for(final FTExpr e : exprs) not &= e instanceof FTNot;
     if(not) {
       // convert (!A and !B and ...) to !(A or B or ...)
-      final int es = expr.length;
-      for(int e = 0; e < es; ++e) expr[e] = expr[e].expr[0];
-      return new FTNot(info, new FTOr(info, expr));
+      final int es = exprs.length;
+      for(int e = 0; e < es; ++e) exprs[e] = exprs[e].exprs[0];
+      return new FTNot(info, new FTOr(info, exprs));
     }
     return this;
   }
 
   @Override
   public FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final FTNode item = expr[0].item(ctx, info);
-    final int es = expr.length;
-    for(int e = 1; e < es; ++e) and(item, expr[e].item(ctx, info));
+    final FTNode item = exprs[0].item(ctx, info);
+    final int es = exprs.length;
+    for(int e = 1; e < es; ++e) and(item, exprs[e].item(ctx, info));
     return item;
   }
 
   @Override
   public FTIter iter(final QueryContext ctx) throws QueryException {
     // initialize iterators
-    final int es = expr.length;
+    final int es = exprs.length;
     final FTIter[] ir = new FTIter[es];
     final FTNode[] it = new FTNode[es];
     for(int e = 0; e < es; ++e) {
-      ir[e] = expr[e].iter(ctx);
+      ir[e] = exprs[e].iter(ctx);
       it[e] = ir[e].next();
     }
 
@@ -124,13 +124,13 @@ public final class FTAnd extends FTExpr {
 
   @Override
   public boolean indexAccessible(final IndexCosts ic) throws QueryException {
-    final int es = expr.length;
+    final int es = exprs.length;
     neg = new boolean[es];
 
     int is = 0;
     int n = 0;
     for(int i = 0; i < es; ++i) {
-      if(!expr[i].indexAccessible(ic)) return false;
+      if(!exprs[i].indexAccessible(ic)) return false;
       neg[i] = ic.not;
       if(ic.not) ++n;
       ic.not = false;
@@ -145,7 +145,7 @@ public final class FTAnd extends FTExpr {
 
   @Override
   public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final FTAnd copy = new FTAnd(info, Arr.copyAll(ctx, scp, vs, expr));
+    final FTAnd copy = new FTAnd(info, Arr.copyAll(ctx, scp, vs, exprs));
     if(neg != null) copy.neg = neg.clone();
     return copy;
   }

@@ -25,18 +25,18 @@ public final class FNInspect extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNInspect(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNInspect(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _INSPECT_FUNCTIONS: return functions(ctx);
       default:                 return super.iter(ctx);
     }
@@ -44,7 +44,7 @@ public final class FNInspect extends StandardFunc {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _INSPECT_FUNCTION: return function(ctx);
       case _INSPECT_MODULE:   return module(ctx);
       case _INSPECT_CONTEXT:  return context(ctx);
@@ -55,7 +55,7 @@ public final class FNInspect extends StandardFunc {
 
   @Override
   protected Expr opt(final QueryContext ctx, final VarScope scp) throws QueryException {
-    if(sig == Function._INSPECT_FUNCTIONS && expr.length == 0) {
+    if(func == Function._INSPECT_FUNCTIONS && exprs.length == 0) {
       for(final StaticFunc sf : ctx.funcs.funcs()) sf.compile(ctx);
       return functions(ctx).value();
     }
@@ -69,10 +69,10 @@ public final class FNInspect extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item function(final QueryContext ctx) throws QueryException {
-    final FItem func = checkFunc(expr[0], ctx);
-    final QNm name = func.funcName();
-    final StaticFunc sf = name == null ? null : ctx.funcs.get(name, func.arity(), null, false);
-    return new PlainDoc(ctx, info).function(name, sf, func.funcType(), func.annotations(), null);
+    final FItem fn = checkFunc(exprs[0], ctx);
+    final QNm name = fn.funcName();
+    final StaticFunc sf = name == null ? null : ctx.funcs.get(name, fn.arity(), null, false);
+    return new PlainDoc(ctx, info).function(name, sf, fn.funcType(), fn.annotations(), null);
   }
 
   /**
@@ -93,7 +93,7 @@ public final class FNInspect extends StandardFunc {
    */
   private Item module(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    return new PlainDoc(ctx, info).parse(checkPath(expr[0], ctx));
+    return new PlainDoc(ctx, info).parse(checkPath(exprs[0], ctx));
   }
 
   /**
@@ -104,7 +104,7 @@ public final class FNInspect extends StandardFunc {
    */
   private Item xqdoc(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    return new XQDoc(ctx, info).parse(checkPath(expr[0], ctx));
+    return new XQDoc(ctx, info).parse(checkPath(exprs[0], ctx));
   }
 
   /**
@@ -116,11 +116,11 @@ public final class FNInspect extends StandardFunc {
   private ValueBuilder functions(final QueryContext ctx) throws QueryException {
     // about to be updated in a future version
     final ArrayList<StaticFunc> old = new ArrayList<>();
-    if(expr.length > 0) {
+    if(exprs.length > 0) {
       // cache existing functions
       for(final StaticFunc sf : ctx.funcs.funcs()) old.add(sf);
       try {
-        final IO io = checkPath(expr[0], ctx);
+        final IO io = checkPath(exprs[0], ctx);
         ctx.parse(Token.string(io.read()), io.path(), sc);
         ctx.compile();
       } catch(final IOException ex) {
@@ -142,7 +142,7 @@ public final class FNInspect extends StandardFunc {
   @Override
   public boolean has(final Flag flag) {
     // do not relocate function, as it introduces new code
-    return flag == Flag.NDT && sig == Function._INSPECT_FUNCTIONS && expr.length == 1 ||
+    return flag == Flag.NDT && func == Function._INSPECT_FUNCTIONS && exprs.length == 1 ||
         super.has(flag);
   }
 }

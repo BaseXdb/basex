@@ -51,43 +51,45 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param r return type
-   * @param v arguments
-   * @param e function body
-   * @param a annotations
-   * @param bindings bindings for non-local variables
-   * @param stc static context
-   * @param scp scope
+   * @param info input info
+   * @param ret return type
+   * @param args arguments
+   * @param expr function body
+   * @param ann annotations
+   * @param nonLocal bindings for non-local variables
+   * @param sc static context
+   * @param scope scope
    */
-  public Closure(final InputInfo ii, final SeqType r, final Var[] v, final Expr e, final Ann a,
-      final HashMap<Var, Expr> bindings, final StaticContext stc, final VarScope scp) {
-    this(ii, null, r, v, e, a, bindings, stc, scp);
+  public Closure(final InputInfo info, final SeqType ret, final Var[] args, final Expr expr,
+      final Ann ann, final HashMap<Var, Expr> nonLocal, final StaticContext sc,
+      final VarScope scope) {
+    this(info, null, ret, args, expr, ann, nonLocal, sc, scope);
   }
 
   /**
    * Package-private constructor allowing a name.
-   * @param ii input info
-   * @param nm name of the function
-   * @param r return type
-   * @param v argument variables
-   * @param e function expression
-   * @param a annotations
-   * @param bindings bindings for non-local variables
-   * @param stc static context
-   * @param scp variable scope
+   * @param info input info
+   * @param name name of the function
+   * @param ret return type
+   * @param args argument variables
+   * @param expr function expression
+   * @param ann annotations
+   * @param nonLocal bindings for non-local variables
+   * @param sc static context
+   * @param scope variable scope
    */
-  Closure(final InputInfo ii, final QNm nm, final SeqType r, final Var[] v, final Expr e,
-      final Ann a, final HashMap<Var, Expr> bindings, final StaticContext stc, final VarScope scp) {
-    super(ii, e);
-    name = nm;
-    args = v;
-    ret = r;
-    ann = a == null ? new Ann() : a;
-    updating = ann.contains(Ann.Q_UPDATING);
-    nonLocal = bindings;
-    scope = scp;
-    sc = stc;
+  Closure(final InputInfo info, final QNm name, final SeqType ret, final Var[] args,
+      final Expr expr, final Ann ann, final HashMap<Var, Expr> nonLocal, final StaticContext sc,
+      final VarScope scope) {
+    super(info, expr);
+    this.name = name;
+    this.args = args;
+    this.ret = ret;
+    this.ann = ann == null ? new Ann() : ann;
+    updating = this.ann.contains(Ann.Q_UPDATING);
+    this.nonLocal = nonLocal;
+    this.scope = scope;
+    this.sc = sc;
   }
 
   @Override

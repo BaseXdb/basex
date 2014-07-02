@@ -36,17 +36,18 @@ public final class FNGen extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNGen(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNGen(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case DATA:                return data(ctx);
       case COLLECTION:          return collection(ctx).iter();
       case URI_COLLECTION:      return uriCollection(ctx);
@@ -57,7 +58,7 @@ public final class FNGen extends StandardFunc {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case DOC:                     return doc(ctx);
       case DOC_AVAILABLE:           return docAvailable(ctx);
       case UNPARSED_TEXT:           return unparsedText(ctx, false);
@@ -72,7 +73,7 @@ public final class FNGen extends StandardFunc {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case COLLECTION: return collection(ctx);
       default:         return super.value(ctx);
     }
@@ -80,8 +81,8 @@ public final class FNGen extends StandardFunc {
 
   @Override
   protected Expr opt(final QueryContext ctx, final VarScope scp) {
-    if(sig == DATA && expr.length == 1) {
-      final SeqType t = expr[0].type();
+    if(func == DATA && exprs.length == 1) {
+      final SeqType t = exprs[0].type();
       type = t.type.isNode() ? SeqType.get(AtomType.ATM, t.occ) : t;
     }
     return this;
@@ -94,7 +95,7 @@ public final class FNGen extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter data(final QueryContext ctx) throws QueryException {
-    final Iter ir = ctx.iter(expr.length == 0 ? checkCtx(ctx) : expr[0]);
+    final Iter ir = ctx.iter(exprs.length == 0 ? checkCtx(ctx) : exprs[0]);
 
     return new Iter() {
       @Override
@@ -115,7 +116,7 @@ public final class FNGen extends StandardFunc {
    */
   private Value collection(final QueryContext ctx) throws QueryException {
     // return default collection
-    final Item it = expr.length == 0 ? null : expr[0].item(ctx, info);
+    final Item it = exprs.length == 0 ? null : exprs[0].item(ctx, info);
     if(it == null) return ctx.resources.collection(info);
 
     // check if reference is valid
@@ -150,9 +151,9 @@ public final class FNGen extends StandardFunc {
    */
   private Item put(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    final byte[] file = checkEStr(expr[1], ctx);
-    final ANode nd = checkNode(expr[0], ctx);
-    if(nd.type != NodeType.DOC && nd.type != NodeType.ELM) throw UPFOTYPE.get(info, expr[0]);
+    final byte[] file = checkEStr(exprs[1], ctx);
+    final ANode nd = checkNode(exprs[0], ctx);
+    if(nd.type != NodeType.DOC && nd.type != NodeType.ELM) throw UPFOTYPE.get(info, exprs[0]);
 
     final Uri u = Uri.uri(file);
     if(u == Uri.EMPTY || !u.isValid()) throw UPFOURI.get(info, file);
@@ -174,7 +175,7 @@ public final class FNGen extends StandardFunc {
    * @throws QueryException query exception
    */
   private ANode doc(final QueryContext ctx) throws QueryException {
-    final Item it = expr[0].item(ctx, info);
+    final Item it = exprs[0].item(ctx, info);
     if(it == null) return null;
     final byte[] in = checkEStr(it);
     if(!Uri.uri(in).isValid()) throw INVDOC.get(info, in);
@@ -210,7 +211,7 @@ public final class FNGen extends StandardFunc {
    */
   private Item unparsedText(final QueryContext ctx, final boolean check) throws QueryException {
     checkCreate(ctx);
-    final byte[] path = checkStr(expr[0], ctx);
+    final byte[] path = checkStr(exprs[0], ctx);
     final IO base = sc.baseIO();
     if(base == null) throw STBASEURI.get(info);
 
@@ -295,7 +296,7 @@ public final class FNGen extends StandardFunc {
    * @throws QueryException query exception
    */
   private ANode parseXml(final QueryContext ctx, final boolean frag) throws QueryException {
-    final Item item = expr[0].item(ctx, info);
+    final Item item = exprs[0].item(ctx, info);
     if(item == null) return null;
     try {
       final IO io = new IOContent(checkStr(item), string(sc.baseURI().string()));
@@ -312,29 +313,29 @@ public final class FNGen extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str serialize(final QueryContext ctx) throws QueryException {
-    final Item it = expr.length > 1 ? expr[1].item(ctx, info) : null;
+    final Item it = exprs.length > 1 ? exprs[1].item(ctx, info) : null;
     final SerializerOptions sopts = FuncOptions.serializer(it, info);
-    return Str.get(serialize(expr[0].iter(ctx), sopts, SERANY));
+    return Str.get(serialize(exprs[0].iter(ctx), sopts, SERANY));
   }
 
   @Override
   public boolean has(final Flag flag) {
-    return (flag == Flag.X30 || flag == Flag.CTX) && sig == DATA && expr.length == 0 ||
+    return (flag == Flag.X30 || flag == Flag.CTX) && func == DATA && exprs.length == 0 ||
         super.has(flag);
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    if(oneOf(sig, DATA) && expr.length == 0) {
+    if(oneOf(func, DATA) && exprs.length == 0) {
       if(!visitor.lock(DBLocking.CTX)) return false;
-    } else if(oneOf(sig, DOC_AVAILABLE, DOC, COLLECTION, URI_COLLECTION)) {
-      if(expr.length == 0) {
-        if(oneOf(sig, COLLECTION, URI_COLLECTION) && !visitor.lock(DBLocking.COLL))
+    } else if(oneOf(func, DOC_AVAILABLE, DOC, COLLECTION, URI_COLLECTION)) {
+      if(exprs.length == 0) {
+        if(oneOf(func, COLLECTION, URI_COLLECTION) && !visitor.lock(DBLocking.COLL))
           return false;
-      } else if(!(expr[0] instanceof Str)) {
+      } else if(!(exprs[0] instanceof Str)) {
         if(!visitor.lock(null)) return false;
       } else {
-        final QueryInput qi = new QueryInput(string(((Str) expr[0]).string()));
+        final QueryInput qi = new QueryInput(string(((Str) exprs[0]).string()));
         if(qi.db == null && !visitor.lock(null)) return false;
         if(!visitor.lock(qi.db)) return false;
       }
@@ -345,7 +346,7 @@ public final class FNGen extends StandardFunc {
   @Override
   public boolean iterable() {
     // collections will never yield duplicates
-    return sig == COLLECTION || super.iterable();
+    return func == COLLECTION || super.iterable();
   }
 
   /**

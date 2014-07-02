@@ -26,14 +26,14 @@ final class FTContainsIndex extends FTContains {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e contains, select and optional ignore expression
-   * @param f full-text expression
-   * @param nt {@code not} flag
+   * @param info input info
+   * @param expr contains, select and optional ignore expression
+   * @param ftexpr full-text expression
+   * @param not {@code not} flag
    */
-  FTContainsIndex(final InputInfo ii, final Expr e, final FTExpr f, final boolean nt) {
-    super(e, f, ii);
-    not = nt;
+  FTContainsIndex(final InputInfo info, final Expr expr, final FTExpr ftexpr, final boolean not) {
+    super(expr, ftexpr, info);
+    this.not = not;
   }
 
   @Override

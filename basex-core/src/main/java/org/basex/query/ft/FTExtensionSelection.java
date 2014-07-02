@@ -22,41 +22,41 @@ public final class FTExtensionSelection extends FTExpr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param prag pragmas
-   * @param e enclosed FTSelection
+   * @param info input info
+   * @param pragmas pragmas
+   * @param expr enclosed FTSelection
    */
-  public FTExtensionSelection(final InputInfo ii, final Pragma[] prag, final FTExpr e) {
-    super(ii, e);
-    pragmas = prag;
+  public FTExtensionSelection(final InputInfo info, final Pragma[] pragmas, final FTExpr expr) {
+    super(info, expr);
+    this.pragmas = pragmas;
   }
 
   @Override
   public FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return expr[0].item(ctx, info);
+    return exprs[0].item(ctx, info);
   }
 
   @Override
   public FTIter iter(final QueryContext ctx) throws QueryException {
-    return expr[0].iter(ctx);
+    return exprs[0].iter(ctx);
   }
 
   @Override
   public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final Pragma[] prag = pragmas.clone();
     for(int i = 0; i < prag.length; i++) prag[i] = prag[i].copy();
-    return copyType(new FTExtensionSelection(info, prag, expr[0].copy(ctx, scp, vs)));
+    return copyType(new FTExtensionSelection(info, prag, exprs[0].copy(ctx, scp, vs)));
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(), pragmas, expr);
+    addPlan(plan, planElem(), pragmas, exprs);
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     for(final Pragma p : pragmas) sb.append(p).append(' ');
-    return sb.append(BRACE1 + ' ').append(expr[0]).append(' ').append(BRACE2).toString();
+    return sb.append(BRACE1 + ' ').append(exprs[0]).append(' ').append(BRACE2).toString();
   }
 }

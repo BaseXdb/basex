@@ -33,7 +33,7 @@ public final class Delete extends Update {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Iter t = ctx.iter(expr[0]);
+    final Iter t = ctx.iter(exprs[0]);
     for(Item i; (i = t.next()) != null;) {
       if(!(i instanceof ANode)) throw UPTRGDELEMPT.get(info);
       final ANode n = (ANode) i;
@@ -48,11 +48,11 @@ public final class Delete extends Update {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Delete(sc, info, expr[0].copy(ctx, scp, vs));
+    return new Delete(sc, info, exprs[0].copy(ctx, scp, vs));
   }
 
   @Override
   public String toString() {
-    return DELETE + ' ' + NODES + ' ' + expr[0];
+    return DELETE + ' ' + NODES + ' ' + exprs[0];
   }
 }

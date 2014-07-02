@@ -43,11 +43,11 @@ public final class Replace extends Update {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Constr c = new Constr(ii, sc).add(ctx, expr[1]);
+    final Constr c = new Constr(ii, sc).add(ctx, exprs[1]);
     if(c.errAtt) throw UPNOATTRPER.get(info);
     if(c.duplAtt != null) throw UPATTDUPL.get(info, new QNm(c.duplAtt));
 
-    final Iter t = ctx.iter(expr[0]);
+    final Iter t = ctx.iter(exprs[0]);
     final Item i = t.next();
     // check target constraints
     if(i == null) throw UPSEQEMP.get(info, Util.className(this));
@@ -89,13 +89,13 @@ public final class Replace extends Update {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Replace(sc, info, expr[0].copy(ctx, scp, vs),
-        expr[1].copy(ctx, scp, vs), value);
+    return new Replace(sc, info, exprs[0].copy(ctx, scp, vs),
+        exprs[1].copy(ctx, scp, vs), value);
   }
 
   @Override
   public String toString() {
     return REPLACE + (value ? ' ' + VALUEE + ' ' + OF : "") +
-      ' ' + NODE + ' ' + expr[0] + ' ' + WITH + ' ' + expr[1];
+      ' ' + NODE + ' ' + exprs[0] + ' ' + WITH + ' ' + exprs[1];
   }
 }

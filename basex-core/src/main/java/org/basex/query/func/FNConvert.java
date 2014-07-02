@@ -31,18 +31,18 @@ public final class FNConvert extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNConvert(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNConvert(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _CONVERT_BINARY_TO_BYTES: return binaryToBytes(ctx).iter();
       default:                       return super.iter(ctx);
     }
@@ -50,7 +50,7 @@ public final class FNConvert extends StandardFunc {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _CONVERT_BINARY_TO_BYTES: return binaryToBytes(ctx);
       default:                       return super.value(ctx);
     }
@@ -58,7 +58,7 @@ public final class FNConvert extends StandardFunc {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _CONVERT_INTEGER_FROM_BASE:   return integerFromBase(ctx, ii);
       case _CONVERT_INTEGER_TO_BASE:     return integerToBase(ctx, ii);
       case _CONVERT_BINARY_TO_STRING:    return toString(ctx);
@@ -111,7 +111,7 @@ public final class FNConvert extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str integerToBase(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final long num = checkItr(expr[0], ctx), base = checkItr(expr[1], ctx);
+    final long num = checkItr(exprs[0], ctx), base = checkItr(exprs[1], ctx);
     if(base < 2 || base > 36) throw INVBASE.get(ii, base);
 
     // use fast variant for powers of two
@@ -149,8 +149,8 @@ public final class FNConvert extends StandardFunc {
    * @throws QueryException exception
    */
   private Int integerFromBase(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final byte[] str = checkStr(expr[0], ctx);
-    final long base = checkItr(expr[1], ctx);
+    final byte[] str = checkStr(exprs[0], ctx);
+    final long base = checkItr(exprs[1], ctx);
     if(base < 2 || base > 36) throw INVBASE.get(ii, base);
 
     long res = 0;
@@ -174,7 +174,7 @@ public final class FNConvert extends StandardFunc {
    */
   private Value binaryToBytes(final QueryContext ctx) throws QueryException {
     try {
-      return BytSeq.get(checkItem(expr[0], ctx).input(info).content());
+      return BytSeq.get(checkItem(exprs[0], ctx).input(info).content());
     } catch(final IOException ex) {
       throw BXCO_STRING.get(info, ex);
     }
@@ -187,7 +187,7 @@ public final class FNConvert extends StandardFunc {
    * @throws QueryException query exception
    */
   private Dtm integerToDateTime(final QueryContext ctx) throws QueryException {
-    return new Dtm(checkItr(expr[0], ctx), info);
+    return new Dtm(checkItr(exprs[0], ctx), info);
   }
 
   /**
@@ -197,7 +197,7 @@ public final class FNConvert extends StandardFunc {
    * @throws QueryException query exception
    */
   private Int dateTimeToInteger(final QueryContext ctx) throws QueryException {
-    return Int.get(dateTimeToMs(expr[0], ctx));
+    return Int.get(dateTimeToMs(exprs[0], ctx));
   }
 
   /**
@@ -207,7 +207,7 @@ public final class FNConvert extends StandardFunc {
    * @throws QueryException query exception
    */
   private DTDur integerToDayTime(final QueryContext ctx) throws QueryException {
-    return new DTDur(checkItr(expr[0], ctx));
+    return new DTDur(checkItr(exprs[0], ctx));
   }
 
   /**
@@ -217,7 +217,7 @@ public final class FNConvert extends StandardFunc {
    * @throws QueryException query exception
    */
   private Int dayTimeToInteger(final QueryContext ctx) throws QueryException {
-    final DTDur dur = (DTDur) checkType(checkItem(expr[0], ctx), AtomType.DTD);
+    final DTDur dur = (DTDur) checkType(checkItem(exprs[0], ctx), AtomType.DTD);
     final BigDecimal ms = dur.sec.multiply(BigDecimal.valueOf(1000));
     if(ms.compareTo(ADateDur.BDMAXLONG) > 0) throw INTRANGE.get(info, dur);
     return Int.get(ms.longValue());
@@ -230,7 +230,7 @@ public final class FNConvert extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str toString(final QueryContext ctx) throws QueryException {
-    final Bin bin = checkBinary(expr[0], ctx);
+    final Bin bin = checkBinary(exprs[0], ctx);
     final String enc = encoding(1, BXCO_ENCODING, ctx);
 
     try {
@@ -277,7 +277,7 @@ public final class FNConvert extends StandardFunc {
    * @throws QueryException query exception
    */
   private byte[] stringToBinary(final QueryContext ctx) throws QueryException {
-    final byte[] in = checkStr(expr[0], ctx);
+    final byte[] in = checkStr(exprs[0], ctx);
     final String enc = encoding(1, BXCO_ENCODING, ctx);
     if(enc == null || enc == UTF8) return in;
     try {
@@ -309,7 +309,7 @@ public final class FNConvert extends StandardFunc {
    * @throws QueryException query exception
    */
   private byte[] bytesToBinary(final QueryContext ctx) throws QueryException {
-    final Value v = expr[0].value(ctx);
+    final Value v = exprs[0].value(ctx);
     // directly pass on byte array
     if(v instanceof BytSeq) return ((BytSeq) v).toJava();
 

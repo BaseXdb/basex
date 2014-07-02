@@ -54,14 +54,14 @@ public final class Insert extends Update {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Constr c = new Constr(ii, sc).add(ctx, expr[1]);
+    final Constr c = new Constr(ii, sc).add(ctx, exprs[1]);
     final ANodeList cList = c.children;
     final ANodeList aList = c.atts;
     if(c.errAtt) throw UPNOATTRPER.get(info);
     if(c.duplAtt != null) throw UPATTDUPL.get(info, new QNm(c.duplAtt));
 
     // check target constraints
-    final Iter t = ctx.iter(expr[0]);
+    final Iter t = ctx.iter(exprs[0]);
     final Item i = t.next();
     if(i == null) throw UPSEQEMP.get(info, Util.className(this));
     if(!(i instanceof ANode) || t.next() != null)
@@ -106,12 +106,12 @@ public final class Insert extends Update {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Insert(sc, info, expr[1].copy(ctx, scp, vs), first, last, before, after,
-        expr[0].copy(ctx, scp, vs));
+    return new Insert(sc, info, exprs[1].copy(ctx, scp, vs), first, last, before, after,
+        exprs[0].copy(ctx, scp, vs));
   }
 
   @Override
   public String toString() {
-    return INSERT + ' ' + NODE + ' ' + expr[1] + ' ' + INTO + ' ' + expr[0];
+    return INSERT + ' ' + NODE + ' ' + exprs[1] + ' ' + INTO + ' ' + exprs[0];
   }
 }

@@ -23,25 +23,25 @@ import org.basex.util.hash.*;
  */
 public final class RangeAccess extends IndexAccess {
   /** Index type. */
-  private final NumericRange ind;
+  private final NumericRange index;
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param t index reference
-   * @param ic index context
+   * @param info input info
+   * @param index index reference
+   * @param ictx index context
    */
-  RangeAccess(final InputInfo ii, final NumericRange t, final IndexContext ic) {
-    super(ic, ii);
-    ind = t;
+  RangeAccess(final InputInfo info, final NumericRange index, final IndexContext ictx) {
+    super(ictx, info);
+    this.index = index;
   }
 
   @Override
   public AxisIter iter(final QueryContext ctx) {
-    final byte kind = ind.type() == IndexType.TEXT ? Data.TEXT : Data.ATTR;
+    final byte kind = index.type() == IndexType.TEXT ? Data.TEXT : Data.ATTR;
 
     return new AxisIter() {
-      final IndexIterator it = ictx.data.iter(ind);
+      final IndexIterator it = ictx.data.iter(index);
       @Override
       public ANode next() {
         return it.more() ? new DBNode(ictx.data, it.pre(), kind) : null;
@@ -51,19 +51,19 @@ public final class RangeAccess extends IndexAccess {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new RangeAccess(info, ind, ictx);
+    return new RangeAccess(info, index, ictx);
   }
 
   @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(DATA, ictx.data.meta.name,
-        MIN, ind.min, MAX, ind.max, TYP, ind.type));
+        MIN, index.min, MAX, index.max, TYP, index.type));
   }
 
   @Override
   public String toString() {
     return new TokenBuilder(DB).add(':').
-      add(ind.type().toString().toLowerCase(Locale.ENGLISH)).add("-range(").
-      addExt(ind.min).add(SEP).addExt(ind.max).add(')').toString();
+      add(index.type().toString().toLowerCase(Locale.ENGLISH)).add("-range(").
+      addExt(index.min).add(SEP).addExt(index.max).add(')').toString();
   }
 }

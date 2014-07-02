@@ -55,18 +55,19 @@ public final class FNZip extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNZip(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNZip(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     checkCreate(ctx);
-    switch(sig) {
+    switch(func) {
       case _ZIP_BINARY_ENTRY:     return binaryEntry(ctx);
       case _ZIP_TEXT_ENTRY:       return textEntry(ctx);
       case _ZIP_HTML_ENTRY:       return xmlEntry(ctx, true);
@@ -96,7 +97,7 @@ public final class FNZip extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str textEntry(final QueryContext ctx) throws QueryException {
-    final String enc = expr.length < 3 ? null : string(checkStr(expr[2], ctx));
+    final String enc = exprs.length < 3 ? null : string(checkStr(exprs[2], ctx));
     final IO io = new IOContent(entry(ctx));
     final boolean val = ctx.context.options.get(MainOptions.CHECKSTRINGS);
     try {
@@ -130,7 +131,7 @@ public final class FNZip extends StandardFunc {
    * @throws QueryException query exception
    */
   private ANode entries(final QueryContext ctx) throws QueryException {
-    final String file = string(checkStr(expr[0], ctx));
+    final String file = string(checkStr(exprs[0], ctx));
 
     // check file path
     final IOFile path = new IOFile(file);
@@ -213,7 +214,7 @@ public final class FNZip extends StandardFunc {
    */
   private Item zipFile(final QueryContext ctx) throws QueryException {
     // check argument
-    final ANode elm = (ANode) checkType(expr[0].item(ctx, info), NodeType.ELM);
+    final ANode elm = (ANode) checkType(exprs[0].item(ctx, info), NodeType.ELM);
     if(!elm.qname().eq(Q_FILE)) throw ZIP_UNKNOWN.get(info, elm.qname());
     // get file
     final String file = attribute(elm, HREF, true);
@@ -353,14 +354,14 @@ public final class FNZip extends StandardFunc {
    */
   private Item updateEntries(final QueryContext ctx) throws QueryException {
     // check argument
-    final ANode elm = (ANode) checkType(expr[0].item(ctx, info), NodeType.ELM);
+    final ANode elm = (ANode) checkType(exprs[0].item(ctx, info), NodeType.ELM);
     if(!elm.qname().eq(Q_FILE)) throw ZIP_UNKNOWN.get(info, elm.qname());
 
     // sorted paths in original file
     final String in = attribute(elm, HREF, true);
 
     // target and temporary output file
-    final IOFile target = new IOFile(string(checkStr(expr[1], ctx)));
+    final IOFile target = new IOFile(string(checkStr(exprs[1], ctx)));
     IOFile out;
     do {
       out = new IOFile(target.path() + new Random().nextInt(0x7FFFFFFF));
@@ -444,8 +445,8 @@ public final class FNZip extends StandardFunc {
    * @throws QueryException query exception
    */
   private byte[] entry(final QueryContext ctx) throws QueryException {
-    final IOFile file = new IOFile(string(checkStr(expr[0], ctx)));
-    final String path = string(checkStr(expr[1], ctx));
+    final IOFile file = new IOFile(string(checkStr(exprs[0], ctx)));
+    final String path = string(checkStr(exprs[1], ctx));
     if(!file.exists()) throw ZIP_NOTFOUND.get(info, file);
 
     try {

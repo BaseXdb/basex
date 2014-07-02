@@ -29,15 +29,15 @@ public final class TypeCase extends Single {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param v variable
-   * @param ts sequence types this case matches, the empty array means {@code default}
-   * @param r return expression
+   * @param info input info
+   * @param var variable
+   * @param types sequence types this case matches, the empty array means {@code default}
+   * @param expr return expression
    */
-  public TypeCase(final InputInfo ii, final Var v, final SeqType[] ts, final Expr r) {
-    super(ii, r);
-    var = v;
-    types = ts;
+  public TypeCase(final InputInfo info, final Var var, final SeqType[] types, final Expr expr) {
+    super(info, expr);
+    this.var = var;
+    this.types = types;
   }
 
   @Override

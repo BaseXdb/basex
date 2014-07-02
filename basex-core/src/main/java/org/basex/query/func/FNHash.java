@@ -19,17 +19,18 @@ public final class FNHash extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNHash(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNHash(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _HASH_MD5:         return hash("MD5", ctx);
       case _HASH_SHA1:        return hash("SHA", ctx);
       case _HASH_SHA256:      return hash("SHA-256", ctx);
@@ -45,7 +46,7 @@ public final class FNHash extends StandardFunc {
    * @throws QueryException exception
    */
   private B64 hash(final QueryContext ctx) throws QueryException {
-    return hash(Token.string(checkStr(expr[1], ctx)), ctx);
+    return hash(Token.string(checkStr(exprs[1], ctx)), ctx);
   }
 
   /**
@@ -56,7 +57,7 @@ public final class FNHash extends StandardFunc {
    * @throws QueryException exception
    */
   private B64 hash(final String algo, final QueryContext ctx) throws QueryException {
-    return hashBinary(checkStrBin(checkItem(expr[0], ctx)), algo);
+    return hashBinary(checkStrBin(checkItem(exprs[0], ctx)), algo);
   }
 
   /**

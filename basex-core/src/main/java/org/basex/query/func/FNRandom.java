@@ -21,17 +21,18 @@ public final class FNRandom extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNRandom(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNRandom(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _RANDOM_DOUBLE:  return Dbl.get(randomDouble());
       case _RANDOM_INTEGER: return Int.get(randomInt(ctx));
       case _RANDOM_UUID:    return Str.get(UUID.randomUUID().toString());
@@ -40,7 +41,7 @@ public final class FNRandom extends StandardFunc {
   }
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _RANDOM_SEEDED_DOUBLE:  return randomSeededDouble(ctx);
       case _RANDOM_SEEDED_INTEGER: return randomSeededInt(ctx);
       case _RANDOM_GAUSSIAN:       return randomGaussian(ctx);
@@ -56,8 +57,8 @@ public final class FNRandom extends StandardFunc {
    * @throws QueryException query exception
    */
   private int randomInt(final QueryContext ctx) throws QueryException {
-    if(expr.length == 0) return RND.nextInt();
-    final long s = checkItr(expr[0], ctx);
+    if(exprs.length == 0) return RND.nextInt();
+    final long s = checkItr(exprs[0], ctx);
     return s < 1 || s > Integer.MAX_VALUE ? 0 : RND.nextInt((int) s);
   }
 
@@ -73,15 +74,15 @@ public final class FNRandom extends StandardFunc {
   private Iter randomSeededInt(final QueryContext ctx) throws QueryException {
     return new Iter() {
       int count;
-      final long seed = checkItr(expr[0], ctx);
-      final int num = (int) checkItr(expr[1], ctx);
+      final long seed = checkItr(exprs[0], ctx);
+      final int num = (int) checkItr(exprs[1], ctx);
       final Random r = new Random(seed);
 
       @Override
       public Item next() throws QueryException {
-        if(expr.length == 3) {
+        if(exprs.length == 3) {
           // max defined
-          final int max = (int) checkItr(expr[2], ctx);
+          final int max = (int) checkItr(exprs[2], ctx);
           return ++count <= num ? Int.get(r.nextInt(max)) : null;
         }
         // no max given
@@ -108,8 +109,8 @@ public final class FNRandom extends StandardFunc {
   private Iter randomSeededDouble(final QueryContext ctx) throws QueryException {
     return new Iter() {
       int count;
-      final long seed = checkItr(expr[0], ctx);
-      final int num = (int) checkItr(expr[1], ctx);
+      final long seed = checkItr(exprs[0], ctx);
+      final int num = (int) checkItr(exprs[1], ctx);
       final Random r = new Random(seed);
 
       @Override
@@ -129,7 +130,7 @@ public final class FNRandom extends StandardFunc {
    */
   private Iter randomGaussian(final QueryContext ctx) throws QueryException {
     return new Iter() {
-      final int num = (int) checkItr(expr[0], ctx);
+      final int num = (int) checkItr(exprs[0], ctx);
       int count;
       @Override
       public Item next() {

@@ -20,17 +20,18 @@ public final class FNFetch extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNFetch(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNFetch(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _FETCH_TEXT:         return text(ctx);
       case _FETCH_BINARY:       return binary(ctx);
       case _FETCH_CONTENT_TYPE: return contentType(ctx);
@@ -45,7 +46,7 @@ public final class FNFetch extends StandardFunc {
    * @throws QueryException query exception
    */
   private StrStream text(final QueryContext ctx) throws QueryException {
-    final byte[] uri = checkStr(expr[0], ctx);
+    final byte[] uri = checkStr(exprs[0], ctx);
     final String enc = encoding(1, BXFE_ENCODING, ctx);
     return new StrStream(IO.get(Token.string(uri)), enc, BXFE_IO, ctx);
   }
@@ -57,7 +58,7 @@ public final class FNFetch extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64Stream binary(final QueryContext ctx) throws QueryException {
-    final byte[] uri = checkStr(expr[0], ctx);
+    final byte[] uri = checkStr(exprs[0], ctx);
     return new B64Stream(IO.get(Token.string(uri)), BXFE_IO);
   }
 
@@ -68,7 +69,7 @@ public final class FNFetch extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str contentType(final QueryContext ctx) throws QueryException {
-    final byte[] uri = checkStr(expr[0], ctx);
+    final byte[] uri = checkStr(exprs[0], ctx);
     final IO io = IO.get(Token.string(uri));
 
     final String path = io.path();

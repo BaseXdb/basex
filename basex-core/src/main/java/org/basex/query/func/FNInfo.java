@@ -22,17 +22,18 @@ public final class FNInfo extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNInfo(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNInfo(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case ERROR: return error(ctx);
       case TRACE: return trace(ctx);
       case AVAILABLE_ENVIRONMENT_VARIABLES: return avlEnvVars();
@@ -42,7 +43,7 @@ public final class FNInfo extends StandardFunc {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case ENVIRONMENT_VARIABLE: return envVar(ctx);
       default: return super.item(ctx, ii);
     }
@@ -50,7 +51,7 @@ public final class FNInfo extends StandardFunc {
 
   @Override
   protected Expr opt(final QueryContext ctx, final VarScope scp) {
-    if(sig == TRACE) type = expr[0].type();
+    if(func == TRACE) type = exprs[0].type();
     return this;
   }
 
@@ -61,20 +62,20 @@ public final class FNInfo extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter error(final QueryContext ctx) throws QueryException {
-    final int al = expr.length;
+    final int al = exprs.length;
     if(al == 0) throw FUNERR1.get(info);
 
     QNm name = FUNERR1.qname();
     String msg = FUNERR1.desc;
 
-    final Item it = expr[0].item(ctx, info);
+    final Item it = exprs[0].item(ctx, info);
     if(it == null) {
       if(al == 1) throw INVEMPTY.get(info, description());
     } else {
       name = checkQNm(it, ctx, sc);
     }
-    if(al > 1) msg = Token.string(checkEStr(expr[1], ctx));
-    final Value val = al > 2 ? ctx.value(expr[2]) : null;
+    if(al > 1) msg = Token.string(checkEStr(exprs[1], ctx));
+    final Value val = al > 2 ? ctx.value(exprs[2]) : null;
     throw new QueryException(info, name, msg).value(val);
   }
 
@@ -86,8 +87,8 @@ public final class FNInfo extends StandardFunc {
    */
   private Iter trace(final QueryContext ctx) throws QueryException {
     return new Iter() {
-      final Iter ir = expr[0].iter(ctx);
-      final byte[] label = checkStr(expr[1], ctx);
+      final Iter ir = exprs[0].iter(ctx);
+      final byte[] label = checkStr(exprs[1], ctx);
       boolean empty = true;
       @Override
       public Item next() throws QueryException {
@@ -120,7 +121,7 @@ public final class FNInfo extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str envVar(final QueryContext ctx) throws QueryException {
-    final String e = System.getenv(Token.string(checkStr(expr[0], ctx)));
+    final String e = System.getenv(Token.string(checkStr(exprs[0], ctx)));
     return e != null ? Str.get(e) : null;
   }
 

@@ -28,12 +28,12 @@ public final class HTTPResponse {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param opts database options
+   * @param info input info
+   * @param options database options
    */
-  public HTTPResponse(final InputInfo ii, final MainOptions opts) {
-    info = ii;
-    options = opts;
+  public HTTPResponse(final InputInfo info, final MainOptions options) {
+    this.info = info;
+    this.options = options;
   }
 
   /**

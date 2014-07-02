@@ -80,18 +80,18 @@ public final class FNArchive extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNArchive(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNArchive(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case _ARCHIVE_ENTRIES:        return entries(ctx);
       case _ARCHIVE_EXTRACT_TEXT:   return extractText(ctx);
       case _ARCHIVE_EXTRACT_BINARY: return extractBinary(ctx);
@@ -102,7 +102,7 @@ public final class FNArchive extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     checkCreate(ctx);
-    switch(sig) {
+    switch(func) {
       case _ARCHIVE_CREATE:  return create(ctx);
       case _ARCHIVE_UPDATE:  return update(ctx);
       case _ARCHIVE_DELETE:  return delete(ctx);
@@ -119,8 +119,8 @@ public final class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64 create(final QueryContext ctx) throws QueryException {
-    final Iter entr = ctx.iter(expr[0]);
-    final Iter cont = ctx.iter(expr[1]);
+    final Iter entr = ctx.iter(exprs[0]);
+    final Iter cont = ctx.iter(exprs[1]);
     final Options opts = checkOptions(2, Q_OPTIONS, new ArchiveOptions(), ctx);
 
     final String format = opts.get(ArchiveOptions.FORMAT);
@@ -171,7 +171,7 @@ public final class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private FElem options(final QueryContext ctx) throws QueryException {
-    final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
+    final B64 archive = (B64) checkType(checkItem(exprs[0], ctx), AtomType.B64);
     String format = null;
     int level = -1;
 
@@ -207,7 +207,7 @@ public final class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter entries(final QueryContext ctx) throws QueryException {
-    final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
+    final B64 archive = (B64) checkType(checkItem(exprs[0], ctx), AtomType.B64);
 
     final ValueBuilder vb = new ValueBuilder();
     final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
@@ -265,12 +265,12 @@ public final class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64 update(final QueryContext ctx) throws QueryException {
-    final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
+    final B64 archive = (B64) checkType(checkItem(exprs[0], ctx), AtomType.B64);
     // entries to be updated
     final TokenObjMap<Item[]> hm = new TokenObjMap<>();
 
-    final Iter entr = ctx.iter(expr[1]);
-    final Iter cont = ctx.iter(expr[2]);
+    final Iter entr = ctx.iter(exprs[1]);
+    final Iter cont = ctx.iter(exprs[2]);
     int e = 0;
     int c = 0;
     Item en, cn;
@@ -316,10 +316,10 @@ public final class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64 delete(final QueryContext ctx) throws QueryException {
-    final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
+    final B64 archive = (B64) checkType(checkItem(exprs[0], ctx), AtomType.B64);
     // entries to be deleted
     final TokenObjMap<Item[]> hm = new TokenObjMap<>();
-    final Iter names = ctx.iter(expr[1]);
+    final Iter names = ctx.iter(exprs[1]);
     for(Item en; (en = names.next()) != null;) {
       hm.put(checkElmStr(en).string(info), null);
     }
@@ -346,7 +346,7 @@ public final class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private TokenList extract(final QueryContext ctx) throws QueryException {
-    final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
+    final B64 archive = (B64) checkType(checkItem(exprs[0], ctx), AtomType.B64);
     final TokenSet hs = entries(1, ctx);
 
     final TokenList tl = new TokenList();
@@ -373,7 +373,7 @@ public final class FNArchive extends StandardFunc {
    */
   private Item write(final QueryContext ctx) throws QueryException {
     final java.nio.file.Path path = checkPath(0, ctx);
-    final B64 archive = (B64) checkType(checkItem(expr[1], ctx), AtomType.B64);
+    final B64 archive = (B64) checkType(checkItem(exprs[1], ctx), AtomType.B64);
     final TokenSet hs = entries(2, ctx);
 
     final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
@@ -409,10 +409,10 @@ public final class FNArchive extends StandardFunc {
    */
   private TokenSet entries(final int e, final QueryContext ctx) throws QueryException {
     TokenSet hs = null;
-    if(e < expr.length) {
+    if(e < exprs.length) {
       // filter result to specified entries
       hs = new TokenSet();
-      final Iter names = ctx.iter(expr[e]);
+      final Iter names = ctx.iter(exprs[e]);
       for(Item en; (en = names.next()) != null;) {
         hs.add(checkElmStr(en).string(info));
       }

@@ -33,10 +33,10 @@ public final class XQDoc extends Inspect {
   /**
    * Constructor.
    * @param qc query context
-   * @param ii input info
+   * @param info input info
    */
-  public XQDoc(final QueryContext qc, final InputInfo ii) {
-    super(qc, ii);
+  public XQDoc(final QueryContext qc, final InputInfo info) {
+    super(qc, info);
   }
 
   @Override
@@ -44,7 +44,7 @@ public final class XQDoc extends Inspect {
     final QueryParser qp = parseQuery(io);
     final FElem xqdoc = new FElem(PREFIX, PREFIX, URI).declareNS();
     final FElem control = elem("control", xqdoc);
-    elem("date", control).add(ctx.initDateTime().dtm.string(info));
+    elem("date", control).add(qc.initDateTime().dtm.string(info));
     elem("version", control).add("1.1");
 
     final String type = module instanceof LibraryModule ? "library" : "main";

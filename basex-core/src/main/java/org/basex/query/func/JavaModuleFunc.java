@@ -25,7 +25,7 @@ public final class JavaModuleFunc extends JavaMapping {
   /** Java module. */
   private final Object module;
   /** Method to be called. */
-  private final Method mth;
+  private final Method method;
   /** Method parameters. */
   private final Class<?>[] params;
   /** Indicates if function parameters are of (sub)class {@link Value}. */
@@ -33,18 +33,18 @@ public final class JavaModuleFunc extends JavaMapping {
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param jm Java module
-   * @param m Java method/field
-   * @param a arguments
+   * @param sc static context
+   * @param info input info
+   * @param module Java module
+   * @param method Java method/field
+   * @param args arguments
    */
-  JavaModuleFunc(final StaticContext sctx, final InputInfo ii, final Object jm, final Method m,
-      final Expr[] a) {
-    super(sctx, ii, a);
-    module = jm;
-    mth = m;
-    params = m.getParameterTypes();
+  JavaModuleFunc(final StaticContext sc, final InputInfo info, final Object module,
+      final Method method, final Expr[] args) {
+    super(sc, info, args);
+    this.module = module;
+    this.method = method;
+    params = method.getParameterTypes();
     vTypes = JavaFunc.values(params);
   }
 
@@ -60,7 +60,7 @@ public final class JavaModuleFunc extends JavaMapping {
     final Object[] args = JavaFunc.args(params, vTypes, vals, true);
     if(args != null) {
       try {
-        return mth.invoke(module, args);
+        return method.invoke(module, args);
       } catch(final Exception ex) {
         Throwable e = ex;
         if(e.getCause() != null) {
@@ -73,22 +73,22 @@ public final class JavaModuleFunc extends JavaMapping {
 
     // compose error message: expected arguments
     final TokenBuilder expect = new TokenBuilder();
-    for(final Class<?> c : mth.getParameterTypes()) {
+    for(final Class<?> c : method.getParameterTypes()) {
       if(!expect.isEmpty()) expect.add(", ");
       expect.add(Util.className(c));
     }
-    throw JAVAMOD.get(info, mth.getName() + '(' + expect + ')',
-        mth.getName() + '(' + foundArgs(vals) + ')');
+    throw JAVAMOD.get(info, method.getName() + '(' + expect + ')',
+        method.getName() + '(' + foundArgs(vals) + ')');
   }
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new JavaModuleFunc(sc, info, module, mth, copyAll(ctx, scp, vs, expr));
+    return new JavaModuleFunc(sc, info, module, method, copyAll(ctx, scp, vs, exprs));
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, name()), expr);
+    addPlan(plan, planElem(NAM, name()), exprs);
   }
 
   @Override
@@ -101,7 +101,7 @@ public final class JavaModuleFunc extends JavaMapping {
    * @return string
    */
   private String name() {
-    return Util.className(module) + ':' + mth.getName();
+    return Util.className(module) + ':' + method.getName();
   }
 
   @Override
@@ -111,9 +111,9 @@ public final class JavaModuleFunc extends JavaMapping {
 
   @Override
   public boolean has(final Flag f) {
-    return f == Flag.NDT && mth.getAnnotation(Deterministic.class) == null ||
+    return f == Flag.NDT && method.getAnnotation(Deterministic.class) == null ||
       (f == Flag.CTX || f == Flag.FCS) &&
-      mth.getAnnotation(FocusDependent.class) == null ||
+      method.getAnnotation(FocusDependent.class) == null ||
       super.has(f);
   }
 }

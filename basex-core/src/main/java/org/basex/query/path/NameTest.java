@@ -45,7 +45,7 @@ public final class NameTest extends Test {
   }
 
   @Override
-  public boolean compile(final QueryContext ctx) {
+  public boolean optimize(final QueryContext ctx) {
     // skip optimizations if data reference cannot be determined statically
     final Data data = ctx.data();
     if(data == null) return true;

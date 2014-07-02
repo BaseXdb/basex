@@ -21,26 +21,27 @@ import org.basex.util.hash.*;
 public final class FTMildNot extends FTExpr {
   /**
    * Constructor.
-   * @param ii input info
-   * @param e1 first expression
-   * @param e2 second expression
+   * @param info input info
+   * @param expr1 first expression
+   * @param expr2 second expression
    * @throws QueryException query exception
    */
-  public FTMildNot(final InputInfo ii, final FTExpr e1, final FTExpr e2) throws QueryException {
-    super(ii, e1, e2);
+  public FTMildNot(final InputInfo info, final FTExpr expr1, final FTExpr expr2)
+      throws QueryException {
+    super(info, expr1, expr2);
     if(usesExclude()) throw FTMILD.get(info);
   }
 
   @Override
   public FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return mildnot(expr[0].item(ctx, info), expr[1].item(ctx, info));
+    return mildnot(exprs[0].item(ctx, info), exprs[1].item(ctx, info));
   }
 
   @Override
   public FTIter iter(final QueryContext ctx) throws QueryException {
     return new FTIter() {
-      final FTIter i1 = expr[0].iter(ctx);
-      final FTIter i2 = expr[1].iter(ctx);
+      final FTIter i1 = exprs[0].iter(ctx);
+      final FTIter i2 = exprs[1].iter(ctx);
       FTNode it1 = i1.next();
       FTNode it2 = i2.next();
 
@@ -94,7 +95,7 @@ public final class FTMildNot extends FTExpr {
   @Override
   public boolean indexAccessible(final IndexCosts ic) throws QueryException {
     int is = ic.costs();
-    for(final FTExpr e : expr) {
+    for(final FTExpr e : exprs) {
       if(!e.indexAccessible(ic)) return false;
       is = Math.min(Integer.MIN_VALUE, is + ic.costs());
     }
@@ -105,7 +106,7 @@ public final class FTMildNot extends FTExpr {
   @Override
   public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     try {
-      return new FTMildNot(info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs));
+      return new FTMildNot(info, exprs[0].copy(ctx, scp, vs), exprs[1].copy(ctx, scp, vs));
     } catch(final QueryException e) {
       // checks were already done
       throw Util.notExpected(e);

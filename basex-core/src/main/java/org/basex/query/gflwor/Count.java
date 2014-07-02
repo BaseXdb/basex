@@ -21,16 +21,16 @@ import org.basex.util.hash.*;
  */
 public final class Count extends Clause {
   /** Count variable. */
-  final Var count;
+  final Var var;
 
   /**
    * Constructor.
-   * @param v variable
-   * @param ii input info
+   * @param var variable
+   * @param info input info
    */
-  public Count(final Var v, final InputInfo ii) {
-    super(ii, v);
-    count = v;
+  public Count(final Var var, final InputInfo info) {
+    super(info, var);
+    this.var = var;
   }
 
   @Override
@@ -41,7 +41,7 @@ public final class Count extends Clause {
       @Override
       public boolean next(final QueryContext ctx) throws QueryException {
         if(!sub.next(ctx)) return false;
-        ctx.set(count, Int.get(i++), info);
+        ctx.set(var, Int.get(i++), info);
         return true;
       }
     };
@@ -54,25 +54,13 @@ public final class Count extends Clause {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem e = planElem();
-    count.plan(e);
-    plan.add(e);
-  }
-
-  @Override
-  public String toString() {
-    return "count " + count;
-  }
-
-  @Override
   public boolean has(final Flag flag) {
     return false;
   }
 
   @Override
   public Count compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    count.refineType(SeqType.ITR, ctx, info);
+    var.refineType(SeqType.ITR, ctx, info);
     return this;
   }
 
@@ -99,14 +87,14 @@ public final class Count extends Clause {
 
   @Override
   public Count copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final Var v = scp.newCopyOf(ctx, count);
-    vs.put(count.id, v);
+    final Var v = scp.newCopyOf(ctx, var);
+    vs.put(var.id, v);
     return new Count(v, info);
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitor.declared(count);
+    return visitor.declared(var);
   }
 
   @Override
@@ -122,5 +110,17 @@ public final class Count extends Clause {
   @Override
   public int exprSize() {
     return 0;
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    final FElem e = planElem();
+    var.plan(e);
+    plan.add(e);
+  }
+
+  @Override
+  public String toString() {
+    return "count " + var;
   }
 }

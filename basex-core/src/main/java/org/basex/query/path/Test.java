@@ -22,7 +22,7 @@ public abstract class Test {
   /** Static document node test. */
   public static final KindTest DOC = new KindTest(NodeType.DOC);
   /** Static attribute node test. */
-  private static final KindTest ATT = new KindTest(NodeType.ATT);
+  public static final KindTest ATT = new KindTest(NodeType.ATT);
   /** Static comment node test. */
   public static final KindTest COM = new KindTest(NodeType.COM);
   /** Static comment node test. */
@@ -71,12 +71,12 @@ public abstract class Test {
   }
 
   /**
-   * Optimizes and compiles the expression.
+   * Optimizes the expression.
    * @param ctx query context
    * @return false if test always returns false
    */
   @SuppressWarnings("unused")
-  public boolean compile(final QueryContext ctx) {
+  public boolean optimize(final QueryContext ctx) {
     return true;
   }
 

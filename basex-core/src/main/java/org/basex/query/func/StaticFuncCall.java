@@ -29,30 +29,30 @@ public final class StaticFuncCall extends FuncCall {
 
   /**
    * Function call constructor.
-   * @param ii input info
-   * @param nm function name
-   * @param arg arguments
-   * @param sctx static context
+   * @param info input info
+   * @param name function name
+   * @param args arguments
+   * @param sc static context
    */
-  public StaticFuncCall(final QNm nm, final Expr[] arg, final StaticContext sctx,
-      final InputInfo ii) {
-    this(nm, arg, sctx, null, ii);
+  public StaticFuncCall(final QNm name, final Expr[] args, final StaticContext sc,
+      final InputInfo info) {
+    this(name, args, sc, null, info);
   }
 
   /**
    * Copy constructor.
-   * @param ii input info
-   * @param nm function name
-   * @param arg arguments
-   * @param sctx static context
-   * @param fun referenced function
+   * @param info input info
+   * @param name function name
+   * @param args arguments
+   * @param sc static context
+   * @param func referenced function
    */
-  private StaticFuncCall(final QNm nm, final Expr[] arg, final StaticContext sctx,
-      final StaticFunc fun, final InputInfo ii) {
-    super(ii, arg);
-    sc = sctx;
-    name = nm;
-    func = fun;
+  private StaticFuncCall(final QNm name, final Expr[] args, final StaticContext sc,
+      final StaticFunc func, final InputInfo info) {
+    super(info, args);
+    this.sc = sc;
+    this.name = name;
+    this.func = func;
   }
 
   @Override
@@ -67,7 +67,7 @@ public final class StaticFuncCall extends FuncCall {
     func.compile(ctx);
 
     // try to inline the function
-    final Expr inl = func.inlineExpr(expr, ctx, scp, info);
+    final Expr inl = func.inlineExpr(exprs, ctx, scp, info);
     if(inl != null) return inl;
     type = func.type();
     return this;
@@ -81,8 +81,8 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public StaticFuncCall copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final Expr[] arg = new Expr[expr.length];
-    for(int i = 0; i < arg.length; i++) arg[i] = expr[i].copy(ctx, scp, vs);
+    final Expr[] arg = new Expr[exprs.length];
+    for(int i = 0; i < arg.length; i++) arg[i] = exprs[i].copy(ctx, scp, vs);
     final StaticFuncCall call = new StaticFuncCall(name, arg, sc, func, info);
     call.type = type;
     call.size = size;
@@ -127,7 +127,7 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, name, TCL, tailCall), expr);
+    addPlan(plan, planElem(NAM, name, TCL, tailCall), exprs);
   }
 
   @Override
@@ -152,9 +152,9 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   Value[] evalArgs(final QueryContext ctx) throws QueryException {
-    final int al = expr.length;
+    final int al = exprs.length;
     final Value[] args = new Value[al];
-    for(int a = 0; a < al; ++a) args[a] = ctx.value(expr[a]);
+    for(int a = 0; a < al; ++a) args[a] = ctx.value(exprs[a]);
     return args;
   }
 }

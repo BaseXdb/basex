@@ -38,19 +38,19 @@ public final class MainModule extends StaticScope {
 
   /**
    * Constructor.
-   * @param rt root expression
-   * @param scp variable scope
-   * @param xqdoc documentation
+   * @param expr root expression
+   * @param scope variable scope
+   * @param doc documentation
    * @param type optional type
-   * @param sctx static context
-   * @param ii input info
+   * @param sc static context
+   * @param info input info
    */
-  public MainModule(final Expr rt, final VarScope scp, final SeqType type, final String xqdoc,
-      final StaticContext sctx, final InputInfo ii) {
+  public MainModule(final Expr expr, final VarScope scope, final SeqType type, final String doc,
+      final StaticContext sc, final InputInfo info) {
 
-    super(scp, xqdoc, sctx, ii);
-    expr = rt;
-    declType = type;
+    super(scope, doc, sc, info);
+    this.expr = expr;
+    this.declType = type;
   }
 
   @Override

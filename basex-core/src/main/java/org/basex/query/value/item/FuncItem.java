@@ -166,8 +166,8 @@ public final class FuncItem extends FItem implements Scope {
       refs[i] = new VarRef(ii, vs[i]);
     }
 
-    final Expr e = new DynFuncCall(ii, sc, false, this, refs),
-        optimized = opt ? e.optimize(ctx, vsc) : e, checked;
+    final Expr e = new DynFuncCall(ii, sc, false, this, refs);
+    final Expr optimized = opt ? e.optimize(ctx, vsc) : e, checked;
     if(ft.ret == null || tp.ret != null && tp.ret.instanceOf(ft.ret)) {
       checked = optimized;
     } else {

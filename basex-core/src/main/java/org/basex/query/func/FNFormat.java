@@ -24,17 +24,18 @@ public final class FNFormat extends StandardFunc {
   /**
    * Constructor.
    * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNFormat(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNFormat(final StaticContext sctx, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sctx, info, func, args);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+    switch(func) {
       case FORMAT_INTEGER:  return formatInteger(ctx);
       case FORMAT_NUMBER:   return formatNumber(ctx);
       case FORMAT_DATETIME: return formatDate(AtomType.DTM, ctx);
@@ -51,10 +52,10 @@ public final class FNFormat extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str formatInteger(final QueryContext ctx) throws QueryException {
-    final byte[] pic = checkStr(expr[1], ctx);
-    final byte[] lng = expr.length == 2 ? EMPTY : checkStr(expr[2], ctx);
+    final byte[] pic = checkStr(exprs[1], ctx);
+    final byte[] lng = exprs.length == 2 ? EMPTY : checkStr(exprs[2], ctx);
 
-    final Item it = expr[0].item(ctx, info);
+    final Item it = exprs[0].item(ctx, info);
     if(it == null) return Str.ZERO;
     final long num = checkItr(it);
 
@@ -74,13 +75,13 @@ public final class FNFormat extends StandardFunc {
    */
   private Str formatNumber(final QueryContext ctx) throws QueryException {
     // evaluate arguments
-    Item it = expr[0].item(ctx, info);
+    Item it = exprs[0].item(ctx, info);
     if(it == null) it = Dbl.NAN;
     else if(!it.type.isNumberOrUntyped()) throw numberError(this, it);
     // retrieve picture
-    final byte[] pic = checkStr(expr[1], ctx);
+    final byte[] pic = checkStr(exprs[1], ctx);
     // retrieve format declaration
-    final QNm frm = expr.length == 3 ? new QNm(trim(checkEStr(expr[2], ctx)), sc) :
+    final QNm frm = exprs.length == 3 ? new QNm(trim(checkEStr(exprs[2], ctx)), sc) :
       new QNm(EMPTY);
     final DecFormatter df = sc.decFormats.get(frm.id());
     if(df == null) throw FORMNUM.get(info, frm);
@@ -96,11 +97,11 @@ public final class FNFormat extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item formatDate(final Type tp, final QueryContext ctx) throws QueryException {
-    final Item it = expr[0].item(ctx, info);
-    final byte[] pic = checkEStr(expr[1], ctx);
-    final byte[] lng = expr.length == 5 ? checkEStr(expr[2], ctx) : EMPTY;
-    final byte[] cal = expr.length == 5 ? checkEStr(expr[3], ctx) : EMPTY;
-    final byte[] plc = expr.length == 5 ? checkEStr(expr[4], ctx) : EMPTY;
+    final Item it = exprs[0].item(ctx, info);
+    final byte[] pic = checkEStr(exprs[1], ctx);
+    final byte[] lng = exprs.length == 5 ? checkEStr(exprs[2], ctx) : EMPTY;
+    final byte[] cal = exprs.length == 5 ? checkEStr(exprs[3], ctx) : EMPTY;
+    final byte[] plc = exprs.length == 5 ? checkEStr(exprs[4], ctx) : EMPTY;
     if(it == null) return null;
     final ADate date = (ADate) checkType(it, tp);
 

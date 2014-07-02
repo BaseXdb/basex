@@ -27,14 +27,14 @@ public final class StaticVarRef extends ParseExpr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param nm variable name
-   * @param sctx static context
+   * @param info input info
+   * @param name variable name
+   * @param sc static context
    */
-  public StaticVarRef(final InputInfo ii, final QNm nm, final StaticContext sctx) {
-    super(ii);
-    name = nm;
-    sc = sctx;
+  public StaticVarRef(final InputInfo info, final QNm name, final StaticContext sc) {
+    super(info);
+    this.name = name;
+    this.sc = sc;
   }
 
   @Override
