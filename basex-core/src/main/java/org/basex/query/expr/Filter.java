@@ -50,35 +50,35 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     // invalidate current context value (will be overwritten by filter)
-    final Value cv = ctx.value;
+    final Value cv = qc.value;
     try {
-      root = root.compile(ctx, scp);
+      root = root.compile(qc, scp);
       // return empty root
-      if(root.isEmpty()) return optPre(null, ctx);
+      if(root.isEmpty()) return optPre(null, qc);
       // convert filters without numeric predicates to axis paths
       if(root instanceof AxisPath && !super.has(Flag.FCS))
-        return ((Path) root.copy(ctx, scp)).addPreds(ctx, scp, preds).compile(ctx, scp);
+        return ((Path) root.copy(qc, scp)).addPreds(qc, scp, preds).compile(qc, scp);
 
       // optimize filter expressions
-      ctx.value = null;
-      final Expr e = super.compile(ctx, scp);
+      qc.value = null;
+      final Expr e = super.compile(qc, scp);
       if(e != this) return e;
 
       // no predicates.. return root; otherwise, do some advanced compilations
-      return preds.length == 0 ? root : opt(ctx);
+      return preds.length == 0 ? root : opt(qc);
     } finally {
-      ctx.value = cv;
+      qc.value = cv;
     }
   }
 
   /**
    * Compiles the filter expression, excluding the root node.
-   * @param ctx query context
+   * @param qc query context
    * @return compiled expression
    */
-  private Expr opt(final QueryContext ctx) {
+  private Expr opt(final QueryContext qc) {
     // evaluate return type
     final SeqType t = root.type();
 
@@ -93,7 +93,7 @@ public abstract class Filter extends Preds {
         size = s > 0 ? 1 : 0;
       }
       // no results will remain: return empty sequence
-      if(size == 0) return optPre(null, ctx);
+      if(size == 0) return optPre(null, qc);
       type = SeqType.get(t.type, size);
     }
 
@@ -106,7 +106,7 @@ public abstract class Filter extends Preds {
       final Value v = (Value) root;
       final long from = last ? v.size() - 1 : pos.min - 1;
       final long len = last ? 1 : pos.max - from;
-      return optPre(SubSeq.get(v, from, len), ctx);
+      return optPre(SubSeq.get(v, from, len), qc);
     }
 
     // only choose deterministic and context-independent offsets; e.g., skip:
@@ -125,30 +125,30 @@ public abstract class Filter extends Preds {
 
   /**
    * Adds a predicate to the filter.
-   * @param ctx query context
+   * @param qc query context
    * @param scp variable scope
    * @param p predicate to be added
    * @return self reference
    * @throws QueryException query exception
    */
-  public abstract Filter addPred(final QueryContext ctx, final VarScope scp, final Expr p)
+  public abstract Filter addPred(final QueryContext qc, final VarScope scp, final Expr p)
       throws QueryException;
 
   @Override
-  public final Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public final Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // invalidate current context value (will be overwritten by filter)
-    final Value cv = ctx.value;
+    final Value cv = qc.value;
     try {
       // return empty root
-      if(root.isEmpty()) return optPre(null, ctx);
+      if(root.isEmpty()) return optPre(null, qc);
       // convert filters without numeric predicates to axis paths
       if(root instanceof AxisPath && !super.has(Flag.FCS))
-        return ((Path) root.copy(ctx, scp)).addPreds(ctx, scp, preds);
+        return ((Path) root.copy(qc, scp)).addPreds(qc, scp, preds);
 
       // no predicates.. return root; otherwise, do some advanced compilations
-      return preds.length == 0 ? root : opt(ctx);
+      return preds.length == 0 ? root : opt(qc);
     } finally {
-      ctx.value = cv;
+      qc.value = cv;
     }
   }
 
@@ -172,13 +172,13 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
       throws QueryException {
 
-    final boolean pr = super.inline(ctx, scp, v, e) != null;
-    final Expr rt = root == null ? null : root.inline(ctx, scp, v, e);
+    final boolean pr = super.inline(qc, scp, v, e) != null;
+    final Expr rt = root == null ? null : root.inline(qc, scp, v, e);
     if(rt != null) root = rt;
-    return pr || rt != null ? optimize(ctx, scp) : null;
+    return pr || rt != null ? optimize(qc, scp) : null;
   }
 
   @Override

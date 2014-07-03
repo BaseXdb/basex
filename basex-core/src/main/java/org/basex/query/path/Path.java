@@ -129,13 +129,13 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    if(root != null) root = root.compile(ctx, scp);
+  public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    if(root != null) root = root.compile(qc, scp);
 
-    final Value init = ctx.value, cv = initial(ctx);
+    final Value init = qc.value, cv = initial(qc);
     final boolean doc = cv != null && cv.type == NodeType.DOC;
 
-    ctx.value = cv;
+    qc.value = cv;
     try {
       for(int s = 0; s < steps.length; s++) {
         Expr e = steps[s];
@@ -144,39 +144,39 @@ public abstract class Path extends ParseExpr {
         final boolean as = e instanceof Step;
         if(as && s == 0 && doc) cv.type = NodeType.NOD;
 
-        e = e.compile(ctx, scp);
-        if(e.isEmpty()) return optPre(null, ctx);
+        e = e.compile(qc, scp);
+        if(e.isEmpty()) return optPre(null, qc);
         steps[s] = e;
 
         // no axis step: invalidate context value
-        if(!as) ctx.value = null;
+        if(!as) qc.value = null;
       }
     } finally {
       if(doc) cv.type = NodeType.DOC;
-      ctx.value = init;
+      qc.value = init;
     }
 
     // no steps left
     if(steps.length == 0) return root == null ? new Context(info) : root;
     // optimize path
-    return optimize(ctx, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public final Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
-    final Value v = initial(ctx);
-    if(emptyPath(v)) return optPre(null, ctx);
+  public final Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    final Value v = initial(qc);
+    if(emptyPath(v)) return optPre(null, qc);
 
     // merge descendant steps
-    Expr e = mergeSteps(ctx);
+    Expr e = mergeSteps(qc);
     if(e == this && v != null && v.type == NodeType.DOC) {
       // check index access
-      e = index(ctx, v);
+      e = index(qc, v);
       // rewrite descendant to child steps
-      if(e == this) e = children(ctx, v);
+      if(e == this) e = children(qc, v);
     }
     // recompile path if it has changed
-    if(e != this) return e.compile(ctx, scp);
+    if(e != this) return e.compile(qc, scp);
 
     // set atomic type for single attribute steps to speed up predicate tests
     if(root == null && steps.length == 1 && steps[0] instanceof Step) {
@@ -186,19 +186,19 @@ public abstract class Path extends ParseExpr {
 
     // choose best path implementation and set type information
     final Path path = get(info, root, steps);
-    path.size(ctx);
+    path.size(qc);
     path.type = SeqType.get(steps[steps.length - 1].type().type, size);
     return path;
   }
 
   /**
    * Returns the initial context value of a path or {@code null}.
-   * @param ctx query context (may be @code null)
+   * @param qc query context (may be @code null)
    * @return root
    */
-  protected final Value initial(final QueryContext ctx) {
+  protected final Value initial(final QueryContext qc) {
     // current context value
-    final Value value = ctx != null ? ctx.value : null;
+    final Value value = qc != null ? qc.value : null;
     // no root or context expression: return context
     if(root == null || root instanceof Context) return value;
     // root is value: return root
@@ -228,26 +228,26 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Adds a predicate to the last step.
-   * @param ctx query context
+   * @param qc query context
    * @param scp variable scope
    * @param pred predicate to be added
    * @return resulting path instance
    * @throws QueryException query exception
    */
-  public final Expr addPreds(final QueryContext ctx, final VarScope scp, final Expr... pred)
+  public final Expr addPreds(final QueryContext qc, final VarScope scp, final Expr... pred)
       throws QueryException {
 
     steps[steps.length - 1] = axisStep(steps.length - 1).addPreds(pred);
-    return get(info, root, steps).optimize(ctx, scp);
+    return get(info, root, steps).optimize(qc, scp);
   }
 
   /**
    * Computes the number of results.
-   * @param ctx query context (may be @code null)
+   * @param qc query context (may be @code null)
    * @return number of results
    */
-  private long size(final QueryContext ctx) {
-    final Value rt = initial(ctx);
+  private long size(final QueryContext qc) {
+    final Value rt = initial(qc);
     // skip computation if value contains document nodes
     if(rt == null || rt.type != NodeType.DOC) return -1;
     final Data data = rt.data();
@@ -385,11 +385,11 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Converts descendant to child steps.
-   * @param ctx query context
+   * @param qc query context
    * @param rt root value
    * @return original or new expression
    */
-  private Expr children(final QueryContext ctx, final Value rt) {
+  private Expr children(final QueryContext qc, final Value rt) {
     // skip if index does not exist or is out-dated, or if several namespaces occur in the input
     final Data data = rt.data();
     if(data == null || !data.meta.uptodate || data.nspaces.globalNS() == null) return this;
@@ -421,7 +421,7 @@ public abstract class Path extends ParseExpr {
         qnm.add(nm);
         nodes = PathSummary.parent(nodes);
       }
-      ctx.compInfo(OPTCHILD, steps[s]);
+      qc.compInfo(OPTCHILD, steps[s]);
 
       // build new steps
       int ts = qnm.size();
@@ -453,7 +453,7 @@ public abstract class Path extends ParseExpr {
         for(final PathNode pn : data.paths.desc(name, Data.ELEM)) {
           if(pn.level() == s + 1) continue LOOP;
         }
-        ctx.compInfo(OPTPATH, path);
+        qc.compInfo(OPTPATH, path);
         return Empty.SEQ;
       }
     }
@@ -464,18 +464,34 @@ public abstract class Path extends ParseExpr {
   /**
    * Returns an equivalent expression which accesses an index.
    * If the expression cannot be rewritten, the original expression is returned.
-   * @param ctx query context
+   *
+   * The following types of queries can be rewritten (in the examples, the equality comparison
+   * is used, which will be rewritten to {@link ValueAccess} instances):
+   *
+   * <pre>
+   * 1. A[text() = '...']    -> IA('...')
+   * 2. A[. = '...']         -> IA('...', A)
+   * 3. text()[. = '...']    -> IA('...')
+   * 4. A[B = '...']         -> IA('...', B)/parent::A
+   * 1. A[B/text() = '...']  -> IA('...')/parent::B/parent::A
+   * 2. A[B/C = '...']       -> IA('...', C)/parent::B/parent::A
+   * 7. A[@a = '...']        -> IA('...', @a)/parent::A
+   * 8. @a[. = '...']        -> IA('...', @a)</pre>
+   *
+   * Queries of type 1, 3, 5 will not yield any results if the string to be compared is empty.
+   *
+   * @param qc query context
    * @param rt root value
    * @return original or new expression
    * @throws QueryException query exception
    */
-  private Expr index(final QueryContext ctx, final Value rt) throws QueryException {
+  private Expr index(final QueryContext qc, final Value rt) throws QueryException {
     // only rewrite paths with data reference
     final Data data = rt.data();
     if(data == null) return this;
 
     // cache index access costs
-    IndexCosts index = null;
+    IndexInfo index = null;
     // cheapest predicate and step
     int iPred = 0, iStep = 0;
 
@@ -493,21 +509,21 @@ public abstract class Path extends ParseExpr {
       // choose cheapest index access
       final int pl = step.preds.length;
       for(int p = 0; p < pl; p++) {
-        final IndexCosts ic = new IndexCosts(ictx, ctx, step);
-        if(!step.preds[p].indexAccessible(ic)) continue;
+        final IndexInfo ii = new IndexInfo(ictx, qc, step);
+        if(!step.preds[p].indexAccessible(ii)) continue;
 
-        if(ic.costs() == 0) {
-          if(ic.not) {
+        if(ii.costs == 0) {
+          if(ii.not) {
             // not operator... accept all results
             step.preds[p] = Bln.TRUE;
             continue;
           }
           // no results...
-          ctx.compInfo(OPTNOINDEX, this);
+          qc.compInfo(OPTNOINDEX, this);
           return Empty.SEQ;
         }
-        if(index == null || index.costs() > ic.costs()) {
-          index = ic;
+        if(index == null || index.costs > ii.costs) {
+          index = ii;
           iPred = p;
           iStep = s;
         }
@@ -515,15 +531,16 @@ public abstract class Path extends ParseExpr {
     }
 
     // skip rewriting if no index access is possible, or if it is too expensive
-    if(index == null || index.costs() > data.meta.size) return this;
+    if(index == null || index.costs > data.meta.size) return this;
+
+    // rewrite for index access
+    qc.compInfo(index.info);
 
     // replace expressions for index access
     final Step indexStep = index.step;
-    Expr indexExpr = indexStep.preds[iPred].indexEquivalent(index);
-
     if(index.seq) {
       // sequential evaluation; do not invert path
-      indexStep.preds[iPred] = indexExpr;
+      indexStep.preds[iPred] = index.expr;
     } else {
       // collect remaining predicates
       final int pl = indexStep.preds.length;
@@ -571,12 +588,12 @@ public abstract class Path extends ParseExpr {
       // create resulting expression
       final ExprList resultSteps = new ExprList();
       final Expr resultRoot;
-      if(indexExpr instanceof Path) {
-        final Path p = (Path) indexExpr;
+      if(index.expr instanceof Path) {
+        final Path p = (Path) index.expr;
         resultRoot = p.root;
         resultSteps.add(p.steps);
       } else {
-        resultRoot = indexExpr;
+        resultRoot = index.expr;
       }
 
       if(!newPreds.isEmpty()) {
@@ -602,10 +619,10 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Merge steps.
-   * @param ctx query context
+   * @param qc query context
    * @return original or new expression
    */
-  private Expr mergeSteps(final QueryContext ctx) {
+  private Expr mergeSteps(final QueryContext qc) {
     // merge descendant steps
     boolean opt = false;
     final int sl = steps.length;
@@ -632,7 +649,7 @@ public abstract class Path extends ParseExpr {
     }
 
     if(opt) {
-      ctx.compInfo(OPTDESC);
+      qc.compInfo(OPTDESC);
       return get(info, root, stps.finish());
     }
     return this;
@@ -651,12 +668,12 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+  public final Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
       throws QueryException {
 
     boolean changed = false;
     if(root != null) {
-      final Expr rt = root.inline(ctx, scp, v, e);
+      final Expr rt = root.inline(qc, scp, v, e);
       if(rt != null) {
         root = rt;
         changed = true;
@@ -665,13 +682,13 @@ public abstract class Path extends ParseExpr {
 
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
-      final Expr nw = steps[s].inline(ctx, scp, v, e);
+      final Expr nw = steps[s].inline(qc, scp, v, e);
       if(nw != null) {
         steps[s] = nw;
         changed = true;
       }
     }
-    return changed ? optimize(ctx, scp) : null;
+    return changed ? optimize(qc, scp) : null;
   }
 
   @Override

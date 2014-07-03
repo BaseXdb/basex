@@ -34,7 +34,7 @@ public final class FTScope extends FTFilter {
   }
 
   @Override
-  protected boolean filter(final QueryContext ctx, final FTMatch mtc, final FTLexer lex) {
+  protected boolean filter(final QueryContext qc, final FTMatch mtc, final FTLexer lex) {
     if(same) {
       int s = -1;
       for(final FTStringMatch sm : mtc) {
@@ -59,8 +59,8 @@ public final class FTScope extends FTFilter {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTScope(info, exprs[0].copy(ctx, scp, vs), same, unit);
+  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new FTScope(info, exprs[0].copy(qc, scp, vs), same, unit);
   }
 
   @Override

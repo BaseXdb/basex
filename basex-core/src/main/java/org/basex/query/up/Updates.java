@@ -68,12 +68,12 @@ public final class Updates {
   /**
    * Adds an update primitive to the current context modifier.
    * @param up update primitive
-   * @param ctx query context
+   * @param qc query context
    * @throws QueryException query exception
    */
-  public void add(final Update up, final QueryContext ctx) throws QueryException {
+  public void add(final Update up, final QueryContext qc) throws QueryException {
     if(mod == null) mod = new DatabaseModifier();
-    mod.add(up, ctx);
+    mod.add(up, qc);
   }
 
   /**
@@ -84,10 +84,10 @@ public final class Updates {
    * database table are calculated. Otherwise a new data instance is created.
    *
    * @param target target fragment
-   * @param ctx query context
+   * @param qc query context
    * @return database node created from input fragment
    */
-  public DBNode determineDataRef(final ANode target, final QueryContext ctx) {
+  public DBNode determineDataRef(final ANode target, final QueryContext qc) {
     if(target instanceof DBNode) return (DBNode) target;
 
     // determine highest ancestor node
@@ -102,7 +102,7 @@ public final class Updates {
     MemData data = fragmentIDs.get(ancID);
     // if data doesn't exist, create a new one
     if(data == null) {
-      data =  (MemData) anc.dbCopy(ctx.context.options).data;
+      data =  (MemData) anc.dbCopy(qc.context.options).data;
       // create a mapping between the fragment id and the data reference
       fragmentIDs.put(ancID, data);
     }

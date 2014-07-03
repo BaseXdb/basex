@@ -38,68 +38,68 @@ public final class QNm extends Item {
 
   /**
    * Constructor.
-   * @param n name
+   * @param name name
    */
-  public QNm(final byte[] n) {
+  public QNm(final byte[] name) {
     super(AtomType.QNM);
-    name = n;
-    pref = indexOf(n, ':');
+    this.name = name;
+    pref = indexOf(name, ':');
   }
 
   /**
    * Constructor.
-   * @param n name
+   * @param name name
    */
-  public QNm(final String n) {
-    this(token(n));
+  public QNm(final String name) {
+    this(token(name));
   }
 
   /**
    * Constructor.
-   * @param n name
-   * @param u namespace URI
+   * @param name name
+   * @param uri namespace URI
    */
-  public QNm(final byte[] n, final byte[] u) {
-    this(n);
-    uri(u);
+  public QNm(final byte[] name, final byte[] uri) {
+    this(name);
+    uri(uri);
   }
 
   /**
    * Constructor.
-   * @param n name
-   * @param u namespace URI
+   * @param name name
+   * @param uri namespace URI
    */
-  public QNm(final String n, final byte[] u) {
-    this(token(n), u);
+  public QNm(final String name, final byte[] uri) {
+    this(token(name), uri);
   }
 
   /**
    * Constructor.
-   * @param n name
-   * @param u namespace URI
+   * @param name name
+   * @param uri namespace URI
    */
-  public QNm(final String n, final String u) {
-    this(token(n), u == null ? null : token(u));
+  public QNm(final String name, final String uri) {
+    this(token(name), uri == null ? null : token(uri));
   }
 
   /**
    * Constructor, binding a statically known namespace.
    * If no namespace is found, the namespace uri is set to {@code null}.
-   * @param n name
+   * @param name name
    * @param sc static context
    */
-  public QNm(final byte[] n, final StaticContext sc) {
-    this(n);
+  public QNm(final byte[] name, final StaticContext sc) {
+    this(name);
     uri(sc.ns.uri(prefix()));
   }
 
   /**
    * Constructor for converting a Java QName.
-   * @param qn qname
+   * @param name qname
    */
-  public QNm(final QName qn) {
-    this(token(qn.getPrefix().isEmpty() ? qn.getLocalPart() :
-      qn.getPrefix() + ':' + qn.getLocalPart()), token(qn.getNamespaceURI()));
+  public QNm(final QName name) {
+    this(token(name.getPrefix().isEmpty() ? name.getLocalPart() :
+      name.getPrefix() + ':' + name.getLocalPart()), token(name.getNamespaceURI()));
   }
 
   /**

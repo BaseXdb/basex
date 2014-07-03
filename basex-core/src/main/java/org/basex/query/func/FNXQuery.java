@@ -44,76 +44,75 @@ public final class FNXQuery extends StandardFunc {
 
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    * @param func function definition
    * @param args arguments
    */
-  public FNXQuery(final StaticContext sctx, final InputInfo info, final Function func,
+  public FNXQuery(final StaticContext sc, final InputInfo info, final Function func,
       final Expr... args) {
-    super(sctx, info, func, args);
+    super(sc, info, func, args);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
     switch(func) {
-      case _XQUERY_EVAL:   return eval(ctx, false);
-      case _XQUERY_UPDATE: return eval(ctx, true);
-      case _XQUERY_INVOKE: return invoke(ctx);
-      case _XQUERY_TYPE:   return value(ctx).iter();
-      default:             return super.iter(ctx);
+      case _XQUERY_EVAL:   return eval(qc, false);
+      case _XQUERY_UPDATE: return eval(qc, true);
+      case _XQUERY_INVOKE: return invoke(qc);
+      case _XQUERY_TYPE:   return value(qc).iter();
+      default:             return super.iter(qc);
     }
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     switch(func) {
-      case _XQUERY_EVAL:   return eval(ctx, false).value();
-      case _XQUERY_UPDATE: return eval(ctx, true).value();
-      case _XQUERY_INVOKE: return invoke(ctx).value();
-      case _XQUERY_TYPE:   return type(ctx).value(ctx);
-      default:             return super.value(ctx);
+      case _XQUERY_EVAL:   return eval(qc, false).value();
+      case _XQUERY_UPDATE: return eval(qc, true).value();
+      case _XQUERY_INVOKE: return invoke(qc).value();
+      case _XQUERY_TYPE:   return type(qc).value(qc);
+      default:             return super.value(qc);
     }
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx, final VarScope scp) {
-    return func == _XQUERY_TYPE ? type(ctx) : this;
+  protected Expr opt(final QueryContext qc, final VarScope scp) {
+    return func == _XQUERY_TYPE ? type(qc) : this;
   }
 
   /**
    * Performs the eval function.
-   * @param ctx query context
+   * @param qc query context
    * @param updating updating
    * @return resulting value
    * @throws QueryException query exception
    */
-  private ValueBuilder eval(final QueryContext ctx, final boolean updating) throws QueryException {
-    return eval(ctx, checkStr(exprs[0], ctx), null, updating);
+  private ValueBuilder eval(final QueryContext qc, final boolean updating) throws QueryException {
+    return eval(qc, checkStr(exprs[0], qc), null, updating);
   }
 
   /**
    * Evaluates the specified string.
-   * @param ctx query context
+   * @param qc query context
    * @param qu query string
    * @param path path to query file (may be {@code null})
    * @param updating updating query
    * @return resulting value
    * @throws QueryException query exception
    */
-  private ValueBuilder eval(final QueryContext ctx, final byte[] qu, final String path,
+  private ValueBuilder eval(final QueryContext qc, final byte[] qu, final String path,
       final boolean updating) throws QueryException {
 
     // bind variables and context item
-    final HashMap<String, Value> bindings = bindings(1, ctx);
-
-    final QueryContext qc = ctx.proc(new QueryContext(ctx));
+    final HashMap<String, Value> bindings = bindings(1, qc);
+    final QueryContext qctx = qc.proc(new QueryContext(qc));
 
     final Timer to = new Timer(true);
-    final Perm tmp = ctx.context.user.perm;
+    final Perm tmp = qc.context.user.perm;
     if(exprs.length > 2) {
-      final Options opts = checkOptions(2, Q_OPTIONS, new XQueryOptions(), ctx);
-      ctx.context.user.perm = Perm.get(opts.get(XQueryOptions.PERMISSION));
+      final Options opts = checkOptions(2, Q_OPTIONS, new XQueryOptions(), qc);
+      qc.context.user.perm = Perm.get(opts.get(XQueryOptions.PERMISSION));
       // initial memory consumption: perform garbage collection and calculate usage
       Performance.gc(2);
       final long mb = opts.get(XQueryOptions.MEMORY);
@@ -125,7 +124,7 @@ public final class FNXQuery extends StandardFunc {
             // limit reached: perform garbage collection and check again
             if(Performance.memory() > limit) {
               Performance.gc(1);
-              if(Performance.memory() > limit) qc.stop();
+              if(Performance.memory() > limit) qctx.stop();
             }
           }
         }, 500, 500);
@@ -134,57 +133,56 @@ public final class FNXQuery extends StandardFunc {
       if(ms != 0) {
         to.schedule(new TimerTask() {
           @Override
-          public void run() { qc.stop(); }
+          public void run() { qctx.stop(); }
         }, ms);
       }
     }
 
     // evaluate query
     try {
-      final StaticContext sctx = new StaticContext(qc.context);
+      final StaticContext sctx = new StaticContext(qctx.context);
       for(final Map.Entry<String, Value> it : bindings.entrySet()) {
         final String k = it.getKey();
         final Value v = it.getValue();
-        if(k.isEmpty()) qc.context(v, null, sctx);
-        else qc.bind(k, v, null);
+        if(k.isEmpty()) qctx.context(v, null, sctx);
+        else qctx.bind(k, v, null);
       }
-
-      qc.parseMain(string(qu), path, sctx);
+      qctx.parseMain(string(qu), path, sctx);
 
       if(updating) {
-        if(!sc.mixUpdates && !qc.updating && !qc.root.expr.isVacuous())
+        if(!sc.mixUpdates && !qctx.updating && !qctx.root.expr.isVacuous())
           throw BXXQ_NOUPDATE.get(info);
       } else {
-        if(qc.updating) throw BXXQ_UPDATING.get(info);
+        if(qctx.updating) throw BXXQ_UPDATING.get(info);
       }
-      qc.compile();
+      qctx.compile();
 
       final ValueBuilder vb = new ValueBuilder();
-      cache(qc.iter(), vb, ctx);
+      cache(qctx.iter(), vb, qc);
       return vb;
     } catch(final ProcException ex) {
       throw BXXQ_STOPPED.get(info);
     } catch(final QueryException ex) {
       throw ex.err() == BASX_PERM ? BXXQ_PERM.get(info, ex.getLocalizedMessage()) : ex;
     } finally {
-      ctx.context.user.perm = tmp;
-      ctx.proc(null);
-      qc.close();
+      qc.context.user.perm = tmp;
+      qc.proc(null);
+      qctx.close();
       to.cancel();
     }
   }
 
   /**
    * Performs the invoke function.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  private ValueBuilder invoke(final QueryContext ctx) throws QueryException {
-    checkCreate(ctx);
-    final IO io = checkPath(exprs[0], ctx);
+  private ValueBuilder invoke(final QueryContext qc) throws QueryException {
+    checkCreate(qc);
+    final IO io = checkPath(exprs[0], qc);
     try {
-      return eval(ctx, io.read(), io.path(), false);
+      return eval(qc, io.read(), io.path(), false);
     } catch(final IOException ex) {
       throw IOERR.get(info, ex);
     }
@@ -192,12 +190,12 @@ public final class FNXQuery extends StandardFunc {
 
   /**
    * Dumps the argument's type and size and returns it unchanged.
-   * @param ctx query context
+   * @param qc query context
    * @return the argument expression
    */
-  private Expr type(final QueryContext ctx) {
+  private Expr type(final QueryContext qc) {
     FNInfo.dump(Util.inf("{ type: %, size: %, exprSize: % }", exprs[0].type(), exprs[0].size(),
-        exprs[0].exprSize()), token(exprs[0].toString()), ctx);
+        exprs[0].exprSize()), token(exprs[0].toString()), qc);
     return exprs[0];
   }
 

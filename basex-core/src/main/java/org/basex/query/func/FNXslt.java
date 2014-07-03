@@ -71,46 +71,46 @@ public final class FNXslt extends StandardFunc {
 
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    * @param func function definition
    * @param args arguments
    */
-  public FNXslt(final StaticContext sctx, final InputInfo info, final Function func,
+  public FNXslt(final StaticContext sc, final InputInfo info, final Function func,
       final Expr... args) {
-    super(sctx, info, func, args);
+    super(sc, info, func, args);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     switch(func) {
       case _XSLT_PROCESSOR:      return Str.get(get(true));
       case _XSLT_VERSION:        return Str.get(get(false));
-      case _XSLT_TRANSFORM:      return transform(ctx, true);
-      case _XSLT_TRANSFORM_TEXT: return transform(ctx, false);
-      default:                   return super.item(ctx, ii);
+      case _XSLT_TRANSFORM:      return transform(qc, true);
+      case _XSLT_TRANSFORM_TEXT: return transform(qc, false);
+      default:                   return super.item(qc, ii);
     }
   }
 
   /**
    * Performs an XSL transformation.
-   * @param ctx query context
+   * @param qc query context
    * @param node return result as node
    * @return item
    * @throws QueryException query exception
    */
-  private Item transform(final QueryContext ctx, final boolean node) throws QueryException {
-    checkCreate(ctx);
-    final IO in = read(exprs[0], ctx);
-    final IO xsl = read(exprs[1], ctx);
-    final Options opts = checkOptions(2, Q_PARAMETERS, new Options(), ctx);
+  private Item transform(final QueryContext qc, final boolean node) throws QueryException {
+    checkCreate(qc);
+    final IO in = read(exprs[0], qc);
+    final IO xsl = read(exprs[1], qc);
+    final Options opts = checkOptions(2, Q_PARAMETERS, new Options(), qc);
 
     final PrintStream tmp = System.err;
     final ArrayOutput ao = new ArrayOutput();
     try {
       System.setErr(new PrintStream(ao));
       final byte[] result = transform(in, xsl, opts.free());
-      return node ? new DBNode(new IOContent(result), ctx.context.options) : Str.get(result);
+      return node ? new DBNode(new IOContent(result), qc.context.options) : Str.get(result);
     } catch(final IOException ex) {
       System.setErr(tmp);
       throw IOERR.get(info, ex);
@@ -125,12 +125,12 @@ public final class FNXslt extends StandardFunc {
   /**
    * Returns an input reference (possibly cached) to the specified input.
    * @param e expressio nto be evaluated
-   * @param ctx query context
+   * @param qc query context
    * @return item
    * @throws QueryException query exception
    */
-  private IO read(final Expr e, final QueryContext ctx) throws QueryException {
-    final Item it = checkItem(e, ctx);
+  private IO read(final Expr e, final QueryContext qc) throws QueryException {
+    final Item it = checkItem(e, qc);
     if(it.type.isNode()) {
       try {
         final IO io = new IOContent(it.serialize().toArray());
@@ -141,7 +141,7 @@ public final class FNXslt extends StandardFunc {
       }
     }
     if(it.type.isStringOrUntyped()) {
-      return checkPath(it, ctx);
+      return checkPath(it, qc);
     }
     throw STRNODTYPE.get(info, this, it.type);
   }

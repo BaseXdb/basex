@@ -162,17 +162,17 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // swap expressions
     if(swap()) {
       op = op.swap();
-      ctx.compInfo(OPTSWAP, this);
+      qc.compInfo(OPTSWAP, this);
     }
 
     final Expr e1 = exprs[0];
@@ -182,16 +182,16 @@ public final class CmpV extends Cmp {
 
     Expr e = this;
     if(oneIsEmpty()) {
-      e = optPre(null, ctx);
+      e = optPre(null, qc);
     } else if(allAreValues()) {
-      e = preEval(ctx);
+      e = preEval(qc);
     } else if(e1.isFunction(Function.COUNT)) {
       e = compCount(op);
-      if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
+      if(e != this) qc.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
     } else if(e1.isFunction(Function.POSITION)) {
       // position() CMP number
       e = Pos.get(op, e2, e, info);
-      if(e != this) ctx.compInfo(OPTWRITE, this);
+      if(e != this) qc.compInfo(OPTWRITE, this);
     } else if(e1.type().eq(SeqType.BLN) && (op == OpV.EQ && e2 == Bln.FALSE ||
         op == OpV.NE && e2 == Bln.TRUE)) {
       // (A eq false()) -> not(A)
@@ -201,7 +201,7 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public Expr compEbv(final QueryContext ctx) {
+  public Expr compEbv(final QueryContext qc) {
     // e.g.: if($x eq true()) -> if($x)
     // checking one direction is sufficient, as operators may have been swapped
     return (op == OpV.EQ && exprs[1] == Bln.TRUE ||
@@ -210,10 +210,10 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Item a = exprs[0].item(ctx, info);
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Item a = exprs[0].item(qc, info);
     if(a == null) return null;
-    final Item b = exprs[1].item(ctx, info);
+    final Item b = exprs[1].item(qc, info);
     if(b == null) return null;
     if(a.comparable(b)) return Bln.get(op.eval(a, b, coll, info));
 
@@ -229,8 +229,8 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final Expr a = exprs[0].copy(ctx, scp, vs), b = exprs[1].copy(ctx, scp, vs);
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    final Expr a = exprs[0].copy(qc, scp, vs), b = exprs[1].copy(qc, scp, vs);
     return new CmpV(a, b, op, coll, info);
   }
 

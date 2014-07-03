@@ -46,18 +46,18 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    min = min.compile(ctx, scp);
-    max = max.compile(ctx, scp);
-    return super.compile(ctx, scp);
+  public FTExpr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    min = min.compile(qc, scp);
+    max = max.compile(qc, scp);
+    return super.compile(qc, scp);
   }
 
   @Override
-  protected boolean filter(final QueryContext ctx, final FTMatch mtc, final FTLexer lex)
+  protected boolean filter(final QueryContext qc, final FTMatch mtc, final FTLexer lex)
       throws QueryException {
 
-    final long mn = checkItr(min, ctx);
-    final long mx = checkItr(max, ctx);
+    final long mn = checkItr(min, qc);
+    final long mx = checkItr(max, qc);
     mtc.sort();
 
     final FTMatch match = new FTMatch();
@@ -98,20 +98,20 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public FTExpr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
       throws QueryException {
-    final Expr mn = min.inline(ctx, scp, v, e), mx = max.inline(ctx, scp, v, e);
+    final Expr mn = min.inline(qc, scp, v, e), mx = max.inline(qc, scp, v, e);
     if(mn != null) min = mn;
     if(mx != null) max = mx;
 
-    return inlineAll(ctx, scp, exprs, v, e) || mn != null || mx != null
-        ? optimize(ctx, scp) : null;
+    return inlineAll(qc, scp, exprs, v, e) || mn != null || mx != null
+        ? optimize(qc, scp) : null;
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTDistance(info, exprs[0].copy(ctx, scp, vs),
-        min.copy(ctx, scp, vs), max.copy(ctx, scp, vs), unit);
+  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new FTDistance(info, exprs[0].copy(qc, scp, vs),
+        min.copy(qc, scp, vs), max.copy(qc, scp, vs), unit);
   }
 
   @Override

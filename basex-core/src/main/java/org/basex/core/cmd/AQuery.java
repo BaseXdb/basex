@@ -189,7 +189,7 @@ public abstract class AQuery extends Command {
   private QueryProcessor qp(final String query, final Context ctx) {
     if(qp == null) {
       qp = proc(new QueryProcessor(query, ctx));
-      if(info == null) info = qp.ctx.info;
+      if(info == null) info = qp.qc.info;
     }
     return qp;
   }
@@ -204,7 +204,7 @@ public abstract class AQuery extends Command {
     try {
       qp(args[0], ctx);
       parse(null);
-      params = qp.ctx.serParams();
+      params = qp.qc.serParams();
     } catch(final QueryException ex) {
       error(Util.message(ex));
     }

@@ -46,10 +46,10 @@ public abstract class FTContains extends ParseExpr {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    expr = expr.compile(ctx, scp);
-    ftexpr = ftexpr.compile(ctx, scp);
-    return expr.isEmpty() ? optPre(Bln.FALSE, ctx) : this;
+  public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    expr = expr.compile(qc, scp);
+    ftexpr = ftexpr.compile(qc, scp);
+    return expr.isEmpty() ? optPre(Bln.FALSE, qc) : this;
   }
 
   @Override
@@ -68,14 +68,14 @@ public abstract class FTContains extends ParseExpr {
   }
 
   @Override
-  public final Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+  public final Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
       throws QueryException {
 
-    final Expr ex = expr.inline(ctx, scp, v, e);
+    final Expr ex = expr.inline(qc, scp, v, e);
     if(ex != null) expr = ex;
-    final FTExpr fte = ftexpr.inline(ctx, scp, v, e);
+    final FTExpr fte = ftexpr.inline(qc, scp, v, e);
     if(fte != null) ftexpr = fte;
-    return ex != null || fte != null ? optimize(ctx, scp) : null;
+    return ex != null || fte != null ? optimize(qc, scp) : null;
   }
 
   @Override

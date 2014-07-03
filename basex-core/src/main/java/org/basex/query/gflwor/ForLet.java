@@ -32,9 +32,9 @@ abstract class ForLet extends GFLWOR.Clause {
   }
 
   @Override
-  public Clause compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    expr = expr.compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Clause compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    expr = expr.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
@@ -53,14 +53,14 @@ abstract class ForLet extends GFLWOR.Clause {
   }
 
   @Override
-  public final Clause inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+  public final Clause inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
       throws QueryException {
 
-    final Expr sub = expr.inline(ctx, scp, v, e);
+    final Expr sub = expr.inline(qc, scp, v, e);
     if(sub == null) return null;
     expr = sub;
     // call compile instead of optimize, because many new optimizations may be triggered by inlining
-    return compile(ctx, scp);
+    return compile(qc, scp);
   }
 
   @Override

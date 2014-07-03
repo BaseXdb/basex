@@ -72,11 +72,11 @@ public abstract class Test {
 
   /**
    * Optimizes the expression.
-   * @param ctx query context
+   * @param qc query context
    * @return false if test always returns false
    */
   @SuppressWarnings("unused")
-  public boolean optimize(final QueryContext ctx) {
+  public boolean optimize(final QueryContext qc) {
     return true;
   }
 

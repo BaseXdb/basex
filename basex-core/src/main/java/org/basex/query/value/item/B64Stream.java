@@ -23,12 +23,12 @@ public final class B64Stream extends B64 {
 
   /**
    * Constructor.
-   * @param in input
-   * @param err error message to be thrown
+   * @param input input
+   * @param error error message to be thrown
    */
-  public B64Stream(final IO in, final Err err) {
-    input = in;
-    error = err;
+  public B64Stream(final IO input, final Err error) {
+    this.input = input;
+    this.error = error;
   }
 
   @Override

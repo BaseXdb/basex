@@ -33,19 +33,19 @@ public final class Instance extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return expr.isValue() ? preEval(ctx) : this;
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return expr.isValue() ? preEval(qc) : this;
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return Bln.get(seq.instance(ctx.value(expr)));
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(seq.instance(qc.value(expr)));
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Instance(info, expr.copy(ctx, scp, vs), seq);
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new Instance(info, expr.copy(qc, scp, vs), seq);
   }
 
   @Override

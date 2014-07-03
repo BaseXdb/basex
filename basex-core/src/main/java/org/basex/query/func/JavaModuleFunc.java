@@ -49,12 +49,12 @@ public final class JavaModuleFunc extends JavaMapping {
   }
 
   @Override
-  protected Object eval(final Value[] vals, final QueryContext ctx) throws QueryException {
+  protected Object eval(final Value[] vals, final QueryContext qc) throws QueryException {
     // assign context if module is inheriting {@link QueryModule}
     if(module instanceof QueryModule) {
       final QueryModule mod = (QueryModule) module;
       mod.staticContext = sc;
-      mod.queryContext = ctx;
+      mod.queryContext = qc;
     }
 
     final Object[] args = JavaFunc.args(params, vTypes, vals, true);
@@ -82,8 +82,8 @@ public final class JavaModuleFunc extends JavaMapping {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new JavaModuleFunc(sc, info, module, method, copyAll(ctx, scp, vs, exprs));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new JavaModuleFunc(sc, info, module, method, copyAll(qc, scp, vs, exprs));
   }
 
   @Override

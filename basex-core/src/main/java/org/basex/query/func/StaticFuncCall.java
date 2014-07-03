@@ -56,33 +56,33 @@ public final class StaticFuncCall extends FuncCall {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
 
     // disallow call of private functions from module with different uri
     if(func.ann.contains(Ann.Q_PRIVATE) && !Token.eq(func.sc.baseURI().string(),
         sc.baseURI().string())) throw FUNCPRIV.get(info, name.string());
 
     // compile mutually recursive functions
-    func.compile(ctx);
+    func.compile(qc);
 
     // try to inline the function
-    final Expr inl = func.inlineExpr(exprs, ctx, scp, info);
+    final Expr inl = func.inlineExpr(exprs, qc, scp, info);
     if(inl != null) return inl;
     type = func.type();
     return this;
   }
 
   @Override
-  public StaticFuncCall optimize(final QueryContext ctx, final VarScope scp) {
+  public StaticFuncCall optimize(final QueryContext qc, final VarScope scp) {
     // do not inline a static function after compilation as it must be recursive
     return this;
   }
 
   @Override
-  public StaticFuncCall copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+  public StaticFuncCall copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final Expr[] arg = new Expr[exprs.length];
-    for(int i = 0; i < arg.length; i++) arg[i] = exprs[i].copy(ctx, scp, vs);
+    for(int i = 0; i < arg.length; i++) arg[i] = exprs[i].copy(qc, scp, vs);
     final StaticFuncCall call = new StaticFuncCall(name, arg, sc, func, info);
     call.type = type;
     call.size = size;
@@ -146,15 +146,15 @@ public final class StaticFuncCall extends FuncCall {
   }
 
   @Override
-  public StaticFunc evalFunc(final QueryContext ctx) {
+  public StaticFunc evalFunc(final QueryContext qc) {
     return func;
   }
 
   @Override
-  Value[] evalArgs(final QueryContext ctx) throws QueryException {
+  Value[] evalArgs(final QueryContext qc) throws QueryException {
     final int al = exprs.length;
     final Value[] args = new Value[al];
-    for(int a = 0; a < al; ++a) args[a] = ctx.value(exprs[a]);
+    for(int a = 0; a < al; ++a) args[a] = qc.value(exprs[a]);
     return args;
   }
 }

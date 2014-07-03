@@ -25,7 +25,7 @@ public final class Dec extends ANum {
   /** Zero value. */
   private static final Dec ZERO = new Dec(BigDecimal.ZERO);
   /** Decimal value. */
-  private final BigDecimal val;
+  private final BigDecimal value;
 
   /**
    * Constructor.
@@ -33,81 +33,81 @@ public final class Dec extends ANum {
    */
   public Dec(final byte[] t) {
     super(AtomType.DEC);
-    val = new BigDecimal(Token.string(trim(t)));
+    value = new BigDecimal(Token.string(trim(t)));
   }
 
   /**
    * Constructor.
-   * @param d decimal value
-   * @param t string representation
+   * @param value decimal value
+   * @param type string representation
    */
-  public Dec(final BigDecimal d, final Type t) {
-    super(t);
-    val = d;
+  public Dec(final BigDecimal value, final Type type) {
+    super(type);
+    this.value = value;
   }
 
   /**
    * Constructor.
-   * @param d decimal value
+   * @param value decimal value
    */
-  private Dec(final BigDecimal d) {
+  private Dec(final BigDecimal value) {
     super(AtomType.DEC);
-    val = d;
+    this.value = value;
   }
 
   /**
    * Constructor.
-   * @param d big decimal value
+   * @param value big decimal value
    * @return value
    */
-  public static Dec get(final BigDecimal d) {
-    return d.signum() == 0 ? ZERO : new Dec(d);
+  public static Dec get(final BigDecimal value) {
+    return value.signum() == 0 ? ZERO : new Dec(value);
   }
 
   /**
    * Constructor.
-   * @param d big decimal value
+   * @param value big decimal value
    * @return value
    */
-  public static Dec get(final double d) {
-    return get(BigDecimal.valueOf(d));
+  public static Dec get(final double value) {
+    return get(BigDecimal.valueOf(value));
   }
 
   @Override
   public byte[] string() {
-    return chopNumber(token(val.toPlainString()));
+    return chopNumber(token(value.toPlainString()));
   }
 
   @Override
   public boolean bool(final InputInfo ii) {
-    return val.signum() != 0;
+    return value.signum() != 0;
   }
 
   @Override
   public long itr() {
-    return val.longValue();
+    return value.longValue();
   }
 
   @Override
   public float flt() {
-    return val.floatValue();
+    return value.floatValue();
   }
 
   @Override
   public double dbl() {
-    return val.doubleValue();
+    return value.doubleValue();
   }
 
   @Override
   public BigDecimal dec(final InputInfo ii) {
-    return val;
+    return value;
   }
 
   @Override
   public boolean eq(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
     return it.type == AtomType.DBL || it.type == AtomType.FLT ?
-        it.eq(this, coll, ii) : val.compareTo(it.dec(ii)) == 0;
+        it.eq(this, coll, ii) : value.compareTo(it.dec(ii)) == 0;
   }
 
   @Override
@@ -115,17 +115,17 @@ public final class Dec extends ANum {
       throws QueryException {
     final double d = it.dbl(ii);
     return d == Double.NEGATIVE_INFINITY ? -1 : d == Double.POSITIVE_INFINITY ? 1 :
-      Double.isNaN(d) ? UNDEF : val.compareTo(it.dec(ii));
+      Double.isNaN(d) ? UNDEF : value.compareTo(it.dec(ii));
   }
 
   @Override
   public Object toJava() {
-    return type == AtomType.ULN ? new BigInteger(val.toString()) : val;
+    return type == AtomType.ULN ? new BigInteger(value.toString()) : value;
   }
 
   @Override
   public boolean sameAs(final Expr cmp) {
-    return cmp instanceof Dec && val.compareTo(((Dec) cmp).val) == 0;
+    return cmp instanceof Dec && value.compareTo(((Dec) cmp).value) == 0;
   }
 
   /**

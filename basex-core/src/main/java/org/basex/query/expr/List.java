@@ -37,14 +37,14 @@ public final class List extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     final int es = exprs.length;
-    for(int e = 0; e < es; e++) exprs[e] = exprs[e].compile(ctx, scp);
-    return optimize(ctx, scp);
+    for(int e = 0; e < es; e++) exprs[e] = exprs[e].compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // compute number of results
     size = 0;
     boolean ne = false;
@@ -60,13 +60,13 @@ public final class List extends Arr {
     }
 
     if(size >= 0) {
-      if(size == 0 && !has(Flag.NDT) && !has(Flag.UPD)) return optPre(null, ctx);
+      if(size == 0 && !has(Flag.NDT) && !has(Flag.UPD)) return optPre(null, qc);
       if(allAreValues() && size <= MAX_MAT_SIZE) {
         Type all = null;
         final Value[] vs = new Value[exprs.length];
         int c = 0;
         for(final Expr e : exprs) {
-          final Value v = e.value(ctx);
+          final Value v = e.value(qc);
           if(c == 0) all = v.type;
           else if(all != v.type) all = null;
           vs[c++] = v;
@@ -87,7 +87,7 @@ public final class List extends Arr {
           for(int i = 0; i < c; i++) vb.add(vs[i]);
           val = vb.value();
         }
-        return optPre(val, ctx);
+        return optPre(val, qc);
       }
     }
 
@@ -107,7 +107,7 @@ public final class List extends Arr {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) {
+  public Iter iter(final QueryContext qc) {
     return new Iter() {
       Iter ir;
       int e;
@@ -117,7 +117,7 @@ public final class List extends Arr {
         while(true) {
           if(ir == null) {
             if(e == exprs.length) return null;
-            ir = ctx.iter(exprs[e++]);
+            ir = qc.iter(exprs[e++]);
           }
           final Item it = ir.next();
           if(it != null) return it;
@@ -128,15 +128,15 @@ public final class List extends Arr {
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
-    for(final Expr e : exprs) vb.add(ctx.value(e));
+    for(final Expr e : exprs) vb.add(qc.value(e));
     return vb.value();
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return copyType(new List(info, copyAll(ctx, scp, vs, exprs)));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return copyType(new List(info, copyAll(qc, scp, vs, exprs)));
   }
 
   @Override

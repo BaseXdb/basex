@@ -89,12 +89,12 @@ public final class QueryInfo {
   public String toString(final QueryProcessor qp, final long printed, final long hits,
       final boolean detailed) {
 
-    final int runs = Math.max(1, qp.ctx.context.options.get(MainOptions.RUNS));
+    final int runs = Math.max(1, qp.qc.context.options.get(MainOptions.RUNS));
     final TokenBuilder tb = new TokenBuilder();
     final long total = parsing + compiling + evaluating + serializing;
     if(detailed) {
       final int up = qp.updates();
-      tb.add(toString(qp.ctx)).add(NL);
+      tb.add(toString(qp.qc)).add(NL);
       tb.add(PARSING_CC).add(Performance.getTime(parsing, runs)).add(NL);
       tb.add(COMPILING_CC).add(Performance.getTime(compiling, runs)).add(NL);
       tb.add(EVALUATING_CC).add(Performance.getTime(evaluating, runs)).add(NL);

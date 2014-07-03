@@ -29,21 +29,21 @@ public final class CDoc extends CNode {
   }
 
   @Override
-  public FDoc item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public FDoc item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // create node
     final Constr c = new Constr(ii, sc);
     final FDoc doc = new FDoc(c.children, Token.EMPTY);
 
     // add child nodes
-    c.add(ctx, exprs);
+    c.add(qc, exprs);
     if(c.errAtt || !c.atts.isEmpty()) throw DOCATTS.get(ii);
     if(c.errNS || !c.nspaces.isEmpty()) throw DOCNS.get(ii);
     return doc.optimize();
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CDoc(sc, info, exprs[0].copy(ctx, scp, vs));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new CDoc(sc, info, exprs[0].copy(qc, scp, vs));
   }
 
   @Override

@@ -36,10 +36,10 @@ final class FTTokenizer {
   /**
    * Constructor.
    * @param w full-text words
-   * @param ctx query context
+   * @param qc query context
    */
-  FTTokenizer(final FTWords w, final QueryContext ctx) {
-    this(w, ctx.ftOpt(), new Levenshtein(ctx.context.options.get(MainOptions.LSERROR)));
+  FTTokenizer(final FTWords w, final QueryContext qc) {
+    this(w, qc.ftOpt(), new Levenshtein(qc.context.options.get(MainOptions.LSERROR)));
   }
 
   /**

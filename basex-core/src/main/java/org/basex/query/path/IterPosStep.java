@@ -25,7 +25,7 @@ final class IterPosStep extends Step {
   }
 
   @Override
-  public NodeIter iter(final QueryContext ctx) {
+  public NodeIter iter(final QueryContext qc) {
     return new NodeIter() {
       boolean skip;
       AxisIter ai;
@@ -34,11 +34,11 @@ final class IterPosStep extends Step {
       @Override
       public ANode next() throws QueryException {
         if(skip) return null;
-        if(ai == null) ai = axis.iter(checkNode(ctx));
+        if(ai == null) ai = axis.iter(checkNode(qc));
 
         ANode lnode = null;
         while(true) {
-          ctx.checkStop();
+          qc.checkStop();
           final ANode node = ai.next();
           if(node == null) {
             skip = last;
@@ -49,20 +49,20 @@ final class IterPosStep extends Step {
           if(!test.eq(node)) continue;
 
           // evaluate predicates
-          final long cp = ctx.pos, cs = ctx.size;
-          ctx.size = 0;
-          ctx.pos = ++cpos;
+          final long cp = qc.pos, cs = qc.size;
+          qc.size = 0;
+          qc.pos = ++cpos;
           try {
-            if(preds(node, ctx)) {
+            if(preds(node, qc)) {
               // check if more results can be expected
-              skip = pos != null && pos.skip(ctx);
+              skip = pos != null && pos.skip(qc);
               return node.finish();
             }
             // remember last node
             if(last) lnode = node.finish();
           } finally {
-            ctx.pos = cp;
-            ctx.size = cs;
+            qc.pos = cp;
+            qc.size = cs;
           }
         }
       }
@@ -78,10 +78,9 @@ final class IterPosStep extends Step {
   }
 
   @Override
-  public Step copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public Step copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final Expr[] pred = new Expr[preds.length];
-    for(int i = 0; i < pred.length; i++) pred[i] = preds[i].copy(ctx, scp, vs);
+    for(int i = 0; i < pred.length; i++) pred[i] = preds[i].copy(qc, scp, vs);
     return copy(new IterPosStep(new AxisStep(info, axis, test.copy(), pred)));
   }
 }

@@ -230,9 +230,9 @@ public final class Unit {
   private void eval(final StaticFunc func) throws QueryException {
     current = func;
 
-    final QueryContext query = new QueryContext(ctx);
+    final QueryContext qc = new QueryContext(ctx);
     try {
-      query.parse(input, file.path(), null);
+      qc.parse(input, file.path(), null);
 
       // wrap function with a function call
       final StaticFuncCall sfc = new StaticFuncCall(
@@ -240,14 +240,14 @@ public final class Unit {
       final MainModule mm = new MainModule(sfc, new VarScope(func.sc), null, func.sc);
 
       // assign main module and http context and register process
-      query.mainModule(mm);
-      query.compile();
+      qc.mainModule(mm);
+      qc.compile();
 
-      final Iter iter = query.iter();
+      final Iter iter = qc.iter();
       while(iter.next() != null) throw UNIT_EMPTY.get(null, func.name.local());
 
     } finally {
-      query.close();
+      qc.close();
     }
   }
 

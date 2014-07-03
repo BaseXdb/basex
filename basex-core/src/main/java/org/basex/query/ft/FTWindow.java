@@ -39,16 +39,16 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    win = win.compile(ctx, scp);
-    return super.compile(ctx, scp);
+  public FTExpr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    win = win.compile(qc, scp);
+    return super.compile(qc, scp);
   }
 
   @Override
-  protected boolean filter(final QueryContext ctx, final FTMatch mtc, final FTLexer lex)
+  protected boolean filter(final QueryContext qc, final FTMatch mtc, final FTLexer lex)
       throws QueryException {
 
-    final int n = (int) checkItr(win, ctx) - 1;
+    final int n = (int) checkItr(win, qc) - 1;
     mtc.sort();
 
     FTStringMatch f = null;
@@ -93,17 +93,17 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public FTExpr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
       throws QueryException {
-    final boolean ex = inlineAll(ctx, scp, exprs, v, e);
-    final Expr w = win.inline(ctx, scp, v, e);
+    final boolean ex = inlineAll(qc, scp, exprs, v, e);
+    final Expr w = win.inline(qc, scp, v, e);
     if(w != null) win = w;
-    return ex || w != null ? optimize(ctx, scp) : null;
+    return ex || w != null ? optimize(qc, scp) : null;
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTWindow(info, exprs[0].copy(ctx, scp, vs), win.copy(ctx, scp, vs), unit);
+  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new FTWindow(info, exprs[0].copy(qc, scp, vs), win.copy(qc, scp, vs), unit);
   }
 
   @Override

@@ -154,7 +154,7 @@ public final class WebDAVLockService {
       for(final Entry<String, Object> entry : query.entries()) {
         qp.bind(entry.getKey(), entry.getValue());
       }
-      qp.ctx.parseLibrary(string(module), FILE, qp.sc);
+      qp.qc.parseLibrary(string(module), FILE, qp.sc);
 
       final Result r = qp.execute();
       final int n = (int) r.size();

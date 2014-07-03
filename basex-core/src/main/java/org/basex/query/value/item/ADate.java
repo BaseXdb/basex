@@ -72,26 +72,26 @@ public abstract class ADate extends ADateDur {
 
   /**
    * Constructor.
-   * @param typ data type
-   * @param d date reference
+   * @param type data type
+   * @param date date reference
    */
-  ADate(final Type typ, final ADate d) {
-    super(typ);
-    yea = d.yea;
-    mon = d.mon;
-    day = d.day;
-    hou = d.hou;
-    min = d.min;
-    sec = d.sec;
-    zon = d.zon;
+  ADate(final Type type, final ADate date) {
+    super(type);
+    yea = date.yea;
+    mon = date.mon;
+    day = date.day;
+    hou = date.hou;
+    min = date.min;
+    sec = date.sec;
+    zon = date.zon;
   }
 
   /**
    * Constructor.
-   * @param typ data type
+   * @param type data type
    */
-  ADate(final Type typ) {
-    super(typ);
+  ADate(final Type type) {
+    super(type);
   }
 
   /**

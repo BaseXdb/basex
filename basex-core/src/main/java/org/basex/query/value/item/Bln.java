@@ -22,48 +22,48 @@ public final class Bln extends Item {
   /** Static boolean item without scoring. */
   public static final Bln FALSE = new Bln(false);
   /** Data. */
-  private final boolean val;
+  private final boolean value;
 
   /**
    * Constructor, adding a full-text score.
-   * @param b boolean value
+   * @param value boolean value
    */
-  private Bln(final boolean b) {
+  private Bln(final boolean value) {
     super(AtomType.BLN);
-    val = b;
+    this.value = value;
   }
 
   /**
    * Constructor, adding a full-text score.
-   * @param b boolean value
-   * @param s score value
+   * @param value boolean value
+   * @param score score value
    */
-  private Bln(final boolean b, final double s) {
-    this(b);
-    score = s;
+  private Bln(final boolean value, final double score) {
+    this(value);
+    this.score = score;
   }
 
   /**
    * Constructor, adding a full-text score.
-   * @param s score value
+   * @param score score value
    * @return item
    */
-  public static Bln get(final double s) {
-    return s == 0 ? FALSE : new Bln(true, s);
+  public static Bln get(final double score) {
+    return score == 0 ? FALSE : new Bln(true, score);
   }
 
   /**
    * Returns a static item instance.
-   * @param b boolean value
+   * @param value boolean value
    * @return item
    */
-  public static Bln get(final boolean b) {
-    return b ? TRUE : FALSE;
+  public static Bln get(final boolean value) {
+    return value ? TRUE : FALSE;
   }
 
   @Override
   public byte[] string(final InputInfo ii) {
-    return Token.token(val);
+    return Token.token(value);
   }
 
   /**
@@ -71,55 +71,55 @@ public final class Bln extends Item {
    * @return string value
    */
   public byte[] string() {
-    return Token.token(val);
+    return Token.token(value);
   }
 
   @Override
   public boolean bool(final InputInfo ii) {
-    return val;
+    return value;
   }
 
   @Override
   public long itr(final InputInfo ii) {
-    return val ? 1 : 0;
+    return value ? 1 : 0;
   }
 
   @Override
   public float flt(final InputInfo ii) {
-    return val ? 1 : 0;
+    return value ? 1 : 0;
   }
 
   @Override
   public double dbl(final InputInfo ii) {
-    return val ? 1 : 0;
+    return value ? 1 : 0;
   }
 
   @Override
   public BigDecimal dec(final InputInfo ii) {
-    return val ? BigDecimal.ONE : BigDecimal.ZERO;
+    return value ? BigDecimal.ONE : BigDecimal.ZERO;
   }
 
   @Override
   public boolean eq(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return val == (it.type == type ? it.bool(ii) : parse(it.string(ii), ii));
+    return value == (it.type == type ? it.bool(ii) : parse(it.string(ii), ii));
   }
 
   @Override
   public int diff(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
     final boolean n = it.type == type ? it.bool(ii) : parse(it.string(ii), ii);
-    return val ? n ? 0 : 1 : n ? -1 : 0;
+    return value ? n ? 0 : 1 : n ? -1 : 0;
   }
 
   @Override
   public Boolean toJava() {
-    return val;
+    return value;
   }
 
   @Override
   public boolean sameAs(final Expr cmp) {
-    return cmp instanceof Bln && val == ((Bln) cmp).val;
+    return cmp instanceof Bln && value == ((Bln) cmp).value;
   }
 
   /**
@@ -138,6 +138,6 @@ public final class Bln extends Item {
 
   @Override
   public String toString() {
-    return new TokenBuilder(val ? Token.TRUE : Token.FALSE).add("()").toString();
+    return new TokenBuilder(value ? Token.TRUE : Token.FALSE).add("()").toString();
   }
 }

@@ -28,9 +28,9 @@ final class AxisStep extends Step {
   }
 
   @Override
-  public NodeIter iter(final QueryContext ctx) throws QueryException {
+  public NodeIter iter(final QueryContext qc) throws QueryException {
     // evaluate step
-    final AxisIter ai = axis.iter(checkNode(ctx));
+    final AxisIter ai = axis.iter(checkNode(qc));
     final NodeSeqBuilder nc = new NodeSeqBuilder();
     for(ANode n; (n = ai.next()) != null;) {
       if(test.eq(n)) nc.add(n.finish());
@@ -38,18 +38,18 @@ final class AxisStep extends Step {
 
     // evaluate predicates
     for(final Expr p : preds) {
-      ctx.size = nc.size();
-      ctx.pos = 1;
+      qc.size = nc.size();
+      qc.pos = 1;
       int c = 0;
       for(int n = 0; n < nc.size(); ++n) {
-        ctx.value = nc.get(n);
-        final Item i = p.test(ctx, info);
+        qc.value = nc.get(n);
+        final Item i = p.test(qc, info);
         if(i != null) {
           // assign score value
           nc.get(n).score(i.score());
           nc.nodes[c++] = nc.get(n);
         }
-        ctx.pos++;
+        qc.pos++;
       }
       nc.size(c);
     }
@@ -57,9 +57,9 @@ final class AxisStep extends Step {
   }
 
   @Override
-  public Step copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+  public Step copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final Expr[] pred = new Expr[preds.length];
-    for(int i = 0; i < pred.length; i++) pred[i] = preds[i].copy(ctx, scp, vs);
+    for(int i = 0; i < pred.length; i++) pred[i] = preds[i].copy(qc, scp, vs);
     return copy(new AxisStep(info, axis, test.copy(), pred));
   }
 }

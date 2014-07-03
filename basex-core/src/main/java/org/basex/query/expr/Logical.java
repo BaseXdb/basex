@@ -32,17 +32,17 @@ public abstract class Logical extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
     final boolean and = this instanceof And;
     final int es = exprs.length;
     final ExprList el = new ExprList(es);
     for(final Expr e : exprs) {
-      final Expr ex = e.compEbv(ctx);
+      final Expr ex = e.compEbv(qc);
       if(ex.isValue()) {
         // atomic items can be pre-evaluated
-        ctx.compInfo(OPTREMOVE, this, e);
-        if(ex.ebv(ctx, info).bool(info) ^ and) return Bln.get(!and);
+        qc.compInfo(OPTREMOVE, this, e);
+        if(ex.ebv(qc, info).bool(info) ^ and) return Bln.get(!and);
       } else {
         el.add(ex);
       }
@@ -53,12 +53,12 @@ public abstract class Logical extends Arr {
   }
 
   @Override
-  public final void markTailCalls(final QueryContext ctx) {
+  public final void markTailCalls(final QueryContext qc) {
     // if the last expression surely returns a boolean, we can jump to it
     final Expr last = exprs[exprs.length - 1];
     if(last.type().eq(SeqType.BLN)) {
       tailCall = true;
-      last.markTailCalls(ctx);
+      last.markTailCalls(qc);
     }
   }
 
@@ -74,9 +74,9 @@ public abstract class Logical extends Arr {
 
   /**
    * Flattens nested logical expressions.
-   * @param ctx query context
+   * @param qc query context
    */
-  final void compFlatten(final QueryContext ctx) {
+  final void compFlatten(final QueryContext qc) {
     // flatten nested expressions
     final int es = exprs.length;
     final ExprList tmp = new ExprList(es);
@@ -85,7 +85,7 @@ public abstract class Logical extends Arr {
     for(final Expr ex : exprs) {
       if(and && ex instanceof And || or && ex instanceof Or) {
         for(final Expr e : ((Arr) ex).exprs) tmp.add(e);
-        ctx.compInfo(OPTFLAT, ex);
+        qc.compInfo(OPTFLAT, ex);
       } else {
         tmp.add(ex);
       }

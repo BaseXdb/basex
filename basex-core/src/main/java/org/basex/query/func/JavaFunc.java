@@ -28,23 +28,23 @@ public final class JavaFunc extends JavaMapping {
 
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    * @param clazz Java class
    * @param method Java method/field
    * @param args arguments
    */
-  JavaFunc(final StaticContext sctx, final InputInfo info, final Class<?> clazz,
-      final String method, final Expr[] args) {
-    super(sctx, info, args);
+  JavaFunc(final StaticContext sc, final InputInfo info, final Class<?> clazz, final String method,
+      final Expr[] args) {
+    super(sc, info, args);
     this.clazz = clazz;
     this.method = method;
   }
 
   @Override
-  protected Object eval(final Value[] args, final QueryContext ctx) throws QueryException {
+  protected Object eval(final Value[] args, final QueryContext qc) throws QueryException {
     try {
-      return method.equals(NEW) ? constructor(args) : method(args, ctx);
+      return method.equals(NEW) ? constructor(args) : method(args, qc);
     } catch(final InvocationTargetException ex) {
       final Throwable cause = ex.getCause();
       throw cause instanceof QueryException ? ((QueryException) cause).info(info) :
@@ -58,8 +58,8 @@ public final class JavaFunc extends JavaMapping {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new JavaFunc(sc, info, clazz, method, copyAll(ctx, scp, vs, exprs));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new JavaFunc(sc, info, clazz, method, copyAll(qc, scp, vs, exprs));
   }
 
   /**
@@ -79,11 +79,11 @@ public final class JavaFunc extends JavaMapping {
   /**
    * Calls a method.
    * @param ar arguments
-   * @param ctx query context
+   * @param qc query context
    * @return resulting object
    * @throws Exception exception
    */
-  private Object method(final Value[] ar, final QueryContext ctx) throws Exception {
+  private Object method(final Value[] ar, final QueryContext qc) throws Exception {
     // check if a field with the specified name exists
     try {
       final Field f = clazz.getField(method);
@@ -104,7 +104,7 @@ public final class JavaFunc extends JavaMapping {
           if(inst instanceof QueryModule) {
             final QueryModule mod = (QueryModule) inst;
             mod.staticContext = sc;
-            mod.queryContext = ctx;
+            mod.queryContext = qc;
           }
         }
         return meth.invoke(inst, arg);

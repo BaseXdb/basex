@@ -2,14 +2,14 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.data.*;
-import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -112,8 +112,6 @@ public final class CmpG extends Cmp {
 
   /** Comparator. */
   public OpG op;
-  /** Index expressions. */
-  private ValueAccess[] va = {};
   /** Flag for atomic evaluation. */
   private boolean atomic;
 
@@ -133,29 +131,32 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    // avoid reoptimization
+    if(atomic) return this;
+
     // swap expressions; add text() to location paths to simplify optimizations
     if(swap()) {
       op = op.swap();
-      ctx.compInfo(OPTSWAP, this);
+      qc.compInfo(OPTSWAP, this);
     }
 
     final Expr e1 = exprs[0];
     final Expr e2 = exprs[1];
     Expr e = this;
     if(oneIsEmpty()) {
-      e = optPre(Bln.FALSE, ctx);
+      e = optPre(Bln.FALSE, qc);
     } else if(allAreValues()) {
-      e = preEval(ctx);
+      e = preEval(qc);
     } else if(e1.isFunction(Function.COUNT)) {
       e = compCount(op.op);
-      if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
+      if(e != this) qc.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
     } else if(e1.isFunction(Function.POSITION)) {
       if(e2 instanceof RangeSeq && op.op == OpV.EQ) {
         // position() CMP range
@@ -166,28 +167,28 @@ public final class CmpG extends Cmp {
         // position() CMP number
         e = Pos.get(op.op, e2, e, info);
       }
-      if(e != this) ctx.compInfo(OPTWRITE, this);
+      if(e != this) qc.compInfo(OPTWRITE, this);
     } else if(e1.type().eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE ||
         op == OpG.NE && e2 == Bln.TRUE)) {
       // (A = false()) -> not(A)
       e = Function.NOT.get(null, info, e1);
-      ctx.compInfo(OPTWRITE, this);
+      qc.compInfo(OPTWRITE, this);
     } else {
       // rewrite path CMP number
       e = CmpR.get(this);
       if(e == this) e = CmpSR.get(this);
-      if(e != this) ctx.compInfo(OPTWRITE, this);
+      if(e != this) qc.compInfo(OPTWRITE, this);
     }
     if(e != this) return e;
 
     // check if both arguments will always yield one result
     atomic = e1.type().zeroOrOne() && e2.type().zeroOrOne();
-    if(atomic) ctx.compInfo(OPTATOMIC, this);
+    if(atomic) qc.compInfo(OPTATOMIC, this);
     return this;
   }
 
   @Override
-  public Expr compEbv(final QueryContext ctx) {
+  public Expr compEbv(final QueryContext qc) {
     // e.g.: exists(...) = true() -> exists(...)
     // checking one direction is sufficient, as operators may have been swapped
     return (op == OpG.EQ && exprs[1] == Bln.TRUE ||
@@ -196,17 +197,17 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // atomic evaluation of arguments (faster)
     if(atomic) {
-      final Item it1 = exprs[0].item(ctx, info);
+      final Item it1 = exprs[0].item(qc, info);
       if(it1 == null) return Bln.FALSE;
-      final Item it2 = exprs[1].item(ctx, info);
+      final Item it2 = exprs[1].item(qc, info);
       if(it2 == null) return Bln.FALSE;
       return Bln.get(eval(it1, it2, coll));
     }
 
-    final Iter ir1 = ctx.iter(exprs[0]);
+    final Iter ir1 = qc.iter(exprs[0]);
     final long is1 = ir1.size();
 
     // skip empty result
@@ -215,9 +216,9 @@ public final class CmpG extends Cmp {
 
     // evaluate single items
     if(s1 && exprs[1].size() == 1)
-      return Bln.get(eval(ir1.next(), exprs[1].item(ctx, info), coll));
+      return Bln.get(eval(ir1.next(), exprs[1].item(qc, info), coll));
 
-    Iter ir2 = ctx.iter(exprs[1]);
+    Iter ir2 = qc.iter(exprs[1]);
     final long is2 = ir2.size();
 
     // skip empty result
@@ -285,83 +286,79 @@ public final class CmpG extends Cmp {
   /**
    * Creates a union of the existing and the specified expressions.
    * @param g general comparison
-   * @param ctx query context
+   * @param qc query context
    * @param scp variable scope
    * @return true if union was successful
    * @throws QueryException query exception
    */
-  boolean union(final CmpG g, final QueryContext ctx, final VarScope scp) throws QueryException {
+  boolean union(final CmpG g, final QueryContext qc, final VarScope scp) throws QueryException {
     if(op != g.op || !exprs[0].sameAs(g.exprs[0])) return false;
-    exprs[1] = new List(info, exprs[1], g.exprs[1]).compile(ctx, scp);
+    exprs[1] = new List(info, exprs[1], g.exprs[1]).compile(qc, scp);
     atomic = atomic && exprs[1].type().zeroOrOne();
     return true;
   }
 
   @Override
-  public boolean indexAccessible(final IndexCosts ic) throws QueryException {
+  public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     // only equality expressions on default collation can be rewritten
     if(op != OpG.EQ || coll != null) return false;
 
     // location path, string
-    final Step step = ic.indexStep(exprs[0]);
-    if(step == null) return false;
-
-    // check which index applies
-    final Data data = ic.ictx.data;
-    final boolean text = step.test.type == NodeType.TXT && data.meta.textindex;
-    final boolean attr = step.test.type == NodeType.ATT && data.meta.attrindex;
-    if(!text && !attr) return false;
+    if(!ii.check(exprs[0], false)) return false;
 
     // support expressions
-    final IndexType ind = text ? IndexType.TEXT : IndexType.ATTRIBUTE;
+    final Data data = ii.ic.data;
     final Expr arg = exprs[1];
+    final ParseExpr root;
     if(!arg.isValue()) {
-      final SeqType t = arg.type();
-      /* index access is not possible if returned type is no string or not untyped, if
-         expression depends on context, or if it is non-deterministic. examples:
-         //*[text() = 1]
+      /* index access is not possible if returned type is not a string or untyped; if
+         expression depends on context; or if it is non-deterministic. examples:
+         for $x in ('a', 1) return //*[text() = $x]
          //*[text() = .]
          //*[text() = (if(random:double() < .5) then 'X' else 'Y')]
        */
-      if(!t.type.isStringOrUntyped() || arg.has(Flag.CTX) || arg.has(Flag.NDT) || arg.has(Flag.UPD))
-        return false;
+      if(!arg.type().type.isStringOrUntyped() || arg.has(Flag.CTX) || arg.has(Flag.NDT) ||
+          arg.has(Flag.UPD)) return false;
 
-      ic.addCosts(data.meta.size / 10);
-      va = Array.add(va, new ValueAccess(info, arg, ind, ic.ictx));
-      return true;
-    }
+      // estimate costs (tend to worst case)
+      ii.costs = Math.max(1, data.meta.size / 10);
+      root = new ValueAccess(info, arg, ii.text, ii.name, ii.ic);
 
-    // loop through all items
-    ic.costs(0);
-    final Iter ir = arg.iter(ic.ctx);
-    for(Item it; (it = ir.next()) != null;) {
-      // only strings and untyped items are supported
-      if(!it.type.isStringOrUntyped()) return false;
-      // do no use index if string is empty
-      if(it.string(info).length == 0) return false;
+    } else {
+      // loop through all items
+      ii.costs = 0;
+      final Iter ir = arg.iter(ii.qc);
+      final ArrayList<ValueAccess> va = new ArrayList<>();
+      final TokenSet strings = new TokenSet();
+      for(Item it; (it = ir.next()) != null;) {
+        // only strings and untyped items are supported
+        if(!it.type.isStringOrUntyped()) return false;
+        // do no use index if string is empty
+        final byte[] string = it.string(info);
+        if(string.length == 0) return false;
 
-      final int is = data.costs(new StringToken(ind, it.string(info)));
-      // add only expressions that yield results
-      if(is != 0) {
-        va = Array.add(va, new ValueAccess(info, it, ind, ic.ictx));
-        ic.addCosts(is);
+        // add only expressions that yield results and have not been requested before
+        if(!strings.contains(string)) {
+          strings.put(string);
+          final int costs = data.costs(new StringToken(ii.text, string));
+          if(costs != 0) {
+            va.add(new ValueAccess(info, it, ii.text, ii.name, ii.ic));
+            ii.costs += costs;
+          }
+        }
       }
+      // more than one string - merge index results
+      final int vs = va.size();
+      root = vs == 1 ? va.get(0) : new Union(info, va.toArray(new ValueAccess[vs]));
     }
+
+    ii.create(root, info, Util.info(ii.text ? OPTTXTINDEX : OPTATVINDEX, arg), false);
     return true;
   }
 
   @Override
-  public Expr indexEquivalent(final IndexCosts ic) {
-    final boolean text = va[0].itype == IndexType.TEXT;
-    ic.ctx.compInfo(text ? OPTTXTINDEX : OPTATVINDEX);
-    // more than one string - merge index results
-    final ParseExpr root = va.length == 1 ? va[0] : new Union(info, va);
-    return ic.invert(exprs[0], root, text);
-  }
-
-  @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final Expr a = exprs[0].copy(ctx, scp, vs), b = exprs[1].copy(ctx, scp, vs);
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    final Expr a = exprs[0].copy(qc, scp, vs), b = exprs[1].copy(qc, scp, vs);
     return new CmpG(a, b, op, coll, info);
   }
 

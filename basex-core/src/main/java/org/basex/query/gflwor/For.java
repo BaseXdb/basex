@@ -61,30 +61,30 @@ public final class For extends ForLet {
       /** Current position. */
       private long p;
       @Override
-      public boolean next(final QueryContext ctx) throws QueryException {
+      public boolean next(final QueryContext qc) throws QueryException {
         while(true) {
           final Item it = iter == null ? null : iter.next();
           if(it != null) {
             // there's another item to serve
             ++p;
-            ctx.set(var, it, info);
-            if(pos != null) ctx.set(pos, Int.get(p), info);
-            if(score != null) ctx.set(score, Dbl.get(it.score()), info);
+            qc.set(var, it, info);
+            if(pos != null) qc.set(pos, Int.get(p), info);
+            if(score != null) qc.set(score, Dbl.get(it.score()), info);
             return true;
           }
           if(empty && iter != null && p == 0) {
             // expression yields no items, bind the empty sequence instead
-            ctx.set(var, Empty.SEQ, info);
-            if(pos != null) ctx.set(pos, Int.get(p), info);
-            if(score != null) ctx.set(score, Dbl.get(0), info);
+            qc.set(var, Empty.SEQ, info);
+            if(pos != null) qc.set(pos, Int.get(p), info);
+            if(score != null) qc.set(score, Dbl.get(0), info);
             iter = null;
             return true;
           }
           // no more iterations from above, we're done here
-          if(!sub.next(ctx)) return false;
+          if(!sub.next(qc)) return false;
 
           // next iteration, reset iterator and counter
-          iter = expr.iter(ctx);
+          iter = expr.iter(qc);
           p = 0;
         }
       }
@@ -92,26 +92,26 @@ public final class For extends ForLet {
   }
 
   @Override
-  public For optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public For optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     final SeqType tp = expr.type();
     final boolean emp = empty && tp.mayBeZero();
     type = SeqType.get(tp.type, emp ? Occ.ZERO_ONE : Occ.ONE);
-    var.refineType(type, ctx, info);
-    if(pos != null) pos.refineType(SeqType.ITR, ctx, info);
-    if(score != null) score.refineType(SeqType.DBL, ctx, info);
+    var.refineType(type, qc, info);
+    if(pos != null) pos.refineType(SeqType.ITR, qc, info);
+    if(score != null) score.refineType(SeqType.DBL, qc, info);
     size = emp ? -1 : 1;
     return this;
   }
 
   @Override
-  public For copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final Var v = scp.newCopyOf(ctx, var);
+  public For copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    final Var v = scp.newCopyOf(qc, var);
     vs.put(var.id, v);
-    final Var p = pos == null ? null : scp.newCopyOf(ctx, pos);
+    final Var p = pos == null ? null : scp.newCopyOf(qc, pos);
     if(p != null) vs.put(pos.id, p);
-    final Var s = score == null ? null : scp.newCopyOf(ctx, score);
+    final Var s = score == null ? null : scp.newCopyOf(qc, score);
     if(s != null) vs.put(score.id, s);
-    return new For(v, p, s, expr.copy(ctx, scp, vs), empty, info);
+    return new For(v, p, s, expr.copy(qc, scp, vs), empty, info);
   }
 
   @Override
@@ -149,27 +149,27 @@ public final class For extends ForLet {
 
   /**
    * Tries to add the given expression as an attribute to this loop's sequence.
-   * @param ctx query context
+   * @param qc query context
    * @param scp variable scope
    * @param ex expression to add as predicate
    * @return success
    * @throws QueryException query exception
    */
-  boolean toPred(final QueryContext ctx, final VarScope scp, final Expr ex) throws QueryException {
+  boolean toPred(final QueryContext qc, final VarScope scp, final Expr ex) throws QueryException {
     if(empty || !(vars.length == 1 && ex.uses(var) && ex.removable(var))) return false;
 
     // reset context value (will not be accessible within predicate)
-    final Value cv = ctx.value;
+    final Value cv = qc.value;
     Expr pred = ex;
     try {
-      ctx.value = null;
+      qc.value = null;
       // assign type of iterated items to context expression
       final Context c = new Context(info);
       c.type = expr.type().type.seqType();
-      final Expr r = ex.inline(ctx, scp, var, c);
+      final Expr r = ex.inline(qc, scp, var, c);
       if(r != null) pred = r;
     } finally {
-      ctx.value = cv;
+      qc.value = cv;
     }
 
     // attach predicates to axis path or filter, or create a new filter
@@ -177,11 +177,11 @@ public final class For extends ForLet {
 
     // add to clause expression
     if(expr instanceof AxisPath) {
-      expr = ((Path) expr).addPreds(ctx, scp, pred);
+      expr = ((Path) expr).addPreds(qc, scp, pred);
     } else if(expr instanceof Filter) {
-      expr = ((Filter) expr).addPred(ctx, scp, pred);
+      expr = ((Filter) expr).addPred(qc, scp, pred);
     } else {
-      expr = Filter.get(info, expr, pred).optimize(ctx, scp);
+      expr = Filter.get(info, expr, pred).optimize(qc, scp);
     }
 
     return true;

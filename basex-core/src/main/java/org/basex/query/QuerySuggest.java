@@ -34,15 +34,15 @@ public final class QuerySuggest extends QueryParser {
 
   /**
    * Constructor.
-   * @param q query
-   * @param c query context
-   * @param d data reference
+   * @param query query string
+   * @param qc query context
+   * @param data data reference
    * @throws QueryException query exception
    */
-  public QuerySuggest(final String q, final QueryContext c, final Data d)
+  public QuerySuggest(final String query, final QueryContext qc, final Data data)
       throws QueryException {
-    super(q, null, c, null);
-    data = d;
+    super(query, null, qc, null);
+    this.data = data;
     checkInit();
   }
 

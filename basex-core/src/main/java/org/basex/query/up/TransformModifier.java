@@ -34,7 +34,7 @@ public final class TransformModifier extends ContextModifier {
   }
 
   @Override
-  void add(final Update up, final QueryContext ctx) throws QueryException {
+  void add(final Update up, final QueryContext qc) throws QueryException {
     // Disallow side-effecting updates within transform expressions.
     if(!(up instanceof NodeUpdate)) throw BASX_DBTRANSFORM.get(up.info());
     add(up);

@@ -48,10 +48,10 @@ final class DataUpdates {
 
   /**
    * Constructor.
-   * @param d data reference
+   * @param data data reference
    */
-  DataUpdates(final Data d) {
-    data = d;
+  DataUpdates(final Data data) {
+    this.data = data;
   }
 
   /**
@@ -74,7 +74,7 @@ final class DataUpdates {
 
     } else if(up instanceof Put) {
       final Put p = (Put) up;
-      final int id = p.nodeid;
+      final int id = p.id;
       final Put old = puts.get(id);
       if(old == null) puts.put(id, p);
       else old.merge(p);

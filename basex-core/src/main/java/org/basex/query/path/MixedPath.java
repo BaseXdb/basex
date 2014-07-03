@@ -35,14 +35,14 @@ public final class MixedPath extends Path {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
     // creates an iterator from the root value
-    final Value v = root != null ? ctx.value(root) : checkCtx(ctx);
+    final Value v = root != null ? qc.value(root) : checkCtx(qc);
     Iter res = v.iter();
 
-    final Value cv = ctx.value;
-    final long cs = ctx.size;
-    final long cp = ctx.pos;
+    final Value cv = qc.value;
+    final long cs = qc.size;
+    final long cp = qc.pos;
     try {
       // loop through all expressions
       final int sl = steps.length;
@@ -52,22 +52,22 @@ public final class MixedPath extends Path {
 
         // map operator: don't remove duplicates and check for nodes
         final boolean path = !(step instanceof Bang);
-        ctx.size = res.size();
-        ctx.pos = 1;
+        qc.size = res.size();
+        qc.pos = 1;
 
         // loop through all input items
         int nodes = 0;
         for(Item it; (it = res.next()) != null;) {
           if(path && !it.type.isNode()) throw PATHNODE.get(info, it.type);
-          ctx.value = it;
+          qc.value = it;
 
           // loop through all resulting items
-          final Iter ir = ctx.iter(step);
+          final Iter ir = qc.iter(step);
           for(Item i; (i = ir.next()) != null;) {
             if(i.type.isNode()) nodes++;
             vb.add(i);
           }
-          ctx.pos++;
+          qc.pos++;
         }
 
         final long vs = vb.size();
@@ -90,15 +90,15 @@ public final class MixedPath extends Path {
       }
       return res;
     } finally {
-      ctx.value = cv;
-      ctx.size = cs;
-      ctx.pos = cp;
+      qc.value = cv;
+      qc.size = cs;
+      qc.pos = cp;
     }
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new MixedPath(info, root == null ? null : root.copy(ctx, scp, vs),
-        Arr.copyAll(ctx, scp, vs, steps));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new MixedPath(info, root == null ? null : root.copy(qc, scp, vs),
+        Arr.copyAll(qc, scp, vs, steps));
   }
 }

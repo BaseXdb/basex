@@ -18,13 +18,13 @@ import org.basex.util.*;
 public final class ReplaceNode extends NodeCopy {
   /**
    * Constructor.
-   * @param p target node pre value
-   * @param d target data instance
-   * @param i input info
-   * @param c node copy insertion sequence
+   * @param pre target node pre value
+   * @param data target data instance
+   * @param ii input info
+   * @param nodes node copy insertion sequence
    */
-  public ReplaceNode(final int p, final Data d, final InputInfo i, final ANodeList c) {
-    super(UpdateType.REPLACENODE, p, d, i, c);
+  public ReplaceNode(final int pre, final Data data, final InputInfo ii, final ANodeList nodes) {
+    super(UpdateType.REPLACENODE, pre, data, ii, nodes);
   }
 
   @Override

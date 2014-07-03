@@ -27,7 +27,7 @@ public final class FTOrder extends FTFilter {
   }
 
   @Override
-  protected boolean filter(final QueryContext ctx, final FTMatch match, final FTLexer lex) {
+  protected boolean filter(final QueryContext qc, final FTMatch match, final FTLexer lex) {
     int pos = 0, start = 0;
     for(final FTStringMatch sm : match) {
       if(sm.exclude || pos == sm.pos) continue;
@@ -39,8 +39,8 @@ public final class FTOrder extends FTFilter {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTOrder(info, exprs[0].copy(ctx, scp, vs));
+  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new FTOrder(info, exprs[0].copy(qc, scp, vs));
   }
 
   @Override

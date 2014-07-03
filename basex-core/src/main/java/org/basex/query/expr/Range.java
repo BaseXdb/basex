@@ -31,49 +31,49 @@ public final class Range extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     Expr e = this;
     if(oneIsEmpty()) {
       e = Empty.SEQ;
     } else if(allAreValues()) {
-      e = value(ctx);
+      e = value(qc);
     }
-    return optPre(e, ctx);
+    return optPre(e, qc);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    return value(ctx).iter();
+  public Iter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    final long[] v = rng(ctx);
+  public Value value(final QueryContext qc) throws QueryException {
+    final long[] v = rng(qc);
     return v == null ? Empty.SEQ : RangeSeq.get(v[0], v[1] - v[0] + 1, true);
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Range(info, exprs[0].copy(ctx, scp, vs), exprs[1].copy(ctx, scp, vs));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new Range(info, exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs));
   }
 
   /**
    * Returns the start and end value of the range operator, or {@code null}
    * if the range could not be evaluated.
-   * @param ctx query context
+   * @param qc query context
    * @return value array
    * @throws QueryException query exception
    */
-  private long[] rng(final QueryContext ctx) throws QueryException {
-    final Item a = exprs[0].item(ctx, info);
+  private long[] rng(final QueryContext qc) throws QueryException {
+    final Item a = exprs[0].item(qc, info);
     if(a == null) return null;
-    final Item b = exprs[1].item(ctx, info);
+    final Item b = exprs[1].item(qc, info);
     if(b == null) return null;
     return new long[] { checkItr(a), checkItr(b) };
   }

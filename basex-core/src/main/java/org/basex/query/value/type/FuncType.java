@@ -33,14 +33,14 @@ public class FuncType implements Type {
 
   /**
    * Constructor.
-   * @param a annotations
-   * @param arg argument types
-   * @param typ return type
+   * @param ann annotations
+   * @param args argument types
+   * @param ret return type
    */
-  FuncType(final Ann a, final SeqType[] arg, final SeqType typ) {
-    ann = a != null ? a : new Ann();
-    args = arg;
-    ret = typ;
+  FuncType(final Ann ann, final SeqType[] args, final SeqType ret) {
+    this.ann = ann != null ? ann : new Ann();
+    this.args = args;
+    this.ret = ret;
   }
 
   @Override
@@ -80,23 +80,23 @@ public class FuncType implements Type {
   }
 
   @Override
-  public FItem cast(final Item it, final QueryContext ctx, final StaticContext sc,
+  public FItem cast(final Item it, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) throws QueryException {
 
     if(!(it instanceof FItem)) throw Err.castError(ii, this, it);
     final FItem f = (FItem) it;
-    return this == ANY_FUN ? f : f.coerceTo(this, ctx, ii, false);
+    return this == ANY_FUN ? f : f.coerceTo(this, qc, ii, false);
   }
 
   @Override
-  public final Item cast(final Object o, final QueryContext ctx, final StaticContext sc,
+  public final Item cast(final Object o, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) {
     throw Util.notExpected(o);
   }
 
   @Override
-  public final Item castString(final String s, final QueryContext ctx,
-      final StaticContext sc, final InputInfo ii) {
+  public final Item castString(final String s, final QueryContext qc, final StaticContext sc,
+      final InputInfo ii) {
     throw Util.notExpected(s);
   }
 

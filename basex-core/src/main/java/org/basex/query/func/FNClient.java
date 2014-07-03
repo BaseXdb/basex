@@ -30,58 +30,58 @@ public final class FNClient extends StandardFunc {
 
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    * @param func function definition
    * @param args arguments
    */
-  public FNClient(final StaticContext sctx, final InputInfo info, final Function func,
+  public FNClient(final StaticContext sc, final InputInfo info, final Function func,
       final Expr... args) {
-    super(sctx, info, func, args);
+    super(sc, info, func, args);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    checkCreate(ctx);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    checkCreate(qc);
     switch(func) {
-      case _CLIENT_QUERY: return query(ctx).iter(ctx);
-      default:            return super.iter(ctx);
+      case _CLIENT_QUERY: return query(qc).iter(qc);
+      default:            return super.iter(qc);
     }
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     switch(func) {
-      case _CLIENT_QUERY: return query(ctx);
-      default:            return super.value(ctx);
+      case _CLIENT_QUERY: return query(qc);
+      default:            return super.value(qc);
     }
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    checkCreate(ctx);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    checkCreate(qc);
     switch(func) {
-      case _CLIENT_CONNECT: return connect(ctx);
-      case _CLIENT_EXECUTE: return execute(ctx);
-      case _CLIENT_INFO:    return info(ctx);
-      case _CLIENT_CLOSE:   return close(ctx);
-      default:              return super.item(ctx, ii);
+      case _CLIENT_CONNECT: return connect(qc);
+      case _CLIENT_EXECUTE: return execute(qc);
+      case _CLIENT_INFO:    return info(qc);
+      case _CLIENT_CLOSE:   return close(qc);
+      default:              return super.item(qc, ii);
     }
   }
 
   /**
    * Establishes a connection to a remote database instance.
-   * @param ctx query context
+   * @param qc query context
    * @return connection id
    * @throws QueryException query exception
    */
-  private Uri connect(final QueryContext ctx) throws QueryException {
-    final String host = Token.string(checkStr(exprs[0], ctx));
-    final String user = Token.string(checkStr(exprs[2], ctx));
-    final String pass = Token.string(checkStr(exprs[3], ctx));
-    final int port = (int) checkItr(exprs[1], ctx);
+  private Uri connect(final QueryContext qc) throws QueryException {
+    final String host = Token.string(checkStr(exprs[0], qc));
+    final String user = Token.string(checkStr(exprs[2], qc));
+    final String pass = Token.string(checkStr(exprs[3], qc));
+    final int port = (int) checkItr(exprs[1], qc);
     try {
-      return sessions(ctx).add(new ClientSession(host, port, user, pass));
+      return sessions(qc).add(new ClientSession(host, port, user, pass));
     } catch(final IOException ex) {
       throw BXCL_CONN.get(info, ex);
     }
@@ -89,13 +89,13 @@ public final class FNClient extends StandardFunc {
 
   /**
    * Executes a command and returns the result as string.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  private Str execute(final QueryContext ctx) throws QueryException {
-    final ClientSession cs = session(ctx, false);
-    final String cmd = Token.string(checkStr(exprs[1], ctx));
+  private Str execute(final QueryContext qc) throws QueryException {
+    final ClientSession cs = session(qc, false);
+    final String cmd = Token.string(checkStr(exprs[1], qc));
 
     try {
       final ArrayOutput ao = new ArrayOutput();
@@ -112,29 +112,29 @@ public final class FNClient extends StandardFunc {
 
   /**
    * Executes a command and returns the result as string.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  private Str info(final QueryContext ctx) throws QueryException {
-    return Str.get(session(ctx, false).info().replaceAll("\r\n?", "\n").trim());
+  private Str info(final QueryContext qc) throws QueryException {
+    return Str.get(session(qc, false).info().replaceAll("\r\n?", "\n").trim());
   }
 
   /**
    * Executes a query and returns the result as sequence.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  private Value query(final QueryContext ctx) throws QueryException {
-    final ClientSession cs = session(ctx, false);
-    final String query = Token.string(checkStr(exprs[1], ctx));
+  private Value query(final QueryContext qc) throws QueryException {
+    final ClientSession cs = session(qc, false);
+    final String query = Token.string(checkStr(exprs[1], qc));
     final ValueBuilder vb = new ValueBuilder();
     ClientQuery cq = null;
     try {
       cq = cs.query(query);
       // bind variables and context item
-      for(final Map.Entry<String, Value> binding : bindings(2, ctx).entrySet()) {
+      for(final Map.Entry<String, Value> binding : bindings(2, qc).entrySet()) {
         final String k = binding.getKey();
         final Value v = binding.getValue();
         if(!v.isItem()) throw BXCL_ITEM.get(info, v);
@@ -149,7 +149,7 @@ public final class FNClient extends StandardFunc {
       // evaluate query
       while(cq.more()) {
         final String result = cq.next();
-        vb.add(cq.type().castString(result, ctx, sc, info));
+        vb.add(cq.type().castString(result, qc, sc, info));
       }
       return vb.value();
     } catch(final QueryIOException ex) {
@@ -170,13 +170,13 @@ public final class FNClient extends StandardFunc {
 
   /**
    * Establishes a connection to a remote database instance.
-   * @param ctx query context
+   * @param qc query context
    * @return connection id
    * @throws QueryException query exception
    */
-  private Item close(final QueryContext ctx) throws QueryException {
+  private Item close(final QueryContext qc) throws QueryException {
     try {
-      session(ctx, true).close();
+      session(qc, true).close();
       return null;
     } catch(final IOException ex) {
       throw BXCL_COMMAND.get(info, ex);
@@ -186,29 +186,29 @@ public final class FNClient extends StandardFunc {
   /**
    * Returns a connection and removes it from list with opened connections if
    * requested.
-   * @param ctx query context
+   * @param qc query context
    * @param del flag indicating if connection has to be removed
    * @return connection
    * @throws QueryException query exception
    */
-  private ClientSession session(final QueryContext ctx, final boolean del) throws QueryException {
-    final Uri id = (Uri) checkType(exprs[0].item(ctx, info), AtomType.URI);
-    final ClientSession cs = sessions(ctx).get(id);
+  private ClientSession session(final QueryContext qc, final boolean del) throws QueryException {
+    final Uri id = (Uri) checkType(exprs[0].item(qc, info), AtomType.URI);
+    final ClientSession cs = sessions(qc).get(id);
     if(cs == null) throw BXCL_NOTAVL.get(info, id);
-    if(del) sessions(ctx).remove(id);
+    if(del) sessions(qc).remove(id);
     return cs;
   }
 
   /**
    * Returns the sessions handler.
-   * @param ctx query context
+   * @param qc query context
    * @return connection handler
    */
-  private static ClientSessions sessions(final QueryContext ctx) {
-    ClientSessions res = ctx.resources.get(ClientSessions.class);
+  private static ClientSessions sessions(final QueryContext qc) {
+    ClientSessions res = qc.resources.get(ClientSessions.class);
     if(res == null) {
       res = new ClientSessions();
-      ctx.resources.add(res);
+      qc.resources.add(res);
     }
     return res;
   }

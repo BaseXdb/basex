@@ -16,10 +16,10 @@ import org.basex.util.*;
 public abstract class ANum extends Item {
   /**
    * Constructor.
-   * @param t type
+   * @param type type
    */
-  ANum(final Type t) {
-    super(t);
+  ANum(final Type type) {
+    super(type);
   }
 
   /* Removing "throws QueryException" */
@@ -69,8 +69,8 @@ public abstract class ANum extends Item {
   protected abstract float flt();
 
   @Override
-  public Item test(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return dbl() == ctx.pos ? this : null;
+  public Item test(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return dbl() == qc.pos ? this : null;
   }
 
   @Override

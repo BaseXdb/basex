@@ -25,22 +25,22 @@ public final class FPI extends FNode {
 
   /**
    * Constructor for creating a processing instruction.
-   * @param n name
-   * @param v value
+   * @param name name
+   * @param value value
    */
-  public FPI(final String n, final String v) {
-    this(QNm.get(n), token(v));
+  public FPI(final String name, final String value) {
+    this(QNm.get(name), token(value));
   }
 
   /**
    * Constructor for creating a processing instruction.
-   * @param n name
-   * @param v value
+   * @param name name
+   * @param value value
    */
-  public FPI(final QNm n, final byte[] v) {
+  public FPI(final QNm name, final byte[] value) {
     super(NodeType.PI);
-    name = n;
-    val = v;
+    this.name = name;
+    this.value = value;
   }
 
   /**
@@ -64,17 +64,17 @@ public final class FPI extends FNode {
 
   @Override
   public FNode copy() {
-    return new FPI(name, val).parent(par);
+    return new FPI(name, value).parent(par);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, name.string(), VAL, val));
+    addPlan(plan, planElem(NAM, name.string(), VAL, value));
   }
 
   @Override
   public String toString() {
-    return Util.info("<?% %?>", name.string(), val);
+    return Util.info("<?% %?>", name.string(), value);
   }
 
   /**

@@ -39,24 +39,24 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    weight = weight.compile(ctx, scp);
-    return super.compile(ctx, scp);
+  public FTExpr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    weight = weight.compile(qc, scp);
+    return super.compile(qc, scp);
   }
 
   // called by sequential variant
   @Override
-  public FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return weight(exprs[0].item(ctx, info), ctx);
+  public FTNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return weight(exprs[0].item(qc, info), qc);
   }
 
   // called by index variant
   @Override
-  public FTIter iter(final QueryContext ctx) {
+  public FTIter iter(final QueryContext qc) {
     return new FTIter() {
       @Override
       public FTNode next() throws QueryException {
-        return weight(exprs[0].iter(ctx).next(), ctx);
+        return weight(exprs[0].iter(qc).next(), qc);
       }
     };
   }
@@ -64,14 +64,14 @@ public final class FTWeight extends FTExpr {
   /**
    * Returns the item with weight calculation.
    * @param item input item
-   * @param ctx query context
+   * @param qc query context
    * @return item
    * @throws QueryException query exception
    */
-  private FTNode weight(final FTNode item, final QueryContext ctx) throws QueryException {
+  private FTNode weight(final FTNode item, final QueryContext qc) throws QueryException {
     // evaluate weight
     if(item == null) return null;
-    final double d = checkDbl(weight, ctx);
+    final double d = checkDbl(weight, qc);
     if(Math.abs(d) > 1000) throw FTWEIGHT.get(info, d);
     if(d == 0) item.all.size(0);
     item.score(item.score() * d);
@@ -79,7 +79,7 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public boolean indexAccessible(final IndexCosts ic) {
+  public boolean indexAccessible(final IndexInfo ii) {
     // weight makes no sense as long as no index-based scoring exists
     return false;
   }
@@ -100,20 +100,20 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public FTExpr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
       throws QueryException {
-    boolean change = inlineAll(ctx, scp, exprs, v, e);
-    final Expr w = weight.inline(ctx, scp, v, e);
+    boolean change = inlineAll(qc, scp, exprs, v, e);
+    final Expr w = weight.inline(qc, scp, v, e);
     if(w != null) {
       weight = w;
       change = true;
     }
-    return change ? optimize(ctx, scp) : null;
+    return change ? optimize(qc, scp) : null;
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTWeight(info, exprs[0].copy(ctx, scp, vs), weight.copy(ctx, scp, vs));
+  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new FTWeight(info, exprs[0].copy(qc, scp, vs), weight.copy(qc, scp, vs));
   }
 
   @Override

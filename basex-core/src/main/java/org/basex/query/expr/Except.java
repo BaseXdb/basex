@@ -28,20 +28,20 @@ public final class Except extends Set {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     final int es = exprs.length;
     final ExprList el = new ExprList(es);
     for(final Expr ex : exprs) {
       if(ex.isEmpty()) {
         // remove empty operands (return empty sequence if first value is empty)
-        if(el.isEmpty()) return optPre(null, ctx);
-        ctx.compInfo(OPTREMOVE, this, ex);
+        if(el.isEmpty()) return optPre(null, qc);
+        qc.compInfo(OPTREMOVE, this, ex);
       } else {
         el.add(ex);
       }
@@ -54,8 +54,8 @@ public final class Except extends Set {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final Except ex = new Except(info, copyAll(ctx, scp, vs, exprs));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    final Except ex = new Except(info, copyAll(qc, scp, vs, exprs));
     ex.iterable = iterable;
     return copyType(ex);
   }

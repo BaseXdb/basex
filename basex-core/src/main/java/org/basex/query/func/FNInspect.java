@@ -24,116 +24,116 @@ import org.basex.util.*;
 public final class FNInspect extends StandardFunc {
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    * @param func function definition
    * @param args arguments
    */
-  public FNInspect(final StaticContext sctx, final InputInfo info, final Function func,
+  public FNInspect(final StaticContext sc, final InputInfo info, final Function func,
       final Expr... args) {
-    super(sctx, info, func, args);
+    super(sc, info, func, args);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
     switch(func) {
-      case _INSPECT_FUNCTIONS: return functions(ctx);
-      default:                 return super.iter(ctx);
+      case _INSPECT_FUNCTIONS: return functions(qc);
+      default:                 return super.iter(qc);
     }
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     switch(func) {
-      case _INSPECT_FUNCTION: return function(ctx);
-      case _INSPECT_MODULE:   return module(ctx);
-      case _INSPECT_CONTEXT:  return context(ctx);
-      case _INSPECT_XQDOC:    return xqdoc(ctx);
-      default:                return super.item(ctx, ii);
+      case _INSPECT_FUNCTION: return function(qc);
+      case _INSPECT_MODULE:   return module(qc);
+      case _INSPECT_CONTEXT:  return context(qc);
+      case _INSPECT_XQDOC:    return xqdoc(qc);
+      default:                return super.item(qc, ii);
     }
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx, final VarScope scp) throws QueryException {
+  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
     if(func == Function._INSPECT_FUNCTIONS && exprs.length == 0) {
-      for(final StaticFunc sf : ctx.funcs.funcs()) sf.compile(ctx);
-      return functions(ctx).value();
+      for(final StaticFunc sf : qc.funcs.funcs()) sf.compile(qc);
+      return functions(qc).value();
     }
     return this;
   }
 
   /**
    * Performs the function function.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Item function(final QueryContext ctx) throws QueryException {
-    final FItem fn = checkFunc(exprs[0], ctx);
+  private Item function(final QueryContext qc) throws QueryException {
+    final FItem fn = checkFunc(exprs[0], qc);
     final QNm name = fn.funcName();
-    final StaticFunc sf = name == null ? null : ctx.funcs.get(name, fn.arity(), null, false);
-    return new PlainDoc(ctx, info).function(name, sf, fn.funcType(), fn.annotations(), null);
+    final StaticFunc sf = name == null ? null : qc.funcs.get(name, fn.arity(), null, false);
+    return new PlainDoc(qc, info).function(name, sf, fn.funcType(), fn.annotations(), null);
   }
 
   /**
    * Performs the context function.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Item context(final QueryContext ctx) throws QueryException {
-    return new PlainDoc(ctx, info).context();
+  private Item context(final QueryContext qc) throws QueryException {
+    return new PlainDoc(qc, info).context();
   }
 
   /**
    * Performs the module function.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Item module(final QueryContext ctx) throws QueryException {
-    checkCreate(ctx);
-    return new PlainDoc(ctx, info).parse(checkPath(exprs[0], ctx));
+  private Item module(final QueryContext qc) throws QueryException {
+    checkCreate(qc);
+    return new PlainDoc(qc, info).parse(checkPath(exprs[0], qc));
   }
 
   /**
    * Performs the xqdoc function.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Item xqdoc(final QueryContext ctx) throws QueryException {
-    checkCreate(ctx);
-    return new XQDoc(ctx, info).parse(checkPath(exprs[0], ctx));
+  private Item xqdoc(final QueryContext qc) throws QueryException {
+    checkCreate(qc);
+    return new XQDoc(qc, info).parse(checkPath(exprs[0], qc));
   }
 
   /**
    * Performs the functions function.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  private ValueBuilder functions(final QueryContext ctx) throws QueryException {
+  private ValueBuilder functions(final QueryContext qc) throws QueryException {
     // about to be updated in a future version
     final ArrayList<StaticFunc> old = new ArrayList<>();
     if(exprs.length > 0) {
       // cache existing functions
-      for(final StaticFunc sf : ctx.funcs.funcs()) old.add(sf);
+      for(final StaticFunc sf : qc.funcs.funcs()) old.add(sf);
       try {
-        final IO io = checkPath(exprs[0], ctx);
-        ctx.parse(Token.string(io.read()), io.path(), sc);
-        ctx.compile();
+        final IO io = checkPath(exprs[0], qc);
+        qc.parse(Token.string(io.read()), io.path(), sc);
+        qc.compile();
       } catch(final IOException ex) {
         throw IOERR.get(info, ex);
       } finally {
-        ctx.close();
+        qc.close();
       }
     }
 
     final ValueBuilder vb = new ValueBuilder();
-    for(final StaticFunc sf : ctx.funcs.funcs()) {
+    for(final StaticFunc sf : qc.funcs.funcs()) {
       if(old.contains(sf)) continue;
-      final FuncItem fi = Functions.getUser(sf, ctx, sf.sc, info);
+      final FuncItem fi = Functions.getUser(sf, qc, sf.sc, info);
       if(sc.mixUpdates || !fi.annotations().contains(Ann.Q_UPDATING)) vb.add(fi);
     }
     return vb;

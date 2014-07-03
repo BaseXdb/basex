@@ -37,14 +37,14 @@ final class FTContainsIndex extends FTContains {
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Iter ir = expr.iter(ctx);
-    final FTLexer tmp = ctx.ftToken;
-    ctx.ftToken = lex;
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Iter ir = expr.iter(qc);
+    final FTLexer tmp = qc.ftToken;
+    qc.ftToken = lex;
 
     // create index iterator
     if(fti == null) {
-      fti = ftexpr.iter(ctx);
+      fti = ftexpr.iter(qc);
       ftn = fti.next();
     }
 
@@ -60,17 +60,17 @@ final class FTContainsIndex extends FTContains {
     if(n == null) fti = null;
 
     // cache entry for visualizations or ft:mark/ft:extract
-    if(found && ctx.ftPosData != null && !not) {
-      ctx.ftPosData.add(ftn.data, ftn.pre, ftn.all);
+    if(found && qc.ftPosData != null && !not) {
+      qc.ftPosData.add(ftn.data, ftn.pre, ftn.all);
     }
 
-    ctx.ftToken = tmp;
+    qc.ftToken = tmp;
     return Bln.get(found ? 1 : 0);
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return copyType(new FTContainsIndex(info, expr.copy(ctx, scp, vs),
-        ftexpr.copy(ctx, scp, vs), not));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return copyType(new FTContainsIndex(info, expr.copy(qc, scp, vs),
+        ftexpr.copy(qc, scp, vs), not));
   }
 }

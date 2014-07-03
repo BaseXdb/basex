@@ -37,25 +37,25 @@ public final class FNFile extends StandardFunc {
 
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    * @param func function definition
    * @param args arguments
    */
-  public FNFile(final StaticContext sctx, final InputInfo info, final Function func,
+  public FNFile(final StaticContext sc, final InputInfo info, final Function func,
       final Expr... args) {
-    super(sctx, info, func, args);
+    super(sc, info, func, args);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    checkCreate(ctx);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    checkCreate(qc);
     try {
       switch(func) {
-        case _FILE_CHILDREN:        return children(ctx);
-        case _FILE_LIST:            return list(ctx);
-        case _FILE_READ_TEXT_LINES: return readTextLines(ctx);
-        default:                    return super.iter(ctx);
+        case _FILE_CHILDREN:        return children(qc);
+        case _FILE_LIST:            return list(qc);
+        case _FILE_READ_TEXT_LINES: return readTextLines(qc);
+        default:                    return super.iter(qc);
       }
     } catch(final NoSuchFileException ex) {
       throw FILE_NOT_FOUND.get(info, ex);
@@ -69,43 +69,43 @@ public final class FNFile extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    checkCreate(ctx);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    checkCreate(qc);
     try {
       switch(func) {
-        case _FILE_APPEND:            return write(true, ctx);
-        case _FILE_APPEND_BINARY:     return writeBinary(true, ctx);
-        case _FILE_APPEND_TEXT:       return writeText(true, ctx);
-        case _FILE_APPEND_TEXT_LINES: return writeTextLines(true, ctx);
+        case _FILE_APPEND:            return write(true, qc);
+        case _FILE_APPEND_BINARY:     return writeBinary(true, qc);
+        case _FILE_APPEND_TEXT:       return writeText(true, qc);
+        case _FILE_APPEND_TEXT_LINES: return writeTextLines(true, qc);
         case _FILE_BASE_DIR:          return baseDir();
-        case _FILE_COPY:              return relocate(true, ctx);
-        case _FILE_CREATE_DIR:        return createDir(ctx);
-        case _FILE_CREATE_TEMP_DIR:   return createTemp(true, ctx);
-        case _FILE_CREATE_TEMP_FILE:  return createTemp(false, ctx);
+        case _FILE_COPY:              return relocate(true, qc);
+        case _FILE_CREATE_DIR:        return createDir(qc);
+        case _FILE_CREATE_TEMP_DIR:   return createTemp(true, qc);
+        case _FILE_CREATE_TEMP_FILE:  return createTemp(false, qc);
         case _FILE_CURRENT_DIR:       return currentDir();
-        case _FILE_DELETE:            return delete(ctx);
+        case _FILE_DELETE:            return delete(qc);
         case _FILE_DIR_SEPARATOR:     return Str.get(File.separator);
-        case _FILE_EXISTS:            return Bln.get(Files.exists(checkPath(0, ctx)));
-        case _FILE_IS_DIR:            return Bln.get(Files.isDirectory(checkPath(0, ctx)));
-        case _FILE_IS_FILE:           return Bln.get(Files.isRegularFile(checkPath(0, ctx)));
-        case _FILE_LAST_MODIFIED:     return lastModified(ctx);
+        case _FILE_EXISTS:            return Bln.get(Files.exists(checkPath(0, qc)));
+        case _FILE_IS_DIR:            return Bln.get(Files.isDirectory(checkPath(0, qc)));
+        case _FILE_IS_FILE:           return Bln.get(Files.isRegularFile(checkPath(0, qc)));
+        case _FILE_LAST_MODIFIED:     return lastModified(qc);
         case _FILE_LINE_SEPARATOR:    return Str.get(NL);
-        case _FILE_MOVE:              return relocate(false, ctx);
-        case _FILE_NAME:              return name(ctx);
-        case _FILE_PARENT:            return parent(ctx);
+        case _FILE_MOVE:              return relocate(false, qc);
+        case _FILE_NAME:              return name(qc);
+        case _FILE_PARENT:            return parent(qc);
         case _FILE_PATH_SEPARATOR:    return Str.get(File.pathSeparator);
-        case _FILE_PATH_TO_NATIVE:    return pathToNative(ctx);
-        case _FILE_PATH_TO_URI:       return pathToUri(ctx);
-        case _FILE_READ_BINARY:       return readBinary(ctx);
-        case _FILE_READ_TEXT:         return readText(ctx);
-        case _FILE_RESOLVE_PATH:      return resolvePath(ctx);
-        case _FILE_SIZE:              return size(ctx);
+        case _FILE_PATH_TO_NATIVE:    return pathToNative(qc);
+        case _FILE_PATH_TO_URI:       return pathToUri(qc);
+        case _FILE_READ_BINARY:       return readBinary(qc);
+        case _FILE_READ_TEXT:         return readText(qc);
+        case _FILE_RESOLVE_PATH:      return resolvePath(qc);
+        case _FILE_SIZE:              return size(qc);
         case _FILE_TEMP_DIR:          return Str.get(Prop.TMP);
-        case _FILE_WRITE:             return write(false, ctx);
-        case _FILE_WRITE_BINARY:      return writeBinary(false, ctx);
-        case _FILE_WRITE_TEXT:        return writeText(false, ctx);
-        case _FILE_WRITE_TEXT_LINES:  return writeTextLines(false, ctx);
-        default:                      return super.item(ctx, ii);
+        case _FILE_WRITE:             return write(false, qc);
+        case _FILE_WRITE_BINARY:      return writeBinary(false, qc);
+        case _FILE_WRITE_TEXT:        return writeText(false, qc);
+        case _FILE_WRITE_TEXT_LINES:  return writeTextLines(false, qc);
+        default:                      return super.item(qc, ii);
       }
     } catch(final NoSuchFileException ex) {
       throw FILE_NOT_FOUND.get(info, ex);
@@ -122,38 +122,38 @@ public final class FNFile extends StandardFunc {
 
   /**
    * Returns the last modified date of the specified path.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private Item lastModified(final QueryContext ctx) throws QueryException, IOException {
-    final Path path = checkPath(0, ctx);
+  private Item lastModified(final QueryContext qc) throws QueryException, IOException {
+    final Path path = checkPath(0, qc);
     final BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
     return new Dtm(attrs.lastModifiedTime().toMillis(), info);
   }
 
   /**
    * Returns the size of the specified path.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private Item size(final QueryContext ctx) throws QueryException, IOException {
-    final Path path = checkPath(0, ctx);
+  private Item size(final QueryContext qc) throws QueryException, IOException {
+    final Path path = checkPath(0, qc);
     final BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
     return Int.get(attrs.isDirectory() ? 0 : attrs.size());
   }
 
   /**
    * Returns the base name of the specified path.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  private Str name(final QueryContext ctx) throws QueryException {
-    final Path path = checkPath(0, ctx).getFileName();
+  private Str name(final QueryContext qc) throws QueryException {
+    final Path path = checkPath(0, qc).getFileName();
     return path == null ? Str.ZERO : Str.get(path.toString());
   }
 
@@ -176,58 +176,58 @@ public final class FNFile extends StandardFunc {
 
   /**
    * Returns the directory name of the specified path.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  private Str parent(final QueryContext ctx) throws QueryException {
-    final Path parent = absolute(checkPath(0, ctx)).getParent();
+  private Str parent(final QueryContext qc) throws QueryException {
+    final Path parent = absolute(checkPath(0, qc)).getParent();
     return parent == null ? null : get(parent, true);
   }
 
   /**
    * Returns the native name of the specified path.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private Str pathToNative(final QueryContext ctx) throws QueryException, IOException {
-    final Path nat = checkPath(0, ctx).toRealPath();
+  private Str pathToNative(final QueryContext qc) throws QueryException, IOException {
+    final Path nat = checkPath(0, qc).toRealPath();
     return get(nat, Files.isDirectory(nat));
   }
 
   /**
    * Transforms a file system path into a URI with the file:// scheme.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  private Uri pathToUri(final QueryContext ctx) throws QueryException {
-    return Uri.uri(checkPath(0, ctx).toUri().toString());
+  private Uri pathToUri(final QueryContext qc) throws QueryException {
+    return Uri.uri(checkPath(0, qc).toUri().toString());
   }
 
   /**
    * Returns an absolute file path.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  private Str resolvePath(final QueryContext ctx) throws QueryException {
-    final Path abs = absolute(checkPath(0, ctx));
+  private Str resolvePath(final QueryContext qc) throws QueryException {
+    final Path abs = absolute(checkPath(0, qc));
     return get(abs, Files.isDirectory(abs));
   }
 
   /**
    * Returns paths to all children of a directory.
-   * @param ctx query context
+   * @param qc query context
    * @return iterator
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private Iter children(final QueryContext ctx) throws QueryException, IOException {
+  private Iter children(final QueryContext qc) throws QueryException, IOException {
     final TokenList children = new TokenList();
-    try(DirectoryStream<Path> paths = Files.newDirectoryStream(checkPath(0, ctx))) {
+    try(DirectoryStream<Path> paths = Files.newDirectoryStream(checkPath(0, qc))) {
       for(final Path child : paths) children.add(get(child, Files.isDirectory(child)).string());
     }
     return StrSeq.get(children).iter();
@@ -235,16 +235,16 @@ public final class FNFile extends StandardFunc {
 
   /**
    * Lists all files of a directory.
-   * @param ctx query context
+   * @param qc query context
    * @return iterator
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private Iter list(final QueryContext ctx) throws QueryException, IOException {
-    final Path dir = checkPath(0, ctx).toRealPath();
-    final boolean rec = optionalBool(1, ctx);
+  private Iter list(final QueryContext qc) throws QueryException, IOException {
+    final Path dir = checkPath(0, qc).toRealPath();
+    final boolean rec = optionalBool(1, qc);
     final Pattern pat = exprs.length == 3 ? Pattern.compile(IOFile.regex(
-        string(checkStr(exprs[2], ctx))), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE) : null;
+        string(checkStr(exprs[2], qc))), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE) : null;
 
     final TokenList list = new TokenList();
     list(dir.getNameCount(), dir, list, rec, pat);
@@ -291,13 +291,13 @@ public final class FNFile extends StandardFunc {
 
   /**
    * Creates a directory.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private synchronized Item createDir(final QueryContext ctx) throws QueryException, IOException {
-    final Path path = absolute(checkPath(0, ctx));
+  private synchronized Item createDir(final QueryContext qc) throws QueryException, IOException {
+    final Path path = absolute(checkPath(0, qc));
 
     // find lowest existing path
     for(Path p = path; p != null;) {
@@ -314,20 +314,20 @@ public final class FNFile extends StandardFunc {
 
   /**
    * Creates a temporary file or directory.
-   * @param ctx query context
+   * @param qc query context
    * @param dir create a directory instead of a file
    * @return path of created file or directory
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private synchronized Item createTemp(final boolean dir, final QueryContext ctx)
+  private synchronized Item createTemp(final boolean dir, final QueryContext qc)
       throws QueryException, IOException {
 
-    final String pref = string(checkStr(exprs[0], ctx));
-    final String suf = exprs.length > 1 ? string(checkStr(exprs[1], ctx)) : "";
+    final String pref = string(checkStr(exprs[0], qc));
+    final String suf = exprs.length > 1 ? string(checkStr(exprs[1], qc)) : "";
     final Path root;
     if(exprs.length > 2) {
-      root = checkPath(2, ctx);
+      root = checkPath(2, qc);
       if(Files.isRegularFile(root)) throw FILE_NO_DIR.get(info, root);
     } else {
       root = Paths.get(Prop.TMP);
@@ -351,14 +351,14 @@ public final class FNFile extends StandardFunc {
 
   /**
    * Deletes a file or directory.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private synchronized Item delete(final QueryContext ctx) throws QueryException, IOException {
-    final Path path = checkPath(0, ctx);
-    if(optionalBool(1, ctx)) {
+  private synchronized Item delete(final QueryContext qc) throws QueryException, IOException {
+    final Path path = checkPath(0, qc);
+    if(optionalBool(1, qc)) {
       delete(path);
     } else {
       Files.delete(path);
@@ -383,15 +383,15 @@ public final class FNFile extends StandardFunc {
 
   /**
    * Reads the contents of a binary file.
-   * @param ctx query context
+   * @param qc query context
    * @return Base64Binary
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private B64 readBinary(final QueryContext ctx) throws QueryException, IOException {
-    final Path path = checkPath(0, ctx);
-    final long off = exprs.length > 1 ? checkItr(exprs[1], ctx) : 0;
-    long len = exprs.length > 2 ? checkItr(exprs[2], ctx) : 0;
+  private B64 readBinary(final QueryContext qc) throws QueryException, IOException {
+    final Path path = checkPath(0, qc);
+    final long off = exprs.length > 1 ? checkItr(exprs[1], qc) : 0;
+    long len = exprs.length > 2 ? checkItr(exprs[2], qc) : 0;
 
     if(!Files.exists(path)) throw FILE_NOT_FOUND.get(info, path);
     if(Files.isDirectory(path)) throw FILE_IS_DIR.get(info, path);
@@ -412,43 +412,43 @@ public final class FNFile extends StandardFunc {
 
   /**
    * Reads the contents of a file.
-   * @param ctx query context
+   * @param qc query context
    * @return string
    * @throws QueryException query exception
    */
-  private StrStream readText(final QueryContext ctx) throws QueryException {
-    final Path path = checkPath(0, ctx);
-    final String enc = encoding(1, FILE_UNKNOWN_ENCODING, ctx);
+  private StrStream readText(final QueryContext qc) throws QueryException {
+    final Path path = checkPath(0, qc);
+    final String enc = encoding(1, FILE_UNKNOWN_ENCODING, qc);
     if(!Files.exists(path)) throw FILE_NOT_FOUND.get(info, path);
     if(Files.isDirectory(path)) throw FILE_IS_DIR.get(info, path);
-    return new StrStream(new IOFile(path.toFile()), enc, FILE_IO_ERROR, ctx);
+    return new StrStream(new IOFile(path.toFile()), enc, FILE_IO_ERROR, qc);
   }
 
   /**
    * Returns the contents of a file line by line.
-   * @param ctx query context
+   * @param qc query context
    * @return string
    * @throws QueryException query exception
    */
-  private Iter readTextLines(final QueryContext ctx) throws QueryException {
-    return FNGen.textIter(readText(ctx).string(info));
+  private Iter readTextLines(final QueryContext qc) throws QueryException {
+    return FNGen.textIter(readText(qc).string(info));
   }
 
   /**
    * Writes items to a file.
    * @param append append flag
-   * @param ctx query context
+   * @param qc query context
    * @return true if file was successfully written
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private synchronized Item write(final boolean append, final QueryContext ctx)
+  private synchronized Item write(final boolean append, final QueryContext qc)
       throws QueryException, IOException {
 
-    final Path path = checkParentDir(checkPath(0, ctx));
-    final Iter ir = exprs[1].iter(ctx);
+    final Path path = checkParentDir(checkPath(0, qc));
+    final Iter ir = exprs[1].iter(qc);
     final SerializerOptions sopts = FuncOptions.serializer(
-        exprs.length > 2 ? exprs[2].item(ctx, info) : null, info);
+        exprs.length > 2 ? exprs[2].item(qc, info) : null, info);
 
     //Files.newOutputStream(path, append ? StandardOpenOption.APPEND : StandardOpenOption.CREATE);
 
@@ -465,17 +465,17 @@ public final class FNFile extends StandardFunc {
   /**
    * Writes items to a file.
    * @param append append flag
-   * @param ctx query context
+   * @param qc query context
    * @return true if file was successfully written
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private synchronized Item writeText(final boolean append, final QueryContext ctx)
+  private synchronized Item writeText(final boolean append, final QueryContext qc)
       throws QueryException, IOException {
 
-    final Path path = checkParentDir(checkPath(0, ctx));
-    final byte[] s = checkStr(exprs[1], ctx);
-    final String enc = encoding(2, FILE_UNKNOWN_ENCODING, ctx);
+    final Path path = checkParentDir(checkPath(0, qc));
+    final byte[] s = checkStr(exprs[1], qc);
+    final String enc = encoding(2, FILE_UNKNOWN_ENCODING, qc);
     final Charset cs = enc == null || enc == UTF8 ? null : Charset.forName(enc);
 
     try(final PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
@@ -487,17 +487,17 @@ public final class FNFile extends StandardFunc {
   /**
    * Writes items to a file.
    * @param append append flag
-   * @param ctx query context
+   * @param qc query context
    * @return true if file was successfully written
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private synchronized Item writeTextLines(final boolean append, final QueryContext ctx)
+  private synchronized Item writeTextLines(final boolean append, final QueryContext qc)
       throws QueryException, IOException {
 
-    final Path path = checkParentDir(checkPath(0, ctx));
-    final Iter ir = exprs[1].iter(ctx);
-    final String enc = encoding(2, FILE_UNKNOWN_ENCODING, ctx);
+    final Path path = checkParentDir(checkPath(0, qc));
+    final Iter ir = exprs[1].iter(qc);
+    final String enc = encoding(2, FILE_UNKNOWN_ENCODING, qc);
     final Charset cs = enc == null || enc == UTF8 ? null : Charset.forName(enc);
 
     try(final PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
@@ -514,17 +514,17 @@ public final class FNFile extends StandardFunc {
   /**
    * Writes binary items to a file.
    * @param append append flag
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private synchronized Item writeBinary(final boolean append, final QueryContext ctx)
+  private synchronized Item writeBinary(final boolean append, final QueryContext qc)
       throws QueryException, IOException {
 
-    final Path path = checkParentDir(checkPath(0, ctx));
-    final Bin bin = checkBinary(exprs[1], ctx);
-    final long off = exprs.length > 2 ? checkItr(exprs[2], ctx) : 0;
+    final Path path = checkParentDir(checkPath(0, qc));
+    final Bin bin = checkBinary(exprs[1], qc);
+    final long off = exprs.length > 2 ? checkItr(exprs[2], qc) : 0;
 
     // write full file
     if(exprs.length == 2) {
@@ -560,18 +560,18 @@ public final class FNFile extends StandardFunc {
   /**
    * Transfers a file path, given a source and a target.
    * @param copy copy flag (no move)
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private synchronized Item relocate(final boolean copy, final QueryContext ctx)
+  private synchronized Item relocate(final boolean copy, final QueryContext qc)
       throws QueryException, IOException {
 
-    final Path source = checkPath(0, ctx);
+    final Path source = checkPath(0, qc);
     if(!Files.exists(source)) throw FILE_NOT_FOUND.get(info, source);
     final Path src = absolute(source);
-    Path trg = absolute(checkPath(1, ctx));
+    Path trg = absolute(checkPath(1, qc));
 
     if(Files.isDirectory(trg)) {
       // target is a directory: attach file name
@@ -617,12 +617,12 @@ public final class FNFile extends StandardFunc {
   /**
    * Returns the value of an optional boolean.
    * @param i argument index
-   * @param ctx query context
+   * @param qc query context
    * @return boolean value
    * @throws QueryException query exception
    */
-  private boolean optionalBool(final int i, final QueryContext ctx) throws QueryException {
-    return i < exprs.length && checkBln(exprs[i], ctx);
+  private boolean optionalBool(final int i, final QueryContext qc) throws QueryException {
+    return i < exprs.length && checkBln(exprs[i], qc);
   }
 
   /**

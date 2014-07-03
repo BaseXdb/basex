@@ -19,47 +19,47 @@ import org.basex.util.*;
 public final class FNUnit extends StandardFunc {
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    * @param func function definition
    * @param args arguments
    */
-  public FNUnit(final StaticContext sctx, final InputInfo info, final Function func,
+  public FNUnit(final StaticContext sc, final InputInfo info, final Function func,
       final Expr... args) {
-    super(sctx, info, func, args);
+    super(sc, info, func, args);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     switch(func) {
-      case _UNIT_ASSERT:        return assrt(ctx);
-      case _UNIT_ASSERT_EQUALS: return assertEquals(ctx);
-      case _UNIT_FAIL:          return fail(ctx);
-      default:                  return super.item(ctx, ii);
+      case _UNIT_ASSERT:        return assrt(qc);
+      case _UNIT_ASSERT_EQUALS: return assertEquals(qc);
+      case _UNIT_FAIL:          return fail(qc);
+      default:                  return super.item(qc, ii);
     }
   }
 
   /**
    * Performs the assert function.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Item assrt(final QueryContext ctx) throws QueryException {
-    final byte[] str = exprs.length < 2 ? null : checkStr(exprs[1], ctx);
-    if(exprs[0].ebv(ctx, info).bool(info)) return null;
+  private Item assrt(final QueryContext qc) throws QueryException {
+    final byte[] str = exprs.length < 2 ? null : checkStr(exprs[1], qc);
+    if(exprs[0].ebv(qc, info).bool(info)) return null;
     throw str == null ? UNIT_ASSERT.get(info) : UNIT_MESSAGE.get(info, str);
   }
 
   /**
    * Performs the assert-equals function.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Item assertEquals(final QueryContext ctx) throws QueryException {
-    final byte[] str = exprs.length < 3 ? null : checkStr(exprs[2], ctx);
-    final Iter iter1 = ctx.iter(exprs[0]), iter2 = ctx.iter(exprs[1]);
+  private Item assertEquals(final QueryContext qc) throws QueryException {
+    final byte[] str = exprs.length < 3 ? null : checkStr(exprs[2], qc);
+    final Iter iter1 = qc.iter(exprs[0]), iter2 = qc.iter(exprs[1]);
     final Compare comp = new Compare(info);
     Item it1, it2;
     int c = 1;
@@ -77,11 +77,11 @@ public final class FNUnit extends StandardFunc {
 
   /**
    * Performs the fail function.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Item fail(final QueryContext ctx) throws QueryException {
-    throw UNIT_MESSAGE.get(info, checkStr(exprs[0], ctx));
+  private Item fail(final QueryContext qc) throws QueryException {
+    throw UNIT_MESSAGE.get(info, checkStr(exprs[0], qc));
   }
 }

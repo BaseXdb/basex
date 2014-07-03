@@ -20,7 +20,7 @@ public final class Int extends ANum {
   /** Constant values. */
   private static final Int[] NUMS;
   /** Integer value. */
-  private final long val;
+  private final long value;
 
   // caches the first 128 integers
   static {
@@ -30,103 +30,103 @@ public final class Int extends ANum {
 
   /**
    * Constructor.
-   * @param v value
+   * @param value value
    */
-  private Int(final long v) {
-    this(v, AtomType.ITR);
+  private Int(final long value) {
+    this(value, AtomType.ITR);
   }
 
   /**
    * Constructor.
-   * @param v value
-   * @param t data type
+   * @param value value
+   * @param type data type
    */
-  public Int(final long v, final Type t) {
-    super(t);
-    val = v;
+  public Int(final long value, final Type type) {
+    super(type);
+    this.value = value;
   }
 
   /**
    * Returns an instance of this class.
-   * @param v value
+   * @param value value
    * @return instance
    */
-  public static Int get(final long v) {
-    return v >= 0 && v < NUMS.length ? NUMS[(int) v] : new Int(v);
+  public static Int get(final long value) {
+    return value >= 0 && value < NUMS.length ? NUMS[(int) value] : new Int(value);
   }
 
   /**
    * Returns an instance of this class.
-   * @param v value
-   * @param t data type
+   * @param value value
+   * @param type data type
    * @return instance
    */
-  public static Int get(final long v, final Type t) {
-    return t == AtomType.ITR ? get(v) : new Int(v, t);
+  public static Int get(final long value, final Type type) {
+    return type == AtomType.ITR ? get(value) : new Int(value, type);
   }
 
   @Override
   public byte[] string() {
-    return val == 0 ? Token.ZERO : Token.token(val);
+    return value == 0 ? Token.ZERO : Token.token(value);
   }
 
   @Override
   public boolean bool(final InputInfo ii) {
-    return val != 0;
+    return value != 0;
   }
 
   @Override
   public long itr() {
-    return val;
+    return value;
   }
 
   @Override
   public float flt() {
-    return val;
+    return value;
   }
 
   @Override
   public double dbl() {
-    return val;
+    return value;
   }
 
   @Override
-  public Item test(final QueryContext ctx, final InputInfo ii) {
-    return val == ctx.pos ? this : null;
+  public Item test(final QueryContext qc, final InputInfo ii) {
+    return value == qc.pos ? this : null;
   }
 
   @Override
   public BigDecimal dec(final InputInfo ii) {
-    return BigDecimal.valueOf(val);
+    return BigDecimal.valueOf(value);
   }
 
   @Override
   public boolean eq(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return it instanceof Int ? val == ((Int) it).val : val == it.dbl(ii);
+    return it instanceof Int ? value == ((Int) it).value : value == it.dbl(ii);
   }
 
   @Override
   public int diff(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
     if(it instanceof Int) {
-      final long i = ((Int) it).val;
-      return val < i ? -1 : val > i ? 1 : 0;
+      final long i = ((Int) it).value;
+      return value < i ? -1 : value > i ? 1 : 0;
     }
     final double n = it.dbl(ii);
-    return Double.isNaN(n) ? UNDEF : val < n ? -1 : val > n ? 1 : 0;
+    return Double.isNaN(n) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;
   }
 
   @Override
   public Object toJava() {
     switch((AtomType) type) {
-      case BYT: return (byte) val;
+      case BYT: return (byte) value;
       case SHR:
-      case UBY: return (short) val;
+      case UBY: return (short) value;
       case INT:
-      case USH: return (int) val;
+      case USH: return (int) value;
       case LNG:
-      case UIN: return val;
+      case UIN: return value;
       default:  return new BigInteger(toString());
     }
   }
@@ -135,7 +135,7 @@ public final class Int extends ANum {
   public boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof Int)) return false;
     final Int i = (Int) cmp;
-    return type == i.type && val == i.val;
+    return type == i.type && value == i.value;
   }
 
   /**

@@ -119,8 +119,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public void compile(final QueryContext ctx) throws QueryException {
-    compile(ctx, null);
+  public void compile(final QueryContext qc) throws QueryException {
+    compile(qc, null);
   }
 
   /**
@@ -145,19 +145,19 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     if(compiled) return this;
     compiled = true;
 
     // compile closure
     for(final Entry<Var, Expr> e : nonLocal.entrySet()) {
-      final Expr bound = e.getValue().compile(ctx, scp);
+      final Expr bound = e.getValue().compile(qc, scp);
       e.setValue(bound);
-      e.getKey().refineType(bound.type(), ctx, info);
+      e.getKey().refineType(bound.type(), qc, info);
     }
 
     try {
-      expr = expr.compile(ctx, scope);
+      expr = expr.compile(qc, scope);
     } catch(final QueryException qe) {
       expr = FNInfo.error(qe, ret != null ? ret : expr.type());
     } finally {
@@ -165,13 +165,13 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     }
 
     // convert all function calls in tail position to proper tail calls
-    expr.markTailCalls(ctx);
+    expr.markTailCalls(qc);
 
-    return optimize(ctx, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     final SeqType r = expr.type();
     final SeqType retType = updating ? SeqType.EMP : ret == null || r.instanceOf(ret) ? r : ret;
     type = FuncType.get(ann, args, retType).seqType();
@@ -181,7 +181,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       // inline all values in the closure
       for(final Entry<Var, Value> e : staticBindings()) {
         final Var v = e.getKey();
-        final Expr inlined = expr.inline(ctx, scope, v, v.checkType(e.getValue(), ctx, info, true));
+        final Expr inlined = expr.inline(qc, scope, v, v.checkType(e.getValue(), qc, info, true));
         if (inlined != null) expr = inlined;
       }
     } catch(final QueryException qe) {
@@ -191,7 +191,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     }
 
     // only evaluate if the closure is empty, so we don't lose variables
-    return nonLocal.isEmpty() ? preEval(ctx) : this;
+    return nonLocal.isEmpty() ? preEval(qc) : this;
   }
 
   @Override
@@ -203,68 +203,68 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
+  public Expr inline(final QueryContext qc, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
     boolean change = false;
 
     for(final Entry<Var, Expr> entry : nonLocal.entrySet()) {
-      final Expr ex = entry.getValue().inline(ctx, scp, v, e);
+      final Expr ex = entry.getValue().inline(qc, scp, v, e);
       if(ex != null) {
         change = true;
         entry.setValue(ex);
       }
     }
 
-    return change ? optimize(ctx, scp) : null;
+    return change ? optimize(qc, scp) : null;
   }
 
   @Override
-  public Expr copy(final QueryContext cx, final VarScope scp, final IntObjMap<Var> vs) {
-    final VarScope v = scope.copy(cx, vs);
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    final VarScope v = scope.copy(qc, vs);
     final HashMap<Var, Expr> nl = new HashMap<>();
     for(final Entry<Var, Expr> e : nonLocal.entrySet()) {
       final Var var = vs.get(e.getKey().id);
-      final Expr ex = e.getValue().copy(cx, scp, vs);
+      final Expr ex = e.getValue().copy(qc, scp, vs);
       nl.put(var, ex);
     }
     final Var[] a = args.clone();
     for(int i = 0; i < a.length; i++) a[i] = vs.get(a[i].id);
-    final Expr e = expr.copy(cx, v, vs);
+    final Expr e = expr.copy(qc, v, vs);
     e.markTailCalls(null);
     return copyType(new Closure(info, name, ret, a, e, ann, nl, sc, v));
   }
 
   @Override
-  public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
+  public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
       final InputInfo ii) throws QueryException {
 
     if(expr.has(Flag.CTX)) return null;
-    ctx.compInfo(OPTINLINE, this);
+    qc.compInfo(OPTINLINE, this);
     // create let bindings for all variables
     final LinkedList<GFLWOR.Clause> cls =
         exprs.length == 0 && nonLocal.isEmpty() ? null : new LinkedList<GFLWOR.Clause>();
     final IntObjMap<Var> vs = new IntObjMap<>();
     for(int i = 0; i < args.length; i++) {
-      final Var old = args[i], v = scp.newCopyOf(ctx, old);
+      final Var old = args[i], v = scp.newCopyOf(qc, old);
       vs.put(old.id, v);
-      cls.add(new Let(v, exprs[i], false, ii).optimize(ctx, scp));
+      cls.add(new Let(v, exprs[i], false, ii).optimize(qc, scp));
     }
 
     for(final Entry<Var, Expr> e : nonLocal.entrySet()) {
-      final Var old = e.getKey(), v = scp.newCopyOf(ctx, old);
+      final Var old = e.getKey(), v = scp.newCopyOf(qc, old);
       vs.put(old.id, v);
-      cls.add(new Let(v, e.getValue(), false, ii).optimize(ctx, scp));
+      cls.add(new Let(v, e.getValue(), false, ii).optimize(qc, scp));
     }
 
     // copy the function body
-    final Expr cpy = expr.copy(ctx, scp, vs), rt = ret == null ? cpy :
-      new TypeCheck(sc, ii, cpy, ret, true).optimize(ctx, scp);
+    final Expr cpy = expr.copy(qc, scp, vs), rt = ret == null ? cpy :
+      new TypeCheck(sc, ii, cpy, ret, true).optimize(qc, scp);
 
-    return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(ctx, scp);
+    return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(qc, scp);
   }
 
   @Override
-  public FuncItem item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public FuncItem item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FuncType ft = (FuncType) type().type;
 
     final Expr body;
@@ -272,25 +272,25 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       // collect closure
       final LinkedList<GFLWOR.Clause> cls = new LinkedList<>();
       for(final Entry<Var, Expr> e : nonLocal.entrySet())
-        cls.add(new Let(e.getKey(), e.getValue().value(ctx), false, ii));
+        cls.add(new Let(e.getKey(), e.getValue().value(qc), false, ii));
       body = new GFLWOR(ii, cls, expr);
     } else {
       body = expr;
     }
 
     final Expr checked = ret == null ? body :
-      new TypeCheck(sc, info, body, ret, true).optimize(ctx, scope);
+      new TypeCheck(sc, info, body, ret, true).optimize(qc, scope);
     return new FuncItem(sc, ann, null, args, ft, checked, scope.stackSize());
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    return item(ctx, info);
+  public Value value(final QueryContext qc) throws QueryException {
+    return item(qc, info);
   }
 
   @Override
-  public ValueIter iter(final QueryContext ctx) throws QueryException {
-    return value(ctx).iter();
+  public ValueIter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
   }
 
   @Override

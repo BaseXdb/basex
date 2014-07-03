@@ -19,18 +19,18 @@ import org.basex.util.*;
  */
 public final class ItemSeq extends Seq {
   /** Item array. */
-  private final Item[] item;
+  private final Item[] items;
   /** Item Types. */
   private Type ret;
 
   /**
    * Constructor.
-   * @param it items
-   * @param s size
+   * @param items items
+   * @param size size
    */
-  private ItemSeq(final Item[] it, final int s) {
-    super(s);
-    item = it;
+  private ItemSeq(final Item[] items, final int size) {
+    super(size);
+    this.items = items;
   }
 
   /**
@@ -45,17 +45,17 @@ public final class ItemSeq extends Seq {
   }
 
   @Override
-  public Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    if(item[0] instanceof ANode) return item[0];
+  public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
+    if(items[0] instanceof ANode) return items[0];
     throw CONDTYPE.get(ii, this);
   }
 
   @Override
   public SeqType type() {
     if(ret == null) {
-      Type t = item[0].type;
+      Type t = items[0].type;
       for(int s = 1; s < size; s++) {
-        if(t != item[s].type) {
+        if(t != items[s].type) {
           t = AtomType.ITEM;
           break;
         }
@@ -75,18 +75,18 @@ public final class ItemSeq extends Seq {
   public boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof ItemSeq)) return false;
     final ItemSeq is = (ItemSeq) cmp;
-    return item == is.item && size == is.size;
+    return items == is.items && size == is.size;
   }
 
   @Override
   public int writeTo(final Item[] arr, final int start) {
-    System.arraycopy(item, 0, arr, start, (int) size);
+    System.arraycopy(items, 0, arr, start, (int) size);
     return (int) size;
   }
 
   @Override
   public Item itemAt(final long pos) {
-    return item[(int) pos];
+    return items[(int) pos];
   }
 
   @Override
@@ -96,9 +96,9 @@ public final class ItemSeq extends Seq {
 
   @Override
   public Value reverse() {
-    final int s = item.length;
+    final int s = items.length;
     final Item[] tmp = new Item[s];
-    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = item[r];
+    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = items[r];
     return get(tmp, s, type);
   }
 
@@ -106,7 +106,7 @@ public final class ItemSeq extends Seq {
   public boolean has(final Flag flag) {
     if(flag == Flag.UPD) {
       for(int l = 0; l < size; l++) {
-        if(item[l].has(Flag.UPD)) return true;
+        if(items[l].has(Flag.UPD)) return true;
       }
     }
     return false;

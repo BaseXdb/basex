@@ -22,37 +22,37 @@ import org.basex.util.list.*;
 public final class FNId extends StandardFunc {
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    * @param func function definition
    * @param args arguments
    */
-  public FNId(final StaticContext sctx, final InputInfo info, final Function func,
+  public FNId(final StaticContext sc, final InputInfo info, final Function func,
       final Expr... args) {
-    super(sctx, info, func, args);
+    super(sc, info, func, args);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
     // functions have 1 or 2 arguments...
-    final ANode node = checkNode(exprs.length == 2 ? exprs[1] : checkCtx(ctx), ctx);
+    final ANode node = checkNode(exprs.length == 2 ? exprs[1] : checkCtx(qc), qc);
 
     switch(func) {
-      case ID:              return id(ctx.iter(exprs[0]), node);
-      case IDREF:           return idref(ctx.iter(exprs[0]), node);
-      case ELEMENT_WITH_ID: return elid(ctx.iter(exprs[0]), node);
-      default:              return super.iter(ctx);
+      case ID:              return id(qc.iter(exprs[0]), node);
+      case IDREF:           return idref(qc.iter(exprs[0]), node);
+      case ELEMENT_WITH_ID: return elid(qc.iter(exprs[0]), node);
+      default:              return super.iter(qc);
     }
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // functions have 1 or 2 arguments...
-    final ANode node = checkNode(exprs.length == 2 ? exprs[1] : checkCtx(ctx), ctx);
+    final ANode node = checkNode(exprs.length == 2 ? exprs[1] : checkCtx(qc), qc);
 
     switch(func) {
-      case LANG:  return lang(lc(checkEStr(exprs[0], ctx)), node);
-      default:    return super.item(ctx, ii);
+      case LANG:  return lang(lc(checkEStr(exprs[0], qc)), node);
+      default:    return super.item(qc, ii);
     }
   }
 

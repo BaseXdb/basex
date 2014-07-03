@@ -15,30 +15,30 @@ import org.basex.util.*;
 public final class FNContext extends StandardFunc {
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    * @param func function definition
    * @param args arguments
    */
-  public FNContext(final StaticContext sctx, final InputInfo info, final Function func,
+  public FNContext(final StaticContext sc, final InputInfo info, final Function func,
       final Expr... args) {
-    super(sctx, info, func, args);
+    super(sc, info, func, args);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     switch(func) {
-      case CURRENT_DATE:      return ctx.initDateTime().date;
-      case CURRENT_DATETIME:  return ctx.initDateTime().dtm;
-      case CURRENT_TIME:      return ctx.initDateTime().time;
-      case IMPLICIT_TIMEZONE: return ctx.initDateTime().zone;
+      case CURRENT_DATE:      return qc.initDateTime().date;
+      case CURRENT_DATETIME:  return qc.initDateTime().dtm;
+      case CURRENT_TIME:      return qc.initDateTime().time;
+      case IMPLICIT_TIMEZONE: return qc.initDateTime().zone;
       case DEFAULT_COLLATION:
         final Collation coll = sc.collation;
         return Uri.uri(coll == null ? QueryText.COLLATIONURI : coll.uri());
       case STATIC_BASE_URI:
         final Uri uri = sc.baseURI();
         return uri == Uri.EMPTY ? null : uri;
-      default: return super.item(ctx, ii);
+      default: return super.item(qc, ii);
     }
   }
 }

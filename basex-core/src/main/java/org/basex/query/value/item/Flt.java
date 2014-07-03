@@ -25,79 +25,79 @@ public final class Flt extends ANum {
   /** Value "1". */
   private static final Flt ONE = new Flt(1);
   /** Data. */
-  private final float val;
+  private final float value;
 
   /**
    * Constructor.
-   * @param v value
+   * @param value value
    */
-  private Flt(final float v) {
+  private Flt(final float value) {
     super(AtomType.FLT);
-    val = v;
+    this.value = value;
   }
 
   /**
    * Returns an instance of this class.
-   * @param f value
+   * @param value value
    * @return instance
    */
-  public static Flt get(final float f) {
-    return f == 0 && Float.floatToRawIntBits(f) == 0 ? ZERO : f == 1 ? ONE :
-      isNaN(f) ? NAN : new Flt(f);
+  public static Flt get(final float value) {
+    return value == 0 && Float.floatToRawIntBits(value) == 0 ? ZERO : value == 1 ? ONE :
+      isNaN(value) ? NAN : new Flt(value);
   }
 
   @Override
   public byte[] string() {
-    return Token.token(val);
+    return Token.token(value);
   }
 
   @Override
   public boolean bool(final InputInfo ii) {
-    return !isNaN(val) && val != 0;
+    return !isNaN(value) && value != 0;
   }
 
   @Override
   public long itr() {
-    return (long) val;
+    return (long) value;
   }
 
   @Override
   public float flt() {
-    return val;
+    return value;
   }
 
   @Override
   public double dbl() {
-    return val;
+    return value;
   }
 
   @Override
   public BigDecimal dec(final InputInfo ii) throws QueryException {
-    return Dec.parse(val, ii);
+    return Dec.parse(value, ii);
   }
 
   @Override
   public boolean eq(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return it.type == AtomType.DBL ? it.eq(this, coll, ii) : val == it.flt(ii);
+    return it.type == AtomType.DBL ? it.eq(this, coll, ii) : value == it.flt(ii);
   }
 
   @Override
   public int diff(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
     final double n = it.flt(ii);
-    if(isNaN(n) || isNaN(val)) return UNDEF;
-    return val < n ? -1 : val > n ? 1 : 0;
+    if(isNaN(n) || isNaN(value)) return UNDEF;
+    return value < n ? -1 : value > n ? 1 : 0;
   }
 
   @Override
   public Float toJava() {
-    return val;
+    return value;
   }
 
   @Override
   public boolean sameAs(final Expr cmp) {
-    return cmp instanceof Flt && val == ((Flt) cmp).val ||
+    return cmp instanceof Flt && value == ((Flt) cmp).value ||
       this == NAN && cmp == NAN;
   }
 

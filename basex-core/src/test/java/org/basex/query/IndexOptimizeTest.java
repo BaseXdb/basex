@@ -197,6 +197,7 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
     query("//text()[. = '']", "");
     query("//*[. = '']", "<a/>");
     query("//a[. = '']", "<a/>");
+    query("//a[. = <x/>]", "<a/>");
 
     query("//a[not(text() = '')]/text()", "12 3");
     query("//text()[not(. = '')]", "12 3");

@@ -38,21 +38,21 @@ public final class Castable extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
-    return expr.isValue() ? preEval(ctx) : this;
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    return expr.isValue() ? preEval(qc) : this;
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Value v = expr.value(ctx);
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Value v = expr.value(qc);
     try {
-      seq.cast(v, ctx, sc, ii, this);
+      seq.cast(v, qc, sc, ii, this);
       return Bln.TRUE;
     } catch(final QueryException ex) {
       return Bln.FALSE;
@@ -60,8 +60,8 @@ public final class Castable extends Single {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Castable(sc, info, expr.copy(ctx, scp, vs), seq);
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new Castable(sc, info, expr.copy(qc, scp, vs), seq);
   }
 
   @Override

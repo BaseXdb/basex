@@ -36,24 +36,24 @@ public final class Cast extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     if(expr.type().one()) type = SeqType.get(type.type, Occ.ONE);
 
     // pre-evaluate value
-    if(expr.isValue()) return optPre(value(ctx), ctx);
+    if(expr.isValue()) return optPre(value(qc), qc);
 
     // skip cast if specified and return types are equal
     // (the following types will always be correct)
     final Type t = type.type;
     if((t == AtomType.BLN || t == AtomType.FLT || t == AtomType.DBL ||
         t == AtomType.QNM || t == AtomType.URI) && type.eq(expr.type())) {
-      optPre(expr, ctx);
+      optPre(expr, qc);
       return expr;
     }
 
@@ -63,18 +63,18 @@ public final class Cast extends Single {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    return value(ctx).iter();
+  public Iter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    return type.cast(expr.item(ctx, info), ctx, sc, info, this);
+  public Value value(final QueryContext qc) throws QueryException {
+    return type.cast(expr.item(qc, info), qc, sc, info, this);
   }
 
   @Override
-  public Cast copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Cast(sc, info, expr.copy(ctx, scp, vs), type);
+  public Cast copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new Cast(sc, info, expr.copy(qc, scp, vs), type);
   }
 
   @Override

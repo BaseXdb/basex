@@ -28,7 +28,7 @@ public abstract class IndexAccess extends Simple {
   }
 
   @Override
-  public abstract NodeIter iter(final QueryContext ctx) throws QueryException;
+  public abstract NodeIter iter(final QueryContext qc) throws QueryException;
 
   @Override
   public final boolean iterable() {

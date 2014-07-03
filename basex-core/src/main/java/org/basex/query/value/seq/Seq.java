@@ -23,20 +23,20 @@ public abstract class Seq extends Value {
 
   /**
    * Constructor.
-   * @param s size
+   * @param size size
    */
-  Seq(final long s) {
-    this(s, AtomType.ITEM);
+  Seq(final long size) {
+    this(size, AtomType.ITEM);
   }
 
   /**
    * Constructor, specifying a type.
-   * @param s size
-   * @param t type
+   * @param size size
+   * @param type type
    */
-  Seq(final long s, final Type t) {
-    super(t);
-    size = s;
+  Seq(final long size, final Type type) {
+    super(type);
+    this.size = size;
   }
 
   /**
@@ -73,13 +73,13 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     throw SEQCAST.get(ii, this);
   }
 
   @Override
-  public final Item test(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return ebv(ctx, ii);
+  public final Item test(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return ebv(qc, ii);
   }
 
   @Override

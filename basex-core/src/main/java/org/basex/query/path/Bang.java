@@ -25,25 +25,25 @@ public final class Bang extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
     type = expr.type();
     return this;
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    return ctx.iter(expr);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    return qc.iter(expr);
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    return ctx.value(expr);
+  public Value value(final QueryContext qc) throws QueryException {
+    return qc.value(expr);
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Bang(info, expr.copy(ctx, scp, vs));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new Bang(info, expr.copy(qc, scp, vs));
   }
 
   @Override

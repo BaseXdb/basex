@@ -25,90 +25,90 @@ public final class Dbl extends ANum {
   /** Value "1". */
   private static final Dbl ONE = new Dbl(1);
   /** Data. */
-  private final double val;
+  private final double value;
 
   /**
    * Constructor.
-   * @param v value
+   * @param value value
    */
-  private Dbl(final double v) {
+  private Dbl(final double value) {
     super(AtomType.DBL);
-    val = v;
+    this.value = value;
   }
 
   /**
    * Returns an instance of this class.
-   * @param d value
+   * @param value value
    * @return instance
    */
-  public static Dbl get(final double d) {
-    return d == 0 && doubleToRawLongBits(d) == 0 ? ZERO : d == 1 ? ONE :
-      isNaN(d) ? NAN : new Dbl(d);
+  public static Dbl get(final double value) {
+    return value == 0 && doubleToRawLongBits(value) == 0 ? ZERO : value == 1 ? ONE :
+      isNaN(value) ? NAN : new Dbl(value);
   }
 
   /**
    * Returns an instance of this class.
-   * @param v value
+   * @param value value
    * @param ii input info
    * @return instance
    * @throws QueryException query exception
    */
-  public static Dbl get(final byte[] v, final InputInfo ii) throws QueryException {
-    return get(parse(v, ii));
+  public static Dbl get(final byte[] value, final InputInfo ii) throws QueryException {
+    return get(parse(value, ii));
   }
 
   @Override
   public byte[] string() {
-    return Token.token(val);
+    return Token.token(value);
   }
 
   @Override
   public boolean bool(final InputInfo ii) {
-    return !isNaN(val) && val != 0;
+    return !isNaN(value) && value != 0;
   }
 
   @Override
   public long itr() {
-    return (long) val;
+    return (long) value;
   }
 
   @Override
   public float flt() {
-    return (float) val;
+    return (float) value;
   }
 
   @Override
   public double dbl() {
-    return val;
+    return value;
   }
 
   @Override
   public BigDecimal dec(final InputInfo ii) throws QueryException {
-    return Dec.parse(val, ii);
+    return Dec.parse(value, ii);
   }
 
   @Override
   public boolean eq(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return val == it.dbl(ii);
+    return value == it.dbl(ii);
   }
 
   @Override
   public int diff(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
     final double n = it.dbl(ii);
-    if(isNaN(n) || isNaN(val)) return UNDEF;
-    return val < n ? -1 : val > n ? 1 : 0;
+    if(isNaN(n) || isNaN(value)) return UNDEF;
+    return value < n ? -1 : value > n ? 1 : 0;
   }
 
   @Override
   public Double toJava() {
-    return val;
+    return value;
   }
 
   @Override
   public boolean sameAs(final Expr cmp) {
-    return cmp instanceof Dbl && val == ((Dbl) cmp).val || this == NAN && cmp == NAN;
+    return cmp instanceof Dbl && value == ((Dbl) cmp).value || this == NAN && cmp == NAN;
   }
 
   /**

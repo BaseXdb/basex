@@ -26,16 +26,16 @@ public final class DBNodeSeq extends NativeSeq {
 
   /**
    * Constructor.
-   * @param p pre values
-   * @param d data reference
+   * @param pres pre values
+   * @param data data reference
    * @param t node type
-   * @param c indicates if pre values represent all document nodes of a database
+   * @param complete indicates if pre values represent all document nodes of a database
    */
-  private DBNodeSeq(final int[] p, final Data d, final Type t, final boolean c) {
-    super(p.length, t);
-    pres = p;
-    data = d;
-    complete = c;
+  private DBNodeSeq(final int[] pres, final Data data, final Type t, final boolean complete) {
+    super(pres.length, t);
+    this.pres = pres;
+    this.data = data;
+    this.complete = complete;
   }
 
   @Override
@@ -44,7 +44,7 @@ public final class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public Item ebv(final QueryContext ctx, final InputInfo ii) {
+  public Item ebv(final QueryContext qc, final InputInfo ii) {
     return itemAt(0);
   }
 

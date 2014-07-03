@@ -159,12 +159,12 @@ public final class StaticFuncs extends ExprInfo {
 
   /**
    * Compiles the functions.
-   * @param ctx query context
+   * @param qc query context
    */
-  public void compile(final QueryContext ctx) {
+  public void compile(final QueryContext qc) {
     // only compile those functions that are used
     for(final FuncCache fc : funcs.values()) {
-      if(!fc.calls.isEmpty()) fc.func.compile(ctx);
+      if(!fc.calls.isEmpty()) fc.func.compile(qc);
     }
   }
 

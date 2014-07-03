@@ -48,45 +48,45 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    for(final Let c : copies) c.expr = c.expr.compile(ctx, scp);
-    super.compile(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    for(final Let c : copies) c.expr = c.expr.compile(qc, scp);
+    super.compile(qc, scp);
     return this;
   }
 
   @Override
-  public ValueIter iter(final QueryContext ctx) throws QueryException {
-    return value(ctx).iter();
+  public ValueIter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    final int o = (int) ctx.resources.output.size();
-    final Updates updates = ctx.resources.updates();
+  public Value value(final QueryContext qc) throws QueryException {
+    final int o = (int) qc.resources.output.size();
+    final Updates updates = qc.resources.updates();
     final ContextModifier tmp = updates.mod;
     final TransformModifier pu = new TransformModifier();
     updates.mod = pu;
 
     try {
       for(final Let fo : copies) {
-        final Iter ir = ctx.iter(fo.expr);
+        final Iter ir = qc.iter(fo.expr);
         Item i = ir.next();
         if(!(i instanceof ANode) || ir.next() != null) throw UPCOPYMULT.get(fo.info, fo.var.name);
 
         // copy node to main memory data instance
-        i = ((ANode) i).dbCopy(ctx.context.options);
+        i = ((ANode) i).dbCopy(qc.context.options);
         // add resulting node to variable
-        ctx.set(fo.var, i, info);
+        qc.set(fo.var, i, info);
         pu.addData(i.data());
       }
-      final Value v = ctx.value(exprs[0]);
+      final Value v = qc.value(exprs[0]);
       if(!v.isEmpty()) throw BASEX_MOD.get(info);
 
       updates.prepare();
       updates.apply();
-      return ctx.value(exprs[1]);
+      return qc.value(exprs[1]);
     } finally {
-      ctx.resources.output.size(o);
+      qc.resources.output.size(o);
       updates.mod = tmp;
     }
   }
@@ -108,16 +108,16 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
-    final boolean cp = inlineAll(ctx, scp, copies, v, e);
-    return inlineAll(ctx, scp, exprs, v, e) || cp ? optimize(ctx, scp) : null;
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
+    final boolean cp = inlineAll(qc, scp, copies, v, e);
+    return inlineAll(qc, scp, exprs, v, e) || cp ? optimize(qc, scp) : null;
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Transform(info, copyAll(ctx, scp, vs, copies), exprs[0].copy(ctx, scp, vs),
-        exprs[1].copy(ctx, scp, vs));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new Transform(info, copyAll(qc, scp, vs, copies), exprs[0].copy(qc, scp, vs),
+        exprs[1].copy(qc, scp, vs));
   }
 
   @Override

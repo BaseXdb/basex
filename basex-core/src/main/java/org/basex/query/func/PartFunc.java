@@ -45,15 +45,15 @@ public final class PartFunc extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     final Expr f = exprs[exprs.length - 1];
-    if(allAreValues()) return preEval(ctx);
+    if(allAreValues()) return preEval(qc);
 
     final SeqType t = f.type();
     if(t.instanceOf(SeqType.FUN_O) && t.type != FuncType.ANY_FUN) {
@@ -69,9 +69,9 @@ public final class PartFunc extends Arr {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Expr fn = exprs[exprs.length - 1];
-    final FItem f = (FItem) checkType(fn.item(ctx, ii), FuncType.ANY_FUN);
+    final FItem f = (FItem) checkType(fn.item(qc, ii), FuncType.ANY_FUN);
     final FuncType ft = f.funcType();
 
     final int arity = exprs.length + holes.length - 1;
@@ -82,17 +82,17 @@ public final class PartFunc extends Arr {
     final Var[] vars = new Var[holes.length];
     int p = -1;
     for(int i = 0; i < holes.length; i++) {
-      while(++p < holes[i]) args[p] = exprs[p - i].value(ctx);
-      vars[i] = scp.newLocal(ctx, f.argName(holes[i]), null, false);
+      while(++p < holes[i]) args[p] = exprs[p - i].value(qc);
+      vars[i] = scp.newLocal(qc, f.argName(holes[i]), null, false);
       args[p] = new VarRef(info, vars[i]);
-      vars[i].refineType(ft.args[p], ctx, ii);
+      vars[i].refineType(ft.args[p], qc, ii);
     }
-    while(++p < args.length) args[p] = exprs[p - holes.length].value(ctx);
+    while(++p < args.length) args[p] = exprs[p - holes.length].value(qc);
 
     final Ann ann = f.annotations();
     final FuncType tp = FuncType.get(ann, vars, ft.ret);
     final DynFuncCall fc = new DynFuncCall(info, sc, ann.contains(Ann.Q_UPDATING), f, args);
-    return new FuncItem(sc, ann, null, vars, tp, fc, ctx.value, ctx.pos, ctx.size, scp.stackSize());
+    return new FuncItem(sc, ann, null, vars, tp, fc, qc.value, qc.pos, qc.size, scp.stackSize());
   }
 
   @Override
@@ -101,14 +101,14 @@ public final class PartFunc extends Arr {
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    return item(ctx, info);
+  public Value value(final QueryContext qc) throws QueryException {
+    return item(qc, info);
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new PartFunc(sc, info, exprs[exprs.length - 1].copy(ctx, scp, vs),
-        copyAll(ctx, scp, vs, Arrays.copyOf(exprs, exprs.length - 1)), holes.clone());
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new PartFunc(sc, info, exprs[exprs.length - 1].copy(qc, scp, vs),
+        copyAll(qc, scp, vs, Arrays.copyOf(exprs, exprs.length - 1)), holes.clone());
   }
 
   @Override

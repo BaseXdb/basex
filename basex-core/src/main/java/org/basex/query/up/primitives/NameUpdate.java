@@ -27,7 +27,7 @@ public abstract class NameUpdate extends Update implements Comparable<NameUpdate
    * @param qc query context
    */
   NameUpdate(final UpdateType type, final String name, final InputInfo info,
-             final QueryContext qc) {
+      final QueryContext qc) {
 
     super(type, info);
     this.name = name;

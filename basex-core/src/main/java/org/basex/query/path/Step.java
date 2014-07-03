@@ -63,9 +63,9 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // check if test will yield no results
-    if(!test.optimize(ctx)) return Empty.SEQ;
+    if(!test.optimize(qc)) return Empty.SEQ;
 
     for(int p = 0; p < preds.length; ++p) {
       Expr pr = Pos.get(OpV.EQ, preds[p], preds[p], info);
@@ -76,29 +76,29 @@ public abstract class Step extends Preds {
         if(cmp.exprs[0].isFunction(Function.POSITION) && cmp.exprs[1].isFunction(Function.LAST)) {
           if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
              cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
-            ctx.compInfo(OPTWRITE, pr);
+            qc.compInfo(OPTWRITE, pr);
             pr = cmp.exprs[1];
           }
         }
       }
 
       if(pr.isValue()) {
-        if(!pr.ebv(ctx, info).bool(info)) {
-          ctx.compInfo(OPTREMOVE, this, pr);
+        if(!pr.ebv(qc, info).bool(info)) {
+          qc.compInfo(OPTREMOVE, this, pr);
           return Empty.SEQ;
         }
-        ctx.compInfo(OPTREMOVE, this, pr);
+        qc.compInfo(OPTREMOVE, this, pr);
         preds = Array.delete(preds, p--);
       } else if(pr instanceof And && !pr.has(Flag.FCS)) {
         // replace AND expression with predicates (don't swap position tests)
-        ctx.compInfo(OPTPRED, pr);
+        qc.compInfo(OPTPRED, pr);
         final Expr[] and = ((Arr) pr).exprs;
         final int m = and.length - 1;
         final ExprList tmp = new ExprList(preds.length + m);
         for(final Expr e : Arrays.asList(preds).subList(0, p)) tmp.add(e);
         for(final Expr a : and) {
           // wrap test with boolean() if the result is numeric
-          tmp.add(Function.BOOLEAN.get(null, info, a).compEbv(ctx));
+          tmp.add(Function.BOOLEAN.get(null, info, a).compEbv(qc));
         }
         for(final Expr e : Arrays.asList(preds).subList(p + 1, preds.length)) tmp.add(e);
         preds = tmp.finish();

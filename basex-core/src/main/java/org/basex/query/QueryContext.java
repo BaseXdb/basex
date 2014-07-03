@@ -56,7 +56,7 @@ public final class QueryContext extends Proc {
   private final HashMap<QNm, Expr> bindings = new HashMap<>();
 
   /** Parent query context. */
-  private final QueryContext parentCtx;
+  private final QueryContext qcParent;
   /** Query info. */
   public final QueryInfo info;
   /** Database context. */
@@ -142,91 +142,91 @@ public final class QueryContext extends Proc {
 
   /**
    * Constructor.
-   * @param parent parent context
+   * @param qcParent parent context
    */
-  public QueryContext(final QueryContext parent) {
-    this(parent.context, parent);
-    listen = parent.listen;
-    resources = parent.resources;
+  public QueryContext(final QueryContext qcParent) {
+    this(qcParent.context, qcParent);
+    listen = qcParent.listen;
+    resources = qcParent.resources;
   }
 
   /**
    * Constructor.
-   * @param ctx database context
+   * @param context database context
    */
-  public QueryContext(final Context ctx) {
-    this(ctx, null);
+  public QueryContext(final Context context) {
+    this(context, null);
     resources = new QueryResources(this);
   }
 
   /**
    * Constructor.
    * @param context database context
-   * @param parent parent context (optional)
+   * @param qcParent parent context (optional)
    */
-  private QueryContext(final Context context, final QueryContext parent) {
+  private QueryContext(final Context context, final QueryContext qcParent) {
     this.context = context;
-    this.parentCtx = parent;
+    this.qcParent = qcParent;
     info = new QueryInfo(this);
   }
 
   /**
    * Parses the specified query.
-   * @param qu input query
+   * @param query query string
    * @param path file path (may be {@code null})
    * @param sc static context
    * @return main module
    * @throws QueryException query exception
    */
-  public StaticScope parse(final String qu, final String path, final StaticContext sc)
+  public StaticScope parse(final String query, final String path, final StaticContext sc)
       throws QueryException {
-    return parse(qu, QueryProcessor.isLibrary(qu), path, sc);
+    return parse(query, QueryProcessor.isLibrary(query), path, sc);
   }
 
   /**
    * Parses the specified query.
-   * @param qu input query
+   * @param query query string
    * @param library library/main module
    * @param path file path (may be {@code null})
    * @param sc static context
    * @return main module
    * @throws QueryException query exception
    */
-  public StaticScope parse(final String qu, final boolean library, final String path,
+  public StaticScope parse(final String query, final boolean library, final String path,
       final StaticContext sc) throws QueryException {
-    return library ? parseLibrary(qu, path, sc) : parseMain(qu, path, sc);
+    return library ? parseLibrary(query, path, sc) : parseMain(query, path, sc);
   }
 
   /**
    * Parses the specified query.
-   * @param qu input query
+   * @param query query string
    * @param path file path (may be {@code null})
    * @param sc static context
    * @return main module
    * @throws QueryException query exception
    */
-  public MainModule parseMain(final String qu, final String path, final StaticContext sc)
+  public MainModule parseMain(final String query, final String path, final StaticContext sc)
       throws QueryException {
 
-    info.query = qu;
-    root = new QueryParser(qu, path, this, sc).parseMain();
+    info.query = query;
+    root = new QueryParser(query, path, this, sc).parseMain();
     updating = updating && root.expr.has(Flag.UPD);
     return root;
   }
 
   /**
    * Parses the specified module.
-   * @param qu input query
+   * @param query query string
    * @param path file path (may be {@code null})
    * @param sc static context
    * @return name of module
    * @throws QueryException query exception
    */
-  public LibraryModule parseLibrary(final String qu, final String path, final StaticContext sc)
+  public LibraryModule parseLibrary(final String query, final String path, final StaticContext sc)
       throws QueryException {
 
-    info.query = qu;
-    return new QueryParser(qu, path, this, sc).parseLibrary(true);
+    info.query = query;
+    return new QueryParser(query, path, this, sc).parseLibrary(true);
   }
 
   /**
@@ -339,7 +339,7 @@ public final class QueryContext extends Proc {
       final Updates updates = resources.updates;
       if(updates != null) {
         // if parent context exists, updates will be performed by main context
-        if(parentCtx == null) {
+        if(qcParent == null) {
           final ValueBuilder output = resources.output;
           final StringList dbs = updates.databases();
           final HashSet<Data> datas = updates.prepare();
@@ -379,7 +379,7 @@ public final class QueryContext extends Proc {
       if(!(it instanceof DBNode)) continue;
       final Data data = it.data();
       if(datas.contains(data) || !data.inMemory() && dbs.contains(data.meta.name)) {
-        cache.set(((DBNode) it).dbCopy(context.options), c);
+        cache.set(c, ((DBNode) it).dbCopy(context.options));
       }
     }
   }
@@ -480,7 +480,7 @@ public final class QueryContext extends Proc {
    * @param string evaluation info
    */
   public void evalInfo(final String string) {
-    (parentCtx != null ? parentCtx.info : info).evalInfo(string);
+    (qcParent != null ? qcParent.info : info).evalInfo(string);
   }
 
   /**
@@ -530,7 +530,7 @@ public final class QueryContext extends Proc {
     // close only once
     if(closed) return;
 
-    if(parentCtx == null) {
+    if(qcParent == null) {
       closed = true;
       resources.close();
     }

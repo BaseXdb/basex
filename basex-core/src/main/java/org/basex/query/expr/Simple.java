@@ -26,7 +26,7 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) {
+  public Expr compile(final QueryContext qc, final VarScope scp) {
     return this;
   }
 
@@ -46,8 +46,8 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
     return null;
   }
 

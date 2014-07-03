@@ -92,7 +92,7 @@ final class QueryListener extends Proc {
    * @throws IOException I/O Exception
    */
   String parameters() throws IOException {
-    if(parameters == null) parameters = parse().ctx.serParams();
+    if(parameters == null) parameters = parse().qc.serParams();
     return parameters.toString();
   }
 
@@ -123,7 +123,7 @@ final class QueryListener extends Proc {
 
         // create serializer
         qp.compile();
-        final QueryInfo qi = qp.ctx.info;
+        final QueryInfo qi = qp.qc.info;
         qi.compiling = perf.time();
         final Iter ir = qp.iter();
         qi.evaluating = perf.time();
@@ -189,7 +189,7 @@ final class QueryListener extends Proc {
       try {
         perf.time();
         init().parse();
-        qp.ctx.info.parsing = perf.time();
+        qp.qc.info.parsing = perf.time();
         parsed = true;
       } catch(final QueryException ex) {
         throw new BaseXException(ex);

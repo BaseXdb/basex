@@ -26,116 +26,116 @@ import org.basex.util.*;
 public final class FNStr extends StandardFunc {
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    * @param func function definition
    * @param args arguments
    */
-  public FNStr(final StaticContext sctx, final InputInfo info, final Function func,
+  public FNStr(final StaticContext sc, final InputInfo info, final Function func,
       final Expr... args) {
-    super(sctx, info, func, args);
+    super(sc, info, func, args);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
     final Expr e = exprs[0];
 
     switch(func) {
       case STRING_TO_CODEPOINTS:
-        return str2cp(e.item(ctx, info));
+        return str2cp(e.item(qc, info));
       default:
-        return super.iter(ctx);
+        return super.iter(qc);
     }
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     switch(func) {
       case STRING_TO_CODEPOINTS:
-        final int[] tmp = cps(checkEStr(exprs[0], ctx));
+        final int[] tmp = cps(checkEStr(exprs[0], qc));
         final long[] vals = new long[tmp.length];
         for(int i = 0; i < tmp.length; i++) vals[i] = tmp[i];
         return IntSeq.get(vals, AtomType.ITR);
       default:
-        return super.value(ctx);
+        return super.value(qc);
     }
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Expr e = exprs[0];
 
     switch(func) {
       case CODEPOINTS_TO_STRING:
-        return cp2str(ctx.iter(e));
+        return cp2str(qc.iter(e));
       case COMPARE:
-        Collation coll = checkColl(exprs.length == 3 ? exprs[2] : null, ctx, sc);
-        Item it1 = e.item(ctx, info);
-        Item it2 = exprs[1].item(ctx, info);
+        Collation coll = checkColl(exprs.length == 3 ? exprs[2] : null, qc, sc);
+        Item it1 = e.item(qc, info);
+        Item it2 = exprs[1].item(qc, info);
         if(it1 == null || it2 == null) return null;
         return Int.get(Math.max(-1, Math.min(1,
             coll == null ? diff(checkEStr(it1), checkEStr(it2)) :
             coll.compare(checkStr(it1), checkStr(it2)))));
       case CODEPOINT_EQUAL:
-        it1 = e.item(ctx, info);
-        it2 = exprs[1].item(ctx, info);
+        it1 = e.item(qc, info);
+        it2 = exprs[1].item(qc, info);
         if(it1 == null || it2 == null) return null;
         return Bln.get(eq(checkEStr(it1), checkEStr(it2)));
       case STRING_JOIN:
-        return strjoin(ctx);
+        return strjoin(qc);
       case SUBSTRING:
-        return substr(ctx);
+        return substr(qc);
       case NORMALIZE_UNICODE:
-        return normuni(ctx);
+        return normuni(qc);
       case UPPER_CASE:
-        return Str.get(uc(checkEStr(e, ctx)));
+        return Str.get(uc(checkEStr(e, qc)));
       case LOWER_CASE:
-        return Str.get(lc(checkEStr(e, ctx)));
+        return Str.get(lc(checkEStr(e, qc)));
       case TRANSLATE:
-        return trans(ctx);
+        return trans(qc);
       case ENCODE_FOR_URI:
-        return Str.get(uri(checkEStr(e, ctx), false));
+        return Str.get(uri(checkEStr(e, qc), false));
       case IRI_TO_URI:
-        return Str.get(uri(checkEStr(e, ctx), true));
+        return Str.get(uri(checkEStr(e, qc), true));
       case ESCAPE_HTML_URI:
-        return Str.get(escape(checkEStr(e, ctx)));
+        return Str.get(escape(checkEStr(e, qc)));
       case CONCAT:
-        return concat(ctx);
+        return concat(qc);
       case CONTAINS:
-        coll = checkColl(exprs.length == 3 ? exprs[2] : null, ctx, sc);
-        byte[] ss = checkEStr(e, ctx);
-        byte[] sb = checkEStr(exprs[1], ctx);
+        coll = checkColl(exprs.length == 3 ? exprs[2] : null, qc, sc);
+        byte[] ss = checkEStr(e, qc);
+        byte[] sb = checkEStr(exprs[1], qc);
         return Bln.get(coll == null ? contains(ss, sb) : coll.contains(ss, sb, info));
       case STARTS_WITH:
-        coll = checkColl(exprs.length == 3 ? exprs[2] : null, ctx, sc);
-        ss = checkEStr(e, ctx);
-        sb = checkEStr(exprs[1], ctx);
+        coll = checkColl(exprs.length == 3 ? exprs[2] : null, qc, sc);
+        ss = checkEStr(e, qc);
+        sb = checkEStr(exprs[1], qc);
         return Bln.get(coll == null ? startsWith(ss, sb) : coll.startsWith(ss, sb, info));
       case ENDS_WITH:
-        coll = checkColl(exprs.length == 3 ? exprs[2] : null, ctx, sc);
-        ss = checkEStr(e, ctx);
-        sb = checkEStr(exprs[1], ctx);
+        coll = checkColl(exprs.length == 3 ? exprs[2] : null, qc, sc);
+        ss = checkEStr(e, qc);
+        sb = checkEStr(exprs[1], qc);
         return Bln.get(coll == null ? endsWith(ss, sb) : coll.endsWith(ss, sb, info));
       case SUBSTRING_AFTER:
-        coll = checkColl(exprs.length == 3 ? exprs[2] : null, ctx, sc);
-        ss = checkEStr(e, ctx);
-        sb = checkEStr(exprs[1], ctx);
+        coll = checkColl(exprs.length == 3 ? exprs[2] : null, qc, sc);
+        ss = checkEStr(e, qc);
+        sb = checkEStr(exprs[1], qc);
         if(coll == null) {
           final int p = indexOf(ss, sb);
           return p == -1 ? Str.ZERO : Str.get(substring(ss, p + sb.length));
         }
         return Str.get(coll.after(ss, sb, info));
       case SUBSTRING_BEFORE:
-        coll = checkColl(exprs.length == 3 ? exprs[2] : null, ctx, sc);
-        ss = checkEStr(e, ctx);
-        sb = checkEStr(exprs[1], ctx);
+        coll = checkColl(exprs.length == 3 ? exprs[2] : null, qc, sc);
+        ss = checkEStr(e, qc);
+        sb = checkEStr(exprs[1], qc);
         if(coll == null) {
           final int p = indexOf(ss, sb);
           return p == -1 ? Str.ZERO : Str.get(substring(ss, 0, p));
         }
         return Str.get(coll.before(ss, sb, info));
       default:
-        return super.item(ctx, ii);
+        return super.item(qc, ii);
     }
   }
 
@@ -182,15 +182,15 @@ public final class FNStr extends StandardFunc {
 
   /**
    * Returns a substring.
-   * @param ctx query context
+   * @param qc query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Str substr(final QueryContext ctx) throws QueryException {
+  private Str substr(final QueryContext qc) throws QueryException {
     // normalize positions
-    final byte[] str = checkEStr(exprs[0], ctx);
+    final byte[] str = checkEStr(exprs[0], qc);
 
-    final Item is = checkItem(exprs[1], ctx);
+    final Item is = checkItem(exprs[1], qc);
     int s;
     if(is instanceof Int) {
       s = (int) is.itr(info) - 1;
@@ -204,7 +204,7 @@ public final class FNStr extends StandardFunc {
     int l = ascii ? str.length : len(str);
     int e = l;
     if(end) {
-      final Item ie = checkItem(exprs[2], ctx);
+      final Item ie = checkItem(exprs[2], qc);
       e = ie instanceof Int ? (int) ie.itr(info) : subPos(ie.dbl(info) + 1);
     }
     if(s < 0) {
@@ -238,14 +238,14 @@ public final class FNStr extends StandardFunc {
 
   /**
    * Returns a translated string.
-   * @param ctx query context
+   * @param qc query context
    * @return string
    * @throws QueryException query exception
    */
-  private Str trans(final QueryContext ctx) throws QueryException {
-    final int[] tok =  cps(checkEStr(exprs[0], ctx));
-    final int[] srch = cps(checkStr(exprs[1], ctx));
-    final int[] rep =  cps(checkStr(exprs[2], ctx));
+  private Str trans(final QueryContext qc) throws QueryException {
+    final int[] tok =  cps(checkEStr(exprs[0], qc));
+    final int[] srch = cps(checkStr(exprs[1], qc));
+    final int[] rep =  cps(checkStr(exprs[2], qc));
 
     final TokenBuilder tmp = new TokenBuilder(tok.length);
     for(final int t : tok) {
@@ -263,14 +263,14 @@ public final class FNStr extends StandardFunc {
 
   /**
    * Returns a joined string.
-   * @param ctx query context
+   * @param qc query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Str strjoin(final QueryContext ctx) throws QueryException {
-    final byte[] sep = exprs.length == 2 ? checkStr(exprs[1], ctx) : EMPTY;
+  private Str strjoin(final QueryContext qc) throws QueryException {
+    final byte[] sep = exprs.length == 2 ? checkStr(exprs[1], qc) : EMPTY;
     final TokenBuilder tb = new TokenBuilder();
-    final Iter iter = ctx.iter(exprs[0]);
+    final Iter iter = qc.iter(exprs[0]);
     int c = 0;
     for(Item i; (i = iter.next()) != null;) {
       tb.add(checkEStr(i)).add(sep);
@@ -282,16 +282,16 @@ public final class FNStr extends StandardFunc {
 
   /**
    * Returns normalized unicode.
-   * @param ctx query context
+   * @param qc query context
    * @return string
    * @throws QueryException query exception
    */
-  private Str normuni(final QueryContext ctx) throws QueryException {
-    final byte[] str = checkEStr(exprs[0], ctx);
+  private Str normuni(final QueryContext qc) throws QueryException {
+    final byte[] str = checkEStr(exprs[0], qc);
 
     Form form = Form.NFC;
     if(exprs.length == 2) {
-      final byte[] n = uc(trim(checkStr(exprs[1], ctx)));
+      final byte[] n = uc(trim(checkStr(exprs[1], qc)));
       if(n.length == 0) return Str.get(str);
       try {
         form = Form.valueOf(string(n));
@@ -304,14 +304,14 @@ public final class FNStr extends StandardFunc {
 
   /**
    * Concatenates strings.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting item
    * @throws QueryException query exception
    */
-  private Str concat(final QueryContext ctx) throws QueryException {
+  private Str concat(final QueryContext qc) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr a : exprs) {
-      final Item it = a.item(ctx, info);
+      final Item it = a.item(qc, info);
       if(it != null) tb.add(it.string(info));
     }
     return Str.get(tb.finish());

@@ -31,16 +31,16 @@ public abstract class ANode extends Item {
   public final int id = ID.incrementAndGet();
 
   /** Cached string value. */
-  byte[] val;
+  byte[] value;
   /** Parent node. */
   ANode par;
 
   /**
    * Constructor.
-   * @param t data type
+   * @param type data type
    */
-  ANode(final NodeType t) {
-    super(t);
+  ANode(final NodeType type) {
+    super(type);
   }
 
   @Override

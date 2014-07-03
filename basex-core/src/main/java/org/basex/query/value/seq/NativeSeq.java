@@ -17,15 +17,15 @@ import org.basex.util.*;
 public abstract class NativeSeq extends Seq {
   /**
    * Constructor.
-   * @param s number of items
-   * @param t item type
+   * @param size number of items
+   * @param type item type
    */
-  NativeSeq(final int s, final Type t) {
-    super(s, t);
+  NativeSeq(final int size, final Type type) {
+    super(size, type);
   }
 
   @Override
-  public Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
     throw CONDTYPE.get(ii, this);
   }
 

@@ -37,10 +37,10 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   /**
    * Constructor.
-   * @param t data type
+   * @param type data type
    */
-  protected Value(final Type t) {
-    type = t;
+  protected Value(final Type type) {
+    this.type = type;
   }
 
   @Override
@@ -48,12 +48,12 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public final Value compile(final QueryContext ctx, final VarScope scp) {
+  public final Value compile(final QueryContext qc, final VarScope scp) {
     return this;
   }
 
   @Override
-  public final ValueIter iter(final QueryContext ctx) {
+  public final ValueIter iter(final QueryContext qc) {
     return iter();
   }
 
@@ -69,7 +69,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public abstract ValueIter iter();
 
   @Override
-  public final Value value(final QueryContext ctx) {
+  public final Value value(final QueryContext qc) {
     return this;
   }
 
@@ -113,14 +113,14 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
       throws QueryException {
     // values do not contain variable references
     return null;
   }
 
   @Override
-  public Value copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+  public Value copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     return this;
   }
 

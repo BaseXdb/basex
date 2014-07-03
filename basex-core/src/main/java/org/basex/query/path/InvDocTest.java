@@ -30,8 +30,8 @@ final class InvDocTest extends Test {
   }
 
   /**
-   * Returns a document test. This test will only be utilized by
-   * {@link AxisPath#index} if all context values are database nodes.
+   * Returns a document test. This test will be called by {@link AxisPath#index} if the context
+   * value only consists of database nodes.
    * @param rt root value
    * @return document test
    */

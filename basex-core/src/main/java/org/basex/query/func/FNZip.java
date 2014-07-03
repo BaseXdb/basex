@@ -54,52 +54,52 @@ public final class FNZip extends StandardFunc {
 
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    * @param func function definition
    * @param args arguments
    */
-  public FNZip(final StaticContext sctx, final InputInfo info, final Function func,
+  public FNZip(final StaticContext sc, final InputInfo info, final Function func,
       final Expr... args) {
-    super(sctx, info, func, args);
+    super(sc, info, func, args);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    checkCreate(ctx);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    checkCreate(qc);
     switch(func) {
-      case _ZIP_BINARY_ENTRY:     return binaryEntry(ctx);
-      case _ZIP_TEXT_ENTRY:       return textEntry(ctx);
-      case _ZIP_HTML_ENTRY:       return xmlEntry(ctx, true);
-      case _ZIP_XML_ENTRY:        return xmlEntry(ctx, false);
-      case _ZIP_ENTRIES:          return entries(ctx);
-      case _ZIP_ZIP_FILE:         return zipFile(ctx);
-      case _ZIP_UPDATE_ENTRIES:   return updateEntries(ctx);
-      default:                    return super.item(ctx, ii);
+      case _ZIP_BINARY_ENTRY:     return binaryEntry(qc);
+      case _ZIP_TEXT_ENTRY:       return textEntry(qc);
+      case _ZIP_HTML_ENTRY:       return xmlEntry(qc, true);
+      case _ZIP_XML_ENTRY:        return xmlEntry(qc, false);
+      case _ZIP_ENTRIES:          return entries(qc);
+      case _ZIP_ZIP_FILE:         return zipFile(qc);
+      case _ZIP_UPDATE_ENTRIES:   return updateEntries(qc);
+      default:                    return super.item(qc, ii);
     }
   }
 
   /**
    * Returns a xs:base64Binary item, created from a binary file.
    * Returns a binary entry.
-   * @param ctx query context
+   * @param qc query context
    * @return binary result
    * @throws QueryException query exception
    */
-  private B64 binaryEntry(final QueryContext ctx) throws QueryException {
-    return new B64(entry(ctx));
+  private B64 binaryEntry(final QueryContext qc) throws QueryException {
+    return new B64(entry(qc));
   }
 
   /**
    * Returns a string, created from a text file.
-   * @param ctx query context
+   * @param qc query context
    * @return binary result
    * @throws QueryException query exception
    */
-  private Str textEntry(final QueryContext ctx) throws QueryException {
-    final String enc = exprs.length < 3 ? null : string(checkStr(exprs[2], ctx));
-    final IO io = new IOContent(entry(ctx));
-    final boolean val = ctx.context.options.get(MainOptions.CHECKSTRINGS);
+  private Str textEntry(final QueryContext qc) throws QueryException {
+    final String enc = exprs.length < 3 ? null : string(checkStr(exprs[2], qc));
+    final IO io = new IOContent(entry(qc));
+    final boolean val = qc.context.options.get(MainOptions.CHECKSTRINGS);
     try {
       return Str.get(new NewlineInput(io).encoding(enc).validate(val).content());
     } catch(final IOException ex) {
@@ -109,14 +109,14 @@ public final class FNZip extends StandardFunc {
 
   /**
    * Returns a document node, created from an XML or HTML file.
-   * @param ctx query context
+   * @param qc query context
    * @param html html flag
    * @return binary result
    * @throws QueryException query exception
    */
-  private ANode xmlEntry(final QueryContext ctx, final boolean html) throws QueryException {
-    final MainOptions opts = ctx.context.options;
-    final IO io = new IOContent(entry(ctx));
+  private ANode xmlEntry(final QueryContext qc, final boolean html) throws QueryException {
+    final MainOptions opts = qc.context.options;
+    final IO io = new IOContent(entry(qc));
     try {
       return new DBNode(html ? new HtmlParser(io, opts) : Parser.xmlParser(io, opts));
     } catch(final IOException ex) {
@@ -126,12 +126,12 @@ public final class FNZip extends StandardFunc {
 
   /**
    * Returns a zip archive description.
-   * @param ctx query context
+   * @param qc query context
    * @return binary result
    * @throws QueryException query exception
    */
-  private ANode entries(final QueryContext ctx) throws QueryException {
-    final String file = string(checkStr(exprs[0], ctx));
+  private ANode entries(final QueryContext qc) throws QueryException {
+    final String file = string(checkStr(exprs[0], qc));
 
     // check file path
     final IOFile path = new IOFile(file);
@@ -208,13 +208,13 @@ public final class FNZip extends StandardFunc {
 
   /**
    * Creates a new zip file.
-   * @param ctx query context
+   * @param qc query context
    * @return binary result
    * @throws QueryException query exception
    */
-  private Item zipFile(final QueryContext ctx) throws QueryException {
+  private Item zipFile(final QueryContext qc) throws QueryException {
     // check argument
-    final ANode elm = (ANode) checkType(exprs[0].item(ctx, info), NodeType.ELM);
+    final ANode elm = (ANode) checkType(exprs[0].item(qc, info), NodeType.ELM);
     if(!elm.qname().eq(Q_FILE)) throw ZIP_UNKNOWN.get(info, elm.qname());
     // get file
     final String file = attribute(elm, HREF, true);
@@ -223,7 +223,7 @@ public final class FNZip extends StandardFunc {
     boolean ok = true;
     try(final FileOutputStream fos = new FileOutputStream(file);
         final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(fos))) {
-      create(zos, elm.children(), "", null, ctx);
+      create(zos, elm.children(), "", null, qc);
     } catch(final IOException ex) {
       ok = false;
       throw ZIP_FAIL.get(info, ex);
@@ -239,13 +239,13 @@ public final class FNZip extends StandardFunc {
    * @param zos output stream
    * @param ai axis iterator
    * @param root root path
-   * @param ctx query context
+   * @param qc query context
    * @param zf original zip file (or {@code null})
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   private void create(final ZipOutputStream zos, final AxisIter ai, final String root,
-      final ZipFile zf, final QueryContext ctx) throws QueryException, IOException {
+      final ZipFile zf, final QueryContext qc) throws QueryException, IOException {
 
     final byte[] data = new byte[IO.BLOCKSIZE];
     for(ANode node; (node = ai.next()) != null;) {
@@ -272,7 +272,7 @@ public final class FNZip extends StandardFunc {
       zos.putNextEntry(new ZipEntry(root + name));
 
       if(dir) {
-        create(zos, node.children(), root + name, zf, ctx);
+        create(zos, node.children(), root + name, zf, qc);
       } else {
         if(src != null) {
           // write file to zip archive
@@ -314,7 +314,7 @@ public final class FNZip extends StandardFunc {
               try {
                 final Serializer ser = Serializer.get(zos, serPar(node));
                 do {
-                  ser.serialize(DataBuilder.stripNS(n, ZIPURI, ctx.context));
+                  ser.serialize(DataBuilder.stripNS(n, ZIPURI, qc.context));
                 } while((n = ch.next()) != null);
                 ser.close();
               } catch(final QueryIOException ex) {
@@ -348,20 +348,20 @@ public final class FNZip extends StandardFunc {
 
   /**
    * Updates a zip archive.
-   * @param ctx query context
+   * @param qc query context
    * @return empty result
    * @throws QueryException query exception
    */
-  private Item updateEntries(final QueryContext ctx) throws QueryException {
+  private Item updateEntries(final QueryContext qc) throws QueryException {
     // check argument
-    final ANode elm = (ANode) checkType(exprs[0].item(ctx, info), NodeType.ELM);
+    final ANode elm = (ANode) checkType(exprs[0].item(qc, info), NodeType.ELM);
     if(!elm.qname().eq(Q_FILE)) throw ZIP_UNKNOWN.get(info, elm.qname());
 
     // sorted paths in original file
     final String in = attribute(elm, HREF, true);
 
     // target and temporary output file
-    final IOFile target = new IOFile(string(checkStr(exprs[1], ctx)));
+    final IOFile target = new IOFile(string(checkStr(exprs[1], qc)));
     IOFile out;
     do {
       out = new IOFile(target.path() + new Random().nextInt(0x7FFFFFFF));
@@ -375,7 +375,7 @@ public final class FNZip extends StandardFunc {
       try(final FileOutputStream fos = new FileOutputStream(out.path());
           final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(fos))) {
         // fill new zip file with entries from old file and description
-        create(zos, elm.children(), "", zf, ctx);
+        create(zos, elm.children(), "", zf, qc);
       } catch(final IOException ex) {
         ok = false;
         throw ZIP_FAIL.get(info, ex);
@@ -440,13 +440,13 @@ public final class FNZip extends StandardFunc {
 
   /**
    * Returns an entry from a zip file.
-   * @param ctx query context
+   * @param qc query context
    * @return binary result
    * @throws QueryException query exception
    */
-  private byte[] entry(final QueryContext ctx) throws QueryException {
-    final IOFile file = new IOFile(string(checkStr(exprs[0], ctx)));
-    final String path = string(checkStr(exprs[1], ctx));
+  private byte[] entry(final QueryContext qc) throws QueryException {
+    final IOFile file = new IOFile(string(checkStr(exprs[0], qc)));
+    final String path = string(checkStr(exprs[1], qc));
     if(!file.exists()) throw ZIP_NOTFOUND.get(info, file);
 
     try {

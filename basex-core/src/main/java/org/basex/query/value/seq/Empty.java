@@ -61,17 +61,17 @@ public final class Empty extends Value {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) {
+  public Item item(final QueryContext qc, final InputInfo ii) {
     return null;
   }
 
   @Override
-  public Item ebv(final QueryContext ctx, final InputInfo ii) {
+  public Item ebv(final QueryContext qc, final InputInfo ii) {
     return Bln.FALSE;
   }
 
   @Override
-  public Item test(final QueryContext ctx, final InputInfo ii) {
+  public Item test(final QueryContext qc, final InputInfo ii) {
     return null;
   }
 

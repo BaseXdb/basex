@@ -16,19 +16,19 @@ import org.basex.util.*;
 public class InsertInto extends NodeCopy {
   /**
    * Constructor for an insertInto.
-   * @param p target pre value
-   * @param d target data instance
-   * @param i input info
-   * @param n node copy insertion sequence
+   * @param pre target pre value
+   * @param data target data instance
+   * @param ii input info
+   * @param nodes node copy insertion sequence
    */
-  public InsertInto(final int p, final Data d, final InputInfo i, final ANodeList n) {
-    super(UpdateType.INSERTINTO, p, d, i, n);
+  public InsertInto(final int pre, final Data data, final InputInfo ii, final ANodeList nodes) {
+    super(UpdateType.INSERTINTO, pre, data, ii, nodes);
   }
 
   @Override
   public final void merge(final Update up) {
-    final ANodeList newInsert = ((NodeCopy) up).insert;
-    for(final ANode n : newInsert) insert.add(n);
+    final ANodeList newInsert = ((NodeCopy) up).nodes;
+    for(final ANode n : newInsert) nodes.add(n);
   }
 
   @Override

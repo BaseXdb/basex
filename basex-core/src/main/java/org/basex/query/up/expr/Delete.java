@@ -23,32 +23,32 @@ import org.basex.util.hash.*;
 public final class Delete extends Update {
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
-   * @param expr return expression
+   * @param trg target expression
    */
-  public Delete(final StaticContext sctx, final InputInfo info, final Expr expr) {
-    super(sctx, info, expr);
+  public Delete(final StaticContext sc, final InputInfo info, final Expr trg) {
+    super(sc, info, trg);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Iter t = ctx.iter(exprs[0]);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Iter t = qc.iter(exprs[0]);
     for(Item i; (i = t.next()) != null;) {
       if(!(i instanceof ANode)) throw UPTRGDELEMPT.get(info);
       final ANode n = (ANode) i;
       // nodes without parents are ignored
       if(n.parent() == null) continue;
-      final Updates updates = ctx.resources.updates();
-      final DBNode dbn = updates.determineDataRef(n, ctx);
-      updates.add(new DeleteNode(dbn.pre, dbn.data, info), ctx);
+      final Updates updates = qc.resources.updates();
+      final DBNode dbn = updates.determineDataRef(n, qc);
+      updates.add(new DeleteNode(dbn.pre, dbn.data, info), qc);
     }
     return null;
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Delete(sc, info, exprs[0].copy(ctx, scp, vs));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new Delete(sc, info, exprs[0].copy(qc, scp, vs));
   }
 
   @Override

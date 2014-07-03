@@ -48,13 +48,13 @@ public final class DynFuncCall extends FuncCall {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     final int ar = exprs.length - 1;
     final Expr f = exprs[ar];
     final Type t = f.type().type;
@@ -66,12 +66,12 @@ public final class DynFuncCall extends FuncCall {
 
     if(f instanceof XQFunctionExpr) {
       // maps can only contain fully evaluated Values, so this is safe
-      if(allAreValues() && f instanceof Map) return optPre(value(ctx), ctx);
+      if(allAreValues() && f instanceof Map) return optPre(value(qc), qc);
 
       // try to inline the function
       if(!(f instanceof FuncItem && comesFrom((FuncItem) f)) && !updating) {
         final Expr[] args = Arrays.copyOf(exprs, exprs.length - 1);
-        final Expr inl = ((XQFunctionExpr) f).inlineExpr(args, ctx, scp, info);
+        final Expr inl = ((XQFunctionExpr) f).inlineExpr(args, qc, scp, info);
         if(inl != null) return inl;
       }
     }
@@ -108,8 +108,8 @@ public final class DynFuncCall extends FuncCall {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final Expr[] copy = copyAll(ctx, scp, vs, exprs);
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    final Expr[] copy = copyAll(qc, scp, vs, exprs);
     final int last = copy.length - 1;
     final Expr[] args = Arrays.copyOf(copy, last);
     final DynFuncCall call = new DynFuncCall(info, sc, updating, copy[last], args);
@@ -147,9 +147,9 @@ public final class DynFuncCall extends FuncCall {
   }
 
   @Override
-  FItem evalFunc(final QueryContext ctx) throws QueryException {
+  FItem evalFunc(final QueryContext qc) throws QueryException {
     final int ar = exprs.length - 1;
-    final Item it = checkItem(exprs[ar], ctx);
+    final Item it = checkItem(exprs[ar], qc);
     if(!(it instanceof FItem)) throw INVFUNCITEM.get(info, it.type);
     final FItem fit = (FItem) it;
     if(fit.arity() != ar) throw INVARITY.get(info, fit, ar);
@@ -160,10 +160,10 @@ public final class DynFuncCall extends FuncCall {
   }
 
   @Override
-  Value[] evalArgs(final QueryContext ctx) throws QueryException {
+  Value[] evalArgs(final QueryContext qc) throws QueryException {
     final int al = exprs.length - 1;
     final Value[] args = new Value[al];
-    for(int a = 0; a < al; ++a) args[a] = ctx.value(exprs[a]);
+    for(int a = 0; a < al; ++a) args[a] = qc.value(exprs[a]);
     return args;
   }
 

@@ -27,14 +27,14 @@ public final class And extends Logical {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     // remove atomic values
-    final Expr c = super.compile(ctx, scp);
-    return c != this ? c : optimize(ctx, scp);
+    final Expr c = super.compile(qc, scp);
+    return c != this ? c : optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // merge predicates if possible
     final int es = exprs.length;
     final ExprList el = new ExprList(es);
@@ -61,7 +61,7 @@ public final class And extends Logical {
       }
       // no optimization found; add original expression
       if(tmp == null && e != Bln.TRUE) {
-        if(e == Bln.FALSE) return optPre(Bln.FALSE, ctx);
+        if(e == Bln.FALSE) return optPre(Bln.FALSE, qc);
         el.add(e);
       }
     }
@@ -70,11 +70,11 @@ public final class And extends Logical {
     if(cs != null) el.add(cs);
 
     // all arguments were true()
-    if(el.isEmpty()) return optPre(Bln.TRUE, ctx);
+    if(el.isEmpty()) return optPre(Bln.TRUE, qc);
 
-    if(es != el.size()) ctx.compInfo(OPTWRITE, this);
+    if(es != el.size()) qc.compInfo(OPTWRITE, this);
     exprs = el.finish();
-    compFlatten(ctx);
+    compFlatten(qc);
 
     boolean not = true;
     for(final Expr e : exprs) {
@@ -85,11 +85,11 @@ public final class And extends Logical {
     }
 
     if(not) {
-      ctx.compInfo(OPTWRITE, this);
+      qc.compInfo(OPTWRITE, this);
       final Expr[] inner = new Expr[exprs.length];
       for(int i = 0; i < inner.length; i++) inner[i] = ((Arr) exprs[i]).exprs[0];
-      final Expr or = new Or(info, inner).optimize(ctx, scp);
-      return Function.NOT.get(null, or).optimize(ctx, scp);
+      final Expr or = new Or(info, inner).optimize(qc, scp);
+      return Function.NOT.get(null, or).optimize(qc, scp);
     }
 
     // return single expression if it yields a boolean
@@ -97,55 +97,45 @@ public final class And extends Logical {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     for(int i = 0; i < exprs.length - 1; i++)
-      if(!exprs[i].ebv(ctx, info).bool(info)) return Bln.FALSE;
+      if(!exprs[i].ebv(qc, info).bool(info)) return Bln.FALSE;
     final Expr last = exprs[exprs.length - 1];
-    return tailCall ? last.item(ctx, ii) : last.ebv(ctx, ii).bool(ii) ? Bln.TRUE : Bln.FALSE;
+    return tailCall ? last.item(qc, ii) : last.ebv(qc, ii).bool(ii) ? Bln.TRUE : Bln.FALSE;
   }
 
   @Override
-  public And copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vars) {
+  public And copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vars) {
     final int es = exprs.length;
     final Expr[] ex = new Expr[es];
-    for(int i = 0; i < es; i++) ex[i] = exprs[i].copy(ctx, scp, vars);
+    for(int i = 0; i < es; i++) ex[i] = exprs[i].copy(qc, scp, vars);
     return new And(info, ex);
   }
 
   @Override
-  public boolean indexAccessible(final IndexCosts ic) throws QueryException {
-    int is = 0;
+  public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     final int es = exprs.length;
     final int[] ics = new int[es];
-    boolean ia = true;
-    for(int e = 0; e < es; ++e) {
-      if(exprs[e].indexAccessible(ic) && !ic.seq) {
-        // skip queries with no results
-        if(ic.costs() == 0) return true;
-        // summarize costs
-        ics[e] = ic.costs();
-        if(is == 0 || ic.costs() < is) is = ic.costs();
-      } else {
-        ia = false;
-      }
+    final Expr[] tmp = new Expr[es];
+    for(int e = 0; e < es; e++) {
+      final Expr expr = exprs[e];
+      // check if expression can be rewritten, and if access is not sequential
+      if(!expr.indexAccessible(ii) || ii.seq) return false;
+      // skip queries with no results
+      if(ii.costs == 0) return true;
+      // summarize costs
+      ics[e] = ii.costs;
+      tmp[e] = ii.expr;
     }
 
-    if(ia) {
-      // evaluate arguments with high selectivity first
-      final int[] ord = Array.createOrder(ics, true);
-      final Expr[] ex = new Expr[es];
-      for(int e = 0; e < es; ++e) ex[e] = exprs[ord[e]];
-      exprs = ex;
-    }
-
-    ic.costs(is);
-    return ia;
-  }
-
-  @Override
-  public Expr indexEquivalent(final IndexCosts ic) throws QueryException {
-    super.indexEquivalent(ic);
-    return new InterSect(info, exprs);
+    // evaluate arguments with higher selectivity first
+    final int[] ord = Array.createOrder(ics, true);
+    final Expr[] ex = new Expr[es];
+    for(int e = 0; e < es; ++e) ex[e] = tmp[ord[e]];
+    ii.expr = new InterSect(info, ex);
+    // use worst costs for estimation, as all index results may need to be scanned
+    ii.costs = ics[ord[es - 1]];
+    return true;
   }
 
   @Override

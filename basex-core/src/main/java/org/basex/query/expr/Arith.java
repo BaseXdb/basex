@@ -35,13 +35,13 @@ public final class Arith extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     final SeqType s0 = exprs[0].type();
     final SeqType s1 = exprs[1].type();
     final Type t0 = s0.type;
@@ -52,21 +52,21 @@ public final class Arith extends Arr {
     } else if(s0.one() && s1.one()) {
       type = SeqType.ITEM;
     }
-    return optPre(oneIsEmpty() ? null : allAreValues() ? item(ctx, info) : this, ctx);
+    return optPre(oneIsEmpty() ? null : allAreValues() ? item(qc, info) : this, qc);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Item a = exprs[0].item(ctx, info);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Item a = exprs[0].item(qc, info);
     if(a == null) return null;
-    final Item b = exprs[1].item(ctx, info);
+    final Item b = exprs[1].item(qc, info);
     if(b == null) return null;
     return calc.ev(info, a, b);
   }
 
   @Override
-  public Arith copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final Expr a = exprs[0].copy(ctx, scp, vs), b = exprs[1].copy(ctx, scp, vs);
+  public Arith copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    final Expr a = exprs[0].copy(qc, scp, vs), b = exprs[1].copy(qc, scp, vs);
     return copyType(new Arith(info, a, b, calc));
   }
 

@@ -35,8 +35,8 @@ public final class Where extends GFLWOR.Clause {
   Eval eval(final Eval sub) {
     return new Eval() {
       @Override
-      public boolean next(final QueryContext ctx) throws QueryException {
-        while(sub.next(ctx)) if(pred.ebv(ctx, info).bool(info)) return true;
+      public boolean next(final QueryContext qc) throws QueryException {
+        while(sub.next(qc)) if(pred.ebv(qc, info).bool(info)) return true;
         return false;
       }
     };
@@ -60,14 +60,14 @@ public final class Where extends GFLWOR.Clause {
   }
 
   @Override
-  public Where compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    pred = pred.compile(ctx, scp).compEbv(ctx);
-    return optimize(ctx, scp);
+  public Where compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    pred = pred.compile(qc, scp).compEbv(qc);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Where optimize(final QueryContext cx, final VarScope sc) throws QueryException {
-    if(pred.isValue()) pred = pred.ebv(cx, info);
+  public Where optimize(final QueryContext qc, final VarScope sc) throws QueryException {
+    if(pred.isValue()) pred = pred.ebv(qc, info);
     return this;
   }
 
@@ -82,17 +82,17 @@ public final class Where extends GFLWOR.Clause {
   }
 
   @Override
-  public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+  public GFLWOR.Clause inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
       throws QueryException {
-    final Expr sub = pred.inline(ctx, scp, v, e);
+    final Expr sub = pred.inline(qc, scp, v, e);
     if(sub == null) return null;
     pred = sub;
-    return optimize(ctx, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Where copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Where(pred.copy(ctx, scp, vs), info);
+  public Where copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new Where(pred.copy(qc, scp, vs), info);
   }
 
   @Override

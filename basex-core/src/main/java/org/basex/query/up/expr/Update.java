@@ -23,13 +23,13 @@ abstract class Update extends Arr {
 
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    * @param expr expressions
    */
-  Update(final StaticContext sctx, final InputInfo info, final Expr... expr) {
+  Update(final StaticContext sc, final InputInfo info, final Expr... expr) {
     super(info, expr);
-    sc = sctx;
+    this.sc = sc;
     type = SeqType.EMP;
   }
 

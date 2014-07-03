@@ -33,14 +33,14 @@ final class RestXqResponse {
   /**
    * Constructor.
    * @param rxf function to be evaluated
-   * @param ctx query context
+   * @param qc query context
    * @param hc HTTP context
    * @param err optional query error
    */
-  RestXqResponse(final RestXqFunction rxf, final QueryContext ctx, final HTTPContext hc,
+  RestXqResponse(final RestXqFunction rxf, final QueryContext qc, final HTTPContext hc,
       final QueryException err) {
     function = rxf;
-    query = ctx;
+    query = qc;
     http = hc;
     error = err;
   }

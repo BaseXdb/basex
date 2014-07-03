@@ -19,25 +19,25 @@ public final class DeleteNode extends NodeUpdate {
 
   /**
    * Constructor.
-   * @param p target node PRE value
-   * @param d target data reference
-   * @param i input info
+   * @param pre target node PRE value
+   * @param data target data reference
+   * @param ii input info
    */
-  public DeleteNode(final int p, final Data d, final InputInfo i) {
-    this(p, d, i, false);
+  public DeleteNode(final int pre, final Data data, final InputInfo ii) {
+    this(pre, data, ii, false);
   }
 
   /**
    * Constructor for a delete primitive that is a product of a replaceElementContent
    * substitution.
-   * @param p target node PRE value
-   * @param d target data reference
-   * @param i input info
-   * @param r this delete is a product of a replaceElementContent substitution
+   * @param pre target node PRE value
+   * @param data target data reference
+   * @param ii input info
+   * @param rec this delete is a product of a replaceElementContent substitution
    */
-  public DeleteNode(final int p, final Data d, final InputInfo i, final boolean r) {
-    super(UpdateType.DELETENODE, p, d, i);
-    rec = r;
+  public DeleteNode(final int pre, final Data data, final InputInfo ii, final boolean rec) {
+    super(UpdateType.DELETENODE, pre, data, ii);
+    this.rec = rec;
   }
 
   @Override

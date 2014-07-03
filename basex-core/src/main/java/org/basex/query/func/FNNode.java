@@ -23,20 +23,20 @@ import org.basex.util.list.*;
 public final class FNNode extends StandardFunc {
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    * @param func function definition
    * @param args arguments
    */
-  public FNNode(final StaticContext sctx, final InputInfo info, final Function func,
+  public FNNode(final StaticContext sc, final InputInfo info, final Function func,
       final Expr... args) {
-    super(sctx, info, func, args);
+    super(sc, info, func, args);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // functions have 0 or 1 arguments...
-    final Item it = (exprs.length == 0 ? checkCtx(ctx) : exprs[0]).item(ctx, info);
+    final Item it = (exprs.length == 0 ? checkCtx(qc) : exprs[0]).item(qc, info);
     final ANode node = it == null ? null : checkNode(it);
 
     switch(func) {
@@ -91,7 +91,7 @@ public final class FNNode extends StandardFunc {
       case PATH:
         return node != null ? path(node) : null;
       default:
-        return super.item(ctx, ii);
+        return super.item(qc, ii);
     }
   }
 

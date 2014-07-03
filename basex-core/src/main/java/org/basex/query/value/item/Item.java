@@ -28,10 +28,10 @@ public abstract class Item extends Value {
 
   /**
    * Constructor.
-   * @param t data type
+   * @param type data type
    */
-  protected Item(final Type t) {
-    super(t);
+  protected Item(final Type type) {
+    super(type);
   }
 
   @Override
@@ -52,7 +52,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final Item item(final QueryContext ctx, final InputInfo ii) {
+  public final Item item(final QueryContext qc, final InputInfo ii) {
     return this;
   }
 
@@ -62,12 +62,12 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final Item ebv(final QueryContext ctx, final InputInfo ii) {
+  public final Item ebv(final QueryContext qc, final InputInfo ii) {
     return this;
   }
 
   @Override
-  public Item test(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item test(final QueryContext qc, final InputInfo ii) throws QueryException {
     return bool(ii) ? this : null;
   }
 

@@ -6,6 +6,7 @@ import org.basex.data.*;
 import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -35,19 +36,17 @@ public abstract class AxisPath extends Path {
    * @return inverted path
    */
   public final Path invertPath(final Expr rt, final Step curr) {
-    // hold the steps to the end of the inverted path
-    int s = steps.length;
-    final Expr[] stps = new Expr[s--];
     // add predicates of last step to new root node
+    int s = steps.length - 1;
     final Expr r = step(s).preds.length == 0 ? rt : Filter.get(info, rt, step(s).preds);
 
     // add inverted steps in a backward manner
-    int c = 0;
+    final ExprList stps = new ExprList();
     while(--s >= 0) {
-      stps[c++] = Step.get(info, step(s + 1).axis.invert(), step(s).test, step(s).preds);
+      stps.add(Step.get(info, step(s + 1).axis.invert(), step(s).test, step(s).preds));
     }
-    stps[c] = Step.get(info, step(s + 1).axis.invert(), curr.test);
-    return Path.get(info, r, stps);
+    stps.add(Step.get(info, step(s + 1).axis.invert(), curr.test));
+    return Path.get(info, r, stps.finish());
   }
 
   /**
@@ -61,11 +60,11 @@ public abstract class AxisPath extends Path {
 
   /**
    * Returns the path nodes that will result from this path.
-   * @param ctx query context
+   * @param qc query context
    * @return path nodes, or {@code null} if nodes cannot be evaluated
    */
-  public ArrayList<PathNode> nodes(final QueryContext ctx) {
-    final Value init = initial(ctx);
+  public ArrayList<PathNode> nodes(final QueryContext qc) {
+    final Value init = initial(qc);
     final Data data = init != null && init.type == NodeType.DOC ? init.data() : null;
     if(data == null || !data.meta.uptodate) return null;
 

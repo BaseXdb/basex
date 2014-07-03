@@ -37,7 +37,7 @@ public final class RangeAccess extends IndexAccess {
   }
 
   @Override
-  public AxisIter iter(final QueryContext ctx) {
+  public AxisIter iter(final QueryContext qc) {
     final byte kind = index.type() == IndexType.TEXT ? Data.TEXT : Data.ATTR;
 
     return new AxisIter() {
@@ -50,14 +50,14 @@ public final class RangeAccess extends IndexAccess {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     return new RangeAccess(info, index, ictx);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(DATA, ictx.data.meta.name,
-        MIN, index.min, MAX, index.max, TYP, index.type));
+    addPlan(plan, planElem(DATA, ictx.data.meta.name, MIN, index.min, MAX, index.max,
+        TYPE, index.type()));
   }
 
   @Override

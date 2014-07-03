@@ -65,10 +65,10 @@ abstract class TrieNode {
   final int size;
   /**
    * Constructor.
-   * @param s size
+   * @param size size
    */
-  TrieNode(final int s) {
-    size = s;
+  TrieNode(final int size) {
+    this.size = size;
   }
 
   /**

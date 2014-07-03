@@ -41,22 +41,22 @@ public final class Try extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     try {
-      super.compile(ctx, scp);
-      if(expr.isValue()) return optPre(expr, ctx);
+      super.compile(qc, scp);
+      if(expr.isValue()) return optPre(expr, qc);
     } catch(final QueryException ex) {
       if(!ex.isCatchable()) throw ex;
       for(final Catch c : catches) {
         if(c.matches(ex)) {
           // found a matching clause, compile and inline error message
-          return optPre(c.compile(ctx, scp).asExpr(ex, ctx, scp), ctx);
+          return optPre(c.compile(qc, scp).asExpr(ex, qc, scp), qc);
         }
       }
       throw ex;
     }
 
-    for(final Catch c : catches) c.compile(ctx, scp);
+    for(final Catch c : catches) c.compile(qc, scp);
     type = expr.type();
     for(final Catch c : catches)
       if(!c.expr.isFunction(Function.ERROR)) type = type.union(c.type());
@@ -64,18 +64,18 @@ public final class Try extends Single {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    return value(ctx).iter();
+  public Iter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     // don't catch errors from error handlers
     try {
-      return ctx.value(expr);
+      return qc.value(expr);
     } catch(final QueryException ex) {
       if(!ex.isCatchable()) throw ex;
-      for(final Catch c : catches) if(c.matches(ex)) return c.value(ctx, ex);
+      for(final Catch c : catches) if(c.matches(ex)) return c.value(qc, ex);
       throw ex;
     }
   }
@@ -86,14 +86,14 @@ public final class Try extends Single {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
       throws QueryException {
 
     boolean change = false;
     try {
-      final Expr sub = expr.inline(ctx, scp, v, e);
+      final Expr sub = expr.inline(qc, scp, v, e);
       if(sub != null) {
-        if(sub.isValue()) return optPre(sub, ctx);
+        if(sub.isValue()) return optPre(sub, qc);
         expr = sub;
         change = true;
       }
@@ -102,20 +102,20 @@ public final class Try extends Single {
       for(final Catch c : catches) {
         if(c.matches(qe)) {
           // found a matching clause, inline variable and error message
-          final Catch nw = c.inline(ctx, scp, v, e);
-          return optPre((nw == null ? c : nw).asExpr(qe, ctx, scp), ctx);
+          final Catch nw = c.inline(qc, scp, v, e);
+          return optPre((nw == null ? c : nw).asExpr(qe, qc, scp), qc);
         }
       }
       throw qe;
     }
 
-    for(final Catch c : catches) change |= c.inline(ctx, scp, v, e) != null;
+    for(final Catch c : catches) change |= c.inline(qc, scp, v, e) != null;
     return change ? this : null;
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Try(info, expr.copy(ctx, scp, vs), Arr.copyAll(ctx, scp, vs, catches));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new Try(info, expr.copy(qc, scp, vs), Arr.copyAll(qc, scp, vs, catches));
   }
 
   @Override
@@ -136,8 +136,8 @@ public final class Try extends Single {
   }
 
   @Override
-  public void markTailCalls(final QueryContext ctx) {
-    for(final Catch c : catches) c.markTailCalls(ctx);
+  public void markTailCalls(final QueryContext qc) {
+    for(final Catch c : catches) c.markTailCalls(qc);
   }
 
   @Override

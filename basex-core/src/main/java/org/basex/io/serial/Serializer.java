@@ -386,7 +386,7 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   private void serialize(final DBNode node) throws IOException {
-    final FTPosData ft = node instanceof FTPosNode ? ((FTPosNode) node).ft : null;
+    final FTPosData ft = node instanceof FTPosNode ? ((FTPosNode) node).ftpos : null;
     final Data data = node.data;
     int p = node.pre;
     int k = data.kind(p);

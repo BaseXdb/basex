@@ -33,8 +33,8 @@ abstract class Set extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
     for(final Expr e : exprs) {
       if(e.iterable()) continue;
       iterable = false;
@@ -44,9 +44,9 @@ abstract class Set extends Arr {
   }
 
   @Override
-  public final NodeIter iter(final QueryContext ctx) throws QueryException {
+  public final NodeIter iter(final QueryContext qc) throws QueryException {
     final Iter[] iter = new Iter[exprs.length];
-    for(int e = 0; e != exprs.length; ++e) iter[e] = ctx.iter(exprs[e]);
+    for(int e = 0; e != exprs.length; ++e) iter[e] = qc.iter(exprs[e]);
     return iterable ? iter(iter) : eval(iter).sort();
   }
 

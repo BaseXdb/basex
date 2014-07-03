@@ -30,13 +30,12 @@ public final class FTOpts extends FTExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    final FTOpt tmp = ctx.ftOpt();
-    ctx.ftOpt(opt.copy(tmp));
-    if(opt.sw != null && ctx.value != null && ctx.value.data() != null)
-      opt.sw.comp(ctx.value.data());
-    exprs[0] = exprs[0].compile(ctx, scp);
-    ctx.ftOpt(tmp);
+  public FTExpr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    final FTOpt tmp = qc.ftOpt();
+    qc.ftOpt(opt.copy(tmp));
+    if(opt.sw != null && qc.value != null && qc.value.data() != null) opt.sw.comp(qc.value.data());
+    exprs[0] = exprs[0].compile(qc, scp);
+    qc.ftOpt(tmp);
     return exprs[0];
   }
 
@@ -51,19 +50,19 @@ public final class FTOpts extends FTExpr {
   }
 
   @Override
-  public FTNode item(final QueryContext ctx, final InputInfo ii) {
+  public FTNode item(final QueryContext qc, final InputInfo ii) {
     // shouldn't be called, as compile returns argument
     throw Util.notExpected();
   }
 
   @Override
-  public FTIter iter(final QueryContext ctx) {
+  public FTIter iter(final QueryContext qc) {
     // shouldn't be called, as compile returns argument
     throw Util.notExpected();
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTOpts(info, exprs[0].copy(ctx, scp, vs), new FTOpt().copy(opt));
+  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new FTOpts(info, exprs[0].copy(qc, scp, vs), new FTOpt().copy(opt));
   }
 }

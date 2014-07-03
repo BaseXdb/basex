@@ -16,30 +16,30 @@ import org.basex.util.*;
 public final class Hex extends Bin {
   /**
    * Constructor.
-   * @param b bytes
+   * @param value bytes
    */
-  public Hex(final byte[] b) {
-    super(b, AtomType.HEX);
+  public Hex(final byte[] value) {
+    super(value, AtomType.HEX);
   }
 
   /**
    * Constructor.
-   * @param v textual representation
+   * @param value textual representation
    * @param ii input info
    * @throws QueryException query exception
    */
-  public Hex(final byte[] v, final InputInfo ii) throws QueryException {
-    super(decode(Token.trim(v), ii), AtomType.HEX);
+  public Hex(final byte[] value, final InputInfo ii) throws QueryException {
+    super(decode(Token.trim(value), ii), AtomType.HEX);
   }
 
   /**
    * Constructor.
-   * @param b binary data
+   * @param bin binary data
    * @param ii input info
    * @throws QueryException query exception
    */
-  public Hex(final Bin b, final InputInfo ii) throws QueryException {
-    this(b.binary(ii));
+  public Hex(final Bin bin, final InputInfo ii) throws QueryException {
+    this(bin.binary(ii));
   }
 
   @Override

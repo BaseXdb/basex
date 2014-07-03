@@ -39,10 +39,10 @@ public class QueryException extends Exception {
   /**
    * Constructor, specifying an exception or error. {@link Err#BASX_GENERIC} will be set
    * as error code.
-   * @param th exception or error
+   * @param cause exception or error
    */
-  public QueryException(final Throwable th) {
-    this(Util.message(th));
+  public QueryException(final Throwable cause) {
+    this(Util.message(cause));
   }
 
   /**

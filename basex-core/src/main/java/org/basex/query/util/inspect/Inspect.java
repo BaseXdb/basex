@@ -58,17 +58,17 @@ public abstract class Inspect {
    * @throws QueryException query exception
    */
   final QueryParser parseQuery(final IO io) throws QueryException {
-    final QueryContext qCtx = new QueryContext(qc.context);
+    final QueryContext qctx = new QueryContext(qc.context);
     try {
       final String input = string(io.read());
       // parse query
-      final QueryParser qp = new QueryParser(input, io.path(), qCtx, null);
+      final QueryParser qp = new QueryParser(input, io.path(), qctx, null);
       module = QueryProcessor.isLibrary(input) ? qp.parseLibrary(true) : qp.parseMain();
       return qp;
     } catch(final IOException | QueryException ex) {
       throw IOERR.get(info, ex);
     } finally {
-      qCtx.close();
+      qctx.close();
     }
   }
 

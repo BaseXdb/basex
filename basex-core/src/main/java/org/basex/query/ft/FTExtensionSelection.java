@@ -32,20 +32,20 @@ public final class FTExtensionSelection extends FTExpr {
   }
 
   @Override
-  public FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return exprs[0].item(ctx, info);
+  public FTNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return exprs[0].item(qc, info);
   }
 
   @Override
-  public FTIter iter(final QueryContext ctx) throws QueryException {
-    return exprs[0].iter(ctx);
+  public FTIter iter(final QueryContext qc) throws QueryException {
+    return exprs[0].iter(qc);
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final Pragma[] prag = pragmas.clone();
     for(int i = 0; i < prag.length; i++) prag[i] = prag[i].copy();
-    return copyType(new FTExtensionSelection(info, prag, exprs[0].copy(ctx, scp, vs)));
+    return copyType(new FTExtensionSelection(info, prag, exprs[0].copy(qc, scp, vs)));
   }
 
   @Override

@@ -41,16 +41,16 @@ public final class TypeCheck extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    expr = expr.compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    expr = expr.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     final SeqType argType = expr.type();
     if(argType.instanceOf(this.type)) {
-      ctx.compInfo(QueryText.OPTCAST, this.type);
+      qc.compInfo(QueryText.OPTCAST, this.type);
       return expr;
     }
 
@@ -58,9 +58,9 @@ public final class TypeCheck extends Single {
       if(expr instanceof FuncItem && this.type.type instanceof FuncType) {
         if(!this.type.occ.check(1)) throw Err.treatError(info, this.type, expr);
         final FuncItem fit = (FuncItem) expr;
-        return optPre(fit.coerceTo((FuncType) this.type.type, ctx, info, true), ctx);
+        return optPre(fit.coerceTo((FuncType) this.type.type, qc, info, true), qc);
       }
-      return optPre(value(ctx), ctx);
+      return optPre(value(qc), qc);
     }
 
     if(argType.type.instanceOf(this.type.type) && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {
@@ -68,28 +68,28 @@ public final class TypeCheck extends Single {
       if(occ == null) throw INVCAST.get(info, argType, this.type);
     }
 
-    final Expr opt = expr.typeCheck(this, ctx, scp);
-    if(opt != null) return optPre(opt, ctx);
+    final Expr opt = expr.typeCheck(this, qc, scp);
+    if(opt != null) return optPre(opt, qc);
 
     return this;
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    return value(ctx).iter();
+  public Iter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    final Value val = expr.value(ctx);
+  public Value value(final QueryContext qc) throws QueryException {
+    final Value val = expr.value(qc);
     if(this.type.instance(val)) return val;
-    if(promote) return this.type.promote(ctx, sc, info, val, false);
+    if(promote) return this.type.promote(qc, sc, info, val, false);
     throw INVCAST.get(info, val.type(), this.type);
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new TypeCheck(sc, info, expr.copy(ctx, scp, vs), this.type, promote);
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new TypeCheck(sc, info, expr.copy(qc, scp, vs), this.type, promote);
   }
 
   @Override
@@ -116,13 +116,12 @@ public final class TypeCheck extends Single {
   /**
    * Creates an expression that checks the given expression's return type.
    * @param e expression to check
-   * @param ctx query context
+   * @param qc query context
    * @param scp variable scope
    * @return the resulting expression
    * @throws QueryException query exception
    */
-  public Expr check(final Expr e, final QueryContext ctx, final VarScope scp)
-      throws QueryException {
-    return new TypeCheck(sc, info, e, this.type, promote).optimize(ctx, scp);
+  public Expr check(final Expr e, final QueryContext qc, final VarScope scp) throws QueryException {
+    return new TypeCheck(sc, info, e, this.type, promote).optimize(qc, scp);
   }
 }

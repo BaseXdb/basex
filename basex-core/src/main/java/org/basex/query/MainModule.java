@@ -26,21 +26,21 @@ public final class MainModule extends StaticScope {
 
   /**
    * Constructor.
-   * @param rt root expression
-   * @param scp variable scope
-   * @param xqdoc documentation
-   * @param sctx static context
+   * @param expr root expression
+   * @param scope variable scope
+   * @param doc xqdoc documentation
+   * @param sc static context
    */
-  public MainModule(final Expr rt, final VarScope scp, final String xqdoc,
-      final StaticContext sctx) {
-    this(rt, scp, null, xqdoc, sctx, null);
+  public MainModule(final Expr expr, final VarScope scope, final String doc,
+      final StaticContext sc) {
+    this(expr, scope, null, doc, sc, null);
   }
 
   /**
    * Constructor.
    * @param expr root expression
    * @param scope variable scope
-   * @param doc documentation
+   * @param doc xqdoc documentation
    * @param type optional type
    * @param sc static context
    * @param info input info
@@ -54,11 +54,11 @@ public final class MainModule extends StaticScope {
   }
 
   @Override
-  public void compile(final QueryContext ctx) throws QueryException {
+  public void compile(final QueryContext qc) throws QueryException {
     if(compiled) return;
     try {
       compiled = true;
-      expr = expr.compile(ctx, scope);
+      expr = expr.compile(qc, scope);
     } finally {
       scope.cleanUp(this);
     }
@@ -66,14 +66,14 @@ public final class MainModule extends StaticScope {
 
   /**
    * Evaluates this module and returns the result as a cached value iterator.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException evaluation exception
    */
-  public ValueBuilder cache(final QueryContext ctx) throws QueryException {
-    final int fp = scope.enter(ctx);
+  public ValueBuilder cache(final QueryContext qc) throws QueryException {
+    final int fp = scope.enter(qc);
     try {
-      final Iter iter = expr.iter(ctx);
+      final Iter iter = expr.iter(qc);
 
       final ValueBuilder cache;
       if(iter instanceof ValueBuilder) {
@@ -86,26 +86,26 @@ public final class MainModule extends StaticScope {
       return cache;
 
     } finally {
-      scope.exit(ctx, fp);
+      scope.exit(qc, fp);
     }
   }
 
   /**
    * Creates a result iterator which lazily evaluates this module.
-   * @param ctx query context
+   * @param qc query context
    * @return result iterator
    * @throws QueryException query exception
    */
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    if(declType != null) return cache(ctx);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    if(declType != null) return cache(qc);
 
-    final int fp = scope.enter(ctx);
-    final Iter iter = expr.iter(ctx);
+    final int fp = scope.enter(qc);
+    final Iter iter = expr.iter(qc);
     return new Iter() {
       @Override
       public Item next() throws QueryException {
         final Item it = iter.next();
-        if(it == null) scope.exit(ctx, fp);
+        if(it == null) scope.exit(qc, fp);
         return it;
       }
 
@@ -144,12 +144,12 @@ public final class MainModule extends StaticScope {
   /**
    * Adds the names of the databases that may be touched by the module.
    * @param lr lock result
-   * @param ctx query context
+   * @param qc query context
    * @return result of check
    * @see Proc#databases(LockResult)
    */
-  public boolean databases(final LockResult lr, final QueryContext ctx) {
-    return expr.accept(new LockVisitor(lr, ctx));
+  public boolean databases(final LockResult lr, final QueryContext qc) {
+    return expr.accept(new LockVisitor(lr, qc));
   }
 
   /**
@@ -167,11 +167,11 @@ public final class MainModule extends StaticScope {
     /**
      * Constructor.
      * @param lr lock result
-     * @param ctx query context
+     * @param qc query context
      */
-    LockVisitor(final LockResult lr, final QueryContext ctx) {
-      sl = ctx.updating ? lr.write : lr.read;
-      level = ctx.ctxItem == null ? 0 : 1;
+    LockVisitor(final LockResult lr, final QueryContext qc) {
+      sl = qc.updating ? lr.write : lr.read;
+      level = qc.ctxItem == null ? 0 : 1;
     }
 
     @Override

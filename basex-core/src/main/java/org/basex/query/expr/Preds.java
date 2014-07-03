@@ -39,10 +39,10 @@ public abstract class Preds extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     final int pl = preds.length;
-    for(int p = 0; p < pl; ++p) preds[p] = preds[p].compile(ctx, scp).compEbv(ctx);
-    return optimize(ctx, scp);
+    for(int p = 0; p < pl; ++p) preds[p] = preds[p].compile(qc, scp).compEbv(qc);
+    return optimize(qc, scp);
   }
 
   /**
@@ -66,25 +66,25 @@ public abstract class Preds extends ParseExpr {
   /**
    * Checks if the predicates are successful for the specified item.
    * @param it item to be checked
-   * @param ctx query context
+   * @param qc query context
    * @return result of check
    * @throws QueryException query exception
    */
-  protected final boolean preds(final Item it, final QueryContext ctx) throws QueryException {
+  protected final boolean preds(final Item it, final QueryContext qc) throws QueryException {
     if(preds.length == 0) return true;
 
     // set context item and position
-    final Value cv = ctx.value;
+    final Value cv = qc.value;
     try {
       for(final Expr p : preds) {
-        ctx.value = it;
-        final Item i = p.test(ctx, info);
+        qc.value = it;
+        final Item i = p.test(qc, info);
         if(i == null) return false;
         it.score(i.score());
       }
       return true;
     } finally {
-      ctx.value = cv;
+      qc.value = cv;
     }
   }
 
@@ -108,9 +108,9 @@ public abstract class Preds extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
       throws QueryException {
-    return inlineAll(ctx, scp, preds, v, e) ? optimize(ctx, scp) : null;
+    return inlineAll(qc, scp, preds, v, e) ? optimize(qc, scp) : null;
   }
 
   /**

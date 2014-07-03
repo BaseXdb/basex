@@ -24,21 +24,21 @@ import org.basex.util.*;
 public final class FNSimple extends StandardFunc {
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    * @param func function definition
    * @param args arguments
    */
-  public FNSimple(final StaticContext sctx, final InputInfo info, final Function func,
+  public FNSimple(final StaticContext sc, final InputInfo info, final Function func,
       final Expr... args) {
-    super(sctx, info, func, args);
+    super(sc, info, func, args);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
     switch(func) {
       case ONE_OR_MORE:
-        final Iter ir = exprs[0].iter(ctx);
+        final Iter ir = exprs[0].iter(qc);
         final long len = ir.size();
         if(len == 0) throw EXPECTOM.get(info);
         if(len > 0) return ir;
@@ -55,28 +55,28 @@ public final class FNSimple extends StandardFunc {
           }
         };
       case UNORDERED:
-        return ctx.iter(exprs[0]);
+        return qc.iter(exprs[0]);
       default:
-        return super.iter(ctx);
+        return super.iter(qc);
     }
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     switch(func) {
       case ONE_OR_MORE:
-        final Value val = ctx.value(exprs[0]);
+        final Value val = qc.value(exprs[0]);
         if(val.isEmpty()) throw EXPECTOM.get(info);
         return val;
       case UNORDERED:
-        return ctx.value(exprs[0]);
+        return qc.value(exprs[0]);
       default:
-        return super.value(ctx);
+        return super.value(qc);
     }
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Expr e = exprs.length == 1 ? exprs[0] : null;
     switch(func) {
       case FALSE:
@@ -84,34 +84,34 @@ public final class FNSimple extends StandardFunc {
       case TRUE:
         return Bln.TRUE;
       case EMPTY:
-        return Bln.get(e.iter(ctx).next() == null);
+        return Bln.get(e.iter(qc).next() == null);
       case EXISTS:
-        return Bln.get(e.iter(ctx).next() != null);
+        return Bln.get(e.iter(qc).next() != null);
       case BOOLEAN:
-        return Bln.get(e.ebv(ctx, info).bool(info));
+        return Bln.get(e.ebv(qc, info).bool(info));
       case NOT:
-        return Bln.get(!e.ebv(ctx, info).bool(info));
+        return Bln.get(!e.ebv(qc, info).bool(info));
       case DEEP_EQUAL:
-        return Bln.get(deep(ctx));
+        return Bln.get(deep(qc));
       case DEEP_EQUAL_OPT:
-        return Bln.get(deepOpt(ctx));
+        return Bln.get(deepOpt(qc));
       case ZERO_OR_ONE:
-        Iter ir = e.iter(ctx);
+        Iter ir = e.iter(qc);
         Item it = ir.next();
         if(it != null && ir.next() != null) throw EXPECTZ0.get(info);
         return it;
       case EXACTLY_ONE:
-        ir = e.iter(ctx);
+        ir = e.iter(qc);
         it = ir.next();
         if(it == null || ir.next() != null) throw EXPECTO.get(info);
         return it;
       default:
-        return super.item(ctx, ii);
+        return super.item(qc, ii);
     }
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx, final VarScope scp) {
+  protected Expr opt(final QueryContext qc, final VarScope scp) {
     if(exprs.length == 0) return this;
     final Expr e = exprs[0];
 
@@ -127,12 +127,12 @@ public final class FNSimple extends StandardFunc {
       case NOT:
         if(e.isFunction(Function.EMPTY)) {
           // simplify: not(empty(A)) -> exists(A)
-          ctx.compInfo(QueryText.OPTWRITE, this);
+          qc.compInfo(QueryText.OPTWRITE, this);
           exprs = ((Arr) e).exprs;
           func = Function.EXISTS;
         } else if(e.isFunction(Function.EXISTS)) {
           // simplify: not(exists(A)) -> empty(A)
-          ctx.compInfo(QueryText.OPTWRITE, this);
+          qc.compInfo(QueryText.OPTWRITE, this);
           exprs = ((Arr) e).exprs;
           func = Function.EMPTY;
         } else if(e instanceof CmpV || e instanceof CmpG) {
@@ -144,7 +144,7 @@ public final class FNSimple extends StandardFunc {
           return compBln(((Arr) e).exprs[0], info);
         } else {
           // simplify, e.g.: not(boolean(A)) -> not(A)
-          exprs[0] = e.compEbv(ctx);
+          exprs[0] = e.compEbv(qc);
         }
         return this;
       case ZERO_OR_ONE:
@@ -164,7 +164,7 @@ public final class FNSimple extends StandardFunc {
   }
 
   @Override
-  public Expr compEbv(final QueryContext ctx) {
+  public Expr compEbv(final QueryContext qc) {
     if(exprs.length == 0) return this;
     final Expr e = exprs[0];
 
@@ -176,32 +176,32 @@ public final class FNSimple extends StandardFunc {
       // if(exists(node*)) -> if(node*)
       if(e.type().type.isNode()) ex = e;
     }
-    if(ex != this) ctx.compInfo(QueryText.OPTWRITE, this);
+    if(ex != this) qc.compInfo(QueryText.OPTWRITE, this);
     return ex;
   }
 
   /**
    * Checks items for deep equality.
-   * @param ctx query context
+   * @param qc query context
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean deep(final QueryContext ctx) throws QueryException {
-    final Collation coll = checkColl(exprs.length == 3 ? exprs[2] : null, ctx, sc);
-    return new Compare(info).collation(coll).deep(ctx.iter(exprs[0]), ctx.iter(exprs[1]));
+  private boolean deep(final QueryContext qc) throws QueryException {
+    final Collation coll = checkColl(exprs.length == 3 ? exprs[2] : null, qc, sc);
+    return new Compare(info).collation(coll).deep(qc.iter(exprs[0]), qc.iter(exprs[1]));
   }
 
   /**
    * Checks items for deep equality.
-   * @param ctx query context
+   * @param qc query context
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean deepOpt(final QueryContext ctx) throws QueryException {
+  private boolean deepOpt(final QueryContext qc) throws QueryException {
     final Compare cmp = new Compare(info);
     final Mode[] modes = Mode.values();
     if(exprs.length == 3) {
-      final Iter ir = exprs[2].iter(ctx);
+      final Iter ir = exprs[2].iter(qc);
       for(Item it; (it = ir.next()) != null;) {
         final byte[] key = uc(checkEStr(it));
         boolean found = false;
@@ -215,6 +215,6 @@ public final class FNSimple extends StandardFunc {
         if(!found) throw INVALIDOPTX.get(info, key);
       }
     }
-    return cmp.deep(ctx.iter(exprs[0]), ctx.iter(exprs[1]));
+    return cmp.deep(qc.iter(exprs[0]), qc.iter(exprs[1]));
   }
 }

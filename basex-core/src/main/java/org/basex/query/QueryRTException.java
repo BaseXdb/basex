@@ -10,11 +10,10 @@ package org.basex.query;
 public final class QueryRTException extends RuntimeException {
   /**
    * Constructor.
-   *
-   * @param qe query exception to wrap
+   * @param cause query exception to wrap
    */
-  public QueryRTException(final QueryException qe) {
-    super(qe);
+  public QueryRTException(final QueryException cause) {
+    super(cause);
   }
 
   @Override

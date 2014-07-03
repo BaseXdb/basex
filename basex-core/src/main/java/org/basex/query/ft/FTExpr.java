@@ -37,34 +37,34 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public FTExpr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     final int es = exprs.length;
-    for(int e = 0; e < es; e++) exprs[e] = exprs[e].compile(ctx, scp);
+    for(int e = 0; e < es; e++) exprs[e] = exprs[e].compile(qc, scp);
     return this;
   }
 
   @Override
-  public FTExpr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public FTExpr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     return this;
   }
 
   /**
    * This method is called by the sequential full-text evaluation.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting item
    * @throws QueryException query exception
    */
   @Override
-  public abstract FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException;
+  public abstract FTNode item(final QueryContext qc, final InputInfo ii) throws QueryException;
 
   /**
    * This method is called by the index-based full-text evaluation.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting item
    * @throws QueryException query exception
    */
   @Override
-  public abstract FTIter iter(final QueryContext ctx) throws QueryException;
+  public abstract FTIter iter(final QueryContext qc) throws QueryException;
 
   @Override
   public boolean has(final Flag flag) {
@@ -84,20 +84,13 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public FTExpr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
       throws QueryException {
-    return inlineAll(ctx, scp, exprs, v, e) ? optimize(ctx, scp) : null;
+    return inlineAll(qc, scp, exprs, v, e) ? optimize(qc, scp) : null;
   }
 
   @Override
   public abstract FTExpr copy(QueryContext ctx, VarScope scp, IntObjMap<Var> vs);
-
-  @Override
-  public FTExpr indexEquivalent(final IndexCosts ic) throws QueryException {
-    final int es = exprs.length;
-    for(int e = 0; e < es; e++) exprs[e] = exprs[e].indexEquivalent(ic);
-    return this;
-  }
 
   /**
    * Checks if sub expressions of a mild not operator violate the grammar.

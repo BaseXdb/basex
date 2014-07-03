@@ -18,12 +18,12 @@ public abstract class Bin extends Item {
 
   /**
    * Constructor.
-   * @param d binary data
-   * @param t type
+   * @param data binary data
+   * @param type type
    */
-  Bin(final byte[] d, final Type t) {
-    super(t);
-    data = d;
+  Bin(final byte[] data, final Type type) {
+    super(type);
+    this.data = data;
   }
 
   /**

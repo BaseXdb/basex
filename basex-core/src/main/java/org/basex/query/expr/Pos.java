@@ -76,23 +76,23 @@ public final class Pos extends Simple {
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    checkCtx(ctx);
-    return Bln.get(ctx.pos >= min && ctx.pos <= max);
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    checkCtx(qc);
+    return Bln.get(qc.pos >= min && qc.pos <= max);
   }
 
   @Override
-  public Pos copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+  public Pos copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     return new Pos(min, max, info);
   }
 
   /**
    * Returns false if no more results can be expected.
-   * @param ctx query context
+   * @param qc query context
    * @return result of check
    */
-  public boolean skip(final QueryContext ctx) {
-    return ctx.pos >= max;
+  public boolean skip(final QueryContext qc) {
+    return qc.pos >= max;
   }
 
   /**

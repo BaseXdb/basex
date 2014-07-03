@@ -121,7 +121,7 @@ public final class XQuery implements Iterable<XdmItem> {
     final StringList sl = new StringList();
     for(final String p : paths) sl.add(p);
     try {
-      qp.ctx.resources.addCollection(name, sl.toArray(), qp.sc.baseIO());
+      qp.qc.resources.addCollection(name, sl.toArray(), qp.sc.baseIO());
     } catch(final QueryException ex) {
       Util.debug(ex);
       throw new XQueryException(ex);
@@ -136,7 +136,7 @@ public final class XQuery implements Iterable<XdmItem> {
    */
   public void addDocument(final String name, final String path) {
     try {
-      qp.ctx.resources.addDoc(name, path, qp.sc.baseIO());
+      qp.qc.resources.addDoc(name, path, qp.sc.baseIO());
     } catch(final QueryException ex) {
       Util.debug(ex);
       throw new XQueryException(ex);
@@ -150,7 +150,7 @@ public final class XQuery implements Iterable<XdmItem> {
    * @throws XQueryException exception
    */
   public void addResource(final String name, final String... strings) {
-    qp.ctx.resources.addResource(name, strings);
+    qp.qc.resources.addResource(name, strings);
   }
 
   /**
@@ -231,7 +231,7 @@ public final class XQuery implements Iterable<XdmItem> {
    * @return serialization properties
    */
   public SerializerOptions serializer() {
-    return qp.ctx.serParams();
+    return qp.qc.serParams();
   }
 
   /**

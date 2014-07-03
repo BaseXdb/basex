@@ -3,6 +3,8 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
@@ -25,36 +27,35 @@ import org.basex.util.hash.*;
 public final class ValueAccess extends IndexAccess {
   /** Expression. */
   private Expr expr;
-  /** Index type. */
-  final IndexType itype;
+  /** Text index. */
+  final boolean text;
+  /** Parent name test. */
+  final byte[] name;
 
   /**
    * Constructor.
    * @param info input info
    * @param expr index expression
-   * @param type access type
+   * @param text text index
+   * @param name parent name test
    * @param ictx index context
    */
-  public ValueAccess(final InputInfo info, final Expr expr, final IndexType type,
+  public ValueAccess(final InputInfo info, final Expr expr, final boolean text, final byte[] name,
       final IndexContext ictx) {
     super(ictx, info);
     this.expr = expr;
-    this.itype = type;
+    this.text = text;
+    this.name = name;
   }
 
   @Override
-  public NodeIter iter(final QueryContext ctx) throws QueryException {
-    NodeIter[] iter = {};
-    final Iter ir = ctx.iter(expr);
-    for(Item it; (it = ir.next()) != null;) {
-      final int s = iter.length;
-      final NodeIter[] tmp = new NodeIter[s + 1];
-      System.arraycopy(iter, 0, tmp, 0, s);
-      iter = tmp;
-      iter[s] = index(it.string(info));
-    }
-    return iter.length == 0 ? AxisMoreIter.EMPTY : iter.length == 1 ? iter[0] :
-      new Union(info, expr).eval(iter);
+  public NodeIter iter(final QueryContext qc) throws QueryException {
+    final ArrayList<NodeIter> iter = new ArrayList<>();
+    final Iter ir = qc.iter(expr);
+    for(Item it; (it = ir.next()) != null;) iter.add(index(it.string(info)));
+    final int is = iter.size();
+    return is == 0 ? AxisMoreIter.EMPTY : is == 1 ? iter.get(0) :
+      new Union(info, expr).eval(iter.toArray(new NodeIter[is]));
   }
 
   /**
@@ -63,32 +64,44 @@ public final class ValueAccess extends IndexAccess {
    * @return iterator
    */
   private AxisIter index(final byte[] term) {
-    // access index if term is not too long, and if index exists.
+    // special case: empty string
+    final int tl = term.length;
+    // - no element name: return 0 results, because empty text nodes are non-existent
+    // - otherwise, return scan-based element iterator (only considers leaf elements)
+    if(tl == 0 && text) return name == null ? AxisMoreIter.EMPTY : scanEmpty();
+
+    // use index traversal if index exists and if term is not too long.
     // otherwise, scan data sequentially
     final Data data = ictx.data;
-    final IndexIterator ii = term.length <= data.meta.maxlen &&
-      (itype == IndexType.TEXT ? data.meta.textindex : data.meta.attrindex) ?
-      data.iter(new StringToken(itype, term)) : scan(term);
+    final IndexIterator ii = (text ? data.meta.textindex : data.meta.attrindex) &&
+        tl > 0 && tl <= data.meta.maxlen ? data.iter(new StringToken(text, term)) : scan(term);
 
+    final int kind = text ? Data.TEXT : Data.ATTR;
     return new AxisIter() {
-      final byte kind = itype == IndexType.TEXT ? Data.TEXT : Data.ATTR;
-
       @Override
       public ANode next() {
-        return ii.more() ? new DBNode(data, ii.pre(), kind) : null;
+        while(ii.more()) {
+          int pre = ii.pre();
+          if(name != null) {
+            final int par = data.parent(pre, kind);
+            if(data.kind(par) != Data.ELEM || !eq(data.name(par, Data.ELEM), name)) continue;
+            pre = par;
+          }
+          return new DBNode(data, pre, name == null ? kind : Data.ELEM);
+        }
+        return null;
       }
     };
   }
 
   /**
-   * Returns scan-based iterator.
-   * @param val value to be found
+   * Returns a scan-based iterator, which accepts text nodes with the specified text string.
+   * @param value value to be found
    * @return node iterator
    */
-  private IndexIterator scan(final byte[] val) {
+  private IndexIterator scan(final byte[] value) {
     return new IndexIterator() {
       final Data data = ictx.data;
-      final boolean text = itype == IndexType.TEXT;
       final byte kind = text ? Data.TEXT : Data.ATTR;
       int pre = -1;
 
@@ -99,13 +112,33 @@ public final class ValueAccess extends IndexAccess {
       @Override
       public boolean more() {
         while(++pre < data.meta.size) {
-          if(data.kind(pre) == kind && eq(data.text(pre, text), val)) return true;
+          if(data.kind(pre) == kind && eq(data.text(pre, text), value)) return true;
         }
         return false;
       }
       @Override
       public int size() {
         return Math.max(1, data.meta.size >>> 1);
+      }
+    };
+  }
+
+  /**
+   * Returns a scan-based iterator, which accepts leaf elements without text nodes.
+   * @return node iterator
+   */
+  private AxisIter scanEmpty() {
+    return new AxisIter() {
+      final Data data = ictx.data;
+      int pre = -1;
+
+      @Override
+      public DBNode next() {
+        while(++pre < data.meta.size) {
+          if(data.kind(pre) == Data.ELEM && data.size(pre, Data.ELEM) == 1)
+            return new DBNode(data, pre, Data.ELEM);
+        }
+        return null;
       }
     };
   }
@@ -126,28 +159,17 @@ public final class ValueAccess extends IndexAccess {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
-    final Expr sub = expr.inline(ctx, scp, v, e);
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
+    final Expr sub = expr.inline(qc, scp, v, e);
     if(sub == null) return null;
     expr = sub;
-    return optimize(ctx, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new ValueAccess(info, expr.copy(ctx, scp, vs), itype, ictx);
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(DATA, ictx.data.meta.name, TYP, itype), expr);
-  }
-
-  @Override
-  public String toString() {
-    return (itype == IndexType.TEXT ? Function._DB_TEXT : Function._DB_ATTRIBUTE).get(
-        null, info, Str.get(ictx.data.meta.name), expr).toString();
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new ValueAccess(info, expr.copy(qc, scp, vs), text, name, ictx);
   }
 
   @Override
@@ -158,5 +180,20 @@ public final class ValueAccess extends IndexAccess {
   @Override
   public int exprSize() {
     return expr.exprSize() + 1;
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(DATA, ictx.data.meta.name, TYP,
+        text ? IndexType.TEXT : IndexType.ATTRIBUTE, NAM, name), expr);
+  }
+
+  @Override
+  public String toString() {
+    final TokenBuilder string = new TokenBuilder();
+    string.add((text ? Function._DB_TEXT : Function._DB_ATTRIBUTE).get(
+        null, info, Str.get(ictx.data.meta.name), expr).toString());
+    if(name != null) string.add("/parent::").add(name);
+    return string.toString();
   }
 }

@@ -33,15 +33,15 @@ public final class FTMildNot extends FTExpr {
   }
 
   @Override
-  public FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return mildnot(exprs[0].item(ctx, info), exprs[1].item(ctx, info));
+  public FTNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return mildnot(exprs[0].item(qc, info), exprs[1].item(qc, info));
   }
 
   @Override
-  public FTIter iter(final QueryContext ctx) throws QueryException {
+  public FTIter iter(final QueryContext qc) throws QueryException {
     return new FTIter() {
-      final FTIter i1 = exprs[0].iter(ctx);
-      final FTIter i2 = exprs[1].iter(ctx);
+      final FTIter i1 = exprs[0].iter(qc);
+      final FTIter i2 = exprs[1].iter(qc);
       FTNode it1 = i1.next();
       FTNode it2 = i2.next();
 
@@ -93,20 +93,21 @@ public final class FTMildNot extends FTExpr {
   }
 
   @Override
-  public boolean indexAccessible(final IndexCosts ic) throws QueryException {
-    int is = ic.costs();
+  public boolean indexAccessible(final IndexInfo ii) throws QueryException {
+    int costs = ii.costs;
     for(final FTExpr e : exprs) {
-      if(!e.indexAccessible(ic)) return false;
-      is = Math.min(Integer.MIN_VALUE, is + ic.costs());
+      if(!e.indexAccessible(ii)) return false;
+      costs += ii.costs;
     }
-    ic.costs(is);
+    // use summarized costs for estimation
+    ii.costs = costs;
     return true;
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     try {
-      return new FTMildNot(info, exprs[0].copy(ctx, scp, vs), exprs[1].copy(ctx, scp, vs));
+      return new FTMildNot(info, exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs));
     } catch(final QueryException e) {
       // checks were already done
       throw Util.notExpected(e);

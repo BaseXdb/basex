@@ -32,12 +32,12 @@ public final class CNSpace extends CName {
   }
 
   @Override
-  public FNames item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Item it = name.item(ctx, info);
+  public FNames item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Item it = name.item(qc, info);
     final byte[] cp = checkEStr(it);
     if(cp.length != 0 && !XMLToken.isNCName(cp)) throw INVNSNAME.get(info, cp);
 
-    final byte[] cu = trim(value(ctx, ii));
+    final byte[] cu = trim(value(qc, ii));
     if(eq(cp, XML) ^ eq(cu, XMLURI)) throw CNXML.get(info);
     if(eq(cp, XMLNS)) throw CNINV.get(info, cp);
     if(eq(cu, XMLNSURI) || cu.length == 0) throw CNINV.get(info, cu);
@@ -46,7 +46,7 @@ public final class CNSpace extends CName {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CNSpace(sc, info, name.copy(ctx, scp, vs), exprs[0].copy(ctx, scp, vs));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new CNSpace(sc, info, name.copy(qc, scp, vs), exprs[0].copy(qc, scp, vs));
   }
 }

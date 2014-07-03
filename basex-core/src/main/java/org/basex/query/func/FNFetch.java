@@ -19,57 +19,57 @@ import org.basex.util.*;
 public final class FNFetch extends StandardFunc {
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    * @param func function definition
    * @param args arguments
    */
-  public FNFetch(final StaticContext sctx, final InputInfo info, final Function func,
+  public FNFetch(final StaticContext sc, final InputInfo info, final Function func,
       final Expr... args) {
-    super(sctx, info, func, args);
+    super(sc, info, func, args);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     switch(func) {
-      case _FETCH_TEXT:         return text(ctx);
-      case _FETCH_BINARY:       return binary(ctx);
-      case _FETCH_CONTENT_TYPE: return contentType(ctx);
-      default:                  return super.item(ctx, ii);
+      case _FETCH_TEXT:         return text(qc);
+      case _FETCH_BINARY:       return binary(qc);
+      case _FETCH_CONTENT_TYPE: return contentType(qc);
+      default:                  return super.item(qc, ii);
     }
   }
 
   /**
    * Fetches a resource identified by a URI and returns a string representation.
-   * @param ctx query context
+   * @param qc query context
    * @return string
    * @throws QueryException query exception
    */
-  private StrStream text(final QueryContext ctx) throws QueryException {
-    final byte[] uri = checkStr(exprs[0], ctx);
-    final String enc = encoding(1, BXFE_ENCODING, ctx);
-    return new StrStream(IO.get(Token.string(uri)), enc, BXFE_IO, ctx);
+  private StrStream text(final QueryContext qc) throws QueryException {
+    final byte[] uri = checkStr(exprs[0], qc);
+    final String enc = encoding(1, BXFE_ENCODING, qc);
+    return new StrStream(IO.get(Token.string(uri)), enc, BXFE_IO, qc);
   }
 
   /**
    * Fetches a resource identified by a URI and returns a binary representation.
-   * @param ctx query context
+   * @param qc query context
    * @return Base64Binary
    * @throws QueryException query exception
    */
-  private B64Stream binary(final QueryContext ctx) throws QueryException {
-    final byte[] uri = checkStr(exprs[0], ctx);
+  private B64Stream binary(final QueryContext qc) throws QueryException {
+    final byte[] uri = checkStr(exprs[0], qc);
     return new B64Stream(IO.get(Token.string(uri)), BXFE_IO);
   }
 
   /**
    * Fetches the content type of a resource.
-   * @param ctx query context
+   * @param qc query context
    * @return content type
    * @throws QueryException query exception
    */
-  private Str contentType(final QueryContext ctx) throws QueryException {
-    final byte[] uri = checkStr(exprs[0], ctx);
+  private Str contentType(final QueryContext qc) throws QueryException {
+    final byte[] uri = checkStr(exprs[0], qc);
     final IO io = IO.get(Token.string(uri));
 
     final String path = io.path();

@@ -54,46 +54,46 @@ public final class FNAdmin extends StandardFunc {
 
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    * @param func function definition
    * @param args arguments
    */
-  public FNAdmin(final StaticContext sctx, final InputInfo info, final Function func,
+  public FNAdmin(final StaticContext sc, final InputInfo info, final Function func,
       final Expr... args) {
-    super(sctx, info, func, args);
+    super(sc, info, func, args);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    checkAdmin(ctx);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    checkAdmin(qc);
     switch(func) {
-      case _ADMIN_LOGS:     return logs(ctx);
-      case _ADMIN_USERS:    return users(ctx);
-      case _ADMIN_SESSIONS: return sessions(ctx);
-      default:              return super.iter(ctx);
+      case _ADMIN_LOGS:     return logs(qc);
+      case _ADMIN_USERS:    return users(qc);
+      case _ADMIN_SESSIONS: return sessions(qc);
+      default:              return super.iter(qc);
     }
   }
 
   /**
    * Lists all log files.
-   * @param ctx query context
+   * @param qc query context
    * @return users
    * @throws QueryException query exception
    */
-  private Iter logs(final QueryContext ctx) throws QueryException {
+  private Iter logs(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
     if(exprs.length == 0) {
       // return list of all log files
-      for(final IOFile f : ctx.context.log.files()) {
+      for(final IOFile f : qc.context.log.files()) {
         final String date = f.name().replace(IO.LOGSUFFIX, "");
         vb.add(new FElem(FILE).add(date).add(SIZE, Token.token(f.length())));
       }
     } else {
       // return content of single log file
-      final boolean merge = exprs.length > 1 && checkBln(exprs[1], ctx);
-      final String name = Token.string(checkStr(exprs[0], ctx)) + IO.LOGSUFFIX;
-      final IOFile file = new IOFile(ctx.context.log.dir(), name);
+      final boolean merge = exprs.length > 1 && checkBln(exprs[1], qc);
+      final String name = Token.string(checkStr(exprs[0], qc)) + IO.LOGSUFFIX;
+      final IOFile file = new IOFile(qc.context.log.dir(), name);
       final ArrayList<LogEntry> logs = logs(file);
       for(int s = 0; s < logs.size(); s++) {
         final LogEntry l1 = logs.get(s);
@@ -169,14 +169,14 @@ public final class FNAdmin extends StandardFunc {
 
   /**
    * Lists all registered users.
-   * @param ctx query context
+   * @param qc query context
    * @return users
    * @throws QueryException query exception
    */
-  private Iter users(final QueryContext ctx) throws QueryException {
+  private Iter users(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
-    for(final User u : exprs.length == 0 ? ctx.context.users.users(null) :
-      checkData(ctx).meta.users.users(ctx.context.users)) {
+    for(final User u : exprs.length == 0 ? qc.context.users.users(null) :
+      checkData(qc).meta.users.users(qc.context.users)) {
       vb.add(new FElem(USER).add(u.name).add(PERMISSION,
           u.perm.toString().toLowerCase(Locale.ENGLISH)).add(PASSWORD, u.password));
     }
@@ -185,13 +185,13 @@ public final class FNAdmin extends StandardFunc {
 
   /**
    * Lists all open sessions.
-   * @param ctx query context
+   * @param qc query context
    * @return users
    */
-  private static Iter sessions(final QueryContext ctx) {
+  private static Iter sessions(final QueryContext qc) {
     final ValueBuilder vb = new ValueBuilder();
-    synchronized(ctx.context.sessions) {
-      for(final ClientListener sp : ctx.context.sessions) {
+    synchronized(qc.context.sessions) {
+      for(final ClientListener sp : qc.context.sessions) {
         final String user = sp.context().user.name;
         final String addr = sp.address();
         final Data data = sp.context().data();

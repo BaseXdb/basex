@@ -26,24 +26,24 @@ public final class LitMap extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return allAreValues() ? preEval(ctx) : this;
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return allAreValues() ? preEval(qc) : this;
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     Map map = Map.EMPTY;
     final int es = exprs.length;
     for(int i = 0; i < es; i++) {
-      map = map.insert(checkItem(exprs[i], ctx), ctx.value(exprs[++i]), ii);
+      map = map.insert(checkItem(exprs[i], qc), qc.value(exprs[++i]), ii);
     }
     return map;
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new LitMap(info, copyAll(ctx, scp, vs, exprs));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new LitMap(info, copyAll(qc, scp, vs, exprs));
   }
 
   @Override

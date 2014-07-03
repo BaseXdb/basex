@@ -20,12 +20,12 @@ public final class IntSeq extends NativeSeq {
 
   /**
    * Constructor.
-   * @param vals values
-   * @param t type
+   * @param values values
+   * @param type type
    */
-  private IntSeq(final long[] vals, final Type t) {
-    super(vals.length, t);
-    values = vals;
+  private IntSeq(final long[] values, final Type type) {
+    super(values.length, type);
+    this.values = values;
   }
 
   @Override

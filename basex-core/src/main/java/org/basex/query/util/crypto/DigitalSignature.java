@@ -99,14 +99,14 @@ public final class DigitalSignature {
    * @param expr XPath expression which specifies node to be signed
    * @param ce certificate which contains keystore information for
    *        signing the node, may be null
-   * @param ctx query context
+   * @param qc query context
    * @param ii input info
    *
    * @return signed node
    * @throws QueryException query exception
    */
   public Item generateSignature(final ANode node, final byte[] c, final byte[] d, final byte[] sig,
-      final byte[] ns, final byte[] t, final byte[] expr, final ANode ce, final QueryContext ctx,
+      final byte[] ns, final byte[] t, final byte[] expr, final ANode ce, final QueryContext qc,
       final InputInfo ii) throws QueryException {
 
     // checking input variables
@@ -266,7 +266,7 @@ public final class DigitalSignature {
 
       // actually sign the document
       xmlSig.sign(signContext);
-      signedNode = NodeType.DOC.cast(inputNode, ctx, null, ii);
+      signedNode = NodeType.DOC.cast(inputNode, qc, null, ii);
 
     } catch(final XPathExpressionException e) {
       throw CX_XPINV.get(info, e);

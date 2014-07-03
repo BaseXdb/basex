@@ -28,24 +28,24 @@ public final class Context extends Simple {
   }
 
   @Override
-  public Context compile(final QueryContext ctx, final VarScope scp) {
-    if(ctx.value != null) type = ctx.value.type();
+  public Context compile(final QueryContext qc, final VarScope scp) {
+    if(qc.value != null) type = qc.value.type();
     return this;
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    return checkCtx(ctx).iter();
+  public Iter iter(final QueryContext qc) throws QueryException {
+    return checkCtx(qc).iter();
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    return checkCtx(ctx);
+  public Value value(final QueryContext qc) throws QueryException {
+    return checkCtx(qc);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return checkCtx(ctx).item(ctx, info);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return checkCtx(qc).item(qc, info);
   }
 
   @Override
@@ -59,7 +59,7 @@ public final class Context extends Simple {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     return copyType(new Context(info));
   }
 

@@ -20,11 +20,11 @@ public final class FltSeq extends NativeSeq {
 
   /**
    * Constructor.
-   * @param vals bytes
+   * @param values bytes
    */
-  private FltSeq(final float[] vals) {
-    super(vals.length, AtomType.FLT);
-    values = vals;
+  private FltSeq(final float[] values) {
+    super(values.length, AtomType.FLT);
+    this.values = values;
   }
 
   @Override

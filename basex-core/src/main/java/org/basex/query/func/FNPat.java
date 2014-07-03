@@ -49,63 +49,63 @@ public final class FNPat extends StandardFunc {
 
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    * @param func function definition
    * @param args arguments
    */
-  public FNPat(final StaticContext sctx, final InputInfo info, final Function func,
+  public FNPat(final StaticContext sc, final InputInfo info, final Function func,
       final Expr... args) {
-    super(sctx, info, func, args);
+    super(sc, info, func, args);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
     switch(func) {
-      case TOKENIZE: return tokenize(ctx).iter();
-      default:       return super.iter(ctx);
+      case TOKENIZE: return tokenize(qc).iter();
+      default:       return super.iter(qc);
     }
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     switch(func) {
-      case TOKENIZE: return tokenize(ctx);
-      default:       return super.value(ctx);
+      case TOKENIZE: return tokenize(qc);
+      default:       return super.value(qc);
     }
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     switch(func) {
-      case MATCHES:        return matches(checkEStr(exprs[0], ctx), ctx);
-      case REPLACE:        return replace(checkEStr(exprs[0], ctx), ctx);
-      case ANALYZE_STRING: return analyzeString(checkEStr(exprs[0], ctx), ctx);
-      default:             return super.item(ctx, ii);
+      case MATCHES:        return matches(checkEStr(exprs[0], qc), qc);
+      case REPLACE:        return replace(checkEStr(exprs[0], qc), qc);
+      case ANALYZE_STRING: return analyzeString(checkEStr(exprs[0], qc), qc);
+      default:             return super.item(qc, ii);
     }
   }
 
   /**
    * Evaluates the match function.
    * @param val input value
-   * @param ctx query context
+   * @param qc query context
    * @return function result
    * @throws QueryException query exception
    */
-  private Item matches(final byte[] val, final QueryContext ctx) throws QueryException {
-    final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, ctx);
+  private Item matches(final byte[] val, final QueryContext qc) throws QueryException {
+    final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc);
     return Bln.get(p.matcher(string(val)).find());
   }
 
   /**
    * Evaluates the analyze-string function.
    * @param val input value
-   * @param ctx query context
+   * @param qc query context
    * @return function result
    * @throws QueryException query exception
    */
-  private Item analyzeString(final byte[] val, final QueryContext ctx) throws QueryException {
-    final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, ctx);
+  private Item analyzeString(final byte[] val, final QueryContext qc) throws QueryException {
+    final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc);
     if(p.matcher("").matches()) throw REGROUP.get(info);
     final String str = string(val);
     final Matcher m = p.matcher(str);
@@ -162,12 +162,12 @@ public final class FNPat extends StandardFunc {
   /**
    * Evaluates the replace function.
    * @param val input value
-   * @param ctx query context
+   * @param qc query context
    * @return function result
    * @throws QueryException query exception
    */
-  private Item replace(final byte[] val, final QueryContext ctx) throws QueryException {
-    final byte[] rep = checkStr(exprs[2], ctx);
+  private Item replace(final byte[] val, final QueryContext qc) throws QueryException {
+    final byte[] rep = checkStr(exprs[2], qc);
     for(int i = 0; i < rep.length; ++i) {
       if(rep[i] == '\\') {
         if(i + 1 == rep.length || rep[i + 1] != '\\' && rep[i + 1] != '$')
@@ -178,7 +178,7 @@ public final class FNPat extends StandardFunc {
         (i + 1 == rep.length || !digit(rep[i + 1]))) throw FUNREPDOL.get(info);
     }
 
-    final Pattern p = pattern(exprs[1], exprs.length == 4 ? exprs[3] : null, ctx);
+    final Pattern p = pattern(exprs[1], exprs.length == 4 ? exprs[3] : null, qc);
     if(p.pattern().isEmpty()) throw REGROUP.get(info);
 
     String r = string(rep);
@@ -196,13 +196,13 @@ public final class FNPat extends StandardFunc {
 
   /**
    * Evaluates the tokenize function.
-   * @param ctx query context
+   * @param qc query context
    * @return function result
    * @throws QueryException query exception
    */
-  private Value tokenize(final QueryContext ctx) throws QueryException {
-    final byte[] val = checkEStr(exprs[0], ctx);
-    final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, ctx);
+  private Value tokenize(final QueryContext qc) throws QueryException {
+    final byte[] val = checkEStr(exprs[0], qc);
+    final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc);
     if(p.matcher("").matches()) throw REGROUP.get(info);
 
     final TokenList tl = new TokenList();
@@ -223,15 +223,15 @@ public final class FNPat extends StandardFunc {
    * Returns a regular expression pattern.
    * @param pattern input pattern
    * @param modifier modifier item
-   * @param ctx query context
+   * @param qc query context
    * @return pattern modifier
    * @throws QueryException query exception
    */
-  private Pattern pattern(final Expr pattern, final Expr modifier, final QueryContext ctx)
+  private Pattern pattern(final Expr pattern, final Expr modifier, final QueryContext qc)
       throws QueryException {
 
-    final byte[] pat = checkStr(pattern, ctx);
-    final byte[] mod = modifier != null ? checkStr(modifier, ctx) : null;
+    final byte[] pat = checkStr(pattern, qc);
+    final byte[] mod = modifier != null ? checkStr(modifier, qc) : null;
     final TokenBuilder tb = new TokenBuilder(pat);
     if(mod != null) tb.add(0).add(mod);
     final byte[] key = tb.finish();

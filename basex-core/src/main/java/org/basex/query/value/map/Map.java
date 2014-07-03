@@ -36,11 +36,11 @@ public final class Map extends FItem {
 
   /**
    * Constructor.
-   * @param m map
+   * @param root map
    */
-  private Map(final TrieNode m) {
+  private Map(final TrieNode root) {
     super(SeqType.ANY_MAP, new Ann());
-    root = m;
+    this.root = root;
   }
 
   @Override
@@ -69,15 +69,15 @@ public final class Map extends FItem {
   }
 
   @Override
-  public Item invItem(final QueryContext ctx, final InputInfo ii, final Value... args)
+  public Item invItem(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return get(args[0].item(ctx, ii), ii).item(ctx, ii);
+    return get(args[0].item(qc, ii), ii).item(qc, ii);
   }
 
   @Override
-  public Value invValue(final QueryContext ctx, final InputInfo ii, final Value... args)
+  public Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return get(args[0].item(ctx, ii), ii);
+    return get(args[0].item(qc, ii), ii);
   }
 
   /**
@@ -167,7 +167,7 @@ public final class Map extends FItem {
   }
 
   @Override
-  public Map coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii,
+  public Map coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean opt) throws QueryException {
     if(!(ft instanceof MapType) || !hasType((MapType) ft)) throw castError(ii, ft, this);
     return this;
@@ -330,7 +330,7 @@ public final class Map extends FItem {
   }
 
   @Override
-  public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
+  public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
       final InputInfo ii) {
     return null;
   }

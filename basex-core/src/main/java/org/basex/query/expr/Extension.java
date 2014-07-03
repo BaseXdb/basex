@@ -37,38 +37,38 @@ public final class Extension extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     try {
-      for(final Pragma p : pragmas) p.init(ctx, info);
-      expr = expr.compile(ctx, scp);
+      for(final Pragma p : pragmas) p.init(qc, info);
+      expr = expr.compile(qc, scp);
       type = expr.type();
       size = expr.size();
     } finally {
-      for(final Pragma p : pragmas) p.finish(ctx);
+      for(final Pragma p : pragmas) p.finish(qc);
     }
     return this;
   }
 
   @Override
-  public ValueIter iter(final QueryContext ctx) throws QueryException {
-    return value(ctx).iter(ctx);
+  public ValueIter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter(qc);
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     try {
-      for(final Pragma p : pragmas) p.init(ctx, info);
-      return ctx.value(expr);
+      for(final Pragma p : pragmas) p.init(qc, info);
+      return qc.value(expr);
     } finally {
-      for(final Pragma p : pragmas) p.finish(ctx);
+      for(final Pragma p : pragmas) p.finish(qc);
     }
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final Pragma[] prag = pragmas.clone();
     for(int i = 0; i < prag.length; i++) prag[i] = prag[i].copy();
-    return copyType(new Extension(info, prag, expr.copy(ctx, scp, vs)));
+    return copyType(new Extension(info, prag, expr.copy(qc, scp, vs)));
   }
 
   @Override

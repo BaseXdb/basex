@@ -21,11 +21,11 @@ public final class DecSeq extends NativeSeq {
 
   /**
    * Constructor.
-   * @param vals bytes
+   * @param values bytes
    */
-  private DecSeq(final BigDecimal[] vals) {
-    super(vals.length, AtomType.DEC);
-    values = vals;
+  private DecSeq(final BigDecimal[] values) {
+    super(values.length, AtomType.DEC);
+    this.values = values;
   }
 
   @Override

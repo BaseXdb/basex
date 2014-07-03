@@ -20,11 +20,11 @@ public final class DblSeq extends NativeSeq {
 
   /**
    * Constructor.
-   * @param vals bytes
+   * @param values bytes
    */
-  private DblSeq(final double[] vals) {
-    super(vals.length, AtomType.DBL);
-    values = vals;
+  private DblSeq(final double[] values) {
+    super(values.length, AtomType.DBL);
+    this.values = values;
   }
 
   @Override

@@ -19,11 +19,11 @@ public final class BytSeq extends NativeSeq {
 
   /**
    * Constructor.
-   * @param vals bytes
+   * @param values bytes
    */
-  private BytSeq(final byte[] vals) {
-    super(vals.length, AtomType.BYT);
-    values = vals;
+  private BytSeq(final byte[] values) {
+    super(values.length, AtomType.BYT);
+    this.values = values;
   }
 
   @Override

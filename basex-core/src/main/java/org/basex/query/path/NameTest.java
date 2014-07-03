@@ -45,9 +45,9 @@ public final class NameTest extends Test {
   }
 
   @Override
-  public boolean optimize(final QueryContext ctx) {
+  public boolean optimize(final QueryContext qc) {
     // skip optimizations if data reference cannot be determined statically
-    final Data data = ctx.data();
+    final Data data = qc.data();
     if(data == null) return true;
 
     // skip optimizations if more than one namespace is defined in the database
@@ -70,7 +70,7 @@ public final class NameTest extends Test {
     if(results) results = kind != Kind.NAME ||
         (type == NodeType.ELM ? data.tagindex : data.atnindex).contains(local);
 
-    if(!results) ctx.compInfo(OPTNAME, name);
+    if(!results) qc.compInfo(OPTNAME, name);
     return results;
   }
 

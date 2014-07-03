@@ -35,52 +35,52 @@ import org.basex.util.*;
 public final class FNGen extends StandardFunc {
   /**
    * Constructor.
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    * @param func function definition
    * @param args arguments
    */
-  public FNGen(final StaticContext sctx, final InputInfo info, final Function func,
+  public FNGen(final StaticContext sc, final InputInfo info, final Function func,
       final Expr... args) {
-    super(sctx, info, func, args);
+    super(sc, info, func, args);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
     switch(func) {
-      case DATA:                return data(ctx);
-      case COLLECTION:          return collection(ctx).iter();
-      case URI_COLLECTION:      return uriCollection(ctx);
-      case UNPARSED_TEXT_LINES: return unparsedTextLines(ctx);
-      default:                  return super.iter(ctx);
+      case DATA:                return data(qc);
+      case COLLECTION:          return collection(qc).iter();
+      case URI_COLLECTION:      return uriCollection(qc);
+      case UNPARSED_TEXT_LINES: return unparsedTextLines(qc);
+      default:                  return super.iter(qc);
     }
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     switch(func) {
-      case DOC:                     return doc(ctx);
-      case DOC_AVAILABLE:           return docAvailable(ctx);
-      case UNPARSED_TEXT:           return unparsedText(ctx, false);
-      case UNPARSED_TEXT_AVAILABLE: return unparsedText(ctx, true);
-      case PUT:                     return put(ctx);
-      case PARSE_XML:               return parseXml(ctx, false);
-      case PARSE_XML_FRAGMENT:      return parseXml(ctx, true);
-      case SERIALIZE:               return serialize(ctx);
-      default:                      return super.item(ctx, ii);
+      case DOC:                     return doc(qc);
+      case DOC_AVAILABLE:           return docAvailable(qc);
+      case UNPARSED_TEXT:           return unparsedText(qc, false);
+      case UNPARSED_TEXT_AVAILABLE: return unparsedText(qc, true);
+      case PUT:                     return put(qc);
+      case PARSE_XML:               return parseXml(qc, false);
+      case PARSE_XML_FRAGMENT:      return parseXml(qc, true);
+      case SERIALIZE:               return serialize(qc);
+      default:                      return super.item(qc, ii);
     }
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     switch(func) {
-      case COLLECTION: return collection(ctx);
-      default:         return super.value(ctx);
+      case COLLECTION: return collection(qc);
+      default:         return super.value(qc);
     }
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx, final VarScope scp) {
+  protected Expr opt(final QueryContext qc, final VarScope scp) {
     if(func == DATA && exprs.length == 1) {
       final SeqType t = exprs[0].type();
       type = t.type.isNode() ? SeqType.get(AtomType.ATM, t.occ) : t;
@@ -90,12 +90,12 @@ public final class FNGen extends StandardFunc {
 
   /**
    * Performs the data function.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  private Iter data(final QueryContext ctx) throws QueryException {
-    final Iter ir = ctx.iter(exprs.length == 0 ? checkCtx(ctx) : exprs[0]);
+  private Iter data(final QueryContext qc) throws QueryException {
+    final Iter ir = qc.iter(exprs.length == 0 ? checkCtx(qc) : exprs[0]);
 
     return new Iter() {
       @Override
@@ -110,29 +110,29 @@ public final class FNGen extends StandardFunc {
 
   /**
    * Performs the collection function.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  private Value collection(final QueryContext ctx) throws QueryException {
+  private Value collection(final QueryContext qc) throws QueryException {
     // return default collection
-    final Item it = exprs.length == 0 ? null : exprs[0].item(ctx, info);
-    if(it == null) return ctx.resources.collection(info);
+    final Item it = exprs.length == 0 ? null : exprs[0].item(qc, info);
+    if(it == null) return qc.resources.collection(info);
 
     // check if reference is valid
     final byte[] in = checkEStr(it);
     if(!Uri.uri(in).isValid()) throw INVCOLL.get(info, in);
-    return ctx.resources.collection(new QueryInput(string(in)), sc.baseIO(), info);
+    return qc.resources.collection(new QueryInput(string(in)), sc.baseIO(), info);
   }
 
   /**
    * Performs the uri-collection function.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  private Iter uriCollection(final QueryContext ctx) throws QueryException {
-    final Iter coll = collection(ctx).iter();
+  private Iter uriCollection(final QueryContext qc) throws QueryException {
+    final Iter coll = collection(qc).iter();
     return new Iter() {
       @Override
       public Item next() throws QueryException {
@@ -145,52 +145,52 @@ public final class FNGen extends StandardFunc {
 
   /**
    * Performs the put function.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  private Item put(final QueryContext ctx) throws QueryException {
-    checkCreate(ctx);
-    final byte[] file = checkEStr(exprs[1], ctx);
-    final ANode nd = checkNode(exprs[0], ctx);
+  private Item put(final QueryContext qc) throws QueryException {
+    checkCreate(qc);
+    final byte[] file = checkEStr(exprs[1], qc);
+    final ANode nd = checkNode(exprs[0], qc);
     if(nd.type != NodeType.DOC && nd.type != NodeType.ELM) throw UPFOTYPE.get(info, exprs[0]);
 
     final Uri u = Uri.uri(file);
     if(u == Uri.EMPTY || !u.isValid()) throw UPFOURI.get(info, file);
-    final Updates updates = ctx.resources.updates();
-    final DBNode target = updates.determineDataRef(nd, ctx);
+    final Updates updates = qc.resources.updates();
+    final DBNode target = updates.determineDataRef(nd, qc);
 
     final String uri = IO.get(string(u.string())).path();
     // check if all target paths are unique
     if(!updates.putPaths.add(uri)) throw UPURIDUP.get(info, uri);
 
-    updates.add(new Put(target.pre, target.data, uri, info), ctx);
+    updates.add(new Put(target.pre, target.data, uri, info), qc);
     return null;
   }
 
   /**
    * Performs the doc function.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  private ANode doc(final QueryContext ctx) throws QueryException {
-    final Item it = exprs[0].item(ctx, info);
+  private ANode doc(final QueryContext qc) throws QueryException {
+    final Item it = exprs[0].item(qc, info);
     if(it == null) return null;
     final byte[] in = checkEStr(it);
     if(!Uri.uri(in).isValid()) throw INVDOC.get(info, in);
-    return ctx.resources.doc(new QueryInput(string(in)), sc.baseIO(), info);
+    return qc.resources.doc(new QueryInput(string(in)), sc.baseIO(), info);
   }
 
   /**
    * Performs the doc-available function.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  private Bln docAvailable(final QueryContext ctx) throws QueryException {
+  private Bln docAvailable(final QueryContext qc) throws QueryException {
     try {
-      return Bln.get(doc(ctx) != null);
+      return Bln.get(doc(qc) != null);
     } catch(final QueryException ex) {
       final Err err = ex.err();
       if(err != null) {
@@ -204,27 +204,27 @@ public final class FNGen extends StandardFunc {
 
   /**
    * Performs the unparsed-text function.
-   * @param ctx query context
+   * @param qc query context
    * @param check only check if text is available
    * @return content
    * @throws QueryException query exception
    */
-  private Item unparsedText(final QueryContext ctx, final boolean check) throws QueryException {
-    checkCreate(ctx);
-    final byte[] path = checkStr(exprs[0], ctx);
+  private Item unparsedText(final QueryContext qc, final boolean check) throws QueryException {
+    checkCreate(qc);
+    final byte[] path = checkStr(exprs[0], qc);
     final IO base = sc.baseIO();
     if(base == null) throw STBASEURI.get(info);
 
     String enc = null;
     try {
-      enc = encoding(1, WHICHENC, ctx);
+      enc = encoding(1, WHICHENC, qc);
 
       final String p = string(path);
       if(p.indexOf('#') != -1) throw FRAGID.get(info, p);
       if(!Uri.uri(p).isValid()) throw INVURL.get(info, p);
 
       IO io = base.merge(p);
-      final String[] rp = ctx.resources.texts.get(io.path());
+      final String[] rp = qc.resources.texts.get(io.path());
       if(rp != null && rp.length > 0) {
         io = IO.get(rp[0]);
         if(rp.length > 1) enc = rp[1];
@@ -255,12 +255,12 @@ public final class FNGen extends StandardFunc {
 
   /**
    * Performs the unparsed-text-lines function.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  private Iter unparsedTextLines(final QueryContext ctx) throws QueryException {
-    return textIter(unparsedText(ctx, false).string(info));
+  private Iter unparsedTextLines(final QueryContext qc) throws QueryException {
+    return textIter(unparsedText(qc, false).string(info));
   }
 
   /**
@@ -290,17 +290,17 @@ public final class FNGen extends StandardFunc {
 
   /**
    * Returns a document node for the parsed XML input.
-   * @param ctx query context
+   * @param qc query context
    * @param frag parse fragment
    * @return result
    * @throws QueryException query exception
    */
-  private ANode parseXml(final QueryContext ctx, final boolean frag) throws QueryException {
-    final Item item = exprs[0].item(ctx, info);
+  private ANode parseXml(final QueryContext qc, final boolean frag) throws QueryException {
+    final Item item = exprs[0].item(qc, info);
     if(item == null) return null;
     try {
       final IO io = new IOContent(checkStr(item), string(sc.baseURI().string()));
-      return parseXml(io, ctx.context, frag);
+      return parseXml(io, qc.context, frag);
     } catch(final IOException ex) {
       throw SAXERR.get(info, ex);
     }
@@ -308,14 +308,14 @@ public final class FNGen extends StandardFunc {
 
   /**
    * Performs the serialize function.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  private Str serialize(final QueryContext ctx) throws QueryException {
-    final Item it = exprs.length > 1 ? exprs[1].item(ctx, info) : null;
+  private Str serialize(final QueryContext qc) throws QueryException {
+    final Item it = exprs.length > 1 ? exprs[1].item(qc, info) : null;
     final SerializerOptions sopts = FuncOptions.serializer(it, info);
-    return Str.get(serialize(exprs[0].iter(ctx), sopts, SERANY));
+    return Str.get(serialize(exprs[0].iter(qc), sopts, SERANY));
   }
 
   @Override

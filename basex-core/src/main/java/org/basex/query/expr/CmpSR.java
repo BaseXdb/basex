@@ -4,11 +4,9 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
 import org.basex.data.*;
-import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -34,8 +32,6 @@ public final class CmpSR extends Single {
   private final byte[] max;
   /** Include maximum value. */
   private final boolean mxi;
-  /** Index container. */
-  private StringRange rt;
   /** Flag for atomic evaluation. */
   private final boolean atomic;
 
@@ -82,15 +78,15 @@ public final class CmpSR extends Single {
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // atomic evaluation of arguments (faster)
     if(atomic) {
-      final Item it = expr.item(ctx, info);
+      final Item it = expr.item(qc, info);
       return Bln.get(it != null && eval(it));
     }
 
     // iterative evaluation
-    final Iter ir = ctx.iter(expr);
+    final Iter ir = qc.iter(expr);
     for(Item it; (it = ir.next()) != null;) {
       if(eval(it)) return Bln.TRUE;
     }
@@ -140,40 +136,27 @@ public final class CmpSR extends Single {
   }
 
   @Override
-  public boolean indexAccessible(final IndexCosts ic) {
-    // only default collation is supported
-    if(coll != null) return false;
+  public boolean indexAccessible(final IndexInfo ii) {
+    // only default collation is supported, and min/max values are required
+    if(coll != null || min == null || max == null) return false;
 
     // accept only location path, string and equality expressions
-    final Data data = ic.ictx.data;
-    final Step step = ic.indexStep(expr);
+    final Data data = ii.ic.data;
     // no range index support in main-memory index structures
-    if(step == null || data.inMemory()) return false;
-
-    // check which index applies
-    final boolean text = step.test.type == NodeType.TXT && data.meta.textindex;
-    final boolean attr = step.test.type == NodeType.ATT && data.meta.attrindex;
-    if(!text && !attr || min == null || max == null) return false;
+    if(data.inMemory() || !ii.check(expr, false)) return false;
 
     // create range access
-    rt = new StringRange(text ? IndexType.TEXT : IndexType.ATTRIBUTE, min, mni, max, mxi);
-    ic.costs(Math.max(1, data.meta.size / 10));
+    final StringRange sr = new StringRange(ii.text, min, mni, max, mxi);
+    ii.costs = Math.max(1, data.meta.size / 10);
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add(mni ? '[' : '(').addExt(min).add(',').addExt(max).add(mxi ? ']' : ')');
+    ii.create(new StringRangeAccess(info, sr, ii.ic), info, Util.info(OPTSRNGINDEX, tb), true);
     return true;
   }
 
   @Override
-  public Expr indexEquivalent(final IndexCosts ic) {
-    ic.ctx.compInfo(OPTSRNGINDEX);
-    final ParseExpr root = new StringRangeAccess(info, rt, ic.ictx);
-    return ic.invert(expr, root, rt.type() == IndexType.TEXT);
-  }
-
-  @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final CmpSR res =
-        new CmpSR(expr.copy(ctx, scp, vs), min, mni, max, mxi, coll, info);
-    res.rt = rt;
-    return res;
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new CmpSR(expr.copy(qc, scp, vs), min, mni, max, mxi, coll, info);
   }
 
   @Override

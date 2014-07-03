@@ -53,17 +53,17 @@ public final class Constr {
 
   /**
    * Constructs child and attribute nodes.
-   * @param ctx query context
+   * @param qc query context
    * @param expr input expressions
    * @return self reference
    * @throws QueryException query exception
    */
-  public Constr add(final QueryContext ctx, final Expr... expr) throws QueryException {
+  public Constr add(final QueryContext qc, final Expr... expr) throws QueryException {
     final int s = sc.ns.size();
     try {
       for(final Expr e : expr) {
         more = false;
-        final Iter iter = ctx.iter(e);
+        final Iter iter = qc.iter(e);
         for(Item ch; (ch = iter.next()) != null && add(ch););
       }
       if(!text.isEmpty()) children.add(new FTxt(text.finish()));

@@ -27,10 +27,10 @@ public final class VarScope {
 
   /**
    * Constructor for a top-level module.
-   * @param sctx static context
+   * @param sc static context
    */
-  public VarScope(final StaticContext sctx) {
-    sc = sctx;
+  public VarScope(final StaticContext sc) {
+    this.sc = sc;
   }
 
   /**
@@ -46,43 +46,43 @@ public final class VarScope {
 
   /**
    * Creates a new local variable in this scope.
-   * @param ctx query context
+   * @param qc query context
    * @param name variable name
    * @param typ type of the variable
    * @param param function parameter flag
    * @return the variable
    */
-  public Var newLocal(final QueryContext ctx, final QNm name, final SeqType typ,
+  public Var newLocal(final QueryContext qc, final QNm name, final SeqType typ,
       final boolean param) {
-    return add(new Var(ctx, sc, name, typ, param));
+    return add(new Var(qc, sc, name, typ, param));
   }
 
   /**
    * Creates a new copy of the given variable in this scope.
-   * @param ctx query context
+   * @param qc query context
    * @param var variable to copy
    * @return the variable
    */
-  public Var newCopyOf(final QueryContext ctx, final Var var) {
-    return add(new Var(ctx, sc, var));
+  public Var newCopyOf(final QueryContext qc, final Var var) {
+    return add(new Var(qc, sc, var));
   }
 
   /**
    * Enters this scope.
-   * @param ctx query context
+   * @param qc query context
    * @return old frame pointer
    */
-  public int enter(final QueryContext ctx) {
-    return ctx.stack.enterFrame(vars.size());
+  public int enter(final QueryContext qc) {
+    return qc.stack.enterFrame(vars.size());
   }
 
   /**
    * Exits this scope.
-   * @param ctx query context
+   * @param qc query context
    * @param fp frame pointer
    */
-  public void exit(final QueryContext ctx, final int fp) {
-    ctx.stack.exitFrame(fp);
+  public void exit(final QueryContext qc, final int fp) {
+    qc.stack.exitFrame(fp);
   }
 
   /**
@@ -150,13 +150,13 @@ public final class VarScope {
 
   /**
    * Copies this VarScope.
-   * @param ctx query context
+   * @param qc query context
    * @param vs variable mapping
    * @return copied scope
    */
-  public VarScope copy(final QueryContext ctx, final IntObjMap<Var> vs) {
+  public VarScope copy(final QueryContext qc, final IntObjMap<Var> vs) {
     final VarScope cscp = new VarScope(sc);
-    for(final Var v : vars) vs.put(v.id, cscp.newCopyOf(ctx, v));
+    for(final Var v : vars) vs.put(v.id, cscp.newCopyOf(qc, v));
     return cscp;
   }
 }

@@ -68,11 +68,11 @@ public final class XQFTTS extends W3CTS {
 
   @Override
   protected void parse(final QueryProcessor qp, final Nodes root) throws QueryException {
-    final QueryContext ctx = qp.ctx;
-    ctx.stop = stop;
-    ctx.thes = thes;
+    final QueryContext qc = qp.qc;
+    qc.stop = stop;
+    qc.thes = thes;
 
-    final FTOpt opt = ctx.ftOpt();
+    final FTOpt opt = qc.ftOpt();
     for(final String s : aux("stopwords", root)) {
       final IO fn = stop2.get(s);
       if(fn != null) {

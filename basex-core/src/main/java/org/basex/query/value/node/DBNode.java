@@ -38,43 +38,43 @@ public class DBNode extends ANode {
 
   /**
    * Constructor, creating a document node from the specified data reference.
-   * @param d data reference
+   * @param data data reference
    */
-  public DBNode(final Data d) {
-    this(d, 0);
+  public DBNode(final Data data) {
+    this(data, 0);
   }
 
   /**
    * Constructor, creating a node from the specified data reference.
-   * @param d data reference
-   * @param p pre value
+   * @param data data reference
+   * @param pre pre value
    */
-  public DBNode(final Data d, final int p) {
-    this(d, p, d.kind(p));
+  public DBNode(final Data data, final int pre) {
+    this(data, pre, data.kind(pre));
   }
 
   /**
    * Constructor, specifying full node information.
-   * @param d data reference
-   * @param p pre value
-   * @param k node kind
+   * @param data data reference
+   * @param pre pre value
+   * @param kind node kind
    */
-  public DBNode(final Data d, final int p, final int k) {
-    this(d, p, null, type(k));
+  public DBNode(final Data data, final int pre, final int kind) {
+    this(data, pre, null, type(kind));
   }
 
   /**
    * Constructor, specifying full node information.
-   * @param d data reference
-   * @param p pre value
-   * @param r parent reference
-   * @param t node type
+   * @param data data reference
+   * @param pre pre value
+   * @param par parent reference
+   * @param type node type
    */
-  DBNode(final Data d, final int p, final ANode r, final NodeType t) {
-    super(t);
-    data = d;
-    pre = p;
-    par = r;
+  DBNode(final Data data, final int pre, final ANode par, final NodeType type) {
+    super(type);
+    this.data = data;
+    this.pre = pre;
+    this.par = par;
   }
 
   /**
@@ -104,7 +104,7 @@ public class DBNode extends ANode {
   private void set(final int p, final int k) {
     type = type(k);
     par = null;
-    val = null;
+    value = null;
     nsp = null;
     pre = p;
   }
@@ -116,8 +116,8 @@ public class DBNode extends ANode {
 
   @Override
   public final byte[] string() {
-    if(val == null) val = data.atom(pre);
-    return val;
+    if(value == null) value = data.atom(pre);
+    return value;
   }
 
   @Override
@@ -217,8 +217,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final Value copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public final Value copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     return copy();
   }
 

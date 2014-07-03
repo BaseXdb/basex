@@ -24,10 +24,10 @@ public abstract class AStr extends Item {
 
   /**
    * Constructor, specifying a type.
-   * @param t atomic type
+   * @param type atomic type
    */
-  AStr(final AtomType t) {
-    super(t);
+  AStr(final AtomType type) {
+    super(type);
   }
 
   @Override

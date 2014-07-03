@@ -51,9 +51,9 @@ public final class Catch extends Single {
   }
 
   @Override
-  public Catch compile(final QueryContext ctx, final VarScope scp) {
+  public Catch compile(final QueryContext qc, final VarScope scp) {
     try {
-      expr = expr.compile(ctx, scp);
+      expr = expr.compile(qc, scp);
       type = expr.type();
     } catch(final QueryException qe) {
       expr = FNInfo.error(qe, expr.type());
@@ -63,12 +63,12 @@ public final class Catch extends Single {
 
   /**
    * Returns the value of the caught expression.
-   * @param ctx query context
+   * @param qc query context
    * @param ex thrown exception
    * @return resulting item
    * @throws QueryException query exception
    */
-  Value value(final QueryContext ctx, final QueryException ex) throws QueryException {
+  Value value(final QueryContext qc, final QueryException ex) throws QueryException {
     int i = 0;
     final byte[] io = ex.file() == null ? EMPTY : token(ex.file());
     final Value val = ex.value();
@@ -76,26 +76,26 @@ public final class Catch extends Single {
         Str.get(ex.getLocalizedMessage()), val == null ? Empty.SEQ : val,
         Str.get(io), Int.get(ex.line()), Int.get(ex.column()),
         Str.get(ex.getMessage().replaceAll("\r\n?", "\n")) }) {
-      ctx.set(vars[i++], v, info);
+      qc.set(vars[i++], v, info);
     }
-    return ctx.value(expr);
+    return qc.value(expr);
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final Var[] vrs = new Var[NAMES.length];
     for(int i = 0; i < vrs.length; i++)
-      vrs[i] = scp.newLocal(ctx, NAMES[i], TYPES[i], false);
+      vrs[i] = scp.newLocal(qc, NAMES[i], TYPES[i], false);
     final Catch ctch = new Catch(info, codes.clone(), vrs);
     for(int i = 0; i < vars.length; i++) vs.put(vars[i].id, ctch.vars[i]);
-    ctch.expr = expr.copy(ctx, scp, vs);
+    ctch.expr = expr.copy(qc, scp, vs);
     return ctch;
   }
 
   @Override
-  public Catch inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e) {
+  public Catch inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e) {
     try {
-      final Expr sub = expr.inline(ctx, scp, v, e);
+      final Expr sub = expr.inline(qc, scp, v, e);
       if(sub == null) return null;
       expr = sub;
     } catch(final QueryException qe) {
@@ -107,19 +107,19 @@ public final class Catch extends Single {
   /**
    * Returns this clause as an inlineable expression.
    * @param ex caught exception
-   * @param ctx query context
+   * @param qc query context
    * @param scp variable scope
    * @return equivalent expression
    * @throws QueryException query exception during inlining
    */
-  Expr asExpr(final QueryException ex, final QueryContext ctx, final VarScope scp)
+  Expr asExpr(final QueryException ex, final QueryContext qc, final VarScope scp)
       throws QueryException {
 
     if(expr.isValue()) return expr;
     int i = 0;
     Expr e = expr;
     for(final Value v : values(ex)) {
-      final Expr e2 = e.inline(ctx, scp, vars[i++], v);
+      final Expr e2 = e.inline(qc, scp, vars[i++], v);
       if(e2 != null) e = e2;
       if(e.isValue()) break;
     }

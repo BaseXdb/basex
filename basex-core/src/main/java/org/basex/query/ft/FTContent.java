@@ -32,7 +32,7 @@ public final class FTContent extends FTFilter {
   }
 
   @Override
-  protected boolean filter(final QueryContext ctx, final FTMatch mtc, final FTLexer lex) {
+  protected boolean filter(final QueryContext qc, final FTMatch mtc, final FTLexer lex) {
     if(content == FTContents.START) {
       for(final FTStringMatch sm : mtc) if(sm.start == 0) return true;
     } else if(content == FTContents.END) {
@@ -57,8 +57,8 @@ public final class FTContent extends FTFilter {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTContent(info, exprs[0].copy(ctx, scp, vs), content);
+  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new FTContent(info, exprs[0].copy(qc, scp, vs), content);
   }
 
   @Override

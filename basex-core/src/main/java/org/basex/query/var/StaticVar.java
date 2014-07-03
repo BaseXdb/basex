@@ -53,14 +53,14 @@ public final class StaticVar extends StaticDecl {
   }
 
   @Override
-  public void compile(final QueryContext ctx) throws QueryException {
+  public void compile(final QueryContext qc) throws QueryException {
     if(expr == null) throw VAREMPTY.get(info, '$' + Token.string(name.string()));
     if(dontEnter) throw circVarError(this);
 
     if(!compiled) {
       dontEnter = true;
       try {
-        expr = expr.compile(ctx, scope);
+        expr = expr.compile(qc, scope);
       } catch(final QueryException qe) {
         compiled = true;
         if(lazy) {
@@ -74,29 +74,29 @@ public final class StaticVar extends StaticDecl {
       }
 
       compiled = true;
-      if(!lazy || expr.isValue()) bind(value(ctx));
+      if(!lazy || expr.isValue()) bind(value(qc));
     }
   }
 
   /**
    * Evaluates this variable lazily.
-   * @param ctx query context
+   * @param qc query context
    * @return value of this variable
    * @throws QueryException query exception
    */
-  public Value value(final QueryContext ctx) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     if(dontEnter) throw circVarError(this);
     if(lazy) {
       if(!compiled) throw Util.notExpected(this + " was not compiled.");
       if(value != null) return value;
       dontEnter = true;
-      final int fp = scope.enter(ctx);
+      final int fp = scope.enter(qc);
       try {
-        return bind(expr.value(ctx));
+        return bind(expr.value(qc));
       } catch(final QueryException qe) {
         throw qe.notCatchable();
       } finally {
-        scope.exit(ctx, fp);
+        scope.exit(qc, fp);
         dontEnter = false;
       }
     }
@@ -104,11 +104,11 @@ public final class StaticVar extends StaticDecl {
     if(value != null) return value;
     if(expr == null) throw VAREMPTY.get(info, this);
     dontEnter = true;
-    final int fp = scope.enter(ctx);
+    final int fp = scope.enter(qc);
     try {
-      return bind(expr.value(ctx));
+      return bind(expr.value(qc));
     } finally {
-      scope.exit(ctx, fp);
+      scope.exit(qc, fp);
       dontEnter = false;
     }
   }
@@ -124,16 +124,16 @@ public final class StaticVar extends StaticDecl {
   /**
    * Binds an expression to this variable from outside the query.
    * @param e value to bind
-   * @param ctx query context
+   * @param qc query context
    * @return if the value could be bound
    * @throws QueryException query exception
    */
-  public boolean bind(final Expr e, final QueryContext ctx) throws QueryException {
+  public boolean bind(final Expr e, final QueryContext qc) throws QueryException {
     if(!external || compiled) return false;
 
     if(e instanceof Value) {
       Value v = (Value) e;
-      if(declType != null && !declType.instance(v)) v = declType.cast(v, ctx, sc, info, e);
+      if(declType != null && !declType.instance(v)) v = declType.cast(v, qc, sc, info, e);
       bind(v);
     } else {
       expr = checkType(e, info);

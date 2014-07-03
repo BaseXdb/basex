@@ -26,7 +26,7 @@ import org.basex.util.list.*;
  * given by the table position. The following restrictions are imposed on the data:
  * <ul>
  * <li>The table is limited to 2^31 entries (pre values are signed int's)</li>
- * <li>A maximum of 2^15 different tag and attribute names is allowed</li>
+ * <li>A maximum of 2^15 different element and attribute names is allowed</li>
  * <li>A maximum of 2^8 different namespaces is allowed</li>
  * </ul>
  * Each node occupies 128 bits. The current storage layout looks as follows:
@@ -139,9 +139,9 @@ public abstract class Data {
   public abstract void finishUpdate();
 
   /**
-   * Returns the indexed pre references for the specified token.
+   * Returns an index iterator for the specified token.
    * @param token index token reference
-   * @return array of sorted pre values
+   * @return index iterator
    */
   public final IndexIterator iter(final IndexToken token) {
     return index(token.type()).iter(token);
@@ -355,7 +355,7 @@ public abstract class Data {
   }
 
   /**
-   * Returns a reference to the tag or attribute name id.
+   * Returns a reference to the name of an element, attribute or processing instruction.
    * @param pre pre value
    * @return token reference
    */
@@ -364,7 +364,7 @@ public abstract class Data {
   }
 
   /**
-   * Returns a tag, attribute or pi name.
+   * Returns the name of an element, attribute or processing instruction.
    * @param pre pre value
    * @param kind node kind
    * @return name reference
@@ -458,10 +458,10 @@ public abstract class Data {
   // UPDATE OPERATIONS ========================================================
 
   /**
-   * Updates (renames) an element, attribute or pi name.
+   * Updates (renames) the name of an element, attribute or processing instruction.
    * @param pre pre value
    * @param kind node kind
-   * @param name new tag, attribute or pi name
+   * @param name name of new element, attribute or processing instruction
    * @param uri uri
    */
   public final void update(final int pre, final int kind, final byte[] name, final byte[] uri) {
@@ -492,7 +492,7 @@ public abstract class Data {
    * attribute node.
    * @param pre pre value to be replaced
    * @param kind node kind
-   * @param value value to be updated (tag name, text, comment, pi)
+   * @param value value to be updated (element name, text, comment, pi)
    */
   public final void update(final int pre, final int kind, final byte[] value) {
     final byte[] v = kind == PI ? trim(concat(name(pre, kind), SPACE, value)) : value;
@@ -942,7 +942,7 @@ public abstract class Data {
   /**
    * Adds an element entry to the internal update buffer.
    * @param dist parent distance
-   * @param name tag name index
+   * @param name element name index
    * @param asize number of attributes
    * @param size node size
    * @param uri namespace uri reference

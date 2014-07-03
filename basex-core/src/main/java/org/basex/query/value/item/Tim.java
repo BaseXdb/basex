@@ -15,33 +15,33 @@ import org.basex.util.*;
 public final class Tim extends ADate {
   /**
    * Constructor.
-   * @param time time
+   * @param value time
    */
-  public Tim(final ADate time) {
-    super(AtomType.TIM, time);
+  public Tim(final ADate value) {
+    super(AtomType.TIM, value);
     clean();
   }
 
   /**
    * Constructor.
-   * @param time time
+   * @param value time
    * @param ii input info
    * @throws QueryException query exception
    */
-  public Tim(final byte[] time, final InputInfo ii) throws QueryException {
+  public Tim(final byte[] value, final InputInfo ii) throws QueryException {
     super(AtomType.TIM);
-    time(time, XTIME, ii);
+    time(value, XTIME, ii);
     clean();
   }
 
   /**
    * Constructor.
-   * @param time time
+   * @param value time
    * @param dur duration to be added/subtracted
    * @param plus plus/minus flag
    */
-  public Tim(final Tim time, final DTDur dur, final boolean plus) {
-    super(AtomType.TIM, time);
+  public Tim(final Tim value, final DTDur dur, final boolean plus) {
+    super(AtomType.TIM, value);
     calc(dur, plus);
     clean();
   }

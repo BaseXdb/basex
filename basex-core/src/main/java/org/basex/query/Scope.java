@@ -18,10 +18,10 @@ public interface Scope {
 
   /**
    * Compiles the expression contained in this scope.
-   * @param ctx query context
+   * @param qc query context
    * @throws QueryException compilation errors
    */
-  void compile(QueryContext ctx) throws QueryException;
+  void compile(QueryContext qc) throws QueryException;
 
   /**
    * Checks if this scope has already been compiled.
