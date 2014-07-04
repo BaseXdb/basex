@@ -91,6 +91,8 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
    * @param p current position
    */
   void drag(final BaseXSplitSep sep, final double p) {
+    if(dragSize == null) startDrag(p);
+
     final Component[] m = getComponents();
     final int r = propSize.length;
     int q = 0;
