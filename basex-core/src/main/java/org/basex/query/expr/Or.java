@@ -101,7 +101,7 @@ public final class Or extends Logical {
     final ExprList ex = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       // check if expression can be rewritten, and if access is not sequential
-      if(!expr.indexAccessible(ii) || ii.seq) return false;
+      if(!expr.indexAccessible(ii)) return false;
       // skip expressions without results
       if(ii.costs == 0) continue;
       costs += ii.costs;

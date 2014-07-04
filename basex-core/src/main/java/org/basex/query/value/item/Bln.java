@@ -124,16 +124,16 @@ public final class Bln extends Item {
 
   /**
    * Converts the specified string to a boolean.
-   * @param str string to be checked
+   * @param value string to be checked
    * @param ii input info
    * @return result of check
    * @throws QueryException query exception
    */
-  public static boolean parse(final byte[] str, final InputInfo ii) throws QueryException {
-    final byte[] s = Token.trim(str);
+  public static boolean parse(final byte[] value, final InputInfo ii) throws QueryException {
+    final byte[] s = Token.trim(value);
     if(Token.eq(s, Token.TRUE) || Token.eq(s, Token.ONE)) return true;
     if(Token.eq(s, Token.FALSE) || Token.eq(s, Token.ZERO)) return false;
-    throw FUNCAST.get(ii, AtomType.BLN, chop(str));
+    throw FUNCAST.get(ii, AtomType.BLN, chop(value));
   }
 
   @Override

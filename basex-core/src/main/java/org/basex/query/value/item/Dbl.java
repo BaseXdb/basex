@@ -113,18 +113,18 @@ public final class Dbl extends ANum {
 
   /**
    * Converts the given token into a double value.
-   * @param val value to be converted
+   * @param value value to be converted
    * @param ii input info
    * @return double value
    * @throws QueryException query exception
    */
-  public static double parse(final byte[] val, final InputInfo ii) throws QueryException {
+  public static double parse(final byte[] value, final InputInfo ii) throws QueryException {
     try {
-      return parseDouble(Token.string(val));
+      return parseDouble(Token.string(value));
     } catch(final NumberFormatException ex) {
-      if(Token.eq(Token.trim(val), Token.INF)) return POSITIVE_INFINITY;
-      if(Token.eq(Token.trim(val), Token.NINF)) return NEGATIVE_INFINITY;
-      throw FUNCAST.get(ii, ZERO.type, chop(val));
+      if(Token.eq(Token.trim(value), Token.INF)) return POSITIVE_INFINITY;
+      if(Token.eq(Token.trim(value), Token.NINF)) return NEGATIVE_INFINITY;
+      throw FUNCAST.get(ii, ZERO.type, chop(value));
     }
   }
 }

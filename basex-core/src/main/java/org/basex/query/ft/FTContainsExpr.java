@@ -64,15 +64,7 @@ public final class FTContainsExpr extends FTContains {
     // return if step is no text node, or if no index is available
     if(!ii.check(expr, true) || !ftexpr.indexAccessible(ii)) return false;
 
-    // sequential evaluation with index access
-    ii.seq |= ii.not;
-    if(ii.seq) {
-      ii.expr = new FTContainsIndex(info, expr, ftexpr, ii.not);
-      ii.info = Util.info(OPTSFTXINDEX, ftexpr);
-    } else {
-      // standard index evaluation; first expression will always be an axis path
-      ii.create(new FTIndexAccess(info, ftexpr, ii.ic), info, Util.info(OPTFTXINDEX, ftexpr), true);
-    }
+    ii.create(new FTIndexAccess(info, ftexpr, ii.ic), info, Util.info(OPTFTXINDEX, ftexpr), true);
     return true;
   }
 

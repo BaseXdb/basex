@@ -303,7 +303,7 @@ public final class CmpG extends Cmp {
     // only equality expressions on default collation can be rewritten
     if(op != OpG.EQ || coll != null) return false;
 
-    // location path, string
+    // check if index rewriting is possible
     if(!ii.check(exprs[0], false)) return false;
 
     // support expressions
@@ -333,7 +333,7 @@ public final class CmpG extends Cmp {
       for(Item it; (it = ir.next()) != null;) {
         // only strings and untyped items are supported
         if(!it.type.isStringOrUntyped()) return false;
-        // do no use index if string is empty
+        // do not use index if string is empty
         final byte[] string = it.string(info);
         if(string.length == 0) return false;
 

@@ -756,8 +756,8 @@ public enum AtomType implements Type {
    * @param s string flag
    * @param i type id
    */
-  AtomType(final String nm, final AtomType pr, final byte[] ur, final boolean n,
-      final boolean u, final boolean s, final Type.ID i) {
+  AtomType(final String nm, final AtomType pr, final byte[] ur, final boolean n, final boolean u,
+      final boolean s, final Type.ID i) {
     name = new QNm(nm, ur);
     par = pr;
     num = n;

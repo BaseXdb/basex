@@ -24,10 +24,6 @@ public final class IndexInfo {
   /** Step with predicate that can be rewritten for index access. */
   public final Step step;
 
-  /** Flag for ftnot expressions. */
-  public boolean not;
-  /** Flag for sequential processing. */
-  public boolean seq;
   /** Name of parent element. */
   public byte[] name;
 

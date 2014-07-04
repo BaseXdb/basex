@@ -109,11 +109,7 @@ public final class CmpR extends Single {
 
     // remove comparisons that will never yield results
     if(mn > mx) return Bln.FALSE;
-    if(mn == mx) {
-      // return simplified comparison for exact hit, or false if value is not included
-      return mni && mxi ? new CmpG(expr, Dbl.get(mn), CmpG.OpG.EQ, null, info)
-                        : Bln.FALSE;
-    }
+    // do not rewrite checks for identical values (will be evaluated faster by index)
     return new CmpR(c.expr, mn, mni && c.mni, mx, mxi && c.mxi, info);
   }
 

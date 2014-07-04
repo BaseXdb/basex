@@ -108,7 +108,7 @@ public final class FTOr extends FTExpr {
     int costs = 0;
     for(final FTExpr e : exprs) {
       // no index access if negated queries is found
-      if(!e.indexAccessible(ii) || ii.not) return false;
+      if(!e.indexAccessible(ii)) return false;
       costs += ii.costs;
     }
     // use summarized costs for estimation

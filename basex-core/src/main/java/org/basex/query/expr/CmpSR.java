@@ -60,20 +60,20 @@ public final class CmpSR extends Single {
 
   /**
    * Tries to convert the specified expression into a range expression.
-   * @param ex expression to be converted
+   * @param cmp expression to be converted
    * @return new or original expression
    * @throws QueryException query exception
    */
-  static Expr get(final CmpG ex) throws QueryException {
-    if(!(ex.exprs[1] instanceof AStr)) return ex;
-    final byte[] d = ((Item) ex.exprs[1]).string(ex.info);
-    final Expr e = ex.exprs[0];
-    switch(ex.op.op) {
-      case GE: return new CmpSR(e, d, true, null, true, ex.coll, ex.info);
-      case GT: return new CmpSR(e, d, false, null, true, ex.coll, ex.info);
-      case LE: return new CmpSR(e, null, true, d, true, ex.coll, ex.info);
-      case LT: return new CmpSR(e, null, true, d, false, ex.coll, ex.info);
-      default: return ex;
+  static Expr get(final CmpG cmp) throws QueryException {
+    if(!(cmp.exprs[1] instanceof AStr)) return cmp;
+    final byte[] d = ((Item) cmp.exprs[1]).string(cmp.info);
+    final Expr e = cmp.exprs[0];
+    switch(cmp.op.op) {
+      case GE: return new CmpSR(e, d,    true,  null, true,  cmp.coll, cmp.info);
+      case GT: return new CmpSR(e, d,    false, null, true,  cmp.coll, cmp.info);
+      case LE: return new CmpSR(e, null, true,  d,    true,  cmp.coll, cmp.info);
+      case LT: return new CmpSR(e, null, true,  d,    false, cmp.coll, cmp.info);
+      default: return cmp;
     }
   }
 
@@ -128,8 +128,7 @@ public final class CmpSR extends Single {
       if(d > 0) return Bln.FALSE;
       if(d == 0) {
         // return simplified comparison for exact hit, or false if value is not included
-        return mni && mxi ? new CmpG(expr, Str.get(mn), CmpG.OpG.EQ, null, info)
-                          : Bln.FALSE;
+        return mni && mxi ? new CmpG(expr, Str.get(mn), CmpG.OpG.EQ, null, info) : Bln.FALSE;
       }
     }
     return new CmpSR(c.expr, mn, mni && c.mni, mx, mxi && c.mxi, null, info);

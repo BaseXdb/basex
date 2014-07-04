@@ -513,11 +513,6 @@ public abstract class Path extends ParseExpr {
         if(!step.preds[p].indexAccessible(ii)) continue;
 
         if(ii.costs == 0) {
-          if(ii.not) {
-            // not operator... accept all results
-            step.preds[p] = Bln.TRUE;
-            continue;
-          }
           // no results...
           qc.compInfo(OPTNOINDEX, this);
           return Empty.SEQ;
@@ -538,83 +533,78 @@ public abstract class Path extends ParseExpr {
 
     // replace expressions for index access
     final Step indexStep = index.step;
-    if(index.seq) {
-      // sequential evaluation; do not invert path
-      indexStep.preds[iPred] = index.expr;
-    } else {
-      // collect remaining predicates
-      final int pl = indexStep.preds.length;
-      final ExprList newPreds = new ExprList(pl - 1);
-      for(int p = 0; p < pl; p++) {
-        if(p != iPred) newPreds.add(indexStep.preds[p]);
-      }
 
-      // check if steps before index step need to be inverted and traversed
-      final Test test = InvDocTest.get(rt);
-      boolean inv = true;
-      if(test == Test.DOC && data.meta.uptodate) {
-        int s = 0;
-        for(; s <= iStep; s++) {
-          // step must use child axis and name test, and have no predicates
-          final Step step = axisStep(s);
-          if(step.test.kind != Kind.NAME || step.axis != Axis.CHILD ||
-              s != iStep && step.preds.length > 0) break;
-
-          // support only unique paths with nodes on the correct level
-          final int name = data.tagindex.id(step.test.name.local());
-          final ArrayList<PathNode> pn = data.paths.desc(name, Data.ELEM);
-          if(pn.size() != 1 || pn.get(0).level() != s + 1) break;
-        }
-        inv = s <= iStep;
-      }
-
-      // invert steps that occur before index step and add them as predicate
-      final ExprList invSteps = new ExprList();
-      if(inv) {
-        for(int s = iStep; s >= 0; s--) {
-          final Axis ax = axisStep(s).axis.invert();
-          if(s == 0) {
-            // add document test for collections and axes other than ancestors
-            if(test != Test.DOC || ax != Axis.ANC && ax != Axis.ANCORSELF)
-              invSteps.add(Step.get(info, ax, test));
-          } else {
-            final Step prev = axisStep(s - 1);
-            invSteps.add(Step.get(info, ax, prev.test, prev.preds));
-          }
-        }
-      }
-      if(!invSteps.isEmpty()) newPreds.add(get(info, null, invSteps.finish()));
-
-      // create resulting expression
-      final ExprList resultSteps = new ExprList();
-      final Expr resultRoot;
-      if(index.expr instanceof Path) {
-        final Path p = (Path) index.expr;
-        resultRoot = p.root;
-        resultSteps.add(p.steps);
-      } else {
-        resultRoot = index.expr;
-      }
-
-      if(!newPreds.isEmpty()) {
-        int ls = resultSteps.size() - 1;
-        Step step;
-        if(ls < 0 || !(resultSteps.get(ls) instanceof Step)) {
-          // add at least one self axis step
-          step = Step.get(info, Axis.SELF, Test.NOD);
-          ls++;
-        } else {
-          step = (Step) resultSteps.get(ls);
-        }
-        // add remaining predicates to last step
-        resultSteps.set(ls, step.addPreds(newPreds.finish()));
-      }
-
-      // add remaining steps
-      for(int s = iStep + 1; s < sl; s++) resultSteps.add(steps[s]);
-      return get(info, resultRoot, resultSteps.finish());
+    // collect remaining predicates
+    final int pl = indexStep.preds.length;
+    final ExprList newPreds = new ExprList(pl - 1);
+    for(int p = 0; p < pl; p++) {
+      if(p != iPred) newPreds.add(indexStep.preds[p]);
     }
-    return this;
+
+    // check if steps before index step need to be inverted and traversed
+    final Test test = InvDocTest.get(rt);
+    boolean inv = true;
+    if(test == Test.DOC && data.meta.uptodate) {
+      int s = 0;
+      for(; s <= iStep; s++) {
+        // step must use child axis and name test, and have no predicates
+        final Step step = axisStep(s);
+        if(step.test.kind != Kind.NAME || step.axis != Axis.CHILD ||
+            s != iStep && step.preds.length > 0) break;
+
+        // support only unique paths with nodes on the correct level
+        final int name = data.tagindex.id(step.test.name.local());
+        final ArrayList<PathNode> pn = data.paths.desc(name, Data.ELEM);
+        if(pn.size() != 1 || pn.get(0).level() != s + 1) break;
+      }
+      inv = s <= iStep;
+    }
+
+    // invert steps that occur before index step and add them as predicate
+    final ExprList invSteps = new ExprList();
+    if(inv) {
+      for(int s = iStep; s >= 0; s--) {
+        final Axis ax = axisStep(s).axis.invert();
+        if(s == 0) {
+          // add document test for collections and axes other than ancestors
+          if(test != Test.DOC || ax != Axis.ANC && ax != Axis.ANCORSELF)
+            invSteps.add(Step.get(info, ax, test));
+        } else {
+          final Step prev = axisStep(s - 1);
+          invSteps.add(Step.get(info, ax, prev.test, prev.preds));
+        }
+      }
+    }
+    if(!invSteps.isEmpty()) newPreds.add(get(info, null, invSteps.finish()));
+
+    // create resulting expression
+    final ExprList resultSteps = new ExprList();
+    final Expr resultRoot;
+    if(index.expr instanceof Path) {
+      final Path p = (Path) index.expr;
+      resultRoot = p.root;
+      resultSteps.add(p.steps);
+    } else {
+      resultRoot = index.expr;
+    }
+
+    if(!newPreds.isEmpty()) {
+      int ls = resultSteps.size() - 1;
+      Step step;
+      if(ls < 0 || !(resultSteps.get(ls) instanceof Step)) {
+        // add at least one self axis step
+        step = Step.get(info, Axis.SELF, Test.NOD);
+        ls++;
+      } else {
+        step = (Step) resultSteps.get(ls);
+      }
+      // add remaining predicates to last step
+      resultSteps.set(ls, step.addPreds(newPreds.finish()));
+    }
+
+    // add remaining steps
+    for(int s = iStep + 1; s < sl; s++) resultSteps.add(steps[s]);
+    return get(info, resultRoot, resultSteps.finish());
   }
 
   /**

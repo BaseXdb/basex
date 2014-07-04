@@ -129,12 +129,6 @@ public final class FTAnd extends FTExpr {
     int costs = 0;
     for(int e = 0; e < es; ++e) {
       if(!exprs[e].indexAccessible(ii)) return false;
-      if(ii.not) {
-        // no index access if first expression is negated
-        if(e == 0) return false;
-        ng[e] = true;
-        ii.not = false;
-      }
       // use worst costs for estimation, as all index results may need to be scanned
       if(costs < ii.costs) costs = ii.costs;
     }

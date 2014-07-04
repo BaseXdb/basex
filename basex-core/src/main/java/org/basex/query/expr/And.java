@@ -120,7 +120,7 @@ public final class And extends Logical {
     for(int e = 0; e < es; e++) {
       final Expr expr = exprs[e];
       // check if expression can be rewritten, and if access is not sequential
-      if(!expr.indexAccessible(ii) || ii.seq) return false;
+      if(!expr.indexAccessible(ii)) return false;
       // skip queries with no results
       if(ii.costs == 0) return true;
       // summarize costs

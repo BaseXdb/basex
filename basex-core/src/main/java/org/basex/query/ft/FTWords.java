@@ -372,7 +372,8 @@ public final class FTWords extends FTExpr {
           }
         }
         // favor full-text index requests over exact queries
-        ii.costs += Math.max(1, data.costs(ft) / 100);
+        final int costs = data.costs(ft);
+        if(costs != 0) ii.costs += Math.max(1, costs / 100);
       }
     }
     return true;

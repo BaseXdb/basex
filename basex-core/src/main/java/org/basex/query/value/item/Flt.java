@@ -103,18 +103,18 @@ public final class Flt extends ANum {
 
   /**
    * Converts the given token into a double value.
-   * @param val value to be converted
+   * @param value value to be converted
    * @param ii input info
    * @return double value
    * @throws QueryException query exception
    */
-  static float parse(final byte[] val, final InputInfo ii) throws QueryException {
+  static float parse(final byte[] value, final InputInfo ii) throws QueryException {
     try {
-      return Float.parseFloat(Token.string(val));
+      return Float.parseFloat(Token.string(value));
     } catch(final NumberFormatException ex) {
-      if(Token.eq(Token.trim(val), Token.INF)) return Float.POSITIVE_INFINITY;
-      if(Token.eq(Token.trim(val), Token.NINF)) return Float.NEGATIVE_INFINITY;
-      throw FUNCAST.get(ii, ZERO.type, chop(val));
+      if(Token.eq(Token.trim(value), Token.INF)) return Float.POSITIVE_INFINITY;
+      if(Token.eq(Token.trim(value), Token.NINF)) return Float.NEGATIVE_INFINITY;
+      throw FUNCAST.get(ii, ZERO.type, chop(value));
     }
   }
 }

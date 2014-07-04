@@ -784,17 +784,17 @@ public interface QueryText {
   /** Optimization info. */
   String OPTPATH = "removing non-existing path %";
   /** Optimization info. */
-  String OPTTXTINDEX = "text index access for %";
+  String OPTTXTINDEX = "applying text index for %";
   /** Optimization info. */
-  String OPTATVINDEX = "attribute index access for %";
+  String OPTATVINDEX = "applying attribute index for %";
   /** Optimization info. */
-  String OPTFTXINDEX = "full-text index access for %";
+  String OPTFTXINDEX = "applying full-text index for %";
   /** Optimization info. */
-  String OPTSFTXINDEX = "sequential full-text index access for %";
+  String OPTSFTXINDEX = "applying sequential full-text index for %";
   /** Optimization info. */
-  String OPTRNGINDEX = "range index access for %";
+  String OPTRNGINDEX = "applying range index for %";
   /** Optimization info. */
-  String OPTSRNGINDEX = "string range index access for %";
+  String OPTSRNGINDEX = "applying string range index for %";
   /** Optimization info. */
   String OPTNOINDEX = "removing path with no index results";
   /** Optimization info. */
