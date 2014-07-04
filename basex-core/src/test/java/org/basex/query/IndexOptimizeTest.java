@@ -155,8 +155,9 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
     new Set(MainOptions.LANGUAGE, "de").execute(context);
     createDoc();
     new Open(NAME).execute(context);
-    check("//text()[. contains text 'test' using language 'de']");
-    check("//text()[. contains text 'test' using language 'German']");
+    check("//text()[. contains text '1']");
+    check("//text()[. contains text '1' using language 'de']");
+    check("//text()[. contains text '1' using language 'German']");
   }
 
   /**
