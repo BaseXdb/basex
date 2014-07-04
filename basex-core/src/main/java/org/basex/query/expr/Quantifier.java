@@ -7,6 +7,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.gflwor.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -58,7 +59,18 @@ public final class Quantifier extends Single {
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // return pre-evaluated result
-    return expr.isValue() ? optPre(item(qc, info), qc) : this;
+    if(expr.isValue()) return optPre(item(qc, info), qc);
+
+    // pre-evaluate satisfy clause if it is a value
+    if(expr instanceof GFLWOR && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {
+      final GFLWOR gflwor = (GFLWOR) expr;
+      if(gflwor.size() > 0 && gflwor.ret.isValue()) {
+        final Value value = (Value) gflwor.ret;
+        qc.compInfo(OPTPRE, value);
+        return Bln.get(value.ebv(qc, info).bool(info));
+      }
+    }
+    return this;
   }
 
   @Override

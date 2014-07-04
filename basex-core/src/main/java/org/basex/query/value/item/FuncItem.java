@@ -222,8 +222,8 @@ public final class FuncItem extends FItem implements Scope {
   public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
       final InputInfo ii) throws QueryException {
 
-    if(!(expr.isValue() || expr.exprSize() < qc.context.options.get(MainOptions.INLINELIMIT)
-        && !expr.has(Flag.CTX) && !expr.has(Flag.UPD))) return null;
+    if(!(expr.isValue() || expr.exprSize() < qc.context.options.get(MainOptions.INLINELIMIT) &&
+        !expr.has(Flag.CTX) && !expr.has(Flag.UPD))) return null;
     qc.compInfo(OPTINLINE, this);
 
     // create let bindings for all variables

@@ -55,8 +55,8 @@ public abstract class Cmp extends Arr {
   public abstract Cmp invert();
 
   /**
-   * This method is called if the first operand of the comparison
-   * expression is a {@code count()} function.
+   * This method is called if the first operand of the comparison expression is a
+   * {@code count()} function.
    * @param o comparison operator
    * @return resulting expression
    * @throws QueryException query exception

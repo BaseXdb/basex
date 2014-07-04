@@ -28,7 +28,7 @@ public final class GFLWOR extends ParseExpr {
   /** FLWOR clauses. */
   private final LinkedList<Clause> clauses;
   /** Return expression. */
-  private Expr ret;
+  public Expr ret;
 
   /**
    * Constructor.
@@ -642,7 +642,7 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
-   * Checks if this FLWOR expression only used for, let and where clauses.
+   * Checks if this FLWOR expression only uses for, let and where clauses.
    * @return result of check
    */
   private boolean isFLWR() {
@@ -655,21 +655,6 @@ public final class GFLWOR extends ParseExpr {
   public boolean accept(final ASTVisitor visitor) {
     for(final Clause cl : clauses) if(!cl.accept(visitor)) return false;
     return ret.accept(visitor);
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    final FElem e = planElem();
-    for(final Clause cl : clauses) cl.plan(e);
-    ret.plan(e);
-    plan.add(e);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    for(final Clause cl : clauses) sb.append(cl).append(' ');
-    return sb.append(QueryText.RETURN).append(' ').append(ret).toString();
   }
 
   @Override
@@ -698,6 +683,21 @@ public final class GFLWOR extends ParseExpr {
     if(tc.type.occ != Occ.ZERO_MORE) return null;
     ret = tc.check(ret, qc, scp);
     return optimize(qc, scp);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    final FElem e = planElem();
+    for(final Clause cl : clauses) cl.plan(e);
+    ret.plan(e);
+    plan.add(e);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    for(final Clause cl : clauses) sb.append(cl).append(' ');
+    return sb.append(QueryText.RETURN).append(' ').append(ret).toString();
   }
 
   /**
