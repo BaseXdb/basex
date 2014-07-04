@@ -84,8 +84,25 @@ public final class FNAcc extends StandardFunc {
     final Item it = ir.next();
     if(it == null || ir.next() != null) return Dbl.NAN;
     if(it instanceof FItem) throw FIATOM.get(info, it.type);
+    if(it.type == AtomType.DBL) return it;
+
+    // shortcut: check if string only consists of valid double characters
+    if(it.type.isStringOrUntyped() && it.type != AtomType.URI) {
+      final byte[] value = it.string(info);
+      for(final int v : value) {
+        if(!Token.digit(v) && v != '+' && v != 'e' && v != 'E' && v != '.' && v != '-' &&
+           !Token.ws(v)) return Dbl.NAN;
+      }
+      try {
+        return Dbl.get(Double.parseDouble(Token.string(value)));
+      } catch(final NumberFormatException ex) {
+        return Dbl.NAN;
+      }
+    }
+
+    // default conversion
     try {
-      return it.type == AtomType.DBL ? it : AtomType.DBL.cast(it, qc, sc, info);
+      return AtomType.DBL.cast(it, qc, sc, info);
     } catch(final QueryException ex) {
       return Dbl.NAN;
     }
