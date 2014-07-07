@@ -158,7 +158,7 @@ public final class FNXQuery extends StandardFunc {
       qctx.compile();
 
       final ValueBuilder vb = new ValueBuilder();
-      cache(qctx.iter(), vb, qc);
+      cache(qctx.iter(), vb, qctx);
       return vb;
     } catch(final ProcException ex) {
       throw BXXQ_STOPPED.get(info);
