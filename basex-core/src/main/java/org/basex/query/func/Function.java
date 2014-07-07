@@ -992,12 +992,12 @@ public enum Function {
   /* FNUnit functions. */
 
   /** XQuery function. */
-  _UNIT_ASSERT(FNUnit.class, "assert(test[,message])", arg(ITEM_ZM, STR), EMP, flag(NDT)),
+  _UNIT_ASSERT(FNUnit.class, "assert(test[,failure])", arg(ITEM_ZM, ITEM), EMP, flag(NDT)),
   /** XQuery function. */
-  _UNIT_ASSERT_EQUALS(FNUnit.class, "assert-equals(result,expected[,message])",
-      arg(ITEM_ZM, ITEM_ZM, STR), EMP, flag(NDT)),
+  _UNIT_ASSERT_EQUALS(FNUnit.class, "assert-equals(result,expected[,failure])",
+      arg(ITEM_ZM, ITEM_ZM, ITEM), EMP, flag(NDT)),
   /** XQuery function. */
-  _UNIT_FAIL(FNUnit.class, "fail(message)", arg(STR), EMP, flag(NDT)),
+  _UNIT_FAIL(FNUnit.class, "fail(failure)", arg(ITEM), EMP, flag(NDT)),
 
   /* FNValidate functions. */
 
