@@ -34,7 +34,7 @@ public final class Test extends Command {
     try {
       final XMLSerializer ser = Serializer.get(out);
       final Suite suite = new Suite();
-      ser.serialize(suite.test(root, context));
+      ser.serialize(suite.test(root, context, this));
       out.print(NL);
       out.flush();
 

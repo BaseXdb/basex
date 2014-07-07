@@ -30,10 +30,11 @@ public final class Suite {
    * Tests all test functions in the specified path.
    * @param ctx database context
    * @param root path to test modules
+   * @param proc calling process
    * @return resulting value
    * @throws IOException I/O exception
    */
-  public FElem test(final IOFile root, final Context ctx) throws IOException {
+  public FElem test(final IOFile root, final Context ctx, final Proc proc) throws IOException {
     final ArrayList<IOFile> files = new ArrayList<>();
 
     final Performance perf = new Performance();
@@ -48,7 +49,7 @@ public final class Suite {
     }
 
     for(final IOFile file : files) {
-      final Unit unit = new Unit(file, ctx);
+      final Unit unit = new Unit(file, ctx, proc);
       unit.test(suites);
       errors += unit.errors;
       failures += unit.failures;

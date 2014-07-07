@@ -58,7 +58,7 @@ public final class FNUnit extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item assertEquals(final QueryContext qc) throws QueryException {
-    final byte[] str = exprs.length < 3 ? null : checkStr(exprs[2], qc);
+    final Item it = exprs.length < 3 ? null : checkItem(exprs[2], qc);
     final Iter iter1 = qc.iter(exprs[0]), iter2 = qc.iter(exprs[1]);
     final Compare comp = new Compare(info);
     Item it1, it2;
@@ -71,7 +71,7 @@ public final class FNUnit extends StandardFunc {
       if(empty1 || empty2 || !comp.deep(it1.iter(), it2.iter())) break;
       c++;
     }
-    if(str != null) throw UNIT_MESSAGE.get(info, str);
+    if(it != null) throw UNIT_MESSAGE.get(info, it.string(null)).value(it);
     throw new UnitException(info, UNIT_ASSERT_EQUALS, it1, it2, c);
   }
 

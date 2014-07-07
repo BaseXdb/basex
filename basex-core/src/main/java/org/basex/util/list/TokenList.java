@@ -62,6 +62,16 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   }
 
   /**
+   * Adds elements to the array.
+   * @param elements elements to be added
+   * @return self reference
+   */
+  public TokenList add(final byte[]... elements) {
+    for(final byte[] s : elements) add(s);
+    return this;
+  }
+
+  /**
    * Adds a long value.
    * @param element element to be added
    */

@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.core.Context;
 import org.basex.io.*;
 import org.basex.query.*;
@@ -31,6 +32,9 @@ public final class Unit {
   private final Context ctx;
   /** File. */
   private final IOFile file;
+  /** Parent process. */
+  private final Proc proc;
+
   /** File contents. */
   private String input;
   /** Functions. */
@@ -51,10 +55,12 @@ public final class Unit {
    * Constructor.
    * @param file file
    * @param ctx database context
+   * @param proc process
    */
-  public Unit(final IOFile file, final Context ctx) {
+  public Unit(final IOFile file, final Context ctx, final Proc proc) {
     this.file = file;
     this.ctx = ctx;
+    this.proc = proc;
   }
 
   /**
@@ -78,9 +84,9 @@ public final class Unit {
       funcs = qc.funcs.funcs();
 
       // loop through all functions
-      for(final StaticFunc uf : funcs) {
+      for(final StaticFunc sf : funcs) {
         // find Unit annotations
-        final Ann ann = uf.ann;
+        final Ann ann = sf.ann;
         final int as = ann.size();
         boolean xq = false;
         for(int a = 0; !xq && a < as; a++) {
@@ -89,22 +95,22 @@ public final class Unit {
         if(!xq) continue;
 
         // Unit function:
-        if(uf.ann.contains(Ann.Q_PRIVATE)) throw UNIT_PRIVATE.get(null, uf.name.local());
-        if(uf.args.length > 0) throw UNIT_ARGS.get(null, uf.name.local());
+        if(sf.ann.contains(Ann.Q_PRIVATE)) throw UNIT_PRIVATE.get(null, sf.name.local());
+        if(sf.args.length > 0) throw UNIT_ARGS.get(null, sf.name.local());
 
-        if(indexOf(uf, BEFORE) != -1) before.add(uf);
-        if(indexOf(uf, AFTER) != -1) after.add(uf);
-        if(indexOf(uf, BEFORE_MODULE) != -1) beforeModule.add(uf);
-        if(indexOf(uf, AFTER_MODULE) != -1) afterModule.add(uf);
-        if(indexOf(uf, TEST) != -1) test.add(uf);
+        if(indexOf(sf, BEFORE) != -1) before.add(sf);
+        if(indexOf(sf, AFTER) != -1) after.add(sf);
+        if(indexOf(sf, BEFORE_MODULE) != -1) beforeModule.add(sf);
+        if(indexOf(sf, AFTER_MODULE) != -1) afterModule.add(sf);
+        if(indexOf(sf, TEST) != -1) test.add(sf);
       }
 
       // call initializing functions before first test
-      for(final StaticFunc uf : beforeModule) eval(uf);
+      for(final StaticFunc sf : beforeModule) eval(sf);
 
-      for(final StaticFunc uf : test) {
+      for(final StaticFunc sf : test) {
         // check arguments
-        final Value values = uf.ann.values[indexOf(uf, TEST)];
+        final Value values = sf.ann.values[indexOf(sf, TEST)];
         final long vs = values.size();
 
         // expected error code
@@ -113,21 +119,21 @@ public final class Unit {
           if(vs == 2 && eq(EXPECTED, values.itemAt(0).string(null))) {
             code = values.itemAt(1).string(null);
           } else {
-            throw UNIT_ANN.get(null, '%', uf.ann.names[0]);
+            throw UNIT_ANN.get(null, '%', sf.ann.names[0]);
           }
         }
 
-        final FElem testcase = new FElem(TESTCASE).add(NAME, uf.name.local());
+        final FElem testcase = new FElem(TESTCASE).add(NAME, sf.name.local());
         tests++;
 
         final Performance perf2 = new Performance();
-        final int skip = indexOf(uf, IGNORE);
+        final int skip = indexOf(sf, IGNORE);
         if(skip == -1) {
           try {
             // call functions marked with "before"
             for(final StaticFunc fn : before) eval(fn);
             // call functions
-            eval(uf);
+            eval(sf);
             // call functions marked with "after"
             for(final StaticFunc fn : after) eval(fn);
 
@@ -139,31 +145,21 @@ public final class Unit {
             final QNm name = ex.qname();
             if(code == null || !eq(code, name.local())) {
               final FElem error;
-              final boolean failure = Err.UNIT_ASSERT.eq(name);
-              if(failure) {
+              final boolean fail = Err.UNIT_ASSERT.eq(name);
+              if(fail) {
                 failures++;
                 error = new FElem(FAILURE);
               } else {
                 errors++;
                 error = new FElem(ERROR);
               }
-              error.add(LINE, token(ex.line()));
-              error.add(COLUMN, token(ex.column()));
-
-              if(ex instanceof UnitException) {
-                final UnitException ue = (UnitException) ex;
-                error.add(elem(ue.returned, RETURNED, ue.count));
-                error.add(elem(ue.expected, EXPECTED, ue.count));
-              } else {
-                if(!failure) error.add(TYPE, ex.qname().prefixId(QueryText.ERRORURI));
-                error.add(ex.getLocalizedMessage());
-              }
+              addError(ex, error, fail);
               testcase.add(error);
             }
           }
         } else {
           // skip test
-          final Value sv = uf.ann.values[skip];
+          final Value sv = sf.ann.values[skip];
           testcase.add(SKIPPED, sv.isEmpty() ? EMPTY : sv.itemAt(0).string(null));
           skipped++;
         }
@@ -172,23 +168,22 @@ public final class Unit {
       }
 
       // run finalizing tests
-      for(final StaticFunc uf : afterModule) eval(uf);
+      for(final StaticFunc sf : afterModule) eval(sf);
 
     } catch(final QueryException ex) {
+      final FElem error;
       if(current == null) {
-        // handle parsing errors
-        final FElem error = new FElem(ERROR);
-        error.add(LINE, token(ex.line()));
-        error.add(COLUMN, token(ex.column()));
-        error.add(TYPE, ex.qname().prefixId(QueryText.ERRORURI));
-        error.add(ex.getLocalizedMessage());
-        suite.add(error);
+        // handle errors caused by parsing or compiling a module
+        error = new FElem(ERROR);
+        try {
+          addError(ex, error, true);
+        } catch(final QueryException ignored) { }
       } else {
-        // handle initializers
-        final FElem testcase = new FElem(TESTCASE).add(NAME, current.name.local());
-        testcase.add(TIME, time(perf));
-        suite.add(testcase);
+        // handle errors caused by initializing unit functions
+        error = new FElem(TESTCASE).add(NAME, current.name.local());
+        error.add(TIME, time(perf));
       }
+      suite.add(error);
       errors++;
     }
 
@@ -201,6 +196,48 @@ public final class Unit {
       suites.add(suite);
     }
   }
+
+  /**
+   * Adds error information to the specified node.
+   * @param ex exception
+   * @param error error element
+   * @param fail fail (unit error) flag
+   * @throws QueryException query exception
+   */
+  private void addError(final QueryException ex, final FElem error, final boolean fail)
+      throws QueryException {
+
+    error.add(LINE, token(ex.line()));
+    error.add(COLUMN, token(ex.column()));
+    final String url = IO.get(ex.file()).url();
+    if(!file.url().equals(url)) error.add(URI, url);
+
+    if(ex instanceof UnitException) {
+      // unit exception: add expected and returned values
+      final UnitException ue = (UnitException) ex;
+      error.add(elem(ue.returned, RETURNED, ue.count));
+      error.add(elem(ue.expected, EXPECTED, ue.count));
+    } else if(fail) {
+      // unit failure:
+      final Value v = ex.value();
+      if(v.isItem()) {
+        // add attached value
+        if(v.type.isNode()) {
+          error.add((ANode) v);
+        } else {
+          error.add(((Item) v).string(null));
+        }
+      } else {
+        // otherwise, add error message
+        error.add(ex.getLocalizedMessage());
+      }
+    } else {
+      // any other exception: add type and error message
+      error.add(TYPE, ex.qname().prefixId(QueryText.ERRORURI));
+      error.add(ex.getLocalizedMessage());
+    }
+  }
+
 
   /**
    * Creates a new element.
@@ -230,9 +267,10 @@ public final class Unit {
   private void eval(final StaticFunc func) throws QueryException {
     current = func;
 
-    final QueryContext qc = new QueryContext(ctx);
+    final QueryContext qctx = proc.proc(new QueryContext(ctx));
+    qctx.listen = proc.listen;
     try {
-      qc.parse(input, file.path(), null);
+      qctx.parse(input, file.path(), null);
 
       // wrap function with a function call
       final StaticFuncCall sfc = new StaticFuncCall(
@@ -240,14 +278,15 @@ public final class Unit {
       final MainModule mm = new MainModule(sfc, new VarScope(func.sc), null, func.sc);
 
       // assign main module and http context and register process
-      qc.mainModule(mm);
-      qc.compile();
+      qctx.mainModule(mm);
+      qctx.compile();
 
-      final Iter iter = qc.iter();
+      final Iter iter = qctx.iter();
       while(iter.next() != null) throw UNIT_EMPTY.get(null, func.name.local());
 
     } finally {
-      qc.close();
+      proc.proc(null);
+      qctx.close();
     }
   }
 
