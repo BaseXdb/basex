@@ -27,7 +27,6 @@ public final class PreEvalTest extends QueryPlanTest {
     check("count(//*)", "4", "exists(//" + Util.className(Int.class) + ')');
     check("count(//node())", "6", "exists(//" + Util.className(Int.class) + ')');
     check("count(//comment())", "0", "exists(//" + Util.className(Int.class) + ')');
-    check("count(//processing-instruction())", "0", "exists(//" + Util.className(Int.class) + ')');
     check("count(/self::document-node())", "1", "exists(//" + Util.className(Int.class) + ')');
     new DropDB(NAME).execute(context);
   }
