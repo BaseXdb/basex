@@ -276,17 +276,14 @@ public final class Functions extends TokenSet {
    */
   QueryException similarError(final QNm name, final InputInfo ii) {
     // compare specified name with names of predefined functions
-    final byte[] ln = name.local();
+    final byte[] local = name.local(), uri = name.uri();
     final Levenshtein ls = new Levenshtein();
-    for(int k = 1; k < size; ++k) {
-      final int i = indexOf(keys[k], '}');
-      final byte[] u = substring(keys[k], 2, i);
-      final byte[] l = substring(keys[k], i + 1);
-      if(eq(ln, l)) {
+    for(final byte[] key : this) {
+      final int i = indexOf(key, '}');
+      final byte[] u = substring(key, 2, i), l = substring(key, i + 1);
+      if(eq(local, l) || eq(uri, u) && ls.similar(local, l)) {
         return FUNCSIMILAR.get(ii, name.prefixId(FNURI),
             new TokenBuilder(NSGlobal.prefix(u)).add(':').add(l));
-      } else if(ls.similar(ln, l)) {
-        return FUNCSIMILAR.get(ii, name.string(), l);
       }
     }
     return null;
