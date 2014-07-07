@@ -33,7 +33,7 @@ public final class ProjectView extends BaseXPanel {
   /** Editor view. */
   final EditorView editor;
   /** Filter field. */
-  final ProjectFilter filter;
+  private final ProjectFilter filter;
   /** Filter list. */
   final ProjectList list;
   /** Root path. */
@@ -123,11 +123,26 @@ public final class ProjectView extends BaseXPanel {
   /**
    * Refreshes the specified file node.
    * @param file file to be opened
-   * @param tr refresh tree
+   * @param rename file has been renamed
    */
-  public void refresh(final IOFile file, final boolean tr) {
-    if(tr) refresh(file);
+  public void save(final IOFile file, final boolean rename) {
+    refresh(file);
+    if(rename) reset();
+    refresh();
+  }
+
+  /**
+   * Refreshes the filter view.
+   */
+  public void refresh() {
     filter.refresh(true);
+  }
+
+  /**
+   * Resets the filter cache.
+   */
+  public void reset() {
+    filter.reset();
   }
 
   /**
@@ -141,7 +156,7 @@ public final class ProjectView extends BaseXPanel {
   }
 
   /**
-   * Refreshes the specified file node, or its parent.
+   * Refreshes the visualization of the specified file, or its parent, in the tree.
    * @param file file to be refreshed
    */
   private void refresh(final IOFile file) {

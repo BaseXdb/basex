@@ -412,8 +412,7 @@ public final class EditorView extends View {
     if(file == null) return false;
 
     // success: display new file in project view
-    edit.save(file);
-    return true;
+    return edit.save(file);
   }
 
   /**

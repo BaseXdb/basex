@@ -42,7 +42,7 @@ final class ProjectList extends JList<String> {
       @Override public boolean enabled(final GUI main) { return selectedValue() != null; }
     }, null,
     new GUIPopupCmd(REFRESH, BaseXKeys.REFRESH) {
-      @Override public void execute() { project.filter.refresh(true); }
+      @Override public void execute() { project.refresh(); }
     },
     new GUIPopupCmd(COPY_PATH, BaseXKeys.COPYPATH) {
       @Override public void execute() {

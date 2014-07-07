@@ -166,7 +166,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     RefreshCmd() { super(REFRESH, BaseXKeys.REFRESH); }
 
     @Override public void execute() {
-      view.filter.reset();
+      view.reset();
       selectedNode().refresh();
     }
 
@@ -225,7 +225,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
         } else {
           parent.refresh();
           setSelectionPath(parent.path());
-          view.filter.reset();
+          view.reset();
         }
       }
     }
@@ -243,7 +243,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
 
     @Override public void execute() {
       startEditingAtPath(selectedNode().path());
-      view.filter.reset();
+      view.reset();
     }
 
     @Override public boolean enabled(final GUI main) {

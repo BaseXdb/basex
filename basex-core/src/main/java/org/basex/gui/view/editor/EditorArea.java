@@ -178,17 +178,18 @@ public final class EditorArea extends TextPanel {
    * @return success flag
    */
   boolean save(final IOFile io) {
-    final boolean same = io == file;
-    if(same && !modified) return false;
-    try {
-      io.write(getText());
-      file(io);
-      view.project.refresh(io, true);
-      return true;
-    } catch(final Exception ex) {
-      BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, io));
-      return false;
+    final boolean rename = io != file;
+    if(rename || modified) {
+      try {
+        io.write(getText());
+        file(io);
+        view.project.save(io, rename);
+        return true;
+      } catch(final Exception ex) {
+        BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, io));
+      }
     }
+    return false;
   }
 
   /**
