@@ -17,7 +17,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * This class provides access to statically available functions.
+ * This class provides access to built-in functions.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
@@ -37,7 +37,7 @@ public final class Functions extends TokenSet {
   }
 
   /**
-   * Constructor, registering statically available XQuery functions.
+   * Constructor, registering built-in XQuery functions.
    */
   private Functions() {
     for(final Function def : Function.VALUES) {
@@ -268,25 +268,42 @@ public final class Functions extends TokenSet {
   }
 
   /**
-   * Returns an exception if the name of a pre-defined function is similar to the
+   * Returns an exception if the name of a built-in function is similar to the
    * specified function name.
-   * @param name function name
+   * @param name name of input function
    * @param ii input info
-   * @return query exception
+   * @return query exception, or {@code null}
    */
   QueryException similarError(final QNm name, final InputInfo ii) {
-    // compare specified name with names of predefined functions
+    // find functions with identical local names
     final byte[] local = name.local(), uri = name.uri();
+    for(final byte[] key : this) {
+      final int k = indexOf(key, '}');
+      final byte[] l = substring(key, k + 1);
+      if(eq(local, l)) return similarError(name, ii, key);
+    }
+    // find functions with identical URIs and similar local names
     final Levenshtein ls = new Levenshtein();
     for(final byte[] key : this) {
-      final int i = indexOf(key, '}');
-      final byte[] u = substring(key, 2, i), l = substring(key, i + 1);
-      if(eq(local, l) || eq(uri, u) && ls.similar(local, l)) {
-        return FUNCSIMILAR.get(ii, name.prefixId(FNURI),
-            new TokenBuilder(NSGlobal.prefix(u)).add(':').add(l));
-      }
+      final int k = indexOf(key, '}');
+      final byte[] u = substring(key, 2, k), l = substring(key, k + 1);
+      if(eq(uri, u) && ls.similar(local, l)) return similarError(name, ii, key);
     }
     return null;
+  }
+
+  /**
+   * Returns an exception for the specified function.
+   * @param name name of input function
+   * @param ii input info
+   * @param key key of built-in function
+   * @return query exception
+   */
+  private QueryException similarError(final QNm name, final InputInfo ii, final byte[] key) {
+    final int k = indexOf(key, '}');
+    final byte[] u = substring(key, 2, k), l = substring(key, k + 1);
+    return FUNCSIMILAR.get(ii, name.prefixId(FNURI),
+        new TokenBuilder(NSGlobal.prefix(u)).add(':').add(l));
   }
 
   @Override
