@@ -385,13 +385,6 @@ public final class EditorView extends View {
   }
 
   /**
-   * Reverts the contents of the currently opened editor.
-   */
-  public void reopen() {
-    getEditor().reopen(true);
-  }
-
-  /**
    * Saves the contents of the currently opened editor.
    * @return {@code false} if operation was canceled
    */
@@ -465,7 +458,6 @@ public final class EditorView extends View {
     if(edit != null) {
       // display open file
       tabs.setSelectedComponent(edit);
-      edit.reopen(true);
     } else {
       try {
         // check and retrieve content
