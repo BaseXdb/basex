@@ -141,9 +141,10 @@ public abstract class Step extends Preds {
     int kind = -1, name = 0;
     if(test.type != null) {
       kind = ANode.kind(test.type);
-      if(kind == Data.PI) return null;
 
       if(test.kind == Kind.NAME) {
+        // PI name are not indexed...
+        if(kind == Data.PI) return null;
         // element/attribute test (*:ln)
         final Names names = kind == Data.ATTR ? data.atnindex : data.tagindex;
         name = names.id(((NameTest) test).local);

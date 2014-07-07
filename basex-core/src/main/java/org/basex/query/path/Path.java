@@ -186,7 +186,7 @@ public abstract class Path extends ParseExpr {
 
     // choose best path implementation and set type information
     final Path path = get(info, root, steps);
-    path.size(qc);
+    path.size = path.size(qc);
     path.type = SeqType.get(steps[steps.length - 1].type().type, size);
     return path;
   }
