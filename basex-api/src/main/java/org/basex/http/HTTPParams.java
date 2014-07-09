@@ -135,7 +135,11 @@ public final class HTTPParams {
   private void addURLEncoded(final Map<String, Value> params) throws IOException {
     for(final String nv : body().toString().split("&")) {
       final String[] parts = nv.split("=", 2);
-      if(parts.length == 2) params.put(parts[0], Str.get(URLDecoder.decode(parts[1], UTF8)));
+      if(parts.length == 2) {
+        final Atm i = new Atm(URLDecoder.decode(parts[1], UTF8));
+        final Value v = params.get(parts[0]);
+        params.put(parts[0], v == null ? i : new ValueBuilder().add(v).add(i).value());
+      }
     }
   }
 
