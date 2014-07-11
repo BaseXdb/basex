@@ -6,12 +6,12 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.*;
+import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
 import org.basex.io.*;
 import org.basex.query.func.*;
-import org.basex.server.*;
 import org.junit.*;
 import org.junit.Test;
 

@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.basex.*;
+import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.util.*;
 import org.junit.*;

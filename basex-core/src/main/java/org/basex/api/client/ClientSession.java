@@ -1,4 +1,4 @@
-package org.basex.server;
+package org.basex.api.client;
 
 import java.io.*;
 import java.net.*;
@@ -8,12 +8,12 @@ import org.basex.core.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
+import org.basex.server.*;
 import org.basex.util.*;
 
 /**
- * This class offers methods to execute database commands via the
- * client/server architecture. Commands are sent to the server instance over
- * a socket connection:
+ * This class contains methods to execute database commands via the client/server architecture.
+ * Commands are sent to the server instance over a socket connection:
  * <ul>
  * <li> A socket instance is created by the constructor.</li>
  * <li> The {@link #execute} method sends database commands to the server.
@@ -32,7 +32,7 @@ import org.basex.util.*;
 public class ClientSession extends Session {
   /** Event notifications. */
   private final Map<String, EventNotifier> notifiers =
-    Collections.synchronizedMap(new HashMap<String, EventNotifier>());
+      Collections.synchronizedMap(new HashMap<String, EventNotifier>());
   /** Server output (buffered). */
   final PrintOutput sout;
   /** Server input. */
@@ -40,7 +40,7 @@ public class ClientSession extends Session {
 
   /** Socket reference. */
   private final Socket socket;
-  /** Socket host name. */
+  /** Socket event host. */
   private final String ehost;
   /** Socket event reference. */
   private Socket esocket;
@@ -97,7 +97,7 @@ public class ClientSession extends Session {
    * @throws IOException I/O exception
    */
   public ClientSession(final String host, final int port, final String user, final String pass,
-                        final OutputStream output) throws IOException {
+      final OutputStream output) throws IOException {
 
     super(output);
     ehost = host;
@@ -156,15 +156,15 @@ public class ClientSession extends Session {
   }
 
   @Override
-  protected void execute(final String cmd, final OutputStream os) throws IOException {
-    send(cmd);
+  protected void execute(final String command, final OutputStream output) throws IOException {
+    send(command);
     sout.flush();
-    receive(os);
+    receive(output);
   }
 
   @Override
-  protected void execute(final Command cmd, final OutputStream os) throws IOException {
-    execute(cmd.toString(), os);
+  protected void execute(final Command command, final OutputStream output) throws IOException {
+    execute(command.toString(), output);
   }
 
   /**
@@ -211,10 +211,10 @@ public class ClientSession extends Session {
 
   /**
    * Starts the listener thread.
-   * @param in input stream
+   * @param input input stream
    */
-  private void listen(final InputStream in) {
-    final BufferInput bi = new BufferInput(in);
+  private void listen(final InputStream input) {
+    final BufferInput bi = new BufferInput(input);
     new Thread() {
       @Override
       public void run() {
@@ -246,75 +246,76 @@ public class ClientSession extends Session {
 
   /**
    * Receives the info string.
-   * @param os output stream to send result to. If {@code null}, no result
+   * @param output output stream to send result to. If {@code null}, no result
    *           will be requested
    * @throws IOException I/O exception
    */
-  private void receive(final OutputStream os) throws IOException {
+  private void receive(final OutputStream output) throws IOException {
     final BufferInput bi = new BufferInput(sin);
-    if(os != null) receive(bi, os);
+    if(output != null) receive(bi, output);
     info = bi.readString();
     if(!ok(bi)) throw new BaseXException(info);
   }
 
   /**
    * Checks the next success flag.
-   * @param bi buffer input
+   * @param input buffer input
    * @return value of check
    * @throws IOException I/O exception
    */
-  static boolean ok(final BufferInput bi) throws IOException {
-    return bi.read() == 0;
+  static boolean ok(final BufferInput input) throws IOException {
+    return input.read() == 0;
   }
 
   /**
    * Sends the specified command, string arguments and input.
-   * @param cmd command
+   * @param command command
    * @param input input stream
-   * @param strings string arguments
+   * @param args string arguments
    * @throws IOException I/O exception
    */
-  private void send(final ServerCmd cmd, final InputStream input, final String... strings)
+  private void send(final ServerCmd command, final InputStream input, final String... args)
       throws IOException {
 
-    sout.write(cmd.code);
-    for(final String s : strings) send(s);
+    sout.write(command.code);
+    for(final String arg : args) send(arg);
     send(input);
   }
 
   /**
    * Retrieves data from the server.
-   * @param bi buffered server input
-   * @param os output stream
+   * @param input buffered server input
+   * @param output output stream
    * @throws IOException I/O exception
    */
-  static void receive(final BufferInput bi, final OutputStream os)
-      throws IOException {
-    final DecodingInput di = new DecodingInput(bi);
-    for(int b; (b = di.read()) != -1;) os.write(b);
+  static void receive(final BufferInput input, final OutputStream output) throws IOException {
+    final DecodingInput di = new DecodingInput(input);
+    for(int b; (b = di.read()) != -1;) output.write(b);
   }
 
   /**
    * Sends a string to the server.
-   * @param s string to be sent
+   * @param string string to be sent
    * @throws IOException I/O exception
    */
-  void send(final String s) throws IOException {
-    sout.write(Token.token(s));
+  void send(final String string) throws IOException {
+    sout.write(Token.token(string));
     sout.write(0);
   }
 
   /**
    * Executes a command and sends the result to the specified output stream.
-   * @param cmd server command
+   * @param command server command
    * @param arg argument
-   * @param os target output stream
+   * @param output target output stream
    * @return string
    * @throws IOException I/O exception
    */
-  String exec(final ServerCmd cmd, final String arg, final OutputStream os) throws IOException {
-    final OutputStream o = os == null ? new ArrayOutput() : os;
-    sout.write(cmd.code);
+  String exec(final ServerCmd command, final String arg, final OutputStream output)
+      throws IOException {
+
+    final OutputStream o = output == null ? new ArrayOutput() : output;
+    sout.write(command.code);
     send(arg);
     sout.flush();
     final BufferInput bi = new BufferInput(sin);

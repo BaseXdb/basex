@@ -17,6 +17,7 @@ public final class XQueryException extends RuntimeException {
    */
   public XQueryException(final QueryException ex) {
     super(ex);
+    Util.debug(ex);
   }
 
   /**

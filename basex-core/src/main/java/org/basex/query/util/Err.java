@@ -54,8 +54,6 @@ public enum Err {
   BXCL_COMMAND(BXCL, 4, "Command could not be executed: %"),
   /** BXCL0005. */
   BXCL_QUERY(BXCL, 5, "Query could not be executed: %"),
-  /** BXCL0006. */
-  BXCL_ITEM(BXCL, 6, "Value to be bound is no single item: %"),
 
   // Conversion module
 
@@ -783,6 +781,8 @@ public enum Err {
   /** XPST0003. */
   NOTYPE(XPST, 3, "Unknown type '%'."),
   /** XPST0003. */
+  BINDNAME(XPST, 3, "Invalid variable name '%'."),
+  /** XPST0003. */
   PIXML(XPST, 3, "Processing instruction has illegal name: '%'."),
   /** XPST0003. */
   QNAMEINV(XPST, 3, "Expecting QName, '%' found."),
@@ -1140,8 +1140,7 @@ public enum Err {
   /** XUTY0007. */
   UPTRGDELEMPT(XUTY, 7, "Only nodes can be deleted."),
   /** XUTY0008. */
-  UPTRGMULT(XUTY, 8,
-      "Single element, text, attribute, comment or pi expected as replace target."),
+  UPTRGMULT(XUTY, 8, "Single element, text, attribute, comment or pi expected as replace target."),
   /** XUTY0010. */
   UPWRELM(XUTY, 10, "Replacing nodes must be no attribute nodes."),
   /** XUTY0011. */

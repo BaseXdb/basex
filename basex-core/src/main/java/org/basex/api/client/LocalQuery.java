@@ -1,44 +1,45 @@
-package org.basex.server;
+package org.basex.api.client;
 
 import java.io.*;
 
 import org.basex.core.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
+import org.basex.server.*;
 
 /**
  * This class defines all methods for iteratively evaluating queries locally.
- * All data is interpreted by the {@link QueryListener}.
+ * All data is interpreted by the {@link ServerQuery}.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public class LocalQuery extends Query {
   /** Active query listener. */
-  private final QueryListener ql;
+  private final ServerQuery ql;
 
   /**
    * Constructor. Query output will be written to the provided output stream.
    * All methods will return {@code null}.
-   * @param q query string
-   * @param ctx database context
-   * @param o output stream to write query output
+   * @param query query string
+   * @param context database context
+   * @param output output stream to write query output
    */
-  LocalQuery(final String q, final Context ctx, final OutputStream o) {
-    ql = new QueryListener(q, ctx);
-    out = o;
+  LocalQuery(final String query, final Context context, final OutputStream output) {
+    ql = new ServerQuery(query, context);
+    this.out = output;
   }
 
   @Override
-  public void bind(final String n, final Object v, final String t) throws IOException {
+  public void bind(final String name, final Object value, final String type) throws IOException {
     cache = null;
-    ql.bind(n, v, t);
+    ql.bind(name, value, type);
   }
 
   @Override
-  public void context(final Object v, final String t) throws IOException {
+  public void context(final Object value, final String type) throws IOException {
     cache = null;
-    ql.context(v, t);
+    ql.context(value, type);
   }
 
   @Override

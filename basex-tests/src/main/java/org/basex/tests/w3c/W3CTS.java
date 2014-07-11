@@ -9,15 +9,12 @@ import java.util.regex.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
-import org.basex.core.Context;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -555,26 +552,19 @@ public abstract class W3CTS extends Main {
       if(!tb.isEmpty()) tb.add(", ");
       tb.add(nm);
 
-      Expr expr = null;
-      if(src == null) {
-        // assign collection
-        expr = coll(nm, qp);
-      } else {
-        // assign document
-        final String dbname = new IOFile(src).dbname();
-        Function def = Function.DOC;
-        // updates: drop updated document or open updated database
-        if(updating()) {
-          if(first) {
-            new DropDB(dbname).execute(context);
-          } else {
-            def = Function._DB_OPEN;
-            src = dbname;
-          }
+      // assign document
+      final String dbname = new IOFile(src).dbname();
+      // updates: drop updated document or open updated database
+      if(updating()) {
+        if(first) {
+          new DropDB(dbname).execute(context);
+        } else {
+          src = dbname;
         }
-        expr = def.get(qp.sc, Str.get(src));
       }
-      if(var != null) qp.bind(string(data.atom(var.pres[c])), expr);
+
+      final Value value = qp.qc.resources.doc(new QueryInput(src), qp.sc.baseIO(), null);
+      qp.bind(string(data.atom(var.pres[c])), value);
     }
     return tb.finish();
   }
@@ -624,8 +614,7 @@ public abstract class W3CTS extends Main {
       final String file = pth + string(data.atom(nod.pres[c])) + IO.XQSUFFIX;
       final String in = read(new IOFile(queries + file));
       final QueryProcessor xq = new QueryProcessor(in, context);
-      final Value val = xq.value();
-      qp.bind(string(data.atom(var.pres[c])), val);
+      qp.bind(string(data.atom(var.pres[c])), xq.value());
       xq.close();
     }
   }

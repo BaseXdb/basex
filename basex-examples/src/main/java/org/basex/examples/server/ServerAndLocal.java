@@ -3,10 +3,10 @@ package org.basex.examples.server;
 import java.io.*;
 
 import org.basex.*;
+import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.examples.local.*;
-import org.basex.server.*;
 
 /**
  * This class sends a query to a database server instance.

@@ -1,4 +1,4 @@
-package org.basex.server;
+package org.basex.api.client;
 
 import java.io.*;
 
@@ -6,6 +6,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
 import org.basex.query.*;
+import org.basex.server.*;
 import org.basex.util.*;
 
 /**
@@ -108,17 +109,17 @@ public class LocalSession extends Session {
   }
 
   @Override
-  protected void execute(final String str, final OutputStream os) throws BaseXException {
+  protected void execute(final String command, final OutputStream output) throws BaseXException {
     try {
-      execute(new CommandParser(str, ctx).parseSingle(), os);
+      execute(new CommandParser(command, ctx).parseSingle(), output);
     } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }
   }
 
   @Override
-  protected void execute(final Command cmd, final OutputStream os) throws BaseXException {
-    cmd.execute(ctx, os);
-    info = cmd.info();
+  protected void execute(final Command command, final OutputStream output) throws BaseXException {
+    command.execute(ctx, output);
+    info = command.info();
   }
 }

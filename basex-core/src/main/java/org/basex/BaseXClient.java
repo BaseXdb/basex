@@ -4,8 +4,8 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
+import org.basex.api.client.*;
 import org.basex.core.*;
-import org.basex.server.*;
 import org.basex.util.*;
 
 /**

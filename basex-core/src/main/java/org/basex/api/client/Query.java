@@ -1,4 +1,4 @@
-package org.basex.server;
+package org.basex.api.client;
 
 import java.io.*;
 
@@ -8,8 +8,9 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * <p>This class defines methods for executing queries.
- * It is implemented by {@link ClientQuery}.</p>
+ * <p>This class defines methods for evaluating queries.
+ * It is implemented by {@link ClientQuery} and {@link LocalQuery}.</p>
+ *
  * <p>Results are either returned as string or serialized to the output
  * stream that has been specified via the constructor or via
  * {@link Session#setOutputStream(OutputStream)}.</p>
@@ -19,10 +20,10 @@ import org.basex.util.list.*;
  */
 public abstract class Query {
   /** Client output stream. */
-  OutputStream out;
-
+  protected OutputStream out;
   /** Cached results. */
-  TokenList cache;
+  protected TokenList cache;
+
   /** Cached result types. */
   private ByteList types;
   /** Cache pointer. */
@@ -40,30 +41,30 @@ public abstract class Query {
 
   /**
    * Binds a value with an optional type to an external variable.
-   * @param n name of variable
-   * @param v value to be bound
-   * @param t data type (may be {@code null})
+   * @param name name of variable
+   * @param value value to be bound
+   * @param type data type (may be {@code null})
    * @throws IOException I/O exception
    */
-  public abstract void bind(final String n, final Object v, final String t)
+  public abstract void bind(final String name, final Object value, final String type)
       throws IOException;
 
   /**
    * Binds a value to the context item.
-   * @param v value to be bound
+   * @param value value to be bound
    * @throws IOException I/O exception
    */
-  public final void context(final Object v) throws IOException {
-    context(v, "");
+  public final void context(final Object value) throws IOException {
+    context(value, "");
   }
 
   /**
    * Binds a value with an optional type to an external variable.
-   * @param v value to be bound
-   * @param t data type (may be {@code null})
+   * @param value value to be bound
+   * @param type data type (may be {@code null})
    * @throws IOException I/O exception
    */
-  public abstract void context(final Object v, final String t) throws IOException;
+  public abstract void context(final Object value, final String type) throws IOException;
 
   /**
    * Returns {@code true} if more items are available.
@@ -108,15 +109,15 @@ public abstract class Query {
 
   /**
    * Caches the incoming input.
-   * @param is input stream
+   * @param input input stream
    * @throws IOException I/O exception
    */
-  void cache(final InputStream is) throws IOException {
+  void cache(final InputStream input) throws IOException {
     cache = new TokenList();
     types = new ByteList();
     final ByteList bl = new ByteList();
-    for(int t; (t = is.read()) > 0;) {
-      final DecodingInput di = new DecodingInput(is);
+    for(int t; (t = input.read()) > 0;) {
+      final DecodingInput di = new DecodingInput(input);
       for(int b; (b = di.read()) != -1;) bl.add(b);
       cache.add(bl.toArray());
       types.add(t);

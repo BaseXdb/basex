@@ -334,9 +334,10 @@ public final class QT3TS extends Main {
           query.addDocument(src.get(URI), file);
           final String role = src.get(ROLE);
           if(role == null) continue;
-          final Object call = query.funcCall("fn:doc", Str.get(file));
-          if(role.equals(".")) query.context(call);
-          else query.bind(role, call);
+
+          final XdmValue doc = query.document(file);
+          if(role.equals(".")) query.context(doc);
+          else query.bind(role, doc);
         }
         // bind resources
         for(final HashMap<String, String> src : e.resources) {
@@ -345,7 +346,7 @@ public final class QT3TS extends Main {
         // bind collections
         query.addCollection(e.collURI, e.collSources.toArray());
         if(e.collContext) {
-          query.context(query.funcCall("fn:collection", Str.get(e.collURI)));
+          query.context(query.collection(e.collURI));
         }
         // bind context item
         if(e.context != null) {

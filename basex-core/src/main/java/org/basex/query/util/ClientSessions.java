@@ -2,9 +2,9 @@ package org.basex.query.util;
 
 import java.io.*;
 
+import org.basex.api.client.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 

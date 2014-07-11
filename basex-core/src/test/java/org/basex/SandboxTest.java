@@ -6,10 +6,10 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.util.concurrent.*;
 
+import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
-import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.junit.*;

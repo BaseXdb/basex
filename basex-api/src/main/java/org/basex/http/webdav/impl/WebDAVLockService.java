@@ -76,7 +76,7 @@ public final class WebDAVLockService {
     final String token = UUID.randomUUID().toString();
 
     final WebDAVQuery query = new WebDAVQuery("w:create-lock(" +
-        "$path, $token, $scope, $type, $depth, $owner,$timeout)");
+        "$path, $token, $scope, $type, $depth, $owner, $timeout)");
     query.bind("path", db + SEP + p);
     query.bind("token", token);
     query.bind("scope", scope);

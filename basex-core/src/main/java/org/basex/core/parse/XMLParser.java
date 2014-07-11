@@ -285,7 +285,7 @@ final class XMLParser extends CmdParser {
 
     // run query
     final QueryProcessor qp = new QueryProcessor(tb.toString(), ctx).context(root);
-    qp.bind("A", ma).bind("O", oa);
+    qp.bind("A", ma.value()).bind("O", oa.value());
     if(!qp.execute().toString().isEmpty()) return true;
 
     // build error string

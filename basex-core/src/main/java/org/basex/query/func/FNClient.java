@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
+import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
@@ -15,7 +16,6 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.server.*;
 import org.basex.util.*;
 
 /**
@@ -136,16 +136,11 @@ public final class FNClient extends StandardFunc {
       // bind variables and context item
       for(final Map.Entry<String, Value> binding : bindings(2, qc).entrySet()) {
         final String k = binding.getKey();
-        final Value v = binding.getValue();
-        if(!v.isItem()) throw BXCL_ITEM.get(info, v);
-        final Item it = (Item) v;
-        final Type t = v.type;
-        if(it instanceof FuncItem) throw FIVALUE.get(info, t);
-
-        final Object value = t instanceof NodeType ? v.serialize() : Token.string(it.string(info));
-        if(k.isEmpty()) cq.context(value, t.toString());
-        else cq.bind(k, value, t.toString());
+        final Value value = binding.getValue();
+        if(k.isEmpty()) cq.context(value);
+        else cq.bind(k, value);
       }
+
       // evaluate query
       while(cq.more()) {
         final String result = cq.next();

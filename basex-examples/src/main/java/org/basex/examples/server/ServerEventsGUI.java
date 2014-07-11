@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 import org.basex.*;
+import org.basex.api.client.*;
 import org.basex.server.*;
 import org.basex.util.*;
 

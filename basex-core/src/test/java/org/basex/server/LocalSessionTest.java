@@ -1,5 +1,6 @@
 package org.basex.server;
 
+import org.basex.api.client.*;
 import org.junit.*;
 
 /**

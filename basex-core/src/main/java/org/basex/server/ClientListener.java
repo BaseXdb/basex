@@ -31,7 +31,7 @@ public final class ClientListener extends Thread {
   public long last;
 
   /** Active queries. */
-  private final HashMap<String, QueryListener> queries = new HashMap<>();
+  private final HashMap<String, ServerQuery> queries = new HashMap<>();
   /** Performance measurement. */
   private final Performance perf = new Performance();
   /** Database context. */
@@ -450,11 +450,11 @@ public final class ClientListener extends Thread {
 
     String err = null;
     try {
-      final QueryListener qp;
+      final ServerQuery qp;
       final StringBuilder info = new StringBuilder();
       if(sc == ServerCmd.QUERY) {
         final String query = arg;
-        qp = new QueryListener(query, context);
+        qp = new ServerQuery(query, context);
         arg = Integer.toString(id++);
         queries.put(arg, qp);
         // send {ID}0

@@ -1,4 +1,4 @@
-package org.basex.server;
+package org.basex.api.client;
 
 import static org.junit.Assert.*;
 
@@ -9,6 +9,7 @@ import org.basex.*;
 import org.basex.core.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
+import org.basex.server.*;
 import org.basex.util.*;
 import org.junit.*;
 

@@ -147,31 +147,19 @@ public class QueryParser extends InputParser {
       } else {
         if(ch == ',') {
           if(s + 1 == sl || bind.charAt(s + 1) != ',') {
-            bind(key, val);
+            qc.bind(key.toString().trim(), new Atm(val.toString()));
             key.setLength(0);
             val.setLength(0);
             first = true;
             continue;
           }
-          // commas are escaped by a second comma
+          // literal commas are escaped by a second comma
           s++;
         }
         val.append(ch);
       }
     }
-    bind(key, val);
-  }
-
-  /**
-   * Binds the specified variable.
-   * If a URI is specified, the query is treated as a module.
-   * @param key key
-   * @param val value
-   * @throws QueryException query exception
-   */
-  private void bind(final StringBuilder key, final StringBuilder val) throws QueryException {
-    final String k = key.toString().trim();
-    if(!k.isEmpty()) qc.bind(k, new Atm(val.toString()), null);
+    if(key.length() != 0) qc.bind(key.toString().trim(), new Atm(val.toString()));
   }
 
   /**
@@ -195,11 +183,11 @@ public class QueryParser extends InputParser {
       prolog2();
 
       pushVarContext(null);
-      final Expr e = expr();
-      if(e == null) throw alter == null ? error(EXPREMPTY) : error();
+      final Expr expr = expr();
+      if(expr == null) throw alter == null ? error(EXPREMPTY) : error();
       final VarScope scope = popVarContext();
 
-      final MainModule mm = new MainModule(e, scope, moduleDoc, sc);
+      final MainModule mm = new MainModule(expr, scope, moduleDoc, sc);
       finish(mm, true);
       return mm;
     } catch(final QueryException ex) {

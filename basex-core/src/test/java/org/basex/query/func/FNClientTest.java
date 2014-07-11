@@ -5,11 +5,11 @@ import static org.basex.query.func.Function.*;
 import java.io.*;
 
 import org.basex.*;
+import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.util.*;
 import org.basex.query.*;
-import org.basex.server.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -79,9 +79,14 @@ public final class FNClientTest extends AdvancedQueryTest {
         _CLIENT_QUERY.args("$a", "1") + '+' + _CLIENT_QUERY.args("$b", "2"), "3");
     query(_CLIENT_QUERY.args(conn(), "\"declare variable $a external; $a*2\"",
         " map { 'a': 1 }"), "2");
+    query(_CLIENT_QUERY.args(conn(), "\"declare variable $a external; count($a)\"",
+        " map { 'a': () }"), "0");
+    query(_CLIENT_QUERY.args(conn(), "\"declare variable $a external; count($a)\"",
+        " map { 'a': (1 to 5) }"), "5");
+    query(_CLIENT_QUERY.args(conn(), "\"declare variable $a external; $a\"",
+        " map { 'a': (1,<a/>,'a') }"), "1<a/>a");
     // query errors
     error(_CLIENT_QUERY.args(conn(), "x"), Err.NOCTX);
-    error(_CLIENT_QUERY.args(conn(), "\"$a\"", " map { 'a': (1,2) }"), Err.BXCL_ITEM);
   }
 
   /** Test method for the correct return of all XDM data types. */

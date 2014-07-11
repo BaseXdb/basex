@@ -1,4 +1,4 @@
-package org.basex.server;
+package org.basex.api.client;
 
 import java.io.*;
 
@@ -6,24 +6,23 @@ import org.basex.core.*;
 import org.basex.io.out.*;
 
 /**
- * <p>This class defines methods for evaluating commands, either locally or
- * via the client/server architecture.</p>
+ * <p>This class defines methods for executing commands, either locally or via the
+ * client/server architecture.</p>
  *
- * <p>The results of database commands are returned as strings. If an output
- * stream is specified in the constructor or with
- * {@link #setOutputStream(OutputStream)}, results are instead serialized
- * to that stream.
- * The class is implemented by the {@link ClientSession} and
- * {@link LocalSession} classes.</p>
+ * <p>The results of database commands are returned as strings. If an output stream is specified in
+ * the constructor or with {@link #setOutputStream(OutputStream)}, results are instead serialized
+ * to that stream.</p>
+ *
+ * <p>The class is implemented by the {@link ClientSession} and {@link LocalSession} classes.</p>
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
 public abstract class Session {
   /** Client output stream. */
-  OutputStream out;
+  protected OutputStream out;
   /** Command info. */
-  String info;
+  protected String info;
 
   /**
    * Executes a {@link Command} and returns the result as string or serializes
@@ -136,17 +135,19 @@ public abstract class Session {
 
   /**
    * Executes a command and prints the result to the specified output stream.
-   * @param cmd command to be parsed
-   * @param os output stream
+   * @param command command to be parsed
+   * @param output output stream
    * @throws IOException I/O exception
    */
-  protected abstract void execute(final String cmd, final OutputStream os) throws IOException;
+  protected abstract void execute(final String command, final OutputStream output)
+      throws IOException;
 
   /**
    * Executes a command and prints the result to the specified output stream.
-   * @param cmd command to be executed
-   * @param os output stream
+   * @param command command to be executed
+   * @param output output stream
    * @throws IOException I/O exception
    */
-  protected abstract void execute(final Command cmd, final OutputStream os) throws IOException;
+  protected abstract void execute(final Command command, final OutputStream output)
+      throws IOException;
 }

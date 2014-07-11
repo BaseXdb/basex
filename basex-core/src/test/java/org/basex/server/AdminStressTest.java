@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.concurrent.*;
 
 import org.basex.*;
+import org.basex.api.client.*;
 import org.basex.core.cmd.*;
 import org.basex.util.*;
 import org.junit.*;

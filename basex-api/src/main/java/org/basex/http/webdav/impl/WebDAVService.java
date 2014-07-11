@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.List;
 
+import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;

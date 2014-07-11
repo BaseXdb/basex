@@ -1,7 +1,7 @@
 package org.basex.performance;
 
 import org.basex.*;
-import org.basex.server.*;
+import org.basex.api.client.*;
 import org.basex.SandboxTest;
 import org.junit.*;
 
