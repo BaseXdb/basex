@@ -583,7 +583,7 @@ public final class FNDb extends StandardFunc {
   private Item replace(final QueryContext qc) throws QueryException {
     final Data data = checkData(qc);
     final String path = path(1, qc);
-    final NewInput input = checkInput(checkItem(exprs[2], qc), token(path));
+    final Item item = checkItem(exprs[2], qc);
     final Options opts = checkOptions(3, Q_OPTIONS, new Options(), qc);
 
     // remove old documents
@@ -597,11 +597,11 @@ public final class FNDb extends StandardFunc {
     // delete binary resources
     final IOFile bin = data.inMemory() ? null : data.meta.binary(path);
     if(bin != null) {
-      if(bin.exists()) {
+      if(bin.exists() || item instanceof Bin) {
         if(bin.isDir()) throw BXDB_DIR.get(info, path);
-        updates.add(new DBStore(data, path, input, info), qc);
+        updates.add(new DBStore(data, path, item, info), qc);
       } else {
-        updates.add(new DBAdd(data, input, opts, qc, info), qc);
+        updates.add(new DBAdd(data, checkInput(item, token(path)), opts, qc, info), qc);
       }
     }
     return null;
@@ -819,12 +819,13 @@ public final class FNDb extends StandardFunc {
   private Item store(final QueryContext qc) throws QueryException {
     final Data data = checkData(qc);
     final String path = path(1, qc);
+    final Item item = checkItem(exprs[2], qc);
+
     if(data.inMemory()) throw BXDB_MEM.get(info, data.meta.name);
     final IOFile file = data.meta.binary(path);
     if(file == null || file.isDir()) throw RESINV.get(info, path);
 
-    final Item it = checkItem(exprs[2], qc);
-    qc.resources.updates().add(new DBStore(data, path, it, info), qc);
+    qc.resources.updates().add(new DBStore(data, path, item, info), qc);
     return null;
   }
 
