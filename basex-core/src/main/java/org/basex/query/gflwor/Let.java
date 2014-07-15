@@ -106,6 +106,7 @@ public final class Let extends ForLet {
       var.refineType(expr.type(), qc, info);
     }
     size = score ? 1 : expr.size();
+    var.size = size;
     return this;
   }
 
@@ -122,8 +123,7 @@ public final class Let extends ForLet {
   }
 
   @Override
-  long calcSize(final long cnt) {
-    return cnt;
+  void calcSize(final long[] minMax) {
   }
 
   /**

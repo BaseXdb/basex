@@ -38,7 +38,7 @@ abstract class ForLet extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean has(final Flag flag) {
+  public final boolean has(final Flag flag) {
     return expr.has(flag);
   }
 

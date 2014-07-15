@@ -212,8 +212,7 @@ public final class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  long calcSize(final long cnt) {
-    return cnt;
+  void calcSize(final long[] minMax) {
   }
 
   @Override

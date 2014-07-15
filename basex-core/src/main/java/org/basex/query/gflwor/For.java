@@ -100,6 +100,7 @@ public final class For extends ForLet {
     if(pos != null) pos.refineType(SeqType.ITR, qc, info);
     if(score != null) score.refineType(SeqType.DBL, qc, info);
     size = emp ? -1 : 1;
+    var.size = size;
     return this;
   }
 
@@ -188,9 +189,14 @@ public final class For extends ForLet {
   }
 
   @Override
-  long calcSize(final long count) {
+  void calcSize(final long[] minMax) {
     final long sz = expr.size();
-    return sz < 0 ? -1 : sz > 0 ? sz * count : empty ? 1 : 0;
+    minMax[0] *= sz > 0 ? sz : empty ? 1 : 0;
+    if(sz < 0) {
+      minMax[1] = -1;
+    } else if(minMax[1] > 0) { // sz >= 0
+      minMax[1] *= sz;
+    }
   }
 
   @Override

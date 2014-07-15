@@ -306,8 +306,8 @@ public final class GroupBy extends GFLWOR.Clause {
   }
 
   @Override
-  long calcSize(final long cnt) {
-    return -1;
+  void calcSize(final long[] minMax) {
+    minMax[0] = Math.min(minMax[0], 1);
   }
 
   @Override

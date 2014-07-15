@@ -111,8 +111,9 @@ public final class Where extends GFLWOR.Clause {
   }
 
   @Override
-  long calcSize(final long cnt) {
-    return pred == Bln.FALSE ? 0 : -1;
+  void calcSize(final long[] minMax) {
+    minMax[0] = 0;
+    if(pred == Bln.FALSE) minMax[1] = 0;
   }
 
   @Override

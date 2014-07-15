@@ -49,8 +49,12 @@ public final class Count extends Clause {
 
   @Override
   boolean skippable(final Clause cl) {
+    if(!super.skippable(cl)) return false;
+
     // the clause should not change tuple counts
-    return super.skippable(cl) && cl.calcSize(1) == 1;
+    final long[] minMax = { 1, 1 };
+    cl.calcSize(minMax);
+    return minMax[0] == 1 && minMax[1] == 1;
   }
 
   @Override
@@ -80,8 +84,7 @@ public final class Count extends Clause {
   }
 
   @Override
-  public Clause inline(final QueryContext qc, final VarScope scp,
-      final Var v, final Expr e) {
+  public Clause inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e) {
     return null;
   }
 
@@ -103,8 +106,7 @@ public final class Count extends Clause {
   }
 
   @Override
-  long calcSize(final long cnt) {
-    return cnt;
+  void calcSize(final long[] minMax) {
   }
 
   @Override

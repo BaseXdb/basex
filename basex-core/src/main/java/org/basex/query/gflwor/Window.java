@@ -341,8 +341,9 @@ public final class Window extends Clause {
   }
 
   @Override
-  long calcSize(final long cnt) {
-    return expr.isEmpty() ? 0 : -1;
+  void calcSize(final long[] minMax) {
+    minMax[0] = 0;
+    if(expr.isEmpty()) minMax[1] = 0;
   }
 
   @Override

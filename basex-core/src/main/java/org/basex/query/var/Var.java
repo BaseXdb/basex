@@ -32,7 +32,7 @@ public final class Var extends ExprInfo {
   /** Stack slot number. */
   int slot = -1;
   /** Expected result size. */
-  long size = -1;
+  public long size = -1;
 
   /** Flag for function parameters. */
   private final boolean param;

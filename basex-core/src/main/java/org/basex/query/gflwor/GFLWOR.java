@@ -237,9 +237,12 @@ public final class GFLWOR extends ParseExpr {
     final long output = ret.size();
     if(output == 0) return 0;
 
-    long tuples = 1;
-    for(final Clause c : clauses) if((tuples = c.calcSize(tuples)) <= 0) break;
-    return tuples == 0 ? 0 : output < 0 || tuples < 0 ? -1 : tuples * output;
+    final long[] minMax = { 1, 1 };
+    for(final Clause c : clauses) {
+      c.calcSize(minMax);
+      if(minMax[1] == 0) break;
+    }
+    return output >= 0 && minMax[1] >= 0 && minMax[0] == minMax[1] ? minMax[1] * output : -1;
   }
 
   /**
@@ -552,15 +555,15 @@ public final class GFLWOR extends ParseExpr {
    * @return usage count
    */
   private VarUsage count(final Var v, final int p) {
-    long c = 1;
+    final long[] minMax = { 1, 1 };
     VarUsage uses = VarUsage.NEVER;
     final ListIterator<Clause> iter = clauses.listIterator(p);
     while(iter.hasNext()) {
       final Clause cl = iter.next();
-      uses = uses.plus(cl.count(v).times(c));
-      c = cl.calcSize(c);
+      uses = uses.plus(cl.count(v).times(minMax[1]));
+      cl.calcSize(minMax);
     }
-    return uses.plus(ret.count(v).times(c));
+    return uses.plus(ret.count(v).times(minMax[1]));
   }
 
   @Override
@@ -665,8 +668,11 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public void markTailCalls(final QueryContext qc) {
-    long n = 1;
-    for(final Clause c : clauses) if((n = c.calcSize(n)) != 1) return;
+    final long[] minMax = { 1, 1 };
+    for(final Clause c : clauses) {
+      c.calcSize(minMax);
+      if(minMax[1] < 0 || minMax[1] > 1) return;
+    }
     ret.markTailCalls(qc);
   }
 
@@ -821,10 +827,9 @@ public final class GFLWOR extends ParseExpr {
     }
 
     /**
-     * Calculates the number of results.
-     * @param count number of incoming tuples, must be greater than zero
-     * @return number of outgoing tuples if known, {@code -1} otherwise
+     * Calculates the minimum and maximum number of results.
+     * @param minMax minimum and maximum number of incoming tuples
      */
-    abstract long calcSize(long count);
+    abstract void calcSize(long[] minMax);
   }
 }
