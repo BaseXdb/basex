@@ -18,64 +18,65 @@ import org.basex.util.*;
 public final class FNProf extends StandardFunc {
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNProf(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNProf(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
-      case _PROF_MEM:  return mem(ctx);
-      case _PROF_TIME: return time(ctx);
-      default:         return super.iter(ctx);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    switch(func) {
+      case _PROF_MEM:  return mem(qc);
+      case _PROF_TIME: return time(qc);
+      default:         return super.iter(qc);
     }
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
-      case _PROF_SLEEP:      return sleep(ctx);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    switch(func) {
+      case _PROF_SLEEP:      return sleep(qc);
       case _PROF_CURRENT_MS: return Int.get(System.currentTimeMillis());
       case _PROF_CURRENT_NS: return Int.get(System.nanoTime());
-      case _PROF_DUMP:       return dump(ctx);
-      case _PROF_HUMAN:      return human(ctx);
-      case _PROF_VOID:       return voidd(ctx);
-      default:               return super.item(ctx, ii);
+      case _PROF_DUMP:       return dump(qc);
+      case _PROF_HUMAN:      return human(qc);
+      case _PROF_VOID:       return voidd(qc);
+      default:               return super.item(qc, ii);
     }
   }
 
   /**
    * Measures the memory consumption for the specified expression in MB.
-   * @param ctx query context
+   * @param qc query context
    * @return memory consumption
    * @throws QueryException query exception
    */
-  private Iter mem(final QueryContext ctx) throws QueryException {
+  private Iter mem(final QueryContext qc) throws QueryException {
     // measure initial memory consumption
     Performance.gc(3);
     final long min = Performance.memory();
 
     // optional message
-    final byte[] msg = expr.length > 2 ? checkStr(expr[2], ctx) : null;
+    final byte[] msg = exprs.length > 2 ? checkStr(exprs[2], qc) : null;
 
     // check caching flag
-    if(expr.length > 1 && checkBln(expr[1], ctx)) {
-      final Value v = ctx.value(expr[0]).cache().value();
-      dump(min, msg, ctx);
+    if(exprs.length > 1 && checkBln(exprs[1], qc)) {
+      final Value v = qc.value(exprs[0]).cache().value();
+      dump(min, msg, qc);
       return v.iter();
     }
 
     return new Iter() {
-      final Iter ir = expr[0].iter(ctx);
+      final Iter ir = exprs[0].iter(qc);
       @Override
       public Item next() throws QueryException {
         final Item it = ir.next();
-        if(it == null) dump(min, msg, ctx);
+        if(it == null) dump(min, msg, qc);
         return it;
       }
     };
@@ -83,30 +84,30 @@ public final class FNProf extends StandardFunc {
 
   /**
    * Dumps the items of a sequence.
-   * @param ctx query context
+   * @param qc query context
    * @return memory consumption
    * @throws QueryException query exception
    */
-  private Item dump(final QueryContext ctx) throws QueryException {
-    final Iter ir = expr[0].iter(ctx);
-    final byte[] label = expr.length > 1 ? checkStr(expr[1], ctx) : null;
+  private Item dump(final QueryContext qc) throws QueryException {
+    final Iter ir = exprs[0].iter(qc);
+    final byte[] label = exprs.length > 1 ? checkStr(exprs[1], qc) : null;
     boolean empty = true;
     for(Item it; (it = ir.next()) != null;) {
-      FNInfo.dump(it, label, info, ctx);
+      FNInfo.dump(it, label, info, qc);
       empty = false;
     }
-    if(empty) FNInfo.dump(null, label, info, ctx);
+    if(empty) FNInfo.dump(null, label, info, qc);
     return null;
   }
 
   /**
    * Materializes and swallows the input.
-   * @param ctx query context
+   * @param qc query context
    * @return memory consumption
    * @throws QueryException query exception
    */
-  private Item voidd(final QueryContext ctx) throws QueryException {
-    final Iter ir = expr[0].iter(ctx);
+  private Item voidd(final QueryContext qc) throws QueryException {
+    final Iter ir = exprs[0].iter(qc);
     for(Item it; (it = ir.next()) != null;) it.materialize(info);
     return null;
   }
@@ -115,51 +116,51 @@ public final class FNProf extends StandardFunc {
    * Dumps the memory consumption.
    * @param min initial memory usage
    * @param msg message (can be {@code null})
-   * @param ctx query context
+   * @param qc query context
    */
-  private static void dump(final long min, final byte[] msg, final QueryContext ctx) {
+  private static void dump(final long min, final byte[] msg, final QueryContext qc) {
     Performance.gc(2);
     final long max = Performance.memory();
     final long mb = Math.max(0, max - min);
-    FNInfo.dump(token(Performance.format(mb)), msg, ctx);
+    FNInfo.dump(token(Performance.format(mb)), msg, qc);
   }
 
   /**
    * Returns a human-readable version of the specified integer.
-   * @param ctx query context
+   * @param qc query context
    * @return memory consumption
    * @throws QueryException query exception
    */
-  private Item human(final QueryContext ctx) throws QueryException {
-    return Str.get(Performance.format(checkItr(expr[0], ctx), true));
+  private Item human(final QueryContext qc) throws QueryException {
+    return Str.get(Performance.format(checkItr(exprs[0], qc), true));
   }
 
   /**
    * Measures the execution time for the specified expression in milliseconds.
-   * @param ctx query context
+   * @param qc query context
    * @return time in milliseconds
    * @throws QueryException query exception
    */
-  private Iter time(final QueryContext ctx) throws QueryException {
+  private Iter time(final QueryContext qc) throws QueryException {
     // create timer
     final Performance p = new Performance();
 
     // optional message
-    final byte[] msg = expr.length > 2 ? checkStr(expr[2], ctx) : null;
+    final byte[] msg = exprs.length > 2 ? checkStr(exprs[2], qc) : null;
 
     // check caching flag
-    if(expr.length > 1 && checkBln(expr[1], ctx)) {
-      final Value v = ctx.value(expr[0]).cache().value();
-      FNInfo.dump(token(p.getTime()), msg, ctx);
+    if(exprs.length > 1 && checkBln(exprs[1], qc)) {
+      final Value v = qc.value(exprs[0]).cache().value();
+      FNInfo.dump(token(p.getTime()), msg, qc);
       return v.iter();
     }
 
     return new Iter() {
-      final Iter ir = expr[0].iter(ctx);
+      final Iter ir = exprs[0].iter(qc);
       @Override
       public Item next() throws QueryException {
         final Item it = ir.next();
-        if(it == null) FNInfo.dump(token(p.getTime()), msg, ctx);
+        if(it == null) FNInfo.dump(token(p.getTime()), msg, qc);
         return it;
       }
     };
@@ -167,12 +168,12 @@ public final class FNProf extends StandardFunc {
 
   /**
    * Sleeps for the specified number of milliseconds.
-   * @param ctx query context
+   * @param qc query context
    * @return {@code null}
    * @throws QueryException query exception
    */
-  private Item sleep(final QueryContext ctx) throws QueryException {
-    Performance.sleep(checkItr(expr[0], ctx));
+  private Item sleep(final QueryContext qc) throws QueryException {
+    Performance.sleep(checkItr(exprs[0], qc));
     return null;
   }
 }

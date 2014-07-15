@@ -3,7 +3,6 @@ package org.basex.util.ft;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.util.*;
 
 /**
  * This class contains language tokens which are valid for the xml:lang
@@ -24,9 +23,9 @@ import org.basex.util.*;
  */
 public final class Language implements Comparable<Language> {
   /** Available languages, indexed by language code. */
-  static final HashMap<String, Language> ALL = new HashMap<String, Language>();
+  static final HashMap<String, Language> ALL = new HashMap<>();
   /** Available languages, indexed by their display. */
-  private static final HashMap<String, Language> DISP = new HashMap<String, Language>();
+  private static final HashMap<String, Language> DISP = new HashMap<>();
 
   static {
     for(final Locale l : Locale.getAvailableLocales()) {
@@ -74,7 +73,7 @@ public final class Language implements Comparable<Language> {
    * @return default language
    */
   public static Language def() {
-    final Language lang = DISP.get(Prop.language);
+    final Language lang = DISP.get(MainOptions.LANGUAGE.value());
     return lang == null ? get("en") : lang;
   }
 

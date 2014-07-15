@@ -20,40 +20,40 @@ public abstract class FTFilter extends FTExpr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
+   * @param info input info
+   * @param expr expression
    */
-  FTFilter(final InputInfo ii, final FTExpr e) {
-    this(ii, e, FTUnit.WORDS);
+  FTFilter(final InputInfo info, final FTExpr expr) {
+    this(info, expr, FTUnit.WORDS);
   }
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
-   * @param u unit
+   * @param info input info
+   * @param expr expression
+   * @param unit unit
    */
-  FTFilter(final InputInfo ii, final FTExpr e, final FTUnit u) {
-    super(ii, e);
-    unit = u;
+  FTFilter(final InputInfo info, final FTExpr expr, final FTUnit unit) {
+    super(info, expr);
+    this.unit = unit;
   }
 
   @Override
-  public final FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final FTNode it = expr[0].item(ctx, info);
-    filter(ctx, it, ctx.ftToken);
+  public final FTNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final FTNode it = exprs[0].item(qc, info);
+    filter(qc, it, qc.ftToken);
     return it;
   }
 
   @Override
-  public final FTIter iter(final QueryContext ctx) throws QueryException {
-    final FTIter ir = expr[0].iter(ctx);
+  public final FTIter iter(final QueryContext qc) throws QueryException {
+    final FTIter ir = exprs[0].iter(qc);
     return new FTIter() {
       @Override
       public FTNode next() throws QueryException {
         FTNode it;
         while((it = ir.next()) != null) {
-          if(filter(ctx, it, content() ? new FTLexer().init(it.string(info)) : null)) break;
+          if(filter(qc, it, content() ? new FTLexer().init(it.string(info)) : null)) break;
         }
         return it;
       }
@@ -62,31 +62,31 @@ public abstract class FTFilter extends FTExpr {
 
   /**
    * Evaluates the position filters.
-   * @param ctx query context
+   * @param qc query context
    * @param item input node
    * @param lex tokenizer
    * @return result of check
    * @throws QueryException query exception
    */
-  final boolean filter(final QueryContext ctx, final FTNode item, final FTLexer lex)
+  private boolean filter(final QueryContext qc, final FTNode item, final FTLexer lex)
       throws QueryException {
 
     final FTMatches all = item.all;
     for(int a = 0; a < all.size(); a++) {
-      if(!filter(ctx, all.match[a], lex)) all.delete(a--);
+      if(!filter(qc, all.match[a], lex)) all.delete(a--);
     }
     return !all.isEmpty();
   }
 
   /**
    * Evaluates the filter expression.
-   * @param ctx query context
+   * @param qc query context
    * @param m full-text match
    * @param ft tokenizer
    * @return result of check
    * @throws QueryException query exception
    */
-  protected abstract boolean filter(final QueryContext ctx, final FTMatch m, final FTLexer ft)
+  protected abstract boolean filter(final QueryContext qc, final FTMatch m, final FTLexer ft)
       throws QueryException;
 
   /**
@@ -110,12 +110,12 @@ public abstract class FTFilter extends FTExpr {
   }
 
   @Override
-  public final boolean indexAccessible(final IndexCosts ic) throws QueryException {
-    return expr[0].indexAccessible(ic);
+  public final boolean indexAccessible(final IndexInfo ii) throws QueryException {
+    return exprs[0].indexAccessible(ii);
   }
 
   @Override
   public String toString() {
-    return expr[0] + " ";
+    return exprs[0] + " ";
   }
 }

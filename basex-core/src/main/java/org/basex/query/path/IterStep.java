@@ -17,29 +17,29 @@ import org.basex.util.hash.*;
 final class IterStep extends Step {
   /**
    * Constructor.
-   * @param ii input info
-   * @param a axis
-   * @param t node test
-   * @param p predicates
+   * @param info input info
+   * @param axis axis
+   * @param test node test
+   * @param preds predicates
    */
-  IterStep(final InputInfo ii, final Axis a, final Test t, final Expr[] p) {
-    super(ii, a, t, p);
+  IterStep(final InputInfo info, final Axis axis, final Test test, final Expr[] preds) {
+    super(info, axis, test, preds);
   }
 
   @Override
-  public NodeIter iter(final QueryContext ctx) {
+  public NodeIter iter(final QueryContext qc) {
     return new NodeIter() {
       AxisIter ai;
 
       @Override
       public ANode next() throws QueryException {
-        if(ai == null) ai = axis.iter(checkNode(ctx));
+        if(ai == null) ai = axis.iter(checkNode(qc));
         while(true) {
-          ctx.checkStop();
+          qc.checkStop();
           final ANode node = ai.next();
           if(node == null) return null;
           // evaluate node test and predicates
-          if(test.eq(node) && preds(node, ctx)) return node.finish();
+          if(test.eq(node) && preds(node, qc)) return node.finish();
         }
       }
 
@@ -52,10 +52,9 @@ final class IterStep extends Step {
   }
 
   @Override
-  public IterStep copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public IterStep copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final Expr[] pred = new Expr[preds.length];
-    for(int i = 0; i < pred.length; i++) pred[i] = preds[i].copy(ctx, scp, vs);
+    for(int i = 0; i < pred.length; i++) pred[i] = preds[i].copy(qc, scp, vs);
     return copy(new IterStep(info, axis, test.copy(), pred));
   }
 }

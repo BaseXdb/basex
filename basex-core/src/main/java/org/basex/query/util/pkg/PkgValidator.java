@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.util.pkg.Package.Component;
@@ -30,12 +29,12 @@ public final class PkgValidator {
 
   /**
    * Constructor.
-   * @param r repository context
-   * @param ii input info
+   * @param repo repository context
+   * @param info input info
    */
-  public PkgValidator(final Repo r, final InputInfo ii) {
-    repo = r;
-    info = ii;
+  public PkgValidator(final Repo repo, final InputInfo info) {
+    this.repo = repo;
+    this.info = info;
   }
 
   /**
@@ -58,7 +57,7 @@ public final class PkgValidator {
    * @throws QueryException query exception
    */
   private void checkDepends(final Package pkg) throws QueryException {
-    final ArrayList<Dependency> procs = new ArrayList<Dependency>();
+    final ArrayList<Dependency> procs = new ArrayList<>();
     for(final Dependency dep : pkg.dep) {
       // first check of dependency elements are consistently defined in the
       // descriptor
@@ -101,7 +100,7 @@ public final class PkgValidator {
     final int i = Prop.VERSION.indexOf(' ');
     final TokenSet versions = new TokenSet(token(i == -1 ? Prop.VERSION :
       Prop.VERSION.substring(0, i)));
-    final byte[] name = token(Text.PROJECT_NAME);
+    final byte[] name = token(Prop.PROJECT_NAME);
     for(final Dependency d : procs) {
       if(!eq(lc(d.processor), name)) {
         supported = false;

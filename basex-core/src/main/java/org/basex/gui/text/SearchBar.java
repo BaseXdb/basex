@@ -39,9 +39,9 @@ public final class SearchBar extends BaseXBack {
   /** Mode: multi-line. */
   final AbstractButton multi;
   /** Action: replace text. */
-  final AbstractButton rplc;
+  private final AbstractButton rplc;
   /** Action: close panel. */
-  final AbstractButton cls;
+  private final AbstractButton cls;
 
   /** GUI reference. */
   private final GUI gui;
@@ -68,12 +68,12 @@ public final class SearchBar extends BaseXBack {
     search = new BaseXTextField(main);
     search.history(GUIOptions.SEARCHED, gui);
     search.setPreferredSize(null);
-    search.hint(Text.FIND);
+    search.hint(Text.FIND + Text.DOTS);
 
     replace = new BaseXTextField(main);
     replace.history(GUIOptions.REPLACED, gui);
     replace.setPreferredSize(null);
-    replace.hint(Text.REPLACE_WITH);
+    replace.hint(Text.REPLACE_WITH + Text.DOTS);
 
     regex = onOffButton("f_regex", Text.REGULAR_EXPR, GUIOptions.SR_REGEX);
     mcase = onOffButton("f_case", Text.MATCH_CASE, GUIOptions.SR_CASE);
@@ -258,7 +258,7 @@ public final class SearchBar extends BaseXBack {
   /**
    * Searches text in the current editor.
    */
-  void search() {
+  private void search() {
     search(true);
   }
 
@@ -266,7 +266,7 @@ public final class SearchBar extends BaseXBack {
    * Searches text in the current editor.
    * @param jump jump to next hit
    */
-  void search(final boolean jump) {
+  private void search(final boolean jump) {
     final String text = isVisible() ? search.getText() : "";
     editor.search(new SearchContext(this, text), jump);
   }

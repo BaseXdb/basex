@@ -2,12 +2,15 @@ package org.basex.build;
 
 import static org.junit.Assert.*;
 
-import org.basex.core.*;
-import org.basex.core.cmd.*;
-import org.basex.query.*;
 import org.basex.*;
+import org.basex.core.*;
+import org.basex.core.MainOptions.MainParser;
+import org.basex.core.cmd.*;
+import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * Tests queries with path in it on collections.
@@ -85,6 +88,22 @@ public final class PathTest extends SandboxTest {
     weekTest();
     weekTest2();
   }
+
+  /**
+   * #905: Ensure that parser options will not affect doc() and collection().
+   * May be moved to a separate test class in future.
+   * @throws Exception exception
+   */
+  @Test
+  public void docParsing() throws Exception {
+    final IOFile path = new IOFile(sandbox(), "doc.xml");
+    path.write(Token.token("<a/>"));
+    context.options.set(MainOptions.PARSER, MainParser.JSON);
+    final QueryProcessor qp = new QueryProcessor("doc('" + path + "')", context);
+    assertEquals("<a/>", qp.execute().toString());
+    qp.close();
+  }
+
 
   /**
    * Checks the results of the query without index access.

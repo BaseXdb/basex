@@ -25,7 +25,7 @@ public final class FNames extends FNode {
   public FNames(final byte[] n, final byte[] v) {
     super(NodeType.NSP);
     name = n;
-    val = v;
+    value = v;
   }
 
   @Override
@@ -40,19 +40,19 @@ public final class FNames extends FNode {
 
   @Override
   public FNode copy() {
-    return new FNames(name, val);
+    return new FNames(name, value);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, name, VAL, val));
+    addPlan(plan, planElem(NAM, name, VAL, value));
   }
 
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder().add(' ').add(XMLNS);
     if(name.length != 0) tb.add(':').add(name);
-    return tb.add("=\"").add(Token.string(val).replaceAll("\"", "\"\"")).
+    return tb.add("=\"").add(Token.string(value).replaceAll("\"", "\"\"")).
         add('"').toString();
   }
 }

@@ -23,9 +23,9 @@ final class FTTokenizer {
   final FTOpt opt;
 
   /** Wildcard object cache. */
-  private final TokenObjMap<FTWildcard> wcCache = new TokenObjMap<FTWildcard>();
+  private final TokenObjMap<FTWildcard> wcCache = new TokenObjMap<>();
   /** Token cache. */
-  private final TokenObjMap<FTTokens> cache = new TokenObjMap<FTTokens>();
+  private final TokenObjMap<FTTokens> cache = new TokenObjMap<>();
   /** Token comparator. */
   private final TokenComparator cmp;
   /** Levenshtein reference. */
@@ -36,10 +36,10 @@ final class FTTokenizer {
   /**
    * Constructor.
    * @param w full-text words
-   * @param ctx query context
+   * @param qc query context
    */
-  FTTokenizer(final FTWords w, final QueryContext ctx) {
-    this(w, ctx.ftOpt(), new Levenshtein(ctx.context.options.get(MainOptions.LSERROR)));
+  FTTokenizer(final FTWords w, final QueryContext qc) {
+    this(w, qc.ftOpt(), new Levenshtein(qc.context.options.get(MainOptions.LSERROR)));
   }
 
   /**

@@ -21,7 +21,7 @@ import org.basex.util.list.*;
  */
 public final class Users {
   /** User array. */
-  private final ArrayList<User> list = new ArrayList<User>(0);
+  private final ArrayList<User> list = new ArrayList<>(0);
   /** Filename; set to {@code null} if the instance handles local users. */
   private IOFile file;
 
@@ -38,16 +38,10 @@ public final class Users {
     if(!file.exists()) file = new IOFile(Prop.HOME, perm);
 
     if(file.exists()) {
-      DataInput in = null;
-      try {
-        in = new DataInput(file);
+      try(DataInput in = new DataInput(file)) {
         read(in);
       } catch(final IOException ex) {
         Util.errln(ex);
-      } finally {
-        if(in != null) try {
-          in.close();
-        } catch (final IOException ignored) { }
       }
     } else {
       // define default admin user with all rights
@@ -74,10 +68,8 @@ public final class Users {
    */
   public synchronized void write() {
     if(file == null) return;
-    try {
-      final DataOutput out = new DataOutput(file);
+    try(final DataOutput out = new DataOutput(file)) {
       write(out);
-      out.close();
     } catch(final IOException ex) {
       Util.debug(ex);
     }
@@ -202,7 +194,7 @@ public final class Users {
    * @return user information
    */
   public synchronized User[] users(final Users users) {
-    final ArrayList<User> al = new ArrayList<User>();
+    final ArrayList<User> al = new ArrayList<>();
     for(final User user : list) {
       if(users == null || users.get(user.name) != null) al.add(user);
     }

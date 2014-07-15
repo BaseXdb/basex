@@ -7,12 +7,12 @@ import java.io.*;
 
 import javax.swing.*;
 
+import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.List;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.*;
-import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -238,7 +238,7 @@ final class DialogUser extends BaseXBack {
    * Sets new data.
    * @throws IOException I/O exception
    */
-  void setData() throws IOException {
+  private void setData() throws IOException {
     users = table(null);
 
     if(global) {

@@ -35,24 +35,31 @@ public final class FNXQueryTest extends AdvancedQueryTest {
     error(_XQUERY_EVAL.args("declare %updating function local:x() {()}; local:x()"),
         Err.BXXQ_UPDATING);
     query(_XQUERY_EVAL.args("declare %updating function local:x() {()}; 1"));
-    query(_XQUERY_EVAL.args("\"" + DOC.args(PATH).replace('"', '\'') + "\""));
+    query(_XQUERY_EVAL.args('"' + DOC.args(PATH).replace('"', '\'') + '"'));
 
     // check additional options
+    query(_DB_CREATE.args('"' + NAME + '"'));
+    query("try{ " + _XQUERY_EVAL.args("\"(1 to 10000000000000)[.=0]\"", " map{}",
+        " map{ 'timeout':'1'}") + " } catch * { () }", "");
+    error(_XQUERY_EVAL.args("\"doc('" + NAME + "')\"", " map{}", " map{ 'permission':'none'}"),
+        Err.BXXQ_PERM);
+    error(_XQUERY_EVAL.args("\"db:open('" + NAME + "')\"", " map{}", " map{ 'permission':'none'}"),
+        Err.BXDB_OPEN);
     error(_XQUERY_EVAL.args("\"file:exists('x')\"", " map{}", " map{ 'permission':'none'}"),
         Err.BXXQ_PERM);
     error(_XQUERY_EVAL.args("\"(1 to 10000000000000)[.=0]\"", " map{}", " map{ 'timeout':'1'}"),
         Err.BXXQ_STOPPED);
-    error(_XQUERY_EVAL.args("1 to 10000000000000", " map{}", " map{ 'memory':'10'}"),
+    error(_XQUERY_EVAL.args("\"(1 to 10000000000000) ! <a/>\"", " map{}", " map{ 'memory':'10'}"),
         Err.BXXQ_STOPPED);
   }
 
   /** Test method. */
   @Test
-  public void evaluate() {
-    query(_XQUERY_EVALUATE.args("1"), 1);
-    query(_XQUERY_EVALUATE.args("\"" + DOC.args(PATH).replace('"', '\'') + "\""));
-    error(_XQUERY_EVALUATE.args("\"" + _DB_OPEN.args("X").replace('"', '\'') + "\""),
-        Err.BXXQ_NEWDB);
+  public void update() {
+    query(_XQUERY_UPDATE.args("delete node <a/>"));
+    query(_XQUERY_UPDATE.args("\"db:output('1')\""), "1");
+    query(_XQUERY_UPDATE.args(" '()'"));
+    error(_XQUERY_UPDATE.args("1"), Err.BXXQ_NOUPDATE);
   }
 
   /** Test method. */

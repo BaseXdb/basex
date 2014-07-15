@@ -17,37 +17,37 @@ import org.basex.util.*;
  */
 public final class NameTest extends Test {
   /** Local name. */
-  public final byte[] ln;
+  public final byte[] local;
   /** Default element namespace. */
   private final byte[] defElemNS;
 
   /**
    * Empty constructor ('*').
-   * @param att attribute flag
+   * @param attr attribute flag
    */
-  public NameTest(final boolean att) {
-    this(null, Mode.ALL, att, null);
+  public NameTest(final boolean attr) {
+    this(null, Kind.WILDCARD, attr, null);
   }
 
   /**
    * Constructor.
-   * @param nm name
-   * @param t type of name test
-   * @param att attribute flag
-   * @param elemNS default element namespace
+   * @param name name (may be {@code null})
+   * @param mode type of name test
+   * @param attr attribute flag
+   * @param elemNS default element namespace (may be {@code null})
    */
-  public NameTest(final QNm nm, final Mode t, final boolean att, final byte[] elemNS) {
-    type = att ? NodeType.ATT : NodeType.ELM;
-    ln = nm != null ? nm.local() : null;
+  public NameTest(final QNm name, final Kind mode, final boolean attr, final byte[] elemNS) {
+    type = attr ? NodeType.ATT : NodeType.ELM;
+    local = name != null ? name.local() : null;
     defElemNS = elemNS != null ? elemNS : Token.EMPTY;
-    name = nm;
-    mode = t;
+    this.name = name;
+    this.kind = mode;
   }
 
   @Override
-  public boolean compile(final QueryContext ctx) {
+  public boolean optimize(final QueryContext qc) {
     // skip optimizations if data reference cannot be determined statically
-    final Data data = ctx.data();
+    final Data data = qc.data();
     if(data == null) return true;
 
     // skip optimizations if more than one namespace is defined in the database
@@ -56,10 +56,10 @@ public final class NameTest extends Test {
 
     // check if test may yield results
     boolean results = true;
-    if(mode == Mode.STD && !name.hasURI()) {
+    if(kind == Kind.URI_NAME && !name.hasURI()) {
       if(type == NodeType.ATT || Token.eq(dataNS, defElemNS)) {
         // namespace is irrelevant/identical: only check local name
-        mode = Mode.LN;
+        kind = Kind.NAME;
       } else {
         // element and db default namespaces are different: no results
         results = false;
@@ -67,10 +67,10 @@ public final class NameTest extends Test {
     }
 
     // check existence of tag/attribute names
-    if(results) results = mode != Mode.LN ||
-        (type == NodeType.ELM ? data.tagindex : data.atnindex).contains(ln);
+    if(results) results = kind != Kind.NAME ||
+        (type == NodeType.ELM ? data.tagindex : data.atnindex).contains(local);
 
-    if(!results) ctx.compInfo(OPTNAME, name);
+    if(!results) qc.compInfo(OPTNAME, name);
     return results;
   }
 
@@ -84,16 +84,16 @@ public final class NameTest extends Test {
     // only elements and attributes will yield results
     if(node.type != type) return false;
 
-    switch(mode) {
+    switch(kind) {
       // wildcard: accept all nodes
-      case ALL: return true;
+      case WILDCARD: return true;
       // namespaces wildcard: only check local name
-      case LN: return Token.eq(ln, Token.local(node.name()));
+      case NAME: return Token.eq(local, Token.local(node.name()));
       // name wildcard: only check namespace
-      case NS: return Token.eq(name.uri(), node.qname(tmpq).uri());
+      case URI: return Token.eq(name.uri(), node.qname(tmpq).uri());
       // check attributes, or check everything
       default: return type == NodeType.ATT && !name.hasURI() ?
-        Token.eq(ln, node.name()) : name.eq(node.qname(tmpq));
+        Token.eq(local, node.name()) : name.eq(node.qname(tmpq));
     }
   }
 
@@ -103,29 +103,48 @@ public final class NameTest extends Test {
    * @return result of check
    */
   public boolean eq(final QNm nm) {
-    switch(mode) {
+    switch(kind) {
       // wildcard: accept all nodes
-      case ALL:  return true;
+      case WILDCARD: return true;
       // namespaces wildcard: only check local name
-      case LN: return Token.eq(ln, nm.local());
+      case NAME: return Token.eq(local, nm.local());
       // name wildcard: only check namespace
-      case NS: return Token.eq(name.uri(), nm.uri());
+      case URI: return Token.eq(name.uri(), nm.uri());
       // check everything
       default: return name.eq(nm);
     }
   }
 
-  @Override
-  public String toString() {
-    if(mode == Mode.ALL) return "*";
-    if(mode == Mode.LN) return "*:" + Token.string(name.string());
-    final String uri = name.uri().length == 0 || name.hasPrefix() ? "" :
-      '{' + Token.string(name.uri()) + '}';
-    return uri + (mode == Mode.NS ? "*" : Token.string(name.string()));
+  /**
+   * Checks if the specified test is equals to this test.
+   * @param test test to be compared
+   * @return result of check
+   */
+  public boolean eq(final NameTest test) {
+    if(kind != test.kind) return false;
+    switch(kind) {
+      // wildcard: accept all nodes
+      case WILDCARD: return true;
+      // namespaces wildcard: only check local name
+      case NAME: return Token.eq(local, test.local);
+      // name wildcard: only check namespace
+      case URI: return Token.eq(name.uri(), test.name.uri());
+      // check everything
+      default: return name.eq(test.name);
+    }
   }
 
   @Override
   public Test intersect(final Test other) {
     throw Util.notExpected(other);
+  }
+
+  @Override
+  public String toString() {
+    if(kind == Kind.WILDCARD) return "*";
+    if(kind == Kind.NAME) return "*:" + Token.string(name.string());
+    final String uri = name.uri().length == 0 || name.hasPrefix() ? "" :
+      '{' + Token.string(name.uri()) + '}';
+    return uri + (kind == Kind.URI ? "*" : Token.string(name.string()));
   }
 }

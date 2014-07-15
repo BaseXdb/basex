@@ -12,12 +12,27 @@ import org.basex.query.*;
  * @author Christian Gruen
  */
 abstract class CmdParser {
+  /** Input lines. */
+  final String input;
+  /** Context. */
+  final Context ctx;
+
   /** Suggest possible completions. */
   boolean suggest;
   /** Single command flag. */
   boolean single;
   /** Password reader. */
   PasswordReader pwReader;
+
+  /**
+   * Constructor.
+   * @param input input
+   * @param context context
+   */
+  CmdParser(final String input, final Context context) {
+    ctx = context;
+    this.input = input;
+  }
 
   /**
    * Attaches a password reader.

@@ -6,6 +6,7 @@ import static org.basex.query.util.Err.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.up.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -33,34 +34,34 @@ public final class Insert extends Update {
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
+   * @param sc static context
+   * @param info input info
    * @param src source expression
-   * @param f first flag
-   * @param l last
-   * @param b before
-   * @param a after
-   * @param tr target expression
+   * @param first first flag
+   * @param last last
+   * @param before before
+   * @param after after
+   * @param trg target expression
    */
-  public Insert(final StaticContext sctx, final InputInfo ii, final Expr src,
-      final boolean f, final boolean l, final boolean b, final boolean a, final Expr tr) {
-    super(sctx, ii, tr, src);
-    first = f;
-    last = l;
-    before = b;
-    after = a;
+  public Insert(final StaticContext sc, final InputInfo info, final Expr src, final boolean first,
+      final boolean last, final boolean before, final boolean after, final Expr trg) {
+    super(sc, info, trg, src);
+    this.first = first;
+    this.last = last;
+    this.before = before;
+    this.after = after;
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Constr c = new Constr(ii, sc).add(ctx, expr[1]);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Constr c = new Constr(ii, sc).add(qc, exprs[1]);
     final ANodeList cList = c.children;
     final ANodeList aList = c.atts;
     if(c.errAtt) throw UPNOATTRPER.get(info);
     if(c.duplAtt != null) throw UPATTDUPL.get(info, new QNm(c.duplAtt));
 
     // check target constraints
-    final Iter t = ctx.iter(expr[0]);
+    final Iter t = qc.iter(exprs[0]);
     final Item i = t.next();
     if(i == null) throw UPSEQEMP.get(info, Util.className(this));
     if(!(i instanceof ANode) || t.next() != null)
@@ -77,39 +78,40 @@ public final class Insert extends Update {
         throw UPTRGTYP.get(info);
     }
 
-    UpdatePrimitive up;
+    NodeUpdate up;
     DBNode dbn;
     // no update primitive is created if node list is empty
+    final Updates updates = qc.resources.updates();
     if(!aList.isEmpty()) {
       final ANode targ = before || after ? par : n;
       if(targ.type != NodeType.ELM) throw (before || after ? UPATTELM : UPATTELM2).get(info);
 
-      dbn = ctx.updates.determineDataRef(targ, ctx);
+      dbn = updates.determineDataRef(targ, qc);
       up = new InsertAttribute(dbn.pre, dbn.data, info, checkNS(aList, targ));
-      ctx.updates.add(up, ctx);
+      updates.add(up, qc);
     }
 
     // no update primitive is created if node list is empty
     if(!cList.isEmpty()) {
-      dbn = ctx.updates.determineDataRef(n, ctx);
+      dbn = updates.determineDataRef(n, qc);
       if(before) up = new InsertBefore(dbn.pre, dbn.data, info, cList);
       else if(after) up = new InsertAfter(dbn.pre, dbn.data, info, cList);
       else if(first) up = new InsertIntoAsFirst(dbn.pre, dbn.data, info, cList);
       else if(last) up = new InsertIntoAsLast(dbn.pre, dbn.data, info, cList);
       else up = new InsertInto(dbn.pre, dbn.data, info, cList);
-      ctx.updates.add(up, ctx);
+      updates.add(up, qc);
     }
     return null;
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Insert(sc, info, expr[1].copy(ctx, scp, vs), first, last, before, after,
-        expr[0].copy(ctx, scp, vs));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new Insert(sc, info, exprs[1].copy(qc, scp, vs), first, last, before, after,
+        exprs[0].copy(qc, scp, vs));
   }
 
   @Override
   public String toString() {
-    return INSERT + ' ' + NODE + ' ' + expr[1] + ' ' + INTO + ' ' + expr[0];
+    return INSERT + ' ' + NODE + ' ' + exprs[1] + ' ' + INTO + ' ' + exprs[0];
   }
 }

@@ -3,9 +3,10 @@ package org.basex.http.webdav;
 import java.io.*;
 import java.util.*;
 
+import org.basex.util.*;
+
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.Request.Method;
-import org.basex.util.*;
 
 /**
  * Dummy resource to be returned when no authorization is provided.
@@ -14,7 +15,7 @@ import org.basex.util.*;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-final class BXNotAuthorizedResource implements FolderResource {
+final class BXNotAuthorizedResource implements FolderResource, LockableResource {
   /** The only instance of this class. */
   public static final Resource NOAUTH = new BXNotAuthorizedResource();
 
@@ -112,6 +113,26 @@ final class BXNotAuthorizedResource implements FolderResource {
 
   @Override
   public String checkRedirect(final Request request) {
+    return null;
+  }
+
+  @Override
+  public LockResult lock(final LockTimeout lockTimeout, final LockInfo lockInfo) {
+    return null;
+  }
+
+  @Override
+  public LockResult refreshLock(final String s) {
+    return null;
+  }
+
+  @Override
+  public void unlock(final String s) {
+
+  }
+
+  @Override
+  public LockToken getCurrentLock() {
     return null;
   }
 }

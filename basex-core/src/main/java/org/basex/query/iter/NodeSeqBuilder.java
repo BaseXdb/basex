@@ -37,12 +37,12 @@ public final class NodeSeqBuilder extends AxisIter {
 
   /**
    * Lightweight constructor, assigning the specified array of sorted nodes.
-   * @param it node array
-   * @param s size
+   * @param nodes node array
+   * @param size size
    */
-  public NodeSeqBuilder(final ANode[] it, final int s) {
-    nodes = it;
-    size = s;
+  public NodeSeqBuilder(final ANode[] nodes, final int size) {
+    this.nodes = nodes;
+    this.size = size;
   }
 
   /**

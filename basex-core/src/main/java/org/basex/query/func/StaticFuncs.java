@@ -26,7 +26,7 @@ import org.basex.util.list.*;
  */
 public final class StaticFuncs extends ExprInfo {
   /** User-defined functions. */
-  private final TokenObjMap<FuncCache> funcs = new TokenObjMap<FuncCache>();
+  private final TokenObjMap<FuncCache> funcs = new TokenObjMap<>();
 
   /**
    * returns the signature of the function with the given name and arity.
@@ -131,7 +131,7 @@ public final class StaticFuncs extends ExprInfo {
             if(a != 0) exp.append(a + 1 < as ? "," : " or ");
             exp.append(al.get(a));
           }
-          final int a = call.expr.length;
+          final int a = call.exprs.length;
           throw (a == 1 ? FUNCTYPESG : FUNCTYPEPL).get(call.info, call.name.string(), a, exp);
         }
 
@@ -142,6 +142,7 @@ public final class StaticFuncs extends ExprInfo {
 
       if(call != null) {
         if(fc.func.expr == null) throw FUNCNOIMPL.get(call.info, call.name.string());
+        // set updating flag; this will trigger checks in {@link QueryContext#check}
         qc.updating |= fc.func.updating;
       }
       id++;
@@ -158,12 +159,12 @@ public final class StaticFuncs extends ExprInfo {
 
   /**
    * Compiles the functions.
-   * @param ctx query context
+   * @param qc query context
    */
-  public void compile(final QueryContext ctx) {
+  public void compile(final QueryContext qc) {
     // only compile those functions that are used
     for(final FuncCache fc : funcs.values()) {
-      if(!fc.calls.isEmpty()) fc.func.compile(ctx);
+      if(!fc.calls.isEmpty()) fc.func.compile(qc);
     }
   }
 
@@ -176,8 +177,8 @@ public final class StaticFuncs extends ExprInfo {
    * @return function if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public StaticFunc get(final QNm name, final long arity, final InputInfo ii,
-      final boolean error) throws QueryException {
+  public StaticFunc get(final QNm name, final long arity, final InputInfo ii, final boolean error)
+      throws QueryException {
 
     final FuncCache fc = funcs.get(sig(name, arity));
     if(fc != null) return fc.func;
@@ -196,20 +197,19 @@ public final class StaticFuncs extends ExprInfo {
    * @return exception
    */
   public QueryException similarError(final QNm name, final InputInfo ii) {
-    // find global function
-    QueryException qe = Functions.get().similarError(name, ii);
-    if(qe == null) {
-      // find local functions
-      final Levenshtein ls = new Levenshtein();
-      final byte[] nm = lc(name.local());
-      for(final FuncCache fc : funcs.values()) {
-        final StaticFunc sf = fc.func;
-        if(sf != null && sf.expr != null && ls.similar(nm, lc(sf.name.local()))) {
-          qe = FUNCSIMILAR.get(ii, name.string(), sf.name.string());
-          break;
-        }
+    // find local functions
+    QueryException qe = null;
+    final Levenshtein ls = new Levenshtein();
+    final byte[] nm = lc(name.local());
+    for(final FuncCache fc : funcs.values()) {
+      final StaticFunc sf = fc.func;
+      if(sf != null && sf.expr != null && ls.similar(nm, lc(sf.name.local()))) {
+        qe = FUNCSIMILAR.get(ii, name.string(), sf.name.string());
+        break;
       }
     }
+    // find global function
+    if(qe == null) qe = Functions.get().similarError(name, ii);
     return qe;
   }
 
@@ -240,7 +240,7 @@ public final class StaticFuncs extends ExprInfo {
     final StringBuilder sb = new StringBuilder();
     for(final FuncCache fc : funcs.values()) {
       if(fc.func != null && fc.func.compiled()) {
-        sb.append(fc.func.toString()).append(Text.NL);
+        sb.append(fc.func).append(Text.NL);
       }
     }
     return sb.toString();
@@ -249,7 +249,7 @@ public final class StaticFuncs extends ExprInfo {
   /** Function cache. */
   private static class FuncCache {
     /** Function calls. */
-    final ArrayList<StaticFuncCall> calls = new ArrayList<StaticFuncCall>(0);
+    final ArrayList<StaticFuncCall> calls = new ArrayList<>(0);
     /** Function. */
     StaticFunc func;
 
@@ -288,9 +288,9 @@ public final class StaticFuncs extends ExprInfo {
 
       if(func == null) {
         // [LW] should be deferred until the actual types are known (i.e. compile time)
-        return new TypedFunc(call, new Ann(), FuncType.arity(args.length));
+        return new TypedFunc(call, new Ann());
       }
-      return new TypedFunc(call.init(func), func.ann, func.funcType());
+      return new TypedFunc(call.init(func), func.ann);
     }
 
     /**

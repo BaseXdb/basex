@@ -2,7 +2,7 @@ package org.basex.performance;
 
 import org.basex.core.cmd.*;
 import org.basex.*;
-import org.junit.*;
+import org.junit.Test;
 
 /**
  * Performs bulk updates with standalone version.

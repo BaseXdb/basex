@@ -86,8 +86,7 @@ public final class SAXWrapper extends SingleParser {
     } catch(final Exception ex) {
       // occurs, e.g. if document encoding is invalid:
       // prefix message with source id
-      String msg = Util.message(ex);
-      if(in != null) msg = '"' + in + '"' + COLS + msg;
+      final String msg = '"' + in + '"' + COLS + Util.message(ex);
       // wrap and return original message
       throw new IOException(msg, ex);
     } finally {
@@ -112,7 +111,7 @@ public final class SAXWrapper extends SingleParser {
    * @throws IOException I/O exception
    */
   private InputSource wrap(final InputSource is) throws IOException {
-    if(is == null) return is;
+    if(is == null) return null;
 
     // choose input stream
     final InputStream in;

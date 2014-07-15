@@ -1,5 +1,7 @@
 package org.basex.query.up;
 
+import java.util.*;
+
 import org.basex.data.*;
 import org.basex.data.atomic.*;
 import org.basex.query.*;
@@ -28,12 +30,12 @@ import org.basex.util.list.*;
  * <p>Updates work like the following:</p>
  *
  * <ol>
- * <li> Each call of an updating expression creates an {@link UpdatePrimitive}.</li>
+ * <li> Each call of an updating expression creates an {@link NodeUpdate}.</li>
  * <li> All update primitives for a snapshot/query are collected here.</li>
  * <li> Primitives are kept separately for each database that is addressed. This
  *      way we can operate on PRE values instead of node IDs, skip mapping
  *      overhead and further optimize the process.
- *      {@link DatabaseUpdates}</li>
+ *      {@link DataUpdates}</li>
  * <li> Primitives are further kept separately for each database node - each
  *      individual target PRE value. There's a specific container for this:
  *      {@link NodeUpdates}</li>
@@ -43,8 +45,8 @@ import org.basex.util.list.*;
  * <li> After the query has been parsed and all update primitives have been added
  *      to the list, constraints, which cannot be taken care of on the fly, are
  *      checked. If no problems occur, updates are TO BE carried out.</li>
- * <li> Before applying the updates the {@link UpdatePrimitiveComparator} helps to order
- *      {@link UpdatePrimitive} for execution. Each primitive then creates a sequence of
+ * <li> Before applying the updates the {@link NodeUpdateComparator} helps to order
+ *      {@link NodeUpdate} for execution. Each primitive then creates a sequence of
  *      {@link BasicUpdate} which are passed to the {@link Data} layer via an
  *      {@link AtomicUpdateCache}. This list takes care of optimization and also text node
  *      merging.</li>
@@ -61,17 +63,17 @@ public final class Updates {
 
   /** Mapping between fragment IDs and the temporary data instances
    * to apply updates on the corresponding fragments. */
-  private final IntObjMap<MemData> fragmentIDs = new IntObjMap<MemData>();
+  private final IntObjMap<MemData> fragmentIDs = new IntObjMap<>();
 
   /**
    * Adds an update primitive to the current context modifier.
    * @param up update primitive
-   * @param ctx query context
+   * @param qc query context
    * @throws QueryException query exception
    */
-  public void add(final Operation up, final QueryContext ctx) throws QueryException {
+  public void add(final Update up, final QueryContext qc) throws QueryException {
     if(mod == null) mod = new DatabaseModifier();
-    mod.add(up, ctx);
+    mod.add(up, qc);
   }
 
   /**
@@ -82,10 +84,10 @@ public final class Updates {
    * database table are calculated. Otherwise a new data instance is created.
    *
    * @param target target fragment
-   * @param ctx query context
+   * @param qc query context
    * @return database node created from input fragment
    */
-  public DBNode determineDataRef(final ANode target, final QueryContext ctx) {
+  public DBNode determineDataRef(final ANode target, final QueryContext qc) {
     if(target instanceof DBNode) return (DBNode) target;
 
     // determine highest ancestor node
@@ -100,16 +102,23 @@ public final class Updates {
     MemData data = fragmentIDs.get(ancID);
     // if data doesn't exist, create a new one
     if(data == null) {
-      data =  (MemData) anc.dbCopy(ctx.context.options).data;
+      data =  (MemData) anc.dbCopy(qc.context.options).data;
       // create a mapping between the fragment id and the data reference
       fragmentIDs.put(ancID, data);
     }
 
     // determine the pre value of the target node within its database
-    final int trgID = target.id;
-    final int pre = preSteps(anc, trgID);
-
+    final int pre = preSteps(anc, target.id);
     return new DBNode(data, pre);
+  }
+
+  /**
+   * Prepares update operations.
+   * @return updated data references
+   * @throws QueryException query exception
+   */
+  public HashSet<Data> prepare() throws QueryException {
+    return mod == null ? null : mod.prepare();
   }
 
   /**

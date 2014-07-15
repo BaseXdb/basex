@@ -105,7 +105,7 @@ final class MapRects implements Iterable<MapRect> {
 
   @Override
   public Iterator<MapRect> iterator() {
-    return new ArrayIterator<MapRect>(list, size);
+    return new ArrayIterator<>(list, size);
   }
 
   /**

@@ -47,6 +47,8 @@ public final class FNInspectTest extends AdvancedQueryTest {
     query(func + "/annotation/@uri/data()", "http://www.w3.org/2012/xquery");
     query(func + "/return/@type/data()", "xs:integer");
     query(func + "/return/@occurrence/data()", "");
+
+    query(_INSPECT_FUNCTION.args(" %db:f function() {()}") + "/annotation/@name = 'db:f'", "true");
   }
 
   /** Test method. */
@@ -82,8 +84,7 @@ public final class FNInspectTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void context() {
-    final String func = query("declare function local:x() { 1 }; " +
-        _INSPECT_CONTEXT.args());
+    final String func = query("declare function local:x() { 1 }; " + _INSPECT_CONTEXT.args());
     query(func + "/name()", "context");
     query(COUNT.args(func + "/function"), "1");
     query(func + "/function/@name/string()", "local:x");
@@ -92,13 +93,13 @@ public final class FNInspectTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void functions() {
-    query("declare function local:x() { 1 }; " +
-        COUNT.args(_INSPECT_FUNCTIONS.args()), "1");
-    query("declare function local:x() { 2 }; " +
-        _INSPECT_FUNCTIONS.args() + "()", "2");
+    query("declare function local:x() { 1 }; " + COUNT.args(_INSPECT_FUNCTIONS.args()), "1");
+    query("declare function local:x() { 2 }; " + _INSPECT_FUNCTIONS.args() + "()", "2");
     query("import module namespace hello='world' at 'src/test/resources/hello.xqm';" +
-        "inspect:functions()[last()] instance of function(*)",
-        "true"
-        );
+        "inspect:functions()[last()] instance of function(*)", "true");
+
+    query("for $f in " + _INSPECT_FUNCTIONS.args("src/test/resources/hello.xqm")
+        + "where local-name-from-QName(function-name($f)) = 'world' "
+        + "return $f()", "hello world");
   }
 }

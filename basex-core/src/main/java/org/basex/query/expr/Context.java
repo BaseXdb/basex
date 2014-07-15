@@ -1,11 +1,8 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
-
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -15,7 +12,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Context item.
+ * Context item (or value).
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
@@ -23,36 +20,32 @@ import org.basex.util.hash.*;
 public final class Context extends Simple {
   /**
    * Constructor.
-   * @param ii input info
+   * @param info input info
    */
-  public Context(final InputInfo ii) {
-    super(ii);
-    type = SeqType.ITEM;
-    size = 1;
+  public Context(final InputInfo info) {
+    super(info);
+    type = SeqType.ITEM_ZM;
   }
 
   @Override
-  public Context compile(final QueryContext ctx, final VarScope scp) {
-    if(ctx.value != null) {
-      type = ctx.value.type();
-      size = ctx.value.size();
-    }
+  public Context compile(final QueryContext qc, final VarScope scp) {
+    if(qc.value != null) type = qc.value.type();
     return this;
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    return checkCtx(ctx).iter();
+  public Iter iter(final QueryContext qc) throws QueryException {
+    return checkCtx(qc).iter();
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    return checkCtx(ctx);
+  public Value value(final QueryContext qc) throws QueryException {
+    return checkCtx(qc);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return checkCtx(ctx).item(ctx, info);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return checkCtx(qc).item(qc, info);
   }
 
   @Override
@@ -66,21 +59,13 @@ public final class Context extends Simple {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     return copyType(new Context(info));
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
     return visitor.lock(DBLocking.CTX) && super.accept(visitor);
-  }
-
-  @Override
-  public Expr addText(final QueryContext ctx) {
-    // replacing context node with text() node to facilitate index rewritings
-    if(!ctx.leaf) return this;
-    ctx.compInfo(OPTTEXT);
-    return Path.get(info, null, Step.get(info, Axis.CHILD, Test.TXT));
   }
 
   @Override

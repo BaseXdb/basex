@@ -60,7 +60,7 @@ public final class GUI extends AGUI {
   /** Fullscreen flag. */
   public boolean fullscreen;
   /** Result panel. */
-  public final GUIMenu menu;
+  private final GUIMenu menu;
   /** Button panel. */
   public final BaseXBack buttons;
   /** Navigation/input panel. */
@@ -222,7 +222,7 @@ public final class GUI extends AGUI {
       }
     });
 
-    go = BaseXButton.get("c_go", EXECUTE_QUERY, false, this);
+    go = BaseXButton.get("c_go", RUN_QUERY, false, this);
     go.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -371,7 +371,7 @@ public final class GUI extends AGUI {
    * @param edit call from editor panel
    * @return success flag
    */
-  boolean exec(final Command cmd, final boolean edit) {
+  private boolean exec(final Command cmd, final boolean edit) {
     // wait when command is still running
     final int thread = ++threadID;
     while(true) {
@@ -391,7 +391,7 @@ public final class GUI extends AGUI {
 
       final Data data = context.data();
       // reset current context if realtime filter is activated
-      if(gopts.get(GUIOptions.FILTERRT) && data != null && !context.root()) context.update();
+      if(gopts.get(GUIOptions.FILTERRT) && data != null && !context.root()) context.invalidate();
 
       // remember current command and context nodes
       final Nodes current = context.current();
@@ -436,6 +436,7 @@ public final class GUI extends AGUI {
       // check if query feedback was evaluated in the query view
       if(!ok && !stopped) {
         // display error in info view
+        text.setText(ao);
         if((!edit || inf.startsWith(S_BUGINFO)) && !info.visible()) {
           GUIMenuCmd.C_SHOWINFO.execute(this);
         }
@@ -681,7 +682,7 @@ public final class GUI extends AGUI {
   /**
    * Checks for a new version and shows a confirmation dialog.
    */
-  void checkVersion() {
+  private void checkVersion() {
     final Version disk = new Version(gopts.get(GUIOptions.UPDATEVERSION));
     final Version used = new Version(Prop.VERSION.replaceAll(" .*", ""));
 
@@ -690,14 +691,14 @@ public final class GUI extends AGUI {
       gopts.set(GUIOptions.UPDATEVERSION, used.toString());
     } else {
       try {
-        final String page = Token.string(new IOUrl(VERSION_URL).read());
+        final String page = Token.string(new IOUrl(Prop.VERSION_URL).read());
         final Matcher m = Pattern.compile("^(Version )?([\\w\\d.]*?)( .*|$)",
             Pattern.DOTALL).matcher(page);
         if(m.matches()) {
           final Version latest = new Version(m.group(2));
           if(disk.compareTo(latest) < 0) {
             if(BaseXDialog.confirm(this, Util.info(H_NEW_VERSION, Prop.NAME, latest))) {
-              BaseXDialog.browse(this, UPDATE_URL);
+              BaseXDialog.browse(this, Prop.UPDATE_URL);
             } else {
               // don't show update dialog anymore if it has been rejected once
               gopts.set(GUIOptions.UPDATEVERSION, latest.toString());

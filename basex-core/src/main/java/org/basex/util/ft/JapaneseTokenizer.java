@@ -3,10 +3,10 @@ package org.basex.util.ft;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
-import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 
+import org.basex.io.*;
 import org.basex.util.*;
 
 /**
@@ -68,7 +68,7 @@ public class JapaneseTokenizer extends Tokenizer {
   /** Token iterator. */
   private Iterator<Morpheme> tokens;
   /** Token list. */
-  private ArrayList<Morpheme> tokenList = new ArrayList<Morpheme>();
+  private ArrayList<Morpheme> tokenList = new ArrayList<>();
   /** Current position of the Token list. */
   private int cpos;
   /** Current token. */
@@ -88,11 +88,11 @@ public class JapaneseTokenizer extends Tokenizer {
   private boolean sc;
 
   static {
-    File dic = null;
+    IOFile dic = null;
     if(Reflect.available(PATTERN)) {
-      dic = new File(LANG);
+      dic = new IOFile(LANG);
       if(!dic.exists()) {
-        dic = new File(Prop.HOME, "etc/" + LANG);
+        dic = new IOFile(Prop.HOME, "etc/" + LANG);
         if(!dic.exists()) {
           available = false;
         }
@@ -108,7 +108,7 @@ public class JapaneseTokenizer extends Tokenizer {
       } else {
         /* Igo constructor. */
         final Constructor<?> tgr = Reflect.find(clz, String.class);
-        tagger = Reflect.get(tgr, dic.toString());
+        tagger = Reflect.get(tgr, dic.path());
         if(tagger == null) {
           available = false;
           Util.debug("Could not initialize Igo Japanese lexer.");
@@ -156,9 +156,8 @@ public class JapaneseTokenizer extends Tokenizer {
     if(wc) { // convert wide-space to space
       source = source.replace('\u3000', '\u0020');
     }
-    final ArrayList<?> morpheme =
-        (ArrayList<?>) Reflect.invoke(parse, tagger, source);
-    final ArrayList<Morpheme> list = new ArrayList<Morpheme>();
+    final ArrayList<?> morpheme = (ArrayList<?>) Reflect.invoke(parse, tagger, source);
+    final ArrayList<Morpheme> list = new ArrayList<>();
     try {
       int prev = 0;
       for(int i = 0; i < morpheme.size(); i++) {
@@ -178,7 +177,7 @@ public class JapaneseTokenizer extends Tokenizer {
 
         // separates continuous mark (ASCII)
         boolean cont = true;
-        final ArrayList<Morpheme> marks = new ArrayList<Morpheme>();
+        final ArrayList<Morpheme> marks = new ArrayList<>();
         for(int j = 0; j < srfc.length(); j++) {
           final String c = String.valueOf(srfc.charAt(j));
           final byte[] t = token(c);

@@ -5,13 +5,15 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.util.*;
 
+import org.basex.*;
+import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
+import org.basex.io.*;
 import org.basex.query.func.*;
-import org.basex.server.*;
-import org.basex.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * Tests for the {@link MainOptions#ADDRAW} option.
@@ -22,7 +24,7 @@ public class AddRawOptionTest extends SandboxTest {
   /** Test directory. */
   private static final String DIR = "src/test/resources/dir";
   /** Test files from {@link AddRawOptionTest#DIR}}. */
-  private static final File[] FILES = new File(DIR).listFiles();
+  private static final IOFile[] FILES = new IOFile(DIR).children();
 
   /**
    * Class set up method.
@@ -67,7 +69,7 @@ public class AddRawOptionTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   private static void assertAllFilesExist() throws IOException {
-    final HashSet<String> files = new HashSet<String>();
+    final HashSet<String> files = new HashSet<>();
     final Session session = new LocalSession(context);
     try {
       final Query q = session.query(Function._DB_LIST.args(NAME));
@@ -78,11 +80,10 @@ public class AddRawOptionTest extends SandboxTest {
     }
 
     assertFalse("No files were imported", files.isEmpty());
-    for(final File f : FILES) {
-      final String fname = f.getName();
+    for(final IOFile f : FILES) {
+      final String fname = f.name();
       assertTrue("File " + fname + " is not imported", files.contains(fname));
     }
-    assertEquals("Expected number of imported files is different",
-        FILES.length, files.size());
+    assertEquals("Expected number of imported files is different", FILES.length, files.size());
   }
 }

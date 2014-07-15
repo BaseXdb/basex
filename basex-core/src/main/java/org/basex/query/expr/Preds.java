@@ -1,25 +1,16 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
-
-import java.util.*;
-
 import org.basex.query.*;
-import org.basex.query.expr.CmpG.OpG;
-import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.func.*;
 import org.basex.query.path.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
- * Abstract predicate expression, implemented by {@link Filter} and
- * {@link Step}.
+ * Abstract predicate expression, implemented by {@link Filter} and {@link Step}.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
@@ -34,12 +25,12 @@ public abstract class Preds extends ParseExpr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param p predicates
+   * @param info input info
+   * @param preds predicates
    */
-  protected Preds(final InputInfo ii, final Expr[] p) {
-    super(ii);
-    preds = p;
+  protected Preds(final InputInfo info, final Expr[] preds) {
+    super(info);
+    this.preds = preds;
   }
 
   @Override
@@ -48,55 +39,10 @@ public abstract class Preds extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    for(int p = 0; p < preds.length; ++p)
-      preds[p] = preds[p].compile(ctx, scp).compEbv(ctx);
-    return optimize(ctx, scp);
-  }
-
-  @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
-    for(int p = 0; p < preds.length; ++p) {
-      Expr pr = Pos.get(OpV.EQ, preds[p], preds[p], info);
-
-      // position() = last() -> last()
-      if(pr instanceof CmpG || pr instanceof CmpV) {
-        final Cmp cmp = (Cmp) pr;
-        if(cmp.expr[0].isFunction(Function.POSITION) &&
-           cmp.expr[1].isFunction(Function.LAST)) {
-          if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
-             cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
-            ctx.compInfo(OPTWRITE, pr);
-            pr = cmp.expr[1];
-          }
-        }
-      }
-
-      if(pr.isValue()) {
-        if(!pr.ebv(ctx, info).bool(info)) {
-          ctx.compInfo(OPTREMOVE, this, pr);
-          return Empty.SEQ;
-        }
-        ctx.compInfo(OPTREMOVE, this, pr);
-        preds = Array.delete(preds, p--);
-      } else if(pr instanceof And && !pr.has(Flag.FCS)) {
-        // replace AND expression with predicates (don't swap position tests)
-        ctx.compInfo(OPTPRED, pr);
-        final Expr[] and = ((Arr) pr).expr;
-        final int m = and.length - 1;
-        final ExprList tmp = new ExprList(preds.length + m);
-        for(final Expr e : Arrays.asList(preds).subList(0, p)) tmp.add(e);
-        for(final Expr a : and) {
-          // wrap test with boolean() if the result is numeric
-          tmp.add(Function.BOOLEAN.get(null, info, a).compEbv(ctx));
-        }
-        for(final Expr e : Arrays.asList(preds).subList(p + 1, preds.length)) tmp.add(e);
-        preds = tmp.finish();
-      } else {
-        preds[p] = pr;
-      }
-    }
-    return this;
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    final int pl = preds.length;
+    for(int p = 0; p < pl; ++p) preds[p] = preds[p].compile(qc, scp).compEbv(qc);
+    return optimize(qc, scp);
   }
 
   /**
@@ -120,25 +66,25 @@ public abstract class Preds extends ParseExpr {
   /**
    * Checks if the predicates are successful for the specified item.
    * @param it item to be checked
-   * @param ctx query context
+   * @param qc query context
    * @return result of check
    * @throws QueryException query exception
    */
-  protected final boolean preds(final Item it, final QueryContext ctx) throws QueryException {
+  protected final boolean preds(final Item it, final QueryContext qc) throws QueryException {
     if(preds.length == 0) return true;
 
     // set context item and position
-    final Value cv = ctx.value;
+    final Value cv = qc.value;
     try {
       for(final Expr p : preds) {
-        ctx.value = it;
-        final Item i = p.test(ctx, info);
+        qc.value = it;
+        final Item i = p.test(qc, info);
         if(i == null) return false;
         it.score(i.score());
       }
       return true;
     } finally {
-      ctx.value = cv;
+      qc.value = cv;
     }
   }
 
@@ -162,21 +108,9 @@ public abstract class Preds extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
       throws QueryException {
-    return inlineAll(ctx, scp, preds, v, e) ? optimize(ctx, scp) : null;
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    for(final Expr p : preds) p.plan(plan);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    for(final Expr e : preds) sb.append('[').append(e).append(']');
-    return sb.toString();
+    return inlineAll(qc, scp, preds, v, e) ? optimize(qc, scp) : null;
   }
 
   /**
@@ -189,5 +123,17 @@ public abstract class Preds extends ParseExpr {
     p.last = last;
     p.pos = pos;
     return copyType(p);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    for(final Expr p : preds) p.plan(plan);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    for(final Expr e : preds) sb.append('[').append(e).append(']');
+    return sb.toString();
   }
 }

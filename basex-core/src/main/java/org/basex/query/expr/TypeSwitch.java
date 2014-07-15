@@ -25,14 +25,14 @@ public final class TypeSwitch extends ParseExpr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param t typeswitch expression
-   * @param c case expressions
+   * @param info input info
+   * @param ts typeswitch expression
+   * @param cases case expressions
    */
-  public TypeSwitch(final InputInfo ii, final Expr t, final TypeCase[] c) {
-    super(ii);
-    ts = t;
-    cases = c;
+  public TypeSwitch(final InputInfo info, final Expr ts, final TypeCase[] cases) {
+    super(info);
+    this.ts = ts;
+    this.cases = cases;
   }
 
   @Override
@@ -44,18 +44,18 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    ts = ts.compile(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    ts = ts.compile(qc, scp);
     // static condition: return branch in question
     if(ts.isValue()) {
-      final Value val = ts.value(ctx);
+      final Value val = ts.value(qc);
       for(final TypeCase tc : cases) {
         if(tc.matches(val))
-          return optPre(tc.compile(ctx, scp, (Value) ts).expr, ctx);
+          return optPre(tc.compile(qc, scp, (Value) ts).expr, qc);
       }
     }
     // compile branches
-    for(final TypeCase tc : cases) tc.compile(ctx, scp);
+    for(final TypeCase tc : cases) tc.compile(qc, scp);
 
     // return first branch if all branches are equal (e.g., empty) and use no variables
     final TypeCase tc = cases[0];
@@ -63,7 +63,7 @@ public final class TypeSwitch extends ParseExpr {
     for(int c = 1; eq && c < cases.length; ++c) {
       eq = tc.expr.sameAs(cases[c].expr);
     }
-    if(eq) return optPre(tc.expr, ctx);
+    if(eq) return optPre(tc.expr, qc);
 
     // combine return types
     type = cases[0].type();
@@ -74,10 +74,10 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    final Value seq = ctx.value(ts);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    final Value seq = qc.value(ts);
     for(final TypeCase tc : cases) {
-      final Iter iter = tc.iter(ctx, seq);
+      final Iter iter = tc.iter(qc, seq);
       if(iter != null) return iter;
     }
     // will never happen
@@ -108,22 +108,22 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
+  public Expr inline(final QueryContext qc, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
-    boolean change = inlineAll(ctx, scp, cases, v, e);
-    final Expr t = ts.inline(ctx, scp, v, e);
+    boolean change = inlineAll(qc, scp, cases, v, e);
+    final Expr t = ts.inline(qc, scp, v, e);
     if(t != null) {
       change = true;
       ts = t;
     }
-    return change ? optimize(ctx, scp) : null;
+    return change ? optimize(qc, scp) : null;
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final TypeCase[] cs = new TypeCase[cases.length];
-    for(int i = 0; i < cs.length; i++) cs[i] = cases[i].copy(ctx, scp, vs);
-    return new TypeSwitch(info, ts.copy(ctx, scp, vs), cs);
+    for(int i = 0; i < cs.length; i++) cs[i] = cases[i].copy(qc, scp, vs);
+    return new TypeSwitch(info, ts.copy(qc, scp, vs), cs);
   }
 
   @Override
@@ -138,8 +138,8 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public void markTailCalls(final QueryContext ctx) {
-    for(final TypeCase t : cases) t.markTailCalls(ctx);
+  public void markTailCalls(final QueryContext qc) {
+    for(final TypeCase t : cases) t.markTailCalls(qc);
   }
 
   @Override

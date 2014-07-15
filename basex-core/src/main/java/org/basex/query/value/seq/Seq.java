@@ -23,20 +23,20 @@ public abstract class Seq extends Value {
 
   /**
    * Constructor.
-   * @param s size
+   * @param size size
    */
-  Seq(final long s) {
-    this(s, AtomType.ITEM);
+  Seq(final long size) {
+    this(size, AtomType.ITEM);
   }
 
   /**
    * Constructor, specifying a type.
-   * @param s size
-   * @param t type
+   * @param size size
+   * @param type type
    */
-  Seq(final long s, final Type t) {
-    super(t);
-    size = s;
+  Seq(final long size, final Type type) {
+    super(type);
+    this.size = size;
   }
 
   /**
@@ -73,13 +73,13 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     throw SEQCAST.get(ii, this);
   }
 
   @Override
-  public final Item test(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return ebv(ctx, ii);
+  public final Item test(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return ebv(qc, ii);
   }
 
   @Override
@@ -124,10 +124,26 @@ public abstract class Seq extends Value {
   }
 
   @Override
+  public String toErrorString() {
+    return toString(true);
+  }
+
+  @Override
   public String toString() {
+    return toString(false);
+  }
+
+  /**
+   * Returns a string representation of the sequence.
+   * @param error error flag
+   * @return string
+   */
+  private String toString(final boolean error) {
     final StringBuilder sb = new StringBuilder(PAR1);
     for(int i = 0; i < size; ++i) {
-      sb.append(i == 0 ? "" : SEP).append(itemAt(i));
+      sb.append(i == 0 ? "" : SEP);
+      final Item it = itemAt(i);
+      sb.append(error ? it.toErrorString() : it.toString());
       if(sb.length() <= 32 || i + 1 == size) continue;
       // output is chopped to prevent too long error strings
       sb.append(SEP + DOTS);

@@ -29,7 +29,7 @@ public abstract class AQuery extends Command {
   Result result;
 
   /** Variables. */
-  private final HashMap<String, String[]> vars = new HashMap<String, String[]>();
+  private final HashMap<String, String[]> vars = new HashMap<>();
   /** HTTP context. */
   private Object http;
   /** Query processor. */
@@ -110,10 +110,7 @@ public abstract class AQuery extends Command {
         }
         return info(info.toString(qp, out.size(), hits, options.get(MainOptions.QUERYINFO)));
 
-      } catch(final QueryException ex) {
-        cause = ex;
-        err = Util.message(ex);
-      } catch(final IOException ex) {
+      } catch(final QueryException | IOException ex) {
         cause = ex;
         err = Util.message(ex);
       } catch(final ProcException ex) {
@@ -192,7 +189,7 @@ public abstract class AQuery extends Command {
   private QueryProcessor qp(final String query, final Context ctx) {
     if(qp == null) {
       qp = proc(new QueryProcessor(query, ctx));
-      if(info == null) info = qp.ctx.info;
+      if(info == null) info = qp.qc.info;
     }
     return qp;
   }
@@ -207,7 +204,7 @@ public abstract class AQuery extends Command {
     try {
       qp(args[0], ctx);
       parse(null);
-      params = qp.ctx.serParams();
+      params = qp.qc.serParams();
     } catch(final QueryException ex) {
       error(Util.message(ex));
     }
@@ -268,18 +265,19 @@ public abstract class AQuery extends Command {
     if(comp != options.get(MainOptions.COMPPLAN)) return;
 
     // show dot plan
-    BufferOutput bo = null;
     try {
       if(options.get(MainOptions.DOTPLAN)) {
         final String path = context.options.get(MainOptions.QUERYPATH);
         final String dot = path.isEmpty() ? "plan.dot" :
             new IOFile(path).name().replaceAll("\\..*?$", ".dot");
 
-        bo = new BufferOutput(dot);
-        final DOTSerializer d = new DOTSerializer(bo, options.get(MainOptions.DOTCOMPACT));
-        d.serialize(qp.plan());
-        d.close();
+        try(final BufferOutput bo = new BufferOutput(dot)) {
+          final DOTSerializer d = new DOTSerializer(bo, options.get(MainOptions.DOTCOMPACT));
+          d.serialize(qp.plan());
+          d.close();
+        }
       }
+
       // show XML plan
       if(options.get(MainOptions.XMLPLAN)) {
         info(NL + QUERY_PLAN + COL);
@@ -287,8 +285,6 @@ public abstract class AQuery extends Command {
       }
     } catch(final Exception ex) {
       Util.stack(ex);
-    } finally {
-      if(bo != null) try { bo.close(); } catch(final IOException ignored) { }
     }
   }
 

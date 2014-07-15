@@ -26,22 +26,22 @@ public final class CAttr extends CName {
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param c computed construction flag
-   * @param n name
-   * @param v attribute values
+   * @param sc static context
+   * @param info input info
+   * @param comp computed construction flag
+   * @param name name
+   * @param values attribute values
    */
-  public CAttr(final StaticContext sctx, final InputInfo ii, final boolean c,
-      final Expr n, final Expr... v) {
-    super(ATTRIBUTE, sctx, ii, n, v);
-    comp = c;
+  public CAttr(final StaticContext sc, final InputInfo info, final boolean comp,
+      final Expr name, final Expr... values) {
+    super(ATTRIBUTE, sc, info, name, values);
+    this.comp = comp;
     type = SeqType.ATT;
   }
 
   @Override
-  public FAttr item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    QNm nm = qname(ctx, ii);
+  public FAttr item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    QNm nm = qname(qc, ii);
     final byte[] cp = nm.prefix();
     if(comp) {
       final byte[] cu = nm.uri();
@@ -56,15 +56,15 @@ public final class CAttr extends CName {
     }
     if(!nm.hasURI() && nm.hasPrefix()) throw INVPREF.get(info, nm);
 
-    byte[] val = value(ctx, ii);
+    byte[] val = value(qc, ii);
     if(eq(cp, XML) && eq(nm.local(), ID)) val = norm(val);
 
     return new FAttr(nm, val);
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CAttr(sc, info, comp, name.copy(ctx, scp, vs),
-        copyAll(ctx, scp, vs, expr));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new CAttr(sc, info, comp, name.copy(qc, scp, vs),
+        copyAll(qc, scp, vs, exprs));
   }
 }

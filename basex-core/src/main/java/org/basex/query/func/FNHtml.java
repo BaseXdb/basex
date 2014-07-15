@@ -25,35 +25,36 @@ public final class FNHtml extends StandardFunc {
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNHtml(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNHtml(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    switch(func) {
       case _HTML_PARSER: return Str.get(HtmlParser.parser());
-      case _HTML_PARSE:  return parse(ctx);
-      default:           return super.item(ctx, ii);
+      case _HTML_PARSE:  return parse(qc);
+      default:           return super.item(qc, ii);
     }
   }
 
   /**
    * Converts HTML input to XML and returns a document node.
-   * @param ctx query context
+   * @param qc query context
    * @return document node
    * @throws QueryException query exception
    */
-  private DBNode parse(final QueryContext ctx) throws QueryException {
-    final byte[] in = checkStrBin(checkItem(expr[0], ctx));
-    final HtmlOptions opts = checkOptions(1, Q_OPTIONS, new HtmlOptions(), ctx);
+  private DBNode parse(final QueryContext qc) throws QueryException {
+    final byte[] in = checkStrBin(checkItem(exprs[0], qc));
+    final HtmlOptions opts = checkOptions(1, Q_OPTIONS, new HtmlOptions(), qc);
     try {
-      return new DBNode(new HtmlParser(new IOContent(in), ctx.context.options, opts));
+      return new DBNode(new HtmlParser(new IOContent(in), qc.context.options, opts));
     } catch(final IOException ex) {
       throw BXHL_IO.get(info, ex);
     }

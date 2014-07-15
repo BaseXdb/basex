@@ -10,7 +10,7 @@ import java.util.*;
  */
 public abstract class Tokenizer extends LanguageImpl {
   /** List of available tokenizers. */
-  public static final LinkedList<Tokenizer> IMPL = new LinkedList<Tokenizer>();
+  public static final LinkedList<Tokenizer> IMPL = new LinkedList<>();
 
   /** Are special characters included? */
   boolean special;

@@ -45,13 +45,11 @@ public final class XQuery implements Iterable<XdmItem> {
    * @return self reference
    * @throws XQueryException exception
    */
-  public XQuery context(final Object value) {
+  public XQuery context(final XdmValue value) {
     try {
-      if(value != null) qp.context(value instanceof XdmValue ?
-          ((XdmValue) value).internal() : value);
+      qp.context(value.internal());
       return this;
     } catch(final QueryException ex) {
-      Util.debug(ex);
       throw new XQueryException(ex);
     }
   }
@@ -63,12 +61,11 @@ public final class XQuery implements Iterable<XdmItem> {
    * @return self reference
    * @throws XQueryException exception
    */
-  public XQuery bind(final String key, final Object value) {
+  public XQuery bind(final String key, final XdmValue value) {
     try {
-      qp.bind(key, value instanceof XdmValue ? ((XdmValue) value).internal() : value);
+      qp.bind(key, value.internal());
       return this;
     } catch(final QueryException ex) {
-      Util.debug(ex);
       throw new XQueryException(ex);
     }
   }
@@ -86,7 +83,6 @@ public final class XQuery implements Iterable<XdmItem> {
       qp.namespace(prefix, uri);
       return this;
     } catch(final QueryException ex) {
-      Util.debug(ex);
       throw new XQueryException(ex);
     }
   }
@@ -106,7 +102,6 @@ public final class XQuery implements Iterable<XdmItem> {
       qp.sc.decFormats.put(new QNm(name).id(), new DecFormatter(null, tm));
       return this;
     } catch(final QueryException ex) {
-      Util.debug(ex);
       throw new XQueryException(ex);
     }
   }
@@ -121,9 +116,36 @@ public final class XQuery implements Iterable<XdmItem> {
     final StringList sl = new StringList();
     for(final String p : paths) sl.add(p);
     try {
-      qp.ctx.resource.addCollection(name, sl.toArray(), qp.sc.baseIO());
+      qp.qc.resources.addCollection(name, sl.toArray(), qp.sc.baseIO());
     } catch(final QueryException ex) {
-      Util.debug(ex);
+      throw new XQueryException(ex);
+    }
+  }
+
+  /**
+   * Returns a collection reference.
+   * @param name name of the collection
+   * @return reference
+   * @throws XQueryException exception
+   */
+  public XdmValue collection(final String name) {
+    try {
+      return XdmValue.get(qp.qc.resources.collection(new QueryInput(name), qp.sc.baseIO(), null));
+    } catch(final QueryException ex) {
+      throw new XQueryException(ex);
+    }
+  }
+
+  /**
+   * Returns a document reference.
+   * @param name name of the collection
+   * @return reference
+   * @throws XQueryException exception
+   */
+  public XdmValue document(final String name) {
+    try {
+      return XdmItem.get(qp.qc.resources.doc(new QueryInput(name), qp.sc.baseIO(), null));
+    } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }
   }
@@ -136,9 +158,8 @@ public final class XQuery implements Iterable<XdmItem> {
    */
   public void addDocument(final String name, final String path) {
     try {
-      qp.ctx.resource.addDoc(name, path, qp.sc.baseIO());
+      qp.qc.resources.addDoc(name, path, qp.sc.baseIO());
     } catch(final QueryException ex) {
-      Util.debug(ex);
       throw new XQueryException(ex);
     }
   }
@@ -150,7 +171,7 @@ public final class XQuery implements Iterable<XdmItem> {
    * @throws XQueryException exception
    */
   public void addResource(final String name, final String... strings) {
-    qp.ctx.resource.addResource(name, strings);
+    qp.qc.resources.addResource(name, strings);
   }
 
   /**
@@ -180,13 +201,13 @@ public final class XQuery implements Iterable<XdmItem> {
    * @param args function arguments
    * @return the function call
    */
-  public Object funcCall(final String fName, final Expr... args) {
+  public StandardFunc funcCall(final String fName, final Expr... args) {
+    if(!fName.equals("fn:doc")) System.out.print(" FUNC: " + fName);
+    final QNm qName = new QNm(fName);
+    qName.uri(qName.hasPrefix() ? NSGlobal.uri(qName.prefix()) : qp.sc.funcNS);
     try {
-      final QNm qName = new QNm(fName);
-      qName.uri(qName.hasPrefix() ? NSGlobal.uri(qName.prefix()) : qp.sc.funcNS);
       return Functions.get().get(qName, args, qp.sc, null);
     } catch(QueryException ex) {
-      Util.debug(ex);
       throw new XQueryException(ex);
     }
   }
@@ -203,7 +224,6 @@ public final class XQuery implements Iterable<XdmItem> {
       it = ir.next();
       return it != null ? XdmItem.get(it) : null;
     } catch(final QueryException ex) {
-      Util.debug(ex);
       throw new XQueryException(ex);
     } finally {
       if(it == null) qp.close();
@@ -219,7 +239,6 @@ public final class XQuery implements Iterable<XdmItem> {
     try {
       return XdmValue.get(qp.value());
     } catch(final QueryException ex) {
-      Util.debug(ex);
       throw new XQueryException(ex);
     } finally {
       qp.close();
@@ -231,7 +250,7 @@ public final class XQuery implements Iterable<XdmItem> {
    * @return serialization properties
    */
   public SerializerOptions serializer() {
-    return qp.ctx.serParams();
+    return qp.qc.serParams();
   }
 
   /**

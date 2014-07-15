@@ -68,14 +68,14 @@ public abstract class Compare {
     if(xsltMode) new IOFile(TMPCTX).write(Token.token("<x/>"));
 
     // loop through all queries
-    final BufferedReader br = new BufferedReader(
-        new InputStreamReader(new FileInputStream(QUERIES), Token.UTF8));
-    while(true) {
-      final String line = br.readLine();
-      if(line == null) break;
-      if(!line.isEmpty() && line.charAt(0) != '#') query(line);
+    try(final BufferedReader br = new BufferedReader(
+        new InputStreamReader(new FileInputStream(QUERIES), Token.UTF8))) {
+      while(true) {
+        final String line = br.readLine();
+        if(line == null) break;
+        if(!line.isEmpty() && line.charAt(0) != '#') query(line);
+      }
     }
-    br.close();
 
     // delete temporary files
     new IOFile(TMP).delete();
@@ -128,7 +128,7 @@ public abstract class Compare {
    */
   private static String execute(final String[] proc) {
     try {
-      final ArrayList<String> al = new ArrayList<String>();
+      final ArrayList<String> al = new ArrayList<>();
       al.addAll(Arrays.asList(proc).subList(1, proc.length));
 
       final ProcessBuilder pb = new ProcessBuilder(al);

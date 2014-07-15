@@ -1,16 +1,16 @@
 package org.basex.query.func;
 
+import static org.junit.Assert.*;
+
 import java.util.*;
 import java.util.Set;
 
-import org.basex.core.cmd.*;
+import org.basex.build.*;
 import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.type.*;
-import org.basex.query.*;
-import org.junit.*;
-
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests all function signatures.
@@ -25,7 +25,7 @@ public class SignatureTest extends AdvancedQueryTest {
    */
   @Test
   public void signatures() throws Exception {
-    context.openDB(CreateDB.mainMem(new IOContent("<a/>"), context));
+    context.openDB(MemBuilder.build(new IOContent("<a/>"), context));
     context.data().meta.name = "X";
     for(final Function f : Function.values()) check(f);
   }
@@ -45,7 +45,7 @@ public class SignatureTest extends AdvancedQueryTest {
     assertTrue(def + Arrays.toString(names),
         names.length == (def.max == Integer.MAX_VALUE ? def.min : def.max));
     // all variable names must be distinct
-    final Set<String> set = new HashSet<String>(Arrays.asList(names));
+    final Set<String> set = new HashSet<>(Arrays.asList(names));
     assertEquals("Duplicate argument names: " + def, names.length, set.size());
     // var-arg functions must have a number at the end
     if(def.max == Integer.MAX_VALUE) assertTrue(names[names.length - 1].matches(".*\\d+$"));

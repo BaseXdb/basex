@@ -54,10 +54,10 @@ public final class Encryption {
   /**
    * Constructor.
    *
-   * @param ii input info
+   * @param info input info
    */
-  public Encryption(final InputInfo ii) {
-    info = ii;
+  public Encryption(final InputInfo info) {
+    this.info = info;
   }
 
   /**
@@ -83,24 +83,19 @@ public final class Encryption {
     // initialization vector length
     final int ivl = toInt(tivl);
 
-    byte[] t = null;
     try {
-      t = ec ? encrypt(in, k, aa, ivl) : decrypt(in, k, aa, ivl);
+      return Str.get(ec ? encrypt(in, k, aa, ivl) : decrypt(in, k, aa, ivl));
     } catch(final NoSuchPaddingException e) {
       throw CX_NOPAD.get(info, e);
     } catch(final BadPaddingException e) {
       throw CX_BADPAD.get(info, e);
-    } catch(final NoSuchAlgorithmException e) {
-      throw CX_INVALGO.get(info, e);
     } catch(final InvalidKeyException e) {
       throw CX_KEYINV.get(info, e);
     } catch(final IllegalBlockSizeException e) {
       throw CX_ILLBLO.get(info, e);
-    } catch(final InvalidAlgorithmParameterException e) {
+    } catch(final GeneralSecurityException e) {
       throw CX_INVALGO.get(info, e);
     }
-
-    return Str.get(t);
   }
 
   /**

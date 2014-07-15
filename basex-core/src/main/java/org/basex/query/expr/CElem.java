@@ -5,7 +5,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -28,30 +27,30 @@ public final class CElem extends CName {
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param t tag
-   * @param ns namespaces, or {@code null} if this is a computed constructor.
+   * @param sc static context
+   * @param info input info
+   * @param name name
+   * @param nspaces namespaces, or {@code null} if this is a computed constructor.
    * @param cont element contents
    */
-  public CElem(final StaticContext sctx, final InputInfo ii, final Expr t, final Atts ns,
+  public CElem(final StaticContext sc, final InputInfo info, final Expr name, final Atts nspaces,
       final Expr... cont) {
-    super(ELEMENT, sctx, ii, t, cont);
-    nspaces = ns == null ? new Atts() : ns;
-    comp = ns == null;
+    super(ELEMENT, sc, info, name, cont);
+    this.nspaces = nspaces == null ? new Atts() : nspaces;
+    comp = nspaces == null;
     type = SeqType.ELM;
   }
 
   @Override
-  public CElem compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public CElem compile(final QueryContext qc, final VarScope scp) throws QueryException {
     final int s = addNS();
-    super.compile(ctx, scp);
+    super.compile(qc, scp);
     sc.ns.size(s);
     return this;
   }
 
   @Override
-  public FElem item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public FElem item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final int s = addNS();
     try {
       // adds in-scope namespaces
@@ -61,7 +60,7 @@ public final class CElem extends CName {
       }
 
       // create and check QName
-      final QNm nm = qname(ctx, ii);
+      final QNm nm = qname(qc, ii);
       final byte[] cp = nm.prefix(), cu = nm.uri();
       if(eq(cp, XML) ^ eq(cu, XMLURI)) throw CEXML.get(info, cu, cp);
       if(eq(cu, XMLNSURI)) throw CEINV.get(info, cu);
@@ -90,7 +89,7 @@ public final class CElem extends CName {
       final FElem node = new FElem(nm, ns, constr.children, constr.atts);
 
       // add child and attribute nodes
-      constr.add(ctx, expr);
+      constr.add(qc, exprs);
       if(constr.errAtt) throw NOATTALL.get(info);
       if(constr.errNS) throw NONSALL.get(info);
       if(constr.duplAtt != null) throw CATTDUPL.get(info, constr.duplAtt);
@@ -122,24 +121,8 @@ public final class CElem extends CName {
         }
       }
 
-      // add inherited namespaces
-      final Atts stack = sc.ns.stack();
-      for(int a = stack.size() - 1; a >= 0; a--) {
-        final byte[] pref = stack.name(a);
-        if(!ns.contains(pref)) ns.add(pref, stack.value(a));
-      }
-
-      // update parent references of children
-      for(int c = 0; c < constr.children.size(); ++c) {
-        final ANode child = constr.children.get(c);
-        // add inherited and remove unused namespaces
-        if(child.type == NodeType.ELM) {
-          if(sc.inheritNS) inherit(child, ns);
-          if(!sc.preserveNS) noPreserve(child);
-          child.optimize();
-        }
-      }
-
+      // update and optimize child nodes
+      for(int c = 0; c < constr.children.size(); ++c) constr.children.get(c).optimize();
       // return generated and optimized node
       return node.optimize();
 
@@ -149,39 +132,9 @@ public final class CElem extends CName {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CElem(sc, info, name.copy(ctx, scp, vs), comp ? null : nspaces.copy(),
-        copyAll(ctx, scp, vs, expr));
-  }
-
-  /**
-   * Removes unused namespaces.
-   * @param node to be modified
-   */
-  private static void noPreserve(final ANode node) {
-    final Atts ns = node.namespaces();
-    final byte[] pref = node.qname().prefix();
-    for(int i = ns.size() - 1; i >= 0; i--) {
-      boolean f = eq(ns.name(i), pref);
-      final AxisIter atts = node.attributes();
-      for(ANode it; !f && (it = atts.next()) != null;) {
-        f = eq(it.qname().prefix(), pref);
-      }
-      if(!f) ns.delete(i);
-    }
-  }
-
-  /**
-   * Inherits namespaces.
-   * @param node to be modified
-   * @param nsp in-scope namespaces
-   */
-  private static void inherit(final ANode node, final Atts nsp) {
-    final Atts ns = node.namespaces();
-    for(int a = nsp.size() - 1; a >= 0; a--) {
-      final byte[] pref = nsp.name(a);
-      if(!ns.contains(pref)) ns.add(pref, nsp.value(a));
-    }
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new CElem(sc, info, name.copy(qc, scp, vs), comp ? null : nspaces.copy(),
+        copyAll(qc, scp, vs, exprs));
   }
 
   /**

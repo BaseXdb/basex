@@ -1,6 +1,6 @@
 package org.basex.query.up;
 
-import static org.basex.query.up.primitives.PrimitiveType.*;
+import static org.basex.query.up.primitives.UpdateType.*;
 import java.util.*;
 
 import org.basex.query.*;
@@ -15,60 +15,61 @@ import org.basex.query.up.primitives.*;
  */
 final class NodeUpdates {
   /** Container for update primitives. */
-  List<UpdatePrimitive> prim = new ArrayList<UpdatePrimitive>(1);
+  List<NodeUpdate> updates = new ArrayList<>(1);
 
   /**
-   * Adds an update primitive to this container.
-   * @param p primitive
+   * Adds an update to this container.
+   * @param up node update
    * @throws QueryException query exception
    */
-  void add(final UpdatePrimitive p) throws QueryException {
+  void add(final NodeUpdate up) throws QueryException {
     // Primitives can be merged eventually ...
-    final int typeIndex = index(p.type);
+    final int typeIndex = index(up.type);
     if(typeIndex == -1) {
-      prim.add(p);
+      updates.add(up);
     } else {
-      final UpdatePrimitive up = prim.get(typeIndex);
+      final NodeUpdate nodeUp = updates.get(typeIndex);
       // but an insertInto could be part of a substitute of a replaceElementContent,
       // then we cannot merge them, as this would insert unwanted nodes
-      if(up instanceof InsertInto) {
-        final InsertInto oprim = (InsertInto) up;
-        final InsertInto nprim = (InsertInto) p;
+      if(nodeUp instanceof InsertInto) {
+        final InsertInto oprim = (InsertInto) nodeUp;
+        final InsertInto nprim = (InsertInto) up;
         // if the new primitive substitutes, than replace the old one with the new one
         if(nprim instanceof ReplaceContent) {
-          prim.set(typeIndex, nprim);
+          updates.set(typeIndex, nprim);
         } else if(!(oprim instanceof ReplaceContent)) {
           // if neither substitutes, merge them.
-          up.merge(p);
+          nodeUp.merge(up);
         }
       } else {
         // all other primitives can be merged regardless
-        up.merge(p);
+        nodeUp.merge(up);
       }
     }
   }
 
   /**
-   * Find the update primitive with the given type. In case there is no
+   * Finds the update primitive with the given type. In case there is no
    * primitive of the given type, null is returned.
-   * @param t PrimitiveType
+   * @param type update type
    * @return primitive of type t, null if not found
    */
-  private UpdatePrimitive find(final PrimitiveType t) {
-    for(final UpdatePrimitive p : prim) {
-      if(p.type == t) return p;
+  private NodeUpdate find(final UpdateType type) {
+    for(final NodeUpdate p : updates) {
+      if(p.type == type) return p;
     }
     return null;
   }
 
   /**
-   * Find the update primitive with the given {@link PrimitiveType} and returns its index.
+   * Finds the update primitive with the given {@link UpdateType} and returns its index.
    * @param t PrimitiveType
    * @return index of primitive with given type or -1 if not found
    */
-  private int index(final PrimitiveType t) {
-    for(int i = 0; i < prim.size(); i++) {
-      if(prim.get(i).type == t) return i;
+  private int index(final UpdateType t) {
+    final int us = updates.size();
+    for(int u = 0; u < us; u++) {
+      if(updates.get(u).type == t) return u;
     }
     return -1;
   }
@@ -80,8 +81,8 @@ final class NodeUpdates {
    * @return list with update primitives
    * This method can only be once, as the internal update list will eventually be removed.
    */
-  List<UpdatePrimitive> finish() {
-    List<UpdatePrimitive> primnew = new ArrayList<UpdatePrimitive>();
+  List<NodeUpdate> finish() {
+    List<NodeUpdate> primnew = new ArrayList<>();
 
     /* Check if target node T is deleted and remove superfluous primitives. */
     final DeleteNode del = (DeleteNode) find(DELETENODE);
@@ -91,7 +92,7 @@ final class NodeUpdates {
      * snapshot, either a text node as a single child or no child node at all. */
     if(del != null && del.rec) {
       primnew.add(del);
-      prim = null;
+      updates = null;
       return primnew;
     }
 
@@ -99,11 +100,11 @@ final class NodeUpdates {
     // removed.
     final ReplaceNode replace = (ReplaceNode) find(REPLACENODE);
     if(replace != null) {
-      for(final UpdatePrimitive p : prim) {
+      for(final NodeUpdate p : updates) {
         if(p.type == REPLACENODE || p.type == INSERTBEFORE || p.type == INSERTAFTER)
           primnew.add(p);
       }
-      prim = null;
+      updates = null;
       return primnew;
     }
 
@@ -113,20 +114,20 @@ final class NodeUpdates {
      * expression forms the only exception. */
     final ReplaceValue rec = (ReplaceValue) find(REPLACEVALUE);
     if(rec != null && rec.rec) {
-      for(final UpdatePrimitive p : prim) {
+      for(final NodeUpdate p : updates) {
         /* Add only InsertIntos that are part of the substitution and make sure no
          * other primitive is added, that adds nodes to the child axis of T. */
         if(p.type != INSERTINTOFIRST && p.type != INSERTINTO && p.type != INSERTINTOLAST
             || p.type == INSERTINTO && p instanceof ReplaceContent)
           primnew.add(p);
       }
-      prim = null;
+      updates = null;
       return primnew;
     }
 
     // otherwise, return old list
-    primnew = prim;
-    prim = null;
+    primnew = updates;
+    updates = null;
     return primnew;
   }
 }

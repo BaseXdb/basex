@@ -15,6 +15,7 @@ import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * Concurrency tests of BaseX REST API.

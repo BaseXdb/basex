@@ -12,6 +12,5 @@ public final class FTScopeOptions extends Options {
   /** Option: same. */
   public static final BooleanOption SAME = new BooleanOption("same", true);
   /** Option: unit. */
-  public static final EnumOption<FTBigUnit> UNIT =
-      new EnumOption<FTBigUnit>("unit", FTBigUnit.SENTENCE);
+  public static final EnumOption<FTBigUnit> UNIT = new EnumOption<>("unit", FTBigUnit.SENTENCE);
 }

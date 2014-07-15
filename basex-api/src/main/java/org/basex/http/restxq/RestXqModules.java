@@ -2,7 +2,6 @@ package org.basex.http.restxq;
 
 import static org.basex.http.restxq.RestXqText.*;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -23,7 +22,7 @@ public final class RestXqModules {
   private static final RestXqModules INSTANCE = new RestXqModules();
 
   /** Module cache. */
-  private HashMap<String, RestXqModule> modules = new HashMap<String, RestXqModule>();
+  private HashMap<String, RestXqModule> modules = new HashMap<>();
   /** RESTXQ path. */
   private IOFile restxq;
   /** Private constructor. */
@@ -57,7 +56,7 @@ public final class RestXqModules {
   RestXqFunction find(final HTTPContext http, final QNm error) throws Exception {
     cache(http);
     // collect all functions
-    final ArrayList<RestXqFunction> list = new ArrayList<RestXqFunction>();
+    final ArrayList<RestXqFunction> list = new ArrayList<>();
     for(final RestXqModule mod : modules.values()) {
       for(final RestXqFunction rxf : mod.functions()) {
         if(rxf.matches(http, error)) list.add(rxf);
@@ -78,8 +77,9 @@ public final class RestXqModules {
           if(first.compareTo(rxf) != 0) break;
           tb.add(Prop.NL).add(rxf.function.info.toString());
         }
-        if(first.path != null) first.error(PATH_CONFLICT, first.path, tb);
-        first.error(ERROR_CONFLICT, first.error, tb);
+        throw first.path == null ?
+          first.error(ERROR_CONFLICT, error, tb) :
+          first.error(PATH_CONFLICT, first.path, tb);
       }
     }
     // choose most specific function
@@ -94,12 +94,12 @@ public final class RestXqModules {
   private synchronized void cache(final HTTPContext http) throws Exception {
     // initialize RESTXQ directory (may be relative against WEBPATH)
     if(restxq == null) {
-      final File fl = new File(http.context().globalopts.get(GlobalOptions.RESTXQPATH));
-      restxq = fl.isAbsolute() ? new IOFile(fl) :
-        new IOFile(http.context().globalopts.get(GlobalOptions.WEBPATH), fl.getPath());
+      final GlobalOptions gopts = http.context().globalopts;
+      restxq = new IOFile(gopts.get(GlobalOptions.WEBPATH)).resolve(
+          gopts.get(GlobalOptions.RESTXQPATH));
     }
     // create new cache
-    final HashMap<String, RestXqModule> cache = new HashMap<String, RestXqModule>();
+    final HashMap<String, RestXqModule> cache = new HashMap<>();
     cache(http, restxq, cache);
     modules = cache;
   }
@@ -119,8 +119,7 @@ public final class RestXqModules {
         cache(http, file, cache);
       } else {
         final String path = file.path();
-        final boolean lib = path.endsWith(IO.XQMSUFFIX);
-        if(lib || path.endsWith(IO.XQSUFFIX)) {
+        if(file.hasSuffix(IO.XQSUFFIXES)) {
           RestXqModule module = modules.get(path);
           boolean parsed = false;
           if(module != null) {
@@ -128,7 +127,7 @@ public final class RestXqModules {
             parsed = module.uptodate();
           } else {
             // create new module
-            module = new RestXqModule(file, lib);
+            module = new RestXqModule(file);
           }
           // add module if it has been parsed, and if it contains annotations
           if(parsed || module.parse(http)) {

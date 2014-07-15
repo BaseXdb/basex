@@ -2,6 +2,7 @@ package org.basex.api.xmldb;
 
 import static org.junit.Assert.*;
 
+import org.basex.io.*;
 import org.junit.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
@@ -96,9 +97,8 @@ public class XPathQueryServiceTest extends XMLDBBaseTest {
     assertEquals("Wrong result size.", 1, serv.query("/").getSize());
 
     // add second document
-    final Resource res = coll.createResource(DOC2,
-        XMLResource.RESOURCE_TYPE);
-    res.setContent(read(DOCPATH + DOC2));
+    final Resource res = coll.createResource(DOC2, XMLResource.RESOURCE_TYPE);
+    res.setContent(new IOFile(DOCPATH, DOC2).read());
     coll.storeResource(res);
     assertEquals("Wrong result size", 6, serv.query("//node()").getSize());
 
@@ -108,8 +108,7 @@ public class XPathQueryServiceTest extends XMLDBBaseTest {
 
   @Test
   public void testQueryResource() throws Exception {
-     assertEquals("Wrong result size", 3, serv.queryResource(DOC1,
-      "//node()").getSize());
+     assertEquals("Wrong result size", 3, serv.queryResource(DOC1, "//node()").getSize());
 
     // catch query errors
     try {

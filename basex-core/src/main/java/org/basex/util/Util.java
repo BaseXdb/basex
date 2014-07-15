@@ -31,8 +31,8 @@ public final class Util {
    */
   public static String bug(final Throwable throwable) {
     final TokenBuilder tb = new TokenBuilder(S_BUGINFO);
-    tb.add(NL).add("Contact: ").add(MAILING_LIST);
-    tb.add(NL).add("Version: ").add(TITLE);
+    tb.add(NL).add("Contact: ").add(Prop.MAILING_LIST);
+    tb.add(NL).add("Version: ").add(Prop.TITLE);
     tb.add(NL).add("Java: ").add(System.getProperty("java.vendor"));
     tb.add(", ").add(System.getProperty("java.version"));
     tb.add(NL).add("OS: ").add(System.getProperty("os.name"));
@@ -225,7 +225,7 @@ public final class Util {
    * @param message message
    * @param depth number of steps to print
    */
-  public static void stack(final String message, final int depth) {
+  private static void stack(final String message, final int depth) {
     errln(message);
     final String[] stack = toArray(new Throwable());
     final int l = Math.min(Math.max(2, depth + 2), stack.length);

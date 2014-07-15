@@ -4,9 +4,10 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.query.util.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * Mixed XQuery tests.
@@ -99,5 +100,15 @@ public final class MixedTest extends AdvancedQueryTest {
     new Optimize().execute(context);
     query(COUNT.args(_DB_OPEN.args(NAME, "a") + "/a"), "1");
     query(COUNT.args(_DB_OPEN.args(NAME) + "/a"), "2");
+  }
+
+  /**
+   * Tests constant-propagating variables that were introduced by inlining.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void gh907() throws BaseXException {
+    new CreateDB(NAME, "<x/>").execute(context);
+    query("declare function local:a($a) { contains($a, 'a') }; //x[local:a(.)]", "");
   }
 }

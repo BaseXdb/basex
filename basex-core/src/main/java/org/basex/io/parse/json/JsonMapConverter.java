@@ -33,7 +33,7 @@ import org.basex.util.*;
  */
 public final class JsonMapConverter extends JsonConverter {
   /** Stack for intermediate values. */
-  private final Stack<Value> stack = new Stack<Value>();
+  private final Stack<Value> stack = new Stack<>();
 
   /**
    * Constructor.

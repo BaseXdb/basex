@@ -44,9 +44,9 @@ public class XMLSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void atomic(final Item i) throws IOException {
+  protected void atomic(final Item i, final boolean iter) throws IOException {
     if(tags.isEmpty()) check();
-    super.atomic(i);
+    super.atomic(i, iter);
   }
 
   /**

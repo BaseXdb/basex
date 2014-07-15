@@ -82,10 +82,10 @@ public final class DigitalSignature {
 
   /**
    * Constructor.
-   * @param ii input info
+   * @param info input info
    */
-  public DigitalSignature(final InputInfo ii) {
-    info = ii;
+  public DigitalSignature(final InputInfo info) {
+    this.info = info;
   }
 
   /**
@@ -99,14 +99,14 @@ public final class DigitalSignature {
    * @param expr XPath expression which specifies node to be signed
    * @param ce certificate which contains keystore information for
    *        signing the node, may be null
-   * @param ctx query context
+   * @param qc query context
    * @param ii input info
    *
    * @return signed node
    * @throws QueryException query exception
    */
   public Item generateSignature(final ANode node, final byte[] c, final byte[] d, final byte[] sig,
-      final byte[] ns, final byte[] t, final byte[] expr, final ANode ce, final QueryContext ctx,
+      final byte[] ns, final byte[] t, final byte[] expr, final ANode ce, final QueryContext qc,
       final InputInfo ii) throws QueryException {
 
     // checking input variables
@@ -135,8 +135,7 @@ public final class DigitalSignature {
     if(!TYPES.contains(lc(b))) throw CX_SIGTYPINV.get(info, t);
     final byte[] type = b;
 
-    Item signedNode = null;
-
+    final Item signedNode;
     try {
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
 
@@ -173,7 +172,7 @@ public final class DigitalSignature {
         }
 
         // initialize the keystore
-        KeyStore ks = null;
+        final KeyStore ks;
         try {
           ks = KeyStore.getInstance(ksTY);
         } catch(final KeyStoreException ex) {
@@ -188,9 +187,9 @@ public final class DigitalSignature {
         final PublicKey puk = x509ce.getPublicKey();
         final KeyInfoFactory kifactory = fac.getKeyInfoFactory();
         final KeyValue keyValue = kifactory.newKeyValue(puk);
-        final Vector<XMLStructure> kiCont = new Vector<XMLStructure>();
+        final Vector<XMLStructure> kiCont = new Vector<>();
         kiCont.add(keyValue);
-        final List<Object> x509Content = new ArrayList<Object>();
+        final List<Object> x509Content = new ArrayList<>();
         final X509IssuerSerial issuer = kifactory.newX509IssuerSerial(x509ce.
             getIssuerX500Principal().getName(), x509ce.getSerialNumber());
         x509Content.add(x509ce.getSubjectX500Principal().getName());
@@ -223,7 +222,7 @@ public final class DigitalSignature {
             XPathConstants.NODESET);
         if(xRes.getLength() < 1)
           throw CX_XPINV.get(info, expr);
-        tfList = new ArrayList<Transform>(2);
+        tfList = new ArrayList<>(2);
         tfList.add(fac.newTransform(Transform.XPATH,
             new XPathFilterParameterSpec(string(expr))));
         tfList.add(fac.newTransform(Transform.ENVELOPED,
@@ -267,29 +266,19 @@ public final class DigitalSignature {
 
       // actually sign the document
       xmlSig.sign(signContext);
-      signedNode = NodeType.DOC.cast(inputNode, ctx, null, ii);
+      signedNode = NodeType.DOC.cast(inputNode, qc, null, ii);
 
     } catch(final XPathExpressionException e) {
       throw CX_XPINV.get(info, e);
-    } catch(final SAXException e) {
-      throw CX_IOEXC.get(info, e);
-    } catch(final IOException e) {
-      throw CX_IOEXC.get(info, e);
-    } catch(final ParserConfigurationException e) {
+    } catch(final SAXException | IOException | ParserConfigurationException e) {
       throw CX_IOEXC.get(info, e);
     } catch(final KeyStoreException e) {
       throw CX_KSEXC.get(info, e);
-    } catch(final MarshalException e) {
+    } catch(final MarshalException |  XMLSignatureException e) {
       throw CX_SIGEXC.get(info, e);
-    } catch(final XMLSignatureException e) {
-      throw CX_SIGEXC.get(info, e);
-    } catch(final NoSuchAlgorithmException e) {
+    } catch(final NoSuchAlgorithmException | CertificateException e) {
       throw CX_ALGEXC.get(info, e);
-    } catch(final CertificateException e) {
-      throw CX_ALGEXC.get(info, e);
-    } catch(final UnrecoverableKeyException e) {
-      throw CX_NOKEY.get(info, e);
-    } catch(final KeyException e) {
+    } catch(final UnrecoverableKeyException | KeyException e) {
       throw CX_NOKEY.get(info, e);
     } catch(final InvalidAlgorithmParameterException e) {
       throw CX_ALGEXC.get(info, e);
@@ -305,8 +294,6 @@ public final class DigitalSignature {
    * @throws QueryException query exception
    */
   public Item validateSignature(final ANode node) throws QueryException {
-    boolean coreVal = false;
-
     try {
       final Document doc = toDOMNode(node);
       final DOMValidateContext valContext =
@@ -318,21 +305,14 @@ public final class DigitalSignature {
       valContext.setNode(signl.item(0));
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
       final XMLSignature signature = fac.unmarshalXMLSignature(valContext);
-      coreVal = signature.validate(valContext);
+      return Bln.get(signature.validate(valContext));
 
-    } catch(final XMLSignatureException e) {
-      throw CX_IOEXC.get(info, e);
-    } catch(final SAXException e) {
-      throw CX_IOEXC.get(info, e);
-    } catch(final ParserConfigurationException e) {
-      throw CX_IOEXC.get(info, e);
-    } catch(final IOException e) {
+    } catch(final XMLSignatureException | SAXException | ParserConfigurationException |
+        IOException e) {
       throw CX_IOEXC.get(info, e);
     } catch(final MarshalException e) {
       throw CX_SIGEXC.get(info, e);
     }
-
-    return Bln.get(coreVal);
   }
 
   /**

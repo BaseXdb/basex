@@ -57,6 +57,8 @@ public final class EditorView extends View {
   private final AbstractButton stop;
   /** Go button. */
   private final AbstractButton go;
+  /** Test button. */
+  private final AbstractButton test;
   /** Search bar. */
   private final SearchBar search;
   /** Info label. */
@@ -77,7 +79,7 @@ public final class EditorView extends View {
   /** Project files. */
   final ProjectView project;
   /** Input info. */
-  InputInfo errorInfo;
+  private InputInfo errorInfo;
 
   /**
    * Default constructor.
@@ -107,12 +109,15 @@ public final class EditorView extends View {
     stop.addKeyListener(this);
     stop.setEnabled(false);
 
-    go = BaseXButton.get("c_go", BaseXLayout.addShortcut(EXECUTE_QUERY, BaseXKeys.EXEC1.toString()),
-        false, gui);
+    go = BaseXButton.get("c_go", BaseXLayout.addShortcut(RUN_QUERY,
+        BaseXKeys.EXEC1.toString()), false, gui);
     go.addKeyListener(this);
+    test = BaseXButton.get("c_test", BaseXLayout.addShortcut(RUN_TESTS,
+        BaseXKeys.UNIT.toString()), false, gui);
+    test.addKeyListener(this);
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
-    buttons.layout(new TableLayout(1, 7, 1, 0)).border(0, 0, 8, 0);
+    buttons.layout(new TableLayout(1, 8, 1, 0)).border(0, 0, 8, 0);
     buttons.add(openB);
     buttons.add(saveB);
     buttons.add(hist);
@@ -120,6 +125,7 @@ public final class EditorView extends View {
     buttons.add(Box.createHorizontalStrut(6));
     buttons.add(stop);
     buttons.add(go);
+    buttons.add(test);
 
     final BaseXBack north = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     north.add(buttons, BorderLayout.WEST);
@@ -226,6 +232,7 @@ public final class EditorView extends View {
       public void actionPerformed(final ActionEvent e) {
         stop.setEnabled(false);
         go.setEnabled(false);
+        test.setEnabled(false);
         gui.stop();
       }
     });
@@ -233,6 +240,12 @@ public final class EditorView extends View {
       @Override
       public void actionPerformed(final ActionEvent e) {
         run(getEditor(), Action.EXECUTE);
+      }
+    });
+    test.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent e) {
+        run(getEditor(), Action.TEST);
       }
     });
     tabs.addChangeListener(new ChangeListener() {
@@ -243,6 +256,7 @@ public final class EditorView extends View {
         search.editor(ea, true);
         gui.refreshControls();
         posCode.invokeLater();
+        refreshMark();
         run(ea, Action.PARSE);
       }
     });
@@ -273,7 +287,9 @@ public final class EditorView extends View {
 
   @Override
   public void refreshMark() {
-    go.setEnabled(getEditor().script || !gui.gopts.get(GUIOptions.EXECRT));
+    final boolean script = getEditor().script;
+    go.setEnabled(script || !gui.gopts.get(GUIOptions.EXECRT));
+    test.setEnabled(!script);
   }
 
   @Override
@@ -287,6 +303,7 @@ public final class EditorView extends View {
     final Font ef = GUIConstants.font.deriveFont(7f + (fontSize >> 1));
     info.setFont(ef);
     pos.setFont(ef);
+    project.refreshLayout();
   }
 
   @Override
@@ -364,16 +381,7 @@ public final class EditorView extends View {
     fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
     fc.filter(BXS_FILES, IO.BXSSUFFIX);
     fc.textFilters();
-
-    final IOFile[] open = fc.multi().selectAll(Mode.FOPEN);
-    for(final IOFile f : open) open(f);
-  }
-
-  /**
-   * Reverts the contents of the currently opened editor.
-   */
-  public void reopen() {
-    getEditor().reopen(true);
+    for(final IOFile f : fc.multi().selectAll(Mode.FOPEN)) open(f);
   }
 
   /**
@@ -404,8 +412,7 @@ public final class EditorView extends View {
     if(file == null) return false;
 
     // success: display new file in project view
-    edit.save(file);
-    return true;
+    return edit.save(file);
   }
 
   /**
@@ -450,7 +457,6 @@ public final class EditorView extends View {
     if(edit != null) {
       // display open file
       tabs.setSelectedComponent(edit);
-      edit.reopen(true);
     } else {
       try {
         // check and retrieve content
@@ -486,7 +492,8 @@ public final class EditorView extends View {
     final boolean eq = eq(in, editor.last);
     if(eq && action == Action.CHECK) return;
 
-    if(action == Action.EXECUTE && gui.gopts.get(GUIOptions.SAVERUN)) {
+    final boolean run = action == Action.EXECUTE || action == Action.TEST;
+    if(run && gui.gopts.get(GUIOptions.SAVERUN)) {
       for(final EditorArea edit : editors()) {
         if(edit.opened()) edit.save();
       }
@@ -496,11 +503,10 @@ public final class EditorView extends View {
     editor.last = in;
 
     final boolean xquery = file.hasSuffix(IO.XQSUFFIXES) || !file.path().contains(".");
-    editor.script = !xquery && file.hasSuffix(IO.BXSSUFFIX);
-    if(action == Action.EXECUTE && editor.script) {
-      // execute query if forced, or if realtime execution is activated
+    if(editor.script && run) {
+      // run query if forced, or if realtime execution is activated
       gui.execute(true, new Execute(string(in)));
-    } else if(xquery || action == Action.EXECUTE) {
+    } else if(xquery || run) {
       // check if input is/might be an xquery main module
       String input = in.length == 0 ? "()" : string(in);
       boolean lib = QueryProcessor.isLibrary(input);
@@ -516,8 +522,12 @@ public final class EditorView extends View {
 
       gui.context.options.set(MainOptions.QUERYPATH, file.path());
       if(!lib && exec) {
-        // execute query if forced, or if realtime execution is activated
+        // run query if forced, or if realtime execution is activated
         gui.execute(true, new XQuery(input));
+        execFile = file;
+      } else if(action == Action.TEST) {
+        // run query if forced, or if realtime execution is activated
+        gui.execute(true, new Test(file.path()));
         execFile = file;
       } else {
         // parse query
@@ -587,9 +597,8 @@ public final class EditorView extends View {
   private byte[] read(final IOFile file) throws IOException {
     // check content
     final TokenBuilder text = new TokenBuilder((int) Math.min(Integer.MAX_VALUE, file.length()));
-    final TextInput ti = new NewlineInput(file).validate(true);
-    boolean valid = true;
-    try {
+    try(final TextInput ti = new NewlineInput(file).validate(true)) {
+      boolean valid = true;
       while(true) {
         try {
           final int cp = ti.read();
@@ -611,8 +620,6 @@ public final class EditorView extends View {
           }
         }
       }
-    } finally {
-      ti.close();
     }
   }
 
@@ -620,11 +627,11 @@ public final class EditorView extends View {
    * Refreshes the list of recent query files and updates the query path.
    * @param file new file
    */
-  void refreshHistory(final IO file) {
+  void refreshHistory(final IOFile file) {
     final StringList paths = new StringList();
     if(file != null) {
       final String path = file.path();
-      gui.gopts.set(GUIOptions.WORKPATH, file.dirPath());
+      gui.gopts.set(GUIOptions.WORKPATH, file.dir());
       paths.add(path);
       tabs.setToolTipTextAt(tabs.getSelectedIndex(), path);
     }
@@ -787,7 +794,7 @@ public final class EditorView extends View {
    * @param col column
    * @return position
    */
-  private int pos(final byte[] text, final int line, final int col) {
+  private static int pos(final byte[] text, final int line, final int col) {
     final int ll = text.length;
     int ep = ll;
     for(int p = 0, l = 1, c = 1; p < ll; ++c, p += cl(text, p)) {
@@ -893,10 +900,12 @@ public final class EditorView extends View {
     String title = edit.file.name();
     if(edit.modified) title += '*';
     edit.label.setText(title);
+    edit.script = edit.file.hasSuffix(IO.BXSSUFFIX);
 
     // update components
     gui.refreshControls();
     posCode.invokeLater();
+    refreshMark();
   }
 
   /** Code for setting cursor position. */
@@ -914,7 +923,7 @@ public final class EditorView extends View {
    * @param opened considers only opened files
    * @return editor
    */
-  EditorArea find(final IO file, final boolean opened) {
+  private EditorArea find(final IO file, final boolean opened) {
     for(final EditorArea edit : editors()) {
       if(edit.file.eq(file) && (!opened || edit.opened())) return edit;
     }
@@ -944,7 +953,7 @@ public final class EditorView extends View {
    * Adds a new editor tab.
    * @return editor reference
    */
-  EditorArea addTab() {
+  private EditorArea addTab() {
     final EditorArea edit = new EditorArea(this, newTabFile());
     edit.setFont(mfont);
 
@@ -1011,8 +1020,8 @@ public final class EditorView extends View {
    * Returns all editors.
    * @return editors
    */
-  EditorArea[] editors() {
-    final ArrayList<EditorArea> edits = new ArrayList<EditorArea>();
+  private EditorArea[] editors() {
+    final ArrayList<EditorArea> edits = new ArrayList<>();
     for(final Component c : tabs.getComponents()) {
       if(c instanceof EditorArea) edits.add((EditorArea) c);
     }

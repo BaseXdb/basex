@@ -25,7 +25,6 @@ import org.basex.util.*;
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
- * @author Andreas Weiler
  */
 public final class FNIndex extends StandardFunc {
   /** Name: name. */
@@ -49,60 +48,61 @@ public final class FNIndex extends StandardFunc {
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNIndex(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNIndex(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
-      case _INDEX_FACETS: return facets(ctx);
-      default: return super.item(ctx, ii);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    switch(func) {
+      case _INDEX_FACETS: return facets(qc);
+      default: return super.item(qc, ii);
     }
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
-      case _INDEX_TEXTS: return values(ctx, IndexType.TEXT);
-      case _INDEX_ATTRIBUTES: return values(ctx, IndexType.ATTRIBUTE);
-      case _INDEX_ELEMENT_NAMES: return names(ctx, IndexType.TAG);
-      case _INDEX_ATTRIBUTE_NAMES: return names(ctx, IndexType.ATTNAME);
-      default: return super.iter(ctx);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    switch(func) {
+      case _INDEX_TEXTS: return values(qc, IndexType.TEXT);
+      case _INDEX_ATTRIBUTES: return values(qc, IndexType.ATTRIBUTE);
+      case _INDEX_ELEMENT_NAMES: return names(qc, IndexType.TAG);
+      case _INDEX_ATTRIBUTE_NAMES: return names(qc, IndexType.ATTNAME);
+      default: return super.iter(qc);
     }
   }
 
   /**
    * Returns facet information about a database.
-   * @param ctx query context
+   * @param qc query context
    * @return facet information
    * @throws QueryException query exception
    */
-  private Item facets(final QueryContext ctx) throws QueryException {
-    final Data data = checkData(ctx);
-    final boolean flat = expr.length == 2 && eq(checkStr(expr[1], ctx), FLAT);
+  private Item facets(final QueryContext qc) throws QueryException {
+    final Data data = checkData(qc);
+    final boolean flat = exprs.length == 2 && eq(checkStr(exprs[1], qc), FLAT);
     return new FDoc().add(flat ? flat(data) : tree(data, data.paths.root().get(0)));
   }
 
   /**
    * Returns all entries of the specified value index.
-   * @param ctx query context
+   * @param qc query context
    * @param it index type
    * @return text entries
    * @throws QueryException query exception
    */
-  private Iter values(final QueryContext ctx, final IndexType it) throws QueryException {
-    final Data data = checkData(ctx);
-    final byte[] entry = expr.length < 2 ? EMPTY : checkStr(expr[1], ctx);
+  private Iter values(final QueryContext qc, final IndexType it) throws QueryException {
+    final Data data = checkData(qc);
+    final byte[] entry = exprs.length < 2 ? EMPTY : checkStr(exprs[1], qc);
     if(data.inMemory()) throw BXDB_MEM.get(info, data.meta.name);
 
-    final IndexEntries et = expr.length < 3 ? new IndexEntries(entry, it) :
-      new IndexEntries(entry, checkBln(expr[2], ctx), it);
+    final IndexEntries et = exprs.length < 3 ? new IndexEntries(entry, it) :
+      new IndexEntries(entry, checkBln(exprs[2], qc), it);
     return entries(data, et, this);
   }
 
@@ -137,13 +137,13 @@ public final class FNIndex extends StandardFunc {
 
   /**
    * Returns all entries of the specified name index.
-   * @param ctx query context
+   * @param qc query context
    * @param it index type
    * @return text entries
    * @throws QueryException query exception
    */
-  private Iter names(final QueryContext ctx, final IndexType it) throws QueryException {
-    final Data data = checkData(ctx);
+  private Iter names(final QueryContext qc, final IndexType it) throws QueryException {
+    final Data data = checkData(qc);
     return entries(it == IndexType.TAG ? data.tagindex : data.atnindex,
       new IndexEntries(EMPTY, it));
   }
@@ -205,7 +205,7 @@ public final class FNIndex extends StandardFunc {
     final Names names = elm ? data.tagindex : data.atnindex;
     if(root.kind == Data.ATTR || elm) elem.add(NAME, names.key(root.name));
     stats(root.stats, elem);
-    for(final PathNode p : root.ch) elem.add(tree(data, p));
+    for(final PathNode p : root.children) elem.add(tree(data, p));
     return elem;
   }
 
@@ -236,6 +236,6 @@ public final class FNIndex extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return dataLock(visitor) && super.accept(visitor);
+    return dataLock(visitor, 1) && super.accept(visitor);
   }
 }

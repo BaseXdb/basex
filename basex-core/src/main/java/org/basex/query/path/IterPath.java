@@ -8,7 +8,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -23,20 +22,16 @@ import org.basex.util.hash.*;
 final class IterPath extends AxisPath {
   /**
    * Constructor.
-   * @param ii input info
-   * @param r root expression
-   * @param s axis steps
-   * @param t return type
-   * @param c cardinality
+   * @param info input info
+   * @param root root expression
+   * @param steps axis steps
    */
-  IterPath(final InputInfo ii, final Expr r, final Expr[] s, final SeqType t, final long c) {
-    super(ii, r, s);
-    type = t;
-    size = c;
+  IterPath(final InputInfo info, final Expr root, final Expr... steps) {
+    super(info, root, steps);
   }
 
   @Override
-  public NodeIter iter(final QueryContext ctx) {
+  public NodeIter iter(final QueryContext qc) {
     return new NodeIter() {
       final boolean r = root != null;
       Expr[] expr;
@@ -58,16 +53,17 @@ final class IterPath extends AxisPath {
           }
           // create iterator array
           iter = new Iter[expr.length];
-          iter[0] = ctx.iter(expr[0]);
+          iter[0] = qc.iter(expr[0]);
         }
 
-        final Value cv = ctx.value;
-        final long cp = ctx.pos;
-        final long cs = ctx.size;
+        final Value cv = qc.value;
+        final long cp = qc.pos;
+        final long cs = qc.size;
         try {
           while(true) {
             final Item it = iter[p].next();
             if(it == null) {
+              iter[p] = null;
               if(--p == -1) {
                 node = null;
                 break;
@@ -75,9 +71,9 @@ final class IterPath extends AxisPath {
             } else if(p < iter.length - 1) {
               // ensure that root only returns nodes
               if(r && p == 0 && !(it instanceof ANode)) throw PATHNODE.get(info, it.type);
-              ctx.value = it;
+              qc.value = it;
               ++p;
-              if(iter[p] == null || !iter[p].reset()) iter[p] = ctx.iter(expr[p]);
+              if(iter[p] == null || !iter[p].reset()) iter[p] = qc.iter(expr[p]);
             } else {
               // remaining steps will always yield nodes
               final ANode n = (ANode) it;
@@ -90,9 +86,9 @@ final class IterPath extends AxisPath {
           return node;
         } finally {
           // reset context and return result
-          ctx.value = cv;
-          ctx.pos = cp;
-          ctx.size = cs;
+          qc.value = cv;
+          qc.pos = cp;
+          qc.size = cs;
         }
       }
 
@@ -107,8 +103,8 @@ final class IterPath extends AxisPath {
   }
 
   @Override
-  public IterPath copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return copyType(new IterPath(info, root == null ? null : root.copy(ctx, scp, vs),
-        Arr.copyAll(ctx, scp, vs, steps), type, size));
+  public IterPath copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    final Expr rt = root == null ? null : root.copy(qc, scp, vs);
+    return copyType(new IterPath(info, rt,  Arr.copyAll(qc, scp, vs, steps)));
   }
 }

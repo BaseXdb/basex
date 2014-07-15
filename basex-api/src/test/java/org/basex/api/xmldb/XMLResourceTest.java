@@ -6,6 +6,8 @@ import java.io.*;
 
 import javax.xml.parsers.*;
 
+import org.basex.io.*;
+import org.basex.util.*;
 import org.junit.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
@@ -79,8 +81,7 @@ public class XMLResourceTest extends XMLDBBaseTest {
   @Test
   public void testSetContentAsDOM() throws Exception {
     // store small document
-    final XMLResource xml = (XMLResource) coll.createResource(DOC2,
-        XMLResource.RESOURCE_TYPE);
+    final XMLResource xml = (XMLResource) coll.createResource(DOC2, XMLResource.RESOURCE_TYPE);
     xml.setContent("<xml/>");
     coll.storeResource(xml);
     assertEquals("Wrong number of documents.", 2, coll.getResourceCount());
@@ -88,8 +89,7 @@ public class XMLResourceTest extends XMLDBBaseTest {
     // overwrite document with DOM contents
     final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     final DocumentBuilder builder = factory.newDocumentBuilder();
-    final Document doc = builder.parse(
-        new File(DOCPATH + DOC2));
+    final Document doc = builder.parse(new File(DOCPATH, DOC2));
     xml.setContentAsDOM(doc);
     coll.storeResource(xml);
     assertEquals("Wrong number of documents.", 2, coll.getResourceCount());
@@ -118,10 +118,8 @@ public class XMLResourceTest extends XMLDBBaseTest {
   @Test
   public void testSetContentAsSAX() throws Exception {
     // store small document
-    final XMLResource doc2 = (XMLResource) coll.createResource(DOC2,
-        XMLResource.RESOURCE_TYPE);
-    final XMLResource doc3 = (XMLResource) coll.createResource(DOC3,
-        XMLResource.RESOURCE_TYPE);
+    final XMLResource doc2 = (XMLResource) coll.createResource(DOC2, XMLResource.RESOURCE_TYPE);
+    final XMLResource doc3 = (XMLResource) coll.createResource(DOC3, XMLResource.RESOURCE_TYPE);
 
     final XMLReader reader2 = XMLReaderFactory.createXMLReader();
     reader2.setContentHandler(doc2.setContentAsSAX());
@@ -156,7 +154,7 @@ public class XMLResourceTest extends XMLDBBaseTest {
 
     // compare serialized node with input file
     final String cont = r.getContent().toString().replaceAll("\\r?\\n *", "");
-    final String buffer = new String(read(file)).trim();
+    final String buffer = Token.string(new IOFile(file).read()).trim();
     assertEquals("File content differs.", buffer, cont.trim());
   }
 }

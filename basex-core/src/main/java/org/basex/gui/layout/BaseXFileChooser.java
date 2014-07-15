@@ -45,13 +45,13 @@ public final class BaseXFileChooser {
    * @param main reference to main window
    */
   public BaseXFileChooser(final String title, final String path, final GUI main) {
+    final IOFile file = new IOFile(path);
     if(main.gopts.get(GUIOptions.SIMPLEFD)) {
       fd = new FileDialog(main, title);
-      fd.setDirectory(new File(path).getPath());
+      fd.setDirectory(file.path());
     } else {
       fc = new JFileChooser(path);
-      final File file = new File(path);
-      if(!file.isDirectory()) fc.setSelectedFile(file);
+      if(!file.isDir()) fc.setSelectedFile(file.file());
       fc.setDialogTitle(title);
       gui = main;
     }

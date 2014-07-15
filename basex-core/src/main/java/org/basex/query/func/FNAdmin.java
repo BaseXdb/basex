@@ -54,45 +54,46 @@ public final class FNAdmin extends StandardFunc {
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNAdmin(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNAdmin(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    checkAdmin(ctx);
-    switch(sig) {
-      case _ADMIN_LOGS:     return logs(ctx);
-      case _ADMIN_USERS:    return users(ctx);
-      case _ADMIN_SESSIONS: return sessions(ctx);
-      default:              return super.iter(ctx);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    checkAdmin(qc);
+    switch(func) {
+      case _ADMIN_LOGS:     return logs(qc);
+      case _ADMIN_USERS:    return users(qc);
+      case _ADMIN_SESSIONS: return sessions(qc);
+      default:              return super.iter(qc);
     }
   }
 
   /**
    * Lists all log files.
-   * @param ctx query context
+   * @param qc query context
    * @return users
    * @throws QueryException query exception
    */
-  private Iter logs(final QueryContext ctx) throws QueryException {
+  private Iter logs(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
-    if(expr.length == 0) {
+    if(exprs.length == 0) {
       // return list of all log files
-      for(final IOFile f : ctx.context.log.files()) {
+      for(final IOFile f : qc.context.log.files()) {
         final String date = f.name().replace(IO.LOGSUFFIX, "");
         vb.add(new FElem(FILE).add(date).add(SIZE, Token.token(f.length())));
       }
     } else {
       // return content of single log file
-      final boolean merge = expr.length > 1 && checkBln(expr[1], ctx);
-      final String name = Token.string(checkStr(expr[0], ctx)) + IO.LOGSUFFIX;
-      final IOFile file = new IOFile(ctx.context.log.dir(), name);
+      final boolean merge = exprs.length > 1 && checkBln(exprs[1], qc);
+      final String name = Token.string(checkStr(exprs[0], qc)) + IO.LOGSUFFIX;
+      final IOFile file = new IOFile(qc.context.log.dir(), name);
       final ArrayList<LogEntry> logs = logs(file);
       for(int s = 0; s < logs.size(); s++) {
         final LogEntry l1 = logs.get(s);
@@ -142,30 +143,25 @@ public final class FNAdmin extends StandardFunc {
    * @throws QueryException query exception
    */
   private ArrayList<LogEntry> logs(final IOFile file) throws QueryException {
-    try {
-      final ArrayList<LogEntry> logs = new ArrayList<LogEntry>();
-      final NewlineInput nli = new NewlineInput(file);
-      try {
-        for(String line; (line = nli.readLine()) != null;) {
-          final LogEntry log = new LogEntry();
-          final String[] cols = line.split("\t");
-          if(cols.length > 2 && (cols[1].matches(".*:\\d+") || cols[1].equals(Log.SERVER))) {
-            log.time = cols[0];
-            log.address = cols[1];
-            log.user = cols[2];
-            log.type = cols.length > 3 ? cols[3] : "";
-            log.message = cols.length > 4 ? cols[4] : "";
-            log.ms = cols.length > 5 ? new BigDecimal(cols[5].replace(" ms", "")) : BigDecimal.ZERO;
-          } else {
-            // legacy format
-            log.message = line;
-          }
-          logs.add(log);
+    try(final NewlineInput nli = new NewlineInput(file)) {
+      final ArrayList<LogEntry> logs = new ArrayList<>();
+      for(String line; (line = nli.readLine()) != null;) {
+        final LogEntry log = new LogEntry();
+        final String[] cols = line.split("\t");
+        if(cols.length > 2 && (cols[1].matches(".*:\\d+") || cols[1].equals(Log.SERVER))) {
+          log.time = cols[0];
+          log.address = cols[1];
+          log.user = cols[2];
+          log.type = cols.length > 3 ? cols[3] : "";
+          log.message = cols.length > 4 ? cols[4] : "";
+          log.ms = cols.length > 5 ? new BigDecimal(cols[5].replace(" ms", "")) : BigDecimal.ZERO;
+        } else {
+          // legacy format
+          log.message = line;
         }
-        return logs;
-      } finally {
-        nli.close();
+        logs.add(log);
       }
+      return logs;
     } catch(final IOException ex) {
       throw IOERR.get(info, ex);
     }
@@ -173,14 +169,14 @@ public final class FNAdmin extends StandardFunc {
 
   /**
    * Lists all registered users.
-   * @param ctx query context
+   * @param qc query context
    * @return users
    * @throws QueryException query exception
    */
-  private Iter users(final QueryContext ctx) throws QueryException {
+  private Iter users(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
-    for(final User u : expr.length == 0 ? ctx.context.users.users(null) :
-      checkData(ctx).meta.users.users(ctx.context.users)) {
+    for(final User u : exprs.length == 0 ? qc.context.users.users(null) :
+      checkData(qc).meta.users.users(qc.context.users)) {
       vb.add(new FElem(USER).add(u.name).add(PERMISSION,
           u.perm.toString().toLowerCase(Locale.ENGLISH)).add(PASSWORD, u.password));
     }
@@ -189,13 +185,13 @@ public final class FNAdmin extends StandardFunc {
 
   /**
    * Lists all open sessions.
-   * @param ctx query context
+   * @param qc query context
    * @return users
    */
-  private static Iter sessions(final QueryContext ctx) {
+  private static Iter sessions(final QueryContext qc) {
     final ValueBuilder vb = new ValueBuilder();
-    synchronized(ctx.context.sessions) {
-      for(final ClientListener sp : ctx.context.sessions) {
+    synchronized(qc.context.sessions) {
+      for(final ClientListener sp : qc.context.sessions) {
         final String user = sp.context().user.name;
         final String addr = sp.address();
         final Data data = sp.context().data();
@@ -209,7 +205,7 @@ public final class FNAdmin extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return !(oneOf(sig, _ADMIN_USERS, _ADMIN_SESSIONS) && !visitor.lock(DBLocking.ADMIN)) &&
-      !(sig == _ADMIN_USERS && expr.length > 0 && !dataLock(visitor)) && super.accept(visitor);
+    return !(oneOf(func, _ADMIN_USERS, _ADMIN_SESSIONS) && !visitor.lock(DBLocking.ADMIN)) &&
+      !(func == _ADMIN_USERS && exprs.length > 0 && !dataLock(visitor, 1)) && super.accept(visitor);
   }
 }

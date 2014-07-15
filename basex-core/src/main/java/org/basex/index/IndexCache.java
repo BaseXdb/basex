@@ -15,7 +15,7 @@ import org.basex.util.*;
  */
 public final class IndexCache {
   /** Queue used to collect unused keys. */
-  private final ReferenceQueue<IndexEntry> queue = new ReferenceQueue<IndexEntry>();
+  private final ReferenceQueue<IndexEntry> queue = new ReferenceQueue<>();
   /** Read-write lock. */
   private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock(true);
   /** Hash table buckets. */

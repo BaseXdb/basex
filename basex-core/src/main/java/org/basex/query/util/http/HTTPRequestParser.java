@@ -26,10 +26,10 @@ public final class HTTPRequestParser {
 
   /**
    * Constructor.
-   * @param ii input info
+   * @param info input info
    */
-  public HTTPRequestParser(final InputInfo ii) {
-    info = ii;
+  public HTTPRequestParser(final InputInfo info) {
+    this.info = info;
   }
 
   /**

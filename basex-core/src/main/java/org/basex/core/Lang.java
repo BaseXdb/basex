@@ -16,15 +16,14 @@ import org.basex.util.list.*;
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
- * @author Andreas Weiler
  */
 public final class Lang {
   /** Language suffix. */
   private static final String SUFFIX = "lang";
   /** Cached source files. */
-  private static final HashMap<String, String> TEXTS = new HashMap<String, String>();
+  private static final HashMap<String, String> TEXTS = new HashMap<>();
   /** Checks which strings have been applied. */
-  private static final HashMap<String, Boolean> CHECK = new HashMap<String, Boolean>();
+  private static final HashMap<String, Boolean> CHECK = new HashMap<>();
 
   /** Private constructor. */
   private Lang() { }
@@ -44,27 +43,22 @@ public final class Lang {
     if(is == null) {
       Util.errln(path + " not found.");
     } else {
-      try {
-        final NewlineInput nli = new NewlineInput(is);
-        try {
-          for(String line; (line = nli.readLine()) != null;) {
-            final int i = line.indexOf('=');
-            if(i == -1 || line.startsWith("#")) continue;
-            final String key = line.substring(0, i).trim();
-            String val = line.substring(i + 1).trim();
-            if("langright".equals(key)) {
-              Prop.langright = "true".equals(val);
-            } else {
-              if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
-              if(Prop.langkeys) val = '[' + key + ": " + val + ']';
-              if(TEXTS.put(key, val) != null) {
-                Util.errln("%." + SUFFIX + ": '%' is declared twice", lang, key);
-              }
-              CHECK.put(key, true);
+      try(final NewlineInput nli = new NewlineInput(is)) {
+        for(String line; (line = nli.readLine()) != null;) {
+          final int i = line.indexOf('=');
+          if(i == -1 || line.startsWith("#")) continue;
+          final String key = line.substring(0, i).trim();
+          String val = line.substring(i + 1).trim();
+          if("langright".equals(key)) {
+            Prop.langright = "true".equals(val);
+          } else {
+            if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
+            if(Prop.langkeys) val = '[' + key + ": " + val + ']';
+            if(TEXTS.put(key, val) != null) {
+              Util.errln("%." + SUFFIX + ": '%' is declared twice", lang, key);
             }
+            CHECK.put(key, true);
           }
-        } finally {
-          nli.close();
         }
       } catch(final IOException ex) {
         Util.errln(ex);
@@ -130,7 +124,7 @@ public final class Lang {
           creds.add(credits(cont));
         }
       } else {
-        for(final IO f : IOFile.get(url.toString()).children()) {
+        for(final IO f : new IOFile(IOUrl.toFile(url.toString())).children()) {
           langs.add(f.name().replaceAll('.' + SUFFIX, ""));
           creds.add(credits(f.read()));
         }
@@ -158,7 +152,7 @@ public final class Lang {
   public static void check() {
     read("English");
     final StringBuilder sb = new StringBuilder();
-    final HashSet<String> set = new HashSet<String>();
+    final HashSet<String> set = new HashSet<>();
     for(final String s : TEXTS.keySet()) set.add(s);
 
     final IOFile[] files = new IOFile("src/main/resources/lang").children();

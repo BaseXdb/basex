@@ -29,59 +29,60 @@ import org.basex.util.*;
 public final class FNSeq extends StandardFunc {
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNSeq(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNSeq(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
-      case HEAD: return head(ctx);
-      default:   return super.item(ctx, ii);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    switch(func) {
+      case HEAD: return head(qc);
+      default:   return super.item(qc, ii);
     }
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
-      case INDEX_OF:        return indexOf(ctx);
-      case DISTINCT_VALUES: return distinctValues(ctx);
-      case INSERT_BEFORE:   return insertBefore(ctx);
-      case REVERSE:         return reverse(ctx);
-      case REMOVE:          return remove(ctx);
-      case SUBSEQUENCE:     return subseqIter(ctx);
-      case TAIL:            return tail(ctx);
-      case OUTERMOST:       return most(ctx, true);
-      case INNERMOST:       return most(ctx, false);
-      default:              return super.iter(ctx);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    switch(func) {
+      case INDEX_OF:        return indexOf(qc);
+      case DISTINCT_VALUES: return distinctValues(qc);
+      case INSERT_BEFORE:   return insertBefore(qc);
+      case REVERSE:         return reverse(qc);
+      case REMOVE:          return remove(qc);
+      case SUBSEQUENCE:     return subseqIter(qc);
+      case TAIL:            return tail(qc);
+      case OUTERMOST:       return most(qc, true);
+      case INNERMOST:       return most(qc, false);
+      default:              return super.iter(qc);
     }
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    switch(sig) {
-      case SUBSEQUENCE: return subseqValue(ctx);
-      case TAIL:        final Value seq = ctx.value(expr[0]);
+  public Value value(final QueryContext qc) throws QueryException {
+    switch(func) {
+      case SUBSEQUENCE: return subseqValue(qc);
+      case TAIL:        final Value seq = qc.value(exprs[0]);
                         return SubSeq.get(seq, 1, seq.size() - 1);
-      default:          return super.value(ctx);
+      default:          return super.value(qc);
     }
   }
 
   /**
    * Returns the outermost/innermost nodes of a node sequence, i.e. a node is
    * only contained, if none of its ancestors/descendants are.
-   * @param ctx query context
+   * @param qc query context
    * @param outer outermost flag
    * @return outermost/innermost nodes
    * @throws QueryException exception
    */
-  private Iter most(final QueryContext ctx, final boolean outer) throws QueryException {
-    final Iter iter = expr[0].iter(ctx);
+  private Iter most(final QueryContext qc, final boolean outer) throws QueryException {
+    final Iter iter = exprs[0].iter(qc);
     final NodeSeqBuilder nc = new NodeSeqBuilder().check();
     for(Item it; (it = iter.next()) != null;) nc.add(checkNode(it));
     final int len = (int) nc.size();
@@ -142,26 +143,26 @@ public final class FNSeq extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx, final VarScope scp) throws QueryException {
+  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
     // static typing:
     // index-of will create integers, insert-before might add new types
-    if(sig == Function.INDEX_OF || sig == Function.INSERT_BEFORE) return this;
+    if(func == Function.INDEX_OF || func == Function.INSERT_BEFORE) return this;
 
     // pre-evaluate distinct values
-    final SeqType st = expr[0].type();
+    final SeqType st = exprs[0].type();
     final Type t = st.type;
-    if(sig == Function.DISTINCT_VALUES && expr.length == 1) {
+    if(func == Function.DISTINCT_VALUES && exprs.length == 1) {
       type = t.isNode() ? SeqType.get(AtomType.ATM, st.occ) : st;
-      return cmpDist(ctx);
+      return cmpDist(qc);
     }
 
     // all other types will return existing types
     Occ o = Occ.ZERO_MORE;
     // at most one returned item
-    if(sig == Function.SUBSEQUENCE && st.one()) o = Occ.ZERO_ONE;
+    if(func == Function.SUBSEQUENCE && st.one()) o = Occ.ZERO_ONE;
 
     // head will return at most one item
-    else if(sig == Function.HEAD) o = Occ.ZERO_ONE;
+    else if(func == Function.HEAD) o = Occ.ZERO_ONE;
     type = SeqType.get(t, o);
 
     return this;
@@ -169,15 +170,15 @@ public final class FNSeq extends StandardFunc {
 
   /**
    * Pre-evaluates distinct-values() function, utilizing database statistics.
-   * @param ctx query context
+   * @param qc query context
    * @return original or optimized expression
    * @throws QueryException query exception
    */
-  private Expr cmpDist(final QueryContext ctx) throws QueryException {
+  private Expr cmpDist(final QueryContext qc) throws QueryException {
     // can only be performed on axis paths
-    if(!(expr[0] instanceof AxisPath)) return this;
+    if(!(exprs[0] instanceof AxisPath)) return this;
     // try to get statistics for resulting nodes
-    final ArrayList<PathNode> nodes = ((AxisPath) expr[0]).nodes(ctx);
+    final ArrayList<PathNode> nodes = ((AxisPath) exprs[0]).nodes(qc);
     if(nodes == null) return this;
     // loop through all nodes
     final HashItemSet is = new HashItemSet();
@@ -185,7 +186,7 @@ public final class FNSeq extends StandardFunc {
       // retrieve text child if addressed node is an element
       if(pn.kind == Data.ELEM) {
         if(!pn.stats.isLeaf()) return this;
-        for(final PathNode n : pn.ch) if(n.kind == Data.TEXT) pn = n;
+        for(final PathNode n : pn.children) if(n.kind == Data.TEXT) pn = n;
       }
       // skip nodes others than texts and attributes
       if(pn.kind != Data.TEXT && pn.kind != Data.ATTR) return this;
@@ -202,26 +203,26 @@ public final class FNSeq extends StandardFunc {
 
   /**
    * Returns the first item in a sequence.
-   * @param ctx query context
+   * @param qc query context
    * @return first item
    * @throws QueryException query exception
    */
-  private Item head(final QueryContext ctx) throws QueryException {
-    final Expr e = expr[0];
-    return e.type().zeroOrOne() ? e.item(ctx, info) : e.iter(ctx).next();
+  private Item head(final QueryContext qc) throws QueryException {
+    final Expr e = exprs[0];
+    return e.type().zeroOrOne() ? e.item(qc, info) : e.iter(qc).next();
   }
 
   /**
    * Returns all but the first item in a sequence.
-   * @param ctx query context
+   * @param qc query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter tail(final QueryContext ctx) throws QueryException {
-    final Expr e = expr[0];
+  private Iter tail(final QueryContext qc) throws QueryException {
+    final Expr e = exprs[0];
     if(e.type().zeroOrOne()) return Empty.ITER;
 
-    final Iter ir = e.iter(ctx);
+    final Iter ir = e.iter(qc);
     if(ir instanceof ValueIter) {
       final Value val = ir.value();
       return SubSeq.get(val, 1, val.size() - 1).iter();
@@ -239,16 +240,16 @@ public final class FNSeq extends StandardFunc {
 
   /**
    * Returns the indexes of an item in a sequence.
-   * @param ctx query context
+   * @param qc query context
    * @return position(s) of item
    * @throws QueryException query exception
    */
-  private Iter indexOf(final QueryContext ctx) throws QueryException {
-    final Item it = checkItem(expr[1], ctx);
-    final Collation coll = checkColl(expr.length == 3 ? expr[2] : null, ctx, sc);
+  private Iter indexOf(final QueryContext qc) throws QueryException {
+    final Item it = checkItem(exprs[1], qc);
+    final Collation coll = checkColl(exprs.length == 3 ? exprs[2] : null, qc, sc);
 
     return new Iter() {
-      final Iter ir = expr[0].iter(ctx);
+      final Iter ir = exprs[0].iter(qc);
       int c;
 
       @Override
@@ -265,24 +266,24 @@ public final class FNSeq extends StandardFunc {
 
   /**
    * Returns all distinct values of a sequence.
-   * @param ctx query context
+   * @param qc query context
    * @return distinct iterator
    * @throws QueryException query exception
    */
-  private Iter distinctValues(final QueryContext ctx) throws QueryException {
-    final Collation coll = checkColl(expr.length == 2 ? expr[1] : null, ctx, sc);
-    if(expr[0] instanceof RangeSeq) return expr[0].iter(ctx);
+  private Iter distinctValues(final QueryContext qc) throws QueryException {
+    final Collation coll = checkColl(exprs.length == 2 ? exprs[1] : null, qc, sc);
+    if(exprs[0] instanceof RangeSeq) return exprs[0].iter(qc);
 
     return new Iter() {
       final ItemSet set = coll == null ? new HashItemSet() : new CollationItemSet(coll);
-      final Iter ir = expr[0].iter(ctx);
+      final Iter ir = exprs[0].iter(qc);
 
       @Override
       public Item next() throws QueryException {
         while(true) {
           Item i = ir.next();
           if(i == null) return null;
-          ctx.checkStop();
+          qc.checkStop();
           i = atom(i, info);
           if(set.add(i, info)) return i;
         }
@@ -292,15 +293,15 @@ public final class FNSeq extends StandardFunc {
 
   /**
    * Inserts items before the specified position.
-   * @param ctx query context
+   * @param qc query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter insertBefore(final QueryContext ctx) throws QueryException {
+  private Iter insertBefore(final QueryContext qc) throws QueryException {
     return new Iter() {
-      final long pos = Math.max(1, checkItr(expr[1], ctx));
-      final Iter iter = expr[0].iter(ctx);
-      final Iter ins = expr[2].iter(ctx);
+      final long pos = Math.max(1, checkItr(exprs[1], qc));
+      final Iter iter = exprs[0].iter(qc);
+      final Iter ins = exprs[2].iter(qc);
       long p = pos;
       boolean last;
 
@@ -319,14 +320,14 @@ public final class FNSeq extends StandardFunc {
 
   /**
    * Removes an item at a specified position in a sequence.
-   * @param ctx query context
+   * @param qc query context
    * @return iterator without item
    * @throws QueryException query exception
    */
-  private Iter remove(final QueryContext ctx) throws QueryException {
+  private Iter remove(final QueryContext qc) throws QueryException {
     return new Iter() {
-      final long pos = checkItr(expr[1], ctx);
-      final Iter iter = expr[0].iter(ctx);
+      final long pos = checkItr(exprs[1], qc);
+      final Iter iter = exprs[0].iter(qc);
       long c;
 
       @Override
@@ -339,27 +340,27 @@ public final class FNSeq extends StandardFunc {
   /**
    * Creates a subsequence out of a sequence, starting with start and
    * ending with end.
-   * @param ctx query context
+   * @param qc query context
    * @return subsequence
    * @throws QueryException query exception
    */
-  private Iter subseqIter(final QueryContext ctx) throws QueryException {
-    final double ds = checkDbl(expr[1], ctx);
+  private Iter subseqIter(final QueryContext qc) throws QueryException {
+    final double ds = checkDbl(exprs[1], qc);
     if(Double.isNaN(ds)) return Empty.ITER;
     final long s = StrictMath.round(ds);
     final boolean si = s == Long.MIN_VALUE;
 
     long l = Long.MAX_VALUE;
-    if(expr.length > 2) {
-      final double dl = checkDbl(expr[2], ctx);
+    if(exprs.length > 2) {
+      final double dl = checkDbl(exprs[2], qc);
       if(Double.isNaN(dl)) return Empty.ITER;
       if(si && dl == Double.POSITIVE_INFINITY) return Empty.ITER;
       l = StrictMath.round(dl);
     }
     final boolean li = l == Long.MAX_VALUE;
-    if(si) return li ? expr[0].iter(ctx) : Empty.ITER;
+    if(si) return li ? exprs[0].iter(qc) : Empty.ITER;
 
-    final Iter iter = ctx.iter(expr[0]);
+    final Iter iter = qc.iter(exprs[0]);
 
     // optimization: return subsequence
     if(iter instanceof ValueIter) {
@@ -413,27 +414,27 @@ public final class FNSeq extends StandardFunc {
 
   /**
    * Evaluates the {@code subsequence} function strictly.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Value subseqValue(final QueryContext ctx) throws QueryException {
-    final double dstart = checkDbl(expr[1], ctx);
+  private Value subseqValue(final QueryContext qc) throws QueryException {
+    final double dstart = checkDbl(exprs[1], qc);
     if(Double.isNaN(dstart)) return Empty.SEQ;
     final long start = StrictMath.round(dstart);
     final boolean sinf = start == Long.MIN_VALUE;
 
     long length = Long.MAX_VALUE;
-    if(expr.length > 2) {
-      final double dlength = checkDbl(expr[2], ctx);
+    if(exprs.length > 2) {
+      final double dlength = checkDbl(exprs[2], qc);
       if(Double.isNaN(dlength)) return Empty.SEQ;
       if(sinf && dlength == Double.POSITIVE_INFINITY) return Empty.SEQ;
       length = StrictMath.round(dlength);
     }
     final boolean linf = length == Long.MAX_VALUE;
-    if(sinf) return linf ? expr[0].value(ctx) : Empty.SEQ;
+    if(sinf) return linf ? exprs[0].value(qc) : Empty.SEQ;
 
-    final Iter iter = ctx.iter(expr[0]);
+    final Iter iter = qc.iter(exprs[0]);
 
     // optimization: return subsequence
     if(iter instanceof ValueIter) {
@@ -470,20 +471,20 @@ public final class FNSeq extends StandardFunc {
 
   /**
    * Reverses a sequence.
-   * @param ctx query context
+   * @param qc query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter reverse(final QueryContext ctx) throws QueryException {
+  private Iter reverse(final QueryContext qc) throws QueryException {
     // optimization: reverse sequence
-    if(expr[0] instanceof Seq) return ((Seq) expr[0]).reverse().iter();
+    if(exprs[0] instanceof Seq) return ((Seq) exprs[0]).reverse().iter();
 
     // materialize value if number of results is unknown
-    final Iter iter = ctx.iter(expr[0]);
+    final Iter iter = qc.iter(exprs[0]);
     final long s = iter.size();
     if(s == -1) {
       // estimate result size (could be known in the original expression)
-      final ValueBuilder vb = new ValueBuilder(Math.max((int) expr[0].size(), 1));
+      final ValueBuilder vb = new ValueBuilder(Math.max((int) exprs[0].size(), 1));
       for(Item it; (it = iter.next()) != null;) vb.add(it);
       Array.reverse(vb.items(), 0, (int) vb.size());
       return vb;

@@ -27,28 +27,28 @@ final class List extends TrieNode {
   /**
    * Constructor.
    *
-   * @param h hash value
-   * @param ks key array
-   * @param vs value array
+   * @param hash hash value
+   * @param keys key array
+   * @param values value array
    */
-  List(final int h, final Item[] ks, final Value[] vs) {
-    super(ks.length);
-    keys = ks;
-    values = vs;
-    hash = h;
+  List(final int hash, final Item[] keys, final Value[] values) {
+    super(keys.length);
+    this.keys = keys;
+    this.values = values;
+    this.hash = hash;
     assert verify();
   }
 
   /**
    * Constructor for creating a collision list from two bindings.
-   * @param h hash value
-   * @param k1 first key
-   * @param v1 first value
-   * @param k2 second key
-   * @param v2 second value
+   * @param hash hash value
+   * @param key1 first key
+   * @param value1 first value
+   * @param key2 second key
+   * @param value2 second value
    */
-  List(final int h, final Item k1, final Value v1, final Item k2, final Value v2) {
-    this(h, new Item[]{ k1, k2 }, new Value[]{ v1, v2 });
+  List(final int hash, final Item key1, final Value value1, final Item key2, final Value value2) {
+    this(hash, new Item[]{ key1, key2 }, new Value[]{ value1, value2 });
   }
 
   @Override

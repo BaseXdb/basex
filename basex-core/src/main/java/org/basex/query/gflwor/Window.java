@@ -43,24 +43,24 @@ public final class Window extends Clause {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param slide {@code sliding window} flag
-   * @param v window variable
-   * @param in sequence
-   * @param st start condition
-   * @param o {@code only} flag
-   * @param nd end condition
+   * @param info input info
+   * @param sliding {@code sliding window} flag
+   * @param var window variable
+   * @param expr sequence
+   * @param start start condition
+   * @param only {@code only} flag
+   * @param end end condition
    * @throws QueryException query exception
    */
-  public Window(final InputInfo ii, final boolean slide, final Var v, final Expr in,
-      final Condition st, final boolean o, final Condition nd) throws QueryException {
-    super(ii, vars(v, st, nd, ii));
-    sliding = slide;
-    var = v;
-    expr = in;
-    start = st;
-    only = o;
-    end = nd;
+  public Window(final InputInfo info, final boolean sliding, final Var var, final Expr expr,
+      final Condition start, final boolean only, final Condition end) throws QueryException {
+    super(info, vars(var, start, end, info));
+    this.sliding = sliding;
+    this.var = var;
+    this.expr = expr;
+    this.start = start;
+    this.only = only;
+    this.end = end;
   }
 
   /**
@@ -68,12 +68,12 @@ public final class Window extends Clause {
    * @param vr window variable
    * @param st start condition
    * @param nd end condition, might be {@code null}
-   * @param ii input info for the error message
+   * @param info input info for the error message
    * @return non-{@code null} variables
    * @throws QueryException query exception if the variable names aren't unique
    */
   private static Var[] vars(final Var vr, final Condition st, final Condition nd,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
     // determine the size of the array beforehand
     final int stn = st.nVars();
     final Var[] vs = new Var[1 + stn + (nd == null ? 0 : nd.nVars())];
@@ -87,15 +87,14 @@ public final class Window extends Clause {
     for(int i = 0; i < vs.length; i++) {
       final Var v = vs[i];
       for(int j = i; --j >= 0;)
-        if(v.name.eq(vs[j].name)) throw WINDOWUNIQ.get(ii, vs[j]);
+        if(v.name.eq(vs[j].name)) throw WINDOWUNIQ.get(info, vs[j]);
     }
     return vs;
   }
 
   @Override
   Eval eval(final Eval sub) {
-    return sliding ? slidingEval(sub) : end == null ? tumblingEval(sub)
-        : tumblingEndEval(sub);
+    return sliding ? slidingEval(sub) : end == null ? tumblingEval(sub) : tumblingEndEval(sub);
   }
 
   /**
@@ -110,10 +109,10 @@ public final class Window extends Clause {
       /** Position of the start item. */
       private long spos;
       @Override
-      public boolean next(final QueryContext ctx) throws QueryException {
+      public boolean next(final QueryContext qc) throws QueryException {
         while(true) {
           // find first item
-          final Item fst = vals != null ? vals[0] : findStart(ctx) ? curr : null;
+          final Item fst = vals != null ? vals[0] : findStart(qc) ? curr : null;
 
           // find end item
           if(fst != null) {
@@ -124,7 +123,7 @@ public final class Window extends Clause {
             vals = null;
 
             while(readNext()) {
-              if(start.matches(ctx, curr, p, prev, next)) {
+              if(start.matches(qc, curr, p, prev, next)) {
                 vals = new Item[]{ curr, prev, next };
                 spos = p;
                 break;
@@ -132,13 +131,13 @@ public final class Window extends Clause {
               window.add(curr);
             }
 
-            start.bind(ctx, st[0], ps, st[1], st[2]);
-            ctx.set(var, window.value(), info);
+            start.bind(qc, st[0], ps, st[1], st[2]);
+            qc.set(var, window.value(), info);
             return true;
           }
 
           // no more iterations from above, we're done here
-          if(!prepareNext(ctx, sub)) return false;
+          if(!prepareNext(qc, sub)) return false;
           vals = null;
         }
       }
@@ -153,15 +152,15 @@ public final class Window extends Clause {
   private Eval tumblingEndEval(final Eval sub) {
     return new TumblingEval() {
       @Override
-      public boolean next(final QueryContext ctx) throws QueryException {
+      public boolean next(final QueryContext qc) throws QueryException {
         while(true) {
-          if(findStart(ctx)) {
+          if(findStart(qc)) {
             // find end item
             final ValueBuilder window = new ValueBuilder();
             boolean found = false;
             do {
               window.add(curr);
-              if(end.matches(ctx, curr, p, prev, next)) {
+              if(end.matches(qc, curr, p, prev, next)) {
                 found = true;
                 break;
               }
@@ -169,13 +168,13 @@ public final class Window extends Clause {
 
             // don't return dangling items if the {@code only} flag was specified
             if(found || !only) {
-              ctx.set(var, window.value(), info);
+              qc.set(var, window.value(), info);
               return true;
             }
           }
 
           // no more iterations from above, we're done here
-          if(!prepareNext(ctx, sub)) return false;
+          if(!prepareNext(qc, sub)) return false;
         }
       }
     };
@@ -189,15 +188,15 @@ public final class Window extends Clause {
   private Eval slidingEval(final Eval sub) {
     return new WindowEval() {
       /** Queue holding the items of the current window. */
-      private final ArrayDeque<Item> queue = new ArrayDeque<Item>();
+      private final ArrayDeque<Item> queue = new ArrayDeque<>();
       @Override
-      public boolean next(final QueryContext ctx) throws QueryException {
+      public boolean next(final QueryContext qc) throws QueryException {
         while(true) {
           Item curr, next = null;
           while((curr = advance()) != null) {
             next = queue.peekFirst();
             if(next == null && (next = next()) != null) queue.addLast(next);
-            if(start.matches(ctx, curr, p, prev, next)) break;
+            if(start.matches(qc, curr, p, prev, next)) break;
             prev = curr;
           }
 
@@ -210,7 +209,7 @@ public final class Window extends Clause {
             long ps = p;
             do {
               cache.add(it);
-              if(end.matches(ctx, it, ps++, pr, nx)) break;
+              if(end.matches(qc, it, ps++, pr, nx)) break;
               pr = it;
               it = nx;
               if(qiter.hasNext()) {
@@ -223,15 +222,15 @@ public final class Window extends Clause {
 
             // return window if end was found or {@code only} isn't set
             if(!(it == null && only)) {
-              start.bind(ctx, curr, p, prev, next);
+              start.bind(qc, curr, p, prev, next);
               prev = curr;
-              ctx.set(var, cache.value(), info);
+              qc.set(var, cache.value(), info);
               return true;
             }
           }
 
           // abort if no more tuples from above
-          if(!prepareNext(ctx, sub)) return false;
+          if(!prepareNext(qc, sub)) return false;
           queue.clear();
         }
       }
@@ -252,17 +251,17 @@ public final class Window extends Clause {
   }
 
   @Override
-  public Clause compile(final QueryContext cx, final VarScope scp) throws QueryException {
-    expr = expr.compile(cx, scp);
-    start.compile(cx, scp);
-    if(end != null) end.compile(cx, scp);
-    return optimize(cx, scp);
+  public Clause compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    expr = expr.compile(qc, scp);
+    start.compile(qc, scp);
+    if(end != null) end.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Clause optimize(final QueryContext cx, final VarScope sc) throws QueryException {
+  public Clause optimize(final QueryContext qc, final VarScope sc) throws QueryException {
     final SeqType t = expr.type();
-    var.refineType(t.withOcc(Occ.ZERO_MORE), cx, info);
+    var.refineType(t.withOcc(Occ.ZERO_MORE), qc, info);
     return this;
   }
 
@@ -283,25 +282,25 @@ public final class Window extends Clause {
   }
 
   @Override
-  public Clause inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
-    final Expr ex = expr.inline(ctx, scp, v, e);
-    final Condition st = start.inline(ctx, scp, v, e),
-        en = end == null ? null : end.inline(ctx, scp, v, e);
+  public Clause inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
+
+    final Expr ex = expr.inline(qc, scp, v, e);
+    final Condition st = start.inline(qc, scp, v, e),
+        en = end == null ? null : end.inline(qc, scp, v, e);
     if(ex != null) expr = ex;
     if(st != null) start = st;
     if(en != null) end = en;
-    return ex != null || st != null || en != null ? optimize(ctx, scp) : null;
+    return ex != null || st != null || en != null ? optimize(qc, scp) : null;
   }
 
   @Override
-  public Window copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
-    final Var v = scp.newCopyOf(ctx, var);
+  public Window copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    final Var v = scp.newCopyOf(qc, var);
     vs.put(var.id, v);
     try {
-      return new Window(info, sliding, v, expr.copy(ctx, scp, vs),
-          start.copy(ctx, scp, vs), only, end != null ? end.copy(ctx, scp, vs) : null);
+      return new Window(info, sliding, v, expr.copy(qc, scp, vs),
+          start.copy(qc, scp, vs), only, end != null ? end.copy(qc, scp, vs) : null);
     } catch(final QueryException e) {
       // checks have already been done
       throw Util.notExpected(e);
@@ -371,53 +370,52 @@ public final class Window extends Clause {
 
     /**
      * Constructor.
-     * @param st start condition flag
-     * @param it item variable
-     * @param p position variable
-     * @param pr previous variable
-     * @param nx next variable
+     * @param start start condition flag
+     * @param item item variable
+     * @param pos position variable
+     * @param prev previous variable
+     * @param next next variable
      * @param cond condition expression
-     * @param ii input info
+     * @param info input info
      */
-    public Condition(final boolean st, final Var it, final Var p, final Var pr,
-        final Var nx, final Expr cond, final InputInfo ii) {
-      super(ii, cond);
-      start = st;
-      item = it;
-      pos = p;
-      prev = pr;
-      next = nx;
+    public Condition(final boolean start, final Var item, final Var pos, final Var prev,
+        final Var next, final Expr cond, final InputInfo info) {
+      super(info, cond);
+      this.start = start;
+      this.item = item;
+      this.pos = pos;
+      this.prev = prev;
+      this.next = next;
     }
 
     @Override
-    public Expr compile(final QueryContext cx, final VarScope scp) throws QueryException {
-      expr = expr.compile(cx, scp).compEbv(cx);
+    public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+      expr = expr.compile(qc, scp).compEbv(qc);
       return this;
     }
 
     @Override
-    public Condition optimize(final QueryContext ctx, final VarScope scp) {
+    public Condition optimize(final QueryContext qc, final VarScope scp) {
       return this;
     }
 
     @Override
-    public Condition inline(final QueryContext ctx, final VarScope scp,
-        final Var v, final Expr e) throws QueryException {
-      return (Condition) super.inline(ctx, scp, v, e);
+    public Condition inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+        throws QueryException {
+      return (Condition) super.inline(qc, scp, v, e);
     }
 
     @Override
-    public Condition copy(final QueryContext ctx, final VarScope scp,
-        final IntObjMap<Var> vs) {
-      final Var it = item == null ? null : scp.newCopyOf(ctx, item),
-                ps = pos  == null ? null : scp.newCopyOf(ctx, pos),
-                pr = prev == null ? null : scp.newCopyOf(ctx, prev),
-                nx = next == null ? null : scp.newCopyOf(ctx, next);
+    public Condition copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+      final Var it = item == null ? null : scp.newCopyOf(qc, item),
+                ps = pos  == null ? null : scp.newCopyOf(qc, pos),
+                pr = prev == null ? null : scp.newCopyOf(qc, prev),
+                nx = next == null ? null : scp.newCopyOf(qc, next);
       if(it != null) vs.put(item.id, it);
       if(ps != null) vs.put(pos.id,  ps);
       if(pr != null) vs.put(prev.id, pr);
       if(nx != null) vs.put(next.id, nx);
-      return new Condition(start, it, ps, pr, nx, expr.copy(ctx, scp, vs), info);
+      return new Condition(start, it, ps, pr, nx, expr.copy(qc, scp, vs), info);
     }
 
     /**
@@ -457,7 +455,7 @@ public final class Window extends Clause {
 
     /**
      * Binds the variables and checks if the item satisfies this condition.
-     * @param ctx query context for variable binding
+     * @param qc query context for variable binding
      * @param it current item
      * @param p position in the input sequence
      * @param pr previous item
@@ -465,30 +463,30 @@ public final class Window extends Clause {
      * @return {@code true} if {@code it} matches the condition, {@code false} otherwise
      * @throws QueryException query exception
      */
-    boolean matches(final QueryContext ctx, final Item it, final long p, final Item pr,
+    boolean matches(final QueryContext qc, final Item it, final long p, final Item pr,
         final Item nx) throws QueryException {
       // bind variables
-      bind(ctx, it, p, pr, nx);
+      bind(qc, it, p, pr, nx);
 
       // evaluate as effective boolean value
-      return expr.ebv(ctx, info).bool(info);
+      return expr.ebv(qc, info).bool(info);
     }
 
     /**
      * Binds this condition's variables to the given values.
-     * @param ctx query context
+     * @param qc query context
      * @param it current item
      * @param p position
      * @param pr previous item
      * @param nx next item
      * @throws QueryException query exception
      */
-    void bind(final QueryContext ctx, final Item it, final long p, final Item pr,
-        final Item nx) throws QueryException {
-      if(item != null) ctx.set(item, it == null ? Empty.SEQ : it, info);
-      if(pos  != null) ctx.set(pos,  Int.get(p),                  info);
-      if(prev != null) ctx.set(prev, pr == null ? Empty.SEQ : pr, info);
-      if(next != null) ctx.set(next, nx == null ? Empty.SEQ : nx, info);
+    void bind(final QueryContext qc, final Item it, final long p, final Item pr, final Item nx)
+        throws QueryException {
+      if(item != null) qc.set(item, it == null ? Empty.SEQ : it, info);
+      if(pos  != null) qc.set(pos,  Int.get(p),                  info);
+      if(prev != null) qc.set(prev, pr == null ? Empty.SEQ : pr, info);
+      if(next != null) qc.set(next, nx == null ? Empty.SEQ : nx, info);
     }
 
     @Override
@@ -566,14 +564,14 @@ public final class Window extends Clause {
 
     /**
      * Tries to prepare the next round.
-     * @param ctx query context
+     * @param qc query context
      * @param sub sub-evaluator
      * @return {@code true} if the next round could be prepared, {@code false} otherwise
      * @throws QueryException evaluation exception
      */
-    boolean prepareNext(final QueryContext ctx, final Eval sub) throws QueryException {
-      if(!sub.next(ctx)) return false;
-      iter = expr.iter(ctx);
+    boolean prepareNext(final QueryContext qc, final Eval sub) throws QueryException {
+      if(!sub.next(qc)) return false;
+      iter = expr.iter(qc);
       prev = null;
       p = 0;
       return true;
@@ -619,20 +617,20 @@ public final class Window extends Clause {
 
     /**
      * Finds the next item in the sequence satisfying the start condition.
-     * @param ctx query context
+     * @param qc query context
      * @return {@code true} if the current binding satisfies the start condition,
      *   {@code false} otherwise
      * @throws QueryException evaluation exception
      */
-    final boolean findStart(final QueryContext ctx) throws QueryException {
+    final boolean findStart(final QueryContext qc) throws QueryException {
       while(readNext())
-        if(start.matches(ctx, curr, p, prev, next)) return true;
+        if(start.matches(qc, curr, p, prev, next)) return true;
       return false;
     }
 
     @Override
-    boolean prepareNext(final QueryContext ctx, final Eval sub) throws QueryException {
-      if(!super.prepareNext(ctx, sub)) return false;
+    boolean prepareNext(final QueryContext qc, final Eval sub) throws QueryException {
+      if(!super.prepareNext(qc, sub)) return false;
       curr = null;
       next = null;
       return true;

@@ -140,7 +140,7 @@ final class DialogImport extends BaseXBack {
    * Returns an XML file chosen by the user.
    * @return file chooser
    */
-  IOFile inputFile() {
+  private IOFile inputFile() {
     final String path = gui.gopts.get(GUIOptions.INPUTPATH);
     final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR, path, gui);
     fc.textFilters();
@@ -202,7 +202,7 @@ final class DialogImport extends BaseXBack {
    * Opens a file dialog to choose an input file or directory,
    * and updates the panel.
    */
-  void choose() {
+  private void choose() {
     // get user input (may be canceled)
     final IOFile in = inputFile();
     if(in == null) return;
@@ -257,9 +257,7 @@ final class DialogImport extends BaseXBack {
   private static MainParser guess(final IO in) {
     if(!in.exists() || in instanceof IOUrl) return null;
 
-    BufferInput ti = null;
-    try {
-      ti = new BufferInput(in);
+    try(final BufferInput ti = new BufferInput(in)) {
       int b = ti.read();
       // input starts with opening bracket: may be xml
       if(b == '<') return MainParser.XML;
@@ -271,10 +269,7 @@ final class DialogImport extends BaseXBack {
       }
       // all characters were of type ascii
       return MainParser.TEXT;
-    } catch(final IOException ignored) {
-    } finally {
-      if(ti != null) try { ti.close(); } catch(final IOException ignored) { }
-    }
+    } catch(final IOException ignored) { }
     // could not evaluate type
     return null;
   }

@@ -11,7 +11,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class DataAccess {
+public final class DataAccess implements AutoCloseable {
   /** Buffer manager. */
   private final Buffers bm = new Buffers();
   /** Reference to the data input stream. */
@@ -33,12 +33,12 @@ public final class DataAccess {
     try {
       f = new RandomAccessFile(fl.file(), "rw");
       len = f.length();
+      file = f;
+      cursor(0);
     } catch(final IOException ex) {
       if(f != null) f.close();
       throw ex;
     }
-    file = f;
-    cursor(0);
   }
 
   /**
@@ -56,9 +56,7 @@ public final class DataAccess {
     }
   }
 
-  /**
-   * Closes the data access.
-   */
+  @Override
   public synchronized void close() {
     flush();
     try {
@@ -80,7 +78,7 @@ public final class DataAccess {
    * Sets the file length.
    * @param l file length
    */
-  synchronized void length(final long l) {
+  private synchronized void length(final long l) {
     changed |= l != len;
     len = l;
   }
@@ -105,7 +103,7 @@ public final class DataAccess {
    * Reads the next byte.
    * @return next byte
    */
-  public int read() {
+  private int read() {
     final Buffer bf = buffer(off == IO.BLOCKSIZE);
     return bf.data[off++] & 0xFF;
   }
@@ -272,7 +270,7 @@ public final class DataAccess {
    * Writes the next byte.
    * @param b byte to be written
    */
-  public void write(final int b) {
+  private void write(final int b) {
     final Buffer bf = buffer(off == IO.BLOCKSIZE);
     bf.dirty = true;
     bf.data[off++] = (byte) b;
@@ -363,7 +361,7 @@ public final class DataAccess {
    * @param offset offset in the buffer where the token starts
    * @param length token length
    */
-  void writeToken(final byte[] buf, final int offset, final int length) {
+  private void writeToken(final byte[] buf, final int offset, final int length) {
     writeNum(length);
 
     final int last = offset + length;

@@ -14,7 +14,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Expression list.
+ * List of expressions that have been separated by commas.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
@@ -24,31 +24,31 @@ public final class List extends Arr {
   private static final int MAX_MAT_SIZE = 1 << 20;
   /**
    * Constructor.
-   * @param ii input info
-   * @param l expression list
+   * @param info input info
+   * @param exprs expressions
    */
-  public List(final InputInfo ii, final Expr... l) {
-    super(ii, l);
+  public List(final InputInfo info, final Expr... exprs) {
+    super(info, exprs);
   }
 
   @Override
   public void checkUp() throws QueryException {
-    checkAllUp(expr);
+    checkAllUp(exprs);
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    final int es = expr.length;
-    for(int e = 0; e < es; e++) expr[e] = expr[e].compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    final int es = exprs.length;
+    for(int e = 0; e < es; e++) exprs[e] = exprs[e].compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // compute number of results
     size = 0;
     boolean ne = false;
-    for(final Expr e : expr) {
+    for(final Expr e : exprs) {
       final long c = e.size();
       ne |= c > 0 || e.type().occ.min == 1;
       if(c == -1) {
@@ -60,13 +60,13 @@ public final class List extends Arr {
     }
 
     if(size >= 0) {
-      if(size == 0 && !has(Flag.NDT) && !has(Flag.UPD)) return optPre(null, ctx);
+      if(size == 0 && !has(Flag.NDT) && !has(Flag.UPD)) return optPre(null, qc);
       if(allAreValues() && size <= MAX_MAT_SIZE) {
         Type all = null;
-        final Value[] vs = new Value[expr.length];
+        final Value[] vs = new Value[exprs.length];
         int c = 0;
-        for(final Expr e : expr) {
-          final Value v = e.value(ctx);
+        for(final Expr e : exprs) {
+          final Value v = e.value(qc);
           if(c == 0) all = v.type;
           else if(all != v.type) all = null;
           vs[c++] = v;
@@ -87,7 +87,7 @@ public final class List extends Arr {
           for(int i = 0; i < c; i++) vb.add(vs[i]);
           val = vb.value();
         }
-        return optPre(val, ctx);
+        return optPre(val, qc);
       }
     }
 
@@ -96,7 +96,7 @@ public final class List extends Arr {
     } else {
       final Occ o = size == 1 ? Occ.ONE : size < 0 && !ne ? Occ.ZERO_MORE : Occ.ONE_MORE;
       SeqType t = null;
-      for(final Expr e : expr) {
+      for(final Expr e : exprs) {
         final SeqType st = e.type();
         if(!e.isEmpty() && st.occ != Occ.ZERO) t = t == null ? st : t.union(st);
       }
@@ -107,7 +107,7 @@ public final class List extends Arr {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) {
+  public Iter iter(final QueryContext qc) {
     return new Iter() {
       Iter ir;
       int e;
@@ -116,8 +116,8 @@ public final class List extends Arr {
       public Item next() throws QueryException {
         while(true) {
           if(ir == null) {
-            if(e == expr.length) return null;
-            ir = ctx.iter(expr[e++]);
+            if(e == exprs.length) return null;
+            ir = qc.iter(exprs[e++]);
           }
           final Item it = ir.next();
           if(it != null) return it;
@@ -128,20 +128,20 @@ public final class List extends Arr {
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
-    for(final Expr e : expr) vb.add(ctx.value(e));
+    for(final Expr e : exprs) vb.add(qc.value(e));
     return vb.value();
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return copyType(new List(info, copyAll(ctx, scp, vs, expr)));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return copyType(new List(info, copyAll(qc, scp, vs, exprs)));
   }
 
   @Override
   public boolean isVacuous() {
-    for(final Expr e : expr) if(!e.isVacuous()) return false;
+    for(final Expr e : exprs) if(!e.isVacuous()) return false;
     return true;
   }
 

@@ -26,14 +26,14 @@ public final class Switch extends ParseExpr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param c condition
-   * @param sc cases (last one is default case)
+   * @param info input info
+   * @param cond condition
+   * @param cases cases (last one is default case)
    */
-  public Switch(final InputInfo ii, final Expr c, final SwitchCase[] sc) {
-    super(ii);
-    cases = sc;
-    cond = c;
+  public Switch(final InputInfo info, final Expr cond, final SwitchCase[] cases) {
+    super(info);
+    this.cases = cases;
+    this.cond = cond;
   }
 
   @Override
@@ -42,63 +42,63 @@ public final class Switch extends ParseExpr {
     for(final SwitchCase sc : cases) sc.checkUp();
     // check if none or all return expressions are updating
     final Expr[] tmp = new Expr[cases.length];
-    for(int i = 0; i < tmp.length; ++i) tmp[i] = cases[i].expr[0];
+    for(int i = 0; i < tmp.length; ++i) tmp[i] = cases[i].exprs[0];
     checkAllUp(tmp);
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    cond = cond.compile(ctx, scp);
-    for(final SwitchCase sc : cases) sc.compile(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    cond = cond.compile(qc, scp);
+    for(final SwitchCase sc : cases) sc.compile(qc, scp);
 
     // check if expression can be pre-evaluated
     Expr ex = this;
     if(cond.isValue()) {
-      final Item it = cond.item(ctx, info);
+      final Item it = cond.item(qc, info);
       LOOP:
       for(final SwitchCase sc : cases) {
-        final int sl = sc.expr.length;
+        final int sl = sc.exprs.length;
         for(int e = 1; e < sl; e++) {
-          if(!sc.expr[e].isValue()) break LOOP;
+          if(!sc.exprs[e].isValue()) break LOOP;
 
           // includes check for empty sequence (null reference)
-          final Item cs = sc.expr[e].item(ctx, info);
+          final Item cs = sc.exprs[e].item(qc, info);
           if(it == cs || cs != null && it != null && it.equiv(cs, null, info)) {
-            ex = sc.expr[0];
+            ex = sc.exprs[0];
             break LOOP;
           }
         }
-        if(sl == 1) ex = sc.expr[0];
+        if(sl == 1) ex = sc.exprs[0];
       }
     }
-    if(ex != this) return optPre(ex, ctx);
+    if(ex != this) return optPre(ex, qc);
 
     // expression could not be pre-evaluated
-    type = cases[0].expr[0].type();
+    type = cases[0].exprs[0].type();
     for(int c = 1; c < cases.length; c++) {
-      type = type.union(cases[c].expr[0].type());
+      type = type.union(cases[c].exprs[0].type());
     }
     return ex;
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    return ctx.iter(getCase(ctx));
+  public Iter iter(final QueryContext qc) throws QueryException {
+    return qc.iter(getCase(qc));
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    return ctx.value(getCase(ctx));
+  public Value value(final QueryContext qc) throws QueryException {
+    return qc.value(getCase(qc));
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return getCase(ctx).item(ctx, ii);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return getCase(qc).item(qc, ii);
   }
 
   @Override
   public boolean isVacuous() {
-    for(final SwitchCase sc : cases) if(!sc.expr[0].isVacuous()) return false;
+    for(final SwitchCase sc : cases) if(!sc.exprs[0].isVacuous()) return false;
     return true;
   }
 
@@ -125,42 +125,42 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
-    boolean change = inlineAll(ctx, scp, cases, v, e);
-    final Expr cn = cond.inline(ctx, scp, v, e);
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
+    boolean change = inlineAll(qc, scp, cases, v, e);
+    final Expr cn = cond.inline(qc, scp, v, e);
     if(cn != null) {
       change = true;
       cond = cn;
     }
-    return change ? optimize(ctx, scp) : null;
+    return change ? optimize(qc, scp) : null;
   }
 
   /**
    * Chooses the selected {@code case} expression.
-   * @param ctx query context
+   * @param qc query context
    * @return case expression
    * @throws QueryException query exception
    */
-  private Expr getCase(final QueryContext ctx) throws QueryException {
-    final Item it = cond.item(ctx, info);
+  private Expr getCase(final QueryContext qc) throws QueryException {
+    final Item it = cond.item(qc, info);
     for(final SwitchCase sc : cases) {
-      final int sl = sc.expr.length;
+      final int sl = sc.exprs.length;
       for(int e = 1; e < sl; e++) {
         // includes check for empty sequence (null reference)
-        final Item cs = sc.expr[e].item(ctx, info);
+        final Item cs = sc.exprs[e].item(qc, info);
         if(it == cs || it != null && cs != null && it.equiv(cs, null, info))
-          return sc.expr[0];
+          return sc.exprs[0];
       }
-      if(sl == 1) return sc.expr[0];
+      if(sl == 1) return sc.exprs[0];
     }
     // will never be evaluated
     return null;
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Switch(info, cond.copy(ctx, scp, vs), Arr.copyAll(ctx, scp, vs, cases));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new Switch(info, cond.copy(qc, scp, vs), Arr.copyAll(qc, scp, vs, cases));
   }
 
   @Override
@@ -171,13 +171,13 @@ public final class Switch extends ParseExpr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(SWITCH + PAR1 + cond + PAR2);
-    for(final SwitchCase sc : cases) sb.append(sc.toString());
+    for(final SwitchCase sc : cases) sb.append(sc);
     return sb.toString();
   }
 
   @Override
-  public void markTailCalls(final QueryContext ctx) {
-    for(final SwitchCase sc : cases) sc.markTailCalls(ctx);
+  public void markTailCalls(final QueryContext qc) {
+    for(final SwitchCase sc : cases) sc.markTailCalls(qc);
   }
 
   @Override

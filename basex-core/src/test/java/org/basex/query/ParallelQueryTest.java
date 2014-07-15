@@ -33,7 +33,7 @@ public final class ParallelQueryTest {
     // generate reference result
     result = query();
     // generate results to be compared
-    final ArrayList<Query> queries = new ArrayList<Query>();
+    final ArrayList<Query> queries = new ArrayList<>();
     for(int i = 0; i < 10; i++) queries.add(new Query());
     for(final Query q : queries) q.start();
     for(final Query q : queries) q.join();

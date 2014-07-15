@@ -17,15 +17,15 @@ import org.basex.util.ft.*;
  */
 public final class XQFTTS extends W3CTS {
   /** Cached stop word files. */
-  private final HashMap<String, IO> stop = new HashMap<String, IO>();
+  private final HashMap<String, IO> stop = new HashMap<>();
   /** Cached stop word files. */
-  private final HashMap<String, IO> stop2 = new HashMap<String, IO>();
+  private final HashMap<String, IO> stop2 = new HashMap<>();
   /** Cached stemming dictionaries. */
-  private final HashMap<String, IO> stem = new HashMap<String, IO>();
+  private final HashMap<String, IO> stem = new HashMap<>();
   /** Cached thesaurus. */
-  private final HashMap<String, IO> thes = new HashMap<String, IO>();
+  private final HashMap<String, IO> thes = new HashMap<>();
   /** Cached thesaurus. */
-  private final HashMap<String, IO> thes2 = new HashMap<String, IO>();
+  private final HashMap<String, IO> thes2 = new HashMap<>();
 
   /**
    * Main method of the test class.
@@ -33,16 +33,15 @@ public final class XQFTTS extends W3CTS {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    new XQFTTS().run(args);
+    new XQFTTS(args).run();
   }
 
   /**
    * Constructor.
+   * @param args command-line arguments
    */
-  public XQFTTS() {
-    super(Util.className(XQFTTS.class));
-    //context.prop.set(Prop.FTINDEX, true);
-    //context.prop.set(Prop.FORCECREATE, true);
+  public XQFTTS(final String[] args) {
+    super(args, Util.className(XQFTTS.class));
   }
 
   @Override
@@ -69,11 +68,11 @@ public final class XQFTTS extends W3CTS {
 
   @Override
   protected void parse(final QueryProcessor qp, final Nodes root) throws QueryException {
-    final QueryContext ctx = qp.ctx;
-    ctx.stop = stop;
-    ctx.thes = thes;
+    final QueryContext qc = qp.qc;
+    qc.stop = stop;
+    qc.thes = thes;
 
-    final FTOpt opt = ctx.ftOpt();
+    final FTOpt opt = qc.ftOpt();
     for(final String s : aux("stopwords", root)) {
       final IO fn = stop2.get(s);
       if(fn != null) {

@@ -21,19 +21,19 @@ import org.basex.util.hash.*;
 public final class CPI extends CName {
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param n name
-   * @param v value
+   * @param sc static context
+   * @param info input info
+   * @param name name
+   * @param value value
    */
-  public CPI(final StaticContext sctx, final InputInfo ii, final Expr n, final Expr v) {
-    super(PI, sctx, ii, n, v);
+  public CPI(final StaticContext sc, final InputInfo info, final Expr name, final Expr value) {
+    super(PI, sc, info, name, value);
     type = SeqType.PI;
   }
 
   @Override
-  public FPI item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Item it = checkItem(name, ctx);
+  public FPI item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Item it = checkItem(name, qc);
     final Type ip = it.type;
     if(!ip.isStringOrUntyped() && ip != AtomType.QNM) throw CPIWRONG.get(info, it);
 
@@ -41,7 +41,7 @@ public final class CPI extends CName {
     if(eq(lc(nm), XML)) throw CPIXML.get(info, nm);
     if(!XMLToken.isNCName(nm)) throw CPIINVAL.get(info, nm);
 
-    byte[] v = value(ctx, ii);
+    byte[] v = value(qc, ii);
     int i = -1;
     while(++i != v.length && v[i] >= 0 && v[i] <= ' ');
     v = substring(v, i);
@@ -49,7 +49,7 @@ public final class CPI extends CName {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CPI(sc, info, name.copy(ctx, scp, vs), expr[0].copy(ctx, scp, vs));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new CPI(sc, info, name.copy(qc, scp, vs), exprs[0].copy(qc, scp, vs));
   }
 }

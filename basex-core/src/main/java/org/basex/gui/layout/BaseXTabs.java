@@ -79,7 +79,7 @@ public final class BaseXTabs extends JTabbedPane {
    */
   private void drop(final boolean last, final MouseEvent e) {
     final int newTab = Math.min(getTabCount() - (last ? 1 : 2),
-        getUI().tabForCoordinate(BaseXTabs.this, e.getX(), e.getY()));
+        getUI().tabForCoordinate(this, e.getX(), e.getY()));
 
     if(newTab >= 0 && newTab != draggedTab) {
       final Component comp = getComponentAt(draggedTab);

@@ -32,7 +32,7 @@ public enum NodeType implements Type {
   /** Text type. */
   TXT("text", NOD, ID.TXT) {
     @Override
-    public ANode cast(final Object o, final QueryContext ctx, final StaticContext sc,
+    public ANode cast(final Object o, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) {
       if(o instanceof BXText) return ((BXNode) o).getNode();
       if(o instanceof Text) return new FTxt((Text) o);
@@ -43,7 +43,7 @@ public enum NodeType implements Type {
   /** PI type. */
   PI("processing-instruction", NOD, ID.PI) {
     @Override
-    public ANode cast(final Object o, final QueryContext ctx, final StaticContext sc,
+    public ANode cast(final Object o, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       if(o instanceof BXPI) return ((BXNode) o).getNode();
       if(o instanceof ProcessingInstruction) return new FPI((ProcessingInstruction) o);
@@ -56,7 +56,7 @@ public enum NodeType implements Type {
   /** Element type. */
   ELM("element", NOD, ID.ELM) {
     @Override
-    public ANode cast(final Object o, final QueryContext ctx, final StaticContext sc,
+    public ANode cast(final Object o, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       if(o instanceof BXElem)  return ((BXNode) o).getNode();
       if(o instanceof Element) return new FElem((Element) o, null, new TokenMap());
@@ -71,7 +71,7 @@ public enum NodeType implements Type {
   /** Document type. */
   DOC("document-node", NOD, ID.DOC) {
     @Override
-    public ANode cast(final Object o, final QueryContext ctx, final StaticContext sc,
+    public ANode cast(final Object o, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       if(o instanceof BXDoc) return ((BXNode) o).getNode();
       try {
@@ -97,16 +97,16 @@ public enum NodeType implements Type {
   /** Document element type. */
   DEL("document-node(element())", NOD, ID.DEL) {
     @Override
-    public Item cast(final Object o, final QueryContext ctx, final StaticContext sc,
+    public Item cast(final Object o, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      return DOC.cast(o, ctx, sc, ii);
+      return DOC.cast(o, qc, sc, ii);
     }
   },
 
   /** Attribute type. */
   ATT("attribute", NOD, ID.ATT) {
     @Override
-    public ANode cast(final Object o, final QueryContext ctx, final StaticContext sc,
+    public ANode cast(final Object o, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       if(o instanceof BXAttr) return ((BXNode) o).getNode();
       if(o instanceof Attr) return new FAttr((Attr) o);
@@ -119,7 +119,7 @@ public enum NodeType implements Type {
   /** Comment type. */
   COM("comment", NOD, ID.COM) {
     @Override
-    public ANode cast(final Object o, final QueryContext ctx, final StaticContext sc,
+    public ANode cast(final Object o, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       if(o instanceof BXComm) return ((BXNode) o).getNode();
       if(o instanceof Comment) return new FComm((Comment) o);
@@ -187,21 +187,21 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public Item cast(final Item it, final QueryContext ctx, final StaticContext sc,
+  public Item cast(final Item it, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     return it.type == this ? it : error(it, ii);
   }
 
   @Override
-  public Item cast(final Object o, final QueryContext ctx, final StaticContext sc,
+  public Item cast(final Object o, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     throw Util.notExpected(o);
   }
 
   @Override
-  public Item castString(final String o, final QueryContext ctx, final StaticContext sc,
+  public Item castString(final String o, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return cast(o, ctx, sc, ii);
+    return cast(o, qc, sc, ii);
   }
 
   @Override
@@ -283,7 +283,7 @@ public enum NodeType implements Type {
    * @param id type ID
    * @return corresponding type if found, {@code null} otherwise
    */
-  static Type getType(final Type.ID id) {
+  static Type getType(final ID id) {
     for(final NodeType t : VALUES) if(t.id == id) return t;
     return null;
   }

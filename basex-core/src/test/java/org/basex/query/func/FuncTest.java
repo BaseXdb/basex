@@ -18,6 +18,11 @@ public final class FuncTest extends QueryTest {
       "</desclist>";
 
     queries = new Object[][] {
+      { "sum 1", itr(1), "sum(1)" },
+      { "sum 2", itr(55), "sum(1 to 10)" },
+      { "sum 3", itr(4611686016981624750L), "sum(1 to 3037000499)" },
+      { "sum 4", itr(4611686020018625250L), "sum(1 to 3037000500)" },
+      { "sum 5", itr(9223372034707292160L), "sum(1 to 4294967295)" },
       { "distinct-values 2", itr(2),
         "count(distinct-values(//line/text()))" },
     };

@@ -16,35 +16,36 @@ import org.basex.util.*;
 public final class FNHttp extends StandardFunc {
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNHttp(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNHttp(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    checkCreate(ctx);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    checkCreate(qc);
 
     // get request node
-    final Item req = expr[0].item(ctx, info);
+    final Item req = exprs[0].item(qc, info);
     final ANode request = req == null ? null : checkNode(req);
 
     // get HTTP URI
-    final byte[] href = expr.length >= 2 ? checkEStr(expr[1].item(ctx, info)) : null;
+    final byte[] href = exprs.length >= 2 ? checkEStr(exprs[1].item(qc, info)) : null;
 
     // get parameter $bodies
     ValueBuilder cache = null;
-    if(expr.length == 3) {
-      final Iter bodies = expr[2].iter(ctx);
+    if(exprs.length == 3) {
+      final Iter bodies = exprs[2].iter(qc);
       cache = new ValueBuilder();
       for(Item i; (i = bodies.next()) != null;) cache.add(i);
     }
 
     // send HTTP request
-    return new HTTPClient(info, ctx.context.options).sendRequest(href, request, cache);
+    return new HTTPClient(info, qc.context.options).sendRequest(href, request, cache);
   }
 }

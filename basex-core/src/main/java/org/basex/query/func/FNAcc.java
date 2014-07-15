@@ -22,36 +22,37 @@ import org.basex.util.*;
 public final class FNAcc extends StandardFunc {
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNAcc(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNAcc(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Expr e = expr.length == 0 ? checkCtx(ctx) : expr[0];
-    switch(sig) {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Expr e = exprs.length == 0 ? checkCtx(qc) : exprs[0];
+    switch(func) {
       case POSITION:
-        return Int.get(ctx.pos);
+        return Int.get(qc.pos);
       case LAST:
-        return Int.get(ctx.size);
+        return Int.get(qc.size);
       case STRING:
-        return string(e, ii, ctx);
+        return string(e, ii, qc);
       case NUMBER:
-        return number(ctx.iter(e), ctx);
+        return number(qc.iter(e), qc);
       case STRING_LENGTH:
-        return Int.get(len(checkEStr(expr.length == 0 ? string(e, ii, ctx) : e, ctx)));
+        return Int.get(len(checkEStr(exprs.length == 0 ? string(e, ii, qc) : e, qc)));
       case NORMALIZE_SPACE:
-        return Str.get(norm(checkEStr(e, ctx)));
+        return Str.get(norm(checkEStr(e, qc)));
       case NAMESPACE_URI_FROM_QNAME:
-        final Item it = e.item(ctx, info);
-        return it == null ? null : Uri.uri(checkQNm(it, ctx, sc).uri());
+        final Item it = e.item(qc, info);
+        return it == null ? null : Uri.uri(checkQNm(it, qc, sc).uri());
       default:
-        return super.item(ctx, ii);
+        return super.item(qc, ii);
     }
   }
 
@@ -59,14 +60,14 @@ public final class FNAcc extends StandardFunc {
    * Converts the specified item to a string.
    * @param e expression
    * @param ii input info
-   * @param ctx query context
+   * @param qc query context
    * @return double iterator
    * @throws QueryException query exception
    */
-  private Item string(final Expr e, final InputInfo ii, final QueryContext ctx)
+  private Item string(final Expr e, final InputInfo ii, final QueryContext qc)
       throws QueryException {
 
-    final Item it = e.item(ctx, info);
+    final Item it = e.item(qc, info);
     if(it == null) return Str.ZERO;
     if(it instanceof FItem) throw FISTR.get(ii, it.type);
     return it.type == AtomType.STR ? it : Str.get(it.string(ii));
@@ -75,16 +76,33 @@ public final class FNAcc extends StandardFunc {
   /**
    * Converts the specified item to a double.
    * @param ir iterator
-   * @param ctx query context
+   * @param qc query context
    * @return double iterator
    * @throws QueryException query exception
    */
-  private Item number(final Iter ir, final QueryContext ctx) throws QueryException {
+  private Item number(final Iter ir, final QueryContext qc) throws QueryException {
     final Item it = ir.next();
     if(it == null || ir.next() != null) return Dbl.NAN;
     if(it instanceof FItem) throw FIATOM.get(info, it.type);
+    if(it.type == AtomType.DBL) return it;
+
+    // shortcut: check if string only consists of valid double characters
+    if(it.type.isStringOrUntyped() && it.type != AtomType.URI) {
+      final byte[] value = it.string(info);
+      for(final int v : value) {
+        if(!Token.digit(v) && v != '+' && v != 'e' && v != 'E' && v != '.' && v != '-' &&
+           !Token.ws(v)) return Dbl.NAN;
+      }
+      try {
+        return Dbl.get(Double.parseDouble(Token.string(value)));
+      } catch(final NumberFormatException ex) {
+        return Dbl.NAN;
+      }
+    }
+
+    // default conversion
     try {
-      return it.type == AtomType.DBL ? it : AtomType.DBL.cast(it, ctx, sc, info);
+      return AtomType.DBL.cast(it, qc, sc, info);
     } catch(final QueryException ex) {
       return Dbl.NAN;
     }
@@ -92,12 +110,12 @@ public final class FNAcc extends StandardFunc {
 
   @Override
   public boolean has(final Flag flag) {
-    return flag == Flag.CTX && expr.length == 0 || super.has(flag);
+    return flag == Flag.CTX && exprs.length == 0 || super.has(flag);
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return !(!oneOf(sig, POSITION, LAST) && expr.length == 0 && !visitor.lock(DBLocking.CTX)) &&
+    return !(!oneOf(func, POSITION, LAST) && exprs.length == 0 && !visitor.lock(DBLocking.CTX)) &&
       super.accept(visitor);
   }
 }

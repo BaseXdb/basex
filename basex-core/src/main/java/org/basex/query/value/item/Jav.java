@@ -13,34 +13,34 @@ import org.basex.util.*;
  */
 public final class Jav extends Item {
   /** Java object. */
-  private final Object val;
+  private final Object value;
   /** Query context. */
   private final QueryContext qc;
 
   /**
    * Constructor.
-   * @param o value
-   * @param ctx query context
+   * @param value value
+   * @param qc query context
    */
-  public Jav(final Object o, final QueryContext ctx) {
+  public Jav(final Object value, final QueryContext qc) {
     super(AtomType.JAVA);
-    val = o;
-    qc = ctx;
+    this.value = value;
+    this.qc = qc;
   }
 
   @Override
   public byte[] string(final InputInfo ii) throws QueryException {
-    return materialize(ii).val;
+    return materialize(ii).value;
   }
 
   @Override
   public Str materialize(final InputInfo ii) throws QueryException {
-    return Str.get(val, qc, ii);
+    return Str.get(value, qc, ii);
   }
 
   @Override
   public boolean bool(final InputInfo ii) {
-    return !val.toString().isEmpty();
+    return !value.toString().isEmpty();
   }
 
   @Override
@@ -57,11 +57,11 @@ public final class Jav extends Item {
 
   @Override
   public Object toJava() {
-    return val;
+    return value;
   }
 
   @Override
   public String toString() {
-    return Util.info("\"%\"", val);
+    return Util.info("\"%\"", value);
   }
 }

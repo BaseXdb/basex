@@ -10,7 +10,7 @@ import org.basex.util.options.*;
  */
 public final class FTWindowOptions extends Options {
   /** Option: unit. */
-  public static final EnumOption<FTUnit> UNIT = new EnumOption<FTUnit>("unit", FTUnit.WORDS);
+  public static final EnumOption<FTUnit> UNIT = new EnumOption<>("unit", FTUnit.WORDS);
   /** Option: size. */
   public static final NumberOption SIZE = new NumberOption("size", Integer.MAX_VALUE);
 }

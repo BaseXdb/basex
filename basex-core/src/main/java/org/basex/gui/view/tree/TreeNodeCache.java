@@ -23,7 +23,7 @@ final class TreeNodeCache implements TreeConstants {
    * @param atts show attributes
    */
   TreeNodeCache(final Data data, final boolean atts) {
-    final ArrayList<IntList> alil = new ArrayList<IntList>();
+    final ArrayList<IntList> alil = new ArrayList<>();
 
     final int ts = data.meta.size;
     final IntList roots = data.resources.docs();

@@ -22,7 +22,7 @@ public final class TransformModifier extends ContextModifier {
    * clause of this transform expression will cause a query exception
    * (XUDY0014) if the data reference of the corresponding target node is not
    * part of this set, hence the target node has not been copied. */
-  private final Set<Data> refs = new HashSet<Data>();
+  private final Set<Data> refs = new HashSet<>();
 
   /**
    * Adds a data reference to list which keeps track of the nodes copied
@@ -34,15 +34,14 @@ public final class TransformModifier extends ContextModifier {
   }
 
   @Override
-  void add(final Operation o, final QueryContext ctx) throws QueryException {
-    /* Disallow side-effecting updates within transform expressions.
-     * Currently, also fn:put() is rejected
-     * (future discussion: https://www.w3.org/Bugs/Public/show_bug.cgi?id=13970). */
-    if(o instanceof BasicOperation) throw BASX_DBTRANSFORM.get(o.getInfo());
+  void add(final Update up, final QueryContext qc) throws QueryException {
+    // Disallow side-effecting updates within transform expressions.
+    if(!(up instanceof NodeUpdate)) throw BASX_DBTRANSFORM.get(up.info());
+    add(up);
 
-    add(o);
-    /* check if the target node of the given primitive has been copied in the
-     * 'copy' statement of this transform expression. */
-    if(!refs.contains(o.getData())) throw UPNOTCOPIED.get(o.getInfo(), o.getTargetNode());
+    // Check if the target node of the given primitive has been copied in the
+    // 'copy' statement of this transform expression.
+    final NodeUpdate nodeUp = (NodeUpdate) up;
+    if(!refs.contains(nodeUp.data())) throw UPNOTCOPIED.get(nodeUp.info(), nodeUp.node());
   }
 }

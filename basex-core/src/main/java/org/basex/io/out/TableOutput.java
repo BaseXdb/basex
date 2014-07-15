@@ -64,13 +64,10 @@ public final class TableOutput extends OutputStream {
     os.close();
 
     // create table info file
-    final DataOutput out = new DataOutput(meta.dbfile(file + 'i'));
-    try {
+    try(final DataOutput out = new DataOutput(meta.dbfile(file + 'i'))) {
       out.writeNum(pages);
       // max value indicates that regular page table is not stored on disk
       out.writeNum(empty ? 0 : Integer.MAX_VALUE);
-    } finally {
-      out.close();
     }
   }
 }

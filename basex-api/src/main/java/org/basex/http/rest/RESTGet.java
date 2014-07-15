@@ -27,13 +27,13 @@ final class RESTGet {
    * @throws IOException I/O exception
    */
   public static RESTCmd get(final RESTSession rs) throws IOException {
-    final Map<String, String[]> vars = new HashMap<String, String[]>();
+    final Map<String, String[]> vars = new HashMap<>();
 
     // parse query string
     String op = null, input = null, value = null;
     final HTTPContext http = rs.http;
-    final SerializerOptions sopts = http.serialization;
-    for(final Entry<String, String[]> param : http.params().entrySet()) {
+    final SerializerOptions sopts = http.sopts();
+    for(final Entry<String, String[]> param : http.params.map().entrySet()) {
       final String key = param.getKey();
       final String[] vals = param.getValue();
       final String val = vals[0];

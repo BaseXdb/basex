@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 import java.util.*;
 
 import javax.swing.*;
@@ -34,11 +33,11 @@ public final class ProjectView extends BaseXPanel {
   /** Editor view. */
   final EditorView editor;
   /** Filter field. */
-  final ProjectFilter filter;
+  private final ProjectFilter filter;
   /** Filter list. */
   final ProjectList list;
   /** Root path. */
-  final BaseXTextField path;
+  private final BaseXTextField path;
   /** Splitter. */
   private final BaseXSplit split;
   /** Last focused component. */
@@ -47,7 +46,7 @@ public final class ProjectView extends BaseXPanel {
   /** Remembers the last focused component. */
   final FocusAdapter lastfocus = new FocusAdapter() {
     @Override
-    public void focusLost(final FocusEvent ev) {
+    public void focusGained(final FocusEvent ev) {
       last = ev.getComponent();
     }
   };
@@ -124,11 +123,26 @@ public final class ProjectView extends BaseXPanel {
   /**
    * Refreshes the specified file node.
    * @param file file to be opened
-   * @param tr refresh tree
+   * @param rename file has been renamed
    */
-  public void refresh(final IOFile file, final boolean tr) {
-    if(tr) refresh(file);
+  public void save(final IOFile file, final boolean rename) {
+    refresh(file);
+    if(rename) reset();
+    refresh();
+  }
+
+  /**
+   * Refreshes the filter view.
+   */
+  public void refresh() {
     filter.refresh(true);
+  }
+
+  /**
+   * Resets the filter cache.
+   */
+  public void reset() {
+    filter.reset();
   }
 
   /**
@@ -136,12 +150,13 @@ public final class ProjectView extends BaseXPanel {
    * @param file file to be focused
    */
   public void jump(final IOFile file) {
-    final IOFile fl = new IOFile(canonical(file.file()));
+    final IOFile fl = file.normalize();
     if(fl.path().startsWith(root.file.path())) tree.expand(root, fl.path());
+    tree.requestFocusInWindow();
   }
 
   /**
-   * Refreshes the specified file node, or its parent.
+   * Refreshes the visualization of the specified file, or its parent, in the tree.
    * @param file file to be refreshed
    */
   private void refresh(final IOFile file) {
@@ -149,9 +164,8 @@ public final class ProjectView extends BaseXPanel {
     if(node != null) {
       node.refresh();
     } else {
-      final File parent = file.file().getParentFile();
-      if(parent == null) return;
-      refresh(new IOFile(parent));
+      final IOFile parent = file.parent();
+      if(parent != null) refresh(parent);
     }
   }
 
@@ -161,7 +175,7 @@ public final class ProjectView extends BaseXPanel {
    * @return node, or {@code null}
    */
   private ProjectNode find(final IOFile file) {
-    final IOFile fl = new IOFile(canonical(file.file()));
+    final IOFile fl = file.normalize();
     if(fl.path().startsWith(root.file.path())) {
       final Enumeration<?> en = root.depthFirstEnumeration();
       while(en.hasMoreElements()) {
@@ -173,11 +187,22 @@ public final class ProjectView extends BaseXPanel {
   }
 
   /**
+   * Called when GUI design has changed.
+   */
+  public void refreshLayout() {
+    filter.refreshLayout();
+  }
+
+  /**
    * Focuses the project filter.
    * @param ea calling editor
    */
   public void findFiles(final EditorArea ea) {
-    filter.find(ea);
+    if(isFocusOwner()) {
+      filter.find(tree.selectedNode());
+    } else {
+      filter.find(ea);
+    }
   }
 
   /**
@@ -219,29 +244,15 @@ public final class ProjectView extends BaseXPanel {
     final String proj = gui.gopts.get(GUIOptions.PROJECTPATH);
     if(!proj.isEmpty()) return proj;
 
-    final File io1 = new File(gopts.get(GlobalOptions.REPOPATH));
-    final File io2 = new File(gopts.get(GlobalOptions.WEBPATH));
-    final File fl = new File(gopts.get(GlobalOptions.RESTXQPATH));
-    final File io3 = fl.isAbsolute() ? fl : new File(io2, fl.getPath());
+    final IOFile dir1 = new IOFile(gopts.get(GlobalOptions.REPOPATH));
+    final IOFile dir2 = new IOFile(gopts.get(GlobalOptions.WEBPATH));
+    final IOFile dir3 = dir2.resolve(gopts.get(GlobalOptions.RESTXQPATH));
     final StringList sl = new StringList();
-    for(final File f : new File[] { io1, io2, io3}) {
-      final String p = canonical(f).getParent();
+    for(final IOFile f : new IOFile[] { dir1, dir2, dir3}) {
+      final String p = f.normalize().parent().path();
       if(!sl.contains(p)) sl.add(p);
     }
-    return sl.unique().get(0);
-  }
-
-  /**
-   * Returns the canonical or (if not possible) the absolute file reference.
-   * @param f file reference
-   * @return file
-   */
-  private File canonical(final File f) {
-    try {
-      return f.getCanonicalFile();
-    } catch(final IOException ex) {
-      return f.getAbsoluteFile();
-    }
+    return sl.sort().unique().get(0);
   }
 
   /**
@@ -265,7 +276,7 @@ public final class ProjectView extends BaseXPanel {
   /**
    * Changes the root directory.
    */
-  void change() {
+  private void change() {
     final ProjectNode child = tree.selectedNode();
     final BaseXFileChooser fc = new BaseXFileChooser(CHOOSE_DIR, child.file.path(), gui);
     final IOFile io = fc.select(Mode.DOPEN);

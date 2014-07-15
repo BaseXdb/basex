@@ -17,17 +17,22 @@ import org.basex.util.hash.*;
 public final class InterSect extends Set {
   /**
    * Constructor.
-   * @param ii input info
-   * @param l expression list
+   * @param info input info
+   * @param exprs expressions
    */
-  public InterSect(final InputInfo ii, final Expr[] l) {
-    super(ii, l);
+  public InterSect(final InputInfo info, final Expr[] exprs) {
+    super(info, exprs);
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return oneIsEmpty() ? optPre(null, ctx) : this;
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    return oneIsEmpty() ? optPre(null, qc) : this;
   }
 
   @Override
@@ -37,7 +42,7 @@ public final class InterSect extends Set {
     for(Item it; (it = iter[0].next()) != null;) nc.add(checkNode(it));
     final boolean db = nc.dbnodes();
 
-    for(int e = 1; e != expr.length && nc.size() != 0; ++e) {
+    for(int e = 1; e != exprs.length && nc.size() != 0; ++e) {
       final NodeSeqBuilder nt = new NodeSeqBuilder().check();
       final Iter ir = iter[e];
       for(Item it; (it = ir.next()) != null;) {
@@ -51,8 +56,8 @@ public final class InterSect extends Set {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final InterSect is = new InterSect(info, copyAll(ctx, scp, vs, expr));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    final InterSect is = new InterSect(info, copyAll(qc, scp, vs, exprs));
     is.iterable = iterable;
     return copyType(is);
   }

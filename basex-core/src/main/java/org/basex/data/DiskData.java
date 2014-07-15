@@ -62,8 +62,7 @@ public final class DiskData extends Data {
     // don't open databases marked as updating
     if(updateFile().exists()) throw new BaseXException(Text.DB_UPDATED_X, meta.name);
 
-    final DataInput in = new DataInput(meta.dbfile(DATAINF));
-    try {
+    try(final DataInput in = new DataInput(meta.dbfile(DATAINF))) {
       // read meta data and indexes
       meta.read(in);
       while(true) {
@@ -75,8 +74,6 @@ public final class DiskData extends Data {
         else if(k.equals(DBNS))   nspaces = new Namespaces(in);
         else if(k.equals(DBDOCS)) resources.read(in);
       }
-    } finally {
-      in.close();
     }
 
     // open data and indexes
@@ -118,7 +115,7 @@ public final class DiskData extends Data {
    * Initializes the database.
    * @throws IOException I/O exception
    */
-  void init() throws IOException {
+  private void init() throws IOException {
     table = new TableDiskAccess(meta, false);
     texts = new DataAccess(meta.dbfile(DATATXT));
     values = new DataAccess(meta.dbfile(DATAATV));
@@ -130,20 +127,20 @@ public final class DiskData extends Data {
    */
   private void write() throws IOException {
     if(meta.dirty) {
-      final DataOutput out = new DataOutput(meta.dbfile(DATAINF));
-      meta.write(out);
-      out.writeToken(token(DBTAGS));
-      tagindex.write(out);
-      out.writeToken(token(DBATTS));
-      atnindex.write(out);
-      out.writeToken(token(DBPATH));
-      paths.write(out);
-      out.writeToken(token(DBNS));
-      nspaces.write(out);
-      out.writeToken(token(DBDOCS));
-      resources.write(out);
-      out.write(0);
-      out.close();
+      try(final DataOutput out = new DataOutput(meta.dbfile(DATAINF))) {
+        meta.write(out);
+        out.writeToken(token(DBTAGS));
+        tagindex.write(out);
+        out.writeToken(token(DBATTS));
+        atnindex.write(out);
+        out.writeToken(token(DBPATH));
+        paths.write(out);
+        out.writeToken(token(DBNS));
+        nspaces.write(out);
+        out.writeToken(token(DBDOCS));
+        resources.write(out);
+        out.write(0);
+      }
       if(idmap != null) idmap.write(meta.dbfile(DATAIDP));
       meta.dirty = false;
     }
@@ -346,8 +343,8 @@ public final class DiskData extends Data {
 
   @Override
   protected void indexBegin() {
-    txts = new TokenObjMap<IntList>();
-    atvs = new TokenObjMap<IntList>();
+    txts = new TokenObjMap<>();
+    atvs = new TokenObjMap<>();
   }
 
   @Override
@@ -397,8 +394,8 @@ public final class DiskData extends Data {
     if(!(meta.textindex || meta.attrindex)) return;
 
     // collect all keys and ids
-    txts = new TokenObjMap<IntList>();
-    atvs = new TokenObjMap<IntList>();
+    txts = new TokenObjMap<>();
+    atvs = new TokenObjMap<>();
     final int l = pre + size;
     for(int p = pre; p < l; ++p) {
       final int k = kind(p);

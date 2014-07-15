@@ -101,11 +101,19 @@ public interface Type {
     }
 
     /**
-     * returns the type ID as a byte.
+     * Returns the type ID as a byte.
      * @return type ID
      */
     public byte asByte() {
       return id;
+    }
+
+    /**
+     * Wraps the type ID in a byte array.
+     * @return type ID
+     */
+    public byte[] bytes() {
+      return new byte[] { id };
     }
 
     /**
@@ -135,13 +143,13 @@ public interface Type {
   /**
    * Casts the specified item to the XQuery data type.
    * @param it item to be converted
-   * @param ctx query context
+   * @param qc query context
    * @param sc static context
    * @param ii input info
    * @return new item
    * @throws QueryException query exception
    */
-  Value cast(final Item it, final QueryContext ctx, final StaticContext sc, final InputInfo ii)
+  Value cast(final Item it, final QueryContext qc, final StaticContext sc, final InputInfo ii)
       throws QueryException;
 
   /**

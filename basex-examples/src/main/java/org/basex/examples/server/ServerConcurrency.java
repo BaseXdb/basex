@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.*;
-import org.basex.server.*;
+import org.basex.api.client.*;
 
 /**
  * This class connects multiple clients to one server instance.

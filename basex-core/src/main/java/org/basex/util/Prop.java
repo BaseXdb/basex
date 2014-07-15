@@ -2,7 +2,9 @@ package org.basex.util;
 
 import java.io.*;
 import java.net.*;
+import java.nio.file.*;
 import java.security.*;
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
@@ -40,7 +42,7 @@ public final class Prop {
   /** Project name. */
   public static final String NAME = "BaseX";
   /** Code version (may contain major, minor and optional patch number). */
-  public static final String VERSION = version("7.8.2 beta");
+  public static final String VERSION = version("8.0 beta");
   /** Main author. */
   public static final String AUTHOR = "Christian Gr\u00FCn";
   /** Co-authors (1). */
@@ -49,6 +51,24 @@ public final class Prop {
   public static final String TEAM2 = "Lukas Kircher, Leo W\u00F6rteler";
   /** Entity. */
   public static final String ENTITY = NAME + " Team";
+  /** Project namespace. */
+  public static final String PROJECT_NAME = NAME.toLowerCase(Locale.ENGLISH);
+  /** URL. */
+  public static final String URL = "http://" + PROJECT_NAME + ".org";
+  /** URL of the community page. */
+  public static final String COMMUNITY_URL = URL + "/community";
+  /** URL of the documentation. */
+  public static final String DOC_URL = "http://docs." + PROJECT_NAME + ".org";
+  /** URL of the update page. */
+  public static final String UPDATE_URL = URL + "/products/download/all-downloads/";
+  /** Version URL. */
+  public static final String VERSION_URL = "http://files." + PROJECT_NAME + ".org/version.txt";
+  /** Repository URL. */
+  public static final String REPO_URL = "http://files." + PROJECT_NAME + ".org/modules";
+  /** Mail. */
+  public static final String MAILING_LIST = PROJECT_NAME + "-talk@mailman.uni-konstanz.de";
+  /** Title and version. */
+  public static final String TITLE = NAME + ' ' + VERSION;
 
   /** New line string. */
   public static final String NL = System.getProperty("line.separator");
@@ -112,53 +132,27 @@ public final class Prop {
     // not found; check working directory for property file
     dir = System.getProperty("user.dir");
     final String home = IO.BASEXSUFFIX + "home";
-    File file = new File(dir, home);
-    if(!file.exists()) file = new File(dir, IO.BASEXSUFFIX);
-    if(file.exists()) return file.getParent();
+    IOFile file = new IOFile(dir, home);
+    if(!file.exists()) file = new IOFile(dir, IO.BASEXSUFFIX);
+    if(file.exists()) return file.dir();
 
     // not found; check application directory
-    dir = applicationPath();
-    if(dir != null) {
-      file = new File(dir);
-      dir = file.isFile() ? file.getParent() : file.getPath();
-      file = new File(dir, home);
-      if(!file.exists()) file = new File(dir, IO.BASEXSUFFIX);
-      if(file.exists()) return file.getParent();
+    if(LOCATION != null) {
+      try {
+        dir = Paths.get(LOCATION.toURI()).toString();
+        if(dir != null) {
+          dir = new IOFile(dir).dir();
+          file = new IOFile(dir, home);
+          if(!file.exists()) file = new IOFile(dir, IO.BASEXSUFFIX);
+          if(file.exists()) return file.dir();
+        }
+      } catch(final Exception ex) {
+        Util.stack(ex);
+      }
     }
 
     // not found; choose user home directory as default
     return USERHOME;
-  }
-
-  /**
-   * Returns the absolute path to this application, or {@code null} if the
-   * path cannot be evaluated.
-   * @return application path.
-   */
-  private static String applicationPath() {
-    if(LOCATION == null) return null;
-
-    // decode path; URLDecode returns wrong results
-    final String path = LOCATION.getPath();
-    final TokenBuilder tb = new TokenBuilder();
-    final int pl = path.length();
-    for(int p = 0; p < pl; ++p) {
-      final char ch = path.charAt(p);
-      if(ch == '%' && p + 2 < pl) {
-        tb.addByte((byte) Integer.parseInt(path.substring(p + 1, p + 3), 16));
-        p += 2;
-      } else {
-        tb.add(ch);
-      }
-    }
-    try {
-      // return path, using the correct encoding
-      return new String(tb.finish(), ENCODING);
-    } catch(final Exception ex) {
-      // return default path; not expected to occur
-      Util.stack(ex);
-      return tb.toString();
-    }
   }
 
   /**

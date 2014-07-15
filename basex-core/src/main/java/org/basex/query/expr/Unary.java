@@ -23,29 +23,34 @@ public final class Unary extends Single {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
-   * @param min minus flag
+   * @param info input info
+   * @param expr expression
+   * @param minus minus flag
    */
-  public Unary(final InputInfo ii, final Expr e, final boolean min) {
-    super(ii, e);
-    minus = min;
+  public Unary(final InputInfo info, final Expr expr, final boolean minus) {
+    super(info, expr);
+    this.minus = minus;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     type = expr.type();
     if(!type.type.isNumber()) {
       // expression will always yield a number, empty sequence or error
       type = type.mayBeZero() ? SeqType.ITR_ZO : SeqType.ITR;
     }
-    return expr.isValue() ? preEval(ctx) : this;
+    return expr.isValue() ? preEval(qc) : this;
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Item it = expr.item(ctx, info);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Item it = expr.item(qc, info);
     if(it == null) return null;
     final Type ip = it.type;
 
@@ -66,8 +71,8 @@ public final class Unary extends Single {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return copyType(new Unary(info, expr.copy(ctx, scp, vs), minus));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return copyType(new Unary(info, expr.copy(qc, scp, vs), minus));
   }
 
   @Override

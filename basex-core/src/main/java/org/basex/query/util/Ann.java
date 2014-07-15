@@ -27,7 +27,7 @@ public final class Ann extends ElementList {
 
   /** Supported REST annotations. */
   private static final byte[][] ANN_REST = tokens("error", "path", "produces", "consumes",
-      "query-param", "form-param", "header-param", "cookie-param", "error-param",
+      "query-param", "form-param", "header-param", "cookie-param", "error-param", "method",
       "GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS");
   /** Supported UNIT annotations. */
   private static final byte[][] ANN_UNIT = tokens("test", "ignore", "before", "after",

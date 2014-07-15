@@ -16,11 +16,11 @@ public final class IndexContext {
 
   /**
    * Constructor.
-   * @param d data reference
-   * @param i iterable flag
+   * @param data data reference
+   * @param iterable iterable flag
    */
-  public IndexContext(final Data d, final boolean i) {
-    data = d;
-    iterable = i;
+  public IndexContext(final Data data, final boolean iterable) {
+    this.data = data;
+    this.iterable = iterable;
   }
 }

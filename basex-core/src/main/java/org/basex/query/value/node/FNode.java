@@ -16,16 +16,16 @@ import org.basex.util.*;
 public abstract class FNode extends ANode {
   /**
    * Constructor.
-   * @param t data type
+   * @param type data type
    */
-  FNode(final NodeType t) {
-    super(t);
+  FNode(final NodeType type) {
+    super(type);
   }
 
   @Override
   public byte[] string() {
-    if(val == null) val = Token.EMPTY;
-    return val;
+    if(value == null) value = Token.EMPTY;
+    return value;
   }
 
   @Override
@@ -145,14 +145,14 @@ public abstract class FNode extends ANode {
    * @return node iterator
    */
   final byte[] string(final ANodeList iter) {
-    if(val == null) {
+    if(value == null) {
       final TokenBuilder tb = new TokenBuilder();
       for(final ANode nc : iter) {
         if(nc.type == NodeType.ELM || nc.type == NodeType.TXT) tb.add(nc.string());
       }
-      val = tb.finish();
+      value = tb.finish();
     }
-    return val;
+    return value;
   }
 
   /**

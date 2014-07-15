@@ -38,13 +38,13 @@ public final class FuncOptions {
 
   /**
    * Constructor.
-   * @param name name of root node
-   * @param ii input info
+   * @param root name of root node
+   * @param info input info
    */
-  public FuncOptions(final QNm name, final InputInfo ii) {
-    test = new NodeTest(name);
-    root = name;
-    info = ii;
+  public FuncOptions(final QNm root, final InputInfo info) {
+    test = new NodeTest(root);
+    this.root = root;
+    this.info = info;
   }
 
   /**
@@ -64,7 +64,9 @@ public final class FuncOptions {
    * @param error raise error if parameter is unknown
    * @throws QueryException query exception
    */
-  void parse(final Item item, final Options options, final Err error) throws QueryException {
+  private void parse(final Item item, final Options options, final Err error)
+      throws QueryException {
+
     final TokenBuilder tb = new TokenBuilder();
     if(item != null) {
       try {

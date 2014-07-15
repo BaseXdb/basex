@@ -15,6 +15,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -74,68 +75,70 @@ public final class FNSql extends StandardFunc {
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNSql(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNSql(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    checkCreate(ctx);
-    switch(sig) {
-      case _SQL_EXECUTE:          return execute(ctx);
-      case _SQL_EXECUTE_PREPARED: return executePrepared(ctx);
-      default:                    return super.iter(ctx);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    checkCreate(qc);
+    switch(func) {
+      case _SQL_EXECUTE:          return execute(qc);
+      case _SQL_EXECUTE_PREPARED: return executePrepared(qc);
+      default:                    return super.iter(qc);
     }
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    checkCreate(ctx);
-    switch(sig) {
-      case _SQL_INIT:     return init(ctx);
-      case _SQL_CONNECT:  return connect(ctx);
-      case _SQL_PREPARE:  return prepare(ctx);
-      case _SQL_CLOSE:    return close(ctx);
-      case _SQL_COMMIT:   return commit(ctx);
-      case _SQL_ROLLBACK: return rollback(ctx);
-      default:            return super.item(ctx, ii);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    checkCreate(qc);
+    switch(func) {
+      case _SQL_INIT:     return init(qc);
+      case _SQL_CONNECT:  return connect(qc);
+      case _SQL_PREPARE:  return prepare(qc);
+      case _SQL_CLOSE:    return close(qc);
+      case _SQL_COMMIT:   return commit(qc);
+      case _SQL_ROLLBACK: return rollback(qc);
+      default:            return super.item(qc, ii);
     }
   }
 
   /**
    * Initializes JDBC with the specified driver.
-   * @param ctx query context
+   * @param qc query context
    * @return {@code null}
    * @throws QueryException query exception
    */
-  private Item init(final QueryContext ctx) throws QueryException {
-    final String driver = string(checkStr(expr[0], ctx));
+  private Item init(final QueryContext qc) throws QueryException {
+    final String driver = string(checkStr(exprs[0], qc));
     if(Reflect.find(driver) == null) throw BXSQ_DRIVER.get(info, driver);
     return null;
   }
 
   /**
    * Establishes a connection to a relational database.
-   * @param ctx query context
+   * @param qc query context
    * @return connection id
    * @throws QueryException query exception
    */
-  private Int connect(final QueryContext ctx) throws QueryException {
+  private Int connect(final QueryContext qc) throws QueryException {
     // URL to relational database
-    final String url = string(checkStr(expr[0], ctx));
+    final String url = string(checkStr(exprs[0], qc));
+    final JDBCConnections jdbc = jdbc(qc);
     try {
-      if(expr.length > 2) {
+      if(exprs.length > 2) {
         // credentials
-        final String user = string(checkStr(expr[1], ctx));
-        final String pass = string(checkStr(expr[2], ctx));
-        if(expr.length == 4) {
+        final String user = string(checkStr(exprs[1], qc));
+        final String pass = string(checkStr(exprs[2], qc));
+        if(exprs.length == 4) {
           // connection options
-          final Options opts = checkOptions(3, Q_OPTIONS, new Options(), ctx);
+          final Options opts = checkOptions(3, Q_OPTIONS, new Options(), qc);
           // extract auto-commit mode from options
           boolean ac = true;
           final HashMap<String, String> options = opts.free();
@@ -153,11 +156,11 @@ public final class FNSql extends StandardFunc {
           final Connection conn = getConnection(url, props);
           // set auto/commit mode
           conn.setAutoCommit(ac);
-          return Int.get(ctx.jdbc().add(conn));
+          return Int.get(jdbc.add(conn));
         }
-        return Int.get(ctx.jdbc().add(getConnection(url, user, pass)));
+        return Int.get(jdbc.add(getConnection(url, user, pass)));
       }
-      return Int.get(ctx.jdbc().add(getConnection(url)));
+      return Int.get(jdbc.add(getConnection(url)));
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.get(info, ex);
     }
@@ -178,18 +181,18 @@ public final class FNSql extends StandardFunc {
 
   /**
    * Prepares a statement and returns its id.
-   * @param ctx query context
+   * @param qc query context
    * @return prepared statement id
    * @throws QueryException query exception
    */
-  private Int prepare(final QueryContext ctx) throws QueryException {
-    final Connection conn = connection(ctx, false);
+  private Int prepare(final QueryContext qc) throws QueryException {
+    final Connection conn = connection(qc);
     // Prepared statement
-    final byte[] prepStmt = checkStr(expr[1], ctx);
+    final byte[] prepStmt = checkStr(exprs[1], qc);
     try {
       // Keep prepared statement
       final PreparedStatement prep = conn.prepareStatement(string(prepStmt));
-      return Int.get(ctx.jdbc().add(prep));
+      return Int.get(jdbc(qc).add(prep));
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.get(info, ex);
     }
@@ -197,44 +200,40 @@ public final class FNSql extends StandardFunc {
 
   /**
    * Executes a query, update or prepared statement.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  private NodeSeqBuilder execute(final QueryContext ctx) throws QueryException {
-    final int id = (int) checkItr(expr[0], ctx);
-    final Object obj = ctx.jdbc().get(id);
+  private NodeSeqBuilder execute(final QueryContext qc) throws QueryException {
+    final int id = (int) checkItr(exprs[0], qc);
+    final Object obj = jdbc(qc).get(id);
     if(!(obj instanceof Connection)) throw BXSQ_CONN.get(info, id);
 
-    final String query = string(checkStr(expr[1], ctx));
-    Statement stmt = null;
-    try {
-      stmt = ((Connection) obj).createStatement();
+    final String query = string(checkStr(exprs[1], qc));
+    try(final Statement stmt = ((Connection) obj).createStatement()) {
       final boolean result = stmt.execute(query);
-      return result ? buildResult(stmt.getResultSet(), ctx) : new NodeSeqBuilder();
+      return result ? buildResult(stmt.getResultSet(), qc) : new NodeSeqBuilder();
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.get(info, ex);
-    } finally {
-      if(stmt != null) try { stmt.close(); } catch(final SQLException ignored) { }
     }
   }
 
   /**
    * Executes a query, update or prepared statement.
-   * @param ctx query context
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  private NodeSeqBuilder executePrepared(final QueryContext ctx) throws QueryException {
-    final int id = (int) checkItr(expr[0], ctx);
-    final Object obj = ctx.jdbc().get(id);
+  private NodeSeqBuilder executePrepared(final QueryContext qc) throws QueryException {
+    final int id = (int) checkItr(exprs[0], qc);
+    final Object obj = jdbc(qc).get(id);
     if(!(obj instanceof PreparedStatement)) throw BXSQ_STATE.get(info, id);
 
     // Get parameters for prepared statement
     long c = 0;
     ANode params = null;
-    if(expr.length > 1) {
-      params = (ANode) checkType(checkItem(expr[1], ctx), NodeType.ELM);
+    if(exprs.length > 1) {
+      params = (ANode) checkType(checkItem(exprs[1], qc), NodeType.ELM);
       if(!params.qname().eq(Q_PARAMETERS)) throw INVALIDOPTX.get(info, params.qname().local());
       c = countParams(params);
     }
@@ -244,7 +243,7 @@ public final class FNSql extends StandardFunc {
       // Check if number of parameters equals number of place holders
       if(c != stmt.getParameterMetaData().getParameterCount()) throw BXSQ_PARAMS.get(info);
       if(params != null) setParameters(params.children(), stmt);
-      return stmt.execute() ? buildResult(stmt.getResultSet(), ctx) : new NodeSeqBuilder();
+      return stmt.execute() ? buildResult(stmt.getResultSet(), qc) : new NodeSeqBuilder();
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.get(info, ex);
     }
@@ -346,12 +345,12 @@ public final class FNSql extends StandardFunc {
   /**
    * Builds a sequence of elements from a query's result set.
    * @param rs result set
-   * @param ctx query context
+   * @param qc query context
    * @return sequence of elements <tuple/> each of which represents a row from
    *         the result set
    * @throws QueryException query exception
    */
-  private NodeSeqBuilder buildResult(final ResultSet rs, final QueryContext ctx)
+  private NodeSeqBuilder buildResult(final ResultSet rs, final QueryContext qc)
       throws QueryException {
 
     try {
@@ -376,9 +375,10 @@ public final class FNSql extends StandardFunc {
             // add XML value as child element
             final String xml = ((SQLXML) value).getString();
             try {
-              col.add(new DBNode(new IOContent(xml), ctx.context.options).children().next());
+              col.add(new DBNode(new IOContent(xml), qc.context.options).children().next());
             } catch(final IOException ex) {
               // fallback: add string representation
+              Util.debug(ex);
               col.add(xml);
             }
           } else {
@@ -394,14 +394,22 @@ public final class FNSql extends StandardFunc {
   }
 
   /**
-   * Closes a connection to a relational database.
-   * @param ctx query context
+   * Closes a connection or a prepared statement.
+   * @param qc query context
    * @return {@code null}
    * @throws QueryException query exception
    */
-  private Item close(final QueryContext ctx) throws QueryException {
+  private Item close(final QueryContext qc) throws QueryException {
     try {
-      connection(ctx, true).close();
+      final int id = (int) checkItr(exprs[0], qc);
+      final JDBCConnections jdbc = jdbc(qc);
+      final Object obj = jdbc.get(id);
+      if(obj instanceof Connection) {
+        ((Connection) obj).close();
+      } else {
+        ((PreparedStatement) obj).close();
+      }
+      jdbc.remove(id);
       return null;
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.get(info, ex);
@@ -410,13 +418,13 @@ public final class FNSql extends StandardFunc {
 
   /**
    * Commits all changes made during last transaction.
-   * @param ctx query context
+   * @param qc query context
    * @return {@code null}
    * @throws QueryException query exception
    */
-  private Item commit(final QueryContext ctx) throws QueryException {
+  private Item commit(final QueryContext qc) throws QueryException {
     try {
-      connection(ctx, false).commit();
+      connection(qc).commit();
       return null;
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.get(info, ex);
@@ -425,13 +433,13 @@ public final class FNSql extends StandardFunc {
 
   /**
    * Rollbacks all changes made during last transaction.
-   * @param ctx query context
+   * @param qc query context
    * @return {@code null}
    * @throws QueryException query exception
    */
-  private Item rollback(final QueryContext ctx) throws QueryException {
+  private Item rollback(final QueryContext qc) throws QueryException {
     try {
-      connection(ctx, false).rollback();
+      connection(qc).rollback();
       return null;
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.get(info, ex);
@@ -439,19 +447,29 @@ public final class FNSql extends StandardFunc {
   }
 
   /**
-   * Returns a connection and removes it from list with opened connections if
-   * requested.
-   * @param ctx query context
-   * @param del flag indicating if connection has to be removed
+   * Returns a connection.
+   * @param qc query context
    * @return connection
    * @throws QueryException query exception
    */
-  private Connection connection(final QueryContext ctx, final boolean del)
-      throws QueryException {
-    final int id = (int) checkItr(expr[0], ctx);
-    final Object obj = ctx.jdbc().get(id);
-    if(!(obj instanceof Connection)) throw BXSQ_CONN.get(info, id);
-    if(del) ctx.jdbc().remove(id);
-    return (Connection) obj;
+  private Connection connection(final QueryContext qc) throws QueryException {
+    final int id = (int) checkItr(exprs[0], qc);
+    final Object obj = jdbc(qc).get(id);
+    if(obj instanceof Connection) return (Connection) obj;
+    throw BXSQ_CONN.get(info, id);
+  }
+
+  /**
+   * Returns the JDBC connection handler.
+   * @param qc query context
+   * @return connection handler
+   */
+  private static JDBCConnections jdbc(final QueryContext qc) {
+    JDBCConnections res = qc.resources.get(JDBCConnections.class);
+    if(res == null) {
+      res = new JDBCConnections();
+      qc.resources.add(res);
+    }
+    return res;
   }
 }

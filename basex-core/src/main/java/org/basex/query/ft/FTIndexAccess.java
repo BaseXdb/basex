@@ -28,19 +28,19 @@ public final class FTIndexAccess extends Simple {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param ex contains, select and optional ignore expression
-   * @param ic index context
+   * @param info input info
+   * @param ftexpr contains, select and optional ignore expression
+   * @param ictx index context
    */
-  public FTIndexAccess(final InputInfo ii, final FTExpr ex, final IndexContext ic) {
-    super(ii);
-    ftexpr = ex;
-    ictx = ic;
+  public FTIndexAccess(final InputInfo info, final FTExpr ftexpr, final IndexContext ictx) {
+    super(info);
+    this.ftexpr = ftexpr;
+    this.ictx = ictx;
   }
 
   @Override
-  public NodeIter iter(final QueryContext ctx) throws QueryException {
-    final FTIter ir = ftexpr.iter(ctx);
+  public NodeIter iter(final QueryContext qc) throws QueryException {
+    final FTIter ir = ftexpr.iter(qc);
 
     return new NodeIter() {
       @Override
@@ -48,7 +48,7 @@ public final class FTIndexAccess extends Simple {
         final FTNode it = ir.next();
         if(it != null) {
           // cache entry for visualizations or ft:mark/ft:extract
-          if(ctx.ftPosData != null) ctx.ftPosData.add(it.data, it.pre, it.all);
+          if(qc.ftPosData != null) qc.ftPosData.add(it.data, it.pre, it.all);
           // assign scoring, if not done yet
           it.score();
           // remove matches reference to save memory
@@ -75,14 +75,14 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
       throws QueryException {
-    return ftexpr.inline(ctx, scp, v, e) == null ? null : optimize(ctx, scp);
+    return ftexpr.inline(qc, scp, v, e) == null ? null : optimize(qc, scp);
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTIndexAccess(info, ftexpr.copy(ctx, scp, vs), ictx);
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new FTIndexAccess(info, ftexpr.copy(qc, scp, vs), ictx);
   }
 
   @Override

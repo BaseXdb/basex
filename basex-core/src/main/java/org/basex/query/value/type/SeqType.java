@@ -39,24 +39,24 @@ public final class SeqType {
 
     /**
      * Constructor.
-     * @param mn minimal number of occurrences
-     * @param mx maximal number of occurrences
-     * @param s string representation
+     * @param min minimal number of occurrences
+     * @param max maximal number of occurrences
+     * @param str string representation
      */
-    Occ(final int mn, final int mx, final String s) {
-      min = mn;
-      max = mx;
-      str = s;
+    Occ(final int min, final int max, final String str) {
+      this.min = min;
+      this.max = max;
+      this.str = str;
     }
 
     /**
      * Checks if the specified occurrence indicator is an instance of the
      * current occurrence indicator.
-     * @param o occurrence indicator to check
+     * @param occ occurrence indicator to check
      * @return result of check
      */
-    public boolean instanceOf(final Occ o) {
-      return min >= o.min && max <= o.max;
+    public boolean instanceOf(final Occ occ) {
+      return min >= occ.min && max <= occ.max;
     }
 
     /**
@@ -85,11 +85,11 @@ public final class SeqType {
 
     /**
      * Checks if the given cardinality is supported by this type.
-     * @param c cardinality
+     * @param card cardinality
      * @return result of check
      */
-    public boolean check(final long c) {
-      return min <= c && c <= max;
+    public boolean check(final long card) {
+      return min <= card && card <= max;
     }
 
     @Override
@@ -240,63 +240,64 @@ public final class SeqType {
 
   /**
    * Private constructor.
-   * @param t type
-   * @param o occurrences
+   * @param type type
+   * @param occ occurrence
    */
-  private SeqType(final Type t, final Occ o) {
-    this(t, o, null);
+  private SeqType(final Type type, final Occ occ) {
+    this(type, occ, null);
   }
 
   /**
    * Constructor. This one is called by {@link Type#seqType} to create
    * unique sequence type instances.
-   * @param t type
+   * @param type type
    */
-  SeqType(final Type t) {
-    this(t, Occ.ONE);
+  SeqType(final Type type) {
+    this(type, Occ.ONE);
   }
 
   /**
    * Private constructor.
-   * @param t type
-   * @param o occurrences
-   * @param k kind test
+   * @param type type
+   * @param occ occurrences
+   * @param kind kind test
    */
-  private SeqType(final Type t, final Occ o, final Test k) {
-    type = t;
-    occ = o;
-    kind = k;
+  private SeqType(final Type type, final Occ occ, final Test kind) {
+    this.type = type;
+    this.occ = occ;
+    this.kind = kind;
   }
 
   /**
    * Returns a sequence type.
-   * @param t type
-   * @param o occurrences
+   * @param type type
+   * @param occ occurrences
    * @return sequence type
    */
-  public static SeqType get(final Type t, final Occ o) {
-    return o == Occ.ONE ? t.seqType() : o == Occ.ZERO ? EMP : new SeqType(t, o);
+  public static SeqType get(final Type type, final Occ occ) {
+    return occ == Occ.ONE ? type.seqType() : occ == Occ.ZERO ? EMP : new SeqType(type, occ);
   }
 
   /**
    * Returns a sequence type.
-   * @param t type
-   * @param o number of occurrences
+   * @param type type
+   * @param occ number of occurrences
    * @return sequence type
    */
-  public static SeqType get(final Type t, final long o) {
-    return get(t, o == 0 ? Occ.ZERO : o == 1 ? Occ.ONE : o > 1 ? Occ.ONE_MORE : Occ.ZERO_MORE);
+  public static SeqType get(final Type type, final long occ) {
+    return get(type, occ == 0 ? Occ.ZERO : occ == 1 ? Occ.ONE : occ > 1 ? Occ.ONE_MORE :
+      Occ.ZERO_MORE);
   }
 
   /**
    * Returns a sequence type.
-   * @param t type
-   * @param o occurrences
-   * @param k kind test
+   * @param type type
+   * @param occ occurrences
+   * @param test kind test
    * @return sequence type
    */
-  public static SeqType get(final Type t, final Occ o, final Test k) {
-    return k == null ? get(t, o) : new SeqType(t, o, k);
+  public static SeqType get(final Type type, final Occ occ, final Test test) {
+    return test == null ? get(type, occ) : new SeqType(type, occ, test);
   }
 
   /**
@@ -339,23 +340,23 @@ public final class SeqType {
   /**
    * Tries to cast the given item to this sequence type.
    * @param it item to cast
-   * @param ctx query context
+   * @param qc query context
    * @param sc static context
    * @param ii input info
    * @param e expression for error message
    * @return promoted item
    * @throws QueryException query exception
    */
-  public Value cast(final Item it, final QueryContext ctx, final StaticContext sc,
+  public Value cast(final Item it, final QueryContext qc, final StaticContext sc,
       final InputInfo ii, final ExprInfo e) throws QueryException {
 
     if(it == null) {
-      if(!occ.check(0)) throw INVEMPTYEX.get(ii, e.description(), this);
+      if(!occ.check(0)) throw INVEMPTYEX.get(ii, e, this);
       return Empty.SEQ;
     }
 
     if(!occ.check(1)) throw INVCAST.get(ii, it.type, this);
-    final Value v = it.type.eq(type) ? it : type.cast(it, ctx, sc, ii);
+    final Value v = it.type.eq(type) ? it : type.cast(it, qc, sc, ii);
     if(kind != null) {
       for(final Item i : v) if(!kind.eq(it)) throw Err.castError(ii, type, i);
     }
@@ -365,38 +366,37 @@ public final class SeqType {
   /**
    * Casts a sequence to this type.
    * @param val value to cast
-   * @param ctx query context
+   * @param qc query context
    * @param sc static context
    * @param ii input info
    * @param e expression
    * @return resulting value
    * @throws QueryException query exception
    */
-  public Value cast(final Value val, final QueryContext ctx, final StaticContext sc,
+  public Value cast(final Value val, final QueryContext qc, final StaticContext sc,
       final InputInfo ii, final ExprInfo e) throws QueryException {
-    if(val.size() < 2) return cast(val.isEmpty() ? null : val.itemAt(0), ctx, sc, ii, e);
+    if(val.size() < 2) return cast(val.isEmpty() ? null : val.itemAt(0), qc, sc, ii, e);
 
     if(!occ.check(val.size())) throw INVCAST.get(ii, val.type(), this);
     final ValueBuilder vb = new ValueBuilder((int) val.size());
-    for(int i = 0; i < val.size(); i++) vb.add(cast(val.itemAt(i), ctx, sc, ii, e));
+    for(int i = 0; i < val.size(); i++) vb.add(cast(val.itemAt(i), qc, sc, ii, e));
     return vb.value();
   }
 
   /**
-   * Treats the specified value as this sequence type.
-   * @param val value to promote
+   * Checks the specified value for this sequence type.
+   * @param val value to be checked
    * @param ii input info
-   * @return the value
    * @throws QueryException query exception
    */
-  public Value treat(final Value val, final InputInfo ii) throws QueryException {
-    if(val.type().instanceOf(this)) return val;
+  public void treat(final Value val, final InputInfo ii) throws QueryException {
+    if(val.type().instanceOf(this)) return;
 
     final int size = (int) val.size();
     if(!occ.check(size)) throw Err.treatError(ii, this, val);
 
     // empty sequence has all types
-    if(size == 0) return Empty.SEQ;
+    if(size == 0) return;
     // check first item
     boolean ins = instance(val.itemAt(0), true);
 
@@ -404,12 +404,11 @@ public final class SeqType {
     if(!val.homogeneous())
       for(int i = 1; ins && i < size; i++) ins = instance(val.itemAt(i), true);
     if(!ins) throw Err.treatError(ii, this, val);
-    return val;
   }
 
   /**
    * Promotes an item to the type of this sequence type.
-   * @param ctx query context
+   * @param qc query context
    * @param sc static context
    * @param ii input info
    * @param it item to promote
@@ -417,7 +416,7 @@ public final class SeqType {
    * @return promoted item
    * @throws QueryException query exception
    */
-  private Value promote(final QueryContext ctx, final StaticContext sc, final InputInfo ii,
+  private Value promote(final QueryContext qc, final StaticContext sc, final InputInfo ii,
       final Item it, final boolean opt) throws QueryException {
 
     if(type instanceof AtomType) {
@@ -428,7 +427,7 @@ public final class SeqType {
           if(sc.xquery3()) throw NSSENS.get(ii, it.type, type);
           throw Err.treatError(ii, withOcc(Occ.ONE), it);
         }
-        return type.cast(atom, ctx, sc, ii);
+        return type.cast(atom, qc, sc, ii);
       }
 
       final Type at = atom.type, tt = type;
@@ -439,7 +438,7 @@ public final class SeqType {
       if(tt == AtomType.STR && at.instanceOf(AtomType.URI))
         return Str.get(atom.string(ii));
     } else if(it instanceof FItem && type instanceof FuncType) {
-      return ((FItem) it).coerceTo((FuncType) type, ctx, ii, opt);
+      return ((FItem) it).coerceTo((FuncType) type, qc, ii, opt);
     }
 
     throw Err.treatError(ii, withOcc(Occ.ONE), it);
@@ -447,7 +446,7 @@ public final class SeqType {
 
   /**
    * Promotes a value to the type of this sequence type.
-   * @param ctx query context
+   * @param qc query context
    * @param sc static context
    * @param ii input info
    * @param val value to convert
@@ -455,20 +454,20 @@ public final class SeqType {
    * @return converted value
    * @throws QueryException if the conversion was not possible
    */
-  public Value promote(final QueryContext ctx, final StaticContext sc, final InputInfo ii,
+  public Value promote(final QueryContext qc, final StaticContext sc, final InputInfo ii,
       final Value val, final boolean opt) throws QueryException {
 
     final long n = val.size();
     if(!occ.check(n)) throw Err.treatError(ii, this, val);
     if(n == 0) return Empty.SEQ;
     if(val.isItem())
-      return instance((Item) val, true) ? val : promote(ctx, sc, ii, (Item) val, opt);
+      return instance((Item) val, true) ? val : promote(qc, sc, ii, (Item) val, opt);
 
     ValueBuilder vb = null;
     final Item fst = val.itemAt(0);
     if(!instance(fst, true)) {
       vb = new ValueBuilder(new Item[(int) val.size()], 0);
-      vb.add(promote(ctx, sc, ii, fst, opt));
+      vb.add(promote(qc, sc, ii, fst, opt));
     } else if(val.homogeneous()) {
       return val;
     }
@@ -476,11 +475,11 @@ public final class SeqType {
     for(int i = 1; i < n; i++) {
       final Item it = val.itemAt(i);
       if(vb != null) {
-        vb.add(instance(it, true) ? it : promote(ctx, sc, ii, it, opt));
+        vb.add(instance(it, true) ? it : promote(qc, sc, ii, it, opt));
       } else if(!instance(it, true)) {
         vb = new ValueBuilder(new Item[(int) val.size()], 0);
         for(int j = 0; j < i; j++) vb.add(val.itemAt(j));
-        vb.add(promote(ctx, sc, ii, it, opt));
+        vb.add(promote(qc, sc, ii, it, opt));
       }
     }
     return vb != null ? Seq.get(vb.items(), (int) vb.size(), type) : val;
@@ -577,7 +576,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeNumber() {
-    return type.isNumber() || type == AtomType.ITEM;
+    return type.isNumber() || AtomType.AAT.instanceOf(type);
   }
 
   /**

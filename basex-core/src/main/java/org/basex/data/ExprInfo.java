@@ -24,7 +24,7 @@ public abstract class ExprInfo {
    * Returns the simplified class name.
    * @return class name
    */
-  byte[] info() {
+  private byte[] info() {
     return Token.token(Util.className(this));
   }
 

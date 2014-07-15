@@ -22,7 +22,7 @@ import org.basex.util.list.*;
  */
 public final class Thesaurus {
   /** Thesaurus root references. */
-  private final TokenObjMap<ThesNode> nodes = new TokenObjMap<ThesNode>();
+  private final TokenObjMap<ThesNode> nodes = new TokenObjMap<>();
   /** Relationships. */
   private static final TokenMap RSHIPS = new TokenMap();
   /** Database context. */

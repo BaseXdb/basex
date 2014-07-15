@@ -3,7 +3,6 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import java.io.*;
-import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
@@ -30,19 +29,15 @@ public class Restore extends ABackup {
 
   @Override
   protected boolean run() {
-    String db = args[0];
-    if(!Databases.validName(db)) return error(NAME_INVALID_X, db);
+    final String name = args[0];
+    if(!Databases.validName(name)) return error(NAME_INVALID_X, name);
 
-    // find backup file with or without date suffix
-    IOFile file = goptions.dbpath(db + IO.ZIPSUFFIX);
-    if(file.exists()) {
-      // db is already the name of a backup -> extract db name
-      db = Pattern.compile(DateTime.PATTERN + '$').split(db)[0];
-    } else {
-      final StringList list = Databases.backupPaths(db, context).sort(Prop.CASE, false);
-      if(!list.isEmpty()) file = new IOFile(list.get(0));
-    }
-    if(!file.exists()) return error(BACKUP_NOT_FOUND_X, db);
+    // find backup with or without date suffix
+    final StringList backups = context.databases.backups(name);
+    if(backups.isEmpty()) return error(BACKUP_NOT_FOUND_X, name);
+
+    final String backup = backups.get(0);
+    final String db = Databases.name(backup);
 
     // close database if it's currently opened and not opened by others
     if(!closed) closed = close(context, db);
@@ -51,10 +46,11 @@ public class Restore extends ABackup {
 
     // try to restore database
     try {
-      restore(file, this);
+      restore(db, backup, this, context);
       return !closed || new Open(db).run(context) ?
-        info(DB_RESTORED_X, file.name(), perf) : error(DB_NOT_RESTORED_X, db);
+        info(DB_RESTORED_X, backup, perf) : error(DB_NOT_RESTORED_X, db);
     } catch(final IOException ex) {
+      Util.debug(ex);
       return error(DB_NOT_RESTORED_X, db);
     }
   }
@@ -62,22 +58,29 @@ public class Restore extends ABackup {
   @Override
   public void databases(final LockResult lr) {
     super.databases(lr);
-    final String name = args[0];
-    // Not sure whether database or backup name is provided, lock both
-    final String dbName = Pattern.compile(DateTime.PATTERN + '$').split(name)[0];
-    lr.write.add(name).add(dbName);
+    // Not sure whether database or name of backup file is provided: lock both
+    final String backup = args[0];
+    lr.write.add(backup).add(Databases.name(backup));
   }
 
   /**
    * Restores the specified database.
-   * @param file file
+   * @param db name of database
+   * @param backup name of backup
    * @param cmd calling command instance
-   * @throws IOException I/O exception
+   * @param context database context
+   * @throws IOException  I/O exception
    */
-  private void restore(final IOFile file, final Restore cmd) throws IOException {
-    final Zip zip = new Zip(file);
+  public static void restore(final String db, final String backup, final Restore cmd,
+      final Context context) throws IOException {
+
+    // drop target database
+    DropDB.drop(db, context);
+
+    final IOFile dbpath = context.globalopts.dbpath();
+    final Zip zip = new Zip(new IOFile(dbpath, backup + IO.ZIPSUFFIX));
     if(cmd != null) cmd.proc(zip);
-    zip.unzip(goptions.dbpath());
+    zip.unzip(dbpath);
   }
 
   @Override

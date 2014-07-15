@@ -31,14 +31,14 @@ public final class OrderBy extends GFLWOR.Clause {
 
   /**
    * Constructor.
-   * @param vs variables to sort
-   * @param ks sort keys
-   * @param ii input info
+   * @param refs variables to sort
+   * @param keys sort keys
+   * @param info input info
    */
-  public OrderBy(final VarRef[] vs, final Key[] ks, final InputInfo ii) {
-    super(ii);
-    refs = vs;
-    keys = ks;
+  public OrderBy(final VarRef[] refs, final Key[] keys, final InputInfo info) {
+    super(info);
+    this.refs = refs;
+    this.keys = keys;
   }
 
   @Override
@@ -51,33 +51,33 @@ public final class OrderBy extends GFLWOR.Clause {
       /** Current position. */
       int pos;
       @Override
-      public boolean next(final QueryContext ctx) throws QueryException {
-        if(tpls == null) sort(ctx);
+      public boolean next(final QueryContext qc) throws QueryException {
+        if(tpls == null) sort(qc);
         if(pos == tpls.length) return false;
         final int p = perm[pos++];
         final Value[] tuple = tpls[p];
         // free the space occupied by the tuple
         tpls[p] = null;
-        for(int i = 0; i < refs.length; i++) ctx.set(refs[i].var, tuple[i], info);
+        for(int i = 0; i < refs.length; i++) qc.set(refs[i].var, tuple[i], info);
         return true;
       }
 
       /**
        * Caches and sorts all incoming tuples.
-       * @param ctx query context
+       * @param qc query context
        * @throws QueryException evaluation exception
        */
-      private void sort(final QueryContext ctx) throws QueryException {
+      private void sort(final QueryContext qc) throws QueryException {
         // keys are stored at odd positions, values at even ones
-        List<Value[]> tuples = new ArrayList<Value[]>();
-        while(sub.next(ctx)) {
+        List<Value[]> tuples = new ArrayList<>();
+        while(sub.next(qc)) {
           final Item[] key = new Item[keys.length];
           for(int i = 0; i < keys.length; i++)
-            key[i] = keys[i].expr.item(ctx, keys[i].info);
+            key[i] = keys[i].expr.item(qc, keys[i].info);
           tuples.add(key);
 
           final Value[] vals = new Value[refs.length];
-          for(int i = 0; i < refs.length; i++) vals[i] = refs[i].value(ctx);
+          for(int i = 0; i < refs.length; i++) vals[i] = refs[i].value(qc);
           tuples.add(vals);
         }
 
@@ -145,13 +145,13 @@ public final class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  public OrderBy compile(final QueryContext cx, final VarScope sc) throws QueryException {
-    for(final Key k : keys) k.compile(cx, sc);
+  public OrderBy compile(final QueryContext qc, final VarScope sc) throws QueryException {
+    for(final Key k : keys) k.compile(qc, sc);
     return this;
   }
 
   @Override
-  public OrderBy optimize(final QueryContext ctx, final VarScope scp) {
+  public OrderBy optimize(final QueryContext qc, final VarScope scp) {
     return this;
   }
 
@@ -167,17 +167,16 @@ public final class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp, final Var v,
-      final Expr e) throws QueryException {
+  public GFLWOR.Clause inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
     for(int i = refs.length; --i >= 0;)
       if(v.is(refs[i].var)) refs = Array.delete(refs, i);
-    return inlineAll(ctx, scp, keys, v, e) ? optimize(ctx, scp) : null;
+    return inlineAll(qc, scp, keys, v, e) ? optimize(qc, scp) : null;
   }
 
   @Override
-  public OrderBy copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new OrderBy(Arr.copyAll(ctx, scp, vs, refs),
-        Arr.copyAll(ctx, scp, vs, keys), info);
+  public OrderBy copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new OrderBy(Arr.copyAll(qc, scp, vs, refs), Arr.copyAll(qc, scp, vs, keys), info);
   }
 
   @Override
@@ -186,7 +185,7 @@ public final class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  boolean clean(final QueryContext ctx, final IntObjMap<Var> decl, final BitArray used) {
+  boolean clean(final QueryContext qc, final IntObjMap<Var> decl, final BitArray used) {
     // delete unused variables
     final int len = refs.length;
     for(int i = refs.length; --i >= 0;)
@@ -241,23 +240,23 @@ public final class OrderBy extends GFLWOR.Clause {
 
     /**
      * Constructor.
-     * @param ii input info
-     * @param k sort key expression
-     * @param dsc descending order
-     * @param lst empty least
-     * @param cl collation
+     * @param info input info
+     * @param key sort key expression
+     * @param desc descending order
+     * @param least empty least
+     * @param coll collation
      */
-    public Key(final InputInfo ii, final Expr k, final boolean dsc, final boolean lst,
-        final Collation cl) {
-      super(ii, k);
-      desc = dsc;
-      least = lst;
-      coll = cl;
+    public Key(final InputInfo info, final Expr key, final boolean desc, final boolean least,
+        final Collation coll) {
+      super(info, key);
+      this.desc = desc;
+      this.least = least;
+      this.coll = coll;
     }
 
     @Override
-    public Key copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-      return new Key(info, expr.copy(ctx, scp, vs), desc, least, coll);
+    public Key copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+      return new Key(info, expr.copy(qc, scp, vs), desc, least, coll);
     }
 
     @Override

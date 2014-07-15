@@ -24,9 +24,7 @@ public final class JarLoader extends URLClassLoader {
     super(urls, parent);
   }
 
-  /**
-   * Closes the class loader.
-   */
+  @Override
   public void close() {
     try {
       final Field ucp = URLClassLoader.class.getDeclaredField("ucp");

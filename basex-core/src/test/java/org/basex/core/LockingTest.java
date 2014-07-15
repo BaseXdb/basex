@@ -38,7 +38,7 @@ public final class LockingTest extends SandboxTest {
    */
   @Parameters
   public static Collection<Object[]> generateParams() {
-    final List<Object[]> params = new ArrayList<Object[]>();
+    final List<Object[]> params = new ArrayList<>();
     for(int i = 1; i <= REPEAT; i++) {
       params.add(new Object[0]);
     }
@@ -361,7 +361,6 @@ public final class LockingTest extends SandboxTest {
 
     assertTrue("Increase {@code objects.length}!", objects.length > 1);
     final String[] release = Arrays.copyOf(objects, 1);
-    final String[] keep = Arrays.copyOfRange(objects, 1, objects.length);
 
     final LockTester th1 = new LockTester(null, NONE, objects, sync);
     final LockTester th2 = new LockTester(sync, release, NONE, test);
@@ -369,9 +368,6 @@ public final class LockingTest extends SandboxTest {
     th1.start();
     th2.start();
     assertFalse("Thread 2 shouldn't be able to acquire lock yet.",
-        test.await(WAIT, TimeUnit.MILLISECONDS));
-    th1.downgrade(keep);
-    assertTrue("Thread 2 should be able to acquire lock now.",
         test.await(WAIT, TimeUnit.MILLISECONDS));
     th1.release();
     th2.release();
@@ -387,16 +383,12 @@ public final class LockingTest extends SandboxTest {
 
     assertTrue("Increase {@code objects.length}!", objects.length > 1);
     final String[] release = Arrays.copyOf(objects, 1);
-    final String[] keep = Arrays.copyOfRange(objects, 1, objects.length);
 
     final LockTester th1 = new LockTester(null, NONE, objects, sync);
     final LockTester th2 = new LockTester(sync, NONE, release, test);
 
     th1.start();
     th2.start();
-    assertFalse("Thread 2 shouldn't be able to acquire lock yet.",
-        test.await(WAIT, TimeUnit.MILLISECONDS));
-    th1.downgrade(keep);
     assertFalse("Thread 2 shouldn't be able to acquire lock yet.",
         test.await(WAIT, TimeUnit.MILLISECONDS));
     th1.release();
@@ -420,9 +412,6 @@ public final class LockingTest extends SandboxTest {
     th2.start();
     assertFalse("Thread 2 shouldn't be able to acquire lock yet.",
         test.await(WAIT, TimeUnit.MILLISECONDS));
-    th1.downgrade(objects);
-    assertFalse("Thread 2 shouldn't be able to acquire lock yet.",
-        test.await(WAIT, TimeUnit.MILLISECONDS));
     th1.release();
     assertTrue("Thread 2 should be able to acquire lock now.",
         test.await(WAIT, TimeUnit.MILLISECONDS));
@@ -443,9 +432,6 @@ public final class LockingTest extends SandboxTest {
     th1.start();
     th2.start();
     assertFalse("Thread 2 shouldn't be able to acquire lock yet.",
-        test.await(WAIT, TimeUnit.MILLISECONDS));
-    th1.downgrade(NONE);
-    assertTrue("Thread 2 should be able to acquire lock now.",
         test.await(WAIT, TimeUnit.MILLISECONDS));
     th1.release();
     th2.release();
@@ -468,9 +454,6 @@ public final class LockingTest extends SandboxTest {
 
     th1.start();
     th2.start();
-    assertFalse("Thread 2 shouldn't be able to acquire lock yet.",
-        test.await(WAIT, TimeUnit.MILLISECONDS));
-    th1.downgrade(NONE);
     assertFalse("Thread 2 shouldn't be able to acquire lock yet.",
         test.await(WAIT, TimeUnit.MILLISECONDS));
     th1.release();
@@ -549,8 +532,6 @@ public final class LockingTest extends SandboxTest {
             th.start();
             try {
               Thread.sleep(HOLD_TIME);
-              th.downgrade(randomSubset(write, false));
-              Thread.sleep(HOLD_TIME);
               if(!latch.await(FUZZING_THREADS * HOLD_TIME + WAIT, TimeUnit.MILLISECONDS))
                 throw new RuntimeException("Looks like thread is stuck in a deadlock.");
             } catch(final InterruptedException e) {
@@ -582,8 +563,6 @@ public final class LockingTest extends SandboxTest {
     private final String[] readObjects;
     /** Array of objects to put write locks onto. */
     private final String[] writeObjects;
-    /** If set, downgrade locks after being notified. */
-    private volatile String[] downgrade;
     /** Flag indicating to release locks after being notified. */
     private volatile boolean requestRelease;
 
@@ -594,8 +573,7 @@ public final class LockingTest extends SandboxTest {
      * @param w Strings to put write lock on
      * @param c Latch to count down after receiving locks
      */
-    LockTester(final CountDownLatch a, final String[] r, final String[] w,
-        final CountDownLatch c) {
+    LockTester(final CountDownLatch a, final String[] r, final String[] w, final CountDownLatch c) {
       await = a;
       writing = w != null && w.length != 0;
       readObjects = r;
@@ -626,27 +604,12 @@ public final class LockingTest extends SandboxTest {
       // Wait until we're asked to release the lock
       synchronized(this) {
         try {
-          while(!requestRelease || downgrade != null) {
-            if(downgrade != null) {
-              locks.downgrade(new StringList().add(downgrade));
-              downgrade = null;
-            }
-            if(!requestRelease) wait();
-          }
+          while(!requestRelease) wait();
         } catch(final InterruptedException e) {
           throw new RuntimeException("Unexpectedly interrupted.");
         }
       }
       locks.release(cmd);
-    }
-
-    /**
-     * Downgrade given locks.
-     * @param dg Locks to keep
-     */
-    public synchronized void downgrade(final String[] dg) {
-      downgrade = dg;
-      notifyAll();
     }
 
     /**

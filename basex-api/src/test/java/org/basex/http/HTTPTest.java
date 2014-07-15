@@ -14,6 +14,7 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.util.*;
+import org.basex.util.Base64;
 import org.basex.util.list.*;
 import org.junit.*;
 
@@ -39,7 +40,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @param local local flag
    * @throws Exception exception
    */
-  public static void init(final String rt, final boolean local) throws Exception {
+  protected static void init(final String rt, final boolean local) throws Exception {
     initContext(CONTEXT);
     assertTrue(new IOFile(CONTEXT.globalopts.get(GlobalOptions.WEBPATH)).md());
     root = rt;
@@ -86,7 +87,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  public static String get(final String query) throws IOException {
+  protected static String get(final String query) throws IOException {
     return request(query, GET);
   }
 
@@ -96,7 +97,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @return response code
    * @throws IOException I/O exception
    */
-  public static String delete(final String query) throws IOException {
+  protected static String delete(final String query) throws IOException {
     return request(query, DELETE);
   }
 
@@ -106,12 +107,12 @@ public abstract class HTTPTest extends SandboxTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  public static String head(final String query) throws IOException {
+  protected static String head(final String query) throws IOException {
     return request(query, HEAD);
   }
 
   /**
-   * Executes the specified GET request and returns the result.
+   * Executes the specified HTTP request and returns the result.
    * @param query request
    * @param method HTTP method
    * @return string result, or {@code null} for a failure.
@@ -119,11 +120,23 @@ public abstract class HTTPTest extends SandboxTest {
    */
   private static String request(final String query, final HTTPMethod method)
       throws IOException {
+    return request(query, method.name());
+  }
+
+  /**
+   * Executes the specified HTTP request and returns the result.
+   * @param query request
+   * @param method HTTP method
+   * @return string result, or {@code null} for a failure.
+   * @throws IOException I/O exception
+   */
+  protected static String request(final String query, final String method)
+      throws IOException {
 
     final URL url = new URL(root + query);
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     try {
-      conn.setRequestMethod(method.name());
+      conn.setRequestMethod(method);
       return read(new BufferInput(conn.getInputStream())).replaceAll("\r?\n *", "");
     } catch(final IOException ex) {
       throw error(conn, ex);
@@ -140,7 +153,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  public static String post(final String query, final String request, final String type)
+  protected static String post(final String query, final String request, final String type)
       throws IOException {
 
     // create connection
@@ -153,9 +166,9 @@ public abstract class HTTPTest extends SandboxTest {
     final String encoded = Base64.encode(Text.S_ADMIN + ':' + Text.S_ADMIN);
     conn.setRequestProperty(HTTPText.AUTHORIZATION, HTTPText.BASIC + ' ' + encoded);
     // send query
-    final OutputStream out = conn.getOutputStream();
-    out.write(token(request));
-    out.close();
+    try(final OutputStream out = conn.getOutputStream()) {
+      out.write(token(request));
+    }
 
     try {
       return read(conn.getInputStream()).replaceAll("\r?\n *", "");
@@ -173,7 +186,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @return exception
    * @throws IOException I/O exception
    */
-  public static IOException error(final HttpURLConnection conn, final IOException ex)
+  protected static IOException error(final HttpURLConnection conn, final IOException ex)
       throws IOException {
 
     final String msg = read(conn.getErrorStream());
@@ -186,12 +199,12 @@ public abstract class HTTPTest extends SandboxTest {
    * @return string
    * @throws IOException I/O exception
    */
-  public static String read(final InputStream is) throws IOException {
+  protected static String read(final InputStream is) throws IOException {
     final ArrayOutput ao = new ArrayOutput();
     if(is != null) {
-      final BufferInput bi = new BufferInput(is);
-      for(int i; (i = bi.read()) != -1;) ao.write(i);
-      bi.close();
+      try(final BufferInput bi = new BufferInput(is)) {
+        for(int i; (i = bi.read()) != -1;) ao.write(i);
+      }
     }
     return ao.toString();
   }
@@ -202,7 +215,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @param is input stream
    * @throws IOException I/O exception
    */
-  public static void put(final String u, final InputStream is) throws IOException {
+  protected static void put(final String u, final InputStream is) throws IOException {
     put(u, is, null);
   }
 
@@ -213,7 +226,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @param ctype content type (optional, may be {@code null})
    * @throws IOException I/O exception
    */
-  public static void put(final String u, final InputStream is, final String ctype)
+  protected static void put(final String u, final InputStream is, final String ctype)
       throws IOException {
 
     final URL url = new URL(root + u);
@@ -221,13 +234,13 @@ public abstract class HTTPTest extends SandboxTest {
     conn.setDoOutput(true);
     conn.setRequestMethod(PUT.name());
     if(ctype != null) conn.setRequestProperty(MimeTypes.CONTENT_TYPE, ctype);
-    final OutputStream bos = new BufferedOutputStream(conn.getOutputStream());
-    if(is != null) {
-      // send input stream if it not empty
-      final BufferedInputStream bis = new BufferedInputStream(is);
-      for(int i; (i = bis.read()) != -1;) bos.write(i);
-      bis.close();
-      bos.close();
+    try(final OutputStream bos = new BufferedOutputStream(conn.getOutputStream())) {
+      if(is != null) {
+        // send input stream if it not empty
+        try(final BufferedInputStream bis = new BufferedInputStream(is)) {
+          for(int i; (i = bis.read()) != -1;) bos.write(i);
+        }
+      }
     }
     try {
       read(conn.getInputStream());

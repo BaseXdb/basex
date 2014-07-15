@@ -6,14 +6,19 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 
+import org.basex.*;
+import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests the client/server query API.
@@ -438,10 +443,60 @@ public abstract class SessionTest extends SandboxTest {
   /** Runs a query with an external variable declaration.
    * @throws IOException I/O exception */
   @Test
+  public void queryBindEmptySequence() throws IOException {
+    Query query = session.query("declare variable $a external; $a");
+    query.bind("a", "()", "empty-sequence()");
+    assertNull(query.next());
+    query.close();
+  }
+
+  /** Runs a query with an external variable declaration.
+   * @throws IOException I/O exception */
+  @Test
   public void queryBindInt() throws IOException {
-    final Query query = session.query("declare variable $a as xs:integer external; $a");
+    Query query = session.query("declare variable $a as xs:integer external; $a");
     query.bind("a", "5", "xs:integer");
     assertEqual("5", query.next());
+    query.close();
+
+    query = session.query("declare variable $a external; $a");
+    query.bind("a", Int.get(1), "xs:integer");
+    assertEqual("1", query.next());
+    query.close();
+  }
+
+  /** Runs a query with an external variable declaration.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryBindSequence() throws IOException {
+    Query query = session.query("declare variable $a external; $a");
+    query.bind("a", "1\u00012", "xs:integer");
+    assertEqual("1", query.next());
+    assertEqual("2", query.next());
+    query.close();
+
+    query = session.query("declare variable $a external; $a");
+    query.bind("a", "09\u0002xs:hexBinary\u00012", "xs:integer");
+    assertEqual("09", query.next());
+    assertEqual("2", query.next());
+    query.close();
+
+    query = session.query("declare variable $a external; $a");
+    query.bind("a", Seq.get(new Item[] { Int.get(1), Str.get("X") }, 2));
+    assertEqual("1", query.next());
+    assertEqual("X", query.next());
+    query.close();
+
+    query = session.query("declare variable $a external; $a");
+    query.bind("a", IntSeq.get(new long[] { 1, 2 }, AtomType.INT));
+    assertEqual("1", query.next());
+    assertEqual("2", query.next());
+    query.close();
+
+    query = session.query("declare variable $a external; $a");
+    query.bind("a", IntSeq.get(new long[] { 1, 2 }, AtomType.INT), "xs:integer");
+    assertEqual("1", query.next());
+    assertEqual("2", query.next());
     query.close();
   }
 
@@ -605,12 +660,20 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
+  /** Runs a query and retrieves XML entities as string.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryEntities() throws IOException {
+    final Query query = session.query("'&amp;&lt;&gt;&apos;&quot;'");
+    assertEqual("&<>'\"", query.next());
+  }
+
   /**
    * Checks if the most recent output equals the specified string.
    * @param exp expected string
    * @param ret string returned from the client API
    */
-  final void assertEqual(final Object exp, final Object ret) {
+  private void assertEqual(final Object exp, final Object ret) {
     final String result = (out != null ? out : ret).toString();
     if(out != null) out.reset();
     assertEquals(exp.toString(), result.replaceAll("\\r|\\n", ""));

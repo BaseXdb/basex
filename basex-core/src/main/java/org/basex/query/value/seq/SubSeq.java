@@ -43,14 +43,14 @@ public final class SubSeq extends Seq {
 
   /**
    * Constructor.
-   * @param seq underlying sequence
-   * @param from starting index
+   * @param sub underlying sequence
+   * @param start starting index
    * @param len length of the subsequence
    */
-  private SubSeq(final Seq seq, final long from, final long len) {
-    super(len, seq.type);
-    sub = seq;
-    start = from;
+  private SubSeq(final Seq sub, final long start, final long len) {
+    super(len, sub.type);
+    this.sub = sub;
+    this.start = start;
   }
 
   @Override
@@ -79,7 +79,7 @@ public final class SubSeq extends Seq {
   }
 
   @Override
-  public Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item fst = itemAt(0);
     if(fst instanceof ANode) return fst;
     throw CONDTYPE.get(ii, this);

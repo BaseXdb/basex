@@ -19,30 +19,31 @@ import org.basex.util.*;
 public final class FNNum extends StandardFunc {
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNNum(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNNum(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Item it = expr[0].item(ctx, info);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Item it = exprs[0].item(qc, info);
     if(it == null) return null;
 
     final Type ip = it.type;
     if(!ip.isNumberOrUntyped()) throw numberError(this, it);
     final double d = it.dbl(info);
-    switch(sig) {
+    switch(func) {
       case ABS:                return abs(it, info);
       case CEILING:            return num(it, d, StrictMath.ceil(d));
       case FLOOR:              return num(it, d, StrictMath.floor(d));
-      case ROUND:              return rnd(it, d, false, ctx);
-      case ROUND_HALF_TO_EVEN: return rnd(it, d, true, ctx);
-      default:                 return super.item(ctx, ii);
+      case ROUND:              return rnd(it, d, false, qc);
+      case ROUND_HALF_TO_EVEN: return rnd(it, d, true, qc);
+      default:                 return super.item(qc, ii);
     }
   }
 
@@ -51,14 +52,13 @@ public final class FNNum extends StandardFunc {
    * @param it input item
    * @param d input double value
    * @param h2e half-to-even flag
-   * @param ctx query context
+   * @param qc query context
    * @return absolute item
    * @throws QueryException query exception
    */
-  private Item rnd(final Item it, final double d, final boolean h2e, final QueryContext ctx)
+  private Item rnd(final Item it, final double d, final boolean h2e, final QueryContext qc)
       throws QueryException {
-
-    final long p = expr.length == 1 ? 0 : checkItr(expr[1], ctx);
+    final long p = exprs.length == 1 ? 0 : checkItr(exprs[1], qc);
     return round(it, d, p, h2e, info);
   }
 
@@ -159,7 +159,7 @@ public final class FNNum extends StandardFunc {
 
   @Override
   public boolean has(final Flag flag) {
-    return flag == Flag.X30 && sig == Function.ROUND && expr.length == 2 ||
+    return flag == Flag.X30 && func == Function.ROUND && exprs.length == 2 ||
         super.has(flag);
   }
 }

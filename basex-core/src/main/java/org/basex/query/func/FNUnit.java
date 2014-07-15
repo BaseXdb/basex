@@ -2,9 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 
-import java.util.*;
-
-import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -22,48 +19,47 @@ import org.basex.util.*;
 public final class FNUnit extends StandardFunc {
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNUnit(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNUnit(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
-      case _UNIT_ASSERT:        return assrt(ctx);
-      case _UNIT_ASSERT_EQUALS: return assertEquals(ctx);
-      case _UNIT_FAIL:          return fail(ctx);
-      case _UNIT_TEST:          return test(ctx);
-      case _UNIT_TEST_URIS:     return testUris(ctx);
-      default:                  return super.item(ctx, ii);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    switch(func) {
+      case _UNIT_ASSERT:        return assrt(qc);
+      case _UNIT_ASSERT_EQUALS: return assertEquals(qc);
+      case _UNIT_FAIL:          return fail(qc);
+      default:                  return super.item(qc, ii);
     }
   }
 
   /**
    * Performs the assert function.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Item assrt(final QueryContext ctx) throws QueryException {
-    final byte[] str = expr.length < 2 ? null : checkStr(expr[1], ctx);
-    if(expr[0].ebv(ctx, info).bool(info)) return null;
+  private Item assrt(final QueryContext qc) throws QueryException {
+    final byte[] str = exprs.length < 2 ? null : checkStr(exprs[1], qc);
+    if(exprs[0].ebv(qc, info).bool(info)) return null;
     throw str == null ? UNIT_ASSERT.get(info) : UNIT_MESSAGE.get(info, str);
   }
 
   /**
    * Performs the assert-equals function.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Item assertEquals(final QueryContext ctx) throws QueryException {
-    final byte[] str = expr.length < 3 ? null : checkStr(expr[2], ctx);
-    final Iter iter1 = ctx.iter(expr[0]), iter2 = ctx.iter(expr[1]);
+  private Item assertEquals(final QueryContext qc) throws QueryException {
+    final Item it = exprs.length < 3 ? null : checkItem(exprs[2], qc);
+    final Iter iter1 = qc.iter(exprs[0]), iter2 = qc.iter(exprs[1]);
     final Compare comp = new Compare(info);
     Item it1, it2;
     int c = 1;
@@ -75,53 +71,17 @@ public final class FNUnit extends StandardFunc {
       if(empty1 || empty2 || !comp.deep(it1.iter(), it2.iter())) break;
       c++;
     }
-    if(str != null) throw UNIT_MESSAGE.get(info, str);
+    if(it != null) throw UNIT_MESSAGE.get(info, it.string(null)).value(it);
     throw new UnitException(info, UNIT_ASSERT_EQUALS, it1, it2, c);
   }
 
   /**
    * Performs the fail function.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Item fail(final QueryContext ctx) throws QueryException {
-    throw UNIT_MESSAGE.get(info, checkStr(expr[0], ctx));
-  }
-
-  /**
-   * Performs the test function.
-   * @param ctx query context
-   * @return resulting value
-   * @throws QueryException query exception
-   */
-  private Item test(final QueryContext ctx) throws QueryException {
-    final Unit unit = new Unit(ctx, info);
-    if(expr.length == 0) return unit.test(sc);
-
-    final ArrayList<StaticFunc> funcs = new ArrayList<StaticFunc>();
-    final Iter ir = ctx.iter(expr[0]);
-    for(Item it; (it = ir.next()) != null;) {
-      final FItem fi = checkFunc(it, ctx);
-      if(fi.funcName() != null) {
-        final StaticFunc sf = ctx.funcs.get(fi.funcName(), fi.arity(), null, true);
-        if(sf != null) funcs.add(sf);
-      }
-    }
-    return unit.test(sc, funcs);
-  }
-
-  /**
-   * Performs the test-uris function.
-   * @param ctx query context
-   * @return resulting value
-   * @throws QueryException query exception
-   */
-  private Item testUris(final QueryContext ctx) throws QueryException {
-    checkCreate(ctx);
-    final ArrayList<IO> inputs = new ArrayList<IO>();
-    final Iter ir = ctx.iter(expr[0]);
-    for(Item it; (it = ir.next()) != null;) inputs.add(checkPath(it, ctx));
-    return new Suite(ctx, info).test(inputs);
+  private Item fail(final QueryContext qc) throws QueryException {
+    throw UNIT_MESSAGE.get(info, checkStr(exprs[0], qc));
   }
 }

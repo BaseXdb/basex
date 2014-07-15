@@ -12,7 +12,7 @@ import org.basex.util.*;
 
 /**
  * This class can be used to build new sequences.
- * At the same time, it serves as an iterator.
+ * At the same time, it may serve as an iterator.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
@@ -34,49 +34,49 @@ public final class ValueBuilder extends ValueIter implements Result {
 
   /**
    * Constructor.
-   * @param c initial capacity
+   * @param capacity initial capacity
    */
-  public ValueBuilder(final int c) {
-    items = new Item[c];
+  public ValueBuilder(final int capacity) {
+    this.items = new Item[capacity];
   }
 
   /**
    * Constructor.
-   * @param arr initial array
-   * @param s initial size
+   * @param items initial items
+   * @param size initial size
    */
-  public ValueBuilder(final Item[] arr, final int s) {
-    items = arr;
-    size = s;
+  public ValueBuilder(final Item[] items, final int size) {
+    this.items = items;
+    this.size = size;
   }
 
   /**
    * Adds the contents of a value.
-   * @param val value to be added
+   * @param value value to be added
    * @return self reference
    */
-  public ValueBuilder add(final Value val) {
-    for(final long sz = val.size(); items.length - size < sz;) items = extend(items);
-    size += val.writeTo(items, size);
+  public ValueBuilder add(final Value value) {
+    for(final long sz = value.size(); items.length - size < sz;) items = extend(items);
+    size += value.writeTo(items, size);
     return this;
   }
 
   /**
    * Adds a single item.
-   * @param it item to be added
+   * @param item item to be added
    * @return self reference
    */
-  public ValueBuilder add(final Item it) {
+  public ValueBuilder add(final Item item) {
     if(size == items.length) items = extend(items);
-    items[size++] = it;
+    items[size++] = item;
     return this;
   }
 
   @Override
-  public boolean sameAs(final Result v) {
-    if(!(v instanceof ValueBuilder)) return false;
+  public boolean sameAs(final Result result) {
+    if(!(result instanceof ValueBuilder)) return false;
 
-    final ValueBuilder vb = (ValueBuilder) v;
+    final ValueBuilder vb = (ValueBuilder) result;
     if(size != vb.size) return false;
     for(int i = 0; i < size; ++i) {
       if(items[i].type != vb.items[i].type || !items[i].sameAs(vb.items[i])) return false;
@@ -133,11 +133,11 @@ public final class ValueBuilder extends ValueIter implements Result {
 
   /**
    * Sets an item to the specified position.
-   * @param i item to be set
-   * @param p position
+   * @param i index
+   * @param item item to be set
    */
-  public void set(final Item i, final int p) {
-    items[p] = i;
+  public void set(final int i, final Item item) {
+    items[i] = item;
   }
 
   @Override

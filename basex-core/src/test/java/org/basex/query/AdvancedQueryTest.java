@@ -2,10 +2,12 @@ package org.basex.query;
 
 import static org.junit.Assert.*;
 
+import java.io.*;
+
+import org.basex.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.util.*;
-import org.basex.*;
 import org.basex.util.*;
 
 /**
@@ -15,28 +17,25 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class AdvancedQueryTest extends SandboxTest {
+  /** Base uri. */
+  private static final String BASEURI = new File(".").getAbsolutePath();
+
   /**
    * Runs the specified query and normalizes newlines.
    * @param query query string
    * @return result
    */
   protected static String query(final String query) {
-    final QueryProcessor qp = new QueryProcessor(query, context);
-    qp.sc.baseURI(".");
     try {
-      final ArrayOutput ao = new ArrayOutput();
-      final Serializer ser = qp.getSerializer(ao);
-      qp.execute().serialize(ser);
-      ser.close();
-      return ao.toString().replaceAll("(\\r|\\n)+ *", "");
+      return run(query);
     } catch(final Exception ex) {
+      ex.printStackTrace();
       final AssertionError err = new AssertionError("Query failed:\n" + query);
       err.initCause(ex);
       throw err;
-    } finally {
-      qp.close();
     }
   }
+
 
   /**
    * Checks if a query yields the specified string.
@@ -98,14 +97,8 @@ public abstract class AdvancedQueryTest extends SandboxTest {
    * @param error expected error
    */
   protected static void error(final String query, final Err... error) {
-    final QueryProcessor qp = new QueryProcessor(query, context);
-    qp.sc.baseURI(".");
     try {
-      final ArrayOutput ao = new ArrayOutput();
-      final Serializer ser = qp.getSerializer(ao);
-      qp.execute().serialize(ser);
-      ser.close();
-      final String res = ao.toString().replaceAll("(\\r|\\n)+ *", "");
+      final String res = run(query);
       final StringBuilder sb = new StringBuilder("Query did not fail:\n");
       sb.append(query).append("\n[E]");
       for(final Err e : error) sb.append(' ').append(e);
@@ -117,8 +110,6 @@ public abstract class AdvancedQueryTest extends SandboxTest {
     } catch(final Exception ex) {
       Util.stack(ex);
       fail("Unexpected exception: " + ex);
-    } finally {
-      qp.close();
     }
   }
 
@@ -140,6 +131,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
       if(err != null) {
         int c = 0;
         for(final Err er : error) tb.add(c++ == 0 ? "" : "/").add(er.name());
+        ex.printStackTrace();
         fail(tb.add("\nResult: ").add(err.name() + " (" + err.qname() + ')').toString());
       } else {
         int c = 0;
@@ -158,5 +150,25 @@ public abstract class AdvancedQueryTest extends SandboxTest {
     return "<serialization-parameters " +
       "xmlns='http://www.w3.org/2010/xslt-xquery-serialization'>" + arg +
       "</serialization-parameters>";
+  }
+
+  /**
+   * Runs the specified query and normalizes newlines.
+   * @param query query string
+   * @return result
+   * @throws Exception exception
+   */
+  private static String run(final String query) throws Exception {
+    final QueryProcessor qp = new QueryProcessor(query, context);
+    qp.sc.baseURI(BASEURI);
+    try {
+      final ArrayOutput ao = new ArrayOutput();
+      final Serializer ser = qp.getSerializer(ao);
+      qp.execute().serialize(ser);
+      ser.close();
+      return ao.toString().replaceAll("(\\r|\\n)+ *", "");
+    } finally {
+      qp.close();
+    }
   }
 }

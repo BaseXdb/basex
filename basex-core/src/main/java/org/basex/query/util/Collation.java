@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 import java.text.*;
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -22,9 +21,9 @@ import org.basex.util.hash.*;
  */
 public final class Collation {
   /** Implementation-defined collation URL. */
-  private static final byte[] URL = token(Text.URL + "/collation");
+  private static final byte[] URL = token(Prop.URL + "/collation");
   /** Available locales, indexed by language code. */
-  private static final HashMap<String, Locale> LOCALES = new HashMap<String, Locale>();
+  private static final HashMap<String, Locale> LOCALES = new HashMap<>();
   /** Strengths. */
   private static final byte[][] STRENGTHS = tokens(
     "primary", "secondary", "tertiary", "identical");
@@ -60,14 +59,14 @@ public final class Collation {
   /**
    * Returns a collation instance for the specified uri.
    * @param uri collation uri
-   * @param ctx query context
+   * @param qc query context
    * @param sc static context
    * @param info input info
    * @param err error code for unknown collation uris
    * @return collator instance or {@code null} for unicode point collation
    * @throws QueryException query exception
    */
-  public static Collation get(final byte[] uri, final QueryContext ctx, final StaticContext sc,
+  public static Collation get(final byte[] uri, final QueryContext qc, final StaticContext sc,
       final InputInfo info, final Err err) throws QueryException {
 
     // return default collation
@@ -89,13 +88,13 @@ public final class Collation {
 
     // create new collation or return cached instance
     final byte[] full = new TokenBuilder(URL).add('?').add(args).finish();
-    if(ctx.collations == null) ctx.collations = new TokenObjMap<Collation>();
-    Collation coll = ctx.collations.get(full);
+    if(qc.collations == null) qc.collations = new TokenObjMap<>();
+    Collation coll = qc.collations.get(full);
     if(coll == null) {
       final Collator cl = get(args);
       if(cl == null) throw err.get(info, uri);
       coll = new Collation(cl, full);
-      ctx.collations.put(full, coll);
+      qc.collations.put(full, coll);
     }
     return coll;
   }

@@ -25,41 +25,39 @@ public final class VarRef extends ParseExpr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param v variable
+   * @param info input info
+   * @param var variable
    */
-  public VarRef(final InputInfo ii, final Var v) {
-    super(ii);
-    var = v;
+  public VarRef(final InputInfo info, final Var var) {
+    super(info);
+    this.var = var;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) {
-    // constant propagation
-    final Value v = ctx.get(var);
-    return v != null ? v : optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) {
+    return optimize(qc, scp);
   }
 
   @Override
-  public VarRef optimize(final QueryContext ctx, final VarScope scp) {
+  public VarRef optimize(final QueryContext qc, final VarScope scp) {
     type = var.type();
     size = var.size;
     return this;
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return ctx.get(var).item(ctx, ii);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return qc.get(var).item(qc, ii);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) {
-    return ctx.get(var).iter();
+  public Iter iter(final QueryContext qc) {
+    return qc.get(var).iter();
   }
 
   @Override
-  public Value value(final QueryContext ctx) {
-    return ctx.get(var);
+  public Value value(final QueryContext qc) {
+    return qc.get(var);
   }
 
   @Override
@@ -73,15 +71,15 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e) {
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e) {
     // [LW] Is copying always necessary?
-    return v.is(var) ? e.isValue() ? e : e.copy(ctx, scp) : null;
+    return v.is(var) ? e.isValue() ? e : e.copy(qc, scp) : null;
   }
 
   @Override
-  public VarRef copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+  public VarRef copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final Var nw = vs.get(var.id);
-    return new VarRef(info, nw != null ? nw : var).optimize(ctx, scp);
+    return new VarRef(info, nw != null ? nw : var).optimize(qc, scp);
   }
 
   @Override
@@ -112,8 +110,7 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public String toString() {
-    return new TokenBuilder(DOLLAR).add(
-        var.name.toString()).add('_').addInt(var.id).toString();
+    return new TokenBuilder(DOLLAR).add(var.name.toString()).add('_').addInt(var.id).toString();
   }
 
   @Override

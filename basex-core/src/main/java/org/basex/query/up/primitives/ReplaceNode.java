@@ -18,34 +18,34 @@ import org.basex.util.*;
 public final class ReplaceNode extends NodeCopy {
   /**
    * Constructor.
-   * @param p target node pre value
-   * @param d target data instance
-   * @param i input info
-   * @param c node copy insertion sequence
+   * @param pre target node pre value
+   * @param data target data instance
+   * @param ii input info
+   * @param nodes node copy insertion sequence
    */
-  public ReplaceNode(final int p, final Data d, final InputInfo i, final ANodeList c) {
-    super(PrimitiveType.REPLACENODE, p, d, i, c);
+  public ReplaceNode(final int pre, final Data data, final InputInfo ii, final ANodeList nodes) {
+    super(UpdateType.REPLACENODE, pre, data, ii, nodes);
   }
 
   @Override
   public void update(final NamePool pool) {
     if(insseq == null) return;
     add(pool);
-    pool.remove(getTargetNode());
+    pool.remove(node());
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) throws QueryException {
-    throw UPMULTREPL.get(info, getTargetNode());
+  public void merge(final Update up) throws QueryException {
+    throw UPMULTREPL.get(info, node());
   }
 
   @Override
   public void addAtomics(final AtomicUpdateCache l) {
-    l.addReplace(targetPre, insseq);
+    l.addReplace(pre, insseq);
   }
 
   @Override
-  public UpdatePrimitive[] substitute(final MemData tmp) {
-    return new UpdatePrimitive[] { this };
+  public NodeUpdate[] substitute(final MemData tmp) {
+    return new NodeUpdate[] { this };
   }
 }

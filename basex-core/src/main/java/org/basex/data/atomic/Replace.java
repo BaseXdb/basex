@@ -73,13 +73,13 @@ final class Replace extends StructuralUpdate {
    * @param trg destination data reference
    * @return true if substitution successful
    */
-  boolean lazyReplace(final Data trg) {
+  private boolean lazyReplace(final Data trg) {
     final Data src = insseq.data;
     final int srcSize = insseq.size();
     // check for equal subtree size
     if(srcSize != trg.size(location, trg.kind(location))) return false;
 
-    final List<BasicUpdate> valueUpdates = new ArrayList<BasicUpdate>();
+    final List<BasicUpdate> valueUpdates = new ArrayList<>();
     for(int c = 0; c < srcSize; c++) {
       final int s = insseq.start + c;
       final int t = location + c;

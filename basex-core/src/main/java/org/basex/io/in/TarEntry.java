@@ -10,11 +10,11 @@ import org.basex.util.list.*;
  */
 public final class TarEntry {
   /** Name of an entry. */
-  private String name;
+  private final String name;
   /** Entry size. */
-  private long size;
+  private final long size;
   /** File type. */
-  private byte type;
+  private final byte type;
 
   /**
    * Constructor.
@@ -27,7 +27,7 @@ public final class TarEntry {
       if(buffer[i] == 0) break;
       result.add(buffer[i]);
     }
-    String n = null;
+    String n;
     try {
       n = new String(result.toArray());
     } catch(final Exception ex) {
@@ -72,6 +72,6 @@ public final class TarEntry {
    * @return result of check
    */
   public boolean isDirectory() {
-    return type == '5' || name.toString().endsWith("/");
+    return type == '5' || name.endsWith("/");
   }
 }

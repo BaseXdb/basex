@@ -11,9 +11,9 @@ import org.basex.core.cmd.Set;
 import org.basex.io.out.*;
 import org.basex.query.expr.*;
 import org.basex.query.ft.*;
-import org.basex.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests if queries are rewritten for index access.
@@ -21,7 +21,7 @@ import org.junit.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class IndexOptimizeTest extends SandboxTest {
+public final class IndexOptimizeTest extends AdvancedQueryTest {
   /**
    * Creates a test database.
    * @throws Exception exception
@@ -55,6 +55,8 @@ public final class IndexOptimizeTest extends SandboxTest {
     check("data(//*[@* = 'y'])", "1");
     check("data(//@*[. = 'y'])", "y");
     check("//*[text() contains text '1']");
+    check("//a[. = '1']");
+    check("//xml[a = '1']");
   }
 
   /**
@@ -68,6 +70,8 @@ public final class IndexOptimizeTest extends SandboxTest {
     new Open(NAME).execute(context);
     check("//*[text() = '1']");
     check("//*[text() contains text '1']");
+    check("//a[. = '1']");
+    check("//xml[a = '1']");
   }
 
   /**
@@ -80,6 +84,8 @@ public final class IndexOptimizeTest extends SandboxTest {
     final String doc = DOC.args(NAME);
     check(doc + "//*[text() = '1']");
     check(doc + "//*[text() contains text '2']");
+    check(doc + "//a[. = '1']");
+    check(doc + "//xml[a = '1']");
   }
 
   /**
@@ -92,6 +98,8 @@ public final class IndexOptimizeTest extends SandboxTest {
     final String doc = COLLECTION.args(NAME);
     check(doc + "//*[text() = '1']");
     check(doc + "//*[text() contains text '2']");
+    check(doc + "//a[. = '1']");
+    check(doc + "//xml[a = '1']");
   }
 
   /**
@@ -103,7 +111,9 @@ public final class IndexOptimizeTest extends SandboxTest {
     createColl();
     final String doc = _DB_OPEN.args(NAME);
     check(doc + "//*[text() = '1']");
-    check(doc + "//*[text() <- '2']");
+    check(doc + "//*[text() contains text '2']");
+    check(doc + "//a[. = '1']");
+    check(doc + "//xml[a = '1']");
   }
 
   /**
@@ -115,6 +125,9 @@ public final class IndexOptimizeTest extends SandboxTest {
     createColl();
     final String doc = _DB_OPEN.args(NAME, "two");
     check(doc + "//*[text() = '1']", "");
+    check(doc + "//*[text() contains text '2']", "");
+    check(doc + "//a[. = '1']", "");
+    check(doc + "//xml[a = '1']", "");
     check(doc + "//*[text() = '4']", "<a>4</a>");
   }
 
@@ -126,11 +139,11 @@ public final class IndexOptimizeTest extends SandboxTest {
   public void ftTest() throws Exception {
     createDoc();
     new Open(NAME).execute(context);
-    check("data(//*[text() <- '1'])", "1");
-    check("data(//*[text() <- '1 2' any word])", "1 2 3");
-    check("//*[text() <- {'2','4'} all]", "");
-    check("//*[text() <- {'2','3'} all words]", "<a>2 3</a>");
-    check("//*[text() <- {'2','4'} all words]", "");
+    check("data(//*[text() contains text '1'])", "1");
+    check("data(//*[text() contains text '1 2' any word])", "1 2 3");
+    check("//*[text() contains text {'2','4'} all]", "");
+    check("//*[text() contains text {'2','3'} all words]", "<a>2 3</a>");
+    check("//*[text() contains text {'2','4'} all words]", "");
   }
 
   /**
@@ -142,8 +155,9 @@ public final class IndexOptimizeTest extends SandboxTest {
     new Set(MainOptions.LANGUAGE, "de").execute(context);
     createDoc();
     new Open(NAME).execute(context);
-    check("//text()[. contains text 'test' using language 'de']");
-    check("//text()[. contains text 'test' using language 'German']");
+    check("//text()[. contains text '1']");
+    check("//text()[. contains text '1' using language 'de']");
+    check("//text()[. contains text '1' using language 'German']");
   }
 
   /**
@@ -153,8 +167,14 @@ public final class IndexOptimizeTest extends SandboxTest {
   @Test
   public void functionTest() throws Exception {
     createColl();
-    final String doc = _DB_OPEN.args(NAME);
+    // document access after inlining
+    check("declare function local:x($d) { collection($d)//text()[. = '1'] };"
+        + "local:x('" + NAME + "')", "1");
+    check("declare function local:x($d, $s) { collection($d)//text()[. = $s] };"
+        + "local:x('" + NAME + "', '1')", "1");
+
     // text: search term must be string
+    final String doc = _DB_OPEN.args(NAME);
     check("declare function local:x() {" + doc +
         "//text()[. = '1'] }; local:x()", "1");
     check("declare function local:x($x as xs:string) {" + doc +
@@ -167,11 +187,30 @@ public final class IndexOptimizeTest extends SandboxTest {
   }
 
   /**
+   * Checks predicate tests for empty strings.
+   * @throws Exception unexpected exception
+   */
+  @Test
+  public void empty() throws Exception {
+    createDoc();
+    new Open(NAME).execute(context);
+    query("//*[text() = '']", "");
+    query("//text()[. = '']", "");
+    query("//*[. = '']", "<a/>");
+    query("//a[. = '']", "<a/>");
+    query("//a[. = <x/>]", "<a/>");
+
+    query("//a[not(text() = '')]/text()", "12 3");
+    query("//text()[not(. = '')]", "12 3");
+    query("//a[not(. = '')]/text()", "12 3");
+}
+
+  /**
    * Creates a test database.
    * @throws Exception exception
    */
   private static void createDoc() throws Exception {
-    new CreateDB(NAME, "<xml><a x='y'>1</a><a>2 3</a></xml>").execute(context);
+    new CreateDB(NAME, "<xml><a x='y'>1</a><a>2 3</a><a/></xml>").execute(context);
     new Close().execute(context);
   }
 
@@ -218,10 +257,11 @@ public final class IndexOptimizeTest extends SandboxTest {
           "[self::" + Util.className(ValueAccess.class) +
           "|self::" + Util.className(FTIndexAccess.class) + ']', context);
       ao = qp.execute().serialize();
-      assertFalse("No index used:\nQuery: " + query + "\nInfo: " + qp.info() +
-          "\nPlan: " + plan, ao.toString().isEmpty());
+
+      assertFalse("No index used:\n- Query: " + query + "\n- Plan: " + plan + "\n- " +
+          qp.info().trim(), ao.toString().isEmpty());
     } catch(final QueryException ex) {
-      fail(Util.message(ex) + "\nQuery: " + query + "\nPlan: " + plan);
+      fail(Util.message(ex) + "\n- Query: " + query + "\n- Plan: " + plan);
     } catch(final IOException ex) {
       fail(Util.message(ex));
     } finally {

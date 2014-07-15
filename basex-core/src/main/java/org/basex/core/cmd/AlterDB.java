@@ -58,12 +58,15 @@ public final class AlterDB extends ACreate {
    * Renames the specified database.
    * @param source name of the existing database
    * @param target new database name
-   * @param ctx database context
+   * @param context database context
    * @return success flag
    */
   public static synchronized boolean alter(final String source, final String target,
-      final Context ctx) {
-    return ctx.globalopts.dbpath(source).rename(ctx.globalopts.dbpath(target));
+      final Context context) {
+
+    // drop target database
+    DropDB.drop(target, context);
+    return context.globalopts.dbpath(source).rename(context.globalopts.dbpath(target));
   }
 
   @Override

@@ -21,13 +21,12 @@ import com.bradmcevoy.http.Cookie;
  */
 final class BXServletResponse extends AbstractResponse {
   /** Thread local variable to hold the current response. */
-  private static final ThreadLocal<HttpServletResponse> RESPONSE =
-      new ThreadLocal<HttpServletResponse>();
+  private static final ThreadLocal<HttpServletResponse> RESPONSE = new ThreadLocal<>();
 
   /** HTTP servlet response. */
   private final HttpServletResponse res;
   /** Response headers. */
-  private final Map<String, String> headers = new HashMap<String, String>();
+  private final Map<String, String> headers = new HashMap<>();
   /** Response status. */
   private Status status;
 

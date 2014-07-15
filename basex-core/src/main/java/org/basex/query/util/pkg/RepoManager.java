@@ -33,20 +33,20 @@ public final class RepoManager {
 
   /**
    * Constructor.
-   * @param ctx database context
+   * @param context database context
    */
-  public RepoManager(final Context ctx) {
-    repo = ctx.repo;
+  public RepoManager(final Context context) {
+    repo = context.repo;
   }
 
   /**
    * Constructor.
-   * @param ctx database context
-   * @param ii input info
+   * @param context database context
+   * @param info input info
    */
-  public RepoManager(final Context ctx, final InputInfo ii) {
-    this(ctx);
-    info = ii;
+  public RepoManager(final Context context, final InputInfo info) {
+    this(context);
+    this.info = info;
   }
 
   /**
@@ -58,7 +58,7 @@ public final class RepoManager {
   public boolean install(final String path) throws QueryException {
     // check if package exists, and cache contents
     final IO io = IO.get(path);
-    byte[] cont = null;
+    final byte[] cont;
     try {
       cont = io.read();
     } catch(final IOException ex) {
@@ -199,13 +199,13 @@ public final class RepoManager {
   public static IOFile file(final String name, final Repo repo) {
     // traverse all files, find exact matches
     IOFile path = new IOFile(repo.path(), name);
-    for(final IOFile ch : path.dir().children()) {
+    for(final IOFile ch : path.parent().children()) {
       if(ch.name().equals(path.name())) return ch;
     }
     // traverse all files, find prefix matches
     path = new IOFile(repo.path(), name.replace('.', '/'));
     final String start = path.name() + '.';
-    for(final IOFile ch : path.dir().children()) {
+    for(final IOFile ch : path.parent().children()) {
       if(ch.name().startsWith(start)) return ch;
     }
     return null;
@@ -263,7 +263,7 @@ public final class RepoManager {
     final IOFile rp = new IOFile(repo.context.globalopts.get(GlobalOptions.REPOPATH));
     final IOFile target = new IOFile(rp, path);
     final boolean exists = target.exists();
-    target.dir().md();
+    target.parent().md();
     target.write(content);
     return exists;
   }

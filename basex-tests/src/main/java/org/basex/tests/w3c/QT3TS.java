@@ -1,7 +1,6 @@
 package org.basex.tests.w3c;
 
 import static org.basex.tests.w3c.QT3Constants.*;
-import static org.basex.tests.w3c.QT3Constants.ENCODING;
 import static org.basex.util.Prop.*;
 import static org.basex.util.Token.*;
 
@@ -16,7 +15,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.io.serial.SerializerOptions.*;
+import org.basex.io.serial.SerializerOptions.YesNo;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.Compare.Mode;
@@ -34,7 +33,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class QT3TS {
+public final class QT3TS extends Main {
   /** EQName pattern. */
   private static final Pattern BIND = Pattern.compile("^Q\\{(.*?)\\}(.+)$");
 
@@ -85,7 +84,7 @@ public final class QT3TS {
   /** Database context. */
   protected final Context ctx = new Context();
   /** Global environments. */
-  private final ArrayList<QT3Env> genvs = new ArrayList<QT3Env>();
+  private final ArrayList<QT3Env> genvs = new ArrayList<>();
 
   /**
    * Main method of the test class.
@@ -94,7 +93,7 @@ public final class QT3TS {
    */
   public static void main(final String[] args) throws Exception {
     try {
-      new QT3TS().run(args);
+      new QT3TS(args).run();
     } catch(final IOException ex) {
       Util.errln(ex);
       System.exit(1);
@@ -102,13 +101,21 @@ public final class QT3TS {
   }
 
   /**
-   * Runs all tests.
+   * Constructor.
    * @param args command-line arguments
+   */
+  protected QT3TS(String[] args) {
+    super(args);
+  }
+
+
+  /**
+   * Runs all tests.
    * @throws Exception exception
    */
-  private void run(final String[] args) throws Exception {
+  private void run() throws Exception {
     ctx.globalopts.set(GlobalOptions.DBPATH, sandbox().path() + "/data");
-    parseArguments(args);
+    parseArgs();
     init();
 
     final Performance perf = new Performance();
@@ -141,20 +148,20 @@ public final class QT3TS {
 
     // save log data
     Util.outln(NL + "Writing log file '" + testid + ".log'...");
-    final PrintOutput po = new PrintOutput(testid + ".log");
-    po.println("QT3TS RESULTS __________________________" + NL);
-    po.println(result.toString());
-    po.println("WRONG __________________________________" + NL);
-    po.print(wrong.finish());
-    if(all || !single.isEmpty()) {
-      po.println("CORRECT ________________________________" + NL);
-      po.print(right.finish());
+    try(final PrintOutput po = new PrintOutput(testid + ".log")) {
+      po.println("QT3TS RESULTS __________________________" + NL);
+      po.println(result.toString());
+      po.println("WRONG __________________________________" + NL);
+      po.print(wrong.finish());
+      if(all || !single.isEmpty()) {
+        po.println("CORRECT ________________________________" + NL);
+        po.print(right.finish());
+      }
+      if(ignoring) {
+        po.println("IGNORED ________________________________" + NL);
+        po.print(ignore.finish());
+      }
     }
-    if(ignoring) {
-      po.println("IGNORED ________________________________" + NL);
-      po.print(ignore.finish());
-    }
-    po.close();
 
     // save report
     if(report != null) {
@@ -188,11 +195,11 @@ public final class QT3TS {
     final XdmValue set = new XQuery("*:test-set", ctx).context(doc).value();
     final IO base = IO.get(doc.getBaseURI());
     baseURI = base.path();
-    baseDir = base.dirPath();
+    baseDir = base.dir();
 
     if(supported(set)) {
       // parse environment of test-set
-      final ArrayList<QT3Env> envs = new ArrayList<QT3Env>();
+      final ArrayList<QT3Env> envs = new ArrayList<>();
       for(final XdmItem ienv : new XQuery("*:environment", ctx).context(set))
         envs.add(new QT3Env(ctx, ienv));
 
@@ -294,7 +301,7 @@ public final class QT3TS {
         }
       }
     }
-    
+
     final XQuery query = new XQuery(string, ctx);
     if(base) query.baseURI(baseURI);
 
@@ -327,18 +334,19 @@ public final class QT3TS {
           query.addDocument(src.get(URI), file);
           final String role = src.get(ROLE);
           if(role == null) continue;
-          final Object call = query.funcCall("fn:doc", Str.get(file));
-          if(role.equals(".")) query.context(call);
-          else query.bind(role, call);
+
+          final XdmValue doc = query.document(file);
+          if(role.equals(".")) query.context(doc);
+          else query.bind(role, doc);
         }
         // bind resources
         for(final HashMap<String, String> src : e.resources) {
-          query.addResource(src.get(URI), file(base, src.get(FILE)), src.get(ENCODING));
+          query.addResource(src.get(URI), file(base, src.get(FILE)), src.get(Prop.ENCODING));
         }
         // bind collections
         query.addCollection(e.collURI, e.collSources.toArray());
         if(e.collContext) {
-          query.context(query.funcCall("fn:collection", Str.get(e.collURI)));
+          query.context(query.collection(e.collURI));
         }
         // bind context item
         if(e.context != null) {
@@ -638,11 +646,11 @@ public final class QT3TS {
    */
   private String assertPermutation(final XdmValue value, final XdmValue expect) {
     // cache expected results
-    final HashSet<String> exp = new HashSet<String>();
+    final HashSet<String> exp = new HashSet<>();
     for(final XdmItem it : new XQuery(expect.getString(), ctx))
       exp.add(it.getString());
     // cache actual results
-    final HashSet<String> res = new HashSet<String>();
+    final HashSet<String> res = new HashSet<>();
     for(final XdmItem it : value) res.add(it.getString());
 
     if(exp.size() != res.size())
@@ -873,24 +881,9 @@ public final class QT3TS {
     return in.replaceAll("\r\n|\r|\n", NL);
   }
 
-  /**
-   * Parses the command-line arguments, specified by the user.
-   * @param args command-line arguments
-   * @throws IOException I/O exception
-   */
-  private void parseArguments(final String[] args) throws IOException {
-    final Args arg = new Args(args, this, " -v [pat]" + NL +
-        " [pat] perform tests starting with a pattern" + NL +
-        " -a  save all tests" + NL +
-        " -d  debugging mode" + NL +
-        " -e  ignore error codes" + NL +
-        " -i  also save ignored files" + NL +
-        " -p  path to the test suite" + NL +
-        " -r  generate report file" + NL +
-        " -s  print slow queries" + NL +
-        " -v  verbose output",
-        Util.info(Text.S_CONSOLE, Util.className(this)));
-
+  @Override
+  protected void parseArgs() throws IOException {
+    final MainParser arg = new MainParser(this);
     while(arg.more()) {
       if(arg.dash()) {
         final char c = arg.next();
@@ -907,7 +900,7 @@ public final class QT3TS {
         } else if(c == 'r') {
           report = new QT3TSReport();
         } else if(c == 's') {
-          slow = new TreeMap<Long, String>();
+          slow = new TreeMap<>();
         } else if(c == 'p') {
           final File f = new File(arg.string());
           if(!f.isDirectory()) throw arg.usage();
@@ -928,7 +921,7 @@ public final class QT3TS {
    */
   @SuppressWarnings("unchecked")
   private static void init() {
-    final Map<String, String> ne = new HashMap<String, String>();
+    final Map<String, String> ne = new HashMap<>();
     ne.put("QTTEST", "42");
     ne.put("QTTEST2", "other");
     ne.put("QTTESTEMPTY", "");
@@ -977,5 +970,24 @@ public final class QT3TS {
    */
   private IOFile sandbox() {
     return new IOFile(Prop.TMP, testid);
+  }
+
+  @Override
+  public String header() {
+    return Util.info(Text.S_CONSOLE, Util.className(this));
+  }
+
+  @Override
+  public String usage() {
+    return " -v [pat]" + NL +
+        " [pat] perform tests starting with a pattern" + NL +
+        " -a  save all tests" + NL +
+        " -d  debugging mode" + NL +
+        " -e  ignore error codes" + NL +
+        " -i  also save ignored files" + NL +
+        " -p  path to the test suite" + NL +
+        " -r  generate report file" + NL +
+        " -s  print slow queries" + NL +
+        " -v  verbose output";
   }
 }

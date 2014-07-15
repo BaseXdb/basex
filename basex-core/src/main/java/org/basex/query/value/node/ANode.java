@@ -26,21 +26,21 @@ public abstract class ANode extends Item {
   /** Static node counter. */
   // [CG] XQuery, node id: move to query context to reduce chance of overflow, or
   // move to FNode to reduce memory usage of DBNode instances
-  private static AtomicInteger sid = new AtomicInteger();
+  private static final AtomicInteger ID = new AtomicInteger();
   /** Unique node id. */
-  public final int id = sid.incrementAndGet();
+  public final int id = ID.incrementAndGet();
 
   /** Cached string value. */
-  byte[] val;
+  byte[] value;
   /** Parent node. */
   ANode par;
 
   /**
    * Constructor.
-   * @param t data type
+   * @param type data type
    */
-  ANode(final NodeType t) {
-    super(t);
+  ANode(final NodeType type) {
+    super(type);
   }
 
   @Override
@@ -402,6 +402,7 @@ public abstract class ANode extends Item {
       @Override
       public ANode next() {
         if(nc == null) {
+          if(type == NodeType.ATT) return null;
           final ANode r = parent();
           if(r == null) return null;
 

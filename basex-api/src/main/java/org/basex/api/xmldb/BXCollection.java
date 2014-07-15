@@ -146,7 +146,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
     if(!data.startUpdate()) throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK);
     data.delete(getResource(del.getId()).pos);
-    ctx.update();
+    ctx.invalidate();
     data.finishUpdate();
   }
 
@@ -184,7 +184,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     final Data data = ctx.data();
     if(!data.startUpdate()) throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK);
     data.insert(data.meta.size, -1, new DataClip(md));
-    ctx.update();
+    ctx.invalidate();
     data.finishUpdate();
   }
 

@@ -16,7 +16,7 @@ public final class MinHeapTest {
   /** Checks if the heap can be used for sorting. */
   @Test
   public void heapSort() {
-    final MinHeap<Integer, Integer> heap = new MinHeap<Integer, Integer>(2, null);
+    final MinHeap<Integer, Integer> heap = new MinHeap<>(2, null);
     final Integer[] vals = new Integer[1000];
     for(int i = 0; i < vals.length; i++) vals[i] = i;
     Collections.shuffle(Arrays.asList(vals));
@@ -37,7 +37,7 @@ public final class MinHeapTest {
   /** Checks if the heap can be used for sorting a pre-sorted sequence. */
   @Test
   public void heapPreSort() {
-    final MinHeap<Integer, Integer> heap = new MinHeap<Integer, Integer>(2, null);
+    final MinHeap<Integer, Integer> heap = new MinHeap<>(2, null);
     for(int i = 0; i < 1000; i++) {
       heap.insert(i, i);
       heap.verify();

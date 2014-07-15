@@ -5,7 +5,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -35,21 +34,21 @@ public abstract class ParseExpr extends Expr {
 
   /**
    * Constructor.
-   * @param ii input info
+   * @param info input info
    */
-  protected ParseExpr(final InputInfo ii) {
-    info = ii;
+  protected ParseExpr(final InputInfo info) {
+    this.info = info;
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    final Item it = item(ctx, info);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    final Item it = item(qc, info);
     return it != null ? it.iter() : Empty.ITER;
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Iter ir = iter(ctx);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Iter ir = iter(qc);
     final Item it = ir.next();
     if(it == null || ir.size() == 1) return it;
     Item n = ir.next();
@@ -63,12 +62,12 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     if(type().zeroOrOne()) {
-      final Value v = item(ctx, info);
+      final Value v = item(qc, info);
       return v == null ? Empty.SEQ : v;
     }
-    return ctx.iter(this).value();
+    return qc.iter(this).value();
   }
 
   /**
@@ -84,12 +83,12 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
-  public final Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public final Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item it;
     if(type().zeroOrOne()) {
-      it = item(ctx, info);
+      it = item(qc, info);
     } else {
-      final Iter ir = iter(ctx);
+      final Iter ir = iter(qc);
       it = ir.next();
       if(!(it == null || it instanceof ANode || ir.next() == null))
         throw CONDTYPE.get(info, this);
@@ -98,9 +97,9 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
-  public final Item test(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Item it = ebv(ctx, info);
-    return (it instanceof ANum ? it.dbl(info) == ctx.pos : it.bool(info)) ? it : null;
+  public final Item test(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Item it = ebv(qc, info);
+    return (it instanceof ANum ? it.dbl(info) == qc.pos : it.bool(info)) ? it : null;
   }
 
   @Override
@@ -117,22 +116,22 @@ public abstract class ParseExpr extends Expr {
 
   /**
    * Pre-evaluates the specified expression.
-   * @param ctx query context
+   * @param qc query context
    * @return optimized expression
    * @throws QueryException query exception
    */
-  protected final Expr preEval(final QueryContext ctx) throws QueryException {
-    return optPre(item(ctx, info), ctx);
+  protected final Expr preEval(final QueryContext qc) throws QueryException {
+    return optPre(item(qc, info), qc);
   }
 
   /**
    * Adds an optimization info for pre-evaluating the specified expression.
    * @param opt optimized expression
-   * @param ctx query context
+   * @param qc query context
    * @return optimized expression
    */
-  protected final Expr optPre(final Expr opt, final QueryContext ctx) {
-    if(opt != this) ctx.compInfo(OPTPRE, this);
+  protected final Expr optPre(final Expr opt, final QueryContext qc) {
+    if(opt != this) qc.compInfo(OPTPRE, this);
     return opt == null ? Empty.SEQ : opt;
   }
 
@@ -141,11 +140,11 @@ public abstract class ParseExpr extends Expr {
    * If the specified expression yields a boolean value anyway, it will be
    * returned as is. Otherwise, it will be wrapped into a boolean function.
    * @param e expression to be rewritten
-   * @param ii input info
+   * @param info input info
    * @return expression
    */
-  protected static Expr compBln(final Expr e, final InputInfo ii) {
-    return e.type().eq(SeqType.BLN) ? e : Function.BOOLEAN.get(null, ii, e);
+  protected static Expr compBln(final Expr e, final InputInfo info) {
+    return e.type().eq(SeqType.BLN) ? e : Function.BOOLEAN.get(null, info, e);
   }
 
   // VALIDITY CHECKS ==========================================================
@@ -198,12 +197,12 @@ public abstract class ParseExpr extends Expr {
    * Checks if the specified expression yields a boolean.
    * Returns the boolean or throws an exception.
    * @param e expression to be checked
-   * @param ctx query context
+   * @param qc query context
    * @return boolean
    * @throws QueryException query exception
    */
-  protected final boolean checkBln(final Expr e, final QueryContext ctx) throws QueryException {
-    final Item it = checkNoEmpty(e.item(ctx, info), AtomType.BLN);
+  protected final boolean checkBln(final Expr e, final QueryContext qc) throws QueryException {
+    final Item it = checkNoEmpty(e.item(qc, info), AtomType.BLN);
     final Type ip = it.type;
     if(ip == AtomType.BLN || ip.isUntyped()) return it.bool(info);
     throw INVCAST.get(info, it.type, AtomType.BLN);
@@ -213,12 +212,12 @@ public abstract class ParseExpr extends Expr {
    * Checks if the specified expression yields a double.
    * Returns the double or throws an exception.
    * @param e expression to be checked
-   * @param ctx query context
+   * @param qc query context
    * @return double
    * @throws QueryException query exception
    */
-  protected final double checkDbl(final Expr e, final QueryContext ctx) throws QueryException {
-    final Item it = checkNoEmpty(e.item(ctx, info), AtomType.DBL);
+  protected final double checkDbl(final Expr e, final QueryContext qc) throws QueryException {
+    final Item it = checkNoEmpty(e.item(qc, info), AtomType.DBL);
     if(it.type.isNumberOrUntyped()) return it.dbl(info);
     throw numberError(this, it);
   }
@@ -227,12 +226,12 @@ public abstract class ParseExpr extends Expr {
    * Checks if the specified expression yields a float.
    * Returns the float or throws an exception.
    * @param e expression to be checked
-   * @param ctx query context
+   * @param qc query context
    * @return double
    * @throws QueryException query exception
    */
-  protected final float checkFlt(final Expr e, final QueryContext ctx) throws QueryException {
-    final Item it = checkNoEmpty(e.item(ctx, info), AtomType.FLT);
+  protected final float checkFlt(final Expr e, final QueryContext qc) throws QueryException {
+    final Item it = checkNoEmpty(e.item(qc, info), AtomType.FLT);
     if(it.type.isNumberOrUntyped()) return it.flt(info);
     throw numberError(this, it);
   }
@@ -241,12 +240,12 @@ public abstract class ParseExpr extends Expr {
    * Checks if the specified expression is an integer.
    * Returns a token representation or an exception.
    * @param e expression to be checked
-   * @param ctx query context
+   * @param qc query context
    * @return integer value
    * @throws QueryException query exception
    */
-  protected final long checkItr(final Expr e, final QueryContext ctx) throws QueryException {
-    return checkItr(checkNoEmpty(e.item(ctx, info), AtomType.ITR));
+  protected final long checkItr(final Expr e, final QueryContext qc) throws QueryException {
+    return checkItr(checkNoEmpty(e.item(qc, info), AtomType.ITR));
   }
 
   /**
@@ -266,12 +265,12 @@ public abstract class ParseExpr extends Expr {
    * Checks if the specified expression yields a node.
    * Returns the boolean or throws an exception.
    * @param e expression to be checked
-   * @param ctx query context
+   * @param qc query context
    * @return boolean
    * @throws QueryException query exception
    */
-  protected final ANode checkNode(final Expr e, final QueryContext ctx) throws QueryException {
-    return checkNode(checkItem(e, ctx));
+  protected final ANode checkNode(final Expr e, final QueryContext qc) throws QueryException {
+    return checkNode(checkItem(e, qc));
   }
 
   /**
@@ -301,26 +300,26 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified collation is supported.
    * @param e expression to be checked
-   * @param ctx query context
+   * @param qc query context
    * @param sc static context
    * @return collator, or {@code null} (default collation)
    * @throws QueryException query exception
    */
-  protected final Collation checkColl(final Expr e, final QueryContext ctx, final StaticContext sc)
+  protected final Collation checkColl(final Expr e, final QueryContext qc, final StaticContext sc)
       throws QueryException {
-    return Collation.get(e == null ? null : checkStr(e, ctx), ctx, sc, info, WHICHCOLL);
+    return Collation.get(e == null ? null : checkStr(e, qc), qc, sc, info, WHICHCOLL);
   }
 
   /**
    * Checks if the specified expression yields a string.
    * Returns a token representation or an exception.
    * @param e expression to be evaluated
-   * @param ctx query context
+   * @param qc query context
    * @return string representation
    * @throws QueryException query exception
    */
-  protected final byte[] checkStr(final Expr e, final QueryContext ctx) throws QueryException {
-    return checkStr(checkItem(e, ctx));
+  protected final byte[] checkStr(final Expr e, final QueryContext qc) throws QueryException {
+    return checkStr(checkItem(e, qc));
   }
 
   /**
@@ -352,24 +351,24 @@ public abstract class ParseExpr extends Expr {
 
   /**
    * Throws an exception if the context value is not set.
-   * @param ctx query context
+   * @param qc query context
    * @return context
    * @throws QueryException query exception
    */
-  protected final Value checkCtx(final QueryContext ctx) throws QueryException {
-    final Value v = ctx.value;
+  protected final Value checkCtx(final QueryContext qc) throws QueryException {
+    final Value v = qc.value;
     if(v != null) return v;
     throw NOCTX.get(info, this);
   }
 
   /**
    * Throws an exception if the context value is not a node.
-   * @param ctx query context
+   * @param qc query context
    * @return context
    * @throws QueryException query exception
    */
-  protected final ANode checkNode(final QueryContext ctx) throws QueryException {
-    final Value v = ctx.value;
+  protected final ANode checkNode(final QueryContext qc) throws QueryException {
+    final Value v = qc.value;
     if(v == null) throw NOCTX.get(info, this);
     if(v instanceof ANode) return (ANode) v;
     throw STEPNODE.get(info, this, v.type);
@@ -378,23 +377,23 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression yields a non-empty item.
    * @param e expression to be evaluated
-   * @param ctx query context
+   * @param qc query context
    * @return item
    * @throws QueryException query exception
    */
-  protected final Item checkItem(final Expr e, final QueryContext ctx) throws QueryException {
-    return checkNoEmpty(e.item(ctx, info));
+  protected final Item checkItem(final Expr e, final QueryContext qc) throws QueryException {
+    return checkNoEmpty(e.item(qc, info));
   }
 
   /**
    * Checks if the specified expression yields a binary item.
    * @param e expression to be evaluated
-   * @param ctx query context
+   * @param qc query context
    * @return binary item
    * @throws QueryException query exception
    */
-  protected final Bin checkBinary(final Expr e, final QueryContext ctx) throws QueryException {
-    final Item it = checkItem(e, ctx);
+  protected final Bin checkBinary(final Expr e, final QueryContext qc) throws QueryException {
+    final Item it = checkItem(e, qc);
     if(it instanceof Bin) return (Bin) it;
     throw BINARYTYPE.get(info, it.type);
   }
@@ -414,15 +413,15 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression has the specified type; if no, throws an exception.
    * @param e expression to be checked
-   * @param ctx query context
+   * @param qc query context
    * @param sc static context
    * @return specified item
    * @throws QueryException query exception
    */
-  protected final QNm checkQNm(final Expr e, final QueryContext ctx, final StaticContext sc)
+  protected final QNm checkQNm(final Expr e, final QueryContext qc, final StaticContext sc)
       throws QueryException {
 
-    final Item it = checkItem(e, ctx);
+    final Item it = checkItem(e, qc);
     if(it.type == AtomType.QNM) return (QNm) it;
     if(it.type.isUntyped() && sc.xquery3()) throw NSSENS.get(info, it.type, AtomType.QNM);
     throw INVCAST.get(info, it.type, AtomType.QNM);
@@ -432,12 +431,12 @@ public abstract class ParseExpr extends Expr {
    * Checks if the specified expression yields a string or binary item.
    * Checks the type of the given function item.
    * @param e expression to be evaluated
-   * @param ctx query context
+   * @param qc query context
    * @return function item
    * @throws QueryException query exception
    */
-  protected FItem checkFunc(final Expr e, final QueryContext ctx) throws QueryException {
-    return (FItem) checkType(checkItem(e, ctx), FuncType.ANY_FUN);
+  protected FItem checkFunc(final Expr e, final QueryContext qc) throws QueryException {
+    return (FItem) checkType(checkItem(e, qc), FuncType.ANY_FUN);
   }
 
   /**
@@ -480,56 +479,43 @@ public abstract class ParseExpr extends Expr {
    * Checks if the specified expression yields a string or empty sequence.
    * Returns a token representation or an exception.
    * @param e expression to be evaluated
-   * @param ctx query context
+   * @param qc query context
    * @return item
    * @throws QueryException query exception
    */
-  protected final byte[] checkEStr(final Expr e, final QueryContext ctx) throws QueryException {
-    return checkEStr(e.item(ctx, info));
+  protected final byte[] checkEStr(final Expr e, final QueryContext qc) throws QueryException {
+    return checkEStr(e.item(qc, info));
   }
 
   /**
    * Checks if the current user has create permissions. If negative, an
    * exception is thrown.
-   * @param ctx query context
+   * @param qc query context
    * @throws QueryException query exception
    */
-  protected final void checkAdmin(final QueryContext ctx) throws QueryException {
-    checkPerm(ctx, Perm.ADMIN);
+  protected final void checkAdmin(final QueryContext qc) throws QueryException {
+    checkPerm(qc, Perm.ADMIN);
   }
 
   /**
    * Checks if the current user has create permissions. If negative, an
    * exception is thrown.
-   * @param ctx query context
+   * @param qc query context
    * @throws QueryException query exception
    */
-  protected final void checkCreate(final QueryContext ctx) throws QueryException {
-    checkPerm(ctx, Perm.CREATE);
-  }
-
-  /**
-   * Checks if the current user has write permissions for the specified database.
-   * If negative, an exception is thrown.
-   * @param data data reference
-   * @param ctx query context
-   * @return data reference
-   * @throws QueryException query exception
-   */
-  protected final Data checkWrite(final Data data, final QueryContext ctx) throws QueryException {
-    if(!ctx.context.perm(Perm.WRITE, data.meta)) throw BASX_PERM.get(info, Perm.WRITE);
-    return data;
+  protected final void checkCreate(final QueryContext qc) throws QueryException {
+    checkPerm(qc, Perm.CREATE);
   }
 
   /**
    * Checks if the current user has given permissions. If negative, an
    * exception is thrown.
-   * @param ctx query context
+   * @param qc query context
    * @param p permission
    * @throws QueryException query exception
    */
-  private void checkPerm(final QueryContext ctx, final Perm p) throws QueryException {
-    if(!ctx.context.user.has(p)) throw BASX_PERM.get(info, p);
+  private void checkPerm(final QueryContext qc, final Perm p) throws QueryException {
+    if(!qc.context.user.has(p)) throw BASX_PERM.get(info, p);
   }
 
   /**

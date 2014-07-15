@@ -17,37 +17,37 @@ import org.basex.util.hash.*;
 final class CachedFilter extends Filter {
   /**
    * Constructor.
-   * @param ii input info
-   * @param r expression
-   * @param p predicates
+   * @param info input info
+   * @param root root expression
+   * @param preds predicates
    */
-  CachedFilter(final InputInfo ii, final Expr r, final Expr... p) {
-    super(ii, r, p);
+  CachedFilter(final InputInfo info, final Expr root, final Expr... preds) {
+    super(info, root, preds);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    Value val = root.value(ctx);
-    final Value cv = ctx.value;
-    final long cs = ctx.size;
-    final long cp = ctx.pos;
+  public Iter iter(final QueryContext qc) throws QueryException {
+    Value val = root.value(qc);
+    final Value cv = qc.value;
+    final long cs = qc.size;
+    final long cp = qc.pos;
 
     try {
       // evaluate first predicate, based on incoming value
       final ValueBuilder vb = new ValueBuilder();
       Expr p = preds[0];
       long is = val.size();
-      ctx.size = is;
-      ctx.pos = 1;
+      qc.size = is;
+      qc.pos = 1;
       for(int s = 0; s < is; ++s) {
         final Item it = val.itemAt(s);
-        ctx.value = it;
-        final Item i = p.test(ctx, info);
+        qc.value = it;
+        final Item i = p.test(qc, info);
         if(i != null) {
           it.score(i.score());
           vb.add(it);
         }
-        ctx.pos++;
+        qc.pos++;
       }
       // save memory
       val = null;
@@ -57,14 +57,14 @@ final class CachedFilter extends Filter {
       for(int i = 1; i < pl; i++) {
         is = vb.size();
         p = preds[i];
-        ctx.size = is;
-        ctx.pos = 1;
+        qc.size = is;
+        qc.pos = 1;
         int c = 0;
         for(int s = 0; s < is; ++s) {
           final Item it = vb.get(s);
-          ctx.value = it;
-          if(p.test(ctx, info) != null) vb.set(it, c++);
-          ctx.pos++;
+          qc.value = it;
+          if(p.test(qc, info) != null) vb.set(c++, it);
+          qc.pos++;
         }
         vb.size(c);
       }
@@ -72,22 +72,22 @@ final class CachedFilter extends Filter {
       // return resulting values
       return vb;
     } finally {
-      ctx.value = cv;
-      ctx.size = cs;
-      ctx.pos = cp;
+      qc.value = cv;
+      qc.size = cs;
+      qc.pos = cp;
     }
   }
 
   @Override
-  public Filter addPred(final QueryContext ctx, final VarScope scp, final Expr p) {
+  public Filter addPred(final QueryContext qc, final VarScope scp, final Expr p) {
     preds = Array.add(preds, new Expr[preds.length + 1], p);
     return this;
   }
 
   @Override
-  public Filter copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final Filter f = new CachedFilter(info, root == null ? null : root.copy(ctx, scp, vs),
-        Arr.copyAll(ctx, scp, vs, preds));
+  public Filter copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    final Filter f = new CachedFilter(info, root == null ? null : root.copy(qc, scp, vs),
+        Arr.copyAll(qc, scp, vs, preds));
     f.pos = pos;
     f.last = last;
     return f;

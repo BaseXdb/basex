@@ -19,23 +19,19 @@ import org.basex.query.func.*;
  */
 final class RestXqModule {
   /** Supported methods. */
-  private final ArrayList<RestXqFunction> functions = new ArrayList<RestXqFunction>();
+  private final ArrayList<RestXqFunction> functions = new ArrayList<>();
   /** File reference. */
   private final IOFile file;
-  /** Library module flag. */
-  private final boolean lib;
   /** Parsing timestamp. */
   private long time;
 
   /**
    * Constructor.
    * @param in xquery module
-   * @param l library module flag
    */
-  RestXqModule(final IOFile in, final boolean l) {
+  RestXqModule(final IOFile in) {
     file = in;
     time = in.timeStamp();
-    lib = l;
   }
 
   /**
@@ -102,11 +98,12 @@ final class RestXqModule {
       // loop through all functions
       for(final StaticFunc uf : qc.funcs.funcs()) {
         // compare input info
-        if(!func.function.info.equals(uf.info)) continue;
-        final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
-        rxf.parse();
-        new RestXqResponse(rxf, qc, http, error).create();
-        break;
+        if(func.function.info.equals(uf.info)) {
+          final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
+          rxf.parse();
+          new RestXqResponse(rxf, qc, http, error).create();
+          break;
+        }
       }
     } finally {
       qc.close();
@@ -124,7 +121,7 @@ final class RestXqModule {
   private QueryContext parseModule(final HTTPContext http) throws QueryException {
     final QueryContext qc = new QueryContext(http.context());
     try {
-      qc.parse(string(file.read()), lib, file.path(), null);
+      qc.parse(string(file.read()), file.path(), null);
       return qc;
     } catch(final IOException ex) {
       throw IOERR.get(null, ex);

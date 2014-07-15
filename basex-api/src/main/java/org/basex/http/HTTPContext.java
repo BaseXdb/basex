@@ -7,14 +7,15 @@ import static org.basex.io.MimeTypes.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.net.*;
 import java.util.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.basex.*;
-import org.basex.build.JsonOptions.JsonFormat;
 import org.basex.build.*;
+import org.basex.build.JsonOptions.JsonFormat;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
@@ -24,7 +25,7 @@ import org.basex.util.list.*;
 import org.basex.util.options.*;
 
 /**
- * This class bundles context-based information on a single HTTP operation.
+ * Bundles context-based information on a single HTTP operation.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
@@ -35,10 +36,12 @@ public final class HTTPContext {
   /** Servlet response. */
   public final HttpServletResponse res;
   /** Request method. */
-  public final HTTPMethod method;
+  public final String method;
+  /** Request method. */
+  public final HTTPParams params;
 
   /** Serialization parameters. */
-  public SerializerOptions serialization = new SerializerOptions();
+  private SerializerOptions sopts;
   /** Result wrapping. */
   public boolean wrapping;
   /** User name. */
@@ -68,17 +71,18 @@ public final class HTTPContext {
 
     req = rq;
     res = rs;
-    final String mth = rq.getMethod();
-    method = HTTPMethod.get(mth);
+    params = new HTTPParams(this);
+
+    method = rq.getMethod();
 
     final StringBuilder uri = new StringBuilder(req.getRequestURL());
     final String qs = req.getQueryString();
     if(qs != null) uri.append('?').append(qs);
-    log('[' + mth + "] " + uri, null);
+    log('[' + method + "] " + uri, null);
 
     // set UTF8 as default encoding (can be overwritten)
     res.setCharacterEncoding(UTF8);
-    segments = toSegments(req.getPathInfo());
+    segments = decode(toSegments(req.getPathInfo()));
 
     // adopt servlet-specific credentials or use global ones
     final GlobalOptions mprop = context().globalopts;
@@ -97,19 +101,6 @@ public final class HTTPContext {
       } else {
         throw new LoginException(WHICHAUTH, values[0]);
       }
-    }
-  }
-
-  /**
-   * Returns an immutable map with all query parameters.
-   * @return parameters
-   * @throws IOException I/O exception
-   */
-  public Map<String, String[]> params() throws IOException {
-    try {
-      return req.getParameterMap();
-    } catch(final IllegalStateException ex) {
-      throw new IOException(ex);
     }
   }
 
@@ -136,9 +127,10 @@ public final class HTTPContext {
    */
   public void initResponse() {
     // set content type and encoding
-    final String enc = serialization.get(SerializerOptions.ENCODING);
+    final SerializerOptions opts = sopts();
+    final String enc = opts.get(SerializerOptions.ENCODING);
     res.setCharacterEncoding(enc);
-    final String ct = mediaType(serialization);
+    final String ct = mediaType(opts);
     res.setContentType(new TokenBuilder(ct).add(CHARSET).add(enc).toString());
   }
 
@@ -273,17 +265,34 @@ public final class HTTPContext {
       return ctx;
     } catch(final LoginException ex) {
       // delay users with wrong passwords
-      for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(1000);
+      for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(100);
       throw ex;
     }
   }
 
   /**
    * Returns the database context.
-   * @return context;
+   * @return context
    */
   public Context context() {
     return context;
+  }
+
+  /**
+   * Assigns serialization parameters.
+   * @param opts serialization parameters.
+   */
+  public void sopts(final SerializerOptions opts) {
+    sopts = opts;
+  }
+
+  /**
+   * Returns the serialization parameters.
+   * @return serialization parameters.
+   */
+  public SerializerOptions sopts() {
+    if(sopts == null) sopts = new SerializerOptions();
+    return sopts;
   }
 
   /**
@@ -331,31 +340,13 @@ public final class HTTPContext {
       final String key = en.nextElement();
       if(!key.startsWith(Prop.DBPREFIX)) continue;
 
-      // legacy: rewrite obsolete options. will be removed some versions later
-      final String val = sc.getInitParameter(key);
-      String k = key;
-      String v = val;
-      if(key.equals(Prop.DBPREFIX + "httppath")) {
-        k = Prop.DBPREFIX + GlobalOptions.RESTXQPATH.name();
-      } else if(key.equals(Prop.DBPREFIX + "mode")) {
-        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.name();
-        v = Boolean.toString("local".equals(v));
-      } else if(key.equals(Prop.DBPREFIX + "server")) {
-        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.name();
-        v = Boolean.toString(!Boolean.parseBoolean(v));
+      String val = sc.getInitParameter(key);
+      if(key.endsWith("path") && !new File(val).isAbsolute()) {
+        // prefix relative path with absolute servlet path
+        Util.debug(key.toUpperCase(Locale.ENGLISH) + ": " + val);
+        val = new IOFile(webapp, val).path();
       }
-      k = k.toLowerCase(Locale.ENGLISH);
-      if(!k.equals(key) || !v.equals(val)) {
-        Util.errln("Warning! Outdated option: " +
-          key + '=' + val + " => " + k + '=' + v);
-      }
-
-      // prefix relative paths with absolute servlet path
-      if(k.endsWith("path") && !new File(v).isAbsolute()) {
-        Util.debug(k.toUpperCase(Locale.ENGLISH) + ": " + v);
-        v = new IOFile(webapp, v).path();
-      }
-      Options.setSystem(k, v);
+      Options.setSystem(key, val);
     }
 
     // create context, update options
@@ -392,6 +383,24 @@ public final class HTTPContext {
       if(!tb.isEmpty()) sl.add(tb.toString());
     }
     return sl.toArray();
+  }
+
+  /**
+   * Decodes the specified path segments.
+   * @param segments strings to be decoded
+   * @return argument
+   * @throws IllegalArgumentException invalid path segments
+   */
+  public static String[] decode(final String[] segments) {
+    try {
+      final int sl = segments.length;
+      for(int s = 0; s < sl; s++) {
+        segments[s] = URLDecoder.decode(segments[s], Prop.ENCODING);
+      }
+      return segments;
+    } catch(final UnsupportedEncodingException ex) {
+      throw new IllegalArgumentException(ex);
+    }
   }
 
   // PRIVATE METHODS ====================================================================

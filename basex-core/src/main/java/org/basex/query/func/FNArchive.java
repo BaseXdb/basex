@@ -6,10 +6,10 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.nio.charset.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.zip.*;
 
-import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -79,49 +79,49 @@ public final class FNArchive extends StandardFunc {
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNArchive(final StaticContext sctx, final InputInfo ii, final Function f,
-      final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNArchive(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
-      case _ARCHIVE_ENTRIES:        return entries(ctx);
-      case _ARCHIVE_EXTRACT_TEXT:   return extractText(ctx);
-      case _ARCHIVE_EXTRACT_BINARY: return extractBinary(ctx);
-      default:                      return super.iter(ctx);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    switch(func) {
+      case _ARCHIVE_ENTRIES:        return entries(qc);
+      case _ARCHIVE_EXTRACT_TEXT:   return extractText(qc);
+      case _ARCHIVE_EXTRACT_BINARY: return extractBinary(qc);
+      default:                      return super.iter(qc);
     }
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    checkCreate(ctx);
-    switch(sig) {
-      case _ARCHIVE_CREATE:  return create(ctx);
-      case _ARCHIVE_UPDATE:  return update(ctx);
-      case _ARCHIVE_DELETE:  return delete(ctx);
-      case _ARCHIVE_OPTIONS: return options(ctx);
-      case _ARCHIVE_WRITE:   return write(ctx);
-      default:               return super.item(ctx, ii);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    checkCreate(qc);
+    switch(func) {
+      case _ARCHIVE_CREATE:  return create(qc);
+      case _ARCHIVE_UPDATE:  return update(qc);
+      case _ARCHIVE_DELETE:  return delete(qc);
+      case _ARCHIVE_OPTIONS: return options(qc);
+      case _ARCHIVE_WRITE:   return write(qc);
+      default:               return super.item(qc, ii);
     }
   }
 
   /**
    * Creates a new archive.
-   * @param ctx query context
+   * @param qc query context
    * @return archive
    * @throws QueryException query exception
    */
-  private B64 create(final QueryContext ctx) throws QueryException {
-    final Iter entr = ctx.iter(expr[0]);
-    final Iter cont = ctx.iter(expr[1]);
-    final Options opts = checkOptions(2, Q_OPTIONS, new ArchiveOptions(), ctx);
+  private B64 create(final QueryContext qc) throws QueryException {
+    final Iter entr = qc.iter(exprs[0]);
+    final Iter cont = qc.iter(exprs[1]);
+    final Options opts = checkOptions(2, Q_OPTIONS, new ArchiveOptions(), qc);
 
     final String format = opts.get(ArchiveOptions.FORMAT);
     final ArchiveOut out = ArchiveOut.get(format.toLowerCase(Locale.ENGLISH), info);
@@ -148,7 +148,7 @@ public final class FNArchive extends StandardFunc {
         if(en == null || cn == null) break;
         if(out instanceof GZIPOut && c > 0)
           throw ARCH_ONE.get(info, format.toUpperCase(Locale.ENGLISH));
-        add(checkElmStr(en), cn, out, level, ctx);
+        add(checkElmStr(en), cn, out, level, qc);
         e++;
         c++;
       }
@@ -166,12 +166,12 @@ public final class FNArchive extends StandardFunc {
 
   /**
    * Returns the options of an archive.
-   * @param ctx query context
+   * @param qc query context
    * @return entries
    * @throws QueryException query exception
    */
-  private FElem options(final QueryContext ctx) throws QueryException {
-    final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
+  private FElem options(final QueryContext qc) throws QueryException {
+    final B64 archive = (B64) checkType(checkItem(exprs[0], qc), AtomType.B64);
     String format = null;
     int level = -1;
 
@@ -202,12 +202,12 @@ public final class FNArchive extends StandardFunc {
 
   /**
    * Returns the entries of an archive.
-   * @param ctx query context
+   * @param qc query context
    * @return entries
    * @throws QueryException query exception
    */
-  private Iter entries(final QueryContext ctx) throws QueryException {
-    final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
+  private Iter entries(final QueryContext qc) throws QueryException {
+    final B64 archive = (B64) checkType(checkItem(exprs[0], qc), AtomType.B64);
 
     final ValueBuilder vb = new ValueBuilder();
     final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
@@ -235,42 +235,42 @@ public final class FNArchive extends StandardFunc {
 
   /**
    * Extracts text entries.
-   * @param ctx query context
+   * @param qc query context
    * @return text entry
    * @throws QueryException query exception
    */
-  private ValueBuilder extractText(final QueryContext ctx) throws QueryException {
-    final String enc = encoding(2, ARCH_ENCODING, ctx);
+  private ValueBuilder extractText(final QueryContext qc) throws QueryException {
+    final String enc = encoding(2, ARCH_ENCODING, qc);
     final ValueBuilder vb = new ValueBuilder();
-    for(final byte[] b : extract(ctx)) vb.add(Str.get(encode(b, enc, ctx)));
+    for(final byte[] b : extract(qc)) vb.add(Str.get(encode(b, enc, qc)));
     return vb;
   }
 
   /**
    * Extracts binary entries.
-   * @param ctx query context
+   * @param qc query context
    * @return binary entry
    * @throws QueryException query exception
    */
-  private ValueBuilder extractBinary(final QueryContext ctx) throws QueryException {
+  private ValueBuilder extractBinary(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
-    for(final byte[] b : extract(ctx)) vb.add(new B64(b));
+    for(final byte[] b : extract(qc)) vb.add(new B64(b));
     return vb;
   }
 
   /**
    * Updates an archive.
-   * @param ctx query context
+   * @param qc query context
    * @return updated archive
    * @throws QueryException query exception
    */
-  private B64 update(final QueryContext ctx) throws QueryException {
-    final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
+  private B64 update(final QueryContext qc) throws QueryException {
+    final B64 archive = (B64) checkType(checkItem(exprs[0], qc), AtomType.B64);
     // entries to be updated
-    final TokenObjMap<Item[]> hm = new TokenObjMap<Item[]>();
+    final TokenObjMap<Item[]> hm = new TokenObjMap<>();
 
-    final Iter entr = ctx.iter(expr[1]);
-    final Iter cont = ctx.iter(expr[2]);
+    final Iter entr = qc.iter(exprs[1]);
+    final Iter cont = qc.iter(exprs[2]);
     int e = 0;
     int c = 0;
     Item en, cn;
@@ -298,7 +298,7 @@ public final class FNArchive extends StandardFunc {
       for(final byte[] h : hm) {
         if(h == null) continue;
         final Item[] it = hm.get(h);
-        add(it[0], it[1], out, ZipEntry.DEFLATED, ctx);
+        add(it[0], it[1], out, ZipEntry.DEFLATED, qc);
       }
     } catch(final IOException ex) {
       throw ARCH_FAIL.get(info, ex);
@@ -311,15 +311,15 @@ public final class FNArchive extends StandardFunc {
 
   /**
    * Deletes files from an archive.
-   * @param ctx query context
+   * @param qc query context
    * @return updated archive
    * @throws QueryException query exception
    */
-  private B64 delete(final QueryContext ctx) throws QueryException {
-    final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
+  private B64 delete(final QueryContext qc) throws QueryException {
+    final B64 archive = (B64) checkType(checkItem(exprs[0], qc), AtomType.B64);
     // entries to be deleted
-    final TokenObjMap<Item[]> hm = new TokenObjMap<Item[]>();
-    final Iter names = ctx.iter(expr[1]);
+    final TokenObjMap<Item[]> hm = new TokenObjMap<>();
+    final Iter names = qc.iter(exprs[1]);
     for(Item en; (en = names.next()) != null;) {
       hm.put(checkElmStr(en).string(info), null);
     }
@@ -341,13 +341,13 @@ public final class FNArchive extends StandardFunc {
 
   /**
    * Extracts entries from the archive.
-   * @param ctx query context
+   * @param qc query context
    * @return text entries
    * @throws QueryException query exception
    */
-  private TokenList extract(final QueryContext ctx) throws QueryException {
-    final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
-    final TokenSet hs = entries(1, ctx);
+  private TokenList extract(final QueryContext qc) throws QueryException {
+    final B64 archive = (B64) checkType(checkItem(exprs[0], qc), AtomType.B64);
+    final TokenSet hs = entries(1, qc);
 
     final TokenList tl = new TokenList();
     final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
@@ -367,14 +367,14 @@ public final class FNArchive extends StandardFunc {
 
   /**
    * Writes entries from an archive to disk.
-   * @param ctx query context
+   * @param qc query context
    * @return text entries
    * @throws QueryException query exception
    */
-  private Item write(final QueryContext ctx) throws QueryException {
-    final File path = checkFile(0, ctx);
-    final B64 archive = (B64) checkType(checkItem(expr[1], ctx), AtomType.B64);
-    final TokenSet hs = entries(2, ctx);
+  private Item write(final QueryContext qc) throws QueryException {
+    final java.nio.file.Path path = checkPath(0, qc);
+    final B64 archive = (B64) checkType(checkItem(exprs[1], qc), AtomType.B64);
+    final TokenSet hs = entries(2, qc);
 
     final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
     try {
@@ -382,12 +382,12 @@ public final class FNArchive extends StandardFunc {
         final ZipEntry ze = in.entry();
         final String name = ze.getName();
         if(hs == null || hs.delete(token(name)) != 0) {
-          final IOFile file = new IOFile(path.getPath(), name);
+          final java.nio.file.Path file = path.resolve(name);
           if(ze.isDirectory()) {
-            file.md();
+            Files.createDirectories(file);
           } else {
-            file.dir().md();
-            file.write(in.read());
+            Files.createDirectories(file.getParent());
+            Files.write(file, in.read());
           }
         }
       }
@@ -403,16 +403,16 @@ public final class FNArchive extends StandardFunc {
    * Returns all archive entries from the specified argument.
    * A {@code null} reference is returned if no entries are specified.
    * @param e argument index
-   * @param ctx query context
+   * @param qc query context
    * @return set with all entries
    * @throws QueryException query exception
    */
-  private TokenSet entries(final int e, final QueryContext ctx) throws QueryException {
+  private TokenSet entries(final int e, final QueryContext qc) throws QueryException {
     TokenSet hs = null;
-    if(e < expr.length) {
+    if(e < exprs.length) {
       // filter result to specified entries
       hs = new TokenSet();
-      final Iter names = ctx.iter(expr[e]);
+      final Iter names = qc.iter(exprs[e]);
       for(Item en; (en = names.next()) != null;) {
         hs.add(checkElmStr(en).string(info));
       }
@@ -426,12 +426,12 @@ public final class FNArchive extends StandardFunc {
    * @param cont contents
    * @param out output archive
    * @param level default compression level
-   * @param ctx query context
+   * @param qc query context
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   private void add(final Item entry, final Item cont, final ArchiveOut out, final int level,
-      final QueryContext ctx) throws QueryException, IOException {
+      final QueryContext qc) throws QueryException, IOException {
 
     // create new zip entry
     String name = string(entry.string(info));
@@ -451,7 +451,7 @@ public final class FNArchive extends StandardFunc {
       final byte[] mod = el.attribute(LAST_MOD);
       if(mod != null) {
         try {
-          ze.setTime(dateTimeToMs(new Dtm(mod, info), ctx));
+          ze.setTime(dateTimeToMs(new Dtm(mod, info), qc));
         } catch(final QueryException qe) {
           throw ARCH_DATETIME.get(info, mod);
         }
@@ -467,7 +467,7 @@ public final class FNArchive extends StandardFunc {
 
     // data to be compressed
     byte[] val = checkStrBin(cont);
-    if(cont instanceof AStr && enc != null && enc != UTF8) val = encode(val, enc, ctx);
+    if(cont instanceof AStr && enc != null && enc != UTF8) val = encode(val, enc, qc);
 
     try {
       out.level(lvl == null ? level : toInt(lvl));
@@ -481,15 +481,15 @@ public final class FNArchive extends StandardFunc {
    * Encodes the specified string to another encoding.
    * @param val value to be encoded
    * @param enc encoding
-   * @param ctx query context
+   * @param qc query context
    * @return encoded string
    * @throws QueryException query exception
    */
-  private byte[] encode(final byte[] val, final String enc, final QueryContext ctx)
+  private byte[] encode(final byte[] val, final String enc, final QueryContext qc)
       throws QueryException {
 
     try {
-      return FNConvert.toString(new ArrayInput(val), enc, ctx);
+      return FNConvert.toString(new ArrayInput(val), enc, qc);
     } catch(final IOException ex) {
       throw ARCH_ENCODE.get(info, ex);
     }

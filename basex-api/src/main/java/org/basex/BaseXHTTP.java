@@ -27,7 +27,7 @@ import org.eclipse.jetty.xml.*;
  * @author Christian Gruen
  * @author Dirk Kirsten
  */
-public final class BaseXHTTP {
+public final class BaseXHTTP extends Main {
   /** Database context. */
   private final Context context;
   /** HTTP server. */
@@ -59,7 +59,8 @@ public final class BaseXHTTP {
    * @throws Exception exception
    */
   public BaseXHTTP(final String... args) throws Exception {
-    parseArguments(args);
+    super(args);
+    parseArgs();
 
     // context must be initialized after parsing of arguments
     context = HTTPContext.init();
@@ -226,7 +227,7 @@ public final class BaseXHTTP {
         // update file in resource path if it has changed
         if(!res.exists() || !Token.eq(data, res.read())) {
           Util.errln("Updating " +  res);
-          res.dir().md();
+          res.parent().md();
           res.write(in.read());
         }
       }
@@ -242,21 +243,17 @@ public final class BaseXHTTP {
     if(create) {
       // create configuration file
       Util.errln("Creating " +  trg);
-      trg.dir().md();
+      trg.parent().md();
       trg.write(data);
     }
     return trg;
   }
 
-  /**
-   * Parses the command-line arguments, specified by the user.
-   * @param args command-line arguments
-   * @throws IOException I/O exception
-   */
-  private void parseArguments(final String[] args) throws IOException {
+  @Override
+  protected void parseArgs() throws IOException {
     /* command-line properties will be stored in system properties;
      * this way, they will not be overwritten by the settings specified in web.xml. */
-    final Args arg = new Args(args, this, S_HTTPINFO, Util.info(S_CONSOLE, HTTP));
+    final MainParser arg = new MainParser(this);
     boolean serve = true;
     while(arg.more()) {
       if(arg.dash()) {
@@ -336,8 +333,8 @@ public final class BaseXHTTP {
    * @param port server port
    * @return stop file
    */
-  private static File stopFile(final int port) {
-    return new File(Prop.TMP, Util.className(BaseXHTTP.class) + port);
+  private static IOFile stopFile(final int port) {
+    return new IOFile(Prop.TMP, Util.className(BaseXHTTP.class) + port);
   }
 
   /**
@@ -346,9 +343,9 @@ public final class BaseXHTTP {
    * @throws IOException I/O exception
    */
   private static void stop(final int port) throws IOException {
-    final File stop = stopFile(port);
+    final IOFile stop = stopFile(port);
     try {
-      stop.createNewFile();
+      stop.touch();
       new Socket(S_LOCALHOST, port).close();
       // give the notified process some time to quit
       Performance.sleep(100);
@@ -382,7 +379,7 @@ public final class BaseXHTTP {
     /** Server socket. */
     private final ServerSocket ss;
     /** Stop file. */
-    private final File stop;
+    private final IOFile stop;
 
     /**
      * Constructor.
@@ -415,5 +412,15 @@ public final class BaseXHTTP {
         Util.errln(ex);
       }
     }
+  }
+
+  @Override
+  public String header() {
+    return Util.info(S_CONSOLE, HTTP);
+  }
+
+  @Override
+  public String usage() {
+    return S_HTTPINFO;
   }
 }

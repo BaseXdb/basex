@@ -17,18 +17,18 @@ public abstract class CNode extends Arr {
   final StaticContext sc;
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param n name
+   * @param sc static context
+   * @param info input info
+   * @param name name
    */
-  CNode(final StaticContext sctx, final InputInfo ii, final Expr... n) {
-    super(ii, n);
-    sc = sctx;
+  CNode(final StaticContext sc, final InputInfo info, final Expr... name) {
+    super(info, name);
+    this.sc = sc;
     size = 1;
   }
 
   @Override
-  public abstract ANode item(final QueryContext ctx, final InputInfo ii) throws QueryException;
+  public abstract ANode item(final QueryContext qc, final InputInfo ii) throws QueryException;
 
   @Override
   public boolean has(final Flag flag) {
@@ -46,8 +46,6 @@ public abstract class CNode extends Arr {
 
   @Override
   protected String toString(final String pref) {
-    final StringBuilder sb = new StringBuilder(pref).append(" { ");
-    sb.append(expr.length == 0 ? "()" : super.toString(SEP));
-    return sb.append(" }").toString();
+    return pref + " { " + (exprs.length == 0 ? "()" : super.toString(SEP)) + " }";
   }
 }

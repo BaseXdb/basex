@@ -10,7 +10,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Masoumeh Seydi
  */
-public final class GeoErrors {
+final class GeoErrors {
   /** Error namespace. */
   private static final byte[] NS = QueryText.EXPERROR;
   /** Namespace and error code prefix. */
@@ -22,31 +22,31 @@ public final class GeoErrors {
 
   /**
    * GEO0001: Unrecognized geo object.
-   * @param element Geometry object
+   * @param name name of element
    * @return query exception
    */
-  static QueryException unrecognizedGeo(final Object element) {
-    return thrw(1, "Unrecognized Geo type: %", element);
+  static QueryException unrecognizedGeo(final byte[] name) {
+    return thrw(1, "Unrecognized Geo type: %", name);
   }
 
   /**
-   * GEO0002: gml reader error massage (JTS).
-   * @param e error
+   * GEO0002: GML reader error massage (JTS).
+   * @param th throwable
    * @return query exception
    */
-  static QueryException gmlReaderErr(final Object e) {
-    return thrw(2, "%", e);
+  static QueryException gmlReaderErr(final Throwable th) {
+    return thrw(2, "Parsing GML 2.0: %", th);
   }
 
   /**
    * GEO0003: Inappropriate input geometry.
-   * @param input Geometry object
+   * @param name name of element
    * @param geo exact Geometry object
    * @return query exception
    */
-  static QueryException geoType(final Object input, final String geo) {
+  static QueryException geoType(final byte[] name, final String geo) {
     return thrw(3, "% is not an appropiate geometry for this function. "
-              + "The input geometry should be a %.", input, geo);
+              + "The input geometry should be a %.", name, geo);
   }
 
   /**
@@ -60,12 +60,21 @@ public final class GeoErrors {
 
 
   /**
-   * GEO0005: gml writer error massage (JTS).
-   * @param e error
+   * GEO0005: GML writer error massage (JTS).
+   * @param th throwable
    * @return query exception
    */
-  static QueryException gmlWriterErr(final Object e) {
-    return thrw(5, "%", e);
+  static QueryException gmlWriterErr(final Throwable th) {
+    return thrw(5, "%", th);
+  }
+
+  /**
+   * Creates an error QName for the specified code.
+   * @param code code
+   * @return query exception
+   */
+  static QNm qname(final int code) {
+    return new QNm(String.format("%s:GEO%04d", PREFIX, code), NS);
   }
 
   /**
@@ -75,17 +84,7 @@ public final class GeoErrors {
    * @param ext extension
    * @return query exception
    */
-  private static QueryException thrw(final int code, final String msg,
-      final Object... ext) {
+  private static QueryException thrw(final int code, final String msg, final Object... ext) {
     return new QueryException(null, qname(code), msg, ext);
-  }
-
-  /**
-   * Creates an error QName for the specified code.
-   * @param code code
-   * @return query exception
-   */
-  public static QNm qname(final int code) {
-    return new QNm(String.format("%s:GEO%04d", PREFIX, code), NS);
   }
 }

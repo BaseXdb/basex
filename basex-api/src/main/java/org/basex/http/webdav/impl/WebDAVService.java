@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.List;
 
+import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
@@ -37,45 +38,43 @@ public final class WebDAVService<T> {
   /** Locking service. */
   public final WebDAVLockService locking;
   /** Session. */
-  public LocalSession session;
+  private LocalSession ls;
 
   /**
    * Constructor.
    * @param f resource factory
    * @param h http context
-   * @throws LoginException login exception
    */
-  public WebDAVService(final ResourceMetaDataFactory<T> f, final HTTPContext h)
-      throws LoginException {
-
+  public WebDAVService(final ResourceMetaDataFactory<T> f, final HTTPContext h) {
     factory = f;
     http = h;
     locking = new WebDAVLockService(http);
-    session = new LocalSession(http.authenticate(), http.user, http.pass);
+  }
+
+  /**
+   * Closes an open session.
+   */
+  public void close() {
+    if(ls != null) ls.close();
   }
 
   /**
    * Authenticates the user with the given password.
    * @param user user name
    * @param pass password
-   * @throws IOException if the login is invalid
+   * @throws LoginException if the login is invalid
    */
-  public void authenticate(final String user, final String pass) throws IOException {
+  public void authenticate(final String user, final String pass) throws LoginException {
     http.credentials(user, pass);
     http.authenticate();
   }
 
   /**
    * Checks if the user is authorized to perform the given action.
-   * @param user user name
-   * @param action action
    * @param db database
-   * @param path path
    * @return {@code true} if the user is authorized
    */
-  @SuppressWarnings("unused")
-  public boolean authorize(final String user, final String action, final String db,
-      final String path) {
+  public static boolean authorize(final String db) {
     return !WEBDAV_DB.equals(db);
   }
 
@@ -90,6 +89,7 @@ public final class WebDAVService<T> {
     if(!pathExists(db, dummy)) return;
 
     // path contains dummy document
+    final LocalSession session = session();
     session.execute(new Open(db));
     session.execute(new Delete(dummy));
   }
@@ -131,7 +131,7 @@ public final class WebDAVService<T> {
    * @return resource meta data
    * @throws IOException I/O exception
    */
-  ResourceMetaData metaData(final String db, final String path) throws IOException {
+  private ResourceMetaData metaData(final String db, final String path) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(
       "let $a := " + _DB_LIST_DETAILS.args("$db", "$path") +
       "return (" +
@@ -159,6 +159,7 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public void delete(final String db, final String path) throws IOException {
+    final LocalSession session = session();
     session.execute(new Open(db));
     session.execute(new Delete(path));
 
@@ -175,6 +176,7 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public void rename(final String db, final String path, final String npath) throws IOException {
+    final LocalSession session = session();
     session.execute(new Open(db));
     session.execute(new Rename(path, npath));
 
@@ -200,7 +202,7 @@ public final class WebDAVService<T> {
 
     final WebDAVQuery query = new WebDAVQuery(
       "declare option db:chop 'false';" +
-      "if(" + _DB_IS_RAW.args("$db", "$path") + ")" +
+      "if(" + _DB_IS_RAW.args("$db", "$path") + ')' +
       " then " + _DB_STORE.args("$tdb", "$tpath", _DB_RETRIEVE.args("$db", "$path")) +
       " else " + _DB_ADD.args("$tdb", _DB_OPEN.args("$db", "$path"), "$tpath"));
     query.bind("db", db);
@@ -246,7 +248,7 @@ public final class WebDAVService<T> {
   public void retrieve(final String db, final String path, final boolean raw,
       final OutputStream out) throws IOException {
 
-    session.setOutputStream(out);
+    session().setOutputStream(out);
     final WebDAVQuery query = new WebDAVQuery(
       "declare option output:" + (raw ?
       "method 'raw'; " + _DB_RETRIEVE.args("$db", "$path") :
@@ -263,7 +265,7 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public T createDb(final String db) throws IOException {
-    session.execute(new CreateDB(db));
+    session().execute(new CreateDB(db));
     return factory.database(this, new ResourceMetaData(db, timestamp(db)));
   }
 
@@ -273,7 +275,7 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public void dropDb(final String db) throws IOException {
-    session.execute(new DropDB(db));
+    session().execute(new DropDB(db));
   }
 
   /**
@@ -283,7 +285,7 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public void renameDb(final String db, final String n) throws IOException {
-    session.execute(new AlterDB(db, n));
+    session().execute(new AlterDB(db, n));
   }
 
   /**
@@ -293,7 +295,7 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public void copyDb(final String db, final String n) throws IOException {
-    session.execute(new Copy(db, n));
+    session().execute(new Copy(db, n));
   }
 
   /**
@@ -313,8 +315,8 @@ public final class WebDAVService<T> {
     final StringList result = execute(query);
     final int rs = result.size();
 
-    final HashSet<String> paths = new HashSet<String>();
-    final List<T> ch = new ArrayList<T>(rs / 5);
+    final HashSet<String> paths = new HashSet<>();
+    final List<T> ch = new ArrayList<>(rs / 5);
     for(int r = 0; r < rs; r += 5) {
       final boolean raw  = Boolean.parseBoolean(result.get(r));
       final String ctype = result.get(r + 1);
@@ -346,7 +348,7 @@ public final class WebDAVService<T> {
 
     final StringList result = execute(query);
     final int rs = result.size();
-    final List<T> dbs = new ArrayList<T>(rs >>> 1);
+    final List<T> dbs = new ArrayList<>(rs >>> 1);
     for(int r = 0; r < rs; r += 2) {
       final String name = result.get(r);
       final long mod = DateTime.parse(result.get(r + 1));
@@ -396,6 +398,8 @@ public final class WebDAVService<T> {
    */
   public T createFile(final String db, final String path, final String name,
     final InputStream in) throws IOException {
+
+    final LocalSession session = session();
     session.execute(new Open(db));
     final String dbp = path.isEmpty() ? name : path + SEP + name;
     // delete old resource if it already exists
@@ -456,7 +460,7 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   private T createDb(final String db, final InputStream in) throws IOException {
-    session.create(db, in);
+    session().create(db, in);
     return factory.database(this, new ResourceMetaData(db, timestamp(db)));
   }
 
@@ -469,6 +473,7 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   private T addXML(final String db, final String path, final InputStream in) throws IOException {
+    final LocalSession session = session();
     session.execute(new Set(MainOptions.CHOP, false));
     session.execute(new Open(db));
     session.add(path, in);
@@ -484,6 +489,7 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   private T store(final String db, final String path, final InputStream in) throws IOException {
+    final LocalSession session = session();
     session.execute(new Open(db));
     session.store(path, in);
     return factory.file(this, metaData(db, path));
@@ -499,8 +505,7 @@ public final class WebDAVService<T> {
    */
   private T addFile(final String db, final String path, final InputStream in) throws IOException {
     // use 4MB as buffer input
-    final BufferInput bi = new BufferInput(in, 1 << 22);
-    try {
+    try(final BufferInput bi = new BufferInput(in, 1 << 22)) {
       // guess the content type from the first character
       if(peek(bi) == '<') {
         try {
@@ -526,8 +531,6 @@ public final class WebDAVService<T> {
         d = db;
       }
       return store(d, path, bi);
-    } finally {
-      bi.close();
     }
   }
 
@@ -541,6 +544,7 @@ public final class WebDAVService<T> {
     // check if path is a folder and is empty
     if(path.matches("[^/]") || pathExists(db, path)) return;
 
+    final LocalSession session = session();
     session.execute(new Open(db));
     session.store(path + SEP + DUMMY, new ArrayInput(Token.EMPTY));
   }
@@ -552,12 +556,22 @@ public final class WebDAVService<T> {
    * @throws IOException error during query execution
    */
   private StringList execute(final WebDAVQuery query) throws IOException {
-    final LocalQuery lq = session.query(query.toString());
+    final LocalQuery lq = session().query(query.toString());
     for(final Entry<String, Object> entry : query.entries()) {
       lq.bind(entry.getKey(), entry.getValue());
     }
     final StringList sl = new StringList();
     while(lq.more()) sl.add(lq.next());
     return sl;
+  }
+
+  /**
+   * Constructor.
+   * @return local session
+   * @throws LoginException login exception
+   */
+  private LocalSession session() throws LoginException {
+    if(ls == null) ls = new LocalSession(http.authenticate(), http.user, http.pass);
+    return ls;
   }
 }

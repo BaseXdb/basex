@@ -51,7 +51,7 @@ public final class FTIndex implements Index {
   private static final int ENTRY = 9;
 
   /** Cached texts. Increases used memory, but speeds up repeated queries. */
-  private final IntObjMap<byte[]> ctext = new IntObjMap<byte[]>();
+  private final IntObjMap<byte[]> ctext = new IntObjMap<>();
   /** Levenshtein reference. */
   private final Levenshtein ls = new Levenshtein();
   /** Data reference. */
@@ -200,7 +200,7 @@ public final class FTIndex implements Index {
    * @param ti entry length
    * @return position where the key was found, or would have been found
    */
-  int find(final byte[] token, final int i, final int e, final int ti) {
+  private int find(final byte[] token, final int i, final int e, final int ti) {
     final int tl = ti + ENTRY;
     int l = 0, h = (e - i) / tl;
     while(l <= h) {
@@ -384,7 +384,7 @@ public final class FTIndex implements Index {
    * @param token index token
    * @return iterator
    */
-  private FTIndexIterator iter(final long off, final int size, final DataAccess da,
+  private static FTIndexIterator iter(final long off, final int size, final DataAccess da,
       final byte[] token) {
     da.cursor(off);
     final IntList pr = new IntList(size);
@@ -402,7 +402,7 @@ public final class FTIndex implements Index {
    * @param token index token
    * @return iterator
    */
-  private synchronized FTIndexIterator iter(final FTCache ftc, final byte[] token) {
+  private static synchronized FTIndexIterator iter(final FTCache ftc, final byte[] token) {
     final int size = ftc.pre.size();
 
     return new FTIndexIterator() {

@@ -8,7 +8,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public interface Locking {
+interface Locking {
   /**
    * Puts read and write locks the specified databases.
    * Store and return the {@code token} for unlocking these objects again.
@@ -20,12 +20,6 @@ public interface Locking {
    *   Global locking is performed if the passed on reference is {@code null}
    */
   void acquire(final Proc pr, final StringList read, final StringList write);
-
-  /**
-   * Unlock all string locked by a transaction.
-   * @param write write locks to keep
-   */
-  void downgrade(final StringList write);
 
   /**
    * Unlock all string locked by a transaction.

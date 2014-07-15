@@ -3,6 +3,7 @@ package org.basex.data;
 import static org.basex.util.Token.*;
 
 import java.util.*;
+import java.util.List;
 
 import org.basex.core.cmd.*;
 import org.basex.data.atomic.*;
@@ -25,7 +26,7 @@ import org.basex.util.list.*;
  * given by the table position. The following restrictions are imposed on the data:
  * <ul>
  * <li>The table is limited to 2^31 entries (pre values are signed int's)</li>
- * <li>A maximum of 2^15 different tag and attribute names is allowed</li>
+ * <li>A maximum of 2^15 different element and attribute names is allowed</li>
  * <li>A maximum of 2^8 different namespaces is allowed</li>
  * </ul>
  * Each node occupies 128 bits. The current storage layout looks as follows:
@@ -127,7 +128,7 @@ public abstract class Data {
 
   /**
    * Starts an update operation: writes a file to disk to indicate that an update is
-   * going on, and exclusively locks the table.
+   * going on, and exclusively locks the table file.
    * @return success flag
    */
   public abstract boolean startUpdate();
@@ -138,9 +139,9 @@ public abstract class Data {
   public abstract void finishUpdate();
 
   /**
-   * Returns the indexed pre references for the specified token.
+   * Returns an index iterator for the specified token.
    * @param token index token reference
-   * @return array of sorted pre values
+   * @return index iterator
    */
   public final IndexIterator iter(final IndexToken token) {
     return index(token.type()).iter(token);
@@ -228,7 +229,7 @@ public abstract class Data {
    * @param id unique node id
    * @return pre value or -1 if id was not found
    */
-  final int preold(final int id) {
+  private int preold(final int id) {
     // find pre value in table
     for(int p = Math.max(0, id); p < meta.size; ++p)
       if(id == id(p)) return p;
@@ -354,7 +355,7 @@ public abstract class Data {
   }
 
   /**
-   * Returns a reference to the tag or attribute name id.
+   * Returns a reference to the name of an element, attribute or processing instruction.
    * @param pre pre value
    * @return token reference
    */
@@ -363,7 +364,7 @@ public abstract class Data {
   }
 
   /**
-   * Returns a tag, attribute or pi name.
+   * Returns the name of an element, attribute or processing instruction.
    * @param pre pre value
    * @param kind node kind
    * @return name reference
@@ -457,10 +458,10 @@ public abstract class Data {
   // UPDATE OPERATIONS ========================================================
 
   /**
-   * Updates (renames) an element, attribute or pi name.
+   * Updates (renames) the name of an element, attribute or processing instruction.
    * @param pre pre value
    * @param kind node kind
-   * @param name new tag, attribute or pi name
+   * @param name name of new element, attribute or processing instruction
    * @param uri uri
    */
   public final void update(final int pre, final int kind, final byte[] name, final byte[] uri) {
@@ -491,7 +492,7 @@ public abstract class Data {
    * attribute node.
    * @param pre pre value to be replaced
    * @param kind node kind
-   * @param value value to be updated (tag name, text, comment, pi)
+   * @param value value to be updated (element name, text, comment, pi)
    */
   public final void update(final int pre, final int kind, final byte[] value) {
     final byte[] v = kind == PI ? trim(concat(name(pre, kind), SPACE, value)) : value;
@@ -658,7 +659,7 @@ public abstract class Data {
 
     if(!cache) updateDist(pre, -s);
 
-    // propagate PRE value shifts to namespaces
+    // delete namespace nodes and propagate PRE value shifts
     nspaces.delete(pre, s, this);
   }
 
@@ -698,8 +699,9 @@ public abstract class Data {
     // loop through all entries
     final IntList preStack = new IntList();
     final NSNode nsRoot = nspaces.getCurrent();
-    final HashSet<NSNode> newNodes = new HashSet<NSNode>();
     final IntList flagPres = new IntList();
+    // track existing NSNodes - their PRE values have to be shifted after each tuple insertion
+    final List<NSNode> nsNodesShift = nspaces.getNSNodes(tpre);
 
     // indicates if database only contains a dummy node
     final Data data = source.data;
@@ -748,13 +750,7 @@ public abstract class Data {
               // see if prefix has been declared/ is part of current ns scope
               final byte[] old = nsScope.get(at.name(a));
               if(old == null || !eq(old, at.value(a))) {
-                // we have to keep track of all new NSNodes that are added
-                // to the Namespace structure, as their pre values must not
-                // be updated. I.e. if an NSNode N with pre value 3 existed
-                // prior to inserting and two new nodes are inserted at
-                // location pre == 3 we have to make sure N and only N gets
-                // updated.
-                newNodes.add(nspaces.add(at.name(a), at.value(a), pre));
+                nspaces.add(at.name(a), at.value(a), pre);
                 ne = true;
               }
             }
@@ -788,7 +784,7 @@ public abstract class Data {
           break;
       }
       // propagate PRE value shifts to keep namespace structure valid
-      nspaces.shiftPreAfterInsert(tpre, 1, newNodes);
+      Namespaces.incrementPre(nsNodesShift, 1);
     }
     // finalize and update namespace structure
     while(!preStack.isEmpty()) nspaces.close(preStack.pop());
@@ -923,7 +919,7 @@ public abstract class Data {
    * Sets the update buffer to a new size.
    * @param size number of table entries
    */
-  final void buffer(final int size) {
+  private void buffer(final int size) {
     final int bs = size << IO.NODEPOWER;
     if(b.length != bs) b = new byte[bs];
   }
@@ -946,7 +942,7 @@ public abstract class Data {
   /**
    * Adds an element entry to the internal update buffer.
    * @param dist parent distance
-   * @param name tag name index
+   * @param name element name index
    * @param asize number of attributes
    * @param size node size
    * @param uri namespace uri reference
@@ -1077,7 +1073,7 @@ public abstract class Data {
    * @param end end pre value
    * @return table
    */
-  final String toString(final int start, final int end) {
+  private String toString(final int start, final int end) {
     return string(InfoStorage.table(this, start, end));
   }
 

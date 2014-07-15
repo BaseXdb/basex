@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -24,29 +25,34 @@ public final class Castable extends Single {
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
+   * @param sc static context
+   * @param info input info
    * @param e expression
-   * @param s sequence type
+   * @param seq sequence type
    */
-  public Castable(final StaticContext sctx, final InputInfo ii, final Expr e,
-      final SeqType s) {
-    super(ii, e);
-    sc = sctx;
-    seq = s;
+  public Castable(final StaticContext sc, final InputInfo info, final Expr e, final SeqType seq) {
+    super(info, e);
+    this.sc = sc;
+    this.seq = seq;
     type = SeqType.BLN;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return expr.isValue() ? preEval(ctx) : this;
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii) {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    return expr.isValue() ? preEval(qc) : this;
+  }
+
+  @Override
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Value v = expr.value(qc);
     try {
-      seq.cast(expr.item(ctx, ii), ctx, sc, ii, this);
+      seq.cast(v, qc, sc, ii, this);
       return Bln.TRUE;
     } catch(final QueryException ex) {
       return Bln.FALSE;
@@ -54,8 +60,8 @@ public final class Castable extends Single {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Castable(sc, info, expr.copy(ctx, scp, vs), seq);
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new Castable(sc, info, expr.copy(qc, scp, vs), seq);
   }
 
   @Override

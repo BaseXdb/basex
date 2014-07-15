@@ -163,10 +163,9 @@ public final class PlotView extends View {
           plotChanged = true;
           markingChanged = true;
 
-          final String[] keys =
-            plotData.getCategories(token(item)).toStringArray();
-          xCombo.setModel(new DefaultComboBoxModel(keys));
-          yCombo.setModel(new DefaultComboBoxModel(keys));
+          final String[] keys = plotData.getCategories(token(item)).toStringArray();
+          xCombo.setModel(new DefaultComboBoxModel<>(keys));
+          yCombo.setModel(new DefaultComboBoxModel<>(keys));
           if(keys.length > 0) {
             // choose name category as default for horizontal axis
             xCombo.setSelectedIndex(Math.min(1, keys.length));
@@ -200,7 +199,7 @@ public final class PlotView extends View {
    * @param ax plot axis
    * @param cb combo box
    */
-  void setAxis(final PlotAxis ax, final BaseXCombo cb) {
+  private void setAxis(final PlotAxis ax, final BaseXCombo cb) {
     final String cs = cb.getSelectedItem();
     if(!ax.setAxis(cs)) return;
     plotChanged = true;
@@ -817,7 +816,7 @@ public final class PlotView extends View {
     plotData = new PlotData(gui.context);
 
     final String[] items = plotData.getItems().toStringArray();
-    itemCombo.setModel(new DefaultComboBoxModel(items));
+    itemCombo.setModel(new DefaultComboBoxModel<>(items));
 
     // set first item and trigger assignment of axis assignments
     if(items.length > 0) itemCombo.setSelectedIndex(0);

@@ -34,21 +34,4 @@ public final class FNUnitTest extends AdvancedQueryTest {
     query(_UNIT_ASSERT_EQUALS.args("1", "1"), "");
     error(_UNIT_ASSERT_EQUALS.args("1", "2"), Err.UNIT_ASSERT_EQUALS);
   }
-
-  /** Test method. */
-  @Test
-  public void test() {
-    String func = "declare %unit:test function local:x() { 1 }; ";
-    query(func + COUNT.args(_UNIT_TEST.args()), "1");
-
-    func = "declare %unit:test function local:x() { unit:fail('') }; ";
-    query(func + COUNT.args(_UNIT_TEST.args() + "//failure"), "1");
-
-    func = "declare %unit:test function local:x() { 1+<a/> }; ";
-    query(func + COUNT.args(_UNIT_TEST.args() + "//error"), "1");
-
-    func = "declare %unit:test function local:x() { 1+<a/> }; ";
-    query(func + COUNT.args(_UNIT_TEST.args(_INSPECT_FUNCTIONS.args()) + "//error"), "1");
-    query(func + _UNIT_TEST.args("()") + "/*/*", "");
-  }
 }

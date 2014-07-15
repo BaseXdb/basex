@@ -27,7 +27,7 @@ public final class RESTCommand extends RESTCmd {
   protected void run0() throws IOException {
     // set content type to text
     final HTTPContext http = session.http;
-    http.serialization.set(SerializerOptions.METHOD, SerialMethod.TEXT);
+    http.sopts().set(SerializerOptions.METHOD, SerialMethod.TEXT);
     http.initResponse();
 
     for(final Command c : cmds) run(c, http.res.getOutputStream());

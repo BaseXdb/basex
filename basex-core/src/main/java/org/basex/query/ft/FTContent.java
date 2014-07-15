@@ -22,17 +22,17 @@ public final class FTContent extends FTFilter {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param ex expression
-   * @param cont contents type
+   * @param info input info
+   * @param expr expression
+   * @param content contents type
    */
-  public FTContent(final InputInfo ii, final FTExpr ex, final FTContents cont) {
-    super(ii, ex);
-    content = cont;
+  public FTContent(final InputInfo info, final FTExpr expr, final FTContents content) {
+    super(info, expr);
+    this.content = content;
   }
 
   @Override
-  protected boolean filter(final QueryContext ctx, final FTMatch mtc, final FTLexer lex) {
+  protected boolean filter(final QueryContext qc, final FTMatch mtc, final FTLexer lex) {
     if(content == FTContents.START) {
       for(final FTStringMatch sm : mtc) if(sm.start == 0) return true;
     } else if(content == FTContents.END) {
@@ -57,13 +57,13 @@ public final class FTContent extends FTFilter {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTContent(info, expr[0].copy(ctx, scp, vs), content);
+  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new FTContent(info, exprs[0].copy(qc, scp, vs), content);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(CONTENT, content.toString()), expr);
+    addPlan(plan, planElem(CONTENT, content.toString()), exprs);
   }
 
   @Override

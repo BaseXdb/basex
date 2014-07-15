@@ -200,7 +200,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
    * @return supported languages
    */
   public static StringList languages() {
-    final TreeMap<Language, Stemmer> langs = new TreeMap<Language, Stemmer>();
+    final TreeMap<Language, Stemmer> langs = new TreeMap<>();
     for(final Stemmer stem : Stemmer.IMPL) {
       for(final Language l : stem.languages()) {
         if(langs.containsKey(l)) continue;
@@ -213,6 +213,6 @@ public final class FTLexer extends FTIterator implements IndexToken {
     for(final Entry<Language, Stemmer> l : langs.entrySet()) {
       sl.add(l.getKey() + " (" + l.getValue() + ')');
     }
-    return sl.sort(true);
+    return sl.sort();
   }
 }

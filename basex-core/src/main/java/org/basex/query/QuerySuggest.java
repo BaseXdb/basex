@@ -34,15 +34,15 @@ public final class QuerySuggest extends QueryParser {
 
   /**
    * Constructor.
-   * @param q query
-   * @param c query context
-   * @param d data reference
+   * @param query query string
+   * @param qc query context
+   * @param data data reference
    * @throws QueryException query exception
    */
-  public QuerySuggest(final String q, final QueryContext c, final Data d)
+  public QuerySuggest(final String query, final QueryContext qc, final Data data)
       throws QueryException {
-    super(q, null, c, null);
-    data = d;
+    super(query, null, qc, null);
+    this.data = data;
     checkInit();
   }
 
@@ -57,7 +57,7 @@ public final class QuerySuggest extends QueryParser {
         final String nm = string(n.token(data));
         if(!nm.isEmpty() && !sl.contains(nm)) sl.add(nm);
       }
-      sl.sort(true);
+      sl.sort();
     }
     return sl;
   }
@@ -67,7 +67,7 @@ public final class QuerySuggest extends QueryParser {
     if(stack != null && !stack.empty()) return;
     all = data.paths.root();
     curr = all;
-    stack = new Stack<ArrayList<PathNode>>();
+    stack = new Stack<>();
   }
 
   @Override
@@ -95,7 +95,7 @@ public final class QuerySuggest extends QueryParser {
   private void checkTest(final boolean eq) {
     if(tag == null) return;
 
-    final ArrayList<PathNode> tmp = new ArrayList<PathNode>();
+    final ArrayList<PathNode> tmp = new ArrayList<>();
     boolean s = false;
     for(final PathNode p : all) {
       final byte[] nm = p.token(data);
@@ -113,7 +113,7 @@ public final class QuerySuggest extends QueryParser {
     if(stack == null) return;
     if(open) {
       checkTest(true);
-      final ArrayList<PathNode> tmp = new ArrayList<PathNode>();
+      final ArrayList<PathNode> tmp = new ArrayList<>();
       for(final PathNode p : curr) tmp.add(p);
       stack.add(tmp);
       checkAxis(Axis.CHILD);

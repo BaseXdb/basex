@@ -181,7 +181,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
 
   @Override
   public final Iterator<byte[]> iterator() {
-    return new ArrayIterator<byte[]>(keys, 1, size);
+    return new ArrayIterator<>(keys, 1, size);
   }
 
   @Override

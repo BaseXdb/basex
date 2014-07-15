@@ -6,11 +6,12 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.basex.*;
+import org.basex.api.client.*;
 import org.basex.core.cmd.*;
-import org.basex.core.parse.Commands.*;
-import org.basex.server.*;
+import org.basex.core.parse.Commands.CmdIndex;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests user permissions.
@@ -21,8 +22,10 @@ import org.junit.*;
 public final class PermissionTest extends SandboxTest {
   /** Name of the database to be renamed. */
   private static final String RENAMED = Util.className(PermissionTest.class) + 'r';
+  /** Test folder. */
+  private static final String FOLDER = "src/test/resources/";
   /** Test repository. **/
-  private static final String REPO = "src/test/resources/repo/";
+  private static final String REPO = FOLDER + "repo/";
 
   /** Server reference. */
   private static BaseXServer server;
@@ -152,8 +155,8 @@ public final class PermissionTest extends SandboxTest {
     no(new RepoDelete("http://www.pkg3.com", null), testSession);
 
     // XQuery update
-    no(new XQuery("for $item in doc('" + NAME + "')//xml " +
-      "return rename node $item as 'null'"), testSession);
+    no(new XQuery("for $item in doc('" + NAME + "')//xml return delete node $item"), testSession);
+    no(new XQuery("db:create('" + NAME + "')"), testSession);
     no(new Optimize(), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
     no(new Replace(RENAMED, "<xml />"), testSession);
@@ -163,7 +166,7 @@ public final class PermissionTest extends SandboxTest {
     no(new DropIndex("SUMMARY"), testSession);
     no(new CreateUser(NAME, Token.md5(NAME)), testSession);
     no(new DropUser(NAME), testSession);
-    no(new Export("."), testSession);
+    no(new Export(Prop.TMP + NAME), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
@@ -196,6 +199,8 @@ public final class PermissionTest extends SandboxTest {
     // XQuery Update
     ok(new XQuery("for $item in doc('" + NAME + "')//xml " +
         "return rename node $item as 'null'"), testSession);
+    no(new XQuery("db:create('" + NAME + "')"), testSession);
+
     ok(new Optimize(), testSession);
     for(final CmdIndex cmd : CmdIndex.values()) {
       ok(new CreateIndex(cmd), testSession);
@@ -210,7 +215,7 @@ public final class PermissionTest extends SandboxTest {
     no(new DropDB(NAME), testSession);
     no(new CreateUser(NAME, Token.md5(NAME)), testSession);
     no(new DropUser(NAME), testSession);
-    no(new Export("."), testSession);
+    no(new Export(Prop.TMP + NAME), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
@@ -222,13 +227,14 @@ public final class PermissionTest extends SandboxTest {
   @Test
   public void createPermsNeeded() {
     ok(new Grant("create", NAME), adminSession);
+    ok(new XQuery("db:create('" + NAME + "')"), testSession);
 
     ok(new Close(), testSession);
     ok(new CreateDB(NAME, "<xml/>"), testSession);
     for(final CmdIndex cmd : CmdIndex.values()) {
       ok(new CreateIndex(cmd), testSession);
     }
-    ok(new Export("."), testSession);
+    ok(new Export(Prop.TMP + NAME), testSession);
 
     // repo Stuff
     ok(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
@@ -242,6 +248,7 @@ public final class PermissionTest extends SandboxTest {
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
     no(new AlterUser(NAME, Token.md5(NAME)), testSession);
+    no(new org.basex.core.cmd.Test(FOLDER + "tests-ok.xqm"), testSession);
   }
 
   /** Tests all commands where admin permission is needed. */
@@ -266,6 +273,7 @@ public final class PermissionTest extends SandboxTest {
     ok(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
     ok(new RepoList(), testSession);
     ok(new RepoDelete("http://www.pkg3.com", null), testSession);
+    ok(new org.basex.core.cmd.Test(FOLDER + "tests-ok.xqm"), testSession);
   }
 
   /** Drops users. */
@@ -301,7 +309,7 @@ public final class PermissionTest extends SandboxTest {
     try {
       s.execute(cmd);
       fail("\"" + cmd + "\" was supposed to fail.");
-    } catch(final IOException ex) {
+    } catch(final IOException ignored) {
     }
   }
 }

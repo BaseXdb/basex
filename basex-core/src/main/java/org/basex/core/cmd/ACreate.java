@@ -55,12 +55,9 @@ public abstract class ACreate extends Command {
       io = IO.get(args[1]);
     } else if(in != null) {
       if(in.getCharacterStream() != null) {
-        final Reader r = in.getCharacterStream();
         final TokenBuilder tb = new TokenBuilder();
-        try {
+        try(final Reader r = in.getCharacterStream()) {
           for(int c; (c = r.read()) != -1;) tb.add(c);
-        } finally {
-          r.close();
         }
         io = new IOContent(tb.finish());
       } else if(in.getByteStream() != null) {

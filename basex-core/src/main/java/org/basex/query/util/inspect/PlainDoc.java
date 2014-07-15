@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -24,10 +25,10 @@ public final class PlainDoc extends Inspect {
   /**
    * Constructor.
    * @param qc query context
-   * @param ii input info
+   * @param info input info
    */
-  public PlainDoc(final QueryContext qc, final InputInfo ii) {
-    super(qc, ii);
+  public PlainDoc(final QueryContext qc, final InputInfo info) {
+    super(qc, info);
   }
 
   /**
@@ -38,11 +39,11 @@ public final class PlainDoc extends Inspect {
   public FElem context() throws QueryException {
     final FElem context = elem("context", null);
 
-    for(final StaticVar sv : ctx.vars) {
+    for(final StaticVar sv : qc.vars) {
       variable(sv, context);
     }
-    for(final StaticFunc sf : ctx.funcs.funcs()) {
-      function(sf.name, sf, sf.funcType(), context);
+    for(final StaticFunc sf : qc.funcs.funcs()) {
+      function(sf.name, sf, sf.funcType(), sf.ann, context);
     }
 
     return context;
@@ -62,7 +63,9 @@ public final class PlainDoc extends Inspect {
     if(doc != null) comment(doc, mod);
 
     for(final StaticVar sv : module.vars().values()) variable(sv, mod);
-    for(final StaticFunc sf : module.funcs().values()) function(sf.name, sf, sf.funcType(), mod);
+    for(final StaticFunc sf : module.funcs().values())
+      function(sf.name, sf, sf.funcType(), sf.ann, mod);
+
     return mod;
   }
 
@@ -88,12 +91,13 @@ public final class PlainDoc extends Inspect {
    * @param fname name of function
    * @param sf function reference
    * @param ftype function type
+   * @param ann annotations
    * @param parent node
    * @return resulting value
    * @throws QueryException query exception
    */
   public FElem function(final QNm fname, final StaticFunc sf, final FuncType ftype,
-        final FElem parent) throws QueryException {
+        final Ann ann, final FElem parent) throws QueryException {
 
     final FElem function = elem("function", parent);
     if(fname != null) {
@@ -118,12 +122,12 @@ public final class PlainDoc extends Inspect {
         if(uri.length != 0) argument.add("uri", uri);
 
         final byte[] pdoc = doc(doc, name);
-        if(pdoc != null) add(pdoc, ctx.context, argument);
+        if(pdoc != null) add(pdoc, qc.context, argument);
       }
       type(ftype.args[a], argument);
     }
 
-    if(sf != null) annotation(sf.ann, function, true);
+    annotation(ann, function, true);
 
     if(doc != null) {
       for(final byte[] key : doc) {
@@ -131,7 +135,7 @@ public final class PlainDoc extends Inspect {
         for(final byte[] value : doc.get(key)) {
           final FElem elem = eq(key, DOC_TAGS) ? elem(string(key), function) :
             elem("tag", function).add("name", key);
-          add(value, ctx.context, elem);
+          add(value, qc.context, elem);
         }
       }
     }
@@ -139,7 +143,7 @@ public final class PlainDoc extends Inspect {
     final SeqType rt = sf != null ? sf.type() : ftype.ret;
     final FElem ret = type(rt, elem("return", function));
     final TokenList returns = doc != null ? doc.get(DOC_RETURN) : null;
-    if(returns != null) for(final byte[] val : returns) add(val, ctx.context, ret);
+    if(returns != null) for(final byte[] val : returns) add(val, qc.context, ret);
     return function;
   }
 

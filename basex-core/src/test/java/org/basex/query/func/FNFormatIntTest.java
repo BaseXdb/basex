@@ -14,6 +14,7 @@ public final class FNFormatIntTest extends QueryTest {
     doc = "<dummy/>";
 
     queries = new Object[][] {
+      { "000", str(""), "format-integer((), 'w')" },
       { "010", str("123"), "format-integer(123, '1')" },
       { "020", str("123"), "format-integer(123, '001')" },
       { "030", str("00123"), "format-integer(123, '00001')" },
@@ -111,8 +112,7 @@ public final class FNFormatIntTest extends QueryTest {
       { "err010", "format-integer(123, '0\u0661')" },
       { "err020", "format-integer(123, '\u06610')" },
       { "err030", "format-integer(123, '0\u06610')" },
-      { "err035", "format-integer(1234, '\u06630\u0663')" },
-      { "err040", "format-integer(a, 'w')" }, // XPDY0002
+      { "err040", "format-integer(1234, '\u06630\u0663')" },
       { "err050", "format-integer(1, '')" }, // XTDE0030
       { "err070", "format-integer(1234, 'Ww;o())')" },
       { "err100", "format-integer(1500000, '0,000,')" },

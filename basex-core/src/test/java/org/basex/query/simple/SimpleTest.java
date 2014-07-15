@@ -21,6 +21,7 @@ public final class SimpleTest extends QueryTest {
       { "Annotation 3", "declare %local:x(.) variable $a := 1; $a" },
 
       { "Compare 1", "xs:QName('a') = attribute a { 'b' }" },
+      { "Compare 2", bool(false), "<a/>/x = (c, ())" },
 
       { "FLWOR 1", itr(3), "(for $i in 1 to 5 return $i)[3]" },
       { "FLWOR 2", itr(4),
@@ -90,6 +91,9 @@ public final class SimpleTest extends QueryTest {
       { "Filter 5", empty(), "<x><a><b c='d'/></a></x>/(a,b)[@c]" },
       { "Filter 6", bool(true), "empty((1,2,3)[3][2])" },
       { "Filter 7", bool(true), "empty((1,2,3)[position() = 3][2])" },
+      { "Filter 8", itr(1), "1[boolean(max((<a>1</a>, <b>2</b>)))]" },
+      { "Filter 9", str("x"), "string(<n><a/><a>x</a></n>/a/text()[.][.])" },
+      { "Filter 10", str("x"), "string(<n><a/><a>x</a></n>/a/text()[1][1])" },
 
       { "ContextItem 0", node(0), "." },
       { "ContextItem 1", node(0), "42[not(.)], ." },
@@ -101,12 +105,15 @@ public final class SimpleTest extends QueryTest {
       { "ContextItem 6", itr(1),
         "declare function local:x() {1+<x/>};1[try { local:x() } catch *{.}]" },
       { "ContextItem 7", node(0), "try { <a/>/(1+'') } catch * {.}" },
+      { "ContextItem 8", itr(1, 1), "('a', 'b') ! count(.)" },
 
       { "Path 1", empty(), "<a/>[./(@*)]" },
 
       { "Cast 1", itr(1), "xs:integer('+1')" },
       { "Cast 2", "xs:integer('++1')" },
       { "Cast 3", bool(false), "string('/') castable as xs:QName" },
+      { "Cast 4", str("error"),
+        "try { '1999-12-31'/. castable as xs:date } catch err:XPTY0019 { 'error' }" },
 
       { "Div 1", "xs:dayTimeDuration('PT0S') div xs:dayTimeDuration('PT0S')" },
       { "Div 2", "xs:yearMonthDuration('P0M') div xs:yearMonthDuration('P0M')" },
@@ -149,7 +156,26 @@ public final class SimpleTest extends QueryTest {
         "local:foo()')" },
       { "FuncTest 3", "local:a(), local:a(1)" },
 
-      { "StaticVar 1", "declare variable $CONFIG := $CONFIG; delete node <a/>" }
+      { "StaticVar 1", "declare variable $CONFIG := $CONFIG; delete node <a/>" },
+
+      { "Limits 1", itr(9223372036854775806L), "2 * 4611686018427387903" },
+      { "Limits 2", "2 * 4611686018427387904" }, // overflow
+      { "Limits 3", itr(-9223372036854775808L), "-2 * 4611686018427387904" },
+      { "Limits 4", "4611686018427387905 * -2" }, // underflow
+      { "Limits 5", itr(-9223372036854775808L), "xs:decimal('18446744073709551616') idiv -2" },
+      { "Limits 6", "xs:decimal('18446744073709551616') idiv 2" }, // does not fit
+      { "Limits 7", itr(9223372036854775806L), "xs:decimal('18446744073709551612') idiv 2" },
+      { "Limits 8", "-9223372036854775808 idiv -1" },
+      { "Limits 9", "-9223372036854775807 - 1024" },
+      { "Limits 10", "-9223372036854775808 - 1" },
+      // { "Limits 11", itr(-9223372036854775808L), "-9223372036854775808" },
+
+      { "Empty 1", str(""), "format-integer(let $x := random:integer() return (), '0')" },
+      { "Empty 2", empty(), "math:sin(let $x := random:integer() return ())" },
+      { "Empty 3", bool(true), "let $a := () return empty($a)" },
+      { "Empty 4", bool(false), "let $a := () return exists($a)" },
+      { "Empty 5", bool(true), "declare function local:foo($x as empty-sequence())"
+          + "as xs:boolean { empty($x) }; local:foo(())" }
     };
   }
 }

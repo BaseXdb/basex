@@ -45,22 +45,23 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Compiles and optimizes the expression, assigns data types and cardinalities.
-   * @param ctx query context
+   * This method will be initially called by {@link QueryContext#compile}.
+   * @param qc query context
    * @param scp variable scope
    * @return optimized expression
    * @throws QueryException query exception
    */
-  public abstract Expr compile(QueryContext ctx, VarScope scp) throws QueryException;
+  public abstract Expr compile(QueryContext qc, VarScope scp) throws QueryException;
 
   /**
    * Optimizes an already compiled expression without recompiling its sub-expressions.
-   * @param ctx query context
+   * @param qc query context
    * @param scp variable scope
    * @return optimized expression
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     return this;
   }
 
@@ -68,52 +69,52 @@ public abstract class Expr extends ExprInfo {
    * Evaluates the expression and returns an iterator on the resulting items.
    * If this method is not overwritten, {@link #item} must be implemented
    * by an expression, as it may be called by this method.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting item
    * @throws QueryException query exception
    */
-  public abstract Iter iter(final QueryContext ctx) throws QueryException;
+  public abstract Iter iter(final QueryContext qc) throws QueryException;
 
   /**
    * Evaluates the expression and returns the resulting item or
    * a {@code null} reference, if the expression yields an empty sequence.
    * If this method is not overwritten, {@link #iter} must be implemented
    * by an expression, as it may be called by this method.
-   * @param ctx query context
+   * @param qc query context
    * @param ii input info
    * @return iterator
    * @throws QueryException query exception
    */
-  public abstract Item item(final QueryContext ctx, final InputInfo ii)
+  public abstract Item item(final QueryContext qc, final InputInfo ii)
       throws QueryException;
 
   /**
    * Evaluates the expression and returns the resulting value.
-   * @param ctx query context
+   * @param qc query context
    * @return iterator
    * @throws QueryException query exception
    */
-  public abstract Value value(final QueryContext ctx) throws QueryException;
+  public abstract Value value(final QueryContext qc) throws QueryException;
 
   /**
    * Checks if the iterator can be dissolved into an effective boolean value.
    * If not, returns an error. If yes, returns the first value - which can be
    * also be e.g. an integer, which is later evaluated as numeric predicate.
-   * @param ctx query context
+   * @param qc query context
    * @param ii input info
    * @return item
    * @throws QueryException query exception
    */
-  public abstract Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException;
+  public abstract Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException;
 
   /**
    * Performs a predicate test and returns the item if test was successful.
-   * @param ctx query context
+   * @param qc query context
    * @param ii input info
    * @return item
    * @throws QueryException query exception
    */
-  public abstract Item test(final QueryContext ctx, final InputInfo ii) throws QueryException;
+  public abstract Item test(final QueryContext qc, final InputInfo ii) throws QueryException;
 
   /**
    * Tests if this is an empty sequence. This function is only overwritten
@@ -156,9 +157,9 @@ public abstract class Expr extends ExprInfo {
   public abstract long size();
 
   /**
-   * Indicates if an expression has the specified compiler property. This method is
-   * called by numerous {@link #compile(QueryContext, VarScope)} methods to test properties of
-   * sub-expressions. It returns {@code true} if at least one test is successful.
+   * Indicates if an expression has the specified compiler property. This method must only be
+   * called at compile time. It is invoked to test properties of sub-expressions.
+   * It returns {@code true} if at least one test is successful.
    * @param flag flag to be found
    * @return result of check
    */
@@ -203,19 +204,21 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Inlines an expression into this one, replacing all references to the given variable.
-   * @param ctx query context for recompilation
-   * @param scp variable scope for recompilation
+   * This function is e.g. called by {@link GFLWOR#inlineLets} and {@link For#toPred},
+   * and the variable reference is replaced in {@link VarRef#inline}.
+   * @param qc query context for reoptimization
+   * @param scp variable scope for reoptimization
    * @param v variable to replace
    * @param e expression to inline
    * @return resulting expression if something changed, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public abstract Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
+  public abstract Expr inline(final QueryContext qc, final VarScope scp, final Var v,
       final Expr e) throws QueryException;
 
   /**
    * Inlines the given expression into all elements of the given array.
-   * @param ctx query context
+   * @param qc query context
    * @param scp variable scope
    * @param arr array
    * @param v variable to replace
@@ -223,12 +226,12 @@ public abstract class Expr extends ExprInfo {
    * @return {@code true} if the array has changed, {@code false} otherwise
    * @throws QueryException query exception
    */
-  protected static boolean inlineAll(final QueryContext ctx, final VarScope scp,
+  protected static boolean inlineAll(final QueryContext qc, final VarScope scp,
       final Expr[] arr, final Var v, final Expr e) throws QueryException {
 
     boolean change = false;
     for(int i = 0; i < arr.length; i++) {
-      final Expr nw = arr[i].inline(ctx, scp, v, e);
+      final Expr nw = arr[i].inline(qc, scp, v, e);
       if(nw != null) {
         arr[i] = nw;
         change = true;
@@ -240,23 +243,23 @@ public abstract class Expr extends ExprInfo {
   /**
    * Copies an expression.
    * Will be useful for inlining functions, or for copying static queries.
-   * @param ctx query context
+   * @param qc query context
    * @param scp variable scope for creating new variables
    * @return copied expression
    */
-  public final Expr copy(final QueryContext ctx, final VarScope scp) {
-    return copy(ctx, scp, new IntObjMap<Var>());
+  public final Expr copy(final QueryContext qc, final VarScope scp) {
+    return copy(qc, scp, new IntObjMap<Var>());
   }
 
   /**
    * Copies an expression.
    * Will be useful for inlining functions, or for copying static queries.
-   * @param ctx query context
+   * @param qc query context
    * @param scp variable scope for creating new variables
    * @param vs mapping from old variable IDs to new variable copies
    * @return copied expression
    */
-  public abstract Expr copy(QueryContext ctx, VarScope scp, IntObjMap<Var> vs);
+  public abstract Expr copy(QueryContext qc, VarScope scp, IntObjMap<Var> vs);
 
   /**
    * <p>This method is overwritten by {@link CmpG}, {@link CmpV} and {@link FNSimple}.
@@ -267,11 +270,11 @@ public abstract class Expr extends ExprInfo {
    * <p>Example in {@link CmpV}:
    * <code>if($x eq true())</code> is rewritten to <code>if($x)</code>, if <code>$x</code>
    * is known to return a single boolean.</p>
-   * @param ctx query context
+   * @param qc query context
    * @return optimized expression
    */
   @SuppressWarnings("unused")
-  public Expr compEbv(final QueryContext ctx) {
+  public Expr compEbv(final QueryContext qc) {
     return this;
   }
 
@@ -294,27 +297,16 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Checks if an expression can be rewritten to an index access. If this method is
-   * implemented, {@link #indexEquivalent} must be implemented as well.
-   * @param ic index costs analyzer
+   * Checks if an expression can be rewritten to an index access.
+   * If so, the index expression will be bound to {@link IndexInfo#expr}.
+   * This method will be called by {@link Path#index}.
+   * @param ii index info
    * @return true if an index can be used
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public boolean indexAccessible(final IndexCosts ic) throws QueryException {
+  public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     return false;
-  }
-
-  /**
-   * Returns an equivalent expression which accesses an index structure. Will be called
-   * if {@link #indexAccessible} is returns true for an expression.
-   * @param ic index costs analyzer
-   * @return equivalent index-expression
-   * @throws QueryException query exception
-   */
-  @SuppressWarnings("unused")
-  public Expr indexEquivalent(final IndexCosts ic) throws QueryException {
-    return null;
   }
 
   /**
@@ -328,22 +320,12 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Checks if this expression is a certain function.
-   * @param f function definition
+   * @param func function definition
    * @return result of check
    */
   @SuppressWarnings("unused")
-  public boolean isFunction(final Function f) {
+  public boolean isFunction(final Function func) {
     return false;
-  }
-
-  /**
-   * Optionally adds a text node to an expression for potential index rewriting.
-   * @param ctx query context
-   * @return expression
-   */
-  @SuppressWarnings("unused")
-  public Expr addText(final QueryContext ctx) {
-    return this;
   }
 
   /**
@@ -351,7 +333,7 @@ public abstract class Expr extends ExprInfo {
    * @return {@code true} if there are variables which are used but not declared
    *         in this expression, {@code false} otherwise
    */
-  public boolean hasFreeVars() {
+  protected boolean hasFreeVars() {
     final BitSet declared = new BitSet();
     return !accept(new ASTVisitor() {
       @Override
@@ -369,10 +351,10 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Finds and marks tail calls, enabling TCO.
-   * @param ctx query context, {@code null} if the changes should not be reported
+   * @param qc query context, {@code null} if the changes should not be reported
    */
   @SuppressWarnings("unused")
-  public void markTailCalls(final QueryContext ctx) { }
+  public void markTailCalls(final QueryContext qc) { }
 
   /**
    * Traverses this expression, notifying the visitor of declared and used variables,
@@ -404,13 +386,13 @@ public abstract class Expr extends ExprInfo {
   /**
    * Tries to push the given type check inside this expression.
    * @param tc type check to push into the expression
-   * @param ctx query context
+   * @param qc query context
    * @param scp variable scope
    * @return the resulting expression if successful, {@code null} otherwise
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  protected Expr typeCheck(final TypeCheck tc, final QueryContext ctx, final VarScope scp)
+  protected Expr typeCheck(final TypeCheck tc, final QueryContext qc, final VarScope scp)
       throws QueryException {
     return null;
   }

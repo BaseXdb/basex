@@ -2,9 +2,9 @@ package org.basex.query.util;
 
 import java.io.*;
 
-import org.basex.core.*;
+import org.basex.api.client.*;
+import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -14,11 +14,11 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class ClientSessions {
+public final class ClientSessions implements DataResources {
   /** Last inserted id. */
   private int lastId = -1;
   /** Map with all open sessions and their ids. */
-  private final TokenObjMap<ClientSession> conns = new TokenObjMap<ClientSession>();
+  private final TokenObjMap<ClientSession> conns = new TokenObjMap<>();
 
   /**
    * Adds a session.
@@ -26,7 +26,7 @@ public final class ClientSessions {
    * @return session id
    */
   public Uri add(final ClientSession cs) {
-    final byte[] uri = Token.token(Text.PROJECT_NAME + "://" + cs + '/' + ++lastId);
+    final byte[] uri = Token.token(Prop.PROJECT_NAME + "://" + cs + '/' + ++lastId);
     conns.put(uri, cs);
     return Uri.uri(uri);
   }
@@ -48,9 +48,7 @@ public final class ClientSessions {
     conns.delete(id.string());
   }
 
-  /**
-   * Closes all opened sessions.
-   */
+  @Override
   public void close() {
     for(final byte[] c : conns) {
       final ClientSession cs = conns.get(c);

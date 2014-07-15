@@ -16,30 +16,30 @@ import org.basex.util.*;
 public final class InsertBefore extends NodeCopy {
   /**
    * Constructor.
-   * @param p pre
-   * @param d data
-   * @param i input info
-   * @param c node copy
+   * @param pre pre
+   * @param data data
+   * @param ii input info
+   * @param nodes node copy insertion sequence
    */
-  public InsertBefore(final int p, final Data d, final InputInfo i, final ANodeList c) {
-    super(PrimitiveType.INSERTBEFORE, p, d, i, c);
+  public InsertBefore(final int pre, final Data data, final InputInfo ii, final ANodeList nodes) {
+    super(UpdateType.INSERTBEFORE, pre, data, ii, nodes);
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) {
-    final InsertBefore newOne = (InsertBefore) p;
-    final ANodeList newInsert = newOne.insert;
-    for(final ANode n : newInsert) insert.add(n);
+  public void merge(final Update up) {
+    final InsertBefore newOne = (InsertBefore) up;
+    final ANodeList newInsert = newOne.nodes;
+    for(final ANode n : newInsert) nodes.add(n);
   }
 
   @Override
   public void addAtomics(final AtomicUpdateCache l) {
-    l.addInsert(targetPre, data.parent(targetPre, data.kind(targetPre)), insseq, false);
+    l.addInsert(pre, data.parent(pre, data.kind(pre)), insseq, false);
   }
 
   @Override
-  public UpdatePrimitive[] substitute(final MemData tmp) {
-    return new UpdatePrimitive[] { this };
+  public NodeUpdate[] substitute(final MemData tmp) {
+    return new NodeUpdate[] { this };
   }
 
   @Override

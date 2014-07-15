@@ -39,6 +39,8 @@ public enum Err {
   BASX_ANNOT(BASX, 6, "Annotation %% is invalid or not supported."),
   /** BASX0006. */
   BASX_ANNOTARGS(BASX, 6, "Annotation %% has invalid arguments."),
+  /** XUST0002. */
+  BASEX_MOD(XUST, 2, "All transform expressions must be updating or return an empty sequence."),
 
   // Client module
 
@@ -52,8 +54,6 @@ public enum Err {
   BXCL_COMMAND(BXCL, 4, "Command could not be executed: %"),
   /** BXCL0005. */
   BXCL_QUERY(BXCL, 5, "Query could not be executed: %"),
-  /** BXCL0006. */
-  BXCL_ITEM(BXCL, 6, "Value to be bound is no single item: %"),
 
   // Conversion module
 
@@ -77,6 +77,10 @@ public enum Err {
   BXDB_NODB(BXDB, 1, "%: database node expected."),
   /** BXDB0002. */
   BXDB_OPEN(BXDB, 2, "%"),
+  /** BXDB0002. */
+  BXDB_WHICH(BXDB, 2, "Database not found: %."),
+  /** BXDB0002. */
+  BXDB_WHICHBACK(BXDB, 2, "No backup file found: %."),
   /** BXDB0003. */
   BXDB_MEM(BXDB, 3, "Operation requires database '%' to be persistent."),
   /** BXDB0004. */
@@ -88,10 +92,9 @@ public enum Err {
   /** BXDB0006. */
   BXDB_SINGLE(BXDB, 6, "Database path '%' points to more than one document."),
   /** BXDB0007. */
-  BXDB_OPENED(BXDB, 7,
-      "Database '%' cannot be updated, as it is opened by another process."),
+  BXDB_OPENED(BXDB, 7, "Database '%' cannot be updated, as it is opened by another process."),
   /** BXDB0008. */
-  BXDB_RENAME(BXDB, 8, "%: Invalid target path."),
+  BXDB_RENAME(BXDB, 8, "Invalid target path: %."),
   /** BXDB0009. */
   BXDB_RANGE(BXDB, 9, "%: value '%' is out of range."),
   /** BXDB0010. */
@@ -99,11 +102,19 @@ public enum Err {
   /** BXDB0011. */
   BXDB_NAME(BXDB, 11, "Invalid database name: '%'."),
   /** BXDB0012. */
-  BXDB_CREATE(BXDB, 12, "Database '%' can only be created once."),
+  BXDB_ALTERDROP(BXDB, 12, "Database '%' cannot be both altered and dropped."),
+  /** BXDB0012. */
+  BXDB_ONCE(BXDB, 12, "Database '%' can only be % once."),
+  /** BXDB0012. */
+  BXDB_ONCEBACK(BXDB, 12, "Backup '%' can only be % once."),
   /** BXDB0013. */
   BXDB_CREATEARGS(BXDB, 13, "Number of specified inputs and paths differs: % vs. %."),
   /** BXDB0014. */
   BXDB_DIR(BXDB, 14, "Database path '%' points to a directory."),
+  /** BXDB0015. */
+  BXDB_NOBACKUP(BXDB, 15, "No backup found: %."),
+  /** BXDB0016. */
+  BXDB_SAME(BXDB, 16, "Name of source and target database is equal: %."),
 
   // Fetch module
 
@@ -141,7 +152,7 @@ public enum Err {
   /** BXRE0001. */
   BXRE_WHICH(BXRE, 1, "Package '%' does not exist."),
   /** BXRE0002. */
-  BXRE_URI(BXRE, 2, "Namespace URI is invalid: '%'."),
+  BXRE_URI(BXRE, 2, "URI is invalid or has no path component: '%'."),
   /** BXRE0003. */
   BXRE_NOTINST(BXRE, 3, "Required package '%' is not installed."),
   /** BXRE0004. */
@@ -197,7 +208,7 @@ public enum Err {
   /** BXXQ0001. */
   BXXQ_UPDATING(BXXQ, 1, "No updating expression allowed."),
   /** BXXQ0002. */
-  BXXQ_NEWDB(BXXQ, 2, "Database '%' cannot be opened."),
+  BXXQ_NOUPDATE(BXXQ, 2, "Updating expression expected."),
   /** BXXQ0002. */
   BXXQ_PERM(BXXQ, 3, "%"),
   /** BXXQ0004. */
@@ -214,11 +225,13 @@ public enum Err {
   /** UNIT0002. */
   UNIT_ARGS(UNIT, 2, "Test function '%' must have no arguments."),
   /** UNIT0003. */
-  UNIT_UPDATE(UNIT, 3, "Function '%' is updating."),
+  UNIT_PRIVATE(UNIT, 3, "Test function '%' must be public."),
   /** UNIT0004. */
   UNIT_TWICE(UNIT, 4, "Annotation %:% was declare twice."),
   /** UNIT0005. */
   UNIT_ANN(UNIT, 5, "Annotation '%%' has invalid arguments."),
+  /** UNIT0006. */
+  UNIT_EMPTY(UNIT, 6, "Test function '%' returns items."),
 
   // EXPath modules
 
@@ -308,31 +321,27 @@ public enum Err {
   CX_SIGTYPINV(CX, 28, "Signature type is not supported."),
 
   /** File error. */
-  FILE_NF(FILE, "not-found", "File '%' does not exist."),
+  FILE_NOT_FOUND(FILE, "not-found", "File '%' does not exist."),
   /** File error. */
-  FILE_E(FILE, "exists", "File '%' already exists."),
+  FILE_EXISTS(FILE, "exists", "File '%' already exists."),
   /** File error. */
-  FILE_ND(FILE, "no-dir", "Path '%' is no directory."),
+  FILE_NO_DIR(FILE, "no-dir", "Path '%' is no directory."),
   /** File error. */
-  FILE_ID(FILE, "is-dir", "Path '%' is a directory."),
+  FILE_IS_DIR(FILE, "is-dir", "Path '%' is a directory."),
   /** File error. */
-  FILE_ID_FULL(FILE, "is-dir", "Path '%' is a non-empty directory."),
+  FILE_ID_DIR2(FILE, "is-dir", "Path '%' is a non-empty directory."),
   /** File error. */
-  FILE_UE(FILE, "unknown-encoding", "Unknown encoding '%'."),
+  FILE_UNKNOWN_ENCODING(FILE, "unknown-encoding", "Unknown encoding '%'."),
   /** File error. */
-  FILE_OOR(FILE, "out-of-range", "Requested file chunk [%,%] exceeds file bounds."),
+  FILE_OUT_OF_RANGE(FILE, "out-of-range", "Requested file chunk [%,%] exceeds file bounds."),
   /** File error. */
-  FILE_IE(FILE, "io-error", "%"),
+  FILE_INVALID_PATH(FILE, "invalid-path", "Invalid file path: '%'."),
   /** File error. */
-  FILE_IE_DIR(FILE, "io-error", "Directory '%' cannot be created."),
+  FILE_IO_ERROR(FILE, "io-error", "%"),
   /** File error. */
-  FILE_IE_DEL(FILE, "io-error", "Path '%' cannot be deleted."),
+  FILE_IO_ERROR_DEL(FILE, "io-error", "Path '%' cannot be deleted."),
   /** File error. */
-  FILE_IE_MOVE(FILE, "io-error", "Moving '%' to '%' failed."),
-  /** File error. */
-  FILE_IE_ACCESS(FILE, "io-error", "Files of '%' cannot be accessed."),
-  /** File error. */
-  FILE_IE_PATH(FILE, "io-error", "Invalid file path: '%'."),
+  FILE_IE_ERROR_ACCESS(FILE, "io-error", "Access to '%' is denied."),
 
   /** HASH0001. */
   HASH_ALG(HASH, 1, "Algorithm not supported: '%'."),
@@ -518,7 +527,7 @@ public enum Err {
   /** FORG0006. */
   INVALIDOPT(FORG, 6, "%"),
   /** FORG0006. */
-  INVALIDOPTX(FORG, 6, Text.UNKNOWN_OPTION_X),
+  INVALIDOPTX(FORG, 6, "Unknown option '%'."),
 
   /** FORG0008. */
   FUNZONE(FORG, 8, "% and % have different timezones."),
@@ -554,7 +563,9 @@ public enum Err {
   /** FOUP0002. */
   UPPUTERR(FOUP, 2, "\"%\" could not be written."),
   /** FOUP0002. */
-  UPDBDROP(FOUP, 2, "Database \"%\" could not be dropped."),
+  UPDROPBACK(FOUP, 2, "Backup \"%\" could not be %."),
+  /** FOUP0002. */
+  UPDBERROR(FOUP, 2, "Database \"%\" could not be %."),
   /** FOUP0002. */
   UPDBPUTERR(FOUP, 2, "Resource \"%\" could not be written."),
   /** FOUP0002. */
@@ -769,6 +780,8 @@ public enum Err {
   EXPREMPTY(XPST, 3, "Unknown function or expression."),
   /** XPST0003. */
   NOTYPE(XPST, 3, "Unknown type '%'."),
+  /** XPST0003. */
+  BINDNAME(XPST, 3, "Invalid variable name '%'."),
   /** XPST0003. */
   PIXML(XPST, 3, "Processing instruction has illegal name: '%'."),
   /** XPST0003. */
@@ -1096,8 +1109,11 @@ public enum Err {
   /** XUDY0031. */
   UPURIDUP(XUDY, 31, "URI '%' is addressed multiple times."),
 
-  /** BASX0007. */
-  UPFUNCITEM(XUST, 1, "Updating function items are not supported yet."),
+  /** XUDY0032 (WIP). */
+  UPFUNCNOTUP(XUDY, 32, "Function is not updating."),
+  /** XUDY0032 (WIP). */
+  UPFUNCUP(XUDY, 32, "Function is updating."),
+
   /** XUST0001. */
   UPNOT(XUST, 1, "%: no updating expression allowed."),
   /** XUST0001. */
@@ -1105,8 +1121,7 @@ public enum Err {
   /** XUST0001. */
   UPCTX(XUST, 1, "Context item may not declare an updating expression."),
   /** XUST0002. */
-  UPMODIFY(XUST, 2,
-      "Modify clause: all expressions must be updating or return an empty sequence."),
+  UPMODIFY(XUST, 2, "Modify clause: all expressions must be updating or return an empty sequence."),
   /** XUST0002. */
   UPEXPECTF(XUST, 2, "Function body must be an updating expression."),
   /** XUST0003. */
@@ -1114,7 +1129,7 @@ public enum Err {
   /** XUST0026. */
   NOREVAL(XUST, 26, "Revalidation mode not supported."),
   /** XUST0028. */
-  UPFUNCTYPE(XUST, 28, "No return type allowed in updating functions."),
+  UUPFUNCTYPE(XUST, 28, "No return type allowed in updating functions."),
 
   /** XUTY0004. */
   UPNOATTRPER(XUTY, 4, "Attribute must follow the root element."),
@@ -1125,8 +1140,7 @@ public enum Err {
   /** XUTY0007. */
   UPTRGDELEMPT(XUTY, 7, "Only nodes can be deleted."),
   /** XUTY0008. */
-  UPTRGMULT(XUTY, 8,
-      "Single element, text, attribute, comment or pi expected as replace target."),
+  UPTRGMULT(XUTY, 8, "Single element, text, attribute, comment or pi expected as replace target."),
   /** XUTY0010. */
   UPWRELM(XUTY, 10, "Replacing nodes must be no attribute nodes."),
   /** XUTY0011. */
@@ -1136,7 +1150,7 @@ public enum Err {
   /** XUTY0013. */
   UPCOPYMULT(XUTY, 13, "Value assigned to $% must be a single node."),
   /** XUTY0013. */
-  UPSOURCE(XUTY, 13, "Source of copy expression must be a single node."),
+  UPSOURCE(XUTY, 13, "Source of transform expression must be a single node."),
   /** XUTY0022. */
   UPATTELM2(XUTY, 22, "Insert target must be an element.");
 
@@ -1146,9 +1160,9 @@ public enum Err {
   /** Error code. */
   public final String code;
   /** Error URI. */
-  public final byte[] uri;
+  private final byte[] uri;
   /** Error prefix. */
-  public final String prefix;
+  private final String prefix;
   /** Error description. */
   public final String desc;
 
@@ -1159,7 +1173,7 @@ public enum Err {
    * @param dsc description
    */
   Err(final ErrType type, final String msg, final String dsc) {
-    code = new StringBuilder().append(msg).toString();
+    code = msg;
     uri = type.uri;
     prefix = type.prefix;
     desc = dsc;
@@ -1199,6 +1213,15 @@ public enum Err {
    */
   public QueryIOException getIO(final Object... ext) {
     return new QueryIOException(get(null, ext));
+  }
+
+  /**
+   * Checks if the error code equals the specified QName.
+   * @param name name to compare
+   * @return result of check
+   */
+  public final boolean eq(final QNm name) {
+    return Token.eq(name.uri(), uri) && Token.eq(name.local(), Token.token(code));
   }
 
   /**
@@ -1298,7 +1321,7 @@ public enum Err {
    * @return function
    */
   public final QNm qname() {
-    return new QNm(new StringBuilder().append(prefix).append(':').append(code).toString(), uri);
+    return new QNm(prefix + ':' + code, uri);
   }
 
   /**

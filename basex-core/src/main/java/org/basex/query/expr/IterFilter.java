@@ -23,7 +23,7 @@ final class IterFilter extends Filter {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) {
+  public Iter iter(final QueryContext qc) {
     return new Iter() {
       /** Iterator. */
       Iter iter;
@@ -31,11 +31,11 @@ final class IterFilter extends Filter {
       @Override
       public Item next() throws QueryException {
         // first call - initialize iterator
-        if(iter == null) iter = ctx.iter(root);
+        if(iter == null) iter = qc.iter(root);
         // filter sequence
         for(Item it; (it = iter.next()) != null;) {
-          ctx.checkStop();
-          if(preds(it, ctx)) return it;
+          qc.checkStop();
+          if(preds(it, qc)) return it;
         }
         return null;
       }
@@ -43,18 +43,16 @@ final class IterFilter extends Filter {
   }
 
   @Override
-  public Filter copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
-    final Filter f = new CachedFilter(info, root == null ? null : root.copy(ctx, scp, vs),
-        Arr.copyAll(ctx, scp, vs, preds));
+  public Filter copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    final Filter f = new CachedFilter(info, root == null ? null : root.copy(qc, scp, vs),
+        Arr.copyAll(qc, scp, vs, preds));
     return copy(new IterFilter(f));
   }
 
   @Override
-  public Filter addPred(final QueryContext ctx, final VarScope scp, final Expr p)
+  public Filter addPred(final QueryContext qc, final VarScope scp, final Expr p)
       throws QueryException {
     // [LW] should be fixed
-    return ((Filter) new CachedFilter(info, root, preds).copy(ctx, scp)
-        ).addPred(ctx, scp, p);
+    return ((Filter) new CachedFilter(info, root, preds).copy(qc, scp)).addPred(qc, scp, p);
   }
 }

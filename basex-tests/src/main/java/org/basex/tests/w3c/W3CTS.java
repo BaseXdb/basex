@@ -7,16 +7,14 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
+import org.basex.build.*;
 import org.basex.core.*;
-import org.basex.core.Context;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -31,7 +29,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class W3CTS {
+public abstract class W3CTS extends Main {
   // Try "ulimit -n 65536" if Linux tells you "Too many open files."
 
   /** Inspect flag. */
@@ -87,11 +85,11 @@ public abstract class W3CTS {
   private String group;
 
   /** Cached source files. */
-  private final HashMap<String, String> srcs = new HashMap<String, String>();
+  private final HashMap<String, String> srcs = new HashMap<>();
   /** Cached module files. */
-  private final HashMap<String, String> mods = new HashMap<String, String>();
+  private final HashMap<String, String> mods = new HashMap<>();
   /** Cached collections. */
-  private final HashMap<String, String[]> colls = new HashMap<String, String[]>();
+  private final HashMap<String, String[]> colls = new HashMap<>();
 
   /** OK log. */
   private final StringBuilder logOK = new StringBuilder();
@@ -115,9 +113,11 @@ public abstract class W3CTS {
 
   /**
    * Constructor.
+   * @param args command-line arguments
    * @param nm name of test
    */
-  protected W3CTS(final String nm) {
+  protected W3CTS(final String[] args, final String nm) {
+    super(args);
     input = nm + "Catalog" + IO.XMLSUFFIX;
     testid = nm.substring(0, 4);
     pathlog = testid.toLowerCase(Locale.ENGLISH) + ".log";
@@ -126,13 +126,12 @@ public abstract class W3CTS {
 
   /**
    * Runs the test suite.
-   * @param args command-line arguments
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  void run(final String[] args) throws QueryException, IOException {
+  void run() throws QueryException, IOException {
     try {
-      parseArguments(args);
+      parseArgs();
     } catch(final IOException ex) {
       Util.errln(ex);
       System.exit(1);
@@ -149,8 +148,7 @@ public abstract class W3CTS {
     final Performance perf = new Performance();
     context.options.set(MainOptions.CHOP, false);
 
-    //new Check(path + input).execute(context);
-    data = CreateDB.mainMem(new IOFile(path + input), context);
+    data = MemBuilder.build(new IOFile(path + input), context);
 
     final Nodes root = new Nodes(0, data);
     Util.outln(NL + Util.className(this) + " Test Suite " +
@@ -206,30 +204,30 @@ public abstract class W3CTS {
 
     final String time = perf.getTime();
     Util.outln("Writing log file..." + NL);
-    PrintOutput po = new PrintOutput(path + pathlog);
-    po.println("TEST RESULTS ________________________________________________");
-    po.println(NL + "Total #Queries: " + total);
-    po.println("Correct / Empty Results: " + ok + " / " + ok2);
-    po.print("Conformance (w/Empty Results): ");
-    po.println(pc(ok, total) + " / " + pc(ok + ok2, total));
-    po.println("Wrong Results / Errors: " + err + " / " + err2 + NL);
-    po.println("WRONG _______________________________________________________");
-    po.print(NL + logErr);
-    po.println("WRONG (ERRORS) ______________________________________________");
-    po.print(NL + logErr2);
-    po.println("CORRECT? (EMPTY) ____________________________________________");
-    po.print(NL + logOK2);
-    po.println("CORRECT _____________________________________________________");
-    po.print(NL + logOK);
-    po.println("_____________________________________________________________");
-    po.close();
+    try(final PrintOutput po = new PrintOutput(path + pathlog)) {
+      po.println("TEST RESULTS ________________________________________________");
+      po.println(NL + "Total #Queries: " + total);
+      po.println("Correct / Empty Results: " + ok + " / " + ok2);
+      po.print("Conformance (w/Empty Results): ");
+      po.println(pc(ok, total) + " / " + pc(ok + ok2, total));
+      po.println("Wrong Results / Errors: " + err + " / " + err2 + NL);
+      po.println("WRONG _______________________________________________________");
+      po.print(NL + logErr);
+      po.println("WRONG (ERRORS) ______________________________________________");
+      po.print(NL + logErr2);
+      po.println("CORRECT? (EMPTY) ____________________________________________");
+      po.print(NL + logOK2);
+      po.println("CORRECT _____________________________________________________");
+      po.print(NL + logOK);
+      po.println("_____________________________________________________________");
+    }
 
     if(reporting) {
-      po = new PrintOutput(report + Prop.NAME + IO.XMLSUFFIX);
-      print(po, report + Prop.NAME + "Pre" + IO.XMLSUFFIX);
-      po.print(logReport.toString());
-      print(po, report + Prop.NAME + "Pos" + IO.XMLSUFFIX);
-      po.close();
+      try(final PrintOutput po = new PrintOutput(report + Prop.NAME + IO.XMLSUFFIX)) {
+        print(po, report + Prop.NAME + "Pre" + IO.XMLSUFFIX);
+        po.print(logReport.toString());
+        print(po, report + Prop.NAME + "Pos" + IO.XMLSUFFIX);
+      }
     }
 
     Util.outln("Total #Queries: " + total);
@@ -285,7 +283,7 @@ public abstract class W3CTS {
       Nodes curr = null;
       if(cont.size() != 0) {
         final String p = srcs.get(string(data.atom(cont.pres[0])));
-        final Data d = CreateDB.mainMem(IO.get(p), context);
+        final Data d = MemBuilder.build(IO.get(p), context);
         curr = new Nodes(d.resources.docs().toArray(), d);
         curr.root = true;
       }
@@ -514,7 +512,7 @@ public abstract class W3CTS {
   private ValueIter toIter(final String xml, final boolean frag) {
     try {
       final String str = frag ? "<X>" + xml + "</X>" : xml;
-      final Data d = CreateDB.mainMem(IO.get(str), context);
+      final Data d = MemBuilder.build(IO.get(str), context);
       final IntList il = new IntList();
       for(int p = frag ? 2 : 0; p < d.meta.size; p += d.size(p, d.kind(p))) {
         il.add(p);
@@ -554,26 +552,19 @@ public abstract class W3CTS {
       if(!tb.isEmpty()) tb.add(", ");
       tb.add(nm);
 
-      Expr expr = null;
-      if(src == null) {
-        // assign collection
-        expr = coll(nm, qp);
-      } else {
-        // assign document
-        final String dbname = new IOFile(src).dbname();
-        Function def = Function.DOC;
-        // updates: drop updated document or open updated database
-        if(updating()) {
-          if(first) {
-            new DropDB(dbname).execute(context);
-          } else {
-            def = Function._DB_OPEN;
-            src = dbname;
-          }
+      // assign document
+      final String dbname = new IOFile(src).dbname();
+      // updates: drop updated document or open updated database
+      if(updating()) {
+        if(first) {
+          new DropDB(dbname).execute(context);
+        } else {
+          src = dbname;
         }
-        expr = def.get(qp.sc, Str.get(src));
       }
-      if(var != null) qp.bind(string(data.atom(var.pres[c])), expr);
+
+      final Value value = qp.qc.resources.doc(new QueryInput(src), qp.sc.baseIO(), null);
+      qp.bind(string(data.atom(var.pres[c])), value);
     }
     return tb.finish();
   }
@@ -604,7 +595,7 @@ public abstract class W3CTS {
    * @throws QueryException query exception
    */
   private Uri coll(final byte[] name, final QueryProcessor qp) throws QueryException {
-    qp.ctx.resource.addCollection(string(name), colls.get(string(name)), qp.sc.baseIO());
+    qp.qc.resources.addCollection(string(name), colls.get(string(name)), qp.sc.baseIO());
     return Uri.uri(name);
   }
 
@@ -623,8 +614,7 @@ public abstract class W3CTS {
       final String file = pth + string(data.atom(nod.pres[c])) + IO.XQSUFFIX;
       final String in = read(new IOFile(queries + file));
       final QueryProcessor xq = new QueryProcessor(in, context);
-      final Value val = xq.value();
-      qp.bind(string(data.atom(var.pres[c])), val);
+      qp.bind(string(data.atom(var.pres[c])), xq.value());
       xq.close();
     }
   }
@@ -641,10 +631,10 @@ public abstract class W3CTS {
     if(reporting) {
       final File file = new File(results + pth);
       if(!file.exists()) file.mkdirs();
-      final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-          new FileOutputStream(results + pth + nm), UTF8));
-      bw.write(msg);
-      bw.close();
+      try(final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
+          new FileOutputStream(results + pth + nm), UTF8))) {
+        bw.write(msg);
+      }
     }
   }
 
@@ -695,9 +685,9 @@ public abstract class W3CTS {
    * @throws IOException I/O exception
    */
   private static void print(final PrintOutput po, final String f) throws IOException {
-    final BufferedReader br = new BufferedReader(new FileReader(f));
-    for(String line; (line = br.readLine()) != null;) po.println(line);
-    br.close();
+    try(final BufferedReader br = new BufferedReader(new FileReader(f))) {
+      for(String line; (line = br.readLine()) != null;) po.println(line);
+    }
   }
 
   /**
@@ -750,25 +740,9 @@ public abstract class W3CTS {
     return false;
   }
 
-  /**
-   * Parses the command-line arguments, specified by the user.
-   * @param args command-line arguments
-   * @throws IOException I/O exception
-   */
-  protected final void parseArguments(final String[] args) throws IOException {
-    final Args arg = new Args(args, this,
-        " [options] [pat]" + NL +
-        " [pat] perform tests starting with a pattern" + NL +
-        " -c     print compilation steps" + NL +
-        " -C     run tests depending on current time" + NL +
-        " -g     <test-group> test group to test" + NL +
-        " -h     show this help" + NL +
-        " -m     minimum conformance" + NL +
-        " -p     change path" + NL +
-        " -r     create report" + NL +
-        " -t[ms] list slowest queries" + NL +
-        " -v     verbose output", Util.info(S_CONSOLE, Util.className(this)));
-
+  @Override
+  protected final void parseArgs() throws IOException {
+    final MainParser arg = new MainParser(this);
     while(arg.more()) {
       if(arg.dash()) {
         final char c = arg.next();
@@ -805,5 +779,25 @@ public abstract class W3CTS {
    */
   private IOFile sandbox() {
     return new IOFile(Prop.TMP, testid);
+  }
+
+  @Override
+  public String header() {
+    return Util.info(S_CONSOLE, Util.className(this));
+  }
+
+  @Override
+  public String usage() {
+    return " [options] [pat]" + NL +
+        " [pat] perform tests starting with a pattern" + NL +
+        " -c     print compilation steps" + NL +
+        " -C     run tests depending on current time" + NL +
+        " -g     <test-group> test group to test" + NL +
+        " -h     show this help" + NL +
+        " -m     minimum conformance" + NL +
+        " -p     change path" + NL +
+        " -r     create report" + NL +
+        " -t[ms] list slowest queries" + NL +
+        " -v     verbose output";
   }
 }

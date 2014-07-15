@@ -1,6 +1,6 @@
 package org.basex.api.xmldb;
 
-import static org.basex.core.Text.*;
+import org.basex.util.*;
 
 /**
  * This class organizes textual information for the XMLDB API.
@@ -10,7 +10,7 @@ import static org.basex.core.Text.*;
  */
 interface BXXMLDBText {
   /** DB URI. */
-  String DBURI = PROJECT_NAME + "://";
+  String DBURI = Prop.PROJECT_NAME + "://";
   /** XMLDB Prefix. */
   String XMLDB = "xmldb";
   /** XMLDB with colon. */

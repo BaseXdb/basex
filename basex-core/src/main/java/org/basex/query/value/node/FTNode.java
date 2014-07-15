@@ -20,30 +20,30 @@ public final class FTNode extends DBNode {
 
   /**
    * Constructor, called by the sequential variant.
-   * @param a matches
-   * @param s scoring
+   * @param all matches
+   * @param score scoring
    */
-  public FTNode(final FTMatches a, final double s) {
-    this(a, null, 0, 0, 0, s);
+  public FTNode(final FTMatches all, final double score) {
+    this(all, null, 0, 0, 0, score);
   }
 
   /**
    * Constructor, called by the index variant.
-   * @param a full-text matches
+   * @param all full-text matches
    * @param d data reference
    * @param p pre value
-   * @param l token length
-   * @param tis number of indexed results
-   * @param s score value out of the index
+   * @param tl token length
+   * @param is number of indexed results
+   * @param score score value out of the index
    */
-  public FTNode(final FTMatches a, final Data d, final int p, final int l, final int tis,
-      final double s) {
+  public FTNode(final FTMatches all, final Data d, final int p, final int tl, final int is,
+      final double score) {
 
     super(d, p, null, NodeType.TXT);
-    all = a;
-    tl = l;
-    is = tis;
-    if(s != -1) score = s;
+    this.all = all;
+    this.tl = tl;
+    this.is = is;
+    if(score != -1) this.score = score;
   }
 
   @Override

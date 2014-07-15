@@ -23,73 +23,73 @@ public abstract class Logical extends Arr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression list
+   * @param info input info
+   * @param exprs expressions
    */
-  Logical(final InputInfo ii, final Expr[] e) {
-    super(ii, e);
+  Logical(final InputInfo info, final Expr[] exprs) {
+    super(info, exprs);
     type = SeqType.BLN;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
     final boolean and = this instanceof And;
-    final int es = expr.length;
+    final int es = exprs.length;
     final ExprList el = new ExprList(es);
-    for(final Expr e : expr) {
-      final Expr ex = e.compEbv(ctx);
+    for(final Expr e : exprs) {
+      final Expr ex = e.compEbv(qc);
       if(ex.isValue()) {
         // atomic items can be pre-evaluated
-        ctx.compInfo(OPTREMOVE, this, e);
-        if(ex.ebv(ctx, info).bool(info) ^ and) return Bln.get(!and);
+        qc.compInfo(OPTREMOVE, this, e);
+        if(ex.ebv(qc, info).bool(info) ^ and) return Bln.get(!and);
       } else {
         el.add(ex);
       }
     }
     if(el.isEmpty()) return Bln.get(and);
-    expr = el.finish();
+    exprs = el.finish();
     return this;
   }
 
   @Override
-  public final void markTailCalls(final QueryContext ctx) {
+  public final void markTailCalls(final QueryContext qc) {
     // if the last expression surely returns a boolean, we can jump to it
-    final Expr last = expr[expr.length - 1];
+    final Expr last = exprs[exprs.length - 1];
     if(last.type().eq(SeqType.BLN)) {
       tailCall = true;
-      last.markTailCalls(ctx);
+      last.markTailCalls(qc);
     }
   }
 
   @Override
   public void plan(final FElem plan) {
     final FElem el = planElem();
-    if(tailCall) el.add(planAttr(TCL, tailCall));
+    if(tailCall) el.add(planAttr(TCL, true));
     plan.add(el);
-    for(final ExprInfo e : expr) {
+    for(final ExprInfo e : exprs) {
       if(e != null) e.plan(el);
     }
   }
 
   /**
    * Flattens nested logical expressions.
-   * @param ctx query context
+   * @param qc query context
    */
-  final void compFlatten(final QueryContext ctx) {
+  final void compFlatten(final QueryContext qc) {
     // flatten nested expressions
-    final int es = expr.length;
+    final int es = exprs.length;
     final ExprList tmp = new ExprList(es);
     final boolean and = this instanceof And;
     final boolean or = this instanceof Or;
-    for(final Expr ex : expr) {
+    for(final Expr ex : exprs) {
       if(and && ex instanceof And || or && ex instanceof Or) {
-        for(final Expr e : ((Arr) ex).expr) tmp.add(e);
-        ctx.compInfo(OPTFLAT, ex);
+        for(final Expr e : ((Arr) ex).exprs) tmp.add(e);
+        qc.compInfo(OPTFLAT, ex);
       } else {
         tmp.add(ex);
       }
     }
-    if(es != tmp.size()) expr = tmp.finish();
+    if(es != tmp.size()) exprs = tmp.finish();
   }
 }

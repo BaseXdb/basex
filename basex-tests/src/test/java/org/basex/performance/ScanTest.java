@@ -3,13 +3,14 @@ package org.basex.performance;
 import java.io.*;
 import java.util.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
-import org.basex.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class benchmarks simple table scans.
@@ -36,12 +37,11 @@ public final class ScanTest extends SandboxTest {
      * </XML>
      */
     final IOFile dbfile = new IOFile(sandbox(), NAME);
-    final BufferOutput bo = new BufferOutput(dbfile.path());
-    final int max = 16;
-    final byte[] cache = new byte[max];
-    // use constant seed to create same test document every time
-    final Random rnd = new Random(0);
-    try {
+    try(final BufferOutput bo = new BufferOutput(dbfile.path())) {
+      final int max = 16;
+      final byte[] cache = new byte[max];
+      // use constant seed to create same test document every time
+      final Random rnd = new Random(0);
       bo.write(Token.token("<XML>"));
       final byte[] start = Token.token("<SUB>");
       final byte[] end = Token.token("</SUB>");
@@ -53,8 +53,6 @@ public final class ScanTest extends SandboxTest {
         bo.write(end);
       }
       bo.write(Token.token("</XML>"));
-    } finally {
-      bo.close();
     }
 
     // create database

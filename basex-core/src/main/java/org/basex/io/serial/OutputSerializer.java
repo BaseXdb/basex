@@ -51,7 +51,7 @@ public abstract class OutputSerializer extends Serializer {
   /** New line. */
   protected final byte[] nl;
   /** Output stream. */
-  protected final PrintOutput out;
+  final PrintOutput out;
 
   /** Item flag (used for formatting). */
   private boolean item;
@@ -149,7 +149,8 @@ public abstract class OutputSerializer extends Serializer {
 
     // print byte-order-mark
     out = PrintOutput.get(os);
-    out.setLimit(opts.get(LIMIT));
+    final int l = opts.get(LIMIT);
+    if(l != -1) out.setLimit(l);
 
     if(bom) {
       // comparison by reference
@@ -331,20 +332,22 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   @Override
-  protected void atomic(final Item it) throws IOException {
+  protected void atomic(final Item it, final boolean iter) throws IOException {
     if(sep && item) print(' ');
 
     try {
       if(it instanceof StrStream) {
-        final InputStream ni = ((StrStream) it).input(null);
-        try {
-          for(int i; (i = ni.read()) != -1;) encode(i);
-        } finally {
-          ni.close();
+        try(final InputStream ni = ((StrStream) it).input(null)) {
+          for(int cp; (cp = ni.read()) != -1;) {
+            if(iter) print(cp); else encode(cp);
+          }
         }
       } else {
         final byte[] atom = it.string(null);
-        for(int a = 0; a < atom.length; a += cl(atom, a)) encode(cp(atom, a));
+        for(int a = 0; a < atom.length; a += cl(atom, a)) {
+          final int cp = cp(atom, a);
+          if(iter) print(cp); else encode(cp);
+        }
       }
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);

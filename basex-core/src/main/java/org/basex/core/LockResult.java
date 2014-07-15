@@ -22,12 +22,8 @@ public class LockResult {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("LockResult: ");
-    sb.append("Read ");
-    if(read == null) sb.append(" all? ").append(readAll);
-    else sb.append(read);
-    sb.append(", Write ");
-    if(write == null) sb.append("all? ").append(writeAll);
-    else sb.append(write);
+    sb.append("Read ").append(read);
+    sb.append(", Write ").append(write);
     return sb.toString();
   }
 }

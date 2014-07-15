@@ -149,6 +149,14 @@ public class StringList extends ElementList implements Iterable<String> {
   }
 
   /**
+   * Sorts the elements in ascending order, using the standard options.
+   * @return self reference
+   */
+  public final StringList sort() {
+    return sort(true);
+  }
+
+  /**
    * Sorts the elements in ascending order.
    * @param cs respect case sensitivity
    * @return self reference
@@ -181,8 +189,7 @@ public class StringList extends ElementList implements Iterable<String> {
   }
 
   /**
-   * Removes duplicates from the list.
-   * The list must be sorted.
+   * Removes duplicates, provided that the entries are sorted.
    * @return self reference
    */
   public StringList unique() {
@@ -198,7 +205,7 @@ public class StringList extends ElementList implements Iterable<String> {
 
   @Override
   public final Iterator<String> iterator() {
-    return new ArrayIterator<String>(list, size);
+    return new ArrayIterator<>(list, size);
   }
 
   @Override

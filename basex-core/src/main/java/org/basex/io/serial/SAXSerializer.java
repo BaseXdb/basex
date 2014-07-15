@@ -239,7 +239,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  protected void atomic(final Item i) {
+  protected void atomic(final Item i, final boolean iter) {
     // ignored
   }
 

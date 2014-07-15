@@ -7,7 +7,7 @@ import org.basex.index.*;
 import org.basex.*;
 import org.basex.query.func.*;
 import org.basex.util.list.*;
-import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests commands and XQueries for correct identification of databases
@@ -302,7 +302,7 @@ public class CommandLockingTest extends SandboxTest {
    * @param up Updating command?
    * @param dbs Required and allowed databases
    */
-  private void ckDBs(final Command cmd, final boolean up, final StringList dbs) {
+  private static void ckDBs(final Command cmd, final boolean up, final StringList dbs) {
     ckDBs(cmd, up, dbs, dbs);
   }
 

@@ -23,19 +23,13 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class XMLParser extends CmdParser {
-  /** Context. */
-  private final String input;
-  /** Context. */
-  private final Context ctx;
-
   /**
    * Constructor.
-   * @param in input
-   * @param c context
+   * @param input input
+   * @param context context
    */
-  XMLParser(final String in, final Context c) {
-    input = in;
-    ctx = c;
+  XMLParser(final String input, final Context context) {
+    super(input, context);
   }
 
   @Override
@@ -166,6 +160,8 @@ final class XMLParser extends CmdParser {
       return new ShowUsers(value(root, DATABASE));
     if(e.equals(STORE) && check(root, PATH + '?', '<' + INPUT))
       return new Store(value(root, PATH), xml(root));
+    if(e.equals(TEST) && check(root, PATH))
+      return new Test(value(root, PATH));
     if(e.equals(XQUERY) && check(root, '#' + QUERY))
       return new XQuery(value(root));
     throw error(Text.UNKNOWN_CMD_X, '<' + e + "/>");
@@ -289,7 +285,7 @@ final class XMLParser extends CmdParser {
 
     // run query
     final QueryProcessor qp = new QueryProcessor(tb.toString(), ctx).context(root);
-    qp.bind("A", ma).bind("O", oa);
+    qp.bind("A", ma.value()).bind("O", oa.value());
     if(!qp.execute().toString().isEmpty()) return true;
 
     // build error string

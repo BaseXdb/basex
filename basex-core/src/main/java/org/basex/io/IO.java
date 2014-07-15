@@ -41,6 +41,8 @@ public abstract class IO {
   /** JAR file suffix. */
   public static final String JARSUFFIX = ".jar";
   /** TGZIP file suffix. */
+  public static final String TARGZSUFFIX = ".tar.gz";
+  /** TGZIP file suffix. */
   public static final String TGZSUFFIX = ".tgz";
   /** GZIP file suffix. */
   public static final String GZSUFFIX = ".gz";
@@ -90,11 +92,11 @@ public abstract class IO {
   public static final long OFFCOMP = 0x4000000000L;
 
   /** File path. The path uses forward slashes, no matter which OS is used. */
-  String path;
+  protected String path;
+  /** File length. */
+  protected long len = -1;
   /** File name. */
   private String name;
-  /** File length. */
-  long len = -1;
 
   /**
    * Protected constructor.
@@ -108,7 +110,7 @@ public abstract class IO {
    * Sets the file path and name.
    * @param p file path
    */
-  final void init(final String p) {
+  private void init(final String p) {
     path = p;
     final String n = p.substring(p.lastIndexOf('/') + 1);
     // use current time if no name is given
@@ -137,7 +139,7 @@ public abstract class IO {
     if(source == null) return new IOContent("");
     final String s = source.trim();
     return s.indexOf('<') == 0 ? new IOContent(s) :
-           IOUrl.isFileURL(s)  ? IOFile.get(s) :
+           IOUrl.isFileURL(s)  ? new IOFile(IOUrl.toFile(s)) :
            IOFile.isValid(s)   ? new IOFile(s) :
            IOUrl.isValid(s)    ? new IOUrl(s) :
            new IOContent(s);
@@ -309,7 +311,7 @@ public abstract class IO {
    * Returns the directory path.
    * @return chopped filename
    */
-  public String dirPath() {
+  public String dir() {
     return "";
   }
 

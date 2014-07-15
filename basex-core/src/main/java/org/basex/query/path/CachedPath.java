@@ -23,35 +23,24 @@ final class CachedPath extends AxisPath {
   private boolean cache;
   /** Cached result. */
   private NodeSeqBuilder citer;
-  /** Last visited item. */
-  private Value lvalue;
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param r root expression; can be a {@code null} reference
-   * @param s axis steps
+   * @param info input info
+   * @param root root expression; can be a {@code null} reference
+   * @param steps axis steps
    */
-  CachedPath(final InputInfo ii, final Expr r, final Expr... s) {
-    super(ii, r, s);
-  }
-
-  @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
-    final Expr e = super.optimize(ctx, scp);
-    if(e != this) return e;
-
-    // analyze if result set can be cached - no predicates/variables...
+  CachedPath(final InputInfo info, final Expr root, final Expr... steps) {
+    super(info, root, steps);
+    // analyze if result set can be cached: no root node, no variables...
     cache = root != null && !hasFreeVars();
-    return this;
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    final Value cv = ctx.value;
-    final long cs = ctx.size;
-    final long cp = ctx.pos;
-    final Value r = root != null ? ctx.value(root) : cv;
+  public Iter iter(final QueryContext qc) throws QueryException {
+    final Value cv = qc.value;
+    final long cp = qc.pos, cs = qc.size;
+    final Value r = root != null ? qc.value(root) : cv;
 
     try {
       /* cache values if:
@@ -61,23 +50,23 @@ final class CachedPath extends AxisPath {
        */
       citer = new NodeSeqBuilder().check();
       if(r != null) {
-        final Iter ir = ctx.iter(r);
+        final Iter ir = qc.iter(r);
         for(Item it; (it = ir.next()) != null;) {
           // ensure that root only returns nodes
           if(root != null && !(it instanceof ANode)) throw PATHNODE.get(info, it.type);
-          ctx.value = it;
-          iter(0, citer, ctx);
+          qc.value = it;
+          iter(0, citer, qc);
         }
       } else {
-        ctx.value = null;
-        iter(0, citer, ctx);
+        qc.value = null;
+        iter(0, citer, qc);
       }
       citer.sort();
       return citer;
     } finally {
-      ctx.value = cv;
-      ctx.size = cs;
-      ctx.pos = cp;
+      qc.value = cv;
+      qc.size = cs;
+      qc.pos = cp;
     }
   }
 
@@ -85,36 +74,34 @@ final class CachedPath extends AxisPath {
    * Recursive step iterator.
    * @param l current step
    * @param nc node cache
-   * @param ctx query context
+   * @param qc query context
    * @throws QueryException query exception
    */
-  private void iter(final int l, final NodeSeqBuilder nc, final QueryContext ctx)
+  private void iter(final int l, final NodeSeqBuilder nc, final QueryContext qc)
       throws QueryException {
 
-    // cast is safe (steps will always return a {@link NodeIter} instance
-    final NodeIter ni = (NodeIter) ctx.iter(steps[l]);
+    // cast is safe (steps will always return a {@link NodeIter} instance)
+    final NodeIter ni = (NodeIter) qc.iter(steps[l]);
     final boolean more = l + 1 != steps.length;
     for(ANode node; (node = ni.next()) != null;) {
       if(more) {
-        ctx.value = node;
-        iter(l + 1, nc, ctx);
+        qc.value = node;
+        iter(l + 1, nc, qc);
       } else {
-        ctx.checkStop();
+        qc.checkStop();
         nc.add(node);
       }
     }
   }
 
   @Override
-  public AxisPath copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
-    final Expr[] stps = new Expr[steps.length];
-    for(int s = 0; s < steps.length; ++s) stps[s] = step(s).copy(ctx, scp, vs);
-    final CachedPath ap = copyType(
-        new CachedPath(info, root == null ? null : root.copy(ctx, scp, vs), stps));
+  public AxisPath copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    final int sl = steps.length;
+    final Step[] stps = new Step[sl];
+    for(int s = 0; s < sl; ++s) stps[s] = step(s).copy(qc, scp, vs);
+    final Expr rt = root == null ? null : root.copy(qc, scp, vs);
+    final CachedPath ap = copyType(new CachedPath(info, rt, stps));
     ap.cache = cache;
-    if(citer != null) ap.citer = citer.copy();
-    if(lvalue != null) ap.lvalue = lvalue;
     return ap;
   }
 }

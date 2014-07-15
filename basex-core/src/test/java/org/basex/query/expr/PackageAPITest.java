@@ -3,8 +3,6 @@ package org.basex.query.expr;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
-import java.io.*;
-
 import org.basex.core.*;
 import org.basex.core.Context;
 import org.basex.core.cmd.*;
@@ -15,6 +13,7 @@ import org.basex.query.util.pkg.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests the EXPath package API.
@@ -411,8 +410,8 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * @return result of check
    */
   private static boolean file(final String path) {
-    final File file = new File(REPO + path);
-    return file.exists() && !file.isDirectory();
+    final IOFile file = new IOFile(REPO, path);
+    return file.exists() && !file.isDir();
   }
 
   /**
@@ -421,7 +420,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * @return result of check
    */
   private static boolean dir(final String path) {
-    return new File(REPO + path).isDirectory();
+    return new IOFile(REPO, path).isDir();
   }
 
   /**

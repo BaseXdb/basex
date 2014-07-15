@@ -122,11 +122,11 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       if(!elem.startsWith("@")) tl.add(Token.token(elem));
     }
 
-    final String[] keys = entries(data.paths.desc(tl, true, false));
-    final BaseXCombo cm = new BaseXCombo(gui, keys);
+    final String[] entries = entries(data.paths.desc(tl, true, false));
+    final BaseXCombo cm = new BaseXCombo(gui, entries);
     cm.addActionListener(this);
     cm.addKeyListener(main);
-    if(keys.length == 1) cm.setEnabled(false);
+    if(entries.length == 1) cm.setEnabled(false);
     panel.add(cm);
     panel.add(new BaseXLabel(""));
   }
@@ -218,7 +218,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    * Runs a query.
    * @param force force the execution of a new query
    */
-  void query(final boolean force) {
+  private void query(final boolean force) {
     final TokenBuilder tb = new TokenBuilder();
     final Data data = gui.context.data();
 
@@ -292,15 +292,14 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
   }
 
   /**
-   * Returns the combo box selections
-   * and the keys of the specified set.
-   * @param keys keys
+   * Returns the combo box selections and the keys of the specified set.
+   * @param names keys
    * @return key array
    */
-  private static String[] entries(final TokenList keys) {
-    final StringList sl = new StringList();
-    sl.add(Util.info(ENTRIES, keys.size()));
-    for(final byte[] k : keys) sl.add(Token.string(k));
-    return sl.sort(true, true, 1).toArray();
+  private static String[] entries(final TokenList names) {
+    final StringList entries = new StringList();
+    entries.add(Util.info(ENTRIES, names.size()));
+    for(final byte[] k : names) entries.add(Token.string(k));
+    return entries.sort(true, true, 1).toArray();
   }
 }

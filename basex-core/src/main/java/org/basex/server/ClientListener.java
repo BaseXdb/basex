@@ -31,8 +31,7 @@ public final class ClientListener extends Thread {
   public long last;
 
   /** Active queries. */
-  private final HashMap<String, QueryListener> queries =
-    new HashMap<String, QueryListener>();
+  private final HashMap<String, ServerQuery> queries = new HashMap<>();
   /** Performance measurement. */
   private final Performance perf = new Performance();
   /** Database context. */
@@ -200,7 +199,7 @@ public final class ClientListener extends Thread {
       } else {
         if(!us.isEmpty()) log(ACCESS_DENIED, false);
         // delay users with wrong passwords
-        for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(1000);
+        for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(100);
         send(false);
       }
     } catch(final IOException ex) {
@@ -451,11 +450,11 @@ public final class ClientListener extends Thread {
 
     String err = null;
     try {
-      final QueryListener qp;
+      final ServerQuery qp;
       final StringBuilder info = new StringBuilder();
       if(sc == ServerCmd.QUERY) {
         final String query = arg;
-        qp = new QueryListener(query, context);
+        qp = new ServerQuery(query, context);
         arg = Integer.toString(id++);
         queries.put(arg, qp);
         // send {ID}0
@@ -528,7 +527,7 @@ public final class ClientListener extends Thread {
    * @param ok success flag
    * @throws IOException I/O exception
    */
-  void send(final boolean ok) throws IOException {
+  private void send(final boolean ok) throws IOException {
     out.write(ok ? 0 : 1);
     out.flush();
   }

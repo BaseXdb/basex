@@ -5,10 +5,11 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.basex.*;
+import org.basex.api.client.*;
 import org.basex.core.cmd.*;
-import org.basex.server.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests transaction and locking cases.
@@ -117,7 +118,7 @@ public final class PoolTest extends SandboxTest {
     try {
       session.execute(cmd);
       fail("Command was supposed to fail.");
-    } catch(final IOException ex) {
+    } catch(final IOException ignored) {
     }
   }
 }

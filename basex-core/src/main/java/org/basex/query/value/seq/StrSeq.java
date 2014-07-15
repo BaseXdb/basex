@@ -22,11 +22,11 @@ public final class StrSeq extends NativeSeq {
 
   /**
    * Constructor.
-   * @param vals values
+   * @param values values
    */
-  private StrSeq(final byte[][] vals) {
-    super(vals.length, AtomType.STR);
-    values = vals;
+  private StrSeq(final byte[][] values) {
+    super(values.length, AtomType.STR);
+    this.values = values;
   }
 
   @Override

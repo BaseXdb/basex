@@ -23,15 +23,15 @@ final class Leaf extends TrieNode {
 
   /**
    * Constructor.
-   * @param h hash code of the key
-   * @param k key
-   * @param v value
+   * @param hash hash code of the key
+   * @param key key
+   * @param value value
    */
-  Leaf(final int h, final Item k, final Value v) {
+  Leaf(final int hash, final Item key, final Value value) {
     super(1);
-    hash = h;
-    key = k;
-    value = v;
+    this.hash = hash;
+    this.key = key;
+    this.value = value;
     assert verify();
   }
 

@@ -29,30 +29,27 @@ public class DropBackup extends ABackup {
     final String name = args[0];
     if(!Databases.validName(name, true)) return error(NAME_INVALID_X, name);
 
-    // retrieve all databases
+    // loop through all databases and collect databases to be dropped
     final StringList dbs = context.databases.listDBs(name);
-    // loop through all databases and drop backups
-    for(final String db : dbs) drop(db.contains("-") ? db : db + '-', context);
+    // if the given argument is not a database name, it could be the name of a backup file
+    if(dbs.isEmpty()) dbs.add(name);
 
-    // if the given argument is not a database name, it could be the name
-    // of a backup file
-    if(dbs.isEmpty()) drop(name, context);
+    // drop all backups
+    for(final String db : dbs) {
+      for(final String backup : context.databases.backups(db)) drop(backup, context);
+    }
 
     return info(BACKUP_DROPPED_X, name + '*' + IO.ZIPSUFFIX);
   }
 
   /**
-   * Drops one or more backups of the specified database.
-   *
-   * @param db database
+   * Drops a backup with the specified name.
+   * @param name name of backup file
    * @param ctx database context
+   * @return success flag
    */
-  private static void drop(final String db, final Context ctx) {
-    final IOFile dir = ctx.globalopts.dbpath();
-    for(final IOFile f : dir.children()) {
-      final String n = f.name();
-      if(n.startsWith(db) && n.endsWith(IO.ZIPSUFFIX)) f.delete();
-    }
+  public static boolean drop(final String name, final Context ctx) {
+    return new IOFile(ctx.globalopts.dbpath(), name + IO.ZIPSUFFIX).delete();
   }
 
   @Override

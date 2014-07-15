@@ -24,29 +24,29 @@ import org.basex.util.hash.*;
 public final class Treat extends Single {
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
-   * @param s sequence type
+   * @param info input info
+   * @param expr expression
+   * @param type sequence type
    */
-  public Treat(final InputInfo ii, final Expr e, final SeqType s) {
-    super(ii, e);
-    type = s;
+  public Treat(final InputInfo info, final Expr expr, final SeqType type) {
+    super(info, expr);
+    this.type = type;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
-    return expr.isValue() ? optPre(value(ctx), ctx) : this;
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    return expr.isValue() ? optPre(value(qc), qc) : this;
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter iter = ctx.iter(expr);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    final Iter iter = qc.iter(expr);
     final Item it = iter.next();
     // input is empty
     if(it == null) {
@@ -77,8 +77,8 @@ public final class Treat extends Single {
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    final Value val = ctx.value(expr);
+  public Value value(final QueryContext qc) throws QueryException {
+    final Value val = qc.value(expr);
 
     final long len = val.size();
     // input is empty
@@ -105,8 +105,8 @@ public final class Treat extends Single {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Treat(info, expr.copy(ctx, scp, vs), type);
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new Treat(info, expr.copy(qc, scp, vs), type);
   }
 
   @Override

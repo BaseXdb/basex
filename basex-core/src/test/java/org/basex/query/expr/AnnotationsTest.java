@@ -38,11 +38,11 @@ public final class AnnotationsTest extends AdvancedQueryTest {
     error("declare %public %public variable $x := 1; $x", Err.DUPLVARVIS);
     error("declare %public %private variable $x := 1; $x", Err.DUPLVARVIS);
     error("declare %updating variable $x := 1; $x", Err.UPDATINGVAR);
-    error("declare %updating function local:x() { 1 }; local:x()", Err.UPEXPECTF);
     error("declare %updating updating function local:x() " +
         "{ insert node <a/> into <b/> }; local:x()", Err.DUPLUPD);
     error("declare updating %updating function local:x() " +
         "{ insert node <a/> into <b/> }; local:x()", Err.DUPLUPD);
+    error("declare %updating function local:x() { 1 }; local:x()", Err.UPEXPECTF);
   }
 
   /** Parsing errors and conflicts. */

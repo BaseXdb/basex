@@ -68,7 +68,8 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   }
 
   @Override
-  public BXFolder createCollection(final String folder) throws BadRequestException {
+  public BXFolder createCollection(final String folder) throws BadRequestException,
+    NotAuthorizedException {
     return new BXCode<BXFolder>(this) {
       @Override
       public BXFolder get() throws IOException {
@@ -78,28 +79,31 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   }
 
   @Override
-  public BXAbstractResource child(final String childName) {
+  public BXAbstractResource child(final String childName)
+      throws BadRequestException, NotAuthorizedException {
+
     return new BXCode<BXAbstractResource>(this) {
       @Override
       public BXAbstractResource get() throws IOException {
         return service.resource(meta.db, meta.path + SEP + childName);
       }
-    }.evalNoEx();
+    }.eval();
   }
 
   @Override
-  public List<BXAbstractResource> getChildren() {
+  public List<BXAbstractResource> getChildren() throws BadRequestException, NotAuthorizedException {
     return new BXCode<List<BXAbstractResource>>(this) {
       @Override
       public List<BXAbstractResource> get() throws IOException {
         return service.list(meta.db, meta.path);
       }
-    }.evalNoEx();
+    }.eval();
   }
 
   @Override
   public BXAbstractResource createNew(final String newName, final InputStream input,
-      final Long length, final String contentType) throws BadRequestException {
+      final Long length, final String contentType)
+      throws BadRequestException, NotAuthorizedException {
     return new BXCode<BXAbstractResource>(this) {
       @Override
       public BXAbstractResource get() throws IOException {
@@ -110,7 +114,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
 
   @Override
   public final LockToken createAndLock(final String name, final LockTimeout timeout,
-      final LockInfo lockInfo) throws NotAuthorizedException {
+      final LockInfo lockInfo) {
     try {
       final BXAbstractResource r = createNew(name, new ArrayInput(Token.EMPTY), 0L, null);
       final LockResult lockResult = r.lock(timeout, lockInfo);

@@ -43,16 +43,16 @@ public final class HTTPPayload {
 
   /**
    * Constructor.
-   * @param is input stream
+   * @param in input stream
    * @param body create body
-   * @param ii input info
-   * @param opts database options
+   * @param info input info
+   * @param options database options
    */
-  public HTTPPayload(final InputStream is, final boolean body, final InputInfo ii,
-      final MainOptions opts) {
-    in = is;
-    info = ii;
-    options = opts;
+  public HTTPPayload(final InputStream in, final boolean body, final InputInfo info,
+      final MainOptions options) {
+    this.in = in;
+    this.info = info;
+    this.options = options;
     payloads = body ? new ValueBuilder() : null;
   }
 
@@ -281,7 +281,7 @@ public final class HTTPPayload {
     // parse boundary, create helper arrays
     final byte[] bound = concat(DASHES, boundary(ext)), last = concat(bound, DASHES);
 
-    final HashMap<String, Value> map = new HashMap<String, Value>();
+    final HashMap<String, Value> map = new HashMap<>();
 
     final ByteList cont = new ByteList();
     int lines = -1;

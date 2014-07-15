@@ -40,7 +40,7 @@ final class RestXqRespBuilder {
       final HTTPContext http) throws Exception {
 
     // don't allow attributes
-    for(final ANode a : response.attributes()) func.error(UNEXP_NODE, a);
+    for(final ANode a : response.attributes()) throw func.error(UNEXP_NODE, a);
 
     // parse response and serialization parameters
     SerializerOptions sp = func.output;
@@ -54,7 +54,7 @@ final class RestXqRespBuilder {
           final QNm qnm = a.qname();
           if(qnm.eq(Q_STATUS)) sta = a.string();
           else if(qnm.eq(Q_REASON) || qnm.eq(Q_MESSAGE)) msg = a.string();
-          else func.error(UNEXP_NODE, a);
+          else throw func.error(UNEXP_NODE, a);
         }
         if(sta != null) {
           status = toInt(sta);
@@ -76,7 +76,7 @@ final class RestXqRespBuilder {
               }
             }
           } else {
-            func.error(UNEXP_NODE, c);
+            throw func.error(UNEXP_NODE, c);
           }
         }
       } else if(OUTPUT_SERIAL.eq(n)) {
@@ -84,7 +84,7 @@ final class RestXqRespBuilder {
         sp = FuncOptions.serializer(n, func.function.info);
         FuncOptions.serializer(n, func.output, func.function.info);
       } else {
-        func.error(UNEXP_NODE, n);
+        throw func.error(UNEXP_NODE, n);
       }
     }
 
@@ -95,12 +95,12 @@ final class RestXqRespBuilder {
     Item item = iter.next();
     if(item == null) {
       error = true;
-    } else if(func.methods.size() == 1 && func.methods.contains(HTTPMethod.HEAD)) {
-      func.error(HEAD_METHOD);
+    } else if(func.methods.size() == 1 && func.methods.contains(HTTPMethod.HEAD.name())) {
+      throw func.error(HEAD_METHOD);
     }
 
     // cache result
-    http.serialization = sp;
+    http.sopts(sp);
     http.initResponse();
     final Serializer ser = Serializer.get(cache, sp);
     for(; item != null; item = iter.next()) ser.serialize(item);

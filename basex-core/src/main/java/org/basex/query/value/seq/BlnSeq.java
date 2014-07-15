@@ -20,11 +20,11 @@ public final class BlnSeq extends NativeSeq {
 
   /**
    * Constructor.
-   * @param vals bytes
+   * @param values bytes
    */
-  private BlnSeq(final boolean[] vals) {
-    super(vals.length, AtomType.BLN);
-    values = vals;
+  private BlnSeq(final boolean[] values) {
+    super(values.length, AtomType.BLN);
+    this.values = values;
   }
 
   @Override

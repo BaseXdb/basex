@@ -76,7 +76,7 @@ public final class WebDAVLockService {
     final String token = UUID.randomUUID().toString();
 
     final WebDAVQuery query = new WebDAVQuery("w:create-lock(" +
-        "$path, $token, $scope, $type, $depth, $owner,$timeout)");
+        "$path, $token, $scope, $type, $depth, $owner, $timeout)");
     query.bind("path", db + SEP + p);
     query.bind("token", token);
     query.bind("scope", scope);
@@ -154,7 +154,7 @@ public final class WebDAVLockService {
       for(final Entry<String, Object> entry : query.entries()) {
         qp.bind(entry.getKey(), entry.getValue());
       }
-      qp.ctx.parseLibrary(string(module), FILE, qp.sc);
+      qp.qc.parseLibrary(string(module), FILE, qp.sc);
 
       final Result r = qp.execute();
       final int n = (int) r.size();

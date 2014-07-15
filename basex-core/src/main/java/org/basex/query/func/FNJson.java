@@ -25,33 +25,34 @@ public final class FNJson extends StandardFunc {
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNJson(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNJson(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
-      case _JSON_PARSE:     return parse(ctx);
-      case _JSON_SERIALIZE: return serialize(ctx);
-      default:              return super.item(ctx, ii);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    switch(func) {
+      case _JSON_PARSE:     return parse(qc);
+      case _JSON_SERIALIZE: return serialize(qc);
+      default:              return super.item(qc, ii);
     }
   }
 
   /**
    * Converts a JSON object to an item according to the given configuration.
-   * @param ctx query context
+   * @param qc query context
    * @return item
    * @throws QueryException query exception
    */
-  private Item parse(final QueryContext ctx) throws QueryException {
-    final byte[] input = checkStr(expr[0], ctx);
-    final JsonParserOptions opts = checkOptions(1, Q_OPTIONS, new JsonParserOptions(), ctx);
+  private Item parse(final QueryContext qc) throws QueryException {
+    final byte[] input = checkStr(exprs[0], qc);
+    final JsonParserOptions opts = checkOptions(1, Q_OPTIONS, new JsonParserOptions(), qc);
     try {
       final JsonConverter conv = JsonConverter.get(opts);
       conv.convert(input, null);
@@ -63,13 +64,13 @@ public final class FNJson extends StandardFunc {
 
   /**
    * Serializes the specified XML document to JSON.
-   * @param ctx query context
+   * @param qc query context
    * @return string representation
    * @throws QueryException query exception
    */
-  private Str serialize(final QueryContext ctx) throws QueryException {
-    final Iter iter = ctx.iter(expr[0]);
-    final JsonSerialOptions jopts = checkOptions(1, Q_OPTIONS, new JsonSerialOptions(), ctx);
+  private Str serialize(final QueryContext qc) throws QueryException {
+    final Iter iter = qc.iter(exprs[0]);
+    final JsonSerialOptions jopts = checkOptions(1, Q_OPTIONS, new JsonSerialOptions(), qc);
 
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.JSON);

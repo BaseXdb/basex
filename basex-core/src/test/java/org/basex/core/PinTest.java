@@ -4,11 +4,12 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 
+import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.index.*;
-import org.basex.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests update conflicts caused by multiple database contexts.
@@ -227,7 +228,7 @@ public final class PinTest extends SandboxTest {
     try {
       cmd.execute(ctx);
       fail("\"" + cmd + "\" was supposed to fail.");
-    } catch(final IOException ex) {
+    } catch(final IOException ignored) {
     }
   }
 

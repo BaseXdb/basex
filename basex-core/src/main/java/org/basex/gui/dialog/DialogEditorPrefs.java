@@ -12,9 +12,6 @@ import org.basex.gui.layout.*;
  * @author Christian Gruen
  */
 final class DialogEditorPrefs extends BaseXBack {
-  /** Main window reference. */
-  private final GUI gui;
-
   /** Show line margin. */
   private final BaseXCheckBox showmargin;
   /** Line margin. */
@@ -35,6 +32,8 @@ final class DialogEditorPrefs extends BaseXBack {
   private final BaseXCheckBox saverun;
   /** Automatically add characters. */
   private final BaseXCheckBox auto;
+  /** Default file filter. */
+  private final BaseXTextField files;
 
   /**
    * Default constructor.
@@ -42,9 +41,7 @@ final class DialogEditorPrefs extends BaseXBack {
    */
   DialogEditorPrefs(final BaseXDialog d) {
     border(8).setLayout(new TableLayout(1, 2, 40, 0));
-    gui = d.gui;
-
-    final GUIOptions gopts = gui.gopts;
+    final GUIOptions gopts = d.gui.gopts;
     showmargin = new BaseXCheckBox(SHOW_LINE_MARGIN + COL, GUIOptions.SHOWMARGIN, gopts, d);
     margin = new BaseXTextField(GUIOptions.MARGIN, gopts, d);
     invisible = new BaseXCheckBox(SHOW_INVISIBLE, GUIOptions.SHOWINVISIBLE, gopts, d);
@@ -55,10 +52,12 @@ final class DialogEditorPrefs extends BaseXBack {
     indent = new BaseXTextField(GUIOptions.INDENT, gopts, d);
     auto = new BaseXCheckBox(AUTO_ADD_CHARS, GUIOptions.AUTO, gopts, d);
     saverun = new BaseXCheckBox(SAVE_BEFORE_EXECUTE, GUIOptions.SAVERUN, gopts, d);
+    files = new BaseXTextField(GUIOptions.FILES, gopts, d);
     BaseXLayout.setWidth(margin, 30);
     BaseXLayout.setWidth(indent, 30);
+    BaseXLayout.setWidth(files, 150);
 
-    BaseXBack p = new BaseXBack().layout(new TableLayout(6, 1));
+    BaseXBack p = new BaseXBack().layout(new TableLayout(8, 1));
     p.add(new BaseXLabel(VIEW + COL, true, true));
     BaseXBack pp = new BaseXBack().layout(new TableLayout(1, 2, 8, 0));
     pp.add(showmargin);
@@ -68,6 +67,8 @@ final class DialogEditorPrefs extends BaseXBack {
     p.add(shownl);
     p.add(numbers);
     p.add(markline);
+    p.add(new BaseXLabel(FILE_FILTER + COL, true, true).border(6,  0,  6,  0));
+    p.add(files);
     add(p);
 
     final BaseXBack pv = new BaseXBack().layout(new TableLayout(2, 1, 0, 8));
@@ -99,6 +100,7 @@ final class DialogEditorPrefs extends BaseXBack {
     shownl.assign();
     numbers.assign();
     markline.assign();
+    files.assign();
     margin.assign();
     spaces.assign();
     indent.assign();

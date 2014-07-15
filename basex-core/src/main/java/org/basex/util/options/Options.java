@@ -29,11 +29,11 @@ public class Options implements Iterable<Option<?>> {
   private static final String PROPUSER = "# Local Options";
 
   /** Map with option names and definition. */
-  protected final TreeMap<String, Option<?>> options = new TreeMap<String, Option<?>>();
+  protected final TreeMap<String, Option<?>> options = new TreeMap<>();
   /** Map with option names and values. */
-  private final TreeMap<String, Object> values = new TreeMap<String, Object>();
+  private final TreeMap<String, Object> values = new TreeMap<>();
   /** Free option definitions. */
-  private final HashMap<String, String> free = new HashMap<String, String>();
+  private final HashMap<String, String> free = new HashMap<>();
   /** Options, cached from an input file. */
   private final StringBuilder user = new StringBuilder();
 
@@ -77,8 +77,8 @@ public class Options implements Iterable<Option<?>> {
    */
   public final synchronized void write() {
     final TokenBuilder tmp = new TokenBuilder();
-    boolean first = true;
     try {
+      boolean first = true;
       for(final Option<?> opt : options(getClass())) {
         final String name = opt.name();
         if(opt instanceof Comment) {
@@ -313,7 +313,7 @@ public class Options implements Iterable<Option<?>> {
     if(options.isEmpty()) {
       free.put(name, val);
     } else {
-      assign(name, val, -1);
+      assign(name, val, -1, true);
     }
   }
 
@@ -361,7 +361,8 @@ public class Options implements Iterable<Option<?>> {
     for(final String key : sl) {
       final String v = System.getProperty(key);
       try {
-        assign(key.substring(DBPREFIX.length()).toUpperCase(Locale.ENGLISH), v);
+        final String k = key.substring(DBPREFIX.length()).toUpperCase(Locale.ENGLISH);
+        if(assign(k, v, -1, false)) Util.debug(k + Text.COLS + v);
       } catch(final BaseXException ignore) { /* may belong to another Options instance */ }
     }
   }
@@ -444,7 +445,7 @@ public class Options implements Iterable<Option<?>> {
   public static Option<?>[] options(final Class<? extends Options> clz)
       throws IllegalAccessException {
 
-    final ArrayList<Option<?>> opts = new ArrayList<Option<?>>();
+    final ArrayList<Option<?>> opts = new ArrayList<>();
     for(final Field f : clz.getFields()) {
       if(!Modifier.isStatic(f.getModifiers())) continue;
       final Object obj = f.get(null);
@@ -501,9 +502,7 @@ public class Options implements Iterable<Option<?>> {
     final StringList errs = new StringList();
     final boolean exists = file.exists();
     if(exists) {
-      NewlineInput nli = null;
-      try {
-        nli = new NewlineInput(opts);
+      try(final NewlineInput nli = new NewlineInput(opts)) {
         boolean local = false;
         for(String line; (line = nli.readLine()) != null;) {
           line = line.trim();
@@ -541,7 +540,7 @@ public class Options implements Iterable<Option<?>> {
             setSystem(name, val);
           } else {
             try {
-              assign(name, val, num);
+              assign(name, val, num, true);
               read.add(name);
             } catch(final BaseXException ex) {
               errs.add(ex.getMessage());
@@ -551,8 +550,6 @@ public class Options implements Iterable<Option<?>> {
       } catch(final IOException ex) {
         errs.add("file could not be parsed.");
         Util.errln(ex);
-      } finally {
-        if(nli != null) try { nli.close(); } catch(final IOException ignored) { }
       }
     }
 
@@ -580,15 +577,20 @@ public class Options implements Iterable<Option<?>> {
    * @param name name of option
    * @param val value of option
    * @param num number (optional)
+   * @param error raise error if option is unknown
    * @throws BaseXException database exception
+   * @return success flag
    */
-  private synchronized void assign(final String name, final String val, final int num)
-      throws BaseXException {
+  private synchronized boolean assign(final String name, final String val, final int num,
+      final boolean error) throws BaseXException {
 
     final Option<?> option = options.get(name);
     if(option == null) {
-      throw new BaseXException(error(name));
-    } else if(option instanceof BooleanOption) {
+      if(error) throw new BaseXException(error(name));
+      return false;
+    }
+
+    if(option instanceof BooleanOption) {
       final boolean v;
       if(val == null || val.isEmpty()) {
         final Boolean b = get((BooleanOption) option);
@@ -645,6 +647,7 @@ public class Options implements Iterable<Option<?>> {
         ss[num - 1] = val;
       }
     }
+    return true;
   }
 
   /**

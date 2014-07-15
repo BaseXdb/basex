@@ -3,15 +3,16 @@ package org.basex.query.up.primitives;
 import static org.basex.query.util.Err.*;
 
 import java.io.*;
+import java.util.*;
 import java.util.List;
 
 import org.basex.build.*;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.data.atomic.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -21,82 +22,78 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public final class DBCreate extends DBNew {
-  /** Name of new database. */
-  public final String name;
+public final class DBCreate extends NameUpdate {
+  /** Container for new database documents. */
+  private final DBNew add;
+  /** Database update options. */
+  private final DBOptions updates;
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param nm name for created database
-   * @param in input (ANode and QueryInput references)
+   * @param name name for created database
+   * @param input input (ANode and QueryInput references)
    * @param opts database options
-   * @param c query context
+   * @param qc query context
+   * @param info input info
    * @throws QueryException query exception
    */
-  public DBCreate(final InputInfo ii, final String nm, final List<NewInput> in,
-      final Options opts, final QueryContext c) throws QueryException {
+  public DBCreate(final String name, final List<NewInput> input, final Options opts,
+      final QueryContext qc, final InputInfo info) throws QueryException {
 
-    super(TYPE.DBCREATE, null, c, ii);
-    inputs = in;
-    name = nm;
-    options = opts.free();
-    check(true);
+    super(UpdateType.DBCREATE, name, info, qc);
+    final ArrayList<Option<?>> supported = new ArrayList<>();
+    for(final Option<?> option : DBOptions.INDEXING) supported.add(option);
+    for(final Option<?> option : DBOptions.PARSING) supported.add(option);
+    updates = new DBOptions(opts.free(), supported, info);
+    add = new DBNew(qc, input, info);
   }
 
   @Override
-  public DBNode getTargetNode() {
-    return null;
-  }
+  public void prepare() throws QueryException {
+    if(add.inputs == null || add.inputs.isEmpty()) return;
 
-  @Override
-  public void merge(final BasicOperation o) throws QueryException {
-    throw BXDB_CREATE.get(info, ((DBCreate) o).name);
-  }
-
-  @Override
-  public void prepare(final MemData tmp) throws QueryException {
-    if(inputs != null && !inputs.isEmpty()) addDocs(new MemData(qc.context.options), name);
+    final MainOptions opts = qc.context.options;
+    updates.assign(opts);
+    try {
+      add.addDocs(new MemData(opts), name);
+    } finally {
+      updates.reset(opts);
+    }
   }
 
   @Override
   public void apply() throws QueryException {
-    // remove data instance from list of opened resources
-    qc.resource.removeData(name);
-    // check if addressed database is still pinned by any other process
-    if(qc.context.pinned(name)) throw BXDB_OPENED.get(info, name);
+    close();
 
-    initOptions();
-    assignOptions();
+    final MainOptions opts = qc.context.options;
+    updates.assign(opts);
     try {
-      data = CreateDB.create(name, Parser.emptyParser(qc.context.options), qc.context);
+      final Data data = CreateDB.create(name, Parser.emptyParser(opts), qc.context);
+
+      // add initial documents and optimize database
+      if(add.md != null) {
+        if(!data.startUpdate()) throw BXDB_OPENED.get(null, data.meta.name);
+        try {
+          data.insert(data.meta.size, -1, new DataClip(add.md));
+          Optimize.optimize(data, null);
+        } finally {
+          data.finishUpdate();
+        }
+      }
+      Close.close(data, qc.context);
+
     } catch(final IOException ex) {
       throw UPDBOPTERR.get(info, ex);
     } finally {
-      resetOptions();
+      updates.reset(opts);
     }
-    qc.resource.addData(data);
-
-    // add initial documents
-    if(md != null) {
-      if(!data.startUpdate()) throw BXDB_OPENED.get(null, data.meta.name);
-      data.insert(data.meta.size, -1, new DataClip(md));
-      try {
-        Optimize.optimize(data, null);
-      } catch(final IOException ex) {
-        data.finishUpdate();
-        throw UPDBOPTERR.get(info, ex);
-      }
-    }
-  }
-
-  @Override
-  public int size() {
-    return 1;
   }
 
   @Override
   public String toString() {
-    return Util.className(this) + '[' + inputs + ']';
+    return Util.className(this) + '[' + add.inputs + ']';
   }
+
+  @Override
+  public String operation() { return "created"; }
 }

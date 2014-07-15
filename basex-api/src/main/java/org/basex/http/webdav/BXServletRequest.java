@@ -37,11 +37,9 @@ final class BXServletRequest extends AbstractRequest {
   /** Authentication. */
   private Auth auth;
   /** Content types map. */
-  private static final Map<ContentType, String> CONTENT_TYPES =
-      new EnumMap<ContentType, String>(ContentType.class);
+  private static final Map<ContentType, String> CONTENT_TYPES = new EnumMap<>(ContentType.class);
   /** Type contents map. */
-  private static final Map<String, ContentType> TYPE_CONTENTS =
-      new HashMap<String, ContentType>();
+  private static final Map<String, ContentType> TYPE_CONTENTS = new HashMap<>();
 
   static {
     CONTENT_TYPES.put(ContentType.HTTP, Response.HTTP);
@@ -52,8 +50,7 @@ final class BXServletRequest extends AbstractRequest {
   }
 
   /** Thread local variable to hold the current request. */
-  private static final ThreadLocal<HttpServletRequest> REQUEST =
-      new ThreadLocal<HttpServletRequest>();
+  private static final ThreadLocal<HttpServletRequest> REQUEST = new ThreadLocal<>();
 
   /**
    * Get the current request.
@@ -120,7 +117,7 @@ final class BXServletRequest extends AbstractRequest {
 
   @Override
   public Map<String, String> getHeaders() {
-    final Map<String, String> map = new HashMap<String, String>();
+    final Map<String, String> map = new HashMap<>();
     final Enumeration<String> en = req.getHeaderNames();
     while(en.hasMoreElements()) {
       final String name = en.nextElement();
@@ -140,7 +137,7 @@ final class BXServletRequest extends AbstractRequest {
 
   @Override
   public List<Cookie> getCookies() {
-    final List<Cookie> list = new ArrayList<Cookie>();
+    final List<Cookie> list = new ArrayList<>();
     for(final javax.servlet.http.Cookie c : req.getCookies())
       list.add(new BXServletCookie(c));
     return list;
@@ -205,7 +202,7 @@ final class BXServletRequest extends AbstractRequest {
    * Request content type.
    * @return the content type of the current request
    */
-  ContentType getRequestContentType() {
+  private ContentType getRequestContentType() {
     final String s = req.getContentType();
     if(s == null) return null;
     if(s.contains(Response.MULTIPART)) return ContentType.MULTIPART;
@@ -216,7 +213,7 @@ final class BXServletRequest extends AbstractRequest {
    * Is the content type of the request a multi-part?
    * @return {@code true} if the request is multi-part
    */
-  boolean isMultiPart() {
+  private boolean isMultiPart() {
     return getRequestContentType() == ContentType.MULTIPART;
   }
 }

@@ -32,6 +32,8 @@ public interface RestXqText {
   byte[] COOKIE_PARAM = token("cookie-param");
   /** Token "query-param". */
   byte[] ERROR_PARAM = token("error-param");
+  /** Token "method". */
+  byte[] METHOD = token("method");
 
   /** Token "header". */
   byte[] HEADER = token("header");
@@ -62,13 +64,13 @@ public interface RestXqText {
   /** Error message. */
   String ANN_MISSING = "Annotation %% or %% missing.";
   /** Error message. */
+  String ANN_BODYVAR = "More than one body request variable specified.";
+  /** Error message. */
   String ANN_TWICE = "Annotation %% is specified more than once.";
   /** Error message. */
   String ANN_UNKNOWN = "Annotation %% is invalid or not supported.";
   /** Error message. */
   String ANN_ATLEAST = "Annotation %% requires at least % parameter(s).";
-  /** Error message. */
-  String ANN_EXACTLY = "Annotation %% requires exactly % parameter(s).";
   /** Error message. */
   String ANN_STRING = "Single string expected for %%, found: %.";
   /** Error message. */
@@ -77,6 +79,10 @@ public interface RestXqText {
   String INV_VARNAME = "Invalid variable name: $%.";
   /** Error message. */
   String INV_CODE = "Invalid error code: '%'.";
+  /** Error message. */
+  String INV_PRIORITY = "Errors must be of the same priority (\"%\" vs \"%\").";
+  /** Error message. */
+  String INV_ERR_SAME = "The same error has been specified twice: \"%\".";
   /** Error message. */
   String INV_NONS = "No namespace declared for '%'.";
   /** Error message. */
@@ -98,9 +104,9 @@ public interface RestXqText {
   /** Error message. */
   String INPUT_CONV = "Input could not be converted: %";
   /** Error message. */
-  String PATH_CONFLICT = "Several functions assigned to path \"%\":%";
+  String PATH_CONFLICT = "Path \"%\" assigned to several functions:%";
   /** Error message. */
-  String ERROR_CONFLICT = "Several functions assigned to error \"%\":%";
+  String ERROR_CONFLICT = "Error \"%\" matched by several functions:%";
   /** Error message. */
   String NO_VALUE = "'%' element has no string value.";
 

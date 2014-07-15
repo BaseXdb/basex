@@ -23,22 +23,23 @@ import org.basex.util.list.*;
 public final class FNNode extends StandardFunc {
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNNode(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNNode(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // functions have 0 or 1 arguments...
-    final Item it = (expr.length == 0 ? checkCtx(ctx) : expr[0]).item(ctx, info);
+    final Item it = (exprs.length == 0 ? checkCtx(qc) : exprs[0]).item(qc, info);
     final ANode node = it == null ? null : checkNode(it);
 
-    switch(sig) {
+    switch(func) {
       case NODE_NAME:
         QNm qname = node != null ? node.qname() : null;
         return qname != null && qname.string().length != 0 ? qname : null;
@@ -90,7 +91,7 @@ public final class FNNode extends StandardFunc {
       case PATH:
         return node != null ? path(node) : null;
       default:
-        return super.item(ctx, ii);
+        return super.item(qc, ii);
     }
   }
 
@@ -147,13 +148,13 @@ public final class FNNode extends StandardFunc {
 
   @Override
   public boolean has(final Flag flag) {
-    return flag == Flag.X30 && expr.length == 0 &&
-        oneOf(sig, DOCUMENT_URI, NODE_NAME, NILLED) ||
-        flag == Flag.CTX && expr.length == 0 || super.has(flag);
+    return flag == Flag.X30 && exprs.length == 0 &&
+        oneOf(func, DOCUMENT_URI, NODE_NAME, NILLED) ||
+        flag == Flag.CTX && exprs.length == 0 || super.has(flag);
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return (expr.length != 0 || visitor.lock(DBLocking.CTX)) && super.accept(visitor);
+    return (exprs.length != 0 || visitor.lock(DBLocking.CTX)) && super.accept(visitor);
   }
 }

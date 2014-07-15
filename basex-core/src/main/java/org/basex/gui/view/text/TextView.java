@@ -202,7 +202,7 @@ public final class TextView extends View {
   /**
    * Saves the displayed text.
    */
-  void save() {
+  private void save() {
     final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS,
         gui.gopts.get(GUIOptions.WORKPATH), gui).suffix(IO.XMLSUFFIX);
 
@@ -216,9 +216,7 @@ public final class TextView extends View {
     opts.set(MainOptions.MAXHITS, -1);
     opts.set(MainOptions.CACHEQUERY, false);
 
-    PrintOutput out = null;
-    try {
-      out = new PrintOutput(file.toString());
+    try(final PrintOutput out = new PrintOutput(file.toString())) {
       if(cmd != null) {
         cmd.execute(gui.context, out);
       } else if(ns != null) {
@@ -230,7 +228,6 @@ public final class TextView extends View {
     } catch(final IOException ex) {
       BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, file));
     } finally {
-      if(out != null) try { out.close(); } catch(final IOException ignored) { }
       opts.set(MainOptions.MAXHITS, mh);
       opts.set(MainOptions.CACHEQUERY, true);
       gui.cursor(CURSORARROW, true);

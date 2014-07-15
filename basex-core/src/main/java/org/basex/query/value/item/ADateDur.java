@@ -53,10 +53,10 @@ public abstract class ADateDur extends Item {
 
   /**
    * Constructor.
-   * @param t data type
+   * @param type data type
    */
-  ADateDur(final Type t) {
-    super(t);
+  ADateDur(final Type type) {
+    super(type);
   }
 
   /**
@@ -100,12 +100,10 @@ public abstract class ADateDur extends Item {
    * @param i input
    * @param ex example format
    * @param ii input info
-   * @return never
-   * @throws QueryException query exception
+   * @return date format exception
    */
-  final QueryException dateErr(final byte[] i, final String ex,
-                               final InputInfo ii) throws QueryException {
-    throw DATEFORMAT.get(ii, type, i, ex);
+  final QueryException dateError(final byte[] i, final String ex, final InputInfo ii) {
+    return DATEFORMAT.get(ii, type, i, ex);
   }
 
   /**

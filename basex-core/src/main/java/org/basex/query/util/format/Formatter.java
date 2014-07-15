@@ -35,7 +35,7 @@ public abstract class Formatter extends FormatUtil {
   /** Default language: English. */
   private static final byte[] EN = token("en");
   /** Formatter instances. */
-  private static final TokenObjMap<Formatter> MAP = new TokenObjMap<Formatter>();
+  private static final TokenObjMap<Formatter> MAP = new TokenObjMap<>();
 
   // initialize hash map with English formatter as default
   static {
@@ -367,7 +367,7 @@ public abstract class Formatter extends FormatUtil {
    * @return string representation
    * @throws QueryException query exception
    */
-  final byte[] formatZone(final int num, final FormatParser fp, final byte[] marker)
+  private byte[] formatZone(final int num, final FormatParser fp, final byte[] marker)
       throws QueryException {
 
     final boolean uc = ch(marker, 0) == 'Z';

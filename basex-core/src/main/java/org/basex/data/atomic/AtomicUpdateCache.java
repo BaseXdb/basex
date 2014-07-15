@@ -64,8 +64,8 @@ public final class AtomicUpdateCache {
    * @param d target data reference
    */
   public AtomicUpdateCache(final Data d) {
-    struct = new ArrayList<StructuralUpdate>();
-    val = new ArrayList<BasicUpdate>();
+    struct = new ArrayList<>();
+    val = new ArrayList<>();
     data = d;
   }
 
@@ -216,7 +216,7 @@ public final class AtomicUpdateCache {
    * @param a first update in sequence
    * @param b second update in sequence
    */
-  static void check(final BasicUpdate a, final BasicUpdate b) {
+  private static void check(final BasicUpdate a, final BasicUpdate b) {
     // check order of location PRE, must be strictly ordered low-to-high
     if(b.location < a.location)
       throw Util.notExpected("Invalid order at location " + a.location);
@@ -456,7 +456,7 @@ public final class AtomicUpdateCache {
    */
   private void resolveTextAdjacency() {
     // Text node merges are also gathered on a separate list to leverage optimizations.
-    final List<Delete> deletes = new LinkedList<Delete>();
+    final List<Delete> deletes = new LinkedList<>();
 
     // keep track of the visited locations to avoid superfluous checks
     int smallestVisited = Integer.MAX_VALUE;

@@ -20,18 +20,18 @@ import org.basex.util.hash.*;
 public final class CComm extends CNode {
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param c comment
+   * @param sc static context
+   * @param info input info
+   * @param comment comment
    */
-  public CComm(final StaticContext sctx, final InputInfo ii, final Expr c) {
-    super(sctx, ii, c);
+  public CComm(final StaticContext sc, final InputInfo info, final Expr comment) {
+    super(sc, info, comment);
     type = SeqType.COM;
   }
 
   @Override
-  public FComm item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Iter iter = ctx.iter(expr[0]);
+  public FComm item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Iter iter = qc.iter(exprs[0]);
 
     final TokenBuilder tb = new TokenBuilder();
     boolean more = false;
@@ -44,8 +44,8 @@ public final class CComm extends CNode {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CComm(sc, info, expr[0].copy(ctx, scp, vs));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new CComm(sc, info, exprs[0].copy(qc, scp, vs));
   }
 
   @Override

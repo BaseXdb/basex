@@ -6,10 +6,10 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.util.concurrent.*;
 
+import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
-import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.junit.*;
@@ -22,7 +22,7 @@ import org.junit.*;
  */
 public abstract class SandboxTest {
   /** Default output stream. */
-  protected static final PrintStream OUT = System.out;
+  static final PrintStream OUT = System.out;
   /** Default error stream. */
   protected static final PrintStream ERR = System.err;
   /** Null output stream. */

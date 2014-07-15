@@ -20,15 +20,15 @@ public final class LibraryModule extends Module {
   /**
    * Constructor.
    * @param name of library
-   * @param xqdoc documentation
+   * @param doc documentation
    * @param funcs user-defined functions
    * @param vars static variables
    * @param modules imported modules
-   * @param sctx static context
+   * @param sc static context
    */
-  public LibraryModule(final QNm name, final String xqdoc, final TokenObjMap<StaticFunc> funcs,
-      final TokenObjMap<StaticVar> vars, final TokenSet modules, final StaticContext sctx) {
-    super(null, xqdoc, funcs, vars, modules, sctx, null);
+  public LibraryModule(final QNm name, final String doc, final TokenObjMap<StaticFunc> funcs,
+      final TokenObjMap<StaticVar> vars, final TokenSet modules, final StaticContext sc) {
+    super(null, doc, funcs, vars, modules, sc, null);
     this.name = name;
   }
 
@@ -46,7 +46,7 @@ public final class LibraryModule extends Module {
   }
 
   @Override
-  public void compile(final QueryContext ctx) throws QueryException {
+  public void compile(final QueryContext qc) {
   }
 
   @Override

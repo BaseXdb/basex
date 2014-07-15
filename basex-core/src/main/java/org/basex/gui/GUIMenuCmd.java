@@ -70,13 +70,13 @@ public enum GUIMenuCmd implements GUICommand {
 
       // check if existing files will be overwritten
       if(root.exists()) {
-        IO file = null;
+        IOFile file = null;
         boolean overwrite = false;
         final Data d = gui.context.data();
         final IntList il = d.resources.docs();
         final int is = il.size();
         for(int i = 0; i < is; i++) {
-          file = root.merge(Token.string(d.text(il.get(i), true)));
+          file = root.resolve(Token.string(d.text(il.get(i), true)));
           if(file.exists()) {
             if(overwrite) {
               // more than one file will be overwritten; check remaining tests
@@ -134,7 +134,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_EDITREOPEN(REOPEN + DOTS, null, false, false) {
     @Override
     public void execute(final GUI gui) {
-      gui.editor.reopen();
+      gui.editor.getEditor().reopen(true);
     }
 
     @Override
@@ -213,6 +213,19 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       gui.editor.getEditor().format();
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+  },
+
+  /** Sorts text. */
+  C_SORT(SORT, "% U", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().sort();
     }
 
     @Override
@@ -419,7 +432,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Finds files. */
-  C_FILESEARCH(FIND_FILES + DOTS, "% H", false, false) {
+  C_FILESEARCH(FIND_FILES + DOTS, Prop.MAC ? "% shift H" : "% H", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.showProject();
@@ -712,7 +725,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_HELP(HELP, "F1", false, false) {
     @Override
     public void execute(final GUI gui) {
-      BaseXDialog.browse(gui, DOC_URL);
+      BaseXDialog.browse(gui, Prop.DOC_URL);
     }
   },
 
@@ -720,7 +733,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_COMMUNITY(COMMUNITY, null, false, false) {
     @Override
     public void execute(final GUI gui) {
-      BaseXDialog.browse(gui, COMMUNITY_URL);
+      BaseXDialog.browse(gui, Prop.COMMUNITY_URL);
     }
   },
 
@@ -728,7 +741,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_UPDATES(CHECK_FOR_UPDATES, null, false, false) {
     @Override
     public void execute(final GUI gui) {
-      BaseXDialog.browse(gui, UPDATE_URL);
+      BaseXDialog.browse(gui, Prop.UPDATE_URL);
     }
   },
 
@@ -781,7 +794,7 @@ public enum GUIMenuCmd implements GUICommand {
       for(final int pre : ctx.current().pres) doc &= data.kind(pre) == Data.DOC;
       if(doc) {
         // if yes, jump to database root
-        ctx.update();
+        ctx.invalidate();
         gui.notify.context(ctx.current(), false, null);
       } else {
         // otherwise, jump to parent nodes
@@ -804,7 +817,7 @@ public enum GUIMenuCmd implements GUICommand {
       final Context ctx = gui.context;
       if(ctx.root()) return;
       // jump to database root
-      ctx.update();
+      ctx.invalidate();
       gui.notify.context(ctx.current(), false, null);
     }
 

@@ -33,10 +33,10 @@ public abstract class FormatParser extends FormatUtil {
 
   /**
    * Constructor for formatting integers.
-   * @param ii input info
+   * @param info input info
    */
-  FormatParser(final InputInfo ii) {
-    info = ii;
+  FormatParser(final InputInfo info) {
+    this.info = info;
   }
 
   /**

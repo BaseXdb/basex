@@ -2,6 +2,7 @@ package org.basex.build;
 
 import java.io.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
 
@@ -16,6 +17,7 @@ public final class MemBuilder extends Builder {
   /** Data reference. */
   private MemData data;
 
+
   /**
    * Constructor.
    * @param nm name of database
@@ -23,6 +25,17 @@ public final class MemBuilder extends Builder {
    */
   public MemBuilder(final String nm, final Parser parse) {
     super(nm, parse);
+  }
+
+  /**
+   * Builds a main memory database instance.
+   * @param input input
+   * @param context database context
+   * @return data database instance
+   * @throws IOException I/O exception
+   */
+  public static MemData build(final IO input, final Context context) throws IOException {
+    return build(Parser.xmlParser(input, context.options));
   }
 
   /**

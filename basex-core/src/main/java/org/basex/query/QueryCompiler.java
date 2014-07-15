@@ -23,10 +23,10 @@ final class QueryCompiler {
   private static final int MAP_THRESHOLD = 16;
 
   /** Query context. */
-  private final QueryContext ctx;
+  private final QueryContext qc;
 
   /** Result list. */
-  private final ArrayList<Scope[]> result = new ArrayList<Scope[]>();
+  private final ArrayList<Scope[]> result = new ArrayList<>();
   /** Node stack. */
   private final IntList stack = new IntList();
   /** Index and lowlink list. */
@@ -35,19 +35,19 @@ final class QueryCompiler {
   private int next;
 
   /** Adjacency list. */
-  private final ArrayList<int[]> adjacent = new ArrayList<int[]>();
+  private final ArrayList<int[]> adjacent = new ArrayList<>();
   /** Declaration list. */
-  private final ArrayList<Scope> scopes = new ArrayList<Scope>();
+  private final ArrayList<Scope> scopes = new ArrayList<>();
   /** Declaration list. */
   private IdentityHashMap<Scope, Integer> ids;
 
   /**
    * Constructor.
-   * @param cx query context
+   * @param qc query context
    * @param root root expression
    */
-  private QueryCompiler(final QueryContext cx, final Scope root) {
-    ctx = cx;
+  private QueryCompiler(final QueryContext qc, final Scope root) {
+    this.qc = qc;
     add(root);
   }
 
@@ -57,8 +57,8 @@ final class QueryCompiler {
    * @return list of all declarations that the main module uses
    */
   public static List<StaticDecl> usedDecls(final MainModule main) {
-    final List<StaticDecl> scopes = new ArrayList<StaticDecl>();
-    final IdentityHashMap<Scope, Object> map = new IdentityHashMap<Scope, Object>();
+    final List<StaticDecl> scopes = new ArrayList<>();
+    final IdentityHashMap<Scope, Object> map = new IdentityHashMap<>();
     main.visit(new ASTVisitor() {
       @Override
       public boolean staticVar(final StaticVar var) {
@@ -96,13 +96,12 @@ final class QueryCompiler {
 
   /**
    * Compiles all necessary parts of this query.
-   * @param ctx query context
+   * @param qc query context
    * @param root root expression
    * @throws QueryException compilation errors
    */
-  public static void compile(final QueryContext ctx, final MainModule root)
-      throws QueryException {
-    if(!root.compiled()) new QueryCompiler(ctx, root).compile();
+  public static void compile(final QueryContext qc, final MainModule root) throws QueryException {
+    if(!root.compiled()) new QueryCompiler(qc, root).compile();
   }
 
   /**
@@ -111,10 +110,10 @@ final class QueryCompiler {
    */
   private void compile() throws QueryException {
     // compile the used scopes only
-    for(final Scope[] comp : components(0)) circCheck(comp).compile(ctx);
+    for(final Scope[] comp : components(0)) circCheck(comp).compile(qc);
 
     // check for circular variable declarations without compiling the unused scopes
-    for(final StaticVar v : ctx.vars) {
+    for(final StaticVar v : qc.vars) {
       if(id(v) == -1) for(final Scope[] comp : components(add(v))) circCheck(comp);
     }
   }
@@ -189,7 +188,7 @@ final class QueryCompiler {
    * @param scp scope
    * @return id if existing, {@code null} otherwise
    */
-  int id(final Scope scp) {
+  private int id(final Scope scp) {
     if(ids != null) {
       final Integer id = ids.get(scp);
       return id == null ? -1 : id;
@@ -204,10 +203,10 @@ final class QueryCompiler {
    * @param scp scope to add
    * @return the scope's ID
    */
-  int add(final Scope scp) {
+  private int add(final Scope scp) {
     final int id = scopes.size();
     if(id == MAP_THRESHOLD) {
-      ids = new IdentityHashMap<Scope, Integer>();
+      ids = new IdentityHashMap<>();
       for(final Scope s : scopes) ids.put(s, ids.size());
     }
 

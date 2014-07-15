@@ -76,36 +76,36 @@ public final class CmpN extends Cmp {
 
   /**
    * Constructor.
-   * @param e1 first expression
-   * @param e2 second expression
-   * @param o comparator
-   * @param ii input info
+   * @param expr1 first expression
+   * @param expr2 second expression
+   * @param op comparator
+   * @param info input info
    */
-  public CmpN(final Expr e1, final Expr e2, final OpN o, final InputInfo ii) {
-    super(ii, e1, e2, null);
-    op = o;
+  public CmpN(final Expr expr1, final Expr expr2, final OpN op, final InputInfo info) {
+    super(info, expr1, expr2, null);
+    this.op = op;
     type = SeqType.BLN_ZO;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
-    type = SeqType.get(AtomType.BLN, expr[0].size() == 1 && expr[1].size() == 1 ?
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    type = SeqType.get(AtomType.BLN, exprs[0].size() == 1 && exprs[1].size() == 1 ?
         Occ.ONE : Occ.ZERO_ONE);
 
-    return optPre(oneIsEmpty() ? null : allAreValues() ? item(ctx, info) : this, ctx);
+    return optPre(oneIsEmpty() ? null : allAreValues() ? item(qc, info) : this, qc);
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Item a = expr[0].item(ctx, info);
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Item a = exprs[0].item(qc, info);
     if(a == null) return null;
-    final Item b = expr[1].item(ctx, info);
+    final Item b = exprs[1].item(qc, info);
     if(b == null) return null;
     return Bln.get(op.eval(checkNode(a), checkNode(b)));
   }
@@ -116,13 +116,13 @@ public final class CmpN extends Cmp {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CmpN(expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs), op, info);
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new CmpN(exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs), op, info);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(OP, op.name), expr);
+    addPlan(plan, planElem(OP, op.name), exprs);
   }
 
   @Override

@@ -62,6 +62,16 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   }
 
   /**
+   * Adds elements to the array.
+   * @param elements elements to be added
+   * @return self reference
+   */
+  public TokenList add(final byte[]... elements) {
+    for(final byte[] s : elements) add(s);
+    return this;
+  }
+
+  /**
    * Adds a long value.
    * @param element element to be added
    */
@@ -183,13 +193,40 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
    * @return self reference
    */
   public TokenList sort(final boolean cs) {
-    Arrays.sort(list, 0, size, cs ? COMP : LC_COMP);
+    return sort(cs, true);
+  }
+
+  /**
+   * Sorts the elements.
+   * @param cs respect case sensitivity
+   * @param asc ascending (true)/descending (false) flag
+   * @return self reference
+   */
+  public TokenList sort(final boolean cs, final boolean asc) {
+    final Comparator<byte[]> comp = cs ? COMP : LC_COMP;
+    Arrays.sort(list, 0, size, asc ? comp : Collections.reverseOrder(comp));
+    return this;
+  }
+
+  /**
+   * Removes duplicates from the list.
+   * The list must be sorted.
+   * @return self reference
+   */
+  public TokenList unique() {
+    if(size != 0) {
+      int s = 0;
+      for(int l = 1; l < size; l++) {
+        if(!eq(list[l], list[s])) list[++s] = list[l];
+      }
+      size = s + 1;
+    }
     return this;
   }
 
   @Override
   public Iterator<byte[]> iterator() {
-    return new ArrayIterator<byte[]>(list, size);
+    return new ArrayIterator<>(list, size);
   }
 
   @Override

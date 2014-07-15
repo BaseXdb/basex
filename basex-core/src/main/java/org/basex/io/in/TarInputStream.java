@@ -34,7 +34,7 @@ public final class TarInputStream extends FilterInputStream {
   @Override
   public int read() throws IOException {
     final int res = read(buf, 0, 1);
-    return res == -1 ? -1 : (buf[0] & 0xFF);
+    return res == -1 ? -1 : buf[0] & 0xFF;
   }
 
   @Override
@@ -62,7 +62,7 @@ public final class TarInputStream extends FilterInputStream {
   }
 
   @Override
-  public synchronized void reset() throws IOException {
+  public synchronized void reset() {
     Util.notImplemented();
   }
 
@@ -74,7 +74,7 @@ public final class TarInputStream extends FilterInputStream {
   public TarEntry getNextEntry() throws IOException {
     // close entry
     if(entry != null) {
-      long ln = entry.getSize() - size + BLOCK - (size & (BLOCK - 1));
+      long ln = entry.getSize() - size + BLOCK - (size & BLOCK - 1);
       while(ln != BLOCK && ln > 0) ln -= skip(ln);
       entry = null;
       size = 0;

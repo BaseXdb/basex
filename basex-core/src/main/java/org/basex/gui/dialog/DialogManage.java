@@ -12,7 +12,6 @@ import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.text.*;
-import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -137,7 +136,7 @@ public final class DialogManage extends BaseXDialog {
 
     final StringList dbs = choice.getValues();
     final String db = choice.getValue();
-    final ArrayList<Command> cmds = new ArrayList<Command>();
+    final ArrayList<Command> cmds = new ArrayList<>();
 
     if(cmp == open) {
       close();
@@ -217,14 +216,9 @@ public final class DialogManage extends BaseXDialog {
       backup.setEnabled(active);
 
       // enable/disable backup buttons
-      final StringList back = Databases.backupPaths(db, ctx).sort(Prop.CASE, false);
-      for(int b = 0; b < back.size(); b++) {
-        final String n = new IOFile(back.get(b)).name();
-        back.set(b, n.substring(0, n.lastIndexOf('.')));
-      }
-
-      active = !back.isEmpty();
-      backups.setData(back.toArray());
+      final StringList names = ctx.databases.backups(db);
+      active = !names.isEmpty();
+      backups.setData(names.toArray());
       backups.setEnabled(active);
 
       restore.setEnabled(active);

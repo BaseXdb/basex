@@ -15,6 +15,7 @@ import org.basex.query.util.Compare.Mode;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.tests.bxapi.*;
+import org.basex.tests.bxapi.XQuery;
 import org.basex.tests.bxapi.xdm.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -32,7 +33,7 @@ public abstract class QT3TestSet {
   public Context ctx;
 
   /** Expected results. */
-  public final ArrayList<String> expected = new ArrayList<String>();
+  public final ArrayList<String> expected = new ArrayList<>();
 
   /** QT3TS path, possibly {@code null}. */
   public static final String QT3TS = System.getenv("QT3TS");
@@ -135,10 +136,10 @@ public abstract class QT3TestSet {
     final XdmValue value = result.value;
     if(value == null) return fail(Util.info("Permutation of: '%'", expect));
     // cache expected results
-    final HashSet<String> exp = new HashSet<String>();
+    final HashSet<String> exp = new HashSet<>();
     for(final XdmItem it : new XQuery(expect, ctx)) exp.add(it.getString());
     // cache actual results
-    final HashSet<String> res = new HashSet<String>();
+    final HashSet<String> res = new HashSet<>();
     for(final XdmItem it : value) res.add(it.getString());
 
     if(exp.size() != res.size())
@@ -293,7 +294,8 @@ public abstract class QT3TestSet {
     final XdmValue value = result.value;
     if(value == null) return fail(Util.info("Matches: '%'", pat));
     final XQuery match = new XQuery("fn:matches($in, $pat, $flags)", ctx);
-    match.bind("in", value.toString()).bind("pat", pat).bind("flags", flags);
+    match.bind("in", value).bind("pat", XdmItem.get(Str.get(pat)));
+    match.bind("flags", XdmItem.get(Str.get(flags)));
     return result(match.next().getBoolean(), Util.info("Matches: '%'", pat));
   }
 
@@ -401,14 +403,13 @@ public abstract class QT3TestSet {
     if(!qt3.canRead()) return null;
     try {
       f.createNewFile();
-      final BufferedInputStream in = new BufferedInputStream(new FileInputStream(qt3));
-      final BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(f));
-      final byte[] buffer = new byte[1 << 13];
-      for(int len; (len = in.read(buffer)) >= 0;) {
-        out.write(buffer, 0, len);
+      try(final BufferedInputStream in = new BufferedInputStream(new FileInputStream(qt3));
+          final BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(f))) {
+        final byte[] buffer = new byte[1 << 13];
+        for(int len; (len = in.read(buffer)) >= 0;) {
+          out.write(buffer, 0, len);
+        }
       }
-      in.close();
-      out.close();
       return f.getPath();
     } catch(IOException e) {
       e.printStackTrace();

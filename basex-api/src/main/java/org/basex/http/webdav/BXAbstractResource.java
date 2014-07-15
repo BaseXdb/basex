@@ -7,6 +7,7 @@ import java.util.*;
 
 import org.basex.http.webdav.impl.ResourceMetaData;
 import org.basex.http.webdav.impl.WebDAVService;
+import org.basex.server.LoginException;
 import org.basex.util.*;
 
 import com.bradmcevoy.http.*;
@@ -45,21 +46,19 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
 
   @Override
   public Object authenticate(final String user, final String pass) {
-    if(user != null)
-      new BXCode<Object>(this) {
-        @Override
-        public void run() throws IOException {
-          service.authenticate(user, pass);
-        }
-      }.evalNoEx();
-    return user;
+    if(user == null) return null;
+    return new BXCode<Object>(this) {
+      @Override
+      public String get() throws LoginException {
+        service.authenticate(user, pass);
+        return user;
+      }
+    }.evalNoEx();
   }
 
   @Override
-  public boolean authorise(final Request request, final Request.Method method,
-      final Auth auth) {
-    return auth != null && auth.getTag() != null && service.authorize(auth.getUser(),
-      "any", meta.db, meta.path);
+  public boolean authorise(final Request request, final Request.Method method, final Auth auth) {
+    return auth != null && auth.getTag() != null && WebDAVService.authorize(meta.db);
   }
 
   @Override
@@ -88,7 +87,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
   }
 
   @Override
-  public void delete() throws BadRequestException {
+  public void delete() throws BadRequestException, NotAuthorizedException {
     new BXCode<Object>(this) {
       @Override
       public void run() throws IOException {
@@ -98,8 +97,8 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
   }
 
   @Override
-  public void copyTo(final CollectionResource target, final String name)
-      throws BadRequestException {
+  public void copyTo(final CollectionResource target, final String name) throws BadRequestException,
+      NotAuthorizedException {
 
     new BXCode<Object>(this) {
       @Override
@@ -113,8 +112,8 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
   }
 
   @Override
-  public void moveTo(final CollectionResource target, final String name)
-      throws BadRequestException {
+  public void moveTo(final CollectionResource target, final String name) throws BadRequestException,
+      NotAuthorizedException {
 
     new BXCode<Object>(this) {
       @Override
@@ -136,8 +135,9 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
    * otherwise a failure reason code
    */
   @Override
-  public LockResult lock(final LockTimeout timeout, final LockInfo lockInfo) throws
-    NotAuthorizedException, PreConditionFailedException, LockedException {
+  public LockResult lock(final LockTimeout timeout, final LockInfo lockInfo)
+      throws NotAuthorizedException, PreConditionFailedException, LockedException {
+
     return new BXCode<LockResult>(this) {
       @Override
       public LockResult get() throws IOException {
@@ -154,7 +154,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
    */
   @Override
   public LockResult refreshLock(final String token) throws NotAuthorizedException,
-    PreConditionFailedException {
+      PreConditionFailedException {
     return new BXCode<LockResult>(this) {
       @Override
       public LockResult get() throws IOException {
@@ -171,7 +171,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
    */
   @Override
   public void unlock(final String tokenId) throws NotAuthorizedException,
-    PreConditionFailedException {
+      PreConditionFailedException {
     new BXCode<Object>(this) {
       @Override
       public void run() throws IOException {
@@ -243,7 +243,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
    * @param n new name of the folder
    * @throws IOException I/O exception
    */
-  final void moveTo(final BXFolder f, final String n) throws IOException {
+  private void moveTo(final BXFolder f, final String n) throws IOException {
     if(f.meta.db.equals(meta.db)) {
       // folder is moved to a folder in the same database
       rename(f.meta.path + SEP + n);
@@ -261,7 +261,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
    * @return lock result
    * @throws IOException I/O exception
    */
-  final LockResult lockResource(final LockTimeout timeout, final LockInfo lockInfo)
+  private LockResult lockResource(final LockTimeout timeout, final LockInfo lockInfo)
       throws IOException {
 
     final String tokenId = service.locking.lock(meta.db, meta.path,
@@ -280,7 +280,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
    * @return the token of the active lock or {@code null} if resource is not locked
    * @throws IOException I/O exception
    */
-  final LockToken getCurrentActiveLock() throws IOException {
+  private LockToken getCurrentActiveLock() throws IOException {
     final String lockInfoStr = service.locking.lock(meta.db, meta.path);
     return lockInfoStr == null ? null : parseLockInfo(lockInfoStr);
   }
@@ -291,7 +291,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
    * @return lock result
    * @throws IOException I/O exception
    */
-  final LockResult refresh(final String token) throws IOException {
+  private LockResult refresh(final String token) throws IOException {
     service.locking.refreshLock(token);
     final String lockInfoStr = service.locking.lock(token);
     final LockToken lockToken = lockInfoStr == null ? null : parseLockInfo(lockInfoStr);
@@ -313,7 +313,8 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
       reader.parse(new InputSource(new StringReader(lockInfo)));
       return handler.lockToken;
     } catch(final SAXException ex) {
-      Util.err("Error while parsing lock info", ex);
+      Util.errln("Error while parsing lock info.");
+      Util.debug(ex);
       return null;
     }
   }

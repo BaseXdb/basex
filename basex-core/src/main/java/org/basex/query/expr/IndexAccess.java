@@ -18,17 +18,17 @@ public abstract class IndexAccess extends Simple {
 
   /**
    * Constructor.
-   * @param ic index context
-   * @param ii input info
+   * @param ictx index context
+   * @param info input info
    */
-  IndexAccess(final IndexContext ic, final InputInfo ii) {
-    super(ii);
-    ictx = ic;
+  IndexAccess(final IndexContext ictx, final InputInfo info) {
+    super(info);
+    this.ictx = ictx;
     type = SeqType.NOD_ZM;
   }
 
   @Override
-  public abstract NodeIter iter(final QueryContext ctx) throws QueryException;
+  public abstract NodeIter iter(final QueryContext qc) throws QueryException;
 
   @Override
   public final boolean iterable() {

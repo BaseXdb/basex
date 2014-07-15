@@ -28,16 +28,16 @@ public final class StrStream extends AStr {
 
   /**
    * Constructor.
-   * @param io input
-   * @param enc encoding (may be null)
-   * @param ctx query context
-   * @param err error message to be thrown
+   * @param input input
+   * @param encoding encoding (may be null)
+   * @param qc query context
+   * @param error error message to be thrown
    */
-  public StrStream(final IO io, final String enc, final Err err, final QueryContext ctx) {
-    input = io;
-    encoding = enc;
-    error = err;
-    validate = ctx.context.options.get(MainOptions.CHECKSTRINGS);
+  public StrStream(final IO input, final String encoding, final Err error, final QueryContext qc) {
+    this.input = input;
+    this.encoding = encoding;
+    this.error = error;
+    validate = qc.context.options.get(MainOptions.CHECKSTRINGS);
   }
 
   @Override

@@ -26,14 +26,14 @@ public final class RangeSeq extends Seq {
 
   /**
    * Constructor.
-   * @param s start value
-   * @param sz size
-   * @param a ascending
+   * @param start start value
+   * @param size size
+   * @param asc ascending
    */
-  private RangeSeq(final long s, final long sz, final boolean a) {
-    super(sz, AtomType.ITR);
-    start = s;
-    asc = a;
+  private RangeSeq(final long start, final long size, final boolean asc) {
+    super(size, AtomType.ITR);
+    this.start = start;
+    this.asc = asc;
   }
 
   /**
@@ -55,7 +55,7 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
     throw CONDTYPE.get(ii, this);
   }
 

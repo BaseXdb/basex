@@ -5,8 +5,8 @@ import static org.basex.http.restxq.RestXqText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.net.*;
 import java.util.*;
+import java.util.Set;
 import java.util.regex.*;
 
 import javax.servlet.http.*;
@@ -14,14 +14,14 @@ import javax.servlet.http.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
-import org.basex.io.in.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.path.*;
+import org.basex.query.path.Test.Kind;
 import org.basex.query.util.*;
-import org.basex.query.util.http.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -37,12 +37,13 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class RestXqFunction implements Comparable<RestXqFunction> {
-  /** Pattern for a single template. */
-  private static final Pattern TEMPLATE =
-      Pattern.compile("\\s*\\{\\s*\\$(.+?)\\s*\\}\\s*");
+  /** Single template pattern. */
+  private static final Pattern TEMPLATE = Pattern.compile("\\s*\\{\\s*\\$(.+?)\\s*\\}\\s*");
+  /** EQName pattern. */
+  private static final Pattern EQNAME = Pattern.compile("^Q\\{(.*?)\\}(.*)$");
 
   /** Supported methods. */
-  EnumSet<HTTPMethod> methods = EnumSet.allOf(HTTPMethod.class);
+  final Set<String> methods = new HashSet<>();
   /** Serialization parameters. */
   final SerializerOptions output;
   /** Associated function. */
@@ -55,16 +56,16 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   /** Error. */
   RestXqError error;
   /** Query parameters. */
-  private final ArrayList<RestXqParam> errorParams = new ArrayList<RestXqParam>();
+  private final ArrayList<RestXqParam> errorParams = new ArrayList<>();
 
   /** Query parameters. */
-  final ArrayList<RestXqParam> queryParams = new ArrayList<RestXqParam>();
+  final ArrayList<RestXqParam> queryParams = new ArrayList<>();
   /** Form parameters. */
-  final ArrayList<RestXqParam> formParams = new ArrayList<RestXqParam>();
+  final ArrayList<RestXqParam> formParams = new ArrayList<>();
   /** Header parameters. */
-  final ArrayList<RestXqParam> headerParams = new ArrayList<RestXqParam>();
+  final ArrayList<RestXqParam> headerParams = new ArrayList<>();
   /** Cookie parameters. */
-  private final ArrayList<RestXqParam> cookieParams = new ArrayList<RestXqParam>();
+  private final ArrayList<RestXqParam> cookieParams = new ArrayList<>();
 
   /** Query context. */
   private final QueryContext context;
@@ -111,7 +112,6 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    */
   boolean parse() throws QueryException {
     // parse all annotations
-    final EnumSet<HTTPMethod> mth = EnumSet.noneOf(HTTPMethod.class);
     final boolean[] declared = new boolean[function.args.length];
     boolean found = false;
     final int as = function.ann.size();
@@ -125,15 +125,18 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       if(rexq) {
         if(eq(PATH, local)) {
           // annotation "path"
-          if(path != null) error(info, ANN_TWICE, "%", name.string());
-          path = new RestXqPath(toString(value, name));
-          for(final String s : path) {
-            if(s.trim().startsWith("{")) checkVariable(s, AtomType.AAT, declared);
+          if(path != null) throw error(info, ANN_TWICE, "%", name.string());
+          try {
+            path = new RestXqPath(toString(value, name));
+          } catch(final IllegalArgumentException ex) {
+            throw error(info, ex.getMessage());
+          }
+          for(int s = 0; s < path.size; s++) {
+            if(path.isTemplate(s)) checkVariable(path.segment[s], AtomType.AAT, declared);
           }
         } else if(eq(ERROR, local)) {
           // annotation "error"
-          if(error != null) error(info, ANN_TWICE, "%", name.string());
-          error = error(value, name);
+          error(value, name);
         } else if(eq(CONSUMES, local)) {
           // annotation "consumes"
           strings(value, name, consumes);
@@ -155,40 +158,61 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         } else if(eq(ERROR_PARAM, local)) {
           // annotation "error-param"
           errorParams.add(param(value, name, declared));
+        } else if(eq(METHOD, local)) {
+          // annotation "method"
+          if(value.size() < 1) throw error(function.info, ANN_ATLEAST, "%", name.string(), 1);
+          final String mth = toString(value.itemAt(0), name).toUpperCase(Locale.ENGLISH);
+          final Value body = value.size() > 1 ? value.itemAt(1) : null;
+          addMethod(mth, body, name, declared, info);
         } else {
           // method annotations
-          final HTTPMethod m = get(string(local));
-          if(m == null) error(info, ANN_UNKNOWN, "%", name.string());
-          if(!value.isEmpty()) {
-            // remember post/put variable
-            if(requestBody != null) error(info, ANN_TWICE, "%", name.string());
-            if(m != POST && m != PUT) error(info, METHOD_VALUE, m);
-            requestBody = checkVariable(toString(value, name), declared);
-          }
-          if(mth.contains(m)) error(info, ANN_TWICE, "%", name.string());
-          mth.add(m);
+          final String mth = string(local);
+          if(get(mth) == null) throw error(info, ANN_UNKNOWN, "%", name.string());
+          addMethod(mth, value, name, declared, info);
         }
       } else if(eq(uri, QueryText.OUTPUTURI)) {
         // serialization parameters
         try {
           output.assign(string(local), toString(value, name));
         } catch(final BaseXException ex) {
-          error(info, UNKNOWN_SER, local);
+          throw error(info, UNKNOWN_SER, local);
         }
       }
       found |= rexq;
     }
-    if(!mth.isEmpty()) methods = mth;
 
     if(found) {
-      if(path == null && error == null) error(function.info, ANN_MISSING, '%', PATH, '%', ERROR);
+      if(path == null && error == null)
+        throw error(function.info, ANN_MISSING, '%', PATH, '%', ERROR);
 
       for(int i = 0; i < declared.length; i++) {
         if(declared[i]) continue;
-        error(function.info, VAR_UNDEFINED, function.args[i].name.string());
+        throw error(function.info, VAR_UNDEFINED, function.args[i].name.string());
       }
     }
     return found;
+  }
+
+  /**
+   * Add a HTTP method to the list of supported methods by this RESTXQ function.
+   * @param method HTTP method as a string
+   * @param body variable to which the HTTP request body to be bound (optional)
+   * @param ann RESTXQ annotation specifying the HTTP method
+   * @param declared variable declaration flags
+   * @param info input info
+   * @throws QueryException query exception
+   */
+  private void addMethod(final String method, final Value body, final QNm ann,
+      final boolean[] declared, final InputInfo info) throws QueryException {
+
+    if(body != null && !body.isEmpty()) {
+      final HTTPMethod m = get(method);
+      if(m != null && !m.body) throw error(info, METHOD_VALUE, m);
+      if(requestBody != null) throw error(info, ANN_BODYVAR);
+      requestBody = checkVariable(toString(body, ann), declared);
+    }
+    if(methods.contains(method)) throw error(info, ANN_TWICE, "%", ann.string());
+    methods.add(method);
   }
 
   /**
@@ -199,8 +223,8 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    */
   boolean matches(final HTTPContext http, final QNm err) {
     // check method, consumed and produced media type, and path or error
-    return methods.contains(http.method) && consumes(http) && produces(http) &&
-        (err == null ? path != null && path.matches(http) :
+    return (methods.isEmpty() || methods.contains(http.method)) && consumes(http) &&
+        produces(http) && (err == null ? path != null && path.matches(http) :
           error != null && error.matches(err));
   }
 
@@ -219,51 +243,26 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     if(path != null) {
       for(int s = 0; s < path.size; s++) {
         final Matcher m = TEMPLATE.matcher(path.segment[s]);
-        if(!m.find()) continue;
-        final QNm qnm = new QNm(token(m.group(1)), function.sc);
-        if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
-        bind(qnm, arg, new Atm(http.segment(s)));
+        if(m.find()) {
+          final QNm qnm = new QNm(token(m.group(1)), function.sc);
+          if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
+          bind(qnm, arg, new Atm(http.segment(s)));
+        }
       }
     }
 
-    // cache request body
-    final String ct = http.contentType();
-    IOContent body = null;
-
+    // bind request body in the correct format
     if(requestBody != null) {
-      // bind request body in the correct format
-      body = cache(http, null);
       try {
-        final String ext = http.contentTypeExt();
-        bind(requestBody, arg, HTTPPayload.value(body, context.context.options, ct, ext));
+        bind(requestBody, arg, http.params.content());
       } catch(final IOException ex) {
-        error(INPUT_CONV, ex);
+        throw error(INPUT_CONV, ex);
       }
     }
 
-    // convert parameters to XQuery values
-    final Map<String, Value> params = new HashMap<String, Value>();
-    for(final Map.Entry<String, String[]> entry : http.params().entrySet()) {
-      final String[] values = entry.getValue();
-      final ValueBuilder vb = new ValueBuilder(values.length);
-      for(final String v : values) vb.add(new Atm(v));
-      params.put(entry.getKey(), vb.value());
-    }
-
-    // bind query parameters
-    for(final RestXqParam rxp : queryParams) bind(rxp, arg, params.get(rxp.key));
-
-    // bind form parameters
-    if(!formParams.isEmpty()) {
-      if(MimeTypes.MULTIPART_FORM_DATA.equals(ct)) {
-        // convert multipart parameters encoded in a form
-        addMultipart(cache(http, body), params, http.contentTypeExt());
-      } else if(MimeTypes.APP_FORM_URLENCODED.equals(ct)) {
-        // convert URL-encoded parameters
-        addURLEncoded(cache(http, body), params);
-      }
-      for(final RestXqParam rxp : formParams) bind(rxp, arg, params.get(rxp.key));
-    }
+    // bind query and form parameters
+    for(final RestXqParam rxp : queryParams) bind(rxp, arg, http.params.query().get(rxp.key));
+    for(final RestXqParam rxp : formParams) bind(rxp, arg, http.params.form().get(rxp.key));
 
     // bind header parameters
     for(final RestXqParam rxp : headerParams) {
@@ -288,7 +287,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     }
 
     // bind errors
-    final Map<String, Value> errs = new HashMap<String, Value>();
+    final Map<String, Value> errs = new HashMap<>();
     if(err != null) {
       final Value[] values = Catch.values(err);
       for(int v = 0; v < Catch.NAMES.length; v++) {
@@ -303,10 +302,9 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param msg message
    * @param ext error extension
    * @return exception
-   * @throws QueryException query exception
    */
-  QueryException error(final String msg, final Object... ext) throws QueryException {
-    throw error(function.info, msg, ext);
+  QueryException error(final String msg, final Object... ext) {
+    return error(function.info, msg, ext);
   }
 
   /**
@@ -315,11 +313,9 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param msg message
    * @param ext error extension
    * @return exception
-   * @throws QueryException query exception
    */
-  private static QueryException error(final InputInfo info, final String msg, final Object... ext)
-      throws QueryException {
-    throw new QueryException(info, Err.BASX_RESTXQ, Util.info(msg, ext));
+  private static QueryException error(final InputInfo info, final String msg, final Object... ext) {
+    return new QueryException(info, Err.BASX_RESTXQ, Util.info(msg, ext));
   }
 
   @Override
@@ -336,7 +332,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @return resulting variable
    * @throws QueryException query exception
    */
-  private QNm checkVariable(final String tmp, final boolean[] declared) throws QueryException {
+  private QNm checkVariable(final String tmp, final boolean... declared) throws QueryException {
     return checkVariable(tmp, AtomType.ITEM, declared);
   }
 
@@ -348,22 +344,22 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @return resulting variable
    * @throws QueryException query exception
    */
-  private QNm checkVariable(final String tmp, final Type type, final boolean[] declared)
+  private QNm checkVariable(final String tmp, final Type type, final boolean... declared)
       throws QueryException {
 
     final Var[] args = function.args;
     final Matcher m = TEMPLATE.matcher(tmp);
-    if(!m.find()) error(INV_TEMPLATE, tmp);
+    if(!m.find()) throw error(INV_TEMPLATE, tmp);
     final byte[] vn = token(m.group(1));
-    if(!XMLToken.isQName(vn)) error(INV_VARNAME, vn);
+    if(!XMLToken.isQName(vn)) throw error(INV_VARNAME, vn);
     final QNm name = new QNm(vn);
     if(name.hasPrefix()) name.uri(function.sc.ns.uri(name.prefix()));
     int r = -1;
     while(++r < args.length && !args[r].name.eq(name));
-    if(r == args.length) error(UNKNOWN_VAR, vn);
-    if(declared[r]) error(VAR_ASSIGNED, vn);
+    if(r == args.length) throw error(UNKNOWN_VAR, vn);
+    if(declared[r]) throw error(VAR_ASSIGNED, vn);
     final SeqType st = args[r].declaredType();
-    if(args[r].checksType() && !st.type.instanceOf(type)) error(INV_VARTYPE, vn, type);
+    if(args[r].checksType() && !st.type.instanceOf(type)) throw error(INV_VARTYPE, vn, type);
     declared[r] = true;
     return name;
   }
@@ -429,18 +425,19 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
     for(int i = 0; i < function.args.length; i++) {
       final Var var = function.args[i];
-      if(!var.name.eq(name)) continue;
-      // casts and binds the value
-      final SeqType decl = var.declaredType();
-      final Value val = value.type().instanceOf(decl) ? value :
-        decl.cast(value, context, function.sc, null, var);
-      args[i] = var.checkType(val, context, null, false);
-      break;
+      if(var.name.eq(name)) {
+        // casts and binds the value
+        final SeqType decl = var.declaredType();
+        final Value val = value.type().instanceOf(decl) ? value :
+          decl.cast(value, context, function.sc, null, var);
+        args[i] = var.checkType(val, context, null, false);
+        break;
+      }
     }
   }
 
   /**
-   * Returns the specified value as an atomic string.
+   * Returns the specified value as a string.
    * @param value value
    * @param name name
    * @return string
@@ -473,11 +470,11 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @return parameter
    * @throws QueryException HTTP exception
    */
-  private RestXqParam param(final Value value, final QNm name, final boolean[] declared)
+  private RestXqParam param(final Value value, final QNm name, final boolean... declared)
       throws QueryException {
 
     final long vs = value.size();
-    if(vs < 2) error(function.info, ANN_ATLEAST, "%", name.string(), 2);
+    if(vs < 2) throw error(function.info, ANN_ATLEAST, "%", name.string(), 2);
     // name of parameter
     final String key = toString(value.itemAt(0), name);
     // variable template
@@ -492,75 +489,58 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * Returns an error.
    * @param value value
    * @param name name
-   * @return parameter
    * @throws QueryException HTTP exception
    */
-  private RestXqError error(final Value value, final QNm name) throws QueryException {
-    if(value.size() != 1) error(function.info, ANN_EXACTLY, "%", name.string(), 1);
+  private void error(final Value value, final QNm name) throws QueryException {
+    if(value.isEmpty()) throw error(function.info, ANN_ATLEAST, "%", name.string(), 1);
+
+    if(error == null) error = new RestXqError();
 
     // name of parameter
-    final String err = toString(value.itemAt(0), name);
-    QNm code = null;
-    if(!"*".equals(err)) {
-      final byte[] c = token(err);
-      if(!XMLToken.isQName(c)) error(INV_CODE, c);
-      code = new QNm(c, function.sc);
-      if(!code.hasURI() && code.hasPrefix()) error(INV_NONS, code);
-    }
-    // message
-    return new RestXqError(code);
-  }
-
-  /**
-   * Adds multipart form-data from the passed on request body.
-   * @param body request body
-   * @param pars map parameters
-   * @param ext content type extension (may be {@code null})
-   * @throws IOException I/O exception
-   * @throws QueryException query exception
-   */
-  private void addMultipart(final IOContent body, final Map<String, Value> pars, final String ext)
-      throws IOException, QueryException {
-
-    final MainOptions opts = context.context.options;
-    final HTTPPayload hp = new HTTPPayload(body.inputStream(), true, null, opts);
-    final HashMap<String, Value> map = hp.multiForm(ext);
-    for(final Map.Entry<String, Value> entry : map.entrySet()) {
-      pars.put(entry.getKey(), entry.getValue());
-    }
-  }
-
-  // PRIVATE STATIC METHODS =============================================================
-
-  /**
-   * Caches the request body, if not done yet.
-   * @param http http context
-   * @param cache cache existing cache reference
-   * @return cache
-   * @throws IOException I/O exception
-   */
-  private static IOContent cache(final HTTPContext http, final IOContent cache) throws IOException {
-    if(cache != null) return cache;
-    final BufferInput bi = new BufferInput(http.req.getInputStream());
-    final IOContent io = new IOContent(bi.content());
-    io.name(http.method + IO.XMLSUFFIX);
-    return io;
-  }
-
-  /**
-   * Adds URL-encoded parameters from the passed on request body.
-   * @param body request body
-   * @param pars map parameters
-   */
-  private static void addURLEncoded(final IOContent body, final Map<String, Value> pars) {
-    for(final String nv : body.toString().split("&")) {
-      final String[] parts = nv.split("=", 2);
-      if(parts.length < 2) continue;
-      try {
-        pars.put(parts[0], Str.get(URLDecoder.decode(parts[1], UTF8)));
-      } catch(final Exception ex) {
-        throw Util.notExpected(ex);
+    final int s = (int) value.size();
+    NameTest last = error.get(0);
+    for(int i = 0; i < s; i++) {
+      final String err = toString(value.itemAt(i), name);
+      final Kind kind;
+      QNm qnm = null;
+      if(err.equals("*")) {
+        kind = Kind.WILDCARD;
+      } else if(err.startsWith("*:")) {
+        final byte[] local = token(err.substring(2));
+        if(!XMLToken.isNCName(local)) throw error(INV_CODE, err);
+        qnm = new QNm(local);
+        kind = Kind.NAME;
+      } else if(err.endsWith(":*")) {
+        final byte[] prefix = token(err.substring(0, err.length() - 2));
+        if(!XMLToken.isNCName(prefix)) throw error(INV_CODE, err);
+        qnm = new QNm(concat(prefix, COLON), function.sc);
+        kind = Kind.URI;
+      } else {
+        final Matcher m = EQNAME.matcher(err);
+        if(m.matches()) {
+          final byte[] uri = token(m.group(1));
+          final byte[] local = token(m.group(2));
+          if(local.length == 1 && local[0] == '*') {
+            qnm = new QNm(COLON, uri);
+            kind = Kind.URI;
+          } else {
+            if(!XMLToken.isNCName(local) || !Uri.uri(uri).isValid()) throw error(INV_CODE, err);
+            qnm = new QNm(local, uri);
+            kind = Kind.URI_NAME;
+          }
+        } else {
+          final byte[] nm = token(err);
+          if(!XMLToken.isQName(nm)) throw error(INV_CODE, err);
+          qnm = new QNm(nm, function.sc);
+          kind = Kind.URI_NAME;
+        }
       }
+      // message
+      if(qnm != null && qnm.hasPrefix() && !qnm.hasURI()) throw error(INV_NONS, qnm);
+      final NameTest test = new NameTest(qnm, kind, false, null);
+      if(last != null && last.kind != kind) throw error(INV_PRIORITY, last, test);
+      if(!error.add(test)) throw error(INV_ERR_SAME, last);
+      last = test;
     }
   }
 }

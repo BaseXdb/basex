@@ -10,6 +10,7 @@ import org.basex.io.*;
 import org.basex.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * Tests adding files/folders/zip files/urls to collections.
@@ -33,7 +34,7 @@ public final class AddDeleteTest extends SandboxTest {
   /** Test XML fragment. */
   private static final String XMLFRAG = "<xml a='blu'><foo /></xml>";
   /** Temporary XML file. */
-  private static final String TEMP = NAME + IO.XMLSUFFIX;
+  private static final String TEMP = Prop.TMP + NAME + IO.XMLSUFFIX;
 
   /** Number of XML files for folder. */
   private static final int NFLDR;
@@ -195,7 +196,7 @@ public final class AddDeleteTest extends SandboxTest {
     try {
       new Add("", io.path()).execute(context);
       fail("Broken file was added to the database.");
-    } catch(final Exception ex) { }
+    } catch(final Exception ignored) { }
 
     assertTrue(io.delete());
   }
@@ -243,7 +244,7 @@ public final class AddDeleteTest extends SandboxTest {
     try {
       new Add("", "<x").execute(context);
       fail("Broken file was added to the database.");
-    } catch(final Exception ex) { }
+    } catch(final Exception ignored) { }
 
     assertTrue(io.delete());
   }

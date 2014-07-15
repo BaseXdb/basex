@@ -122,7 +122,7 @@ public final class DataBuilder {
     final int n = data.atnindex.index(q.string(), null, false);
     // usually, attributes don't have a namespace flag.
     // this is different here, because a stand-alone attribute has no parent element.
-    data.attr(ds, pre - par, n, node.string(), u, u != 0);
+    data.attr(ds, pre - par, n, node.string(), u, par == -1 && u != 0);
     data.insert(ds);
     return pre + 1;
   }
@@ -220,7 +220,7 @@ public final class DataBuilder {
 
     // add new namespaces
     data.nspaces.prepare();
-    final Atts ns = node.nsScope();
+    final Atts ns = par == -1 ? node.nsScope() : node.namespaces();
     final int nl = ns.size();
     for(int n = 0; n < nl; n++) data.nspaces.add(ns.name(n), ns.value(n), ds);
 

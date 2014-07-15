@@ -59,28 +59,28 @@ public final class TableDiskAccess extends TableAccess {
     super(md);
 
     // read meta and index data
-    final DataInput in = new DataInput(meta.dbfile(DATATBL + 'i'));
-    final int b = in.readNum();
-    blocks = b;
+    try(final DataInput in = new DataInput(meta.dbfile(DATATBL + 'i'))) {
+      final int b = in.readNum();
+      blocks = b;
 
-    // check if page index is regular and can be calculated (0: no pages)
-    final int u = in.readNum();
-    final boolean regular = u == 0 || u == Integer.MAX_VALUE;
-    if(regular) {
-      used = u == 0 ? 0 : b;
-    } else {
-      // read page index and first pre values from disk
-      used = u;
-      fpres = in.readNums();
-      pages = in.readNums();
-    }
+      // check if page index is regular and can be calculated (0: no pages)
+      final int u = in.readNum();
+      final boolean regular = u == 0 || u == Integer.MAX_VALUE;
+      if(regular) {
+        used = u == 0 ? 0 : b;
+      } else {
+        // read page index and first pre values from disk
+        used = u;
+        fpres = in.readNums();
+        pages = in.readNums();
+      }
 
-    // read block bitmap
-    if(!regular) {
-      final int psize = in.readNum();
-      usedPages = new BitArray(in.readLongs(psize), used);
+      // read block bitmap
+      if(!regular) {
+        final int psize = in.readNum();
+        usedPages = new BitArray(in.readLongs(psize), used);
+      }
     }
-    in.close();
 
     // initialize data file
     file = new RandomAccessFile(meta.dbfile(DATATBL).file(), "rw");
@@ -99,18 +99,11 @@ public final class TableDiskAccess extends TableAccess {
     final IOFile table = MetaData.file(ctx.globalopts.dbpath(db), DATATBL);
     if(!table.exists()) return false;
 
-    try {
-      final RandomAccessFile file = new RandomAccessFile(table.file(), "rw");
-      try {
-        return file.getChannel().tryLock() == null;
-      } finally {
-        file.close();
-      }
-    } catch(final OverlappingFileLockException ex) {
-      return true;
+    try(final RandomAccessFile file = new RandomAccessFile(table.file(), "rw")) {
+      return file.getChannel().tryLock() == null;
     } catch(final ClosedChannelException ex) {
       return false;
-    } catch(final IOException ex) {
+    } catch(final OverlappingFileLockException | IOException ex) {
       return true;
     }
   }
@@ -120,18 +113,18 @@ public final class TableDiskAccess extends TableAccess {
     for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
     if(!dirty) return;
 
-    final DataOutput out = new DataOutput(meta.dbfile(DATATBL + 'i'));
-    out.writeNum(blocks);
-    out.writeNum(used);
+    try(final DataOutput out = new DataOutput(meta.dbfile(DATATBL + 'i'))) {
+      out.writeNum(blocks);
+      out.writeNum(used);
 
-    // due to legacy issues, number of blocks is written several times
-    out.writeNum(blocks);
-    for(int a = 0; a < blocks; a++) out.writeNum(fpres[a]);
-    out.writeNum(blocks);
-    for(int a = 0; a < blocks; a++) out.writeNum(pages[a]);
+      // due to legacy issues, number of blocks is written several times
+      out.writeNum(blocks);
+      for(int a = 0; a < blocks; a++) out.writeNum(fpres[a]);
+      out.writeNum(blocks);
+      for(int a = 0; a < blocks; a++) out.writeNum(pages[a]);
 
-    out.writeLongs(usedPages.toArray());
-    out.close();
+      out.writeLongs(usedPages.toArray());
+    }
     dirty = false;
   }
 

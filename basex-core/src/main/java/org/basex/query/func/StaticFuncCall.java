@@ -29,60 +29,60 @@ public final class StaticFuncCall extends FuncCall {
 
   /**
    * Function call constructor.
-   * @param ii input info
-   * @param nm function name
-   * @param arg arguments
-   * @param sctx static context
+   * @param info input info
+   * @param name function name
+   * @param args arguments
+   * @param sc static context
    */
-  public StaticFuncCall(final QNm nm, final Expr[] arg, final StaticContext sctx,
-      final InputInfo ii) {
-    this(nm, arg, sctx, null, ii);
+  public StaticFuncCall(final QNm name, final Expr[] args, final StaticContext sc,
+      final InputInfo info) {
+    this(name, args, sc, null, info);
   }
 
   /**
    * Copy constructor.
-   * @param ii input info
-   * @param nm function name
-   * @param arg arguments
-   * @param sctx static context
-   * @param fun referenced function
+   * @param info input info
+   * @param name function name
+   * @param args arguments
+   * @param sc static context
+   * @param func referenced function
    */
-  private StaticFuncCall(final QNm nm, final Expr[] arg, final StaticContext sctx,
-      final StaticFunc fun, final InputInfo ii) {
-    super(ii, arg);
-    sc = sctx;
-    name = nm;
-    func = fun;
+  private StaticFuncCall(final QNm name, final Expr[] args, final StaticContext sc,
+      final StaticFunc func, final InputInfo info) {
+    super(info, args);
+    this.sc = sc;
+    this.name = name;
+    this.func = func;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
 
     // disallow call of private functions from module with different uri
     if(func.ann.contains(Ann.Q_PRIVATE) && !Token.eq(func.sc.baseURI().string(),
         sc.baseURI().string())) throw FUNCPRIV.get(info, name.string());
 
     // compile mutually recursive functions
-    func.compile(ctx);
+    func.compile(qc);
 
     // try to inline the function
-    final Expr inl = func.inlineExpr(expr, ctx, scp, info);
+    final Expr inl = func.inlineExpr(exprs, qc, scp, info);
     if(inl != null) return inl;
     type = func.type();
     return this;
   }
 
   @Override
-  public StaticFuncCall optimize(final QueryContext ctx, final VarScope scp) {
+  public StaticFuncCall optimize(final QueryContext qc, final VarScope scp) {
     // do not inline a static function after compilation as it must be recursive
     return this;
   }
 
   @Override
-  public StaticFuncCall copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final Expr[] arg = new Expr[expr.length];
-    for(int i = 0; i < arg.length; i++) arg[i] = expr[i].copy(ctx, scp, vs);
+  public StaticFuncCall copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    final Expr[] arg = new Expr[exprs.length];
+    for(int i = 0; i < arg.length; i++) arg[i] = exprs[i].copy(qc, scp, vs);
     final StaticFuncCall call = new StaticFuncCall(name, arg, sc, func, info);
     call.type = type;
     call.size = size;
@@ -122,12 +122,12 @@ public final class StaticFuncCall extends FuncCall {
     // function code: position or context references will have no effect on calling code
     if(flag == Flag.FCS || flag == Flag.CTX) return false;
     // pass on check to function code
-    return func == null || (flag == Flag.UPD ? func.updating : func.has(flag));
+    return func == null || (flag == Flag.UPD && !sc.mixUpdates ? func.updating : func.has(flag));
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, name, TCL, tailCall), expr);
+    addPlan(plan, planElem(NAM, name, TCL, tailCall), exprs);
   }
 
   @Override
@@ -146,15 +146,15 @@ public final class StaticFuncCall extends FuncCall {
   }
 
   @Override
-  public StaticFunc evalFunc(final QueryContext ctx) {
+  public StaticFunc evalFunc(final QueryContext qc) {
     return func;
   }
 
   @Override
-  Value[] evalArgs(final QueryContext ctx) throws QueryException {
-    final int al = expr.length;
+  Value[] evalArgs(final QueryContext qc) throws QueryException {
+    final int al = exprs.length;
     final Value[] args = new Value[al];
-    for(int a = 0; a < al; ++a) args[a] = ctx.value(expr[a]);
+    for(int a = 0; a < al; ++a) args[a] = qc.value(exprs[a]);
     return args;
   }
 }

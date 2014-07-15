@@ -119,6 +119,13 @@ public final class GUIOptions extends Options {
   /** Flag for showing the simple file dialog. */
   public static final BooleanOption SIMPLEFD = new BooleanOption("SIMPLEFD", false);
 
+  /** Sort ascending. */
+  public static final BooleanOption ASCSORT = new BooleanOption("ASCSORT", true);
+  /** Case sensitive sorting. */
+  public static final BooleanOption CASESORT = new BooleanOption("CASESORT", true);
+  /** Merge duplicate lines. */
+  public static final BooleanOption MERGEDUPL = new BooleanOption("MERGEDUPL", false);
+
   /** Show line margin. */
   public static final BooleanOption SHOWMARGIN = new BooleanOption("SHOWMARGIN", true);
   /** Line margin. */
@@ -139,6 +146,8 @@ public final class GUIOptions extends Options {
   public static final BooleanOption SAVERUN = new BooleanOption("SAVERUN", false);
   /** Automatically add characters. */
   public static final BooleanOption AUTO = new BooleanOption("AUTO", true);
+  /** Default file filter. */
+  public static final StringOption FILES = new StringOption("FILES", "*.xml, *.xq*");
 
   /** Current input mode in global text field (Search, XQuery, Command). */
   public static final NumberOption SEARCHMODE = new NumberOption("SEARCHMODE", 0);

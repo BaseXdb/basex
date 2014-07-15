@@ -23,21 +23,21 @@ import org.basex.util.hash.*;
 public final class Root extends Simple {
   /**
    * Constructor.
-   * @param ii input info
+   * @param info input info
    */
-  public Root(final InputInfo ii) {
-    super(ii);
+  public Root(final InputInfo info) {
+    super(info);
     type = SeqType.DOC_ZM;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) {
-    return ctx.value != null && ctx.value.type == NodeType.DOC ? ctx.value : this;
+  public Expr compile(final QueryContext qc, final VarScope scp) {
+    return qc.value != null && qc.value.type == NodeType.DOC ? qc.value : this;
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter iter = checkCtx(ctx).iter();
+  public Iter iter(final QueryContext qc) throws QueryException {
+    final Iter iter = checkCtx(qc).iter();
     final NodeSeqBuilder nc = new NodeSeqBuilder().check();
     for(Item i; (i = iter.next()) != null;) {
       final ANode n = root(i);
@@ -48,7 +48,7 @@ public final class Root extends Simple {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     return new Root(info);
   }
 

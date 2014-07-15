@@ -37,17 +37,17 @@ public final class GroupBy extends GFLWOR.Clause {
 
   /**
    * Constructor.
-   * @param gs grouping specs
-   * @param pr references to pre-grouping variables
-   * @param pst post-grouping variables
-   * @param ii input info
+   * @param specs grouping specs
+   * @param pre references to pre-grouping variables
+   * @param post post-grouping variables
+   * @param info input info
    */
-  public GroupBy(final Spec[] gs, final VarRef[] pr, final Var[] pst, final InputInfo ii) {
-    super(ii, vars(gs, pst));
-    specs = gs;
-    preExpr = new Expr[pr.length];
-    System.arraycopy(pr, 0, preExpr, 0, pr.length);
-    post = pst;
+  public GroupBy(final Spec[] specs, final VarRef[] pre, final Var[] post, final InputInfo info) {
+    super(info, vars(specs, post));
+    this.specs = specs;
+    this.post = post;
+    preExpr = new Expr[pre.length];
+    System.arraycopy(pre, 0, preExpr, 0, pre.length);
     int n = 0;
     for(final Spec spec : specs) if(!spec.occluded) n++;
     nonOcc = n;
@@ -55,19 +55,19 @@ public final class GroupBy extends GFLWOR.Clause {
 
   /**
    * Copy constructor.
-   * @param gs grouping specs
-   * @param pe pre-grouping expressions
-   * @param pst post-grouping variables
-   * @param no number of non-occluded grouping variables
-   * @param ii input info
+   * @param specs grouping specs
+   * @param pre pre-grouping expressions
+   * @param post post-grouping variables
+   * @param nonOcc number of non-occluded grouping variables
+   * @param info input info
    */
-  private GroupBy(final Spec[] gs, final Expr[] pe, final Var[] pst,
-      final int no, final InputInfo ii) {
-    super(ii, vars(gs, pst));
-    specs = gs;
-    preExpr = pe;
-    post = pst;
-    nonOcc = no;
+  private GroupBy(final Spec[] specs, final Expr[] pre, final Var[] post, final int nonOcc,
+      final InputInfo info) {
+    super(info, vars(specs, post));
+    this.specs = specs;
+    this.preExpr = pre;
+    this.post = post;
+    this.nonOcc = nonOcc;
   }
 
   /**
@@ -92,8 +92,8 @@ public final class GroupBy extends GFLWOR.Clause {
       private int pos;
 
       @Override
-      public boolean next(final QueryContext ctx) throws QueryException {
-        if(groups == null) groups = init(ctx);
+      public boolean next(final QueryContext qc) throws QueryException {
+        if(groups == null) groups = init(qc);
         if(pos == groups.length) return false;
 
         final Group curr = groups[pos];
@@ -104,30 +104,30 @@ public final class GroupBy extends GFLWOR.Clause {
         for(final Spec spec : specs) {
           if(!spec.occluded) {
             final Item key = curr.key[p++];
-            ctx.set(spec.var, key == null ? Empty.SEQ : key, info);
+            qc.set(spec.var, key == null ? Empty.SEQ : key, info);
           }
         }
-        for(int i = 0; i < post.length; i++) ctx.set(post[i], curr.ngv[i].value(), info);
+        for(int i = 0; i < post.length; i++) qc.set(post[i], curr.ngv[i].value(), info);
         return true;
       }
 
       /**
        * Builds up the groups.
-       * @param ctx query context
+       * @param qc query context
        * @throws QueryException query exception
        */
-      private Group[] init(final QueryContext ctx) throws QueryException {
-        final ArrayList<Group> grps = new ArrayList<Group>();
-        final IntObjMap<Group> map = new IntObjMap<Group>();
+      private Group[] init(final QueryContext qc) throws QueryException {
+        final ArrayList<Group> grps = new ArrayList<>();
+        final IntObjMap<Group> map = new IntObjMap<>();
         final Collation[] colls = new Collation[nonOcc];
         for(int i = 0, p = 0; i < specs.length; i++)
           if(!specs[i].occluded) colls[p++] = specs[i].coll;
 
-        while(sub.next(ctx)) {
+        while(sub.next(qc)) {
           final Item[] key = new Item[nonOcc];
           int p = 0, hash = 1;
           for(final Spec spec : specs) {
-            final Item ki = spec.item(ctx, info),
+            final Item ki = spec.item(qc, info),
                 atom = ki == null ? null : StandardFunc.atom(ki, info);
             if(!spec.occluded) {
               key[p++] = atom;
@@ -137,7 +137,7 @@ public final class GroupBy extends GFLWOR.Clause {
               hash = 31 * hash +
                   (atom == null || spec.coll != null ? 0 : atom.hash(info));
             }
-            ctx.set(spec.var, atom == null ? Empty.SEQ : atom, info);
+            qc.set(spec.var, atom == null ? Empty.SEQ : atom, info);
           }
 
           // find the group for this key
@@ -169,7 +169,7 @@ public final class GroupBy extends GFLWOR.Clause {
           }
 
           // add values of non-grouping variables to the group
-          for(int j = 0; j < preExpr.length; j++) grp.ngv[j].add(preExpr[j].value(ctx));
+          for(int j = 0; j < preExpr.length; j++) grp.ngv[j].add(preExpr[j].value(qc));
         }
 
         // we're finished, copy the array so the list can be garbage-collected
@@ -186,7 +186,9 @@ public final class GroupBy extends GFLWOR.Clause {
    * @return {@code true} if the compare as equal, {@code false} otherwise
    * @throws QueryException query exception
    */
-  boolean eq(final Item[] as, final Item[] bs, final Collation[] coll) throws QueryException {
+  private boolean eq(final Item[] as, final Item[] bs, final Collation[] coll)
+      throws QueryException {
+
     for(int i = 0; i < as.length; i++) {
       final Item a = as[i], b = bs[i];
       if(a == null ^ b == null || a != null && !a.equiv(b, coll[i], info)) return false;
@@ -220,18 +222,17 @@ public final class GroupBy extends GFLWOR.Clause {
   }
 
   @Override
-  public GroupBy compile(final QueryContext cx, final VarScope sc) throws QueryException {
-    for(final Expr e : preExpr) e.compile(cx, sc);
-    for(final Spec b : specs) b.compile(cx, sc);
-    return optimize(cx, sc);
+  public GroupBy compile(final QueryContext qc, final VarScope sc) throws QueryException {
+    for(final Expr e : preExpr) e.compile(qc, sc);
+    for(final Spec b : specs) b.compile(qc, sc);
+    return optimize(qc, sc);
   }
 
   @Override
-  public GroupBy optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public GroupBy optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     for(int i = 0; i < preExpr.length; i++) {
       final SeqType it = preExpr[i].type();
-      post[i].refineType(it.withOcc(it.mayBeZero() ? Occ.ZERO_MORE : Occ.ONE_MORE),
-          ctx, info);
+      post[i].refineType(it.withOcc(it.mayBeZero() ? Occ.ZERO_MORE : Occ.ONE_MORE), qc, info);
     }
     return this;
   }
@@ -248,29 +249,28 @@ public final class GroupBy extends GFLWOR.Clause {
   }
 
   @Override
-  public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
-    final boolean b = inlineAll(ctx, scp, specs, v, e),
-        p = inlineAll(ctx, scp, preExpr, v, e);
-    return b || p ? optimize(ctx, scp) : null;
+  public GFLWOR.Clause inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
+    final boolean b = inlineAll(qc, scp, specs, v, e),
+        p = inlineAll(qc, scp, preExpr, v, e);
+    return b || p ? optimize(qc, scp) : null;
   }
 
   @Override
-  public GroupBy copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public GroupBy copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     // copy the pre-grouping expressions
-    final Expr[] pEx = Arr.copyAll(ctx, scp, vs, preExpr);
+    final Expr[] pEx = Arr.copyAll(qc, scp, vs, preExpr);
 
     // create fresh copies of the post-grouping variables
     final Var[] ps = new Var[post.length];
     for(int i = 0; i < ps.length; i++) {
       final Var old = post[i];
-      ps[i] = scp.newCopyOf(ctx, old);
+      ps[i] = scp.newCopyOf(qc, old);
       vs.put(old.id, ps[i]);
     }
 
     // done
-    return new GroupBy(Arr.copyAll(ctx, scp, vs, specs), pEx, ps, nonOcc, info);
+    return new GroupBy(Arr.copyAll(qc, scp, vs, specs), pEx, ps, nonOcc, info);
   }
 
   @Override
@@ -282,7 +282,7 @@ public final class GroupBy extends GFLWOR.Clause {
   }
 
   @Override
-  boolean clean(final QueryContext ctx, final IntObjMap<Var> decl, final BitArray used) {
+  boolean clean(final QueryContext qc, final IntObjMap<Var> decl, final BitArray used) {
     // [LW] does not fix {@link #vars}
     final int len = preExpr.length;
     for(int i = 0; i < post.length; i++) {
@@ -335,15 +335,15 @@ public final class GroupBy extends GFLWOR.Clause {
     /**
      * Constructor.
      *
-     * @param ii input info
-     * @param v grouping variable
-     * @param e grouping expression
-     * @param cl collation
+     * @param info input info
+     * @param var grouping variable
+     * @param expr grouping expression
+     * @param coll collation
      */
-    public Spec(final InputInfo ii, final Var v, final Expr e, final Collation cl) {
-      super(ii, e);
-      var = v;
-      coll = cl;
+    public Spec(final InputInfo info, final Var var, final Expr expr, final Collation coll) {
+      super(info, expr);
+      this.var = var;
+      this.coll = coll;
     }
 
     @Override
@@ -363,16 +363,15 @@ public final class GroupBy extends GFLWOR.Clause {
     }
 
     @Override
-    public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-      return expr.item(ctx, ii);
+    public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+      return expr.item(qc, ii);
     }
 
     @Override
-    public Expr copy(final QueryContext ctx, final VarScope scp,
-        final IntObjMap<Var> vs) {
-      final Var v = scp.newCopyOf(ctx, var);
+    public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+      final Var v = scp.newCopyOf(qc, var);
       vs.put(var.id, v);
-      final Spec spec = new Spec(info, v, expr.copy(ctx, scp, vs), coll);
+      final Spec spec = new Spec(info, v, expr.copy(qc, scp, vs), coll);
       spec.occluded = occluded;
       return spec;
     }

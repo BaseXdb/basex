@@ -25,17 +25,17 @@ public abstract class CName extends CNode {
 
   /**
    * Constructor.
-   * @param d description
-   * @param sctx static context
-   * @param ii input info
-   * @param n name
+   * @param desc description
+   * @param sc static context
+   * @param info input info
+   * @param name name
    * @param v attribute values
    */
-  CName(final String d, final StaticContext sctx, final InputInfo ii, final Expr n,
+  CName(final String desc, final StaticContext sc, final InputInfo info, final Expr name,
       final Expr... v) {
-    super(sctx, ii, v);
-    name = n;
-    desc = d;
+    super(sc, info, v);
+    this.name = name;
+    this.desc = desc;
   }
 
   @Override
@@ -45,22 +45,22 @@ public abstract class CName extends CNode {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    name = name.compile(ctx, scp);
-    return super.compile(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    name = name.compile(qc, scp);
+    return super.compile(qc, scp);
   }
 
   /**
    * Returns the atomized value of the constructor.
-   * @param ctx query context
+   * @param qc query context
    * @param ii input info
    * @return resulting value
    * @throws QueryException query exception
    */
-  final byte[] value(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  final byte[] value(final QueryContext qc, final InputInfo ii) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
-    for(final Expr e : expr) {
-      final Iter ir = ctx.iter(e);
+    for(final Expr e : exprs) {
+      final Iter ir = qc.iter(e);
       boolean m = false;
       for(Item it; (it = ir.next()) != null;) {
         if(m) tb.add(' ');
@@ -73,13 +73,13 @@ public abstract class CName extends CNode {
 
   /**
    * Returns an updated name expression.
-   * @param ctx query context
+   * @param qc query context
    * @param ii input info
    * @return result
    * @throws QueryException query exception
    */
-  final QNm qname(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Item it = checkItem(name, ctx);
+  final QNm qname(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Item it = checkItem(name, qc);
     final Type ip = it.type;
     if(ip == AtomType.QNM) return (QNm) it;
 
@@ -101,7 +101,7 @@ public abstract class CName extends CNode {
 
   @Override
   public final void plan(final FElem plan) {
-    addPlan(plan, planElem(), name, expr);
+    addPlan(plan, planElem(), name, exprs);
   }
 
   @Override
@@ -117,7 +117,7 @@ public abstract class CName extends CNode {
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
-    return name.accept(visitor) && visitAll(visitor, expr);
+    return name.accept(visitor) && visitAll(visitor, exprs);
   }
 
   @Override
@@ -126,18 +126,19 @@ public abstract class CName extends CNode {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
-    final boolean ex = inlineAll(ctx, scp, expr, v, e);
-    final Expr sub = name.inline(ctx, scp, v, e);
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
+
+    final boolean ex = inlineAll(qc, scp, exprs, v, e);
+    final Expr sub = name.inline(qc, scp, v, e);
     if(sub != null) name = sub;
-    return sub != null || ex ? optimize(ctx, scp) : null;
+    return sub != null || ex ? optimize(qc, scp) : null;
   }
 
   @Override
   public final int exprSize() {
     int sz = 1;
-    for(final Expr e : expr) sz += e.exprSize();
+    for(final Expr e : exprs) sz += e.exprSize();
     return sz + name.exprSize();
   }
 }

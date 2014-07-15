@@ -2,20 +2,21 @@ package org.basex.query.util;
 
 import java.sql.*;
 
+import org.basex.query.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Opened JDBC connections.
+ * JDBC connections.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Rositsa Shadura
  */
-public final class JDBCConnections {
+public final class JDBCConnections implements DataResources {
   /** Last inserted id. */
   private int lastId = -1;
   /** Map with all open connections and prepared statements with unique ids. */
-  private final IntObjMap<Object> conns = new IntObjMap<Object>();
+  private final IntObjMap<Object> conns = new IntObjMap<>();
 
   /**
    * Adds a connection or prepared statement to depot.
@@ -44,9 +45,7 @@ public final class JDBCConnections {
     conns.delete(id);
   }
 
-  /**
-   * Closes all opened connections.
-   */
+  @Override
   public void close() {
     for(int i = 0; i < conns.size(); i++) {
       final int key = conns.key(i);

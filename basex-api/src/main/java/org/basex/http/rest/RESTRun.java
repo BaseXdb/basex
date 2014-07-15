@@ -7,8 +7,10 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.parse.*;
 import org.basex.http.*;
 import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.util.*;
 
 /**
@@ -42,25 +44,38 @@ public final class RESTRun extends RESTQuery {
   /**
    * Creates a new instance of this command.
    * @param rs REST session
-   * @param input query input
+   * @param path relative path to query input
    * @param vars external variables
    * @param val context value
    * @return command
    * @throws IOException I/O exception
    */
-  static RESTRun get(final RESTSession rs, final String input, final Map<String, String[]> vars,
+  static RESTQuery get(final RESTSession rs, final String path, final Map<String, String[]> vars,
       final String val) throws IOException {
 
     // get root directory for files
     final IOFile root = new IOFile(rs.context.globalopts.get(GlobalOptions.WEBPATH));
 
     // check if file is not found, is a folder or points to parent folder
-    final IOFile io = new IOFile(root, input);
-    if(!io.exists() || io.isDir() || !io.path().startsWith(root.path()))
-      throw HTTPCode.NOT_FOUND_X.get(Util.info(RES_NOT_FOUND_X, input));
+    final IOFile file = new IOFile(root, path);
+    if(!file.exists() || file.isDir() || !file.path().startsWith(root.path()))
+      throw HTTPCode.NOT_FOUND_X.get(Util.info(RES_NOT_FOUND_X, path));
+
+    // retrieve file contents
+    final String input = file.string();
+    // interpret as commands if input ends with command script suffix
+    if(file.hasSuffix(IO.BXSSUFFIX)) {
+      try {
+        for(final Command cmd : new CommandParser(input, rs.context).parse()) rs.add(cmd);
+      } catch(final QueryException ex) {
+        throw new IOException(ex);
+      }
+    } else {
+      // otherwise, interpret input as xquery
+      rs.add(new XQuery(input));
+    }
 
     // perform query
-    rs.add(new XQuery(io.string()));
-    return new RESTRun(rs, vars, val, io.path());
+    return new RESTRun(rs, vars, val, file.path());
   }
 }

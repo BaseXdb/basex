@@ -26,7 +26,7 @@ import org.basex.util.list.*;
  */
 public abstract class Inspect {
   /** Query context. */
-  final QueryContext ctx;
+  final QueryContext qc;
   /** Input info. */
   final InputInfo info;
 
@@ -36,11 +36,11 @@ public abstract class Inspect {
   /**
    * Constructor.
    * @param qc query context
-   * @param ii input info
+   * @param info input info
    */
-  Inspect(final QueryContext qc, final InputInfo ii) {
-    ctx = qc;
-    info = ii;
+  Inspect(final QueryContext qc, final InputInfo info) {
+    this.qc = qc;
+    this.info = info;
   }
 
   /**
@@ -58,19 +58,17 @@ public abstract class Inspect {
    * @throws QueryException query exception
    */
   final QueryParser parseQuery(final IO io) throws QueryException {
-    final QueryContext qc = new QueryContext(ctx.context);
+    final QueryContext qctx = new QueryContext(qc.context);
     try {
       final String input = string(io.read());
       // parse query
-      final QueryParser qp = new QueryParser(input, io.path(), qc, null);
+      final QueryParser qp = new QueryParser(input, io.path(), qctx, null);
       module = QueryProcessor.isLibrary(input) ? qp.parseLibrary(true) : qp.parseMain();
       return qp;
-    } catch(final IOException ex) {
-      throw IOERR.get(info, ex);
-    } catch(final QueryException ex) {
+    } catch(final IOException | QueryException ex) {
       throw IOERR.get(info, ex);
     } finally {
-      qc.close();
+      qctx.close();
     }
   }
 
@@ -82,7 +80,7 @@ public abstract class Inspect {
   final void comment(final TokenObjMap<TokenList> tags, final FElem parent) {
     for(final byte[] key : tags) {
       for(final byte[] value : tags.get(key)) {
-        add(value, ctx.context, tag(key, parent));
+        add(value, qc.context, tag(key, parent));
       }
     }
   }

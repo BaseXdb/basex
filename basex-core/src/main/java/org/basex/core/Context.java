@@ -195,7 +195,7 @@ public final class Context {
   /**
    * Invalidates the current node set.
    */
-  public void update() {
+  public void invalidate() {
     current = null;
   }
 
@@ -240,16 +240,6 @@ public final class Context {
   }
 
   /**
-   * Downgrades locks.
-   * @param pr process
-   * @param write write locks to keep
-   */
-  public void downgrade(final Proc pr, final StringList write) {
-    // ignore downgrade call if process is not registered
-    if(pr.registered()) locks.downgrade(prepareLock(write, false));
-  }
-
-  /**
    * Unlocks the process and stops the timeout.
    * @param pr process
    */
@@ -276,6 +266,6 @@ public final class Context {
         else sl.set(d, data.meta.name);
       }
     }
-    return sl;
+    return sl.sort().unique();
   }
 }

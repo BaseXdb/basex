@@ -38,6 +38,8 @@ public interface Constants {
   byte[] LINE = token("line");
   /** Name: column. */
   byte[] COLUMN = token("column");
+  /** Name: uri. */
+  byte[] URI = token("uri");
   /** Name: error. */
   byte[] ERROR = token("error");
   /** Name: failures. */

@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.nio.charset.*;
+import java.nio.file.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -35,58 +36,58 @@ import org.basex.util.options.*;
  */
 public abstract class StandardFunc extends Arr {
   /** Function signature. */
-  Function sig;
+  Function func;
   /** Static context. */
   final StaticContext sc;
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param s function definition
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
    * @param args arguments
    */
-  protected StandardFunc(final StaticContext sctx, final InputInfo ii, final Function s,
+  protected StandardFunc(final StaticContext sc, final InputInfo info, final Function func,
       final Expr... args) {
-    super(ii, args);
-    sc = sctx;
-    sig = s;
-    type = sig.ret;
+    super(info, args);
+    this.sc = sc;
+    this.func = func;
+    this.type = func.ret;
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     // compile all arguments
-    super.compile(ctx, scp);
-    return optimize(ctx, scp);
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public final Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public final Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // skip context-based or non-deterministic functions, and non-values
-    return optPre(has(Flag.CTX) || has(Flag.NDT) || has(Flag.HOF) || !allAreValues()
-        ? opt(ctx, scp) : sig.ret.zeroOrOne() ? item(ctx, info) : value(ctx), ctx);
+    return optPre(has(Flag.CTX) || has(Flag.NDT) || has(Flag.HOF) || has(Flag.UPD) ||
+        !allAreValues() ? opt(qc, scp) : func.ret.zeroOrOne() ? item(qc, info) : value(qc), qc);
   }
 
   /**
    * Performs function specific optimizations.
-   * @param ctx query context
+   * @param qc query context
    * @param scp variable scope
    * @return evaluated item
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  Expr opt(final QueryContext ctx, final VarScope scp) throws QueryException {
+  Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
     return this;
   }
 
   @Override
-  public final StandardFunc copy(final QueryContext ctx, final VarScope scp,
+  public final StandardFunc copy(final QueryContext qc, final VarScope scp,
       final IntObjMap<Var> vs) {
-    final int es = expr.length;
+    final int es = exprs.length;
     final Expr[] arg = new Expr[es];
-    for(int e = 0; e < es; e++) arg[e] = expr[e].copy(ctx, scp, vs);
-    return sig.get(sc, info, arg);
+    for(int e = 0; e < es; e++) arg[e] = exprs[e].copy(qc, scp, vs);
+    return func.get(sc, info, arg);
   }
 
   /**
@@ -128,12 +129,12 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public boolean has(final Flag flag) {
-    return sig.has(flag) || flag != Flag.X30 && flag != Flag.HOF && super.has(flag);
+    return func.has(flag) || flag != Flag.X30 && flag != Flag.HOF && super.has(flag);
   }
 
   @Override
   public final boolean isFunction(final Function f) {
-    return sig == f;
+    return func == f;
   }
 
   @Override
@@ -143,81 +144,90 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final String description() {
-    return sig.toString();
+    return func.toString();
   }
 
   @Override
   public final void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, sig.desc), expr);
+    addPlan(plan, planElem(NAM, func.desc), exprs);
   }
 
   @Override
   public final String toString() {
-    final String desc = sig.toString();
+    final String desc = func.toString();
     return new TokenBuilder(desc.substring(0,
-        desc.indexOf('(') + 1)).addSep(expr, SEP).add(PAR2).toString();
+        desc.indexOf('(') + 1)).addSep(exprs, SEP).add(PAR2).toString();
   }
 
   /**
-   * Returns a data instance for the first string argument of the function.
+   * Returns a database instance for the first string argument of the function.
    * This method assumes that the function has at least one argument.
-   * @param ctx query context
+   * @param qc query context
    * @return data instance
    * @throws QueryException query exception
    */
-  final Data checkData(final QueryContext ctx) throws QueryException {
-    final String name = string(checkStr(expr[0], ctx));
+  protected final Data checkData(final QueryContext qc) throws QueryException {
+    final String name = string(checkStr(exprs[0], qc));
     if(!Databases.validName(name)) throw INVDB.get(info, name);
-    return ctx.resource.database(name, info);
+    return qc.resources.database(name, info);
   }
 
   /**
-   * Converts the specified argument to a file instance.
+   * Converts the specified argument to a file path.
    * @param i argument index
-   * @param ctx query context
+   * @param qc query context
    * @return file instance
    * @throws QueryException query exception
    */
-  File checkFile(final int i, final QueryContext ctx) throws QueryException {
-    if(i >= expr.length) return null;
-    final String file = string(checkStr(expr[i], ctx));
-    return IOUrl.isFileURL(file) ? IOFile.get(file).file() : new File(file);
+  protected Path checkPath(final int i, final QueryContext qc) throws QueryException {
+    if(i >= exprs.length) return null;
+    final String file = string(checkStr(exprs[i], qc));
+    try {
+      return Paths.get(IOUrl.isFileURL(file) ? IOUrl.toFile(file) : file);
+    } catch(final InvalidPathException ex) {
+      throw FILE_INVALID_PATH.get(info, file);
+    }
   }
 
   /**
    * Returns a valid reference if a file is found in the specified path or the static base uri.
    * Otherwise, returns an error.
    * @param path file path
-   * @param ctx query context
+   * @param qc query context
    * @return input source, or exception
    * @throws QueryException query exception
    */
-  public IO checkPath(final Expr path, final QueryContext ctx) throws QueryException {
-    return QueryResources.checkPath(new QueryInput(string(checkStr(path, ctx))), sc.baseIO(), info);
+  IO checkPath(final Expr path, final QueryContext qc) throws QueryException {
+    return QueryResources.checkPath(new QueryInput(string(checkStr(path, qc))), sc.baseIO(), info);
   }
 
   /**
-   * Checks if the specified database can be detected for locking, i.e., if the
-   * first argument of the tested function is a static string.
-   * This method assumes that the function has at least one argument.
+   * Checks if one of the specified arguments point to databases that need to be locked.
    * @param visitor visitor
+   * @param dbs database arguments
    * @return result of check
    */
-  final boolean dataLock(final ASTVisitor visitor) {
-    return visitor.lock(expr[0] instanceof Str ? string(((Str) expr[0]).string()) : null);
+  protected final boolean dataLock(final ASTVisitor visitor, final int dbs) {
+    boolean more = true;
+    for(int db = 0; db < dbs; db++) {
+      more &= visitor.lock(exprs[db] instanceof Str ? string(((Str) exprs[db]).string()) : null);
+    }
+    return more;
   }
 
   /**
    * Returns a normalized encoding representation.
    * @param i index of encoding argument
    * @param err error for invalid encoding
-   * @param ctx query context
+   * @param qc query context
    * @return text entry
    * @throws QueryException query exception
    */
-  final String encoding(final int i, final Err err, final QueryContext ctx) throws QueryException {
-    if(i >= expr.length) return null;
-    final String enc = string(checkStr(expr[i], ctx));
+  protected final String encoding(final int i, final Err err, final QueryContext qc)
+      throws QueryException {
+
+    if(i >= exprs.length) return null;
+    final String enc = string(checkStr(exprs[i], qc));
     try {
       if(Charset.isSupported(enc)) return normEncoding(enc);
     } catch(final IllegalArgumentException ignored) {
@@ -232,25 +242,25 @@ public abstract class StandardFunc extends Arr {
    * @param i index of options argument
    * @param qnm QName
    * @param opts options
-   * @param ctx query context
+   * @param qc query context
    * @return passed on options
    * @throws QueryException query exception
    */
-  <E extends Options> E checkOptions(final int i, final QNm qnm, final E opts,
-      final QueryContext ctx) throws QueryException {
-    if(i < expr.length) new FuncOptions(qnm, info).parse(expr[i].item(ctx, info), opts);
+  protected <E extends Options> E checkOptions(final int i, final QNm qnm, final E opts,
+      final QueryContext qc) throws QueryException {
+    if(i < exprs.length) new FuncOptions(qnm, info).parse(exprs[i].item(qc, info), opts);
     return opts;
   }
 
   /**
    * Converts the specified dateTime to milliseconds.
    * @param e expression
-   * @param ctx query context
+   * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  final long dateTimeToMs(final Expr e, final QueryContext ctx) throws QueryException {
-    final Dtm dtm = (Dtm) checkType(checkItem(e, ctx), AtomType.DTM);
+  protected final long dateTimeToMs(final Expr e, final QueryContext qc) throws QueryException {
+    final Dtm dtm = (Dtm) checkType(checkItem(e, qc), AtomType.DTM);
     if(dtm.yea() > 292278993) throw INTRANGE.get(info, dtm);
     return dtm.toJava().toGregorianCalendar().getTimeInMillis();
   }
@@ -258,15 +268,17 @@ public abstract class StandardFunc extends Arr {
   /**
    * Returns all keys and values of the specified binding argument.
    * @param i index of argument
-   * @param ctx query context
+   * @param qc query context
    * @return resulting map
    * @throws QueryException query exception
    */
-  final HashMap<String, Value> bindings(final int i, final QueryContext ctx) throws QueryException {
-    final HashMap<String, Value> hm = new HashMap<String, Value>();
-    final int es = expr.length;
+  protected final HashMap<String, Value> bindings(final int i, final QueryContext qc)
+      throws QueryException {
+
+    final HashMap<String, Value> hm = new HashMap<>();
+    final int es = exprs.length;
     if(i < es) {
-      final Map map = checkMap(checkItem(expr[i], ctx));
+      final Map map = checkMap(checkItem(exprs[i], qc));
       for(final Item it : map.keys()) {
         final byte[] key;
         if(it instanceof Str) {
@@ -285,21 +297,17 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Caches and materializes all items of the specified iterator.
-   * @param ir iterator
+   * @param iter iterator
    * @param vb value builder
-   * @param ctx query context
+   * @param qc query context
    * @throws QueryException query exception
    */
-  final void cache(final Iter ir, final ValueBuilder vb, final QueryContext ctx)
+  protected final void cache(final Iter iter, final ValueBuilder vb, final QueryContext qc)
       throws QueryException {
 
-    for(Item it; (it = ir.next()) != null;) {
-      ctx.checkStop();
+    for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
       if(it instanceof FItem) throw FIVALUE.get(info, it.type);
-      // cache database nodes
-      final Data d = it.data();
-      if(d != null && !d.inMemory()) it = ((ANode) it).dbCopy(ctx.context.options);
-      // add materialized version of nodes
       vb.add(it.materialize(info));
     }
   }
@@ -310,7 +318,7 @@ public abstract class StandardFunc extends Arr {
    * @param sigs signatures to be compared
    * @return result of check
    */
-  static boolean oneOf(final Function sig, final Function... sigs) {
+  protected static boolean oneOf(final Function sig, final Function... sigs) {
     for(final Function s : sigs) if(sig == s) return true;
     return false;
   }

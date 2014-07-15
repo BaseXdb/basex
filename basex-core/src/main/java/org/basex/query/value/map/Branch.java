@@ -21,14 +21,14 @@ final class Branch extends TrieNode {
 
   /**
    * Constructor taking children array and the size of this map.
-   * @param ch children
-   * @param u bit array
-   * @param s size of this node
+   * @param kids children
+   * @param used bit array
+   * @param size size of this node
    */
-  Branch(final TrieNode[] ch, final int u, final int s) {
-    super(s);
-    kids = ch;
-    used = u;
+  Branch(final TrieNode[] kids, final int used, final int size) {
+    super(size);
+    this.kids = kids;
+    this.used = used;
     assert verify();
   }
 

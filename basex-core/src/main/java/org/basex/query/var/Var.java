@@ -43,32 +43,32 @@ public final class Var extends ExprInfo {
 
   /**
    * Constructor.
-   * @param ctx query context, used for generating a variable ID
-   * @param sctx static context
-   * @param n variable name, {@code null} for unnamed variable
-   * @param typ expected type, {@code null} for no check
-   * @param fun function parameter flag
+   * @param qc query context, used for generating a variable ID
+   * @param sc static context
+   * @param name variable name, {@code null} for unnamed variable
+   * @param type expected type, {@code null} for no check
+   * @param param function parameter flag
    */
-  Var(final QueryContext ctx, final StaticContext sctx, final QNm n, final SeqType typ,
-      final boolean fun) {
-    sc = sctx;
-    name = n;
-    declType = typ == null || typ.eq(SeqType.ITEM_ZM) ? null : typ;
+  Var(final QueryContext qc, final StaticContext sc, final QNm name, final SeqType type,
+      final boolean param) {
+    this.sc = sc;
+    this.name = name;
+    this.param = param;
+    this.promote = param;
+    declType = type == null || type.eq(SeqType.ITEM_ZM) ? null : type;
     inType = SeqType.ITEM_ZM;
-    id = ctx.varIDs++;
-    param = fun;
-    promote = fun;
+    id = qc.varIDs++;
     size = inType.occ();
   }
 
   /**
    * Copy constructor.
-   * @param ctx query context
-   * @param sctx static context
+   * @param qc query context
+   * @param sc static context
    * @param var variable to copy
    */
-  Var(final QueryContext ctx, final StaticContext sctx, final Var var) {
-    this(ctx, sctx, var.name, var.declType, var.param);
+  Var(final QueryContext qc, final StaticContext sc, final Var var) {
+    this(qc, sc, var.name, var.declType, var.param);
     promote = var.promote;
     inType = var.inType;
     size = var.size;
@@ -95,11 +95,11 @@ public final class Var extends ExprInfo {
    * Tries to refine the compile-time type of this variable through the type of the bound
    * expression.
    * @param t type of the bound expression
-   * @param ctx query context
+   * @param qc query context
    * @param ii input info
    * @throws QueryException query exception
    */
-  public void refineType(final SeqType t, final QueryContext ctx, final InputInfo ii)
+  public void refineType(final SeqType t, final QueryContext qc, final InputInfo ii)
       throws QueryException {
 
     if(t == null) return;
@@ -107,7 +107,7 @@ public final class Var extends ExprInfo {
     if(declType != null) {
       if(declType.occ.intersect(t.occ) == null) throw INVCAST.get(ii, t, declType);
       if(t.instanceOf(declType)) {
-        ctx.compInfo(QueryText.OPTCAST, this);
+        qc.compInfo(QueryText.OPTCAST, this);
         declType = null;
       } else if(!t.promotable(declType)) {
         return;
@@ -133,30 +133,30 @@ public final class Var extends ExprInfo {
    * Returns an equivalent to the given expression that checks this variable's type.
    * @param e expression
    * @param scp variable scope
-   * @param ctx query context
+   * @param qc query context
    * @param ii input info
    * @return checked expression
    * @throws QueryException query exception
    */
-  public Expr checked(final Expr e, final QueryContext ctx, final VarScope scp, final InputInfo ii)
+  public Expr checked(final Expr e, final QueryContext qc, final VarScope scp, final InputInfo ii)
       throws QueryException {
-    return checksType() ? new TypeCheck(sc, ii, e, declType, promote).optimize(ctx, scp) : e;
+    return checksType() ? new TypeCheck(sc, ii, e, declType, promote).optimize(qc, scp) : e;
   }
 
   /**
    * Checks the type of this value and casts/promotes it when necessary.
    * @param val value to be checked
-   * @param ctx query context
+   * @param qc query context
    * @param ii input info
    * @param opt if the result should be optimized
    * @return checked and possibly cast value
    * @throws QueryException if the check failed
    */
-  public Value checkType(final Value val, final QueryContext ctx, final InputInfo ii,
+  public Value checkType(final Value val, final QueryContext qc, final InputInfo ii,
       final boolean opt) throws QueryException {
 
     if(!checksType() || declType.instance(val)) return val;
-    if(promote) return declType.promote(ctx, sc, ii, val, opt);
+    if(promote) return declType.promote(qc, sc, ii, val, opt);
     throw INVCAST.get(ii, val.type(), declType);
   }
 
@@ -178,7 +178,7 @@ public final class Var extends ExprInfo {
     if(!checksType() || vt.type.instanceOf(et.type) ||
         et.type.instanceOf(vt.type) && et.occ.instanceOf(vt.occ)) return;
 
-    if(!promote || (!et.type.isNode() && !et.promotable(vt))) {
+    if(!promote || !et.type.isNode() && !et.promotable(vt)) {
       if(vt.type.nsSensitive() && sc.xquery3()) throw NSSENS.get(info, et, vt);
       throw INVCAST.get(info, et, vt);
     }
@@ -210,6 +210,32 @@ public final class Var extends ExprInfo {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return obj instanceof Var && is((Var) obj);
+  }
+
+  @Override
+  public int hashCode() {
+    return id;
+  }
+
+  /**
+   * Tries to adopt the given type check.
+   * @param type type to check
+   * @param prom if function conversion should be applied
+   * @return {@code true} if the check could be adopted, {@code false} otherwise
+   */
+  public boolean adoptCheck(final SeqType type, final boolean prom) {
+    if(declType == null || type.instanceOf(declType)) {
+      declType = type;
+    } else if(!declType.instanceOf(type)) {
+      return false;
+    }
+    promote |= prom;
+    return true;
+  }
+
+  @Override
   public String toErrorString() {
     return new TokenBuilder().add(QueryText.DOLLAR).add(name.string()).toString();
   }
@@ -223,32 +249,5 @@ public final class Var extends ExprInfo {
     }
     if(declType != null) tb.add(" " + declType);
     return tb.toString();
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return obj instanceof Var && is((Var) obj);
-  }
-
-  @Override
-  public int hashCode() {
-    return id;
-  }
-
-  /**
-   * Tries to adopt the given type check.
-   * @param t type to check
-   * @param prom if function conversion should be applied
-   * @return {@code true} if the check could be adopted, {@code false} otherwise
-   */
-  public boolean adoptCheck(final SeqType t, final boolean prom) {
-    if(declType == null || t.instanceOf(declType)) {
-      declType = t;
-    } else if(!declType.instanceOf(t)) {
-      return false;
-    }
-
-    promote |= prom;
-    return true;
   }
 }

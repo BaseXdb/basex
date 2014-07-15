@@ -22,7 +22,7 @@ public class FuncType implements Type {
   public static final FuncType ANY_FUN = new FuncType(null, null, null);
 
   /** Annotations. */
-  public final Ann ann;
+  private final Ann ann;
   /** Argument types. */
   public final SeqType[] args;
   /** Return type. */
@@ -33,14 +33,14 @@ public class FuncType implements Type {
 
   /**
    * Constructor.
-   * @param a annotations
-   * @param arg argument types
-   * @param typ return type
+   * @param ann annotations
+   * @param args argument types
+   * @param ret return type
    */
-  FuncType(final Ann a, final SeqType[] arg, final SeqType typ) {
-    ann = a != null ? a : new Ann();
-    args = arg;
-    ret = typ;
+  FuncType(final Ann ann, final SeqType[] args, final SeqType ret) {
+    this.ann = ann != null ? ann : new Ann();
+    this.args = args;
+    this.ret = ret;
   }
 
   @Override
@@ -80,23 +80,23 @@ public class FuncType implements Type {
   }
 
   @Override
-  public FItem cast(final Item it, final QueryContext ctx, final StaticContext sc,
+  public FItem cast(final Item it, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) throws QueryException {
 
     if(!(it instanceof FItem)) throw Err.castError(ii, this, it);
     final FItem f = (FItem) it;
-    return this == ANY_FUN ? f : f.coerceTo(this, ctx, ii, false);
+    return this == ANY_FUN ? f : f.coerceTo(this, qc, ii, false);
   }
 
   @Override
-  public final Item cast(final Object o, final QueryContext ctx, final StaticContext sc,
+  public final Item cast(final Object o, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) {
     throw Util.notExpected(o);
   }
 
   @Override
-  public final Item castString(final String s, final QueryContext ctx,
-      final StaticContext sc, final InputInfo ii) {
+  public final Item castString(final String s, final QueryContext qc, final StaticContext sc,
+      final InputInfo ii) {
     throw Util.notExpected(s);
   }
 
@@ -157,7 +157,7 @@ public class FuncType implements Type {
     if(t instanceof MapType) return t.intersect(this);
 
     // the easy cases
-    if(this.instanceOf(t)) return this;
+    if(instanceOf(t)) return this;
     if(t.instanceOf(this)) return t;
 
     if(t instanceof FuncType) {
@@ -176,13 +176,13 @@ public class FuncType implements Type {
 
   /**
    * Getter for function types.
-   * @param a annotations
+   * @param ann annotations
    * @param ret return type
    * @param args argument types
    * @return function type
    */
-  public static FuncType get(final Ann a, final SeqType ret, final SeqType... args) {
-    return args == null || ret == null ? ANY_FUN : new FuncType(a, args, ret);
+  public static FuncType get(final Ann ann, final SeqType ret, final SeqType... args) {
+    return args == null || ret == null ? ANY_FUN : new FuncType(ann, args, ret);
   }
 
   /**

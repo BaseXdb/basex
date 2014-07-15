@@ -19,25 +19,27 @@ import org.basex.util.*;
 public final class FNMath extends StandardFunc {
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNMath(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNMath(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final double e = exprs.length == 2 ? checkDbl(exprs[1], qc) : 0;
     double d = 0;
-    if(expr.length > 0 && sig != _MATH_CRC32) {
-      if(expr[0].isEmpty()) return null;
-      d = checkDbl(expr[0], ctx);
+    if(exprs.length > 0 && func != _MATH_CRC32) {
+      final Item it = exprs[0].item(qc, info);
+      if(it == null) return null;
+      d = checkDbl(it, qc);
     }
-    final double e = expr.length == 2 ? checkDbl(expr[1], ctx) : 0;
 
-    switch(sig) {
+    switch(func) {
       case _MATH_PI:     return Dbl.get(PI);
       case _MATH_E:      return Dbl.get(E);
       case _MATH_SQRT:   return Dbl.get(sqrt(d));
@@ -57,8 +59,8 @@ public final class FNMath extends StandardFunc {
       case _MATH_SINH:   return Dbl.get(sinh(d));
       case _MATH_COSH:   return Dbl.get(cosh(d));
       case _MATH_TANH:   return Dbl.get(tanh(d));
-      case _MATH_CRC32:  return crc32(ctx);
-      default:           return super.item(ctx, ii);
+      case _MATH_CRC32:  return crc32(qc);
+      default:           return super.item(qc, ii);
     }
   }
 
@@ -79,13 +81,13 @@ public final class FNMath extends StandardFunc {
 
   /**
    * Creates the CRC32 hash of the given xs:string.
-   * @param ctx query context
+   * @param qc query context
    * @return xs:hexBinary instance containing the hash
    * @throws QueryException exception
    */
-  private Hex crc32(final QueryContext ctx) throws QueryException {
+  private Hex crc32(final QueryContext qc) throws QueryException {
     final CRC32 crc = new CRC32();
-    crc.update(checkStr(expr[0], ctx));
+    crc.update(checkStr(exprs[0], qc));
     final byte[] r = new byte[4];
     for(int i = r.length, c = (int) crc.getValue(); i-- > 0; c >>>= 8) r[i] = (byte) c;
     return new Hex(r);

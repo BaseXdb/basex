@@ -18,11 +18,9 @@ public class JsonOptions extends Options {
   /** Option: lax conversion of names to QNames. */
   public static final BooleanOption LAX = new BooleanOption("lax", false);
   /** Option: parser specification. */
-  public static final EnumOption<JsonSpec> SPEC =
-      new EnumOption<JsonSpec>("spec", JsonSpec.RFC4627);
+  public static final EnumOption<JsonSpec> SPEC = new EnumOption<>("spec", JsonSpec.RFC4627);
   /** Option: format. */
-  public static final EnumOption<JsonFormat> FORMAT =
-      new EnumOption<JsonFormat>("format", JsonFormat.DIRECT);
+  public static final EnumOption<JsonFormat> FORMAT = new EnumOption<>("format", JsonFormat.DIRECT);
 
   /** JSON specs. */
   public enum JsonSpec {

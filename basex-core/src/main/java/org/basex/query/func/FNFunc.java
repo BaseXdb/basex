@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
@@ -25,88 +26,89 @@ public final class FNFunc extends StandardFunc {
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNFunc(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNFunc(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
-      case FOR_EACH:      return forEach(ctx);
-      case FILTER:        return filter(ctx);
-      case FOR_EACH_PAIR: return forEachPair(ctx);
-      case FOLD_LEFT:     return foldLeft(ctx);
-      case FOLD_RIGHT:    return foldRight(ctx);
-      default:            return super.iter(ctx);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    switch(func) {
+      case FOR_EACH:      return forEach(qc);
+      case FILTER:        return filter(qc);
+      case FOR_EACH_PAIR: return forEachPair(qc);
+      case FOLD_LEFT:     return foldLeft(qc);
+      case FOLD_RIGHT:    return foldRight(qc);
+      default:            return super.iter(qc);
     }
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
-      case FUNCTION_ARITY:  return Int.get(checkFunc(expr[0], ctx).arity());
-      case FUNCTION_NAME:   return checkFunc(expr[0], ctx).funcName();
-      case FUNCTION_LOOKUP: return lookup(ctx, ii);
-      default:              return super.item(ctx, ii);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    switch(func) {
+      case FUNCTION_ARITY:  return Int.get(checkFunc(exprs[0], qc).arity());
+      case FUNCTION_NAME:   return checkFunc(exprs[0], qc).funcName();
+      case FUNCTION_LOOKUP: return lookup(qc, ii);
+      default:              return super.item(qc, ii);
     }
   }
 
   @Override
-  Expr opt(final QueryContext ctx, final VarScope scp) throws QueryException {
-    if(oneOf(sig, Function.FOLD_LEFT, Function.FOLD_RIGHT, Function.FOR_EACH)
-        && allAreValues() && expr[0].size() < UNROLL_LIMIT) {
+  Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+    if(oneOf(func, FOLD_LEFT, FOLD_RIGHT, FOR_EACH)
+        && allAreValues() && exprs[0].size() < UNROLL_LIMIT) {
       // unroll the loop
-      ctx.compInfo(QueryText.OPTUNROLL, this);
-      final Value seq = (Value) expr[0];
+      qc.compInfo(QueryText.OPTUNROLL, this);
+      final Value seq = (Value) exprs[0];
       final int len = (int) seq.size();
 
       // fn:for-each(...)
-      if (sig == Function.FOR_EACH) {
+      if (func == FOR_EACH) {
         final Expr[] results = new Expr[len];
         for(int i = 0; i < len; i++) {
-          results[i] = new DynFuncCall(info, expr[1], seq.itemAt(i)).optimize(ctx, scp);
+          results[i] = new DynFuncCall(info, sc, false, exprs[1], seq.itemAt(i)).optimize(qc, scp);
         }
-        return new List(info, results).optimize(ctx, scp);
+        return new List(info, results).optimize(qc, scp);
       }
 
       // folds
-      Expr e = expr[1];
-      if (sig == Function.FOLD_LEFT) {
+      Expr e = exprs[1];
+      if (func == FOLD_LEFT) {
         for (final Item it : seq)
-          e = new DynFuncCall(info, expr[2], e, it).optimize(ctx, scp);
+          e = new DynFuncCall(info, sc, false, exprs[2], e, it).optimize(qc, scp);
       } else {
         for (int i = len; --i >= 0;)
-          e = new DynFuncCall(info, expr[2], seq.itemAt(i), e).optimize(ctx, scp);
+          e = new DynFuncCall(info, sc, false, exprs[2], seq.itemAt(i), e).optimize(qc, scp);
       }
       return e;
     }
 
-    if(sig == Function.FUNCTION_LOOKUP) {
-      for(final StaticFunc sf : ctx.funcs.funcs()) sf.compile(ctx);
+    if(func == FUNCTION_LOOKUP) {
+      for(final StaticFunc sf : qc.funcs.funcs()) sf.compile(qc);
     }
     return this;
   }
 
   /**
    * Looks up the specified function item.
-   * @param ctx query context
+   * @param qc query context
    * @param ii input info
    * @return function item
    * @throws QueryException query exception
    */
-  private Item lookup(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final QNm name = checkQNm(expr[0], ctx, sc);
-    final long arity = checkItr(expr[1], ctx);
+  private Item lookup(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final QNm name = checkQNm(exprs[0], qc, sc);
+    final long arity = checkItr(exprs[1], qc);
     if(arity < 0 || arity > Integer.MAX_VALUE) throw FUNCUNKNOWN.get(ii, name);
 
     try {
-      final Expr lit = Functions.getLiteral(name, (int) arity, ctx, sc, ii);
-      return lit == null ? null : lit.item(ctx, ii);
+      final Expr lit = Functions.getLiteral(name, (int) arity, qc, sc, ii);
+      return lit == null ? null : lit.item(qc, ii);
     } catch(final QueryException e) {
       // function not found (in most cases: XPST0017)
       return null;
@@ -115,13 +117,13 @@ public final class FNFunc extends StandardFunc {
 
   /**
    * Maps a function onto a sequence of items.
-   * @param ctx query context
+   * @param qc query context
    * @return sequence of results
    * @throws QueryException exception
    */
-  private Iter forEach(final QueryContext ctx) throws QueryException {
-    final FItem f = withArity(1, 1, ctx);
-    final Iter xs = expr[0].iter(ctx);
+  private Iter forEach(final QueryContext qc) throws QueryException {
+    final FItem f = withArity(1, 1, qc);
+    final Iter xs = exprs[0].iter(qc);
     return new Iter() {
       /** Results. */
       Iter ys = Empty.ITER;
@@ -133,7 +135,7 @@ public final class FNFunc extends StandardFunc {
           if(it != null) return it;
           final Item x = xs.next();
           if(x == null) return null;
-          ys = f.invokeValue(ctx, info, x).iter();
+          ys = f.invokeValue(qc, info, x).iter();
         } while(true);
       }
     };
@@ -141,20 +143,20 @@ public final class FNFunc extends StandardFunc {
 
   /**
    * Filters the given sequence with the given predicate.
-   * @param ctx query context
+   * @param qc query context
    * @return filtered sequence
    * @throws QueryException query exception
    */
-  private Iter filter(final QueryContext ctx) throws QueryException {
-    final FItem f = withArity(1, 1, ctx);
-    final Iter xs = expr[0].iter(ctx);
+  private Iter filter(final QueryContext qc) throws QueryException {
+    final FItem f = withArity(1, 1, qc);
+    final Iter xs = exprs[0].iter(qc);
     return new Iter() {
       @Override
       public Item next() throws QueryException {
         do {
           final Item it = xs.next();
           if(it == null) return null;
-          if(checkBln(checkNoEmpty(f.invokeItem(ctx, info, it)), ctx)) return it;
+          if(checkBln(checkNoEmpty(f.invokeItem(qc, info, it)), qc)) return it;
         } while(true);
       }
     };
@@ -162,14 +164,14 @@ public final class FNFunc extends StandardFunc {
 
   /**
    * Zips two sequences with the given zipper function.
-   * @param ctx query context
+   * @param qc query context
    * @return sequence of results
    * @throws QueryException query exception
    */
-  private Iter forEachPair(final QueryContext ctx) throws QueryException {
-    final FItem zipper = withArity(2, 2, ctx);
-    final Iter xs = expr[0].iter(ctx);
-    final Iter ys = expr[1].iter(ctx);
+  private Iter forEachPair(final QueryContext qc) throws QueryException {
+    final FItem zipper = withArity(2, 2, qc);
+    final Iter xs = exprs[0].iter(qc);
+    final Iter ys = exprs[1].iter(qc);
     return new Iter() {
       /** Results. */
       Iter zs = Empty.ITER;
@@ -181,7 +183,7 @@ public final class FNFunc extends StandardFunc {
           if(it != null) return it;
           final Item x = xs.next(), y = ys.next();
           if(x == null || y == null) return null;
-          zs = zipper.invokeValue(ctx, info, x, y).iter();
+          zs = zipper.invokeValue(qc, info, x, y).iter();
         } while(true);
       }
     };
@@ -189,38 +191,38 @@ public final class FNFunc extends StandardFunc {
 
   /**
    * Folds a sequence into a return value, starting from the left.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting sequence
    * @throws QueryException query exception
    */
-  private Iter foldLeft(final QueryContext ctx) throws QueryException {
-    final FItem f = withArity(2, 2, ctx);
-    final Iter xs = expr[0].iter(ctx);
+  private Iter foldLeft(final QueryContext qc) throws QueryException {
+    final FItem f = withArity(2, 2, qc);
+    final Iter xs = exprs[0].iter(qc);
     Item x = xs.next();
 
     // don't convert to a value if not necessary
-    if(x == null) return expr[1].iter(ctx);
+    if(x == null) return exprs[1].iter(qc);
 
-    Value sum = ctx.value(expr[1]);
-    do sum = f.invokeValue(ctx, info, sum, x);
+    Value sum = qc.value(exprs[1]);
+    do sum = f.invokeValue(qc, info, sum, x);
     while((x = xs.next()) != null);
     return sum.iter();
   }
 
   /**
    * Folds a sequence into a return value, starting from the left.
-   * @param ctx query context
+   * @param qc query context
    * @return resulting sequence
    * @throws QueryException query exception
    */
-  private Iter foldRight(final QueryContext ctx) throws QueryException {
-    final FItem f = withArity(2, 2, ctx);
-    final Value xs = ctx.value(expr[0]);
+  private Iter foldRight(final QueryContext qc) throws QueryException {
+    final FItem f = withArity(2, 2, qc);
+    final Value xs = qc.value(exprs[0]);
     // evaluate start value lazily if it's passed straight through
-    if(xs.isEmpty()) return expr[1].iter(ctx);
+    if(xs.isEmpty()) return exprs[1].iter(qc);
 
-    Value res = ctx.value(expr[1]);
-    for(long i = xs.size(); --i >= 0;) res = f.invokeValue(ctx, info, xs.itemAt(i), res);
+    Value res = qc.value(exprs[1]);
+    for(long i = xs.size(); --i >= 0;) res = f.invokeValue(qc, info, xs.itemAt(i), res);
     return res.iter();
   }
 
@@ -228,12 +230,12 @@ public final class FNFunc extends StandardFunc {
    * Casts and checks the function item for its arity.
    * @param p position of the function
    * @param a arity
-   * @param ctx query context
+   * @param qc query context
    * @return function item
    * @throws QueryException query exception
    */
-  private FItem withArity(final int p, final int a, final QueryContext ctx) throws QueryException {
-    final Item it = checkItem(expr[p], ctx);
+  private FItem withArity(final int p, final int a, final QueryContext qc) throws QueryException {
+    final Item it = checkItem(exprs[p], qc);
     if(it instanceof FItem) {
       final FItem fi = (FItem) it;
       if(fi.arity() == a) return fi;

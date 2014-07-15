@@ -23,30 +23,30 @@ public class B64 extends Bin {
 
   /**
    * Constructor.
-   * @param d binary data
+   * @param data binary data
    */
-  public B64(final byte[] d) {
-    super(d, AtomType.B64);
+  public B64(final byte[] data) {
+    super(data, AtomType.B64);
   }
 
   /**
    * Constructor.
-   * @param v textual representation
+   * @param value textual representation
    * @param ii input info
    * @throws QueryException query exception
    */
-  public B64(final byte[] v, final InputInfo ii) throws QueryException {
-    super(decode(v, ii), AtomType.B64);
+  public B64(final byte[] value, final InputInfo ii) throws QueryException {
+    super(decode(value, ii), AtomType.B64);
   }
 
   /**
    * Constructor.
-   * @param b base64 input
+   * @param bin base64 input
    * @param ii input info
    * @throws QueryException query exception
    */
-  public B64(final Bin b, final InputInfo ii) throws QueryException {
-    this(b.binary(ii));
+  public B64(final Bin bin, final InputInfo ii) throws QueryException {
+    this(bin.binary(ii));
   }
 
   @Override

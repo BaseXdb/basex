@@ -21,7 +21,6 @@ import org.basex.util.hash.*;
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
- * @author Andreas Weiler
  */
 final class XMLScanner extends Proc {
   /** Entities. */
@@ -685,7 +684,7 @@ final class XMLScanner extends Proc {
         while((ch = nextChar()) != qu) tok.add(ch);
         if(!f) return null;
         final String name = string(tok.finish());
-        if(!dtd && r) return cont;
+        if(!dtd && r) return null;
 
         final XMLInput tin = input;
         if(dtd) {

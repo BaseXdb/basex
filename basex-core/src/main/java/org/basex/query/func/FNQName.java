@@ -21,47 +21,48 @@ import org.basex.util.*;
 public final class FNQName extends StandardFunc {
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNQName(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNQName(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
-      case IN_SCOPE_PREFIXES: return inscope(ctx);
-      default:                return super.iter(ctx);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    switch(func) {
+      case IN_SCOPE_PREFIXES: return inscope(qc);
+      default:                return super.iter(qc);
     }
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // functions have 1 or 2 arguments...
-    final Item it = expr[0].item(ctx, info);
-    final Item it2 = expr.length == 2 ? expr[1].item(ctx, info) : null;
-    switch(sig) {
+    final Item it = exprs[0].item(qc, info);
+    final Item it2 = exprs.length == 2 ? exprs[1].item(qc, info) : null;
+    switch(func) {
       case RESOLVE_QNAME:            return resolveQName(it, it2);
       case QNAME:                    return qName(it, it2);
-      case LOCAL_NAME_FROM_QNAME:    return lnFromQName(ctx, it);
-      case PREFIX_FROM_QNAME:        return prefixFromQName(ctx, it);
+      case LOCAL_NAME_FROM_QNAME:    return lnFromQName(qc, it);
+      case PREFIX_FROM_QNAME:        return prefixFromQName(qc, it);
       case NAMESPACE_URI_FOR_PREFIX: return nsUriForPrefix(it, it2);
       case RESOLVE_URI:              return resolveUri(it, it2);
-      default:                       return super.item(ctx, ii);
+      default:                       return super.item(qc, ii);
     }
   }
 
   /**
    * Returns the in-scope prefixes of the specified node.
-   * @param ctx query context
+   * @param qc query context
    * @return prefix sequence
    * @throws QueryException query exception
    */
-  private Iter inscope(final QueryContext ctx) throws QueryException {
-    final ANode node = (ANode) checkType(expr[0].item(ctx, info),
+  private Iter inscope(final QueryContext qc) throws QueryException {
+    final ANode node = (ANode) checkType(exprs[0].item(qc, info),
         NodeType.ELM);
 
     final Atts ns = node.nsScope().add(XML, XMLURI);
@@ -97,28 +98,28 @@ public final class FNQName extends StandardFunc {
 
   /**
    * Returns the local name of a QName.
-   * @param ctx query context
+   * @param qc query context
    * @param it qname
    * @return prefix sequence
    * @throws QueryException query exception
    */
-  private Item lnFromQName(final QueryContext ctx, final Item it) throws QueryException {
+  private Item lnFromQName(final QueryContext qc, final Item it) throws QueryException {
     if(it == null) return null;
-    final QNm nm = checkQNm(it, ctx, sc);
-    return AtomType.NCN.cast(Str.get(nm.local()), ctx, sc, info);
+    final QNm nm = checkQNm(it, qc, sc);
+    return AtomType.NCN.cast(Str.get(nm.local()), qc, sc, info);
   }
 
   /**
    * Returns the local name of a QName.
-   * @param ctx query context
+   * @param qc query context
    * @param it qname
    * @return prefix sequence
    * @throws QueryException query exception
    */
-  private Item prefixFromQName(final QueryContext ctx, final Item it) throws QueryException {
+  private Item prefixFromQName(final QueryContext qc, final Item it) throws QueryException {
     if(it == null) return null;
-    final QNm nm = checkQNm(it, ctx, sc);
-    return nm.hasPrefix() ? AtomType.NCN.cast(Str.get(nm.prefix()), ctx, sc, info) : null;
+    final QNm nm = checkQNm(it, qc, sc);
+    return nm.hasPrefix() ? AtomType.NCN.cast(Str.get(nm.prefix()), qc, sc, info) : null;
   }
 
   /**

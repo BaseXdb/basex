@@ -25,14 +25,14 @@ public final class Pos extends Simple {
 
   /**
    * Constructor.
-   * @param mn minimum value
-   * @param mx minimum value
-   * @param ii input info
+   * @param min minimum value
+   * @param max minimum value
+   * @param info input info
    */
-  private Pos(final long mn, final long mx, final InputInfo ii) {
-    super(ii);
-    min = mn;
-    max = mx;
+  private Pos(final long min, final long max, final InputInfo info) {
+    super(info);
+    this.min = min;
+    this.max = max;
     type = SeqType.BLN;
   }
 
@@ -76,23 +76,23 @@ public final class Pos extends Simple {
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    checkCtx(ctx);
-    return Bln.get(ctx.pos >= min && ctx.pos <= max);
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    checkCtx(qc);
+    return Bln.get(qc.pos >= min && qc.pos <= max);
   }
 
   @Override
-  public Pos copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+  public Pos copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     return new Pos(min, max, info);
   }
 
   /**
    * Returns false if no more results can be expected.
-   * @param ctx query context
+   * @param qc query context
    * @return result of check
    */
-  public boolean skip(final QueryContext ctx) {
-    return ctx.pos >= max;
+  public boolean skip(final QueryContext qc) {
+    return qc.pos >= max;
   }
 
   /**

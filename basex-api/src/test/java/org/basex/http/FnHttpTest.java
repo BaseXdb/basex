@@ -26,6 +26,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests the server-based HTTP Client.
@@ -97,7 +98,7 @@ public class FnHttpTest extends HTTPTest {
     qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='post'>"
         + "<http:body media-type='application/xml'>"
-        + "<query xmlns='" + URL + "/rest'>"
+        + "<query xmlns='" + Prop.URL + "/rest'>"
         + "<text>1</text>"
         + "<parameter name='wrap' value='yes'/>"
         + "</query>" + "</http:body>"
@@ -110,7 +111,7 @@ public class FnHttpTest extends HTTPTest {
        "<http:request method='post'>"
         + "<http:body media-type='application/xml'/></http:request>",
         RESTURL,
-        "<query xmlns='" + URL + "/rest'>"
+        "<query xmlns='" + Prop.URL + "/rest'>"
         + "<text>1</text>"
         + "<parameter name='wrap' value='yes'/>"
         + "</query>"), ctx);
@@ -345,7 +346,7 @@ public class FnHttpTest extends HTTPTest {
   public void errors() throws IOException {
 
     // Incorrect requests
-    final List<byte[]> falseReqs = new ArrayList<byte[]>();
+    final List<byte[]> falseReqs = new ArrayList<>();
 
     // Request without method
     final byte[] falseReq1 = token("<http:request "
@@ -521,61 +522,58 @@ public class FnHttpTest extends HTTPTest {
     assertEquals("a<b>b</b>", fakeConn3.out.toString());
   }
 
-  /*
-   * Tests writing of body content when @method is http:base64Binary.
+  /**
+   * Tests writing of body content when @method is raw and output is xs:base64Binary.
    * @throws IOException I/O Exception
+   */
   @Test
   public void writeBase64() throws IOException {
     // Case 1: content is xs:base64Binary
     final HTTPRequest req1 = new HTTPRequest();
-    req1.payloadAttrs.put(METHOD, token("http:base64Binary"));
+    req1.payloadAttrs.put("method", "raw");
+
     req1.bodyContent.add(new B64(token("dGVzdA==")));
-    final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
-        "http://www.test.com"));
+    final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL("http://www.test.com"));
     HTTPClient hc = new HTTPClient(null, ctx.options);
     hc.setRequestContent(fakeConn1.getOutputStream(), req1);
     assertEquals(fakeConn1.out.toString(), "dGVzdA==");
 
     // Case 2: content is a node
     final HTTPRequest req2 = new HTTPRequest();
-    req2.payloadAttrs.put(METHOD, token("http:base64Binary"));
+    req2.payloadAttrs.put("method", "raw");
     final FElem e3 = new FElem("a").add("dGVzdA==");
     req2.bodyContent.add(e3);
-    final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
-        "http://www.test.com"));
+    final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL("http://www.test.com"));
     hc = new HTTPClient(null, ctx.options);
     hc.setRequestContent(fakeConn2.getOutputStream(), req2);
     assertEquals(fakeConn2.out.toString(), "dGVzdA==");
   }
-   */
 
-  /*
-   * Tests writing of body content when @method is http:hexBinary.
+  /**
+   * Tests writing of body content when @method is raw and output is xs:hexBinary.
    * @throws IOException I/O Exception
+   */
   @Test
   public void writeHex() throws IOException {
     // Case 1: content is xs:hexBinary
     final HTTPRequest req1 = new HTTPRequest();
-    req1.payloadAttrs.put(METHOD, token("http:hexBinary"));
+    req1.payloadAttrs.put("method", "raw");
     req1.bodyContent.add(new Hex(token("74657374")));
-    final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
-        "http://www.test.com"));
+    final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL("http://www.test.com"));
     HTTPClient hc = new HTTPClient(null, ctx.options);
     hc.setRequestContent(fakeConn1.getOutputStream(), req1);
     assertEquals(fakeConn1.out.toString(), "74657374");
 
     // Case 2: content is a node
     final HTTPRequest req2 = new HTTPRequest();
-    req2.payloadAttrs.put(METHOD, token("http:base64Binary"));
+    req2.payloadAttrs.put("method", "raw");
     final FElem e3 = new FElem("a").add("74657374");
     req2.bodyContent.add(e3);
-    final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
-        "http://www.test.com"));
+    final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL("http://www.test.com"));
     hc = new HTTPClient(null, ctx.options);
     hc.setRequestContent(fakeConn2.getOutputStream(), req2);
     assertEquals(fakeConn2.out.toString(), "74657374");
   }
-   */
 
   /**
    * Tests writing of request content when @src is set.
@@ -584,14 +582,12 @@ public class FnHttpTest extends HTTPTest {
   @Test
   public void writeFromResource() throws IOException {
     // Create a file form which will be read
-    final File f = new File(Prop.TMP + Util.className(FnHttpTest.class));
-    final FileOutputStream out = new FileOutputStream(f);
-    out.write(token("test"));
-    out.close();
+    final IOFile file = new IOFile(Prop.TMP, Util.className(FnHttpTest.class));
+    file.write(token("test"));
 
     // Request
     final HTTPRequest req = new HTTPRequest();
-    req.payloadAttrs.put("src", new IOFile(f).url());
+    req.payloadAttrs.put("src", file.url());
     req.payloadAttrs.put("method", "binary");
     // HTTP connection
     final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL("http://www.test.com"));
@@ -599,7 +595,7 @@ public class FnHttpTest extends HTTPTest {
     hc.setRequestContent(fakeConn.getOutputStream(), req);
 
     // Delete file
-    f.delete();
+    file.delete();
 
     assertEquals(fakeConn.out.toString(), "test");
   }
@@ -636,20 +632,20 @@ public class FnHttpTest extends HTTPTest {
   public void multipartResponse() throws IOException, QueryException {
     // Create fake HTTP connection
     final FakeHttpConnection conn = new FakeHttpConnection(new URL("http://www.test.com"));
-    final Map<String, List<String>> hdrs = new HashMap<String, List<String>>();
-    final List<String> fromVal = new ArrayList<String>();
+    final Map<String, List<String>> hdrs = new HashMap<>();
+    final List<String> fromVal = new ArrayList<>();
     fromVal.add("Nathaniel Borenstein <nsb@bellcore.com>");
     // From: Nathaniel Borenstein <nsb@bellcore.com>
     hdrs.put("From", fromVal);
-    final List<String> mimeVal = new ArrayList<String>();
+    final List<String> mimeVal = new ArrayList<>();
     mimeVal.add("1.0");
     // MIME-Version: 1.0
     hdrs.put("MIME-version", mimeVal);
-    final List<String> subjVal = new ArrayList<String>();
+    final List<String> subjVal = new ArrayList<>();
     subjVal.add("Formatted text mail");
     // Subject: Formatted text mail
     hdrs.put("Subject", subjVal);
-    final List<String> contTypeVal = new ArrayList<String>();
+    final List<String> contTypeVal = new ArrayList<>();
     contTypeVal.add("multipart/alternative");
     contTypeVal.add("boundary=\"boundary42\"");
     // Content-Type: multipart/alternative; boundary=boundary42
@@ -718,24 +714,24 @@ public class FnHttpTest extends HTTPTest {
     // Create fake HTTP connection
     final FakeHttpConnection conn = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    final Map<String, List<String>> hdrs = new HashMap<String, List<String>>();
-    final List<String> fromVal = new ArrayList<String>();
+    final Map<String, List<String>> hdrs = new HashMap<>();
+    final List<String> fromVal = new ArrayList<>();
     fromVal.add("Nathaniel Borenstein <nsb@bellcore.com>");
     // From: Nathaniel Borenstein <nsb@bellcore.com>
     hdrs.put("From", fromVal);
-    final List<String> mimeVal = new ArrayList<String>();
+    final List<String> mimeVal = new ArrayList<>();
     mimeVal.add("1.0");
-    final List<String> toVal = new ArrayList<String>();
+    final List<String> toVal = new ArrayList<>();
     toVal.add("Ned Freed <ned@innosoft.com>");
     // To: Ned Freed <ned@innosoft.com>
     hdrs.put("To", toVal);
     // MIME-Version: 1.0
     hdrs.put("MIME-version", mimeVal);
-    final List<String> subjVal = new ArrayList<String>();
+    final List<String> subjVal = new ArrayList<>();
     subjVal.add("Formatted text mail");
     // Subject: Formatted text mail
     hdrs.put("Subject", subjVal);
-    final List<String> contTypeVal = new ArrayList<String>();
+    final List<String> contTypeVal = new ArrayList<>();
     contTypeVal.add("multipart/mixed");
     contTypeVal.add("boundary=\"simple boundary\"");
     // Content-Type: multipart/alternative; boundary=boundary42
@@ -845,7 +841,7 @@ final class FakeHttpConnection extends HttpURLConnection {
   FakeHttpConnection(final URL u) {
     super(u);
     out = new ByteArrayOutputStream();
-    headers = new HashMap<String, List<String>>();
+    headers = new HashMap<>();
   }
 
   @Override

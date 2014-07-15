@@ -29,35 +29,36 @@ public final class PartFunc extends Arr {
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param fn function expression
-   * @param arg argument expressions
-   * @param hl positions of the placeholders
+   * @param sc static context
+   * @param info input info
+   * @param expr function expression
+   * @param args argument expressions
+   * @param holes positions of the placeholders
    */
-  public PartFunc(final StaticContext sctx, final InputInfo ii, final Expr fn,
-      final Expr[] arg, final int[] hl) {
-    super(ii, Array.add(arg, fn));
-    sc = sctx;
-    holes = hl;
+  public PartFunc(final StaticContext sc, final InputInfo info, final Expr expr, final Expr[] args,
+      final int[] holes) {
+
+    super(info, Array.add(args, expr));
+    this.sc = sc;
+    this.holes = holes;
     type = SeqType.FUN_O;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
-    final Expr f = expr[expr.length - 1];
-    if(allAreValues()) return preEval(ctx);
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    final Expr f = exprs[exprs.length - 1];
+    if(allAreValues()) return preEval(qc);
 
     final SeqType t = f.type();
     if(t.instanceOf(SeqType.FUN_O) && t.type != FuncType.ANY_FUN) {
       final FuncType ft = (FuncType) t.type;
-      final int arity = expr.length + holes.length - 1;
+      final int arity = exprs.length + holes.length - 1;
       if(ft.args.length != arity) throw INVARITY.get(info, f, arity);
       final SeqType[] ar = new SeqType[holes.length];
       for(int i = 0; i < holes.length; i++) ar[i] = ft.args[holes[i]];
@@ -68,12 +69,12 @@ public final class PartFunc extends Arr {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Expr fn = expr[expr.length - 1];
-    final FItem f = (FItem) checkType(fn.item(ctx, ii), FuncType.ANY_FUN);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Expr fn = exprs[exprs.length - 1];
+    final FItem f = (FItem) checkType(fn.item(qc, ii), FuncType.ANY_FUN);
     final FuncType ft = f.funcType();
 
-    final int arity = expr.length + holes.length - 1;
+    final int arity = exprs.length + holes.length - 1;
     if(f.arity() != arity) throw INVARITY.get(ii, f, arity);
     final Expr[] args = new Expr[arity];
 
@@ -81,56 +82,71 @@ public final class PartFunc extends Arr {
     final Var[] vars = new Var[holes.length];
     int p = -1;
     for(int i = 0; i < holes.length; i++) {
-      while(++p < holes[i]) args[p] = expr[p - i].value(ctx);
-      vars[i] = scp.newLocal(ctx, f.argName(holes[i]), null, false);
+      while(++p < holes[i]) args[p] = exprs[p - i].value(qc);
+      vars[i] = scp.newLocal(qc, f.argName(holes[i]), null, false);
       args[p] = new VarRef(info, vars[i]);
-      vars[i].refineType(ft.args[p], ctx, ii);
+      vars[i].refineType(ft.args[p], qc, ii);
     }
-    while(++p < args.length) args[p] = expr[p - holes.length].value(ctx);
+    while(++p < args.length) args[p] = exprs[p - holes.length].value(qc);
 
     final Ann ann = f.annotations();
     final FuncType tp = FuncType.get(ann, vars, ft.ret);
-    return new FuncItem(sc, ann, null, vars, tp, new DynFuncCall(info, f, args),
-        ctx.value, ctx.pos, ctx.size, scp.stackSize());
+    final DynFuncCall fc = new DynFuncCall(info, sc, ann.contains(Ann.Q_UPDATING), f, args);
+    return new FuncItem(sc, ann, null, vars, tp, fc, qc.value, qc.pos, qc.size, scp.stackSize());
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    return item(ctx, info);
+  public void checkUp() throws QueryException {
+    checkNoneUp(Arrays.copyOf(exprs, exprs.length - 1));
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new PartFunc(sc, info, expr[expr.length - 1].copy(ctx, scp, vs),
-        copyAll(ctx, scp, vs, Arrays.copyOf(expr, expr.length - 1)), holes.clone());
+  public Value value(final QueryContext qc) throws QueryException {
+    return item(qc, info);
+  }
+
+  @Override
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new PartFunc(sc, info, exprs[exprs.length - 1].copy(qc, scp, vs),
+        copyAll(qc, scp, vs, Arrays.copyOf(exprs, exprs.length - 1)), holes.clone());
   }
 
   @Override
   public void plan(final FElem plan) {
     final FElem e = planElem();
-    final int es = expr.length, hs = holes.length;
-    expr[es - 1].plan(e);
+    final int es = exprs.length, hs = holes.length;
+    exprs[es - 1].plan(e);
     int p = -1;
     for(int i = 0; i < hs; i++) {
-      while(++p < holes[i]) expr[p - i].plan(e);
+      while(++p < holes[i]) exprs[p - i].plan(e);
       final FElem a = new FElem(QueryText.ARG);
       e.add(a.add(planAttr(QueryText.POS, Token.token(i))));
     }
-    while(++p < es + hs - 1) expr[p - hs].plan(e);
+    while(++p < es + hs - 1) exprs[p - hs].plan(e);
     plan.add(e);
   }
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(expr[expr.length - 1].toString()).add('(');
+    final TokenBuilder tb = new TokenBuilder(exprs[exprs.length - 1].toString()).add('(');
     int p = -1;
-    final int es = expr.length, hs = holes.length;
+    final int es = exprs.length, hs = holes.length;
     for(int i = 0; i < hs; i++) {
       while(++p < holes[i])
-        tb.add(p > 0 ? QueryText.SEP : "").add(expr[p - i].toString());
+        tb.add(p > 0 ? QueryText.SEP : "").add(exprs[p - i].toString());
       tb.add(p > 0 ? QueryText.SEP : "").add('?');
     }
-    while(++p < es + hs - 1) tb.add(QueryText.SEP).add(expr[p - hs].toString());
+    while(++p < es + hs - 1) tb.add(QueryText.SEP).add(exprs[p - hs].toString());
     return tb.add(')').toString();
+  }
+
+  /**
+   * Returns the function annotations.
+   * @return annotations
+   */
+  public Ann annotations() {
+    final Expr fn = exprs[exprs.length - 1];
+    if(!(fn instanceof FItem)) return null;
+    return ((FItem) fn).annotations();
   }
 }

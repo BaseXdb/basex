@@ -92,6 +92,6 @@ public final class ANodeList extends ElementList implements Iterable<ANode> {
 
   @Override
   public Iterator<ANode> iterator() {
-    return new ArrayIterator<ANode>(list, size);
+    return new ArrayIterator<>(list, size);
   }
 }

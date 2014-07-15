@@ -97,7 +97,7 @@ public final class JsonMLSerializer extends JsonSerializer {
   protected void finishPi(final byte[] name, final byte[] value) { }
 
   @Override
-  protected void atomic(final Item value) throws IOException {
+  protected void atomic(final Item value, final boolean iter) throws IOException {
     error("Atomic values cannot be serialized");
   }
 

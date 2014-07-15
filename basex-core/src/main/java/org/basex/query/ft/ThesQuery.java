@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  */
 public final class ThesQuery {
   /** Thesaurus root references. */
-  private final ArrayList<Thesaurus> thes = new ArrayList<Thesaurus>(1);
+  private final ArrayList<Thesaurus> thes = new ArrayList<>(1);
 
   /**
    * Adds two thesaurus definitions.

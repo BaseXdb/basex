@@ -20,24 +20,24 @@ import org.basex.util.hash.*;
 public final class CTxt extends CNode {
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param t text
+   * @param sc static context
+   * @param info input info
+   * @param text text
    */
-  public CTxt(final StaticContext sctx, final InputInfo ii, final Expr t) {
-    super(sctx, ii, t);
+  public CTxt(final StaticContext sc, final InputInfo info, final Expr text) {
+    super(sc, info, text);
     type = SeqType.TXT_ZO;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return optPre(oneIsEmpty() ? null : this, ctx);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optPre(oneIsEmpty() ? null : this, qc);
   }
 
   @Override
-  public FTxt item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Iter iter = ctx.iter(expr[0]);
+  public FTxt item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Iter iter = qc.iter(exprs[0]);
     Item it = iter.next();
     if(it == null) return null;
 
@@ -53,8 +53,8 @@ public final class CTxt extends CNode {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CTxt(sc, info, expr[0].copy(ctx, scp, vs));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new CTxt(sc, info, exprs[0].copy(qc, scp, vs));
   }
 
   @Override

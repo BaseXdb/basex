@@ -26,9 +26,9 @@ public final class SyntaxXQuery extends Syntax {
   private static final String CLOSING = "})";
 
   /** Keywords. */
-  private static final HashSet<String> KEYWORDS = new HashSet<String>();
+  private static final HashSet<String> KEYWORDS = new HashSet<>();
   /** Functions. */
-  private static final HashSet<String> FUNCTIONS = new HashSet<String>();
+  private static final HashSet<String> FUNCTIONS = new HashSet<>();
 
   /** Comment. */
   private int comment;
@@ -188,7 +188,7 @@ public final class SyntaxXQuery extends Syntax {
    * @param text text
    * @return result of check
    */
-  private boolean spaces(final TokenBuilder text) {
+  private static boolean spaces(final TokenBuilder text) {
     for(int t = text.size() - 1; t >= 0; t--) {
       final byte c = text.get(t);
       if(c == '\n') break;
@@ -205,7 +205,7 @@ public final class SyntaxXQuery extends Syntax {
    * @param dist maximum allowed distance
    * @return result of check
    */
-  private boolean matches(final char ch, final int pos, final byte[] text, final int dist) {
+  private static boolean matches(final char ch, final int pos, final byte[] text, final int dist) {
     for(int d = 0; dist > 0 ? d < dist : d > dist; d += dist > 0 ? 1 : -1) {
       final int p = pos + d;
       if(p < 0 || p >= text.length) break;

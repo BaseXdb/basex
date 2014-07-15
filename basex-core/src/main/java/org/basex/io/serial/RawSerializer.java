@@ -26,15 +26,10 @@ public final class RawSerializer extends TextSerializer {
   }
 
   @Override
-  protected void atomic(final Item it) throws IOException {
-    try {
-      final InputStream is = it.input(null);
-      try {
-        final PrintOutput po = out;
-        for(int i; (i = is.read()) != -1;) po.write(i);
-      } finally {
-        is.close();
-      }
+  protected void atomic(final Item it, final boolean iter) throws IOException {
+    try(final InputStream is = it.input(null)) {
+      final PrintOutput po = out;
+      for(int i; (i = is.read()) != -1;) po.write(i);
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }

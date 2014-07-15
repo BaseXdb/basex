@@ -22,30 +22,30 @@ public final class Instance extends Single {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
-   * @param s sequence type
+   * @param info input info
+   * @param expr expression
+   * @param seq sequence type
    */
-  public Instance(final InputInfo ii, final Expr e, final SeqType s) {
-    super(ii, e);
-    seq = s;
+  public Instance(final InputInfo info, final Expr expr, final SeqType seq) {
+    super(info, expr);
+    this.seq = seq;
     type = SeqType.BLN;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return expr.isValue() ? preEval(ctx) : this;
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return expr.isValue() ? preEval(qc) : this;
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return Bln.get(seq.instance(ctx.value(expr)));
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(seq.instance(qc.value(expr)));
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Instance(info, expr.copy(ctx, scp, vs), seq);
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new Instance(info, expr.copy(qc, scp, vs), seq);
   }
 
   @Override

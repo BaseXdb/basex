@@ -81,7 +81,7 @@ public final class Export extends Command {
     final IOFile root = new IOFile(path);
     root.md();
 
-    final HashSet<String> exported = new HashSet<String>();
+    final HashSet<String> exported = new HashSet<>();
 
     // XML documents
     final IntList il = data.resources.docs();
@@ -106,33 +106,32 @@ public final class Export extends Command {
     for(int i = 0; i < is; i++) {
       final int pre = il.get(i);
       // create file path
-      final IO f = root.merge(Token.string(data.text(pre, true)));
+      final IOFile fl = root.resolve(Token.string(data.text(pre, true)));
       if(export != null) {
         export.checkStop();
-        export.progFile = f;
+        export.progFile = fl;
         export.progPos++;
       }
       // create dir if necessary
-      final IOFile dir = new IOFile(f.dirPath());
-      if(!dir.exists()) dir.md();
+      fl.parent().md();
 
       // serialize file
-      final PrintOutput po = new PrintOutput(unique(exported, f.path()));
-      final Serializer ser = Serializer.get(po, sopts);
-      ser.serialize(new DBNode(data, pre));
-      ser.close();
-      po.close();
+      try(final PrintOutput po = new PrintOutput(unique(exported, fl.path()))) {
+        final Serializer ser = Serializer.get(po, sopts);
+        ser.serialize(new DBNode(data, pre));
+        ser.close();
+      }
     }
 
     // export raw files
     for(final String s : desc) {
-      final IOFile f = new IOFile(root.path(), s);
+      final IOFile fl = new IOFile(root.path(), s);
       if(export != null) {
         export.checkStop();
-        export.progFile = f;
+        export.progFile = fl;
         export.progPos++;
       }
-      final String u = unique(exported, f.path());
+      final String u = unique(exported, fl.path());
       new IOFile(bin, s).copyTo(new IOFile(u));
     }
   }

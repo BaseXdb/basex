@@ -6,10 +6,11 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.atomic.*;
 import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.util.*;
-import org.basex.query.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * General test of the XQuery Update Facility implementation.
@@ -28,6 +29,15 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   private static void createDB(final String input) throws BaseXException {
     new CreateDB(NAME, input == null ? DOC : input).execute(context);
+  }
+
+  /**
+   * Closes the currently opened database.
+   * @throws BaseXException database exception
+   */
+  @After
+  public void finish() throws BaseXException {
+    new Close().execute(context);
   }
 
   // BASIC XQUF TESTS *********************************************
@@ -68,6 +78,13 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void transform() {
     query("let $c := <x/> return copy $c := $c modify () return $c", "<x/>");
     query("declare variable $d := document{ <x/> } update (); $d/x", "<x/>");
+  }
+
+  /** Transform expression containing a simple expression. */
+  @Test
+  public void transSimple() {
+    error("<a/> update ('')", Err.UPMODIFY);
+    error("copy $a := <a/> modify ('') return $a", Err.UPMODIFY);
   }
 
   /**
@@ -289,9 +306,9 @@ public final class UpdateTest extends AdvancedQueryTest {
    * multiple operations of the same type on the same node. Deleting a PRE value twice
    * would lead to deleting another node due to PRE shifts after the first delete.
    *
-   * If another {@link UpdatePrimitive} leads to the deletion of a node (i.e.
+   * If another {@link NodeUpdate} leads to the deletion of a node (i.e.
    * {@link ReplaceValue} it must be substituted first by a sequence of other
-   * {@link UpdatePrimitive} that contains the {@link DeleteNode} primitive.
+   * {@link NodeUpdate} that contains the {@link DeleteNode} primitive.
    *
    */
   @Test
@@ -304,7 +321,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Tests if the substitution of a {@link ReplaceNode} primitive does not interfere with
-   * the primitive types used for substitution that are actually called by the user.
+   * the update types used for substitution that are actually called by the user.
    */
   @Test
   public void replaceSubstitution() {
@@ -595,10 +612,8 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void textMerging04() throws Exception {
     createDB(null);
-    query("let $i := //item[@id='item0'] return insert node 'foo' " +
-      "before $i/location/text()");
-    query("let $i := //item[@id='item0'] return " +
-      "($i/location/text())[1]", "fooUnited States");
+    query("let $i := //item[@id='item0'] return insert node 'foo' before $i/location/text()");
+    query("let $i := //item[@id='item0'] return ($i/location/text())[1]", "fooUnited States");
   }
 
   /**
@@ -623,8 +638,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     createDB(null);
     query("let $i := //item[@id='item0']/location return " +
       "(insert node <n/> into $i, insert node 'foo' as last into $i)");
-    query("let $i := //item[@id='item0']/location return " +
-      "delete node $i/n");
+    query("let $i := //item[@id='item0']/location return delete node $i/n");
     query("(//item[@id='item0']/location/text())[1]", "United Statesfoo");
   }
 
@@ -635,8 +649,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void textMerging07() throws Exception {
     createDB(null);
-    query("let $i := //item[@id='item0']/location return " +
-      "insert node 'foo' after $i/text()");
+    query("let $i := //item[@id='item0']/location return insert node 'foo' after $i/text()");
     query("(//item[@id='item0']/location/text())[1]", "United Statesfoo");
   }
 
@@ -647,13 +660,12 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void textMerging08() throws Exception {
     createDB(null);
-    query("let $i := //item[@id='item0'] return " +
-      "(insert node 'foo' after $i/location)");
+    query("let $i := //item[@id='item0'] return (insert node 'foo' after $i/location)");
     query("let $i := //item[@id='item0']/location return " +
       "(insert node 'foo' after $i, insert node 'faa' before $i, insert " +
       "node 'faa' into $i, delete node $i/text())");
-    query("let $i := //item[@id='item0']/location " +
-      "return ($i/text(), ($i/../text())[2])", "faafoofoo");
+    query("let $i := //item[@id='item0']/location return ($i/text(), ($i/../text())[2])",
+        "faafoofoo");
   }
 
   /**
@@ -1118,19 +1130,6 @@ public final class UpdateTest extends AdvancedQueryTest {
       "xquery:eval('declare variable $c external; $c()', map { 'c': local:c#0 })", "<a/>");
   }
 
-  /**
-   * Tests the expressions in modify clauses for updates.
-   */
-  @Test
-  public void modifyCheck() {
-    error("copy $c:= <a>X</a> modify 'a' return $c", Err.UPMODIFY);
-    error("copy $c:= <a>X</a> modify(delete node $c/text(),'a') return $c", Err.UPALL);
-
-    error("text { <a/> update (delete node <a/>,<b/>) }", Err.UPALL);
-    error("1[<a/> update (delete node <a/>,<b/>)]", Err.UPALL);
-    error("for $i in 1 order by (<a/> update (delete node <a/>,<b/>)) return $i", Err.UPALL);
-  }
-
   /** Tests adding an attribute and thus crossing the {@link IO#MAXATTS} line (GH-752). */
   @Test
   public void insertAttrMaxAtt() {
@@ -1163,19 +1162,51 @@ public final class UpdateTest extends AdvancedQueryTest {
     query("(<X/>,<Y/>)/(insert node <Z/> into .)");
   }
 
+  /**
+   * Tests the expressions in modify clauses for updates.
+   */
+  @Test
+  public void modifyCheck() {
+    error("copy $c:= <a>X</a> modify 'a' return $c", Err.UPMODIFY);
+    error("copy $c:= <a>X</a> modify(delete node $c/text(),'a') return $c", Err.UPALL);
+
+    error("text { <a/> update (delete node <a/>,<b/>) }", Err.UPALL);
+    error("1[<a/> update (delete node <a/>,<b/>)]", Err.UPALL);
+    error("for $i in 1 order by (<a/> update (delete node <a/>,<b/>)) return $i", Err.UPALL);
+  }
 
   /**
    * Reject updating function items.
    */
   @Test
   public void updatingFuncItems() {
-    error("db:output(?)", Err.UPFUNCITEM);
-    error("db:output#1", Err.UPFUNCITEM);
-    error("declare %updating function local:a() { () }; local:a#0()", Err.UPFUNCITEM);
+    error("db:output(?)", Err.SERFUNC);
+    error("db:output#1", Err.SERFUNC);
+    error("declare updating function local:a() { () }; local:a#0", Err.SERFUNC);
     error("declare function local:a() { local:b#0 };"
-        + "declare %updating function local:b() { db:output('1') }; local:a()", Err.UPFUNCITEM);
-    // is still accepted (should also be rejected in future):
-    //error("declare function local:not-used() { local:b#0 };"
-    //    + "declare %updating function local:b() { db:output('1') }; local:b()", Err.UPFUNCITEM);
+        + "declare updating function local:b() { db:output('1') }; local:a()", Err.SERFUNC);
+    query("declare function local:not-used() { local:b#0 };"
+        + "declare updating function local:b() { db:output('1') }; local:b()", "1");
+
+    error("db:output(?)(<a/>)", Err.UPFUNCUP);
+    error("db:output#1(<a/>)", Err.UPFUNCUP);
+    error("%updating function($a) { db:output($a) }(1)", Err.UPFUNCUP);
+    error("declare updating function local:a() { () }; local:a#0()", Err.UPFUNCUP);
+    error("declare function local:a() { local:b#0 };"
+        + "declare updating function local:b() { db:output('1') }; local:a()()", Err.UPFUNCUP);
+
+    error("updating count(?)(1)", Err.UPFUNCNOTUP);
+    error("updating count#1(1)", Err.UPFUNCNOTUP);
+    error("updating function($a) { count($a) }(1)", Err.UPFUNCNOTUP);
+    error("declare function local:a() { () }; updating local:a#0()", Err.UPFUNCNOTUP);
+    error("declare function local:a() { local:b#0 };"
+        + "declare function local:b() { count('1') }; updating local:a()()", Err.UPFUNCNOTUP);
+  }
+
+  /** Test method. */
+  @Test
+  public void updateCheck() {
+    query("declare function local:a() { fold-left((), (), function($a, $b) { local:a() }) };"
+        + "declare function local:b() { () }; ()", "");
   }
 }

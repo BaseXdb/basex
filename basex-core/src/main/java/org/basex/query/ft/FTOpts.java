@@ -20,50 +20,49 @@ public final class FTOpts extends FTExpr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
-   * @param o ft options
+   * @param info input info
+   * @param expr expression
+   * @param opt ft options
    */
-  public FTOpts(final InputInfo ii, final FTExpr e, final FTOpt o) {
-    super(ii, e);
-    opt = o;
+  public FTOpts(final InputInfo info, final FTExpr expr, final FTOpt opt) {
+    super(info, expr);
+    this.opt = opt;
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    final FTOpt tmp = ctx.ftOpt();
-    ctx.ftOpt(opt.copy(tmp));
-    if(opt.sw != null && ctx.value != null && ctx.value.data() != null)
-      opt.sw.comp(ctx.value.data());
-    expr[0] = expr[0].compile(ctx, scp);
-    ctx.ftOpt(tmp);
-    return expr[0];
+  public FTExpr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    final FTOpt tmp = qc.ftOpt();
+    qc.ftOpt(opt.copy(tmp));
+    if(opt.sw != null && qc.value != null && qc.value.data() != null) opt.sw.comp(qc.value.data());
+    exprs[0] = exprs[0].compile(qc, scp);
+    qc.ftOpt(tmp);
+    return exprs[0];
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(), opt, expr[0]);
+    addPlan(plan, planElem(), opt, exprs[0]);
   }
 
   @Override
   public String toString() {
-    return expr[0].toString() + opt;
+    return exprs[0].toString() + opt;
   }
 
   @Override
-  public FTNode item(final QueryContext ctx, final InputInfo ii) {
+  public FTNode item(final QueryContext qc, final InputInfo ii) {
     // shouldn't be called, as compile returns argument
     throw Util.notExpected();
   }
 
   @Override
-  public FTIter iter(final QueryContext ctx) {
+  public FTIter iter(final QueryContext qc) {
     // shouldn't be called, as compile returns argument
     throw Util.notExpected();
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTOpts(info, expr[0].copy(ctx, scp, vs), new FTOpt().copy(opt));
+  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new FTOpts(info, exprs[0].copy(qc, scp, vs), new FTOpt().copy(opt));
   }
 }

@@ -24,7 +24,7 @@ final class CsvMapConverter extends CsvConverter {
   /** Headers. */
   private final TokenList headers = new TokenList();
   /** All records. */
-  private final ArrayList<ValueBuilder> records = new ArrayList<ValueBuilder>();
+  private final ArrayList<ValueBuilder> records = new ArrayList<>();
 
   /** Current record. */
   private ValueBuilder record = new ValueBuilder();
@@ -60,7 +60,7 @@ final class CsvMapConverter extends CsvConverter {
       byte[] name = headers.get(col++);
       if(name == null) name = ENTRY;
       try {
-        record.set(((Map) record.get(0)).insert(Str.get(name), Str.get(value), null), 0);
+        record.set(0, ((Map) record.get(0)).insert(Str.get(name), Str.get(value), null));
       } catch(final QueryException ex) {
         throw new QueryIOException(ex);
       }

@@ -7,11 +7,12 @@ import java.io.*;
 import java.util.concurrent.*;
 
 import org.basex.*;
+import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.server.*;
 import org.basex.query.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests the functions of the Database Module in a client/server environment.
@@ -21,7 +22,7 @@ import org.junit.*;
  */
 public final class FNDbServerTest extends AdvancedQueryTest {
   /** Number of clients. */
-  private static final int NUM = 1;
+  private static final int NUM = 5;
   /** Test file. */
   private static final String FILE = "src/test/resources/input.xml";
   /** Server reference. */
@@ -78,24 +79,24 @@ public final class FNDbServerTest extends AdvancedQueryTest {
     final ClientSession check = createClient();
 
     // same DB name, which is 2 x NUM times
-    runTwoClients(new XQuery(_DB_CREATE.args(NAME)));
+    runClients(new XQuery(_DB_CREATE.args(NAME)));
     assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
-    runTwoClients(new XQuery(_DB_CREATE.args(NAME)));
+    runClients(new XQuery(_DB_CREATE.args(NAME)));
     assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
 
     // same DB name and files
-    runTwoClients(new XQuery(_DB_CREATE.args(NAME, FILE, "in/")));
+    runClients(new XQuery(_DB_CREATE.args(NAME, FILE, "in/")));
     assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
 
-    // drop, create
-    runTwoClients(new XQuery(
+    // create
+    runClients(new XQuery(
       _DB_DROP.args(NAME) + ',' +
       _DB_CREATE.args(NAME, FILE, "in/")
     ));
 
-    // add, drop, create
-    runTwoClients(new XQuery(
-      _DB_ADD.args(NAME, "<X/>", "x.xml") + ',' +
+    // add, create
+    runClients(new XQuery(
+        _DB_ADD.args(NAME, "<X/>", "x.xml") + ',' +
       _DB_DROP.args(NAME) + ',' +
       _DB_CREATE.args(NAME, FILE)));
 
@@ -108,7 +109,7 @@ public final class FNDbServerTest extends AdvancedQueryTest {
    * @throws IOException I/O exception
    * @throws InterruptedException interrupted exception
    */
-  private static void runTwoClients(final Command cmd) throws IOException, InterruptedException {
+  private static void runClients(final Command cmd) throws IOException, InterruptedException {
     final CountDownLatch start = new CountDownLatch(1);
     final CountDownLatch stop = new CountDownLatch(NUM);
     final Client[] clients = new Client[NUM];

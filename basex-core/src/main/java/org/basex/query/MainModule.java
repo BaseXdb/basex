@@ -7,7 +7,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -30,19 +29,16 @@ public final class MainModule extends Module {
    * Creates a new main module for a context item declared in the prolog.
    * @param expr root expression
    * @param scope variable scope
-   * @param xqdoc documentation
+   * @param doc documentation
    * @param type optional type
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    * @return main module
    */
   public static MainModule get(final Expr expr, final VarScope scope, final SeqType type,
-      final String xqdoc, final StaticContext sctx, final InputInfo info) {
-    return new MainModule(expr, scope, type, xqdoc, null, null, null, sctx, info);
+      final String doc, final StaticContext sc, final InputInfo info) {
+    return new MainModule(expr, scope, type, doc, null, null, null, sc, info);
   }
-
-  //ctx.ctxItem = new MainModule(expr, scope, type, currDoc.toString(), sc, info());
-
 
   /**
    * Creates a new main module for the specified function.
@@ -59,69 +55,77 @@ public final class MainModule extends Module {
   /**
    * Constructor.
    * @param expr root expression
-   * @param scp variable scope
-   * @param xqdoc documentation
+   * @param scope variable scope
+   * @param doc documentation
    * @param funcs user-defined functions
    * @param vars static variables
    * @param imports namespace URIs of imported modules
    * @param type optional type
-   * @param sctx static context
+   * @param sc static context
    * @param info input info
    */
-  public MainModule(final Expr expr, final VarScope scp, final SeqType type, final String xqdoc,
+  public MainModule(final Expr expr, final VarScope scope, final SeqType type, final String doc,
       final TokenObjMap<StaticFunc> funcs, final TokenObjMap<StaticVar> vars,
-      final TokenSet imports, final StaticContext sctx, final InputInfo info) {
+      final TokenSet imports, final StaticContext sc, final InputInfo info) {
 
-    super(scp, xqdoc, funcs, vars, imports, sctx, info);
+    super(scope, doc, funcs, vars, imports, sc, info);
     this.expr = expr;
     this.declType = type;
   }
 
   @Override
-  public void compile(final QueryContext ctx) throws QueryException {
+  public void compile(final QueryContext qc) throws QueryException {
     if(compiled) return;
     try {
       compiled = true;
-      scope.enter(ctx);
-      expr = expr.compile(ctx, scope);
-      scope.cleanUp(this);
+      expr = expr.compile(qc, scope);
     } finally {
-      scope.exit(ctx, 0);
+      scope.cleanUp(this);
     }
   }
 
   /**
-   * Evaluates this module and returns the result as a value.
-   * @param ctx query context
+   * Evaluates this module and returns the result as a cached value iterator.
+   * @param qc query context
    * @return result
    * @throws QueryException evaluation exception
    */
-  public Value value(final QueryContext ctx) throws QueryException {
-    final int fp = scope.enter(ctx);
+  public ValueBuilder cache(final QueryContext qc) throws QueryException {
+    final int fp = scope.enter(qc);
     try {
-      final Value v = ctx.value(expr);
-      return declType != null ? declType.treat(v, info) : v;
+      final Iter iter = expr.iter(qc);
+
+      final ValueBuilder cache;
+      if(iter instanceof ValueBuilder) {
+        cache = (ValueBuilder) iter;
+      } else {
+        cache = new ValueBuilder();
+        for(Item it; (it = iter.next()) != null;) cache.add(it);
+      }
+      if(declType != null) declType.treat(cache.value(), info);
+      return cache;
+
     } finally {
-      scope.exit(ctx, fp);
+      scope.exit(qc, fp);
     }
   }
 
   /**
    * Creates a result iterator which lazily evaluates this module.
-   * @param ctx query context
+   * @param qc query context
    * @return result iterator
    * @throws QueryException query exception
    */
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    if(declType != null) return value(ctx).iter();
+  public Iter iter(final QueryContext qc) throws QueryException {
+    if(declType != null) return cache(qc);
 
-    final int fp = scope.enter(ctx);
-    final Iter iter = expr.iter(ctx);
+    final int fp = scope.enter(qc);
+    final Iter iter = expr.iter(qc);
     return new Iter() {
       @Override
       public Item next() throws QueryException {
         final Item it = iter.next();
-        if(it == null) scope.exit(ctx, fp);
+        if(it == null) scope.exit(qc, fp);
         return it;
       }
 
@@ -160,12 +164,12 @@ public final class MainModule extends Module {
   /**
    * Adds the names of the databases that may be touched by the module.
    * @param lr lock result
-   * @param ctx query context
+   * @param qc query context
    * @return result of check
    * @see Proc#databases(LockResult)
    */
-  public boolean databases(final LockResult lr, final QueryContext ctx) {
-    return expr.accept(new LockVisitor(lr, ctx));
+  public boolean databases(final LockResult lr, final QueryContext qc) {
+    return expr.accept(new LockVisitor(lr, qc));
   }
 
   /**
@@ -174,7 +178,7 @@ public final class MainModule extends Module {
    */
   static class LockVisitor extends ASTVisitor {
     /** Already visited scopes. */
-    private final IdentityHashMap<Scope, Object> funcs = new IdentityHashMap<Scope, Object>();
+    private final IdentityHashMap<Scope, Object> funcs = new IdentityHashMap<>();
     /** List of databases to be locked. */
     private final StringList sl;
     /** Focus level. */
@@ -183,11 +187,11 @@ public final class MainModule extends Module {
     /**
      * Constructor.
      * @param lr lock result
-     * @param ctx query context
+     * @param qc query context
      */
-    LockVisitor(final LockResult lr, final QueryContext ctx) {
-      sl = ctx.updating ? lr.write : lr.read;
-      level = ctx.ctxItem == null ? 0 : 1;
+    LockVisitor(final LockResult lr, final QueryContext qc) {
+      sl = qc.updating ? lr.write : lr.read;
+      level = qc.ctxItem == null ? 0 : 1;
     }
 
     @Override

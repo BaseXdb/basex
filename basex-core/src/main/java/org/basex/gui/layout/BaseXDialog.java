@@ -77,7 +77,7 @@ public abstract class BaseXDialog extends JDialog {
    * Initializes the dialog.
    * @param main reference to the main window
    */
-  void init(final GUI main) {
+  private void init(final GUI main) {
     gui = main;
     panel = new BaseXBack(new BorderLayout()).border(10, 10, 10, 10);
     add(panel, BorderLayout.CENTER);
@@ -255,7 +255,7 @@ public abstract class BaseXDialog extends JDialog {
     try {
       Desktop.getDesktop().browse(new URI(url));
     } catch(final Exception ex) {
-      error(gui, Util.info(H_BROWSER_ERROR_X, URL));
+      error(gui, Util.info(H_BROWSER_ERROR_X, Prop.URL));
     }
   }
 }

@@ -2,12 +2,13 @@ package org.basex.build;
 
 import static org.junit.Assert.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.serial.*;
 import org.basex.io.serial.SerializerOptions.YesNo;
-import org.basex.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * Tests for parsing XML documents.

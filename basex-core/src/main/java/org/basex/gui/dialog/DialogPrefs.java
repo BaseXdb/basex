@@ -15,13 +15,13 @@ import org.basex.gui.layout.*;
  */
 public final class DialogPrefs extends BaseXDialog {
   /** General preferences. */
-  final DialogGeneralPrefs general;
+  private final DialogGeneralPrefs general;
   /** Editor preferences. */
-  final DialogEditorPrefs editor;
+  private final DialogEditorPrefs editor;
   /** Visualization preferences. */
-  final DialogVisualPrefs visual;
+  private final DialogVisualPrefs visual;
   /** Tabs. */
-  final BaseXTabs tabs;
+  private final BaseXTabs tabs;
 
   /**
    * Default constructor.

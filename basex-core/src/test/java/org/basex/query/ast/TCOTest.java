@@ -138,4 +138,17 @@ public class TCOTest extends QueryPlanTest {
         "42"
     );
   }
+
+  /** Checks if errors in tail-called functions can escape try/catch. */
+  @Test
+  public void tailCallInTry() {
+    check(
+        "declare option db:INLINELIMIT \"-1\";" +
+        "declare option db:TAILCALLS \"0\";" +
+        "declare function local:foo() { try { local:bar() } catch * { 42 } };" +
+        "declare function local:bar() { error() };" +
+        "local:foo()",
+
+        "42");
+  }
 }

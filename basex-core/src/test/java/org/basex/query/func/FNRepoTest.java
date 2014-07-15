@@ -3,8 +3,6 @@ package org.basex.query.func;
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
-import java.io.*;
-
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
@@ -84,8 +82,8 @@ public class FNRepoTest extends AdvancedQueryTest {
    * @return result of check
    */
   private static boolean file(final String path) {
-    final File file = new File(REPO + path);
-    return file.exists() && !file.isDirectory();
+    final IOFile file = new IOFile(REPO, path);
+    return file.exists() && !file.isDir();
   }
 
   /**
@@ -94,7 +92,7 @@ public class FNRepoTest extends AdvancedQueryTest {
    * @return result of check
    */
   private static boolean dir(final String path) {
-    return new File(REPO + path).isDirectory();
+    return new IOFile(REPO, path).isDir();
   }
 
   /**

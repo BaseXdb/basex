@@ -17,53 +17,54 @@ import org.basex.util.*;
 public final class FNCrypto extends StandardFunc {
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNCrypto(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNCrypto(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    switch(func) {
       case _CRYPTO_HMAC:
-        return new Encryption(ii).hmac(checkStr(expr[0], ctx), checkStr(expr[1],
-            ctx), checkStr(expr[2], ctx),
-            expr.length == 4 ? checkStr(expr[3], ctx) : Token.EMPTY);
+        return new Encryption(ii).hmac(checkStr(exprs[0], qc), checkStr(exprs[1],
+            qc), checkStr(exprs[2], qc),
+            exprs.length == 4 ? checkStr(exprs[3], qc) : Token.EMPTY);
       case _CRYPTO_ENCRYPT:
-        return new Encryption(ii).encryption(checkStr(expr[0], ctx),
-            checkStr(expr[1], ctx), checkStr(expr[2], ctx),
-            checkStr(expr[3], ctx), true);
+        return new Encryption(ii).encryption(checkStr(exprs[0], qc),
+            checkStr(exprs[1], qc), checkStr(exprs[2], qc),
+            checkStr(exprs[3], qc), true);
       case _CRYPTO_DECRYPT:
-        return new Encryption(ii).encryption(checkStr(expr[0], ctx),
-            checkStr(expr[1], ctx), checkStr(expr[2], ctx),
-            checkStr(expr[3], ctx), false);
+        return new Encryption(ii).encryption(checkStr(exprs[0], qc),
+            checkStr(exprs[1], qc), checkStr(exprs[2], qc),
+            checkStr(exprs[3], qc), false);
       case _CRYPTO_GENERATE_SIGNATURE:
         // determine type of 7th argument
         Item arg6 = null;
         boolean arg6Str = false;
-        if(expr.length > 6) {
-          arg6 = checkItem(expr[6], ctx);
+        if(exprs.length > 6) {
+          arg6 = checkItem(exprs[6], qc);
 
           if(arg6 instanceof AStr) arg6Str = true;
           else if(!(arg6 instanceof ANode)) throw Err.typeError(this, AtomType.STR, arg6);
         }
         return new DigitalSignature(ii).generateSignature(
-            checkNode(expr[0].item(ctx, ii)), checkStr(expr[1], ctx),
-            checkStr(expr[2], ctx), checkStr(expr[3], ctx),
-            checkStr(expr[4], ctx), checkStr(expr[5], ctx),
+            checkNode(exprs[0].item(qc, ii)), checkStr(exprs[1], qc),
+            checkStr(exprs[2], qc), checkStr(exprs[3], qc),
+            checkStr(exprs[4], qc), checkStr(exprs[5], qc),
             arg6Str ? arg6.string(ii) : Token.token(""),
-            expr.length > 7 ? checkNode(expr[7].item(ctx, ii)) :
-              expr.length == 7 && !arg6Str ? checkNode(expr[6].item(ctx, ii)) : null,
-            ctx, info);
+            exprs.length > 7 ? checkNode(exprs[7].item(qc, ii)) :
+              exprs.length == 7 && !arg6Str ? checkNode(exprs[6].item(qc, ii)) : null,
+            qc, info);
       case _CRYPTO_VALIDATE_SIGNATURE:
         return new DigitalSignature(ii).
-            validateSignature(checkNode(expr[0].item(ctx, ii)));
+            validateSignature(checkNode(exprs[0].item(qc, ii)));
       default:
-        return super.item(ctx, ii);
+        return super.item(qc, ii);
     }
   }
 }

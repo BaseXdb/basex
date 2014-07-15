@@ -1,13 +1,12 @@
 package org.basex.io;
 
 import java.io.*;
-import java.net.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
 
 import javax.xml.transform.stream.*;
 
-import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -74,21 +73,18 @@ public final class IOFile extends IO {
    * @return success flag
    */
   public boolean touch() {
-    // some file systems require several runs
-    for(int i = 0; i < 5; i++) {
-      try {
-        if(file.createNewFile()) return true;
-      } catch(final IOException ex) {
-        Performance.sleep(i * 10L);
-        Util.debug(ex);
-      }
+    try {
+      Files.createFile(toPath());
+      return true;
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      return false;
     }
-    return false;
   }
 
   @Override
   public byte[] read() throws IOException {
-    return new BufferInput(this).content();
+    return Files.readAllBytes(toPath());
   }
 
   @Override
@@ -126,33 +122,43 @@ public final class IOFile extends IO {
     return new FileInputStream(file);
   }
 
+  /**
+   * Resolves two paths.
+   * @param pth file path (relative or absolute)
+   * @return resulting path
+   */
+  public IOFile resolve(final String pth) {
+    final File f = new File(pth);
+    return f.isAbsolute() ? new IOFile(f) : new IOFile(dir(), pth);
+  }
+
   @Override
-  public IO merge(final String f) {
-    final IO io = IO.get(f);
-    if(!(io instanceof IOFile) || f.contains(":") || f.startsWith("/")) return io;
-    return new IOFile(dir(), f);
+  public IO merge(final String pth) {
+    final IO io = IO.get(pth);
+    if(!(io instanceof IOFile) || pth.contains(":") || pth.startsWith("/")) return io;
+    return new IOFile(dir(), pth);
   }
 
   /**
-   * Recursively creates the directory.
-   * @return success flag
+   * Recursively creates the directory if it does not exist yet.
+   * @return {@code true} if the directory exists or has been created.
    */
   public boolean md() {
-    return !file.exists() && file.mkdirs();
+    return file.exists() || file.mkdirs();
   }
 
   @Override
-  public String dirPath() {
+  public String dir() {
     return isDir() ? path : path.substring(0, path.lastIndexOf('/') + 1);
   }
 
   /**
-   * Returns a directory reference. If the file points to a directory, a self reference
-   * is returned
-   * @return directory
+   * Returns the parent of this file or directory, or {@code null} if there is no parent directory.
+   * @return directory, or {@code null}
    */
-  public IOFile dir() {
-    return isDir() ? this : new IOFile(path.substring(0, path.lastIndexOf('/') + 1));
+  public IOFile parent() {
+    final String parent = file.getParent();
+    return parent == null ? null : new IOFile(parent);
   }
 
   /**
@@ -173,7 +179,7 @@ public final class IOFile extends IO {
     final File[] ch = file.listFiles();
     if(ch == null) return new IOFile[] {};
 
-    final ArrayList<IOFile> io = new ArrayList<IOFile>(ch.length);
+    final ArrayList<IOFile> io = new ArrayList<>(ch.length);
     final Pattern p = Pattern.compile(regex, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
     for(final File f : ch) {
       if(p.matcher(f.getName()).matches()) io.add(new IOFile(f));
@@ -203,57 +209,48 @@ public final class IOFile extends IO {
     if(io.isDir()) {
       for(final IOFile f : io.children()) add(f, files, off);
     } else {
-      files.add(io.path().substring(off).replace('\\', '/'));
+      files.add(io.path().substring(off));
     }
   }
 
   /**
    * Writes the specified byte array.
-   * @param c contents
+   * @param bytes bytes
    * @throws IOException I/O exception
    */
-  public void write(final byte[] c) throws IOException {
-    final FileOutputStream out = new FileOutputStream(path);
-    try {
-      out.write(c);
-    } finally {
-      out.close();
-    }
+  public void write(final byte[] bytes) throws IOException {
+    Files.write(toPath(), bytes);
   }
 
   /**
-   * Writes the specified input. The specified stream is eventually closed.
+   * Writes the specified input. The specified input stream is eventually closed.
    * @param in input stream
    * @throws IOException I/O exception
    */
   public void write(final InputStream in) throws IOException {
-    try {
-      final BufferOutput out = new BufferOutput(path);
-      try {
-        for(int i; (i = in.read()) != -1;) out.write(i);
-      } finally {
-        out.close();
-      }
+    try(final BufferOutput out = new BufferOutput(path)) {
+      for(int i; (i = in.read()) != -1;) out.write(i);
     } finally {
       in.close();
     }
   }
 
   /**
-   * Deletes the IO reference.
-   * @return success flag
+   * Deletes the file or directory.
+   * @return {@code true} if the file does not exist or has been deleted.
    */
   public boolean delete() {
+    boolean ok = true;
     if(file.exists()) {
-      boolean ok = true;
       if(isDir()) for(final IOFile ch : children()) ok &= ch.delete();
-      // some file systems require several runs
-      for(int i = 0; i < 5; i++) {
-        if(file.delete() && !file.exists()) return ok;
-        Performance.sleep(i * 10L);
+      try {
+        Files.delete(toPath());
+      } catch(final IOException ex) {
+        Util.debug(ex);
+        return false;
       }
     }
-    return false;
+    return ok;
   }
 
   /**
@@ -271,24 +268,9 @@ public final class IOFile extends IO {
    * @throws IOException I/O exception
    */
   public void copyTo(final IOFile target) throws IOException {
-    // optimize buffer size
-    final int bsize = (int) Math.max(1, Math.min(length(), 1 << 22));
-    final byte[] buf = new byte[bsize];
-
     // create parent directory of target file
-    target.dir().md();
-    final FileInputStream fis = new FileInputStream(file);
-    try {
-      final FileOutputStream fos = new FileOutputStream(target.file);
-      try {
-        // copy file buffer by buffer
-        for(int i; (i = fis.read(buf)) != -1;) fos.write(buf, 0, i);
-      } finally {
-        fos.close();
-      }
-    } finally {
-      fis.close();
-    }
+    target.parent().md();
+    Files.copy(toPath(), target.toPath());
   }
 
   @Override
@@ -325,7 +307,33 @@ public final class IOFile extends IO {
     } else {
       args = new String[] { "xdg-open", path };
     }
-    new ProcessBuilder(args).directory(dir().file).start();
+    new ProcessBuilder(args).directory(parent().file).start();
+  }
+
+  /**
+   * Returns a {@link Path} instance of this file.
+   * @return path
+   * @throws IOException I/O exception
+   */
+  public Path toPath() throws IOException {
+    try {
+      return Paths.get(path);
+    } catch(final InvalidPathException ex) {
+      Util.debug(ex);
+      throw new IOException(ex);
+    }
+  }
+
+  /**
+   * Returns a native file path representation. If normalization fails, returns the original path.
+   * @return path
+   */
+  public IOFile normalize() {
+    try {
+      return new IOFile(toPath().toRealPath().toFile());
+    } catch(final IOException ex) {
+      return this;
+    }
   }
 
   // STATIC METHODS ===============================================================================
@@ -396,45 +404,6 @@ public final class IOFile extends IO {
       if(!suf && sub) sb.append(".*");
     }
     return Prop.CASE ? sb.toString() : sb.toString().toLowerCase(Locale.ENGLISH);
-  }
-
-  /**
-   * Normalizes the specified URL and creates a new instance of this class.
-   * @param url url to be converted
-   * @return file path
-   */
-  public static IOFile get(final String url) {
-    String file = url;
-    try {
-      if(file.indexOf('%') != -1) file = URLDecoder.decode(file, Prop.ENCODING);
-    } catch(final Exception ex) { /* ignored. */ }
-    // remove file scheme
-    if(file.startsWith(FILEPREF)) file = file.substring(FILEPREF.length());
-    // remove duplicate slashes
-    file = normSlashes(file);
-    // remove leading slash from Windows paths
-    if(file.length() > 2 && file.charAt(0) == '/' && file.charAt(2) == ':' &&
-        Token.letter(file.charAt(1))) file = file.substring(1);
-
-    return new IOFile(file);
-  }
-
-  /**
-   * Normalize slashes in the specified path.
-   * @param path path to be normalized
-   * @return normalized path
-   */
-  private static String normSlashes(final String path) {
-    boolean a = true;
-    final StringBuilder sb = new StringBuilder(path.length());
-    final int pl = path.length();
-    for(int p = 0; p < pl; p++) {
-      final char c = path.charAt(p);
-      final boolean b = c != '/';
-      if(a || b) sb.append(c);
-      a = b;
-    }
-    return sb.toString();
   }
 
   /**

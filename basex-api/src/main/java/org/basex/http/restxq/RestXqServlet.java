@@ -18,9 +18,6 @@ import org.basex.query.*;
 public final class RestXqServlet extends BaseXServlet {
   @Override
   protected void run(final HTTPContext http) throws Exception {
-    // authenticate user
-    http.authenticate();
-
     // analyze input path
     final RestXqModules rxm = RestXqModules.get();
     // select XQuery function

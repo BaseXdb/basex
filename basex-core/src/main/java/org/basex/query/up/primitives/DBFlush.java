@@ -11,18 +11,18 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class DBFlush extends BasicOperation {
+public final class DBFlush extends DBUpdate {
   /**
    * Constructor.
-   * @param d data
-   * @param ii input info
+   * @param data data
+   * @param info input info
    */
-  public DBFlush(final Data d, final InputInfo ii) {
-    super(TYPE.DBFLUSH, d, ii);
+  public DBFlush(final Data data, final InputInfo info) {
+    super(UpdateType.DBFLUSH, data, info);
   }
 
   @Override
-  public void merge(final BasicOperation o) { }
+  public void merge(final Update up) { }
 
   @Override
   public void apply() {

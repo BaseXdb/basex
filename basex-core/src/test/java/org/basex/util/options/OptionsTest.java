@@ -2,12 +2,12 @@ package org.basex.util.options;
 
 import static org.junit.Assert.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.basex.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.Test;
 
 /**
  * Tests on options.

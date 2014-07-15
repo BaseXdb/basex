@@ -21,23 +21,27 @@ import org.basex.util.hash.*;
 public final class Union extends Set {
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression list
+   * @param info input info
+   * @param exprs expressions
    */
-  public Union(final InputInfo ii, final Expr... e) {
-    super(ii, e);
+  public Union(final InputInfo info, final Expr... exprs) {
+    super(info, exprs);
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
+  }
 
-    final int es = expr.length;
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    final int es = exprs.length;
     final ExprList el = new ExprList(es);
-    for(final Expr ex : expr) {
+    for(final Expr ex : exprs) {
       if(ex.isEmpty()) {
         // remove empty operands
-        ctx.compInfo(OPTREMOVE, this, ex);
+        qc.compInfo(OPTREMOVE, this, ex);
       } else {
         el.add(ex);
       }
@@ -47,13 +51,13 @@ public final class Union extends Set {
     // ensure that results are always sorted
     if(el.size() == 1 && iterable) return el.get(0);
     // replace expressions with optimized list
-    if(el.size() != es) expr = el.finish();
+    if(el.size() != es) exprs = el.finish();
     return this;
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final Union un = new Union(info, copyAll(ctx, scp, vs, expr));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    final Union un = new Union(info, copyAll(qc, scp, vs, exprs));
     un.iterable = iterable;
     return copyType(un);
   }

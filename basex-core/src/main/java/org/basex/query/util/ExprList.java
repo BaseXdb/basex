@@ -49,10 +49,22 @@ public final class ExprList extends ElementList {
   /**
    * Adds an element to the array.
    * @param e element to be added
+   * @return self reference
    */
-  public void add(final Expr e) {
+  public ExprList add(final Expr e) {
     if(size == list.length) resize(newSize());
     list[size++] = e;
+    return this;
+  }
+
+  /**
+   * Adds elements to the array.
+   * @param elements elements to be added
+   * @return self reference
+   */
+  public ExprList add(final Expr... elements) {
+    for(final Expr e : elements) add(e);
+    return this;
   }
 
   /**
@@ -78,8 +90,8 @@ public final class ExprList extends ElementList {
 
   /**
    * Returns an array with all elements.
-   * Warning: returns the internal array representation for better performance.
-   * @return internal array
+   * Warning: the internal array representation may be returned to improve performance.
+   * @return internal or internal array
    */
   public Expr[] finish() {
     if(size != list.length) {

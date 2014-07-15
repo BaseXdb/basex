@@ -36,29 +36,29 @@ public final class Compare {
 
   /**
    * Constructor.
-   * @param ii input info
+   * @param info input info
    */
-  public Compare(final InputInfo ii) {
-    info = ii;
+  public Compare(final InputInfo info) {
+    this.info = info;
   }
 
   /**
    * Sets the specified flag.
-   * @param f flag
+   * @param flag flag
    * @return self reference
    */
-  public Compare flag(final Mode f) {
-    flags.add(f);
+  public Compare flag(final Mode flag) {
+    flags.add(flag);
     return this;
   }
 
   /**
    * Sets a collation.
-   * @param c collation
+   * @param cl collation
    * @return self reference
    */
-  public Compare collation(final Collation c) {
-    coll = c;
+  public Compare collation(final Collation cl) {
+    coll = cl;
     return this;
   }
 
@@ -128,7 +128,7 @@ public final class Compare {
       if(s1.is(s2)) continue;
       AxisIter ch1 = s1.children(), ch2 = s2.children();
 
-      final Stack<AxisIter> stack = new Stack<AxisIter>();
+      final Stack<AxisIter> stack = new Stack<>();
       stack.push(ch1);
       stack.push(ch2);
 

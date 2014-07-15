@@ -32,28 +32,29 @@ public final class FNProc extends StandardFunc {
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNProc(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNProc(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    checkCreate(ctx);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    checkCreate(qc);
 
     final TokenList tl = new TokenList();
-    tl.add(checkStr(expr[0], ctx));
-    if(expr.length > 1) {
-      final Iter ir = ctx.iter(expr[1]);
+    tl.add(checkStr(exprs[0], qc));
+    if(exprs.length > 1) {
+      final Iter ir = qc.iter(exprs[1]);
       for(Item it; (it = ir.next()) != null;) tl.add(checkStr(it));
     }
 
-    final String c = expr.length > 2 ? string(checkStr(expr[2], ctx)) : Prop.ENCODING;
-    Charset cs = null;
+    final String c = exprs.length > 2 ? string(checkStr(exprs[2], qc)) : Prop.ENCODING;
+    final Charset cs;
     try {
       cs = Charset.forName(c);
     } catch(final Exception ex) {
@@ -61,10 +62,10 @@ public final class FNProc extends StandardFunc {
     }
 
     final String[] args = tl.toStringArray();
-    switch(sig) {
+    switch(func) {
       case _PROC_SYSTEM:  return system(args, cs);
       case _PROC_EXECUTE: return execute(args, cs);
-      default:            return super.item(ctx, ii);
+      default:            return super.item(qc, ii);
     }
   }
 

@@ -26,17 +26,17 @@ public final class FTDistance extends FTFilter {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
-   * @param mn minimum
-   * @param mx maximum
-   * @param u unit
+   * @param info input info
+   * @param expr expression
+   * @param min minimum
+   * @param max maximum
+   * @param unit unit
    */
-  public FTDistance(final InputInfo ii, final FTExpr e, final Expr mn, final Expr mx,
-      final FTUnit u) {
-    super(ii, e, u);
-    min = mn;
-    max = mx;
+  public FTDistance(final InputInfo info, final FTExpr expr, final Expr min, final Expr max,
+      final FTUnit unit) {
+    super(info, expr, unit);
+    this.min = min;
+    this.max = max;
   }
 
   @Override
@@ -46,18 +46,18 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    min = min.compile(ctx, scp);
-    max = max.compile(ctx, scp);
-    return super.compile(ctx, scp);
+  public FTExpr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    min = min.compile(qc, scp);
+    max = max.compile(qc, scp);
+    return super.compile(qc, scp);
   }
 
   @Override
-  protected boolean filter(final QueryContext ctx, final FTMatch mtc, final FTLexer lex)
+  protected boolean filter(final QueryContext qc, final FTMatch mtc, final FTLexer lex)
       throws QueryException {
 
-    final long mn = checkItr(min, ctx);
-    final long mx = checkItr(max, ctx);
+    final long mn = checkItr(min, qc);
+    final long mx = checkItr(max, qc);
     mtc.sort();
 
     final FTMatch match = new FTMatch();
@@ -98,21 +98,25 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public FTExpr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
       throws QueryException {
-    return inlineAll(ctx, scp, expr, v, e) || inlineAll(ctx, scp, new Expr[] { min, max }, v, e)
-        ? optimize(ctx, scp) : null;
+    final Expr mn = min.inline(qc, scp, v, e), mx = max.inline(qc, scp, v, e);
+    if(mn != null) min = mn;
+    if(mx != null) max = mx;
+
+    return inlineAll(qc, scp, exprs, v, e) || mn != null || mx != null
+        ? optimize(qc, scp) : null;
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTDistance(info, expr[0].copy(ctx, scp, vs),
-        min.copy(ctx, scp, vs), max.copy(ctx, scp, vs), unit);
+  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new FTDistance(info, exprs[0].copy(qc, scp, vs),
+        min.copy(qc, scp, vs), max.copy(qc, scp, vs), unit);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(DISTANCE, min + "-" + max + ' ' + unit), expr);
+    addPlan(plan, planElem(DISTANCE, min + "-" + max + ' ' + unit), exprs);
   }
 
   @Override
@@ -128,7 +132,7 @@ public final class FTDistance extends FTFilter {
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final FTExpr e : expr) sz += e.exprSize();
+    for(final FTExpr e : exprs) sz += e.exprSize();
     return min.exprSize() + max.exprSize() + sz;
   }
 }

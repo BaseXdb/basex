@@ -24,10 +24,10 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.util.*;
-import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -47,8 +47,6 @@ public final class QueryContext extends Proc {
   /** URL pattern (matching Clark and EQName notation). */
   private static final Pattern BIND = Pattern.compile("^((\"|')(.*?)\\2:|Q?(\\{(.*?)\\}))(.+)$");
 
-  /** Imported modules. */
-  private final TokenObjMap<Module> modules = new TokenObjMap<Module>();
   /** The evaluation stack. */
   public final QueryStack stack = new QueryStack();
   /** Static variables. */
@@ -56,13 +54,17 @@ public final class QueryContext extends Proc {
   /** Functions. */
   public final StaticFuncs funcs = new StaticFuncs();
   /** Externally bound variables. */
-  private final HashMap<QNm, Expr> bindings = new HashMap<QNm, Expr>();
+  private final HashMap<QNm, Expr> bindings = new HashMap<>();
 
-  /** Query resources. */
-  public final QueryResources resource = new QueryResources(this);
+  /** Parent query context. */
+  private final QueryContext qcParent;
+  /** Query info. */
+  public final QueryInfo info;
   /** Database context. */
   public final Context context;
 
+  /** Query resources. */
+  public QueryResources resources;
   /** HTTP context. */
   public Object http;
 
@@ -71,7 +73,7 @@ public final class QueryContext extends Proc {
   /** Cached thesaurus files. */
   public HashMap<String, IO> thes;
   /** Global database options (will be reassigned after query execution). */
-  public final HashMap<Option<?>, Object> staticOpts = new HashMap<Option<?>, Object>();
+  public final HashMap<Option<?>, Object> staticOpts = new HashMap<>();
   /** Temporary query options (key/value pairs), supplied by option declarations. */
   public final StringList tempOpts = new StringList();
 
@@ -109,14 +111,6 @@ public final class QueryContext extends Proc {
   /** Strings to lock defined by lock:write option. */
   public final StringList writeLocks = new StringList(0);
 
-  /** Pending updates. */
-  public Updates updates;
-  /** Pending output. */
-  public final ValueBuilder output = new ValueBuilder();
-
-  /** Compilation flag: current node has leaves. */
-  public boolean leaf;
-
   /** Number of successive tail calls. */
   public int tailCalls;
   /** Maximum number of successive tail calls (will be set before compilation). */
@@ -126,7 +120,6 @@ public final class QueryContext extends Proc {
   private XQFunction tailFunc;
   /** Arguments for the next tail call. */
   private Value[] args;
-
   /** Counter for variable IDs. */
   public int varIDs;
 
@@ -141,97 +134,100 @@ public final class QueryContext extends Proc {
   SerializerOptions serialOpts;
   /** Initial context value. */
   public MainModule ctxItem;
-  /** Module loader. */
-  public final ModuleLoader modLoader;
-  /** Opened connections to relational databases. */
-  private JDBCConnections jdbc;
-  /** Opened connections to relational databases. */
-  private ClientSessions sessions;
-  /** Root expression of the query. */
-  MainModule root;
 
-  /** Parent query context. */
-  private QueryContext parentCtx;
-  /** Query info. */
-  public final QueryInfo info;
+  /** Root expression of the query. */
+  public MainModule root;
+
   /** Indicates if the query context has been closed. */
   private boolean closed;
 
   /**
    * Constructor.
-   * @param parent parent context
+   * @param qcParent parent context
    */
-  public QueryContext(final QueryContext parent) {
-    this(parent.context);
-    parentCtx = parent;
-    listen = parent.listen;
+  public QueryContext(final QueryContext qcParent) {
+    this(qcParent.context, qcParent);
+    listen = qcParent.listen;
+    resources = qcParent.resources;
   }
 
   /**
    * Constructor.
-   * @param ctx database context
+   * @param context database context
    */
-  public QueryContext(final Context ctx) {
-    context = ctx;
-    nodes = ctx.current();
-    modLoader = new ModuleLoader(ctx);
+  public QueryContext(final Context context) {
+    this(context, null);
+    resources = new QueryResources(this);
+  }
+
+  /**
+   * Constructor.
+   * @param context database context
+   * @param qcParent parent context (optional)
+   */
+  private QueryContext(final Context context, final QueryContext qcParent) {
+    this.context = context;
+    this.qcParent = qcParent;
     info = new QueryInfo(this);
   }
 
   /**
    * Parses the specified query.
-   * @param qu input query
+   * @param query query string
    * @param path file path (may be {@code null})
    * @param sc static context
    * @return main module
    * @throws QueryException query exception
    */
-  public StaticScope parse(final String qu, final String path, final StaticContext sc)
+  public StaticScope parse(final String query, final String path, final StaticContext sc)
       throws QueryException {
-    return parse(qu, QueryProcessor.isLibrary(qu), path, sc);
+    return parse(query, QueryProcessor.isLibrary(query), path, sc);
   }
 
   /**
    * Parses the specified query.
-   * @param qu input query
+   * @param query query string
    * @param library library/main module
    * @param path file path (may be {@code null})
    * @param sc static context
    * @return main module
    * @throws QueryException query exception
    */
-  public StaticScope parse(final String qu, final boolean library, final String path,
+  public StaticScope parse(final String query, final boolean library, final String path,
       final StaticContext sc) throws QueryException {
-    return library ? parseLibrary(qu, path, sc) : parseMain(qu, path, sc);
+    return library ? parseLibrary(query, path, sc) : parseMain(query, path, sc);
   }
 
   /**
    * Parses the specified query.
-   * @param qu input query
+   * @param query query string
    * @param path file path (may be {@code null})
    * @param sc static context
    * @return main module
    * @throws QueryException query exception
    */
-  public MainModule parseMain(final String qu, final String path, final StaticContext sc)
+  public MainModule parseMain(final String query, final String path, final StaticContext sc)
       throws QueryException {
-    info.query = qu;
-    root = new QueryParser(qu, path, this, sc).parseMain();
+
+    info.query = query;
+    root = new QueryParser(query, path, this, sc).parseMain();
+    updating = updating && root.expr.has(Flag.UPD);
     return root;
   }
 
   /**
    * Parses the specified module.
-   * @param qu input query
+   * @param query query string
    * @param path file path (may be {@code null})
    * @param sc static context
    * @return name of module
    * @throws QueryException query exception
    */
-  public LibraryModule parseLibrary(final String qu, final String path, final StaticContext sc)
+  public LibraryModule parseLibrary(final String query, final String path, final StaticContext sc)
       throws QueryException {
-    info.query = qu;
-    return new QueryParser(qu, path, this, sc).parseLibrary(true);
+
+    info.query = query;
+    return new QueryParser(query, path, this, sc).parseLibrary(true);
   }
 
   /**
@@ -244,10 +240,31 @@ public final class QueryContext extends Proc {
   }
 
   /**
+   * Checks function calls and variable references.
+   * @param main main module
+   * @param sc static context
+   * @throws QueryException query exception
+   */
+  void check(final MainModule main, final StaticContext sc) throws QueryException {
+    // check function calls and variable references
+    funcs.check(this);
+    vars.check();
+
+    // check placement of updating expressions if any have been found
+    if(!sc.mixUpdates && updating) {
+      funcs.checkUp();
+      vars.checkUp();
+      if(main != null) main.expr.checkUp();
+    }
+  }
+
+  /**
    * Compiles and optimizes the expression.
    * @throws QueryException query exception
    */
   public void compile() throws QueryException {
+    if(nodes == null) nodes = context.current();
+
     // set database options
     final StringList o = tempOpts;
     for(int s = 0; s < o.size(); s += 2) {
@@ -267,7 +284,7 @@ public final class QueryContext extends Proc {
       // evaluate initial expression
       try {
         ctxItem.compile(this);
-        value = ctxItem.value(this);
+        value = ctxItem.cache(this).value();
       } catch(final QueryException ex) {
         if(ex.err() != NOCTX) throw ex;
         // only {@link ParseExpr} instances may cause this error
@@ -277,7 +294,7 @@ public final class QueryContext extends Proc {
       // add full-text container reference
       if(nodes.ftpos != null) ftPosData = new FTPosData();
       // cache the initial context nodes
-      resource.compile(nodes);
+      resources.compile(nodes);
     }
 
     // if specified, convert context item to specified type
@@ -295,7 +312,7 @@ public final class QueryContext extends Proc {
    * Compiles all used functions and the root expression.
    * @throws QueryException query exception
    */
-  void analyze() throws QueryException {
+  private void analyze() throws QueryException {
     try {
       // compile the expression
       if(root != null) QueryCompiler.compile(this, root);
@@ -314,8 +331,36 @@ public final class QueryContext extends Proc {
    */
   public Iter iter() throws QueryException {
     try {
-      // evaluate lazily if query will perform no updates
-      return updating ? value().iter() : root.iter(this);
+      // no updates: iterate through results
+      if(!updating) return root.iter(this);
+
+      // cache results
+      ValueBuilder cache = root.cache(this);
+
+      final Updates updates = resources.updates;
+      if(updates != null) {
+        // if parent context exists, updates will be performed by main context
+        if(qcParent == null) {
+          final ValueBuilder output = resources.output;
+          final StringList dbs = updates.databases();
+          final HashSet<Data> datas = updates.prepare();
+
+          // copy nodes that will be affected by an update operation
+          copy(cache, datas, dbs);
+          copy(output, datas, dbs);
+
+          if(context.data() != null) context.invalidate();
+          updates.apply();
+
+          // append cached outputs
+          if(output.size() != 0) {
+            if(cache.size() == 0) cache = output;
+            else cache.add(output.value());
+          }
+        }
+      }
+      return cache;
+
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
       throw BASX_STACKOVERFLOW.get(null);
@@ -323,51 +368,38 @@ public final class QueryContext extends Proc {
   }
 
   /**
-   * Returns the result value.
-   * @return result value
-   * @throws QueryException query exception
+   * Creates copies of nodes that will be affected by an update operation.
+   * @param cache node cache
+   * @param datas data references
+   * @param dbs database names
    */
-  public Value value() throws QueryException {
-    try {
-      final Value v = root.value(this);
-      final Value u = update();
-      return u != null ? u : v;
-    } catch(final StackOverflowError ex) {
-      Util.debug(ex);
-      throw BASX_STACKOVERFLOW.get(null);
+  private void copy(final ValueBuilder cache, final HashSet<Data> datas, final StringList dbs) {
+    final long cs = cache.size();
+    for(int c = 0; c < cs; c++) {
+      final Item it = cache.get(c);
+      if(!(it instanceof DBNode)) continue;
+      final Data data = it.data();
+      if(datas.contains(data) || !data.inMemory() && dbs.contains(data.meta.name)) {
+        cache.set(c, ((DBNode) it).dbCopy(context.options));
+      }
     }
-  }
-
-  /**
-   * Performs updates.
-   * @return resulting value
-   * @throws QueryException query exception
-   */
-  Value update() throws QueryException {
-    if(updating) {
-      //context.downgrade(this, updates.databases());
-      updates.apply();
-      if(updates.size() != 0 && context.data() != null) context.update();
-      if(output.size() != 0) return output.value();
-    }
-    return null;
-  }
-
-  /**
-   * Evaluates the specified expression and returns an iterator.
-   * @param e expression to be evaluated
-   * @return iterator
-   * @throws QueryException query exception
-   */
-  public Iter iter(final Expr e) throws QueryException {
-    checkStop();
-    return e.iter(this);
   }
 
   /**
    * Evaluates the specified expression and returns an iterator.
    * @param expr expression to be evaluated
    * @return iterator
+   * @throws QueryException query exception
+   */
+  public Iter iter(final Expr expr) throws QueryException {
+    checkStop();
+    return expr.iter(this);
+  }
+
+  /**
+   * Evaluates the specified expression and returns a value.
+   * @param expr expression to be evaluated
+   * @return value
    * @throws QueryException query exception
    */
   public Value value(final Expr expr) throws QueryException {
@@ -387,7 +419,9 @@ public final class QueryContext extends Proc {
   public void databases(final LockResult lr) {
     lr.read.add(readLocks);
     lr.write.add(writeLocks);
-    if(root == null || !root.databases(lr, this)) {
+    if(root == null || !root.databases(lr, this) ||
+       ctxItem != null && !ctxItem.databases(lr, this)) {
+
       if(updating) lr.writeAll = true;
       else lr.readAll = true;
     }
@@ -403,7 +437,7 @@ public final class QueryContext extends Proc {
 
   /**
    * Binds a value to the context item, using the same rules as for
-   * {@link #bind binding variables}.
+   * {@link #bind(String, Object, String) binding variables}.
    * @param val value to be bound
    * @param type data type (may be {@code null})
    * @param sc static context
@@ -411,7 +445,16 @@ public final class QueryContext extends Proc {
    */
   public void context(final Object val, final String type, final StaticContext sc)
       throws QueryException {
-    ctxItem = MainModule.get(cast(val, type), new VarScope(sc), null, null, sc, null);
+    context(cast(val, type), sc);
+  }
+
+  /**
+   * Binds a value to the context item.
+   * @param val value to be bound
+   * @param sc static context
+   */
+  public void context(final Value val, final StaticContext sc) {
+    ctxItem = MainModule.get(val, new VarScope(sc), null, null, sc, null);
   }
 
   /**
@@ -419,10 +462,9 @@ public final class QueryContext extends Proc {
    * <ul>
    * <li>If {@code "json"} is specified, the value is converted according to the rules
    *     specified in {@link JsonMapConverter}.</li>
-   * <li>If {@code "xml"} is specified, the value is converted to a document node.</li>
-   * <li>Otherwise, the type is interpreted as atomic XDM data type.</li>
+   * <li>Otherwise, the type is cast to the specified XDM data type.</li>
    * </ul>
-   * If the value is an XQuery value {@link Value}, it is directly assigned.
+   * If the value is an XQuery {@link Value}, it is directly assigned.
    * Otherwise, it is cast to the XQuery data model, using a Java/XQuery mapping.
    * @param name name of variable
    * @param val value to be bound
@@ -431,6 +473,32 @@ public final class QueryContext extends Proc {
    */
   public void bind(final String name, final Object val, final String type) throws QueryException {
     bind(name, cast(val, type));
+  }
+
+  /**
+   * Binds a value to a global variable.
+   * @param name name of variable
+   * @param val value to be bound
+   * @throws QueryException query exception
+   */
+  public void bind(final String name, final Value val) throws QueryException {
+    // remove optional $ prefix
+    String nm = name.indexOf('$') == 0 ? name.substring(1) : name;
+    byte[] uri = EMPTY;
+
+    // check for namespace declaration
+    final Matcher m = BIND.matcher(nm);
+    if(m.find()) {
+      String u = m.group(3);
+      if(u == null) u = m.group(5);
+      uri = token(u);
+      nm = m.group(6);
+    }
+    final byte[] ln = token(nm);
+    if(nm.isEmpty() || !XMLToken.isNCName(ln)) throw BINDNAME.get(null, nm);
+
+    // bind variable
+    bindings.put(new QNm(ln, uri), val);
   }
 
   /**
@@ -447,7 +515,7 @@ public final class QueryContext extends Proc {
    * @param string evaluation info
    */
   public void evalInfo(final String string) {
-    (parentCtx != null ? parentCtx.info : info).evalInfo(string);
+    (qcParent != null ? qcParent.info : info).evalInfo(string);
   }
 
   /**
@@ -456,24 +524,6 @@ public final class QueryContext extends Proc {
    */
   public String info() {
     return info.toString(this);
-  }
-
-  /**
-   * Returns JDBC connections.
-   * @return jdbc connections
-   */
-  public JDBCConnections jdbc() {
-    if(jdbc == null) jdbc = new JDBCConnections();
-    return jdbc;
-  }
-
-  /**
-   * Returns client sessions.
-   * @return client session
-   */
-  public ClientSessions sessions() {
-    if(sessions == null) sessions = new ClientSessions();
-    return sessions;
   }
 
   /**
@@ -502,12 +552,10 @@ public final class QueryContext extends Proc {
   }
 
   /**
-   * Sets the updating flag.
-   * @param up updating flag
+   * Indicates that the query contains any updating expressions.
    */
-  public void updating(final boolean up) {
-    if(updates == null) updates = new Updates();
-    updating = up;
+  public void updating() {
+    updating = true;
   }
 
   /**
@@ -516,20 +564,15 @@ public final class QueryContext extends Proc {
   public void close() {
     // close only once
     if(closed) return;
-    closed = true;
+
+    if(qcParent == null) {
+      closed = true;
+      resources.close();
+    }
 
     // reassign original database options
     for(final Entry<Option<?>, Object> e : staticOpts.entrySet())
       context.options.put(e.getKey(), e.getValue());
-
-    // close database connections
-    resource.close();
-    // close JDBC connections
-    if(jdbc != null) jdbc.close();
-    // close client sessions
-    if(sessions != null) sessions.close();
-    // close dynamically loaded JAR files
-    modLoader.close();
   }
 
   @Override
@@ -613,33 +656,6 @@ public final class QueryContext extends Proc {
   // PRIVATE METHODS ====================================================================
 
   /**
-   * Binds an expression to a global variable.
-   * @param name name of variable
-   * @param e value to be bound
-   */
-  private void bind(final String name, final Expr e) {
-    // remove optional $ prefix
-    String nm = name.indexOf('$') == 0 ? name.substring(1) : name;
-    byte[] uri = EMPTY;
-
-    // check for namespace declaration
-    final Matcher m = BIND.matcher(nm);
-    if(m.find()) {
-      String u = m.group(3);
-      if(u == null) u = m.group(5);
-      uri = token(u);
-      nm = m.group(6);
-    }
-    final byte[] ln = token(nm);
-
-    // [LW] better throw an error
-    if(nm.isEmpty() || !XMLToken.isNCName(ln)) return;
-
-    // bind variable
-    bindings.put(new QNm(ln, uri), e);
-  }
-
-  /**
    * Casts a value to the specified type.
    * See {@link #bind(String, Object, String)} for more infos.
    * @param val value to be cast
@@ -647,41 +663,94 @@ public final class QueryContext extends Proc {
    * @return cast value
    * @throws QueryException query exception
    */
-  private Expr cast(final Object val, final String type) throws QueryException {
-    final StaticContext sc = root != null ? root.sc : new StaticContext(true);
+  private Value cast(final Object val, final String type) throws QueryException {
+    final StaticContext sc = root != null ? root.sc : new StaticContext(context);
 
-    // return original value
-    if(type == null || type.isEmpty())
-      return val instanceof Expr ? (Expr) val : JavaMapping.toValue(val, this, sc);
+    // String input
+    Object vl = val;
+    if(vl instanceof String) {
+      final String string = (String) vl;
+      final StringList strings = new StringList(1);
+      // strings containing multiple items (value \1 ...)
+      if(string.indexOf('\1') != -1) {
+        strings.add(string.split("\1"));
+        vl = strings.toArray();
+      } else {
+        strings.add(string);
+      }
+
+      // sub types overriding the global value (value \2 type)
+      if(string.indexOf('\2') != -1) {
+        final ValueBuilder vb = new ValueBuilder(strings.size());
+        for(final String str : strings) {
+          final int i = str.indexOf('\2');
+          final String s = i == -1 ? str : str.substring(0, i);
+          final String t = i == -1 ? type : str.substring(i + 1);
+          vb.add(cast(s, t));
+        }
+        return vb.value();
+      }
+    }
+
+    // no type specified: return original value or convert Java object
+    if(type == null || type.isEmpty()) {
+      return vl instanceof Value ? (Value) vl : JavaMapping.toValue(vl, this, sc);
+    }
 
     // convert to json
-    try {
-      if(type.equalsIgnoreCase(MainParser.JSON.toString())) {
+    if(type.equalsIgnoreCase(MainParser.JSON.name())) {
+      try {
         final JsonParserOptions jp = new JsonParserOptions();
         jp.set(JsonOptions.SPEC, JsonSpec.ECMA_262);
         jp.set(JsonOptions.FORMAT, JsonFormat.MAP);
         final JsonConverter conv = JsonConverter.get(jp);
-        conv.convert(token(val.toString()), null);
+        conv.convert(token(vl.toString()), null);
         return conv.finish();
+      } catch(final QueryIOException ex) {
+        throw ex.getCause();
       }
-    } catch(final QueryIOException ex) {
-      throw ex.getCause();
     }
+
+    // test for empty sequence
+    if(type.equals(QueryText.EMPTY_SEQUENCE + "()")) return Empty.SEQ;
 
     // convert to the specified type
     // [LW] type should be parsed properly
     final QNm nm = new QNm(token(type.replaceAll("\\(.*?\\)$", "")), sc);
     if(!nm.hasURI() && nm.hasPrefix()) throw NOURI.get(null, nm.string());
 
-    Type t;
+    Type tp;
     if(type.endsWith(")")) {
-      t = NodeType.find(nm);
+      if(nm.eq(AtomType.ITEM.name)) tp = AtomType.ITEM;
+      else tp = NodeType.find(nm);
+      if(tp == null) tp = FuncType.find(nm);
     } else {
-      t = ListType.find(nm);
-      if(t == null) t = AtomType.find(nm, false);
+      tp = ListType.find(nm);
+      if(tp == null) tp = AtomType.find(nm, false);
     }
-    if(t == null) throw NOTYPE.get(null, type);
-    return t.cast(val, this, sc, null);
+    if(tp == null) throw NOTYPE.get(null, type);
+
+    // cast XDM values
+    if(vl instanceof Value) {
+      // cast single item
+      if(vl instanceof Item) return tp.cast((Item) vl, this, sc, null);
+      // cast sequence
+      final Value v = (Value) vl;
+      final ValueBuilder seq = new ValueBuilder((int) v.size());
+      for(final Item i : v) seq.add(tp.cast(i, this, sc, null));
+      return seq.value();
+    }
+
+    if(vl instanceof String[]) {
+      // cast string array
+      final String[] strings = (String[]) vl;
+      final ValueBuilder seq = new ValueBuilder(strings.length);
+      for(final String s : strings) seq.add(tp.cast(s, this, sc, null));
+      return seq.value();
+    }
+
+    // cast any other object to XDM
+    return tp.cast(vl, this, sc, null);
   }
 
   /**

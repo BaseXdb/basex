@@ -64,7 +64,7 @@ final class DialogGeneralPrefs extends BaseXBack {
       @Override
       public void actionPerformed(final ActionEvent e) {
         final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path.getText(), gui).select(Mode.DOPEN);
-        if(dir != null) path.setText(dir.dirPath());
+        if(dir != null) path.setText(dir.dir());
       }
     });
 

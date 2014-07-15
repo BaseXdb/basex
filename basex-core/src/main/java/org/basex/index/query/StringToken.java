@@ -11,17 +11,17 @@ import org.basex.index.*;
 public final class StringToken implements IndexToken {
   /** Index type. */
   private final IndexType type;
-  /** Text. */
-  private final byte[] text;
+  /** Index string. */
+  private final byte[] token;
 
   /**
    * Constructor.
-   * @param it index type
-   * @param tok token
+   * @param text text index
+   * @param token token
    */
-  public StringToken(final IndexType it, final byte[] tok) {
-    type = it;
-    text = tok;
+  public StringToken(final boolean text, final byte[] token) {
+    type = text ? IndexType.TEXT : IndexType.ATTRIBUTE;
+    this.token = token;
   }
 
   @Override
@@ -31,6 +31,6 @@ public final class StringToken implements IndexToken {
 
   @Override
   public byte[] get() {
-    return text;
+    return token;
   }
 }

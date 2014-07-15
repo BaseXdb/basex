@@ -43,7 +43,7 @@ public final class DirParser extends Parser {
   /** Raw parsing. */
   private final boolean rawParser;
   /** Database path for storing binary files. */
-  private final IOFile rawPath;
+  private IOFile rawPath;
 
   /** Last source. */
   private IO lastSrc;
@@ -55,24 +55,31 @@ public final class DirParser extends Parser {
   /**
    * Constructor.
    * @param source source path
-   * @param opts database options
-   * @param path future database path
+   * @param options main options
    */
-  public DirParser(final IO source, final MainOptions opts, final IOFile path) {
-    super(source, opts);
-    final String parent = source.dirPath();
-    root = parent.endsWith("/") ? parent : parent + '/';
+  public DirParser(final IO source, final MainOptions options) {
+    super(source, options);
+
+    final String dir = source.dir();
+    root = dir.endsWith("/") ? dir : dir + '/';
     skipCorrupt = options.get(MainOptions.SKIPCORRUPT);
     archives = options.get(MainOptions.ADDARCHIVES);
     addRaw = options.get(MainOptions.ADDRAW);
     dtd = options.get(MainOptions.DTD);
     rawParser = options.get(MainOptions.PARSER) == MainParser.RAW;
-
     filter = !source.isDir() && !source.isArchive() ? null :
-      Pattern.compile(IOFile.regex(opts.get(MainOptions.CREATEFILTER)));
-    // choose binary storage if disk-based database path is known and
-    // if raw parser or "add raw" option were chosen
-    rawPath = path != null && (addRaw || rawParser) ? new IOFile(path, IO.RAW) : null;
+      Pattern.compile(IOFile.regex(options.get(MainOptions.CREATEFILTER)));
+  }
+
+  /**
+   * Constructor.
+   * @param source source path
+   * @param context database context
+   * @param path future database path
+   */
+  public DirParser(final IO source, final Context context, final IOFile path) {
+    this(source, context.options);
+    if(path != null && (addRaw || rawParser)) rawPath = new IOFile(path, IO.RAW);
   }
 
   @Override
@@ -94,33 +101,34 @@ public final class DirParser extends Parser {
     } else if(archives && io.isArchive()) {
       final String name = io.name().toLowerCase(Locale.ENGLISH);
       InputStream in = io.inputStream();
-      if(name.endsWith(IO.GZSUFFIX)) {
-        // process GZIP archive
-        final GZIPInputStream is = new GZIPInputStream(in);
-        src = new IOStream(is, io.name().replaceAll("\\..*", IO.XMLSUFFIX));
-        parseResource(b);
-        is.close();
-      } else if(name.endsWith(IO.TARSUFFIX) || name.endsWith(IO.TGZSUFFIX)) {
+      if(name.endsWith(IO.TARSUFFIX) || name.endsWith(IO.TGZSUFFIX) ||
+          name.endsWith(IO.TARGZSUFFIX)) {
         // process TAR files
-        if(name.endsWith(IO.TGZSUFFIX)) in = new GZIPInputStream(in);
-        final TarInputStream is = new TarInputStream(in);
-        for(TarEntry ze; (ze = is.getNextEntry()) != null;) {
-          if(ze.isDirectory()) continue;
-          src = new IOStream(is, ze.getName());
-          src.length(ze.getSize());
+        if(!name.endsWith(IO.TARSUFFIX)) in = new GZIPInputStream(in);
+        try(final TarInputStream is = new TarInputStream(in)) {
+          for(TarEntry ze; (ze = is.getNextEntry()) != null;) {
+            if(ze.isDirectory()) continue;
+            src = new IOStream(is, ze.getName());
+            src.length(ze.getSize());
+            parseResource(b);
+          }
+        }
+      } else if(name.endsWith(IO.GZSUFFIX)) {
+        // process GZIP archive
+        try(final GZIPInputStream is = new GZIPInputStream(in)) {
+          src = new IOStream(is, io.name().replaceAll("\\..*", IO.XMLSUFFIX));
           parseResource(b);
         }
-        is.close();
       } else {
         // process ZIP archive
-        final ZipInputStream is = new ZipInputStream(in);
-        for(ZipEntry ze; (ze = is.getNextEntry()) != null;) {
-          if(ze.isDirectory()) continue;
-          src = new IOStream(is, ze.getName());
-          src.length(ze.getSize());
-          parseResource(b);
+        try(final ZipInputStream is = new ZipInputStream(in)) {
+          for(ZipEntry ze; (ze = is.getNextEntry()) != null;) {
+            if(ze.isDirectory()) continue;
+            src = new IOStream(is, ze.getName());
+            src.length(ze.getSize());
+            parseResource(b);
+          }
         }
-        is.close();
       }
     } else {
       // process regular file

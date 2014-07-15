@@ -2,7 +2,7 @@ package org.basex.query;
 
 import static org.basex.util.Token.*;
 
-import org.basex.core.*;
+import org.basex.util.*;
 
 /**
  * This class assembles text string and tokens required by the XQuery processor
@@ -590,11 +590,11 @@ public interface QueryText {
   byte[] EXPERROR = token(EXPATH + "error");
 
   /** Project URI. */
-  byte[] BASEXURI = token(Text.URL);
+  byte[] BASEXURI = token(Prop.URL);
   /** Project modules. */
-  String BXMODULES = Text.URL + "/modules/";
+  String BXMODULES = Prop.URL + "/modules/";
   /** Project errors. */
-  byte[] BXERRORS = token(Text.URL + "/errors");
+  byte[] BXERRORS = token(Prop.URL + "/errors");
 
   /** Database module URI. */
   byte[] ADMINURI = token(BXMODULES + "admin");
@@ -742,7 +742,7 @@ public interface QueryText {
   // OPTIMIZATIONS
 
   /** Optimization info. */
-  String OPTDESC = "simplifying descendant-or-self step(s)";
+  String OPTDESC = "rewriting descendant-or-self step(s)";
   /** Optimization info. */
   String OPTATOMIC = "atomic evaluation of %";
   /** Optimization info. */
@@ -784,28 +784,21 @@ public interface QueryText {
   /** Optimization info. */
   String OPTPATH = "removing non-existing path %";
   /** Optimization info. */
-  String OPTTXTINDEX = "applying text index";
+  String OPTTXTINDEX = "applying text index for %";
   /** Optimization info. */
-  String OPTATVINDEX = "applying attribute index";
+  String OPTATVINDEX = "applying attribute index for %";
   /** Optimization info. */
-  String OPTFTXINDEX = "applying full-text index";
+  String OPTFTXINDEX = "applying full-text index for %";
   /** Optimization info. */
-  String OPTRNGINDEX = "applying range index";
+  String OPTSFTXINDEX = "applying sequential full-text index for %";
   /** Optimization info. */
-  String OPTSRNGINDEX = "applying string range index";
+  String OPTRNGINDEX = "applying range index for %";
+  /** Optimization info. */
+  String OPTSRNGINDEX = "applying string range index for %";
   /** Optimization info. */
   String OPTNOINDEX = "removing path with no index results";
-  /** Optimization info. */
-  String OPTBIND = "binding static variable %";
   /** Optimization info. */
   String OPTCHILD = "converting % to child steps";
   /** Optimization info. */
   String OPTUNROLL = "unrolling %";
-
-  /** Warning. */
-  String WARNSELF = "Warning: '%' will never yield results.";
-  /** Warning. */
-  String WARNDESC = "Warning: '%' cannot have descendants.";
-  /** Warning. */
-  String WARNDOC = "Warning: '%' cannot have % nodes.";
 }

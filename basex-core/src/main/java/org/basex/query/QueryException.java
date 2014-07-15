@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  */
 public class QueryException extends Exception {
   /** Stack. */
-  private final ArrayList<InputInfo> stack = new ArrayList<InputInfo>();
+  private final ArrayList<InputInfo> stack = new ArrayList<>();
   /** Error QName. */
   private final QNm name;
   /** Error value. */
@@ -39,43 +39,45 @@ public class QueryException extends Exception {
   /**
    * Constructor, specifying an exception or error. {@link Err#BASX_GENERIC} will be set
    * as error code.
-   * @param th exception or error
+   * @param cause exception or error
    */
-  public QueryException(final Throwable th) {
-    this(Util.message(th));
+  public QueryException(final Throwable cause) {
+    this(Util.message(cause));
   }
 
   /**
    * Constructor, specifying a simple error message. {@link Err#BASX_GENERIC} will be set
    * as error code.
-   * @param msg error message
+   * @param message error message
    */
-  public QueryException(final String msg) {
-    this(null, Err.BASX_GENERIC, msg);
+  public QueryException(final String message) {
+    this(null, Err.BASX_GENERIC, message);
   }
 
   /**
    * Default constructor.
-   * @param ii input info
-   * @param er error reference
+   * @param info input info
+   * @param err error reference
    * @param ext error extension
    */
-  public QueryException(final InputInfo ii, final Err er, final Object... ext) {
-    this(ii, er.qname(), er.desc, ext);
-    err = er;
+  public QueryException(final InputInfo info, final Err err, final Object... ext) {
+    this(info, err.qname(), err.desc, ext);
+    this.err = err;
   }
 
   /**
    * Constructor, specifying the error code and message as string.
-   * @param ii input info
-   * @param errc error code
-   * @param msg error message
+   * @param info input info
+   * @param name error code
+   * @param message error message
    * @param ext error extension
    */
-  public QueryException(final InputInfo ii, final QNm errc, final String msg, final Object... ext) {
-    super(message(msg, ext));
-    name = errc;
-    if(ii != null) info(ii);
+  public QueryException(final InputInfo info, final QNm name, final String message,
+      final Object... ext) {
+
+    super(message(message, ext));
+    this.name = name;
+    if(info != null) info(info);
     for(final Object o : ext) {
       if(o instanceof Throwable) {
         initCause((Throwable) o);
@@ -228,7 +230,7 @@ public class QueryException extends Exception {
     final TokenBuilder tb = new TokenBuilder();
     if(info != null) tb.add(STOPPED_AT).add(info.toString()).add(COL).add(NL);
     final byte[] code = name.local();
-    if(code.length != 0) tb.add('[').add(code).add("] ");
+    if(code.length != 0) tb.add('[').add(name.prefixId(QueryText.ERRORURI)).add("] ");
     tb.add(getLocalizedMessage());
     if(!stack.isEmpty()) {
       tb.add(NL).add(NL).add(STACK_TRACE).add(COL);

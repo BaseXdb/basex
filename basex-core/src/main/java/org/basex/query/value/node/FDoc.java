@@ -20,7 +20,7 @@ public final class FDoc extends FNode {
   /** Child nodes. */
   private final ANodeList children;
   /** Base URI. */
-  private final byte[] base;
+  private final byte[] uri;
 
   /**
    * Constructor.
@@ -31,31 +31,31 @@ public final class FDoc extends FNode {
 
   /**
    * Constructor.
-   * @param b base uri
+   * @param uri base uri
    */
-  public FDoc(final String b) {
-    this(Token.token(b));
+  public FDoc(final String uri) {
+    this(Token.token(uri));
   }
 
   /**
    * Constructor.
-   * @param b base uri
+   * @param uri base uri
    */
-  public FDoc(final byte[] b) {
-    this(new ANodeList(), b);
+  public FDoc(final byte[] uri) {
+    this(new ANodeList(), uri);
   }
 
   /**
    * Constructor.
-   * @param ch children
-   * @param b base uri
+   * @param children children
+   * @param uri base uri
    */
-  public FDoc(final ANodeList ch, final byte[] b) {
+  public FDoc(final ANodeList children, final byte[] uri) {
     super(NodeType.DOC);
-    children = ch;
-    base = b;
+    this.children = children;
+    this.uri = uri;
     // update parent references
-    for(final ANode n : ch) n.parent(this);
+    for(final ANode n : children) n.parent(this);
   }
 
   @Override
@@ -106,22 +106,22 @@ public final class FDoc extends FNode {
 
   @Override
   public byte[] baseURI() {
-    return base;
+    return uri;
   }
 
   @Override
   public FDoc copy() {
-    return new FDoc(children, base).optimize();
+    return new FDoc(children, uri).optimize();
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(BASE, base));
+    addPlan(plan, planElem(BASE, uri));
   }
 
   @Override
   public byte[] xdmInfo() {
-    return new ByteList().add(typeId().asByte()).add(base).add(0).toArray();
+    return new ByteList().add(typeId().bytes()).add(uri).add(0).toArray();
   }
 
   @Override
@@ -133,6 +133,6 @@ public final class FDoc extends FNode {
 
   @Override
   public String toString() {
-    return Util.info("%(%)", type, base);
+    return Util.info("%(%)", type, uri);
   }
 }

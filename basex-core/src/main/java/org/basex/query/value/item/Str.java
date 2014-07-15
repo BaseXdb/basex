@@ -1,6 +1,5 @@
 package org.basex.query.value.item;
 
-import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 
 import org.basex.core.*;
@@ -8,7 +7,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * String item ({@code xs:string}, {@code xs:normalizedString}, {@code xs:language}, etc.).
@@ -20,57 +18,57 @@ public class Str extends AStr {
   /** Zero-length string. */
   public static final Str ZERO = new Str(Token.EMPTY);
   /** String data. */
-  final byte[] val;
+  final byte[] value;
 
   /**
    * Constructor.
-   * @param v value
+   * @param value value
    */
-  private Str(final byte[] v) {
-    this(v, AtomType.STR);
+  private Str(final byte[] value) {
+    this(value, AtomType.STR);
   }
 
   /**
    * Constructor.
-   * @param v value
-   * @param t data type
+   * @param value value
+   * @param type data type
    */
-  public Str(final byte[] v, final AtomType t) {
-    super(t);
-    val = v;
+  public Str(final byte[] value, final AtomType type) {
+    super(type);
+    this.value = value;
   }
 
   /**
    * Returns an instance of this class.
-   * @param v value
+   * @param value value
    * @return instance
    */
-  public static Str get(final byte[] v) {
-    return v.length == 0 ? ZERO : new Str(v);
+  public static Str get(final byte[] value) {
+    return value.length == 0 ? ZERO : new Str(value);
   }
 
   /**
    * Returns an instance of this class.
-   * @param s string
+   * @param value string
    * @return instance
    */
-  public static Str get(final String s) {
-    return get(Token.token(s));
+  public static Str get(final String value) {
+    return get(Token.token(value));
   }
 
   /**
    * Returns an instance of this class.
-   * @param v object (will be converted to token)
-   * @param ctx query context
+   * @param value object (will be converted to token)
+   * @param qc query context
    * @param ii input info
    * @return instance
    * @throws QueryException query exception
    */
-  public static Str get(final Object v, final QueryContext ctx, final InputInfo ii)
+  public static Str get(final Object value, final QueryContext qc, final InputInfo ii)
       throws QueryException {
 
-    final byte[] bytes = Token.token(v.toString());
-    if(ctx.context.options.get(MainOptions.CHECKSTRINGS)) {
+    final byte[] bytes = Token.token(value.toString());
+    if(qc.context.options.get(MainOptions.CHECKSTRINGS)) {
       final int bl = bytes.length;
       for(int b = 0; b < bl; b += Token.cl(bytes, b)) {
         final int cp = Token.cp(bytes, b);
@@ -82,7 +80,7 @@ public class Str extends AStr {
 
   @Override
   public final byte[] string(final InputInfo ii) {
-    return val;
+    return value;
   }
 
   /**
@@ -90,30 +88,18 @@ public class Str extends AStr {
    * @return string value
    */
   public final byte[] string() {
-    return val;
+    return value;
   }
 
   @Override
   public final boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof Str)) return false;
     final Str i = (Str) cmp;
-    return type == i.type && Token.eq(val, i.val);
+    return type == i.type && Token.eq(value, i.value);
   }
 
   @Override
   public final String toJava() {
-    return Token.string(val);
-  }
-
-  @Override
-  public final String toString() {
-    final ByteList tb = new ByteList();
-    tb.add('"');
-    for(final byte v : val) {
-      if(v == '&') tb.add(E_AMP);
-      else tb.add(v);
-      if(v == '"') tb.add('"');
-    }
-    return tb.add('"').toString();
+    return Token.string(value);
   }
 }

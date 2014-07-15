@@ -30,7 +30,7 @@ public final class QueryProcessor extends Proc {
   /** Static context. */
   public final StaticContext sc;
   /** Expression context. */
-  public final QueryContext ctx;
+  public final QueryContext qc;
   /** Query. */
   private final String query;
   /** Parsed flag. */
@@ -40,13 +40,13 @@ public final class QueryProcessor extends Proc {
 
   /**
    * Default constructor.
-   * @param qu query to process
-   * @param cx database context
+   * @param query query string
+   * @param ctx database context
    */
-  public QueryProcessor(final String qu, final Context cx) {
-    query = qu;
-    ctx = proc(new QueryContext(cx));
-    sc = new StaticContext(cx.options.get(MainOptions.XQUERY3));
+  public QueryProcessor(final String query, final Context ctx) {
+    this.query = query;
+    qc = proc(new QueryContext(ctx));
+    sc = new StaticContext(ctx);
   }
 
   /**
@@ -56,8 +56,8 @@ public final class QueryProcessor extends Proc {
   public void parse() throws QueryException {
     if(parsed) return;
     parsed = true;
-    ctx.parseMain(query, null, sc);
-    updating = ctx.updating;
+    qc.parseMain(query, null, sc);
+    updating = qc.updating;
   }
 
   /**
@@ -68,7 +68,7 @@ public final class QueryProcessor extends Proc {
     if(compiled) return;
     compiled = true;
     parse();
-    ctx.compile();
+    qc.compile();
   }
 
   /**
@@ -78,7 +78,7 @@ public final class QueryProcessor extends Proc {
    */
   public Iter iter() throws QueryException {
     compile();
-    return ctx.iter();
+    return qc.iter();
   }
 
   /**
@@ -88,7 +88,7 @@ public final class QueryProcessor extends Proc {
    */
   public Value value() throws QueryException {
     compile();
-    return ctx.value();
+    return qc.iter().value();
   }
 
   /**
@@ -98,7 +98,7 @@ public final class QueryProcessor extends Proc {
    */
   public Result execute() throws QueryException {
     compile();
-    return ctx.execute();
+    return qc.execute();
   }
 
   /**
@@ -115,7 +115,7 @@ public final class QueryProcessor extends Proc {
    */
   public QueryProcessor bind(final String name, final Object value, final String type)
       throws QueryException {
-    ctx.bind(name, value, type);
+    qc.bind(name, value, type);
     return this;
   }
 
@@ -146,7 +146,7 @@ public final class QueryProcessor extends Proc {
    * @return self reference
    */
   public QueryProcessor http(final Object value) {
-    ctx.http(value);
+    qc.http(value);
     return this;
   }
 
@@ -159,7 +159,7 @@ public final class QueryProcessor extends Proc {
    * @throws QueryException query exception
    */
   public QueryProcessor context(final Object value, final String type) throws QueryException {
-    ctx.context(value, type, sc);
+    qc.context(value, type, sc);
     return this;
   }
 
@@ -169,7 +169,7 @@ public final class QueryProcessor extends Proc {
    * @return self reference
    */
   public QueryProcessor context(final Nodes nodes) {
-    ctx.nodes = nodes;
+    qc.nodes = nodes;
     return this;
   }
 
@@ -199,7 +199,7 @@ public final class QueryProcessor extends Proc {
   public Serializer getSerializer(final OutputStream os) throws IOException, QueryException {
     compile();
     try {
-      return Serializer.get(os, ctx.serParams());
+      return Serializer.get(os, qc.serParams());
     } catch(final QueryIOException ex) {
       throw ex.getCause();
     }
@@ -216,7 +216,7 @@ public final class QueryProcessor extends Proc {
     // throw error
     if(res.size() != 0) throw BXDB_DBRETURN.get(null);
     // return empty result set
-    return new Nodes(ctx.nodes.data);
+    return new Nodes(qc.nodes.data);
   }
 
   /**
@@ -225,7 +225,7 @@ public final class QueryProcessor extends Proc {
    * @param file file name
    */
   public void module(final String uri, final String file) {
-    ctx.modDeclared.put(uri, file);
+    qc.modDeclared.put(uri, file);
   }
 
   /**
@@ -240,12 +240,12 @@ public final class QueryProcessor extends Proc {
    * Closes the processor.
    */
   public void close() {
-    ctx.close();
+    qc.close();
   }
 
   @Override
   public void databases(final LockResult lr) {
-    ctx.databases(lr);
+    qc.databases(lr);
   }
 
   /**
@@ -253,7 +253,7 @@ public final class QueryProcessor extends Proc {
    * @return number of updates
    */
   public int updates() {
-    return updating ? ctx.updates.size() : 0;
+    return updating ? qc.resources.updates().size() : 0;
   }
 
   /**
@@ -261,7 +261,7 @@ public final class QueryProcessor extends Proc {
    * @return query information
    */
   public String info() {
-    return ctx.info();
+    return qc.info();
   }
 
   /**
@@ -314,7 +314,7 @@ public final class QueryProcessor extends Proc {
    */
   public FDoc plan() {
     final FDoc doc = new FDoc();
-    ctx.plan(doc);
+    qc.plan(doc);
     return doc;
   }
 

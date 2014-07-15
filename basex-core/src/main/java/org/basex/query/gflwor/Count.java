@@ -21,16 +21,16 @@ import org.basex.util.hash.*;
  */
 public final class Count extends Clause {
   /** Count variable. */
-  final Var count;
+  final Var var;
 
   /**
    * Constructor.
-   * @param v variable
-   * @param ii input info
+   * @param var variable
+   * @param info input info
    */
-  public Count(final Var v, final InputInfo ii) {
-    super(ii, v);
-    count = v;
+  public Count(final Var var, final InputInfo info) {
+    super(info, var);
+    this.var = var;
   }
 
   @Override
@@ -39,9 +39,9 @@ public final class Count extends Clause {
       /** Counter. */
       private long i = 1;
       @Override
-      public boolean next(final QueryContext ctx) throws QueryException {
-        if(!sub.next(ctx)) return false;
-        ctx.set(count, Int.get(i++), info);
+      public boolean next(final QueryContext qc) throws QueryException {
+        if(!sub.next(qc)) return false;
+        qc.set(var, Int.get(i++), info);
         return true;
       }
     };
@@ -54,30 +54,18 @@ public final class Count extends Clause {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem e = planElem();
-    count.plan(e);
-    plan.add(e);
-  }
-
-  @Override
-  public String toString() {
-    return "count " + count;
-  }
-
-  @Override
   public boolean has(final Flag flag) {
     return false;
   }
 
   @Override
-  public Count compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    count.refineType(SeqType.ITR, ctx, info);
+  public Count compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    var.refineType(SeqType.ITR, qc, info);
     return this;
   }
 
   @Override
-  public Count optimize(final QueryContext ctx, final VarScope scp) {
+  public Count optimize(final QueryContext qc, final VarScope scp) {
     return this;
   }
 
@@ -92,21 +80,21 @@ public final class Count extends Clause {
   }
 
   @Override
-  public Clause inline(final QueryContext ctx, final VarScope scp,
+  public Clause inline(final QueryContext qc, final VarScope scp,
       final Var v, final Expr e) {
     return null;
   }
 
   @Override
-  public Count copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final Var v = scp.newCopyOf(ctx, count);
-    vs.put(count.id, v);
+  public Count copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    final Var v = scp.newCopyOf(qc, var);
+    vs.put(var.id, v);
     return new Count(v, info);
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitor.declared(count);
+    return visitor.declared(var);
   }
 
   @Override
@@ -122,5 +110,17 @@ public final class Count extends Clause {
   @Override
   public int exprSize() {
     return 0;
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    final FElem e = planElem();
+    var.plan(e);
+    plan.add(e);
+  }
+
+  @Override
+  public String toString() {
+    return "count " + var;
   }
 }

@@ -1,9 +1,6 @@
 package org.basex.http.restxq;
 
-import java.util.*;
-
 import org.basex.http.*;
-import org.basex.util.*;
 
 /**
  * This class represents the path of a RESTXQ function.
@@ -11,9 +8,11 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-final class RestXqPath implements Iterable<String>, Comparable<RestXqPath> {
+final class RestXqPath implements Comparable<RestXqPath> {
   /** Path segments. */
   final String[] segment;
+  /** Template flags. */
+  final boolean[] template;
   /** Number of segments. */
   final int size;
 
@@ -24,6 +23,9 @@ final class RestXqPath implements Iterable<String>, Comparable<RestXqPath> {
   RestXqPath(final String path) {
     segment = HTTPContext.toSegments(path);
     size = segment.length;
+    template = new boolean[size];
+    for(int s = 0; s < size; s++) template[s] = segment[s].trim().startsWith("{");
+    HTTPContext.decode(segment);
   }
 
   /**
@@ -46,8 +48,8 @@ final class RestXqPath implements Iterable<String>, Comparable<RestXqPath> {
    * @param s offset of segment
    * @return result of check
    */
-  private boolean isTemplate(final int s) {
-    return segment[s].trim().startsWith("{");
+  boolean isTemplate(final int s) {
+    return template[s];
   }
 
   @Override
@@ -55,34 +57,16 @@ final class RestXqPath implements Iterable<String>, Comparable<RestXqPath> {
     final int d = size - rxs.size;
     if(d != 0) return d;
     for(int s = 0; s < size; s++) {
-      final boolean wc1 = isTemplate(s);
-      final boolean wc2 = rxs.isTemplate(s);
+      final boolean wc1 = isTemplate(s), wc2 = rxs.isTemplate(s);
       if(wc1 != wc2) return wc1 ? 1 : -1;
     }
     return 0;
   }
 
   @Override
-  public Iterator<String> iterator() {
-    return new Iterator<String>() {
-      private int c;
-      @Override
-      public boolean hasNext() { return c < size; }
-      @Override
-      public String next() { return segment[c++]; }
-      @Override
-      public void remove() { throw Util.notExpected(); }
-    };
-  }
-
-  @Override
   public String toString() {
-    // returns a schematic representation of the segments
     final StringBuilder sb = new StringBuilder("/");
-    for(int s = 0; s < size; s++) {
-      sb.append(segment[s]).append('/');
-      //sb.append(isTemplate(s) ? "{...}" : segment[s]).append('/');
-    }
+    for(int s = 0; s < size; s++) sb.append(segment[s]).append('/');
     return sb.toString();
   }
 }

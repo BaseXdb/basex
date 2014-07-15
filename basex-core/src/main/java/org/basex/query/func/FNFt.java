@@ -36,72 +36,73 @@ public final class FNFt extends StandardFunc {
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNFt(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNFt(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    switch(sig) {
-      case _FT_CONTAINS: return contains(ctx);
-      case _FT_COUNT:    return count(ctx);
-      default:           return super.item(ctx, ii);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    switch(func) {
+      case _FT_CONTAINS: return contains(qc);
+      case _FT_COUNT:    return count(qc);
+      default:           return super.item(qc, ii);
     }
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
-      case _FT_SEARCH:   return search(ctx);
-      case _FT_SCORE:    return score(ctx);
-      case _FT_MARK:     return mark(ctx, false);
-      case _FT_EXTRACT:  return mark(ctx, true);
-      case _FT_TOKENS:   return tokens(ctx);
-      case _FT_TOKENIZE: return tokenize(ctx);
-      default:           return super.iter(ctx);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    switch(func) {
+      case _FT_SEARCH:   return search(qc);
+      case _FT_SCORE:    return score(qc);
+      case _FT_MARK:     return mark(qc, false);
+      case _FT_EXTRACT:  return mark(qc, true);
+      case _FT_TOKENS:   return tokens(qc);
+      case _FT_TOKENIZE: return tokenize(qc);
+      default:           return super.iter(qc);
     }
   }
 
   /**
    * Performs the count function.
-   * @param ctx query context
+   * @param qc query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Item count(final QueryContext ctx) throws QueryException {
-    final FTPosData tmp = ctx.ftPosData;
-    ctx.ftPosData = new FTPosData();
-    final Iter ir = ctx.iter(expr[0]);
+  private Item count(final QueryContext qc) throws QueryException {
+    final FTPosData tmp = qc.ftPosData;
+    qc.ftPosData = new FTPosData();
+    final Iter ir = qc.iter(exprs[0]);
     for(Item it; (it = ir.next()) != null;)
       checkDBNode(it);
-    final int s = ctx.ftPosData.size();
-    ctx.ftPosData = tmp;
+    final int s = qc.ftPosData.size();
+    qc.ftPosData = tmp;
     return Int.get(s);
   }
 
   /**
    * Performs the mark function.
-   * @param ctx query context
+   * @param qc query context
    * @param ex extract flag
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter mark(final QueryContext ctx, final boolean ex) throws QueryException {
+  private Iter mark(final QueryContext qc, final boolean ex) throws QueryException {
     byte[] m = MARK;
     int l = ex ? 150 : Integer.MAX_VALUE;
 
-    if(expr.length > 1) {
+    if(exprs.length > 1) {
       // name of the marker element; default is <mark/>
-      m = checkStr(expr[1], ctx);
+      m = checkStr(exprs[1], qc);
       if(!XMLToken.isQName(m)) throw valueError(info, AtomType.QNM, m);
     }
-    if(expr.length > 2) {
-      l = (int) checkItr(expr[2], ctx);
+    if(exprs.length > 2) {
+      l = (int) checkItr(exprs[2], qc);
     }
     final byte[] mark = m;
     final int len = l;
@@ -119,23 +120,23 @@ public final class FNFt extends StandardFunc {
             if(it != null) return it;
             vi = null;
           }
-          final FTPosData tmp = ctx.ftPosData;
+          final FTPosData tmp = qc.ftPosData;
           try {
-            ctx.ftPosData = ftd;
-            if(ir == null) ir = ctx.iter(expr[0]);
+            qc.ftPosData = ftd;
+            if(ir == null) ir = qc.iter(exprs[0]);
             final Item it = ir.next();
             if(it == null) return null;
 
             // copy node to main memory data instance
-            final MemData md = new MemData(ctx.context.options);
+            final MemData md = new MemData(qc.context.options);
             final DataBuilder db = new DataBuilder(md);
-            db.ftpos(mark, ctx.ftPosData, len).build(checkDBNode(it));
+            db.ftpos(mark, qc.ftPosData, len).build(checkDBNode(it));
 
             final IntList il = new IntList();
             for(int p = 0; p < md.meta.size; p += md.size(p, md.kind(p))) il.add(p);
             vi = DBNodeSeq.get(il, md, false, false).iter();
           } finally {
-            ctx.ftPosData = tmp;
+            qc.ftPosData = tmp;
           }
         }
       }
@@ -144,13 +145,13 @@ public final class FNFt extends StandardFunc {
 
   /**
    * Performs the score function.
-   * @param ctx query context
+   * @param qc query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter score(final QueryContext ctx) throws QueryException {
+  private Iter score(final QueryContext qc) throws QueryException {
     return new Iter() {
-      final Iter iter = expr[0].iter(ctx);
+      final Iter iter = exprs[0].iter(qc);
 
       @Override
       public Dbl next() throws QueryException {
@@ -162,14 +163,14 @@ public final class FNFt extends StandardFunc {
 
   /**
    * Performs the contains function.
-   * @param ctx query context
+   * @param qc query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Bln contains(final QueryContext ctx) throws QueryException {
-    final Value input = ctx.value(expr[0]);
-    final Value query = ctx.value(expr[1]);
-    final FTOptions opts = checkOptions(2, Q_OPTIONS, new FTOptions(), ctx);
+  private Bln contains(final QueryContext qc) throws QueryException {
+    final Value input = qc.value(exprs[0]);
+    final Value query = qc.value(exprs[1]);
+    final FTOptions opts = checkOptions(2, Q_OPTIONS, new FTOptions(), qc);
 
     final FTOpt opt = new FTOpt();
     final FTMode mode = opts.get(FTIndexOptions.MODE);
@@ -181,23 +182,23 @@ public final class FNFt extends StandardFunc {
     opt.cs = opts.get(FTOptions.CASE);
     if(opt.is(FZ) && opt.is(WC)) throw BXFT_MATCH.get(info, this);
 
-    final FTOpt tmp = ctx.ftOpt();
-    ctx.ftOpt(opt);
-    final FTExpr fte = new FTWords(info, query, mode, null).compile(ctx, null);
-    ctx.ftOpt(tmp);
-    return new FTContainsExpr(input, options(fte, opts), info).item(ctx, info);
+    final FTOpt tmp = qc.ftOpt();
+    qc.ftOpt(opt);
+    final FTExpr fte = new FTWords(info, query, mode, null).compile(qc, null);
+    qc.ftOpt(tmp);
+    return new FTContainsExpr(input, options(fte, opts), info).item(qc, info);
   }
 
   /**
    * Performs the search function.
-   * @param ctx query context
+   * @param qc query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter search(final QueryContext ctx) throws QueryException {
-    final Data data = checkData(ctx);
-    final Value terms = ctx.value(expr[1]);
-    final FTOptions opts = checkOptions(2, Q_OPTIONS, new FTOptions(), ctx);
+  private Iter search(final QueryContext qc) throws QueryException {
+    final Data data = checkData(qc);
+    final Value terms = qc.value(exprs[1]);
+    final FTOptions opts = checkOptions(2, Q_OPTIONS, new FTOptions(), qc);
 
     final IndexContext ic = new IndexContext(data, false);
     if(!data.meta.ftxtindex) throw BXDB_INDEX.get(info, data.meta.name,
@@ -209,11 +210,11 @@ public final class FNFt extends StandardFunc {
     opt.set(WC, opts.get(FTIndexOptions.WILDCARDS));
     if(opt.is(FZ) && opt.is(WC)) throw BXFT_MATCH.get(info, this);
 
-    final FTOpt tmp = ctx.ftOpt();
-    ctx.ftOpt(opt);
-    final FTExpr fte = new FTWords(info, ic, terms, mode).compile(ctx, null);
-    ctx.ftOpt(tmp);
-    return new FTIndexAccess(info, options(fte, opts), ic).iter(ctx);
+    final FTOpt tmp = qc.ftOpt();
+    qc.ftOpt(opt);
+    final FTExpr fte = new FTWords(info, data, terms, mode).compile(qc, null);
+    qc.ftOpt(tmp);
+    return new FTIndexAccess(info, options(fte, opts), ic).iter(qc);
   }
 
   /**
@@ -257,13 +258,13 @@ public final class FNFt extends StandardFunc {
 
   /**
    * Performs the tokens function.
-   * @param ctx query context
+   * @param qc query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter tokens(final QueryContext ctx) throws QueryException {
-    final Data data = checkData(ctx);
-    byte[] entry = expr.length < 2 ? Token.EMPTY : checkStr(expr[1], ctx);
+  private Iter tokens(final QueryContext qc) throws QueryException {
+    final Data data = checkData(qc);
+    byte[] entry = exprs.length < 2 ? Token.EMPTY : checkStr(exprs[1], qc);
     if(entry.length != 0) {
       final FTLexer ftl = new FTLexer(new FTOpt().copy(data.meta));
       ftl.init(entry);
@@ -274,13 +275,13 @@ public final class FNFt extends StandardFunc {
 
   /**
    * Performs the tokenize function.
-   * @param ctx query context
+   * @param qc query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter tokenize(final QueryContext ctx) throws QueryException {
-    final FTOpt opt = new FTOpt().copy(ctx.ftOpt());
-    final FTLexer ftl = new FTLexer(opt).init(checkStr(expr[0], ctx));
+  private Iter tokenize(final QueryContext qc) throws QueryException {
+    final FTOpt opt = new FTOpt().copy(qc.ftOpt());
+    final FTLexer ftl = new FTLexer(opt).init(checkStr(exprs[0], qc));
     return new Iter() {
       @Override
       public Str next() {
@@ -291,6 +292,6 @@ public final class FNFt extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return !(oneOf(sig, _FT_SEARCH, _FT_TOKENS) && !dataLock(visitor)) && super.accept(visitor);
+    return !(oneOf(func, _FT_SEARCH, _FT_TOKENS) && !dataLock(visitor, 1)) && super.accept(visitor);
   }
 }

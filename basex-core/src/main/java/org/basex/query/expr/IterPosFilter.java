@@ -31,7 +31,7 @@ final class IterPosFilter extends Filter {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) {
+  public Iter iter(final QueryContext qc) {
     return new Iter() {
       boolean skip, direct;
       Iter iter;
@@ -45,7 +45,7 @@ final class IterPosFilter extends Filter {
         if(iter == null) {
           if(off) {
             // evaluate offset and create position expression
-            final Item it = preds[0].ebv(ctx, info);
+            final Item it = preds[0].ebv(qc, info);
             final long l = it.itr(info);
             final Expr e = Pos.get(l, l, info);
             // don't accept fractional numbers
@@ -53,7 +53,7 @@ final class IterPosFilter extends Filter {
             pos = (Pos) e;
           }
 
-          iter = ctx.iter(root);
+          iter = qc.iter(root);
           cpos = 1;
 
           if(pos != null || last) {
@@ -70,58 +70,57 @@ final class IterPosFilter extends Filter {
         }
 
         // cache context
-        final long cp = ctx.pos;
-        final long cs = ctx.size;
+        final long cp = qc.pos;
+        final long cs = qc.size;
         try {
           Item item;
           if(direct) {
             // directly access relevant items
             item = iter.size() < cpos ? null : iter.get(cpos - 1);
-            ctx.pos = cpos++;
+            qc.pos = cpos++;
           } else {
             // loop through all items
             Item lnode = null;
             while((item = iter.next()) != null) {
               // evaluate predicates
-              ctx.checkStop();
-              ctx.size = 0;
-              ctx.pos = cpos++;
-              if(preds(item, ctx)) break;
+              qc.checkStop();
+              qc.size = 0;
+              qc.pos = cpos++;
+              if(preds(item, qc)) break;
               // remember last node
               lnode = item;
-              ctx.pos = cp;
-              ctx.size = cs;
+              qc.pos = cp;
+              qc.size = cs;
             }
             // returns the last item
             if(last) item = lnode;
           }
 
           // check if more items can be expected
-          skip = last || pos != null && pos.skip(ctx);
+          skip = last || pos != null && pos.skip(qc);
           if(skip && direct) iter.reset();
           return item;
         } finally {
           // reset context and return result
-          ctx.pos = cp;
-          ctx.size = cs;
+          qc.pos = cp;
+          qc.size = cs;
         }
       }
     };
   }
 
   @Override
-  public Filter copy(final QueryContext ctx, final VarScope scp,
+  public Filter copy(final QueryContext qc, final VarScope scp,
       final IntObjMap<Var> vs) {
-    final Filter f = new CachedFilter(info, root == null ? null : root.copy(ctx, scp, vs),
-        Arr.copyAll(ctx, scp, vs, preds));
+    final Filter f = new CachedFilter(info, root == null ? null : root.copy(qc, scp, vs),
+        Arr.copyAll(qc, scp, vs, preds));
     return copy(new IterPosFilter(f, off));
   }
 
   @Override
-  public Filter addPred(final QueryContext ctx, final VarScope scp, final Expr p)
+  public Filter addPred(final QueryContext qc, final VarScope scp, final Expr p)
       throws QueryException {
     // [LW] should be fixed
-    return ((Filter) new CachedFilter(info, root, preds).copy(ctx, scp)
-        ).addPred(ctx, scp, p);
+    return ((Filter) new CachedFilter(info, root, preds).copy(qc, scp)).addPred(qc, scp, p);
   }
 }

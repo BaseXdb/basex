@@ -145,53 +145,53 @@ public final class CmpV extends Cmp {
   }
 
   /** Comparator. */
-  OpV op;
+  public OpV op;
 
   /**
    * Constructor.
-   * @param e1 first expression
-   * @param e2 second expression
-   * @param o operator
+   * @param expr1 first expression
+   * @param expr2 second expression
+   * @param op operator
    * @param coll collation
-   * @param ii input info
+   * @param info input info
    */
-  public CmpV(final Expr e1, final Expr e2, final OpV o, final Collation coll,
-      final InputInfo ii) {
-    super(ii, e1, e2, coll);
-    op = o;
+  public CmpV(final Expr expr1, final Expr expr2, final OpV op, final Collation coll,
+      final InputInfo info) {
+    super(info, expr1, expr2, coll);
+    this.op = op;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return this.optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // swap expressions
     if(swap()) {
       op = op.swap();
-      ctx.compInfo(OPTSWAP, this);
+      qc.compInfo(OPTSWAP, this);
     }
 
-    final Expr e1 = expr[0];
-    final Expr e2 = expr[1];
+    final Expr e1 = exprs[0];
+    final Expr e2 = exprs[1];
     type = SeqType.get(AtomType.BLN, e1.size() == 1 && e2.size() == 1 ?
         Occ.ONE : Occ.ZERO_ONE);
 
     Expr e = this;
     if(oneIsEmpty()) {
-      e = optPre(null, ctx);
+      e = optPre(null, qc);
     } else if(allAreValues()) {
-      e = preEval(ctx);
+      e = preEval(qc);
     } else if(e1.isFunction(Function.COUNT)) {
       e = compCount(op);
-      if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
+      if(e != this) qc.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
     } else if(e1.isFunction(Function.POSITION)) {
       // position() CMP number
       e = Pos.get(op, e2, e, info);
-      if(e != this) ctx.compInfo(OPTWRITE, this);
+      if(e != this) qc.compInfo(OPTWRITE, this);
     } else if(e1.type().eq(SeqType.BLN) && (op == OpV.EQ && e2 == Bln.FALSE ||
         op == OpV.NE && e2 == Bln.TRUE)) {
       // (A eq false()) -> not(A)
@@ -201,21 +201,21 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public Expr compEbv(final QueryContext ctx) {
+  public Expr compEbv(final QueryContext qc) {
     // e.g.: if($x eq true()) -> if($x)
     // checking one direction is sufficient, as operators may have been swapped
-    return (op == OpV.EQ && expr[1] == Bln.TRUE ||
-            op == OpV.NE && expr[1] == Bln.FALSE) &&
-      expr[0].type().eq(SeqType.BLN) ? expr[0] : this;
+    return (op == OpV.EQ && exprs[1] == Bln.TRUE ||
+            op == OpV.NE && exprs[1] == Bln.FALSE) &&
+      exprs[0].type().eq(SeqType.BLN) ? exprs[0] : this;
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Item a = expr[0].item(ctx, info);
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Item a = exprs[0].item(qc, info);
     if(a == null) return null;
-    final Item b = expr[1].item(ctx, info);
+    final Item b = exprs[1].item(qc, info);
     if(b == null) return null;
-    if(a.comparable(b)) return Bln.get(op.eval(a, b, collation, info));
+    if(a.comparable(b)) return Bln.get(op.eval(a, b, coll, info));
 
     if(a instanceof FItem) throw FIEQ.get(info, a.type);
     if(b instanceof FItem) throw FIEQ.get(info, b.type);
@@ -224,19 +224,19 @@ public final class CmpV extends Cmp {
 
   @Override
   public CmpV invert() {
-    return expr[0].size() != 1 || expr[1].size() != 1 ? this :
-      new CmpV(expr[0], expr[1], op.invert(), collation, info);
+    return exprs[0].size() != 1 || exprs[1].size() != 1 ? this :
+      new CmpV(exprs[0], exprs[1], op.invert(), coll, info);
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final Expr a = expr[0].copy(ctx, scp, vs), b = expr[1].copy(ctx, scp, vs);
-    return new CmpV(a, b, op, collation, info);
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    final Expr a = exprs[0].copy(qc, scp, vs), b = exprs[1].copy(qc, scp, vs);
+    return new CmpV(a, b, op, coll, info);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(OP, op.name), expr);
+    addPlan(plan, planElem(OP, op.name), exprs);
   }
 
   @Override

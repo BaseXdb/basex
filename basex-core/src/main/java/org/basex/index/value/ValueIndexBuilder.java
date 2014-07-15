@@ -99,58 +99,55 @@ public final class ValueIndexBuilder extends IndexBuilder {
    */
   private void merge() throws IOException {
     final String f = text ? DATATXT : DATAATV;
-    final DataOutput outL = new DataOutput(data.meta.dbfile(f + 'l'));
-    final DataOutput outR = new DataOutput(data.meta.dbfile(f + 'r'));
-    outL.write4(0);
-
-    // initialize cached index iterators
-    final IntList ml = new IntList();
-    final IntList il = new IntList();
-    final ValueIndexMerger[] vm = new ValueIndexMerger[splits];
-    for(int i = 0; i < splits; ++i) vm[i] = new ValueIndexMerger(data, text, i);
     int sz = 0;
+    try(final DataOutput outL = new DataOutput(data.meta.dbfile(f + 'l'));
+        final DataOutput outR = new DataOutput(data.meta.dbfile(f + 'r'))) {
+      outL.write4(0);
 
-    // parse through all values
-    while(true) {
-      checkStop();
+      // initialize cached index iterators
+      final IntList ml = new IntList();
+      final IntList il = new IntList();
+      final ValueIndexMerger[] vm = new ValueIndexMerger[splits];
+      for(int i = 0; i < splits; ++i) vm[i] = new ValueIndexMerger(data, text, i);
 
-      // find first index which is not completely parsed yet
-      int min = -1;
-      while(++min < splits && vm[min].values.length == 0);
-      if(min == splits) break;
+      // parse through all values
+      while(true) {
+        checkStop();
 
-      // find index entry with smallest key
-      ml.reset();
-      for(int i = min; i < splits; ++i) {
-        if(vm[i].values.length == 0) continue;
-        final int d = diff(vm[min].key, vm[i].key);
-        if(d < 0) continue;
-        if(d > 0) {
-          min = i;
-          ml.reset();
+        // find first index which is not completely parsed yet
+        int min = -1;
+        while(++min < splits && vm[min].values.length == 0);
+        if(min == splits) break;
+
+        // find index entry with smallest key
+        ml.reset();
+        for(int i = min; i < splits; ++i) {
+          if(vm[i].values.length == 0) continue;
+          final int d = diff(vm[min].key, vm[i].key);
+          if(d < 0) continue;
+          if(d > 0) {
+            min = i;
+            ml.reset();
+          }
+          ml.add(i);
         }
-        ml.add(i);
-      }
 
-      // parse through all values, cache and sort id values
-      final int ms = ml.size();
-      for(int m = 0; m < ms; ++m) {
-        final ValueIndexMerger t = vm[ml.get(m)];
-        final int vl = t.values.length;
-        for(int l = 4, v; l < vl; l += Num.length(v)) {
-          v = Num.get(t.values, l);
-          il.add(v);
+        // parse through all values, cache and sort id values
+        final int ms = ml.size();
+        for(int m = 0; m < ms; ++m) {
+          final ValueIndexMerger t = vm[ml.get(m)];
+          final int vl = t.values.length;
+          for(int l = 4, v; l < vl; l += Num.length(v)) {
+            v = Num.get(t.values, l);
+            il.add(v);
+          }
+          t.next();
         }
-        t.next();
+        // write final structure to disk
+        write(outL, outR, il);
+        ++sz;
       }
-      // write final structure to disk
-      write(outL, outR, il);
-      ++sz;
     }
-
-    // close index files
-    outR.close();
-    outL.close();
 
     // write number of entries to first position
     final DataAccess da = new DataAccess(data.meta.dbfile(f + 'l'));
@@ -166,38 +163,37 @@ public final class ValueIndexBuilder extends IndexBuilder {
   private void writeIndex(final boolean partial) throws IOException {
     // write id arrays and references
     final String name = (text ? DATATXT : DATAATV) + (partial ? splits : "");
-    final DataOutput outL = new DataOutput(data.meta.dbfile(name + 'l'));
-    final DataOutput outR = new DataOutput(data.meta.dbfile(name + 'r'));
-    outL.write4(index.size());
+    try(final DataOutput outL = new DataOutput(data.meta.dbfile(name + 'l'));
+        final DataOutput outR = new DataOutput(data.meta.dbfile(name + 'r'))) {
+      outL.write4(index.size());
 
-    final IntList il = new IntList();
-    index.init();
-    while(index.more()) {
-      final byte[] values = index.values.get(index.next());
-      final int vs = Num.size(values);
+      final IntList il = new IntList();
+      index.init();
+      while(index.more()) {
+        final byte[] values = index.values.get(index.next());
+        final int vs = Num.size(values);
 
-      if(partial) {
-        // write temporary structure to disk: number of entries, absolute values
-        outR.write5(outL.size());
-        outL.write(values, 0, vs);
-      } else {
-        // cache and sort all values
-        for(int ip = 4; ip < vs; ip += Num.length(values, ip)) {
-          il.add(Num.get(values, ip));
+        if(partial) {
+          // write temporary structure to disk: number of entries, absolute values
+          outR.write5(outL.size());
+          outL.write(values, 0, vs);
+        } else {
+          // cache and sort all values
+          for(int ip = 4; ip < vs; ip += Num.length(values, ip)) {
+            il.add(Num.get(values, ip));
+          }
+          // write final structure to disk
+          write(outL, outR, il);
         }
-        // write final structure to disk
-        write(outL, outR, il);
       }
     }
-    outL.close();
-    outR.close();
 
     // temporarily write texts
     if(partial) {
-      final DataOutput outT = new DataOutput(data.meta.dbfile(name + 't'));
-      index.init();
-      while(index.more()) outT.writeToken(index.keys.get(index.next()));
-      outT.close();
+      try(final DataOutput outT = new DataOutput(data.meta.dbfile(name + 't'))) {
+        index.init();
+        while(index.more()) outT.writeToken(index.keys.get(index.next()));
+      }
     }
     // increase split counter
     splits++;

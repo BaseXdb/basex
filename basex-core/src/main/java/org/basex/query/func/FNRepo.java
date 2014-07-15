@@ -31,31 +31,32 @@ public final class FNRepo extends StandardFunc {
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param f function definition
-   * @param e arguments
+   * @param sc static context
+   * @param info input info
+   * @param func function definition
+   * @param args arguments
    */
-  public FNRepo(final StaticContext sctx, final InputInfo ii, final Function f, final Expr... e) {
-    super(sctx, ii, f, e);
+  public FNRepo(final StaticContext sc, final InputInfo info, final Function func,
+      final Expr... args) {
+    super(sc, info, func, args);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(sig) {
-      case _REPO_LIST: return list(ctx);
-      default:         return super.iter(ctx);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    switch(func) {
+      case _REPO_LIST: return list(qc);
+      default:         return super.iter(qc);
     }
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    checkCreate(ctx);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    checkCreate(qc);
 
-    final RepoManager rm = new RepoManager(ctx.context, ii);
+    final RepoManager rm = new RepoManager(qc.context, ii);
     // either path to package or package name
-    final String pkg = expr.length == 0 ? null : Token.string(checkStr(expr[0], ctx));
-    switch(sig) {
+    final String pkg = exprs.length == 0 ? null : Token.string(checkStr(exprs[0], qc));
+    switch(func) {
       case _REPO_INSTALL:
         rm.install(pkg);
         return null;
@@ -63,18 +64,18 @@ public final class FNRepo extends StandardFunc {
         rm.delete(pkg);
         return null;
       default:
-        return super.item(ctx, ii);
+        return super.item(qc, ii);
     }
   }
 
   /**
    * Performs the list function.
-   * @param ctx query context
+   * @param qc query context
    * @return iterator
    */
-  private static Iter list(final QueryContext ctx) {
+  private static Iter list(final QueryContext qc) {
     final NodeSeqBuilder cache = new NodeSeqBuilder();
-    for(final byte[] p : ctx.context.repo.pkgDict()) {
+    for(final byte[] p : qc.context.repo.pkgDict()) {
       if(p == null) continue;
       final FElem elem = new FElem(PACKAGE);
       elem.add(NAME, Package.name(p));
@@ -83,7 +84,7 @@ public final class FNRepo extends StandardFunc {
       cache.add(elem);
     }
     // traverse all directories, ignore root entries with dashes
-    for(final IOFile dir : ctx.context.repo.path().children()) {
+    for(final IOFile dir : qc.context.repo.path().children()) {
       if(dir.name().indexOf('-') != -1) continue;
       for(final String s : dir.descendants()) {
         final FElem elem = new FElem(PACKAGE);

@@ -11,6 +11,7 @@ import org.basex.io.serial.*;
 import org.basex.io.serial.SerializerOptions.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests the functions of the EXPath Cryptographic module. The tests

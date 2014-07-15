@@ -44,8 +44,8 @@ public final class FNZipTest extends AdvancedQueryTest {
   /** Finishes the test. */
   @AfterClass
   public static void finish() {
-    new File(TMPZIP).delete();
-    new File(TMPFILE).delete();
+    new IOFile(TMPZIP).delete();
+    new IOFile(TMPFILE).delete();
   }
 
   /** Test method. */
@@ -150,11 +150,10 @@ public final class FNZipTest extends AdvancedQueryTest {
    * @param name file name
    * @param entry entry
    * @return parameter string
-   * @throws IOException I/O Exception
    */
-  private static String paramsPrefix(final String name, final String entry) throws IOException {
+  private static String paramsPrefix(final String name, final String entry) {
     return "<zip:file xmlns:zip='http://expath.org/ns/zip' href='" +
-        new File(TMPZIP).getCanonicalPath() + "'>" +
+        new IOFile(TMPZIP).path() + "'>" +
         "<zip:entry name='" + name + "'>" + entry + "</zip:entry></zip:file>";
   }
 
@@ -178,11 +177,10 @@ public final class FNZipTest extends AdvancedQueryTest {
    * Returns a zip archive description.
    * @param arg zip arguments
    * @return parameter string
-   * @throws IOException I/O Exception
    */
-  private static String params(final String arg) throws IOException {
+  private static String params(final String arg) {
     return "<file xmlns='http://expath.org/ns/zip' href='" +
-    new File(TMPZIP).getCanonicalPath() + "'>" + arg + "</file>";
+        new IOFile(TMPZIP).path() + "'>" + arg + "</file>";
   }
 
   /**
@@ -192,17 +190,13 @@ public final class FNZipTest extends AdvancedQueryTest {
    * @throws IOException I/O exception
    */
   private static void checkEntry(final String file, final byte[] data) throws IOException {
-    ZipFile zf = null;
-    try {
-      zf = new ZipFile(TMPZIP);
+    try(final ZipFile zf = new ZipFile(TMPZIP)) {
       final ZipEntry ze = zf.getEntry(file);
       assertNotNull("File not found: " + file, ze);
       final byte[] dt = new IOStream(zf.getInputStream(ze)).read();
       assertTrue("Wrong contents in file \"" + file + "\":" + Prop.NL +
           "Expected: " + string(data) + Prop.NL + "Found: " + string(dt),
           eq(data, dt));
-    } finally {
-      if(zf != null) zf.close();
     }
   }
 }

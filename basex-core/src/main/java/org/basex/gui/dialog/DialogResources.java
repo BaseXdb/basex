@@ -128,7 +128,7 @@ public final class DialogResources extends BaseXBack {
    * Returns the current tree node selection.
    * @return selected node
    */
-  TreeNode selection() {
+  private TreeNode selection() {
     final TreePath t = tree.getSelectionPath();
     return t == null ? null : (TreeNode) t.getLastPathComponent();
   }

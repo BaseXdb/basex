@@ -3,7 +3,6 @@ package org.basex;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
-import java.util.*;
 
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -23,7 +22,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class BaseXGUI {
+public final class BaseXGUI extends Main {
   /** Database context. */
   private final Context context = new Context();
   /** Files, specified as arguments. */
@@ -50,7 +49,8 @@ public final class BaseXGUI {
    * @throws BaseXException database exception
    */
   public BaseXGUI(final String... args) throws BaseXException {
-    parseArguments(args);
+    super(args);
+    parseArgs();
 
     // set Mac-specific properties
     if(Prop.MAC) {
@@ -122,9 +122,7 @@ public final class BaseXGUI {
       if(laf.equals("Metal")) {
         // use non-bold fonts in Java's look & feel
         final UIDefaults def = UIManager.getDefaults();
-        final Enumeration<?> en = def.keys();
-        while(en.hasMoreElements()) {
-          final Object k = en.nextElement();
+        for(final Object k : def.keySet()) {
           final Object v = def.get(k);
           if(v instanceof Font) def.put(k, ((Font) v).deriveFont(Font.PLAIN));
         }
@@ -143,16 +141,22 @@ public final class BaseXGUI {
     }
   }
 
-  /**
-   * Parses the command-line arguments, specified by the user.
-   * @param args command-line arguments
-   * @throws BaseXException database exception
-   */
-  private void parseArguments(final String[] args) throws BaseXException {
-    final Args arg = new Args(args, this, S_GUIINFO, Util.info(S_CONSOLE, S_GUI));
+  @Override
+  protected void parseArgs() throws BaseXException {
+    final MainParser arg = new MainParser(this);
     while(arg.more()) {
       if(arg.dash()) throw arg.usage();
       files.add(arg.string());
     }
+  }
+
+  @Override
+  public String header() {
+    return Util.info(S_CONSOLE, S_GUI);
+  }
+
+  @Override
+  public String usage() {
+    return S_GUIINFO;
   }
 }

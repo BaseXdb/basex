@@ -2,8 +2,6 @@ package org.basex.core;
 
 import static org.basex.core.Lang.*;
 
-import java.util.*;
-
 import org.basex.core.parse.Commands.*;
 import org.basex.util.*;
 
@@ -46,23 +44,6 @@ public interface Text {
   /** False flag. */
   String FALSE = "false";
 
-  /** Project namespace. */
-  String PROJECT_NAME = Prop.NAME.toLowerCase(Locale.ENGLISH);
-  /** URL. */
-  String URL = "http://" + PROJECT_NAME + ".org";
-  /** URL of the community page. */
-  String COMMUNITY_URL = URL + "/community";
-  /** URL of the documentation. */
-  String DOC_URL = "http://docs." + PROJECT_NAME + ".org";
-  /** URL of the update page. */
-  String UPDATE_URL = URL + "/products/download/all-downloads/";
-  /** Version URL. */
-  String VERSION_URL = "http://files." + PROJECT_NAME + ".org/version.txt";
-  /** Mail. */
-  String MAILING_LIST = PROJECT_NAME + "-talk@mailman.uni-konstanz.de";
-  /** Title and version. */
-  String TITLE = Prop.NAME + ' ' + Prop.VERSION;
-
   /** Local (standalone) mode. */
   String S_STANDALONE = "Standalone";
   /** Start information. */
@@ -79,6 +60,7 @@ public interface Text {
     "  -r<num>     Set number of query executions" + NL +
     "  -R          Turn query execution on/off" + NL +
     "  -s<pars>    Set serialization parameter(s)" + NL +
+    "  -t[path]    Run tests in file or directory" + NL +
     "  -u          Write updates back to original files" + NL +
     "  -v/V        Show (all) process info" + NL +
     "  -w          Preserve whitespaces from input files" + NL +
@@ -121,7 +103,6 @@ public interface Text {
     "  -c<cmds>  Execute initial database commands" + NL +
     "  -d        Activate debugging mode" + NL +
     "  -e<port>  Set event port" + NL +
-    "  -i        Enter interactive mode" + NL +
     "  -n<name>  Set host the server is bound to" + NL +
     "  -p<port>  Set server port" + NL +
     "  -S        Start as service" + NL +
@@ -153,7 +134,7 @@ public interface Text {
   /** Bug info. */
   String S_BUGINFO = "Improper use? Potential bug? Your feedback is welcome:";
   /** Console text. */
-  String S_CONSOLE = TITLE + " [%]" + NL;
+  String S_CONSOLE = Prop.TITLE + " [%]" + NL;
 
   /** Localhost. */
   String S_LOCALHOST = "localhost";
@@ -400,6 +381,10 @@ public interface Text {
   /** Command help. */
   String[] HELPRUN = {
     '[' + S_PATH + ']', lang("c_run1"), lang("c_run2", S_PATH)
+  };
+  /** Command help. */
+  String[] HELPTEST = {
+    '[' + S_PATH + ']', lang("c_test1"), lang("c_test2", S_PATH)
   };
   /** Command help. */
   String[] HELPEXECUTE = {
@@ -814,7 +799,9 @@ public interface Text {
   /** Command info. */
   String RECENTLY_OPENED = lang("recently_opened");
   /** Command info. */
-  String EXECUTE_QUERY = lang("execute_query");
+  String RUN_QUERY = lang("run_query");
+  /** Command info. */
+  String RUN_TESTS = lang("run_tests");
   /** Command info. */
   String INPUT_HISTORY = lang("input_history");
 
@@ -910,6 +897,8 @@ public interface Text {
   String NEW = lang("new");
   /** Command info. */
   String DELETE = lang("delete");
+  /** Command info. */
+  String INSTALL_FROM_URL = lang("install_from_url");
   /** Command info. */
   String INSTALL = lang("install");
   /** Command info. */
@@ -1118,14 +1107,21 @@ public interface Text {
   /** Full-text index information. */
   String LANGUAGE = lang("language");
   /** Full-text index information. */
-  String CASE_SENSITIVITY = lang("case_sensitivity");
+  String CASE_SENSITIVE = lang("case_sensitive");
   /** Full-text index information. */
   String DIACRITICS = lang("diacritics");
   /** Full-text index using stopword list. */
   String STOPWORD_LIST = lang("stopword_list");
 
+  /** Ascending order. */
+  String ASCENDING_ORDER = lang("ascending_order");
+  /** Merge duplicate lines. */
+  String MERGE_DUPLICATES = lang("merge_duplicates");
+
   /** Format. */
   String FORMAT = lang("format");
+  /** Sort. */
+  String SORT = lang("sort");
   /** Split input lines. */
   String SPLIT_INPUT_LINES = lang("split_input_lines");
   /** Treat first line as header. */
@@ -1256,6 +1252,8 @@ public interface Text {
   String SAVE_BEFORE_EXECUTE = lang("save_before_execute");
   /** Automatically add characters. */
   String AUTO_ADD_CHARS = lang("auto_add_chars");
+  /** Default file filter. */
+  String FILE_FILTER = lang("file_filter");
 
   /** Comment. */
   String COMMENT = lang("comment");

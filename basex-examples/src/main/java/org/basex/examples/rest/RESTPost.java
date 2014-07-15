@@ -41,11 +41,10 @@ public final class RESTPost {
     conn.setRequestProperty("Content-Type", "application/query+xml");
 
     // Get and cache output stream
-    OutputStream out = conn.getOutputStream();
-
-    // Send UTF-8 encoded query to server
-    out.write(request.getBytes("UTF-8"));
-    out.close();
+    try(OutputStream out = conn.getOutputStream()) {
+      // Send UTF-8 encoded query to server
+      out.write(request.getBytes("UTF-8"));
+    }
 
     // Print the HTTP response code
     int code = conn.getResponseCode();
@@ -58,14 +57,14 @@ public final class RESTPost {
       System.out.println("\n* Result:");
 
       // Get and cache input as UTF-8 encoded stream
-      BufferedReader br = new BufferedReader(new InputStreamReader(
-          conn.getInputStream(), "UTF-8"));
+      try(BufferedReader br = new BufferedReader(
+          new InputStreamReader(conn.getInputStream(), "UTF-8"))) {
 
-      // Print all lines of the result
-      for(String line; (line = br.readLine()) != null;) {
-        System.out.println(line);
+        // Print all lines of the result
+        for(String line; (line = br.readLine()) != null;) {
+          System.out.println(line);
+        }
       }
-      br.close();
     }
 
     // Close connection

@@ -15,7 +15,7 @@ import org.basex.util.list.*;
  *
  * This class prevents locking deadlocks by sorting all all strings
  *
- * Locks can only be released and downgraded by the same thread which acquired it.
+ * Locks can only be released by the same thread which acquired it.
  *
  * Locking methods are not synchronized to each other. The user must make sure not to call
  * them in parallel by the same thread (it is fine to call arbitrary locking methods by
@@ -64,11 +64,9 @@ public final class DBLocking implements Locking {
    */
   private final ReentrantReadWriteLock writeAll = new ReentrantReadWriteLock();
   /** Stores one lock for each object used for locking. */
-  private final Map<String, ReentrantReadWriteLock> locks =
-      new HashMap<String, ReentrantReadWriteLock>();
+  private final Map<String, ReentrantReadWriteLock> locks = new HashMap<>();
   /** Stores lock usage counters for each object used for locking. */
-  private final Map<String, Integer> lockUsage =
-      new HashMap<String, Integer>();
+  private final Map<String, Integer> lockUsage = new HashMap<>();
   /**
    * Currently running transactions.
    * Used as monitor for atomizing access to {@link #queue}.
@@ -79,19 +77,17 @@ public final class DBLocking implements Locking {
    *
    * Used as monitor for waiting threads in queue.
    */
-  private final Queue<Long> queue = new LinkedList<Long>();
+  private final Queue<Long> queue = new LinkedList<>();
   /**
    * Stores a list of objects each transaction has write-locked.
    * Null means lock everything, an empty array lock nothing.
    */
-  private final ConcurrentMap<Long, StringList> writeLocked =
-      new ConcurrentHashMap<Long, StringList>();
+  private final ConcurrentMap<Long, StringList> writeLocked = new ConcurrentHashMap<>();
   /**
    * Stores a list of objects each transaction has read-locked. Null means lock
    * everything, an empty array lock nothing.
    */
-  private final ConcurrentMap<Long, StringList> readLocked =
-      new ConcurrentHashMap<Long, StringList>();
+  private final ConcurrentMap<Long, StringList> readLocked = new ConcurrentHashMap<>();
   /** BaseX database context. */
   private final GlobalOptions gopts;
 
@@ -157,14 +153,14 @@ public final class DBLocking implements Locking {
     // Local locking
     final StringList writeObjects;
     if(write != null) {
-      writeObjects = write.sort(true).unique();
+      writeObjects = write.sort().unique();
       writeLocked.put(thread, writeObjects);
     } else {
       writeObjects = new StringList(0);
     }
     final StringList readObjects;
     if(read != null) {
-      readObjects = read.sort(true).unique();
+      readObjects = read.sort().unique();
       readLocked.put(thread, readObjects);
     } else {
       readObjects = new StringList(0);
@@ -188,81 +184,6 @@ public final class DBLocking implements Locking {
         getOrCreateLock(readObject).readLock().lock();
       }
     }
-  }
-
-  /**
-   * Only keeps given write locks, downgrades the others to read locks.
-   * @param write write locks to keep
-   */
-  @Override
-  public void downgrade(final StringList write) {
-    final Long thread = Thread.currentThread().getId();
-    if(write == null)
-      throw new IllegalMonitorStateException("Cannot downgrade to global write lock.");
-    write.sort(true).unique();
-
-    // Fetch current locking status
-    final StringList writeObjects = writeLocked.remove(thread);
-    final StringList readObjects = readLocked.remove(thread);
-    final StringList newWriteObjects = new StringList();
-    StringList newReadObjects = new StringList();
-    if(readObjects != null) newReadObjects.add(readObjects);
-
-    if(writeObjects != null) {
-      if(!writeObjects.containsAll(write)) throw new IllegalMonitorStateException(
-          "Cannot downgrade write lock that has not been acquired.");
-
-      // Perform downgrades
-      for(final String object : writeObjects) {
-        if(write.contains(object)) {
-          newWriteObjects.add(object);
-        } else {
-          final ReentrantReadWriteLock lock = getOrCreateLock(object);
-          assert lock.getWriteHoldCount() == 1 : "Unexpected write lock count: "
-              + lock.getWriteHoldCount();
-          lock.readLock().lock();
-          newReadObjects.add(object);
-          lock.writeLock().unlock();
-        }
-      }
-    }
-
-    // Downgrade from global write lock to global read lock
-    if(writeAll.writeLock().isHeldByCurrentThread()) {
-      for(final String object : write) {
-        getOrCreateLock(object).writeLock().lock();
-        setLockUsed(object);
-      }
-      newWriteObjects.add(write);
-      // Release all local read locks as we're fetching a global one
-      for(final String object : readObjects) {
-        getOrCreateLock(object).readLock().unlock();
-        unsetLockIfUnused(object);
-      }
-      newReadObjects = null;
-      readLocked.remove(thread);
-      writeAll.readLock().lock();
-      writeAll.writeLock().unlock();
-
-      synchronized(globalLock) {
-        if(!write.isEmpty())
-          localWriters++;
-        globalReaders++;
-        globalLock.notifyAll();
-      }
-    }
-
-    // Downgrade from local write lock to no write locks
-    synchronized(globalLock) {
-      if(write.isEmpty()) {
-        localWriters--;
-        globalLock.notifyAll();
-      }
-    }
-
-    // Write back new locking lists
-    writeLocked.put(thread, newWriteObjects);
-    if(newReadObjects != null) readLocked.put(thread, newReadObjects);
   }
 
   /**

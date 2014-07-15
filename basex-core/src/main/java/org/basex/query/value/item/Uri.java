@@ -14,44 +14,47 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class Uri extends Str {
+public final class Uri extends AStr {
   /** Empty URI. */
   public static final Uri EMPTY = new Uri(Token.EMPTY);
+  /** String data. */
+  final byte[] value;
 
   /**
    * Constructor.
-   * @param v value
+   * @param value value
    */
-  private Uri(final byte[] v) {
-    super(v, AtomType.URI);
+  private Uri(final byte[] value) {
+    super(AtomType.URI);
+    this.value = value;
   }
 
   /**
    * Creates a new uri instance.
-   * @param uri value
+   * @param value value
    * @return uri instance
    */
-  public static Uri uri(final byte[] uri) {
-    return uri(uri, true);
+  public static Uri uri(final byte[] value) {
+    return uri(value, true);
   }
 
   /**
    * Creates a new uri instance.
-   * @param uri value
+   * @param value string value
    * @return uri instance
    */
-  public static Uri uri(final String uri) {
-    return uri(Token.token(uri), true);
+  public static Uri uri(final String value) {
+    return uri(Token.token(value), true);
   }
 
   /**
    * Creates a new uri instance.
-   * @param uri value
+   * @param value value
    * @param normalize chop leading and trailing whitespaces
    * @return uri instance
    */
-  public static Uri uri(final byte[] uri, final boolean normalize) {
-    final byte[] u = normalize ? Token.norm(uri) : uri;
+  public static Uri uri(final byte[] value, final boolean normalize) {
+    final byte[] u = normalize ? Token.norm(value) : value;
     return u.length == 0 ? EMPTY : new Uri(u);
   }
 
@@ -64,10 +67,10 @@ public final class Uri extends Str {
    * @throws QueryException query exception
    */
   public Uri resolve(final Uri add, final InputInfo info) throws QueryException {
-    if(add.val.length == 0) return this;
+    if(add.value.length == 0) return this;
     try {
-      final URI base = new URI(Token.string(val));
-      final URI res = new URI(Token.string(add.val));
+      final URI base = new URI(Token.string(value));
+      final URI res = new URI(Token.string(add.value));
       final URI uri = base.resolve(res);
       return uri(Token.token(uri.toString()), false);
     } catch(final URISyntaxException ex) {
@@ -80,7 +83,7 @@ public final class Uri extends Str {
    * @return result of check
    */
   public boolean isAbsolute() {
-    return Token.contains(val, ':');
+    return Token.contains(value, ':');
   }
 
   /**
@@ -89,10 +92,32 @@ public final class Uri extends Str {
    */
   public boolean isValid() {
     try {
-      new URI(Token.string(Token.uri(val, true)));
+      new URI(Token.string(Token.uri(value, true)));
       return true;
     } catch(final URISyntaxException ex) {
       return false;
+    }
+  }
+
+  @Override
+  public byte[] string(final InputInfo ii) {
+    return value;
+  }
+
+  /**
+   * Returns the string value.
+   * @return string value
+   */
+  public byte[] string() {
+    return value;
+  }
+
+  @Override
+  public URI toJava() throws QueryException {
+    try {
+      return new URI(Token.string(value));
+    } catch(final URISyntaxException ex) {
+      throw new QueryException(ex);
     }
   }
 }

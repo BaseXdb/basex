@@ -60,16 +60,7 @@ public final class DropDB extends ACreate {
    */
   public static synchronized boolean drop(final String db, final Context ctx) {
     final IOFile dbpath = ctx.globalopts.dbpath(db);
-    return dbpath.exists() && drop(dbpath);
-  }
-
-  /**
-   * Drops a database directory.
-   * @param path database path
-   * @return success of operation
-   */
-  private static synchronized boolean drop(final IOFile path) {
-    return path.exists() && path.delete();
+    return dbpath.exists() && dbpath.delete();
   }
 
   /**

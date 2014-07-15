@@ -19,7 +19,7 @@ public final class Escape extends RegExp {
   };
 
   /** Character classes. */
-  private static final Map<String, CharRange[]> MAP = new HashMap<String, CharRange[]>();
+  private static final Map<String, CharRange[]> MAP = new HashMap<>();
 
   /** Initial name characters. */
   private static final String INITIAL;
@@ -126,7 +126,7 @@ public final class Escape extends RegExp {
    * @return ranges
    */
   private static int[][] read(final String string) {
-    final ArrayList<int[]> ranges = new ArrayList<int[]>();
+    final ArrayList<int[]> ranges = new ArrayList<>();
     for(int i = 0; i < string.length();) {
       final int[] rng = new int[2];
       i += Character.charCount(rng[0] = string.codePointAt(i));
@@ -142,7 +142,7 @@ public final class Escape extends RegExp {
    * @return merged ranges
    */
   private static int[][] merge(final int[][]... rss) {
-    final ArrayList<int[]> ranges = new ArrayList<int[]>();
+    final ArrayList<int[]> ranges = new ArrayList<>();
     for(final int[][] rs : rss) Collections.addAll(ranges, rs);
     Collections.sort(ranges, CMP);
     for(int i = 0; i < ranges.size(); i++) {
@@ -164,7 +164,7 @@ public final class Escape extends RegExp {
    */
   private static int[][] invert(final int[][] rng) {
     int start = Character.MIN_CODE_POINT;
-    final ArrayList<int[]> ranges = new ArrayList<int[]>();
+    final ArrayList<int[]> ranges = new ArrayList<>();
 
     for(final int[] in : rng) {
       if(in[0] - 1 >= start) ranges.add(new int[] { start, in[0] - 1 });
@@ -413,7 +413,7 @@ public final class Escape extends RegExp {
     NOT_WORD    = serialize(invert(word));
 
     // easy to reproduce from http://www.w3.org/TR/xsd-unicode-blocknames/#blocks
-    final HashMap<String, int[][]> m = new HashMap<String, int[][]>();
+    final HashMap<String, int[][]> m = new HashMap<>();
     add(m, "BasicLatin", new int[] { 0x0000, 0x007F });
     add(m, "Latin-1Supplement", new int[] { 0x0080, 0x00FF });
     add(m, "LatinExtended-A", new int[] { 0x0100, 0x017F });

@@ -238,7 +238,7 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
    * @param start start position
    * @return line and column positions
    */
-  int[] lineCol(final int start) {
+  private int[] lineCol(final int start) {
     final int[] lc = new int[4];
     if(lines != null) {
       int ln = 0, st = 0;

@@ -29,7 +29,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public final class ReplaceValue extends UpdatePrimitive {
+public final class ReplaceValue extends NodeUpdate {
   /** New value. */
   private final byte[] value;
   /** States if this primitive represents a replaceElementContent expression. */
@@ -37,20 +37,20 @@ public final class ReplaceValue extends UpdatePrimitive {
 
   /**
    * Constructor.
-   * @param p target node PRE value
-   * @param d target data reference
-   * @param i input info
-   * @param v new value
+   * @param pre target node PRE value
+   * @param data target data reference
+   * @param ii input info
+   * @param value new value
    */
-  public ReplaceValue(final int p, final Data d, final InputInfo i, final byte[] v) {
-    super(PrimitiveType.REPLACEVALUE, p, d, i);
-    value = v;
-    rec = d.kind(targetPre) == Data.ELEM;
+  public ReplaceValue(final int pre, final Data data, final InputInfo ii, final byte[] value) {
+    super(UpdateType.REPLACEVALUE, pre, data, ii);
+    this.value = value;
+    rec = data.kind(pre) == Data.ELEM;
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) throws QueryException {
-    throw UPMULTREPV.get(info, getTargetNode());
+  public void merge(final Update up) throws QueryException {
+    throw UPMULTREPV.get(info, node());
   }
 
   @Override
@@ -60,7 +60,7 @@ public final class ReplaceValue extends UpdatePrimitive {
 
   @Override
   public String toString() {
-    return Util.info("%[%, %]", Util.className(this), getTargetNode(), value);
+    return Util.info("%[%, %]", Util.className(this), node(), value);
   }
 
   /**
@@ -68,7 +68,7 @@ public final class ReplaceValue extends UpdatePrimitive {
    * @return true if application of primitive results in empty text node
    */
   private boolean deleteText() {
-    return value.length == 0 && data.kind(targetPre) == Data.TEXT;
+    return value.length == 0 && data.kind(pre) == Data.TEXT;
   }
 
   /**
@@ -88,21 +88,21 @@ public final class ReplaceValue extends UpdatePrimitive {
   @Override
   public void addAtomics(final AtomicUpdateCache l) {
     if(!substituted())
-      l.addUpdateValue(targetPre, value);
+      l.addUpdateValue(pre, value);
   }
 
   @Override
-  public UpdatePrimitive[] substitute(final MemData tmp) {
-    final int k = data.kind(targetPre);
+  public NodeUpdate[] substitute(final MemData tmp) {
+    final int k = data.kind(pre);
     // else substitute if target is an element
     if(rec) {
-      final List<UpdatePrimitive> l = new LinkedList<UpdatePrimitive>();
+      final List<NodeUpdate> l = new LinkedList<>();
       // add the primitive to catch forbidden primitive merges (same target node)
       l.add(this);
       // add the delete primitives for the child nodes of the target
       // ... child axis boundaries
-      final int firstChild = targetPre + data.attSize(targetPre, k);
-      final int followingNode = targetPre + data.size(targetPre, k);
+      final int firstChild = pre + data.attSize(pre, k);
+      final int followingNode = pre + data.size(pre, k);
       int runner = firstChild;
       // while runner is child of target
       while(runner < followingNode) {
@@ -115,24 +115,24 @@ public final class ReplaceValue extends UpdatePrimitive {
       if(value.length > 0) {
         // create Data instance for insertion sequence
         // copy all nodes into a single database instance
-        final int pre = tmp.meta.size;
-        tmp.text(pre, 1, value, Data.TEXT);
-        tmp.insert(pre);
+        final int p = tmp.meta.size;
+        tmp.text(p, 1, value, Data.TEXT);
+        tmp.insert(p);
         // add the substituting insertInto statement to the list
-        final ANodeList nl = new ANodeList(new DBNode(tmp, pre));
-        l.add(new ReplaceContent(targetPre, data, info, nl));
+        final ANodeList nl = new ANodeList(new DBNode(tmp, p));
+        l.add(new ReplaceContent(pre, data, info, nl));
       }
-      return l.toArray(new UpdatePrimitive[l.size()]);
+      return l.toArray(new NodeUpdate[l.size()]);
     }
 
     // or a text node has to be deleted
     if(deleteText()) {
       // don't forget to add this primitive to catch forbidden primitive merges
-      return new UpdatePrimitive[] { this, new DeleteNode(targetPre, data, info, false) };
+      return new NodeUpdate[] { this, new DeleteNode(pre, data, info, false) };
     }
 
     // no substitution
-    return new UpdatePrimitive[] { this };
+    return new NodeUpdate[] { this };
   }
 
   @Override

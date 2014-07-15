@@ -7,6 +7,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.gflwor.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -26,51 +27,63 @@ public final class Quantifier extends Single {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param f variable inputs
-   * @param s satisfier
-   * @param e every flag
+   * @param info input info
+   * @param inputs variable inputs
+   * @param expr satisfier
+   * @param every every flag
    */
-  public Quantifier(final InputInfo ii, final For[] f, final Expr s, final boolean e) {
-    this(ii, new GFLWOR(ii, new LinkedList<GFLWOR.Clause>(Arrays.asList(f)),
-        compBln(s, ii)), e);
+  public Quantifier(final InputInfo info, final For[] inputs, final Expr expr,
+      final boolean every) {
+    this(info, new GFLWOR(info, new LinkedList<GFLWOR.Clause>(Arrays.asList(inputs)),
+        compBln(expr, info)), every);
   }
 
   /**
    * Copy constructor.
-   * @param ii input info
+   * @param info input info
    * @param tests expression
-   * @param e every flag
+   * @param every every flag
    */
-  private Quantifier(final InputInfo ii, final Expr tests, final boolean e) {
-    super(ii, tests);
-    every = e;
+  private Quantifier(final InputInfo info, final Expr tests, final boolean every) {
+    super(info, tests);
+    this.every = every;
     type = SeqType.BLN;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // return pre-evaluated result
-    return expr.isValue() ? optPre(item(ctx, info), ctx) : this;
+    if(expr.isValue()) return optPre(item(qc, info), qc);
+
+    // pre-evaluate satisfy clause if it is a value
+    if(expr instanceof GFLWOR && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {
+      final GFLWOR gflwor = (GFLWOR) expr;
+      if(gflwor.size() > 0 && gflwor.ret.isValue()) {
+        final Value value = (Value) gflwor.ret;
+        qc.compInfo(OPTPRE, value);
+        return Bln.get(value.ebv(qc, info).bool(info));
+      }
+    }
+    return this;
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Iter iter = expr.iter(ctx);
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Iter iter = expr.iter(qc);
     for(Item it; (it = iter.next()) != null;)
-      if(every ^ it.ebv(ctx, ii).bool(ii)) return Bln.get(!every);
+      if(every ^ it.ebv(qc, ii).bool(ii)) return Bln.get(!every);
     return Bln.get(every);
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Quantifier(info, expr.copy(ctx, scp, vs), every);
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new Quantifier(info, expr.copy(qc, scp, vs), every);
   }
 
   @Override
@@ -80,8 +93,7 @@ public final class Quantifier extends Single {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(every ? EVERY : SOME);
-    return sb.append('(').append(expr).append(')').toString();
+    return every ? EVERY : SOME + '(' + expr + ')';
   }
 
   @Override

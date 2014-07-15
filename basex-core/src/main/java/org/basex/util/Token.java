@@ -603,7 +603,7 @@ public final class Token {
    * @param end last byte to be parsed (exclusive)
    * @return resulting integer value
    */
-  public static int toInt(final byte[] token, final int start, final int end) {
+  private static int toInt(final byte[] token, final int start, final int end) {
     int t = start;
     while(t < end && token[t] <= ' ') ++t;
     if(t == end) return Integer.MIN_VALUE;
@@ -863,7 +863,7 @@ public final class Token {
    * @param pos start position
    * @return result of test
    */
-  public static boolean startsWith(final byte[] token, final int ch, final int pos) {
+  private static boolean startsWith(final byte[] token, final int ch, final int pos) {
     return pos < token.length && token[pos] == ch;
   }
 
@@ -1021,6 +1021,8 @@ public final class Token {
    * @return resulting token
    */
   public static byte[] replace(final byte[] token, final int search, final int replace) {
+    if(!contains(token, search)) return token;
+
     final TokenBuilder tb = new TokenBuilder(token.length);
     final int tl = token.length;
     for(int i = 0; i < tl; i += cl(token, i)) {

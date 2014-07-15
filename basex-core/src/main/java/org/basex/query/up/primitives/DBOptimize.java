@@ -3,6 +3,7 @@ package org.basex.query.up.primitives;
 import static org.basex.query.util.Err.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -18,31 +19,40 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  */
-public final class DBOptimize extends DBNew {
+public final class DBOptimize extends DBUpdate {
+  /** Database update options. */
+  private final DBOptions options;
+  /** Query context. */
+  private final QueryContext qc;
   /** Flag to optimize all database structures. */
   private boolean all;
 
   /**
    * Constructor.
-   * @param dt data
-   * @param ctx database context
-   * @param al optimize all database structures flag
+   * @param data data
+   * @param all optimize all database structures flag
    * @param opts database options
-   * @param ii input info
+   * @param qc database context
+   * @param info input info
    * @throws QueryException query exception
    */
-  public DBOptimize(final Data dt, final QueryContext ctx, final boolean al,
-      final Options opts, final InputInfo ii) throws QueryException {
+  public DBOptimize(final Data data, final boolean all, final Options opts, final QueryContext qc,
+      final InputInfo info) throws QueryException {
 
-    super(TYPE.DBOPTIMIZE, dt, ctx, ii);
-    all = al;
-    options = opts.free();
-    check(false);
+    super(UpdateType.DBOPTIMIZE, data, info);
+    this.all = all;
+    this.qc = qc;
+
+    final ArrayList<Option<?>> supported = new ArrayList<>();
+    for(final Option<?> option : DBOptions.INDEXING) {
+      if(all || option != MainOptions.UPDINDEX) supported.add(option);
+    }
+    options = new DBOptions(opts.free(), supported, info);
   }
 
   @Override
-  public void merge(final BasicOperation o) {
-    all |= ((DBOptimize) o).all;
+  public void merge(final Update up) {
+    all |= ((DBOptimize) up).all;
   }
 
   @Override
@@ -50,23 +60,28 @@ public final class DBOptimize extends DBNew {
 
   @Override
   public void apply() throws QueryException {
+    // assign database and query options to runtime options
     final MetaData meta = data.meta;
     final MainOptions opts = meta.options;
 
-    nprops.put(MainOptions.TEXTINDEX, meta.createtext);
-    nprops.put(MainOptions.ATTRINDEX, meta.createattr);
-    nprops.put(MainOptions.FTINDEX,   meta.createftxt);
-    initOptions();
-    assignOptions();
+    options.assign(MainOptions.TEXTINDEX, meta.createtext);
+    options.assign(MainOptions.ATTRINDEX, meta.createattr);
+    options.assign(MainOptions.FTINDEX,   meta.createftxt);
+    options.assign(MainOptions.UPDINDEX,  meta.updindex);
+    options.assign(opts);
 
+    // adopt runtime options
     meta.createtext = opts.get(MainOptions.TEXTINDEX);
     meta.createattr = opts.get(MainOptions.ATTRINDEX);
     meta.createftxt = opts.get(MainOptions.FTINDEX);
+    meta.updindex = opts.get(MainOptions.UPDINDEX);
 
+    // check if indexing options have changed
     final int mc = opts.get(MainOptions.MAXCATS);
     final int ml = opts.get(MainOptions.MAXLEN);
     final boolean rebuild = mc != meta.maxcats || ml != meta.maxlen;
 
+    // check if fulltext indexing options have changed
     final boolean st = opts.get(MainOptions.STEMMING);
     final boolean cs = opts.get(MainOptions.CASESENS);
     final boolean dc = opts.get(MainOptions.DIACRITICS);
@@ -89,11 +104,12 @@ public final class DBOptimize extends DBNew {
     } catch(final IOException ex) {
       throw UPDBOPTERR.get(info, ex);
     } finally {
-      resetOptions();
+      // reset runtime options to original values
+      options.reset(opts);
     }
 
     // remove old database reference
-    if(all) qc.resource.removeData(data.meta.name);
+    if(all) qc.resources.remove(data.meta.name);
   }
 
   @Override

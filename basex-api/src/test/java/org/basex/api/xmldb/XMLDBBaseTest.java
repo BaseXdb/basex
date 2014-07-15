@@ -2,10 +2,9 @@ package org.basex.api.xmldb;
 
 import static org.basex.core.Text.*;
 
-import java.io.*;
-
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.util.*;
 
 /**
  * Base class for all XMLDB tests.
@@ -19,7 +18,7 @@ public abstract class XMLDBBaseTest {
   static final String DRIVER = BXDatabase.class.getName();
   /** Database/document path. */
   static final String URL =
-      "xmldb:" + PROJECT_NAME + "://" + S_LOCALHOST + ':' + GlobalOptions.PORT.value + '/';
+      "xmldb:" + Prop.PROJECT_NAME + "://" + S_LOCALHOST + ':' + GlobalOptions.PORT.value + '/';
   /** Name of the collection. */
   static final String COLL = "XMLDB";
   /** Database/document path. */
@@ -53,21 +52,5 @@ public abstract class XMLDBBaseTest {
    */
   static void dropDB() throws BaseXException {
     new DropDB(COLL).execute(CONTEXT);
-  }
-
-  /**
-   * Convenience method for returning the contents of the specified file.
-   * @param fn file name
-   * @return contents as byte array
-   * @throws IOException I/O exception
-   */
-  static byte[] read(final String fn) throws IOException {
-    final File file = new File(fn);
-    final byte[] buffer = new byte[(int) file.length()];
-    final FileInputStream fis = new FileInputStream(file);
-    final DataInputStream dis = new DataInputStream(fis);
-    dis.readFully(buffer);
-    dis.close();
-    return buffer;
   }
 }

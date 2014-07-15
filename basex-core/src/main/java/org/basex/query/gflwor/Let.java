@@ -7,6 +7,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.gflwor.GFLWOR.Clause;
 import org.basex.query.gflwor.GFLWOR.Eval;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -24,26 +25,20 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public final class Let extends GFLWOR.Clause {
-  /** Variable. */
-  public final Var var;
-  /** Bound expression. */
-  public Expr expr;
+public final class Let extends ForLet {
   /** Score flag. */
   private final boolean score;
 
   /**
    * Constructor.
-   * @param v variable
-   * @param e expression
-   * @param scr score flag
-   * @param ii input info
+   * @param var variable
+   * @param expr expression
+   * @param score score flag
+   * @param info input info
    */
-  public Let(final Var v, final Expr e, final boolean scr, final InputInfo ii) {
-    super(ii, v);
-    var = v;
-    expr = e;
-    score = scr;
+  public Let(final Var var, final Expr expr, final boolean score, final InputInfo info) {
+    super(info, var, expr, var);
+    this.score = score;
   }
 
   /**
@@ -89,6 +84,61 @@ public final class Let extends GFLWOR.Clause {
   }
 
   @Override
+  public Clause compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    var.refineType(score ? SeqType.DBL : expr.type(), qc, info);
+    return super.compile(qc, scp);
+  }
+
+  @Override
+  public Let optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    if(!score && expr instanceof TypeCheck) {
+      final TypeCheck tc = (TypeCheck) expr;
+      if(tc.isRedundant(var) || var.adoptCheck(tc.type, tc.promote)) {
+        qc.compInfo(OPTCAST, tc.type);
+        expr = tc.expr;
+      }
+    }
+
+    type = score ? SeqType.DBL : expr.type();
+    var.refineType(type, qc, info);
+    if(var.checksType() && expr.isValue()) {
+      expr = var.checkType((Value) expr, qc, info, true);
+      var.refineType(expr.type(), qc, info);
+    }
+    size = score ? 1 : expr.size();
+    return this;
+  }
+
+  @Override
+  public Let copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    final Var v = scp.newCopyOf(qc, var);
+    vs.put(var.id, v);
+    return new Let(v, expr.copy(qc, scp, vs), score, info);
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return expr.accept(visitor) && visitor.declared(var);
+  }
+
+  @Override
+  long calcSize(final long cnt) {
+    return cnt;
+  }
+
+  /**
+   * Returns an expression that is appropriate for inlining.
+   * @param qc query context
+   * @param scp variable scope
+   * @return inlineable expression
+   * @throws QueryException query exception
+   */
+  public Expr inlineExpr(final QueryContext qc, final VarScope scp) throws QueryException {
+    return score ? Function._FT_SCORE.get(null, expr).optimize(qc, scp)
+                 : var.checked(expr, qc, scp, info);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     final FElem e = planElem();
     if(score) e.add(planAttr(Token.token(SCORE), Token.TRUE));
@@ -100,108 +150,6 @@ public final class Let extends GFLWOR.Clause {
   @Override
   public String toString() {
     return LET + ' ' + (score ? SCORE + ' ' : "") + var + ' ' + ASSIGN + ' ' + expr;
-  }
-
-  @Override
-  public boolean has(final Flag flag) {
-    return expr.has(flag);
-  }
-
-  @Override
-  public Let compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    var.refineType(score ? SeqType.DBL : expr.type(), ctx, info);
-    expr = expr.compile(ctx, scp);
-    return optimize(ctx, scp);
-  }
-
-  @Override
-  public Let optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
-    if(!score && expr instanceof TypeCheck) {
-      final TypeCheck tc = (TypeCheck) expr;
-      if(tc.isRedundant(var) || var.adoptCheck(tc.type, tc.promote)) {
-        ctx.compInfo(OPTCAST, tc.type);
-        expr = tc.expr;
-      }
-    }
-
-    type = score ? SeqType.DBL : expr.type();
-    var.refineType(type, ctx, info);
-    if(var.checksType() && expr.isValue()) {
-      expr = var.checkType((Value) expr, ctx, info, true);
-      var.refineType(expr.type(), ctx, info);
-    }
-    size = score ? 1 : expr.size();
-    return this;
-  }
-
-  /**
-   * Binds the the value of this let clause to the context if it is statically known.
-   * @param ctx query context
-   * @throws QueryException evaluation exception
-   */
-  void bindConst(final QueryContext ctx) throws QueryException {
-    if(expr.isValue()) {
-      ctx.compInfo(OPTBIND, var);
-      ctx.set(var, score ? score(expr.iter(ctx)) : (Value) expr, info);
-    }
-  }
-
-  @Override
-  public boolean removable(final Var v) {
-    return expr.removable(v);
-  }
-
-  @Override
-  public VarUsage count(final Var v) {
-    return expr.count(v);
-  }
-
-  @Override
-  public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
-    final Expr sub = expr.inline(ctx, scp, v, e);
-    if(sub == null) return null;
-    expr = sub;
-    return optimize(ctx, scp);
-  }
-
-  @Override
-  public Let copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final Var v = scp.newCopyOf(ctx, var);
-    vs.put(var.id, v);
-    return new Let(v, expr.copy(ctx, scp, vs), score, info);
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return expr.accept(visitor) && visitor.declared(var);
-  }
-
-  @Override
-  public void checkUp() throws QueryException {
-    checkNoUp(expr);
-  }
-
-  @Override
-  long calcSize(final long cnt) {
-    return cnt;
-  }
-
-  /**
-   * Returns an expression that is appropriate for inlining.
-   * @param ctx query context
-   * @param scp variable scope
-   * @return inlineable expression
-   * @throws QueryException query exception
-   */
-  public Expr inlineExpr(final QueryContext ctx, final VarScope scp) throws QueryException {
-    return score ? Function._FT_SCORE.get(null, expr).optimize(ctx, scp)
-                 : var.checked(expr, ctx, scp, info);
-  }
-
-  @Override
-  public int exprSize() {
-    return expr.exprSize();
   }
 
   /** Evaluator for a block of {@code let} expressions. */
@@ -217,16 +165,16 @@ public final class Let extends GFLWOR.Clause {
      * @param subEval sub-evaluator
      */
     LetEval(final Let let, final Eval subEval) {
-      lets = new ArrayList<Let>();
+      lets = new ArrayList<>();
       lets.add(let);
       sub = subEval;
     }
 
     @Override
-    public boolean next(final QueryContext ctx) throws QueryException {
-      if(!sub.next(ctx)) return false;
+    public boolean next(final QueryContext qc) throws QueryException {
+      if(!sub.next(qc)) return false;
       for(final Let let : lets)
-        ctx.set(let.var, let.score ? score(let.expr.iter(ctx)) : ctx.value(let.expr), let.info);
+        qc.set(let.var, let.score ? score(let.expr.iter(qc)) : qc.value(let.expr), let.info);
       return true;
     }
   }

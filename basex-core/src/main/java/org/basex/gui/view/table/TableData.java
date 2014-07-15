@@ -102,22 +102,22 @@ final class TableData {
 
   /**
    * Initializes the table data.
-   * @param r optional root node (ignored if -1)
-   * @param data data reference
+   * @param rt optional root node (ignored if -1)
+   * @param dt data reference
    */
-  void init(final Data data, final int r) {
+  void init(final Data dt, final int rt) {
     cols = new TableCol[0];
-    root = r;
+    root = rt;
     sortCol = -1;
     last = "";
     rowH = 1;
 
-    if(r == -1 && roots.isEmpty()) return;
-    if(root == -1) root = data.tagindex.id(roots.get(0));
-    for(final byte[] k : data.paths.desc(data.tagindex.key(root), true, true)) {
+    if(rt == -1 && roots.isEmpty()) return;
+    if(root == -1) root = dt.tagindex.id(roots.get(0));
+    for(final byte[] k : dt.paths.desc(dt.tagindex.key(root), true, true)) {
       final boolean elem = !startsWith(k, '@');
       final byte[] key = delete(k, '@');
-      final Names index = elem ? data.tagindex : data.atnindex;
+      final Names index = elem ? dt.tagindex : dt.atnindex;
       if(index.stat(index.id(key)).isLeaf()) addCol(key, elem);
     }
 

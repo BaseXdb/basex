@@ -20,12 +20,12 @@ public final class MapType extends FuncType {
 
   /**
    * Constructor.
-   * @param arg argument type
+   * @param type argument type
    * @param rt return type
    */
-  MapType(final AtomType arg, final SeqType rt) {
-    super(new Ann(), new SeqType[]{ arg.seqType() }, rt);
-    keyType = arg;
+  MapType(final AtomType type, final SeqType rt) {
+    super(new Ann(), new SeqType[]{ type.seqType() }, rt);
+    this.keyType = type;
   }
 
   @Override
@@ -34,7 +34,7 @@ public final class MapType extends FuncType {
   }
 
   @Override
-  public Map cast(final Item it, final QueryContext ctx, final StaticContext sc,
+  public Map cast(final Item it, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     if(it instanceof Map) {
       final Map m = (Map) it;

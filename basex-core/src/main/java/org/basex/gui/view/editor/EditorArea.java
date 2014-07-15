@@ -54,16 +54,15 @@ public final class EditorArea extends TextPanel {
     addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(final FocusEvent e) {
-        // refresh query path and work directory
-        final String path = file.path();
-        gui.context.options.set(MainOptions.QUERYPATH, path);
-        gui.gopts.set(GUIOptions.WORKPATH, file.dirPath());
+        // refresh query path and working directory
+        gui.context.options.set(MainOptions.QUERYPATH, file.path());
+        gui.gopts.set(GUIOptions.WORKPATH, file.dir());
 
         // reload file if it has been changed
         SwingUtilities.invokeLater(new Runnable() {
           @Override
           public void run() {
-            if(reopen(false)) return;
+            reopen(false);
           }
         });
       }
@@ -128,6 +127,8 @@ public final class EditorArea extends TextPanel {
     super.keyReleased(e);
     if(EXEC1.is(e) || EXEC2.is(e)) {
       release(Action.EXECUTE);
+    } else if(UNIT.is(e)) {
+      release(Action.TEST);
     } else if((!e.isActionKey() || MOVEDOWN.is(e) || MOVEUP.is(e)) && !modifier(e)) {
       release(Action.CHECK);
     }
@@ -177,17 +178,18 @@ public final class EditorArea extends TextPanel {
    * @return success flag
    */
   boolean save(final IOFile io) {
-    final boolean same = io == file;
-    if(same && !modified) return false;
-    try {
-      io.write(getText());
-      file(io);
-      view.project.refresh(io, true);
-      return true;
-    } catch(final Exception ex) {
-      BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, io));
-      return false;
+    final boolean rename = io != file;
+    if(rename || modified) {
+      try {
+        io.write(getText());
+        file(io);
+        view.project.save(io, rename);
+        return true;
+      } catch(final Exception ex) {
+        BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, io));
+      }
     }
+    return false;
   }
 
   /**

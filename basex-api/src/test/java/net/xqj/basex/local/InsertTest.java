@@ -26,7 +26,7 @@ public final class InsertTest extends XQJBaseTest {
   public void setUp() throws XQException {
     super.setUp();
 
-    XQExpression xqpe = xqc.createExpression();
+    final XQExpression xqpe = xqc.createExpression();
     xqpe.executeCommand("CREATE DB " + DB);
     xqpe.executeCommand("SET DEFAULTDB true");
     xqpe.executeCommand("OPEN " + DB);
@@ -36,7 +36,7 @@ public final class InsertTest extends XQJBaseTest {
   @After
   @Override
   public void tearDown() throws XQException {
-    XQExpression xqpe = xqc.createExpression();
+    final XQExpression xqpe = xqc.createExpression();
     xqpe.executeCommand("DROP DB " + DB);
     super.tearDown();
   }
@@ -47,7 +47,7 @@ public final class InsertTest extends XQJBaseTest {
    **/
   @Test
   public void testInsert() throws XQException {
-    XQConnection2 xqc2 = (XQConnection2) xqc;
+    final XQConnection2 xqc2 = (XQConnection2) xqc;
 
     xqc2.insertItem(URI, createDocument("<e>hello</e>"), null);
     assertTrue(docAvailable(URI));
@@ -60,7 +60,7 @@ public final class InsertTest extends XQJBaseTest {
    **/
   @Test
   public void testAdd() throws XQException {
-    XQConnection2 xqc2 = (XQConnection2) xqc;
+    final XQConnection2 xqc2 = (XQConnection2) xqc;
     xqc2.insertItem(URI, createDocument("<e>a</e>"), options(ADD));
 
     assertTrue(docAvailable(URI));
@@ -76,7 +76,7 @@ public final class InsertTest extends XQJBaseTest {
    **/
   @Test
   public void testReplace() throws XQException {
-    XQConnection2 xqc2 = (XQConnection2) xqc;
+    final XQConnection2 xqc2 = (XQConnection2) xqc;
     xqc2.insertItem(URI, createDocument("<e>a</e>"), options(REPLACE));
 
     assertTrue(docAvailable(URI));
@@ -92,7 +92,7 @@ public final class InsertTest extends XQJBaseTest {
    **/
   @Test
   public void testStore() throws XQException {
-    XQConnection2 xqc2 = (XQConnection2) xqc;
+    final XQConnection2 xqc2 = (XQConnection2) xqc;
     xqc2.insertItem(URI, createDocument("<e>a</e>"), options(STORE));
     assertTrue(dbExists(DB, URI));
 
@@ -112,7 +112,7 @@ public final class InsertTest extends XQJBaseTest {
    * @throws XQException query exception
    */
   private boolean dbExists(final String db, final String uri) throws XQException {
-    XQResultSequence rs =
+    final XQResultSequence rs =
       xqc.createExpression().executeQuery(
         "db:exists('" + db + "', '" + uri + "')"
       );
@@ -128,7 +128,7 @@ public final class InsertTest extends XQJBaseTest {
    * @throws XQException query exception
    */
   private int countUris(final String db, final String uri) throws XQException {
-    XQResultSequence rs =
+    final XQResultSequence rs =
       xqc.createExpression().executeQuery(
         "xs:int(fn:count(db:list('" + db + "', '" + uri + "')))"
       );
