@@ -51,10 +51,11 @@ public final class Castable extends Single {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Value v = expr.value(qc);
+    if(!(v instanceof Item)) return Bln.get(v.isEmpty() && seq.occ.check(0));
     try {
-      seq.cast(v, qc, sc, ii, this);
+      if(!seq.type.eq(v.type)) seq.type.cast((Item) v, qc, sc, ii);
       return Bln.TRUE;
-    } catch(final QueryException ex) {
+    } catch(final QueryException ignored) {
       return Bln.FALSE;
     }
   }

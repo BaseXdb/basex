@@ -100,14 +100,12 @@ public final class Bln extends Item {
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public boolean eq(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     return value == (it.type == type ? it.bool(ii) : parse(it.string(ii), ii));
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     final boolean n = it.type == type ? it.bool(ii) : parse(it.string(ii), ii);
     return value ? n ? 0 : 1 : n ? -1 : 0;
   }
@@ -122,6 +120,11 @@ public final class Bln extends Item {
     return cmp instanceof Bln && value == ((Bln) cmp).value;
   }
 
+  @Override
+  public String toString() {
+    return new TokenBuilder(value ? Token.TRUE : Token.FALSE).add("()").toString();
+  }
+
   /**
    * Converts the specified string to a boolean.
    * @param value string to be checked
@@ -130,14 +133,9 @@ public final class Bln extends Item {
    * @throws QueryException query exception
    */
   public static boolean parse(final byte[] value, final InputInfo ii) throws QueryException {
-    final byte[] s = Token.trim(value);
-    if(Token.eq(s, Token.TRUE) || Token.eq(s, Token.ONE)) return true;
-    if(Token.eq(s, Token.FALSE) || Token.eq(s, Token.ZERO)) return false;
+    final byte[] v = Token.trim(value);
+    if(Token.eq(v, Token.TRUE) || Token.eq(v, Token.ONE)) return true;
+    if(Token.eq(v, Token.FALSE) || Token.eq(v, Token.ZERO)) return false;
     throw FUNCAST.get(ii, AtomType.BLN, chop(value));
-  }
-
-  @Override
-  public String toString() {
-    return new TokenBuilder(value ? Token.TRUE : Token.FALSE).add("()").toString();
   }
 }

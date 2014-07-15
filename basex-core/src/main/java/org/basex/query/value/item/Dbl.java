@@ -1,6 +1,5 @@
 package org.basex.query.value.item;
 
-import static java.lang.Double.*;
 import static org.basex.query.util.Err.*;
 
 import java.math.*;
@@ -19,7 +18,7 @@ import org.basex.util.*;
  */
 public final class Dbl extends ANum {
   /** Value "NaN". */
-  public static final Dbl NAN = new Dbl(NaN);
+  public static final Dbl NAN = new Dbl(Double.NaN);
   /** Value "0". */
   private static final Dbl ZERO = new Dbl(0);
   /** Value "1". */
@@ -42,8 +41,8 @@ public final class Dbl extends ANum {
    * @return instance
    */
   public static Dbl get(final double value) {
-    return value == 0 && doubleToRawLongBits(value) == 0 ? ZERO : value == 1 ? ONE :
-      isNaN(value) ? NAN : new Dbl(value);
+    return value == 0 && Double.doubleToRawLongBits(value) == 0 ? ZERO : value == 1 ? ONE :
+      Double.isNaN(value) ? NAN : new Dbl(value);
   }
 
   /**
@@ -64,7 +63,7 @@ public final class Dbl extends ANum {
 
   @Override
   public boolean bool(final InputInfo ii) {
-    return !isNaN(value) && value != 0;
+    return !Double.isNaN(value) && value != 0;
   }
 
   @Override
@@ -88,16 +87,14 @@ public final class Dbl extends ANum {
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public boolean eq(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     return value == it.dbl(ii);
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     final double n = it.dbl(ii);
-    if(isNaN(n) || isNaN(value)) return UNDEF;
+    if(Double.isNaN(n) || Double.isNaN(value)) return UNDEF;
     return value < n ? -1 : value > n ? 1 : 0;
   }
 
@@ -119,12 +116,12 @@ public final class Dbl extends ANum {
    * @throws QueryException query exception
    */
   public static double parse(final byte[] value, final InputInfo ii) throws QueryException {
-    try {
-      return parseDouble(Token.string(value));
-    } catch(final NumberFormatException ex) {
-      if(Token.eq(Token.trim(value), Token.INF)) return POSITIVE_INFINITY;
-      if(Token.eq(Token.trim(value), Token.NINF)) return NEGATIVE_INFINITY;
-      throw FUNCAST.get(ii, ZERO.type, chop(value));
-    }
+    final double d = Token.toDouble(value);
+    if(d == d) return d;
+    final byte[] v = Token.trim(value);
+    if(Token.eq(v, Token.NAN)) return Double.NaN;
+    if(Token.eq(v, Token.INF)) return Double.POSITIVE_INFINITY;
+    if(Token.eq(v, Token.NINF)) return Double.NEGATIVE_INFINITY;
+    throw FUNCAST.get(ii, ZERO.type, chop(v));
   }
 }

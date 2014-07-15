@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static java.lang.Double.*;
 import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
@@ -88,16 +89,10 @@ public final class FNAcc extends StandardFunc {
 
     // shortcut: check if string only consists of valid double characters
     if(it.type.isStringOrUntyped() && it.type != AtomType.URI) {
-      final byte[] value = it.string(info);
-      for(final int v : value) {
-        if(!Token.digit(v) && v != '+' && v != 'e' && v != 'E' && v != '.' && v != '-' &&
-           !Token.ws(v)) return Dbl.NAN;
-      }
-      try {
-        return Dbl.get(Double.parseDouble(Token.string(value)));
-      } catch(final NumberFormatException ex) {
-        return Dbl.NAN;
-      }
+      final byte[] value = trim(it.string(info));
+      if(eq(value, INF)) return Dbl.get(POSITIVE_INFINITY);
+      if(eq(value, NINF)) return Dbl.get(NEGATIVE_INFINITY);
+      return Dbl.get(toDouble(value));
     }
 
     // default conversion

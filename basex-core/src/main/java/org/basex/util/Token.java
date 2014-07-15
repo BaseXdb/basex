@@ -507,7 +507,7 @@ public final class Token {
     boolean f = false;
     for(final int t : token) {
       if(t >= 0 && t <= ' ' || digit(t)) continue;
-      f = t == 'e' || t == 'E' || t == '.' || t == '-';
+      f = t == 'e' || t == 'E' || t == '.' || t == '-' || t == '+';
       if(!f) return Double.NaN;
     }
     if(f || tl > 9) return dbl(token);

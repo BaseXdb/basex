@@ -1,6 +1,5 @@
 package org.basex.query.value.item;
 
-import static java.lang.Double.*;
 import static org.basex.query.util.Err.*;
 
 import java.math.*;
@@ -43,7 +42,7 @@ public final class Flt extends ANum {
    */
   public static Flt get(final float value) {
     return value == 0 && Float.floatToRawIntBits(value) == 0 ? ZERO : value == 1 ? ONE :
-      isNaN(value) ? NAN : new Flt(value);
+      Float.isNaN(value) ? NAN : new Flt(value);
   }
 
   @Override
@@ -53,7 +52,7 @@ public final class Flt extends ANum {
 
   @Override
   public boolean bool(final InputInfo ii) {
-    return !isNaN(value) && value != 0;
+    return !Float.isNaN(value) && value != 0;
   }
 
   @Override
@@ -77,16 +76,14 @@ public final class Flt extends ANum {
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public boolean eq(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     return it.type == AtomType.DBL ? it.eq(this, coll, ii) : value == it.flt(ii);
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    final double n = it.flt(ii);
-    if(isNaN(n) || isNaN(value)) return UNDEF;
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
+    final float n = it.flt(ii);
+    if(Float.isNaN(n) || Float.isNaN(value)) return UNDEF;
     return value < n ? -1 : value > n ? 1 : 0;
   }
 
@@ -97,8 +94,7 @@ public final class Flt extends ANum {
 
   @Override
   public boolean sameAs(final Expr cmp) {
-    return cmp instanceof Flt && value == ((Flt) cmp).value ||
-      this == NAN && cmp == NAN;
+    return cmp instanceof Flt && value == ((Flt) cmp).value || this == NAN && cmp == NAN;
   }
 
   /**
@@ -112,8 +108,9 @@ public final class Flt extends ANum {
     try {
       return Float.parseFloat(Token.string(value));
     } catch(final NumberFormatException ex) {
-      if(Token.eq(Token.trim(value), Token.INF)) return Float.POSITIVE_INFINITY;
-      if(Token.eq(Token.trim(value), Token.NINF)) return Float.NEGATIVE_INFINITY;
+      final byte[] v = Token.trim(value);
+      if(Token.eq(v, Token.INF)) return Float.POSITIVE_INFINITY;
+      if(Token.eq(v, Token.NINF)) return Float.NEGATIVE_INFINITY;
       throw FUNCAST.get(ii, ZERO.type, chop(value));
     }
   }
