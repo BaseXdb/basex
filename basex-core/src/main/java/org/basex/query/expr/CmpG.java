@@ -138,17 +138,13 @@ public final class CmpG extends Cmp {
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    // avoid reoptimization
-    if(atomic) return this;
-
     // swap expressions; add text() to location paths to simplify optimizations
     if(swap()) {
       op = op.swap();
       qc.compInfo(OPTSWAP, this);
     }
 
-    final Expr e1 = exprs[0];
-    final Expr e2 = exprs[1];
+    final Expr e1 = exprs[0], e2 = exprs[1];
     Expr e = this;
     if(oneIsEmpty()) {
       e = optPre(Bln.FALSE, qc);

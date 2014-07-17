@@ -64,6 +64,8 @@ public final class Quantifier extends Single {
     // pre-evaluate satisfy clause if it is a value
     if(expr instanceof GFLWOR && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {
       final GFLWOR gflwor = (GFLWOR) expr;
+      gflwor.ret = gflwor.ret.optimize(qc, scp);
+
       if(gflwor.size() > 0 && gflwor.ret.isValue()) {
         final Value value = (Value) gflwor.ret;
         qc.compInfo(OPTPRE, value);
