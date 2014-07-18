@@ -122,6 +122,6 @@ public final class Dbl extends ANum {
     if(Token.eq(v, Token.NAN)) return Double.NaN;
     if(Token.eq(v, Token.INF)) return Double.POSITIVE_INFINITY;
     if(Token.eq(v, Token.NINF)) return Double.NEGATIVE_INFINITY;
-    throw FUNCAST.get(ii, ZERO.type, chop(v));
+    throw FUNCAST.get(ii, ZERO.type, chop(v, ii));
   }
 }

@@ -235,7 +235,7 @@ public class FuncType implements Type {
   }
 
   @Override
-  public ID id() {
+  public final ID id() {
     return Type.ID.FUN;
   }
 

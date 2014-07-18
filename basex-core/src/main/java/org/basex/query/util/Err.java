@@ -1197,13 +1197,14 @@ public enum Err {
   }
 
   /**
-   * Throws a query exception.
+   * Throws a query exception. If {@link InputInfo#check()} returns {@code true},
+   * a static error instance ({@link QueryException#ERROR}) will be returned.
    * @param ii input info
    * @param ext extended info
    * @return query exception (indicates that an error is raised)
    */
   public QueryException get(final InputInfo ii, final Object... ext) {
-    return new QueryException(ii, this, ext);
+    return ii != null && ii.check() ? QueryException.ERROR : new QueryException(ii, this, ext);
   }
 
   /**
@@ -1427,10 +1428,13 @@ public enum Err {
   /**
    * Chops the specified object to a maximum size.
    * @param object object
+   * @param info input info
    * @return exception or null
    * @throws QueryException query exception
    */
-  public static byte[] chop(final Object object) throws QueryException {
+  public static byte[] chop(final Object object, final InputInfo info) throws QueryException {
+    if(info != null && info.check()) return Token.EMPTY;
+
     final TokenBuilder tb = new TokenBuilder();
     byte l = 0;
     final byte[] string = object instanceof byte[] ? (byte[]) object : object instanceof Item ?

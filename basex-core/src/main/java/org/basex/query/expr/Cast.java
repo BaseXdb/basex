@@ -1,10 +1,12 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
@@ -56,9 +58,7 @@ public final class Cast extends Single {
       optPre(expr, qc);
       return expr;
     }
-
     size = type.occ();
-
     return this;
   }
 
@@ -69,7 +69,9 @@ public final class Cast extends Single {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return type.cast(expr.item(qc, info), qc, sc, info, this);
+    final Value v = expr.value(qc);
+    if(!type.occ.check(v.size())) throw INVCASTEX.get(info, v.type(), type, v);
+    return v instanceof Item ? type.cast((Item) v, qc, sc, info, true) : v;
   }
 
   @Override

@@ -2185,7 +2185,7 @@ public class QueryParser extends InputParser {
 
     final long l = toLong(tok.finish());
     if(l != Long.MIN_VALUE) return Int.get(l);
-    return FNInfo.error(new QueryException(info(), RANGE, tok), SeqType.ITR);
+    return FNInfo.error(RANGE.get(info(), tok), SeqType.ITR);
   }
 
   /**

@@ -315,7 +315,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @return exception
    */
   private static QueryException error(final InputInfo info, final String msg, final Object... ext) {
-    return new QueryException(info, Err.BASX_RESTXQ, Util.info(msg, ext));
+    return Err.BASX_RESTXQ.get(info, Util.info(msg, ext));
   }
 
   @Override
@@ -423,14 +423,14 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     // skip nulled values
     if(value == null) return;
 
-    for(int i = 0; i < function.args.length; i++) {
-      final Var var = function.args[i];
+    for(int f = 0; f < function.args.length; f++) {
+      final Var var = function.args[f];
       if(var.name.eq(name)) {
         // casts and binds the value
         final SeqType decl = var.declaredType();
         final Value val = value.type().instanceOf(decl) ? value :
-          decl.cast(value, context, function.sc, null, var);
-        args[i] = var.checkType(val, context, null, false);
+          decl.cast(value, context, function.sc, null);
+        args[f] = var.checkType(val, context, null, false);
         break;
       }
     }

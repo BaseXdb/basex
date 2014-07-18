@@ -153,6 +153,6 @@ public final class Dec extends ANum {
         return new BigDecimal(Token.string(value).trim());
     } catch(final NumberFormatException ignored) { }
 
-    throw FUNCAST.get(ii, AtomType.DEC, chop(value));
+    throw FUNCAST.get(ii, AtomType.DEC, chop(value, ii));
   }
 }

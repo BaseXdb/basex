@@ -1,6 +1,5 @@
 package org.basex.query.func;
 
-import static java.lang.Double.*;
 import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
@@ -86,20 +85,13 @@ public final class FNAcc extends StandardFunc {
     if(it == null || ir.next() != null) return Dbl.NAN;
     if(it instanceof FItem) throw FIATOM.get(info, it.type);
     if(it.type == AtomType.DBL) return it;
-
-    // shortcut: check if string only consists of valid double characters
-    if(it.type.isStringOrUntyped() && it.type != AtomType.URI) {
-      final byte[] value = trim(it.string(info));
-      if(eq(value, INF)) return Dbl.get(POSITIVE_INFINITY);
-      if(eq(value, NINF)) return Dbl.get(NEGATIVE_INFINITY);
-      return Dbl.get(toDouble(value));
-    }
-
-    // default conversion
     try {
+      if(info != null) info.check(true);
       return AtomType.DBL.cast(it, qc, sc, info);
     } catch(final QueryException ex) {
       return Dbl.NAN;
+    } finally {
+      if(info != null) info.check(false);
     }
   }
 

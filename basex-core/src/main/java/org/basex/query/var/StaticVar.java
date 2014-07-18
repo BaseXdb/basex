@@ -133,7 +133,7 @@ public final class StaticVar extends StaticDecl {
 
     if(e instanceof Value) {
       Value v = (Value) e;
-      if(declType != null && !declType.instance(v)) v = declType.cast(v, qc, sc, info, e);
+      if(declType != null && !declType.instance(v)) v = declType.cast(v, qc, sc, info);
       bind(v);
     } else {
       expr = checkType(e, info);

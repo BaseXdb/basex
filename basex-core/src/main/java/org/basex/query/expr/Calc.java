@@ -149,13 +149,13 @@ public enum Calc {
       if(ta == tb) {
         if(ta == YMD) {
           final BigDecimal bd = BigDecimal.valueOf(((YMDur) b).ymd());
-          if(bd.doubleValue() == 0.0) throw DIVZERO.get(ii, chop(a));
+          if(bd.doubleValue() == 0.0) throw DIVZERO.get(ii, chop(a, ii));
           return Dec.get(BigDecimal.valueOf(((YMDur) a).ymd()).divide(
               bd, 20, BigDecimal.ROUND_HALF_EVEN));
         }
         if(ta == DTD) {
           final BigDecimal bd = ((DTDur) b).dtd();
-          if(bd.doubleValue() == 0.0) throw DIVZERO.get(ii, chop(a));
+          if(bd.doubleValue() == 0.0) throw DIVZERO.get(ii, chop(a, ii));
           return Dec.get(((DTDur) a).dtd().divide(bd, 20,
               BigDecimal.ROUND_HALF_EVEN));
         }
@@ -176,7 +176,7 @@ public enum Calc {
 
       final BigDecimal b1 = a.dec(ii);
       final BigDecimal b2 = b.dec(ii);
-      if(b2.signum() == 0) throw DIVZERO.get(ii, chop(a));
+      if(b2.signum() == 0) throw DIVZERO.get(ii, chop(a, ii));
       final int s = Math.max(18, Math.max(b1.scale(), b2.scale()));
       return Dec.get(b1.divide(b2, s, RoundingMode.HALF_EVEN));
     }
@@ -191,7 +191,7 @@ public enum Calc {
       if(t == DBL || t == FLT) {
         final double d1 = a.dbl(ii);
         final double d2 = b.dbl(ii);
-        if(d2 == 0) throw DIVZERO.get(ii, chop(a));
+        if(d2 == 0) throw DIVZERO.get(ii, chop(a, ii));
         final double d = d1 / d2;
         if(Double.isNaN(d) || Double.isInfinite(d)) throw DIVFLOW.get(ii, d1, d2);
         if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw RANGE.get(ii, d1 + " idiv " + d2);
@@ -201,14 +201,14 @@ public enum Calc {
       if(t == ITR) {
         final long b1 = a.itr(ii);
         final long b2 = b.itr(ii);
-        if(b2 == 0) throw DIVZERO.get(ii, chop(a));
+        if(b2 == 0) throw DIVZERO.get(ii, chop(a, ii));
         if(b1 == Integer.MIN_VALUE && b2 == -1) throw RANGE.get(ii, b1 + " idiv " + b2);
         return Int.get(b1 / b2);
       }
 
       final BigDecimal b1 = a.dec(ii);
       final BigDecimal b2 = b.dec(ii);
-      if(b2.signum() == 0) throw DIVZERO.get(ii, chop(a));
+      if(b2.signum() == 0) throw DIVZERO.get(ii, chop(a, ii));
       final BigDecimal res = b1.divideToIntegralValue(b2);
       if(!(MIN_LONG.compareTo(res) <= 0 && res.compareTo(MAX_LONG) <= 0))
         throw RANGE.get(ii, b1 + " idiv " + b2);
@@ -227,13 +227,13 @@ public enum Calc {
       if(t == ITR) {
         final long b1 = a.itr(ii);
         final long b2 = b.itr(ii);
-        if(b2 == 0) throw DIVZERO.get(ii, chop(a));
+        if(b2 == 0) throw DIVZERO.get(ii, chop(a, ii));
         return Int.get(b1 % b2);
       }
 
       final BigDecimal b1 = a.dec(ii);
       final BigDecimal b2 = b.dec(ii);
-      if(b2.signum() == 0) throw DIVZERO.get(ii, chop(a));
+      if(b2.signum() == 0) throw DIVZERO.get(ii, chop(a, ii));
       final BigDecimal q = b1.divide(b2, 0, BigDecimal.ROUND_DOWN);
       return Dec.get(b1.subtract(q.multiply(b2)));
     }

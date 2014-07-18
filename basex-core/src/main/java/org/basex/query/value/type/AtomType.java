@@ -385,7 +385,7 @@ public enum AtomType implements Type {
       final BigDecimal v = checkNum(it, ii).dec(ii);
       final BigDecimal i = v.setScale(0, BigDecimal.ROUND_DOWN);
       if(v.signum() < 0 || v.compareTo(Dec.MAXULNG) > 0 ||
-        it.type.isStringOrUntyped() && !v.equals(i)) throw FUNCAST.get(ii, this, chop(it));
+        it.type.isStringOrUntyped() && !v.equals(i)) throw FUNCAST.get(ii, this, chop(it, ii));
       return new Dec(i, this);
     }
   },
@@ -676,7 +676,7 @@ public enum AtomType implements Type {
 
       if(!it.type.isStringOrUntyped()) invCast(it, ii);
       final Uri u = Uri.uri(it.string(ii));
-      if(!u.isValid()) throw FUNCAST.get(ii, this, chop(it));
+      if(!u.isValid()) throw FUNCAST.get(ii, this, chop(it, ii));
       return u;
     }
     @Override
@@ -695,7 +695,7 @@ public enum AtomType implements Type {
       // xquery 3.0 also allows untyped arguments
       if(it.type != STR && !(sc.xquery3() && it.type.isUntyped())) invCast(it, ii);
       final byte[] nm = trim(it.string(ii));
-      if(!XMLToken.isQName(nm)) throw FUNCAST.get(ii, this, chop(nm));
+      if(!XMLToken.isQName(nm)) throw FUNCAST.get(ii, this, chop(nm, ii));
       final QNm qn = new QNm(nm, sc);
       if(!qn.hasURI() && qn.hasPrefix()) throw NSDECL.get(ii, qn.prefix());
       return qn;
@@ -720,7 +720,7 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Object o, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) {
-      return new Jav(o, null);
+      return new Jav(o, qc);
     }
   };
 
@@ -767,27 +767,27 @@ public enum AtomType implements Type {
   }
 
   @Override
-  public boolean isNumber() {
+  public final boolean isNumber() {
     return num;
   }
 
   @Override
-  public boolean isUntyped() {
+  public final boolean isUntyped() {
     return unt;
   }
 
   @Override
-  public boolean isNumberOrUntyped() {
+  public final boolean isNumberOrUntyped() {
     return num || unt;
   }
 
   @Override
-  public boolean isStringOrUntyped() {
+  public final boolean isStringOrUntyped() {
     return str || unt;
   }
 
   @Override
-  public byte[] string() {
+  public final byte[] string() {
     return name.string();
   }
 
@@ -804,20 +804,20 @@ public enum AtomType implements Type {
   }
 
   @Override
-  public Item castString(final String o, final QueryContext qc, final StaticContext sc,
+  public final Item castString(final String o, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     return cast(o, qc, sc, ii);
   }
 
   @Override
-  public SeqType seqType() {
+  public final SeqType seqType() {
     // cannot be statically instantiated due to circular dependencies
     if(seq == null) seq = new SeqType(this);
     return seq;
   }
 
   @Override
-  public boolean eq(final Type t) {
+  public final boolean eq(final Type t) {
     return this == t;
   }
 
@@ -827,7 +827,7 @@ public enum AtomType implements Type {
   }
 
   @Override
-  public Type union(final Type t) {
+  public final Type union(final Type t) {
     if(instanceOf(t)) return t;
     if(t.instanceOf(this)) return this;
 
@@ -841,7 +841,7 @@ public enum AtomType implements Type {
   }
 
   @Override
-  public Type intersect(final Type t) {
+  public final Type intersect(final Type t) {
     return instanceOf(t) ? this : t.instanceOf(this) ? t : null;
   }
 
@@ -851,12 +851,12 @@ public enum AtomType implements Type {
   }
 
   @Override
-  public Type.ID id() {
+  public final Type.ID id() {
     return id;
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     final boolean xs = Token.eq(XSURI, name.uri());
     final TokenBuilder tb = new TokenBuilder();
     if(xs) tb.add(NSGlobal.prefix(name.uri())).add(':');
@@ -872,10 +872,10 @@ public enum AtomType implements Type {
    * @return item argument
    * @throws QueryException query exception
    */
-  Item checkNum(final Item it, final InputInfo ii) throws QueryException {
+  final Item checkNum(final Item it, final InputInfo ii) throws QueryException {
     final Type ip = it.type;
-    return it instanceof ANum || ip.isStringOrUntyped() && ip != URI || ip == BLN ?
-      it : invCast(it, ii);
+    return it instanceof ANum || ip.isStringOrUntyped() && ip != URI || ip == BLN ? it :
+      invCast(it, ii);
   }
 
   /**
@@ -887,7 +887,7 @@ public enum AtomType implements Type {
    * @return integer value
    * @throws QueryException query exception
    */
-  long checkLong(final Object o, final long min, final long max, final InputInfo ii)
+  final long checkLong(final Object o, final long min, final long max, final InputInfo ii)
       throws QueryException {
 
     final Item it = o instanceof Item ? (Item) o : Str.get(o.toString());
@@ -897,17 +897,17 @@ public enum AtomType implements Type {
     if(ip == DBL || ip == FLT) {
       final double d = it.dbl(ii);
       if(Double.isNaN(d) || Double.isInfinite(d)) throw valueError(ii, this, it);
-      if(min != max && (d < min || d > max)) throw FUNCAST.get(ii, this, chop(it));
+      if(min != max && (d < min || d > max)) throw FUNCAST.get(ii, this, chop(it, ii));
       if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw INTRANGE.get(ii, d);
       return (long) d;
     }
     if(min == max) {
       final double d = it.dbl(ii);
-      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw FUNCAST.get(ii, this, chop(it));
+      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw FUNCAST.get(ii, this, chop(it, ii));
     }
 
     final long l = it.itr(ii);
-    if(min != max && (l < min || l > max)) throw FUNCAST.get(ii, this, chop(it));
+    if(min != max && (l < min || l > max)) throw FUNCAST.get(ii, this, chop(it, ii));
     return l;
   }
 
@@ -928,7 +928,7 @@ public enum AtomType implements Type {
    * @throws QueryException query exception
    * @return name
    */
-  byte[] checkName(final Item it, final InputInfo ii) throws QueryException {
+  final byte[] checkName(final Item it, final InputInfo ii) throws QueryException {
     final byte[] v = norm(it.string(ii));
     if(!XMLToken.isNCName(v)) invValue(it, ii);
     return v;
@@ -941,7 +941,7 @@ public enum AtomType implements Type {
    * @return dummy item
    * @throws QueryException query exception
    */
-  Item invCast(final Item it, final InputInfo ii) throws QueryException {
+  final Item invCast(final Item it, final InputInfo ii) throws QueryException {
     throw castError(ii, this, it);
   }
 
@@ -952,8 +952,13 @@ public enum AtomType implements Type {
    * @return dummy item
    * @throws QueryException query exception
    */
-  Item invValue(final Item it, final InputInfo ii) throws QueryException {
+  final Item invValue(final Item it, final InputInfo ii) throws QueryException {
     throw FUNCCASTEX.get(ii, it.type(), this, it);
+  }
+
+  @Override
+  public final boolean nsSensitive() {
+    return instanceOf(QNM) || instanceOf(NOT);
   }
 
   /**
@@ -969,11 +974,6 @@ public enum AtomType implements Type {
       }
     }
     return null;
-  }
-
-  @Override
-  public boolean nsSensitive() {
-    return instanceOf(QNM) || instanceOf(NOT);
   }
 
   /**

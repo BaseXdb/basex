@@ -111,7 +111,7 @@ public abstract class ADate extends ADateDur {
     day = (byte) (Token.toInt(mt.group(4)) - 1);
 
     if(mon < 0 || mon >= 12 || day < 0 || day >= dpm(yea, mon)) throw dateError(d, e, ii);
-    if(yea <= MIN_YEAR || yea > MAX_YEAR) throw DATERANGE.get(ii, type, chop(d));
+    if(yea <= MIN_YEAR || yea > MAX_YEAR) throw DATERANGE.get(ii, type, chop(d, ii));
     zone(mt, 5, d, ii);
   }
 

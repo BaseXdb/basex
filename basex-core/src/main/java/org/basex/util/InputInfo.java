@@ -1,5 +1,8 @@
 package org.basex.util;
 
+import org.basex.query.expr.*;
+import org.basex.query.util.*;
+
 
 /**
  * This class contains the original query, its file reference, and line/column
@@ -9,6 +12,8 @@ package org.basex.util;
  * @author Christian Gruen
  */
 public final class InputInfo {
+  /** Indicates if a raised error should be static. */
+  private boolean check;
   /** Input path. */
   private final String path;
   /** Input query. */
@@ -81,6 +86,22 @@ public final class InputInfo {
     }
     line = l;
     col = c;
+  }
+
+  /**
+   * Returns the check flag (invoked by {@link Err#get(InputInfo, Object...)}).
+   * @return check flag
+   */
+  public boolean check() {
+    return check;
+  }
+
+  /**
+   * Sets the check flag (invoked e.g. by {@link Castable#optimize}).
+   * @param c check flag
+   */
+  public void check(final boolean c) {
+    check = c;
   }
 
   @Override

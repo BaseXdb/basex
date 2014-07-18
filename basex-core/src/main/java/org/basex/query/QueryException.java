@@ -19,6 +19,12 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public class QueryException extends Exception {
+  /** Static exception. */
+  public static final QueryException ERROR = new QueryException("") {
+    @Override
+    public synchronized Throwable fillInStackTrace() { return this; }
+  };
+
   /** Stack. */
   private final ArrayList<InputInfo> stack = new ArrayList<>();
   /** Error QName. */

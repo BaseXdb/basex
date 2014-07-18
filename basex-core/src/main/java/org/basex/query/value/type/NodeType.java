@@ -49,7 +49,7 @@ public enum NodeType implements Type {
       if(o instanceof ProcessingInstruction) return new FPI((ProcessingInstruction) o);
       final Matcher m = Pattern.compile("<\\?(.*?) (.*)\\?>").matcher(o.toString());
       if(m.find()) return new FPI(m.group(1), m.group(2));
-      throw NODEERR.get(ii, this, chop(o));
+      throw NODEERR.get(ii, this, chop(o, ii));
     }
   },
 
@@ -112,7 +112,7 @@ public enum NodeType implements Type {
       if(o instanceof Attr) return new FAttr((Attr) o);
       final Matcher m = Pattern.compile(" (.*?)=\"(.*)\"").matcher(o.toString());
       if(m.find()) return new FAttr(m.group(1), m.group(2));
-      throw NODEERR.get(ii, this, chop(o));
+      throw NODEERR.get(ii, this, chop(o, ii));
     }
   },
 
@@ -125,7 +125,7 @@ public enum NodeType implements Type {
       if(o instanceof Comment) return new FComm((Comment) o);
       final Matcher m = Pattern.compile("<!--(.*?)-->").matcher(o.toString());
       if(m.find()) return new FComm(m.group(1));
-      throw NODEERR.get(ii, this, chop(o));
+      throw NODEERR.get(ii, this, chop(o, ii));
     }
   },
 
@@ -167,17 +167,17 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public boolean isNumber() {
+  public final boolean isNumber() {
     return false;
   }
 
   @Override
-  public boolean isUntyped() {
+  public final boolean isUntyped() {
     return true;
   }
 
   @Override
-  public boolean isNumberOrUntyped() {
+  public final boolean isNumberOrUntyped() {
     return true;
   }
 
@@ -187,7 +187,7 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public Item cast(final Item it, final QueryContext qc, final StaticContext sc,
+  public final Item cast(final Item it, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     return it.type == this ? it : error(it, ii);
   }
@@ -199,20 +199,20 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public Item castString(final String o, final QueryContext qc, final StaticContext sc,
+  public final Item castString(final String o, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     return cast(o, qc, sc, ii);
   }
 
   @Override
-  public SeqType seqType() {
+  public final SeqType seqType() {
     // cannot be statically instantiated due to circular dependency
     if(seq == null) seq = new SeqType(this);
     return seq;
   }
 
   @Override
-  public boolean eq(final Type t) {
+  public final boolean eq(final Type t) {
     return this == t;
   }
 
@@ -222,28 +222,28 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public Type union(final Type t) {
+  public final Type union(final Type t) {
     return t.isNode() ? this == t ? this : NOD : AtomType.ITEM;
   }
 
   @Override
-  public NodeType intersect(final Type t) {
+  public final NodeType intersect(final Type t) {
     if(!(t instanceof NodeType)) return instanceOf(t) ? this : null;
     return this == t ? this : this == NOD ? (NodeType) t : t == NOD ? this : null;
   }
 
   @Override
-  public ID id() {
+  public final ID id() {
     return id;
   }
 
   @Override
-  public byte[] string() {
+  public final byte[] string() {
     return string;
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return new TokenBuilder(string).add("()").toString();
   }
 
@@ -254,8 +254,13 @@ public enum NodeType implements Type {
    * @return dummy item
    * @throws QueryException query exception
    */
-  Item error(final Item it, final InputInfo ii) throws QueryException {
+  final Item error(final Item it, final InputInfo ii) throws QueryException {
     throw Err.castError(ii, this, it);
+  }
+
+  @Override
+  public boolean nsSensitive() {
+    return false;
   }
 
   /**
@@ -271,11 +276,6 @@ public enum NodeType implements Type {
       }
     }
     return null;
-  }
-
-  @Override
-  public boolean nsSensitive() {
-    return false;
   }
 
   /**
