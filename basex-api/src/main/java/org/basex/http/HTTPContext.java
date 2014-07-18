@@ -60,6 +60,8 @@ public final class HTTPContext {
   private final String[] segments;
   /** Nonce for Digest Auth. */
   public final String nonce;
+  /** Realm for Digest Auth. */
+  public final String realm;
 
   /**
    * Constructor.
@@ -76,6 +78,8 @@ public final class HTTPContext {
     params = new HTTPParams(this);
 
     method = rq.getMethod();
+    // Assigning realm for digest auth.
+    realm = "basex.org";
 
     final StringBuilder uri = new StringBuilder(req.getRequestURL());
     final String qs = req.getQueryString();
