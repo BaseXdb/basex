@@ -15,6 +15,9 @@ import org.basex.http.*;
 public final class RESTServlet extends BaseXServlet {
   @Override
   protected void run(final HTTPContext http) throws IOException {
+
+    System.out.println(http.nonce);
+
     final RESTSession rs = new RESTSession(http, http.authenticate());
     final RESTCmd cmd = code(rs);
     try {

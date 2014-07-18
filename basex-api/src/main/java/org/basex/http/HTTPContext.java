@@ -58,6 +58,8 @@ public final class HTTPContext {
   private final Performance perf = new Performance();
   /** Segments. */
   private final String[] segments;
+  /** Nonce for Digest Auth. */
+  public final String nonce;
 
   /**
    * Constructor.
@@ -84,6 +86,10 @@ public final class HTTPContext {
     res.setCharacterEncoding(UTF8);
     segments = decode(toSegments(req.getPathInfo()));
 
+    //calculating nonce based on UUID
+
+    nonce =  calcNonce();
+
     // adopt servlet-specific credentials or use global ones
     final GlobalOptions mprop = context().globalopts;
     user = servlet.user != null ? servlet.user : mprop.get(GlobalOptions.USER);
@@ -104,6 +110,13 @@ public final class HTTPContext {
     }
   }
 
+  /**
+   * Calculate nonce based on UUID.
+   * @return nonce
+   */
+  public String calcNonce() {
+    return Token.md5(UUID.randomUUID().toString());
+  }
   /**
    * Returns the content type of a request (without an optional encoding).
    * @return content type
