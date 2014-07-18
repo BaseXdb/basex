@@ -52,7 +52,8 @@ public final class GlobalOptions extends Options {
   public static final StringOption USER = new StringOption("USER", "");
   /** Default password. */
   public static final StringOption PASSWORD = new StringOption("PASSWORD", "");
-
+  /** Default authmethod. */
+  public static final StringOption AUTHMETHOD = new StringOption("AUTHMETHOD", "");
   /** Server: host, used for binding the server. Empty string for wildcard.*/
   public static final StringOption SERVERHOST = new StringOption("SERVERHOST", "");
   /** Server: proxy host. */

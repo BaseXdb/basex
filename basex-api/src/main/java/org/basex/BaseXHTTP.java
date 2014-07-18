@@ -65,6 +65,7 @@ public final class BaseXHTTP extends Main {
     // context must be initialized after parsing of arguments
     context = HTTPContext.init();
 
+
     // create jetty instance and set default context to HTTP path
     final GlobalOptions gopts = context.globalopts;
     final String webapp = gopts.get(GlobalOptions.WEBPATH);
