@@ -68,8 +68,8 @@ public final class NSContext {
         if(eq(stack.name(s), pref)) return stack.value(s);
       }
     }
-    final byte[] uri = staticURI(pref);
-    return uri == null ? NSGlobal.uri(pref) : uri.length == 0 ? null : uri;
+    final byte[] u = staticURI(pref);
+    return u == null ? pref.length == 0 ? null : NSGlobal.uri(pref) : u.length == 0 ? null : u;
   }
 
   /**
