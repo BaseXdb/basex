@@ -169,7 +169,7 @@ public final class Map extends FItem {
   @Override
   public Map coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean opt) throws QueryException {
-    if(!(ft instanceof MapType) || !hasType((MapType) ft)) throw castError(ii, ft, this);
+    if(!(ft instanceof MapType) || !hasType((MapType) ft)) throw castError(ii, this, ft);
     return this;
   }
 

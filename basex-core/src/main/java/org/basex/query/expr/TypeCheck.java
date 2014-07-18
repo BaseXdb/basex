@@ -56,7 +56,7 @@ public final class TypeCheck extends Single {
 
     if(expr.isValue()) {
       if(expr instanceof FuncItem && this.type.type instanceof FuncType) {
-        if(!this.type.occ.check(1)) throw Err.treatError(info, this.type, expr);
+        if(!this.type.occ.check(1)) throw Err.treatError(info, expr, this.type);
         final FuncItem fit = (FuncItem) expr;
         return optPre(fit.coerceTo((FuncType) this.type.type, qc, info, true), qc);
       }

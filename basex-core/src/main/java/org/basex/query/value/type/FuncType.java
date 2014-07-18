@@ -83,7 +83,7 @@ public class FuncType implements Type {
   public FItem cast(final Item it, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) throws QueryException {
 
-    if(!(it instanceof FItem)) throw Err.castError(ii, this, it);
+    if(!(it instanceof FItem)) throw Err.castError(ii, it, this);
     final FItem f = (FItem) it;
     return this == ANY_FUN ? f : f.coerceTo(this, qc, ii, false);
   }

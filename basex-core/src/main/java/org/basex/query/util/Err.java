@@ -1169,31 +1169,31 @@ public enum Err {
   /**
    * Constructor.
    * @param type error type
-   * @param msg error message
-   * @param dsc description
+   * @param code error code
+   * @param desc description
    */
-  Err(final ErrType type, final String msg, final String dsc) {
-    code = msg;
+  Err(final ErrType type, final String code, final String desc) {
+    this.code = code;
+    this.desc = desc;
     uri = type.uri;
     prefix = type.prefix;
-    desc = dsc;
   }
 
   /**
    * Constructor.
    * @param type error type
-   * @param nr error number
-   * @param dsc description
+   * @param number error number
+   * @param desc description
    */
-  Err(final ErrType type, final int nr, final String dsc) {
+  Err(final ErrType type, final int number, final String desc) {
     final StringBuilder sb = new StringBuilder(8).append(type);
-    final String n = Integer.toString(nr);
+    final String n = Integer.toString(number);
     final int s  = 4 - n.length();
     for(int i = 0; i < s; i++) sb.append('0');
     code = sb.append(n).toString();
     uri = type.uri;
     prefix = type.prefix;
-    desc = dsc;
+    this.desc = desc;
   }
 
   /**
@@ -1337,13 +1337,13 @@ public enum Err {
   /**
    * Returns an error for the specified name.
    * @param name error name
-   * @param ii input info
    * @param msg error message
+   * @param ii input info
    * @return exception or null
    */
-  public static QueryException get(final String name, final InputInfo ii, final String msg) {
-    for(final Err e : VALUES) {
-      if(e.toString().equals(name)) return new QueryException(ii, e.qname(), msg).err(e);
+  public static QueryException get(final String name, final String msg, final InputInfo ii) {
+    for(final Err err : VALUES) {
+      if(err.toString().equals(name)) return new QueryException(ii, err.qname(), msg).err(err);
     }
     return null;
   }
@@ -1351,66 +1351,66 @@ public enum Err {
   /**
    * Throws a comparison exception.
    * @param ii input info
-   * @param it1 first item
-   * @param it2 second item
+   * @param item1 first item
+   * @param item2 second item
    * @return query exception (indicates that an error is raised)
    */
-  public static QueryException diffError(final InputInfo ii, final Item it1, final Item it2) {
-    return (it1 == it2 ? TYPECMP : INVTYPECMP).get(ii, it1.type, it2.type);
+  public static QueryException diffError(final InputInfo ii, final Item item1, final Item item2) {
+    return (item1 == item2 ? TYPECMP : INVTYPECMP).get(ii, item1.type, item2.type);
   }
 
   /**
    * Throws a type cast exception.
    * @param ii input info
-   * @param t expression cast type
-   * @param v value
+   * @param value value
+   * @param type expression cast type
    * @return query exception (indicates that an error is raised)
    */
-  public static QueryException castError(final InputInfo ii, final Type t, final Value v) {
-    return INVCASTEX.get(ii, v.type, t, v);
+  public static QueryException castError(final InputInfo ii, final Value value, final Type type) {
+    return INVCASTEX.get(ii, value.type, type, value);
   }
 
   /**
    * Throws a type promoting exception.
    * @param ii input info
-   * @param t expression cast type
-   * @param e expression
+   * @param expr expression
+   * @param type expression cast type
    * @return query exception (indicates that an error is raised)
    */
-  public static QueryException treatError(final InputInfo ii, final SeqType t, final Expr e) {
-    return INVTREAT.get(ii, e.description(), t, e);
+  public static QueryException treatError(final InputInfo ii, final Expr expr, final SeqType type) {
+    return INVTREAT.get(ii, expr.description(), type, expr);
   }
 
   /**
    * Throws a type exception.
-   * @param e parsing expression
-   * @param t expected type
-   * @param it found item
+   * @param expr parsing expression
+   * @param item found item
+   * @param type expected type
    * @return query exception (indicates that an error is raised)
    */
-  public static QueryException typeError(final ParseExpr e, final Type t, final Item it) {
-    return INVCAST.get(e.info, it.type, t);
+  public static QueryException typeError(final ParseExpr expr, final Item item, final Type type) {
+    return INVCAST.get(expr.info, item.type, type);
   }
 
   /**
    * Throws a number exception.
-   * @param e parsing expression
-   * @param it found item
+   * @param expr parsing expression
+   * @param item found item
    * @return query exception (indicates that an error is raised)
    */
-  public static QueryException numberError(final ParseExpr e, final Item it) {
-    return NONUMBER.get(e.info, e.description(), it.type);
+  public static QueryException numberError(final ParseExpr expr, final Item item) {
+    return NONUMBER.get(expr.info, expr.description(), item.type);
   }
 
   /**
    * Throws an invalid value exception.
    * @param ii input info
-   * @param t expected type
-   * @param v value
+   * @param type expected type
+   * @param value value
    * @return query exception (indicates that an error is raised)
    */
-  public static QueryException valueError(final InputInfo ii, final Type t, final Object v) {
-    return INVALUE.get(ii, t, v);
+  public static QueryException valueError(final InputInfo ii, final Type type, final Object value) {
+    return INVALUE.get(ii, type, value);
   }
 
   /**
@@ -1427,18 +1427,18 @@ public enum Err {
 
   /**
    * Chops the specified object to a maximum size.
-   * @param object object
-   * @param info input info
+   * @param value value
+   * @param ii input info
    * @return exception or null
    * @throws QueryException query exception
    */
-  public static byte[] chop(final Object object, final InputInfo info) throws QueryException {
-    if(info != null && info.check()) return Token.EMPTY;
+  public static byte[] chop(final Object value, final InputInfo ii) throws QueryException {
+    if(ii != null && ii.check()) return Token.EMPTY;
 
     final TokenBuilder tb = new TokenBuilder();
     byte l = 0;
-    final byte[] string = object instanceof byte[] ? (byte[]) object : object instanceof Item ?
-      ((Item) object).string(null) : Token.token(object.toString());
+    final byte[] string = value instanceof byte[] ? (byte[]) value : value instanceof Item ?
+      ((Item) value).string(null) : Token.token(value.toString());
     for(byte b : string) {
       final int ts = tb.size();
       if(ts == MAX) {

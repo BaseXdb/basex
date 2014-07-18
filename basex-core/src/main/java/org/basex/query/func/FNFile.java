@@ -502,7 +502,7 @@ public final class FNFile extends StandardFunc {
 
     try(final PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
       for(Item it; (it = ir.next()) != null;) {
-        if(!it.type.isStringOrUntyped()) throw Err.typeError(this, AtomType.STR, it);
+        if(!it.type.isStringOrUntyped()) throw Err.typeError(this, it, AtomType.STR);
         final byte[] s = it.string(info);
         out.write(cs == null ? s : string(s).getBytes(cs));
         out.write(cs == null ? NL : Prop.NL.getBytes(cs));

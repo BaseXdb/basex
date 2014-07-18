@@ -152,7 +152,7 @@ public final class StaticVar extends StaticDecl {
   private Expr checkType(final Expr e, final InputInfo ii) throws QueryException {
     if(declType != null) {
       if(e instanceof Value) declType.treat((Value) e, ii);
-      else if(e.type().intersect(declType) == null) throw treatError(ii, declType, e);
+      else if(e.type().intersect(declType) == null) throw treatError(ii, e, declType);
     }
     return e;
   }

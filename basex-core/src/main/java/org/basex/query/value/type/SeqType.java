@@ -354,7 +354,7 @@ public final class SeqType {
       if(!error && info != null) info.check(true);
       final Value v = type.cast(it, qc, sc, info);
       if(kind != null) {
-        for(final Item i : v) if(!kind.eq(it)) throw Err.castError(info, type, i);
+        for(final Item i : v) if(!kind.eq(it)) throw Err.castError(info, i, type);
       }
       return v;
     } catch(final QueryException ex) {
@@ -401,7 +401,7 @@ public final class SeqType {
     if(val.type().instanceOf(this)) return;
 
     final int size = (int) val.size();
-    if(!occ.check(size)) throw Err.treatError(ii, this, val);
+    if(!occ.check(size)) throw Err.treatError(ii, val, this);
 
     // empty sequence has all types
     if(size == 0) return;
@@ -411,7 +411,7 @@ public final class SeqType {
     // check heterogeneous sequences
     if(!val.homogeneous())
       for(int i = 1; ins && i < size; i++) ins = instance(val.itemAt(i), true);
-    if(!ins) throw Err.treatError(ii, this, val);
+    if(!ins) throw Err.treatError(ii, val, this);
   }
 
   /**
@@ -433,7 +433,7 @@ public final class SeqType {
       if(atom.type == AtomType.ATM) {
         if(type.nsSensitive()) {
           if(sc.xquery3()) throw NSSENS.get(ii, it.type, type);
-          throw Err.treatError(ii, withOcc(Occ.ONE), it);
+          throw Err.treatError(ii, it, withOcc(Occ.ONE));
         }
         return type.cast(atom, qc, sc, ii);
       }
@@ -449,7 +449,7 @@ public final class SeqType {
       return ((FItem) it).coerceTo((FuncType) type, qc, ii, opt);
     }
 
-    throw Err.treatError(ii, withOcc(Occ.ONE), it);
+    throw Err.treatError(ii, it, withOcc(Occ.ONE));
   }
 
   /**
@@ -466,7 +466,7 @@ public final class SeqType {
       final Value val, final boolean opt) throws QueryException {
 
     final long n = val.size();
-    if(!occ.check(n)) throw Err.treatError(ii, this, val);
+    if(!occ.check(n)) throw Err.treatError(ii, val, this);
     if(n == 0) return Empty.SEQ;
     if(val.isItem())
       return instance((Item) val, true) ? val : promote(qc, sc, ii, (Item) val, opt);

@@ -240,6 +240,6 @@ public final class FNFunc extends StandardFunc {
       final FItem fi = (FItem) it;
       if(fi.arity() == a) return fi;
     }
-    throw Err.typeError(this, FuncType.arity(a), it);
+    throw Err.typeError(this, it, FuncType.arity(a));
   }
 }

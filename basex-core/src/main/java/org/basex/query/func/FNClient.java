@@ -152,7 +152,7 @@ public final class FNClient extends StandardFunc {
     } catch(final BaseXException ex) {
       final Matcher m = QUERYPAT.matcher(ex.getMessage());
       if(m.find()) {
-        final QueryException exc = get(m.group(1), info, m.group(2));
+        final QueryException exc = get(m.group(1), m.group(2), info);
         throw exc == null ? new QueryException(info, new QNm(m.group(1)), m.group(2)) : exc;
       }
       throw BXCL_QUERY.get(info, ex);

@@ -148,8 +148,7 @@ public final class DTDur extends Dur {
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     if(it.type != type) throw diffError(ii, it, this);
     return sec.subtract(((ADateDur) it).sec).signum();
   }

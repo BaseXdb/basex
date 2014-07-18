@@ -50,7 +50,7 @@ public final class FNCrypto extends StandardFunc {
           arg6 = checkItem(exprs[6], qc);
 
           if(arg6 instanceof AStr) arg6Str = true;
-          else if(!(arg6 instanceof ANode)) throw Err.typeError(this, AtomType.STR, arg6);
+          else if(!(arg6 instanceof ANode)) throw Err.typeError(this, arg6, AtomType.STR);
         }
         return new DigitalSignature(ii).generateSignature(
             checkNode(exprs[0].item(qc, ii)), checkStr(exprs[1], qc),

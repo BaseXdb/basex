@@ -942,7 +942,7 @@ public enum AtomType implements Type {
    * @throws QueryException query exception
    */
   final Item invCast(final Item it, final InputInfo ii) throws QueryException {
-    throw castError(ii, this, it);
+    throw castError(ii, it, this);
   }
 
   /**

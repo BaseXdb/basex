@@ -121,7 +121,7 @@ public final class FNDate extends StandardFunc {
   private Dur checkDur(final Item it) throws QueryException {
     if(it instanceof Dur) return (Dur) it;
     if(it.type.isUntyped()) return new Dur(it.string(info), info);
-    throw Err.typeError(this, AtomType.DUR, it);
+    throw Err.typeError(this, it, AtomType.DUR);
   }
 
   /**

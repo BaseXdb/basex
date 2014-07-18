@@ -242,6 +242,6 @@ public final class FNHof extends StandardFunc {
   private FItem withArity(final int p, final int a, final QueryContext qc) throws QueryException {
     final Item f = checkItem(exprs[p], qc);
     if(f instanceof FItem && ((XQFunction) f).arity() == a) return (FItem) f;
-    throw Err.typeError(this, FuncType.arity(a), f);
+    throw Err.typeError(this, f, FuncType.arity(a));
   }
 }
