@@ -26,11 +26,11 @@ public final class Treat extends Single {
    * Constructor.
    * @param info input info
    * @param expr expression
-   * @param type sequence type
+   * @param seqType sequence type
    */
-  public Treat(final InputInfo info, final Expr expr, final SeqType type) {
+  public Treat(final InputInfo info, final Expr expr, final SeqType seqType) {
     super(info, expr);
-    this.type = type;
+    this.seqType = seqType;
   }
 
   @Override
@@ -50,15 +50,20 @@ public final class Treat extends Single {
     final Item it = iter.next();
     // input is empty
     if(it == null) {
-      if(type.mayBeZero()) return Empty.ITER;
-      throw NOTREAT.get(info, description(), Empty.SEQ, type);
+      if(seqType.mayBeZero()) return Empty.ITER;
+      throw NOTREAT.get(info, Empty.SEQ.seqType(), seqType, Empty.SEQ);
     }
     // treat as empty sequence
-    if(type.occ == Occ.ZERO) throw NOTREAT.get(info, description(), it.type, type);
+    if(seqType.occ == Occ.ZERO) throw NOTREAT.get(info, it.type, seqType, it);
 
-    if(type.zeroOrOne()) {
-      if(iter.next() != null) throw NOTREATS.get(info, description(), type);
-      if(!it.type.instanceOf(type.type)) throw NOTREAT.get(info, description(), it.type, type);
+    if(seqType.zeroOrOne()) {
+      final Item n = iter.next();
+      if(n != null) {
+        final ValueBuilder vb = new ValueBuilder(3).add(it).add(n);
+        if(iter.next() != null) vb.add(Str.get(DOTS));
+        throw NOTREAT.get(info, expr.seqType(), seqType, vb.value());
+      }
+      if(!it.type.instanceOf(seqType.type)) throw NOTREAT.get(info, it.type, seqType, it);
       return it.iter();
     }
 
@@ -68,7 +73,7 @@ public final class Treat extends Single {
       @Override
       public Item next() throws QueryException {
         if(i == null) return null;
-        if(!i.type.instanceOf(type.type)) throw NOTREAT.get(info, description(), i.type, type);
+        if(!i.type.instanceOf(seqType.type)) throw NOTREAT.get(info, i.type, seqType, i);
         final Item ii = i;
         i = iter.next();
         return ii;
@@ -83,39 +88,38 @@ public final class Treat extends Single {
     final long len = val.size();
     // input is empty
     if(len == 0) {
-      if(type.mayBeZero()) return val;
-      throw NOTREAT.get(info, description(), Empty.SEQ, type);
+      if(seqType.mayBeZero()) return val;
+      throw NOTREAT.get(info, Empty.SEQ.seqType(), seqType, Empty.SEQ);
     }
     // treat as empty sequence
-    if(type.occ == Occ.ZERO) throw NOTREAT.get(info, description(), val.type, type);
+    if(seqType.occ == Occ.ZERO) throw NOTREAT.get(info, val.type, seqType, val);
 
-    if(type.zeroOrOne()) {
-      if(len > 1) throw NOTREATS.get(info, description(), type);
+    if(seqType.zeroOrOne()) {
+      if(len > 1) throw NOTREAT.get(info, val.seqType(), seqType, val);
       final Item it = val.itemAt(0);
-      if(!it.type.instanceOf(type.type)) throw NOTREAT.get(info, description(), it.type, type);
+      if(!it.type.instanceOf(seqType.type)) throw NOTREAT.get(info, it.type, seqType, it);
       return it;
     }
 
     for(long i = 0; i < len; i++) {
       final Item it = val.itemAt(i);
-      if(!it.type.instanceOf(type.type))
-        throw NOTREAT.get(info, description(), it.type, type);
+      if(!it.type.instanceOf(seqType.type)) throw NOTREAT.get(info, it.type, seqType, it);
     }
     return val;
   }
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Treat(info, expr.copy(qc, scp, vs), type);
+    return new Treat(info, expr.copy(qc, scp, vs), seqType);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(TYP, type), expr);
+    addPlan(plan, planElem(TYP, seqType), expr);
   }
 
   @Override
   public String toString() {
-    return '(' + expr.toString() + ") " + TREAT + ' ' + AS + ' ' + type;
+    return '(' + expr.toString() + ") " + TREAT + ' ' + AS + ' ' + seqType;
   }
 }

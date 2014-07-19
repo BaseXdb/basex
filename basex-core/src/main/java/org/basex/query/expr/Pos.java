@@ -33,7 +33,7 @@ public final class Pos extends Simple {
     super(info);
     this.min = min;
     this.max = max;
-    type = SeqType.BLN;
+    seqType = SeqType.BLN;
   }
 
   /**

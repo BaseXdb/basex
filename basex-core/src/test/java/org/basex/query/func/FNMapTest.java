@@ -29,8 +29,8 @@ public final class FNMapTest extends AdvancedQueryTest {
     query(EXISTS.args(_MAP_ENTRY.args("A", "B")), true);
     query(EXISTS.args(_MAP_ENTRY.args(1, 2)), true);
     query(EXISTS.args(_MAP_NEW.args(_MAP_ENTRY.args(1, 2))), "true");
-    error(EXISTS.args(_MAP_ENTRY.args("()", 2)), Err.INVEMPTY);
-    error(EXISTS.args(_MAP_ENTRY.args("(1,2)", 2)), Err.SEQCAST);
+    error(EXISTS.args(_MAP_ENTRY.args("()", 2)), Err.SEQEMPTY);
+    error(EXISTS.args(_MAP_ENTRY.args("(1,2)", 2)), Err.NOITEM);
   }
 
   /** Test method. */

@@ -17,7 +17,6 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -418,7 +417,7 @@ public final class FNFile extends StandardFunc {
    */
   private StrStream readText(final QueryContext qc) throws QueryException {
     final Path path = checkPath(0, qc);
-    final String enc = encoding(1, FILE_UNKNOWN_ENCODING, qc);
+    final String enc = checkEncoding(1, FILE_UNKNOWN_ENCODING, qc);
     if(!Files.exists(path)) throw FILE_NOT_FOUND.get(info, path);
     if(Files.isDirectory(path)) throw FILE_IS_DIR.get(info, path);
     return new StrStream(new IOFile(path.toFile()), enc, FILE_IO_ERROR, qc);
@@ -475,7 +474,7 @@ public final class FNFile extends StandardFunc {
 
     final Path path = checkParentDir(checkPath(0, qc));
     final byte[] s = checkStr(exprs[1], qc);
-    final String enc = encoding(2, FILE_UNKNOWN_ENCODING, qc);
+    final String enc = checkEncoding(2, FILE_UNKNOWN_ENCODING, qc);
     final Charset cs = enc == null || enc == UTF8 ? null : Charset.forName(enc);
 
     try(final PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
@@ -497,12 +496,12 @@ public final class FNFile extends StandardFunc {
 
     final Path path = checkParentDir(checkPath(0, qc));
     final Iter ir = exprs[1].iter(qc);
-    final String enc = encoding(2, FILE_UNKNOWN_ENCODING, qc);
+    final String enc = checkEncoding(2, FILE_UNKNOWN_ENCODING, qc);
     final Charset cs = enc == null || enc == UTF8 ? null : Charset.forName(enc);
 
     try(final PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
       for(Item it; (it = ir.next()) != null;) {
-        if(!it.type.isStringOrUntyped()) throw Err.typeError(this, it, AtomType.STR);
+        if(!it.type.isStringOrUntyped()) throw castError(info, it, AtomType.STR);
         final byte[] s = it.string(info);
         out.write(cs == null ? s : string(s).getBytes(cs));
         out.write(cs == null ? NL : Prop.NL.getBytes(cs));
@@ -523,7 +522,7 @@ public final class FNFile extends StandardFunc {
       throws QueryException, IOException {
 
     final Path path = checkParentDir(checkPath(0, qc));
-    final Bin bin = checkBinary(exprs[1], qc);
+    final Bin bin = checkBin(exprs[1], qc);
     final long off = exprs.length > 2 ? checkItr(exprs[2], qc) : 0;
 
     // write full file

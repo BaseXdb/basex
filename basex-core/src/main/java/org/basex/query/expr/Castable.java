@@ -20,21 +20,22 @@ import org.basex.util.hash.*;
 public final class Castable extends Single {
   /** Static context. */
   private final StaticContext sc;
-  /** Instance. */
-  private final SeqType seq;
+  /** Sequence type to check for. */
+  private final SeqType type;
 
   /**
    * Constructor.
    * @param sc static context
    * @param info input info
-   * @param e expression
-   * @param seq sequence type
+   * @param expr expression
+   * @param type sequence type to check for
    */
-  public Castable(final StaticContext sc, final InputInfo info, final Expr e, final SeqType seq) {
-    super(info, e);
+  public Castable(final StaticContext sc, final InputInfo info, final Expr expr,
+      final SeqType type) {
+    super(info, expr);
     this.sc = sc;
-    this.seq = seq;
-    type = SeqType.BLN;
+    this.type = type;
+    seqType = SeqType.BLN;
   }
 
   @Override
@@ -51,22 +52,22 @@ public final class Castable extends Single {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Value v = expr.value(qc);
-    return Bln.get(seq.occ.check(v.size()) &&
-        (v.isEmpty() || seq.cast((Item) v, qc, sc, info, false) != null));
+    return Bln.get(type.occ.check(v.size()) &&
+        (v.isEmpty() || type.cast((Item) v, qc, sc, info, false) != null));
   }
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Castable(sc, info, expr.copy(qc, scp, vs), seq);
+    return new Castable(sc, info, expr.copy(qc, scp, vs), type);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(TYP, seq), expr);
+    addPlan(plan, planElem(TYP, type), expr);
   }
 
   @Override
   public String toString() {
-    return expr + " " + CASTABLE + ' ' + AS + ' ' + seq;
+    return expr + " " + CASTABLE + ' ' + AS + ' ' + type;
   }
 }

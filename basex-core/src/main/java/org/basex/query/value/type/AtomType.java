@@ -16,7 +16,7 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * XQuery data types.
+ * XQuery atomic types.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
@@ -385,7 +385,7 @@ public enum AtomType implements Type {
       final BigDecimal v = checkNum(it, ii).dec(ii);
       final BigDecimal i = v.setScale(0, BigDecimal.ROUND_DOWN);
       if(v.signum() < 0 || v.compareTo(Dec.MAXULNG) > 0 ||
-        it.type.isStringOrUntyped() && !v.equals(i)) throw FUNCAST.get(ii, this, chop(it, ii));
+        it.type.isStringOrUntyped() && !v.equals(i)) throw funCastError(ii, this, it);
       return new Dec(i, this);
     }
   },
@@ -676,7 +676,7 @@ public enum AtomType implements Type {
 
       if(!it.type.isStringOrUntyped()) invCast(it, ii);
       final Uri u = Uri.uri(it.string(ii));
-      if(!u.isValid()) throw FUNCAST.get(ii, this, chop(it, ii));
+      if(!u.isValid()) throw funCastError(ii, this, it);
       return u;
     }
     @Override
@@ -695,7 +695,7 @@ public enum AtomType implements Type {
       // xquery 3.0 also allows untyped arguments
       if(it.type != STR && !(sc.xquery3() && it.type.isUntyped())) invCast(it, ii);
       final byte[] nm = trim(it.string(ii));
-      if(!XMLToken.isQName(nm)) throw FUNCAST.get(ii, this, chop(nm, ii));
+      if(!XMLToken.isQName(nm)) throw funCastError(ii, this, nm);
       final QNm qn = new QNm(nm, sc);
       if(!qn.hasURI() && qn.hasPrefix()) throw NSDECL.get(ii, qn.prefix());
       return qn;
@@ -732,58 +732,58 @@ public enum AtomType implements Type {
   /** Name. */
   public final QNm name;
   /** Parent type. */
-  public final AtomType par;
+  public final AtomType parent;
   /** Type id . */
   private final Type.ID id;
 
   /** Number flag. */
-  private final boolean num;
+  private final boolean numeric;
   /** Untyped flag. */
-  private final boolean unt;
+  private final boolean untyped;
   /** String flag. */
-  private final boolean str;
+  private final boolean string;
 
-  /** Sequence type (lazy). */
-  private SeqType seq;
+  /** Sequence type (lazy instantiation). */
+  private SeqType seqType;
 
   /**
    * Constructor.
-   * @param nm string representation
-   * @param pr parent type
-   * @param ur uri
-   * @param n number flag
-   * @param u untyped flag
-   * @param s string flag
-   * @param i type id
+   * @param name string representation
+   * @param parent parent type
+   * @param uri uri
+   * @param numeric numeric flag
+   * @param untyped untyped flag
+   * @param string string flag
+   * @param id type id
    */
-  AtomType(final String nm, final AtomType pr, final byte[] ur, final boolean n, final boolean u,
-      final boolean s, final Type.ID i) {
-    name = new QNm(nm, ur);
-    par = pr;
-    num = n;
-    unt = u;
-    str = s;
-    id = i;
+  AtomType(final String name, final AtomType parent, final byte[] uri, final boolean numeric,
+      final boolean untyped, final boolean string, final Type.ID id) {
+    this.name = new QNm(name, uri);
+    this.parent = parent;
+    this.numeric = numeric;
+    this.untyped = untyped;
+    this.string = string;
+    this.id = id;
   }
 
   @Override
   public final boolean isNumber() {
-    return num;
+    return numeric;
   }
 
   @Override
   public final boolean isUntyped() {
-    return unt;
+    return untyped;
   }
 
   @Override
   public final boolean isNumberOrUntyped() {
-    return num || unt;
+    return numeric || untyped;
   }
 
   @Override
   public final boolean isStringOrUntyped() {
-    return str || unt;
+    return string || untyped;
   }
 
   @Override
@@ -812,8 +812,8 @@ public enum AtomType implements Type {
   @Override
   public final SeqType seqType() {
     // cannot be statically instantiated due to circular dependencies
-    if(seq == null) seq = new SeqType(this);
-    return seq;
+    if(seqType == null) seqType = new SeqType(this);
+    return seqType;
   }
 
   @Override
@@ -823,7 +823,7 @@ public enum AtomType implements Type {
 
   @Override
   public final boolean instanceOf(final Type t) {
-    return this == t || par != null && par.instanceOf(t);
+    return this == t || parent != null && parent.instanceOf(t);
   }
 
   @Override
@@ -833,8 +833,8 @@ public enum AtomType implements Type {
 
     if(t instanceof AtomType) {
       final List<AtomType> arr = new ArrayList<>();
-      for(AtomType at = (AtomType) t; (at = at.par) != null;) arr.add(at);
-      for(AtomType p = this; (p = p.par) != null;)
+      for(AtomType at = (AtomType) t; (at = at.parent) != null;) arr.add(at);
+      for(AtomType p = this; (p = p.parent) != null;)
         if(arr.contains(p)) return p;
     }
     return ITEM;
@@ -897,17 +897,17 @@ public enum AtomType implements Type {
     if(ip == DBL || ip == FLT) {
       final double d = it.dbl(ii);
       if(Double.isNaN(d) || Double.isInfinite(d)) throw valueError(ii, this, it);
-      if(min != max && (d < min || d > max)) throw FUNCAST.get(ii, this, chop(it, ii));
+      if(min != max && (d < min || d > max)) throw funCastError(ii, this, it);
       if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw INTRANGE.get(ii, d);
       return (long) d;
     }
     if(min == max) {
       final double d = it.dbl(ii);
-      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw FUNCAST.get(ii, this, chop(it, ii));
+      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw funCastError(ii, this, it);
     }
 
     final long l = it.itr(ii);
-    if(min != max && (l < min || l > max)) throw FUNCAST.get(ii, this, chop(it, ii));
+    if(min != max && (l < min || l > max)) throw funCastError(ii, this, it);
     return l;
   }
 
@@ -953,7 +953,7 @@ public enum AtomType implements Type {
    * @throws QueryException query exception
    */
   final Item invValue(final Item it, final InputInfo ii) throws QueryException {
-    throw FUNCCASTEX.get(ii, it.type(), this, it);
+    throw FUNCCASTEX.get(ii, it.type, this, it);
   }
 
   @Override
@@ -962,15 +962,15 @@ public enum AtomType implements Type {
   }
 
   /**
-   * Finds and returns the specified data type.
-   * @param type type as string
-   * @param all accept all types (include those without parent type)
+   * Finds and returns the specified type.
+   * @param type type
+   * @param all accept all types (including those without parent type)
    * @return type or {@code null}
    */
   public static AtomType find(final QNm type, final boolean all) {
     if(!Token.eq(type.uri(), BASEXURI)) {
       for(final AtomType t : VALUES) {
-        if(t.name.eq(type) && (all || t.par != null)) return t;
+        if(t.name.eq(type) && (all || t.parent != null)) return t;
       }
     }
     return null;

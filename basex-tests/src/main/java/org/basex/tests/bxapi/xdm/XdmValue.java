@@ -97,16 +97,13 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return value type
    */
   public abstract SeqType getType();
-
-  @Override
-  public abstract String toString();
-
-  // PACKAGE PROTECTED METHODS ================================================
-
   /**
    * Returns the internal value representation.
    * Should be made invisible to other packages.
    * @return value
    */
   public abstract Value internal();
+
+  @Override
+  public abstract String toString();
 }

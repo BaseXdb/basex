@@ -89,7 +89,7 @@ public final class Map extends FItem {
    */
   private Item key(final Item it, final InputInfo ii) throws QueryException {
     // no empty sequence allowed
-    if(it == null) throw INVEMPTY.get(ii, description());
+    if(it == null) throw SEQEMPTY.get(ii);
 
     // function items can't be keys
     if(it instanceof FItem) throw FIATOM.get(ii, it.type);
@@ -163,7 +163,7 @@ public final class Map extends FItem {
    */
   public boolean hasType(final MapType t) {
     return root.hasType(t.keyType == AtomType.AAT ? null : t.keyType,
-        t.ret.eq(SeqType.ITEM_ZM) ? null : t.ret);
+        t.retType.eq(SeqType.ITEM_ZM) ? null : t.retType);
   }
 
   @Override

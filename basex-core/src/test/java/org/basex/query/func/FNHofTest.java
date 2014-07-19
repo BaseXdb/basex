@@ -37,14 +37,14 @@ public final class FNHofTest extends QueryPlanTest {
   public void sortWithTest() {
     query("hof:sort-with((), function($a, $b) { $a < $b })", "");
     query("hof:sort-with(1 to 5, function($a, $b) { $a > $b })", "5 4 3 2 1");
-    error("hof:sort-with(1 to 5, <x/>)", Err.INVCAST);
+    error("hof:sort-with(1 to 5, <x/>)", Err.INVCASTEX);
   }
 
   /** Test method. */
   @Test
   public void foldLeft1Test() {
     query("hof:fold-left1(1 to 10, function($x, $y) { $x + $y })", "55");
-    error("hof:fold-left1((), function($x, $y) { $x + $y })", Err.INVEMPTY);
+    error("hof:fold-left1((), function($x, $y) { $x + $y })", Err.SEQEMPTY);
     // should be unrolled and evaluated at compile time
     check("hof:fold-left1(1 to 9, function($a,$b) {$a+$b})",
         "45",

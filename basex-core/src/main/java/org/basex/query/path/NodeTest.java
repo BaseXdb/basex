@@ -36,16 +36,16 @@ public class NodeTest extends Test {
 
   /**
    * Constructor.
-   * @param nt node type
-   * @param nm optional node name
-   * @param et extended node type
-   * @param st strip flag; only relevant if specified type is {@code xs:untyped}
+   * @param type node type
+   * @param name optional node name
+   * @param ext extended node type
+   * @param strip strip flag; only relevant if specified type is {@code xs:untyped}
    */
-  public NodeTest(final NodeType nt, final QNm nm, final Type et, final boolean st) {
-    type = nt;
-    name = nm;
-    ext = et;
-    strip = st;
+  public NodeTest(final NodeType type, final QNm name, final Type ext, final boolean strip) {
+    this.type = type;
+    this.name = name;
+    this.ext = ext;
+    this.strip = strip;
   }
 
   @Override
@@ -61,15 +61,6 @@ public class NodeTest extends Test {
       (node instanceof DBNode || strip) && ext == AtomType.UTY ||
       type == NodeType.ATT && (ext == AtomType.AST ||
       ext == AtomType.AAT || ext == AtomType.ATM));
-  }
-
-  @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    if(name == null) tb.add('*');
-    else tb.add(name.string());
-    if(ext != null) tb.add(',').addExt(ext);
-    return tb.toString();
   }
 
   @Override
@@ -90,7 +81,15 @@ public class NodeTest extends Test {
     if(other instanceof NameTest) {
       throw Util.notExpected(other);
     }
-
     return null;
+  }
+
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder();
+    if(name == null) tb.add('*');
+    else tb.add(name.string());
+    if(ext != null) tb.add(',').addExt(ext);
+    return tb.toString();
   }
 }

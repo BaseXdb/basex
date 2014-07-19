@@ -149,10 +149,10 @@ public final class FNSeq extends StandardFunc {
     if(func == Function.INDEX_OF || func == Function.INSERT_BEFORE) return this;
 
     // pre-evaluate distinct values
-    final SeqType st = exprs[0].type();
+    final SeqType st = exprs[0].seqType();
     final Type t = st.type;
     if(func == Function.DISTINCT_VALUES && exprs.length == 1) {
-      type = t.isNode() ? SeqType.get(AtomType.ATM, st.occ) : st;
+      seqType = t.isNode() ? SeqType.get(AtomType.ATM, st.occ) : st;
       return cmpDist(qc);
     }
 
@@ -163,7 +163,7 @@ public final class FNSeq extends StandardFunc {
 
     // head will return at most one item
     else if(func == Function.HEAD) o = Occ.ZERO_ONE;
-    type = SeqType.get(t, o);
+    seqType = SeqType.get(t, o);
 
     return this;
   }
@@ -209,7 +209,7 @@ public final class FNSeq extends StandardFunc {
    */
   private Item head(final QueryContext qc) throws QueryException {
     final Expr e = exprs[0];
-    return e.type().zeroOrOne() ? e.item(qc, info) : e.iter(qc).next();
+    return e.seqType().zeroOrOne() ? e.item(qc, info) : e.iter(qc).next();
   }
 
   /**
@@ -220,7 +220,7 @@ public final class FNSeq extends StandardFunc {
    */
   private Iter tail(final QueryContext qc) throws QueryException {
     final Expr e = exprs[0];
-    if(e.type().zeroOrOne()) return Empty.ITER;
+    if(e.seqType().zeroOrOne()) return Empty.ITER;
 
     final Iter ir = e.iter(qc);
     if(ir instanceof ValueIter) {

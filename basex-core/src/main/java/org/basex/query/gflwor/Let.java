@@ -48,7 +48,7 @@ public final class Let extends ForLet {
    */
   static Let fromFor(final For fr) {
     final Let lt = new Let(fr.var, fr.expr, false, fr.info);
-    lt.type = fr.expr.type();
+    lt.seqType = fr.expr.seqType();
     return lt;
   }
 
@@ -85,7 +85,7 @@ public final class Let extends ForLet {
 
   @Override
   public Clause compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    var.refineType(score ? SeqType.DBL : expr.type(), qc, info);
+    var.refineType(score ? SeqType.DBL : expr.seqType(), qc, info);
     return super.compile(qc, scp);
   }
 
@@ -93,17 +93,17 @@ public final class Let extends ForLet {
   public Let optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     if(!score && expr instanceof TypeCheck) {
       final TypeCheck tc = (TypeCheck) expr;
-      if(tc.isRedundant(var) || var.adoptCheck(tc.type, tc.promote)) {
-        qc.compInfo(OPTCAST, tc.type);
+      if(tc.isRedundant(var) || var.adoptCheck(tc.seqType, tc.promote)) {
+        qc.compInfo(OPTCAST, tc.seqType);
         expr = tc.expr;
       }
     }
 
-    type = score ? SeqType.DBL : expr.type();
-    var.refineType(type, qc, info);
+    seqType = score ? SeqType.DBL : expr.seqType();
+    var.refineType(seqType, qc, info);
     if(var.checksType() && expr.isValue()) {
       expr = var.checkType((Value) expr, qc, info, true);
-      var.refineType(expr.type(), qc, info);
+      var.refineType(expr.seqType(), qc, info);
     }
     size = score ? 1 : expr.size();
     var.size = size;

@@ -24,12 +24,12 @@ public final class Context extends Simple {
    */
   public Context(final InputInfo info) {
     super(info);
-    type = SeqType.ITEM_ZM;
+    seqType = SeqType.ITEM_ZM;
   }
 
   @Override
   public Context compile(final QueryContext qc, final VarScope scp) {
-    if(qc.value != null) type = qc.value.type();
+    if(qc.value != null) seqType = qc.value.seqType();
     return this;
   }
 

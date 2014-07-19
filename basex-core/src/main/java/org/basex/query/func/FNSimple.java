@@ -40,7 +40,7 @@ public final class FNSimple extends StandardFunc {
       case ONE_OR_MORE:
         final Iter ir = exprs[0].iter(qc);
         final long len = ir.size();
-        if(len == 0) throw EXPECTOM.get(info);
+        if(len == 0) throw ONEORMORE.get(info);
         if(len > 0) return ir;
         return new Iter() {
           private boolean first = true;
@@ -48,7 +48,7 @@ public final class FNSimple extends StandardFunc {
           public Item next() throws QueryException {
             final Item it = ir.next();
             if(first) {
-              if(it == null) throw EXPECTOM.get(info);
+              if(it == null) throw ONEORMORE.get(info);
               first = false;
             }
             return it;
@@ -66,7 +66,7 @@ public final class FNSimple extends StandardFunc {
     switch(func) {
       case ONE_OR_MORE:
         final Value val = qc.value(exprs[0]);
-        if(val.isEmpty()) throw EXPECTOM.get(info);
+        if(val.isEmpty()) throw ONEORMORE.get(info);
         return val;
       case UNORDERED:
         return qc.value(exprs[0]);
@@ -98,12 +98,12 @@ public final class FNSimple extends StandardFunc {
       case ZERO_OR_ONE:
         Iter ir = e.iter(qc);
         Item it = ir.next();
-        if(it != null && ir.next() != null) throw EXPECTZ0.get(info);
+        if(it != null && ir.next() != null) throw ZEROORONE.get(info);
         return it;
       case EXACTLY_ONE:
         ir = e.iter(qc);
         it = ir.next();
-        if(it == null || ir.next() != null) throw EXPECTO.get(info);
+        if(it == null || ir.next() != null) throw EXACTLYONE.get(info);
         return it;
       default:
         return super.item(qc, ii);
@@ -123,7 +123,7 @@ public final class FNSimple extends StandardFunc {
           Bln.get(func == Function.EMPTY ^ e.size() != 0);
       case BOOLEAN:
         // simplify, e.g.: if(boolean(A)) -> if(A)
-        return e.type().eq(SeqType.BLN) ? e : this;
+        return e.seqType().eq(SeqType.BLN) ? e : this;
       case NOT:
         if(e.isFunction(Function.EMPTY)) {
           // simplify: not(empty(A)) -> exists(A)
@@ -148,14 +148,14 @@ public final class FNSimple extends StandardFunc {
         }
         return this;
       case ZERO_OR_ONE:
-        type = SeqType.get(e.type().type, Occ.ZERO_ONE);
-        return e.type().zeroOrOne() ? e : this;
+        seqType = SeqType.get(e.seqType().type, Occ.ZERO_ONE);
+        return e.seqType().zeroOrOne() ? e : this;
       case EXACTLY_ONE:
-        type = SeqType.get(e.type().type, Occ.ONE);
-        return e.type().one() ? e : this;
+        seqType = SeqType.get(e.seqType().type, Occ.ONE);
+        return e.seqType().one() ? e : this;
       case ONE_OR_MORE:
-        type = SeqType.get(e.type().type, Occ.ONE_MORE);
-        return e.type().mayBeZero() ? this : e;
+        seqType = SeqType.get(e.seqType().type, Occ.ONE_MORE);
+        return e.seqType().mayBeZero() ? this : e;
       case UNORDERED:
         return e;
       default:
@@ -171,10 +171,10 @@ public final class FNSimple extends StandardFunc {
     Expr ex = this;
     if(func == Function.BOOLEAN) {
       // (test)[boolean(A)] -> (test)[A]
-      if(!e.type().mayBeNumber()) ex = e;
+      if(!e.seqType().mayBeNumber()) ex = e;
     } else if(func == Function.EXISTS) {
       // if(exists(node*)) -> if(node*)
-      if(e.type().type.isNode()) ex = e;
+      if(e.seqType().type.isNode()) ex = e;
     }
     if(ex != this) qc.compInfo(QueryText.OPTWRITE, this);
     return ex;

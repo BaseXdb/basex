@@ -71,7 +71,7 @@ public final class FAttr extends FNode {
 
   @Override
   public FNode copy() {
-    return new FAttr(name, value).parent(par);
+    return new FAttr(name, value).parent(parent);
   }
 
   @Override

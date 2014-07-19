@@ -51,7 +51,7 @@ public final class FNInfo extends StandardFunc {
 
   @Override
   protected Expr opt(final QueryContext qc, final VarScope scp) {
-    if(func == TRACE) type = exprs[0].type();
+    if(func == TRACE) seqType = exprs[0].seqType();
     return this;
   }
 
@@ -70,7 +70,7 @@ public final class FNInfo extends StandardFunc {
 
     final Item it = exprs[0].item(qc, info);
     if(it == null) {
-      if(al == 1) throw INVEMPTY.get(info, description());
+      if(al == 1) throw SEQEMPTY.get(info);
     } else {
       name = checkQNm(it, qc, sc);
     }
@@ -180,7 +180,7 @@ public final class FNInfo extends StandardFunc {
   public static FNInfo error(final QueryException ex, final SeqType tp) {
     final FNInfo err = new FNInfo(null, ex.info(), ERROR, ex.qname(),
         Str.get(ex.getLocalizedMessage()));
-    err.type = tp;
+    err.seqType = tp;
     return err;
   }
 }

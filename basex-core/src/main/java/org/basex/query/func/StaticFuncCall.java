@@ -69,7 +69,7 @@ public final class StaticFuncCall extends FuncCall {
     // try to inline the function
     final Expr inl = func.inlineExpr(exprs, qc, scp, info);
     if(inl != null) return inl;
-    type = func.type();
+    seqType = func.seqType();
     return this;
   }
 
@@ -84,7 +84,7 @@ public final class StaticFuncCall extends FuncCall {
     final Expr[] arg = new Expr[exprs.length];
     for(int i = 0; i < arg.length; i++) arg[i] = exprs[i].copy(qc, scp, vs);
     final StaticFuncCall call = new StaticFuncCall(name, arg, sc, func, info);
-    call.type = type;
+    call.seqType = seqType;
     call.size = size;
     return call;
   }

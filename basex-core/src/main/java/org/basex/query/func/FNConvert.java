@@ -219,7 +219,7 @@ public final class FNConvert extends StandardFunc {
   private Int dayTimeToInteger(final QueryContext qc) throws QueryException {
     final DTDur dur = (DTDur) checkType(checkItem(exprs[0], qc), AtomType.DTD);
     final BigDecimal ms = dur.sec.multiply(BigDecimal.valueOf(1000));
-    if(ms.compareTo(ADateDur.BDMAXLONG) > 0) throw INTRANGE.get(info, dur);
+    if(ms.compareTo(ADateDur.BDMAXLONG) > 0) throw INTRANGE.get(info, ms);
     return Int.get(ms.longValue());
   }
 
@@ -230,9 +230,8 @@ public final class FNConvert extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str toString(final QueryContext qc) throws QueryException {
-    final Bin bin = checkBinary(exprs[0], qc);
-    final String enc = encoding(1, BXCO_ENCODING, qc);
-
+    final Bin bin = checkBin(exprs[0], qc);
+    final String enc = checkEncoding(1, BXCO_ENCODING, qc);
     try {
       return Str.get(toString(bin.input(info), enc, qc));
     } catch(final IOException ex) {
@@ -278,12 +277,12 @@ public final class FNConvert extends StandardFunc {
    */
   private byte[] stringToBinary(final QueryContext qc) throws QueryException {
     final byte[] in = checkStr(exprs[0], qc);
-    final String enc = encoding(1, BXCO_ENCODING, qc);
+    final String enc = checkEncoding(1, BXCO_ENCODING, qc);
     if(enc == null || enc == UTF8) return in;
     try {
       return toBinary(in, enc);
     } catch(final CharacterCodingException ex) {
-      throw BXCO_BASE64.get(info);
+      throw BXCO_BASE64.get(info, chop(in, info), enc);
     }
   }
 

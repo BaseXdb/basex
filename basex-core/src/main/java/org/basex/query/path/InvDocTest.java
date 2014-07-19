@@ -22,11 +22,11 @@ final class InvDocTest extends Test {
 
   /**
    * Constructor.
-   * @param n database document nodes
+   * @param nodes database document nodes
    */
-  private InvDocTest(final Nodes n) {
+  private InvDocTest(final Nodes nodes) {
+    this.nodes = nodes;
     type = NodeType.DOC;
-    nodes = n;
   }
 
   /**
@@ -69,12 +69,12 @@ final class InvDocTest extends Test {
   }
 
   @Override
-  public String toString() {
-    return new TokenBuilder(NodeType.DOC.string()).add("(...)").toString();
+  public Test intersect(final Test other) {
+    throw Util.notExpected(this);
   }
 
   @Override
-  public Test intersect(final Test other) {
-    throw Util.notExpected(this);
+  public String toString() {
+    return new TokenBuilder(NodeType.DOC.string()).add("(...)").toString();
   }
 }

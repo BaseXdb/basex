@@ -19,10 +19,10 @@ final class XdmNode extends XdmItem {
 
   /**
    * Constructor.
-   * @param n node
+   * @param node node
    */
-  XdmNode(final ANode n) {
-    node = n;
+  XdmNode(final ANode node) {
+    this.node = node;
   }
 
   @Override
@@ -47,7 +47,12 @@ final class XdmNode extends XdmItem {
 
   @Override
   public SeqType getType() {
-    return node.type();
+    return node.seqType();
+  }
+
+  @Override
+  public ANode internal() {
+    return node;
   }
 
   @Override
@@ -57,12 +62,5 @@ final class XdmNode extends XdmItem {
     } catch(final QueryIOException ex) {
       throw Util.notExpected(ex);
     }
-  }
-
-  // PACKAGE PROTECTED METHODS ================================================
-
-  @Override
-  public ANode internal() {
-    return node;
   }
 }

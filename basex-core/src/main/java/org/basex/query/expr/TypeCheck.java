@@ -1,9 +1,9 @@
 package org.basex.query.expr;
 
 import static org.basex.query.util.Err.*;
+
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -29,14 +29,14 @@ public final class TypeCheck extends Single {
    * @param sc static context
    * @param info input info
    * @param expr expression to be promoted
-   * @param type type to promote to
+   * @param seqType type to promote to
    * @param promote flag for function promotion
    */
   public TypeCheck(final StaticContext sc, final InputInfo info, final Expr expr,
-      final SeqType type, final boolean promote) {
+      final SeqType seqType, final boolean promote) {
     super(info, expr);
     this.sc = sc;
-    this.type = type;
+    this.seqType = seqType;
     this.promote = promote;
   }
 
@@ -48,24 +48,24 @@ public final class TypeCheck extends Single {
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    final SeqType argType = expr.type();
-    if(argType.instanceOf(this.type)) {
-      qc.compInfo(QueryText.OPTCAST, this.type);
+    final SeqType argType = expr.seqType();
+    if(argType.instanceOf(seqType)) {
+      qc.compInfo(QueryText.OPTCAST, seqType);
       return expr;
     }
 
     if(expr.isValue()) {
-      if(expr instanceof FuncItem && this.type.type instanceof FuncType) {
-        if(!this.type.occ.check(1)) throw Err.treatError(info, expr, this.type);
+      if(expr instanceof FuncItem && seqType.type instanceof FuncType) {
+        if(!seqType.occ.check(1)) throw INVTREAT.get(info, expr.seqType(), seqType);
         final FuncItem fit = (FuncItem) expr;
-        return optPre(fit.coerceTo((FuncType) this.type.type, qc, info, true), qc);
+        return optPre(fit.coerceTo((FuncType) seqType.type, qc, info, true), qc);
       }
       return optPre(value(qc), qc);
     }
 
-    if(argType.type.instanceOf(this.type.type) && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {
-      final SeqType.Occ occ = argType.occ.intersect(this.type.occ);
-      if(occ == null) throw INVCAST.get(info, argType, this.type);
+    if(argType.type.instanceOf(seqType.type) && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {
+      final SeqType.Occ occ = argType.occ.intersect(seqType.occ);
+      if(occ == null) throw INVCAST.get(info, argType, seqType);
     }
 
     final Expr opt = expr.typeCheck(this, qc, scp);
@@ -82,26 +82,26 @@ public final class TypeCheck extends Single {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value val = expr.value(qc);
-    if(this.type.instance(val)) return val;
-    if(promote) return this.type.promote(qc, sc, info, val, false);
-    throw INVCAST.get(info, val.type(), this.type);
+    if(seqType.instance(val)) return val;
+    if(promote) return seqType.promote(qc, sc, info, val, false);
+    throw INVCASTEX.get(info, val.seqType(), seqType, val);
   }
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new TypeCheck(sc, info, expr.copy(qc, scp, vs), this.type, promote);
+    return new TypeCheck(sc, info, expr.copy(qc, scp, vs), seqType, promote);
   }
 
   @Override
   public void plan(final FElem plan) {
-    final FElem elem = planElem(QueryText.TYP, this.type);
+    final FElem elem = planElem(QueryText.TYP, seqType);
     if(promote) elem.add(planAttr(QueryText.FUNCTION, Token.TRUE));
     addPlan(plan, elem, expr);
   }
 
   @Override
   public String toString() {
-    return "((: " + this.type + ", " + promote + " :) " + expr + ')';
+    return "((: " + seqType + ", " + promote + " :) " + expr + ')';
   }
 
   /**
@@ -110,7 +110,7 @@ public final class TypeCheck extends Single {
    * @return result of check
    */
   public boolean isRedundant(final Var var) {
-    return (!promote || var.promotes()) && var.declaredType().instanceOf(this.type);
+    return (!promote || var.promotes()) && var.declaredType().instanceOf(seqType);
   }
 
   /**
@@ -122,6 +122,6 @@ public final class TypeCheck extends Single {
    * @throws QueryException query exception
    */
   public Expr check(final Expr e, final QueryContext qc, final VarScope scp) throws QueryException {
-    return new TypeCheck(sc, info, e, this.type, promote).optimize(qc, scp);
+    return new TypeCheck(sc, info, e, seqType, promote).optimize(qc, scp);
   }
 }

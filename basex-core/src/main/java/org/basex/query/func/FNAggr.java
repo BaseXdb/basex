@@ -88,8 +88,8 @@ public final class FNAggr extends StandardFunc {
         break;
       case SUM:
         if(c == 0) return exprs.length == 2 ? exprs[1] : Int.get(0);
-        final Type a = e.type().type, b = exprs.length == 2 ? exprs[1].type().type : a;
-        if(a.isNumberOrUntyped() && b.isNumberOrUntyped()) type = Calc.type(a, b).seqType();
+        final Type a = e.seqType().type, b = exprs.length == 2 ? exprs[1].seqType().type : a;
+        if(a.isNumberOrUntyped() && b.isNumberOrUntyped()) seqType = Calc.type(a, b).seqType();
         break;
       default:
         break;
@@ -107,19 +107,16 @@ public final class FNAggr extends StandardFunc {
    */
   private Item sum(final Iter iter, final Item it, final boolean avg) throws QueryException {
     Item rs = it.type.isUntyped() ? Dbl.get(it.string(info), info) : it;
-    final boolean n = rs instanceof ANum;
-    final boolean dtd = !n && rs.type == DTD;
-    final boolean ymd = !n && !dtd && rs.type == YMD;
-    if(!n && (!(rs instanceof Dur) || rs.type == DUR)) throw SUMTYPE.get(info, this, rs.type);
+    final boolean num = rs instanceof ANum, dtd = rs.type == DTD, ymd = rs.type == YMD;
+    if(!num && (!(rs instanceof Dur) || rs.type == DUR)) throw SUMTYPE.get(info, rs.type, rs);
 
     int c = 1;
     for(Item i; (i = iter.next()) != null;) {
       if(i.type.isNumberOrUntyped()) {
-        if(!n) throw FUNDUR.get(info, this, i.type);
+        if(!num) throw SUMDUR.get(info, i.type, i);
       } else {
-        if(n) throw FUNNUM.get(info, this, i.type);
-        if(dtd && i.type != DTD || ymd && i.type != YMD)
-          throw FUNCMP.get(info, this, it.type, i.type);
+        if(num) throw SUMNUM.get(info, i.type, i);
+        if(dtd && i.type != DTD || ymd && i.type != YMD) throw SUMDUR.get(info, i.type, i);
       }
       rs = Calc.PLUS.ev(info, rs, i);
       ++c;
@@ -135,9 +132,7 @@ public final class FNAggr extends StandardFunc {
    * @return resulting item
    * @throws QueryException query exception
    */
-  private Item minmax(final Iter iter, final OpV cmp, final QueryContext qc)
-      throws QueryException {
-
+  private Item minmax(final Iter iter, final OpV cmp, final QueryContext qc) throws QueryException {
     final Collation coll = checkColl(exprs.length == 2 ? exprs[1] : null, qc, sc);
 
     Item rs = iter.next();
@@ -149,7 +144,7 @@ public final class FNAggr extends StandardFunc {
     // strings
     if(rs instanceof AStr) {
       for(Item it; (it = iter.next()) != null;) {
-        if(!(it instanceof AStr)) throw FUNCMP.get(info, this, rs.type, it.type);
+        if(!(it instanceof AStr)) throw FUNTYPE.get(info, rs.type, it.type, it);
         if(cmp.eval(rs, it, coll, info)) rs = it;
       }
       return rs;
@@ -157,7 +152,7 @@ public final class FNAggr extends StandardFunc {
     // dates, durations and booleans
     if(rs instanceof ADate || rs instanceof Dur || rs.type == BLN) {
       for(Item it; (it = iter.next()) != null;) {
-        if(rs.type != it.type) throw FUNCMP.get(info, this, rs.type, it.type);
+        if(rs.type != it.type) throw FUNTYPE.get(info, rs.type, it.type, it);
         if(cmp.eval(rs, it, coll, info)) rs = it;
       }
       return rs;
@@ -174,15 +169,16 @@ public final class FNAggr extends StandardFunc {
 
   /**
    * Returns the numeric type with the highest precedence.
-   * @param r result item
-   * @param i new item
+   * @param res result item
+   * @param it new item
    * @return result
    * @throws QueryException query exception
    */
-  private Type numType(final Item r, final Item i) throws QueryException {
-    final Type tr = r.type, ti = i.type;
+  private Type numType(final Item res, final Item it) throws QueryException {
+    final Type ti = it.type;
     if(ti.isUntyped()) return DBL;
-    if(!(i instanceof ANum)) throw FUNCMP.get(info, this, tr, ti);
+    final Type tr = res.type;
+    if(!(it instanceof ANum)) throw FUNTYPE.get(info, tr, ti, it);
 
     if(tr == ti) return tr;
     if(tr == DBL || ti == DBL) return DBL;

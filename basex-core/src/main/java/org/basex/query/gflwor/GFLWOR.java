@@ -218,7 +218,7 @@ public final class GFLWOR extends ParseExpr {
       return Empty.SEQ;
     }
 
-    type = SeqType.get(ret.type().type, size);
+    seqType = SeqType.get(ret.seqType().type, size);
 
     if(clauses.getFirst() instanceof Where) {
       // where A <...> return B  ===>  if(A) then <...> return B else ()
@@ -630,7 +630,7 @@ public final class GFLWOR extends ParseExpr {
           iter.next();
           iter.remove();
         }
-        ret = FNInfo.error(qe, ret.type());
+        ret = FNInfo.error(qe, ret.seqType());
         return true;
       }
     }
@@ -686,7 +686,7 @@ public final class GFLWOR extends ParseExpr {
   @Override
   public Expr typeCheck(final TypeCheck tc, final QueryContext qc, final VarScope scp)
       throws QueryException {
-    if(tc.type.occ != Occ.ZERO_MORE) return null;
+    if(tc.seqType.occ != Occ.ZERO_MORE) return null;
     ret = tc.check(ret, qc, scp);
     return optimize(qc, scp);
   }

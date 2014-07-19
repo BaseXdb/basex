@@ -44,7 +44,7 @@ public abstract class Expr extends ExprInfo {
   public abstract void checkUp() throws QueryException;
 
   /**
-   * Compiles and optimizes the expression, assigns data types and cardinalities.
+   * Compiles and optimizes the expression, assigns types and cardinalities.
    * This method will be initially called by {@link QueryContext#compile}.
    * @param qc query context
    * @param scp variable scope
@@ -67,8 +67,8 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns an iterator on the resulting items.
-   * If this method is not overwritten, {@link #item} must be implemented
-   * by an expression, as it may be called by this method.
+   * If this method is not overwritten, {@link #item} must be implemented by an expression,
+   * as it may be called by this method.
    * @param qc query context
    * @return resulting item
    * @throws QueryException query exception
@@ -76,17 +76,16 @@ public abstract class Expr extends ExprInfo {
   public abstract Iter iter(final QueryContext qc) throws QueryException;
 
   /**
-   * Evaluates the expression and returns the resulting item or
-   * a {@code null} reference, if the expression yields an empty sequence.
-   * If this method is not overwritten, {@link #iter} must be implemented
-   * by an expression, as it may be called by this method.
+   * Evaluates the expression and returns the resulting item,
+   * or a {@code null} reference if the expression yields an empty sequence.
+   * If this method is not overwritten, {@link #iter} must be implemented by an expression,
+   * as it may be called by this method.
    * @param qc query context
    * @param ii input info
    * @return iterator
    * @throws QueryException query exception
    */
-  public abstract Item item(final QueryContext qc, final InputInfo ii)
-      throws QueryException;
+  public abstract Item item(final QueryContext qc, final InputInfo ii) throws QueryException;
 
   /**
    * Evaluates the expression and returns the resulting value.
@@ -279,11 +278,10 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Returns the static type of the evaluated value. For simplicity, some types have been
-   * merged to super types. As an example, many numeric types are treated as integers.
+   * Returns the static type of the resulting value.
    * @return result of check
    */
-  public abstract SeqType type();
+  public abstract SeqType seqType();
 
   /**
    * Indicates if the items returned by this expression are iterable, i.e., if returned nodes are
@@ -293,7 +291,7 @@ public abstract class Expr extends ExprInfo {
    * @return result of check
    */
   public boolean iterable() {
-    return type().zeroOrOne();
+    return seqType().zeroOrOne();
   }
 
   /**

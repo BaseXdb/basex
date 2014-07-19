@@ -26,7 +26,7 @@ public final class CTxt extends CNode {
    */
   public CTxt(final StaticContext sc, final InputInfo info, final Expr text) {
     super(sc, info, text);
-    type = SeqType.TXT_ZO;
+    seqType = SeqType.TXT_ZO;
   }
 
   @Override

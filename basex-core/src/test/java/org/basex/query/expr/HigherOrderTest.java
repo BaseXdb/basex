@@ -85,7 +85,7 @@ public final class HigherOrderTest extends AdvancedQueryTest {
   /**  Test for empty-sequence() as function item. */
   @Test
   public void emptyFunTest() {
-    error("()()", Err.INVEMPTY);
+    error("()()", Err.SEQEMPTY);
   }
 
   /**  Tests the creation of a cast function as function item. */

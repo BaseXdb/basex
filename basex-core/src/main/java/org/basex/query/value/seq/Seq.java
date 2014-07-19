@@ -74,7 +74,7 @@ public abstract class Seq extends Value {
 
   @Override
   public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw SEQCAST.get(ii, this);
+    throw NOITEM.get(ii, this);
   }
 
   @Override
@@ -144,7 +144,7 @@ public abstract class Seq extends Value {
       sb.append(i == 0 ? "" : SEP);
       final Item it = itemAt(i);
       sb.append(error ? it.toErrorString() : it.toString());
-      if(sb.length() <= 24 || i + 1 == size) continue;
+      if(sb.length() <= 16 || i + 1 == size) continue;
       // output is chopped to prevent too long error strings
       sb.append(SEP + DOTS);
       break;

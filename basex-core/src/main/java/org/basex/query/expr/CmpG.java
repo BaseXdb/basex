@@ -86,12 +86,12 @@ public final class CmpG extends Cmp {
 
     /**
      * Constructor.
-     * @param n string representation
-     * @param c comparator
+     * @param name string representation
+     * @param op comparator
      */
-    OpG(final String n, final OpV c) {
-      name = n;
-      op = c;
+    OpG(final String name, final OpV op) {
+      this.name = name;
+      this.op = op;
     }
 
     /**
@@ -127,7 +127,7 @@ public final class CmpG extends Cmp {
       final InputInfo info) {
     super(info, expr1, expr2, coll);
     this.op = op;
-    type = SeqType.BLN;
+    seqType = SeqType.BLN;
   }
 
   @Override
@@ -164,7 +164,7 @@ public final class CmpG extends Cmp {
         e = Pos.get(op.op, e2, e, info);
       }
       if(e != this) qc.compInfo(OPTWRITE, this);
-    } else if(e1.type().eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE ||
+    } else if(e1.seqType().eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE ||
         op == OpG.NE && e2 == Bln.TRUE)) {
       // (A = false()) -> not(A)
       e = Function.NOT.get(null, info, e1);
@@ -178,7 +178,7 @@ public final class CmpG extends Cmp {
     if(e != this) return e;
 
     // check if both arguments will always yield one result
-    atomic = e1.type().zeroOrOne() && e2.type().zeroOrOne();
+    atomic = e1.seqType().zeroOrOne() && e2.seqType().zeroOrOne();
     if(atomic) qc.compInfo(OPTATOMIC, this);
     return this;
   }
@@ -189,7 +189,7 @@ public final class CmpG extends Cmp {
     // checking one direction is sufficient, as operators may have been swapped
     return (op == OpG.EQ && exprs[1] == Bln.TRUE ||
             op == OpG.NE && exprs[1] == Bln.FALSE) &&
-      exprs[0].type().eq(SeqType.BLN) ? exprs[0] : this;
+      exprs[0].seqType().eq(SeqType.BLN) ? exprs[0] : this;
   }
 
   @Override
@@ -258,19 +258,19 @@ public final class CmpG extends Cmp {
 
   /**
    * Compares a single item.
-   * @param a first item to be compared
-   * @param b second item to be compared
+   * @param it1 first item to be compared
+   * @param it2 second item to be compared
    * @param cl collation
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean eval(final Item a, final Item b, final Collation cl) throws QueryException {
-    final Type ta = a.type, tb = b.type;
-    if(!(a instanceof FItem || b instanceof FItem) &&
-        (ta == tb || ta.isUntyped() || tb.isUntyped() ||
-        a instanceof ANum && b instanceof ANum ||
-        a instanceof AStr && b instanceof AStr)) return op.op.eval(a, b, cl, info);
-    throw Err.INVTYPECMP.get(info, ta, tb);
+  private boolean eval(final Item it1, final Item it2, final Collation cl) throws QueryException {
+    final Type t1 = it1.type, t2 = it2.type;
+    if(!(it1 instanceof FItem || it2 instanceof FItem) &&
+        (t1 == t2 || t1.isUntyped() || t2.isUntyped() ||
+        it1 instanceof ANum && it2 instanceof ANum ||
+        it1 instanceof AStr && it2 instanceof AStr)) return op.op.eval(it1, it2, cl, info);
+    throw Err.diffError(info, it1, it2);
   }
 
   @Override
@@ -290,7 +290,7 @@ public final class CmpG extends Cmp {
   boolean union(final CmpG g, final QueryContext qc, final VarScope scp) throws QueryException {
     if(op != g.op || !exprs[0].sameAs(g.exprs[0])) return false;
     exprs[1] = new List(info, exprs[1], g.exprs[1]).compile(qc, scp);
-    atomic = atomic && exprs[1].type().zeroOrOne();
+    atomic = atomic && exprs[1].seqType().zeroOrOne();
     return true;
   }
 
@@ -313,7 +313,7 @@ public final class CmpG extends Cmp {
          //*[text() = .]
          //*[text() = (if(random:double() < .5) then 'X' else 'Y')]
        */
-      if(!arg.type().type.isStringOrUntyped() || arg.has(Flag.CTX) || arg.has(Flag.NDT) ||
+      if(!arg.seqType().type.isStringOrUntyped() || arg.has(Flag.CTX) || arg.has(Flag.NDT) ||
           arg.has(Flag.UPD)) return false;
 
       // estimate costs (tend to worst case)
@@ -354,8 +354,7 @@ public final class CmpG extends Cmp {
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Expr a = exprs[0].copy(qc, scp, vs), b = exprs[1].copy(qc, scp, vs);
-    return new CmpG(a, b, op, coll, info);
+    return new CmpG(exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs), op, coll, info);
   }
 
   @Override

@@ -240,7 +240,7 @@ public final class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private ValueBuilder extractText(final QueryContext qc) throws QueryException {
-    final String enc = encoding(2, ARCH_ENCODING, qc);
+    final String enc = checkEncoding(2, ARCH_ENCODING, qc);
     final ValueBuilder vb = new ValueBuilder();
     for(final byte[] b : extract(qc)) vb.add(Str.get(encode(b, enc, qc)));
     return vb;
@@ -503,6 +503,6 @@ public final class FNArchive extends StandardFunc {
    */
   private Item checkElmStr(final Item it) throws QueryException {
     if(it instanceof AStr || TEST.eq(it)) return it;
-    throw ELMSTRTYPE.get(info, Q_ENTRY.string(), it.type);
+    throw ELMSTRTYPE.get(info, Q_ENTRY.prefixId(XML), it.type, it);
   }
 }

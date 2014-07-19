@@ -52,7 +52,7 @@ public abstract class StandardFunc extends Arr {
     super(info, args);
     this.sc = sc;
     this.func = func;
-    this.type = func.ret;
+    this.seqType = func.ret;
   }
 
   @Override
@@ -139,7 +139,7 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final boolean isVacuous() {
-    return !has(Flag.UPD) && type.eq(SeqType.EMP);
+    return !has(Flag.UPD) && seqType.eq(SeqType.EMP);
   }
 
   @Override
@@ -197,22 +197,8 @@ public abstract class StandardFunc extends Arr {
    * @return input source, or exception
    * @throws QueryException query exception
    */
-  IO checkPath(final Expr path, final QueryContext qc) throws QueryException {
+  protected IO checkPath(final Expr path, final QueryContext qc) throws QueryException {
     return QueryResources.checkPath(new QueryInput(string(checkStr(path, qc))), sc.baseIO(), info);
-  }
-
-  /**
-   * Checks if one of the specified arguments point to databases that need to be locked.
-   * @param visitor visitor
-   * @param dbs database arguments
-   * @return result of check
-   */
-  protected final boolean dataLock(final ASTVisitor visitor, final int dbs) {
-    boolean more = true;
-    for(int db = 0; db < dbs; db++) {
-      more &= visitor.lock(exprs[db] instanceof Str ? string(((Str) exprs[db]).string()) : null);
-    }
-    return more;
   }
 
   /**
@@ -223,7 +209,7 @@ public abstract class StandardFunc extends Arr {
    * @return text entry
    * @throws QueryException query exception
    */
-  protected final String encoding(final int i, final Err err, final QueryContext qc)
+  protected final String checkEncoding(final int i, final Err err, final QueryContext qc)
       throws QueryException {
 
     if(i >= exprs.length) return null;
@@ -261,8 +247,22 @@ public abstract class StandardFunc extends Arr {
    */
   protected final long dateTimeToMs(final Expr e, final QueryContext qc) throws QueryException {
     final Dtm dtm = (Dtm) checkType(checkItem(e, qc), AtomType.DTM);
-    if(dtm.yea() > 292278993) throw INTRANGE.get(info, dtm);
+    if(dtm.yea() > 292278993) throw INTRANGE.get(info, dtm.yea());
     return dtm.toJava().toGregorianCalendar().getTimeInMillis();
+  }
+
+  /**
+   * Checks if one of the specified arguments point to databases that need to be locked.
+   * @param visitor visitor
+   * @param dbs database arguments
+   * @return result of check
+   */
+  protected final boolean dataLock(final ASTVisitor visitor, final int dbs) {
+    boolean more = true;
+    for(int db = 0; db < dbs; db++) {
+      more &= visitor.lock(exprs[db] instanceof Str ? string(((Str) exprs[db]).string()) : null);
+    }
+    return more;
   }
 
   /**

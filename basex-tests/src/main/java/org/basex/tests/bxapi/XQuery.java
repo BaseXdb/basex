@@ -33,10 +33,10 @@ public final class XQuery implements Iterable<XdmItem> {
   /**
    * Constructor.
    * @param query query
-   * @param ctx database context
+   * @param context database context
    */
-  public XQuery(final String query, final Context ctx) {
-    qp = new QueryProcessor(query, ctx);
+  public XQuery(final String query, final Context context) {
+    qp = new QueryProcessor(query, context);
   }
 
   /**
@@ -291,12 +291,12 @@ public final class XQuery implements Iterable<XdmItem> {
   /**
    * Returns the string representation of a query result.
    * @param query query string
-   * @param val optional context
-   * @param ctx database context
+   * @param value optional context
+   * @param context database context
    * @return optional expected test suite result
    */
-  public static String string(final String query, final XdmValue val, final Context ctx) {
-    final XdmValue xv = new XQuery(query, ctx).context(val).value();
+  public static String string(final String query, final XdmValue value, final Context context) {
+    final XdmValue xv = new XQuery(query, context).context(value).value();
     return xv.size() == 0 ? "" : xv.getString();
   }
 

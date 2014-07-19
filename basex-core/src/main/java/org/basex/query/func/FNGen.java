@@ -82,8 +82,8 @@ public final class FNGen extends StandardFunc {
   @Override
   protected Expr opt(final QueryContext qc, final VarScope scp) {
     if(func == DATA && exprs.length == 1) {
-      final SeqType t = exprs[0].type();
-      type = t.type.isNode() ? SeqType.get(AtomType.ATM, t.occ) : t;
+      final SeqType t = exprs[0].seqType();
+      seqType = t.type.isNode() ? SeqType.get(AtomType.ATM, t.occ) : t;
     }
     return this;
   }
@@ -217,7 +217,7 @@ public final class FNGen extends StandardFunc {
 
     String enc = null;
     try {
-      enc = encoding(1, WHICHENC, qc);
+      enc = checkEncoding(1, WHICHENC, qc);
 
       final String p = string(path);
       if(p.indexOf('#') != -1) throw FRAGID.get(info, p);
@@ -296,10 +296,10 @@ public final class FNGen extends StandardFunc {
    * @throws QueryException query exception
    */
   private ANode parseXml(final QueryContext qc, final boolean frag) throws QueryException {
-    final Item item = exprs[0].item(qc, info);
-    if(item == null) return null;
+    final Item it = exprs[0].item(qc, info);
+    if(it == null) return null;
     try {
-      final IO io = new IOContent(checkStr(item), string(sc.baseURI().string()));
+      final IO io = new IOContent(checkStr(it), string(sc.baseURI().string()));
       return parseXml(io, qc.context, frag);
     } catch(final IOException ex) {
       throw SAXERR.get(info, ex);

@@ -129,18 +129,6 @@ public final class Dec extends ANum {
   }
 
   /**
-   * Converts the given double into a decimal value.
-   * @param value value to be converted
-   * @param ii input info
-   * @return double value
-   * @throws QueryException query exception
-   */
-  public static BigDecimal parse(final double value, final InputInfo ii) throws QueryException {
-    if(Double.isNaN(value) || Double.isInfinite(value)) throw valueError(ii, AtomType.DEC, value);
-    return BigDecimal.valueOf(value);
-  }
-
-  /**
    * Converts the given token into a decimal value.
    * @param value value to be converted
    * @param ii input info
@@ -153,6 +141,6 @@ public final class Dec extends ANum {
         return new BigDecimal(Token.string(value).trim());
     } catch(final NumberFormatException ignored) { }
 
-    throw FUNCAST.get(ii, AtomType.DEC, chop(value, ii));
+    throw funCastError(ii, AtomType.DEC, value);
   }
 }

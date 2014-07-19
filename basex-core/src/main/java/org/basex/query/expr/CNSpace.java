@@ -28,7 +28,7 @@ public final class CNSpace extends CName {
    */
   public CNSpace(final StaticContext sc, final InputInfo info, final Expr name, final Expr value) {
     super(NSPACE, sc, info, name, value);
-    type = SeqType.NSP;
+    seqType = SeqType.NSP;
   }
 
   @Override

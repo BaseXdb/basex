@@ -444,7 +444,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryBindEmptySequence() throws IOException {
-    Query query = session.query("declare variable $a external; $a");
+    final Query query = session.query("declare variable $a external; $a");
     query.bind("a", "()", "empty-sequence()");
     assertNull(query.next());
     query.close();

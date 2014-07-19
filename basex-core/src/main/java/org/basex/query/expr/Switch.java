@@ -74,9 +74,9 @@ public final class Switch extends ParseExpr {
     if(ex != this) return optPre(ex, qc);
 
     // expression could not be pre-evaluated
-    type = cases[0].exprs[0].type();
+    seqType = cases[0].exprs[0].seqType();
     for(int c = 1; c < cases.length; c++) {
-      type = type.union(cases[c].exprs[0].type());
+      seqType = seqType.union(cases[c].exprs[0].seqType());
     }
     return ex;
   }

@@ -61,7 +61,7 @@ public final class YMDur extends Dur {
 
     this(value);
     if(Double.isNaN(factor)) throw DATECALC.get(ii, description(), factor);
-    if(mult ? Double.isInfinite(factor) : factor == 0) throw DATEZERO.get(ii, type);
+    if(mult ? Double.isInfinite(factor) : factor == 0) throw DATEZERO.get(ii, type, factor);
     final double d = mult ? mon * factor : mon / factor;
     if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw MONTHRANGE.get(ii, d);
     mon = StrictMath.round(d);

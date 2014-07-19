@@ -78,7 +78,7 @@ public final class PlainDoc extends Inspect {
     final FElem variable = elem("variable", parent);
     variable.add("name", sv.name.string());
     if(sv.name.uri().length != 0) variable.add("uri", sv.name.uri());
-    type(sv.type(), variable);
+    type(sv.seqType(), variable);
     comment(sv, variable);
     annotation(sv.ann, variable, true);
     return variable;
@@ -104,7 +104,7 @@ public final class PlainDoc extends Inspect {
     }
 
     final TokenObjMap<TokenList> doc = sf != null ? sf.doc() : null;
-    final int al = ftype.args.length;
+    final int al = ftype.argTypes.length;
     QNm[] names = null;
     if(sf != null) {
       names = new QNm[al];
@@ -122,7 +122,7 @@ public final class PlainDoc extends Inspect {
         final byte[] pdoc = doc(doc, name);
         if(pdoc != null) add(pdoc, qc.context, argument);
       }
-      type(ftype.args[a], argument);
+      type(ftype.argTypes[a], argument);
     }
 
     annotation(ann, function, true);
@@ -138,7 +138,7 @@ public final class PlainDoc extends Inspect {
       }
     }
 
-    final SeqType rt = sf != null ? sf.type() : ftype.ret;
+    final SeqType rt = sf != null ? sf.seqType() : ftype.retType;
     final FElem ret = type(rt, elem("return", function));
     final TokenList returns = doc != null ? doc.get(DOC_RETURN) : null;
     if(returns != null) for(final byte[] val : returns) add(val, qc.context, ret);

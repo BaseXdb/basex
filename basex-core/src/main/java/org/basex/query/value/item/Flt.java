@@ -72,7 +72,9 @@ public final class Flt extends ANum {
 
   @Override
   public BigDecimal dec(final InputInfo ii) throws QueryException {
-    return Dec.parse(value, ii);
+    if(Float.isNaN(value) || Float.isInfinite(value))
+      throw valueError(ii, AtomType.DEC, Dbl.get(value));
+    return BigDecimal.valueOf(value);
   }
 
   @Override
@@ -111,7 +113,7 @@ public final class Flt extends ANum {
       final byte[] v = Token.trim(value);
       if(Token.eq(v, Token.INF)) return Float.POSITIVE_INFINITY;
       if(Token.eq(v, Token.NINF)) return Float.NEGATIVE_INFINITY;
-      throw FUNCAST.get(ii, ZERO.type, chop(value, ii));
+      throw funCastError(ii, AtomType.FLT, value);
     }
   }
 }

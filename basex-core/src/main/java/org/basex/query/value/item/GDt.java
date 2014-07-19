@@ -38,7 +38,7 @@ public final class GDt extends ADate {
   /**
    * Constructor.
    * @param date date
-   * @param type data type
+   * @param type item type
    */
   public GDt(final ADate date, final Type type) {
     super(type, date);
@@ -53,7 +53,7 @@ public final class GDt extends ADate {
   /**
    * Constructor.
    * @param date date
-   * @param type data type
+   * @param type item type
    * @param ii input info
    * @throws QueryException query exception
    */

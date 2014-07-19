@@ -36,7 +36,7 @@ public final class FNMath extends StandardFunc {
     if(exprs.length > 0 && func != _MATH_CRC32) {
       final Item it = exprs[0].item(qc, info);
       if(it == null) return null;
-      d = checkDbl(it, qc);
+      d = checkDbl(it);
     }
 
     switch(func) {

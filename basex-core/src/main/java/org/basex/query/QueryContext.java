@@ -299,8 +299,8 @@ public final class QueryContext extends Proc {
 
     // if specified, convert context item to specified type
     // [LW] should not be necessary
-    if(value != null && root.sc.initType != null) {
-      value = root.sc.initType.promote(this, root.sc, null, value, true);
+    if(value != null && root.sc.contextType != null) {
+      value = root.sc.contextType.promote(this, root.sc, null, value, true);
     }
 
     // dynamic compilation
@@ -439,7 +439,7 @@ public final class QueryContext extends Proc {
    * Binds a value to the context item, using the same rules as for
    * {@link #bind(String, Object, String) binding variables}.
    * @param val value to be bound
-   * @param type data type (may be {@code null})
+   * @param type type (may be {@code null})
    * @param sc static context
    * @throws QueryException query exception
    */
@@ -460,15 +460,15 @@ public final class QueryContext extends Proc {
   /**
    * Binds a value to a global variable. The specified type is interpreted as follows:
    * <ul>
-   * <li>If {@code "json"} is specified, the value is converted according to the rules
-   *     specified in {@link JsonMapConverter}.</li>
-   * <li>Otherwise, the type is cast to the specified XDM data type.</li>
+   *   <li>If {@code "json"} is specified, the value is converted according to the rules
+   *       specified in {@link JsonMapConverter}.</li>
+   *   <li>Otherwise, the type is cast to the specified XDM type.</li>
    * </ul>
    * If the value is an XQuery {@link Value}, it is directly assigned.
    * Otherwise, it is cast to the XQuery data model, using a Java/XQuery mapping.
    * @param name name of variable
    * @param val value to be bound
-   * @param type data type (may be {@code null})
+   * @param type type (may be {@code null})
    * @throws QueryException query exception
    */
   public void bind(final String name, final Object val, final String type) throws QueryException {
@@ -659,7 +659,7 @@ public final class QueryContext extends Proc {
    * Casts a value to the specified type.
    * See {@link #bind(String, Object, String)} for more infos.
    * @param val value to be cast
-   * @param type data type (may be {@code null})
+   * @param type type (may be {@code null})
    * @return cast value
    * @throws QueryException query exception
    */

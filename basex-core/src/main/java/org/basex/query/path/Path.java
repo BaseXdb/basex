@@ -181,13 +181,13 @@ public abstract class Path extends ParseExpr {
     // set atomic type for single attribute steps to speed up predicate tests
     if(root == null && steps.length == 1 && steps[0] instanceof Step) {
       final Step curr = (Step) steps[0];
-      if(curr.axis == ATTR && curr.test.kind == Kind.URI_NAME) curr.type = SeqType.NOD_ZO;
+      if(curr.axis == ATTR && curr.test.kind == Kind.URI_NAME) curr.seqType = SeqType.NOD_ZO;
     }
 
     // choose best path implementation and set type information
     final Path path = get(info, root, steps);
     path.size = path.size(qc);
-    path.type = SeqType.get(steps[steps.length - 1].type().type, size);
+    path.seqType = SeqType.get(steps[steps.length - 1].seqType().type, size);
     return path;
   }
 

@@ -26,7 +26,7 @@ public final class Var extends ExprInfo {
   public final QNm name;
   /** Variable ID. */
   public final int id;
-  /** Declared type, {@code null} if not specified. */
+  /** Declared sequence type, {@code null} if not specified. */
   public SeqType declType;
 
   /** Stack slot number. */
@@ -37,7 +37,7 @@ public final class Var extends ExprInfo {
   /** Flag for function parameters. */
   private final boolean param;
   /** Actual return type (by type inference). */
-  private SeqType inType;
+  private SeqType seqType;
   /** Flag for function conversion. */
   private boolean promote;
 
@@ -46,19 +46,19 @@ public final class Var extends ExprInfo {
    * @param qc query context, used for generating a variable ID
    * @param sc static context
    * @param name variable name, {@code null} for unnamed variable
-   * @param type expected type, {@code null} for no check
+   * @param declType declared sequence type, {@code null} for no check
    * @param param function parameter flag
    */
-  Var(final QueryContext qc, final StaticContext sc, final QNm name, final SeqType type,
+  Var(final QueryContext qc, final StaticContext sc, final QNm name, final SeqType declType,
       final boolean param) {
     this.sc = sc;
     this.name = name;
     this.param = param;
     this.promote = param;
-    declType = type == null || type.eq(SeqType.ITEM_ZM) ? null : type;
-    inType = SeqType.ITEM_ZM;
+    this.declType = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
+    seqType = SeqType.ITEM_ZM;
     id = qc.varIDs++;
-    size = inType.occ();
+    size = seqType.occ();
   }
 
   /**
@@ -70,22 +70,22 @@ public final class Var extends ExprInfo {
   Var(final QueryContext qc, final StaticContext sc, final Var var) {
     this(qc, sc, var.name, var.declType, var.param);
     promote = var.promote;
-    inType = var.inType;
+    seqType = var.seqType;
     size = var.size;
   }
 
   /**
-   * Type of values bound to this variable.
-   * @return type (not {@code null})
+   * Sequence type of values bound to this variable.
+   * @return sequence type (not {@code null})
    */
-  public SeqType type() {
-    final SeqType intersect = declType != null ? declType.intersect(inType) : null;
-    return intersect != null ? intersect : declType != null ? declType : inType;
+  public SeqType seqType() {
+    final SeqType intersect = declType != null ? declType.intersect(seqType) : null;
+    return intersect != null ? intersect : declType != null ? declType : seqType;
   }
 
   /**
    * Declared type of this variable.
-   * @return declared type, possibly {@code null}
+   * @return declared type (not {@code null})
    */
   public SeqType declaredType() {
     return declType == null ? SeqType.ITEM_ZM : declType;
@@ -94,30 +94,30 @@ public final class Var extends ExprInfo {
   /**
    * Tries to refine the compile-time type of this variable through the type of the bound
    * expression.
-   * @param t type of the bound expression
+   * @param st sequence type of the bound expression
    * @param qc query context
    * @param ii input info
    * @throws QueryException query exception
    */
-  public void refineType(final SeqType t, final QueryContext qc, final InputInfo ii)
+  public void refineType(final SeqType st, final QueryContext qc, final InputInfo ii)
       throws QueryException {
 
-    if(t == null) return;
+    if(st == null) return;
 
     if(declType != null) {
-      if(declType.occ.intersect(t.occ) == null) throw INVCAST.get(ii, t, declType);
-      if(t.instanceOf(declType)) {
+      if(declType.occ.intersect(st.occ) == null) throw INVCAST.get(ii, st, declType);
+      if(st.instanceOf(declType)) {
         qc.compInfo(QueryText.OPTCAST, this);
         declType = null;
-      } else if(!t.promotable(declType)) {
+      } else if(!st.promotable(declType)) {
         return;
       }
     }
 
-    if(!inType.eq(t) && !inType.instanceOf(t)) {
+    if(!seqType.eq(st) && !seqType.instanceOf(st)) {
       // the new type provides new information
-      final SeqType is = inType.intersect(t);
-      if(is != null) inType = is;
+      final SeqType is = seqType.intersect(st);
+      if(is != null) seqType = is;
     }
   }
 
@@ -157,7 +157,7 @@ public final class Var extends ExprInfo {
 
     if(!checksType() || declType.instance(val)) return val;
     if(promote) return declType.promote(qc, sc, ii, val, opt);
-    throw INVCAST.get(ii, val.type(), declType);
+    throw INVCAST.get(ii, val.seqType(), declType);
   }
 
   /**
@@ -174,7 +174,7 @@ public final class Var extends ExprInfo {
    * @throws QueryException query exception
    */
   public void checkType(final Expr expr, final InputInfo info) throws QueryException {
-    final SeqType et = expr.type(), vt = type();
+    final SeqType et = expr.seqType(), vt = seqType();
     if(!checksType() || vt.type.instanceOf(et.type) ||
         et.type.instanceOf(vt.type) && et.occ.instanceOf(vt.occ)) return;
 
@@ -202,14 +202,6 @@ public final class Var extends ExprInfo {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem e = planElem(QueryText.NAM, '$' + Token.string(name.string()),
-        QueryText.ID, Token.token(id));
-    if(declType != null) e.add(planAttr(QueryText.AS, declType.toString()));
-    addPlan(plan, e);
-  }
-
-  @Override
   public boolean equals(final Object obj) {
     return obj instanceof Var && is((Var) obj);
   }
@@ -221,18 +213,26 @@ public final class Var extends ExprInfo {
 
   /**
    * Tries to adopt the given type check.
-   * @param type type to check
+   * @param st type to check
    * @param prom if function conversion should be applied
    * @return {@code true} if the check could be adopted, {@code false} otherwise
    */
-  public boolean adoptCheck(final SeqType type, final boolean prom) {
-    if(declType == null || type.instanceOf(declType)) {
-      declType = type;
-    } else if(!declType.instanceOf(type)) {
+  public boolean adoptCheck(final SeqType st, final boolean prom) {
+    if(declType == null || st.instanceOf(declType)) {
+      declType = st;
+    } else if(!declType.instanceOf(st)) {
       return false;
     }
     promote |= prom;
     return true;
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    final FElem e = planElem(QueryText.NAM, '$' + Token.string(name.string()),
+        QueryText.ID, Token.token(id));
+    if(declType != null) e.add(planAttr(QueryText.AS, declType.toString()));
+    addPlan(plan, e);
   }
 
   @Override

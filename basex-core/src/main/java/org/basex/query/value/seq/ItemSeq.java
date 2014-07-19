@@ -47,11 +47,11 @@ public final class ItemSeq extends Seq {
   @Override
   public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
     if(items[0] instanceof ANode) return items[0];
-    throw CONDTYPE.get(ii, this);
+    throw EBV.get(ii, this);
   }
 
   @Override
-  public SeqType type() {
+  public SeqType seqType() {
     if(ret == null) {
       Type t = items[0].type;
       for(int s = 1; s < size; s++) {

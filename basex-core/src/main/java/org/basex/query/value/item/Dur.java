@@ -42,7 +42,7 @@ public class Dur extends ADateDur {
 
   /**
    * Constructor.
-   * @param type data type
+   * @param type item type
    */
   Dur(final Type type) {
     super(type);
@@ -59,7 +59,7 @@ public class Dur extends ADateDur {
   /**
    * Constructor.
    * @param dur duration
-   * @param type data type
+   * @param type item type
    */
   private Dur(final Dur dur, final Type type) {
     this(type);
@@ -70,7 +70,7 @@ public class Dur extends ADateDur {
   /**
    * Constructor.
    * @param value value
-   * @param type data type
+   * @param type item type
    * @param ii input info
    * @throws QueryException query exception
    */

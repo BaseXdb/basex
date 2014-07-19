@@ -72,7 +72,7 @@ public abstract class ADate extends ADateDur {
 
   /**
    * Constructor.
-   * @param type data type
+   * @param type item type
    * @param date date reference
    */
   ADate(final Type type, final ADate date) {
@@ -88,7 +88,7 @@ public abstract class ADate extends ADateDur {
 
   /**
    * Constructor.
-   * @param type data type
+   * @param type item type
    */
   ADate(final Type type) {
     super(type);

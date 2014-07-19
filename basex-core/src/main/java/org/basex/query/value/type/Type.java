@@ -6,7 +6,7 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * XQuery data types.
+ * XQuery item types.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
@@ -141,7 +141,7 @@ public interface Type {
   }
 
   /**
-   * Casts the specified item to the XQuery data type.
+   * Casts the specified item to this type.
    * @param it item to be converted
    * @param qc query context
    * @param sc static context
@@ -153,7 +153,7 @@ public interface Type {
       throws QueryException;
 
   /**
-   * Casts the specified Java object to the XQuery data type.
+   * Casts the specified Java object to this type.
    * @param o Java object
    * @param ctx query context
    * @param sc static context
@@ -165,7 +165,7 @@ public interface Type {
       throws QueryException;
 
   /**
-   * Casts the specified string to the XQuery data type.
+   * Casts the specified string to this type.
    * @param s string object
    * @param ctx query context
    * @param sc static context
@@ -177,7 +177,7 @@ public interface Type {
       throws QueryException;
 
   /**
-   * Returns the sequence type of this data type.
+   * Returns the sequence type of items with this type.
    * @return sequence type
    */
   SeqType seqType();
@@ -186,34 +186,34 @@ public interface Type {
 
   /**
    * Checks if this type is equal to the given one.
-   * @param t other type
+   * @param type other type
    * @return {@code true} if both types are equal, {@code false} otherwise
    */
-  boolean eq(final Type t);
+  boolean eq(final Type type);
 
   /**
    * Checks if the current type is an instance of the specified type.
-   * @param t type to be checked
+   * @param type type to be checked
    * @return result of check
    */
-  boolean instanceOf(final Type t);
+  boolean instanceOf(final Type type);
 
   /**
    * Computes the union between this type and the given one, i.e. the least common
    * ancestor of both types in the type hierarchy.
-   * @param t other type
+   * @param type other type
    * @return union type
    */
-  Type union(final Type t);
+  Type union(final Type type);
 
   /**
    * Computes the intersection between this type and the given one, i.e. the least
    * specific type that is sub-type of both types. If no such type exists, {@code null} is
    * returned.
-   * @param t other type
+   * @param type other type
    * @return intersection type or {@code null}
    */
-  Type intersect(final Type t);
+  Type intersect(final Type type);
 
   /**
    * Checks if the type refers to a node.
@@ -258,12 +258,12 @@ public interface Type {
    */
   ID id();
 
-  @Override
-  String toString();
-
   /**
    * Checks if the type is namespace-sensitive.
    * @return result of check
    */
   boolean nsSensitive();
+
+  @Override
+  String toString();
 }

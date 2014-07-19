@@ -17,19 +17,19 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class Instance extends Single {
-  /** Sequence type. */
-  private final SeqType seq;
+  /** Sequence type to check for. */
+  private final SeqType type;
 
   /**
    * Constructor.
    * @param info input info
    * @param expr expression
-   * @param seq sequence type
+   * @param type sequence type to check for
    */
-  public Instance(final InputInfo info, final Expr expr, final SeqType seq) {
+  public Instance(final InputInfo info, final Expr expr, final SeqType type) {
     super(info, expr);
-    this.seq = seq;
-    type = SeqType.BLN;
+    this.type = type;
+    seqType = SeqType.BLN;
   }
 
   @Override
@@ -40,21 +40,21 @@ public final class Instance extends Single {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(seq.instance(qc.value(expr)));
+    return Bln.get(type.instance(qc.value(expr)));
   }
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Instance(info, expr.copy(qc, scp, vs), seq);
+    return new Instance(info, expr.copy(qc, scp, vs), type);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(TYP, seq), expr);
+    addPlan(plan, planElem(TYP, type), expr);
   }
 
   @Override
   public String toString() {
-    return Util.info("% instance of %", expr, seq);
+    return Util.info("% instance of %", expr, type);
   }
 }

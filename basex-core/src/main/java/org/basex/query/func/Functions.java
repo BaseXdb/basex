@@ -67,13 +67,13 @@ public final class Functions extends TokenSet {
     // no constructor function found, or abstract type specified
     if(type != null && type != AtomType.NOT && type != AtomType.AAT) {
       if(arity == 1) return type;
-      throw FUNCTYPEPL.get(ii, name.string(), arity, 1);
+      throw FUNCTYPES.get(ii, name.string(), arity, "s", 1);
     }
 
     // include similar function name in error message
     final Levenshtein ls = new Levenshtein();
     for(final AtomType t : AtomType.VALUES) {
-      if(t.par == null) continue;
+      if(t.parent == null) continue;
       final byte[] u = t.name.uri();
       if(eq(u, XSURI) && t != AtomType.NOT && t != AtomType.AAT && ls.similar(
           lc(ln), lc(t.string()))) throw FUNCSIMILAR.get(ii, name.string(), t.string());
@@ -99,7 +99,7 @@ public final class Functions extends TokenSet {
     if(!eq(fl.uri(), name.uri())) return null;
     // check number of arguments
     if(arity >= fl.min && arity <= fl.max) return fl;
-    throw (arity == 1 ? FUNCARGSG : FUNCARGPL).get(ii, fl, arity);
+    throw FUNCARGS.get(ii, fl, arity, arity == 1 ? "" : "s");
   }
 
   /**
@@ -130,13 +130,13 @@ public final class Functions extends TokenSet {
   public static Expr getLiteral(final QNm name, final int arity, final QueryContext qc,
       final StaticContext sc, final InputInfo ii) throws QueryException {
 
-    // parse data type constructors
+    // parse type constructors
     if(eq(name.uri(), XSURI)) {
       final Type type = getCast(name, arity, ii);
       final VarScope scp = new VarScope(sc);
       final Var[] args = { scp.newLocal(qc, new QNm(QueryText.ITEMM, ""), SeqType.AAT_ZO, true) };
       final Expr e = new Cast(sc, ii, new VarRef(ii, args[0]), type.seqType());
-      final FuncType tp = FuncType.get(e.type(), SeqType.AAT_ZO);
+      final FuncType tp = FuncType.get(e.seqType(), SeqType.AAT_ZO);
       return new FuncItem(sc, new Ann(), name, args, tp, e, scp.stackSize());
     }
 
@@ -151,7 +151,7 @@ public final class Functions extends TokenSet {
       final Var[] args = new Var[arity];
       final Expr[] calls = new Expr[arity];
       for(int i = 0; i < arity; i++) {
-        args[i] = scp.newLocal(qc, argNames[i], ft.args[i], true);
+        args[i] = scp.newLocal(qc, argNames[i], ft.argTypes[i], true);
         calls[i] = new VarRef(ii, args[i]);
       }
 
@@ -206,10 +206,11 @@ public final class Functions extends TokenSet {
     final VarScope scp = new VarScope(sc);
     final int arity = sf.args.length;
     final Var[] args = new Var[arity];
-    final Expr[] calls = new Expr[args.length];
-    for(int i = 0; i < args.length; i++) {
-      args[i] = scp.newLocal(qc, sf.argName(i), ft.args[i], true);
-      calls[i] = new VarRef(info, args[i]);
+    final int al = args.length;
+    final Expr[] calls = new Expr[al];
+    for(int a = 0; a < al; a++) {
+      args[a] = scp.newLocal(qc, sf.argName(a), ft.argTypes[a], true);
+      calls[a] = new VarRef(info, args[a]);
     }
     final TypedFunc tf = qc.funcs.getFuncRef(sf.name, calls, sc, info);
     return new FuncItem(sc, tf.ann, sf.name, args, ft, tf.fun, scp.stackSize());
@@ -231,7 +232,7 @@ public final class Functions extends TokenSet {
       final QueryContext qc, final StaticContext sc, final InputInfo ii) throws QueryException {
 
     // get namespace and local name
-    // parse data type constructors
+    // parse type constructors
     if(eq(name.uri(), XSURI)) {
       final Type type = getCast(name, args.length, ii);
       final SeqType to = SeqType.get(type, Occ.ZERO_ONE);

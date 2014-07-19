@@ -18,10 +18,10 @@ final class XdmAtomic extends XdmItem {
 
   /**
    * Constructor.
-   * @param it item
+   * @param item item
    */
-  XdmAtomic(final Item it) {
-    item = it;
+  XdmAtomic(final Item item) {
+    this.item = item;
   }
 
   @Override
@@ -44,18 +44,16 @@ final class XdmAtomic extends XdmItem {
 
   @Override
   public SeqType getType() {
-    return item.type();
+    return item.seqType();
+  }
+
+  @Override
+  public Item internal() {
+    return item;
   }
 
   @Override
   public String toString() {
     return item.toString();
-  }
-
-  // PACKAGE PROTECTED METHODS ================================================
-
-  @Override
-  public Item internal() {
-    return item;
   }
 }

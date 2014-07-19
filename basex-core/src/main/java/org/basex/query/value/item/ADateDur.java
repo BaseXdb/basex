@@ -53,7 +53,7 @@ public abstract class ADateDur extends Item {
 
   /**
    * Constructor.
-   * @param type data type
+   * @param type item type
    */
   ADateDur(final Type type) {
     super(type);

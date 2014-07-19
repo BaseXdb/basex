@@ -72,8 +72,8 @@ public final class FuncItem extends FItem implements Scope {
    * @param stackSize stack-frame size
    */
   public FuncItem(final StaticContext sc, final Ann ann, final QNm name, final Var[] params,
-      final FuncType type, final Expr expr, final Value ctxValue,
-      final long pos, final long size, final int stackSize) {
+      final FuncType type, final Expr expr, final Value ctxValue, final long pos, final long size,
+      final int stackSize) {
 
     super(type, ann);
     this.name = name;
@@ -81,7 +81,6 @@ public final class FuncItem extends FItem implements Scope {
     this.expr = expr;
     this.stackSize = stackSize;
     this.sc = sc;
-
     this.ctxVal = ctxValue;
     this.pos = pos;
     this.size = size;
@@ -154,7 +153,7 @@ public final class FuncItem extends FItem implements Scope {
   public FItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean opt) throws QueryException {
 
-    if(params.length != ft.args.length) throw Err.castError(ii, this, ft);
+    if(params.length != ft.argTypes.length) throw Err.castError(ii, this, ft);
     final FuncType tp = funcType();
     if(tp.instanceOf(ft)) return this;
 
@@ -162,25 +161,20 @@ public final class FuncItem extends FItem implements Scope {
     final Var[] vs = new Var[params.length];
     final Expr[] refs = new Expr[vs.length];
     for(int i = vs.length; i-- > 0;) {
-      vs[i] = vsc.newLocal(qc, params[i].name, ft.args[i], true);
+      vs[i] = vsc.newLocal(qc, params[i].name, ft.argTypes[i], true);
       refs[i] = new VarRef(ii, vs[i]);
     }
 
     final Expr e = new DynFuncCall(ii, sc, false, this, refs);
     final Expr optimized = opt ? e.optimize(qc, vsc) : e, checked;
-    if(ft.ret == null || tp.ret != null && tp.ret.instanceOf(ft.ret)) {
+    if(ft.retType == null || tp.retType != null && tp.retType.instanceOf(ft.retType)) {
       checked = optimized;
     } else {
-      final TypeCheck tc = new TypeCheck(sc, ii, optimized, ft.ret, true);
+      final TypeCheck tc = new TypeCheck(sc, ii, optimized, ft.retType, true);
       checked = opt ? tc.optimize(qc, vsc) : tc;
     }
     checked.markTailCalls(null);
     return new FuncItem(sc, ann, name, vs, ft, checked, vsc.stackSize());
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(TYPE, type), params, expr);
   }
 
   @Override
@@ -207,15 +201,6 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public Object toJava() {
     throw Util.notExpected();
-  }
-
-  @Override
-  public String toString() {
-    final FuncType ft = (FuncType) type;
-    final TokenBuilder tb = new TokenBuilder(FUNCTION).add('(');
-    for(final Var v : params) tb.addExt(v).add(v == params[params.length - 1] ? "" : ", ");
-    tb.add(')').add(ft.ret != null ? " as " + ft.ret : "").add(" { ").addExt(expr).add(" }");
-    return tb.toString();
   }
 
   @Override
@@ -252,5 +237,19 @@ public final class FuncItem extends FItem implements Scope {
       }
     });
     return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(qc, scp);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(TYPE, type), params, expr);
+  }
+
+  @Override
+  public String toString() {
+    final FuncType ft = (FuncType) type;
+    final TokenBuilder tb = new TokenBuilder(FUNCTION).add('(');
+    for(final Var v : params) tb.addExt(v).add(v == params[params.length - 1] ? "" : ", ");
+    tb.add(')').add(ft.retType != null ? " as " + ft.retType : "");
+    return tb.add(" { ").addExt(expr).add(" }").toString();
   }
 }

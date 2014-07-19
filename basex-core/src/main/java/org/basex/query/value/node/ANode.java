@@ -33,11 +33,11 @@ public abstract class ANode extends Item {
   /** Cached string value. */
   byte[] value;
   /** Parent node. */
-  ANode par;
+  ANode parent;
 
   /**
    * Constructor.
-   * @param type data type
+   * @param type item type
    */
   ANode(final NodeType type) {
     super(type);

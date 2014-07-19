@@ -16,7 +16,7 @@ import org.basex.util.*;
 public abstract class FNode extends ANode {
   /**
    * Constructor.
-   * @param type data type
+   * @param type item type
    */
   FNode(final NodeType type) {
     super(type);
@@ -54,7 +54,7 @@ public abstract class FNode extends ANode {
 
   @Override
   public final ANode parent() {
-    return par;
+    return parent;
   }
 
   @Override
@@ -97,7 +97,7 @@ public abstract class FNode extends ANode {
 
   @Override
   public final FNode parent(final ANode p) {
-    par = p;
+    parent = p;
     return this;
   }
 
@@ -195,7 +195,7 @@ public abstract class FNode extends ANode {
 
       @Override
       public ANode next() {
-        return (more ^= true) ? par : null;
+        return (more ^= true) ? parent : null;
       }
     };
   }

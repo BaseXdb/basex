@@ -276,7 +276,7 @@ public final class FNValidate extends StandardFunc {
       }
       return io;
     }
-    throw STRNODTYPE.get(info, this, it.type);
+    throw STRNODTYPE.get(info, it.type, it);
   }
 
   /** Schema error handler. */

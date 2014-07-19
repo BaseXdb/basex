@@ -27,7 +27,7 @@ public final class Range extends Arr {
    */
   public Range(final InputInfo info, final Expr expr1, final Expr expr2) {
     super(info, expr1, expr2);
-    type = SeqType.ITR_ZM;
+    seqType = SeqType.ITR_ZM;
   }
 
   @Override
@@ -71,11 +71,11 @@ public final class Range extends Arr {
    * @throws QueryException query exception
    */
   private long[] rng(final QueryContext qc) throws QueryException {
-    final Item a = exprs[0].item(qc, info);
-    if(a == null) return null;
-    final Item b = exprs[1].item(qc, info);
-    if(b == null) return null;
-    return new long[] { checkItr(a), checkItr(b) };
+    final Item it1 = exprs[0].item(qc, info);
+    if(it1 == null) return null;
+    final Item it2 = exprs[1].item(qc, info);
+    if(it2 == null) return null;
+    return new long[] { checkItr(it1), checkItr(it2) };
   }
 
   @Override

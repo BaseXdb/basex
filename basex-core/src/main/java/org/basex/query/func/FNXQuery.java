@@ -194,7 +194,7 @@ public final class FNXQuery extends StandardFunc {
    * @return the argument expression
    */
   private Expr type(final QueryContext qc) {
-    FNInfo.dump(Util.inf("{ type: %, size: %, exprSize: % }", exprs[0].type(), exprs[0].size(),
+    FNInfo.dump(Util.inf("{ type: %, size: %, exprSize: % }", exprs[0].seqType(), exprs[0].size(),
         exprs[0].exprSize()), token(exprs[0].toString()), qc);
     return exprs[0];
   }

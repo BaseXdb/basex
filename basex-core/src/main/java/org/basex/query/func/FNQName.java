@@ -84,11 +84,8 @@ public final class FNQName extends StandardFunc {
    */
   private Item qName(final Item it, final Item it2) throws QueryException {
     final byte[] uri = checkEStr(it);
-    if(it2 == null) throw INVEMPTYEX.get(info, description(), AtomType.STR);
-
-    final byte[] name = checkEStr(it2);
-    final byte[] str = !contains(name, ':') && eq(uri, XMLURI) ?
-        concat(XMLC, name) : name;
+    final byte[] name = checkStr(checkNoEmpty(it2, AtomType.STR));
+    final byte[] str = !contains(name, ':') && eq(uri, XMLURI) ? concat(XMLC, name) : name;
     if(!XMLToken.isQName(str)) throw valueError(info, AtomType.QNM, Str.get(name));
     final QNm nm = new QNm(str, uri);
     if(nm.hasPrefix() && uri.length == 0)

@@ -41,7 +41,7 @@ public final class Extension extends Single {
     try {
       for(final Pragma p : pragmas) p.init(qc, info);
       expr = expr.compile(qc, scp);
-      type = expr.type();
+      seqType = expr.seqType();
       size = expr.size();
     } finally {
       for(final Pragma p : pragmas) p.finish(qc);

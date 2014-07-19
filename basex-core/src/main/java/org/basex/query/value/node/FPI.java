@@ -64,7 +64,7 @@ public final class FPI extends FNode {
 
   @Override
   public FNode copy() {
-    return new FPI(name, value).parent(par);
+    return new FPI(name, value).parent(parent);
   }
 
   @Override

@@ -29,15 +29,10 @@ public final class Union extends Set {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
-  }
-
-  @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    final int es = exprs.length;
-    final ExprList el = new ExprList(es);
+    super.optimize(qc, scp);
+
+    final ExprList el = new ExprList(exprs.length);
     for(final Expr ex : exprs) {
       if(ex.isEmpty()) {
         // remove empty operands
@@ -51,7 +46,7 @@ public final class Union extends Set {
     // ensure that results are always sorted
     if(el.size() == 1 && iterable) return el.get(0);
     // replace expressions with optimized list
-    if(el.size() != es) exprs = el.finish();
+    exprs = el.finish();
     return this;
   }
 

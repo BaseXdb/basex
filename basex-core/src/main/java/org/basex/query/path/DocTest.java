@@ -16,11 +16,11 @@ public final class DocTest extends Test {
 
   /**
    * Constructor.
-   * @param t child test (may be {@code null})
+   * @param test child test (may be {@code null})
    */
-  public DocTest(final Test t) {
+  public DocTest(final Test test) {
+    this.test = test;
     type = NodeType.DOC;
-    test = t;
   }
 
   @Override
@@ -33,13 +33,6 @@ public final class DocTest extends Test {
     if(node.type != NodeType.DOC) return false;
     final AxisMoreIter ai = node.children();
     return ai.more() && test.eq(ai.next()) && !ai.more();
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder().append(type).append('(');
-    if(test != null) sb.append(test);
-    return sb.append(')').toString();
   }
 
   @Override
@@ -58,5 +51,12 @@ public final class DocTest extends Test {
     if(other instanceof KindTest) return NodeType.DOC.instanceOf(other.type) ? this : null;
     if(other instanceof InvDocTest) return this;
     return null;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder().append(type).append('(');
+    if(test != null) sb.append(test);
+    return sb.append(')').toString();
   }
 }

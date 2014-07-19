@@ -25,13 +25,8 @@ public final class InterSect extends Set {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
-  }
-
-  @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.optimize(qc, scp);
     return oneIsEmpty() ? optPre(null, qc) : this;
   }
 
@@ -42,7 +37,8 @@ public final class InterSect extends Set {
     for(Item it; (it = iter[0].next()) != null;) nc.add(checkNode(it));
     final boolean db = nc.dbnodes();
 
-    for(int e = 1; e != exprs.length && nc.size() != 0; ++e) {
+    final int el = exprs.length;
+    for(int e = 1; e < el && nc.size() != 0; ++e) {
       final NodeSeqBuilder nt = new NodeSeqBuilder().check();
       final Iter ir = iter[e];
       for(Item it; (it = ir.next()) != null;) {

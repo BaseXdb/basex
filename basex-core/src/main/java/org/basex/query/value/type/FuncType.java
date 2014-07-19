@@ -12,7 +12,7 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
- * XQuery 3.0 function data types.
+ * XQuery 3.0 function types.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
@@ -24,23 +24,23 @@ public class FuncType implements Type {
   /** Annotations. */
   private final Ann ann;
   /** Argument types. */
-  public final SeqType[] args;
+  public final SeqType[] argTypes;
   /** Return type. */
-  public final SeqType ret;
+  public final SeqType retType;
 
-  /** This function type's sequence type. */
-  private SeqType seq;
+  /** This function type's sequence type (lazy instantiation). */
+  private SeqType seqType;
 
   /**
    * Constructor.
    * @param ann annotations
-   * @param args argument types
-   * @param ret return type
+   * @param argTypes argument types
+   * @param retType return type
    */
-  FuncType(final Ann ann, final SeqType[] args, final SeqType ret) {
+  FuncType(final Ann ann, final SeqType[] argTypes, final SeqType retType) {
     this.ann = ann != null ? ann : new Ann();
-    this.args = args;
-    this.ret = ret;
+    this.argTypes = argTypes;
+    this.retType = retType;
   }
 
   @Override
@@ -70,8 +70,8 @@ public class FuncType implements Type {
 
   @Override
   public final SeqType seqType() {
-    if(seq == null) seq = new SeqType(this);
-    return seq;
+    if(seqType == null) seqType = new SeqType(this);
+    return seqType;
   }
 
   @Override
@@ -112,9 +112,9 @@ public class FuncType implements Type {
       if(!ann.contains(ft.ann.names[i], ft.ann.values[i])) return false;
     }
 
-    if(this == ANY_FUN || ft == ANY_FUN || args.length != ft.args.length) return false;
-    for(int i = 0; i < args.length; i++) if(!args[i].eq(ft.args[i])) return false;
-    return ret.eq(ft.ret);
+    if(this == ANY_FUN || ft == ANY_FUN || argTypes.length != ft.argTypes.length) return false;
+    for(int i = 0; i < argTypes.length; i++) if(!argTypes[i].eq(ft.argTypes[i])) return false;
+    return retType.eq(ft.retType);
   }
 
   @Override
@@ -130,10 +130,10 @@ public class FuncType implements Type {
 
     // takes care of FunType.ANY
     if(this == ft || ft == ANY_FUN) return true;
-    if(this == ANY_FUN || args.length != ft.args.length ||
-        !ret.instanceOf(ft.ret)) return false;
-    for(int a = 0; a < args.length; a++) {
-      if(!ft.args[a].instanceOf(args[a])) return false;
+    if(this == ANY_FUN || argTypes.length != ft.argTypes.length ||
+        !retType.instanceOf(ft.retType)) return false;
+    for(int a = 0; a < argTypes.length; a++) {
+      if(!ft.argTypes[a].instanceOf(argTypes[a])) return false;
     }
     return true;
   }
@@ -142,13 +142,13 @@ public class FuncType implements Type {
   public Type union(final Type t) {
     if(!(t instanceof FuncType)) return AtomType.ITEM;
     final FuncType ft = (FuncType) t;
-    if(this == ANY_FUN || ft == ANY_FUN || args.length != ft.args.length) return ANY_FUN;
-    final SeqType[] arg = new SeqType[args.length];
+    if(this == ANY_FUN || ft == ANY_FUN || argTypes.length != ft.argTypes.length) return ANY_FUN;
+    final SeqType[] arg = new SeqType[argTypes.length];
     for(int i = 0; i < arg.length; i++) {
-      arg[i] = args[i].intersect(ft.args[i]);
+      arg[i] = argTypes[i].intersect(ft.argTypes[i]);
       if(arg[i] == null) return ANY_FUN;
     }
-    return get(ann.intersect(ft.ann), ret.union(ft.ret), arg);
+    return get(ann.intersect(ft.ann), retType.union(ft.retType), arg);
   }
 
   @Override
@@ -163,10 +163,10 @@ public class FuncType implements Type {
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
       // ANY_FUN is excluded by the easy cases
-      final SeqType rt = ret.intersect(ft.ret);
-      if(rt != null && args.length == ft.args.length) {
-        final SeqType[] arg = new SeqType[args.length];
-        for(int i = 0; i < arg.length; i++) arg[i] = args[i].union(ft.args[i]);
+      final SeqType rt = retType.intersect(ft.retType);
+      if(rt != null && argTypes.length == ft.argTypes.length) {
+        final SeqType[] arg = new SeqType[argTypes.length];
+        for(int i = 0; i < arg.length; i++) arg[i] = argTypes[i].union(ft.argTypes[i]);
         final Ann a = ann.union(ft.ann);
         return a == null ? null : get(a, rt, arg);
       }
@@ -197,7 +197,7 @@ public class FuncType implements Type {
 
   /**
    * Finds and returns the specified function type.
-   * @param type type as string
+   * @param type type
    * @return type or {@code null}
    */
   public static Type find(final QNm type) {
@@ -245,7 +245,7 @@ public class FuncType implements Type {
     if(this == ANY_FUN) {
       tb.add('*').add(')');
     } else {
-      tb.addSep(args, ", ").add(") as ").add(ret.toString());
+      tb.addSep(argTypes, ", ").add(") as ").add(retType.toString());
     }
     return tb.toString();
   }

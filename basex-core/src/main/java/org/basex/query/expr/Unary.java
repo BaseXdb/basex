@@ -40,10 +40,10 @@ public final class Unary extends Single {
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    type = expr.type();
-    if(!type.type.isNumber()) {
+    seqType = expr.seqType();
+    if(!seqType.type.isNumber()) {
       // expression will always yield a number, empty sequence or error
-      type = type.mayBeZero() ? SeqType.ITR_ZO : SeqType.ITR;
+      seqType = seqType.mayBeZero() ? SeqType.ITR_ZO : SeqType.ITR;
     }
     return expr.isValue() ? preEval(qc) : this;
   }

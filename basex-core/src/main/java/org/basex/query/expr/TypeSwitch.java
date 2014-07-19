@@ -66,9 +66,9 @@ public final class TypeSwitch extends ParseExpr {
     if(eq) return optPre(tc.expr, qc);
 
     // combine return types
-    type = cases[0].type();
+    seqType = cases[0].seqType();
     for(int c = 1; c < cases.length; ++c) {
-      type = type.union(cases[c].type());
+      seqType = seqType.union(cases[c].seqType());
     }
     return this;
   }

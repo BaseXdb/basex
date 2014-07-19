@@ -56,11 +56,11 @@ public final class RangeSeq extends Seq {
 
   @Override
   public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw CONDTYPE.get(ii, this);
+    throw EBV.get(ii, this);
   }
 
   @Override
-  public SeqType type() {
+  public SeqType seqType() {
     return SeqType.ITR_OM;
   }
 

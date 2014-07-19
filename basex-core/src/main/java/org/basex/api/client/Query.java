@@ -43,7 +43,7 @@ public abstract class Query {
    * Binds a value with an optional type to an external variable.
    * @param name name of variable
    * @param value value to be bound
-   * @param type data type (may be {@code null})
+   * @param type value type (may be {@code null})
    * @throws IOException I/O exception
    */
   public abstract void bind(final String name, final Object value, final String type)
@@ -61,7 +61,7 @@ public abstract class Query {
   /**
    * Binds a value with an optional type to an external variable.
    * @param value value to be bound
-   * @param type data type (may be {@code null})
+   * @param type value type (may be {@code null})
    * @throws IOException I/O exception
    */
   public abstract void context(final Object value, final String type) throws IOException;
@@ -100,7 +100,7 @@ public abstract class Query {
   }
 
   /**
-   * Returns the current XQuery type (must be called after {@link #next()}.
+   * Returns the XQuery type of the current item (must be called after {@link #next()}.
    * @return item type
    */
   public final Type type() {

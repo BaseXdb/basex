@@ -134,7 +134,7 @@ public final class FElem extends FNode {
     // general stuff
     final String nu = elem.getNamespaceURI();
     this.name = new QNm(elem.getNodeName(), nu == null ? EMPTY : token(nu));
-    this.par = par;
+    this.parent = par;
     this.ns = new Atts();
 
     // attributes and namespaces
@@ -405,7 +405,7 @@ public final class FElem extends FNode {
     if(ns != null) for(int n = 0; n < ns.size(); ++n) as.add(ns.name(n), ns.value(n));
     if(atts != null) for(final ANode n : atts) at.add(n.copy());
     if(children != null) for(final ANode n : children) ch.add(n.copy());
-    node.parent(par);
+    node.parent(parent);
     return node.optimize();
   }
 

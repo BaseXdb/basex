@@ -140,25 +140,26 @@ public enum NodeType implements Type {
 
   /** Cached enums (faster). */
   private static final NodeType[] VALUES = values();
-  /** String representation. */
-  private final byte[] string;
+  /** Name. */
+  private final byte[] name;
   /** Parent type. */
-  private final Type par;
+  private final Type parent;
   /** Type id . */
   private final ID id;
-  /** Sequence type. */
+
+  /** Sequence type (lazy instantiation). */
   private SeqType seq;
 
   /**
    * Constructor.
-   * @param nm string representation
-   * @param pr parent type
-   * @param i type id
+   * @param name name
+   * @param parent parent type
+   * @param id type id
    */
-  NodeType(final String nm, final Type pr, final ID i) {
-    string = Token.token(nm);
-    par = pr;
-    id = i;
+  NodeType(final String name, final Type parent, final ID id) {
+    this.name = Token.token(name);
+    this.parent = parent;
+    this.id = id;
   }
 
   @Override
@@ -218,7 +219,7 @@ public enum NodeType implements Type {
 
   @Override
   public final boolean instanceOf(final Type t) {
-    return this == t || par.instanceOf(t);
+    return this == t || parent.instanceOf(t);
   }
 
   @Override
@@ -239,12 +240,12 @@ public enum NodeType implements Type {
 
   @Override
   public final byte[] string() {
-    return string;
+    return name;
   }
 
   @Override
   public final String toString() {
-    return new TokenBuilder(string).add("()").toString();
+    return new TokenBuilder(name).add("()").toString();
   }
 
   /**
@@ -265,14 +266,14 @@ public enum NodeType implements Type {
 
   /**
    * Finds and returns the specified node type.
-   * @param type type as string
+   * @param type type
    * @return type or {@code null}
    */
   public static NodeType find(final QNm type) {
     if(type.uri().length == 0) {
       final byte[] ln = type.local();
       for(final NodeType t : VALUES) {
-        if(Token.eq(ln, t.string)) return t;
+        if(Token.eq(ln, t.name)) return t;
       }
     }
     return null;

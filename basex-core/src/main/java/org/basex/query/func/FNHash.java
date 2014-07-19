@@ -57,7 +57,7 @@ public final class FNHash extends StandardFunc {
    * @throws QueryException exception
    */
   private B64 hash(final String algo, final QueryContext qc) throws QueryException {
-    return hashBinary(checkStrBin(checkItem(exprs[0], qc)), algo);
+    return hashBinary(checkStrBin(exprs[0], qc), algo);
   }
 
   /**

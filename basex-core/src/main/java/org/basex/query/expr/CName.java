@@ -82,11 +82,12 @@ public abstract class CName extends CNode {
     final Item it = checkItem(name, qc);
     final Type ip = it.type;
     if(ip == AtomType.QNM) return (QNm) it;
+    if(!ip.isStringOrUntyped() || ip == AtomType.URI) throw CPIWRONG.get(info, ip, it);
 
     // create and update namespace
     final byte[] str = it.string(ii);
     if(XMLToken.isQName(str)) return new QNm(str, sc);
-    throw (ip.isStringOrUntyped() ? INVNAME : INVQNAME).get(info, str);
+    throw INVNAME.get(info, str);
   }
 
   @Override
@@ -97,22 +98,6 @@ public abstract class CName extends CNode {
   @Override
   public final boolean has(final Flag flag) {
     return name.has(flag) || super.has(flag);
-  }
-
-  @Override
-  public final void plan(final FElem plan) {
-    addPlan(plan, planElem(), name, exprs);
-  }
-
-  @Override
-  public final String description() {
-    return info(desc);
-  }
-
-  @Override
-  public final String toString() {
-    return toString(desc + (name.type().eq(SeqType.QNM) ? " " + name :
-      " { " + name + " }"));
   }
 
   @Override
@@ -138,7 +123,22 @@ public abstract class CName extends CNode {
   @Override
   public final int exprSize() {
     int sz = 1;
-    for(final Expr e : exprs) sz += e.exprSize();
+    for(final Expr expr : exprs) sz += expr.exprSize();
     return sz + name.exprSize();
+  }
+
+  @Override
+  public final void plan(final FElem plan) {
+    addPlan(plan, planElem(), name, exprs);
+  }
+
+  @Override
+  public final String description() {
+    return info(desc);
+  }
+
+  @Override
+  public final String toString() {
+    return toString(desc + (name.seqType().eq(SeqType.QNM) ? " " + name : " { " + name + " }"));
   }
 }

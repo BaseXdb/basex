@@ -76,7 +76,7 @@ public final class XQDoc extends Inspect {
       if(sv.name.hasPrefix()) nsCache.put(sv.name.prefix(), sv.name.uri());
       comment(sv, variable);
       annotations(sv.ann, variable);
-      type(sv.type(), variable);
+      type(sv.seqType(), variable);
     }
 
     // functions
@@ -96,9 +96,9 @@ public final class XQDoc extends Inspect {
       for(int i = 0; i < al; i++) {
         final Var v = sf.args[i];
         if(i > 0) tb.add(SEP);
-        tb.add(DOLLAR).add(v.name.string()).add(' ').add(AS).add(' ').addExt(t.args[i]);
+        tb.add(DOLLAR).add(v.name.string()).add(' ').add(AS).add(' ').addExt(t.argTypes[i]);
       }
-      tb.add(PAR2).add(' ' + AS + ' ' + t.ret);
+      tb.add(PAR2).add(' ' + AS + ' ' + t.retType);
       if(sf.expr == null) tb.add(" external");
 
       elem("signature", function).add(tb.toString());
@@ -108,10 +108,10 @@ public final class XQDoc extends Inspect {
           final FElem fparameter = elem("parameter", fparameters);
           final Var v = sf.args[a];
           elem("name", fparameter).add(v.name.string());
-          type(t.args[a], fparameter);
+          type(t.argTypes[a], fparameter);
         }
       }
-      type(sf.type(), elem("return", function));
+      type(sf.seqType(), elem("return", function));
     }
 
     // add namespaces

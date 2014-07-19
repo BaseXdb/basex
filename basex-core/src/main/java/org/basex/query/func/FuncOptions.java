@@ -70,7 +70,8 @@ public final class FuncOptions {
     final TokenBuilder tb = new TokenBuilder();
     if(item != null) {
       try {
-        if(!(item instanceof Map || test.eq(item))) throw ELMMAPTYPE.get(info, root, item.type);
+        if(!(item instanceof Map || test.eq(item)))
+          throw ELMMAPTYPE.get(info, root.prefixId(XML), item.type, item);
         options.parse(tb.add(optString(item)).toString());
       } catch(final BaseXException ex) {
         throw error.get(info, ex);
@@ -90,11 +91,10 @@ public final class FuncOptions {
     if(item instanceof Map) {
       final Map map = (Map) item;
       for(final Item it : map.keys()) {
-        if(!(it instanceof AStr))
-          throw FUNCMP.get(info, map.description(), AtomType.STR, it.type);
+        if(!(it instanceof AStr)) throw FUNTYPE.get(info, AtomType.STR, it.type, it);
         tb.add(it.string(info)).add('=');
         final Value val = map.get(it, info);
-        if(!val.isItem()) throw FUNCMP.get(info, map.description(), AtomType.ITEM, val);
+        if(!val.isItem()) throw FUNTYPE.get(info, AtomType.ITEM, val.seqType(), val);
         tb.add(optString((Item) val).replace(",", ",,")).add(',');
       }
     } else if(item.type == NodeType.ELM) {

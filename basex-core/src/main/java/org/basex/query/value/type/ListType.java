@@ -32,16 +32,17 @@ public enum ListType implements Type {
   private final AtomType type;
   /** Name. */
   private final QNm name;
-  /** Sequence type (lazy). */
+
+  /** Sequence type (lazy instantiation). */
   private SeqType seq;
 
   /**
    * Constructor.
+   * @param name name
    * @param type atomic type
-   * @param nm string representation
    */
-  ListType(final String nm, final AtomType type) {
-    name = new QNm(nm, XSURI);
+  ListType(final String name, final AtomType type) {
+    this.name = new QNm(name, XSURI);
     this.type = type;
   }
 
@@ -139,8 +140,8 @@ public enum ListType implements Type {
   }
 
   /**
-   * Finds and returns the specified data type.
-   * @param type type as string
+   * Finds and returns the specified type.
+   * @param type type
    * @return type or {@code null}
    */
   public static ListType find(final QNm type) {

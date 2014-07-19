@@ -28,24 +28,32 @@ public final class CPI extends CName {
    */
   public CPI(final StaticContext sc, final InputInfo info, final Expr name, final Expr value) {
     super(PI, sc, info, name, value);
-    type = SeqType.PI;
+    seqType = SeqType.PI;
   }
 
   @Override
   public FPI item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item it = checkItem(name, qc);
     final Type ip = it.type;
-    if(!ip.isStringOrUntyped() && ip != AtomType.QNM) throw CPIWRONG.get(info, it);
 
-    final byte[] nm = trim(it.string(ii));
-    if(eq(lc(nm), XML)) throw CPIXML.get(info, nm);
-    if(!XMLToken.isNCName(nm)) throw CPIINVAL.get(info, nm);
+    final QNm qnm;
+    if(ip == AtomType.QNM) {
+      qnm = (QNm) it;
+    } else {
+      if(!ip.isStringOrUntyped() || ip == AtomType.URI) throw CPIWRONG.get(info, ip, it);
+
+      final byte[] nm = trim(it.string(ii));
+      if(eq(lc(nm), XML)) throw CPIXML.get(info, nm);
+      if(!XMLToken.isNCName(nm)) throw CPIINVAL.get(info, nm);
+      qnm = new QNm(nm);
+    }
 
     byte[] v = value(qc, ii);
     int i = -1;
-    while(++i != v.length && v[i] >= 0 && v[i] <= ' ');
+    final int vl = v.length;
+    while(++i < vl && v[i] >= 0 && v[i] <= ' ');
     v = substring(v, i);
-    return new FPI(new QNm(nm), FPI.parse(v, info));
+    return new FPI(qnm, FPI.parse(v, info));
   }
 
   @Override

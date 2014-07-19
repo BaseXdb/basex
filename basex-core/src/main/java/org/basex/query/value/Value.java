@@ -32,12 +32,12 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public abstract class Value extends Expr implements Iterable<Item> {
-  /** Data type. */
+  /** Item type. */
   public Type type;
 
   /**
    * Constructor.
-   * @param type data type
+   * @param type item type
    */
   protected Value(final Type type) {
     this.type = type;

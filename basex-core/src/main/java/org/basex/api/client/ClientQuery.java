@@ -83,7 +83,7 @@ public class ClientQuery extends Query {
     }
 
     final ServerCmd cmd = name == null ? ServerCmd.CONTEXT : ServerCmd.BIND;
-    final String n = name == null ? "" : (name + '\0');
+    final String n = name == null ? "" : name + '\0';
     cs.exec(cmd, id + '\0' + n + v + '\0' + t, null);
   }
 

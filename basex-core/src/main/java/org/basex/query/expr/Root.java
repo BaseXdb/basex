@@ -27,7 +27,7 @@ public final class Root extends Simple {
    */
   public Root(final InputInfo info) {
     super(info);
-    type = SeqType.DOC_ZM;
+    seqType = SeqType.DOC_ZM;
   }
 
   @Override

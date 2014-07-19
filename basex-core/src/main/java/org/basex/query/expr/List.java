@@ -50,7 +50,7 @@ public final class List extends Arr {
     boolean ne = false;
     for(final Expr e : exprs) {
       final long c = e.size();
-      ne |= c > 0 || e.type().occ.min == 1;
+      ne |= c > 0 || e.seqType().occ.min == 1;
       if(c == -1) {
         size = -1;
         break;
@@ -92,15 +92,15 @@ public final class List extends Arr {
     }
 
     if(size == 0) {
-      type = SeqType.EMP;
+      seqType = SeqType.EMP;
     } else {
       final Occ o = size == 1 ? Occ.ONE : size < 0 && !ne ? Occ.ZERO_MORE : Occ.ONE_MORE;
-      SeqType t = null;
+      SeqType st = null;
       for(final Expr e : exprs) {
-        final SeqType st = e.type();
-        if(!e.isEmpty() && st.occ != Occ.ZERO) t = t == null ? st : t.union(st);
+        final SeqType et = e.seqType();
+        if(!e.isEmpty() && et.occ != Occ.ZERO) st = st == null ? et : st.union(et);
       }
-      type = SeqType.get(t == null ? AtomType.ITEM : t.type, o);
+      seqType = SeqType.get(st == null ? AtomType.ITEM : st.type, o);
     }
 
     return this;

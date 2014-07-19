@@ -33,7 +33,7 @@ public final class StaticContext {
   /** Default function namespace. */
   public byte[] funcNS = FNURI;
   /** Context item static type. */
-  public SeqType initType;
+  public SeqType contextType;
 
   /** Construction mode. */
   public boolean strip;

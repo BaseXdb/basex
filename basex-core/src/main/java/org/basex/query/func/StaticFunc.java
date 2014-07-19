@@ -41,7 +41,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @param ann annotations
    * @param name function name
    * @param args arguments
-   * @param type type
+   * @param type declared return type
    * @param expr function body
    * @param sc static context
    * @param scope variable scope
@@ -73,14 +73,14 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
         // remove redundant casts
         if((declType.type == AtomType.BLN || declType.type == AtomType.FLT ||
             declType.type == AtomType.DBL || declType.type == AtomType.QNM ||
-            declType.type == AtomType.URI) && declType.eq(expr.type())) {
+            declType.type == AtomType.URI) && declType.eq(expr.seqType())) {
           qc.compInfo(OPTCAST, declType);
         } else {
           expr = new TypeCheck(sc, info, expr, declType, true).optimize(qc, scope);
         }
       }
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, expr.type());
+      expr = FNInfo.error(qe, expr.seqType());
     } finally {
       scope.cleanUp(this);
       qc.value = cv;

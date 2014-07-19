@@ -13,10 +13,10 @@ import org.basex.util.*;
 class KindTest extends Test {
   /**
    * Constructor.
-   * @param t node type
+   * @param type node type
    */
-  KindTest(final NodeType t) {
-    type = t;
+  KindTest(final NodeType type) {
+    this.type = type;
   }
 
   @Override
@@ -27,11 +27,6 @@ class KindTest extends Test {
   @Override
   public boolean eq(final ANode node) {
     return node.type == type;
-  }
-
-  @Override
-  public String toString() {
-    return String.valueOf(type);
   }
 
   @Override
@@ -47,5 +42,10 @@ class KindTest extends Test {
       throw Util.notExpected(other);
     }
     return null;
+  }
+
+  @Override
+  public String toString() {
+    return String.valueOf(type);
   }
 }

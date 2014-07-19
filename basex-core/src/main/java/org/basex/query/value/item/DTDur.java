@@ -80,7 +80,7 @@ public final class DTDur extends Dur {
 
     this(dur);
     if(Double.isNaN(factor)) throw DATECALC.get(ii, description(), factor);
-    if(mult ? Double.isInfinite(factor) : factor == 0) throw DATEZERO.get(ii, type);
+    if(mult ? Double.isInfinite(factor) : factor == 0) throw DATEZERO.get(ii, type, factor);
     if(mult ? factor == 0 : Double.isInfinite(factor)) {
       sec = BigDecimal.ZERO;
     } else {
@@ -149,7 +149,7 @@ public final class DTDur extends Dur {
 
   @Override
   public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
-    if(it.type != type) throw diffError(ii, it, this);
-    return sec.subtract(((ADateDur) it).sec).signum();
+    if(it.type == type) return sec.subtract(((ADateDur) it).sec).signum();
+    throw diffError(ii, it, this);
   }
 }

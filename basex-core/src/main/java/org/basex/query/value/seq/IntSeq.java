@@ -87,7 +87,7 @@ public final class IntSeq extends NativeSeq {
    * Creates a sequence with the items in the specified expressions.
    * @param vals values
    * @param size size of resulting sequence
-   * @param type data type
+   * @param type item type
    * @return value
    * @throws QueryException query exception
    */

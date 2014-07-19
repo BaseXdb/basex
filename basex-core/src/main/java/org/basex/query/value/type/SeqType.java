@@ -230,7 +230,7 @@ public final class SeqType {
   /** Zero or more binaries. */
   public static final SeqType BIN_ZM = new SeqType(AtomType.BIN, Occ.ZERO_MORE);
 
-  /** Sequence type. */
+  /** Item type. */
   public final Type type;
   /** Number of occurrences. */
   public final Occ occ;
@@ -247,7 +247,7 @@ public final class SeqType {
   }
 
   /**
-   * Constructor. This one is called by {@link Type#seqType} to create
+   * Constructor. This one is called by {@link Type#seqType()} to create
    * unique sequence type instances.
    * @param type type
    */
@@ -377,17 +377,14 @@ public final class SeqType {
   public Value cast(final Value val, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) throws QueryException {
 
-    if(val.isEmpty()) {
-      if(occ.check(0)) return Empty.SEQ;
-      throw INVCAST.get(ii, Empty.SEQ.type(), this);
-    }
-    final long s = val.size();
-    if(!occ.check(s)) throw INVCAST.get(ii, val.type(), this);
+    final long vs = val.size();
+    if(!occ.check(vs)) throw INVCASTEX.get(ii, val.seqType(), this, val);
 
+    if(val.isEmpty()) return Empty.SEQ;
     if(val.isItem()) return cast((Item) val, qc, sc, ii, true);
 
-    final ValueBuilder vb = new ValueBuilder((int) s);
-    for(int i = 0; i < s; i++) vb.add(cast(val.itemAt(i), qc, sc, ii, true));
+    final ValueBuilder vb = new ValueBuilder((int) vs);
+    for(int v = 0; v < vs; v++) vb.add(cast(val.itemAt(v), qc, sc, ii, true));
     return vb.value();
   }
 
@@ -398,7 +395,7 @@ public final class SeqType {
    * @throws QueryException query exception
    */
   public void treat(final Value val, final InputInfo ii) throws QueryException {
-    if(val.type().instanceOf(this)) return;
+    if(val.seqType().instanceOf(this)) return;
 
     final int size = (int) val.size();
     if(!occ.check(size)) throw Err.treatError(ii, val, this);
@@ -468,8 +465,7 @@ public final class SeqType {
     final long n = val.size();
     if(!occ.check(n)) throw Err.treatError(ii, val, this);
     if(n == 0) return Empty.SEQ;
-    if(val.isItem())
-      return instance((Item) val, true) ? val : promote(qc, sc, ii, (Item) val, opt);
+    if(val.isItem()) return instance((Item) val, true) ? val : promote(qc, sc, ii, (Item) val, opt);
 
     ValueBuilder vb = null;
     final Item fst = val.itemAt(0);
@@ -608,6 +604,17 @@ public final class SeqType {
       && (t.kind == null || kind != null && kind.intersect(t.kind) != null);
   }
 
+  /**
+   * Returns a string representation of the type.
+   * @return string
+   */
+  public String typeString() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append(occ == Occ.ZERO ? EMPTY_SEQUENCE + "()" : type);
+    if(kind != null) sb.deleteCharAt(sb.length() - 1).append(kind).append(')');
+    return sb.toString();
+  }
+
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
@@ -617,17 +624,6 @@ public final class SeqType {
       sb.append(typeString());
     }
     if(!(type instanceof ListType)) sb.append(occ);
-    return sb.toString();
-  }
-
-  /**
-   * Returns a string representation of the type.
-   * @return string
-   */
-  public String typeString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(occ == Occ.ZERO ? EMPTY_SEQUENCE + "()" : type);
-    if(kind != null) sb.deleteCharAt(sb.length() - 1).append(kind).append(')');
     return sb.toString();
   }
 }

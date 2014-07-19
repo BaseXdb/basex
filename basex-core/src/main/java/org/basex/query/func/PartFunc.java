@@ -41,7 +41,7 @@ public final class PartFunc extends Arr {
     super(info, Array.add(args, expr));
     this.sc = sc;
     this.holes = holes;
-    type = SeqType.FUN_O;
+    seqType = SeqType.FUN_O;
   }
 
   @Override
@@ -55,14 +55,14 @@ public final class PartFunc extends Arr {
     final Expr f = exprs[exprs.length - 1];
     if(allAreValues()) return preEval(qc);
 
-    final SeqType t = f.type();
+    final SeqType t = f.seqType();
     if(t.instanceOf(SeqType.FUN_O) && t.type != FuncType.ANY_FUN) {
       final FuncType ft = (FuncType) t.type;
       final int arity = exprs.length + holes.length - 1;
-      if(ft.args.length != arity) throw INVARITY.get(info, f, arity);
+      if(ft.argTypes.length != arity) throw INVARITY.get(info, f, arity);
       final SeqType[] ar = new SeqType[holes.length];
-      for(int i = 0; i < holes.length; i++) ar[i] = ft.args[holes[i]];
-      type = FuncType.get(ft.ret, ar).seqType();
+      for(int i = 0; i < holes.length; i++) ar[i] = ft.argTypes[holes[i]];
+      seqType = FuncType.get(ft.retType, ar).seqType();
     }
 
     return this;
@@ -85,12 +85,12 @@ public final class PartFunc extends Arr {
       while(++p < holes[i]) args[p] = exprs[p - i].value(qc);
       vars[i] = scp.newLocal(qc, f.argName(holes[i]), null, false);
       args[p] = new VarRef(info, vars[i]);
-      vars[i].refineType(ft.args[p], qc, ii);
+      vars[i].refineType(ft.argTypes[p], qc, ii);
     }
     while(++p < args.length) args[p] = exprs[p - holes.length].value(qc);
 
     final Ann ann = f.annotations();
-    final FuncType tp = FuncType.get(ann, vars, ft.ret);
+    final FuncType tp = FuncType.get(ann, vars, ft.retType);
     final DynFuncCall fc = new DynFuncCall(info, sc, ann.contains(Ann.Q_UPDATING), f, args);
     return new FuncItem(sc, ann, null, vars, tp, fc, qc.value, qc.pos, qc.size, scp.stackSize());
   }

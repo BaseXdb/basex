@@ -134,7 +134,7 @@ public final class FNNum extends StandardFunc {
   }
 
   /**
-   * Returns a numeric result with the correct data type.
+   * Returns a numeric result with the correct type.
    * @param it input item
    * @param n input double value
    * @param d calculated double value

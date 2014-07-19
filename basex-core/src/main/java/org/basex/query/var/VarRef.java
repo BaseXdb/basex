@@ -40,7 +40,7 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public VarRef optimize(final QueryContext qc, final VarScope scp) {
-    type = var.type();
+    seqType = var.seqType();
     size = var.size;
     return this;
   }

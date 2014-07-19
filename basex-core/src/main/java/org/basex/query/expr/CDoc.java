@@ -25,7 +25,7 @@ public final class CDoc extends CNode {
    */
   public CDoc(final StaticContext sc, final InputInfo info, final Expr expr) {
     super(sc, info, expr);
-    type = SeqType.DOC_O;
+    seqType = SeqType.DOC_O;
   }
 
   @Override

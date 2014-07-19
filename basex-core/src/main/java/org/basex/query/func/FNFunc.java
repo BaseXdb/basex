@@ -6,7 +6,6 @@ import static org.basex.query.util.Err.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -156,7 +155,7 @@ public final class FNFunc extends StandardFunc {
         do {
           final Item it = xs.next();
           if(it == null) return null;
-          if(checkBln(checkNoEmpty(f.invokeItem(qc, info, it)), qc)) return it;
+          if(checkBln(f.invokeItem(qc, info, it))) return it;
         } while(true);
       }
     };
@@ -240,6 +239,6 @@ public final class FNFunc extends StandardFunc {
       final FItem fi = (FItem) it;
       if(fi.arity() == a) return fi;
     }
-    throw Err.typeError(this, it, FuncType.arity(a));
+    throw castError(info, it, FuncType.arity(a));
   }
 }

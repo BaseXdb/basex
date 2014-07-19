@@ -28,7 +28,7 @@ public abstract class Item extends Value {
 
   /**
    * Constructor.
-   * @param type data type
+   * @param type item type
    */
   protected Item(final Type type) {
     super(type);
@@ -91,7 +91,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public boolean bool(final InputInfo ii) throws QueryException {
-    throw CONDTYPE.get(ii, type, this);
+    throw EBV.get(ii, type, this);
   }
 
   /**
@@ -140,12 +140,9 @@ public abstract class Item extends Value {
    * @return result of check
    */
   public final boolean comparable(final Item it) {
-    final Type t1 = type;
-    final Type t2 = it.type;
-    return t1 == t2 ||
-      this instanceof ANum && it instanceof ANum ||
-      t1.isStringOrUntyped() && t2.isStringOrUntyped() ||
-      this instanceof Dur && it instanceof Dur;
+    final Type t1 = type, t2 = it.type;
+    return t1 == t2 || this instanceof ANum && it instanceof ANum ||
+      t1.isStringOrUntyped() && t2.isStringOrUntyped() || this instanceof Dur && it instanceof Dur;
   }
 
   /**
@@ -170,8 +167,8 @@ public abstract class Item extends Value {
   public final boolean equiv(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
     // check if both values are NaN, or if values are equal..
-    return (this == Dbl.NAN || this == Flt.NAN) && it instanceof ANum &&
-        Double.isNaN(it.dbl(ii)) || comparable(it) && eq(it, coll, ii);
+    return (this == Dbl.NAN || this == Flt.NAN) && it instanceof ANum && Double.isNaN(it.dbl(ii)) ||
+        comparable(it) && eq(it, coll, ii);
   }
 
   /**
@@ -184,7 +181,7 @@ public abstract class Item extends Value {
    */
   @SuppressWarnings("unused")
   public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
-    throw (this == it ? TYPECMP : INVTYPECMP).get(ii, type, it.type);
+    throw Util.notExpected();
   }
 
   /**
@@ -209,7 +206,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final SeqType type() {
+  public final SeqType seqType() {
     return type.seqType();
   }
 

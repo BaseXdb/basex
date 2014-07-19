@@ -36,7 +36,7 @@ public abstract class FTContains extends ParseExpr {
     super(info);
     this.expr = expr;
     this.ftexpr = ftexpr;
-    type = SeqType.BLN;
+    seqType = SeqType.BLN;
     lex = new FTLexer(new FTOpt());
   }
 

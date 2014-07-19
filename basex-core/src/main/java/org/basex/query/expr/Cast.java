@@ -29,12 +29,13 @@ public final class Cast extends Single {
    * @param sc static context
    * @param info input info
    * @param expr expression
-   * @param type data type
+   * @param seqType target type
    */
-  public Cast(final StaticContext sc, final InputInfo info, final Expr expr, final SeqType type) {
+  public Cast(final StaticContext sc, final InputInfo info, final Expr expr,
+      final SeqType seqType) {
     super(info, expr);
     this.sc = sc;
-    this.type = type;
+    this.seqType = seqType;
   }
 
   @Override
@@ -45,20 +46,20 @@ public final class Cast extends Single {
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    if(expr.type().one()) type = SeqType.get(type.type, Occ.ONE);
+    if(expr.seqType().one()) seqType = SeqType.get(seqType.type, Occ.ONE);
 
     // pre-evaluate value
     if(expr.isValue()) return optPre(value(qc), qc);
 
     // skip cast if specified and return types are equal
     // (the following types will always be correct)
-    final Type t = type.type;
+    final Type t = seqType.type;
     if((t == AtomType.BLN || t == AtomType.FLT || t == AtomType.DBL ||
-        t == AtomType.QNM || t == AtomType.URI) && type.eq(expr.type())) {
+        t == AtomType.QNM || t == AtomType.URI) && seqType.eq(expr.seqType())) {
       optPre(expr, qc);
       return expr;
     }
-    size = type.occ();
+    size = seqType.occ();
     return this;
   }
 
@@ -70,22 +71,22 @@ public final class Cast extends Single {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value v = expr.value(qc);
-    if(!type.occ.check(v.size())) throw INVCASTEX.get(info, v.type(), type, v);
-    return v instanceof Item ? type.cast((Item) v, qc, sc, info, true) : v;
+    if(!seqType.occ.check(v.size())) throw INVCASTEX.get(info, v.seqType(), seqType, v);
+    return v instanceof Item ? seqType.cast((Item) v, qc, sc, info, true) : v;
   }
 
   @Override
   public Cast copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Cast(sc, info, expr.copy(qc, scp, vs), type);
+    return new Cast(sc, info, expr.copy(qc, scp, vs), seqType);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(TYP, type), expr);
+    addPlan(plan, planElem(TYP, seqType), expr);
   }
 
   @Override
   public String toString() {
-    return expr + " " + CAST + ' ' + AS + ' ' + type;
+    return expr + " " + CAST + ' ' + AS + ' ' + seqType;
   }
 }

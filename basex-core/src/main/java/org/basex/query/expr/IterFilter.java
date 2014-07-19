@@ -19,7 +19,7 @@ final class IterFilter extends Filter {
    */
   IterFilter(final Filter f) {
     super(f.info, f.root, f.preds);
-    type = f.type;
+    seqType = f.seqType;
   }
 
   @Override

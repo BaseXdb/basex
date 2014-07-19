@@ -255,9 +255,9 @@ public abstract class JavaMapping extends Arr {
   }
 
   /**
-   * Returns an appropriate XQuery data type for the specified Java object.
+   * Returns an appropriate XQuery type for the specified Java object.
    * @param o object
-   * @return xquery type, or {@code null} if no appropriate type was found
+   * @return item type, or {@code null} if no appropriate type was found
    */
   private static Type type(final Object o) {
     final Type t = type(o.getClass());
@@ -294,9 +294,9 @@ public abstract class JavaMapping extends Arr {
   }
 
   /**
-   * Returns an appropriate XQuery data type for the specified Java class.
+   * Returns an appropriate XQuery type for the specified Java class.
    * @param type Java type
-   * @return xquery type
+   * @return item type, or {@code null} if no appropriate type was found
    */
   static Type type(final Class<?> type) {
     for(int j = 0; j < JAVA.length; ++j) {
@@ -315,7 +315,7 @@ public abstract class JavaMapping extends Arr {
     final StringBuilder sb = new StringBuilder();
     for(final Value v : args) {
       if(sb.length() != 0) sb.append(", ");
-      sb.append(v instanceof Jav ? Util.className(((Jav) v).toJava()) : v.type());
+      sb.append(v instanceof Jav ? Util.className(((Jav) v).toJava()) : v.seqType());
     }
     return sb.toString();
   }

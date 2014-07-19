@@ -140,10 +140,9 @@ public final class QNm extends Item {
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public boolean eq(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     if(it instanceof QNm) return eq((QNm) it);
-    throw INVTYPECMP.get(ii, it.type, type);
+    throw diffError(ii, this, it);
   }
 
   /**

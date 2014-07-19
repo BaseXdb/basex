@@ -159,8 +159,8 @@ public final class FNDb extends StandardFunc {
     final Data data = checkData(qc);
     final int v = (int) checkItr(exprs[1], qc);
     final int pre = id ? data.pre(v) : v;
-    if(pre < 0 || pre >= data.meta.size) throw BXDB_RANGE.get(info, this, v);
-    return new DBNode(data, pre);
+    if(pre >= 0 && pre < data.meta.size) return new DBNode(data, pre);
+    throw BXDB_RANGE.get(info, data.meta.name, id ? "ID" : "pre", v);
   }
 
   /**
@@ -467,7 +467,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str name(final QueryContext qc) throws QueryException {
-    return Str.get(checkDBNode(checkItem(exprs[0], qc)).data.meta.name);
+    return Str.get(checkDBNode(exprs[0].item(qc, info)).data.meta.name);
   }
 
   /**
@@ -945,7 +945,7 @@ public final class FNDb extends StandardFunc {
       return ni;
     }
 
-    if(!in.type.isStringOrUntyped()) throw STRNODTYPE.get(info, this, in.type);
+    if(!in.type.isStringOrUntyped()) throw STRNODTYPE.get(info, in.type, in);
 
     final QueryInput qi = new QueryInput(string(in.string(info)));
     if(!qi.input.exists()) throw WHICHRES.get(info, qi.original);

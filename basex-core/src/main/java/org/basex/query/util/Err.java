@@ -47,7 +47,7 @@ public enum Err {
   /** BXCL0001. */
   BXCL_CONN(BXCL, 1, "Connection failed: %"),
   /** BXCL0002. */
-  BXCL_NOTAVL(BXCL, 2, "Session is not available or has already been closed: %"),
+  BXCL_NOTAVL(BXCL, 2, "Session with ID % is not available or has been closed."),
   /** BXCL0003. */
   BXCL_COMM(BXCL, 3, "An error occurred: %"),
   /** BXCL0004. */
@@ -60,7 +60,7 @@ public enum Err {
   /** BXCO0001. */
   BXCO_STRING(BXCO, 1, "String conversion: %."),
   /** BXCO0001. */
-  BXCO_BASE64(BXCO, 1, "String cannot be converted to the supplied encoding."),
+  BXCO_BASE64(BXCO, 1, "Conversion of '%' to encoding '%' failed."),
   /** BXCO0002. */
   BXCO_ENCODING(BXCO, 2, "Unknown encoding '%'."),
 
@@ -74,13 +74,13 @@ public enum Err {
   // Database module
 
   /** BXDB0001. */
-  BXDB_NODB(BXDB, 1, "%: database node expected."),
+  BXDB_NODB(BXDB, 1, "Database node expected, % found: %."),
   /** BXDB0002. */
   BXDB_OPEN(BXDB, 2, "%"),
   /** BXDB0002. */
-  BXDB_WHICH(BXDB, 2, "Database not found: %."),
+  BXDB_WHICH(BXDB, 2, "Database '%' not found."),
   /** BXDB0002. */
-  BXDB_WHICHBACK(BXDB, 2, "No backup file found: %."),
+  BXDB_WHICHBACK(BXDB, 2, "No backup found for database '%'."),
   /** BXDB0003. */
   BXDB_MEM(BXDB, 3, "Operation requires database '%' to be persistent."),
   /** BXDB0004. */
@@ -96,11 +96,11 @@ public enum Err {
   /** BXDB0008. */
   BXDB_RENAME(BXDB, 8, "Invalid target path: %."),
   /** BXDB0009. */
-  BXDB_RANGE(BXDB, 9, "%: value '%' is out of range."),
+  BXDB_RANGE(BXDB, 9, "Database '%' has no node with % value %."),
   /** BXDB0010. */
   BXDB_EVENT(BXDB, 10, "Event '%' is unknown."),
   /** BXDB0011. */
-  BXDB_NAME(BXDB, 11, "Invalid database name: '%'."),
+  BXDB_NAME(BXDB, 11, "Invalid database name '%'."),
   /** BXDB0012. */
   BXDB_ALTERDROP(BXDB, 12, "Database '%' cannot be both altered and dropped."),
   /** BXDB0012. */
@@ -126,7 +126,7 @@ public enum Err {
   // Fulltext module
 
   /** BXFT0001. */
-  BXFT_MATCH(BXFT, 1, "Wildcards and fuzzy option cannot be both specified."),
+  BXFT_MATCH(BXFT, 1, "Wildcards and fuzzy option cannot be specified both."),
 
   // HTML module
 
@@ -351,7 +351,7 @@ public enum Err {
   /** HC0002. */
   HC_PARSE(HC, 2, "Conversion failed: %"),
   /** HC0003. */
-  HC_ATTR(HC, 3, "No attribute beside 'src' and 'media-type' allowed."),
+  HC_ATTR(HC, 3, "No attribute allowed beside 'src' and 'media-type'."),
   /** HC0004. */
   HC_REQ(HC, 4, "Invalid request element: %."),
   /** HC0005. */
@@ -360,7 +360,7 @@ public enum Err {
   HC_PARAMS(HC, 6, "Specify request element or HTTP URI."),
 
   /** ZIP0001. */
-  ZIP_NOTFOUND(ZIP, 1, "Path '%' is not found."),
+  ZIP_NOTFOUND(ZIP, 1, "Path '%' not found."),
   /** ZIP0002. */
   ZIP_INVALID(ZIP, 2, "% element: attribute '%' expected."),
   /** ZIP0002. */
@@ -373,12 +373,12 @@ public enum Err {
   /** FOAR0001. */
   DIVZERO(FOAR, 1, "% cannot be divided by zero."),
   /** FOAR0002. */
-  DIVFLOW(FOAR, 2, "Invalid division result: % / %."),
+  DIVFLOW(FOAR, 2, "Invalid division result: %."),
   /** FOAR0002. */
   RANGE(FOAR, 2, "Value out of range: %."),
 
   /** FOCA0002. */
-  INVALUE(FOCA, 2, "Invalid value for %: %."),
+  INVALUE(FOCA, 2, "Cannot cast % to %: %."),
   /** FOCA0003. */
   INTRANGE(FOCA, 3, "Integer value out of range: %."),
   /** FOCA0005. */
@@ -412,7 +412,7 @@ public enum Err {
   /** FODC0007. */
   RESINV(FODC, 7, "Resource path \"%\" is invalid."),
   /** FODC0007. */
-  INVDB(FODC, 7, "Invalid database name: \"%\"."),
+  INVDB(FODC, 7, "Invalid database name '%'."),
 
   /** FODF1280. */
   FORMNUM(FODF, 1280, "Unknown decimal format: %."),
@@ -444,7 +444,7 @@ public enum Err {
   /** FODT0002. */
   SECDURRANGE(FODT, 2, "Seconds '%' out of range."),
   /** FODT0002. */
-  DATEZERO(FODT, 2, "Invalid % calculation: infinity/zero."),
+  DATEZERO(FODT, 2, "Invalid % calculation: %."),
   /** FODT0003. */
   INVALZONE(FODT, 3, "Timezone out of range (-14:00 to +14:00): %."),
   /** FODT0003. */
@@ -470,34 +470,44 @@ public enum Err {
   /** FORG0001. */
   INVALIDZONE(FORG, 1, "Invalid timezone: %."),
   /** FORG0001. */
-  FUNCAST(FORG, 1, "Invalid % cast: \"%\"."),
+  FUNCAST(FORG, 1, "Cannot cast to %: \"%\"."),
   /** FORG0001. */
-  FUNCCASTEX(FORG, 1, "Invalid cast from % to %: %."),
+  FUNCCASTEX(FORG, 1, "Cannot cast % to %: %."),
   /** FORG0001. */
   DATEFORMAT(FORG, 1, "Wrong % format: '%' (try e.g. '%')."),
   /** FORG0002. */
   URIINVRES(FORG, 2, "URI argument is invalid: %."),
   /** FORG0002. */
-  URIABS(FORG, 2, "Base URI % is not absolute."),
+  URIABS(FORG, 2, "Base URI is not absolute: %."),
 
   /** FORG0003. */
-  EXPECTZ0(FORG, 3, "Zero or one value expected."),
+  ZEROORONE(FORG, 3, "Zero or one value expected."),
   /** FORG0004. */
-  EXPECTOM(FORG, 4, "One or more values expected."),
+  ONEORMORE(FORG, 4, "One or more values expected."),
   /** FORG0005. */
-  EXPECTO(FORG, 5, "Exactly one value expected."),
+  EXACTLYONE(FORG, 5, "Exactly one value expected."),
   /** FORG0006. */
-  FUNCMP(FORG, 6, "%: % expected, % found."),
+  FUNTYPE(FORG, 6, "% expected, % found: %."),
   /** FORG0006. */
-  CONDTYPE(FORG, 6, "% not allowed as condition type."),
+  FUNCMP(FORG, 6, "Items of type % cannot be compared."),
   /** FORG0006. */
-  SUMTYPE(FORG, 6, "%: invalid argument type '%'."),
+  EBV(FORG, 6, "Effective boolean value not defined for %."),
   /** FORG0006. */
-  FUNNUM(FORG, 6, "%: number expected, % found."),
+  SUMTYPE(FORG, 6, "Argument type % is invalid: %."),
   /** FORG0006. */
-  FUNDUR(FORG, 6, "%: duration expected, % found."),
+  SUMNUM(FORG, 6, "Number expected, % found: %."),
   /** FORG0006. */
-  TYPECMP(FORG, 6, "% is not comparable."),
+  SUMDUR(FORG, 6, "Duration expected, % found: %."),
+  /** FORG0006. */
+  BINARYTYPE(FORG, 6, "Binary expected, % found."),
+  /** FORG0006. */
+  STRNODTYPE(FORG, 6, "String or node expected, % found: %."),
+  /** FORG0006. */
+  ELMMAPTYPE(FORG, 6, "element(%) or map expected, % found: %."),
+  /** FORG0006. */
+  ELMSTRTYPE(FORG, 6, "element(%) or string expected, % found: %."),
+  /** FORG0006. */
+  STRBINTYPE(FORG, 6, "String or binary expected, % found: %."),
   /** FORG0006. */
   JAVACON(FORG, 6, "Unknown constructor: %(%)."),
   /** FORG0006. */
@@ -507,23 +517,13 @@ public enum Err {
   /** FORG0006. */
   JAVAMOD(FORG, 6, "Invalid arguments: % expected, % found."),
   /** FORG0006. */
+  JAVAERR(FORG, 6, "Java function call failed: %."),
+  /** FORG0006. */
   INVBASE(FORG, 6, "Unsupported base: %."),
   /** FORG0006. */
   INVDIG(FORG, 6, "Invalid digit for base %: %."),
   /** FORG0006. */
-  JAVAERR(FORG, 6, "Java function call failed: %."),
-  /** FORG0006. */
-  ERRFORM(FORG, 6, "%: %."),
-  /** FORG0006. */
-  BINARYTYPE(FORG, 6, "Binary item expected, % found"),
-  /** FORG0006. */
-  STRNODTYPE(FORG, 6, "%: string or node expected, % found."),
-  /** FORG0006. */
-  ELMMAPTYPE(FORG, 6, "element(%) or map expected, % found"),
-  /** FORG0006. */
-  ELMSTRTYPE(FORG, 6, "element(%) or string expected, % found"),
-  /** FORG0006. */
-  STRBINTYPE(FORG, 6, "String or binary type expected, % found"),
+  ERRFORMAT(FORG, 6, "%: %."),
   /** FORG0006. */
   INVALIDOPT(FORG, 6, "%"),
   /** FORG0006. */
@@ -539,9 +539,9 @@ public enum Err {
   /** FORX0003. */
   REGROUP(FORX, 3, "Pattern matches empty string."),
   /** FORX0004. */
-  FUNREPBS(FORX, 4, "Replacement string: invalid backslash."),
+  FUNREPBS(FORX, 4, "Invalid backslash in replacement string: %."),
   /** FORX0004. */
-  FUNREPDOL(FORX, 4, "Replacement string: invalid dollar sign."),
+  FUNREPDOL(FORX, 4, "Invalid dollar sign in replacement string: %."),
 
   /** FOTY0013. */
   FIVALUE(FOTY, 13, "Items of type % have no typed value."),
@@ -646,9 +646,7 @@ public enum Err {
   /** XPDY0050. */
   CTXNODE(XPDY, 50, "Root of the context item must be a document node."),
   /** XPDY0050. */
-  NOTREAT(XPDY, 50, "%: % cannot be treated as %."),
-  /** XPDY0050. */
-  NOTREATS(XPDY, 50, "%: % expected, sequence found."),
+  NOTREAT(XPDY, 50, "Cannot treat % as %: %."),
 
   /** XPST0001. */
   STBASEURI(XPST, 1, "Static Base URI is undefined."),
@@ -829,19 +827,15 @@ public enum Err {
   /** XPST0017. */
   FUNCSIMILAR(XPST, 17, "Unknown function '%'; similar: '%'."),
   /** XPST0017. */
-  FUNCARGSG(XPST, 17, "%: % argument supplied."),
+  FUNCARGS(XPST, 17, "%: % argument% supplied."),
   /** XPST0017. */
-  FUNCARGPL(XPST, 17, "%: % arguments supplied."),
+  FUNCTYPES(XPST, 17, "%: % argument% supplied (% expected)."),
   /** XPST0017. */
-  FUNCTYPESG(XPST, 17, "Function '%': % argument supplied, % expected."),
+  FUNCUNKNOWN(XPST, 17, "Unknown function '%'."),
   /** XPST0017. */
-  FUNCTYPEPL(XPST, 17, "Function '%': % arguments supplied, % expected."),
+  FUNCNOIMPL(XPST, 17, "Function '%' not implemented."),
   /** XPST0017. */
-  FUNCUNKNOWN(XPST, 17, "Function '%' is unknown."),
-  /** XPST0017. */
-  FUNCNOIMPL(XPST, 17, "Function '%' is not implemented."),
-  /** XPST0017. */
-  FUNCJAVA(XPST, 17, "Java function '%' is not found."),
+  FUNCJAVA(XPST, 17, "Java function '%' not found."),
   /** XPST0017. */
   JAVAAMBIG(XPST, 17, "Several implementations found for '%'."),
   /** XPST0017. */
@@ -859,40 +853,45 @@ public enum Err {
   NSMISS(XPST, 81, "QName '%' has no namespace."),
 
   /** XPTY0004. */
-  SEQCAST(XPTY, 4, "Single item expected, % found."),
+  NONAME(XPTY, 4, "Name expected, '%' found."),
   /** XPTY0004. */
-  INVCAST(XPTY, 4, "Cannot cast from % to %."),
+  SEQEMPTY(XPTY, 4, "Item expected, empty sequence found."),
   /** XPTY0004. */
-  INVCASTEX(XPTY, 4, "Invalid cast from % to %: %."),
+  SEQEXP(XPTY, 4, "% expected, empty sequence found."),
   /** XPTY0004. */
-  INVTREAT(XPTY, 4, "Cannot treat % as %: %."),
+  NOITEM(XPTY, 4, "Item expected, sequence found: %."),
+  /** XPTY0004. */
+  NONUMBER(XPTY, 4, "Number expected, % found: %."),
+  /** XPTY0004. */
+  NODUR(XPTY, 4, "Duration expected, % found: %."),
+  /** XPTY0004. */
+  NOSUBDUR(XPTY, 4, "Subtype of xs:duration expected: %."),
+  /** XPTY0004. */
+  STRQNM(XPTY, 4, "String or QName expected, % found: %."),
+  /** XPTY0004. */
+  CPIWRONG(XPTY, 4, "String or NCName expected, % found: %."),
+
+  /** XPTY0004. */
+  INVCAST(XPTY, 4, "Cannot cast % to %."),
+  /** XPTY0004. */
+  INVCASTEX(XPTY, 4, "Cannot cast % to %: %."),
+  /** XPTY0004. */
+  INVTREAT(XPTY, 4, "Cannot treat % as %."),
+  /** XPTY0004. */
+  INVTREATEX(XPTY, 4, "Cannot treat % as %: %."),
   /** XPTY0004. */
   CALCTYPE(XPTY, 4, "% not defined for % and %."),
   /** XPTY0004. */
   INVFUNCITEM(XPTY, 4, "Function item required for function call, % found."),
 
   /** XPTY0004. */
-  NOSUBDUR(XPTY, 4, "%: only supported on subtypes of xs:duration, not %."),
+  CMPTYPE(XPTY, 4, "Items of type % cannot be compared."),
   /** XPTY0004. */
-  INVEMPTY(XPTY, 4, "%: no empty sequence allowed."),
-  /** XPTY0004. */
-  INVEMPTYEX(XPTY, 4, "%: % expected, empty sequence found."),
-  /** XPTY0004. */
-  NODUR(XPTY, 4, "%: duration expected, % found."),
-  /** XPTY0004. */
-  INVTYPECMP(XPTY, 4, "% and % cannot be compared."),
-  /** XPTY0004. */
-  NONUMBER(XPTY, 4, "%: number expected, % found."),
-  /** XPTY0004. */
-  NONAME(XPTY, 4, "Expecting name, '%' found."),
+  CMPTYPES(XPTY, 4, "Items of type % and % cannot be compared."),
   /** XPTY0004. */
   DOCATTS(XPTY, 4, "Cannot add attributes to a document node."),
   /** XPTY0004. */
   DOCNS(XPTY, 4, "Cannot add namespaces to a document node."),
-  /** XPTY0004. */
-  CPIWRONG(XPTY, 4, "Name has invalid type: '%'."),
-  /** XPTY0004. */
-  INVQNAME(XPTY, 4, "Invalid QName: '%'."),
   /** XPTY0004. */
   INVARITY(XPTY, 4, "Wrong number of arguments in %, expected %."),
   /** XPTY0004. */
@@ -907,7 +906,7 @@ public enum Err {
   /** XPTY0020. */
   STEPNODE(XPTY, 20, "Context node required for %; % found."),
   /** XPTY0117. */
-  NSSENS(XPTY, 117, "Cannot cast from % to %."),
+  NSSENS(XPTY, 117, "Cannot cast % to %."),
 
   /** XQDY0025. */
   CATTDUPL(XQDY, 25, "Duplicate attribute '%'."),
@@ -1356,7 +1355,20 @@ public enum Err {
    * @return query exception (indicates that an error is raised)
    */
   public static QueryException diffError(final InputInfo ii, final Item item1, final Item item2) {
-    return (item1 == item2 ? TYPECMP : INVTYPECMP).get(ii, item1.type, item2.type);
+    final Type t1 = item1.type, t2 = item2.type;
+    return (item1 == item2 ? FUNCMP : t1 == t2 ? CMPTYPE : CMPTYPES).get(ii, t1, t2);
+  }
+
+  /**
+   * Throws a type promoting exception.
+   * @param ii input info
+   * @param value value
+   * @param seqType sequence type
+   * @return query exception (indicates that an error is raised)
+   */
+  public static QueryException treatError(final InputInfo ii, final Value value,
+      final SeqType seqType) {
+    return INVTREATEX.get(ii, value.seqType(), seqType, value);
   }
 
   /**
@@ -1371,35 +1383,36 @@ public enum Err {
   }
 
   /**
-   * Throws a type promoting exception.
+   * Throws a type cast exception.
    * @param ii input info
-   * @param expr expression
+   * @param value value
    * @param type expression cast type
    * @return query exception (indicates that an error is raised)
+   * @throws QueryException query exception
    */
-  public static QueryException treatError(final InputInfo ii, final Expr expr, final SeqType type) {
-    return INVTREAT.get(ii, expr.description(), type, expr);
-  }
-
-  /**
-   * Throws a type exception.
-   * @param expr parsing expression
-   * @param item found item
-   * @param type expected type
-   * @return query exception (indicates that an error is raised)
-   */
-  public static QueryException typeError(final ParseExpr expr, final Item item, final Type type) {
-    return INVCAST.get(expr.info, item.type, type);
+  public static QueryException funCastError(final InputInfo ii, final Type type, final Object value)
+      throws QueryException {
+    return FUNCAST.get(ii, type, chop(value, ii));
   }
 
   /**
    * Throws a number exception.
    * @param expr parsing expression
-   * @param item found item
+   * @param item item
    * @return query exception (indicates that an error is raised)
    */
   public static QueryException numberError(final ParseExpr expr, final Item item) {
-    return NONUMBER.get(expr.info, expr.description(), item.type);
+    return numberError(expr.info, item);
+  }
+
+  /**
+   * Throws a number exception.
+   * @param ii input info
+   * @param item found item
+   * @return query exception (indicates that an error is raised)
+   */
+  public static QueryException numberError(final InputInfo ii, final Item item) {
+    return NONUMBER.get(ii, item.type, item);
   }
 
   /**
@@ -1409,8 +1422,8 @@ public enum Err {
    * @param value value
    * @return query exception (indicates that an error is raised)
    */
-  public static QueryException valueError(final InputInfo ii, final Type type, final Object value) {
-    return INVALUE.get(ii, type, value);
+  public static QueryException valueError(final InputInfo ii, final Type type, final Value value) {
+    return INVALUE.get(ii, value.seqType(), type, value);
   }
 
   /**
@@ -1438,7 +1451,7 @@ public enum Err {
     final TokenBuilder tb = new TokenBuilder();
     byte l = 0;
     final byte[] string = value instanceof byte[] ? (byte[]) value : value instanceof Item ?
-      ((Item) value).string(null) : Token.token(value.toString());
+      ((Item) value).string(ii) : Token.token(value.toString());
     for(byte b : string) {
       final int ts = tb.size();
       if(ts == MAX) {

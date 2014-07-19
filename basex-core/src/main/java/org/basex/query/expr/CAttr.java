@@ -32,11 +32,11 @@ public final class CAttr extends CName {
    * @param name name
    * @param values attribute values
    */
-  public CAttr(final StaticContext sc, final InputInfo info, final boolean comp,
-      final Expr name, final Expr... values) {
+  public CAttr(final StaticContext sc, final InputInfo info, final boolean comp, final Expr name,
+      final Expr... values) {
     super(ATTRIBUTE, sc, info, name, values);
     this.comp = comp;
-    type = SeqType.ATT;
+    seqType = SeqType.ATT;
   }
 
   @Override

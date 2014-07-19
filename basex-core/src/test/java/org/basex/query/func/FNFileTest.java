@@ -298,7 +298,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void writeText() {
     error(_FILE_WRITE_TEXT.args(PATH, "x"), Err.FILE_IS_DIR);
-    error(_FILE_WRITE_TEXT.args(PATH1, " 123"), Err.INVCAST);
+    error(_FILE_WRITE_TEXT.args(PATH1, " 123"), Err.INVCASTEX);
 
     query(_FILE_WRITE_TEXT.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), "1");
@@ -311,7 +311,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void writeTextLines() {
     error(_FILE_WRITE_TEXT_LINES.args(PATH, "x"), Err.FILE_IS_DIR);
-    error(_FILE_WRITE_TEXT_LINES.args(PATH1, " 123"), Err.INVCAST);
+    error(_FILE_WRITE_TEXT_LINES.args(PATH1, " 123"), Err.INVCASTEX);
 
     query(_FILE_WRITE_TEXT_LINES.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), 1 + Prop.NL.length());
@@ -360,7 +360,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void appendText() {
     error(_FILE_APPEND_TEXT.args(PATH, "x"), Err.FILE_IS_DIR);
-    error(_FILE_APPEND_TEXT.args(PATH1, " 123"), Err.INVCAST);
+    error(_FILE_APPEND_TEXT.args(PATH1, " 123"), Err.INVCASTEX);
 
     query(_FILE_APPEND_TEXT.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), "1");
@@ -373,7 +373,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void appendTextLines() {
     error(_FILE_APPEND_TEXT_LINES.args(PATH, "x"), Err.FILE_IS_DIR);
-    error(_FILE_APPEND_TEXT_LINES.args(PATH1, " 123"), Err.INVCAST);
+    error(_FILE_APPEND_TEXT_LINES.args(PATH1, " 123"), Err.INVCASTEX);
 
     query(_FILE_APPEND_TEXT_LINES.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), 1 + Prop.NL.length());

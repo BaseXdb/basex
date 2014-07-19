@@ -44,7 +44,7 @@ public final class StaticVarRef extends ParseExpr {
   @Override
   public Expr compile(final QueryContext qc, final VarScope o) throws QueryException {
     var.compile(qc);
-    type = var.type();
+    seqType = var.seqType();
     return var.value != null ? var.value : this;
   }
 

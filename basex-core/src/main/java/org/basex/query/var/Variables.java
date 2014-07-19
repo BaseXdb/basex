@@ -27,7 +27,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   /**
    * Declares a new static variable.
    * @param nm variable name
-   * @param type type
+   * @param type declared type
    * @param ann annotations
    * @param expr bound expression, possibly {@code null}
    * @param ext {@code external} flag

@@ -23,24 +23,24 @@ public final class CmpN extends Cmp {
     /** Node comparison: same. */
     EQ("is") {
       @Override
-      public boolean eval(final ANode a, final ANode b) {
-        return a.is(b);
+      public boolean eval(final ANode it1, final ANode it2) {
+        return it1.is(it2);
       }
     },
 
     /** Node comparison: before. */
     ET("<<") {
       @Override
-      public boolean eval(final ANode a, final ANode b) {
-        return a.diff(b) < 0;
+      public boolean eval(final ANode it1, final ANode it2) {
+        return it1.diff(it2) < 0;
       }
     },
 
     /** Node comparison: after. */
     GT(">>") {
       @Override
-      public boolean eval(final ANode a, final ANode b) {
-        return a.diff(b) > 0;
+      public boolean eval(final ANode it1, final ANode it2) {
+        return it1.diff(it2) > 0;
       }
     };
 
@@ -51,19 +51,19 @@ public final class CmpN extends Cmp {
 
     /**
      * Constructor.
-     * @param n string representation
+     * @param name string representation
      */
-    OpN(final String n) {
-      name = n;
+    OpN(final String name) {
+      this.name = name;
     }
 
     /**
      * Evaluates the expression.
-     * @param a first node
-     * @param b second node
+     * @param it1 first node
+     * @param it2 second node
      * @return result
      */
-    public abstract boolean eval(ANode a, ANode b);
+    public abstract boolean eval(ANode it1, ANode it2);
 
     @Override
     public String toString() {
@@ -84,7 +84,7 @@ public final class CmpN extends Cmp {
   public CmpN(final Expr expr1, final Expr expr2, final OpN op, final InputInfo info) {
     super(info, expr1, expr2, null);
     this.op = op;
-    type = SeqType.BLN_ZO;
+    seqType = SeqType.BLN_ZO;
   }
 
   @Override
@@ -95,19 +95,18 @@ public final class CmpN extends Cmp {
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    type = SeqType.get(AtomType.BLN, exprs[0].size() == 1 && exprs[1].size() == 1 ?
+    seqType = SeqType.get(AtomType.BLN, exprs[0].size() == 1 && exprs[1].size() == 1 ?
         Occ.ONE : Occ.ZERO_ONE);
-
     return optPre(oneIsEmpty() ? null : allAreValues() ? item(qc, info) : this, qc);
   }
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item a = exprs[0].item(qc, info);
-    if(a == null) return null;
-    final Item b = exprs[1].item(qc, info);
-    if(b == null) return null;
-    return Bln.get(op.eval(checkNode(a), checkNode(b)));
+    final Item it1 = exprs[0].item(qc, info);
+    if(it1 == null) return null;
+    final Item it2 = exprs[1].item(qc, info);
+    if(it2 == null) return null;
+    return Bln.get(op.eval(checkNode(it1), checkNode(it2)));
   }
 
   @Override

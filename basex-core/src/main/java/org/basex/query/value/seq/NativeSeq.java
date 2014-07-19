@@ -26,7 +26,7 @@ public abstract class NativeSeq extends Seq {
 
   @Override
   public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw CONDTYPE.get(ii, this);
+    throw EBV.get(ii, this);
   }
 
   @Override
@@ -42,7 +42,7 @@ public abstract class NativeSeq extends Seq {
   }
 
   @Override
-  public final SeqType type() {
+  public final SeqType seqType() {
     return SeqType.get(type, Occ.ONE_MORE);
   }
 }

@@ -39,7 +39,7 @@ public abstract class StaticDecl extends StaticScope {
     super(scope, doc, sc, info);
     this.ann = ann == null ? new Ann() : ann;
     this.name = name;
-    this.declType = type;
+    declType = type;
   }
 
   /**
@@ -49,11 +49,11 @@ public abstract class StaticDecl extends StaticScope {
   public abstract byte[] id();
 
   /**
-   * Returns the type of this expression. If no type has been declare in the expression,
+   * Returns the type of this expression. If no type has been declared in the expression,
    * it is derived from the expression type.
    * @return return type
    */
-  public SeqType type() {
-    return declType != null ? declType : expr.type();
+  public SeqType seqType() {
+    return declType != null ? declType : expr.seqType();
   }
 }

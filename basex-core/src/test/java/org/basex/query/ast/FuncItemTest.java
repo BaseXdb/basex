@@ -208,7 +208,7 @@ public final class FuncItemTest extends QueryPlanTest {
   public void funcItemCoercion() {
     error("let $f := function($g as function() as item()) { $g() }" +
         "return $f(function() { 1, 2 })",
-        Err.INVTREAT);
+        Err.INVTREATEX);
   }
 
   /** Tests if all functions are compiled when reflection takes places. */

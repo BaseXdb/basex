@@ -57,9 +57,9 @@ public final class Try extends Single {
     }
 
     for(final Catch c : catches) c.compile(qc, scp);
-    type = expr.type();
+    seqType = expr.seqType();
     for(final Catch c : catches)
-      if(!c.expr.isFunction(Function.ERROR)) type = type.union(c.type());
+      if(!c.expr.isFunction(Function.ERROR)) seqType = seqType.union(c.seqType());
     return this;
   }
 

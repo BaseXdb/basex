@@ -244,7 +244,7 @@ public abstract class Data {
   /**
    * Returns a pre value.
    * @param id unique node id
-   * @return pre value or -1 if id was not found
+   * @return pre value or {@code -1} if id was not found
    */
   public final int pre(final int id) {
     return meta.updindex ? idmap.pre(id) : preold(id);

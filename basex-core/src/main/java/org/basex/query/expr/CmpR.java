@@ -53,8 +53,8 @@ public final class CmpR extends Single {
     this.mni = mni;
     this.max = max;
     this.mxi = mxi;
-    type = SeqType.BLN;
-    atomic = expr.type().zeroOrOne();
+    seqType = SeqType.BLN;
+    atomic = expr.seqType().zeroOrOne();
   }
 
   /**

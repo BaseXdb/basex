@@ -51,7 +51,7 @@ public final class FNHtml extends StandardFunc {
    * @throws QueryException query exception
    */
   private DBNode parse(final QueryContext qc) throws QueryException {
-    final byte[] in = checkStrBin(checkItem(exprs[0], qc));
+    final byte[] in = checkStrBin(exprs[0], qc);
     final HtmlOptions opts = checkOptions(1, Q_OPTIONS, new HtmlOptions(), qc);
     try {
       return new DBNode(new HtmlParser(new IOContent(in), qc.context.options, opts));

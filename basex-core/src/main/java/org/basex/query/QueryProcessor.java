@@ -102,14 +102,14 @@ public final class QueryProcessor extends Proc {
   }
 
   /**
-   * Binds a value with the specified data type to a global variable.
+   * Binds a value with the specified type to a global variable.
    * If the value is an {@link Expr} instance, it is directly assigned.
    * Otherwise, it is first cast to the appropriate XQuery type. If {@code "json"}
-   * is specified as data type, the value is interpreted according to the rules
+   * is specified as type, the value is interpreted according to the rules
    * specified in {@link JsonMapConverter}.
    * @param name name of variable
    * @param value value to be bound
-   * @param type data type (may be {@code null})
+   * @param type type (may be {@code null})
    * @return self reference
    * @throws QueryException query exception
    */
@@ -151,10 +151,10 @@ public final class QueryProcessor extends Proc {
   }
 
   /**
-   * Binds a value with the specified data type to the context item,
+   * Binds a value with the specified type to the context item,
    * using the same rules as for {@link #bind binding variables}.
    * @param value value to be bound
-   * @param type data type (may be {@code null})
+   * @param type type (may be {@code null})
    * @return self reference
    * @throws QueryException query exception
    */

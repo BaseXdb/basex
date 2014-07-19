@@ -74,7 +74,7 @@ public class DBNode extends ANode {
     super(type);
     this.data = data;
     this.pre = pre;
-    this.par = par;
+    this.parent = par;
   }
 
   /**
@@ -103,7 +103,7 @@ public class DBNode extends ANode {
    */
   private void set(final int p, final int k) {
     type = type(k);
-    par = null;
+    parent = null;
     value = null;
     nsp = null;
     pre = p;
@@ -211,7 +211,7 @@ public class DBNode extends ANode {
 
   @Override
   public final DBNode copy() {
-    final DBNode n = new DBNode(data, pre, par, nodeType());
+    final DBNode n = new DBNode(data, pre, parent, nodeType());
     n.score = score;
     return n;
   }
@@ -225,7 +225,7 @@ public class DBNode extends ANode {
   public final DBNode dbCopy(final MainOptions opts) {
     final MemData md = new MemData(opts);
     new DataBuilder(md).build(this);
-    return new DBNode(md).parent(par);
+    return new DBNode(md).parent(parent);
   }
 
   @Override
@@ -240,7 +240,7 @@ public class DBNode extends ANode {
 
   @Override
   public final ANode parent() {
-    if(par != null) return par;
+    if(parent != null) return parent;
     final int p = data.parent(pre, data.kind(pre));
     if(p == -1) return null;
 
@@ -251,7 +251,7 @@ public class DBNode extends ANode {
 
   @Override
   protected final DBNode parent(final ANode p) {
-    par = p;
+    parent = p;
     return this;
   }
 

@@ -91,7 +91,7 @@ public abstract class Preds extends ParseExpr {
   @Override
   public boolean has(final Flag flag) {
     for(final Expr p : preds) {
-      if(flag == Flag.FCS && p.type().mayBeNumber() || p.has(flag)) return true;
+      if(flag == Flag.FCS && p.seqType().mayBeNumber() || p.has(flag)) return true;
     }
     return false;
   }

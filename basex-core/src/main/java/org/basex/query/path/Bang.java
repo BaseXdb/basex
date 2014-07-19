@@ -27,7 +27,7 @@ public final class Bang extends Single {
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     super.compile(qc, scp);
-    type = expr.type();
+    seqType = expr.seqType();
     return this;
   }
 

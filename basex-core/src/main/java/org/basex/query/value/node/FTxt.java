@@ -41,7 +41,7 @@ public final class FTxt extends FNode {
 
   @Override
   public FNode copy() {
-    return new FTxt(value).parent(par);
+    return new FTxt(value).parent(parent);
   }
 
   @Override

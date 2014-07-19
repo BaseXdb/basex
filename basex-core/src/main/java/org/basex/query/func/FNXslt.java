@@ -140,10 +140,8 @@ public final class FNXslt extends StandardFunc {
         ex.getCause(info);
       }
     }
-    if(it.type.isStringOrUntyped()) {
-      return checkPath(it, qc);
-    }
-    throw STRNODTYPE.get(info, this, it.type);
+    if(it.type.isStringOrUntyped()) return checkPath(it, qc);
+    throw STRNODTYPE.get(info, it.type, it);
   }
 
   /**

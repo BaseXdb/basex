@@ -792,11 +792,11 @@ public class QueryParser extends InputParser {
     if(!eq(uri, muri)) throw error(WRONGMODULE, muri, file);
 
     // check if context item declaration types are compatible to each other
-    if(sub.initType != null) {
-      if(sc.initType == null) {
-        sc.initType = sub.initType;
-      } else if(!sub.initType.eq(sc.initType)) {
-        throw error(CITYPES, sub.initType, sc.initType);
+    if(sub.contextType != null) {
+      if(sc.contextType == null) {
+        sc.contextType = sub.contextType;
+      } else if(!sub.contextType.eq(sc.contextType)) {
+        throw error(CITYPES, sub.contextType, sc.contextType);
       }
     }
     qc.modStack.pop();
@@ -811,11 +811,11 @@ public class QueryParser extends InputParser {
     if(!decl.add(ITEMM)) throw error(DUPLITEM);
 
     if(wsConsumeWs(AS)) {
-      final SeqType type = itemType();
-      if(sc.initType == null) {
-        sc.initType = type;
-      } else if(!sc.initType.eq(type)) {
-        throw error(CITYPES, sc.initType, type);
+      final SeqType declType = itemType();
+      if(sc.contextType == null) {
+        sc.contextType = declType;
+      } else if(!sc.contextType.eq(declType)) {
+        throw error(CITYPES, sc.contextType, declType);
       }
     }
 
@@ -824,9 +824,9 @@ public class QueryParser extends InputParser {
 
     pushVarContext(null);
     final Expr e = check(single(), NOVARDECL);
-    final SeqType type = sc.initType == null ? SeqType.ITEM : sc.initType;
+    final SeqType declType = sc.contextType == null ? SeqType.ITEM : sc.contextType;
     final VarScope scope = popVarContext();
-    qc.ctxItem = new MainModule(e, scope, type, currDoc.toString(), sc, info());
+    qc.ctxItem = new MainModule(e, scope, declType, currDoc.toString(), sc, info());
 
     if(module != null) throw error(DECITEM);
     if(!sc.mixUpdates && e.has(Flag.UPD)) throw error(UPCTX, e);
@@ -890,11 +890,11 @@ public class QueryParser extends InputParser {
     pushVarContext(null);
     final Var[] args = paramList();
     wsCheck(PAR2);
-    final SeqType tp = optAsType();
+    final SeqType type = optAsType();
     if(ann.contains(Ann.Q_UPDATING)) qc.updating();
-    final Expr body = wsConsumeWs(EXTERNAL) ? null : enclosed(NOFUNBODY);
+    final Expr expr = wsConsumeWs(EXTERNAL) ? null : enclosed(NOFUNBODY);
     final VarScope scope = popVarContext();
-    funcs.add(qc.funcs.declare(ann, name, args, tp, body, sc, scope, currDoc.toString(), ii));
+    funcs.add(qc.funcs.declare(ann, name, args, type, expr, sc, scope, currDoc.toString(), ii));
   }
 
   /**
@@ -1041,8 +1041,8 @@ public class QueryParser extends InputParser {
           // sequence isn't compatible with the type and can't be assigned
           final Var nv = addVar(v.var.name, null, false);
           // [LW] should be done everywhere
-          if(v.type().one())
-            nv.refineType(SeqType.get(v.type().type, Occ.ONE_MORE), qc, info());
+          if(v.seqType().one())
+            nv.refineType(SeqType.get(v.seqType().type, Occ.ONE_MORE), qc, info());
           ngrp[i] = nv;
           curr.put(nv.name.id(), nv);
         }
@@ -1244,11 +1244,11 @@ public class QueryParser extends InputParser {
     do {
       final InputInfo ii = info();
       final QNm name = varName();
-      final SeqType type = optAsType();
+      final SeqType declType = optAsType();
 
       final Expr by;
-      if(type != null || wsConsume(ASSIGN)) {
-        if(type != null) wsCheck(ASSIGN);
+      if(declType != null || wsConsume(ASSIGN)) {
+        if(declType != null) wsCheck(ASSIGN);
         by = check(single(), NOVARDECL);
       } else {
         final VarRef vr = resolveLocalVar(name, ii);
@@ -1280,7 +1280,7 @@ public class QueryParser extends InputParser {
       final Collation coll = wsConsumeWs(COLLATION) ? Collation.get(stringLiteral(),
           qc, sc, info(), FLWORCOLL) : sc.collation;
       final GroupBy.Spec spec =
-          new GroupBy.Spec(ii, addVar(name, type, false), by, coll);
+          new GroupBy.Spec(ii, addVar(name, declType, false), by, coll);
       if(specs == null) {
         specs = new GroupBy.Spec[] { spec };
       } else {
@@ -2185,7 +2185,8 @@ public class QueryParser extends InputParser {
 
     final long l = toLong(tok.finish());
     if(l != Long.MIN_VALUE) return Int.get(l);
-    return FNInfo.error(RANGE.get(info(), tok), SeqType.ITR);
+    final InputInfo ii = info();
+    return FNInfo.error(RANGE.get(ii, chop(tok, ii)), SeqType.ITR);
   }
 
   /**
@@ -3829,7 +3830,7 @@ public class QueryParser extends InputParser {
     // go down through the scopes and add bindings to their closures
     while(++i < localVars.size()) {
       final VarContext vctx = localVars.get(i);
-      final Var local = vctx.addVar(var.name, var.type(), false);
+      final Var local = vctx.addVar(var.name, var.seqType(), false);
       vctx.nonLocal.put(local, new VarRef(ii, var));
       var = local;
     }

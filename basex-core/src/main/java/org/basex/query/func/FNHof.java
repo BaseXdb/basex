@@ -7,7 +7,6 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -81,7 +80,7 @@ public final class FNHof extends StandardFunc {
         if(allAreValues() && exprs[0].size() < FNFunc.UNROLL_LIMIT) {
           qc.compInfo(QueryText.OPTUNROLL, this);
           final Value seq = (Value) exprs[0];
-          if(seq.isEmpty()) throw INVEMPTY.get(info, description());
+          if(seq.isEmpty()) throw SEQEMPTY.get(info);
           final FItem f = withArity(1, 2, qc);
           Expr e = seq.itemAt(0);
           for(int i = 1, len = (int) seq.size(); i < len; i++)
@@ -103,10 +102,10 @@ public final class FNHof extends StandardFunc {
    */
   private Value foldLeft1(final QueryContext qc) throws QueryException {
     final FItem f = withArity(1, 2, qc);
-    final Iter xs = exprs[0].iter(qc);
+    final Iter iter = exprs[0].iter(qc);
 
-    Value sum = checkNoEmpty(xs.next());
-    for(Item x; (x = xs.next()) != null;) sum = f.invokeValue(qc, info, sum, x);
+    Value sum = checkNoEmpty(iter.next());
+    for(Item it; (it = iter.next()) != null;) sum = f.invokeValue(qc, info, sum, it);
     return sum;
   }
 
@@ -139,9 +138,7 @@ public final class FNHof extends StandardFunc {
     final FItem pred = withArity(0, 1, qc);
     final FItem fun = withArity(1, 1, qc);
     Value v = qc.value(exprs[2]);
-    while(!checkBln(checkNoEmpty(pred.invokeItem(qc, info, v)), qc)) {
-      v = fun.invokeValue(qc, info, v);
-    }
+    while(!checkBln(pred.invokeItem(qc, info, v))) v = fun.invokeValue(qc, info, v);
     return v;
   }
 
@@ -242,6 +239,6 @@ public final class FNHof extends StandardFunc {
   private FItem withArity(final int p, final int a, final QueryContext qc) throws QueryException {
     final Item f = checkItem(exprs[p], qc);
     if(f instanceof FItem && ((XQFunction) f).arity() == a) return (FItem) f;
-    throw Err.typeError(this, f, FuncType.arity(a));
+    throw castError(info, f, FuncType.arity(a));
   }
 }

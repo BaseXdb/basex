@@ -22,7 +22,7 @@ public final class LitMap extends Arr {
    */
   public LitMap(final InputInfo info, final Expr[] expr) {
     super(info, expr);
-    type = SeqType.MAP_O;
+    seqType = SeqType.MAP_O;
   }
 
   @Override
@@ -36,7 +36,7 @@ public final class LitMap extends Arr {
     Map map = Map.EMPTY;
     final int es = exprs.length;
     for(int i = 0; i < es; i++) {
-      map = map.insert(checkItem(exprs[i], qc), qc.value(exprs[++i]), ii);
+      map = map.insert(exprs[i].item(qc, info), qc.value(exprs[++i]), ii);
     }
     return map;
   }

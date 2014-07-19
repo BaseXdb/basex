@@ -54,8 +54,8 @@ public final class CmpSR extends Single {
     this.mni = mni;
     this.max = max;
     this.mxi = mxi;
-    type = SeqType.BLN;
-    atomic = expr.type().zeroOrOne();
+    seqType = SeqType.BLN;
+    atomic = expr.seqType().zeroOrOne();
   }
 
   /**
@@ -100,7 +100,7 @@ public final class CmpSR extends Single {
    * @throws QueryException query exception
    */
   private boolean eval(final Item it) throws QueryException {
-    if(!it.type.isStringOrUntyped()) throw INVTYPECMP.get(info, it.type, AtomType.STR);
+    if(!it.type.isStringOrUntyped()) throw diffError(info, it, it);
     final byte[] s = it.string(info);
     final int mn = min == null ?  1 :
       coll == null ? Token.diff(s, min) : coll.compare(s, min);

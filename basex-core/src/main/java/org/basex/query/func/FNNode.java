@@ -60,7 +60,7 @@ public final class FNNode extends StandardFunc {
         do {
           if(n == null) return sc.baseURI().resolve(base, info);
           final Uri bu = Uri.uri(n.baseURI(), false);
-          if(!bu.isValid()) throw FUNCAST.get(ii, bu.type, bu);
+          if(!bu.isValid()) throw INVURI.get(ii, n.baseURI());
           base = bu.resolve(base, info);
           if(n.type == NodeType.DOC && n instanceof DBNode) break;
           n = n.parent();
@@ -124,7 +124,7 @@ public final class FNNode extends StandardFunc {
       } else if(n.type == NodeType.COM || n.type == NodeType.TXT) {
         final AxisIter ai = n.precedingSibling();
         for(ANode fs; (fs = ai.next()) != null;) if(fs.type == n.type) i++;
-        tb.addExt(n.type() + "[%]", i);
+        tb.addExt(n.seqType() + "[%]", i);
       } else if(n.type == NodeType.PI) {
         final QNm qnm = n.qname();
         final AxisIter ai = n.precedingSibling();

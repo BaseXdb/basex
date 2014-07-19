@@ -171,11 +171,11 @@ public final class FNPat extends StandardFunc {
     for(int i = 0; i < rep.length; ++i) {
       if(rep[i] == '\\') {
         if(i + 1 == rep.length || rep[i + 1] != '\\' && rep[i + 1] != '$')
-          throw FUNREPBS.get(info);
+          throw FUNREPBS.get(info, rep);
         ++i;
       }
       if(rep[i] == '$' && (i == 0 || rep[i - 1] != '\\') &&
-        (i + 1 == rep.length || !digit(rep[i + 1]))) throw FUNREPDOL.get(info);
+        (i + 1 == rep.length || !digit(rep[i + 1]))) throw FUNREPDOL.get(info, rep);
     }
 
     final Pattern p = pattern(exprs[1], exprs.length == 4 ? exprs[3] : null, qc);

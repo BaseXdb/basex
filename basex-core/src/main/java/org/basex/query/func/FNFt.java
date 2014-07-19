@@ -78,8 +78,7 @@ public final class FNFt extends StandardFunc {
     final FTPosData tmp = qc.ftPosData;
     qc.ftPosData = new FTPosData();
     final Iter ir = qc.iter(exprs[0]);
-    for(Item it; (it = ir.next()) != null;)
-      checkDBNode(it);
+    for(Item it; (it = ir.next()) != null;) checkDBNode(it);
     final int s = qc.ftPosData.size();
     qc.ftPosData = tmp;
     return Int.get(s);
@@ -99,7 +98,7 @@ public final class FNFt extends StandardFunc {
     if(exprs.length > 1) {
       // name of the marker element; default is <mark/>
       m = checkStr(exprs[1], qc);
-      if(!XMLToken.isQName(m)) throw valueError(info, AtomType.QNM, m);
+      if(!XMLToken.isQName(m)) throw valueError(info, AtomType.QNM, Str.get(m));
     }
     if(exprs.length > 2) {
       l = (int) checkItr(exprs[2], qc);

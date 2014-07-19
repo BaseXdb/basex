@@ -39,7 +39,7 @@ public final class Int extends ANum {
   /**
    * Constructor.
    * @param value value
-   * @param type data type
+   * @param type item type
    */
   public Int(final long value, final Type type) {
     super(type);
@@ -58,7 +58,7 @@ public final class Int extends ANum {
   /**
    * Returns an instance of this class.
    * @param value value
-   * @param type data type
+   * @param type item type
    * @return instance
    */
   public static Int get(final long value, final Type type) {
@@ -153,7 +153,7 @@ public final class Int extends ANum {
     try {
       return Long.parseLong(Token.string(val).trim());
     } catch(final NumberFormatException ex) {
-      throw FUNCAST.get(ii, NUMS[0].type, chop(val, ii));
+      throw funCastError(ii, AtomType.INT, val);
     }
   }
 }

@@ -37,7 +37,7 @@ public final class StaticVar extends StaticDecl {
    * @param scope variable scope
    * @param ann annotations
    * @param name variable name
-   * @param type variable type
+   * @param type declared variable type
    * @param expr expression to be bound
    * @param external external flag
    * @param doc current xqdoc cache
@@ -64,7 +64,7 @@ public final class StaticVar extends StaticDecl {
       } catch(final QueryException qe) {
         compiled = true;
         if(lazy) {
-          expr = FNInfo.error(qe, expr.type());
+          expr = FNInfo.error(qe, expr.seqType());
           return;
         }
         throw qe.notCatchable();
@@ -152,7 +152,8 @@ public final class StaticVar extends StaticDecl {
   private Expr checkType(final Expr e, final InputInfo ii) throws QueryException {
     if(declType != null) {
       if(e instanceof Value) declType.treat((Value) e, ii);
-      else if(e.type().intersect(declType) == null) throw treatError(ii, e, declType);
+      else if(e.seqType().intersect(declType) == null)
+        throw INVTREAT.get(ii, e.seqType(), declType);
     }
     return e;
   }

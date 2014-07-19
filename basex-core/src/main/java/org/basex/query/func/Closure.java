@@ -153,13 +153,13 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     for(final Entry<Var, Expr> e : nonLocal.entrySet()) {
       final Expr bound = e.getValue().compile(qc, scp);
       e.setValue(bound);
-      e.getKey().refineType(bound.type(), qc, info);
+      e.getKey().refineType(bound.seqType(), qc, info);
     }
 
     try {
       expr = expr.compile(qc, scope);
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, ret != null ? ret : expr.type());
+      expr = FNInfo.error(qe, ret != null ? ret : expr.seqType());
     } finally {
       scope.cleanUp(this);
     }
@@ -172,9 +172,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    final SeqType r = expr.type();
+    final SeqType r = expr.seqType();
     final SeqType retType = updating ? SeqType.EMP : ret == null || r.instanceOf(ret) ? r : ret;
-    type = FuncType.get(ann, args, retType).seqType();
+    seqType = FuncType.get(ann, args, retType).seqType();
     size = 1;
 
     try {
@@ -185,7 +185,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         if (inlined != null) expr = inlined;
       }
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, ret != null ? ret : expr.type());
+      expr = FNInfo.error(qe, ret != null ? ret : expr.seqType());
     } finally {
       scope.cleanUp(this);
     }
@@ -265,7 +265,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public FuncItem item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final FuncType ft = (FuncType) type().type;
+    final FuncType ft = (FuncType) seqType().type;
 
     final Expr body;
     if(!nonLocal.isEmpty()) {

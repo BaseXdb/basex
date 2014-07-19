@@ -97,8 +97,7 @@ public final class DigitalSignature {
    * @param ns signature element namespace prefix
    * @param t signature type (enveloped, enveloping, detached)
    * @param expr XPath expression which specifies node to be signed
-   * @param ce certificate which contains keystore information for
-   *        signing the node, may be null
+   * @param ce certificate which contains keystore information for signing the node, may be null
    * @param qc query context
    * @param ii input info
    *
@@ -138,7 +137,6 @@ public final class DigitalSignature {
     final Item signedNode;
     try {
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
-
       final PrivateKey pk;
       final KeyInfo ki;
 
@@ -151,24 +149,15 @@ public final class DigitalSignature {
         final int s = ceChildren.getLength();
         int ci = 0;
         // iterate child axis to retrieve keystore setup
-        String ksURI = null;
-        String pkPW = null;
-        String kAlias = null;
-        String ksPW = null;
-        String ksTY = null;
+        String ksURI = null, pkPW = null, kAlias = null, ksPW = null, ksTY = null;
         while(ci < s) {
           final Node cn = ceChildren.item(ci++);
           final String name = cn.getNodeName();
-          if("keystore-type".equals(name))
-            ksTY = cn.getTextContent();
-          else if("keystore-password".equals(name))
-            ksPW = cn.getTextContent();
-          else if("key-alias".equals(name))
-            kAlias = cn.getTextContent();
-          else if("private-key-password".equals(name))
-            pkPW = cn.getTextContent();
-          else if("keystore-uri".equals(name))
-            ksURI = cn.getTextContent();
+          if("keystore-type".equals(name)) ksTY = cn.getTextContent();
+          else if("keystore-password".equals(name)) ksPW = cn.getTextContent();
+          else if("key-alias".equals(name)) kAlias = cn.getTextContent();
+          else if("private-key-password".equals(name)) pkPW = cn.getTextContent();
+          else if("keystore-uri".equals(name)) ksURI = cn.getTextContent();
         }
 
         // initialize the keystore
@@ -181,8 +170,7 @@ public final class DigitalSignature {
 
         ks.load(new FileInputStream(ksURI), ksPW.toCharArray());
         pk = (PrivateKey) ks.getKey(kAlias, pkPW.toCharArray());
-        final X509Certificate x509ce = (X509Certificate)
-            ks.getCertificate(kAlias);
+        final X509Certificate x509ce = (X509Certificate) ks.getCertificate(kAlias);
         if(x509ce == null) throw CX_ALINV.get(info, kAlias);
         final PublicKey puk = x509ce.getPublicKey();
         final KeyInfoFactory kifactory = fac.getKeyInfoFactory();
@@ -201,8 +189,7 @@ public final class DigitalSignature {
 
       // auto-generate keys if no certificate is provided
       } else {
-        final KeyPairGenerator gen =
-            KeyPairGenerator.getInstance(keytype);
+        final KeyPairGenerator gen = KeyPairGenerator.getInstance(keytype);
         gen.initialize(512);
         final KeyPair kp = gen.generateKeyPair();
         final KeyInfoFactory kif = fac.getKeyInfoFactory();
@@ -218,15 +205,11 @@ public final class DigitalSignature {
       if(expr.length > 0) {
         final XPathFactory xpf = XPathFactory.newInstance();
         final XPathExpression xExpr = xpf.newXPath().compile(string(expr));
-        final NodeList xRes = (NodeList) xExpr.evaluate(inputNode,
-            XPathConstants.NODESET);
-        if(xRes.getLength() < 1)
-          throw CX_XPINV.get(info, expr);
+        final NodeList xRes = (NodeList) xExpr.evaluate(inputNode, XPathConstants.NODESET);
+        if(xRes.getLength() < 1) throw CX_XPINV.get(info, expr);
         tfList = new ArrayList<>(2);
-        tfList.add(fac.newTransform(Transform.XPATH,
-            new XPathFilterParameterSpec(string(expr))));
-        tfList.add(fac.newTransform(Transform.ENVELOPED,
-            (TransformParameterSpec) null));
+        tfList.add(fac.newTransform(Transform.XPATH, new XPathFilterParameterSpec(string(expr))));
+        tfList.add(fac.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null));
 
       } else {
         tfList = Collections.singletonList(fac.newTransform(
@@ -240,8 +223,7 @@ public final class DigitalSignature {
       // creating signed info element
       final SignedInfo si = fac.newSignedInfo(fac.newCanonicalizationMethod(
           canonicalization, (C14NMethodParameterSpec) null),
-              fac.newSignatureMethod(signature, null),
-              Collections.singletonList(ref));
+          fac.newSignatureMethod(signature, null), Collections.singletonList(ref));
 
       // prepare document signature
       final DOMSignContext signContext;
@@ -255,8 +237,7 @@ public final class DigitalSignature {
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         final XMLStructure cont = new DOMStructure(inputNode.getDocumentElement());
-        final XMLObject obj = fac.newXMLObject(Collections.singletonList(cont),
-            "", null, null);
+        final XMLObject obj = fac.newXMLObject(Collections.singletonList(cont), "", null, null);
         xmlSig = fac.newXMLSignature(si, ki, Collections.singletonList(obj), null, null);
         signContext = new DOMSignContext(pk, inputNode);
       }
@@ -296,12 +277,9 @@ public final class DigitalSignature {
   public Item validateSignature(final ANode node) throws QueryException {
     try {
       final Document doc = toDOMNode(node);
-      final DOMValidateContext valContext =
-          new DOMValidateContext(new MyKeySelector(), doc);
-      final NodeList signl = doc.getElementsByTagNameNS(XMLSignature.XMLNS,
-          "Signature");
-      if(signl.getLength() < 1)
-        throw CX_NOSIG.get(info, node);
+      final DOMValidateContext valContext = new DOMValidateContext(new MyKeySelector(), doc);
+      final NodeList signl = doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
+      if(signl.getLength() < 1) throw CX_NOSIG.get(info, node);
       valContext.setNode(signl.item(0));
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
       final XMLSignature signature = fac.unmarshalXMLSignature(valContext);

@@ -57,7 +57,7 @@ public final class FNStream extends StandardFunc {
 
   @Override
   protected Expr opt(final QueryContext qc, final VarScope scp) {
-    if(func == Function._STREAM_MATERIALIZE) type = exprs[0].type();
+    if(func == Function._STREAM_MATERIALIZE) seqType = exprs[0].seqType();
     return this;
   }
 }

@@ -20,7 +20,7 @@ import org.basex.util.*;
  */
 abstract class Set extends Arr {
   /** Iterable flag. */
-  boolean iterable = true;
+  boolean iterable;
 
   /**
    * Constructor.
@@ -29,17 +29,25 @@ abstract class Set extends Arr {
    */
   Set(final InputInfo info, final Expr[] exprs) {
     super(info, exprs);
-    type = SeqType.NOD_ZM;
+    seqType = SeqType.NOD_ZM;
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+  public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     super.compile(qc, scp);
+    return optimize(qc, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    boolean i = true;
     for(final Expr e : exprs) {
-      if(e.iterable()) continue;
-      iterable = false;
-      break;
+      if(!e.iterable()) {
+        i = false;
+        break;
+      }
     }
+    iterable = i;
     return this;
   }
 
@@ -68,6 +76,11 @@ abstract class Set extends Arr {
   @Override
   public final boolean iterable() {
     return iterable;
+  }
+
+  @Override
+  public final String toString() {
+    return PAR1 + toString(' ' + Util.className(this).toLowerCase(Locale.ENGLISH) + ' ') + PAR2;
   }
 
   /**
@@ -101,11 +114,5 @@ abstract class Set extends Arr {
       item[i] = it == null ? null : checkNode(it);
       return it != null;
     }
-  }
-
-  @Override
-  public final String toString() {
-    return PAR1 + toString(' ' +
-        Util.className(this).toLowerCase(Locale.ENGLISH) + ' ') + PAR2;
   }
 }

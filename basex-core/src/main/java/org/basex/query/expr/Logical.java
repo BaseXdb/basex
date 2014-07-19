@@ -28,7 +28,7 @@ public abstract class Logical extends Arr {
    */
   Logical(final InputInfo info, final Expr[] exprs) {
     super(info, exprs);
-    type = SeqType.BLN;
+    seqType = SeqType.BLN;
   }
 
   @Override
@@ -56,7 +56,7 @@ public abstract class Logical extends Arr {
   public final void markTailCalls(final QueryContext qc) {
     // if the last expression surely returns a boolean, we can jump to it
     final Expr last = exprs[exprs.length - 1];
-    if(last.type().eq(SeqType.BLN)) {
+    if(last.seqType().eq(SeqType.BLN)) {
       tailCall = true;
       last.markTailCalls(qc);
     }

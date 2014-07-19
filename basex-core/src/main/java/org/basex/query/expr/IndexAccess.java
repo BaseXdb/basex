@@ -24,7 +24,7 @@ public abstract class IndexAccess extends Simple {
   IndexAccess(final IndexContext ictx, final InputInfo info) {
     super(info);
     this.ictx = ictx;
-    type = SeqType.NOD_ZM;
+    seqType = SeqType.NOD_ZM;
   }
 
   @Override

@@ -15,39 +15,40 @@ import org.basex.util.*;
  */
 final class XdmSequence extends XdmValue {
   /** Wrapped sequence. */
-  final Seq sequence;
+  final Seq seq;
 
   /**
    * Constructor.
    * @param seq sequence
    */
   XdmSequence(final Seq seq) {
-    sequence = seq;
+    this.seq = seq;
   }
 
   @Override
   public SeqType getType() {
-    return sequence.type();
+    return seq.seqType();
   }
 
   @Override
   public int size() {
-    return (int) sequence.size();
+    return (int) seq.size();
   }
 
   @Override
   public Iterator<XdmItem> iterator() {
     return new Iterator<XdmItem>() {
-      private int c;
+      private final int ss = size();
+      private int s;
 
       @Override
       public boolean hasNext() {
-        return c < sequence.size();
+        return s < ss;
       }
 
       @Override
       public XdmItem next() {
-        return XdmItem.get(sequence.itemAt(c++));
+        return XdmItem.get(seq.itemAt(s++));
       }
 
       @Override
@@ -59,7 +60,7 @@ final class XdmSequence extends XdmValue {
 
   @Override
   public Value internal() {
-    return sequence;
+    return seq;
   }
 
   @Override

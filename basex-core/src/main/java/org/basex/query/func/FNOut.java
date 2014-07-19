@@ -59,7 +59,7 @@ public final class FNOut extends StandardFunc {
     try {
       return Str.get(String.format(form, args));
     } catch(final RuntimeException ex) {
-      throw ERRFORM.get(info, Util.className(ex), ex);
+      throw ERRFORMAT.get(info, Util.className(ex), ex);
     }
   }
 }

@@ -43,24 +43,24 @@ public final class StaticFuncs extends ExprInfo {
    * @param ann annotations
    * @param nm function name
    * @param args formal parameters
-   * @param ret return type
-   * @param body function body
+   * @param type declared return type
+   * @param expr function body
    * @param sc static context
-   * @param scp variable scope
-   * @param xqdoc current xqdoc cache
+   * @param scope variable scope
+   * @param doc current xqdoc cache
    * @param ii input info
    * @return static function reference
    * @throws QueryException query exception
    */
-  public StaticFunc declare(final Ann ann, final QNm nm, final Var[] args, final SeqType ret,
-      final Expr body, final StaticContext sc, final VarScope scp, final String xqdoc,
+  public StaticFunc declare(final Ann ann, final QNm nm, final Var[] args, final SeqType type,
+      final Expr expr, final StaticContext sc, final VarScope scope, final String doc,
       final InputInfo ii) throws QueryException {
 
     final byte[] uri = nm.uri();
     if(uri.length == 0) throw FUNNONS.get(ii, nm.string());
     if(NSGlobal.reserved(uri)) throw NAMERES.get(ii, nm.string());
 
-    final StaticFunc fn = new StaticFunc(ann, nm, args, ret, body, sc, scp, xqdoc, ii);
+    final StaticFunc fn = new StaticFunc(ann, nm, args, type, expr, sc, scope, doc, ii);
     final byte[] sig = fn.id();
     final FuncCache fc = funcs.get(sig);
     if(fc != null) fc.setFunc(fn);
@@ -127,12 +127,22 @@ public final class StaticFuncs extends ExprInfo {
         if(!al.isEmpty()) {
           final StringBuilder exp = new StringBuilder();
           final int as = al.size();
+          int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
           for(int a = 0; a < as; a++) {
-            if(a != 0) exp.append(a + 1 < as ? "," : " or ");
-            exp.append(al.get(a));
+            final int m = al.get(a);
+            if(m < min) min = m;
+            if(m > max) max = m;
           }
-          final int a = call.exprs.length;
-          throw (a == 1 ? FUNCTYPESG : FUNCTYPEPL).get(call.info, call.name.string(), a, exp);
+          if(as > 1 && max - min + 1 == as) {
+            exp.append(min).append('-').append(max);
+          } else {
+            for(int a = 0; a < as; a++) {
+              if(a != 0) exp.append(a + 1 < as ? ", " : " or ");
+              exp.append(al.get(a));
+            }
+          }
+          final int arity = call.exprs.length;
+          throw FUNCTYPES.get(call.info, call.name.string(), arity, arity == 1 ? "" : "s", exp);
         }
 
         // if not, indicate that function is unknown

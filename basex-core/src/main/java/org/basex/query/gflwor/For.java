@@ -93,10 +93,10 @@ public final class For extends ForLet {
 
   @Override
   public For optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    final SeqType tp = expr.type();
+    final SeqType tp = expr.seqType();
     final boolean emp = empty && tp.mayBeZero();
-    type = SeqType.get(tp.type, emp ? Occ.ZERO_ONE : Occ.ONE);
-    var.refineType(type, qc, info);
+    seqType = SeqType.get(tp.type, emp ? Occ.ZERO_ONE : Occ.ONE);
+    var.refineType(seqType, qc, info);
     if(pos != null) pos.refineType(SeqType.ITR, qc, info);
     if(score != null) score.refineType(SeqType.DBL, qc, info);
     size = emp ? -1 : 1;
@@ -141,7 +141,7 @@ public final class For extends ForLet {
    * @return {@code true} if the clause was converted, {@code false} otherwise
    */
   boolean asLet(final List<Clause> clauses, final int p) {
-    if(expr.size() != 1 && !expr.type().one()) return false;
+    if(expr.size() != 1 && !expr.seqType().one()) return false;
     clauses.set(p, Let.fromFor(this));
     if(score != null) clauses.add(p + 1, Let.fromForScore(this));
     if(pos != null) clauses.add(p + 1, new Let(pos, Int.get(1), false, info));
@@ -166,7 +166,7 @@ public final class For extends ForLet {
       qc.value = null;
       // assign type of iterated items to context expression
       final Context c = new Context(info);
-      c.type = expr.type().type.seqType();
+      c.seqType = expr.seqType().type.seqType();
       final Expr r = ex.inline(qc, scp, var, c);
       if(r != null) pred = r;
     } finally {
@@ -174,7 +174,7 @@ public final class For extends ForLet {
     }
 
     // attach predicates to axis path or filter, or create a new filter
-    if(pred.type().mayBeNumber()) pred = Function.BOOLEAN.get(null, info, pred);
+    if(pred.seqType().mayBeNumber()) pred = Function.BOOLEAN.get(null, info, pred);
 
     // add to clause expression
     if(expr instanceof AxisPath) {

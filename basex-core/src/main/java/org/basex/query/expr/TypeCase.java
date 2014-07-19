@@ -64,9 +64,9 @@ public final class TypeCase extends Single {
       }
     } catch(final QueryException ex) {
       // replace original expression with error
-      expr = FNInfo.error(ex, expr.type());
+      expr = FNInfo.error(ex, expr.seqType());
     }
-    type = expr.type();
+    seqType = expr.seqType();
     return this;
   }
 
@@ -75,7 +75,7 @@ public final class TypeCase extends Single {
     try {
       return super.inline(qc, scp, v, e);
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, expr.type());
+      expr = FNInfo.error(qe, expr.seqType());
       return this;
     }
   }
