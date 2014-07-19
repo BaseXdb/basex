@@ -72,19 +72,19 @@ public final class Where extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    return pred.removable(v);
+  public boolean removable(final Var var) {
+    return pred.removable(var);
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return pred.count(v);
+  public VarUsage count(final Var var) {
+    return pred.count(var);
   }
 
   @Override
-  public GFLWOR.Clause inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
-      throws QueryException {
-    final Expr sub = pred.inline(qc, scp, v, e);
+  public GFLWOR.Clause inline(final QueryContext qc, final VarScope scp, final Var var,
+      final Expr ex) throws QueryException {
+    final Expr sub = pred.inline(qc, scp, var, ex);
     if(sub == null) return null;
     pred = sub;
     return optimize(qc, scp);

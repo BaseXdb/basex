@@ -83,22 +83,22 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    return win.removable(v) && super.removable(v);
+  public boolean removable(final Var var) {
+    return win.removable(var) && super.removable(var);
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return win.count(v).plus(super.count(v));
+  public VarUsage count(final Var var) {
+    return win.count(var).plus(super.count(var));
   }
 
   @Override
-  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
-    final boolean ex = inlineAll(qc, scp, exprs, v, e);
-    final Expr w = win.inline(qc, scp, v, e);
+    final boolean e = inlineAll(qc, scp, exprs, var, ex);
+    final Expr w = win.inline(qc, scp, var, ex);
     if(w != null) win = w;
-    return ex || w != null ? optimize(qc, scp) : null;
+    return e || w != null ? optimize(qc, scp) : null;
   }
 
   @Override

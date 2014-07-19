@@ -112,7 +112,7 @@ public final class DBLocking implements Locking {
           || queue.peek() != thread) {
         try {
           queue.wait();
-        } catch(final InterruptedException e) {
+        } catch(final InterruptedException ex) {
           Thread.currentThread().interrupt();
         }
       }
@@ -131,7 +131,7 @@ public final class DBLocking implements Locking {
         while(globalReaders > 0) {
           try {
             globalLock.wait();
-          } catch(final InterruptedException e) {
+          } catch(final InterruptedException ex) {
             Thread.currentThread().interrupt();
           }
         }
@@ -142,7 +142,7 @@ public final class DBLocking implements Locking {
         while(localWriters > 0) {
           try {
             globalLock.wait();
-          } catch(final InterruptedException e) {
+          } catch(final InterruptedException ex) {
             Thread.currentThread().interrupt();
           }
         }

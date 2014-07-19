@@ -11,11 +11,11 @@ import org.basex.core.*;
 abstract class ARepo extends Command {
   /**
    * Constructor for repository commands.
-   * @param p required permission
-   * @param arg arguments
+   * @param perm required permission
+   * @param args arguments
    */
-  ARepo(final Perm p, final String... arg) {
-    super(p, arg);
+  ARepo(final Perm perm, final String... args) {
+    super(perm, args);
   }
 
   @Override

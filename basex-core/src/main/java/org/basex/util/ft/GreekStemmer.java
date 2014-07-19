@@ -21,7 +21,7 @@ public class GreekStemmer extends InternalStemmer {
   }
 
   @Override
-  GreekStemmer get(final Language l, final FTIterator fti) {
+  GreekStemmer get(final Language lang, final FTIterator fti) {
     return new GreekStemmer(fti);
   }
 

@@ -24,41 +24,41 @@ public class BuilderSerializer extends Serializer {
 
   /**
    * Constructor taking a Builder.
-   * @param b builder to be used
+   * @param builder builder to be used
    */
-  public BuilderSerializer(final Builder b) {
-    build = b;
+  public BuilderSerializer(final Builder builder) {
+    this.build = builder;
   }
 
   @Override
-  protected final void finishText(final byte[] b) throws IOException {
-    build.text(b);
+  protected final void finishText(final byte[] value) throws IOException {
+    build.text(value);
   }
 
   @Override
-  protected void startOpen(final byte[] t) throws IOException {
+  protected void startOpen(final byte[] name) throws IOException {
   }
 
   @Override
-  protected final void finishPi(final byte[] n, final byte[] v) throws IOException {
-    build.pi(concat(n, SPACE, v));
+  protected final void finishPi(final byte[] name, final byte[] value) throws IOException {
+    build.pi(concat(name, SPACE, value));
   }
 
   @Override
-  protected final void atomic(final Item b, final boolean iter) {
+  protected final void atomic(final Item it, final boolean iter) {
     throw Util.notExpected();
   }
 
   @Override
   protected final void finishOpen() throws IOException {
-    build.openElem(tag, atts, nsp);
+    build.openElem(elem, atts, nsp);
     atts.clear();
     nsp.clear();
   }
 
   @Override
   protected void finishEmpty() throws IOException {
-    build.emptyElem(tag, atts, nsp);
+    build.emptyElem(elem, atts, nsp);
     atts.clear();
     nsp.clear();
   }
@@ -69,22 +69,22 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  protected final void finishComment(final byte[] b) throws IOException {
-    build.comment(b);
+  protected final void finishComment(final byte[] value) throws IOException {
+    build.comment(value);
   }
 
   @Override
-  protected final void attribute(final byte[] n, final byte[] v) {
-    if(startsWith(n, XMLNS)) {
-      if(n.length == 5) {
-        nsp.add(EMPTY, v);
-      } else if(n[5] == ':') {
-        nsp.add(substring(n, 6), v);
+  protected final void attribute(final byte[] name, final byte[] value) {
+    if(startsWith(name, XMLNS)) {
+      if(name.length == 5) {
+        nsp.add(EMPTY, value);
+      } else if(name[5] == ':') {
+        nsp.add(substring(name, 6), value);
       } else {
-        atts.add(n, v);
+        atts.add(name, value);
       }
     } else {
-      atts.add(n, v);
+      atts.add(name, value);
     }
   }
 

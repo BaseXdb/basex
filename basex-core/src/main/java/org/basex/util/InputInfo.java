@@ -37,14 +37,14 @@ public final class InputInfo {
 
   /**
    * Constructor.
-   * @param p input path
-   * @param l line
-   * @param c column
+   * @param path input path
+   * @param line line
+   * @param col column
    */
-  public InputInfo(final String p, final int l, final int c) {
-    path = p;
-    line = l;
-    col = c;
+  public InputInfo(final String path, final int line, final int col) {
+    this.path = path;
+    this.line = line;
+    this.col = col;
   }
 
   /**
@@ -98,10 +98,10 @@ public final class InputInfo {
 
   /**
    * Sets the check flag (invoked e.g. by {@link Castable#optimize}).
-   * @param c check flag
+   * @param value value to set
    */
-  public void check(final boolean c) {
-    check = c;
+  public void check(final boolean value) {
+    check = value;
   }
 
   @Override

@@ -39,15 +39,15 @@ public class HTMLSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void attribute(final byte[] n, final byte[] v) throws IOException {
+  protected void attribute(final byte[] name, final byte[] value) throws IOException {
     print(' ');
-    print(n);
+    print(name);
 
     // don't append value for boolean attributes
-    final byte[] tagatt = concat(lc(tag), COLON, lc(n));
-    if(BOOLEAN.contains(tagatt) && eq(n, v)) return;
+    final byte[] nm = concat(lc(elem), COLON, lc(name));
+    if(BOOLEAN.contains(nm) && eq(name, value)) return;
     // escape URI attributes
-    final byte[] val = escuri && URIS.contains(tagatt) ? escape(v) : v;
+    final byte[] val = escuri && URIS.contains(nm) ? escape(value) : value;
 
     print(ATT1);
     for(int k = 0; k < val.length; k += cl(val, k)) {
@@ -66,21 +66,21 @@ public class HTMLSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void finishComment(final byte[] n) throws IOException {
+  protected void finishComment(final byte[] value) throws IOException {
     if(sep) indent();
     print(COMM_O);
-    print(n);
+    print(value);
     print(COMM_C);
   }
 
   @Override
-  protected void finishPi(final byte[] n, final byte[] v) throws IOException {
+  protected void finishPi(final byte[] name, final byte[] value) throws IOException {
     if(sep) indent();
-    if(contains(v, '>')) throw SERPI.getIO();
+    if(contains(value, '>')) throw SERPI.getIO();
     print(PI_O);
-    print(n);
+    print(name);
     print(' ');
-    print(v);
+    print(value);
     print(ELEM_C);
   }
 
@@ -93,14 +93,14 @@ public class HTMLSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void startOpen(final byte[] t) throws IOException {
+  protected void startOpen(final byte[] name) throws IOException {
     doctype(null);
     if(sep) indent();
     print(ELEM_O);
-    print(t);
+    print(name);
     sep = indent;
-    script = SCRIPTS.contains(lc(t));
-    if(content && eq(lc(tag), HEAD)) ct++;
+    script = SCRIPTS.contains(lc(name));
+    if(content && eq(lc(elem), HEAD)) ct++;
   }
 
   @Override
@@ -114,9 +114,9 @@ public class HTMLSerializer extends OutputSerializer {
     if(ct(true, true)) return;
     print(ELEM_C);
     if(html5) {
-      if(EMPTIES5.contains(lc(tag))) return;
+      if(EMPTIES5.contains(lc(elem))) return;
     } else {
-      if(EMPTIES.contains(lc(tag))) {
+      if(EMPTIES.contains(lc(elem))) {
         final byte[] u = nsUri(EMPTY);
         if(u == null || u.length == 0) return;
       }
@@ -128,17 +128,17 @@ public class HTMLSerializer extends OutputSerializer {
   @Override
   protected void finishClose() throws IOException {
     super.finishClose();
-    script = script && !SCRIPTS.contains(lc(tag));
+    script = script && !SCRIPTS.contains(lc(elem));
   }
 
   @Override
-  boolean doctype(final byte[] dt) throws IOException {
-    if(level != 0) return false;
-    if(!super.doctype(dt) && html5) {
+  boolean doctype(final byte[] type) throws IOException {
+    if(lvl != 0) return false;
+    if(!super.doctype(type) && html5) {
       if(sep) indent();
       print(DOCTYPE);
-      if(dt == null) print(HTML);
-      else print(dt);
+      if(type == null) print(HTML);
+      else print(type);
       print(ELEM_C);
       if(indent) print(nl);
     }

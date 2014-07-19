@@ -195,23 +195,23 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public VarUsage count(final Var v) {
+  public VarUsage count(final Var var) {
     VarUsage all = VarUsage.NEVER;
     for(final Entry<Var, Expr> e : nonLocal.entrySet())
-      if((all = all.plus(e.getValue().count(v))) == VarUsage.MORE_THAN_ONCE) break;
+      if((all = all.plus(e.getValue().count(var))) == VarUsage.MORE_THAN_ONCE) break;
     return all;
   }
 
   @Override
   public Expr inline(final QueryContext qc, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+      final Var var, final Expr ex) throws QueryException {
     boolean change = false;
 
     for(final Entry<Var, Expr> entry : nonLocal.entrySet()) {
-      final Expr ex = entry.getValue().inline(qc, scp, v, e);
-      if(ex != null) {
+      final Expr e = entry.getValue().inline(qc, scp, var, ex);
+      if(e != null) {
         change = true;
-        entry.setValue(ex);
+        entry.setValue(e);
       }
     }
 
@@ -306,9 +306,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public boolean removable(final Var v) {
+  public boolean removable(final Var var) {
     for(final Entry<Var, Expr> e : nonLocal.entrySet())
-      if(!e.getValue().removable(v)) return false;
+      if(!e.getValue().removable(var)) return false;
     return true;
   }
 

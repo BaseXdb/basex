@@ -22,18 +22,18 @@ public final class ExprList extends ElementList {
 
   /**
    * Constructor, specifying an initial array capacity.
-   * @param c array capacity
+   * @param capacity array capacity
    */
-  public ExprList(final int c) {
-    list = new Expr[c];
+  public ExprList(final int capacity) {
+    list = new Expr[capacity];
   }
 
   /**
    * Constructor, specifying an initial entry.
-   * @param c array capacity
+   * @param element array capacity
    */
-  public ExprList(final Expr c) {
-    list = new Expr[] { c };
+  public ExprList(final Expr element) {
+    list = new Expr[] { element };
     size = 1;
   }
 
@@ -48,12 +48,12 @@ public final class ExprList extends ElementList {
 
   /**
    * Adds an element to the array.
-   * @param e element to be added
+   * @param element element to be added
    * @return self reference
    */
-  public ExprList add(final Expr e) {
+  public ExprList add(final Expr element) {
     if(size == list.length) resize(newSize());
-    list[size++] = e;
+    list[size++] = element;
     return this;
   }
 
@@ -69,21 +69,21 @@ public final class ExprList extends ElementList {
 
   /**
    * Sets an element at the specified index position.
-   * @param i index
-   * @param e element to be set
+   * @param index index
+   * @param element element to be set
    */
-  public void set(final int i, final Expr e) {
-    if(i >= list.length) resize(newSize(i + 1));
-    list[i] = e;
-    size = Math.max(size, i + 1);
+  public void set(final int index, final Expr element) {
+    if(index >= list.length) resize(newSize(index + 1));
+    list[index] = element;
+    size = Math.max(size, index + 1);
   }
 
   /**
    * Resizes the array.
-   * @param s new size
+   * @param sz new size
    */
-  private void resize(final int s) {
-    final Expr[] tmp = new Expr[s];
+  private void resize(final int sz) {
+    final Expr[] tmp = new Expr[sz];
     System.arraycopy(list, 0, tmp, 0, size);
     list = tmp;
   }

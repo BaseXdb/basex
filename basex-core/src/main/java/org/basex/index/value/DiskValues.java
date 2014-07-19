@@ -45,26 +45,26 @@ public class DiskValues implements Index {
 
   /**
    * Constructor, initializing the index structure.
-   * @param d data reference
-   * @param txt value type (texts/attributes)
+   * @param data data reference
+   * @param text value type (texts/attributes)
    * @throws IOException I/O Exception
    */
-  public DiskValues(final Data d, final boolean txt) throws IOException {
-    this(d, txt, txt ? DATATXT : DATAATV);
+  public DiskValues(final Data data, final boolean text) throws IOException {
+    this(data, text, text ? DATATXT : DATAATV);
   }
 
   /**
    * Constructor, initializing the index structure.
-   * @param d data reference
-   * @param txt value type (texts/attributes)
+   * @param data data reference
+   * @param text value type (texts/attributes)
    * @param pref file prefix
    * @throws IOException I/O Exception
    */
-  DiskValues(final Data d, final boolean txt, final String pref) throws IOException {
-    data = d;
-    text = txt;
-    idxl = new DataAccess(d.meta.dbfile(pref + 'l'));
-    idxr = new DataAccess(d.meta.dbfile(pref + 'r'));
+  DiskValues(final Data data, final boolean text, final String pref) throws IOException {
+    this.data = data;
+    this.text = text;
+    idxl = new DataAccess(data.meta.dbfile(pref + 'l'));
+    idxr = new DataAccess(data.meta.dbfile(pref + 'r'));
     size.set(idxl.read4());
   }
 
@@ -290,15 +290,15 @@ public class DiskValues implements Index {
   /**
    * Iterator method.
    * <p><em>Important:</em> This method is thread-safe.</p>
-   * @param s number of values
-   * @param ps offset
+   * @param sz number of values
+   * @param offset offset
    * @return iterator
    */
-  private IndexIterator iter(final int s, final long ps) {
-    final IntList pres = new IntList(s);
-    long p = ps;
+  private IndexIterator iter(final int sz, final long offset) {
+    final IntList pres = new IntList(sz);
+    long p = offset;
     synchronized(monitor) {
-      for(int i = 0, id = 0; i < s; i++) {
+      for(int i = 0, id = 0; i < sz; i++) {
         id += idxl.readNum(p);
         p = idxl.cursor();
         pres.add(pre(id));
@@ -480,10 +480,10 @@ public class DiskValues implements Index {
 
   /**
    * Remove record from the index.
-   * @param o old record key
-   * @param n new record key
+   * @param old old record key
+   * @param key new record key
    * @param id record id
    */
   @SuppressWarnings("unused")
-  public void replace(final byte[] o, final byte[] n, final int id) { }
+  public void replace(final byte[] old, final byte[] key, final int id) { }
 }

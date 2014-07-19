@@ -164,12 +164,12 @@ public final class Context {
 
   /**
    * Sets the specified data instance as current database.
-   * @param d data reference
+   * @param dt data reference
    */
-  public void openDB(final Data d) {
-    data = d;
+  public void openDB(final Data dt) {
+    data = dt;
     copied = null;
-    set(null, new Nodes(d));
+    set(null, new Nodes(dt));
   }
 
   /**
@@ -210,14 +210,14 @@ public final class Context {
 
   /**
    * Checks if the current user has the specified permission.
-   * @param p requested permission
+   * @param perm requested permission
    * @param md optional meta data reference
    * @return result of check
    */
-  public boolean perm(final Perm p, final MetaData md) {
-    final User us = md == null || p == Perm.CREATE || p == Perm.ADMIN ? null :
+  public boolean perm(final Perm perm, final MetaData md) {
+    final User us = md == null || perm == Perm.CREATE || perm == Perm.ADMIN ? null :
       md.users.get(user.name);
-    return (us == null ? user : us).has(p);
+    return (us == null ? user : us).has(perm);
   }
 
   /**

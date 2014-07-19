@@ -136,10 +136,10 @@ public final class SerializerOptions extends Options {
 
     /**
      * Constructor.
-     * @param s string
+     * @param string string
      */
-    Norm(final String s) {
-      string = s;
+    Norm(final String string) {
+      this.string = string;
     }
 
     @Override
@@ -161,12 +161,12 @@ public final class SerializerOptions extends Options {
 
     /**
      * Constructor.
-     * @param n name
-     * @param nl newline string
+     * @param name name
+     * @param newline newline string
      */
-    Newline(final String n, final String nl) {
-      name = n;
-      newline = nl;
+    Newline(final String name, final String newline) {
+      this.name = name;
+      this.newline = newline;
     }
 
     /**

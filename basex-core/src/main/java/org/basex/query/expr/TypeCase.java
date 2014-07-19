@@ -71,9 +71,9 @@ public final class TypeCase extends Single {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e) {
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr ex) {
     try {
-      return super.inline(qc, scp, v, e);
+      return super.inline(qc, scp, v, ex);
     } catch(final QueryException qe) {
       expr = FNInfo.error(qe, expr.seqType());
       return this;

@@ -178,12 +178,12 @@ public final class FTLexer extends FTIterator implements IndexToken {
   /**
    * Calculates a position value, dependent on the specified unit. Does not have
    * to be implemented by all tokenizers. Returns 0 if not implemented.
-   * @param w word position
-   * @param u unit
+   * @param word word position
+   * @param unit unit
    * @return new position
    */
-  public int pos(final int w, final FTUnit u) {
-    return tok.pos(w, u);
+  public int pos(final int word, final FTUnit unit) {
+    return tok.pos(word, unit);
   }
 
   /**

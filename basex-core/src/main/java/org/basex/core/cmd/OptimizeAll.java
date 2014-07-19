@@ -171,21 +171,21 @@ public final class OptimizeAll extends ACreate {
 
     /**
      * Constructor.
-     * @param d disk data
-     * @param c calling command (can be {@code null})
+     * @param data disk data
+     * @param cmd calling command (can be {@code null})
      */
-    DBParser(final DiskData d, final OptimizeAll c) {
-      super(d.meta.original.isEmpty() ? null : IO.get(d.meta.original), d.meta.options);
-      data = d;
-      cmd = c;
+    DBParser(final DiskData data, final OptimizeAll cmd) {
+      super(data.meta.original.isEmpty() ? null : IO.get(data.meta.original), data.meta.options);
+      this.data = data;
+      this.cmd = cmd;
     }
 
     @Override
     public void parse(final Builder build) throws IOException {
       final Serializer ser = new BuilderSerializer(build) {
         @Override
-        protected void startOpen(final byte[] t) throws IOException {
-          super.startOpen(t);
+        protected void startOpen(final byte[] name) throws IOException {
+          super.startOpen(name);
           if(cmd != null) cmd.pre++;
         }
 

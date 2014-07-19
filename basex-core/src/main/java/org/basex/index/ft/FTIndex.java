@@ -195,28 +195,28 @@ public final class FTIndex implements Index {
   /**
    * Binary search.
    * @param token token to look for
-   * @param i start position
-   * @param e end position
+   * @param start start position
+   * @param end end position
    * @param ti entry length
    * @return position where the key was found, or would have been found
    */
-  private int find(final byte[] token, final int i, final int e, final int ti) {
+  private int find(final byte[] token, final int start, final int end, final int ti) {
     final int tl = ti + ENTRY;
-    int l = 0, h = (e - i) / tl;
+    int l = 0, h = (end - start) / tl;
     while(l <= h) {
       final int m = l + h >>> 1;
-      final int p = i + m * tl;
+      final int p = start + m * tl;
       byte[] txt = ctext.get(p);
       if(txt == null) {
         txt = inY.readBytes(p, ti);
         ctext.put(p, txt);
       }
       final int d = diff(txt, token);
-      if(d == 0) return i + m * tl;
+      if(d == 0) return start + m * tl;
       if(d < 0) l = m + 1;
       else h = m - 1;
     }
-    return i + l * tl;
+    return start + l * tl;
   }
 
   @Override

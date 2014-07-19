@@ -18,19 +18,19 @@ import org.basex.util.list.*;
 abstract class AUser extends Command {
   /**
    * Protected constructor, specifying command arguments.
-   * @param p required permission
-   * @param a arguments
+   * @param perm required permission
+   * @param args arguments
    */
-  AUser(final Perm p, final String... a) {
-    super(p, a);
+  AUser(final Perm perm, final String... args) {
+    super(perm, args);
   }
 
   /**
    * Protected constructor, specifying command arguments.
-   * @param a arguments
+   * @param args arguments
    */
-  AUser(final String... a) {
-    this(Perm.ADMIN, a);
+  AUser(final String... args) {
+    this(Perm.ADMIN, args);
   }
 
   /**

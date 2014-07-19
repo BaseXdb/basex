@@ -45,9 +45,9 @@ public final class IntObjMap<E> extends IntSet {
   }
 
   @Override
-  protected void rehash(final int s) {
-    super.rehash(s);
-    values = Array.copy(values, new Object[s]);
+  protected void rehash(final int sz) {
+    super.rehash(sz);
+    values = Array.copy(values, new Object[sz]);
   }
 
   @Override

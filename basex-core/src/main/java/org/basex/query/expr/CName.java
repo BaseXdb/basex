@@ -82,7 +82,7 @@ public abstract class CName extends CNode {
     final Item it = checkItem(name, qc);
     final Type ip = it.type;
     if(ip == AtomType.QNM) return (QNm) it;
-    if(!ip.isStringOrUntyped() || ip == AtomType.URI) throw CPIWRONG.get(info, ip, it);
+    if(!ip.isStringOrUntyped() || ip == AtomType.URI) throw STRQNM.get(info, ip, it);
 
     // create and update namespace
     final byte[] str = it.string(ii);
@@ -91,8 +91,8 @@ public abstract class CName extends CNode {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    return name.removable(v) && super.removable(v);
+  public boolean removable(final Var var) {
+    return name.removable(var) && super.removable(var);
   }
 
   @Override
@@ -106,18 +106,18 @@ public abstract class CName extends CNode {
   }
 
   @Override
-  public final VarUsage count(final Var v) {
-    return name.count(v).plus(super.count(v));
+  public final VarUsage count(final Var var) {
+    return name.count(var).plus(super.count(var));
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
 
-    final boolean ex = inlineAll(qc, scp, exprs, v, e);
-    final Expr sub = name.inline(qc, scp, v, e);
+    final boolean changed = inlineAll(qc, scp, exprs, var, ex);
+    final Expr sub = name.inline(qc, scp, var, ex);
     if(sub != null) name = sub;
-    return sub != null || ex ? optimize(qc, scp) : null;
+    return sub != null || changed ? optimize(qc, scp) : null;
   }
 
   @Override

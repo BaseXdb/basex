@@ -16,13 +16,13 @@ public final class IndexEntry {
 
   /**
    * Constructor.
-   * @param k key
-   * @param s number of hits
-   * @param p pointer to the id list
+   * @param key key
+   * @param size number of hits
+   * @param pointer pointer to the id list
    */
-  public IndexEntry(final byte[] k, final int s, final long p) {
-    key = k;
-    size = s;
-    pointer = p;
+  public IndexEntry(final byte[] key, final int size, final long pointer) {
+    this.key = key;
+    this.size = size;
+    this.pointer = pointer;
   }
 }

@@ -54,7 +54,7 @@ public final class QueryContext extends Proc {
   /** Functions. */
   public final StaticFuncs funcs = new StaticFuncs();
   /** Externally bound variables. */
-  private final HashMap<QNm, Expr> bindings = new HashMap<>();
+  private final HashMap<QNm, Value> bindings = new HashMap<>();
 
   /** Parent query context. */
   private final QueryContext qcParent;

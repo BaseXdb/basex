@@ -32,11 +32,11 @@ public abstract class Serializer {
   public static final SerializerOptions OPTIONS = new SerializerOptions();
 
   /** Stack with names of opened elements. */
-  protected final TokenList tags = new TokenList();
+  protected final TokenList elems = new TokenList();
   /** Current level. */
-  protected int level;
+  protected int lvl;
   /** Current element name. */
-  protected byte[] tag;
+  protected byte[] elem;
   /** Undeclare prefixes. */
   boolean undecl;
   /** Indentation flag. */
@@ -173,7 +173,7 @@ public abstract class Serializer {
     finishElement();
     nstack.push(nspaces.size());
     opening = true;
-    tag = name;
+    elem = name;
     startOpen(name);
   }
 
@@ -187,8 +187,8 @@ public abstract class Serializer {
       finishEmpty();
       opening = false;
     } else {
-      tag = tags.pop();
-      level--;
+      elem = elems.pop();
+      lvl--;
       finishClose();
     }
   }
@@ -205,12 +205,12 @@ public abstract class Serializer {
   }
   /**
    * Gets the namespace URI currently bound by the given prefix.
-   * @param pref namespace prefix
+   * @param prefix namespace prefix
    * @return URI if found, {@code null} otherwise
    */
-  final byte[] nsUri(final byte[] pref) {
+  final byte[] nsUri(final byte[] prefix) {
     for(int n = nspaces.size() - 1; n >= 0; n--) {
-      if(eq(nspaces.name(n), pref)) return nspaces.value(n);
+      if(eq(nspaces.name(n), prefix)) return nspaces.value(n);
     }
     return null;
   }
@@ -218,16 +218,16 @@ public abstract class Serializer {
 
   /**
    * Serializes a namespace if it has not been serialized by an ancestor yet.
-   * @param pref prefix
-   * @param uri URI
+   * @param prefix prefix
+   * @param uri namespace URI
    * @throws IOException I/O exception
    */
-  protected void namespace(final byte[] pref, final byte[] uri) throws IOException {
-    if(!undecl && pref.length != 0 && uri.length == 0) return;
-    final byte[] u = nsUri(pref);
+  protected void namespace(final byte[] prefix, final byte[] uri) throws IOException {
+    if(!undecl && prefix.length != 0 && uri.length == 0) return;
+    final byte[] u = nsUri(prefix);
     if(u == null || !eq(u, uri)) {
-      attribute(pref.length == 0 ? XMLNS : concat(XMLNSC, pref), uri);
-      nspaces.add(pref, uri);
+      attribute(prefix.length == 0 ? XMLNS : concat(XMLNSC, prefix), uri);
+      nspaces.add(prefix, uri);
     }
   }
 
@@ -270,7 +270,7 @@ public abstract class Serializer {
 
   /**
    * Starts an element.
-   * @param name tag name
+   * @param name element name
    * @throws IOException I/O exception
    */
   protected abstract void startOpen(final byte[] name) throws IOException;
@@ -445,7 +445,7 @@ public abstract class Serializer {
                 if(nsp.add(pref)) namespace(pref, ns.value(n));
               }
               // check ancestors only on top level
-              if(level != 0) break;
+              if(lvl != 0) break;
 
               pp = data.parent(pp, data.kind(pp));
             } while(pp >= 0 && data.kind(pp) == Data.ELEM);
@@ -476,13 +476,13 @@ public abstract class Serializer {
 
   /**
    * Serializes a text.
-   * @param v text bytes
+   * @param value text bytes
    * @param ftp full-text positions, used for visualization highlighting
    * @throws IOException I/O exception
    */
-  private void text(final byte[] v, final FTPos ftp) throws IOException {
+  private void text(final byte[] value, final FTPos ftp) throws IOException {
     finishElement();
-    finishText(v, ftp);
+    finishText(value, ftp);
   }
 
   /**
@@ -524,7 +524,7 @@ public abstract class Serializer {
     if(!opening) return;
     opening = false;
     finishOpen();
-    tags.push(tag);
-    level++;
+    elems.push(elem);
+    lvl++;
   }
 }

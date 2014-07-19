@@ -22,23 +22,23 @@ public final class BXDomImpl implements DOMImplementation {
   }
 
   @Override
-  public BXDoc createDocument(final String nsURI, final String qn, final DocumentType doctype) {
+  public BXDoc createDocument(final String uri, final String name, final DocumentType type) {
     throw Util.notImplemented();
   }
 
   @Override
-  public DocumentType createDocumentType(final String qn, final String pid, final String sid) {
+  public DocumentType createDocumentType(final String name, final String pid, final String sid) {
     throw Util.notImplemented();
   }
 
   @Override
-  public Object getFeature(final String f, final String v) {
+  public Object getFeature(final String name, final String value) {
     return null;
   }
 
   @Override
-  public boolean hasFeature(final String f, final String v) {
-    return "XML".equalsIgnoreCase(f) && (v == null ||
-        Token.eq(v, "", "1.0", "2.0", "3.0"));
+  public boolean hasFeature(final String name, final String value) {
+    return "XML".equalsIgnoreCase(name) && (value == null ||
+        Token.eq(value, "", "1.0", "2.0", "3.0"));
   }
 }

@@ -97,21 +97,21 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    for(final Let c : copies) if(!c.removable(v)) return false;
-    return super.removable(v);
+  public boolean removable(final Var var) {
+    for(final Let c : copies) if(!c.removable(var)) return false;
+    return super.removable(var);
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return VarUsage.sum(v, copies).plus(super.count(v));
+  public VarUsage count(final Var var) {
+    return VarUsage.sum(var, copies).plus(super.count(var));
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
-    final boolean cp = inlineAll(qc, scp, copies, v, e);
-    return inlineAll(qc, scp, exprs, v, e) || cp ? optimize(qc, scp) : null;
+    final boolean cp = inlineAll(qc, scp, copies, var, ex);
+    return inlineAll(qc, scp, exprs, var, ex) || cp ? optimize(qc, scp) : null;
   }
 
   @Override

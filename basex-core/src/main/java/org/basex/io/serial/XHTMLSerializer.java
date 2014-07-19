@@ -23,17 +23,17 @@ public class XHTMLSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void attribute(final byte[] n, final byte[] v) throws IOException {
+  protected void attribute(final byte[] name, final byte[] value) throws IOException {
     // escape URI attributes
-    final byte[] tagatt = concat(lc(tag), COLON, lc(n));
-    final byte[] val = escuri && HTMLSerializer.URIS.contains(tagatt) ? escape(v) : v;
-    super.attribute(n, val);
+    final byte[] nm = concat(lc(elem), COLON, lc(name));
+    final byte[] val = escuri && HTMLSerializer.URIS.contains(nm) ? escape(value) : value;
+    super.attribute(name, val);
   }
 
   @Override
-  protected void startOpen(final byte[] t) throws IOException {
-    super.startOpen(t);
-    if(content && eq(lc(tag), HEAD)) ct++;
+  protected void startOpen(final byte[] value) throws IOException {
+    super.startOpen(value);
+    if(content && eq(lc(elem), HEAD)) ct++;
   }
 
   @Override
@@ -45,7 +45,7 @@ public class XHTMLSerializer extends OutputSerializer {
   @Override
   protected void finishEmpty() throws IOException {
     if(ct(true, false)) return;
-    if((html5 ? HTMLSerializer.EMPTIES5 : HTMLSerializer.EMPTIES).contains(lc(tag))) {
+    if((html5 ? HTMLSerializer.EMPTIES5 : HTMLSerializer.EMPTIES).contains(lc(elem))) {
       print(' ');
       print(ELEM_SC);
     } else {
@@ -56,13 +56,13 @@ public class XHTMLSerializer extends OutputSerializer {
   }
 
   @Override
-  protected boolean doctype(final byte[] dt) throws IOException {
-    if(level != 0) return false;
-    if(!super.doctype(dt) && html5) {
+  protected boolean doctype(final byte[] type) throws IOException {
+    if(lvl != 0) return false;
+    if(!super.doctype(type) && html5) {
       if(sep) indent();
       print(DOCTYPE);
-      if(dt == null) print(HTML);
-      else print(dt);
+      if(type == null) print(HTML);
+      else print(type);
       print(ELEM_C);
       print(nl);
     }

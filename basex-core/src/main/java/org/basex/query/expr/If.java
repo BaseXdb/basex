@@ -153,27 +153,27 @@ public final class If extends Arr {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    return cond.removable(v) && super.removable(v);
+  public boolean removable(final Var var) {
+    return cond.removable(var) && super.removable(var);
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return cond.count(v).plus(VarUsage.maximum(v, exprs));
+  public VarUsage count(final Var var) {
+    return cond.count(var).plus(VarUsage.maximum(var, exprs));
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
 
-    final Expr sub = cond.inline(qc, scp, v, e);
+    final Expr sub = cond.inline(qc, scp, var, ex);
     if(sub != null) cond = sub;
     boolean te = false;
     final int es = exprs.length;
     for(int i = 0; i < es; i++) {
       Expr nw;
       try {
-        nw = exprs[i].inline(qc, scp, v, e);
+        nw = exprs[i].inline(qc, scp, var, ex);
       } catch(final QueryException qe) {
         nw = FNInfo.error(qe, seqType);
       }

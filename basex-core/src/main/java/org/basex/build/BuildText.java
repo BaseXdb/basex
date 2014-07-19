@@ -194,10 +194,10 @@ public interface BuildText {
 
     /**
      * Enumeration constructor.
-     * @param s string representation
+     * @param string string representation
      */
-    Type(final String s) {
-      string = s;
+    Type(final String string) {
+      this.string = string;
     }
   }
 }

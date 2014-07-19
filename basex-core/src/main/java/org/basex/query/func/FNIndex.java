@@ -144,7 +144,7 @@ public final class FNIndex extends StandardFunc {
    */
   private Iter names(final QueryContext qc, final IndexType it) throws QueryException {
     final Data data = checkData(qc);
-    return entries(it == IndexType.TAG ? data.tagindex : data.atnindex,
+    return entries(it == IndexType.TAG ? data.elmindex : data.atnindex,
       new IndexEntries(EMPTY, it));
   }
 
@@ -173,7 +173,7 @@ public final class FNIndex extends StandardFunc {
    */
   private static FElem flat(final Data data) {
     final FElem elem = new FElem(new QNm(NodeType.DOC.string()));
-    index(data.tagindex, ELM, elem);
+    index(data.elmindex, ELM, elem);
     index(data.atnindex, ATT, elem);
     return elem;
   }
@@ -202,7 +202,7 @@ public final class FNIndex extends StandardFunc {
   private static FElem tree(final Data data, final PathNode root) {
     final FElem elem = new FElem(new QNm(ANode.type(root.kind).string()));
     final boolean elm = root.kind == Data.ELEM;
-    final Names names = elm ? data.tagindex : data.atnindex;
+    final Names names = elm ? data.elmindex : data.atnindex;
     if(root.kind == Data.ATTR || elm) elem.add(NAME, names.key(root.name));
     stats(root.stats, elem);
     for(final PathNode p : root.children) elem.add(tree(data, p));

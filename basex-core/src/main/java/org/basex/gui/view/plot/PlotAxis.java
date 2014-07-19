@@ -18,7 +18,7 @@ final class PlotAxis {
   private static final int TEXTLENGTH = 11;
   /** Plot data reference. */
   private final PlotData plotData;
-  /** Tag reference to selected attribute. */
+  /** Reference to selected attribute. */
   int attrID;
   /** Number of different categories for x attribute. */
   int nrCats;
@@ -45,8 +45,8 @@ final class PlotAxis {
   /** Axis uses logarithmic scale. */
   boolean log;
 
-  /** True if attribute is a tag, false if attribute. */
-  private boolean tag;
+  /** True if attribute is an element, false if attribute. */
+  private boolean elem;
   /** Ln of min. */
   private double logMin;
   /** Ln of max. */
@@ -64,7 +64,7 @@ final class PlotAxis {
    * (Re)Initializes axis.
    */
   private void initialize() {
-    tag = false;
+    elem = false;
     type = StatsType.INTEGER;
     co = new double[0];
     nrCats = -1;
@@ -88,10 +88,10 @@ final class PlotAxis {
     if(attribute == null) return false;
     initialize();
     byte[] b = token(attribute);
-    tag = !contains(b, '@');
+    elem = !contains(b, '@');
     b = delete(b, '@');
     final Data data = plotData.context.data();
-    attrID = (tag ? data.tagindex : data.atnindex).id(b);
+    attrID = (elem ? data.elmindex : data.atnindex).id(b);
     refreshAxis();
     return true;
   }
@@ -103,7 +103,7 @@ final class PlotAxis {
    */
   void refreshAxis() {
     final Data data = plotData.context.data();
-    final Stats key = tag ? data.tagindex.stat(attrID) :
+    final Stats key = elem ? data.elmindex.stat(attrID) :
       data.atnindex.stat(attrID);
     if(key == null) return;
     type = key.type;
@@ -249,7 +249,7 @@ final class PlotAxis {
     final int limit = pre + data.size(pre, Data.ELEM);
     for(int p = pre; p < limit; ++p) {
       final int kind = data.kind(p);
-      if((kind == Data.ELEM && tag || kind == Data.ATTR && !tag) &&
+      if((kind == Data.ELEM && elem || kind == Data.ATTR && !elem) &&
           attrID == data.name(p)) return data.atom(p);
     }
     return EMPTY;

@@ -58,16 +58,16 @@ public final class FNAcc extends StandardFunc {
 
   /**
    * Converts the specified item to a string.
-   * @param e expression
+   * @param ex expression
    * @param ii input info
    * @param qc query context
    * @return double iterator
    * @throws QueryException query exception
    */
-  private Item string(final Expr e, final InputInfo ii, final QueryContext qc)
+  private Item string(final Expr ex, final InputInfo ii, final QueryContext qc)
       throws QueryException {
 
-    final Item it = e.item(qc, info);
+    final Item it = ex.item(qc, info);
     if(it == null) return Str.ZERO;
     if(it instanceof FItem) throw FISTR.get(ii, it.type);
     return it.type == AtomType.STR ? it : Str.get(it.string(ii));

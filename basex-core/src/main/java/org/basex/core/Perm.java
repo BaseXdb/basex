@@ -23,47 +23,47 @@ public enum Perm {
 
   /**
    * Constructor.
-   * @param n numeric representation
+   * @param num numeric representation
    */
-  Perm(final int n) {
-    num = n;
+  Perm(final int num) {
+    this.num = num;
   }
 
   /**
    * Returns the permission with less privileges.
-   * @param p permission to be compared
+   * @param perm permission to be compared
    * @return permission
    */
-  public Perm min(final Perm p) {
-    return num < p.num ? this : p;
+  public Perm min(final Perm perm) {
+    return num < perm.num ? this : perm;
   }
 
   /**
    * Returns the permission with more privileges.
-   * @param p permission to be compared
+   * @param perm permission to be compared
    * @return permission
    */
-  public Perm max(final Perm p) {
-    return num > p.num ? this : p;
+  public Perm max(final Perm perm) {
+    return num > perm.num ? this : perm;
   }
 
   /**
    * Returns a permission matching the specified number.
-   * @param n numeric representation
+   * @param num numeric representation
    * @return permission, or {@link #ADMIN} if no match is found
    */
-  static Perm get(final int n) {
-    for(final Perm p : values()) if(p.num == n) return p;
+  static Perm get(final int num) {
+    for(final Perm p : values()) if(p.num == num) return p;
     return ADMIN;
   }
 
   /**
    * Returns a permission matching the specified string.
-   * @param s permission string
+   * @param perm permission string
    * @return permission, or {@link #ADMIN} if no match is found
    */
-  public static Perm get(final String s) {
-    for(final Perm p : values()) if(p.name().equalsIgnoreCase(s)) return p;
+  public static Perm get(final String perm) {
+    for(final Perm p : values()) if(p.name().equalsIgnoreCase(perm)) return p;
     return ADMIN;
   }
 }

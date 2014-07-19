@@ -29,8 +29,8 @@ public final class QuerySuggest extends QueryParser {
   private ArrayList<PathNode> curr;
   /** Hide flag. */
   private boolean show;
-  /** Last tag name. */
-  private byte[] tag;
+  /** Last element name. */
+  private byte[] name;
 
   /**
    * Constructor.
@@ -83,28 +83,28 @@ public final class QuerySuggest extends QueryParser {
     final TokenBuilder tb = new TokenBuilder();
     if(attr) tb.add('@');
     if(test != null) tb.add(test.toString().replaceAll("\\*:", ""));
-    tag = tb.finish();
-    // use inexact matching only, if the tag is at the end:
+    name = tb.finish();
+    // use inexact matching only, if the element is at the end:
     checkTest(pos < length);
   }
 
   /**
-   * Checks the tag name.
+   * Checks the element name.
    * @param eq equality test
    */
   private void checkTest(final boolean eq) {
-    if(tag == null) return;
+    if(name == null) return;
 
     final ArrayList<PathNode> tmp = new ArrayList<>();
     boolean s = false;
     for(final PathNode p : all) {
       final byte[] nm = p.token(data);
-      if(startsWith(nm, tag)) {
-        if(!eq || eq(nm, tag)) tmp.add(p);
-        s |= !eq(tag, nm);
+      if(startsWith(nm, name)) {
+        if(!eq || eq(nm, name)) tmp.add(p);
+        s |= !eq(name, nm);
       }
     }
-    show = tag.length == 0 || s;
+    show = name.length == 0 || s;
     curr = tmp;
   }
 

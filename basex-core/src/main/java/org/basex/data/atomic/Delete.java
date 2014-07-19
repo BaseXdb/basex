@@ -11,14 +11,15 @@ import org.basex.data.*;
 final class Delete extends StructuralUpdate {
   /**
    * Constructor.
-   * @param l target node location PRE
-   * @param s PRE value shifts introduced by update
-   * @param a accumulated shifts
-   * @param f PRE value of the first node which distance has to be updated
-   * @param p parent
+   * @param location target node location PRE
+   * @param shifts PRE value shifts introduced by update
+   * @param acc accumulated shifts
+   * @param first PRE value of the first node which distance has to be updated
+   * @param parent parent
    */
-  private Delete(final int l, final int s, final int a, final int f, final int p) {
-    super(l, s, a, f, p);
+  private Delete(final int location, final int shifts, final int acc, final int first,
+      final int parent) {
+    super(location, shifts, acc, first, parent);
   }
 
   /**
@@ -34,8 +35,8 @@ final class Delete extends StructuralUpdate {
   }
 
   @Override
-  void apply(final Data d) {
-    d.delete(location);
+  void apply(final Data data) {
+    data.delete(location);
   }
 
   @Override
@@ -54,12 +55,12 @@ final class Delete extends StructuralUpdate {
   }
 
   @Override
-  public BasicUpdate merge(final Data data, final BasicUpdate u) {
-    if(u != null && parent == u.parent && u instanceof Insert &&
-        location - shifts == u.location && data.kind(location) != Data.ATTR) {
-      final Insert ins = (Insert) u;
+  public BasicUpdate merge(final Data data, final BasicUpdate bu) {
+    if(bu != null && parent == bu.parent && bu instanceof Insert &&
+        location - shifts == bu.location && data.kind(location) != Data.ATTR) {
+      final Insert ins = (Insert) bu;
       return new Replace(location, shifts + ins.shifts,
-          ins.accumulatedShifts, preOfAffectedNode, ins.insseq, parent);
+          ins.accumulatedShifts, preOfAffectedNode, ins.clip, parent);
     }
     return null;
   }

@@ -91,16 +91,16 @@ public final class DirParser extends Parser {
 
   /**
    * Parses the specified file or its children.
-   * @param b builder
-   * @param io current input
+   * @param builder builder
+   * @param input current input
    * @throws IOException I/O exception
    */
-  private void parse(final Builder b, final IO io) throws IOException {
-    if(io instanceof IOFile && io.isDir()) {
-      for(final IO f : ((IOFile) io).children()) parse(b, f);
-    } else if(archives && io.isArchive()) {
-      final String name = io.name().toLowerCase(Locale.ENGLISH);
-      InputStream in = io.inputStream();
+  private void parse(final Builder builder, final IO input) throws IOException {
+    if(input instanceof IOFile && input.isDir()) {
+      for(final IO f : ((IOFile) input).children()) parse(builder, f);
+    } else if(archives && input.isArchive()) {
+      final String name = input.name().toLowerCase(Locale.ENGLISH);
+      InputStream in = input.inputStream();
       if(name.endsWith(IO.TARSUFFIX) || name.endsWith(IO.TGZSUFFIX) ||
           name.endsWith(IO.TARGZSUFFIX)) {
         // process TAR files
@@ -110,14 +110,14 @@ public final class DirParser extends Parser {
             if(ze.isDirectory()) continue;
             src = new IOStream(is, ze.getName());
             src.length(ze.getSize());
-            parseResource(b);
+            parseResource(builder);
           }
         }
       } else if(name.endsWith(IO.GZSUFFIX)) {
         // process GZIP archive
         try(final GZIPInputStream is = new GZIPInputStream(in)) {
-          src = new IOStream(is, io.name().replaceAll("\\..*", IO.XMLSUFFIX));
-          parseResource(b);
+          src = new IOStream(is, input.name().replaceAll("\\..*", IO.XMLSUFFIX));
+          parseResource(builder);
         }
       } else {
         // process ZIP archive
@@ -126,14 +126,14 @@ public final class DirParser extends Parser {
             if(ze.isDirectory()) continue;
             src = new IOStream(is, ze.getName());
             src.length(ze.getSize());
-            parseResource(b);
+            parseResource(builder);
           }
         }
       }
     } else {
       // process regular file
-      src = io;
-      parseResource(b);
+      src = input;
+      parseResource(builder);
     }
   }
 

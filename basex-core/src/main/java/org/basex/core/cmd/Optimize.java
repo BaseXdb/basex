@@ -89,12 +89,12 @@ public final class Optimize extends ACreate {
     if(!md.uptodate) {
       data.paths.init();
       data.resources.init();
-      data.tagindex.init();
+      data.elmindex.init();
       data.atnindex.init();
       md.dirty = true;
 
       final IntList pars = new IntList();
-      final IntList tags = new IntList();
+      final IntList elms = new IntList();
       int n = 0;
 
       for(int pre = 0; pre < md.size; ++pre) {
@@ -102,20 +102,20 @@ public final class Optimize extends ACreate {
         final int par = data.parent(pre, kind);
         while(!pars.isEmpty() && pars.peek() > par) {
           pars.pop();
-          tags.pop();
+          elms.pop();
         }
         final int level = pars.size();
         if(kind == Data.DOC) {
           data.paths.put(0, Data.DOC, level);
           pars.push(pre);
-          tags.push(0);
+          elms.push(0);
           ++n;
         } else if(kind == Data.ELEM) {
           final int id = data.name(pre);
-          data.tagindex.index(data.tagindex.key(id), null, true);
+          data.elmindex.index(data.elmindex.key(id), null, true);
           data.paths.put(id, Data.ELEM, level);
           pars.push(pre);
-          tags.push(id);
+          elms.push(id);
         } else if(kind == Data.ATTR) {
           final int id = data.name(pre);
           final byte[] val = data.text(pre, false);
@@ -123,7 +123,7 @@ public final class Optimize extends ACreate {
           data.paths.put(id, Data.ATTR, level, val, md);
         } else {
           final byte[] val = data.text(pre, true);
-          if(kind == Data.TEXT && level > 1) data.tagindex.index(tags.peek(), val);
+          if(kind == Data.TEXT && level > 1) data.elmindex.index(elms.peek(), val);
           data.paths.put(0, kind, level, val, md);
         }
         if(cmd != null) cmd.pre = pre;
@@ -141,21 +141,21 @@ public final class Optimize extends ACreate {
   /**
    * Optimizes the specified index.
    * @param type index type
-   * @param d data reference
+   * @param data data reference
    * @param create create flag
    * @param old old flag
    * @param rebuild rebuild all index structures
    * @param cmd calling command instance
    * @throws IOException I/O exception
    */
-  private static void optimize(final IndexType type, final Data d, final boolean create,
+  private static void optimize(final IndexType type, final Data data, final boolean create,
       final boolean old, final boolean rebuild, final Optimize cmd) throws IOException {
 
     // check if flags are nothing has changed
     if(!rebuild && create == old) return;
 
     // create or drop index
-    if(create) create(type, d, cmd);
-    else drop(type, d);
+    if(create) create(type, data, cmd);
+    else drop(type, data);
   }
 }

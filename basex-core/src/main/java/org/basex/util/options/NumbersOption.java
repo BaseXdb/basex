@@ -14,12 +14,12 @@ public final class NumbersOption extends Option<int[]> {
 
   /**
    * Default constructor.
-   * @param n name
-   * @param v value
+   * @param name name
+   * @param value value
    */
-  public NumbersOption(final String n, final int... v) {
-    super(n);
-    value = v;
+  public NumbersOption(final String name, final int... value) {
+    super(name);
+    this.value = value;
   }
 
   @Override

@@ -48,10 +48,10 @@ public abstract class ElementList {
 
   /**
    * Enforces the number of elements.
-   * @param s number of elements
+   * @param sz number of elements
    */
-  public final void size(final int s) {
-    size = s;
+  public final void size(final int sz) {
+    size = sz;
   }
 
   /**

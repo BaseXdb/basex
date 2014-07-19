@@ -141,7 +141,7 @@ public final class CmpR extends Single {
   }
 
   /**
-   * Retrieves the statistics key for the tag/attribute name.
+   * Retrieves the statistics key for the element/attribute name.
    * @param ii index info
    * @param text text flag
    * @return key
@@ -166,7 +166,7 @@ public final class CmpR extends Single {
       name = ((NameTest) step.test).local;
     }
 
-    final Names names = text ? data.tagindex : data.atnindex;
+    final Names names = text ? data.elmindex : data.atnindex;
     final Stats key = names.stat(names.id(name));
     return key == null || key.type == StatsType.INTEGER ||
         key.type == StatsType.DOUBLE ? key : null;

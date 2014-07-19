@@ -14,10 +14,10 @@ public abstract class Option<O> {
 
   /**
    * Constructor without default value.
-   * @param n name
+   * @param name name
    */
-  Option(final String n) {
-    name = n;
+  Option(final String name) {
+    this.name = name;
   }
 
   /**

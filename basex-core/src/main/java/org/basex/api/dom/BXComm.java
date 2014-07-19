@@ -12,9 +12,9 @@ import org.w3c.dom.*;
 public final class BXComm extends BXChar implements Comment {
   /**
    * Constructor.
-   * @param n node reference
+   * @param node node reference
    */
-  public BXComm(final ANode n) {
-    super(n);
+  public BXComm(final ANode node) {
+    super(node);
   }
 }

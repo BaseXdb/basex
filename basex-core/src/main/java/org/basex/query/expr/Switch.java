@@ -109,26 +109,26 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    for(final SwitchCase sc : cases) if(!sc.removable(v)) return false;
-    return cond.removable(v);
+  public boolean removable(final Var var) {
+    for(final SwitchCase sc : cases) if(!sc.removable(var)) return false;
+    return cond.removable(var);
   }
 
   @Override
-  public VarUsage count(final Var v) {
+  public VarUsage count(final Var var) {
     VarUsage max = VarUsage.NEVER, curr = VarUsage.NEVER;
     for(final SwitchCase cs : cases) {
-      curr = curr.plus(cs.countCases(v));
-      max = max.max(curr.plus(cs.count(v)));
+      curr = curr.plus(cs.countCases(var));
+      max = max.max(curr.plus(cs.count(var)));
     }
-    return max.plus(cond.count(v));
+    return max.plus(cond.count(var));
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
-    boolean change = inlineAll(qc, scp, cases, v, e);
-    final Expr cn = cond.inline(qc, scp, v, e);
+    boolean change = inlineAll(qc, scp, cases, var, ex);
+    final Expr cn = cond.inline(qc, scp, var, ex);
     if(cn != null) {
       change = true;
       cond = cn;

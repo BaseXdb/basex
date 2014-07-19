@@ -101,8 +101,8 @@ final class LuceneStemmer extends Stemmer {
   }
 
   @Override
-  Stemmer get(final Language l, final FTIterator fti) {
-    return new LuceneStemmer(l, fti);
+  Stemmer get(final Language lang, final FTIterator fti) {
+    return new LuceneStemmer(lang, fti);
   }
 
   @Override
@@ -140,14 +140,14 @@ final class LuceneStemmer extends Stemmer {
 
     /**
      * Constructor.
-     * @param sc class implementing the stemmer
-     * @param stm method {@code stem}
-     * @param ch indicator for stemming via character array
+     * @param clz class implementing the stemmer
+     * @param stem method {@code stem}
+     * @param chars indicator for stemming via character array
      */
-    StemmerClass(final Class<?> sc, final Method stm, final boolean ch) {
-      clz = sc;
-      stem = stm;
-      chars = ch;
+    StemmerClass(final Class<?> clz, final Method stem, final boolean chars) {
+      this.clz = clz;
+      this.stem = stem;
+      this.chars = chars;
       stem.setAccessible(true);
     }
   }

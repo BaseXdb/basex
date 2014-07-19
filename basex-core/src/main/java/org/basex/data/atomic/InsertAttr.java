@@ -10,21 +10,21 @@ import org.basex.data.*;
  */
 final class InsertAttr extends StructuralUpdate {
   /** Insertion sequence. */
-  private final DataClip insseq;
+  private final DataClip clip;
 
   /**
    * Constructor.
-   * @param l PRE value of the target node location
-   * @param s row shifts
-   * @param a accumulated row shifts
-   * @param f PRE value of the first node which distance has to be updated
-   * @param par parent PRE value for the inserted node
-   * @param c insert sequence data clip
+   * @param location PRE value of the target node location
+   * @param shifts row shifts
+   * @param acc accumulated row shifts
+   * @param first PRE value of the first node which distance has to be updated
+   * @param parent parent PRE value for the inserted node
+   * @param clip insert sequence data clip
    */
-  private InsertAttr(final int l, final int s, final int a, final int f, final int par,
-      final DataClip c) {
-    super(l, s, a, f, par);
-    insseq = c;
+  private InsertAttr(final int location, final int shifts, final int acc, final int first,
+      final int parent, final DataClip clip) {
+    super(location, shifts, acc, first, parent);
+    this.clip = clip;
   }
 
   /**
@@ -34,20 +34,19 @@ final class InsertAttr extends StructuralUpdate {
    * @param clip insertion sequence
    * @return instance
    */
-  static InsertAttr getInstance(final int pre, final int par,
-      final DataClip clip) {
+  static InsertAttr getInstance(final int pre, final int par, final DataClip clip) {
     final int sh = clip.size();
     return new InsertAttr(pre, sh, sh, pre, par, clip);
   }
 
   @Override
-  void apply(final Data d) {
-    d.insertAttr(location, parent, insseq);
+  void apply(final Data data) {
+    data.insertAttr(location, parent, clip);
   }
 
   @Override
   DataClip getInsertionData() {
-    return insseq;
+    return clip;
   }
 
   @Override

@@ -11,10 +11,10 @@ import org.basex.core.*;
 abstract class AEvent extends Command {
   /**
    * Protected constructor.
-   * @param a arguments
+   * @param args arguments
    */
-  AEvent(final String... a) {
-    super(Perm.ADMIN, false, a);
+  AEvent(final String... args) {
+    super(Perm.ADMIN, false, args);
   }
 
   @Override

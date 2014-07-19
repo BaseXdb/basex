@@ -775,25 +775,25 @@ public final class Token {
   /**
    * Checks if the first token contains the specified character.
    * @param token token
-   * @param c character to be found
+   * @param ch character to be found
    * @return result of test
    */
-  public static boolean contains(final byte[] token, final int c) {
-    return indexOf(token, c) != -1;
+  public static boolean contains(final byte[] token, final int ch) {
+    return indexOf(token, ch) != -1;
   }
 
   /**
    * Returns the position of the specified character or -1.
    * @param token token
-   * @param c character to be found
+   * @param ch character to be found
    * @return position or {@code -1}
    */
-  public static int indexOf(final byte[] token, final int c) {
+  public static int indexOf(final byte[] token, final int ch) {
     final int tl = token.length;
-    if(c < 128) {
-      for(int t = 0; t < tl; t++) if(token[t] == c) return t;
+    if(ch < 128) {
+      for(int t = 0; t < tl; t++) if(token[t] == ch) return t;
     } else {
-      for(int t = 0; t < tl; t += cl(token, t)) if(cp(token, t) == c) return t;
+      for(int t = 0; t < tl; t += cl(token, t)) if(cp(token, t) == ch) return t;
     }
     return -1;
   }
@@ -801,16 +801,16 @@ public final class Token {
   /**
    * Returns the last position of the specified character or -1.
    * @param token token
-   * @param c character to be found
+   * @param ch character to be found
    * @return position or {@code -1}
    */
-  public static int lastIndexOf(final byte[] token, final int c) {
+  public static int lastIndexOf(final byte[] token, final int ch) {
     final int tl = token.length;
     int p = -1;
-    if(c < 128) {
-      for(int t = tl - 1; t >= 0; --t) if(token[t] == c) return t;
+    if(ch < 128) {
+      for(int t = tl - 1; t >= 0; --t) if(token[t] == ch) return t;
     } else {
-      for(int t = 0; t < tl; t += cl(token, t)) if(cp(token, t) == c) p = t;
+      for(int t = 0; t < tl; t += cl(token, t)) if(cp(token, t) == ch) p = t;
     }
     return p;
   }
@@ -1293,12 +1293,12 @@ public final class Token {
   /**
    * Adds the specified byte in hex code.
    * @param tb token builder
-   * @param b byte to be added
+   * @param value byte to be added
    */
-  private static void hex(final TokenBuilder tb, final byte b) {
+  private static void hex(final TokenBuilder tb, final byte value) {
     tb.add('%');
-    tb.addByte(HEX[(b & 0xFF) >> 4]);
-    tb.addByte(HEX[b & 0xFF & 15]);
+    tb.addByte(HEX[(value & 0xFF) >> 4]);
+    tb.addByte(HEX[value & 0xFF & 15]);
   }
 
   /**

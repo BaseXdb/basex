@@ -16,10 +16,10 @@ import org.w3c.dom.*;
 public final class BXDoc extends BXNode implements Document {
   /**
    * Constructor.
-   * @param n node reference
+   * @param node node reference
    */
-  public BXDoc(final ANode n) {
-    super(n);
+  public BXDoc(final ANode node) {
+    super(node);
   }
 
   @Override
@@ -28,43 +28,43 @@ public final class BXDoc extends BXNode implements Document {
   }
 
   @Override
-  public BXNode adoptNode(final Node source) {
+  public BXNode adoptNode(final Node node) {
     throw readOnly();
   }
 
   @Override
-  public BXAttr createAttribute(final String nm) {
-    return new BXAttr(new FAttr(new QNm(nm), EMPTY));
+  public BXAttr createAttribute(final String name) {
+    return new BXAttr(new FAttr(new QNm(name), EMPTY));
   }
 
   @Override
-  public BXAttr createAttributeNS(final String uri, final String qn) {
-    return new BXAttr(new FAttr(new QNm(qn, uri), EMPTY));
+  public BXAttr createAttributeNS(final String uri, final String name) {
+    return new BXAttr(new FAttr(new QNm(name, uri), EMPTY));
   }
 
   @Override
-  public BXCData createCDATASection(final String dat) {
-    return new BXCData(new FTxt(dat));
+  public BXCData createCDATASection(final String value) {
+    return new BXCData(new FTxt(value));
   }
 
   @Override
-  public BXComm createComment(final String dat) {
-    return new BXComm(new FComm(dat));
+  public BXComm createComment(final String value) {
+    return new BXComm(new FComm(value));
   }
 
   @Override
   public BXDocFrag createDocumentFragment() {
-    return new BXDocFrag(new FDoc(node.baseURI()));
+    return new BXDocFrag(new FDoc(nd.baseURI()));
   }
 
   @Override
-  public BXElem createElement(final String nm) {
-    return new BXElem(new FElem(new QNm(nm)));
+  public BXElem createElement(final String name) {
+    return new BXElem(new FElem(new QNm(name)));
   }
 
   @Override
-  public BXElem createElementNS(final String uri, final String qn) {
-    return new BXElem(new FElem(new QNm(qn, uri)));
+  public BXElem createElementNS(final String uri, final String name) {
+    return new BXElem(new FElem(new QNm(name, uri)));
   }
 
   @Override
@@ -73,13 +73,13 @@ public final class BXDoc extends BXNode implements Document {
   }
 
   @Override
-  public BXPI createProcessingInstruction(final String t, final String dat) {
-    return new BXPI(new FPI(t, dat));
+  public BXPI createProcessingInstruction(final String name, final String value) {
+    return new BXPI(new FPI(name, value));
   }
 
   @Override
-  public BXText createTextNode(final String dat) {
-    return new BXText(new FTxt(dat));
+  public BXText createTextNode(final String value) {
+    return new BXText(new FTxt(value));
   }
 
   @Override
@@ -108,7 +108,7 @@ public final class BXDoc extends BXNode implements Document {
   }
 
   @Override
-  public BXElem getElementById(final String elementId) {
+  public BXElem getElementById(final String id) {
     throw Util.notImplemented();
   }
 
@@ -118,7 +118,7 @@ public final class BXDoc extends BXNode implements Document {
   }
 
   @Override
-  public BXNList getElementsByTagNameNS(final String namespaceURI, final String localName) {
+  public BXNList getElementsByTagNameNS(final String uri, final String name) {
     throw Util.notImplemented();
   }
 
@@ -153,7 +153,7 @@ public final class BXDoc extends BXNode implements Document {
   }
 
   @Override
-  public BXNode importNode(final Node importedNode, final boolean deep) {
+  public BXNode importNode(final Node node, final boolean deep) {
     throw Util.notImplemented();
   }
 
@@ -163,28 +163,27 @@ public final class BXDoc extends BXNode implements Document {
   }
 
   @Override
-  public BXNode renameNode(final Node n, final String namespaceURI,
-      final String qualifiedName) {
+  public BXNode renameNode(final Node node, final String uri, final String name) {
     throw readOnly();
   }
 
   @Override
-  public void setDocumentURI(final String documentURI) {
+  public void setDocumentURI(final String uri) {
     throw readOnly();
   }
 
   @Override
-  public void setStrictErrorChecking(final boolean strictErrorChecking) {
+  public void setStrictErrorChecking(final boolean value) {
     throw Util.notImplemented();
   }
 
   @Override
-  public void setXmlStandalone(final boolean xmlStandalone) {
+  public void setXmlStandalone(final boolean value) {
     throw Util.notImplemented();
   }
 
   @Override
-  public void setXmlVersion(final String xmlVersion) {
+  public void setXmlVersion(final String value) {
     throw Util.notImplemented();
   }
 }

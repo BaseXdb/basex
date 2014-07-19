@@ -53,18 +53,18 @@ final class FTList {
 
   /**
    * Constructor, initializing the index structure.
-   * @param d data
-   * @param cf prefix
+   * @param data data
+   * @param prefix prefix
    * @throws IOException I/O exception
    */
-  FTList(final Data d, final int cf) throws IOException {
-    files = d.meta.dbfile(DATAFTX + cf + 'y');
-    filed = d.meta.dbfile(DATAFTX + cf + 'z');
+  FTList(final Data data, final int prefix) throws IOException {
+    files = data.meta.dbfile(DATAFTX + prefix + 'y');
+    filed = data.meta.dbfile(DATAFTX + prefix + 'z');
     str = new DataAccess(files);
     dat = new DataAccess(filed);
-    tp = new int[d.meta.maxlen + 3];
+    tp = new int[data.meta.maxlen + 3];
     for(int i = 0; i < tp.length; ++i) tp[i] = -1;
-    sizes = d.meta.dbfile(DATAFTX + cf + 'x');
+    sizes = data.meta.dbfile(DATAFTX + prefix + 'x');
     final DataAccess li = new DataAccess(sizes);
     int is = li.readNum();
     while(--is >= 0) {

@@ -14,12 +14,12 @@ public final class StringsOption extends Option<String[]> {
 
   /**
    * Default constructor.
-   * @param n name
-   * @param v value
+   * @param name name
+   * @param value value
    */
-  public StringsOption(final String n, final String... v) {
-    super(n);
-    value = v;
+  public StringsOption(final String name, final String... value) {
+    super(name);
+    this.value = value;
   }
 
   @Override

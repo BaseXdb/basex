@@ -36,8 +36,8 @@ public class ClientQuery extends Query {
       throws IOException {
 
     cs = session;
-    id = cs.exec(ServerCmd.QUERY, query, null);
     out = output;
+    id = session.exec(ServerCmd.QUERY, query, null);
   }
 
   @Override

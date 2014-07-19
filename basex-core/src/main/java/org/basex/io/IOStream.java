@@ -28,10 +28,10 @@ public final class IOStream extends IO {
   /**
    * Constructor.
    * @param is input stream
-   * @param p content path
+   * @param path path
    */
-  public IOStream(final InputStream is, final String p) {
-    super(p);
+  public IOStream(final InputStream is, final String path) {
+    super(path);
     input = is instanceof BufferInput ? (BufferInput) is : new BufferInput(is);
   }
 

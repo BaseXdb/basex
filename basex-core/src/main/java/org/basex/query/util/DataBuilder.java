@@ -22,7 +22,7 @@ public final class DataBuilder {
   private final MemData data;
   /** Full-text position data. */
   private DataFTBuilder ftbuilder;
-  /** Index reference of marker tag. */
+  /** Index reference of marker element. */
   private int marker;
 
   /**
@@ -35,14 +35,14 @@ public final class DataBuilder {
 
   /**
    * Attaches full-text position data.
-   * @param tag name of marker tag
+   * @param name name of marker element
    * @param pos full-text position data
    * @param len length of extract
    * @return self reference
    */
-  public DataBuilder ftpos(final byte[] tag, final FTPosData pos, final int len) {
+  public DataBuilder ftpos(final byte[] name, final FTPosData pos, final int len) {
     ftbuilder = new DataFTBuilder(pos, len);
-    marker = data.tagindex.index(tag, null, false);
+    marker = data.elmindex.index(name, null, false);
     return this;
   }
 
@@ -226,7 +226,7 @@ public final class DataBuilder {
 
     // analyze node name
     final QNm name = node.qname();
-    final int tn = data.tagindex.index(name.string(), null, false);
+    final int tn = data.elmindex.index(name.string(), null, false);
     final int s = size(node, false);
     final int u = data.nspaces.uri(name.uri());
 

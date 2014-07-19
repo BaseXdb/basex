@@ -170,7 +170,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       for(int c = 0; c < cs; ++c) if(panel.getComponent(c) == source) cp = c;
 
       if((cp & 1) == 0) {
-        // combo box with tags/attributes
+        // combo box with element/attribute names
         final BaseXCombo combo = (BaseXCombo) source;
         panel.remove(cp + 1);
 
@@ -179,7 +179,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
         if(selected) {
           final String item = combo.getSelectedItem();
           final boolean att = item.startsWith("@");
-          final Names names = att ? data.atnindex : data.tagindex;
+          final Names names = att ? data.atnindex : data.elmindex;
           final byte[] key = Token.token(att ? item.substring(1) : item);
           final Stats stat = names.stat(names.id(key));
           switch(stat.type) {

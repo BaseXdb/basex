@@ -40,12 +40,12 @@ public class StringList extends ElementList implements Iterable<String> {
 
   /**
    * Adds an element to the array.
-   * @param e element to be added
+   * @param element element to be added
    * @return self reference
    */
-  public final StringList add(final String e) {
+  public final StringList add(final String element) {
     if(size == list.length) list = Array.copyOf(list, newSize());
-    list[size++] = e;
+    list[size++] = element;
     return this;
   }
 

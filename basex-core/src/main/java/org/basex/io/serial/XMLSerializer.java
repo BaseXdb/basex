@@ -29,24 +29,24 @@ public class XMLSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void startOpen(final byte[] t) throws IOException {
-    if(tags.isEmpty()) {
+  protected void startOpen(final byte[] name) throws IOException {
+    if(elems.isEmpty()) {
       if(root) check();
       root = true;
     }
-    super.startOpen(t);
+    super.startOpen(name);
   }
 
   @Override
-  protected void finishText(final byte[] v) throws IOException {
-    if(tags.isEmpty()) check();
-    super.finishText(v);
+  protected void finishText(final byte[] value) throws IOException {
+    if(elems.isEmpty()) check();
+    super.finishText(value);
   }
 
   @Override
-  protected void atomic(final Item i, final boolean iter) throws IOException {
-    if(tags.isEmpty()) check();
-    super.atomic(i, iter);
+  protected void atomic(final Item it, final boolean iter) throws IOException {
+    if(elems.isEmpty()) check();
+    super.atomic(it, iter);
   }
 
   /**

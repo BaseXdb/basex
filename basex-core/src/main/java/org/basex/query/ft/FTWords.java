@@ -391,22 +391,22 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    if(occ != null) for(final Expr o : occ) if(!o.removable(v)) return false;
-    return query.removable(v);
+  public boolean removable(final Var var) {
+    if(occ != null) for(final Expr o : occ) if(!o.removable(var)) return false;
+    return query.removable(var);
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return occ != null ? VarUsage.sum(v, occ).plus(query.count(v)) : query.count(v);
+  public VarUsage count(final Var var) {
+    return occ != null ? VarUsage.sum(var, occ).plus(query.count(var)) : query.count(var);
   }
 
   @Override
-  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
 
-    boolean change = occ != null && inlineAll(qc, scp, occ, v, e);
-    final Expr q = query.inline(qc, scp, v, e);
+    boolean change = occ != null && inlineAll(qc, scp, occ, var, ex);
+    final Expr q = query.inline(qc, scp, var, ex);
     if(q != null) {
       query = q;
       change = true;

@@ -141,26 +141,26 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   private NSDecl namespaces;
 
   @Override
-  protected void startOpen(final byte[] n) {
+  protected void startOpen(final byte[] name) {
     namespaces = new NSDecl(namespaces);
     attributes.clear();
   }
 
   @Override
-  protected void attribute(final byte[] n, final byte[] v) {
+  protected void attribute(final byte[] name, final byte[] value) {
     byte[] prefix = null;
-    if(startsWith(n, XMLNS)) {
-      if(n.length == 5) {
+    if(startsWith(name, XMLNS)) {
+      if(name.length == 5) {
         prefix = EMPTY;
-      } else if(n[5] == ':') {
-        prefix = substring(n, 6);
+      } else if(name[5] == ':') {
+        prefix = substring(name, 6);
       }
     }
 
     if(prefix != null) {
-      namespaces.put(prefix, v);
+      namespaces.put(prefix, value);
     } else {
-      attributes.add(n, v);
+      attributes.add(name, value);
     }
   }
 
@@ -178,9 +178,9 @@ public final class SAXSerializer extends Serializer implements XMLReader {
         attrs.addAttribute(uri, lname, rname, null, value);
       }
 
-      final String uri = string(namespaces.get(prefix(tag)));
-      final String lname = string(local(tag));
-      final String rname = string(tag);
+      final String uri = string(namespaces.get(prefix(elem)));
+      final String lname = string(local(elem));
+      final String rname = string(elem);
       contentHandler.startElement(uri, lname, rname, attrs);
 
     } catch(final SAXException ex) {
@@ -197,7 +197,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   @Override
   protected void finishClose() throws IOException {
     try {
-      final String name = string(tag);
+      final String name = string(elem);
       contentHandler.endElement("", name, name);
       namespaces = namespaces.getParent();
     } catch(final SAXException ex) {
@@ -206,9 +206,9 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  protected void finishText(final byte[] text) throws IOException {
+  protected void finishText(final byte[] value) throws IOException {
     try {
-      final String s = string(text);
+      final String s = string(value);
       final char[] c = s.toCharArray();
       contentHandler.characters(c, 0, c.length);
     } catch(final SAXException ex) {
@@ -217,10 +217,10 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  protected void finishComment(final byte[] comment) throws IOException {
+  protected void finishComment(final byte[] value) throws IOException {
     if(lexicalHandler != null) {
       try {
-        final String s = string(comment);
+        final String s = string(value);
         final char[] c = s.toCharArray();
         lexicalHandler.comment(c, 0, c.length);
       } catch(final SAXException ex) {
@@ -230,16 +230,16 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  protected void finishPi(final byte[] n, final byte[] v) throws IOException {
+  protected void finishPi(final byte[] name, final byte[] value) throws IOException {
     try {
-      contentHandler.processingInstruction(string(n), string(v));
+      contentHandler.processingInstruction(string(name), string(value));
     } catch(final SAXException ex) {
       throw new IOException(ex);
     }
   }
 
   @Override
-  protected void atomic(final Item i, final boolean iter) {
+  protected void atomic(final Item it, final boolean iter) {
     // ignored
   }
 
@@ -254,10 +254,10 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
     /**
      * Constructor.
-     * @param par parent declarations
+     * @param parent parent declarations
      */
-    NSDecl(final NSDecl par) {
-      parent = par;
+    NSDecl(final NSDecl parent) {
+      this.parent = parent;
     }
 
     /**

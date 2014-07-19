@@ -43,8 +43,8 @@ public final class TokenBoolMap extends TokenSet {
   }
 
   @Override
-  protected void rehash(final int s) {
-    super.rehash(s);
-    values = Arrays.copyOf(values, s);
+  protected void rehash(final int sz) {
+    super.rehash(sz);
+    values = Arrays.copyOf(values, sz);
   }
 }

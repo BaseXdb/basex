@@ -52,11 +52,11 @@ public final class Atts extends ElementList {
 
   /**
    * Deletes the specified entry.
-   * @param i entry offset
+   * @param index entry index
    */
-  public void delete(final int i) {
-    Array.move(nm, i + 1, -1, --size - i);
-    Array.move(vl, i + 1, -1, size - i);
+  public void delete(final int index) {
+    Array.move(nm, index + 1, -1, --size - index);
+    Array.move(vl, index + 1, -1, size - index);
   }
 
   /**
@@ -80,20 +80,20 @@ public final class Atts extends ElementList {
 
   /**
    * Returns the name at the specified index position.
-   * @param i index
+   * @param index index
    * @return name
    */
-  public byte[] name(final int i) {
-    return nm[i];
+  public byte[] name(final int index) {
+    return nm[index];
   }
 
   /**
    * Returns the value at the specified index position.
-   * @param i index
+   * @param index index
    * @return value
    */
-  public byte[] value(final int i) {
-    return vl[i];
+  public byte[] value(final int index) {
+    return vl[index];
   }
 
   /**

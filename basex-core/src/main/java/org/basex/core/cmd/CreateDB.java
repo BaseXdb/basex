@@ -47,10 +47,10 @@ public final class CreateDB extends ACreate {
 
   /**
    * Attaches a parser.
-   * @param p input parser
+   * @param prsr input parser
    */
-  public void setParser(final Parser p) {
-    parser = p;
+  public void setParser(final Parser prsr) {
+    parser = prsr;
   }
 
   @Override

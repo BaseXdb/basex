@@ -84,7 +84,7 @@ public final class Count extends Clause {
   }
 
   @Override
-  public Clause inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e) {
+  public Clause inline(final QueryContext qc, final VarScope scp, final Var v, final Expr ex) {
     return null;
   }
 

@@ -31,22 +31,21 @@ final class ValueIndexMerger {
 
   /**
    * Constructor.
-   * @param d data reference
-   * @param txt text flag
+   * @param data data reference
+   * @param text text flag
    * @param i merge id
    * @throws IOException I/O exception
    */
-  ValueIndexMerger(final Data d, final boolean txt, final int i) throws IOException {
-    pref = (txt ? DATATXT : DATAATV) + i;
-    dk = new DataInput(d.meta.dbfile(pref + 't'));
-    dv = new DiskValues(d, txt, pref);
-    data = d;
+  ValueIndexMerger(final Data data, final boolean text, final int i) throws IOException {
+    pref = (text ? DATATXT : DATAATV) + i;
+    dk = new DataInput(data.meta.dbfile(pref + 't'));
+    dv = new DiskValues(data, text, pref);
+    this.data = data;
     next();
   }
 
   /**
-   * Jumps to the next value. {@link #values} will have 0 entries if the
-   * end of file is reached.
+   * Jumps to the next value. {@link #values} will have 0 entries if the end of file is reached.
    * @throws IOException I/O exception
    */
   void next() throws IOException {

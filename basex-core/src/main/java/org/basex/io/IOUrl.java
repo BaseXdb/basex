@@ -26,10 +26,10 @@ public final class IOUrl extends IO {
 
   /**
    * Constructor.
-   * @param u url
+   * @param url url
    */
-  public IOUrl(final String u) {
-    super(u);
+  public IOUrl(final String url) {
+    super(url);
   }
 
   @Override
@@ -39,12 +39,12 @@ public final class IOUrl extends IO {
 
   @Override
   public InputSource inputSource() {
-    return new InputSource(path);
+    return new InputSource(pth);
   }
 
   @Override
   public StreamSource streamSource() {
-    return new StreamSource(path);
+    return new StreamSource(pth);
   }
 
   @Override
@@ -69,7 +69,7 @@ public final class IOUrl extends IO {
     } catch(final RuntimeException ex) {
       // catch unexpected runtime exceptions
       Util.debug(ex);
-      throw new BaseXException(NOT_PARSED_X, path);
+      throw new BaseXException(NOT_PARSED_X, pth);
     }
   }
 
@@ -79,7 +79,7 @@ public final class IOUrl extends IO {
    * @throws IOException I/O exception
    */
   public URLConnection connection() throws IOException {
-    final URL url = new URL(path);
+    final URL url = new URL(pth);
     final URLConnection conn = url.openConnection();
     conn.setConnectTimeout(TIMEOUT * 1000);
     // use basic authentication if credentials are contained in the url
@@ -90,14 +90,14 @@ public final class IOUrl extends IO {
 
   @Override
   public String dir() {
-    return path.endsWith("/") ? path : path.substring(0, path.lastIndexOf('/') + 1);
+    return pth.endsWith("/") ? pth : pth.substring(0, pth.lastIndexOf('/') + 1);
   }
 
   @Override
-  public IO merge(final String f) {
-    final IO io = IO.get(f);
-    if(!(io instanceof IOFile) || f.contains(":") || f.startsWith("/")) return io;
-    return IO.get((path.endsWith("/") ? path : path.replace("^(.*/).*", "$1")) + f);
+  public IO merge(final String path) {
+    final IO io = IO.get(path);
+    if(!(io instanceof IOFile) || path.contains(":") || path.startsWith("/")) return io;
+    return IO.get((pth.endsWith("/") ? pth : pth.replace("^(.*/).*", "$1")) + path);
   }
 
   /**
@@ -116,12 +116,12 @@ public final class IOUrl extends IO {
   }
 
   /**
-   * Checks if the specified string is a valid file URI.
-   * @param s source
+   * Checks if the specified string is a valid file URL.
+   * @param url url to be tested
    * @return result of check
    */
-  public static boolean isFileURL(final String s) {
-    return s.startsWith(FILEPREF + '/');
+  public static boolean isFileURL(final String url) {
+    return url.startsWith(FILEPREF + '/');
   }
 
   /**

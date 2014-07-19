@@ -45,27 +45,31 @@ public enum VarUsage {
 
   /**
    * Checks how often the given variable is accessed in all of the given expressions.
-   * @param v variable
-   * @param es expressions
+   * @param var variable
+   * @param exprs expressions
    * @return number of accesses to the variable in all expressions combined
    */
-  public static VarUsage sum(final Var v, final Expr... es) {
+  public static VarUsage sum(final Var var, final Expr... exprs) {
     VarUsage all = NEVER;
-    for(final Expr e : es)
-      if((all = all.plus(e.count(v))) == MORE_THAN_ONCE) break;
+    for(final Expr expr : exprs) {
+      all = all.plus(expr.count(var));
+      if(all == MORE_THAN_ONCE) break;
+    }
     return all;
   }
 
   /**
    * Checks how often the given variable is used in any of the given expressions.
-   * @param v variable
-   * @param es expressions
+   * @param var variable
+   * @param exprs expressions
    * @return maximum number of accesses in any given expression
    */
-  public static VarUsage maximum(final Var v, final Expr... es) {
+  public static VarUsage maximum(final Var var, final Expr... exprs) {
     VarUsage any = NEVER;
-    for(final Expr e : es)
-      if((any = any.max(e.count(v))) == MORE_THAN_ONCE) break;
+    for(final Expr expr : exprs) {
+      any = any.max(expr.count(var));
+      if(any == MORE_THAN_ONCE) break;
+    }
     return any;
   }
 }

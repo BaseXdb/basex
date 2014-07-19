@@ -24,7 +24,7 @@ abstract class JsonXmlConverter extends JsonConverter {
   private final boolean strings;
 
   /** Current element. */
-  FElem elem;
+  FElem curr;
 
   /**
    * Constructor.
@@ -41,8 +41,8 @@ abstract class JsonXmlConverter extends JsonConverter {
    * @return element
    */
   FElem element() {
-    if(elem == null) elem = new FElem(JSON);
-    return elem;
+    if(curr == null) curr = new FElem(JSON);
+    return curr;
   }
 
   @Override
@@ -71,11 +71,11 @@ abstract class JsonXmlConverter extends JsonConverter {
 
   /**
    * Adds type information to an element or the type cache.
-   * @param e element
+   * @param elem element
    * @param name JSON name
    * @param type data type
    */
-  void addType(final FElem e, final byte[] name, final byte[] type) {
+  void addType(final FElem elem, final byte[] name, final byte[] type) {
     // merge type information
     if(merge) {
       // check if name exists and contains no whitespaces
@@ -85,7 +85,7 @@ abstract class JsonXmlConverter extends JsonConverter {
           final TypeCache arr = names.get(name);
           if(arr != null && arr.type == type) {
             // add element if all types are identical
-            arr.add(e);
+            arr.add(elem);
           } else {
             // different types for same element
             if(arr != null) {
@@ -94,29 +94,29 @@ abstract class JsonXmlConverter extends JsonConverter {
               names.put(name, null);
             }
             // add type attribute, ignore string type
-            addType(e, type);
+            addType(elem, type);
           }
         } else {
           // new name: create new type cache
-          names.put(name, new TypeCache(name, type, e));
+          names.put(name, new TypeCache(name, type, elem));
         }
       } else {
         // no name, or name with whitespaces: add type attribute, ignore string type
-        addType(e, type);
+        addType(elem, type);
       }
     } else {
       // add type attribute
-      addType(e, type);
+      addType(elem, type);
     }
   }
 
   /**
    * Adds a type attribute to the specified element. Ignore string types.
-   * @param e element
+   * @param elem element
    * @param type type
    */
-  private void addType(final FElem e, final byte[] type) {
-    if(strings || type != STRING) e.add(TYPE, type);
+  private void addType(final FElem elem, final byte[] type) {
+    if(strings || type != STRING) elem.add(TYPE, type);
   }
 
   /**

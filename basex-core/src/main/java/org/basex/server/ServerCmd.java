@@ -49,20 +49,20 @@ public enum ServerCmd {
 
   /**
    * Constructor.
-   * @param c control code
+   * @param code control code
    */
-  ServerCmd(final int c) {
-    code = c;
+  ServerCmd(final int code) {
+    this.code = code;
   }
 
   /**
    * Returns the server command for the specified control byte
    * (soon obsolete).
-   * @param b control byte
+   * @param code control code
    * @return server command
    */
-  static ServerCmd get(final int b) {
-    for(final ServerCmd s : values()) if(s.code == b) return s;
+  static ServerCmd get(final int code) {
+    for(final ServerCmd s : values()) if(s.code == code) return s;
     // current default for unknown codes: database command.
     return COMMAND;
   }

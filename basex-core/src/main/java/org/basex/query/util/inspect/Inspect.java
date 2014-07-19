@@ -78,9 +78,9 @@ public abstract class Inspect {
    * @param parent parent element
    */
   final void comment(final TokenObjMap<TokenList> tags, final FElem parent) {
-    for(final byte[] key : tags) {
-      for(final byte[] value : tags.get(key)) {
-        add(value, qc.context, tag(key, parent));
+    for(final byte[] tag : tags) {
+      for(final byte[] name : tags.get(tag)) {
+        add(name, qc.context, elem(tag, parent));
       }
     }
   }
@@ -108,12 +108,12 @@ public abstract class Inspect {
   }
 
   /**
-   * Creates a new element for the specified tag.
-   * @param tag tag
+   * Creates a new element.
+   * @param name element name
    * @param parent parent element
    * @return element
    */
-  protected abstract FElem tag(final byte[] tag, final FElem parent);
+  protected abstract FElem elem(final byte[] name, final FElem parent);
 
   /**
    * Creates an element.

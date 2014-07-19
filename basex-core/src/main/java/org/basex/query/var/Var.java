@@ -131,16 +131,16 @@ public final class Var extends ExprInfo {
 
   /**
    * Returns an equivalent to the given expression that checks this variable's type.
-   * @param e expression
+   * @param ex expression
    * @param scp variable scope
    * @param qc query context
    * @param ii input info
    * @return checked expression
    * @throws QueryException query exception
    */
-  public Expr checked(final Expr e, final QueryContext qc, final VarScope scp, final InputInfo ii)
+  public Expr checked(final Expr ex, final QueryContext qc, final VarScope scp, final InputInfo ii)
       throws QueryException {
-    return checksType() ? new TypeCheck(sc, ii, e, declType, promote).optimize(qc, scp) : e;
+    return checksType() ? new TypeCheck(sc, ii, ex, declType, promote).optimize(qc, scp) : ex;
   }
 
   /**
@@ -186,11 +186,11 @@ public final class Var extends ExprInfo {
 
   /**
    * Checks whether the given variable is identical to this one, i.e. has the same ID.
-   * @param v variable to check
+   * @param var variable to check
    * @return {@code true}, if the IDs are equal, {@code false} otherwise
    */
-  public boolean is(final Var v) {
-    return id == v.id;
+  public boolean is(final Var var) {
+    return id == var.id;
   }
 
   /**

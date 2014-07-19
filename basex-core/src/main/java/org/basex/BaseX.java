@@ -180,7 +180,7 @@ public class BaseX extends CLI {
    * Launches the console mode, which reads and executes user input.
    */
   private void console() {
-    Util.outln(S_CONSOLE + TRY_MORE_X, sa() ? S_STANDALONE : S_CLIENT);
+    Util.outln(S_CONSOLE + TRY_MORE_X, local() ? S_STANDALONE : S_CLIENT);
     verbose = true;
 
     // create console reader
@@ -216,10 +216,10 @@ public class BaseX extends CLI {
   }
 
   /**
-   * Tests if this client is stand-alone.
-   * @return stand-alone flag
+   * Tests if this is a local client.
+   * @return local mode
    */
-  protected boolean sa() {
+  protected boolean local() {
     return true;
   }
 
@@ -235,14 +235,14 @@ public class BaseX extends CLI {
       if(arg.dash()) {
         c = arg.next();
         if(c == 'b' || c == 'c' || c == 'C' || c == 'i' || c == 'o' || c == 'q' ||
-            c == 'r' || c == 's' || c == 't' && sa()) {
+            c == 'r' || c == 's' || c == 't' && local()) {
           // options followed by a string
           v = arg.string();
-        } else if(c == 'd' || c == 'D' && sa() || c == 'L' || c == 'u' && sa() || c == 'R' ||
+        } else if(c == 'd' || c == 'D' && local() || c == 'L' || c == 'u' && local() || c == 'R' ||
             c == 'v' || c == 'V' || c == 'w' || c == 'W' || c == 'x' || c == 'X' || c == 'z') {
           // options to be toggled
           v = "";
-        } else if(!sa()) {
+        } else if(!local()) {
           // client options: need to be set before other options
           if(c == 'n') {
             // set server name
@@ -276,11 +276,11 @@ public class BaseX extends CLI {
 
   @Override
   public String header() {
-    return Util.info(S_CONSOLE, sa() ? S_STANDALONE : S_CLIENT);
+    return Util.info(S_CONSOLE, local() ? S_STANDALONE : S_CLIENT);
   }
 
   @Override
   public String usage() {
-    return sa() ? S_LOCALINFO : S_CLIENTINFO;
+    return local() ? S_LOCALINFO : S_CLIENTINFO;
   }
 }

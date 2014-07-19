@@ -10,21 +10,21 @@ import org.basex.data.*;
  */
 final class Insert extends StructuralUpdate {
   /** Insertion sequence. */
-  final DataClip insseq;
+  final DataClip clip;
 
   /**
    * Constructor.
-   * @param l PRE value of the target node location
-   * @param s shifts
-   * @param a accumulated shifts
-   * @param f PRE value of the first node which distance has to be updated
-   * @param p parent PRE value for the inserted nodes
-   * @param c insertion sequence data clip
+   * @param location PRE value of the target node location
+   * @param shifts shifts
+   * @param acc accumulated shifts
+   * @param first PRE value of the first node which distance has to be updated
+   * @param parent parent PRE value for the inserted nodes
+   * @param clip insertion sequence data clip
    */
-  private Insert(final int l, final int s, final int a, final int f, final int p,
-      final DataClip c) {
-    super(l, s, a, f, p);
-    insseq = c;
+  private Insert(final int location, final int shifts, final int acc, final int first,
+      final int parent, final DataClip clip) {
+    super(location, shifts, acc, first, parent);
+    this.clip = clip;
   }
 
   /**
@@ -34,20 +34,19 @@ final class Insert extends StructuralUpdate {
    * @param clip insertion sequence
    * @return instance
    */
-  static Insert getInstance(final int pre, final int par,
-      final DataClip clip) {
+  static Insert getInstance(final int pre, final int par, final DataClip clip) {
     final int s = clip.size();
     return new Insert(pre, s, s, pre, par, clip);
   }
 
   @Override
-  void apply(final Data d) {
-    d.insert(location, parent, insseq);
+  void apply(final Data data) {
+    data.insert(location, parent, clip);
   }
 
   @Override
   DataClip getInsertionData() {
-    return insseq;
+    return clip;
   }
 
   @Override
@@ -56,18 +55,18 @@ final class Insert extends StructuralUpdate {
   }
 
   @Override
-  public String toString() {
-    return "\n Insert: " + super.toString();
+  public BasicUpdate merge(final Data data, final BasicUpdate bu) {
+    if(bu != null && parent == bu.parent && bu instanceof Delete && location == bu.location
+        && data.kind(bu.location) != Data.ATTR) {
+      final Delete del = (Delete) bu;
+      return new Replace(location, shifts + del.shifts,
+          del.accumulatedShifts, del.preOfAffectedNode, clip, parent);
+    }
+    return null;
   }
 
   @Override
-  public BasicUpdate merge(final Data data, final BasicUpdate u) {
-    if(u != null && parent == u.parent && u instanceof Delete && location == u.location
-        && data.kind(u.location) != Data.ATTR) {
-      final Delete del = (Delete) u;
-      return new Replace(location, shifts + del.shifts,
-          del.accumulatedShifts, del.preOfAffectedNode, insseq, parent);
-    }
-    return null;
+  public String toString() {
+    return "\n Insert: " + super.toString();
   }
 }

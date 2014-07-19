@@ -11,10 +11,10 @@ import org.basex.core.*;
 abstract class AGet extends Command {
   /**
    * Default constructor.
-   * @param a arguments
+   * @param args arguments
    */
-  AGet(final String... a) {
-    super(Perm.NONE, a);
+  AGet(final String... args) {
+    super(Perm.NONE, args);
   }
 
   @Override

@@ -2374,8 +2374,8 @@ public class QueryParser extends InputParser {
     final byte[] nse = sc.elemNS;
     final int npos = names.size();
 
-    final QNm tag = new QNm(qName(TAGNAME));
-    names.add(new QNmCheck(tag));
+    final QNm name = new QNm(qName(ELEMNAME));
+    names.add(new QNmCheck(name));
     consumeWS();
 
     final Atts ns = new Atts();
@@ -2475,16 +2475,16 @@ public class QueryParser extends InputParser {
     } else {
       check('>');
       while(curr() != '<' || next() != '/') {
-        final Expr e = dirElemContent(tag.string());
+        final Expr e = dirElemContent(name.string());
         if(e == null) continue;
         add(cont, e);
       }
       pos += 2;
 
-      final byte[] close = qName(TAGNAME);
+      final byte[] close = qName(ELEMNAME);
       consumeWS();
       check('>');
-      if(!eq(tag.string(), close)) throw error(TAGWRONG, tag.string(), close);
+      if(!eq(name.string(), close)) throw error(TAGWRONG, name.string(), close);
     }
 
     assignURI(npos);
@@ -2501,16 +2501,16 @@ public class QueryParser extends InputParser {
 
     sc.ns.size(s);
     sc.elemNS = nse;
-    return new CElem(sc, info(), tag, ns, cont.finish());
+    return new CElem(sc, info(), name, ns, cont.finish());
   }
 
   /**
    * Parses the "DirElemContent" rule.
-   * @param tag opening tag
+   * @param name name of opening element
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr dirElemContent(final byte[] tag) throws QueryException {
+  private Expr dirElemContent(final byte[] name) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     boolean strip = true;
     do {
@@ -2538,7 +2538,7 @@ public class QueryParser extends InputParser {
       } else if(c != 0) {
         strip &= !entity(tb);
       } else {
-        throw error(NOCLOSING, tag);
+        throw error(NOCLOSING, name);
       }
     } while(true);
   }
@@ -2682,7 +2682,7 @@ public class QueryParser extends InputParser {
       names.add(new QNmCheck(qn));
     } else {
       if(!wsConsume(BRACE1)) return null;
-      name = check(expr(), NOTAG);
+      name = check(expr(), NOELEMNAME);
       wsCheck(BRACE2);
     }
 
@@ -2804,14 +2804,14 @@ public class QueryParser extends InputParser {
       if(t == null) {
         if(wsConsume(PAR1)) throw error(SIMPLETYPE, name);
         if(sc.xquery3()) {
-          if(!AtomType.AST.name.eq(name)) throw error(TYPEUNKNOWN30, name);
+          if(!AtomType.AST.name.eq(name)) throw error(TYPEUNKNOWN30, name.prefixId(XML));
           t = AtomType.AST;
         } else {
           throw error(TYPEUNKNOWN, name);
         }
       }
       if(t == AtomType.AST || t == AtomType.AAT || t == AtomType.NOT)
-        throw error(CASTUNKNOWN, name);
+        throw error(CASTUNKNOWN, name.prefixId(XML));
     }
     skipWs();
     return SeqType.get(t, consume('?') ? Occ.ZERO_ONE : Occ.ONE);
@@ -2878,14 +2878,14 @@ public class QueryParser extends InputParser {
         if(t != null) return functionTest(ann, t).seqType();
       }
       // no type found
-      if(t == null) throw error(NOTYPE, name.string());
+      if(t == null) throw error(NOTYPE, name.prefixId(XML));
     } else {
       // attach default element namespace
       if(!name.hasURI()) name.uri(sc.elemNS);
       // atomic types
       t = AtomType.find(name, false);
       // no type found
-      if(t == null) throw error(TYPEUNKNOWN, name);
+      if(t == null) throw error(TYPEUNKNOWN, name.prefixId(XML));
     }
 
     // annotations are not allowed for remaining types
@@ -3754,15 +3754,15 @@ public class QueryParser extends InputParser {
 
   /**
    * Raises an entity error.
-   * @param p start position
-   * @param c error code
+   * @param start start position
+   * @param code error code
    * @throws QueryException query exception
    */
-  private void entityError(final int p, final Err c) throws QueryException {
-    final String sub = input.substring(p, Math.min(p + 20, length));
+  private void entityError(final int start, final Err code) throws QueryException {
+    final String sub = input.substring(start, Math.min(start + 20, length));
     final int semi = sub.indexOf(';');
     final String ent = semi == -1 ? sub + "..." : sub.substring(0, semi + 1);
-    throw error(c, ent);
+    throw error(code, ent);
   }
 
   /**
@@ -4037,12 +4037,12 @@ public class QueryParser extends InputParser {
   /**
    * Adds an expression to the specified array.
    * @param ar input array
-   * @param e new expression
+   * @param ex new expression
    * @throws QueryException query exception
    */
-  private void add(final ExprList ar, final Expr e) throws QueryException {
-    if(e == null) throw error(INCOMPLETE);
-    ar.add(e);
+  private void add(final ExprList ar, final Expr ex) throws QueryException {
+    if(ex == null) throw error(INCOMPLETE);
+    ar.add(ex);
   }
 
   /**

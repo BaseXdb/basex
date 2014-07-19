@@ -160,7 +160,7 @@ public final class PathSummary implements Index {
 
   /**
    * Returns all children or descendants of the specified nodes with the
-   * specified tag or attribute value. Called from the query optimizer.
+   * specified element or attribute names. Called from the query optimizer.
    * @param name name reference
    * @param kind node kind
    * @return descendant nodes
@@ -200,7 +200,7 @@ public final class PathSummary implements Index {
     for(final byte[] name : names) {
       final boolean attr = startsWith(name, '@');
       final byte kind = attr ? Data.ATTR : Data.ELEM;
-      final int id = attr ? data.atnindex.id(substring(name, 1)) : data.tagindex.id(name);
+      final int id = attr ? data.atnindex.id(substring(name, 1)) : data.elmindex.id(name);
 
       final ArrayList<PathNode> tmp = new ArrayList<>();
       for(final PathNode node : nodes) {

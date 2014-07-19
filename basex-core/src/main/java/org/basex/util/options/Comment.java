@@ -9,10 +9,10 @@ package org.basex.util.options;
 public final class Comment extends Option<Object> {
   /**
    * Constructor without default value.
-   * @param n name
+   * @param name name
    */
-  public Comment(final String n) {
-    super(n);
+  public Comment(final String name) {
+    super(name);
   }
 
   @Override

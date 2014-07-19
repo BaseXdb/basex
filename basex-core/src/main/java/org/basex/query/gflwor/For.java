@@ -124,14 +124,14 @@ public final class For extends ForLet {
 
   /**
    * Gathers all non-{@code null} variables.
-   * @param v var
-   * @param p pos
-   * @param s scope
+   * @param var var
+   * @param pos pos
+   * @param scope scope
    * @return non-{@code null} variables
    */
-  private static Var[] vars(final Var v, final Var p, final Var s) {
-    return p == null ? s == null ? new Var[] { v } : new Var[] { v, s } :
-      s == null ? new Var[] { v, p } : new Var[] { v, p, s };
+  private static Var[] vars(final Var var, final Var pos, final Var scope) {
+    return pos == null ? scope == null ? new Var[] { var } : new Var[] { var, scope } :
+      scope == null ? new Var[] { var, pos } : new Var[] { var, pos, scope };
   }
 
   /**

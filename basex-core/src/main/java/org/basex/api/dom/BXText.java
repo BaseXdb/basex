@@ -13,10 +13,10 @@ import org.w3c.dom.*;
 public class BXText extends BXChar implements Text {
   /**
    * Constructor.
-   * @param n node reference
+   * @param node node reference
    */
-  public BXText(final ANode n) {
-    super(n);
+  public BXText(final ANode node) {
+    super(node);
   }
 
   @Override
@@ -26,16 +26,16 @@ public class BXText extends BXChar implements Text {
 
   @Override
   public boolean isElementContentWhitespace() {
-    return Token.ws(node.string());
+    return Token.ws(nd.string());
   }
 
   @Override
-  public BXText replaceWholeText(final String content) {
+  public BXText replaceWholeText(final String value) {
     throw readOnly();
   }
 
   @Override
-  public BXText splitText(final int off) {
+  public BXText splitText(final int offset) {
     throw readOnly();
   }
 }

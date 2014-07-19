@@ -60,14 +60,14 @@ public final class ClientListener extends Thread {
 
   /**
    * Constructor.
-   * @param s socket
-   * @param c database context
-   * @param srv server reference
+   * @param socket socket
+   * @param context database context
+   * @param server server reference
    */
-  public ClientListener(final Socket s, final Context c, final BaseXServer srv) {
-    context = new Context(c, this);
-    socket = s;
-    server = srv;
+  public ClientListener(final Socket socket, final Context context, final BaseXServer server) {
+    this.context = new Context(context, this);
+    this.socket = socket;
+    this.server = server;
     last = System.currentTimeMillis();
     setDaemon(true);
   }

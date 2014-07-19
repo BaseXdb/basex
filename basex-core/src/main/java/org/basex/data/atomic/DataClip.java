@@ -24,22 +24,22 @@ public final class DataClip {
 
   /**
    * Constructor.
-   * @param d data reference
+   * @param data data reference
    */
-  public DataClip(final Data d) {
-    this(d, 0, d.meta.size);
+  public DataClip(final Data data) {
+    this(data, 0, data.meta.size);
   }
 
   /**
    * Constructor.
-   * @param d data reference
-   * @param s start
-   * @param e end
+   * @param data data reference
+   * @param start start
+   * @param end end
    */
-  public DataClip(final Data d, final int s, final int e) {
-    data = d;
-    start = s;
-    end = e;
+  public DataClip(final Data data, final int start, final int end) {
+    this.data = data;
+    this.start = start;
+    this.end = end;
   }
 
   /**

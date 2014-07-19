@@ -186,10 +186,10 @@ public interface Commands {
 
     /**
      * Default constructor.
-     * @param h help texts, or {@code null} if command is hidden.
+     * @param help help texts, or {@code null} if command is hidden.
      */
-    Cmd(final String... h) {
-      help = h;
+    Cmd(final String... help) {
+      this.help = help;
     }
 
     /**

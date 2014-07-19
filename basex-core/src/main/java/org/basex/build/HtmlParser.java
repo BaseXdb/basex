@@ -167,10 +167,10 @@ public final class HtmlParser extends XMLParser {
 
   /**
    * Reflection invoke XMLWriter.setOutputProperty().
-   * @param p property
-   * @param v value
+   * @param name property
+   * @param value value
    */
-  private static void opt(final String p, final String v) {
-    Reflect.invoke(METHOD, WRITER, p, v);
+  private static void opt(final String name, final String value) {
+    Reflect.invoke(METHOD, WRITER, name, value);
   }
 }

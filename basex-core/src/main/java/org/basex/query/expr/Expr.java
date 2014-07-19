@@ -166,16 +166,16 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Checks if the given variable is used by this expression.
-   * @param v variable to be checked
+   * @param var variable to be checked
    * @return {@code true} if the variable is used, {@code false} otherwise
    */
-  public final boolean uses(final Var v) {
+  public final boolean uses(final Var var) {
     // return true iff the the search was aborted, i.e. the variable is used
     return !accept(new ASTVisitor() {
       @Override
       public boolean used(final VarRef ref) {
         // abort when the variable is used
-        return !ref.var.is(v);
+        return !ref.var.is(var);
       }
     });
   }
@@ -189,17 +189,17 @@ public abstract class Expr extends ExprInfo {
    * </ul>
    * This method is called by {@link GFLWOR#compile(QueryContext, VarScope)} to rewrite where
    * clauses into predicates.
-   * @param v variable to be replaced
+   * @param var variable to be replaced
    * @return result of check
    */
-  public abstract boolean removable(final Var v);
+  public abstract boolean removable(final Var var);
 
   /**
    * Checks how often a variable is used in this expression.
-   * @param v variable to look for
+   * @param var variable to look for
    * @return how often the variable is used, see {@link VarUsage}
    */
-  public abstract VarUsage count(final Var v);
+  public abstract VarUsage count(final Var var);
 
   /**
    * Inlines an expression into this one, replacing all references to the given variable.
@@ -207,30 +207,30 @@ public abstract class Expr extends ExprInfo {
    * and the variable reference is replaced in {@link VarRef#inline}.
    * @param qc query context for reoptimization
    * @param scp variable scope for reoptimization
-   * @param v variable to replace
-   * @param e expression to inline
+   * @param var variable to replace
+   * @param ex expression to inline
    * @return resulting expression if something changed, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public abstract Expr inline(final QueryContext qc, final VarScope scp, final Var v,
-      final Expr e) throws QueryException;
+  public abstract Expr inline(final QueryContext qc, final VarScope scp, final Var var,
+      final Expr ex) throws QueryException;
 
   /**
    * Inlines the given expression into all elements of the given array.
    * @param qc query context
    * @param scp variable scope
    * @param arr array
-   * @param v variable to replace
-   * @param e expression to inline
+   * @param var variable to replace
+   * @param ex expression to inline
    * @return {@code true} if the array has changed, {@code false} otherwise
    * @throws QueryException query exception
    */
   protected static boolean inlineAll(final QueryContext qc, final VarScope scp,
-      final Expr[] arr, final Var v, final Expr e) throws QueryException {
+      final Expr[] arr, final Var var, final Expr ex) throws QueryException {
 
     boolean change = false;
     for(int i = 0; i < arr.length; i++) {
-      final Expr nw = arr[i].inline(qc, scp, v, e);
+      final Expr nw = arr[i].inline(qc, scp, var, ex);
       if(nw != null) {
         arr[i] = nw;
         change = true;

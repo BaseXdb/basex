@@ -25,21 +25,21 @@ public abstract class ACreate extends Command {
 
   /**
    * Protected constructor, specifying command arguments.
-   * @param arg arguments
+   * @param args arguments
    */
-  ACreate(final String... arg) {
-    this(Perm.CREATE, false, arg);
+  ACreate(final String... args) {
+    this(Perm.CREATE, false, args);
     newData = true;
   }
 
   /**
    * Protected constructor, specifying command flags and arguments.
-   * @param p required permission
-   * @param d requires opened database
-   * @param arg arguments
+   * @param perm required permission
+   * @param openDB requires opened database
+   * @param args arguments
    */
-  ACreate(final Perm p, final boolean d, final String... arg) {
-    super(p, d, arg);
+  ACreate(final Perm perm, final boolean openDB, final String... args) {
+    super(perm, openDB, args);
   }
 
   /**

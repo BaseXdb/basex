@@ -12,20 +12,20 @@ public final class StringOption extends Option<String> {
 
   /**
    * Constructor without default value.
-   * @param n name
+   * @param name name
    */
-  public StringOption(final String n) {
-    this(n, null);
+  public StringOption(final String name) {
+    this(name, null);
   }
 
   /**
    * Default constructor.
-   * @param n name
-   * @param v value
+   * @param name name
+   * @param value value
    */
-  public StringOption(final String n, final String v) {
-    super(n);
-    value = v;
+  public StringOption(final String name, final String value) {
+    super(name);
+    this.value = value;
   }
 
   @Override

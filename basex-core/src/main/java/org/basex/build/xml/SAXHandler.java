@@ -48,31 +48,31 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
 
   /**
    * Constructor.
-   * @param build builder reference
-   * @param ch chopping flag
-   * @param sn strip namespaces
+   * @param builder builder reference
+   * @param chop chopping flag
+   * @param stripNS strip namespaces
    */
-  public SAXHandler(final Builder build, final boolean ch, final boolean sn) {
-    builder = build;
-    stripNS = sn;
-    chop = ch;
-    chops.push(ch);
+  public SAXHandler(final Builder builder, final boolean chop, final boolean stripNS) {
+    this.builder = builder;
+    this.stripNS = stripNS;
+    this.chop = chop;
+    chops.push(chop);
   }
 
   @Override
-  public void startElement(final String uri, final String ln, final String qn, final Attributes at)
-      throws SAXException {
+  public void startElement(final String uri, final String local, final String name,
+      final Attributes attr) throws SAXException {
 
     try {
       finishText();
 
-      final int as = at.getLength();
+      final int as = attr.getLength();
       for(int a = 0; a < as; ++a) {
-        final byte[] an = token(at.getQName(a));
-        final byte[] av = token(at.getValue(a));
+        final byte[] an = token(attr.getQName(a));
+        final byte[] av = token(attr.getValue(a));
         atts.add(stripNS ? local(an) : an, av);
       }
-      final byte[] en = token(qn);
+      final byte[] en = token(name);
       builder.openElem(stripNS ? local(en) : en, atts, nsp);
 
       boolean c = chops.peek();
@@ -95,7 +95,8 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   }
 
   @Override
-  public void endElement(final String uri, final String ln, final String qn) throws SAXException {
+  public void endElement(final String uri, final String local, final String name)
+      throws SAXException {
     try {
       finishText();
       builder.closeElem();
@@ -106,27 +107,27 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   }
 
   @Override
-  public void characters(final char[] ch, final int s, final int l) {
-    sb.append(ch, s, l);
+  public void characters(final char[] chars, final int start, final int length) {
+    sb.append(chars, start, length);
   }
 
   @Override
-  public void processingInstruction(final String nm, final String cont) throws SAXException {
+  public void processingInstruction(final String name, final String content) throws SAXException {
     if(dtd) return;
     try {
       finishText();
-      builder.pi(token(nm + ' ' + cont));
+      builder.pi(token(name + ' ' + content));
     } catch(final IOException ex) {
       error(ex);
     }
   }
 
   @Override
-  public void comment(final char[] ch, final int s, final int l) throws SAXException {
+  public void comment(final char[] chars, final int start, final int length) throws SAXException {
     if(dtd) return;
     try {
       finishText();
-      builder.comment(token(new String(ch, s, l)));
+      builder.comment(token(new String(chars, start, length)));
     } catch(final IOException ex) {
       error(ex);
     }
@@ -181,7 +182,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
 
   // LexicalHandler
   @Override
-  public void startDTD(final String n, final String pid, final String sid) {
+  public void startDTD(final String name, final String pid, final String sid) {
     dtd = true;
   }
 
@@ -193,9 +194,9 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   @Override
   public void endCDATA() { /* ignored. */ }
   @Override
-  public void endEntity(final String n) { /* ignored. */ }
+  public void endEntity(final String entity) { /* ignored. */ }
   @Override
   public void startCDATA() { /* ignored. */ }
   @Override
-  public void startEntity(final String n) { /* ignored. */ }
+  public void startEntity(final String entity) { /* ignored. */ }
 }

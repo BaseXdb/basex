@@ -18,23 +18,23 @@ public final class User {
 
   /**
    * Constructor.
-   * @param n user name
-   * @param p password
-   * @param r rights
+   * @param name user name
+   * @param password password
+   * @param perm rights
    */
-  User(final String n, final String p, final Perm r) {
-    name = n;
-    password = p.toLowerCase(Locale.ENGLISH);
-    perm = r;
+  User(final String name, final String password, final Perm perm) {
+    this.name = name;
+    this.password = password.toLowerCase(Locale.ENGLISH);
+    this.perm = perm;
   }
 
   /**
    * Tests if the user has the specified permission.
-   * @param p permission to be checked
+   * @param prm permission to be checked
    * @return result of check
    */
-  public boolean has(final Perm p) {
-    return perm.num >= p.num;
+  public boolean has(final Perm prm) {
+    return perm.num >= prm.num;
   }
 
   /**

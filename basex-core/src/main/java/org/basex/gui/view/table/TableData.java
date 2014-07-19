@@ -47,7 +47,7 @@ final class TableData {
   int mouseX;
   /** Mouse Y position. */
   int mouseY;
-  /** ID of the table root tag. */
+  /** ID of the table root element. */
   int root;
 
   /** GUI options. */
@@ -57,11 +57,11 @@ final class TableData {
 
   /** Table Column. */
   static final class TableCol {
-    /** Tag/Attribute flag. */
+    /** Element/attribute name. */
     byte[] name;
     /** Column IDs. */
     int id;
-    /** Tag/Attribute flags. */
+    /** Element/attribute flag. */
     boolean elem;
     /** Column width. */
     double width;
@@ -91,7 +91,7 @@ final class TableData {
     for(final byte[] k : data.paths.desc(EMPTY, true, true)) {
       int c = 0;
       for(final byte[] kk : data.paths.desc(k, true, false)) {
-        final Names nm = startsWith(kk, '@') ? data.atnindex : data.tagindex;
+        final Names nm = startsWith(kk, '@') ? data.atnindex : data.elmindex;
         if(nm.stat(nm.id(delete(kk, '@'))).isLeaf()) ++c;
       }
       // add keys with a minimum of three columns
@@ -113,11 +113,11 @@ final class TableData {
     rowH = 1;
 
     if(rt == -1 && roots.isEmpty()) return;
-    if(root == -1) root = dt.tagindex.id(roots.get(0));
-    for(final byte[] k : dt.paths.desc(dt.tagindex.key(root), true, true)) {
+    if(root == -1) root = dt.elmindex.id(roots.get(0));
+    for(final byte[] k : dt.paths.desc(dt.elmindex.key(root), true, true)) {
       final boolean elem = !startsWith(k, '@');
       final byte[] key = delete(k, '@');
-      final Names index = elem ? dt.tagindex : dt.atnindex;
+      final Names index = elem ? dt.elmindex : dt.atnindex;
       if(index.stat(index.id(key)).isLeaf()) addCol(key, elem);
     }
 
@@ -143,13 +143,13 @@ final class TableData {
   }
 
   /**
-   * Adds the specified tag or attribute as column if it exists in the data.
-   * @param name tag/attribute to be added
+   * Adds the specified element or attribute as column if it exists in the data.
+   * @param name element/attribute name to be added
    * @param elem element flag
    */
   private void addCol(final byte[] name, final boolean elem) {
     final Data data = context.data();
-    final int id = (elem ? data.tagindex : data.atnindex).id(name);
+    final int id = (elem ? data.elmindex : data.atnindex).id(name);
     if(id == 0) return;
     final TableCol col = new TableCol();
     col.id = id;
@@ -167,12 +167,12 @@ final class TableData {
     for(int p : context.current().pres) {
       if(p >= data.meta.size) break;
       final int s = p + data.size(p, data.kind(p));
-      // find first root tag
+      // find first root element name
       do {
         if(data.kind(p) == Data.ELEM && data.name(p) == root) break;
       } while(++p < s);
 
-      // parse whole document and collect root tags
+      // parse whole document and collect root element names
       while(p < s) {
         final int k = data.kind(p);
         if(k == Data.ELEM && data.name(p) == root) rows.add(p);
@@ -191,7 +191,7 @@ final class TableData {
     final Data data = context.data();
     final int cs = cols.length;
 
-    // scan first MAXROWS root tags
+    // scan first MAXROWS root elements
     final int nRows = rows.size();
     final TableIterator ti = new TableIterator(data, this);
 
@@ -242,7 +242,7 @@ final class TableData {
     final boolean e = cols[sortCol].elem;
 
     final Data data = context.data();
-    final Names index = e ? data.tagindex : data.atnindex;
+    final Names index = e ? data.elmindex : data.atnindex;
     final StatsType type = index.stat(c).type;
     final boolean num = type == StatsType.INTEGER || type == StatsType.DOUBLE;
 
@@ -267,10 +267,10 @@ final class TableData {
   }
 
   /**
-   * Returns possible root tag.
+   * Returns pre value of possible root element.
    * @param data data reference
    * @param pre pre value to start with
-   * @return root
+   * @return pre value of root element
    */
   int getRoot(final Data data, final int pre) {
     if(pre == -1) return -1;
@@ -322,7 +322,7 @@ final class TableData {
       names.add(col.name);
       elems.add(col.elem);
     }
-    final String query = Find.findTable(filters, names, elems, data.tagindex.key(root),
+    final String query = Find.findTable(filters, names, elems, data.elmindex.key(root),
         gopts.get(GUIOptions.FILTERRT) || r);
     if(query.equals(last)) return null;
     last = query;

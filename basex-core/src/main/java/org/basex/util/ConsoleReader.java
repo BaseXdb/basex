@@ -79,9 +79,9 @@ public abstract class ConsoleReader {
       try {
         Util.out(PROMPT);
         return in.readLine();
-      } catch(final IOException e) {
+      } catch(final IOException ex) {
         // should not happen
-        throw new RuntimeException(e);
+        throw new RuntimeException(ex);
       }
     }
 

@@ -806,9 +806,9 @@ public enum Function {
   /** XQuery function. */
   _FT_COUNT(FNFt.class, "count(nodes)", arg(NOD_ZM), ITR),
   /** XQuery function. */
-  _FT_MARK(FNFt.class, "mark(nodes[,tag])", arg(NOD_ZM, STR), NOD_ZM),
+  _FT_MARK(FNFt.class, "mark(nodes[,name])", arg(NOD_ZM, STR), NOD_ZM),
   /** XQuery function. */
-  _FT_EXTRACT(FNFt.class, "extract(nodes[,tag[,length]])", arg(ITEM_ZM, STR, ITR), NOD_ZM),
+  _FT_EXTRACT(FNFt.class, "extract(nodes[,name[,length]])", arg(ITEM_ZM, STR, ITR), NOD_ZM),
   /** XQuery function. */
   _FT_SCORE(FNFt.class, "score(items)", arg(ITEM_ZM), DBL_ZM),
   /** XQuery function. */

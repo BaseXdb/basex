@@ -11,10 +11,10 @@ import org.basex.core.*;
 abstract class ABackup extends Command {
   /**
    * Protected constructor.
-   * @param a arguments
+   * @param args arguments
    */
-  ABackup(final String... a) {
-    super(Perm.CREATE, false, a);
+  ABackup(final String... args) {
+    super(Perm.CREATE, false, args);
   }
 
   @Override

@@ -87,23 +87,23 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    return min.removable(v) || max.removable(v) && super.removable(v);
+  public boolean removable(final Var var) {
+    return min.removable(var) || max.removable(var) && super.removable(var);
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return super.count(v).plus(VarUsage.sum(v, min, max));
+  public VarUsage count(final Var var) {
+    return super.count(var).plus(VarUsage.sum(var, min, max));
   }
 
   @Override
-  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
-    final Expr mn = min.inline(qc, scp, v, e), mx = max.inline(qc, scp, v, e);
+    final Expr mn = min.inline(qc, scp, var, ex), mx = max.inline(qc, scp, var, ex);
     if(mn != null) min = mn;
     if(mx != null) max = mx;
 
-    return inlineAll(qc, scp, exprs, v, e) || mn != null || mx != null
+    return inlineAll(qc, scp, exprs, var, ex) || mn != null || mx != null
         ? optimize(qc, scp) : null;
   }
 

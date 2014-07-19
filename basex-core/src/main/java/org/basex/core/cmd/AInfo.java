@@ -14,11 +14,11 @@ import org.basex.util.*;
 abstract class AInfo extends Command {
   /**
    * Protected constructor.
-   * @param d requires opened database
-   * @param a arguments
+   * @param openDB requires opened database
+   * @param args arguments
    */
-  AInfo(final boolean d, final String... a) {
-    super(Perm.READ, d, a);
+  AInfo(final boolean openDB, final String... args) {
+    super(Perm.READ, openDB, args);
   }
 
   /**

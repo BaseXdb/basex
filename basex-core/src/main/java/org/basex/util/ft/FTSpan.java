@@ -20,14 +20,14 @@ public final class FTSpan {
 
   /**
    * Constructor.
-   * @param t token text
-   * @param p number of tokens parsed before the current token
-   * @param sc is a special character
+   * @param text token text
+   * @param pos number of tokens parsed before the current token
+   * @param special is a special character
    */
-  FTSpan(final byte[] t, final int p, final boolean sc) {
-    text = t;
-    pos = p;
-    special = sc;
+  FTSpan(final byte[] text, final int pos, final boolean special) {
+    this.text = text;
+    this.pos = pos;
+    this.special = special;
   }
 
   @Override

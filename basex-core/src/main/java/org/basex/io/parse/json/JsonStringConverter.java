@@ -162,8 +162,8 @@ public final class JsonStringConverter extends JsonConverter {
   }
 
   @Override
-  public void booleanLit(final byte[] b) {
-    tb.add(b);
+  public void booleanLit(final byte[] value) {
+    tb.add(value);
   }
 
   @Override

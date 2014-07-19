@@ -103,17 +103,17 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public final boolean removable(final Var v) {
+  public final boolean removable(final Var var) {
     return true;
   }
 
   @Override
-  public final VarUsage count(final Var v) {
+  public final VarUsage count(final Var var) {
     return VarUsage.NEVER;
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
     // values do not contain variable references
     return null;

@@ -14,16 +14,16 @@ final class DictionaryStemmer extends Stemmer {
 
   /**
    * Constructor.
-   * @param d stem dictionary
+   * @param dict stem dictionary
    * @param fti full-text iterator
    */
-  DictionaryStemmer(final StemDir d, final FTIterator fti) {
+  DictionaryStemmer(final StemDir dict, final FTIterator fti) {
     super(fti);
-    dict = d;
+    this.dict = dict;
   }
 
   @Override
-  Stemmer get(final Language l, final FTIterator fti) {
+  Stemmer get(final Language lang, final FTIterator fti) {
     return new DictionaryStemmer(dict, fti);
   }
 

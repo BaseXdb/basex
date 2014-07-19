@@ -387,9 +387,9 @@ public enum Err {
   /** FOCH0001. */
   INVCODE(FOCH, 1, "Invalid XML character '&#x%;'."),
   /** FOCH0002. */
-  WHICHCOLL(FOCH, 2, "Unknown collation \"%\"."),
+  WHICHCOLL(FOCH, 2, "Unknown collation '%'."),
   /** FOCH0003. */
-  NORMUNI(FOCH, 3, "Unsupported normalization form (\"%\")."),
+  NORMUNI(FOCH, 3, "Unsupported normalization form ('%')."),
   /** FOCH0004. */
   CHARCOLL(FOCH, 4, "Collation does not support function."),
 
@@ -402,20 +402,20 @@ public enum Err {
   /** FODC0002. */
   IOERR(FODC, 2, "%"),
   /** FODC0002. */
-  WHICHRES(FODC, 2, "Resource \"%\" does not exist."),
+  WHICHRES(FODC, 2, "Resource '%' does not exist."),
   /** FODC0004. */
-  INVCOLL(FODC, 4, "Invalid collection URI \"%\"."),
+  INVCOLL(FODC, 4, "Invalid collection URI: '%'."),
   /** FODC0005. */
-  INVDOC(FODC, 5, "Invalid document URI \"%\"."),
+  INVDOC(FODC, 5, "Invalid document URI: '%'."),
   /** FODC0006. */
   SAXERR(FODC, 6, "SAX: %"),
   /** FODC0007. */
-  RESINV(FODC, 7, "Resource path \"%\" is invalid."),
+  RESINV(FODC, 7, "Resource path '%' is invalid."),
   /** FODC0007. */
-  INVDB(FODC, 7, "Invalid database name '%'."),
+  INVDB(FODC, 7, "Invalid database name: '%'."),
 
   /** FODF1280. */
-  FORMNUM(FODF, 1280, "Unknown decimal format: %."),
+  FORMNUM(FODF, 1280, "Unknown decimal format: '%'."),
   /** FODF1310. */
   PICEMPTY(FODF, 1310, "The picture string may not be empty."),
   /** FODF1310. */
@@ -559,19 +559,19 @@ public enum Err {
   /** FOUP0001. */
   UPDOCTYPE(FOUP, 1, "Document expected, % found."),
   /** FOUP0002. */
-  UPFOURI(FOUP, 2, "No valid URI: \"%\"."),
+  UPFOURI(FOUP, 2, "Invalid URI: %."),
   /** FOUP0002. */
-  UPPUTERR(FOUP, 2, "\"%\" could not be written."),
+  UPPUTERR(FOUP, 2, "File '%' could not be written."),
   /** FOUP0002. */
-  UPDROPBACK(FOUP, 2, "Backup \"%\" could not be %."),
+  UPDROPBACK(FOUP, 2, "Backup '%' could not be %."),
   /** FOUP0002. */
-  UPDBERROR(FOUP, 2, "Database \"%\" could not be %."),
+  UPDBERROR(FOUP, 2, "Database '%' could not be %."),
   /** FOUP0002. */
-  UPDBPUTERR(FOUP, 2, "Resource \"%\" could not be written."),
+  UPDBPUTERR(FOUP, 2, "Resource '%' could not be written."),
   /** FOUP0002. */
-  UPDBDELERR(FOUP, 2, "Resource \"%\" could not be deleted."),
+  UPDBDELERR(FOUP, 2, "Resource '%' could not be deleted."),
   /** FOUP0002. */
-  UPDBRENAMEERR(FOUP, 2, "Resource \"%\" could not be renamed."),
+  UPDBRENAMEERR(FOUP, 2, "Resource '%' could not be renamed."),
   /** FOUP0002. */
   UPDBOPTERR(FOUP, 2, "%"),
 
@@ -677,9 +677,9 @@ public enum Err {
   /** XPST0003. */
   COPYEXPR(XPST, 3, "Copy expression is incomplete."),
   /** XPST0003. */
-  NOTAG(XPST, 3, "Expecting tag name."),
+  NOELEMNAME(XPST, 3, "Expecting element name."),
   /** XPST0003. */
-  TAGNAME(XPST, 3, "Expecting tag name, '<%' found."),
+  ELEMNAME(XPST, 3, "Expecting element name, '<%' found."),
   /** XPST0003. */
   NOATTNAME(XPST, 3, "Expecting attribute name."),
   /** XPST0003. */
@@ -689,7 +689,7 @@ public enum Err {
   /** XPST0003. */
   WRONGCHAR(XPST, 3, "Expecting '%'%."),
   /** XPST0003. */
-  INVENTITY(XPST, 3, "Invalid entity '%'."),
+  INVENTITY(XPST, 3, "Invalid entity: '%'."),
   /** XPST0003. */
   INCOMPLETE(XPST, 3, "Incomplete expression."),
   /** XPST0003. */
@@ -777,9 +777,9 @@ public enum Err {
   /** XPST0003. */
   EXPREMPTY(XPST, 3, "Unknown function or expression."),
   /** XPST0003. */
-  NOTYPE(XPST, 3, "Unknown type '%'."),
+  NOTYPE(XPST, 3, "Unknown type: %."),
   /** XPST0003. */
-  BINDNAME(XPST, 3, "Invalid variable name '%'."),
+  BINDNAME(XPST, 3, "Invalid variable name: '%'."),
   /** XPST0003. */
   PIXML(XPST, 3, "Processing instruction has illegal name: '%'."),
   /** XPST0003. */
@@ -844,9 +844,9 @@ public enum Err {
   FUNC30(XPST, 17, "Function not available in XQuery 1.0."),
 
   /** XPST0051. */
-  TYPEUNKNOWN(XPST, 51, "Unknown type '%'."),
+  TYPEUNKNOWN(XPST, 51, "Unknown type: %."),
   /** XPST0080. */
-  CASTUNKNOWN(XPST, 80, "Invalid cast type '%'."),
+  CASTUNKNOWN(XPST, 80, "Invalid cast type: %."),
   /** XPST0081. */
   NOURI(XPST, 81, "No namespace declared for '%'."),
   /** XPST0081. */
@@ -917,7 +917,7 @@ public enum Err {
   /** XQDY0044. */
   CAXML(XQDY, 44, "XML prefix and namespace cannot be rebound."),
   /** XQDY0044. */
-  CAINV(XQDY, 44, "Invalid attribute prefix/namespace '%'."),
+  CAINV(XQDY, 44, "Invalid attribute prefix/namespace: '%'."),
   /** XQDY0054. */
   CIRCVAR30(XQDY, 54, "Static variable depends on itself: %"),
   /** XQDY0054. */
@@ -958,7 +958,7 @@ public enum Err {
   /** XQST0038. */
   DUPLCOLL(XQST, 38, "Duplicate 'collation' declaration."),
   /** XQST0038. */
-  WHICHDEFCOLL(XQST, 38, "Unknown collation \"%\"."),
+  WHICHDEFCOLL(XQST, 38, "Unknown collation '%'."),
   /** XQST0039. */
   FUNCDUPL(XQST, 39, "Duplicate function argument %."),
   /** XQST0040. */
@@ -976,7 +976,7 @@ public enum Err {
   /** XQST0049. */
   VARDUPL(XQST, 49, "Duplicate declaration of static variable $%."),
   /** XQST0052. */
-  TYPEUNKNOWN30(XQST, 52, "Unknown cast type '%'."),
+  TYPEUNKNOWN30(XQST, 52, "Unknown cast type: %."),
   /** XQST0054. */
   CIRCVAR(XQST, 54, "Global variable depends on itself: %"),
   /** XQST0055. */
@@ -1018,7 +1018,7 @@ public enum Err {
   /** XQST0075. */
   IMPLVAL(XQST, 75, "Validation not supported."),
   /** XQST0076. */
-  FLWORCOLL(XQST, 76, "Unknown collation \"%\"."),
+  FLWORCOLL(XQST, 76, "Unknown collation '%'."),
   /** XQST0079. */
   NOPRAGMA(XQST, 79, "Expecting pragma expression."),
   /** XQST0085. */
@@ -1435,9 +1435,6 @@ public enum Err {
     return (var.sc.xquery3() ? CIRCVAR30 : CIRCVAR).get(var.info, var);
   }
 
-  /** Maximum size of chopped error string. */
-  private static final int MAX = 64;
-
   /**
    * Chops the specified object to a maximum size.
    * @param value value
@@ -1454,7 +1451,7 @@ public enum Err {
       ((Item) value).string(ii) : Token.token(value.toString());
     for(byte b : string) {
       final int ts = tb.size();
-      if(ts == MAX) {
+      if(ts == 32) {
         tb.add(Text.DOTS);
         break;
       }

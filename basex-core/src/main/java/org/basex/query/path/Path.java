@@ -295,7 +295,7 @@ public abstract class Path extends ParseExpr {
       final boolean desc = curr.axis == DESC;
       if(!desc && curr.axis != CHILD || curr.test.kind != Kind.NAME) return null;
 
-      final int name = data.tagindex.id(curr.test.name.local());
+      final int name = data.elmindex.id(curr.test.name.local());
 
       final ArrayList<PathNode> tmp = new ArrayList<>();
       for(final PathNode node : PathSummary.desc(nodes, desc)) {
@@ -412,7 +412,7 @@ public abstract class Path extends ParseExpr {
       // cache child steps
       final ArrayList<QNm> qnm = new ArrayList<>();
       while(nodes.get(0).parent != null) {
-        QNm nm = new QNm(data.tagindex.key(nodes.get(0).name));
+        QNm nm = new QNm(data.elmindex.key(nodes.get(0).name));
         // skip children with prefixes
         if(nm.hasPrefix()) return this;
         for(final PathNode p : nodes) {
@@ -449,7 +449,7 @@ public abstract class Path extends ParseExpr {
         if(st.test.kind != Kind.NAME) break;
 
         // check if one of the addressed nodes is on the correct level
-        final int name = data.tagindex.id(st.test.name.local());
+        final int name = data.elmindex.id(st.test.name.local());
         for(final PathNode pn : data.paths.desc(name, Data.ELEM)) {
           if(pn.level() == s + 1) continue LOOP;
         }
@@ -553,7 +553,7 @@ public abstract class Path extends ParseExpr {
             s != iStep && step.preds.length > 0) break;
 
         // support only unique paths with nodes on the correct level
-        final int name = data.tagindex.id(step.test.name.local());
+        final int name = data.elmindex.id(step.test.name.local());
         final ArrayList<PathNode> pn = data.paths.desc(name, Data.ELEM);
         if(pn.size() != 1 || pn.get(0).level() != s + 1) break;
       }
@@ -652,18 +652,18 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    final VarUsage inRoot = root == null ? VarUsage.NEVER : root.count(v);
-    return VarUsage.sum(v, steps) == VarUsage.NEVER ? inRoot : VarUsage.MORE_THAN_ONCE;
+  public VarUsage count(final Var var) {
+    final VarUsage inRoot = root == null ? VarUsage.NEVER : root.count(var);
+    return VarUsage.sum(var, steps) == VarUsage.NEVER ? inRoot : VarUsage.MORE_THAN_ONCE;
   }
 
   @Override
-  public final Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public final Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
 
     boolean changed = false;
     if(root != null) {
-      final Expr rt = root.inline(qc, scp, v, e);
+      final Expr rt = root.inline(qc, scp, var, ex);
       if(rt != null) {
         root = rt;
         changed = true;
@@ -672,7 +672,7 @@ public abstract class Path extends ParseExpr {
 
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
-      final Expr nw = steps[s].inline(qc, scp, v, e);
+      final Expr nw = steps[s].inline(qc, scp, var, ex);
       if(nw != null) {
         steps[s] = nw;
         changed = true;

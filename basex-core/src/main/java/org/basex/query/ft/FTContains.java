@@ -58,24 +58,24 @@ public abstract class FTContains extends ParseExpr {
   }
 
   @Override
-  public final boolean removable(final Var v) {
-    return expr.removable(v) && ftexpr.removable(v);
+  public final boolean removable(final Var var) {
+    return expr.removable(var) && ftexpr.removable(var);
   }
 
   @Override
-  public final VarUsage count(final Var v) {
-    return expr.count(v).plus(ftexpr.count(v));
+  public final VarUsage count(final Var var) {
+    return expr.count(var).plus(ftexpr.count(var));
   }
 
   @Override
-  public final Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public final Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
 
-    final Expr ex = expr.inline(qc, scp, v, e);
-    if(ex != null) expr = ex;
-    final FTExpr fte = ftexpr.inline(qc, scp, v, e);
+    final Expr e = expr.inline(qc, scp, var, ex);
+    if(e != null) expr = e;
+    final FTExpr fte = ftexpr.inline(qc, scp, var, ex);
     if(fte != null) ftexpr = fte;
-    return ex != null || fte != null ? optimize(qc, scp) : null;
+    return e != null || fte != null ? optimize(qc, scp) : null;
   }
 
   @Override

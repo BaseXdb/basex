@@ -31,10 +31,10 @@ final class ProcLocking implements Locking {
 
   /**
    * Default constructor.
-   * @param c context
+   * @param ctx context
    */
-  ProcLocking(final Context c) {
-    ctx = c;
+  ProcLocking(final Context ctx) {
+    this.ctx = ctx;
   }
 
   @Override

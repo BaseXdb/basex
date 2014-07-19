@@ -14,21 +14,21 @@ import org.basex.data.*;
  */
 final class Replace extends StructuralUpdate {
   /** Insertion sequence. */
-  private final DataClip insseq;
+  private final DataClip clip;
 
   /**
    * Constructor.
-   * @param l PRE value of the target node location
-   * @param c insertion sequence data clip
-   * @param s PRE value shifts introduced by update
-   * @param a accumulated shifts
-   * @param f PRE value of the first node which distance has to be updated
-   * @param p parent node PRE
+   * @param location PRE value of the target node location
+   * @param clip insertion sequence data clip
+   * @param shifts PRE value shifts introduced by update
+   * @param acc accumulated shifts
+   * @param first PRE value of the first node which distance has to be updated
+   * @param parent parent node PRE
    */
-  Replace(final int l, final int s, final int a, final int f, final DataClip c,
-      final int p) {
-    super(l, s, a, f, p);
-    insseq = c;
+  Replace(final int location, final int shifts, final int acc, final int first, final DataClip clip,
+      final int parent) {
+    super(location, shifts, acc, first, parent);
+    this.clip = clip;
   }
 
   /**
@@ -47,22 +47,22 @@ final class Replace extends StructuralUpdate {
   }
 
   @Override
-  void apply(final Data targetData) {
+  void apply(final Data data) {
     // [LK] replace optimizations only work without namespaces..
-    if(targetData.nspaces.size() == 0 && insseq.data.nspaces.size() == 0) {
+    if(data.nspaces.size() == 0 && clip.data.nspaces.size() == 0) {
       // Lazy Replace
-      if(lazyReplace(targetData)) return;
+      if(lazyReplace(data)) return;
       // Rapid Replace
-      targetData.replace(location, insseq);
+      data.replace(location, clip);
     } else {
-      final int targetKind = targetData.kind(location);
-      final int targetParent = targetData.parent(location, targetKind);
+      final int targetKind = data.kind(location);
+      final int targetParent = data.parent(location, targetKind);
       // delete first - otherwise insert must be at location+1
-      targetData.delete(location);
+      data.delete(location);
       if(targetKind == Data.ATTR)
-        targetData.insertAttr(location, targetParent, insseq);
+        data.insertAttr(location, targetParent, clip);
       else
-        targetData.insert(location, targetParent, insseq);
+        data.insert(location, targetParent, clip);
     }
   }
 
@@ -70,74 +70,72 @@ final class Replace extends StructuralUpdate {
    * Lazy Replace implementation. Checks if the replace operation can be substituted with
    * cheaper value updates. If structural changes have to be made no substitution takes
    * place.
-   * @param trg destination data reference
+   * @param data destination data reference
    * @return true if substitution successful
    */
-  private boolean lazyReplace(final Data trg) {
-    final Data src = insseq.data;
-    final int srcSize = insseq.size();
+  private boolean lazyReplace(final Data data) {
+    final Data src = clip.data;
+    final int srcSize = clip.size();
     // check for equal subtree size
-    if(srcSize != trg.size(location, trg.kind(location))) return false;
+    if(srcSize != data.size(location, data.kind(location))) return false;
 
     final List<BasicUpdate> valueUpdates = new ArrayList<>();
     for(int c = 0; c < srcSize; c++) {
-      final int s = insseq.start + c;
+      final int s = clip.start + c;
       final int t = location + c;
       final int sk = src.kind(s);
-      final int tk = trg.kind(t);
+      final int tk = data.kind(t);
 
       if(sk != tk)
         return false;
       // distance can differ for first two tuples
-      if(c > 0 && src.dist(s, sk) != trg.dist(t, tk))
+      if(c > 0 && src.dist(s, sk) != data.dist(t, tk))
         return false;
       // check text / comment values
       if(sk == Data.TEXT || sk == Data.COMM) {
         final byte[] srcText = src.text(s, true);
-        if(trg.textLen(t, true) != src.textLen(s, true) ||
-            !eq(trg.text(t, true), srcText))
-          valueUpdates.add(UpdateValue.getInstance(trg, t, srcText));
+        if(data.textLen(t, true) != src.textLen(s, true) ||
+            !eq(data.text(t, true), srcText))
+          valueUpdates.add(UpdateValue.getInstance(data, t, srcText));
       } else {
         // check element, attribute, processing instruction name
         final byte[] srcName = src.name(s, sk);
-        final byte[] trgName = trg.name(t, tk);
+        final byte[] trgName = data.name(t, tk);
         if(!eq(srcName, trgName))
-          valueUpdates.add(Rename.getInstance(trg, t, srcName, EMPTY));
+          valueUpdates.add(Rename.getInstance(data, t, srcName, EMPTY));
         switch(sk) {
           case Data.ELEM:
             // check size of elements
-            if(src.attSize(s, sk) != trg.attSize(t, tk) || src.size(s, sk) != trg.size(t, tk))
+            if(src.attSize(s, sk) != data.attSize(t, tk) || src.size(s, sk) != data.size(t, tk))
               return false;
             break;
           case Data.ATTR:
             // check attribute values
             byte[] srcValue = src.text(s, false);
-            if(!eq(trg.text(t, false), srcValue))
-              valueUpdates.add(UpdateValue.getInstance(trg, t, srcValue));
+            if(!eq(data.text(t, false), srcValue))
+              valueUpdates.add(UpdateValue.getInstance(data, t, srcValue));
             break;
           case Data.PI:
             // check processing instruction value
             final byte[] srcText = src.text(s, true);
-            final byte[] trgText = trg.text(t, true);
+            final byte[] trgText = data.text(t, true);
             final int i = indexOf(srcText, ' ');
             srcValue =  i == -1 ? EMPTY : substring(srcText, i + 1);
             if(!eq(srcValue, indexOf(trgText, ' ') == -1 ? EMPTY :
               substring(trgText, i + 1))) {
-              valueUpdates.add(UpdateValue.getInstance(trg, t, srcValue));
+              valueUpdates.add(UpdateValue.getInstance(data, t, srcValue));
             }
             break;
         }
       }
     }
-    for(final BasicUpdate u : valueUpdates) {
-      u.apply(trg);
-    }
+    for(final BasicUpdate bu : valueUpdates) bu.apply(data);
     return true;
   }
 
   @Override
   DataClip getInsertionData() {
-    return insseq;
+    return clip;
   }
 
   @Override

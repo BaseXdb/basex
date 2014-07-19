@@ -67,12 +67,12 @@ public abstract class Tokenizer extends LanguageImpl {
   /**
    * Calculates a position value, dependent on the specified unit. Does not have
    * to be implemented by all tokenizers. Returns 0 if not implemented.
-   * @param w word position
-   * @param u unit
+   * @param word word position
+   * @param unit unit
    * @return new position
    */
   @SuppressWarnings("unused")
-  int pos(final int w, final FTUnit u) {
+  int pos(final int word, final FTUnit unit) {
     return 0;
   }
 }

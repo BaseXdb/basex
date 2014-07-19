@@ -124,20 +124,20 @@ public final class FNXslt extends StandardFunc {
 
   /**
    * Returns an input reference (possibly cached) to the specified input.
-   * @param e expressio nto be evaluated
+   * @param ex expressio nto be evaluated
    * @param qc query context
    * @return item
    * @throws QueryException query exception
    */
-  private IO read(final Expr e, final QueryContext qc) throws QueryException {
-    final Item it = checkItem(e, qc);
+  private IO read(final Expr ex, final QueryContext qc) throws QueryException {
+    final Item it = checkItem(ex, qc);
     if(it.type.isNode()) {
       try {
         final IO io = new IOContent(it.serialize().toArray());
         io.name(string(((ANode) it).baseURI()));
         return io;
-      } catch(final QueryIOException ex) {
-        ex.getCause(info);
+      } catch(final QueryIOException e) {
+        e.getCause(info);
       }
     }
     if(it.type.isStringOrUntyped()) return checkPath(it, qc);

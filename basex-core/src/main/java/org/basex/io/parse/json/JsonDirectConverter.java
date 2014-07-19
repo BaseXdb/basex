@@ -73,15 +73,15 @@ public final class JsonDirectConverter extends JsonXmlConverter {
     final FElem e = new FElem(name);
     addType(e, e.name(), type);
 
-    if(elem != null) elem.add(e);
-    else elem = e;
+    if(curr != null) curr.add(e);
+    else curr = e;
     name = null;
     return e;
   }
 
   @Override
   void openObject() {
-    elem = addElem(OBJECT);
+    curr = addElem(OBJECT);
   }
 
   @Override
@@ -94,13 +94,13 @@ public final class JsonDirectConverter extends JsonXmlConverter {
 
   @Override
   void closeObject() {
-    final FElem par = (FElem) elem.parent();
-    if(par != null) elem = par;
+    final FElem par = (FElem) curr.parent();
+    if(par != null) curr = par;
   }
 
   @Override
   void openArray() {
-    elem = addElem(ARRAY);
+    curr = addElem(ARRAY);
   }
 
   @Override
@@ -157,7 +157,7 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   }
 
   @Override
-  public void booleanLit(final byte[] b) {
-    addElem(BOOLEAN).add(b);
+  public void booleanLit(final byte[] value) {
+    addElem(BOOLEAN).add(value);
   }
 }

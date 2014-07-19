@@ -12,10 +12,10 @@ import org.w3c.dom.*;
 public final class BXDocFrag extends BXNode implements DocumentFragment {
   /**
    * Constructor.
-   * @param n node reference
+   * @param node node reference
    */
-  public BXDocFrag(final ANode n) {
-    super(n);
+  public BXDocFrag(final ANode node) {
+    super(node);
   }
 
   @Override

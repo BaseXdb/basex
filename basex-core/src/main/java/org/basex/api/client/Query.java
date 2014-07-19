@@ -31,12 +31,12 @@ public abstract class Query {
 
   /**
    * Binds a value to an external variable.
-   * @param n name of variable
-   * @param v value to be bound
+   * @param name name of variable
+   * @param value value to be bound
    * @throws IOException I/O exception
    */
-  public final void bind(final String n, final Object v) throws IOException {
-    bind(n, v, "");
+  public final void bind(final String name, final Object value) throws IOException {
+    bind(name, value, "");
   }
 
   /**

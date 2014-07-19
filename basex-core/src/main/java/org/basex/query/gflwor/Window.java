@@ -282,16 +282,16 @@ public final class Window extends Clause {
   }
 
   @Override
-  public Clause inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public Clause inline(final QueryContext qc, final VarScope scp, final Var v, final Expr ex)
       throws QueryException {
 
-    final Expr ex = expr.inline(qc, scp, v, e);
-    final Condition st = start.inline(qc, scp, v, e),
-        en = end == null ? null : end.inline(qc, scp, v, e);
-    if(ex != null) expr = ex;
+    final Expr e = expr.inline(qc, scp, v, ex);
+    final Condition st = start.inline(qc, scp, v, ex);
+    final Condition en = end == null ? null : end.inline(qc, scp, v, ex);
+    if(e != null) expr = e;
     if(st != null) start = st;
     if(en != null) end = en;
-    return ex != null || st != null || en != null ? optimize(qc, scp) : null;
+    return e != null || st != null || en != null ? optimize(qc, scp) : null;
   }
 
   @Override
@@ -401,9 +401,9 @@ public final class Window extends Clause {
     }
 
     @Override
-    public Condition inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+    public Condition inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
         throws QueryException {
-      return (Condition) super.inline(qc, scp, v, e);
+      return (Condition) super.inline(qc, scp, var, ex);
     }
 
     @Override

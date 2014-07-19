@@ -65,29 +65,29 @@ public final class FTOpt extends ExprInfo {
 
   /**
    * Sets the specified flag.
-   * @param f flag to be set
-   * @param v value
+   * @param flag flag to be set
+   * @param value value
    */
-  public void set(final FTFlag f, final boolean v) {
-    map.put(f, v);
+  public void set(final FTFlag flag, final boolean value) {
+    map.put(flag, value);
   }
 
   /**
    * Tests if the specified flag has been set.
-   * @param f flag index
+   * @param flag flag index
    * @return true if flag has been set
    */
-  public boolean isSet(final FTFlag f) {
-    return map.get(f) != null;
+  public boolean isSet(final FTFlag flag) {
+    return map.get(flag) != null;
   }
 
   /**
    * Returns the specified flag.
-   * @param f flag index
+   * @param flag flag index
    * @return flag
    */
-  public boolean is(final FTFlag f) {
-    final Boolean b = map.get(f);
+  public boolean is(final FTFlag flag) {
+    final Boolean b = map.get(flag);
     return b != null && b;
   }
 

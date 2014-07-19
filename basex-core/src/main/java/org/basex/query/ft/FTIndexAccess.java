@@ -65,19 +65,19 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    return ftexpr.removable(v);
+  public boolean removable(final Var var) {
+    return ftexpr.removable(var);
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return ftexpr.count(v);
+  public VarUsage count(final Var var) {
+    return ftexpr.count(var);
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
-    return ftexpr.inline(qc, scp, v, e) == null ? null : optimize(qc, scp);
+    return ftexpr.inline(qc, scp, var, ex) == null ? null : optimize(qc, scp);
   }
 
   @Override

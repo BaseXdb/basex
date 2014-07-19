@@ -25,7 +25,7 @@ final class GermanStemmer extends InternalStemmer {
   }
 
   @Override
-  Stemmer get(final Language l, final FTIterator fti) {
+  Stemmer get(final Language lang, final FTIterator fti) {
     return new GermanStemmer(fti);
   }
 

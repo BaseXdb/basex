@@ -22,8 +22,7 @@ public final class ViewData {
   private ViewData() { }
 
   /**
-   * Checks if the specified node is a leaf node
-   * (text node or file element or file tag).
+   * Checks if the specified node is a text node.
    * @param opts gui options
    * @param d data reference
    * @param pre pre value
@@ -97,7 +96,7 @@ public final class ViewData {
   }
 
   /**
-   * Returns the tag name of the specified node.
+   * Returns the name of the specified element.
    * Note that the pre value must reference an element node.
    * @param opts gui options
    * @param data data reference

@@ -17,24 +17,24 @@ public final class OptionsOption<O extends Options> extends Option<O> {
 
   /**
    * Constructor without default value.
-   * @param n name
-   * @param v value
+   * @param name name
+   * @param value value
    */
   @SuppressWarnings("unchecked")
-  public OptionsOption(final String n, final O v) {
-    super(n);
-    value = v;
-    clazz = (Class<O>) v.getClass();
+  public OptionsOption(final String name, final O value) {
+    super(name);
+    this.value = value;
+    clazz = (Class<O>) value.getClass();
   }
 
   /**
    * Constructor without default value.
-   * @param n name
-   * @param v value
+   * @param name name
+   * @param clazz class
    */
-  public OptionsOption(final String n, final Class<O> v) {
-    super(n);
-    clazz = v;
+  public OptionsOption(final String name, final Class<O> clazz) {
+    super(name);
+    this.clazz = clazz;
     value = null;
   }
 

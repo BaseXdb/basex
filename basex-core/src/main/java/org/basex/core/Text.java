@@ -835,7 +835,7 @@ public interface Text {
   /** Info on up-to-date. */
   String UP_TO_DATE = lang("up_to_date");
 
-  /** Info on tags. */
+  /** Info on elements. */
   String ELEMENTS = lang("elements");
   /** Info on attributes. */
   String ATTRIBUTES = lang("attributes");

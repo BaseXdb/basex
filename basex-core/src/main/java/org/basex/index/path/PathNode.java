@@ -19,7 +19,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class PathNode {
-  /** Tag/attribute name id. */
+  /** Element/attribute name. */
   public final short name;
   /** Node kind, defined in the {@link Data} class. */
   public final byte kind;
@@ -164,7 +164,7 @@ public final class PathNode {
    */
   public byte[] token(final Data data) {
     switch(kind) {
-      case Data.ELEM: return data.tagindex.key(name);
+      case Data.ELEM: return data.elmindex.key(name);
       case Data.ATTR: return Token.concat(ATT, data.atnindex.key(name));
       case Data.TEXT: return TEXT;
       case Data.COMM: return COMMENT;
@@ -199,7 +199,7 @@ public final class PathNode {
     for(int i = 0; i < level << 1; ++i) tb.add(' ');
     switch(kind) {
       case Data.DOC:  tb.add(DOC); break;
-      case Data.ELEM: tb.add(data.tagindex.key(name)); break;
+      case Data.ELEM: tb.add(data.elmindex.key(name)); break;
       case Data.TEXT: tb.add(TEXT); break;
       case Data.ATTR: tb.add(ATT); tb.add(data.atnindex.key(name)); break;
       case Data.COMM: tb.add(COMMENT); break;

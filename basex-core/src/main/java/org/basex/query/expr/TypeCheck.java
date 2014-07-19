@@ -115,13 +115,14 @@ public final class TypeCheck extends Single {
 
   /**
    * Creates an expression that checks the given expression's return type.
-   * @param e expression to check
+   * @param ex expression to check
    * @param qc query context
    * @param scp variable scope
    * @return the resulting expression
    * @throws QueryException query exception
    */
-  public Expr check(final Expr e, final QueryContext qc, final VarScope scp) throws QueryException {
-    return new TypeCheck(sc, info, e, seqType, promote).optimize(qc, scp);
+  public Expr check(final Expr ex, final QueryContext qc, final VarScope scp)
+      throws QueryException {
+    return new TypeCheck(sc, info, ex, seqType, promote).optimize(qc, scp);
   }
 }

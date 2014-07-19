@@ -26,10 +26,11 @@ public final class StaticVar extends StaticDecl {
 
   /** If this variable can be bound from outside the query. */
   private final boolean external;
-  /** Bound value. */
-  Value value;
   /** Flag for lazy evaluation. */
   private final boolean lazy;
+
+  /** Bound value. */
+  Value val;
 
   /**
    * Constructor for a variable declared in a query.
@@ -88,7 +89,7 @@ public final class StaticVar extends StaticDecl {
     if(dontEnter) throw circVarError(this);
     if(lazy) {
       if(!compiled) throw Util.notExpected(this + " was not compiled.");
-      if(value != null) return value;
+      if(val != null) return val;
       dontEnter = true;
       final int fp = scope.enter(qc);
       try {
@@ -101,7 +102,7 @@ public final class StaticVar extends StaticDecl {
       }
     }
 
-    if(value != null) return value;
+    if(val != null) return val;
     if(expr == null) throw VAREMPTY.get(info, this);
     dontEnter = true;
     final int fp = scope.enter(qc);
@@ -123,52 +124,26 @@ public final class StaticVar extends StaticDecl {
 
   /**
    * Binds an expression to this variable from outside the query.
-   * @param e value to bind
+   * @param value value to bind
    * @param qc query context
-   * @return if the value could be bound
    * @throws QueryException query exception
    */
-  public boolean bind(final Expr e, final QueryContext qc) throws QueryException {
-    if(!external || compiled) return false;
-
-    if(e instanceof Value) {
-      Value v = (Value) e;
-      if(declType != null && !declType.instance(v)) v = declType.cast(v, qc, sc, info);
-      bind(v);
-    } else {
-      expr = checkType(e, info);
-      value = null;
-    }
-    return true;
-  }
-
-  /**
-   * Checks if the given expression can be bound to this variable.
-   * @param e expression
-   * @param ii input info
-   * @return the expression
-   * @throws QueryException query exception
-   */
-  private Expr checkType(final Expr e, final InputInfo ii) throws QueryException {
-    if(declType != null) {
-      if(e instanceof Value) declType.treat((Value) e, ii);
-      else if(e.seqType().intersect(declType) == null)
-        throw INVTREAT.get(ii, e.seqType(), declType);
-    }
-    return e;
+  public void bind(final Value value, final QueryContext qc) throws QueryException {
+    if(!external || compiled) return;
+    bind(declType == null || declType.instance(value) ? value : declType.cast(value, qc, sc, info));
   }
 
   /**
    * Binds the specified value to the variable.
-   * @param v value to be set
+   * @param value value to be set
    * @return self reference
    * @throws QueryException query exception
    */
-  private Value bind(final Value v) throws QueryException {
-    expr = v;
-    value = v;
-    if(declType != null) declType.treat(v, info);
-    return value;
+  private Value bind(final Value value) throws QueryException {
+    expr = value;
+    val = value;
+    if(declType != null) declType.treat(value, info);
+    return val;
   }
 
   @Override

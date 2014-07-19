@@ -13,20 +13,20 @@ import org.w3c.dom.*;
 public final class BXPI extends BXNode implements ProcessingInstruction {
   /**
    * Constructor.
-   * @param n node reference
+   * @param node node reference
    */
-  public BXPI(final ANode n) {
-    super(n);
+  public BXPI(final ANode node) {
+    super(node);
   }
 
   @Override
   public String getNodeValue() {
-    return Token.string(node.string());
+    return Token.string(nd.string());
   }
 
   @Override
   public String getNodeName() {
-    return Token.string(node.name());
+    return Token.string(nd.name());
   }
 
   @Override
@@ -40,7 +40,7 @@ public final class BXPI extends BXNode implements ProcessingInstruction {
   }
 
   @Override
-  public void setData(final String dat) {
+  public void setData(final String value) {
     throw readOnly();
   }
 }

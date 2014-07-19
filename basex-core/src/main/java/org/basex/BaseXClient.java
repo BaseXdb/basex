@@ -40,7 +40,7 @@ public final class BaseXClient extends BaseX {
   }
 
   @Override
-  protected boolean sa() {
+  protected boolean local() {
     return false;
   }
 

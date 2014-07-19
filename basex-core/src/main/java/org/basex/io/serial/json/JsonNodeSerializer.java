@@ -55,16 +55,16 @@ public final class JsonNodeSerializer extends JsonSerializer {
 
   @Override
   protected void startOpen(final byte[] name) throws IOException {
-    if(level == 0 && !eq(name, JSON)) error("<%> expected as root node", JSON);
-    types.set(level, null);
-    comma.set(level + 1, false);
+    if(lvl == 0 && !eq(name, JSON)) error("<%> expected as root node", JSON);
+    types.set(lvl, null);
+    comma.set(lvl + 1, false);
     key = atts ? null : name;
   }
 
   @Override
   protected void attribute(final byte[] name, final byte[] value) throws IOException {
     // parse merged types on root level
-    if(level == 0) {
+    if(lvl == 0) {
       final int tl = typeCache.length;
       for(int t = 0; t < tl; t++) {
         if(eq(name, ATTRS[t])) {
@@ -76,27 +76,27 @@ public final class JsonNodeSerializer extends JsonSerializer {
 
     if(eq(name, TYPE)) {
       // add single type
-      if(!eq(value, TYPES)) error("<%> has invalid type \"%\"", tag, value);
-      types.set(level, value);
+      if(!eq(value, TYPES)) error("<%> has invalid type \"%\"", elem, value);
+      types.set(lvl, value);
     } else if(atts && eq(name, NAME)) {
       key = value;
-      if(!eq(tag, PAIR)) error("<%> found, <pair> expected", tag);
+      if(!eq(elem, PAIR)) error("<%> found, <pair> expected", elem);
     } else if(!eq(name, XMLNS) && !startsWith(name, XMLNSC)) {
-      error("<%> has invalid attribute \"%\"", tag, name);
+      error("<%> has invalid attribute \"%\"", elem, name);
     }
   }
 
   @Override
   protected void finishOpen() throws IOException {
-    if(comma.get(level)) print(',');
-    else comma.set(level, true);
+    if(comma.get(lvl)) print(',');
+    else comma.set(lvl, true);
 
-    if(level > 0) {
-      indent(level);
-      final byte[] ptype = types.get(level - 1);
+    if(lvl > 0) {
+      indent(lvl);
+      final byte[] ptype = types.get(lvl - 1);
       if(eq(ptype, OBJECT)) {
-        if(atts && !eq(tag, PAIR)) error("<%> found, <%> expected", tag, PAIR);
-        if(key == null) error("<%> has no name attribute", tag);
+        if(atts && !eq(elem, PAIR)) error("<%> found, <%> expected", elem, PAIR);
+        if(key == null) error("<%> has no name attribute", elem);
         print('"');
         final byte[] name = atts ? key : XMLToken.decode(key, lax);
         if(name == null) error("Name of element <%> is invalid", key);
@@ -105,17 +105,17 @@ public final class JsonNodeSerializer extends JsonSerializer {
         if(indent) print(' ');
       } else if(eq(ptype, ARRAY)) {
         if(atts) {
-          if(!eq(tag, ITEM)) error("<%> found, <%> expected", tag, ITEM);
-          if(key != null) error("<%> must have no name attribute", tag);
+          if(!eq(elem, ITEM)) error("<%> found, <%> expected", elem, ITEM);
+          if(key != null) error("<%> must have no name attribute", elem);
         } else {
-          if(!eq(tag, VALUE)) error("<%> found, <%> expected", tag, VALUE);
+          if(!eq(elem, VALUE)) error("<%> found, <%> expected", elem, VALUE);
         }
       } else {
-        error("<%> is typed as \"%\" and cannot be nested", tags.get(level - 1), ptype);
+        error("<%> is typed as \"%\" and cannot be nested", elems.get(lvl - 1), ptype);
       }
     }
 
-    byte[] type = types.get(level);
+    byte[] type = types.get(lvl);
     if(type == null) {
       if(key != null) {
         final int tl = typeCache.length;
@@ -124,42 +124,42 @@ public final class JsonNodeSerializer extends JsonSerializer {
         }
       }
       if(type == null) type = STRING;
-      types.set(level,  type);
+      types.set(lvl,  type);
     }
 
     if(eq(type, OBJECT)) {
       print('{');
     } else if(eq(type, ARRAY)) {
       print('[');
-    } else if(level == 0 && spec == JsonSpec.RFC4627) {
+    } else if(lvl == 0 && spec == JsonSpec.RFC4627) {
       error("<%> must be typed as \"%\" or \"%\"", JSON, OBJECT, ARRAY);
     }
   }
 
   @Override
-  protected void finishText(final byte[] text) throws IOException {
-    final byte[] type = types.get(level - 1);
+  protected void finishText(final byte[] value) throws IOException {
+    final byte[] type = types.get(lvl - 1);
     if(eq(type, STRING)) {
       print('"');
-      for(final byte ch : text) encode(ch);
+      for(final byte ch : value) encode(ch);
       print('"');
     } else if(eq(type, BOOLEAN)) {
-      if(!eq(text, TRUE, FALSE))
-        error("Value of <%> is no boolean: \"%\"", tags.get(level - 1), text);
-      print(text);
+      if(!eq(value, TRUE, FALSE))
+        error("Value of <%> is no boolean: \"%\"", elems.get(lvl - 1), value);
+      print(value);
     } else if(eq(type, NUMBER)) {
-      if(Double.isNaN(toDouble(text)))
-        error("Value of <%> is no number: \"%\"", tags.get(level - 1), text);
-      print(text);
-    } else if(trim(text).length != 0) {
-      error("<%> is typed as \"%\" and cannot have a value", tags.get(level - 1), type);
+      if(Double.isNaN(toDouble(value)))
+        error("Value of <%> is no number: \"%\"", elems.get(lvl - 1), value);
+      print(value);
+    } else if(trim(value).length != 0) {
+      error("<%> is typed as \"%\" and cannot have a value", elems.get(lvl - 1), type);
     }
   }
 
   @Override
   protected void finishEmpty() throws IOException {
     finishOpen();
-    final byte[] type = types.get(level);
+    final byte[] type = types.get(lvl);
     if(eq(type, STRING)) {
       print("\"\"");
     } else if(eq(type, NULL)) {
@@ -172,12 +172,12 @@ public final class JsonNodeSerializer extends JsonSerializer {
 
   @Override
   protected void finishClose() throws IOException {
-    final byte[] type = types.get(level);
+    final byte[] type = types.get(lvl);
     if(eq(type, ARRAY)) {
-      indent(level);
+      indent(lvl);
       print(']');
     } else if(eq(type, OBJECT)) {
-      indent(level);
+      indent(lvl);
       print('}');
     }
   }
@@ -199,13 +199,13 @@ public final class JsonNodeSerializer extends JsonSerializer {
 
   /**
    * Prints some indentation.
-   * @param lvl level
+   * @param level level
    * @throws IOException I/O exception
    */
-  private void indent(final int lvl) throws IOException {
+  private void indent(final int level) throws IOException {
     if(!indent) return;
     print(nl);
-    final int ls = lvl * indents;
+    final int ls = level * indents;
     for(int l = 0; l < ls; ++l) print(tab);
   }
 

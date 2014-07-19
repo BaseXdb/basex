@@ -12,37 +12,37 @@ import org.basex.util.*;
  */
 final class UpdateValue extends BasicUpdate {
   /** Target node kind. */
-  private final int targetkind;
+  private final int kind;
   /** New value for target node. */
   private final byte[] value;
 
   /**
    * Constructor.
-   * @param l PRE value of the target node location
-   * @param k node kind of the target node
-   * @param v new value which is assigned to the target node
-   * @param p parent of updated node
+   * @param location PRE value of the target node location
+   * @param kind node kind of the target node
+   * @param value new value which is assigned to the target node
+   * @param parent parent of updated node
    */
-  private UpdateValue(final int l, final int k, final byte[] v, final int p) {
-    super(l, p);
-    targetkind = k;
-    value = v;
+  private UpdateValue(final int location, final int kind, final byte[] value, final int parent) {
+    super(location, parent);
+    this.kind = kind;
+    this.value = value;
   }
 
   /**
    * Factory.
    * @param data data reference
    * @param pre PRE value of the target node location
-   * @param v new value which is assigned to the target node
+   * @param value new value which is assigned to the target node
    * @return new instance
    */
-  static UpdateValue getInstance(final Data data, final int pre, final byte[] v) {
-    return new UpdateValue(pre, data.kind(pre), v, data.parent(pre, data.kind(pre)));
+  static UpdateValue getInstance(final Data data, final int pre, final byte[] value) {
+    return new UpdateValue(pre, data.kind(pre), value, data.parent(pre, data.kind(pre)));
   }
 
   @Override
-  void apply(final Data d) {
-    d.update(location, targetkind, value);
+  void apply(final Data data) {
+    data.update(location, kind, value);
   }
 
   @Override

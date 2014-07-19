@@ -36,7 +36,7 @@ final class XMLScanner extends Proc {
   /** Scanning states. */
   private enum State {
     /** Content state.   */ CONTENT,
-    /** Tag state.       */ TAG,
+    /** Element state.   */ ELEMENT,
     /** Attribute state. */ ATT,
     /** Quoted state.    */ QUOTE,
   }
@@ -72,14 +72,14 @@ final class XMLScanner extends Proc {
 
   /**
    * Initializes the scanner.
-   * @param f input file
+   * @param file input file
    * @param opts database options
-   * @param frag allow parsing of document fragment
+   * @param fragment allow parsing of document fragment
    * @throws IOException I/O exception
    */
-  XMLScanner(final IO f, final MainOptions opts, final boolean frag) throws IOException {
-    input = new XMLInput(f);
-    fragment = frag;
+  XMLScanner(final IO file, final MainOptions opts, final boolean fragment) throws IOException {
+    this.fragment = fragment;
+    input = new XMLInput(file);
 
     try {
       for(int e = 0; e < ENTITIES.length; e += 2) ents.put(ENTITIES[e], ENTITIES[e + 1]);
@@ -138,8 +138,8 @@ final class XMLScanner extends Proc {
     // checks the scanner state
     switch(state) {
       case CONTENT: scanCONTENT(ch); break;
-      case TAG:
-      case ATT: scanTAG(ch); break;
+      case ELEMENT:
+      case ATT: scanELEMENT(ch); break;
       case QUOTE: scanATTVALUE(ch);
     }
     return true;
@@ -166,7 +166,7 @@ final class XMLScanner extends Proc {
       return;
     }
 
-    // parse a TAG
+    // parse ELEMENT
     text = true;
     final int c = nextChar();
 
@@ -191,26 +191,26 @@ final class XMLScanner extends Proc {
     }
 
     prolog = false;
-    state = State.TAG;
+    state = State.ELEMENT;
 
-    // closing tag...
+    // closing element...
     if(c == '/') {
       type = Type.L_BR_CLOSE;
       return;
     }
-    // opening tag...
+    // opening element...
     type = Type.L_BR;
     prev(1);
   }
 
   /**
-   * Scans an XML tag.
+   * Scans an XML element.
    * @param ch current character
    * @throws IOException I/O exception
    */
-  private void scanTAG(final int ch) throws IOException {
+  private void scanELEMENT(final int ch) throws IOException {
     int c = ch;
-    // scan tag end...
+    // scan element end...
     if(c == '>') {
       type = Type.R_BR;
       state = State.CONTENT;
@@ -223,7 +223,7 @@ final class XMLScanner extends Proc {
       state = State.QUOTE;
       quote = c;
     } else if(c == '/') {
-      // scan empty tag end...
+      // scan empty element end...
       type = Type.CLOSE_R_BR;
       if((c = nextChar()) == '>') {
         state = State.CONTENT;
@@ -235,7 +235,7 @@ final class XMLScanner extends Proc {
       // scan whitespace...
       type = Type.WS;
     } else if(isStartChar(c)) {
-      // scan tag name...
+      // scan name of attribute or element...
       type = state == State.ATT ? Type.ATTNAME : Type.ELEMNAME;
       do token.add(c); while(isChar(c = nextChar()));
       prev(1);
@@ -467,11 +467,11 @@ final class XMLScanner extends Proc {
 
   /**
    * Scans a reference. [67]
-   * @param f dissolve entities
+   * @param e dissolve entities
    * @return entity
    * @throws IOException I/O exception
    */
-  private byte[] ref(final boolean f) throws IOException {
+  private byte[] ref(final boolean e) throws IOException {
     // scans numeric entities
     if(consume('#')) { // [66]
       final TokenBuilder ent = new TokenBuilder();
@@ -506,7 +506,7 @@ final class XMLScanner extends Proc {
     final byte[] name = name(false);
     if(!consume(';')) return QUESTION;
 
-    if(!f) return concat(AMPER, name, SEMI);
+    if(!e) return concat(AMPER, name, SEMI);
 
     byte[] en = ents.get(name);
     if(en == null) en = getEntity(name);
@@ -554,10 +554,10 @@ final class XMLScanner extends Proc {
 
   /**
    * Jumps the specified number of characters back.
-   * @param p number of characters
+   * @param num number of characters
    */
-  private void prev(final int p) {
-    input.prev(p);
+  private void prev(final int num) {
+    input.prev(num);
   }
 
   /**
@@ -613,15 +613,15 @@ final class XMLScanner extends Proc {
 
   /**
    * Consumes an XML name. [5]
-   * @param f force parsing
+   * @param force force parsing
    * @return name
    * @throws IOException I/O exception
    */
-  private byte[] name(final boolean f) throws IOException {
+  private byte[] name(final boolean force) throws IOException {
     final TokenBuilder name = new TokenBuilder();
     int c = consume();
     if(!isStartChar(c)) {
-      if(f) throw error(INVNAME);
+      if(force) throw error(INVNAME);
       prev(1);
       return null;
     }
@@ -650,7 +650,7 @@ final class XMLScanner extends Proc {
     if(!prolog) throw error(TYPEAFTER);
     if(!s()) throw error(ERRDT);
 
-    name(true); // parse root tag
+    name(true); // parse root element
     s(); externalID(true, true); s();
 
     while(consume('[')) {
@@ -663,28 +663,28 @@ final class XMLScanner extends Proc {
 
   /**
    * Scans an external ID.
-   * @param f full flag
-   * @param r root flag
+   * @param full full flag
+   * @param root root flag
    * @return id
    * @throws IOException I/O exception
    */
-  private byte[] externalID(final boolean f, final boolean r) throws IOException {
+  private byte[] externalID(final boolean full, final boolean root) throws IOException {
     byte[] cont = null;
     final boolean pub = consume(PUBLIC);
     if(pub || consume(SYSTEM)) {
       checkS();
       if(pub) {
         pubidLit();
-        if(f) checkS();
+        if(full) checkS();
       }
       final int qu = consume(); // [11]
       if(qu == '\'' || qu == '"') {
         int ch;
         final TokenBuilder tok = new TokenBuilder();
         while((ch = nextChar()) != qu) tok.add(ch);
-        if(!f) return null;
+        if(!full) return null;
         final String name = string(tok.finish());
-        if(!dtd && r) return null;
+        if(!dtd && root) return null;
 
         final XMLInput tin = input;
         if(dtd) {
@@ -711,13 +711,13 @@ final class XMLScanner extends Proc {
         }
 
         s();
-        if(r) {
+        if(root) {
           extSubsetDecl();
           if(!consume((char) 0)) throw error(INVEND);
         }
         input = tin;
       } else {
-        if(f) throw error(SCANQUOTE, (char) qu);
+        if(full) throw error(SCANQUOTE, (char) qu);
         prev(1);
       }
     }
@@ -1002,12 +1002,12 @@ final class XMLScanner extends Proc {
 
   /**
    * Throws an exception.
-   * @param e error message
-   * @param a error arguments
+   * @param message error message
+   * @param ext error arguments
    * @return build exception (indicates that an error is raised)
    */
-  private BuildException error(final String e, final Object... a) {
-    return new BuildException(det() + COLS + e, a);
+  private BuildException error(final String message, final Object... ext) {
+    return new BuildException(det() + COLS + message, ext);
   }
 
   @Override

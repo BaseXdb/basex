@@ -15,7 +15,7 @@ import org.basex.query.value.node.*;
  */
 public final class JsonAttsConverter extends JsonXmlConverter {
   /** Current name of a pair. */
-  private byte[] name;
+  private byte[] nm;
 
   /**
    * Constructor.
@@ -31,16 +31,16 @@ public final class JsonAttsConverter extends JsonXmlConverter {
   }
 
   @Override
-  void openPair(final byte[] n) {
-    final FElem e = new FElem(PAIR).add(NAME, n);
-    elem.add(e);
-    elem = e;
-    name = n;
+  void openPair(final byte[] name) {
+    final FElem e = new FElem(PAIR).add(NAME, name);
+    curr.add(e);
+    curr = e;
+    nm = name;
   }
 
   @Override
   void closePair() {
-    elem = (FElem) elem.parent();
+    curr = (FElem) curr.parent();
   }
 
   @Override
@@ -50,19 +50,19 @@ public final class JsonAttsConverter extends JsonXmlConverter {
   @Override
   void openArray() {
     addType(ARRAY);
-    name = null;
+    nm = null;
   }
 
   @Override
   void openItem() {
     final FElem e = new FElem(ITEM);
-    elem.add(e);
-    elem = e;
+    curr.add(e);
+    curr = e;
   }
 
   @Override
   void closeItem() {
-    elem = (FElem) elem.parent();
+    curr = (FElem) curr.parent();
   }
 
   @Override
@@ -70,9 +70,9 @@ public final class JsonAttsConverter extends JsonXmlConverter {
   }
 
   @Override
-  public void openConstr(final byte[] nm) {
+  public void openConstr(final byte[] name) {
     openObject();
-    openPair(nm);
+    openPair(name);
     openArray();
   }
 
@@ -120,7 +120,7 @@ public final class JsonAttsConverter extends JsonXmlConverter {
    */
   private FElem addType(final byte[] type) {
     final FElem e = element();
-    addType(e, name, type);
+    addType(e, nm, type);
     return e;
   }
 }

@@ -36,7 +36,7 @@ public final class JsonMLSerializer extends JsonSerializer {
 
   @Override
   protected void startOpen(final byte[] name) throws IOException {
-    if(level != 0) {
+    if(lvl != 0) {
       print(',');
       indent();
     }
@@ -62,7 +62,7 @@ public final class JsonMLSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void namespace(final byte[] n, final byte[] v) {
+  protected void namespace(final byte[] name, final byte[] value) {
   }
 
   @Override
@@ -71,11 +71,11 @@ public final class JsonMLSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void finishText(final byte[] text) throws IOException {
+  protected void finishText(final byte[] value) throws IOException {
     print(',');
     indent();
     print('"');
-    for(final byte ch : text) encode(ch);
+    for(final byte ch : value) encode(ch);
     print('"');
   }
 

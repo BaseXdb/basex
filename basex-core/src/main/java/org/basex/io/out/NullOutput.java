@@ -8,5 +8,5 @@ package org.basex.io.out;
  */
 public final class NullOutput extends PrintOutput {
   @Override
-  public void write(final int b) { }
+  public void write(final int value) { }
 }

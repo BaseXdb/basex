@@ -169,7 +169,7 @@ public final class PlainDoc extends Inspect {
   }
 
   @Override
-  protected FElem tag(final byte[] tag, final FElem parent) {
+  protected FElem elem(final byte[] tag, final FElem parent) {
     final String t = string(tag);
     return elem(eq(tag, DOC_TAGS) ? t : t + "_tag", parent);
   }

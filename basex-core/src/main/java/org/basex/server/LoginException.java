@@ -21,10 +21,10 @@ public final class LoginException extends IOException {
   }
   /**
    * Constructs an exception with the specified message and extension.
-   * @param s message
-   * @param e message extension
+   * @param message message
+   * @param ext message extension
    */
-  public LoginException(final String s, final Object... e) {
-    super(Util.info(s, e));
+  public LoginException(final String message, final Object... ext) {
+    super(Util.info(message, ext));
   }
 }

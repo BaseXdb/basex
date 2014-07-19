@@ -622,14 +622,14 @@ public class FNBin extends StandardFunc {
 
   /**
    * Checks if the specified expression yields a binary item.
-   * @param e expression to be evaluated
+   * @param ex expression to be evaluated
    * @param empty allow empty sequence
    * @param qc query context
    * @return binary item
    * @throws QueryException query exception
    */
-  private B64 b64(final Expr e, final boolean empty, final QueryContext qc) throws QueryException {
-    final Item it = e.item(qc, info);
+  private B64 b64(final Expr ex, final boolean empty, final QueryContext qc) throws QueryException {
+    final Item it = ex.item(qc, info);
     if(it == null) {
       if(empty) return null;
       throw SEQEMPTY.get(info);

@@ -13,10 +13,10 @@ import org.basex.util.*;
 public final class BuildException extends IOException {
   /**
    * Constructs an exception with the specified message and extension.
-   * @param s message
-   * @param e message extension
+   * @param message message
+   * @param ext message extension
    */
-  public BuildException(final String s, final Object... e) {
-    super(Util.info(s, e));
+  public BuildException(final String message, final Object... ext) {
+    super(Util.info(message, ext));
   }
 }

@@ -22,12 +22,12 @@ public final class RepoInstall extends ARepo {
 
   /**
    * Constructor.
-   * @param p package
-   * @param i input info
+   * @param perm package
+   * @param info input info
    */
-  public RepoInstall(final String p, final InputInfo i) {
-    super(Perm.CREATE, p);
-    info = i;
+  public RepoInstall(final String perm, final InputInfo info) {
+    super(Perm.CREATE, perm);
+    this.info = info;
   }
 
   @Override

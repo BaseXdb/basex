@@ -38,30 +38,14 @@ public abstract class JsonSerializer extends OutputSerializer {
   protected final void encode(final int ch) throws IOException {
     if(escape) {
       switch (ch) {
-        case '\b':
-          print("\\b");
-          break;
-        case '\f':
-          print("\\f");
-          break;
-        case '\n':
-          print("\\n");
-          break;
-        case '\r':
-          print("\\r");
-          break;
-        case '\t':
-          print("\\t");
-          break;
-        case '"':
-          print("\\\"");
-          break;
-        case '\\':
-          print("\\\\");
-          break;
-        default:
-          print(ch);
-          break;
+        case '\b': print("\\b"); break;
+        case '\f': print("\\f"); break;
+        case '\n': print("\\n"); break;
+        case '\r': print("\\r"); break;
+        case '\t': print("\\t"); break;
+        case '"': print("\\\""); break;
+        case '\\': print("\\\\"); break;
+        default: print(ch); break;
       }
     } else {
       print(ch);

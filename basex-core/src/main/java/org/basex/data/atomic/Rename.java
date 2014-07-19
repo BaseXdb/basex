@@ -11,7 +11,7 @@ import org.basex.util.*;
  */
 final class Rename extends BasicUpdate {
   /** Kind of updated node. */
-  private final int targetkind;
+  private final int kind;
   /** The new name of the node. */
   private final byte[] name;
   /** Name URI. */
@@ -19,36 +19,36 @@ final class Rename extends BasicUpdate {
 
   /**
    * Constructor.
-   * @param l PRE value of target node location
-   * @param k target node kind
-   * @param n new name for the target node
-   * @param u new name uri for the target node
-   * @param p parent node PRE
+   * @param location PRE value of target node location
+   * @param kind target node kind
+   * @param name new name for the target node
+   * @param uri new name uri for the target node
+   * @param parent parent node PRE
    */
-  private Rename(final int l, final int k, final byte[] n, final byte[] u, final int p) {
-    super(l, p);
-    if(n.length == 0) throw Util.notExpected("New name must not be empty.");
-    targetkind = k;
-    name = n;
-    uri = u;
+  private Rename(final int location, final int kind, final byte[] name, final byte[] uri,
+      final int parent) {
+    super(location, parent);
+    if(name.length == 0) throw Util.notExpected("New name must not be empty.");
+    this.kind = kind;
+    this.name = name;
+    this.uri = uri;
   }
 
   /**
    * Factory.
    * @param data data reference
    * @param pre target node PRE
-   * @param n new name
-   * @param u new uri
+   * @param name new name
+   * @param uri new uri
    * @return instance
    */
-  static Rename getInstance(final Data data, final int pre, final byte[] n,
-      final byte[] u) {
-    return new Rename(pre, data.kind(pre), n, u, data.parent(pre, data.kind(pre)));
+  static Rename getInstance(final Data data, final int pre, final byte[] name, final byte[] uri) {
+    return new Rename(pre, data.kind(pre), name, uri, data.parent(pre, data.kind(pre)));
   }
 
   @Override
-  void apply(final Data d) {
-    d.update(location, targetkind, name, uri);
+  void apply(final Data data) {
+    data.update(location, kind, name, uri);
   }
 
   @Override

@@ -54,7 +54,7 @@ public final class Context extends Simple {
   }
 
   @Override
-  public boolean removable(final Var v) {
+  public boolean removable(final Var var) {
     return false;
   }
 

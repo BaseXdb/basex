@@ -14,59 +14,59 @@ import org.xml.sax.*;
  */
 public final class IOContent extends IO {
   /** Content. */
-  private final byte[] cont;
+  private final byte[] content;
 
   /**
    * Constructor.
-   * @param c contents
+   * @param content contents
    */
-  public IOContent(final byte[] c) {
-    this(c, "");
+  public IOContent(final byte[] content) {
+    this(content, "");
   }
 
   /**
    * Constructor.
-   * @param c contents
+   * @param content contents
    */
-  public IOContent(final String c) {
-    this(Token.token(c), "");
+  public IOContent(final String content) {
+    this(Token.token(content), "");
   }
 
   /**
    * Constructor.
-   * @param c contents
-   * @param p content path
+   * @param content content
+   * @param path content path
    */
-  public IOContent(final byte[] c, final String p) {
-    super(p);
-    cont = c;
-    len = cont.length;
+  public IOContent(final byte[] content, final String path) {
+    super(path);
+    this.content = content;
+    len = content.length;
   }
 
   @Override
   public byte[] read() {
-    return cont;
+    return content;
   }
 
   @Override
   public InputSource inputSource() {
     final InputSource is = new InputSource(inputStream());
-    is.setSystemId(path);
+    is.setSystemId(pth);
     return is;
   }
 
   @Override
   public StreamSource streamSource() {
-    return new StreamSource(inputStream(), path);
+    return new StreamSource(inputStream(), pth);
   }
 
   @Override
   public ArrayInput inputStream() {
-    return new ArrayInput(cont);
+    return new ArrayInput(content);
   }
 
   @Override
   public String toString() {
-    return Token.string(cont);
+    return Token.string(content);
   }
 }

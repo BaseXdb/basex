@@ -379,48 +379,48 @@ public final class MetaData {
 
   /**
    * Converts the specified string to a boolean value.
-   * @param v value
+   * @param value value
    * @return result
    */
-  private static boolean toBool(final String v) {
-    return "1".equals(v);
+  private static boolean toBool(final String value) {
+    return "1".equals(value);
   }
 
   /**
    * Writes a boolean option to the specified output.
    * @param out output stream
-   * @param k key
-   * @param v value
+   * @param name key
+   * @param value value
    * @throws IOException I/O exception
    */
-  private static void writeInfo(final DataOutput out, final String k, final boolean v)
+  private static void writeInfo(final DataOutput out, final String name, final boolean value)
       throws IOException {
-    writeInfo(out, k, v ? "1" : "0");
+    writeInfo(out, name, value ? "1" : "0");
   }
 
   /**
    * Writes a numeric option to the specified output.
    * @param out output stream
-   * @param k key
-   * @param v value
+   * @param name key
+   * @param value value
    * @throws IOException I/O exception
    */
-  private static void writeInfo(final DataOutput out, final String k, final long v)
+  private static void writeInfo(final DataOutput out, final String name, final long value)
       throws IOException {
-    writeInfo(out, k, Long.toString(v));
+    writeInfo(out, name, Long.toString(value));
   }
 
   /**
    * Writes a string option to the specified output.
    * @param out output stream
-   * @param k key
-   * @param v value
+   * @param name key
+   * @param value value
    * @throws IOException I/O exception
    */
-  private static void writeInfo(final DataOutput out, final String k, final String v)
+  private static void writeInfo(final DataOutput out, final String name, final String value)
       throws IOException {
-    out.writeToken(token(k));
-    out.writeToken(token(v));
+    out.writeToken(token(name));
+    out.writeToken(token(value));
   }
 
 }

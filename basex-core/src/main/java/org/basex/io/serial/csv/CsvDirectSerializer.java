@@ -52,7 +52,7 @@ public final class CsvDirectSerializer extends CsvSerializer {
 
   @Override
   protected void startOpen(final byte[] name) {
-    if(level == 1) data = new TokenMap();
+    if(lvl == 1) data = new TokenMap();
     attv = null;
   }
 
@@ -63,18 +63,18 @@ public final class CsvDirectSerializer extends CsvSerializer {
   @Override
   protected void finishEmpty() throws IOException {
     finishOpen();
-    if(level == 2) cache(EMPTY);
+    if(lvl == 2) cache(EMPTY);
     finishClose();
   }
 
   @Override
-  protected void finishText(final byte[] text) throws IOException {
-    if(level == 3) cache(text);
+  protected void finishText(final byte[] value) throws IOException {
+    if(lvl == 3) cache(value);
   }
 
   @Override
   protected void finishClose() throws IOException {
-    if(level != 1) return;
+    if(lvl != 1) return;
 
     if(headers != null) {
       final int s = headers.size();
@@ -98,15 +98,15 @@ public final class CsvDirectSerializer extends CsvSerializer {
   }
 
   @Override
-  protected void attribute(final byte[] n, final byte[] v) {
-    attv = v;
+  protected void attribute(final byte[] name, final byte[] value) {
+    attv = value;
   }
 
   @Override
-  protected void finishComment(final byte[] n) { }
+  protected void finishComment(final byte[] value) { }
 
   @Override
-  protected void finishPi(final byte[] n, final byte[] v) { }
+  protected void finishPi(final byte[] name, final byte[] value) { }
 
   @Override
   protected void atomic(final Item value, final boolean iter) throws IOException {
@@ -120,21 +120,21 @@ public final class CsvDirectSerializer extends CsvSerializer {
 
   /**
    * Caches the specified text and its header.
-   * @param text text to be cached
+   * @param value text to be cached
    * @throws IOException I/O exception
    */
-  private void cache(final byte[] text) throws IOException {
+  private void cache(final byte[] value) throws IOException {
     if(headers != null) {
-      final byte[] key = atts && attv != null ? attv : tag;
+      final byte[] key = atts && attv != null ? attv : elem;
       final byte[] name = XMLToken.decode(key, lax);
       if(name == null) error("Invalid element name <%>", key);
       if(!headers.contains(name)) headers.add(name);
       final byte[] old = data.get(name);
-      final byte[] txt = old == null || old.length == 0 ? text :
-        text.length == 0 ? old : new TokenBuilder(old).add(',').add(text).finish();
+      final byte[] txt = old == null || old.length == 0 ? value :
+        value.length == 0 ? old : new TokenBuilder(old).add(',').add(value).finish();
       data.put(name, txt);
     } else {
-      data.put(token(data.size()), text);
+      data.put(token(data.size()), value);
     }
   }
 

@@ -33,7 +33,7 @@ public class CsvMapSerializer extends CsvSerializer {
 
   @Override
   public void serialize(final Item item) throws IOException {
-    if(sep && level == 0) print(' ');
+    if(sep && lvl == 0) print(' ');
 
     if(!(item instanceof Map))
       throw BXCS_SERIAL.getIO("Top level must be a map; " + item.type + " found");

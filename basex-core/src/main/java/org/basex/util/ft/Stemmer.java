@@ -61,11 +61,11 @@ public abstract class Stemmer extends LanguageImpl {
 
   /**
    * Factory method.
-   * @param l language
+   * @param lang language
    * @param fti full-text iterator
    * @return stemmer
    */
-  abstract Stemmer get(final Language l, final FTIterator fti);
+  abstract Stemmer get(final Language lang, final FTIterator fti);
 
   /**
    * Stems a word.

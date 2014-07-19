@@ -34,12 +34,12 @@ public class JsonMapSerializer extends JsonSerializer {
 
   @Override
   public void serialize(final Item item) throws IOException {
-    if(sep && level == 0) print(' ');
+    if(sep && lvl == 0) print(' ');
 
     try {
       if(item instanceof Map) {
         final Map map = (Map) item;
-        level++;
+        lvl++;
 
         // check if keys of a map are strings (names of pairs) or positive integers (array offsets)
         final Value keys = map.keys();
@@ -78,10 +78,10 @@ public class JsonMapSerializer extends JsonSerializer {
           f = true;
         }
 
-        level--;
+        lvl--;
         indent();
         print(object ? '}' : ']');
-      } else if(level == 0 && spec == JsonSpec.RFC4627) {
+      } else if(lvl == 0 && spec == JsonSpec.RFC4627) {
         throw BXJS_SERIAL.getIO("Top level must be a map; " + item.type + " found");
       } else if(item == null) {
         // empty sequence
@@ -105,7 +105,7 @@ public class JsonMapSerializer extends JsonSerializer {
   protected final void indent() throws IOException {
     if(!indent) return;
     print(nl);
-    final int ls = level * indents;
+    final int ls = lvl * indents;
     for(int l = 0; l < ls; ++l) print(tab);
   }
 }

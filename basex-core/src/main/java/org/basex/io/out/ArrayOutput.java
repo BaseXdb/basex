@@ -18,11 +18,11 @@ public final class ArrayOutput extends PrintOutput {
   private byte[] buf = new byte[8];
 
   @Override
-  public void write(final int b) {
+  public void write(final int value) {
     final int s = (int) size;
     if(s == max) return;
     if(s == buf.length) buf = Arrays.copyOf(buf, Array.newSize(s));
-    buf[s] = (byte) b;
+    buf[s] = (byte) value;
     size = s + 1;
   }
 

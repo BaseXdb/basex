@@ -77,23 +77,23 @@ public final class XMLToken {
 
   /**
    * Checks if the specified token is a valid NCName.
-   * @param v value to be checked
+   * @param value value to be checked
    * @return result of check
    */
-  public static boolean isNCName(final byte[] v) {
-    final int l = v.length;
-    return l != 0 && ncName(v, 0) == l;
+  public static boolean isNCName(final byte[] value) {
+    final int l = value.length;
+    return l != 0 && ncName(value, 0) == l;
   }
 
   /**
    * Checks if the specified token is a valid name.
-   * @param v value to be checked
+   * @param value value to be checked
    * @return result of check
    */
-  public static boolean isName(final byte[] v) {
-    final int l = v.length;
-    for(int i = 0; i < l; i += cl(v, i)) {
-      final int c = cp(v, i);
+  public static boolean isName(final byte[] value) {
+    final int l = value.length;
+    for(int i = 0; i < l; i += cl(value, i)) {
+      final int c = cp(value, i);
       if(i == 0 ? !isStartChar(c) : !isChar(c)) return false;
     }
     return l != 0;
@@ -101,12 +101,12 @@ public final class XMLToken {
 
   /**
    * Checks if the specified token is a valid NMToken.
-   * @param v value to be checked
+   * @param value value to be checked
    * @return result of check
    */
-  public static boolean isNMToken(final byte[] v) {
-    final int l = v.length;
-    for(int i = 0; i < l; i += cl(v, i)) if(!isChar(cp(v, i))) return false;
+  public static boolean isNMToken(final byte[] value) {
+    final int l = value.length;
+    for(int i = 0; i < l; i += cl(value, i)) if(!isChar(cp(value, i))) return false;
     return l != 0;
   }
 
@@ -127,36 +127,36 @@ public final class XMLToken {
 
   /**
    * Checks the specified token as an NCName.
-   * @param v value to be checked
-   * @param p start position
+   * @param value value to be checked
+   * @param start start position
    * @return end position
    */
-  private static int ncName(final byte[] v, final int p) {
-    final int l = v.length;
-    for(int i = p; i < l; i += cl(v, i)) {
-      final int c = cp(v, i);
-      if(i == p ? !isNCStartChar(c) : !isNCChar(c)) return i;
+  private static int ncName(final byte[] value, final int start) {
+    final int l = value.length;
+    for(int i = start; i < l; i += cl(value, i)) {
+      final int c = cp(value, i);
+      if(i == start ? !isNCStartChar(c) : !isNCChar(c)) return i;
     }
     return l;
   }
 
   /**
    * Encodes a string to a valid NCName.
-   * @param nm token to be encoded
+   * @param name token to be encoded
    * @param lax lax encoding (lossy, but better readable)
    * @return valid NCName
    */
-  public static byte[] encode(final byte[] nm, final boolean lax) {
+  public static byte[] encode(final byte[] name, final boolean lax) {
     // lax encoding: trim whitespaces
-    final byte[] name = lax ? trim(nm) : nm;
-    if(name.length == 0) return UNDERSCORE;
+    final byte[] nm = lax ? trim(name) : name;
+    if(nm.length == 0) return UNDERSCORE;
 
-    for(int i = 0; i < name.length; i += cl(name, i)) {
-      int cp = cp(name, i);
+    for(int i = 0; i < nm.length; i += cl(nm, i)) {
+      int cp = cp(nm, i);
       if(cp == '_' || !(i == 0 ? isNCStartChar(cp) : isNCChar(cp))) {
-        final TokenBuilder tb = new TokenBuilder(name.length << 1).add(name, 0, i);
-        for(int j = i; j < name.length; j += cl(name, j)) {
-          cp = cp(name, j);
+        final TokenBuilder tb = new TokenBuilder(nm.length << 1).add(nm, 0, i);
+        for(int j = i; j < nm.length; j += cl(nm, j)) {
+          cp = cp(nm, j);
           if(lax) {
             final boolean nc = isNCChar(cp);
             // prefix invalid start chars (numbers, dashes, dots) with underscore
@@ -177,7 +177,7 @@ public final class XMLToken {
         return tb.finish();
       }
     }
-    return name;
+    return nm;
   }
 
   /**

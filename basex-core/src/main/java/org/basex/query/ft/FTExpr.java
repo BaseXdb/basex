@@ -73,20 +73,20 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    for(final Expr e : exprs) if(!e.removable(v)) return false;
+  public boolean removable(final Var var) {
+    for(final Expr e : exprs) if(!e.removable(var)) return false;
     return true;
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return VarUsage.sum(v, exprs);
+  public VarUsage count(final Var var) {
+    return VarUsage.sum(var, exprs);
   }
 
   @Override
-  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
-    return inlineAll(qc, scp, exprs, v, e) ? optimize(qc, scp) : null;
+    return inlineAll(qc, scp, exprs, var, ex) ? optimize(qc, scp) : null;
   }
 
   @Override

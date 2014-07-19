@@ -13,8 +13,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * This class indexes and organizes the tags or attribute names,
- * used in an XML document.
+ * This class indexes and organizes the element or attribute names used in an XML document.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
@@ -55,18 +54,18 @@ public final class Names extends TokenSet implements Index {
 
   /**
    * Indexes a name and returns its unique id.
-   * @param n name to be added
-   * @param v value, added to statistics
-   * @param st statistics flag
+   * @param name name to be added
+   * @param value value, added to statistics
+   * @param stat statistics flag
    * @return name id
    */
-  public int index(final byte[] n, final byte[] v, final boolean st) {
-    final int id = put(n);
-    if(st) {
+  public int index(final byte[] name, final byte[] value, final boolean stat) {
+    final int id = put(name);
+    if(stat) {
       if(stats[id] == null) stats[id] = new Stats();
-      final Stats stat = stats[id];
-      if(v != null) stat.add(v, meta);
-      stat.count++;
+      final Stats s = stats[id];
+      if(value != null) s.add(value, meta);
+      s.count++;
     }
     return id;
   }
@@ -74,11 +73,11 @@ public final class Names extends TokenSet implements Index {
   /**
    * Adds a value to the statistics of the specified key.
    * Evaluates the value for the specified key id.
-   * @param n name id
-   * @param v value, added to statistics
+   * @param name name id
+   * @param value value, added to statistics
    */
-  public void index(final int n, final byte[] v) {
-    stats[n].add(v, meta);
+  public void index(final int name, final byte[] value) {
+    stats[name].add(value, meta);
   }
 
   @Override

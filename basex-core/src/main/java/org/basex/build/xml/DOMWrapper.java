@@ -113,10 +113,10 @@ public final class DOMWrapper extends Parser {
 
     /**
      * Constructor.
-     * @param n input node
+     * @param node input node
      */
-    NodeIterator(final Node n) {
-      nl = n.getChildNodes();
+    NodeIterator(final Node node) {
+      nl = node.getChildNodes();
     }
 
     /**

@@ -78,12 +78,12 @@ public final class QueryStack {
 
   /**
    * Calculates the position of the given variable on the stack.
-   * @param v variable
+   * @param var variable
    * @return position
    */
-  private int pos(final Var v) {
-    final int pos = fp + v.slot;
-    if(pos < fp || sl <= pos) throw Util.notExpected(v);
+  private int pos(final Var var) {
+    final int pos = fp + var.slot;
+    if(pos < fp || sl <= pos) throw Util.notExpected(var);
     return pos;
   }
 

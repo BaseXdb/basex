@@ -149,19 +149,19 @@ public final class ValueAccess extends IndexAccess {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    return expr.removable(v);
+  public boolean removable(final Var var) {
+    return expr.removable(var);
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return expr.count(v);
+  public VarUsage count(final Var var) {
+    return expr.count(var);
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
-    final Expr sub = expr.inline(qc, scp, v, e);
+    final Expr sub = expr.inline(qc, scp, var, ex);
     if(sub == null) return null;
     expr = sub;
     return optimize(qc, scp);

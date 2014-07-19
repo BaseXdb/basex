@@ -19,11 +19,11 @@ public final class CommandParser {
 
   /**
    * Constructor.
-   * @param in input
-   * @param c context
+   * @param input input
+   * @param ctx context
    */
-  public CommandParser(final String in, final Context c) {
-    parser = in.startsWith("<") ? new XMLParser(in, c) : new StringParser(in, c);
+  public CommandParser(final String input, final Context ctx) {
+    parser = input.startsWith("<") ? new XMLParser(input, ctx) : new StringParser(input, ctx);
   }
 
   /**

@@ -73,10 +73,10 @@ public final class TokenBuilder {
 
   /**
    * Sets the number of bytes. Note that no bound check is performed by this method.
-   * @param s number of bytes
+   * @param sz number of bytes
    */
-  public void size(final int s) {
-    size = s;
+  public void size(final int sz) {
+    size = sz;
   }
 
   /**

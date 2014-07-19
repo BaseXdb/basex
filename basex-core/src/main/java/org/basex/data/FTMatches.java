@@ -25,63 +25,63 @@ public final class FTMatches extends ElementList implements Iterable<FTMatch> {
 
   /**
    * Constructor.
-   * @param p query position
+   * @param pos query position
    */
-  public FTMatches(final int p) {
-    pos = p;
+  public FTMatches(final int pos) {
+    this.pos = pos;
   }
 
   /**
    * Resets the match container.
-   * @param p query position
+   * @param ps query position
    */
-  public void reset(final int p) {
-    pos = p;
+  public void reset(final int ps) {
+    pos = ps;
     size = 0;
   }
 
   /**
    * Adds a match entry.
-   * @param p position
+   * @param ps position
    */
-  public void or(final int p) {
-    or(p, p);
+  public void or(final int ps) {
+    or(ps, ps);
   }
 
   /**
    * Adds a match entry.
-   * @param s start position
-   * @param e end position
+   * @param start start position
+   * @param end end position
    */
-  public void or(final int s, final int e) {
-    add(new FTMatch(1).add(new FTStringMatch(s, e, pos)));
+  public void or(final int start, final int end) {
+    add(new FTMatch(1).add(new FTStringMatch(start, end, pos)));
   }
 
   /**
    * Adds a match entry.
-   * @param s start position
-   * @param e end position
+   * @param start start position
+   * @param end end position
    */
-  public void and(final int s, final int e) {
-    final FTStringMatch sm = new FTStringMatch(s, e, pos);
+  public void and(final int start, final int end) {
+    final FTStringMatch sm = new FTStringMatch(start, end, pos);
     for(final FTMatch m : this) m.add(sm);
   }
 
   /**
    * Adds a match entry.
-   * @param m match to be added
+   * @param ftm match to be added
    */
-  public void add(final FTMatch m) {
+  public void add(final FTMatch ftm) {
     if(size == match.length) match = Array.copy(match, new FTMatch[Array.newSize(size)]);
-    match[size++] = m;
+    match[size++] = ftm;
   }
 
   /**
    * Removes the specified match.
-   * @param i match offset
+   * @param index match index
    */
-  public void delete(final int i) {
-    Array.move(match, i + 1, -1, --size - i);
+  public void delete(final int index) {
+    Array.move(match, index + 1, -1, --size - index);
   }
 
   /**
@@ -96,14 +96,14 @@ public final class FTMatches extends ElementList implements Iterable<FTMatch> {
   /**
    * Combines two matches as phrase.
    * @param all second match list
-   * @param dis word distance
+   * @param distance word distance
    * @return true if matches are left
    */
-  public boolean phrase(final FTMatches all, final int dis) {
+  public boolean phrase(final FTMatches all, final int distance) {
     int a = 0, b = 0, c = 0;
     while(a < size && b < all.size) {
       final int e = all.match[b].match[0].start;
-      final int d = e - match[a].match[0].end - dis;
+      final int d = e - match[a].match[0].end - distance;
       if(d == 0) {
         match[c] = match[a];
         match[c++].match[0].end = e;

@@ -68,7 +68,7 @@ public final class DiskData extends Data {
       while(true) {
         final String k = string(in.readToken());
         if(k.isEmpty()) break;
-        if(k.equals(DBTAGS))      tagindex = new Names(in, meta);
+        if(k.equals(DBTAGS))      elmindex = new Names(in, meta);
         else if(k.equals(DBATTS)) atnindex = new Names(in, meta);
         else if(k.equals(DBPATH)) paths = new PathSummary(this, in);
         else if(k.equals(DBNS))   nspaces = new Namespaces(in);
@@ -92,17 +92,17 @@ public final class DiskData extends Data {
   /**
    * Internal database constructor, called from {@link DiskBuilder#build}.
    * @param md meta data
-   * @param nm tags
-   * @param at attributes
+   * @param el element names
+   * @param at attribute names
    * @param ps path summary
    * @param n namespaces
    * @throws IOException I/O Exception
    */
-  public DiskData(final MetaData md, final Names nm, final Names at, final PathSummary ps,
+  public DiskData(final MetaData md, final Names el, final Names at, final PathSummary ps,
       final Namespaces n) throws IOException {
 
     meta = md;
-    tagindex = nm;
+    elmindex = el;
     atnindex = at;
     paths = ps;
     paths.data(this);
@@ -130,7 +130,7 @@ public final class DiskData extends Data {
       try(final DataOutput out = new DataOutput(meta.dbfile(DATAINF))) {
         meta.write(out);
         out.writeToken(token(DBTAGS));
-        tagindex.write(out);
+        elmindex.write(out);
         out.writeToken(token(DBATTS));
         atnindex.write(out);
         out.writeToken(token(DBPATH));
@@ -256,31 +256,31 @@ public final class DiskData extends Data {
 
   /**
    * Returns a text (text, comment, pi) or attribute value.
-   * @param o text offset
+   * @param off text offset
    * @param text text or attribute flag
    * @return text
    */
-  private byte[] txt(final long o, final boolean text) {
-    final byte[] txt = (text ? texts : values).readToken(o & IO.OFFCOMP - 1);
-    return cpr(o) ? COMP.get().unpack(txt) : txt;
+  private byte[] txt(final long off, final boolean text) {
+    final byte[] txt = (text ? texts : values).readToken(off & IO.OFFCOMP - 1);
+    return cpr(off) ? COMP.get().unpack(txt) : txt;
   }
 
   /**
    * Returns true if the specified value contains a number.
-   * @param o offset
+   * @param offset offset
    * @return result of check
    */
-  private static boolean num(final long o) {
-    return (o & IO.OFFNUM) != 0;
+  private static boolean num(final long offset) {
+    return (offset & IO.OFFNUM) != 0;
   }
 
   /**
    * Returns true if the specified value references a compressed token.
-   * @param o offset
+   * @param offset offset
    * @return result of check
    */
-  private static boolean cpr(final long o) {
-    return (o & IO.OFFCOMP) != 0;
+  private static boolean cpr(final long offset) {
+    return (offset & IO.OFFCOMP) != 0;
   }
 
   // UPDATE OPERATIONS ========================================================

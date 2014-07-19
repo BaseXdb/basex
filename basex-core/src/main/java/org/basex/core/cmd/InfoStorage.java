@@ -74,21 +74,20 @@ public final class InfoStorage extends AQuery {
   /**
    * Prints the specified range of the table.
    * @param data data reference
-   * @param s first node to be printed
-   * @param e last node to be printed
+   * @param start first node to be printed
+   * @param end last node to be printed
    * @return table
    */
-  public static byte[] table(final Data data, final int s, final int e) {
+  public static byte[] table(final Data data, final int start, final int end) {
     final TokenBuilder tb = new TokenBuilder();
-    final int ps = Math.max(0, s);
-    final int pe = Math.min(data.meta.size, e);
+    final int ps = Math.max(0, start);
+    final int pe = Math.min(data.meta.size, end);
     final Table table = th();
     for(int p = ps; p < pe; ++p) table(table, data, p);
     tb.add(table.finish());
 
     final byte[] ns = data.nspaces.table(ps, pe);
-    if(ns.length != 0)
-      tb.add(NL).add(ns).add(data.nspaces.toString(ps, pe)).add(NL);
+    if(ns.length != 0) tb.add(NL).add(ns).add(data.nspaces.toString(ps, pe)).add(NL);
     return tb.finish();
   }
 
@@ -112,34 +111,34 @@ public final class InfoStorage extends AQuery {
 
   /**
    * Writes the entry for the specified pre value to the table.
-   * @param t table reference
+   * @param table table reference
    * @param data data reference
-   * @param p node to be printed
+   * @param pre node to be printed
    */
-  private static void table(final Table t, final Data data, final int p) {
-    final int k = data.kind(p);
+  private static void table(final Table table, final Data data, final int pre) {
+    final int k = data.kind(pre);
     final TokenList tl = new TokenList();
-    tl.add(p);
-    tl.add(p - data.parent(p, k));
-    tl.add(data.size(p, k));
-    tl.add(data.attSize(p, k));
-    tl.add(data.id(p));
-    final int u = data.uri(p, k);
-    if(data.nsFlag(p)) tl.add("+" + u);
+    tl.add(pre);
+    tl.add(pre - data.parent(pre, k));
+    tl.add(data.size(pre, k));
+    tl.add(data.attSize(pre, k));
+    tl.add(data.id(pre));
+    final int u = data.uri(pre, k);
+    if(data.nsFlag(pre)) tl.add("+" + u);
     else tl.add(u);
     tl.add(TABLEKINDS[k]);
 
     final byte[] cont;
     if(k == Data.ELEM) {
-      cont = data.name(p, Data.ELEM);
+      cont = data.name(pre, Data.ELEM);
     } else if(k == Data.ATTR) {
-      cont = new TokenBuilder(data.name(p, Data.ATTR)).add(ATT1).add(
-          data.text(p, false)).add(ATT2).finish();
+      cont = new TokenBuilder(data.name(pre, Data.ATTR)).add(ATT1).add(
+          data.text(pre, false)).add(ATT2).finish();
     } else {
-      cont = data.text(p, true);
+      cont = data.text(pre, true);
     }
     tl.add(replace(chop(cont, 64), '\n', ' '));
-    t.contents.add(tl);
+    table.contents.add(tl);
   }
 
   @Override

@@ -12,8 +12,8 @@ import org.basex.query.*;
  * @author Christian Gruen
  */
 abstract class CmdParser {
-  /** Input lines. */
-  final String input;
+  /** Input string. */
+  final String string;
   /** Context. */
   final Context ctx;
 
@@ -31,7 +31,7 @@ abstract class CmdParser {
    */
   CmdParser(final String input, final Context context) {
     ctx = context;
-    this.input = input;
+    string = input;
   }
 
   /**

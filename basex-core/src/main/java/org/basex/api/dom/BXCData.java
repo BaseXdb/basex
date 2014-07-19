@@ -12,10 +12,10 @@ import org.w3c.dom.*;
 public final class BXCData extends BXText implements CDATASection {
   /**
    * Constructor.
-   * @param n node reference
+   * @param node node reference
    */
-  public BXCData(final ANode n) {
-    super(n);
+  public BXCData(final ANode node) {
+    super(node);
   }
 
   @Override

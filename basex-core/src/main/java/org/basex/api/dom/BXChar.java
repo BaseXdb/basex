@@ -13,10 +13,10 @@ import org.w3c.dom.*;
 abstract class BXChar extends BXNode implements CharacterData {
   /**
    * Constructor.
-   * @param n node reference
+   * @param node node reference
    */
-  BXChar(final ANode n) {
-    super(n);
+  BXChar(final ANode node) {
+    super(node);
   }
 
   @Override
@@ -26,12 +26,12 @@ abstract class BXChar extends BXNode implements CharacterData {
 
   @Override
   public final String getNodeValue() {
-    return Token.string(node.string());
+    return Token.string(nd.string());
   }
 
   @Override
   public final int getLength() {
-    return node.string().length;
+    return nd.string().length;
   }
 
   @Override
@@ -63,7 +63,7 @@ abstract class BXChar extends BXNode implements CharacterData {
   }
 
   @Override
-  public final void setData(final String dat) {
+  public final void setData(final String value) {
     throw Util.notImplemented();
   }
 }

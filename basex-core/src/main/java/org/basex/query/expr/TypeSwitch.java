@@ -97,21 +97,21 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    for(final TypeCase tc : cases) if(!tc.removable(v)) return false;
-    return ts.removable(v);
+  public boolean removable(final Var var) {
+    for(final TypeCase tc : cases) if(!tc.removable(var)) return false;
+    return ts.removable(var);
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return ts.count(v).plus(VarUsage.maximum(v, cases));
+  public VarUsage count(final Var var) {
+    return ts.count(var).plus(VarUsage.maximum(var, cases));
   }
 
   @Override
   public Expr inline(final QueryContext qc, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
-    boolean change = inlineAll(qc, scp, cases, v, e);
-    final Expr t = ts.inline(qc, scp, v, e);
+      final Var var, final Expr ex) throws QueryException {
+    boolean change = inlineAll(qc, scp, cases, var, ex);
+    final Expr t = ts.inline(qc, scp, var, ex);
     if(t != null) {
       change = true;
       ts = t;

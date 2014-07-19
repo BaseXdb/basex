@@ -27,37 +27,37 @@ public final class IOFile extends IO {
 
   /**
    * Constructor.
-   * @param f file path
+   * @param path file path
    */
-  public IOFile(final String f) {
-    this(new File(f));
+  public IOFile(final String path) {
+    this(new File(path));
   }
 
   /**
    * Constructor.
-   * @param fl file reference
+   * @param file file reference
    */
-  public IOFile(final File fl) {
-    super(new PathList().create(fl.getAbsolutePath()));
-    file = fl.isAbsolute() ? fl : fl.getAbsoluteFile();
-  }
-
-  /**
-   * Constructor.
-   * @param dir directory
-   * @param n file name
-   */
-  public IOFile(final String dir, final String n) {
-    this(new File(dir, n));
+  public IOFile(final File file) {
+    super(new PathList().create(file.getAbsolutePath()));
+    this.file = file.isAbsolute() ? file : file.getAbsoluteFile();
   }
 
   /**
    * Constructor.
    * @param dir directory
-   * @param n file name
+   * @param name file name
    */
-  public IOFile(final IOFile dir, final String n) {
-    this(new File(dir.file, n));
+  public IOFile(final String dir, final String name) {
+    this(new File(dir, name));
+  }
+
+  /**
+   * Constructor.
+   * @param dir directory
+   * @param name file name
+   */
+  public IOFile(final IOFile dir, final String name) {
+    this(new File(dir.file, name));
   }
 
   /**
@@ -109,12 +109,12 @@ public final class IOFile extends IO {
 
   @Override
   public InputSource inputSource() {
-    return new InputSource(path);
+    return new InputSource(pth);
   }
 
   @Override
   public StreamSource streamSource() {
-    return new StreamSource(path);
+    return new StreamSource(pth);
   }
 
   @Override
@@ -124,19 +124,19 @@ public final class IOFile extends IO {
 
   /**
    * Resolves two paths.
-   * @param pth file path (relative or absolute)
+   * @param path file path (relative or absolute)
    * @return resulting path
    */
-  public IOFile resolve(final String pth) {
-    final File f = new File(pth);
-    return f.isAbsolute() ? new IOFile(f) : new IOFile(dir(), pth);
+  public IOFile resolve(final String path) {
+    final File f = new File(path);
+    return f.isAbsolute() ? new IOFile(f) : new IOFile(dir(), path);
   }
 
   @Override
-  public IO merge(final String pth) {
-    final IO io = IO.get(pth);
-    if(!(io instanceof IOFile) || pth.contains(":") || pth.startsWith("/")) return io;
-    return new IOFile(dir(), pth);
+  public IO merge(final String path) {
+    final IO io = IO.get(path);
+    if(!(io instanceof IOFile) || path.contains(":") || path.startsWith("/")) return io;
+    return new IOFile(dir(), path);
   }
 
   /**
@@ -149,7 +149,7 @@ public final class IOFile extends IO {
 
   @Override
   public String dir() {
-    return isDir() ? path : path.substring(0, path.lastIndexOf('/') + 1);
+    return isDir() ? pth : pth.substring(0, pth.lastIndexOf('/') + 1);
   }
 
   /**
@@ -203,13 +203,13 @@ public final class IOFile extends IO {
    * Adds the relative paths of all descendant files to the specified list.
    * @param io current file
    * @param files file list
-   * @param off string length of root path
+   * @param offset string length of root path
    */
-  private static void add(final IOFile io, final StringList files, final int off) {
+  private static void add(final IOFile io, final StringList files, final int offset) {
     if(io.isDir()) {
-      for(final IOFile f : io.children()) add(f, files, off);
+      for(final IOFile f : io.children()) add(f, files, offset);
     } else {
-      files.add(io.path().substring(off));
+      files.add(io.path().substring(offset));
     }
   }
 
@@ -228,7 +228,7 @@ public final class IOFile extends IO {
    * @throws IOException I/O exception
    */
   public void write(final InputStream in) throws IOException {
-    try(final BufferOutput out = new BufferOutput(path)) {
+    try(final BufferOutput out = new BufferOutput(pth)) {
       for(int i; (i = in.read()) != -1;) out.write(i);
     } finally {
       in.close();
@@ -275,18 +275,18 @@ public final class IOFile extends IO {
 
   @Override
   public boolean eq(final IO io) {
-    return io instanceof IOFile && (Prop.CASE ? path.equals(io.path) :
-      path.equalsIgnoreCase(io.path));
+    return io instanceof IOFile && (Prop.CASE ? pth.equals(io.pth) :
+      pth.equalsIgnoreCase(io.pth));
   }
 
   @Override
   public String url() {
     final TokenBuilder tb = new TokenBuilder(FILEPREF);
     // add leading slash for Windows paths
-    if(!path.startsWith("/")) tb.add("///");
-    for(int p = 0; p < path.length(); p++) {
+    if(!pth.startsWith("/")) tb.add("///");
+    for(int p = 0; p < pth.length(); p++) {
       // replace spaces with %20
-      final char ch = path.charAt(p);
+      final char ch = pth.charAt(p);
       if(ch == ' ') tb.add("%20");
       else tb.add(ch);
     }
@@ -301,11 +301,11 @@ public final class IOFile extends IO {
   public void open() throws IOException {
     final String[] args;
     if(Prop.WIN) {
-      args = new String[] { "rundll32", "url.dll,FileProtocolHandler", path };
+      args = new String[] { "rundll32", "url.dll,FileProtocolHandler", pth };
     } else if(Prop.MAC) {
-      args = new String[] { "/usr/bin/open", path };
+      args = new String[] { "/usr/bin/open", pth };
     } else {
-      args = new String[] { "xdg-open", path };
+      args = new String[] { "xdg-open", pth };
     }
     new ProcessBuilder(args).directory(parent().file).start();
   }
@@ -317,7 +317,7 @@ public final class IOFile extends IO {
    */
   public Path toPath() throws IOException {
     try {
-      return Paths.get(path);
+      return Paths.get(pth);
     } catch(final InvalidPathException ex) {
       Util.debug(ex);
       throw new IOException(ex);
@@ -349,13 +349,13 @@ public final class IOFile extends IO {
 
   /**
    * Checks if the specified string is a valid file reference.
-   * @param s source
+   * @param path path string
    * @return result of check
    */
-  public static boolean isValid(final String s) {
+  public static boolean isValid(final String path) {
     // accept short strings, string without colons and strings with Windows drive letters
-    return s.length() < 3 || s.indexOf(':') == -1 ||
-        Token.letter(s.charAt(0)) && s.charAt(1) == ':';
+    return path.length() < 3 || path.indexOf(':') == -1 ||
+        Token.letter(path.charAt(0)) && path.charAt(1) == ':';
   }
 
   /**

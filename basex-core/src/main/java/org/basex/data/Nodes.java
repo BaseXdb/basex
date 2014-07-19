@@ -20,74 +20,73 @@ import org.basex.util.list.*;
  */
 public final class Nodes implements Result {
   /** Full-text position data (for visualization). */
-  public final FTPosData ftpos;
+  public FTPosData ftpos;
   /** Root flag (nodes represent all document nodes of the database). */
   public boolean root;
   /** Root node. */
   public Data data;
-  /** Pre values container. */
+  /** Pre values. */
   public int[] pres;
   /** Sorted pre values. */
   public int[] sorted;
 
   /**
    * Constructor, specifying a database instance.
-   * @param d data reference
+   * @param data data reference
    */
-  public Nodes(final Data d) {
-    this(new int[0], d);
+  public Nodes(final Data data) {
+    this(new int[0], data);
   }
 
   /**
    * Constructor, specifying a single node and a database instance.
-   * @param n single node
-   * @param d data reference
+   * @param pre pre value
+   * @param data data reference
    */
-  public Nodes(final int n, final Data d) {
-    this(new int[] { n }, d);
+  public Nodes(final int pre, final Data data) {
+    this(new int[] { pre }, data);
   }
 
   /**
    * Constructor, specifying a node set and a database instance.
-   * @param n node set
-   * @param d data reference
+   * @param pres pre values
+   * @param data data reference
    */
-  public Nodes(final int[] n, final Data d) {
-    this(n, d, Prop.gui ? new FTPosData() : null);
+  public Nodes(final int[] pres, final Data data) {
+    this(pres, data, Prop.gui ? new FTPosData() : null);
   }
 
   /**
    * Constructor, specifying a node set, a database instance, and full-text
    * positions.
-   * @param n node set
-   * @param d data reference
-   * @param ft ft position data
+   * @param pres pre values
+   * @param data data reference
+   * @param ftpos ft position data
    */
-  public Nodes(final int[] n, final Data d, final FTPosData ft) {
-    data = d;
-    ftpos = ft;
-    set(n);
-    if(d == null) throw Util.notExpected("No data available");
+  public Nodes(final int[] pres, final Data data, final FTPosData ftpos) {
+    this.data = data;
+    this.ftpos = ftpos;
+    set(pres);
+    if(data == null) throw Util.notExpected("No data available");
   }
 
   /**
    * Constructor, which should only used by test classes.
    * No database reference is specified.
-   * @param n node set
+   * @param pres pre values
    */
-  public Nodes(final int[] n) {
-    pres = n;
-    ftpos = null;
+  public Nodes(final int[] pres) {
+    this.pres = pres;
   }
 
   /**
    * Copy constructor.
-   * @param nds nodes to copy
+   * @param nodes nodes to copy
    */
-  public Nodes(final Nodes nds) {
-    this(nds.pres.clone(), nds.data, nds.ftpos == null ? null : nds.ftpos.copy());
-    root = nds.root;
-    if(nds.sorted != null) sorted = nds.sorted.clone();
+  public Nodes(final Nodes nodes) {
+    this(nodes.pres.clone(), nodes.data, nodes.ftpos == null ? null : nodes.ftpos.copy());
+    root = nodes.root;
+    if(nodes.sorted != null) sorted = nodes.sorted.clone();
   }
 
   @Override
@@ -96,10 +95,10 @@ public final class Nodes implements Result {
   }
 
   @Override
-  public boolean sameAs(final Result r) {
+  public boolean sameAs(final Result result) {
     final int s = pres.length;
-    if(!(r instanceof Nodes) || r.size() != s) return false;
-    final Nodes n = (Nodes) r;
+    if(!(result instanceof Nodes) || result.size() != s) return false;
+    final Nodes n = (Nodes) result;
     if(data != n.data) return false;
     for(int c = 0; c < s; ++c) if(n.pres[c] != pres[c]) return false;
     return ftpos == null || ftpos.sameAs(n.ftpos);
@@ -123,89 +122,89 @@ public final class Nodes implements Result {
 
   /**
    * Checks if the specified node is contained in the array.
-   * @param p pre value
+   * @param pre pre value
    * @return true if the node was found
    */
-  public boolean contains(final int p) {
-    return find(p) >= 0;
+  public boolean contains(final int pre) {
+    return find(pre) >= 0;
   }
 
   /**
    * Returns the position of the specified node or the negative value - 1 of
    * the position where it should have been found.
-   * @param p pre value
+   * @param pre pre value
    * @return true if the node was found
    */
-  public int find(final int p) {
+  public int find(final int pre) {
     sort();
-    return Arrays.binarySearch(sorted, p);
+    return Arrays.binarySearch(sorted, pre);
   }
 
   /**
    * Adds or removes the specified pre node.
-   * @param p pre value
+   * @param pre pre value
    */
-  public void toggle(final int p) {
-    final int[] n = { p };
-    set(contains(p) ? except(pres, n) : union(pres, n));
+  public void toggle(final int pre) {
+    final int[] n = { pre };
+    set(contains(pre) ? except(pres, n) : union(pres, n));
   }
 
   /**
    * Merges the specified array with the existing pre nodes.
-   * @param p pre value
+   * @param pre pre value
    */
-  public void union(final int[] p) {
-    set(union(pres, p));
+  public void union(final int[] pre) {
+    set(union(pres, pre));
   }
 
   /**
    * Merges two sorted integer arrays via union.
    * Note that the input arrays must be sorted.
-   * @param ai first set
-   * @param bi second set
+   * @param pres1 first set
+   * @param pres2 second set
    * @return resulting set
    */
-  private static int[] union(final int[] ai, final int[] bi) {
-    final int al = ai.length, bl = bi.length;
+  private static int[] union(final int[] pres1, final int[] pres2) {
+    final int al = pres1.length, bl = pres2.length;
     final IntList c = new IntList();
     int a = 0, b = 0;
     while(a != al && b != bl) {
-      final int d = ai[a] - bi[b];
-      c.add(d <= 0 ? ai[a++] : bi[b++]);
+      final int d = pres1[a] - pres2[b];
+      c.add(d <= 0 ? pres1[a++] : pres2[b++]);
       if(d == 0) ++b;
     }
-    while(a != al) c.add(ai[a++]);
-    while(b != bl) c.add(bi[b++]);
+    while(a != al) c.add(pres1[a++]);
+    while(b != bl) c.add(pres2[b++]);
     return c.toArray();
   }
 
   /**
    * Subtracts the second from the first array.
    * Note that the input arrays must be sorted.
-   * @param ai first set
-   * @param bi second set
+   * @param pres1 first set
+   * @param pres2 second set
    * @return resulting set
    */
-  private static int[] except(final int[] ai, final int[] bi) {
-    final int al = ai.length, bl = bi.length;
+  private static int[] except(final int[] pres1, final int[] pres2) {
+    final int al = pres1.length, bl = pres2.length;
     final IntList c = new IntList();
     int a = 0, b = 0;
     while(a != al && b != bl) {
-      final int d = ai[a] - bi[b];
-      if(d < 0) c.add(ai[a]);
+      final int d = pres1[a] - pres2[b];
+      if(d < 0) c.add(pres1[a]);
       else ++b;
       if(d <= 0) ++a;
     }
-    while(a != al) c.add(ai[a++]);
+    while(a != al) c.add(pres1[a++]);
     return c.toArray();
   }
 
   /**
    * Sets the specified nodes.
-   * @param n values
+   * @param nodes values
    */
-  private void set(final int[] n) {
-    pres = n;
+  private void set(final int[] nodes) {
+    pres = nodes;
     sorted = null;
   }
 
@@ -233,8 +232,8 @@ public final class Nodes implements Result {
   }
 
   @Override
-  public void serialize(final Serializer ser, final int n) throws IOException {
-    ser.serialize(new FTPosNode(data, pres[n], ftpos));
+  public void serialize(final Serializer ser, final int pre) throws IOException {
+    ser.serialize(new FTPosNode(data, pres[pre], ftpos));
   }
 
   @Override

@@ -21,17 +21,18 @@ public abstract class StructuralUpdate extends BasicUpdate {
 
   /**
    * Constructor.
-   * @param l target node location PRE
-   * @param s PRE value shifts introduced by update
-   * @param a accumulated shifts
-   * @param f PRE value of the first node the distance of which has to be updated
-   * @param p parent node
+   * @param location target node location PRE
+   * @param shifts PRE value shifts introduced by update
+   * @param acc accumulated shifts
+   * @param first PRE value of the first node the distance of which has to be updated
+   * @param parent parent node
    */
-  StructuralUpdate(final int l, final int s, final int a, final int f, final int p) {
-    super(l, p);
-    shifts = s;
-    accumulatedShifts = a;
-    preOfAffectedNode = f;
+  StructuralUpdate(final int location, final int shifts, final int acc, final int first,
+      final int parent) {
+    super(location, parent);
+    this.shifts = shifts;
+    accumulatedShifts = acc;
+    preOfAffectedNode = first;
   }
 
   @Override

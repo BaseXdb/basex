@@ -49,23 +49,23 @@ public abstract class Command extends Proc {
 
   /**
    * Constructor for commands requiring no opened database.
-   * @param p required permission
-   * @param arg arguments
+   * @param perm required permission
+   * @param args arguments
    */
-  protected Command(final Perm p, final String... arg) {
-    this(p, false, arg);
+  protected Command(final Perm perm, final String... args) {
+    this(perm, false, args);
   }
 
   /**
    * Constructor.
-   * @param p required permission
-   * @param d requires opened database
-   * @param arg arguments
+   * @param perm required permission
+   * @param openDB requires an opened database
+   * @param args arguments
    */
-  protected Command(final Perm p, final boolean d, final String... arg) {
-    perm = p;
-    openDB = d;
-    args = arg;
+  protected Command(final Perm perm, final boolean openDB, final String... args) {
+    this.perm = perm;
+    this.openDB = openDB;
+    this.args = args;
   }
 
   /**
@@ -120,18 +120,18 @@ public abstract class Command extends Proc {
 
   /**
    * Attaches an input stream.
-   * @param is input stream
+   * @param input input stream
    */
-  public void setInput(final InputStream is) {
-    in = new InputSource(is);
+  public final void setInput(final InputStream input) {
+    in = new InputSource(input);
   }
 
   /**
    * Attaches an input source.
-   * @param is input source
+   * @param input input source
    */
-  public void setInput(final InputSource is) {
-    in = is;
+  public final void setInput(final InputSource input) {
+    in = input;
   }
 
   /**
@@ -274,27 +274,27 @@ public abstract class Command extends Proc {
    * Adds the names of the database that has been addressed by the argument index.
    * No databases will be added if the argument uses glob syntax.
    * @param db databases
-   * @param a argument index
+   * @param index argument index
    * @return {@code false} if database cannot be determined due to glob syntax
    */
-  protected final boolean databases(final StringList db, final int a) {
+  protected final boolean databases(final StringList db, final int index) {
     // return true if the addressed database argument does not exists
-    if(args.length <= a || args[a] == null) return true;
-    final boolean noglob = !args[a].matches(".*[\\?\\*,].*");
-    if(noglob) db.add(args[a]);
+    if(args.length <= index || args[index] == null) return true;
+    final boolean noglob = !args[index].matches(".*[\\?\\*,].*");
+    if(noglob) db.add(args[index]);
     return noglob;
   }
 
   /**
    * Returns the specified command option.
-   * @param s string to be found
-   * @param typ options enumeration
+   * @param string string to be found
+   * @param type options enumeration
    * @param <E> token type
    * @return option
    */
-  protected static <E extends Enum<E>> E getOption(final String s, final Class<E> typ) {
+  protected static <E extends Enum<E>> E getOption(final String string, final Class<E> type) {
     try {
-      return Enum.valueOf(typ, s.toUpperCase(Locale.ENGLISH));
+      return Enum.valueOf(type, string.toUpperCase(Locale.ENGLISH));
     } catch(final Exception ex) {
       return null;
     }

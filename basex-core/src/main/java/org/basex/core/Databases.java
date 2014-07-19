@@ -37,10 +37,10 @@ public final class Databases {
 
   /**
    * Creates a new instance and loads available databases.
-   * @param c Database context
+   * @param ctx Database context
    */
-  Databases(final Context c) {
-    gopts = c.globalopts;
+  Databases(final Context ctx) {
+    gopts = ctx.globalopts;
   }
 
   /**

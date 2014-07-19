@@ -31,23 +31,23 @@ public final class BitArray {
 
   /**
    * Construct a new bit array with the specified number of bits.
-   * @param n initial number of bits
+   * @param capacity initial number of bits
    */
-  private BitArray(final int n) {
-    init(new long[(Math.max(0, n - 1) >>> WORD_POWER) + 1], n);
+  private BitArray(final int capacity) {
+    init(new long[(Math.max(0, capacity - 1) >>> WORD_POWER) + 1], capacity);
   }
 
   /**
    * Construct a new bit array and an initial value.
-   * @param n initial number of bits
+   * @param capacity initial number of bits
    * @param set sets or clears all values
    */
-  public BitArray(final int n, final boolean set) {
-    this(n);
+  public BitArray(final int capacity, final boolean set) {
+    this(capacity);
     if(set) {
-      final int p = Math.max(0, n - 1) >>> WORD_POWER;
+      final int p = Math.max(0, capacity - 1) >>> WORD_POWER;
       for(int i = 0; i < p; i++) words[i] = 0XFFFFFFFFFFFFFFFFL;
-      for(int i = p << WORD_POWER; i < n; i++) set(i);
+      for(int i = p << WORD_POWER; i < capacity; i++) set(i);
     }
   }
 

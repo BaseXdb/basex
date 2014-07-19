@@ -131,9 +131,9 @@ public final class XQDoc extends Inspect {
   }
 
   @Override
-  protected FElem tag(final byte[] tag, final FElem parent) {
-    return eq(tag, DOC_TAGS) ? elem(string(tag), parent) :
-      elem("custom", parent).add("tag", tag);
+  protected FElem elem(final byte[] name, final FElem parent) {
+    return eq(name, DOC_TAGS) ? elem(string(name), parent) :
+      elem("custom", parent).add("tag", name);
   }
 
   /**

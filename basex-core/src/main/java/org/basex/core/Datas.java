@@ -57,10 +57,10 @@ public final class Datas {
 
   /**
    * Adds an already pinned data reference to the pool.
-   * @param d data reference
+   * @param data data reference
    */
-  public synchronized void add(final Data d) {
-    list.add(d);
+  public synchronized void add(final Data data) {
+    list.add(data);
   }
 
   /**

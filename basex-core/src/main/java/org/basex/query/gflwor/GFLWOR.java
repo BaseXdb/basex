@@ -538,59 +538,59 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    for(final Clause cl : clauses) if(!cl.removable(v)) return false;
-    return ret.removable(v);
+  public boolean removable(final Var var) {
+    for(final Clause cl : clauses) if(!cl.removable(var)) return false;
+    return ret.removable(var);
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return count(v, 0);
+  public VarUsage count(final Var var) {
+    return count(var, 0);
   }
 
   /**
    * Counts the number of usages of the given variable starting from the given clause.
-   * @param v variable
-   * @param p start position
+   * @param var variable
+   * @param index start position
    * @return usage count
    */
-  private VarUsage count(final Var v, final int p) {
+  private VarUsage count(final Var var, final int index) {
     final long[] minMax = { 1, 1 };
     VarUsage uses = VarUsage.NEVER;
-    final ListIterator<Clause> iter = clauses.listIterator(p);
+    final ListIterator<Clause> iter = clauses.listIterator(index);
     while(iter.hasNext()) {
       final Clause cl = iter.next();
-      uses = uses.plus(cl.count(v).times(minMax[1]));
+      uses = uses.plus(cl.count(var).times(minMax[1]));
       cl.calcSize(minMax);
     }
-    return uses.plus(ret.count(v).times(minMax[1]));
+    return uses.plus(ret.count(var).times(minMax[1]));
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
-    return inline(qc, scp, v, e, 0) ? optimize(qc, scp) : null;
+    return inline(qc, scp, var, ex, 0) ? optimize(qc, scp) : null;
   }
 
   /**
    * Inlines an expression bound to a given variable, starting at a specified clause.
    * @param qc query context
    * @param scp variable scope
-   * @param v variable
-   * @param e expression to inline
-   * @param p clause position
+   * @param var variable
+   * @param ex expression to inline
+   * @param pos clause position
    * @return if changes occurred
    * @throws QueryException query exception
    */
-  private boolean inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e,
-      final int p) throws QueryException {
+  private boolean inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex,
+      final int pos) throws QueryException {
 
     boolean change = false;
-    final ListIterator<Clause> iter = clauses.listIterator(p);
+    final ListIterator<Clause> iter = clauses.listIterator(pos);
     while(iter.hasNext()) {
       final Clause cl = iter.next();
       try {
-        final Clause c = cl.inline(qc, scp, v, e);
+        final Clause c = cl.inline(qc, scp, var, ex);
         if(c != null) {
           change = true;
           iter.set(c);
@@ -601,7 +601,7 @@ public final class GFLWOR extends ParseExpr {
     }
 
     try {
-      final Expr rt = ret.inline(qc, scp, v, e);
+      final Expr rt = ret.inline(qc, scp, var, ex);
       if(rt != null) {
         change = true;
         ret = rt;
@@ -769,7 +769,7 @@ public final class GFLWOR extends ParseExpr {
         throws QueryException;
 
     @Override
-    public abstract Clause inline(QueryContext ctx, VarScope scp, Var v, Expr e)
+    public abstract Clause inline(QueryContext ctx, VarScope scp, Var var, Expr ex)
         throws QueryException;
 
     @Deprecated
@@ -818,11 +818,11 @@ public final class GFLWOR extends ParseExpr {
 
     /**
      * Checks if the given variable is declared by this clause.
-     * @param v variable
+     * @param var variable
      * @return {code true} if the variable was declared here, {@code false} otherwise
      */
-    public final boolean declares(final Var v) {
-      for(final Var decl : vars) if(v.is(decl)) return true;
+    public final boolean declares(final Var var) {
+      for(final Var decl : vars) if(var.is(decl)) return true;
       return false;
     }
 

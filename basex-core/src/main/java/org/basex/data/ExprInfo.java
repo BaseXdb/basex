@@ -63,21 +63,21 @@ public abstract class ExprInfo {
    * Adds trees of the specified expressions to the root node.
    * @param plan root node
    * @param el new element
-   * @param expr expressions
+   * @param exprs expressions
    */
-  protected void addPlan(final FElem plan, final FElem el, final Object... expr) {
+  protected void addPlan(final FElem plan, final FElem el, final Object... exprs) {
     plan.add(el);
-    for(final Object o : expr) {
-      if(o instanceof ExprInfo) {
-        ((ExprInfo) o).plan(el);
-      } else if(o instanceof ExprInfo[]) {
-        for(final ExprInfo e : (ExprInfo[]) o) {
-          if(e != null) e.plan(el);
+    for(final Object expr : exprs) {
+      if(expr instanceof ExprInfo) {
+        ((ExprInfo) expr).plan(el);
+      } else if(expr instanceof ExprInfo[]) {
+        for(final ExprInfo ex : (ExprInfo[]) expr) {
+          if(ex != null) ex.plan(el);
         }
-      } else if(o instanceof byte[]) {
-        el.add((byte[]) o);
-      } else if(o != null) {
-        el.add(o.toString());
+      } else if(expr instanceof byte[]) {
+        el.add((byte[]) expr);
+      } else if(expr != null) {
+        el.add(expr.toString());
       }
     }
   }
@@ -94,11 +94,11 @@ public abstract class ExprInfo {
 
   /**
    * Creates a new attribute to be added to the expression tree.
-   * @param n name of attribute
-   * @param v value of attribute
+   * @param name name of attribute
+   * @param value value of attribute
    * @return tree node
    */
-  protected FAttr planAttr(final Object n, final Object v) {
-    return new FAttr(Util.inf(n), Util.inf(v));
+  protected FAttr planAttr(final Object name, final Object value) {
+    return new FAttr(Util.inf(name), Util.inf(value));
   }
 }

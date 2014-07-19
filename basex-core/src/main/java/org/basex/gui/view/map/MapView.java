@@ -358,7 +358,7 @@ public final class MapView extends View implements Runnable {
       g.drawRect(x, y, w, h);
       g.drawRect(x + 1, y + 1, w - 2, h - 2);
 
-      // draw tag label
+      // draw element label
       g.setFont(font);
       smooth(g);
       if(data.kind(f.pre) == Data.ELEM) {

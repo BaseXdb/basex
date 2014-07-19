@@ -158,13 +158,13 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final boolean removable(final Var v) {
-    return root.removable(v) && super.removable(v);
+  public final boolean removable(final Var var) {
+    return root.removable(var) && super.removable(var);
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    final VarUsage inPreds = super.count(v), inRoot = root.count(v);
+  public VarUsage count(final Var var) {
+    final VarUsage inPreds = super.count(var), inRoot = root.count(var);
     if(inPreds == VarUsage.NEVER) return inRoot;
     final long sz = root.size();
     return sz >= 0 && sz <= 1 || root.seqType().zeroOrOne()
@@ -172,11 +172,11 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
 
-    final boolean pr = super.inline(qc, scp, v, e) != null;
-    final Expr rt = root == null ? null : root.inline(qc, scp, v, e);
+    final boolean pr = super.inline(qc, scp, var, ex) != null;
+    final Expr rt = root == null ? null : root.inline(qc, scp, var, ex);
     if(rt != null) root = rt;
     return pr || rt != null ? optimize(qc, scp) : null;
   }

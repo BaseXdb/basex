@@ -17,12 +17,12 @@ public abstract class BasicUpdate {
 
   /**
    * Constructor.
-   * @param l target node location PRE
-   * @param p parent node PRE value
+   * @param location target node location PRE
+   * @param parent parent node PRE value
    */
-  BasicUpdate(final int l, final int p) {
-    location = l;
-    parent = p;
+  BasicUpdate(final int location, final int parent) {
+    this.location = location;
+    this.parent = parent;
   }
 
   /**
@@ -35,9 +35,9 @@ public abstract class BasicUpdate {
 
   /**
    * Applies the update to the given data instance.
-   * @param d data instance on which to execute the update
+   * @param data data instance on which to execute the update
    */
-  abstract void apply(final Data d);
+  abstract void apply(final Data data);
 
   /**
    * Returns the data to be inserted (for inserts,...).
@@ -55,11 +55,11 @@ public abstract class BasicUpdate {
   /**
    * Merges the given update and this update if possible.
    * @param data data reference
-   * @param u update to merge with
+   * @param bu update to merge with
    * @return merged atomic update or null if merge not possible
    */
   @SuppressWarnings("unused")
-  public BasicUpdate merge(final Data data, final BasicUpdate u) {
+  public BasicUpdate merge(final Data data, final BasicUpdate bu) {
     return null;
   }
 

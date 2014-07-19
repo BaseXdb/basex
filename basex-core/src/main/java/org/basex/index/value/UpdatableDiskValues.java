@@ -20,24 +20,24 @@ import org.basex.util.list.*;
 public final class UpdatableDiskValues extends DiskValues {
   /**
    * Constructor, initializing the index structure.
-   * @param d data reference
-   * @param txt value type (texts/attributes)
+   * @param data data reference
+   * @param text value type (texts/attributes)
    * @throws IOException I/O Exception
    */
-  public UpdatableDiskValues(final Data d, final boolean txt) throws IOException {
-    this(d, txt, txt ? DATATXT : DATAATV);
+  public UpdatableDiskValues(final Data data, final boolean text) throws IOException {
+    this(data, text, text ? DATATXT : DATAATV);
   }
 
   /**
    * Constructor, initializing the index structure.
-   * @param d data reference
-   * @param txt value type (texts/attributes)
-   * @param pref file prefix
+   * @param data data reference
+   * @param text value type (texts/attributes)
+   * @param prefix file prefix
    * @throws IOException I/O Exception
    */
-  private UpdatableDiskValues(final Data d, final boolean txt, final String pref)
+  private UpdatableDiskValues(final Data data, final boolean text, final String prefix)
       throws IOException {
-    super(d, txt, pref);
+    super(data, text, prefix);
   }
 
   @Override
@@ -52,15 +52,15 @@ public final class UpdatableDiskValues extends DiskValues {
   }
 
   @Override
-  public synchronized void index(final TokenObjMap<IntList> m) {
+  public synchronized void index(final TokenObjMap<IntList> map) {
     final int s = size.get();
     final int last = s - 1;
 
     // create a sorted list of all keys: allows faster binary search
-    final TokenList allkeys = new TokenList(m).sort(true);
+    final TokenList allkeys = new TokenList(map).sort(true);
 
     // create a sorted list of the new keys and update the old keys
-    final TokenList nkeys = new TokenList(m.size());
+    final TokenList nkeys = new TokenList(map.size());
     int p = 0;
     for(final byte[] key : allkeys) {
       p = get(key, p, s);
@@ -68,7 +68,7 @@ public final class UpdatableDiskValues extends DiskValues {
         p = -(p + 1);
         nkeys.add(key);
       } else {
-        appendIds(p++, key, diffs(m.get(key)));
+        appendIds(p++, key, diffs(map.get(key)));
       }
     }
 
@@ -86,7 +86,7 @@ public final class UpdatableDiskValues extends DiskValues {
       }
 
       // add the new key and its ids
-      idxr.write5(pos * 5L, idxl.appendNums(diffs(m.get(key))));
+      idxr.write5(pos * 5L, idxl.appendNums(diffs(map.get(key))));
       ctext.put(pos--, key);
       // [DP] should the entry be added to the cache?
     }
@@ -124,19 +124,19 @@ public final class UpdatableDiskValues extends DiskValues {
   }
 
   @Override
-  public synchronized void delete(final TokenObjMap<IntList> m) {
+  public synchronized void delete(final TokenObjMap<IntList> map) {
     // create a sorted list of all keys: allows faster binary search
-    final TokenList allkeys = new TokenList(m).sort(true);
+    final TokenList allkeys = new TokenList(map).sort(true);
 
     // delete ids and create a list of the key positions which should be deleted
-    final IntList empty = new IntList(m.size());
+    final IntList empty = new IntList(map.size());
     int p = -1;
     final int s = size.get();
     for(final byte[] key : allkeys) {
       p = get(key, ++p, s);
-      if(p < 0) throw Util.notExpected("Tried to delete ids " + m.get(key) +
+      if(p < 0) throw Util.notExpected("Tried to delete ids " + map.get(key) +
           " of non-existing index key: '" + string(key) + '\'');
-      else if(deleteIds(p, key, m.get(key).sort().toArray()) == 0) empty.add(p);
+      else if(deleteIds(p, key, map.get(key).sort().toArray()) == 0) empty.add(p);
     }
 
     // empty should contain sorted keys, since allkeys was sorted, too
@@ -200,20 +200,20 @@ public final class UpdatableDiskValues extends DiskValues {
   }
 
   @Override
-  public synchronized void replace(final byte[] o, final byte[] n, final int id) {
+  public synchronized void replace(final byte[] old, final byte[] key, final int id) {
     // delete the id from the old key
-    final int p = get(o);
+    final int p = get(old);
     if(p >= 0) {
       final int[] tmp = { id};
-      if(deleteIds(p, o, tmp) == 0) {
+      if(deleteIds(p, old, tmp) == 0) {
         // the old key remains empty: delete it
-        cache.delete(o);
+        cache.delete(old);
         tmp[0] = p;
         deleteKeys(tmp);
       }
     }
     // add the id to the new key
-    insertId(n, id);
+    insertId(key, id);
   }
 
   /**

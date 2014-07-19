@@ -13,10 +13,10 @@ import org.w3c.dom.*;
 public final class BXNNode extends BXNList implements NamedNodeMap {
   /**
    * Constructor.
-   * @param nb nodes
+   * @param nodes nodes
    */
-  public BXNNode(final ANodeList nb) {
-    super(nb);
+  public BXNNode(final ANodeList nodes) {
+    super(nodes);
   }
 
   @Override
@@ -30,7 +30,7 @@ public final class BXNNode extends BXNList implements NamedNodeMap {
   }
 
   @Override
-  public BXNode getNamedItemNS(final String uri, final String ln) {
+  public BXNode getNamedItemNS(final String uri, final String name) {
     throw Util.notImplemented();
   }
 
@@ -50,7 +50,7 @@ public final class BXNNode extends BXNList implements NamedNodeMap {
   }
 
   @Override
-  public BXNode removeNamedItemNS(final String uri, final String ln) {
+  public BXNode removeNamedItemNS(final String uri, final String name) {
     throw Util.notImplemented();
   }
 }

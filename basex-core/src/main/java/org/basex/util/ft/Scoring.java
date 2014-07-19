@@ -18,43 +18,44 @@ public final class Scoring {
   /**
    * Calculates a score value, based on the token length
    * and complete text length.
-   * @param tl token length
-   * @param l complete length
+   * @param token token length
+   * @param length complete length
    * @return result
    */
-  public static double word(final int tl, final double l) {
-    return min(1, log(1 + LOG * tl / l));
+  public static double word(final int token, final double length) {
+    return min(1, log(1 + LOG * token / length));
   }
 
   /**
    * Combines two scoring values.
-   * @param o old value
-   * @param n new value
+   * @param value1 old value
+   * @param value2 new value
    * @return result
    */
-  public static double merge(final double o, final double n) {
-    return 1 - (1 - o) * (1 - n);
+  public static double merge(final double value1, final double value2) {
+    return 1 - (1 - value1) * (1 - value2);
   }
 
   /**
    * Inverses the scoring value for FTNot.
-   * @param d scoring value
+   * @param value scoring value
    * @return inverse scoring value
    */
-  public static double not(final double d) {
-    return 1 - d;
+  public static double not(final double value) {
+    return 1 - value;
   }
 
   /**
    * Calculates the score for a text node.
    * Used if no index score is available.
-   * @param npv number of pos values
-   * @param is total number of index entries
-   * @param tokl token length
-   * @param tl text length
+   * @param number number of pos values
+   * @param size total number of index entries
+   * @param token token length
+   * @param length text length
    * @return score value
    */
-  public static double textNode(final int npv, final int is, final int tokl, final int tl) {
-    return max((double) npv / is, log(tokl * npv + 1) / log(tl + 1));
+  public static double textNode(final int number, final int size, final int token,
+      final int length) {
+    return max((double) number / size, log(token * number + 1) / log(length + 1));
   }
 }

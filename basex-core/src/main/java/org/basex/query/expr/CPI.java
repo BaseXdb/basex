@@ -53,6 +53,7 @@ public final class CPI extends CName {
     final int vl = v.length;
     while(++i < vl && v[i] >= 0 && v[i] <= ' ');
     v = substring(v, i);
+
     return new FPI(qnm, FPI.parse(v, info));
   }
 

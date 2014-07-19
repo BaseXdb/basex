@@ -84,7 +84,7 @@ public final class FNFormat extends StandardFunc {
     final QNm frm = exprs.length == 3 ? new QNm(trim(checkEStr(exprs[2], qc)), sc) :
       new QNm(EMPTY);
     final DecFormatter df = sc.decFormats.get(frm.id());
-    if(df == null) throw FORMNUM.get(info, frm);
+    if(df == null) throw FORMNUM.get(info, frm.prefixId(XML));
 
     return Str.get(df.format(info, it, pic));
   }

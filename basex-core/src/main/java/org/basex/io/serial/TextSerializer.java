@@ -20,16 +20,16 @@ public class TextSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void attribute(final byte[] n, final byte[] v) throws IOException { }
+  protected void attribute(final byte[] name, final byte[] value) throws IOException { }
 
   @Override
-  protected void finishComment(final byte[] n) throws IOException { }
+  protected void finishComment(final byte[] value) throws IOException { }
 
   @Override
-  protected void finishPi(final byte[] n, final byte[] v) throws IOException { }
+  protected void finishPi(final byte[] name, final byte[] value) throws IOException { }
 
   @Override
-  protected void startOpen(final byte[] t) throws IOException { }
+  protected void startOpen(final byte[] name) throws IOException { }
 
   @Override
   protected void finishOpen() throws IOException { }

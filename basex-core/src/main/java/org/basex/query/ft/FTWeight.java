@@ -90,20 +90,20 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    return weight.removable(v) && super.removable(v);
+  public boolean removable(final Var var) {
+    return weight.removable(var) && super.removable(var);
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return weight.count(v).plus(super.count(v));
+  public VarUsage count(final Var var) {
+    return weight.count(var).plus(super.count(var));
   }
 
   @Override
-  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
-    boolean change = inlineAll(qc, scp, exprs, v, e);
-    final Expr w = weight.inline(qc, scp, v, e);
+    boolean change = inlineAll(qc, scp, exprs, var, ex);
+    final Expr w = weight.inline(qc, scp, var, ex);
     if(w != null) {
       weight = w;
       change = true;

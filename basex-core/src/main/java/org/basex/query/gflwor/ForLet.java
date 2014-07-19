@@ -53,10 +53,10 @@ abstract class ForLet extends GFLWOR.Clause {
   }
 
   @Override
-  public final Clause inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public final Clause inline(final QueryContext qc, final VarScope scp, final Var v, final Expr ex)
       throws QueryException {
 
-    final Expr sub = expr.inline(qc, scp, v, e);
+    final Expr sub = expr.inline(qc, scp, v, ex);
     if(sub == null) return null;
     expr = sub;
     // call compile instead of optimize, because many new optimizations may be triggered by inlining

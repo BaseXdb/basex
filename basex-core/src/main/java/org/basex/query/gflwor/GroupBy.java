@@ -220,20 +220,20 @@ public final class GroupBy extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    for(final Spec b : specs) if(!b.removable(v)) return false;
+  public boolean removable(final Var var) {
+    for(final Spec b : specs) if(!b.removable(var)) return false;
     return true;
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return VarUsage.sum(v, specs).plus(VarUsage.sum(v, preExpr));
+  public VarUsage count(final Var var) {
+    return VarUsage.sum(var, specs).plus(VarUsage.sum(var, preExpr));
   }
 
   @Override
-  public GFLWOR.Clause inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
-      throws QueryException {
-    final boolean b = inlineAll(qc, scp, specs, v, e), p = inlineAll(qc, scp, preExpr, v, e);
+  public GFLWOR.Clause inline(final QueryContext qc, final VarScope scp, final Var var,
+      final Expr ex) throws QueryException {
+    final boolean b = inlineAll(qc, scp, specs, var, ex), p = inlineAll(qc, scp, preExpr, var, ex);
     return b || p ? optimize(qc, scp) : null;
   }
 

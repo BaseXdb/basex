@@ -20,10 +20,10 @@ public final class CmdBuilder {
 
   /**
    * Constructor.
-   * @param c command
+   * @param cmd command
    */
-  public CmdBuilder(final Command c) {
-    cmd = c;
+  public CmdBuilder(final Command cmd) {
+    this.cmd = cmd;
   }
 
   /**
@@ -37,12 +37,12 @@ public final class CmdBuilder {
 
   /**
    * Initializes the builder with the specified string.
-   * @param s command string
+   * @param string command string
    * @return self instance
    */
-  public CmdBuilder init(final String s) {
+  public CmdBuilder init(final String string) {
     tb.reset();
-    tb.add(s);
+    tb.add(string);
     return this;
   }
 

@@ -84,12 +84,12 @@ public final class Table {
 
   /**
    * Returns the value for the specified table position.
-   * @param r row
-   * @param c column
+   * @param row row
+   * @param column column
    * @return value
    */
-  public String value(final int r, final int c) {
-    return string(contents.get(r).get(c));
+  public String value(final int row, final int column) {
+    return string(contents.get(row).get(column));
   }
 
   /**
@@ -173,16 +173,10 @@ public final class Table {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
-    for(final byte[] b : header) {
-      tb.add(b);
-      tb.add('\t');
-    }
+    for(final byte[] b : header) tb.add(b).add('\t');
     tb.add(NL);
     for(final TokenList e : contents) {
-      for(final byte[] b : e) {
-        tb.add(b);
-        tb.add('\t');
-      }
+      for(final byte[] b : e) tb.add(b).add('\t');
     }
     return tb.toString();
   }
