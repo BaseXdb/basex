@@ -119,11 +119,11 @@ public final class Dbl extends ANum {
    */
   public static double parse(final byte[] value, final InputInfo ii) throws QueryException {
     final double d = Token.toDouble(value);
-    if(d == d) return d;
+    if(!Double.isNaN(d)) return d;
     final byte[] v = Token.trim(value);
     if(Token.eq(v, Token.NAN)) return Double.NaN;
     if(Token.eq(v, Token.INF)) return Double.POSITIVE_INFINITY;
     if(Token.eq(v, Token.NINF)) return Double.NEGATIVE_INFINITY;
-    throw funCastError(ii, ZERO.type, v);
+    throw funCastError(ii, AtomType.DBL, value);
   }
 }

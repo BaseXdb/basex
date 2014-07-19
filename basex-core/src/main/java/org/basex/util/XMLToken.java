@@ -112,16 +112,16 @@ public final class XMLToken {
 
   /**
    * Checks if the specified token is a valid QName.
-   * @param val value to be checked
+   * @param value value to be checked
    * @return result of check
    */
-  public static boolean isQName(final byte[] val) {
-    final int l = val.length;
+  public static boolean isQName(final byte[] value) {
+    final int l = value.length;
     if(l == 0) return false;
-    final int i = ncName(val, 0);
+    final int i = ncName(value, 0);
     if(i == l) return true;
-    if(i == 0 || val[i] != ':') return false;
-    final int j = ncName(val, i + 1);
+    if(i == 0 || value[i] != ':') return false;
+    final int j = ncName(value, i + 1);
     return j == l && j != i + 1;
   }
 

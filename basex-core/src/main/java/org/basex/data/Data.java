@@ -205,7 +205,7 @@ public abstract class Data {
         byte[] t = EMPTY;
         int p = pre;
         final int s = p + size(p, kind(p));
-        while(p != s) {
+        while(p < s) {
           final int k = kind(p);
           if(k == TEXT) {
             txt = text(p, true);
@@ -218,7 +218,7 @@ public abstract class Data {
           }
           p += attSize(p, k);
         }
-        return tb == null ? t : tb.finish();
+        return tb == null ? t : tb.array();
     }
   }
 

@@ -44,38 +44,38 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
 
   /**
    * Constructor for generated results.
-   * @param d content data
-   * @param c Collection
+   * @param content content data
+   * @param coll Collection
    */
-  BXXMLResource(final byte[] d, final Collection c) {
-    content = d;
-    coll = c;
+  BXXMLResource(final byte[] content, final Collection coll) {
+    this.content = content;
+    this.coll = coll;
   }
 
   /**
    * Constructor for query results.
-   * @param res query result
-   * @param p query counter
-   * @param c Collection
+   * @param result query result
+   * @param pos query counter
+   * @param coll Collection
    */
-  BXXMLResource(final Result res, final int p, final Collection c) {
-    result = res;
-    coll = c;
-    pos = p;
+  BXXMLResource(final Result result, final int pos, final Collection coll) {
+    this.result = result;
+    this.coll = coll;
+    this.pos = pos;
   }
 
   /**
    * Standard constructor.
-   * @param d data reference
-   * @param p pre value
-   * @param i id
-   * @param c collection
+   * @param data data reference
+   * @param pos pre value
+   * @param id id
+   * @param coll collection
    */
-  BXXMLResource(final Data d, final int p, final String i, final Collection c) {
-    id = i;
-    coll = c;
-    data = d;
-    pos = p;
+  BXXMLResource(final Data data, final int pos, final String id, final Collection coll) {
+    this.id = id;
+    this.coll = coll;
+    this.data = data;
+    this.pos = pos;
   }
 
   @Override
@@ -192,12 +192,12 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
 
     /**
      * Default constructor.
-     * @param mb memory builder
-     * @param r resource
+     * @param builder memory builder
+     * @param resource resource
      */
-    BXSAXContentHandler(final BXXMLResource r, final MemBuilder mb) {
-      super(mb, false, false);
-      res = r;
+    BXSAXContentHandler(final BXXMLResource resource, final MemBuilder builder) {
+      super(builder, false, false);
+      res = resource;
     }
 
     @Override

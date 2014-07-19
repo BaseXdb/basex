@@ -118,7 +118,7 @@ public class JsonMLConverter extends JsonXmlConverter {
   }
 
   @Override
-  public void stringLit(final byte[] val) throws QueryIOException {
+  public void stringLit(final byte[] value) throws QueryIOException {
     if(attName == null && curr != null && stack.peek() == null) {
       stack.pop();
       stack.push(curr);
@@ -127,10 +127,10 @@ public class JsonMLConverter extends JsonXmlConverter {
 
     if(curr == null) {
       final FElem e = stack.isEmpty() ? null : stack.peek();
-      if(e == null) curr = new FElem(check(val));
-      else e.add(new FTxt(val));
+      if(e == null) curr = new FElem(check(value));
+      else e.add(new FTxt(value));
     } else if(attName != null) {
-      curr.add(attName, val);
+      curr.add(attName, value);
       attName = null;
     } else {
       error("No string allowed at this stage");

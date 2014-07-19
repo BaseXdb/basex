@@ -19,7 +19,7 @@ import org.xmldb.api.base.Collection;
  */
 public final class BXDatabase implements Database, BXXMLDBText {
   /** Database context. */
-  public final Context ctx = new Context();
+  Context ctx = new Context();
 
   @Override
   public boolean acceptsURI(final String uri) throws XMLDBException {
@@ -28,9 +28,8 @@ public final class BXDatabase implements Database, BXXMLDBText {
   }
 
   @Override
-  public Collection getCollection(final String uri, final String user,
-      final String password) throws XMLDBException {
-
+  public Collection getCollection(final String uri, final String user, final String password)
+      throws XMLDBException {
     // create database context
     final String name = getCollectionName(uri);
     final boolean exists = ctx.globalopts.dbexists(name);
@@ -48,20 +47,20 @@ public final class BXDatabase implements Database, BXXMLDBText {
   }
 
   @Override
-  public String getProperty(final String key) {
+  public String getProperty(final String name) {
     try {
-      return Get.get(key.toUpperCase(Locale.ENGLISH), ctx);
+      return Get.get(name.toUpperCase(Locale.ENGLISH), ctx);
     } catch(final BaseXException ex) {
       return null;
     }
   }
 
   @Override
-  public void setProperty(final String key, final String value) throws XMLDBException {
+  public void setProperty(final String name, final String value) throws XMLDBException {
     try {
-      new Set(key, value).execute(ctx);
+      new Set(name, value).execute(ctx);
     } catch(final BaseXException ex) {
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + key);
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + name);
     }
   }
 

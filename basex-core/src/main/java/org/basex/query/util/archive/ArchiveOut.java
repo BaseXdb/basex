@@ -56,10 +56,10 @@ public abstract class ArchiveOut {
   /**
    * Writes the specified entry.
    * @param entry zip entry
-   * @param val value to be written
+   * @param value value to be written
    * @throws IOException I/O exception
    */
-  public abstract void write(final ZipEntry entry, final byte[] val) throws IOException;
+  public abstract void write(final ZipEntry entry, final byte[] value) throws IOException;
 
   /**
    * Closes the stream.

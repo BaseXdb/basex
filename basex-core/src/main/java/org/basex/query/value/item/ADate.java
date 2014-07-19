@@ -140,46 +140,46 @@ public abstract class ADate extends ADateDur {
 
   /**
    * Initializes the timezone.
-   * @param mt matcher
-   * @param p first matching position
-   * @param val value
+   * @param matcher matcher
+   * @param pos first matching position
+   * @param value value
    * @param ii input info
    * @throws QueryException query exception
    */
-  final void zone(final Matcher mt, final int p, final byte[] val, final InputInfo ii)
+  final void zone(final Matcher matcher, final int pos, final byte[] value, final InputInfo ii)
       throws QueryException {
 
-    final String tz = mt.group(p);
+    final String tz = matcher.group(pos);
     if(tz == null) return;
     if("Z".equals(tz)) {
       zon = 0;
     } else {
-      final int th = Token.toInt(mt.group(p + 2));
-      final int tm = Token.toInt(mt.group(p + 3));
-      if(th > 14 || tm > 59 || th == 14 && tm != 0) throw INVALIDZONE.get(ii, val);
+      final int th = Token.toInt(matcher.group(pos + 2));
+      final int tm = Token.toInt(matcher.group(pos + 3));
+      if(th > 14 || tm > 59 || th == 14 && tm != 0) throw INVALIDZONE.get(ii, value);
       final int mn = th * 60 + tm;
-      zon = (short) ("-".equals(mt.group(p + 1)) ? -mn : mn);
+      zon = (short) ("-".equals(matcher.group(pos + 1)) ? -mn : mn);
     }
   }
 
   /**
    * Adds/subtracts the specified dayTime duration.
    * @param dur duration
-   * @param p plus/minus flag
+   * @param plus plus/minus flag
    */
-  final void calc(final DTDur dur, final boolean p) {
-    add(p ? dur.sec : dur.sec.negate());
+  final void calc(final DTDur dur, final boolean plus) {
+    add(plus ? dur.sec : dur.sec.negate());
   }
 
   /**
    * Adds/subtracts the specified yearMonth duration.
    * @param dur duration
-   * @param p plus/minus flag
+   * @param plus plus/minus flag
    * @param ii input info
    * @throws QueryException query exception
    */
-  final void calc(final YMDur dur, final boolean p, final InputInfo ii) throws QueryException {
-    final long m = p ? dur.mon : -dur.mon;
+  final void calc(final YMDur dur, final boolean plus, final InputInfo ii) throws QueryException {
+    final long m = plus ? dur.mon : -dur.mon;
     final long mn = mon + m;
     mon = (byte) mod(mn, 12);
     yea += div(mn, 12);
@@ -212,22 +212,22 @@ public abstract class ADate extends ADateDur {
 
   /**
    * Returns a normalized module value for negative and positive values.
-   * @param i input value
-   * @param m modulo
+   * @param value input value
+   * @param mod modulo
    * @return result
    */
-  private static long mod(final long i, final int m) {
-    return i > 0 ? i % m : (Long.MAX_VALUE / m * m + i) % m;
+  private static long mod(final long value, final int mod) {
+    return value > 0 ? value % mod : (Long.MAX_VALUE / mod * mod + value) % mod;
   }
 
   /**
    * Returns a normalized division value for negative and positive values.
-   * @param i input value
-   * @param d divisor
+   * @param value input value
+   * @param div divisor
    * @return result
    */
-  private static long div(final long i, final int d) {
-    return i < 0 ? (i + 1) / d - 1 : i / d;
+  private static long div(final long value, final int div) {
+    return value < 0 ? (value + 1) / div - 1 : value / div;
   }
 
   /**
@@ -349,12 +349,12 @@ public abstract class ADate extends ADateDur {
   /**
    * Prefixes the specified number of zero digits before a number.
    * @param tb token builder
-   * @param n number to be printed
-   * @param z maximum number of zero digits
+   * @param number number to be printed
+   * @param zero maximum number of zero digits
    */
-  static void prefix(final TokenBuilder tb, final long n, final int z) {
-    final byte[] t = Token.token(n);
-    for(int i = t.length; i < z; i++) tb.add('0');
+  static void prefix(final TokenBuilder tb, final long number, final int zero) {
+    final byte[] t = Token.token(number);
+    for(int i = t.length; i < zero; i++) tb.add('0');
     tb.add(t);
   }
 
@@ -423,14 +423,14 @@ public abstract class ADate extends ADateDur {
    * All values must be specified in their internal representation
    * (undefined values are supported, too).
    * Algorithm is derived from J R Stockton (http://www.merlyn.demon.co.uk/daycount.htm).
-   * @param yea year
-   * @param mon month
+   * @param year year
+   * @param month month
    * @param day days
    * @return days
    */
-  private static BigDecimal days(final long yea, final int mon, final int day) {
-    final long y = yea - (mon < 2 ? 1 : 0);
-    final int m = mon + (mon < 2 ? 13 : 1);
+  private static BigDecimal days(final long year, final int month, final int day) {
+    final long y = year - (month < 2 ? 1 : 0);
+    final int m = month + (month < 2 ? 13 : 1);
     final int d = day + 1;
     return BD365.multiply(BigDecimal.valueOf(y)).add(
         BigDecimal.valueOf(y / 4 - y / 100 + y / 400 - 92 + d + (153 * m - 2) / 5));

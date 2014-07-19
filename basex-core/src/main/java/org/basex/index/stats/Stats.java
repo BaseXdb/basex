@@ -111,26 +111,26 @@ public final class Stats {
    * conversion fails again, it is handled as string category. Next, all values
    * are cached. As soon as their number exceeds a maximum, the cached
    * values are skipped, and contents are treated as arbitrary strings.
-   * @param val value to be added
+   * @param value value to be added
    * @param meta meta data
    */
-  public void add(final byte[] val, final MetaData meta) {
-    final int vl = val.length;
-    if(vl == 0 || type == StatsType.TEXT || ws(val)) return;
+  public void add(final byte[] value, final MetaData meta) {
+    final int vl = value.length;
+    if(vl == 0 || type == StatsType.TEXT || ws(value)) return;
 
     StatsType t = type;
     if(t == StatsType.NONE) t = StatsType.INTEGER;
 
     if(cats != null && cats.size() <= meta.maxcats) {
-      if(val.length > meta.maxlen) {
+      if(value.length > meta.maxlen) {
         t = StatsType.TEXT;
         cats = null;
       } else {
-        cats.put(val, Math.max(1, cats.get(val) + 1));
+        cats.put(value, Math.max(1, cats.get(value) + 1));
       }
     }
     if(t == StatsType.INTEGER) {
-      final long d = toLong(val);
+      final long d = toLong(value);
       if(d == Long.MIN_VALUE) {
         t = StatsType.DOUBLE;
       } else {
@@ -139,7 +139,7 @@ public final class Stats {
       }
     }
     if(t == StatsType.DOUBLE) {
-      final double d = toDouble(val);
+      final double d = toDouble(value);
       if(Double.isNaN(d)) {
         t = cats.size() <= meta.maxcats ? StatsType.CATEGORY : StatsType.TEXT;
       } else {

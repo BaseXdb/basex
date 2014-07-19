@@ -46,6 +46,8 @@ public final class Token {
   public static final byte[] INF = token("INF");
   /** Token '-INF'. */
   public static final byte[] NINF = token("-INF");
+  /** Minimum long value. */
+  public static final byte[] MINLONG = token("-9223372036854775808");
   /** Space. */
   public static final byte[] SPACE = { ' ' };
   /** Number '0'. */
@@ -504,34 +506,52 @@ public final class Token {
    */
   public static double toDouble(final byte[] token) {
     final int tl = token.length;
+    int s = -1;
+    while(++s < tl && ws(token[s]));
+    if(s == tl) return Double.NaN;
+
+    int e = s;
     boolean f = false;
-    for(final int t : token) {
-      if(t >= 0 && t <= ' ' || digit(t)) continue;
-      f = t == 'e' || t == 'E' || t == '.' || t == '-' || t == '+';
-      if(!f) return Double.NaN;
+    for(int p = s; p < tl; ++p) {
+      final byte b = token[p];
+      if(e == s) {
+        if(digit(b) || b == '+') continue;
+        if(ws(b)) {
+          e = p + 1;
+        } else {
+          f = b == 'e' || b == 'E' || b == '.' || b == '-';
+          if(!f) return Double.NaN;
+        }
+      } else if(!ws(b)) {
+        return Double.NaN;
+      }
     }
-    if(f || tl > 9) return dbl(token);
-    final int d = toInt(token);
+    if(e == s) e = tl;
+    if(f || e - s > 9) return toDouble(token, s, e);
+
+    final int d = toInt(token, s, e);
     return d == Integer.MIN_VALUE ? Double.NaN : d;
   }
 
   /**
    * Converts the specified token into a double value.
-   * {@link Double#NaN} is returned when the input is invalid.
+   * {@link Double#NaN} is returned if the input is invalid.
    * @param token token to be converted
+   * @param start first byte to be parsed
+   * @param end last byte to be parsed - exclusive
    * @return resulting double value
    */
-  private static double dbl(final byte[] token) {
+  private static double toDouble(final byte[] token, final int start, final int end) {
     try {
-      return Double.parseDouble(string(token));
-    } catch(final Exception ex) {
+      return Double.parseDouble(string(token, start, end - start));
+    } catch(final NumberFormatException ex) {
       return Double.NaN;
     }
   }
 
   /**
    * Converts the specified string into an long value.
-   * {@link Long#MIN_VALUE} is returned when the input is invalid.
+   * {@link Long#MIN_VALUE} is returned if the input is invalid.
    * @param string string to be converted
    * @return resulting long value
    */
@@ -541,7 +561,8 @@ public final class Token {
 
   /**
    * Converts the specified token into an long value.
-   * {@link Long#MIN_VALUE} is returned when the input is invalid.
+   * {@link Long#MIN_VALUE} is returned if the input is invalid.
+   * Note that this may also be the actual value ({@link #MINLONG})..
    * @param token token to be converted
    * @return resulting long value
    */
@@ -551,33 +572,34 @@ public final class Token {
 
   /**
    * Converts the specified token into an long value.
-   * {@link Long#MIN_VALUE} is returned when the input is invalid.
+   * {@link Long#MIN_VALUE} is returned if the input is invalid.
+   * Note that this may also be the actual value ({@link #MINLONG})..
    * @param token token to be converted
    * @param start first byte to be parsed
    * @param end last byte to be parsed - exclusive
    * @return resulting long value
    */
   public static long toLong(final byte[] token, final int start, final int end) {
-    int t = start;
-    while(t < end && token[t] <= ' ') ++t;
-    if(t == end) return Long.MIN_VALUE;
+    int p = start;
+    while(p < end && ws(token[p])) ++p;
+    if(p == end) return Long.MIN_VALUE;
     boolean m = false;
-    if(token[t] == '-' || token[t] == '+') m = token[t++] == '-';
-    if(t == end) return Long.MIN_VALUE;
+    if(token[p] == '-' || token[p] == '+') m = token[p++] == '-';
+    if(p == end) return Long.MIN_VALUE;
     long v = 0;
-    for(; t < end; ++t) {
-      final byte c = token[t];
-      if(c < '0' || c > '9') break;
-      if(v >= MAXLONG && (c > '7' || v > MAXLONG)) return Long.MIN_VALUE;
-      v = (v << 3) + (v << 1) + c - '0';
+    for(; p < end; ++p) {
+      final byte b = token[p];
+      if(b < '0' || b > '9') break;
+      if(v >= MAXLONG && (b > '7' || v > MAXLONG)) return Long.MIN_VALUE;
+      v = (v << 3) + (v << 1) + b - '0';
     }
-    while(t < end && token[t] <= ' ') ++t;
-    return t < end ? Long.MIN_VALUE : m ? -v : v;
+    while(p < end && ws(token[p])) ++p;
+    return p < end ? Long.MIN_VALUE : m ? -v : v;
   }
 
   /**
    * Converts the specified string into an integer value.
-   * {@link Integer#MIN_VALUE} is returned when the input is invalid.
+   * {@link Integer#MIN_VALUE} is returned if the input is invalid.
    * @param string string to be converted
    * @return resulting integer value
    */
@@ -587,7 +609,7 @@ public final class Token {
 
   /**
    * Converts the specified token into an integer value.
-   * {@link Integer#MIN_VALUE} is returned when the input is invalid.
+   * {@link Integer#MIN_VALUE} is returned if the input is invalid.
    * @param token token to be converted
    * @return resulting integer value
    */
@@ -597,28 +619,28 @@ public final class Token {
 
   /**
    * Converts the specified token into an integer value.
-   * {@link Integer#MIN_VALUE} is returned when the input is invalid.
+   * {@link Integer#MIN_VALUE} is returned if the input is invalid.
    * @param token token to be converted
    * @param start first byte to be parsed
    * @param end last byte to be parsed (exclusive)
    * @return resulting integer value
    */
   private static int toInt(final byte[] token, final int start, final int end) {
-    int t = start;
-    while(t < end && token[t] <= ' ') ++t;
-    if(t == end) return Integer.MIN_VALUE;
+    int p = start;
+    while(p < end && ws(token[p])) ++p;
+    if(p == end) return Integer.MIN_VALUE;
     boolean m = false;
-    if(token[t] == '-' || token[t] == '+') m = token[t++] == '-';
-    if(t == end) return Integer.MIN_VALUE;
+    if(token[p] == '-' || token[p] == '+') m = token[p++] == '-';
+    if(p == end) return Integer.MIN_VALUE;
     int v = 0;
-    for(; t < end; ++t) {
-      final byte c = token[t];
-      if(c < '0' || c > '9') break;
-      if(v >= MAXINT && (c > '7' || v > MAXINT)) return Integer.MIN_VALUE;
-      v = (v << 3) + (v << 1) + c - '0';
+    for(; p < end; ++p) {
+      final byte b = token[p];
+      if(b < '0' || b > '9') break;
+      if(v >= MAXINT && (b > '7' || v > MAXINT)) return Integer.MIN_VALUE;
+      v = (v << 3) + (v << 1) + b - '0';
     }
-    while(t < end && token[t] <= ' ') ++t;
-    return t < end || v < 0 ? Integer.MIN_VALUE : m ? -v : v;
+    while(p < end && ws(token[p])) ++p;
+    return p < end || v < 0 ? Integer.MIN_VALUE : m ? -v : v;
   }
 
   /**
@@ -1009,7 +1031,7 @@ public final class Token {
    * @return true if all characters are whitespaces
    */
   public static boolean ws(final byte[] token) {
-    for(final byte t : token) if(t < 0 || t > ' ') return false;
+    for(final byte t : token) if(!ws(t)) return false;
     return true;
   }
 
@@ -1038,10 +1060,9 @@ public final class Token {
    * @return trimmed token
    */
   public static byte[] trim(final byte[] token) {
-    int s = -1;
-    int e = token.length;
-    while(++s < e) if(token[s] > ' ' || token[s] < 0) break;
-    while(--e > s) if(token[e] > ' ' || token[e] < 0) break;
+    int s = -1, e = token.length;
+    while(++s < e) if(!ws(token[s])) break;
+    while(--e > s) if(!ws(token[e])) break;
     if(++e == token.length && s == 0) return token;
     return s == e ? EMPTY : Arrays.copyOfRange(token, s, e);
   }
@@ -1338,17 +1359,17 @@ public final class Token {
 
   /**
    * Returns a hex representation of the specified byte array.
-   * @param val values to be mapped
+   * @param vaue values to be mapped
    * @param uc upper case
    * @return hex representation
    */
-  public static byte[] hex(final byte[] val, final boolean uc) {
+  public static byte[] hex(final byte[] vaue, final boolean uc) {
     final int u = uc ? 0x37 : 0x57;
-    final byte[] data = new byte[val.length << 1];
-    for(int d = 0, c = 0; d < val.length; d++) {
-      int b = val[d] >> 4 & 0x0F;
+    final byte[] data = new byte[vaue.length << 1];
+    for(int d = 0, c = 0; d < vaue.length; d++) {
+      int b = vaue[d] >> 4 & 0x0F;
       data[c++] = (byte) (b + (b > 9 ? u : '0'));
-      b = val[d] & 0x0F;
+      b = vaue[d] & 0x0F;
       data[c++] = (byte) (b + (b > 9 ? u : '0'));
     }
     return data;

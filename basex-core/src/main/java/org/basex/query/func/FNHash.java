@@ -62,14 +62,14 @@ public final class FNHash extends StandardFunc {
 
   /**
    * Creates the hash of the given xs:string, using the algorithm {@code algo}.
-   * @param val value to be hashed
+   * @param value value to be hashed
    * @param algo hashing algorithm
    * @return xs:hexBinary instance containing the hash
    * @throws QueryException exception
    */
-  private B64 hashBinary(final byte[] val, final String algo) throws QueryException {
+  private B64 hashBinary(final byte[] value, final String algo) throws QueryException {
     try {
-      return new B64(MessageDigest.getInstance(algo).digest(val));
+      return new B64(MessageDigest.getInstance(algo).digest(value));
     } catch(final NoSuchAlgorithmException ex) {
       throw HASH_ALG.get(info, algo);
     }

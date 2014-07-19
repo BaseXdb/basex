@@ -90,21 +90,21 @@ public final class PathNode {
    * Indexes the specified name and its kind.
    * @param nm name id
    * @param knd node kind
-   * @param val value
+   * @param value value
    * @param meta meta data
    * @return node reference
    */
-  PathNode index(final int nm, final byte knd, final byte[] val, final MetaData meta) {
+  PathNode index(final int nm, final byte knd, final byte[] value, final MetaData meta) {
     for(final PathNode c : children) {
       if(c.kind == knd && c.name == nm) {
-        if(val != null) c.stats.add(val, meta);
+        if(value != null) c.stats.add(value, meta);
         c.stats.count++;
         return c;
       }
     }
 
     final PathNode node = new PathNode(nm, knd, this);
-    if(val != null) node.stats.add(val, meta);
+    if(value != null) node.stats.add(value, meta);
 
     final int cs = children.length;
     final PathNode[] nodes = new PathNode[cs + 1];

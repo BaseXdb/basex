@@ -479,17 +479,16 @@ public final class FNArchive extends StandardFunc {
 
   /**
    * Encodes the specified string to another encoding.
-   * @param val value to be encoded
-   * @param enc encoding
+   * @param value value to be encoded
+   * @param encoding encoding
    * @param qc query context
    * @return encoded string
    * @throws QueryException query exception
    */
-  private byte[] encode(final byte[] val, final String enc, final QueryContext qc)
+  private byte[] encode(final byte[] value, final String encoding, final QueryContext qc)
       throws QueryException {
-
     try {
-      return FNConvert.toString(new ArrayInput(val), enc, qc);
+      return FNConvert.toString(new ArrayInput(value), encoding, qc);
     } catch(final IOException ex) {
       throw ARCH_ENCODE.get(info, ex);
     }

@@ -114,9 +114,9 @@ public final class JsonMapConverter extends JsonConverter {
   }
 
   @Override
-  public void numberLit(final byte[] val) throws QueryIOException {
+  public void numberLit(final byte[] value) throws QueryIOException {
     try {
-      stack.push(Dbl.get(val, null));
+      stack.push(Dbl.get(value, null));
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }

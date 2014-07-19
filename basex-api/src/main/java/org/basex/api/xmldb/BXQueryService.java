@@ -33,30 +33,30 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
 
   /**
    * Standard constructor.
-   * @param c for collection reference
-   * @param n service name
-   * @param v version
+   * @param coll for collection reference
+   * @param name service name
+   * @param version version
    */
-  BXQueryService(final BXCollection c, final String n, final String v) {
-    coll = c;
-    name = n;
-    version = v;
+  BXQueryService(final BXCollection coll, final String name, final String version) {
+    this.coll = coll;
+    this.name = name;
+    this.version = version;
   }
 
   @Override
-  public void setNamespace(final String pre, final String uri) throws XMLDBException {
-    if(uri != null && !uri.isEmpty()) ns.put(pre == null ? "" : pre, uri);
-    else throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_NSURI + pre);
+  public void setNamespace(final String prefix, final String uri) throws XMLDBException {
+    if(uri != null && !uri.isEmpty()) ns.put(prefix == null ? "" : prefix, uri);
+    else throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_NSURI + prefix);
   }
 
   @Override
-  public String getNamespace(final String pre) {
-    return ns.get(pre == null ? "" : pre);
+  public String getNamespace(final String prefix) {
+    return ns.get(prefix == null ? "" : prefix);
   }
 
   @Override
-  public void removeNamespace(final String pre) {
-    ns.remove(pre == null ? "" : pre);
+  public void removeNamespace(final String prefix) {
+    ns.remove(prefix == null ? "" : prefix);
   }
 
   @Override

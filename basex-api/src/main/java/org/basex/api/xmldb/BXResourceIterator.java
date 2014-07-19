@@ -10,34 +10,31 @@ import org.xmldb.api.base.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-final class BXResourceIterator implements ResourceIterator, BXXMLDBText,
-    Iterable<Resource> {
-
+final class BXResourceIterator implements ResourceIterator, BXXMLDBText, Iterable<Resource> {
   /** Resources. */
-  private final Iterator<Resource> res;
+  private final Iterator<Resource> iter;
 
   /**
    * Standard constructor with result.
-   * @param r resources
+   * @param resources resource iterator
    */
-  BXResourceIterator(final ArrayList<Resource> r) {
-    res = r.iterator();
+  BXResourceIterator(final ArrayList<Resource> resources) {
+    iter = resources.iterator();
   }
 
   @Override
   public boolean hasMoreResources() {
-    return res.hasNext();
+    return iter.hasNext();
   }
 
   @Override
   public Resource nextResource() throws XMLDBException {
-    if(!res.hasNext())
-      throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE, ERR_ITER);
-    return res.next();
+    if(!iter.hasNext()) throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE, ERR_ITER);
+    return iter.next();
   }
 
   @Override
   public Iterator<Resource> iterator() {
-    return res;
+    return iter;
   }
 }

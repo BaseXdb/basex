@@ -39,9 +39,9 @@ public final class ZIPOut extends ArchiveOut {
   }
 
   @Override
-  public void write(final ZipEntry entry, final byte[] val) throws IOException {
+  public void write(final ZipEntry entry, final byte[] value) throws IOException {
     zos.putNextEntry(entry);
-    zos.write(val);
+    zos.write(value);
     zos.closeEntry();
   }
 

@@ -87,27 +87,27 @@ public final class FNPat extends StandardFunc {
 
   /**
    * Evaluates the match function.
-   * @param val input value
+   * @param value input value
    * @param qc query context
    * @return function result
    * @throws QueryException query exception
    */
-  private Item matches(final byte[] val, final QueryContext qc) throws QueryException {
+  private Item matches(final byte[] value, final QueryContext qc) throws QueryException {
     final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc);
-    return Bln.get(p.matcher(string(val)).find());
+    return Bln.get(p.matcher(string(value)).find());
   }
 
   /**
    * Evaluates the analyze-string function.
-   * @param val input value
+   * @param value input value
    * @param qc query context
    * @return function result
    * @throws QueryException query exception
    */
-  private Item analyzeString(final byte[] val, final QueryContext qc) throws QueryException {
+  private Item analyzeString(final byte[] value, final QueryContext qc) throws QueryException {
     final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc);
     if(p.matcher("").matches()) throw REGROUP.get(info);
-    final String str = string(val);
+    final String str = string(value);
     final Matcher m = p.matcher(str);
 
     final FElem root = new FElem(Q_ANALYZE).declareNS();
@@ -123,30 +123,32 @@ public final class FNPat extends StandardFunc {
 
   /**
    * Processes a match.
-   * @param m matcher
-   * @param str string
-   * @param par parent
-   * @param g group number
+   * @param matcher matcher
+   * @param string string
+   * @param parent parent
+   * @param group group number
    * @return next group number and position in string
    */
-  private static int[] match(final Matcher m, final String str, final FElem par, final int g) {
-    final FElem nd = new FElem(g == 0 ? Q_MATCH : Q_MGROUP);
-    if(g > 0) nd.add(NR, token(g));
+  private static int[] match(final Matcher matcher, final String string, final FElem parent,
+      final int group) {
 
-    final int start = m.start(g), end = m.end(g), gc = m.groupCount();
-    int[] pos = { g + 1, start }; // group and position in string
-    while(pos[0] <= gc && m.end(pos[0]) <= end) {
-      final int st = m.start(pos[0]);
+    final FElem nd = new FElem(group == 0 ? Q_MATCH : Q_MGROUP);
+    if(group > 0) nd.add(NR, token(group));
+
+    final int start = matcher.start(group), end = matcher.end(group), gc = matcher.groupCount();
+    int[] pos = { group + 1, start }; // group and position in string
+    while(pos[0] <= gc && matcher.end(pos[0]) <= end) {
+      final int st = matcher.start(pos[0]);
       if(st >= 0) { // group matched
-        if(pos[1] < st) nd.add(str.substring(pos[1], st));
-        pos = match(m, str, nd, pos[0]);
+        if(pos[1] < st) nd.add(string.substring(pos[1], st));
+        pos = match(matcher, string, nd, pos[0]);
       } else pos[0]++; // skip it
     }
     if(pos[1] < end) {
-      nd.add(str.substring(pos[1], end));
+      nd.add(string.substring(pos[1], end));
       pos[1] = end;
     }
-    par.add(nd);
+    parent.add(nd);
     return pos;
   }
 
@@ -161,12 +163,12 @@ public final class FNPat extends StandardFunc {
 
   /**
    * Evaluates the replace function.
-   * @param val input value
+   * @param value input value
    * @param qc query context
    * @return function result
    * @throws QueryException query exception
    */
-  private Item replace(final byte[] val, final QueryContext qc) throws QueryException {
+  private Item replace(final byte[] value, final QueryContext qc) throws QueryException {
     final byte[] rep = checkStr(exprs[2], qc);
     for(int i = 0; i < rep.length; ++i) {
       if(rep[i] == '\\') {
@@ -187,7 +189,7 @@ public final class FNPat extends StandardFunc {
     }
 
     try {
-      return Str.get(p.matcher(string(val)).replaceAll(r));
+      return Str.get(p.matcher(string(value)).replaceAll(r));
     } catch(final Exception ex) {
       if(ex.getMessage().contains("No group")) throw REGROUP.get(info);
       throw REGPAT.get(info, ex);

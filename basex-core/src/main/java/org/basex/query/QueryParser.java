@@ -2551,8 +2551,7 @@ public class QueryParser extends InputParser {
    */
   private Str text(final TokenBuilder tb, final boolean strip) {
     final byte[] t = tb.finish();
-    return t.length == 0 || strip && !sc.spaces && ws(t) ?
-        null : Str.get(t);
+    return t.length == 0 || strip && !sc.spaces && ws(t) ? null : Str.get(t);
   }
 
   /**

@@ -34,13 +34,13 @@ public final class BXCollection implements Collection, BXXMLDBText {
    * Constructor to create/open a collection.
    * @param name name of the database
    * @param open open existing database
-   * @param d database context
+   * @param database database context
    * @throws XMLDBException exception
    */
-  public BXCollection(final String name, final boolean open, final Database d)
+  public BXCollection(final String name, final boolean open, final Database database)
       throws XMLDBException {
 
-    db = (BXDatabase) d;
+    this.db = (BXDatabase) database;
     ctx = db.ctx;
     try {
       ctx.openDB(open ? Open.open(name, ctx) :
@@ -65,12 +65,12 @@ public final class BXCollection implements Collection, BXXMLDBText {
   }
 
   @Override
-  public Service getService(final String nm, final String ver) throws XMLDBException {
+  public Service getService(final String name, final String version) throws XMLDBException {
     check();
-    if("1.0".equals(ver)) {
-      if(Token.eq(nm, BXQueryService.XPATH, BXQueryService.XQUERY))
-        return new BXQueryService(this, nm, ver);
-      if(nm.equals(BXCollectionManagementService.MANAGEMENT))
+    if("1.0".equals(version)) {
+      if(Token.eq(name, BXQueryService.XPATH, BXQueryService.XQUERY))
+        return new BXQueryService(this, name, version);
+      if(name.equals(BXCollectionManagementService.MANAGEMENT))
         return new BXCollectionManagementService(this);
     }
     return null;
@@ -219,21 +219,21 @@ public final class BXCollection implements Collection, BXXMLDBText {
   }
 
   @Override
-  public String getProperty(final String key) throws XMLDBException {
+  public String getProperty(final String name) throws XMLDBException {
     check();
     try {
-      return MetaData.class.getField(key).get(ctx.data().meta).toString();
+      return MetaData.class.getField(name).get(ctx.data().meta).toString();
     } catch(final Exception ex) {
       return null;
     }
   }
 
   @Override
-  public void setProperty(final String key, final String val) throws XMLDBException {
+  public void setProperty(final String name, final String val) throws XMLDBException {
     check();
     try {
       final MetaData md = ctx.data().meta;
-      final Field f = MetaData.class.getField(key);
+      final Field f = MetaData.class.getField(name);
       final Object k = f.get(md);
 
       if(k instanceof Boolean) {
@@ -246,7 +246,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
         f.set(md, val);
       }
     } catch(final Exception ex) {
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + key);
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + name);
     }
   }
 

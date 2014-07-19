@@ -1,23 +1,21 @@
 package org.basex.http.webdav.impl;
 
-import org.basex.core.BaseXException;
-import org.basex.data.Result;
-import org.basex.http.HTTPContext;
-import org.basex.io.IOStream;
-import org.basex.io.out.ArrayOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
-import org.basex.util.Util;
-import org.basex.util.list.StringList;
+import static org.basex.http.webdav.impl.Utils.*;
+import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
+import java.io.*;
 import java.util.Map.Entry;
+import java.util.*;
 
-import static org.basex.http.webdav.impl.Utils.SEP;
-import static org.basex.util.Token.string;
+import org.basex.core.*;
+import org.basex.http.*;
+import org.basex.io.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.value.item.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Service managing the WebDAV locks.
@@ -156,13 +154,13 @@ public final class WebDAVLockService {
       }
       qp.qc.parseLibrary(string(module), FILE, qp.sc);
 
-      final Result r = qp.execute();
-      final int n = (int) r.size();
-      final StringList items = new StringList(n);
-      for(int i = 0; i < n; i++) {
-        final ArrayOutput ao = new ArrayOutput();
-        r.serialize(Serializer.get(ao), 0);
+      final StringList items = new StringList();
+      final ArrayOutput ao = new ArrayOutput();
+      final Serializer ser = qp.getSerializer(ao);
+      for(final Item it : qp.value()) {
+        ser.serialize(it);
         items.add(ao.toString());
+        ao.reset();
       }
       return items;
     } catch(final QueryException ex) {

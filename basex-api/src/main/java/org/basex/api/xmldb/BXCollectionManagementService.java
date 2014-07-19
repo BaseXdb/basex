@@ -26,10 +26,10 @@ final class BXCollectionManagementService implements
 
   /**
    * Default constructor.
-   * @param c collection reference
+   * @param coll collection reference
    */
-  BXCollectionManagementService(final BXCollection c) {
-    coll = c;
+  BXCollectionManagementService(final BXCollection coll) {
+    this.coll = coll;
   }
 
   @Override
@@ -57,17 +57,17 @@ final class BXCollectionManagementService implements
   }
 
   @Override
-  public void setCollection(final Collection c) {
-    coll = (BXCollection) c;
+  public void setCollection(final Collection cl) {
+    coll = (BXCollection) cl;
   }
 
   @Override
-  public String getProperty(final String nm) {
+  public String getProperty(final String name) {
     return null;
   }
 
   @Override
-  public void setProperty(final String nm, final String value) throws XMLDBException {
-    throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + nm);
+  public void setProperty(final String name, final String value) throws XMLDBException {
+    throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + name);
   }
 }

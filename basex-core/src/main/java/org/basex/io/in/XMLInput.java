@@ -74,15 +74,15 @@ public class XMLInput extends InputStream {
 
   /**
    * Inserts some bytes in the input stream.
-   * @param val values to insert
-   * @param s add spaces
+   * @param value values to insert
+   * @param spaces add spaces
    * @return true if everything went alright
    * @throws IOException I/O exception
    */
-  public boolean add(final byte[] val, final boolean s) throws IOException {
-    if(s) add(new NewlineInput(new ArrayInput(Token.SPACE)));
-    add(new NewlineInput(new ArrayInput(val)));
-    if(s) add(new NewlineInput(new ArrayInput(Token.SPACE)));
+  public boolean add(final byte[] value, final boolean spaces) throws IOException {
+    if(spaces) add(new NewlineInput(new ArrayInput(Token.SPACE)));
+    add(new NewlineInput(new ArrayInput(value)));
+    if(spaces) add(new NewlineInput(new ArrayInput(Token.SPACE)));
     return ip < 32;
   }
 
@@ -91,8 +91,7 @@ public class XMLInput extends InputStream {
    * @param ti buffer to be added
    */
   private void add(final NewlineInput ti) {
-    if(++ip == inputs.length)
-      inputs = Array.copy(inputs, new NewlineInput[Array.newSize(ip)]);
+    if(++ip == inputs.length) inputs = Array.copy(inputs, new NewlineInput[Array.newSize(ip)]);
     inputs[ip] = ti;
   }
 

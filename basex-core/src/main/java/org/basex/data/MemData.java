@@ -115,13 +115,13 @@ public final class MemData extends Data {
   protected void delete(final int pre, final boolean text) { }
 
   @Override
-  public void updateText(final int pre, final byte[] val, final int kind) {
+  public void updateText(final int pre, final byte[] value, final int kind) {
     final int id = id(pre);
     if(meta.updindex) {
       final boolean txt = kind != ATTR;
       ((MemValues) (txt ? txtindex : atvindex)).delete(text(pre, txt), id);
     }
-    textOff(pre, index(pre, id, val, kind));
+    textOff(pre, index(pre, id, value, kind));
   }
 
   @Override

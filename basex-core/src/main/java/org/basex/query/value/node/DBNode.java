@@ -122,9 +122,14 @@ public class DBNode extends ANode {
 
   @Override
   public final long itr(final InputInfo ii) throws QueryException {
-    final boolean txt = type == NodeType.TXT || type == NodeType.COM;
-    if(txt || type == NodeType.ATT) {
-      final long l = data.textItr(pre, txt);
+    if(type == NodeType.ELM) {
+      final int as = data.attSize(pre, Data.ELEM);
+      if(data.size(pre, Data.ELEM) - as == 1 && data.kind(pre + as) == Data.TEXT) {
+        final long l = data.textItr(pre + as, true);
+        if(l != Long.MIN_VALUE) return l;
+      }
+    } else if(type == NodeType.TXT || type == NodeType.ATT) {
+      final long l = data.textItr(pre, type == NodeType.TXT);
       if(l != Long.MIN_VALUE) return l;
     }
     return Int.parse(data.atom(pre), ii);
@@ -132,10 +137,13 @@ public class DBNode extends ANode {
 
   @Override
   public final double dbl(final InputInfo ii) throws QueryException {
-    final boolean txt = type == NodeType.TXT || type == NodeType.COM;
-    if(txt || type == NodeType.ATT) {
-      final double d = data.textDbl(pre, txt);
-      if(!Double.isNaN(d)) return d;
+    if(type == NodeType.ELM) {
+      final int as = data.attSize(pre, Data.ELEM);
+      if(data.size(pre, Data.ELEM) - as == 1 && data.kind(pre + as) == Data.TEXT) {
+        return data.textDbl(pre + as, true);
+      }
+    } else if(type == NodeType.TXT || type == NodeType.ATT) {
+      return data.textDbl(pre, type == NodeType.TXT);
     }
     return Dbl.parse(data.atom(pre), ii);
   }

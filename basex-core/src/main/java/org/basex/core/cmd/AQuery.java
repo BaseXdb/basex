@@ -25,9 +25,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class AQuery extends Command {
-  /** Query result. */
-  Result result;
-
   /** Variables. */
   private final HashMap<String, String[]> vars = new HashMap<>();
   /** HTTP context. */
@@ -36,6 +33,9 @@ public abstract class AQuery extends Command {
   private QueryProcessor qp;
   /** Query info. */
   private QueryInfo info;
+
+  /** Query result. */
+  protected Result result;
 
   /**
    * Protected constructor.
