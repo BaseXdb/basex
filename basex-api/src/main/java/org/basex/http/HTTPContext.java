@@ -61,7 +61,8 @@ public final class HTTPContext {
   /** Nonce for Digest Auth. */
   public final String nonce;
   /** Realm for Digest Auth. */
-  public final String realm;
+  private final String realm;
+  public String AM = "auth";
 
   /**
    * Constructor.
@@ -78,6 +79,7 @@ public final class HTTPContext {
     params = new HTTPParams(this);
 
     method = rq.getMethod();
+
     // Assigning realm for digest auth.
     realm = "basex.org";
 
@@ -101,16 +103,21 @@ public final class HTTPContext {
 
     // overwrite credentials with session-specific data
     final String auth = req.getHeader(AUTHORIZATION);
-    if(auth != null) {
+   if (auth == null) {
+      res.addHeader("WWW-Authenticate", getAuthenticateHeader());
+      res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+  }
+      if(auth != null) {
       final String[] values = auth.split(" ");
-      if(values[0].equals(BASIC)) {
+      if(values[0].equals(BASIC)){
         final String[] cred = Base64.decode(values[1]).split(":", 2);
         if(cred.length != 2) throw new LoginException(NOPASSWD);
         user = cred[0];
         pass = cred[1];
-      } else {
-        throw new LoginException(WHICHAUTH, values[0]);
+      } else if(values[0].equals(DIGEST)){
+        authenticate();
       }
+      throw new LoginException(WHICHAUTH, values[0]);
     }
   }
 
@@ -241,8 +248,8 @@ public final class HTTPContext {
     try {
       log(message, code);
       res.resetBuffer();
-      if(code == SC_UNAUTHORIZED) res.setHeader(WWW_AUTHENTICATE, BASIC);
-
+      //if(code == SC_UNAUTHORIZED) res.addHeader(WWW_AUTHENTICATE, getAuthenticateHeader());
+      if(code == SC_UNAUTHORIZED) res.addHeader(WWW_AUTHENTICATE, BASIC);
       if(error && code >= SC_BAD_REQUEST) {
         res.sendError(code, message);
       } else {
@@ -267,14 +274,56 @@ public final class HTTPContext {
   /**
    * Authenticate the user and returns a new client {@link Context} instance.
    * @return client context
-   * @throws LoginException login exception
+   * @throws IOException
+   * Change to LoginException to resolve errors in WebDAV
    */
-  public Context authenticate() throws LoginException {
+  public Context authenticate() throws IOException {
     final byte[] address = token(req.getRemoteAddr());
+    Context ctx = null;
+    res.setContentType("text/html;charset=UTF-8");
+    PrintWriter  out = res.getWriter();
+
     try {
+
+      String auth = req.getHeader(AUTHORIZATION);
+     /* if(auth == null)
+      {
+        res.addHeader("WWW_AUTHENTICATE", getAuthenticateHeader());
+        res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+      }*/
+
       if(user == null || user.isEmpty() || pass == null || pass.isEmpty())
-        throw new LoginException(NOPASSWD);
-      final Context ctx = new Context(context(), null);
+      throw new LoginException(NOPASSWD);
+      else if(auth.startsWith(DIGEST)){
+        HashMap<String, String> headerValues = parseHeader(auth);
+
+        String method = req.getMethod();
+
+        String HA1 = Token.md5(ctx.user.name + ":" + realm + ":" + ctx.user.password);
+
+        String reqURI = headerValues.get("uri");
+
+        String HA2 = Token.md5(method + ":" + reqURI);
+
+        String serverResponse;
+        {
+
+
+        String nonceCount = headerValues.get("nc");
+        String clientNonce = headerValues.get("cnonce");
+
+        serverResponse = Token.md5(HA1 + ":" + nonce + ":"
+             + nonceCount + ":" + clientNonce + ":" + AM + ":" + HA2);
+
+        }
+        String clientResponse = headerValues.get("response");
+
+        if (!serverResponse.equals(clientResponse)) {
+        res.addHeader("WWW-Authenticate", getAuthenticateHeader());
+        res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        }
+      }
+      ctx = new Context(context(), null);
       ctx.user = ctx.users.get(user);
       if(ctx.user == null || !ctx.user.password.equals(md5(pass))) throw new LoginException();
 
@@ -285,7 +334,61 @@ public final class HTTPContext {
       for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(100);
       throw ex;
     }
+    /*finally {
+      out.close();
+  }*/
+
   }
+
+  /**
+   * Authenticate Header.
+   */
+  private String getAuthenticateHeader() {
+    String header = "";
+
+
+    header += "Digest realm=\"" + realm + "\",";
+    //System.out.println(header);
+    if (AM == null) {
+        header += "qop=" + AM + ",";
+    }
+    header += "nonce=\"" + nonce + "\",";
+    header += "opaque=\"" + getOpaque(realm, nonce) + "\"";
+    //System.out.println(header);
+    return header;
+
+}
+ /**
+  * Opaque used in Digest Auth.
+  * @param realm
+  * @param nonce
+  * @return
+  */
+  private String getOpaque(final String realm, final String nonce) {
+
+    return Token.md5(realm + nonce);
+}
+/**
+ * Parsing header for Digest Auth.
+ * @param headerString
+ * @return
+ */
+  private HashMap<String, String> parseHeader(String headerString) {
+
+    // Isolate the string part which tells you about the authentication scheme
+
+    String headerStringWithoutScheme = headerString.substring(headerString.indexOf(" ") + 1).trim();
+    HashMap<String, String> values = new HashMap<>();
+    String keyValueArray[] = headerStringWithoutScheme.split(",");
+    for (String keyval : keyValueArray) {
+        if (keyval.contains("=")) {
+            String key = keyval.substring(0, keyval.indexOf("="));
+            String value = keyval.substring(keyval.indexOf("=") + 1);
+            values.put(key.trim(), value.replaceAll("\"", "").trim());
+        }
+    }
+    return values;
+}
 
   /**
    * Returns the database context.

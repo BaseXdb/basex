@@ -16,7 +16,7 @@ public final class RESTServlet extends BaseXServlet {
   @Override
   protected void run(final HTTPContext http) throws IOException {
 
-    System.out.println(http.nonce);
+    System.out.println(http.context().globalopts);
 
     final RESTSession rs = new RESTSession(http, http.authenticate());
     final RESTCmd cmd = code(rs);

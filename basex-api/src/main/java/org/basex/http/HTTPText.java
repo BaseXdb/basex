@@ -13,6 +13,8 @@ public interface HTTPText {
   String AUTHORIZATION = "Authorization";
   /** HTTP basic authentication. */
   String BASIC = "Basic";
+  /** HTTP digest authentication. */
+  String DIGEST = "Digest";
 
   /** HTTP String. */
   String HTTP = "HTTP";
