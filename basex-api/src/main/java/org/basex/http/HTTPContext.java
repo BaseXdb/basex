@@ -23,6 +23,7 @@ import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
+import org.basex.util.Base64;
 
 /**
  * Bundles context-based information on a single HTTP operation.
