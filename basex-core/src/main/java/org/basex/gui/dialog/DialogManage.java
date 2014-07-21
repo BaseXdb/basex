@@ -60,8 +60,8 @@ public final class DialogManage extends BaseXDialog {
     panel.setLayout(new BorderLayout(4, 0));
 
     // create database chooser
-    final StringList dbs = main.context.databases.list();
-    choice = new BaseXList(dbs.toArray(), this, false);
+    final String[] dbs = main.context.databases.list().finish();
+    choice = new BaseXList(dbs, this, false);
     choice.setSize(200, 500);
     final Data data = main.context.data();
     if(data != null) choice.setValue(data.meta.name);
@@ -113,7 +113,7 @@ public final class DialogManage extends BaseXDialog {
     set(tabs, BorderLayout.EAST);
 
     action(null);
-    if(!dbs.isEmpty()) finish(null);
+    if(dbs.length != 0) finish(null);
   }
 
   /**
@@ -129,7 +129,7 @@ public final class DialogManage extends BaseXDialog {
     final Context ctx = gui.context;
     if(refresh) {
       // rebuild databases and focus list chooser
-      choice.setData(ctx.databases.list().toArray());
+      choice.setData(ctx.databases.list().finish());
       choice.requestFocusInWindow();
       refresh = false;
     }
@@ -216,9 +216,9 @@ public final class DialogManage extends BaseXDialog {
       backup.setEnabled(active);
 
       // enable/disable backup buttons
-      final StringList names = ctx.databases.backups(db);
-      active = !names.isEmpty();
-      backups.setData(names.toArray());
+      final String[] names = ctx.databases.backups(db).finish();
+      active = names.length != 0;
+      backups.setData(names);
       backups.setEnabled(active);
 
       restore.setEnabled(active);

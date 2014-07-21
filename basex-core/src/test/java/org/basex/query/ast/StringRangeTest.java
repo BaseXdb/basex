@@ -35,8 +35,7 @@ public final class StringRangeTest extends QueryPlanTest {
       // add random value
       final int s = rnd.nextInt(8);
       for(int j = 0; j <= s; j++) r.add('A' + rnd.nextInt(26));
-      tb.add("<x>").add(r.finish()).add("</x>");
-      r.reset();
+      tb.add("<x>").add(r.next()).add("</x>");
     }
     tb.add("</xml>");
     new CreateDB(NAME, tb.toString()).execute(context);

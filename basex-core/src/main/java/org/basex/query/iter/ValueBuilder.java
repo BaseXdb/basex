@@ -73,18 +73,6 @@ public final class ValueBuilder extends ValueIter implements Result {
   }
 
   @Override
-  public boolean sameAs(final Result result) {
-    if(!(result instanceof ValueBuilder)) return false;
-
-    final ValueBuilder vb = (ValueBuilder) result;
-    if(size != vb.size) return false;
-    for(int i = 0; i < size; ++i) {
-      if(items[i].type != vb.items[i].type || !items[i].sameAs(vb.items[i])) return false;
-    }
-    return true;
-  }
-
-  @Override
   public void serialize(final Serializer ser) throws IOException {
     for(int c = 0; c < size && !ser.finished(); ++c) serialize(ser, c);
   }
@@ -140,22 +128,26 @@ public final class ValueBuilder extends ValueIter implements Result {
     items[i] = item;
   }
 
+  /**
+   * Returns the cached items as value.
+   * @return sequence (internal representation!)
+   */
   @Override
   public Value value() {
     return Seq.get(items, size);
   }
 
   @Override
-  public ArrayOutput serialize() throws IOException {
+  public String serialize() throws IOException {
     final ArrayOutput ao = new ArrayOutput();
     serialize(Serializer.get(ao));
-    return ao;
+    return ao.toString();
   }
 
   @Override
   public String toString() {
     try {
-      return serialize().toString();
+      return serialize();
     } catch(final IOException ex) {
       throw Util.notExpected(ex);
     }

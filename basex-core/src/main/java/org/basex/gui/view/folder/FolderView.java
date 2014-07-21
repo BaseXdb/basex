@@ -112,7 +112,7 @@ public final class FolderView extends View {
     startY = 0;
     scroll.pos(0);
 
-    final Nodes curr = gui.context.current();
+    final DBNodes curr = gui.context.current();
     if(more && curr.size() != 0) jumpTo(curr.pres[0], true);
     refreshHeight();
     repaint();
@@ -138,7 +138,7 @@ public final class FolderView extends View {
     startY = 0;
     scroll.pos(0);
 
-    final Nodes marked = gui.context.marked;
+    final DBNodes marked = gui.context.marked;
     if(marked.size() != 0) jumpTo(marked.pres[0], true);
     refreshHeight();
     repaint();
@@ -202,7 +202,7 @@ public final class FolderView extends View {
    */
   private void drawString(final Graphics g, final int pre, final int x, final int y) {
     final Data data = gui.context.data();
-    final Nodes marked = gui.context.marked;
+    final DBNodes marked = gui.context.marked;
 
     final int kind = data.kind(pre);
     final boolean elem = kind == Data.ELEM || kind == Data.DOC;
@@ -371,7 +371,7 @@ public final class FolderView extends View {
     if(!focus(e.getX(), e.getY())) return;
 
     // add or remove marked node
-    final Nodes marked = gui.context.marked;
+    final DBNodes marked = gui.context.marked;
     if(e.getClickCount() == 2) {
       gui.notify.context(marked, false, null);
     } else if(e.isShiftDown()) {
@@ -462,7 +462,7 @@ public final class FolderView extends View {
 
     // calculate new tree position
     gui.context.focused = -1;
-    final Nodes curr = gui.context.current();
+    final DBNodes curr = gui.context.current();
     int pre = curr.pres[0];
     final FolderIterator it = new FolderIterator(this);
     while(it.more() && focus-- != 0) pre = it.pre;

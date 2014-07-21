@@ -193,7 +193,7 @@ final class JsonParser extends InputParser {
       cp = input.codePointAt(pos += cp < 0x10000 ? 1 : 2);
     } while(Character.isJavaIdentifierPart(cp));
     skipWs();
-    return tb.finish();
+    return tb.toArray();
   }
 
   /**
@@ -238,7 +238,7 @@ final class JsonParser extends InputParser {
           break loop;
         default:
           skipWs();
-          return tb.finish();
+          return tb.toArray();
       }
     }
 
@@ -253,7 +253,7 @@ final class JsonParser extends InputParser {
       } while(ch >= '0' && ch <= '9');
       if(ch != 'e' && ch != 'E') {
         skipWs();
-        return tb.finish();
+        return tb.toArray();
       }
     }
 
@@ -269,7 +269,7 @@ final class JsonParser extends InputParser {
     do tb.addByte((byte) consume());
     while((ch = curr()) >= '0' && ch <= '9');
     skipWs();
-    return tb.finish();
+    return tb.toArray();
   }
 
   /**
@@ -286,7 +286,7 @@ final class JsonParser extends InputParser {
       if(ch == '"') {
         if(hi != 0) tb.add(hi);
         skipWs();
-        return tb.finish();
+        return tb.toArray();
       }
 
       if(ch == '\\') {

@@ -211,8 +211,7 @@ public final class FNSql extends StandardFunc {
 
     final String query = string(checkStr(exprs[1], qc));
     try(final Statement stmt = ((Connection) obj).createStatement()) {
-      final boolean result = stmt.execute(query);
-      return result ? buildResult(stmt.getResultSet(), qc) : new NodeSeqBuilder();
+      return stmt.execute(query) ? buildResult(stmt.getResultSet(), qc) : new NodeSeqBuilder();
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.get(info, ex);
     }

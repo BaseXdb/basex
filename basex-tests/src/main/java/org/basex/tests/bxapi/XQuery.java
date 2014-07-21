@@ -46,12 +46,8 @@ public final class XQuery implements Iterable<XdmItem> {
    * @throws XQueryException exception
    */
   public XQuery context(final XdmValue value) {
-    try {
-      qp.context(value.internal());
-      return this;
-    } catch(final QueryException ex) {
-      throw new XQueryException(ex);
-    }
+    qp.context(value.internal());
+    return this;
   }
 
   /**

@@ -160,7 +160,7 @@ public final class TreeView extends View implements TreeConstants {
     super.paintComponent(g);
     gui.painting = true;
 
-    final Nodes nodes = gui.context.current();
+    final DBNodes nodes = gui.context.current();
     roots = nodes.pres;
     if(roots.length == 0) return;
 
@@ -526,7 +526,7 @@ public final class TreeView extends View implements TreeConstants {
         }
       }
     }
-    gui.notify.mark(new Nodes(list.toArray(), gui.context.data()), this);
+    gui.notify.mark(new DBNodes(gui.context.data(), list.finish()), this);
   }
 
   /**
@@ -1111,7 +1111,7 @@ public final class TreeView extends View implements TreeConstants {
       if(flv >= sub.subtreeHeight(frn)) return;
 
       if(tr.bigRect(sub, frn, flv)) {
-        final Nodes ns = new Nodes(gui.context.data());
+        final DBNodes ns = new DBNodes(gui.context.data());
         int sum = getHitBigRectNodesNum(frn, flv, frect);
         final int fix = sub.preIndex(frn, flv, fpre);
         if(fix + sum + 1 == sub.levelSize(frn, flv)) ++sum;
@@ -1140,8 +1140,8 @@ public final class TreeView extends View implements TreeConstants {
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
     if(gui.updating || gui.context.focused == -1) return;
-    if(e.getWheelRotation() <= 0) gui.notify.context(new Nodes(
-        gui.context.focused, gui.context.data()), false, null);
+    if(e.getWheelRotation() <= 0) gui.notify.context(new DBNodes(
+        gui.context.data(), gui.context.focused), false, null);
     else gui.notify.hist(false);
   }
 

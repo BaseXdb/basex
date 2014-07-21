@@ -160,7 +160,7 @@ public final class FNFile extends StandardFunc {
    * Returns the current working directory.
    * @return result
    */
-  private Str currentDir() {
+  private static Str currentDir() {
     return get(absolute(Paths.get(".")), true);
   }
 

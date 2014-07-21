@@ -85,8 +85,6 @@ public enum Err {
   BXDB_MEM(BXDB, 3, "Operation requires database '%' to be persistent."),
   /** BXDB0004. */
   BXDB_INDEX(BXDB, 4, "Database '%' has no % index."),
-  /** BXDB0005. */
-  BXDB_DBRETURN(BXDB, 5, "Query must yield database nodes."),
   /** BXDB0006. */
   BXDB_NODOC(BXDB, 6, "Database path '%' yields no documents."),
   /** BXDB0006. */
@@ -338,8 +336,6 @@ public enum Err {
   FILE_INVALID_PATH(FILE, "invalid-path", "Invalid file path: '%'."),
   /** File error. */
   FILE_IO_ERROR(FILE, "io-error", "%"),
-  /** File error. */
-  FILE_IO_ERROR_DEL(FILE, "io-error", "Path '%' cannot be deleted."),
   /** File error. */
   FILE_IE_ERROR_ACCESS(FILE, "io-error", "Access to '%' is denied."),
 
@@ -1459,7 +1455,7 @@ public enum Err {
       if(b != ' ' || l != ' ') tb.addByte(b);
       l = b;
     }
-    return tb.array();
+    return tb.finish();
   }
 
   @Override

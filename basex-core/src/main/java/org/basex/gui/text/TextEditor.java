@@ -568,15 +568,14 @@ public final class TextEditor {
     for(int i = s; i < e; i++) {
       final byte ch = tmp[i];
       if(ch == '\n') {
-        tl.add(bl.toArray());
-        bl.reset();
+        tl.add(bl.next());
       } else {
         bl.add(ch);
       }
     }
 
     // sort data and merge duplicate lines
-    if(!bl.isEmpty()) tl.add(bl.toArray());
+    if(!bl.isEmpty()) tl.add(bl.finish());
     tl.sort(gopts.get(GUIOptions.CASESORT), gopts.get(GUIOptions.ASCSORT));
     if(gopts.get(GUIOptions.MERGEDUPL)) tl.unique();
 

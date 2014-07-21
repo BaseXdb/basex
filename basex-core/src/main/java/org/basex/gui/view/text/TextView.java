@@ -45,7 +45,7 @@ public final class TextView extends View {
   /** Result command. */
   private Command cmd;
   /** Result nodes. */
-  private Nodes ns;
+  private DBNodes ns;
 
   /**
    * Default constructor.
@@ -140,7 +140,7 @@ public final class TextView extends View {
    * Serializes the specified nodes.
    * @param n nodes to display
    */
-  private void setText(final Nodes n) {
+  private void setText(final DBNodes n) {
     if(visible()) {
       try {
         final ArrayOutput ao = new ArrayOutput();
@@ -176,7 +176,7 @@ public final class TextView extends View {
     if(mh >= 0 && r != null && r.size() >= mh) {
       parse = true;
     } else if(out.finished()) {
-      if(r instanceof Nodes) ns = (Nodes) r;
+      if(r instanceof DBNodes) ns = (DBNodes) r;
       else parse = true;
     }
     // create new command instance

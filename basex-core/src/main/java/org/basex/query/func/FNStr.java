@@ -227,18 +227,18 @@ public final class FNStr extends StandardFunc {
     final int[] srch = cps(checkStr(exprs[1], qc));
     final int[] rep =  cps(checkStr(exprs[2], qc));
 
-    final TokenBuilder tmp = new TokenBuilder(tok.length);
+    final TokenBuilder tb = new TokenBuilder(tok.length);
     for(final int t : tok) {
       int j = -1;
       while(++j < srch.length && t != srch[j]) ;
       if(j < srch.length) {
         if(j >= rep.length) continue;
-        tmp.add(rep[j]);
+        tb.add(rep[j]);
       } else {
-        tmp.add(t);
+        tb.add(t);
       }
     }
-    return Str.get(tmp.finish());
+    return Str.get(tb.finish());
   }
 
   /**
@@ -294,7 +294,7 @@ public final class FNStr extends StandardFunc {
       final Item it = a.item(qc, info);
       if(it != null) tb.add(it.string(info));
     }
-    return Str.get(tb.array());
+    return Str.get(tb.finish());
   }
 
   /**

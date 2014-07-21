@@ -42,7 +42,7 @@ public final class Functions extends TokenSet {
   private Functions() {
     for(final Function def : Function.VALUES) {
       final String dsc = def.desc;
-      final byte[] ln = token(dsc.substring(0, dsc.indexOf(PAR1)));
+      final byte[] ln = token(dsc.substring(0, dsc.indexOf('(')));
       final int i = put(new QNm(ln, def.uri()).id());
       if(funcs[i] != null) throw Util.notExpected("Function defined twice: " + def);
       funcs[i] = def;
@@ -300,11 +300,11 @@ public final class Functions extends TokenSet {
    * @param key key of built-in function
    * @return query exception
    */
-  private QueryException similarError(final QNm name, final InputInfo ii, final byte[] key) {
+  private static QueryException similarError(final QNm name, final InputInfo ii, final byte[] key) {
     final int k = indexOf(key, '}');
     final byte[] u = substring(key, 2, k), l = substring(key, k + 1);
     return FUNCSIMILAR.get(ii, name.prefixId(FNURI),
-        new TokenBuilder(NSGlobal.prefix(u)).add(':').add(l));
+        new TokenBuilder(NSGlobal.prefix(u)).add(':').add(l).finish());
   }
 
   @Override

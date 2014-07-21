@@ -282,7 +282,7 @@ public final class BaseXServer extends CLI implements Runnable {
 
     // try to connect to the new server instance
     for(int c = 1; c < 10; ++c) {
-      Performance.sleep(c * 100);
+      Performance.sleep(c * 100L);
       if(ping(S_LOCALHOST, port)) return;
     }
     throw new BaseXException(CONNECTION_ERROR);

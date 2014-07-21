@@ -21,21 +21,21 @@ public final class DBNodeSeq extends NativeSeq {
   private final Data data;
   /** Pre values. */
   public final int[] pres;
-  /** Complete. */
-  public final boolean complete;
+  /** Pre values comprise all documents of the database. */
+  public final boolean all;
 
   /**
    * Constructor.
    * @param pres pre values
    * @param data data reference
-   * @param t node type
-   * @param complete indicates if pre values represent all document nodes of a database
+   * @param type node type
+   * @param all pre values comprise all documents of the database
    */
-  private DBNodeSeq(final int[] pres, final Data data, final Type t, final boolean complete) {
-    super(pres.length, t);
+  private DBNodeSeq(final int[] pres, final Data data, final Type type, final boolean all) {
+    super(pres.length, type);
     this.pres = pres;
     this.data = data;
-    this.complete = complete;
+    this.all = all;
   }
 
   @Override
@@ -77,27 +77,27 @@ public final class DBNodeSeq extends NativeSeq {
 
   /**
    * Creates a node sequence with the given data reference and pre values.
-   * @param v pre values
-   * @param d data reference
-   * @param docs indicates if all values reference document nodes
-   * @param c indicates if values include all document nodes of a database
+   * @param pres pre values
+   * @param data data reference
+   * @param docs all values reference document nodes
+   * @param all pre values comprise all documents of the database
    * @return resulting item or sequence
    */
-  public static Value get(final IntList v, final Data d, final boolean docs,
-      final boolean c) {
-    return get(v.toArray(), d, docs ? NodeType.DOC : NodeType.NOD, c);
+  public static Value get(final IntList pres, final Data data, final boolean docs,
+      final boolean all) {
+    return get(pres.toArray(), data, docs ? NodeType.DOC : NodeType.NOD, all);
   }
 
   /**
    * Creates a node sequence with the given data reference and pre values.
-   * @param v pre values
-   * @param d data reference
-   * @param t node type
-   * @param c indicates if values include all document nodes of a database
+   * @param pres pre values
+   * @param data data reference
+   * @param type node type
+   * @param all pre values comprise all documents of the database
    * @return resulting item or sequence
    */
-  private static Value get(final int[] v, final Data d, final Type t, final boolean c) {
-    return v.length == 0 ? Empty.SEQ : v.length == 1 ? new DBNode(d, v[0]) :
-      new DBNodeSeq(v, d, t, c);
+  private static Value get(final int[] pres, final Data data, final Type type, final boolean all) {
+    return pres.length == 0 ? Empty.SEQ : pres.length == 1 ? new DBNode(data, pres[0]) :
+      new DBNodeSeq(pres, data, type, all);
   }
 }

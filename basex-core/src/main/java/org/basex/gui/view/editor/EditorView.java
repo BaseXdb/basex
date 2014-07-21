@@ -602,7 +602,7 @@ public final class EditorView extends View {
       while(true) {
         try {
           final int cp = ti.read();
-          if(cp == -1) return text.array();
+          if(cp == -1) return text.finish();
           text.add(cp);
         } catch(final InputException ex) {
           if(valid) {
@@ -641,7 +641,7 @@ public final class EditorView extends View {
       if(fl.exists() && !fl.eq(file)) paths.add(fl.path());
     }
     // store sorted history
-    gui.gopts.set(GUIOptions.EDITOR, paths.toArray());
+    gui.gopts.set(GUIOptions.EDITOR, paths.finish());
     hist.setEnabled(!paths.isEmpty());
   }
 
@@ -828,7 +828,7 @@ public final class EditorView extends View {
     for(final EditorArea edit : editors()) {
       if(edit.opened()) files.add(edit.file.path());
     }
-    gui.gopts.set(GUIOptions.OPEN, files.toArray());
+    gui.gopts.set(GUIOptions.OPEN, files.finish());
     return true;
   }
 

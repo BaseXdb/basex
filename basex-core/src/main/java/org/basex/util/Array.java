@@ -142,7 +142,7 @@ public final class Array {
       final boolean ascending) {
     final IntList il = number(values.length);
     il.sort(values, numeric, ascending);
-    return il.toArray();
+    return il.finish();
   }
 
   /**
@@ -154,7 +154,7 @@ public final class Array {
   public static int[] createOrder(final double[] values, final boolean ascending) {
     final IntList il = number(values.length);
     il.sort(values, ascending);
-    return il.toArray();
+    return il.finish();
   }
 
   /**
@@ -166,7 +166,7 @@ public final class Array {
   public static int[] createOrder(final int[] values, final boolean ascending) {
     final IntList il = number(values.length);
     il.sort(values, ascending);
-    return il.toArray();
+    return il.finish();
   }
 
   /**

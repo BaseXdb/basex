@@ -236,7 +236,7 @@ public final class QNm extends Item {
 
   @Override
   public byte[] xdmInfo() {
-    return new ByteList().add(typeId().bytes()).add(uri()).add(0).toArray();
+    return new ByteList().add(typeId().bytes()).add(uri()).add(0).finish();
   }
 
   @Override
@@ -246,7 +246,7 @@ public final class QNm extends Item {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj.getClass() == QNm.class && eq((QNm) obj);
+    return obj instanceof QNm && eq((QNm) obj);
   }
 
   @Override

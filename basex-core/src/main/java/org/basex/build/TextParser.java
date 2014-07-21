@@ -51,9 +51,8 @@ public final class TextParser extends SingleParser {
       for(int ch; (ch = nli.read()) != -1;) {
         if(ch == '\n' && lines) {
           builder.openElem(LINE, atts, nsp);
-          builder.text(tb.finish());
+          builder.text(tb.next());
           builder.closeElem();
-          tb.reset();
         } else {
           tb.add(XMLToken.valid(ch) ? ch : '?');
         }

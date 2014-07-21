@@ -168,6 +168,6 @@ public final class JsonStringConverter extends JsonConverter {
 
   @Override
   public Item finish() {
-    return Str.get(tb.finish());
+    return Str.get(tb.toArray());
   }
 }

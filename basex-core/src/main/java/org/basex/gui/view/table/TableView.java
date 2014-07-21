@@ -94,7 +94,7 @@ public final class TableView extends View implements Runnable {
     if(!visible() || tdata.rows == null) return;
 
     final Context context = gui.context;
-    final Nodes marked = context.marked;
+    final DBNodes marked = context.marked;
     if(marked.size() != 0) {
       final int p = tdata.getRoot(context.data(), marked.pres[0]);
       if(p != -1) setPos(p);
@@ -246,9 +246,9 @@ public final class TableView extends View implements Runnable {
         query();
         //repaint();
       } else {
-        Nodes nodes = context.marked;
+        DBNodes nodes = context.marked;
         if(getCursor() == CURSORARROW) {
-          nodes = new Nodes(tdata.getRoot(nodes.data, pre), nodes.data);
+          nodes = new DBNodes(nodes.data, tdata.getRoot(nodes.data, pre));
         }
         gui.notify.context(nodes, false, null);
       }
@@ -258,7 +258,7 @@ public final class TableView extends View implements Runnable {
       it.init(pre);
       while(it.more()) {
         if(it.col == c) {
-          gui.notify.mark(new Nodes(it.pre, data), null);
+          gui.notify.mark(new DBNodes(data, it.pre), null);
           return;
         }
       }

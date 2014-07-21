@@ -135,7 +135,7 @@ public class BufferInput extends InputStream {
   public final byte[] readBytes() throws IOException {
     final ByteList bl = new ByteList();
     for(int l; (l = readByte()) > 0;) bl.add(l);
-    return bl.toArray();
+    return bl.finish();
   }
 
   @Override
@@ -192,7 +192,7 @@ public class BufferInput extends InputStream {
       // parse until end of stream
       final ByteList bl = new ByteList();
       for(int ch; (ch = readByte()) != -1;) bl.add(ch);
-      return bl.toArray();
+      return bl.finish();
     } finally {
       close();
     }

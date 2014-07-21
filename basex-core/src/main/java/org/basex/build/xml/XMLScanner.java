@@ -327,7 +327,7 @@ final class XMLScanner extends Proc {
     }
     // end of file
     if(!fragment) {
-      if(!ws(token.finish())) throw error(AFTERROOT);
+      if(!ws(token.toArray())) throw error(AFTERROOT);
       type = Type.EOF;
     }
   }

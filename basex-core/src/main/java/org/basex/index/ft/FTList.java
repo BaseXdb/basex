@@ -65,14 +65,14 @@ final class FTList {
     tp = new int[data.meta.maxlen + 3];
     for(int i = 0; i < tp.length; ++i) tp[i] = -1;
     sizes = data.meta.dbfile(DATAFTX + prefix + 'x');
-    final DataAccess li = new DataAccess(sizes);
-    int is = li.readNum();
-    while(--is >= 0) {
-      final int p = li.readNum();
-      tp[p] = li.read4();
+    try(final DataAccess li = new DataAccess(sizes)) {
+      int is = li.readNum();
+      while(--is >= 0) {
+        final int p = li.readNum();
+        tp[p] = li.read4();
+      }
+      tp[tp.length - 1] = (int) str.length();
     }
-    tp[tp.length - 1] = (int) str.length();
-    li.close();
     next();
   }
 

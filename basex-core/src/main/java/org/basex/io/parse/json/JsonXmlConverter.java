@@ -63,7 +63,7 @@ abstract class JsonXmlConverter extends JsonConverter {
         }
       }
       for(int i = 0; i < types.length; i++) {
-        if(types[i] != null) e.add(ATTRS[i], types[i].toArray());
+        if(types[i] != null) e.add(ATTRS[i], types[i].finish());
       }
     }
     return new FDoc().add(e);

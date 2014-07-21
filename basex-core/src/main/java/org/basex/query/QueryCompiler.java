@@ -275,6 +275,6 @@ final class QueryCompiler {
       final StaticVar var = (StaticVar) curr;
       throw Err.CIRCREF.get(var.info, "$" + var.name);
     }
-    return adj.toArray();
+    return adj.finish();
   }
 }

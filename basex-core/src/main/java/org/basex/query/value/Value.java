@@ -140,10 +140,10 @@ public abstract class Value extends Expr implements Iterable<Item> {
   /**
    * Writes this value's items out to the given array.
    * @param arr array to write to
-   * @param start start position
+   * @param index start position
    * @return number of written items
    */
-  public abstract int writeTo(final Item[] arr, final int start);
+  public abstract int writeTo(final Item[] arr, final int index);
 
   /**
    * Creates an {@link ValueBuilder}, containing all items of this value.

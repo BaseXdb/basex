@@ -136,6 +136,5 @@ public class MemValues extends TokenSet implements Index {
    * @param key record key
    * @param id record id
    */
-  @SuppressWarnings("unused")
   public void delete(final byte[] key, final int id) { }
 }

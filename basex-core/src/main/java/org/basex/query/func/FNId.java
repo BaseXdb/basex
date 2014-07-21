@@ -130,7 +130,7 @@ public final class FNId extends StandardFunc {
     for(Item id; (id = iter.next()) != null;) {
       for(final byte[] i : split(norm(checkEStr(id)), ' ')) tl.add(i);
     }
-    return tl.toArray();
+    return tl.finish();
   }
 
   /**

@@ -139,7 +139,7 @@ public final class QT3TSReport {
    * @param name name of element
    * @return element node
    */
-  private FElem element(final String name) {
+  private static FElem element(final String name) {
     return new FElem(name, URI).declareNS();
   }
 
@@ -149,7 +149,7 @@ public final class QT3TSReport {
    * @param parent parent node
    * @return element node
    */
-  private FElem element(final String name, final FElem parent) {
+  private static FElem element(final String name, final FElem parent) {
     final FElem elem = new FElem(name, URI);
     parent.add(elem);
     return elem;

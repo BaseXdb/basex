@@ -412,8 +412,7 @@ public final class QT3TS extends Main {
       right.add(tmp.finish());
       correct++;
     } else {
-      tmp.add("Expect: " + noComments(exp)).add(NL).add(NL);
-      wrong.add(tmp.finish());
+      wrong.add(tmp.add("Expect: ").add(noComments(exp)).add(NL).add(NL).finish());
     }
     if(report != null) report.addTest(name, exp == null);
   }
@@ -756,7 +755,7 @@ public final class QT3TS extends Main {
    * @return optional expected test suite result
    * @throws IOException I/O exception
    */
-  private String serialize(final XdmValue value, final SerializerOptions sprop)
+  private static String serialize(final XdmValue value, final SerializerOptions sprop)
       throws IOException {
 
     final ArrayOutput ao = new ArrayOutput();
@@ -781,9 +780,8 @@ public final class QT3TS extends Main {
     final TokenBuilder tb = new TokenBuilder();
     int c = 0;
     for(final XdmItem it : value) {
-      if(c != 0) tb.add(' ');
+      if(c++ != 0) tb.add(' ');
       tb.add(it.getString());
-      c++;
     }
 
     final String res = norm ? string(norm(tb.finish())) : tb.toString();

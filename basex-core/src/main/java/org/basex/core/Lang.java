@@ -132,7 +132,7 @@ public final class Lang {
     } catch(final IOException ex) {
       Util.errln(ex);
     }
-    return new String[][] { langs.toArray(), creds.toArray() };
+    return new String[][] { langs.finish(), creds.finish() };
   }
 
   /**

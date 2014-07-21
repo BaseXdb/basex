@@ -237,7 +237,7 @@ public class FNBin extends StandardFunc {
       if(l < 0 || l > 255) throw BIN_OOR_X.get(info, l);
       bl.add((int) l);
     }
-    return new B64(bl.toArray());
+    return new B64(bl.finish());
   }
 
   /**
@@ -282,7 +282,7 @@ public class FNBin extends StandardFunc {
     final ByteList bl = new ByteList();
     final Iter ir = qc.iter(exprs[0]);
     for(Item it; (it = ir.next()) != null;) bl.add(checkBin(it).binary(info));
-    return new B64(bl.toArray());
+    return new B64(bl.finish());
   }
 
   /**

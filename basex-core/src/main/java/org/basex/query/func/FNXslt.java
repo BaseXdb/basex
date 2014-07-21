@@ -116,7 +116,7 @@ public final class FNXslt extends StandardFunc {
       throw IOERR.get(info, ex);
     } catch(final TransformerException ex) {
       System.setErr(tmp);
-      throw BXSL_ERROR.get(info, trim(utf8(ao.toArray(), Prop.ENCODING)));
+      throw BXSL_ERROR.get(info, trim(utf8(ao.finish(), Prop.ENCODING)));
     } finally {
       System.setErr(tmp);
     }
@@ -133,7 +133,7 @@ public final class FNXslt extends StandardFunc {
     final Item it = checkItem(ex, qc);
     if(it.type.isNode()) {
       try {
-        final IO io = new IOContent(it.serialize().toArray());
+        final IO io = new IOContent(it.serialize().finish());
         io.name(string(((ANode) it).baseURI()));
         return io;
       } catch(final QueryIOException e) {
@@ -166,6 +166,6 @@ public final class FNXslt extends StandardFunc {
     // do transformation and return result
     final ArrayOutput ao = new ArrayOutput();
     tr.transform(in.streamSource(), new StreamResult(ao));
-    return ao.toArray();
+    return ao.finish();
   }
 }

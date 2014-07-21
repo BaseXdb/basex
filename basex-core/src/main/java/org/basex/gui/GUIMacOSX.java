@@ -139,7 +139,7 @@ public final class GUIMacOSX {
      * Finder or another application.
      * @param obj application event
      */
-    public void handleOpenFile(@SuppressWarnings("unused") final Object obj) {
+    public void handleOpenFile(final Object obj) {
       // get the associated filename:
       // final String name = (String) GUIMacOSX.invoke(obj, "getFilename");
     }

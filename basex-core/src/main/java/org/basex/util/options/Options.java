@@ -100,7 +100,7 @@ public class Options implements Iterable<Option<?>> {
       }
       tmp.add(NL).add(PROPUSER).add(NL);
       tmp.add(user.toString());
-      final byte[] content = tmp.array();
+      final byte[] content = tmp.finish();
 
       // only write file if contents have changed
       if(!file.exists() || !eq(content, file.read())) file.write(content);
@@ -624,8 +624,7 @@ public class Options implements Iterable<Option<?>> {
         if(ii == null) ii = new int[0];
         final IntList il = new IntList(ii.length + 1);
         for(final int i : ii) il.add(i);
-        il.add(v);
-        put(option, il.toArray());
+        put(option, il.add(v).finish());
       } else {
         if(num < 0 || num >= ii.length) throw new BaseXException(Text.OPT_OFFSET, option.name());
         ii[num] = v;
@@ -636,8 +635,7 @@ public class Options implements Iterable<Option<?>> {
         if(ss == null) ss = new String[0];
         final StringList sl = new StringList(ss.length + 1);
         for(final String s : ss) sl.add(s);
-        sl.add(val);
-        put(option, sl.toArray());
+        put(option, sl.add(val).finish());
       } else if(num == 0) {
         final int v = toInt(val);
         if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER, option.name());

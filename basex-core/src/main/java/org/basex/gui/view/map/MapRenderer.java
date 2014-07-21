@@ -599,10 +599,8 @@ final class MapRenderer {
         p = cc;
         // invert tokens
         ul = tl.size() - 1;
-        final byte[][] toks = tl.toArray();
-        final boolean[] tc = ttcol.toArray();
-        tl.reset();
-        ttcol.reset();
+        final byte[][] toks = tl.next();
+        final boolean[] tc = ttcol.next();
         for(int j = toks.length - 1; j >= 0; j--) {
           tl.add(toks[j]);
           ttcol.add(tc[j]);

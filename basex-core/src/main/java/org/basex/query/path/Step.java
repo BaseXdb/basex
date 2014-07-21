@@ -94,14 +94,14 @@ public abstract class Step extends Preds {
         qc.compInfo(OPTPRED, pr);
         final Expr[] and = ((Arr) pr).exprs;
         final int m = and.length - 1;
-        final ExprList tmp = new ExprList(preds.length + m);
-        for(final Expr e : Arrays.asList(preds).subList(0, p)) tmp.add(e);
+        final ExprList el = new ExprList(preds.length + m);
+        for(final Expr e : Arrays.asList(preds).subList(0, p)) el.add(e);
         for(final Expr a : and) {
           // wrap test with boolean() if the result is numeric
-          tmp.add(Function.BOOLEAN.get(null, info, a).compEbv(qc));
+          el.add(Function.BOOLEAN.get(null, info, a).compEbv(qc));
         }
-        for(final Expr e : Arrays.asList(preds).subList(p + 1, preds.length)) tmp.add(e);
-        preds = tmp.finish();
+        for(final Expr e : Arrays.asList(preds).subList(p + 1, preds.length)) el.add(e);
+        preds = el.array();
       } else {
         preds[p] = pr;
       }

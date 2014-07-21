@@ -51,10 +51,16 @@ public class IntList extends ElementList {
   /**
    * Adds an element to the array.
    * @param element element to be added
+   * @return self reference
    */
-  public final void add(final int element) {
-    if(size == list.length) list = Arrays.copyOf(list, newSize());
-    list[size++] = element;
+  public final IntList add(final int element) {
+    int[] lst = list;
+    int s = size;
+    if(s == lst.length) lst = Arrays.copyOf(lst, newSize());
+    lst[s++] = element;
+    list = lst;
+    size = s;
+    return this;
   }
 
   /**
@@ -83,7 +89,9 @@ public class IntList extends ElementList {
    * @return result of check
    */
   public final boolean contains(final int element) {
-    for(int i = 0; i < size; ++i) if(list[i] == element) return true;
+    final int s = size;
+    final int[] lst = list;
+    for(int i = 0; i < s; ++i) if(lst[i] == element) return true;
     return false;
   }
 
@@ -106,9 +114,11 @@ public class IntList extends ElementList {
    * @param element element to be removed
    */
   public final void delete(final int element) {
+    final int[] lst = list;
+    final int sz = size;
     int s = 0;
-    for(int i = 0; i < size; ++i) {
-      if(list[i] != element) list[s++] = list[i];
+    for(int i = 0; i < sz; ++i) {
+      if(lst[i] != element) lst[s++] = lst[i];
     }
     size = s;
   }
@@ -119,8 +129,9 @@ public class IntList extends ElementList {
    * @return deleted element
    */
   public final int deleteAt(final int index) {
-    final int l = list[index];
-    Array.move(list, index + 1, -1, --size - index);
+    final int[] lst = list;
+    final int l = lst[index];
+    Array.move(lst, index + 1, -1, --size - index);
     return l;
   }
 
@@ -130,7 +141,9 @@ public class IntList extends ElementList {
    * @param index index of the first element
    */
   public final void move(final int diff, final int index) {
-    for(int a = index; a < size; a++) list[a] += diff;
+    final int[] lst = list;
+    final int sz = size;
+    for(int a = index; a < sz; a++) lst[a] += diff;
   }
 
   /**
@@ -173,6 +186,28 @@ public class IntList extends ElementList {
    */
   public final int[] toArray() {
     return Arrays.copyOf(list, size);
+  }
+
+  /**
+   * Returns an array with all elements and resets the array size.
+   * @return array
+   */
+  public int[] next() {
+    final int[] lst = Arrays.copyOf(list, size);
+    reset();
+    return lst;
+  }
+
+  /**
+   * Returns an array with all elements and invalidates the internal array.
+   * Warning: the function must only be called if the builder is discarded afterwards.
+   * @return array (internal representation!)
+   */
+  public int[] finish() {
+    final int[] lst = list;
+    list = null;
+    final int s = size;
+    return s == lst.length ? lst : Arrays.copyOf(lst, s);
   }
 
   /**

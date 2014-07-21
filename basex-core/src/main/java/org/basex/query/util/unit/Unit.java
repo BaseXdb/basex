@@ -238,7 +238,6 @@ public final class Unit {
     }
   }
 
-
   /**
    * Creates a new element.
    * @param it item
@@ -247,15 +246,16 @@ public final class Unit {
    * @return new element
    * @throws QueryException query exception
    */
-  private FElem elem(final Item it, final byte[] name, final int c) throws QueryException {
+  private static FElem elem(final Item it, final byte[] name, final int c) throws QueryException {
     final FElem exp = new FElem(name);
-    if(it instanceof ANode) {
-      exp.add((ANode) it);
-    } else if(it != null) {
-      exp.add(it.string(null));
+    if(it != null) {
+      if(it instanceof ANode) {
+        exp.add((ANode) it);
+      } else {
+        exp.add(it.string(null));
+      }
+      exp.add(ITEM, token(c)).add(TYPE, it.type.toString());
     }
-    exp.add(ITEM, token(c));
-    exp.add(TYPE, it.type.toString());
     return exp;
   }
 
@@ -299,7 +299,7 @@ public final class Unit {
    * @return value
    * @throws QueryException query exception
    */
-  private int indexOf(final StaticFunc func, final byte[] name) throws QueryException {
+  private static int indexOf(final StaticFunc func, final byte[] name) throws QueryException {
     final Ann ann = func.ann;
     final int as = ann.size();
     int pos = -1;

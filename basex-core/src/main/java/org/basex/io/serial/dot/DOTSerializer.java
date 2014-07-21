@@ -62,7 +62,7 @@ public final class DOTSerializer extends OutputSerializer {
 
   @Override
   protected void finishOpen() throws IOException {
-    final byte[] attr = tb.finish();
+    final byte[] attr = tb.toArray();
     String color = color(elem);
     if(color == null) color = attr.length == 0 ? ELEM1 : ELEM2;
     print(concat(elem, attr), color);

@@ -46,20 +46,21 @@ public final class Context {
   /** Log. */
   public final Log log;
 
-  // GUI references
-  /** Marked nodes. */
-  public Nodes marked;
-  /** Copied nodes. */
-  public Nodes copied;
-  /** Focused node. */
-  public int focused = -1;
-
-  /** Node context. Set if it does not contain all documents of the current database. */
-  private Nodes current;
+  /** Current node context. Set if it does not contain all documents of the current database. */
+  private DBNodes current;
   /** Process locking. */
   private final Locking locks;
   /** Data reference. */
   private Data data;
+
+  // GUI references
+
+  /** Marked nodes. */
+  public DBNodes marked;
+  /** Copied nodes. */
+  public DBNodes copied;
+  /** Focused node. */
+  public int focused = -1;
 
   /**
    * Default constructor, which is usually called once in the lifetime of a project.
@@ -146,11 +147,12 @@ public final class Context {
    * Returns the current node context.
    * @return node set
    */
-  public Nodes current() {
-    if(current != null || data == null) return current;
-    final Nodes n = new Nodes(data.resources.docs().toArray(), data);
-    n.root = true;
-    return n;
+  public DBNodes current() {
+    if(data == null) return null;
+    if(current != null) return current;
+    final DBNodes nodes = new DBNodes(data, data.resources.docs().toArray());
+    nodes.all = true;
+    return nodes;
   }
 
   /**
@@ -158,8 +160,8 @@ public final class Context {
    * nodes of the currently opened database.
    * @param curr node set
    */
-  public void current(final Nodes curr) {
-    current = curr.checkRoot();
+  public void current(final DBNodes curr) {
+    current = curr.discardDocs();
   }
 
   /**
@@ -169,7 +171,7 @@ public final class Context {
   public void openDB(final Data dt) {
     data = dt;
     copied = null;
-    set(null, new Nodes(dt));
+    set(null, new DBNodes(dt));
   }
 
   /**
@@ -186,7 +188,7 @@ public final class Context {
    * @param curr context set
    * @param mark marked nodes
    */
-  public void set(final Nodes curr, final Nodes mark) {
+  public void set(final DBNodes curr, final DBNodes mark) {
     current = curr;
     marked = mark;
     focused = -1;

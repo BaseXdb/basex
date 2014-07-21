@@ -1,8 +1,6 @@
 # LANGUAGE FILE, TRANSLATED BY
 # Tuguldur Jamiyansharav, CSMS
 
-OFF                  = Хаалттай
-ON                   = Нээлттэй
 about_%              = % тухай
 access_denied        = Хандалт амжилтгүй.
 add                  = Нэмэх

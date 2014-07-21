@@ -101,7 +101,7 @@ public final class DBLocking implements Locking {
 
   @Override
   public void acquire(final Proc pr, final StringList read, final StringList write) {
-    final Long thread = Thread.currentThread().getId();
+    final long thread = Thread.currentThread().getId();
     if(writeLocked.containsKey(thread) || readLocked.containsKey(thread))
       throw new IllegalMonitorStateException("Thread already holds one or more locks.");
 

@@ -145,7 +145,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
         ErrorCodes.NO_SUCH_RESOURCE, ERR_UNKNOWN + data.meta.name);
 
     if(!data.startUpdate()) throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK);
-    data.delete(getResource(del.getId()).pos);
+    data.delete(getResource(del.getId()).pre);
     ctx.invalidate();
     data.finishUpdate();
   }

@@ -58,7 +58,7 @@ public final class Or extends Logical {
 
     if(exprs.length != el.size()) {
       qc.compInfo(OPTWRITE, this);
-      exprs = el.finish();
+      exprs = el.array();
     }
     compFlatten(qc);
 
@@ -98,19 +98,19 @@ public final class Or extends Logical {
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     int costs = 0;
-    final ExprList ex = new ExprList(exprs.length);
+    final ExprList el = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       // check if expression can be rewritten, and if access is not sequential
       if(!expr.indexAccessible(ii)) return false;
       // skip expressions without results
       if(ii.costs == 0) continue;
       costs += ii.costs;
-      ex.add(ii.expr);
+      el.add(ii.expr);
     }
     // use summarized costs for estimation
     ii.costs = costs;
     // no expressions means no costs: expression will later be ignored
-    ii.expr = ex.size() == 1 ? ex.get(0) : new Union(info, ex.finish());
+    ii.expr = el.size() == 1 ? el.get(0) : new Union(info, el.array());
     return true;
   }
 

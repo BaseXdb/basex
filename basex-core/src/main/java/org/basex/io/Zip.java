@@ -137,7 +137,7 @@ public final class Zip extends Proc {
       final byte[] data = new byte[IO.BLOCKSIZE];
       final ByteList bl = new ByteList();
       for(int c; (c = in.read(data)) != -1;) bl.add(data, 0, c);
-      return bl.toArray();
+      return bl.finish();
     }
     return null;
   }

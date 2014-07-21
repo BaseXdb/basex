@@ -79,8 +79,8 @@ public final class ItemSeq extends Seq {
   }
 
   @Override
-  public int writeTo(final Item[] arr, final int start) {
-    System.arraycopy(items, 0, arr, start, (int) size);
+  public int writeTo(final Item[] arr, final int index) {
+    System.arraycopy(items, 0, arr, index, (int) size);
     return (int) size;
   }
 

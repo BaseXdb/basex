@@ -32,10 +32,16 @@ public final class BoolList extends ElementList {
   /**
    * Adds an element.
    * @param element element to be added
+   * @return self reference
    */
-  public void add(final boolean element) {
-    if(size == list.length) list = Arrays.copyOf(list, newSize());
-    list[size++] = element;
+  public BoolList add(final boolean element) {
+    boolean[] lst = list;
+    int s = size;
+    if(s == lst.length) lst = Arrays.copyOf(lst, newSize());
+    lst[s++] = element;
+    list = lst;
+    size = s;
+    return this;
   }
 
   /**
@@ -88,6 +94,28 @@ public final class BoolList extends ElementList {
    */
   public boolean[] toArray() {
     return Arrays.copyOf(list, size);
+  }
+
+  /**
+   * Returns an array with all elements and resets the array size.
+   * @return array
+   */
+  public boolean[] next() {
+    final boolean[] lst = Arrays.copyOf(list, size);
+    reset();
+    return lst;
+  }
+
+  /**
+   * Returns an array with all elements and invalidates the internal array.
+   * Warning: the function must only be called if the builder is discarded afterwards.
+   * @return array (internal representation!)
+   */
+  public boolean[] finish() {
+    final boolean[] lst = list;
+    list = null;
+    final int s = size;
+    return s == lst.length ? lst : Arrays.copyOf(lst, s);
   }
 
   @Override

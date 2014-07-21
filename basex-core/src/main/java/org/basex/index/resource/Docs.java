@@ -76,7 +76,7 @@ final class Docs {
 
   /**
    * Returns the {@code pre} values of all document nodes.
-   * @return document nodes
+   * @return document nodes (internal representation!)
    */
   synchronized IntList docs() {
     if(docList == null) {
@@ -95,7 +95,7 @@ final class Docs {
 
   /**
    * Returns the document paths, and initializes them if necessary.
-   * @return document paths
+   * @return document paths (internal representation!)
    */
   private synchronized TokenList paths() {
     if(pathList == null) {
@@ -112,7 +112,7 @@ final class Docs {
 
   /**
    * Returns the document path order, and initialize the array if necessary.
-   * @return path order
+   * @return path order (internal representation!)
    */
   private synchronized int[] order() {
     if(pathOrder == null) {
@@ -128,27 +128,28 @@ final class Docs {
    */
   void insert(final int pre, final DataClip clip) {
     // find all document nodes in the given data instance
-    final IntList pres = new IntList();
+    final IntList il = new IntList();
     for(int dpre = clip.start; dpre < clip.end;) {
       final int k = clip.data.kind(dpre);
-      if(k == Data.DOC) pres.add(pre + dpre);
+      if(k == Data.DOC) il.add(pre + dpre);
       dpre += clip.data.size(dpre, k);
     }
+    final int[] pres = il.finish();
 
     // insert DOC nodes and move pre values of following DOC nodes
-    final int[] presA = pres.toArray();
+    final int ps = pres.length;
     final IntList docs = docs();
     final TokenList paths = paths();
 
     int i = docs.sortedIndexOf(pre);
     if(i < 0) i = -i - 1;
-    docs.insert(i, presA);
-    docs.move(clip.size(), i + pres.size());
+    docs.insert(i, pres);
+    docs.move(clip.size(), i + ps);
 
-    final byte[][] t = new byte[presA.length][];
+    final byte[][] t = new byte[ps][];
     for(int j = 0; j < t.length; j++) {
       // subtract pre to retrieve paths from given data instance
-      t[j] = normalize(clip.data.text(presA[j] - pre, true));
+      t[j] = normalize(clip.data.text(pres[j] - pre, true));
     }
     paths.insert(i, t);
     pathOrder = null;
@@ -201,7 +202,7 @@ final class Docs {
    * Returns the pre values of all document nodes matching the specified path.
    * @param path input path
    * @param exact exact (no prefix) matches
-   * @return root nodes
+   * @return root nodes (internal representation!)
    */
   synchronized IntList docs(final String path, final boolean exact) {
     // invalid path, or no documents: return empty list

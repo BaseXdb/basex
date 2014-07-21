@@ -83,7 +83,7 @@ public final class FTPosData {
    * @param ft reference to compare to
    * @return boolean same()
    */
-  boolean sameAs(final FTPosData ft) {
+  boolean equals(final FTPosData ft) {
     if(size != ft.size) return false;
     for(int i = 0; i < size; ++i) {
       if(pos[i].pre != ft.pos[i].pre || !Arrays.equals(
@@ -108,19 +108,5 @@ public final class FTPosData {
       else h = m - 1;
     }
     return -l - 1;
-  }
-
-  /**
-   * Creates a copy.
-   * @return copy
-   */
-  public FTPosData copy() {
-    final FTPosData ftpos = new FTPosData();
-    ftpos.dt = dt;
-    ftpos.size = size;
-    ftpos.pos = pos.clone();
-    for(int i = 0; i < ftpos.pos.length; i++)
-      if(ftpos.pos[i] != null) ftpos.pos[i] = ftpos.pos[i].copy();
-    return ftpos;
   }
 }

@@ -28,9 +28,9 @@ public final class ViewNotifier {
   final GUI gui;
 
   /** Zoomed rectangle history. */
-  private final Nodes[] marked = new Nodes[MAXHIST];
+  private final DBNodes[] marked = new DBNodes[MAXHIST];
   /** Zoomed rectangle history. */
-  private final Nodes[] cont = new Nodes[MAXHIST];
+  private final DBNodes[] cont = new DBNodes[MAXHIST];
   /** Command history. */
   private final String[] queries = new String[MAXHIST];
   /** Attached views. */
@@ -101,7 +101,7 @@ public final class ViewNotifier {
    * @param mark marked nodes
    * @param vw the calling view
    */
-  public void mark(final Nodes mark, final View vw) {
+  public void mark(final DBNodes mark, final View vw) {
     final Context ctx = gui.context;
     ctx.marked = mark;
     for(final View v : view) if(v != vw && v.visible()) v.refreshMark();
@@ -125,9 +125,9 @@ public final class ViewNotifier {
     if(f == -1) return;
 
     final Context ctx = gui.context;
-    Nodes nodes = ctx.marked;
+    DBNodes nodes = ctx.marked;
     if(mode == 0) {
-      nodes = new Nodes(f, ctx.data());
+      nodes = new DBNodes(ctx.data(), f);
     } else if(mode == 1) {
       nodes.union(new int[] { f });
     } else {
@@ -164,20 +164,20 @@ public final class ViewNotifier {
    * @param quick quick switch
    * @param vw the calling view
    */
-  public void context(final Nodes nodes, final boolean quick, final View vw) {
+  public void context(final DBNodes nodes, final boolean quick, final View vw) {
     final Context ctx = gui.context;
 
     // add new entry if current node set has not been cached yet
-    final Nodes newn = nodes.checkRoot();
-    final Nodes empty = new Nodes(new int[0], ctx.data(), ctx.marked.ftpos);
-    final Nodes curr = quick ? ctx.current() : null;
-    final Nodes cmp = quick ? curr : ctx.marked;
-    if(cont[hist] == null ? cmp != null : cmp == null || !cont[hist].sameAs(cmp)) {
+    final DBNodes newn = nodes.discardDocs();
+    final DBNodes empty = new DBNodes(ctx.data(), ctx.marked.ftpos(), new int[0]);
+    final DBNodes curr = quick ? ctx.current() : null;
+    final DBNodes cmp = quick ? curr : ctx.marked;
+    if(cont[hist] == null ? cmp != null : cmp == null || !cont[hist].equals(cmp)) {
       checkHist();
       if(quick) {
         // store history entry
         queries[hist] = "";
-        marked[hist] = new Nodes(ctx.data());
+        marked[hist] = new DBNodes(ctx.data());
         // add current entry
         cont[++hist] = curr;
       } else {
@@ -204,7 +204,7 @@ public final class ViewNotifier {
   public void update() {
     final Data data = initHistory(gui.context);
     if(data == null) return;
-    gui.context.marked = new Nodes(data);
+    gui.context.marked = new DBNodes(data);
     for(final View v : view) if(v.visible()) v.refreshUpdate();
     gui.refreshControls();
   }
@@ -263,7 +263,7 @@ public final class ViewNotifier {
     final Data data = ctx.data();
     if(data != null) {
       // new database opened
-      marked[0] = new Nodes(data);
+      marked[0] = new DBNodes(data);
       queries[0] = "";
     }
     return data;

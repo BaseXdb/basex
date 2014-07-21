@@ -102,7 +102,7 @@ public final class FNClient extends StandardFunc {
       cs.setOutputStream(ao);
       cs.execute(cmd);
       cs.setOutputStream(null);
-      return Str.get(ao.toArray());
+      return Str.get(ao.finish());
     } catch(final BaseXException ex) {
       throw BXCL_COMMAND.get(info, ex);
     } catch(final IOException ex) {

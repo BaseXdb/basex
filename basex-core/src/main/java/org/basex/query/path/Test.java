@@ -75,7 +75,6 @@ public abstract class Test {
    * @param qc query context
    * @return false if test always returns false
    */
-  @SuppressWarnings("unused")
   public boolean optimize(final QueryContext qc) {
     return true;
   }

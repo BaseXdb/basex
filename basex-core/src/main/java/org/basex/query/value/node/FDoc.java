@@ -121,7 +121,7 @@ public final class FDoc extends FNode {
 
   @Override
   public byte[] xdmInfo() {
-    return new ByteList().add(typeId().bytes()).add(uri).add(0).toArray();
+    return new ByteList().add(typeId().bytes()).add(uri).add(0).finish();
   }
 
   @Override

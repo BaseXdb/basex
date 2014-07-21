@@ -271,7 +271,7 @@ public final class Util {
     sl.add(clazz.getName()).add("-D").add(args);
 
     try {
-      return new ProcessBuilder(sl.toArray()).start();
+      return new ProcessBuilder(sl.finish()).start();
     } catch(final IOException ex) {
       throw notExpected(ex);
     }

@@ -140,7 +140,7 @@ public final class UpdatableDiskValues extends DiskValues {
     }
 
     // empty should contain sorted keys, since allkeys was sorted, too
-    if(!empty.isEmpty()) deleteKeys(empty.toArray());
+    if(!empty.isEmpty()) deleteKeys(empty.finish());
   }
 
   /**

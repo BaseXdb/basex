@@ -135,7 +135,7 @@ public final class FNConvert extends StandardFunc {
       n /= base;
     }
 
-    final byte[] res = tb.toArray();
+    final byte[] res = tb.finish();
     Array.reverse(res);
     return Str.get(res);
   }
@@ -318,6 +318,6 @@ public final class FNConvert extends StandardFunc {
     for(Item it; (it = ir.next()) != null;) {
       bl.add((int) ((ANum) checkType(it, AtomType.BYT)).itr());
     }
-    return bl.toArray();
+    return bl.finish();
   }
 }

@@ -150,9 +150,9 @@ public final class ValueIndexBuilder extends IndexBuilder {
     }
 
     // write number of entries to first position
-    final DataAccess da = new DataAccess(data.meta.dbfile(f + 'l'));
-    da.write4(sz);
-    da.close();
+    try(final DataAccess da = new DataAccess(data.meta.dbfile(f + 'l'))) {
+      da.write4(sz);
+    }
   }
 
   /**

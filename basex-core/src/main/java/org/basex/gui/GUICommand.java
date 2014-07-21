@@ -48,7 +48,7 @@ public interface GUICommand {
    * Returns a shortcut.
    * @return shortcut
    */
-  String shortcut();
+  String shortCut();
 
   /**
    * Returns the command shortcuts.

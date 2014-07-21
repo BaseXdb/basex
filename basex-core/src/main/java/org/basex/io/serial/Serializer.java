@@ -199,7 +199,6 @@ public abstract class Serializer {
    * @param ftp full-text positions, used for visualization highlighting
    * @throws IOException I/O exception
    */
-  @SuppressWarnings("unused")
   void finishText(final byte[] value, final FTPos ftp) throws IOException {
     text(value);
   }
@@ -369,7 +368,7 @@ public abstract class Serializer {
           final byte[] n = nd.name();
           final byte[] v = nd.string();
           attribute(n, v);
-          if(eq(n, XML_SPACE)) indent &= eq(v, DataText.DEFAULT);
+          if(eq(n, XML_SPACE) && indent) indent = eq(v, DataText.DEFAULT);
         }
         // serialize children
         ai = node.children();
@@ -458,7 +457,7 @@ public abstract class Serializer {
             final byte[] n = data.name(p, Data.ATTR);
             final byte[] v = data.text(p, false);
             attribute(n, v);
-            if(eq(n, XML_SPACE)) indent &= eq(v, DataText.DEFAULT);
+            if(eq(n, XML_SPACE) && indent) indent = eq(v, DataText.DEFAULT);
           }
           pars.push(r);
         }

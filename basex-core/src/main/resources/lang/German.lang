@@ -1,8 +1,6 @@
 # LANGUAGE FILE, TRANSLATED BY
 # BaseX Team
 
-OFF                  = AUS
-ON                   = AN
 about_%              = Über %
 access_denied        = Der Zugriff wurde verweigert.
 add                  = Hinzufügen

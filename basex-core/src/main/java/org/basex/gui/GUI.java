@@ -394,7 +394,7 @@ public final class GUI extends AGUI {
       if(gopts.get(GUIOptions.FILTERRT) && data != null && !context.root()) context.invalidate();
 
       // remember current command and context nodes
-      final Nodes current = context.current();
+      final DBNodes current = context.current();
       command = cmd;
 
       // execute command and cache result
@@ -442,8 +442,8 @@ public final class GUI extends AGUI {
         }
       } else {
         // get query result
-        final Result result = cmd.result();
-        Nodes nodes = result instanceof Nodes && result.size() != 0 ? (Nodes) result : null;
+        final Result result = cmd.finish();
+        DBNodes nodes = result instanceof DBNodes && result.size() != 0 ? (DBNodes) result : null;
 
         if(context.data() != data) {
           // database reference has changed - notify views
@@ -456,19 +456,19 @@ public final class GUI extends AGUI {
         } else if(result != null) {
           // check if result has changed
           final boolean flt = gopts.get(GUIOptions.FILTERRT);
-          final Nodes nd = context.current();
-          if(flt || nd != null && !nd.sameAs(current)) {
+          final DBNodes curr = context.current();
+          if(flt || curr != null && !curr.equals(current)) {
             // refresh context if at least one node was found
-            if(nodes != null) notify.context((Nodes) result, flt, null);
+            if(nodes != null) notify.context(nodes, flt, null);
           } else if(context.marked != null) {
             // refresh highlight
-            Nodes m = context.marked;
+            DBNodes m = context.marked;
             if(nodes != null) {
               // use query result
               m = nodes;
             } else if(m.size() != 0) {
               // remove old highlight
-              m = new Nodes(data);
+              m = new DBNodes(data);
             }
             // refresh views
             if(context.marked != m) notify.mark(m, null);
@@ -586,7 +586,7 @@ public final class GUI extends AGUI {
    * Refreshes the menu and the buttons.
    */
   public void refreshControls() {
-    final Nodes marked = context.marked;
+    final DBNodes marked = context.marked;
     if(marked != null) setResults(marked.size());
 
     filter.setEnabled(marked != null && marked.size() != 0);

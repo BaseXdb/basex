@@ -52,11 +52,11 @@ public final class XmlTokenBuilder {
   }
 
   /**
-   * Returns the original byte array if its size matches the token size, or returns a copy.
+   * Returns the original byte array.
    * @return XML token
    */
-  public byte[] array() {
-    return cache.array();
+  public byte[] toArray() {
+    return cache.toArray();
   }
 
   /**

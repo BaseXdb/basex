@@ -46,7 +46,7 @@ public class LocalQuery extends Query {
   protected void cache() throws IOException {
     final ArrayOutput ao = new ArrayOutput();
     ql.execute(true, ao, true, false);
-    cache(new ArrayInput(ao.toArray()));
+    cache(new ArrayInput(ao.finish()));
   }
 
   @Override

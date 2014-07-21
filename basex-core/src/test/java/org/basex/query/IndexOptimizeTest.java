@@ -8,7 +8,6 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
-import org.basex.io.out.*;
 import org.basex.query.expr.*;
 import org.basex.query.ft.*;
 import org.basex.util.*;
@@ -245,8 +244,8 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
     String plan = null;
     QueryProcessor qp = new QueryProcessor(query, context);
     try {
-      ArrayOutput ao = qp.execute().serialize();
-      if(result != null) assertEquals(result, ao.toString().replaceAll("\\r?\\n", ""));
+      String string = qp.execute().serialize();
+      if(result != null) assertEquals(result, string.replaceAll("\\r?\\n", ""));
 
       // fetch query plan
       plan = qp.plan().serialize().toString();
@@ -256,10 +255,10 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
       qp = new QueryProcessor(plan + "/descendant-or-self::*" +
           "[self::" + Util.className(ValueAccess.class) +
           "|self::" + Util.className(FTIndexAccess.class) + ']', context);
-      ao = qp.execute().serialize();
+      string = qp.execute().serialize();
 
       assertFalse("No index used:\n- Query: " + query + "\n- Plan: " + plan + "\n- " +
-          qp.info().trim(), ao.toString().isEmpty());
+          qp.info().trim(), string.isEmpty());
     } catch(final QueryException ex) {
       fail(Util.message(ex) + "\n- Query: " + query + "\n- Plan: " + plan);
     } catch(final IOException ex) {

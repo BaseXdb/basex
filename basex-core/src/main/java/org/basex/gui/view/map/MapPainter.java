@@ -36,7 +36,7 @@ abstract class MapPainter {
    */
   final Color color(final MapRects rects, final int ri) {
     // find marked node
-    final Nodes marked = view.gui.context.marked;
+    final DBNodes marked = view.gui.context.marked;
     if(marked != null) {
       final int p = -marked.find(rects.get(ri).pre) - 1;
       if(p >= 0) {

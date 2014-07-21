@@ -89,18 +89,19 @@ final class ProjectList extends JList<String> {
         for(int i = 0; i < is; i++) list[i] = Token.string(elements.key(i + 1));
         if(changed(list)) {
           // check which old values had been selected
-          final List<String> vals = getSelectedValuesList();
+          final List<String> values = getSelectedValuesList();
           final IntList il = new IntList();
-          for(final String val : vals) {
+          for(final String value : values) {
+            final byte[] val = Token.token(value);
             for(int i = 0; i < is; i++) {
-              if(val.equals(elements.key(i + 1))) {
+              if(Token.eq(val, elements.key(i + 1))) {
                 il.add(i);
                 break;
               }
             }
           }
           setListData(list);
-          setSelectedIndices(il.toArray());
+          setSelectedIndices(il.finish());
         }
         search = srch;
       }

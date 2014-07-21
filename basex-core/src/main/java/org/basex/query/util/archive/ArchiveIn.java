@@ -75,7 +75,7 @@ public abstract class ArchiveIn {
   public byte[] read() throws IOException {
     final ArrayOutput ao = new ArrayOutput();
     for(int c; (c = read(data)) != -1;) ao.write(data, 0, c);
-    return ao.toArray();
+    return ao.finish();
   }
 
   /**

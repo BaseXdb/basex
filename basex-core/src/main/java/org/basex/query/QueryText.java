@@ -746,8 +746,6 @@ public interface QueryText {
   /** Optimization info. */
   String OPTATOMIC = "atomic evaluation of %";
   /** Optimization info. */
-  String OPTMERGE = "merging axis paths";
-  /** Optimization info. */
   String OPTPRE = "pre-evaluating %";
   /** Optimization info. */
   String OPTWRITE = "rewriting %";
@@ -758,15 +756,11 @@ public interface QueryText {
   /** Optimization info. */
   String OPTTCE = "marking as tail call: %";
   /** Optimization info. */
-  String OPTREMCTX = "removing context expression (.)";
-  /** Optimization info. */
   String OPTFORLET = "moving for/let clauses";
   /** Optimization info. */
   String OPTFORTOLET = "rewriting singleton for to let";
   /** Optimization info. */
   String OPTSWAP = "swapping operands: %";
-  /** Optimization info. */
-  String OPTTEXT = "adding text() step";
   /** Optimization info. */
   String OPTFLWOR = "simplifying flwor expression";
   /** Optimization info. */
@@ -789,8 +783,6 @@ public interface QueryText {
   String OPTATVINDEX = "applying attribute index for %";
   /** Optimization info. */
   String OPTFTXINDEX = "applying full-text index for %";
-  /** Optimization info. */
-  String OPTSFTXINDEX = "applying sequential full-text index for %";
   /** Optimization info. */
   String OPTRNGINDEX = "applying range index for %";
   /** Optimization info. */

@@ -258,8 +258,8 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final int writeTo(final Item[] arr, final int start) {
-    arr[start] = this;
+  public final int writeTo(final Item[] arr, final int index) {
+    arr[index] = this;
     return 1;
   }
 

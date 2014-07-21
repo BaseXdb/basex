@@ -126,7 +126,7 @@ public final class TypeCase extends Single {
         if(!bl.isEmpty()) bl.add(or);
         bl.add(Token.token(t.toString()));
       }
-      e.add(planAttr(Token.token(TYPE), bl.toArray()));
+      e.add(planAttr(Token.token(TYPE), bl.finish()));
     }
     if(var != null) e.add(planAttr(VAR, Token.token(var.toString())));
     expr.plan(e);

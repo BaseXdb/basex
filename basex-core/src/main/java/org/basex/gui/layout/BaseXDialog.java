@@ -124,7 +124,6 @@ public abstract class BaseXDialog extends JDialog {
    * Reacts on user input; can be overwritten.
    * @param source source
    */
-  @SuppressWarnings("unused")
   public void action(final Object source) { }
 
   /**

@@ -44,8 +44,12 @@ public class StringList extends ElementList implements Iterable<String> {
    * @return self reference
    */
   public final StringList add(final String element) {
-    if(size == list.length) list = Array.copyOf(list, newSize());
-    list[size++] = element;
+    String[] lst = list;
+    int s = size;
+    if(s == lst.length) lst = Arrays.copyOf(lst, newSize());
+    lst[s++] = element;
+    list = lst;
+    size = s;
     return this;
   }
 
@@ -133,9 +137,11 @@ public class StringList extends ElementList implements Iterable<String> {
    * @param element element to be removed
    */
   public final void delete(final String element) {
+    final String[] lst = list;
+    final int sz = size;
     int s = 0;
-    for(int i = 0; i < size; ++i) {
-      if(!list[i].equals(element)) list[s++] = list[i];
+    for(int i = 0; i < sz; ++i) {
+      if(!lst[i].equals(element)) lst[s++] = lst[i];
     }
     size = s;
   }
@@ -146,6 +152,28 @@ public class StringList extends ElementList implements Iterable<String> {
    */
   public final String[] toArray() {
     return Array.copyOf(list, size);
+  }
+
+  /**
+   * Returns an array with all elements and resets the array size.
+   * @return array
+   */
+  public final String[] next() {
+    final String[] lst = Arrays.copyOf(list, size);
+    reset();
+    return lst;
+  }
+
+  /**
+   * Returns an array with all elements and invalidates the internal array.
+   * Warning: the function must only be called if the builder is discarded afterwards.
+   * @return array (internal representation!)
+   */
+  public String[] finish() {
+    final String[] lst = list;
+    list = null;
+    final int s = size;
+    return s == lst.length ? lst : Arrays.copyOf(lst, s);
   }
 
   /**

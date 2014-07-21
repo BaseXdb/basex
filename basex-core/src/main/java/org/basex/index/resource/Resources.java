@@ -53,7 +53,7 @@ public final class Resources implements Index {
 
   /**
    * Returns the {@code pre} values of all document nodes.
-   * @return document nodes
+   * @return document nodes (internal representation!)
    */
   public synchronized IntList docs() {
     return docs.docs();
@@ -104,7 +104,7 @@ public final class Resources implements Index {
   /**
    * Returns the pre values of all document nodes starting with the specified path.
    * @param path input path
-   * @return root nodes
+   * @return root nodes (internal representation!)
    */
   public synchronized IntList docs(final String path) {
     return docs.docs(path, false);
@@ -114,7 +114,7 @@ public final class Resources implements Index {
    * Returns the pre values of all document nodes matching the specified path.
    * @param path input path
    * @param exact exact (no prefix) matches
-   * @return root nodes
+   * @return root nodes (internal representation!)
    */
   public synchronized IntList docs(final String path, final boolean exact) {
     return docs.docs(path, exact);

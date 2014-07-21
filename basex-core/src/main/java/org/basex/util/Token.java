@@ -1013,10 +1013,7 @@ public final class Token {
     for(int i = 0; i < l; i += cl(token, i)) {
       final int c = cp(token, i);
       if(c == sep) {
-        if(!tb.isEmpty()) {
-          split[s++] = tb.finish();
-          tb.reset();
-        }
+        if(!tb.isEmpty()) split[s++] = tb.next();
       } else {
         tb.add(c);
       }

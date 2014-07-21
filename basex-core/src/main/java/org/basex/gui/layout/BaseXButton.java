@@ -116,7 +116,7 @@ public class BaseXButton extends JButton {
    */
   public static AbstractButton command(final GUICommand cmd, final GUI gui) {
     final String name = cmd.toString().toLowerCase(Locale.ENGLISH);
-    final AbstractButton button = get(name, cmd.shortcut(), cmd.toggle(), gui);
+    final AbstractButton button = get(name, cmd.shortCut(), cmd.toggle(), gui);
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {

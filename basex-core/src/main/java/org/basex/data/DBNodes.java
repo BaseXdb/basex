@@ -11,82 +11,56 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * This class stores node references of a database in an ascending order.
+ * This class stores database nodes in an ascending order.
  * Instances of this class are used in the {@link Context} class to
  * reference the currently used, marked, and copied nodes.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class Nodes implements Result {
-  /** Full-text position data (for visualization). */
-  public FTPosData ftpos;
-  /** Root flag (nodes represent all document nodes of the database). */
-  public boolean root;
+public final class DBNodes implements Result {
+  /** Pre values comprise all documents of the database. */
+  public boolean all;
   /** Root node. */
   public Data data;
   /** Pre values. */
   public int[] pres;
   /** Sorted pre values. */
   public int[] sorted;
+  /** Full-text position data (for visualization). */
+  private FTPosData ftpos;
 
   /**
-   * Constructor, specifying a database instance.
+   * Constructor, specifying a database and pre values.
    * @param data data reference
-   */
-  public Nodes(final Data data) {
-    this(new int[0], data);
-  }
-
-  /**
-   * Constructor, specifying a single node and a database instance.
-   * @param pre pre value
-   * @param data data reference
-   */
-  public Nodes(final int pre, final Data data) {
-    this(new int[] { pre }, data);
-  }
-
-  /**
-   * Constructor, specifying a node set and a database instance.
    * @param pres pre values
-   * @param data data reference
    */
-  public Nodes(final int[] pres, final Data data) {
-    this(pres, data, Prop.gui ? new FTPosData() : null);
+  public DBNodes(final Data data, final int... pres) {
+    this(data, null, pres);
   }
 
   /**
-   * Constructor, specifying a node set, a database instance, and full-text
-   * positions.
-   * @param pres pre values
+   * Constructor, specifying a database, pre values and full-text positions.
    * @param data data reference
    * @param ftpos ft position data
-   */
-  public Nodes(final int[] pres, final Data data, final FTPosData ftpos) {
-    this.data = data;
-    this.ftpos = ftpos;
-    set(pres);
-    if(data == null) throw Util.notExpected("No data available");
-  }
-
-  /**
-   * Constructor, which should only used by test classes.
-   * No database reference is specified.
    * @param pres pre values
    */
-  public Nodes(final int[] pres) {
+  public DBNodes(final Data data, final FTPosData ftpos, final int... pres) {
+    this.data = data;
+    this.ftpos = ftpos;
     this.pres = pres;
   }
 
   /**
-   * Copy constructor.
-   * @param nodes nodes to copy
+   * Constructor, specifying a database, pre values and full-text positions.
+   * @param data data reference
+   * @param all pre values comprise all documents of the database
+   * @param pres pre values
    */
-  public Nodes(final Nodes nodes) {
-    this(nodes.pres.clone(), nodes.data, nodes.ftpos == null ? null : nodes.ftpos.copy());
-    root = nodes.root;
-    if(nodes.sorted != null) sorted = nodes.sorted.clone();
+  public DBNodes(final Data data, final boolean all, final int... pres) {
+    this.data = data;
+    this.all = all;
+    this.pres = pres;
   }
 
   @Override
@@ -94,22 +68,26 @@ public final class Nodes implements Result {
     return pres.length;
   }
 
-  @Override
-  public boolean sameAs(final Result result) {
-    final int s = pres.length;
-    if(!(result instanceof Nodes) || result.size() != s) return false;
-    final Nodes n = (Nodes) result;
-    if(data != n.data) return false;
-    for(int c = 0; c < s; ++c) if(n.pres[c] != pres[c]) return false;
-    return ftpos == null || ftpos.sameAs(n.ftpos);
+  /**
+   * Compares results for equality.
+   * @param result result to be compared
+   * @return true if results are equal
+   */
+  public boolean equals(final DBNodes result) {
+    final int[] ps = pres, ps2 = result.pres;
+    final int pl = ps.length;
+    if(pl != ps2.length || data != result.data) return false;
+    for(int c = 0; c < pl; ++c) if(ps2[c] != ps[c]) return false;
+    return ftpos == null ? result.ftpos == null : ftpos.equals(result.ftpos);
   }
 
   /**
-   * Checks if the node set contains all root nodes of the data instance.
-   * If yes, returns {@code null}.
-   * @return self reference
+   * Returns {@code null} if the pre values comprise all documents of the database.
+   * @return self reference or {@code null}
    */
-  public Nodes checkRoot() {
+  public DBNodes discardDocs() {
+    if(all) return null;
+
     final IntList docs = data.resources.docs();
     final int[] ps = pres;
     final int pl = ps.length;
@@ -158,6 +136,14 @@ public final class Nodes implements Result {
   }
 
   /**
+   * Returns full-text position data.
+   * @return position data
+   */
+  public FTPosData ftpos() {
+    return ftpos;
+  }
+
+  /**
    * Merges two sorted integer arrays via union.
    * Note that the input arrays must be sorted.
    * @param pres1 first set
@@ -166,16 +152,16 @@ public final class Nodes implements Result {
    */
   private static int[] union(final int[] pres1, final int[] pres2) {
     final int al = pres1.length, bl = pres2.length;
-    final IntList c = new IntList();
+    final IntList il = new IntList();
     int a = 0, b = 0;
     while(a != al && b != bl) {
       final int d = pres1[a] - pres2[b];
-      c.add(d <= 0 ? pres1[a++] : pres2[b++]);
+      il.add(d <= 0 ? pres1[a++] : pres2[b++]);
       if(d == 0) ++b;
     }
-    while(a != al) c.add(pres1[a++]);
-    while(b != bl) c.add(pres2[b++]);
-    return c.toArray();
+    while(a != al) il.add(pres1[a++]);
+    while(b != bl) il.add(pres2[b++]);
+    return il.finish();
   }
 
   /**
@@ -187,16 +173,16 @@ public final class Nodes implements Result {
    */
   private static int[] except(final int[] pres1, final int[] pres2) {
     final int al = pres1.length, bl = pres2.length;
-    final IntList c = new IntList();
+    final IntList il = new IntList();
     int a = 0, b = 0;
     while(a != al && b != bl) {
       final int d = pres1[a] - pres2[b];
-      if(d < 0) c.add(pres1[a]);
+      if(d < 0) il.add(pres1[a]);
       else ++b;
       if(d <= 0) ++a;
     }
-    while(a != al) c.add(pres1[a++]);
-    return c.toArray();
+    while(a != al) il.add(pres1[a++]);
+    return il.finish();
   }
 
   /**
@@ -228,7 +214,7 @@ public final class Nodes implements Result {
 
   @Override
   public void serialize(final Serializer ser) throws IOException {
-    for(int c = 0; c < pres.length && !ser.finished(); ++c) serialize(ser, c);
+    for(int c = 0; c < pres.length && !ser.finished(); c++) serialize(ser, c);
   }
 
   @Override
@@ -237,16 +223,16 @@ public final class Nodes implements Result {
   }
 
   @Override
-  public ArrayOutput serialize() throws IOException {
+  public String serialize() throws IOException {
     final ArrayOutput ao = new ArrayOutput();
     serialize(Serializer.get(ao));
-    return ao;
+    return ao.toString();
   }
 
   @Override
   public String toString() {
     try {
-      return serialize().toString();
+      return serialize();
     } catch(final IOException ex) {
       throw Util.notExpected(ex);
     }

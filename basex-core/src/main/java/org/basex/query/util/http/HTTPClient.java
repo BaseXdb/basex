@@ -21,7 +21,6 @@ import org.basex.query.util.http.HTTPRequest.Part;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.Base64;
 import org.basex.util.hash.*;
 
 /**
@@ -197,7 +196,7 @@ public final class HTTPClient {
    * @return encoded credentials
    */
   private static String encodeCredentials(final String u, final String p) {
-    return BASIC + ' ' + Base64.encode(u + ':' + p);
+    return BASIC + ' ' + org.basex.util.Base64.encode(u + ':' + p);
   }
 
   /**
@@ -220,9 +219,9 @@ public final class HTTPClient {
         method = SerialMethod.XHTML.toString();
       } else if(eq(type, TEXT_HTML)) {
         method = SerialMethod.HTML.toString();
-      } else if(type != null && isXML(type)) {
+      } else if(isXML(type)) {
         method = SerialMethod.XML.toString();
-      } else if(type != null && isText(type)) {
+      } else if(isText(type)) {
         method = SerialMethod.TEXT.toString();
       } else {
         // default serialization method is XML
@@ -281,7 +280,8 @@ public final class HTTPClient {
    * @param out output stream
    * @throws IOException I/O exception
    */
-  private void writeMultipart(final HTTPRequest r, final OutputStream out) throws IOException {
+  private static void writeMultipart(final HTTPRequest r, final OutputStream out)
+      throws IOException {
     final byte[] boundary = r.payloadAttrs.get(BOUNDARY);
     for(final Part part : r.parts) writePart(part, out, boundary);
     out.write(new TokenBuilder("--").add(boundary).add("--").add(CRLF).finish());

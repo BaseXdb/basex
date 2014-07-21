@@ -336,7 +336,6 @@ public abstract class Formatter extends FormatUtil {
 
     final TokenBuilder tb = new TokenBuilder();
     final int ch = fp.first;
-
     if(ch == 'w') {
       tb.add(word(n, fp.ordinal));
     } else if(ch == KANJI[1]) {
@@ -436,7 +435,7 @@ public abstract class Formatter extends FormatUtil {
 
     int n = c == 0 ? num / 60 : num % 60;
     if(num < 0) n = -n;
-    return number(n, new IntFormat(format.finish(), null), zeroes(format.cp(0)));
+    return number(n, new IntFormat(format.toArray(), null), zeroes(format.cp(0)));
   }
 
   /**

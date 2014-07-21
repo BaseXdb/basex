@@ -44,7 +44,7 @@ public final class Except extends Set {
     // ensure that results are always sorted
     if(el.size() == 1 && iterable) return el.get(0);
     // replace expressions with optimized list
-    exprs = el.finish();
+    exprs = el.array();
     return this;
   }
 

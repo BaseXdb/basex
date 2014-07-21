@@ -69,9 +69,8 @@ final class DataFTBuilder {
       if(ftp.contains(span.pos) || marked) {
         if(!tb.isEmpty()) {
           // write current text node
-          tl.add(tb.finish());
           len += tb.size();
-          tb.reset();
+          tl.add(tb.next());
           // skip construction
           if(len >= 0 && tl.size() > 1 && !marked) break;
         }
@@ -83,8 +82,8 @@ final class DataFTBuilder {
     }
     // write last text node
     if(!tb.isEmpty()) {
-      tl.add(tb.finish());
       len += tb.size();
+      tl.add(tb.finish());
     }
 
     // chop first and last text

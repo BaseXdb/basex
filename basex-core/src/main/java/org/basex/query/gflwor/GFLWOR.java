@@ -749,7 +749,6 @@ public final class GFLWOR extends ParseExpr {
      * @param decl variables declared by this FLWOR expression
      * @return {@code true} if something changed, {@code false} otherwise
      */
-    @SuppressWarnings("unused")
     boolean clean(final QueryContext qc, final IntObjMap<Var> decl, final BitArray used) {
       return false;
     }

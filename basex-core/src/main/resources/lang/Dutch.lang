@@ -1,8 +1,6 @@
 # LANGUAGE FILE, TRANSLATED BY
 # Huib Verweij
 
-OFF                  = UIT
-ON                   = AAN
 about_%              = Over %
 access_denied        = Toegang geweigerd.
 add                  = Toevoegen

@@ -304,8 +304,7 @@ public final class BaseXDSlider extends BaseXPanel {
       w = s.getWidth() - LABELW - ARROW * 2;
       dist = s.encode(s.totMax - s.totMin);
       xs = (int) (s.encode(s.min - s.totMin) * w / dist);
-      xe = (s.totMin == s.totMax ? w :
-        (int) (s.encode(s.max - s.totMin) * w / dist)) + ARROW;
+      xe = (s.totMin == s.totMax ? w : (int) (s.encode(s.max - s.totMin) * w / dist)) + ARROW;
     }
   }
 }

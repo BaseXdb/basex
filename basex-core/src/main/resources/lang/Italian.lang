@@ -1,8 +1,6 @@
 # LANGUAGE FILE, TRANSLATED BY
 # Massimo Franceschet
 
-OFF                  = OFF
-ON                   = ON
 about_%              = Su %
 access_denied        = Accesso negato.
 add                  = Aggiungi

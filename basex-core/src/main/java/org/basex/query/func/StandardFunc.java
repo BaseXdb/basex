@@ -124,7 +124,7 @@ public abstract class StandardFunc extends Arr {
     } catch(final IOException ex) {
       throw err.get(info, ex);
     }
-    return ao.toArray();
+    return ao.finish();
   }
 
   @Override

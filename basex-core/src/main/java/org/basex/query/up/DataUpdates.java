@@ -133,7 +133,7 @@ final class DataUpdates {
           --p;
         }
         if(par != -1) il.add(par);
-        checkNames(il.toArray());
+        checkNames(il.finish());
       } else {
         if(k == Data.ELEM) checkNames(pre);
         --p;
@@ -142,13 +142,6 @@ final class DataUpdates {
 
     // build atomic update cache
     auc = createAtomicUpdates(preparePrimitives());
-  }
-
-  /**
-   * Locks the database for write operations.
-   */
-  void finishUpdate() {
-    data.finishUpdate();
   }
 
   /**

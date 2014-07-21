@@ -37,8 +37,12 @@ public class ByteList extends ElementList {
    * @return self reference
    */
   public ByteList add(final int element) {
-    if(size == list.length) list = Arrays.copyOf(list, newSize());
-    list[size++] = (byte) element;
+    byte[] lst = list;
+    int s = size;
+    if(s == lst.length) lst = Arrays.copyOf(lst, newSize());
+    lst[s++] = (byte) element;
+    list = lst;
+    size = s;
     return this;
   }
 
@@ -80,7 +84,30 @@ public class ByteList extends ElementList {
    * @return array
    */
   public byte[] toArray() {
-    return Arrays.copyOf(list, size);
+    final int s = size;
+    return s == 0 ? EMPTY : Arrays.copyOf(list, s);
+  }
+
+  /**
+   * Returns an array with all elements and resets the array size.
+   * @return array
+   */
+  public final byte[] next() {
+    final int s = size;
+    if(s == 0) return EMPTY;
+    size = 0;
+    return Arrays.copyOf(list, s);
+  }
+  /**
+   * Returns an array with all elements and invalidates the internal array.
+   * Warning: the function must only be called if the builder is discarded afterwards.
+   * @return array (internal representation!)
+   */
+  public byte[] finish() {
+    final byte[] lst = list;
+    list = null;
+    final int s = size;
+    return s == 0 ? EMPTY : s == lst.length ? lst : Arrays.copyOf(lst, s);
   }
 
   @Override

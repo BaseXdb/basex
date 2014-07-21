@@ -34,7 +34,6 @@ public class ClientQuery extends Query {
    */
   ClientQuery(final String query, final ClientSession session, final OutputStream output)
       throws IOException {
-
     cs = session;
     out = output;
     id = session.exec(ServerCmd.QUERY, query, null);

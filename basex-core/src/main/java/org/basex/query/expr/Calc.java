@@ -294,7 +294,7 @@ public enum Calc {
    * @return duration
    * @throws QueryException query exception
    */
-  final Dur checkDur(final InputInfo ii, final Item it) throws QueryException {
+  static final Dur checkDur(final InputInfo ii, final Item it) throws QueryException {
     final Type ip = it.type;
     if(!(it instanceof Dur)) throw NODUR.get(ii, ip, it);
     if(ip == DUR) throw NOSUBDUR.get(ii, it);
@@ -308,7 +308,8 @@ public enum Calc {
    * @param it2 second item
    * @throws QueryException query exception
    */
-  final void checkNum(final InputInfo ii, final Item it1, final Item it2) throws QueryException {
+  static final void checkNum(final InputInfo ii, final Item it1, final Item it2)
+      throws QueryException {
     if(!it1.type.isNumberOrUntyped()) throw numberError(ii, it1);
     if(!it2.type.isNumberOrUntyped()) throw numberError(ii, it2);
   }

@@ -90,9 +90,9 @@ final class PlotData {
    * @param nodes nodes to be displayed
    * @param sub determine descendant nodes of given context nodes
    */
-  void refreshItems(final Nodes nodes, final boolean sub) {
+  void refreshItems(final DBNodes nodes, final boolean sub) {
     final Data data = context.data();
-    final IntList tmpPres = new IntList();
+    final IntList il = new IntList();
     final int itmID = data.elmindex.id(item);
 
     if(!sub) {
@@ -108,14 +108,14 @@ final class PlotData {
       while(p < nl) {
         final int kind = data.kind(p);
         if(kind == Data.ELEM) {
-          if(data.name(p) == itmID) tmpPres.add(p);
+          if(data.name(p) == itmID) il.add(p);
           p += data.attSize(p, Data.ELEM);
         } else {
           ++p;
         }
       }
     }
-    pres = tmpPres.toArray();
+    pres = il.finish();
     Arrays.sort(pres);
   }
 

@@ -54,7 +54,7 @@ public abstract class Iter {
   }
 
   /**
-   * Returns a sequence with all iterator values.
+   * Returns a value with all iterated items.
    * Must only be called if {@link #next} has not been called before.
    * @return sequence
    * @throws QueryException query exception

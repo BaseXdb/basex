@@ -38,6 +38,6 @@ public final class BaseXHistory {
     for(final String s : gui.gopts.get(history)) {
       if(sl.size() < MAX &&  !input.equals(s)) sl.add(s);
     }
-    gui.gopts.set(history, sl.toArray());
+    gui.gopts.set(history, sl.finish());
   }
 }

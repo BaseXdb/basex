@@ -105,7 +105,7 @@ public final class DialogPackages extends BaseXDialog {
     final Context ctx = gui.context;
     if(refresh) {
       // rebuild databases and focus list chooser
-      packages.setData(new RepoManager(ctx).list().toArray());
+      packages.setData(new RepoManager(ctx).list().finish());
       packages.requestFocusInWindow();
       refresh = false;
     }

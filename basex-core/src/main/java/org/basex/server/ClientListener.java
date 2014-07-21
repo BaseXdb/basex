@@ -234,8 +234,9 @@ public final class ClientListener extends Thread {
     running = false;
 
     // wait until running command was stopped
-    if(command != null) {
-      command.stop();
+    final Command c = command;
+    if(c != null) {
+      c.stop();
       do Performance.sleep(50); while(command != null);
     }
     context.sessions.remove(this);

@@ -144,7 +144,7 @@ public final class Users {
     for(final User u : list) {
       if(pattern.matcher(u.name).matches()) sl.add(u.name);
     }
-    return sl.toArray();
+    return sl.finish();
   }
 
   /**

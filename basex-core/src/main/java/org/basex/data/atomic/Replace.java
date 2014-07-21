@@ -94,15 +94,13 @@ final class Replace extends StructuralUpdate {
       // check text / comment values
       if(sk == Data.TEXT || sk == Data.COMM) {
         final byte[] srcText = src.text(s, true);
-        if(data.textLen(t, true) != src.textLen(s, true) ||
-            !eq(data.text(t, true), srcText))
+        if(data.textLen(t, true) != src.textLen(s, true) || !eq(data.text(t, true), srcText))
           valueUpdates.add(UpdateValue.getInstance(data, t, srcText));
       } else {
         // check element, attribute, processing instruction name
         final byte[] srcName = src.name(s, sk);
         final byte[] trgName = data.name(t, tk);
-        if(!eq(srcName, trgName))
-          valueUpdates.add(Rename.getInstance(data, t, srcName, EMPTY));
+        if(!eq(srcName, trgName)) valueUpdates.add(Rename.getInstance(data, t, srcName, EMPTY));
         switch(sk) {
           case Data.ELEM:
             // check size of elements

@@ -41,8 +41,7 @@ public final class CmdBuilder {
    * @return self instance
    */
   public CmdBuilder init(final String string) {
-    tb.reset();
-    tb.add(string);
+    tb.reset().add(string);
     return this;
   }
 

@@ -260,7 +260,7 @@ public final class FNValidate extends StandardFunc {
       // return node in string representation
       final ArrayOutput ao = new ArrayOutput();
       Serializer.get(ao, sopts).serialize(it);
-      final IOContent io = new IOContent(ao.toArray());
+      final IOContent io = new IOContent(ao.finish());
       io.name(string(((ANode) it).baseURI()));
       return io;
     }
@@ -271,7 +271,7 @@ public final class FNValidate extends StandardFunc {
         // add doctype declaration if specified
         final ArrayOutput ao = new ArrayOutput();
         Serializer.get(ao, sopts).serialize(new DBNode(io, qc.context.options));
-        io = new IOContent(ao.toArray());
+        io = new IOContent(ao.finish());
         io.name(io.path());
       }
       return io;

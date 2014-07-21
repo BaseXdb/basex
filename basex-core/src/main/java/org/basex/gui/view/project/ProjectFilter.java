@@ -159,7 +159,7 @@ final class ProjectFilter extends BaseXBack {
     final IntList il = new IntList();
     final TokenParser tp = new TokenParser(Token.token(content));
     while(tp.more()) il.add(Token.lc(tp.next()));
-    if(filter(file, il.toArray(), thread, results)) {
+    if(filter(file, il.finish(), thread, results)) {
       project.list.setElements(results, content.isEmpty() ? null : content);
     }
 

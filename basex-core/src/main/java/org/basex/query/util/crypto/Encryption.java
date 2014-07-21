@@ -191,7 +191,7 @@ public final class Encryption {
       mac.init(key);
       final byte[] hash = mac.doFinal(msg);
       // convert to specified encoding, base64 as a standard, else use hex
-      return Str.get(b64 ? Base64.encode(hash) : hex(hash, true));
+      return Str.get(b64 ? org.basex.util.Base64.encode(hash) : hex(hash, true));
     } catch(final NoSuchAlgorithmException e) {
       throw CX_INVHASH.get(info, e);
     } catch(final InvalidKeyException e) {

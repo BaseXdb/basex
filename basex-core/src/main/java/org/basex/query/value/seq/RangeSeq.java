@@ -39,12 +39,12 @@ public final class RangeSeq extends Seq {
   /**
    * Returns a value representation of the specified items.
    * @param min minimum value
-   * @param sz size
+   * @param size size
    * @param asc ascending
    * @return resulting item or sequence
    */
-  public static Value get(final long min, final long sz, final boolean asc) {
-    return sz < 1 ? Empty.SEQ : sz == 1 ? Int.get(min) : new RangeSeq(min, sz, asc);
+  public static Value get(final long min, final long size, final boolean asc) {
+    return size < 1 ? Empty.SEQ : size == 1 ? Int.get(min) : new RangeSeq(min, size, asc);
   }
 
   @Override
@@ -72,8 +72,8 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public int writeTo(final Item[] arr, final int pos) {
-    for(int i = 0; i < size; i++) arr[pos + i] = itemAt(i);
+  public int writeTo(final Item[] arr, final int index) {
+    for(int i = 0; i < size; i++) arr[index + i] = itemAt(i);
     return (int) size;
   }
 

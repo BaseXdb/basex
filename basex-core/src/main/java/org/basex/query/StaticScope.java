@@ -76,7 +76,6 @@ public abstract class StaticScope extends ExprInfo implements Scope {
           add(key, val, map);
           key = Token.token(l.replaceAll("^@(\\w*).*", "$1"));
           l = l.replaceAll("^@\\w+ *", "");
-          val.reset();
         }
         val.add(l).add('\n');
       }
@@ -102,6 +101,6 @@ public abstract class StaticScope extends ExprInfo implements Scope {
       tl = new TokenList();
       map.put(k, tl);
     }
-    tl.add(val.trim().finish());
+    tl.add(val.trim().next());
   }
 }

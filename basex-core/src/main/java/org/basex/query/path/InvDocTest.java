@@ -1,7 +1,6 @@
 package org.basex.query.path;
 
 import org.basex.data.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -17,15 +16,19 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class InvDocTest extends Test {
-  /** Database nodes. */
-  private final Nodes nodes;
+  /** Data reference. */
+  private final Data data;
+  /** Pre values. */
+  private final IntList pres;
 
   /**
    * Constructor.
-   * @param nodes database document nodes
+   * @param pres pre values
+   * @param data data reference
    */
-  private InvDocTest(final Nodes nodes) {
-    this.nodes = nodes;
+  private InvDocTest(final IntList pres, final Data data) {
+    this.pres = pres;
+    this.data = data;
     type = NodeType.DOC;
   }
 
@@ -43,15 +46,14 @@ final class InvDocTest extends Test {
     // adopt nodes from existing sequence
     if(rt instanceof DBNodeSeq) {
       final DBNodeSeq seq = (DBNodeSeq) rt;
-      return seq.complete ? Test.DOC : new InvDocTest(new Nodes(seq.pres, data));
+      return seq.all ? Test.DOC : new InvDocTest(new IntList(seq.pres), data);
     }
 
     // loop through all documents and add pre values of documents
     // not more than 2^31 documents supported
     final IntList il = new IntList((int) rt.size());
-    final ValueIter ir = rt.iter();
-    for(Item it; (it = ir.next()) != null;) il.add(((DBNode) it).pre);
-    return new InvDocTest(new Nodes(il.toArray(), data));
+    for(final Item it : rt) il.add(((DBNode) it).pre);
+    return new InvDocTest(il, data);
   }
 
   @Override
@@ -60,12 +62,12 @@ final class InvDocTest extends Test {
     if(!(node instanceof DBNode)) return false;
     // ensure that the pre value is contained in the target documents
     final DBNode db = (DBNode) node;
-    return nodes.data == db.data && nodes.contains(db.pre);
+    return data == db.data && pres.contains(db.pre);
   }
 
   @Override
   public Test copy() {
-    return new InvDocTest(new Nodes(nodes));
+    return new InvDocTest(pres, data);
   }
 
   @Override

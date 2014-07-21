@@ -34,10 +34,15 @@ public final class QueryResources {
 
   /** Database context. */
   private final QueryContext qc;
+
+  /** Collections: single nodes and sequences. */
+  private final ArrayList<Value> colls = new ArrayList<>(1);
+  /** Names of collections. */
+  private final ArrayList<String> collNames = new ArrayList<>(1);
   /** Opened databases. */
-  private Data[] data = new Data[1];
-  /** Number of databases. */
-  private int datas;
+  private final ArrayList<Data> datas = new ArrayList<>(1);
+  /** Indicates if the first database in the context is globally opened. */
+  private boolean globalData;
 
   /** Module loader. */
   private ModuleLoader modules;
@@ -48,13 +53,6 @@ public final class QueryResources {
   public final ValueBuilder output = new ValueBuilder();;
   /** Pending updates. */
   Updates updates;
-
-  /** Collections: single nodes and sequences. */
-  private Value[] coll = new Value[1];
-  /** Names of collections. */
-  private String[] collName = new String[1];
-  /** Number of collections. */
-  private int colls;
 
   /**
    * Constructor.
@@ -67,22 +65,23 @@ public final class QueryResources {
   /**
    * Compiles the resources.
    * @param nodes input node set
-   * @throws QueryException query exception
+   * @return context value
    */
-  void compile(final Nodes nodes) throws QueryException {
-    final Data d = nodes.data;
-    if(!qc.context.perm(Perm.READ, d.meta)) throw BASX_PERM.get(null, Perm.READ);
-
+  Value compile(final DBNodes nodes) {
     // assign initial context value
-    final boolean root = nodes.root;
-    qc.value = DBNodeSeq.get(new IntList(nodes.pres), d, root, root);
+    final Data data = nodes.data;
+    final boolean all = nodes.all;
+    final Value value = DBNodeSeq.get(new IntList(nodes.pres), data, all, all);
 
     // create default collection: use initial node set if it contains all
     // documents of the database. otherwise, create new node set
-    addCollection(root ? qc.value : DBNodeSeq.get(d.resources.docs(), d, true, true), d.meta.name);
+    final Value coll = all ? value : DBNodeSeq.get(data.resources.docs(), data, true, true);
+    addCollection(coll, data.meta.name);
+    addData(data);
+    synchronized(qc.context.dbs) { qc.context.dbs.pin(data); }
 
-    add(d);
-    synchronized(qc.context.dbs) { qc.context.dbs.pin(d); }
+    globalData = true;
+    return value;
   }
 
   /**
@@ -108,8 +107,8 @@ public final class QueryResources {
    * Closes all opened data references that have not been added by the global context.
    */
   void close() {
-    for(int d = 0; d < datas; d++) Close.close(data[d], qc.context);
-    datas = 0;
+    for(final Data data : datas) Close.close(data, qc.context);
+    datas.clear();
 
     // close dynamically loaded JAR files
     if(modules != null) modules.close();
@@ -126,14 +125,14 @@ public final class QueryResources {
    */
   public Data database(final String name, final InputInfo info) throws QueryException {
     // check if a database with the same name has already been opened
-    for(int d = 0; d < datas; ++d) {
-      if(data[d].inMemory()) continue;
-      final String n = data[d].meta.name;
-      if(Prop.CASE ? n.equals(name) : n.equalsIgnoreCase(name)) return data[d];
+    for(final Data data : datas) {
+      if(data.inMemory()) continue;
+      final String n = data.meta.name;
+      if(Prop.CASE ? n.equals(name) : n.equalsIgnoreCase(name)) return data;
     }
     try {
       // open and add new data reference
-      return add(Open.open(name, qc.context));
+      return addData(Open.open(name, qc.context));
     } catch(final IOException ex) {
       throw BXDB_OPEN.get(info, ex);
     }
@@ -152,23 +151,22 @@ public final class QueryResources {
       throws QueryException {
 
     // favor default database
-    if(qc.context.options.get(MainOptions.DEFAULTDB) && qc.nodes != null) {
-      final Data dt = data[0];
-      final int pre = dt.resources.doc(qi.original);
-      if(pre != -1) return new DBNode(dt, pre, Data.DOC);
+    final Data gd = globalData();
+    if(qc.context.options.get(MainOptions.DEFAULTDB) && gd != null) {
+      final int pre = gd.resources.doc(qi.original);
+      if(pre != -1) return new DBNode(gd, pre, Data.DOC);
     }
 
     // check currently opened databases
-    for(int d = 0; d < datas; ++d) {
-      final Data dt = data[d];
+    for(final Data data : datas) {
       // check if database has a single document with an identical input path
-      if(dt.resources.docs().size() == 1 && IO.get(dt.meta.original).eq(qi.input))
-        return new DBNode(dt, 0, Data.DOC);
+      if(data.resources.docs().size() == 1 && IO.get(data.meta.original).eq(qi.input))
+        return new DBNode(data, 0, Data.DOC);
 
       // check if database and input have identical name
       // database instance has same name as input path
-      final String n = dt.meta.name;
-      if(Prop.CASE ? n.equals(qi.db) : n.equalsIgnoreCase(qi.db)) return doc(dt, qi, info);
+      final String n = data.meta.name;
+      if(Prop.CASE ? n.equals(qi.db) : n.equalsIgnoreCase(qi.db)) return doc(data, qi, info);
     }
 
     // open new database, or create new instance
@@ -184,8 +182,8 @@ public final class QueryResources {
    * @throws QueryException query exception
    */
   public Value collection(final InputInfo info) throws QueryException {
-    if(colls == 0) throw NODEFCOLL.get(info);
-    return coll[0];
+    if(colls.isEmpty()) throw NODEFCOLL.get(info);
+    return colls.get(0);
   }
 
   /**
@@ -201,10 +199,10 @@ public final class QueryResources {
       throws QueryException {
 
     // favor default database
-    if(qc.context.options.get(MainOptions.DEFAULTDB) && qc.nodes != null) {
-      final Data dt = data[0];
-      final IntList pres = dt.resources.docs(qi.original);
-      return DBNodeSeq.get(pres, dt, true, qi.original.isEmpty());
+    final Data gd = globalData();
+    if(qc.context.options.get(MainOptions.DEFAULTDB) && gd != null) {
+      final IntList pres = gd.resources.docs(qi.original);
+      return DBNodeSeq.get(pres, gd, true, qi.original.isEmpty());
     }
 
     // merge input with base directory
@@ -213,21 +211,21 @@ public final class QueryResources {
     // check currently opened collections
     if(in != null) {
       final String[] names = { in, qi.original };
-      for(int c = 0; c < colls; c++) {
-        final String n = collName[c];
-        if(Prop.CASE ? Token.eq(n, names) : Token.eqic(n, names)) return coll[c];
+      final int cs = colls.size();
+      for(int c = 0; c < cs; c++) {
+        final String name = collNames.get(c);
+        if(Prop.CASE ? Token.eq(name, names) : Token.eqic(name, names)) return colls.get(c);
       }
     }
 
     // check currently opened databases
     Data dt = null;
-    for(int i = 0; i < datas; ++i) {
+    for(final Data data : datas) {
       // return database instance with the same name or file path
-      final Data d = data[i];
-      final String n = d.meta.name;
+      final String n = data.meta.name;
       if(Prop.CASE ? n.equals(qi.db) : n.equalsIgnoreCase(qi.db) ||
-          IO.get(d.meta.original).eq(qi.input)) {
-        dt = d;
+          IO.get(data.meta.original).eq(qi.input)) {
+        dt = data;
         break;
       }
     }
@@ -236,6 +234,69 @@ public final class QueryResources {
     if(dt == null) dt = open(qi);
     if(dt == null) dt = create(qi, false, baseIO, info);
     return DBNodeSeq.get(dt.resources.docs(qi.path), dt, true, qi.path.isEmpty());
+  }
+
+  /**
+   * Returns a reference to the updates.
+   * @return updates
+   */
+  public Updates updates() {
+    if(updates == null) updates = new Updates();
+    return updates;
+  }
+
+  /**
+   * Returns the module loader.
+   * @return module loader
+   */
+  public ModuleLoader modules() {
+    if(modules == null) modules = new ModuleLoader(qc.context);
+    return modules;
+  }
+
+  /**
+   * Removes and closes a database if it has not been added by the global context.
+   * @param name name of database to be removed
+   */
+  public void remove(final String name) {
+    final int ds = datas.size();
+    for(int d = globalData ? 1 : 0; d < ds; d++) {
+      final Data data = datas.get(d);
+      if(data.meta.name.equals(name)) {
+        Close.close(data, qc.context);
+        datas.remove(d);
+        break;
+      }
+    }
+  }
+
+  /**
+   * Returns the globally opened database.
+   * @return database or {@code null} if no database is globally opened
+   */
+  Data globalData() {
+    return globalData ? datas.get(0) : null;
+  }
+
+  /**
+   * Returns a valid reference if a file is found in the specified path or the static base uri.
+   * Otherwise, returns an error.
+   * @param input query input
+   * @param baseIO base IO
+   * @param info input info
+   * @return input source, or exception
+   * @throws QueryException query exception
+   */
+  public static IO checkPath(final QueryInput input, final IO baseIO, final InputInfo info)
+      throws QueryException {
+
+    IO in = input.input;
+    if(in.exists()) return in;
+    if(baseIO != null) {
+      in = baseIO.merge(input.original);
+      if(!in.path().equals(input.original) && in.exists()) return in;
+    }
+    throw WHICHRES.get(info, in);
   }
 
   // TEST APIS ====================================================================================
@@ -283,24 +344,6 @@ public final class QueryResources {
     addCollection(Seq.get(nodes, ns, NodeType.DOC), name);
   }
 
-  /**
-   * Returns a reference to the updates.
-   * @return updates
-   */
-  public Updates updates() {
-    if(updates == null) updates = new Updates();
-    return updates;
-  }
-
-  /**
-   * Returns the module loader.
-   * @return module loader
-   */
-  public ModuleLoader modules() {
-    if(modules == null) modules = new ModuleLoader(qc.context);
-    return modules;
-  }
-
   // PRIVATE METHODS ====================================================================
 
   /**
@@ -312,10 +355,8 @@ public final class QueryResources {
     if(input.db != null) {
       try {
         // try to open database
-        return add(Open.open(input.db, qc.context));
-      } catch(final IOException ex) {
-        /* ignored */
-      }
+        return addData(Open.open(input.db, qc.context));
+      } catch(final IOException ex) { Util.debug(ex); }
     }
     return null;
   }
@@ -355,8 +396,8 @@ public final class QueryResources {
       opts.put(option, option.value());
     }
     try {
-      final boolean force = context.options.get(MainOptions.FORCECREATE);
-      return add(CreateDB.create(source.dbname(), new DirParser(source, opts), context, !force));
+      final boolean fc = context.options.get(MainOptions.FORCECREATE);
+      return addData(CreateDB.create(source.dbname(), new DirParser(source, opts), context, !fc));
     } catch(final IOException ex) {
       throw IOERR.get(info, ex);
     } finally {
@@ -364,27 +405,6 @@ public final class QueryResources {
       for(int o = 0; o < ol; o++) opts.put(options[o], values[o]);
       input.path = "";
     }
-  }
-
-  /**
-   * Returns a valid reference if a file is found in the specified path or the static base uri.
-   * Otherwise, returns an error.
-   * @param input query input
-   * @param baseIO base IO
-   * @param info input info
-   * @return input source, or exception
-   * @throws QueryException query exception
-   */
-  public static IO checkPath(final QueryInput input, final IO baseIO, final InputInfo info)
-      throws QueryException {
-
-    IO in = input.input;
-    if(in.exists()) return in;
-    if(baseIO != null) {
-      in = baseIO.merge(input.original);
-      if(!in.path().equals(input.original) && in.exists()) return in;
-    }
-    throw WHICHRES.get(info, in);
   }
 
   /**
@@ -407,42 +427,21 @@ public final class QueryResources {
 
   /**
    * Adds a data reference.
-   * @param d data reference to be added
+   * @param data data reference to be added
    * @return argument
    */
-  private Data add(final Data d) {
-    if(datas == data.length) data = Array.copy(data, new Data[Array.newSize(datas)]);
-    data[datas++] = d;
-    return d;
-  }
-
-  /**
-   * Removes and closes a database if it has not been added by the global context.
-   * @param name name of database to be removed
-   */
-  public void remove(final String name) {
-    for(int d = qc.nodes != null ? 1 : 0; d < datas; d++) {
-      if(data[d].meta.name.equals(name)) {
-        Close.close(data[d], qc.context);
-        Array.move(data, d + 1, -1, --datas - d);
-        data[datas] = null;
-        break;
-      }
-    }
+  private Data addData(final Data data) {
+    datas.add(data);
+    return data;
   }
 
   /**
    * Adds a collection to the global collection list.
-   * @param nodes collection nodes
+   * @param coll documents of collection
    * @param name collection name
    */
-  private void addCollection(final Value nodes, final String name) {
-    if(colls == coll.length) {
-      final int s = Array.newSize(colls);
-      coll = Array.copy(coll, new Value[s]);
-      collName = Array.copyOf(collName, s);
-    }
-    coll[colls] = nodes;
-    collName[colls++] = name;
+  private void addCollection(final Value coll, final String name) {
+    colls.add(coll);
+    collNames.add(name);
   }
 }

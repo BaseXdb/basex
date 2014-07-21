@@ -52,12 +52,4 @@ public final class FTPos {
   public int size() {
     return poss.size();
   }
-
-  /**
-   * Creates a copy.
-   * @return the copy
-   */
-  public FTPos copy() {
-    return new FTPos(pre, new IntList(poss.toArray()));
-  }
 }

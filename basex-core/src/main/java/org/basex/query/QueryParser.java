@@ -958,7 +958,7 @@ public class QueryParser extends InputParser {
     if(!wsConsume(COMMA)) return e;
     final ExprList el = new ExprList(e);
     do add(el, single()); while(wsConsume(COMMA));
-    return new List(info(), el.finish());
+    return new List(info(), el.array());
   }
 
   /**
@@ -1345,7 +1345,7 @@ public class QueryParser extends InputParser {
       }
       wsCheck(RETURN);
       cases.set(0, check(single(), NOSWITCH));
-      exprs = Array.add(exprs, new SwitchCase(info(), cases.finish()));
+      exprs = Array.add(exprs, new SwitchCase(info(), cases.array()));
     } while(cases.size() != 1);
 
     return new Switch(info(), expr, exprs);
@@ -1420,7 +1420,7 @@ public class QueryParser extends InputParser {
 
     final ExprList el = new ExprList(e);
     do add(el, and()); while(wsConsumeWs(OR));
-    return new Or(info(), el.finish());
+    return new Or(info(), el.array());
   }
 
   /**
@@ -1434,7 +1434,7 @@ public class QueryParser extends InputParser {
 
     final ExprList el = new ExprList(e);
     do add(el, update()); while(wsConsumeWs(AND));
-    return new And(info(), el.finish());
+    return new And(info(), el.array());
   }
 
   /**
@@ -1511,7 +1511,7 @@ public class QueryParser extends InputParser {
 
     final ExprList el = new ExprList(e);
     do add(el, range()); while(wsConsume(CONCAT));
-    return Function.CONCAT.get(sc, info(), el.finish());
+    return Function.CONCAT.get(sc, info(), el.array());
   }
 
   /**
@@ -1566,7 +1566,7 @@ public class QueryParser extends InputParser {
     if(e == null || !isUnion()) return e;
     final ExprList el = new ExprList(e);
     do add(el, intersect()); while(isUnion());
-    return new Union(info(), el.finish());
+    return new Union(info(), el.array());
   }
 
   /**
@@ -1593,12 +1593,12 @@ public class QueryParser extends InputParser {
     if(wsConsumeWs(INTERSECT)) {
       final ExprList el = new ExprList(e);
       do add(el, instanceoff()); while(wsConsumeWs(INTERSECT));
-      return new InterSect(info(), el.finish());
+      return new InterSect(info(), el.array());
     }
     if(wsConsumeWs(EXCEPT)) {
       final ExprList el = new ExprList(e);
       do add(el, instanceoff()); while(wsConsumeWs(EXCEPT));
-      return new Except(info(), el.finish());
+      return new Except(info(), el.array());
     }
     return e;
   }
@@ -1741,7 +1741,7 @@ public class QueryParser extends InputParser {
         c = curr();
       }
 
-      final byte[] v = tok.trim().finish();
+      final byte[] v = tok.trim().toArray();
       if(eq(name.prefix(), DB)) {
         // project-specific declaration
         final String key = string(uc(name.local()));
@@ -1802,7 +1802,7 @@ public class QueryParser extends InputParser {
       else root = ex;
       relativePath(el);
     }
-    return Path.get(info(), root, el.finish());
+    return Path.get(info(), root, el.array());
   }
 
   /**
@@ -1852,7 +1852,6 @@ public class QueryParser extends InputParser {
    * Performs an optional axis check.
    * @param axis axis
    */
-  @SuppressWarnings("unused")
   void checkAxis(final Axis axis) { }
 
   /**
@@ -1860,14 +1859,12 @@ public class QueryParser extends InputParser {
    * @param test node test
    * @param attr attribute flag
    */
-  @SuppressWarnings("unused")
   void checkTest(final Test test, final boolean attr) { }
 
   /**
    * Checks a predicate.
    * @param open open flag
    */
-  @SuppressWarnings("unused")
   void checkPred(final boolean open) { }
 
   /**
@@ -1932,7 +1929,7 @@ public class QueryParser extends InputParser {
       wsCheck(BR2);
       checkPred(false);
     }
-    return Step.get(info(), ax, test, el.finish());
+    return Step.get(info(), ax, test, el.array());
   }
 
   /**
@@ -2006,14 +2003,14 @@ public class QueryParser extends InputParser {
           add(el, expr());
           wsCheck(BR2);
         } while(wsConsume(BR1));
-        e = Filter.get(info(), e, el.finish());
+        e = Filter.get(info(), e, el.array());
       } else if(e != null) {
         if(!wsConsume(PAR1)) break;
 
         final InputInfo ii = info();
         final ExprList argList = new ExprList();
         final int[] holes = argumentList(argList, e);
-        final Expr[] args = argList.finish();
+        final Expr[] args = argList.array();
         // only set updating flag if updating and non-updating expressions are mixed
         Ann ann = null;
         if(e instanceof FuncItem) ann = ((FuncItem) e).annotations();
@@ -2093,7 +2090,7 @@ public class QueryParser extends InputParser {
       } while(wsConsume(COMMA));
       wsCheck(BRACE2);
     }
-    return el.finish();
+    return el.array();
   }
 
   /**
@@ -2178,12 +2175,12 @@ public class QueryParser extends InputParser {
     if(XMLToken.isNCStartChar(curr())) return checkDbl();
 
     if(dec) {
-      final byte[] t = tok.finish();
+      final byte[] t = tok.toArray();
       if(t.length == 1 && t[0] == '.') throw error(NUMBERDEC, t);
       return new Dec(t);
     }
 
-    final long l = toLong(tok.finish());
+    final long l = toLong(tok.toArray());
     if(l != Long.MIN_VALUE) return Int.get(l);
     final InputInfo ii = info();
     return FNInfo.error(RANGE.get(ii, chop(tok, ii)), SeqType.ITR);
@@ -2204,7 +2201,7 @@ public class QueryParser extends InputParser {
     if(s == tok.size()) throw error(NUMBERDBL, tok);
 
     if(XMLToken.isNCStartChar(curr())) throw error(NUMBERWS);
-    return Dbl.get(tok.finish(), info());
+    return Dbl.get(tok.toArray(), info());
   }
 
   /**
@@ -2226,7 +2223,7 @@ public class QueryParser extends InputParser {
       if(!consume(del)) break;
       tok.add(del);
     }
-    return tok.finish();
+    return tok.toArray();
   }
 
   /**
@@ -2252,7 +2249,7 @@ public class QueryParser extends InputParser {
       if(!more()) throw error(WRONGCHAR, BRACE2, found());
       entity(tok);
     }
-    return tok.finish();
+    return tok.toArray();
   }
 
   /**
@@ -2291,7 +2288,7 @@ public class QueryParser extends InputParser {
         final InputInfo ii = info();
         final ExprList argList = new ExprList();
         final int[] holes = argumentList(argList, name.string());
-        final Expr[] args = argList.finish();
+        final Expr[] args = argList.array();
         alter = FUNCUNKNOWN;
         alterFunc = name;
         alterPos = pos;
@@ -2405,14 +2402,13 @@ public class QueryParser extends InputParser {
               tb.add(consume());
               consume();
             } else {
-              final byte[] text = tb.finish();
+              final byte[] text = tb.next();
               if(text.length == 0) {
                 add(attv, enclosed(NOENCLEXPR));
                 simple = false;
               } else {
                 add(attv, Str.get(text));
               }
-              tb.reset();
             }
           } else if(ch == '}') {
             consume();
@@ -2465,7 +2461,7 @@ public class QueryParser extends InputParser {
         if(atts == null) atts = new ArrayList<>(1);
         atts.add(attn);
         names.add(new QNmCheck(attn, false));
-        add(cont, new CAttr(sc, info(), false, attn, attv.finish()));
+        add(cont, new CAttr(sc, info(), false, attn, attv.array()));
       }
       if(!consumeWS()) break;
     }
@@ -2501,7 +2497,7 @@ public class QueryParser extends InputParser {
 
     sc.ns.size(s);
     sc.elemNS = nse;
-    return new CElem(sc, info(), name, ns, cont.finish());
+    return new CElem(sc, info(), name, ns, cont.array());
   }
 
   /**
@@ -2550,7 +2546,7 @@ public class QueryParser extends InputParser {
    * @return text or {@code null}
    */
   private Str text(final TokenBuilder tb, final boolean strip) {
-    final byte[] t = tb.finish();
+    final byte[] t = tb.toArray();
     return t.length == 0 || strip && !sc.spaces && ws(t) ? null : Str.get(t);
   }
 
@@ -2564,8 +2560,7 @@ public class QueryParser extends InputParser {
     check('-');
     final TokenBuilder tb = new TokenBuilder();
     do {
-      while(not('-'))
-        tb.add(consume());
+      while(not('-')) tb.add(consume());
       consume();
       if(consume('-')) {
         check('>');
@@ -3041,7 +3036,7 @@ public class QueryParser extends InputParser {
       nm = trim(stringLiteral());
       if(!XMLToken.isNCName(nm)) throw error(INVNCNAME, nm);
     } else if(ncName()) {
-      nm = tok.finish();
+      nm = tok.toArray();
     } else {
       return null;
     }
@@ -3311,10 +3306,9 @@ public class QueryParser extends InputParser {
     if(!i) return additive();
     skipWs();
     tok.reset();
-    while(digit(curr()))
-      tok.add(consume());
+    while(digit(curr())) tok.add(consume());
     if(tok.isEmpty()) throw error(INTEXP);
-    return Int.get(toLong(tok.finish()));
+    return Int.get(toLong(tok.toArray()));
   }
 
   /**
@@ -3593,7 +3587,7 @@ public class QueryParser extends InputParser {
           if(!wsConsume(PAR2)) throw error(FUNCMISS, func);
         }
         qc.updating();
-        return new DynFuncCall(ii, sc, true, func, argList.finish());
+        return new DynFuncCall(ii, sc, true, func, argList.array());
       }
     }
     pos = p;
@@ -3608,7 +3602,7 @@ public class QueryParser extends InputParser {
    */
   private byte[] ncName(final Err err) throws QueryException {
     tok.reset();
-    if(ncName()) return tok.finish();
+    if(ncName()) return tok.toArray();
     if(err != null) throw error(err, consume());
     return EMPTY;
   }
@@ -3679,7 +3673,7 @@ public class QueryParser extends InputParser {
         --pos;
       }
     }
-    return tok.finish();
+    return tok.toArray();
   }
 
   /**
@@ -3937,13 +3931,13 @@ public class QueryParser extends InputParser {
   private boolean wsConsumeWs(final String s1, final String s2, final Err expr)
       throws QueryException {
 
-    final int i = pos;
+    final int i1 = pos;
     if(!wsConsumeWs(s1)) return false;
     alter = expr;
     alterPos = pos;
     final int i2 = pos;
     final boolean ok = wsConsume(s2);
-    pos = ok ? i2 : i;
+    pos = ok ? i2 : i1;
     return ok;
   }
 

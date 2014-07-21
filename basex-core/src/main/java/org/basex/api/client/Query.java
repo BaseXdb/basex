@@ -119,9 +119,8 @@ public abstract class Query {
     for(int t; (t = input.read()) > 0;) {
       final DecodingInput di = new DecodingInput(input);
       for(int b; (b = di.read()) != -1;) bl.add(b);
-      cache.add(bl.toArray());
+      cache.add(bl.next());
       types.add(t);
-      bl.reset();
     }
     pos = 0;
   }

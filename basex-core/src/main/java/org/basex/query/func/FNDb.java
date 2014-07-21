@@ -888,8 +888,7 @@ public final class FNDb extends StandardFunc {
     try {
       final ArrayOutput ao = qc.value(exprs[1]).serialize();
       // throw exception if event is unknown
-      if(!qc.context.events.notify(qc.context, name, ao.toArray()))
-        throw BXDB_EVENT.get(info, name);
+      if(!qc.context.events.notify(qc.context, name, ao.finish())) throw BXDB_EVENT.get(info, name);
       return null;
     } catch(final QueryIOException ex) {
       throw ex.getCause(info);

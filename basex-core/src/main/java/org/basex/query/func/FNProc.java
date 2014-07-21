@@ -138,8 +138,7 @@ public final class FNProc extends StandardFunc {
    * @param cs charset
    * @return result
    */
-  private static Thread reader(final InputStream in, final TokenBuilder tb,
-      final Charset cs) {
+  private static Thread reader(final InputStream in, final TokenBuilder tb, final Charset cs) {
     final InputStreamReader isr = new InputStreamReader(in, cs);
     final BufferedReader br = new BufferedReader(isr);
     return new Thread() {
@@ -160,7 +159,7 @@ public final class FNProc extends StandardFunc {
    * @return output
    */
   private static byte[] norm(final TokenBuilder tb) {
-    return delete(tb.finish(), '\r');
+    return delete(tb.toArray(), '\r');
   }
 
   /**

@@ -136,7 +136,7 @@ public final class MapView extends View implements Runnable {
   @Override
   public void refreshContext(final boolean more, final boolean quick) {
     // use simple zooming animation for result node filtering
-    final Nodes context = gui.context.current();
+    final DBNodes context = gui.context.current();
     final int hist = gui.notify.hist;
     final boolean page = !more && rectHist[hist + 1] != null &&
       rectHist[hist + 1].pre == 0 || more && (context.size() != 1 ||
@@ -151,7 +151,7 @@ public final class MapView extends View implements Runnable {
     if(painter == null) return;
 
     // calculate map
-    final Nodes curr = gui.context.current();
+    final DBNodes curr = gui.context.current();
     calc(new MapRect(0, 0, getWidth(), getHeight(), 0, 0), curr, mainMap);
     repaint();
   }
@@ -275,7 +275,7 @@ public final class MapView extends View implements Runnable {
    * @param nodes nodes to draw in the map
    * @param map image to draw rectangles on
    */
-  private void calc(final MapRect rect, final Nodes nodes, final BufferedImage map) {
+  private void calc(final MapRect rect, final DBNodes nodes, final BufferedImage map) {
     // calculate new main rectangles
     gui.cursor(CURSORWAIT);
 
@@ -469,7 +469,7 @@ public final class MapView extends View implements Runnable {
     if(!focus() && gui.context.focused == -1) return;
 
     // add or remove marked node
-    final Nodes marked = gui.context.marked;
+    final DBNodes marked = gui.context.marked;
     if(e.getClickCount() == 2) {
       if(mainRects.size != 1) gui.notify.context(marked, false, null);
     } else if(e.isShiftDown()) {
@@ -506,7 +506,7 @@ public final class MapView extends View implements Runnable {
         np = rect.pre + ViewData.size(data, rect.pre);
       }
     }
-    gui.notify.mark(new Nodes(il.toArray(), data), null);
+    gui.notify.mark(new DBNodes(data, il.finish()), null);
   }
 
   @Override
@@ -522,7 +522,7 @@ public final class MapView extends View implements Runnable {
   public void mouseWheelMoved(final MouseWheelEvent e) {
     if(gui.updating || gui.context.focused == -1) return;
     if(e.getWheelRotation() <= 0) {
-      final Nodes m = new Nodes(gui.context.focused, gui.context.data());
+      final DBNodes m = new DBNodes(gui.context.data(), gui.context.focused);
       gui.context.marked = m;
       gui.notify.context(m, false, null);
     } else {

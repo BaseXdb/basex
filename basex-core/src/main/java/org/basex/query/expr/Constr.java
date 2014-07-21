@@ -66,7 +66,7 @@ public final class Constr {
         final Iter iter = qc.iter(e);
         for(Item ch; (ch = iter.next()) != null && add(ch););
       }
-      if(!text.isEmpty()) children.add(new FTxt(text.finish()));
+      if(!text.isEmpty()) children.add(new FTxt(text.toArray()));
       return this;
     } finally {
       sc.ns.size(s);
@@ -145,10 +145,7 @@ public final class Constr {
         // type: element/comment/processing instruction node
 
         // add text node
-        if(!text.isEmpty()) {
-          children.add(new FTxt(text.finish()));
-          text.reset();
-        }
+        if(!text.isEmpty()) children.add(new FTxt(text.next()));
 
         // [CG] XQuery, element construction: avoid full copy of sub tree if not needed
         node = node.deepCopy();

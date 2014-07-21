@@ -1,8 +1,6 @@
 # LANGUAGE FILE, TRANSLATED BY
 # Andria Arisal
 
-OFF                  = OFF
-ON                   = ON
 about_%              = Perihal %
 access_denied        = Akses ditolak.
 add                  = Tambah

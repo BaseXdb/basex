@@ -70,7 +70,7 @@ final class TableContent extends BaseXBack {
     for(int i = 0; i < nCols; ++i) tb[i] = new TokenBuilder();
 
     focusedString = null;
-    final Nodes marked = context.marked;
+    final DBNodes marked = context.marked;
     int l = scroll.pos() / rowH - 1;
     int posY = -scroll.pos() + l * rowH;
 
@@ -132,7 +132,7 @@ final class TableContent extends BaseXBack {
         final double ce = x + cw;
 
         if(ce != 0) {
-          final byte[] str = tb[c].isEmpty() ? null : tb[c].finish();
+          final byte[] str = tb[c].isEmpty() ? null : tb[c].toArray();
           if(str != null) {
             if(tdata.mouseX > x && tdata.mouseX < ce || fcol == c) {
               fx = (int) x;

@@ -255,7 +255,7 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public boolean enabled(final GUI gui) {
       // disallow copy of empty node set or root node
-      final Nodes marked = gui.context.marked;
+      final DBNodes marked = gui.context.marked;
       return marked != null && marked.size() != 0;
     }
   },
@@ -265,8 +265,8 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
-      final Nodes n = ctx.marked;
-      ctx.copied = new Nodes(n.pres, n.data);
+      final DBNodes n = ctx.marked;
+      ctx.copied = new DBNodes(n.data, n.pres);
     }
 
     @Override
@@ -281,7 +281,7 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       final StringBuilder sb = new StringBuilder();
-      final Nodes n = gui.context.copied;
+      final DBNodes n = gui.context.copied;
       for(int i = 0; i < n.size(); ++i) {
         if(i > 0) sb.append(',');
         sb.append(openPre(n, i));
@@ -305,12 +305,12 @@ public enum GUIMenuCmd implements GUICommand {
     public void execute(final GUI gui) {
       if(!BaseXDialog.confirm(gui, DELETE_NODES)) return;
       final StringBuilder sb = new StringBuilder();
-      final Nodes n = gui.context.marked;
+      final DBNodes n = gui.context.marked;
       for(int i = 0; i < n.size(); ++i) {
         if(i > 0) sb.append(',');
         sb.append(openPre(n, i));
       }
-      gui.context.marked = new Nodes(n.data);
+      gui.context.marked = new DBNodes(n.data);
       gui.context.copied = null;
       gui.context.focused = -1;
       gui.execute(new XQuery("delete nodes (" + sb + ')'));
@@ -327,7 +327,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_INSERT(NEW + DOTS, null, true, false) {
     @Override
     public void execute(final GUI gui) {
-      final Nodes n = gui.context.marked;
+      final DBNodes n = gui.context.marked;
       final DialogInsert insert = new DialogInsert(gui);
       if(!insert.ok()) return;
 
@@ -356,7 +356,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_EDIT(EDIT + DOTS, null, true, false) {
     @Override
     public void execute(final GUI gui) {
-      final Nodes n = gui.context.marked;
+      final DBNodes n = gui.context.marked;
       final DialogEdit edit = new DialogEdit(gui, n.pres[0]);
       if(!edit.ok()) return;
 
@@ -387,18 +387,18 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
-      Nodes marked = ctx.marked;
+      DBNodes marked = ctx.marked;
       if(marked.size() == 0) {
         final int pre = gui.context.focused;
         if(pre == -1) return;
-        marked = new Nodes(pre, ctx.data());
+        marked = new DBNodes(ctx.data(), pre);
       }
       gui.notify.context(marked, false, null);
     }
 
     @Override
     public boolean enabled(final GUI gui) {
-      final Nodes marked = gui.context.marked;
+      final DBNodes marked = gui.context.marked;
       return marked != null && marked.size() != 0;
     }
   },
@@ -675,15 +675,15 @@ public enum GUIMenuCmd implements GUICommand {
       final Data data = ctx.data();
       if(rt) {
         if(root) {
-          gui.notify.mark(new Nodes(data), null);
+          gui.notify.mark(new DBNodes(data), null);
         } else {
-          final Nodes mark = ctx.marked;
-          ctx.marked = new Nodes(data);
+          final DBNodes mark = ctx.marked;
+          ctx.marked = new DBNodes(data);
           gui.notify.context(mark, true, null);
         }
       } else {
         if(!root) {
-          gui.notify.context(new Nodes(0, data), true, null);
+          gui.notify.context(new DBNodes(data, 0), true, null);
           gui.notify.mark(ctx.current(), null);
         }
       }
@@ -878,7 +878,7 @@ public enum GUIMenuCmd implements GUICommand {
   public final boolean toggle() { return toggle; }
 
   @Override
-  public String shortcut() { return shortcut; }
+  public String shortCut() { return shortcut; }
 
   @Override
   public Object shortcuts() { return key; }
@@ -891,7 +891,7 @@ public enum GUIMenuCmd implements GUICommand {
    * @param no disallowed node types
    * @return result of check
    */
-  private static boolean updatable(final Nodes n, final int... no) {
+  private static boolean updatable(final DBNodes n, final int... no) {
     if(n == null || (no.length == 0 ? n.size() < 1 : n.size() != 1)) return false;
     final int k = n.data.kind(n.pres[0]);
     for(final int i : no) if(k == i) return false;
@@ -913,7 +913,7 @@ public enum GUIMenuCmd implements GUICommand {
    * @param i offset
    * @return function string
    */
-  private static String openPre(final Nodes n, final int i) {
+  private static String openPre(final DBNodes n, final int i) {
     return Function._DB_OPEN_PRE.get(null, Str.get(n.data.meta.name),
         Int.get(n.pres[i])).toString();
   }

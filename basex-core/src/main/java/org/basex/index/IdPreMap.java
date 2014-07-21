@@ -112,9 +112,9 @@ public class IdPreMap {
    * @return a sorted array of PRE values
    */
   public int[] pre(final int[] ids, final int off, final int len) {
-    final IntList p = new IntList(ids.length);
-    for(int i = off; i < len; ++i) p.add(pre(ids[i]));
-    return p.sort().toArray();
+    final IntList il = new IntList(len - off);
+    for(int i = off; i < len; ++i) il.add(pre(ids[i]));
+    return il.sort().finish();
   }
 
   /**

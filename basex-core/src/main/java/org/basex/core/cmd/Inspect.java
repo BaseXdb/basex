@@ -53,7 +53,7 @@ public final class Inspect extends Command {
       final int par = data.parent(pre, kind);
       if(par >= 0) {
         final int parKind = data.kind(par);
-        if(par >= pre || (kind == Data.DOC ? par != -1 : par < 0)) parRef.add(pre);
+        if(par >= pre) parRef.add(pre);
         // check if parent is no doc and no element, or if node is a descendant
         // of its parent node
         if(parKind != Data.DOC && parKind != Data.ELEM ||

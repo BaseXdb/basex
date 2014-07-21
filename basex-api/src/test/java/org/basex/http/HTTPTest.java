@@ -14,7 +14,6 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.util.*;
-import org.basex.util.Base64;
 import org.basex.util.list.*;
 import org.junit.*;
 
@@ -163,7 +162,7 @@ public abstract class HTTPTest extends SandboxTest {
     conn.setRequestMethod(POST.name());
     conn.setRequestProperty(MimeTypes.CONTENT_TYPE, type);
     // basic authentication
-    final String encoded = Base64.encode(Text.S_ADMIN + ':' + Text.S_ADMIN);
+    final String encoded = org.basex.util.Base64.encode(Text.S_ADMIN + ':' + Text.S_ADMIN);
     conn.setRequestProperty(HTTPText.AUTHORIZATION, HTTPText.BASIC + ' ' + encoded);
     // send query
     try(final OutputStream out = conn.getOutputStream()) {

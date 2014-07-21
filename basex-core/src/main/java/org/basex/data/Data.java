@@ -218,7 +218,7 @@ public abstract class Data {
           }
           p += attSize(p, k);
         }
-        return tb == null ? t : tb.array();
+        return tb == null ? t : tb.finish();
     }
   }
 
@@ -256,10 +256,9 @@ public abstract class Data {
    */
   public final int[] pre(final int[] ids, final int off, final int len) {
     if(meta.updindex) return idmap.pre(ids, off, len);
-
-    final IntList p = new IntList(ids.length);
-    for(int i = off; i < len; ++i) p.add(preold(ids[i]));
-    return p.sort().toArray();
+    final IntList il = new IntList(len - off);
+    for(int i = off; i < len; ++i) il.add(preold(ids[i]));
+    return il.sort().finish();
   }
 
   /**

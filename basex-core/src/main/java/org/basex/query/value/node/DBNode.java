@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * Database nodes.
+ * Database node.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
@@ -453,7 +453,7 @@ public class DBNode extends ANode {
     final ByteList bl = new ByteList().add(typeId().bytes());
     if(type == NodeType.DOC) bl.add(baseURI()).add(0);
     else if(type == NodeType.ATT) bl.add(qname().uri()).add(0);
-    return bl.toArray();
+    return bl.finish();
   }
 
   @Override

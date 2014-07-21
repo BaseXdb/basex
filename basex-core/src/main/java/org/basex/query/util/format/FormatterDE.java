@@ -83,8 +83,7 @@ final class FormatterDE extends Formatter {
       word(tb, n, ord);
     }
     // create title case
-    final TokenParser tp = new TokenParser(tb.finish());
-    tb.reset();
+    final TokenParser tp = new TokenParser(tb.next());
     for(boolean u = true; tp.more(); u = false) {
       tb.add(u ? uc(tp.next()) : lc(tp.next()));
     }

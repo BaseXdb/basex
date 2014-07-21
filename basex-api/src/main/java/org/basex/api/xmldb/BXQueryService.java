@@ -6,6 +6,10 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.value.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
+import org.basex.util.list.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.modules.*;
@@ -66,7 +70,8 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
 
   @Override
   public BXResourceSet query(final String query) throws XMLDBException {
-    return query(coll.ctx.current(), query);
+    final DBNodes nodes = coll.ctx.current();
+    return query(query, DBNodeSeq.get(new IntList(nodes.pres), nodes.data, nodes.all, nodes.all));
   }
 
   @Override
@@ -74,7 +79,7 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
       throws XMLDBException {
 
     final BXXMLResource xml = coll.getResource(id);
-    if(xml != null) return query(new Nodes(xml.pos, xml.data), query);
+    if(xml != null) return query(query, new DBNode(xml.data, xml.pre));
     // throw exception if id was not found...
     throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_RES + id);
   }
@@ -105,13 +110,13 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
   }
 
   /**
-   * Method for both query actions.
-   * @param nodes initial node set
+   * Runs a query and returns the result set.
    * @param query query string
+   * @param nodes nodes
    * @return resource set
    * @throws XMLDBException exception
    */
-  private BXResourceSet query(final Nodes nodes, final String query) throws XMLDBException {
+  private BXResourceSet query(final String query, final Value nodes) throws XMLDBException {
     // creates a query instance
     final QueryProcessor qp = new QueryProcessor(query, coll.ctx).context(nodes);
     try {
@@ -119,11 +124,9 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
       try {
         coll.ctx.register(qp);
         // add default namespaces
-        for(final String n : ns.keySet()) {
-          qp.sc.ns.add(token(n), token(ns.get(n)), null);
-        }
+        for(final String n : ns.keySet()) qp.sc.ns.add(token(n), token(ns.get(n)), null);
         // perform query and return result
-        return new BXResourceSet(qp.execute(), coll);
+        return new BXResourceSet(qp.value(), coll);
       } finally {
         qp.close();
         coll.ctx.unregister(qp);

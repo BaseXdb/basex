@@ -1,8 +1,6 @@
 # LANGUAGE FILE, TRANSLATED BY
 # Oleksandr Shpak, Max Shamaev
 
-OFF                  = НЕТ
-ON                   = ДА
 about_%              = О %
 access_denied        = Доступ запрещен
 add                  = Добавить

@@ -56,7 +56,7 @@ public final class Test extends Command {
    * @param string string
    * @param number number
    */
-  private void add(final StringBuilder sb, final String string, final int number) {
+  private static void add(final StringBuilder sb, final String string, final int number) {
     sb.append(number).append(' ').append(string);
     if(number != 1) sb.append('s');
     sb.append(", ");

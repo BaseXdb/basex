@@ -18,7 +18,7 @@ final class TreeRects implements TreeConstants {
   /** View. */
   private final View view;
   /** Displayed nods. */
-  Nodes nodes;
+  DBNodes nodes;
 
   /**
    * Constructor.

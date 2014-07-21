@@ -71,7 +71,6 @@ public abstract class Tokenizer extends LanguageImpl {
    * @param unit unit
    * @return new position
    */
-  @SuppressWarnings("unused")
   int pos(final int word, final FTUnit unit) {
     return 0;
   }

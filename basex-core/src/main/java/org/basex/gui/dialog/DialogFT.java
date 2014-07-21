@@ -12,7 +12,6 @@ import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.io.*;
 import org.basex.util.ft.*;
-import org.basex.util.list.*;
 
 /**
  * Full-text creation dialog.
@@ -77,8 +76,8 @@ final class DialogFT extends BaseXBack {
 
     final BaseXBack b1 = new BaseXBack(new TableLayout(1, 2, 8, 0));
     b1.add(check[F_LANG]);
-    final StringList langs = FTLexer.languages();
-    language = new BaseXCombo(d, langs.toArray());
+    final String[] langs = FTLexer.languages().finish();
+    language = new BaseXCombo(d, langs);
     final Language ln = Language.get(opts);
     for(final String l : langs) {
       final String s = l.replaceFirst(" \\(.*", "");

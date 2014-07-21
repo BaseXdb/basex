@@ -37,17 +37,12 @@ public final class InfoStorage extends AQuery {
     final String end = args[1];
 
     // evaluate input as number range or xquery
-    if(start != null && toInt(start) == Integer.MIN_VALUE) {
-      queryNodes();
-      if(result == null) return false;
-    }
-
+    final DBNodes nodes = start != null && toInt(start) == Integer.MIN_VALUE ? dbNodes() : null;
     final Data data = context.data();
-    if(result != null) {
+    if(nodes != null) {
       final Table table = th();
-      for(final int n : ((Nodes) result).pres) table(table, data, n);
+      for(final int n : nodes.pres) table(table, data, n);
       out.print(table.finish());
-      result = null;
     } else {
       int ps = 0;
       int pe = 1000;

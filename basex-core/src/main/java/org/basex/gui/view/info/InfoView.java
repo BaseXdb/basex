@@ -299,7 +299,7 @@ public final class InfoView extends View implements LinkListener {
   @Override
   public void paintComponent(final Graphics g) {
     if(changed) {
-      area.setText(text.finish());
+      area.setText(text.toArray());
       changed = false;
     }
 

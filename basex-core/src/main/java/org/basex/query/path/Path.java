@@ -86,7 +86,7 @@ public abstract class Path extends ParseExpr {
 
     // check if all steps are axis steps
     boolean axes = true;
-    final Expr[] st = stps.finish();
+    final Expr[] st = stps.array();
     for(final Expr step : st) axes &= step instanceof Step;
 
     // choose best implementation
@@ -575,7 +575,7 @@ public abstract class Path extends ParseExpr {
         }
       }
     }
-    if(!invSteps.isEmpty()) newPreds.add(get(info, null, invSteps.finish()));
+    if(!invSteps.isEmpty()) newPreds.add(get(info, null, invSteps.array()));
 
     // create resulting expression
     final ExprList resultSteps = new ExprList();
@@ -599,12 +599,12 @@ public abstract class Path extends ParseExpr {
         step = (Step) resultSteps.get(ls);
       }
       // add remaining predicates to last step
-      resultSteps.set(ls, step.addPreds(newPreds.finish()));
+      resultSteps.set(ls, step.addPreds(newPreds.array()));
     }
 
     // add remaining steps
     for(int s = iStep + 1; s < sl; s++) resultSteps.add(steps[s]);
-    return get(info, resultRoot, resultSteps.finish());
+    return get(info, resultRoot, resultSteps.array());
   }
 
   /**
@@ -640,7 +640,7 @@ public abstract class Path extends ParseExpr {
 
     if(opt) {
       qc.compInfo(OPTDESC);
-      return get(info, root, stps.finish());
+      return get(info, root, stps.array());
     }
     return this;
   }
@@ -712,8 +712,7 @@ public abstract class Path extends ParseExpr {
     if(root != null) sb.append(root);
     for(final Expr s : steps) {
       if(sb.length() != 0) sb.append(s instanceof Bang ? " ! " : "/");
-      if(s instanceof Step) sb.append(s);
-      else sb.append(s);
+      sb.append(s);
     }
     return sb.toString();
   }

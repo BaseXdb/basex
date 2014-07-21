@@ -1,8 +1,6 @@
 # LANGUAGE FILE, TRANSLATED BY
 # Adrian Berila
 
-OFF                  = Oprit
-ON                   = Pornit
 about_%              = Despre %
 access_denied        = Acces refuzat.
 add                  = Adăugare

@@ -69,15 +69,15 @@ public class XMLParser extends SingleParser {
     scanner.more();
     while(true) {
       if(scanner.type == Type.TEXT) {
-        final byte[] text = scanner.token.finish();
+        final byte[] text = scanner.token.toArray();
         if(!elms.isEmpty() || fragment || !ws(text)) {
           if(chops.peek()) scanner.token.trim();
-          builder.text(scanner.token.finish());
+          builder.text(scanner.token.toArray());
         }
       } else if(scanner.type == Type.COMMENT) {
-        builder.comment(scanner.token.finish());
+        builder.comment(scanner.token.toArray());
       } else if(scanner.type == Type.PI) {
-        builder.pi(scanner.token.finish());
+        builder.pi(scanner.token.toArray());
       } else if(scanner.type == Type.EOF) {
         break;
       } else if(scanner.type != Type.DTD) {
@@ -142,7 +142,7 @@ public class XMLParser extends SingleParser {
       consume(Type.QUOTE);
       byte[] av = EMPTY;
       if(scanner.type == Type.ATTVALUE) {
-        av = scanner.token.finish();
+        av = scanner.token.toArray();
         scanner.more();
       }
       consume(Type.QUOTE);
@@ -206,7 +206,7 @@ public class XMLParser extends SingleParser {
    */
   private byte[] consumeToken(final Type type) throws IOException {
     if(scanner.type == type) {
-      final byte[] tok = scanner.token.finish();
+      final byte[] tok = scanner.token.toArray();
       scanner.more();
       return tok;
     }

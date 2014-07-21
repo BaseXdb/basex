@@ -20,9 +20,11 @@ public final class Cs extends AQuery {
 
   @Override
   protected boolean run() {
-    queryNodes();
-    if(result == null) return false;
-    if(result.size() != 0) context.current((Nodes) result);
+    final DBNodes nodes = dbNodes();
+    if(nodes != null && nodes.size() != 0) {
+      context.current(nodes);
+      result = nodes;
+    }
     return true;
   }
 }

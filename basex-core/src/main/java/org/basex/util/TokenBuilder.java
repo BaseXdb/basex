@@ -239,8 +239,12 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder addByte(final byte value) {
-    if(size == chars.length) chars = Arrays.copyOf(chars, Array.newSize(size));
-    chars[size++] = value;
+    byte[] chrs = chars;
+    int s = size;
+    if(s == chrs.length) chrs = Arrays.copyOf(chrs, Array.newSize(s));
+    chrs[s++] = value;
+    chars = chrs;
+    size = s;
     return this;
   }
 
@@ -370,29 +374,46 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder trim() {
-    while(size > 0 && ws(chars[size - 1])) --size;
-    int s = -1;
-    while(++s < size && ws(chars[s]));
-    if(s != 0 && s != size) Array.move(chars, s, -s, size - s);
-    size -= s;
+    final byte[] chrs = chars;
+    int s = size, c = -1;
+    while(s > 0 && ws(chrs[s - 1])) --s;
+    while(++c < s && ws(chrs[c]));
+    if(c != 0 && c != s) Array.move(chrs, c, -c, s - c);
+    size = s - c;
     return this;
   }
 
   /**
    * Returns the token as byte array.
-   * @return character array
+   * @return token
    */
-  public byte[] finish() {
-    return Arrays.copyOf(chars, size);
+  public byte[] toArray() {
+    final int s = size;
+    return s == 0 ? EMPTY : Arrays.copyOf(chars, s);
   }
 
   /**
-   * Returns the original byte array if its size matches the token size, or returns a copy
-   * as {@link #finish()} does.
-   * @return character array
+   * Returns the token as byte array and resets the token buffer.
+   * The call of this function is identical to calling {@link #toArray} and {@link #reset}.
+   * @return token
    */
-  public byte[] array() {
-    return size == chars.length ? chars : finish();
+  public byte[] next() {
+    final int s = size;
+    if(s == 0) return EMPTY;
+    size = 0;
+    return Arrays.copyOf(chars, s);
+  }
+
+  /**
+   * Returns the token as byte array, and invalidates the internal array.
+   * Warning: the function must only be called if the builder is discarded afterwards.
+   * @return token
+   */
+  public byte[] finish() {
+    final byte[] chrs = chars;
+    chars = null;
+    final int s = size;
+    return s == 0 ? EMPTY : s == chrs.length ? chrs : Arrays.copyOf(chrs, s);
   }
 
   @Override

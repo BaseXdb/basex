@@ -1,5 +1,7 @@
 package org.basex.io.out;
 
+import static org.basex.util.Token.*;
+
 import java.io.*;
 import java.util.*;
 
@@ -15,14 +17,14 @@ import org.basex.util.*;
  */
 public final class ArrayOutput extends PrintOutput {
   /** Byte buffer. */
-  private byte[] buf = new byte[8];
+  private byte[] buffer = new byte[8];
 
   @Override
   public void write(final int value) {
     final int s = (int) size;
     if(s == max) return;
-    if(s == buf.length) buf = Arrays.copyOf(buf, Array.newSize(s));
-    buf[s] = (byte) value;
+    if(s == buffer.length) buffer = Arrays.copyOf(buffer, Array.newSize(s));
+    buffer[s] = (byte) value;
     size = s + 1;
   }
 
@@ -31,7 +33,19 @@ public final class ArrayOutput extends PrintOutput {
    * @return byte array
    */
   public byte[] toArray() {
-    return Arrays.copyOf(buf, (int) size);
+    return Arrays.copyOf(buffer, (int) size);
+  }
+
+  /**
+   * Returns the output as byte array, and invalidates the internal array.
+   * Warning: the function must only be called if the output stream is discarded afterwards.
+   * @return token
+   */
+  public byte[] finish() {
+    final byte[] bffr = buffer;
+    buffer = null;
+    final int s = (int) size;
+    return s == 0 ? EMPTY : s == bffr.length ? bffr : Arrays.copyOf(bffr, s);
   }
 
   @Override
@@ -44,7 +58,7 @@ public final class ArrayOutput extends PrintOutput {
    * @return buffer
    */
   public byte[] buffer() {
-    return buf;
+    return buffer;
   }
 
   /**
@@ -56,6 +70,6 @@ public final class ArrayOutput extends PrintOutput {
 
   @Override
   public String toString() {
-    return Token.string(buf, 0, (int) size);
+    return Token.string(buffer, 0, (int) size);
   }
 }

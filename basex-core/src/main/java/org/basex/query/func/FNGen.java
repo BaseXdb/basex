@@ -277,7 +277,7 @@ public final class FNGen extends StandardFunc {
         @Override
         public Item next() {
           try {
-            return nli.readLine(tb) ? Str.get(tb.finish()) : null;
+            return nli.readLine(tb) ? Str.get(tb.toArray()) : null;
           } catch(final IOException ex) {
             throw Util.notExpected(ex);
           }

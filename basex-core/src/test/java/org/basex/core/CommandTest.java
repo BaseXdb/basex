@@ -587,7 +587,7 @@ public class CommandTest extends SandboxTest {
    * @param nodes context nodes
    * @param size expected size
    */
-  private static void ok(final Nodes nodes, final int size) {
+  private static void ok(final DBNodes nodes, final int size) {
     if(nodes != null) assertEquals(size, nodes.size());
   }
 

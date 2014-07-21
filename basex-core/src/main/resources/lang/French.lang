@@ -1,8 +1,6 @@
 # LANGUAGE FILE, TRANSLATED BY
 # Maud Ingarao
 
-OFF                  = OFF
-ON                   = ON
 about_%              = A propos de %
 access_denied        = Accès refusé.
 add                  = Ajouter

@@ -55,10 +55,16 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   /**
    * Adds an element.
    * @param element element to be added
+   * @return self reference
    */
-  public void add(final byte[] element) {
-    if(size == list.length) list = Array.copyOf(list, newSize());
-    list[size++] = element;
+  public TokenList add(final byte[] element) {
+    byte[][] lst = list;
+    int s = size;
+    if(s == lst.length) lst = Arrays.copyOf(lst, newSize());
+    lst[s++] = element;
+    list = lst;
+    size = s;
+    return this;
   }
 
   /**
@@ -173,6 +179,28 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
    */
   public byte[][] toArray() {
     return Array.copyOf(list, size);
+  }
+
+  /**
+   * Returns an array with all elements and resets the array size.
+   * @return array
+   */
+  public byte[][] next() {
+    final byte[][] lst = Arrays.copyOf(list, size);
+    reset();
+    return lst;
+  }
+
+  /**
+   * Returns the token as byte array, and invalidates the internal array.
+   * Warning: the function must only be called if the builder is discarded afterwards.
+   * @return token
+   */
+  public byte[][] finish() {
+    final byte[][] lst = list;
+    list = null;
+    final int s = size;
+    return s == lst.length ? lst : Arrays.copyOf(lst, s);
   }
 
   /**

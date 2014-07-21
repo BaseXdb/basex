@@ -174,8 +174,6 @@ public interface Text {
   /** Index info. */
   String HASH = "Hash";
   /** Index info. */
-  String FUZZY = "Fuzzy";
-  /** Index info. */
   String SORTED_LIST = "Sorted List";
 
   /** Query hits. */
@@ -251,11 +249,6 @@ public interface Text {
   String USERNAME = lang("username");
   /** Password. */
   String PASSWORD = lang("password");
-
-  /** Option flag. */
-  String INFOON = lang("ON");
-  /** Option flag. */
-  String INFOOFF = lang("OFF");
 
   // COMMANDS =================================================================
 

@@ -309,7 +309,7 @@ public final class BaseXLayout {
     final StringBuilder sb = new StringBuilder();
     for(final String s : sc.split(" ")) {
       String t = "%".equals(s) ? Prop.MAC ? "meta" : "control" : s;
-      if(t.length() != 1) t = Toolkit.getProperty("AWT." + t.toLowerCase(), t);
+      if(t.length() != 1) t = Toolkit.getProperty("AWT." + t.toLowerCase(Locale.ENGLISH), t);
       sb.append('+').append(t);
     }
     return str + " (" + sb.substring(1) + ')';

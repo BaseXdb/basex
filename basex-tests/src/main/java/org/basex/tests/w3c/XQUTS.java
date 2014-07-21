@@ -1,8 +1,9 @@
 package org.basex.tests.w3c;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -32,7 +33,7 @@ public final class XQUTS extends W3CTS {
   }
 
   @Override
-  protected Nodes states(final Nodes root) throws QueryException {
+  protected Value states(final Item root) throws QueryException {
     return nodes("*:state", root);
   }
 

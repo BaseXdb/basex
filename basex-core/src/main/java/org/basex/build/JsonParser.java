@@ -50,7 +50,7 @@ public final class JsonParser extends XMLParser {
   public static IOContent toXML(final IO io, final JsonParserOptions options) throws IOException {
     final JsonConverter conv = JsonConverter.get(options);
     conv.convert(io);
-    final IOContent xml = new IOContent(conv.finish().serialize().toArray());
+    final IOContent xml = new IOContent(conv.finish().serialize().finish());
     xml.name(io.name());
     return xml;
   }

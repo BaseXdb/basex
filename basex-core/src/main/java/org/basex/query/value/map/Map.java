@@ -87,7 +87,7 @@ public final class Map extends FItem {
    * @return possibly atomized item if non {@code NaN}, {@code null} otherwise
    * @throws QueryException query exception
    */
-  private Item key(final Item it, final InputInfo ii) throws QueryException {
+  private static Item key(final Item it, final InputInfo ii) throws QueryException {
     // no empty sequence allowed
     if(it == null) throw SEQEMPTY.get(ii);
 

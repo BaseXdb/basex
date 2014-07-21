@@ -139,13 +139,10 @@ public final class Prop {
     // not found; check application directory
     if(LOCATION != null) {
       try {
-        dir = Paths.get(LOCATION.toURI()).toString();
-        if(dir != null) {
-          dir = new IOFile(dir).dir();
-          file = new IOFile(dir, home);
-          if(!file.exists()) file = new IOFile(dir, IO.BASEXSUFFIX);
-          if(file.exists()) return file.dir();
-        }
+        dir = new IOFile(Paths.get(LOCATION.toURI()).toString()).dir();
+        file = new IOFile(dir, home);
+        if(!file.exists()) file = new IOFile(dir, IO.BASEXSUFFIX);
+        if(file.exists()) return file.dir();
       } catch(final Exception ex) {
         Util.stack(ex);
       }

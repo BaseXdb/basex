@@ -102,7 +102,7 @@ public final class DecFormatter extends FormatUtil {
     // create auxiliary strings
     final TokenBuilder tb = new TokenBuilder();
     for(int i = 0; i < 10; i++) tb.add(zero + i);
-    digits = tb.finish();
+    digits = tb.toArray();
     active = tb.add(decimal).add(grouping).add(optional).finish();
   }
 
@@ -129,7 +129,7 @@ public final class DecFormatter extends FormatUtil {
       if(contains(pic, pattern)) throw PICNUM.get(info, picture);
       tl.add(pic);
     }
-    final byte[][] patterns = tl.toArray();
+    final byte[][] patterns = tl.finish();
 
     // check and analyze patterns
     if(!check(patterns)) throw PICNUM.get(info, picture);
@@ -340,11 +340,11 @@ public final class DecFormatter extends FormatUtil {
     // add minus sign
     if(neg && pics.length != 2) res.add(minus);
     // add prefix and integer part
-    res.add(pic.fix[0].finish()).add(intgr.finish());
+    res.add(pic.fix[0].toArray()).add(intgr.finish());
     // add fractional part
     if(!fract.isEmpty()) res.add(decimal).add(fract.finish());
     // add suffix
-    return res.add(pic.fix[1].finish()).finish();
+    return res.add(pic.fix[1].toArray()).finish();
   }
 
   /** Picture variables. */

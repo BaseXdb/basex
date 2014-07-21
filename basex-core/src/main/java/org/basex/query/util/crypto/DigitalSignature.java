@@ -306,7 +306,7 @@ public final class DigitalSignature {
     final Serializer ser = Serializer.get(ao, sopts);
     ser.serialize(n);
     ser.close();
-    return ao.toArray();
+    return ao.finish();
   }
 
   /**

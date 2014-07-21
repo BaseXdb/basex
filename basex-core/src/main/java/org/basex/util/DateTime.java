@@ -14,8 +14,7 @@ public final class DateTime {
   /** Date pattern. */
   public static final String PATTERN = "-\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}";
   /** Full date format. */
-  public static final SimpleDateFormat FULL =
-      new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+  public static final SimpleDateFormat FULL = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
   /** Date format without milliseconds and timestamp. */
   public static final SimpleDateFormat DATETIME = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
   /** Date format. */

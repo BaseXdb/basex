@@ -83,17 +83,15 @@ public final class QueryContext extends Proc {
   public long pos = 1;
   /** Current context size. */
   public long size = 1;
-  /** Globally available nodes (may be {@code null}). */
-  Nodes nodes;
 
+  /** Full-text position data (needed for highlighting full-text results). */
+  public FTPosData ftPosData = Prop.gui ? new FTPosData() : null;
   /** Available collations. */
   public TokenObjMap<Collation> collations;
   /** Current full-text token. */
   public FTLexer ftToken;
   /** Current full-text options. */
   private FTOpt ftOpt;
-  /** Full-text position data (needed for highlighting full-text results). */
-  public FTPosData ftPosData;
   /** Full-text token positions (needed for highlighting full-text results). */
   public int ftPos;
 
@@ -263,8 +261,6 @@ public final class QueryContext extends Proc {
    * @throws QueryException query exception
    */
   public void compile() throws QueryException {
-    if(nodes == null) nodes = context.current();
-
     // set database options
     final StringList o = tempOpts;
     for(int s = 0; s < o.size(); s += 2) {
@@ -290,11 +286,13 @@ public final class QueryContext extends Proc {
         // only {@link ParseExpr} instances may cause this error
         throw CIRCCTX.get(ctxItem.info);
       }
-    } else if(nodes != null) {
-      // add full-text container reference
-      if(nodes.ftpos != null) ftPosData = new FTPosData();
+    } else {
       // cache the initial context nodes
-      resources.compile(nodes);
+      final DBNodes nodes = context.current();
+      if(nodes != null) {
+        if(!context.perm(Perm.READ, nodes.data.meta)) throw BASX_PERM.get(null, Perm.READ);
+        value = resources.compile(nodes);
+      }
     }
 
     // if specified, convert context item to specified type
@@ -608,23 +606,21 @@ public final class QueryContext extends Proc {
     Item it;
 
     // check if all results belong to the database of the input context
-    if(serialOpts == null && nodes != null) {
-      final IntList pre = new IntList();
-
+    final Data data = resources.globalData();
+    if(serialOpts == null && data != null) {
+      final IntList pres = new IntList();
       while((it = ir.next()) != null) {
         checkStop();
-        if(it.data() != nodes.data) break;
-        if(pre.size() < max) pre.add(((DBNode) it).pre);
+        if(it.data() != data) break;
+        if(pres.size() < max) pres.add(((DBNode) it).pre);
       }
 
-      final int ps = pre.size();
-      if(it == null || ps == max) {
-        // all nodes have been processed: return GUI-friendly nodeset
-        return ps == 0 ? vb : new Nodes(pre.toArray(), nodes.data, ftPosData);
-      }
+      final int ps = pres.size();
+      // all nodes have been processed: return compact node sequence
+      if(it == null || ps == max) return ps == 0 ? vb : new DBNodes(data, ftPosData, pres.finish());
 
       // otherwise, add nodes to standard iterator
-      for(int p = 0; p < ps; ++p) vb.add(new DBNode(nodes.data, pre.get(p)));
+      for(int p = 0; p < ps; ++p) vb.add(new DBNode(data, pres.get(p)));
       vb.add(it);
     }
 
@@ -645,11 +641,11 @@ public final class QueryContext extends Proc {
     final FElem e = new FElem(QueryText.PLAN);
     if(root != null) {
       for(final StaticScope scp : QueryCompiler.usedDecls(root)) scp.plan(e);
+      root.plan(e);
     } else {
       funcs.plan(e);
       vars.plan(e);
     }
-    root.plan(e);
     doc.add(e);
   }
 

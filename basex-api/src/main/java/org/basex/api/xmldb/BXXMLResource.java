@@ -16,6 +16,7 @@ import org.basex.io.out.*;
 import org.basex.io.parse.xml.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
@@ -34,13 +35,13 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
   /** String id. */
   private String id;
   /** Query result. */
-  private Result result;
+  private Item item;
   /** Cached content. */
   Object content;
   /** Data reference. */
   Data data;
   /** Pre value or result position. */
-  int pos;
+  int pre;
 
   /**
    * Constructor for generated results.
@@ -54,28 +55,26 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
 
   /**
    * Constructor for query results.
-   * @param result query result
-   * @param pos query counter
+   * @param item query result
    * @param coll Collection
    */
-  BXXMLResource(final Result result, final int pos, final Collection coll) {
-    this.result = result;
+  BXXMLResource(final Item item, final Collection coll) {
+    this.item = item;
     this.coll = coll;
-    this.pos = pos;
   }
 
   /**
    * Standard constructor.
    * @param data data reference
-   * @param pos pre value
+   * @param pre pre value
    * @param id id
    * @param coll collection
    */
-  BXXMLResource(final Data data, final int pos, final String id, final Collection coll) {
+  BXXMLResource(final Data data, final int pre, final String id, final Collection coll) {
     this.id = id;
     this.coll = coll;
     this.data = data;
-    this.pos = pos;
+    this.pre = pre;
   }
 
   @Override
@@ -101,9 +100,9 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
         final ArrayOutput ao = new ArrayOutput();
         final Serializer ser = Serializer.get(ao);
         if(data != null) {
-          ser.serialize(new DBNode(data, pos));
-        } else if(result != null) {
-          result.serialize(ser, pos);
+          ser.serialize(new DBNode(data, pre));
+        } else if(item != null) {
+          ser.serialize(item);
         } else {
           return null;
         }
@@ -136,15 +135,14 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
 
   @Override
   public String getDocumentId() throws XMLDBException {
-    // throw exception if resource result from query; does not conform to the
+    // throw exception if resource results from query; does not conform to the
     // specs, but many query results are not related to a document anymore
-    if(result != null)
-     throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_DOC);
+    if(item != null) throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_DOC);
 
     // resource does not result from a query - return normal id
     if(id != null) return id;
     // get document root id
-    int p = pos;
+    int p = pre;
     while(p >= 0) {
       final int k = data.kind(p);
       if(k == Data.DOC) return string(data.text(p, true));
@@ -155,7 +153,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
 
   @Override
   public Node getContentAsDOM() {
-    if(!(content instanceof Node)) content = new BXDoc(new DBNode(data, pos));
+    if(!(content instanceof Node)) content = new BXDoc(new DBNode(data, pre));
     return (Node) content;
   }
 

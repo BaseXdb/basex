@@ -74,7 +74,6 @@ abstract class AUser extends Command {
    * @param db database to be modified
    * @return success flag
    */
-  @SuppressWarnings("unused")
   boolean run(final String user, final String db) {
     return true;
   }

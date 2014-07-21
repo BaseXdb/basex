@@ -85,18 +85,18 @@ public final class IntSeq extends NativeSeq {
 
   /**
    * Creates a sequence with the items in the specified expressions.
-   * @param vals values
+   * @param values values
    * @param size size of resulting sequence
    * @param type item type
    * @return value
    * @throws QueryException query exception
    */
-  public static Value get(final Value[] vals, final int size, final Type type)
+  public static Value get(final Value[] values, final int size, final Type type)
       throws QueryException {
 
     final long[] tmp = new long[size];
     int t = 0;
-    for(final Value val : vals) {
+    for(final Value val : values) {
       // speed up construction, depending on input
       final int vs = (int) val.size();
       if(val instanceof Item) {

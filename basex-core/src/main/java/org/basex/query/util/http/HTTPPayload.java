@@ -115,10 +115,10 @@ public final class HTTPPayload {
       for(int i; (i = bis.read()) != -1;) bl.add(i);
       // In case of XML, HTML or text content type, use supplied character set
       if(isXML(ctype) || isText(ctype))
-        return new TextInput(new IOContent(bl.toArray())).encoding(ce).content();
+        return new TextInput(new IOContent(bl.finish())).encoding(ce).content();
 
       // In case of binary data, do not encode anything
-      return bl.toArray();
+      return bl.finish();
     } finally {
       bis.close();
     }
@@ -217,13 +217,13 @@ public final class HTTPPayload {
       // RFC 1341: a line ends with CRLF
       while(b == '\r') {
         b = in.read();
-        if(b == '\n') return bl.toArray();
+        if(b == '\n') return bl.finish();
         bl.add('\r');
-        if(b == -1) return bl.toArray();
+        if(b == -1) return bl.finish();
       }
       bl.add(b);
     }
-    return bl.isEmpty() ? null : bl.toArray();
+    return bl.isEmpty() ? null : bl.finish();
   }
 
   /**
@@ -248,7 +248,7 @@ public final class HTTPPayload {
       }
       bl.add(next).add('\n');
     }
-    return new TextInput(new IOContent(bl.toArray())).encoding(enc).content();
+    return new TextInput(new IOContent(bl.finish())).encoding(enc).content();
   }
 
   /**
@@ -295,13 +295,12 @@ public final class HTTPPayload {
             final Map m = (Map) val;
             final Str k = Str.get(fn);
             final Value v = new ValueBuilder().add(m.get(k, info)).add(
-                new B64(cont.toArray())).value();
+                new B64(cont.next())).value();
             val = m.insert(k, v, info);
           } else {
-            val = Str.get(cont.toArray());
+            val = Str.get(cont.next());
           }
           if(!name.isEmpty()) map.put(name, val);
-          cont.reset();
           lines = -1;
           if(eq(line, last)) break;
         } else {

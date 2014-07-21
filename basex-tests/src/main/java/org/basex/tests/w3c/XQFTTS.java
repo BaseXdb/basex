@@ -2,10 +2,11 @@ package org.basex.tests.w3c;
 
 import java.util.*;
 
-import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ft.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 
@@ -45,29 +46,26 @@ public final class XQFTTS extends W3CTS {
   }
 
   @Override
-  protected void init(final Nodes root) throws QueryException {
+  protected void init(final DBNode root) throws QueryException {
     Util.outln("Caching Full-text Structures...");
-    for(final int s : nodes("//*:stopwords", root).pres) {
-      final Nodes srcRoot = new Nodes(s, data);
-      final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
-      stop.put(text("@uri", srcRoot), IO.get(val));
-      stop2.put(text("@ID", srcRoot), IO.get(val));
+    for(final Item node : nodes("//*:stopwords", root)) {
+      final String val = (path + text("@FileName", node)).replace('\\', '/');
+      stop.put(text("@uri", node), IO.get(val));
+      stop2.put(text("@ID", node), IO.get(val));
     }
-    for(final int s : nodes("//*:stemming-dictionary", root).pres) {
-      final Nodes srcRoot = new Nodes(s, data);
-      final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
-      stem.put(text("@ID", srcRoot), IO.get(val));
+    for(final Item node : nodes("//*:stemming-dictionary", root)) {
+      final String val = (path + text("@FileName", node)).replace('\\', '/');
+      stem.put(text("@ID", node), IO.get(val));
     }
-    for(final int s : nodes("//*:thesaurus", root).pres) {
-      final Nodes srcRoot = new Nodes(s, data);
-      final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
-      thes.put(text("@uri", srcRoot), IO.get(val));
-      thes2.put(text("@ID", srcRoot), IO.get(val));
+    for(final Item node : nodes("//*:thesaurus", root)) {
+      final String val = (path + text("@FileName", node)).replace('\\', '/');
+      thes.put(text("@uri", node), IO.get(val));
+      thes2.put(text("@ID", node), IO.get(val));
     }
   }
 
   @Override
-  protected void parse(final QueryProcessor qp, final Nodes root) throws QueryException {
+  protected void parse(final QueryProcessor qp, final Item root) throws QueryException {
     final QueryContext qc = qp.qc;
     qc.stop = stop;
     qc.thes = thes;
@@ -105,7 +103,7 @@ public final class XQFTTS extends W3CTS {
    * @return attribute value
    * @throws QueryException query exception
    */
-  private String[] aux(final String role, final Nodes root) throws QueryException {
+  private String[] aux(final String role, final Item root) throws QueryException {
     return text("*:aux-URI[@role = '" + role + "']", root).split("/");
   }
 }

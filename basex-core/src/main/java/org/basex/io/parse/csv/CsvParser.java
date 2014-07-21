@@ -102,11 +102,10 @@ final class CsvParser extends InputParser {
     if(record && first && data) conv.record();
     if(record || !first) {
       if(data) {
-        conv.entry(entry.finish());
+        conv.entry(entry.next());
       } else {
-        conv.header(entry.finish());
+        conv.header(entry.next());
       }
-      entry.reset();
     }
   }
 }

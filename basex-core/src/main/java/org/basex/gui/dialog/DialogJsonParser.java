@@ -62,16 +62,16 @@ final class DialogJsonParser extends DialogParser {
 
     encoding = DialogExport.encoding(d, jopts.get(JsonParserOptions.ENCODING));
 
-    final StringList sl = new StringList();
     final JsonFormat[] formats = JsonFormat.values();
     final int fl = formats.length - 1;
-    for(int f = 0; f < fl; f++) sl.add(formats[f].toString());
-    format = new BaseXCombo(d, sl.toArray());
+    final StringList frmts = new StringList(fl);
+    for(int f = 0; f < fl; f++) frmts.add(formats[f].toString());
+    format = new BaseXCombo(d, frmts.finish());
     format.setSelectedItem(jopts.get(JsonOptions.FORMAT));
 
-    sl.reset();
-    for(final JsonSpec cs : JsonSpec.values()) sl.add(cs.toString());
-    spec = new BaseXCombo(d, sl.toArray());
+    final StringList spcs = new StringList();
+    for(final JsonSpec cs : JsonSpec.values()) spcs.add(cs.toString());
+    spec = new BaseXCombo(d, spcs.finish());
     spec.setSelectedItem(jopts.get(JsonOptions.SPEC));
 
     unescape = new BaseXCheckBox(UNESCAPE_CHARS, JsonParserOptions.UNESCAPE, jopts, d);

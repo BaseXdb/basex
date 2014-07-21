@@ -2,7 +2,7 @@ package org.basex.api.xmldb;
 
 import java.util.*;
 
-import org.basex.data.*;
+import org.basex.query.value.*;
 import org.basex.util.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.base.Collection;
@@ -24,11 +24,11 @@ final class BXResourceSet implements ResourceSet, BXXMLDBText {
    * @param result result
    * @param coll collection
    */
-  BXResourceSet(final Result result, final Collection coll) {
+  BXResourceSet(final Value result, final Collection coll) {
     // convert result into resource instances
     final int rs = (int) result.size();
     list = new ArrayList<>(rs);
-    for(int s = 0; s < rs; ++s) list.add(new BXXMLResource(result, s, coll));
+    for(int s = 0; s < rs; ++s) list.add(new BXXMLResource(result.itemAt(s), coll));
     this.coll = coll;
   }
 

@@ -96,7 +96,7 @@ public final class CompressTest extends SandboxTest {
     }
     qp.close();
 
-    run(tl.toArray());
+    run(tl.finish());
     run(tb.finish());
   }
 

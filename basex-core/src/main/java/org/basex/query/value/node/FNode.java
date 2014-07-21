@@ -8,7 +8,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Main memory based node fragments.
+ * Main-memory node fragment.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen

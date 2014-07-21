@@ -90,15 +90,16 @@ public final class ExprList extends ElementList {
 
   /**
    * Returns an array with all elements.
-   * Warning: the internal array representation may be returned to improve performance.
+   * Warning: the function must only be called if the list is discarded afterwards.
    * @return internal or internal array
    */
-  public Expr[] finish() {
+  public Expr[] array() {
+    Expr[] tmp = list;
     if(size != list.length) {
-      final Expr[] tmp = new Expr[size];
+      tmp = new Expr[size];
       System.arraycopy(list, 0, tmp, 0, size);
-      list = tmp;
     }
-    return list;
+    list = null;
+    return tmp;
   }
 }

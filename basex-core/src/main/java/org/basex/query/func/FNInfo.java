@@ -142,7 +142,7 @@ public final class FNInfo extends StandardFunc {
       } else if(it.type == NodeType.ATT || it.type == NodeType.NSP) {
         value = Token.token(it.toString());
       } else {
-        value = it.serialize().toArray();
+        value = it.serialize().finish();
       }
       dump(value, label, qc);
     } catch(final QueryIOException ex) {

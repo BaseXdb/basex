@@ -45,7 +45,7 @@ public abstract class GUIPopupCmd implements GUICommand {
   }
 
   @Override
-  public final String shortcut() {
+  public final String shortCut() {
     return null;
   }
 

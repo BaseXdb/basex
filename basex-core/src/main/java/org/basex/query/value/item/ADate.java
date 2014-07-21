@@ -262,7 +262,7 @@ public abstract class ADate extends ADateDur {
       }
 
       // change time if two competing time zones exist
-      if(zon != Short.MAX_VALUE) add(BigDecimal.valueOf(60 * (t - zon)));
+      if(zon != Short.MAX_VALUE) add(BigDecimal.valueOf(60L * (t - zon)));
     }
     zon = t;
   }

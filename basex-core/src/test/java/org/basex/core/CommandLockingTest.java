@@ -350,7 +350,6 @@ public class CommandLockingTest extends SandboxTest {
                             final StringList reqWt, final StringList allowWt) {
     // Fetch databases BaseX thinks it needs to lock
     final LockResult lr = new LockResult();
-    // [CG] cmd.updating needed because of some side-effects (instantiate QueryProcessor?)
     cmd.updating(DUMMY_CONTEXT);
     cmd.databases(lr);
     // Need sorted lists for compareAll

@@ -81,16 +81,16 @@ public final class InfoIndex extends AInfo {
 
   /**
    * Returns the specified index information.
-   * @param ds index description
+   * @param desc index description
    * @param it index type
    * @param data data reference
    * @param avl states if index is available
    * @return information
    */
-  private static byte[] info(final String ds, final IndexType it, final Data data,
+  private static byte[] info(final String desc, final IndexType it, final Data data,
       final boolean avl) {
 
-    final TokenBuilder tb = new TokenBuilder(ds).add(NL);
+    final TokenBuilder tb = new TokenBuilder(desc).add(NL);
     if(avl) tb.add(data.info(it));
     else tb.add(LI).addExt(NOT_AVAILABLE, it).add(NL);
     return tb.add(NL).finish();

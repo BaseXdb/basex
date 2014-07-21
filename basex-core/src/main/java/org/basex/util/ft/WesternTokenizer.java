@@ -295,8 +295,7 @@ public final class WesternTokenizer extends Tokenizer {
       if(c != norm(c)) {
         final TokenBuilder tb = new TokenBuilder();
         tb.add(t, 0, i);
-        for(int j = i; j < tl; j += cl(t, j))
-          tb.add(norm(cp(t, j)));
+        for(int j = i; j < tl; j += cl(t, j)) tb.add(norm(cp(t, j)));
         return tb.finish();
       }
     }
@@ -313,13 +312,11 @@ public final class WesternTokenizer extends Tokenizer {
   static byte[] upper(final byte[] t, final boolean a) {
     final int tl = t.length;
     if(a) {
-      for(int i = 0; i < tl; ++i)
-        t[i] = (byte) uc(t[i]);
+      for(int i = 0; i < tl; ++i) t[i] = (byte) uc(t[i]);
       return t;
     }
     final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < tl; i += cl(t, i))
-      tb.add(uc(cp(t, i)));
+    for(int i = 0; i < tl; i += cl(t, i)) tb.add(uc(cp(t, i)));
     return tb.finish();
   }
 
@@ -337,21 +334,17 @@ public final class WesternTokenizer extends Tokenizer {
       return t;
     }
     final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < tl; i += cl(t, i))
-      tb.add(lc(cp(t, i)));
+    for(int i = 0; i < tl; i += cl(t, i)) tb.add(lc(cp(t, i)));
     return tb.finish();
   }
 
   @Override
   int[][] info() {
     init();
-    final IntList[] il = { new IntList(), new IntList(),
-        new IntList(), new IntList(), new IntList()};
-    int lass = 0;
-    int lasp = 0;
-    int sl = 0;
-    int pl = 0;
-
+    final IntList[] il = {
+      new IntList(), new IntList(), new IntList(), new IntList(), new IntList()
+    };
+    int lass = 0, lasp = 0, sl = 0, pl = 0;
     while(more()) {
       final byte[] n = orig();
       final int l = n.length;
@@ -384,8 +377,9 @@ public final class WesternTokenizer extends Tokenizer {
     // last sentence not finished with a punctuation mark
     il[1].add(sl + 1);
 
-    return new int[][] { il[0].toArray(), il[1].toArray(), il[2].toArray(),
-        il[3].toArray(), il[4].toArray()};
+    return new int[][] {
+        il[0].finish(), il[1].finish(), il[2].finish(), il[3].finish(), il[4].finish()
+    };
   }
 
   @Override

@@ -16,8 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 class SAXSerializerObject {
   /** Name of the object. */
   @XmlAttribute
-  private
-  String name;
+  private String name;
   /** Value. */
   private long value;
 

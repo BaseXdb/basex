@@ -34,15 +34,15 @@ public final class IntFormat extends FormatParser {
     final TokenParser tp = new TokenParser(mod);
     // parse cardinal/ordinal flag
     if(tp.consume('c') || tp.consume('o')) {
-      final TokenBuilder ord = new TokenBuilder();
+      final TokenBuilder tb = new TokenBuilder();
       if(tp.consume('(')) {
         while(!tp.consume(')')) {
           if(!tp.more()) throw INVORDINAL.get(info, mod);
           final int cp = tp.next();
-          if(cp != '-') ord.add(cp);
+          if(cp != '-') tb.add(cp);
         }
       }
-      ordinal = ord.finish();
+      ordinal = tb.finish();
     }
     // parse alphabetical/traditional flag
     if(!tp.consume('a')) tp.consume('t');

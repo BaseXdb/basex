@@ -58,7 +58,6 @@ public abstract class BasicUpdate {
    * @param bu update to merge with
    * @return merged atomic update or null if merge not possible
    */
-  @SuppressWarnings("unused")
   public BasicUpdate merge(final Data data, final BasicUpdate bu) {
     return null;
   }

@@ -339,7 +339,7 @@ public final class DialogServer extends BaseXDialog {
       } else if(cmp == deleteAll) {
         IOFile file = null;
         for(int i = 0; i < logc.getItemCount(); ++i) {
-          final IOFile f = new IOFile(logd, logc.getItemAt(i).toString());
+          final IOFile f = new IOFile(logd, logc.getItemAt(i));
           if(!f.delete()) file = f;
         }
         if(file != null) {

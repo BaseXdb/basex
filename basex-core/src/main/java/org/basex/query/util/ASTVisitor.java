@@ -12,7 +12,6 @@ import org.basex.query.var.*;
  *
  * @author Leo Woerteler
  */
-@SuppressWarnings("unused")
 public abstract class ASTVisitor {
   /**
    * Notifies the visitor of a variable declaration.
