@@ -199,6 +199,7 @@ public abstract class Serializer {
    * @param ftp full-text positions, used for visualization highlighting
    * @throws IOException I/O exception
    */
+  @SuppressWarnings("unused")
   void finishText(final byte[] value, final FTPos ftp) throws IOException {
     text(value);
   }

@@ -381,8 +381,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    */
   private static void ok(final IO desc) {
     try {
-      new PkgValidator(context.repo, null).check(
-         new PkgParser(context.repo, null).parse(desc));
+      new PkgValidator(context.repo, null).check(new PkgParser(null).parse(desc));
     } catch(final QueryException ex) {
       fail("Unexpected exception thrown: " + ex);
     }
@@ -396,8 +395,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    */
   private static void error(final IO desc, final Err err, final String exp) {
     try {
-      new PkgValidator(context.repo, null).check(
-         new PkgParser(context.repo, null).parse(desc));
+      new PkgValidator(context.repo, null).check(new PkgParser(null).parse(desc));
       fail(exp);
     } catch(final QueryException ex) {
       check(null, ex, err);

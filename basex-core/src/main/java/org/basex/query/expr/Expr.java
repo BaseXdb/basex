@@ -272,6 +272,7 @@ public abstract class Expr extends ExprInfo {
    * @param qc query context
    * @return optimized expression
    */
+  @SuppressWarnings("unused")
   public Expr compEbv(final QueryContext qc) {
     return this;
   }
@@ -320,6 +321,7 @@ public abstract class Expr extends ExprInfo {
    * @param func function definition
    * @return result of check
    */
+  @SuppressWarnings("unused")
   public boolean isFunction(final Function func) {
     return false;
   }
@@ -349,6 +351,7 @@ public abstract class Expr extends ExprInfo {
    * Finds and marks tail calls, enabling TCO.
    * @param qc query context, {@code null} if the changes should not be reported
    */
+  @SuppressWarnings("unused")
   public void markTailCalls(final QueryContext qc) { }
 
   /**

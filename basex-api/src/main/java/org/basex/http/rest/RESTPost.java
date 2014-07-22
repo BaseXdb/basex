@@ -47,7 +47,7 @@ final class RESTPost {
     final Context ctx = rs.context;
     final DBNode doc;
     try {
-      doc = new DBNode(new IOContent(input), ctx.options);
+      doc = new DBNode(new IOContent(input));
     } catch(final IOException ex) {
       throw HTTPCode.BAD_REQUEST_X.get(ex);
     }

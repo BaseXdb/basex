@@ -23,18 +23,14 @@ import org.basex.util.*;
  * @author Rositsa Shadura
  */
 public final class PkgParser {
-  /** Repository context. */
-  private final Repo repo;
   /** Input info. */
   private final InputInfo info;
 
   /**
    * Constructor.
-   * @param repo repository context
    * @param info input info
    */
-  public PkgParser(final Repo repo, final InputInfo info) {
-    this.repo = repo;
+  public PkgParser(final InputInfo info) {
     this.info = info;
   }
 
@@ -47,12 +43,8 @@ public final class PkgParser {
   public Package parse(final IO io) throws QueryException {
     final Package pkg = new Package();
     try {
-      final byte[] content = io.read();
-
-      final DBNode doc = new DBNode(new IOContent(content), repo.context.options);
-      final ANode node = childElements(doc).next();
-
       // checks root node
+      final ANode node = childElements(new DBNode(new IOContent(io.read()))).next();
       if(!eqNS(PACKAGE, node.qname()))
         throw BXRE_DESC.get(info, Util.info(WHICHELEM, node.qname()));
 

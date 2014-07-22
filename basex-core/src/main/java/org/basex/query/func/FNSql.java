@@ -211,7 +211,7 @@ public final class FNSql extends StandardFunc {
 
     final String query = string(checkStr(exprs[1], qc));
     try(final Statement stmt = ((Connection) obj).createStatement()) {
-      return stmt.execute(query) ? buildResult(stmt.getResultSet(), qc) : new NodeSeqBuilder();
+      return stmt.execute(query) ? buildResult(stmt.getResultSet()) : new NodeSeqBuilder();
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.get(info, ex);
     }
@@ -242,7 +242,7 @@ public final class FNSql extends StandardFunc {
       // Check if number of parameters equals number of place holders
       if(c != stmt.getParameterMetaData().getParameterCount()) throw BXSQ_PARAMS.get(info);
       if(params != null) setParameters(params.children(), stmt);
-      return stmt.execute() ? buildResult(stmt.getResultSet(), qc) : new NodeSeqBuilder();
+      return stmt.execute() ? buildResult(stmt.getResultSet()) : new NodeSeqBuilder();
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.get(info, ex);
     }
@@ -344,14 +344,11 @@ public final class FNSql extends StandardFunc {
   /**
    * Builds a sequence of elements from a query's result set.
    * @param rs result set
-   * @param qc query context
    * @return sequence of elements <tuple/> each of which represents a row from
    *         the result set
    * @throws QueryException query exception
    */
-  private NodeSeqBuilder buildResult(final ResultSet rs, final QueryContext qc)
-      throws QueryException {
-
+  private NodeSeqBuilder buildResult(final ResultSet rs) throws QueryException {
     try {
       final ResultSetMetaData metadata = rs.getMetaData();
       final int cc = metadata.getColumnCount();
@@ -374,7 +371,7 @@ public final class FNSql extends StandardFunc {
             // add XML value as child element
             final String xml = ((SQLXML) value).getString();
             try {
-              col.add(new DBNode(new IOContent(xml), qc.context.options).children().next());
+              col.add(new DBNode(new IOContent(xml)).children().next());
             } catch(final IOException ex) {
               // fallback: add string representation
               Util.debug(ex);

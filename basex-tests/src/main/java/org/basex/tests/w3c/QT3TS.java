@@ -120,7 +120,6 @@ public final class QT3TS extends Main {
 
     final Performance perf = new Performance();
     ctx.options.set(MainOptions.CHOP, false);
-    ctx.options.set(MainOptions.INTPARSE, false);
 
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.INDENT, YesNo.NO);

@@ -80,11 +80,10 @@ public class DBNode extends ANode {
   /**
    * Constructor, specifying an XML input reference.
    * @param input input reference
-   * @param opts database options
    * @throws IOException I/O exception
    */
-  public DBNode(final IO input, final MainOptions opts) throws IOException {
-    this(Parser.xmlParser(input, opts));
+  public DBNode(final IO input) throws IOException {
+    this(Parser.xmlParser(input));
   }
 
   /**

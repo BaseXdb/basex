@@ -49,7 +49,6 @@ public abstract class QT3TestSet {
   public void buildUp() throws BaseXException {
     ctx = new Context();
     new Set(MainOptions.CHOP, false).execute(ctx);
-    new Set(MainOptions.INTPARSE, false).execute(ctx);
     new Set(MainOptions.XQUERY3, true).execute(ctx);
     result = null;
   }

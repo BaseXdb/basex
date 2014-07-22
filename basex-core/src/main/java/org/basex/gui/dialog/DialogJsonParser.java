@@ -123,8 +123,7 @@ final class DialogJsonParser extends DialogParser {
         } else {
           json = EXAMPLE;
         }
-        final IO io = JsonParser.toXML(new IOContent(json), jopts);
-        final DBNode node = new DBNode(io, dialog.gui.context.options);
+        final DBNode node = new DBNode(JsonParser.toXML(new IOContent(json), jopts));
         example.setText(example(MainParser.JSON.name(), json, node.serialize().toString()));
       }
     } catch(final IOException ex) {

@@ -6,11 +6,11 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -20,18 +20,14 @@ import org.basex.util.*;
  * @author Rositsa Shadura
  */
 final class JarParser {
-  /** Context. */
-  private final Context context;
   /** Input info. */
   private final InputInfo info;
 
   /**
    * Constructor.
-   * @param context database context
    * @param info input info
    */
-  JarParser(final Context context, final InputInfo info) {
-    this.context = context;
+  JarParser(final InputInfo info) {
     this.info = info;
   }
 
@@ -44,8 +40,10 @@ final class JarParser {
   public JarDesc parse(final IO io) throws QueryException {
     final JarDesc desc = new JarDesc();
     try {
-      final ANode node = new DBNode(io, context.options).children().next();
+      final ANode node = new DBNode(io).children().next();
       for(final ANode next : node.children()) {
+        if(next.type != NodeType.ELM) continue;
+
         final QNm name = next.qname();
         // ignore namespace to improve compatibility
         if(eq(JAR, name.local())) desc.jars.add(next.string());

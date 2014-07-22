@@ -136,7 +136,7 @@ public final class Repo {
     final IOFile desc = new IOFile(dir, DESCRIPTOR);
     if(!desc.exists()) return;
     try {
-      final Package pkg = new PkgParser(context.repo, null).parse(desc);
+      final Package pkg = new PkgParser(null).parse(desc);
       final byte[] name = pkg.uniqueName();
       // read package components
       for(final Component comp : pkg.comps) {

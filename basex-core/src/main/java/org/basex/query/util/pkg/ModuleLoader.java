@@ -257,7 +257,7 @@ public final class ModuleLoader {
     final IO pkgDesc = new IOFile(pkgDir, PkgText.DESCRIPTOR);
     if(!pkgDesc.exists()) Util.debug(PkgText.MISSDESC, string(name));
 
-    final Package pkg = new PkgParser(context.repo, ii).parse(pkgDesc);
+    final Package pkg = new PkgParser(ii).parse(pkgDesc);
     // check if package contains a jar descriptor
     final IOFile jarDesc = new IOFile(pkgDir, PkgText.JARDESC);
     // add jars to classpath
@@ -295,10 +295,8 @@ public final class ModuleLoader {
       final InputInfo ii) throws QueryException {
 
     // add new URLs
-    final JarDesc desc = new JarParser(context, ii).parse(jarDesc);
-    for(final byte[] u : desc.jars) {
-      addURL(new IOFile(new IOFile(pkgDir, modDir), string(u)));
-    }
+    final JarDesc desc = new JarParser(ii).parse(jarDesc);
+    for(final byte[] u : desc.jars) addURL(new IOFile(new IOFile(pkgDir, modDir), string(u)));
   }
 
   /**

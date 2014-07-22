@@ -6,10 +6,8 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -79,9 +77,7 @@ public abstract class Inspect {
    */
   final void comment(final TokenObjMap<TokenList> tags, final FElem parent) {
     for(final byte[] tag : tags) {
-      for(final byte[] name : tags.get(tag)) {
-        add(name, qc.context, elem(tag, parent));
-      }
+      for(final byte[] name : tags.get(tag)) add(name, elem(tag, parent));
     }
   }
 
@@ -125,13 +121,12 @@ public abstract class Inspect {
 
   /**
    * Parses a string as XML and adds the resulting nodes to the specified parent.
-   * @param ctx database context
    * @param value string to parse
    * @param elem element
    */
-  public static void add(final byte[] value, final Context ctx, final FElem elem) {
+  public static void add(final byte[] value, final FElem elem) {
     try {
-      final ANode node = FNGen.parseXml(new IOContent(value), ctx, true);
+      final ANode node = new DBNode(new IOContent(value));
       for(final ANode n : node.children()) elem.add(n.copy());
     } catch(final IOException ex) {
       // fallback: add string representation

@@ -467,12 +467,14 @@ public class DiskValues implements Index {
    * Add entries to the index.
    * @param m a set of <key, id-list> pairs
    */
+  @SuppressWarnings("unused")
   public void index(final TokenObjMap<IntList> m) { }
 
   /**
    * Delete records from the index.
    * @param m a set of <key, id-list> pairs
    */
+  @SuppressWarnings("unused")
   public void delete(final TokenObjMap<IntList> m) { }
 
   /**
@@ -481,5 +483,6 @@ public class DiskValues implements Index {
    * @param key new record key
    * @param id record id
    */
+  @SuppressWarnings("unused")
   public void replace(final byte[] old, final byte[] key, final int id) { }
 }

@@ -92,39 +92,38 @@ public abstract class Parser extends Proc {
   }
 
   /**
-   * Returns an XML parser instance.
-   * @param in input source
-   * @param options database options
+   * Returns an XML parser instance, using the Java default parser.
+   * @param source input source
    * @return xml parser
-   * @throws IOException I/O exception
    */
-  public static SingleParser xmlParser(final IO in, final MainOptions options)
-      throws IOException {
-    // use internal or default XML parser
-    return options.get(MainOptions.INTPARSE) ? new XMLParser(in, options) :
-      new SAXWrapper(in, options);
+  public static SAXWrapper xmlParser(final IO source) {
+    final MainOptions opts = new MainOptions();
+    opts.set(MainOptions.CHOP, false);
+    return new SAXWrapper(source, opts);
   }
+
 
   /**
    * Returns a parser instance, based on the current options.
-   * @param in input source
+   * @param source input source
    * @param options database options
    * @param target relative path reference
    * @return parser
    * @throws IOException I/O exception
    */
-  public static SingleParser singleParser(final IO in, final MainOptions options,
+  public static SingleParser singleParser(final IO source, final MainOptions options,
       final String target) throws IOException {
 
     // use file specific parser
     final SingleParser p;
     final MainParser mp = options.get(MainOptions.PARSER);
     switch(mp) {
-      case HTML: p = new HtmlParser(in, options); break;
-      case TEXT: p = new TextParser(in, options); break;
-      case JSON: p = new JsonParser(in, options); break;
-      case CSV:  p = new CsvParser(in, options); break;
-      default:   p = xmlParser(in, options); break;
+      case HTML: p = new HtmlParser(source, options); break;
+      case TEXT: p = new TextParser(source, options); break;
+      case JSON: p = new JsonParser(source, options); break;
+      case CSV:  p = new CsvParser(source, options); break;
+      default:   p = options.get(MainOptions.INTPARSE) ? new XMLParser(source, options) :
+        new SAXWrapper(source, options); break;
     }
     p.target(target);
     return p;

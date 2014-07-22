@@ -70,6 +70,7 @@ abstract class Syntax {
    * @param spaces spaces
    * @return formatted string
    */
+  @SuppressWarnings("unused")
   public byte[] format(final byte[] string, final byte[] spaces) {
     return string;
   }

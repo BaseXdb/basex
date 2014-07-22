@@ -308,9 +308,7 @@ public final class QueryResources {
    * @param baseIO base URI
    * @throws QueryException query exception
    */
-  public void addDoc(final String name, final String path, final IO baseIO)
-      throws QueryException {
-
+  public void addDoc(final String name, final String path, final IO baseIO) throws QueryException {
     final QueryInput qi = new QueryInput(path);
     final Data d = create(qi, true, baseIO, null);
     if(name != null) d.meta.original = name;
@@ -344,7 +342,7 @@ public final class QueryResources {
     addCollection(Seq.get(nodes, ns, NodeType.DOC), name);
   }
 
-  // PRIVATE METHODS ====================================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Tries to open the addressed database, or returns {@code null}.

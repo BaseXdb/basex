@@ -103,6 +103,7 @@ public class TokenMgrError extends Error {
    * @param curr  the offending character
    * @return error message
    */
+  @SuppressWarnings("unused")
   protected static String lexicalError(final boolean eof, final int state, final int line,
       final int col, final String after, final char curr) {
     return "Lexical error at line " + line + ", column " + col + ".  Encountered: " +

@@ -33,7 +33,7 @@ public class MemDataTest extends SandboxTest {
    */
   @Before
   public void setUp() throws IOException {
-    data = MemBuilder.build(new IOContent(XML), context);
+    data = MemBuilder.build(new IOContent(XML));
     context.openDB(data);
   }
 

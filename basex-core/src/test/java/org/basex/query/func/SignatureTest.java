@@ -25,8 +25,7 @@ public class SignatureTest extends AdvancedQueryTest {
    */
   @Test
   public void signatures() throws Exception {
-    context.openDB(MemBuilder.build(new IOContent("<a/>"), context));
-    context.data().meta.name = "X";
+    context.openDB(MemBuilder.build(new IOContent("<a/>")));
     for(final Function f : Function.values()) check(f);
   }
 

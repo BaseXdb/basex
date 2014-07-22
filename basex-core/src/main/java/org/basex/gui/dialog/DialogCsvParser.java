@@ -120,8 +120,7 @@ final class DialogCsvParser extends DialogParser {
       format.setEnabled(head);
       lax.setEnabled(head && copts.get(CsvOptions.FORMAT) == CsvFormat.DIRECT);
 
-      final IO io = CsvParser.toXML(new IOContent(EXAMPLE), copts);
-      final DBNode node = new DBNode(io, dialog.gui.context.options);
+      final DBNode node = new DBNode(CsvParser.toXML(new IOContent(EXAMPLE), copts));
       example.setText(example(MainParser.CSV.name(), EXAMPLE, node.serialize().toString()));
     } catch(final IOException ex) {
       example.setText(error(ex));

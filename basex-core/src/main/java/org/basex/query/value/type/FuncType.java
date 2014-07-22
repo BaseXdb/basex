@@ -80,24 +80,24 @@ public class FuncType implements Type {
   }
 
   @Override
-  public FItem cast(final Item it, final QueryContext qc, final StaticContext sc,
+  public FItem cast(final Item item, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) throws QueryException {
 
-    if(!(it instanceof FItem)) throw Err.castError(ii, it, this);
-    final FItem f = (FItem) it;
+    if(!(item instanceof FItem)) throw Err.castError(ii, item, this);
+    final FItem f = (FItem) item;
     return this == ANY_FUN ? f : f.coerceTo(this, qc, ii, false);
   }
 
   @Override
-  public final Item cast(final Object o, final QueryContext qc, final StaticContext sc,
+  public final Item cast(final Object value, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) {
-    throw Util.notExpected(o);
+    throw Util.notExpected(value);
   }
 
   @Override
-  public final Item castString(final String s, final QueryContext qc, final StaticContext sc,
+  public final Item castString(final String string, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) {
-    throw Util.notExpected(s);
+    throw Util.notExpected(string);
   }
 
   @Override

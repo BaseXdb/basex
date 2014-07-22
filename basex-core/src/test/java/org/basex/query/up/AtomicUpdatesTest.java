@@ -558,7 +558,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    */
   private static AtomicUpdateCache atomics(final String doc) {
     try {
-      return new AtomicUpdateCache(MemBuilder.build(new IOContent(doc), context));
+      return new AtomicUpdateCache(MemBuilder.build(new IOContent(doc)));
     } catch(final IOException ex) {
       fail(Util.message(ex));
       return null;

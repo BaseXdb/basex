@@ -118,7 +118,7 @@ public final class FNZip extends StandardFunc {
     final MainOptions opts = qc.context.options;
     final IO io = new IOContent(entry(qc));
     try {
-      return new DBNode(html ? new HtmlParser(io, opts) : Parser.xmlParser(io, opts));
+      return new DBNode(html ? new HtmlParser(io, opts) : Parser.xmlParser(io));
     } catch(final IOException ex) {
       throw SAXERR.get(info, ex);
     }

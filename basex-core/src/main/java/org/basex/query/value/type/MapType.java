@@ -34,13 +34,13 @@ public final class MapType extends FuncType {
   }
 
   @Override
-  public Map cast(final Item it, final QueryContext qc, final StaticContext sc, final InputInfo ii)
+  public Map cast(final Item item, final QueryContext qc, final StaticContext sc, final InputInfo ii)
       throws QueryException {
-    if(it instanceof Map) {
-      final Map m = (Map) it;
+    if(item instanceof Map) {
+      final Map m = (Map) item;
       if(m.hasType(this)) return m;
     }
-    throw Err.castError(ii, it, this);
+    throw Err.castError(ii, item, this);
   }
 
   @Override

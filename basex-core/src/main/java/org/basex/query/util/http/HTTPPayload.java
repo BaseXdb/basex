@@ -348,7 +348,7 @@ public final class HTTPPayload {
         final String enc = charset(ext);
         val = Str.get(URLDecoder.decode(string(in.read()), enc == null ? UTF8 : enc));
       } else if(isXML(ctype)) {
-        val = new DBNode(in, opts);
+        val = new DBNode(in);
       } else if(isText(ctype)) {
         val = Str.get(new TextInput(in).content());
       } else if(isMultipart(ctype)) {

@@ -173,7 +173,7 @@ public final class RepoManager {
 
         // clean package repository
         final IOFile f = repo.path(string(dict.get(nextPkg)));
-        repo.delete(new PkgParser(repo, info).parse(new IOFile(f, DESCRIPTOR)));
+        repo.delete(new PkgParser(info).parse(new IOFile(f, DESCRIPTOR)));
         // package does not participate in a dependency => delete it
         if(!f.delete()) throw BXRE_DELETE.get(info, f);
         found = true;
@@ -279,7 +279,7 @@ public final class RepoManager {
     final Zip zip = new Zip(new IOContent(content));
     // parse and validate descriptor file
     final IOContent dsc = new IOContent(zip.read(DESCRIPTOR));
-    final Package pkg = new PkgParser(repo, info).parse(dsc);
+    final Package pkg = new PkgParser(info).parse(dsc);
 
     // remove existing package
     final byte[] name = pkg.uniqueName();
@@ -321,7 +321,7 @@ public final class RepoManager {
       if(nextPkg != null && !eq(nextPkg, pkgName)) {
         // check only packages different from the current one
         final IOFile desc = new IOFile(repo.path(string(dict.get(nextPkg))), DESCRIPTOR);
-        final Package pkg = new PkgParser(repo, info).parse(desc);
+        final Package pkg = new PkgParser(info).parse(desc);
         final byte[] name = Package.name(pkgName);
         for(final Dependency dep : pkg.dep)
           // Check only package dependencies

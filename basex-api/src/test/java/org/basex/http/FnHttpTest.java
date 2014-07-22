@@ -224,7 +224,7 @@ public class FnHttpTest extends HTTPTest {
         + "<http:header name='hdr2' value='hdr2val'/>"
         + "<http:body media-type='text/xml'>" + "Test body content"
         + "</http:body>" + "</http:request>";
-    final DBNode dbNode = new DBNode(new IOContent(req), ctx.options);
+    final DBNode dbNode = new DBNode(new IOContent(req));
     final HTTPRequestParser rp = new HTTPRequestParser(null);
     final HTTPRequest r = rp.parse(dbNode.children().next(), null);
 
@@ -256,7 +256,7 @@ public class FnHttpTest extends HTTPTest {
         + "Part3" + "</http:body>" + "</http:multipart>"
         + "</http:request>";
 
-    final DBNode dbNode1 = new DBNode(new IOContent(multiReq), ctx.options);
+    final DBNode dbNode1 = new DBNode(new IOContent(multiReq));
     final HTTPRequestParser rp = new HTTPRequestParser(null);
     final HTTPRequest r = rp.parse(dbNode1.children().next(), null);
 
@@ -305,7 +305,7 @@ public class FnHttpTest extends HTTPTest {
         + "<http:body media-type='text/plain'/>"
         + "</http:multipart>" + "</http:request>";
 
-    final DBNode dbNode1 = new DBNode(new IOContent(multiReq), ctx.options);
+    final DBNode dbNode1 = new DBNode(new IOContent(multiReq));
     final ValueBuilder bodies = new ValueBuilder();
     bodies.add(Str.get("Part1"));
     bodies.add(Str.get("Part2"));
@@ -408,7 +408,7 @@ public class FnHttpTest extends HTTPTest {
     falseReqs.add(falseReq8);
 
     for(final byte[] falseReq : falseReqs) {
-      final DBNode dbNode = new DBNode(new IOContent(falseReq), ctx.options);
+      final DBNode dbNode = new DBNode(new IOContent(falseReq));
       try {
         final HTTPRequestParser rp = new HTTPRequestParser(null);
         rp.parse(dbNode.children().next(), null);
@@ -686,7 +686,7 @@ public class FnHttpTest extends HTTPTest {
         + "<http:body media-type='text/x-whatever'/>"
         + "</http:multipart>" + "</http:response> ";
 
-    final DBNode dbNode = new DBNode(new IOContent(reqItem), ctx.options);
+    final DBNode dbNode = new DBNode(new IOContent(reqItem));
     resultIter.add(dbNode.children().next());
     resultIter.add(Str.get("...plain text version of message goes here....\n\n"));
     resultIter.add(Str.get(".... richtext version of same message goes here ...\n"));
@@ -777,7 +777,7 @@ public class FnHttpTest extends HTTPTest {
         + "<http:body media-type='text/plain; charset=us-ascii'/>"
         + "</http:multipart>" + "</http:response>";
 
-    final DBNode dbNode = new DBNode(new IOContent(reqItem), ctx.options);
+    final DBNode dbNode = new DBNode(new IOContent(reqItem));
     resultIter.add(dbNode.children().next());
     resultIter.add(Str.get("This is implicitly typed plain ASCII text.\n"
         + "It does NOT end with a linebreak.\n"));

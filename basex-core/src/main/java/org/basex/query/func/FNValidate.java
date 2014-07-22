@@ -270,7 +270,7 @@ public final class FNValidate extends StandardFunc {
       if(sopts != null) {
         // add doctype declaration if specified
         final ArrayOutput ao = new ArrayOutput();
-        Serializer.get(ao, sopts).serialize(new DBNode(io, qc.context.options));
+        Serializer.get(ao, sopts).serialize(new DBNode(io));
         io = new IOContent(ao.finish());
         io.name(io.path());
       }

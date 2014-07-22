@@ -542,10 +542,9 @@ public class QueryParser extends InputParser {
       if(name.equals(SerializerOptions.PARAMETER_DOCUMENT.name())) {
         final IO io = IO.get(string(resolvedUri(val).string()));
         try {
-          final ANode node = new DBNode(io, qc.context.options).children().next();
           // check parameters and add values to serialization parameters
           final InputInfo info = info();
-          FuncOptions.serializer(node, qc.serialOpts, info);
+          FuncOptions.serializer(new DBNode(io).children().next(), qc.serialOpts, info);
 
           final HashMap<String, String> free = qc.serialOpts.free();
           if(!free.isEmpty()) throw SERWHICH.get(info, free.keySet().iterator().next());
@@ -1852,6 +1851,7 @@ public class QueryParser extends InputParser {
    * Performs an optional axis check.
    * @param axis axis
    */
+  @SuppressWarnings("unused")
   void checkAxis(final Axis axis) { }
 
   /**
@@ -1859,12 +1859,14 @@ public class QueryParser extends InputParser {
    * @param test node test
    * @param attr attribute flag
    */
+  @SuppressWarnings("unused")
   void checkTest(final Test test, final boolean attr) { }
 
   /**
    * Checks a predicate.
    * @param open open flag
    */
+  @SuppressWarnings("unused")
   void checkPred(final boolean open) { }
 
   /**

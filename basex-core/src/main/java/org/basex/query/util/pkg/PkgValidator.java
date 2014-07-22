@@ -200,7 +200,7 @@ public final class PkgValidator {
         // of the current one
         final String pkgDir = string(repo.pkgDict().get(nextPkg));
         final IO pkgDesc = new IOFile(repo.path(pkgDir), DESCRIPTOR);
-        final Package pkg = new PkgParser(repo, info).parse(pkgDesc);
+        final Package pkg = new PkgParser(info).parse(pkgDesc);
         for(final Component nextComp : pkg.comps) {
           if(nextComp.name().equals(comp.name())) return true;
         }

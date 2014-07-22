@@ -5,9 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.build.*;
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
@@ -112,8 +110,7 @@ public final class Thesaurus {
    */
   private void init(final InputInfo ii) throws QueryException {
     try {
-      final Data data = MemBuilder.build(Parser.xmlParser(file, ctx.options));
-      final Value entries = nodes("//*:entry", new DBNode(data, 0));
+      final Value entries = nodes("//*:entry", new DBNode(file));
       for(final Item entry : entries) build(entry);
     } catch(final IOException ex) {
       throw NOTHES.get(ii, file);

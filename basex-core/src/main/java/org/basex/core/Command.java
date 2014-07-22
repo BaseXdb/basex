@@ -166,6 +166,7 @@ public abstract class Command extends Proc {
    * @param ctx database context
    * @return result of check
    */
+  @SuppressWarnings("unused")
   public boolean updating(final Context ctx) {
     return perm == Perm.CREATE || perm == Perm.WRITE;
   }
@@ -186,6 +187,7 @@ public abstract class Command extends Proc {
    * @param ctx database context
    * @return result of check
    */
+  @SuppressWarnings("unused")
   public boolean newData(final Context ctx) {
     return false;
   }

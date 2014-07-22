@@ -710,6 +710,7 @@ public class TextPanel extends BaseXPanel {
    * Releases a key or mouse. Can be overwritten to react on events.
    * @param action action
    */
+  @SuppressWarnings("unused")
   protected void release(final Action action) { }
 
   // EDITOR COMMANDS ==========================================================

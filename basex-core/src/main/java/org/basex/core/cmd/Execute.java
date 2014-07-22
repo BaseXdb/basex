@@ -102,6 +102,7 @@ public class Execute extends Command {
    * Finalizes command execution.
    * @param ctx database context
    */
+  @SuppressWarnings("unused")
   void finish(final Context ctx) {
   }
 

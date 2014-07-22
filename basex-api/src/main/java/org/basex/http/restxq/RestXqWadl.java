@@ -133,6 +133,6 @@ final class RestXqWadl {
     if(xqdoc == null) return;
     final FElem doc = elem("doc", parent);
     doc.namespaces().add(EMPTY, token(XHTML_URL));
-    Inspect.add(xqdoc, http.context(), doc);
+    Inspect.add(xqdoc, doc);
   }
 }
