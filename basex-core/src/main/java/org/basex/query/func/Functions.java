@@ -269,8 +269,7 @@ public final class Functions extends TokenSet {
   }
 
   /**
-   * Returns an exception if the name of a built-in function is similar to the
-   * specified function name.
+   * Returns an exception if the name of a built-in function is similar to the specified name.
    * @param name name of input function
    * @param ii input info
    * @return query exception, or {@code null}
@@ -279,16 +278,21 @@ public final class Functions extends TokenSet {
     // find functions with identical local names
     final byte[] local = name.local(), uri = name.uri();
     for(final byte[] key : this) {
-      final int k = indexOf(key, '}');
-      final byte[] l = substring(key, k + 1);
-      if(eq(local, l)) return similarError(name, ii, key);
+      final int i = indexOf(key, '}');
+      if(eq(local, substring(key, i + 1))) return similarError(name, ii, key);
     }
     // find functions with identical URIs and similar local names
     final Levenshtein ls = new Levenshtein();
     for(final byte[] key : this) {
-      final int k = indexOf(key, '}');
-      final byte[] u = substring(key, 2, k), l = substring(key, k + 1);
-      if(eq(uri, u) && ls.similar(local, l)) return similarError(name, ii, key);
+      final int i = indexOf(key, '}');
+      if(eq(uri, substring(key, 2, i)) && ls.similar(local, substring(key, i + 1)))
+        return similarError(name, ii, key);
+    }
+    // find functions with identical URIs and local names that start with the specified name
+    for(final byte[] key : this) {
+      final int i = indexOf(key, '}');
+      if(eq(uri, substring(key, 2, i)) && startsWith(substring(key, i + 1), local))
+        return similarError(name, ii, key);
     }
     return null;
   }
@@ -301,10 +305,9 @@ public final class Functions extends TokenSet {
    * @return query exception
    */
   private static QueryException similarError(final QNm name, final InputInfo ii, final byte[] key) {
-    final int k = indexOf(key, '}');
-    final byte[] u = substring(key, 2, k), l = substring(key, k + 1);
-    return FUNCSIMILAR.get(ii, name.prefixId(FNURI),
-        new TokenBuilder(NSGlobal.prefix(u)).add(':').add(l).finish());
+    final int i = indexOf(key, '}');
+    return FUNCSIMILAR.get(ii, name.prefixId(FNURI), new TokenBuilder(
+        NSGlobal.prefix(substring(key, 2, i))).add(':').add(substring(key, i + 1)).finish());
   }
 
   @Override
