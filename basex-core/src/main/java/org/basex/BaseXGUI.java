@@ -27,7 +27,7 @@ public final class BaseXGUI extends Main {
   /** Database context. */
   private final Context context = new Context();
   /** Files, specified as arguments. */
-  private final StringList files = new StringList();
+  private final StringList files = new StringList(0);
   /** Mac OS X GUI optimizations. */
   GUIMacOSX osxGUI;
 
@@ -82,7 +82,7 @@ public final class BaseXGUI extends Main {
         if(osxGUI != null) osxGUI.init(gui);
 
         // open specified document or database
-        for(final String file : files) {
+        for(final String file : files.finish()) {
           if(file.matches("^.*\\" + IO.BASEXSUFFIX + "[^.]*$")) continue;
 
           final IOFile io = new IOFile(file);
