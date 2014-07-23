@@ -13,7 +13,7 @@
        <context-param/> elements, as shown below. Please checkout
        http://docs.basex.org/wiki/Options for a list of all options. -->
 
-  <!-- Set default credentials -->
+  <!-- Set default credentials 
   <context-param>
     <param-name>org.basex.user</param-name>
     <param-value>admin</param-value>
@@ -21,6 +21,11 @@
   <context-param>
     <param-name>org.basex.password</param-name>
     <param-value>admin</param-value>
+  </context-param> -->
+
+ <context-param>
+    <param-name>org.basex.authmethod</param-name>
+    <param-value>Digest</param-value>
   </context-param>
 
   <!--
