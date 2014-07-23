@@ -2,12 +2,15 @@ package org.basex.core;
 
 import static org.basex.core.Text.*;
 
+import java.util.*;
+
 import org.basex.data.*;
 import org.basex.io.random.*;
 import org.basex.query.util.pkg.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+
 
 /**
  * This class serves as a central database context.
@@ -40,6 +43,7 @@ public final class Context {
   public final Repo repo;
   /** Databases list. */
   public final Databases databases;
+    /** Auth Method. */
 
   /** User reference. */
   public User user;
@@ -60,12 +64,23 @@ public final class Context {
   private final Locking locks;
   /** Data reference. */
   private Data data;
+  /** Nonce for Digest Auth. */
+  public static String nonce;
 
-  /**
+    /**
    * Default constructor, which is usually called once in the lifetime of a project.
    */
   public Context() {
     this(true);
+    nonce = calcNonce();
+  }
+
+  /**
+   * Calculate nonce based on UUID.
+   * @return nonce
+   */
+  public String calcNonce() {
+    return Token.md5(UUID.randomUUID().toString());
   }
 
   /**
@@ -94,7 +109,8 @@ public final class Context {
     users = ctx.users;
     repo = ctx.repo;
     log = ctx.log;
-  }
+
+   }
 
   /**
    * Private constructor.
@@ -113,6 +129,7 @@ public final class Context {
     log = new Log(this);
     user = users.get(S_ADMIN);
     listener = null;
+
   }
 
   /**

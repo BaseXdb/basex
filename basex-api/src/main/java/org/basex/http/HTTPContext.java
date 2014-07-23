@@ -13,6 +13,7 @@ import java.util.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import org.apache.commons.codec.digest.*;
 import org.basex.*;
 import org.basex.build.*;
 import org.basex.build.JsonOptions.JsonFormat;
@@ -48,6 +49,10 @@ public final class HTTPContext {
   public String user;
   /** Password. */
   public String pass;
+  /** Auth Method */
+  public StringOption auth;
+  /** Auth Type. */
+  public StringOption atype;
 
   /** Global static database context. */
   private static Context context;
@@ -59,10 +64,12 @@ public final class HTTPContext {
   /** Segments. */
   private final String[] segments;
   /** Nonce for Digest Auth. */
-  public final String nonce;
+  public String nonce;
   /** Realm for Digest Auth. */
   private final String realm;
-  public String AM = "auth";
+  /** Used in header calc */
+  public String type;
+
 
   /**
    * Constructor.
@@ -80,7 +87,6 @@ public final class HTTPContext {
 
     method = rq.getMethod();
 
-    // Assigning realm for digest auth.
     realm = "basex.org";
 
     final StringBuilder uri = new StringBuilder(req.getRequestURL());
@@ -92,42 +98,46 @@ public final class HTTPContext {
     res.setCharacterEncoding(UTF8);
     segments = decode(toSegments(req.getPathInfo()));
 
-    //calculating nonce based on UUID
-
-    nonce =  calcNonce();
+    nonce = context.nonce;
 
     // adopt servlet-specific credentials or use global ones
     final GlobalOptions mprop = context().globalopts;
     user = servlet.user != null ? servlet.user : mprop.get(GlobalOptions.USER);
     pass = servlet.pass != null ? servlet.pass : mprop.get(GlobalOptions.PASSWORD);
+    String atype = mprop.get(GlobalOptions.AUTHMETHOD);
+
+    type = atype;
 
     // overwrite credentials with session-specific data
     final String auth = req.getHeader(AUTHORIZATION);
-   if (auth == null) {
+
+
+
+  if (auth == null){
+
       res.addHeader("WWW-Authenticate", getAuthenticateHeader());
+      //res.addHeader(WWW_AUTHENTICATE, BASIC);
       res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
   }
-      if(auth != null) {
+      if(auth != null && atype != null) {
       final String[] values = auth.split(" ");
       if(values[0].equals(BASIC)){
         final String[] cred = Base64.decode(values[1]).split(":", 2);
         if(cred.length != 2) throw new LoginException(NOPASSWD);
         user = cred[0];
         pass = cred[1];
-      } else if(values[0].equals(DIGEST)){
+      }else if(values[0].equals(DIGEST)){
+        HashMap<String, String> headerValues = parseHeader(auth);
+        user = headerValues.get("username");
+        //user = "admin";
+        pass = "admin";
         authenticate();
-      }
-      throw new LoginException(WHICHAUTH, values[0]);
+      }else {
+        throw new LoginException(WHICHAUTH, values[0]);
+        }
     }
   }
 
-  /**
-   * Calculate nonce based on UUID.
-   * @return nonce
-   */
-  public String calcNonce() {
-    return Token.md5(UUID.randomUUID().toString());
-  }
   /**
    * Returns the content type of a request (without an optional encoding).
    * @return content type
@@ -248,8 +258,8 @@ public final class HTTPContext {
     try {
       log(message, code);
       res.resetBuffer();
-      //if(code == SC_UNAUTHORIZED) res.addHeader(WWW_AUTHENTICATE, getAuthenticateHeader());
-      if(code == SC_UNAUTHORIZED) res.addHeader(WWW_AUTHENTICATE, BASIC);
+      if(code == SC_UNAUTHORIZED) res.addHeader(WWW_AUTHENTICATE, getAuthenticateHeader());
+      //if(code == SC_UNAUTHORIZED) res.setHeader(WWW_AUTHENTICATE, BASIC);
       if(error && code >= SC_BAD_REQUEST) {
         res.sendError(code, message);
       } else {
@@ -271,61 +281,79 @@ public final class HTTPContext {
     pass = p;
   }
 
+
   /**
    * Authenticate the user and returns a new client {@link Context} instance.
    * @return client context
    * @throws IOException
-   * Change to LoginException to resolve errors in WebDAV
+   * changed to IOException, to resolve webdav errors change to LoginException
    */
   public Context authenticate() throws IOException {
     final byte[] address = token(req.getRemoteAddr());
+    /** Created context object here */
     Context ctx = null;
-    res.setContentType("text/html;charset=UTF-8");
-    PrintWriter  out = res.getWriter();
+
+    //res.setContentType("text/html;charset=UTF-8");
+    //PrintWriter out = res.getWriter();
 
     try {
-
       String auth = req.getHeader(AUTHORIZATION);
-     /* if(auth == null)
-      {
-        res.addHeader("WWW_AUTHENTICATE", getAuthenticateHeader());
-        res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-      }*/
 
-      if(user == null || user.isEmpty() || pass == null || pass.isEmpty())
-      throw new LoginException(NOPASSWD);
-      else if(auth.startsWith(DIGEST)){
+      if(user == null || user.isEmpty())
+        throw new LoginException(NOPASSWD);
+
+      else if(auth.startsWith(BASIC) && pass != null){
+      ctx = new Context(context(), null);
+      ctx.user = ctx.users.get(user);
+
+      if(ctx.user == null || !ctx.user.password.equals(md5(pass))) throw new LoginException();
+
+
+      }else { if(auth.startsWith(DIGEST))
+
+        ctx = new Context(context(), null);
+
+        ctx.user = ctx.users.get(user);
+
+        if(ctx.user == null && !res.isCommitted()) {
+
+          /** res.isCommited is added to resolve the lang.Illegal Exception: Commited. */
+          res.addHeader("WWW-Authenticate", getAuthenticateHeader());
+          res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+
+        }
+
         HashMap<String, String> headerValues = parseHeader(auth);
 
         String method = req.getMethod();
 
-        String HA1 = Token.md5(ctx.user.name + ":" + realm + ":" + ctx.user.password);
+      //   TODO Something with password
+
+        String HA1 = Token.md5(ctx.user.name + ":" + realm + ":" + pass);
+        //String HA1 = "1a2ec214025c13676dcb66f53addb3a2";
 
         String reqURI = headerValues.get("uri");
 
         String HA2 = Token.md5(method + ":" + reqURI);
 
-        String serverResponse;
-        {
+         String serverResponse;
 
+         {
 
-        String nonceCount = headerValues.get("nc");
-        String clientNonce = headerValues.get("cnonce");
+           serverResponse = Token.md5(HA1 + ":" + nonce + ":" + HA2);
 
-        serverResponse = Token.md5(HA1 + ":" + nonce + ":"
-             + nonceCount + ":" + clientNonce + ":" + AM + ":" + HA2);
+         }
 
-        }
         String clientResponse = headerValues.get("response");
 
-        if (!serverResponse.equals(clientResponse)) {
-        res.addHeader("WWW-Authenticate", getAuthenticateHeader());
-        res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-        }
+        if(!serverResponse.equals(clientResponse) && !res.isCommitted()) // throw new LoginException();
+          {
+            /** res.isCommited is added to resolve the lang.Illegal Exception: Commited. */
+            res.addHeader("WWW-Authenticate", getAuthenticateHeader());
+            res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+          }
+
       }
-      ctx = new Context(context(), null);
-      ctx.user = ctx.users.get(user);
-      if(ctx.user == null || !ctx.user.password.equals(md5(pass))) throw new LoginException();
 
       context.blocker.remove(address);
       return ctx;
@@ -334,28 +362,23 @@ public final class HTTPContext {
       for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(100);
       throw ex;
     }
-    /*finally {
-      out.close();
-  }*/
-
   }
+
+
 
   /**
    * Authenticate Header.
    */
   private String getAuthenticateHeader() {
     String header = "";
-
+    if(type.equals(BASIC)){
+    header = BASIC;
+    }else if(type.equals(DIGEST)){
 
     header += "Digest realm=\"" + realm + "\",";
-    //System.out.println(header);
-    if (AM == null) {
-        header += "qop=" + AM + ",";
-    }
     header += "nonce=\"" + nonce + "\",";
     header += "opaque=\"" + getOpaque(realm, nonce) + "\"";
-    //System.out.println(header);
-    return header;
+  }return header;
 
 }
  /**
@@ -374,8 +397,6 @@ public final class HTTPContext {
  * @return
  */
   private HashMap<String, String> parseHeader(String headerString) {
-
-    // Isolate the string part which tells you about the authentication scheme
 
     String headerStringWithoutScheme = headerString.substring(headerString.indexOf(" ") + 1).trim();
     HashMap<String, String> values = new HashMap<>();
