@@ -61,9 +61,10 @@ public final class WebDAVService<T> {
    * Authenticates the user with the given password.
    * @param user user name
    * @param pass password
-   * @throws LoginException if the login is invalid
+   * @throws IOException
+   * Changed to IOException from LoginException
    */
-  public void authenticate(final String user, final String pass) throws LoginException {
+  public void authenticate(final String user, final String pass) throws IOException {
     http.credentials(user, pass);
     http.authenticate();
   }
@@ -567,9 +568,10 @@ public final class WebDAVService<T> {
   /**
    * Constructor.
    * @return local session
-   * @throws LoginException login exception
+   * @throws IOException
+   * Changed to IOException from LoginException for testing
    */
-  private LocalSession session() throws LoginException {
+  private LocalSession session() throws IOException {
     if(ls == null) ls = new LocalSession(http.authenticate(), http.user, http.pass);
     return ls;
   }
