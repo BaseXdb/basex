@@ -286,6 +286,29 @@ public abstract class Command extends Proc {
   }
 
   /**
+   * Starts an update operation.
+   * @param data data reference
+   * @return success flag
+   */
+  protected final boolean startUpdate(final Data data) {
+    try {
+      data.startUpdate();
+      return true;
+    } catch(final IOException ex) {
+      info(Util.message(ex));
+      return false;
+    }
+  }
+
+  /**
+   * Finalizes an update operation.
+   * @param data data reference
+   */
+  protected final void finishUpdate(final Data data) {
+    data.finishUpdate();
+  }
+
+  /**
    * Returns the specified command option.
    * @param string string to be found
    * @param type options enumeration

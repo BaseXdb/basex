@@ -22,11 +22,7 @@ public final class Flush extends Command {
   @Override
   protected boolean run() {
     final Data data = context.data();
-    if(!options.get(MainOptions.AUTOFLUSH)) {
-      options.set(MainOptions.AUTOFLUSH, true);
-      data.finishUpdate();
-      options.set(MainOptions.AUTOFLUSH, false);
-    }
+    if(!options.get(MainOptions.AUTOFLUSH)) data.flush(true);
     return info(DB_FLUSHED_X, data.meta.name, perf);
   }
 

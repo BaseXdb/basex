@@ -26,7 +26,7 @@ public final class ModuleLoader {
   /** Default class loader. */
   private static final ClassLoader LOADER = Thread.currentThread().getContextClassLoader();
   /** Cached URLs to be added to the class loader. */
-  private final ArrayList<URL> urls = new ArrayList<>();
+  private final ArrayList<URL> urls = new ArrayList<>(0);
   /** Current class loader. */
   private ClassLoader loader = LOADER;
   /** Java modules. */

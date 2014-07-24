@@ -91,6 +91,8 @@ public enum Err {
   BXDB_SINGLE(BXDB, 6, "Database path '%' points to more than one document."),
   /** BXDB0007. */
   BXDB_OPENED(BXDB, 7, "Database '%' cannot be updated, as it is opened by another process."),
+  /** BXDB0007. */
+  BXDB_LOCK(BXDB, 7, "%"),
   /** BXDB0008. */
   BXDB_RENAME(BXDB, 8, "Invalid target path: %."),
   /** BXDB0009. */

@@ -2,6 +2,8 @@ package org.basex.data;
 
 import static org.junit.Assert.*;
 
+import java.io.*;
+
 import org.basex.data.atomic.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -15,9 +17,10 @@ import org.junit.*;
 public final class UpdateTestAttributes extends UpdateTest {
   /**
    * Tests the update of an existing attribute.
+   * @throws IOException I/O exception
    */
   @Test
-  public void updateAttribute() {
+  public void updateAttribute() throws IOException {
     final Data data = context.data();
     data.startUpdate();
     data.update(7, Data.ATTR, T_NAME, Token.EMPTY);
@@ -34,9 +37,10 @@ public final class UpdateTestAttributes extends UpdateTest {
 
   /**
    * Tests the update of an existing attribute.
+   * @throws IOException I/O exception
    */
   @Test
-  public void updateAttribute2() {
+  public void updateAttribute2() throws IOException {
     final Data data = context.data();
     data.startUpdate();
     data.update(8, Data.ATTR, T_NAME, Token.EMPTY);
@@ -51,9 +55,10 @@ public final class UpdateTestAttributes extends UpdateTest {
 
   /**
    * Tests the insertion of a new attribute.
+   * @throws IOException I/O exception
    */
   @Test
-  public void addAttribute() {
+  public void addAttribute() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
 

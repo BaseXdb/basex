@@ -28,8 +28,7 @@ public final class Delete extends ACreate {
     final Data data = context.data();
     final String target = args[0];
 
-    // start update
-    if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
+    if(!startUpdate()) return false;
 
     // delete all documents
     final IntList docs = data.resources.docs(target);
@@ -44,7 +43,7 @@ public final class Delete extends ACreate {
     delete(data, target);
 
     // finish update
-    data.finishUpdate();
+    finishUpdate();
 
     // return info message
     return info(RES_DELETED_X_X, docs.size() + bins.size(), perf);

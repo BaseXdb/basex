@@ -206,9 +206,10 @@ public final class UpdateTestText extends UpdateTest {
 
   /**
    * Tests updateText.
+   * @throws IOException I/O exception
    */
   @Test
-  public void updateText() {
+  public void updateText() throws IOException {
     final Data data = context.data();
     data.startUpdate();
     data.update(10, Data.TEXT, T_JUNIT);

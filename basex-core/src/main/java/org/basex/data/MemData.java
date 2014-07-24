@@ -84,10 +84,13 @@ public final class MemData extends Data {
   public void setIndex(final IndexType type, final Index index) { }
 
   @Override
-  public boolean startUpdate() { return true; }
+  public void startUpdate() { }
 
   @Override
   public void finishUpdate() { }
+
+  @Override
+  public void flush(final boolean all) { }
 
   @Override
   public byte[] text(final int pre, final boolean text) {

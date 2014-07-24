@@ -26,11 +26,7 @@ public final class DBFlush extends DBUpdate {
 
   @Override
   public void apply() {
-    final MainOptions opts = data.meta.options;
-    if(opts.get(MainOptions.AUTOFLUSH)) return;
-    opts.set(MainOptions.AUTOFLUSH, true);
-    data.finishUpdate();
-    opts.set(MainOptions.AUTOFLUSH, false);
+    if(!data.meta.options.get(MainOptions.AUTOFLUSH)) data.flush(true);
   }
 
   @Override

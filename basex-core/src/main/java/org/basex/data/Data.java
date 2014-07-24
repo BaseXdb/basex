@@ -2,6 +2,7 @@ package org.basex.data;
 
 import static org.basex.util.Token.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.List;
 
@@ -129,14 +130,20 @@ public abstract class Data {
   /**
    * Starts an update operation: writes a file to disk to indicate that an update is
    * going on, and exclusively locks the table file.
-   * @return success flag
+   * @throws IOException I/O exception
    */
-  public abstract boolean startUpdate();
+  public abstract void startUpdate() throws IOException;
 
   /**
    * Finishes an update operation: removes the update file and the exclusive lock.
    */
   public abstract void finishUpdate();
+
+  /**
+   * Flushes updated data.
+   * @param all flush all data
+   */
+  public abstract void flush(final boolean all);
 
   /**
    * Returns an index iterator for the specified token.

@@ -28,9 +28,10 @@ public abstract class TableAccess {
 
   /**
    * Flushes the table contents.
+   * @param all flush all contents or only buffers
    * @throws IOException I/O exception
    */
-  public abstract void flush() throws IOException;
+  public abstract void flush(final boolean all) throws IOException;
 
   /**
    * Closes the table access.
@@ -40,10 +41,10 @@ public abstract class TableAccess {
 
   /**
    * Tries to acquires a lock on the table. If a lock exists, it is first released.
-   * @param excl exclusive/shared lock
+   * @param write write/read lock
    * @return success flag
    */
-  public abstract boolean lock(final boolean excl);
+  public abstract boolean lock(final boolean write);
 
   /**
    * Reads a byte value and returns it as an integer value.

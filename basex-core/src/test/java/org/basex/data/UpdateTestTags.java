@@ -2,6 +2,8 @@ package org.basex.data;
 
 import static org.junit.Assert.*;
 
+import java.io.*;
+
 import org.basex.data.atomic.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -15,9 +17,10 @@ import org.junit.*;
 public final class UpdateTestTags extends UpdateTest {
   /**
    * Tests insert as last child.
+   * @throws IOException I/O exception
    */
   @Test
-  public void insertTagAsOnly1() {
+  public void insertTagAsOnly1() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
     insertTag(3, 0, T_JUNIT, Data.ELEM);
@@ -41,9 +44,10 @@ public final class UpdateTestTags extends UpdateTest {
 
   /**
    * Tests insert as last child.
+   * @throws IOException I/O exception
    */
   @Test
-  public void insertTagAsOnly2() {
+  public void insertTagAsOnly2() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
     insertTag(3, 1, T_JUNIT, Data.ELEM);
@@ -67,9 +71,10 @@ public final class UpdateTestTags extends UpdateTest {
 
   /**
    * Tests insert as last child.
+   * @throws IOException I/O exception
    */
   @Test
-  public void insertTagAsOnly3() {
+  public void insertTagAsOnly3() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
     insertTag(3, 2, T_JUNIT, Data.ELEM);
@@ -93,9 +98,10 @@ public final class UpdateTestTags extends UpdateTest {
 
   /**
    * Tests insert as last child.
+   * @throws IOException I/O exception
    */
   @Test
-  public void insertTagAfterAttsAsFirst() {
+  public void insertTagAfterAttsAsFirst() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
     insertTag(6, 1, T_JUNIT, Data.ELEM);
@@ -118,9 +124,10 @@ public final class UpdateTestTags extends UpdateTest {
 
   /**
    * Tests insert as last child.
+   * @throws IOException I/O exception
    */
   @Test
-  public void insertTagAfterAttsAsSecond() {
+  public void insertTagAfterAttsAsSecond() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
     insertTag(6, 2, T_JUNIT, Data.ELEM);
@@ -143,9 +150,10 @@ public final class UpdateTestTags extends UpdateTest {
 
   /**
    * Tests insert as last child.
+   * @throws IOException I/O exception
    */
   @Test
-  public void insertTagAfterAttsAsLast() {
+  public void insertTagAfterAttsAsLast() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
     insertTag(6, 0, T_JUNIT, Data.ELEM);
@@ -168,9 +176,10 @@ public final class UpdateTestTags extends UpdateTest {
 
   /**
    * Tests updateTagName.
+   * @throws IOException I/O exception
    */
   @Test
-  public void updateTagName() {
+  public void updateTagName() throws IOException {
     final Data data = context.data();
     data.startUpdate();
     data.update(6, Data.ELEM, T_JUNIT, Token.EMPTY);
@@ -188,8 +197,10 @@ public final class UpdateTestTags extends UpdateTest {
    * @param pos inserting position
    * @param name tag name
    * @param kind node kind
+   * @throws IOException I/O exception
    */
-  private static void insertTag(final int par, final int pos, final byte[] name, final int kind) {
+  private static void insertTag(final int par, final int pos, final byte[] name, final int kind)
+      throws IOException {
     int root;
     final Data data = context.data();
     if(pos == 0) {

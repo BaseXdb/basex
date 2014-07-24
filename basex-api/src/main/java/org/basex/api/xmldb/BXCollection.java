@@ -144,10 +144,15 @@ public final class BXCollection implements Collection, BXXMLDBText {
     if(del.data != data && del.data != null) throw new XMLDBException(
         ErrorCodes.NO_SUCH_RESOURCE, ERR_UNKNOWN + data.meta.name);
 
-    if(!data.startUpdate()) throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK);
-    data.delete(getResource(del.getId()).pre);
-    ctx.invalidate();
-    data.finishUpdate();
+    try {
+      data.startUpdate();
+      data.delete(getResource(del.getId()).pre);
+      ctx.invalidate();
+      data.finishUpdate();
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK);
+    }
   }
 
   @Override
@@ -182,10 +187,15 @@ public final class BXCollection implements Collection, BXXMLDBText {
     }
 
     final Data data = ctx.data();
-    if(!data.startUpdate()) throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK);
-    data.insert(data.meta.size, -1, new DataClip(md));
-    ctx.invalidate();
-    data.finishUpdate();
+    try {
+      data.startUpdate();
+      data.insert(data.meta.size, -1, new DataClip(md));
+      ctx.invalidate();
+      data.finishUpdate();
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK);
+    }
   }
 
   @Override

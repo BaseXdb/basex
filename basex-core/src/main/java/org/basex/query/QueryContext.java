@@ -569,8 +569,9 @@ public final class QueryContext extends Proc {
     }
 
     // reassign original database options
-    for(final Entry<Option<?>, Object> e : staticOpts.entrySet())
+    for(final Entry<Option<?>, Object> e : staticOpts.entrySet()) {
       context.options.put(e.getKey(), e.getValue());
+    }
   }
 
   @Override

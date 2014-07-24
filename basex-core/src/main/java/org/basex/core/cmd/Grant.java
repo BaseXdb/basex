@@ -80,7 +80,7 @@ public final class Grant extends AUser {
     }
 
     // try to lock database
-    if(!data.startUpdate()) return !info(DB_PINNED_X, data.meta.name);
+    if(!startUpdate(data)) return false;
 
     User u = data.meta.users.get(user);
     // add local user reference
@@ -90,7 +90,8 @@ public final class Grant extends AUser {
     }
     u.perm = prm;
     data.meta.dirty = true;
-    data.finishUpdate();
+    finishUpdate(data);
+
     Close.close(data, context);
     return info(GRANTED_ON_X_X_X, args[0], user, db);
   }

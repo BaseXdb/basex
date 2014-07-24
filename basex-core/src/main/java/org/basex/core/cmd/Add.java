@@ -99,10 +99,10 @@ public final class Add extends ACreate {
       tmp = build.build();
       // skip update if fragment is empty
       if(tmp.meta.size > 1) {
-        if(lock && !data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
+        if(lock && !startUpdate()) return false;
         data.insert(data.meta.size, -1, new DataClip(tmp));
         context.invalidate();
-        if(lock) data.finishUpdate();
+        if(lock) finishUpdate();
       }
       // return info message
       return info(parser.info() + PATH_ADDED_X_X, name, perf);

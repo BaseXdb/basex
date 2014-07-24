@@ -57,14 +57,14 @@ public final class CreateIndex extends ACreate {
         return error(UNKNOWN_CMD_X, this);
     }
 
-    if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
+    if(!startUpdate()) return false;
     try {
       create(index, data, this);
       return info(INDEX_CREATED_X_X, index, perf);
     } catch(final IOException ex) {
       return error(Util.message(ex));
     } finally {
-      data.finishUpdate();
+      finishUpdate();
     }
   }
 

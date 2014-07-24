@@ -29,15 +29,13 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public void flush() { }
+  public void flush(final boolean all) { }
 
   @Override
   public void close() { }
 
   @Override
-  public boolean lock(final boolean lock) {
-    return true;
-  }
+  public boolean lock(final boolean lock) { return true; }
 
   @Override
   public int read1(final int p, final int o) {

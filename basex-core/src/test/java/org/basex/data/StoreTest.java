@@ -19,7 +19,7 @@ public final class StoreTest extends SandboxTest {
   private static final int NQUERIES = 100;
 
   /**
-   * Initializes the test.
+   * Initializes the tests.
    * @throws Exception exception
    */
   @BeforeClass
@@ -28,19 +28,6 @@ public final class StoreTest extends SandboxTest {
     run(new Set(MainOptions.TEXTINDEX, false));
     run(new Set(MainOptions.ATTRINDEX, false));
     run(new Set(MainOptions.AUTOFLUSH, false));
-  }
-
-  /**
-   * Finishes the test.
-   * @throws BaseXException database exception
-   */
-  @AfterClass
-  public static void finish() throws BaseXException {
-    run(new DropDB(NAME));
-    run(new Set(MainOptions.TEXTINDEX, true));
-    run(new Set(MainOptions.ATTRINDEX, true));
-    run(new Set(MainOptions.AUTOFLUSH, true));
-    run(new Set(MainOptions.UPDINDEX, false));
   }
 
   /**
@@ -105,7 +92,6 @@ public final class StoreTest extends SandboxTest {
   @Test
   public void updIndexFlush() throws BaseXException {
     run(new Set(MainOptions.TEXTINDEX, true));
-    run(new Set(MainOptions.AUTOFLUSH, false));
     run(new Set(MainOptions.UPDINDEX, true));
     run(new CreateDB(NAME));
     final String input = "<a>0</a>";

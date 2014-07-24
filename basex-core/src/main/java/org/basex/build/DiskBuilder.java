@@ -23,7 +23,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class DiskBuilder extends Builder {
+public final class DiskBuilder extends Builder implements AutoCloseable {
   /** Text compressor. */
   private static final ThreadLocal<Compress> COMP = new ThreadLocal<Compress>() {
     @Override
@@ -43,6 +43,8 @@ public final class DiskBuilder extends Builder {
 
   /** Database context. */
   private final Context context;
+  /** Closed flag. */
+  private boolean closed;
   /** Debug counter. */
   private int c;
 
@@ -104,9 +106,7 @@ public final class DiskBuilder extends Builder {
     md.dbfile(DATATMP).delete();
 
     // return database instance
-    final DiskData data = new DiskData(md, elms, atts, path, ns);
-    data.finishUpdate();
-    return data;
+    return new DiskData(md, elms, atts, path, ns);
   }
 
   @Override
@@ -121,6 +121,8 @@ public final class DiskBuilder extends Builder {
 
   @Override
   public void close() throws IOException {
+    if(closed) return;
+    closed = true;
     if(tout != null) tout.close();
     if(xout != null) xout.close();
     if(vout != null) vout.close();

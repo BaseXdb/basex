@@ -121,40 +121,35 @@ public final class OptimizeAll extends ACreate {
     ctx.options.set(MainOptions.STOPWORDS,  m.stopwords);
 
     // build database and index structures
-    final DiskBuilder builder = new DiskBuilder(tname, new DBParser(old, cmd), ctx);
-    try {
+    try(final DiskBuilder builder = new DiskBuilder(tname, new DBParser(old, cmd), ctx)) {
       final DiskData d = builder.build();
-      if(m.createtext) create(IndexType.TEXT, d, cmd);
-      if(m.createattr) create(IndexType.ATTRIBUTE, d, cmd);
-      if(m.createftxt) create(IndexType.FULLTEXT, d, cmd);
-      // adopt original meta data
-      d.meta.createtext = m.createtext;
-      d.meta.createattr = m.createattr;
-      d.meta.createftxt = m.createftxt;
-      d.meta.filesize   = m.filesize;
-      d.meta.users      = m.users;
-      d.meta.dirty      = true;
-
-      // move binary files
-      final IOFile bin = data.meta.binaries();
-      if(bin.exists()) bin.rename(d.meta.binaries());
-      final IOFile upd = old.updateFile();
-      if(upd.exists()) upd.copyTo(d.updateFile());
-      d.close();
-    } finally {
       try {
-        builder.close();
-      } catch(final IOException ex) {
-        Util.debug(ex);
+        if(m.createtext) create(IndexType.TEXT, d, cmd);
+        if(m.createattr) create(IndexType.ATTRIBUTE, d, cmd);
+        if(m.createftxt) create(IndexType.FULLTEXT, d, cmd);
+        // adopt original meta data
+        d.meta.createtext = m.createtext;
+        d.meta.createattr = m.createattr;
+        d.meta.createftxt = m.createftxt;
+        d.meta.filesize   = m.filesize;
+        d.meta.users      = m.users;
+        d.meta.dirty      = true;
+
+        // move binary files
+        final IOFile bin = data.meta.binaries();
+        if(bin.exists()) bin.rename(d.meta.binaries());
+        final IOFile upd = old.updateFile();
+        if(upd.exists()) upd.copyTo(d.updateFile());
+      } finally {
+        d.close();
       }
     }
+    // return database instance
     Close.close(data, ctx);
 
     // drop old database and rename temporary to final name
-    if(!DropDB.drop(m.name, ctx))
-      throw new BaseXException(DB_NOT_DROPPED_X, m.name);
-    if(!AlterDB.alter(tname, m.name, ctx))
-      throw new BaseXException(DB_NOT_RENAMED_X, tname);
+    if(!DropDB.drop(m.name, ctx)) throw new BaseXException(DB_NOT_DROPPED_X, m.name);
+    if(!AlterDB.alter(tname, m.name, ctx)) throw new BaseXException(DB_NOT_RENAMED_X, tname);
   }
 
   /**

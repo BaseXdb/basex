@@ -49,7 +49,7 @@ public abstract class ACreate extends Command {
    * @return IO reference
    * @throws IOException I/O exception
    */
-  IO sourceToIO(final String name) throws IOException {
+  protected final IO sourceToIO(final String name) throws IOException {
     IO io = null;
     if(args[1] != null && !args[1].isEmpty()) {
       io = IO.get(args[1]);
@@ -72,6 +72,21 @@ public abstract class ACreate extends Command {
       io.name(name.isEmpty() ? "" : name + '.' + options.get(MainOptions.PARSER));
     }
     return io;
+  }
+
+  /**
+   * Starts an update operation.
+   * @return success flag
+   */
+  protected final boolean startUpdate() {
+    return startUpdate(context.data());
+  }
+
+  /**
+   * Finalizes an update operation.
+   */
+  protected final void finishUpdate() {
+    finishUpdate(context.data());
   }
 
   /**

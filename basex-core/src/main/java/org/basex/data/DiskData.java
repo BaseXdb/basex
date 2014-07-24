@@ -144,8 +144,6 @@ public final class DiskData extends Data {
       if(idmap != null) idmap.write(meta.dbfile(DATAIDP));
       meta.dirty = false;
     }
-    // in all cases, remove updating file
-    updateFile().delete();
   }
 
   @Override
@@ -194,27 +192,40 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public boolean startUpdate() {
+  public void startUpdate() throws IOException {
+    if(!table.lock(true)) throw new BaseXException(Text.DB_PINNED_X, meta.name);
     final IOFile uf = updateFile();
-    return (uf.exists() || uf.touch()) && table.lock(true);
+    if(uf.exists()) throw new BaseXException(Text.DB_UPDATED_X, meta.name);
+    if(!uf.touch()) throw Util.notExpected("Database '%': could not create lock file.", meta.name);
   }
 
   @Override
   public synchronized void finishUpdate() {
-    // skip all flush operations if auto flush is off, or file has already been closed
-    if(!meta.options.get(MainOptions.AUTOFLUSH) || closed) return;
+    // remove updating file
+    final IOFile uf = updateFile();
+    if(!uf.exists()) throw Util.notExpected("Database '%': lock file does not exist.", meta.name);
+    if(!uf.delete()) throw Util.notExpected("Database '%': could not delete lock file.", meta.name);
 
+    // db:optimize(..., true) will close the database before this function is called
+    if(!closed) {
+      flush(meta.options.get(MainOptions.AUTOFLUSH));
+      if(!table.lock(false)) throw Util.notExpected("Database '%': could not unlock.", meta.name);
+    }
+  }
+
+  @Override
+  public synchronized void flush(final boolean all) {
     try {
-      write();
-      table.flush();
-      texts.flush();
-      values.flush();
-      if(txtindex != null) ((DiskValues) txtindex).flush();
-      if(atvindex != null) ((DiskValues) atvindex).flush();
+      table.flush(all);
+      if(all) {
+        write();
+        texts.flush();
+        values.flush();
+        if(txtindex != null) ((DiskValues) txtindex).flush();
+        if(atvindex != null) ((DiskValues) atvindex).flush();
+      }
     } catch(final IOException ex) {
       Util.stack(ex);
-    } finally {
-      table.lock(false);
     }
   }
 

@@ -2,6 +2,7 @@ package org.basex.query.up;
 
 import static org.basex.query.util.Err.*;
 
+import java.io.*;
 import java.util.*;
 
 import org.basex.data.*;
@@ -110,11 +111,13 @@ public abstract class ContextModifier {
     int i = 0;
     try {
       for(final Data data : datas) {
-        if(!data.startUpdate()) throw BXDB_OPENED.get(null, data.meta.name);
+        data.startUpdate();
         i++;
       }
       // apply node and database update
       for(final DataUpdates up : dbUpdates.values()) up.apply();
+    } catch(final IOException ex) {
+      throw BXDB_LOCK.get(null, ex);
     } finally {
       // remove locks: in case of a crash, remove only already acquired write locks
       for(final Data data : datas) {

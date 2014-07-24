@@ -77,8 +77,8 @@ public final class Unit {
     final ArrayList<StaticFunc> test = new ArrayList<>(0);
     final Performance perf = new Performance();
 
+    final QueryContext qc = new QueryContext(ctx);
     try {
-      final QueryContext qc = new QueryContext(ctx);
       input = string(file.read());
       qc.parse(input, file.path(), null);
       funcs = qc.funcs.funcs();
@@ -185,6 +185,8 @@ public final class Unit {
       }
       suite.add(error);
       errors++;
+    } finally {
+      qc.close();
     }
 
     if(suite.hasChildren()) {

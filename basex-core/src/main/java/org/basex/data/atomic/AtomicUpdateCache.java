@@ -224,11 +224,9 @@ public final class AtomicUpdateCache {
       // - the inserted node would directly be deleted without this restriction
       if(bu2 instanceof Insert || bu2 instanceof InsertAttr)
         if(bu1 instanceof Delete)
-          throw Util.notExpected("Invalid sequence of delete, insert at location "
-          + bu1.location);
+          throw Util.notExpected("Invalid sequence of delete, insert at location " + bu1.location);
         else if(bu1 instanceof Replace)
-          throw Util.notExpected("Invalid sequence of replace, insert at location "
-              + bu1.location);
+          throw Util.notExpected("Invalid sequence of replace, insert at location " + bu1.location);
 
       // check multiple {@link Delete}, {@link Replace}
       if(bu2.destructive() && bu1.destructive())

@@ -44,13 +44,20 @@ public final class Util {
 
   /**
    * Throws a runtime exception for an unexpected exception.
+   * @return runtime exception (indicates that an error is raised)
+   */
+  public static RuntimeException notExpected() {
+    return notExpected("Not Expected.");
+  }
+
+  /**
+   * Throws a runtime exception for an unexpected exception.
+   * @param message message
    * @param ext optional extension
    * @return runtime exception (indicates that an error is raised)
    */
-  public static RuntimeException notExpected(final Object... ext) {
-    final TokenBuilder tb = new TokenBuilder();
-    tb.addExt("%", ext.length == 0 ? "Not Expected." : ext[0]);
-    return new RuntimeException(tb.toString());
+  public static RuntimeException notExpected(final Object message, Object... ext) {
+    return new RuntimeException(info(message, ext));
   }
 
   /**

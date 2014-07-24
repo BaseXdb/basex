@@ -50,7 +50,7 @@ public final class Replace extends ACreate {
     final Data data = context.data();
     final IntList pre = data.resources.docs(path, true);
 
-    if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
+    if(!startUpdate()) return false;
     try {
       final boolean ok;
       final IOFile file = data.meta.binary(path);
@@ -58,6 +58,7 @@ public final class Replace extends ACreate {
         // replace binary file if it already exists
         final Store store = new Store(path);
         store.setInput(in);
+        store.lock = false;
         ok = store.run(context) || error(store.info());
       } else {
         // otherwise, add new document as xml
@@ -75,7 +76,7 @@ public final class Replace extends ACreate {
       }
       return ok && info(RES_REPLACED_X_X, 1, perf);
     } finally {
-      data.finishUpdate();
+      finishUpdate();
     }
   }
 }

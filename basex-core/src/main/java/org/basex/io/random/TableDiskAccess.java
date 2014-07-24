@@ -52,10 +52,10 @@ public final class TableDiskAccess extends TableAccess {
   /**
    * Constructor.
    * @param md meta data
-   * @param lock exclusive access
+   * @param write write lock
    * @throws IOException I/O exception
    */
-  public TableDiskAccess(final MetaData md, final boolean lock) throws IOException {
+  public TableDiskAccess(final MetaData md, final boolean write) throws IOException {
     super(md);
 
     // read meta and index data
@@ -84,9 +84,7 @@ public final class TableDiskAccess extends TableAccess {
 
     // initialize data file
     file = new RandomAccessFile(meta.dbfile(DATATBL).file(), "rw");
-    if(lock) exclusiveLock();
-    else sharedLock();
-    if(fl == null) throw new BaseXException(Text.DB_PINNED_X, md.name);
+    if(!lock(write)) throw new BaseXException(Text.DB_PINNED_X, md.name);
   }
 
   /**
@@ -101,26 +99,26 @@ public final class TableDiskAccess extends TableAccess {
 
     try(final RandomAccessFile file = new RandomAccessFile(table.file(), "rw")) {
       return file.getChannel().tryLock() == null;
-    } catch(final ClosedChannelException ex) {
-      return false;
-    } catch(final OverlappingFileLockException | IOException ex) {
+    } catch(final IOException ex) {
+      System.out.println(ex);
       return true;
     }
   }
 
   @Override
-  public synchronized void flush() throws IOException {
+  public synchronized void flush(final boolean all) throws IOException {
     for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
-    if(!dirty) return;
+    if(!dirty || !all) return;
 
     try(final DataOutput out = new DataOutput(meta.dbfile(DATATBL + 'i'))) {
-      out.writeNum(blocks);
+      final int blcks = blocks;
+      out.writeNum(blcks);
       out.writeNum(used);
 
       // due to legacy issues, number of blocks is written several times
-      out.writeNum(blocks);
+      out.writeNum(blcks);
       for(int a = 0; a < blocks; a++) out.writeNum(fpres[a]);
-      out.writeNum(blocks);
+      out.writeNum(blcks);
       for(int a = 0; a < blocks; a++) out.writeNum(pages[a]);
 
       out.writeLongs(usedPages.toArray());
@@ -130,56 +128,20 @@ public final class TableDiskAccess extends TableAccess {
 
   @Override
   public synchronized void close() throws IOException {
-    flush();
+    flush(true);
     file.close();
   }
 
   @Override
-  public boolean lock(final boolean lock) {
+  public boolean lock(final boolean write) {
     try {
-      if(lock) {
-        if(exclusiveLock()) return true;
-        if(sharedLock()) return false;
-      } else {
-        if(sharedLock()) return true;
-      }
+      if(fl != null && write != fl.isShared()) return true;
+      if(fl != null) fl.release();
+      fl = file.getChannel().tryLock(0, Long.MAX_VALUE, !write);
+      return fl != null;
     } catch(final IOException ex) {
-      Util.stack(ex);
+      throw Util.notExpected(ex);
     }
-    throw Util.notExpected((lock ? "Exclusive" : "Shared") +
-        " lock could not be acquired.");
-  }
-
-  /**
-   * Acquires an exclusive lock on the file.
-   * @return success flag
-   * @throws IOException I/O exception
-   */
-  private boolean exclusiveLock() throws IOException {
-    return lck(false);
-  }
-
-  /**
-   * Acquires a shared lock on the file.
-   * @return success flag
-   * @throws IOException I/O exception
-   */
-  private boolean sharedLock() throws IOException {
-    return lck(true);
-  }
-
-  /**
-   * Acquires a lock on the file. Does nothing if the correct lock has already been
-   * acquired. Otherwise, releases an existing lock.
-   * @param shared shared/exclusive lock
-   * @return success flag
-   * @throws IOException I/O exception
-   */
-  private boolean lck(final boolean shared) throws IOException {
-    if(fl != null && shared == fl.isShared()) return true;
-    if(fl != null) fl.release();
-    fl = file.getChannel().tryLock(0, Long.MAX_VALUE, shared);
-    return fl != null;
   }
 
   @Override
