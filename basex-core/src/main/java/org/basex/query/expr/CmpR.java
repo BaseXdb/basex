@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.util.Token.*;
 
 import org.basex.data.*;
 import org.basex.index.name.*;
@@ -126,13 +127,24 @@ public final class CmpR extends Single {
     // estimate costs for range access; all values out of range: no results
     final NumericRange nr = new NumericRange(ii.text,
         Math.max(min, key.min), Math.min(max, key.max));
-    ii.costs = nr.min > nr.max || nr.max < key.min || nr.min > key.max ? 0 :
-      Math.max(1, data.meta.size / 5);
 
     // skip queries with no results
-    if(ii.costs == 0) return true;
+    if(nr.min > nr.max || nr.max < key.min || nr.min > key.max) {
+      ii.costs = 0;
+      return true;
+    }
+
+    // skip if numbers are negative, doubles, or of different string length
+    final int mnl = min >= 0 && (long) min == min ? token(min).length : -1;
+    final int mxl = max >= 0 && (long) max == max ? token(max).length : -1;
+    if(mnl != mxl || mnl == -1) return false;
+
+    // estimate costs (you conservative value)
+    ii.costs = Math.max(1, data.meta.size / 3);
+
     // don't use index if min/max values are infinite
-    if(min == Double.NEGATIVE_INFINITY && max == Double.POSITIVE_INFINITY) return false;
+    if(min == Double.NEGATIVE_INFINITY && max == Double.POSITIVE_INFINITY ||
+        Token.token((int) nr.min).length != Token.token((int) nr.max).length) return false;
 
     final TokenBuilder tb = new TokenBuilder();
     tb.add(mni ? '[' : '(').addExt(min).add(',').addExt(max).add(mxi ? ']' : ')');

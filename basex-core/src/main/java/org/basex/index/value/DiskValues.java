@@ -344,10 +344,8 @@ public class DiskValues implements Index {
    * @return results
    */
   private IndexIterator idRange(final NumericRange tok) {
-    final double min = tok.min;
-    final double max = tok.max;
-
     // check if min and max are positive integers with the same number of digits
+    final double min = tok.min, max = tok.max;
     final int len = max > 0 && (long) max == max ? token(max).length : 0;
     final boolean simple = len != 0 && min > 0 && (long) min == min && token(min).length == len;
 
