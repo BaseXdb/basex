@@ -159,8 +159,8 @@ public final class PathSummary implements Index {
   }
 
   /**
-   * Returns all children or descendants of the specified nodes with the
-   * specified element or attribute names. Called from the query optimizer.
+   * Returns all descendants with the specified element or attribute names.
+   * Called from the query optimizer.
    * @param name name reference
    * @param kind node kind
    * @return descendant nodes

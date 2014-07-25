@@ -146,8 +146,7 @@ public final class PathNode {
   }
 
   /**
-   * Recursively adds the node and its descendants to the specified list
-   * with the specified name.
+   * Recursively adds the node and its descendants to the specified list with the specified name.
    * @param nodes node list
    * @param nm name id
    * @param knd node kind

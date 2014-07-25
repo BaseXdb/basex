@@ -302,7 +302,7 @@ public final class GFLWOR extends ParseExpr {
             // inline only cheap axis paths
             || expr instanceof AxisPath && ((AxisPath) expr).cheap()) {
 
-            qc.compInfo(QueryText.OPTINLINE, lt);
+            qc.compInfo(QueryText.OPTINLINE, lt.var);
             inline(qc, scp, lt.var, lt.inlineExpr(qc, scp), next);
             iter.remove();
             thisRound = change = true;

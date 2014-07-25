@@ -438,11 +438,11 @@ public abstract class Path extends ParseExpr {
       break;
     }
 
-    // check if the all children in the path exist; don't test with namespaces
+    // check if all child steps yield results; if not, return empty sequence
     if(data.nspaces.size() == 0) {
       LOOP:
       for(int s = 0; s < path.steps.length; s++) {
-        // only verify child steps; ignore namespaces
+        // only accept child steps; ignore namespaces
         final Step st = path.axisStep(s);
         if(st == null || st.axis != CHILD) break;
         if(st.test.kind == Kind.WILDCARD || st.test.kind == null) continue;
@@ -541,28 +541,10 @@ public abstract class Path extends ParseExpr {
       if(p != iPred) newPreds.add(indexStep.preds[p]);
     }
 
-    // check if steps before index step need to be inverted and traversed
-    final Test test = InvDocTest.get(rt);
-    boolean inv = true;
-    if(test == Test.DOC && data.meta.uptodate) {
-      int s = 0;
-      for(; s <= iStep; s++) {
-        // step must use child axis and name test, and have no predicates
-        final Step step = axisStep(s);
-        if(step.test.kind != Kind.NAME || step.axis != Axis.CHILD ||
-            s != iStep && step.preds.length > 0) break;
-
-        // support only unique paths with nodes on the correct level
-        final int name = data.elmindex.id(step.test.name.local());
-        final ArrayList<PathNode> pn = data.paths.desc(name, Data.ELEM);
-        if(pn.size() != 1 || pn.get(0).level() != s + 1) break;
-      }
-      inv = s <= iStep;
-    }
-
     // invert steps that occur before index step and add them as predicate
+    final Test test = InvDocTest.get(rt);
     final ExprList invSteps = new ExprList();
-    if(inv) {
+    if(test != Test.DOC || !data.meta.uptodate || predSteps(data, iStep)) {
       for(int s = iStep; s >= 0; s--) {
         final Axis ax = axisStep(s).axis.invert();
         if(s == 0) {
@@ -605,6 +587,29 @@ public abstract class Path extends ParseExpr {
     // add remaining steps
     for(int s = iStep + 1; s < sl; s++) resultSteps.add(steps[s]);
     return get(info, resultRoot, resultSteps.array());
+  }
+
+  /**
+   * Checks if steps before index step need to be inverted and traversed.
+   * @param data data reference
+   * @param iStep index step
+   * @return result of check
+   */
+  private boolean predSteps(final Data data, final int iStep) {
+    for(int s = iStep; s >= 0; s--) {
+      final Step step = axisStep(s);
+      // ensure that the index step does not use wildcard
+      if(step.test.kind == Kind.WILDCARD && s != iStep) continue;
+      // consider child steps with name test and without predicates
+      if(step.test.kind != Kind.NAME || step.axis != Axis.CHILD ||
+          s != iStep && step.preds.length > 0) return true;
+
+      // support only unique paths with nodes on the correct level
+      final int name = data.elmindex.id(step.test.name.local());
+      final ArrayList<PathNode> pn = data.paths.desc(name, Data.ELEM);
+      if(pn.size() != 1 || pn.get(0).level() != s + 1) return true;
+    }
+    return false;
   }
 
   /**
