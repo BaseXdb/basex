@@ -233,11 +233,12 @@ public final class Unit {
     final QueryContext query = new QueryContext(ctx);
     try {
       query.parse(input, file.path(), null);
+      final StaticFunc sf = find(query, func);
 
       // wrap function with a function call
       final StaticFuncCall sfc = new StaticFuncCall(
-          func.name, new Expr[0], func.sc, func.info).init(func);
-      final MainModule mm = new MainModule(sfc, new VarScope(func.sc), null, func.sc);
+          sf.name, new Expr[0], sf.sc, sf.info).init(sf);
+      final MainModule mm = new MainModule(sfc, new VarScope(sf.sc), null, sf.sc);
 
       // assign main module and http context and register process
       query.mainModule(mm);
@@ -249,6 +250,19 @@ public final class Unit {
     } finally {
       query.close();
     }
+  }
+
+  /**
+   * Returns the specified function from the given query context.
+   * @param qctx query context.
+   * @param func function to be found
+   * @return function
+   */
+  private static StaticFunc find(final QueryContext qctx, final StaticFunc func) {
+    for(final StaticFunc sf : qctx.funcs.funcs()) {
+      if(func.info.equals(sf.info)) return sf;
+    }
+    return null;
   }
 
   /**
