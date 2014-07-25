@@ -25,6 +25,17 @@ public final class MainModule extends StaticScope {
   private final SeqType declType;
 
   /**
+   * Constructor for a function call.
+   * @param sf static function
+   * @param args function arguments
+   * @throws QueryException query exception
+   */
+  public MainModule(final StaticFunc sf, final Expr[] args) throws QueryException {
+    this(new StaticFuncCall(sf.name, args, sf.sc, sf.info).init(sf),
+        new VarScope(sf.sc), null, sf.sc);
+  }
+
+  /**
    * Constructor.
    * @param expr root expression
    * @param scope variable scope

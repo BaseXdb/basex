@@ -47,11 +47,13 @@ final class RestXqModule {
     final QueryContext qc = parseModule(http);
     try {
       // loop through all functions
+      final String name = file.name();
       for(final StaticFunc uf : qc.funcs.funcs()) {
-        // consider only functions that are defined in this module
-        if(!file.name().equals(new IOFile(uf.info.path()).name())) continue;
-        final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
-        if(rxf.parse()) functions.add(rxf);
+        // only add functions that are defined in the same module (file)
+        if(name.equals(new IOFile(uf.info.path()).name())) {
+          final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
+          if(rxf.parse()) functions.add(rxf);
+        }
       }
     } finally {
       qc.close();
@@ -95,16 +97,9 @@ final class RestXqModule {
     // create new XQuery instance
     final QueryContext qc = parseModule(http);
     try {
-      // loop through all functions
-      for(final StaticFunc uf : qc.funcs.funcs()) {
-        // compare input info
-        if(func.function.info.equals(uf.info)) {
-          final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
-          rxf.parse();
-          new RestXqResponse(rxf, qc, http, error).create();
-          break;
-        }
-      }
+      final RestXqFunction rxf = new RestXqFunction(find(qc, func.function), qc, this);
+      rxf.parse();
+      new RestXqResponse(rxf, qc, http, error).create();
     } finally {
       qc.close();
     }
@@ -124,7 +119,23 @@ final class RestXqModule {
       qc.parse(string(file.read()), file.path(), null);
       return qc;
     } catch(final IOException ex) {
+      // may be triggered when reading the file
       throw IOERR.get(null, ex);
+    } finally {
+      qc.close();
     }
+  }
+
+  /**
+   * Returns the specified function from the given query context.
+   * @param qctx query context.
+   * @param func function to be found
+   * @return function
+   */
+  private StaticFunc find(final QueryContext qctx, final StaticFunc func) {
+    for(final StaticFunc sf : qctx.funcs.funcs()) {
+      if(func.info.equals(sf.info)) return sf;
+    }
+    return null;
   }
 }

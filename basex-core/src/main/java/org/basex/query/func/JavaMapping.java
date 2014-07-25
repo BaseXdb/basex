@@ -242,7 +242,7 @@ public abstract class JavaMapping extends Arr {
 
     // check addressed class
     try {
-      return new JavaFunc(sc, ii, qc.resources.modules().findClass(path), local, args);
+      return new JavaFunc(sc, ii, modules.findClass(path), local, args);
     } catch(final ClassNotFoundException ex) {
       // only throw exception if "java:" prefix was explicitly specified
       if(java) throw FUNCJAVA.get(ii, path);

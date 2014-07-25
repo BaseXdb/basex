@@ -18,7 +18,6 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -35,10 +34,8 @@ public final class Unit {
   /** Parent process. */
   private final Proc proc;
 
-  /** File contents. */
+  /** Query string. */
   private String input;
-  /** Functions. */
-  private StaticFunc[] funcs;
   /** Currently processed function. */
   private StaticFunc current;
 
@@ -81,10 +78,9 @@ public final class Unit {
     try {
       input = string(file.read());
       qc.parse(input, file.path(), null);
-      funcs = qc.funcs.funcs();
 
       // loop through all functions
-      for(final StaticFunc sf : funcs) {
+      for(final StaticFunc sf : qc.funcs.funcs()) {
         // find Unit annotations
         final Ann ann = sf.ann;
         final int as = ann.size();
@@ -273,14 +269,7 @@ public final class Unit {
     qctx.listen = proc.listen;
     try {
       qctx.parse(input, file.path(), null);
-
-      // wrap function with a function call
-      final StaticFuncCall sfc = new StaticFuncCall(
-          func.name, new Expr[0], func.sc, func.info).init(func);
-      final MainModule mm = new MainModule(sfc, new VarScope(func.sc), null, func.sc);
-
-      // assign main module and http context and register process
-      qctx.mainModule(mm);
+      qctx.mainModule(new MainModule(find(qctx, func), new Expr[0]));
       qctx.compile();
 
       final Iter iter = qctx.iter();
@@ -290,6 +279,19 @@ public final class Unit {
       proc.proc(null);
       qctx.close();
     }
+  }
+
+  /**
+   * Returns the specified function from the given query context.
+   * @param qctx query context.
+   * @param func function to be found
+   * @return function
+   */
+  private StaticFunc find(final QueryContext qctx, final StaticFunc func) {
+    for(final StaticFunc sf : qctx.funcs.funcs()) {
+      if(func.info.equals(sf.info)) return sf;
+    }
+    return null;
   }
 
   /**

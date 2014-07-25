@@ -68,7 +68,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   private final ArrayList<RestXqParam> cookieParams = new ArrayList<>();
 
   /** Query context. */
-  private final QueryContext context;
+  private final QueryContext qc;
   /** Consumed media types. */
   private final StringList consumes = new StringList();
   /** Returned media types. */
@@ -78,14 +78,14 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
   /**
    * Constructor.
-   * @param uf associated user function
+   * @param function associated user function
    * @param qc query context
-   * @param m associated module
+   * @param module associated module
    */
-  RestXqFunction(final StaticFunc uf, final QueryContext qc, final RestXqModule m) {
-    function = uf;
-    context = qc;
-    module = m;
+  RestXqFunction(final StaticFunc function, final QueryContext qc, final RestXqModule module) {
+    this.function = function;
+    this.qc = qc;
+    this.module = module;
     output = qc.serParams();
   }
 
@@ -429,8 +429,8 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         // casts and binds the value
         final SeqType decl = var.declaredType();
         final Value val = value.seqType().instanceOf(decl) ? value :
-          decl.cast(value, context, function.sc, null);
-        args[f] = var.checkType(val, context, null, false);
+          decl.cast(value, qc, function.sc, null);
+        args[f] = var.checkType(val, qc, null, false);
         break;
       }
     }

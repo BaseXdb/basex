@@ -112,7 +112,7 @@ public final class Functions extends TokenSet {
    * @throws QueryException query exception
    */
   public StandardFunc get(final QNm name, final Expr[] args, final StaticContext sc,
-                           final InputInfo ii) throws QueryException {
+      final InputInfo ii) throws QueryException {
     final Function fl = getBuiltIn(name, args.length, ii);
     return fl == null ? null : fl.get(sc, ii, args);
   }
@@ -184,9 +184,7 @@ public final class Functions extends TokenSet {
       refs[i] = new VarRef(ii, vs[i]);
     }
     final Expr jm = JavaMapping.get(name, refs, qc, sc, ii);
-    if(jm != null) return new FuncLit(new Ann(), name, vs, jm, jt, scp, sc, ii);
-
-    return null;
+    return jm == null ? null : new FuncLit(new Ann(), name, vs, jm, jt, scp, sc, ii);
   }
 
 
@@ -260,9 +258,7 @@ public final class Functions extends TokenSet {
     if(jf != null) return TypedFunc.java(jf);
 
     // add user-defined function that has not been declared yet
-    if(!dyn && FuncType.find(name) == null) {
-      return qc.funcs.getFuncRef(name, args, sc, ii);
-    }
+    if(!dyn && FuncType.find(name) == null) return qc.funcs.getFuncRef(name, args, sc, ii);
 
     // no function found
     return null;

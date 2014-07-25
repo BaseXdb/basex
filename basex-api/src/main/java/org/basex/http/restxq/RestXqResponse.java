@@ -12,7 +12,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 
 /**
  * This class creates a new HTTP response.
@@ -51,13 +50,12 @@ final class RestXqResponse {
    */
   void create() throws Exception {
     // bind variables
-    final StaticFunc uf = function.function;
-    final Expr[] args = new Expr[uf.args.length];
+    final StaticFunc sf = function.function;
+    final Expr[] args = new Expr[sf.args.length];
     function.bind(http, args, error);
 
     // wrap function with a function call
-    final StaticFuncCall sfc = new StaticFuncCall(uf.name, args, uf.sc, uf.info).init(uf);
-    final MainModule mm = new MainModule(sfc, new VarScope(uf.sc), null, uf.sc);
+    final MainModule mm = new MainModule(sf, args);
 
     // assign main module and http context and register process
     query.mainModule(mm);
