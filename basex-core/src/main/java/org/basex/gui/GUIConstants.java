@@ -262,7 +262,7 @@ public final class GUIConstants {
   /** Bold character widths. */
   private static int[] bwidth;
   /** Monospace character widths. */
-  public static int[] mfwidth;
+  private static int[] mfwidth;
 
   // KEYS =====================================================================
 

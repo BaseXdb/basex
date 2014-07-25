@@ -40,7 +40,7 @@ final class TextRenderer extends BaseXBack {
   /** Font height. */
   private int fontHeight;
   /** Character widths. */
-  private int[] charWidths = GUIConstants.mfwidth;
+  private int[] charWidths;
   /** Width of current word. */
   private int wordWidth;
   /** Show invisible characters. */
@@ -96,6 +96,7 @@ final class TextRenderer extends BaseXBack {
     scroll = s;
     edit = editable;
     gui = main;
+    font(GUIConstants.dmfont);
   }
 
   @Override
@@ -118,7 +119,6 @@ final class TextRenderer extends BaseXBack {
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
-
     pars.reset();
     final TextIterator iter = init(g, false);
     int oldL = 0;
@@ -544,7 +544,7 @@ final class TextRenderer extends BaseXBack {
    * @return width
    */
   private int fontWidth(final Graphics g, final int cp) {
-    return cp < ' ' || g == null ?  cp == '\t' ?
+    return cp < ' ' || g == null ? cp == '\t' ?
       charWidths[' '] * indent : 0 : cp < 256 ? charWidths[cp] :
       cp >= 0xD800 && cp <= 0xDC00 ? 0 : g.getFontMetrics().charWidth(cp);
   }
