@@ -182,7 +182,7 @@ public final class CmpV extends Cmp {
 
     Expr e = this;
     if(oneIsEmpty()) {
-      e = optPre(null, qc);
+      e = optPre(qc);
     } else if(allAreValues()) {
       e = preEval(qc);
     } else if(e1.isFunction(Function.COUNT)) {

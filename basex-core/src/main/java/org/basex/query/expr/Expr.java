@@ -11,6 +11,7 @@ import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -150,6 +151,15 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
+   * Returns the data reference bound to this expression. This method is overwritten
+   * by the values {@link DBNode} and {@link DBNodeSeq} and some more expressions.
+   * @return data reference
+   */
+  public Data data() {
+    return null;
+  }
+
+  /**
    * Returns the sequence size or 1.
    * @return result of check
    */
@@ -225,8 +235,8 @@ public abstract class Expr extends ExprInfo {
    * @return {@code true} if the array has changed, {@code false} otherwise
    * @throws QueryException query exception
    */
-  protected static boolean inlineAll(final QueryContext qc, final VarScope scp,
-      final Expr[] arr, final Var var, final Expr ex) throws QueryException {
+  protected static boolean inlineAll(final QueryContext qc, final VarScope scp, final Expr[] arr,
+      final Var var, final Expr ex) throws QueryException {
 
     boolean change = false;
     for(int i = 0; i < arr.length; i++) {

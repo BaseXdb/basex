@@ -2,6 +2,7 @@ package org.basex.query.var;
 
 import static org.basex.query.QueryText.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -58,6 +59,11 @@ public final class VarRef extends ParseExpr {
   @Override
   public Value value(final QueryContext qc) {
     return qc.get(var);
+  }
+
+  @Override
+  public Data data() {
+    return var.data;
   }
 
   @Override

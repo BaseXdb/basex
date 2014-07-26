@@ -60,7 +60,7 @@ public final class List extends Arr {
     }
 
     if(size >= 0) {
-      if(size == 0 && !has(Flag.NDT) && !has(Flag.UPD)) return optPre(null, qc);
+      if(size == 0 && !has(Flag.NDT) && !has(Flag.UPD)) return optPre(qc);
       if(allAreValues() && size <= MAX_MAT_SIZE) {
         Type all = null;
         final Value[] vs = new Value[exprs.length];

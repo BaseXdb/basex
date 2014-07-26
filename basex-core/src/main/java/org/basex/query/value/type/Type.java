@@ -141,7 +141,7 @@ public interface Type {
   }
 
   /**
-   * Casts the specified item to this type.
+   * Casts the specified item to this item type.
    * @param item item to be converted
    * @param qc query context
    * @param sc static context
@@ -153,7 +153,7 @@ public interface Type {
       throws QueryException;
 
   /**
-   * Casts the specified Java value to this type.
+   * Casts the specified Java value to this item type.
    * @param value Java value
    * @param ctx query context
    * @param sc static context
@@ -165,7 +165,7 @@ public interface Type {
       throws QueryException;
 
   /**
-   * Casts the specified string to this type.
+   * Casts the specified string to this item type.
    * @param value string object
    * @param ctx query context
    * @param sc static context
@@ -177,7 +177,7 @@ public interface Type {
       throws QueryException;
 
   /**
-   * Returns the sequence type of items with this type.
+   * Returns a sequence type with this item type.
    * @return sequence type
    */
   SeqType seqType();

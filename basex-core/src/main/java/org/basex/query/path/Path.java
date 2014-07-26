@@ -94,6 +94,165 @@ public abstract class Path extends ParseExpr {
       new CachedPath(info, rt, st) : new MixedPath(info, rt, st);
   }
 
+  @Override
+  public final void checkUp() throws QueryException {
+    checkNoUp(root);
+    final int ss = steps.length;
+    for(int s = 0; s < ss - 1; s++) checkNoUp(steps[s]);
+    steps[ss - 1].checkUp();
+  }
+
+  @Override
+  public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    if(root != null) root = root.compile(qc, scp);
+    // no steps
+    if(steps.length == 0) return root == null ? new Context(info) : root;
+
+    final Value init = qc.value, cv = initial(qc);
+    final boolean doc = cv != null && cv.type == NodeType.DOC;
+    qc.value = cv;
+    try {
+      final int sl = steps.length;
+      for(int s = 0; s < sl; s++) {
+        Expr e = steps[s];
+
+        // axis step: if input is a document, its type is temporarily generalized
+        final boolean as = e instanceof Step;
+        if(as && s == 0 && doc) cv.type = NodeType.NOD;
+
+        e = e.compile(qc, scp);
+        if(e.isEmpty()) return optPre(qc);
+        steps[s] = e;
+
+        // no axis step: invalidate context value
+        if(!as) qc.value = null;
+      }
+    } finally {
+      if(doc) cv.type = NodeType.DOC;
+      qc.value = init;
+    }
+    // optimize path
+    return optimize(qc, scp);
+  }
+
+  @Override
+  public final Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    final Value v = initial(qc);
+    if(v != null && v.isEmpty() || emptyPath(v)) return optPre(qc);
+
+    // merge descendant steps
+    Expr e = mergeSteps(qc);
+    if(e == this && v != null && v.type == NodeType.DOC) {
+      // check index access
+      e = index(qc, v);
+      // rewrite descendant to child steps
+      if(e == this) e = children(qc, v);
+    }
+    // recompile path if it has changed
+    if(e != this) return e.compile(qc, scp);
+
+    // set atomic type for single attribute steps to speed up predicate tests
+    if(root == null && steps.length == 1 && steps[0] instanceof Step) {
+      final Step curr = (Step) steps[0];
+      if(curr.axis == ATTR && curr.test.kind == Kind.URI_NAME) curr.seqType = SeqType.NOD_ZO;
+    }
+
+    // choose best path implementation and set type information
+    final Path path = get(info, root, steps);
+    path.size = path.size(qc);
+    path.seqType = SeqType.get(steps[steps.length - 1].seqType().type, size);
+    return path;
+  }
+
+  @Override
+  public Data data() {
+    if(root != null) {
+      // data reference
+      final Data data = root.data();
+      if(data != null) {
+        final int sl = steps.length;
+        for(int s = 0; s < sl; s++) {
+          if(axisStep(s) == null) return null;
+        }
+        return data;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public final boolean has(final Flag flag) {
+    // first step or root expression will be used as context
+    if(flag == Flag.CTX) return root == null || root.has(flag);
+    for(final Expr s : steps) if(s.has(flag)) return true;
+    return root != null && root.has(flag);
+  }
+
+  /**
+   * Casts the specified step into an axis step, or returns a {@code null} reference.
+   * @param index index
+   * @return step
+   */
+  public final Step axisStep(final int index) {
+    return steps[index] instanceof Step ? (Step) steps[index] : null;
+  }
+
+  /**
+   * Adds a predicate to the last step.
+   * @param qc query context
+   * @param scp variable scope
+   * @param preds predicate to be added
+   * @return resulting path instance
+   * @throws QueryException query exception
+   */
+  public final Expr addPreds(final QueryContext qc, final VarScope scp, final Expr... preds)
+      throws QueryException {
+
+    steps[steps.length - 1] = axisStep(steps.length - 1).addPreds(preds);
+    return get(info, root, steps).optimize(qc, scp);
+  }
+
+  /**
+   * Returns the path nodes that will result from this path.
+   * @param qc query context
+   * @return path nodes, or {@code null} if nodes cannot be evaluated
+   */
+  public final ArrayList<PathNode> pathNodes(final QueryContext qc) {
+    final Value init = initial(qc);
+    final Data data = init != null && init.type == NodeType.DOC ? init.data() : null;
+    if(data == null || !data.meta.uptodate) return null;
+
+    ArrayList<PathNode> nodes = data.paths.root();
+    final int sl = steps.length;
+    for(int s = 0; s < sl; s++) {
+      final Step curr = axisStep(s);
+      if(curr == null) return null;
+      nodes = curr.nodes(nodes, data);
+      if(nodes == null) return null;
+    }
+    return nodes;
+  }
+
+  /**
+   * Guesses if the evaluation of this axis path is cheap. This is used to determine if it
+   * can be inlined into a loop to enable index rewritings.
+   * @return guess
+   */
+  public final boolean cheap() {
+    if(!(root instanceof ANode) || ((Value) root).type != NodeType.DOC) return false;
+    final Axis[] expensive = { Axis.DESC, Axis.DESCORSELF, Axis.PREC, Axis.PRECSIBL,
+        Axis.FOLL, Axis.FOLLSIBL };
+    final int sl = steps.length;
+    for(int i = 0; i < sl; i++) {
+      final Step s = axisStep(i);
+      if(s == null) return false;
+      if(i < 2) for(final Axis a : expensive) if(s.axis == a) return false;
+      final Expr[] ps = s.preds;
+      if(!(ps.length == 0 || ps.length == 1 && ps[0] instanceof Pos)) return false;
+    }
+    return true;
+  }
+
   /**
    * Checks if the path can be rewritten for iterative evaluation.
    * @param root root expression; can be a {@code null} reference
@@ -120,125 +279,25 @@ public abstract class Path extends ParseExpr {
     return true;
   }
 
-  @Override
-  public final void checkUp() throws QueryException {
-    checkNoUp(root);
-    final int ss = steps.length;
-    for(int s = 0; s < ss - 1; s++) checkNoUp(steps[s]);
-    steps[ss - 1].checkUp();
-  }
-
-  @Override
-  public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    if(root != null) root = root.compile(qc, scp);
-
-    final Value init = qc.value, cv = initial(qc);
-    final boolean doc = cv != null && cv.type == NodeType.DOC;
-
-    qc.value = cv;
-    try {
-      for(int s = 0; s < steps.length; s++) {
-        Expr e = steps[s];
-
-        // axis step: if input is a document, its type is temporarily generalized
-        final boolean as = e instanceof Step;
-        if(as && s == 0 && doc) cv.type = NodeType.NOD;
-
-        e = e.compile(qc, scp);
-        if(e.isEmpty()) return optPre(null, qc);
-        steps[s] = e;
-
-        // no axis step: invalidate context value
-        if(!as) qc.value = null;
-      }
-    } finally {
-      if(doc) cv.type = NodeType.DOC;
-      qc.value = init;
-    }
-
-    // no steps left
-    if(steps.length == 0) return root == null ? new Context(info) : root;
-    // optimize path
-    return optimize(qc, scp);
-  }
-
-  @Override
-  public final Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    final Value v = initial(qc);
-    if(emptyPath(v)) return optPre(null, qc);
-
-    // merge descendant steps
-    Expr e = mergeSteps(qc);
-    if(e == this && v != null && v.type == NodeType.DOC) {
-      // check index access
-      e = index(qc, v);
-      // rewrite descendant to child steps
-      if(e == this) e = children(qc, v);
-    }
-    // recompile path if it has changed
-    if(e != this) return e.compile(qc, scp);
-
-    // set atomic type for single attribute steps to speed up predicate tests
-    if(root == null && steps.length == 1 && steps[0] instanceof Step) {
-      final Step curr = (Step) steps[0];
-      if(curr.axis == ATTR && curr.test.kind == Kind.URI_NAME) curr.seqType = SeqType.NOD_ZO;
-    }
-
-    // choose best path implementation and set type information
-    final Path path = get(info, root, steps);
-    path.size = path.size(qc);
-    path.seqType = SeqType.get(steps[steps.length - 1].seqType().type, size);
-    return path;
-  }
-
   /**
    * Returns the initial context value of a path or {@code null}.
    * @param qc query context (may be @code null)
    * @return root
    */
-  protected final Value initial(final QueryContext qc) {
+  private Value initial(final QueryContext qc) {
     // current context value
     final Value value = qc != null ? qc.value : null;
     // no root or context expression: return context
     if(root == null || root instanceof Context) return value;
+    // root reference
+    if(root instanceof Root) return value != null && value.isItem() ? Root.root(value) : value;
     // root is value: return root
     if(root.isValue()) return (Value) root;
-    // root reference:
-    if(root instanceof Root) return value != null && value.size() == 1 ? Root.root(value) : value;
+    // data reference
+    final Data d = root.data();
+    if(d != null) return new DBNode(d, 0, Data.ELEM);
     // otherwise, return null
     return null;
-  }
-
-  @Override
-  public final boolean has(final Flag flag) {
-    // first step or root expression will be used as context
-    if(flag == Flag.CTX) return root == null || root.has(flag);
-    for(final Expr s : steps) if(s.has(flag)) return true;
-    return root != null && root.has(flag);
-  }
-
-  /**
-   * Casts the specified step into an axis step, or returns a {@code null} reference.
-   * @param i index
-   * @return step
-   */
-  public final Step axisStep(final int i) {
-    return steps[i] instanceof Step ? (Step) steps[i] : null;
-  }
-
-  /**
-   * Adds a predicate to the last step.
-   * @param qc query context
-   * @param scp variable scope
-   * @param pred predicate to be added
-   * @return resulting path instance
-   * @throws QueryException query exception
-   */
-  public final Expr addPreds(final QueryContext qc, final VarScope scp, final Expr... pred)
-      throws QueryException {
-
-    steps[steps.length - 1] = axisStep(steps.length - 1).addPreds(pred);
-    return get(info, root, steps).optimize(qc, scp);
   }
 
   /**
@@ -248,7 +307,7 @@ public abstract class Path extends ParseExpr {
    */
   private long size(final QueryContext qc) {
     final Value rt = initial(qc);
-    // skip computation if value contains document nodes
+    // skip computation if value is not a document node
     if(rt == null || rt.type != NodeType.DOC) return -1;
     final Data data = rt.data();
     // skip computation if no database instance is available, is out-of-date or
@@ -257,12 +316,13 @@ public abstract class Path extends ParseExpr {
 
     ArrayList<PathNode> nodes = data.paths.root();
     long m = 1;
-    for(int s = 0; s < steps.length; s++) {
+    final int sl = steps.length;
+    for(int s = 0; s < sl; s++) {
       final Step curr = axisStep(s);
       if(curr != null) {
         nodes = curr.nodes(nodes, data);
         if(nodes == null) return -1;
-      } else if(s + 1 == steps.length) {
+      } else if(s + 1 == sl) {
         m = steps[s].size();
       } else {
         // stop if a non-axis step is not placed last
@@ -317,9 +377,8 @@ public abstract class Path extends ParseExpr {
    * @return {@code true} if steps will never yield results
    */
   private boolean emptyPath(final Value rt) {
-    for(int s = 0; s < steps.length; s++) {
-      if(emptyPath(rt, s)) return true;
-    }
+    final int sl = steps.length;
+    for(int s = 0; s < sl; s++) if(emptyPath(rt, s)) return true;
     return false;
   }
 
@@ -438,24 +497,11 @@ public abstract class Path extends ParseExpr {
       break;
     }
 
-    // check if all child steps yield results; if not, return empty sequence
-    if(data.nspaces.size() == 0) {
-      LOOP:
-      for(int s = 0; s < path.steps.length; s++) {
-        // only accept child steps; ignore namespaces
-        final Step st = path.axisStep(s);
-        if(st == null || st.axis != CHILD) break;
-        if(st.test.kind == Kind.WILDCARD || st.test.kind == null) continue;
-        if(st.test.kind != Kind.NAME) break;
-
-        // check if one of the addressed nodes is on the correct level
-        final int name = data.elmindex.id(st.test.name.local());
-        for(final PathNode pn : data.paths.desc(name, Data.ELEM)) {
-          if(pn.level() == s + 1) continue LOOP;
-        }
-        qc.compInfo(OPTPATH, path);
-        return Empty.SEQ;
-      }
+    // check if all steps yield results; if not, return empty sequence
+    final ArrayList<PathNode> nodes = pathNodes(qc);
+    if(nodes != null && nodes.isEmpty()) {
+      qc.compInfo(OPTPATH, path);
+      return Empty.SEQ;
     }
 
     return path;
@@ -605,8 +651,7 @@ public abstract class Path extends ParseExpr {
           s != iStep && step.preds.length > 0) return true;
 
       // support only unique paths with nodes on the correct level
-      final int name = data.elmindex.id(step.test.name.local());
-      final ArrayList<PathNode> pn = data.paths.desc(name, Data.ELEM);
+      final ArrayList<PathNode> pn = data.paths.desc(step.test.name.local());
       if(pn.size() != 1 || pn.get(0).level() != s + 1) return true;
     }
     return false;

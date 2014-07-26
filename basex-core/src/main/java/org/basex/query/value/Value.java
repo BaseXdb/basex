@@ -14,8 +14,6 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -73,22 +71,10 @@ public abstract class Value extends Expr implements Iterable<Item> {
     return this;
   }
 
-  /**
-   * Returns the data reference (if) attached to this value. This method is overwritten
-   * by {@link DBNode} and {@link DBNodeSeq}.
-   * @return data reference
-   */
-  public Data data() {
-    return null;
-  }
-
   @Override
   public final boolean isValue() {
     return true;
   }
-
-  @Override
-  public abstract long size();
 
   /**
    * Returns a Java representation of the value.

@@ -149,11 +149,10 @@ public final class PathNode {
    * Recursively adds the node and its descendants to the specified list with the specified name.
    * @param nodes node list
    * @param nm name id
-   * @param knd node kind
    */
-  void addDesc(final ArrayList<PathNode> nodes, final int nm, final int knd) {
-    if(nm == name && knd == kind) nodes.add(this);
-    for(final PathNode child : children) child.addDesc(nodes, nm, knd);
+  public void addDesc(final ArrayList<PathNode> nodes, final int nm) {
+    if(kind == Data.ELEM && nm == name) nodes.add(this);
+    for(final PathNode child : children) child.addDesc(nodes, nm);
   }
 
   /**

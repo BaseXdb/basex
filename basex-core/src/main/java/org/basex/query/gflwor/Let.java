@@ -107,6 +107,7 @@ public final class Let extends ForLet {
     }
     size = score ? 1 : expr.size();
     var.size = size;
+    var.data = expr.data();
     return this;
   }
 

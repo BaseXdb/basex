@@ -159,13 +159,13 @@ public abstract class Step extends Preds {
        axis != Axis.DESCORSELF && axis != Axis.SELF) return null;
 
     final ArrayList<PathNode> tmp = new ArrayList<>();
-    for(final PathNode n : nodes) {
+    for(final PathNode pn : nodes) {
       if(axis == Axis.SELF || axis == Axis.DESCORSELF) {
-        if(kind == -1 || kind == n.kind && (name == 0 || name == n.name)) {
-          if(!tmp.contains(n)) tmp.add(n);
+        if(kind == -1 || kind == pn.kind && (name == 0 || name == pn.name)) {
+          if(!tmp.contains(pn)) tmp.add(pn);
         }
       }
-      if(axis != Axis.SELF) add(n, tmp, name, kind);
+      if(axis != Axis.SELF) add(pn, tmp, name, kind);
     }
     return tmp;
   }

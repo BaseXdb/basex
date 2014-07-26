@@ -130,6 +130,15 @@ public abstract class ParseExpr extends Expr {
 
   /**
    * Adds an optimization info for pre-evaluating the specified expression.
+   * @param qc query context
+   * @return optimized expression
+   */
+  protected final Expr optPre(final QueryContext qc) {
+    return optPre(null, qc);
+  }
+
+  /**
+   * Adds an optimization info for pre-evaluating the specified expression.
    * @param ex optimized expression
    * @param qc query context
    * @return optimized expression

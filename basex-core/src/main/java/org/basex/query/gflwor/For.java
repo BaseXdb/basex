@@ -101,6 +101,7 @@ public final class For extends ForLet {
     if(score != null) score.refineType(SeqType.DBL, qc, info);
     size = emp ? -1 : 1;
     var.size = size;
+    var.data = expr.data();
     return this;
   }
 

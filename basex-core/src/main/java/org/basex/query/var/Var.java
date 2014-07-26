@@ -33,6 +33,8 @@ public final class Var extends ExprInfo {
   int slot = -1;
   /** Expected result size. */
   public long size = -1;
+  /** Data reference. */
+  public Data data;
 
   /** Flag for function parameters. */
   private final boolean param;

@@ -76,8 +76,9 @@ public final class Quantifier extends Single {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = expr.iter(qc);
-    for(Item it; (it = iter.next()) != null;)
+    for(Item it; (it = iter.next()) != null;) {
       if(every ^ it.ebv(qc, ii).bool(ii)) return Bln.get(!every);
+    }
     return Bln.get(every);
   }
 

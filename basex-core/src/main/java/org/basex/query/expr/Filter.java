@@ -55,8 +55,8 @@ public abstract class Filter extends Preds {
     final Value cv = qc.value;
     try {
       root = root.compile(qc, scp);
-      // return empty root
-      if(root.isEmpty()) return optPre(null, qc);
+      // root is empty
+      if(root.isEmpty()) return optPre(qc);
       // convert filters without numeric predicates to axis paths
       if(root instanceof AxisPath && !super.has(Flag.FCS))
         return ((Path) root.copy(qc, scp)).addPreds(qc, scp, preds).compile(qc, scp);
@@ -93,7 +93,7 @@ public abstract class Filter extends Preds {
         size = s > 0 ? 1 : 0;
       }
       // no results will remain: return empty sequence
-      if(size == 0) return optPre(null, qc);
+      if(size == 0) return optPre(qc);
       seqType = SeqType.get(st.type, size);
     }
 
@@ -140,7 +140,7 @@ public abstract class Filter extends Preds {
     final Value cv = qc.value;
     try {
       // return empty root
-      if(root.isEmpty()) return optPre(null, qc);
+      if(root.isEmpty()) return optPre(qc);
       // convert filters without numeric predicates to axis paths
       if(root instanceof AxisPath && !super.has(Flag.FCS))
         return ((Path) root.copy(qc, scp)).addPreds(qc, scp, preds);

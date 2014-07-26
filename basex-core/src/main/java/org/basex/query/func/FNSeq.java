@@ -178,7 +178,7 @@ public final class FNSeq extends StandardFunc {
     // can only be performed on axis paths
     if(!(exprs[0] instanceof AxisPath)) return this;
     // try to get statistics for resulting nodes
-    final ArrayList<PathNode> nodes = ((AxisPath) exprs[0]).nodes(qc);
+    final ArrayList<PathNode> nodes = ((AxisPath) exprs[0]).pathNodes(qc);
     if(nodes == null) return this;
     // loop through all nodes
     final HashItemSet is = new HashItemSet();

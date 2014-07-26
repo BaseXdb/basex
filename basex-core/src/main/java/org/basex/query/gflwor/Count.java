@@ -64,12 +64,12 @@ public final class Count extends Clause {
 
   @Override
   public Count compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    var.refineType(SeqType.ITR, qc, info);
-    return this;
+    return optimize(qc, scp);
   }
 
   @Override
-  public Count optimize(final QueryContext qc, final VarScope scp) {
+  public Count optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    var.refineType(SeqType.ITR, qc, info);
     return this;
   }
 
