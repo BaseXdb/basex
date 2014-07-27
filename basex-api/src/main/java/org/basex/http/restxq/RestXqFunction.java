@@ -127,13 +127,11 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
           // annotation "path"
           if(path != null) throw error(info, ANN_TWICE, "%", name.string());
           try {
-            path = new RestXqPath(toString(value, name));
+            path = new RestXqPath(toString(value, name), info);
           } catch(final IllegalArgumentException ex) {
             throw error(info, ex.getMessage());
           }
-          for(int s = 0; s < path.size; s++) {
-            if(path.isTemplate(s)) checkVariable(path.segment[s], AtomType.AAT, declared);
-          }
+          for(QNm v : path.getVariableNames()) checkVariable(v, AtomType.AAT, declared);
         } else if(eq(ERROR, local)) {
           // annotation "error"
           error(value, name);
@@ -241,13 +239,11 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
     // bind variables from segments
     if(path != null) {
-      for(int s = 0; s < path.size; s++) {
-        final Matcher m = TEMPLATE.matcher(path.segment[s]);
-        if(m.find()) {
-          final QNm qnm = new QNm(token(m.group(1)), function.sc);
-          if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
-          bind(qnm, arg, new Atm(http.segment(s)));
-        }
+      Map<QNm, String> variableValues = path.getVariableValues(http);
+      for (QNm v : path.getVariableNames()) {
+        final QNm qnm = new QNm(v.string(), function.sc);
+        if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
+        bind(qnm, arg, new Atm(variableValues.get(v)));
       }
     }
 
@@ -326,7 +322,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   // PRIVATE METHODS ====================================================================
 
   /**
-   * Checks the specified template and adds a variable.
+   * Checks the specified template variable.
    * @param tmp template string
    * @param declared variable declaration flags
    * @return resulting variable
@@ -337,7 +333,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   }
 
   /**
-   * Checks the specified template and adds a variable.
+   * Checks the specified template variable.
    * @param tmp template string
    * @param type allowed type
    * @param declared variable declaration flags
@@ -346,20 +342,32 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    */
   private QNm checkVariable(final String tmp, final Type type, final boolean... declared)
       throws QueryException {
-
-    final Var[] args = function.args;
     final Matcher m = TEMPLATE.matcher(tmp);
     if(!m.find()) throw error(INV_TEMPLATE, tmp);
     final byte[] vn = token(m.group(1));
     if(!XMLToken.isQName(vn)) throw error(INV_VARNAME, vn);
     final QNm name = new QNm(vn);
+    return checkVariable(name, type, declared);
+  }
+
+  /**
+   * Checks if the specified variable exists in the current function.
+   * @param name variable
+   * @param type allowed type
+   * @param declared variable declaration flags
+   * @return resulting variable
+   * @throws QueryException query exception
+   */
+  private QNm checkVariable(QNm name, Type type, boolean[] declared) throws QueryException
+  {
     if(name.hasPrefix()) name.uri(function.sc.ns.uri(name.prefix()));
     int r = -1;
+    final Var[] args = function.args;
     while(++r < args.length && !args[r].name.eq(name));
-    if(r == args.length) throw error(UNKNOWN_VAR, vn);
-    if(declared[r]) throw error(VAR_ASSIGNED, vn);
+    if(r == args.length) throw error(UNKNOWN_VAR, name.string());
+    if(declared[r]) throw error(VAR_ASSIGNED, name.string());
     final SeqType st = args[r].declaredType();
-    if(args[r].checksType() && !st.type.instanceOf(type)) throw error(INV_VARTYPE, vn, type);
+    if(args[r].checksType() && !st.type.instanceOf(type)) throw error(INV_VARTYPE, name.string(), type);
     declared[r] = true;
     return name;
   }
