@@ -278,9 +278,8 @@ public final class PlotView extends View {
     g.setFont(font);
     g.setColor(Color.black);
     final Data data = gui.context.data();
-    final boolean nd = data == null;
-    if(nd || plotWidth - sz < 0 || plotHeight - sz < 0) {
-      BaseXLayout.drawCenter(g, nd ? NO_DATA : NO_PIXELS, w, h / 2 - MARGIN[0]);
+    if(data == null || plotWidth - sz < 0 || plotHeight - sz < 0) {
+      BaseXLayout.drawCenter(g, data == null ? NO_DATA : NO_PIXELS, w, h / 2 - MARGIN[0]);
       return;
     }
 
@@ -302,7 +301,7 @@ public final class PlotView extends View {
      */
     int focused = gui.context.focused;
     if(focused != -1) {
-      final int itmID = data.elmindex.id(plotData.item);
+      final int itmID = data.elemNames.id(plotData.item);
       int k = data.kind(focused);
       int name = data.name(focused);
       while(focused > 0 && itmID != name) {

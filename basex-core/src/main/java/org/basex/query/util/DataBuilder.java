@@ -42,7 +42,7 @@ public final class DataBuilder {
    */
   public DataBuilder ftpos(final byte[] name, final FTPosData pos, final int len) {
     ftbuilder = new DataFTBuilder(pos, len);
-    marker = data.elmindex.index(name, null, false);
+    marker = data.elemNames.index(name, null, false);
     return this;
   }
 
@@ -119,7 +119,7 @@ public final class DataBuilder {
       if(par == -1) data.nspaces.add(ds, pre + 1, q.prefix(), uri, data);
       u = data.nspaces.uri(uri);
     }
-    final int n = data.atnindex.index(q.string(), null, false);
+    final int n = data.attrNames.index(q.string(), null, false);
     // usually, attributes don't have a namespace flag.
     // this is different here, because a stand-alone attribute has no parent element.
     data.attr(ds, pre - par, n, node.string(), u, par == -1 && u != 0);
@@ -226,7 +226,7 @@ public final class DataBuilder {
 
     // analyze node name
     final QNm name = node.qname();
-    final int tn = data.elmindex.index(name.string(), null, false);
+    final int tn = data.elemNames.index(name.string(), null, false);
     final int s = size(node, false);
     final int u = data.nspaces.uri(name.uri());
 

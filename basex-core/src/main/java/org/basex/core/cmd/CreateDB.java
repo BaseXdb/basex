@@ -11,8 +11,6 @@ import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdCreate;
 import org.basex.data.*;
 import org.basex.index.*;
-import org.basex.index.ft.*;
-import org.basex.index.value.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -164,22 +162,14 @@ public final class CreateDB extends ACreate {
     // database is currently locked by another process
     if(ctx.pinned(name)) throw new BaseXException(DB_PINNED_X, name);
 
-    // create disk builder, set database path
-    try(final DiskBuilder builder = new DiskBuilder(name, parser, ctx)) {
-      // build database and index structures
-      final Data data = builder.build();
-      try {
-        if(data.meta.createtext) data.setIndex(IndexType.TEXT,
-          new ValueIndexBuilder(data, true).build());
-        if(data.meta.createattr) data.setIndex(IndexType.ATTRIBUTE,
-          new ValueIndexBuilder(data, false).build());
-        if(data.meta.createftxt) data.setIndex(IndexType.FULLTEXT,
-          new FTBuilder(data).build());
-      } finally {
-        data.close();
-      }
-    }
-    return Open.open(name, ctx);
+    // create disk-based instance
+    new DiskBuilder(name, parser, ctx).build().close();
+
+    final Data data = Open.open(name, ctx);
+    if(data.meta.createtext) create(IndexType.TEXT,      data, null);
+    if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, null);
+    if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, null);
+    return data;
   }
 
   @Override

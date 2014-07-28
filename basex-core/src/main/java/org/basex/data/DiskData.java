@@ -44,9 +44,9 @@ public final class DiskData extends Data {
   /** Values access file. */
   private DataAccess values;
   /** Texts buffered for subsequent index updates. */
-  private TokenObjMap<IntList> txts;
+  private TokenObjMap<IntList> txtBuffer;
   /** Attribute values buffered for subsequent index updates. */
-  private TokenObjMap<IntList> atvs;
+  private TokenObjMap<IntList> atvBuffer;
   /** Closed flag. */
   private boolean closed;
 
@@ -68,8 +68,8 @@ public final class DiskData extends Data {
       while(true) {
         final String k = string(in.readToken());
         if(k.isEmpty()) break;
-        if(k.equals(DBTAGS))      elmindex = new Names(in, meta);
-        else if(k.equals(DBATTS)) atnindex = new Names(in, meta);
+        if(k.equals(DBTAGS))      elemNames = new Names(in, meta);
+        else if(k.equals(DBATTS)) attrNames = new Names(in, meta);
         else if(k.equals(DBPATH)) paths = new PathSummary(this, in);
         else if(k.equals(DBNS))   nspaces = new Namespaces(in);
         else if(k.equals(DBDOCS)) resources.read(in);
@@ -79,13 +79,13 @@ public final class DiskData extends Data {
     // open data and indexes
     if(meta.updindex) {
       idmap = new IdPreMap(meta.dbfile(DATAIDP));
-      if(meta.textindex) txtindex = new UpdatableDiskValues(this, true);
-      if(meta.attrindex) atvindex = new UpdatableDiskValues(this, false);
+      if(meta.textindex) textIndex = new UpdatableDiskValues(this, true);
+      if(meta.attrindex) attrIndex = new UpdatableDiskValues(this, false);
     } else {
-      if(meta.textindex) txtindex = new DiskValues(this, true);
-      if(meta.attrindex) atvindex = new DiskValues(this, false);
+      if(meta.textindex) textIndex = new DiskValues(this, true);
+      if(meta.attrindex) attrIndex = new DiskValues(this, false);
     }
-    if(meta.ftxtindex) ftxindex = new FTIndex(this);
+    if(meta.ftxtindex) ftxtIndex = new FTIndex(this);
     init();
   }
 
@@ -102,8 +102,8 @@ public final class DiskData extends Data {
       final Namespaces n) throws IOException {
 
     meta = md;
-    elmindex = el;
-    atnindex = at;
+    elemNames = el;
+    attrNames = at;
     paths = ps;
     paths.data(this);
     nspaces = n;
@@ -130,9 +130,9 @@ public final class DiskData extends Data {
       try(final DataOutput out = new DataOutput(meta.dbfile(DATAINF))) {
         meta.write(out);
         out.writeToken(token(DBTAGS));
-        elmindex.write(out);
+        elemNames.write(out);
         out.writeToken(token(DBATTS));
-        atnindex.write(out);
+        attrNames.write(out);
         out.writeToken(token(DBPATH));
         paths.write(out);
         out.writeToken(token(DBNS));
@@ -155,38 +155,61 @@ public final class DiskData extends Data {
       table.close();
       texts.close();
       values.close();
-      closeIndex(IndexType.TEXT);
-      closeIndex(IndexType.ATTRIBUTE);
-      closeIndex(IndexType.FULLTEXT);
+      close(IndexType.TEXT);
+      close(IndexType.ATTRIBUTE);
+      close(IndexType.FULLTEXT);
     } catch(final IOException ex) {
       Util.stack(ex);
     }
   }
 
-  @Override
-  public synchronized void closeIndex(final IndexType type) {
-    // close existing index
+  /**
+   * Closes the specified index.
+   * @param type index to be closed
+   */
+  private synchronized void close(final IndexType type) {
+    // close index and invalidate reference
     final Index index = index(type);
-    if(index == null) return;
-    index.close();
-
-    // invalidate index reference
-    meta.dirty = true;
-    switch(type) {
-      case TEXT:      txtindex = null; break;
-      case ATTRIBUTE: atvindex = null; break;
-      case FULLTEXT:  ftxindex = null; break;
-      default:        break;
+    if(index != null) {
+      index.close();
+      set(type, null);
     }
   }
 
   @Override
-  public void setIndex(final IndexType type, final Index index) {
+  public void createIndex(final IndexType type, final Command cmd) throws IOException {
+    // close existing index
+    close(type);
+    final IndexBuilder ib;
+    switch(type) {
+      case TEXT:      ib = new DiskValuesBuilder(this, true); break;
+      case ATTRIBUTE: ib = new DiskValuesBuilder(this, false); break;
+      case FULLTEXT:  ib = new FTBuilder(this); break;
+      default:        throw Util.notExpected();
+    }
+    if(cmd != null) cmd.proc(ib);
+    set(type, ib.build());
+  }
+
+  @Override
+  public boolean dropIndex(final IndexType type) {
+    // close and drop index (return true if no index exists)
+    final Index index = index(type);
+    close(type);
+    return index == null || index.drop();
+  }
+
+  /**
+   * Assigns the specified index.
+   * @param type index to be opened
+   * @param index index instance
+   */
+  private void set(final IndexType type, final Index index) {
     meta.dirty = true;
     switch(type) {
-      case TEXT:      txtindex = index; break;
-      case ATTRIBUTE: atvindex = index; break;
-      case FULLTEXT:  ftxindex = index; break;
+      case TEXT:      textIndex = index; break;
+      case ATTRIBUTE: attrIndex = index; break;
+      case FULLTEXT:  ftxtIndex = index; break;
       default:        break;
     }
   }
@@ -221,8 +244,8 @@ public final class DiskData extends Data {
         write();
         texts.flush();
         values.flush();
-        if(txtindex != null) ((DiskValues) txtindex).flush();
-        if(atvindex != null) ((DiskValues) atvindex).flush();
+        if(textIndex != null) ((DiskValues) textIndex).flush();
+        if(attrIndex != null) ((DiskValues) attrIndex).flush();
       }
     } catch(final IOException ex) {
       Util.stack(ex);
@@ -312,7 +335,7 @@ public final class DiskData extends Data {
       // update indexes
       final int id = id(pre);
       final byte[] oldval = text(pre, text);
-      final DiskValues index = (DiskValues) (text ? txtindex : atvindex);
+      final DiskValues index = (DiskValues) (text ? textIndex : attrIndex);
       // don't index document names
       if(index != null && kind != DOC) index.replace(oldval, value, id);
     }
@@ -324,44 +347,41 @@ public final class DiskData extends Data {
 
     // new entry (offset or value)
     final long v = toSimpleInt(value);
-    // flag for inlining numeric value
-    final boolean vn = v != Integer.MIN_VALUE;
-    // text to be stored (null if value will be inlined)
-    final byte[] vl = vn ? null : COMP.get().pack(value);
-
-    // old entry (offset or value)
-    final long old = textOff(pre);
-    // find text store offset
-    final long off;
-    if(num(old)) {
-      // numeric entry: append new entry at the end
-      off = len;
-    } else {
-      // text size (0 if value will be inlined)
-      final int l = vn ? 0 : vl.length + Num.length(vl.length);
-      off = store.free(old & IO.OFFCOMP - 1, l);
-    }
-
-    // store new entry
-    if(vn) {
+    if(v != Integer.MIN_VALUE) {
       // inline integer value
       textOff(pre, v | IO.OFFNUM);
     } else {
-      store.writeToken(off, vl);
-      textOff(pre, vl == value ? off : off | IO.OFFCOMP);
+      // text to be stored (possibly packed)
+      final byte[] val = COMP.get().pack(value);
+      // old entry (offset or value)
+      final long old = textOff(pre);
+
+      // find text store offset
+      final long off;
+      if(num(old)) {
+        // numeric entry: append new entry at the end
+        off = len;
+      } else {
+        // text size (0 if value will be inlined)
+        final int vl = val.length;
+        off = store.free(old & IO.OFFCOMP - 1, vl + Num.length(vl));
+      }
+
+      store.writeToken(off, val);
+      textOff(pre, val == value ? off : off | IO.OFFCOMP);
     }
   }
 
   @Override
   protected void indexBegin() {
-    txts = new TokenObjMap<>();
-    atvs = new TokenObjMap<>();
+    txtBuffer = new TokenObjMap<>();
+    atvBuffer = new TokenObjMap<>();
   }
 
   @Override
   protected void indexEnd() {
-    if(!txts.isEmpty()) ((DiskValues) txtindex).index(txts);
-    if(!atvs.isEmpty()) ((DiskValues) atvindex).index(atvs);
+    if(!txtBuffer.isEmpty()) ((DiskValues) textIndex).index(txtBuffer);
+    if(!atvBuffer.isEmpty()) ((DiskValues) attrIndex).index(atvBuffer);
   }
 
   @Override
@@ -371,11 +391,11 @@ public final class DiskData extends Data {
 
     if(kind == ATTR) {
       store = values;
-      m = meta.attrindex ? atvs : null;
+      m = meta.attrindex ? atvBuffer : null;
     } else {
       store = texts;
       // don't index document names
-      m = meta.textindex && kind != DOC ? txts : null;
+      m = meta.textindex && kind != DOC ? txtBuffer : null;
     }
 
     // add text to map to index later
@@ -402,32 +422,32 @@ public final class DiskData extends Data {
 
   @Override
   protected void indexDelete(final int pre, final int size) {
-    if(!(meta.textindex || meta.attrindex)) return;
-
-    // collect all keys and ids
-    txts = new TokenObjMap<>();
-    atvs = new TokenObjMap<>();
-    final int l = pre + size;
-    for(int p = pre; p < l; ++p) {
-      final int k = kind(p);
-      final boolean isAttr = k == ATTR;
-      // consider nodes which are attribute, text, comment, or proc. instruction
-      if(meta.attrindex && isAttr ||
-         meta.textindex && (k == TEXT || k == COMM || k == PI)) {
-        final byte[] key = text(p, !isAttr);
-        if(key.length <= meta.maxlen) {
-          final TokenObjMap<IntList> m = isAttr ? atvs : txts;
-          IntList ids = m.get(key);
-          if(ids == null) {
-            ids = new IntList(1);
-            m.put(key, ids);
+    final boolean textI = meta.textindex, attrI = meta.attrindex;
+    if(textI || attrI) {
+      // collect all keys and ids
+      txtBuffer = new TokenObjMap<>();
+      atvBuffer = new TokenObjMap<>();
+      final int l = pre + size;
+      for(int p = pre; p < l; ++p) {
+        final int k = kind(p);
+        // consider nodes which are attribute, text, comment, or proc. instruction
+        final boolean text = k == TEXT || k == COMM || k == PI;
+        if(textI && text || attrI && k == ATTR) {
+          final byte[] key = text(p, text);
+          if(key.length <= meta.maxlen) {
+            final TokenObjMap<IntList> m = text ? txtBuffer : atvBuffer;
+            IntList ids = m.get(key);
+            if(ids == null) {
+              ids = new IntList(1);
+              m.put(key, ids);
+            }
+            ids.add(id(p));
           }
-          ids.add(id(p));
         }
       }
+      if(!txtBuffer.isEmpty()) ((DiskValues) textIndex).delete(txtBuffer);
+      if(!atvBuffer.isEmpty()) ((DiskValues) attrIndex).delete(atvBuffer);
     }
-    if(!txts.isEmpty()) ((DiskValues) txtindex).delete(txts);
-    if(!atvs.isEmpty()) ((DiskValues) atvindex).delete(atvs);
   }
 
   @Override

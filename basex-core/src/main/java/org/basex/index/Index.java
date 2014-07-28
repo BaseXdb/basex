@@ -47,4 +47,10 @@ public interface Index {
    * Closes the index.
    */
   void close();
+
+  /**
+   * Drops the index.
+   * @return success flag
+   */
+  boolean drop();
 }

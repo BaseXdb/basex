@@ -68,17 +68,15 @@ public final class DBNodes implements Result {
     return pres.length;
   }
 
-  /**
-   * Compares results for equality.
-   * @param result result to be compared
-   * @return true if results are equal
-   */
-  public boolean equals(final DBNodes result) {
-    final int[] ps = pres, ps2 = result.pres;
+  @Override
+  public boolean equals(final Object obj) {
+    if(!(obj instanceof DBNodes)) return false;
+    final DBNodes n = (DBNodes) obj;
+    final int[] ps = pres, ps2 = n.pres;
     final int pl = ps.length;
-    if(pl != ps2.length || data != result.data) return false;
+    if(pl != ps2.length || data != n.data) return false;
     for(int c = 0; c < pl; ++c) if(ps2[c] != ps[c]) return false;
-    return ftpos == null ? result.ftpos == null : ftpos.equals(result.ftpos);
+    return ftpos == null ? n.ftpos == null : ftpos.equals(n.ftpos);
   }
 
   /**

@@ -165,7 +165,7 @@ public final class PathSummary implements Index {
    * @return descendant nodes
    */
   public ArrayList<PathNode> desc(final byte[] name) {
-    final int id = data.elmindex.id(name);
+    final int id = data.elemNames.id(name);
     final ArrayList<PathNode> nodes = new ArrayList<>();
     for(final PathNode child : root.children) child.addDesc(nodes, id);
     return nodes;
@@ -200,7 +200,7 @@ public final class PathSummary implements Index {
     for(final byte[] name : names) {
       final boolean attr = startsWith(name, '@');
       final byte kind = attr ? Data.ATTR : Data.ELEM;
-      final int id = attr ? data.atnindex.id(substring(name, 1)) : data.elmindex.id(name);
+      final int id = attr ? data.attrNames.id(substring(name, 1)) : data.elemNames.id(name);
 
       final ArrayList<PathNode> tmp = new ArrayList<>();
       for(final PathNode node : nodes) {
@@ -240,6 +240,11 @@ public final class PathSummary implements Index {
   }
 
   // Unsupported methods ======================================================
+
+  @Override
+  public boolean drop() {
+    throw Util.notExpected();
+  }
 
   @Override
   public IndexIterator iter(final IndexToken token) {

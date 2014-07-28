@@ -99,31 +99,31 @@ public final class MetaData {
 
   /**
    * Constructor, specifying the database options.
-   * @param opts database options
+   * @param options database options
    */
-  public MetaData(final MainOptions opts) {
-    this("", opts, null);
+  public MetaData(final MainOptions options) {
+    this("", options, null);
   }
 
   /**
    * Constructor, specifying the database name and context.
-   * @param db name of the database
+   * @param name name of the database
    * @param ctx database context
    */
-  public MetaData(final String db, final Context ctx) {
-    this(db, ctx.options, ctx.globalopts);
+  public MetaData(final String name, final Context ctx) {
+    this(name, ctx.options, ctx.globalopts);
   }
 
   /**
    * Constructor, specifying the database name.
-   * @param db name of the database
-   * @param opts database options
-   * @param gopts global options
+   * @param name name of the database
+   * @param options database options
+   * @param global global options
    */
-  private MetaData(final String db, final MainOptions opts, final GlobalOptions gopts) {
-    path = gopts != null ? gopts.dbpath(db) : null;
-    options = opts;
-    name = db;
+  private MetaData(final String name, final MainOptions options, final GlobalOptions global) {
+    this.options = options;
+    this.name = name;
+    path = global != null ? global.dbpath(name) : null;
     chop = options.get(MainOptions.CHOP);
     createtext = options.get(MainOptions.TEXTINDEX);
     createattr = options.get(MainOptions.ATTRINDEX);
@@ -167,15 +167,15 @@ public final class MetaData {
 
   /**
    * Calculates the database size.
-   * @param io current file
+   * @param file current file
    * @return file length
    */
-  private static long dbsize(final IOFile io) {
+  private static long dbsize(final IOFile file) {
     long s = 0;
-    if(io.isDir()) {
-      for(final IOFile f : io.children()) s += dbsize(f);
+    if(file.isDir()) {
+      for(final IOFile f : file.children()) s += dbsize(f);
     } else {
-      s += io.length();
+      s += file.length();
     }
     return s;
   }
@@ -183,11 +183,11 @@ public final class MetaData {
   /**
    * Creates a database file.
    * @param path database path
-   * @param fn filename
+   * @param name filename
    * @return database filename
    */
-  public static IOFile file(final IOFile path, final String fn) {
-    return new IOFile(path, fn + IO.BASEXSUFFIX);
+  public static IOFile file(final IOFile path, final String name) {
+    return new IOFile(path, name + IO.BASEXSUFFIX);
   }
 
   // PUBLIC METHODS ===========================================================
@@ -219,11 +219,11 @@ public final class MetaData {
   /**
    * Returns a file instance for the specified database file.
    * Should only be called if database is disk-based.
-   * @param fn filename
+   * @param filename filename
    * @return database filename
    */
-  public IOFile dbfile(final String fn) {
-    return file(path, fn);
+  public IOFile dbfile(final String filename) {
+    return file(path, filename);
   }
 
   /**
@@ -250,11 +250,11 @@ public final class MetaData {
   /**
    * Drops the specified database files.
    * Should only be called if database is disk-based.
-   * @param pat file pattern, or {@code null} if all files are to be deleted
+   * @param pattern file pattern, or {@code null} if all files are to be deleted
    * @return result of check
    */
-  public synchronized boolean drop(final String pat) {
-    return path != null && DropDB.drop(path, pat + IO.BASEXSUFFIX);
+  public synchronized boolean drop(final String pattern) {
+    return path != null && DropDB.drop(path, pattern + IO.BASEXSUFFIX);
   }
 
   /**

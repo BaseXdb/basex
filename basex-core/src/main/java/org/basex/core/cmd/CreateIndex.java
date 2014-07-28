@@ -30,37 +30,33 @@ public final class CreateIndex extends ACreate {
   @Override
   protected boolean run() {
     final Data data = context.data();
-    if(data.inMemory()) return error(NO_MAINMEM);
 
     final CmdIndex ci = getOption(CmdIndex.class);
     if(ci == null) return error(UNKNOWN_CMD_X, this);
-    final IndexType index;
-    switch(ci) {
-      case TEXT:
-        data.meta.createtext = true;
-        index = IndexType.TEXT;
-        break;
-      case ATTRIBUTE:
-        data.meta.createattr = true;
-        index = IndexType.ATTRIBUTE;
-        break;
-      case FULLTEXT:
-        data.meta.createftxt = true;
-        data.meta.stemming = options.get(MainOptions.STEMMING);
-        data.meta.casesens = options.get(MainOptions.CASESENS);
-        data.meta.diacritics = options.get(MainOptions.DIACRITICS);
-        data.meta.language = Language.get(options);
-        data.meta.stopwords = options.get(MainOptions.STOPWORDS);
-        index = IndexType.FULLTEXT;
-        break;
-      default:
-        return error(UNKNOWN_CMD_X, this);
+    final IndexType type;
+    if(ci == CmdIndex.TEXT) {
+      data.meta.createtext = true;
+      type = IndexType.TEXT;
+    } else if(ci == CmdIndex.ATTRIBUTE) {
+      data.meta.createattr = true;
+      type = IndexType.ATTRIBUTE;
+    } else if(ci == CmdIndex.FULLTEXT) {
+      if(data.inMemory()) return error(NO_MAINMEM);
+      data.meta.createftxt = true;
+      data.meta.stemming = options.get(MainOptions.STEMMING);
+      data.meta.casesens = options.get(MainOptions.CASESENS);
+      data.meta.diacritics = options.get(MainOptions.DIACRITICS);
+      data.meta.language = Language.get(options);
+      data.meta.stopwords = options.get(MainOptions.STOPWORDS);
+      type = IndexType.FULLTEXT;
+    } else {
+      return error(UNKNOWN_CMD_X, this);
     }
 
     if(!startUpdate()) return false;
     try {
-      create(index, data, this);
-      return info(INDEX_CREATED_X_X, index, perf);
+      create(type, data, this);
+      return info(INDEX_CREATED_X_X, type, perf);
     } catch(final IOException ex) {
       return error(Util.message(ex));
     } finally {

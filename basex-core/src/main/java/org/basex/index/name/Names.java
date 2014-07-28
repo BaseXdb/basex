@@ -149,6 +149,11 @@ public final class Names extends TokenSet implements Index {
   // Unsupported methods ======================================================
 
   @Override
+  public boolean drop() {
+    throw Util.notExpected();
+  }
+
+  @Override
   public IndexIterator iter(final IndexToken token) {
     throw Util.notExpected();
   }

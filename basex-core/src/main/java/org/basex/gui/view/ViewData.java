@@ -120,7 +120,7 @@ public final class ViewData {
    * @return name id
    */
   public static int nameID(final Data data) {
-    return data.atnindex.id(T_NAME);
+    return data.attrNames.id(T_NAME);
   }
 
   /**
@@ -129,7 +129,7 @@ public final class ViewData {
    * @return name id
    */
   public static int sizeID(final Data data) {
-    return data.atnindex.id(T_SIZE);
+    return data.attrNames.id(T_SIZE);
   }
 
   /**

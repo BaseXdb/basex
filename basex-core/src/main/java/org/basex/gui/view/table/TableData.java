@@ -91,7 +91,7 @@ final class TableData {
     for(final byte[] k : data.paths.desc(EMPTY, true, true)) {
       int c = 0;
       for(final byte[] kk : data.paths.desc(k, true, false)) {
-        final Names nm = startsWith(kk, '@') ? data.atnindex : data.elmindex;
+        final Names nm = startsWith(kk, '@') ? data.attrNames : data.elemNames;
         if(nm.stat(nm.id(delete(kk, '@'))).isLeaf()) ++c;
       }
       // add keys with a minimum of three columns
@@ -113,11 +113,11 @@ final class TableData {
     rowH = 1;
 
     if(rt == -1 && roots.isEmpty()) return;
-    if(root == -1) root = dt.elmindex.id(roots.get(0));
-    for(final byte[] k : dt.paths.desc(dt.elmindex.key(root), true, true)) {
+    if(root == -1) root = dt.elemNames.id(roots.get(0));
+    for(final byte[] k : dt.paths.desc(dt.elemNames.key(root), true, true)) {
       final boolean elem = !startsWith(k, '@');
       final byte[] key = delete(k, '@');
-      final Names index = elem ? dt.elmindex : dt.atnindex;
+      final Names index = elem ? dt.elemNames : dt.attrNames;
       if(index.stat(index.id(key)).isLeaf()) addCol(key, elem);
     }
 
@@ -149,7 +149,7 @@ final class TableData {
    */
   private void addCol(final byte[] name, final boolean elem) {
     final Data data = context.data();
-    final int id = (elem ? data.elmindex : data.atnindex).id(name);
+    final int id = (elem ? data.elemNames : data.attrNames).id(name);
     if(id == 0) return;
     final TableCol col = new TableCol();
     col.id = id;
@@ -242,7 +242,7 @@ final class TableData {
     final boolean e = cols[sortCol].elem;
 
     final Data data = context.data();
-    final Names index = e ? data.elmindex : data.atnindex;
+    final Names index = e ? data.elemNames : data.attrNames;
     final StatsType type = index.stat(c).type;
     final boolean num = type == StatsType.INTEGER || type == StatsType.DOUBLE;
 
@@ -322,7 +322,7 @@ final class TableData {
       names.add(col.name);
       elems.add(col.elem);
     }
-    final String query = Find.findTable(filters, names, elems, data.elmindex.key(root),
+    final String query = Find.findTable(filters, names, elems, data.elemNames.key(root),
         gopts.get(GUIOptions.FILTERRT) || r);
     if(query.equals(last)) return null;
     last = query;

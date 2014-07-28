@@ -7,7 +7,6 @@ import org.basex.index.path.*;
 import org.basex.index.value.*;
 import org.basex.io.random.*;
 import org.basex.util.*;
-import org.basex.util.hash.TokenSet;
 
 /**
  * This class stores and organizes the database table and the index structures
@@ -20,41 +19,38 @@ import org.basex.util.hash.TokenSet;
 public final class MemData extends Data {
   /**
    * Constructor.
-   * @param ps path summary
-   * @param ns namespaces
+   * @param paths path summary
+   * @param nspaces namespaces
    * @param opts database options
    */
-  public MemData(final PathSummary ps, final Namespaces ns, final MainOptions opts) {
-    this(null, null, ps, ns, opts, null, null);
+  public MemData(final PathSummary paths, final Namespaces nspaces, final MainOptions opts) {
+    this(null, null, paths, nspaces, opts, null, null);
   }
 
   /**
    * Constructor.
-   * @param elm element name index
-   * @param att attribute name index
-   * @param ps path summary
-   * @param ns namespaces
-   * @param opts database options
-   * @param txt text index
-   * @param atv attribute value index
+   * @param elmindex element name index
+   * @param atnindex attribute name index
+   * @param paths path summary
+   * @param nspaces namespaces
+   * @param options database options
+   * @param txtindex text index
+   * @param atvindex attribute value index
    */
-  private MemData(final Names elm, final Names att, final PathSummary ps, final Namespaces ns,
-      final MainOptions opts, final Index txt, final Index atv) {
+  private MemData(final Names elmindex, final Names atnindex, final PathSummary paths,
+      final Namespaces nspaces, final MainOptions options, final Index txtindex,
+      final Index atvindex) {
 
-    meta = new MetaData(opts);
+    meta = new MetaData(options);
     table = new TableMemAccess(meta);
-    if(meta.updindex) {
-      idmap = new IdPreMap(meta.lastid);
-      txtindex = txt == null ? new UpdatableMemValues(this) : txt;
-      atvindex = atv == null ? new UpdatableMemValues(this) : atv;
-    } else {
-      txtindex = txt == null ? new MemValues(this) : txt;
-      atvindex = atv == null ? new MemValues(this) : atv;
-    }
-    elmindex = elm == null ? new Names(meta) : elm;
-    atnindex = att == null ? new Names(meta) : att;
-    paths = ps == null ? new PathSummary(this) : ps;
-    nspaces = ns == null ? new Namespaces() : ns;
+    final boolean up = meta.updindex;
+    if(up) idmap = new IdPreMap(meta.lastid);
+    this.textIndex = txtindex == null ? new MemValues(this, up) : txtindex;
+    this.attrIndex = atvindex == null ? new MemValues(this, up) : atvindex;
+    this.elemNames = elmindex == null ? new Names(meta) : elmindex;
+    this.attrNames = atnindex == null ? new Names(meta) : atnindex;
+    this.paths = paths == null ? new PathSummary(this) : paths;
+    this.nspaces = nspaces == null ? new Namespaces() : nspaces;
   }
 
   /**
@@ -62,8 +58,8 @@ public final class MemData extends Data {
    * @param data data reference
    */
   public MemData(final Data data) {
-    this(data.elmindex, data.atnindex, data.paths, null, data.meta.options, data.txtindex,
-        data.atvindex);
+    this(data.elemNames, data.attrNames, data.paths, null, data.meta.options, data.textIndex,
+        data.attrIndex);
   }
 
   /**
@@ -74,14 +70,26 @@ public final class MemData extends Data {
     this(null, null, opts);
   }
 
+  /**
+   * Finishes build process.
+   */
+  public void finish() {
+    values(true).finish();
+    values(false).finish();
+  }
+
   @Override
   public void close() { }
 
   @Override
-  public void closeIndex(final IndexType type) { }
+  public void createIndex(final IndexType type, final Command cmd) {
+    values(type == IndexType.TEXT).create(type);
+  }
 
   @Override
-  public void setIndex(final IndexType type, final Index index) { }
+  public boolean dropIndex(final IndexType type) {
+    return values(type == IndexType.TEXT).drop();
+  }
 
   @Override
   public void startUpdate() { }
@@ -94,7 +102,7 @@ public final class MemData extends Data {
 
   @Override
   public byte[] text(final int pre, final boolean text) {
-    return ((TokenSet) (text ? txtindex : atvindex)).key((int) textOff(pre));
+    return values(text).key((int) textOff(pre));
   }
 
   @Override
@@ -121,28 +129,27 @@ public final class MemData extends Data {
   public void updateText(final int pre, final byte[] value, final int kind) {
     final int id = id(pre);
     if(meta.updindex) {
-      final boolean txt = kind != ATTR;
-      ((MemValues) (txt ? txtindex : atvindex)).delete(text(pre, txt), id);
+      final boolean text = kind != ATTR;
+      values(text).delete(text(pre, text), id);
     }
     textOff(pre, index(pre, id, value, kind));
   }
 
   @Override
   protected long index(final int pre, final int id, final byte[] txt, final int kind) {
-    return ((MemValues) (kind == ATTR ? atvindex : txtindex)).
-        put(txt, meta.updindex ? id : pre);
+    return values(kind != ATTR).put(txt, meta.updindex ? id : pre);
   }
 
   @Override
   protected void indexDelete(final int pre, final int size) {
-    final int l = pre + size;
-    for(int p = pre; p < l; ++p) {
-      final int k = kind(p);
-      final boolean isAttr = k == ATTR;
-      // skip nodes which are not attribute, text, comment, or proc. instruction
-      if(isAttr || k == TEXT || k == COMM || k == PI) {
-        final byte[] key = text(p, !isAttr);
-        ((MemValues) (isAttr ? atvindex : txtindex)).delete(key, id(p));
+    final boolean textI = meta.textindex, attrI = meta.attrindex;
+    if(textI || attrI) {
+      final int l = pre + size;
+      for(int p = pre; p < l; ++p) {
+        final int k = kind(p);
+        // consider nodes which are attribute, text, comment, or proc. instruction
+        final boolean text = k == TEXT || k == COMM || k == PI;
+        if(text || k == ATTR) values(text).delete(text(p, text), id(p));
       }
     }
   }
@@ -150,5 +157,14 @@ public final class MemData extends Data {
   @Override
   public boolean inMemory() {
     return true;
+  }
+
+  /**
+   * Returns the specified value index.
+   * @param text text index
+   * @return index
+   */
+  private MemValues values(final boolean text) {
+    return (MemValues) (text ? textIndex : attrIndex);
   }
 }

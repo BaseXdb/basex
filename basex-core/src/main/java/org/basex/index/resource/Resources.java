@@ -164,6 +164,11 @@ public final class Resources implements Index {
   // Inherited methods ========================================================
 
   @Override
+  public boolean drop() {
+    throw Util.notExpected();
+  }
+
+  @Override
   public void close() { }
 
   @Override

@@ -78,12 +78,10 @@ public final class FTPosData {
     return c;
   }
 
-  /**
-   * Compares full-text data for equality.
-   * @param ft reference to compare to
-   * @return boolean same()
-   */
-  boolean equals(final FTPosData ft) {
+  @Override
+  public boolean equals(final Object obj) {
+    if(!(obj instanceof FTPosData)) return false;
+    final FTPosData ft = (FTPosData) obj;
     if(size != ft.size) return false;
     for(int i = 0; i < size; ++i) {
       if(pos[i].pre != ft.pos[i].pre || !Arrays.equals(

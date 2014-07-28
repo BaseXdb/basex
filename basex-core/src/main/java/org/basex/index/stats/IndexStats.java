@@ -78,7 +78,7 @@ public final class IndexStats {
    * @param tb token builder reference
    */
   public void print(final TokenBuilder tb) {
-    tb.add(LI_ENTRIES + size + NL);
+    tb.add(LI_ENTRIES).addInt(size).add(NL);
     int m = 0;
     int c = 0;
     for(int o = 0; o < max; ++o) {
@@ -91,7 +91,7 @@ public final class IndexStats {
     }
 
     print(tb, txtMax, occMax, m + 2);
-    if(c == 0) tb.add("  " + DOTS + NL);
+    if(c == 0) tb.add("  ").add(DOTS).add(NL);
     print(tb, txtMin, occMin, m + 2);
   }
 

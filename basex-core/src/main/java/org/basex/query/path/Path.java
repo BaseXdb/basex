@@ -355,7 +355,7 @@ public abstract class Path extends ParseExpr {
       final boolean desc = curr.axis == DESC;
       if(!desc && curr.axis != CHILD || curr.test.kind != Kind.NAME) return null;
 
-      final int name = data.elmindex.id(curr.test.name.local());
+      final int name = data.elemNames.id(curr.test.name.local());
 
       final ArrayList<PathNode> tmp = new ArrayList<>();
       for(final PathNode node : PathSummary.desc(nodes, desc)) {
@@ -471,7 +471,7 @@ public abstract class Path extends ParseExpr {
       // cache child steps
       final ArrayList<QNm> qnm = new ArrayList<>();
       while(nodes.get(0).parent != null) {
-        QNm nm = new QNm(data.elmindex.key(nodes.get(0).name));
+        QNm nm = new QNm(data.elemNames.key(nodes.get(0).name));
         // skip children with prefixes
         if(nm.hasPrefix()) return this;
         for(final PathNode p : nodes) {

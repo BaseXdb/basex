@@ -67,6 +67,7 @@ public final class MemBuilder extends Builder {
       throw ex;
     }
     close();
+    data.finish();
     return data;
   }
 
@@ -88,8 +89,8 @@ public final class MemBuilder extends Builder {
     md.filesize = file != null ? file.length() : 0;
     md.time = file != null ? file.timeStamp() : System.currentTimeMillis();
     meta = data.meta;
-    elms = data.elmindex;
-    atts = data.atnindex;
+    elemNames = data.elemNames;
+    attrNames = data.attrNames;
     path.data(data);
   }
 

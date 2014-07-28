@@ -404,13 +404,13 @@ public final class ClientListener extends Thread {
       events = true;
     }
     final String name = in.readString();
-    final Sessions s = context.events.get(name);
-    final boolean ok = s != null && !s.contains(this);
+    final Sessions session = context.events.get(name);
+    final boolean ok = session != null && !session.contains(this);
     final String message;
     if(ok) {
-      s.add(this);
+      session.add(this);
       message = WATCHING_EVENT_X;
-    } else if(s == null) {
+    } else if(session == null) {
       message = EVENT_UNKNOWN_X;
     } else {
       message = EVENT_WATCHED_X;
@@ -425,13 +425,13 @@ public final class ClientListener extends Thread {
   private void unwatch() throws IOException {
     final String name = in.readString();
 
-    final Sessions s = context.events.get(name);
-    final boolean ok = s != null && s.contains(this);
+    final Sessions session = context.events.get(name);
+    final boolean ok = session != null && session.contains(this);
     final String message;
     if(ok) {
-      s.remove(this);
+      session.remove(this);
       message = UNWATCHING_EVENT_X;
-    } else if(s == null) {
+    } else if(session == null) {
       message = EVENT_UNKNOWN_X;
     } else {
       message = EVENT_NOT_WATCHED_X;

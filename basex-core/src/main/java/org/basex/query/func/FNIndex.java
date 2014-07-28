@@ -121,13 +121,13 @@ public final class FNIndex extends StandardFunc {
     final boolean avl;
     final IndexType it = entries.type();
     if(it == IndexType.TEXT) {
-      index = data.txtindex;
+      index = data.textIndex;
       avl = data.meta.textindex;
     } else if(it == IndexType.ATTRIBUTE) {
-      index = data.atvindex;
+      index = data.attrIndex;
       avl = data.meta.attrindex;
     } else {
-      index = data.ftxindex;
+      index = data.ftxtIndex;
       avl = data.meta.ftxtindex;
     }
     if(!avl) throw BXDB_INDEX.get(call.info, data.meta.name,
@@ -144,7 +144,7 @@ public final class FNIndex extends StandardFunc {
    */
   private Iter names(final QueryContext qc, final IndexType it) throws QueryException {
     final Data data = checkData(qc);
-    return entries(it == IndexType.TAG ? data.elmindex : data.atnindex,
+    return entries(it == IndexType.TAG ? data.elemNames : data.attrNames,
       new IndexEntries(EMPTY, it));
   }
 
@@ -173,8 +173,8 @@ public final class FNIndex extends StandardFunc {
    */
   private static FElem flat(final Data data) {
     final FElem elem = new FElem(new QNm(NodeType.DOC.string()));
-    index(data.elmindex, ELM, elem);
-    index(data.atnindex, ATT, elem);
+    index(data.elemNames, ELM, elem);
+    index(data.attrNames, ATT, elem);
     return elem;
   }
 
@@ -202,7 +202,7 @@ public final class FNIndex extends StandardFunc {
   private static FElem tree(final Data data, final PathNode root) {
     final FElem elem = new FElem(new QNm(ANode.type(root.kind).string()));
     final boolean elm = root.kind == Data.ELEM;
-    final Names names = elm ? data.elmindex : data.atnindex;
+    final Names names = elm ? data.elemNames : data.attrNames;
     if(root.kind == Data.ATTR || elm) elem.add(NAME, names.key(root.name));
     stats(root.stats, elem);
     for(final PathNode p : root.children) elem.add(tree(data, p));

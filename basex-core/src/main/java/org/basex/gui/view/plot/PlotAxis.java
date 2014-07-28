@@ -91,7 +91,7 @@ final class PlotAxis {
     elem = !contains(b, '@');
     b = delete(b, '@');
     final Data data = plotData.context.data();
-    attrID = (elem ? data.elmindex : data.atnindex).id(b);
+    attrID = (elem ? data.elemNames : data.attrNames).id(b);
     refreshAxis();
     return true;
   }
@@ -103,8 +103,8 @@ final class PlotAxis {
    */
   void refreshAxis() {
     final Data data = plotData.context.data();
-    final Stats key = elem ? data.elmindex.stat(attrID) :
-      data.atnindex.stat(attrID);
+    final Stats key = elem ? data.elemNames.stat(attrID) :
+      data.attrNames.stat(attrID);
     if(key == null) return;
     type = key.type;
     if(type == null) return;

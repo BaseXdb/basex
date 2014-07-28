@@ -78,8 +78,8 @@ public final class DiskBuilder extends Builder implements AutoCloseable {
     context.globalopts.dbpath(dbname).md();
 
     meta = md;
-    elms = new Names(md);
-    atts = new Names(md);
+    elemNames = new Names(md);
+    attrNames = new Names(md);
     try {
       tout = new DataOutput(new TableOutput(md, DATATBL));
       xout = new DataOutput(md.dbfile(DATATXT), bs);
@@ -106,7 +106,7 @@ public final class DiskBuilder extends Builder implements AutoCloseable {
     md.dbfile(DATATMP).delete();
 
     // return database instance
-    return new DiskData(md, elms, atts, path, ns);
+    return new DiskData(md, elemNames, attrNames, path, ns);
   }
 
   @Override

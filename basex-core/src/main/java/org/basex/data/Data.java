@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.atomic.*;
 import org.basex.index.*;
@@ -86,19 +87,19 @@ public abstract class Data {
   /** Meta data. */
   public MetaData meta;
   /** Element names. */
-  public Names elmindex;
+  public Names elemNames;
   /** Attribute names. */
-  public Names atnindex;
+  public Names attrNames;
   /** Namespace index. */
   public Namespaces nspaces;
   /** Path summary index. */
   public PathSummary paths;
   /** Text index. */
-  public Index txtindex;
+  public Index textIndex;
   /** Attribute value index. */
-  public Index atvindex;
+  public Index attrIndex;
   /** Full-text index instance. */
-  public Index ftxindex;
+  public Index ftxtIndex;
   /** Number of current database users. */
   public int pins = 1;
 
@@ -115,17 +116,19 @@ public abstract class Data {
   public abstract void close();
 
   /**
-   * Closes the specified index.
-   * @param type index to be closed
+   * Drops the specified index.
+   * @param type index to be dropped
+   * @param cmd calling command
+   * @throws IOException I/O exception
    */
-  public abstract void closeIndex(IndexType type);
+  public abstract void createIndex(IndexType type, Command cmd) throws IOException;
 
   /**
-   * Assigns the specified index.
-   * @param type index to be opened
-   * @param index index instance
+   * Drops the specified index.
+   * @param type index to be dropped
+   * @return success flag
    */
-  public abstract void setIndex(IndexType type, Index index);
+  public abstract boolean dropIndex(IndexType type);
 
   /**
    * Starts an update operation: writes a file to disk to indicate that an update is
@@ -180,13 +183,13 @@ public abstract class Data {
    */
   final Index index(final IndexType type) {
     switch(type) {
-      case TAG:   return elmindex;
-      case ATTNAME:   return atnindex;
-      case TEXT:      return txtindex;
-      case ATTRIBUTE: return atvindex;
-      case FULLTEXT:  return ftxindex;
+      case TAG:       return elemNames;
+      case ATTNAME:   return attrNames;
+      case TEXT:      return textIndex;
+      case ATTRIBUTE: return attrIndex;
+      case FULLTEXT:  return ftxtIndex;
       case PATH:      return paths;
-      default:         throw Util.notExpected();
+      default:        throw Util.notExpected();
     }
   }
 
@@ -232,30 +235,16 @@ public abstract class Data {
   // RETRIEVING VALUES ========================================================
 
   /**
-   * Returns a pre value.
-   * @param id unique node id
-   * @return pre value or -1 if id was not found
-   */
-  private int preold(final int id) {
-    // find pre value in table
-    for(int p = Math.max(0, id); p < meta.size; ++p) if(id == id(p)) return p;
-    final int ps = Math.min(meta.size, id);
-    for(int p = 0; p < ps; ++p) if(id == id(p)) return p;
-    // id not found
-    return -1;
-  }
-
-  /**
-   * Returns a pre value.
+   * Returns a pre value for the specified id.
    * @param id unique node id
    * @return pre value or {@code -1} if id was not found
    */
   public final int pre(final int id) {
-    return meta.updindex ? idmap.pre(id) : preold(id);
+    return meta.updindex ? idmap.pre(id) : findPre(id);
   }
 
   /**
-   * Returns pre values.
+   * Returns a pre value for the specified id.
    * @param ids unique node ids
    * @param off start offset
    * @param len number of ids
@@ -264,8 +253,22 @@ public abstract class Data {
   public final int[] pre(final int[] ids, final int off, final int len) {
     if(meta.updindex) return idmap.pre(ids, off, len);
     final IntList il = new IntList(len - off);
-    for(int i = off; i < len; ++i) il.add(preold(ids[i]));
+    for(int i = off; i < len; ++i) il.add(findPre(ids[i]));
     return il.sort().finish();
+  }
+
+  /**
+   * Returns a pre value for the specified id by scanning the table.
+   * @param id unique node id
+   * @return pre value or -1 if id was not found
+   */
+  private int findPre(final int id) {
+    // find pre value in table; start with specified id
+    for(int p = Math.max(0, id); p < meta.size; ++p) if(id == id(p)) return p;
+    final int ps = Math.min(meta.size, id);
+    for(int p = 0; p < ps; ++p) if(id == id(p)) return p;
+    // id not found
+    return -1;
   }
 
   /**
@@ -378,7 +381,7 @@ public abstract class Data {
       final int i = indexOf(name, ' ');
       return i == -1 ? name : substring(name, 0, i);
     }
-    return (kind == ELEM ? elmindex : atnindex).key(name(pre));
+    return (kind == ELEM ? elemNames : attrNames).key(name(pre));
   }
 
   /**
@@ -422,7 +425,7 @@ public abstract class Data {
    * @param pre pre value
    * @return disk offset
    */
-  final long textOff(final int pre) {
+  public final long textOff(final int pre) {
     return table.read5(pre, 3);
   }
 
@@ -484,7 +487,7 @@ public abstract class Data {
       table.write1(pre, kind == ELEM ? 3 : 11, nuri);
       // write name reference
       table.write2(pre, 1, (nsFlag(pre) ? 1 << 15 : 0) |
-        (kind == ELEM ? elmindex : atnindex).index(name, null, false));
+        (kind == ELEM ? elemNames : attrNames).index(name, null, false));
       // write namespace flag
       table.write2(npre, 1, (ne || nsFlag(npre) ? 1 << 15 : 0) | name(npre));
     }
@@ -559,7 +562,7 @@ public abstract class Data {
         case ELEM:
           // add element
           byte[] nm = data.name(spre, kind);
-          elem(dist, elmindex.index(nm, null, false), data.attSize(spre, kind), ssize,
+          elem(dist, elemNames.index(nm, null, false), data.attSize(spre, kind), ssize,
               nspaces.uri(nm, true), false);
           break;
         case TEXT:
@@ -571,7 +574,7 @@ public abstract class Data {
         case ATTR:
           // add attribute
           nm = data.name(spre, kind);
-          attr(pre, dist, atnindex.index(nm, null, false), data.text(spre, false),
+          attr(pre, dist, attrNames.index(nm, null, false), data.text(spre, false),
               nspaces.uri(nm, false), false);
           break;
       }
@@ -624,10 +627,8 @@ public abstract class Data {
     final int s = size(pre, k);
     resources.delete(pre, s);
 
-    if(meta.updindex) {
-      // delete child records from indexes
-      indexDelete(pre, s);
-    }
+    // delete child records from indexes
+    if(meta.updindex) indexDelete(pre, s);
 
     /// explicitly delete text or attribute value
     if(k != DOC && k != ELEM) delete(pre, k != ATTR);
@@ -759,7 +760,7 @@ public abstract class Data {
             }
           }
           byte[] nm = data.name(spre, kind);
-          elem(dist, elmindex.index(nm, null, false), data.attSize(spre, kind), ssize,
+          elem(dist, elemNames.index(nm, null, false), data.attSize(spre, kind), ssize,
               nspaces.uri(nm, true), ne);
           preStack.push(pre);
           break;
@@ -782,7 +783,7 @@ public abstract class Data {
             // here as direct table access would interfere with the buffer
             flagPres.add(nsPre);
           }
-          attr(pre, dist, atnindex.index(nm, null, false), data.text(spre, false),
+          attr(pre, dist, attrNames.index(nm, null, false), data.text(spre, false),
               nspaces.uri(nm, false), false);
           break;
       }

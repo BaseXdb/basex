@@ -178,7 +178,7 @@ public final class CmpR extends Single {
       name = ((NameTest) step.test).local;
     }
 
-    final Names names = text ? data.elmindex : data.atnindex;
+    final Names names = text ? data.elemNames : data.attrNames;
     final Stats key = names.stat(names.id(name));
     return key == null || key.type == StatsType.INTEGER ||
         key.type == StatsType.DOUBLE ? key : null;

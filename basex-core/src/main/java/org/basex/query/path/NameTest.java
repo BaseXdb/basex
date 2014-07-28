@@ -68,7 +68,7 @@ public final class NameTest extends Test {
 
     // check existence of element/attribute names
     if(results) results = kind != Kind.NAME ||
-        (type == NodeType.ELM ? data.elmindex : data.atnindex).contains(local);
+        (type == NodeType.ELM ? data.elemNames : data.attrNames).contains(local);
 
     if(!results) qc.compInfo(OPTNAME, name);
     return results;

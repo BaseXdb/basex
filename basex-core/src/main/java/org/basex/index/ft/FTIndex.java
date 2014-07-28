@@ -232,6 +232,11 @@ public final class FTIndex implements Index {
   }
 
   @Override
+  public boolean drop() {
+    return data.meta.drop(DATAFTX + '.');
+  }
+
+  @Override
   public synchronized void close() {
     inX.close();
     inY.close();

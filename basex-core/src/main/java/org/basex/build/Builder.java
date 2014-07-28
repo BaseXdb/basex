@@ -41,9 +41,9 @@ public abstract class Builder extends Proc {
   /** Meta data on built database. */
   MetaData meta;
   /** Element name index. */
-  Names elms;
+  Names elemNames;
   /** Attribute name index. */
-  Names atts;
+  Names attrNames;
 
   /** Parent stack. */
   private final IntList pstack = new IntList();
@@ -262,7 +262,7 @@ public abstract class Builder extends Proc {
    */
   private void addElem(final byte[] name, final Atts att, final Atts nsp) throws IOException {
     // get reference of element name
-    int n = elms.index(name, null, true);
+    int n = elemNames.index(name, null, true);
     path.put(n, Data.ELEM, level);
 
     // cache pre value
@@ -288,7 +288,7 @@ public abstract class Builder extends Proc {
     for(int a = 0; a < as; ++a) {
       final byte[] av = att.value(a);
       final byte[] an = att.name(a);
-      n = atts.index(an, av, true);
+      n = attrNames.index(an, av, true);
       u = ns.uri(an, false);
       if(u == 0 && indexOf(an, ':') != -1 && !eq(prefix(an), XML))
         throw new BuildException(WHICHNS, parser.detail(), an);
@@ -298,12 +298,12 @@ public abstract class Builder extends Proc {
     }
 
     // set leaf node information in index
-    if(level > 1) elms.stat(tstack.get(level - 1)).setLeaf(false);
+    if(level > 1) elemNames.stat(tstack.get(level - 1)).setLeaf(false);
 
     // check if data ranges exceed database limits,
     // based on the storage details in {@link Data}
-    limit(elms.size(), 0x8000, LIMITELEMS);
-    limit(atts.size(), 0x8000, LIMITATTS);
+    limit(elemNames.size(), 0x8000, LIMITELEMS);
+    limit(attrNames.size(), 0x8000, LIMITATTS);
     limit(ns.size(), 0x100, LIMITNS);
     if(meta.size < 0) limit(0, 0, LIMITRANGE);
   }
@@ -330,9 +330,9 @@ public abstract class Builder extends Proc {
     if(l > 1) {
       final int i = tstack.get(l - 1);
       // text node processing for statistics
-      if(kind == Data.TEXT) elms.index(i, value);
+      if(kind == Data.TEXT) elemNames.index(i, value);
       // set leaf node information in index
-      else elms.stat(i).setLeaf(false);
+      else elemNames.stat(i).setLeaf(false);
     }
 
     path.put(0, kind, l, value, meta);

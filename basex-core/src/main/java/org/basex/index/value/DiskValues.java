@@ -18,8 +18,8 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This class provides access to attribute values and text contents stored on
- * disk. The data structure is described in the {@link ValueIndexBuilder} class.
+ * This class provides access to attribute values and text contents stored on disk.
+ * The data structure is described in the {@link DiskValuesBuilder} class.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
@@ -74,12 +74,12 @@ public class DiskValues implements Index {
   @Override
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(LI_STRUCTURE + SORTED_LIST + NL);
+    tb.add(LI_STRUCTURE).add(SORTED_LIST).add(NL);
     final IndexStats stats = new IndexStats(data.meta.options.get(MainOptions.MAXSTAT));
 
     synchronized(monitor) {
       final long l = idxl.length() + idxr.length();
-      tb.add(LI_SIZE + Performance.format(l, true) + NL);
+      tb.add(LI_SIZE).add(Performance.format(l, true)).add(NL);
       final int s = size.get();
       for(int m = 0; m < s; ++m) {
         final long pos = idxr.read5(m * 5L);
@@ -450,6 +450,11 @@ public class DiskValues implements Index {
   public void flush() {
     idxl.flush();
     idxr.flush();
+  }
+
+  @Override
+  public final boolean drop() {
+    return data.meta.drop((text ? DATATXT : DATAATV) + '.');
   }
 
   @Override

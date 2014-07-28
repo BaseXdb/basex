@@ -216,7 +216,7 @@ public final class UpdateTestTags extends UpdateTest {
       }
     }
     final MemData md = new MemData(data);
-    md.elem(1, data.elmindex.index(name, null, false), 1, 1, 0, false);
+    md.elem(1, data.elemNames.index(name, null, false), 1, 1, 0, false);
     md.insert(0);
     data.startUpdate();
     data.insert(root, par, new DataClip(md));

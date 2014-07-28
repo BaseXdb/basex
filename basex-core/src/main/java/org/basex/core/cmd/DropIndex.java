@@ -29,32 +29,26 @@ public final class DropIndex extends ACreate {
   @Override
   protected boolean run() {
     final Data data = context.data();
-    if(data.inMemory()) return error(NO_MAINMEM);
-
     final CmdIndex ci = getOption(CmdIndex.class);
-    if(ci == null) return error(UNKNOWN_CMD_X, this);
-    final IndexType it;
-    switch(ci) {
-      case TEXT:
-        data.meta.createtext = false;
-        it = IndexType.TEXT;
-        break;
-      case ATTRIBUTE:
-        data.meta.createattr = false;
-        it = IndexType.ATTRIBUTE;
-        break;
-      case FULLTEXT:
-        data.meta.createftxt = false;
-        it = IndexType.FULLTEXT;
-        break;
-      default:
-        return error(UNKNOWN_CMD_X, this);
+    final IndexType type;
+    if(ci == CmdIndex.TEXT) {
+      data.meta.createtext = false;
+      type = IndexType.TEXT;
+    } else if(ci == CmdIndex.ATTRIBUTE) {
+      data.meta.createattr = false;
+      type = IndexType.ATTRIBUTE;
+    } else if(ci == CmdIndex.FULLTEXT) {
+      if(data.inMemory()) return error(NO_MAINMEM);
+      data.meta.createftxt = false;
+      type = IndexType.FULLTEXT;
+    } else {
+      return error(UNKNOWN_CMD_X, this);
     }
 
     if(!startUpdate()) return false;
     try {
-      return drop(it, context.data()) ? info(INDEX_DROPPED_X_X, it, perf) :
-        error(INDEX_NOT_DROPPED_X, it);
+      return drop(type, data) ? info(INDEX_DROPPED_X_X, type, perf) :
+        error(INDEX_NOT_DROPPED_X, type);
     } finally {
       finishUpdate();
     }

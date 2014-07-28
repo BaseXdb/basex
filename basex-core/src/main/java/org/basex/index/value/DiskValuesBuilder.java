@@ -34,7 +34,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class ValueIndexBuilder extends IndexBuilder {
+public final class DiskValuesBuilder extends IndexBuilder {
   /** Temporary value tree. */
   private IndexTree index = new IndexTree();
   /** Index type (attributes/texts). */
@@ -45,7 +45,7 @@ public final class ValueIndexBuilder extends IndexBuilder {
    * @param data data reference
    * @param text value type (text/attribute)
    */
-  public ValueIndexBuilder(final Data data, final boolean text) {
+  public DiskValuesBuilder(final Data data, final boolean text) {
     super(data, data.meta.options.get(MainOptions.INDEXSPLITSIZE));
     this.text = text;
   }
@@ -89,8 +89,7 @@ public final class ValueIndexBuilder extends IndexBuilder {
     else data.meta.attrindex = true;
 
     finishIndex(perf);
-    return data.meta.updindex ?
-        new UpdatableDiskValues(data, text) : new DiskValues(data, text);
+    return data.meta.updindex ? new UpdatableDiskValues(data, text) : new DiskValues(data, text);
   }
 
   /**
@@ -107,8 +106,8 @@ public final class ValueIndexBuilder extends IndexBuilder {
       // initialize cached index iterators
       final IntList ml = new IntList();
       final IntList il = new IntList();
-      final ValueIndexMerger[] vm = new ValueIndexMerger[splits];
-      for(int i = 0; i < splits; ++i) vm[i] = new ValueIndexMerger(data, text, i);
+      final DiskValuesMerger[] vm = new DiskValuesMerger[splits];
+      for(int i = 0; i < splits; ++i) vm[i] = new DiskValuesMerger(data, text, i);
 
       // parse through all values
       while(true) {
@@ -135,7 +134,7 @@ public final class ValueIndexBuilder extends IndexBuilder {
         // parse through all values, cache and sort id values
         final int ms = ml.size();
         for(int m = 0; m < ms; ++m) {
-          final ValueIndexMerger t = vm[ml.get(m)];
+          final DiskValuesMerger t = vm[ml.get(m)];
           final int vl = t.values.length;
           for(int l = 4, v; l < vl; l += Num.length(v)) {
             v = Num.get(t.values, l);

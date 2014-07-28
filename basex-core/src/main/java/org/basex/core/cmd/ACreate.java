@@ -1,15 +1,12 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import static org.basex.data.DataText.*;
 
 import java.io.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
-import org.basex.index.ft.*;
-import org.basex.index.value.*;
 import org.basex.io.*;
 import org.basex.util.*;
 
@@ -91,51 +88,49 @@ public abstract class ACreate extends Command {
 
   /**
    * Builds the specified index.
-   * @param index index to be built
+   * @param type index to be built
    * @param data data reference
    * @param cmd calling command
    * @throws IOException I/O exception
    */
-  static void create(final IndexType index, final Data data, final ACreate cmd) throws IOException {
-    if(data.inMemory()) return;
-
-    final IndexBuilder ib;
-    switch(index) {
-      case TEXT:      ib = new ValueIndexBuilder(data, true); break;
-      case ATTRIBUTE: ib = new ValueIndexBuilder(data, false); break;
-      case FULLTEXT:  ib = new FTBuilder(data); break;
-      default:        throw Util.notExpected();
+  static void create(final IndexType type, final Data data, final ACreate cmd) throws IOException {
+    data.meta.dirty = true;
+    final boolean ok = data.dropIndex(type);
+    if(ok) {
+      if(type == IndexType.TEXT) {
+        data.meta.textindex = true;
+      } else if(type == IndexType.ATTRIBUTE) {
+        data.meta.attrindex = true;
+      } else if(type == IndexType.FULLTEXT) {
+        data.meta.ftxtindex = true;
+      } else {
+        throw Util.notExpected();
+      }
     }
-    data.closeIndex(index);
-    data.setIndex(index, (cmd == null ? ib : cmd.proc(ib)).build());
+    data.createIndex(type, cmd);
   }
 
   /**
    * Drops the specified index.
-   * @param index index type
+   * @param type index type
    * @param data data reference
-   * @return success of operation
+   * @return success flag
    */
-  static boolean drop(final IndexType index, final Data data) {
-    String pat = null;
-    switch(index) {
-      case TEXT:
-        data.meta.textindex = false;
-        pat = DATATXT;
-        break;
-      case ATTRIBUTE:
-        data.meta.attrindex = false;
-        pat = DATAATV;
-        break;
-      case FULLTEXT:
-        data.meta.ftxtindex = false;
-        pat = DATAFTX;
-        break;
-      default:
-    }
-    data.closeIndex(index);
+  protected static boolean drop(final IndexType type, final Data data) {
     data.meta.dirty = true;
-    return pat == null || data.meta.drop(pat + '.');
+    final boolean ok = data.dropIndex(type);
+    if(ok) {
+      if(type == IndexType.TEXT) {
+        data.meta.textindex = false;
+      } else if(type == IndexType.ATTRIBUTE) {
+        data.meta.attrindex = false;
+      } else if(type == IndexType.FULLTEXT) {
+        data.meta.ftxtindex = false;
+      } else {
+        throw Util.notExpected();
+      }
+    }
+    return ok;
   }
 
   @Override
