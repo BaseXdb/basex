@@ -56,7 +56,7 @@ public final class Util {
    * @param ext optional extension
    * @return runtime exception (indicates that an error is raised)
    */
-  public static RuntimeException notExpected(final Object message, Object... ext) {
+  public static RuntimeException notExpected(final Object message, final Object... ext) {
     return new RuntimeException(info(message, ext));
   }
 

@@ -33,32 +33,32 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   public void lazyReplace() {
     // IDENTICAL: 0 value updates
     query(transform("<doc><tree/></doc>",
-            "replace node $input//tree with <tree/>"),
+        "replace node $input//tree with <tree/>"),
         "<doc><tree/></doc>");
     // FAIL: different size of trees
     query(transform("<doc><tree><n/></tree></doc>",
-            "replace node $input//tree with <tree/>"),
+        "replace node $input//tree with <tree/>"),
         "<doc><tree/></doc>");
     // FAIL: kind
     query(transform("<doc><tree><n/></tree></doc>",
-            "replace node $input//tree with <tree>text</tree>"),
+        "replace node $input//tree with <tree>text</tree>"),
         "<doc><tree>text</tree></doc>");
     // FAIL: distance (size would've already failed on ancestor axis)
     query(transform("<doc><tree><n/></tree></doc>",
-            "replace node $input//tree with <tree/>"),
+        "replace node $input//tree with <tree/>"),
         "<doc><tree/></doc>");
     // FAIL: replace attribute w/ sequence of attributes
     query(transform("<doc><tree id=\"0\"/></doc>",
         "replace node $input//@id with (attribute id {\"1\"}, attribute id2 {\"2\"})"),
-    "<doc><tree id=\"1\" id2=\"2\"/></doc>");
+        "<doc><tree id=\"1\" id2=\"2\"/></doc>");
     // LAZY REPLACE: 8 value updates -> element, attribute, text, comment, processing instruction
     query(transform("<doc><tree1 a='0'>text1<a/><!--comm1--><a/><?p1 i1?><?p11?></tree1></doc>",
-            "replace node $input//tree1 with " +
-            "<tree2 b='1'>text2<a/><!--comm2--><a/><?p2 i2?><?p22?></tree2>"),
+        "replace node $input//tree1 with " +
+        "<tree2 b='1'>text2<a/><!--comm2--><a/><?p2 i2?><?p22?></tree2>"),
         "<doc><tree2 b=\"1\">text2<a/><!--comm2--><a/><?p2 i2?><?p22 ?></tree2></doc>");
     // LAZY REPLACE: 2 value updates -> single attribute
     query(transform("<doc><tree id1=\"0\"/></doc>",
-            "replace node $input//@id1 with attribute id2 {\"1\"}"),
+        "replace node $input//@id1 with attribute id2 {\"1\"}"),
         "<doc><tree id2=\"1\"/></doc>");
   }
 
@@ -528,7 +528,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    */
   private static DataClip clipA(final Data d, final String name, final String value) {
     final int s = d.meta.size;
-    d.attr(s, s + 1, d.atnindex.index(token(name), null, false), token(value), -1, false);
+    d.attr(s, s + 1, d.attrNames.index(token(name), null, false), token(value), -1, false);
     d.insert(s);
     return new DataClip(d, s, d.meta.size);
   }
@@ -542,10 +542,10 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    */
   private static DataClip clipE(final Data d, final String n, final boolean b) {
     final int s = d.meta.size;
-    d.elem(s + 1, d.elmindex.index(token(n), null, false), 1, b ? 2 : 1, 0, false);
+    d.elem(s + 1, d.elemNames.index(token(n), null, false), 1, b ? 2 : 1, 0, false);
     d.insert(s);
     if(b) {
-      d.elem(1, d.elmindex.index(token(n), null, false), 1, 1, 0, false);
+      d.elem(1, d.elemNames.index(token(n), null, false), 1, 1, 0, false);
       d.insert(s + 1);
     }
     return new DataClip(d, s, d.meta.size);
