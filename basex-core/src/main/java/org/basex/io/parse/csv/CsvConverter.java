@@ -32,9 +32,12 @@ public abstract class CsvConverter {
    * @throws IOException I/O exception
    */
   public void convert(final IO input) throws IOException {
-    final String encoding = copts.get(CsvParserOptions.ENCODING);
-    final String csv = new NewlineInput(input).encoding(encoding).cache().toString();
-    CsvParser.parse(csv, copts, this);
+    final TextInput in = new TextInput(input);
+    try {
+      CsvParser.parse(in.encoding(copts.get(CsvParserOptions.ENCODING)), copts, this);
+    } finally {
+      in.close();
+    }
   }
 
   /**

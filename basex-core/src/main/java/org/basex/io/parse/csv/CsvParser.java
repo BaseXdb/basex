@@ -1,6 +1,9 @@
 package org.basex.io.parse.csv;
 
+import java.io.*;
+
 import org.basex.build.*;
+import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.util.*;
 
@@ -10,7 +13,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-final class CsvParser extends InputParser {
+final class CsvParser {
+  /** Input stream. */
+  private final TextInput input;
   /** Converter. */
   private final CsvConverter conv;
   /** Header flag. */
@@ -29,16 +34,16 @@ final class CsvParser extends InputParser {
 
   /**
    * Constructor.
-   * @param in input
+   * @param input input
    * @param opts options
-   * @param cnv converter
+   * @param conv converter
    */
-  private CsvParser(final String in, final CsvParserOptions opts, final CsvConverter cnv) {
-    super(in);
+  private CsvParser(final TextInput input, final CsvParserOptions opts, final CsvConverter conv) {
+    this.input = input;
+    this.conv = conv;
     header = opts.get(CsvOptions.HEADER);
     separator = opts.separator();
     quotes = opts.get(CsvOptions.QUOTES);
-    conv = cnv;
   }
 
   /**
@@ -47,26 +52,28 @@ final class CsvParser extends InputParser {
    * @param input input string
    * @param opts options
    * @param conv converter
-   * @throws QueryIOException parse exception
+   * @throws IOException I/O exception
    */
-  static void parse(final String input, final CsvParserOptions opts, final CsvConverter conv)
-      throws QueryIOException {
+  static void parse(final TextInput input, final CsvParserOptions opts, final CsvConverter conv)
+      throws IOException {
     new CsvParser(input, opts, conv).parse();
   }
 
   /**
    * Parses a CSV expression.
-   * @throws QueryIOException query I/O exception
+   * @throws IOException query I/O exception
    */
-  private void parse() throws QueryIOException {
+  private void parse() throws IOException {
     final TokenBuilder entry = new TokenBuilder();
     data = !header;
 
-    for(char ch; (ch = consume()) != 0;) {
+    int ch = input.read();
+    while(ch != -1) {
       if(quoted) {
         // quoted state
         if(ch == '"') {
-          if(!consume('"')) {
+          ch = input.read();
+          if(ch != '"') {
             quoted = false;
             continue;
           }
@@ -88,6 +95,7 @@ final class CsvParser extends InputParser {
         // parse any other character
         entry.add(XMLToken.valid(ch) ? ch : '?');
       }
+      ch = input.read();
     }
     record(entry, !entry.isEmpty());
   }
