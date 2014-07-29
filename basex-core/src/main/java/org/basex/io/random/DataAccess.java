@@ -159,8 +159,7 @@ public final class DataAccess implements AutoCloseable {
    * @return long value
    */
   public synchronized long read5() {
-    return ((long) read() << 32) + ((long) read() << 24) +
-      (read() << 16) + (read() << 8) + read();
+    return ((long) read() << 32) + ((long) read() << 24) + (read() << 16) + (read() << 8) + read();
   }
 
   /**
