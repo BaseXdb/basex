@@ -6,7 +6,6 @@ import static org.junit.Assert.*;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -52,18 +51,20 @@ public abstract class UpdateTest extends SandboxTest {
 
   /**
    * Creates the database.
+   * @throws BaseXException database exception
    */
   @Before
-  public final void setUp() {
+  public final void setUp() throws BaseXException {
     exec(new CreateDB(NAME, TESTFILE));
     size = context.data().meta.size;
   }
 
   /**
    * Deletes the test database.
+   * @throws BaseXException database exception
    */
   @After
-  public final void tearDown() {
+  public final void tearDown() throws BaseXException {
     if(mainmem) return;
     exec(new Close());
     exec(new DropDB(NAME));
@@ -71,8 +72,9 @@ public abstract class UpdateTest extends SandboxTest {
 
   /**
    * Reloads the database.
+   * @throws BaseXException database exception
    */
-  static void reload() {
+  static void reload() throws BaseXException {
     if(mainmem) return;
     exec(new Close());
     exec(new Open(NAME));
@@ -90,9 +92,10 @@ public abstract class UpdateTest extends SandboxTest {
 
   /**
    * Tests for correct data size.
+   * @throws BaseXException database exception
    */
   @Test
-  public final void size() {
+  public final void size() throws BaseXException {
     assertEquals("Unexpected size!", size, context.data().meta.size);
     reload();
     assertEquals("Unexpected size!", size, context.data().meta.size);
@@ -102,12 +105,9 @@ public abstract class UpdateTest extends SandboxTest {
    * Executes the specified command. Gives feedback and stops the test
    * if errors occur.
    * @param cmd command reference
+   * @throws BaseXException database exception
    */
-  private static void exec(final Command cmd) {
-    try {
-      cmd.execute(context);
-    } catch(final BaseXException ex) {
-      Util.errln(ex);
-    }
+  private static void exec(final Command cmd) throws BaseXException {
+    cmd.execute(context);
   }
 }
