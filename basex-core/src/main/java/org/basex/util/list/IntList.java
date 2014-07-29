@@ -62,6 +62,15 @@ public class IntList extends ElementList {
     size = s;
     return this;
   }
+  /**
+   * Adds elements to the array.
+   * @param elements elements to be added
+   * @return self reference
+   */
+  public final IntList add(final int... elements) {
+    for(final int s : elements) add(s);
+    return this;
+  }
 
   /**
    * Returns the element at the specified position.
