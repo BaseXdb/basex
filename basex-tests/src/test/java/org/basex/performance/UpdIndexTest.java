@@ -23,14 +23,14 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 @RunWith(Parameterized.class)
-public final class IncUpdateTest extends SandboxTest {
+public final class UpdIndexTest extends SandboxTest {
   /**
    * Test parameters.
    * @return parameters
    */
   @Parameters
   public static List<Object[]> params() {
-    return Arrays.asList(new Object[][] { {false}, {true} });
+    return Arrays.asList(new Object[][] { { false }, { true } });
   }
 
   /** Number of steps. */
@@ -45,7 +45,7 @@ public final class IncUpdateTest extends SandboxTest {
    * Constructor.
    * @param u incremental index update flag.
    */
-  public IncUpdateTest(final boolean u) {
+  public UpdIndexTest(final boolean u) {
     ixupdate = u;
   }
 
