@@ -51,11 +51,11 @@ public final class IndexCache {
    * Adds a new cache entry. If an entry with the specified key already exists,
    * it will be updated.
    * @param key key
-   * @param s number of index hits
-   * @param p pointer to id list
+   * @param sz number of index hits
+   * @param pointer pointer to id list
    * @return cache entry
    */
-  public IndexEntry add(final byte[] key, final int s, final long p) {
+  public IndexEntry add(final byte[] key, final int sz, final long pointer) {
     final int hash = hash(key);
     rwl.writeLock().lock();
 
@@ -63,7 +63,6 @@ public final class IndexCache {
       purge();
 
       final int i = indexFor(hash, buckets.length);
-
       BucketEntry current = buckets[i];
       BucketEntry prev = current;
       while(current != null) {
@@ -72,14 +71,14 @@ public final class IndexCache {
         if(entry == null) {
           delete(i, current, prev, next);
         } else if(current.hash == hash && eq(entry.key, key)) {
-          update(entry, s, p);
+          update(entry, sz, pointer);
           return entry;
         }
         prev = current;
         current = next;
       }
 
-      final IndexEntry entry = new IndexEntry(key, s, p);
+      final IndexEntry entry = new IndexEntry(key, sz, pointer);
       add(i, hash, entry);
       return entry;
     } finally {

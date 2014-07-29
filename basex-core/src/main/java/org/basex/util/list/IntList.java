@@ -68,7 +68,12 @@ public class IntList extends ElementList {
    * @return self reference
    */
   public final IntList add(final int... elements) {
-    for(final int s : elements) add(s);
+    int[] lst = list;
+    final int l = elements.length, s = size, ns = s + l;
+    if(ns > lst.length) lst = Arrays.copyOf(lst, newSize(ns));
+    System.arraycopy(elements, 0, lst, s, l);
+    list = lst;
+    size = ns;
     return this;
   }
 

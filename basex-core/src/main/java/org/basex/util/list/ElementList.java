@@ -29,8 +29,7 @@ public abstract class ElementList {
   }
 
   /**
-   * Returns a new array size that is larger than or equal to the specified
-   * size.
+   * Returns a new array size that is larger than or equal to the specified size.
    * @param min minimum size
    * @return new array size
    */

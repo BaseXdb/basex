@@ -46,7 +46,7 @@ public class StringList extends ElementList implements Iterable<String> {
   public final StringList add(final String element) {
     String[] lst = list;
     int s = size;
-    if(s == lst.length) lst = Arrays.copyOf(lst, newSize());
+    if(s == lst.length) lst = Array.copyOf(lst, newSize());
     lst[s++] = element;
     list = lst;
     size = s;
@@ -59,7 +59,12 @@ public class StringList extends ElementList implements Iterable<String> {
    * @return self reference
    */
   public final StringList add(final String... elements) {
-    for(final String s : elements) add(s);
+    String[] lst = list;
+    final int l = elements.length, s = size, ns = s + l;
+    if(ns > lst.length) lst = Array.copyOf(lst, newSize(ns));
+    System.arraycopy(elements, 0, lst, s, l);
+    list = lst;
+    size = ns;
     return this;
   }
 
@@ -159,7 +164,7 @@ public class StringList extends ElementList implements Iterable<String> {
    * @return array
    */
   public final String[] next() {
-    final String[] lst = Arrays.copyOf(list, size);
+    final String[] lst = Array.copyOf(list, size);
     reset();
     return lst;
   }
@@ -173,7 +178,7 @@ public class StringList extends ElementList implements Iterable<String> {
     final String[] lst = list;
     list = null;
     final int s = size;
-    return s == lst.length ? lst : Arrays.copyOf(lst, s);
+    return s == lst.length ? lst : Array.copyOf(lst, s);
   }
 
   /**
