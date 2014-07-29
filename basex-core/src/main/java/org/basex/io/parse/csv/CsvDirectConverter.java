@@ -33,6 +33,8 @@ final class CsvDirectConverter extends CsvConverter {
 
   /** Root node. */
   private final FElem root = new FElem(CSV);
+  /** Document node. */
+  private final FDoc doc = new FDoc().add(root);
   /** Record. */
   private FElem record;
   /** Current column. */
@@ -75,6 +77,6 @@ final class CsvDirectConverter extends CsvConverter {
 
   @Override
   public FDoc finish() {
-    return new FDoc().add(root);
+    return doc;
   }
 }

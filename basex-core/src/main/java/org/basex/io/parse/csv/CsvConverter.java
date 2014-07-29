@@ -71,7 +71,7 @@ public abstract class CsvConverter {
   abstract void entry(final byte[] value) throws QueryIOException;
 
   /**
-   * Returns the resulting XQuery value.
+   * Returns the resulting byte array.
    * @return result
    * @throws QueryIOException query exception
    */

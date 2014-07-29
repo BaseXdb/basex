@@ -21,17 +21,18 @@ public final class XmlTokenBuilder {
    * @param atts attribute names and values
    */
   public void openElement(final byte[] name, final byte[]... atts) {
-    cache.add('<').add(name);
+    final TokenBuilder cch = cache;
+    cch.add('<').add(name);
     final int al = atts.length;
     for(int a = 0; a < al; a += 2) {
       final byte[] an = atts[a], av = atts[a + 1];
       if(av != null) {
-        cache.add(' ').add(an).add('=').add('"');
+        cch.add(' ').add(an).add('=').add('"');
         addAttribute(av);
-        cache.add('"');
+        cch.add('"');
       }
     }
-    cache.add('>');
+    cch.add('>');
   }
 
   /**
@@ -52,11 +53,11 @@ public final class XmlTokenBuilder {
   }
 
   /**
-   * Returns the original byte array.
+   * Returns the token as byte array, and invalidates the internal array.
    * @return XML token
    */
-  public byte[] toArray() {
-    return cache.toArray();
+  public byte[] finish() {
+    return cache.finish();
   }
 
   /**

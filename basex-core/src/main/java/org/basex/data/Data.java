@@ -581,7 +581,7 @@ public abstract class Data {
     }
 
     if(meta.updindex) {
-      indexEnd();
+      indexAdd();
       // update ID -> PRE map:
       idmap.delete(tpre, id(tpre), -tsize);
       idmap.insert(tpre, meta.lastid - size + 1, size);
@@ -815,7 +815,7 @@ public abstract class Data {
     if(meta.updindex) {
       // add the entries to the ID -> PRE mapping:
       idmap.insert(tpre, id(tpre), size);
-      indexEnd();
+      indexAdd();
     }
 
     if(!cache) updateDist(tpre + size, size);
@@ -1052,8 +1052,11 @@ public abstract class Data {
   /** Notify the index structures that an update operation is started. */
   void indexBegin() { }
 
-  /** Notify the index structures that an update operation is finished. */
-  void indexEnd() { }
+  /** Notify the index structures that an add operation is finished. */
+  void indexAdd() { }
+
+  /** Notify the index structures that a delete operation is finished. */
+  void indexDelete() { }
 
   /**
    * Delete a node and its descendants from the corresponding indexes.

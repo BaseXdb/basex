@@ -263,29 +263,29 @@ public final class DiskData extends Data {
   @Override
   public byte[] text(final int pre, final boolean text) {
     final long o = textOff(pre);
-    return num(o) ? token((int) o) : txt(o, text);
+    return number(o) ? token((int) o) : txt(o, text);
   }
 
   @Override
   public long textItr(final int pre, final boolean text) {
     final long o = textOff(pre);
-    return num(o) ? o & IO.OFFNUM - 1 : toLong(txt(o, text));
+    return number(o) ? o & IO.OFFNUM - 1 : toLong(txt(o, text));
   }
 
   @Override
   public double textDbl(final int pre, final boolean text) {
     final long o = textOff(pre);
-    return num(o) ? o & IO.OFFNUM - 1 : toDouble(txt(o, text));
+    return number(o) ? o & IO.OFFNUM - 1 : toDouble(txt(o, text));
   }
 
   @Override
   public int textLen(final int pre, final boolean text) {
     final long o = textOff(pre);
-    if(num(o)) return numDigits((int) o);
+    if(number(o)) return numDigits((int) o);
     final DataAccess da = text ? texts : values;
     final int l = da.readNum(o & IO.OFFCOMP - 1);
     // compressed: next number contains number of compressed bytes
-    return cpr(o) ? da.readNum() : l;
+    return compressed(o) ? da.readNum() : l;
   }
 
   /**
@@ -296,7 +296,7 @@ public final class DiskData extends Data {
    */
   private byte[] txt(final long off, final boolean text) {
     final byte[] txt = (text ? texts : values).readToken(off & IO.OFFCOMP - 1);
-    return cpr(off) ? COMP.get().unpack(txt) : txt;
+    return compressed(off) ? COMP.get().unpack(txt) : txt;
   }
 
   /**
@@ -304,7 +304,7 @@ public final class DiskData extends Data {
    * @param offset offset
    * @return result of check
    */
-  private static boolean num(final long offset) {
+  private static boolean number(final long offset) {
     return (offset & IO.OFFNUM) != 0;
   }
 
@@ -313,7 +313,7 @@ public final class DiskData extends Data {
    * @param offset offset
    * @return result of check
    */
-  private static boolean cpr(final long offset) {
+  private static boolean compressed(final long offset) {
     return (offset & IO.OFFCOMP) != 0;
   }
 
@@ -324,7 +324,7 @@ public final class DiskData extends Data {
     // old entry (offset or value)
     final long old = textOff(pre);
     // fill unused space with zero-bytes
-    if(!num(old)) (text ? texts : values).free(old & IO.OFFCOMP - 1, 0);
+    if(!number(old)) (text ? texts : values).free(old & IO.OFFCOMP - 1, 0);
   }
 
   @Override
@@ -358,7 +358,7 @@ public final class DiskData extends Data {
 
       // find text store offset
       final long off;
-      if(num(old)) {
+      if(number(old)) {
         // numeric entry: append new entry at the end
         off = len;
       } else {
@@ -379,31 +379,36 @@ public final class DiskData extends Data {
   }
 
   @Override
-  protected void indexEnd() {
-    if(!txtBuffer.isEmpty()) ((DiskValues) textIndex).index(txtBuffer);
-    if(!atvBuffer.isEmpty()) ((DiskValues) attrIndex).index(atvBuffer);
+  protected void indexAdd() {
+    if(!txtBuffer.isEmpty()) ((DiskValues) textIndex).add(txtBuffer);
+    if(!atvBuffer.isEmpty()) ((DiskValues) attrIndex).add(atvBuffer);
+  }
+
+  @Override
+  protected void indexDelete() {
+    if(!txtBuffer.isEmpty()) ((DiskValues) textIndex).delete(txtBuffer);
+    if(!atvBuffer.isEmpty()) ((DiskValues) attrIndex).delete(atvBuffer);
   }
 
   @Override
   protected long index(final int pre, final int id, final byte[] value, final int kind) {
     final DataAccess store;
-    final TokenObjMap<IntList> m;
-
+    final TokenObjMap<IntList> map;
     if(kind == ATTR) {
       store = values;
-      m = meta.attrindex ? atvBuffer : null;
+      map = meta.attrindex ? atvBuffer : null;
     } else {
       store = texts;
       // don't index document names
-      m = meta.textindex && kind != DOC ? txtBuffer : null;
+      map = meta.textindex && kind != DOC ? txtBuffer : null;
     }
 
     // add text to map to index later
-    if(meta.updindex && m != null && value.length <= meta.maxlen) {
-      IntList ids = m.get(value);
+    if(meta.updindex && map != null && value.length <= meta.maxlen) {
+      IntList ids = map.get(value);
       if(ids == null) {
         ids = new IntList(1);
-        m.put(value, ids);
+        map.put(value, ids);
       }
       ids.add(id);
     }
@@ -425,8 +430,7 @@ public final class DiskData extends Data {
     final boolean textI = meta.textindex, attrI = meta.attrindex;
     if(textI || attrI) {
       // collect all keys and ids
-      txtBuffer = new TokenObjMap<>();
-      atvBuffer = new TokenObjMap<>();
+      indexBegin();
       final int l = pre + size;
       for(int p = pre; p < l; ++p) {
         final int k = kind(p);
@@ -445,8 +449,7 @@ public final class DiskData extends Data {
           }
         }
       }
-      if(!txtBuffer.isEmpty()) ((DiskValues) textIndex).delete(txtBuffer);
-      if(!atvBuffer.isEmpty()) ((DiskValues) attrIndex).delete(atvBuffer);
+      indexDelete();
     }
   }
 

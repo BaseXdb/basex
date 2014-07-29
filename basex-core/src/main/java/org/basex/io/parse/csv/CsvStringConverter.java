@@ -81,6 +81,6 @@ public final class CsvStringConverter extends CsvConverter {
   public Str finish() {
     if(record) xml.closeElement(RECORD);
     xml.closeElement(CSV);
-    return Str.get(xml.toArray());
+    return Str.get(xml.finish());
   }
 }

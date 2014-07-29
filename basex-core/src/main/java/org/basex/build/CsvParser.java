@@ -8,8 +8,7 @@ import org.basex.io.*;
 import org.basex.io.parse.csv.*;
 
 /**
- * This class parses files in the CSV format
- * and converts them to XML.
+ * This class parses files in the CSV format and converts them to XML.
  *
  * <p>The parser provides some options, which can be specified via the
  * {@link MainOptions#CSVPARSER} option.</p>
@@ -29,7 +28,7 @@ public final class CsvParser extends XMLParser {
   }
 
   /**
-   * Converts CSV data to XML.
+   * Converts CSV data to an XML string.
    * @param io input
    * @param copts parsing options
    * @return parser
