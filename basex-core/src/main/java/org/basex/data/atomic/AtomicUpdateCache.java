@@ -283,8 +283,7 @@ public final class AtomicUpdateCache {
     data.cache = true;
     applyUpdates();
     adjustDistances();
-    if(mergeTexts)
-      resolveTextAdjacency();
+    if(mergeTexts) resolveTextAdjacency();
     data.cache = false;
     clear();
   }

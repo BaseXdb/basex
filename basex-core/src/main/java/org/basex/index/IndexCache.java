@@ -170,8 +170,7 @@ public final class IndexCache {
    * @param p previous cache entry
    * @param n next cache entry
    */
-  private void delete(final int i, final BucketEntry e, final BucketEntry p,
-      final BucketEntry n) {
+  private void delete(final int i, final BucketEntry e, final BucketEntry p, final BucketEntry n) {
     if(p == e) buckets[i] = n;
     else p.next = n;
     e.next = null;

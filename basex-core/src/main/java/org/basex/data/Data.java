@@ -104,9 +104,9 @@ public abstract class Data {
   public int pins = 1;
 
   /** Table access file. */
-  TableAccess table;
+  protected TableAccess table;
   /** ID->PRE mapping. */
-  IdPreMap idmap;
+  protected IdPreMap idmap;
   /** States if distance caching is active. */
   public boolean cache;
 
@@ -602,8 +602,7 @@ public abstract class Data {
       p = parent(p, k);
     }
 
-    if(!cache)
-      updateDist(tpre + size, diff);
+    if(!cache) updateDist(tpre + size, diff);
 
     // adjust attribute size of parent if attributes inserted. attribute size
     // of parent cannot be reduced via a replace expression.
