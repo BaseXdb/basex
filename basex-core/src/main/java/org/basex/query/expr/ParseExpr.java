@@ -27,7 +27,7 @@ public abstract class ParseExpr extends Expr {
   /** Input information. */
   public final InputInfo info;
   /** Static type. */
-  public SeqType seqType;
+  protected SeqType seqType;
   /** Cardinality of result; {@code -1} if unknown. */
   protected long size = -1;
 
@@ -117,6 +117,14 @@ public abstract class ParseExpr extends Expr {
   }
 
   // OPTIMIZATIONS ============================================================
+
+  /**
+   * Assigns a sequence type.
+   * @param type sequence type
+   */
+  public void seqType(final SeqType type) {
+    seqType = type;
+  }
 
   /**
    * Pre-evaluates the specified expression.

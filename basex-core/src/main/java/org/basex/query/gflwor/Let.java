@@ -93,8 +93,8 @@ public final class Let extends ForLet {
   public Let optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     if(!score && expr instanceof TypeCheck) {
       final TypeCheck tc = (TypeCheck) expr;
-      if(tc.isRedundant(var) || var.adoptCheck(tc.seqType, tc.promote)) {
-        qc.compInfo(OPTCAST, tc.seqType);
+      if(tc.isRedundant(var) || var.adoptCheck(tc.seqType(), tc.promote)) {
+        qc.compInfo(OPTCAST, tc.seqType());
         expr = tc.expr;
       }
     }

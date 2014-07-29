@@ -167,7 +167,7 @@ public final class For extends ForLet {
       qc.value = null;
       // assign type of iterated items to context expression
       final Context c = new Context(info);
-      c.seqType = expr.seqType().type.seqType();
+      c.seqType(expr.seqType().type.seqType());
       final Expr r = ex.inline(qc, scp, var, c);
       if(r != null) pred = r;
     } finally {
