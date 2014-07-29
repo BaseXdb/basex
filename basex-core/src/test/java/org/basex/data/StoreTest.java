@@ -85,8 +85,8 @@ public final class StoreTest extends SandboxTest {
   }
 
   /**
-   * Tests the {@link MainOptions#UPDINDEX} and {@link MainOptions#AUTOFLUSH} flags in
-   * combination. Reaction on a bug (incremental value index was not correctly closed)
+   * Tests the {@link MainOptions#UPDINDEX} and {@link MainOptions#AUTOFLUSH} flags in combination.
+   * Reaction on a bug (incremental value index was not correctly closed)
    * @throws BaseXException database exception
    */
   @Test

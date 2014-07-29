@@ -15,7 +15,7 @@ import org.basex.util.list.*;
  * disk. The data structure is described in the {@link DiskValuesBuilder} class.
  *
  * @author BaseX Team 2005-14, BSD License
- * @author Christian Gruen
+ * @author Dimitar Popov
  */
 public final class UpdatableDiskValues extends DiskValues {
   /**
@@ -52,7 +52,7 @@ public final class UpdatableDiskValues extends DiskValues {
   }
 
   @Override
-  public synchronized void index(final TokenObjMap<IntList> map) {
+  public synchronized void add(final TokenObjMap<IntList> map) {
     final int s = size.get();
     final int last = s - 1;
 

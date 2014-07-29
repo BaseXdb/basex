@@ -422,7 +422,7 @@ public class DiskValues implements Index {
   }
 
   /**
-   * Binary search for key in the {@link #idxr}.
+   * Binary search for key in the {@link #idxr} reference file.
    * <p><em>Important:</em> This method is thread-safe.</p>
    * @param key token to be found
    * @param first begin of the search interval (inclusive)
@@ -468,20 +468,20 @@ public class DiskValues implements Index {
 
   /**
    * Add entries to the index.
-   * @param m a set of <key, id-list> pairs
+   * @param map a set of <key, id-list> pairs
    */
   @SuppressWarnings("unused")
-  public void index(final TokenObjMap<IntList> m) { }
+  public void add(final TokenObjMap<IntList> map) { }
 
   /**
-   * Delete records from the index.
-   * @param m a set of <key, id-list> pairs
+   * Deletes index entries from the index.
+   * @param map a set of <key, id-list> pairs
    */
   @SuppressWarnings("unused")
-  public void delete(final TokenObjMap<IntList> m) { }
+  public void delete(final TokenObjMap<IntList> map) { }
 
   /**
-   * Remove record from the index.
+   * Replaces an index entry in the index.
    * @param old old record key
    * @param key new record key
    * @param id record id
