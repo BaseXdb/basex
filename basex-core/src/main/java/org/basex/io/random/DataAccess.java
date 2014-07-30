@@ -79,8 +79,10 @@ public final class DataAccess implements AutoCloseable {
    * @param l file length
    */
   private synchronized void length(final long l) {
-    changed |= l != len;
-    len = l;
+    if(l != len) {
+      changed = true;
+      len = l;
+    }
   }
 
   /**
@@ -104,7 +106,7 @@ public final class DataAccess implements AutoCloseable {
    * @return next byte
    */
   private int read() {
-    final Buffer bf = buffer(off == IO.BLOCKSIZE);
+    final Buffer bf = buffer();
     return bf.data[off++] & 0xFF;
   }
 
@@ -270,7 +272,7 @@ public final class DataAccess implements AutoCloseable {
    * @param b byte to be written
    */
   private void write(final int b) {
-    final Buffer bf = buffer(off == IO.BLOCKSIZE);
+    final Buffer bf = buffer();
     bf.dirty = true;
     bf.data[off++] = (byte) b;
     final long nl = bf.pos + off;
@@ -367,7 +369,7 @@ public final class DataAccess implements AutoCloseable {
     int o = offset;
 
     while(o < last) {
-      final Buffer bf = buffer(off == IO.BLOCKSIZE);
+      final Buffer bf = buffer();
       final int l = Math.min(last - o, IO.BLOCKSIZE - off);
       System.arraycopy(buf, o, bf.data, off, l);
       bf.dirty = true;
@@ -445,8 +447,16 @@ public final class DataAccess implements AutoCloseable {
    */
   private void writeBlock(final Buffer bf) throws IOException {
     file.seek(bf.pos);
-    file.write(bf.data);
+    file.write(bf.data, 0, (int) Math.min(IO.BLOCKSIZE, len - bf.pos));
     bf.dirty = false;
+  }
+
+  /**
+   * Returns a buffer which can be used for writing new bytes.
+   * @return buffer
+   */
+  private Buffer buffer() {
+    return buffer(off == IO.BLOCKSIZE);
   }
 
   /**
