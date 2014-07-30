@@ -132,7 +132,7 @@ public final class FTIndex implements Index {
 
     // return cached or new result
     final IndexEntry e = entry(tok);
-    return e.size > 0 ? iter(e.pointer, e.size, inZ, tok) : FTIndexIterator.FTEMPTY;
+    return e.size > 0 ? iter(e.offset, e.size, inZ, tok) : FTIndexIterator.FTEMPTY;
   }
 
   /**

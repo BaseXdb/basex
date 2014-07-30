@@ -101,8 +101,7 @@ public final class Num {
   }
 
   /**
-   * Returns the length value of the specified array, stored in the first
-   * four bytes.
+   * Returns the length value of the specified array, stored in the first four bytes.
    * @param array input array
    * @return array length
    */
@@ -112,8 +111,7 @@ public final class Num {
   }
 
   /**
-   * Stores the specified length value in the first bytes of the
-   * specified array.
+   * Stores the specified length value in the first bytes of the specified array.
    * @param array input array
    * @param length length to be stored
    */

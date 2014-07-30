@@ -77,6 +77,7 @@ public final class DiskData extends Data {
     }
 
     // open data and indexes
+    init();
     if(meta.updindex) {
       idmap = new IdPreMap(meta.dbfile(DATAIDP));
       if(meta.textindex) textIndex = new UpdatableDiskValues(this, true);
@@ -86,7 +87,6 @@ public final class DiskData extends Data {
       if(meta.attrindex) attrIndex = new DiskValues(this, false);
     }
     if(meta.ftxtindex) ftxtIndex = new FTIndex(this);
-    init();
   }
 
   /**

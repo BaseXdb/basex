@@ -75,15 +75,6 @@ public final class DataAccess implements AutoCloseable {
   }
 
   /**
-   * Sets the file length.
-   * @param l file length
-   */
-  private synchronized void length(final long l) {
-    changed |= l != len;
-    len = l;
-  }
-
-  /**
    * Returns the file length.
    * @return file length
    */
@@ -97,15 +88,6 @@ public final class DataAccess implements AutoCloseable {
    */
   public boolean more() {
     return cursor() < len;
-  }
-
-  /**
-   * Reads the next byte.
-   * @return next byte
-   */
-  private int read() {
-    final Buffer bf = buffer(off == IO.BLOCKSIZE);
-    return bf.data[off++] & 0xFF;
   }
 
   /**
@@ -266,18 +248,6 @@ public final class DataAccess implements AutoCloseable {
   }
 
   /**
-   * Writes the next byte.
-   * @param b byte to be written
-   */
-  private void write(final int b) {
-    final Buffer bf = buffer(off == IO.BLOCKSIZE);
-    bf.dirty = true;
-    bf.data[off++] = (byte) b;
-    final long nl = bf.pos + off;
-    if(nl > len) length(nl);
-  }
-
-  /**
    * Writes a 5-byte value to the specified position.
    * @param p position in the file
    * @param v value to be written
@@ -334,40 +304,17 @@ public final class DataAccess implements AutoCloseable {
   }
 
   /**
-   * Appends integers to the file in compressed form.
-   * @param v integer values
-   * @return the position in the file where the values have been written
-   */
-  public long appendNums(final int[] v) {
-    final long end = len;
-    writeNums(end, v);
-    return end;
-  }
-
-  /**
-   * Appends a value to the file and return it's offset.
-   * @param p write position
-   * @param v byte array to be appended
-   */
-  public void writeToken(final long p, final byte[] v) {
-    cursor(p);
-    writeToken(v, 0, v.length);
-  }
-
-  /**
-   * Write a token to the file.
+   * Writes a byte array to the file.
    * @param buf buffer containing the token
    * @param offset offset in the buffer where the token starts
    * @param length token length
    */
-  private void writeToken(final byte[] buf, final int offset, final int length) {
-    writeNum(length);
-
+  public void writeBytes(final byte[] buf, final int offset, final int length) {
     final int last = offset + length;
     int o = offset;
 
     while(o < last) {
-      final Buffer bf = buffer(off == IO.BLOCKSIZE);
+      final Buffer bf = buffer();
       final int l = Math.min(last - o, IO.BLOCKSIZE - off);
       System.arraycopy(buf, o, bf.data, off, l);
       bf.dirty = true;
@@ -382,19 +329,12 @@ public final class DataAccess implements AutoCloseable {
 
   /**
    * Appends a value to the file and return it's offset.
-   * @param v number to be appended
+   * @param p write position
+   * @param v byte array to be appended
    */
-  private void writeNum(final int v) {
-    if(v < 0 || v > 0x3FFFFFFF) {
-      write(0xC0); write(v >>> 24); write(v >>> 16); write(v >>> 8); write(v);
-    } else if(v > 0x3FFF) {
-      write(v >>> 24 | 0x80); write(v >>> 16);
-      write(v >>> 8); write(v);
-    } else if(v > 0x3F) {
-      write(v >>> 8 | 0x40); write(v);
-    } else {
-      write(v);
-    }
+  public void writeToken(final long p, final byte[] v) {
+    cursor(p);
+    writeToken(v, 0, v.length);
   }
 
   /**
@@ -439,14 +379,82 @@ public final class DataAccess implements AutoCloseable {
   // PRIVATE METHODS ==========================================================
 
   /**
+   * Sets the file length.
+   * @param l file length
+   */
+  private synchronized void length(final long l) {
+    if(l != len) {
+      changed = true;
+      len = l;
+    }
+  }
+
+  /**
+   * Reads the next byte.
+   * @return next byte
+   */
+  private int read() {
+    final Buffer bf = buffer();
+    return bf.data[off++] & 0xFF;
+  }
+
+  /**
+   * Writes the next byte.
+   * @param b byte to be written
+   */
+  private void write(final int b) {
+    final Buffer bf = buffer();
+    bf.dirty = true;
+    bf.data[off++] = (byte) b;
+    final long nl = bf.pos + off;
+    if(nl > len) length(nl);
+  }
+
+  /**
+   * Write a token to the file.
+   * @param buf buffer containing the token
+   * @param offset offset in the buffer where the token starts
+   * @param length token length
+   */
+  private void writeToken(final byte[] buf, final int offset, final int length) {
+    writeNum(length);
+    writeBytes(buf, offset, length);
+  }
+
+  /**
+   * Appends a value to the file and return it's offset.
+   * @param v number to be appended
+   */
+  private void writeNum(final int v) {
+    if(v < 0 || v > 0x3FFFFFFF) {
+      write(0xC0); write(v >>> 24); write(v >>> 16); write(v >>> 8); write(v);
+    } else if(v > 0x3FFF) {
+      write(v >>> 24 | 0x80); write(v >>> 16);
+      write(v >>> 8); write(v);
+    } else if(v > 0x3F) {
+      write(v >>> 8 | 0x40); write(v);
+    } else {
+      write(v);
+    }
+  }
+
+  /**
    * Writes the specified block to disk.
    * @param bf buffer to write
    * @throws IOException I/O exception
    */
   private void writeBlock(final Buffer bf) throws IOException {
     file.seek(bf.pos);
-    file.write(bf.data);
+    file.write(bf.data, 0, (int) Math.min(IO.BLOCKSIZE, len - bf.pos));
     bf.dirty = false;
+  }
+
+  /**
+   * Returns a buffer which can be used for writing new bytes.
+   * @return buffer
+   */
+  private Buffer buffer() {
+    return buffer(off == IO.BLOCKSIZE);
   }
 
   /**

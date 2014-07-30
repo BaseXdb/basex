@@ -25,21 +25,23 @@ public final class Open extends Command {
 
   @Override
   protected boolean run() {
-    // close existing database
-    new Close().run(context);
-
     final String db = args[0];
     if(!Databases.validName(db)) return error(NAME_INVALID_X, db);
 
-    try {
-      final Data data = open(db, context);
-      context.openDB(data);
-      if(data.meta.oldindex()) info(H_INDEX_FORMAT);
-      if(data.meta.corrupt)  info(DB_CORRUPT);
-      return info(DB_OPENED_X, db, perf);
-    } catch(final IOException ex) {
-      return error(Util.message(ex));
+    // check if database is already opened
+    Data data = context.data();
+    if(data == null || !data.meta.name.equals(db)) {
+      new Close().run(context);
+      try {
+        data = open(db, context);
+        context.openDB(data);
+        if(data.meta.oldindex()) info(H_INDEX_FORMAT);
+        if(data.meta.corrupt)  info(DB_CORRUPT);
+      } catch(final IOException ex) {
+        return error(Util.message(ex));
+      }
     }
+    return info(DB_OPENED_X, db, perf);
   }
 
   @Override

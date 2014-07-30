@@ -8,7 +8,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 import org.w3c.dom.*;
 
 /**
@@ -203,22 +202,22 @@ public abstract class BXNode implements Node {
 
   @Override
   public final boolean isDefaultNamespace(final String uri) {
-    throw Util.notImplemented();
+    throw notImplemented();
   }
 
   @Override
   public final boolean isEqualNode(final Node cmp) {
-    throw Util.notImplemented();
+    throw notImplemented();
   }
 
   @Override
   public final String lookupNamespaceURI(final String prefix) {
-    throw Util.notImplemented();
+    throw notImplemented();
   }
 
   @Override
   public final String lookupPrefix(final String uri) {
-    throw Util.notImplemented();
+    throw notImplemented();
   }
 
   @Override
@@ -303,5 +302,13 @@ public abstract class BXNode implements Node {
   static DOMException readOnly() {
     return new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
         "DOM implementation is read-only.");
+  }
+
+  /**
+   * Throws a runtime exception for an unimplemented method.
+   * @return runtime exception
+   */
+  static UnsupportedOperationException notImplemented() {
+    return new UnsupportedOperationException();
   }
 }

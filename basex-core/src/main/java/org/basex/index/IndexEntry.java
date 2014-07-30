@@ -9,20 +9,20 @@ package org.basex.index;
 public final class IndexEntry {
   /** Entry key. */
   public final byte[] key;
-  /** Number of index hits for the key. */
+  /** Number of ids. */
   public int size;
-  /** Pointer to the id list for the key. */
-  public long pointer;
+  /** File offset to the id list. */
+  public long offset;
 
   /**
    * Constructor.
    * @param key key
    * @param size number of hits
-   * @param pointer pointer to the id list
+   * @param offset file offset to the id list
    */
-  public IndexEntry(final byte[] key, final int size, final long pointer) {
+  public IndexEntry(final byte[] key, final int size, final long offset) {
     this.key = key;
     this.size = size;
-    this.pointer = pointer;
+    this.offset = offset;
   }
 }

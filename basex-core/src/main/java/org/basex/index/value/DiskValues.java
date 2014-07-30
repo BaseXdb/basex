@@ -26,22 +26,22 @@ import org.basex.util.list.*;
  */
 public class DiskValues implements Index {
   /** ID references. */
-  final DataAccess idxr;
+  protected final DataAccess idxr;
   /** ID lists. */
-  final DataAccess idxl;
+  protected final DataAccess idxl;
+  /** Data reference. */
+  protected final Data data;
+  /** Cached tokens. */
+  protected final IndexCache cache = new IndexCache();
+  /** Cached texts. Increases used memory, but speeds up repeated queries. */
+  protected final IntObjMap<byte[]> ctext = new IntObjMap<>();
+  /** Number of current index entries. */
+  protected final AtomicInteger size = new AtomicInteger();
+
   /** Value type (texts/attributes). */
   private final boolean text;
-  /** Data reference. */
-  final Data data;
-  /** Cached tokens. */
-  final IndexCache cache = new IndexCache();
-  /** Cached texts. Increases used memory, but speeds up repeated queries. */
-  final IntObjMap<byte[]> ctext = new IntObjMap<>();
-
   /** Synchronization object. */
   private final Object monitor = new Object();
-  /** Number of current index entries. */
-  final AtomicInteger size = new AtomicInteger();
 
   /**
    * Constructor, initializing the index structure.
@@ -80,14 +80,13 @@ public class DiskValues implements Index {
     synchronized(monitor) {
       final long l = idxl.length() + idxr.length();
       tb.add(LI_SIZE).add(Performance.format(l, true)).add(NL);
-      final int s = size.get();
+      final int s = size();
       for(int m = 0; m < s; ++m) {
         final long pos = idxr.read5(m * 5L);
         final int oc = idxl.readNum(pos);
         if(stats.adding(oc)) stats.add(data.text(pre(idxl.readNum()), text));
       }
     }
-
     stats.print(tb);
     return tb.finish();
   }
@@ -105,7 +104,109 @@ public class DiskValues implements Index {
     if(it instanceof StringRange) return idRange((StringRange) it);
     if(it instanceof NumericRange) return idRange((NumericRange) it);
     final IndexEntry e = entry(it.get());
-    return iter(e.size, e.pointer);
+    return iter(e.size, e.offset);
+  }
+
+  @Override
+  public final boolean drop() {
+    return data.meta.drop((text ? DATATXT : DATAATV) + '.');
+  }
+
+  @Override
+  public void close() {
+    synchronized(monitor) {
+      idxl.close();
+      idxr.close();
+    }
+  }
+
+  /**
+   * Add entries to the index.
+   * @param map a set of <key, id-list> pairs
+   */
+  @SuppressWarnings("unused")
+  public void add(final TokenObjMap<IntList> map) { }
+
+  /**
+   * Deletes index entries from the index.
+   * @param map a set of <key, id-list> pairs
+   */
+  @SuppressWarnings("unused")
+  public void delete(final TokenObjMap<IntList> map) { }
+
+  /**
+   * Replaces an index entry in the index.
+   * @param old old record key
+   * @param key new record key
+   * @param id record id
+   */
+  @SuppressWarnings("unused")
+  public void replace(final byte[] old, final byte[] key, final int id) { }
+
+  @Override
+  public EntryIterator entries(final IndexEntries input) {
+    final byte[] key = input.get();
+    if(key.length == 0) return allKeys(input.descending);
+    if(input.prefix) return keysWithPrefix(key);
+    return keysFrom(key, input.descending);
+  }
+
+  /**
+   * Flushes the buffered data.
+   */
+  public final void flush() {
+    idxl.flush();
+    idxr.flush();
+  }
+
+  /**
+   * Returns the {@code pre} value for the specified id.
+   * @param id id value
+   * @return pre value
+   */
+  protected int pre(final int id) {
+    return id;
+  }
+
+  /**
+   * Binary search for key in the {@link #idxr}.
+   * <p><em>Important:</em> This method is thread-safe.</p>
+   * @param key token to be found
+   * @return if the key is found: index of the key else: (-(insertion point) - 1)
+   */
+  protected int get(final byte[] key) {
+    return get(key, 0, size());
+  }
+
+  /**
+   * Binary search for key in the {@link #idxr} reference file.
+   * <p><em>Important:</em> This method is thread-safe.</p>
+   * @param key token to be found
+   * @param first begin of the search interval (inclusive)
+   * @param last end of the search interval (exclusive)
+   * @return if the key is found: index of the key else: (-(insertion point) - 1)
+   */
+  protected int get(final byte[] key, final int first, final int last) {
+    int l = first, h = last - 1;
+    synchronized(monitor) {
+      while(l <= h) {
+        final int m = l + h >>> 1;
+        final byte[] txt = readKeyAt(m).key;
+        final int d = diff(txt, key);
+        if(d == 0) return m;
+        if(d < 0) l = m + 1;
+        else h = m - 1;
+      }
+    }
+    return -(l + 1);
+  }
+
+  /**
+   * Returns the number of index entries.
+   * @return number of index entries
+   */
+  protected int size() {
+    return size.get();
   }
 
   /**
@@ -135,21 +236,13 @@ public class DiskValues implements Index {
     return cache.add(tok, count, pointer);
   }
 
-  @Override
-  public EntryIterator entries(final IndexEntries input) {
-    final byte[] key = input.get();
-    if(key.length == 0) return allKeys(input.descending);
-    if(input.prefix) return keysWithPrefix(key);
-    return keysFrom(key, input.descending);
-  }
-
   /**
    * Returns all index entries.
    * @param reverse return in a reverse order
    * @return entries
    */
   private EntryIterator allKeys(final boolean reverse) {
-    final int s = size.get() - 1;
+    final int s = size() - 1;
     return reverse ? keysWithinReverse(0, s) : keysWithin(0, s);
   }
 
@@ -160,7 +253,7 @@ public class DiskValues implements Index {
    * @return entries
    */
   private EntryIterator keysFrom(final byte[] key, final boolean reverse) {
-    final int s = size.get() - 1;
+    final int s = size() - 1;
     int i = get(key);
     if(i < 0) i = -i - 1;
     return reverse ? keysWithinReverse(0, i - 1) : keysWithin(i, s);
@@ -174,7 +267,7 @@ public class DiskValues implements Index {
   private EntryIterator keysWithPrefix(final byte[] prefix) {
     final int i = get(prefix);
     return new EntryIterator() {
-      final int s = size.get();
+      final int s = size();
       int ix = (i < 0 ? -i - 1 : i) - 1; // -1 in order to use the faster ++ix operator
       int count = -1;
 
@@ -279,10 +372,7 @@ public class DiskValues implements Index {
     final long pos = idxr.read5(index * 5L);
     // read and ignore the number of ids in the list
     final int cnt = idxl.readNum(pos);
-    if(key == null) {
-      final int id = idxl.readNum();
-      key = data.text(pre(id), text);
-    }
+    if(key == null) key = data.text(pre(idxl.readNum()), text);
 
     return cache.add(key, cnt, pos + Num.length(cnt));
   }
@@ -296,11 +386,10 @@ public class DiskValues implements Index {
    */
   private IndexIterator iter(final int sz, final long offset) {
     final IntList pres = new IntList(sz);
-    long p = offset;
     synchronized(monitor) {
+      idxl.cursor(offset);
       for(int i = 0, id = 0; i < sz; i++) {
-        id += idxl.readNum(p);
-        p = idxl.cursor();
+        id += idxl.readNum();
         pres.add(pre(id));
       }
     }
@@ -318,7 +407,7 @@ public class DiskValues implements Index {
     final IntList pres = new IntList();
     synchronized(monitor) {
       final int i = get(tok.min);
-      final int s = size.get();
+      final int s = size();
       for(int l = i < 0 ? -i - 1 : tok.mni ? i : i + 1; l < s; l++) {
         final int ps = idxl.readNum(idxr.read5(l * 5L));
         int id = idxl.readNum();
@@ -351,7 +440,7 @@ public class DiskValues implements Index {
 
     final IntList pres = new IntList();
     synchronized(monitor) {
-      final int s = size.get();
+      final int s = size();
       for(int l = 0; l < s; ++l) {
         final int ds = idxl.readNum(idxr.read5(l * 5L));
         int id = idxl.readNum();
@@ -402,90 +491,29 @@ public class DiskValues implements Index {
     };
   }
 
-  /**
-   * Returns the {@code pre} value for the specified id.
-   * @param id id value
-   * @return pre value
-   */
-  int pre(final int id) {
-    return id;
-  }
-
-  /**
-   * Binary search for key in the {@link #idxr}.
-   * <p><em>Important:</em> This method is thread-safe.</p>
-   * @param key token to be found
-   * @return if the key is found: index of the key else: (-(insertion point) - 1)
-   */
-  int get(final byte[] key) {
-    return get(key, 0, size.get());
-  }
-
-  /**
-   * Binary search for key in the {@link #idxr} reference file.
-   * <p><em>Important:</em> This method is thread-safe.</p>
-   * @param key token to be found
-   * @param first begin of the search interval (inclusive)
-   * @param last end of the search interval (exclusive)
-   * @return if the key is found: index of the key else: (-(insertion point) - 1)
-   */
-  int get(final byte[] key, final int first, final int last) {
-    int l = first, h = last - 1;
-    synchronized(monitor) {
-      while(l <= h) {
-        final int m = l + h >>> 1;
-        final byte[] txt = readKeyAt(m).key;
-        final int d = diff(txt, key);
-        if(d == 0) return m;
-        if(d < 0) l = m + 1;
-        else h = m - 1;
+  @Override
+  public String toString() {
+    final int sz = size();
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add(text ? "Text" : "Attribute").add(" index of '").add(data.meta.name).add("':\n");
+    if(sz != 0) {
+      tb.add("- entries: ").addInt(sz).add("\n");
+      tb.add("- references:").add("\n");
+      for(int m = 0; m < sz; m++) {
+        final long pos = idxr.read5(m * 5L);
+        final int oc = idxl.readNum(pos);
+        int id = idxl.readNum();
+        final byte[] txt = data.text(pre(id), text);
+        tb.add("  ").addInt(m).add(": key \"").add(txt).add("\", offset ").addLong(pos);
+        tb.add(", id dists ").addInt(id).add('/').addInt(pre(id));
+        for(int n = 1; n < oc; n++) {
+          final int x = idxl.readNum();
+          id += x;
+          tb.add(",").addInt(id).add('/').addInt(pre(id));
+        }
+        tb.add("\n");
       }
     }
-    return -(l + 1);
+    return tb.toString().trim();
   }
-
-  /**
-   * Flushes the buffered data.
-   */
-  public void flush() {
-    idxl.flush();
-    idxr.flush();
-  }
-
-  @Override
-  public final boolean drop() {
-    return data.meta.drop((text ? DATATXT : DATAATV) + '.');
-  }
-
-  @Override
-  public void close() {
-    synchronized(monitor) {
-      flush();
-      idxl.close();
-      idxr.close();
-    }
-  }
-
-  /**
-   * Add entries to the index.
-   * @param map a set of <key, id-list> pairs
-   */
-  @SuppressWarnings("unused")
-  public void add(final TokenObjMap<IntList> map) { }
-
-  /**
-   * Deletes index entries from the index.
-   * @param map a set of <key, id-list> pairs
-   */
-  @SuppressWarnings("unused")
-  public void delete(final TokenObjMap<IntList> map) { }
-
-  /**
-   * Replaces an index entry in the index.
-   * @param old old record key
-   * @param key new record key
-   * @param id record id
-   */
-  @SuppressWarnings("unused")
-  public void replace(final byte[] old, final byte[] key, final int id) { }
 }

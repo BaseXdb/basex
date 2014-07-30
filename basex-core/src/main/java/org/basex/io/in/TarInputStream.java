@@ -58,12 +58,12 @@ public final class TarInputStream extends FilterInputStream {
 
   @Override
   public synchronized void mark(final int limit) {
-    Util.notImplemented();
+    throw Util.notExpected();
   }
 
   @Override
   public synchronized void reset() {
-    Util.notImplemented();
+    throw Util.notExpected();
   }
 
   /**

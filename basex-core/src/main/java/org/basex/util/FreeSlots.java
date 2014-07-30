@@ -10,31 +10,32 @@ import java.util.Map.*;
  * @author Christian Gruen
  */
 public final class FreeSlots {
-  /** Free slots. */
+  /** Free slots: byte sizes referencing file offsets. */
   private final TreeMap<Integer, LinkedList<Long>> free = new TreeMap<>();
 
   /**
    * Adds a value for the specified slot size.
-   * @param size size
-   * @param value value
+   * @param size byte size
+   * @param offset file offset
    */
-  public void add(final int size, final long value) {
+  public void add(final int size, final long offset) {
     LinkedList<Long> ll = free.get(size);
     if(ll == null) {
       ll = new LinkedList<>();
       free.put(size, ll);
     }
-    ll.add(value);
+    ll.add(offset);
   }
 
   /**
-   * Returns an insertion position for the specified slot size.
-   * @param size ideal size
-   * @return insertion position, or {@code null} if none has been found
+   * Returns the offset of a slot that is greater than or equal to the specified size.
+   * @param size ideal byte size
+   * @param offset offset used as fallback if no free slot is available
+   * @return insertion offset
    */
-  public Long replace(final int size) {
+  public long get(final int size, final long offset) {
     Long value = null;
-    final Entry<Integer, LinkedList<Long>> ps = free.floorEntry(size);
+    final Entry<Integer, LinkedList<Long>> ps = free.ceilingEntry(size);
     if(ps != null) {
       final int sz = ps.getKey();
       final LinkedList<Long> ll = ps.getValue();
@@ -43,6 +44,6 @@ public final class FreeSlots {
       // add new slow entry if chosen entry is smaller than supplied size
       if(sz != size) add(size - sz, value + sz);
     }
-    return value;
+    return value == null ? offset : value;
   }
 }

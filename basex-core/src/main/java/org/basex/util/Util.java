@@ -61,17 +61,6 @@ public final class Util {
   }
 
   /**
-   * Throws a runtime exception for an unimplemented method.
-   * @param ext optional extension
-   * @return runtime exception (indicates that an error is raised)
-   */
-  public static UnsupportedOperationException notImplemented(final Object... ext) {
-    final TokenBuilder tb = new TokenBuilder("Not Implemented");
-    if(ext.length != 0) tb.addExt(" (%)", ext);
-    return new UnsupportedOperationException(tb.add('.').toString());
-  }
-
-  /**
    * Returns the class name of the specified object, excluding its path.
    * @param object object
    * @return class name

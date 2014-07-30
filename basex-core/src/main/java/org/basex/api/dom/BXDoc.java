@@ -104,12 +104,12 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public DOMConfiguration getDomConfig() {
-    throw Util.notImplemented();
+    throw notImplemented();
   }
 
   @Override
   public BXElem getElementById(final String id) {
-    throw Util.notImplemented();
+    throw notImplemented();
   }
 
   @Override
@@ -119,7 +119,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXNList getElementsByTagNameNS(final String uri, final String name) {
-    throw Util.notImplemented();
+    throw notImplemented();
   }
 
   @Override
@@ -134,7 +134,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public boolean getStrictErrorChecking() {
-    throw Util.notImplemented();
+    throw notImplemented();
   }
 
   @Override
@@ -154,7 +154,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXNode importNode(final Node node, final boolean deep) {
-    throw Util.notImplemented();
+    throw notImplemented();
   }
 
   @Override
@@ -174,16 +174,16 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public void setStrictErrorChecking(final boolean value) {
-    throw Util.notImplemented();
+    throw notImplemented();
   }
 
   @Override
   public void setXmlStandalone(final boolean value) {
-    throw Util.notImplemented();
+    throw notImplemented();
   }
 
   @Override
   public void setXmlVersion(final String value) {
-    throw Util.notImplemented();
+    throw notImplemented();
   }
 }

@@ -159,7 +159,7 @@ public final class IndexCache {
    */
   private static void update(final IndexEntry entry, final int sz, final long poi) {
     entry.size = sz;
-    entry.pointer = poi;
+    entry.offset = poi;
   }
 
   /**

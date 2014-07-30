@@ -82,8 +82,7 @@ public final class AtomicUpdateCache {
    * @param clip insertion sequence data clip
    * @param attr insert attribute if true or a node of any other kind if false
    */
-  public void addInsert(final int pre, final int par, final DataClip clip,
-      final boolean attr) {
+  public void addInsert(final int pre, final int par, final DataClip clip, final boolean attr) {
     considerAtomic(attr ? InsertAttr.getInstance(pre, par, clip) :
       Insert.getInstance(pre, par, clip), false);
   }

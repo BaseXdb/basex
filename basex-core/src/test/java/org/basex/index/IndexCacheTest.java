@@ -102,6 +102,6 @@ public final class IndexCacheTest {
   private void assertCacheEntry(final byte[] key, final int size, final long pointer) {
     final IndexEntry entry = cache.get(key);
     assertEquals(entry.size, size);
-    assertEquals(entry.pointer, pointer);
+    assertEquals(entry.offset, pointer);
   }
 }
