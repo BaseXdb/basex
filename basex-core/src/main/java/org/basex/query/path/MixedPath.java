@@ -58,7 +58,7 @@ public final class MixedPath extends Path {
         // loop through all input items
         int nodes = 0;
         for(Item it; (it = res.next()) != null;) {
-          if(path && !it.type.isNode()) throw PATHNODE.get(info, it.type);
+          if(path && !it.type.isNode()) throw PATHNODE.get(info, step, it.type, it);
           qc.value = it;
 
           // loop through all resulting items
@@ -75,8 +75,10 @@ public final class MixedPath extends Path {
           // check if both nodes and atomic values occur in last result
           if(path && nodes > 0) throw EVALNODESVALS.get(info);
           // check if input for next axis step consists items other than nodes
-          if(s + 1 < sl && !(steps[s + 1] instanceof Bang))
-            throw PATHNODE.get(info, vb.get(0).type);
+          if(s + 1 < sl && !(steps[s + 1] instanceof Bang)) {
+            final Item it = vb.get(0);
+            throw PATHNODE.get(info, it.type, it);
+          }
         }
 
         if(path && nodes == vs) {

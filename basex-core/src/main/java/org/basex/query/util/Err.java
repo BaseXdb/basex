@@ -638,7 +638,7 @@ public enum Err {
   SERWHICH(SEPM, 17, "Serialization parameter '%' is invalid."),
 
   /** XPDY0002. */
-  NOCTX(XPDY, 2, "No context item defined to evaluate '%'."),
+  NOCTX(XPDY, 2, "%: no context item bound."),
   /** XPDY0002. */
   VAREMPTY(XPDY, 2, "No value assigned to %."),
   /** XPDY0050. */
@@ -900,9 +900,9 @@ public enum Err {
   /** XPTY0018. */
   EVALNODESVALS(XPTY, 18, "Path yields both nodes and atomic values."),
   /** XPTY0019. */
-  PATHNODE(XPTY, 19, "Steps within a path expression must yield nodes; % found."),
+  PATHNODE(XPTY, 19, "%: node expected as input, % found: %."),
   /** XPTY0020. */
-  STEPNODE(XPTY, 20, "Context node required for %; % found."),
+  STEPNODE(XPTY, 20, "%: node expected as input, % found: %."),
   /** XPTY0117. */
   NSSENS(XPTY, 117, "Cannot cast % to %."),
 

@@ -410,7 +410,7 @@ public abstract class ParseExpr extends Expr {
     final Value v = qc.value;
     if(v instanceof ANode) return (ANode) v;
     if(v == null) throw NOCTX.get(info, this);
-    throw STEPNODE.get(info, this, v.type);
+    throw STEPNODE.get(info, this, v.type, v);
   }
 
   /**
