@@ -13,7 +13,6 @@ import java.util.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import org.apache.commons.codec.digest.*;
 import org.basex.*;
 import org.basex.build.*;
 import org.basex.build.JsonOptions.JsonFormat;
@@ -40,7 +39,6 @@ public final class HTTPContext {
   public final String method;
   /** Request method. */
   public final HTTPParams params;
-
   /** Serialization parameters. */
   private SerializerOptions sopts;
   /** Result wrapping. */
@@ -49,16 +47,10 @@ public final class HTTPContext {
   public String user;
   /** Password. */
   public String pass;
-  /** Auth Method */
-  public StringOption auth;
-  /** Auth Type. */
-  public StringOption atype;
-
   /** Global static database context. */
   private static Context context;
   /** Initialization flag. */
   private static boolean init;
-
   /** Performance. */
   private final Performance perf = new Performance();
   /** Segments. */
@@ -66,9 +58,9 @@ public final class HTTPContext {
   /** Nonce for Digest Auth. */
   public String nonce;
   /** Realm for Digest Auth. */
-  private final String realm;
-  /** Used in header calc */
-  public String type;
+  private String realm;
+  /** Auth Type.  */
+  public String authtype;
 
 
   /**
@@ -98,28 +90,26 @@ public final class HTTPContext {
     res.setCharacterEncoding(UTF8);
     segments = decode(toSegments(req.getPathInfo()));
 
-    nonce = context.nonce;
+    nonce = Context.nonce;
 
     // adopt servlet-specific credentials or use global ones
     final GlobalOptions mprop = context().globalopts;
     user = servlet.user != null ? servlet.user : mprop.get(GlobalOptions.USER);
     pass = servlet.pass != null ? servlet.pass : mprop.get(GlobalOptions.PASSWORD);
-    String atype = mprop.get(GlobalOptions.AUTHMETHOD);
-
-    type = atype;
+    authtype = mprop.get(GlobalOptions.AUTHMETHOD);
 
     // overwrite credentials with session-specific data
     final String auth = req.getHeader(AUTHORIZATION);
 
 
 
-  if (auth == null){
+    if (auth == null){
 
       res.addHeader("WWW-Authenticate", getAuthenticateHeader());
-      //res.addHeader(WWW_AUTHENTICATE, BASIC);
+
       res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-  }
-      if(auth != null && atype != null) {
+    }
+      if(auth != null && mprop.get(GlobalOptions.AUTHMETHOD) != null) {
       final String[] values = auth.split(" ");
       if(values[0].equals(BASIC)){
         final String[] cred = Base64.decode(values[1]).split(":", 2);
@@ -129,7 +119,7 @@ public final class HTTPContext {
       }else if(values[0].equals(DIGEST)){
         HashMap<String, String> headerValues = parseHeader(auth);
         user = headerValues.get("username");
-        //user = "admin";
+        /** Password for digest auth. */
         pass = "admin";
         authenticate();
       }else {
@@ -293,23 +283,19 @@ public final class HTTPContext {
     /** Created context object here */
     Context ctx = null;
 
-    //res.setContentType("text/html;charset=UTF-8");
-    //PrintWriter out = res.getWriter();
-
     try {
-      String auth = req.getHeader(AUTHORIZATION);
 
       if(user == null || user.isEmpty())
         throw new LoginException(NOPASSWD);
 
-      else if(auth.startsWith(BASIC) && pass != null){
+      else if(req.getHeader(AUTHORIZATION).startsWith(BASIC) && pass != null){
       ctx = new Context(context(), null);
       ctx.user = ctx.users.get(user);
 
       if(ctx.user == null || !ctx.user.password.equals(md5(pass))) throw new LoginException();
 
 
-      }else { if(auth.startsWith(DIGEST))
+      }else { if(req.getHeader(AUTHORIZATION).startsWith(DIGEST))
 
         ctx = new Context(context(), null);
 
@@ -323,31 +309,21 @@ public final class HTTPContext {
 
         }
 
-        HashMap<String, String> headerValues = parseHeader(auth);
+        HashMap<String, String> headerValues = parseHeader(req.getHeader(AUTHORIZATION));
 
-        String method = req.getMethod();
-
-      //   TODO Something with password
-
-        String HA1 = Token.md5(ctx.user.name + ":" + realm + ":" + pass);
-        //String HA1 = "1a2ec214025c13676dcb66f53addb3a2";
+        String ha1 = Token.md5(ctx.user.name + ":" + realm + ":" + pass);
 
         String reqURI = headerValues.get("uri");
 
-        String HA2 = Token.md5(method + ":" + reqURI);
+        String ha2 = Token.md5(req.getMethod() + ":" + reqURI);
 
          String serverResponse;
 
-         {
-
-           serverResponse = Token.md5(HA1 + ":" + nonce + ":" + HA2);
-
-         }
+         serverResponse = Token.md5(ha1 + ":" + nonce + ":" + ha2);
 
         String clientResponse = headerValues.get("response");
 
-        if(!serverResponse.equals(clientResponse) && !res.isCommitted()) // throw new LoginException();
-          {
+        if(!serverResponse.equals(clientResponse) && !res.isCommitted()){
             /** res.isCommited is added to resolve the lang.Illegal Exception: Commited. */
             res.addHeader("WWW-Authenticate", getAuthenticateHeader());
             res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
@@ -364,43 +340,44 @@ public final class HTTPContext {
     }
   }
 
-
-
   /**
    * Authenticate Header.
+   * @return header
    */
   private String getAuthenticateHeader() {
     String header = "";
-    if(type.equals(BASIC)){
+    if(authtype.equals(BASIC)){
     header = BASIC;
-    }else if(type.equals(DIGEST)){
-
+    }else if(authtype.equals(DIGEST)){
     header += "Digest realm=\"" + realm + "\",";
     header += "nonce=\"" + nonce + "\",";
     header += "opaque=\"" + getOpaque(realm, nonce) + "\"";
-  }return header;
-
+    }
+    return header;
 }
+
  /**
   * Opaque used in Digest Auth.
-  * @param realm
-  * @param nonce
-  * @return
+  * @param r Realm
+  * @param n Nonce
+  * @return Opaque
   */
-  private String getOpaque(final String realm, final String nonce) {
-
+  private String getOpaque(final String r, final String n) {
+    realm = r;
+    nonce = n;
     return Token.md5(realm + nonce);
 }
+
 /**
  * Parsing header for Digest Auth.
- * @param headerString
- * @return
+ * @param headerString Header String
+ * @return values
  */
-  private HashMap<String, String> parseHeader(String headerString) {
+  private HashMap<String, String> parseHeader(final String headerString) {
 
     String headerStringWithoutScheme = headerString.substring(headerString.indexOf(" ") + 1).trim();
     HashMap<String, String> values = new HashMap<>();
-    String keyValueArray[] = headerStringWithoutScheme.split(",");
+    String[] keyValueArray = headerStringWithoutScheme.split(",");
     for (String keyval : keyValueArray) {
         if (keyval.contains("=")) {
             String key = keyval.substring(0, keyval.indexOf("="));

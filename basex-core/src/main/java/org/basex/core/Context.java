@@ -43,8 +43,6 @@ public final class Context {
   public final Repo repo;
   /** Databases list. */
   public final Databases databases;
-    /** Auth Method. */
-
   /** User reference. */
   public User user;
   /** Log. */

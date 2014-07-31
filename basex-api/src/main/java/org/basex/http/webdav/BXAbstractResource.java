@@ -2,16 +2,17 @@ package org.basex.http.webdav;
 
 import static org.basex.http.webdav.impl.Utils.*;
 import static com.bradmcevoy.http.LockResult.*;
+
 import java.io.*;
 import java.util.*;
 
 import org.basex.http.webdav.impl.ResourceMetaData;
 import org.basex.http.webdav.impl.WebDAVService;
-import org.basex.server.LoginException;
 import org.basex.util.*;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.exceptions.*;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -49,7 +50,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
     if(user == null) return null;
     return new BXCode<Object>(this) {
       @Override
-      public String get() throws LoginException {
+      public String get() throws IOException {
         service.authenticate(user, pass);
         return user;
       }
