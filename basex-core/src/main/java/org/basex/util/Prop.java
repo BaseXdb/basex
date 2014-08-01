@@ -70,7 +70,7 @@ public final class Prop {
   /** Title and version. */
   public static final String TITLE = NAME + ' ' + VERSION;
 
-  /** New line string. */
+  /** System-specific newline string. */
   public static final String NL = System.getProperty("line.separator");
   /** Returns the system's default encoding. */
   public static final String ENCODING = System.getProperty("file.encoding");

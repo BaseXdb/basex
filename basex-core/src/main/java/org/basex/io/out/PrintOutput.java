@@ -5,9 +5,7 @@ import java.io.*;
 import org.basex.util.*;
 
 /**
- * This class is a stream-wrapper for textual data. Note that the internal
- * byte representation (usually UTF8) will be directly output without
- * further character conversion.
+ * This class is a stream-wrapper for textual data encoded in UTF8.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
@@ -70,11 +68,11 @@ public class PrintOutput extends OutputStream {
   }
 
   /**
-   * Writes a character as UTF8.
+   * Prints a unicode character.
    * @param ch character to be printed
    * @throws IOException I/O exception
    */
-  public void utf8(final int ch) throws IOException {
+  public void print(final int ch) throws IOException {
     if(ch <= 0x7F) {
       write(ch);
     } else if(ch <= 0x7FF) {
@@ -90,16 +88,6 @@ public class PrintOutput extends OutputStream {
       write(ch >>  6 & 0x3F | 0x80);
       write(ch & 0x3F | 0x80);
     }
-  }
-
-  /**
-   * Writes a string to the output stream, suffixed by a 0 byte.
-   * @param str string to be written
-   * @throws IOException I/O exception
-   */
-  public final void writeString(final String str) throws IOException {
-    print(Token.token(str));
-    write(0);
   }
 
   /**
@@ -131,7 +119,7 @@ public class PrintOutput extends OutputStream {
   }
 
   /**
-   * Prints a token to the output stream.
+   * Prints a token to the output stream, followed by a system-specific newline.
    * @param token token to be written
    * @throws IOException I/O exception
    */

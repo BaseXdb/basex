@@ -482,7 +482,7 @@ public abstract class OutputSerializer extends Serializer {
   protected void print(final int ch) throws IOException {
     // comparison by reference
     if(utf8) {
-      out.utf8(ch);
+      out.print(ch);
     } else {
       encbuffer.reset();
       encoder.reset();

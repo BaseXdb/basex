@@ -130,7 +130,8 @@ public final class ClientListener extends Thread {
           // send 0 to mark end of potential result
           out.write(0);
           // send {INFO}0
-          out.writeString(msg);
+          out.print(msg);
+          out.write(0);
           // send 1 to mark error
           send(false);
           continue;
@@ -335,7 +336,8 @@ public final class ClientListener extends Thread {
     // write feedback to log file
     log(info, ok);
     // send {MSG}0 and (0|1) as (success|error) flag
-    out.writeString(info);
+    out.print(info);
+    out.write(0);
     send(ok);
   }
 
@@ -398,8 +400,10 @@ public final class ClientListener extends Thread {
 
     // initialize server-based event handling
     if(!events) {
-      out.writeString(Integer.toString(context.globalopts.get(GlobalOptions.EVENTPORT)));
-      out.writeString(Long.toString(getId()));
+      out.print(Integer.toString(context.globalopts.get(GlobalOptions.EVENTPORT)));
+      out.write(0);
+      out.print(Long.toString(getId()));
+      out.write(0);
       out.flush();
       events = true;
     }
@@ -459,7 +463,8 @@ public final class ClientListener extends Thread {
         arg = Integer.toString(id++);
         queries.put(arg, qp);
         // send {ID}0
-        out.writeString(arg);
+        out.print(arg);
+        out.write(0);
         // write log file
         info.append(query);
       } else {
@@ -518,7 +523,8 @@ public final class ClientListener extends Thread {
       // send 0 as end marker, 1 as error flag, and {MSG}0
       out.write(0);
       out.write(1);
-      out.writeString(err);
+      out.print(err);
+      out.write(0);
     }
     out.flush();
   }

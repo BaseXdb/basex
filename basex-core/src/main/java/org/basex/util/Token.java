@@ -7,9 +7,9 @@ import java.util.*;
 
 /**
  * <p>This class provides convenience operations for handling 'Tokens'.
- * Tokens are UTF-8 encoded strings, stored in a byte array.</p>
+ * A token is a UTF-8 encoded string. It is represented as a byte array.</p>
  *
- * <p>Note that, to guarantee a consistent string representation, all string
+ * <p>In order to ensure a consistent representation of tokens in the project, all string
  * conversions should be done via the methods of this class.</p>
  *
  * @author BaseX Team 2005-14, BSD License

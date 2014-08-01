@@ -94,7 +94,7 @@ public final class Store extends ACreate {
       final InputStream is = in.getByteStream();
       final String id = in.getSystemId();
       if(r != null) {
-        for(int c; (c = r.read()) != -1;) po.utf8(c);
+        for(int c; (c = r.read()) != -1;) po.print(c);
       } else if(is != null) {
         for(int b; (b = is.read()) != -1;) po.write(b);
       } else if(id != null) {
