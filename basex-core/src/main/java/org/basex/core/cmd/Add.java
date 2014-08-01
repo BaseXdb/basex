@@ -66,7 +66,7 @@ public final class Add extends ACreate {
 
         finishUpdate();
       }
-      return true;
+      return info(RES_ADDED_X, perf);
     } finally {
       close();
     }
@@ -122,8 +122,7 @@ public final class Add extends ACreate {
         build = new MemBuilder(name, parser);
       }
       clip = new DataClip(build.build());
-      // return info message
-      return info(parser.info() + RES_ADDED_X, name, perf);
+      return true;
     } catch(final IOException ex) {
       return error(Util.message(ex));
     }
