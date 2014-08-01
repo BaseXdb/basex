@@ -48,33 +48,42 @@ public final class Replace extends ACreate {
     if(path == null || path.isEmpty()) return error(NO_DIR_ALLOWED_X, args[0]);
 
     final Data data = context.data();
-    final IntList pre = data.resources.docs(path, true);
 
     if(!startUpdate()) return false;
     try {
-      final boolean ok;
-      final IOFile file = data.meta.binary(path);
+      final IOFile file = data.inMemory() ? null : data.meta.binary(path);
       if(file != null && file.exists()) {
         // replace binary file if it already exists
         final Store store = new Store(path);
         store.setInput(in);
         store.lock = false;
-        ok = store.run(context) || error(store.info());
+        if(!store.run(context)) return error(store.info());
       } else {
         // otherwise, add new document as xml
         final Add add = new Add(path);
-        add.setInput(in);
-        add.lock = false;
-        ok = add.run(context) || error(add.info());
-        // delete old documents if addition was successful
-        if(ok) {
-          final AtomicUpdateCache atomics = new AtomicUpdateCache(data);
-          final int ps = pre.size();
-          for(int p = 0; p < ps; p++) atomics.addDelete(pre.get(p));
-          atomics.execute(false);
+        try {
+          add.setInput(in);
+          add.init(context, out);
+          if(!add.build()) return error(add.info());
+
+          // retrieve old list of resources
+          final AtomicUpdateCache auc = new AtomicUpdateCache(data);
+          final IntList docs = data.resources.docs(path, true);
+          if(docs.isEmpty()) {
+            auc.addInsert(data.meta.size, -1, add.clip);
+          } else {
+            auc.addReplace(docs.get(0), add.clip);
+            final int ds = docs.size();
+            for(int d = 1; d < ds; d++) auc.addDelete(docs.get(d));
+          }
+
+          context.invalidate();
+          auc.execute(false);
+        } finally {
+          add.close();
         }
       }
-      return ok && info(RES_REPLACED_X_X, 1, perf);
+      return info(RES_REPLACED_X_X, 1, perf);
     } finally {
       finishUpdate();
     }

@@ -49,8 +49,7 @@ public final class Store extends ACreate {
 
     if(in == null) {
       final IO io = IO.get(args[1]);
-      if(!io.exists() || io.isDir())
-        return error(RES_NOT_FOUND_X, create ? io : args[1]);
+      if(!io.exists() || io.isDir()) return error(RES_NOT_FOUND_X, create ? io : args[1]);
       in = io.inputSource();
       // set/add name of document
       if((path.isEmpty() || path.endsWith("/")) && !(io instanceof IOContent)) path += io.name();

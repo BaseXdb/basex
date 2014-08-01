@@ -29,9 +29,11 @@ public final class Retrieve extends ACreate {
     final String path = MetaData.normPath(args[0]);
     if(path == null) return error(NAME_INVALID_X, args[0]);
 
-    final IOFile bin = context.data().meta.binary(path);
-    if(bin == null || !bin.exists() || bin.isDir())
-      return error(RES_NOT_FOUND_X, path);
+    final Data data = context.data();
+    if(data.inMemory()) return error(NO_MAINMEM);
+
+    final IOFile bin = data.meta.binary(path);
+    if(bin == null || !bin.exists() || bin.isDir()) return error(RES_NOT_FOUND_X, path);
 
     try(final BufferInput bi = new BufferInput(bin)) {
       for(int b; (b = bi.read()) != -1;) out.write(b);

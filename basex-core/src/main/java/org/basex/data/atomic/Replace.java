@@ -42,8 +42,7 @@ final class Replace extends StructuralUpdate {
     final int oldsize = data.size(pre, data.kind(pre));
     final int newsize = clip.size();
     final int sh = newsize - oldsize;
-    return new Replace(pre, sh, sh, pre + oldsize, clip,
-        data.parent(pre, data.kind(pre)));
+    return new Replace(pre, sh, sh, pre + oldsize, clip, data.parent(pre, data.kind(pre)));
   }
 
   @Override
@@ -59,10 +58,11 @@ final class Replace extends StructuralUpdate {
       final int targetParent = data.parent(location, targetKind);
       // delete first - otherwise insert must be at location+1
       data.delete(location);
-      if(targetKind == Data.ATTR)
+      if(targetKind == Data.ATTR) {
         data.insertAttr(location, targetParent, clip);
-      else
+      } else {
         data.insert(location, targetParent, clip);
+      }
     }
   }
 
@@ -91,13 +91,13 @@ final class Replace extends StructuralUpdate {
       // distance can differ for first two tuples
       if(c > 0 && src.dist(s, sk) != data.dist(t, tk))
         return false;
-      // check text / comment values
-      if(sk == Data.TEXT || sk == Data.COMM) {
+      // check texts, comments and documents
+      if(sk == Data.TEXT || sk == Data.COMM || sk == Data.DOC) {
         final byte[] srcText = src.text(s, true);
-        if(data.textLen(t, true) != src.textLen(s, true) || !eq(data.text(t, true), srcText))
+        if(!eq(data.text(t, true), srcText))
           valueUpdates.add(UpdateValue.getInstance(data, t, srcText));
       } else {
-        // check element, attribute, processing instruction name
+        // check elements, attributes and processing instructions
         final byte[] srcName = src.name(s, sk);
         final byte[] trgName = data.name(t, tk);
         if(!eq(srcName, trgName)) valueUpdates.add(Rename.getInstance(data, t, srcName, EMPTY));
@@ -118,7 +118,7 @@ final class Replace extends StructuralUpdate {
             final byte[] srcText = src.text(s, true);
             final byte[] trgText = data.text(t, true);
             final int i = indexOf(srcText, ' ');
-            srcValue =  i == -1 ? EMPTY : substring(srcText, i + 1);
+            srcValue = i == -1 ? EMPTY : substring(srcText, i + 1);
             if(!eq(srcValue, indexOf(trgText, ' ') == -1 ? EMPTY :
               substring(trgText, i + 1))) {
               valueUpdates.add(UpdateValue.getInstance(data, t, srcValue));

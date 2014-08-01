@@ -24,8 +24,11 @@ import org.basex.util.*;
 public final class Add extends ACreate {
   /** Builder. */
   private Builder build;
-  /** Indicates if database should be locked. */
-  boolean lock = true;
+
+  /** Data clip to insert. */
+  DataClip clip;
+  /** Name of temporary database instance. */
+  private String clipDB;
 
   /**
    * Constructor, specifying a target path.
@@ -48,6 +51,32 @@ public final class Add extends ACreate {
 
   @Override
   protected boolean run() {
+    try {
+      if(!build()) return false;
+
+      // skip update if fragment is empty
+      if(clip.data.meta.size > 1) {
+        if(!startUpdate()) return false;
+
+        context.invalidate();
+        final Data data = context.data();
+        final AtomicUpdateCache auc = new AtomicUpdateCache(data);
+        auc.addInsert(data.meta.size, -1, clip);
+        auc.execute(false);
+
+        finishUpdate();
+      }
+      return true;
+    } finally {
+      close();
+    }
+  }
+
+  /**
+   * Builds a data clip for the document(s) to be added.
+   * @return success flag
+   */
+  boolean build() {
     String name = MetaData.normPath(args[0]);
     if(name == null) return error(NAME_INVALID_X, args[0]);
 
@@ -73,8 +102,6 @@ public final class Add extends ACreate {
       name = name.substring(s + 1);
     }
 
-    final Data data = context.data();
-
     // get name from io reference
     if(name.isEmpty()) name = io.name();
     else io.name(name);
@@ -82,37 +109,33 @@ public final class Add extends ACreate {
     // ensure that the final name is not empty
     if(name.isEmpty()) return error(NAME_INVALID_X, name);
 
-    String db = null;
-    Data tmp = null;
     try {
+      final Data data = context.data();
       final Parser parser = new DirParser(io, context, data.meta.path);
       parser.target(target);
 
       // create random database name for disk-based creation
       if(cache(parser)) {
-        db = context.globalopts.random(data.meta.name);
-        build = new DiskBuilder(db, parser, context);
+        clipDB = context.globalopts.random(data.meta.name);
+        build = new DiskBuilder(clipDB, parser, context);
       } else {
         build = new MemBuilder(name, parser);
       }
-
-      tmp = build.build();
-      // skip update if fragment is empty
-      if(tmp.meta.size > 1) {
-        if(lock && !startUpdate()) return false;
-        data.insert(data.meta.size, -1, new DataClip(tmp));
-        context.invalidate();
-        if(lock) finishUpdate();
-      }
+      clip = new DataClip(build.build());
       // return info message
-      return info(parser.info() + PATH_ADDED_X_X, name, perf);
+      return info(parser.info() + RES_ADDED_X, name, perf);
     } catch(final IOException ex) {
       return error(Util.message(ex));
-    } finally {
-      // close and drop intermediary database instance
-      if(tmp != null) tmp.close();
-      if(db != null) DropDB.drop(db, context);
     }
+  }
+
+  /**
+   * Finalizes an add operation.
+   */
+  void close() {
+    // close and drop intermediary database instance
+    if(clip != null) clip.data.close();
+    if(clipDB != null) DropDB.drop(clipDB, context);
   }
 
   /**

@@ -34,7 +34,7 @@ public class InsertInto extends NodeCopy {
   @Override
   public final void addAtomics(final AtomicUpdateCache l) {
     final int s = data.size(pre, data.kind(pre));
-    l.addInsert(pre + s, pre, insseq, false);
+    l.addInsert(pre + s, pre, insseq);
   }
 
   @Override

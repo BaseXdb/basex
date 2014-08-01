@@ -34,7 +34,7 @@ public final class InsertBefore extends NodeCopy {
 
   @Override
   public void addAtomics(final AtomicUpdateCache l) {
-    l.addInsert(pre, data.parent(pre, data.kind(pre)), insseq, false);
+    l.addInsert(pre, data.parent(pre, data.kind(pre)), insseq);
   }
 
   @Override

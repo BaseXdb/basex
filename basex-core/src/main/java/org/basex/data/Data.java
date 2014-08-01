@@ -439,6 +439,7 @@ public abstract class Data {
 
   /**
    * Returns a text (text, comment, pi) or attribute value as integer value.
+   * {@link Long#MIN_VALUE} is returned if the input is no valid integer.
    * @param pre pre value
    * @param text text/attribute flag
    * @return numeric value
@@ -447,6 +448,7 @@ public abstract class Data {
 
   /**
    * Returns a text (text, comment, pi) or attribute value as double value.
+   * {@link Double#NaN} is returned if the input is no valid double.
    * @param pre pre value
    * @param text text/attribute flag
    * @return numeric value
@@ -454,7 +456,7 @@ public abstract class Data {
   public abstract double textDbl(int pre, boolean text);
 
   /**
-   * Returns the byte length of a text (text, comment, pi).
+   * Returns the byte length of a (possibly compressed) text (text, comment, pi).
    * @param pre pre value
    * @param text text/attribute flag
    * @return length

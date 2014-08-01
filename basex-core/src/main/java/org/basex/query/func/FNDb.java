@@ -820,11 +820,10 @@ public final class FNDb extends StandardFunc {
     final Data data = checkData(qc);
     final String path = path(1, qc);
     final Item item = checkItem(exprs[2], qc);
-
     if(data.inMemory()) throw BXDB_MEM.get(info, data.meta.name);
+
     final IOFile file = data.meta.binary(path);
     if(file == null || file.isDir()) throw RESINV.get(info, path);
-
     qc.resources.updates().add(new DBStore(data, path, item, info), qc);
     return null;
   }

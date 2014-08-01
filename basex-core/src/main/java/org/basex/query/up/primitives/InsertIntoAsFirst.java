@@ -34,8 +34,7 @@ public final class InsertIntoAsFirst extends NodeCopy {
 
   @Override
   public void addAtomics(final AtomicUpdateCache l) {
-    l.addInsert(pre + data.attSize(pre, data.kind(pre)), pre,
-        insseq, false);
+    l.addInsert(pre + data.attSize(pre, data.kind(pre)), pre, insseq);
   }
 
   @Override

@@ -32,10 +32,10 @@ public final class Delete extends ACreate {
 
     // delete all documents
     final IntList docs = data.resources.docs(target);
-    final AtomicUpdateCache atomics = new AtomicUpdateCache(data);
+    final AtomicUpdateCache auc = new AtomicUpdateCache(data);
     final int ds = docs.size();
-    for(int d = 0; d < ds; d++) atomics.addDelete(docs.get(d));
-    atomics.execute(false);
+    for(int d = 0; d < ds; d++) auc.addDelete(docs.get(d));
+    auc.execute(false);
     context.invalidate();
 
     // delete binaries
