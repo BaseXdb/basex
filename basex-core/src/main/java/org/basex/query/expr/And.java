@@ -73,7 +73,7 @@ public final class And extends Logical {
     if(el.isEmpty()) return optPre(Bln.TRUE, qc);
 
     if(es != el.size()) qc.compInfo(OPTWRITE, this);
-    exprs = el.array();
+    exprs = el.finish();
     compFlatten(qc);
 
     boolean not = true;

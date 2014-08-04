@@ -58,7 +58,7 @@ public final class Or extends Logical {
 
     if(exprs.length != el.size()) {
       qc.compInfo(OPTWRITE, this);
-      exprs = el.array();
+      exprs = el.finish();
     }
     compFlatten(qc);
 
@@ -110,7 +110,7 @@ public final class Or extends Logical {
     // use summarized costs for estimation
     ii.costs = costs;
     // no expressions means no costs: expression will later be ignored
-    ii.expr = el.size() == 1 ? el.get(0) : new Union(info, el.array());
+    ii.expr = el.size() == 1 ? el.get(0) : new Union(info, el.finish());
     return true;
   }
 

@@ -11,6 +11,7 @@ import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.Context;
+import org.basex.query.expr.List;
 import org.basex.query.path.Test.Kind;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -86,7 +87,7 @@ public abstract class Path extends ParseExpr {
 
     // check if all steps are axis steps
     boolean axes = true;
-    final Expr[] st = stps.array();
+    final Expr[] st = stps.finish();
     for(final Expr step : st) axes &= step instanceof Step;
 
     // choose best implementation
@@ -603,7 +604,7 @@ public abstract class Path extends ParseExpr {
         }
       }
     }
-    if(!invSteps.isEmpty()) newPreds.add(get(info, null, invSteps.array()));
+    if(!invSteps.isEmpty()) newPreds.add(get(info, null, invSteps.finish()));
 
     // create resulting expression
     final ExprList resultSteps = new ExprList();
@@ -627,12 +628,12 @@ public abstract class Path extends ParseExpr {
         step = (Step) resultSteps.get(ls);
       }
       // add remaining predicates to last step
-      resultSteps.set(ls, step.addPreds(newPreds.array()));
+      resultSteps.set(ls, step.addPreds(newPreds.finish()));
     }
 
     // add remaining steps
     for(int s = iStep + 1; s < sl; s++) resultSteps.add(steps[s]);
-    return get(info, resultRoot, resultSteps.array());
+    return get(info, resultRoot, resultSteps.finish());
   }
 
   /**
@@ -669,20 +670,45 @@ public abstract class Path extends ParseExpr {
     final ExprList stps = new ExprList(sl);
     for(int s = 0; s < sl; s++) {
       final Expr step = steps[s];
-      if(s < sl - 1 && step instanceof Step && steps[s + 1] instanceof Step) {
-        final Step curr = (Step) step, next = (Step) steps[s + 1];
+      // choose simple descendants-or-self steps with succeeding step
+      if(s < sl - 1 && step instanceof Step) {
+        final Step curr = (Step) step;
         if(curr.simple(DESCORSELF, false)) {
-          // descendant-or-self::node()/child::X -> descendant::X
-          if(next.axis == CHILD && !next.has(Flag.FCS)) {
-            next.axis = DESC;
+          // check succeeding step
+          final Expr next = steps[s + 1];
+          if(next instanceof Step) {
+            final Step stp = (Step) next;
+            // descendant-or-self::node()/child::X -> descendant::X
+            if(stp.axis == CHILD && !stp.has(Flag.FCS)) {
+              stp.axis = DESC;
+              opt = true;
+              continue;
+            }
+            // descendant-or-self::node()/@X -> descendant-or-self::*/@X
+            if(stp.axis == ATTR && !stp.has(Flag.FCS)) {
+              curr.test = new NameTest(false);
+              opt = true;
+            }
+          }
+          // descendant-or-self::node()/(child::X, child::Y) -> (descendant::X | descendant::Y)
+          Expr e = mergeList(next);
+          if(e != null) {
+            steps[s + 1] = e;
             opt = true;
             continue;
           }
-          // descendant-or-self::node()/@X -> descendant-or-self::*/@X
-          if(next.axis == ATTR && !next.has(Flag.FCS)) {
-            curr.test = new NameTest(false);
-            opt = true;
+          // //(x | y)[text() = 'x'] -> (descendant::X | descendant::Y)[text() = 'x']
+          // check succeeding filter expression
+          if(next instanceof Filter) {
+            final Filter f = (Filter) next;
+            e = mergeList(f.root);
+            if(e != null) {
+              f.root = e;
+              opt = true;
+              continue;
+            }
           }
+
         }
       }
       stps.add(step);
@@ -690,9 +716,41 @@ public abstract class Path extends ParseExpr {
 
     if(opt) {
       qc.compInfo(OPTDESC);
-      return get(info, root, stps.array());
+      return get(info, root, stps.finish());
     }
     return this;
+  }
+
+  /**
+   * Trie to rewrite union or list expressions.
+   * @param expr input expression
+   * @return rewriting flag
+   */
+  private Expr mergeList(final Expr expr) {
+    if(expr instanceof Union || expr instanceof List) {
+      final Arr next = (Arr) expr;
+      if(childSteps(next)) {
+        for(final Expr e : next.exprs) ((Step) ((Path) e).steps[0]).axis = DESC;
+        return new Union(next.info, next.exprs);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Checks if the expressions in the specified array start with child steps.
+   * @param list array to be checked
+   * @return result of check
+   */
+  private boolean childSteps(final Arr list) {
+    for(final Expr e : list.exprs) {
+      if(!(e instanceof Path)) return false;
+      final Path p = (Path) e;
+      if(p.root != null || !(p.steps[0] instanceof Step)) return false;
+      final Step n = (Step) p.steps[0];
+      if(n.axis != CHILD || n.has(Flag.FCS)) return false;
+    }
+    return true;
   }
 
   @Override

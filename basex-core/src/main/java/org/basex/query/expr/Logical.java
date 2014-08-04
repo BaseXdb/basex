@@ -48,7 +48,7 @@ public abstract class Logical extends Arr {
       }
     }
     if(el.isEmpty()) return Bln.get(and);
-    exprs = el.array();
+    exprs = el.finish();
     return this;
   }
 
@@ -89,6 +89,6 @@ public abstract class Logical extends Arr {
         tmp.add(ex);
       }
     }
-    exprs = tmp.array();
+    exprs = tmp.finish();
   }
 }

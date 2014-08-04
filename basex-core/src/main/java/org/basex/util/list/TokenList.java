@@ -198,7 +198,7 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
 
   /**
    * Returns the token as byte array, and invalidates the internal array.
-   * Warning: the function must only be called if the builder is discarded afterwards.
+   * Warning: the function must only be called if the list is discarded afterwards.
    * @return token
    */
   public byte[][] finish() {

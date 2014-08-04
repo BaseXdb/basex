@@ -957,7 +957,7 @@ public class QueryParser extends InputParser {
     if(!wsConsume(COMMA)) return e;
     final ExprList el = new ExprList(e);
     do add(el, single()); while(wsConsume(COMMA));
-    return new List(info(), el.array());
+    return new List(info(), el.finish());
   }
 
   /**
@@ -1344,7 +1344,7 @@ public class QueryParser extends InputParser {
       }
       wsCheck(RETURN);
       cases.set(0, check(single(), NOSWITCH));
-      exprs = Array.add(exprs, new SwitchCase(info(), cases.array()));
+      exprs = Array.add(exprs, new SwitchCase(info(), cases.finish()));
     } while(cases.size() != 1);
 
     return new Switch(info(), expr, exprs);
@@ -1419,7 +1419,7 @@ public class QueryParser extends InputParser {
 
     final ExprList el = new ExprList(e);
     do add(el, and()); while(wsConsumeWs(OR));
-    return new Or(info(), el.array());
+    return new Or(info(), el.finish());
   }
 
   /**
@@ -1433,7 +1433,7 @@ public class QueryParser extends InputParser {
 
     final ExprList el = new ExprList(e);
     do add(el, update()); while(wsConsumeWs(AND));
-    return new And(info(), el.array());
+    return new And(info(), el.finish());
   }
 
   /**
@@ -1510,7 +1510,7 @@ public class QueryParser extends InputParser {
 
     final ExprList el = new ExprList(e);
     do add(el, range()); while(wsConsume(CONCAT));
-    return Function.CONCAT.get(sc, info(), el.array());
+    return Function.CONCAT.get(sc, info(), el.finish());
   }
 
   /**
@@ -1565,7 +1565,7 @@ public class QueryParser extends InputParser {
     if(e == null || !isUnion()) return e;
     final ExprList el = new ExprList(e);
     do add(el, intersect()); while(isUnion());
-    return new Union(info(), el.array());
+    return new Union(info(), el.finish());
   }
 
   /**
@@ -1592,12 +1592,12 @@ public class QueryParser extends InputParser {
     if(wsConsumeWs(INTERSECT)) {
       final ExprList el = new ExprList(e);
       do add(el, instanceoff()); while(wsConsumeWs(INTERSECT));
-      return new InterSect(info(), el.array());
+      return new InterSect(info(), el.finish());
     }
     if(wsConsumeWs(EXCEPT)) {
       final ExprList el = new ExprList(e);
       do add(el, instanceoff()); while(wsConsumeWs(EXCEPT));
-      return new Except(info(), el.array());
+      return new Except(info(), el.finish());
     }
     return e;
   }
@@ -1801,7 +1801,7 @@ public class QueryParser extends InputParser {
       else root = ex;
       relativePath(el);
     }
-    return Path.get(info(), root, el.array());
+    return Path.get(info(), root, el.finish());
   }
 
   /**
@@ -1931,7 +1931,7 @@ public class QueryParser extends InputParser {
       wsCheck(BR2);
       checkPred(false);
     }
-    return Step.get(info(), ax, test, el.array());
+    return Step.get(info(), ax, test, el.finish());
   }
 
   /**
@@ -2005,14 +2005,14 @@ public class QueryParser extends InputParser {
           add(el, expr());
           wsCheck(BR2);
         } while(wsConsume(BR1));
-        e = Filter.get(info(), e, el.array());
+        e = Filter.get(info(), e, el.finish());
       } else if(e != null) {
         if(!wsConsume(PAR1)) break;
 
         final InputInfo ii = info();
         final ExprList argList = new ExprList();
         final int[] holes = argumentList(argList, e);
-        final Expr[] args = argList.array();
+        final Expr[] args = argList.finish();
         // only set updating flag if updating and non-updating expressions are mixed
         Ann ann = null;
         if(e instanceof FuncItem) ann = ((FuncItem) e).annotations();
@@ -2092,7 +2092,7 @@ public class QueryParser extends InputParser {
       } while(wsConsume(COMMA));
       wsCheck(BRACE2);
     }
-    return el.array();
+    return el.finish();
   }
 
   /**
@@ -2290,7 +2290,7 @@ public class QueryParser extends InputParser {
         final InputInfo ii = info();
         final ExprList argList = new ExprList();
         final int[] holes = argumentList(argList, name.string());
-        final Expr[] args = argList.array();
+        final Expr[] args = argList.finish();
         alter = FUNCUNKNOWN;
         alterFunc = name;
         alterPos = pos;
@@ -2463,7 +2463,7 @@ public class QueryParser extends InputParser {
         if(atts == null) atts = new ArrayList<>(1);
         atts.add(attn);
         names.add(new QNmCheck(attn, false));
-        add(cont, new CAttr(sc, info(), false, attn, attv.array()));
+        add(cont, new CAttr(sc, info(), false, attn, attv.finish()));
       }
       if(!consumeWS()) break;
     }
@@ -2499,7 +2499,7 @@ public class QueryParser extends InputParser {
 
     sc.ns.size(s);
     sc.elemNS = nse;
-    return new CElem(sc, info(), name, ns, cont.array());
+    return new CElem(sc, info(), name, ns, cont.finish());
   }
 
   /**
@@ -3589,7 +3589,7 @@ public class QueryParser extends InputParser {
           if(!wsConsume(PAR2)) throw error(FUNCMISS, func);
         }
         qc.updating();
-        return new DynFuncCall(ii, sc, true, func, argList.array());
+        return new DynFuncCall(ii, sc, true, func, argList.finish());
       }
     }
     pos = p;

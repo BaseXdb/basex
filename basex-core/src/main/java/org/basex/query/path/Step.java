@@ -101,7 +101,7 @@ public abstract class Step extends Preds {
           el.add(Function.BOOLEAN.get(null, info, a).compEbv(qc));
         }
         for(final Expr e : Arrays.asList(preds).subList(p + 1, preds.length)) el.add(e);
-        preds = el.array();
+        preds = el.finish();
       } else {
         preds[p] = pr;
       }

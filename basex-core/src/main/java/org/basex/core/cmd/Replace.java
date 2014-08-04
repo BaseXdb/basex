@@ -50,6 +50,7 @@ public final class Replace extends ACreate {
     final Data data = context.data();
 
     if(!startUpdate()) return false;
+    int sz = 1;
     try {
       final IOFile file = data.inMemory() ? null : data.meta.binary(path);
       if(file != null && file.exists()) {
@@ -68,13 +69,13 @@ public final class Replace extends ACreate {
 
           // retrieve old list of resources
           final AtomicUpdateCache auc = new AtomicUpdateCache(data);
-          final IntList docs = data.resources.docs(path, true);
+          final IntList docs = data.resources.docs(path, false);
+          sz = docs.size();
           if(docs.isEmpty()) {
             auc.addInsert(data.meta.size, -1, add.clip);
           } else {
             auc.addReplace(docs.get(0), add.clip);
-            final int ds = docs.size();
-            for(int d = 1; d < ds; d++) auc.addDelete(docs.get(d));
+            for(int d = 1; d < sz; d++) auc.addDelete(docs.get(d));
           }
 
           context.invalidate();
@@ -83,7 +84,7 @@ public final class Replace extends ACreate {
           add.close();
         }
       }
-      return info(RES_REPLACED_X_X, 1, perf);
+      return info(RES_REPLACED_X_X, sz, perf);
     } finally {
       finishUpdate();
     }
