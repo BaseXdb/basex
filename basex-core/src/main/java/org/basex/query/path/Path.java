@@ -659,47 +659,37 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Merge steps.
+   * Merges expensive descendant-or-self::node() steps.
    * @param qc query context
    * @return original or new expression
    */
   private Expr mergeSteps(final QueryContext qc) {
-    // merge descendant steps
     boolean opt = false;
     final int sl = steps.length;
     final ExprList stps = new ExprList(sl);
     for(int s = 0; s < sl; s++) {
       final Expr step = steps[s];
-      // choose simple descendants-or-self steps with succeeding step
+      // check for simple descendants-or-self step with succeeding step
       if(s < sl - 1 && step instanceof Step) {
         final Step curr = (Step) step;
         if(curr.simple(DESCORSELF, false)) {
           // check succeeding step
           final Expr next = steps[s + 1];
-          if(next instanceof Step) {
-            final Step stp = (Step) next;
-            // descendant-or-self::node()/child::X -> descendant::X
-            if(stp.axis == CHILD && !stp.has(Flag.FCS)) {
-              stp.axis = DESC;
-              opt = true;
-              continue;
-            }
-            // descendant-or-self::node()/@X -> descendant-or-self::*/@X
-            if(stp.axis == ATTR && !stp.has(Flag.FCS)) {
-              curr.test = new NameTest(false);
-              opt = true;
-            }
+          // descendant-or-self::node()/child::X -> descendant::X
+          if(simpleChild(next)) {
+            ((Step) next).axis = DESC;
+            opt = true;
+            continue;
           }
-          // descendant-or-self::node()/(child::X, child::Y) -> (descendant::X | descendant::Y)
+          // descendant-or-self::node()/(X, Y) -> (descendant::X | descendant::Y)
           Expr e = mergeList(next);
           if(e != null) {
             steps[s + 1] = e;
             opt = true;
             continue;
           }
-          // //(x | y)[text() = 'x'] -> (descendant::X | descendant::Y)[text() = 'x']
-          // check succeeding filter expression
-          if(next instanceof Filter) {
+          // //(X, Y)[text()] -> (/descendant::X | /descendant::Y)[text()]
+          if(next instanceof Filter && !next.has(Flag.FCS)) {
             final Filter f = (Filter) next;
             e = mergeList(f.root);
             if(e != null) {
@@ -746,11 +736,21 @@ public abstract class Path extends ParseExpr {
     for(final Expr e : list.exprs) {
       if(!(e instanceof Path)) return false;
       final Path p = (Path) e;
-      if(p.root != null || !(p.steps[0] instanceof Step)) return false;
-      final Step n = (Step) p.steps[0];
-      if(n.axis != CHILD || n.has(Flag.FCS)) return false;
+      if(p.root != null || !simpleChild(p.steps[0])) return false;
     }
     return true;
+  }
+  /**
+   * Checks if the expressions is a simple child step.
+   * @param expr expression to be checked
+   * @return result of check
+   */
+  private boolean simpleChild(final Expr expr) {
+    if(expr instanceof Step) {
+      final Step n = (Step) expr;
+      if(n.axis == CHILD && !n.has(Flag.FCS)) return true;
+    }
+    return false;
   }
 
   @Override

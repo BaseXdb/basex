@@ -118,7 +118,7 @@ public abstract class Step extends Preds {
   public abstract Step copy(QueryContext ctx, VarScope scp, IntObjMap<Var> vs);
 
   /**
-   * Checks if this is a simple axis without predicates.
+   * Checks if this step has no predicates and uses the specified axis text.
    * @param ax axis to be checked
    * @param name name/node test
    * @return result of check
