@@ -54,7 +54,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
   protected void read(final DataInput in) throws IOException {
     keys = in.readTokens();
     next = in.readNums();
-    bucket = in.readNums();
+    buckets = in.readNums();
     size = in.readNum();
   }
 
@@ -66,7 +66,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
   public void write(final DataOutput out) throws IOException {
     out.writeTokens(keys);
     out.writeNums(next);
-    out.writeNums(bucket);
+    out.writeNums(buckets);
     out.writeNum(size);
   }
 
@@ -113,8 +113,8 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * @return id, or {@code 0} if key does not exist
    */
   public final int id(final byte[] key) {
-    final int p = Token.hash(key) & bucket.length - 1;
-    for(int i = bucket[p]; i != 0; i = next[i]) if(eq(key, keys[i])) return i;
+    final int p = Token.hash(key) & buckets.length - 1;
+    for(int i = buckets[p]; i != 0; i = next[i]) if(eq(key, keys[i])) return i;
     return 0;
   }
 
@@ -136,10 +136,10 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * @return deleted key or 0
    */
   public int delete(final byte[] key) {
-    final int b = Token.hash(key) & bucket.length - 1;
-    for(int p = 0, i = bucket[b]; i != 0; p = i, i = next[i]) {
+    final int b = Token.hash(key) & buckets.length - 1;
+    for(int p = 0, i = buckets[b]; i != 0; p = i, i = next[i]) {
       if(!eq(key, keys[i])) continue;
-      if(p == 0) bucket[b] = next[i];
+      if(p == 0) buckets[b] = next[i];
       else next[p] = next[next[i]];
       keys[i] = null;
       return i;
@@ -155,11 +155,11 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    */
   private int index(final byte[] key) {
     checkSize();
-    final int b = Token.hash(key) & bucket.length - 1;
-    for(int r = bucket[b]; r != 0; r = next[r]) if(eq(key, keys[r])) return -r;
-    next[size] = bucket[b];
+    final int b = Token.hash(key) & buckets.length - 1;
+    for(int r = buckets[b]; r != 0; r = next[r]) if(eq(key, keys[r])) return -r;
+    next[size] = buckets[b];
     keys[size] = key;
-    bucket[b] = size;
+    buckets[b] = size;
     return size++;
   }
 

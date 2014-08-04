@@ -376,18 +376,18 @@ public final class DataAccess implements AutoCloseable {
     return o;
   }
 
-  // PRIVATE METHODS ==========================================================
-
   /**
    * Sets the file length.
    * @param l file length
    */
-  private synchronized void length(final long l) {
+  public synchronized void length(final long l) {
     if(l != len) {
       changed = true;
       len = l;
     }
   }
+
+  // PRIVATE METHODS ==========================================================
 
   /**
    * Reads the next byte.

@@ -1,5 +1,7 @@
 package org.basex.util.hash;
 
+import java.util.*;
+
 import org.basex.util.*;
 
 /**
@@ -19,11 +21,15 @@ public final class IntObjMap<E> extends IntSet {
    * If the key already exists, the value is updated.
    * @param key key
    * @param value value
+   * @return old value
    */
-  public void put(final int key, final E value) {
+  @SuppressWarnings("unchecked")
+  public E put(final int key, final E value) {
     // array bounds are checked before array is resized..
     final int i = put(key);
+    final Object v = values[i];
     values[i] = value;
+    return (E) v;
   }
 
   /**
@@ -55,6 +61,12 @@ public final class IntObjMap<E> extends IntSet {
     final int i = super.delete(key);
     if(i != 0) values[i] = null;
     return i;
+  }
+
+  @Override
+  public void clear() {
+    super.clear();
+    Arrays.fill(values, null);
   }
 
   @Override

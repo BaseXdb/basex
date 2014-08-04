@@ -31,9 +31,9 @@ public class DiskValues implements Index {
   protected final DataAccess idxl;
   /** Data reference. */
   protected final Data data;
-  /** Cached tokens. */
+  /** Cached index entries: mapping between keys and index entries. */
   protected final IndexCache cache = new IndexCache();
-  /** Cached texts. Increases used memory, but speeds up repeated queries. */
+  /** Cached texts: mapping between key positions and indexed texts. */
   protected final IntObjMap<byte[]> ctext = new IntObjMap<>();
   /** Number of current index entries. */
   protected final AtomicInteger size = new AtomicInteger();
@@ -191,7 +191,7 @@ public class DiskValues implements Index {
     synchronized(monitor) {
       while(l <= h) {
         final int m = l + h >>> 1;
-        final byte[] txt = readKeyAt(m).key;
+        final byte[] txt = indexEntry(m).key;
         final int d = diff(txt, key);
         if(d == 0) return m;
         if(d < 0) l = m + 1;
@@ -223,17 +223,17 @@ public class DiskValues implements Index {
     if(p < 0) return new IndexEntry(tok, 0, 0);
 
     final int count;
-    final long pointer;
+    final long offset;
 
     synchronized(monitor) {
       // get position in heap file
       final long pos = idxr.read5(p * 5L);
       // the first heap entry represents the number of hits
       count = idxl.readNum(pos);
-      pointer = idxl.cursor();
+      offset = idxl.cursor();
     }
 
-    return cache.add(tok, count, pointer);
+    return cache.add(tok, count, offset);
   }
 
   /**
@@ -275,7 +275,7 @@ public class DiskValues implements Index {
       public byte[] next() {
         if(++ix < s) {
           synchronized(monitor) {
-            final IndexEntry entry = readKeyAt(ix);
+            final IndexEntry entry = indexEntry(ix);
             if(startsWith(entry.key, prefix)) {
               count = entry.size;
               return entry.key;
@@ -308,7 +308,7 @@ public class DiskValues implements Index {
       public byte[] next() {
         if(++ix <= last) {
           synchronized(monitor) {
-            final IndexEntry entry = readKeyAt(ix);
+            final IndexEntry entry = indexEntry(ix);
             count = entry.size;
             return entry.key;
           }
@@ -339,7 +339,7 @@ public class DiskValues implements Index {
       public byte[] next() {
         if(--ix >= first) {
           synchronized(monitor) {
-            final IndexEntry entry = readKeyAt(ix);
+            final IndexEntry entry = indexEntry(ix);
             count = entry.size;
             return entry.key;
           }
@@ -361,7 +361,7 @@ public class DiskValues implements Index {
    * @param index key position
    * @return key
    */
-  private IndexEntry readKeyAt(final int index) {
+  private IndexEntry indexEntry(final int index) {
     // try the cache first
     byte[] key = ctext.get(index);
     if(key != null) {
@@ -369,12 +369,15 @@ public class DiskValues implements Index {
       if(entry != null) return entry;
     }
 
+    // read text and cache result
     final long pos = idxr.read5(index * 5L);
-    // read and ignore the number of ids in the list
-    final int cnt = idxl.readNum(pos);
-    if(key == null) key = data.text(pre(idxl.readNum()), text);
-
-    return cache.add(key, cnt, pos + Num.length(cnt));
+    final int sz = idxl.readNum(pos);
+    final long off = pos + Num.length(sz);
+    if(key == null) {
+      key = data.text(pre(idxl.readNum()), text);
+      ctext.put(index, key);
+    }
+    return cache.add(key, sz, off);
   }
 
   /**

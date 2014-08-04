@@ -56,8 +56,8 @@ public class HashItemSet extends ASet implements ItemSet {
    */
   public final int id(final Item key, final InputInfo ii) throws QueryException {
     final int h = key.hash(ii);
-    final int p = h & bucket.length - 1;
-    for(int id = bucket[p]; id != 0; id = next[id]) {
+    final int p = h & buckets.length - 1;
+    for(int id = buckets[p]; id != 0; id = next[id]) {
       if(keys[id].equiv(key, null, ii)) return -id;
     }
     return 0;
@@ -74,14 +74,14 @@ public class HashItemSet extends ASet implements ItemSet {
   private int index(final Item key, final InputInfo ii) throws QueryException {
     checkSize();
     final int h = key.hash(ii);
-    final int b = h & bucket.length - 1;
-    for(int r = bucket[b]; r != 0; r = next[r]) {
+    final int b = h & buckets.length - 1;
+    for(int r = buckets[b]; r != 0; r = next[r]) {
       if(keys[r].equiv(key, null, ii)) return -r;
     }
-    next[size] = bucket[b];
+    next[size] = buckets[b];
     keys[size] = key;
     hash[size] = h;
-    bucket[b] = size;
+    buckets[b] = size;
     return size++;
   }
 

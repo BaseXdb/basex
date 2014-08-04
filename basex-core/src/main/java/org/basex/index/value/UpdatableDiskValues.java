@@ -40,32 +40,41 @@ public final class UpdatableDiskValues extends DiskValues {
     // create a sorted list of the new keys and update the old keys
     final TokenList newKeys = new TokenList();
 
-    // add sorted keys (allows faster binary search)
-    int p = 0;
+    // update id lists of existing keys (use sorted map to allow for binary search)
+    int index = 0;
     final int sz = size();
     for(final byte[] key : new TokenList(map).sort(true)) {
-      p = get(key, p, sz);
-      if(p >= 0) {
-        appendIds(key, map.get(key).finish(), p++);
+      index = get(key, index, sz);
+      if(index >= 0) {
+        final int[] ids = map.get(key).finish();
+        final long off = idxr.read5(index * 5L);
+        final int oldSize = idxl.readNum(off);
+        final IntList il = new IntList(oldSize + ids.length);
+        for(int o = 0; o < oldSize; ++o) il.add(idxl.readNum());
+        // write new ids
+        free.add((int) (idxl.cursor() - off), off);
+        writeIds(key, il.add(ids), index++);
       } else {
-        p = -(p + 1);
+        index = -(index + 1);
         newKeys.add(key);
       }
     }
 
-    // insert new keys, starting from the biggest one
+    // insert new keys in descending order
     final int ns = newKeys.size();
-    for(int j = ns - 1, i = sz - 1, index = sz + j; j >= 0; --j) {
+    for(int j = ns - 1, oldIndex = sz - 1, newIndex = sz + j; j >= 0; --j) {
       final byte[] key = newKeys.get(j);
-      final int ps = -(1 + get(key, 0, i + 1));
-      if(ps < 0) throw Util.notExpected("Key should not exist: '%'", key);
+      final int idx = -(1 + get(key, 0, oldIndex + 1));
+      if(idx < 0) throw Util.notExpected("Key should not exist: '%'", key);
 
       // create space for new entry
-      while(i >= ps) writeRef(index--, i--);
+      while(oldIndex >= idx) {
+        final long off = idxr.read5(oldIndex * 5L);
+        writeIdOffset(newIndex--, off, ctext.put(oldIndex--, null));
+      }
       // add the new key and its ids
-      writeList(key, map.get(key), index--);
+      writeIds(key, map.get(key), newIndex--);
     }
-
     size(sz + ns);
   }
 
@@ -99,80 +108,24 @@ public final class UpdatableDiskValues extends DiskValues {
       }
     }
     // add the id to the new key
-    insertId(key, id);
-  }
-
-  /**
-   * Removes record ids from the index.
-   * @param index index of the key
-   * @param key record key
-   * @param ids list of record ids to delete
-   * @return {@code true} if list was completely deleted
-   */
-  private boolean deleteIds(final int index, final byte[] key, final int[] ids) {
-    final long pos = idxr.read5(index * 5L);
-
-    // read each id from the list and skip the ones that should be deleted
-    final int oldSize = idxl.readNum(pos), delSize = ids.length, newSize = oldSize - delSize;
-    final IntList newIds = new IntList(newSize);
-    for(int o = 0, d = 0, currId = 0; o < oldSize; o++) {
-      currId += idxl.readNum();
-      if(d < delSize && currId == ids[d]) d++;
-      else newIds.add(currId);
-    }
-
-    // remove old ids
-    free.add((int) (idxl.cursor() - pos), pos);
-
-    // delete cached key if no ids remain
-    if(newSize == 0) {
-      cache.delete(key);
-      return true;
-    }
-
-    // write new ids
-    writeList(key, newIds, index);
-    return false;
-  }
-
-  /**
-   * Deletes keys from the index.
-   * @param keys list of key positions to delete
-   */
-  private void deleteKeys(final int[] keys) {
-    // shift all keys to the left, skipping the ones which have to be deleted
-    int k = 0;
-    final int sz = size(), kl = keys.length;
-    for(int newIndex = keys[k++], oldIndex = newIndex + 1; oldIndex < sz; ++oldIndex) {
-      if(k < kl && oldIndex == keys[k]) k++;
-      else writeRef(newIndex++, oldIndex);
-    }
-    // reduce the size of the index
-    size(sz - k);
-  }
-
-  /**
-   * Adds a text entry to the index.
-   * @param key text to index
-   * @param id id value
-   */
-  private void insertId(final byte[] key, final int id) {
     int index = get(key);
     if(index < 0) {
       index = -(index + 1);
 
-      // create space for new entry
       final int sz = size();
-      for(int i = sz; i > index; --i) writeRef(i, i - 1);
+      final byte[] tmp = idxr.readBytes(0, sz * 5);
+      for(int i = sz; i > index; --i) copy(tmp, i, i - 1);
+      idxr.cursor(0);
+      idxr.writeBytes(tmp, 0, sz * 5);
 
-      // add the key and the id
-      writeList(key, new IntList(1).add(1), index);
+      // write new ids
+      writeIds(key, new IntList(1).add(id), index);
 
       size(sz + 1);
     } else {
       // add id to the list of ids in the index node
-      final long pos = idxr.read5(index * 5L);
-      final int num = idxl.readNum(pos);
+      final long off = idxr.read5(index * 5L);
+      final int num = idxl.readNum(off);
 
       final int newSize = num + 1;
       final IntList newIds = new IntList(newSize);
@@ -193,27 +146,74 @@ public final class UpdatableDiskValues extends DiskValues {
       }
       if(notadded) newIds.add(id);
 
-      writeList(key, newIds, index);
+      writeIds(key, newIds, index);
     }
   }
 
   /**
-   * Adds record ids to an existing index entry.
-   * @param key key
-   * @param ids sorted list of record ids to add: the first value is the
-   * smallest id and all others are only difference to the previous one
+   * Removes record ids from the index.
    * @param index index of the key
+   * @param key record key
+   * @param ids list of record ids to delete
+   * @return {@code true} if list was completely deleted
    */
-  private void appendIds(final byte[] key, final int[] ids, final int index) {
-    // read the old ids
-    final long pos = idxr.read5(index * 5L);
-    final int oldSize = idxl.readNum(pos);
-    final IntList il = new IntList(oldSize + ids.length);
-    for(int o = 0; o < oldSize; ++o) il.add(idxl.readNum());
+  private boolean deleteIds(final int index, final byte[] key, final int[] ids) {
+    final long off = idxr.read5(index * 5L);
 
-    // remove old and write new ids
-    free.add((int) (idxl.cursor() - pos), pos);
-    writeList(key, il.add(ids), index);
+    // read each id from the list and skip the ones that should be deleted
+    final int oldSize = idxl.readNum(off), delSize = ids.length, newSize = oldSize - delSize;
+    final IntList newIds = new IntList(newSize);
+    for(int o = 0, d = 0, currId = 0; o < oldSize; o++) {
+      currId += idxl.readNum();
+      if(d < delSize && currId == ids[d]) d++;
+      else newIds.add(currId);
+    }
+
+    // remove old ids
+    free.add((int) (idxl.cursor() - off), off);
+
+    // delete cached index entry if no ids remain
+    if(newSize == 0) {
+      cache.delete(key);
+      return true;
+    }
+
+    // write new ids
+    writeIds(key, newIds, index);
+    return false;
+  }
+
+  /**
+   * Deletes keys from the index.
+   * @param keys list of key positions to delete
+   */
+  private void deleteKeys(final int[] keys) {
+    int sz = size();
+    final int kl = keys.length;
+    final byte[] tmp = idxr.readBytes(0, sz * 5);
+    for(int k = 0, newIndex = keys[k++], oldIndex = newIndex + 1; oldIndex < sz; oldIndex++) {
+      if(k < kl && oldIndex == keys[k]) {
+        k++;
+      } else {
+        copy(tmp, oldIndex, newIndex++);
+      }
+    }
+    sz -= kl;
+    size(sz);
+
+    idxr.cursor(0);
+    idxr.writeBytes(tmp, 0, sz * 5);
+  }
+
+  /**
+   * Copies an ID reference entry in the array.
+   * @param tmp reference array
+   * @param oldIndex old position
+   * @param newIndex new position
+   */
+  private void copy(final byte[] tmp, final int oldIndex, final int newIndex) {
+    System.arraycopy(tmp, oldIndex * 5, tmp, newIndex * 5, 5);
+    ctext.put(newIndex, ctext.put(oldIndex, null));
   }
 
   /**
@@ -222,42 +222,32 @@ public final class UpdatableDiskValues extends DiskValues {
    * @param ids id list
    * @param index index in reference file
    */
-  private void writeList(final byte[] key, final IntList ids, final int index) {
+  private void writeIds(final byte[] key, final IntList ids, final int index) {
     // compute compressed size of distance list
     final int[] dists = distances(ids);
-    int bytes = Num.length(dists.length);
+    final int sz = dists.length;
+    int bytes = Num.length(sz);
     for(final int id : dists) bytes += Num.length(id);
 
     // choose new insertion position (append at the end if no slot is found)
-    final long pos = free.get(bytes, idxl.length());
+    final long offset = free.get(bytes, idxl.length());
 
     // write new id values
-    idxl.writeNums(pos, dists);
-    writeRef(index, pos, key);
+    writeIdOffset(index, offset, key);
+    idxl.writeNums(offset, dists);
 
     // update the cache entry
-    final int sz = dists.length;
-    cache.add(key, sz, pos + Num.length(sz));
+    cache.add(key, sz, offset + Num.length(sz));
   }
 
   /**
    * Updates an ID reference.
    * @param index index in reference file
-   * @param oldIndex old index
-   */
-  private void writeRef(final int index, final int oldIndex) {
-    writeRef(index, idxr.read5(oldIndex * 5L), ctext.get(oldIndex));
-    ctext.put(oldIndex, null);
-  }
-
-  /**
-   * Updates an ID reference.
-   * @param index index in reference file
-   * @param pos position of ID list
+   * @param offset offset of ID list
    * @param key key
    */
-  private void writeRef(final int index, final long pos, final byte[] key) {
-    idxr.write5(index * 5L, pos);
+  private void writeIdOffset(final int index, final long offset, final byte[] key) {
+    idxr.write5(index * 5L, offset);
     ctext.put(index, key);
   }
 

@@ -28,7 +28,7 @@ public class IntSet extends ASet {
    */
   public IntSet(final int capacity) {
     super(capacity);
-    keys = new int[bucket.length];
+    keys = new int[buckets.length];
   }
 
   /**
@@ -65,8 +65,8 @@ public class IntSet extends ASet {
    * @return id, or {@code 0} if key does not exist
    */
   final int id(final int key) {
-    final int p = key & bucket.length - 1;
-    for(int id = bucket[p]; id != 0; id = next[id]) if(key == keys[id]) return id;
+    final int p = key & buckets.length - 1;
+    for(int id = buckets[p]; id != 0; id = next[id]) if(key == keys[id]) return id;
     return 0;
   }
 
@@ -88,10 +88,10 @@ public class IntSet extends ASet {
    * @return deleted key or 0
    */
   int delete(final int key) {
-    final int b = key & bucket.length - 1;
-    for(int p = 0, i = bucket[b]; i != 0; p = i, i = next[i]) {
+    final int b = key & buckets.length - 1;
+    for(int p = 0, i = buckets[b]; i != 0; p = i, i = next[i]) {
       if(key != keys[i]) continue;
-      if(p == 0) bucket[b] = next[i];
+      if(p == 0) buckets[b] = next[i];
       else next[p] = next[next[i]];
       keys[i] = 0;
       return i;
@@ -107,11 +107,11 @@ public class IntSet extends ASet {
    */
   private int index(final int key) {
     checkSize();
-    final int b = key & bucket.length - 1;
-    for(int r = bucket[b]; r != 0; r = next[r]) if(key == keys[r]) return -r;
-    next[size] = bucket[b];
+    final int b = key & buckets.length - 1;
+    for(int r = buckets[b]; r != 0; r = next[r]) if(key == keys[r]) return -r;
+    next[size] = buckets[b];
     keys[size] = key;
-    bucket[b] = size;
+    buckets[b] = size;
     return size++;
   }
 

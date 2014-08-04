@@ -100,7 +100,6 @@ public final class TableDiskAccess extends TableAccess {
     try(final RandomAccessFile file = new RandomAccessFile(table.file(), "rw")) {
       return file.getChannel().tryLock() == null;
     } catch(final IOException ex) {
-      System.out.println(ex);
       return true;
     }
   }

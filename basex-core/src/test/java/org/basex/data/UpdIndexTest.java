@@ -1,8 +1,9 @@
 package org.basex.data;
 
-import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.query.*;
+import org.basex.query.func.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -12,7 +13,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class UpdIndexTest extends SandboxTest {
+public final class UpdIndexTest extends AdvancedQueryTest {
   /**
    * Initializes the tests.
    * @throws Exception exception
@@ -32,6 +33,8 @@ public final class UpdIndexTest extends SandboxTest {
     for(int i = 0; i < 25; i++) {
       run(new Replace("x.xml", "<x><a>A</a><a>B</a></x>"));
     }
+    query(Function._DB_TEXT.args(NAME, "A"), "A");
+    query(Function._DB_TEXT.args(NAME, "B"), "B");
   }
 
   /**
@@ -44,6 +47,9 @@ public final class UpdIndexTest extends SandboxTest {
       run(new Replace("x.xml", "<x><a>A</a><a>B</a></x>"));
       run(new Replace("x.xml", "<x><a>A</a><a>C</a></x>"));
     }
+    query(Function._DB_TEXT.args(NAME, "A"), "A");
+    query(Function._DB_TEXT.args(NAME, "C"), "C");
+    query(Function._DB_TEXT.args(NAME, "B"), "");
   }
 
   /**
@@ -55,6 +61,9 @@ public final class UpdIndexTest extends SandboxTest {
     for(int i = 0; i < 25; i++) {
       run(new Replace("x.xml", "<x><a>A</a><a>BC</a><a>DEF</a></x>"));
     }
+    query(Function._DB_TEXT.args(NAME, "A"), "A");
+    query(Function._DB_TEXT.args(NAME, "BC"), "BC");
+    query(Function._DB_TEXT.args(NAME, "DEF"), "DEF");
   }
 
   /**
@@ -68,6 +77,8 @@ public final class UpdIndexTest extends SandboxTest {
       run(new Replace("x.xml", "<x><a>A</a><a>BC</a></x>"));
       run(new Close());
     }
+    query(Function._DB_TEXT.args(NAME, "A"), "A");
+    query(Function._DB_TEXT.args(NAME, "BC"), "BC");
   }
 
   /**
@@ -81,6 +92,9 @@ public final class UpdIndexTest extends SandboxTest {
       run(new Add("a", "<x a='a' b='b'/>"));
       run(new Replace("a", "<x/>"));
     }
+    query(Function._DB_ATTRIBUTE.args(NAME, "a"), "");
+    query(Function._DB_ATTRIBUTE.args(NAME, "b"), "");
+    query(Function._DB_ATTRIBUTE.args(NAME, "c"), "");
   }
 
   /**
