@@ -623,15 +623,15 @@ public abstract class Data {
   public final void delete(final int pre) {
     meta.update();
 
-    // size of the subtree to delete
+    // delete references in document index
     int k = kind(pre);
     final int s = size(pre, k);
     resources.delete(pre, s);
 
-    // delete child records from indexes
+    // delete entries in value indexes
     if(meta.updindex) indexDelete(pre, s);
 
-    /// explicitly delete text or attribute value
+    /// delete text or attribute value in heap file
     if(k != DOC && k != ELEM) delete(pre, k != ATTR);
 
     // reduce size of ancestors

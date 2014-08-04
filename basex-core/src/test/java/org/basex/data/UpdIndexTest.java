@@ -29,7 +29,7 @@ public final class UpdIndexTest extends SandboxTest {
    */
   @Test
   public void test() throws BaseXException {
-    for(int i = 0; i < 100; i++) {
+    for(int i = 0; i < 25; i++) {
       run(new Replace("x.xml", "<x><a>A</a><a>B</a></x>"));
     }
   }
@@ -40,7 +40,7 @@ public final class UpdIndexTest extends SandboxTest {
    */
   @Test
   public void test2() throws BaseXException {
-    for(int i = 0; i < 100; i++) {
+    for(int i = 0; i < 25; i++) {
       run(new Replace("x.xml", "<x><a>A</a><a>B</a></x>"));
       run(new Replace("x.xml", "<x><a>A</a><a>C</a></x>"));
     }
@@ -52,7 +52,7 @@ public final class UpdIndexTest extends SandboxTest {
    */
   @Test
   public void test3() throws BaseXException {
-    for(int i = 0; i < 100; i++) {
+    for(int i = 0; i < 25; i++) {
       run(new Replace("x.xml", "<x><a>A</a><a>BC</a><a>DEF</a></x>"));
     }
   }
@@ -63,10 +63,23 @@ public final class UpdIndexTest extends SandboxTest {
    */
   @Test
   public void test4() throws BaseXException {
-    for(int i = 0; i < 100; i++) {
+    for(int i = 0; i < 25; i++) {
       run(new Open(NAME));
       run(new Replace("x.xml", "<x><a>A</a><a>BC</a></x>"));
       run(new Close());
+    }
+  }
+
+  /**
+   * Test.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void test5() throws BaseXException {
+    for(int i = 0; i < 25; i++) {
+      run(new Add("a", "<x c='c'/>"));
+      run(new Add("a", "<x a='a' b='b'/>"));
+      run(new Replace("a", "<x/>"));
     }
   }
 

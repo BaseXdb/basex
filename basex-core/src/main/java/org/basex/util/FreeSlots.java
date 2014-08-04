@@ -46,4 +46,13 @@ public final class FreeSlots {
     }
     return value == null ? offset : value;
   }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(free.size() + " entries:\n");
+    for(final Map.Entry<Integer, LinkedList<Long>> entry : free.entrySet()) {
+      sb.append("- " + entry.getKey() + ": " + entry.getValue() + '\n');
+    }
+    return sb.toString().trim();
+  }
 }

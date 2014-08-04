@@ -143,9 +143,9 @@ public final class UpdatableDiskValues extends DiskValues {
     // shift all keys to the left, skipping the ones which have to be deleted
     int k = 0;
     final int sz = size(), kl = keys.length;
-    for(int newIndex = keys[k++], oldIndex = newIndex + 1; oldIndex < sz; ++oldIndex, ++newIndex) {
+    for(int newIndex = keys[k++], oldIndex = newIndex + 1; oldIndex < sz; ++oldIndex) {
       if(k < kl && oldIndex == keys[k]) k++;
-      writeRef(newIndex, oldIndex);
+      else writeRef(newIndex++, oldIndex);
     }
     // reduce the size of the index
     size(sz - k);
