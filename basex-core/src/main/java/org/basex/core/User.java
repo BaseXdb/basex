@@ -13,6 +13,8 @@ public final class User {
   public final String name;
   /** Password (md5-encoded, lower case). */
   public String password;
+  /** Password Digest (md5-encoded with realm "basex.org", lower case). */
+  public String digest;
   /** Permission. */
   public Perm perm;
 
@@ -20,11 +22,13 @@ public final class User {
    * Constructor.
    * @param n user name
    * @param p password
+   * @param d digest password
    * @param r rights
    */
-  User(final String n, final String p, final Perm r) {
+  User(final String n, final String p, final String d, final Perm r) {
     name = n;
     password = p.toLowerCase(Locale.ENGLISH);
+    digest = d.toLowerCase(Locale.ENGLISH);
     perm = r;
   }
 
@@ -42,6 +46,7 @@ public final class User {
    * @return user copy
    */
   public User copy() {
-    return new User(name, password, perm.min(Perm.WRITE));
+    return new User(name, password, digest, perm.min(Perm.WRITE));
   }
+
 }

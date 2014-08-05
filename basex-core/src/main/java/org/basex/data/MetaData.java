@@ -278,7 +278,7 @@ public final class MetaData {
       final String k = string(in.readToken());
       if(k.isEmpty()) break;
       if(k.equals(DBPERM)) {
-        users.read(in);
+        //users.read(in);
       } else {
         final String v = string(in.readToken());
         if(k.equals(DBSTR))           storage    = v;

@@ -223,8 +223,9 @@ public abstract class Command extends Proc {
    * Executes the command and serializes the result (internal call).
    * @return success of operation
    * @throws IOException I/O exception
+   * @throws SAXException
    */
-  protected abstract boolean run() throws IOException;
+  protected abstract boolean run() throws IOException, SAXException;
 
   /**
    * Builds a string representation from the command. This string must be

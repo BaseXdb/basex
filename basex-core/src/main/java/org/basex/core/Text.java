@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import static org.basex.core.Lang.*;
+import static org.basex.core.Text.*;
 
 import org.basex.core.parse.Commands.*;
 import org.basex.util.*;
@@ -142,6 +143,8 @@ public interface Text {
   String[] S_USERINFO = { "Username", "Read", "Write", "Create", "Admin" };
   /** Default admin user and password. */
   String S_ADMIN = "admin";
+  /** Default admin digest password. */
+  String D_ADMIN = S_ADMIN + ":" + "basex.org" + ":" + S_ADMIN;
 
   /** Command keyword. */
   String S_ALL = "ALL";

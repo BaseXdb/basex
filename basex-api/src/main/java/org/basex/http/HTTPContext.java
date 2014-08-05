@@ -120,7 +120,7 @@ public final class HTTPContext {
         HashMap<String, String> headerValues = parseHeader(auth);
         user = headerValues.get("username");
         /** Password for digest auth. */
-        pass = "admin";
+        //pass = "admin";
         authenticate();
       }else {
         throw new LoginException(WHICHAUTH, values[0]);
@@ -301,6 +301,9 @@ public final class HTTPContext {
 
         ctx.user = ctx.users.get(user);
 
+        //System.out.println(ctx.user.name+" "+ctx.user.password+" "+ctx.user.digest+" "+ctx.user.perm);
+
+
         if(ctx.user == null && !res.isCommitted()) {
 
           /** res.isCommited is added to resolve the lang.Illegal Exception: Commited. */
@@ -311,8 +314,10 @@ public final class HTTPContext {
 
         HashMap<String, String> headerValues = parseHeader(req.getHeader(AUTHORIZATION));
 
-        String ha1 = Token.md5(ctx.user.name + ":" + realm + ":" + pass);
-
+        //String ha1 = Token.md5(ctx.user.name + ":" + realm + ":" + pass);
+        //String ha1 = Token.md5(ctx.user.name + ":" + realm + ":" + ctx.user.password);
+        //String ha1 = ctx.user.password;
+        String ha1 = ctx.user.digest;
         String reqURI = headerValues.get("uri");
 
         String ha2 = Token.md5(req.getMethod() + ":" + reqURI);
@@ -322,6 +327,8 @@ public final class HTTPContext {
          serverResponse = Token.md5(ha1 + ":" + nonce + ":" + ha2);
 
         String clientResponse = headerValues.get("response");
+
+        //System.out.println(clientResponse+" "+serverResponse);
 
         if(!serverResponse.equals(clientResponse) && !res.isCommitted()){
             /** res.isCommited is added to resolve the lang.Illegal Exception: Commited. */

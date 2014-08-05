@@ -7,11 +7,18 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
+import javax.xml.parsers.*;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.*;
+import javax.xml.transform.stream.*;
+
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.w3c.dom.*;
+import org.xml.sax.*;
 
 /**
  * This class organizes all users.
@@ -33,34 +40,55 @@ public final class Users {
     if(ctx == null) return;
 
     // try to find permission file in database and home directory
-    final String perm = IO.BASEXSUFFIX + "perm";
+    final String perm = "permissions.xml";
     file = new IOFile(ctx.globalopts.dbpath(), perm);
+
     if(!file.exists()) file = new IOFile(Prop.HOME, perm);
 
     if(file.exists()) {
-      try(DataInput in = new DataInput(file)) {
+      try {
+        File in = new File("/home/tejus/permissions.xml");
         read(in);
-      } catch(final IOException ex) {
-        Util.errln(ex);
-      }
+       } catch (Exception e) {
+        e.printStackTrace();
+       }
     } else {
       // define default admin user with all rights
-      list.add(new User(S_ADMIN, md5(S_ADMIN), Perm.ADMIN));
+      list.add(new User(S_ADMIN, md5(S_ADMIN), md5(D_ADMIN), Perm.ADMIN));
     }
   }
 
   /**
    * Reads users from disk.
    * @param in input stream
-   * @throws IOException I/O exception
+   * @throws Exception I/O exception
    */
-  public synchronized void read(final DataInput in) throws IOException {
-    final int s = in.readNum();
-    for(int u = 0; u < s; ++u) {
-      final User user = new User(string(in.readToken()), string(in.readToken()),
-          Perm.get(in.readNum()));
-      list.add(user);
+
+  public synchronized void read(final File in) throws Exception {
+
+    DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+    DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+    Document doc = dBuilder.parse(in);
+    doc.getDocumentElement().normalize();
+
+    NodeList nList = doc.getElementsByTagName("user");
+
+    for (int temp = 0; temp < nList.getLength(); temp++) {
+    Node nNode = nList.item(temp);
+    if (nNode.getNodeType() == Node.ELEMENT_NODE);
+    Element eElement = (Element) nNode;
+    if(eElement.hasAttribute("name")) // && eElement.getAttribute("name").equals("user"))
+    {
+    String n, md5, dig, perm;
+    n = eElement.getAttribute("name");
+    perm = eElement.getAttribute("perm");
+    md5 = eElement.getElementsByTagName("password").item(0).getTextContent();
+    dig = eElement.getElementsByTagName("password").item(1).getTextContent();
+    //System.out.println(n+" "+perm+" "+md5+" "+dig);
+    //System.out.println(Perm.get(perm));
+    list.add(new User(n, md5, dig, Perm.get(perm)));
     }
+   }
   }
 
   /**
@@ -68,11 +96,13 @@ public final class Users {
    */
   public synchronized void write() {
     if(file == null) return;
-    try(final DataOutput out = new DataOutput(file)) {
+    try {
+    File out = new File("/home/tejus/permissions.xml");
       write(out);
-    } catch(final IOException ex) {
-      Util.debug(ex);
-    }
+    } catch(Exception e) {
+      e.printStackTrace();
+     }
+
   }
 
   /**
@@ -83,7 +113,7 @@ public final class Users {
    */
   public synchronized boolean create(final String usern, final String pass) {
     // check if user already exists
-    return get(usern) == null && create(new User(usern, pass, Perm.NONE));
+    return get(usern) == null && create(new User(usern, pass, pass, Perm.NONE));
   }
 
   /**
@@ -139,6 +169,7 @@ public final class Users {
    * @param pattern user pattern
    * @return user list
    */
+
   public synchronized String[] find(final Pattern pattern) {
     final StringList sl = new StringList();
     for(final User u : list) {
@@ -151,16 +182,68 @@ public final class Users {
    * Writes permissions to disk.
    * @param out output stream; if set to null, the global rights are written
    * @throws IOException I/O exception
+   * @throws SAXException SAX exception
    */
-  public synchronized void write(final DataOutput out) throws IOException {
+  public synchronized void write(final File out) throws IOException, SAXException {
     // skip writing of local rights
-    out.writeNum(list.size());
-    for(final User user : list) {
-      out.writeToken(token(user.name));
-      out.writeToken(token(user.password));
-      out.writeNum(user.perm.num);
-    }
+    // TODO local permissions
+    try {
+
+      DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+      Document doc = docBuilder.parse(out);
+
+      Element rootElement = doc.getDocumentElement();
+
+      //int index = list.size() + 1;
+
+      for(final User user : list) {
+
+      // user elements
+      Element usr = doc.createElement("user");
+      rootElement.appendChild(usr);
+
+      // set attribute to user element
+      Attr attr = doc.createAttribute("name");
+      Attr att = doc.createAttribute("perm");
+      attr.setValue(user.name);
+      att.setValue(user.perm.toString());
+
+      //att.setValue(user.perm.NONE.toString());
+      //att.setValue(Perm.NONE.toString());
+      usr.setAttributeNode(attr);
+      usr.setAttributeNode(att);
+
+      // md5 password element
+      Element password = doc.createElement("password");
+      password.appendChild(doc.createTextNode(user.password));
+      usr.appendChild(password);
+
+      // digest password element
+      Element pass = doc.createElement("password");
+      pass.appendChild(doc.createTextNode(user.digest));
+      usr.appendChild(pass);
+      }
+      // write the content into xml file
+      TransformerFactory transformerFactory = TransformerFactory.newInstance();
+      Transformer transformer = transformerFactory.newTransformer();
+      DOMSource source = new DOMSource(doc);
+      //StreamResult result = new StreamResult(new File("/home/tejus/permissions.xml"));
+      StreamResult result = new StreamResult(out);
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      transformer.transform(source, result);
+
+      //System.out.println("File saved!");
+
+      } catch (ParserConfigurationException pce) {
+      pce.printStackTrace();
+      } catch (TransformerException tfe) {
+      tfe.printStackTrace();
+      }
+
   }
+
 
   /**
    * Returns information on all users.
