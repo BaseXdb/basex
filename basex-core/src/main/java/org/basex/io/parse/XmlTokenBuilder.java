@@ -4,6 +4,7 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Intermediate XML string builder for importing other data formats to a database.
@@ -14,13 +15,15 @@ import org.basex.util.*;
 public final class XmlTokenBuilder {
   /** XML string. */
   private final TokenBuilder cache = new TokenBuilder();
+  /** Element stack. */
+  private final TokenList open = new TokenList();
 
   /**
    * Opens an element.
    * @param name name of element
    * @param atts attribute names and values
    */
-  public void openElement(final byte[] name, final byte[]... atts) {
+  public void open(final byte[] name, final byte[]... atts) {
     final TokenBuilder cch = cache;
     cch.add('<').add(name);
     final int al = atts.length;
@@ -28,26 +31,26 @@ public final class XmlTokenBuilder {
       final byte[] an = atts[a], av = atts[a + 1];
       if(av != null) {
         cch.add(' ').add(an).add('=').add('"');
-        addAttribute(av);
+        attribute(av);
         cch.add('"');
       }
     }
     cch.add('>');
+    open.add(name);
   }
 
   /**
    * Closes an element.
-   * @param name name of element
    */
-  public void closeElement(final byte[] name) {
-    cache.add('<').add('/').add(name).add('>');
+  public void close() {
+    cache.add('<').add('/').add(open.pop()).add('>');
   }
 
   /**
    * Encodes the specified text.
    * @param value value to be encoded
    */
-  public void addText(final byte[] value) {
+  public void text(final byte[] value) {
     final int tl = value.length;
     for(int k = 0; k < tl; k += cl(value, k)) add(cp(value, k));
   }
@@ -64,7 +67,7 @@ public final class XmlTokenBuilder {
    * Encodes the specified attribute value.
    * @param value value to be encoded
    */
-  private void addAttribute(final byte[] value) {
+  private void attribute(final byte[] value) {
     final int vl = value.length;
     for(int k = 0; k < vl; k += cl(value, k)) {
       final int ch = cp(value, k);

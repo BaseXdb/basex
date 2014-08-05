@@ -47,13 +47,13 @@ public final class CsvStringConverter extends CsvConverter {
     super(opts);
     lax = opts.get(CsvOptions.LAX);
     atts = opts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
-    xml.openElement(CSV);
+    xml.open(CSV);
   }
 
   @Override
   public void record() {
-    if(record) xml.closeElement(RECORD);
-    xml.openElement(RECORD);
+    if(record) xml.close();
+    xml.open(RECORD);
     record = true;
     col = 0;
   }
@@ -72,15 +72,15 @@ public final class CsvStringConverter extends CsvConverter {
     } else if(name != null) {
       elem = name;
     }
-    xml.openElement(elem, NAME, attr);
-    xml.addText(entry);
-    xml.closeElement(elem);
+    xml.open(elem, NAME, attr);
+    xml.text(entry);
+    xml.close();
   }
 
   @Override
   public Str finish() {
-    if(record) xml.closeElement(RECORD);
-    xml.closeElement(CSV);
+    if(record) xml.close();
+    xml.close();
     return Str.get(xml.finish());
   }
 }
