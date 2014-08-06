@@ -274,7 +274,7 @@ public enum Function {
   /** XQuery function. */
   REPLACE(FNPat.class, "replace(string,pattern,replace[,mod])", arg(STR_ZO, STR, STR, STR), STR),
   /** XQuery function. */
-  TOKENIZE(FNPat.class, "tokenize(string,pattern[,mod])", arg(STR_ZO, STR, STR), STR_ZM),
+  TOKENIZE(FNPat.class, "tokenize(string[,pattern[,mod]])", arg(STR_ZO, STR, STR), STR_ZM),
   /** XQuery function. */
   ANALYZE_STRING(FNPat.class, "analyze-string(input,pattern[,mod])",
       arg(STR_ZO, STR, STR), ELM, flag(X30, CNS)),

@@ -204,6 +204,8 @@ public final class FNPat extends StandardFunc {
    */
   private Value tokenize(final QueryContext qc) throws QueryException {
     final byte[] val = checkEStr(exprs[0], qc);
+    if(exprs.length < 2) return StrSeq.get(split(norm(val), ' '));
+
     final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc);
     if(p.matcher("").matches()) throw REGROUP.get(info);
 
