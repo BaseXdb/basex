@@ -20,7 +20,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class Compare {
+public final class DeepCompare {
   /** Flags. */
   public enum Mode {
     /** Compare all node types. */ ALLNODES,
@@ -36,9 +36,16 @@ public final class Compare {
 
   /**
    * Constructor.
+   */
+  public DeepCompare() {
+    this(null);
+  }
+
+  /**
+   * Constructor.
    * @param info input info
    */
-  public Compare(final InputInfo info) {
+  public DeepCompare(final InputInfo info) {
     this.info = info;
   }
 
@@ -47,7 +54,7 @@ public final class Compare {
    * @param flag flag
    * @return self reference
    */
-  public Compare flag(final Mode flag) {
+  public DeepCompare flag(final Mode flag) {
     flags.add(flag);
     return this;
   }
@@ -57,35 +64,20 @@ public final class Compare {
    * @param cl collation
    * @return self reference
    */
-  public Compare collation(final Collation cl) {
+  public DeepCompare collation(final Collation cl) {
     coll = cl;
     return this;
   }
 
   /**
-   * Checks items for deep equality.
-   * @param val1 first value
-   * @param val2 second value
-   * @param info input info
+   * Checks values for deep equality.
+   * @param value1 first value
+   * @param value2 second value
    * @return result of check
    * @throws QueryException query exception
    */
-  public static boolean deep(final Value val1, final Value val2, final InputInfo info)
-      throws QueryException {
-    return deep(val1.iter(), val2.iter(), info);
-  }
-
-  /**
-   * Checks items for deep equality.
-   * @param iter1 first iterator
-   * @param iter2 second iterator
-   * @param info input info
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  public static boolean deep(final Iter iter1, final Iter iter2, final InputInfo info)
-      throws QueryException {
-    return new Compare(info).deep(iter1, iter2);
+  public boolean equal(final Value value1, final Value value2) throws QueryException {
+    return equal(value1.iter(), value2.iter());
   }
 
   /**
@@ -95,7 +87,7 @@ public final class Compare {
    * @return result of check
    * @throws QueryException query exception
    */
-  public boolean deep(final Iter iter1, final Iter iter2) throws QueryException {
+  public boolean equal(final Iter iter1, final Iter iter2) throws QueryException {
     while(true) {
       // check if one or both iterators are exhausted
       final Item it1 = iter1.next(), it2 = iter2.next();
@@ -105,7 +97,7 @@ public final class Compare {
       if(it1 instanceof FItem || it2 instanceof FItem) {
         // maps are functions but have a defined deep-equality
         if(it1 instanceof Map && it2 instanceof Map) {
-          if(!((Map) it1).deep(info, (Map) it2)) return false;
+          if(!((Map) it1).deep(info, (Map) it2, coll)) return false;
           continue;
         }
         throw FICMP.get(info, it1 instanceof FItem ? it1.type : it2.type);
@@ -169,8 +161,7 @@ public final class Compare {
             if(!eq(s1.string(), s2.string())) return false;
           } else if(t1 == NodeType.ELM) {
             // compare attributes
-            if(s1.attributes().value().size() !=
-               s2.attributes().value().size()) return false;
+            if(s1.attributes().value().size() != s2.attributes().value().size()) return false;
 
             // compare names, values and prefixes
             final AxisIter ai1 = s1.attributes();
@@ -181,8 +172,7 @@ public final class Compare {
               for(ANode a2; (a2 = ai2.next()) != null;) {
                 n2 = a2.qname();
                 if(!n1.eq(n2)) continue;
-                if(flags.contains(Mode.NAMESPACES) &&
-                    !eq(n1.prefix(), n2.prefix()) ||
+                if(flags.contains(Mode.NAMESPACES) && !eq(n1.prefix(), n2.prefix()) ||
                     !eq(a1.string(), a2.string())) return false;
                 continue LOOP;
               }

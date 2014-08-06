@@ -4,7 +4,6 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.util.*;
-import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -69,11 +68,5 @@ public final class FNMapTest extends AdvancedQueryTest {
         _MAP_ENTRY.args("$i", "$i + 1")) +
         "for $k in " + _MAP_KEYS.args("$map") + " order by $k return " +
         _MAP_GET.args("$map", "$k"), "2 3 4");
-  }
-
-  /** Test method. */
-  @Test
-  public void collation() {
-    query(_MAP_COLLATION.args(_MAP_NEW.args()), Token.string(QueryText.COLLATIONURI));
   }
 }

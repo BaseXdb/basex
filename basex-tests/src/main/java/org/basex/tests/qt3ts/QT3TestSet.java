@@ -11,7 +11,7 @@ import org.basex.core.cmd.Set;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.util.Compare.Mode;
+import org.basex.query.util.DeepCompare.Mode;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.tests.bxapi.*;

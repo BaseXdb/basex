@@ -2,6 +2,7 @@ package org.basex.query.value.map;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -45,8 +46,8 @@ final class Branch extends TrieNode {
   }
 
   @Override
-  TrieNode insert(final int h, final Item k, final Value v, final int l,
-      final InputInfo ii) throws QueryException {
+  TrieNode insert(final int h, final Item k, final Value v, final int l, final InputInfo ii)
+      throws QueryException {
     final int key = key(h, l);
     final TrieNode sub = kids[key], nsub;
     final int bs, rem;
@@ -211,7 +212,7 @@ final class Branch extends TrieNode {
   }
 
   @Override
-  boolean deep(final InputInfo ii, final TrieNode o) throws QueryException {
+  boolean deep(final InputInfo ii, final TrieNode o, final Collation coll) throws QueryException {
     if(!(o instanceof Branch)) return false;
     final Branch ob = (Branch) o;
 
@@ -220,7 +221,7 @@ final class Branch extends TrieNode {
 
     // recursively compare children
     for(int i = 0; i < KIDS; i++)
-      if(kids[i] != null && !kids[i].deep(ii, ob.kids[i])) return false;
+      if(kids[i] != null && !kids[i].deep(ii, ob.kids[i], coll)) return false;
 
     // everything OK
     return true;

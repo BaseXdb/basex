@@ -86,7 +86,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    */
   public boolean deepEqual(final XdmValue value) {
     try {
-      return Compare.deep(internal(), value.internal(), null);
+      return new DeepCompare().equal(internal(), value.internal());
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }

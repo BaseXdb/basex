@@ -693,7 +693,7 @@ public class FnHttpTest extends HTTPTest {
     resultIter.add(Str.get(".... fanciest formatted version of same  message  goes  here\n...\n"));
 
     // Compare response with expected result
-    if(!Compare.deep(resultIter, expIter, null)) {
+    if(!new DeepCompare().equal(resultIter, expIter)) {
       final TokenBuilder exp = new TokenBuilder();
       for(final Item it : expIter) exp.add("- ").add(it.toString()).add('\n');
       final TokenBuilder res = new TokenBuilder();
@@ -785,8 +785,7 @@ public class FnHttpTest extends HTTPTest {
         + "It DOES end with a linebreak.\n\n"));
 
     // Compare response with expected result
-    // Compare response with expected result
-    if(!Compare.deep(resultIter, expIter, null)) {
+    if(!new DeepCompare().equal(resultIter, expIter)) {
       final TokenBuilder exp = new TokenBuilder();
       for(final Item it : expIter) exp.add(it.toString()).add('\n');
       final TokenBuilder res = new TokenBuilder();

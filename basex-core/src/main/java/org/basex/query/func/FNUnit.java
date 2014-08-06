@@ -60,7 +60,7 @@ public final class FNUnit extends StandardFunc {
   private Item assertEquals(final QueryContext qc) throws QueryException {
     final Item it = exprs.length < 3 ? null : checkItem(exprs[2], qc);
     final Iter iter1 = qc.iter(exprs[0]), iter2 = qc.iter(exprs[1]);
-    final Compare comp = new Compare(info);
+    final DeepCompare comp = new DeepCompare(info);
     Item it1, it2;
     int c = 1;
     while(true) {
@@ -68,7 +68,7 @@ public final class FNUnit extends StandardFunc {
       it2 = iter2.next();
       final boolean empty1 = it1 == null, empty2 = it2 == null;
       if(empty1 && empty2) return null;
-      if(empty1 || empty2 || !comp.deep(it1.iter(), it2.iter())) break;
+      if(empty1 || empty2 || !comp.equal(it1.iter(), it2.iter())) break;
       c++;
     }
     throw new UnitException(info, UNIT_ASSERT_EQUALS, it1, it2, c).value(it);

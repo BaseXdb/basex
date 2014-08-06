@@ -7,7 +7,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.util.Compare.*;
+import org.basex.query.util.DeepCompare.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -188,7 +188,7 @@ public final class FNSimple extends StandardFunc {
    */
   private boolean deep(final QueryContext qc) throws QueryException {
     final Collation coll = checkColl(2, qc);
-    return new Compare(info).collation(coll).deep(qc.iter(exprs[0]), qc.iter(exprs[1]));
+    return new DeepCompare(info).collation(coll).equal(qc.iter(exprs[0]), qc.iter(exprs[1]));
   }
 
   /**
@@ -198,7 +198,7 @@ public final class FNSimple extends StandardFunc {
    * @throws QueryException query exception
    */
   private boolean deepOpt(final QueryContext qc) throws QueryException {
-    final Compare cmp = new Compare(info);
+    final DeepCompare cmp = new DeepCompare(info);
     final Mode[] modes = Mode.values();
     if(exprs.length == 3) {
       final Iter ir = exprs[2].iter(qc);
@@ -215,6 +215,6 @@ public final class FNSimple extends StandardFunc {
         if(!found) throw INVALIDOPTX.get(info, key);
       }
     }
-    return cmp.deep(qc.iter(exprs[0]), qc.iter(exprs[1]));
+    return cmp.equal(qc.iter(exprs[0]), qc.iter(exprs[1]));
   }
 }

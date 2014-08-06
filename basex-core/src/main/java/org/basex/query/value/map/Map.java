@@ -210,22 +210,15 @@ public final class Map extends FItem {
   }
 
   /**
-   * Collation of this map.
-   * @return collation
-   */
-  public Str collation() {
-    return Str.get(COLLATIONURI);
-  }
-
-  /**
    * Checks if the this map is deep-equal to the given one.
    * @param ii input info
    * @param o other map
+   * @param coll collation
    * @return result of check
    * @throws QueryException query exception
    */
-  public boolean deep(final InputInfo ii, final Map o) throws QueryException {
-    return root.deep(ii, o.root);
+  public boolean deep(final InputInfo ii, final Map o, final Collation coll) throws QueryException {
+    return root.deep(ii, o.root, coll);
   }
 
   /**

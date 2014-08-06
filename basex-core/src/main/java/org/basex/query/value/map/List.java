@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -73,8 +74,8 @@ final class List extends TrieNode {
   }
 
   @Override
-  TrieNode insert(final int h, final Item k, final Value v, final int l,
-      final InputInfo ii) throws QueryException {
+  TrieNode insert(final int h, final Item k, final Value v, final int l, final InputInfo ii)
+      throws QueryException {
     // same hash, replace or merge
     if(h == hash) {
       for(int i = keys.length; i-- > 0;) {
@@ -240,7 +241,7 @@ final class List extends TrieNode {
   }
 
   @Override
-  boolean deep(final InputInfo ii, final TrieNode o) throws QueryException {
+  boolean deep(final InputInfo ii, final TrieNode o, final Collation coll) throws QueryException {
     if(!(o instanceof List) || size != o.size) return false;
     final List ol = (List) o;
 
@@ -250,7 +251,7 @@ final class List extends TrieNode {
       for(int j = 0; j < size; j++) {
         if(eq(k, ol.keys[i], ii)) {
           // check bound value, too
-          if(!deep(values[i], ol.values[j], ii)) return false;
+          if(!deep(values[i], ol.values[j], coll, ii)) return false;
           // value matched, continue with next key
           continue outer;
         }

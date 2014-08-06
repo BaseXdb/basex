@@ -2,6 +2,7 @@ package org.basex.query.value.map;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -36,8 +37,8 @@ final class Leaf extends TrieNode {
   }
 
   @Override
-  TrieNode insert(final int h, final Item k, final Value v, final int l,
-      final InputInfo ii) throws QueryException {
+  TrieNode insert(final int h, final Item k, final Value v, final int l, final InputInfo ii)
+      throws QueryException {
     // same hash, replace or merge
     if(h == hash) return eq(k, key, ii) ?
         new Leaf(h, k, v) : new List(hash, key, value, k, v);
@@ -76,8 +77,7 @@ final class Leaf extends TrieNode {
 
   @Override
   StringBuilder toString(final StringBuilder sb, final String ind) {
-    return sb.append(ind).append("`-- ").append(key).append(
-        " => ").append(value).append('\n');
+    return sb.append(ind).append("`-- ").append(key).append(" => ").append(value).append('\n');
   }
 
   @Override
@@ -146,8 +146,7 @@ final class Leaf extends TrieNode {
     final TrieNode[] ch = o.copyKids();
     final TrieNode old = ch[k];
     ch[k] = old == null ? this : old.addAll(this, l + 1, ii);
-    return new Branch(ch, o.used | 1 << k,
-        o.size + ch[k].size - (old != null ? old.size : 0));
+    return new Branch(ch, o.used | 1 << k, o.size + ch[k].size - (old != null ? old.size : 0));
   }
 
   @Override
@@ -166,14 +165,13 @@ final class Leaf extends TrieNode {
 
   @Override
   boolean hasType(final AtomType kt, final SeqType vt) {
-    return (kt == null || key.type.instanceOf(kt))
-        && (vt == null || vt.instance(value));
+    return (kt == null || key.type.instanceOf(kt)) && (vt == null || vt.instance(value));
   }
 
   @Override
-  boolean deep(final InputInfo ii, final TrieNode o) throws QueryException {
-    return o instanceof Leaf && eq(key, ((Leaf) o).key, ii)
-        && deep(value, ((Leaf) o).value, ii);
+  boolean deep(final InputInfo ii, final TrieNode o, final Collation coll) throws QueryException {
+    return o instanceof Leaf && eq(key, ((Leaf) o).key, ii) &&
+        deep(value, ((Leaf) o).value, coll, ii);
   }
 
   @Override

@@ -399,7 +399,7 @@ public enum Function {
   /* FNMap functions. */
 
   /** XQuery function. */
-  _MAP_NEW(FNMap.class, "new([maps[,collation]])", arg(MAP_ZM, STR), MAP_O, flag(X30)),
+  _MAP_NEW(FNMap.class, "new([maps])", arg(MAP_ZM, STR), MAP_O, flag(X30)),
   /** XQuery function. */
   _MAP_ENTRY(FNMap.class, "entry(key,value)", arg(AAT, ITEM_ZM), MAP_O, flag(X30)),
   /** XQuery function. */
@@ -412,8 +412,6 @@ public enum Function {
   _MAP_SIZE(FNMap.class, "size(map)", arg(MAP_O), ITR, flag(X30)),
   /** XQuery function. */
   _MAP_KEYS(FNMap.class, "keys(map)", arg(MAP_O), AAT_ZM, flag(X30)),
-  /** XQuery function. */
-  _MAP_COLLATION(FNMap.class, "collation(map)", arg(MAP_O), STR, flag(X30)),
   /** XQuery function. */
   _MAP_SERIALIZE(FNMap.class, "serialize(map)", arg(MAP_O), STR, flag(X30)),
 

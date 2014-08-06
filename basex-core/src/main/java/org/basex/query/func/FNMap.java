@@ -53,7 +53,6 @@ public final class FNMap extends StandardFunc {
       case _MAP_CONTAINS:  return Bln.get(contains(qc, ii));
       case _MAP_SIZE:      return Int.get(map(qc).mapSize());
       case _MAP_REMOVE:    return remove(qc, ii);
-      case _MAP_COLLATION: return map(qc).collation();
       case _MAP_SERIALIZE: return Str.get(map(qc).serialize(info));
       default:             return super.item(qc, ii);
     }
@@ -90,13 +89,9 @@ public final class FNMap extends StandardFunc {
    */
   private Map newMap(final QueryContext qc, final InputInfo ii) throws QueryException {
     if(exprs.length == 0) return Map.EMPTY;
-    // collations are ignored here as they may disappear in a future version
-    checkColl(1, qc);
-
     Map map = Map.EMPTY;
     final Iter maps = exprs[0].iter(qc);
-    for(Item m; (m = maps.next()) != null;)
-      map = map.addAll(checkMap(m), ii);
+    for(Item m; (m = maps.next()) != null;) map = map.addAll(checkMap(m), ii);
     return map;
   }
 

@@ -52,7 +52,7 @@ abstract class TrieNode {
     @Override
     int hash(final InputInfo ii) { return 0; }
     @Override
-    boolean deep(final InputInfo ii, final TrieNode o) { return this == o; }
+    boolean deep(final InputInfo ii, final TrieNode o, final Collation coll) { return this == o; }
     @Override
     public TrieNode insert(final int h, final Item k, final Value v,
         final int l, final InputInfo i) {
@@ -213,12 +213,14 @@ abstract class TrieNode {
    * Compares two values.
    * @param a first value
    * @param b second value
+   * @param coll collation
    * @param ii input info
    * @return {@code true} if both values are deep equal, {@code false} otherwise
    * @throws QueryException query exception
    */
-  static boolean deep(final Value a, final Value b, final InputInfo ii) throws QueryException {
-    return a.size() == b.size() && Compare.deep(a, b, ii);
+  static boolean deep(final Value a, final Value b, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return a.size() == b.size() && new DeepCompare(ii).collation(coll).equal(a, b);
   }
 
   /**
@@ -245,10 +247,12 @@ abstract class TrieNode {
    * Checks if this node is indistinguishable from the given node.
    * @param ii input info
    * @param o other node
+   * @param coll collation
    * @return result of check
    * @throws QueryException query exception
    */
-  abstract boolean deep(final InputInfo ii, final TrieNode o) throws QueryException;
+  abstract boolean deep(final InputInfo ii, final TrieNode o, final Collation coll)
+      throws QueryException;
 
   /**
    * Recursive helper for {@link Map#toString()}.
