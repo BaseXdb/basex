@@ -174,7 +174,7 @@ public final class FNSimple extends StandardFunc {
       if(!e.seqType().mayBeNumber()) ex = e;
     } else if(func == Function.EXISTS) {
       // if(exists(node*)) -> if(node*)
-      if(e.seqType().type.isNode()) ex = e;
+      if(e.seqType().type instanceof NodeType) ex = e;
     }
     if(ex != this) qc.compInfo(QueryText.OPTWRITE, this);
     return ex;

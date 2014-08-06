@@ -216,12 +216,6 @@ public interface Type {
   Type intersect(final Type type);
 
   /**
-   * Checks if the type refers to a node.
-   * @return result of check
-   */
-  boolean isNode();
-
-  /**
    * Checks if the type refers to a number.
    * @return result of check
    */

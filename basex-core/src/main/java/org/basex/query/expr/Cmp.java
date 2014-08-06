@@ -64,7 +64,7 @@ public abstract class Cmp extends Arr {
   final Expr compCount(final OpV o) throws QueryException {
     // evaluate argument
     final Expr a = exprs[1];
-    if(!a.isItem()) return this;
+    if(!(a instanceof Item)) return this;
     final Item it = (Item) a;
     if(!it.type.isNumberOrUntyped()) return this;
 

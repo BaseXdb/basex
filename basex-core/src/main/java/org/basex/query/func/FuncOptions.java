@@ -94,7 +94,7 @@ public final class FuncOptions {
         if(!(it instanceof AStr)) throw FUNTYPE.get(info, AtomType.STR, it.type, it);
         tb.add(it.string(info)).add('=');
         final Value val = map.get(it, info);
-        if(!val.isItem()) throw FUNTYPE.get(info, AtomType.ITEM, val.seqType(), val);
+        if(!(val instanceof Item)) throw FUNTYPE.get(info, AtomType.ITEM, val.seqType(), val);
         tb.add(optString((Item) val).replace(",", ",,")).add(',');
       }
     } else if(item.type == NodeType.ELM) {

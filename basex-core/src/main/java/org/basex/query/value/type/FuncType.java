@@ -44,11 +44,6 @@ public class FuncType implements Type {
   }
 
   @Override
-  public final boolean isNode() {
-    return false;
-  }
-
-  @Override
   public final boolean isNumber() {
     return false;
   }

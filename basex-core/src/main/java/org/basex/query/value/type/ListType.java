@@ -120,11 +120,6 @@ public enum ListType implements Type {
   }
 
   @Override
-  public final boolean isNode() {
-    return false;
-  }
-
-  @Override
   public final ID id() {
     return null;
   }

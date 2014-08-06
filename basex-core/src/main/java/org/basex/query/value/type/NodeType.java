@@ -165,11 +165,6 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public final boolean isNode() {
-    return true;
-  }
-
-  @Override
   public final boolean isNumber() {
     return false;
   }
@@ -226,7 +221,7 @@ public enum NodeType implements Type {
 
   @Override
   public final Type union(final Type t) {
-    return t.isNode() ? this == t ? this : NOD : AtomType.ITEM;
+    return t instanceof NodeType ? this == t ? this : NOD : AtomType.ITEM;
   }
 
   @Override

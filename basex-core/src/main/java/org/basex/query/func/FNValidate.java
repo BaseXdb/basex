@@ -256,7 +256,7 @@ public final class FNValidate extends StandardFunc {
   private IO read(final Item it, final QueryContext qc, final SerializerOptions sopts)
       throws QueryException, IOException {
 
-    if(it.type.isNode()) {
+    if(it instanceof ANode) {
       // return node in string representation
       final ArrayOutput ao = new ArrayOutput();
       Serializer.get(ao, sopts).serialize(it);

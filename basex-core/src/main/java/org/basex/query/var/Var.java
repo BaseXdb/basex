@@ -180,7 +180,7 @@ public final class Var extends ExprInfo {
     if(!checksType() || vt.type.instanceOf(et.type) ||
         et.type.instanceOf(vt.type) && et.occ.instanceOf(vt.occ)) return;
 
-    if(!promote || !et.type.isNode() && !et.promotable(vt)) {
+    if(!promote || !(et.type instanceof NodeType) && !et.promotable(vt)) {
       if(vt.type.nsSensitive() && sc.xquery3()) throw NSSENS.get(info, et, vt);
       throw INVCAST.get(info, et, vt);
     }

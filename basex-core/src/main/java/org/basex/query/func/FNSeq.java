@@ -152,7 +152,7 @@ public final class FNSeq extends StandardFunc {
     final SeqType st = exprs[0].seqType();
     final Type t = st.type;
     if(func == Function.DISTINCT_VALUES && exprs.length == 1) {
-      seqType = t.isNode() ? SeqType.get(AtomType.ATM, st.occ) : st;
+      seqType = t instanceof NodeType ? SeqType.get(AtomType.ATM, st.occ) : st;
       return cmpDist(qc);
     }
 

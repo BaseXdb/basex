@@ -287,11 +287,11 @@ public abstract class Path extends ParseExpr {
    */
   private Value initial(final QueryContext qc) {
     // current context value
-    final Value value = qc != null ? qc.value : null;
+    final Value v = qc != null ? qc.value : null;
     // no root or context expression: return context
-    if(root == null || root instanceof Context) return value;
+    if(root == null || root instanceof Context) return v;
     // root reference
-    if(root instanceof Root) return value != null && value.isItem() ? Root.root(value) : value;
+    if(root instanceof Root) return v != null && v instanceof Item ? Root.root(v) : v;
     // root is value: return root
     if(root.isValue()) return (Value) root;
     // data reference

@@ -917,7 +917,7 @@ public final class FNDb extends StandardFunc {
   private NewInput checkInput(final Item in, final byte[] path) throws QueryException {
     final NewInput ni = new NewInput();
 
-    if(in.type.isNode()) {
+    if(in instanceof ANode) {
       if(endsWith(path, '.') || endsWith(path, '/')) throw RESINV.get(info, path);
 
       // ensure that the final name is not empty

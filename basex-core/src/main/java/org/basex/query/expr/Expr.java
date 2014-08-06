@@ -143,14 +143,6 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Tests if this is an item.
-   * @return result of check
-   */
-  public boolean isItem() {
-    return false;
-  }
-
-  /**
    * Returns the data reference bound to this expression. This method is overwritten
    * by the values {@link DBNode} and {@link DBNodeSeq} and some more expressions.
    * @return data reference

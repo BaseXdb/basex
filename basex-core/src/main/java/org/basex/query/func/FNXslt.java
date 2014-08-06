@@ -131,7 +131,7 @@ public final class FNXslt extends StandardFunc {
    */
   private IO read(final Expr ex, final QueryContext qc) throws QueryException {
     final Item it = checkItem(ex, qc);
-    if(it.type.isNode()) {
+    if(it instanceof ANode) {
       try {
         final IO io = new IOContent(it.serialize().finish());
         io.name(string(((ANode) it).baseURI()));

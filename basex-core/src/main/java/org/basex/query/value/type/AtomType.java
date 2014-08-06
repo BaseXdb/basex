@@ -257,7 +257,7 @@ public enum AtomType implements Type {
   },
 
   /** Precision decimal type. */
-  PDC("precisionDecimal", null, XSURI, false, false, false, Type.ID.PDC),
+  PDC("precisionDecimal", null, XSURI, true, false, false, Type.ID.PDC),
 
   /** Integer type. */
   ITR("integer", DEC, XSURI, true, false, false, Type.ID.ITR) {
@@ -843,11 +843,6 @@ public enum AtomType implements Type {
   @Override
   public final Type intersect(final Type t) {
     return instanceOf(t) ? this : t.instanceOf(this) ? t : null;
-  }
-
-  @Override
-  public final boolean isNode() {
-    return false;
   }
 
   @Override

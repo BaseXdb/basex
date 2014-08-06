@@ -58,13 +58,13 @@ public final class MixedPath extends Path {
         // loop through all input items
         int nodes = 0;
         for(Item it; (it = res.next()) != null;) {
-          if(path && !it.type.isNode()) throw PATHNODE.get(info, step, it.type, it);
+          if(path && !(it instanceof ANode)) throw PATHNODE.get(info, step, it.type, it);
           qc.value = it;
 
           // loop through all resulting items
           final Iter ir = qc.iter(step);
           for(Item i; (i = ir.next()) != null;) {
-            if(i.type.isNode()) nodes++;
+            if(i instanceof ANode) nodes++;
             vb.add(i);
           }
           qc.pos++;

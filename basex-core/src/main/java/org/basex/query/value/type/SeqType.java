@@ -381,7 +381,7 @@ public final class SeqType {
     if(!occ.check(vs)) throw INVCASTEX.get(ii, val.seqType(), this, val);
 
     if(val.isEmpty()) return Empty.SEQ;
-    if(val.isItem()) return cast((Item) val, qc, sc, ii, true);
+    if(val instanceof Item) return cast((Item) val, qc, sc, ii, true);
 
     final ValueBuilder vb = new ValueBuilder((int) vs);
     for(int v = 0; v < vs; v++) vb.add(cast(val.itemAt(v), qc, sc, ii, true));
@@ -465,7 +465,8 @@ public final class SeqType {
     final long n = val.size();
     if(!occ.check(n)) throw Err.treatError(ii, val, this);
     if(n == 0) return Empty.SEQ;
-    if(val.isItem()) return instance((Item) val, true) ? val : promote(qc, sc, ii, (Item) val, opt);
+    if(val instanceof Item) return instance((Item) val, true) ?
+       val : promote(qc, sc, ii, (Item) val, opt);
 
     ValueBuilder vb = null;
     final Item fst = val.itemAt(0);

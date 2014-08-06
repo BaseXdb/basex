@@ -71,11 +71,6 @@ public abstract class Item extends Value {
     return bool(ii) ? this : null;
   }
 
-  @Override
-  public final boolean isItem() {
-    return true;
-  }
-
   /**
    * Returns a string representation of the value.
    * @param ii input info, use {@code null} if none is available

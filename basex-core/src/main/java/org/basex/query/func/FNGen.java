@@ -83,7 +83,7 @@ public final class FNGen extends StandardFunc {
   protected Expr opt(final QueryContext qc, final VarScope scp) {
     if(func == DATA && exprs.length == 1) {
       final SeqType t = exprs[0].seqType();
-      seqType = t.type.isNode() ? SeqType.get(AtomType.ATM, t.occ) : t;
+      seqType = t.type instanceof NodeType ? SeqType.get(AtomType.ATM, t.occ) : t;
     }
     return this;
   }
