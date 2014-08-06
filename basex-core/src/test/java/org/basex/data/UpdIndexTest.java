@@ -98,6 +98,16 @@ public final class UpdIndexTest extends AdvancedQueryTest {
   }
 
   /**
+   * Test.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void test6() throws BaseXException {
+    run(new CreateDB(NAME, "<X><A>q</A><B>q</B></X>"));
+    query("replace node /X/A with 'x', replace node /X/B with 'y'", "");
+  }
+
+  /**
    * Runs the specified command.
    * @param cmd command to be run
    * @return string result

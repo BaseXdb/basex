@@ -107,28 +107,29 @@ public final class UpdatableDiskValues extends DiskValues {
         deleteKeys(tmp);
       }
     }
-    // add the id to the new key
+
+    final IntList newIds;
     int index = get(key);
     if(index < 0) {
-      index = -(index + 1);
+      newIds = new IntList(1).add(id);
 
-      final int sz = size();
+      // new id list
+      index = -(index + 1);
+      // create space for new entry
+      final int sz = size() + 1;
       final byte[] tmp = idxr.readBytes(0, sz * 5);
-      for(int i = sz; i > index; --i) copy(tmp, i, i - 1);
+      for(int i = sz - 1; i > index; --i) copy(tmp, i, i - 1);
       idxr.cursor(0);
       idxr.writeBytes(tmp, 0, sz * 5);
+      size(sz);
 
-      // write new ids
-      writeIds(key, new IntList(1).add(id), index);
-
-      size(sz + 1);
     } else {
-      // add id to the list of ids in the index node
+      // add id to the existing id list
       final long off = idxr.read5(index * 5L);
       final int num = idxl.readNum(off);
-
       final int newSize = num + 1;
-      final IntList newIds = new IntList(newSize);
+      newIds = new IntList(newSize);
+
       boolean notadded = true;
       int prevId = 0;
       for(int i = 0; i < num; ++i) {
@@ -145,9 +146,9 @@ public final class UpdatableDiskValues extends DiskValues {
         prevId += v;
       }
       if(notadded) newIds.add(id);
-
-      writeIds(key, newIds, index);
     }
+    // write new ids
+    writeIds(key, newIds, index);
   }
 
   /**
