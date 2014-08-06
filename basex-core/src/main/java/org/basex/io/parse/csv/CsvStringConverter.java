@@ -68,11 +68,10 @@ public final class CsvStringConverter extends CsvConverter {
     final byte[] name = headers.get(col++);
     byte[] elem = ENTRY, attr = null;
     if(atts) {
-      attr = name;
-    } else if(name != null) {
-      elem = name;
+      xml.open(elem, NAME, attr);
+    } else {
+      xml.open(name != null ? name : elem);
     }
-    xml.open(elem, NAME, attr);
     xml.text(entry);
     xml.close();
   }

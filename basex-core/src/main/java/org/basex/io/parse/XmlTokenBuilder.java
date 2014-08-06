@@ -28,12 +28,9 @@ public final class XmlTokenBuilder {
     cch.add('<').add(name);
     final int al = atts.length;
     for(int a = 0; a < al; a += 2) {
-      final byte[] an = atts[a], av = atts[a + 1];
-      if(av != null) {
-        cch.add(' ').add(an).add('=').add('"');
-        attribute(av);
-        cch.add('"');
-      }
+      cch.add(' ').add(atts[a]).add('=').add('"');
+      attribute(atts[a + 1]);
+      cch.add('"');
     }
     cch.add('>');
     open.add(name);
