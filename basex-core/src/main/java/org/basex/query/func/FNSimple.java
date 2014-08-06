@@ -187,7 +187,7 @@ public final class FNSimple extends StandardFunc {
    * @throws QueryException query exception
    */
   private boolean deep(final QueryContext qc) throws QueryException {
-    final Collation coll = checkColl(exprs.length == 3 ? exprs[2] : null, qc, sc);
+    final Collation coll = checkColl(2, qc);
     return new Compare(info).collation(coll).deep(qc.iter(exprs[0]), qc.iter(exprs[1]));
   }
 

@@ -133,7 +133,7 @@ public final class FNAggr extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item minmax(final Iter iter, final OpV cmp, final QueryContext qc) throws QueryException {
-    final Collation coll = checkColl(exprs.length == 2 ? exprs[1] : null, qc, sc);
+    final Collation coll = checkColl(1, qc);
 
     Item rs = iter.next();
     if(rs == null) return null;

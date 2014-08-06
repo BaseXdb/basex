@@ -160,6 +160,30 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Checks if the specified expression is a database node.
+   * Returns the node or an exception.
+   * @param it item to be checked
+   * @return item
+   * @throws QueryException query exception
+   */
+  protected final DBNode checkDBNode(final Item it) throws QueryException {
+    if(checkNoEmpty(it, NodeType.NOD) instanceof DBNode) return (DBNode) it;
+    throw BXDB_NODB.get(info, it.type, it);
+  }
+
+  /**
+   * Checks if the specified collation is supported.
+   * @param i argument index
+   * @param qc query context
+   * @return collator, or {@code null} (default collation)
+   * @throws QueryException query exception
+   */
+  protected final Collation checkColl(final int i, final QueryContext qc) throws QueryException {
+    final byte[] coll = i >= exprs.length ? null : checkStr(exprs[i], qc);
+    return Collation.get(coll, qc, sc, info, WHICHCOLL);
+  }
+
+  /**
    * Returns a database instance for the first string argument of the function.
    * This method assumes that the function has at least one argument.
    * @param qc query context
@@ -236,6 +260,37 @@ public abstract class StandardFunc extends Arr {
       final QueryContext qc) throws QueryException {
     if(i < exprs.length) new FuncOptions(qnm, info).parse(exprs[i].item(qc, info), opts);
     return opts;
+  }
+
+  /**
+   * Checks if the current user has create permissions. If negative, an
+   * exception is thrown.
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  protected final void checkAdmin(final QueryContext qc) throws QueryException {
+    checkPerm(qc, Perm.ADMIN);
+  }
+
+  /**
+   * Checks if the current user has create permissions. If negative, an
+   * exception is thrown.
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  protected final void checkCreate(final QueryContext qc) throws QueryException {
+    checkPerm(qc, Perm.CREATE);
+  }
+
+  /**
+   * Checks if the current user has given permissions. If negative, an
+   * exception is thrown.
+   * @param qc query context
+   * @param p permission
+   * @throws QueryException query exception
+   */
+  private void checkPerm(final QueryContext qc, final Perm p) throws QueryException {
+    if(!qc.context.user.has(p)) throw BASX_PERM.get(info, p);
   }
 
   /**

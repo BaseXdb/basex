@@ -4,11 +4,9 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -328,31 +326,6 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression is a database node.
-   * Returns the node or an exception.
-   * @param it item to be checked
-   * @return item
-   * @throws QueryException query exception
-   */
-  protected final DBNode checkDBNode(final Item it) throws QueryException {
-    if(checkNoEmpty(it, NodeType.NOD) instanceof DBNode) return (DBNode) it;
-    throw BXDB_NODB.get(info, it.type, it);
-  }
-
-  /**
-   * Checks if the specified collation is supported.
-   * @param ex expression to be checked
-   * @param qc query context
-   * @param sc static context
-   * @return collator, or {@code null} (default collation)
-   * @throws QueryException query exception
-   */
-  protected final Collation checkColl(final Expr ex, final QueryContext qc, final StaticContext sc)
-      throws QueryException {
-    return Collation.get(ex == null ? null : checkStr(ex, qc), qc, sc, info, WHICHCOLL);
-  }
-
-  /**
    * Checks if the specified expression yields a string.
    * Returns a token representation or an exception.
    * @param ex expression to be evaluated
@@ -373,6 +346,18 @@ public abstract class ParseExpr extends Expr {
    */
   protected final byte[] checkEStr(final Item it) throws QueryException {
     return it == null ? EMPTY : checkStr(it);
+  }
+
+  /**
+   * Checks if the specified expression yields a string or empty sequence.
+   * Returns a token representation or an exception.
+   * @param ex expression to be evaluated
+   * @param qc query context
+   * @return item
+   * @throws QueryException query exception
+   */
+  protected final byte[] checkEStr(final Expr ex, final QueryContext qc) throws QueryException {
+    return checkEStr(ex.item(qc, info));
   }
 
   /**
@@ -398,19 +383,6 @@ public abstract class ParseExpr extends Expr {
     final Value v = qc.value;
     if(v != null) return v;
     throw NOCTX.get(info, this);
-  }
-
-  /**
-   * Throws an exception if the context value is not a node.
-   * @param qc query context
-   * @return context
-   * @throws QueryException query exception
-   */
-  protected final ANode checkNode(final QueryContext qc) throws QueryException {
-    final Value v = qc.value;
-    if(v instanceof ANode) return (ANode) v;
-    if(v == null) throw NOCTX.get(info, this);
-    throw STEPNODE.get(info, this, v.type, v);
   }
 
   /**
@@ -534,49 +506,6 @@ public abstract class ParseExpr extends Expr {
   protected Item checkNoEmpty(final Item it, final Type t) throws QueryException {
     if(it != null) return it;
     throw SEQEXP.get(info, t);
-  }
-
-  /**
-   * Checks if the specified expression yields a string or empty sequence.
-   * Returns a token representation or an exception.
-   * @param ex expression to be evaluated
-   * @param qc query context
-   * @return item
-   * @throws QueryException query exception
-   */
-  protected final byte[] checkEStr(final Expr ex, final QueryContext qc) throws QueryException {
-    return checkEStr(ex.item(qc, info));
-  }
-
-  /**
-   * Checks if the current user has create permissions. If negative, an
-   * exception is thrown.
-   * @param qc query context
-   * @throws QueryException query exception
-   */
-  protected final void checkAdmin(final QueryContext qc) throws QueryException {
-    checkPerm(qc, Perm.ADMIN);
-  }
-
-  /**
-   * Checks if the current user has create permissions. If negative, an
-   * exception is thrown.
-   * @param qc query context
-   * @throws QueryException query exception
-   */
-  protected final void checkCreate(final QueryContext qc) throws QueryException {
-    checkPerm(qc, Perm.CREATE);
-  }
-
-  /**
-   * Checks if the current user has given permissions. If negative, an
-   * exception is thrown.
-   * @param qc query context
-   * @param p permission
-   * @throws QueryException query exception
-   */
-  private void checkPerm(final QueryContext qc, final Perm p) throws QueryException {
-    if(!qc.context.user.has(p)) throw BASX_PERM.get(info, p);
   }
 
   /**

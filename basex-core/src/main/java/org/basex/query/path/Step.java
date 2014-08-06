@@ -1,6 +1,7 @@
 package org.basex.query.path;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 
 import java.util.*;
 
@@ -14,6 +15,7 @@ import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.func.*;
 import org.basex.query.path.Test.Kind;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -199,6 +201,18 @@ public abstract class Step extends Preds {
   final Step addPreds(final Expr... prds) {
     for(final Expr p : prds) preds = Array.add(preds, p);
     return get(info, axis, test, preds);
+  }
+
+  /**
+   * Throws an exception if the context value is not a node.
+   * @param qc query context
+   * @return context
+   * @throws QueryException query exception
+   */
+  protected final ANode checkNode(final QueryContext qc) throws QueryException {
+    final Value v = qc.value;
+    if(v instanceof ANode) return (ANode) v;
+    throw (v == null ? NOCTX : STEPNODE).get(info, this, v.type, v);
   }
 
   @Override

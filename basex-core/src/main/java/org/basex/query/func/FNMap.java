@@ -91,7 +91,7 @@ public final class FNMap extends StandardFunc {
   private Map newMap(final QueryContext qc, final InputInfo ii) throws QueryException {
     if(exprs.length == 0) return Map.EMPTY;
     // collations are ignored here as they may disappear in a future version
-    checkColl(exprs.length == 2 ? exprs[1] : null, qc, sc);
+    checkColl(1, qc);
 
     Map map = Map.EMPTY;
     final Iter maps = exprs[0].iter(qc);

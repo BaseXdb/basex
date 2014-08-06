@@ -51,9 +51,9 @@ public enum Function {
   /** XQuery function. */
   COUNT(FNAggr.class, "count(items)", arg(ITEM_ZM), ITR),
   /** XQuery function. */
-  MAX(FNAggr.class, "max(items[,coll])", arg(AAT_ZM, STR), AAT_ZO),
+  MAX(FNAggr.class, "max(items[,collation])", arg(AAT_ZM, STR), AAT_ZO),
   /** XQuery function. */
-  MIN(FNAggr.class, "min(items[,coll])", arg(AAT_ZM, STR), AAT_ZO),
+  MIN(FNAggr.class, "min(items[,collation])", arg(AAT_ZM, STR), AAT_ZO),
   /** XQuery function. */
   SUM(FNAggr.class, "sum(items[,zero])", arg(AAT_ZM, AAT_ZO), AAT_ZO),
 
@@ -300,9 +300,9 @@ public enum Function {
   /* FNSeq functions. */
 
   /** XQuery function. */
-  DISTINCT_VALUES(FNSeq.class, "distinct-values(items[,coll])", arg(AAT_ZM, STR), AAT_ZM),
+  DISTINCT_VALUES(FNSeq.class, "distinct-values(items[,collation])", arg(AAT_ZM, STR), AAT_ZM),
   /** XQuery function. */
-  INDEX_OF(FNSeq.class, "index-of(items,item[,coll])", arg(AAT_ZM, AAT, STR), ITR_ZM),
+  INDEX_OF(FNSeq.class, "index-of(items,item[,collation])", arg(AAT_ZM, AAT, STR), ITR_ZM),
   /** XQuery function. */
   INSERT_BEFORE(FNSeq.class, "insert-before(items,pos,insert)",
       arg(ITEM_ZM, ITR, ITEM_ZM), ITEM_ZM),
@@ -344,7 +344,8 @@ public enum Function {
   /** XQuery function. */
   ONE_OR_MORE(FNSimple.class, "one-or-more(items)", arg(ITEM_ZM), ITEM_OM),
   /** XQuery function. */
-  DEEP_EQUAL(FNSimple.class, "deep-equal(items1,items2[,coll])", arg(ITEM_ZM, ITEM_ZM, STR), BLN),
+  DEEP_EQUAL(FNSimple.class, "deep-equal(items1,items2[,collation])",
+      arg(ITEM_ZM, ITEM_ZM, STR), BLN),
   /** XQuery function (project specific). */
   DEEP_EQUAL_OPT(FNSimple.class, "deep-equal-opt(items1,items2[,options])",
       arg(ITEM_ZM, ITEM_ZM, ITEM), BLN),
@@ -356,15 +357,18 @@ public enum Function {
   /** XQuery function. */
   CODEPOINTS_TO_STRING(FNStr.class, "codepoints-to-string(nums)", arg(ITR_ZM), STR),
   /** XQuery function. */
-  COMPARE(FNStr.class, "compare(first,second[,coll])", arg(STR_ZO, STR_ZO, STR), ITR_ZO),
+  COMPARE(FNStr.class, "compare(first,second[,collation])", arg(STR_ZO, STR_ZO, STR), ITR_ZO),
   /** XQuery function. */
   CONCAT(FNStr.class, "concat(atom1,atom2[,...])", arg(AAT_ZO, AAT_ZO), STR),
   /** XQuery function. */
-  CONTAINS(FNStr.class, "contains(string,sub[,coll])", arg(STR_ZO, STR_ZO, STR), BLN),
+  CONTAINS(FNStr.class, "contains(string,sub[,collation])", arg(STR_ZO, STR_ZO, STR), BLN),
+  /** XQuery function. */
+  CONTAINS_TOKEN(FNStr.class, "contains-token(strings,token[,collation])",
+      arg(STR_ZM, STR, STR), BLN),
   /** XQuery function. */
   ENCODE_FOR_URI(FNStr.class, "encode-for-uri(string)", arg(STR_ZO), STR),
   /** XQuery function. */
-  ENDS_WITH(FNStr.class, "ends-with(string,sub[,coll])", arg(STR_ZO, STR_ZO, STR), BLN),
+  ENDS_WITH(FNStr.class, "ends-with(string,sub[,collation])", arg(STR_ZO, STR_ZO, STR), BLN),
   /** XQuery function. */
   ESCAPE_HTML_URI(FNStr.class, "escape-html-uri(string)", arg(STR_ZO), STR),
   /** XQuery function. */
@@ -374,7 +378,7 @@ public enum Function {
   /** XQuery function. */
   NORMALIZE_UNICODE(FNStr.class, "normalize-unicode(string[,form])", arg(STR_ZO, STR), STR),
   /** XQuery function. */
-  STARTS_WITH(FNStr.class, "starts-with(string,sub[,coll])", arg(STR_ZO, STR_ZO, STR), BLN),
+  STARTS_WITH(FNStr.class, "starts-with(string,sub[,collation])", arg(STR_ZO, STR_ZO, STR), BLN),
   /** XQuery function. */
   STRING_JOIN(FNStr.class, "string-join(strings[,sep])", arg(STR_ZM, STR), STR),
   /** XQuery function. */
@@ -382,9 +386,10 @@ public enum Function {
   /** XQuery function. */
   SUBSTRING(FNStr.class, "substring(string,start[,len])", arg(STR_ZO, DBL, DBL), STR),
   /** XQuery function. */
-  SUBSTRING_AFTER(FNStr.class, "substring-after(string,sub[,coll])", arg(STR_ZO, STR_ZO, STR), STR),
+  SUBSTRING_AFTER(FNStr.class, "substring-after(string,sub[,collation])",
+      arg(STR_ZO, STR_ZO, STR), STR),
   /** XQuery function. */
-  SUBSTRING_BEFORE(FNStr.class, "substring-before(string,sub[,coll])",
+  SUBSTRING_BEFORE(FNStr.class, "substring-before(string,sub[,collation])",
       arg(STR_ZO, STR_ZO, STR), STR),
   /** XQuery function. */
   TRANSLATE(FNStr.class, "translate(string,map,trans)", arg(STR_ZO, STR, STR), STR),
@@ -394,7 +399,7 @@ public enum Function {
   /* FNMap functions. */
 
   /** XQuery function. */
-  _MAP_NEW(FNMap.class, "new([maps[,coll]])", arg(MAP_ZM, STR), MAP_O, flag(X30)),
+  _MAP_NEW(FNMap.class, "new([maps[,collation]])", arg(MAP_ZM, STR), MAP_O, flag(X30)),
   /** XQuery function. */
   _MAP_ENTRY(FNMap.class, "entry(key,value)", arg(AAT, ITEM_ZM), MAP_O, flag(X30)),
   /** XQuery function. */

@@ -246,7 +246,7 @@ public final class FNSeq extends StandardFunc {
    */
   private Iter indexOf(final QueryContext qc) throws QueryException {
     final Item it = checkItem(exprs[1], qc);
-    final Collation coll = checkColl(exprs.length == 3 ? exprs[2] : null, qc, sc);
+    final Collation coll = checkColl(2, qc);
 
     return new Iter() {
       final Iter ir = exprs[0].iter(qc);
@@ -271,7 +271,7 @@ public final class FNSeq extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter distinctValues(final QueryContext qc) throws QueryException {
-    final Collation coll = checkColl(exprs.length == 2 ? exprs[1] : null, qc, sc);
+    final Collation coll = checkColl(1, qc);
     if(exprs[0] instanceof RangeSeq) return exprs[0].iter(qc);
 
     return new Iter() {

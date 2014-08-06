@@ -71,6 +71,7 @@ public final class FNStr extends StandardFunc {
       case ESCAPE_HTML_URI:      return Str.get(escape(checkEStr(exprs[0], qc)));
       case CONCAT:               return concat(qc);
       case CONTAINS:             return contains(qc);
+      case CONTAINS_TOKEN:       return containsToken(qc);
       case STARTS_WITH:          return startsWith(qc);
       case ENDS_WITH:            return endsWith(qc);
       case SUBSTRING_AFTER:      return substringAfter(qc);
@@ -99,8 +100,8 @@ public final class FNStr extends StandardFunc {
    * @throws QueryException query exception
    */
   private Int compare(final QueryContext qc) throws QueryException {
-    final Collation coll = checkColl(exprs.length == 3 ? exprs[2] : null, qc, sc);
     final Item it1 = exprs[0].item(qc, info), it2 = exprs[1].item(qc, info);
+    final Collation coll = checkColl(2, qc);
     if(it1 == null || it2 == null) return null;
     return Int.get(Math.max(-1, Math.min(1,
         coll == null ? diff(checkStr(it1), checkStr(it2)) :
@@ -304,9 +305,29 @@ public final class FNStr extends StandardFunc {
    * @throws QueryException query exception
    */
   private Bln contains(final QueryContext qc) throws QueryException {
-    final Collation coll = checkColl(exprs.length == 3 ? exprs[2] : null, qc, sc);
     final byte[] ss = checkEStr(exprs[0], qc), sb = checkEStr(exprs[1], qc);
+    final Collation coll = checkColl(2, qc);
     return Bln.get(coll == null ? Token.contains(ss, sb) : coll.contains(ss, sb, info));
+  }
+
+  /**
+   * Checks if a string contains a token.
+   * @param qc query context
+   * @return resulting item
+   * @throws QueryException query exception
+   */
+  private Bln containsToken(final QueryContext qc) throws QueryException {
+    final byte[] token = trim(checkStr(exprs[1], qc));
+    final Collation coll = checkColl(2, qc);
+    if(token.length != 0) {
+      final Iter ir = qc.iter(exprs[0]);
+      for(Item it; (it = ir.next()) != null;) {
+        for(final byte[] tok : split(norm(checkStr(it)), ' ')) {
+          if(coll == null ? eq(token, tok) : coll.compare(token, tok) == 0) return Bln.TRUE;
+        }
+      }
+    }
+    return Bln.FALSE;
   }
 
   /**
@@ -316,8 +337,8 @@ public final class FNStr extends StandardFunc {
    * @throws QueryException query exception
    */
   private Bln startsWith(final QueryContext qc) throws QueryException {
-    final Collation coll = checkColl(exprs.length == 3 ? exprs[2] : null, qc, sc);
     final byte[] ss = checkEStr(exprs[0], qc), sb = checkEStr(exprs[1], qc);
+    final Collation coll = checkColl(2, qc);
     return Bln.get(coll == null ? Token.startsWith(ss, sb) : coll.startsWith(ss, sb, info));
   }
 
@@ -328,8 +349,8 @@ public final class FNStr extends StandardFunc {
    * @throws QueryException query exception
    */
   private Bln endsWith(final QueryContext qc) throws QueryException {
-    final Collation coll = checkColl(exprs.length == 3 ? exprs[2] : null, qc, sc);
     final byte[] ss = checkEStr(exprs[0], qc), sb = checkEStr(exprs[1], qc);
+    final Collation coll = checkColl(2, qc);
     return Bln.get(coll == null ? Token.endsWith(ss, sb) : coll.endsWith(ss, sb, info));
   }
 
@@ -340,8 +361,8 @@ public final class FNStr extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str substringAfter(final QueryContext qc) throws QueryException {
-    final Collation coll = checkColl(exprs.length == 3 ? exprs[2] : null, qc, sc);
     final byte[] ss = checkEStr(exprs[0], qc), sb = checkEStr(exprs[1], qc);
+    final Collation coll = checkColl(2, qc);
     if(coll == null) {
       final int p = indexOf(ss, sb);
       return p == -1 ? Str.ZERO : Str.get(substring(ss, p + sb.length));
@@ -356,8 +377,8 @@ public final class FNStr extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str substringBefore(final QueryContext qc) throws QueryException {
-    final Collation coll = checkColl(exprs.length == 3 ? exprs[2] : null, qc, sc);
     final byte[] ss = checkEStr(exprs[0], qc), sb = checkEStr(exprs[1], qc);
+    final Collation coll = checkColl(2, qc);
     if(coll == null) {
       final int p = indexOf(ss, sb);
       return p == -1 ? Str.ZERO : Str.get(substring(ss, 0, p));
