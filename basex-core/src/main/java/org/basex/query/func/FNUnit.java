@@ -46,9 +46,9 @@ public final class FNUnit extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item assrt(final QueryContext qc) throws QueryException {
-    final byte[] str = exprs.length < 2 ? null : checkStr(exprs[1], qc);
+    final Item it = exprs.length < 2 ? null : checkItem(exprs[1], qc);
     if(exprs[0].ebv(qc, info).bool(info)) return null;
-    throw str == null ? UNIT_ASSERT.get(info) : UNIT_MESSAGE.get(info, str);
+    throw error(it);
   }
 
   /**
@@ -71,8 +71,7 @@ public final class FNUnit extends StandardFunc {
       if(empty1 || empty2 || !comp.deep(it1.iter(), it2.iter())) break;
       c++;
     }
-    if(it != null) throw UNIT_MESSAGE.get(info, it.string(null)).value(it);
-    throw new UnitException(info, UNIT_ASSERT_EQUALS, it1, it2, c);
+    throw new UnitException(info, UNIT_ASSERT_EQUALS, it1, it2, c).value(it);
   }
 
   /**
@@ -82,6 +81,16 @@ public final class FNUnit extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item fail(final QueryContext qc) throws QueryException {
-    throw UNIT_MESSAGE.get(info, checkStr(exprs[0], qc));
+    throw error(exprs.length < 1 ? null : checkItem(exprs[0], qc));
+  }
+
+  /**
+   * Returns an error with the specified item as value.
+   * @param it item (may be {@code null})
+   * @return error
+   * @throws QueryException query exception
+   */
+  private QueryException error(final Item it) throws QueryException {
+    return (it == null ? UNIT_ASSERT.get(info) : UNIT_MESSAGE.get(info, it.string(info))).value(it);
   }
 }

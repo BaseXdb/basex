@@ -219,9 +219,9 @@ public enum Err {
   /** UNIT0001. */
   UNIT_ASSERT(UNIT, 1, "Assertion failed."),
   /** UNIT0001. */
-  UNIT_ASSERT_EQUALS(UNIT, 1, "Item %: % expected, % returned."),
-  /** UNIT0001. */
   UNIT_MESSAGE(UNIT, 1, "%"),
+  /** UNIT0001. */
+  UNIT_ASSERT_EQUALS(UNIT, 1, "Item %: % expected, % returned."),
   /** UNIT0002. */
   UNIT_ARGS(UNIT, 2, "Test function '%' must have no arguments."),
   /** UNIT0003. */

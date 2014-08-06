@@ -32,7 +32,7 @@ public class QueryException extends Exception {
   /** Error value. */
   private Value value = Empty.SEQ;
   /** Error reference. */
-  private Err err;
+  private Err error;
   /** Code suggestions. */
   private StringList suggest;
   /** Error line and column. */
@@ -63,12 +63,12 @@ public class QueryException extends Exception {
   /**
    * Default constructor.
    * @param info input info
-   * @param err error reference
+   * @param error error reference
    * @param ext error extension
    */
-  public QueryException(final InputInfo info, final Err err, final Object... ext) {
-    this(info, err.qname(), err.desc, ext);
-    this.err = err;
+  public QueryException(final InputInfo info, final Err error, final Object... ext) {
+    this(info, error.qname(), error.desc, ext);
+    this.error = error;
   }
 
   /**
@@ -172,21 +172,21 @@ public class QueryException extends Exception {
 
   /**
    * Sets the error value.
-   * @param v error value
+   * @param val error value
    * @return self reference
    */
-  public QueryException value(final Value v) {
-    value = v;
+  public QueryException value(final Value val) {
+    value = val;
     return this;
   }
 
   /**
    * Sets an error.
-   * @param e error
+   * @param err error
    * @return self reference
    */
-  public QueryException err(final Err e) {
-    err = e;
+  public QueryException err(final Err err) {
+    error = err;
     return this;
   }
 
@@ -215,7 +215,7 @@ public class QueryException extends Exception {
    * @return error
    */
   public Err err() {
-    return err;
+    return error;
   }
 
   /**

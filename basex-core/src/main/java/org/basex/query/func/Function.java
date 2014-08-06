@@ -997,7 +997,7 @@ public enum Function {
   _UNIT_ASSERT_EQUALS(FNUnit.class, "assert-equals(result,expected[,failure])",
       arg(ITEM_ZM, ITEM_ZM, ITEM), EMP, flag(NDT)),
   /** XQuery function. */
-  _UNIT_FAIL(FNUnit.class, "fail(failure)", arg(ITEM), EMP, flag(NDT)),
+  _UNIT_FAIL(FNUnit.class, "fail([failure])", arg(ITEM), EMP, flag(NDT)),
 
   /* FNValidate functions. */
 

@@ -338,3 +338,7 @@ placeholders
 octet
 unindents
 hyperlink
+testcase
+testsuites
+testsuite
+testinit

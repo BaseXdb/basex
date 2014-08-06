@@ -29,7 +29,7 @@ public class UnitException extends QueryException {
    */
   public UnitException(final InputInfo info, final Err err, final Item returned,
       final Item expected, final int count) {
-    super(info, err, count, expected, returned);
+    super(info, err, count, expected == null ? "()" : expected, returned == null ? "()" : returned);
     this.expected = expected;
     this.returned = returned;
     this.count = count;

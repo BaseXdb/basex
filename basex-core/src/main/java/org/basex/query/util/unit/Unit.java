@@ -138,20 +138,7 @@ public final class Unit {
               testcase.add(new FElem(FAILURE).add(new FElem(EXPECTED).add(code)));
             }
           } catch(final QueryException ex) {
-            final QNm name = ex.qname();
-            if(code == null || !eq(code, name.local())) {
-              final FElem error;
-              final boolean fail = Err.UNIT_ASSERT.eq(name);
-              if(fail) {
-                failures++;
-                error = new FElem(FAILURE);
-              } else {
-                errors++;
-                error = new FElem(ERROR);
-              }
-              addError(ex, error, fail);
-              testcase.add(error);
-            }
+            addError(ex, testcase, code);
           }
         } else {
           // skip test
@@ -167,20 +154,16 @@ public final class Unit {
       for(final StaticFunc sf : afterModule) eval(sf);
 
     } catch(final QueryException ex) {
-      final FElem error;
       if(current == null) {
-        // handle errors caused by parsing or compiling a module
-        error = new FElem(ERROR);
-        try {
-          addError(ex, error, true);
-        } catch(final QueryException ignored) { }
+        // handle errors caused by parsing or compilation
+        addError(ex, suite, null);
       } else {
-        // handle errors caused by initializing unit functions
-        error = new FElem(TESTCASE).add(NAME, current.name.local());
-        error.add(TIME, time(perf));
+        // handle errors caused by initializing or finalizing unit functions
+        final FElem tc = new FElem(TESTINIT).add(NAME, current.name.local()).add(TIME, time(perf));
+        suite.add(tc);
+        addError(ex, tc, null);
       }
-      suite.add(error);
-      errors++;
+
     } finally {
       qc.close();
     }
@@ -196,43 +179,56 @@ public final class Unit {
   }
 
   /**
-   * Adds error information to the specified node.
+   * Adds an error element to the specified test case.
    * @param ex exception
-   * @param error error element
-   * @param fail fail (unit error) flag
-   * @throws QueryException query exception
+   * @param testcase testcase element
+   * @param code error code (may be {@code null})
    */
-  private void addError(final QueryException ex, final FElem error, final boolean fail)
-      throws QueryException {
+  private void addError(final QueryException ex, final FElem testcase, final byte[] code) {
+    final QNm name = ex.qname();
+    if(code == null || !eq(code, name.local())) {
+      final FElem error;
+      final boolean fail = Err.UNIT_ASSERT.eq(name);
+      if(fail) {
+        failures++;
+        error = new FElem(FAILURE);
+      } else {
+        errors++;
+        error = new FElem(ERROR);
+      }
+      error.add(LINE, token(ex.line()));
+      error.add(COLUMN, token(ex.column()));
+      final String url = IO.get(ex.file()).url();
+      if(!file.url().equals(url)) error.add(URI, url);
 
-    error.add(LINE, token(ex.line()));
-    error.add(COLUMN, token(ex.column()));
-    final String url = IO.get(ex.file()).url();
-    if(!file.url().equals(url)) error.add(URI, url);
+      if(ex instanceof UnitException) {
+        // unit exception: add expected and returned values
+        final UnitException ue = (UnitException) ex;
+        error.add(element(ue.returned, RETURNED, ue.count));
+        error.add(element(ue.expected, EXPECTED, ue.count));
+      } else if(!fail) {
+        // exception other than failure: add type
+        error.add(TYPE, ex.qname().prefixId(QueryText.ERRORURI));
+      }
 
-    if(ex instanceof UnitException) {
-      // unit exception: add expected and returned values
-      final UnitException ue = (UnitException) ex;
-      error.add(elem(ue.returned, RETURNED, ue.count));
-      error.add(elem(ue.expected, EXPECTED, ue.count));
-    } else if(fail) {
-      // unit failure:
+      // failure info
       final Value v = ex.value();
-      if(v.isItem()) {
-        // add attached value
-        if(v.type.isNode()) {
+      if(v instanceof Item) {
+        if(v instanceof ANode) {
           error.add((ANode) v);
         } else {
-          error.add(((Item) v).string(null));
+          final FElem info = new FElem(INFO);
+          try { info.add(((Item) v).string(null)); } catch(final QueryException ignored) { }
+          error.add(info);
         }
       } else {
         // otherwise, add error message
-        error.add(ex.getLocalizedMessage());
+        final FElem info = new FElem(INFO);
+        info.add(ex.getLocalizedMessage());
+        error.add(info);
+
       }
-    } else {
-      // any other exception: add type and error message
-      error.add(TYPE, ex.qname().prefixId(QueryText.ERRORURI));
-      error.add(ex.getLocalizedMessage());
+      testcase.add(error);
     }
   }
 
@@ -240,19 +236,18 @@ public final class Unit {
    * Creates a new element.
    * @param it item
    * @param name name (expected/returned)
-   * @param c item count
+   * @param c item count (ignore it {@code -1})
    * @return new element
-   * @throws QueryException query exception
    */
-  private static FElem elem(final Item it, final byte[] name, final int c) throws QueryException {
+  private static FElem element(final Item it, final byte[] name, final int c) {
     final FElem exp = new FElem(name);
     if(it != null) {
       if(it instanceof ANode) {
         exp.add((ANode) it);
       } else {
-        exp.add(it.string(null));
+        try { exp.add(it.string(null)); } catch(final QueryException ignored) { }
       }
-      exp.add(ITEM, token(c)).add(TYPE, it.type.toString());
+      if(c != -1) exp.add(ITEM, token(c)).add(TYPE, it.type.toString());
     }
     return exp;
   }

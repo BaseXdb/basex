@@ -25,11 +25,15 @@ public interface Constants {
   byte[] EXPECTED = token("expected");
   /** Name: returned. */
   byte[] RETURNED = token("returned");
+  /** Name: info. */
+  byte[] INFO = token("info");
 
   /** Name: testsuites. */
   byte[] TESTSUITES = token("testsuites");
   /** Name: testsuite. */
   byte[] TESTSUITE = token("testsuite");
+  /** Name: testinit. */
+  byte[] TESTINIT = token("testinit");
   /** Name: testcase. */
   byte[] TESTCASE = token("testcase");
   /** Name: failure. */
