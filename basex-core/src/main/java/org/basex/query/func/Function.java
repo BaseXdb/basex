@@ -399,7 +399,7 @@ public enum Function {
   /* FNMap functions. */
 
   /** XQuery function. */
-  _MAP_NEW(FNMap.class, "new([maps])", arg(MAP_ZM, STR), MAP_O, flag(X30)),
+  _MAP_NEW(FNMap.class, "new([maps])", arg(MAP_ZM), MAP_O, flag(X30)),
   /** XQuery function. */
   _MAP_ENTRY(FNMap.class, "entry(key,value)", arg(AAT, ITEM_ZM), MAP_O, flag(X30)),
   /** XQuery function. */
