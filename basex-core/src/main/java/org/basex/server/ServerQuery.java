@@ -118,55 +118,53 @@ public final class ServerQuery extends Proc {
       final boolean full) throws IOException {
 
     try {
-      try {
-        // parses the query and registers the process
-        ctx.register(parse());
+      // parses the query and registers the process
+      ctx.register(parse());
 
-        // create serializer
-        qp.compile();
-        final QueryInfo qi = qp.qc.info;
-        qi.compiling = perf.time();
-        final Iter ir = qp.iter();
-        qi.evaluating = perf.time();
-        parameters();
-        final boolean wrap = !parameters.get(WRAP_PREFIX).isEmpty();
+      // create serializer
+      qp.compile();
+      final QueryInfo qi = qp.qc.info;
+      qi.compiling = perf.time();
+      final Iter ir = qp.iter();
+      qi.evaluating = perf.time();
+      parameters();
+      final boolean wrap = !parameters.get(WRAP_PREFIX).isEmpty();
 
-        // iterate through results
-        final PrintOutput po = PrintOutput.get(encode ? new EncodingOutput(out) : out);
-        if(iter && wrap) {
-          final FElem elem = new FElem("");
-          po.write(full ? elem.xdmInfo() : elem.typeId().bytes());
-        }
-
-        final Serializer ser = Serializer.get(po, full ? null : parameters);
-        int c = 0;
-        for(Item it; (it = ir.next()) != null;) {
-          if(iter && !wrap) {
-            po.write(full ? it.xdmInfo() : it.typeId().bytes());
-            ser.reset();
-            ser.serialize(it, full, true);
-            po.flush();
-            out.write(0);
-          } else {
-            ser.serialize(it, full, false);
-          }
-          c++;
-        }
-        ser.close();
-        if(iter && wrap) out.write(0);
-        qi.serializing = perf.time();
-
-        // generate query info
-        info = qi.toString(qp, po.size(), c, ctx.options.get(MainOptions.QUERYINFO));
-
-      } catch(final QueryException ex) {
-        throw new BaseXException(ex);
-      } catch(final StackOverflowError ex) {
-        Util.debug(ex);
-        throw new BaseXException(BASX_STACKOVERFLOW.desc);
-      } catch(final ProcException ex) {
-        throw new BaseXException(TIMEOUT_EXCEEDED);
+      // iterate through results
+      final PrintOutput po = PrintOutput.get(encode ? new EncodingOutput(out) : out);
+      if(iter && wrap) {
+        final FElem elem = new FElem("");
+        po.write(full ? elem.xdmInfo() : elem.typeId().bytes());
       }
+
+      final Serializer ser = Serializer.get(po, full ? null : parameters);
+      int c = 0;
+      for(Item it; (it = ir.next()) != null;) {
+        if(iter && !wrap) {
+          po.write(full ? it.xdmInfo() : it.typeId().bytes());
+          ser.reset();
+          ser.serialize(it, full, true);
+          po.flush();
+          out.write(0);
+        } else {
+          ser.serialize(it, full, false);
+        }
+        c++;
+      }
+      ser.close();
+      if(iter && wrap) out.write(0);
+      qi.serializing = perf.time();
+
+      // generate query info
+      info = qi.toString(qp, po.size(), c, ctx.options.get(MainOptions.QUERYINFO));
+
+    } catch(final QueryException ex) {
+      throw new BaseXException(ex);
+    } catch(final StackOverflowError ex) {
+      Util.debug(ex);
+      throw new BaseXException(BASX_STACKOVERFLOW.desc);
+    } catch(final ProcException ex) {
+      throw new BaseXException(TIMEOUT_EXCEEDED);
     } finally {
       // close processor and unregisters the process
       if(qp != null) {

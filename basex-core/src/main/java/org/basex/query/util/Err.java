@@ -1434,20 +1434,41 @@ public enum Err {
   }
 
   /**
-   * Chops the specified object to a maximum size.
+   * Chops the specified value to a maximum size.
    * @param value value
    * @param ii input info
    * @return exception or null
    * @throws QueryException query exception
    */
   public static byte[] chop(final Object value, final InputInfo ii) throws QueryException {
+    return ii != null && ii.check() ? Token.EMPTY :
+           value instanceof byte[] ? chop((byte[]) value, ii) :
+           value instanceof Item ? chop(((Item) value).string(ii), ii) :
+           chop(value.toString(), ii);
+  }
+
+  /**
+   * Chops the specified string to a maximum size.
+   * @param string string
+   * @param ii input info
+   * @return exception or null
+   */
+  public static byte[] chop(final String string, final InputInfo ii) {
+    return ii != null && ii.check() ? Token.EMPTY : chop(Token.token(string), ii);
+  }
+
+  /**
+   * Chops the specified token to a maximum size.
+   * @param token token
+   * @param ii input info
+   * @return exception or null
+   */
+  public static byte[] chop(final byte[] token, final InputInfo ii) {
     if(ii != null && ii.check()) return Token.EMPTY;
 
     final TokenBuilder tb = new TokenBuilder();
     byte l = 0;
-    final byte[] string = value instanceof byte[] ? (byte[]) value : value instanceof Item ?
-      ((Item) value).string(ii) : Token.token(value.toString());
-    for(byte b : string) {
+    for(byte b : token) {
       final int ts = tb.size();
       if(ts == 32) {
         tb.add(Text.DOTS);

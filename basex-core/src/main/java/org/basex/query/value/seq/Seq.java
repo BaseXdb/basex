@@ -124,7 +124,7 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public String toErrorString() {
+  public final String toErrorString() {
     return toString(true);
   }
 

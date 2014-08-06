@@ -271,17 +271,9 @@ public class QueryException extends Exception {
   private static String message(final String text, final Object[] ext) {
     final int es = ext.length;
     for(int e = 0; e < es; e++) {
-      Object o = ext[e];
-      if(o instanceof byte[]) {
-        o = Token.string((byte[]) o);
-      } else if(o instanceof ExprInfo) {
-        o = ((ExprInfo) o).toErrorString();
-      } else if(o instanceof Throwable) {
-        o = Util.message((Throwable) o);
-      } else if(!(o instanceof String)) {
-        o = String.valueOf(o);
+      if(ext[e] instanceof ExprInfo) {
+        ext[e] = Err.chop(((ExprInfo) ext[e]).toErrorString(), null);
       }
-      ext[e] = o;
     }
     return Util.info(text, ext);
   }

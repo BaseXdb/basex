@@ -212,7 +212,7 @@ public abstract class Step extends Preds {
   protected final ANode checkNode(final QueryContext qc) throws QueryException {
     final Value v = qc.value;
     if(v instanceof ANode) return (ANode) v;
-    throw (v == null ? NOCTX : STEPNODE).get(info, this, v.type, v);
+    throw v == null ? NOCTX.get(info, this) : STEPNODE.get(info, this, v.type, v);
   }
 
   @Override

@@ -211,22 +211,13 @@ public final class Unit {
         error.add(TYPE, ex.qname().prefixId(QueryText.ERRORURI));
       }
 
-      // failure info
+      // add info
       final Value v = ex.value();
       if(v instanceof Item) {
-        if(v instanceof ANode) {
-          error.add((ANode) v);
-        } else {
-          final FElem info = new FElem(INFO);
-          try { info.add(((Item) v).string(null)); } catch(final QueryException ignored) { }
-          error.add(info);
-        }
+        error.add(element((Item) v, INFO, -1));
       } else {
         // otherwise, add error message
-        final FElem info = new FElem(INFO);
-        info.add(ex.getLocalizedMessage());
-        error.add(info);
-
+        error.add(new FElem(INFO).add(ex.getLocalizedMessage()));
       }
       testcase.add(error);
     }
@@ -245,7 +236,11 @@ public final class Unit {
       if(it instanceof ANode) {
         exp.add((ANode) it);
       } else {
-        try { exp.add(it.string(null)); } catch(final QueryException ignored) { }
+        try {
+          exp.add(it.string(null));
+        } catch(final QueryException ignored) {
+          exp.add(chop(it.toString(), null));
+        }
       }
       if(c != -1) exp.add(ITEM, token(c)).add(TYPE, it.type.toString());
     }
