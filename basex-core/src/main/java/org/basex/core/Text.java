@@ -1,7 +1,7 @@
 package org.basex.core;
 
 import static org.basex.core.Lang.*;
-import static org.basex.core.Text.*;
+//import static org.basex.core.Text.*;
 
 import org.basex.core.parse.Commands.*;
 import org.basex.util.*;

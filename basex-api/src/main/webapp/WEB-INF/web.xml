@@ -23,10 +23,11 @@
     <param-value>admin</param-value>
   </context-param> -->
 
- <context-param>
+  <!-- Set authentication preference 
+  <context-param> 
     <param-name>org.basex.authmethod</param-name>
     <param-value>Digest</param-value>
-  </context-param>
+  </context-param> -->
 
   <!--
   <context-param>

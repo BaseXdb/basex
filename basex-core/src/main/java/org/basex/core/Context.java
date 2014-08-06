@@ -127,7 +127,6 @@ public final class Context {
     log = new Log(this);
     user = users.get(S_ADMIN);
     listener = null;
-
   }
 
   /**

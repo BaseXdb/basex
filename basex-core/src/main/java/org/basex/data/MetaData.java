@@ -356,7 +356,7 @@ public final class MetaData {
     writeInfo(out, DBLASTID,   lastid);
     if(language != null) writeInfo(out, DBFTLN, language.toString());
     out.writeToken(token(DBPERM));
-    users.write(out);
+   // users.write(out);
     out.write(0);
   }
 

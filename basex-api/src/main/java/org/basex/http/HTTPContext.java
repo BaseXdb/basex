@@ -59,9 +59,8 @@ public final class HTTPContext {
   public String nonce;
   /** Realm for Digest Auth. */
   private String realm;
-  /** Auth Type.  */
+  /** Auth Type. */
   public String authtype;
-
 
   /**
    * Constructor.
@@ -101,30 +100,31 @@ public final class HTTPContext {
     // overwrite credentials with session-specific data
     final String auth = req.getHeader(AUTHORIZATION);
 
+    // default authentication is basic or use global ones specified in BaseX Options.
+    if(auth == null) {
 
-
-    if (auth == null){
-
-      res.addHeader("WWW-Authenticate", getAuthenticateHeader());
-
+      res.addHeader(WWW_AUTHENTICATE, getAuthenticateHeader());
       res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+
     }
-      if(auth != null && mprop.get(GlobalOptions.AUTHMETHOD) != null) {
+
+    if(auth != null) {
+
       final String[] values = auth.split(" ");
-      if(values[0].equals(BASIC)){
+      if(values[0].equals(BASIC)) {
         final String[] cred = Base64.decode(values[1]).split(":", 2);
         if(cred.length != 2) throw new LoginException(NOPASSWD);
         user = cred[0];
         pass = cred[1];
-      }else if(values[0].equals(DIGEST)){
+        authenticate();
+      } else if(values[0].equals(DIGEST)) {
         HashMap<String, String> headerValues = parseHeader(auth);
         user = headerValues.get("username");
-        /** Password for digest auth. */
-        //pass = "admin";
+        pass = headerValues.get("response");
         authenticate();
-      }else {
+      } else {
         throw new LoginException(WHICHAUTH, values[0]);
-        }
+      }
     }
   }
 
@@ -212,8 +212,8 @@ public final class HTTPContext {
   }
 
   /**
-   * Returns the addressed database (i.e., the first path entry), or {@code null}
-   * if the root directory was specified.
+   * Returns the addressed database (i.e., the first path entry), or {@code null} if the root
+   * directory was specified.
    * @return database
    */
   public String db() {
@@ -221,8 +221,7 @@ public final class HTTPContext {
   }
 
   /**
-   * Returns an array with all accepted content types.
-   * if the root directory was specified.
+   * Returns an array with all accepted content types. if the root directory was specified.
    * @return database
    */
   public String[] produces() {
@@ -249,7 +248,7 @@ public final class HTTPContext {
       log(message, code);
       res.resetBuffer();
       if(code == SC_UNAUTHORIZED) res.addHeader(WWW_AUTHENTICATE, getAuthenticateHeader());
-      //if(code == SC_UNAUTHORIZED) res.setHeader(WWW_AUTHENTICATE, BASIC);
+      // if(code == SC_UNAUTHORIZED) res.setHeader(WWW_AUTHENTICATE, BASIC);
       if(error && code >= SC_BAD_REQUEST) {
         res.sendError(code, message);
       } else {
@@ -271,78 +270,48 @@ public final class HTTPContext {
     pass = p;
   }
 
-
   /**
    * Authenticate the user and returns a new client {@link Context} instance.
    * @return client context
-   * @throws IOException
-   * changed to IOException, to resolve webdav errors change to LoginException
+   * @throws IOException changed to IOException, to resolve webdav errors change to LoginException
    */
   public Context authenticate() throws IOException {
     final byte[] address = token(req.getRemoteAddr());
     /** Created context object here */
     Context ctx = null;
-
+    /** Default authentication is basic or use global ones specified in BaseX Options. */
     try {
-
-      if(user == null || user.isEmpty())
-        throw new LoginException(NOPASSWD);
-
-      else if(req.getHeader(AUTHORIZATION).startsWith(BASIC) && pass != null){
-      ctx = new Context(context(), null);
-      ctx.user = ctx.users.get(user);
-
-      if(ctx.user == null || !ctx.user.password.equals(md5(pass))) throw new LoginException();
-
-
-      }else { if(req.getHeader(AUTHORIZATION).startsWith(DIGEST))
-
+      if(user == null || user.isEmpty() || pass == null || pass.isEmpty()) throw new LoginException(
+          NOPASSWD);
+      else if(req.getHeader(AUTHORIZATION).startsWith(BASIC)) {
         ctx = new Context(context(), null);
-
         ctx.user = ctx.users.get(user);
-
-        //System.out.println(ctx.user.name+" "+ctx.user.password+" "+ctx.user.digest+" "+ctx.user.perm);
-
-
-        if(ctx.user == null && !res.isCommitted()) {
-
-          /** res.isCommited is added to resolve the lang.Illegal Exception: Commited. */
+        if(ctx.user == null || !ctx.user.password.equals(md5(pass))) throw new LoginException();
+      } else if(req.getHeader(AUTHORIZATION).startsWith(DIGEST)) {
+        ctx = new Context(context(), null);
+        ctx.user = ctx.users.get(user);
+        if(ctx.user == null) {
           res.addHeader("WWW-Authenticate", getAuthenticateHeader());
           res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-
         }
-
         HashMap<String, String> headerValues = parseHeader(req.getHeader(AUTHORIZATION));
-
-        //String ha1 = Token.md5(ctx.user.name + ":" + realm + ":" + pass);
-        //String ha1 = Token.md5(ctx.user.name + ":" + realm + ":" + ctx.user.password);
-        //String ha1 = ctx.user.password;
         String ha1 = ctx.user.digest;
         String reqURI = headerValues.get("uri");
-
         String ha2 = Token.md5(req.getMethod() + ":" + reqURI);
-
-         String serverResponse;
-
-         serverResponse = Token.md5(ha1 + ":" + nonce + ":" + ha2);
-
+        String serverResponse;
+        serverResponse = Token.md5(ha1 + ":" + nonce + ":" + ha2);
         String clientResponse = headerValues.get("response");
-
-        //System.out.println(clientResponse+" "+serverResponse);
-
-        if(!serverResponse.equals(clientResponse) && !res.isCommitted()){
-            /** res.isCommited is added to resolve the lang.Illegal Exception: Commited. */
-            res.addHeader("WWW-Authenticate", getAuthenticateHeader());
-            res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-          }
-
+        if(!serverResponse.equals(clientResponse)) {
+          res.addHeader("WWW-Authenticate", getAuthenticateHeader());
+          res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        }
       }
-
       context.blocker.remove(address);
       return ctx;
     } catch(final LoginException ex) {
       // delay users with wrong passwords
-      for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(100);
+      for(int d = context.blocker.delay(address); d > 0; d--)
+        Performance.sleep(100);
       throw ex;
     }
   }
@@ -353,47 +322,47 @@ public final class HTTPContext {
    */
   private String getAuthenticateHeader() {
     String header = "";
-    if(authtype.equals(BASIC)){
-    header = BASIC;
-    }else if(authtype.equals(DIGEST)){
-    header += "Digest realm=\"" + realm + "\",";
-    header += "nonce=\"" + nonce + "\",";
-    header += "opaque=\"" + getOpaque(realm, nonce) + "\"";
+    if(authtype.equals(BASIC) || authtype.isEmpty()) {
+      header = BASIC;
+    } else if(authtype.equals(DIGEST)) {
+      header += "Digest realm=\"" + realm + "\",";
+      header += "nonce=\"" + nonce + "\",";
+      header += "opaque=\"" + getOpaque(realm, nonce) + "\"";
     }
     return header;
-}
+  }
 
- /**
-  * Opaque used in Digest Auth.
-  * @param r Realm
-  * @param n Nonce
-  * @return Opaque
-  */
+  /**
+   * Opaque used in Digest Auth.
+   * @param r Realm
+   * @param n Nonce
+   * @return Opaque
+   */
   private String getOpaque(final String r, final String n) {
     realm = r;
     nonce = n;
     return Token.md5(realm + nonce);
-}
+  }
 
-/**
- * Parsing header for Digest Auth.
- * @param headerString Header String
- * @return values
- */
+  /**
+   * Parsing header for Digest Auth.
+   * @param headerString Header String
+   * @return values
+   */
   private HashMap<String, String> parseHeader(final String headerString) {
 
     String headerStringWithoutScheme = headerString.substring(headerString.indexOf(" ") + 1).trim();
     HashMap<String, String> values = new HashMap<>();
     String[] keyValueArray = headerStringWithoutScheme.split(",");
-    for (String keyval : keyValueArray) {
-        if (keyval.contains("=")) {
-            String key = keyval.substring(0, keyval.indexOf("="));
-            String value = keyval.substring(keyval.indexOf("=") + 1);
-            values.put(key.trim(), value.replaceAll("\"", "").trim());
-        }
+    for(String keyval : keyValueArray) {
+      if(keyval.contains("=")) {
+        String key = keyval.substring(0, keyval.indexOf("="));
+        String value = keyval.substring(keyval.indexOf("=") + 1);
+        values.put(key.trim(), value.replaceAll("\"", "").trim());
+      }
     }
     return values;
-}
+  }
 
   /**
    * Returns the database context.
@@ -427,9 +396,8 @@ public final class HTTPContext {
    */
   public void log(final String info, final Object type) {
     // add evaluation time if any type is specified
-    context.log.write(type != null ?
-      new Object[] { address(), context.user.name, type, info, perf } :
-      new Object[] { address(), context.user.name, null, info });
+    context.log.write(type != null ? new Object[] { address(), context.user.name, type, info, perf}
+                                  : new Object[] { address(), context.user.name, null, info});
   }
 
   // STATIC METHODS =====================================================================
@@ -444,8 +412,8 @@ public final class HTTPContext {
   }
 
   /**
-   * Initializes the database context, based on the initial servlet context.
-   * Parses all context parameters and passes them on to the database context.
+   * Initializes the database context, based on the initial servlet context. Parses all context
+   * parameters and passes them on to the database context.
    * @param sc servlet context
    * @throws IOException I/O exception
    */

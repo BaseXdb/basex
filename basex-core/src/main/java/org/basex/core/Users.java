@@ -13,8 +13,7 @@ import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
 
 import org.basex.io.*;
-import org.basex.io.in.DataInput;
-import org.basex.io.out.DataOutput;
+//import org.basex.io.parse.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.w3c.dom.*;
@@ -49,9 +48,9 @@ public final class Users {
       try {
         File in = new File("/home/tejus/permissions.xml");
         read(in);
-       } catch (Exception e) {
+      } catch(Exception e) {
         e.printStackTrace();
-       }
+      }
     } else {
       // define default admin user with all rights
       list.add(new User(S_ADMIN, md5(S_ADMIN), md5(D_ADMIN), Perm.ADMIN));
@@ -73,22 +72,23 @@ public final class Users {
 
     NodeList nList = doc.getElementsByTagName("user");
 
-    for (int temp = 0; temp < nList.getLength(); temp++) {
-    Node nNode = nList.item(temp);
-    if (nNode.getNodeType() == Node.ELEMENT_NODE);
-    Element eElement = (Element) nNode;
-    if(eElement.hasAttribute("name")) // && eElement.getAttribute("name").equals("user"))
-    {
-    String n, md5, dig, perm;
-    n = eElement.getAttribute("name");
-    perm = eElement.getAttribute("perm");
-    md5 = eElement.getElementsByTagName("password").item(0).getTextContent();
-    dig = eElement.getElementsByTagName("password").item(1).getTextContent();
-    //System.out.println(n+" "+perm+" "+md5+" "+dig);
-    //System.out.println(Perm.get(perm));
-    list.add(new User(n, md5, dig, Perm.get(perm)));
+    for(int temp = 0; temp < nList.getLength(); temp++) {
+      Node nNode = nList.item(temp);
+      if(nNode.getNodeType() == Node.ELEMENT_NODE)
+      ;
+      Element eElement = (Element) nNode;
+      if(eElement.hasAttribute("name")) // && eElement.getAttribute("name").equals("user"))
+      {
+        String n, md5, dig, perm;
+        n = eElement.getAttribute("name");
+        perm = eElement.getAttribute("perm");
+        md5 = eElement.getElementsByTagName("password").item(0).getTextContent();
+        dig = eElement.getElementsByTagName("password").item(1).getTextContent();
+        // System.out.println(n+" "+perm+" "+md5+" "+dig);
+        // System.out.println(Perm.get(perm));
+        list.add(new User(n, md5, dig, Perm.get(perm)));
+      }
     }
-   }
   }
 
   /**
@@ -97,11 +97,11 @@ public final class Users {
   public synchronized void write() {
     if(file == null) return;
     try {
-    File out = new File("/home/tejus/permissions.xml");
+      File out = new File("/home/tejus/permissions.xml");
       write(out);
     } catch(Exception e) {
       e.printStackTrace();
-     }
+    }
 
   }
 
@@ -160,7 +160,8 @@ public final class Users {
    * @return success of operation
    */
   public synchronized User get(final String usern) {
-    for(final User user : list) if(user.name.equals(usern)) return user;
+    for(final User user : list)
+      if(user.name.equals(usern)) return user;
     return null;
   }
 
@@ -185,6 +186,7 @@ public final class Users {
    * @throws SAXException SAX exception
    */
   public synchronized void write(final File out) throws IOException, SAXException {
+
     // skip writing of local rights
     // TODO local permissions
     try {
@@ -196,54 +198,53 @@ public final class Users {
 
       Element rootElement = doc.getDocumentElement();
 
-      //int index = list.size() + 1;
+      // int index = list.size() + 1;
 
       for(final User user : list) {
 
-      // user elements
-      Element usr = doc.createElement("user");
-      rootElement.appendChild(usr);
+        // user elements
+        Element usr = doc.createElement("user");
+        rootElement.appendChild(usr);
 
-      // set attribute to user element
-      Attr attr = doc.createAttribute("name");
-      Attr att = doc.createAttribute("perm");
-      attr.setValue(user.name);
-      att.setValue(user.perm.toString());
+        // set attribute to user element
+        Attr attr = doc.createAttribute("name");
+        Attr att = doc.createAttribute("perm");
+        attr.setValue(user.name);
+        att.setValue(user.perm.toString());
 
-      //att.setValue(user.perm.NONE.toString());
-      //att.setValue(Perm.NONE.toString());
-      usr.setAttributeNode(attr);
-      usr.setAttributeNode(att);
+        // att.setValue(user.perm.NONE.toString());
+        // att.setValue(Perm.NONE.toString());
+        usr.setAttributeNode(attr);
+        usr.setAttributeNode(att);
 
-      // md5 password element
-      Element password = doc.createElement("password");
-      password.appendChild(doc.createTextNode(user.password));
-      usr.appendChild(password);
+        // md5 password element
+        Element password = doc.createElement("password");
+        password.appendChild(doc.createTextNode(user.password));
+        usr.appendChild(password);
 
-      // digest password element
-      Element pass = doc.createElement("password");
-      pass.appendChild(doc.createTextNode(user.digest));
-      usr.appendChild(pass);
+        // digest password element
+        Element pass = doc.createElement("password");
+        pass.appendChild(doc.createTextNode(user.digest));
+        usr.appendChild(pass);
       }
       // write the content into xml file
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
       Transformer transformer = transformerFactory.newTransformer();
       DOMSource source = new DOMSource(doc);
-      //StreamResult result = new StreamResult(new File("/home/tejus/permissions.xml"));
+      // StreamResult result = new StreamResult(new File("/home/tejus/permissions.xml"));
       StreamResult result = new StreamResult(out);
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
       transformer.transform(source, result);
 
-      //System.out.println("File saved!");
+      // System.out.println("File saved!");
 
-      } catch (ParserConfigurationException pce) {
+    } catch(ParserConfigurationException pce) {
       pce.printStackTrace();
-      } catch (TransformerException tfe) {
+    } catch(TransformerException tfe) {
       tfe.printStackTrace();
-      }
+    }
 
   }
-
 
   /**
    * Returns information on all users.
@@ -255,7 +256,8 @@ public final class Users {
     table.description = USERS_X;
 
     final int sz = file == null ? 3 : 5;
-    for(int u = 0; u < sz; ++u) table.header.add(S_USERINFO[u]);
+    for(int u = 0; u < sz; ++u)
+      table.header.add(S_USERINFO[u]);
 
     for(final User user : users(users)) {
       final TokenList tl = new TokenList();
