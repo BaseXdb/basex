@@ -85,6 +85,10 @@ public final class FNAggr extends StandardFunc {
     switch(func) {
       case COUNT:
         if(c >= 0) return Int.get(c);
+        if(e instanceof FNMap) {
+          final FNMap f = (FNMap) e;
+          if(f.func == Function._MAP_KEYS) return Function._MAP_SIZE.get(sc, info, f.exprs);
+        }
         break;
       case SUM:
         if(c == 0) return exprs.length == 2 ? exprs[1] : Int.get(0);
