@@ -9,7 +9,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 
@@ -121,20 +120,20 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException exception
    */
   private Iter forEach(final QueryContext qc) throws QueryException {
-    final FItem f = withArity(1, 1, qc);
-    final Iter xs = exprs[0].iter(qc);
+    final FItem f = checkArity(1, 1, qc);
+    final Iter ir = exprs[0].iter(qc);
     return new Iter() {
       /** Results. */
-      Iter ys = Empty.ITER;
+      Iter ir2 = Empty.ITER;
 
       @Override
       public Item next() throws QueryException {
         do {
-          final Item it = ys.next();
+          final Item it = ir2.next();
           if(it != null) return it;
-          final Item x = xs.next();
-          if(x == null) return null;
-          ys = f.invokeValue(qc, info, x).iter();
+          final Item it2 = ir.next();
+          if(it2 == null) return null;
+          ir2 = f.invokeValue(qc, info, it2).iter();
         } while(true);
       }
     };
@@ -147,7 +146,7 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter filter(final QueryContext qc) throws QueryException {
-    final FItem f = withArity(1, 1, qc);
+    final FItem f = checkArity(1, 1, qc);
     final Iter xs = exprs[0].iter(qc);
     return new Iter() {
       @Override
@@ -168,7 +167,7 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter forEachPair(final QueryContext qc) throws QueryException {
-    final FItem zipper = withArity(2, 2, qc);
+    final FItem zipper = checkArity(2, 2, qc);
     final Iter xs = exprs[0].iter(qc);
     final Iter ys = exprs[1].iter(qc);
     return new Iter() {
@@ -195,7 +194,7 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter foldLeft(final QueryContext qc) throws QueryException {
-    final FItem f = withArity(2, 2, qc);
+    final FItem f = checkArity(2, 2, qc);
     final Iter xs = exprs[0].iter(qc);
     Item x = xs.next();
 
@@ -215,7 +214,7 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter foldRight(final QueryContext qc) throws QueryException {
-    final FItem f = withArity(2, 2, qc);
+    final FItem f = checkArity(2, 2, qc);
     final Value xs = qc.value(exprs[0]);
     // evaluate start value lazily if it's passed straight through
     if(xs.isEmpty()) return exprs[1].iter(qc);
@@ -223,22 +222,5 @@ public final class FNFunc extends StandardFunc {
     Value res = qc.value(exprs[1]);
     for(long i = xs.size(); --i >= 0;) res = f.invokeValue(qc, info, xs.itemAt(i), res);
     return res.iter();
-  }
-
-  /**
-   * Casts and checks the function item for its arity.
-   * @param p position of the function
-   * @param a arity
-   * @param qc query context
-   * @return function item
-   * @throws QueryException query exception
-   */
-  private FItem withArity(final int p, final int a, final QueryContext qc) throws QueryException {
-    final Item it = checkItem(exprs[p], qc);
-    if(it instanceof FItem) {
-      final FItem fi = (FItem) it;
-      if(fi.arity() == a) return fi;
-    }
-    throw castError(info, it, FuncType.arity(a));
   }
 }

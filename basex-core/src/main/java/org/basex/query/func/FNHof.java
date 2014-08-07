@@ -81,7 +81,7 @@ public final class FNHof extends StandardFunc {
           qc.compInfo(QueryText.OPTUNROLL, this);
           final Value seq = (Value) exprs[0];
           if(seq.isEmpty()) throw SEQEMPTY.get(info);
-          final FItem f = withArity(1, 2, qc);
+          final FItem f = checkArity(1, 2, qc);
           Expr e = seq.itemAt(0);
           for(int i = 1, len = (int) seq.size(); i < len; i++)
             e = new DynFuncCall(info, sc, false, f, e, seq.itemAt(i)).optimize(qc, scp);
@@ -101,7 +101,7 @@ public final class FNHof extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value foldLeft1(final QueryContext qc) throws QueryException {
-    final FItem f = withArity(1, 2, qc);
+    final FItem f = checkArity(1, 2, qc);
     final Iter iter = exprs[0].iter(qc);
 
     Value sum = checkNoEmpty(iter.next());
@@ -135,8 +135,8 @@ public final class FNHof extends StandardFunc {
    * @throws QueryException exception
    */
   private Value until(final QueryContext qc) throws QueryException {
-    final FItem pred = withArity(0, 1, qc);
-    final FItem fun = withArity(1, 1, qc);
+    final FItem pred = checkArity(0, 1, qc);
+    final FItem fun = checkArity(1, 1, qc);
     Value v = qc.value(exprs[2]);
     while(!checkBln(pred.invokeItem(qc, info, v))) v = fun.invokeValue(qc, info, v);
     return v;
@@ -149,7 +149,7 @@ public final class FNHof extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value topKBy(final QueryContext qc) throws QueryException {
-    final FItem getKey = withArity(1, 1, qc);
+    final FItem getKey = checkArity(1, 1, qc);
     final long k = checkItr(exprs[2], qc);
     if(k < 1 || k > Integer.MAX_VALUE / 2) return Empty.SEQ;
 
@@ -214,7 +214,7 @@ public final class FNHof extends StandardFunc {
    * @throws QueryException exception
    */
   private Comparator<Item> getComp(final int pos, final QueryContext qc) throws QueryException {
-    final FItem lt = withArity(pos, 2, qc);
+    final FItem lt = checkArity(pos, 2, qc);
     return new Comparator<Item>() {
       @Override
       public int compare(final Item a, final Item b) {
@@ -226,19 +226,5 @@ public final class FNHof extends StandardFunc {
         }
       }
     };
-  }
-
-  /**
-   * Casts and checks the function item for its arity.
-   * @param p position of the function
-   * @param a arity
-   * @param qc query context
-   * @return function item
-   * @throws QueryException query exception
-   */
-  private FItem withArity(final int p, final int a, final QueryContext qc) throws QueryException {
-    final Item f = checkItem(exprs[p], qc);
-    if(f instanceof FItem && ((XQFunction) f).arity() == a) return (FItem) f;
-    throw castError(info, f, FuncType.arity(a));
   }
 }

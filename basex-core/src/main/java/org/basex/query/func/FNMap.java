@@ -30,18 +30,20 @@ public final class FNMap extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     switch(func) {
-      case _MAP_GET:  return get(qc).iter();
-      case _MAP_KEYS: return map(qc).keys().iter();
-      default:        return super.iter(qc);
+      case _MAP_GET:            return get(qc).iter();
+      case _MAP_KEYS:           return map(qc).keys().iter();
+      case _MAP_FOR_EACH_ENTRY: return forEachEntry(qc);
+      default:                  return super.iter(qc);
     }
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     switch(func) {
-      case _MAP_GET:  return get(qc);
-      case _MAP_KEYS: return map(qc).keys();
-      default:        return super.value(qc);
+      case _MAP_GET:            return get(qc);
+      case _MAP_KEYS:           return map(qc).keys();
+      case _MAP_FOR_EACH_ENTRY: return forEachEntry(qc).value();
+      default:                  return super.value(qc);
     }
   }
 
@@ -132,6 +134,16 @@ public final class FNMap extends StandardFunc {
    */
   private boolean contains(final QueryContext qc, final InputInfo ii) throws QueryException {
     return map(qc).contains(exprs[1].item(qc, ii), ii);
+  }
+
+  /**
+   * Maps a function onto a sequence of items.
+   * @param qc query context
+   * @return sequence of results
+   * @throws QueryException exception
+   */
+  private Iter forEachEntry(final QueryContext qc) throws QueryException {
+    return map(qc).apply(checkArity(1, 2, qc), qc, info);
   }
 
   /**

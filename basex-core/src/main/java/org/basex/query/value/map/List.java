@@ -223,6 +223,14 @@ final class List extends TrieNode {
   }
 
   @Override
+  void apply(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
+    for(int i = 0; i < size; i++) {
+      vb.add(func.invokeValue(qc, ii, keys[i], values[i]));
+    }
+  }
+
+  @Override
   boolean hasType(final AtomType kt, final SeqType vt) {
     if(kt != null)
       for(final Item k : keys) if(!k.type.instanceOf(kt)) return false;

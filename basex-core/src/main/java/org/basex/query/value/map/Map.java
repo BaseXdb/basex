@@ -207,6 +207,21 @@ public final class Map extends FItem {
   }
 
   /**
+   * Applies a function on all entries.
+   * @param func function to apply on keys and values
+   * @param qc query context
+   * @param ii input info
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  public ValueBuilder apply(final FItem func, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(root.size);
+    root.apply(vb, func, qc, ii);
+    return vb;
+  }
+
+  /**
    * Checks if the this map is deep-equal to the given one.
    * @param ii input info
    * @param o other map

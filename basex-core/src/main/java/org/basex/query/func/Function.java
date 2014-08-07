@@ -418,6 +418,9 @@ public enum Function {
   /** XQuery function. */
   _MAP_KEYS(FNMap.class, "keys(map)", arg(MAP_O), AAT_ZM, flag(X30)),
   /** XQuery function. */
+  _MAP_FOR_EACH_ENTRY(FNMap.class, "for-each-entry(map,function)",
+      arg(MAP_O, FuncType.get(ITEM_ZM, AAT, ITEM_ZM).seqType()), ITEM_ZM, flag(X30, Flag.HOF)),
+  /** XQuery function. */
   _MAP_SERIALIZE(FNMap.class, "serialize(map)", arg(MAP_O), STR, flag(X30)),
 
   /* FNMath functions. */

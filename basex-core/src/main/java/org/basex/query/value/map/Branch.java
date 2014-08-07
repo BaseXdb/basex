@@ -198,6 +198,12 @@ final class Branch extends TrieNode {
   }
 
   @Override
+  void apply(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
+    for(final TrieNode nd : kids) if(nd != null) nd.apply(vb, func, qc, ii);
+  }
+
+  @Override
   boolean hasType(final AtomType kt, final SeqType vt) {
     for(final TrieNode k : kids)
       if(!(k == null || k.hasType(kt, vt))) return false;

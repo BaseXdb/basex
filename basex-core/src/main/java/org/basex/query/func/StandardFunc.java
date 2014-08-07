@@ -294,6 +294,24 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Casts and checks the function item for its arity.
+   * @param p position of the function
+   * @param a arity
+   * @param qc query context
+   * @return function item
+   * @throws QueryException query exception
+   */
+  protected FItem checkArity(final int p, final int a, final QueryContext qc)
+      throws QueryException {
+    final Item it = checkItem(exprs[p], qc);
+    if(it instanceof FItem) {
+      final FItem fi = (FItem) it;
+      if(fi.arity() == a) return fi;
+    }
+    throw castError(info, it, FuncType.arity(a));
+  }
+
+  /**
    * Converts the specified dateTime to milliseconds.
    * @param ex expression
    * @param qc query context

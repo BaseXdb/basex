@@ -53,6 +53,9 @@ abstract class TrieNode {
         final InputInfo i) { return new Leaf(h, k, v); }
     @Override
     StringBuilder toString(final StringBuilder sb) { return sb; }
+    @Override
+    void apply(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo ii)
+        throws QueryException { }
   };
 
   /** Size of this node. */
@@ -170,6 +173,17 @@ abstract class TrieNode {
    * @param ks key cache
    */
   abstract void keys(final ValueBuilder ks);
+
+  /**
+   * Applies a function on all entries.
+   * @param vb value builder
+   * @param func function to apply on keys and values
+   * @param qc query context
+   * @param ii input info
+   * @throws QueryException TODO
+   */
+  abstract void apply(final ValueBuilder vb, final FItem func, QueryContext qc, InputInfo ii)
+      throws QueryException;
 
   /**
    * Calculates the hash key for the given level.

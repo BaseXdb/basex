@@ -164,6 +164,12 @@ final class Leaf extends TrieNode {
   }
 
   @Override
+  void apply(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
+    vb.add(func.invokeValue(qc, ii, key, value));
+  }
+
+  @Override
   boolean hasType(final AtomType kt, final SeqType vt) {
     return (kt == null || key.type.instanceOf(kt)) && (vt == null || vt.instance(value));
   }

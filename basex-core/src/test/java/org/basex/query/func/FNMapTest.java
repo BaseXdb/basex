@@ -80,6 +80,14 @@ public final class FNMapTest extends AdvancedQueryTest {
         _MAP_GET.args("$map", "$k"), "2 3 4");
   }
 
+  /** Test method. */
+  @Test
+  public void forEachEntry() {
+    query(_MAP_FOR_EACH_ENTRY.args(" map{}", "function($a, $b) { 1 }"), "");
+    query(_MAP_FOR_EACH_ENTRY.args(" map{1:2}", "function($a, $b) { $a+$b }"), "3");
+    query(_MAP_FOR_EACH_ENTRY.args(" map{'a':1, 'b':2}", "function($a, $b) { $b }"), "1 2");
+  }
+
   /**
    * Counts the map entries.
    * @param query query string
