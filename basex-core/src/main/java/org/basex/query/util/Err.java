@@ -579,6 +579,8 @@ public enum Err {
   FRAGID(FOUT, 1170, "URI contains a fragment identifier: %"),
   /** FOUT1170. */
   INVURL(FOUT, 1170, "URI is invalid: %"),
+  /** FOUT1170. */
+  STBASEURI(FOUT, 1170, "Static Base URI is undefined."),
   /** FOUT1190. */
   WHICHENC(FOUT, 1190, "Unknown encoding '%'."),
   /** FOUT1190. */
@@ -646,8 +648,6 @@ public enum Err {
   /** XPDY0050. */
   NOTREAT(XPDY, 50, "Cannot treat % as %: %."),
 
-  /** XPST0001. */
-  STBASEURI(XPST, 1, "Static Base URI is undefined."),
   /** XPST0003. */
   QUERYEMPTY(XPST, 3, "Empty query."),
   /** XPST0003. */

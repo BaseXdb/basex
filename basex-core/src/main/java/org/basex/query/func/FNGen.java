@@ -213,10 +213,10 @@ public final class FNGen extends StandardFunc {
     checkCreate(qc);
     final byte[] path = checkStr(exprs[0], qc);
     final IO base = sc.baseIO();
-    if(base == null) throw STBASEURI.get(info);
 
     String enc = null;
     try {
+      if(base == null) throw STBASEURI.get(info);
       enc = checkEncoding(1, WHICHENC, qc);
 
       final String p = string(path);
