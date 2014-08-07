@@ -28,9 +28,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class Serializer {
-  /** Default serialization parameters. */
-  public static final SerializerOptions OPTIONS = new SerializerOptions();
-
   /** Stack with names of opened elements. */
   protected final TokenList elems = new TokenList();
   /** Current level. */
@@ -57,7 +54,7 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   public static XMLSerializer get(final OutputStream os) throws IOException {
-    return new XMLSerializer(os, OPTIONS);
+    return new XMLSerializer(os, SerializerOptions.get(true));
   }
 
   /**

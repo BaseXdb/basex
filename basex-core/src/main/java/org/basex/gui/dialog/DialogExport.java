@@ -106,7 +106,7 @@ public final class DialogExport extends BaseXDialog {
     encoding.setSelectedItem(f ? enc : sopts.get(SerializerOptions.ENCODING));
 
     params = new BaseXTextField(sopts.toString(), this);
-    params.setToolTipText(tooltip(Serializer.OPTIONS));
+    params.setToolTipText(tooltip(SerializerOptions.get(true)));
 
     pp = new BaseXBack(new TableLayout(3, 2, 16, 6)).border(8, 0, 8, 0);
     pp.add(new BaseXLabel(METHOD + COL, true, true));

@@ -99,7 +99,7 @@ public abstract class OutputSerializer extends Serializer {
   protected OutputSerializer(final OutputStream os, final SerializerOptions sopts,
       final String... versions) throws IOException {
 
-    final SerializerOptions opts = sopts == null ? OPTIONS : sopts;
+    final SerializerOptions opts = sopts == null ? SerializerOptions.get(true) : sopts;
     final String ver = supported(VERSION, opts, versions);
     final String htmlver = supported(HTML_VERSION, opts, V40, V401, V50);
     html5 = htmlver.equals(V50) || ver.equals(V50);

@@ -885,7 +885,7 @@ public final class FNDb extends StandardFunc {
   private Item event(final QueryContext qc) throws QueryException {
     final byte[] name = checkStr(exprs[0], qc);
     try {
-      final ArrayOutput ao = qc.value(exprs[1]).serialize();
+      final ArrayOutput ao = qc.value(exprs[1]).serialize(SerializerOptions.get(false));
       // throw exception if event is unknown
       if(!qc.context.events.notify(qc.context, name, ao.finish())) throw BXDB_EVENT.get(info, name);
       return null;

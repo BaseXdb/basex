@@ -183,6 +183,9 @@ public final class SerializerOptions extends Options {
     }
   }
 
+  /** Serialization parameters (with and without indentation). */
+  private static final SerializerOptions[] OPTIONS = new SerializerOptions[2];
+
   /**
    * Checks if the specified option is true.
    * @param option option
@@ -190,5 +193,20 @@ public final class SerializerOptions extends Options {
    */
   public boolean yes(final EnumOption<YesNo> option) {
     return get(option) == YesNo.YES;
+  }
+
+  /**
+   * Returns serialization parameters.
+   * @param indent indent XML
+   * @return parameters
+   */
+  public static SerializerOptions get(final boolean indent) {
+    SerializerOptions o = OPTIONS[indent ? 1 : 0];
+    if(o == null) {
+      o = new SerializerOptions();
+      if(!indent) o.set(SerializerOptions.INDENT, YesNo.NO);
+      OPTIONS[indent ? 1 : 0] = o;
+    }
+    return o;
   }
 }

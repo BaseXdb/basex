@@ -205,16 +205,16 @@ public abstract class AQuery extends Command {
    * @return serialization parameters
    */
   public SerializerOptions parameters(final Context ctx) {
-    SerializerOptions params = Serializer.OPTIONS;
     try {
       qp(args[0], ctx);
       parse(null);
-      params = qp.qc.serParams();
+      return qp.qc.serParams();
     } catch(final QueryException ex) {
       error(Util.message(ex));
+    } finally {
+      qp = null;
     }
-    qp = null;
-    return params;
+    return SerializerOptions.get(true);
   }
 
   /**

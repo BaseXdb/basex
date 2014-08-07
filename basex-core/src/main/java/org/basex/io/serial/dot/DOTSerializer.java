@@ -39,7 +39,7 @@ public final class DOTSerializer extends OutputSerializer {
    * @throws IOException I/O exception
    */
   public DOTSerializer(final OutputStream os, final boolean compact) throws IOException {
-    super(os, OPTIONS);
+    super(os, SerializerOptions.get(true));
     this.compact = compact;
     print(HEADER);
   }

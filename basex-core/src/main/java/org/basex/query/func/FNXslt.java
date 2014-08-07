@@ -14,6 +14,7 @@ import javax.xml.transform.stream.*;
 
 import org.basex.io.*;
 import org.basex.io.out.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
@@ -124,7 +125,7 @@ public final class FNXslt extends StandardFunc {
 
   /**
    * Returns an input reference (possibly cached) to the specified input.
-   * @param ex expressio nto be evaluated
+   * @param ex expression to be evaluated
    * @param qc query context
    * @return item
    * @throws QueryException query exception
@@ -133,7 +134,7 @@ public final class FNXslt extends StandardFunc {
     final Item it = checkItem(ex, qc);
     if(it instanceof ANode) {
       try {
-        final IO io = new IOContent(it.serialize().finish());
+        final IO io = new IOContent(it.serialize(SerializerOptions.get(false)).finish());
         io.name(string(((ANode) it).baseURI()));
         return io;
       } catch(final QueryIOException e) {

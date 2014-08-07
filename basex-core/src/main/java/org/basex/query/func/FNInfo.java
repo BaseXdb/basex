@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -147,7 +148,7 @@ public final class FNInfo extends StandardFunc {
       } else if(it.type == NodeType.ATT || it.type == NodeType.NSP) {
         value = Token.token(it.toString());
       } else {
-        value = it.serialize().finish();
+        value = it.serialize(SerializerOptions.get(false)).finish();
       }
       dump(value, label, qc);
     } catch(final QueryIOException ex) {
