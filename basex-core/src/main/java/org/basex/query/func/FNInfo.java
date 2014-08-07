@@ -55,6 +55,11 @@ public final class FNInfo extends StandardFunc {
     return this;
   }
 
+  @Override
+  public boolean isVacuous() {
+    return func == ERROR || super.isVacuous();
+  }
+
   /**
    * Performs the error function.
    * @param qc query context

@@ -219,7 +219,8 @@ public enum Function {
   /* FNInfo functions. */
 
   /** XQuery function. */
-  ERROR(FNInfo.class, "error([code[,desc[,object]]])", arg(QNM_ZO, STR, ITEM_ZM), EMP, flag(NDT)),
+  ERROR(FNInfo.class, "error([code[,desc[,object]]])",
+      arg(QNM_ZO, STR, ITEM_ZM), ITEM_ZM, flag(NDT)),
   /** XQuery function. */
   TRACE(FNInfo.class, "trace(value,label)", arg(ITEM_ZM, STR), ITEM_ZM, flag(NDT)),
   /** XQuery function. */

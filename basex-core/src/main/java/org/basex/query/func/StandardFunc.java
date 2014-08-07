@@ -138,7 +138,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public final boolean isVacuous() {
+  public boolean isVacuous() {
     return !has(Flag.UPD) && seqType.eq(SeqType.EMP);
   }
 
