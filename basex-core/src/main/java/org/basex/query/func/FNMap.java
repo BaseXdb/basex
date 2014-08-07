@@ -48,11 +48,12 @@ public final class FNMap extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     switch(func) {
-      case _MAP_NEW:       // deprecated...
+      case _MAP_NEW:       // deprecated
       case _MAP_MERGE:     return merge(qc, ii);
+      case _MAP_PUT:       return put(qc, ii);
       case _MAP_ENTRY:     return entry(qc, ii);
       case _MAP_CONTAINS:  return Bln.get(contains(qc, ii));
-      case _MAP_SIZE:      return Int.get(map(qc).mapSize());
+      case _MAP_SIZE:      return Int.get(map(qc).mapSize()); // deprecated
       case _MAP_REMOVE:    return remove(qc, ii);
       case _MAP_SERIALIZE: return Str.get(map(qc).serialize(info));
       default:             return super.item(qc, ii);
@@ -99,6 +100,17 @@ public final class FNMap extends StandardFunc {
       map = map == null ? m : map.addAll(m, ii);
     }
     return map == null ? Map.EMPTY : map;
+  }
+
+  /**
+   * Creates a new map from an old one and adds a new entry.
+   * @param qc query context
+   * @param ii input info
+   * @return new map
+   * @throws QueryException query exception
+   */
+  private Map put(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return map(qc).insert(exprs[1].item(qc, info), qc.value(exprs[2]), ii);
   }
 
   /**
