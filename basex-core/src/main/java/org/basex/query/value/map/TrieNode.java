@@ -23,20 +23,15 @@ abstract class TrieNode {
   /** The empty node. */
   static final TrieNode EMPTY = new TrieNode(0) {
     @Override
-    StringBuilder toString(final StringBuilder sb, final String ind) {
-      return sb.append("{ }"); }
+    StringBuilder toString(final StringBuilder sb, final String ind) { return sb.append("{ }"); }
     @Override
-    TrieNode delete(final int h, final Item k, final int l, final InputInfo i) {
-      return this; }
+    TrieNode delete(final int h, final Item k, final int l, final InputInfo i) { return this; }
     @Override
-    Value get(final int h, final Item k, final int l, final InputInfo i) {
-      return null; }
+    Value get(final int h, final Item k, final int l, final InputInfo i) { return null; }
     @Override
-    boolean contains(final int h, final Item k, final int l, final InputInfo ii) {
-      return false; }
+    boolean contains(final int h, final Item k, final int l, final InputInfo ii) { return false; }
     @Override
-    TrieNode addAll(final TrieNode o, final int l, final InputInfo ii) {
-      return o; }
+    TrieNode addAll(final TrieNode o, final int l, final InputInfo ii) { return o; }
     @Override
     TrieNode add(final Leaf o, final int l, final InputInfo ii) { return o; }
     @Override
@@ -54,9 +49,8 @@ abstract class TrieNode {
     @Override
     boolean deep(final InputInfo ii, final TrieNode o, final Collation coll) { return this == o; }
     @Override
-    public TrieNode insert(final int h, final Item k, final Value v,
-        final int l, final InputInfo i) {
-      return new Leaf(h, k, v); }
+    public TrieNode insert(final int h, final Item k, final Value v, final int l,
+        final InputInfo i) { return new Leaf(h, k, v); }
     @Override
     StringBuilder toString(final StringBuilder sb) { return sb; }
   };
@@ -232,7 +226,7 @@ abstract class TrieNode {
    * @throws QueryException query exception
    */
   static boolean eq(final Item a, final Item b, final InputInfo ii) throws QueryException {
-    return a.comparable(b) && a.eq(b, null, ii);
+    return a.equiv(b, null, ii);
   }
 
   /**

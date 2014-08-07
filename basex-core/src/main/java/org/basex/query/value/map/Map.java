@@ -94,11 +94,8 @@ public final class Map extends FItem {
     // function items can't be keys
     if(it instanceof FItem) throw FIATOM.get(ii, it.type);
 
-    // NaN can't be stored as key, as it isn't equal to anything
-    if(it == Flt.NAN || it == Dbl.NAN) return null;
-
-    // untyped items are converted to strings
-   return it.type.isUntyped() ? Str.get(it.string(ii)) : it;
+    // nodes are converted to untyped atomics
+    return it instanceof ANode ? new Atm(it.string(ii)) : it;
   }
 
   /**
