@@ -155,7 +155,7 @@ public final class Functions extends TokenSet {
         calls[i] = new VarRef(ii, args[i]);
       }
 
-      final StandardFunc sf = fn.get(sc, calls);
+      final StandardFunc sf = fn.get(sc, ii, calls);
       if(sf.has(Flag.UPD)) {
         qc.updating();
         ann.add(Ann.Q_UPDATING, Empty.SEQ, ii);

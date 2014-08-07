@@ -914,7 +914,7 @@ public enum GUIMenuCmd implements GUICommand {
    * @return function string
    */
   private static String openPre(final DBNodes n, final int i) {
-    return Function._DB_OPEN_PRE.get(null, Str.get(n.data.meta.name),
+    return Function._DB_OPEN_PRE.get(null, null, Str.get(n.data.meta.name),
         Int.get(n.pres[i])).toString();
   }
 }

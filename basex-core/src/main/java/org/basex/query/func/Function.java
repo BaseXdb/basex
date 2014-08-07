@@ -1178,16 +1178,6 @@ public enum Function {
   /**
    * Creates a new instance of the function.
    * @param sc static context
-   * @param arg arguments
-   * @return function
-   */
-  public StandardFunc get(final StaticContext sc, final Expr... arg) {
-    return get(sc, null, arg);
-  }
-
-  /**
-   * Creates a new instance of the function.
-   * @param sc static context
    * @param info input info
    * @param exprs arguments
    * @return function

@@ -96,18 +96,18 @@ public final class If extends Arr {
         if(b == Bln.FALSE) {
           // if(A) then false() else true() -> not(A)
           qc.compInfo(OPTPRE, this);
-          return Function.NOT.get(null, a).optimize(qc, scp);
+          return Function.NOT.get(null, info, a).optimize(qc, scp);
         }
         // if(A) then B else true() -> not(A) or B
         qc.compInfo(OPTWRITE, this);
-        final Expr notA = Function.NOT.get(null, a).optimize(qc, scp);
+        final Expr notA = Function.NOT.get(null, info, a).optimize(qc, scp);
         return new Or(info, notA, b).optimize(qc, scp);
       }
 
       if(b == Bln.FALSE) {
         // if(A) then false() else C -> not(A) and C
         qc.compInfo(OPTWRITE, this);
-        final Expr notA = Function.NOT.get(null, a).optimize(qc, scp);
+        final Expr notA = Function.NOT.get(null, info, a).optimize(qc, scp);
         return new And(info, notA, c).optimize(qc, scp);
       }
 
