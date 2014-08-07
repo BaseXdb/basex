@@ -38,11 +38,12 @@ public class RegExParser implements RegExParserConstants {
    * @param mod modifiers
    * @param ext XQuery 3.0 syntax
    * @param ii input info
+   * @param check check result for empty strings
    * @return the pattern
    * @throws QueryException query exception
    */
   public static Pattern parse(final byte[] regex, final byte[] mod, final boolean ext,
-      final InputInfo ii) throws QueryException {
+      final InputInfo ii, final boolean check) throws QueryException {
     // process modifiers
     int m = 0;
     boolean strip = false;
@@ -63,7 +64,16 @@ public class RegExParser implements RegExParserConstants {
     try {
       final RegExParser parser = new RegExParser(regex, strip, (m & DOTALL) != 0,
           (m & MULTILINE) != 0);
-      return Pattern.compile(parser.parse().toString(), m);
+      final String string = parser.parse().toString();
+      final Pattern pattern = Pattern.compile(string, m);
+      if(check) {
+        // Circumvent Java RegEx behavior ("If MULTILINE mode is activated"...):
+        // http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#lt
+        final Pattern p = (pattern.flags() & Pattern.MULTILINE) == 0 ? pattern :
+          Pattern.compile(pattern.pattern());
+        if(p.matcher("").matches()) throw REGROUP.get(ii);
+      }
+      return pattern;
     } catch(final ParseException pe) {
       throw REGPAT.get(ii, pe.getMessage());
     } catch(final TokenMgrError err) {

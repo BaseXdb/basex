@@ -93,7 +93,7 @@ public final class FNPat extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item matches(final byte[] value, final QueryContext qc) throws QueryException {
-    final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc);
+    final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc, false);
     return Bln.get(p.matcher(string(value)).find());
   }
 
@@ -105,8 +105,7 @@ public final class FNPat extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item analyzeString(final byte[] value, final QueryContext qc) throws QueryException {
-    final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc);
-    if(p.matcher("").matches()) throw REGROUP.get(info);
+    final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc, true);
     final String str = string(value);
     final Matcher m = p.matcher(str);
 
@@ -180,9 +179,7 @@ public final class FNPat extends StandardFunc {
         (i + 1 == rep.length || !digit(rep[i + 1]))) throw FUNREPDOL.get(info, rep);
     }
 
-    final Pattern p = pattern(exprs[1], exprs.length == 4 ? exprs[3] : null, qc);
-    if(p.pattern().isEmpty()) throw REGROUP.get(info);
-
+    final Pattern p = pattern(exprs[1], exprs.length == 4 ? exprs[3] : null, qc, true);
     String r = string(rep);
     if((p.flags() & Pattern.LITERAL) != 0) {
       r = SLASH.matcher(BSLASH.matcher(r).replaceAll("\\\\\\\\")).replaceAll("\\\\\\$");
@@ -206,7 +203,7 @@ public final class FNPat extends StandardFunc {
     final byte[] val = checkEStr(exprs[0], qc);
     if(exprs.length < 2) return StrSeq.get(split(norm(val), ' '));
 
-    final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc);
+    final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc, true);
     if(p.matcher("").matches()) throw REGROUP.get(info);
 
     final TokenList tl = new TokenList();
@@ -228,11 +225,12 @@ public final class FNPat extends StandardFunc {
    * @param pattern input pattern
    * @param modifier modifier item
    * @param qc query context
+   * @param check check result for empty strings
    * @return pattern modifier
    * @throws QueryException query exception
    */
-  private Pattern pattern(final Expr pattern, final Expr modifier, final QueryContext qc)
-      throws QueryException {
+  private Pattern pattern(final Expr pattern, final Expr modifier, final QueryContext qc,
+      final boolean check) throws QueryException {
 
     final byte[] pat = checkStr(pattern, qc);
     final byte[] mod = modifier != null ? checkStr(modifier, qc) : null;
@@ -241,7 +239,7 @@ public final class FNPat extends StandardFunc {
     final byte[] key = tb.finish();
     Pattern p = patterns.get(key);
     if(p == null) {
-      p = RegExParser.parse(pat, mod, sc.xquery3(), info);
+      p = RegExParser.parse(pat, mod, sc.xquery3(), info, check);
       patterns.put(key, p);
     }
     return p;
