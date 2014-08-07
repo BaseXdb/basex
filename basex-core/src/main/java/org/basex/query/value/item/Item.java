@@ -176,7 +176,7 @@ public abstract class Item extends Value {
    */
   @SuppressWarnings("unused")
   public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
-    throw Util.notExpected();
+    throw (type == it.type ? CMPTYPE : CMPTYPES).get(ii, type, it.type);
   }
 
   /**

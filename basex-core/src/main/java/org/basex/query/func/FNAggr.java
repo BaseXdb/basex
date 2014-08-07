@@ -153,8 +153,8 @@ public final class FNAggr extends StandardFunc {
       }
       return rs;
     }
-    // dates, durations and booleans
-    if(rs instanceof ADate || rs instanceof Dur || rs.type == BLN) {
+    // dates, durations, booleans, binary values
+    if(rs instanceof ADate || rs instanceof Dur || rs instanceof Bin || rs.type == BLN) {
       for(Item it; (it = iter.next()) != null;) {
         if(rs.type != it.type) throw FUNTYPE.get(info, rs.type, it.type, it);
         if(cmp.eval(rs, it, coll, info)) rs = it;

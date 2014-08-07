@@ -53,6 +53,13 @@ public final class Hex extends Bin {
       decode(it.string(ii), ii));
   }
 
+  @Override
+  public int diff(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return Token.diff(binary(ii), it instanceof Bin ? ((Bin) it).binary(ii) :
+      decode(it.string(ii), ii));
+  }
+
   /**
    * Converts the input into a byte array.
    * @param d textual data
