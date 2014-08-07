@@ -1,5 +1,7 @@
 package org.basex.query.value.map;
 
+import static org.basex.query.util.Err.*;
+
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -40,8 +42,10 @@ final class Leaf extends TrieNode {
   TrieNode insert(final int h, final Item k, final Value v, final int l, final InputInfo ii)
       throws QueryException {
     // same hash, replace or merge
-    if(h == hash) return eq(k, key, ii) ?
-        new Leaf(h, k, v) : new List(hash, key, value, k, v);
+    if(h == hash) {
+      if(eq(k, key, ii)) throw MAPKEY.get(ii, k, value, v);
+      return new List(hash, key, value, k, v);
+    }
 
     // different hash, branch
     final TrieNode[] ch = new TrieNode[KIDS];

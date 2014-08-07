@@ -940,6 +940,10 @@ public enum Err {
   CNINV(XQDY, 101, "Invalid prefix/namespace '%'."),
   /** XQDY0102. */
   DUPLNSCONS(XQDY, 102, "Duplicate namespace declaration: '%'."),
+  /** XQDY0137. */
+  MAPKEY(XQDY, 137, "Key % already exists in map: % vs. %."),
+  /** XQDY0138. */
+  ARRAYPOS(XQDY, 138, "No value exists at array position %."),
 
   /** XQST0009. */
   IMPLSCHEMA(XQST, 9, "Schema import not supported."),
