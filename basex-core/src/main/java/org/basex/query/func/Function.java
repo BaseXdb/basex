@@ -401,6 +401,8 @@ public enum Function {
   /** XQuery function. */
   _MAP_NEW(FNMap.class, "new([maps])", arg(MAP_ZM), MAP_O, flag(X30)),
   /** XQuery function. */
+  _MAP_MERGE(FNMap.class, "merge(maps)", arg(MAP_ZM), MAP_O, flag(X30)),
+  /** XQuery function. */
   _MAP_ENTRY(FNMap.class, "entry(key,value)", arg(AAT, ITEM_ZM), MAP_O, flag(X30)),
   /** XQuery function. */
   _MAP_GET(FNMap.class, "get(map,key)", arg(MAP_O, AAT), ITEM_ZM, flag(X30)),

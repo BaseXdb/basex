@@ -48,7 +48,8 @@ public final class FNMap extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     switch(func) {
-      case _MAP_NEW:       return newMap(qc, ii);
+      case _MAP_NEW:       // deprecated...
+      case _MAP_MERGE:     return merge(qc, ii);
       case _MAP_ENTRY:     return entry(qc, ii);
       case _MAP_CONTAINS:  return Bln.get(contains(qc, ii));
       case _MAP_SIZE:      return Int.get(map(qc).mapSize());
@@ -87,12 +88,17 @@ public final class FNMap extends StandardFunc {
    * @return new map
    * @throws QueryException query exception
    */
-  private Map newMap(final QueryContext qc, final InputInfo ii) throws QueryException {
+  private Map merge(final QueryContext qc, final InputInfo ii) throws QueryException {
+    // legacy code (obsolete, as only required by map:new)...
     if(exprs.length == 0) return Map.EMPTY;
-    Map map = Map.EMPTY;
+
+    Map map = null;
     final Iter maps = exprs[0].iter(qc);
-    for(Item m; (m = maps.next()) != null;) map = map.addAll(checkMap(m), ii);
-    return map;
+    for(Item it; (it = maps.next()) != null;) {
+      final Map m = checkMap(it);
+      map = map == null ? m : map.addAll(m, ii);
+    }
+    return map == null ? Map.EMPTY : map;
   }
 
   /**
