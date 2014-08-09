@@ -79,8 +79,8 @@ public final class IntSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final long[] items, final Type type) {
-    return items.length == 0 ? Empty.SEQ : items.length == 1 ?
-        Int.get(items[0], type) : new IntSeq(items, type);
+    return items.length == 0 ? Empty.SEQ : items.length == 1 ? Int.get(items[0], type) :
+      new IntSeq(items, type);
   }
 
   /**
@@ -99,9 +99,7 @@ public final class IntSeq extends NativeSeq {
     for(final Value val : values) {
       // speed up construction, depending on input
       final int vs = (int) val.size();
-      if(val instanceof Item) {
-        tmp[t++] = ((Item) val).itr(null);
-      } else if(val instanceof IntSeq) {
+      if(val instanceof IntSeq) {
         final IntSeq sq = (IntSeq) val;
         System.arraycopy(sq.values, 0, tmp, t, vs);
         t += vs;

@@ -68,6 +68,7 @@ public final class CmpSR extends Single {
     if(!(cmp.exprs[1] instanceof AStr)) return cmp;
     final byte[] d = ((Item) cmp.exprs[1]).string(cmp.info);
     final Expr e = cmp.exprs[0];
+    if(e.seqType().mayBeArray()) return cmp;
     switch(cmp.op.op) {
       case GE: return new CmpSR(e, d,    true,  null, true,  cmp.coll, cmp.info);
       case GT: return new CmpSR(e, d,    false, null, true,  cmp.coll, cmp.info);

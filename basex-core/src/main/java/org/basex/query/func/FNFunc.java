@@ -198,10 +198,10 @@ public final class FNFunc extends StandardFunc {
     Item it = ir.next();
     if(it == null) return exprs[1].iter(qc);
 
-    Value sum = qc.value(exprs[1]);
-    do sum = fun.invokeValue(qc, info, sum, it);
+    Value res = qc.value(exprs[1]);
+    do res = fun.invokeValue(qc, info, res, it);
     while((it = ir.next()) != null);
-    return sum.iter();
+    return res.iter();
   }
 
   /**

@@ -30,8 +30,8 @@ public final class SubSeq extends Seq {
    * @return the resulting value
    */
   public static Value get(final Value val, final long from, final long len) {
-    final long vLen = val.size(), n = Math.min(vLen - from, len);
-    if(n == vLen) return val;
+    final long vs = val.size(), n = Math.min(vs - from, len);
+    if(n == vs) return val;
     if(n <= 0) return Empty.SEQ;
     if(n == 1) return val.itemAt(from);
     if(val instanceof SubSeq) {

@@ -160,9 +160,10 @@ public final class FNSeq extends StandardFunc {
     Occ o = Occ.ZERO_MORE;
     // at most one returned item
     if(func == Function.SUBSEQUENCE && st.one()) o = Occ.ZERO_ONE;
-
     // head will return at most one item
     else if(func == Function.HEAD) o = Occ.ZERO_ONE;
+    // zero items
+    else if(func == Function.TAIL && st.one()) o = Occ.ZERO;
     seqType = SeqType.get(t, o);
 
     return this;
@@ -227,7 +228,6 @@ public final class FNSeq extends StandardFunc {
       final Value val = ir.value();
       return SubSeq.get(val, 1, val.size() - 1).iter();
     }
-
     if(ir.next() == null) return Empty.ITER;
 
     return new Iter() {

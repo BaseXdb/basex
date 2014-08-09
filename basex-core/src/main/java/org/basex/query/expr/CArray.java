@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
  */
 public final class CArray extends Arr {
   /** Create array members. */
-  private boolean create;
+  private final boolean create;
 
   /**
    * Constructor.

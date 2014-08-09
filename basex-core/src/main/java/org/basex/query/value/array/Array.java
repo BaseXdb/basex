@@ -50,8 +50,8 @@ public final class Array extends FItem {
    * @return instance
    */
   public static Array get(final Value... members) {
-    final int size = members.length;
-    return size == 0 ? EMPTY : new Array(members, 0, size);
+    final int s = members.length;
+    return s == 0 ? EMPTY : new Array(members, 0, s);
   }
 
   /**
@@ -76,8 +76,8 @@ public final class Array extends FItem {
       throw castError(ii, it, AtomType.ITR);
 
     final long i = it.itr(ii);
-    if(i < 1 || i > size) throw ARRAYPOS.get(ii, i);
-    return get((int) i - 1);
+    if(i > 0 && i <= size) return get((int) i - 1);
+    throw ARRAYPOS.get(ii, i);
   }
 
   @Override
@@ -126,14 +126,6 @@ public final class Array extends FItem {
   }
 
   /**
-   * Returns the array members.
-   * @return value
-  public Value[] members() {
-    return members;
-  }
-   */
-
-  /**
    * Returns the member at the specified index.
    * @param index index
    * @return value
@@ -153,7 +145,7 @@ public final class Array extends FItem {
   @Override
   public Item materialize(final InputInfo ii) throws QueryException {
     final ValueList vl = new ValueList(size);
-    for(int m = 0; m < size; m++) vl.add(get(m).materialize(ii));
+    for(int a = 0; a < size; a++) vl.add(get(a).materialize(ii));
     return vl.array();
   }
 
@@ -171,13 +163,10 @@ public final class Array extends FItem {
   @Override
   public long atomSize() {
     long s = 0;
-    for(int i = 0; i < size; i++) {
-      final Value v = get(i);
-      if(v instanceof Item) {
-        s += ((Item) v).atomSize();
-      } else {
-        for(final Item it : v) s += it.atomSize();
-      }
+    for(int a = 0; a < size; a++) {
+      final Value v = get(a);
+      final long vs = v.size();
+      for(int i = 0; i < vs; i++) s += v.itemAt(i).atomSize();
     }
     return s;
   }
@@ -194,7 +183,7 @@ public final class Array extends FItem {
     if(single && s > 1) throw SEQFOUND.get(ii, get(0));
     if(size == 1) return get(0).atomValue(ii);
     final ValueBuilder vb = new ValueBuilder((int) s);
-    for(int i = 0; i < size; i++) vb.add(get(i).atomValue(ii));
+    for(int a = 0; a < size; a++) vb.add(get(a).atomValue(ii));
     return vb.value();
   }
 
@@ -220,18 +209,20 @@ public final class Array extends FItem {
   public void string(final TokenBuilder tb, final InputInfo ii) throws QueryException {
     tb.add('[');
     int c = 0;
-    for(int i = 0; i < size; i++) {
+    for(int a = 0; a < size; a++) {
       if(c++ > 0) tb.add(", ");
-      final Value v = get(i);
-      if(v.size() != 1) tb.add('(');
+      final Value v = get(a);
+      final long vs = v.size();
+      if(vs != 1) tb.add('(');
       int cc = 0;
-      for(final Item it : v) {
+      for(int i = 0; i < vs; i++) {
         if(cc++ > 0) tb.add(", ");
+        final Item it = v.itemAt(i);
         if(it instanceof Array) ((Array) it).string(tb, ii);
         else if(it instanceof Map) ((Map) it).string(tb, 0, ii);
         else tb.add(it.toString());
       }
-      if(v.size() != 1) tb.add(')');
+      if(vs != 1) tb.add(')');
     }
     tb.add(']');
   }
@@ -243,9 +234,7 @@ public final class Array extends FItem {
    */
   public boolean hasType(final ArrayType t) {
     if(!t.retType.eq(SeqType.ITEM_ZM)) {
-      for(int i = 0; i < size; i++) {
-        if(!t.retType.instance(get(i))) return false;
-      }
+      for(int a = 0; a < size; a++) if(!t.retType.instance(get(a))) return false;
     }
     return true;
   }
@@ -264,8 +253,8 @@ public final class Array extends FItem {
     if(item instanceof Array) {
       final Array o = (Array) item;
       if(size != o.size) return false;
-      for(int v = 0; v < size; v++) {
-        final Value v1 = get(v), v2 = o.get(v);
+      for(int a = 0; a < size; a++) {
+        final Value v1 = get(a), v2 = o.get(a);
         if(v1.size() != v2.size() || !new DeepCompare(ii).collation(coll).equal(v1, v2))
           return false;
       }
@@ -285,22 +274,20 @@ public final class Array extends FItem {
   @Override
   public Object toJava() throws QueryException {
     final Object[] tmp = new Object[size];
-    for(int v = 0; v < size; v++) {
-      tmp[v] = get(v).toJava();
-    }
+    for(int a = 0; a < size; a++) tmp[a] = get(a).toJava();
     return tmp;
   }
 
   @Override
   public String toString() {
     final StringBuilder tb = new StringBuilder().append("[");
-    for(int v = 0; v < size; v++) {
-      if(v != 0) tb.append(", ");
+    for(int a = 0; a < size; a++) {
+      if(a != 0) tb.append(", ");
       if(tb.length() > 16) {
         tb.append("...");
         break;
       }
-      final Value value = get(v);
+      final Value value = get(a);
       final long vs = value.size();
       if(vs != 1) tb.append('(');
       for(int i = 0; i < vs; i++) {

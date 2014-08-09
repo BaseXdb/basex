@@ -57,8 +57,8 @@ public final class BytSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final byte[] items) {
-    return items.length == 0 ? Empty.SEQ : items.length == 1 ?
-        Int.get(items[0], AtomType.BYT) : new BytSeq(items);
+    return items.length == 0 ? Empty.SEQ : items.length == 1 ? Int.get(items[0], AtomType.BYT) :
+      new BytSeq(items);
   }
 
   /**
@@ -74,9 +74,7 @@ public final class BytSeq extends NativeSeq {
     for(final Value val : values) {
       // speed up construction, depending on input
       final int vs = (int) val.size();
-      if(val instanceof Item) {
-        tmp[t++] = (byte) ((Item) val).itr(null);
-      } else if(val instanceof BytSeq) {
+      if(val instanceof BytSeq) {
         final BytSeq sq = (BytSeq) val;
         System.arraycopy(sq.values, 0, tmp, t, vs);
         t += vs;

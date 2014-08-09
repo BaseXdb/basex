@@ -66,12 +66,13 @@ public final class CmpR extends Single {
   static Expr get(final CmpG cmp) {
     if(!(cmp.exprs[1] instanceof ANum)) return cmp;
     final double d = ((ANum) cmp.exprs[1]).dbl();
-    final Expr expr = cmp.exprs[0];
+    final Expr e = cmp.exprs[0];
+    if(e.seqType().mayBeArray()) return cmp;
     switch(cmp.op.op) {
-      case GE: return new CmpR(expr, d, true, Double.POSITIVE_INFINITY, true, cmp.info);
-      case GT: return new CmpR(expr, d, false, Double.POSITIVE_INFINITY, true, cmp.info);
-      case LE: return new CmpR(expr, Double.NEGATIVE_INFINITY, true, d, true, cmp.info);
-      case LT: return new CmpR(expr, Double.NEGATIVE_INFINITY, true, d, false, cmp.info);
+      case GE: return new CmpR(e, d, true, Double.POSITIVE_INFINITY, true, cmp.info);
+      case GT: return new CmpR(e, d, false, Double.POSITIVE_INFINITY, true, cmp.info);
+      case LE: return new CmpR(e, Double.NEGATIVE_INFINITY, true, d, true, cmp.info);
+      case LT: return new CmpR(e, Double.NEGATIVE_INFINITY, true, d, false, cmp.info);
       default: return cmp;
     }
   }

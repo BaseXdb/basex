@@ -59,8 +59,8 @@ public final class DecSeq extends NativeSeq {
    * @return value
    */
   private static Value get(final BigDecimal[] items) {
-    return items.length == 0 ? Empty.SEQ : items.length == 1 ?
-        Dec.get(items[0]) : new DecSeq(items);
+    return items.length == 0 ? Empty.SEQ : items.length == 1 ? Dec.get(items[0]) :
+      new DecSeq(items);
   }
 
   /**
@@ -76,9 +76,7 @@ public final class DecSeq extends NativeSeq {
     for(final Value val : values) {
       // speed up construction, depending on input
       final int vs = (int) val.size();
-      if(val instanceof Item) {
-        tmp[t++] = ((Item) val).dec(null);
-      } else if(val instanceof DecSeq) {
+      if(val instanceof DecSeq) {
         final DecSeq sq = (DecSeq) val;
         System.arraycopy(sq.values, 0, tmp, t, vs);
         t += vs;

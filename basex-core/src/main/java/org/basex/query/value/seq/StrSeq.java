@@ -62,8 +62,8 @@ public final class StrSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final TokenList items) {
-    return items.isEmpty() ? Empty.SEQ : items.size() == 1 ?
-        Str.get(items.get(0)) : new StrSeq(items.toArray());
+    return items.isEmpty() ? Empty.SEQ : items.size() == 1 ? Str.get(items.get(0)) :
+      new StrSeq(items.toArray());
   }
 
   /**
@@ -72,8 +72,8 @@ public final class StrSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final byte[][] items) {
-    return items.length == 0 ? Empty.SEQ : items.length == 1 ?
-        Str.get(items[0]) : new StrSeq(items);
+    return items.length == 0 ? Empty.SEQ : items.length == 1 ? Str.get(items[0]) :
+      new StrSeq(items);
   }
 
   /**
@@ -89,9 +89,7 @@ public final class StrSeq extends NativeSeq {
     for(final Value val : values) {
       // speed up construction, depending on input
       final int vs = (int) val.size();
-      if(val instanceof Item) {
-        tmp[t++] = ((Item) val).string(null);
-      } else if(val instanceof StrSeq) {
+      if(val instanceof StrSeq) {
         final StrSeq sq = (StrSeq) val;
         System.arraycopy(sq.values, 0, tmp, t, vs);
         t += vs;

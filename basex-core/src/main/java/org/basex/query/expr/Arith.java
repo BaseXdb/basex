@@ -45,10 +45,12 @@ public final class Arith extends Arr {
     final SeqType st1 = exprs[0].seqType();
     final SeqType st2 = exprs[1].seqType();
     final Type t1 = st1.type, t2 = st2.type;
+    final boolean o1 = st1.one() && !st1.mayBeArray();
+    final boolean o2 = st2.one() && !st2.mayBeArray();
     if(t1.isNumberOrUntyped() && t2.isNumberOrUntyped()) {
-      final Occ occ = st1.one() && st2.one() ? Occ.ONE : Occ.ZERO_ONE;
+      final Occ occ = o1 && o2 ? Occ.ONE : Occ.ZERO_ONE;
       seqType = SeqType.get(Calc.type(t1, t2), occ);
-    } else if(st1.one() && st2.one()) {
+    } else if(o1 && o2) {
       seqType = SeqType.ITEM;
     }
     return optPre(oneIsEmpty() ? null : allAreValues() ? item(qc, info) : this, qc);
