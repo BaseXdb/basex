@@ -81,7 +81,7 @@ final class List extends TrieNode {
     // same hash, replace or merge
     if(h == hash) {
       for(int i = keys.length; i-- > 0;) {
-        if(eq(k, keys[i], ii)) throw MAPKEY.get(ii, k, values[i], v);
+        if(eq(k, keys[i], ii)) throw MAPDUPLKEY.get(ii, k, values[i], v);
       }
       return new List(hash, Array.add(keys, k), Array.add(values, v));
     }

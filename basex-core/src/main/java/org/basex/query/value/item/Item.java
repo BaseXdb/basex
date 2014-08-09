@@ -189,15 +189,24 @@ public abstract class Item extends Value {
     return new ArrayInput(string(ii));
   }
 
-  /**
-   * Materializes streamable values, or returns a self reference.
-   * @param ii input info
-   * @return materialized item
-   * @throws QueryException query exception
-   */
-  @SuppressWarnings("unused")
+  @Override
   public Item materialize(final InputInfo ii) throws QueryException {
     return this;
+  }
+
+  @Override
+  public Value atomValue(final InputInfo ii) throws QueryException {
+    return atomItem(ii);
+  }
+
+  @Override
+  public Item atomItem(final InputInfo ii) throws QueryException {
+    return materialize(ii);
+  }
+
+  @Override
+  public long atomSize() {
+    return 1;
   }
 
   @Override

@@ -944,7 +944,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "Expr" rule.
-   * @return query expression
+   * @return query expression (can be {@code null})
    * @throws QueryException query exception
    */
   private Expr expr() throws QueryException {
@@ -2059,12 +2059,19 @@ public class QueryParser extends InputParser {
     e = compConstructor();
     if(e != null) return e;
     // ordered expression
-    if(wsConsumeWs(ORDERED, BRACE1, INCOMPLETE) ||
-        wsConsumeWs(UNORDERED, BRACE1, INCOMPLETE)) return enclosed(NOENCLEXPR);
+    if(wsConsumeWs(ORDERED, BRACE1, INCOMPLETE) || wsConsumeWs(UNORDERED, BRACE1, INCOMPLETE))
+      return enclosed(NOENCLEXPR);
     // map (including legacy syntax)
-    if(wsConsumeWs(MAPSTR, BRACE1, INCOMPLETE) || curr('{')) return new LitMap(info(), keyValues());
-    // general array constructor
-    //if(wsConsumeWs(ARRAY, BRACE1, INCOMPLETE)) return new LitArray(info(), keyValues());
+    if(wsConsumeWs(MAPSTR, BRACE1, INCOMPLETE) || curr('{')) return new CMap(info(), keyValues());
+    // square array constructor
+    if(wsConsumeWs(BR1)) return new CArray(info(), false, values());
+    // curly array constructor
+    if(wsConsumeWs(ARRAYSTR, BRACE1, INCOMPLETE)) {
+      wsCheck(BRACE1);
+      final Expr a = expr();
+      wsCheck(BRACE2);
+      return a == null ? new CArray(info(), true) : new CArray(info(), true, a);
+    }
 
     // context item
     if(c == '.' && !digit(next())) {
@@ -2077,8 +2084,8 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses keys and values of maps and arrays.
-   * @return map literal
+   * Parses keys and values of maps.
+   * @return map literals
    * @throws QueryException query exception
    */
   private Expr[] keyValues() throws QueryException {
@@ -2091,6 +2098,22 @@ public class QueryParser extends InputParser {
         add(el, check(single(), INVMAPVAL));
       } while(wsConsume(COMMA));
       wsCheck(BRACE2);
+    }
+    return el.finish();
+  }
+
+  /**
+   * Parses values of arrays.
+   * @return array literals
+   * @throws QueryException query exception
+   */
+  private Expr[] values() throws QueryException {
+    final ExprList el = new ExprList();
+    if(!wsConsume(BR2)) {
+      do {
+        add(el, check(single(), INVMAPVAL));
+      } while(wsConsume(COMMA));
+      wsCheck(BR2);
     }
     return el.finish();
   }
@@ -2916,11 +2939,16 @@ public class QueryParser extends InputParser {
       final Type key = itemType().type;
       if(!key.instanceOf(AtomType.AAT)) throw error(MAPTAAT, key);
       wsCheck(COMMA);
-      final Type tp = MapType.get((AtomType) key, sequenceType());
+      final MapType tp = MapType.get((AtomType) key, sequenceType());
       wsCheck(PAR2);
       return tp;
     }
-
+    // array
+    if(t instanceof ArrayType) {
+      final ArrayType tp = ArrayType.get(sequenceType());
+      wsCheck(PAR2);
+      return tp;
+    }
     // function type
     SeqType[] args = { };
     if(!wsConsume(PAR2)) {

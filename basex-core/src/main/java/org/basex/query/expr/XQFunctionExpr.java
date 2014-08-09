@@ -48,12 +48,12 @@ public interface XQFunctionExpr {
   /**
    * Tries to inline this function with the given argument expressions.
    * @param exprs argument expressions
-   * @param ctx query context
+   * @param qc query context
    * @param scp variable scope
    * @param ii input info
    * @return the expression to inline if successful, {@code null} otherwise
    * @throws QueryException query exception
    */
-  Expr inlineExpr(Expr[] exprs, QueryContext ctx, VarScope scp, InputInfo ii)
+  Expr inlineExpr(Expr[] exprs, QueryContext qc, VarScope scp, InputInfo ii)
       throws QueryException;
 }

@@ -80,7 +80,7 @@ public final class FNHof extends StandardFunc {
         if(allAreValues() && exprs[0].size() < FNFunc.UNROLL_LIMIT) {
           qc.compInfo(QueryText.OPTUNROLL, this);
           final Value seq = (Value) exprs[0];
-          if(seq.isEmpty()) throw SEQEMPTY.get(info);
+          if(seq.isEmpty()) throw EMPTYFOUND.get(info);
           final FItem f = checkArity(1, 2, qc);
           Expr e = seq.itemAt(0);
           for(int i = 1, len = (int) seq.size(); i < len; i++)

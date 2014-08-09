@@ -10,6 +10,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -89,11 +90,9 @@ public final class Map extends FItem {
    */
   private static Item key(final Item it, final InputInfo ii) throws QueryException {
     // no empty sequence allowed
-    if(it == null) throw SEQEMPTY.get(ii);
-
+    if(it == null) throw EMPTYFOUND.get(ii);
     // function items can't be keys
     if(it instanceof FItem) throw FIATOM.get(ii, it.type);
-
     // nodes are converted to untyped atomics
     return it instanceof ANode ? new Atm(it.string(ii)) : it;
   }
@@ -221,16 +220,12 @@ public final class Map extends FItem {
     return vb;
   }
 
-  /**
-   * Checks if the this map is deep-equal to the given one.
-   * @param ii input info
-   * @param o other map
-   * @param coll collation
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  public boolean deep(final InputInfo ii, final Map o, final Collation coll) throws QueryException {
-    return root.deep(ii, o.root, coll);
+  @Override
+  public boolean deep(final Item item, final InputInfo ii, final Collation coll)
+      throws QueryException {
+
+    if(item instanceof Map) return root.deep(ii, ((Map) item).root, coll);
+    return item instanceof FItem && !(item instanceof Array) && super.deep(item, ii, coll);
   }
 
   /**
@@ -291,7 +286,7 @@ public final class Map extends FItem {
    * @param ii input info
    * @throws QueryException query exception
    */
-  private void string(final TokenBuilder tb, final int level, final InputInfo ii)
+  public void string(final TokenBuilder tb, final int level, final InputInfo ii)
       throws QueryException {
 
     tb.add("{");
@@ -308,6 +303,7 @@ public final class Map extends FItem {
       for(final Item it : v) {
         if(cc++ > 0) tb.add(", ");
         if(it instanceof Map) ((Map) it).string(tb, level + 1, ii);
+        else if(it instanceof Array) ((Array) it).string(tb, ii);
         else tb.add(it.toString());
       }
       if(v.size() != 1) tb.add(')');

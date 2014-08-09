@@ -25,6 +25,8 @@ public interface QueryText {
   /** Parser token. */
   String ANY = "any";
   /** Parser token. */
+  String ARRAYSTR = "array";
+  /** Parser token. */
   String AS = "as";
   /** Parser token. */
   String ASCENDING = "ascending";
@@ -506,6 +508,8 @@ public interface QueryText {
   byte[] JSON = token("json");
   /** MAP token. */
   byte[] MAP = token(MAPSTR);
+  /** Array token. */
+  byte[] ARRAY = token(ARRAYSTR);
   /** Package token. */
   byte[] PKG = token("pkg");
   /** Process token. */
@@ -564,6 +568,8 @@ public interface QueryText {
   byte[] ERRORURI = token(W3URI + "/2005/xqt-errors");
   /** Map URI. */
   byte[] MAPURI = token(W3URI + "/2005/xpath-functions/map");
+  /** Array URI. */
+  byte[] ARRAYURI = token(W3URI + "/2005/xpath-functions/array");
   /** Annotations URI. */
   byte[] XQURI = token(W3URI + "/2012/xquery");
 

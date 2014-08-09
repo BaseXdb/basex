@@ -83,8 +83,7 @@ public final class FNNum extends StandardFunc {
         default:  break;
       }
     }
-    return ip.instanceOf(AtomType.ITR) ?
-        Int.get(Math.abs(it.itr(ii))) : Dec.get(it.dec(ii).abs());
+    return ip.instanceOf(AtomType.ITR) ? Int.get(Math.abs(it.itr(ii))) : Dec.get(it.dec(ii).abs());
   }
 
   /**

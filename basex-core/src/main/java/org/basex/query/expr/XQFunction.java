@@ -17,45 +17,45 @@ public interface XQFunction extends XQFunctionExpr {
    * Internally invokes this function with the given arguments.
    * This method does not deal with tail calls, so it is unsafe to call.
    * Use {@link #invokeValue(QueryContext, InputInfo, Value...)} instead.
-   * @param ctx query context
+   * @param qc query context
    * @param ii input info
    * @param args arguments
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  Value invValue(QueryContext ctx, InputInfo ii, Value... args) throws QueryException;
+  Value invValue(QueryContext qc, InputInfo ii, Value... args) throws QueryException;
 
   /**
    * Internally invokes this function with the given arguments.
    * This method does not deal with tail calls, so it is unsafe to call.
    * Use {@link #invokeItem(QueryContext, InputInfo, Value...)} instead.
-   * @param ctx query context
+   * @param qc query context
    * @param ii input info
    * @param args arguments
    * @return resulting item
    * @throws QueryException query exception
    */
-  Item invItem(QueryContext ctx, InputInfo ii, Value... args) throws QueryException;
+  Item invItem(QueryContext qc, InputInfo ii, Value... args) throws QueryException;
 
   /**
    * Invokes this function with the given arguments.
-   * @param ctx query context
+   * @param qc query context
    * @param ii input info
    * @param args arguments
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  Value invokeValue(QueryContext ctx, InputInfo ii, Value... args) throws QueryException;
+  Value invokeValue(QueryContext qc, InputInfo ii, Value... args) throws QueryException;
 
   /**
    * Invokes this function with the given arguments.
-   * @param ctx query context
+   * @param qc query context
    * @param ii input info
    * @param args arguments
    * @return resulting item
    * @throws QueryException query exception
    */
-  Item invokeItem(QueryContext ctx, InputInfo ii, Value... args) throws QueryException;
+  Item invokeItem(QueryContext qc, InputInfo ii, Value... args) throws QueryException;
 
   /**
    * Size of this function's stack frame.

@@ -43,7 +43,7 @@ final class Leaf extends TrieNode {
       throws QueryException {
     // same hash, replace or merge
     if(h == hash) {
-      if(eq(k, key, ii)) throw MAPKEY.get(ii, k, value, v);
+      if(eq(k, key, ii)) throw MAPDUPLKEY.get(ii, k, value, v);
       return new List(hash, key, value, k, v);
     }
 

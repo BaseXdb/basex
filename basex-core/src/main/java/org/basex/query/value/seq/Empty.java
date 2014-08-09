@@ -86,22 +86,8 @@ public final class Empty extends Value {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(SIZE, 0));
-  }
-
-  @Override
   public int hash(final InputInfo ii) {
     return 0;
-  }
-  @Override
-  public String description() {
-    return EMPTY_SEQUENCE + "()";
-  }
-
-  @Override
-  public String toString() {
-    return "()";
   }
 
   @Override
@@ -117,5 +103,40 @@ public final class Empty extends Value {
   @Override
   public boolean homogeneous() {
     return true;
+  }
+
+  @Override
+  public Value materialize(final InputInfo ii) {
+    return this;
+  }
+
+  @Override
+  public Value atomValue(final InputInfo ii) {
+    return this;
+  }
+
+  @Override
+  public Item atomItem(final InputInfo ii) {
+    return null;
+  }
+
+  @Override
+  public long atomSize() throws QueryException {
+    return 0;
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(SIZE, 0));
+  }
+
+  @Override
+  public String description() {
+    return EMPTY_SEQUENCE + "()";
+  }
+
+  @Override
+  public String toString() {
+    return "()";
   }
 }

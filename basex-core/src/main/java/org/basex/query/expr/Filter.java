@@ -167,8 +167,8 @@ public abstract class Filter extends Preds {
     final VarUsage inPreds = super.count(var), inRoot = root.count(var);
     if(inPreds == VarUsage.NEVER) return inRoot;
     final long sz = root.size();
-    return sz >= 0 && sz <= 1 || root.seqType().zeroOrOne()
-        ? inRoot.plus(inPreds) : VarUsage.MORE_THAN_ONCE;
+    return sz >= 0 && sz <= 1 || root.seqType().zeroOrOne() ? inRoot.plus(inPreds) :
+      VarUsage.MORE_THAN_ONCE;
   }
 
   @Override

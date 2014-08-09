@@ -74,7 +74,7 @@ public abstract class Seq extends Value {
 
   @Override
   public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw NOITEM.get(ii, this);
+    throw SEQFOUND.get(ii, this);
   }
 
   @Override
@@ -108,6 +108,11 @@ public abstract class Seq extends Value {
     int h = 1;
     for(long v = Math.min(size, 5); --v >= 0;) h = 31 * h + itemAt(v).hash(ii);
     return h;
+  }
+
+  @Override
+  public final Item atomItem(final InputInfo ii) throws QueryException {
+    throw SEQFOUND.get(ii, this);
   }
 
   /**

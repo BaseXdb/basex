@@ -375,6 +375,11 @@ public enum Err {
   /** FOAR0002. */
   RANGE(FOAR, 2, "Value out of range: %."),
 
+  /** FOAY0001. */
+  ARRAYBOUNDS(FOAY, 1, "Array index % out of bounds (1-%)."),
+  /** FOAY0002. */
+  ARRAYNEG(FOAY, 2, "Length is negative: %."),
+
   /** FOCA0002. */
   INVALUE(FOCA, 2, "Cannot cast % to %: %."),
   /** FOCA0003. */
@@ -853,11 +858,11 @@ public enum Err {
   /** XPTY0004. */
   NONAME(XPTY, 4, "Name expected, '%' found."),
   /** XPTY0004. */
-  SEQEMPTY(XPTY, 4, "Item expected, empty sequence found."),
+  EMPTYFOUND(XPTY, 4, "Item expected, empty sequence found."),
   /** XPTY0004. */
-  SEQEXP(XPTY, 4, "% expected, empty sequence found."),
+  EMPTYFOUND2(XPTY, 4, "% expected, empty sequence found."),
   /** XPTY0004. */
-  NOITEM(XPTY, 4, "Item expected, sequence found: %."),
+  SEQFOUND(XPTY, 4, "Item expected, sequence found: %."),
   /** XPTY0004. */
   NONUMBER(XPTY, 4, "Number expected, % found: %."),
   /** XPTY0004. */
@@ -940,10 +945,12 @@ public enum Err {
   CNINV(XQDY, 101, "Invalid prefix/namespace '%'."),
   /** XQDY0102. */
   DUPLNSCONS(XQDY, 102, "Duplicate namespace declaration: '%'."),
+  /** XQDY0136. */
+  MAPKEY(XQDY, 136, "Key must be a single atomic value: %."),
   /** XQDY0137. */
-  MAPKEY(XQDY, 137, "Key % already exists in map: % vs. %."),
+  MAPDUPLKEY(XQDY, 137, "Key % already exists in map: % vs. %."),
   /** XQDY0138. */
-  ARRAYPOS(XQDY, 138, "No value exists at array position %."),
+  ARRAYPOS(XQDY, 138, "No value exists at array index %."),
 
   /** XQST0009. */
   IMPLSCHEMA(XQST, 9, "Schema import not supported."),
@@ -1265,6 +1272,7 @@ public enum Err {
     // W3 errors
 
     /** FOAR Error type. */ FOAR,
+    /** FOAY Error type. */ FOAY,
     /** FOCA Error type. */ FOCA,
     /** FOCH Error type. */ FOCH,
     /** FODC Error type. */ FODC,

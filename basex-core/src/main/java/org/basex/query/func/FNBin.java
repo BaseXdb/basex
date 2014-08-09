@@ -632,7 +632,7 @@ public class FNBin extends StandardFunc {
     final Item it = ex.item(qc, info);
     if(it == null) {
       if(empty) return null;
-      throw SEQEMPTY.get(info);
+      throw EMPTYFOUND.get(info);
     }
     return (B64) checkType(it, AtomType.B64);
   }

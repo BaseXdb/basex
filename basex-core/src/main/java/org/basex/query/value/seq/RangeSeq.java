@@ -89,6 +89,21 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
+  public Value materialize(final InputInfo ii) {
+    return this;
+  }
+
+  @Override
+  public Value atomValue(final InputInfo ii) {
+    return this;
+  }
+
+  @Override
+  public long atomSize() {
+    return size;
+  }
+
+  @Override
   public boolean homogeneous() {
     return true;
   }

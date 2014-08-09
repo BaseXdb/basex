@@ -277,15 +277,23 @@ public final class FNSeq extends StandardFunc {
     return new Iter() {
       final ItemSet set = coll == null ? new HashItemSet() : new CollationItemSet(coll);
       final Iter ir = exprs[0].iter(qc);
+      Iter ir2;
 
       @Override
       public Item next() throws QueryException {
         while(true) {
-          Item i = ir.next();
-          if(i == null) return null;
           qc.checkStop();
-          i = atom(i, info);
-          if(set.add(i, info)) return i;
+          while(ir2 != null) {
+            final Item it = ir2.next();
+            if(it == null) {
+              ir2 = null;
+            } else if(set.add(it, info)) {
+              return it;
+            }
+          }
+          final Item it = ir.next();
+          if(it == null) return null;
+          ir2 = it.atomValue(info).iter();
         }
       }
     };

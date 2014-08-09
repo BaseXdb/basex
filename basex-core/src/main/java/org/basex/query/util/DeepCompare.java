@@ -1,6 +1,5 @@
 package org.basex.query.util;
 
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
@@ -9,7 +8,6 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -94,13 +92,13 @@ public final class DeepCompare {
       if(it1 == null || it2 == null) return it1 == null && it2 == null;
 
       // check functions
-      if(it1 instanceof FItem || it2 instanceof FItem) {
-        // maps are functions but have a defined deep-equality
-        if(it1 instanceof Map && it2 instanceof Map) {
-          if(!((Map) it1).deep(info, (Map) it2, coll)) return false;
-          continue;
-        }
-        throw FICMP.get(info, it1 instanceof FItem ? it1.type : it2.type);
+      if(it1 instanceof FItem) {
+        if(((FItem) it1).deep(it2, info, coll)) continue;
+        return false;
+      }
+      if(it2 instanceof FItem) {
+        if(((FItem) it2).deep(it1, info, coll)) continue;
+        return false;
       }
 
       // identical items are also equal
@@ -108,8 +106,8 @@ public final class DeepCompare {
 
       // check atomic values
       if(!(it1 instanceof ANode || it2 instanceof ANode)) {
-        if(!it1.equiv(it2, coll, info)) return false;
-        continue;
+        if(it1.equiv(it2, coll, info)) continue;
+        return false;
       }
 
       // node types must be equal

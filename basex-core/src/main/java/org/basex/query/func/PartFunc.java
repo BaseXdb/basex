@@ -72,12 +72,12 @@ public final class PartFunc extends Arr {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Expr fn = exprs[exprs.length - 1];
     final FItem f = (FItem) checkType(fn.item(qc, ii), FuncType.ANY_FUN);
-    final FuncType ft = f.funcType();
 
     final int arity = exprs.length + holes.length - 1;
     if(f.arity() != arity) throw INVARITY.get(ii, f, arity);
-    final Expr[] args = new Expr[arity];
 
+    final FuncType ft = f.funcType();
+    final Expr[] args = new Expr[arity];
     final VarScope scp = new VarScope(sc);
     final Var[] vars = new Var[holes.length];
     int p = -1;

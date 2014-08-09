@@ -46,7 +46,7 @@ public final class MapType extends FuncType {
   @Override
   public boolean eq(final Type t) {
     if(this == t) return true;
-    if(t.getClass() != MapType.class) return false;
+    if(!(t instanceof MapType)) return false;
     final MapType mt = (MapType) t;
     return keyType.eq(mt.keyType) && retType.eq(mt.retType);
   }

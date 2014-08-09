@@ -3,6 +3,7 @@ package org.basex.query.value.seq;
 import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.*;
@@ -39,6 +40,21 @@ public abstract class NativeSeq extends Seq {
   @Override
   public final boolean homogeneous() {
     return true;
+  }
+
+  @Override
+  public final Value materialize(final InputInfo ii) {
+    return this;
+  }
+
+  @Override
+  public Value atomValue(final InputInfo ii) throws QueryException {
+    return this;
+  }
+
+  @Override
+  public final long atomSize() {
+    return size;
   }
 
   @Override

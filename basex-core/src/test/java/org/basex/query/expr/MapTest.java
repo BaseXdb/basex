@@ -5,7 +5,7 @@ import org.basex.query.*;
 import org.junit.*;
 
 /**
- * Tests for XQuery Maps.
+ * Tests for XQuery maps.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler

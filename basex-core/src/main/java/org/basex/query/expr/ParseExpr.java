@@ -8,6 +8,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
@@ -52,7 +53,7 @@ public abstract class ParseExpr extends Expr {
     if(n != null) {
       final ValueBuilder vb = new ValueBuilder(3).add(it).add(n);
       if(ir.next() != null) vb.add(Str.get(DOTS));
-      throw NOITEM.get(ii, vb.value());
+      throw SEQFOUND.get(ii, vb.value());
     }
     return it;
   }
@@ -397,6 +398,19 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
+   * Checks if the specified expression yields a non-empty item.
+   * @param ex expression to be evaluated
+   * @param qc query context
+   * @param t expected type
+   * @return item
+   * @throws QueryException query exception
+   */
+  protected final Item checkItem(final Expr ex, final QueryContext qc, final Type t)
+      throws QueryException {
+    return checkNoEmpty(ex.item(qc, info), t);
+  }
+
+  /**
    * Checks if the specified expression yields a binary item.
    * @param ex expression to be evaluated
    * @param qc query context
@@ -493,7 +507,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final Item checkNoEmpty(final Item it) throws QueryException {
     if(it != null) return it;
-    throw SEQEMPTY.get(info);
+    throw EMPTYFOUND.get(info);
   }
 
   /**
@@ -505,7 +519,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected Item checkNoEmpty(final Item it, final Type t) throws QueryException {
     if(it != null) return it;
-    throw SEQEXP.get(info, t);
+    throw EMPTYFOUND2.get(info, t);
   }
 
   /**
@@ -517,5 +531,16 @@ public abstract class ParseExpr extends Expr {
   protected Map checkMap(final Item it) throws QueryException {
     if(it instanceof Map) return (Map) it;
     throw castError(info, it, SeqType.ANY_MAP);
+  }
+
+  /**
+   * Assures that the given (non-{@code null}) item is an array.
+   * @param it item to check
+   * @return the array
+   * @throws QueryException if the item is not a array
+   */
+  protected Array checkArray(final Item it) throws QueryException {
+    if(it instanceof Array) return (Array) it;
+    throw castError(info, it, SeqType.ANY_ARRAY);
   }
 }

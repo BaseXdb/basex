@@ -762,14 +762,14 @@ public final class GFLWOR extends ParseExpr {
     abstract Eval eval(final Eval sub);
 
     @Override
-    public abstract Clause compile(QueryContext ctx, final VarScope scp) throws QueryException;
+    public abstract Clause compile(QueryContext qc, final VarScope scp) throws QueryException;
 
     @Override
     public abstract Clause optimize(final QueryContext qc, final VarScope scp)
         throws QueryException;
 
     @Override
-    public abstract Clause inline(QueryContext ctx, VarScope scp, Var var, Expr ex)
+    public abstract Clause inline(QueryContext qc, VarScope scp, Var var, Expr ex)
         throws QueryException;
 
     @Deprecated
@@ -791,10 +791,10 @@ public final class GFLWOR extends ParseExpr {
     }
 
     @Override
-    public abstract Clause copy(QueryContext ctx, VarScope scp, IntObjMap<Var> vs);
+    public abstract Clause copy(QueryContext qc, VarScope scp, IntObjMap<Var> vs);
 
     /**
-     * Checks if the given clause can be slided over this clause.
+     * Checks if the given clause can be slid over this clause.
      * @param cl clause
      * @return result of check
      */

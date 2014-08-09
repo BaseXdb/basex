@@ -64,7 +64,6 @@ public final class CAttr extends CName {
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CAttr(sc, info, comp, name.copy(qc, scp, vs),
-        copyAll(qc, scp, vs, exprs));
+    return new CAttr(sc, info, comp, name.copy(qc, scp, vs), copyAll(qc, scp, vs, exprs));
   }
 }

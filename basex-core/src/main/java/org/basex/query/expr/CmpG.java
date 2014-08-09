@@ -12,6 +12,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -178,7 +179,8 @@ public final class CmpG extends Cmp {
     if(e != this) return e;
 
     // check if both arguments will always yield one result
-    atomic = e1.seqType().zeroOrOne() && e2.seqType().zeroOrOne();
+    final SeqType st1 = e1.seqType(), st2 = e2.seqType();
+    atomic = st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray();
     if(atomic) qc.compInfo(OPTATOMIC, this);
     return this;
   }
@@ -265,6 +267,15 @@ public final class CmpG extends Cmp {
    * @throws QueryException query exception
    */
   private boolean eval(final Item it1, final Item it2, final Collation cl) throws QueryException {
+    if(it1 instanceof Array || it2 instanceof Array) {
+      for(final Item i1 : it1.atomValue(info)) {
+        for(final Item i2 : it2.atomValue(info)) {
+          if(op.op.eval(i1, i2, cl, info)) return true;
+        }
+      }
+      return false;
+    }
+
     final Type t1 = it1.type, t2 = it2.type;
     if(!(it1 instanceof FItem || it2 instanceof FItem) &&
         (t1 == t2 || t1.isUntyped() || t2.isUntyped() ||
@@ -290,7 +301,8 @@ public final class CmpG extends Cmp {
   boolean union(final CmpG g, final QueryContext qc, final VarScope scp) throws QueryException {
     if(op != g.op || !exprs[0].sameAs(g.exprs[0])) return false;
     exprs[1] = new List(info, exprs[1], g.exprs[1]).compile(qc, scp);
-    atomic = atomic && exprs[1].seqType().zeroOrOne();
+    final SeqType st = exprs[1].seqType();
+    atomic = atomic && st.zeroOrOne() && !st.mayBeArray();
     return true;
   }
 

@@ -3,6 +3,7 @@ package org.basex.query.value.seq;
 import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
+import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -34,8 +35,8 @@ public final class SubSeq extends Seq {
     if(n <= 0) return Empty.SEQ;
     if(n == 1) return val.itemAt(from);
     if(val instanceof SubSeq) {
-      final SubSeq sSeq = (SubSeq) val;
-      return new SubSeq(sSeq.sub, sSeq.start + from, n);
+      final SubSeq ss = (SubSeq) val;
+      return new SubSeq(ss.sub, ss.start + from, n);
     }
     // cast is safe because n >= 2
     return new SubSeq((Seq) val, from, n);
@@ -88,5 +89,28 @@ public final class SubSeq extends Seq {
   @Override
   public SeqType seqType() {
     return sub.seqType();
+  }
+
+  @Override
+  public Value materialize(final InputInfo ii) throws QueryException {
+    final int s = (int) size;
+    final ValueBuilder vb = new ValueBuilder(s);
+    for(int i = 0; i < s; i++) vb.add(itemAt(start + i).materialize(ii));
+    return vb.value();
+  }
+
+  @Override
+  public Value atomValue(final InputInfo ii) throws QueryException {
+    final int s = (int) size;
+    final ValueBuilder vb = new ValueBuilder(s);
+    for(int i = 0; i < s; i++) vb.add(itemAt(start + i).atomValue(ii));
+    return vb.value();
+  }
+
+  @Override
+  public long atomSize() {
+    long s = 0;
+    for(int i = 0; i < size; i++) s += itemAt(start + i).atomSize();
+    return s;
   }
 }

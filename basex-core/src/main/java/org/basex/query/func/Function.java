@@ -423,6 +423,49 @@ public enum Function {
   /** XQuery function. */
   _MAP_SERIALIZE(FNMap.class, "serialize(map)", arg(MAP_O), STR, flag(X30)),
 
+  /* FNArray functions. */
+
+  /** XQuery function. */
+  _ARRAY_SIZE(FNArray.class, "size(array)", arg(ARRAY_O), ITR, flag(X30)),
+  /** XQuery function. */
+  _ARRAY_APPEND(FNArray.class, "append(array,value)", arg(ARRAY_O, ITEM_ZM), ARRAY_O, flag(X30)),
+  /** XQuery function. */
+  _ARRAY_SUBARRAY(FNArray.class, "subarray(array,pos[,length])",
+      arg(ARRAY_O, ITR, ITR), ARRAY_O, flag(X30)),
+  /** XQuery function. */
+  _ARRAY_REMOVE(FNArray.class, "remove(array,pos)", arg(ARRAY_O, ITR), ARRAY_O, flag(X30)),
+  /** XQuery function. */
+  _ARRAY_INSERT_BEFORE(FNArray.class, "insert-before(array,pos,value)",
+      arg(ARRAY_O, ITR, ITEM_ZO), ARRAY_O, flag(X30)),
+  /** XQuery function. */
+  _ARRAY_HEAD(FNArray.class, "head(array)", arg(ARRAY_O), ITEM_ZM, flag(X30)),
+  /** XQuery function. */
+  _ARRAY_TAIL(FNArray.class, "tail(array)", arg(ARRAY_O), ITEM_ZM, flag(X30)),
+  /** XQuery function. */
+  _ARRAY_REVERSE(FNArray.class, "reverse(array)", arg(ARRAY_O), ITEM_ZM, flag(X30)),
+  /** XQuery function. */
+  _ARRAY_JOIN(FNArray.class, "join(array)", arg(ARRAY_ZM), ITEM_ZM, flag(X30)),
+  /** XQuery function. */
+  _ARRAY_FOR_EACH_MEMBER(FNArray.class, "for-each-member(array,function)",
+      arg(ARRAY_O, FuncType.get(ITEM_ZM, ITEM_ZM).seqType()), ARRAY_O, flag(X30, Flag.HOF)),
+  /** XQuery function. */
+  _ARRAY_FILTER(FNArray.class, "filter(array,function)",
+      arg(ARRAY_O, FuncType.get(BLN, ITEM_ZM).seqType()), ARRAY_O, flag(X30, Flag.HOF)),
+  /** XQuery function. */
+  _ARRAY_FOLD_LEFT(FNArray.class, "fold-left(array,zero,function)",
+      arg(ARRAY_O, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()), ITEM_ZM,
+      flag(X30, Flag.HOF)),
+  /** XQuery function. */
+  _ARRAY_FOLD_RIGHT(FNArray.class, "fold-right(array,zero,function)",
+      arg(ARRAY_O, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()), ITEM_ZM,
+      flag(X30, Flag.HOF)),
+  /** XQuery function. */
+  _ARRAY_FOR_EACH_PAIR(FNArray.class, "for-each-pair(array1,array2,function)",
+      arg(ARRAY_O, ARRAY_O, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()), ARRAY_O,
+      flag(X30, Flag.HOF)),
+  /** XQuery function. */
+  _ARRAY_SERIALIZE(FNArray.class, "serialize(array)", arg(ARRAY_O), STR, flag(X30)),
+
   /* FNMath functions. */
 
   /** XQuery function. */
@@ -996,7 +1039,7 @@ public enum Function {
   /* FNStream functions. */
 
   /** XQuery function. */
-  _STREAM_MATERIALIZE(FNStream.class, "materialize(item)", arg(ITEM), ITEM),
+  _STREAM_MATERIALIZE(FNStream.class, "materialize(value)", arg(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
   _STREAM_IS_STREAMABLE(FNStream.class, "is-streamable(item)", arg(ITEM), BLN),
 
@@ -1077,8 +1120,9 @@ public enum Function {
   // initialization of class/uri mappings and statically known modules
   static {
     // W3 functions
-    URIS.put(FNMap.class,  MAPURI);
-    URIS.put(FNMath.class, MATHURI);
+    URIS.put(FNMap.class,   MAPURI);
+    URIS.put(FNArray.class, ARRAYURI);
+    URIS.put(FNMath.class,  MATHURI);
     // EXPath functions
     URIS.put(FNBin.class,    BINURI);
     URIS.put(FNCrypto.class, CRYPTOURI);

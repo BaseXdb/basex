@@ -4,6 +4,7 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -110,5 +111,28 @@ public final class ItemSeq extends Seq {
       }
     }
     return false;
+  }
+
+  @Override
+  public Value materialize(final InputInfo ii) throws QueryException {
+    final int s = (int) size;
+    final ValueBuilder vb = new ValueBuilder(s);
+    for(int i = 0; i < s; i++) vb.add(itemAt(i).materialize(ii));
+    return vb.value();
+  }
+
+  @Override
+  public Value atomValue(final InputInfo ii) throws QueryException {
+    final int s = (int) size;
+    final ValueBuilder vb = new ValueBuilder(s);
+    for(int i = 0; i < s; i++) vb.add(itemAt(i).atomValue(ii));
+    return vb.value();
+  }
+
+  @Override
+  public long atomSize() {
+    long s = 0;
+    for(int i = 0; i < size; i++) s += itemAt(i).atomSize();
+    return s;
   }
 }

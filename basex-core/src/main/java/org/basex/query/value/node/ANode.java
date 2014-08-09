@@ -73,6 +73,11 @@ public abstract class ANode extends Item {
       coll.compare(string(), it.string(ii)) : -it.diff(this, coll, ii);
   }
 
+  @Override
+  public final Item atomItem(final InputInfo ii) {
+    return type == NodeType.PI || type == NodeType.COM ? Str.get(string()) : new Atm(string());
+  }
+
   /**
    * Creates a copy of this node.
    * @return copy

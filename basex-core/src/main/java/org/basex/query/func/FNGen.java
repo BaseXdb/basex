@@ -48,7 +48,7 @@ public final class FNGen extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     switch(func) {
-      case DATA:                return data(qc);
+      case DATA:                return data(qc).iter();
       case COLLECTION:          return collection(qc).iter();
       case URI_COLLECTION:      return uriCollection(qc);
       case UNPARSED_TEXT_LINES: return unparsedTextLines(qc);
@@ -74,8 +74,11 @@ public final class FNGen extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     switch(func) {
-      case COLLECTION: return collection(qc);
-      default:         return super.value(qc);
+      case DATA:                return data(qc);
+      case COLLECTION:          return collection(qc);
+      case URI_COLLECTION:      return uriCollection(qc).value();
+      case UNPARSED_TEXT_LINES: return unparsedTextLines(qc).value();
+      default:                  return super.value(qc);
     }
   }
 
@@ -94,18 +97,8 @@ public final class FNGen extends StandardFunc {
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  private Iter data(final QueryContext qc) throws QueryException {
-    final Iter ir = qc.iter(exprs.length == 0 ? checkCtx(qc) : exprs[0]);
-
-    return new Iter() {
-      @Override
-      public Item next() throws QueryException {
-        final Item it = ir.next();
-        if(it == null) return null;
-        if(it instanceof FItem) throw FIATOM.get(info, it.type);
-        return atom(it, info);
-      }
-    };
+  private Value data(final QueryContext qc) throws QueryException {
+    return qc.value(exprs.length == 0 ? checkCtx(qc) : exprs[0]).atomValue(info);
   }
 
   /**

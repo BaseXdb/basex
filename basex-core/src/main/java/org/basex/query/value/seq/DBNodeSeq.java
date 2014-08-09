@@ -3,6 +3,7 @@ package org.basex.query.value.seq;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -71,6 +72,13 @@ public final class DBNodeSeq extends NativeSeq {
     final int[] tmp = new int[s];
     for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = pres[r];
     return get(tmp, data, type, false);
+  }
+
+  @Override
+  public Value atomValue(final InputInfo ii) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder((int) size);
+    for(int s = 0; s < size; s++) vb.add(itemAt(s).atomValue(ii));
+    return vb.value();
   }
 
   // STATIC METHODS =====================================================================

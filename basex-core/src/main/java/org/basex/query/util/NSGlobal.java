@@ -25,6 +25,7 @@ public final class NSGlobal {
     NS.add(FN, FNURI);
     NS.add(MATH, MATHURI);
     NS.add(MAP, MAPURI);
+    NS.add(ARRAY, ARRAYURI);
     NS.add(ANN, XQURI);
     RESERVED = NS.size();
 

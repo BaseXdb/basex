@@ -44,7 +44,7 @@ public final class FNHofTest extends QueryPlanTest {
   @Test
   public void foldLeft1Test() {
     query("hof:fold-left1(1 to 10, function($x, $y) { $x + $y })", "55");
-    error("hof:fold-left1((), function($x, $y) { $x + $y })", Err.SEQEMPTY);
+    error("hof:fold-left1((), function($x, $y) { $x + $y })", Err.EMPTYFOUND);
     // should be unrolled and evaluated at compile time
     check("hof:fold-left1(1 to 9, function($a,$b) {$a+$b})",
         "45",

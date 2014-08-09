@@ -29,7 +29,8 @@ public abstract class AdvancedQueryTest extends SandboxTest {
     try {
       return run(query);
     } catch(final Exception ex) {
-      ex.printStackTrace();
+      Util.errln(Util.message(ex));
+      Util.stack(12);
       final AssertionError err = new AssertionError("Query failed:\n" + query);
       err.initCause(ex);
       throw err;

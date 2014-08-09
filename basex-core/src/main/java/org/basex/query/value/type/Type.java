@@ -155,25 +155,25 @@ public interface Type {
   /**
    * Casts the specified Java value to this item type.
    * @param value Java value
-   * @param ctx query context
+   * @param qc query context
    * @param sc static context
    * @param ii input info
    * @return new item
    * @throws QueryException query exception
    */
-  Value cast(final Object value, QueryContext ctx, final StaticContext sc, final InputInfo ii)
+  Value cast(final Object value, QueryContext qc, final StaticContext sc, final InputInfo ii)
       throws QueryException;
 
   /**
    * Casts the specified string to this item type.
    * @param value string object
-   * @param ctx query context
+   * @param qc query context
    * @param sc static context
    * @param ii input info
    * @return new item
    * @throws QueryException query exception
    */
-  Value castString(final String value, QueryContext ctx, final StaticContext sc, final InputInfo ii)
+  Value castString(final String value, QueryContext qc, final StaticContext sc, final InputInfo ii)
       throws QueryException;
 
   /**

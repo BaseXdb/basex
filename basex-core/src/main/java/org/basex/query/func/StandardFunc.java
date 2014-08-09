@@ -91,19 +91,6 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Atomizes the specified item.
-   * @param it input item
-   * @param ii input info
-   * @return atomized item
-   * @throws QueryException query exception
-   */
-  public static Item atom(final Item it, final InputInfo ii) throws QueryException {
-    final Type ip = it.type;
-    return it instanceof ANode ? ip == NodeType.PI || ip == NodeType.COM ?
-        Str.get(it.string(ii)) : new Atm(it.string(ii)) : it.materialize(ii);
-  }
-
-  /**
    * Serializes the data from the specified iterator.
    * @param ir data to serialize
    * @param opts serialization parameters

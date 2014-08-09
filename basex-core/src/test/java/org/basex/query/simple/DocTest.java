@@ -85,10 +85,9 @@ public final class DocTest extends QueryTest {
       { "PredIndex 6", strings("#000000"), "//@*[. = '#000000']/string()" },
       { "PredIndex 7", empty(), "//@id[. = '#000000']" },
 
-      { "Pred Error 1", "/[/]" },
-      { "Pred Error 2", "/*[]" },
-      { "Pred Error 3", "/*[//]" },
-      { "Pred Error 4", "/*[li" },
+      { "Pred Error 1", "/*[]" },
+      { "Pred Error 2", "/*[//]" },
+      { "Pred Error 3", "/*[li" },
 
       { "PosPred 1", nodes(20), "//li[1]" },
       { "PosPred 2", nodes(20), "//li[position() = 1]" },

@@ -71,6 +71,37 @@ public abstract class Value extends Expr implements Iterable<Item> {
     return this;
   }
 
+  /**
+   * Materializes streamable values, or returns a self reference.
+   * @param ii input info
+   * @return materialized item
+   * @throws QueryException query exception
+   */
+  public abstract Value materialize(final InputInfo ii) throws QueryException;
+
+  /**
+   * Atomizes the items of the value.
+   * @param ii input info
+   * @return atomized item
+   * @throws QueryException query exception
+   */
+  public abstract Value atomValue(final InputInfo ii) throws QueryException;
+
+  /**
+   * Atomizes the items of the value and returns zero or one item or an error.
+   * @param ii input info
+   * @return atomized item
+   * @throws QueryException query exception
+   */
+  public abstract Item atomItem(final InputInfo ii) throws QueryException;
+
+  /**
+   * Computes the number of atomized items.
+   * @return atomized item
+   * @throws QueryException query exception
+   */
+  public abstract long atomSize() throws QueryException;
+
   @Override
   public final boolean isValue() {
     return true;

@@ -123,7 +123,6 @@ public final class FNFunc extends StandardFunc {
     final FItem f = checkArity(1, 1, qc);
     final Iter ir = exprs[0].iter(qc);
     return new Iter() {
-      /** Results. */
       Iter ir2 = Empty.ITER;
 
       @Override
@@ -146,15 +145,15 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter filter(final QueryContext qc) throws QueryException {
-    final FItem f = checkArity(1, 1, qc);
-    final Iter xs = exprs[0].iter(qc);
+    final FItem fun = checkArity(1, 1, qc);
+    final Iter ir = exprs[0].iter(qc);
     return new Iter() {
       @Override
       public Item next() throws QueryException {
         do {
-          final Item it = xs.next();
+          final Item it = ir.next();
           if(it == null) return null;
-          if(checkBln(f.invokeItem(qc, info, it))) return it;
+          if(checkBln(fun.invokeItem(qc, info, it))) return it;
         } while(true);
       }
     };
@@ -167,21 +166,19 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter forEachPair(final QueryContext qc) throws QueryException {
-    final FItem zipper = checkArity(2, 2, qc);
-    final Iter xs = exprs[0].iter(qc);
-    final Iter ys = exprs[1].iter(qc);
+    final FItem fun = checkArity(2, 2, qc);
+    final Iter ir1 = exprs[0].iter(qc), ir2 = exprs[1].iter(qc);
     return new Iter() {
-      /** Results. */
-      Iter zs = Empty.ITER;
+      Iter ir = Empty.ITER;
 
       @Override
       public Item next() throws QueryException {
         do {
-          final Item it = zs.next();
+          final Item it = ir.next();
           if(it != null) return it;
-          final Item x = xs.next(), y = ys.next();
+          final Item x = ir1.next(), y = ir2.next();
           if(x == null || y == null) return null;
-          zs = zipper.invokeValue(qc, info, x, y).iter();
+          ir = fun.invokeValue(qc, info, x, y).iter();
         } while(true);
       }
     };
@@ -194,16 +191,16 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter foldLeft(final QueryContext qc) throws QueryException {
-    final FItem f = checkArity(2, 2, qc);
-    final Iter xs = exprs[0].iter(qc);
-    Item x = xs.next();
+    final Iter ir = exprs[0].iter(qc);
+    final FItem fun = checkArity(2, 2, qc);
 
     // don't convert to a value if not necessary
-    if(x == null) return exprs[1].iter(qc);
+    Item it = ir.next();
+    if(it == null) return exprs[1].iter(qc);
 
     Value sum = qc.value(exprs[1]);
-    do sum = f.invokeValue(qc, info, sum, x);
-    while((x = xs.next()) != null);
+    do sum = fun.invokeValue(qc, info, sum, it);
+    while((it = ir.next()) != null);
     return sum.iter();
   }
 
@@ -214,13 +211,14 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter foldRight(final QueryContext qc) throws QueryException {
-    final FItem f = checkArity(2, 2, qc);
-    final Value xs = qc.value(exprs[0]);
+    final Value v = qc.value(exprs[0]);
+    final FItem fun = checkArity(2, 2, qc);
+
     // evaluate start value lazily if it's passed straight through
-    if(xs.isEmpty()) return exprs[1].iter(qc);
+    if(v.isEmpty()) return exprs[1].iter(qc);
 
     Value res = qc.value(exprs[1]);
-    for(long i = xs.size(); --i >= 0;) res = f.invokeValue(qc, info, xs.itemAt(i), res);
+    for(long i = v.size(); --i >= 0;) res = fun.invokeValue(qc, info, v.itemAt(i), res);
     return res.iter();
   }
 }

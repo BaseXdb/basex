@@ -3,8 +3,8 @@ package org.basex.query.expr;
 import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -60,9 +60,9 @@ public abstract class CName extends CNode {
   final byte[] value(final QueryContext qc, final InputInfo ii) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr e : exprs) {
-      final Iter ir = qc.iter(e);
+      final Value v = qc.value(e);
       boolean m = false;
-      for(Item it; (it = ir.next()) != null;) {
+      for(final Item it : v.atomValue(ii)) {
         if(m) tb.add(' ');
         tb.add(it.string(ii));
         m = true;

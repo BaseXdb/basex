@@ -1,15 +1,16 @@
 package org.basex.query.gflwor;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 
 import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.gflwor.GFLWOR.Eval;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -127,15 +128,18 @@ public final class GroupBy extends GFLWOR.Clause {
           final Item[] key = new Item[nonOcc];
           int p = 0, hash = 1;
           for(final Spec spec : specs) {
-            final Item ki = spec.item(qc, info),
-                atom = ki == null ? null : StandardFunc.atom(ki, info);
+            Value v = spec.item(qc, info);
+            if(v != null) {
+              v = v.atomValue(info);
+              if(!(v instanceof Item)) throw SEQFOUND.get(info, v);
+            }
+            final Item atom = (Item) v;
             if(!spec.occluded) {
               key[p++] = atom;
               // If the values are compared using a special collation, we let them collide
               // here and let the comparison do all the work later.
               // This enables other non-collation specs to avoid the collision.
-              hash = 31 * hash +
-                  (atom == null || spec.coll != null ? 0 : atom.hash(info));
+              hash = 31 * hash + (atom == null || spec.coll != null ? 0 : atom.hash(info));
             }
             qc.set(spec.var, atom == null ? Empty.SEQ : atom, info);
           }

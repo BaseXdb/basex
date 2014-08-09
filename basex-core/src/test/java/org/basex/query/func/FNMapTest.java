@@ -34,8 +34,8 @@ public final class FNMapTest extends AdvancedQueryTest {
     query(EXISTS.args(_MAP_ENTRY.args("A", "B")), true);
     query(EXISTS.args(_MAP_ENTRY.args(1, 2)), true);
     query(EXISTS.args(_MAP_MERGE.args(_MAP_ENTRY.args(1, 2))), "true");
-    error(EXISTS.args(_MAP_ENTRY.args("()", 2)), Err.SEQEMPTY);
-    error(EXISTS.args(_MAP_ENTRY.args("(1,2)", 2)), Err.NOITEM);
+    error(EXISTS.args(_MAP_ENTRY.args("()", 2)), Err.EMPTYFOUND);
+    error(EXISTS.args(_MAP_ENTRY.args("(1,2)", 2)), Err.SEQFOUND);
   }
 
   /** Test method. */
@@ -44,8 +44,8 @@ public final class FNMapTest extends AdvancedQueryTest {
     // no entry
     count(_MAP_PUT.args(" map{}", 1, 2), 1);
     count(_MAP_PUT.args(" map{}", "a", "b"), 1);
-    count(_MAP_PUT.args(" map{ 'a': 'a' }", "a", "b"), 1);
     count(_MAP_PUT.args(" map{ 'a': 'b' }", "c", "d"), 2);
+    error(_MAP_PUT.args(" map{ 'a': 'a' }", "a", "b"), Err.MAPDUPLKEY);
   }
 
   /** Test method. */
@@ -94,6 +94,6 @@ public final class FNMapTest extends AdvancedQueryTest {
    * @param count expected number of entries
    */
   private static void count(final String query, final int count) {
-    query(COUNT.args(_MAP_KEYS.args(" " + query)), count);
+    query(_MAP_SIZE.args(" " + query), count);
   }
 }

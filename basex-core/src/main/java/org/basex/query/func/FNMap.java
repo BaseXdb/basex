@@ -6,6 +6,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -55,7 +56,7 @@ public final class FNMap extends StandardFunc {
       case _MAP_PUT:       return put(qc, ii);
       case _MAP_ENTRY:     return entry(qc, ii);
       case _MAP_CONTAINS:  return Bln.get(contains(qc, ii));
-      case _MAP_SIZE:      return Int.get(map(qc).mapSize()); // deprecated
+      case _MAP_SIZE:      return Int.get(map(qc).mapSize());
       case _MAP_REMOVE:    return remove(qc, ii);
       case _MAP_SERIALIZE: return Str.get(map(qc).serialize(info));
       default:             return super.item(qc, ii);
@@ -153,6 +154,6 @@ public final class FNMap extends StandardFunc {
    * @throws QueryException query exception
    */
   private Map map(final QueryContext qc) throws QueryException {
-    return checkMap(checkItem(exprs[0], qc));
+    return checkMap(checkItem(exprs[0], qc, SeqType.ANY_MAP));
   }
 }

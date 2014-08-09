@@ -5,6 +5,7 @@ import static org.basex.query.util.Err.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -81,6 +82,13 @@ public final class Constr {
    * @throws QueryException query exception
    */
   private boolean add(final Item it) throws QueryException {
+    if(it instanceof Array) {
+      for(final Item i : it.atomValue(info)) {
+        if(!add(i)) return false;
+      }
+      return true;
+    }
+
     if(it instanceof FItem) throw CONSFUNC.get(info, it);
 
     if(it instanceof ANode) {
