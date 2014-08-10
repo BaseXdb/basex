@@ -28,4 +28,10 @@ public final class MapTest extends AdvancedQueryTest {
     error(" map{ ('a', 'b'): 'b' }", Err.MAPKEY);
     error(" map{ 'a': 'b', 'a': 'c' }", Err.MAPDUPLKEY);
   }
+
+  /** Stack overflow bug. */
+  @Test public void so() {
+    query("let $x := map { 'f': { 1: 1, 2: 2 } } "
+        + "return (every $k in map:keys($x('f')) satisfies $k eq $x('f')($k))", true);
+  }
 }
