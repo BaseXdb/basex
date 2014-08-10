@@ -72,7 +72,7 @@ public final class Map extends FItem {
   @Override
   public Item invItem(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return get(args[0].item(qc, ii), ii).item(qc, ii);
+    return invItem(qc, ii, args).item(qc, ii);
   }
 
   @Override
@@ -83,18 +83,18 @@ public final class Map extends FItem {
 
   /**
    * Checks the key item.
-   * @param it item
+   * @param key item
    * @param ii input info
-   * @return possibly atomized item if non {@code NaN}, {@code null} otherwise
+   * @return possibly atomized item
    * @throws QueryException query exception
    */
-  private static Item key(final Item it, final InputInfo ii) throws QueryException {
+  private static Item key(final Item key, final InputInfo ii) throws QueryException {
     // no empty sequence allowed
-    if(it == null) throw EMPTYFOUND.get(ii);
+    if(key == null) throw EMPTYFOUND.get(ii);
     // function items can't be keys
-    if(it instanceof FItem) throw FIATOM.get(ii, it.type);
+    if(key instanceof FItem) throw FIATOM.get(ii, key.type);
     // nodes are converted to untyped atomics
-    return it instanceof ANode ? new Atm(it.string(ii)) : it;
+    return key instanceof ANode ? new Atm(key.string(ii)) : key;
   }
 
   /**
@@ -106,8 +106,6 @@ public final class Map extends FItem {
    */
   public Map delete(final Item key, final InputInfo ii) throws QueryException {
     final Item k = key(key, ii);
-    if(k == null) return this;
-
     final TrieNode del = root.delete(k.hash(ii), k, 0, ii);
     return del == root ? this : del != null ? new Map(del) : EMPTY;
   }
@@ -121,45 +119,43 @@ public final class Map extends FItem {
    */
   public Value get(final Item key, final InputInfo ii) throws QueryException {
     final Item k = key(key, ii);
-    if(k == null) return Empty.SEQ;
-
-    final Value val = root.get(k.hash(ii), k, 0, ii);
-    return val == null ? Empty.SEQ : val;
+    final Value v = root.get(k.hash(ii), k, 0, ii);
+    return v == null ? Empty.SEQ : v;
   }
 
   /**
    * Checks if the given key exists in the map.
-   * @param k key to look for
+   * @param key key to look for
    * @param ii input info
    * @return {@code true()}, if the key exists, {@code false()} otherwise
    * @throws QueryException query exception
    */
-  public boolean contains(final Item k, final InputInfo ii) throws QueryException {
-    final Item key = key(k, ii);
-    return key != null && root.contains(key.hash(ii), key, 0, ii);
+  public boolean contains(final Item key, final InputInfo ii) throws QueryException {
+    final Item k = key(key, ii);
+    return root.contains(k.hash(ii), k, 0, ii);
   }
 
   /**
    * Adds all bindings from the given map into {@code this}.
-   * @param other map to add
+   * @param map map to add
    * @param ii input info
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public Map addAll(final Map other, final InputInfo ii) throws QueryException {
-    if(other == EMPTY) return this;
-    final TrieNode upd = root.addAll(other.root, 0, ii);
-    return upd == other.root ? other : new Map(upd);
+  public Map addAll(final Map map, final InputInfo ii) throws QueryException {
+    if(map == EMPTY) return this;
+    final TrieNode upd = root.addAll(map.root, 0, ii);
+    return upd == map.root ? map : new Map(upd);
   }
 
   /**
    * Checks if the map has the given type.
-   * @param t type
+   * @param mt type
    * @return {@code true} if the type fits, {@code false} otherwise
    */
-  public boolean hasType(final MapType t) {
-    return root.hasType(t.keyType == AtomType.AAT ? null : t.keyType,
-        t.retType.eq(SeqType.ITEM_ZM) ? null : t.retType);
+  public boolean hasType(final MapType mt) {
+    return root.hasType(mt.keyType == AtomType.AAT ? null : mt.keyType,
+        mt.retType.eq(SeqType.ITEM_ZM) ? null : mt.retType);
   }
 
   @Override
@@ -171,16 +167,15 @@ public final class Map extends FItem {
 
   /**
    * Inserts the given value into this map.
-   * @param k key to insert
-   * @param v value to insert
+   * @param key key to insert
+   * @param value value to insert
    * @param ii input info
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public Map insert(final Item k, final Value v, final InputInfo ii) throws QueryException {
-    final Item key = key(k, ii);
-    if(key == null) return this;
-    final TrieNode ins = root.insert(key.hash(ii), key, v, 0, ii);
+  public Map insert(final Item key, final Value value, final InputInfo ii) throws QueryException {
+    final Item k = key(key, ii);
+    final TrieNode ins = root.insert(k.hash(ii), k, value, 0, ii);
     return ins == root ? this : new Map(ins);
   }
 

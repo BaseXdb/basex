@@ -1,7 +1,6 @@
 package org.basex.query.value.map;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -81,7 +80,12 @@ final class List extends TrieNode {
     // same hash, replace or merge
     if(h == hash) {
       for(int i = keys.length; i-- > 0;) {
-        if(eq(k, keys[i], ii)) throw MAPDUPLKEY.get(ii, k, values[i], v);
+        if(eq(k, keys[i], ii)) {
+          // replace value
+          final Value[] vs = values.clone();
+          vs[i] = v;
+          return new List(h, keys.clone(), vs);
+        }
       }
       return new List(hash, Array.add(keys, k), Array.add(values, v));
     }

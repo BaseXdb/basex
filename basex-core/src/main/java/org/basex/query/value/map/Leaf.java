@@ -1,7 +1,5 @@
 package org.basex.query.value.map;
 
-import static org.basex.query.util.Err.*;
-
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -42,10 +40,7 @@ final class Leaf extends TrieNode {
   TrieNode insert(final int h, final Item k, final Value v, final int l, final InputInfo ii)
       throws QueryException {
     // same hash, replace or merge
-    if(h == hash) {
-      if(eq(k, key, ii)) throw MAPDUPLKEY.get(ii, k, value, v);
-      return new List(hash, key, value, k, v);
-    }
+    if(h == hash) return eq(k, key, ii) ? new Leaf(h, k, v) : new List(hash, key, value, k, v);
 
     // different hash, branch
     final TrieNode[] ch = new TrieNode[KIDS];
@@ -95,8 +90,7 @@ final class Leaf extends TrieNode {
         this : new List(hash, key, value, o.key, o.value);
 
     final TrieNode[] ch = new TrieNode[KIDS];
-    final int k = key(hash, l), ok = key(o.hash, l);
-    final int nu;
+    final int k = key(hash, l), ok = key(o.hash, l), nu;
 
     // same key? add recursively
     if(k == ok) {
@@ -107,7 +101,6 @@ final class Leaf extends TrieNode {
       ch[ok] = o;
       nu = 1 << k | 1 << ok;
     }
-
     return new Branch(ch, nu, 2);
   }
 
@@ -140,7 +133,6 @@ final class Leaf extends TrieNode {
       ch[ok] = o;
       nu = 1 << k | 1 << ok;
     }
-
     return new Branch(ch, nu, o.size + 1);
   }
 

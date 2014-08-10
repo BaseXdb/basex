@@ -948,7 +948,7 @@ public enum Err {
   /** XQDY0136. */
   MAPKEY(XQDY, 136, "Key must be a single atomic value: %."),
   /** XQDY0137. */
-  MAPDUPLKEY(XQDY, 137, "Key % already exists in map: % vs. %."),
+  MAPDUPLKEY(XQDY, 137, "Key % already exists in map (value: % vs. %)."),
   /** XQDY0138. */
   ARRAYPOS(XQDY, 138, "No value exists at array index %."),
 

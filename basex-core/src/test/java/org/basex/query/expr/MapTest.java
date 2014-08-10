@@ -20,6 +20,12 @@ public final class MapTest extends AdvancedQueryTest {
 
   /** Tests the the new syntax for map literals (see GH-755). */
   @Test public void jsonSyntax() {
-    query("(<x><y/></x> / map {'test':y, 42:'asdf'})('test')", "<y/>");
+    query("(<x><y/></x> / map { 'test':y, 42:'asdf' })('test')", "<y/>");
+  }
+
+  /** Tests invalid keys. */
+  @Test public void keys() {
+    error(" map{ ('a', 'b'): 'b' }", Err.MAPKEY);
+    error(" map{ 'a': 'b', 'a': 'c' }", Err.MAPDUPLKEY);
   }
 }
