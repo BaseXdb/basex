@@ -8,7 +8,6 @@ import java.io.*;
 import org.basex.build.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -19,21 +18,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNHtml extends BuiltinFunc {
+public final class FNHtml extends StandardFunc {
   /** QName. */
   private static final QNm Q_OPTIONS = QNm.get("options", HTMLURI);
-
-  /**
-   * Constructor.
-   * @param sc static context
-   * @param info input info
-   * @param func function definition
-   * @param args arguments
-   */
-  public FNHtml(final StaticContext sc, final InputInfo info, final Function func,
-      final Expr... args) {
-    super(sc, info, func, args);
-  }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {

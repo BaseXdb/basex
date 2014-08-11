@@ -39,7 +39,7 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  * @author Dimitar Popov
  */
-public final class FNDb extends BuiltinFunc {
+public final class FNDb extends StandardFunc {
   /** Element: parameters. */
   private static final QNm Q_OPTIONS = QNm.get("options");
 
@@ -63,18 +63,6 @@ public final class FNDb extends BuiltinFunc {
   private static final String CTYPE = "content-type";
   /** Modified date element name. */
   private static final String MDATE = "modified-date";
-
-  /**
-   * Constructor.
-   * @param sc static context
-   * @param info input info
-   * @param func function definition
-   * @param args arguments
-   */
-  public FNDb(final StaticContext sc, final InputInfo info, final Function func,
-      final Expr... args) {
-    super(sc, info, func, args);
-  }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {

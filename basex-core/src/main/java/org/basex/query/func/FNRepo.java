@@ -3,7 +3,6 @@ package org.basex.query.func;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.pkg.*;
@@ -19,7 +18,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Rositsa Shadura
  */
-public final class FNRepo extends BuiltinFunc {
+public final class FNRepo extends StandardFunc {
   /** Element name. */
   private static final String PACKAGE = "package";
   /** Header attribute: name. */
@@ -28,18 +27,6 @@ public final class FNRepo extends BuiltinFunc {
   private static final String TYPE = "type";
   /** Header attribute: version. */
   private static final String VERSION = "version";
-
-  /**
-   * Constructor.
-   * @param sc static context
-   * @param info input info
-   * @param func function definition
-   * @param args arguments
-   */
-  public FNRepo(final StaticContext sc, final InputInfo info, final Function func,
-      final Expr... args) {
-    super(sc, info, func, args);
-  }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {

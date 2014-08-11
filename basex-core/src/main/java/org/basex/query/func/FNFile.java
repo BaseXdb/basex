@@ -15,7 +15,6 @@ import org.basex.io.out.*;
 import org.basex.io.random.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -31,21 +30,9 @@ import org.basex.util.list.*;
  * @author Rositsa Shadura
  * @author Christian Gruen
  */
-public final class FNFile extends BuiltinFunc {
+public final class FNFile extends StandardFunc {
   /** Line separator. */
   private static final byte[] NL = token(Prop.NL);
-
-  /**
-   * Constructor.
-   * @param sc static context
-   * @param info input info
-   * @param func function definition
-   * @param args arguments
-   */
-  public FNFile(final StaticContext sc, final InputInfo info, final Function func,
-      final Expr... args) {
-    super(sc, info, func, args);
-  }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {

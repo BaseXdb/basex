@@ -4,7 +4,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -14,23 +13,11 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNOut extends BuiltinFunc {
+public final class FNOut extends StandardFunc {
   /** Newline character. */
   private static final Str NL = Str.get("\n");
   /** Tab character. */
   private static final Str TAB = Str.get("\t");
-
-  /**
-   * Constructor.
-   * @param sc static context
-   * @param info input info
-   * @param func function definition
-   * @param args arguments
-   */
-  public FNOut(final StaticContext sc, final InputInfo info, final Function func,
-      final Expr... args) {
-    super(sc, info, func, args);
-  }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {

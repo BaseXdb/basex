@@ -7,7 +7,6 @@ import java.io.*;
 import java.nio.charset.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -20,7 +19,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNProc extends BuiltinFunc {
+public final class FNProc extends StandardFunc {
   /** Name: result. */
   private static final String RESULT = "result";
   /** Name: standard output. */
@@ -29,18 +28,6 @@ public final class FNProc extends BuiltinFunc {
   private static final String ERROR = "error";
   /** Name: code. */
   private static final String CODE = "code";
-
-  /**
-   * Constructor.
-   * @param sc static context
-   * @param info input info
-   * @param func function definition
-   * @param args arguments
-   */
-  public FNProc(final StaticContext sc, final InputInfo info, final Function func,
-      final Expr... args) {
-    super(sc, info, func, args);
-  }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {

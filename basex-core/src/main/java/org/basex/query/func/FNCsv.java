@@ -11,7 +11,6 @@ import org.basex.io.*;
 import org.basex.io.parse.csv.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -22,21 +21,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class FNCsv extends BuiltinFunc {
+public class FNCsv extends StandardFunc {
   /** Element: options. */
   private static final QNm Q_OPTIONS = QNm.get("csv:options", CSVURI);
-
-  /**
-   * Constructor.
-   * @param sc static context
-   * @param info input info
-   * @param func function definition
-   * @param args arguments
-   */
-  public FNCsv(final StaticContext sc, final InputInfo info, final Function func,
-      final Expr... args) {
-    super(sc, info, func, args);
-  }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {

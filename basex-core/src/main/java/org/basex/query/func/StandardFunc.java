@@ -34,25 +34,34 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class BuiltinFunc extends Arr {
+public abstract class StandardFunc extends Arr {
   /** Function signature. */
   Function func;
   /** Static context. */
-  final StaticContext sc;
+  StaticContext sc;
 
   /**
    * Constructor.
-   * @param sc static context
-   * @param info input info
-   * @param func function definition
-   * @param args arguments
    */
-  protected BuiltinFunc(final StaticContext sc, final InputInfo info, final Function func,
-      final Expr... args) {
-    super(info, args);
-    this.sc = sc;
-    this.func = func;
-    seqType = func.ret;
+  protected StandardFunc() {
+    super(null);
+  }
+  /**
+   * Constructor.
+   * @param ii input info
+   * @param sctx static context
+   * @param f function definition
+   * @param args function arguments
+   * @return self reference
+   */
+  protected StandardFunc init(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr[] args) {
+    sc = sctx;
+    func = f;
+    info = ii;
+    exprs = args;
+    seqType = f.ret;
+    return this;
   }
 
   @Override
@@ -82,7 +91,7 @@ public abstract class BuiltinFunc extends Arr {
   }
 
   @Override
-  public final BuiltinFunc copy(final QueryContext qc, final VarScope scp,
+  public final StandardFunc copy(final QueryContext qc, final VarScope scp,
       final IntObjMap<Var> vs) {
     final int es = exprs.length;
     final Expr[] arg = new Expr[es];

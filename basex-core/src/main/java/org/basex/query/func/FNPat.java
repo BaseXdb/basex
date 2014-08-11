@@ -24,7 +24,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNPat extends BuiltinFunc {
+public final class FNPat extends StandardFunc {
   /** Pattern cache. */
   private final TokenObjMap<Pattern> patterns = new TokenObjMap<>();
 
@@ -46,18 +46,6 @@ public final class FNPat extends BuiltinFunc {
 
   /** Attribute for the analyze-string-result function. */
   private static final String NR = "nr";
-
-  /**
-   * Constructor.
-   * @param sc static context
-   * @param info input info
-   * @param func function definition
-   * @param args arguments
-   */
-  public FNPat(final StaticContext sc, final InputInfo info, final Function func,
-      final Expr... args) {
-    super(sc, info, func, args);
-  }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {

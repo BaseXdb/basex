@@ -26,7 +26,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNXQuery extends BuiltinFunc {
+public final class FNXQuery extends StandardFunc {
   /** Module prefix. */
   private static final String PREFIX = "xquery";
   /** QName. */
@@ -40,18 +40,6 @@ public final class FNXQuery extends BuiltinFunc {
     public static final NumberOption TIMEOUT = new NumberOption("timeout", 0);
     /** Maximum amount of megabytes that may be allocated by the query. */
     public static final NumberOption MEMORY = new NumberOption("memory", 0);
-  }
-
-  /**
-   * Constructor.
-   * @param sc static context
-   * @param info input info
-   * @param func function definition
-   * @param args arguments
-   */
-  public FNXQuery(final StaticContext sc, final InputInfo info, final Function func,
-      final Expr... args) {
-    super(sc, info, func, args);
   }
 
   @Override

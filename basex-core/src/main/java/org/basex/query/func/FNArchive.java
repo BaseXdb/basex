@@ -12,7 +12,6 @@ import java.util.zip.*;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
 import org.basex.query.util.archive.*;
@@ -29,7 +28,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNArchive extends BuiltinFunc {
+public final class FNArchive extends StandardFunc {
   /** Packer format: gzip. */
   public static final String GZIP = "gzip";
   /** Packer format: zip. */
@@ -74,18 +73,6 @@ public final class FNArchive extends BuiltinFunc {
     public static final StringOption FORMAT = new StringOption("format", ZIP);
     /** Archiving algorithm. */
     public static final StringOption ALGORITHM = new StringOption("algorithm", DEFLATE);
-  }
-
-  /**
-   * Constructor.
-   * @param sc static context
-   * @param info input info
-   * @param func function definition
-   * @param args arguments
-   */
-  public FNArchive(final StaticContext sc, final InputInfo info, final Function func,
-      final Expr... args) {
-    super(sc, info, func, args);
   }
 
   @Override

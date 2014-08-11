@@ -11,7 +11,6 @@ import java.util.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -26,7 +25,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class FNBin extends BuiltinFunc {
+public class FNBin extends StandardFunc {
   /** Big endian order. */
   private static final byte[][] BIG = tokens("most-significant-first", "big-endian", "BE");
   /** Big endian order. */
@@ -37,18 +36,6 @@ public class FNBin extends BuiltinFunc {
     /** Or.  */ OR,
     /** Xor. */ XOR,
     /** And. */ AND
-  }
-
-  /**
-   * Constructor.
-   * @param sc static context
-   * @param info input info
-   * @param func function definition
-   * @param args arguments
-   */
-  public FNBin(final StaticContext sc, final InputInfo info, final Function func,
-      final Expr... args) {
-    super(sc, info, func, args);
   }
 
   @Override

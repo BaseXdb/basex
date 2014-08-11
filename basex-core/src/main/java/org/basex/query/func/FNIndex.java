@@ -12,7 +12,6 @@ import org.basex.index.path.*;
 import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -26,7 +25,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNIndex extends BuiltinFunc {
+public final class FNIndex extends StandardFunc {
   /** Name: name. */
   private static final String NAME = "name";
   /** Name: type. */
@@ -45,18 +44,6 @@ public final class FNIndex extends BuiltinFunc {
   private static final byte[] ATT = NodeType.ATT.string();
   /** Flag: flat output. */
   private static final byte[] FLAT = token("flat");
-
-  /**
-   * Constructor.
-   * @param sc static context
-   * @param info input info
-   * @param func function definition
-   * @param args arguments
-   */
-  public FNIndex(final StaticContext sc, final InputInfo info, final Function func,
-      final Expr... args) {
-    super(sc, info, func, args);
-  }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -114,7 +101,7 @@ public final class FNIndex extends BuiltinFunc {
    * @return text entries
    * @throws QueryException query exception
    */
-  static Iter entries(final Data data, final IndexEntries entries, final BuiltinFunc call)
+  static Iter entries(final Data data, final IndexEntries entries, final StandardFunc call)
       throws QueryException {
 
     final Index index;

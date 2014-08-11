@@ -28,7 +28,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNXslt extends BuiltinFunc {
+public final class FNXslt extends StandardFunc {
   /** Element: parameters. */
   private static final QNm Q_PARAMETERS = QNm.get("parameters", XSLTURI);
 
@@ -68,18 +68,6 @@ public final class FNXslt extends BuiltinFunc {
    */
   private static String get(final boolean name) {
     return IMPL[OFFSET + (name ? 1 : 2)];
-  }
-
-  /**
-   * Constructor.
-   * @param sc static context
-   * @param info input info
-   * @param func function definition
-   * @param args arguments
-   */
-  public FNXslt(final StaticContext sc, final InputInfo info, final Function func,
-      final Expr... args) {
-    super(sc, info, func, args);
   }
 
   @Override

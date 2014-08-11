@@ -24,7 +24,7 @@ import org.basex.util.*;
  */
 public abstract class ParseExpr extends Expr {
   /** Input information. */
-  public final InputInfo info;
+  public InputInfo info;
   /** Static type. */
   protected SeqType seqType;
   /** Cardinality of result; {@code -1} if unknown. */

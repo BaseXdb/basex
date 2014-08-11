@@ -13,7 +13,6 @@ import java.util.Map.Entry;
 
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -28,7 +27,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Rositsa Shadura
  */
-public final class FNSql extends BuiltinFunc {
+public final class FNSql extends StandardFunc {
   /** Module prefix. */
   private static final String PREFIX = "sql";
   /** QName. */
@@ -72,18 +71,6 @@ public final class FNSql extends BuiltinFunc {
 
   /** Attribute "type" of <sql:parameter/>. */
   private static final byte[] TYPE = token("type");
-
-  /**
-   * Constructor.
-   * @param sc static context
-   * @param info input info
-   * @param func function definition
-   * @param args arguments
-   */
-  public FNSql(final StaticContext sc, final InputInfo info, final Function func,
-      final Expr... args) {
-    super(sc, info, func, args);
-  }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {

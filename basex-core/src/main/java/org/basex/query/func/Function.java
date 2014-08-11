@@ -1115,7 +1115,7 @@ public enum Function {
    * Mapping between function classes and namespace URIs.
    * If no mapping exists, {@link QueryText#FNURI} will be assumed as default mapping.
    */
-  public static final HashMap<Class<? extends BuiltinFunc>, byte[]> URIS = new HashMap<>();
+  public static final HashMap<Class<? extends StandardFunc>, byte[]> URIS = new HashMap<>();
 
   // initialization of class/uri mappings and statically known modules
   static {
@@ -1178,7 +1178,7 @@ public enum Function {
   /** Compiler flags. */
   private final EnumSet<Flag> flags;
   /** Function classes. */
-  private final Class<? extends BuiltinFunc> func;
+  private final Class<? extends StandardFunc> func;
 
 
   /**
@@ -1189,7 +1189,7 @@ public enum Function {
    * @param typ types of the function arguments
    * @param rtn return type
    */
-  Function(final Class<? extends BuiltinFunc> clz, final String dsc, final SeqType[] typ,
+  Function(final Class<? extends StandardFunc> clz, final String dsc, final SeqType[] typ,
       final SeqType rtn) {
     this(clz, dsc, typ, rtn, EnumSet.noneOf(Flag.class));
   }
@@ -1205,7 +1205,7 @@ public enum Function {
    * @param rtn return type
    * @param flg static function properties
    */
-  Function(final Class<? extends BuiltinFunc> clz, final String dsc, final SeqType[] typ,
+  Function(final Class<? extends StandardFunc> clz, final String dsc, final SeqType[] typ,
       final SeqType rtn, final EnumSet<Flag> flg) {
 
     func = clz;
@@ -1234,9 +1234,8 @@ public enum Function {
    * @param exprs arguments
    * @return function
    */
-  public BuiltinFunc get(final StaticContext sc, final InputInfo info, final Expr... exprs) {
-    return Reflect.get(Reflect.find(func, StaticContext.class, InputInfo.class, Function.class,
-        Expr[].class), sc, info, this, exprs);
+  public StandardFunc get(final StaticContext sc, final InputInfo info, final Expr... exprs) {
+    return Reflect.get(func).init(sc, info, this, exprs);
   }
 
   /**

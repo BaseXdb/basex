@@ -10,7 +10,6 @@ import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.ft.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -28,23 +27,11 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNFt extends BuiltinFunc {
+public final class FNFt extends StandardFunc {
   /** Element: options. */
   private static final QNm Q_OPTIONS = QNm.get("options");
   /** Marker element. */
   private static final byte[] MARK = Token.token("mark");
-
-  /**
-   * Constructor.
-   * @param sc static context
-   * @param info input info
-   * @param func function definition
-   * @param args arguments
-   */
-  public FNFt(final StaticContext sc, final InputInfo info, final Function func,
-      final Expr... args) {
-    super(sc, info, func, args);
-  }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {

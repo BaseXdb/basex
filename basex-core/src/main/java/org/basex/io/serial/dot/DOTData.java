@@ -81,7 +81,7 @@ final class DOTData {
                 QueryText.RET },
     { "66CC66", Var.class, Cast.class },
     // cyan
-    { "009999", StaticFuncCall.class, BuiltinFunc.class, Root.class, VarRef.class,
+    { "009999", StaticFuncCall.class, StandardFunc.class, Root.class, VarRef.class,
                 StaticVar.class, ValueAccess.class, RangeAccess.class,
                 StringRangeAccess.class, FTIndexAccess.class },
   };

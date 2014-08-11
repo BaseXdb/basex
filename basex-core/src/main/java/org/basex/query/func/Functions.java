@@ -111,7 +111,7 @@ public final class Functions extends TokenSet {
    * @return function instance
    * @throws QueryException query exception
    */
-  public BuiltinFunc get(final QNm name, final Expr[] args, final StaticContext sc,
+  public StandardFunc get(final QNm name, final Expr[] args, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     final Function fl = getBuiltIn(name, args.length, ii);
     return fl == null ? null : fl.get(sc, ii, args);
@@ -155,7 +155,7 @@ public final class Functions extends TokenSet {
         calls[i] = new VarRef(ii, args[i]);
       }
 
-      final BuiltinFunc sf = fn.get(sc, ii, calls);
+      final StandardFunc sf = fn.get(sc, ii, calls);
       if(sf.has(Flag.UPD)) {
         qc.updating();
         ann.add(Ann.Q_UPDATING, Empty.SEQ, ii);
@@ -238,7 +238,7 @@ public final class Functions extends TokenSet {
     }
 
     // built-in functions
-    final BuiltinFunc fun = get().get(name, args, sc, ii);
+    final StandardFunc fun = get().get(name, args, sc, ii);
     if(fun != null) {
       if(!sc.xquery3() && fun.has(Flag.X30)) throw FUNC30.get(ii);
       final Ann ann = new Ann();

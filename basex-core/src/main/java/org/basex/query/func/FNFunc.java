@@ -18,21 +18,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public final class FNFunc extends BuiltinFunc {
+public final class FNFunc extends StandardFunc {
   /** Minimum size of a loop that should not be unrolled. */
   static final int UNROLL_LIMIT = 10;
-
-  /**
-   * Constructor.
-   * @param sc static context
-   * @param info input info
-   * @param func function definition
-   * @param args arguments
-   */
-  public FNFunc(final StaticContext sc, final InputInfo info, final Function func,
-      final Expr... args) {
-    super(sc, info, func, args);
-  }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {

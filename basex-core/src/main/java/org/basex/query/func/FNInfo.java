@@ -19,19 +19,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNInfo extends BuiltinFunc {
-  /**
-   * Constructor.
-   * @param sc static context
-   * @param info input info
-   * @param func function definition
-   * @param args arguments
-   */
-  public FNInfo(final StaticContext sc, final InputInfo info, final Function func,
-      final Expr... args) {
-    super(sc, info, func, args);
-  }
-
+public final class FNInfo extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     switch(func) {
@@ -178,10 +166,10 @@ public final class FNInfo extends BuiltinFunc {
    * @param tp type of the expression
    * @return function
    */
-  public static FNInfo error(final QueryException ex, final SeqType tp) {
-    final FNInfo err = new FNInfo(null, ex.info(), ERROR, ex.qname(),
+  public static StandardFunc error(final QueryException ex, final SeqType tp) {
+    final StandardFunc e = ERROR.get(null, ex.info(), ex.qname(),
         Str.get(ex.getLocalizedMessage()));
-    err.seqType = tp;
-    return err;
+    e.seqType(tp);
+    return e;
   }
 }
