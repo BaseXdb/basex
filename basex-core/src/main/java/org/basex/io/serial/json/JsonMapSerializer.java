@@ -48,14 +48,14 @@ public class JsonMapSerializer extends JsonSerializer {
         for(final Item k : keys) {
           if(k.type == AtomType.ITR) {
             final long n = k.itr(null);
-            if(n <= 0) throw BXJS_SERIAL.getIO("Integer key " + k + " ist not positive");
+            if(n <= 0) throw BXJS_SERIAL_X.getIO("Integer key " + k + " ist not positive");
             num = Math.max(num, n);
           } else {
             object = true;
             if(k.type != AtomType.STR) num = -1;
           }
           if(object && num != 0)
-            throw BXJS_SERIAL.getIO("Keys must either be strings or integers");
+            throw BXJS_SERIAL_X.getIO("Keys must either be strings or integers");
         }
 
         // print current object or array
@@ -73,7 +73,7 @@ public class JsonMapSerializer extends JsonSerializer {
             if(indent) print(' ');
           }
           final Value v = map.get(k, null);
-          if(v.size() > 1) throw BXJS_SERIAL.getIO("More than one item specified for key " + k);
+          if(v.size() > 1) throw BXJS_SERIAL_X.getIO("More than one item specified for key " + k);
           serialize(v.isEmpty() ? null : (Item) v);
           f = true;
         }
@@ -82,7 +82,7 @@ public class JsonMapSerializer extends JsonSerializer {
         indent();
         print(object ? '}' : ']');
       } else if(lvl == 0 && spec == JsonSpec.RFC4627) {
-        throw BXJS_SERIAL.getIO("Top level must be a map; " + item.type + " found");
+        throw BXJS_SERIAL_X.getIO("Top level must be a map; " + item.type + " found");
       } else if(item == null) {
         // empty sequence
         print(NULL);

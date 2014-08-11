@@ -50,7 +50,7 @@ public abstract class Query {
       throws IOException;
 
   /**
-   * Binds a value to the context item.
+   * Binds a value to the context value.
    * @param value value to be bound
    * @throws IOException I/O exception
    */

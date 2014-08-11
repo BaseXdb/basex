@@ -48,7 +48,7 @@ public final class ItemSeq extends Seq {
   @Override
   public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
     if(items[0] instanceof ANode) return items[0];
-    throw EBV.get(ii, this);
+    throw EBV_X.get(ii, this);
   }
 
   @Override

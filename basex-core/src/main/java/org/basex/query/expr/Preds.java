@@ -73,7 +73,7 @@ public abstract class Preds extends ParseExpr {
   protected final boolean preds(final Item it, final QueryContext qc) throws QueryException {
     if(preds.length == 0) return true;
 
-    // set context item and position
+    // set context value and position
     final Value cv = qc.value;
     try {
       for(final Expr p : preds) {

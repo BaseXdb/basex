@@ -34,7 +34,7 @@ import org.xml.sax.helpers.*;
  * @author Michael Seiferle
  * @author Marco Lettere (greedy/verbose validation)
  */
-public final class FNValidate extends StandardFunc {
+public final class FNValidate extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -85,7 +85,7 @@ public final class FNValidate extends StandardFunc {
   private Item xsd(final QueryContext qc) throws QueryException {
     final Value seq = xsdInfo(qc);
     if(seq == Empty.SEQ) return null;
-    throw BXVA_FAIL.get(info, seq.iter().next());
+    throw BXVA_FAIL_X.get(info, seq.iter().next());
   }
 
   /**
@@ -120,14 +120,14 @@ public final class FNValidate extends StandardFunc {
     return process(new Validate() {
       @Override
       void process(final ErrorHandler handler) throws IOException, SAXException, QueryException {
-        final IO in = read(checkItem(exprs[0], qc), qc, null);
+        final IO in = read(toItem(exprs[0], qc), qc, null);
         final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         final Schema schema;
         if(exprs.length < 2) {
           // assume that schema declaration is included in document
           schema = sf.newSchema();
         } else {
-          final Item it = checkItem(exprs[1], qc);
+          final Item it = toItem(exprs[1], qc);
           // schema specified as string
           IO scio = read(it, qc, null);
           tmp = createTmp(scio);
@@ -151,7 +151,7 @@ public final class FNValidate extends StandardFunc {
   private Item dtd(final QueryContext qc) throws QueryException {
     final Value seq = dtdInfo(qc);
     if(seq == Empty.SEQ) return null;
-    throw BXVA_FAIL.get(info, seq.iter().next());
+    throw BXVA_FAIL_X.get(info, seq.iter().next());
   }
 
   /**
@@ -183,7 +183,7 @@ public final class FNValidate extends StandardFunc {
       void process(final ErrorHandler handler)
           throws IOException, ParserConfigurationException, SAXException, QueryException {
 
-        final Item it = checkItem(exprs[0], qc);
+        final Item it = toItem(exprs[0], qc);
         SerializerOptions sp = null;
 
         // integrate doctype declaration via serialization parameters
@@ -214,7 +214,7 @@ public final class FNValidate extends StandardFunc {
     try {
       v.process(handler);
     } catch(final IOException | ParserConfigurationException ex) {
-      throw BXVA_START.get(info, ex);
+      throw BXVA_START_X.get(info, ex);
     } catch(final SAXException ex) {
       // fatal exception: get original message
       Throwable e = ex;
@@ -276,7 +276,7 @@ public final class FNValidate extends StandardFunc {
       }
       return io;
     }
-    throw STRNODTYPE.get(info, it.type, it);
+    throw STRNOD_X_X.get(info, it.type, it);
   }
 
   /** Schema error handler. */

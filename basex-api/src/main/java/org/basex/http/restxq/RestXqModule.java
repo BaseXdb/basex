@@ -120,7 +120,7 @@ final class RestXqModule {
       return qc;
     } catch(final IOException ex) {
       // may be triggered when reading the file
-      throw IOERR.get(null, ex);
+      throw IOERR_X.get(null, ex);
     } finally {
       qc.close();
     }

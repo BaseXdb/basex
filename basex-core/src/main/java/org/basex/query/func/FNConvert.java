@@ -27,7 +27,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNConvert extends StandardFunc {
+public final class FNConvert extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -111,8 +111,8 @@ public final class FNConvert extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str integerToBase(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final long num = checkItr(exprs[0], qc), base = checkItr(exprs[1], qc);
-    if(base < 2 || base > 36) throw INVBASE.get(ii, base);
+    final long num = toLong(exprs[0], qc), base = toLong(exprs[1], qc);
+    if(base < 2 || base > 36) throw INVBASE_X.get(ii, base);
 
     // use fast variant for powers of two
     for(int i = 1, p = 2; i < 6; i++, p <<= 1)
@@ -149,16 +149,16 @@ public final class FNConvert extends StandardFunc {
    * @throws QueryException exception
    */
   private Int integerFromBase(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] str = checkStr(exprs[0], qc);
-    final long base = checkItr(exprs[1], qc);
-    if(base < 2 || base > 36) throw INVBASE.get(ii, base);
+    final byte[] str = toToken(exprs[0], qc);
+    final long base = toLong(exprs[1], qc);
+    if(base < 2 || base > 36) throw INVBASE_X.get(ii, base);
 
     long res = 0;
     for(final byte b : str) {
       final int num = b <= '9' ? b - 0x30 : (b & 0xDF) - 0x37;
       if(!(b >= '0' && b <= '9' || b >= 'a' && b <= 'z' ||
           b >= 'A' && b <= 'Z') || num >= base)
-        throw INVDIG.get(ii, base, (char) (b & 0xff));
+        throw INVBASEDIG_X_X.get(ii, base, (char) (b & 0xff));
 
       res = res * base + num;
     }
@@ -174,9 +174,9 @@ public final class FNConvert extends StandardFunc {
    */
   private Value binaryToBytes(final QueryContext qc) throws QueryException {
     try {
-      return BytSeq.get(checkItem(exprs[0], qc).input(info).content());
+      return BytSeq.get(toBin(exprs[0], qc).input(info).content());
     } catch(final IOException ex) {
-      throw BXCO_STRING.get(info, ex);
+      throw BXCO_STRING_X.get(info, ex);
     }
   }
 
@@ -187,7 +187,7 @@ public final class FNConvert extends StandardFunc {
    * @throws QueryException query exception
    */
   private Dtm integerToDateTime(final QueryContext qc) throws QueryException {
-    return new Dtm(checkItr(exprs[0], qc), info);
+    return new Dtm(toLong(exprs[0], qc), info);
   }
 
   /**
@@ -207,7 +207,7 @@ public final class FNConvert extends StandardFunc {
    * @throws QueryException query exception
    */
   private DTDur integerToDayTime(final QueryContext qc) throws QueryException {
-    return new DTDur(checkItr(exprs[0], qc));
+    return new DTDur(toLong(exprs[0], qc));
   }
 
   /**
@@ -217,9 +217,9 @@ public final class FNConvert extends StandardFunc {
    * @throws QueryException query exception
    */
   private Int dayTimeToInteger(final QueryContext qc) throws QueryException {
-    final DTDur dur = (DTDur) checkType(checkItem(exprs[0], qc), AtomType.DTD);
+    final DTDur dur = (DTDur) checkAtomic(exprs[0], qc, AtomType.DTD);
     final BigDecimal ms = dur.sec.multiply(BigDecimal.valueOf(1000));
-    if(ms.compareTo(ADateDur.BDMAXLONG) > 0) throw INTRANGE.get(info, ms);
+    if(ms.compareTo(ADateDur.BDMAXLONG) > 0) throw INTRANGE_X.get(info, ms);
     return Int.get(ms.longValue());
   }
 
@@ -230,12 +230,12 @@ public final class FNConvert extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str toString(final QueryContext qc) throws QueryException {
-    final Bin bin = checkBin(exprs[0], qc);
-    final String enc = checkEncoding(1, BXCO_ENCODING, qc);
+    final Bin bin = toBin(exprs[0], qc);
+    final String enc = toEncoding(1, BXCO_ENCODING_X, qc);
     try {
       return Str.get(toString(bin.input(info), enc, qc));
     } catch(final IOException ex) {
-      throw BXCO_STRING.get(info, ex);
+      throw BXCO_STRING_X.get(info, ex);
     }
   }
 
@@ -276,13 +276,13 @@ public final class FNConvert extends StandardFunc {
    * @throws QueryException query exception
    */
   private byte[] stringToBinary(final QueryContext qc) throws QueryException {
-    final byte[] in = checkStr(exprs[0], qc);
-    final String enc = checkEncoding(1, BXCO_ENCODING, qc);
+    final byte[] in = toToken(exprs[0], qc);
+    final String enc = toEncoding(1, BXCO_ENCODING_X, qc);
     if(enc == null || enc == UTF8) return in;
     try {
       return toBinary(in, enc);
     } catch(final CharacterCodingException ex) {
-      throw BXCO_BASE64.get(info, chop(in, info), enc);
+      throw BXCO_BASE64_X_X.get(info, chop(in, info), enc);
     }
   }
 
@@ -308,7 +308,7 @@ public final class FNConvert extends StandardFunc {
    * @throws QueryException query exception
    */
   private byte[] bytesToBinary(final QueryContext qc) throws QueryException {
-    final Value v = exprs[0].value(qc);
+    final Value v = exprs[0].atomValue(qc, info);
     // directly pass on byte array
     if(v instanceof BytSeq) return ((BytSeq) v).toJava();
 

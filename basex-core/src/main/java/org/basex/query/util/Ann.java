@@ -162,17 +162,17 @@ public final class Ann extends ElementList {
         vis = true;
       } else if(NSGlobal.reserved(name.uri())) {
         // no global namespaces allowed
-        throw ANNRES.get(infos[a], '%', name.string());
+        throw ANNRES_X_X.get(infos[a], '%', name.string());
       } else if(eq(uri, OUTPUTURI)) {
         if(SerializerOptions.get(true).option(string(local)) == null)
-          throw BASX_ANNOT.get(infos[a], '%', name.string());
+          throw BASX_ANNOT_X_X.get(infos[a], '%', name.string());
         if(values[a].size() != 1 || !values[a].itemAt(0).type.isStringOrUntyped()) {
-          throw BASX_ANNOTARGS.get(infos[a], '%', name.string());
+          throw BASX_ANNOTARGS_X_X.get(infos[a], '%', name.string());
         }
       } else if(eq(uri, RESTURI)) {
-        if(!eq(local, ANN_REST)) throw BASX_ANNOT.get(infos[a], '%', name.string());
+        if(!eq(local, ANN_REST)) throw BASX_ANNOT_X_X.get(infos[a], '%', name.string());
       } else if(eq(uri, UNITURI)) {
-        if(!eq(local, ANN_UNIT)) throw BASX_ANNOT.get(infos[a], '%', name.string());
+        if(!eq(local, ANN_UNIT)) throw BASX_ANNOT_X_X.get(infos[a], '%', name.string());
       }
     }
   }

@@ -54,7 +54,7 @@ public class RegExParser implements RegExParserConstants {
         else if(b == 's') m |= DOTALL;
         else if(b == 'q' && ext) m |= LITERAL;
         else if(b == 'x') strip = true;
-        else throw REGMOD.get(ii, (char) b);
+        else throw REGMOD_X.get(ii, (char) b);
       }
     }
 
@@ -75,9 +75,9 @@ public class RegExParser implements RegExParserConstants {
       }
       return pattern;
     } catch(final ParseException pe) {
-      throw REGPAT.get(ii, pe.getMessage());
+      throw REGPAT_X.get(ii, pe.getMessage());
     } catch(final TokenMgrError err) {
-      throw REGPAT.get(ii, err.getMessage());
+      throw REGPAT_X.get(ii, err.getMessage());
     }
   }
 

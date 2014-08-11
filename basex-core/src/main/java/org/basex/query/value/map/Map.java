@@ -82,57 +82,38 @@ public final class Map extends FItem {
   }
 
   /**
-   * Checks the key item.
-   * @param key item
-   * @param ii input info
-   * @return possibly atomized item
-   * @throws QueryException query exception
-   */
-  private static Item key(final Item key, final InputInfo ii) throws QueryException {
-    // no empty sequence allowed
-    if(key == null) throw EMPTYFOUND.get(ii);
-    // function items can't be keys
-    if(key instanceof FItem) throw FIATOM.get(ii, key.type);
-    // nodes are converted to untyped atomics
-    return key instanceof ANode ? new Atm(key.string(ii)) : key;
-  }
-
-  /**
    * Deletes a key from this map.
-   * @param key key to delete
+   * @param key key to delete (must be atomic value)
    * @param ii input info
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
   public Map delete(final Item key, final InputInfo ii) throws QueryException {
-    final Item k = key(key, ii);
-    final TrieNode del = root.delete(k.hash(ii), k, 0, ii);
+    final TrieNode del = root.delete(key.hash(ii), key, 0, ii);
     return del == root ? this : del != null ? new Map(del) : EMPTY;
   }
 
   /**
    * Gets the value from this map.
-   * @param key key to look for
+   * @param key key to look for (must be atomic value)
    * @param ii input info
    * @return bound value if found, the empty sequence {@code ()} otherwise
    * @throws QueryException query exception
    */
   public Value get(final Item key, final InputInfo ii) throws QueryException {
-    final Item k = key(key, ii);
-    final Value v = root.get(k.hash(ii), k, 0, ii);
+    final Value v = root.get(key.hash(ii), key, 0, ii);
     return v == null ? Empty.SEQ : v;
   }
 
   /**
    * Checks if the given key exists in the map.
-   * @param key key to look for
+   * @param key key to look for (must be atomic value)
    * @param ii input info
    * @return {@code true()}, if the key exists, {@code false()} otherwise
    * @throws QueryException query exception
    */
   public boolean contains(final Item key, final InputInfo ii) throws QueryException {
-    final Item k = key(key, ii);
-    return root.contains(k.hash(ii), k, 0, ii);
+    return root.contains(key.hash(ii), key, 0, ii);
   }
 
   /**
@@ -167,15 +148,14 @@ public final class Map extends FItem {
 
   /**
    * Inserts the given value into this map.
-   * @param key key to insert
+   * @param key key to insert (must be atomic value)
    * @param value value to insert
    * @param ii input info
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
   public Map insert(final Item key, final Value value, final InputInfo ii) throws QueryException {
-    final Item k = key(key, ii);
-    final TrieNode ins = root.insert(k.hash(ii), k, value, 0, ii);
+    final TrieNode ins = root.insert(key.hash(ii), key, value, 0, ii);
     return ins == root ? this : new Map(ins);
   }
 

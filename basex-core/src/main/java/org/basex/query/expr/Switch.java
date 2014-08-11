@@ -54,7 +54,7 @@ public final class Switch extends ParseExpr {
     // check if expression can be pre-evaluated
     Expr ex = this;
     if(cond.isValue()) {
-      final Item it = cond.item(qc, info);
+      final Item it = cond.atomItem(qc, info);
       LOOP:
       for(final SwitchCase sc : cases) {
         final int sl = sc.exprs.length;
@@ -143,7 +143,7 @@ public final class Switch extends ParseExpr {
    * @throws QueryException query exception
    */
   private Expr getCase(final QueryContext qc) throws QueryException {
-    final Item it = cond.item(qc, info);
+    final Item it = cond.atomItem(qc, info);
     for(final SwitchCase sc : cases) {
       final int sl = sc.exprs.length;
       for(int e = 1; e < sl; e++) {

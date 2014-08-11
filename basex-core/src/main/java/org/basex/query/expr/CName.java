@@ -79,15 +79,15 @@ public abstract class CName extends CNode {
    * @throws QueryException query exception
    */
   final QNm qname(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = checkItem(name, qc);
+    final Item it = checkNoEmpty(name.atomItem(qc, info), AtomType.QNM);
     final Type ip = it.type;
     if(ip == AtomType.QNM) return (QNm) it;
-    if(!ip.isStringOrUntyped() || ip == AtomType.URI) throw STRQNM.get(info, ip, it);
+    if(!ip.isStringOrUntyped() || ip == AtomType.URI) throw STRQNM_X_X.get(info, ip, it);
 
     // create and update namespace
     final byte[] str = it.string(ii);
     if(XMLToken.isQName(str)) return new QNm(str, sc);
-    throw INVNAME.get(info, str);
+    throw INVNAME_X.get(info, str);
   }
 
   @Override

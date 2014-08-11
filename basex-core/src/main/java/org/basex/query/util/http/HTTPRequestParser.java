@@ -51,7 +51,7 @@ public final class HTTPRequestParser {
 
     // it is an error if content is set for HTTP verbs which must be empty
     if(eq(method, TRACE, DELETE) && (payload != null || bodies != null))
-      throw HC_REQ.get(info, "Body not expected for method " + string(method));
+      throw HC_REQ_X.get(info, "Body not expected for method " + string(method));
 
     if(payload != null) {
       final QNm pl = payload.qname();
@@ -65,7 +65,7 @@ public final class HTTPRequestParser {
         parseMultipart(payload, bodies, r.payloadAttrs, r.parts);
         r.isMultipart = true;
       } else {
-        throw HC_REQ.get(info, "Unknown payload element " + payload.qname());
+        throw HC_REQ_X.get(info, "Unknown payload element " + payload.qname());
       }
     }
     return r;
@@ -155,7 +155,7 @@ public final class HTTPRequestParser {
 
     parseAttrs(multipart, attrs);
     if(attrs.get(MEDIA_TYPE) == null)
-      throw HC_REQ.get(info, "Attribute media-type of http:multipart is mandatory");
+      throw HC_REQ_X.get(info, "Attribute media-type of http:multipart is mandatory");
 
     final AxisIter prts = multipart.children();
     while(true) {
@@ -176,14 +176,14 @@ public final class HTTPRequestParser {
    */
   private void checkRequest(final HTTPRequest r) throws QueryException {
     // @method denotes the HTTP verb and is mandatory
-    if(r.attrs.get(METHOD) == null) throw HC_REQ.get(info, "Attribute method is mandatory");
+    if(r.attrs.get(METHOD) == null) throw HC_REQ_X.get(info, "Attribute method is mandatory");
 
     // check parameters needed in case of authorization
     final byte[] sendAuth = r.attrs.get(SEND_AUTHORIZATION);
     if(sendAuth != null && Boolean.parseBoolean(string(sendAuth))) {
       final byte[] un = r.attrs.get(USERNAME);
       final byte[] pw = r.attrs.get(PASSWORD);
-      if(un == null || pw == null) throw HC_REQ.get(info, "Provided credentials are invalid");
+      if(un == null || pw == null) throw HC_REQ_X.get(info, "Provided credentials are invalid");
     }
   }
 
@@ -196,7 +196,7 @@ public final class HTTPRequestParser {
   private void checkBody(final ANode body, final TokenMap bodyAttrs) throws QueryException {
     // @media-type is mandatory
     if(bodyAttrs.get(MEDIA_TYPE) == null)
-      throw HC_REQ.get(info, "Attribute media-type of http:body is mandatory");
+      throw HC_REQ_X.get(info, "Attribute media-type of http:body is mandatory");
 
     // if src attribute is used to set the content of the body, no
     // other attributes must be specified and no content must be present

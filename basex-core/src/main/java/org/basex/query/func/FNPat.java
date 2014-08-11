@@ -24,7 +24,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNPat extends StandardFunc {
+public final class FNPat extends BuiltinFunc {
   /** Pattern cache. */
   private final TokenObjMap<Pattern> patterns = new TokenObjMap<>();
 
@@ -78,9 +78,9 @@ public final class FNPat extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     switch(func) {
-      case MATCHES:        return matches(checkEStr(exprs[0], qc), qc);
-      case REPLACE:        return replace(checkEStr(exprs[0], qc), qc);
-      case ANALYZE_STRING: return analyzeString(checkEStr(exprs[0], qc), qc);
+      case MATCHES:        return matches(toToken(exprs[0], qc, true), qc);
+      case REPLACE:        return replace(toToken(exprs[0], qc, true), qc);
+      case ANALYZE_STRING: return analyzeString(toToken(exprs[0], qc, true), qc);
       default:             return super.item(qc, ii);
     }
   }
@@ -168,15 +168,15 @@ public final class FNPat extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item replace(final byte[] value, final QueryContext qc) throws QueryException {
-    final byte[] rep = checkStr(exprs[2], qc);
+    final byte[] rep = toToken(exprs[2], qc);
     for(int i = 0; i < rep.length; ++i) {
       if(rep[i] == '\\') {
         if(i + 1 == rep.length || rep[i + 1] != '\\' && rep[i + 1] != '$')
-          throw FUNREPBS.get(info, rep);
+          throw FUNREPBS_X.get(info, rep);
         ++i;
       }
       if(rep[i] == '$' && (i == 0 || rep[i - 1] != '\\') &&
-        (i + 1 == rep.length || !digit(rep[i + 1]))) throw FUNREPDOL.get(info, rep);
+        (i + 1 == rep.length || !digit(rep[i + 1]))) throw FUNREPDOL_X.get(info, rep);
     }
 
     final Pattern p = pattern(exprs[1], exprs.length == 4 ? exprs[3] : null, qc, true);
@@ -189,7 +189,7 @@ public final class FNPat extends StandardFunc {
       return Str.get(p.matcher(string(value)).replaceAll(r));
     } catch(final Exception ex) {
       if(ex.getMessage().contains("No group")) throw REGROUP.get(info);
-      throw REGPAT.get(info, ex);
+      throw REGPAT_X.get(info, ex);
     }
   }
 
@@ -200,8 +200,8 @@ public final class FNPat extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value tokenize(final QueryContext qc) throws QueryException {
-    final byte[] val = checkEStr(exprs[0], qc);
-    if(exprs.length < 2) return StrSeq.get(split(norm(val), ' '));
+    final byte[] val = toToken(exprs[0], qc, true);
+    if(exprs.length < 2) return StrSeq.get(split(normalize(val), ' '));
 
     final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc, true);
     if(p.matcher("").matches()) throw REGROUP.get(info);
@@ -232,8 +232,8 @@ public final class FNPat extends StandardFunc {
   private Pattern pattern(final Expr pattern, final Expr modifier, final QueryContext qc,
       final boolean check) throws QueryException {
 
-    final byte[] pat = checkStr(pattern, qc);
-    final byte[] mod = modifier != null ? checkStr(modifier, qc) : null;
+    final byte[] pat = toToken(pattern, qc);
+    final byte[] mod = modifier != null ? toToken(modifier, qc) : null;
     final TokenBuilder tb = new TokenBuilder(pat);
     if(mod != null) tb.add(0).add(mod);
     final byte[] key = tb.finish();

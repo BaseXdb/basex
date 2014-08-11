@@ -175,11 +175,11 @@ public abstract class JavaMapping extends Arr {
     Method meth = null;
     for(final Method m : mod.getClass().getMethods()) {
       if(m.getName().equals(name) && m.getParameterTypes().length == arity) {
-        if(meth != null) throw JAVAAMBIG.get(ii, "Q{" + path + '}' + name + '#' + arity);
+        if(meth != null) throw JAVAAMBIG_X.get(ii, "Q{" + path + '}' + name + '#' + arity);
         meth = m;
       }
     }
-    if(meth == null) throw FUNCJAVA.get(ii, path + ':' + name);
+    if(meth == null) throw FUNCJAVA_X.get(ii, path + ':' + name);
 
     // check if user has sufficient permissions to call the function
     Perm perm = Perm.ADMIN;
@@ -245,9 +245,9 @@ public abstract class JavaMapping extends Arr {
       return new JavaFunc(sc, ii, modules.findClass(path), local, args);
     } catch(final ClassNotFoundException ex) {
       // only throw exception if "java:" prefix was explicitly specified
-      if(java) throw FUNCJAVA.get(ii, path);
+      if(java) throw FUNCJAVA_X.get(ii, path);
     } catch(final Throwable th) {
-      throw JAVAINIT.get(ii, th);
+      throw JAVAINIT_X.get(ii, th);
     }
 
     // no function found

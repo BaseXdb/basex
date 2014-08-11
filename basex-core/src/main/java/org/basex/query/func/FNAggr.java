@@ -22,7 +22,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNAggr extends StandardFunc {
+public final class FNAggr extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -37,41 +37,13 @@ public final class FNAggr extends StandardFunc {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = qc.iter(exprs[0]);
     switch(func) {
-      case COUNT:
-        long c = iter.size();
-        if(c == -1) {
-          do {
-            qc.checkStop();
-            ++c;
-          } while(iter.next() != null);
-        }
-        return Int.get(c);
-      case MIN:
-        return minmax(iter, OpV.GT, qc);
-      case MAX:
-        return minmax(iter, OpV.LT, qc);
-      case SUM:
-        // partial sum calculation (Little Gauss)
-        if(exprs[0] instanceof RangeSeq) {
-          final RangeSeq rs = (RangeSeq) exprs[0];
-          final long s = rs.itemAt(0).itr(ii);
-          if(s == 0 || s == 1) {
-            final long n = rs.size();
-            return Int.get(n < 3037000500L ? n * (n + 1) / 2 : BigInteger.valueOf(n).multiply(
-                BigInteger.valueOf(n + 1)).divide(BigInteger.valueOf(2)).longValue());
-          }
-        }
-
-        Item it = iter.next();
-        return it != null ? sum(iter, it, false) :
-          exprs.length == 2 ? exprs[1].item(qc, info) : Int.get(0);
-      case AVG:
-        it = iter.next();
-        return it == null ? null : sum(iter, it, true);
-      default:
-        return super.item(qc, ii);
+      case COUNT: return count(qc);
+      case MIN:   return minmax(OpV.GT, qc);
+      case MAX:   return minmax(OpV.LT, qc);
+      case SUM:   return sum(qc, ii);
+      case AVG:   return avg(qc, ii);
+      default:    return super.item(qc, ii);
     }
   }
 
@@ -102,43 +74,34 @@ public final class FNAggr extends StandardFunc {
   }
 
   /**
-   * Sums up the specified item(s).
-   * @param iter iterator
-   * @param it first item
-   * @param avg calculate average
-   * @return summed up item
+   * Computes the number of resulting items.
+   * @param qc query context
+   * @return number
    * @throws QueryException query exception
    */
-  private Item sum(final Iter iter, final Item it, final boolean avg) throws QueryException {
-    Item rs = it.type.isUntyped() ? Dbl.get(it.string(info), info) : it;
-    final boolean num = rs instanceof ANum, dtd = rs.type == DTD, ymd = rs.type == YMD;
-    if(!num && (!(rs instanceof Dur) || rs.type == DUR)) throw SUMTYPE.get(info, rs.type, rs);
-
-    int c = 1;
-    for(Item i; (i = iter.next()) != null;) {
-      if(i.type.isNumberOrUntyped()) {
-        if(!num) throw SUMDUR.get(info, i.type, i);
-      } else {
-        if(num) throw SUMNUM.get(info, i.type, i);
-        if(dtd && i.type != DTD || ymd && i.type != YMD) throw SUMDUR.get(info, i.type, i);
-      }
-      rs = Calc.PLUS.ev(info, rs, i);
-      ++c;
+  private Item count(final QueryContext qc) throws QueryException {
+    final Iter iter = qc.iter(exprs[0]);
+    long c = iter.size();
+    if(c == -1) {
+      do {
+        qc.checkStop();
+        ++c;
+      } while(iter.next() != null);
     }
-    return avg ? Calc.DIV.ev(info, rs, Int.get(c)) : rs;
+    return Int.get(c);
   }
 
   /**
    * Returns a minimum or maximum item.
-   * @param iter values to be compared
    * @param cmp comparator
    * @param qc query context
    * @return resulting item
    * @throws QueryException query exception
    */
-  private Item minmax(final Iter iter, final OpV cmp, final QueryContext qc) throws QueryException {
-    final Collation coll = checkColl(1, qc);
+  private Item minmax(final OpV cmp, final QueryContext qc) throws QueryException {
+    final Collation coll = toCollation(1, qc);
 
+    final Iter iter = exprs[0].atomIter(qc, info);
     Item rs = iter.next();
     if(rs == null) return null;
 
@@ -148,7 +111,7 @@ public final class FNAggr extends StandardFunc {
     // strings
     if(rs instanceof AStr) {
       for(Item it; (it = iter.next()) != null;) {
-        if(!(it instanceof AStr)) throw FUNTYPE.get(info, rs.type, it.type, it);
+        if(!(it instanceof AStr)) throw EXPTYPE_X_X_X.get(info, rs.type, it.type, it);
         if(cmp.eval(rs, it, coll, info)) rs = it;
       }
       return rs;
@@ -156,7 +119,7 @@ public final class FNAggr extends StandardFunc {
     // dates, durations, booleans, binary values
     if(rs instanceof ADate || rs instanceof Dur || rs instanceof Bin || rs.type == BLN) {
       for(Item it; (it = iter.next()) != null;) {
-        if(rs.type != it.type) throw FUNTYPE.get(info, rs.type, it.type, it);
+        if(rs.type != it.type) throw EXPTYPE_X_X_X.get(info, rs.type, it.type, it);
         if(cmp.eval(rs, it, coll, info)) rs = it;
       }
       return rs;
@@ -172,6 +135,71 @@ public final class FNAggr extends StandardFunc {
   }
 
   /**
+   * Returns a summed up value.
+   * @param qc query context
+   * @param ii input info
+   * @return sum
+   * @throws QueryException query exception
+   */
+  private Item sum(final QueryContext qc, final InputInfo ii) throws QueryException {
+    // partial sum calculation (Little Gauss)
+    if(exprs[0] instanceof RangeSeq) {
+      final RangeSeq rs = (RangeSeq) exprs[0];
+      final long s = rs.itemAt(0).itr(ii);
+      if(s == 0 || s == 1) {
+        final long n = rs.size();
+        return Int.get(n < 3037000500L ? n * (n + 1) / 2 : BigInteger.valueOf(n).multiply(
+            BigInteger.valueOf(n + 1)).divide(BigInteger.valueOf(2)).longValue());
+      }
+    }
+
+    final Iter iter = exprs[0].atomIter(qc, ii);
+    Item it = iter.next();
+    return it != null ? sum(iter, it, false) :
+      exprs.length == 2 ? exprs[1].atomItem(qc, ii) : Int.get(0);
+  }
+
+  /**
+   * Returns an average value.
+   * @param qc query context
+   * @param ii input info
+   * @return sum
+   * @throws QueryException query exception
+   */
+  private Item avg(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Iter iter = exprs[0].atomIter(qc, ii);
+    Item it = iter.next();
+    return it == null ? null : sum(iter, it, true);
+  }
+
+  /**
+   * Sums up the specified item(s).
+   * @param iter iterator
+   * @param it first item
+   * @param avg calculate average
+   * @return summed up item
+   * @throws QueryException query exception
+   */
+  private Item sum(final Iter iter, final Item it, final boolean avg) throws QueryException {
+    Item rs = it.type.isUntyped() ? Dbl.get(it.string(info), info) : it;
+    final boolean num = rs instanceof ANum, dtd = rs.type == DTD, ymd = rs.type == YMD;
+    if(!num && (!(rs instanceof Dur) || rs.type == DUR)) throw SUM_X_X.get(info, rs.type, rs);
+
+    int c = 1;
+    for(Item i; (i = iter.next()) != null;) {
+      if(i.type.isNumberOrUntyped()) {
+        if(!num) throw SUMDUR_X_X.get(info, i.type, i);
+      } else {
+        if(num) throw SUMNUM_X_X.get(info, i.type, i);
+        if(dtd && i.type != DTD || ymd && i.type != YMD) throw SUMDUR_X_X.get(info, i.type, i);
+      }
+      rs = Calc.PLUS.ev(info, rs, i);
+      ++c;
+    }
+    return avg ? Calc.DIV.ev(info, rs, Int.get(c)) : rs;
+  }
+
+  /**
    * Returns the numeric type with the highest precedence.
    * @param res result item
    * @param it new item
@@ -182,7 +210,7 @@ public final class FNAggr extends StandardFunc {
     final Type ti = it.type;
     if(ti.isUntyped()) return DBL;
     final Type tr = res.type;
-    if(!(it instanceof ANum)) throw FUNTYPE.get(info, tr, ti, it);
+    if(!(it instanceof ANum)) throw EXPTYPE_X_X_X.get(info, tr, ti, it);
 
     if(tr == ti) return tr;
     if(tr == DBL || ti == DBL) return DBL;

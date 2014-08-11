@@ -111,7 +111,7 @@ public abstract class ADate extends ADateDur {
     day = (byte) (Token.toInt(mt.group(4)) - 1);
 
     if(mon < 0 || mon >= 12 || day < 0 || day >= dpm(yea, mon)) throw dateError(d, e, ii);
-    if(yea <= MIN_YEAR || yea > MAX_YEAR) throw DATERANGE.get(ii, type, chop(d, ii));
+    if(yea <= MIN_YEAR || yea > MAX_YEAR) throw DATERANGE_X_X.get(ii, type, chop(d, ii));
     zone(mt, 5, d, ii);
   }
 
@@ -156,7 +156,7 @@ public abstract class ADate extends ADateDur {
     } else {
       final int th = Token.toInt(matcher.group(pos + 2));
       final int tm = Token.toInt(matcher.group(pos + 3));
-      if(th > 14 || tm > 59 || th == 14 && tm != 0) throw INVALIDZONE.get(ii, value);
+      if(th > 14 || tm > 59 || th == 14 && tm != 0) throw INVALIDZONE_X.get(ii, value);
       final int mn = th * 60 + tm;
       zon = (short) ("-".equals(matcher.group(pos + 1)) ? -mn : mn);
     }
@@ -185,7 +185,7 @@ public abstract class ADate extends ADateDur {
     yea += div(mn, 12);
     day = (byte) Math.min(dpm(yea, mon) - 1, day);
 
-    if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE.get(ii, yea);
+    if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE_X.get(ii, yea);
   }
 
   /**
@@ -257,8 +257,8 @@ public abstract class ADate extends ADateDur {
         t = (short) ((c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET)) / 60000);
       } else {
         t = (short) (tz.min() + tz.hou() * 60);
-        if(tz.sec().signum() != 0) throw ZONESEC.get(ii, tz);
-        if(Math.abs(t) > 60 * 14 || tz.day() != 0) throw INVALZONE.get(ii, tz);
+        if(tz.sec().signum() != 0) throw ZONESEC_X.get(ii, tz);
+        if(Math.abs(t) > 60 * 14 || tz.day() != 0) throw INVALZONE_X.get(ii, tz);
       }
 
       // change time if two competing time zones exist

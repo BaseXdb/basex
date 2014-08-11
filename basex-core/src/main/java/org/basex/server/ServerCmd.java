@@ -35,7 +35,7 @@ public enum ServerCmd {
   REPLACE(12),
   /** Code for storing raw data in a database: {path}0{input}0. */
   STORE(13),
-  /** Code for binding a context item: {id}0{val}0{type}0. */
+  /** Code for binding a context value: {id}0{val}0{type}0. */
   CONTEXT(14),
   /** Code for returning the update flag: {id}0. */
   UPDATING(30),

@@ -19,7 +19,7 @@ public final class GFLWORTest extends AdvancedQueryTest {
   public void shadowTest() {
     query("for $a in for $a in <a>1</a> return $a/text() return <x>{ $a }</x>",
         "<x>1</x>");
-    error("for $a at $b in 'c'[$b > 1] return $a", Err.VARUNDEF);
+    error("for $a at $b in 'c'[$b > 1] return $a", Err.VARUNDEF_X);
   }
 
   /** Tests shadowing between grouping variables. */

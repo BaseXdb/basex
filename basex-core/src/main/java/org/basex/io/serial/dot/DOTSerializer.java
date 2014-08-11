@@ -88,12 +88,12 @@ public final class DOTSerializer extends OutputSerializer {
 
   @Override
   protected void finishText(final byte[] value) throws IOException {
-    print(norm(value), DOTData.TEXT);
+    print(normalize(value), DOTData.TEXT);
   }
 
   @Override
   protected void finishComment(final byte[] value) throws IOException {
-    print(new TokenBuilder(COMM_O).add(norm(value)).add(COMM_C).finish(), COMM);
+    print(new TokenBuilder(COMM_O).add(normalize(value)).add(COMM_C).finish(), COMM);
   }
 
   @Override
@@ -104,7 +104,7 @@ public final class DOTSerializer extends OutputSerializer {
   @Override
   protected void atomic(final Item it, final boolean iter) throws IOException {
     try {
-      print(norm(it.string(null)), ITEM);
+      print(normalize(it.string(null)), ITEM);
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }

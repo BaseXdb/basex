@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
@@ -57,8 +56,8 @@ public final class StaticFuncs extends ExprInfo {
       final InputInfo ii) throws QueryException {
 
     final byte[] uri = nm.uri();
-    if(uri.length == 0) throw FUNNONS.get(ii, nm.string());
-    if(NSGlobal.reserved(uri)) throw NAMERES.get(ii, nm.string());
+    if(uri.length == 0) throw FUNNONS_X.get(ii, nm.string());
+    if(NSGlobal.reserved(uri)) throw NAMERES_X.get(ii, nm.string());
 
     final StaticFunc fn = new StaticFunc(ann, nm, args, type, expr, sc, scope, doc, ii);
     final byte[] sig = fn.id();
@@ -141,17 +140,17 @@ public final class StaticFuncs extends ExprInfo {
               exp.append(al.get(a));
             }
           }
-          final int arity = call.exprs.length;
-          throw FUNCTYPES.get(call.info, call.name.string(), arity, arity == 1 ? "" : "s", exp);
+          final int ar = call.exprs.length;
+          throw FUNCTYPES_X_X_X_X.get(call.info, call.name.string(), ar, ar == 1 ? "" : "s", exp);
         }
 
         // if not, indicate that function is unknown
         final QueryException qe = similarError(call.name, call.info);
-        throw qe == null ? FUNCUNKNOWN.get(call.info, call.name.string()) : qe;
+        throw qe == null ? FUNCUNKNOWN_X.get(call.info, call.name.string()) : qe;
       }
 
       if(call != null) {
-        if(fc.func.expr == null) throw FUNCNOIMPL.get(call.info, call.name.string());
+        if(fc.func.expr == null) throw FUNCNOIMPL_X.get(call.info, call.name.string());
         // set updating flag; this will trigger checks in {@link QueryContext#check}
         qc.updating |= fc.func.updating;
       }
@@ -214,7 +213,7 @@ public final class StaticFuncs extends ExprInfo {
     for(final FuncCache fc : funcs.values()) {
       final StaticFunc sf = fc.func;
       if(sf != null && sf.expr != null && ls.similar(nm, lc(sf.name.local()))) {
-        qe = FUNCSIMILAR.get(ii, name.string(), sf.name.string());
+        qe = FUNCSIMILAR_X_X.get(ii, name.string(), sf.name.string());
         break;
       }
     }
@@ -277,7 +276,7 @@ public final class StaticFuncs extends ExprInfo {
      * @throws QueryException query exception
      */
     public void setFunc(final StaticFunc fn) throws QueryException {
-      if(func != null) throw FUNCDEFINED.get(fn.info, fn.name.string());
+      if(func != null) throw FUNCDEFINED_X.get(fn.info, fn.name.string());
       func = fn;
       for(final StaticFuncCall call : calls) call.init(fn);
     }

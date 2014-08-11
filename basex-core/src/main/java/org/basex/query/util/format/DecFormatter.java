@@ -83,12 +83,12 @@ public final class DecFormatter extends FormatUtil {
           else if(k.equals(DF_PM)) permille = cp;
           else if(k.equals(DF_ZG)) {
             z = zeroes(cp);
-            if(z == -1) throw INVDECFORM.get(info, k, v);
-            if(z != cp) throw INVDECZERO.get(info, (char)  cp);
+            if(z == -1) throw INVDECFORM_X_X.get(info, k, v);
+            if(z != cp) throw INVDECZERO_X.get(info, (char)  cp);
           }
         } else {
           // signs must have single character
-          throw INVDECSINGLE.get(info, k, v);
+          throw INVDECSINGLE_X_X.get(info, k, v);
         }
       }
     }
@@ -97,7 +97,7 @@ public final class DecFormatter extends FormatUtil {
     zero = z;
     final IntSet is = new IntSet();
     final int[] ss = { decimal, grouping, percent, permille, zero, optional, pattern };
-    for(final int s : ss) if(!is.add(s)) throw DUPLDECFORM.get(info, (char) s);
+    for(final int s : ss) if(!is.add(s)) throw DUPLDECFORM_X.get(info, (char) s);
 
     // create auxiliary strings
     final TokenBuilder tb = new TokenBuilder();
@@ -126,13 +126,13 @@ public final class DecFormatter extends FormatUtil {
     } else {
       tl.add(substring(pic, 0, i));
       pic = substring(pic, i + cl(pic, i));
-      if(contains(pic, pattern)) throw PICNUM.get(info, picture);
+      if(contains(pic, pattern)) throw PICNUM_X.get(info, picture);
       tl.add(pic);
     }
     final byte[][] patterns = tl.finish();
 
     // check and analyze patterns
-    if(!check(patterns)) throw PICNUM.get(info, picture);
+    if(!check(patterns)) throw PICNUM_X.get(info, picture);
     final Picture[] pics = analyze(patterns);
 
     // return formatted string

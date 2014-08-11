@@ -63,9 +63,9 @@ public final class CElem extends CName {
       final QNm nm = qname(qc, ii);
       final byte[] cp = nm.prefix(), cu = nm.uri();
       if(eq(cp, XML) ^ eq(cu, XMLURI)) throw CEXML.get(info, cu, cp);
-      if(eq(cu, XMLNSURI)) throw CEINV.get(info, cu);
-      if(eq(cp, XMLNS)) throw CEINV.get(info, cp);
-      if(!nm.hasURI() && nm.hasPrefix()) throw INVPREF.get(info, nm);
+      if(eq(cu, XMLNSURI)) throw CEINV_X.get(info, cu);
+      if(eq(cp, XMLNS)) throw CEINV_X.get(info, cp);
+      if(!nm.hasURI() && nm.hasPrefix()) throw INVPREF_X.get(info, nm);
 
       // analyze element namespace unless it is "xml"
       if(!eq(cp, XML)) {
@@ -92,11 +92,11 @@ public final class CElem extends CName {
       constr.add(qc, exprs);
       if(constr.errAtt) throw NOATTALL.get(info);
       if(constr.errNS) throw NONSALL.get(info);
-      if(constr.duplAtt != null) throw CATTDUPL.get(info, constr.duplAtt);
-      if(constr.duplNS != null) throw DUPLNSCONS.get(info, constr.duplNS);
+      if(constr.duplAtt != null) throw CATTDUPL_X.get(info, constr.duplAtt);
+      if(constr.duplNS != null) throw DUPLNSCONS_X.get(info, constr.duplNS);
 
       // check namespaces
-      if(constr.nspaces.contains(EMPTY) && !nm.hasURI()) throw DUPLNSCONS.get(info, EMPTY);
+      if(constr.nspaces.contains(EMPTY) && !nm.hasURI()) throw DUPLNSCONS_X.get(info, EMPTY);
 
       // add namespaces from constructor
       final Atts cns = constr.nspaces;

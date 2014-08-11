@@ -145,20 +145,27 @@ public final class CmpG extends Cmp {
       qc.compInfo(OPTSWAP, this);
     }
 
+    // check if both arguments will always yield one result
     final Expr e1 = exprs[0], e2 = exprs[1];
+    final SeqType st1 = e1.seqType(), st2 = e2.seqType();
+    atomic = st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray();
+
     Expr e = this;
     if(oneIsEmpty()) {
+      // one value is empty (e.g.: () = local:expensive() )
       e = optPre(Bln.FALSE, qc);
     } else if(allAreValues()) {
-      e = preEval(qc);
+      // pre-evaluate values (e.g.: 1 = 2 )
+      return preEval(qc);
     } else if(e1.isFunction(Function.COUNT)) {
+      // rewrite count() function
       e = compCount(op.op);
       if(e != this) qc.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
     } else if(e1.isFunction(Function.POSITION)) {
+      // rewrite position() function
       if(e2 instanceof RangeSeq && op.op == OpV.EQ) {
         // position() CMP range
-        final long p1 = ((Value) e2).itemAt(0).itr(info);
-        final long p2 = p1 + e2.size() - 1;
+        final long p1 = ((Value) e2).itemAt(0).itr(info), p2 = p1 + e2.size() - 1;
         e = Pos.get(p1, p2, info);
       } else {
         // position() CMP number
@@ -176,13 +183,9 @@ public final class CmpG extends Cmp {
       if(e == this) e = CmpSR.get(this);
       if(e != this) qc.compInfo(OPTWRITE, this);
     }
-    if(e != this) return e;
 
-    // check if both arguments will always yield one result
-    final SeqType st1 = e1.seqType(), st2 = e2.seqType();
-    atomic = st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray();
-    if(atomic) qc.compInfo(OPTATOMIC, this);
-    return this;
+    if(e == this && atomic) qc.compInfo(OPTATOMIC, this);
+    return e;
   }
 
   @Override

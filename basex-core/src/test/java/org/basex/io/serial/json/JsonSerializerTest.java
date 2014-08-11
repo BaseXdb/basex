@@ -196,9 +196,9 @@ public final class JsonSerializerTest extends SandboxTest {
   private static void error(final String query, final JsonFormat format, final JsonSpec spec) {
     try {
       serialize(query, format, spec);
-      fail("Error expected: " + Err.BXJS_SERIAL);
+      fail("Error expected: " + Err.BXJS_SERIAL_X);
     } catch(final QueryIOException ex) {
-      assertEquals(Err.BXJS_SERIAL, ex.getCause().err());
+      assertEquals(Err.BXJS_SERIAL_X, ex.getCause().err());
     } catch(final Exception ex) {
       Util.stack(ex);
       fail(ex.toString());

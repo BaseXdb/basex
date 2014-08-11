@@ -240,19 +240,19 @@ public final class UpdateTest extends AdvancedQueryTest {
     // check 'global' duplicate detection
     String q = transform("<x/>",
         "for $i in 1 to 2 return insert node attribute a { 'b' } into $input");
-    error(q, Err.UPATTDUPL);
+    error(q, Err.UPATTDUPL_X);
 
     // check if insertion sequence itself is duplicate free (which it is not)
     q = transform("<x a='a'/>",
         "delete node $input/@a," +
         "for $i in 1 to 2 return insert node attribute a { 'b' } into $input");
-    error(q, Err.UPATTDUPL);
+    error(q, Err.UPATTDUPL_X);
 
     // replace with a + delete a + insert a
     q = transform("<x a='a'/>",
         "delete node $input/@a, replace node $input/@a with attribute a {'b'}," +
         "insert node attribute a { 'b' } into $input");
-    error(q, Err.UPATTDUPL);
+    error(q, Err.UPATTDUPL_X);
   }
 
   /**
@@ -515,7 +515,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void outOfScope() {
     error("let $d := copy $e := <a/> modify () return $e return $e",
-        Err.VARUNDEF);
+        Err.VARUNDEF_X);
   }
 
   /**
@@ -1168,11 +1168,11 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void modifyCheck() {
     error("copy $c:= <a>X</a> modify 'a' return $c", Err.UPMODIFY);
-    error("copy $c:= <a>X</a> modify(delete node $c/text(),'a') return $c", Err.UPALL);
+    error("copy $c:= <a>X</a> modify(delete node $c/text(),'a') return $c", Err.UPALL_X);
 
-    error("text { <a/> update (delete node <a/>,<b/>) }", Err.UPALL);
-    error("1[<a/> update (delete node <a/>,<b/>)]", Err.UPALL);
-    error("for $i in 1 order by (<a/> update (delete node <a/>,<b/>)) return $i", Err.UPALL);
+    error("text { <a/> update (delete node <a/>,<b/>) }", Err.UPALL_X);
+    error("1[<a/> update (delete node <a/>,<b/>)]", Err.UPALL_X);
+    error("for $i in 1 order by (<a/> update (delete node <a/>,<b/>)) return $i", Err.UPALL_X);
   }
 
   /**
@@ -1180,11 +1180,11 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void updatingFuncItems() {
-    error("db:output(?)", Err.SERFUNC);
-    error("db:output#1", Err.SERFUNC);
-    error("declare updating function local:a() { () }; local:a#0", Err.SERFUNC);
+    error("db:output(?)", Err.SERFUNC_X);
+    error("db:output#1", Err.SERFUNC_X);
+    error("declare updating function local:a() { () }; local:a#0", Err.SERFUNC_X);
     error("declare function local:a() { local:b#0 };"
-        + "declare updating function local:b() { db:output('1') }; local:a()", Err.SERFUNC);
+        + "declare updating function local:b() { db:output('1') }; local:a()", Err.SERFUNC_X);
     query("declare function local:not-used() { local:b#0 };"
         + "declare updating function local:b() { db:output('1') }; local:b()", "1");
 

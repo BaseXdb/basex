@@ -416,7 +416,7 @@ final class JsonParser extends InputParser {
    */
   private QueryIOException error(final String msg, final Object... ext) throws QueryIOException {
     final InputInfo info = new InputInfo(this);
-    final QueryException qe = BXJS_PARSE.get(info, info.line(), info.column(), Util.inf(msg, ext));
-    throw new QueryIOException(qe);
+    throw new QueryIOException(BXJS_PARSE_X_X_X.get(info, info.line(), info.column(),
+        Util.inf(msg, ext)));
   }
 }

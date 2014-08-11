@@ -54,7 +54,7 @@ public final class Range extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final long[] v = rng(qc);
+    final long[] v = range(qc);
     return v == null ? Empty.SEQ : RangeSeq.get(v[0], v[1] - v[0] + 1, true);
   }
 
@@ -70,12 +70,12 @@ public final class Range extends Arr {
    * @return value array
    * @throws QueryException query exception
    */
-  private long[] rng(final QueryContext qc) throws QueryException {
-    final Item it1 = exprs[0].item(qc, info);
+  private long[] range(final QueryContext qc) throws QueryException {
+    final Item it1 = exprs[0].atomItem(qc, info);
     if(it1 == null) return null;
-    final Item it2 = exprs[1].item(qc, info);
+    final Item it2 = exprs[1].atomItem(qc, info);
     if(it2 == null) return null;
-    return new long[] { checkItr(it1), checkItr(it2) };
+    return new long[] { toLong(it1), toLong(it2) };
   }
 
   @Override

@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNMath extends StandardFunc {
+public final class FNMath extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -31,12 +31,12 @@ public final class FNMath extends StandardFunc {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final double e = exprs.length == 2 ? checkDbl(exprs[1], qc) : 0;
+    final double e = exprs.length == 2 ? toDouble(exprs[1], qc) : 0;
     double d = 0;
     if(exprs.length > 0 && func != _MATH_CRC32) {
-      final Item it = exprs[0].item(qc, info);
+      final Item it = exprs[0].atomItem(qc, info);
       if(it == null) return null;
-      d = checkDbl(it);
+      d = toDouble(it);
     }
 
     switch(func) {
@@ -87,7 +87,7 @@ public final class FNMath extends StandardFunc {
    */
   private Hex crc32(final QueryContext qc) throws QueryException {
     final CRC32 crc = new CRC32();
-    crc.update(checkStr(exprs[0], qc));
+    crc.update(toToken(exprs[0], qc));
     final byte[] r = new byte[4];
     for(int i = r.length, c = (int) crc.getValue(); i-- > 0; c >>>= 8) r[i] = (byte) c;
     return new Hex(r);

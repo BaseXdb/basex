@@ -19,7 +19,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNId extends StandardFunc {
+public final class FNId extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -34,24 +34,18 @@ public final class FNId extends StandardFunc {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    // functions have 1 or 2 arguments...
-    final ANode node = checkNode(exprs.length == 2 ? exprs[1] : checkCtx(qc), qc);
-
     switch(func) {
-      case ID:              return id(qc.iter(exprs[0]), node);
-      case IDREF:           return idref(qc.iter(exprs[0]), node);
-      case ELEMENT_WITH_ID: return elid(qc.iter(exprs[0]), node);
+      case ID:              return id(exprs[0].atomIter(qc, info), toNode(arg(1, qc), qc));
+      case IDREF:           return idref(exprs[0].atomIter(qc, info), toNode(arg(1, qc), qc));
+      case ELEMENT_WITH_ID: return elid(exprs[0].atomIter(qc, info), toNode(arg(1, qc), qc));
       default:              return super.iter(qc);
     }
   }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // functions have 1 or 2 arguments...
-    final ANode node = checkNode(exprs.length == 2 ? exprs[1] : checkCtx(qc), qc);
-
     switch(func) {
-      case LANG:  return lang(lc(checkEStr(exprs[0], qc)), node);
+      case LANG:  return lang(lc(toToken(exprs[0], qc, true)), toNode(arg(1, qc), qc));
       default:    return super.item(qc, ii);
     }
   }
@@ -63,14 +57,8 @@ public final class FNId extends StandardFunc {
    * @return resulting node list
    * @throws QueryException query exception
    */
-  private Iter elid(final Iter it, final ANode node) throws QueryException {
+  private Iter elid(final AtomIter it, final ANode node) throws QueryException {
     return id(it, node);
-    /*
-    final NodeCache nc = id(it, node);
-    final NodeCache res = new NodeCache().random();
-    for(ANode n; (n = nc.next()) != null;) res.add(n.parent());
-    return res;
-    */
   }
 
   /**
@@ -80,7 +68,7 @@ public final class FNId extends StandardFunc {
    * @return resulting node list
    * @throws QueryException query exception
    */
-  private NodeSeqBuilder id(final Iter it, final ANode node) throws QueryException {
+  private NodeSeqBuilder id(final AtomIter it, final ANode node) throws QueryException {
     final NodeSeqBuilder nc = new NodeSeqBuilder().check();
     add(ids(it), nc, checkRoot(node), false);
     return nc;
@@ -93,7 +81,7 @@ public final class FNId extends StandardFunc {
    * @return resulting node list
    * @throws QueryException query exception
    */
-  private Iter idref(final Iter it, final ANode node) throws QueryException {
+  private Iter idref(final AtomIter it, final ANode node) throws QueryException {
     final NodeSeqBuilder nb = new NodeSeqBuilder().check();
     add(ids(it), nb, checkRoot(node), true);
     return nb;
@@ -110,7 +98,7 @@ public final class FNId extends StandardFunc {
       final AxisIter atts = n.attributes();
       for(ANode at; (at = atts.next()) != null;) {
         if(eq(at.qname().string(), LANG)) {
-          final byte[] ln = lc(norm(at.string()));
+          final byte[] ln = lc(normalize(at.string()));
           return Bln.get(startsWith(ln, lang) &&
               (lang.length == ln.length || ln[lang.length] == '-'));
         }
@@ -125,10 +113,10 @@ public final class FNId extends StandardFunc {
    * @return ids
    * @throws QueryException query exception
    */
-  private byte[][] ids(final Iter iter) throws QueryException {
+  private byte[][] ids(final AtomIter iter) throws QueryException {
     final TokenList tl = new TokenList();
     for(Item id; (id = iter.next()) != null;) {
-      for(final byte[] i : split(norm(checkEStr(id)), ' ')) tl.add(i);
+      for(final byte[] i : split(normalize(toToken(id)), ' ')) tl.add(i);
     }
     return tl.finish();
   }

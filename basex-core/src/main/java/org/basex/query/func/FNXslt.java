@@ -28,7 +28,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNXslt extends StandardFunc {
+public final class FNXslt extends BuiltinFunc {
   /** Element: parameters. */
   private static final QNm Q_PARAMETERS = QNm.get("parameters", XSLTURI);
 
@@ -104,7 +104,7 @@ public final class FNXslt extends StandardFunc {
     checkCreate(qc);
     final IO in = read(exprs[0], qc);
     final IO xsl = read(exprs[1], qc);
-    final Options opts = checkOptions(2, Q_PARAMETERS, new Options(), qc);
+    final Options opts = toOptions(2, Q_PARAMETERS, new Options(), qc);
 
     final PrintStream tmp = System.err;
     final ArrayOutput ao = new ArrayOutput();
@@ -114,10 +114,10 @@ public final class FNXslt extends StandardFunc {
       return node ? new DBNode(new IOContent(result)) : Str.get(result);
     } catch(final IOException ex) {
       System.setErr(tmp);
-      throw IOERR.get(info, ex);
+      throw IOERR_X.get(info, ex);
     } catch(final TransformerException ex) {
       System.setErr(tmp);
-      throw BXSL_ERROR.get(info, trim(utf8(ao.finish(), Prop.ENCODING)));
+      throw BXSL_ERROR_X.get(info, trim(utf8(ao.finish(), Prop.ENCODING)));
     } finally {
       System.setErr(tmp);
     }
@@ -131,7 +131,7 @@ public final class FNXslt extends StandardFunc {
    * @throws QueryException query exception
    */
   private IO read(final Expr ex, final QueryContext qc) throws QueryException {
-    final Item it = checkItem(ex, qc);
+    final Item it = toItem(ex, qc);
     if(it instanceof ANode) {
       try {
         final IO io = new IOContent(it.serialize(SerializerOptions.get(false)).finish());
@@ -142,7 +142,7 @@ public final class FNXslt extends StandardFunc {
       }
     }
     if(it.type.isStringOrUntyped()) return checkPath(it, qc);
-    throw STRNODTYPE.get(info, it.type, it);
+    throw STRNOD_X_X.get(info, it.type, it);
   }
 
   /**

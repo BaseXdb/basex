@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNNode extends StandardFunc {
+public final class FNNode extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -35,9 +35,7 @@ public final class FNNode extends StandardFunc {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // functions have 0 or 1 arguments...
-    final Item it = (exprs.length == 0 ? checkCtx(qc) : exprs[0]).item(qc, info);
-    final ANode node = it == null ? null : checkNode(it);
+    final ANode node = toNode(arg(0, qc).item(qc, info));
 
     switch(func) {
       case NODE_NAME:
@@ -60,7 +58,7 @@ public final class FNNode extends StandardFunc {
         do {
           if(n == null) return sc.baseURI().resolve(base, info);
           final Uri bu = Uri.uri(n.baseURI(), false);
-          if(!bu.isValid()) throw INVURI.get(ii, n.baseURI());
+          if(!bu.isValid()) throw INVURI_X.get(ii, n.baseURI());
           base = bu.resolve(base, info);
           if(n.type == NodeType.DOC && n instanceof DBNode) break;
           n = n.parent();

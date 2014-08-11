@@ -334,11 +334,11 @@ public final class Token {
   }
 
   /**
-   * Returns the token length.
+   * Returns the number of codepoints in the token.
    * @param token token
-   * @return length
+   * @return number of codepoints
    */
-  public static int len(final byte[] token) {
+  public static int length(final byte[] token) {
     int l = 0;
     for(int t = 0; t < token.length; t += cl(token, t)) ++l;
     return l;
@@ -1137,7 +1137,7 @@ public final class Token {
    * @param token token
    * @return normalized token
    */
-  public static byte[] norm(final byte[] token) {
+  public static byte[] normalize(final byte[] token) {
     final int l = token.length;
     final byte[] tmp = new byte[l];
     int c = 0;

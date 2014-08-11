@@ -89,7 +89,7 @@ public final class Constr {
       return true;
     }
 
-    if(it instanceof FItem) throw CONSFUNC.get(info, it);
+    if(it instanceof FItem) throw CONSFUNC_X.get(info, it);
 
     if(it instanceof ANode) {
       // type: nodes

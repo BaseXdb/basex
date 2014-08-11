@@ -106,7 +106,7 @@ public final class CmpN extends Cmp {
     if(it1 == null) return null;
     final Item it2 = exprs[1].item(qc, info);
     if(it2 == null) return null;
-    return Bln.get(op.eval(checkNode(it1), checkNode(it2)));
+    return Bln.get(op.eval(toNode(it1), toNode(it2)));
   }
 
   @Override

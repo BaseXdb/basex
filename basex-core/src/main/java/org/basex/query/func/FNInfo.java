@@ -19,7 +19,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNInfo extends StandardFunc {
+public final class FNInfo extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -71,16 +71,11 @@ public final class FNInfo extends StandardFunc {
     final int al = exprs.length;
     if(al == 0) throw FUNERR1.get(info);
 
-    QNm name = FUNERR1.qname();
-    String msg = FUNERR1.desc;
+    QNm name = toQNm(exprs[0], qc, sc, al != 1);
+    if(name == null) name = FUNERR1.qname();
 
-    final Item it = exprs[0].item(qc, info);
-    if(it == null) {
-      if(al == 1) throw EMPTYFOUND.get(info);
-    } else {
-      name = checkQNm(it, qc, sc);
-    }
-    if(al > 1) msg = Token.string(checkEStr(exprs[1], qc));
+    String msg = FUNERR1.desc;
+    if(al > 1) msg = Token.string(toToken(exprs[1], qc, true));
     final Value val = al > 2 ? qc.value(exprs[2]) : null;
     throw new QueryException(info, name, msg).value(val);
   }
@@ -94,7 +89,7 @@ public final class FNInfo extends StandardFunc {
   private Iter trace(final QueryContext qc) throws QueryException {
     return new Iter() {
       final Iter ir = exprs[0].iter(qc);
-      final byte[] label = checkStr(exprs[1], qc);
+      final byte[] label = toToken(exprs[1], qc);
       boolean empty = true;
       @Override
       public Item next() throws QueryException {
@@ -127,7 +122,7 @@ public final class FNInfo extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str envVar(final QueryContext qc) throws QueryException {
-    final String e = System.getenv(Token.string(checkStr(exprs[0], qc)));
+    final String e = System.getenv(Token.string(toToken(exprs[0], qc)));
     return e != null ? Str.get(e) : null;
   }
 

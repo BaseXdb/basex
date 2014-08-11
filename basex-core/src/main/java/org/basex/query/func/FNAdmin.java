@@ -26,7 +26,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNAdmin extends StandardFunc {
+public final class FNAdmin extends BuiltinFunc {
   /** QName: user. */
   private static final String USER = "user";
   /** QName: user. */
@@ -91,9 +91,10 @@ public final class FNAdmin extends StandardFunc {
       }
     } else {
       // return content of single log file
-      final boolean merge = exprs.length > 1 && checkBln(exprs[1], qc);
-      final String name = Token.string(checkStr(exprs[0], qc)) + IO.LOGSUFFIX;
+      final String name = Token.string(toToken(exprs[0], qc)) + IO.LOGSUFFIX;
+      final boolean merge = exprs.length > 1 && toBoolean(exprs[1], qc);
       final IOFile file = new IOFile(qc.context.log.dir(), name);
+      if(!file.exists()) throw WHICHRES_X.get(info, file);
       final ArrayList<LogEntry> logs = logs(file);
       for(int s = 0; s < logs.size(); s++) {
         final LogEntry l1 = logs.get(s);
@@ -163,7 +164,7 @@ public final class FNAdmin extends StandardFunc {
       }
       return logs;
     } catch(final IOException ex) {
-      throw IOERR.get(info, ex);
+      throw IOERR_X.get(info, ex);
     }
   }
 

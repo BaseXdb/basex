@@ -60,7 +60,10 @@ public final class DynFuncCall extends FuncCall {
     final Type t = f.seqType().type;
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
-      if(ft.argTypes != null && ft.argTypes.length != ar) throw INVARITY.get(info, f, ar);
+      if(ft.argTypes != null && ft.argTypes.length != ar) {
+        final Expr e = f instanceof FuncItem ? ((FuncItem) f).expr : f;
+        throw INVARITY_X_X_X_X.get(info, e, ar, ar == 1 ? "" : "s", ft.argTypes.length);
+      }
       if(ft.retType != null) seqType = ft.retType;
     }
 
@@ -74,6 +77,8 @@ public final class DynFuncCall extends FuncCall {
         final Expr inl = ((XQFunctionExpr) f).inlineExpr(args, qc, scp, info);
         if(inl != null) return inl;
       }
+    } else if(f instanceof Item && !(f instanceof FItem)) {
+      throw INVFUNCITEM_X.get(info, ((Item) f).type);
     }
     return this;
   }
@@ -149,14 +154,17 @@ public final class DynFuncCall extends FuncCall {
   @Override
   FItem evalFunc(final QueryContext qc) throws QueryException {
     final int ar = exprs.length - 1;
-    final Item it = checkItem(exprs[ar], qc);
-    if(!(it instanceof FItem)) throw INVFUNCITEM.get(info, it.type);
-    final FItem fit = (FItem) it;
-    if(fit.arity() != ar) throw INVARITY.get(info, fit, ar);
-    if(!sc.mixUpdates && updating != fit.annotations().contains(Ann.Q_UPDATING))
+    final Item it = toItem(exprs[ar], qc);
+    if(!(it instanceof FItem)) throw INVFUNCITEM_X.get(info, it.type);
+    final FItem f = (FItem) it;
+    if(f.arity() != ar) {
+      final Expr e = f instanceof FuncItem ? ((FuncItem) f).expr : f;
+      throw INVARITY_X_X_X_X.get(info, e, ar, ar == 1 ? "" : "s", f.arity());
+    }
+    if(!sc.mixUpdates && updating != f.annotations().contains(Ann.Q_UPDATING))
       throw (updating ? UPFUNCNOTUP : UPFUNCUP).get(info);
 
-    return fit;
+    return f;
   }
 
   @Override

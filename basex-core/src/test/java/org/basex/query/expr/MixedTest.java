@@ -33,7 +33,7 @@ public final class MixedTest extends AdvancedQueryTest {
   public void duplImport() {
     error("import module namespace a='world' at '" + XQMFILE + "';" +
       "import module namespace a='world' at '" + XQMFILE + "'; 1",
-      Err.DUPLMODULE);
+      Err.DUPLMODULE_X);
   }
 
   /** Catches duplicate module import with different module uri. */
@@ -41,7 +41,7 @@ public final class MixedTest extends AdvancedQueryTest {
   public void duplImportDiffUri() {
     error("import module namespace a='world' at '" + XQMFILE + "';" +
       "import module namespace a='galaxy' at '" + XQMFILE + "'; 1",
-      Err.DUPLNSDECL);
+      Err.DUPLNSDECL_X);
   }
 
   /** Catches duplicate module import. */
@@ -49,7 +49,7 @@ public final class MixedTest extends AdvancedQueryTest {
   public void duplLocation() {
     error("import module namespace a='world' at '" + XQMFILE + "';" +
       "import module namespace b='galaxy' at '" + XQMFILE + "'; 1",
-      Err.WRONGMODULE);
+      Err.WRONGMODULE_X_X);
   }
 
   /** Checks static context scoping in variables. */

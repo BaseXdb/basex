@@ -58,12 +58,12 @@ public final class Insert extends Update {
     final ANodeList cList = c.children;
     final ANodeList aList = c.atts;
     if(c.errAtt) throw UPNOATTRPER.get(info);
-    if(c.duplAtt != null) throw UPATTDUPL.get(info, new QNm(c.duplAtt));
+    if(c.duplAtt != null) throw UPATTDUPL_X.get(info, new QNm(c.duplAtt));
 
     // check target constraints
     final Iter t = qc.iter(exprs[0]);
     final Item i = t.next();
-    if(i == null) throw UPSEQEMP.get(info, Util.className(this));
+    if(i == null) throw UPSEQEMP_X.get(info, Util.className(this));
     if(!(i instanceof ANode) || t.next() != null)
       throw (before || after ? UPTRGTYP2 : UPTRGTYP).get(info);
 

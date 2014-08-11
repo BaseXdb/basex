@@ -13,7 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Rositsa Shadura
  */
-public final class FNHttp extends StandardFunc {
+public final class FNHttp extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -31,20 +31,17 @@ public final class FNHttp extends StandardFunc {
     checkCreate(qc);
 
     // get request node
-    final Item req = exprs[0].item(qc, info);
-    final ANode request = req == null ? null : checkNode(req);
+    final ANode request = toNode(exprs[0].item(qc, info));
 
     // get HTTP URI
-    final byte[] href = exprs.length >= 2 ? checkEStr(exprs[1].item(qc, info)) : null;
-
+    final byte[] href = exprs.length >= 2 ? toToken(exprs[1], qc, true) : null;
     // get parameter $bodies
     ValueBuilder cache = null;
     if(exprs.length == 3) {
       final Iter bodies = exprs[2].iter(qc);
       cache = new ValueBuilder();
-      for(Item i; (i = bodies.next()) != null;) cache.add(i);
+      for(Item body; (body = bodies.next()) != null;) cache.add(body);
     }
-
     // send HTTP request
     return new HTTPClient(info, qc.context.options).sendRequest(href, request, cache);
   }

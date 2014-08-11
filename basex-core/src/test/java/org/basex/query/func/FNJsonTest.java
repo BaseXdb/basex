@@ -105,7 +105,7 @@ public final class FNJsonTest extends AdvancedQueryTest {
         "\\t\\u000A");
     query("string-to-codepoints(json:parse('\"\\t\\u000A\"'," +
         "  map {'format':'map','unescape':true(),'spec':'liberal'}))", "9 10");
-    error("json:parse('42', map {'spec':'garbage'})", Err.INVALIDOPT);
+    error("json:parse('42', map {'spec':'garbage'})", Err.INVALIDOPT_X);
   }
 
   /**
@@ -174,6 +174,6 @@ public final class FNJsonTest extends AdvancedQueryTest {
   private static void error(final String input, final String options, final Function function) {
     final String query = options.isEmpty() ? function.args(input) :
       function.args(input, " map {" + options + '}');
-    error(query, Err.INVALIDOPT, Err.BXJS_PARSE, Err.BXJS_SERIAL);
+    error(query, Err.INVALIDOPT_X, Err.BXJS_PARSE_X_X_X, Err.BXJS_SERIAL_X);
   }
 }

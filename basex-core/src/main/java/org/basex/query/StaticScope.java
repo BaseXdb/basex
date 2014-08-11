@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 
 import java.io.*;
 
-import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.expr.*;

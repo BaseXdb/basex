@@ -31,7 +31,7 @@ public enum Calc {
         if(t == ITR) {
           final long l1 = it1.itr(ii), l2 = it2.itr(ii);
           if(l2 > 0 ? l1 > Long.MAX_VALUE - l2 : l1 < Long.MIN_VALUE - l2)
-            throw RANGE.get(ii, l1 + " + " + l2);
+            throw RANGE_X.get(ii, l1 + " + " + l2);
           return Int.get(l1 + l2);
         }
         if(t == DBL) return Dbl.get(it1.dbl(ii) + it2.dbl(ii));
@@ -69,7 +69,7 @@ public enum Calc {
         if(t == ITR) {
           final long l1 = it1.itr(ii), l2 = it2.itr(ii);
           if(l2 < 0 ? l1 > Long.MAX_VALUE + l2 : l1 < Long.MIN_VALUE + l2)
-            throw RANGE.get(ii, l1 + " - " + l2);
+            throw RANGE_X.get(ii, l1 + " - " + l2);
           return Int.get(l1 - l2);
         }
         if(t == DBL) return Dbl.get(it1.dbl(ii) - it2.dbl(ii));
@@ -123,7 +123,7 @@ public enum Calc {
           if(l2 > 0 ? l1 > Long.MAX_VALUE / l2 || l1 < Long.MIN_VALUE / l2
                     : l2 < -1 ? l1 > Long.MIN_VALUE / l2 || l1 < Long.MAX_VALUE / l2
                               : l2 == -1 && l1 == Long.MIN_VALUE)
-            throw RANGE.get(ii, l1 + " * " + l2);
+            throw RANGE_X.get(ii, l1 + " * " + l2);
           return Int.get(l1 * l2);
         }
         if(t == DBL) return Dbl.get(it1.dbl(ii) * it2.dbl(ii));
@@ -184,15 +184,15 @@ public enum Calc {
         final double d1 = it1.dbl(ii), d2 = ti2.dbl(ii);
         if(d2 == 0) throw zeroError(ii, it1);
         final double d = d1 / d2;
-        if(Double.isNaN(d) || Double.isInfinite(d)) throw DIVFLOW.get(ii, d1 + " idiv " + d2);
-        if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw RANGE.get(ii, d1 + " idiv " + d2);
+        if(Double.isNaN(d) || Double.isInfinite(d)) throw DIVFLOW_X.get(ii, d1 + " idiv " + d2);
+        if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw RANGE_X.get(ii, d1 + " idiv " + d2);
         return Int.get((long) d);
       }
 
       if(t == ITR) {
         final long b1 = it1.itr(ii), b2 = ti2.itr(ii);
         if(b2 == 0) throw zeroError(ii, it1);
-        if(b1 == Integer.MIN_VALUE && b2 == -1) throw RANGE.get(ii, b1 + " idiv " + b2);
+        if(b1 == Integer.MIN_VALUE && b2 == -1) throw RANGE_X.get(ii, b1 + " idiv " + b2);
         return Int.get(b1 / b2);
       }
 
@@ -200,7 +200,7 @@ public enum Calc {
       if(b2.signum() == 0) throw zeroError(ii, it1);
       final BigDecimal res = b1.divideToIntegralValue(b2);
       if(!(MIN_LONG.compareTo(res) <= 0 && res.compareTo(MAX_LONG) <= 0))
-        throw RANGE.get(ii, b1 + " idiv " + b2);
+        throw RANGE_X.get(ii, b1 + " idiv " + b2);
       return Int.get(res.longValueExact());
     }
   },
@@ -273,7 +273,7 @@ public enum Calc {
    * @throws QueryException query exception
    */
   public static QueryException zeroError(final InputInfo ii, final Item it) throws QueryException {
-    return DIVZERO.get(ii, chop(it, ii));
+    return DIVZERO_X.get(ii, chop(it, ii));
   }
 
   /**
@@ -284,7 +284,7 @@ public enum Calc {
    * @return query exception
    */
   final QueryException typeError(final InputInfo ii, final Type t1, final Type t2) {
-    return CALCTYPE.get(ii, info(), t1, t2);
+    return CALCTYPE_X_X_X.get(ii, info(), t1, t2);
   }
 
   /**
@@ -296,8 +296,8 @@ public enum Calc {
    */
   static final Dur checkDur(final InputInfo ii, final Item it) throws QueryException {
     final Type ip = it.type;
-    if(!(it instanceof Dur)) throw NODUR.get(ii, ip, it);
-    if(ip == DUR) throw NOSUBDUR.get(ii, it);
+    if(!(it instanceof Dur)) throw NODUR_X_X.get(ii, ip, it);
+    if(ip == DUR) throw NOSUBDUR_X.get(ii, it);
     return (Dur) it;
   }
 

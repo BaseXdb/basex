@@ -44,13 +44,13 @@ public final class ArrayTest extends AdvancedQueryTest {
     array("[[1]](1)", "[1]");
     query("[[[1]]](1)(1)(1)", "1");
 
-    error("[](0)", Err.ARRAYPOS);
-    error("[](1)", Err.ARRAYPOS);
-    error("[1](-5000000000)", Err.ARRAYPOS);
-    error("[1](-1)", Err.ARRAYPOS);
-    error("[1](0)", Err.ARRAYPOS);
-    error("[1](2)", Err.ARRAYPOS);
-    error("[1](5000000000)", Err.ARRAYPOS);
+    error("[](0)", Err.ARRAYPOS_X);
+    error("[](1)", Err.ARRAYPOS_X);
+    error("[1](-5000000000)", Err.ARRAYPOS_X);
+    error("[1](-1)", Err.ARRAYPOS_X);
+    error("[1](0)", Err.ARRAYPOS_X);
+    error("[1](2)", Err.ARRAYPOS_X);
+    error("[1](5000000000)", Err.ARRAYPOS_X);
   }
 
   /** Constructor. */
@@ -72,8 +72,8 @@ public final class ArrayTest extends AdvancedQueryTest {
     query("[[8]] div 5", "1.6");
     query("[[9]] mod [[5]]", "4");
 
-    error("[1,2] + 3", Err.SEQFOUND);
-    error("1 + [2,3]", Err.SEQFOUND);
+    error("[1,2] + 3", Err.SEQFOUND_X);
+    error("1 + [2,3]", Err.SEQFOUND_X);
   }
 
   /** Value comparison. */
@@ -89,8 +89,8 @@ public final class ArrayTest extends AdvancedQueryTest {
     query("[[9]] le 5", "false");
     query("[[10]] ge 6", "true");
 
-    error("[1,2] eq 3", Err.SEQFOUND);
-    error("1 eq [2,3]", Err.SEQFOUND);
+    error("[1,2] eq 3", Err.SEQFOUND_X);
+    error("1 eq [2,3]", Err.SEQFOUND_X);
   }
 
   /** General comparison. */
@@ -105,16 +105,21 @@ public final class ArrayTest extends AdvancedQueryTest {
     query("[8,9,10] != [6,7]", "true");
   }
 
-  /** General comparison. */
+  /** Element constructor. */
   @Test public void elementConstructor() {
     query("element a { [] }", "<a/>");
     query("element a { [()] }", "<a/>");
     query("element a { [1] }", "<a>1</a>");
     query("element a { [ <b>c</b> ] }", "<a>c</a>");
     query("element a { [ <b>c</b>, <b>d</b> ] }", "<a>c d</a>");
+
+    query("element { ['a'] } { }", "<a/>");
+
+    error("element { ['a', 'b'] } { }", Err.SEQFOUND_X);
+    error("element { [] } { }", Err.EMPTYFOUND_X);
   }
 
-  /** General comparison. */
+  /** Attribute constructor. */
   @Test public void attributeConstructor() {
     query("<e a='{ [] }'/>/@a/string()", "");
     query("<e a='{ [()] }'/>/@a/string()", "");
@@ -126,14 +131,84 @@ public final class ArrayTest extends AdvancedQueryTest {
     query("attribute a { [()] }/string()", "");
     query("attribute a { [1] }/string()", "1");
     query("attribute a { [1, 2] }/string()", "1 2");
+
+    query("attribute { ['a'] } { }/name()", "a");
+
+    error("attribute { ['a', 'b'] } { }", Err.SEQFOUND_X);
+    error("attribute { [] } { }", Err.EMPTYFOUND_X);
   }
 
-  /** General comparison. */
+  /** Attribute constructor. */
+  @Test public void namespaceConstructor() {
+    query("namespace { ['a'] } { 'u' }/name()", "a");
+    query("namespace a { ['b'] }/string()", "b");
+    query("namespace a { ['b', 'c'] }/string()", "b c");
+
+    error("namespace { ['a', 'b'] } { 'u' }", Err.SEQFOUND_X);
+  }
+
+  /** Text constructor. */
   @Test public void textConstructor() {
     query("<e>{ [] }</e>/string()", "");
     query("<e>{ [()] }</e>/string()", "");
     query("<e>{ [1] }</e>/string()", "1");
     query("<e>{ [1, 2] }</e>/string()", "1 2");
+  }
+
+  /** Comment constructor. */
+  @Test public void commentConstructor() {
+    query("comment { [] }/string()", "");
+    query("comment { ['a'] }/string()", "a");
+    query("comment { [('a', <b>c</b>)] }/string()", "a c");
+  }
+
+  /** PI constructor. */
+  @Test public void piConstructor() {
+    query("processing-instruction { ['a'] } { ['b'] }", "<?a b?>");
+
+    error("processing-instruction { [] } { }", Err.EMPTYFOUND_X);
+    error("processing-instruction { ['a', 'b'] } { }", Err.SEQFOUND_X);
+  }
+
+  /** Group by clause. */
+  @Test public void groupBy() {
+    query("for $a in ('A','B') group by $b := ['a'] return $a", "A B");
+    query("for $a in ('A','B') group by $b := [] return $a", "A B");
+
+    error("for $a in ('A','B') group by $b := ['a','b'] return $a", Err.SEQFOUND_X);
+  }
+
+  /** Order by clause. */
+  @Test public void orderBy() {
+    query("for $a in ('A','B') order by ['a'] return $a", "A B");
+    query("for $a in ('A','B') order by [] return $a", "A B");
+
+    error("for $a in ('A','B') order by ['a','b'] return $a", Err.SEQFOUND_X);
+  }
+
+  /** Switch expression. */
+  @Test public void swtch() {
+    query("switch([]) case 'a' return 'a' default return 'b'", "b");
+    query("switch(['a']) case 'a' return 'a' default return 'b'", "a");
+    query("for $a in ('a',['a']) return switch($a) case 'a' return 'a' default return 'b'", "a a");
+
+    error("switch(['a', 'b']) case 'a' return 'a' default return 'b'", Err.SEQFOUND_X);
+  }
+
+  /** Cast expression. */
+  @Test public void cast() {
+    query("[] cast as xs:integer?", "");
+    query("xs:integer([1])", "1");
+
+    error("[] cast as xs:integer", Err.INVCAST_X_X_X);
+    error("[1,2] cast as xs:integer", Err.INVCAST_X_X_X);
+  }
+
+  /** Functions. */
+  @Test public void functions() {
+    error("string([1])", Err.FISTRING_X);
+    query("number([1])", "1");
+    query("concat('a',['b'],[])", "ab");
   }
 
   /**

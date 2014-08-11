@@ -26,7 +26,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNXQuery extends StandardFunc {
+public final class FNXQuery extends BuiltinFunc {
   /** Module prefix. */
   private static final String PREFIX = "xquery";
   /** QName. */
@@ -89,7 +89,7 @@ public final class FNXQuery extends StandardFunc {
    * @throws QueryException query exception
    */
   private ValueBuilder eval(final QueryContext qc, final boolean updating) throws QueryException {
-    return eval(qc, checkStr(exprs[0], qc), null, updating);
+    return eval(qc, toToken(exprs[0], qc), null, updating);
   }
 
   /**
@@ -104,14 +104,14 @@ public final class FNXQuery extends StandardFunc {
   private ValueBuilder eval(final QueryContext qc, final byte[] qu, final String path,
       final boolean updating) throws QueryException {
 
-    // bind variables and context item
-    final HashMap<String, Value> bindings = bindings(1, qc);
+    // bind variables and context value
+    final HashMap<String, Value> bindings = toBindings(1, qc);
     final QueryContext qctx = qc.proc(new QueryContext(qc));
 
     final Timer to = new Timer(true);
     final Perm tmp = qc.context.user.perm;
     if(exprs.length > 2) {
-      final Options opts = checkOptions(2, Q_OPTIONS, new XQueryOptions(), qc);
+      final Options opts = toOptions(2, Q_OPTIONS, new XQueryOptions(), qc);
       qc.context.user.perm = Perm.get(opts.get(XQueryOptions.PERMISSION));
       // initial memory consumption: perform garbage collection and calculate usage
       Performance.gc(2);
@@ -163,7 +163,7 @@ public final class FNXQuery extends StandardFunc {
     } catch(final ProcException ex) {
       throw BXXQ_STOPPED.get(info);
     } catch(final QueryException ex) {
-      throw ex.err() == BASX_PERM ? BXXQ_PERM.get(info, ex.getLocalizedMessage()) : ex;
+      throw ex.err() == BASX_PERM_X ? BXXQ_PERM_X.get(info, ex.getLocalizedMessage()) : ex;
     } finally {
       qc.context.user.perm = tmp;
       qc.proc(null);
@@ -184,7 +184,7 @@ public final class FNXQuery extends StandardFunc {
     try {
       return eval(qc, io.read(), io.path(), false);
     } catch(final IOException ex) {
-      throw IOERR.get(info, ex);
+      throw IOERR_X.get(info, ex);
     }
   }
 

@@ -71,13 +71,13 @@ public final class Array extends FItem {
       throws QueryException {
 
     final Item it = args[0].item(qc, ii);
-    if(it == null) throw EMPTYFOUND2.get(ii, AtomType.ITR);
+    if(it == null) throw EMPTYFOUND_X.get(ii, AtomType.ITR);
     if(!it.type.instanceOf(AtomType.ITR) && !it.type.isUntyped())
       throw castError(ii, it, AtomType.ITR);
 
     final long i = it.itr(ii);
     if(i > 0 && i <= size) return get((int) i - 1);
-    throw ARRAYPOS.get(ii, i);
+    throw ARRAYPOS_X.get(ii, i);
   }
 
   @Override
@@ -103,7 +103,7 @@ public final class Array extends FItem {
 
   @Override
   public QNm argName(final int pos) {
-    return new QNm("index", "");
+    return new QNm("pos", "");
   }
 
   @Override
@@ -174,13 +174,13 @@ public final class Array extends FItem {
   /**
    * Atomizes the values of the array.
    * @param ii input info
-   * @param single only allow single item
+   * @param single only allow single items as result
    * @return result
    * @throws QueryException query exception
    */
   private Value atm(final InputInfo ii, final boolean single) throws QueryException {
     final long s = atomSize();
-    if(single && s > 1) throw SEQFOUND.get(ii, get(0));
+    if(single && s > 1) throw SEQFOUND_X.get(ii, this);
     if(size == 1) return get(0).atomValue(ii);
     final ValueBuilder vb = new ValueBuilder((int) s);
     for(int a = 0; a < size; a++) vb.add(get(a).atomValue(ii));
@@ -261,6 +261,11 @@ public final class Array extends FItem {
       return true;
     }
     return item instanceof FItem && !(item instanceof Map) && super.deep(item, ii, coll);
+  }
+
+  @Override
+  public String description() {
+    return BR1 + DOTS + BR2;
   }
 
   @Override

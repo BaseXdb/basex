@@ -32,7 +32,7 @@ public final class StaticContext {
   public byte[] elemNS;
   /** Default function namespace. */
   public byte[] funcNS = FNURI;
-  /** Context item static type. */
+  /** Static type of context value. */
   public SeqType contextType;
 
   /** Construction mode. */

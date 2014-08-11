@@ -519,7 +519,7 @@ public abstract class SessionTest extends SandboxTest {
     assertEqual("XML", query.execute());
   }
 
-  /** Runs a query with a bound context item.
+  /** Runs a query with a bound context value.
    * @throws IOException I/O exception */
   @Test
   public void queryContext() throws IOException {
@@ -529,7 +529,7 @@ public abstract class SessionTest extends SandboxTest {
     query.close();
   }
 
-  /** Runs a query with a bound context item.
+  /** Runs a query with a bound context value.
    * @throws IOException I/O exception */
   @Test
   public void queryContextInt() throws IOException {
@@ -539,7 +539,7 @@ public abstract class SessionTest extends SandboxTest {
     query.close();
   }
 
-  /** Runs a query with a bound context item.
+  /** Runs a query with a bound context value.
    * @throws IOException I/O exception */
   @Test
   public void queryContextVar() throws IOException {

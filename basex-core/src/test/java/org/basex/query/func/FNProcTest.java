@@ -17,7 +17,7 @@ public final class FNProcTest extends AdvancedQueryTest {
   @Test
   public void system() {
     query(_PROC_SYSTEM.args("java", "-version"), "");
-    error(_PROC_SYSTEM.args("java", "-version", "xx"), Err.BXPR_ENC);
+    error(_PROC_SYSTEM.args("java", "-version", "xx"), Err.BXPR_ENC_X);
   }
 
   /** Test method. */

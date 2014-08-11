@@ -91,8 +91,8 @@ public final class Unit {
         if(!xq) continue;
 
         // Unit function:
-        if(sf.ann.contains(Ann.Q_PRIVATE)) throw UNIT_PRIVATE.get(null, sf.name.local());
-        if(sf.args.length > 0) throw UNIT_ARGS.get(null, sf.name.local());
+        if(sf.ann.contains(Ann.Q_PRIVATE)) throw UNIT_PRIVATE_X.get(null, sf.name.local());
+        if(sf.args.length > 0) throw UNIT_ARGS_X.get(null, sf.name.local());
 
         if(indexOf(sf, BEFORE) != -1) before.add(sf);
         if(indexOf(sf, AFTER) != -1) after.add(sf);
@@ -115,7 +115,7 @@ public final class Unit {
           if(vs == 2 && eq(EXPECTED, values.itemAt(0).string(null))) {
             code = values.itemAt(1).string(null);
           } else {
-            throw UNIT_ANN.get(null, '%', sf.ann.names[0]);
+            throw UNIT_ANN_X_X.get(null, '%', sf.ann.names[0]);
           }
         }
 
@@ -263,7 +263,7 @@ public final class Unit {
       qctx.compile();
 
       final Iter iter = qctx.iter();
-      while(iter.next() != null) throw UNIT_EMPTY.get(null, func.name.local());
+      while(iter.next() != null) throw UNIT_EMPTY_X.get(null, func.name.local());
 
     } finally {
       proc.proc(null);
@@ -300,7 +300,7 @@ public final class Unit {
     for(int a = 0; a < as; a++) {
       final QNm nm = ann.names[a];
       if(eq(nm.uri(), QueryText.UNITURI) && eq(nm.local(), name)) {
-        if(pos != -1) throw UNIT_TWICE.get(null, '%', nm.local());
+        if(pos != -1) throw UNIT_TWICE_X_X.get(null, '%', nm.local());
         pos = a;
       }
     }

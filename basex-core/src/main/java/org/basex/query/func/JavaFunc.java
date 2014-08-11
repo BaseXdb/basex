@@ -48,12 +48,12 @@ public final class JavaFunc extends JavaMapping {
     } catch(final InvocationTargetException ex) {
       final Throwable cause = ex.getCause();
       throw cause instanceof QueryException ? ((QueryException) cause).info(info) :
-        JAVAERR.get(info, cause);
+        JAVAERROR_X.get(info, cause);
     } catch(final QueryException ex) {
       throw ex;
     } catch(final Throwable ex) {
       Util.debug(ex);
-      throw JAVAFUN.get(info, name(), foundArgs(args));
+      throw JAVACALL_X_X.get(info, name(), foundArgs(args));
     }
   }
 
@@ -73,7 +73,7 @@ public final class JavaFunc extends JavaMapping {
       final Object[] arg = args(con.getParameterTypes(), null, ar, true);
       if(arg != null) return con.newInstance(arg);
     }
-    throw JAVACON.get(info, name(), foundArgs(ar));
+    throw JAVACONSTR_X_X.get(info, name(), foundArgs(ar));
   }
 
   /**
@@ -110,7 +110,7 @@ public final class JavaFunc extends JavaMapping {
         return meth.invoke(inst, arg);
       }
     }
-    throw JAVAMTH.get(info, name(), foundArgs(ar));
+    throw JAVAMETHOD_X_X.get(info, name(), foundArgs(ar));
   }
 
   /**

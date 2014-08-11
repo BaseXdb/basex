@@ -83,7 +83,7 @@ public final class SubSeq extends Seq {
   public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item fst = itemAt(0);
     if(fst instanceof ANode) return fst;
-    throw EBV.get(ii, this);
+    throw EBV_X.get(ii, this);
   }
 
   @Override

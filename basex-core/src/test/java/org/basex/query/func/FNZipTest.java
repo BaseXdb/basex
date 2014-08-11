@@ -54,8 +54,8 @@ public final class FNZipTest extends AdvancedQueryTest {
     query(_ZIP_BINARY_ENTRY.args(ZIP, ENTRY1));
     contains("xs:hexBinary(" + _ZIP_BINARY_ENTRY.args(ZIP, ENTRY1) + ')', "610A61626F");
 
-    error(_ZIP_BINARY_ENTRY.args("abc", "xyz"), Err.ZIP_NOTFOUND);
-    error(_ZIP_BINARY_ENTRY.args(ZIP, ""), Err.ZIP_NOTFOUND);
+    error(_ZIP_BINARY_ENTRY.args("abc", "xyz"), Err.ZIP_NOTFOUND_X);
+    error(_ZIP_BINARY_ENTRY.args(ZIP, ""), Err.ZIP_NOTFOUND_X);
   }
 
   /** Test method. */
@@ -63,7 +63,7 @@ public final class FNZipTest extends AdvancedQueryTest {
   public void textEntry() {
     query(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1));
     query(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1, "US-ASCII"));
-    error(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1, "xyz"), Err.ZIP_FAIL);
+    error(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1, "xyz"), Err.ZIP_FAIL_X);
     // newlines are removed from the result..
     contains(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1), "aaboutab");
   }
@@ -110,7 +110,7 @@ public final class FNZipTest extends AdvancedQueryTest {
 
     // error: duplicate entry specified
     error(_ZIP_ZIP_FILE.args(params("<entry src='" + TMPFILE + "'/>" +
-        "<entry src='" + TMPFILE + "'/>")), Err.ZIP_FAIL);
+        "<entry src='" + TMPFILE + "'/>")), Err.ZIP_FAIL_X);
   }
 
   /**

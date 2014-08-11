@@ -87,7 +87,7 @@ public final class HTTPClient {
         conn.disconnect();
       }
     } catch(final IOException ex) {
-      throw HC_ERROR.get(info, ex);
+      throw HC_ERROR_X.get(info, ex);
     }
   }
 
@@ -102,7 +102,7 @@ public final class HTTPClient {
   private HttpURLConnection openConnection(final String url) throws QueryException, IOException {
     final URLConnection conn = new IOUrl(url).connection();
     if(conn instanceof HttpURLConnection) return (HttpURLConnection) conn;
-    throw HC_ERROR.get(info, "Invalid URL: " + url);
+    throw HC_ERROR_X.get(info, "Invalid URL: " + url);
   }
 
   /**

@@ -267,8 +267,8 @@ public final class FTWords extends FTExpr {
     }
 
     // check if occurrences are in valid range. if yes, return number of tokens
-    final long mn = occ != null ? checkItr(occ[0], qc) : 1;
-    final long mx = occ != null ? checkItr(occ[1], qc) : Long.MAX_VALUE;
+    final long mn = occ != null ? toLong(occ[0], qc) : 1;
+    final long mx = occ != null ? toLong(occ[1], qc) : Long.MAX_VALUE;
     if(mn == 0 && oc == 0) matches = FTNot.not(matches);
     return oc >= mn && oc <= mx ? Math.max(1, num) : 0;
   }
@@ -310,7 +310,7 @@ public final class FTWords extends FTExpr {
    */
   private byte[] nextToken(final Iter iter) throws QueryException {
     final Item it = iter.next();
-    return it == null ? null : checkEStr(it);
+    return it == null ? null : toToken(it);
   }
 
   /**

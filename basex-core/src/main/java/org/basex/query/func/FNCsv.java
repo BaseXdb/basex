@@ -22,7 +22,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class FNCsv extends StandardFunc {
+public class FNCsv extends BuiltinFunc {
   /** Element: options. */
   private static final QNm Q_OPTIONS = QNm.get("csv:options", CSVURI);
 
@@ -54,14 +54,14 @@ public class FNCsv extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item parse(final QueryContext qc) throws QueryException {
-    final byte[] input = checkStr(exprs[0], qc);
-    final CsvParserOptions opts = checkOptions(1, Q_OPTIONS, new CsvParserOptions(), qc);
+    final byte[] input = toToken(exprs[0], qc);
+    final CsvParserOptions opts = toOptions(1, Q_OPTIONS, new CsvParserOptions(), qc);
     try {
       final CsvConverter conv = CsvConverter.get(opts);
       conv.convert(new IOContent(input));
       return conv.finish();
     } catch(final IOException ex) {
-      throw BXCS_PARSE.get(info, ex);
+      throw BXCS_PARSE_X.get(info, ex);
     }
   }
 
@@ -73,11 +73,11 @@ public class FNCsv extends StandardFunc {
    */
   private Str serialize(final QueryContext qc) throws QueryException {
     final Iter iter = qc.iter(exprs[0]);
-    final CsvOptions copts = checkOptions(1, Q_OPTIONS, new CsvOptions(), qc);
+    final CsvOptions copts = toOptions(1, Q_OPTIONS, new CsvOptions(), qc);
 
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.CSV);
     sopts.set(SerializerOptions.CSV, copts);
-    return Str.get(delete(serialize(iter, sopts, INVALIDOPT), '\r'));
+    return Str.get(delete(serialize(iter, sopts, INVALIDOPT_X), '\r'));
   }
 }

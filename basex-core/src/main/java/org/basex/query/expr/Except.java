@@ -59,13 +59,13 @@ public final class Except extends Set {
   protected NodeSeqBuilder eval(final Iter[] iter) throws QueryException {
     final NodeSeqBuilder nc = new NodeSeqBuilder().check();
 
-    for(Item it; (it = iter[0].next()) != null;) nc.add(checkNode(it));
+    for(Item it; (it = iter[0].next()) != null;) nc.add(toNode(it));
     final boolean db = nc.dbnodes();
 
     for(int e = 1; e != exprs.length && nc.size() != 0; ++e) {
       final Iter ir = iter[e];
       for(Item it; (it = ir.next()) != null;) {
-        final int i = nc.indexOf(checkNode(it), db);
+        final int i = nc.indexOf(toNode(it), db);
         if(i != -1) nc.delete(i);
       }
     }

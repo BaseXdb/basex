@@ -80,20 +80,17 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public abstract Value materialize(final InputInfo ii) throws QueryException;
 
   /**
-   * Atomizes the items of the value.
+   * Evaluates the expression and returns the atomized items.
    * @param ii input info
-   * @return atomized item
+   * @return materialized item
    * @throws QueryException query exception
    */
   public abstract Value atomValue(final InputInfo ii) throws QueryException;
 
-  /**
-   * Atomizes the items of the value and returns zero or one item or an error.
-   * @param ii input info
-   * @return atomized item
-   * @throws QueryException query exception
-   */
-  public abstract Item atomItem(final InputInfo ii) throws QueryException;
+  @Override
+  public final Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return atomValue(ii);
+  }
 
   /**
    * Computes the number of atomized items.
@@ -199,7 +196,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
     } catch(final QueryIOException ex) {
       throw ex;
     } catch(final IOException ex) {
-      throw SERANY.getIO(ex);
+      throw SER_X.getIO(ex);
     }
     return ao;
   }

@@ -10,7 +10,7 @@ import java.lang.annotation.*;
  * <p>If a class extends the {@link QueryModule} class, it inherits the {@link #queryContext}
  * and {@link #staticContext} variables, which provide access to all properties of the
  * current query. E.g., they provide access to the current {@link QueryContext#value
- * context item} or the {@link StaticContext#ns declared namespaces} of a query.
+ * context value} or the {@link StaticContext#ns declared namespaces} of a query.
  * Next, the following default properties of functions can be changed via annotations:</p>
  * <ul>
  *   <li>Java functions can only be executed by users with {@code ADMIN} permissions.
@@ -24,7 +24,7 @@ import java.lang.annotation.*;
  *       the specified {@link #queryContext}, it should be annotated as
  *       {@link ContextDependent}.</li>
  *   <li>Java code is treated as "focus-independent". If a function accesses
- *       the current context item, position or size, it should be annotated as
+ *       the current context value, position or size, it should be annotated as
  *       {@link FocusDependent}.</li>
  * </ul>
  *
@@ -90,7 +90,7 @@ public abstract class QueryModule {
 
   /**
    * Java code is treated as "focus-independent". If a function accesses the current
-   * context item, position or size, it should be annotated as {@link FocusDependent}.
+   * context value, position or size, it should be annotated as {@link FocusDependent}.
    */
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.METHOD)

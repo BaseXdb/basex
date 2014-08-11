@@ -9,7 +9,6 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -18,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNArray extends StandardFunc {
+public final class FNArray extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -54,10 +53,10 @@ public final class FNArray extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     switch(func) {
-      case _ARRAY_SIZE:            return Int.get(array(0, qc).arraySize());
+      case _ARRAY_SIZE:            return Int.get(toArray(exprs[0], qc).arraySize());
       case _ARRAY_TAIL:            return tail(qc);
       case _ARRAY_APPEND:          return append(qc);
-      case _ARRAY_SERIALIZE:       return Str.get(array(0, qc).serialize(info));
+      case _ARRAY_SERIALIZE:       return Str.get(toArray(exprs[0], qc).serialize(info));
       case _ARRAY_SUBARRAY:        return subarray(qc);
       case _ARRAY_REMOVE:          return remove(qc);
       case _ARRAY_INSERT_BEFORE:   return insertBefore(qc);
@@ -77,7 +76,7 @@ public final class FNArray extends StandardFunc {
    * @throws QueryException query exception
    */
   private Array append(final QueryContext qc) throws QueryException {
-    final Array array = array(0, qc);
+    final Array array = toArray(exprs[0], qc);
     final int as = array.arraySize();
     final ValueList vl = new ValueList(as + 1);
     for(final Value v : array.members()) vl.add(v);
@@ -91,10 +90,10 @@ public final class FNArray extends StandardFunc {
    * @throws QueryException query exception
    */
   private Array subarray(final QueryContext qc) throws QueryException {
-    final Array array = array(0, qc);
-    final int p = checkPos(array, checkItr(exprs[1], qc), true);
-    final int l = exprs.length > 2 ? (int) checkItr(exprs[2], qc) : array.arraySize() - p;
-    if(l < 0) throw ARRAYNEG.get(info, l);
+    final Array array = toArray(exprs[0], qc);
+    final int p = checkPos(array, toLong(exprs[1], qc), true);
+    final int l = exprs.length > 2 ? (int) toLong(exprs[2], qc) : array.arraySize() - p;
+    if(l < 0) throw ARRAYNEG_X.get(info, l);
     checkPos(array, p + 1 + l, true);
     return Array.get(array, p, l);
   }
@@ -106,8 +105,8 @@ public final class FNArray extends StandardFunc {
    * @throws QueryException query exception
    */
   private Array remove(final QueryContext qc) throws QueryException {
-    final Array array = array(0, qc);
-    final int p = checkPos(array, checkItr(exprs[1], qc));
+    final Array array = toArray(exprs[0], qc);
+    final int p = checkPos(array, toLong(exprs[1], qc));
     final int as = array.arraySize();
     if(p == 0) return Array.get(array, 1, as - 1);
     if(p + 1 == as) return Array.get(array, 0, as - 1);
@@ -123,8 +122,8 @@ public final class FNArray extends StandardFunc {
    * @throws QueryException query exception
    */
   private Array insertBefore(final QueryContext qc) throws QueryException {
-    final Array array = array(0, qc);
-    final int p = checkPos(array, checkItr(exprs[1], qc), true);
+    final Array array = toArray(exprs[0], qc);
+    final int p = checkPos(array, toLong(exprs[1], qc), true);
     final Value ins = qc.value(exprs[2]);
     final int as = array.arraySize();
     final ValueList vl = new ValueList(as + 1);
@@ -143,7 +142,7 @@ public final class FNArray extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value head(final QueryContext qc) throws QueryException {
-    final Array array = array(0, qc);
+    final Array array = toArray(exprs[0], qc);
     return array.get(checkPos(array, 1));
   }
 
@@ -154,7 +153,7 @@ public final class FNArray extends StandardFunc {
    * @throws QueryException query exception
    */
   private Array tail(final QueryContext qc) throws QueryException {
-    final Array array = array(0, qc);
+    final Array array = toArray(exprs[0], qc);
     return Array.get(array, checkPos(array, 1) + 1, array.arraySize() - 1);
   }
 
@@ -165,7 +164,7 @@ public final class FNArray extends StandardFunc {
    * @throws QueryException query exception
    */
   private Array reverse(final QueryContext qc) throws QueryException {
-    final Array array = array(0, qc);
+    final Array array = toArray(exprs[0], qc);
     final int as = array.arraySize();
     final ValueList vl = new ValueList(as);
     for(int a = as - 1; a >= 0; a--) vl.add(array.get(a));
@@ -179,8 +178,8 @@ public final class FNArray extends StandardFunc {
    * @throws QueryException query exception
    */
   private Array forEachMember(final QueryContext qc) throws QueryException {
-    final Array array = array(0, qc);
-    final FItem fun = checkArity(1, 1, qc);
+    final Array array = toArray(exprs[0], qc);
+    final FItem fun = checkArity(exprs[1], 1, qc);
     final ValueList vl = new ValueList(array.arraySize());
     for(final Value v : array.members()) vl.add(fun.invokeValue(qc, info, v));
     return vl.array();
@@ -193,9 +192,8 @@ public final class FNArray extends StandardFunc {
    * @throws QueryException query exception
    */
   private Array forEachPair(final QueryContext qc) throws QueryException {
-    final Array array1 = array(0, qc);
-    final Array array2 = array(1, qc);
-    final FItem fun = checkArity(2, 2, qc);
+    final Array array1 = toArray(exprs[0], qc), array2 = toArray(exprs[1], qc);
+    final FItem fun = checkArity(exprs[2], 2, qc);
     final int as = Math.min(array1.arraySize(), array2.arraySize());
     final ValueList vl = new ValueList(as);
     for(int a = 0; a < as; a++) vl.add(fun.invokeValue(qc, info, array1.get(a), array2.get(a)));
@@ -209,11 +207,11 @@ public final class FNArray extends StandardFunc {
    * @throws QueryException query exception
    */
   private Array filter(final QueryContext qc) throws QueryException {
-    final Array array = array(0, qc);
-    final FItem fun = checkArity(1, 1, qc);
+    final Array array = toArray(exprs[0], qc);
+    final FItem fun = checkArity(exprs[1], 1, qc);
     final ValueList vl = new ValueList();
     for(final Value v : array.members()) {
-      if(checkBln(fun.invokeItem(qc, info, v))) vl.add(v);
+      if(toBoolean(fun.invokeItem(qc, info, v))) vl.add(v);
     }
     return vl.array();
   }
@@ -225,9 +223,9 @@ public final class FNArray extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value foldLeft(final QueryContext qc) throws QueryException {
-    final Array array = array(0, qc);
+    final Array array = toArray(exprs[0], qc);
     Value res = qc.value(exprs[1]);
-    final FItem fun = checkArity(2, 2, qc);
+    final FItem fun = checkArity(exprs[2], 2, qc);
     for(final Value v : array.members()) res = fun.invokeValue(qc, info, res, v);
     return res;
   }
@@ -239,9 +237,9 @@ public final class FNArray extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value foldRight(final QueryContext qc) throws QueryException {
-    final Array array = array(0, qc);
+    final Array array = toArray(exprs[0], qc);
     Value res = qc.value(exprs[1]);
-    final FItem fun = checkArity(2, 2, qc);
+    final FItem fun = checkArity(exprs[2], 2, qc);
     for(int a = array.arraySize(); --a >= 0;) res = fun.invokeValue(qc, info, array.get(a), res);
     return res;
   }
@@ -256,20 +254,9 @@ public final class FNArray extends StandardFunc {
     final ValueList vl = new ValueList();
     final Iter ir = qc.iter(exprs[0]);
     for(Item it; (it = ir.next()) != null;) {
-      for(final Value v : checkArray(it).members()) vl.add(v);
+      for(final Value v : toArray(it).members()) vl.add(v);
     }
     return vl.array();
-  }
-
-  /**
-   * Gets the array at the specified argument position.
-   * @param pos position
-   * @param qc query context
-   * @return array
-   * @throws QueryException query exception
-   */
-  private Array array(final int pos, final QueryContext qc) throws QueryException {
-    return checkArray(checkItem(exprs[pos], qc, SeqType.ANY_ARRAY));
   }
 
   /**
@@ -294,7 +281,7 @@ public final class FNArray extends StandardFunc {
   private int checkPos(final Array array, final long pos, final boolean incl)
       throws QueryException {
     final int as = array.arraySize() + (incl ? 1 : 0);
-    if(pos < 1 || pos > as) throw ARRAYBOUNDS.get(info, pos, as);
+    if(pos < 1 || pos > as) throw ARRAYBOUNDS_X_X.get(info, pos, as);
     return (int) pos - 1;
   }
 }

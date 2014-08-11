@@ -315,7 +315,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @return exception
    */
   private static QueryException error(final InputInfo info, final String msg, final Object... ext) {
-    return Err.BASX_RESTXQ.get(info, Util.info(msg, ext));
+    return Err.BASX_RESTXQ_X.get(info, Util.info(msg, ext));
   }
 
   @Override

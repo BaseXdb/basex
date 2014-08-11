@@ -50,7 +50,7 @@ public final class ReplaceValue extends NodeUpdate {
 
   @Override
   public void merge(final Update up) throws QueryException {
-    throw UPMULTREPV.get(info, node());
+    throw UPMULTREPV_X.get(info, node());
   }
 
   @Override

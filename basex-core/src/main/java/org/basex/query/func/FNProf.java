@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNProf extends StandardFunc {
+public final class FNProf extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -62,10 +62,10 @@ public final class FNProf extends StandardFunc {
     final long min = Performance.memory();
 
     // optional message
-    final byte[] msg = exprs.length > 2 ? checkStr(exprs[2], qc) : null;
+    final byte[] msg = exprs.length > 2 ? toToken(exprs[2], qc) : null;
 
     // check caching flag
-    if(exprs.length > 1 && checkBln(exprs[1], qc)) {
+    if(exprs.length > 1 && toBoolean(exprs[1], qc)) {
       final Value v = qc.value(exprs[0]).cache().value();
       dump(min, msg, qc);
       return v.iter();
@@ -90,7 +90,7 @@ public final class FNProf extends StandardFunc {
    */
   private Item dump(final QueryContext qc) throws QueryException {
     final Iter ir = exprs[0].iter(qc);
-    final byte[] label = exprs.length > 1 ? checkStr(exprs[1], qc) : null;
+    final byte[] label = exprs.length > 1 ? toToken(exprs[1], qc) : null;
     boolean empty = true;
     for(Item it; (it = ir.next()) != null;) {
       FNInfo.dump(it, label, info, qc);
@@ -132,7 +132,7 @@ public final class FNProf extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item human(final QueryContext qc) throws QueryException {
-    return Str.get(Performance.format(checkItr(exprs[0], qc), true));
+    return Str.get(Performance.format(toLong(exprs[0], qc), true));
   }
 
   /**
@@ -146,10 +146,10 @@ public final class FNProf extends StandardFunc {
     final Performance p = new Performance();
 
     // optional message
-    final byte[] msg = exprs.length > 2 ? checkStr(exprs[2], qc) : null;
+    final byte[] msg = exprs.length > 2 ? toToken(exprs[2], qc) : null;
 
     // check caching flag
-    if(exprs.length > 1 && checkBln(exprs[1], qc)) {
+    if(exprs.length > 1 && toBoolean(exprs[1], qc)) {
       final Value v = qc.value(exprs[0]).cache().value();
       FNInfo.dump(token(p.getTime()), msg, qc);
       return v.iter();
@@ -173,7 +173,7 @@ public final class FNProf extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item sleep(final QueryContext qc) throws QueryException {
-    Performance.sleep(checkItr(exprs[0], qc));
+    Performance.sleep(toLong(exprs[0], qc));
     return null;
   }
 }

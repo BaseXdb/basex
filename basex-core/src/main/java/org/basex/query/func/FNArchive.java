@@ -18,7 +18,6 @@ import org.basex.query.path.*;
 import org.basex.query.util.archive.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -30,7 +29,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNArchive extends StandardFunc {
+public final class FNArchive extends BuiltinFunc {
   /** Packer format: gzip. */
   public static final String GZIP = "gzip";
   /** Packer format: zip. */
@@ -119,9 +118,8 @@ public final class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64 create(final QueryContext qc) throws QueryException {
-    final Iter entr = qc.iter(exprs[0]);
-    final Iter cont = qc.iter(exprs[1]);
-    final Options opts = checkOptions(2, Q_OPTIONS, new ArchiveOptions(), qc);
+    final Iter entr = qc.iter(exprs[0]), cont = qc.iter(exprs[1]);
+    final Options opts = toOptions(2, Q_OPTIONS, new ArchiveOptions(), qc);
 
     final String format = opts.get(ArchiveOptions.FORMAT);
     final ArchiveOut out = ArchiveOut.get(format.toLowerCase(Locale.ENGLISH), info);
@@ -131,7 +129,7 @@ public final class FNArchive extends StandardFunc {
     if(alg != null) {
       if(format.equals(ZIP)  && !eq(alg, STORED, DEFLATE) ||
          format.equals(GZIP) && !eq(alg, DEFLATE)) {
-        throw ARCH_SUPP.get(info, ArchiveOptions.ALGORITHM.name(), alg);
+        throw ARCH_SUPP_X_X.get(info, ArchiveOptions.ALGORITHM.name(), alg);
       }
       if(eq(alg, STORED)) level = ZipEntry.STORED;
       else if(eq(alg, DEFLATE)) level = ZipEntry.DEFLATED;
@@ -139,15 +137,14 @@ public final class FNArchive extends StandardFunc {
     out.level(level);
 
     try {
-      int e = 0;
-      int c = 0;
       Item en, cn;
+      int e = 0, c = 0;
       while(true) {
         en = entr.next();
         cn = cont.next();
         if(en == null || cn == null) break;
         if(out instanceof GZIPOut && c > 0)
-          throw ARCH_ONE.get(info, format.toUpperCase(Locale.ENGLISH));
+          throw ARCH_ONE_X.get(info, format.toUpperCase(Locale.ENGLISH));
         add(checkElmStr(en), cn, out, level, qc);
         e++;
         c++;
@@ -155,9 +152,9 @@ public final class FNArchive extends StandardFunc {
       // count remaining entries
       if(cn != null) do c++; while(cont.next() != null);
       if(en != null) do e++; while(entr.next() != null);
-      if(e != c) throw ARCH_DIFF.get(info, e, c);
+      if(e != c) throw ARCH_DIFF_X_X.get(info, e, c);
     } catch(final IOException ex) {
-      throw ARCH_FAIL.get(info, ex);
+      throw ARCH_FAIL_X.get(info, ex);
     } finally {
       out.close();
     }
@@ -171,7 +168,7 @@ public final class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private FElem options(final QueryContext qc) throws QueryException {
-    final B64 archive = (B64) checkType(checkItem(exprs[0], qc), AtomType.B64);
+    final B64 archive = toB64(exprs[0], qc, false);
     String format = null;
     int level = -1;
 
@@ -185,7 +182,7 @@ public final class FNArchive extends StandardFunc {
         break;
       }
     } catch(final IOException ex) {
-      throw ARCH_FAIL.get(info, ex);
+      throw ARCH_FAIL_X.get(info, ex);
     } finally {
       arch.close();
     }
@@ -207,8 +204,7 @@ public final class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter entries(final QueryContext qc) throws QueryException {
-    final B64 archive = (B64) checkType(checkItem(exprs[0], qc), AtomType.B64);
-
+    final B64 archive = toB64(exprs[0], qc, false);
     final ValueBuilder vb = new ValueBuilder();
     final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
     try {
@@ -227,7 +223,7 @@ public final class FNArchive extends StandardFunc {
       }
       return vb;
     } catch(final IOException ex) {
-      throw ARCH_FAIL.get(info, ex);
+      throw ARCH_FAIL_X.get(info, ex);
     } finally {
       in.close();
     }
@@ -240,7 +236,7 @@ public final class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private ValueBuilder extractText(final QueryContext qc) throws QueryException {
-    final String enc = checkEncoding(2, ARCH_ENCODING, qc);
+    final String enc = toEncoding(2, ARCH_ENCODING_X, qc);
     final ValueBuilder vb = new ValueBuilder();
     for(final byte[] b : extract(qc)) vb.add(Str.get(encode(b, enc, qc)));
     return vb;
@@ -265,14 +261,12 @@ public final class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64 update(final QueryContext qc) throws QueryException {
-    final B64 archive = (B64) checkType(checkItem(exprs[0], qc), AtomType.B64);
+    final B64 archive = toB64(exprs[0], qc, false);
     // entries to be updated
     final TokenObjMap<Item[]> hm = new TokenObjMap<>();
 
-    final Iter entr = qc.iter(exprs[1]);
-    final Iter cont = qc.iter(exprs[2]);
-    int e = 0;
-    int c = 0;
+    final Iter entr = qc.iter(exprs[1]), cont = qc.iter(exprs[2]);
+    int e = 0, c = 0;
     Item en, cn;
     while(true) {
       en = entr.next();
@@ -285,13 +279,13 @@ public final class FNArchive extends StandardFunc {
     // count remaining entries
     if(cn != null) do c++; while(cont.next() != null);
     if(en != null) do e++; while(entr.next() != null);
-    if(e != c) throw ARCH_DIFF.get(info, e, c);
+    if(e != c) throw ARCH_DIFF_X_X.get(info, e, c);
 
     final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
     final ArchiveOut out = ArchiveOut.get(in.format(), info);
     try {
       if(in instanceof GZIPIn)
-        throw ARCH_MODIFY.get(info, in.format().toUpperCase(Locale.ENGLISH));
+        throw ARCH_MODIFY_X.get(info, in.format().toUpperCase(Locale.ENGLISH));
       // delete entries to be updated
       while(in.more()) if(!hm.contains(token(in.entry().getName()))) out.write(in);
       // add new and updated entries
@@ -301,7 +295,7 @@ public final class FNArchive extends StandardFunc {
         add(it[0], it[1], out, ZipEntry.DEFLATED, qc);
       }
     } catch(final IOException ex) {
-      throw ARCH_FAIL.get(info, ex);
+      throw ARCH_FAIL_X.get(info, ex);
     } finally {
       in.close();
       out.close();
@@ -316,22 +310,20 @@ public final class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64 delete(final QueryContext qc) throws QueryException {
-    final B64 archive = (B64) checkType(checkItem(exprs[0], qc), AtomType.B64);
+    final B64 archive = toB64(exprs[0], qc, false);
     // entries to be deleted
     final TokenObjMap<Item[]> hm = new TokenObjMap<>();
     final Iter names = qc.iter(exprs[1]);
-    for(Item en; (en = names.next()) != null;) {
-      hm.put(checkElmStr(en).string(info), null);
-    }
+    for(Item en; (en = names.next()) != null;) hm.put(checkElmStr(en).string(info), null);
 
     final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
     final ArchiveOut out = ArchiveOut.get(in.format(), info);
     try {
       if(in instanceof GZIPIn)
-        throw ARCH_MODIFY.get(info, in.format().toUpperCase(Locale.ENGLISH));
+        throw ARCH_MODIFY_X.get(info, in.format().toUpperCase(Locale.ENGLISH));
       while(in.more()) if(!hm.contains(token(in.entry().getName()))) out.write(in);
     } catch(final IOException ex) {
-      throw ARCH_FAIL.get(info, ex);
+      throw ARCH_FAIL_X.get(info, ex);
     } finally {
       in.close();
       out.close();
@@ -346,7 +338,7 @@ public final class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private TokenList extract(final QueryContext qc) throws QueryException {
-    final B64 archive = (B64) checkType(checkItem(exprs[0], qc), AtomType.B64);
+    final B64 archive = toB64(exprs[0], qc, false);
     final TokenSet hs = entries(1, qc);
 
     final TokenList tl = new TokenList();
@@ -358,7 +350,7 @@ public final class FNArchive extends StandardFunc {
           tl.add(in.read());
       }
     } catch(final IOException ex) {
-      throw ARCH_FAIL.get(info, ex);
+      throw ARCH_FAIL_X.get(info, ex);
     } finally {
       in.close();
     }
@@ -372,8 +364,8 @@ public final class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item write(final QueryContext qc) throws QueryException {
-    final java.nio.file.Path path = checkPath(0, qc);
-    final B64 archive = (B64) checkType(checkItem(exprs[1], qc), AtomType.B64);
+    final java.nio.file.Path path = toPath(0, qc);
+    final B64 archive = toB64(exprs[1], qc, false);
     final TokenSet hs = entries(2, qc);
 
     final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
@@ -392,7 +384,7 @@ public final class FNArchive extends StandardFunc {
         }
       }
     } catch(final IOException ex) {
-      throw ARCH_FAIL.get(info, ex);
+      throw ARCH_FAIL_X.get(info, ex);
     } finally {
       in.close();
     }
@@ -413,9 +405,7 @@ public final class FNArchive extends StandardFunc {
       // filter result to specified entries
       hs = new TokenSet();
       final Iter names = qc.iter(exprs[e]);
-      for(Item en; (en = names.next()) != null;) {
-        hs.add(checkElmStr(en).string(info));
-      }
+      for(Item en; (en = names.next()) != null;) hs.add(checkElmStr(en).string(info));
     }
     return hs;
   }
@@ -453,7 +443,7 @@ public final class FNArchive extends StandardFunc {
         try {
           ze.setTime(dateTimeToMs(new Dtm(mod, info), qc));
         } catch(final QueryException qe) {
-          throw ARCH_DATETIME.get(info, mod);
+          throw ARCH_DATETIME_X.get(info, mod);
         }
       }
 
@@ -461,18 +451,18 @@ public final class FNArchive extends StandardFunc {
       final byte[] ea = el.attribute(ENCODING);
       if(ea != null) {
         enc = string(ea);
-        if(!Charset.isSupported(enc)) throw ARCH_ENCODING.get(info, ea);
+        if(!Charset.isSupported(enc)) throw ARCH_ENCODING_X.get(info, ea);
       }
     }
 
     // data to be compressed
-    byte[] val = checkStrBin(cont);
+    byte[] val = toBinary(cont);
     if(cont instanceof AStr && enc != null && enc != UTF8) val = encode(val, enc, qc);
 
     try {
-      out.level(lvl == null ? level : toInt(lvl));
+      out.level(lvl == null ? level : Token.toInt(lvl));
     } catch(final IllegalArgumentException ex) {
-      throw ARCH_LEVEL.get(info, lvl);
+      throw ARCH_LEVEL_X.get(info, lvl);
     }
     out.write(ze, val);
   }
@@ -490,7 +480,7 @@ public final class FNArchive extends StandardFunc {
     try {
       return FNConvert.toString(new ArrayInput(value), encoding, qc);
     } catch(final IOException ex) {
-      throw ARCH_ENCODE.get(info, ex);
+      throw ARCH_ENCODE_X.get(info, ex);
     }
   }
 
@@ -502,6 +492,6 @@ public final class FNArchive extends StandardFunc {
    */
   private Item checkElmStr(final Item it) throws QueryException {
     if(it instanceof AStr || TEST.eq(it)) return it;
-    throw ELMSTRTYPE.get(info, Q_ENTRY.prefixId(XML), it.type, it);
+    throw ELMSTR_X_X_X.get(info, Q_ENTRY.prefixId(XML), it.type, it);
   }
 }

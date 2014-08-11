@@ -37,7 +37,7 @@ public final class MixedPath extends Path {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     // creates an iterator from the root value
-    final Value v = root != null ? qc.value(root) : checkCtx(qc);
+    final Value v = root != null ? qc.value(root) : ctxValue(qc);
     Iter res = v.iter();
 
     final Value cv = qc.value;
@@ -58,7 +58,7 @@ public final class MixedPath extends Path {
         // loop through all input items
         int nodes = 0;
         for(Item it; (it = res.next()) != null;) {
-          if(path && !(it instanceof ANode)) throw PATHNODE.get(info, step, it.type, it);
+          if(path && !(it instanceof ANode)) throw PATHNODE_X_X_X.get(info, step, it.type, it);
           qc.value = it;
 
           // loop through all resulting items
@@ -77,7 +77,7 @@ public final class MixedPath extends Path {
           // check if input for next axis step consists items other than nodes
           if(s + 1 < sl && !(steps[s + 1] instanceof Bang)) {
             final Item it = vb.get(0);
-            throw PATHNODE.get(info, it.type, it);
+            throw PATHNODE_X_X_X.get(info, it.type, it);
           }
         }
 

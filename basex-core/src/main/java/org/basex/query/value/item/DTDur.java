@@ -64,7 +64,7 @@ public final class DTDur extends Dur {
     this(dur);
     sec = plus ? sec.add(add.sec) : sec.subtract(add.sec);
     final double d = sec.doubleValue();
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECDURRANGE.get(ii, d);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECDURRANGE_X.get(ii, d);
   }
 
   /**
@@ -79,8 +79,8 @@ public final class DTDur extends Dur {
       throws QueryException {
 
     this(dur);
-    if(Double.isNaN(factor)) throw DATECALC.get(ii, description(), factor);
-    if(mult ? Double.isInfinite(factor) : factor == 0) throw DATEZERO.get(ii, type, factor);
+    if(Double.isNaN(factor)) throw DATECALC_X_X.get(ii, description(), factor);
+    if(mult ? Double.isInfinite(factor) : factor == 0) throw DATEZERO_X_X.get(ii, type, factor);
     if(mult ? factor == 0 : Double.isInfinite(factor)) {
       sec = BigDecimal.ZERO;
     } else {
@@ -109,7 +109,7 @@ public final class DTDur extends Dur {
     sec = dat.days().subtract(sub.days()).multiply(DAYSECONDS).add(
         dat.seconds().subtract(sub.seconds()));
     final double d = sec.doubleValue();
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECRANGE.get(ii, d);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECRANGE_X.get(ii, d);
   }
 
   /**

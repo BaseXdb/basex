@@ -61,7 +61,7 @@ public final class Union extends Set {
   protected NodeSeqBuilder eval(final Iter[] iter) throws QueryException {
     final NodeSeqBuilder nc = new NodeSeqBuilder().check();
     for(final Iter ir : iter) {
-      for(Item it; (it = ir.next()) != null;) nc.add(checkNode(it));
+      for(Item it; (it = ir.next()) != null;) nc.add(toNode(it));
     }
     return nc;
   }

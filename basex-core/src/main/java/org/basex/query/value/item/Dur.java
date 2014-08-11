@@ -99,7 +99,7 @@ public class Dur extends ADateDur {
       mon = -mon;
       v = -v;
     }
-    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE.get(ii, type, vl);
+    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE_X_X.get(ii, type, vl);
   }
 
   /**
@@ -123,7 +123,7 @@ public class Dur extends ADateDur {
         add(BigDecimal.valueOf(m).multiply(BD60));
     if(!mt.group(1).isEmpty()) sec = sec.negate();
     final double v = sec.doubleValue();
-    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE.get(ii, type, vl);
+    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE_X_X.get(ii, type, vl);
   }
 
   @Override

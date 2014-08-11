@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNHash extends StandardFunc {
+public final class FNHash extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -46,7 +46,7 @@ public final class FNHash extends StandardFunc {
    * @throws QueryException exception
    */
   private B64 hash(final QueryContext qc) throws QueryException {
-    return hash(Token.string(checkStr(exprs[1], qc)), qc);
+    return hash(Token.string(toToken(exprs[1], qc)), qc);
   }
 
   /**
@@ -57,7 +57,7 @@ public final class FNHash extends StandardFunc {
    * @throws QueryException exception
    */
   private B64 hash(final String algo, final QueryContext qc) throws QueryException {
-    return hashBinary(checkStrBin(exprs[0], qc), algo);
+    return hashBinary(toBinary(exprs[0], qc), algo);
   }
 
   /**
@@ -71,7 +71,7 @@ public final class FNHash extends StandardFunc {
     try {
       return new B64(MessageDigest.getInstance(algo).digest(value));
     } catch(final NoSuchAlgorithmException ex) {
-      throw HASH_ALG.get(info, algo);
+      throw HASH_ALG_X.get(info, algo);
     }
   }
 }

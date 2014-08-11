@@ -19,7 +19,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Rositsa Shadura
  */
-public final class FNRepo extends StandardFunc {
+public final class FNRepo extends BuiltinFunc {
   /** Element name. */
   private static final String PACKAGE = "package";
   /** Header attribute: name. */
@@ -55,7 +55,7 @@ public final class FNRepo extends StandardFunc {
 
     final RepoManager rm = new RepoManager(qc.context, ii);
     // either path to package or package name
-    final String pkg = exprs.length == 0 ? null : Token.string(checkStr(exprs[0], qc));
+    final String pkg = exprs.length == 0 ? null : Token.string(toToken(exprs[0], qc));
     switch(func) {
       case _REPO_INSTALL:
         rm.install(pkg);

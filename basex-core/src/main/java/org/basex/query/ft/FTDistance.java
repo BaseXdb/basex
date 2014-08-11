@@ -56,7 +56,7 @@ public final class FTDistance extends FTFilter {
   protected boolean filter(final QueryContext qc, final FTMatch mtc, final FTLexer lex)
       throws QueryException {
 
-    final long mn = checkItr(min, qc), mx = checkItr(max, qc);
+    final long mn = toLong(min, qc), mx = toLong(max, qc);
     mtc.sort();
 
     final FTMatch match = new FTMatch();

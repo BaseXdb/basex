@@ -74,7 +74,7 @@ public abstract class Seq extends Value {
 
   @Override
   public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw SEQFOUND.get(ii, this);
+    throw SEQFOUND_X.get(ii, this);
   }
 
   @Override
@@ -111,8 +111,8 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final Item atomItem(final InputInfo ii) throws QueryException {
-    throw SEQFOUND.get(ii, this);
+  public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    throw SEQFOUND_X.get(ii, this);
   }
 
   /**

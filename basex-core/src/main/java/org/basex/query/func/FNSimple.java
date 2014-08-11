@@ -21,7 +21,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNSimple extends StandardFunc {
+public final class FNSimple extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -187,7 +187,7 @@ public final class FNSimple extends StandardFunc {
    * @throws QueryException query exception
    */
   private boolean deep(final QueryContext qc) throws QueryException {
-    final Collation coll = checkColl(2, qc);
+    final Collation coll = toCollation(2, qc);
     return new DeepCompare(info).collation(coll).equal(qc.iter(exprs[0]), qc.iter(exprs[1]));
   }
 
@@ -201,9 +201,8 @@ public final class FNSimple extends StandardFunc {
     final DeepCompare cmp = new DeepCompare(info);
     final Mode[] modes = Mode.values();
     if(exprs.length == 3) {
-      final Iter ir = exprs[2].iter(qc);
-      for(Item it; (it = ir.next()) != null;) {
-        final byte[] key = uc(checkEStr(it));
+      for(final Item it : exprs[2].atomValue(qc, info)) {
+        final byte[] key = uc(toToken(it));
         boolean found = false;
         for(final Mode m : modes) {
           found = eq(key, token(m.name()));
@@ -212,7 +211,7 @@ public final class FNSimple extends StandardFunc {
             break;
           }
         }
-        if(!found) throw INVALIDOPTX.get(info, key);
+        if(!found) throw INVALIDOPTION_X.get(info, key);
       }
     }
     return cmp.equal(qc.iter(exprs[0]), qc.iter(exprs[1]));

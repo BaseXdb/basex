@@ -28,7 +28,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNFt extends StandardFunc {
+public final class FNFt extends BuiltinFunc {
   /** Element: options. */
   private static final QNm Q_OPTIONS = QNm.get("options");
   /** Marker element. */
@@ -78,7 +78,7 @@ public final class FNFt extends StandardFunc {
     final FTPosData tmp = qc.ftPosData;
     qc.ftPosData = new FTPosData();
     final Iter ir = qc.iter(exprs[0]);
-    for(Item it; (it = ir.next()) != null;) checkDBNode(it);
+    for(Item it; (it = ir.next()) != null;) toDBNode(it);
     final int s = qc.ftPosData.size();
     qc.ftPosData = tmp;
     return Int.get(s);
@@ -97,11 +97,11 @@ public final class FNFt extends StandardFunc {
 
     if(exprs.length > 1) {
       // name of the marker element; default is <mark/>
-      m = checkStr(exprs[1], qc);
-      if(!XMLToken.isQName(m)) throw valueError(info, AtomType.QNM, Str.get(m));
+      m = toToken(exprs[1], qc);
+      if(!XMLToken.isQName(m)) throw valueError(info, AtomType.QNM, m);
     }
     if(exprs.length > 2) {
-      l = (int) checkItr(exprs[2], qc);
+      l = (int) toLong(exprs[2], qc);
     }
     final byte[] mark = m;
     final int len = l;
@@ -129,7 +129,7 @@ public final class FNFt extends StandardFunc {
             // copy node to main memory data instance
             final MemData md = new MemData(qc.context.options);
             final DataBuilder db = new DataBuilder(md);
-            db.ftpos(mark, qc.ftPosData, len).build(checkDBNode(it));
+            db.ftpos(mark, qc.ftPosData, len).build(toDBNode(it));
 
             final IntList il = new IntList();
             for(int p = 0; p < md.meta.size; p += md.size(p, md.kind(p))) il.add(p);
@@ -151,7 +151,6 @@ public final class FNFt extends StandardFunc {
   private Iter score(final QueryContext qc) throws QueryException {
     return new Iter() {
       final Iter iter = exprs[0].iter(qc);
-
       @Override
       public Dbl next() throws QueryException {
         final Item item = iter.next();
@@ -169,7 +168,7 @@ public final class FNFt extends StandardFunc {
   private Bln contains(final QueryContext qc) throws QueryException {
     final Value input = qc.value(exprs[0]);
     final Value query = qc.value(exprs[1]);
-    final FTOptions opts = checkOptions(2, Q_OPTIONS, new FTOptions(), qc);
+    final FTOptions opts = toOptions(2, Q_OPTIONS, new FTOptions(), qc);
 
     final FTOpt opt = new FTOpt();
     final FTMode mode = opts.get(FTIndexOptions.MODE);
@@ -197,10 +196,10 @@ public final class FNFt extends StandardFunc {
   private Iter search(final QueryContext qc) throws QueryException {
     final Data data = checkData(qc);
     final Value terms = qc.value(exprs[1]);
-    final FTOptions opts = checkOptions(2, Q_OPTIONS, new FTOptions(), qc);
+    final FTOptions opts = toOptions(2, Q_OPTIONS, new FTOptions(), qc);
 
     final IndexContext ic = new IndexContext(data, false);
-    if(!data.meta.ftxtindex) throw BXDB_INDEX.get(info, data.meta.name,
+    if(!data.meta.ftxtindex) throw BXDB_INDEX_X.get(info, data.meta.name,
         IndexType.FULLTEXT.toString().toLowerCase(Locale.ENGLISH));
 
     final FTOpt opt = new FTOpt().copy(data.meta);
@@ -263,7 +262,7 @@ public final class FNFt extends StandardFunc {
    */
   private Iter tokens(final QueryContext qc) throws QueryException {
     final Data data = checkData(qc);
-    byte[] entry = exprs.length < 2 ? Token.EMPTY : checkStr(exprs[1], qc);
+    byte[] entry = exprs.length < 2 ? Token.EMPTY : toToken(exprs[1], qc);
     if(entry.length != 0) {
       final FTLexer ftl = new FTLexer(new FTOpt().copy(data.meta));
       ftl.init(entry);
@@ -280,7 +279,7 @@ public final class FNFt extends StandardFunc {
    */
   private Iter tokenize(final QueryContext qc) throws QueryException {
     final FTOpt opt = new FTOpt().copy(qc.ftOpt());
-    final FTLexer ftl = new FTLexer(opt).init(checkStr(exprs[0], qc));
+    final FTLexer ftl = new FTLexer(opt).init(toToken(exprs[0], qc));
     return new Iter() {
       @Override
       public Str next() {

@@ -10,7 +10,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 
@@ -20,7 +19,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public final class FNHof extends StandardFunc {
+public final class FNHof extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -81,7 +80,7 @@ public final class FNHof extends StandardFunc {
           qc.compInfo(QueryText.OPTUNROLL, this);
           final Value seq = (Value) exprs[0];
           if(seq.isEmpty()) throw EMPTYFOUND.get(info);
-          final FItem f = checkArity(1, 2, qc);
+          final FItem f = checkArity(exprs[1], 2, qc);
           Expr e = seq.itemAt(0);
           for(int i = 1, len = (int) seq.size(); i < len; i++)
             e = new DynFuncCall(info, sc, false, f, e, seq.itemAt(i)).optimize(qc, scp);
@@ -101,7 +100,7 @@ public final class FNHof extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value foldLeft1(final QueryContext qc) throws QueryException {
-    final FItem f = checkArity(1, 2, qc);
+    final FItem f = checkArity(exprs[1], 2, qc);
     final Iter iter = exprs[0].iter(qc);
 
     Value sum = checkNoEmpty(iter.next());
@@ -135,10 +134,10 @@ public final class FNHof extends StandardFunc {
    * @throws QueryException exception
    */
   private Value until(final QueryContext qc) throws QueryException {
-    final FItem pred = checkArity(0, 1, qc);
-    final FItem fun = checkArity(1, 1, qc);
+    final FItem pred = checkArity(exprs[0], 1, qc);
+    final FItem fun = checkArity(exprs[1], 1, qc);
     Value v = qc.value(exprs[2]);
-    while(!checkBln(pred.invokeItem(qc, info, v))) v = fun.invokeValue(qc, info, v);
+    while(!toBoolean(pred.invokeItem(qc, info, v))) v = fun.invokeValue(qc, info, v);
     return v;
   }
 
@@ -149,8 +148,8 @@ public final class FNHof extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value topKBy(final QueryContext qc) throws QueryException {
-    final FItem getKey = checkArity(1, 1, qc);
-    final long k = checkItr(exprs[2], qc);
+    final FItem getKey = checkArity(exprs[1], 1, qc);
+    final long k = toLong(exprs[2], qc);
     if(k < 1 || k > Integer.MAX_VALUE / 2) return Empty.SEQ;
 
     final Iter iter = exprs[0].iter(qc);
@@ -186,7 +185,7 @@ public final class FNHof extends StandardFunc {
    */
   private Value topKWith(final QueryContext qc) throws QueryException {
     final Comparator<Item> cmp = getComp(1, qc);
-    final long k = checkItr(exprs[2], qc);
+    final long k = toLong(exprs[2], qc);
     if(k < 1 || k > Integer.MAX_VALUE / 2) return Empty.SEQ;
 
     final Iter iter = exprs[0].iter(qc);
@@ -214,13 +213,13 @@ public final class FNHof extends StandardFunc {
    * @throws QueryException exception
    */
   private Comparator<Item> getComp(final int pos, final QueryContext qc) throws QueryException {
-    final FItem lt = checkArity(pos, 2, qc);
+    final FItem lt = checkArity(exprs[pos], 2, qc);
     return new Comparator<Item>() {
       @Override
       public int compare(final Item a, final Item b) {
         try {
-          return checkType(lt.invokeItem(qc, info, a == null ? Empty.SEQ : a,
-              b == null ? Empty.SEQ : b), AtomType.BLN).bool(info) ? -1 : 1;
+          return toBoolean(lt.invokeItem(qc, info, a == null ? Empty.SEQ : a,
+              b == null ? Empty.SEQ : b)) ? -1 : 1;
         } catch(final QueryException qe) {
           throw new QueryRTException(qe);
         }

@@ -26,7 +26,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNSeq extends StandardFunc {
+public final class FNSeq extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -51,7 +51,7 @@ public final class FNSeq extends StandardFunc {
   public Iter iter(final QueryContext qc) throws QueryException {
     switch(func) {
       case INDEX_OF:        return indexOf(qc);
-      case DISTINCT_VALUES: return distinctValues(qc);
+      case DISTINCT_VALUES: return distinctValuesIter(qc);
       case INSERT_BEFORE:   return insertBefore(qc);
       case REVERSE:         return reverse(qc);
       case REMOVE:          return remove(qc);
@@ -66,10 +66,11 @@ public final class FNSeq extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     switch(func) {
-      case SUBSEQUENCE: return subseqValue(qc);
-      case TAIL:        final Value seq = qc.value(exprs[0]);
-                        return SubSeq.get(seq, 1, seq.size() - 1);
-      default:          return super.value(qc);
+      case DISTINCT_VALUES: return distinctValues(qc);
+      case SUBSEQUENCE:     return subseqValue(qc);
+      case TAIL:            final Value v = qc.value(exprs[0]);
+                            return SubSeq.get(v, 1, v.size() - 1);
+      default:              return super.value(qc);
     }
   }
 
@@ -84,7 +85,7 @@ public final class FNSeq extends StandardFunc {
   private Iter most(final QueryContext qc, final boolean outer) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
     final NodeSeqBuilder nc = new NodeSeqBuilder().check();
-    for(Item it; (it = iter.next()) != null;) nc.add(checkNode(it));
+    for(Item it; (it = iter.next()) != null;) nc.add(toNode(it));
     final int len = (int) nc.size();
 
     // only go further if there are at least two nodes
@@ -245,20 +246,19 @@ public final class FNSeq extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter indexOf(final QueryContext qc) throws QueryException {
-    final Item it = checkItem(exprs[1], qc);
-    final Collation coll = checkColl(2, qc);
-
     return new Iter() {
-      final Iter ir = exprs[0].iter(qc);
+      final Item srch = checkNoEmpty(exprs[1].atomItem(qc, info));
+      final Collation coll = toCollation(2, qc);
+      final AtomIter ir = exprs[0].atomIter(qc, info);
       int c;
 
       @Override
       public Item next() throws QueryException {
         while(true) {
-          final Item i = ir.next();
-          if(i == null) return null;
+          final Item it = ir.next();
+          if(it == null) return null;
           ++c;
-          if(i.comparable(it) && OpV.EQ.eval(i, it, coll, info)) return Int.get(c);
+          if(it.comparable(srch) && OpV.EQ.eval(it, srch, coll, info)) return Int.get(c);
         }
       }
     };
@@ -270,33 +270,42 @@ public final class FNSeq extends StandardFunc {
    * @return distinct iterator
    * @throws QueryException query exception
    */
-  private Iter distinctValues(final QueryContext qc) throws QueryException {
-    final Collation coll = checkColl(1, qc);
+  private Iter distinctValuesIter(final QueryContext qc) throws QueryException {
+    final Collation coll = toCollation(1, qc);
     if(exprs[0] instanceof RangeSeq) return exprs[0].iter(qc);
 
     return new Iter() {
       final ItemSet set = coll == null ? new HashItemSet() : new CollationItemSet(coll);
-      final Iter ir = exprs[0].iter(qc);
-      Iter ir2;
+      final Iter ir = exprs[0].atomIter(qc, info);
 
       @Override
       public Item next() throws QueryException {
         while(true) {
-          qc.checkStop();
-          while(ir2 != null) {
-            final Item it = ir2.next();
-            if(it == null) {
-              ir2 = null;
-            } else if(set.add(it, info)) {
-              return it;
-            }
-          }
-          final Item it = ir.next();
+          Item it = ir.next();
           if(it == null) return null;
-          ir2 = it.atomValue(info).iter();
+          if(set.add(it, info)) return it;
         }
       }
     };
+  }
+
+  /**
+   * Returns all distinct values of a sequence.
+   * @param qc query context
+   * @return distinct iterator
+   * @throws QueryException query exception
+   */
+  private Value distinctValues(final QueryContext qc) throws QueryException {
+    final Collation coll = toCollation(1, qc);
+    if(exprs[0] instanceof RangeSeq) return (RangeSeq) exprs[0];
+
+    final ValueBuilder vb = new ValueBuilder();
+    final ItemSet set = coll == null ? new HashItemSet() : new CollationItemSet(coll);
+    final Iter ir = exprs[0].atomIter(qc, info);
+    for(Item it; (it = ir.next()) != null;) {
+      if(set.add(it, info)) vb.add(it);
+    }
+    return vb.value();
   }
 
   /**
@@ -307,7 +316,7 @@ public final class FNSeq extends StandardFunc {
    */
   private Iter insertBefore(final QueryContext qc) throws QueryException {
     return new Iter() {
-      final long pos = Math.max(1, checkItr(exprs[1], qc));
+      final long pos = Math.max(1, toLong(exprs[1], qc));
       final Iter iter = exprs[0].iter(qc);
       final Iter ins = exprs[2].iter(qc);
       long p = pos;
@@ -334,7 +343,7 @@ public final class FNSeq extends StandardFunc {
    */
   private Iter remove(final QueryContext qc) throws QueryException {
     return new Iter() {
-      final long pos = checkItr(exprs[1], qc);
+      final long pos = toLong(exprs[1], qc);
       final Iter iter = exprs[0].iter(qc);
       long c;
 
@@ -346,21 +355,20 @@ public final class FNSeq extends StandardFunc {
   }
 
   /**
-   * Creates a subsequence out of a sequence, starting with start and
-   * ending with end.
+   * Creates a subsequence out of a sequence, starting with start and ending with end.
    * @param qc query context
    * @return subsequence
    * @throws QueryException query exception
    */
   private Iter subseqIter(final QueryContext qc) throws QueryException {
-    final double ds = checkDbl(exprs[1], qc);
+    final double ds = toDouble(exprs[1], qc);
     if(Double.isNaN(ds)) return Empty.ITER;
     final long s = StrictMath.round(ds);
     final boolean si = s == Long.MIN_VALUE;
 
     long l = Long.MAX_VALUE;
     if(exprs.length > 2) {
-      final double dl = checkDbl(exprs[2], qc);
+      final double dl = toDouble(exprs[2], qc);
       if(Double.isNaN(dl)) return Empty.ITER;
       if(si && dl == Double.POSITIVE_INFINITY) return Empty.ITER;
       l = StrictMath.round(dl);
@@ -427,14 +435,14 @@ public final class FNSeq extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value subseqValue(final QueryContext qc) throws QueryException {
-    final double dstart = checkDbl(exprs[1], qc);
+    final double dstart = toDouble(exprs[1], qc);
     if(Double.isNaN(dstart)) return Empty.SEQ;
     final long start = StrictMath.round(dstart);
     final boolean sinf = start == Long.MIN_VALUE;
 
     long length = Long.MAX_VALUE;
     if(exprs.length > 2) {
-      final double dlength = checkDbl(exprs[2], qc);
+      final double dlength = toDouble(exprs[2], qc);
       if(Double.isNaN(dlength)) return Empty.SEQ;
       if(sinf && dlength == Double.POSITIVE_INFINITY) return Empty.SEQ;
       length = StrictMath.round(dlength);

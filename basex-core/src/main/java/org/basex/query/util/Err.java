@@ -22,106 +22,106 @@ public enum Err {
   // General errors
 
   /** BASX0000. */
-  BASX_GENERIC(BASX, 0, "%"),
+  BASX_GENERIC_X(BASX, 0, "%"),
   /** BASX0001. */
-  BASX_PERM(BASX, 1, "% permission required."),
+  BASX_PERM_X(BASX, 1, "% permission required."),
   /** BASX0002. */
-  BASX_OPTIONS(BASX, 2, "Unknown database option '%'."),
+  BASX_OPTIONS_X(BASX, 2, "Unknown database option '%'."),
   /** BASX0002. */
-  BASX_VALUE(BASX, 2, "Database option '%' cannot be set to '%'."),
+  BASX_VALUE_X_X(BASX, 2, "Database option '%' cannot be set to '%'."),
   /** BASX0003. */
-  BASX_RESTXQ(BASX, 3, "%"),
+  BASX_RESTXQ_X(BASX, 3, "%"),
   /** BASX0004. */
   BASX_DBTRANSFORM(BASX, 4, "No database updates allowed within transform expression."),
   /** BASX0005. */
   BASX_STACKOVERFLOW(BASX, 5, "Stack Overflow: Try tail recursion?"),
   /** BASX0006. */
-  BASX_ANNOT(BASX, 6, "Annotation %% is invalid or not supported."),
+  BASX_ANNOT_X_X(BASX, 6, "Annotation %% is invalid or not supported."),
   /** BASX0006. */
-  BASX_ANNOTARGS(BASX, 6, "Annotation %% has invalid arguments."),
+  BASX_ANNOTARGS_X_X(BASX, 6, "Annotation %% has invalid arguments."),
   /** XUST0002. */
   BASEX_MOD(XUST, 2, "All transform expressions must be updating or return an empty sequence."),
 
   // Client module
 
   /** BXCL0001. */
-  BXCL_CONN(BXCL, 1, "Connection failed: %"),
+  BXCL_CONN_X(BXCL, 1, "Connection failed: %"),
   /** BXCL0002. */
-  BXCL_NOTAVL(BXCL, 2, "Session with ID % is not available or has been closed."),
+  BXCL_NOTAVL_X(BXCL, 2, "Session with ID % is not available or has been closed."),
   /** BXCL0003. */
-  BXCL_COMM(BXCL, 3, "An error occurred: %"),
+  BXCL_COMM_X(BXCL, 3, "An error occurred: %"),
   /** BXCL0004. */
-  BXCL_COMMAND(BXCL, 4, "Command could not be executed: %"),
+  BXCL_COMMAND_X(BXCL, 4, "Command could not be executed: %"),
   /** BXCL0005. */
-  BXCL_QUERY(BXCL, 5, "Query could not be executed: %"),
+  BXCL_QUERY_X(BXCL, 5, "Query could not be executed: %"),
 
   // Conversion module
 
   /** BXCO0001. */
-  BXCO_STRING(BXCO, 1, "String conversion: %."),
+  BXCO_STRING_X(BXCO, 1, "String conversion: %."),
   /** BXCO0001. */
-  BXCO_BASE64(BXCO, 1, "Conversion of '%' to encoding '%' failed."),
+  BXCO_BASE64_X_X(BXCO, 1, "Conversion of '%' to encoding '%' failed."),
   /** BXCO0002. */
-  BXCO_ENCODING(BXCO, 2, "Unknown encoding '%'."),
+  BXCO_ENCODING_X(BXCO, 2, "Unknown encoding '%'."),
 
   // CSV module
 
   /** BXCS0001. */
-  BXCS_PARSE(BXCS, 1, "CSV parser: %."),
+  BXCS_PARSE_X(BXCS, 1, "CSV parser: %."),
   /** BXCS0002. */
-  BXCS_SERIAL(BXCS, 2, "CSV serializer: %."),
+  BXCS_SERIAL_X(BXCS, 2, "CSV serializer: %."),
 
   // Database module
 
   /** BXDB0001. */
-  BXDB_NODB(BXDB, 1, "Database node expected, % found: %."),
+  BXDB_NODB_X_X(BXDB, 1, "Database node expected, % found: %."),
   /** BXDB0002. */
-  BXDB_OPEN(BXDB, 2, "%"),
+  BXDB_OPEN_X(BXDB, 2, "%"),
   /** BXDB0002. */
-  BXDB_WHICH(BXDB, 2, "Database '%' not found."),
+  BXDB_WHICH_X(BXDB, 2, "Database '%' not found."),
   /** BXDB0002. */
-  BXDB_WHICHBACK(BXDB, 2, "No backup found for database '%'."),
+  BXDB_WHICHBACK_X(BXDB, 2, "No backup found for database '%'."),
   /** BXDB0003. */
-  BXDB_MEM(BXDB, 3, "Operation requires database '%' to be persistent."),
+  BXDB_MEM_X(BXDB, 3, "Operation requires database '%' to be persistent."),
   /** BXDB0004. */
-  BXDB_INDEX(BXDB, 4, "Database '%' has no % index."),
+  BXDB_INDEX_X(BXDB, 4, "Database '%' has no % index."),
   /** BXDB0006. */
-  BXDB_NODOC(BXDB, 6, "Database path '%' yields no documents."),
+  BXDB_NODOC_X(BXDB, 6, "Database path '%' yields no documents."),
   /** BXDB0006. */
-  BXDB_SINGLE(BXDB, 6, "Database path '%' points to more than one document."),
+  BXDB_SINGLE_X(BXDB, 6, "Database path '%' points to more than one document."),
   /** BXDB0007. */
-  BXDB_OPENED(BXDB, 7, "Database '%' cannot be updated, as it is opened by another process."),
+  BXDB_OPENED_X(BXDB, 7, "Database '%' cannot be updated, as it is opened by another process."),
   /** BXDB0007. */
-  BXDB_LOCK(BXDB, 7, "%"),
+  BXDB_LOCK_X(BXDB, 7, "%"),
   /** BXDB0008. */
-  BXDB_RENAME(BXDB, 8, "Invalid target path: %."),
+  BXDB_RENAME_X(BXDB, 8, "Invalid target path: %."),
   /** BXDB0009. */
-  BXDB_RANGE(BXDB, 9, "Database '%' has no node with % value %."),
+  BXDB_RANGE_X_X_X(BXDB, 9, "Database '%' has no node with % value %."),
   /** BXDB0010. */
-  BXDB_EVENT(BXDB, 10, "Event '%' is unknown."),
+  BXDB_EVENT_X(BXDB, 10, "Event '%' is unknown."),
   /** BXDB0011. */
-  BXDB_NAME(BXDB, 11, "Invalid database name '%'."),
+  BXDB_NAME_X(BXDB, 11, "Invalid database name '%'."),
   /** BXDB0012. */
-  BXDB_ALTERDROP(BXDB, 12, "Database '%' cannot be both altered and dropped."),
+  BXDB_ALTERDROP_X(BXDB, 12, "Database '%' cannot be both altered and dropped."),
   /** BXDB0012. */
-  BXDB_ONCE(BXDB, 12, "Database '%' can only be % once."),
+  BXDB_ONCE_X_X(BXDB, 12, "Database '%' can only be % once."),
   /** BXDB0012. */
-  BXDB_ONCEBACK(BXDB, 12, "Backup '%' can only be % once."),
+  BXDB_ONCEBACK_X_X(BXDB, 12, "Backup '%' can only be % once."),
   /** BXDB0013. */
-  BXDB_CREATEARGS(BXDB, 13, "Number of specified inputs and paths differs: % vs. %."),
+  BXDB_CREATEARGS_X_X(BXDB, 13, "Number of specified inputs and paths differs: % vs. %."),
   /** BXDB0014. */
-  BXDB_DIR(BXDB, 14, "Database path '%' points to a directory."),
+  BXDB_DIR_X(BXDB, 14, "Database path '%' points to a directory."),
   /** BXDB0015. */
-  BXDB_NOBACKUP(BXDB, 15, "No backup found: %."),
+  BXDB_NOBACKUP_X(BXDB, 15, "No backup found: %."),
   /** BXDB0016. */
-  BXDB_SAME(BXDB, 16, "Name of source and target database is equal: %."),
+  BXDB_SAME_X(BXDB, 16, "Name of source and target database is equal: %."),
 
   // Fetch module
 
   /** BXFE0001. */
-  BXFE_IO(BXFE, 1, "%"),
+  BXFE_IO_X(BXFE, 1, "%"),
   /** BXFE0002. */
-  BXFE_ENCODING(BXFE, 2, "Unknown encoding '%'."),
+  BXFE_ENCODING_X(BXFE, 2, "Unknown encoding '%'."),
 
   // Fulltext module
 
@@ -131,77 +131,77 @@ public enum Err {
   // HTML module
 
   /** BXHL0001. */
-  BXHL_IO(BXHL, 1, "%"),
+  BXHL_IO_X(BXHL, 1, "%"),
 
   // JSON module
 
   /** BXJS0001. */
-  BXJS_PARSE(BXJS, 1, "JSON parser (%:%): %."),
+  BXJS_PARSE_X_X_X(BXJS, 1, "JSON parser (%:%): %."),
   /** BXJS0001. */
-  BXJS_PARSEML(BXJS, 1, "JsonML parser: %."),
+  BXJS_PARSEML_X(BXJS, 1, "JsonML parser: %."),
   /** BXJS0002. */
-  BXJS_SERIAL(BXJS, 2, "JSON serializer: %."),
+  BXJS_SERIAL_X(BXJS, 2, "JSON serializer: %."),
 
   // Process module
 
   /** BXPR9999. */
-  BXPR_ENC(BXPR, 9999, "Unknown encoding '%'."),
+  BXPR_ENC_X(BXPR, 9999, "Unknown encoding '%'."),
 
   // Repository module
 
   /** BXRE0001. */
-  BXRE_WHICH(BXRE, 1, "Package '%' does not exist."),
+  BXRE_WHICH_X(BXRE, 1, "Package '%' does not exist."),
   /** BXRE0002. */
-  BXRE_URI(BXRE, 2, "URI is invalid or has no path component: '%'."),
+  BXRE_URI_X(BXRE, 2, "URI is invalid or has no path component: '%'."),
   /** BXRE0003. */
-  BXRE_NOTINST(BXRE, 3, "Required package '%' is not installed."),
+  BXRE_NOTINST_X(BXRE, 3, "Required package '%' is not installed."),
   /** BXRE0004. */
-  BXRE_DESC(BXRE, 4, "Package descriptor: %."),
+  BXRE_DESC_X(BXRE, 4, "Package descriptor: %."),
   /** BXRE0005. */
-  BXRE_INST(BXRE, 5, "Module % is already installed within another package."),
+  BXRE_INST_X(BXRE, 5, "Module % is already installed within another package."),
   /** BXRE0006. */
-  BXRE_PARSE(BXRE, 6, "Package '%' could not be parsed: %."),
+  BXRE_PARSE_X_X(BXRE, 6, "Package '%' could not be parsed: %."),
   /** BXRE0007. */
-  BXRE_DELETE(BXRE, 7, "File '%' could not be deleted."),
+  BXRE_DELETE_X(BXRE, 7, "File '%' could not be deleted."),
   /** BXRE0008. */
-  BXRE_DEP(BXRE, 8, "Package '%' depends on package '%'."),
+  BXRE_DEP_X_X(BXRE, 8, "Package '%' depends on package '%'."),
   /** BXRE0009. */
   BXRE_VERSION(BXRE, 9, "Package version is not supported."),
   /** BXRE0010. */
-  BXRE_JARDESC(BXRE, 10, "JAR descriptor: %."),
+  BXRE_JARDESC_X(BXRE, 10, "JAR descriptor: %."),
   /** BXRE0011. */
-  BXRE_JARFAIL(BXRE, 11, "Reading JAR descriptor failed: %."),
+  BXRE_JARFAIL_X(BXRE, 11, "Reading JAR descriptor failed: %."),
 
   // XSLT module
 
   /** BXSL0001. */
-  BXSL_ERROR(BXSL, 1, "%"),
+  BXSL_ERROR_X(BXSL, 1, "%"),
 
   // SQL module
 
   /** BXSQ0001. */
-  BXSQ_ERROR(BXSQ, 1, "An SQL exception occurred: '%'"),
+  BXSQ_ERROR_X(BXSQ, 1, "An SQL exception occurred: '%'"),
   /** BXSQ0002. */
-  BXSQ_CONN(BXSQ, 2, "No opened connection with id %"),
+  BXSQ_CONN_X(BXSQ, 2, "No opened connection with id %"),
   /** BXSQ0002. */
-  BXSQ_STATE(BXSQ, 2, "No prepared statement with id %"),
+  BXSQ_STATE_X(BXSQ, 2, "No prepared statement with id %"),
   /** BXSQ0003. */
   BXSQ_PARAMS(BXSQ, 3, "Number of parameters differs from number of placeholders"),
   /** BXSQ0004. */
   BXSQ_TYPE(BXSQ, 4, "No parameter type supplied."),
   /** BXSQ0005. */
-  BXSQ_ATTR(BXSQ, 5, "Not expected attribute: %"),
+  BXSQ_ATTR_X(BXSQ, 5, "Not expected attribute: %"),
   /** BXSQ0006. */
-  BXSQ_FORMAT(BXSQ, 6, "Illegal % format"),
+  BXSQ_FORMAT_X(BXSQ, 6, "Illegal % format"),
   /** BXSQ0007. */
-  BXSQ_DRIVER(BXSQ, 7, "Could not initialize supplied driver: '%'"),
+  BXSQ_DRIVER_X(BXSQ, 7, "Could not initialize supplied driver: '%'"),
 
   // Validation module
 
   /** BXVA0001. */
-  BXVA_FAIL(BXVA, 1, "Validation failed. %"),
+  BXVA_FAIL_X(BXVA, 1, "Validation failed. %"),
   /** BXVA0002. */
-  BXVA_START(BXVA, 2, "Validation could not be started. %"),
+  BXVA_START_X(BXVA, 2, "Validation could not be started. %"),
 
   // XQuery module
 
@@ -210,7 +210,7 @@ public enum Err {
   /** BXXQ0002. */
   BXXQ_NOUPDATE(BXXQ, 2, "Updating expression expected."),
   /** BXXQ0002. */
-  BXXQ_PERM(BXXQ, 3, "%"),
+  BXXQ_PERM_X(BXXQ, 3, "%"),
   /** BXXQ0004. */
   BXXQ_STOPPED(BXXQ, 4, "Timeout or assigned memory was exceeded."),
 
@@ -219,44 +219,44 @@ public enum Err {
   /** UNIT0001. */
   UNIT_ASSERT(UNIT, 1, "Assertion failed."),
   /** UNIT0001. */
-  UNIT_MESSAGE(UNIT, 1, "%"),
+  UNIT_MESSAGE_X(UNIT, 1, "%"),
   /** UNIT0001. */
-  UNIT_ASSERT_EQUALS(UNIT, 1, "Item %: % expected, % returned."),
+  UNIT_ASSERT_EQUALS_X_X_X(UNIT, 1, "Item %: % expected, % returned."),
   /** UNIT0002. */
-  UNIT_ARGS(UNIT, 2, "Test function '%' must have no arguments."),
+  UNIT_ARGS_X(UNIT, 2, "Test function '%' must have no arguments."),
   /** UNIT0003. */
-  UNIT_PRIVATE(UNIT, 3, "Test function '%' must be public."),
+  UNIT_PRIVATE_X(UNIT, 3, "Test function '%' must be public."),
   /** UNIT0004. */
-  UNIT_TWICE(UNIT, 4, "Annotation %:% was declare twice."),
+  UNIT_TWICE_X_X(UNIT, 4, "Annotation %:% was declare twice."),
   /** UNIT0005. */
-  UNIT_ANN(UNIT, 5, "Annotation '%%' has invalid arguments."),
+  UNIT_ANN_X_X(UNIT, 5, "Annotation '%%' has invalid arguments."),
   /** UNIT0006. */
-  UNIT_EMPTY(UNIT, 6, "Test function '%' returns items."),
+  UNIT_EMPTY_X(UNIT, 6, "Test function '%' returns items."),
 
   // EXPath modules
 
   /** ARCH0001. */
-  ARCH_DIFF(ARCH, 1, "Number of supplied entries and contents differs: % vs. %."),
+  ARCH_DIFF_X_X(ARCH, 1, "Number of supplied entries and contents differs: % vs. %."),
   /** ARCH0002. */
   ARCH_UNKNOWN(ARCH, 2, "Packing format not supported."),
   /** ARCH0002. */
-  ARCH_SUPP(ARCH, 2, "% not supported: '%'."),
+  ARCH_SUPP_X_X(ARCH, 2, "% not supported: '%'."),
   /** ARCH0003. */
   ARCH_EMPTY(ARCH, 3, "Name of ZIP entry must not be empty."),
   /** ARCH0003. */
-  ARCH_LEVEL(ARCH, 3, "Invalid compression level: '%'."),
+  ARCH_LEVEL_X(ARCH, 3, "Invalid compression level: '%'."),
   /** ARCH0003. */
-  ARCH_DATETIME(ARCH, 3, "xs:dateTime value is invalid : '%'."),
+  ARCH_DATETIME_X(ARCH, 3, "xs:dateTime value is invalid : '%'."),
   /** ARCH0004. */
-  ARCH_ENCODING(ARCH, 4, "Unknown encoding '%'."),
+  ARCH_ENCODING_X(ARCH, 4, "Unknown encoding '%'."),
   /** ARCH0004. */
-  ARCH_ENCODE(ARCH, 4, "String conversion: %."),
+  ARCH_ENCODE_X(ARCH, 4, "String conversion: %."),
   /** ARCH0005. */
-  ARCH_MODIFY(ARCH, 5, "Entries of % archive cannot be modified."),
+  ARCH_MODIFY_X(ARCH, 5, "Entries of % archive cannot be modified."),
   /** ARCH0006. */
-  ARCH_ONE(ARCH, 6, "% archives are limited to a single entry."),
+  ARCH_ONE_X(ARCH, 6, "% archives are limited to a single entry."),
    /** ARCH9999. */
-  ARCH_FAIL(ARCH, 9999, "Operation failed: %."),
+  ARCH_FAIL_X(ARCH, 9999, "Operation failed: %."),
 
   /** Binary error. */
   BIN_DLA_X_X(BIN, "differing-length-arguments", "Inputs are of different length (%/%)."),
@@ -271,7 +271,7 @@ public enum Err {
   /** Binary error. */
   BIN_UE_X(BIN, "unknown-encoding", "Unknown encoding '%'."),
   /** Binary error. */
-  BIN_CE(BIN, "conversion-error", "%."),
+  BIN_CE_X(BIN, "conversion-error", "%."),
   /** Binary error. */
   BIN_USO_X(BIN, "unknown-significance-order", "Unknown octet-order value: '%'."),
 
@@ -286,7 +286,7 @@ public enum Err {
   /** CX0005. */
   CX_INVNM(CX, 5, "Invalid name for $digital-certificate root."),
   /** CX0007. */
-  CX_KSNULL(CX, 7, "Key store is null: %"),
+  CX_KSNULL_X(CX, 7, "Key store is null: %"),
   /** CX0012. */
   CX_NOKEY(CX, 12, "Cannot find key for alias in given keystore."),
   /** CX0013. */
@@ -308,7 +308,7 @@ public enum Err {
   /** CX0021. */
   CX_INVALGO(CX, 21, "Algorithm is not supported."),
   /** CX0023. */
-  CX_ALINV(CX, 23, "Invalid certificate alias %."),
+  CX_ALINV_X(CX, 23, "Invalid certificate alias %."),
   /** CX0024. */
   CX_ALGEXC(CX, 24, "Invalid algorithm."),
   /** CX0025. */
@@ -321,167 +321,167 @@ public enum Err {
   CX_SIGTYPINV(CX, 28, "Signature type is not supported."),
 
   /** File error. */
-  FILE_NOT_FOUND(FILE, "not-found", "File '%' does not exist."),
+  FILE_NOT_FOUND_X(FILE, "not-found", "File '%' does not exist."),
   /** File error. */
-  FILE_EXISTS(FILE, "exists", "File '%' already exists."),
+  FILE_EXISTS_X(FILE, "exists", "File '%' already exists."),
   /** File error. */
-  FILE_NO_DIR(FILE, "no-dir", "Path '%' is no directory."),
+  FILE_NO_DIR_X(FILE, "no-dir", "Path '%' is no directory."),
   /** File error. */
-  FILE_IS_DIR(FILE, "is-dir", "Path '%' is a directory."),
+  FILE_IS_DIR_X(FILE, "is-dir", "Path '%' is a directory."),
   /** File error. */
-  FILE_ID_DIR2(FILE, "is-dir", "Path '%' is a non-empty directory."),
+  FILE_ID_DIR2_X(FILE, "is-dir", "Path '%' is a non-empty directory."),
   /** File error. */
-  FILE_UNKNOWN_ENCODING(FILE, "unknown-encoding", "Unknown encoding '%'."),
+  FILE_UNKNOWN_ENCODING_X(FILE, "unknown-encoding", "Unknown encoding '%'."),
   /** File error. */
-  FILE_OUT_OF_RANGE(FILE, "out-of-range", "Requested file chunk [%,%] exceeds file bounds."),
+  FILE_OUT_OF_RANGE_X_X(FILE, "out-of-range", "Requested file chunk [%,%] exceeds file bounds."),
   /** File error. */
-  FILE_INVALID_PATH(FILE, "invalid-path", "Invalid file path: '%'."),
+  FILE_INVALID_PATH_X(FILE, "invalid-path", "Invalid file path: '%'."),
   /** File error. */
-  FILE_IO_ERROR(FILE, "io-error", "%"),
+  FILE_IO_ERROR_X(FILE, "io-error", "%"),
   /** File error. */
-  FILE_IE_ERROR_ACCESS(FILE, "io-error", "Access to '%' is denied."),
+  FILE_IE_ERROR_ACCESS_X(FILE, "io-error", "Access to '%' is denied."),
 
   /** HASH0001. */
-  HASH_ALG(HASH, 1, "Algorithm not supported: '%'."),
+  HASH_ALG_X(HASH, 1, "Algorithm not supported: '%'."),
 
   /** HC0001. */
-  HC_ERROR(HC, 1, "%"),
+  HC_ERROR_X(HC, 1, "%"),
   /** HC0002. */
-  HC_PARSE(HC, 2, "Conversion failed: %"),
+  HC_PARSE_X(HC, 2, "Conversion failed: %"),
   /** HC0003. */
   HC_ATTR(HC, 3, "No attribute allowed beside 'src' and 'media-type'."),
   /** HC0004. */
-  HC_REQ(HC, 4, "Invalid request element: %."),
+  HC_REQ_X(HC, 4, "Invalid request element: %."),
   /** HC0005. */
   HC_URL(HC, 5, "No URL supplied."),
   /** HC0006. */
   HC_PARAMS(HC, 6, "Specify request element or HTTP URI."),
 
   /** ZIP0001. */
-  ZIP_NOTFOUND(ZIP, 1, "Path '%' not found."),
+  ZIP_NOTFOUND_X(ZIP, 1, "Path '%' not found."),
   /** ZIP0002. */
-  ZIP_INVALID(ZIP, 2, "% element: attribute '%' expected."),
+  ZIP_INVALID_X_X(ZIP, 2, "% element: attribute '%' expected."),
   /** ZIP0002. */
-  ZIP_UNKNOWN(ZIP, 2, "ZIP definition: unknown element %."),
+  ZIP_UNKNOWN_X(ZIP, 2, "ZIP definition: unknown element %."),
   /** ZIP0003. */
-  ZIP_FAIL(ZIP, 3, "Operation failed: %."),
+  ZIP_FAIL_X(ZIP, 3, "Operation failed: %."),
 
   // W3 Functions
 
   /** FOAR0001. */
-  DIVZERO(FOAR, 1, "% cannot be divided by zero."),
+  DIVZERO_X(FOAR, 1, "% cannot be divided by zero."),
   /** FOAR0002. */
-  DIVFLOW(FOAR, 2, "Invalid division result: %."),
+  DIVFLOW_X(FOAR, 2, "Invalid division result: %."),
   /** FOAR0002. */
-  RANGE(FOAR, 2, "Value out of range: %."),
+  RANGE_X(FOAR, 2, "Value out of range: %."),
 
   /** FOAY0001. */
-  ARRAYBOUNDS(FOAY, 1, "Array index % out of bounds (1-%)."),
+  ARRAYBOUNDS_X_X(FOAY, 1, "Array index % out of bounds (1-%)."),
   /** FOAY0002. */
-  ARRAYNEG(FOAY, 2, "Length is negative: %."),
+  ARRAYNEG_X(FOAY, 2, "Length is negative: %."),
 
   /** FOCA0002. */
-  INVALUE(FOCA, 2, "Cannot cast % to %: %."),
+  INVALUE_X_X(FOCA, 2, "Cannot cast to %: \"%\"."),
   /** FOCA0003. */
-  INTRANGE(FOCA, 3, "Integer value out of range: %."),
+  INTRANGE_X(FOCA, 3, "Integer value out of range: %."),
   /** FOCA0005. */
-  DATECALC(FOCA, 5, "Invalid % calculation: %."),
+  DATECALC_X_X(FOCA, 5, "Invalid % calculation: %."),
 
   /** FOCH0001. */
-  INVCODE(FOCH, 1, "Invalid XML character '&#x%;'."),
+  INVCODE_X(FOCH, 1, "Invalid XML character '&#x%;'."),
   /** FOCH0002. */
-  WHICHCOLL(FOCH, 2, "Unknown collation '%'."),
+  WHICHCOLL_X(FOCH, 2, "Unknown collation '%'."),
   /** FOCH0003. */
-  NORMUNI(FOCH, 3, "Unsupported normalization form ('%')."),
+  NORMUNI_X(FOCH, 3, "Unsupported normalization form ('%')."),
   /** FOCH0004. */
   CHARCOLL(FOCH, 4, "Collation does not support function."),
 
   /** FODC0001. */
   IDDOC(FODC, 1, "Specified node has no document node as root."),
   /** FODC0002. */
-  NODEERR(FODC, 2, "% could not be created: %."),
+  NODEERR_X_X(FODC, 2, "% could not be created: %."),
   /** FODC0002. */
   NODEFCOLL(FODC, 2, "No default collection available."),
   /** FODC0002. */
-  IOERR(FODC, 2, "%"),
+  IOERR_X(FODC, 2, "%"),
   /** FODC0002. */
-  WHICHRES(FODC, 2, "Resource '%' does not exist."),
+  WHICHRES_X(FODC, 2, "Resource '%' does not exist."),
   /** FODC0004. */
-  INVCOLL(FODC, 4, "Invalid collection URI: '%'."),
+  INVCOLL_X(FODC, 4, "Invalid collection URI: '%'."),
   /** FODC0005. */
-  INVDOC(FODC, 5, "Invalid document URI: '%'."),
+  INVDOC_X(FODC, 5, "Invalid document URI: '%'."),
   /** FODC0006. */
-  SAXERR(FODC, 6, "SAX: %"),
+  SAXERR_X(FODC, 6, "SAX: %"),
   /** FODC0007. */
-  RESINV(FODC, 7, "Resource path '%' is invalid."),
+  RESINV_X(FODC, 7, "Resource path '%' is invalid."),
   /** FODC0007. */
-  INVDB(FODC, 7, "Invalid database name: '%'."),
+  INVDB_X(FODC, 7, "Invalid database name: '%'."),
 
   /** FODF1280. */
-  FORMNUM(FODF, 1280, "Unknown decimal format: '%'."),
+  FORMNUM_X(FODF, 1280, "Unknown decimal format: '%'."),
   /** FODF1310. */
   PICEMPTY(FODF, 1310, "The picture string may not be empty."),
   /** FODF1310. */
-  PICNUM(FODF, 1310, "Invalid picture string: '%'."),
+  PICNUM_X(FODF, 1310, "Invalid picture string: '%'."),
   /** FODF1310. */
-  OPTAFTER(FODF, 1310, "Optional digit sign follows mandatory digit signs: '%'."),
+  OPTAFTER_X(FODF, 1310, "Optional digit sign follows mandatory digit signs: '%'."),
   /** FODF1310. */
-  INVGROUP(FODF, 1310, "Invalid position of grouping separator signs: '%'."),
+  INVGROUP_X(FODF, 1310, "Invalid position of grouping separator signs: '%'."),
   /** FODF1310. */
-  DIFFMAND(FODF, 1310, "Mandatory digits must be of the same group: '%'."),
+  DIFFMAND_X(FODF, 1310, "Mandatory digits must be of the same group: '%'."),
   /** FODF1310. */
-  INVORDINAL(FODF, 1310, "Invalid specification of ordinal numbering: '%'."),
+  INVORDINAL_X(FODF, 1310, "Invalid specification of ordinal numbering: '%'."),
   /** FODF1310. */
-  INVDDPATTERN(FODF, 1310, "Invalid decimal-digit-pattern: '%'."),
+  INVDDPATTERN_X(FODF, 1310, "Invalid decimal-digit-pattern: '%'."),
 
   /** FODT0001. */
-  DATERANGE(FODT, 1, "%: '%' out of range."),
+  DATERANGE_X_X(FODT, 1, "%: '%' out of range."),
   /** FODT0001. */
-  YEARRANGE(FODT, 1, "Year '%' out of range."),
+  YEARRANGE_X(FODT, 1, "Year '%' out of range."),
   /** FODT0001. */
-  SECRANGE(FODT, 1, "Seconds '%' out of range."),
+  SECRANGE_X(FODT, 1, "Seconds '%' out of range."),
   /** FODT0002. */
-  DURRANGE(FODT, 2, "%: '%' out of range."),
+  DURRANGE_X_X(FODT, 2, "%: '%' out of range."),
   /** FODT0002. */
-  MONTHRANGE(FODT, 2, "Months '%' out of range."),
+  MONTHRANGE_X(FODT, 2, "Months '%' out of range."),
   /** FODT0002. */
-  SECDURRANGE(FODT, 2, "Seconds '%' out of range."),
+  SECDURRANGE_X(FODT, 2, "Seconds '%' out of range."),
   /** FODT0002. */
-  DATEZERO(FODT, 2, "Invalid % calculation: %."),
+  DATEZERO_X_X(FODT, 2, "Invalid % calculation: %."),
   /** FODT0003. */
-  INVALZONE(FODT, 3, "Timezone out of range (-14:00 to +14:00): %."),
+  INVALZONE_X(FODT, 3, "Timezone out of range (-14:00 to +14:00): %."),
   /** FODT0003. */
-  ZONESEC(FODT, 3, "No seconds allowed in timezone: %."),
+  ZONESEC_X(FODT, 3, "No seconds allowed in timezone: %."),
 
   /** FOER0000. */
   FUNERR1(FOER, 0, "Halted on error()."),
 
   /** FOFD1340. */
-  INVCOMPSPEC(FOFD, 1340, "Invalid variable marker: '[%]'."),
+  INVCOMPSPEC_X(FOFD, 1340, "Invalid variable marker: '[%]'."),
   /** FOFD1340. */
-  PICDATE(FOFD, 1340, "Invalid picture string: '%'."),
+  PICDATE_X(FOFD, 1340, "Invalid picture string: '%'."),
   /** FOFD1340. */
-  CALQNAME(FOFD, 1340, "Invalid EQName: '%'."),
+  CALQNAME_X(FOFD, 1340, "Invalid EQName: '%'."),
   /** FOFD1340. */
-  CALWHICH(FOFD, 1340, "Unknown calendar: '%'."),
+  CALWHICH_X(FOFD, 1340, "Unknown calendar: '%'."),
   /** FOFD1350. */
-  PICINVCOMP(FOFD, 1350, "Component '[%]' not applicable to % values."),
+  PICINVCOMP_X_X(FOFD, 1350, "Component '[%]' not applicable to % values."),
 
   /** FONS0004. */
-  NSDECL(FONS, 4, "No namespace declared for prefix '%'."),
+  NSDECL_X(FONS, 4, "No namespace declared for prefix '%'."),
 
   /** FORG0001. */
-  INVALIDZONE(FORG, 1, "Invalid timezone: %."),
+  INVALIDZONE_X(FORG, 1, "Invalid timezone: %."),
   /** FORG0001. */
-  FUNCAST(FORG, 1, "Cannot cast to %: \"%\"."),
+  FUNCAST_X_X(FORG, 1, "Cannot cast to %: \"%\"."),
   /** FORG0001. */
-  FUNCCASTEX(FORG, 1, "Cannot cast % to %: %."),
+  FUNCCAST_X_X_X(FORG, 1, "Cannot cast % to %: %."),
   /** FORG0001. */
-  DATEFORMAT(FORG, 1, "Wrong % format: '%' (try e.g. '%')."),
+  DATEFORMAT_X_X_X(FORG, 1, "Wrong % format: '%' (try e.g. '%')."),
   /** FORG0002. */
-  URIINVRES(FORG, 2, "URI argument is invalid: %."),
+  URIARG_X(FORG, 2, "URI argument is invalid: %."),
   /** FORG0002. */
-  URIABS(FORG, 2, "Base URI is not absolute: %."),
+  URINOTABS_X(FORG, 2, "Base URI is not absolute: %."),
 
   /** FORG0003. */
   ZEROORONE(FORG, 3, "Zero or one value expected."),
@@ -490,187 +490,185 @@ public enum Err {
   /** FORG0005. */
   EXACTLYONE(FORG, 5, "Exactly one value expected."),
   /** FORG0006. */
-  FUNTYPE(FORG, 6, "% expected, % found: %."),
+  EXPTYPE_X_X_X(FORG, 6, "% expected, % found: %."),
   /** FORG0006. */
-  FUNCMP(FORG, 6, "Items of type % cannot be compared."),
+  NOTCMP_X(FORG, 6, "Items of type % cannot be compared."),
   /** FORG0006. */
-  EBV(FORG, 6, "Effective boolean value not defined for %."),
+  EBV_X(FORG, 6, "Effective boolean value not defined for %."),
   /** FORG0006. */
-  SUMTYPE(FORG, 6, "Argument type % is invalid: %."),
+  SUM_X_X(FORG, 6, "Argument type % is invalid: %."),
   /** FORG0006. */
-  SUMNUM(FORG, 6, "Number expected, % found: %."),
+  SUMNUM_X_X(FORG, 6, "Number expected, % found: %."),
   /** FORG0006. */
-  SUMDUR(FORG, 6, "Duration expected, % found: %."),
+  SUMDUR_X_X(FORG, 6, "Duration expected, % found: %."),
   /** FORG0006. */
-  BINARYTYPE(FORG, 6, "Binary expected, % found."),
+  BINARY_X(FORG, 6, "Binary expected, % found."),
   /** FORG0006. */
-  STRNODTYPE(FORG, 6, "String or node expected, % found: %."),
+  STRNOD_X_X(FORG, 6, "String or node expected, % found: %."),
   /** FORG0006. */
-  ELMMAPTYPE(FORG, 6, "element(%) or map expected, % found: %."),
+  ELMMAP_X_X_X(FORG, 6, "element(%) or map expected, % found: %."),
   /** FORG0006. */
-  ELMSTRTYPE(FORG, 6, "element(%) or string expected, % found: %."),
+  ELMSTR_X_X_X(FORG, 6, "element(%) or string expected, % found: %."),
   /** FORG0006. */
-  STRBINTYPE(FORG, 6, "String or binary expected, % found: %."),
+  STRBIN_X_X(FORG, 6, "String or binary expected, % found: %."),
   /** FORG0006. */
-  JAVACON(FORG, 6, "Unknown constructor: %(%)."),
+  JAVACONSTR_X_X(FORG, 6, "Unknown constructor: %(%)."),
   /** FORG0006. */
-  JAVAMTH(FORG, 6, "Unknown method: %(%)."),
+  JAVAMETHOD_X_X(FORG, 6, "Unknown method: %(%)."),
   /** FORG0006. */
-  JAVAFUN(FORG, 6, "Invalid call of Java function: %(%)."),
+  JAVACALL_X_X(FORG, 6, "Invalid call of Java function: %(%)."),
   /** FORG0006. */
-  JAVAMOD(FORG, 6, "Invalid arguments: % expected, % found."),
+  JAVAARGS_X_X(FORG, 6, "Invalid arguments: % expected, % found."),
   /** FORG0006. */
-  JAVAERR(FORG, 6, "Java function call failed: %."),
+  JAVAERROR_X(FORG, 6, "Java function call failed: %."),
   /** FORG0006. */
-  INVBASE(FORG, 6, "Unsupported base: %."),
+  INVBASE_X(FORG, 6, "Unsupported base: %."),
   /** FORG0006. */
-  INVDIG(FORG, 6, "Invalid digit for base %: %."),
+  INVBASEDIG_X_X(FORG, 6, "Invalid digit for base %: %."),
   /** FORG0006. */
-  ERRFORMAT(FORG, 6, "%: %."),
+  ERRFORMAT_X_X(FORG, 6, "%: %."),
   /** FORG0006. */
-  INVALIDOPT(FORG, 6, "%"),
+  INVALIDOPT_X(FORG, 6, "%"),
   /** FORG0006. */
-  INVALIDOPTX(FORG, 6, "Unknown option '%'."),
+  INVALIDOPTION_X(FORG, 6, "Unknown option '%'."),
 
   /** FORG0008. */
-  FUNZONE(FORG, 8, "% and % have different timezones."),
+  FUNZONE_X_X(FORG, 8, "% and % have different timezones."),
 
   /** FORX0001. */
-  REGMOD(FORX, 1, "Invalid regular modifier: '%'."),
+  REGMOD_X(FORX, 1, "Invalid regular modifier: '%'."),
   /** FORX0002. */
-  REGPAT(FORX, 2, "Invalid pattern: %."),
+  REGPAT_X(FORX, 2, "Invalid pattern: %."),
   /** FORX0003. */
   REGROUP(FORX, 3, "Pattern matches empty string."),
   /** FORX0004. */
-  FUNREPBS(FORX, 4, "Invalid backslash in replacement string: %."),
+  FUNREPBS_X(FORX, 4, "Invalid backslash in replacement string: %."),
   /** FORX0004. */
-  FUNREPDOL(FORX, 4, "Invalid dollar sign in replacement string: %."),
+  FUNREPDOL_X(FORX, 4, "Invalid dollar sign in replacement string: %."),
 
   /** FOTY0013. */
-  FIVALUE(FOTY, 13, "Items of type % have no typed value."),
+  FIATOM_X(FOTY, 13, "Items of type % cannot be atomized."),
   /** FOTY0013. */
-  FIATOM(FOTY, 13, "Items of type % cannot be atomized."),
+  FIEQ_X(FOTY, 13, "Items of type % have no defined equality."),
   /** FOTY0013. */
-  FIEQ(FOTY, 13, "Items of type % have no defined equality."),
+  FISTRING_X(FOTY, 14, "Items of type % have no string representation."),
   /** FOTY0013. */
-  FISTR(FOTY, 14, "Items of type % have no string representation."),
-  /** FOTY0013. */
-  FICMP(FOTY, 15, "Items of type % cannot be compared."),
+  FICMP_X(FOTY, 15, "Items of type % cannot be compared."),
 
   /** FOUP0001. */
-  UPFOTYPE(FOUP, 1, "Document or element expected, % found."),
+  UPFOTYPE_X(FOUP, 1, "Document or element expected, % found."),
   /** FOUP0001. */
-  UPDOCTYPE(FOUP, 1, "Document expected, % found."),
+  UPDOCTYPE_X(FOUP, 1, "Document expected, % found."),
   /** FOUP0002. */
-  UPFOURI(FOUP, 2, "Invalid URI: %."),
+  UPFOURI_X(FOUP, 2, "Invalid URI: %."),
   /** FOUP0002. */
-  UPPUTERR(FOUP, 2, "File '%' could not be written."),
+  UPPUTERR_X(FOUP, 2, "File '%' could not be written."),
   /** FOUP0002. */
-  UPDROPBACK(FOUP, 2, "Backup '%' could not be %."),
+  UPDROPBACK_X_X(FOUP, 2, "Backup '%' could not be %."),
   /** FOUP0002. */
-  UPDBERROR(FOUP, 2, "Database '%' could not be %."),
+  UPDBERROR_X_X(FOUP, 2, "Database '%' could not be %."),
   /** FOUP0002. */
-  UPDBPUTERR(FOUP, 2, "Resource '%' could not be written."),
+  UPDBPUT_X(FOUP, 2, "Resource '%' could not be written."),
   /** FOUP0002. */
-  UPDBDELERR(FOUP, 2, "Resource '%' could not be deleted."),
+  UPDBDELETE_X(FOUP, 2, "Resource '%' could not be deleted."),
   /** FOUP0002. */
-  UPDBRENAMEERR(FOUP, 2, "Resource '%' could not be renamed."),
+  UPDBRENAME_X(FOUP, 2, "Resource '%' could not be renamed."),
   /** FOUP0002. */
-  UPDBOPTERR(FOUP, 2, "%"),
+  UPDBOPTERR_X(FOUP, 2, "%"),
 
   /** FOUT1170. */
-  RESNF(FOUT, 1170, "Resource '%' cannot be retrieved."),
+  RESNF_X(FOUT, 1170, "Resource '%' cannot be retrieved."),
   /** FOUT1170. */
-  FRAGID(FOUT, 1170, "URI contains a fragment identifier: %"),
+  FRAGID_X(FOUT, 1170, "URI contains a fragment identifier: %"),
   /** FOUT1170. */
-  INVURL(FOUT, 1170, "URI is invalid: %"),
+  INVURL_X(FOUT, 1170, "URI is invalid: %"),
   /** FOUT1170. */
   STBASEURI(FOUT, 1170, "Static Base URI is undefined."),
   /** FOUT1190. */
-  WHICHENC(FOUT, 1190, "Unknown encoding '%'."),
+  ENCODING_X(FOUT, 1190, "Unknown encoding '%'."),
   /** FOUT1190. */
-  INVCHARS(FOUT, 1190, "%."),
+  INVCHARS_X(FOUT, 1190, "%."),
   /** FOUT1200. */
-  WHICHCHARS(FOUT, 1200, "Resource contains invalid input: %."),
+  WHICHCHARS_X(FOUT, 1200, "Resource contains invalid input: %."),
 
   /** FTDY0016. */
-  FTWEIGHT(FTDY, 16, "Weight value out of range: %."),
+  FTWEIGHT_X(FTDY, 16, "Weight value out of range: %."),
   /** FTDY0017. */
   FTMILD(FTDY, 17, "Invalid 'mild not' selection."),
   /** FTDY0020. */
-  FTREG(FTDY, 20, "Invalid wildcard syntax: '%'."),
+  FTWILDCARD_X(FTDY, 20, "Invalid wildcard syntax: '%'."),
 
   /** FTST0007. */
   FTIGNORE(FTST, 7, "Ignore option not supported."),
   /** FTST0008. */
-  NOSTOPFILE(FTST, 8, "Stop word file not found: '%'."),
+  NOSTOPFILE_X(FTST, 8, "Stop word file not found: '%'."),
   /** FTST0009. */
-  FTNOSTEM(FTST, 9, "No stemmer available for language '%'."),
+  FTNOSTEM_X(FTST, 9, "No stemmer available for language '%'."),
   /** FTST0009. */
-  FTNOTOK(FTST, 9, "No tokenizer available for language '%'."),
+  FTNOTOK_X(FTST, 9, "No tokenizer available for language '%'."),
   /** FTST0018. */
-  NOTHES(FTST, 18, "Thesaurus not found: '%'."),
+  NOTHES_X(FTST, 18, "Thesaurus not found: '%'."),
   /** FTST0019. */
-  FTDUP(FTST, 19, "Match option '%' was declared twice."),
+  FTDUP_X(FTST, 19, "Match option '%' was declared twice."),
 
   /** SENR0001. */
-  SERATTR(SENR, 1, "Attributes cannot be serialized:%."),
+  SERATTR_X(SENR, 1, "Attributes cannot be serialized:%."),
   /** SENR0001. */
-  SERNS(SENR, 1, "Namespaces cannot be serialized:%."),
+  SERNS_X(SENR, 1, "Namespaces cannot be serialized:%."),
   /** SENR0001. */
-  SERFUNC(SENR, 1, "Items of type % cannot be serialized."),
+  SERFUNC_X(SENR, 1, "Items of type % cannot be serialized."),
   /** SEPM0004. */
   SERSA(SEPM, 4, "If 'standalone' is specified, the root must be a single element."),
   /** SEPM0004. */
   SERDT(SEPM, 4, "If 'doctype-system' is specified, the root must be a single element."),
   /** SESU0007. */
-  SERENCODING(SESU, 7, "Unknown encoding '%'."),
+  SERENCODING_X(SESU, 7, "Unknown encoding '%'."),
   /** SEPM0009. */
   SERSTAND(SEPM, 9, "Invalid combination of 'omit-xml-declaration'."),
   /** SEPM0010. */
   SERUNDECL(SEPM, 10, "XML 1.0: undeclaring prefixes not allowed."),
   /** SESU0013. */
-  SERNOTSUPP(SESU, 13, "%"),
+  SERNOTSUPP_X(SESU, 13, "%"),
   /** SERE0014. */
-  SERILL(SERE, 14, "Illegal HTML character found: #x%;."),
+  SERILL_X(SERE, 14, "Illegal HTML character found: #x%;."),
   /** SERE0015. */
   SERPI(SERE, 15, "Processing construction contains '>'."),
   /** SEPM0016. */
-  SERMAP(SEPM, 16, "Character map '%' is not defined."),
+  SERMAP_X(SEPM, 16, "Character map '%' is not defined."),
   /** SEPM0016. */
-  SERANY(SEPM, 16, "%"),
+  SER_X(SEPM, 16, "%"),
   /** SEPM0017. */
-  SEROPT(SEPM, 17, "%."),
+  SEROPT_X(SEPM, 17, "%."),
   /** SEPM0017. */
-  SERWHICH(SEPM, 17, "Serialization parameter '%' is invalid."),
+  SEROPTION_X(SEPM, 17, "Serialization parameter '%' is invalid."),
 
   /** XPDY0002. */
-  NOCTX(XPDY, 2, "%: no context item bound."),
+  NOCTX_X(XPDY, 2, "%: no context value bound."),
   /** XPDY0002. */
-  VAREMPTY(XPDY, 2, "No value assigned to %."),
+  VAREMPTY_X(XPDY, 2, "No value assigned to %."),
   /** XPDY0050. */
-  CTXNODE(XPDY, 50, "Root of the context item must be a document node."),
+  CTXNODE(XPDY, 50, "Root of the context value must be a document node."),
   /** XPDY0050. */
-  NOTREAT(XPDY, 50, "Cannot treat % as %: %."),
+  NOTREAT_X_X_X(XPDY, 50, "Cannot treat % as %: %."),
 
   /** XPST0003. */
   QUERYEMPTY(XPST, 3, "Empty query."),
   /** XPST0003. */
-  QUERYINV(XPST, 3, "Query contains an illegal character (#%)."),
+  QUERYINV_X(XPST, 3, "Query contains an illegal character (#%)."),
   /** XPST0003. */
-  NOQUOTE(XPST, 3, "Expecting quote%."),
+  NOQUOTE_X(XPST, 3, "Expecting quote%."),
   /** XPST0003. */
   NOVALIDATE(XPST, 3, "Invalid validation expression."),
   /** XPST0003. */
   NUMBERWS(XPST, 3, "Expecting separator after number."),
   /** XPST0003. */
-  NUMBERDBL(XPST, 3, "Incomplete double value: '%'."),
+  NUMBERDBL_X(XPST, 3, "Incomplete double value: '%'."),
   /** XPST0003. */
-  NUMBERDEC(XPST, 3, "Incomplete decimal value: '%'."),
+  NUMBERDEC_X(XPST, 3, "Incomplete decimal value: '%'."),
   /** XPST0003. */
   NUMBERITR(XPST, 3, "Unexpected decimal point."),
   /** XPST0003. */
-  QUERYEND(XPST, 3, "Unexpected end of query: '%'."),
+  QUERYEND_X(XPST, 3, "Unexpected end of query: '%'."),
   /** XPST0003. */
   MODEXPR(XPST, 3, "No expression allowed in a library module."),
   /** XPST0003. */
@@ -682,7 +680,7 @@ public enum Err {
   /** XPST0003. */
   NOELEMNAME(XPST, 3, "Expecting element name."),
   /** XPST0003. */
-  ELEMNAME(XPST, 3, "Expecting element name, '<%' found."),
+  ELEMNAME_X(XPST, 3, "Expecting element name, '<%' found."),
   /** XPST0003. */
   NOATTNAME(XPST, 3, "Expecting attribute name."),
   /** XPST0003. */
@@ -690,21 +688,21 @@ public enum Err {
   /** XPST0003. */
   NOEXPR(XPST, 3, "Expecting expression."),
   /** XPST0003. */
-  WRONGCHAR(XPST, 3, "Expecting '%'%."),
+  WRONGCHAR_X_X(XPST, 3, "Expecting '%'%."),
   /** XPST0003. */
-  INVENTITY(XPST, 3, "Invalid entity: '%'."),
+  INVENTITY_X(XPST, 3, "Invalid entity: '%'."),
   /** XPST0003. */
   INCOMPLETE(XPST, 3, "Incomplete expression."),
   /** XPST0003. */
   EVALUNARY(XPST, 3, "Unary operator expects a numeric value."),
   /** XPST0003. */
-  PATHMISS(XPST, 3, "Expecting location path%."),
+  PATHMISS_X(XPST, 3, "Expecting location path%."),
   /** XPST0003. */
   DECLINCOMPLETE(XPST, 3, "Expecting 'function', 'variable', ..."),
   /** XPST0003. */
   FUNCNAME(XPST, 3, "Expecting function name."),
   /** XPST0003. */
-  RESERVED(XPST, 3, "'%' is a reserved keyword."),
+  RESERVED_X(XPST, 3, "'%' is a reserved keyword."),
   /** XPST0003. */
   PREDMISSING(XPST, 3, "Expecting expression before predicate."),
   /** XPST0003. */
@@ -718,7 +716,7 @@ public enum Err {
   /** XPST0003. */
   NOENCLEXPR(XPST, 3, "Expecting valid expression after curly brace."),
   /** XPST0003. */
-  NOFTSELECT(XPST, 3, "Expecting quote or opening curly brace%."),
+  NOFTSELECT_X(XPST, 3, "Expecting quote or opening curly brace%."),
   /** XPST0003. */
   NODOCCONS(XPST, 3, "Expecting expression in document constructor."),
   /** XPST0003. */
@@ -728,13 +726,13 @@ public enum Err {
   /** XPST0003. */
   NOFUNBODY(XPST, 3, "Expecting function body."),
   /** XPST0003. */
-  FUNCMISS(XPST, 3, "Expecting closing bracket for function '%'."),
+  FUNCMISS_X(XPST, 3, "Expecting closing bracket for function '%'."),
   /** XPST0003. */
-  MAPTAAT(XPST, 3, "Expecting atomic key type for map, found '%'."),
+  MAPTAAT_X(XPST, 3, "Expecting atomic key type for map, found '%'."),
   /** XPST0003. */
   TYPEINVALID(XPST, 3, "Expecting type declaration."),
   /** XPST0003. */
-  NODECLFORM(XPST, 3, "Decimal-format property '%' is invalid."),
+  NODECLFORM_X(XPST, 3, "Decimal-format property '%' is invalid."),
   /** XPST0003. */
   NOTYPESWITCH(XPST, 3, "Incomplete typeswitch expression."),
   /** XPST0003. */
@@ -774,19 +772,19 @@ public enum Err {
   /** XPST0003. */
   NOCOUNT(XPST, 3, "Incomplete 'count' expression."),
   /** XPST0003. */
-  NOCLOSING(XPST, 3, "Expecting closing tag </%>."),
+  NOCLOSING_X(XPST, 3, "Expecting closing tag </%>."),
   /** XPST0003. */
   COMCLOSE(XPST, 3, "Unclosed XQuery comment (: ..."),
   /** XPST0003. */
   EXPREMPTY(XPST, 3, "Unknown function or expression."),
   /** XPST0003. */
-  NOTYPE(XPST, 3, "Unknown type: %."),
+  WHICHTYPE_X(XPST, 3, "Unknown type: %."),
   /** XPST0003. */
-  BINDNAME(XPST, 3, "Invalid variable name: '%'."),
+  BINDNAME_X(XPST, 3, "Invalid variable name: '%'."),
   /** XPST0003. */
-  PIXML(XPST, 3, "Processing instruction has illegal name: '%'."),
+  PIXML_X(XPST, 3, "Processing instruction has illegal name: '%'."),
   /** XPST0003. */
-  QNAMEINV(XPST, 3, "Expecting QName, '%' found."),
+  QNAME_X(XPST, 3, "Expecting QName, '%' found."),
   /** XPST0003. */
   PROLOGORDER(XPST, 3, "Default declarations must be declared first."),
   /** XPST0003. */
@@ -794,7 +792,7 @@ public enum Err {
   /** XPST0003. */
   FTSTOP(XPST, 3, "Stop words expected."),
   /** XPST0003. */
-  FTMATCH(XPST, 3, "Unknown match option '%...'."),
+  FTMATCH_X(XPST, 3, "Unknown match option '%...'."),
   /** XPST0003. */
   INVALPI(XPST, 3, "Processing instruction has invalid name."),
   /** XPST0003. */
@@ -812,200 +810,202 @@ public enum Err {
   /** XPST0003. */
   NSNOTALL(XPST, 3, "Namespace axis is not available in XQuery."),
   /** XPST0003. */
-  SIMPLETYPE(XPST, 3, "Simple type expected, '%(' found."),
+  SIMPLETYPE_X(XPST, 3, "Simple type expected, '%(' found."),
 
   /** XPST0008. */
-  VARUNDEF(XPST, 8, "Undefined variable %."),
+  VARUNDEF_X(XPST, 8, "Undefined variable %."),
   /** XPST0008. */
-  CIRCREF(XPST, 8, "Static variable references itself: %"),
+  CIRCREF_X(XPST, 8, "Static variable references itself: %"),
   /** XPST0008. */
-  VARPRIVATE(XPST, 8, "Variable % is not visible from this module."),
+  VARPRIVATE_X(XPST, 8, "Variable % is not visible from this module."),
   /** XPST0008. */
-  TYPEUNDEF(XPST, 8, "Undefined type '%'."),
+  TYPEUNDEF_X(XPST, 8, "Undefined type '%'."),
   /** XPST0008. */
-  SCHEMAINV(XPST, 8, "Undefined schema name '%'."),
+  SCHEMAINV_X(XPST, 8, "Undefined schema name '%'."),
 
   /** XPST0017. */
-  FUNCPRIV(XPST, 17, "Function '%' is not visible from this module."),
+  FUNCPRIVATE_X(XPST, 17, "Function '%' is not visible from this module."),
   /** XPST0017. */
-  FUNCSIMILAR(XPST, 17, "Unknown function '%'; similar: '%'."),
+  FUNCSIMILAR_X_X(XPST, 17, "Unknown function '%'; similar: '%'."),
   /** XPST0017. */
-  FUNCARGS(XPST, 17, "%: % argument% supplied."),
+  FUNCARGS_X_X_X(XPST, 17, "%: % argument% supplied."),
   /** XPST0017. */
-  FUNCTYPES(XPST, 17, "%: % argument% supplied (% expected)."),
+  FUNCTYPES_X_X_X_X(XPST, 17, "%: % argument% supplied (% expected)."),
   /** XPST0017. */
-  FUNCUNKNOWN(XPST, 17, "Unknown function '%'."),
+  FUNCUNKNOWN_X(XPST, 17, "Unknown function '%'."),
   /** XPST0017. */
-  FUNCNOIMPL(XPST, 17, "Function '%' not implemented."),
+  FUNCNOIMPL_X(XPST, 17, "Function '%' not implemented."),
   /** XPST0017. */
-  FUNCJAVA(XPST, 17, "Java function '%' not found."),
+  FUNCJAVA_X(XPST, 17, "Java function '%' not found."),
   /** XPST0017. */
-  JAVAAMBIG(XPST, 17, "Several implementations found for '%'."),
+  JAVAAMBIG_X(XPST, 17, "Several implementations found for '%'."),
   /** XPST0017. */
-  JAVAINIT(XPST, 17, "Class cannot be initialized: %."),
+  JAVAINIT_X(XPST, 17, "Class cannot be initialized: %."),
   /** XPST0003. */
   FUNC30(XPST, 17, "Function not available in XQuery 1.0."),
 
   /** XPST0051. */
-  TYPEUNKNOWN(XPST, 51, "Unknown type: %."),
+  TYPEUNKNOWN_X(XPST, 51, "Unknown type: %."),
   /** XPST0080. */
-  CASTUNKNOWN(XPST, 80, "Invalid cast type: %."),
+  CASTUNKNOWN_X(XPST, 80, "Invalid cast type: %."),
   /** XPST0081. */
-  NOURI(XPST, 81, "No namespace declared for '%'."),
+  NOURI_X(XPST, 81, "No namespace declared for '%'."),
   /** XPST0081. */
-  NSMISS(XPST, 81, "QName '%' has no namespace."),
+  NSMISS_X(XPST, 81, "QName '%' has no namespace."),
 
   /** XPTY0004. */
-  NONAME(XPTY, 4, "Name expected, '%' found."),
+  NONAME_X(XPTY, 4, "Name expected, '%' found."),
   /** XPTY0004. */
   EMPTYFOUND(XPTY, 4, "Item expected, empty sequence found."),
   /** XPTY0004. */
-  EMPTYFOUND2(XPTY, 4, "% expected, empty sequence found."),
+  EMPTYFOUND_X(XPTY, 4, "% expected, empty sequence found."),
   /** XPTY0004. */
-  SEQFOUND(XPTY, 4, "Item expected, sequence found: %."),
+  SEQFOUND_X(XPTY, 4, "Item expected, sequence found: %."),
   /** XPTY0004. */
-  NONUMBER(XPTY, 4, "Number expected, % found: %."),
+  NONUMBER_X_X(XPTY, 4, "Number expected, % found: %."),
   /** XPTY0004. */
-  NODUR(XPTY, 4, "Duration expected, % found: %."),
+  NODUR_X_X(XPTY, 4, "Duration expected, % found: %."),
   /** XPTY0004. */
-  NOSUBDUR(XPTY, 4, "Subtype of xs:duration expected: %."),
+  NOSUBDUR_X(XPTY, 4, "Subtype of xs:duration expected: %."),
   /** XPTY0004. */
-  STRQNM(XPTY, 4, "String or QName expected, % found: %."),
+  STRQNM_X_X(XPTY, 4, "String or QName expected, % found: %."),
   /** XPTY0004. */
-  CPIWRONG(XPTY, 4, "String or NCName expected, % found: %."),
+  CPIWRONG_X_X(XPTY, 4, "String or NCName expected, % found: %."),
 
   /** XPTY0004. */
-  INVCAST(XPTY, 4, "Cannot cast % to %."),
+  INVCAST_X_X(XPTY, 4, "Cannot cast % to %."),
   /** XPTY0004. */
-  INVCASTEX(XPTY, 4, "Cannot cast % to %: %."),
+  INVCAST_X_X_X(XPTY, 4, "Cannot cast % to %: %."),
   /** XPTY0004. */
-  INVTREAT(XPTY, 4, "Cannot treat % as %."),
+  INVTREAT_X_X(XPTY, 4, "Cannot treat % as %."),
   /** XPTY0004. */
-  INVTREATEX(XPTY, 4, "Cannot treat % as %: %."),
+  INVTREAT_X_X_X(XPTY, 4, "Cannot treat % as %: %."),
   /** XPTY0004. */
-  CALCTYPE(XPTY, 4, "% not defined for % and %."),
+  CALCTYPE_X_X_X(XPTY, 4, "% not defined for % and %."),
   /** XPTY0004. */
-  INVFUNCITEM(XPTY, 4, "Function item required for function call, % found."),
+  INVFUNCITEM_X(XPTY, 4, "Function item required for function call, % found."),
 
   /** XPTY0004. */
-  CMPTYPE(XPTY, 4, "Items of type % cannot be compared."),
+  CMPTYPE_X(XPTY, 4, "Items of type % cannot be compared."),
   /** XPTY0004. */
-  CMPTYPES(XPTY, 4, "Items of type % and % cannot be compared."),
+  CMPTYPES_X_X(XPTY, 4, "Items of type % and % cannot be compared."),
   /** XPTY0004. */
   DOCATTS(XPTY, 4, "Cannot add attributes to a document node."),
   /** XPTY0004. */
   DOCNS(XPTY, 4, "Cannot add namespaces to a document node."),
   /** XPTY0004. */
-  INVARITY(XPTY, 4, "Wrong number of arguments in %, expected %."),
+  INVARITY_X_X_X_X(XPTY, 4, "%: % argument% supplied (% expected)."),
   /** XPTY0004. */
-  INVNCNAME(XPTY, 4, "Invalid NCName: '%'."),
+  INVNCNAME_X(XPTY, 4, "Invalid NCName: '%'."),
   /** XPTY0004. */
-  CITYPES(XPTY, 4, "Incompatible types in context item declarations: % vs. %."),
+  CITYPES_X_X(XPTY, 4, "Incompatible types in context value declarations: % vs. %."),
 
   /** XPTY0018. */
   EVALNODESVALS(XPTY, 18, "Path yields both nodes and atomic values."),
   /** XPTY0019. */
-  PATHNODE(XPTY, 19, "%: node expected as input, % found: %."),
+  PATHNODE_X_X_X(XPTY, 19, "%: node expected as input, % found: %."),
   /** XPTY0020. */
-  STEPNODE(XPTY, 20, "%: node expected as input, % found: %."),
+  STEPNODE_X_X_X(XPTY, 20, "%: node expected as input, % found: %."),
   /** XPTY0117. */
-  NSSENS(XPTY, 117, "Cannot cast % to %."),
+  NSSENS_X_X(XPTY, 117, "Cannot cast % to %."),
 
   /** XQDY0025. */
-  CATTDUPL(XQDY, 25, "Duplicate attribute '%'."),
+  CATTDUPL_X(XQDY, 25, "Duplicate attribute '%'."),
   /** XQDY0026. */
-  CPICONT(XQDY, 26, "Processing instruction has invalid content: '%'."),
+  CPICONT_X(XQDY, 26, "Processing instruction has invalid content: '%'."),
   /** XQDY0041. */
-  CPIINVAL(XQDY, 41, "Processing instruction has invalid name: '%'."),
+  CPIINVAL_X(XQDY, 41, "Processing instruction has invalid name: '%'."),
   /** XQDY0044. */
   CAXML(XQDY, 44, "XML prefix and namespace cannot be rebound."),
   /** XQDY0044. */
-  CAINV(XQDY, 44, "Invalid attribute prefix/namespace: '%'."),
+  CAINV_(XQDY, 44, "Invalid attribute prefix/namespace: '%'."),
   /** XQDY0054. */
-  CIRCVAR30(XQDY, 54, "Static variable depends on itself: %"),
+  CIRCVAR30_X(XQDY, 54, "Static variable depends on itself: %"),
   /** XQDY0054. */
-  CIRCCTX(XQDY, 54, "Context item is not defined."),
+  CIRCCTX(XQDY, 54, "Context value is not defined."),
   /** XQDY0064. */
-  CPIXML(XQDY, 64, "Processing instruction has illegal name: '%'."),
+  CPIXML_X(XQDY, 64, "Processing instruction has illegal name: '%'."),
   /** XQDY0072. */
   COMINVALID(XQDY, 72, "Invalid comment."),
   /** XQDY0074. */
-  INVNSNAME(XQDY, 74, "Invalid namespace prefix: '%'."),
+  INVNSNAME_X(XQDY, 74, "Invalid namespace prefix: '%'."),
   /** XQDY0074. */
-  INVNAME(XQDY, 74, "Invalid QName: '%'."),
+  INVNAME_X(XQDY, 74, "Invalid QName: '%'."),
   /** XQDY0074. */
-  INVPREF(XQDY, 74, "No namespace declared for %."),
+  INVPREF_X(XQDY, 74, "No namespace declared for %."),
   /** XQDY0096. */
   CEXML(XQDY, 96, "XML prefix and namespace cannot be rebound."),
   /** XQDY0096. */
-  CEINV(XQDY, 96, "Invalid element prefix/namespace '%'."),
+  CEINV_X(XQDY, 96, "Invalid element prefix/namespace '%'."),
   /** XQDY0101. */
   CNXML(XQDY, 101, "XML prefix and namespace cannot be rebound."),
   /** XQDY0101. */
-  CNINV(XQDY, 101, "Invalid prefix/namespace '%'."),
+  CNINV_X(XQDY, 101, "Invalid namespace prefix '%'."),
+  /** XQDY0101. */
+  CNINVNS_X(XQDY, 101, "Invalid namespace URI '%'."),
   /** XQDY0102. */
-  DUPLNSCONS(XQDY, 102, "Duplicate namespace declaration: '%'."),
+  DUPLNSCONS_X(XQDY, 102, "Duplicate namespace declaration: '%'."),
   /** XQDY0136. */
-  MAPKEY(XQDY, 136, "Key must be a single atomic value: %."),
+  MAPKEY_X(XQDY, 136, "Key must be a single atomic value: %."),
   /** XQDY0137. */
-  MAPDUPLKEY(XQDY, 137, "Key % already exists in map (value: % vs. %)."),
+  MAPDUPLKEY_X_X_X(XQDY, 137, "Key % already exists in map (value: % vs. %)."),
   /** XQDY0138. */
-  ARRAYPOS(XQDY, 138, "No value exists at array index %."),
+  ARRAYPOS_X(XQDY, 138, "No value exists at array index %."),
 
   /** XQST0009. */
   IMPLSCHEMA(XQST, 9, "Schema import not supported."),
   /** XQST0022. */
   NSCONS(XQST, 22, "Constant namespace value expected."),
   /** XQST0031. */
-  XQUERYVER(XQST, 31, "XQuery version '%' not supported."),
+  XQUERYVER_X(XQST, 31, "XQuery version '%' not supported."),
   /** XQST0032. */
   DUPLBASE(XQST, 32, "Duplicate 'base-uri' declaration."),
   /** XQST0033. */
-  DUPLNSDECL(XQST, 33, "Duplicate declaration of prefix '%'."),
+  DUPLNSDECL_X(XQST, 33, "Duplicate declaration of prefix '%'."),
   /** XQST0034. */
-  FUNCDEFINED(XQST, 34, "Duplicate declaration of function '%'."),
+  FUNCDEFINED_X(XQST, 34, "Duplicate declaration of function '%'."),
   /** XQST0038. */
   DUPLCOLL(XQST, 38, "Duplicate 'collation' declaration."),
   /** XQST0038. */
-  WHICHDEFCOLL(XQST, 38, "Unknown collation '%'."),
+  WHICHDEFCOLL_X(XQST, 38, "Unknown collation '%'."),
   /** XQST0039. */
-  FUNCDUPL(XQST, 39, "Duplicate function argument %."),
+  FUNCDUPL_X(XQST, 39, "Duplicate function argument %."),
   /** XQST0040. */
-  ATTDUPL(XQST, 40, "Duplicate attribute '%'."),
+  ATTDUPL_X(XQST, 40, "Duplicate attribute '%'."),
   /** XQST0045. */
-  NAMERES(XQST, 45, "Function '%' is in reserved namespace."),
+  NAMERES_X(XQST, 45, "Function '%' is in reserved namespace."),
   /** XQST0045. */
-  ANNRES(XQST, 45, "Annotation %% is in reserved namespace."),
+  ANNRES_X_X(XQST, 45, "Annotation %% is in reserved namespace."),
   /** XQST0046. */
-  INVURI(XQST, 46, "URI '%' is invalid."),
+  INVURI_X(XQST, 46, "URI '%' is invalid."),
   /** XQST0047. */
-  DUPLMODULE(XQST, 47, "Module namespace is declared twice: '%'."),
+  DUPLMODULE_X(XQST, 47, "Module namespace is declared twice: '%'."),
   /** XQST0047. */
-  MODNS(XQST, 48, "Declaration % does not match the module namespace."),
+  MODULENS_X(XQST, 48, "Declaration % does not match the module namespace."),
   /** XQST0049. */
-  VARDUPL(XQST, 49, "Duplicate declaration of static variable $%."),
+  VARDUPL_X(XQST, 49, "Duplicate declaration of static variable $%."),
   /** XQST0052. */
-  TYPEUNKNOWN30(XQST, 52, "Unknown cast type: %."),
+  TYPE30_X(XQST, 52, "Unknown cast type: %."),
   /** XQST0054. */
-  CIRCVAR(XQST, 54, "Global variable depends on itself: %"),
+  CIRCVAR_X(XQST, 54, "Global variable depends on itself: %"),
   /** XQST0055. */
   DUPLCOPYNS(XQST, 55, "Duplicate 'copy-namespace' declaration."),
   /** XQST0057. */
   NSEMPTY(XQST, 57, "Namespace URI cannot be empty."),
   /** XQST0059. */
-  INSTERR(XQST, 59, "Could not instantiate module '%'."),
+  INSTERR_X(XQST, 59, "Could not instantiate module '%'."),
   /** XQST0059. */
-  WHICHMODULE(XQST, 59, "Module '%' not found."),
+  WHICHMODULE_X(XQST, 59, "Module '%' not found."),
   /** XQST0059. */
-  WHICHCLASS(XQST, 59, "Class not found: '%'."),
+  WHICHCLASS_X(XQST, 59, "Class not found: '%'."),
   /** XQST0059. */
-  MODINITERR(XQST, 59, "Module not initialized: %."),
+  MODINITERR_X(XQST, 59, "Module not initialized: %."),
   /** XQST0059. */
-  WHICHMODFILE(XQST, 59, "Could not retrieve module '%'."),
+  WHICHMODFILE_X(XQST, 59, "Could not retrieve module '%'."),
   /** XQST0059. */
-  WRONGMODULE(XQST, 59, "Wrong URI '%' in imported module '%'."),
+  WRONGMODULE_X_X(XQST, 59, "Wrong URI '%' in imported module '%'."),
   /** XQST0060. */
-  FUNNONS(XQST, 60, "Namespace needed for function '%'."),
+  FUNNONS_X(XQST, 60, "Namespace needed for function '%'."),
   /** XQST0065. */
   DUPLORD(XQST, 65, "Duplicate 'ordering' declaration."),
   /** XQST0066. */
@@ -1017,45 +1017,45 @@ public enum Err {
   /** XQST0069. */
   DUPLORDEMP(XQST, 69, "Duplicate 'order empty' declaration."),
   /** XQST0070. */
-  BINDXML(XQST, 70, "Prefix '%' cannot be rebound."),
+  BINDXML_X(XQST, 70, "Prefix '%' cannot be rebound."),
   /** XQST0070. */
-  XMLNSDEF(XQST, 70, "'%' cannot be default namespace."),
+  XMLNSDEF_X(XQST, 70, "'%' cannot be default namespace."),
   /** XQST0070. */
-  BINDXMLURI(XQST, 70, "'%' can only be bound to '%'."),
+  BINDXMLURI_X_X(XQST, 70, "'%' can only be bound to '%'."),
   /** XQST0071. */
-  DUPLNSDEF(XQST, 71, "Duplicate declaration of prefix '%'."),
+  DUPLNSDEF_X(XQST, 71, "Duplicate declaration of prefix '%'."),
   /** XQST0075. */
   IMPLVAL(XQST, 75, "Validation not supported."),
   /** XQST0076. */
-  FLWORCOLL(XQST, 76, "Unknown collation '%'."),
+  FLWORCOLL_X(XQST, 76, "Unknown collation '%'."),
   /** XQST0079. */
   NOPRAGMA(XQST, 79, "Expecting pragma expression."),
   /** XQST0085. */
   NSEMPTYURI(XQST, 85, "Namespace URI cannot be empty."),
   /** XQST0087. */
-  XQUERYENC2(XQST, 87, "Unknown encoding '%'."),
+  XQUERYENC2_X(XQST, 87, "Unknown encoding '%'."),
   /** XQST0088. */
   NSMODURI(XQST, 88, "Module namespace cannot be empty."),
   /** XQST0089. */
-  DUPLVAR(XQST, 89, "Duplicate declaration of %."),
+  DUPLVAR_X(XQST, 89, "Duplicate declaration of %."),
   /** XQST0090. */
-  INVCHARREF(XQST, 90, "Invalid character reference '%'."),
+  INVCHARREF_X(XQST, 90, "Invalid character reference '%'."),
   /** XQST0093. */
   CIRCMODULE(XQST, 93, "Circular module declaration."),
   /** XPST0094. */
-  GVARNOTDEFINED(XQST, 94, "Undeclared grouping variable '%'."),
+  GVARNOTDEFINED_X(XQST, 94, "Undeclared grouping variable '%'."),
   /** XPST0097. */
-  INVDECFORM(XQST, 97, "Invalid decimal-format property: %='%'."),
+  INVDECFORM_X_X(XQST, 97, "Invalid decimal-format property: %='%'."),
   /** XPST0097. */
-  INVDECSINGLE(XQST, 97, "Decimal-format property must be a single character: %='%'."),
+  INVDECSINGLE_X_X(XQST, 97, "Decimal-format property must be a single character: %='%'."),
   /** XPST0097. */
-  INVDECZERO(XQST, 97, "Zero-digit property must be Unicode digit with value zero: '%'."),
+  INVDECZERO_X(XQST, 97, "Zero-digit property must be Unicode digit with value zero: '%'."),
   /** XPST0098. */
-  DUPLDECFORM(XQST, 98, "Duplicate use of decimal-format '%'."),
+  DUPLDECFORM_X(XQST, 98, "Duplicate use of decimal-format '%'."),
   /** XQST0099. */
-  DUPLITEM(XQST, 99, "Duplicate declaration of context item."),
+  DUPLITEM(XQST, 99, "Duplicate declaration of context value."),
   /** XQST0103. */
-  WINDOWUNIQ(XQST, 103, "Duplicate variable name in window clause: %"),
+  WINDOWUNIQ_X(XQST, 103, "Duplicate variable name in window clause: %"),
   /** XQST0106. */
   DUPLUPD(XQST, 106, "More than one updating annotation declared."),
   /** XQST0106. */
@@ -1063,23 +1063,23 @@ public enum Err {
   /** XQST0108. */
   MODOUT(XQST, 108, "No output declarations allowed in library modules."),
   /** XPST0109. */
-  OUTINVALID(XQST, 109, "%"),
+  OUTINVALID_X(XQST, 109, "%"),
   /** XPST0110. */
-  OUTDUPL(XQST, 110, "Duplicate declaration of 'output:%'."),
+  OUTDUPL_X(XQST, 110, "Duplicate declaration of 'output:%'."),
   /** XPST0111. */
   DECDUPL(XQST, 111, "Duplicate decimal-format declaration."),
   /** XQST0113. */
-  DECITEM(XQST, 113, "Context item cannot be bound in library module."),
+  DECITEM(XQST, 113, "Context value cannot be bound in library module."),
   /** XPST0111. */
-  DECDUPLPROP(XQST, 114, "Duplicate decimal-format property '%'."),
+  DECDUPLPROP_X(XQST, 114, "Duplicate decimal-format property '%'."),
   /** XQST0116. */
   DUPLVARVIS(XQST, 116, "More than one visibility annotation declared."),
   /** XQST0118. */
-  TAGWRONG(XQST, 118, "Start and end tag are different: <%>...</%>."),
+  TAGWRONG_X_X(XQST, 118, "Different start and end tag: <%>...</%>."),
   /** XQST0119. */
-  OUTDOC(XQST, 119, "Serialization document '%' cannot be parsed."),
+  OUTDOC_X(XQST, 119, "Serialization document '%' cannot be parsed."),
   /** XQST0123. */
-  DECLOPTION(XQST, 123, "Unknown option: %."),
+  DECLOPTION_X(XQST, 123, "Unknown option: %."),
   /** XPST0125. */
   INVISIBLE(XQST, 125, "No visibility annotation allowed in inline function."),
 
@@ -1088,34 +1088,34 @@ public enum Err {
   /** XQTY0024. */
   NONSALL(XQTY, 24, "Namespaces must follow the root element."),
   /** XQTY0105. */
-  CONSFUNC(XQTY, 105, "Invalid content: %."),
+  CONSFUNC_X(XQTY, 105, "Invalid content: %."),
 
   /** XUDY0009. */
-  UPNOPAR(XUDY, 9, "Target % has no parent."),
+  UPNOPAR_X(XUDY, 9, "Target % has no parent."),
   /** XUDY0014. */
-  UPNOTCOPIED(XUDY, 14, "% was not created by copy clause."),
+  UPNOTCOPIED_X(XUDY, 14, "% was not created by copy clause."),
   /** XUDY0015. */
-  UPMULTREN(XUDY, 15, "Node can only be renamed once: %."),
+  UPMULTREN_X(XUDY, 15, "Node can only be renamed once: %."),
   /** XUDY0015. */
-  UPPATHREN(XUDY, 15, "Path can only be renamed once: '%'."),
+  UPPATHREN_X(XUDY, 15, "Path can only be renamed once: '%'."),
   /** XUDY0016. */
-  UPMULTREPL(XUDY, 16, "Node can only be replaced once: %."),
+  UPMULTREPL_X(XUDY, 16, "Node can only be replaced once: %."),
   /** XUDY0017. */
-  UPMULTREPV(XUDY, 17, "Node can only be replaced once: %"),
+  UPMULTREPV_X(XUDY, 17, "Node can only be replaced once: %"),
   /** XUDY0021. */
-  UPATTDUPL(XUDY, 21, "Duplicate attribute %."),
+  UPATTDUPL_X(XUDY, 21, "Duplicate attribute %."),
   /** XUDY0023. */
   UPNSCONFL(XUDY, 23, "Conflicts with existing namespaces."),
   /** XUDY0024. */
   UPNSCONFL2(XUDY, 24, "New namespaces conflict with each other."),
   /** XUDY0027. */
-  UPSEQEMP(XUDY, 27, "% target must not be empty."),
+  UPSEQEMP_X(XUDY, 27, "% target must not be empty."),
   /** XUDY0029. */
   UPPAREMPTY(XUDY, 29, "Target has no parent node."),
   /** XUDY0030. */
   UPATTELM(XUDY, 30, "Attributes cannot be inserted as child of a document."),
   /** XUDY0031. */
-  UPURIDUP(XUDY, 31, "URI '%' is addressed multiple times."),
+  UPURIDUP_X(XUDY, 31, "URI '%' is addressed multiple times."),
 
   /** XUDY0032 (WIP). */
   UPFUNCNOTUP(XUDY, 32, "Function is not updating."),
@@ -1123,11 +1123,11 @@ public enum Err {
   UPFUNCUP(XUDY, 32, "Function is updating."),
 
   /** XUST0001. */
-  UPNOT(XUST, 1, "%: no updating expression allowed."),
+  UPNOT_X(XUST, 1, "%: no updating expression allowed."),
   /** XUST0001. */
-  UPALL(XUST, 1, "%: all expressions must be updating or return an empty sequence."),
+  UPALL_X(XUST, 1, "%: all expressions must be updating or return an empty sequence."),
   /** XUST0001. */
-  UPCTX(XUST, 1, "Context item may not declare an updating expression."),
+  UPCTX(XUST, 1, "Context value may not declare an updating expression."),
   /** XUST0002. */
   UPMODIFY(XUST, 2, "Modify clause: all expressions must be updating or return an empty sequence."),
   /** XUST0002. */
@@ -1156,7 +1156,7 @@ public enum Err {
   /** XUTY0012. */
   UPWRTRGTYP(XUTY, 12, "Single element, attribute or pi expected as rename target."),
   /** XUTY0013. */
-  UPCOPYMULT(XUTY, 13, "Value assigned to $% must be a single node."),
+  UPCOPYMULT_X(XUTY, 13, "Value assigned to $% must be a single node."),
   /** XUTY0013. */
   UPSOURCE(XUTY, 13, "Source of transform expression must be a single node."),
   /** XUTY0022. */
@@ -1366,7 +1366,7 @@ public enum Err {
    */
   public static QueryException diffError(final InputInfo ii, final Item item1, final Item item2) {
     final Type t1 = item1.type, t2 = item2.type;
-    return (item1 == item2 ? FUNCMP : t1 == t2 ? CMPTYPE : CMPTYPES).get(ii, t1, t2);
+    return (item1 == item2 ? NOTCMP_X : t1 == t2 ? CMPTYPE_X : CMPTYPES_X_X).get(ii, t1, t2);
   }
 
   /**
@@ -1378,7 +1378,7 @@ public enum Err {
    */
   public static QueryException treatError(final InputInfo ii, final Value value,
       final SeqType seqType) {
-    return INVTREATEX.get(ii, value.seqType(), seqType, value);
+    return INVTREAT_X_X_X.get(ii, value.seqType(), seqType, value);
   }
 
   /**
@@ -1389,7 +1389,7 @@ public enum Err {
    * @return query exception (indicates that an error is raised)
    */
   public static QueryException castError(final InputInfo ii, final Value value, final Type type) {
-    return INVCASTEX.get(ii, value.type, type, value);
+    return INVCAST_X_X_X.get(ii, value.type, type, value);
   }
 
   /**
@@ -1402,7 +1402,7 @@ public enum Err {
    */
   public static QueryException funCastError(final InputInfo ii, final Type type, final Object value)
       throws QueryException {
-    return FUNCAST.get(ii, type, chop(value, ii));
+    return FUNCAST_X_X.get(ii, type, chop(value, ii));
   }
 
   /**
@@ -1422,7 +1422,7 @@ public enum Err {
    * @return query exception (indicates that an error is raised)
    */
   public static QueryException numberError(final InputInfo ii, final Item item) {
-    return NONUMBER.get(ii, item.type, item);
+    return NONUMBER_X_X.get(ii, item.type, item);
   }
 
   /**
@@ -1432,8 +1432,8 @@ public enum Err {
    * @param value value
    * @return query exception (indicates that an error is raised)
    */
-  public static QueryException valueError(final InputInfo ii, final Type type, final Value value) {
-    return INVALUE.get(ii, value.seqType(), type, value);
+  public static QueryException valueError(final InputInfo ii, final Type type, final byte[] value) {
+    return INVALUE_X_X.get(ii, type, value);
   }
 
   /**
@@ -1442,7 +1442,7 @@ public enum Err {
    * @return never
    */
   public static QueryException circVarError(final StaticVar var) {
-    return (var.sc.xquery3() ? CIRCVAR30 : CIRCVAR).get(var.info, var);
+    return (var.sc.xquery3() ? CIRCVAR30_X : CIRCVAR_X).get(var.info, var);
   }
 
   /**

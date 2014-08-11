@@ -1,7 +1,6 @@
 package org.basex.query.gflwor;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import java.util.*;
 
@@ -10,7 +9,6 @@ import org.basex.query.expr.*;
 import org.basex.query.gflwor.GFLWOR.Eval;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -128,12 +126,7 @@ public final class GroupBy extends GFLWOR.Clause {
           final Item[] key = new Item[nonOcc];
           int p = 0, hash = 1;
           for(final Spec spec : specs) {
-            Value v = spec.item(qc, info);
-            if(v != null) {
-              v = v.atomValue(info);
-              if(!(v instanceof Item)) throw SEQFOUND.get(info, v);
-            }
-            final Item atom = (Item) v;
+            final Item atom = spec.atomItem(qc, info);
             if(!spec.occluded) {
               key[p++] = atom;
               // If the values are compared using a special collation, we let them collide

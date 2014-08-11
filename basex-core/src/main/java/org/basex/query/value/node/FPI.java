@@ -85,7 +85,7 @@ public final class FPI extends FNode {
    * @throws QueryException query exception
    */
   public static byte[] parse(final byte[] atom, final InputInfo ii) throws QueryException {
-    if(contains(atom, CLOSE)) throw CPICONT.get(ii, atom);
+    if(contains(atom, CLOSE)) throw CPICONT_X.get(ii, atom);
     return atom;
   }
 }

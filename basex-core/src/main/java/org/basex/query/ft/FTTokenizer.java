@@ -61,7 +61,7 @@ final class FTTokenizer {
           ftw = wcCache.get(qu);
           if(ftw == null) {
             ftw = new FTWildcard(qu);
-            if(!ftw.parse()) throw FTREG.get(words.info, qu);
+            if(!ftw.parse()) throw FTWILDCARD_X.get(words.info, qu);
             wcCache.put(qu, ftw);
           }
         }

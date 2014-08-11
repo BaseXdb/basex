@@ -61,7 +61,7 @@ public final class StaticFuncCall extends FuncCall {
 
     // disallow call of private functions from module with different uri
     if(func.ann.contains(Ann.Q_PRIVATE) && !Token.eq(func.sc.baseURI().string(),
-        sc.baseURI().string())) throw FUNCPRIV.get(info, name.string());
+        sc.baseURI().string())) throw FUNCPRIVATE_X.get(info, name.string());
 
     // compile mutually recursive functions
     func.compile(qc);
@@ -98,7 +98,7 @@ public final class StaticFuncCall extends FuncCall {
   public StaticFuncCall init(final StaticFunc f) throws QueryException {
     func = f;
     if(f.ann.contains(Ann.Q_PRIVATE) && !Token.eq(sc.baseURI().string(),
-        f.sc.baseURI().string())) throw FUNCPRIV.get(info, f.name.string());
+        f.sc.baseURI().string())) throw FUNCPRIVATE_X.get(info, f.name.string());
     return this;
   }
 

@@ -48,7 +48,7 @@ public final class FTWindow extends FTFilter {
   protected boolean filter(final QueryContext qc, final FTMatch mtc, final FTLexer lex)
       throws QueryException {
 
-    final int n = (int) checkItr(win, qc) - 1;
+    final int n = (int) toLong(win, qc) - 1;
     mtc.sort();
 
     FTStringMatch f = null;

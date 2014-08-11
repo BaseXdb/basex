@@ -15,7 +15,7 @@ public final class MapTest extends AdvancedQueryTest {
   @Test public void mapAsKeyTest() {
     error("declare variable $m := map { 'a': 'b' };" +
           "declare variable $q := map { $m: 'a' };" +
-          "$q", Err.FIATOM);
+          "$q", Err.FIATOM_X);
   }
 
   /** Tests the the new syntax for map literals (see GH-755). */
@@ -25,8 +25,8 @@ public final class MapTest extends AdvancedQueryTest {
 
   /** Tests invalid keys. */
   @Test public void keys() {
-    error(" map{ ('a', 'b'): 'b' }", Err.MAPKEY);
-    error(" map{ 'a': 'b', 'a': 'c' }", Err.MAPDUPLKEY);
+    error(" map{ ('a', 'b'): 'b' }", Err.MAPKEY_X);
+    error(" map{ 'a': 'b', 'a': 'c' }", Err.MAPDUPLKEY_X_X_X);
   }
 
   /** Stack overflow bug. */

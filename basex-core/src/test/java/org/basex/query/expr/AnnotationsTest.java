@@ -34,7 +34,7 @@ public final class AnnotationsTest extends AdvancedQueryTest {
   public void conflicts() {
     error("declare namespace a='a';declare %a:a() variable $x:=1; $x", Err.ANNVALUE);
     error("declare namespace a='a';declare %a:a() variable $x:=1; $x", Err.ANNVALUE);
-    error("declare %pfff:public variable $x := 1; $x", Err.NOURI);
+    error("declare %pfff:public variable $x := 1; $x", Err.NOURI_X);
     error("declare %public %public variable $x := 1; $x", Err.DUPLVARVIS);
     error("declare %public %private variable $x := 1; $x", Err.DUPLVARVIS);
     error("declare %updating variable $x := 1; $x", Err.UPDATINGVAR);
@@ -51,12 +51,12 @@ public final class AnnotationsTest extends AdvancedQueryTest {
     // ignore prefixes with no annotation definitions
     query("declare %db:xx function local:x() { 1 }; 1");
     // check unit annotations
-    error("declare %unit:xyz function local:x() { 1 }; 1", Err.BASX_ANNOT);
+    error("declare %unit:xyz function local:x() { 1 }; 1", Err.BASX_ANNOT_X_X);
     // check restxq annotations
-    error("declare %rest:xx function local:x() { 1 }; 1", Err.BASX_ANNOT);
+    error("declare %rest:xx function local:x() { 1 }; 1", Err.BASX_ANNOT_X_X);
     // check output annotations
-    error("declare %output:xx function local:x() { 1 }; 1", Err.BASX_ANNOT);
-    error("declare %output:method function local:x() { 1 }; 1", Err.BASX_ANNOTARGS);
+    error("declare %output:xx function local:x() { 1 }; 1", Err.BASX_ANNOT_X_X);
+    error("declare %output:method function local:x() { 1 }; 1", Err.BASX_ANNOTARGS_X_X);
   }
 
   /**  Test for empty-sequence() as function item. */

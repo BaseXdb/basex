@@ -47,42 +47,42 @@ public final class FNArchiveTest extends AdvancedQueryTest {
         "<archive:options><archive:format value='gzip'/></archive:options>")), "1");
 
     // different number of entries and contents
-    error(_ARCHIVE_CREATE.args("X", "()"), Err.ARCH_DIFF);
+    error(_ARCHIVE_CREATE.args("X", "()"), Err.ARCH_DIFF_X_X);
     // name must not be empty
     error(_ARCHIVE_CREATE.args("<archive:entry/>", ""), Err.ARCH_EMPTY);
     // invalid compression level
     error(_ARCHIVE_CREATE.args("<archive:entry compression-level='x'>X</archive:entry>", ""),
-        Err.ARCH_LEVEL);
+        Err.ARCH_LEVEL_X);
     error(_ARCHIVE_CREATE.args("<archive:entry compression-level='10'>X</archive:entry>", ""),
-        Err.ARCH_LEVEL);
+        Err.ARCH_LEVEL_X);
     // invalid modification date
     error(_ARCHIVE_CREATE.args("<archive:entry last-modified='2020'>X</archive:entry>", ""),
-        Err.ARCH_DATETIME);
+        Err.ARCH_DATETIME_X);
     // content must be string or binary
-    error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", " 123"), Err.STRBINTYPE);
+    error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", " 123"), Err.STRBIN_X_X);
     // wrong encoding
     error(_ARCHIVE_CREATE.args("<archive:entry encoding='x'>X</archive:entry>", ""),
-        Err.ARCH_ENCODING);
+        Err.ARCH_ENCODING_X);
     // errors while converting a string
     error(_ARCHIVE_CREATE.args("<archive:entry encoding='US-ASCII'>X</archive:entry>",
-        "\u00fc"), Err.ARCH_ENCODE);
+        "\u00fc"), Err.ARCH_ENCODE_X);
     // format not supported
     error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "", " map { 'format':'rar' }"),
         Err.ARCH_UNKNOWN);
     // unknown option
     error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "", " map { 'x':'y' }"),
-        Err.INVALIDOPT);
+        Err.INVALIDOPT_X);
     error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
         "<archive:options><archive:format value='rar'/></archive:options>"),
         Err.ARCH_UNKNOWN);
     // algorithm not supported
     error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
         "<archive:options><archive:algorithm value='unknown'/></archive:options>"),
-        Err.ARCH_SUPP);
+        Err.ARCH_SUPP_X_X);
     // algorithm not supported
     error(_ARCHIVE_CREATE.args("('x','y')", "('a','b')",
         "<archive:options><archive:format value='gzip'/></archive:options>"),
-        Err.ARCH_ONE);
+        Err.ARCH_ONE_X);
   }
 
   /** Test method. */
@@ -175,7 +175,7 @@ public final class FNArchiveTest extends AdvancedQueryTest {
     // updates an existing entry
     error(_ARCHIVE_CREATE.args("X", "X",
         "<archive:options><archive:format value='gzip'/></archive:options>") + " ! " +
-        _ARCHIVE_UPDATE.args(" .", "X", "Y"), Err.ARCH_MODIFY);
+        _ARCHIVE_UPDATE.args(" .", "X", "Y"), Err.ARCH_MODIFY_X);
   }
 
   /** Test method. */
@@ -194,7 +194,7 @@ public final class FNArchiveTest extends AdvancedQueryTest {
     // updates an existing entry
     error(_ARCHIVE_CREATE.args("X", "X",
         "<archive:options><archive:format value='gzip'/></archive:options>") + " ! " +
-        _ARCHIVE_DELETE.args(" .", "X"), Err.ARCH_MODIFY);
+        _ARCHIVE_DELETE.args(" .", "X"), Err.ARCH_MODIFY_X);
   }
 
 

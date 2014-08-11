@@ -54,7 +54,7 @@ public final class Uri extends AStr {
    * @return uri instance
    */
   public static Uri uri(final byte[] value, final boolean normalize) {
-    final byte[] u = normalize ? Token.norm(value) : value;
+    final byte[] u = normalize ? Token.normalize(value) : value;
     return u.length == 0 ? EMPTY : new Uri(u);
   }
 
@@ -74,7 +74,7 @@ public final class Uri extends AStr {
       final URI uri = base.resolve(res);
       return uri(Token.token(uri.toString()), false);
     } catch(final URISyntaxException ex) {
-      throw URIINVRES.get(info, ex.getMessage());
+      throw URIARG_X.get(info, ex.getMessage());
     }
   }
 

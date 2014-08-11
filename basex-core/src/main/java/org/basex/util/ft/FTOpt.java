@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.basex.data.*;
+import org.basex.query.expr.*;
 import org.basex.query.ft.*;
 import org.basex.query.value.node.*;
 

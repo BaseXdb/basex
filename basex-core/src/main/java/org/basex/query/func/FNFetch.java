@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNFetch extends StandardFunc {
+public final class FNFetch extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -46,9 +46,9 @@ public final class FNFetch extends StandardFunc {
    * @throws QueryException query exception
    */
   private StrStream text(final QueryContext qc) throws QueryException {
-    final byte[] uri = checkStr(exprs[0], qc);
-    final String enc = checkEncoding(1, BXFE_ENCODING, qc);
-    return new StrStream(IO.get(Token.string(uri)), enc, BXFE_IO, qc);
+    final byte[] uri = toToken(exprs[0], qc);
+    final String enc = toEncoding(1, BXFE_ENCODING_X, qc);
+    return new StrStream(IO.get(Token.string(uri)), enc, BXFE_IO_X, qc);
   }
 
   /**
@@ -58,8 +58,8 @@ public final class FNFetch extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64Stream binary(final QueryContext qc) throws QueryException {
-    final byte[] uri = checkStr(exprs[0], qc);
-    return new B64Stream(IO.get(Token.string(uri)), BXFE_IO);
+    final byte[] uri = toToken(exprs[0], qc);
+    return new B64Stream(IO.get(Token.string(uri)), BXFE_IO_X);
   }
 
   /**
@@ -69,7 +69,7 @@ public final class FNFetch extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str contentType(final QueryContext qc) throws QueryException {
-    final byte[] uri = checkStr(exprs[0], qc);
+    final byte[] uri = toToken(exprs[0], qc);
     final IO io = IO.get(Token.string(uri));
 
     final String path = io.path();
@@ -78,14 +78,14 @@ public final class FNFetch extends StandardFunc {
       try {
         mt = ((IOUrl) io).connection().getContentType();
       } catch(final IOException ex) {
-        throw BXFE_IO.get(info, ex);
+        throw BXFE_IO_X.get(info, ex);
       }
     } else if(io instanceof IOContent) {
       mt = MimeTypes.APP_XML;
     } else {
       mt = io.exists() ? MimeTypes.get(path) : null;
     }
-    if(mt == null) throw BXFE_IO.get(info, new FileNotFoundException(path));
+    if(mt == null) throw BXFE_IO_X.get(info, new FileNotFoundException(path));
     return Str.get(mt);
   }
 }

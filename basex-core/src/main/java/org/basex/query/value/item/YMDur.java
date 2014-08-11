@@ -44,7 +44,7 @@ public final class YMDur extends Dur {
 
     this(value);
     final double d = (double) mon + (plus ? dur.mon : -dur.mon);
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw MONTHRANGE.get(ii, d);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw MONTHRANGE_X.get(ii, d);
     mon += plus ? dur.mon : -dur.mon;
   }
 
@@ -60,10 +60,10 @@ public final class YMDur extends Dur {
       throws QueryException {
 
     this(value);
-    if(Double.isNaN(factor)) throw DATECALC.get(ii, description(), factor);
-    if(mult ? Double.isInfinite(factor) : factor == 0) throw DATEZERO.get(ii, type, factor);
+    if(Double.isNaN(factor)) throw DATECALC_X_X.get(ii, description(), factor);
+    if(mult ? Double.isInfinite(factor) : factor == 0) throw DATEZERO_X_X.get(ii, type, factor);
     final double d = mult ? mon * factor : mon / factor;
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw MONTHRANGE.get(ii, d);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw MONTHRANGE_X.get(ii, d);
     mon = StrictMath.round(d);
   }
 

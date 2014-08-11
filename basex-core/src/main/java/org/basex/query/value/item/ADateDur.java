@@ -103,7 +103,7 @@ public abstract class ADateDur extends Item {
    * @return date format exception
    */
   final QueryException dateError(final byte[] i, final String ex, final InputInfo ii) {
-    return DATEFORMAT.get(ii, type, i, ex);
+    return DATEFORMAT_X_X_X.get(ii, type, i, ex);
   }
 
   /**
@@ -119,7 +119,7 @@ public abstract class ADateDur extends Item {
     try {
       return Long.parseLong(s);
     } catch(final NumberFormatException ex) {
-      throw (dur ? DURRANGE : DATERANGE).get(ii, type, chop(s, ii));
+      throw (dur ? DURRANGE_X_X : DATERANGE_X_X).get(ii, type, chop(s, ii));
     }
   }
 
@@ -138,7 +138,7 @@ public abstract class ADateDur extends Item {
     try {
       return new BigDecimal(s);
     } catch(final NumberFormatException ex) {
-      throw (dur ? DURRANGE : DATERANGE).get(ii, type, chop(s, ii));
+      throw (dur ? DURRANGE_X_X : DATERANGE_X_X).get(ii, type, chop(s, ii));
     }
   }
 }

@@ -79,7 +79,7 @@ public final class HigherOrderTest extends AdvancedQueryTest {
   /**  Test for name heavy currying. */
   @Test
   public void placeHolderTest() {
-    error("string-join(('a', 'b'), )(',')", Err.FUNCMISS);
+    error("string-join(('a', 'b'), )(',')", Err.FUNCMISS_X);
   }
 
   /**  Test for empty-sequence() as function item. */
@@ -97,12 +97,12 @@ public final class HigherOrderTest extends AdvancedQueryTest {
   /**  Tests the creation of a cast function as function item. */
   @Test
   public void wrongArityTest() {
-    error("count(concat#2('1','2','3'))", Err.INVARITY);
+    error("count(concat#2('1','2','3'))", Err.INVARITY_X_X_X_X);
   }
 
-  /** Tests using a partial function application as the context item (see GH-579). */
+  /** Tests using a partial function application as the context value (see GH-579). */
   @Test
-  public void ctxItemTest() {
+  public void ctxValueTest() {
     query("declare context item := contains(?, \"a\"); .(\"abc\")", "true");
   }
 

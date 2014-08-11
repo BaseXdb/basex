@@ -77,7 +77,7 @@ public final class Pos extends Simple {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCtx(qc);
+    ctxValue(qc);
     return Bln.get(qc.pos >= min && qc.pos <= max);
   }
 

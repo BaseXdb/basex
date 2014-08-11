@@ -67,7 +67,7 @@ public final class Functions extends TokenSet {
     // no constructor function found, or abstract type specified
     if(type != null && type != AtomType.NOT && type != AtomType.AAT) {
       if(arity == 1) return type;
-      throw FUNCTYPES.get(ii, name.string(), arity, "s", 1);
+      throw FUNCTYPES_X_X_X_X.get(ii, name.string(), arity, "s", 1);
     }
 
     // include similar function name in error message
@@ -76,10 +76,10 @@ public final class Functions extends TokenSet {
       if(t.parent == null) continue;
       final byte[] u = t.name.uri();
       if(eq(u, XSURI) && t != AtomType.NOT && t != AtomType.AAT && ls.similar(
-          lc(ln), lc(t.string()))) throw FUNCSIMILAR.get(ii, name.string(), t.string());
+          lc(ln), lc(t.string()))) throw FUNCSIMILAR_X_X.get(ii, name.string(), t.string());
     }
     // no similar name: constructor function found, or abstract type specified
-    throw FUNCUNKNOWN.get(ii, name.string());
+    throw FUNCUNKNOWN_X.get(ii, name.string());
   }
 
   /**
@@ -99,7 +99,7 @@ public final class Functions extends TokenSet {
     if(!eq(fl.uri(), name.uri())) return null;
     // check number of arguments
     if(arity >= fl.min && arity <= fl.max) return fl;
-    throw FUNCARGS.get(ii, fl, arity, arity == 1 ? "" : "s");
+    throw FUNCARGS_X_X_X.get(ii, fl, arity, arity == 1 ? "" : "s");
   }
 
   /**
@@ -111,7 +111,7 @@ public final class Functions extends TokenSet {
    * @return function instance
    * @throws QueryException query exception
    */
-  public StandardFunc get(final QNm name, final Expr[] args, final StaticContext sc,
+  public BuiltinFunc get(final QNm name, final Expr[] args, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     final Function fl = getBuiltIn(name, args.length, ii);
     return fl == null ? null : fl.get(sc, ii, args);
@@ -155,7 +155,7 @@ public final class Functions extends TokenSet {
         calls[i] = new VarRef(ii, args[i]);
       }
 
-      final StandardFunc sf = fn.get(sc, ii, calls);
+      final BuiltinFunc sf = fn.get(sc, ii, calls);
       if(sf.has(Flag.UPD)) {
         qc.updating();
         ann.add(Ann.Q_UPDATING, Empty.SEQ, ii);
@@ -238,7 +238,7 @@ public final class Functions extends TokenSet {
     }
 
     // built-in functions
-    final StandardFunc fun = get().get(name, args, sc, ii);
+    final BuiltinFunc fun = get().get(name, args, sc, ii);
     if(fun != null) {
       if(!sc.xquery3() && fun.has(Flag.X30)) throw FUNC30.get(ii);
       final Ann ann = new Ann();
@@ -302,7 +302,7 @@ public final class Functions extends TokenSet {
    */
   private static QueryException similarError(final QNm name, final InputInfo ii, final byte[] key) {
     final int i = indexOf(key, '}');
-    return FUNCSIMILAR.get(ii, name.prefixId(FNURI), new TokenBuilder(
+    return FUNCSIMILAR_X_X.get(ii, name.prefixId(FNURI), new TokenBuilder(
         NSGlobal.prefix(substring(key, 2, i))).add(':').add(substring(key, i + 1)).finish());
   }
 

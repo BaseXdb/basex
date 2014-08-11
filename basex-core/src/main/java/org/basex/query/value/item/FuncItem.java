@@ -26,7 +26,7 @@ import org.basex.util.hash.*;
 public final class FuncItem extends FItem implements Scope {
   /** Static context. */
   private final StaticContext sc;
-  /** Function name. */
+  /** Function name (may be {@code null}). */
   private final QNm name;
   /** Formal parameters. */
   private final Var[] params;
@@ -47,7 +47,7 @@ public final class FuncItem extends FItem implements Scope {
    * Constructor.
    * @param sc static context
    * @param ann function annotations
-   * @param name function name
+   * @param name function name (may be {@code null})
    * @param params function arguments
    * @param type function type
    * @param expr function body
@@ -62,7 +62,7 @@ public final class FuncItem extends FItem implements Scope {
    * Constructor.
    * @param sc static context
    * @param ann function annotations
-   * @param name function name
+   * @param name function name (may be {@code null})
    * @param params function arguments
    * @param type function type
    * @param expr function body

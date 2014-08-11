@@ -134,7 +134,7 @@ public final class QueryResources {
       // open and add new data reference
       return addData(Open.open(name, qc.context));
     } catch(final IOException ex) {
-      throw BXDB_OPEN.get(info, ex);
+      throw BXDB_OPEN_X.get(info, ex);
     }
   }
 
@@ -296,7 +296,7 @@ public final class QueryResources {
       in = baseIO.merge(input.original);
       if(!in.path().equals(input.original) && in.exists()) return in;
     }
-    throw WHICHRES.get(info, in);
+    throw WHICHRES_X.get(info, in);
   }
 
   // TEST APIS ====================================================================================
@@ -376,11 +376,11 @@ public final class QueryResources {
 
     // do not check input if no read permissions are given
     if(!qc.context.user.has(Perm.READ))
-      throw BXXQ_PERM.get(info, Util.info(Text.PERM_REQUIRED_X, Perm.READ));
+      throw BXXQ_PERM_X.get(info, Util.info(Text.PERM_REQUIRED_X, Perm.READ));
 
     // check if input is an existing file
     final IO source = checkPath(input, baseIO, info);
-    if(single && source.isDir()) WHICHRES.get(info, baseIO);
+    if(single && source.isDir()) WHICHRES_X.get(info, baseIO);
 
     // overwrite parsing options with default values
     final MainOptions opts = context.options;
@@ -397,7 +397,7 @@ public final class QueryResources {
       final boolean fc = context.options.get(MainOptions.FORCECREATE);
       return addData(CreateDB.create(source.dbname(), new DirParser(source, opts), context, !fc));
     } catch(final IOException ex) {
-      throw IOERR.get(info, ex);
+      throw IOERR_X.get(info, ex);
     } finally {
       // reset original values
       for(int o = 0; o < ol; o++) opts.put(options[o], values[o]);
@@ -420,7 +420,7 @@ public final class QueryResources {
     final IntList docs = dt.resources.docs(qi.path);
     // ensure that a single document was filtered
     if(docs.size() == 1) return new DBNode(dt, docs.get(0), Data.DOC);
-    throw (docs.isEmpty() ? BXDB_NODOC : BXDB_SINGLE).get(info, qi.original);
+    throw (docs.isEmpty() ? BXDB_NODOC_X : BXDB_SINGLE_X).get(info, qi.original);
   }
 
   /**

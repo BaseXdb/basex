@@ -679,7 +679,7 @@ public final class QT3TS extends Main {
     try {
       if(!file.isEmpty()) exp = string(new IOFile(baseDir, file).read());
       exp = normNL(exp);
-      if(norm) exp = string(norm(token(exp)));
+      if(norm) exp = string(normalize(token(exp)));
 
       final String res = normNL(asString("serialize(., map{ 'indent':='no' })", value));
       if(exp.equals(res)) return null;
@@ -774,7 +774,7 @@ public final class QT3TS extends Main {
     String exp = expect.getString();
     // normalize space
     final boolean norm = asBoolean("@normalize-space=('true','1')", expect);
-    if(norm) exp = string(norm(token(exp)));
+    if(norm) exp = string(normalize(token(exp)));
 
     final TokenBuilder tb = new TokenBuilder();
     int c = 0;
@@ -783,7 +783,7 @@ public final class QT3TS extends Main {
       tb.add(it.getString());
     }
 
-    final String res = norm ? string(norm(tb.finish())) : tb.toString();
+    final String res = norm ? string(normalize(tb.finish())) : tb.toString();
     return exp.equals(res) ? null : exp;
   }
 

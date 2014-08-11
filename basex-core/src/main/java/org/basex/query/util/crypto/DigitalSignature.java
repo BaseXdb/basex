@@ -165,13 +165,13 @@ public final class DigitalSignature {
         try {
           ks = KeyStore.getInstance(ksTY);
         } catch(final KeyStoreException ex) {
-          throw CX_KSNULL.get(info, ex);
+          throw CX_KSNULL_X.get(info, ex);
         }
 
         ks.load(new FileInputStream(ksURI), ksPW.toCharArray());
         pk = (PrivateKey) ks.getKey(kAlias, pkPW.toCharArray());
         final X509Certificate x509ce = (X509Certificate) ks.getCertificate(kAlias);
-        if(x509ce == null) throw CX_ALINV.get(info, kAlias);
+        if(x509ce == null) throw CX_ALINV_X.get(info, kAlias);
         final PublicKey puk = x509ce.getPublicKey();
         final KeyInfoFactory kifactory = fac.getKeyInfoFactory();
         final KeyValue keyValue = kifactory.newKeyValue(puk);

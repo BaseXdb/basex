@@ -211,15 +211,15 @@ public final class ModuleLoader {
     try {
       clz = findClass(cp);
     } catch(final ClassNotFoundException ex) {
-      throw WHICHCLASS.get(ii, ex.getMessage());
+      throw WHICHCLASS_X.get(ii, ex.getMessage());
       // expected exception
     } catch(final Throwable th) {
-      throw MODINITERR.get(ii, th);
+      throw MODINITERR_X.get(ii, th);
     }
 
     final boolean qm = clz.getSuperclass() == QueryModule.class;
     final Object jm = Reflect.get(clz);
-    if(jm == null) throw INSTERR.get(ii, cp);
+    if(jm == null) throw INSTERR_X.get(ii, cp);
 
     // add all public methods of the class (ignore methods from super classes)
     final ArrayList<Method> list = new ArrayList<>();
@@ -250,7 +250,7 @@ public final class ModuleLoader {
 
     // find package in package dictionary
     final byte[] pDir = context.repo.pkgDict().get(name);
-    if(pDir == null) throw BXRE_NOTINST.get(ii, name);
+    if(pDir == null) throw BXRE_NOTINST_X.get(ii, name);
     final IOFile pkgDir = context.repo.path(string(pDir));
 
     // parse package descriptor
@@ -270,7 +270,7 @@ public final class ModuleLoader {
       if(d.pkg != null) {
         // we consider only package dependencies here
         final byte[] depPkg = new PkgValidator(context.repo, ii).depPkg(d);
-        if(depPkg == null) throw BXRE_NOTINST.get(ii, string(d.pkg));
+        if(depPkg == null) throw BXRE_NOTINST_X.get(ii, string(d.pkg));
         if(toLoad.contains(depPkg)) throw CIRCMODULE.get(ii);
         addRepo(depPkg, toLoad, loaded, ii, qp);
       }

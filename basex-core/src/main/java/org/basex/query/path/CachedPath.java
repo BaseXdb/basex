@@ -54,7 +54,7 @@ final class CachedPath extends AxisPath {
         for(Item it; (it = ir.next()) != null;) {
           // ensure that root only returns nodes
           if(root != null && !(it instanceof ANode))
-            throw PATHNODE.get(info, steps[0], it.type, it);
+            throw PATHNODE_X_X_X.get(info, steps[0], it.type, it);
           qc.value = it;
           iter(0, citer, qc);
         }

@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNProc extends StandardFunc {
+public final class FNProc extends BuiltinFunc {
   /** Name: result. */
   private static final String RESULT = "result";
   /** Name: standard output. */
@@ -47,18 +47,18 @@ public final class FNProc extends StandardFunc {
     checkCreate(qc);
 
     final TokenList tl = new TokenList();
-    tl.add(checkStr(exprs[0], qc));
+    tl.add(toToken(exprs[0], qc));
     if(exprs.length > 1) {
       final Iter ir = qc.iter(exprs[1]);
-      for(Item it; (it = ir.next()) != null;) tl.add(checkStr(it));
+      for(Item it; (it = ir.next()) != null;) tl.add(toToken(it));
     }
 
-    final String c = exprs.length > 2 ? string(checkStr(exprs[2], qc)) : Prop.ENCODING;
+    final String c = exprs.length > 2 ? string(toToken(exprs[2], qc)) : Prop.ENCODING;
     final Charset cs;
     try {
       cs = Charset.forName(c);
     } catch(final Exception ex) {
-      throw BXPR_ENC.get(info, c);
+      throw BXPR_ENC_X.get(info, c);
     }
 
     final String[] args = tl.toStringArray();

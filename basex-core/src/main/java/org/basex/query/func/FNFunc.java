@@ -18,7 +18,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public final class FNFunc extends StandardFunc {
+public final class FNFunc extends BuiltinFunc {
   /** Minimum size of a loop that should not be unrolled. */
   static final int UNROLL_LIMIT = 10;
 
@@ -49,8 +49,8 @@ public final class FNFunc extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     switch(func) {
-      case FUNCTION_ARITY:  return Int.get(checkFunc(exprs[0], qc).arity());
-      case FUNCTION_NAME:   return checkFunc(exprs[0], qc).funcName();
+      case FUNCTION_ARITY:  return Int.get(toFunc(exprs[0], qc).arity());
+      case FUNCTION_NAME:   return toFunc(exprs[0], qc).funcName();
       case FUNCTION_LOOKUP: return lookup(qc, ii);
       default:              return super.item(qc, ii);
     }
@@ -100,9 +100,9 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item lookup(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final QNm name = checkQNm(exprs[0], qc, sc);
-    final long arity = checkItr(exprs[1], qc);
-    if(arity < 0 || arity > Integer.MAX_VALUE) throw FUNCUNKNOWN.get(ii, name);
+    final QNm name = toQNm(exprs[0], qc, sc, false);
+    final long arity = toLong(exprs[1], qc);
+    if(arity < 0 || arity > Integer.MAX_VALUE) throw FUNCUNKNOWN_X.get(ii, name);
 
     try {
       final Expr lit = Functions.getLiteral(name, (int) arity, qc, sc, ii);
@@ -120,7 +120,7 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException exception
    */
   private Iter forEach(final QueryContext qc) throws QueryException {
-    final FItem f = checkArity(1, 1, qc);
+    final FItem f = checkArity(exprs[1], 1, qc);
     final Iter ir = exprs[0].iter(qc);
     return new Iter() {
       Iter ir2 = Empty.ITER;
@@ -145,7 +145,7 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter filter(final QueryContext qc) throws QueryException {
-    final FItem fun = checkArity(1, 1, qc);
+    final FItem fun = checkArity(exprs[1], 1, qc);
     final Iter ir = exprs[0].iter(qc);
     return new Iter() {
       @Override
@@ -153,7 +153,7 @@ public final class FNFunc extends StandardFunc {
         do {
           final Item it = ir.next();
           if(it == null) return null;
-          if(checkBln(fun.invokeItem(qc, info, it))) return it;
+          if(toBoolean(fun.invokeItem(qc, info, it))) return it;
         } while(true);
       }
     };
@@ -166,7 +166,7 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter forEachPair(final QueryContext qc) throws QueryException {
-    final FItem fun = checkArity(2, 2, qc);
+    final FItem fun = checkArity(exprs[2], 2, qc);
     final Iter ir1 = exprs[0].iter(qc), ir2 = exprs[1].iter(qc);
     return new Iter() {
       Iter ir = Empty.ITER;
@@ -192,7 +192,7 @@ public final class FNFunc extends StandardFunc {
    */
   private Iter foldLeft(final QueryContext qc) throws QueryException {
     final Iter ir = exprs[0].iter(qc);
-    final FItem fun = checkArity(2, 2, qc);
+    final FItem fun = checkArity(exprs[2], 2, qc);
 
     // don't convert to a value if not necessary
     Item it = ir.next();
@@ -212,7 +212,7 @@ public final class FNFunc extends StandardFunc {
    */
   private Iter foldRight(final QueryContext qc) throws QueryException {
     final Value v = qc.value(exprs[0]);
-    final FItem fun = checkArity(2, 2, qc);
+    final FItem fun = checkArity(exprs[2], 2, qc);
 
     // evaluate start value lazily if it's passed straight through
     if(v.isEmpty()) return exprs[1].iter(qc);

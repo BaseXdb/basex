@@ -98,8 +98,9 @@ public final class And extends Logical {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    for(int i = 0; i < exprs.length - 1; i++)
+    for(int i = 0; i < exprs.length - 1; i++) {
       if(!exprs[i].ebv(qc, info).bool(info)) return Bln.FALSE;
+    }
     final Expr last = exprs[exprs.length - 1];
     return tailCall ? last.item(qc, ii) : last.ebv(qc, ii).bool(ii) ? Bln.TRUE : Bln.FALSE;
   }

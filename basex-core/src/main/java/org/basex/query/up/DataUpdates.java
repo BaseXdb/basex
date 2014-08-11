@@ -179,7 +179,7 @@ final class DataUpdates {
         Export.export(data, data.meta.original, null);
       } catch(final IOException ex) {
         Util.debug(ex);
-        throw UPPUTERR.get(null, data.meta.original);
+        throw UPPUTERR_X.get(null, data.meta.original);
       }
     }
   }
@@ -274,6 +274,6 @@ final class DataUpdates {
       }
     }
     final QNm dup = pool.duplicate();
-    if(dup != null) throw UPATTDUPL.get(null, dup);
+    if(dup != null) throw UPATTDUPL_X.get(null, dup);
   }
 }

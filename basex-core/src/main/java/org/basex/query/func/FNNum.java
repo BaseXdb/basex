@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNNum extends StandardFunc {
+public final class FNNum extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -31,7 +31,7 @@ public final class FNNum extends StandardFunc {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = exprs[0].item(qc, info);
+    final Item it = exprs[0].atomItem(qc, info);
     if(it == null) return null;
 
     final Type ip = it.type;
@@ -58,7 +58,7 @@ public final class FNNum extends StandardFunc {
    */
   private Item rnd(final Item it, final double d, final boolean h2e, final QueryContext qc)
       throws QueryException {
-    final long p = exprs.length == 1 ? 0 : checkItr(exprs[1], qc);
+    final long p = exprs.length == 1 ? 0 : toLong(exprs[1], qc);
     return round(it, d, p, h2e, info);
   }
 

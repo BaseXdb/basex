@@ -53,16 +53,16 @@ final class DBOptions {
     for(final Entry<String, String> entry : options.entrySet()) {
       final String key = entry.getKey();
       final Option<?> option = opts.get(key);
-      if(option == null) throw BASX_OPTIONS.get(info, key);
+      if(option == null) throw BASX_OPTIONS_X.get(info, key);
 
       final String value = entry.getValue();
       if(option instanceof NumberOption) {
         final int v = toInt(value);
-        if(v < 0) throw BASX_VALUE.get(info, key, value);
+        if(v < 0) throw BASX_VALUE_X_X.get(info, key, value);
         rOptions.put(option, v);
       } else if(option instanceof BooleanOption) {
         final boolean yes = Util.yes(value);
-        if(!yes && !Util.no(value)) throw BASX_VALUE.get(info, key, value);
+        if(!yes && !Util.no(value)) throw BASX_VALUE_X_X.get(info, key, value);
         rOptions.put(option, yes);
       } else {
         rOptions.put(option, value);

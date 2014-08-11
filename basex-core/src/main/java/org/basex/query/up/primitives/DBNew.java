@@ -83,7 +83,7 @@ final class DBNew {
       final MemBuilder b = new MemBuilder(dbname, p);
       return new DataClip(b.build());
     } catch(final IOException ex) {
-      throw IOERR.get(info, ex);
+      throw IOERR_X.get(info, ex);
     }
   }
 }

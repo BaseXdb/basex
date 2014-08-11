@@ -35,7 +35,7 @@ public abstract class ArchiveIn {
       if(li.lookup() == 0x1f) return new GZIPIn(li);
     } catch(final IOException ex) {
       try { bi.close(); } catch(final IOException ignored) { }
-      throw ARCH_FAIL.get(info, ex);
+      throw ARCH_FAIL_X.get(info, ex);
     }
     throw ARCH_UNKNOWN.get(info);
   }

@@ -87,7 +87,7 @@ public final class Window extends Clause {
     for(int i = 0; i < vs.length; i++) {
       final Var v = vs[i];
       for(int j = i; --j >= 0;)
-        if(v.name.eq(vs[j].name)) throw WINDOWUNIQ.get(info, vs[j]);
+        if(v.name.eq(vs[j].name)) throw WINDOWUNIQ_X.get(info, vs[j]);
     }
     return vs;
   }

@@ -87,7 +87,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   @Test
   public void mandatoryAttr() {
     error(new IOContent("<package xmlns:http='http://expath.org/ns/pkg' spec='1.0'/>"),
-        Err.BXRE_DESC, "Missing mandatory attribute not detected.");
+        Err.BXRE_DESC_X, "Missing mandatory attribute not detected.");
   }
 
   /**
@@ -99,7 +99,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     error(
         desc(PKG5, "pkg5", "12.0",
             "<dependency package='" + PKG4 + "'/>"),
-        Err.BXRE_NOTINST, "Missing dependency not detected.");
+        Err.BXRE_NOTINST_X, "Missing dependency not detected.");
   }
 
   /**
@@ -111,7 +111,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     error(
         desc(PKG5, "pkg5", "12.0",
             "<dependency package='" + PKG1 + "' versions='1.0 7.0'/>"),
-        Err.BXRE_NOTINST, "Missing dependency not detected.");
+        Err.BXRE_NOTINST_X, "Missing dependency not detected.");
   }
 
   /**
@@ -123,7 +123,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     error(
         desc(PKG5, "pkg5", "12.0",
             "<dependency package='" + PKG1 + "' versions='12.7'/>"),
-        Err.BXRE_NOTINST, "Missing dependency not detected.");
+        Err.BXRE_NOTINST_X, "Missing dependency not detected.");
   }
 
   /**
@@ -135,7 +135,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     error(
         desc(PKG5, "pkg5", "12.0",
             "<dependency package='" + PKG1 + "' versions='12.7'/>"),
-        Err.BXRE_NOTINST, "Missing dependency not detected.");
+        Err.BXRE_NOTINST_X, "Missing dependency not detected.");
   }
 
   /**
@@ -147,7 +147,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     error(
         desc(PKG5, "pkg5", "12.0",
             "<dependency package='" + PKG1 + "' semver-max='11'/>"),
-        Err.BXRE_NOTINST, "Missing dependency not detected.");
+        Err.BXRE_NOTINST_X, "Missing dependency not detected.");
   }
 
   /**
@@ -158,7 +158,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   public void notInstalledMinMax() {
     error(desc(PKG5, "pkg5", "12.0",
         "<dependency package='" + PKG1 + "' semver-min='5.7' "
-            + "semver-max='11'/>"), Err.BXRE_NOTINST,
+            + "semver-max='11'/>"), Err.BXRE_NOTINST_X,
         "Missing dependency not detected.");
   }
 
@@ -170,7 +170,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   public void alreadyAnotherInstalled() {
     error(desc(PKG5, "pkg5", "12.0",
         "<xquery><namespace>ns1</namespace><file>pkg1mod1.xql</file></xquery>"),
-        Err.BXRE_INST, "Already installed component not detected.");
+        Err.BXRE_INST_X, "Already installed component not detected.");
   }
 
   /**
@@ -229,7 +229,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
       new RepoManager(context).install("src/test/resources/pkg");
       fail("Not existing package not detected.");
     } catch(final QueryException ex) {
-      check(null, ex, Err.BXRE_WHICH);
+      check(null, ex, Err.BXRE_WHICH_X);
     }
     // try to install a package
     new RepoInstall(REPO + "pkg3.xar", null).execute(context);
@@ -301,7 +301,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
       new RepoManager(context).delete("xyz");
       fail("Not installed package not detected.");
     } catch(final QueryException ex) {
-      check(null, ex, Err.BXRE_WHICH);
+      check(null, ex, Err.BXRE_WHICH_X);
     }
     // install a package without dependencies (pkg3)
     new RepoInstall(REPO + "pkg3.xar", null).execute(context);
@@ -334,7 +334,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
       new RepoManager(context).delete(PKG3ID);
       fail("Package involved in a dependency was deleted.");
     } catch(final QueryException ex) {
-      check(null, ex, Err.BXRE_DEP);
+      check(null, ex, Err.BXRE_DEP_X_X);
     }
     // try to delete pkg4 (use package name)
     new RepoDelete(PKG4, null).execute(context);

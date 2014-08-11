@@ -9,8 +9,10 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -19,7 +21,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNAcc extends StandardFunc {
+public final class FNAcc extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -33,57 +35,88 @@ public final class FNAcc extends StandardFunc {
   }
 
   @Override
+  public Iter iter(final QueryContext qc) throws QueryException {
+    switch(func) {
+      case DATA: return data(qc).iter();
+      default:   return super.iter(qc);
+    }
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    switch(func) {
+      case DATA: return data(qc);
+      default:   return super.value(qc);
+    }
+  }
+
+  @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Expr e = exprs.length == 0 ? checkCtx(qc) : exprs[0];
     switch(func) {
       case POSITION:
+        ctxValue(qc);
         return Int.get(qc.pos);
       case LAST:
+        ctxValue(qc);
         return Int.get(qc.size);
       case STRING:
-        return string(e, ii, qc);
+        return string(qc, ii);
       case NUMBER:
-        return number(qc.iter(e), qc);
+        return number(qc);
       case STRING_LENGTH:
-        return Int.get(len(checkEStr(exprs.length == 0 ? string(e, ii, qc) : e, qc)));
+        return Int.get(length(exprs.length == 0 ? string(qc, ii).string(ii) :
+          toToken(arg(0, qc), qc, true)));
       case NORMALIZE_SPACE:
-        return Str.get(norm(checkEStr(e, qc)));
+        return Str.get(normalize(toToken(arg(0, qc), qc, true)));
       case NAMESPACE_URI_FROM_QNAME:
-        final Item it = e.item(qc, info);
-        return it == null ? null : Uri.uri(checkQNm(it, qc, sc).uri());
+        final QNm qnm = toQNm(arg(0, qc), qc, sc, true);
+        return qnm == null ? null : Uri.uri(qnm.uri());
       default:
         return super.item(qc, ii);
     }
   }
 
-  /**
-   * Converts the specified item to a string.
-   * @param ex expression
-   * @param ii input info
-   * @param qc query context
-   * @return double iterator
-   * @throws QueryException query exception
-   */
-  private Item string(final Expr ex, final InputInfo ii, final QueryContext qc)
-      throws QueryException {
-
-    final Item it = ex.item(qc, info);
-    if(it == null) return Str.ZERO;
-    if(it instanceof FItem) throw FISTR.get(ii, it.type);
-    return it.type == AtomType.STR ? it : Str.get(it.string(ii));
+  @Override
+  protected Expr opt(final QueryContext qc, final VarScope scp) {
+    if(func == DATA && exprs.length == 1) {
+      final SeqType t = exprs[0].seqType();
+      seqType = t.type instanceof NodeType ? SeqType.get(AtomType.ATM, t.occ) : t;
+    }
+    return this;
   }
 
   /**
-   * Converts the specified item to a double.
-   * @param ir iterator
+   * Performs the data function.
    * @param qc query context
-   * @return double iterator
+   * @return resulting iterator
    * @throws QueryException query exception
    */
-  private Item number(final Iter ir, final QueryContext qc) throws QueryException {
-    final Item it = ir.next();
-    if(it == null || ir.next() != null) return Dbl.NAN;
-    if(it instanceof FItem) throw FIATOM.get(info, it.type);
+  private Value data(final QueryContext qc) throws QueryException {
+    return (exprs.length == 0 ? ctxValue(qc) : exprs[0]).atomValue(qc, info);
+  }
+
+  /**
+   * Converts the evaluated expression to a string.
+   * @param qc query context
+   * @param ii input info
+   * @return string
+   * @throws QueryException query exception
+   */
+  private Item string(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Item it = arg(0, qc).item(qc, info);
+    if(it instanceof FItem) throw FISTRING_X.get(ii, it.type);
+    return it == null ? Str.ZERO : it.type == AtomType.STR ? it : Str.get(it.string(ii));
+  }
+
+  /**
+   * Converts the evaluated expression to a double.
+   * @param qc query context
+   * @return double
+   * @throws QueryException query exception
+   */
+  private Item number(final QueryContext qc) throws QueryException {
+    final Item it = arg(0, qc).atomItem(qc, info);
+    if(it == null) return Dbl.NAN;
     if(it.type == AtomType.DBL) return it;
     try {
       if(info != null) info.check(true);
@@ -97,7 +130,8 @@ public final class FNAcc extends StandardFunc {
 
   @Override
   public boolean has(final Flag flag) {
-    return flag == Flag.CTX && exprs.length == 0 || super.has(flag);
+    final boolean ctx = exprs.length == 0;
+    return flag == Flag.X30 && func == DATA && ctx || flag == Flag.CTX && ctx || super.has(flag);
   }
 
   @Override

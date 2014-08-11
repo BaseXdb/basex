@@ -19,7 +19,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNHtml extends StandardFunc {
+public final class FNHtml extends BuiltinFunc {
   /** QName. */
   private static final QNm Q_OPTIONS = QNm.get("options", HTMLURI);
 
@@ -51,12 +51,12 @@ public final class FNHtml extends StandardFunc {
    * @throws QueryException query exception
    */
   private DBNode parse(final QueryContext qc) throws QueryException {
-    final byte[] in = checkStrBin(exprs[0], qc);
-    final HtmlOptions opts = checkOptions(1, Q_OPTIONS, new HtmlOptions(), qc);
+    final byte[] in = toBinary(exprs[0], qc);
+    final HtmlOptions opts = toOptions(1, Q_OPTIONS, new HtmlOptions(), qc);
     try {
       return new DBNode(new HtmlParser(new IOContent(in), qc.context.options, opts));
     } catch(final IOException ex) {
-      throw BXHL_IO.get(info, ex);
+      throw BXHL_IO_X.get(info, ex);
     }
   }
 }

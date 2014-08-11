@@ -69,11 +69,11 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
   /** Updating functions. */
   @Test
   public void updatingFunctions() {
-    error("db:output(?)", Err.SERFUNC);
-    error("db:output#1", Err.SERFUNC);
-    error("declare updating function local:a() { () }; local:a#0", Err.SERFUNC);
+    error("db:output(?)", Err.SERFUNC_X);
+    error("db:output#1", Err.SERFUNC_X);
+    error("declare updating function local:a() { () }; local:a#0", Err.SERFUNC_X);
     error("declare function local:a() { local:b#0 };"
-        + "declare updating function local:b() { db:output('1') }; local:a()", Err.SERFUNC);
+        + "declare updating function local:b() { db:output('1') }; local:a()", Err.SERFUNC_X);
     query("declare function local:not-used() { local:b#0 };"
         + "declare updating function local:b() { db:output('1') }; local:b()", "1");
 

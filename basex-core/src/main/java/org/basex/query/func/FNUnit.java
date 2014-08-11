@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNUnit extends StandardFunc {
+public final class FNUnit extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -46,7 +46,7 @@ public final class FNUnit extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item assrt(final QueryContext qc) throws QueryException {
-    final Item it = exprs.length < 2 ? null : checkItem(exprs[1], qc);
+    final Item it = exprs.length < 2 ? null : toItem(exprs[1], qc);
     if(exprs[0].ebv(qc, info).bool(info)) return null;
     throw error(it);
   }
@@ -58,7 +58,7 @@ public final class FNUnit extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item assertEquals(final QueryContext qc) throws QueryException {
-    final Item it = exprs.length < 3 ? null : checkItem(exprs[2], qc);
+    final Item it = exprs.length < 3 ? null : toItem(exprs[2], qc);
     final Iter iter1 = qc.iter(exprs[0]), iter2 = qc.iter(exprs[1]);
     final DeepCompare comp = new DeepCompare(info);
     Item it1, it2;
@@ -71,7 +71,7 @@ public final class FNUnit extends StandardFunc {
       if(empty1 || empty2 || !comp.equal(it1.iter(), it2.iter())) break;
       c++;
     }
-    throw new UnitException(info, UNIT_ASSERT_EQUALS, it1, it2, c).value(it);
+    throw new UnitException(info, UNIT_ASSERT_EQUALS_X_X_X, it1, it2, c).value(it);
   }
 
   /**
@@ -81,7 +81,7 @@ public final class FNUnit extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item fail(final QueryContext qc) throws QueryException {
-    throw error(exprs.length < 1 ? null : checkItem(exprs[0], qc));
+    throw error(exprs.length < 1 ? null : toItem(exprs[0], qc));
   }
 
   /**
@@ -91,6 +91,7 @@ public final class FNUnit extends StandardFunc {
    * @throws QueryException query exception
    */
   private QueryException error(final Item it) throws QueryException {
-    return (it == null ? UNIT_ASSERT.get(info) : UNIT_MESSAGE.get(info, it.string(info))).value(it);
+    return (it == null ? UNIT_ASSERT.get(info) :
+      UNIT_MESSAGE_X.get(info, it.string(info))).value(it);
   }
 }

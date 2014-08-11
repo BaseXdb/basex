@@ -54,7 +54,7 @@ public final class FNInspectTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void module() {
-    error(_INSPECT_MODULE.args("src/test/resources/non-existent.xqm"), Err.WHICHRES);
+    error(_INSPECT_MODULE.args("src/test/resources/non-existent.xqm"), Err.WHICHRES_X);
 
     final String module = "src/test/resources/hello.xqm";
     final String result = query(_INSPECT_MODULE.args(module));
@@ -74,7 +74,7 @@ public final class FNInspectTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void xqdoc() {
-    error(_INSPECT_XQDOC.args("src/test/resources/non-existent.xqm"), Err.WHICHRES);
+    error(_INSPECT_XQDOC.args("src/test/resources/non-existent.xqm"), Err.WHICHRES_X);
 
     // validate against xqDoc schema
     final String result = query(_INSPECT_XQDOC.args("src/test/resources/hello.xqm"));

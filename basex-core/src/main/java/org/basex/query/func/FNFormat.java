@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNFormat extends StandardFunc {
+public final class FNFormat extends BuiltinFunc {
   /** Pattern cache. */
   private final TokenObjMap<FormatParser> formats = new TokenObjMap<>();
 
@@ -52,12 +52,12 @@ public final class FNFormat extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str formatInteger(final QueryContext qc) throws QueryException {
-    final byte[] pic = checkStr(exprs[1], qc);
-    final byte[] lng = exprs.length == 2 ? EMPTY : checkStr(exprs[2], qc);
+    final byte[] pic = toToken(exprs[1], qc);
+    final byte[] lng = exprs.length == 2 ? EMPTY : toToken(exprs[2], qc);
 
-    final Item it = exprs[0].item(qc, info);
+    final Item it = exprs[0].atomItem(qc, info);
     if(it == null) return Str.ZERO;
-    final long num = checkItr(it);
+    final long num = toLong(it);
 
     FormatParser fp = formats.get(pic);
     if(fp == null) {
@@ -75,16 +75,16 @@ public final class FNFormat extends StandardFunc {
    */
   private Str formatNumber(final QueryContext qc) throws QueryException {
     // evaluate arguments
-    Item it = exprs[0].item(qc, info);
+    Item it = exprs[0].atomItem(qc, info);
     if(it == null) it = Dbl.NAN;
     else if(!it.type.isNumberOrUntyped()) throw numberError(this, it);
     // retrieve picture
-    final byte[] pic = checkStr(exprs[1], qc);
+    final byte[] pic = toToken(exprs[1], qc);
     // retrieve format declaration
-    final QNm frm = exprs.length == 3 ? new QNm(trim(checkEStr(exprs[2], qc)), sc) :
+    final QNm frm = exprs.length == 3 ? new QNm(trim(toToken(exprs[2], qc, true)), sc) :
       new QNm(EMPTY);
     final DecFormatter df = sc.decFormats.get(frm.id());
-    if(df == null) throw FORMNUM.get(info, frm.prefixId(XML));
+    if(df == null) throw FORMNUM_X.get(info, frm.prefixId(XML));
 
     return Str.get(df.format(info, it, pic));
   }
@@ -96,15 +96,15 @@ public final class FNFormat extends StandardFunc {
    * @return string
    * @throws QueryException query exception
    */
-  private Item formatDate(final Type tp, final QueryContext qc) throws QueryException {
-    final Item it = exprs[0].item(qc, info);
-    final byte[] pic = checkEStr(exprs[1], qc);
-    final byte[] lng = exprs.length == 5 ? checkEStr(exprs[2], qc) : EMPTY;
-    final byte[] cal = exprs.length == 5 ? checkEStr(exprs[3], qc) : EMPTY;
-    final byte[] plc = exprs.length == 5 ? checkEStr(exprs[4], qc) : EMPTY;
+  private Item formatDate(final AtomType tp, final QueryContext qc) throws QueryException {
+    final Item it = exprs[0].atomItem(qc, info);
+    final byte[] pic = toToken(exprs[1], qc, true);
+    final byte[] lng = exprs.length == 5 ? toToken(exprs[2], qc, true) : EMPTY;
+    final byte[] cal = exprs.length == 5 ? toToken(exprs[3], qc, true) : EMPTY;
+    final byte[] plc = exprs.length == 5 ? toToken(exprs[4], qc, true) : EMPTY;
     if(it == null) return null;
-    final ADate date = (ADate) checkType(it, tp);
 
+    final ADate date = (ADate) checkType(it, tp);
     final Formatter form = Formatter.get(lng);
     return Str.get(form.formatDate(date, lng, pic, cal, plc, info));
   }

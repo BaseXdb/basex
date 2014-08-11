@@ -5,7 +5,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -33,14 +32,13 @@ public final class CNSpace extends CName {
 
   @Override
   public FNames item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = name.item(qc, info);
-    final byte[] cp = checkEStr(it);
-    if(cp.length != 0 && !XMLToken.isNCName(cp)) throw INVNSNAME.get(info, cp);
+    final byte[] cp = toToken(name, qc, true);
+    if(cp.length != 0 && !XMLToken.isNCName(cp)) throw INVNSNAME_X.get(info, cp);
 
     final byte[] cu = trim(value(qc, ii));
     if(eq(cp, XML) ^ eq(cu, XMLURI)) throw CNXML.get(info);
-    if(eq(cp, XMLNS)) throw CNINV.get(info, cp);
-    if(eq(cu, XMLNSURI) || cu.length == 0) throw CNINV.get(info, cu);
+    if(eq(cp, XMLNS)) throw CNINV_X.get(info, cp);
+    if(eq(cu, XMLNSURI) || cu.length == 0) throw CNINVNS_X.get(info, cu);
 
     return new FNames(cp, cu);
   }

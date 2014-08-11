@@ -29,7 +29,7 @@ final class NameUpdates {
     for(final NameUpdate o : nameUpdates) {
       if(o.type == up.type) o.merge(up);
       if(drop && o.type == UpdateType.DBALTER || alter && o.type == UpdateType.DBDROP) {
-        throw BXDB_ALTERDROP.get(o.info(), o.name());
+        throw BXDB_ALTERDROP_X.get(o.info(), o.name());
       }
     }
     nameUpdates.add(up);

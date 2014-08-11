@@ -273,7 +273,7 @@ final class QueryCompiler {
     });
     if(!ok) {
       final StaticVar var = (StaticVar) curr;
-      throw Err.CIRCREF.get(var.info, "$" + var.name);
+      throw Err.CIRCREF_X.get(var.info, "$" + var.name);
     }
     return adj.finish();
   }

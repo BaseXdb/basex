@@ -361,7 +361,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       if(!u && !expr.isVacuous()) throw UPEXPECTF.get(ii);
     } else if(u) {
       // uses updates, but is not declared as such
-      throw UPNOT.get(ii, description());
+      throw UPNOT_X.get(ii, description());
     }
   }
 

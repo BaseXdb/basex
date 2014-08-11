@@ -14,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNOut extends StandardFunc {
+public final class FNOut extends BuiltinFunc {
   /** Newline character. */
   private static final Str NL = Str.get("\n");
   /** Tab character. */
@@ -49,7 +49,7 @@ public final class FNOut extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str format(final QueryContext qc) throws QueryException {
-    final String form = string(checkStr(exprs[0], qc));
+    final String form = string(toToken(exprs[0], qc));
     final int es = exprs.length;
     final Object[] args = new Object[es - 1];
     for(int e = 1; e < es; e++) {
@@ -59,7 +59,7 @@ public final class FNOut extends StandardFunc {
     try {
       return Str.get(String.format(form, args));
     } catch(final RuntimeException ex) {
-      throw ERRFORMAT.get(info, Util.className(ex), ex);
+      throw ERRFORMAT_X_X.get(info, Util.className(ex), ex);
     }
   }
 }

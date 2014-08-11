@@ -21,7 +21,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNInspect extends StandardFunc {
+public final class FNInspect extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -69,7 +69,7 @@ public final class FNInspect extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item function(final QueryContext qc) throws QueryException {
-    final FItem fn = checkFunc(exprs[0], qc);
+    final FItem fn = toFunc(exprs[0], qc);
     final QNm name = fn.funcName();
     final StaticFunc sf = name == null ? null : qc.funcs.get(name, fn.arity(), null, false);
     return new PlainDoc(qc, info).function(name, sf, fn.funcType(), fn.annotations(), null);
@@ -124,7 +124,7 @@ public final class FNInspect extends StandardFunc {
         qc.parse(Token.string(io.read()), io.path(), sc);
         qc.compile();
       } catch(final IOException ex) {
-        throw IOERR.get(info, ex);
+        throw IOERR_X.get(info, ex);
       } finally {
         qc.close();
       }

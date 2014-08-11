@@ -111,15 +111,15 @@ final class RESTPost {
   /**
    * Returns the atomized item for the specified query.
    * @param query query
-   * @param item context item
+   * @param value context value
    * @param ctx database context
    * @return atomized item
    * @throws QueryException query exception
    */
-  private static String value(final String query, final Item item, final Context ctx)
+  private static String value(final String query, final Item value, final Context ctx)
       throws QueryException {
 
-    final QueryProcessor qp = new QueryProcessor(query, ctx).context(item);
+    final QueryProcessor qp = new QueryProcessor(query, ctx).context(value);
     final Item it = qp.iter().next();
     return it == null ? null : Token.string(it.string(null));
   }

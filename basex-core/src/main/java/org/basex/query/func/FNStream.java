@@ -14,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNStream extends StandardFunc {
+public final class FNStream extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -68,7 +68,7 @@ public final class FNStream extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item isStreamable(final QueryContext qc) throws QueryException {
-    final Item it = checkItem(exprs[0], qc);
+    final Item it = toItem(exprs[0], qc);
     return Bln.get(it instanceof StrStream || it instanceof B64Stream);
   }
 

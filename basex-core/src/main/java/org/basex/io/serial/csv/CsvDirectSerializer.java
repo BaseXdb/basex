@@ -145,6 +145,6 @@ public final class CsvDirectSerializer extends CsvSerializer {
    * @throws IOException I/O exception
    */
   private static void error(final String msg, final Object... ext) throws IOException {
-    throw BXCS_SERIAL.getIO(Util.inf(msg, ext));
+    throw BXCS_SERIAL_X.getIO(Util.inf(msg, ext));
   }
 }

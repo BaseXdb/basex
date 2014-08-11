@@ -51,19 +51,19 @@ public final class Treat extends Single {
     // input is empty
     if(it == null) {
       if(seqType.mayBeZero()) return Empty.ITER;
-      throw NOTREAT.get(info, Empty.SEQ.seqType(), seqType, Empty.SEQ);
+      throw NOTREAT_X_X_X.get(info, Empty.SEQ.seqType(), seqType, Empty.SEQ);
     }
     // treat as empty sequence
-    if(seqType.occ == Occ.ZERO) throw NOTREAT.get(info, it.type, seqType, it);
+    if(seqType.occ == Occ.ZERO) throw NOTREAT_X_X_X.get(info, it.type, seqType, it);
 
     if(seqType.zeroOrOne()) {
       final Item n = iter.next();
       if(n != null) {
         final ValueBuilder vb = new ValueBuilder(3).add(it).add(n);
         if(iter.next() != null) vb.add(Str.get(DOTS));
-        throw NOTREAT.get(info, expr.seqType(), seqType, vb.value());
+        throw NOTREAT_X_X_X.get(info, expr.seqType(), seqType, vb.value());
       }
-      if(!it.type.instanceOf(seqType.type)) throw NOTREAT.get(info, it.type, seqType, it);
+      if(!it.type.instanceOf(seqType.type)) throw NOTREAT_X_X_X.get(info, it.type, seqType, it);
       return it.iter();
     }
 
@@ -73,7 +73,7 @@ public final class Treat extends Single {
       @Override
       public Item next() throws QueryException {
         if(i == null) return null;
-        if(!i.type.instanceOf(seqType.type)) throw NOTREAT.get(info, i.type, seqType, i);
+        if(!i.type.instanceOf(seqType.type)) throw NOTREAT_X_X_X.get(info, i.type, seqType, i);
         final Item ii = i;
         i = iter.next();
         return ii;
@@ -89,21 +89,21 @@ public final class Treat extends Single {
     // input is empty
     if(len == 0) {
       if(seqType.mayBeZero()) return val;
-      throw NOTREAT.get(info, Empty.SEQ.seqType(), seqType, Empty.SEQ);
+      throw NOTREAT_X_X_X.get(info, Empty.SEQ.seqType(), seqType, Empty.SEQ);
     }
     // treat as empty sequence
-    if(seqType.occ == Occ.ZERO) throw NOTREAT.get(info, val.type, seqType, val);
+    if(seqType.occ == Occ.ZERO) throw NOTREAT_X_X_X.get(info, val.type, seqType, val);
 
     if(seqType.zeroOrOne()) {
-      if(len > 1) throw NOTREAT.get(info, val.seqType(), seqType, val);
+      if(len > 1) throw NOTREAT_X_X_X.get(info, val.seqType(), seqType, val);
       final Item it = val.itemAt(0);
-      if(!it.type.instanceOf(seqType.type)) throw NOTREAT.get(info, it.type, seqType, it);
+      if(!it.type.instanceOf(seqType.type)) throw NOTREAT_X_X_X.get(info, it.type, seqType, it);
       return it;
     }
 
     for(long i = 0; i < len; i++) {
       final Item it = val.itemAt(i);
-      if(!it.type.instanceOf(seqType.type)) throw NOTREAT.get(info, it.type, seqType, it);
+      if(!it.type.instanceOf(seqType.type)) throw NOTREAT_X_X_X.get(info, it.type, seqType, it);
     }
     return val;
   }

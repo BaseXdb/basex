@@ -18,8 +18,8 @@ public enum HTTPCode {
   ONEOP(SC_BAD_REQUEST, "Only one operation can be specified."),
   /** Error 400, "Unknown parameter: '%'". */
   UNKNOWN_PARAM_X(SC_BAD_REQUEST, "Unknown parameter: '%'."),
-  /** Error 400, "Multiple context items specified.". */
-  MULTIPLE_CONTEXT_X(SC_BAD_REQUEST, "Multiple context items specified."),
+  /** Error 400, "Multiple context values specified.". */
+  MULTIPLE_CONTEXT_X(SC_BAD_REQUEST, "Multiple context values specified."),
 
   /** Error: 404 (not found). */
   NOT_FOUND_X(SC_NOT_FOUND, "%"),

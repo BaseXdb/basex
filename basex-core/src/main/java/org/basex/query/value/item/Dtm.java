@@ -47,7 +47,7 @@ public final class Dtm extends ADate {
     if(zon == Short.MAX_VALUE) {
       zon = time.zon;
     } else if(zon != time.zon && time.zon != Short.MAX_VALUE) {
-      throw FUNZONE.get(ii, date, time);
+      throw FUNZONE_X_X.get(ii, date, time);
     }
   }
 
@@ -89,7 +89,7 @@ public final class Dtm extends ADate {
     this(date);
     if(dur instanceof DTDur) {
       calc((DTDur) dur, plus);
-      if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE.get(ii, yea);
+      if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE_X.get(ii, yea);
     } else {
       calc((YMDur) dur, plus, ii);
     }

@@ -114,7 +114,7 @@ public abstract class OutputSerializer extends Serializer {
     try {
       encoding = Charset.forName(enc);
     } catch(final Exception ex) {
-      throw SERENCODING.getIO(enc);
+      throw SERENCODING_X.getIO(enc);
     }
     utf8 = enc == UTF8;
     if(!utf8) {
@@ -142,7 +142,7 @@ public abstract class OutputSerializer extends Serializer {
     indent  = opts.yes(INDENT) && format;
 
     webdav = "webdav".equals(maps);
-    if(!webdav && !maps.isEmpty()) throw SERMAP.getIO(maps);
+    if(!webdav && !maps.isEmpty()) throw SERMAP_X.getIO(maps);
 
     if(docsys.isEmpty()) docsys = null;
     if(docpub.isEmpty()) docpub = null;
@@ -562,6 +562,6 @@ public abstract class OutputSerializer extends Serializer {
     final String val = opts.get(option);
     if(val.isEmpty()) return allowed.length > 0 ? allowed[0] : val;
     for(final String a : allowed) if(a.equals(val)) return val;
-    throw SERNOTSUPP.getIO(Options.allowed(option, (Object[]) allowed));
+    throw SERNOTSUPP_X.getIO(Options.allowed(option, (Object[]) allowed));
   }
 }

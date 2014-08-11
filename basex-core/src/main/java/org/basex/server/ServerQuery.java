@@ -50,7 +50,7 @@ public final class ServerQuery extends Proc {
   }
 
   /**
-   * Binds a value to a global variable.
+   * Binds a global variable.
    * @param name name of variable
    * @param value value to be bound
    * @param type type
@@ -66,7 +66,7 @@ public final class ServerQuery extends Proc {
   }
 
   /**
-   * Binds a value to the context item.
+   * Binds the context value.
    * @param value value to be bound
    * @param type type
    * @throws IOException query exception

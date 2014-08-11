@@ -56,7 +56,7 @@ public final class TypeCheck extends Single {
 
     if(expr.isValue()) {
       if(expr instanceof FuncItem && seqType.type instanceof FuncType) {
-        if(!seqType.occ.check(1)) throw INVTREAT.get(info, expr.seqType(), seqType);
+        if(!seqType.occ.check(1)) throw INVTREAT_X_X.get(info, expr.seqType(), seqType);
         final FuncItem fit = (FuncItem) expr;
         return optPre(fit.coerceTo((FuncType) seqType.type, qc, info, true), qc);
       }
@@ -65,7 +65,7 @@ public final class TypeCheck extends Single {
 
     if(argType.type.instanceOf(seqType.type) && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {
       final SeqType.Occ occ = argType.occ.intersect(seqType.occ);
-      if(occ == null) throw INVCAST.get(info, argType, seqType);
+      if(occ == null) throw INVCAST_X_X.get(info, argType, seqType);
     }
 
     final Expr opt = expr.typeCheck(this, qc, scp);
@@ -84,7 +84,7 @@ public final class TypeCheck extends Single {
     final Value val = expr.value(qc);
     if(seqType.instance(val)) return val;
     if(promote) return seqType.promote(qc, sc, info, val, false);
-    throw INVCASTEX.get(info, val.seqType(), seqType, val);
+    throw INVCAST_X_X_X.get(info, val.seqType(), seqType, val);
   }
 
   @Override

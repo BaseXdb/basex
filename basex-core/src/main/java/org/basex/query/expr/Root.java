@@ -37,7 +37,7 @@ public final class Root extends Simple {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter iter = checkCtx(qc).iter();
+    final Iter iter = ctxValue(qc).iter();
     final NodeSeqBuilder nc = new NodeSeqBuilder().check();
     for(Item i; (i = iter.next()) != null;) {
       final ANode n = root(i);

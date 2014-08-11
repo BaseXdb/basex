@@ -63,7 +63,7 @@ public final class RepoManager {
       cont = io.read();
     } catch(final IOException ex) {
       Util.debug(ex);
-      throw BXRE_WHICH.get(info, path);
+      throw BXRE_WHICH_X.get(info, path);
     }
 
     try {
@@ -71,7 +71,7 @@ public final class RepoManager {
       if(io.hasSuffix(IO.JARSUFFIX)) return installJAR(cont);
       return installXAR(cont);
     } catch(final IOException ex) {
-      throw BXRE_PARSE.get(info, io.name(), ex);
+      throw BXRE_PARSE_X_X.get(info, io.name(), ex);
     }
   }
 
@@ -169,13 +169,13 @@ public final class RepoManager {
       if(eq(nextPkg, pp) || eq(Package.name(nextPkg), pp)) {
         // check if package to be deleted participates in a dependency
         final byte[] primPkg = primary(nextPkg);
-        if(primPkg != null) throw BXRE_DEP.get(info, string(primPkg), pkg);
+        if(primPkg != null) throw BXRE_DEP_X_X.get(info, string(primPkg), pkg);
 
         // clean package repository
         final IOFile f = repo.path(string(dict.get(nextPkg)));
         repo.delete(new PkgParser(info).parse(new IOFile(f, DESCRIPTOR)));
         // package does not participate in a dependency => delete it
-        if(!f.delete()) throw BXRE_DELETE.get(info, f);
+        if(!f.delete()) throw BXRE_DELETE_X.get(info, f);
         found = true;
       }
     }
@@ -183,11 +183,11 @@ public final class RepoManager {
     // traverse all files
     final IOFile file = file(pkg, repo);
     if(file != null) {
-      if(!file.delete()) throw BXRE_DELETE.get(info, file);
+      if(!file.delete()) throw BXRE_DELETE_X.get(info, file);
       return;
     }
 
-    if(!found) throw BXRE_WHICH.get(info, pkg);
+    if(!found) throw BXRE_WHICH_X.get(info, pkg);
   }
 
   /**
@@ -230,7 +230,7 @@ public final class RepoManager {
 
     // copy file to rewritten URI file path
     final String uriPath = ModuleLoader.uri2path(string(uri));
-    if(uriPath == null) throw BXRE_URI.get(info, uri);
+    if(uriPath == null) throw BXRE_URI_X.get(info, uri);
     return write(uriPath + IO.XQMSUFFIX, content);
   }
 

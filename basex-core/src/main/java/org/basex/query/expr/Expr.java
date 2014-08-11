@@ -97,6 +97,35 @@ public abstract class Expr extends ExprInfo {
   public abstract Value value(final QueryContext qc) throws QueryException;
 
   /**
+   * Evaluates the expression and returns zero or one atomized item, or an error.
+   * @param qc query context
+   * @param ii input info
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  public final AtomIter atomIter(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return new AtomIter(iter(qc), qc, ii);
+  }
+
+  /**
+   * Evaluates the expression and returns zero or one atomized item, or an error.
+   * @param qc query context
+   * @param ii input info
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  public abstract Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException;
+
+  /**
+   * Evaluates the expression and returns the atomized items.
+   * @param qc query context
+   * @param ii input info
+   * @return atomized item
+   * @throws QueryException query exception
+   */
+  public abstract Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException;
+
+  /**
    * Checks if the iterator can be dissolved into an effective boolean value.
    * If not, returns an error. If yes, returns the first value - which can be
    * also be e.g. an integer, which is later evaluated as numeric predicate.
@@ -183,7 +212,7 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Checks if the specified variable is replaceable by a context item.
+   * Checks if the specified variable is replaceable by a context value.
    * The following tests might return false:
    * <ul>
    * <li>{@link Preds#removable}, if one of the variables is used within a predicate.</li>

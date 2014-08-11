@@ -54,7 +54,7 @@ public final class FuncOptions {
    * @throws QueryException query exception
    */
   public void parse(final Item it, final Options options) throws QueryException {
-    parse(it, options, INVALIDOPT);
+    parse(it, options, INVALIDOPT_X);
   }
 
   /**
@@ -71,7 +71,7 @@ public final class FuncOptions {
     if(item != null) {
       try {
         if(!(item instanceof Map || test.eq(item)))
-          throw ELMMAPTYPE.get(info, root.prefixId(XML), item.type, item);
+          throw ELMMAP_X_X_X.get(info, root.prefixId(XML), item.type, item);
         options.parse(tb.add(optString(item)).toString());
       } catch(final BaseXException ex) {
         throw error.get(info, ex);
@@ -91,10 +91,10 @@ public final class FuncOptions {
     if(item instanceof Map) {
       final Map map = (Map) item;
       for(final Item it : map.keys()) {
-        if(!(it instanceof AStr)) throw FUNTYPE.get(info, AtomType.STR, it.type, it);
+        if(!(it instanceof AStr)) throw EXPTYPE_X_X_X.get(info, AtomType.STR, it.type, it);
         tb.add(it.string(info)).add('=');
         final Value val = map.get(it, info);
-        if(!(val instanceof Item)) throw FUNTYPE.get(info, AtomType.ITEM, val.seqType(), val);
+        if(!(val instanceof Item)) throw EXPTYPE_X_X_X.get(info, AtomType.ITEM, val.seqType(), val);
         tb.add(optString((Item) val).replace(",", ",,")).add(',');
       }
     } else if(item.type == NodeType.ELM) {
@@ -154,7 +154,7 @@ public final class FuncOptions {
    */
   public static SerializerOptions serializer(final Item it, final SerializerOptions sopts,
       final InputInfo info) throws QueryException {
-    new FuncOptions(Q_SPARAM, info).parse(it, sopts, SEROPT);
+    new FuncOptions(Q_SPARAM, info).parse(it, sopts, SEROPT_X);
     return sopts;
   }
 }

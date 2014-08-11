@@ -31,7 +31,7 @@ public final class CComm extends CNode {
 
   @Override
   public FComm item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = qc.iter(exprs[0]);
+    final Iter iter = exprs[0].atomIter(qc, ii);
 
     final TokenBuilder tb = new TokenBuilder();
     boolean more = false;

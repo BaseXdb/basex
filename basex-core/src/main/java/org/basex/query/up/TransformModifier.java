@@ -42,6 +42,6 @@ public final class TransformModifier extends ContextModifier {
     // Check if the target node of the given primitive has been copied in the
     // 'copy' statement of this transform expression.
     final NodeUpdate nodeUp = (NodeUpdate) up;
-    if(!refs.contains(nodeUp.data())) throw UPNOTCOPIED.get(nodeUp.info(), nodeUp.node());
+    if(!refs.contains(nodeUp.data())) throw UPNOTCOPIED_X.get(nodeUp.info(), nodeUp.node());
   }
 }

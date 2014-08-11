@@ -14,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Dirk Kirsten
  */
-public final class FNRandom extends StandardFunc {
+public final class FNRandom extends BuiltinFunc {
   /** Random instance. */
   private static final Random RND = new Random();
 
@@ -58,7 +58,7 @@ public final class FNRandom extends StandardFunc {
    */
   private int randomInt(final QueryContext qc) throws QueryException {
     if(exprs.length == 0) return RND.nextInt();
-    final long s = checkItr(exprs[0], qc);
+    final long s = toLong(exprs[0], qc);
     return s < 1 || s > Integer.MAX_VALUE ? 0 : RND.nextInt((int) s);
   }
 
@@ -74,15 +74,15 @@ public final class FNRandom extends StandardFunc {
   private Iter randomSeededInt(final QueryContext qc) throws QueryException {
     return new Iter() {
       int count;
-      final long seed = checkItr(exprs[0], qc);
-      final int num = (int) checkItr(exprs[1], qc);
+      final long seed = toLong(exprs[0], qc);
+      final int num = (int) toLong(exprs[1], qc);
       final Random r = new Random(seed);
 
       @Override
       public Item next() throws QueryException {
         if(exprs.length == 3) {
           // max defined
-          final int max = (int) checkItr(exprs[2], qc);
+          final int max = (int) toLong(exprs[2], qc);
           return ++count <= num ? Int.get(r.nextInt(max)) : null;
         }
         // no max given
@@ -109,8 +109,8 @@ public final class FNRandom extends StandardFunc {
   private Iter randomSeededDouble(final QueryContext qc) throws QueryException {
     return new Iter() {
       int count;
-      final long seed = checkItr(exprs[0], qc);
-      final int num = (int) checkItr(exprs[1], qc);
+      final long seed = toLong(exprs[0], qc);
+      final int num = (int) toLong(exprs[1], qc);
       final Random r = new Random(seed);
 
       @Override
@@ -130,7 +130,7 @@ public final class FNRandom extends StandardFunc {
    */
   private Iter randomGaussian(final QueryContext qc) throws QueryException {
     return new Iter() {
-      final int num = (int) checkItr(exprs[0], qc);
+      final int num = (int) toLong(exprs[0], qc);
       int count;
       @Override
       public Item next() {

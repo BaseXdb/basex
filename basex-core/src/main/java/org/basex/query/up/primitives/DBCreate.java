@@ -83,7 +83,7 @@ public final class DBCreate extends NameUpdate {
       Close.close(data, qc.context);
 
     } catch(final IOException ex) {
-      throw UPDBOPTERR.get(info, ex);
+      throw UPDBOPTERR_X.get(info, ex);
     } finally {
       updates.reset(opts);
     }

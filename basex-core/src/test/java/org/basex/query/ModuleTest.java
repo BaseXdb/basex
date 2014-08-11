@@ -28,7 +28,7 @@ public class ModuleTest extends SandboxTest {
           "", null);
       fail("Unknown function 'm:bar()' was not detected.");
     } catch(final QueryException e) {
-      assertSame(Err.FUNCUNKNOWN, e.err());
+      assertSame(Err.FUNCUNKNOWN_X, e.err());
     } finally {
       qc.close();
     }

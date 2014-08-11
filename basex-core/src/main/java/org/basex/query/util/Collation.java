@@ -74,7 +74,7 @@ public final class Collation {
 
     byte[] args = uri;
     final Uri u = Uri.uri(args);
-    if(!u.isValid()) throw INVURI.get(info, args);
+    if(!u.isValid()) throw INVURI_X.get(info, args);
     if(!u.isAbsolute() && !Token.startsWith(args, '?')) {
       args = sc.baseURI().resolve(u, info).string();
     }

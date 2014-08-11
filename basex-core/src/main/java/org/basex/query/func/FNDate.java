@@ -13,7 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNDate extends StandardFunc {
+public final class FNDate extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -28,7 +28,7 @@ public final class FNDate extends StandardFunc {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = exprs[0].item(qc, info);
+    final Item it = exprs[0].atomItem(qc, info);
     if(it == null) return null;
 
     switch(func) {
@@ -106,7 +106,7 @@ public final class FNDate extends StandardFunc {
    * @return date
    * @throws QueryException query exception
    */
-  private ADate checkDate(final Item it, final Type t, final QueryContext qc)
+  private ADate checkDate(final Item it, final AtomType t, final QueryContext qc)
       throws QueryException {
     return (ADate) (it.type.isUntyped() ? t.cast(it, qc, sc, info) : checkType(it, t));
   }
@@ -132,7 +132,7 @@ public final class FNDate extends StandardFunc {
    * @throws QueryException query exception
    */
   private ADate dateTime(final Item date, final QueryContext qc) throws QueryException {
-    final Item zon = exprs.length == 2 ? exprs[1].item(qc, info) : null;
+    final Item zon = exprs.length == 2 ? exprs[1].atomItem(qc, info) : null;
     if(zon == null) return null;
     final Dat d = date.type.isUntyped() ? new Dat(date.string(info), info) :
       (Dat) checkType(date, AtomType.DAT);
@@ -149,7 +149,9 @@ public final class FNDate extends StandardFunc {
    * @return duration
    * @throws QueryException query exception
    */
-  private ADate adjust(final Item it, final Type t, final QueryContext qc) throws QueryException {
+  private ADate adjust(final Item it, final AtomType t, final QueryContext qc)
+      throws QueryException {
+
     final ADate ad;
     if(it.type.isUntyped()) {
       ad = (ADate) t.cast(it, qc, sc, info);
@@ -159,7 +161,7 @@ public final class FNDate extends StandardFunc {
       ad = t == AtomType.TIM ? new Tim(a) : t == AtomType.DAT ? new Dat(a) : new Dtm(a);
     }
     final boolean spec = exprs.length == 2;
-    final Item zon = spec ? exprs[1].item(qc, info) : null;
+    final Item zon = spec ? exprs[1].atomItem(qc, info) : null;
     ad.timeZone(zon == null ? null : (DTDur) checkType(zon, AtomType.DTD), spec, info);
     return ad;
   }

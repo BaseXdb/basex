@@ -102,7 +102,7 @@ public final class DBOptimize extends DBUpdate {
       if(all) OptimizeAll.optimizeAll(data, qc.context, null);
       else Optimize.optimize(data, rebuild, rebuildFT, null);
     } catch(final IOException ex) {
-      throw UPDBOPTERR.get(info, ex);
+      throw UPDBOPTERR_X.get(info, ex);
     } finally {
       // reset runtime options to original values
       options.reset(opts);

@@ -71,8 +71,8 @@ public final class FTWeight extends FTExpr {
   private FTNode weight(final FTNode item, final QueryContext qc) throws QueryException {
     // evaluate weight
     if(item == null) return null;
-    final double d = checkDbl(weight, qc);
-    if(Math.abs(d) > 1000) throw FTWEIGHT.get(info, d);
+    final double d = toDouble(weight, qc);
+    if(Math.abs(d) > 1000) throw FTWEIGHT_X.get(info, d);
     if(d == 0) item.all.size(0);
     item.score(item.score() * d);
     return item;

@@ -26,7 +26,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNIndex extends StandardFunc {
+public final class FNIndex extends BuiltinFunc {
   /** Name: name. */
   private static final String NAME = "name";
   /** Name: type. */
@@ -85,7 +85,7 @@ public final class FNIndex extends StandardFunc {
    */
   private Item facets(final QueryContext qc) throws QueryException {
     final Data data = checkData(qc);
-    final boolean flat = exprs.length == 2 && eq(checkStr(exprs[1], qc), FLAT);
+    final boolean flat = exprs.length == 2 && eq(toToken(exprs[1], qc), FLAT);
     return new FDoc().add(flat ? flat(data) : tree(data, data.paths.root().get(0)));
   }
 
@@ -98,11 +98,11 @@ public final class FNIndex extends StandardFunc {
    */
   private Iter values(final QueryContext qc, final IndexType it) throws QueryException {
     final Data data = checkData(qc);
-    final byte[] entry = exprs.length < 2 ? EMPTY : checkStr(exprs[1], qc);
-    if(data.inMemory()) throw BXDB_MEM.get(info, data.meta.name);
+    final byte[] entry = exprs.length < 2 ? EMPTY : toToken(exprs[1], qc);
+    if(data.inMemory()) throw BXDB_MEM_X.get(info, data.meta.name);
 
     final IndexEntries et = exprs.length < 3 ? new IndexEntries(entry, it) :
-      new IndexEntries(entry, checkBln(exprs[2], qc), it);
+      new IndexEntries(entry, toBoolean(exprs[2], qc), it);
     return entries(data, et, this);
   }
 
@@ -114,7 +114,7 @@ public final class FNIndex extends StandardFunc {
    * @return text entries
    * @throws QueryException query exception
    */
-  static Iter entries(final Data data, final IndexEntries entries, final StandardFunc call)
+  static Iter entries(final Data data, final IndexEntries entries, final BuiltinFunc call)
       throws QueryException {
 
     final Index index;
@@ -130,7 +130,7 @@ public final class FNIndex extends StandardFunc {
       index = data.ftxtIndex;
       avl = data.meta.ftxtindex;
     }
-    if(!avl) throw BXDB_INDEX.get(call.info, data.meta.name,
+    if(!avl) throw BXDB_INDEX_X.get(call.info, data.meta.name,
         it.toString().toLowerCase(Locale.ENGLISH));
     return entries(index, entries);
   }

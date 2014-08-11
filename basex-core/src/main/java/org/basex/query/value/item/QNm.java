@@ -107,7 +107,7 @@ public final class QNm extends Item {
    * @param u the uri to be set
    */
   public void uri(final byte[] u) {
-    uri = u == null ? null : norm(u);
+    uri = u == null ? null : normalize(u);
   }
 
   /**

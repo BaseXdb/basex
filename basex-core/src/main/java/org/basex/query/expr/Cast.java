@@ -46,7 +46,8 @@ public final class Cast extends Single {
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    if(expr.seqType().one()) seqType = SeqType.get(seqType.type, Occ.ONE);
+    final SeqType st = expr.seqType();
+    if(st.one() && !st.mayBeArray()) seqType = SeqType.get(seqType.type, Occ.ONE);
 
     // pre-evaluate value
     if(expr.isValue()) return optPre(value(qc), qc);
@@ -70,8 +71,8 @@ public final class Cast extends Single {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value v = expr.value(qc);
-    if(!seqType.occ.check(v.size())) throw INVCASTEX.get(info, v.seqType(), seqType, v);
+    final Value v = expr.atomValue(qc, info);
+    if(!seqType.occ.check(v.size())) throw INVCAST_X_X_X.get(info, v.seqType(), seqType, v);
     return v instanceof Item ? seqType.cast((Item) v, qc, sc, info, true) : v;
   }
 

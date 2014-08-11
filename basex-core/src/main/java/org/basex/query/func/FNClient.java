@@ -24,7 +24,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNClient extends StandardFunc {
+public final class FNClient extends BuiltinFunc {
   /** Query pattern. */
   private static final Pattern QUERYPAT = Pattern.compile("\\[(.*?)\\] (.*)", Pattern.MULTILINE);
 
@@ -76,14 +76,14 @@ public final class FNClient extends StandardFunc {
    * @throws QueryException query exception
    */
   private Uri connect(final QueryContext qc) throws QueryException {
-    final String host = Token.string(checkStr(exprs[0], qc));
-    final String user = Token.string(checkStr(exprs[2], qc));
-    final String pass = Token.string(checkStr(exprs[3], qc));
-    final int port = (int) checkItr(exprs[1], qc);
+    final String host = Token.string(toToken(exprs[0], qc));
+    final String user = Token.string(toToken(exprs[2], qc));
+    final String pass = Token.string(toToken(exprs[3], qc));
+    final int port = (int) toLong(exprs[1], qc);
     try {
       return sessions(qc).add(new ClientSession(host, port, user, pass));
     } catch(final IOException ex) {
-      throw BXCL_CONN.get(info, ex);
+      throw BXCL_CONN_X.get(info, ex);
     }
   }
 
@@ -95,7 +95,7 @@ public final class FNClient extends StandardFunc {
    */
   private Str execute(final QueryContext qc) throws QueryException {
     final ClientSession cs = session(qc, false);
-    final String cmd = Token.string(checkStr(exprs[1], qc));
+    final String cmd = Token.string(toToken(exprs[1], qc));
 
     try {
       final ArrayOutput ao = new ArrayOutput();
@@ -104,9 +104,9 @@ public final class FNClient extends StandardFunc {
       cs.setOutputStream(null);
       return Str.get(ao.finish());
     } catch(final BaseXException ex) {
-      throw BXCL_COMMAND.get(info, ex);
+      throw BXCL_COMMAND_X.get(info, ex);
     } catch(final IOException ex) {
-      throw BXCL_COMM.get(info, ex);
+      throw BXCL_COMM_X.get(info, ex);
     }
   }
 
@@ -128,13 +128,13 @@ public final class FNClient extends StandardFunc {
    */
   private Value query(final QueryContext qc) throws QueryException {
     final ClientSession cs = session(qc, false);
-    final String query = Token.string(checkStr(exprs[1], qc));
+    final String query = Token.string(toToken(exprs[1], qc));
     final ValueBuilder vb = new ValueBuilder();
     ClientQuery cq = null;
     try {
       cq = cs.query(query);
-      // bind variables and context item
-      for(final Map.Entry<String, Value> binding : bindings(2, qc).entrySet()) {
+      // bind variables and context value
+      for(final Map.Entry<String, Value> binding : toBindings(2, qc).entrySet()) {
         final String k = binding.getKey();
         final Value value = binding.getValue();
         if(k.isEmpty()) cq.context(value);
@@ -155,9 +155,9 @@ public final class FNClient extends StandardFunc {
         final QueryException exc = get(m.group(1), m.group(2), info);
         throw exc == null ? new QueryException(info, new QNm(m.group(1)), m.group(2)) : exc;
       }
-      throw BXCL_QUERY.get(info, ex);
+      throw BXCL_QUERY_X.get(info, ex);
     } catch(final IOException ex) {
-      throw BXCL_COMM.get(info, ex);
+      throw BXCL_COMM_X.get(info, ex);
     } finally {
       if(cq != null) try { cq.close(); } catch(final IOException ignored) { }
     }
@@ -174,7 +174,7 @@ public final class FNClient extends StandardFunc {
       session(qc, true).close();
       return null;
     } catch(final IOException ex) {
-      throw BXCL_COMMAND.get(info, ex);
+      throw BXCL_COMMAND_X.get(info, ex);
     }
   }
 
@@ -187,9 +187,9 @@ public final class FNClient extends StandardFunc {
    * @throws QueryException query exception
    */
   private ClientSession session(final QueryContext qc, final boolean del) throws QueryException {
-    final Uri id = (Uri) checkType(exprs[0].item(qc, info), AtomType.URI);
+    final Uri id = (Uri) checkAtomic(exprs[0], qc, AtomType.URI);
     final ClientSession cs = sessions(qc).get(id);
-    if(cs == null) throw BXCL_NOTAVL.get(info, id);
+    if(cs == null) throw BXCL_NOTAVL_X.get(info, id);
     if(del) sessions(qc).remove(id);
     return cs;
   }

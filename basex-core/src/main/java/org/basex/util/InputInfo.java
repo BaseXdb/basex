@@ -5,8 +5,8 @@ import org.basex.query.util.*;
 
 
 /**
- * This class contains the original query, its file reference, and line/column
- * information.
+ * This class contains information on the original query, which will be evaluated for
+ * error feedback and debugging purposes.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen

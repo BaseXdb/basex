@@ -226,7 +226,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       if(!u && !expr.isVacuous()) throw UPEXPECTF.get(ii);
     } else if(u) {
       // uses updates, but is not declared as such
-      throw UPNOT.get(ii, description());
+      throw UPNOT_X.get(ii, description());
     }
   }
 

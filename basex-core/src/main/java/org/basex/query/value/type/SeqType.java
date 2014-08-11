@@ -384,7 +384,7 @@ public final class SeqType {
       final InputInfo ii) throws QueryException {
 
     final long vs = val.size();
-    if(!occ.check(vs)) throw INVCASTEX.get(ii, val.seqType(), this, val);
+    if(!occ.check(vs)) throw INVCAST_X_X_X.get(ii, val.seqType(), this, val);
 
     if(val.isEmpty()) return Empty.SEQ;
     if(val instanceof Item) return cast((Item) val, qc, sc, ii, true);
@@ -471,7 +471,7 @@ public final class SeqType {
           vb.add(atom);
         } else if(tp == AtomType.ATM) {
           if(type.nsSensitive()) {
-            if(sc.xquery3()) throw NSSENS.get(ii, item.type, type);
+            if(sc.xquery3()) throw NSSENS_X_X.get(ii, item.type, type);
             throw Err.treatError(ii, item, withOcc(Occ.ONE));
           }
           vb.add(type.cast(atom, qc, sc, ii));

@@ -185,8 +185,8 @@ public final class FNBinTest extends AdvancedQueryTest {
     error(_BIN_DECODE_STRING.args(base64(""), "UTF-8", 1, 0),  BIN_IOOR_X_X);
     error(_BIN_DECODE_STRING.args(base64(""), "UTF-8", 0, 1),  BIN_IOOR_X_X);
     error(_BIN_DECODE_STRING.args(base64(""), "X"),            BIN_UE_X);
-    error(_BIN_DECODE_STRING.args(base64("FF"), "UTF-8"),      BIN_CE);
-    error(_BIN_DECODE_STRING.args(_BIN_HEX.args("03")),        BIN_CE);
+    error(_BIN_DECODE_STRING.args(base64("FF"), "UTF-8"),      BIN_CE_X);
+    error(_BIN_DECODE_STRING.args(_BIN_HEX.args("03")),        BIN_CE_X);
   }
 
   /** Test method. */
@@ -198,7 +198,7 @@ public final class FNBinTest extends AdvancedQueryTest {
     hexQuery(_BIN_ENCODE_STRING.args("\u00c4", "UTF-8"), "C384");
     // errors
     error(_BIN_ENCODE_STRING.args("", "X"),              BIN_UE_X);
-    error(_BIN_ENCODE_STRING.args("\u00c4", "US-ASCII"), BIN_CE);
+    error(_BIN_ENCODE_STRING.args("\u00c4", "US-ASCII"), BIN_CE_X);
   }
 
   /** Test method. */

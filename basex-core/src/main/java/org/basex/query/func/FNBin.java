@@ -26,7 +26,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class FNBin extends StandardFunc {
+public class FNBin extends BuiltinFunc {
   /** Big endian order. */
   private static final byte[][] BIG = tokens("most-significant-first", "big-endian", "BE");
   /** Big endian order. */
@@ -187,8 +187,8 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value toOctets(final QueryContext qc) throws QueryException {
-    final B64 b = b64(exprs[0], false, qc);
-    final byte[] bytes = b.binary(info);
+    final B64 b64 = toB64(exprs[0], qc, false);
+    final byte[] bytes = b64.binary(info);
     final long[] vals = new long[bytes.length];
     for(int i = 0; i < bytes.length; i++) vals[i] = bytes[i] & 0xFF;
     return IntSeq.get(vals, AtomType.ITR);
@@ -201,8 +201,8 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter toOctetsIter(final QueryContext qc) throws QueryException {
-    final B64 b = b64(exprs[0], false, qc);
-    final byte[] bytes = b.binary(info);
+    final B64 b64 = toB64(exprs[0], qc, false);
+    final byte[] bytes = b64.binary(info);
     return new ValueIter() {
       final int s = bytes.length;
       int c;
@@ -230,10 +230,10 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64 fromOctets(final QueryContext qc) throws QueryException {
-    final Iter ir = qc.iter(exprs[0]);
+    final AtomIter ir = exprs[0].atomIter(qc, info);
     final ByteList bl = new ByteList(Math.max(Array.CAPACITY, (int) ir.size()));
     for(Item it; (it = ir.next()) != null;) {
-      final long l = checkItr(it);
+      final long l = toLong(it);
       if(l < 0 || l > 255) throw BIN_OOR_X.get(info, l);
       bl.add((int) l);
     }
@@ -247,8 +247,8 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private Int length(final QueryContext qc) throws QueryException {
-    final B64 b = b64(exprs[0], false, qc);
-    return Int.get(b.binary(info).length);
+    final B64 b64 = toB64(exprs[0], qc, false);
+    return Int.get(b64.binary(info).length);
   }
 
   /**
@@ -258,9 +258,9 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64 part(final QueryContext qc) throws QueryException {
-    final B64 b64 = b64(exprs[0], true, qc);
-    final Long off = checkItr(exprs[1], qc);
-    final Long len = exprs.length > 2 ? checkItr(exprs[2], qc) : null;
+    final B64 b64 = toB64(exprs[0], qc, true);
+    final Long off = toLong(exprs[1], qc);
+    final Long len = exprs.length > 2 ? toLong(exprs[2], qc) : null;
     if(b64 == null) return null;
 
     final byte[] bytes = b64.binary(info);
@@ -280,8 +280,8 @@ public class FNBin extends StandardFunc {
    */
   private B64 join(final QueryContext qc) throws QueryException {
     final ByteList bl = new ByteList();
-    final Iter ir = qc.iter(exprs[0]);
-    for(Item it; (it = ir.next()) != null;) bl.add(checkBin(it).binary(info));
+    final Iter ir = exprs[0].atomIter(qc, info);
+    for(Item it; (it = ir.next()) != null;) bl.add(toB64(it, true).binary(info));
     return new B64(bl.finish());
   }
 
@@ -292,9 +292,9 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64 insertBefore(final QueryContext qc) throws QueryException {
-    final B64 b64 = b64(exprs[0], true, qc);
-    final Long off = checkItr(exprs[1], qc);
-    final B64 xtr = b64(exprs[2], true, qc);
+    final B64 b64 = toB64(exprs[0], qc, true);
+    final Long off = toLong(exprs[1], qc);
+    final B64 xtr = toB64(exprs[2], qc, true);
     if(b64 == null) return null;
 
     final byte[] bytes = b64.binary(info);
@@ -321,9 +321,9 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64 pad(final QueryContext qc, final boolean left) throws QueryException {
-    final B64 b64 = b64(exprs[0], true, qc);
-    final long sz = checkItr(exprs[1], qc);
-    final long octet = exprs.length > 2 ? checkItr(exprs[2], qc) : 0;
+    final B64 b64 = toB64(exprs[0], qc, true);
+    final long sz = toLong(exprs[1], qc);
+    final long octet = exprs.length > 2 ? toLong(exprs[2], qc) : 0;
     if(b64 == null) return null;
 
     final byte[] bytes = b64.binary(info);
@@ -350,9 +350,9 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private Int find(final QueryContext qc) throws QueryException {
-    final B64 b64 = b64(exprs[0], true, qc);
-    final Long off = checkItr(exprs[1], qc);
-    final B64 srch = b64(exprs[2], false, qc);
+    final B64 b64 = toB64(exprs[0], qc, true);
+    final Long off = toLong(exprs[1], qc);
+    final B64 srch = toB64(exprs[2], qc, false);
     if(b64 == null) return null;
 
     final byte[] bytes = b64.binary(info);
@@ -370,10 +370,10 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str decodeString(final QueryContext qc) throws QueryException {
-    final B64 b64 = b64(exprs[0], true, qc);
-    final String enc = checkEncoding(1, BIN_UE_X, qc);
-    final Long off = exprs.length > 2 ? checkItr(exprs[2], qc) : null;
-    final Long len = exprs.length > 3 ? checkItr(exprs[3], qc) : null;
+    final B64 b64 = toB64(exprs[0], qc, true);
+    final String enc = toEncoding(1, BIN_UE_X, qc);
+    final Long off = exprs.length > 2 ? toLong(exprs[2], qc) : null;
+    final Long len = exprs.length > 3 ? toLong(exprs[3], qc) : null;
     if(b64 == null) return null;
 
     byte[] bytes = b64.binary(info);
@@ -389,7 +389,7 @@ public class FNBin extends StandardFunc {
     try {
       return Str.get(FNConvert.toString(new IOContent(bytes).inputStream(), enc, true));
     } catch(final IOException ex) {
-      throw BIN_CE.get(info, ex);
+      throw BIN_CE_X.get(info, ex);
     }
   }
 
@@ -401,12 +401,12 @@ public class FNBin extends StandardFunc {
    */
   private B64 encodeString(final QueryContext qc) throws QueryException {
     final byte[] str = str(0, qc);
-    final String enc = checkEncoding(1, BIN_UE_X, qc);
+    final String enc = toEncoding(1, BIN_UE_X, qc);
     if(str == null) return null;
     try {
       return new B64(enc == null || enc == UTF8 ? str : FNConvert.toBinary(str, enc));
     } catch(final CharacterCodingException ex) {
-      throw BIN_CE.get(info, ex);
+      throw BIN_CE_X.get(info, ex);
     }
   }
 
@@ -417,7 +417,7 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64 packDouble(final QueryContext qc) throws QueryException {
-    final double d = checkDbl(exprs[0], qc);
+    final double d = toDouble(exprs[0], qc);
     final ByteOrder bo = order(1, qc);
     return new B64(ByteBuffer.wrap(new byte[8]).order(bo).putDouble(d).array());
   }
@@ -429,7 +429,7 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64 packFloat(final QueryContext qc) throws QueryException {
-    final float f = checkFlt(exprs[0], qc);
+    final float f = toFloat(exprs[0], qc);
     final ByteOrder bo = order(1, qc);
     return new B64(ByteBuffer.wrap(new byte[4]).order(bo).putFloat(f).array());
   }
@@ -441,8 +441,8 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64 packInteger(final QueryContext qc) throws QueryException {
-    long b = checkItr(exprs[0], qc);
-    final long sz = checkItr(exprs[1], qc);
+    long b = toLong(exprs[0], qc);
+    final long sz = toLong(exprs[1], qc);
     final ByteOrder bo = order(2, qc);
     if(sz < 0) throw BIN_NS_X.get(info, sz);
 
@@ -470,8 +470,8 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private ByteBuffer unpack(final QueryContext qc, final long len) throws QueryException {
-    final B64 b64 = b64(exprs[0], false, qc);
-    final Long off = checkItr(exprs[1], qc);
+    final B64 b64 = toB64(exprs[0], qc, false);
+    final Long off = toLong(exprs[1], qc);
     final ByteOrder bo = order(2, qc);
 
     final byte[] bytes = b64.binary(info);
@@ -491,9 +491,9 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private Int unpackInteger(final QueryContext qc, final boolean signed) throws QueryException {
-    final B64 b64 = b64(exprs[0], false, qc);
-    final Long off = checkItr(exprs[1], qc);
-    final Long sz = checkItr(exprs[2], qc);
+    final B64 b64 = toB64(exprs[0], qc, false);
+    final Long off = toLong(exprs[1], qc);
+    final Long sz = toLong(exprs[2], qc);
     final ByteOrder bo = order(3, qc);
 
     final byte[] bytes = b64.binary(info);
@@ -524,8 +524,8 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64 bit(final Bit op, final QueryContext qc) throws QueryException {
-    final B64 b1 = b64(exprs[0], true, qc);
-    final B64 b2 = b64(exprs[1], true, qc);
+    final B64 b1 = toB64(exprs[0], qc, true);
+    final B64 b2 = toB64(exprs[1], qc, true);
     if(b1 == null || b2 == null) return null;
 
     final byte[] bytes1 = b1.binary(info);
@@ -549,7 +549,7 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64 not(final QueryContext qc) throws QueryException {
-    final B64 b64 = b64(exprs[0], true, qc);
+    final B64 b64 = toB64(exprs[0], qc, true);
     if(b64 == null) return null;
 
     final byte[] bytes = b64.binary(info);
@@ -567,8 +567,8 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64 shift(final QueryContext qc) throws QueryException {
-    final B64 b64 = b64(exprs[0], true, qc);
-    long by = checkItr(exprs[1], qc);
+    final B64 b64 = toB64(exprs[0], qc, true);
+    long by = toLong(exprs[1], qc);
     if(b64 == null) return null;
     if(by == 0) return b64;
 
@@ -621,23 +621,6 @@ public class FNBin extends StandardFunc {
   // UTILITY FUNCTIONS ============================================================================
 
   /**
-   * Checks if the specified expression yields a binary item.
-   * @param ex expression to be evaluated
-   * @param empty allow empty sequence
-   * @param qc query context
-   * @return binary item
-   * @throws QueryException query exception
-   */
-  private B64 b64(final Expr ex, final boolean empty, final QueryContext qc) throws QueryException {
-    final Item it = ex.item(qc, info);
-    if(it == null) {
-      if(empty) return null;
-      throw EMPTYFOUND.get(info);
-    }
-    return (B64) checkType(it, AtomType.B64);
-  }
-
-  /**
    * Converts the specified expression to a string.
    * Returns a token representation or an exception.
    * @param o expression offset
@@ -646,8 +629,8 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private byte[] str(final int o, final QueryContext qc) throws QueryException {
-    final Item it = exprs[o].item(qc, info);
-    return it == null ? null : checkStr(it);
+    final Item it = exprs[o].atomItem(qc, info);
+    return it == null ? null : toToken(it);
   }
 
   /**
@@ -659,7 +642,7 @@ public class FNBin extends StandardFunc {
    */
   private ByteOrder order(final int o, final QueryContext qc) throws QueryException {
     if(o >= exprs.length) return ByteOrder.BIG_ENDIAN;
-    final byte[] order = checkStr(exprs[o], qc);
+    final byte[] order = toToken(exprs[o], qc);
     if(eq(order, BIG)) return ByteOrder.BIG_ENDIAN;
     if(eq(order, LITTLE)) return ByteOrder.LITTLE_ENDIAN;
     throw BIN_USO_X.get(info, order);

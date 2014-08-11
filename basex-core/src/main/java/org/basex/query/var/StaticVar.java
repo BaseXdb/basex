@@ -55,7 +55,7 @@ public final class StaticVar extends StaticDecl {
 
   @Override
   public void compile(final QueryContext qc) throws QueryException {
-    if(expr == null) throw VAREMPTY.get(info, '$' + Token.string(name.string()));
+    if(expr == null) throw VAREMPTY_X.get(info, '$' + Token.string(name.string()));
     if(dontEnter) throw circVarError(this);
 
     if(!compiled) {
@@ -103,7 +103,7 @@ public final class StaticVar extends StaticDecl {
     }
 
     if(val != null) return val;
-    if(expr == null) throw VAREMPTY.get(info, this);
+    if(expr == null) throw VAREMPTY_X.get(info, this);
     dontEnter = true;
     final int fp = scope.enter(qc);
     try {
@@ -119,7 +119,7 @@ public final class StaticVar extends StaticDecl {
    * @throws QueryException query exception
    */
   public void checkUp() throws QueryException {
-    if(expr != null && expr.has(Flag.UPD)) throw UPNOT.get(info, description());
+    if(expr != null && expr.has(Flag.UPD)) throw UPNOT_X.get(info, description());
   }
 
   /**

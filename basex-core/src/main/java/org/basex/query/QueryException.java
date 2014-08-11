@@ -4,7 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.util.*;
 
-import org.basex.data.*;
+import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -43,7 +43,7 @@ public class QueryException extends Exception {
   private boolean catchable = true;
 
   /**
-   * Constructor, specifying an exception or error. {@link Err#BASX_GENERIC} will be set
+   * Constructor, specifying an exception or error. {@link Err#BASX_GENERIC_X} will be set
    * as error code.
    * @param cause exception or error
    */
@@ -52,12 +52,12 @@ public class QueryException extends Exception {
   }
 
   /**
-   * Constructor, specifying a simple error message. {@link Err#BASX_GENERIC} will be set
+   * Constructor, specifying a simple error message. {@link Err#BASX_GENERIC_X} will be set
    * as error code.
    * @param message error message
    */
   public QueryException(final String message) {
-    this(null, Err.BASX_GENERIC, message);
+    this(null, Err.BASX_GENERIC_X, message);
   }
 
   /**

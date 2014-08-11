@@ -148,6 +148,6 @@ public final class FNCsvTest extends AdvancedQueryTest {
   private static void error(final String input, final String options, final Function function) {
     final String query = options.isEmpty() ? function.args(input) :
       function.args(input, " map {" + options + '}');
-    error(query, Err.INVALIDOPT);
+    error(query, Err.INVALIDOPT_X);
   }
 }

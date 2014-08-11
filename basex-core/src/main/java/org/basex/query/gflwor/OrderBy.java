@@ -72,8 +72,9 @@ public final class OrderBy extends GFLWOR.Clause {
         List<Value[]> tuples = new ArrayList<>();
         while(sub.next(qc)) {
           final Item[] key = new Item[keys.length];
-          for(int i = 0; i < keys.length; i++)
-            key[i] = keys[i].expr.item(qc, keys[i].info);
+          for(int i = 0; i < keys.length; i++) {
+            key[i] = keys[i].expr.atomItem(qc, keys[i].info);
+          }
           tuples.add(key);
 
           final Value[] vals = new Value[refs.length];

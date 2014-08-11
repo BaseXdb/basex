@@ -797,7 +797,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     create(1);
     query("insert node attribute xml:space { 'preserve' } into /x", "");
     query(".", "<x xml:space='preserve'/>");
-    error("insert node attribute xml:space { 'preserve' } into /x", Err.UPATTDUPL);
+    error("insert node attribute xml:space { 'preserve' } into /x", Err.UPATTDUPL_X);
   }
 
   /**

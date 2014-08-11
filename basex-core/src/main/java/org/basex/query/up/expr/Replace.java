@@ -45,12 +45,12 @@ public final class Replace extends Update {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Constr c = new Constr(ii, sc).add(qc, exprs[1]);
     if(c.errAtt) throw UPNOATTRPER.get(info);
-    if(c.duplAtt != null) throw UPATTDUPL.get(info, new QNm(c.duplAtt));
+    if(c.duplAtt != null) throw UPATTDUPL_X.get(info, new QNm(c.duplAtt));
 
     final Iter t = qc.iter(exprs[0]);
     final Item i = t.next();
     // check target constraints
-    if(i == null) throw UPSEQEMP.get(info, Util.className(this));
+    if(i == null) throw UPSEQEMP_X.get(info, Util.className(this));
     final Type tp = i.type;
     if(!(i instanceof ANode) || tp == NodeType.DOC || t.next() != null)
       throw UPTRGMULT.get(info);
@@ -72,7 +72,7 @@ public final class Replace extends Update {
       updates.add(new ReplaceValue(dbn.pre, dbn.data, info, txt), qc);
     } else {
       final ANode par = targ.parent();
-      if(par == null) throw UPNOPAR.get(info, i);
+      if(par == null) throw UPNOPAR_X.get(info, i);
       if(tp == NodeType.ATT) {
         // replace attribute node
         if(!list.isEmpty()) throw UPWRATTR.get(info);

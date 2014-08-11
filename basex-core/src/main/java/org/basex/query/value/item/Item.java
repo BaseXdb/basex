@@ -86,7 +86,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public boolean bool(final InputInfo ii) throws QueryException {
-    throw EBV.get(ii, type, this);
+    throw EBV_X.get(ii, type, this);
   }
 
   /**
@@ -176,7 +176,7 @@ public abstract class Item extends Value {
    */
   @SuppressWarnings("unused")
   public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
-    throw (type == it.type ? CMPTYPE : CMPTYPES).get(ii, type, it.type);
+    throw (type == it.type ? CMPTYPE_X : CMPTYPES_X_X).get(ii, type, it.type);
   }
 
   /**
@@ -189,17 +189,30 @@ public abstract class Item extends Value {
     return new ArrayInput(string(ii));
   }
 
+  // Overridden by B64Stream, StrStream and Jav.
   @Override
   public Item materialize(final InputInfo ii) throws QueryException {
     return this;
   }
 
+  // Overridden by Array.
   @Override
   public Value atomValue(final InputInfo ii) throws QueryException {
     return atomItem(ii);
   }
 
   @Override
+  public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return atomItem(ii);
+  }
+
+  /**
+   * Evaluates the expression and returns the atomized items.
+   * @param ii input info
+   * @return materialized item
+   * @throws QueryException query exception
+   */
+  // Overridden by FItem and ANode.
   public Item atomItem(final InputInfo ii) throws QueryException {
     return materialize(ii);
   }

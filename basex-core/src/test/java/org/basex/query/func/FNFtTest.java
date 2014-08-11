@@ -70,9 +70,9 @@ public final class FNFtTest extends AdvancedQueryTest {
         "'window':map {'size':3} }"), true);
 
     // check buggy options
-    error(_FT_CONTAINS.args("x", "x", " map { 'x':'y' }"), Err.INVALIDOPT);
-    error(_FT_CONTAINS.args("x", "x", " map { 'mode':'' }"), Err.INVALIDOPT);
-    error(_FT_CONTAINS.args("x", "x", " 1"), Err.ELMMAPTYPE);
+    error(_FT_CONTAINS.args("x", "x", " map { 'x':'y' }"), Err.INVALIDOPT_X);
+    error(_FT_CONTAINS.args("x", "x", " map { 'mode':'' }"), Err.INVALIDOPT_X);
+    error(_FT_CONTAINS.args("x", "x", " 1"), Err.ELMMAP_X_X_X);
   }
 
   /**
@@ -116,9 +116,9 @@ public final class FNFtTest extends AdvancedQueryTest {
         "'window':map {'size':3} }"), "Databases and XML");
 
     // check buggy options
-    error(_FT_SEARCH.args(NAME, "x", " map { 'x':'y' }"), Err.INVALIDOPT);
-    error(_FT_SEARCH.args(NAME, "x", " map { 'mode':'' }"), Err.INVALIDOPT);
-    error(_FT_SEARCH.args(NAME, "x", " 1"), Err.ELMMAPTYPE);
+    error(_FT_SEARCH.args(NAME, "x", " map { 'x':'y' }"), Err.INVALIDOPT_X);
+    error(_FT_SEARCH.args(NAME, "x", " map { 'mode':'' }"), Err.INVALIDOPT_X);
+    error(_FT_SEARCH.args(NAME, "x", " 1"), Err.ELMMAP_X_X_X);
   }
 
   /** Test method. */

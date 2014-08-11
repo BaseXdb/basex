@@ -45,6 +45,6 @@ public final class FNHashTest extends AdvancedQueryTest {
     query(_HASH_HASH.args("", "SHA-256"), "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=");
     query(_HASH_HASH.args("xs:base64Binary('')", "md5"), "1B2M2Y8AsgTpgAmY7PhCfg==");
     query(_HASH_HASH.args("xs:hexBinary('')", "md5"), "1B2M2Y8AsgTpgAmY7PhCfg==");
-    error(_HASH_HASH.args("", ""), Err.HASH_ALG);
+    error(_HASH_HASH.args("", ""), Err.HASH_ALG_X);
   }
 }

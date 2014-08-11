@@ -6,7 +6,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -15,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public final class FNMap extends StandardFunc {
+public final class FNMap extends BuiltinFunc {
   /**
    * Constructor.
    * @param sc static context
@@ -32,7 +31,7 @@ public final class FNMap extends StandardFunc {
   public Iter iter(final QueryContext qc) throws QueryException {
     switch(func) {
       case _MAP_GET:            return get(qc).iter();
-      case _MAP_KEYS:           return map(qc).keys().iter();
+      case _MAP_KEYS:           return toMap(exprs[0], qc).keys().iter();
       case _MAP_FOR_EACH_ENTRY: return forEachEntry(qc);
       default:                  return super.iter(qc);
     }
@@ -42,7 +41,7 @@ public final class FNMap extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     switch(func) {
       case _MAP_GET:            return get(qc);
-      case _MAP_KEYS:           return map(qc).keys();
+      case _MAP_KEYS:           return toMap(exprs[0], qc).keys();
       case _MAP_FOR_EACH_ENTRY: return forEachEntry(qc).value();
       default:                  return super.value(qc);
     }
@@ -56,9 +55,9 @@ public final class FNMap extends StandardFunc {
       case _MAP_PUT:       return put(qc, ii);
       case _MAP_ENTRY:     return entry(qc, ii);
       case _MAP_CONTAINS:  return Bln.get(contains(qc, ii));
-      case _MAP_SIZE:      return Int.get(map(qc).mapSize());
+      case _MAP_SIZE:      return Int.get(toMap(exprs[0], qc).mapSize());
       case _MAP_REMOVE:    return remove(qc, ii);
-      case _MAP_SERIALIZE: return Str.get(map(qc).serialize(info));
+      case _MAP_SERIALIZE: return Str.get(toMap(exprs[0], qc).serialize(info));
       default:             return super.item(qc, ii);
     }
   }
@@ -71,7 +70,7 @@ public final class FNMap extends StandardFunc {
    * @throws QueryException query exception
    */
   private Map remove(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return map(qc).delete(exprs[1].item(qc, ii), ii);
+    return toMap(exprs[0], qc).delete(toAtomItem(exprs[1], qc), ii);
   }
 
   /**
@@ -82,7 +81,7 @@ public final class FNMap extends StandardFunc {
    * @throws QueryException query exception
    */
   private Map entry(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Map.EMPTY.insert(exprs[0].item(qc, ii), qc.value(exprs[1]), ii);
+    return Map.EMPTY.insert(toAtomItem(exprs[0], qc), qc.value(exprs[1]), ii);
   }
 
   /**
@@ -99,7 +98,7 @@ public final class FNMap extends StandardFunc {
     Map map = null;
     final Iter maps = exprs[0].iter(qc);
     for(Item it; (it = maps.next()) != null;) {
-      final Map m = checkMap(it);
+      final Map m = toMap(it);
       map = map == null ? m : map.addAll(m, ii);
     }
     return map == null ? Map.EMPTY : map;
@@ -113,7 +112,7 @@ public final class FNMap extends StandardFunc {
    * @throws QueryException query exception
    */
   private Map put(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return map(qc).insert(exprs[1].item(qc, info), qc.value(exprs[2]), ii);
+    return toMap(exprs[0], qc).insert(toAtomItem(exprs[1], qc), qc.value(exprs[2]), ii);
   }
 
   /**
@@ -123,7 +122,7 @@ public final class FNMap extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value get(final QueryContext qc) throws QueryException {
-    return map(qc).get(exprs[1].item(qc, info), info);
+    return toMap(exprs[0], qc).get(toAtomItem(exprs[1], qc), info);
   }
 
   /**
@@ -134,7 +133,7 @@ public final class FNMap extends StandardFunc {
    * @throws QueryException query exception
    */
   private boolean contains(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return map(qc).contains(exprs[1].item(qc, ii), ii);
+    return toMap(exprs[0], qc).contains(toAtomItem(exprs[1], qc), ii);
   }
 
   /**
@@ -144,16 +143,6 @@ public final class FNMap extends StandardFunc {
    * @throws QueryException exception
    */
   private Iter forEachEntry(final QueryContext qc) throws QueryException {
-    return map(qc).apply(checkArity(1, 2, qc), qc, info);
-  }
-
-  /**
-   * Gets the map at the first argument position.
-   * @param qc query context
-   * @return map
-   * @throws QueryException query exception
-   */
-  private Map map(final QueryContext qc) throws QueryException {
-    return checkMap(checkItem(exprs[0], qc, SeqType.ANY_MAP));
+    return toMap(exprs[0], qc).apply(checkArity(exprs[1], 2, qc), qc, info);
   }
 }

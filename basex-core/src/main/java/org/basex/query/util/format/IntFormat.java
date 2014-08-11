@@ -37,7 +37,7 @@ public final class IntFormat extends FormatParser {
       final TokenBuilder tb = new TokenBuilder();
       if(tp.consume('(')) {
         while(!tp.consume(')')) {
-          if(!tp.more()) throw INVORDINAL.get(info, mod);
+          if(!tp.more()) throw INVORDINAL_X.get(info, mod);
           final int cp = tp.next();
           if(cp != '-') tb.add(cp);
         }
@@ -46,6 +46,6 @@ public final class IntFormat extends FormatParser {
     }
     // parse alphabetical/traditional flag
     if(!tp.consume('a')) tp.consume('t');
-    if(tp.more()) throw INVORDINAL.get(info, mod);
+    if(tp.more()) throw INVORDINAL_X.get(info, mod);
   }
 }

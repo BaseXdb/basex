@@ -19,7 +19,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNJson extends StandardFunc {
+public final class FNJson extends BuiltinFunc {
   /** Element: options. */
   private static final QNm Q_OPTIONS = QNm.get("json:options", JSONURI);
 
@@ -51,8 +51,8 @@ public final class FNJson extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item parse(final QueryContext qc) throws QueryException {
-    final byte[] input = checkStr(exprs[0], qc);
-    final JsonParserOptions opts = checkOptions(1, Q_OPTIONS, new JsonParserOptions(), qc);
+    final byte[] input = toToken(exprs[0], qc);
+    final JsonParserOptions opts = toOptions(1, Q_OPTIONS, new JsonParserOptions(), qc);
     try {
       final JsonConverter conv = JsonConverter.get(opts);
       conv.convert(input, null);
@@ -70,11 +70,11 @@ public final class FNJson extends StandardFunc {
    */
   private Str serialize(final QueryContext qc) throws QueryException {
     final Iter iter = qc.iter(exprs[0]);
-    final JsonSerialOptions jopts = checkOptions(1, Q_OPTIONS, new JsonSerialOptions(), qc);
+    final JsonSerialOptions jopts = toOptions(1, Q_OPTIONS, new JsonSerialOptions(), qc);
 
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.JSON);
     sopts.set(SerializerOptions.JSON, jopts);
-    return Str.get(delete(serialize(iter, sopts, INVALIDOPT), '\r'));
+    return Str.get(delete(serialize(iter, sopts, INVALIDOPT_X), '\r'));
   }
 }

@@ -107,7 +107,7 @@ public final class Var extends ExprInfo {
     if(st == null) return;
 
     if(declType != null) {
-      if(declType.occ.intersect(st.occ) == null) throw INVCAST.get(ii, st, declType);
+      if(declType.occ.intersect(st.occ) == null) throw INVCAST_X_X.get(ii, st, declType);
       if(st.instanceOf(declType)) {
         qc.compInfo(QueryText.OPTCAST, this);
         declType = null;
@@ -159,7 +159,7 @@ public final class Var extends ExprInfo {
 
     if(!checksType() || declType.instance(val)) return val;
     if(promote) return declType.promote(qc, sc, ii, val, opt);
-    throw INVCAST.get(ii, val.seqType(), declType);
+    throw INVCAST_X_X.get(ii, val.seqType(), declType);
   }
 
   /**
@@ -181,8 +181,8 @@ public final class Var extends ExprInfo {
         et.type.instanceOf(vt.type) && et.occ.instanceOf(vt.occ)) return;
 
     if(!promote || !(et.type instanceof NodeType) && !et.promotable(vt)) {
-      if(vt.type.nsSensitive() && sc.xquery3()) throw NSSENS.get(info, et, vt);
-      throw INVCAST.get(info, et, vt);
+      if(vt.type.nsSensitive() && sc.xquery3()) throw NSSENS_X_X.get(info, et, vt);
+      throw INVCAST_X_X.get(info, et, vt);
     }
   }
 

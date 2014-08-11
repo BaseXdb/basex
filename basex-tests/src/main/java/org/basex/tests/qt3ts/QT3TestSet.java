@@ -241,7 +241,7 @@ public abstract class QT3TestSet {
       tb.add(it.getString());
       c++;
     }
-    return result(exp.equals(norm ? string(norm(tb.finish())) : tb.toString()), exp);
+    return result(exp.equals(norm ? string(normalize(tb.finish())) : tb.toString()), exp);
   }
 
   /**

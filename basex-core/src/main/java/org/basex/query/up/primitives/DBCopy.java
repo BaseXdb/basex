@@ -41,7 +41,7 @@ public class DBCopy extends NameUpdate {
     try {
       Copy.copy(name, newName, qc.context, null);
     } catch(final IOException ex) {
-      throw UPDBOPTERR.get(info, ex);
+      throw UPDBOPTERR_X.get(info, ex);
     }
   }
 

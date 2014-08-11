@@ -142,7 +142,7 @@ public final class QueryProcessor extends Proc {
   }
 
   /**
-   * Binds a value to the context item.
+   * Binds the context value.
    * @param value value to be bound
    * @return self reference
    * @throws QueryException query exception
@@ -152,8 +152,8 @@ public final class QueryProcessor extends Proc {
   }
 
   /**
-   * Binds an XQuery value to the context item.
-   * @param value value to be bound
+   * Binds the context value.
+   * @param value XQuery value to be bound
    * @return self reference
    */
   public QueryProcessor context(final Value value) {
@@ -172,7 +172,7 @@ public final class QueryProcessor extends Proc {
   }
 
   /**
-   * Binds a value with the specified type to the context item,
+   * Binds the context value with a specified type,
    * using the same rules as for {@link #bind binding variables}.
    * @param value value to be bound
    * @param type type (may be {@code null})
