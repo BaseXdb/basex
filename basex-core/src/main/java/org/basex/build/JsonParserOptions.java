@@ -13,4 +13,18 @@ public final class JsonParserOptions extends JsonOptions {
   public static final StringOption ENCODING = new StringOption("encoding");
   /** Option: unescape special characters. */
   public static final BooleanOption UNESCAPE = new BooleanOption("unescape", true);
+
+  /**
+   * Default constructor.
+   */
+  public JsonParserOptions() {
+  }
+
+  /**
+   * Constructor with options to be copied.
+   * @param opts options
+   */
+  public JsonParserOptions(final JsonParserOptions opts) {
+    super(opts);
+  }
 }

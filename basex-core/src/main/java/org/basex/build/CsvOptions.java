@@ -89,4 +89,18 @@ public class CsvOptions extends Options {
     }
     return -1;
   }
+
+  /**
+   * Default constructor.
+   */
+  public CsvOptions() {
+  }
+
+  /**
+   * Constructor with options to be copied.
+   * @param opts options
+   */
+  public CsvOptions(final CsvOptions opts) {
+    super(opts);
+  }
 }

@@ -57,4 +57,18 @@ public class JsonOptions extends Options {
       return super.toString().toLowerCase(Locale.ENGLISH);
     }
   }
+
+  /**
+   * Default constructor.
+   */
+  public JsonOptions() {
+  }
+
+  /**
+   * Constructor with options to be copied.
+   * @param opts options
+   */
+  public JsonOptions(final JsonOptions opts) {
+    super(opts);
+  }
 }

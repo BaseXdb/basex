@@ -13,4 +13,18 @@ public final class TextOptions extends Options {
   public static final StringOption ENCODING = new StringOption("encoding");
   /** Parser option: line-wise parsing. */
   public static final BooleanOption LINES = new BooleanOption("lines", true);
+
+  /**
+   * Default constructor.
+   */
+  public TextOptions() {
+  }
+
+  /**
+   * Constructor with options to be copied.
+   * @param opts options
+   */
+  public TextOptions(final Options opts) {
+    super(opts);
+  }
 }

@@ -19,7 +19,7 @@ public final class VarStack extends ElementList {
    * Default constructor.
    */
   public VarStack() {
-    this(4);
+    this(Array.CAPACITY);
   }
 
   /**

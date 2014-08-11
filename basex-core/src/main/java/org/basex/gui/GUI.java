@@ -125,11 +125,11 @@ public final class GUI extends AGUI {
 
     // set window size
     final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
-    final int[] ps = gopts.get(GUIOptions.GUILOC);
-    final int[] sz = gopts.get(GUIOptions.GUISIZE);
-    final int x = Math.max(0, Math.min(scr.width - sz[0], ps[0]));
-    final int y = Math.max(0, Math.min(scr.height - sz[1], ps[1]));
-    setBounds(x, y, sz[0], sz[1]);
+    final int[] loc = gopts.get(GUIOptions.GUILOC);
+    final int[] size = gopts.get(GUIOptions.GUISIZE);
+    final int x = Math.max(0, Math.min(scr.width - size[0], loc[0]));
+    final int y = Math.max(0, Math.min(scr.height - size[1], loc[1]));
+    setBounds(x, y, size[0], size[1]);
     if(gopts.get(GUIOptions.MAXSTATE)) {
       setExtendedState(MAXIMIZED_HORIZ);
       setExtendedState(MAXIMIZED_VERT);
@@ -194,8 +194,8 @@ public final class GUI extends AGUI {
           }
         };
         final int i = context.data() == null ? 2 : gopts.get(GUIOptions.SEARCHMODE);
-        final String[] hs = gopts.get(i == 0 ? GUIOptions.SEARCH : i == 1 ? GUIOptions.XQUERY
-                                                                         : GUIOptions.COMMANDS);
+        final String[] hs = gopts.get(
+            i == 0 ? GUIOptions.SEARCH : i == 1 ? GUIOptions.XQUERY : GUIOptions.COMMANDS);
         for(final String en : hs) {
           final JMenuItem jmi = new JMenuItem(en);
           jmi.addActionListener(al);
@@ -612,8 +612,8 @@ public final class GUI extends AGUI {
     menu.refresh();
 
     final int i = context.data() == null ? 2 : gopts.get(GUIOptions.SEARCHMODE);
-    final StringsOption options = i == 0 ? GUIOptions.SEARCH : i == 1 ? GUIOptions.XQUERY
-                                                                     : GUIOptions.COMMANDS;
+    final StringsOption options =
+        i == 0 ? GUIOptions.SEARCH : i == 1 ? GUIOptions.XQUERY : GUIOptions.COMMANDS;
     hist.setEnabled(gopts.get(options).length != 0);
   }
 

@@ -69,7 +69,7 @@ class RESTQuery extends RESTCmd {
         }
 
         // initializes the response with query serialization options
-        http.sopts().parse(xq.parameters(context).toString());
+        http.sopts().parse(xq.parameters(context));
         http.initResponse();
 
         // run query

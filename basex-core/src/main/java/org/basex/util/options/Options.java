@@ -34,9 +34,9 @@ public class Options implements Iterable<Option<?>> {
   private final TreeMap<String, Object> values = new TreeMap<>();
   /** Free option definitions. */
   private final HashMap<String, String> free = new HashMap<>();
+
   /** Options, cached from an input file. */
   private final StringBuilder user = new StringBuilder();
-
   /** Options file. */
   private IOFile file;
 
@@ -44,7 +44,7 @@ public class Options implements Iterable<Option<?>> {
    * Default constructor.
    */
   public Options() {
-    this(null);
+    this((IOFile) null);
   }
 
   /**
@@ -54,6 +54,21 @@ public class Options implements Iterable<Option<?>> {
   protected Options(final IOFile opts) {
     init();
     if(opts != null) read(opts);
+  }
+
+  /**
+   * Constructor with options file.
+   * @param opts options file
+   */
+  protected Options(final Options opts) {
+    for(final Entry<String, Option<?>> e : opts.options.entrySet())
+      options.put(e.getKey(), e.getValue());
+    for(final Entry<String, Object> e : opts.values.entrySet())
+      values.put(e.getKey(), e.getValue());
+    for(final Entry<String, String> e : opts.free.entrySet())
+      free.put(e.getKey(), e.getValue());
+    user.append(opts.user.toString());
+    file = opts.file;
   }
 
   /**
@@ -175,42 +190,32 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Returns the requested string array.
+   * Returns the original instance of the requested string array.
    * @param option option to be found
    * @return value
    */
   public final synchronized String[] get(final StringsOption option) {
-    final String[] v = (String[]) get((Option<?>) option);
-    return v == null ? null : v.clone();
+    return (String[]) get((Option<?>) option);
   }
 
   /**
-   * Returns the requested integer array.
+   * Returns the original instance of the requested integer array.
    * @param option option to be found
    * @return value
    */
   public final synchronized int[] get(final NumbersOption option) {
-    final int[] v = (int[]) get((Option<?>) option);
-    return v == null ? null : v.clone();
+    return (int[]) get((Option<?>) option);
   }
 
   /**
-   * Returns the requested options.
+   * Returns the original instance of the requested options.
    * @param option option to be found
    * @param <O> options
    * @return value
    */
   @SuppressWarnings("unchecked")
   public final synchronized <O extends Options> O get(final OptionsOption<O> option) {
-    final O o = (O) get((Option<?>) option);
-    if(o == null) return null;
-    try {
-      final O n = ((Class<O>) o.getClass()).newInstance();
-      n.parse(o.toString());
-      return n;
-    } catch(final Exception ex) {
-      throw Util.notExpected(ex);
-    }
+    return (O) get((Option<?>) option);
   }
 
   /**

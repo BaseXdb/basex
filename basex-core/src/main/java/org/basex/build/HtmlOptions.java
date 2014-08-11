@@ -44,4 +44,18 @@ public final class HtmlOptions extends Options {
   public static final StringOption DOCTYPEPUB = new StringOption("doctype-public");
   /** TagSoup option: encoding=encoding. */
   public static final StringOption ENCODING = new StringOption("encoding");
+
+  /**
+   * Default constructor.
+   */
+  public HtmlOptions() {
+  }
+
+  /**
+   * Constructor with options to be copied.
+   * @param opts options
+   */
+  public HtmlOptions(final Options opts) {
+    super(opts);
+  }
 }

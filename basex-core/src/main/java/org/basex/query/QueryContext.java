@@ -529,7 +529,8 @@ public final class QueryContext extends Proc {
    * @return serialization parameters
    */
   public SerializerOptions serParams() {
-    return serialOpts != null ? serialOpts : context.options.get(MainOptions.SERIALIZER);
+    return serialOpts != null ? serialOpts :
+      new SerializerOptions(context.options.get(MainOptions.SERIALIZER));
   }
 
   /**

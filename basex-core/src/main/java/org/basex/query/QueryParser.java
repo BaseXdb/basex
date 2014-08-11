@@ -529,7 +529,7 @@ public class QueryParser extends InputParser {
       if(module != null) throw error(MODOUT);
 
       if(qc.serialOpts == null) {
-        qc.serialOpts = qc.context.options.get(MainOptions.SERIALIZER);
+        qc.serialOpts = new SerializerOptions(qc.context.options.get(MainOptions.SERIALIZER));
       }
       if(!decl.add("S " + name)) throw error(OUTDUPL_X, name);
       try {

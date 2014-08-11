@@ -209,4 +209,18 @@ public final class SerializerOptions extends Options {
     }
     return o;
   }
+
+  /**
+   * Default constructor.
+   */
+  public SerializerOptions() {
+  }
+
+  /**
+   * Constructor with options to be copied.
+   * @param opts options
+   */
+  public SerializerOptions(final SerializerOptions opts) {
+    super(opts);
+  }
 }

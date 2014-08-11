@@ -54,7 +54,7 @@ final class DialogCsvParser extends DialogParser {
    */
   DialogCsvParser(final BaseXDialog d, final MainOptions opts) {
     super(d);
-    copts = opts.get(MainOptions.CSVPARSER);
+    copts = new CsvParserOptions(opts.get(MainOptions.CSVPARSER));
 
     final BaseXBack pp  = new BaseXBack(new TableLayout(2, 1, 0, 8));
     BaseXBack p = new BaseXBack(new TableLayout(4, 2, 8, 4));
