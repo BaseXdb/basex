@@ -138,7 +138,7 @@ public final class EditorView extends View {
     pos = new BaseXLabel(" ");
     posCode.invokeLater();
 
-    final BaseXBack south = new BaseXBack(Fill.NONE).border(10, 0, 2, 0);
+    final BaseXBack south = new BaseXBack(Fill.NONE).border(4, 0, 0, 0);
     south.layout(new BorderLayout(4, 0));
     south.add(info, BorderLayout.CENTER);
     south.add(pos, BorderLayout.EAST);
