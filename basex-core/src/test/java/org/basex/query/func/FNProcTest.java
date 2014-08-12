@@ -1,8 +1,8 @@
 package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
+import static org.basex.query.util.Err.*;
 
-import org.basex.query.util.*;
 import org.basex.query.*;
 import org.junit.*;
 
@@ -17,7 +17,7 @@ public final class FNProcTest extends AdvancedQueryTest {
   @Test
   public void system() {
     query(_PROC_SYSTEM.args("java", "-version"), "");
-    error(_PROC_SYSTEM.args("java", "-version", "xx"), Err.BXPR_ENC_X);
+    error(_PROC_SYSTEM.args("java", "-version", "xx"), BXPR_ENC_X);
   }
 
   /** Test method. */

@@ -5,8 +5,7 @@ import static org.basex.http.webdav.impl.Utils.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.http.webdav.impl.ResourceMetaData;
-import org.basex.http.webdav.impl.WebDAVService;
+import org.basex.http.webdav.impl.*;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.exceptions.*;

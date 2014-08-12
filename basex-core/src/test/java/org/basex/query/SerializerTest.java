@@ -1,6 +1,7 @@
 package org.basex.query;
 
-import org.basex.query.util.*;
+import static org.basex.query.util.Err.*;
+
 import org.junit.*;
 
 /**
@@ -41,12 +42,12 @@ public final class SerializerTest extends AdvancedQueryTest {
     query(option + "<html><style>{ serialize(<a/>) }</style></html>",
         "<html><style><a/></style></html>");
     query(option + "<a b='&lt;'/>", "<a b=\"<\"></a>");
-    error(option + "<a>&#x90;</a>", Err.SERILL_X);
+    error(option + "<a>&#x90;</a>", SERILL_X);
 
     query(option + "<option selected='selected'/>", "<option selected></option>");
 
     query(option + "<?x y?>", "<?x y>");
-    error(option + "<?x > ?>", Err.SERPI);
+    error(option + "<?x > ?>", SERPI);
   }
 
   /** Test: method=html, version=5.0. */

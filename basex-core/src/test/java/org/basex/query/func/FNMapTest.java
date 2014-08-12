@@ -1,9 +1,9 @@
 package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
+import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.junit.*;
 
 /**
@@ -34,8 +34,8 @@ public final class FNMapTest extends AdvancedQueryTest {
     query(EXISTS.args(_MAP_ENTRY.args("A", "B")), true);
     query(EXISTS.args(_MAP_ENTRY.args(1, 2)), true);
     query(EXISTS.args(_MAP_MERGE.args(_MAP_ENTRY.args(1, 2))), "true");
-    error(EXISTS.args(_MAP_ENTRY.args("()", 2)), Err.EMPTYFOUND);
-    error(EXISTS.args(_MAP_ENTRY.args("(1,2)", 2)), Err.SEQFOUND_X);
+    error(EXISTS.args(_MAP_ENTRY.args("()", 2)), EMPTYFOUND);
+    error(EXISTS.args(_MAP_ENTRY.args("(1,2)", 2)), SEQFOUND_X);
   }
 
   /** Test method. */

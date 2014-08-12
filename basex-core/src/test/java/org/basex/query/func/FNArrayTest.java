@@ -1,9 +1,9 @@
 package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
+import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.junit.*;
 
 /**
@@ -47,10 +47,10 @@ public final class FNArrayTest extends AdvancedQueryTest {
     array(_ARRAY_SUBARRAY.args(" array { 1 to 5 }", " 1", " 1"), "[1]");
     array(_ARRAY_SUBARRAY.args(" array { 1 to 5 }", " 2", " 3"), "[2, 3, 4]");
 
-    error(_ARRAY_SUBARRAY.args(" [1]", " 0", " 0"), Err.ARRAYBOUNDS_X_X);
-    error(_ARRAY_SUBARRAY.args(" [1]", " 1", " -1"), Err.ARRAYNEG_X);
-    error(_ARRAY_SUBARRAY.args(" []", " 1", " 1"), Err.ARRAYBOUNDS_X_X);
-    error(_ARRAY_SUBARRAY.args(" [1]", " 1", " 2"), Err.ARRAYBOUNDS_X_X);
+    error(_ARRAY_SUBARRAY.args(" [1]", " 0", " 0"), ARRAYBOUNDS_X_X);
+    error(_ARRAY_SUBARRAY.args(" [1]", " 1", " -1"), ARRAYNEG_X);
+    error(_ARRAY_SUBARRAY.args(" []", " 1", " 1"), ARRAYBOUNDS_X_X);
+    error(_ARRAY_SUBARRAY.args(" [1]", " 1", " 2"), ARRAYBOUNDS_X_X);
   }
 
   /** Test method. */
@@ -62,9 +62,9 @@ public final class FNArrayTest extends AdvancedQueryTest {
     array(_ARRAY_REMOVE.args(" array { 1 to 5 }", " 3"), "[1, 2, 4, 5]");
     array(_ARRAY_REMOVE.args(" array { 1 to 5 }", " 5"), "[1, 2, 3, 4]");
 
-    error(_ARRAY_REMOVE.args(" []", " 0"), Err.ARRAYBOUNDS_X_X);
-    error(_ARRAY_REMOVE.args(" [1]", " 0"), Err.ARRAYBOUNDS_X_X);
-    error(_ARRAY_REMOVE.args(" [1]", " 2"), Err.ARRAYBOUNDS_X_X);
+    error(_ARRAY_REMOVE.args(" []", " 0"), ARRAYBOUNDS_X_X);
+    error(_ARRAY_REMOVE.args(" [1]", " 0"), ARRAYBOUNDS_X_X);
+    error(_ARRAY_REMOVE.args(" [1]", " 2"), ARRAYBOUNDS_X_X);
   }
 
   /** Test method. */
@@ -73,8 +73,8 @@ public final class FNArrayTest extends AdvancedQueryTest {
     array(_ARRAY_INSERT_BEFORE.args(" [1]", " 1", " 2"), "[2, 1]");
     array(_ARRAY_INSERT_BEFORE.args(" [1]", " 2", " 2"), "[1, 2]");
 
-    error(_ARRAY_INSERT_BEFORE.args(" []", " 0", " 1"), Err.ARRAYBOUNDS_X_X);
-    error(_ARRAY_INSERT_BEFORE.args(" []", " 2", " 1"), Err.ARRAYBOUNDS_X_X);
+    error(_ARRAY_INSERT_BEFORE.args(" []", " 0", " 1"), ARRAYBOUNDS_X_X);
+    error(_ARRAY_INSERT_BEFORE.args(" []", " 2", " 1"), ARRAYBOUNDS_X_X);
   }
 
   /** Test method. */
@@ -83,7 +83,7 @@ public final class FNArrayTest extends AdvancedQueryTest {
     query(_ARRAY_HEAD.args(" array { 1 to 5 }"), "1");
     query(_ARRAY_HEAD.args(" [1 to 2, 3]"), "1 2");
 
-    error(_ARRAY_HEAD.args(" []"), Err.ARRAYBOUNDS_X_X);
+    error(_ARRAY_HEAD.args(" []"), ARRAYBOUNDS_X_X);
   }
 
   /** Test method. */
@@ -92,7 +92,7 @@ public final class FNArrayTest extends AdvancedQueryTest {
     array(_ARRAY_TAIL.args(" array { 1 to 5 }"), "[2, 3, 4, 5]");
     array(_ARRAY_TAIL.args(" [1 to 2, 3]"), "[3]");
 
-    error(_ARRAY_TAIL.args(" []"), Err.ARRAYBOUNDS_X_X);
+    error(_ARRAY_TAIL.args(" []"), ARRAYBOUNDS_X_X);
   }
 
   /** Test method. */

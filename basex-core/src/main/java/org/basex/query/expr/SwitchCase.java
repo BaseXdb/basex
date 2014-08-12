@@ -3,7 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -39,7 +39,7 @@ public final class SwitchCase extends Arr {
         exprs[e] = exprs[e].compile(qc, scp);
       } catch(final QueryException ex) {
         // replace original expression with error
-        exprs[e] = FNInfo.error(ex, exprs[e].seqType());
+        exprs[e] = FnError.get(ex, exprs[e].seqType());
       }
     }
     return this;
@@ -60,7 +60,7 @@ public final class SwitchCase extends Arr {
       try {
         nw = exprs[i].inline(qc, scp, var, ex);
       } catch(final QueryException qe) {
-        nw = FNInfo.error(qe, exprs[i].seqType());
+        nw = FnError.get(qe, exprs[i].seqType());
       }
       if(nw != null) {
         exprs[i] = nw;

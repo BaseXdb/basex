@@ -3,7 +3,7 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 
 import javax.swing.*;
-import javax.swing.UIManager.*;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.basex.gui.*;
 import org.basex.gui.layout.*;

@@ -1,7 +1,7 @@
 package org.basex.query.up;
 
-import static org.junit.Assert.*;
 import static org.basex.util.Token.*;
+import static org.junit.Assert.*;
 
 import java.io.*;
 
@@ -13,7 +13,6 @@ import org.basex.query.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.rules.*;
-import org.junit.Test;
 
 /**
  * Test the {@link AtomicUpdateCache}.

@@ -4,6 +4,7 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -72,7 +73,7 @@ public final class FuncLit extends Single implements Scope {
       expr = expr.compile(qc, scope);
       expr.markTailCalls(null);
     } catch(final QueryException e) {
-      expr = FNInfo.error(e, seqType);
+      expr = FnError.get(e, seqType);
     } finally {
       scope.cleanUp(this);
     }

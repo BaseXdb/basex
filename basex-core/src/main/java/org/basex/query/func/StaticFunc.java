@@ -9,6 +9,7 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Flag;
+import org.basex.query.func.fn.*;
 import org.basex.query.gflwor.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -80,7 +81,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
         }
       }
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, expr.seqType());
+      expr = FnError.get(qe, expr.seqType());
     } finally {
       scope.cleanUp(this);
       qc.value = cv;

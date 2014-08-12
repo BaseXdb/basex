@@ -1,8 +1,8 @@
 package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
+import static org.basex.query.util.Err.*;
 
-import org.basex.query.util.*;
 import org.basex.query.*;
 import org.junit.*;
 
@@ -148,6 +148,6 @@ public final class FNCsvTest extends AdvancedQueryTest {
   private static void error(final String input, final String options, final Function function) {
     final String query = options.isEmpty() ? function.args(input) :
       function.args(input, " map {" + options + '}');
-    error(query, Err.INVALIDOPT_X);
+    error(query, INVALIDOPT_X);
   }
 }

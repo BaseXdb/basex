@@ -7,11 +7,11 @@ import javax.xml.transform.sax.*;
 
 import junit.framework.Assert;
 
+import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.*;
 import org.junit.Test;
 
 /**

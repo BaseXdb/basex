@@ -12,7 +12,7 @@ import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
-import org.basex.gui.text.TextPanel.*;
+import org.basex.gui.text.TextPanel.SearchDir;
 import org.basex.util.options.*;
 
 /**

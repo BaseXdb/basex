@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 
 import java.util.*;
 
@@ -284,7 +285,7 @@ public final class CmpG extends Cmp {
         (t1 == t2 || t1.isUntyped() || t2.isUntyped() ||
         it1 instanceof ANum && it2 instanceof ANum ||
         it1 instanceof AStr && it2 instanceof AStr)) return op.op.eval(it1, it2, cl, info);
-    throw Err.diffError(info, it1, it2);
+    throw diffError(info, it1, it2);
   }
 
   @Override

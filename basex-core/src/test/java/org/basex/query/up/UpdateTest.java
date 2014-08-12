@@ -1,5 +1,6 @@
 package org.basex.query.up;
 
+import static org.basex.query.util.Err.*;
 import static org.junit.Assert.*;
 
 import org.basex.core.*;
@@ -8,7 +9,6 @@ import org.basex.data.atomic.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
-import org.basex.query.util.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -83,8 +83,8 @@ public final class UpdateTest extends AdvancedQueryTest {
   /** Transform expression containing a simple expression. */
   @Test
   public void transSimple() {
-    error("<a/> update ('')", Err.UPMODIFY);
-    error("copy $a := <a/> modify ('') return $a", Err.UPMODIFY);
+    error("<a/> update ('')", UPMODIFY);
+    error("copy $a := <a/> modify ('') return $a", UPMODIFY);
   }
 
   /**
@@ -240,19 +240,19 @@ public final class UpdateTest extends AdvancedQueryTest {
     // check 'global' duplicate detection
     String q = transform("<x/>",
         "for $i in 1 to 2 return insert node attribute a { 'b' } into $input");
-    error(q, Err.UPATTDUPL_X);
+    error(q, UPATTDUPL_X);
 
     // check if insertion sequence itself is duplicate free (which it is not)
     q = transform("<x a='a'/>",
         "delete node $input/@a," +
         "for $i in 1 to 2 return insert node attribute a { 'b' } into $input");
-    error(q, Err.UPATTDUPL_X);
+    error(q, UPATTDUPL_X);
 
     // replace with a + delete a + insert a
     q = transform("<x a='a'/>",
         "delete node $input/@a, replace node $input/@a with attribute a {'b'}," +
         "insert node attribute a { 'b' } into $input");
-    error(q, Err.UPATTDUPL_X);
+    error(q, UPATTDUPL_X);
   }
 
   /**
@@ -515,7 +515,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void outOfScope() {
     error("let $d := copy $e := <a/> modify () return $e return $e",
-        Err.VARUNDEF_X);
+        VARUNDEF_X);
   }
 
   /**
@@ -1094,10 +1094,10 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void dbUpdateTransform() {
-    error("copy $c := <a/> modify db:output('x') return $c", Err.BASX_DBTRANSFORM);
+    error("copy $c := <a/> modify db:output('x') return $c", BASX_DBTRANSFORM);
     error("copy $c := <a/> modify db:add('" + NAME + "','<x/>','x.xml') return $c",
-        Err.BASX_DBTRANSFORM);
-    error("copy $c := <a/> modify put(<a/>, 'x.txt') return $c", Err.BASX_DBTRANSFORM);
+        BASX_DBTRANSFORM);
+    error("copy $c := <a/> modify put(<a/>, 'x.txt') return $c", BASX_DBTRANSFORM);
   }
 
   /**
@@ -1167,12 +1167,12 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void modifyCheck() {
-    error("copy $c:= <a>X</a> modify 'a' return $c", Err.UPMODIFY);
-    error("copy $c:= <a>X</a> modify(delete node $c/text(),'a') return $c", Err.UPALL_X);
+    error("copy $c:= <a>X</a> modify 'a' return $c", UPMODIFY);
+    error("copy $c:= <a>X</a> modify(delete node $c/text(),'a') return $c", UPALL_X);
 
-    error("text { <a/> update (delete node <a/>,<b/>) }", Err.UPALL_X);
-    error("1[<a/> update (delete node <a/>,<b/>)]", Err.UPALL_X);
-    error("for $i in 1 order by (<a/> update (delete node <a/>,<b/>)) return $i", Err.UPALL_X);
+    error("text { <a/> update (delete node <a/>,<b/>) }", UPALL_X);
+    error("1[<a/> update (delete node <a/>,<b/>)]", UPALL_X);
+    error("for $i in 1 order by (<a/> update (delete node <a/>,<b/>)) return $i", UPALL_X);
   }
 
   /**
@@ -1180,27 +1180,27 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void updatingFuncItems() {
-    error("db:output(?)", Err.SERFUNC_X);
-    error("db:output#1", Err.SERFUNC_X);
-    error("declare updating function local:a() { () }; local:a#0", Err.SERFUNC_X);
+    error("db:output(?)", SERFUNC_X);
+    error("db:output#1", SERFUNC_X);
+    error("declare updating function local:a() { () }; local:a#0", SERFUNC_X);
     error("declare function local:a() { local:b#0 };"
-        + "declare updating function local:b() { db:output('1') }; local:a()", Err.SERFUNC_X);
+        + "declare updating function local:b() { db:output('1') }; local:a()", SERFUNC_X);
     query("declare function local:not-used() { local:b#0 };"
         + "declare updating function local:b() { db:output('1') }; local:b()", "1");
 
-    error("db:output(?)(<a/>)", Err.UPFUNCUP);
-    error("db:output#1(<a/>)", Err.UPFUNCUP);
-    error("%updating function($a) { db:output($a) }(1)", Err.UPFUNCUP);
-    error("declare updating function local:a() { () }; local:a#0()", Err.UPFUNCUP);
+    error("db:output(?)(<a/>)", UPFUNCUP);
+    error("db:output#1(<a/>)", UPFUNCUP);
+    error("%updating function($a) { db:output($a) }(1)", UPFUNCUP);
+    error("declare updating function local:a() { () }; local:a#0()", UPFUNCUP);
     error("declare function local:a() { local:b#0 };"
-        + "declare updating function local:b() { db:output('1') }; local:a()()", Err.UPFUNCUP);
+        + "declare updating function local:b() { db:output('1') }; local:a()()", UPFUNCUP);
 
-    error("updating count(?)(1)", Err.UPFUNCNOTUP);
-    error("updating count#1(1)", Err.UPFUNCNOTUP);
-    error("updating function($a) { count($a) }(1)", Err.UPFUNCNOTUP);
-    error("declare function local:a() { () }; updating local:a#0()", Err.UPFUNCNOTUP);
+    error("updating count(?)(1)", UPFUNCNOTUP);
+    error("updating count#1(1)", UPFUNCNOTUP);
+    error("updating function($a) { count($a) }(1)", UPFUNCNOTUP);
+    error("declare function local:a() { () }; updating local:a#0()", UPFUNCNOTUP);
     error("declare function local:a() { local:b#0 };"
-        + "declare function local:b() { count('1') }; updating local:a()()", Err.UPFUNCNOTUP);
+        + "declare function local:b() { count('1') }; updating local:a()()", UPFUNCNOTUP);
   }
 
   /** Test method. */

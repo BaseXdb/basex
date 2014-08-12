@@ -1,24 +1,18 @@
 package net.xqj.basex.local;
 
-import com.xqj2.XQConnection2;
 import static net.xqj.basex.BaseXXQInsertOptions.*;
-
-import net.xqj.basex.BaseXXQInsertOptions;
-import org.junit.Test;
 import static org.junit.Assert.*;
 
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQException;
-import javax.xml.xquery.XQExpression;
-import javax.xml.xquery.XQItem;
-import javax.xml.xquery.XQResultSequence;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
+
+import javax.xml.xquery.*;
+
+import net.xqj.basex.*;
+
+import org.junit.*;
+
+import com.xqj2.*;
 
 /**
  * Test XQJ concurrency, both reads and writes.

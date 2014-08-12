@@ -2,7 +2,7 @@ package org.basex.http.webdav;
 
 import java.io.*;
 
-import org.basex.server.LoginException;
+import org.basex.server.*;
 import org.basex.util.*;
 
 import com.bradmcevoy.http.exceptions.*;

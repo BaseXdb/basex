@@ -1,10 +1,9 @@
 package org.basex.qt3ts;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-
 import org.basex.qt3ts.app.*;
+import org.junit.runner.*;
+import org.junit.runners.*;
+import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * Test suite for the "app" test group.

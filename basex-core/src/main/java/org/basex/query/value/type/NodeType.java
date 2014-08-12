@@ -11,7 +11,6 @@ import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -253,7 +252,7 @@ public enum NodeType implements Type {
    * @throws QueryException query exception
    */
   final Item error(final Item it, final InputInfo ii) throws QueryException {
-    throw Err.castError(ii, it, this);
+    throw castError(ii, it, this);
   }
 
   @Override

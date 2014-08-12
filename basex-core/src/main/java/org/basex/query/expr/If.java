@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -55,7 +56,7 @@ public final class If extends Arr {
         exprs[e] = exprs[e].compile(qc, scp);
       } catch(final QueryException ex) {
         // replace original expression with error
-        exprs[e] = FNInfo.error(ex, seqType);
+        exprs[e] = FnError.get(ex, seqType);
       }
     }
     return optimize(qc, scp);
@@ -175,7 +176,7 @@ public final class If extends Arr {
       try {
         nw = exprs[i].inline(qc, scp, var, ex);
       } catch(final QueryException qe) {
-        nw = FNInfo.error(qe, seqType);
+        nw = FnError.get(qe, seqType);
       }
       if(nw != null) {
         exprs[i] = nw;
@@ -232,7 +233,7 @@ public final class If extends Arr {
       try {
         exprs[i] = tc.check(exprs[i], qc, scp);
       } catch(final QueryException ex) {
-        exprs[i] = FNInfo.error(ex, tp);
+        exprs[i] = FnError.get(ex, tp);
       }
     }
     return optimize(qc, scp);

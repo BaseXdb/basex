@@ -78,7 +78,7 @@ public final class DynFuncCall extends FuncCall {
         if(inl != null) return inl;
       }
     } else if(f instanceof Item && !(f instanceof FItem)) {
-      throw INVFUNCITEM_X.get(info, ((Item) f).type);
+      throw INVFUNCITEM_X.get(info, ((Item) f).type, f);
     }
     return this;
   }
@@ -155,7 +155,7 @@ public final class DynFuncCall extends FuncCall {
   FItem evalFunc(final QueryContext qc) throws QueryException {
     final int ar = exprs.length - 1;
     final Item it = toItem(exprs[ar], qc);
-    if(!(it instanceof FItem)) throw INVFUNCITEM_X.get(info, it.type);
+    if(!(it instanceof FItem)) throw INVFUNCITEM_X.get(info, it.type, it);
     final FItem f = (FItem) it;
     if(f.arity() != ar) {
       final Expr e = f instanceof FuncItem ? ((FuncItem) f).expr : f;

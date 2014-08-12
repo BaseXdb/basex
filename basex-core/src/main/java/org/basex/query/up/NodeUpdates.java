@@ -1,6 +1,7 @@
 package org.basex.query.up;
 
 import static org.basex.query.up.primitives.UpdateType.*;
+
 import java.util.*;
 
 import org.basex.query.*;

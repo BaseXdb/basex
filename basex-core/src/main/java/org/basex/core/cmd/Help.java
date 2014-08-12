@@ -5,7 +5,7 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.core.parse.Commands.*;
+import org.basex.core.parse.Commands.Cmd;
 
 /**
  * Evaluates the 'help' command and returns help on the database commands.

@@ -1,7 +1,7 @@
 package org.basex.io.parse.json;
 
-import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.build.*;
+import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;

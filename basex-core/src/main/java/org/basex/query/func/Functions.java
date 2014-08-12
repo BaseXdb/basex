@@ -17,7 +17,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * This class provides access to built-in functions.
+ * This class provides access to built-in and user-defined functions.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen

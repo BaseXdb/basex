@@ -1,6 +1,7 @@
 package org.basex.query.var;
 
 import static org.basex.query.util.Err.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;

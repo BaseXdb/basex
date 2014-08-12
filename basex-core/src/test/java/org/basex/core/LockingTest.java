@@ -2,16 +2,16 @@ package org.basex.core;
 
 import static org.junit.Assert.*;
 
-import java.lang.reflect.Array;
+import java.lang.reflect.*;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.*;
+
 import org.basex.*;
 import org.basex.util.list.*;
 import org.junit.*;
 import org.junit.runner.*;
 import org.junit.runners.*;
-import org.junit.runners.Parameterized.*;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Tests for {@link DBLocking}.

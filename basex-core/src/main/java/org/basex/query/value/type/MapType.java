@@ -1,6 +1,7 @@
 package org.basex.query.value.type;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.util.*;
@@ -40,7 +41,7 @@ public final class MapType extends FuncType {
       final Map m = (Map) item;
       if(m.hasType(this)) return m;
     }
-    throw Err.castError(ii, item, this);
+    throw castError(ii, item, this);
   }
 
   @Override

@@ -3,7 +3,6 @@ package org.basex.performance;
 import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.core.cmd.*;
-import org.basex.SandboxTest;
 import org.basex.util.*;
 import org.junit.Test;
 

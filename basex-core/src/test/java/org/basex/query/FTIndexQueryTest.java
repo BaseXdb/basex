@@ -5,15 +5,15 @@ import static org.junit.Assert.*;
 
 import java.lang.annotation.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.*;
 import org.basex.query.simple.*;
 import org.basex.util.*;
 import org.junit.*;
+import org.junit.Test;
 import org.junit.rules.*;
 import org.junit.runners.model.*;
-import org.junit.Test;
 
 /**
  * Test if index and non-index full-text queries behave the same way.

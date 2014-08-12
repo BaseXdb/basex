@@ -3,7 +3,7 @@ package org.basex.query.util.archive;
 import java.io.*;
 import java.util.zip.*;
 
-import org.basex.query.func.*;
+import org.basex.query.func.archive.*;
 import org.basex.util.*;
 
 /**

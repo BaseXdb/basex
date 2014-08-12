@@ -5,12 +5,12 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.lang.reflect.*;
 
+import org.basex.*;
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.io.random.*;
-import org.basex.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;

@@ -1,8 +1,6 @@
 package org.basex.io.in;
 
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 import org.basex.util.*;
 

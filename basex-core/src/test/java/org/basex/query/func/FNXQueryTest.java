@@ -1,8 +1,8 @@
 package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
+import static org.basex.query.util.Err.*;
 
-import org.basex.query.util.*;
 import org.basex.query.*;
 import org.junit.*;
 
@@ -27,13 +27,13 @@ public final class FNXQueryTest extends AdvancedQueryTest {
     query(_XQUERY_EVAL.args("\"declare variable $local:a external; $local:a\"",
         " map { xs:QName('local:a'): 1 }"), "1");
     query(_XQUERY_EVAL.args(".", " map { '': 1 }"), "1");
-    error(_XQUERY_EVAL.args("1+"), Err.CALCEXPR);
-    error("declare variable $a:=1;" + _XQUERY_EVAL.args("\"$a\""), Err.VARUNDEF_X);
-    error("for $a in (1,2) return " + _XQUERY_EVAL.args("\"$a\""), Err.VARUNDEF_X);
+    error(_XQUERY_EVAL.args("1+"), CALCEXPR);
+    error("declare variable $a:=1;" + _XQUERY_EVAL.args("\"$a\""), VARUNDEF_X);
+    error("for $a in (1,2) return " + _XQUERY_EVAL.args("\"$a\""), VARUNDEF_X);
     // check updating expressions
-    error(_XQUERY_EVAL.args("delete node ()"), Err.BXXQ_UPDATING);
+    error(_XQUERY_EVAL.args("delete node ()"), BXXQ_UPDATING);
     error(_XQUERY_EVAL.args("declare %updating function local:x() {()}; local:x()"),
-        Err.BXXQ_UPDATING);
+        BXXQ_UPDATING);
     query(_XQUERY_EVAL.args("declare %updating function local:x() {()}; 1"));
     query(_XQUERY_EVAL.args('"' + DOC.args(PATH).replace('"', '\'') + '"'));
 
@@ -42,15 +42,15 @@ public final class FNXQueryTest extends AdvancedQueryTest {
     query("try{ " + _XQUERY_EVAL.args("\"(1 to 10000000000000)[.=0]\"", " map{}",
         " map{ 'timeout':'1'}") + " } catch * { () }", "");
     error(_XQUERY_EVAL.args("\"doc('" + NAME + "')\"", " map{}", " map{ 'permission':'none'}"),
-        Err.BXXQ_PERM_X);
+        BXXQ_PERM_X);
     error(_XQUERY_EVAL.args("\"db:open('" + NAME + "')\"", " map{}", " map{ 'permission':'none'}"),
-        Err.BXDB_OPEN_X);
+        BXDB_OPEN_X);
     error(_XQUERY_EVAL.args("\"file:exists('x')\"", " map{}", " map{ 'permission':'none'}"),
-        Err.BXXQ_PERM_X);
+        BXXQ_PERM_X);
     error(_XQUERY_EVAL.args("\"(1 to 10000000000000)[.=0]\"", " map{}", " map{ 'timeout':'1'}"),
-        Err.BXXQ_STOPPED);
+        BXXQ_STOPPED);
     error(_XQUERY_EVAL.args("\"(1 to 10000000000000) ! <a/>\"", " map{}", " map{ 'memory':'10'}"),
-        Err.BXXQ_STOPPED);
+        BXXQ_STOPPED);
   }
 
   /** Test method. */
@@ -59,14 +59,14 @@ public final class FNXQueryTest extends AdvancedQueryTest {
     query(_XQUERY_UPDATE.args("delete node <a/>"));
     query(_XQUERY_UPDATE.args("\"db:output('1')\""), "1");
     query(_XQUERY_UPDATE.args(" '()'"));
-    error(_XQUERY_UPDATE.args("1"), Err.BXXQ_NOUPDATE);
+    error(_XQUERY_UPDATE.args("1"), BXXQ_NOUPDATE);
   }
 
   /** Test method. */
   @Test
   public void invoke() {
     query(_XQUERY_INVOKE.args("src/test/resources/input.xq"), "XML");
-    error(_XQUERY_INVOKE.args("src/test/resources/xxx.xq"), Err.WHICHRES_X);
+    error(_XQUERY_INVOKE.args("src/test/resources/xxx.xq"), WHICHRES_X);
   }
 
   /** Test method. */

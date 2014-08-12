@@ -20,6 +20,7 @@ import org.basex.query.expr.Context;
 import org.basex.query.expr.List;
 import org.basex.query.ft.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.gflwor.*;
 import org.basex.query.gflwor.GFLWOR.Clause;
 import org.basex.query.gflwor.Window.Condition;
@@ -2208,7 +2209,7 @@ public class QueryParser extends InputParser {
     final long l = toLong(tok.toArray());
     if(l != Long.MIN_VALUE) return Int.get(l);
     final InputInfo ii = info();
-    return FNInfo.error(RANGE_X.get(ii, chop(tok, ii)), SeqType.ITR);
+    return FnError.get(RANGE_X.get(ii, chop(tok, ii)), SeqType.ITR);
   }
 
   /**

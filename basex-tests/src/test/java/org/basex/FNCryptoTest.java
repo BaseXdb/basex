@@ -8,7 +8,7 @@ import java.security.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.serial.*;
-import org.basex.io.serial.SerializerOptions.*;
+import org.basex.io.serial.SerializerOptions.YesNo;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;

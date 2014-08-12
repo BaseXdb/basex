@@ -2,8 +2,7 @@ package org.basex.http.webdav;
 
 import java.io.*;
 
-import org.basex.http.webdav.impl.ResourceMetaData;
-import org.basex.http.webdav.impl.WebDAVService;
+import org.basex.http.webdav.impl.*;
 
 /**
  * WebDAV resource representing a collection database.

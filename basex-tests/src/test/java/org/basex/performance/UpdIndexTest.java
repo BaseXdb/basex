@@ -5,16 +5,16 @@ import static org.junit.Assert.*;
 import java.util.*;
 import java.util.List;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
 import org.basex.query.*;
-import org.basex.*;
 import org.junit.*;
+import org.junit.Test;
 import org.junit.runner.*;
 import org.junit.runners.*;
 import org.junit.runners.Parameterized.Parameters;
-import org.junit.Test;
 
 /**
  * This test class performs some incremental updates.

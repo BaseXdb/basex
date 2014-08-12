@@ -1,6 +1,7 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
+
 import org.basex.util.hash.*;
 
 /**

@@ -1,6 +1,7 @@
 package org.basex.query;
 
 import static org.basex.core.Text.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
@@ -563,7 +564,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
       "copy $a := <a xmlns:p='A' a='v'/> " +
       "modify rename node $a/@a as QName('uri', 'p:a') " +
       "return $a",
-      Err.UPNSCONFL);
+      UPNSCONFL);
   }
 
   /**
@@ -590,7 +591,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
       "modify for $el in $a/descendant-or-self::element() return " +
       "rename node $el as QName('',local-name($el)) " +
       "return $a",
-      Err.UPNSCONFL);
+      UPNSCONFL);
   }
 
   /**
@@ -797,7 +798,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     create(1);
     query("insert node attribute xml:space { 'preserve' } into /x", "");
     query(".", "<x xml:space='preserve'/>");
-    error("insert node attribute xml:space { 'preserve' } into /x", Err.UPATTDUPL_X);
+    error("insert node attribute xml:space { 'preserve' } into /x", UPATTDUPL_X);
   }
 
   /**
@@ -812,7 +813,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     error("copy $c := <a xmlns='X'/> modify (" +
         "  rename node $c as QName('Y','b')," +
         "  insert node attribute c{'a'} into $c" +
-        ") return $c", Err.UPNSCONFL);
+        ") return $c", UPNSCONFL);
     query("copy $c := <a/> modify (" +
         "  rename node $c as QName('X','b')," +
         "  insert node attribute c{'a'} into $c" +

@@ -13,6 +13,7 @@ import java.util.regex.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
+import org.basex.io.serial.SerializerOptions.YesNoOmit;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;

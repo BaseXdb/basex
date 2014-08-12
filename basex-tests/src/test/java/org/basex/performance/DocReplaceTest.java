@@ -1,9 +1,9 @@
 package org.basex.performance;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.basex.*;
 import org.junit.Test;
 
 /**

@@ -1,6 +1,6 @@
 package org.basex.qt3ts.math;
 
-import org.basex.tests.bxapi.XQuery;
+import org.basex.tests.bxapi.*;
 import org.basex.tests.qt3ts.*;
 
 /**

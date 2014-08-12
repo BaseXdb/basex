@@ -1,6 +1,7 @@
 package org.basex.query;
 
 import static org.basex.core.Text.*;
+import static org.basex.query.util.Err.*;
 
 import java.util.*;
 
@@ -57,7 +58,7 @@ public class QueryException extends Exception {
    * @param message error message
    */
   public QueryException(final String message) {
-    this(null, Err.BASX_GENERIC_X, message);
+    this(null, BASX_GENERIC_X, message);
   }
 
   /**
@@ -271,9 +272,7 @@ public class QueryException extends Exception {
   private static String message(final String text, final Object[] ext) {
     final int es = ext.length;
     for(int e = 0; e < es; e++) {
-      if(ext[e] instanceof ExprInfo) {
-        ext[e] = Err.chop(((ExprInfo) ext[e]).toErrorString(), null);
-      }
+      if(ext[e] instanceof ExprInfo) ext[e] = chop(((ExprInfo) ext[e]).toErrorString(), null);
     }
     return Util.info(text, ext);
   }

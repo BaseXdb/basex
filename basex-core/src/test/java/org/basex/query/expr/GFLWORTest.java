@@ -1,9 +1,9 @@
 package org.basex.query.expr;
 
+import static org.basex.query.util.Err.*;
 import static org.junit.Assert.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -19,7 +19,7 @@ public final class GFLWORTest extends AdvancedQueryTest {
   public void shadowTest() {
     query("for $a in for $a in <a>1</a> return $a/text() return <x>{ $a }</x>",
         "<x>1</x>");
-    error("for $a at $b in 'c'[$b > 1] return $a", Err.VARUNDEF_X);
+    error("for $a at $b in 'c'[$b > 1] return $a", VARUNDEF_X);
   }
 
   /** Tests shadowing between grouping variables. */

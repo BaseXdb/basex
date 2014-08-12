@@ -2,7 +2,13 @@ package org.basex.core;
 
 import static org.basex.core.Lang.*;
 
-import org.basex.core.parse.Commands.*;
+import org.basex.core.parse.Commands.CmdCreate;
+import org.basex.core.parse.Commands.CmdDrop;
+import org.basex.core.parse.Commands.CmdIndex;
+import org.basex.core.parse.Commands.CmdInfo;
+import org.basex.core.parse.Commands.CmdPerm;
+import org.basex.core.parse.Commands.CmdRepo;
+import org.basex.core.parse.Commands.CmdShow;
 import org.basex.util.*;
 
 /**

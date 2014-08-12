@@ -883,7 +883,7 @@ public enum Err {
   /** XPTY0004. */
   CALCTYPE_X_X_X(XPTY, 4, "% not defined for % and %."),
   /** XPTY0004. */
-  INVFUNCITEM_X(XPTY, 4, "Function item required for function call, % found."),
+  INVFUNCITEM_X(XPTY, 4, "Function expected, % found: %."),
 
   /** XPTY0004. */
   CMPTYPE_X(XPTY, 4, "Items of type % cannot be compared."),

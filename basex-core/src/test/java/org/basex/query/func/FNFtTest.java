@@ -1,6 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
+import static org.basex.query.util.Err.*;
 
 import java.io.*;
 
@@ -8,7 +9,6 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.Commands.CmdIndex;
 import org.basex.index.*;
-import org.basex.query.util.*;
 import org.basex.query.*;
 import org.junit.*;
 import org.junit.Test;
@@ -70,9 +70,9 @@ public final class FNFtTest extends AdvancedQueryTest {
         "'window':map {'size':3} }"), true);
 
     // check buggy options
-    error(_FT_CONTAINS.args("x", "x", " map { 'x':'y' }"), Err.INVALIDOPT_X);
-    error(_FT_CONTAINS.args("x", "x", " map { 'mode':'' }"), Err.INVALIDOPT_X);
-    error(_FT_CONTAINS.args("x", "x", " 1"), Err.ELMMAP_X_X_X);
+    error(_FT_CONTAINS.args("x", "x", " map { 'x':'y' }"), INVALIDOPT_X);
+    error(_FT_CONTAINS.args("x", "x", " map { 'mode':'' }"), INVALIDOPT_X);
+    error(_FT_CONTAINS.args("x", "x", " 1"), ELMMAP_X_X_X);
   }
 
   /**
@@ -116,9 +116,9 @@ public final class FNFtTest extends AdvancedQueryTest {
         "'window':map {'size':3} }"), "Databases and XML");
 
     // check buggy options
-    error(_FT_SEARCH.args(NAME, "x", " map { 'x':'y' }"), Err.INVALIDOPT_X);
-    error(_FT_SEARCH.args(NAME, "x", " map { 'mode':'' }"), Err.INVALIDOPT_X);
-    error(_FT_SEARCH.args(NAME, "x", " 1"), Err.ELMMAP_X_X_X);
+    error(_FT_SEARCH.args(NAME, "x", " map { 'x':'y' }"), INVALIDOPT_X);
+    error(_FT_SEARCH.args(NAME, "x", " map { 'mode':'' }"), INVALIDOPT_X);
+    error(_FT_SEARCH.args(NAME, "x", " 1"), ELMMAP_X_X_X);
   }
 
   /** Test method. */

@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
-import org.basex.query.util.*;
+import static org.basex.query.util.Err.*;
+
 import org.basex.query.*;
 import org.junit.*;
 
@@ -15,7 +16,7 @@ public final class MapTest extends AdvancedQueryTest {
   @Test public void mapAsKeyTest() {
     error("declare variable $m := map { 'a': 'b' };" +
           "declare variable $q := map { $m: 'a' };" +
-          "$q", Err.FIATOM_X);
+          "$q", FIATOM_X);
   }
 
   /** Tests the the new syntax for map literals (see GH-755). */
@@ -25,8 +26,8 @@ public final class MapTest extends AdvancedQueryTest {
 
   /** Tests invalid keys. */
   @Test public void keys() {
-    error(" map{ ('a', 'b'): 'b' }", Err.MAPKEY_X);
-    error(" map{ 'a': 'b', 'a': 'c' }", Err.MAPDUPLKEY_X_X_X);
+    error(" map{ ('a', 'b'): 'b' }", MAPKEY_X);
+    error(" map{ 'a': 'b', 'a': 'c' }", MAPDUPLKEY_X_X_X);
   }
 
   /** Stack overflow bug. */

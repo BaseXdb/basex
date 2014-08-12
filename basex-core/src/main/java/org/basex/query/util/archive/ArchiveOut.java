@@ -8,7 +8,7 @@ import java.util.zip.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
-import org.basex.query.func.*;
+import org.basex.query.func.archive.*;
 import org.basex.util.*;
 
 /**

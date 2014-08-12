@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.build.JsonOptions.*;
+import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;

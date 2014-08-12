@@ -1,15 +1,10 @@
 package net.xqj.basex.local;
 
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQException;
-import javax.xml.xquery.XQItem;
-import javax.xml.xquery.XQItemType;
-import javax.xml.xquery.XQResultSequence;
+import javax.xml.xquery.*;
 
-import net.xqj.basex.BaseXXQInsertOptions;
+import net.xqj.basex.*;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.*;
 
 /**
  * Base class for all XQJ local tests.

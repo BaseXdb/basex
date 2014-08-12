@@ -4,11 +4,11 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 
+import org.basex.*;
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.basex.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;

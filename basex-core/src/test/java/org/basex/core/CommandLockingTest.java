@@ -2,9 +2,9 @@ package org.basex.core;
 
 import static org.junit.Assert.*;
 
+import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.index.*;
-import org.basex.*;
 import org.basex.query.func.*;
 import org.basex.util.list.*;
 import org.junit.Test;

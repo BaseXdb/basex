@@ -16,7 +16,7 @@ import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
 import org.basex.http.*;
 import org.basex.io.in.*;
-import org.basex.query.func.*;
+import org.basex.query.func.db.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;

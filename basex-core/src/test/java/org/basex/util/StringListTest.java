@@ -2,8 +2,8 @@ package org.basex.util;
 
 import static org.junit.Assert.*;
 
-import org.basex.util.list.StringList;
-import org.junit.Test;
+import org.basex.util.list.*;
+import org.junit.*;
 
 /**
  * Tests for the {@link StringList} implementation.

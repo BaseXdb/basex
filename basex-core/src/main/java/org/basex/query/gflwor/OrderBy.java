@@ -1,6 +1,7 @@
 package org.basex.query.gflwor;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 
 import java.util.*;
 import java.util.List;
@@ -105,7 +106,7 @@ public final class OrderBy extends GFLWOR.Clause {
                   if(m == Dbl.NAN || m == Flt.NAN) m = null;
                   if(n == Dbl.NAN || n == Flt.NAN) n = null;
                   if(m != null && n != null && !m.comparable(n))
-                    throw Err.castError(or.info, n, m.type);
+                    throw castError(or.info, n, m.type);
 
                   final int c = m == null
                       ? n == null ? 0                 : or.least ? -1 : 1

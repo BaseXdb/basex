@@ -1,9 +1,9 @@
 package org.basex.query.expr;
 
 import static org.basex.query.func.Function.*;
+import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.junit.*;
 
 /**
@@ -44,13 +44,13 @@ public final class ArrayTest extends AdvancedQueryTest {
     array("[[1]](1)", "[1]");
     query("[[[1]]](1)(1)(1)", "1");
 
-    error("[](0)", Err.ARRAYPOS_X);
-    error("[](1)", Err.ARRAYPOS_X);
-    error("[1](-5000000000)", Err.ARRAYPOS_X);
-    error("[1](-1)", Err.ARRAYPOS_X);
-    error("[1](0)", Err.ARRAYPOS_X);
-    error("[1](2)", Err.ARRAYPOS_X);
-    error("[1](5000000000)", Err.ARRAYPOS_X);
+    error("[](0)", ARRAYPOS_X);
+    error("[](1)", ARRAYPOS_X);
+    error("[1](-5000000000)", ARRAYPOS_X);
+    error("[1](-1)", ARRAYPOS_X);
+    error("[1](0)", ARRAYPOS_X);
+    error("[1](2)", ARRAYPOS_X);
+    error("[1](5000000000)", ARRAYPOS_X);
   }
 
   /** Constructor. */
@@ -72,8 +72,8 @@ public final class ArrayTest extends AdvancedQueryTest {
     query("[[8]] div 5", "1.6");
     query("[[9]] mod [[5]]", "4");
 
-    error("[1,2] + 3", Err.SEQFOUND_X);
-    error("1 + [2,3]", Err.SEQFOUND_X);
+    error("[1,2] + 3", SEQFOUND_X);
+    error("1 + [2,3]", SEQFOUND_X);
   }
 
   /** Value comparison. */
@@ -89,8 +89,8 @@ public final class ArrayTest extends AdvancedQueryTest {
     query("[[9]] le 5", "false");
     query("[[10]] ge 6", "true");
 
-    error("[1,2] eq 3", Err.SEQFOUND_X);
-    error("1 eq [2,3]", Err.SEQFOUND_X);
+    error("[1,2] eq 3", SEQFOUND_X);
+    error("1 eq [2,3]", SEQFOUND_X);
   }
 
   /** General comparison. */
@@ -115,8 +115,8 @@ public final class ArrayTest extends AdvancedQueryTest {
 
     query("element { ['a'] } { }", "<a/>");
 
-    error("element { ['a', 'b'] } { }", Err.SEQFOUND_X);
-    error("element { [] } { }", Err.EMPTYFOUND_X);
+    error("element { ['a', 'b'] } { }", SEQFOUND_X);
+    error("element { [] } { }", EMPTYFOUND_X);
   }
 
   /** Attribute constructor. */
@@ -134,8 +134,8 @@ public final class ArrayTest extends AdvancedQueryTest {
 
     query("attribute { ['a'] } { }/name()", "a");
 
-    error("attribute { ['a', 'b'] } { }", Err.SEQFOUND_X);
-    error("attribute { [] } { }", Err.EMPTYFOUND_X);
+    error("attribute { ['a', 'b'] } { }", SEQFOUND_X);
+    error("attribute { [] } { }", EMPTYFOUND_X);
   }
 
   /** Attribute constructor. */
@@ -144,7 +144,7 @@ public final class ArrayTest extends AdvancedQueryTest {
     query("namespace a { ['b'] }/string()", "b");
     query("namespace a { ['b', 'c'] }/string()", "b c");
 
-    error("namespace { ['a', 'b'] } { 'u' }", Err.SEQFOUND_X);
+    error("namespace { ['a', 'b'] } { 'u' }", SEQFOUND_X);
   }
 
   /** Text constructor. */
@@ -166,8 +166,8 @@ public final class ArrayTest extends AdvancedQueryTest {
   @Test public void piConstructor() {
     query("processing-instruction { ['a'] } { ['b'] }", "<?a b?>");
 
-    error("processing-instruction { [] } { }", Err.EMPTYFOUND_X);
-    error("processing-instruction { ['a', 'b'] } { }", Err.SEQFOUND_X);
+    error("processing-instruction { [] } { }", EMPTYFOUND_X);
+    error("processing-instruction { ['a', 'b'] } { }", SEQFOUND_X);
   }
 
   /** Group by clause. */
@@ -175,7 +175,7 @@ public final class ArrayTest extends AdvancedQueryTest {
     query("for $a in ('A','B') group by $b := ['a'] return $a", "A B");
     query("for $a in ('A','B') group by $b := [] return $a", "A B");
 
-    error("for $a in ('A','B') group by $b := ['a','b'] return $a", Err.SEQFOUND_X);
+    error("for $a in ('A','B') group by $b := ['a','b'] return $a", SEQFOUND_X);
   }
 
   /** Order by clause. */
@@ -183,7 +183,7 @@ public final class ArrayTest extends AdvancedQueryTest {
     query("for $a in ('A','B') order by ['a'] return $a", "A B");
     query("for $a in ('A','B') order by [] return $a", "A B");
 
-    error("for $a in ('A','B') order by ['a','b'] return $a", Err.SEQFOUND_X);
+    error("for $a in ('A','B') order by ['a','b'] return $a", SEQFOUND_X);
   }
 
   /** Switch expression. */
@@ -192,7 +192,7 @@ public final class ArrayTest extends AdvancedQueryTest {
     query("switch(['a']) case 'a' return 'a' default return 'b'", "a");
     query("for $a in ('a',['a']) return switch($a) case 'a' return 'a' default return 'b'", "a a");
 
-    error("switch(['a', 'b']) case 'a' return 'a' default return 'b'", Err.SEQFOUND_X);
+    error("switch(['a', 'b']) case 'a' return 'a' default return 'b'", SEQFOUND_X);
   }
 
   /** Cast expression. */
@@ -200,13 +200,13 @@ public final class ArrayTest extends AdvancedQueryTest {
     query("[] cast as xs:integer?", "");
     query("xs:integer([1])", "1");
 
-    error("[] cast as xs:integer", Err.INVCAST_X_X_X);
-    error("[1,2] cast as xs:integer", Err.INVCAST_X_X_X);
+    error("[] cast as xs:integer", INVCAST_X_X_X);
+    error("[1,2] cast as xs:integer", INVCAST_X_X_X);
   }
 
   /** Functions. */
   @Test public void functions() {
-    error("string([1])", Err.FISTRING_X);
+    error("string([1])", FISTRING_X);
     query("number([1])", "1");
     query("concat('a',['b'],[])", "ab");
   }

@@ -102,11 +102,11 @@ public final class CmpN extends Cmp {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it1 = exprs[0].item(qc, info);
-    if(it1 == null) return null;
-    final Item it2 = exprs[1].item(qc, info);
-    if(it2 == null) return null;
-    return Bln.get(op.eval(toNode(it1), toNode(it2)));
+    final ANode n1 = toEmptyNode(exprs[0], qc);
+    if(n1 == null) return null;
+    final ANode n2 = toEmptyNode(exprs[1], qc);
+    if(n2 == null) return null;
+    return Bln.get(op.eval(n1, n2));
   }
 
   @Override

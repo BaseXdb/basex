@@ -3,6 +3,7 @@ package org.basex.api.dom;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.w3c.dom.*;
+import org.w3c.dom.CharacterData;
 
 /**
  * DOM - Character data implementation.

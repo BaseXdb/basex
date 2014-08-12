@@ -5,9 +5,7 @@ import static org.basex.http.webdav.BXServletRequest.*;
 import javax.servlet.http.*;
 
 import org.basex.http.*;
-import org.basex.http.webdav.impl.ResourceMetaData;
-import org.basex.http.webdav.impl.ResourceMetaDataFactory;
-import org.basex.http.webdav.impl.WebDAVService;
+import org.basex.http.webdav.impl.*;
 import org.basex.server.*;
 import org.basex.util.*;
 

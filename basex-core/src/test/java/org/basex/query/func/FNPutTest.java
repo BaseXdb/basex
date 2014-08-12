@@ -2,8 +2,8 @@ package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
 
-import org.basex.query.AdvancedQueryTest;
-import org.junit.Test;
+import org.basex.query.*;
+import org.junit.*;
 
 /**
  * This class tests the XQuery fn:put() function.

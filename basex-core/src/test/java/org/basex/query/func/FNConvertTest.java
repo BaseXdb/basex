@@ -1,8 +1,8 @@
 package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
+import static org.basex.query.util.Err.*;
 
-import org.basex.query.util.*;
 import org.basex.query.*;
 import org.junit.*;
 
@@ -25,9 +25,9 @@ public final class FNConvertTest extends AdvancedQueryTest {
     query(_CONVERT_INTEGER_TO_BASE.args(4, 10), 4);
     query(_CONVERT_INTEGER_TO_BASE.args(65535, 10), 65535);
     query(_CONVERT_INTEGER_TO_BASE.args(65536, 10), 65536);
-    error(_CONVERT_INTEGER_TO_BASE.args(1, 1), Err.INVBASE_X);
-    error(_CONVERT_INTEGER_TO_BASE.args(1, 100), Err.INVBASE_X);
-    error(_CONVERT_INTEGER_TO_BASE.args(1, 100), Err.INVBASE_X);
+    error(_CONVERT_INTEGER_TO_BASE.args(1, 1), INVBASE_X);
+    error(_CONVERT_INTEGER_TO_BASE.args(1, 100), INVBASE_X);
+    error(_CONVERT_INTEGER_TO_BASE.args(1, 100), INVBASE_X);
   }
 
   /** Test method. */
@@ -43,10 +43,10 @@ public final class FNConvertTest extends AdvancedQueryTest {
     query(_CONVERT_INTEGER_FROM_BASE.args("4", 10), 4);
     query(_CONVERT_INTEGER_FROM_BASE.args("65535", 10), 65535);
     query(_CONVERT_INTEGER_FROM_BASE.args("65536", 10), 65536);
-    error(_CONVERT_INTEGER_FROM_BASE.args("1", 1), Err.INVBASE_X);
-    error(_CONVERT_INTEGER_FROM_BASE.args("1", 100), Err.INVBASE_X);
-    error(_CONVERT_INTEGER_FROM_BASE.args("abc", 10), Err.INVBASEDIG_X_X);
-    error(_CONVERT_INTEGER_FROM_BASE.args("012", 2), Err.INVBASEDIG_X_X);
+    error(_CONVERT_INTEGER_FROM_BASE.args("1", 1), INVBASE_X);
+    error(_CONVERT_INTEGER_FROM_BASE.args("1", 100), INVBASE_X);
+    error(_CONVERT_INTEGER_FROM_BASE.args("abc", 10), INVBASEDIG_X_X);
+    error(_CONVERT_INTEGER_FROM_BASE.args("012", 2), INVBASEDIG_X_X);
   }
 
   /** Test method. */
@@ -68,7 +68,7 @@ public final class FNConvertTest extends AdvancedQueryTest {
     query(_CONVERT_BINARY_TO_STRING.args("xs:base64Binary(xs:hexBinary('41'))"), "A");
     query(_CONVERT_BINARY_TO_STRING.args("xs:hexBinary('41')"), "A");
     query(_CONVERT_BINARY_TO_STRING.args("xs:hexBinary('41')", "CP1252"), "A");
-    error(_CONVERT_BINARY_TO_STRING.args("xs:hexBinary('41')", "X"), Err.BXCO_ENCODING_X);
+    error(_CONVERT_BINARY_TO_STRING.args("xs:hexBinary('41')", "X"), BXCO_ENCODING_X);
   }
 
   /** Test method. */
@@ -91,8 +91,8 @@ public final class FNConvertTest extends AdvancedQueryTest {
     query(_CONVERT_STRING_TO_BASE64.args("a"), "YQ==");
     query(_CONVERT_STRING_TO_BASE64.args("a", "UTF-8"), "YQ==");
     query(_CONVERT_STRING_TO_BASE64.args("a", "US-ASCII"), "YQ==");
-    error(_CONVERT_STRING_TO_BASE64.args("\u00fc", "US-ASCII"), Err.BXCO_BASE64_X_X);
-    error(_CONVERT_STRING_TO_BASE64.args("a", "X"), Err.BXCO_ENCODING_X);
+    error(_CONVERT_STRING_TO_BASE64.args("\u00fc", "US-ASCII"), BXCO_BASE64_X_X);
+    error(_CONVERT_STRING_TO_BASE64.args("a", "X"), BXCO_ENCODING_X);
   }
 
   /** Test method. */
@@ -101,8 +101,8 @@ public final class FNConvertTest extends AdvancedQueryTest {
     query(_CONVERT_STRING_TO_HEX.args("a"), "61");
     query(_CONVERT_STRING_TO_HEX.args("a", "UTF-8"), "61");
     query(_CONVERT_STRING_TO_HEX.args("a", "US-ASCII"), "61");
-    error(_CONVERT_STRING_TO_HEX.args("\u00fc", "US-ASCII"), Err.BXCO_BASE64_X_X);
-    error(_CONVERT_STRING_TO_HEX.args("a", "X"), Err.BXCO_ENCODING_X);
+    error(_CONVERT_STRING_TO_HEX.args("\u00fc", "US-ASCII"), BXCO_BASE64_X_X);
+    error(_CONVERT_STRING_TO_HEX.args("a", "X"), BXCO_ENCODING_X);
   }
 
   /** Test method. */
@@ -116,7 +116,7 @@ public final class FNConvertTest extends AdvancedQueryTest {
   public void dateTimeToInteger() {
     query(_CONVERT_DATETIME_TO_INTEGER.args("xs:dateTime('1970-01-01T00:00:00Z')"), "0");
     error(_CONVERT_DATETIME_TO_INTEGER.args("xs:dateTime('600000000-01-01T00:00:00Z')"),
-        Err.INTRANGE_X);
+        INTRANGE_X);
   }
 
   /** Test method. */
@@ -130,6 +130,6 @@ public final class FNConvertTest extends AdvancedQueryTest {
   public void dayTimeDurationToInteger() {
     query(_CONVERT_DAYTIME_TO_INTEGER.args("xs:dayTimeDuration('PT0S')"), "0");
     error(_CONVERT_DAYTIME_TO_INTEGER.args("xs:dayTimeDuration('PT10000000000000000S')"),
-        Err.INTRANGE_X);
+        INTRANGE_X);
   }
 }

@@ -1,23 +1,19 @@
 package org.basex.http.webdav;
 
-import static org.basex.http.webdav.impl.Utils.*;
 import static com.bradmcevoy.http.LockResult.*;
+import static org.basex.http.webdav.impl.Utils.*;
+
 import java.io.*;
 import java.util.*;
 
-import org.basex.http.webdav.impl.ResourceMetaData;
-import org.basex.http.webdav.impl.WebDAVService;
-import org.basex.server.LoginException;
+import org.basex.http.webdav.impl.*;
+import org.basex.server.*;
 import org.basex.util.*;
+import org.xml.sax.*;
+import org.xml.sax.helpers.*;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.exceptions.*;
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * WebDAV resource representing an abstract folder within a collection database.

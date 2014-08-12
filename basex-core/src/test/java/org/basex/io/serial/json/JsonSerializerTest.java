@@ -1,16 +1,18 @@
 package org.basex.io.serial.json;
 
+import static org.basex.query.util.Err.*;
 import static org.junit.Assert.*;
 
+import org.basex.*;
 import org.basex.build.*;
-import org.basex.build.JsonOptions.*;
+import org.basex.build.JsonOptions.JsonFormat;
+import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
-import org.basex.*;
-import org.basex.util.Util;
+import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -196,7 +198,7 @@ public final class JsonSerializerTest extends SandboxTest {
   private static void error(final String query, final JsonFormat format, final JsonSpec spec) {
     try {
       serialize(query, format, spec);
-      fail("Error expected: " + Err.BXJS_SERIAL_X);
+      fail("Error expected: " + BXJS_SERIAL_X);
     } catch(final QueryIOException ex) {
       assertEquals(Err.BXJS_SERIAL_X, ex.getCause().err());
     } catch(final Exception ex) {

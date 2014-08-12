@@ -9,8 +9,8 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import org.basex.data.*;
-import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
+import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
 

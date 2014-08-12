@@ -4,7 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
 import java.math.*;
-import java.util.Date;
+import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;

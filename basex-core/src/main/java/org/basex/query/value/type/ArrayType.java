@@ -1,6 +1,7 @@
 package org.basex.query.value.type;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.util.*;
@@ -35,7 +36,7 @@ public final class ArrayType extends FuncType {
       final Array a = (Array) item;
       if(a.hasType(this)) return a;
     }
-    throw Err.castError(ii, item, this);
+    throw castError(ii, item, this);
   }
 
   @Override

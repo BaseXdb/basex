@@ -1,11 +1,11 @@
 package org.basex.query.expr;
 
 import static org.basex.query.func.Function.*;
+import static org.basex.query.util.Err.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -33,7 +33,7 @@ public final class MixedTest extends AdvancedQueryTest {
   public void duplImport() {
     error("import module namespace a='world' at '" + XQMFILE + "';" +
       "import module namespace a='world' at '" + XQMFILE + "'; 1",
-      Err.DUPLMODULE_X);
+      DUPLMODULE_X);
   }
 
   /** Catches duplicate module import with different module uri. */
@@ -41,7 +41,7 @@ public final class MixedTest extends AdvancedQueryTest {
   public void duplImportDiffUri() {
     error("import module namespace a='world' at '" + XQMFILE + "';" +
       "import module namespace a='galaxy' at '" + XQMFILE + "'; 1",
-      Err.DUPLNSDECL_X);
+      DUPLNSDECL_X);
   }
 
   /** Catches duplicate module import. */
@@ -49,7 +49,7 @@ public final class MixedTest extends AdvancedQueryTest {
   public void duplLocation() {
     error("import module namespace a='world' at '" + XQMFILE + "';" +
       "import module namespace b='galaxy' at '" + XQMFILE + "'; 1",
-      Err.WRONGMODULE_X_X);
+      WRONGMODULE_X_X);
   }
 
   /** Checks static context scoping in variables. */

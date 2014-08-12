@@ -1,13 +1,11 @@
 package org.basex.query;
 
+import static org.basex.query.value.type.SeqType.*;
+import static org.basex.query.value.type.SeqType.Occ.*;
 import static org.junit.Assert.*;
 
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
-
-import static org.basex.query.value.type.SeqType.*;
-import static org.basex.query.value.type.SeqType.Occ.*;
-
 import org.junit.*;
 
 /**

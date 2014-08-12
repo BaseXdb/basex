@@ -1,6 +1,7 @@
 package org.basex.query.value.item;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 
 import java.util.*;
 
@@ -153,7 +154,7 @@ public final class FuncItem extends FItem implements Scope {
   public FItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean opt) throws QueryException {
 
-    if(params.length != ft.argTypes.length) throw Err.castError(ii, this, ft);
+    if(params.length != ft.argTypes.length) throw castError(ii, this, ft);
     final FuncType tp = funcType();
     if(tp.instanceOf(ft)) return this;
 

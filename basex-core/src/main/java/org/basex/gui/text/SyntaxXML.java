@@ -1,6 +1,7 @@
 package org.basex.gui.text;
 
 import static org.basex.data.DataText.*;
+
 import java.awt.*;
 
 /**

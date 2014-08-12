@@ -1,7 +1,7 @@
 package org.basex.util;
 
 import java.util.*;
-import java.util.Map.*;
+import java.util.Map.Entry;
 
 /**
  * Organizes free slots for heap files.

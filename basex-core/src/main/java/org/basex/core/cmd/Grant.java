@@ -6,7 +6,7 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.core.parse.*;
-import org.basex.core.parse.Commands.*;
+import org.basex.core.parse.Commands.CmdPerm;
 import org.basex.data.*;
 import org.basex.util.*;
 

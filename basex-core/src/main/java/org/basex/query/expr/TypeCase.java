@@ -1,17 +1,16 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+
 import org.basex.query.*;
-import org.basex.query.func.*;
-import org.basex.query.iter.Iter;
+import org.basex.query.func.fn.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
@@ -64,7 +63,7 @@ public final class TypeCase extends Single {
       }
     } catch(final QueryException ex) {
       // replace original expression with error
-      expr = FNInfo.error(ex, expr.seqType());
+      expr = FnError.get(ex, expr.seqType());
     }
     seqType = expr.seqType();
     return this;
@@ -75,7 +74,7 @@ public final class TypeCase extends Single {
     try {
       return super.inline(qc, scp, v, ex);
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, expr.seqType());
+      expr = FnError.get(qe, expr.seqType());
       return this;
     }
   }

@@ -188,7 +188,7 @@ public final class Unit {
     final QNm name = ex.qname();
     if(code == null || !eq(code, name.local())) {
       final FElem error;
-      final boolean fail = Err.UNIT_ASSERT.eq(name);
+      final boolean fail = UNIT_ASSERT.eq(name);
       if(fail) {
         failures++;
         error = new FElem(FAILURE);

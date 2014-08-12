@@ -5,10 +5,10 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
+import org.basex.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
-import org.basex.*;
 import org.basex.util.list.*;
 import org.junit.*;
 

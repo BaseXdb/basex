@@ -1,5 +1,6 @@
 package org.expath.ns;
 
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -8,7 +9,6 @@ import org.basex.build.*;
 import org.basex.build.xml.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -670,7 +670,7 @@ public final class Geo extends QueryModule {
    * @throws QueryException query exception
    */
   private static Geometry geo(final ANode node, final QNm... names) throws QueryException {
-    if(node.type != NodeType.ELM) throw Err.EXPTYPE_X_X_X.get(null, NodeType.ELM, node.type, node);
+    if(node.type != NodeType.ELM) throw EXPTYPE_X_X_X.get(null, NodeType.ELM, node.type, node);
 
     final QNm qname = node.qname();
     for(final QNm geo : names) {
@@ -708,7 +708,7 @@ public final class Geo extends QueryModule {
       final IO io = new IOContent(geo);
       return new DBNode(MemBuilder.build(new XMLParser(io, queryContext.context.options)));
     } catch(final IOException ex) {
-      throw Err.IOERR_X.get(null, ex);
+      throw IOERR_X.get(null, ex);
     }
   }
 }

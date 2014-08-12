@@ -1,6 +1,7 @@
 package org.basex.query.value.type;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
@@ -78,7 +79,7 @@ public class FuncType implements Type {
   public FItem cast(final Item item, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) throws QueryException {
 
-    if(!(item instanceof FItem)) throw Err.castError(ii, item, this);
+    if(!(item instanceof FItem)) throw castError(ii, item, this);
     final FItem f = (FItem) item;
     return this == ANY_FUN ? f : f.coerceTo(this, qc, ii, false);
   }

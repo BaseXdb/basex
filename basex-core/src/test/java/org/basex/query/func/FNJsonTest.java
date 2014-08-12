@@ -1,8 +1,8 @@
 package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
+import static org.basex.query.util.Err.*;
 
-import org.basex.query.util.*;
 import org.basex.query.*;
 import org.junit.*;
 
@@ -105,7 +105,7 @@ public final class FNJsonTest extends AdvancedQueryTest {
         "\\t\\u000A");
     query("string-to-codepoints(json:parse('\"\\t\\u000A\"'," +
         "  map {'format':'map','unescape':true(),'spec':'liberal'}))", "9 10");
-    error("json:parse('42', map {'spec':'garbage'})", Err.INVALIDOPT_X);
+    error("json:parse('42', map {'spec':'garbage'})", INVALIDOPT_X);
   }
 
   /**
@@ -174,6 +174,6 @@ public final class FNJsonTest extends AdvancedQueryTest {
   private static void error(final String input, final String options, final Function function) {
     final String query = options.isEmpty() ? function.args(input) :
       function.args(input, " map {" + options + '}');
-    error(query, Err.INVALIDOPT_X, Err.BXJS_PARSE_X_X_X, Err.BXJS_SERIAL_X);
+    error(query, INVALIDOPT_X, BXJS_PARSE_X_X_X, BXJS_SERIAL_X);
   }
 }

@@ -1,8 +1,8 @@
 package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
+import static org.basex.query.util.Err.*;
 
-import org.basex.query.util.*;
 import org.basex.query.*;
 import org.junit.*;
 
@@ -20,21 +20,21 @@ public final class FNFetchTest extends AdvancedQueryTest {
   @Test
   public void text() {
     query(_FETCH_TEXT.args(FILE));
-    error(_FETCH_TEXT.args(FILE + 'x'), Err.BXFE_IO_X);
-    error(_FETCH_TEXT.args(FILE, "xxx"), Err.BXFE_ENCODING_X);
+    error(_FETCH_TEXT.args(FILE + 'x'), BXFE_IO_X);
+    error(_FETCH_TEXT.args(FILE, "xxx"), BXFE_ENCODING_X);
   }
 
   /** Test method. */
   @Test
   public void binary() {
     query(_FETCH_BINARY.args(FILE));
-    error(_FETCH_BINARY.args(FILE + 'x'), Err.BXFE_IO_X);
+    error(_FETCH_BINARY.args(FILE + 'x'), BXFE_IO_X);
   }
 
   /** Test method. */
   @Test
   public void contentType() {
     query(_FETCH_CONTENT_TYPE.args(FILE));
-    error(_FETCH_CONTENT_TYPE.args(FILE + 'x'), Err.BXFE_IO_X);
+    error(_FETCH_CONTENT_TYPE.args(FILE + 'x'), BXFE_IO_X);
   }
 }

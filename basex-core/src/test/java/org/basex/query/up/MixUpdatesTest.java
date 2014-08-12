@@ -1,11 +1,11 @@
 package org.basex.query.up;
 
 import static org.basex.query.func.Function.*;
+import static org.basex.query.util.Err.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -37,8 +37,8 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
   /** Transform expression containing a simple expression. */
   @Test
   public void transSimple() {
-    error("<a/> update ('')", Err.BASEX_MOD);
-    error("copy $a := <a/> modify ('') return $a", Err.BASEX_MOD);
+    error("<a/> update ('')", BASEX_MOD);
+    error("copy $a := <a/> modify ('') return $a", BASEX_MOD);
   }
 
   /** Update test. */
@@ -69,11 +69,11 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
   /** Updating functions. */
   @Test
   public void updatingFunctions() {
-    error("db:output(?)", Err.SERFUNC_X);
-    error("db:output#1", Err.SERFUNC_X);
-    error("declare updating function local:a() { () }; local:a#0", Err.SERFUNC_X);
+    error("db:output(?)", SERFUNC_X);
+    error("db:output#1", SERFUNC_X);
+    error("declare updating function local:a() { () }; local:a#0", SERFUNC_X);
     error("declare function local:a() { local:b#0 };"
-        + "declare updating function local:b() { db:output('1') }; local:a()", Err.SERFUNC_X);
+        + "declare updating function local:b() { db:output('1') }; local:a()", SERFUNC_X);
     query("declare function local:not-used() { local:b#0 };"
         + "declare updating function local:b() { db:output('1') }; local:b()", "1");
 

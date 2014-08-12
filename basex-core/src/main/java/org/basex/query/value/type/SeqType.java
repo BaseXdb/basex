@@ -6,7 +6,6 @@ import static org.basex.query.util.Err.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
@@ -360,7 +359,7 @@ public final class SeqType {
       if(!error && info != null) info.check(true);
       final Value v = type.cast(it, qc, sc, info);
       if(kind != null) {
-        for(final Item i : v) if(!kind.eq(it)) throw Err.castError(info, i, type);
+        for(final Item i : v) if(!kind.eq(it)) throw castError(info, i, type);
       }
       return v;
     } catch(final QueryException ex) {
@@ -404,7 +403,7 @@ public final class SeqType {
     if(val.seqType().instanceOf(this)) return;
 
     final int size = (int) val.size();
-    if(!occ.check(size)) throw Err.treatError(ii, val, this);
+    if(!occ.check(size)) throw treatError(ii, val, this);
 
     // empty sequence has all types
     if(size == 0) return;
@@ -414,7 +413,7 @@ public final class SeqType {
     // check heterogeneous sequences
     if(!val.homogeneous())
       for(int i = 1; ins && i < size; i++) ins = instance(val.itemAt(i), true);
-    if(!ins) throw Err.treatError(ii, val, this);
+    if(!ins) throw treatError(ii, val, this);
   }
 
   /**
@@ -431,7 +430,7 @@ public final class SeqType {
       final Value value, final boolean opt) throws QueryException {
 
     final int n = (int) value.size();
-    if(!occ.check(n)) throw Err.treatError(ii, value, this);
+    if(!occ.check(n)) throw treatError(ii, value, this);
     if(n == 0) return Empty.SEQ;
 
     ValueBuilder vb = null;
@@ -472,7 +471,7 @@ public final class SeqType {
         } else if(tp == AtomType.ATM) {
           if(type.nsSensitive()) {
             if(sc.xquery3()) throw NSSENS_X_X.get(ii, item.type, type);
-            throw Err.treatError(ii, item, withOcc(Occ.ONE));
+            throw treatError(ii, item, withOcc(Occ.ONE));
           }
           vb.add(type.cast(atom, qc, sc, ii));
         } else if(type == AtomType.DBL && (tp == AtomType.FLT || tp.instanceOf(AtomType.DEC))) {
@@ -482,13 +481,13 @@ public final class SeqType {
         } else if(type == AtomType.STR && atom instanceof Uri) {
           vb.add(Str.get(atom.string(ii)));
         } else {
-          throw Err.treatError(ii, item, withOcc(Occ.ONE));
+          throw treatError(ii, item, withOcc(Occ.ONE));
         }
       }
     } else if(item instanceof FItem && type instanceof FuncType) {
       vb.add(((FItem) item).coerceTo((FuncType) type, qc, ii, opt));
     } else {
-      throw Err.treatError(ii, item, withOcc(Occ.ONE));
+      throw treatError(ii, item, withOcc(Occ.ONE));
     }
   }
 

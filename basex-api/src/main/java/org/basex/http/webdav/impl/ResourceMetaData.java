@@ -1,8 +1,8 @@
 package org.basex.http.webdav.impl;
 
-import java.util.Date;
+import static org.basex.http.webdav.impl.Utils.*;
 
-import static org.basex.http.webdav.impl.Utils.stripLeadingSlash;
+import java.util.*;
 
 /**
  * Resource meta data.

@@ -4,7 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
-import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -56,7 +56,7 @@ public final class Catch extends Single {
       expr = expr.compile(qc, scp);
       seqType = expr.seqType();
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, expr.seqType());
+      expr = FnError.get(qe, expr.seqType());
     }
     return this;
   }
@@ -99,7 +99,7 @@ public final class Catch extends Single {
       if(sub == null) return null;
       expr = sub;
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, seqType);
+      expr = FnError.get(qe, seqType);
     }
     return this;
   }

@@ -5,6 +5,8 @@ import static org.basex.core.Text.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import javax.swing.text.*;
+
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.gui.GUIConstants.Fill;
@@ -14,8 +16,6 @@ import org.basex.index.name.*;
 import org.basex.index.stats.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
-
-import javax.swing.text.JTextComponent;
 
 /**
  * This view provides standard GUI components to browse the currently opened database.

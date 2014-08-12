@@ -1,8 +1,8 @@
 package org.basex.util;
 
-import java.util.BitSet;
-
 import static java.lang.Long.*;
+
+import java.util.*;
 
 /**
  * Bit array that grows when needed. The implementation is similar to

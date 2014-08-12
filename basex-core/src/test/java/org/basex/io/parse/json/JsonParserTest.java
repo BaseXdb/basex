@@ -1,8 +1,7 @@
 package org.basex.io.parse.json;
 
-import static org.junit.Assert.*;
-
 import static org.basex.build.JsonOptions.JsonSpec.*;
+import static org.junit.Assert.*;
 
 import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.query.*;

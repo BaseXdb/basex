@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.gflwor.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -159,7 +160,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     try {
       expr = expr.compile(qc, scope);
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, ret != null ? ret : expr.seqType());
+      expr = FnError.get(qe, ret != null ? ret : expr.seqType());
     } finally {
       scope.cleanUp(this);
     }
@@ -185,7 +186,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         if (inlined != null) expr = inlined;
       }
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, ret != null ? ret : expr.seqType());
+      expr = FnError.get(qe, ret != null ? ret : expr.seqType());
     } finally {
       scope.cleanUp(this);
     }

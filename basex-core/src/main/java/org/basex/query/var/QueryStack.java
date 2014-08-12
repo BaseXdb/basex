@@ -1,9 +1,8 @@
 package org.basex.query.var;
 
 import org.basex.query.*;
-import org.basex.query.value.Value;
-import org.basex.util.InputInfo;
-import org.basex.util.Util;
+import org.basex.query.value.*;
+import org.basex.util.*;
 
 /**
  * The query stack, containing local variable bindings of all active scopes.

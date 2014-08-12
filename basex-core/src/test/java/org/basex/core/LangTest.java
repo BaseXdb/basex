@@ -4,8 +4,8 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 
-import org.basex.io.out.*;
 import org.basex.*;
+import org.basex.io.out.*;
 import org.junit.*;
 
 /**

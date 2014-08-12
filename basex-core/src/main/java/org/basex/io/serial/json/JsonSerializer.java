@@ -3,7 +3,7 @@ package org.basex.io.serial.json;
 import java.io.*;
 
 import org.basex.build.*;
-import org.basex.build.JsonOptions.*;
+import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.io.serial.*;
 
 /**

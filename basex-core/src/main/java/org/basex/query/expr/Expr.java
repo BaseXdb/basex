@@ -5,6 +5,7 @@ import java.util.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.gflwor.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
@@ -292,7 +293,8 @@ public abstract class Expr extends ExprInfo {
   public abstract Expr copy(QueryContext qc, VarScope scp, IntObjMap<Var> vs);
 
   /**
-   * <p>This method is overwritten by {@link CmpG}, {@link CmpV} and {@link FNSimple}.
+   * <p>This method is overwritten by {@link CmpG}, {@link CmpV}, {@link FnBoolean} and
+   * {@link FnExists}.
    * It is called at compile time by expressions that perform
    * effective boolean value tests (e.g. {@link If} or {@link Preds}).
    * If the arguments of the called expression return a boolean anyway,

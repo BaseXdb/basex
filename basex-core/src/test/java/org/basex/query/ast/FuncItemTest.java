@@ -1,7 +1,8 @@
 package org.basex.query.ast;
 
+import static org.basex.query.util.Err.*;
+
 import org.basex.query.func.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -207,8 +208,7 @@ public final class FuncItemTest extends QueryPlanTest {
   @Test
   public void funcItemCoercion() {
     error("let $f := function($g as function() as item()) { $g() }" +
-        "return $f(function() { 1, 2 })",
-        Err.INVTREAT_X_X_X);
+        "return $f(function() { 1, 2 })", INVTREAT_X_X_X);
   }
 
   /** Tests if all functions are compiled when reflection takes places. */
@@ -255,12 +255,7 @@ public final class FuncItemTest extends QueryPlanTest {
   /** Tests if {@code fn:error()} is allowed with impossible types. */
   @Test
   public void gh958() {
-    error("declare function local:f() as item()+ { error() }; local:f()",
-        Err.FUNERR1
-    );
-
-    error("function() as item()+ { error() }()",
-        Err.FUNERR1
-    );
+    error("declare function local:f() as item()+ { error() }; local:f()", FUNERR1);
+    error("function() as item()+ { error() }()", FUNERR1);
   }
 }

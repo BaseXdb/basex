@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.*;
-import org.basex.build.CsvOptions.*;
+import org.basex.build.CsvOptions.CsvFormat;
 import org.basex.io.serial.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;

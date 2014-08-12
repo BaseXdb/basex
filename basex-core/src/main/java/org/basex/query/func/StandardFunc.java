@@ -36,9 +36,9 @@ import org.basex.util.options.*;
  */
 public abstract class StandardFunc extends Arr {
   /** Function signature. */
-  Function func;
+  public Function func;
   /** Static context. */
-  StaticContext sc;
+  protected StaticContext sc;
 
   /**
    * Constructor.
@@ -46,6 +46,7 @@ public abstract class StandardFunc extends Arr {
   protected StandardFunc() {
     super(null);
   }
+
   /**
    * Constructor.
    * @param ii input info
@@ -54,7 +55,7 @@ public abstract class StandardFunc extends Arr {
    * @param args function arguments
    * @return self reference
    */
-  protected StandardFunc init(final StaticContext sctx, final InputInfo ii, final Function f,
+  public StandardFunc init(final StaticContext sctx, final InputInfo ii, final Function f,
       final Expr[] args) {
     sc = sctx;
     func = f;
@@ -86,7 +87,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
     return this;
   }
 
@@ -107,7 +108,7 @@ public abstract class StandardFunc extends Arr {
    * @return result
    * @throws QueryException query exception
    */
-  byte[] serialize(final Iter ir, final SerializerOptions opts, final Err err)
+  protected byte[] serialize(final Iter ir, final SerializerOptions opts, final Err err)
       throws QueryException {
 
     final ArrayOutput ao = new ArrayOutput();

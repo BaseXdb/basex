@@ -109,9 +109,9 @@ abstract class Set extends Arr {
      * @throws QueryException query exception
      */
     boolean next(final int i) throws QueryException {
-      final ANode it = toNode(iter[i].next());
-      item[i] = it;
-      return it != null;
+      final ANode n = toEmptyNode(iter[i].next());
+      item[i] = n;
+      return n != null;
     }
   }
 }

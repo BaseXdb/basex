@@ -2,7 +2,7 @@
 /* JavaCCOptions:TOKEN_EXTENDS=,KEEP_LINE_COL=null,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 package org.basex.query.regex.parse;
 
-import java.io.Serializable;
+import java.io.*;
 
 /**
  * Describes the input token stream.

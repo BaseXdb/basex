@@ -3,7 +3,7 @@ package org.basex.io.parse.csv;
 import static org.basex.util.Token.*;
 
 import org.basex.build.*;
-import org.basex.build.CsvOptions.*;
+import org.basex.build.CsvOptions.CsvFormat;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;

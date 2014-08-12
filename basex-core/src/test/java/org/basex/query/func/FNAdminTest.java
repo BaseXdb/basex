@@ -1,12 +1,12 @@
 package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -72,6 +72,6 @@ public final class FNAdminTest extends AdvancedQueryTest {
   public void logs() {
     // no logging data exists in the sandbox
     query(_ADMIN_LOGS.args(), "");
-    error(_ADMIN_LOGS.args("2001-01-01"), Err.WHICHRES_X);
+    error(_ADMIN_LOGS.args("2001-01-01"), WHICHRES_X);
   }
 }
