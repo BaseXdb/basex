@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.fn.Num;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -114,7 +113,7 @@ public final class DecFormatter extends FormatUtil {
    * @return string representation
    * @throws QueryException query exception
    */
-  public byte[] format(final InputInfo info, final Item number, final byte[] picture)
+  public byte[] format(final InputInfo info, final ANum number, final byte[] picture)
       throws QueryException {
 
     // find pattern separator and sub-patterns
@@ -273,7 +272,7 @@ public final class DecFormatter extends FormatUtil {
    * @return picture variables
    * @throws QueryException query exception
    */
-  private byte[] format(final Item it, final Picture[] pics, final InputInfo ii)
+  private byte[] format(final ANum it, final Picture[] pics, final InputInfo ii)
       throws QueryException {
 
     // return results for NaN
@@ -291,10 +290,10 @@ public final class DecFormatter extends FormatUtil {
       intgr.add(inf);
     } else {
       // convert and round number
-      Item num = it;
-      if(pic.pc) num = Calc.MULT.ev(ii, num, Int.get(100));
-      if(pic.pm) num = Calc.MULT.ev(ii, num, Int.get(1000));
-      num = Num.round(num, num.dbl(ii), pic.maxFrac, true, ii).abs();
+      ANum num = it;
+      if(pic.pc) num = (ANum) Calc.MULT.ev(ii, num, Int.get(100));
+      if(pic.pm) num = (ANum) Calc.MULT.ev(ii, num, Int.get(1000));
+      num = num.round(pic.maxFrac, true).abs();
 
       // convert positive number to string, chop leading zero
       final String s = (num instanceof Dbl || num instanceof Flt ?

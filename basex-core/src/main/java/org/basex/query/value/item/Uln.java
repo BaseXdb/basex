@@ -18,16 +18,16 @@ import org.basex.util.*;
  */
 public final class Uln extends ANum {
   /** Maximum unsigned long values. */
-  public static final BigDecimal MAX = new BigDecimal(Long.MAX_VALUE).multiply(
+  public static final BigDecimal MAXULN = BigDecimal.valueOf(Long.MAX_VALUE).multiply(
       BigDecimal.valueOf(2)).add(BigDecimal.ONE);
   /** Decimal value. */
-  private final BigDecimal value;
+  private final BigInteger value;
 
   /**
    * Constructor.
    * @param value decimal value
    */
-  private Uln(final BigDecimal value) {
+  private Uln(final BigInteger value) {
     super(AtomType.ULN);
     this.value = value;
   }
@@ -37,13 +37,13 @@ public final class Uln extends ANum {
    * @param value big decimal value
    * @return value
    */
-  public static Uln get(final BigDecimal value) {
+  public static Uln get(final BigInteger value) {
     return new Uln(value);
   }
 
   @Override
   public byte[] string() {
-    return token(value.toPlainString());
+    return token(value.toString());
   }
 
   @Override
@@ -68,7 +68,7 @@ public final class Uln extends ANum {
 
   @Override
   public BigDecimal dec(final InputInfo ii) {
-    return value;
+    return new BigDecimal(value);
   }
 
   @Override
@@ -88,16 +88,23 @@ public final class Uln extends ANum {
   }
 
   @Override
+  public ANum round(final int scale, final boolean even) {
+    return scale >= 0 ? this :
+      Int.get(Dec.get(new BigDecimal(value)).round(scale, even).dec(null).longValue());
+  }
+
+  @Override
   public boolean eq(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
-    return it.type == AtomType.DBL || it.type == AtomType.FLT ?
-        it.eq(this, coll, ii) : value.compareTo(it.dec(ii)) == 0;
+    return it.type == AtomType.ULN ? value.equals(((Uln) it).value) :
+           it.type == AtomType.DBL || it.type == AtomType.FLT ? it.eq(this, coll, ii) :
+             value.compareTo(BigInteger.valueOf(it.itr(ii))) == 0;
   }
 
   @Override
   public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
-    final double d = it.dbl(ii);
-    return d == Double.NEGATIVE_INFINITY ? -1 : d == Double.POSITIVE_INFINITY ? 1 :
-      Double.isNaN(d) ? UNDEF : value.compareTo(it.dec(ii));
+    if(it.type == AtomType.ULN) return value.compareTo(((Uln) it).value);
+    if(it.type == AtomType.DBL || it.type == AtomType.FLT) return -it.diff(this, coll, ii);
+    return value.compareTo(BigInteger.valueOf(it.itr(ii)));
   }
 
   @Override

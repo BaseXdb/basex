@@ -116,6 +116,33 @@ public final class Int extends ANum {
   }
 
   @Override
+  public ANum round(final int scale, final boolean even) {
+    if(scale >= 0 || value == 0 && !even) return this;
+    if(scale < -15) return Uln.get(BigInteger.valueOf(value)).round(scale, even);
+
+    long f = 1;
+    for(long i = 1; i <= -scale; i++) f *= 10;
+    final long a = Math.abs(value), m = a % f, d = m << 1;
+    long v = a - m;
+    if(even) {
+      if(d > f) {
+        v += f;
+      } else if(d == f) {
+        if(v % (2 * f) != 0) v += f;
+      }
+      if(value < 0) v = -v;
+    } else {
+      if(value > 0) {
+        if(d >= f) v += f;
+      } else {
+        if(d > f) v += f;
+        v = -v;
+      }
+    }
+    return v == value ? this : Int.get(v);
+  }
+
+  @Override
   public boolean eq(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
     return it instanceof Int ? value == ((Int) it).value : value == it.dbl(ii);

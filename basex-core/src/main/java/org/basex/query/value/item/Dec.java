@@ -96,6 +96,13 @@ public final class Dec extends ANum {
   }
 
   @Override
+  public Dec round(final int scale, final boolean even) {
+    final int s = value.signum();
+    return s == 0 ? this : Dec.get(value.setScale(scale, even ? BigDecimal.ROUND_HALF_EVEN :
+           s == 1 ? BigDecimal.ROUND_HALF_UP : BigDecimal.ROUND_HALF_DOWN).stripTrailingZeros());
+  }
+
+  @Override
   public boolean eq(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     return it.type == AtomType.DBL || it.type == AtomType.FLT ?
         it.eq(this, coll, ii) : value.compareTo(it.dec(ii)) == 0;

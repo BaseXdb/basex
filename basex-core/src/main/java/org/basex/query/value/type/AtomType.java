@@ -382,11 +382,10 @@ public enum AtomType implements Type {
     public Uln cast(final Object value, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       final Item it = value instanceof Item ? (Item) value : Str.get(value.toString());
-      final BigDecimal v = checkNum(it, ii).dec(ii);
-      final BigDecimal i = v.setScale(0, BigDecimal.ROUND_DOWN);
-      if(v.signum() < 0 || v.compareTo(Uln.MAX) > 0 ||
+      final BigDecimal v = checkNum(it, ii).dec(ii), i = v.setScale(0, BigDecimal.ROUND_DOWN);
+      if(v.signum() < 0 || v.compareTo(Uln.MAXULN) > 0 ||
         it.type.isStringOrUntyped() && !v.equals(i)) throw funCastError(ii, this, it);
-      return Uln.get(i);
+      return Uln.get(i.toBigInteger());
     }
   },
 

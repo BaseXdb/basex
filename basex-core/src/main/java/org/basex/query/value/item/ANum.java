@@ -79,11 +79,20 @@ public abstract class ANum extends Item {
    * @return ceiling value
    */
   public abstract ANum ceiling();
+
   /**
    * Returns an floor value.
    * @return floor value
    */
   public abstract ANum floor();
+
+  /**
+   * Returns a rounded value.
+   * @param scale scale
+   * @param even half-to-even
+   * @return floor value
+   */
+  public abstract ANum round(final int scale, final boolean even);
 
   @Override
   public Item test(final QueryContext qc, final InputInfo ii) throws QueryException {

@@ -106,6 +106,32 @@ public final class Dbl extends ANum {
   }
 
   @Override
+  public Dbl round(final int scale, final boolean even) {
+    double v = value;
+    if(Double.isNaN(v) || Double.isInfinite(v) || value == 0.0) return this;
+    if(!even) {
+      if(v == -0.0) return this;
+      if(scale == 0) {
+        if(v >= -0.5 && v < 0.0) return Dbl.get(-0.0);
+        if(v > Long.MIN_VALUE && v < Long.MAX_VALUE) return Dbl.get(Math.round(v));
+      }
+    }
+
+    final double f = Math.pow(10, scale + 1);
+    v = Math.abs(v * f);
+    if(Double.isInfinite(v)) {
+      final int m = even ? BigDecimal.ROUND_HALF_EVEN : BigDecimal.ROUND_HALF_UP;
+      v = new BigDecimal(value).setScale(scale, m).doubleValue();
+    } else {
+      final double r = v % 10;
+      v += r < 5 ? -r : (even ? r > 5 : r >= 5) ? (10 - r) : even ? (v % 20 == 15 ? 5 : -5) : 0;
+      v /= f;
+      if(value < 0) v = -v;
+    }
+    return v == value ? this : Dbl.get(v);
+  }
+
+  @Override
   public boolean eq(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     return value == it.dbl(ii);
   }
@@ -113,8 +139,7 @@ public final class Dbl extends ANum {
   @Override
   public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     final double n = it.dbl(ii);
-    if(Double.isNaN(n) || Double.isNaN(value)) return UNDEF;
-    return value < n ? -1 : value > n ? 1 : 0;
+    return Double.isNaN(n) || Double.isNaN(value) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;
   }
 
   @Override

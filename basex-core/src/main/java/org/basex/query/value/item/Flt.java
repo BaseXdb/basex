@@ -94,6 +94,12 @@ public final class Flt extends ANum {
   }
 
   @Override
+  public Flt round(final int scale, final boolean even) {
+    final float v = Dbl.get(value).round(scale, even).flt();
+    return value == v ? this : Flt.get(v);
+  }
+
+  @Override
   public boolean eq(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     return it.type == AtomType.DBL ? it.eq(this, coll, ii) : value == it.flt(ii);
   }
@@ -101,8 +107,7 @@ public final class Flt extends ANum {
   @Override
   public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     final float n = it.flt(ii);
-    if(Float.isNaN(n) || Float.isNaN(value)) return UNDEF;
-    return value < n ? -1 : value > n ? 1 : 0;
+    return Float.isNaN(n) || Float.isNaN(value) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;
   }
 
   @Override
@@ -116,10 +121,10 @@ public final class Flt extends ANum {
   }
 
   /**
-   * Converts the given token into a double value.
+   * Converts the given token into a float value.
    * @param value value to be converted
    * @param ii input info
-   * @return double value
+   * @return float value
    * @throws QueryException query exception
    */
   static float parse(final byte[] value, final InputInfo ii) throws QueryException {
