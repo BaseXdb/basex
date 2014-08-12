@@ -32,13 +32,13 @@ public abstract class Option<O> {
    * Returns the default value.
    * @return default value
    */
-  public abstract Object value();
+  public abstract O value();
 
   /**
    * Copies mutable default values. Otherwise, returns the existing instance.
    * @return default value
    */
-  public Object copy() {
+  public O copy() {
     return value();
   }
 
