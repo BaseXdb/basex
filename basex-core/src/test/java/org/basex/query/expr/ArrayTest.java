@@ -96,6 +96,7 @@ public final class ArrayTest extends AdvancedQueryTest {
   /** General comparison. */
   @Test public void generalComparison() {
     query("[] = ()", "false");
+    query("() = []", "false");
     query("[] != 1", "false");
     query("2 = []", "false");
     query("[[[]]] = 2", "false");
@@ -209,6 +210,15 @@ public final class ArrayTest extends AdvancedQueryTest {
     error("string([1])", FISTRING_X);
     query("number([1])", "1");
     query("concat('a',['b'],[])", "ab");
+  }
+
+  /** Type checks. */
+  @Test public void typing() {
+    query("count(data(['a', 'b']))", "2");
+    query("count(data(['a', <a>b</a>]))", "2");
+    query("count(distinct-values(['a', 'a']))", "1");
+    query("count(distinct-values(['a', <a>a</a>]))", "1");
+    query("count(distinct-values(['a', <a>b</a>]))", "2");
   }
 
   /**

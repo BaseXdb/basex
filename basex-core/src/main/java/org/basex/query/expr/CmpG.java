@@ -13,7 +13,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -173,7 +172,7 @@ public final class CmpG extends Cmp {
         e = Pos.get(op.op, e2, e, info);
       }
       if(e != this) qc.compInfo(OPTWRITE, this);
-    } else if(e1.seqType().eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE ||
+    } else if(st1.eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE ||
         op == OpG.NE && e2 == Bln.TRUE)) {
       // (A = false()) -> not(A)
       e = Function.NOT.get(null, info, e1);
@@ -193,8 +192,7 @@ public final class CmpG extends Cmp {
   public Expr compEbv(final QueryContext qc) {
     // e.g.: exists(...) = true() -> exists(...)
     // checking one direction is sufficient, as operators may have been swapped
-    return (op == OpG.EQ && exprs[1] == Bln.TRUE ||
-            op == OpG.NE && exprs[1] == Bln.FALSE) &&
+    return (op == OpG.EQ && exprs[1] == Bln.TRUE || op == OpG.NE && exprs[1] == Bln.FALSE) &&
       exprs[0].seqType().eq(SeqType.BLN) ? exprs[0] : this;
   }
 
@@ -206,59 +204,55 @@ public final class CmpG extends Cmp {
       if(it1 == null) return Bln.FALSE;
       final Item it2 = exprs[1].item(qc, info);
       if(it2 == null) return Bln.FALSE;
-      return Bln.get(eval(it1, it2, coll));
+      return Bln.get(eval(it1, it2));
     }
 
-    final Iter ir1 = qc.iter(exprs[0]);
+    // retrieve iterators
+    final Iter ir1 = exprs[0].atomIter(qc, info);
     final long is1 = ir1.size();
-
-    // skip empty result
     if(is1 == 0) return Bln.FALSE;
-    final boolean s1 = is1 == 1;
-
-    // evaluate single items
-    if(s1 && exprs[1].size() == 1)
-      return Bln.get(eval(ir1.next(), exprs[1].item(qc, info), coll));
-
-    Iter ir2 = qc.iter(exprs[1]);
+    Iter ir2 = exprs[1].atomIter(qc, info);
     final long is2 = ir2.size();
-
-    // skip empty result
     if(is2 == 0) return Bln.FALSE;
-    final boolean s2 = is2 == 1;
 
     // evaluate single items
-    if(s1 && s2) return Bln.get(eval(ir1.next(), ir2.next(), coll));
+    final boolean s1 = is1 == 1, s2 = is2 == 1;
+    if(s1 && s2) return Bln.get(eval(ir1.next(), ir2.next()));
 
-    // evaluate iterator and single item
-    Item it1, it2;
-    if(s2) {
-      it2 = ir2.next();
-      while((it1 = ir1.next()) != null) {
-        if(eval(it1, it2, coll)) return Bln.TRUE;
-      }
+    if(s1) {
+      // first iterator yields single result
+      final Item it1 = ir1.next();
+      for(Item it2; (it2 = ir2.next()) != null;) if(eval(it1, it2)) return Bln.TRUE;
       return Bln.FALSE;
     }
 
-    // evaluate two iterators
+    if(s2) {
+      // second iterator yields single result
+      final Item it2 = ir2.next();
+      for(Item it1; (it1 = ir1.next()) != null;) if(eval(it1, it2)) return Bln.TRUE;
+      return Bln.FALSE;
+    }
+
+    // evaluate two iterators, cache results of second iterator
     if(!ir2.reset()) {
       // cache items for next comparisons
-      final ValueBuilder vb = new ValueBuilder();
-      it1 = ir1.next();
+      final ValueBuilder vb = new ValueBuilder(Math.max(1, (int) is2));
+      final Item it1 = ir1.next();
       if(it1 == null) return Bln.FALSE;
-      while((it2 = ir2.next()) != null) {
-        if(eval(it1, it2, coll)) return Bln.TRUE;
+      for(Item it2; (it2 = ir2.next()) != null;) {
+        if(eval(it1, it2)) return Bln.TRUE;
         vb.add(it2);
       }
       ir2 = vb;
     }
 
-    while((it1 = ir1.next()) != null) {
+    // reset second iterator and keep on looping
+    for(Item it1; (it1 = ir1.next()) != null;) {
       ir2.reset();
-      while((it2 = ir2.next()) != null) {
-        if(eval(it1, it2, coll)) return Bln.TRUE;
-      }
+      for(Item it2; (it2 = ir2.next()) != null;) if(eval(it1, it2)) return Bln.TRUE;
     }
+
+    // give up
     return Bln.FALSE;
   }
 
@@ -266,25 +260,15 @@ public final class CmpG extends Cmp {
    * Compares a single item.
    * @param it1 first item to be compared
    * @param it2 second item to be compared
-   * @param cl collation
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean eval(final Item it1, final Item it2, final Collation cl) throws QueryException {
-    if(it1 instanceof Array || it2 instanceof Array) {
-      for(final Item i1 : it1.atomValue(info)) {
-        for(final Item i2 : it2.atomValue(info)) {
-          if(op.op.eval(i1, i2, cl, info)) return true;
-        }
-      }
-      return false;
-    }
-
+  private boolean eval(final Item it1, final Item it2) throws QueryException {
     final Type t1 = it1.type, t2 = it2.type;
     if(!(it1 instanceof FItem || it2 instanceof FItem) &&
         (t1 == t2 || t1.isUntyped() || t2.isUntyped() ||
         it1 instanceof ANum && it2 instanceof ANum ||
-        it1 instanceof AStr && it2 instanceof AStr)) return op.op.eval(it1, it2, cl, info);
+        it1 instanceof AStr && it2 instanceof AStr)) return op.op.eval(it1, it2, coll, info);
     throw diffError(info, it1, it2);
   }
 

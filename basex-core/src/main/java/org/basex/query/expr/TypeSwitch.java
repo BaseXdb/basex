@@ -50,13 +50,17 @@ public final class TypeSwitch extends ParseExpr {
     if(ts.isValue()) {
       final Value val = ts.value(qc);
       for(final TypeCase tc : cases) {
-        if(tc.matches(val))
-          return optPre(tc.compile(qc, scp, (Value) ts).expr, qc);
+        if(tc.matches(val)) return optPre(tc.compile(qc, scp, (Value) ts).expr, qc);
       }
     }
     // compile branches
     for(final TypeCase tc : cases) tc.compile(qc, scp);
 
+    return optimize(qc, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // return first branch if all branches are equal (e.g., empty) and use no variables
     final TypeCase tc = cases[0];
     boolean eq = tc.var == null;

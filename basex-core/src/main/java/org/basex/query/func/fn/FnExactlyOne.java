@@ -8,7 +8,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 
@@ -31,7 +30,8 @@ public final class FnExactlyOne extends StandardFunc {
   protected Expr opt(final QueryContext qc, final VarScope scp) {
     final Expr e = exprs[0];
     final SeqType st = e.seqType();
-    seqType = SeqType.get(st.type, Occ.ONE);
-    return st.one() ? e : this;
+    if(st.one()) return e;
+    seqType = SeqType.get(st.type, seqType.occ);
+    return this;
   }
 }

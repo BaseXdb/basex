@@ -41,11 +41,16 @@ public final class Extension extends Single {
     try {
       for(final Pragma p : pragmas) p.init(qc, info);
       expr = expr.compile(qc, scp);
-      seqType = expr.seqType();
-      size = expr.size();
     } finally {
       for(final Pragma p : pragmas) p.finish(qc);
     }
+    return optimize(qc, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    seqType = expr.seqType();
+    size = expr.size();
     return this;
   }
 

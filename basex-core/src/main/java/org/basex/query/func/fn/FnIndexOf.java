@@ -23,7 +23,7 @@ public final class FnIndexOf extends StandardFunc {
     return new Iter() {
       final Item srch = checkNoEmpty(exprs[1].atomItem(qc, info));
       final Collation coll = toCollation(2, qc);
-      final AtomIter ir = exprs[0].atomIter(qc, info);
+      final Iter ir = exprs[0].atomIter(qc, info);
       int c;
 
       @Override
@@ -40,7 +40,7 @@ public final class FnIndexOf extends StandardFunc {
 
   @Override
   protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
-    if(exprs[0].seqType().one()) seqType = SeqType.get(seqType().type, Occ.ZERO_ONE);
+    if(exprs[0].seqType().zeroOrOne()) seqType = SeqType.get(seqType().type, Occ.ZERO_ONE);
     return this;
   }
 }

@@ -9,7 +9,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 
 /**
@@ -51,7 +50,8 @@ public final class FnOneOrMore extends StandardFunc {
   protected Expr opt(final QueryContext qc, final VarScope scp) {
     final Expr e = exprs[0];
     final SeqType st = e.seqType();
-    seqType = SeqType.get(st.type, Occ.ONE_MORE);
-    return st.mayBeZero() ? this : e;
+    if(!st.mayBeZero()) return e;
+    seqType = SeqType.get(st.type, seqType.occ);
+    return this;
   }
 }

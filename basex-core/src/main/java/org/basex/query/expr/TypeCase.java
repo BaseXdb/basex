@@ -65,6 +65,11 @@ public final class TypeCase extends Single {
       // replace original expression with error
       expr = FnError.get(ex, expr.seqType());
     }
+    return optimize(qc, scp);
+  }
+
+  @Override
+  public TypeCase optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     seqType = expr.seqType();
     return this;
   }

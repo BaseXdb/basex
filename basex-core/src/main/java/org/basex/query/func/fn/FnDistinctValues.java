@@ -36,7 +36,7 @@ public final class FnDistinctValues extends StandardFunc {
       @Override
       public Item next() throws QueryException {
         while(true) {
-          Item it = ir.next();
+          final Item it = ir.next();
           if(it == null) return null;
           if(set.add(it, info)) return it;
         }
@@ -61,12 +61,12 @@ public final class FnDistinctValues extends StandardFunc {
   @Override
   protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
     final SeqType st = exprs[0].seqType();
-    final Type t = st.type;
-    if(func == Function.DISTINCT_VALUES && exprs.length == 1) {
-      seqType = t instanceof NodeType ? SeqType.get(AtomType.ATM, st.occ) : st;
-      return cmpDist(qc);
+    if(st.type instanceof NodeType) {
+      seqType = SeqType.get(AtomType.ATM, st.occ);
+    } else if(!st.mayBeArray()) {
+      seqType = st;
     }
-    return this;
+    return exprs.length == 1 ? cmpDist(qc) : this;
   }
 
   /**
@@ -78,6 +78,7 @@ public final class FnDistinctValues extends StandardFunc {
   private Expr cmpDist(final QueryContext qc) throws QueryException {
     // can only be performed on axis paths
     if(!(exprs[0] instanceof AxisPath)) return this;
+
     // try to get statistics for resulting nodes
     final ArrayList<PathNode> nodes = ((AxisPath) exprs[0]).pathNodes(qc);
     if(nodes == null) return this;

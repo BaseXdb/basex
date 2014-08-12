@@ -178,7 +178,9 @@ public final class CmpV extends Cmp {
     }
 
     final Expr e1 = exprs[0], e2 = exprs[1];
-    seqType = SeqType.get(AtomType.BLN, e1.size() == 1 && e2.size() == 1 ? Occ.ONE : Occ.ZERO_ONE);
+    final SeqType st1 = e1.seqType(), st2 = e2.seqType();
+    seqType = SeqType.get(AtomType.BLN, st1.one() && !st1.mayBeArray() &&
+        st2.one() && !st2.mayBeArray() ? Occ.ONE : Occ.ZERO_ONE);
 
     Expr e = this;
     if(oneIsEmpty()) {
@@ -192,7 +194,7 @@ public final class CmpV extends Cmp {
       // position() CMP number
       e = Pos.get(op, e2, e, info);
       if(e != this) qc.compInfo(OPTWRITE, this);
-    } else if(e1.seqType().eq(SeqType.BLN) && (op == OpV.EQ && e2 == Bln.FALSE ||
+    } else if(st1.eq(SeqType.BLN) && (op == OpV.EQ && e2 == Bln.FALSE ||
         op == OpV.NE && e2 == Bln.TRUE)) {
       // (A eq false()) -> not(A)
       e = Function.NOT.get(null, info, e1);
@@ -210,9 +212,9 @@ public final class CmpV extends Cmp {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    Item it1 = exprs[0].atomItem(qc, ii);
+    final Item it1 = exprs[0].atomItem(qc, ii);
     if(it1 == null) return null;
-    Item it2 = exprs[1].atomItem(qc, ii);
+    final Item it2 = exprs[1].atomItem(qc, ii);
     if(it2 == null) return null;
     if(it1.comparable(it2)) return Bln.get(op.eval(it1, it2, coll, info));
 

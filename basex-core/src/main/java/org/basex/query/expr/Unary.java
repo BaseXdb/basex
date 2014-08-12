@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -40,12 +41,13 @@ public final class Unary extends Single {
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    seqType = expr.seqType();
-    if(!seqType.type.isNumber()) {
-      // expression will always yield a number, empty sequence or error
-      seqType = seqType.mayBeZero() ? SeqType.ITR_ZO : SeqType.ITR;
-    }
-    return expr.isValue() ? preEval(qc) : this;
+    if(expr.isValue()) return preEval(qc);
+
+    final SeqType st = expr.seqType();
+    final Type t = st.type;
+    seqType = SeqType.get(t.isUntyped() ? AtomType.DBL : t.isNumber() ? t : AtomType.ITR,
+      st.one() && !st.mayBeArray() ? Occ.ONE : Occ.ZERO_ONE);
+    return this;
   }
 
   @Override

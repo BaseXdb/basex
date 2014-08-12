@@ -29,6 +29,11 @@ public final class Context extends Simple {
 
   @Override
   public Context compile(final QueryContext qc, final VarScope scp) {
+    return optimize(qc, scp);
+  }
+
+  @Override
+  public Context optimize(final QueryContext qc, final VarScope scp) {
     if(qc.value != null) seqType = qc.value.seqType();
     return this;
   }

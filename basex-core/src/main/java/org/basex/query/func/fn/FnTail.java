@@ -47,7 +47,7 @@ public final class FnTail extends StandardFunc {
   @Override
   protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
     final SeqType st = exprs[0].seqType();
-    if(st.zeroOrOne()) seqType = SeqType.get(st.type, Occ.ZERO);
+    seqType = st.zeroOrOne() ? SeqType.EMP : SeqType.get(st.type, Occ.ZERO_MORE);
     return this;
   }
 }

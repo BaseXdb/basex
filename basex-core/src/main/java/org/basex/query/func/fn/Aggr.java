@@ -42,5 +42,4 @@ abstract class Aggr extends StandardFunc {
     }
     return avg ? Calc.DIV.ev(info, rs, Int.get(c)) : rs;
   }
-
 }

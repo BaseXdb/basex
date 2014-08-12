@@ -174,8 +174,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     final SeqType r = expr.seqType();
-    final SeqType retType = updating ? SeqType.EMP : ret == null || r.instanceOf(ret) ? r : ret;
-    seqType = FuncType.get(ann, args, retType).seqType();
+    final SeqType rt = updating ? SeqType.EMP : ret == null || r.instanceOf(ret) ? r : ret;
+    seqType = FuncType.get(ann, args, rt).seqType();
     size = 1;
 
     try {

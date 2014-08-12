@@ -32,21 +32,20 @@ public final class FnSum extends Aggr {
     }
 
     final Iter iter = exprs[0].atomIter(qc, ii);
-    Item it = iter.next();
+    final Item it = iter.next();
     return it != null ? sum(iter, it, false) :
       exprs.length == 2 ? exprs[1].atomItem(qc, ii) : Int.get(0);
   }
 
   @Override
   protected Expr opt(final QueryContext qc, final VarScope scp) {
-    // skip non-deterministic and variable expressions
-    final Expr e = exprs[0];
-    if(e.has(Flag.NDT) || e.has(Flag.UPD) || e instanceof VarRef) return this;
+    final Expr e1 = exprs[0], e2 = exprs.length == 2 ? exprs[1] : null;
+    final Type st1 = e1.seqType().type, st2 = e2 != null ? e2.seqType().type : st1;
+    if(st1.isNumberOrUntyped() && st2.isNumberOrUntyped()) seqType = Calc.type(st1, st2).seqType();
 
-    final long c = e.size();
-    if(c == 0) return exprs.length == 2 ? exprs[1] : Int.get(0);
-    final Type a = e.seqType().type, b = exprs.length == 2 ? exprs[1].seqType().type : a;
-    if(a.isNumberOrUntyped() && b.isNumberOrUntyped()) seqType = Calc.type(a, b).seqType();
-    return this;
+    // 0 results: skip non-deterministic and variable expressions
+    final long c = e1.size();
+    return c != 0 || e1.has(Flag.NDT) || e1.has(Flag.UPD) || e1 instanceof VarRef ? this :
+      e2 != null ? e2 : Int.get(0);
   }
 }

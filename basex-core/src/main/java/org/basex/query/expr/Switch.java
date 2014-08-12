@@ -50,7 +50,11 @@ public final class Switch extends ParseExpr {
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     cond = cond.compile(qc, scp);
     for(final SwitchCase sc : cases) sc.compile(qc, scp);
+    return optimize(qc, scp);
+  }
 
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // check if expression can be pre-evaluated
     Expr ex = this;
     if(cond.isValue()) {
@@ -75,9 +79,7 @@ public final class Switch extends ParseExpr {
 
     // expression could not be pre-evaluated
     seqType = cases[0].exprs[0].seqType();
-    for(int c = 1; c < cases.length; c++) {
-      seqType = seqType.union(cases[c].exprs[0].seqType());
-    }
+    for(int c = 1; c < cases.length; c++) seqType = seqType.union(cases[c].exprs[0].seqType());
     return ex;
   }
 

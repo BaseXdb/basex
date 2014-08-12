@@ -28,21 +28,12 @@ public final class ItemSeq extends Seq {
    * Constructor.
    * @param items items
    * @param size size
+   * @param ret sequence type
    */
-  private ItemSeq(final Item[] items, final int size) {
+  ItemSeq(final Item[] items, final int size, final Type ret) {
     super(size);
     this.items = items;
-  }
-
-  /**
-   * Constructor.
-   * @param it items
-   * @param s size
-   * @param t sequence type
-   */
-  ItemSeq(final Item[] it, final int s, final Type t) {
-    this(it, s);
-    ret = t;
+    this.ret = ret;
   }
 
   @Override

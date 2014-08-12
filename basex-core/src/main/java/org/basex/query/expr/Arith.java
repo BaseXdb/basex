@@ -58,9 +58,9 @@ public final class Arith extends Arr {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    Item it1 = exprs[0].atomItem(qc, ii);
+    final Item it1 = exprs[0].atomItem(qc, ii);
     if(it1 == null) return null;
-    Item it2 = exprs[1].atomItem(qc, ii);
+    final Item it2 = exprs[1].atomItem(qc, ii);
     if(it2 == null) return null;
     return calc.ev(info, it1, it2);
   }

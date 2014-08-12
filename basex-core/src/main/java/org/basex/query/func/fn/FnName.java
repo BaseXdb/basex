@@ -18,7 +18,7 @@ public final class FnName extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toEmptyNode(arg(0, qc), qc);
-    QNm qname = node != null ? node.qname() : null;
+    final QNm qname = node != null ? node.qname() : null;
     return qname != null ? Str.get(qname.string()) : Str.ZERO;
   }
 

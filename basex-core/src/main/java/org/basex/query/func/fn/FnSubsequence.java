@@ -32,12 +32,11 @@ public final class FnSubsequence extends StandardFunc {
       if(si && dl == Double.POSITIVE_INFINITY) return Empty.ITER;
       l = StrictMath.round(dl);
     }
-    final boolean li = l == Long.MAX_VALUE;
-    if(si) return li ? exprs[0].iter(qc) : Empty.ITER;
-
-    final Iter iter = qc.iter(exprs[0]);
+    final boolean linf = l == Long.MAX_VALUE;
+    if(si) return linf ? exprs[0].iter(qc) : Empty.ITER;
 
     // optimization: return subsequence
+    final Iter iter = qc.iter(exprs[0]);
     if(iter instanceof ValueIter) {
       final Value val = iter.value();
       final long rs = val.size();
@@ -46,10 +45,10 @@ public final class FnSubsequence extends StandardFunc {
       return SubSeq.get(val, from, len).iter();
     }
     final long max = iter.size();
-    final long e = li ? l : s + l;
+    final long e = linf ? l : s + l;
 
-    // return iterator with all supported functions if number of returned values is known
-    if(max != -1) return new Iter() {
+    // fast route if the size is known
+    if(max >= 0) return new Iter() {
       // directly access specified items
       final long m = Math.min(e, max + 1);
       long c = Math.max(1, s);
@@ -95,24 +94,23 @@ public final class FnSubsequence extends StandardFunc {
     final long start = StrictMath.round(dstart);
     final boolean sinf = start == Long.MIN_VALUE;
 
-    long length = Long.MAX_VALUE;
+    long l = Long.MAX_VALUE;
     if(exprs.length > 2) {
       final double dlength = toDouble(exprs[2], qc);
       if(Double.isNaN(dlength)) return Empty.SEQ;
       if(sinf && dlength == Double.POSITIVE_INFINITY) return Empty.SEQ;
-      length = StrictMath.round(dlength);
+      l = StrictMath.round(dlength);
     }
-    final boolean linf = length == Long.MAX_VALUE;
+    final boolean linf = l == Long.MAX_VALUE;
     if(sinf) return linf ? exprs[0].value(qc) : Empty.SEQ;
 
-    final Iter iter = qc.iter(exprs[0]);
-
     // optimization: return subsequence
+    final Iter iter = qc.iter(exprs[0]);
     if(iter instanceof ValueIter) {
       final Value val = iter.value();
       final long rs = val.size();
       final long from = Math.max(1, start) - 1;
-      final long len = Math.min(rs - from, length + Math.min(0, start - 1));
+      final long len = Math.min(rs - from, l + Math.min(0, start - 1));
       return SubSeq.get(val, from, len);
     }
 
@@ -120,14 +118,14 @@ public final class FnSubsequence extends StandardFunc {
     final long max = iter.size();
     if(max >= 0) {
       final long from = Math.max(1, start) - 1;
-      final long len = Math.min(max - from, length + Math.min(0, start - 1));
+      final long len = Math.min(max - from, l + Math.min(0, start - 1));
       if(from >= max || len <= 0) return Empty.SEQ;
       final ValueBuilder vb = new ValueBuilder(Math.max((int) len, 1));
       for(long i = 0; i < len; i++) vb.add(iter.get(from + i));
       return vb.value();
     }
 
-    final long e = linf ? length : start + length;
+    final long e = linf ? l : start + l;
     final ValueBuilder build = new ValueBuilder();
     Item i;
     for(int c = 1; (i = iter.next()) != null; c++) {

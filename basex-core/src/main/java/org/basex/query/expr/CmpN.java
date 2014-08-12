@@ -95,8 +95,8 @@ public final class CmpN extends Cmp {
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    seqType = SeqType.get(AtomType.BLN, exprs[0].size() == 1 && exprs[1].size() == 1 ?
-        Occ.ONE : Occ.ZERO_ONE);
+    seqType = SeqType.get(AtomType.BLN,
+        exprs[0].size() == 1 && exprs[1].size() == 1 ? Occ.ONE : Occ.ZERO_ONE);
     return optPre(oneIsEmpty() ? null : allAreValues() ? item(qc, info) : this, qc);
   }
 

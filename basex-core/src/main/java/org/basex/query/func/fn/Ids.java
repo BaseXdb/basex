@@ -25,7 +25,7 @@ abstract class Ids extends StandardFunc {
    * @return ids
    * @throws QueryException query exception
    */
-  protected final byte[][] ids(final AtomIter iter) throws QueryException {
+  protected final byte[][] ids(final Iter iter) throws QueryException {
     final TokenList tl = new TokenList();
     for(Item id; (id = iter.next()) != null;) {
       for(final byte[] i : split(normalize(toToken(id)), ' ')) tl.add(i);

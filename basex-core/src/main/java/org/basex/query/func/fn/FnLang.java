@@ -4,14 +4,9 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -20,9 +15,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FnLang extends StandardFunc {
+public final class FnLang extends Ids {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] lang = lc(toEmptyToken(exprs[0], qc));
     final ANode node = toNode(arg(1, qc), qc);
     for(ANode n = node; n != null; n = n.parent()) {
@@ -36,16 +31,5 @@ public final class FnLang extends StandardFunc {
       }
     }
     return Bln.FALSE;
-  }
-
-  @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
-    seqType = SeqType.get(exprs[0].seqType().type, Occ.ZERO_ONE);
-    return this;
-  }
-
-  @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.CTX && exprs.length == 1 || super.has(flag);
   }
 }

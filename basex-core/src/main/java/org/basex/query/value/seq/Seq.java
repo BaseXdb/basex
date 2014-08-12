@@ -41,23 +41,23 @@ public abstract class Seq extends Value {
 
   /**
    * Returns a value representation of the specified items.
-   * @param v value
-   * @param s size
+   * @param value value
+   * @param size size
    * @return resulting item or sequence
    */
-  public static Value get(final Item[] v, final int s) {
-    return get(v, s, null);
+  public static Value get(final Item[] value, final int size) {
+    return get(value, size, null);
   }
 
   /**
    * Returns a value representation of the specified items.
-   * @param v value
-   * @param s size
-   * @param t sequence type
+   * @param value value
+   * @param size size
+   * @param type sequence type
    * @return resulting item or sequence
    */
-  public static Value get(final Item[] v, final int s, final Type t) {
-    return s == 0 ? Empty.SEQ : s == 1 ? v[0] : new ItemSeq(v, s, t);
+  public static Value get(final Item[] value, final int size, final Type type) {
+    return size == 0 ? Empty.SEQ : size == 1 ? value[0] : new ItemSeq(value, size, type);
   }
 
   @Override

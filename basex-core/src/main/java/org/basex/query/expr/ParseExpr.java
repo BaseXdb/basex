@@ -74,7 +74,7 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    Item it1 = item(qc, ii);
+    final Item it1 = item(qc, ii);
     return it1 == null ? null : it1.atomItem(ii);
   }
 
@@ -117,7 +117,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
-  public SeqType seqType() {
+  public final SeqType seqType() {
     return seqType != null ? seqType : SeqType.ITEM_ZM;
   }
 

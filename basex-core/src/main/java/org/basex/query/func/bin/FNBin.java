@@ -219,7 +219,7 @@ public class FNBin extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64 fromOctets(final QueryContext qc) throws QueryException {
-    final AtomIter ir = exprs[0].atomIter(qc, info);
+    final Iter ir = exprs[0].atomIter(qc, info);
     final ByteList bl = new ByteList(Math.max(Array.CAPACITY, (int) ir.size()));
     for(Item it; (it = ir.next()) != null;) {
       final long l = toLong(it);
