@@ -77,6 +77,23 @@ public final class Flt extends ANum {
   }
 
   @Override
+  public Flt abs() {
+    return value > 0d || 1 / value > 0 ? this : Flt.get(-value);
+  }
+
+  @Override
+  public Flt ceiling() {
+    final float v = (float) Math.ceil(value);
+    return v == value ? this : Flt.get(v);
+  }
+
+  @Override
+  public Flt floor() {
+    final float v = (float) Math.floor(value);
+    return v == value ? this : Flt.get(v);
+  }
+
+  @Override
   public boolean eq(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     return it.type == AtomType.DBL ? it.eq(this, coll, ii) : value == it.flt(ii);
   }

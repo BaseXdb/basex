@@ -14,7 +14,7 @@ public final class FnRound extends Num {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item it = exprs[0].atomItem(qc, info);
-    return it == null ? null : rnd(it, toDbl(it), false, qc);
+    return it == null ? null : rnd(it, toDouble(it), false, qc);
   }
 
   @Override

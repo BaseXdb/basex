@@ -374,19 +374,19 @@ public enum AtomType implements Type {
   /** Unsigned long type. */
   ULN("unsignedLong", NNI, XSURI, true, false, false, Type.ID.ULN) {
     @Override
-    public Dec cast(final Item item, final QueryContext qc, final StaticContext sc,
+    public Uln cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       return cast((Object) item, qc, sc, ii);
     }
     @Override
-    public Dec cast(final Object value, final QueryContext qc, final StaticContext sc,
+    public Uln cast(final Object value, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       final Item it = value instanceof Item ? (Item) value : Str.get(value.toString());
       final BigDecimal v = checkNum(it, ii).dec(ii);
       final BigDecimal i = v.setScale(0, BigDecimal.ROUND_DOWN);
-      if(v.signum() < 0 || v.compareTo(Dec.MAXULNG) > 0 ||
+      if(v.signum() < 0 || v.compareTo(Uln.MAX) > 0 ||
         it.type.isStringOrUntyped() && !v.equals(i)) throw funCastError(ii, this, it);
-      return new Dec(i, this);
+      return Uln.get(i);
     }
   },
 

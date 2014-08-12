@@ -23,9 +23,10 @@ public final class FnStringJoin extends StandardFunc {
     Item it = iter.next();
     if(it == null) return Str.ZERO;
     // single result
-    if((it = iter.next()) == null) return Str.get(toToken(it));
+    final byte[] first = toToken(it);
+    if((it = iter.next()) == null) return Str.get(first);
     // join multiple strings
-    final TokenBuilder tb = new TokenBuilder(toToken(it));
+    final TokenBuilder tb = new TokenBuilder(first);
     do tb.add(token).add(toToken(it)); while((it = iter.next()) != null);
     return Str.get(tb.finish());
   }

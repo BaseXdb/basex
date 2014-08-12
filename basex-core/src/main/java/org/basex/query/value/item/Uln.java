@@ -1,6 +1,5 @@
 package org.basex.query.value.item;
 
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.math.*;
@@ -12,14 +11,15 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Decimal item ({@code xs:decimal}).
+ * Unsigned long ({@code xs:unsignedLong}).
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class Dec extends ANum {
-  /** Zero value. */
-  private static final Dec ZERO = new Dec(BigDecimal.ZERO);
+public final class Uln extends ANum {
+  /** Maximum unsigned long values. */
+  public static final BigDecimal MAX = new BigDecimal(Long.MAX_VALUE).multiply(
+      BigDecimal.valueOf(2)).add(BigDecimal.ONE);
   /** Decimal value. */
   private final BigDecimal value;
 
@@ -27,8 +27,8 @@ public final class Dec extends ANum {
    * Constructor.
    * @param value decimal value
    */
-  private Dec(final BigDecimal value) {
-    super(AtomType.DEC);
+  private Uln(final BigDecimal value) {
+    super(AtomType.ULN);
     this.value = value;
   }
 
@@ -37,22 +37,13 @@ public final class Dec extends ANum {
    * @param value big decimal value
    * @return value
    */
-  public static Dec get(final BigDecimal value) {
-    return value.signum() == 0 ? ZERO : new Dec(value);
-  }
-
-  /**
-   * Constructor.
-   * @param value big decimal value
-   * @return value
-   */
-  public static Dec get(final double value) {
-    return get(BigDecimal.valueOf(value));
+  public static Uln get(final BigDecimal value) {
+    return new Uln(value);
   }
 
   @Override
   public byte[] string() {
-    return chopNumber(token(value.toPlainString()));
+    return token(value.toPlainString());
   }
 
   @Override
@@ -81,18 +72,19 @@ public final class Dec extends ANum {
   }
 
   @Override
-  public Dec abs() {
-    return value.signum() == -1 ? Dec.get(value.negate()) : this;
+  public ANum abs() {
+    final long l = itr();
+    return l >= 0 ? this : Int.get(-l);
   }
 
   @Override
-  public Dec ceiling() {
-    return Dec.get(value.setScale(0, BigDecimal.ROUND_CEILING));
+  public Uln ceiling() {
+    return this;
   }
 
   @Override
-  public Dec floor() {
-    return Dec.get(value.setScale(0, BigDecimal.ROUND_FLOOR));
+  public Uln floor() {
+    return this;
   }
 
   @Override
@@ -110,27 +102,11 @@ public final class Dec extends ANum {
 
   @Override
   public Object toJava() {
-    return value;
+    return new BigInteger(value.toString());
   }
 
   @Override
   public boolean sameAs(final Expr cmp) {
-    return cmp instanceof Dec && value.compareTo(((Dec) cmp).value) == 0;
-  }
-
-  /**
-   * Converts the given token into a decimal value.
-   * @param value value to be converted
-   * @param ii input info
-   * @return double value
-   * @throws QueryException query exception
-   */
-  public static BigDecimal parse(final byte[] value, final InputInfo ii) throws QueryException {
-    try {
-      if(!contains(value, 'e') && !contains(value, 'E'))
-        return new BigDecimal(Token.string(value).trim());
-    } catch(final NumberFormatException ignored) { }
-
-    throw funCastError(ii, AtomType.DEC, value);
+    return cmp instanceof Uln && value.compareTo(((Uln) cmp).value) == 0;
   }
 }

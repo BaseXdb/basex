@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
 import java.io.*;
+import java.math.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -2203,7 +2204,7 @@ public class QueryParser extends InputParser {
     if(dec) {
       final byte[] t = tok.toArray();
       if(t.length == 1 && t[0] == '.') throw error(NUMBERDEC_X, t);
-      return new Dec(t);
+      return Dec.get(new BigDecimal(string(trim(t))));
     }
 
     final long l = toLong(tok.toArray());

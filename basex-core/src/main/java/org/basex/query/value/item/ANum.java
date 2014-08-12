@@ -68,6 +68,23 @@ public abstract class ANum extends Item {
    */
   protected abstract float flt();
 
+  /**
+   * Returns an absolute value.
+   * @return absolute value
+   */
+  public abstract ANum abs();
+
+  /**
+   * Returns an ceiling value.
+   * @return ceiling value
+   */
+  public abstract ANum ceiling();
+  /**
+   * Returns an floor value.
+   * @return floor value
+   */
+  public abstract ANum floor();
+
   @Override
   public Item test(final QueryContext qc, final InputInfo ii) throws QueryException {
     return dbl() == qc.pos ? this : null;

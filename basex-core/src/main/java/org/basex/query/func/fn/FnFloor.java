@@ -1,5 +1,7 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.util.Err.*;
+
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -13,9 +15,11 @@ import org.basex.util.*;
 public final class FnFloor extends Num {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = exprs[0].atomItem(qc, info);
+    Item it = exprs[0].atomItem(qc, info);
     if(it == null) return null;
-    final double d = toDbl(it);
-    return num(it, d, StrictMath.floor(d));
+
+    if(it.type.isUntyped()) it = Dbl.get(it.dbl(ii));
+    else if(!(it instanceof ANum)) throw numberError(this, it);
+    return ((ANum) it).floor();
   }
 }

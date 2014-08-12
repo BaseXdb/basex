@@ -1,7 +1,5 @@
 package org.basex.query.func.fn;
 
-import static org.basex.query.util.Err.*;
-
 import java.math.*;
 
 import org.basex.query.*;
@@ -17,19 +15,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Num extends StandardFunc {
-  /**
-   * Checks if the specified item can be converted to a double.
-   * Returns the double or throws an exception.
-   * @param it item
-   * @return double
-   * @throws QueryException query exception
-   */
-  protected double toDbl(final Item it) throws QueryException {
-    final Type ip = it.type;
-    if(!ip.isNumberOrUntyped()) throw numberError(this, it);
-    return it.dbl(info);
-  }
-
   /**
    * Returns a rounded item.
    * @param it input item
@@ -55,7 +40,7 @@ public abstract class Num extends StandardFunc {
    * @return absolute item
    * @throws QueryException query exception
    */
-  public static Item round(final Item it, final double d, final long prec, final boolean h2e,
+  public static ANum round(final Item it, final double d, final long prec, final boolean h2e,
       final InputInfo ii) throws QueryException {
 
     // take care of untyped items
@@ -97,10 +82,10 @@ public abstract class Num extends StandardFunc {
    * @param d calculated double value
    * @return numeric item
    */
-  protected static Item num(final Item it, final double n, final double d) {
+  private static ANum num(final Item it, final double n, final double d) {
     final Type ip = it.type;
     final Item i = ip.isUntyped() ? Dbl.get(n) : it;
-    if(n == d) return i;
+    if(n == d) return (ANum) i;
 
     if(ip instanceof AtomType) {
       switch((AtomType) ip) {

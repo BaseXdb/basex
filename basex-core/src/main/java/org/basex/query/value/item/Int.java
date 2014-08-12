@@ -101,6 +101,21 @@ public final class Int extends ANum {
   }
 
   @Override
+  public Int abs() {
+    return value < 0 ? Int.get(-value) : type != AtomType.ITR ? Int.get(value) : this;
+  }
+
+  @Override
+  public Int ceiling() {
+    return this;
+  }
+
+  @Override
+  public Int floor() {
+    return this;
+  }
+
+  @Override
   public boolean eq(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
     return it instanceof Int ? value == ((Int) it).value : value == it.dbl(ii);

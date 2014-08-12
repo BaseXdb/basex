@@ -89,6 +89,23 @@ public final class Dbl extends ANum {
   }
 
   @Override
+  public Dbl abs() {
+    return value > 0d || 1 / value > 0 ? this : Dbl.get(-value);
+  }
+
+  @Override
+  public Dbl ceiling() {
+    final double d = Math.ceil(value);
+    return d == value ? this : Dbl.get(d);
+  }
+
+  @Override
+  public Dbl floor() {
+    final double d = Math.floor(value);
+    return d == value ? this : Dbl.get(d);
+  }
+
+  @Override
   public boolean eq(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     return value == it.dbl(ii);
   }

@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.func.fn.Num;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -295,7 +294,7 @@ public final class DecFormatter extends FormatUtil {
       Item num = it;
       if(pic.pc) num = Calc.MULT.ev(ii, num, Int.get(100));
       if(pic.pm) num = Calc.MULT.ev(ii, num, Int.get(1000));
-      num = FnAbs.abs(Num.round(num, num.dbl(ii), pic.maxFrac, true, ii), ii);
+      num = Num.round(num, num.dbl(ii), pic.maxFrac, true, ii).abs();
 
       // convert positive number to string, chop leading zero
       final String s = (num instanceof Dbl || num instanceof Flt ?
