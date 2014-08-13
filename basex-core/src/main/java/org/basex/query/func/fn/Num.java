@@ -21,7 +21,7 @@ abstract class Num extends StandardFunc {
   /**
    * Rounds values.
    * @param qc query context
-   * @param even half-to-even computation
+   * @param even half-to-even flag
    * @return number
    * @throws QueryException query exception
    */

@@ -142,13 +142,13 @@ public enum Calc {
       if(t1 == t2) {
         if(t1 == YMD) {
           final BigDecimal bd = BigDecimal.valueOf(((YMDur) it2).ymd());
-          if(bd.doubleValue() == 0.0) throw zeroError(ii, it1);
+          if(bd.doubleValue() == .0) throw zeroError(ii, it1);
           return Dec.get(BigDecimal.valueOf(((YMDur) it1).ymd()).divide(
               bd, 20, BigDecimal.ROUND_HALF_EVEN));
         }
         if(t1 == DTD) {
           final BigDecimal bd = ((DTDur) it2).dtd();
-          if(bd.doubleValue() == 0.0) throw zeroError(ii, it1);
+          if(bd.doubleValue() == .0) throw zeroError(ii, it1);
           return Dec.get(((DTDur) it1).dtd().divide(bd, 20, BigDecimal.ROUND_HALF_EVEN));
         }
       }

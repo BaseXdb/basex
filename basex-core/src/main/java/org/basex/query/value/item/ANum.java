@@ -89,8 +89,8 @@ public abstract class ANum extends Item {
   /**
    * Returns a rounded value.
    * @param scale scale
-   * @param even half-to-even
-   * @return floor value
+   * @param even half-to-even flag
+   * @return rounded value
    */
   public abstract ANum round(final int scale, final boolean even);
 

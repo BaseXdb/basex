@@ -107,28 +107,37 @@ public final class Dbl extends ANum {
 
   @Override
   public Dbl round(final int scale, final boolean even) {
+    final double v = rnd(scale, even);
+    return v == value ? this : Dbl.get(v);
+  }
+
+  /**
+   * Returns a rounded value.
+   * @param s scale
+   * @param e half-to-even flag
+   * @return result
+   */
+  private double rnd(final int s, final boolean e) {
     double v = value;
-    if(Double.isNaN(v) || Double.isInfinite(v) || value == 0.0) return this;
-    if(!even) {
-      if(v == -0.0) return this;
-      if(scale == 0) {
-        if(v >= -0.5 && v < 0.0) return Dbl.get(-0.0);
-        if(v > Long.MIN_VALUE && v < Long.MAX_VALUE) return Dbl.get(Math.round(v));
-      }
+    if(v == .0 || v == -.0 || Double.isNaN(v) || Double.isInfinite(v)) return v;
+    if(!e & s == 0) {
+      if(v >= -.5 && v < .0) return -.0;
+      if(v > Long.MIN_VALUE && v < Long.MAX_VALUE) return Math.round(v);
     }
 
-    final double f = Math.pow(10, scale + 1);
-    v = Math.abs(v * f);
+    final boolean n = v < 0;
+    final double f = Math.pow(10, s + 1);
+    v = (n ? -v : v) * f;
     if(Double.isInfinite(v)) {
-      final int m = even ? BigDecimal.ROUND_HALF_EVEN : BigDecimal.ROUND_HALF_UP;
-      v = new BigDecimal(value).setScale(scale, m).doubleValue();
+      final int m = e ? BigDecimal.ROUND_HALF_EVEN : BigDecimal.ROUND_HALF_UP;
+      v = new BigDecimal(value).setScale(s, m).doubleValue();
     } else {
       final double r = v % 10;
-      v += r < 5 ? -r : (even ? r > 5 : r >= 5) ? (10 - r) : even ? (v % 20 == 15 ? 5 : -5) : 0;
+      v += r < 5 ? -r : (e ? r > 5 : r >= 5) ? 10 - r : e ? v % 20 == 15 ? 5 : -5 : 0;
       v /= f;
-      if(value < 0) v = -v;
+      if(n) v = -v;
     }
-    return v == value ? this : Dbl.get(v);
+    return v;
   }
 
   @Override

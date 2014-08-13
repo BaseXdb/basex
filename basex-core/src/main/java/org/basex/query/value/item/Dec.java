@@ -99,7 +99,7 @@ public final class Dec extends ANum {
   public Dec round(final int scale, final boolean even) {
     final int s = value.signum();
     return s == 0 ? this : Dec.get(value.setScale(scale, even ? BigDecimal.ROUND_HALF_EVEN :
-           s == 1 ? BigDecimal.ROUND_HALF_UP : BigDecimal.ROUND_HALF_DOWN).stripTrailingZeros());
+           s == 1 ? BigDecimal.ROUND_HALF_UP : BigDecimal.ROUND_HALF_DOWN));
   }
 
   @Override
