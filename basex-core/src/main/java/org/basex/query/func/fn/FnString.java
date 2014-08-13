@@ -4,10 +4,12 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -22,6 +24,12 @@ public final class FnString extends StandardFunc {
     final Item it = arg(0, qc).item(qc, info);
     if(it instanceof FItem) throw FISTRING_X.get(ii, it.type);
     return it == null ? Str.ZERO : it.type == AtomType.STR ? it : Str.get(it.string(ii));
+  }
+
+  @Override
+  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+    // string('x') -> 'x'
+    return exprs.length != 0 && exprs[0].seqType().eq(SeqType.STR) ? optPre(exprs[0], qc) : this;
   }
 
   @Override
