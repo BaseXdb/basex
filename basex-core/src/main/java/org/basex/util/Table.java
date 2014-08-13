@@ -172,12 +172,6 @@ public final class Table {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    for(final byte[] b : header) tb.add(b).add('\t');
-    tb.add(NL);
-    for(final TokenList e : contents) {
-      for(final byte[] b : e) tb.add(b).add('\t');
-    }
-    return tb.toString();
+    return string(finish());
   }
 }

@@ -498,7 +498,7 @@ public class DiskValues implements Index {
   public String toString() {
     final int sz = size();
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(text ? "Text" : "Attribute").add(" index of '").add(data.meta.name).add("':\n");
+    tb.add(text ? "TEXT" : "ATTRIBUTE").add(" INDEX, '").add(data.meta.name).add("':\n");
     if(sz != 0) {
       tb.add("- entries: ").addInt(sz).add("\n");
       tb.add("- references:").add("\n");
@@ -506,17 +506,15 @@ public class DiskValues implements Index {
         final long pos = idxr.read5(m * 5L);
         final int oc = idxl.readNum(pos);
         int id = idxl.readNum();
-        final byte[] txt = data.text(pre(id), text);
-        tb.add("  ").addInt(m).add(": key \"").add(txt).add("\", offset ").addLong(pos);
-        tb.add(", id dists ").addInt(id).add('/').addInt(pre(id));
+        tb.add("  ").addInt(m).add(". key: \"").add(data.text(pre(id), text)).add("\"; offset: ");
+        tb.addLong(pos).add("; id/dists: ").addInt(id).add('/').addInt(pre(id));
         for(int n = 1; n < oc; n++) {
-          final int x = idxl.readNum();
-          id += x;
+          id += idxl.readNum();
           tb.add(",").addInt(id).add('/').addInt(pre(id));
         }
         tb.add("\n");
       }
     }
-    return tb.toString().trim();
+    return tb.toString();
   }
 }

@@ -284,23 +284,6 @@ public class IdPreMap {
     }
   }
 
-  @Override
-  public String toString() {
-    final StringBuilder b = new StringBuilder();
-
-    b.append("pres, fids, nids, incs, oids");
-    for(int i = 0; i < rows; i++) {
-      b.append('\n');
-      b.append(pres[i]); b.append(", ");
-      b.append(fids[i]); b.append(", ");
-      b.append(nids[i]); b.append(", ");
-      b.append(incs[i]); b.append(", ");
-      b.append(oids[i]);
-    }
-
-    return b.toString();
-  }
-
   /**
    * Size of the map.
    * @return number of stored tuples.
@@ -396,5 +379,27 @@ public class IdPreMap {
       System.arraycopy(oids, last, oids, s, length);
       rows -= last - s;
     }
+  }
+
+  @Override
+  public String toString() {
+    final Table t = new Table();
+    t.header.add("pres");
+    t.header.add("fids");
+    t.header.add("nids");
+    t.header.add("incs");
+    t.header.add("oids");
+    for(int i = 0; i < 5; ++i) t.align.add(true);
+
+    for(int i = 0; i < rows; i++) {
+      final TokenList tl = new TokenList();
+      tl.add(Token.token(pres[i]));
+      tl.add(Token.token(fids[i]));
+      tl.add(Token.token(nids[i]));
+      tl.add(Token.token(incs[i]));
+      tl.add(Token.token(oids[i]));
+      t.contents.add(tl);
+    }
+    return t.toString();
   }
 }

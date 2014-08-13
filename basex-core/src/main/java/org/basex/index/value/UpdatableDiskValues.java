@@ -271,4 +271,9 @@ public final class UpdatableDiskValues extends DiskValues {
     for(int l = tmp.length - 1; l > 0; --l) tmp[l] -= tmp[l - 1];
     return tmp;
   }
+
+  @Override
+  public String toString() {
+    return super.toString() + "FREE BLOCKS: " + free;
+  }
 }
