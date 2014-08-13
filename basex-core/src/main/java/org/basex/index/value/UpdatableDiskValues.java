@@ -50,7 +50,10 @@ public final class UpdatableDiskValues extends DiskValues {
         final long off = idxr.read5(index * 5L);
         final int oldSize = idxl.readNum(off);
         final IntList il = new IntList(oldSize + ids.length);
-        for(int o = 0; o < oldSize; ++o) il.add(idxl.readNum());
+        for(int o = 0, c = 0; o < oldSize; ++o) {
+          c += idxl.readNum();
+          il.add(c);
+        }
         // write new ids
         free.add((int) (idxl.cursor() - off), off);
         writeIds(key, il.add(ids), index++);

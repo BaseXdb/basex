@@ -42,7 +42,8 @@ public final class FreeSlots {
       value = ll.pop();
       if(ll.isEmpty()) free.remove(sz);
       // add new slow entry if chosen entry is smaller than supplied size
-      if(sz != size) add(size - sz, value + sz);
+      if(sz < size) throw Util.notExpected("Free slot is too small: % < %", sz, size);
+      if(sz > size) add(sz - size, value + size);
     }
     return value == null ? offset : value;
   }
@@ -53,6 +54,6 @@ public final class FreeSlots {
     for(final Map.Entry<Integer, LinkedList<Long>> entry : free.entrySet()) {
       sb.append("- " + entry.getKey() + ": " + entry.getValue() + '\n');
     }
-    return sb.toString().trim();
+    return sb.toString();
   }
 }

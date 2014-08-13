@@ -108,6 +108,22 @@ public final class UpdIndexTest extends AdvancedQueryTest {
   }
 
   /**
+   * Test.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void test7() throws BaseXException {
+    run(new Replace("A", "<a/>"));
+    run(new Replace("B", "<a a='1'/>"));
+    run(new Replace("C", "<a a='1'/>"));
+    run(new Replace("A", "<a a='1'/>"));
+    run(new Close());
+    run(new Open(NAME));
+    run(new Delete("A"));
+    run(new Close());
+  }
+
+  /**
    * Runs the specified command.
    * @param cmd command to be run
    * @return string result
