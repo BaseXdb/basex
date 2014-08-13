@@ -58,14 +58,14 @@ public final class SubSeq extends Seq {
   public Value reverse() {
     final int n = (int) size;
     final Item[] items = new Item[n];
-    for(int i = 0; i < n; i++) items[n - 1 - i] = sub.itemAt(start + i);
+    for(int i = 0; i < n; i++) items[n - 1 - i] = itemAt(i);
     return Seq.get(items, n);
   }
 
   @Override
   public int writeTo(final Item[] arr, final int index) {
     final int n = (int) Math.min(arr.length - index, size);
-    for(int i = 0; i < n; i++) arr[index + i] = sub.itemAt(start + i);
+    for(int i = 0; i < n; i++) arr[index + i] = itemAt(i);
     return n;
   }
 
@@ -95,7 +95,7 @@ public final class SubSeq extends Seq {
   public Value materialize(final InputInfo ii) throws QueryException {
     final int s = (int) size;
     final ValueBuilder vb = new ValueBuilder(s);
-    for(int i = 0; i < s; i++) vb.add(itemAt(start + i).materialize(ii));
+    for(int i = 0; i < s; i++) vb.add(itemAt(i).materialize(ii));
     return vb.value();
   }
 
@@ -103,14 +103,14 @@ public final class SubSeq extends Seq {
   public Value atomValue(final InputInfo ii) throws QueryException {
     final int s = (int) size;
     final ValueBuilder vb = new ValueBuilder(s);
-    for(int i = 0; i < s; i++) vb.add(itemAt(start + i).atomValue(ii));
+    for(int i = 0; i < s; i++) vb.add(itemAt(i).atomValue(ii));
     return vb.value();
   }
 
   @Override
   public long atomSize() {
     long s = 0;
-    for(int i = 0; i < size; i++) s += itemAt(start + i).atomSize();
+    for(int i = 0; i < size; i++) s += itemAt(i).atomSize();
     return s;
   }
 }
