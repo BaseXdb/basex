@@ -329,6 +329,32 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
+   * Checks if the specified expression yields a number or {@Code null}.
+   * Returns the number, {@Code null} or throws an exception.
+   * @param ex expression to be checked
+   * @param qc query context
+   * @return double
+   * @throws QueryException query exception
+   */
+  protected final ANum toNumber(final Expr ex, final QueryContext qc) throws QueryException {
+    final Item it = ex.atomItem(qc, info);
+    return it == null ? null : toNumber(it);
+  }
+
+  /**
+   * Checks if the specified, non-empty item is a double.
+   * Returns the double or throws an exception.
+   * @param it item
+   * @return double
+   * @throws QueryException query exception
+   */
+  protected final ANum toNumber(final Item it) throws QueryException {
+    if(it.type.isUntyped()) return Dbl.get(it.dbl(info));
+    if(it instanceof ANum) return (ANum) it;
+    throw numberError(this, it);
+  }
+
+  /**
    * Checks if the specified expression yields a float.
    * Returns the float or throws an exception.
    * @param ex expression to be checked

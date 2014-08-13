@@ -26,13 +26,9 @@ abstract class Num extends StandardFunc {
    * @throws QueryException query exception
    */
   protected ANum round(final QueryContext qc, final boolean even) throws QueryException {
-    Item it = exprs[0].atomItem(qc, info);
+    final ANum num = toNumber(exprs[0], qc);
     final long p = exprs.length == 1 ? 0 : Math.max(Integer.MIN_VALUE, toLong(exprs[1], qc));
-    if(it == null) return null;
-
-    if(it.type.isUntyped()) it = Dbl.get(it.dbl(info));
-    else if(!(it instanceof ANum)) throw numberError(this, it);
-    return p > Integer.MAX_VALUE ? (ANum) it : ((ANum) it).round((int) p, even);
+    return num == null ? null : p > Integer.MAX_VALUE ? num : num.round((int) p, even);
   }
 
   /**

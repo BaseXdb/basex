@@ -119,7 +119,8 @@ public final class Dbl extends ANum {
    */
   private double rnd(final int s, final boolean e) {
     double v = value;
-    if(v == .0 || v == -.0 || Double.isNaN(v) || Double.isInfinite(v)) return v;
+    if(v == .0 || v == -.0 || Double.isNaN(v) || Double.isInfinite(v) || s > 322) return v;
+    if(s < -308) return 0;
     if(!e & s == 0) {
       if(v >= -.5 && v < .0) return -.0;
       if(v > Long.MIN_VALUE && v < Long.MAX_VALUE) return Math.round(v);
