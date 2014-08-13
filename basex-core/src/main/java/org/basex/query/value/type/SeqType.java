@@ -578,7 +578,7 @@ public final class SeqType {
   }
 
   /**
-   * Tests if the type may be numeric.
+   * Tests if the type may be numeric. User for predicate rewritings.
    * @return result of check
    */
   public boolean mayBeNumber() {

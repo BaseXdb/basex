@@ -91,6 +91,9 @@ public final class ArrayTest extends AdvancedQueryTest {
 
     error("[1,2] eq 3", SEQFOUND_X);
     error("1 eq [2,3]", SEQFOUND_X);
+
+    query("[] eq <a>a</a>", "");
+    query("not([] eq 'a')", "true");
   }
 
   /** General comparison. */
@@ -104,6 +107,12 @@ public final class ArrayTest extends AdvancedQueryTest {
     query("[[6]] != 2", "true");
     query("[7,8] = 3", "false");
     query("[8,9,10] != [6,7]", "true");
+
+    query("[] = 'a'", "false");
+    query("not([] = 'a')", "true");
+    query("['a','b'] = <a>a</a>", "true");
+    query("not(['a','b'] = 'a')", "false");
+    query("not(['a','b'] = <a>a</a>)", "false");
   }
 
   /** Element constructor. */
