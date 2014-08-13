@@ -34,18 +34,18 @@ public final class FreeSlots {
    * @return insertion offset
    */
   public long get(final int size, final long offset) {
-    Long value = null;
-    final Entry<Integer, LinkedList<Long>> ps = free.ceilingEntry(size);
-    if(ps != null) {
-      final int sz = ps.getKey();
-      final LinkedList<Long> ll = ps.getValue();
-      value = ll.pop();
-      if(ll.isEmpty()) free.remove(sz);
+    Long off = null;
+    final Entry<Integer, LinkedList<Long>> entry = free.ceilingEntry(size);
+    if(entry != null) {
+      final int slotSize = entry.getKey();
+      final LinkedList<Long> offsets = entry.getValue();
+      off = offsets.pop();
+      if(offsets.isEmpty()) free.remove(slotSize);
       // add new slow entry if chosen entry is smaller than supplied size
-      if(sz < size) throw Util.notExpected("Free slot is too small: % < %", sz, size);
-      if(sz > size) add(sz - size, value + size);
+      if(slotSize < size) throw Util.notExpected("Free slot is too small: % < %", slotSize, size);
+      if(slotSize > size) add(size - slotSize, off + slotSize);
     }
-    return value == null ? offset : value;
+    return off == null ? offset : off;
   }
 
   @Override
