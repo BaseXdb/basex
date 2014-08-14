@@ -228,6 +228,8 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Checks how often a variable is used in this expression.
+   * This function is e.g. called by {@link SwitchCase#countCases} or (indirectly)
+   * {@link GFLWOR#inlineLets}.
    * @param var variable to look for
    * @return how often the variable is used, see {@link VarUsage}
    */
@@ -235,7 +237,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Inlines an expression into this one, replacing all references to the given variable.
-   * This function is e.g. called by {@link GFLWOR#inlineLets} and {@link For#toPred},
+   * This function is e.g. called by {@link GFLWOR#inlineLets} and {@link For#toPredicate},
    * and the variable reference is replaced in {@link VarRef#inline}.
    * @param qc query context for reoptimization
    * @param scp variable scope for reoptimization

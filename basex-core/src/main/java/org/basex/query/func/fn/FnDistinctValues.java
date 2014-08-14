@@ -52,9 +52,7 @@ public final class FnDistinctValues extends StandardFunc {
     final ValueBuilder vb = new ValueBuilder();
     final ItemSet set = coll == null ? new HashItemSet() : new CollationItemSet(coll);
     final Iter ir = exprs[0].atomIter(qc, info);
-    for(Item it; (it = ir.next()) != null;) {
-      if(set.add(it, info)) vb.add(it);
-    }
+    for(Item it; (it = ir.next()) != null;) if(set.add(it, info)) vb.add(it);
     return vb.value();
   }
 

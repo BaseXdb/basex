@@ -12,10 +12,8 @@ import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -83,7 +81,7 @@ public final class CmpG extends Cmp {
     /** String representation. */
     public final String name;
     /** Comparator. */
-    final OpV op;
+    public final OpV op;
 
     /**
      * Constructor.
@@ -147,45 +145,48 @@ public final class CmpG extends Cmp {
 
     // check if both arguments will always yield one result
     final Expr e1 = exprs[0], e2 = exprs[1];
-    final SeqType st1 = e1.seqType(), st2 = e2.seqType();
-    atomic = st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray();
+    final SeqType st1 = e1.seqType();
 
-    Expr e = this;
-    if(oneIsEmpty()) {
-      // one value is empty (e.g.: () = local:expensive() )
-      e = optPre(Bln.FALSE, qc);
-    } else if(allAreValues()) {
-      // pre-evaluate values (e.g.: 1 = 2 )
-      return preEval(qc);
-    } else if(e1.isFunction(Function.COUNT)) {
-      // rewrite count() function
-      e = compCount(op.op);
-      if(e != this) qc.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
-    } else if(e1.isFunction(Function.POSITION)) {
-      // rewrite position() function
-      if(e2 instanceof RangeSeq && op.op == OpV.EQ) {
-        // position() CMP range
-        final long p1 = ((Value) e2).itemAt(0).itr(info), p2 = p1 + e2.size() - 1;
-        e = Pos.get(p1, p2, info);
-      } else {
-        // position() CMP number
-        e = Pos.get(op.op, e2, e, info);
+    // one value is empty (e.g.: () = local:expensive() )
+    if(oneIsEmpty()) return optPre(Bln.FALSE, qc);
+    // rewrite count() function
+    if(e1.isFunction(Function.COUNT)) {
+      final Expr e = compCount(op.op);
+      if(e != this) {
+        qc.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
+        return e;
       }
-      if(e != this) qc.compInfo(OPTWRITE, this);
-    } else if(st1.eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE ||
-        op == OpG.NE && e2 == Bln.TRUE)) {
-      // (A = false()) -> not(A)
-      e = Function.NOT.get(null, info, e1);
+    }
+    // position() CMP expr
+    if(e1.isFunction(Function.POSITION)) {
+      final Expr e = Pos.get(op.op, e2, this, info);
+      if(e != this) {
+        qc.compInfo(OPTWRITE, this);
+        return e;
+      }
+    }
+    // (A = false()) -> not(A)
+    if(st1.eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE || op == OpG.NE && e2 == Bln.TRUE)) {
       qc.compInfo(OPTWRITE, this);
-    } else {
-      // rewrite path CMP number
-      e = CmpR.get(this);
-      if(e == this) e = CmpSR.get(this);
-      if(e != this) qc.compInfo(OPTWRITE, this);
+      return Function.NOT.get(null, info, e1);
     }
 
-    if(e == this && atomic) qc.compInfo(OPTATOMIC, this);
-    return e;
+    // rewrite expr CMP (range expression or number)
+    ParseExpr e = CmpR.get(this);
+    // rewrite expr CMP string)
+    if(e == this) e = CmpSR.get(this);
+    if(e != this) {
+      // pre-evaluate optimized expression
+      qc.compInfo(OPTWRITE, this);
+      return allAreValues() ? e.preEval(qc) : e;
+    }
+
+    final SeqType st2 = e2.seqType();
+    if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
+      atomic = true;
+      qc.compInfo(OPTATOMIC, this);
+    }
+    return allAreValues() ? preEval(qc) : this;
   }
 
   @Override
@@ -211,12 +212,14 @@ public final class CmpG extends Cmp {
     final Iter ir1 = exprs[0].atomIter(qc, info);
     final long is1 = ir1.size();
     if(is1 == 0) return Bln.FALSE;
+    final boolean s1 = is1 == 1;
+
     Iter ir2 = exprs[1].atomIter(qc, info);
     final long is2 = ir2.size();
     if(is2 == 0) return Bln.FALSE;
 
     // evaluate single items
-    final boolean s1 = is1 == 1, s2 = is2 == 1;
+    final boolean s2 = is2 == 1;
     if(s1 && s2) return Bln.get(eval(ir1.next(), ir2.next()));
 
     if(s1) {

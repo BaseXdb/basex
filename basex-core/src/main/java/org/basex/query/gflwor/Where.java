@@ -19,16 +19,16 @@ import org.basex.util.hash.*;
  */
 public final class Where extends GFLWOR.Clause {
   /** Predicate expression. */
-  Expr pred;
+  Expr expr;
 
   /**
    * Constructor.
-   * @param pred predicate expression
+   * @param expr predicate expression
    * @param info input info
    */
-  public Where(final Expr pred, final InputInfo info) {
+  public Where(final Expr expr, final InputInfo info) {
     super(info);
-    this.pred = pred;
+    this.expr = expr;
   }
 
   @Override
@@ -36,7 +36,7 @@ public final class Where extends GFLWOR.Clause {
     return new Eval() {
       @Override
       public boolean next(final QueryContext qc) throws QueryException {
-        while(sub.next(qc)) if(pred.ebv(qc, info).bool(info)) return true;
+        while(sub.next(qc)) if(expr.ebv(qc, info).bool(info)) return true;
         return false;
       }
     };
@@ -45,59 +45,59 @@ public final class Where extends GFLWOR.Clause {
   @Override
   public void plan(final FElem plan) {
     final FElem e = planElem();
-    pred.plan(e);
+    expr.plan(e);
     plan.add(e);
   }
 
   @Override
   public String toString() {
-    return QueryText.WHERE + ' ' + pred;
+    return QueryText.WHERE + ' ' + expr;
   }
 
   @Override
   public boolean has(final Flag flag) {
-    return pred.has(flag);
+    return expr.has(flag);
   }
 
   @Override
   public Where compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    pred = pred.compile(qc, scp).compEbv(qc);
+    expr = expr.compile(qc, scp).compEbv(qc);
     return optimize(qc, scp);
   }
 
   @Override
   public Where optimize(final QueryContext qc, final VarScope sc) throws QueryException {
-    if(pred.isValue()) pred = pred.ebv(qc, info);
+    if(expr.isValue()) expr = expr.ebv(qc, info);
     return this;
   }
 
   @Override
   public boolean removable(final Var var) {
-    return pred.removable(var);
+    return expr.removable(var);
   }
 
   @Override
   public VarUsage count(final Var var) {
-    return pred.count(var);
+    return expr.count(var);
   }
 
   @Override
   public GFLWOR.Clause inline(final QueryContext qc, final VarScope scp, final Var var,
       final Expr ex) throws QueryException {
-    final Expr sub = pred.inline(qc, scp, var, ex);
+    final Expr sub = expr.inline(qc, scp, var, ex);
     if(sub == null) return null;
-    pred = sub;
+    expr = sub;
     return optimize(qc, scp);
   }
 
   @Override
   public Where copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Where(pred.copy(qc, scp, vs), info);
+    return new Where(expr.copy(qc, scp, vs), info);
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return pred.accept(visitor);
+    return expr.accept(visitor);
   }
 
   @Override
@@ -107,17 +107,17 @@ public final class Where extends GFLWOR.Clause {
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoUp(pred);
+    checkNoUp(expr);
   }
 
   @Override
   void calcSize(final long[] minMax) {
     minMax[0] = 0;
-    if(pred == Bln.FALSE) minMax[1] = 0;
+    if(expr == Bln.FALSE) minMax[1] = 0;
   }
 
   @Override
   public int exprSize() {
-    return pred.exprSize();
+    return expr.exprSize();
   }
 }

@@ -27,7 +27,7 @@ public abstract class Filter extends Preds {
    * @param root root expression
    * @param preds predicates
    */
-  Filter(final InputInfo info, final Expr root, final Expr... preds) {
+  protected Filter(final InputInfo info, final Expr root, final Expr... preds) {
     super(info, preds);
     this.root = root;
   }
@@ -102,11 +102,10 @@ public abstract class Filter extends Preds {
 
     // pre-evaluate if root is value and if one single position() or last() function is specified
     final boolean iter = posIterator();
-    if(preds.length == 1 && (last || pos != null) && root.isValue()) {
+    if(preds.length == 1 && root.isValue()) {
       final Value v = (Value) root;
-      final long from = last ? v.size() - 1 : pos.min - 1;
-      final long len = last ? 1 : pos.max - from;
-      return optPre(SubSeq.get(v, from, len), qc);
+      if(last) return optPre(SubSeq.get(v, v.size() - 1, 1), qc);
+      if(pos != null) return optPre(SubSeq.get(v, pos.min - 1, pos.max - pos.min + 1), qc);
     }
 
     // only choose deterministic and context-independent offsets; e.g., skip:

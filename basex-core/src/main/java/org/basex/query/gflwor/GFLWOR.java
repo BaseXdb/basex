@@ -85,8 +85,8 @@ public final class GFLWOR extends ParseExpr {
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     int i = 0;
     try {
-      for(final Clause c : clauses) {
-        c.compile(qc, scp);
+      for(final Clause clause : clauses) {
+        clause.compile(qc, scp);
         i++;
       }
       ret = ret.compile(qc, scp);
@@ -101,21 +101,24 @@ public final class GFLWOR extends ParseExpr {
     // split combined where clauses
     final ListIterator<Clause> iter = clauses.listIterator();
     while(iter.hasNext()) {
-      final Clause c = iter.next();
-      if(c instanceof Where) {
-        final Where wh = (Where) c;
-        if(wh.pred instanceof And) {
+      final Clause clause = iter.next();
+      if(clause instanceof Where) {
+        final Where wh = (Where) clause;
+        if(wh.expr instanceof And) {
           iter.remove();
-          for(final Expr e : ((Arr) wh.pred).exprs) iter.add(new Where(e, wh.info));
+          for(final Expr e : ((Arr) wh.expr).exprs) iter.add(new Where(e, wh.info));
         }
       }
     }
 
-    // the other optimizations are applied until nothing changes any more
+    // the other optimizations are applied until nothing changes anymore
     boolean changed;
     do {
       // rewrite singleton for clauses to let
       changed = forToLet(qc);
+
+      // remove unused variables
+      changed |= removeVars(qc);
 
       // slide let clauses out to avoid repeated evaluation
       changed |= slideLetsOut(qc);
@@ -131,6 +134,9 @@ public final class GFLWOR extends ParseExpr {
 
       // float where expressions upwards to filter earlier
       changed |= optimizeWhere(qc, scp);
+
+      // rewrite positional variables to predicates
+      changed |= optimizePos(qc, scp);
 
       // remove FLWOR expressions when all clauses were removed
       if(clauses.isEmpty()) {
@@ -223,7 +229,7 @@ public final class GFLWOR extends ParseExpr {
     if(clauses.getFirst() instanceof Where) {
       // where A <...> return B  ===>  if(A) then <...> return B else ()
       final Where wh = (Where) clauses.removeFirst();
-      return new If(info, wh.pred, clauses.isEmpty() ? ret : this, Empty.SEQ);
+      return new If(info, wh.expr, clauses.isEmpty() ? ret : this, Empty.SEQ);
     }
 
     return this;
@@ -238,8 +244,8 @@ public final class GFLWOR extends ParseExpr {
     if(output == 0) return 0;
 
     final long[] minMax = { 1, 1 };
-    for(final Clause c : clauses) {
-      c.calcSize(minMax);
+    for(final Clause clause : clauses) {
+      clause.calcSize(minMax);
       if(minMax[1] == 0) break;
     }
     return output >= 0 && minMax[1] >= 0 && minMax[0] == minMax[1] ? minMax[1] * output : -1;
@@ -251,15 +257,64 @@ public final class GFLWOR extends ParseExpr {
    * @return change flag
    */
   private boolean forToLet(final QueryContext qc) {
-    boolean change = false;
+    boolean changed = false;
     for(int i = clauses.size(); --i >= 0;) {
-      final Clause c = clauses.get(i);
-      if(c instanceof For && ((For) c).asLet(clauses, i)) {
+      final Clause clause = clauses.get(i);
+      if(clause instanceof For && ((For) clause).asLet(clauses, i)) {
         qc.compInfo(QueryText.OPTFORTOLET);
-        change = true;
+        changed = true;
       }
     }
-    return change;
+    return changed;
+  }
+
+  /**
+   * Remove unused variables.
+   * @param qc query context
+   * @return change flag
+   * @throws QueryException query exception
+   */
+  private boolean removeVars(final QueryContext qc) throws QueryException {
+    boolean changed = false;
+    for(int c = 0; c < clauses.size(); c++) {
+      final Clause clause = clauses.get(c);
+      if(clause instanceof Let) {
+        final Let lt = (Let) clause;
+        if(removingVar(lt.var, c + 1, qc) && !lt.has(Flag.NDT) && !lt.has(Flag.UPD)) {
+          // check type before removing variable (see {@link FuncType#funcConv})
+          lt.var.checkType(lt.expr, lt.info);
+          clauses.remove(c);
+          changed = true;
+        }
+      } else if(clause instanceof For) {
+        final For f = (For) clause;
+        if(removingVar(f.score, c, qc)) {
+          f.score = null;
+          changed = true;
+        }
+        if(removingVar(f.pos, c, qc)) {
+          f.pos = null;
+          changed = true;
+        }
+      }
+    }
+    return changed;
+  }
+
+  /**
+   * Remove unused variables.
+   * Counts the number of usages of the given variable starting from the given clause.
+   * @param var variable (may be {@code null})
+   * @param index start position
+   * @param qc query context
+   * @return result of check
+   */
+  private boolean removingVar(final Var var, final int index, final QueryContext qc) {
+    if(var != null && count(var, index) == VarUsage.NEVER) {
+      qc.compInfo(QueryText.OPTVAR, var);
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -270,27 +325,19 @@ public final class GFLWOR extends ParseExpr {
    * @throws QueryException query exception
    */
   private boolean inlineLets(final QueryContext qc, final VarScope scp) throws QueryException {
-    boolean change = false, thisRound;
+    boolean changed = false, changing;
     do {
-      thisRound = false;
+      changing = false;
       final ListIterator<Clause> iter = clauses.listIterator();
       while(iter.hasNext()) {
-        final Clause c = iter.next();
+        final Clause clause = iter.next();
         final int next = iter.nextIndex();
-        if(c instanceof Let) {
-          final Let lt = (Let) c;
+        if(clause instanceof Let) {
+          final Let lt = (Let) clause;
           final Expr expr = lt.expr;
           if(expr.has(Flag.NDT) || expr.has(Flag.UPD)) continue;
 
-          // check type before removing variable (see {@link FuncType#funcConv})
-          lt.var.checkType(expr, lt.info);
-
-          final VarUsage use = count(lt.var, next);
-          if(use == VarUsage.NEVER) {
-            qc.compInfo(QueryText.OPTVAR, lt.var);
-            iter.remove();
-            thisRound = change = true;
-          } else if(
+          if(
             // inline simple values
             expr.isValue()
             // inline variable references without type checks
@@ -298,59 +345,57 @@ public final class GFLWOR extends ParseExpr {
             // inline expressions that occur once, but don't...
             // - access context (e.g. let $x:=. return <a/>[$x=1]), or
             // - construct nodes (e.g. let $x:=<X/> return <X xmlns='xx'>{$x/self::X}</X>)
-            || use == VarUsage.ONCE && !expr.has(Flag.CTX) && !expr.has(Flag.CNS)
+            || count(lt.var, next) == VarUsage.ONCE && !expr.has(Flag.CTX) && !expr.has(Flag.CNS)
             // inline only cheap axis paths
             || expr instanceof AxisPath && ((AxisPath) expr).cheap()) {
 
             qc.compInfo(QueryText.OPTINLINE, lt.var);
             inline(qc, scp, lt.var, lt.inlineExpr(qc, scp), next);
             iter.remove();
-            thisRound = change = true;
+            changing = changed = true;
             // continue from the beginning as clauses below could have been deleted
             break;
           }
         }
       }
-    } while(thisRound);
-    return change;
+    } while(changing);
+    return changed;
   }
 
   /**
-   * Flattens FLWR expressions in for or let clauses by including their clauses in this
-   * expression.
-   *
+   * Flattens FLWR expressions in for or let clauses by including their clauses in this expression.
    * @param qc query context
    * @param scp variable scope
    * @return change flag
    * @throws QueryException query exception
    */
   private boolean unnestFLWR(final QueryContext qc, final VarScope scp) throws QueryException {
-    boolean change = false, thisRound;
+    boolean changed = false, thisRound;
     do {
       thisRound = false;
       final ListIterator<Clause> iter = clauses.listIterator();
       while(iter.hasNext()) {
-        final Clause cl = iter.next();
-        final boolean isFor = cl instanceof For, isLet = cl instanceof Let;
+        final Clause clause = iter.next();
+        final boolean isFor = clause instanceof For, isLet = clause instanceof Let;
         if(isFor) {
           // for $x in (for $y in A (...) return B)  ===>  for $y in A (...) for $x in B
-          final For fr = (For) cl;
+          final For fr = (For) clause;
           if(!fr.empty && fr.pos == null && fr.expr instanceof GFLWOR) {
             final GFLWOR fl = (GFLWOR) fr.expr;
             if(fl.isFLWR()) {
               qc.compInfo(QueryText.OPTFLAT, this);
               iter.remove();
-              for(final Clause c : fl.clauses) iter.add(c);
+              for(final Clause cls : fl.clauses) iter.add(cls);
               fr.expr = fl.ret;
               iter.add(fr);
-              thisRound = change = true;
+              thisRound = changed = true;
             }
           }
         }
 
         if(!thisRound && (isFor || isLet)) {
           // let $x := (let $y := E return F)  ===>  let $y := E let $x := F
-          final Expr e = isFor ? ((For) cl).expr : ((Let) cl).expr;
+          final Expr e = isFor ? ((For) clause).expr : ((Let) clause).expr;
           if(e instanceof GFLWOR) {
             final GFLWOR fl = (GFLWOR) e;
             final LinkedList<Clause> cls = fl.clauses;
@@ -364,16 +409,16 @@ public final class GFLWOR extends ParseExpr {
 
               // re-add the binding with new, reduced expression at the end
               final Expr rest = fl.clauses.isEmpty() ? fl.ret : fl.optimize(qc, scp);
-              if(isFor) ((For) cl).expr = rest;
-              else ((Let) cl).expr = rest;
-              iter.add(cl);
-              thisRound = change = true;
+              if(isFor) ((For) clause).expr = rest;
+              else ((Let) clause).expr = rest;
+              iter.add(clause);
+              thisRound = changed = true;
             }
           }
         }
       }
     } while(thisRound);
-    return change;
+    return changed;
   }
 
   /**
@@ -385,7 +430,7 @@ public final class GFLWOR extends ParseExpr {
     final IntObjMap<Var> decl = new IntObjMap<>();
     final BitArray used = new BitArray();
 
-    for(final Clause cl : clauses) for(final Var v : cl.vars()) decl.put(v.id, v);
+    for(final Clause clause : clauses) for(final Var v : clause.vars()) decl.put(v.id, v);
     final ASTVisitor marker = new ASTVisitor() {
       @Override
       public boolean used(final VarRef ref) {
@@ -396,14 +441,14 @@ public final class GFLWOR extends ParseExpr {
     };
 
     ret.accept(marker);
-    boolean change = false;
-    for(int i = clauses.size(); --i >= 0;) {
-      final Clause curr = clauses.get(i);
-      change |= curr.clean(qc, decl, used);
-      curr.accept(marker);
-      for(final Var v : curr.vars()) used.clear(v.id);
+    boolean changed = false;
+    for(int c = clauses.size(); --c >= 0;) {
+      final Clause clause = clauses.get(c);
+      changed |= clause.clean(qc, decl, used);
+      clause.accept(marker);
+      for(final Var v : clause.vars()) used.clear(v.id);
     }
-    return change;
+    return changed;
   }
 
   /**
@@ -413,7 +458,7 @@ public final class GFLWOR extends ParseExpr {
    * @return {@code true} if there were relocations, {@code false} otherwise
    */
   private boolean slideLetsOut(final QueryContext qc) {
-    boolean change = false;
+    boolean changed = false;
     for(int i = 1; i < clauses.size(); i++) {
       final Clause l = clauses.get(i);
       if(!(l instanceof Let) || l.has(Flag.NDT) || l.has(Flag.CNS) || l.has(Flag.UPD)) continue;
@@ -431,12 +476,12 @@ public final class GFLWOR extends ParseExpr {
 
       if(insert >= 0) {
         clauses.add(insert, clauses.remove(i));
-        if(!change) qc.compInfo(QueryText.OPTFORLET);
-        change = true;
+        if(!changed) qc.compInfo(QueryText.OPTFORLET);
+        changed = true;
         // it's safe to go on because clauses below the current one are never touched
       }
     }
-    return change;
+    return changed;
   }
 
   /**
@@ -446,24 +491,23 @@ public final class GFLWOR extends ParseExpr {
    * @return change flag
    * @throws QueryException query exception
    */
-  private boolean optimizeWhere(final QueryContext qc, final VarScope scp)
-      throws QueryException {
-    boolean change = false;
+  private boolean optimizeWhere(final QueryContext qc, final VarScope scp) throws QueryException {
+    boolean changed = false;
     for(int i = 0; i < clauses.size(); i++) {
-      final Clause c = clauses.get(i);
-      if(!(c instanceof Where) || c.has(Flag.NDT) || c.has(Flag.UPD)) continue;
-      final Where wh = (Where) c;
+      final Clause clause = clauses.get(i);
+      if(!(clause instanceof Where) || clause.has(Flag.NDT) || clause.has(Flag.UPD)) continue;
+      final Where wh = (Where) clause;
 
-      if(wh.pred.isValue()) {
-        if(!(wh.pred instanceof Bln))
-          wh.pred = Bln.get(wh.pred.ebv(qc, wh.info).bool(wh.info));
+      if(wh.expr.isValue()) {
+        if(!(wh.expr instanceof Bln))
+          wh.expr = Bln.get(wh.expr.ebv(qc, wh.info).bool(wh.info));
 
         // predicate is always false: no results possible
-        if(!((Item) wh.pred).bool(null)) break;
+        if(!((Item) wh.expr).bool(null)) break;
 
         // condition is always true
         clauses.remove(i--);
-        change = true;
+        changed = true;
       } else {
         // find insertion position
         int insert = -1;
@@ -477,17 +521,17 @@ public final class GFLWOR extends ParseExpr {
 
         if(insert >= 0) {
           clauses.add(insert, clauses.remove(i));
-          change = true;
+          changed = true;
           // it's safe to go on because clauses below the current one are never touched
         }
 
         final int newPos = insert < 0 ? i : insert;
         for(int b4 = newPos; --b4 >= 0;) {
           final Clause before = clauses.get(b4);
-          if(before instanceof For && ((For) before).toPred(qc, scp, wh.pred)) {
+          if(before instanceof For && ((For) before).toPredicate(qc, scp, wh.expr)) {
             clauses.remove(newPos);
             i--;
-            change = true;
+            changed = true;
           } else if(before instanceof Where) {
             continue;
           }
@@ -495,27 +539,76 @@ public final class GFLWOR extends ParseExpr {
         }
       }
     }
-    if(change) qc.compInfo(QueryText.OPTWHERE2);
-    return change;
+    if(changed) qc.compInfo(QueryText.OPTWHERE2);
+    return changed;
   }
+
+  /**
+   * Rewrite positional variables to predicates.
+   * @param qc query context
+   * @param scp variable scope
+   * @return change flag
+   * @throws QueryException query exception
+   */
+  private boolean optimizePos(final QueryContext qc, final VarScope scp) throws QueryException {
+    boolean changed = false;
+    for(int c = 0; c < clauses.size(); c++) {
+      final Clause clause = clauses.get(c);
+      if(!(clause instanceof For)) continue;
+
+      final For pos = (For) clause;
+      if(pos.pos == null) continue;
+
+      // find where clause ($c = 1)
+      for(int i = c + 1; i < clauses.size(); i++) {
+        final Clause cl = clauses.get(i);
+        if(!(cl instanceof Where)) {
+          // skip group by, count, ...
+          if(!(cl instanceof For || cl instanceof Let) || cl.has(Flag.NDT) || cl.has(Flag.UPD))
+            break;
+          continue;
+        }
+        final Where w = (Where) cl;
+        if(!(w.expr instanceof CmpR)) continue;
+        final CmpR cmp = (CmpR) w.expr;
+        if(!(cmp.expr instanceof VarRef)) continue;
+
+        // remove clause and ensure that the positional variable is only used once
+        clauses.remove(i);
+        if(count(pos.pos, c) == VarUsage.NEVER) {
+          pos.addPredicate(qc, scp, Pos.get(cmp));
+          qc.compInfo(QueryText.OPTPRED, cmp);
+          changed = true;
+        } else {
+          // re-add variable, give up
+          clauses.add(i, cl);
+        }
+        break;
+      }
+    }
+    return changed;
+  }
+
+
+
 
   /** Merges consecutive {@code where} clauses. */
   private void mergeWheres() {
     Where before = null;
     final Iterator<Clause> iter = clauses.iterator();
     while(iter.hasNext()) {
-      final Clause cl = iter.next();
-      if(cl instanceof Where) {
-        final Where wh = (Where) cl;
-        if(wh.pred == Bln.FALSE) return;
+      final Clause clause = iter.next();
+      if(clause instanceof Where) {
+        final Where wh = (Where) clause;
+        if(wh.expr == Bln.FALSE) return;
         if(before != null) {
           iter.remove();
-          final Expr e = before.pred;
+          final Expr e = before.expr;
           if(e instanceof And) {
             final And and = (And) e;
-            and.exprs = Array.add(and.exprs, wh.pred);
+            and.exprs = Array.add(and.exprs, wh.expr);
           } else {
-            before.pred = new And(before.info, e, wh.pred);
+            before.expr = new And(before.info, e, wh.expr);
           }
         } else {
           before = wh;
@@ -533,13 +626,13 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public boolean has(final Flag flag) {
-    for(final Clause cls : clauses) if(cls.has(flag)) return true;
+    for(final Clause clause : clauses) if(clause.has(flag)) return true;
     return ret.has(flag);
   }
 
   @Override
   public boolean removable(final Var var) {
-    for(final Clause cl : clauses) if(!cl.removable(var)) return false;
+    for(final Clause clause : clauses) if(!clause.removable(var)) return false;
     return ret.removable(var);
   }
 
@@ -559,9 +652,9 @@ public final class GFLWOR extends ParseExpr {
     VarUsage uses = VarUsage.NEVER;
     final ListIterator<Clause> iter = clauses.listIterator(index);
     while(iter.hasNext()) {
-      final Clause cl = iter.next();
-      uses = uses.plus(cl.count(var).times(minMax[1]));
-      cl.calcSize(minMax);
+      final Clause clause = iter.next();
+      uses = uses.plus(clause.count(var).times(minMax[1]));
+      clause.calcSize(minMax);
     }
     return uses.plus(ret.count(var).times(minMax[1]));
   }
@@ -585,15 +678,15 @@ public final class GFLWOR extends ParseExpr {
   private boolean inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex,
       final int pos) throws QueryException {
 
-    boolean change = false;
+    boolean changed = false;
     final ListIterator<Clause> iter = clauses.listIterator(pos);
     while(iter.hasNext()) {
-      final Clause cl = iter.next();
+      final Clause clause = iter.next();
       try {
-        final Clause c = cl.inline(qc, scp, var, ex);
-        if(c != null) {
-          change = true;
-          iter.set(c);
+        final Clause cl = clause.inline(qc, scp, var, ex);
+        if(cl != null) {
+          changed = true;
+          iter.set(cl);
         }
       } catch(final QueryException qe) {
         return clauseError(qe, iter.previousIndex() + 1);
@@ -603,14 +696,14 @@ public final class GFLWOR extends ParseExpr {
     try {
       final Expr rt = ret.inline(qc, scp, var, ex);
       if(rt != null) {
-        change = true;
+        changed = true;
         ret = rt;
       }
     } catch(final QueryException qe) {
       return clauseError(qe, clauses.size());
     }
 
-    return change;
+    return changed;
   }
 
   /**
@@ -640,7 +733,7 @@ public final class GFLWOR extends ParseExpr {
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final LinkedList<Clause> cls = new LinkedList<>();
-    for(final Clause cl : clauses) cls.add(cl.copy(qc, scp, vs));
+    for(final Clause clause : clauses) cls.add(clause.copy(qc, scp, vs));
     return copyType(new GFLWOR(info, cls, ret.copy(qc, scp, vs)));
   }
 
@@ -649,28 +742,28 @@ public final class GFLWOR extends ParseExpr {
    * @return result of check
    */
   private boolean isFLWR() {
-    for(final Clause cl : clauses)
-      if(!(cl instanceof For || cl instanceof Let || cl instanceof Where)) return false;
+    for(final Clause clause : clauses)
+      if(!(clause instanceof For || clause instanceof Let || clause instanceof Where)) return false;
     return true;
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    for(final Clause cl : clauses) if(!cl.accept(visitor)) return false;
+    for(final Clause clause : clauses) if(!clause.accept(visitor)) return false;
     return ret.accept(visitor);
   }
 
   @Override
   public void checkUp() throws QueryException {
-    for(final Clause cl : clauses) cl.checkUp();
+    for(final Clause clause : clauses) clause.checkUp();
     ret.checkUp();
   }
 
   @Override
   public void markTailCalls(final QueryContext qc) {
     final long[] minMax = { 1, 1 };
-    for(final Clause c : clauses) {
-      c.calcSize(minMax);
+    for(final Clause clause : clauses) {
+      clause.calcSize(minMax);
       if(minMax[1] < 0 || minMax[1] > 1) return;
     }
     ret.markTailCalls(qc);
@@ -679,7 +772,7 @@ public final class GFLWOR extends ParseExpr {
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final Clause cl : clauses) sz += cl.exprSize();
+    for(final Clause clause : clauses) sz += clause.exprSize();
     return ret.exprSize() + sz;
   }
 
@@ -694,7 +787,7 @@ public final class GFLWOR extends ParseExpr {
   @Override
   public void plan(final FElem plan) {
     final FElem e = planElem();
-    for(final Clause cl : clauses) cl.plan(e);
+    for(final Clause clause : clauses) clause.plan(e);
     ret.plan(e);
     plan.add(e);
   }
@@ -702,7 +795,7 @@ public final class GFLWOR extends ParseExpr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(final Clause cl : clauses) sb.append(cl).append(' ');
+    for(final Clause clause : clauses) sb.append(clause).append(' ');
     return sb.append(QueryText.RETURN).append(' ').append(ret).toString();
   }
 

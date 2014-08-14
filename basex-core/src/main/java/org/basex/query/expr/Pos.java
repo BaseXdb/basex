@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -25,8 +26,8 @@ public final class Pos extends Simple {
 
   /**
    * Constructor.
-   * @param min minimum value
-   * @param max minimum value
+   * @param min minimum value (1 or larger)
+   * @param max minimum value (1 or larger)
    * @param info input info
    */
   private Pos(final long min, final long max, final InputInfo info) {
@@ -37,30 +38,45 @@ public final class Pos extends Simple {
   }
 
   /**
-   * Returns a position expression, or an optimized boolean item.
-   * @param mn minimum value
-   * @param mx minimum value
+   * Returns a position expression for the specified range, or an optimized boolean item.
+   * @param min minimum value
+   * @param max minimum value
    * @param ii input info
    * @return expression
    */
-  public static Expr get(final long mn, final long mx, final InputInfo ii) {
+  public static Expr get(final long min, final long max, final InputInfo ii) {
     // suppose that positions always fit in long values..
-    return mn > mx || mx < 1 ? Bln.FALSE : mn <= 1 && mx == Long.MAX_VALUE ?
-      Bln.TRUE : new Pos(mn, mx, ii);
+    return min > max || max < 1 ? Bln.FALSE : min <= 1 && max == Long.MAX_VALUE ? Bln.TRUE :
+      new Pos(Math.max(1, min), Math.max(1, max), ii);
   }
 
   /**
-   * Returns an instance of this class, if possible, and the input expression
-   * otherwise.
-   * @param cmp comparator
-   * @param a argument
-   * @param o original expression
-   * @param ii input info
-   * @return resulting expression, or {@code null}
+   * Returns a position expression for the specified range comparison.
+   * @param expr range comparison
+   * @return expression
    */
-  public static Expr get(final OpV cmp, final Expr a, final Expr o, final InputInfo ii) {
-    if(a instanceof ANum) {
-      final ANum it = (ANum) a;
+  public static Expr get(final CmpR expr) {
+    final double min = expr.min, max = expr.max;
+    final long mn = (long) (expr.mni ? (long) Math.ceil(min) : Math.floor(min + 1));
+    final long mx = (long) (expr.mxi ? (long) Math.floor(max) : Math.ceil(max - 1));
+    return Pos.get(mn, mx, expr.info);
+  }
+
+  /**
+   * Returns an instance of this class, if possible, and the input expression otherwise.
+   * @param cmp comparator
+   * @param expr argument
+   * @param fallback fallback expression (optional, may be {@code null})
+   * @param ii input info
+   * @return resulting or fallback expression
+   */
+  public static Expr get(final OpV cmp, final Expr expr, final Expr fallback, final InputInfo ii) {
+    if(expr instanceof RangeSeq && cmp == OpV.EQ) {
+      final RangeSeq rs = (RangeSeq) expr;
+      return get(rs.start(), rs.end(), ii);
+    }
+    if(expr instanceof ANum) {
+      final ANum it = (ANum) expr;
       final long p = it.itr();
       final boolean ex = p == it.dbl();
       switch(cmp) {
@@ -72,7 +88,7 @@ public final class Pos extends Simple {
         default:
       }
     }
-    return o;
+    return fallback;
   }
 
   @Override

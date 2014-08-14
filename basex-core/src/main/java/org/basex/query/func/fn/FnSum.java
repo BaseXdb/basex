@@ -23,7 +23,7 @@ public final class FnSum extends Aggr {
     // partial sum calculation (Little Gauss)
     if(exprs[0] instanceof RangeSeq) {
       final RangeSeq rs = (RangeSeq) exprs[0];
-      final long s = rs.itemAt(0).itr(ii);
+      final long s = rs.start();
       if(s == 0 || s == 1) {
         final long n = rs.size();
         return Int.get(n < 3037000500L ? n * (n + 1) / 2 : BigInteger.valueOf(n).multiply(

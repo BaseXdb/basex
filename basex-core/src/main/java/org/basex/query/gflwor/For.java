@@ -30,9 +30,9 @@ import org.basex.util.hash.*;
  */
 public final class For extends ForLet {
   /** Position variable. */
-  final Var pos;
+  Var pos;
   /** Score variable. */
-  final Var score;
+  Var score;
   /** {@code allowing empty} flag. */
   final boolean empty;
 
@@ -150,17 +150,38 @@ public final class For extends ForLet {
   }
 
   /**
-   * Tries to add the given expression as an attribute to this loop's sequence.
+   * Adds a predicate to the loop expression.
+   * @param qc query context
+   * @param scp variable scope
+   * @param pred predicate
+   * @throws QueryException query exception
+   */
+  void addPredicate(final QueryContext qc, final VarScope scp, final Expr pred)
+      throws QueryException {
+    // add to clause expression
+    if(expr instanceof AxisPath) {
+      expr = ((Path) expr).addPreds(qc, scp, pred);
+    } else if(expr instanceof Filter) {
+      expr = ((Filter) expr).addPred(qc, scp, pred);
+    } else {
+      expr = Filter.get(info, expr, pred).optimize(qc, scp);
+    }
+  }
+
+  /**
+   * Tries to add the given expression as a predicate to the loop expression.
    * @param qc query context
    * @param scp variable scope
    * @param ex expression to add as predicate
    * @return success
    * @throws QueryException query exception
    */
-  boolean toPred(final QueryContext qc, final VarScope scp, final Expr ex) throws QueryException {
+  boolean toPredicate(final QueryContext qc, final VarScope scp, final Expr ex)
+      throws QueryException {
+
     if(empty || !(vars.length == 1 && ex.uses(var) && ex.removable(var))) return false;
 
-    // reset context value (will not be accessible within predicate)
+    // reset context value (will not be accessible in predicate)
     final Value cv = qc.value;
     Expr pred = ex;
     try {
@@ -177,27 +198,17 @@ public final class For extends ForLet {
     // attach predicates to axis path or filter, or create a new filter
     if(pred.seqType().mayBeNumber()) pred = Function.BOOLEAN.get(null, info, pred);
 
-    // add to clause expression
-    if(expr instanceof AxisPath) {
-      expr = ((Path) expr).addPreds(qc, scp, pred);
-    } else if(expr instanceof Filter) {
-      expr = ((Filter) expr).addPred(qc, scp, pred);
-    } else {
-      expr = Filter.get(info, expr, pred).optimize(qc, scp);
-    }
-
+    addPredicate(qc, scp, pred);
     return true;
   }
 
   @Override
   void calcSize(final long[] minMax) {
     final long sz = expr.size();
-    minMax[0] *= sz > 0 ? sz : empty ? 1 : 0;
-    if(sz < 0) {
-      minMax[1] = -1;
-    } else if(minMax[1] > 0) { // sz >= 0
-      minMax[1] *= sz;
-    }
+    final long factor = sz > 0 ? sz : empty ? 1 : 0;
+    minMax[0] *= factor;
+    final long max = minMax[1];
+    minMax[1] = sz < 0 ? -1 : max > 0 ? max * factor : max;
   }
 
   @Override

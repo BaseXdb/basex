@@ -55,7 +55,8 @@ public final class CmpSR extends Single {
     this.max = max;
     this.mxi = mxi;
     seqType = SeqType.BLN;
-    atomic = expr.seqType().zeroOrOne();
+    final SeqType st = expr.seqType();
+    atomic = st.zeroOrOne() && !st.mayBeArray();
   }
 
   /**
@@ -64,11 +65,10 @@ public final class CmpSR extends Single {
    * @return new or original expression
    * @throws QueryException query exception
    */
-  static Expr get(final CmpG cmp) throws QueryException {
+  static ParseExpr get(final CmpG cmp) throws QueryException {
     if(!(cmp.exprs[1] instanceof AStr)) return cmp;
     final byte[] d = ((Item) cmp.exprs[1]).string(cmp.info);
     final Expr e = cmp.exprs[0];
-    if(e.seqType().mayBeArray()) return cmp;
     switch(cmp.op.op) {
       case GE: return new CmpSR(e, d,    true,  null, true,  cmp.coll, cmp.info);
       case GT: return new CmpSR(e, d,    false, null, true,  cmp.coll, cmp.info);
@@ -87,7 +87,7 @@ public final class CmpSR extends Single {
     }
 
     // iterative evaluation
-    final Iter ir = qc.iter(expr);
+    final Iter ir = expr.atomIter(qc, info);
     for(Item it; (it = ir.next()) != null;) {
       if(eval(it)) return Bln.TRUE;
     }
@@ -101,7 +101,7 @@ public final class CmpSR extends Single {
    * @throws QueryException query exception
    */
   private boolean eval(final Item it) throws QueryException {
-    if(!it.type.isStringOrUntyped()) throw diffError(info, it, it);
+    if(!it.type.isStringOrUntyped()) throw diffError(info, it, Str.ZERO);
     final byte[] s = it.string(info);
     final int mn = min == null ?  1 :
       coll == null ? Token.diff(s, min) : coll.compare(s, min);
@@ -161,8 +161,7 @@ public final class CmpSR extends Single {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(MIN, min != null ? min : "",
-      MAX, max != null ? max : ""), expr);
+    addPlan(plan, planElem(MIN, min != null ? min : "", MAX, max != null ? max : ""), expr);
   }
 
   @Override

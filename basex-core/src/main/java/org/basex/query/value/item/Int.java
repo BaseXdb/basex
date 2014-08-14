@@ -143,14 +143,12 @@ public final class Int extends ANum {
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public boolean eq(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     return it instanceof Int ? value == ((Int) it).value : value == it.dbl(ii);
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     if(it instanceof Int) {
       final long i = ((Int) it).value;
       return value < i ? -1 : value > i ? 1 : 0;
