@@ -99,12 +99,19 @@ public final class GlobalOptions extends Options {
     langkeys = get(LANGKEYS);
     debug = get(DEBUG);
     final String ph = get(PROXYHOST);
+    if(!ph.isEmpty()) {
+      setSystem("http.proxyHost", ph);
+      setSystem("https.proxyHost", ph);
+    }
     final String pp = Integer.toString(get(PROXYPORT));
-    setSystem("http.proxyHost", ph);
-    setSystem("http.proxyPort", pp);
-    setSystem("https.proxyHost", ph);
-    setSystem("https.proxyPort", pp);
-    setSystem("http.nonProxyHosts", get(NONPROXYHOSTS));
+    if(!pp.isEmpty()) {
+      setSystem("http.proxyPort", pp);
+      setSystem("https.proxyPort", pp);
+    }
+    final String nph = get(NONPROXYHOSTS);
+    if(!nph.isEmpty()) {
+      setSystem("http.nonProxyHosts", nph);
+    }
   }
 
   /**
