@@ -102,14 +102,16 @@ public final class SyntaxXQuery extends Syntax {
     } else if(comment == 3 && ch != ':') {
       comment = ch == ')' ? 0 : 2;
     }
-    if(comment != 0) return COMMENT;
+    if(comment != 0) {
+      var = false;
+      return COMMENT;
+    }
 
     // quotes
     if(ch == '"' || ch == '\'') {
       quote = ch;
       return STRING;
     }
-
     // variables
     if(ch == '$') {
       var = true;
@@ -119,7 +121,6 @@ public final class SyntaxXQuery extends Syntax {
       var = XMLToken.isChar(ch);
       return VARIABLE;
     }
-
     // special characters
     if(!XMLToken.isNCChar(ch)) {
       fun = false;
