@@ -8,7 +8,6 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.nio.*;
 import java.nio.charset.*;
-import java.util.regex.*;
 
 import org.basex.data.*;
 import org.basex.io.*;
@@ -28,8 +27,6 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public abstract class OutputSerializer extends Serializer {
-  /** Whitespace pattern. */
-  private static final Pattern SPACES = Pattern.compile("\\s+");
   /** System document type. */
   String docsys;
   /** Public document type. */
@@ -169,8 +166,8 @@ public abstract class OutputSerializer extends Serializer {
 
     final String supp = opts.get(SUPPRESS_INDENTATION);
     if(!supp.isEmpty()) {
-      for(final String c : SPACES.split(supp)) {
-        if(!c.isEmpty()) suppress.add(c);
+      for(final byte[] c : split(normalize(token(supp)), ' ')) {
+        if(c.length != 0) suppress.add(c);
       }
     }
 
@@ -179,9 +176,11 @@ public abstract class OutputSerializer extends Serializer {
     final boolean xml = this instanceof XMLSerializer || this instanceof XHTMLSerializer;
     if(xml || html) {
       final String cdse = opts.get(CDATA_SECTION_ELEMENTS);
-      for(final String c : SPACES.split(cdse)) {
-        if(c.isEmpty()) continue;
-        if(!html || c.contains(":") && (!html5 || !c.contains("html:"))) cdata.add(c);
+      if(!cdse.isEmpty()) {
+        for(final byte[] c :  split(normalize(token(cdse)), ' ')) {
+          if(c.length == 0) continue;
+          if(!html || contains(c, ':') && (!html5 || !string(c).contains("html:"))) cdata.add(c);
+        }
       }
 
       if(undecl && ver.equals(V10)) throw SERUNDECL.getIO();
