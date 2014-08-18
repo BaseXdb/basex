@@ -1,12 +1,17 @@
 package org.basex.query.func.random;
 
-import java.util.*;
+import org.basex.query.QueryContext;
+import org.basex.query.QueryException;
+import org.basex.query.func.StandardFunc;
+import org.basex.query.iter.Iter;
+import org.basex.query.value.item.Dbl;
+import org.basex.query.value.item.Int;
+import org.basex.query.value.item.Item;
+import org.basex.query.value.item.Str;
+import org.basex.util.InputInfo;
 
-import org.basex.query.*;
-import org.basex.query.func.*;
-import org.basex.query.iter.*;
-import org.basex.query.value.item.*;
-import org.basex.util.*;
+import java.util.Random;
+import java.util.UUID;
 
 /**
  * Random functions.
@@ -47,7 +52,7 @@ public final class FNRandom extends StandardFunc {
   private int randomInt(final QueryContext qc) throws QueryException {
     if(exprs.length == 0) return RND.nextInt();
     final long s = toLong(exprs[0], qc);
-    return s < 1 || s > Integer.MAX_VALUE ? 0 : RND.nextInt((int) s);
+    return RND.nextInt((int) s);
   }
 
   /**
@@ -68,13 +73,8 @@ public final class FNRandom extends StandardFunc {
 
       @Override
       public Item next() throws QueryException {
-        if(exprs.length == 3) {
-          // max defined
-          final int max = (int) toLong(exprs[2], qc);
-          return ++count <= num ? Int.get(r.nextInt(max)) : null;
-        }
-        // no max given
-        return ++count <= num ? Int.get(r.nextInt()) : null;
+        // use no max or the max provided by the function
+        return ++count <= num ? Int.get(exprs.length == 3 ? r.nextInt((int) toLong(exprs[2], qc)) : r.nextInt()) : null;
       }
     };
   }
