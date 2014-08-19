@@ -147,6 +147,13 @@ public enum Err {
   /** BXPR9999. */
   BXPR_ENC_X(BXPR, 9999, "Unknown encoding '%'."),
 
+  // Random module
+
+  /** BXRA0001. */
+  BXRA_BOUNDS_X(BXRA, 1, "Maximum value is out of bounds: %."),
+  /** BXRA0001. */
+  BXRA_NUM_X(BXRA, 2, "Number of values is negative: %."),
+
   // Repository module
 
   /** BXRE0001. */
@@ -1252,6 +1259,7 @@ public enum Err {
     /** BXHL Error type. */ BXHL(QueryText.BXERR, QueryText.BXERRORS),
     /** BXJS Error type. */ BXJS(QueryText.BXERR, QueryText.BXERRORS),
     /** BXPR Error type. */ BXPR(QueryText.BXERR, QueryText.BXERRORS),
+    /** BXRA Error type. */ BXRA(QueryText.BXERR, QueryText.BXERRORS),
     /** BXRE Error type. */ BXRE(QueryText.BXERR, QueryText.BXERRORS),
     /** BXSL Error type. */ BXSL(QueryText.BXERR, QueryText.BXERRORS),
     /** BXSQ Error type. */ BXSQ(QueryText.BXERR, QueryText.BXERRORS),

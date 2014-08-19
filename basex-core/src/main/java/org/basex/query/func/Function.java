@@ -1345,7 +1345,7 @@ public enum Function {
     for(final Object a : arg) {
       if(!tb.isEmpty()) tb.add(',');
       final String s = a.toString();
-      if(ARG.matcher(s).matches() || a instanceof Integer) {
+      if(ARG.matcher(s).matches() || a instanceof Integer || a instanceof Long) {
         tb.add(s);
       } else if(a instanceof Boolean) {
         tb.add(s + "()");

@@ -1,17 +1,14 @@
 package org.basex.query.func.random;
 
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.func.StandardFunc;
-import org.basex.query.iter.Iter;
-import org.basex.query.value.item.Dbl;
-import org.basex.query.value.item.Int;
-import org.basex.query.value.item.Item;
-import org.basex.query.value.item.Str;
-import org.basex.util.InputInfo;
+import static org.basex.query.util.Err.*;
 
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
+
+import org.basex.query.*;
+import org.basex.query.func.*;
+import org.basex.query.iter.*;
+import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * Random functions.
@@ -43,38 +40,42 @@ public final class FNRandom extends StandardFunc {
   }
 
   /**
-   * Returns a random integer, either in the whole integer range or
-   * if a maximum is given between 0 (inclusive) and the given maximum (exclusive).
+   * Returns a random integer, either in the whole integer range or if a maximum is given between 0
+   * (inclusive) and the given maximum (exclusive).
    * @param qc query context
    * @return random integer
    * @throws QueryException query exception
    */
   private int randomInt(final QueryContext qc) throws QueryException {
     if(exprs.length == 0) return RND.nextInt();
-    final long s = toLong(exprs[0], qc);
-    return RND.nextInt((int) s);
+    final long max = toLong(exprs[0], qc);
+    if(max < 1 || max > Integer.MAX_VALUE) throw BXRA_BOUNDS_X.get(info, max);
+    return RND.nextInt((int) max);
   }
 
   /**
-   * Returns a sequence of random integers with exactly $num items
-   * using a seed for initializing the random function, either in the
-   * whole integer range or if a maximum is given between 0 (inclusive)
-   * and the given maximum (exclusive).
+   * Returns a sequence of random integers with exactly $num items using a seed for initializing the
+   * random function, either in the whole integer range or if a maximum is given between 0
+   * (inclusive) and the given maximum (exclusive).
    * @param qc query context
    * @return random integer
    * @throws QueryException query exception
    */
   private Iter randomSeededInt(final QueryContext qc) throws QueryException {
+    final long seed = toLong(exprs[0], qc);
+    final long num = toLong(exprs[1], qc);
+    if(num < 0) throw BXRA_NUM_X.get(info, num);
+    final long max = exprs.length > 2 ? toLong(exprs[2], qc) : Integer.MAX_VALUE;
+    if(max < 1 || max > Integer.MAX_VALUE) throw BXRA_BOUNDS_X.get(info, max);
+
     return new Iter() {
-      int count;
-      final long seed = toLong(exprs[0], qc);
-      final int num = (int) toLong(exprs[1], qc);
       final Random r = new Random(seed);
+      long c;
 
       @Override
       public Item next() throws QueryException {
-        // use no max or the max provided by the function
-        return ++count <= num ? Int.get(exprs.length == 3 ? r.nextInt((int) toLong(exprs[2], qc)) : r.nextInt()) : null;
+        return ++c <= num ? Int.get(
+            max == Integer.MAX_VALUE ? r.nextInt() : r.nextInt((int) max)) : null;
       }
     };
   }
@@ -88,30 +89,31 @@ public final class FNRandom extends StandardFunc {
   }
 
   /**
-   * Returns a sequence of random double with exactly $num items
-   * using a seed between 0.0 (inclusive) and 1.0 (exclusive).
+   * Returns a sequence of random double with exactly $num items using a seed between 0.0
+   * (inclusive) and 1.0 (exclusive).
    * @param qc query context
    * @return random double
    * @throws QueryException query exception
    */
   private Iter randomSeededDouble(final QueryContext qc) throws QueryException {
+    final long seed = toLong(exprs[0], qc);
+    final long num = toLong(exprs[1], qc);
+    if(num < 0) throw BXRA_NUM_X.get(info, num);
+
     return new Iter() {
-      int count;
-      final long seed = toLong(exprs[0], qc);
-      final int num = (int) toLong(exprs[1], qc);
       final Random r = new Random(seed);
+      long c;
 
       @Override
       public Item next() {
-        return ++count <= num ? Dbl.get(r.nextDouble()) : null;
+        return ++c <= num ? Dbl.get(r.nextDouble()) : null;
       }
     };
   }
 
   /**
-   * Returns a sequence of random doubles with exactly $num items
-   * using a Gaussian (i.e. normal) distribution with a mean of 0.0
-   * and a derivation of 1.0
+   * Returns a sequence of random doubles with exactly $num items using a Gaussian (i.e. normal)
+   * distribution with a mean of 0.0 and a derivation of 1.0
    * @param qc query context
    * @return random double
    * @throws QueryException query exception

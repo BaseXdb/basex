@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.junit.*;
 
 /**
@@ -26,10 +27,8 @@ public final class FNRandomTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void seededDouble() {
-    final int num = 5;
-    final Random r = new Random();
-    final Integer seed = r.nextInt();
-    query(_RANDOM_SEEDED_DOUBLE.args(seed, num));
+    final int s = 12345;
+    query(_RANDOM_SEEDED_DOUBLE.args(s, 1), new Random(s).nextDouble());
   }
 
   /** Test method. */
@@ -37,19 +36,20 @@ public final class FNRandomTest extends AdvancedQueryTest {
   public void integer() {
     final Integer i = Integer.valueOf(query(_RANDOM_INTEGER.args(5)));
     assertTrue(i >= 0 && i < 5);
-    assertEquals("0", query(_RANDOM_INTEGER.args(0)));
-    assertEquals("0", query(_RANDOM_INTEGER.args(-1)));
-    assertEquals("0", query(_RANDOM_INTEGER.args(" 8000000000")));
+    error(_RANDOM_INTEGER.args(0), Err.BXRA_BOUNDS_X);
+    error(_RANDOM_INTEGER.args(-1), Err.BXRA_BOUNDS_X);
+    error(_RANDOM_INTEGER.args(8000000000L), Err.BXRA_BOUNDS_X);
   }
 
   /** Test method. */
   @Test
   public void seededInteger() {
-    final int num = 5;
-    final Random r = new Random();
-    final Integer seed = r.nextInt();
-    query(_RANDOM_SEEDED_INTEGER.args(seed, num));
-    query(_RANDOM_SEEDED_INTEGER.args(seed, num, 1000000));
+    final int s = 12345;
+    query(_RANDOM_SEEDED_INTEGER.args(s, 1), new Random(s).nextInt());
+    query(_RANDOM_SEEDED_INTEGER.args(s, 1, 1000000), new Random(s).nextInt(1000000));
+    error(_RANDOM_SEEDED_INTEGER.args(1, -1), Err.BXRA_NUM_X);
+    error(_RANDOM_SEEDED_INTEGER.args(1, 1, -1), Err.BXRA_BOUNDS_X);
+    error(_RANDOM_SEEDED_INTEGER.args(1, 1, 8000000000L), Err.BXRA_BOUNDS_X);
   }
 
   /** Test method. */
