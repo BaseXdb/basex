@@ -380,6 +380,7 @@ unwatching_event_%   = Evento '%' non osservato.
 up_to_date           = Aggiornato
 updated              = Aggiornato
 use_catalog_file     = Usa il documento del catalogo XML
+use_xinclude         = Usa XInclude
 used_mem             = Memoria usata
 user_created_%       = Utente '%' creato.
 user_dropped_%       = Utente '%' eliminato.

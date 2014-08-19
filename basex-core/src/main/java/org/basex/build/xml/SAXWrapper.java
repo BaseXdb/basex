@@ -61,7 +61,7 @@ public final class SAXWrapper extends SingleParser {
 
         f.setNamespaceAware(true);
         f.setValidating(false);
-        f.setXIncludeAware(true);
+        f.setXIncludeAware(options.get(MainOptions.XINCLUDE));
         r = f.newSAXParser().getXMLReader();
       }
 

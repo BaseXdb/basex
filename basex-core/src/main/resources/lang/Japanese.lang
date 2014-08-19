@@ -380,6 +380,7 @@ unwatching_event_%   = イベント '%' は監視外です。
 up_to_date           = 最新
 updated              = 更新しました
 use_catalog_file     = XMLカタログファイルを使用する
+use_xinclude         = Use XInclude
 used_mem             = メモリ使用量
 user_created_%       = ユーザー '%' が作成されました。
 user_dropped_%       = ユーザー '%' は削除されました。

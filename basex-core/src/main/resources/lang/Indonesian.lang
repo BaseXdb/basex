@@ -380,6 +380,7 @@ unwatching_event_%   = Kejadian '%' tidak diamati.
 up_to_date           = Mutakhir
 updated              = Termutakhirkan
 use_catalog_file     = Gunakan berkas katalog XML
+use_xinclude         = Use XInclude
 used_mem             = Memori yang digunakan
 user_created_%       = Pengguna '%' dibuat.
 user_dropped_%       = Pengguna '%' dihapus.

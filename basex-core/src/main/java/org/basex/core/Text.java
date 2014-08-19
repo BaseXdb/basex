@@ -1066,6 +1066,8 @@ public interface Text {
   String FILE_OR_DIR = lang("file_or_dir");
   /** Use Catalog file Checkbox. */
   String USE_CATALOG_FILE = lang("use_catalog_file");
+  /** Use XInclude. */
+  String USE_XINCLUDE = lang("use_xinclude");
   /** Use Catalog file not found on CP. */
   String HELP1_USE_CATALOG = lang("help1_use_catalog");
   /** Use Catalog file not found on CP. */

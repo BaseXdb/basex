@@ -380,6 +380,7 @@ unwatching_event_%   = Eveniment '%' nesupravegheat.
 up_to_date           = La zi
 updated              = Actualizat
 use_catalog_file     = Utilizaţi fişier XML Catalog
+use_xinclude         = Utilizati XInclude
 used_mem             = Memorie utilizată
 user_created_%       = Utilizator '%' creat.
 user_dropped_%       = Utilizator '%' sters.

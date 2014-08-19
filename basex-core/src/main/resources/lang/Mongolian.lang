@@ -380,6 +380,7 @@ unwatching_event_%   = Үйл ажиллагаа(event) '%' хянагдаагү
 up_to_date           = Саяхан шинэчлэгдсэн, шинэ
 updated              = Шинэчлэгдсэн
 use_catalog_file     = XML каталог файл ашиглах
+use_xinclude         = Use XInclude
 used_mem             = Хэрэглэсэн санах ой
 user_created_%       = Хэрэглэгч '%' үүссэн.
 user_dropped_%       = Хэрэглэгч '%' устгагдсан.

@@ -380,6 +380,7 @@ unwatching_event_%   = Event '%' niet langer gemonitord.
 up_to_date           = bijgewerkt
 updated              = Bijgewerkt
 use_catalog_file     = Gebruik XML Catalog bestand
+use_xinclude         = Use XInclude
 used_mem             = Geheugengebruik
 user_created_%       = Gebruiker '%' gecreeerd.
 user_dropped_%       = Gebruiker '%' verwijderd.

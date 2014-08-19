@@ -380,6 +380,7 @@ unwatching_event_%   = Von Event '%' abgemeldet.
 up_to_date           = Up-to-date
 updated              = Updates
 use_catalog_file     = XML Katalog-Datei
+use_xinclude         = Verwende XInclude
 used_mem             = Genutzter Speicher
 user_created_%       = Benutzer '%' erzeugt.
 user_dropped_%       = Benutzer '%' entfernt.

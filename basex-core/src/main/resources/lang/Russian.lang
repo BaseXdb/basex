@@ -380,6 +380,7 @@ unwatching_event_%   = Событие '%' перестало слушаться
 up_to_date           = Актуальное состояние
 updated              = Обновлено
 use_catalog_file     = Использовать файл XML каталога
+use_xinclude         = Use XInclude
 used_mem             = Потребление памяти
 user_created_%       = Создан пользователь '%'
 user_dropped_%       = Пользователь '%' удален

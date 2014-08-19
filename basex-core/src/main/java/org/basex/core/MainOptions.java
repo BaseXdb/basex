@@ -56,8 +56,10 @@ public final class MainOptions extends Options {
   public static final BooleanOption INTPARSE = new BooleanOption("INTPARSE", false);
   /** Strips namespaces. */
   public static final BooleanOption STRIPNS = new BooleanOption("STRIPNS", false);
-  /** Flag for parsing DTDs in internal parser. */
+  /** Flag for parsing DTDs. */
   public static final BooleanOption DTD = new BooleanOption("DTD", false);
+  /** Flag for using XInclude. */
+  public static final BooleanOption XINCLUDE = new BooleanOption("XINCLUDE", true);
   /** Path to XML Catalog file. */
   public static final StringOption CATFILE = new StringOption("CATFILE", "");
 

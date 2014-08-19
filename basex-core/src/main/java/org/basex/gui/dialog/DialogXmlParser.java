@@ -29,6 +29,8 @@ final class DialogXmlParser extends DialogParser {
   private final BaseXCheckBox stripNS;
   /** Use XML Catalog. */
   private final BaseXCheckBox usecat;
+  /** Use XInclude. */
+  private final BaseXCheckBox xinclude;
   /** Catalog file. */
   private final BaseXTextField cfile;
   /** Browse Catalog file. */
@@ -42,7 +44,7 @@ final class DialogXmlParser extends DialogParser {
    */
   DialogXmlParser(final BaseXDialog d, final MainOptions opts) {
     super(d);
-    final BaseXBack pp = new BaseXBack(new TableLayout(9, 1));
+    final BaseXBack pp = new BaseXBack(new TableLayout(10, 1));
 
     intparse = new BaseXCheckBox(INT_PARSER, MainOptions.INTPARSE, opts, d).bold();
     pp.add(intparse);
@@ -58,6 +60,10 @@ final class DialogXmlParser extends DialogParser {
     pp.add(chopWS);
     pp.add(new BaseXLabel(H_CHOP_WS, false, false).border(0, 0, 8, 0));
     pp.add(new BaseXLabel());
+
+    // XInclude
+    xinclude = new BaseXCheckBox(USE_XINCLUDE, MainOptions.XINCLUDE, opts, d).bold();
+    pp.add(xinclude);
 
     // catalog resolver
     final boolean cat = !opts.get(MainOptions.CATFILE).isEmpty();
@@ -95,13 +101,7 @@ final class DialogXmlParser extends DialogParser {
     }
 
     add(pp, BorderLayout.WEST);
-
-    final boolean ip = intparse.isSelected();
-    final boolean uc = usecat.isSelected();
-    intparse.setEnabled(!uc);
-    usecat.setEnabled(!ip && CatalogWrapper.available());
-    cfile.setEnabled(uc);
-    browsec.setEnabled(uc);
+    action(true);
   }
 
   @Override
@@ -109,6 +109,7 @@ final class DialogXmlParser extends DialogParser {
     final boolean ip = intparse.isSelected();
     final boolean uc = usecat.isSelected();
     intparse.setEnabled(!uc);
+    xinclude.setEnabled(!ip);
     usecat.setEnabled(!ip && CatalogWrapper.available());
     cfile.setEnabled(uc);
     browsec.setEnabled(uc);
@@ -125,6 +126,7 @@ final class DialogXmlParser extends DialogParser {
     gui.set(MainOptions.STRIPNS, stripNS.isSelected());
     gui.set(MainOptions.DTD, dtd.isSelected());
     gui.set(MainOptions.INTPARSE, intparse.isSelected());
+    gui.set(MainOptions.XINCLUDE, xinclude.isSelected());
     gui.set(MainOptions.CATFILE, usecat.isSelected() ? cfile.getText() : "");
   }
 }
