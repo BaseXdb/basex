@@ -1498,7 +1498,7 @@ public class QueryParser extends InputParser {
       union();
       throw error(FTIGNORE);
     }
-    return new FTContainsExpr(e, select, info());
+    return new FTContains(e, select, info());
   }
 
   /**

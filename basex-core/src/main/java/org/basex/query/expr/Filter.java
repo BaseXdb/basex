@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import org.basex.query.*;
+import org.basex.query.gflwor.*;
 import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -51,79 +52,30 @@ public abstract class Filter extends Preds {
 
   @Override
   public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    root = root.compile(qc, scp);
+
     // invalidate current context value (will be overwritten by filter)
     final Value cv = qc.value;
     try {
-      root = root.compile(qc, scp);
-      // root is empty
-      if(root.isEmpty()) return optPre(qc);
-      // convert filters without numeric predicates to axis paths
-      if(root instanceof AxisPath && !super.has(Flag.FCS))
-        return ((Path) root.copy(qc, scp)).addPreds(qc, scp, preds).compile(qc, scp);
-
-      // optimize filter expressions
       qc.value = null;
-      final Expr e = super.compile(qc, scp);
-      if(e != this) return e;
-
-      // no predicates.. return root; otherwise, do some advanced compilations
-      return preds.length == 0 ? root : opt(qc);
+      super.compile(qc, scp);
     } finally {
       qc.value = cv;
     }
+    return optimize(qc, scp);
   }
 
-  /**
-   * Compiles the filter expression, excluding the root node.
-   * @param qc query context
-   * @return compiled expression
-   */
-  private Expr opt(final QueryContext qc) {
-    // evaluate return type
-    final SeqType st = root.seqType();
-
-    // determine number of results and type
-    final long s = root.size();
-    if(s == -1) {
-      seqType = SeqType.get(st.type, st.zeroOrOne() ? Occ.ZERO_ONE : Occ.ZERO_MORE);
-    } else {
-      if(pos != null) {
-        size = Math.max(0, s + 1 - pos.min) - Math.max(0, s - pos.max);
-      } else if(last) {
-        size = s > 0 ? 1 : 0;
-      }
-      // no results will remain: return empty sequence
-      if(size == 0) return optPre(qc);
-      seqType = SeqType.get(st.type, size);
-    }
-
-    // no numeric predicates.. use simple iterator
-    if(!super.has(Flag.FCS)) return new IterFilter(this);
-
-    // pre-evaluate if root is value and if one single position() or last() function is specified
-    final boolean iter = posIterator();
-    if(preds.length == 1 && root.isValue()) {
-      final Value v = (Value) root;
-      if(last) return optPre(SubSeq.get(v, v.size() - 1, 1), qc);
-      if(pos != null) return optPre(SubSeq.get(v, pos.min - 1, pos.max - pos.min + 1), qc);
-    }
-
-    // only choose deterministic and context-independent offsets; e.g., skip:
-    // (1 to 10)[random:integer(10)]  or  (1 to 10)[.]
-    boolean off = false;
-    if(preds.length == 1) {
-      final Expr p = preds[0];
-      final SeqType pt = p.seqType();
-      off = pt.type.isNumber() && pt.zeroOrOne() && !p.has(Flag.CTX) && !p.has(Flag.NDT);
-      if(off) seqType = SeqType.get(seqType.type, Occ.ZERO_ONE);
-    }
-
-    // iterator for simple numeric predicate
-    return off || iter ? new IterPosFilter(this, off) : this;
+  @Override
+  public final Expr optimizeEbv(final QueryContext qc, final VarScope scp) throws QueryException {
+    Expr e = merge(root, qc, scp);
+    if(e != this) qc.compInfo(QueryText.OPTWRITE, this);
+    return e;
   }
+
 
   /**
    * Adds a predicate to the filter.
+   * This function is e.g. called by {@link For#addPredicate}.
    * @param qc query context
    * @param scp variable scope
    * @param p predicate to be added
@@ -135,17 +87,64 @@ public abstract class Filter extends Preds {
 
   @Override
   public final Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    // return empty root
+    if(root.isEmpty()) return optPre(qc);
+    // convert filters without numeric predicates to axis paths
+    if(root instanceof AxisPath && !super.has(Flag.FCS))
+      return ((Path) root.copy(qc, scp)).addPreds(qc, scp, preds).compile(qc, scp);
+
     // invalidate current context value (will be overwritten by filter)
     final Value cv = qc.value;
     try {
-      // return empty root
-      if(root.isEmpty()) return optPre(qc);
-      // convert filters without numeric predicates to axis paths
-      if(root instanceof AxisPath && !super.has(Flag.FCS))
-        return ((Path) root.copy(qc, scp)).addPreds(qc, scp, preds);
+      qc.value = null;
+
+      final Expr e = super.optimize(qc, scp);
+      if(e != this) return e;
 
       // no predicates.. return root; otherwise, do some advanced compilations
-      return preds.length == 0 ? root : opt(qc);
+      if(preds.length == 0) return root;
+
+      // evaluate return type
+      final SeqType st = root.seqType();
+
+      // determine number of results and type
+      final long s = root.size();
+      if(s == -1) {
+        seqType = SeqType.get(st.type, st.zeroOrOne() ? Occ.ZERO_ONE : Occ.ZERO_MORE);
+      } else {
+        if(pos != null) {
+          size = Math.max(0, s + 1 - pos.min) - Math.max(0, s - pos.max);
+        } else if(last) {
+          size = s > 0 ? 1 : 0;
+        }
+        // no results will remain: return empty sequence
+        if(size == 0) return optPre(qc);
+        seqType = SeqType.get(st.type, size);
+      }
+
+      // no numeric predicates.. use simple iterator
+      if(!super.has(Flag.FCS)) return new IterFilter(this);
+
+      // pre-evaluate if root is value and if one single position() or last() function is specified
+      final boolean iter = posIterator();
+      if(preds.length == 1 && root.isValue()) {
+        final Value v = (Value) root;
+        if(last) return optPre(SubSeq.get(v, v.size() - 1, 1), qc);
+        if(pos != null) return optPre(SubSeq.get(v, pos.min - 1, pos.max - pos.min + 1), qc);
+      }
+
+      // only choose deterministic and context-independent offsets; e.g., skip:
+      // (1 to 10)[random:integer(10)]  or  (1 to 10)[.]
+      boolean off = false;
+      if(preds.length == 1) {
+        final Expr p = preds[0];
+        final SeqType pt = p.seqType();
+        off = pt.type.isNumber() && pt.zeroOrOne() && !p.has(Flag.CTX) && !p.has(Flag.NDT);
+        if(off) seqType = SeqType.get(seqType.type, Occ.ZERO_ONE);
+      }
+
+      // iterator for simple numeric predicate
+      return off || iter ? new IterPosFilter(this, off) : this;
     } finally {
       qc.value = cv;
     }

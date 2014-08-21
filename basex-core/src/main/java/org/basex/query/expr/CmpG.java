@@ -190,7 +190,7 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public Expr compEbv(final QueryContext qc) {
+  public Expr optimizeEbv(final QueryContext qc, final VarScope scp) throws QueryException {
     // e.g.: exists(...) = true() -> exists(...)
     // checking one direction is sufficient, as operators may have been swapped
     return (op == OpG.EQ && exprs[1] == Bln.TRUE || op == OpG.NE && exprs[1] == Bln.FALSE) &&

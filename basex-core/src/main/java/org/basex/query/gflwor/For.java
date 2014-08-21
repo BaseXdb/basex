@@ -160,7 +160,7 @@ public final class For extends ForLet {
       throws QueryException {
     // add to clause expression
     if(expr instanceof AxisPath) {
-      expr = ((Path) expr).addPreds(qc, scp, pred);
+      expr = ((AxisPath) expr).addPreds(qc, scp, pred);
     } else if(expr instanceof Filter) {
       expr = ((Filter) expr).addPred(qc, scp, pred);
     } else {

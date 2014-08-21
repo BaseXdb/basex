@@ -10,9 +10,6 @@ import org.basex.index.name.*;
 import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpG.OpG;
-import org.basex.query.expr.CmpV.OpV;
-import org.basex.query.func.*;
 import org.basex.query.path.Test.Kind;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -65,55 +62,23 @@ public abstract class Step extends Preds {
   }
 
   @Override
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
+  }
+
+  @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // check if test will yield no results
     if(!test.optimize(qc)) return Empty.SEQ;
 
-    for(int p = 0; p < preds.length; ++p) {
-      Expr pr = Pos.get(OpV.EQ, preds[p], preds[p], info);
-
-      // position() = last() -> last()
-      if(pr instanceof CmpG || pr instanceof CmpV) {
-        final Cmp cmp = (Cmp) pr;
-        if(cmp.exprs[0].isFunction(Function.POSITION) && cmp.exprs[1].isFunction(Function.LAST)) {
-          if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
-             cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
-            qc.compInfo(OPTWRITE, pr);
-            pr = cmp.exprs[1];
-          }
-        }
-      }
-
-      if(pr.isValue()) {
-        if(!pr.ebv(qc, info).bool(info)) {
-          qc.compInfo(OPTREMOVE, this, pr);
-          return Empty.SEQ;
-        }
-        qc.compInfo(OPTREMOVE, this, pr);
-        preds = Array.delete(preds, p--);
-      } else if(pr instanceof And && !pr.has(Flag.FCS)) {
-        // replace AND expression with predicates (don't swap position tests)
-        qc.compInfo(OPTPRED, pr);
-        final Expr[] and = ((Arr) pr).exprs;
-        final int m = and.length - 1;
-        final ExprList el = new ExprList(preds.length + m);
-        for(final Expr e : Arrays.asList(preds).subList(0, p)) el.add(e);
-        for(final Expr a : and) {
-          // wrap test with boolean() if the result is numeric
-          el.add(Function.BOOLEAN.get(null, info, a).compEbv(qc));
-        }
-        for(final Expr e : Arrays.asList(preds).subList(p + 1, preds.length)) el.add(e);
-        preds = el.finish();
-      } else {
-        preds[p] = pr;
-      }
-    }
+    final Expr e = super.optimize(qc, scp);
+    if(e != this) return e;
 
     // no numeric predicates: use simple iterator
-    if(!has(Flag.FCS)) return new IterStep(info, axis, test, preds);
-
-    // use iterator for simple numeric predicate
-    return this instanceof IterPosStep || !posIterator() ? this : new IterPosStep(this);
+    return !has(Flag.FCS) ? new IterStep(info, axis, test, preds) :
+      // use iterator for simple numeric predicate
+      this instanceof IterPosStep || !posIterator() ? this : new IterPosStep(this);
   }
 
   @Override

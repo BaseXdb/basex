@@ -295,8 +295,8 @@ public abstract class Expr extends ExprInfo {
   public abstract Expr copy(QueryContext qc, VarScope scp, IntObjMap<Var> vs);
 
   /**
-   * <p>This method is overwritten by {@link CmpG}, {@link CmpV}, {@link FnBoolean} and
-   * {@link FnExists}.
+   * <p>This method is e.g. overwritten by expressions like {@link CmpG}, {@link CmpV},
+   * {@link FnBoolean}, {@link FnExists}, {@link Path} or {@link Filter}.
    * It is called at compile time by expressions that perform
    * effective boolean value tests (e.g. {@link If} or {@link Preds}).
    * If the arguments of the called expression return a boolean anyway,
@@ -305,10 +305,12 @@ public abstract class Expr extends ExprInfo {
    * <code>if($x eq true())</code> is rewritten to <code>if($x)</code>, if <code>$x</code>
    * is known to return a single boolean.</p>
    * @param qc query context
+   * @param scp variable scope
    * @return optimized expression
+   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr compEbv(final QueryContext qc) {
+  public Expr optimizeEbv(final QueryContext qc, final VarScope scp) throws QueryException {
     return this;
   }
 

@@ -20,9 +20,10 @@ public final class FnEmpty extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) {
+  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+    final Expr e = exprs[0].optimizeEbv(qc, scp);
+    exprs[0] = e;
     // ignore non-deterministic expressions (e.g.: error())
-    final Expr e = exprs[0];
     return e.size() == -1 || e.has(Flag.NDT) || e.has(Flag.CNS) || e.has(Flag.UPD) ? this :
       Bln.get(e.size() == 0);
   }

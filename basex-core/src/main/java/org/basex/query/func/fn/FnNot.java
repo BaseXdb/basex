@@ -20,7 +20,7 @@ public final class FnNot extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) {
+  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
     final Expr e = exprs[0];
     // simplify: not(empty(A)) -> exists(A)
     if(e.isFunction(Function.EMPTY)) {
@@ -44,7 +44,7 @@ public final class FnNot extends StandardFunc {
       return compBln(((Arr) e).exprs[0], info);
     }
     // simplify, e.g.: not(boolean(A)) -> not(A)
-    exprs[0] = e.compEbv(qc);
+    exprs[0] = e.optimizeEbv(qc, scp);
     return this;
   }
 }

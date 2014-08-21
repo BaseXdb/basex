@@ -173,7 +173,7 @@ public final class FNFt extends StandardFunc {
     qc.ftOpt(opt);
     final FTExpr fte = new FTWords(info, query, mode, null).compile(qc, null);
     qc.ftOpt(tmp);
-    return new FTContainsExpr(input, options(fte, opts), info).item(qc, info);
+    return new FTContains(input, options(fte, opts), info).item(qc, info);
   }
 
   /**

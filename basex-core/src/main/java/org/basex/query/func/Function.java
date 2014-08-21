@@ -236,7 +236,7 @@ public enum Function {
   /** XQuery function. */
   LANG(FnLang.class, "lang(ids[,node])", arg(STR_ZO, NOD), BLN),
   /** XQuery function. */
-  LAST(FnLast.class, "last()", arg(), ITR, flag(FCS)),
+  LAST(FnLast.class, "last()", arg(), ITR, flag(FCS, CTX)),
   /** XQuery function. */
   LOCAL_NAME(FnLocalName.class, "local-name([node])", arg(NOD_ZO), STR),
   /** XQuery function. */
@@ -300,7 +300,7 @@ public enum Function {
   /** XQuery function. */
   PATH(FnPath.class, "path([node])", arg(NOD_ZO), STR_ZO, flag(X30)),
   /** XQuery function. */
-  POSITION(FnPosition.class, "position()", arg(), ITR, flag(FCS)),
+  POSITION(FnPosition.class, "position()", arg(), ITR, flag(FCS, CTX)),
   /** XQuery function. */
   PREFIX_FROM_QNAME(FnPrefixFromQName.class, "prefix-from-QName(qname)", arg(QNM_ZO), NCN_ZO),
   /** XQuery function. */

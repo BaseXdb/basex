@@ -37,7 +37,7 @@ public abstract class Logical extends Arr {
     final int es = exprs.length;
     final ExprList el = new ExprList(es);
     for(final Expr e : exprs) {
-      final Expr ex = e.compEbv(qc);
+      final Expr ex = e.optimizeEbv(qc, scp);
       if(ex.isValue()) {
         // atomic items can be pre-evaluated
         qc.compInfo(OPTREMOVE, this, e);

@@ -260,8 +260,8 @@ public final class Window extends Clause {
 
   @Override
   public Clause optimize(final QueryContext qc, final VarScope sc) throws QueryException {
-    final SeqType t = expr.seqType();
-    var.refineType(t.withOcc(Occ.ZERO_MORE), qc, info);
+    final SeqType st = expr.seqType();
+    var.refineType(st.withOcc(Occ.ZERO_MORE), qc, info);
     return this;
   }
 
@@ -391,7 +391,7 @@ public final class Window extends Clause {
 
     @Override
     public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-      expr = expr.compile(qc, scp).compEbv(qc);
+      expr = expr.compile(qc, scp).optimizeEbv(qc, scp);
       return this;
     }
 

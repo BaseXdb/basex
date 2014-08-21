@@ -61,7 +61,7 @@ public final class Where extends GFLWOR.Clause {
 
   @Override
   public Where compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    expr = expr.compile(qc, scp).compEbv(qc);
+    expr = expr.compile(qc, scp).optimizeEbv(qc, scp);
     return optimize(qc, scp);
   }
 

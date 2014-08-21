@@ -45,7 +45,7 @@ public final class If extends Arr {
 
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    cond = cond.compile(qc, scp).compEbv(qc);
+    cond = cond.compile(qc, scp).optimizeEbv(qc, scp);
     // static condition: return branch in question
     if(cond.isValue()) return optPre(eval(qc).compile(qc, scp), qc);
 

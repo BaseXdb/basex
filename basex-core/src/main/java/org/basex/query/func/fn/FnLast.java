@@ -21,11 +21,6 @@ public final class FnLast extends StandardFunc {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.CTX || super.has(flag);
-  }
-
-  @Override
   public boolean accept(final ASTVisitor visitor) {
     return visitor.lock(DBLocking.CTX) && super.accept(visitor);
   }

@@ -59,4 +59,22 @@ public final class RewritingsTest extends QueryPlanTest {
     check("descendant::c", null, "//@axis = 'child'");
     check("descendant::*", null, "not(//@axis = 'child')");
   }
+
+  /**
+   * Checks EBV optimizations.
+   */
+  @Test
+  public void optimizeEbv() {
+    check("empty(<a>X</a>[text()])", null, "//@axis = 'child'");
+    check("exists(<a>X</a>[text()])", null, "//@axis = 'child'");
+    check("boolean(<a>X</a>[text()])", null, "//@axis = 'child'");
+    check("not(<a>X</a>[text()])", null, "//@axis = 'child'");
+
+    check("if(<a>X</a>[text()]) then 1 else 2", null, "//@axis = 'child'");
+    check("<a>X</a>[text()] and <a/>", null, "//@axis = 'child'");
+    check("<a>X</a>[text()] or <a/>", null, "//@axis = 'child'");
+    check("for $a in <a>X</a> where $a[text()] return $a", null, "//@axis = 'child'");
+
+    check("empty(<a>X</a>/.[text()])", null, "//@axis = 'child'");
+  }
 }

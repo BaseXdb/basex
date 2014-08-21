@@ -78,9 +78,17 @@ public abstract class Path extends ParseExpr {
         // single step: rewrite to axis step (required to sort results of path)
         step = Step.get(((Context) step).info, SELF, Test.NOD);
       } else if(step instanceof Filter) {
-        // rewrite to axis step (can be evaluated faster than filter expression)
+        // rewrite filter to axis step
         final Filter f = (Filter) step;
         if(f.root instanceof Context) step = Step.get(f.info, SELF, Test.NOD, f.preds);
+      } else if(step instanceof Path) {
+        // rewrite path to axis steps
+        final Path p = (Path) step;
+        if(p.root == null || p.root instanceof Context) {
+          final int pl = p.steps.length - 1;
+          for(int i = 0; i < pl; i++) stps.add(p.steps[i]);
+          step = p.steps[pl];
+        }
       }
       stps.add(step);
     }
@@ -163,6 +171,23 @@ public abstract class Path extends ParseExpr {
     path.size = path.size(qc);
     path.seqType = SeqType.get(steps[steps.length - 1].seqType().type, size);
     return path;
+  }
+
+  @Override
+  public Expr optimizeEbv(final QueryContext qc, final VarScope scp) throws QueryException {
+    final int sl = steps.length;
+    if(!(steps[sl - 1] instanceof Step)) return this;
+    final Step step = (Step) steps[sl - 1];
+    if(step.preds.length == 1 && step.seqType().type instanceof NodeType &&
+        !step.preds[0].seqType().mayBeNumber()) {
+      final Expr s = step.merge(this, qc, scp);
+      if(s != step) {
+        qc.compInfo(QueryText.OPTWRITE, this);
+        step.preds = new Expr[0];
+        return s;
+      }
+    }
+    return this;
   }
 
   @Override
