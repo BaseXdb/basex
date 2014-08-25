@@ -65,10 +65,10 @@ public final class CsvStringConverter extends CsvConverter {
 
   @Override
   public void entry(final byte[] entry) {
-    final byte[] name = headers.get(col++);
-    final byte[] elem = ENTRY, attr = null;
+    final byte[] elem = ENTRY, name = headers.get(col++);
     if(atts) {
-      xml.open(elem, NAME, attr);
+      if(name == null) xml.open(elem);
+      else xml.open(elem, NAME, name);
     } else {
       xml.open(name != null ? name : elem);
     }

@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.basex.*;
+import org.basex.build.CsvOptions.CsvFormat;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
@@ -49,9 +50,7 @@ public final class CsvParserTest extends SandboxTest {
    */
   @Before
   public void init() throws BaseXException {
-    final CsvParserOptions copts = new CsvParserOptions();
-    copts.set(CsvOptions.HEADER, true);
-    new Set(MainOptions.CSVPARSER, copts).execute(context);
+    new Set(MainOptions.CSVPARSER, new CsvParserOptions()).execute(context);
   }
 
   /**
@@ -80,13 +79,13 @@ public final class CsvParserTest extends SandboxTest {
    */
   @Test
   public void one() throws Exception {
+    final CsvParserOptions copts = context.options.get(MainOptions.CSVPARSER);
+
+    copts.set(CsvOptions.HEADER, true);
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("3", new XQuery("count(//Name)").execute(context));
     assertEquals("2", new XQuery("count(//Email)").execute(context));
 
-    final CsvParserOptions copts = new CsvParserOptions();
-    copts.set(CsvOptions.HEADER, true);
-    new Set(MainOptions.CSVPARSER, copts).execute(context);
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("3", new XQuery("count(//record)").execute(context));
     assertEquals("true", new XQuery("//text() = 'Picard?'").execute(context));
@@ -98,15 +97,30 @@ public final class CsvParserTest extends SandboxTest {
    */
   @Test
   public void sep() throws Exception {
-    final CsvParserOptions copts = new CsvParserOptions();
-    copts.set(CsvOptions.SEPARATOR, "tab");
+    final CsvParserOptions copts = context.options.get(MainOptions.CSVPARSER);
     copts.set(CsvOptions.HEADER, true);
-    new Set(MainOptions.CSVPARSER, copts).execute(context);
+
+    copts.set(CsvOptions.SEPARATOR, "tab");
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("0", new XQuery("count(//Name)").execute(context));
+
     copts.set(CsvOptions.SEPARATOR, ";");
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("0", new XQuery("count(//Name)").execute(context));
+  }
+
+  /**
+   * Adds the sample CSV file, using different separators.
+   * @throws Exception exception
+   */
+  @Test
+  public void atts() throws Exception {
+    final CsvParserOptions copts = context.options.get(MainOptions.CSVPARSER);
+
+    copts.set(CsvOptions.HEADER, true);
+    copts.set(CsvOptions.FORMAT, CsvFormat.ATTRIBUTES);
+    new CreateDB(NAME, FILE).execute(context);
+    assertEquals("true", new XQuery("exists(//entry[@name = 'Name'])").execute(context));
   }
 
   /**
