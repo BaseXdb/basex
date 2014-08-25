@@ -645,11 +645,11 @@ public class FNBin extends StandardFunc {
    */
   private int[] bounds(final Long off, final Long len, final int sz) throws QueryException {
     int o = 0;
-    final int s;
     if(off != null) {
       if(off < 0 || off > sz || off > Integer.MAX_VALUE) throw BIN_IOOR_X_X.get(info, off, sz);
       o = (int) off.longValue();
     }
+    final int s;
     if(len != null) {
       if(len < 0) throw BIN_NS_X.get(info, off);
       if(o + len > sz || len > Integer.MAX_VALUE) throw BIN_IOOR_X_X.get(info, o + len, sz);

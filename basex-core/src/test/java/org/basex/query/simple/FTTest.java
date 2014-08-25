@@ -68,7 +68,7 @@ public final class FTTest extends QueryTest {
       { "FT 1", nodes(14), "//w[text() contains text 'HELLO']" },
       { "FT 2", nodes(14), "//w[text() contains text 'hello']" },
       { "FT 3", nodes(14), "//w[text() contains text '    hello!...   ']" },
-      { "FT 4", empty(), "//w[  text  (   )  contains text  '  crap  '  ]  " },
+      { "FT 4", empty(), "//w[  text  (   )  contains text  '  anarmophism  '  ]  " },
       { "FT 5", empty(), "//w[text() contains text 'db']" },
       { "FT 6", nodes(42, 46), "//mix[text() contains text 'A']" },
       { "FT 7", nodes(14), "//w[text() contains text 'hello']['A' contains text 'A']" },

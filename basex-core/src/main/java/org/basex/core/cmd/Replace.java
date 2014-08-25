@@ -50,9 +50,9 @@ public final class Replace extends ACreate {
     final Data data = context.data();
 
     if(!startUpdate()) return false;
-    int sz = 1;
     try {
       final IOFile file = data.inMemory() ? null : data.meta.binary(path);
+      int sz = 1;
       if(file != null && file.exists()) {
         // replace binary file if it already exists
         final Store store = new Store(path);

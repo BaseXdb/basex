@@ -369,8 +369,9 @@ public final class TokenBuilder {
    */
   public TokenBuilder trim() {
     final byte[] chrs = chars;
-    int s = size, c = -1;
+    int s = size;
     while(s > 0 && ws(chrs[s - 1])) --s;
+    int c = -1;
     while(++c < s && ws(chrs[c]));
     if(c != 0 && c != s) Array.move(chrs, c, -c, s - c);
     size = s - c;
