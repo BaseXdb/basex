@@ -22,10 +22,10 @@ public class SimpleMap extends Arr {
   /**
    * Constructor.
    * @param info input info
-   * @param steps axis steps
+   * @param exprs expressions
    */
-  protected SimpleMap(final InputInfo info, final Expr... steps) {
-    super(info, steps);
+  protected SimpleMap(final InputInfo info, final Expr... exprs) {
+    super(info, exprs);
   }
 
   /**
@@ -117,11 +117,11 @@ public class SimpleMap extends Arr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder().append('(');
     for(final Expr s : exprs) {
-      if(sb.length() != 0) sb.append(" ! ");
+      if(sb.length() != 1) sb.append(" ! ");
       sb.append(s);
     }
-    return sb.toString();
+    return sb.append(')').toString();
   }
 }

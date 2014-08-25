@@ -56,7 +56,8 @@ public abstract class Path extends ParseExpr {
    */
   public static Path get(final InputInfo info, final Expr root, final Expr... steps) {
     // new list with steps
-    final ExprList stps = new ExprList(steps.length);
+    final int sl = steps.length;
+    final ExprList stps = new ExprList(sl);
 
     // merge nested paths
     Expr rt = root;
@@ -69,7 +70,6 @@ public abstract class Path extends ParseExpr {
     if(rt instanceof Context) rt = null;
 
     // add steps of input array
-    final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
       Expr step = steps[s];
       if(step instanceof Context) {

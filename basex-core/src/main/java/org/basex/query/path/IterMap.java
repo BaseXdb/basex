@@ -19,10 +19,10 @@ public final class IterMap extends SimpleMap {
   /**
    * Constructor.
    * @param info input info
-   * @param steps axis steps
+   * @param exprs expressions
    */
-  protected IterMap(final InputInfo info, final Expr... steps) {
-    super(info, steps);
+  protected IterMap(final InputInfo info, final Expr... exprs) {
+    super(info, exprs);
   }
 
   @Override

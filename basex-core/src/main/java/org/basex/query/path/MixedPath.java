@@ -76,7 +76,7 @@ public final class MixedPath extends Path {
           // check if input for next axis step consists items other than nodes
           if(s + 1 < sl) {
             final Item it = vb.get(0);
-            throw PATHNODE_X_X_X.get(info, it.type, it);
+            throw PATHNODE_X_X_X.get(info, steps[s + 1], it.type, it);
           }
         }
 
