@@ -169,14 +169,16 @@ public final class SimpleTest extends QueryTest {
       { "Limits 8", "-9223372036854775808 idiv -1" },
       { "Limits 9", "-9223372036854775807 - 1024" },
       { "Limits 10", "-9223372036854775808 - 1" },
-      // { "Limits 11", itr(-9223372036854775808L), "-9223372036854775808" },
 
       { "Empty 1", strings(""), "format-integer(let $x := random:integer() return (), '0')" },
       { "Empty 2", empty(), "math:sin(let $x := random:integer() return ())" },
       { "Empty 3", booleans(true), "let $a := () return empty($a)" },
       { "Empty 4", booleans(false), "let $a := () return exists($a)" },
       { "Empty 5", booleans(true), "declare function local:foo($x as empty-sequence())"
-          + "as xs:boolean { empty($x) }; local:foo(())" }
+          + "as xs:boolean { empty($x) }; local:foo(())" },
+
+      { "Map 1", strings("c", "a"), "<a/> ! (('b'!'c'), name())" },
+      { "Map 2", integers(5), "((1 to 100000000) ! 5)[1]" },
     };
   }
 }

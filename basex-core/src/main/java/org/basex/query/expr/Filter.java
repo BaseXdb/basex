@@ -34,14 +34,30 @@ public abstract class Filter extends Preds {
   }
 
   /**
-   * Creates a filter expression for the given root and predicates.
-   * @param ii input info
-   * @param r root expression
-   * @param p predicate expressions
+   * Creates a filter or path expression for the given root and predicates.
+   * @param info input info
+   * @param root root expression
+   * @param preds predicate expressions
    * @return filter expression
    */
-  public static Filter get(final InputInfo ii, final Expr r, final Expr... p) {
-    return new CachedFilter(ii, r, p);
+  public static Expr get(final InputInfo info, final Expr root, final Expr... preds) {
+    return path(root, preds) ? ((AxisPath) root).addPreds(preds) :
+      new CachedFilter(info, root, preds);
+  }
+
+  /**
+   * Checks if the specified filter input can be rewritten to a path.
+   * @param root root expression
+   * @param preds predicate expressions
+   * @return filter expression
+   */
+  private static boolean path(final Expr root, final Expr... preds) {
+    if(!(root instanceof AxisPath)) return false;
+    // predicate must not be numeric
+    for(final Expr pred : preds) {
+      if(pred.seqType().mayBeNumber() || pred.has(Flag.FCS)) return false;
+    }
+    return true;
   }
 
   @Override
@@ -53,7 +69,6 @@ public abstract class Filter extends Preds {
   @Override
   public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     root = root.compile(qc, scp);
-
     // invalidate current context value (will be overwritten by filter)
     final Value cv = qc.value;
     try {
@@ -67,7 +82,7 @@ public abstract class Filter extends Preds {
 
   @Override
   public final Expr optimizeEbv(final QueryContext qc, final VarScope scp) throws QueryException {
-    Expr e = merge(root, qc, scp);
+    final Expr e = merge(root, qc, scp);
     if(e != this) qc.compInfo(QueryText.OPTWRITE, this);
     return e;
   }
@@ -76,22 +91,20 @@ public abstract class Filter extends Preds {
   /**
    * Adds a predicate to the filter.
    * This function is e.g. called by {@link For#addPredicate}.
-   * @param qc query context
-   * @param scp variable scope
    * @param p predicate to be added
    * @return self reference
-   * @throws QueryException query exception
    */
-  public abstract Filter addPred(final QueryContext qc, final VarScope scp, final Expr p)
-      throws QueryException;
+  public Expr addPred(final Expr p) {
+    preds = Array.add(preds, new Expr[preds.length + 1], p);
+    return new CachedFilter(info, root, preds);
+  }
 
   @Override
   public final Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    if(path(root, preds)) return ((AxisPath) root).addPreds(preds).optimize(qc, scp);
+
     // return empty root
     if(root.isEmpty()) return optPre(qc);
-    // convert filters without numeric predicates to axis paths
-    if(root instanceof AxisPath && !super.has(Flag.FCS))
-      return ((Path) root.copy(qc, scp)).addPreds(qc, scp, preds).compile(qc, scp);
 
     // invalidate current context value (will be overwritten by filter)
     final Value cv = qc.value;
@@ -123,7 +136,7 @@ public abstract class Filter extends Preds {
       }
 
       // no numeric predicates.. use simple iterator
-      if(!super.has(Flag.FCS)) return new IterFilter(this);
+      if(!super.has(Flag.FCS)) return copy(new IterFilter(info, root, preds));
 
       // pre-evaluate if root is value and if one single position() or last() function is specified
       final boolean iter = posIterator();
@@ -144,7 +157,7 @@ public abstract class Filter extends Preds {
       }
 
       // iterator for simple numeric predicate
-      return off || iter ? new IterPosFilter(this, off) : this;
+      return off || iter ? copy(new IterPosFilter(info, off, root, preds)) : get(info, root, preds);
     } finally {
       qc.value = cv;
     }

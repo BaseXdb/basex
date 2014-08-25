@@ -158,11 +158,12 @@ public final class For extends ForLet {
    */
   void addPredicate(final QueryContext qc, final VarScope scp, final Expr pred)
       throws QueryException {
+
     // add to clause expression
     if(expr instanceof AxisPath) {
-      expr = ((AxisPath) expr).addPreds(qc, scp, pred);
+      expr = ((AxisPath) expr).addPreds(pred).optimize(qc, scp);
     } else if(expr instanceof Filter) {
-      expr = ((Filter) expr).addPred(qc, scp, pred);
+      expr = ((Filter) expr).addPred(pred).optimize(qc, scp);
     } else {
       expr = Filter.get(info, expr, pred).optimize(qc, scp);
     }

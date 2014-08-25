@@ -79,17 +79,7 @@ final class CachedFilter extends Filter {
   }
 
   @Override
-  public Filter addPred(final QueryContext qc, final VarScope scp, final Expr p) {
-    preds = Array.add(preds, new Expr[preds.length + 1], p);
-    return this;
-  }
-
-  @Override
   public Filter copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Filter f = new CachedFilter(info, root == null ? null : root.copy(qc, scp, vs),
-        Arr.copyAll(qc, scp, vs, preds));
-    f.pos = pos;
-    f.last = last;
-    return f;
+    return copy(new CachedFilter(info, root.copy(qc, scp, vs), Arr.copyAll(qc, scp, vs, preds)));
   }
 }

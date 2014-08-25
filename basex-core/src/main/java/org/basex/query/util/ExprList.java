@@ -63,7 +63,10 @@ public final class ExprList extends ElementList {
    * @return self reference
    */
   public ExprList add(final Expr... elements) {
-    for(final Expr e : elements) add(e);
+    final int l = elements.length, s = size, ns = s + l;
+    if(ns > list.length) resize(newSize(ns));
+    System.arraycopy(elements, 0, list, s, l);
+    size = ns;
     return this;
   }
 

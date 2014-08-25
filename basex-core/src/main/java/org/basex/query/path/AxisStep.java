@@ -28,7 +28,7 @@ final class AxisStep extends Step {
   }
 
   @Override
-  public NodeIter iter(final QueryContext qc) throws QueryException {
+  public NodeSeqBuilder iter(final QueryContext qc) throws QueryException {
     // evaluate step
     final AxisIter ai = axis.iter(checkNode(qc));
     final NodeSeqBuilder nc = new NodeSeqBuilder();

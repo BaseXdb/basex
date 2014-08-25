@@ -40,7 +40,7 @@ public abstract class Path extends ParseExpr {
    * @param root root expression; can be a {@code null} reference
    * @param steps steps
    */
-  Path(final InputInfo info, final Expr root, final Expr[] steps) {
+  protected Path(final InputInfo info, final Expr root, final Expr[] steps) {
     super(info);
     this.root = root;
     this.steps = steps;
@@ -80,26 +80,30 @@ public abstract class Path extends ParseExpr {
       } else if(step instanceof Filter) {
         // rewrite filter to axis step
         final Filter f = (Filter) step;
-        if(f.root instanceof Context) step = Step.get(f.info, SELF, Test.NOD, f.preds);
+        if(f.root instanceof Context) {
+          step = Step.get(f.info, SELF, Test.NOD, f.preds);
+        }
       } else if(step instanceof Path) {
         // rewrite path to axis steps
         final Path p = (Path) step;
-        if(p.root == null || p.root instanceof Context) {
-          final int pl = p.steps.length - 1;
-          for(int i = 0; i < pl; i++) stps.add(p.steps[i]);
-          step = p.steps[pl];
-        }
+        if(p.root != null && !(p.root instanceof Context)) stps.add(p.root);
+        final int pl = p.steps.length - 1;
+        for(int i = 0; i < pl; i++) stps.add(p.steps[i]);
+        step = p.steps[pl];
       }
       stps.add(step);
     }
 
     // check if all steps are axis steps
-    boolean axes = true;
+    boolean axes = true, map = true;
     final Expr[] st = stps.finish();
-    for(final Expr step : st) axes &= step instanceof Step;
+    for(final Expr step : st) {
+      axes &= step instanceof Step;
+      map &= step instanceof MapStep && !step.has(Flag.FCS);
+    }
 
     // choose best implementation
-    return axes ? iterative(rt, st) ? new IterPath(info, rt, st) :
+    return map ? new MapPath(info, rt, st) : axes ? iterative(rt, st) ? new IterPath(info, rt, st) :
       new CachedPath(info, rt, st) : new MixedPath(info, rt, st);
   }
 
@@ -224,18 +228,13 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Adds a predicate to the last step.
-   * @param qc query context
-   * @param scp variable scope
+   * Adds predicates to the last step.
    * @param preds predicate to be added
    * @return resulting path instance
-   * @throws QueryException query exception
    */
-  public final Expr addPreds(final QueryContext qc, final VarScope scp, final Expr... preds)
-      throws QueryException {
-
+  public final Path addPreds(final Expr... preds) {
     steps[steps.length - 1] = axisStep(steps.length - 1).addPreds(preds);
-    return get(info, root, steps).optimize(qc, scp);
+    return get(info, root, steps);
   }
 
   /**
@@ -844,7 +843,7 @@ public abstract class Path extends ParseExpr {
     final StringBuilder sb = new StringBuilder();
     if(root != null) sb.append(root);
     for(final Expr s : steps) {
-      if(sb.length() != 0) sb.append(s instanceof Bang ? " ! " : "/");
+      if(sb.length() != 0) sb.append(s instanceof MapStep ? " ! " : "/");
       sb.append(s);
     }
     return sb.toString();

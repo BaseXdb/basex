@@ -128,11 +128,7 @@ public final class FnSubsequence extends StandardFunc {
     final long e = linf ? l : start + l;
     final ValueBuilder build = new ValueBuilder();
     Item i;
-    for(int c = 1; (i = iter.next()) != null; c++) {
-      if(c >= e) {
-        iter.reset();
-        break;
-      }
+    for(int c = 1; c < e && (i = iter.next()) != null; c++) {
       if(c >= start) build.add(i);
     }
     return build.value();

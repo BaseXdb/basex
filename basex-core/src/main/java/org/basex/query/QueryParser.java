@@ -1829,7 +1829,7 @@ public class QueryParser extends InputParser {
       mark();
       Expr st = step();
       if(st == null) throw error(PATHMISS_X, found());
-      if(map) st = new Bang(info(), st);
+      if(map) st = new MapStep(info(), st);
       add(el, st);
     }
   }

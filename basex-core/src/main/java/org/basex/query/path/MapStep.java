@@ -9,18 +9,18 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Map ("bang") operator. Only occurs as argument of the {@link MixedPath} expression.
+ * Map operator. Only occurs as argument of the {@link MixedPath} expression.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class Bang extends Single {
+public final class MapStep extends Single {
   /**
    * Constructor.
    * @param info input info
    * @param expr expression
    */
-  public Bang(final InputInfo info, final Expr expr) {
+  public MapStep(final InputInfo info, final Expr expr) {
     super(info, expr);
   }
 
@@ -43,7 +43,7 @@ public final class Bang extends Single {
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Bang(info, expr.copy(qc, scp, vs));
+    return new MapStep(info, expr.copy(qc, scp, vs));
   }
 
   @Override

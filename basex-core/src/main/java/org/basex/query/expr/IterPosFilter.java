@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -18,16 +19,14 @@ final class IterPosFilter extends Filter {
 
   /**
    * Constructor.
-   * @param f original filter
-   * @param o offset flag
+   * @param info input info
+   * @param off offset flag
+   * @param root root expression
+   * @param preds predicates
    */
-  IterPosFilter(final Filter f, final boolean o) {
-    super(f.info, f.root, f.preds);
-    off = o;
-    seqType = f.seqType;
-    last = f.last;
-    size = f.size;
-    pos = f.pos;
+  IterPosFilter(final InputInfo info, final boolean off, final Expr root, final Expr... preds) {
+    super(info, root, preds);
+    this.off = off;
   }
 
   @Override
@@ -110,17 +109,8 @@ final class IterPosFilter extends Filter {
   }
 
   @Override
-  public Filter copy(final QueryContext qc, final VarScope scp,
-      final IntObjMap<Var> vs) {
-    final Filter f = new CachedFilter(info, root == null ? null : root.copy(qc, scp, vs),
-        Arr.copyAll(qc, scp, vs, preds));
-    return copy(new IterPosFilter(f, off));
-  }
-
-  @Override
-  public Filter addPred(final QueryContext qc, final VarScope scp, final Expr p)
-      throws QueryException {
-    // [LW] should be fixed
-    return ((Filter) new CachedFilter(info, root, preds).copy(qc, scp)).addPred(qc, scp, p);
+  public IterPosFilter copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return copy(new IterPosFilter(info, off, root.copy(qc, scp, vs),
+        Arr.copyAll(qc, scp, vs, preds)));
   }
 }
