@@ -263,10 +263,11 @@ public abstract class Expr extends ExprInfo {
       final Var var, final Expr ex) throws QueryException {
 
     boolean change = false;
-    for(int i = 0; i < arr.length; i++) {
-      final Expr nw = arr[i].inline(qc, scp, var, ex);
-      if(nw != null) {
-        arr[i] = nw;
+    final int al = arr.length;
+    for(int a = 0; a < al; a++) {
+      final Expr e = arr[a].inline(qc, scp, var, ex);
+      if(e != null) {
+        arr[a] = e;
         change = true;
       }
     }

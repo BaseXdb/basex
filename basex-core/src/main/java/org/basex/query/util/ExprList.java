@@ -82,6 +82,16 @@ public final class ExprList extends ElementList {
   }
 
   /**
+   * Checks if the specified element is found in the list.
+   * @param element element to be found
+   * @return result of check
+   */
+  public boolean contains(final Expr element) {
+    for(int i = 0; i < size; ++i) if(list[i].sameAs(element)) return true;
+    return false;
+  }
+
+  /**
    * Resizes the array.
    * @param sz new size
    */

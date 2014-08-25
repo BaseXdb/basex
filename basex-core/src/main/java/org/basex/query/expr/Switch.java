@@ -2,6 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -20,7 +22,7 @@ import org.basex.util.hash.*;
  */
 public final class Switch extends ParseExpr {
   /** Cases. */
-  private final SwitchCase[] cases;
+  private SwitchCase[] cases;
   /** Condition. */
   private Expr cond;
 
@@ -56,31 +58,63 @@ public final class Switch extends ParseExpr {
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // check if expression can be pre-evaluated
-    Expr ex = this;
-    if(cond.isValue()) {
-      final Item it = cond.atomItem(qc, info);
-      LOOP:
-      for(final SwitchCase sc : cases) {
-        final int sl = sc.exprs.length;
-        for(int e = 1; e < sl; e++) {
-          if(!sc.exprs[e].isValue()) break LOOP;
-
-          // includes check for empty sequence (null reference)
-          final Item cs = sc.exprs[e].item(qc, info);
-          if(it == cs || cs != null && it != null && it.equiv(cs, null, info)) {
-            ex = sc.exprs[0];
-            break LOOP;
-          }
-        }
-        if(sl == 1) ex = sc.exprs[0];
-      }
-    }
+    final Expr ex = opt(qc);
     if(ex != this) return optPre(ex, qc);
 
     // expression could not be pre-evaluated
     seqType = cases[0].exprs[0].seqType();
     for(int c = 1; c < cases.length; c++) seqType = seqType.union(cases[c].exprs[0].seqType());
     return ex;
+  }
+
+  /**
+   * Optimizes the expression.
+   * @param qc query context
+   * @return optimized or original expression
+   * @throws QueryException query exception
+   */
+  public Expr opt(final QueryContext qc) throws QueryException {
+    // pre-evaluate cases
+    final boolean pre = cond.isValue();
+    // cache expressions
+    final ExprList cache = new ExprList();
+
+    final Item it = pre ? cond.atomItem(qc, info) : null;
+    final ArrayList<SwitchCase> tmp = new ArrayList<>();
+    for(final SwitchCase sc : cases) {
+      final int sl = sc.exprs.length;
+      final Expr ret = sc.exprs[0];
+      final ExprList el = new ExprList(sl).add(ret);
+      for(int e = 1; e < sl; e++) {
+        final Expr ex = sc.exprs[e];
+        if(pre && ex.isValue()) {
+          // includes check for empty sequence (null reference)
+          final Item cs = ex.item(qc, info);
+          if(it == cs || cs != null && it != null && it.equiv(cs, null, info)) return ret;
+          qc.compInfo(OPTREMOVE, description(), ex);
+        } else if(cache.contains(ex)) {
+          // case has already been checked before
+          qc.compInfo(OPTREMOVE, description(), ex);
+        } else {
+          cache.add(ex);
+          el.add(ex);
+        }
+      }
+      // return default branch (last one) if all others were discarded
+      if(sl == 1 && tmp.size() == 0) return ret;
+      // build list of branches (add default branch and those that could not be pre-evaluated)
+      if(sl == 1 || el.size() > 1) {
+        sc.exprs = el.finish();
+        tmp.add(sc);
+      }
+    }
+
+    if(tmp.size() != cases.length) {
+      // branches have changed
+      qc.compInfo(OPTWRITE, this);
+      cases = tmp.toArray(new SwitchCase[tmp.size()]);
+    }
+    return this;
   }
 
   @Override

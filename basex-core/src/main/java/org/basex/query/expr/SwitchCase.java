@@ -18,7 +18,7 @@ public final class SwitchCase extends Arr {
   /**
    * Constructor.
    * @param info input info
-   * @param exprs return expression (placed first) and cases
+   * @param exprs return expression (placed first) and cases (default branch has 0 cases)
    */
   public SwitchCase(final InputInfo info, final Expr... exprs) {
     super(info, exprs);

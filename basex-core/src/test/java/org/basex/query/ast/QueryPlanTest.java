@@ -37,7 +37,7 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
               "- Plan: " + plan.serialize());
         }
       }
-    } catch(final Exception ex) {
+    } catch(final QueryException | QueryIOException ex) {
       final AssertionError err = new AssertionError(Util.message(ex));
       err.initCause(ex);
       throw err;

@@ -95,15 +95,12 @@ public abstract class Path extends ParseExpr {
     }
 
     // check if all steps are axis steps
-    boolean axes = true, map = true;
+    boolean axes = true;
     final Expr[] st = stps.finish();
-    for(final Expr step : st) {
-      axes &= step instanceof Step;
-      map &= step instanceof MapStep && !step.has(Flag.FCS);
-    }
+    for(final Expr step : st) axes &= step instanceof Step;
 
     // choose best implementation
-    return map ? new MapPath(info, rt, st) : axes ? iterative(rt, st) ? new IterPath(info, rt, st) :
+    return axes ? iterative(rt, st) ? new IterPath(info, rt, st) :
       new CachedPath(info, rt, st) : new MixedPath(info, rt, st);
   }
 
@@ -793,20 +790,11 @@ public abstract class Path extends ParseExpr {
   public final Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
 
-    boolean changed = false;
+    boolean changed = inlineAll(qc, scp, steps, var, ex);
     if(root != null) {
       final Expr rt = root.inline(qc, scp, var, ex);
       if(rt != null) {
         root = rt;
-        changed = true;
-      }
-    }
-
-    final int sl = steps.length;
-    for(int s = 0; s < sl; s++) {
-      final Expr nw = steps[s].inline(qc, scp, var, ex);
-      if(nw != null) {
-        steps[s] = nw;
         changed = true;
       }
     }
@@ -843,7 +831,7 @@ public abstract class Path extends ParseExpr {
     final StringBuilder sb = new StringBuilder();
     if(root != null) sb.append(root);
     for(final Expr s : steps) {
-      if(sb.length() != 0) sb.append(s instanceof MapStep ? " ! " : "/");
+      if(sb.length() != 0) sb.append('/');
       sb.append(s);
     }
     return sb.toString();

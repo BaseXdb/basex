@@ -3,7 +3,6 @@ package org.basex.query.path;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
@@ -11,28 +10,25 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Iterative path expression for map paths that do not access the context position or size.
+ * Simple map expression: iterative evaluation.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-final class MapPath extends Path {
+public final class IterMap extends SimpleMap {
   /**
    * Constructor.
    * @param info input info
-   * @param root root expression
    * @param steps axis steps
    */
-  MapPath(final InputInfo info, final Expr root, final Expr... steps) {
-    super(info, root, steps);
+  protected IterMap(final InputInfo info, final Expr... steps) {
+    super(info, steps);
   }
 
   @Override
-  public Iter iter(final QueryContext qc) {
+  public Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
-      final boolean r = root != null;
-      final int sz = steps.length + (r ? 1 : 0);
-      final Expr[] expr = r ? new ExprList(sz).add(root).add(steps).finish() : steps;
+      final int sz = exprs.length;
       final Iter[] iter = new Iter[sz];
       final Value[] values = new Value[sz];
       int pos = -1;
@@ -44,7 +40,7 @@ final class MapPath extends Path {
         int p = pos;
         if(p == -1) {
           values[++p] = cv;
-          iter[p] = qc.iter(expr[0]);
+          iter[p] = qc.iter(exprs[0]);
         }
 
         try {
@@ -60,7 +56,7 @@ final class MapPath extends Path {
             } else if(p < sz - 1) {
               qc.value = it;
               values[++p] = it;
-              iter[p] = qc.iter(expr[p]);
+              iter[p] = qc.iter(exprs[p]);
             } else {
               pos = p;
               return it;
@@ -80,8 +76,7 @@ final class MapPath extends Path {
   }
 
   @Override
-  public MapPath copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Expr rt = root == null ? null : root.copy(qc, scp, vs);
-    return copyType(new MapPath(info, rt,  Arr.copyAll(qc, scp, vs, steps)));
+  public SimpleMap copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return copyType(new IterMap(info, Arr.copyAll(qc, scp, vs, exprs)));
   }
 }

@@ -402,6 +402,8 @@ public interface QueryText {
   /** Parser token. */
   String IS = "=";
   /** Parser token. */
+  String EXCL = "!";
+  /** Parser token. */
   String XQ10 = "1.0";
   /** Parser token. */
   String XQ11 = "1.1";

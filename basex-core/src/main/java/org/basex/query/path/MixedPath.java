@@ -51,14 +51,13 @@ public final class MixedPath extends Path {
         final ValueBuilder vb = new ValueBuilder();
 
         // map operator: don't remove duplicates and check for nodes
-        final boolean path = !(step instanceof MapStep);
         qc.size = res.size();
         qc.pos = 1;
 
         // loop through all input items
         int nodes = 0;
         for(Item it; (it = res.next()) != null;) {
-          if(path && !(it instanceof ANode)) throw PATHNODE_X_X_X.get(info, step, it.type, it);
+          if(!(it instanceof ANode)) throw PATHNODE_X_X_X.get(info, step, it.type, it);
           qc.value = it;
 
           // loop through all resulting items
@@ -73,15 +72,15 @@ public final class MixedPath extends Path {
         final long vs = vb.size();
         if(nodes < vs) {
           // check if both nodes and atomic values occur in last result
-          if(path && nodes > 0) throw EVALNODESVALS.get(info);
+          if(nodes > 0) throw EVALNODESVALS.get(info);
           // check if input for next axis step consists items other than nodes
-          if(s + 1 < sl && !(steps[s + 1] instanceof MapStep)) {
+          if(s + 1 < sl) {
             final Item it = vb.get(0);
             throw PATHNODE_X_X_X.get(info, it.type, it);
           }
         }
 
-        if(path && nodes == vs) {
+        if(nodes == vs) {
           // remove potential duplicates from node sets
           final NodeSeqBuilder nc = new NodeSeqBuilder().check();
           for(Item it; (it = vb.next()) != null;) nc.add((ANode) it);

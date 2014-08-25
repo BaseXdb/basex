@@ -28,7 +28,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
   protected static String query(final String query) {
     try {
       return run(query);
-    } catch(final Exception ex) {
+    } catch(final QueryException | IOException ex) {
       Util.errln(Util.message(ex));
       Util.stack(12);
       final AssertionError err = new AssertionError("Query failed:\n" + query);
@@ -157,9 +157,10 @@ public abstract class AdvancedQueryTest extends SandboxTest {
    * Runs the specified query and normalizes newlines.
    * @param query query string
    * @return result
-   * @throws Exception exception
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  private static String run(final String query) throws Exception {
+  private static String run(final String query) throws QueryException, IOException {
     final QueryProcessor qp = new QueryProcessor(query, context);
     qp.sc.baseURI(BASEURI);
     try {

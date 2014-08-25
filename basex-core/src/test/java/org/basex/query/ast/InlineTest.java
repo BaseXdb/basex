@@ -22,10 +22,10 @@ public class InlineTest extends QueryPlanTest {
   /** Tests if variable uses in {@link Switch} are counted correctly. */
   @Test public void switchTest() {
     // all paths use $x only once
-    check("let $x := 1 ! 42 return switch(42) case 23 return $x case 84 return $x" +
+    check("let $x := 42 return switch(42) case 23 return $x case 84 return $x" +
         " case $x return 123 default return 1337", "123", "empty(//GFLWOR)");
     // $x is used twice
-    check("let $x := 1 ! 42 return switch(23) case $x return 123 case 23 return $x" +
+    check("let $x := <x/> ! 42 return switch(23) case $x return 123 case 23 return $x" +
         " default return 1337", "42", "exists(//GFLWOR)");
   }
 

@@ -1676,13 +1676,13 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ValueExpr" rule.
-   * @return query expression
+   * @return query expression, or {@code null}
    * @throws QueryException query exception
    */
   private Expr value() throws QueryException {
     validate();
-    final Expr e = path();
-    return e != null ? e : extension();
+    final Expr e = extension();
+    return e == null ? map() : e;
   }
 
   /**
@@ -1712,7 +1712,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ExtensionExpr" rule.
-   * @return query expression
+   * @return query expression, or {@code null}
    * @throws QueryException query exception
    */
   private Expr extension() throws QueryException {
@@ -1755,6 +1755,24 @@ public class QueryParser extends InputParser {
     return el.toArray(new Pragma[el.size()]);
   }
 
+
+  /**
+   * Parses the "MapExpr" rule.
+   * @return query expression, or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr map() throws QueryException {
+    final Expr e = path();
+    if(e != null) {
+      while(next() != '=' && wsConsumeWs(EXCL)) {
+        final ExprList el = new ExprList(e);
+        do add(el, path()); while(next() != '=' && wsConsumeWs(EXCL));
+        return SimpleMap.get(info(), el.finish());
+      }
+    }
+    return e;
+  }
+
   /**
    * Parses the "PathExpr" rule.
    * @return query expression
@@ -1795,9 +1813,8 @@ public class QueryParser extends InputParser {
       mark();
       final Expr ex = step();
       if(ex == null) return null;
-      // return non-step expression if no path or map operator follows
-      final boolean nostep = curr() != '/' && (curr() != '!' || next() == '=');
-      if(nostep && !(ex instanceof Step)) return ex;
+      // return expression if no slash follows
+      if(curr() != '/' && !(ex instanceof Step)) return ex;
       el = new ExprList();
       if(ex instanceof Step) add(el, ex);
       else root = ex;
@@ -1813,7 +1830,6 @@ public class QueryParser extends InputParser {
    */
   private void relativePath(final ExprList el) throws QueryException {
     while(true) {
-      boolean map = false;
       if(consume('/')) {
         if(consume('/')) {
           add(el, descOrSelf());
@@ -1821,15 +1837,12 @@ public class QueryParser extends InputParser {
         } else {
           checkAxis(Axis.CHILD);
         }
-      } else if(next() != '=' && consume('!')) {
-        map = true;
       } else {
         return;
       }
       mark();
-      Expr st = step();
+      final Expr st = step();
       if(st == null) throw error(PATHMISS_X, found());
-      if(map) st = new MapStep(info(), st);
       add(el, st);
     }
   }
