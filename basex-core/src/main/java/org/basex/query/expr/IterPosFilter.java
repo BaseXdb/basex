@@ -97,7 +97,6 @@ final class IterPosFilter extends Filter {
 
           // check if more items can be expected
           skip = last || pos != null && pos.skip(qc);
-          if(skip && direct) iter.reset();
           return item;
         } finally {
           // reset context and return result

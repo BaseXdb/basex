@@ -68,13 +68,4 @@ public final class AtomIter extends Iter {
   public Item get(final long i) throws QueryException {
     return iter.get(i);
   }
-
-  @Override
-  public boolean reset() {
-    if(iter.reset()) {
-      atom = null;
-      return true;
-    }
-    return false;
-  }
 }

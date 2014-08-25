@@ -45,8 +45,6 @@ public abstract class Item extends Value {
       @Override
       public Item get(final long i) { return Item.this; }
       @Override
-      public boolean reset() { req = false; return true; }
-      @Override
       public Value value() { return Item.this; }
     };
   }

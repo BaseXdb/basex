@@ -52,24 +52,12 @@ public final class FnSubsequence extends StandardFunc {
       // directly access specified items
       final long m = Math.min(e, max + 1);
       long c = Math.max(1, s);
-
       @Override
-      public Item next() throws QueryException {
-        return c < m ? iter.get(c++ - 1) : null;
-      }
+      public Item next() throws QueryException { return c < m ? iter.get(c++ - 1) : null; }
       @Override
-      public Item get(final long i) throws QueryException {
-        return iter.get(c + i - 1);
-      }
+      public Item get(final long i) throws QueryException { return iter.get(c + i - 1); }
       @Override
-      public long size() {
-        return Math.max(0, m - c);
-      }
-      @Override
-      public boolean reset() {
-        c = Math.max(1, s);
-        return true;
-      }
+      public long size() { return Math.max(0, m - c); }
     };
 
     // return simple iterator if number of returned values is unknown

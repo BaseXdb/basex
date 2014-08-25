@@ -124,13 +124,6 @@ public final class List extends Arr {
           ir = null;
         }
       }
-
-      @Override
-      public boolean reset() {
-        ir = null;
-        e = 0;
-        return true;
-      }
     };
   }
 

@@ -36,24 +36,12 @@ public final class FnReverse extends StandardFunc {
     // return iterator if items can be directly accessed
     return s == 0 ? Empty.ITER : s == 1 ? iter : new Iter() {
       long c = s;
-
       @Override
-      public Item next() throws QueryException {
-        return --c >= 0 ? iter.get(c) : null;
-      }
+      public Item next() throws QueryException { return --c >= 0 ? iter.get(c) : null; }
       @Override
-      public Item get(final long i) throws QueryException {
-        return iter.get(s - i - 1);
-      }
+      public Item get(final long i) throws QueryException { return iter.get(s - i - 1); }
       @Override
-      public long size() {
-        return s;
-      }
-      @Override
-      public boolean reset() {
-        c = s;
-        return iter.reset();
-      }
+      public long size() { return s; }
     };
   }
 

@@ -27,9 +27,6 @@ public abstract class ValueIter extends Iter implements Iterable<Item> {
   public abstract long size();
 
   @Override
-  public abstract boolean reset();
-
-  @Override
   public abstract Value value();
 
   @Override

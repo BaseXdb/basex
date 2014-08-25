@@ -133,8 +133,6 @@ public abstract class FNode extends ANode {
       @Override
       public long size() { return iter.size(); }
       @Override
-      public boolean reset() { c = 0; return true; }
-      @Override
       public Value value() { return iter.value(); }
     };
   }

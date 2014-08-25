@@ -22,6 +22,8 @@ public final class SimpleTest extends QueryTest {
 
       { "Compare 1", "xs:QName('a') = attribute a { 'b' }" },
       { "Compare 2", booleans(false), "<a/>/x = (c, ())" },
+      { "Compare 3", booleans(false), "(4,5,6) < (1,2)" },
+      { "Compare 4", booleans(false), "(4,5) < (1,2,3)" },
 
       { "FLWOR 1", integers(3), "(for $i in 1 to 5 return $i)[3]" },
       { "FLWOR 2", integers(4),

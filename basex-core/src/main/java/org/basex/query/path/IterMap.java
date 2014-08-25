@@ -66,12 +66,6 @@ public final class IterMap extends SimpleMap {
           qc.value = cv;
         }
       }
-
-      @Override
-      public boolean reset() {
-        pos = -1;
-        return true;
-      }
     };
   }
 

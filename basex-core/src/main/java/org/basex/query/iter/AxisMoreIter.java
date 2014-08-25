@@ -19,7 +19,6 @@ public abstract class AxisMoreIter extends AxisIter {
     @Override public ANode next() { return null; }
     @Override public Item get(final long i) { return null; }
     @Override public long size() { return 0; }
-    @Override public boolean reset() { return true; }
     @Override public Value value() { return Empty.SEQ; }
   };
 

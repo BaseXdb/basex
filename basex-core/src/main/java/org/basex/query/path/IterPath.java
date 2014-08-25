@@ -88,13 +88,6 @@ final class IterPath extends AxisPath {
           qc.size = cs;
         }
       }
-
-      @Override
-      public boolean reset() {
-        node = null;
-        pos = -1;
-        return true;
-      }
     };
   }
 

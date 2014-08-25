@@ -25,7 +25,6 @@ public final class Empty extends Value {
     @Override public Item get(final long i) { return null; }
     @Override public Value value() { return SEQ; }
     @Override public long size() { return 0; }
-    @Override public boolean reset() { return true; }
   };
 
   /**

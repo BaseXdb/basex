@@ -82,12 +82,6 @@ public final class NodeSeqBuilder extends AxisIter {
   }
 
   @Override
-  public boolean reset() {
-    pos = -1;
-    return true;
-  }
-
-  @Override
   public ANode next() {
     if(check) sort(sort);
     return ++pos < size ? nodes[pos] : null;

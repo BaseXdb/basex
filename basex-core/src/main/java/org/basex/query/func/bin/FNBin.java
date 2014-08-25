@@ -200,8 +200,6 @@ public class FNBin extends StandardFunc {
       @Override
       public Int next() { return c < s ? get(c++) : null; }
       @Override
-      public boolean reset() { c = 0; return true; }
-      @Override
       public long size() { return s; }
       @Override
       public Value value() {

@@ -96,12 +96,6 @@ public final class ValueBuilder extends ValueIter implements Result {
   }
 
   @Override
-  public boolean reset() {
-    pos = -1;
-    return true;
-  }
-
-  @Override
   public long size() {
     return size;
   }

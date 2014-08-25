@@ -66,14 +66,6 @@ final class IterPosStep extends Step {
           }
         }
       }
-
-      @Override
-      public boolean reset() {
-        ai = null;
-        skip = false;
-        cpos = 0;
-        return true;
-      }
     };
   }
 

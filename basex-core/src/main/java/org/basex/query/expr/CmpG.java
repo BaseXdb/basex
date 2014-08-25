@@ -209,7 +209,7 @@ public final class CmpG extends Cmp {
     }
 
     // retrieve iterators
-    final Iter ir1 = exprs[0].atomIter(qc, info);
+    Iter ir1 = exprs[0].atomIter(qc, info);
     final long is1 = ir1.size();
     if(is1 == 0) return Bln.FALSE;
     final boolean s1 = is1 == 1;
@@ -236,23 +236,21 @@ public final class CmpG extends Cmp {
       return Bln.FALSE;
     }
 
-    // evaluate two iterators, cache results of second iterator
-    if(!ir2.reset()) {
-      // cache items for next comparisons
-      final ValueBuilder vb = new ValueBuilder(Math.max(1, (int) is2));
-      final Item it1 = ir1.next();
-      if(it1 == null) return Bln.FALSE;
-      for(Item it2; (it2 = ir2.next()) != null;) {
-        if(eval(it1, it2)) return Bln.TRUE;
-        vb.add(it2);
-      }
-      ir2 = vb;
+    // swap iterators if first iterator returns more results than second
+    final boolean swap = is1 > is2;
+    if(swap) {
+      final Iter ir = ir1;
+      ir1 = ir2;
+      ir2 = ir;
     }
 
-    // reset second iterator and keep on looping
+    // loop through all items of first and second iterator
     for(Item it1; (it1 = ir1.next()) != null;) {
-      ir2.reset();
-      for(Item it2; (it2 = ir2.next()) != null;) if(eval(it1, it2)) return Bln.TRUE;
+      if(ir2 == null) ir2 = exprs[swap ? 0 : 1].atomIter(qc, info);
+      for(Item it2; (it2 = ir2.next()) != null;) {
+        if(swap ? eval(it2, it1) : eval(it1, it2)) return Bln.TRUE;
+      }
+      ir2 = null;
     }
 
     // give up

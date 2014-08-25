@@ -128,11 +128,6 @@ public final class MainModule extends StaticScope {
       public Item get(final long i) throws QueryException {
         return iter.get(i);
       }
-
-      @Override
-      public boolean reset() {
-        return iter.reset();
-      }
     };
   }
 

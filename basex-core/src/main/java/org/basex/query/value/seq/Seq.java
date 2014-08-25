@@ -91,8 +91,6 @@ public abstract class Seq extends Value {
       @Override
       public Item next() { return c < size ? itemAt(c++) : null; }
       @Override
-      public boolean reset() { c = 0; return true; }
-      @Override
       public long size() { return size; }
       @Override
       public Value value() { return Seq.this; }

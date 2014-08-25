@@ -245,8 +245,6 @@ public final class FNDb extends StandardFunc {
       @Override
       public Str next() { return pos < size() ? get(pos++) : null; }
       @Override
-      public boolean reset() { pos = 0; return true; }
-      @Override
       public long size() { return tl.size(); }
     };
   }
@@ -313,8 +311,6 @@ public final class FNDb extends StandardFunc {
         return ip < is ? get(ip++) : tp < ts ? get(ip + tp++) : null;
       }
       @Override
-      public boolean reset() { ip = 0; tp = 0; return true; }
-      @Override
       public long size() { return ip + is; }
     };
   }
@@ -347,11 +343,7 @@ public final class FNDb extends StandardFunc {
         return res;
       }
       @Override
-      public ANode next() throws QueryException {
-        return pos < size() ? get(pos++) : null;
-      }
-      @Override
-      public boolean reset() { pos = 0; return true; }
+      public ANode next() throws QueryException { return pos < size() ? get(pos++) : null; }
       @Override
       public long size() { return sl.size(); }
     };

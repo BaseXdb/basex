@@ -42,12 +42,6 @@ final class IterStep extends Step {
           if(test.eq(node) && preds(node, qc)) return node.finish();
         }
       }
-
-      @Override
-      public boolean reset() {
-        ai = null;
-        return true;
-      }
     };
   }
 
