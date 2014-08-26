@@ -53,8 +53,6 @@ public final class FnTrace extends StandardFunc {
       final byte[] value;
       if(it == null) {
         value = token(SeqType.EMP.toString());
-      } else if(it instanceof FuncItem) {
-        value = token((((FuncItem) it).expr).toString());
       } else if(it instanceof FItem || it.type == NodeType.ATT || it.type == NodeType.NSP) {
         value = token(it.toString());
       } else {
