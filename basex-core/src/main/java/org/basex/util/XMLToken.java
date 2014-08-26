@@ -333,7 +333,7 @@ public final class XMLToken {
     "Zeta", "\u0396", "zeta", "\u03b6", "zwj", "\u200d", "zwnj", "\u200c" };
 
   /**
-   * Returns the unicode for the specified entity, or {@code null}.
+   * Returns the unicode for the specified entity or {@code null}.
    * @param key key
    * @return unicode
    */

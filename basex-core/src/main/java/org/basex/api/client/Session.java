@@ -28,7 +28,7 @@ public abstract class Session {
    * Executes a {@link Command} and returns the result as string or serializes
    * it to the specified output stream.
    * @param command command to be executed
-   * @return result, or {@code null} reference
+   * @return result or {@code null} reference
    * @throws IOException I/O exception
    */
   public final String execute(final Command command) throws IOException {
@@ -41,7 +41,7 @@ public abstract class Session {
    * Executes a command and returns the result as string or serializes
    * it to the specified output stream.
    * @param command command to be parsed
-   * @return result, or {@code null} reference
+   * @return result or {@code null} reference
    * @throws IOException I/O exception
    */
   public final String execute(final String command) throws IOException {

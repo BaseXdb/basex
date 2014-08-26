@@ -265,7 +265,7 @@ public final class Array extends FItem {
 
   @Override
   public String description() {
-    return BR1 + DOTS + BR2;
+    return SQUARE1 + DOTS + SQUARE2;
   }
 
   @Override

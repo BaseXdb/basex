@@ -206,7 +206,7 @@ public final class Switch extends ParseExpr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(SWITCH + PAR1 + cond + PAR2);
+    final StringBuilder sb = new StringBuilder(SWITCH + PAREN1 + cond + PAREN2);
     for(final SwitchCase sc : cases) sb.append(sc);
     return sb.toString();
   }

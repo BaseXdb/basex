@@ -50,7 +50,7 @@ final class JsonParser extends InputParser {
    * Parses the input string, directs the parse events to the given handler and returns
    * the resulting value.
    * @param input input string
-   * @param path input path (may be {@code null)}
+   * @param path input path (can be {@code null)}
    * @param opts options
    * @param conv converter
    * @throws QueryIOException parse exception

@@ -406,7 +406,7 @@ public final class QueryContext extends Proc {
   }
 
   /**
-   * Returns the current data reference of the context value, or {@code null}.
+   * Returns the current data reference of the context value or {@code null}.
    * @return data reference
    */
   public Data data() {

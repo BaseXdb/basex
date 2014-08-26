@@ -153,7 +153,7 @@ public abstract class StandardFunc extends Arr {
   public final String toString() {
     final String desc = func.toString();
     return new TokenBuilder(desc.substring(0,
-       desc.indexOf('(') + 1)).addSep(exprs, SEP).add(PAR2).toString();
+       desc.indexOf('(') + 1)).addSep(exprs, SEP).add(PAREN2).toString();
   }
 
   /**
@@ -183,7 +183,7 @@ public abstract class StandardFunc extends Arr {
    * Checks if the specified collation is supported.
    * @param i argument index
    * @param qc query context
-   * @return collator, or {@code null} (default collation)
+   * @return collator or {@code null} (default collation)
    * @throws QueryException query exception
    */
   protected final Collation toCollation(final int i, final QueryContext qc) throws QueryException {

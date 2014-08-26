@@ -73,7 +73,7 @@ public final class FnTrace extends StandardFunc {
   /**
    * Dumps the specified info to standard error or the info view of the GUI.
    * @param value traced value
-   * @param label additional label to display (can be {@code null})
+   * @param label additional label to display (may be {@code null})
    * @param qc query context
    */
   public static void dump(final byte[] value, final byte[] label, final QueryContext qc) {

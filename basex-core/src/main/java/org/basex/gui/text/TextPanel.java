@@ -158,7 +158,7 @@ public class TextPanel extends BaseXPanel {
 
   /**
    * Returns a currently marked string if it does not extend over more than one line.
-   * @return search string, or {@code null}
+   * @return search string or {@code null}
    */
   public String searchString() {
     final String string = editor.copy();

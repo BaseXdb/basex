@@ -120,7 +120,7 @@ public final class FTDistance extends FTFilter {
 
   @Override
   public String toString() {
-    return super.toString() + DISTANCE + PAR1 + min + '-' + max + ' ' + unit + PAR2;
+    return super.toString() + DISTANCE + PAREN1 + min + '-' + max + ' ' + unit + PAREN2;
   }
 
   @Override

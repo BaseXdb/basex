@@ -339,12 +339,12 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         sb.append("let ").append(e.getKey()).append(" := ").append(e.getValue()).append(' ');
       sb.append(RETURN).append(' ');
     }
-    sb.append(FUNCTION).append(PAR1);
+    sb.append(FUNCTION).append(PAREN1);
     for(int i = 0; i < args.length; i++) {
       if(i > 0) sb.append(", ");
       sb.append(args[i]);
     }
-    sb.append(PAR2).append(' ');
+    sb.append(PAREN2).append(' ');
     if(ret != null) sb.append("as ").append(ret).append(' ');
     sb.append("{ ").append(expr).append(" }");
     if(!nonLocal.isEmpty()) sb.append(')');

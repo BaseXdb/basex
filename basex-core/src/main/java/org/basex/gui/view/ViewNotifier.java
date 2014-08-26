@@ -249,7 +249,7 @@ public final class ViewNotifier {
   /**
    * Removes existing history entries and sets an initial entry.
    * @param ctx database context
-   * @return {@link Data} reference, or {@code null}
+   * @return {@link Data} reference or {@code null}
    */
   private Data initHistory(final Context ctx) {
     for(int h = 0; h < histsize; h++) {

@@ -50,7 +50,7 @@ public abstract class Path extends ParseExpr {
    * Returns a new path instance. A path implementation is chosen that works fastest for the
    * given steps.
    * @param info input info
-   * @param root root expression; can be {@code null}
+   * @param root root expression, may be {@code null}
    * @param steps steps
    * @return path instance
    */
@@ -237,7 +237,7 @@ public abstract class Path extends ParseExpr {
   /**
    * Returns the path nodes that will result from this path.
    * @param qc query context
-   * @return path nodes, or {@code null} if nodes cannot be evaluated
+   * @return path nodes or {@code null} if nodes cannot be evaluated
    */
   public final ArrayList<PathNode> pathNodes(final QueryContext qc) {
     final Value init = initial(qc);

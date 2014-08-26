@@ -107,7 +107,7 @@ public final class JavaModuleFunc extends JavaMapping {
 
   @Override
   public String toString() {
-    return name() + PAR1 + toString(SEP) + PAR2;
+    return name() + PAREN1 + toString(SEP) + PAREN2;
   }
 
   @Override

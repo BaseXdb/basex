@@ -51,7 +51,7 @@ public abstract class CLI extends Main {
   /**
    * Constructor.
    * @param args command-line arguments
-   * @param ctx database context, or {@code null}
+   * @param ctx database context or {@code null}
    * @throws IOException I/O exception
    */
   protected CLI(final String[] args, final Context ctx) throws IOException {

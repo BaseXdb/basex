@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Parser extends Proc {
-  /** Source document, or {@code null}. */
+  /** Source document or {@code null}. */
   public IO src;
   /** Attributes of currently parsed element. */
   protected final Atts atts = new Atts();
@@ -28,7 +28,7 @@ public abstract class Parser extends Proc {
 
   /**
    * Constructor.
-   * @param source document source, or {@code null}
+   * @param source document source or {@code null}
    * @param opts database options
    */
   protected Parser(final String source, final MainOptions opts) {
@@ -37,7 +37,7 @@ public abstract class Parser extends Proc {
 
   /**
    * Constructor.
-   * @param source document source, or {@code null}
+   * @param source document source or {@code null}
    * @param opts database options
    */
   protected Parser(final IO source, final MainOptions opts) {

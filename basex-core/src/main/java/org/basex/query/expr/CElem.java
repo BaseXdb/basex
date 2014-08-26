@@ -30,7 +30,7 @@ public final class CElem extends CName {
    * @param sc static context
    * @param info input info
    * @param name name
-   * @param nspaces namespaces, or {@code null} if this is a computed constructor.
+   * @param nspaces namespaces or {@code null} if this is a computed constructor.
    * @param cont element contents
    */
   public CElem(final StaticContext sc, final InputInfo info, final Expr name, final Atts nspaces,

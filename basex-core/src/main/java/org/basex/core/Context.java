@@ -256,7 +256,7 @@ public final class Context {
    * Prepares the string list for locking.
    * @param sl string list
    * @param all lock all databases
-   * @return string list, or {@code null}
+   * @return string list or {@code null}
    */
   private StringList prepareLock(final StringList sl, final boolean all) {
     if(all) return null;

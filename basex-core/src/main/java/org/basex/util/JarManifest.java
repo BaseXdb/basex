@@ -47,7 +47,7 @@ final class JarManifest {
   /**
    * Returns the manifest value for the specified key.
    * @param key key
-   * @return value, or {@code null}
+   * @return value or {@code null}
    */
   public static Object get(final String key) {
     if(MAP != null) {

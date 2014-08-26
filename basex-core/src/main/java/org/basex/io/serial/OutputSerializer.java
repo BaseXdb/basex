@@ -418,7 +418,7 @@ public abstract class OutputSerializer extends Serializer {
 
   /**
    * Prints the document type declaration.
-   * @param type document type, or {@code null} for html type
+   * @param type document type or {@code null} for html type
    * @return true if doctype was added
    * @throws IOException I/O exception
    */

@@ -145,7 +145,7 @@ public final class BXElem extends BXNode implements Element {
   /**
    * Returns the specified attribute.
    * @param name attribute name
-   * @return node, or {@code null}
+   * @return node or {@code null}
    */
   private ANode attribute(final String name) {
     final AxisIter ai = nd.attributes();

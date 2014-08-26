@@ -110,7 +110,7 @@ public final class ModuleLoader {
   /**
    * Returns a reference to the specified class.
    * @param name fully classified class name
-   * @return found class, or {@code null}
+   * @return found class or {@code null}
    * @throws Throwable any exception or error: {@link ClassNotFoundException},
    *   {@link LinkageError} or {@link ExceptionInInitializerError}.
    */
@@ -128,7 +128,7 @@ public final class ModuleLoader {
   /**
    * Returns an instance of the specified Java module class.
    * @param clz class to be found
-   * @return instance, or {@code null}
+   * @return instance or {@code null}
    */
   public Object findImport(final String clz) {
     // check if class was imported as Java module
@@ -155,7 +155,7 @@ public final class ModuleLoader {
    * <li>{@code null} is returned if the URI has an invalid syntax.</li>
    * </ul>
    * @param uri namespace uri
-   * @return path, or {@code null}
+   * @return path or {@code null}
    */
   public static String uri2path(final String uri) {
     try {

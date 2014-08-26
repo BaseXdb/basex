@@ -232,7 +232,7 @@ public final class Map extends FItem {
 
   @Override
   public String description() {
-    return BRACE1 + DOTS + BRACE2;
+    return CURLY1 + DOTS + CURLY2;
   }
 
   @Override

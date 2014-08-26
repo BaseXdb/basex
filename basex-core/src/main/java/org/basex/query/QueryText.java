@@ -380,15 +380,15 @@ public interface QueryText {
   /** Parser token. */
   String ASSIGN = ":=";
   /** Parser token. */
-  String BR1 = "[";
+  String SQUARE1 = "[";
   /** Parser token. */
-  String BR2 = "]";
+  String SQUARE2 = "]";
   /** Parser token. */
   String EQNAME = "Q{";
   /** Parser token. */
-  String BRACE1 = "{";
+  String CURLY1 = "{";
   /** Parser token. */
-  String BRACE2 = "}";
+  String CURLY2 = "}";
   /** Parser token. */
   String CDATA = "<![CDATA[";
   /** Parser token. */
@@ -410,9 +410,9 @@ public interface QueryText {
   /** Parser token. */
   String XQ30 = "3.0";
   /** Parser token. */
-  String PAR1 = "(";
+  String PAREN1 = "(";
   /** Parser token. */
-  String PAR2 = ")";
+  String PAREN2 = ")";
   /** Parser token. */
   String PIPE = "|";
   /** Parser token. */
@@ -420,7 +420,7 @@ public interface QueryText {
   /** Parser token. */
   String PRAGMA2 = "#)";
   /** Parser Token. */
-  String PLHOLDER = "?";
+  String QUESTION = "?";
   /** Parser Token. */
   String ASTERISK = "*";
 

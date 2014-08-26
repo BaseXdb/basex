@@ -72,7 +72,7 @@ public class BufferInput extends InputStream {
   }
 
   /**
-   * Returns the IO reference, or {@code null}.
+   * Returns the IO reference or {@code null}.
    * @return file reference
    */
   public IO io() {
@@ -152,7 +152,7 @@ public class BufferInput extends InputStream {
   }
 
   /**
-   * Returns the input length (may be {@code -1}).
+   * Returns the input length (can be {@code -1}).
    * @return input length
    */
   public final long length() {

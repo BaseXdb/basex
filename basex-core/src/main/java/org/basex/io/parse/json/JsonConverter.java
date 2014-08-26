@@ -40,7 +40,7 @@ public abstract class JsonConverter {
   /**
    * Converts the specified input to an XQuery item.
    * @param input input
-   * @param path input path (may be {@code null)}
+   * @param path input path (can be {@code null)}
    * @throws QueryIOException query I/O exception
    */
   public void convert(final byte[] input, final String path) throws QueryIOException {

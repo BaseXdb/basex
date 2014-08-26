@@ -98,7 +98,7 @@ public abstract class Step extends Preds {
    * Returns the path nodes that are the result of this step.
    * @param nodes initial path nodes
    * @param data data reference
-   * @return resulting path nodes, or {@code null} if nodes cannot be evaluated
+   * @return resulting path nodes or {@code null} if nodes cannot be evaluated
    */
   final ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes, final Data data) {
     // skip steps with predicates or different namespaces

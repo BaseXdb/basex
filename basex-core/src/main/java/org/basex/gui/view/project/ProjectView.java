@@ -172,7 +172,7 @@ public final class ProjectView extends BaseXPanel {
   /**
    * Returns the node for the specified file.
    * @param file file to be found
-   * @return node, or {@code null}
+   * @return node or {@code null}
    */
   private ProjectNode find(final IOFile file) {
     final IOFile fl = file.normalize();
@@ -216,7 +216,7 @@ public final class ProjectView extends BaseXPanel {
    * Renames a file or directory in the tree.
    * @param node source node
    * @param name new name of file or directory
-   * @return new file reference, or {@code null} if operation failed
+   * @return new file reference or {@code null} if operation failed
    */
   IOFile rename(final ProjectNode node, final String name) {
     // check if chosen file name is valid

@@ -66,7 +66,7 @@ public final class Optimize extends ACreate {
   /**
    * Optimizes the structures of a database.
    * @param data data
-   * @param cmd calling command instance (can be {@code null})
+   * @param cmd calling command instance (may be {@code null})
    * @throws IOException I/O Exception during index rebuild
    */
   public static void optimize(final Data data, final Optimize cmd) throws IOException {
@@ -78,7 +78,7 @@ public final class Optimize extends ACreate {
    * @param data data
    * @param rebuild rebuild all index structures
    * @param rebuildFT rebuild full-text index
-   * @param cmd calling command instance (can be {@code null})
+   * @param cmd calling command instance (may be {@code null})
    * @throws IOException I/O Exception during index rebuild
    */
   public static void optimize(final Data data, final boolean rebuild, final boolean rebuildFT,

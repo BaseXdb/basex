@@ -58,7 +58,7 @@ public final class NewlineInput extends TextInput {
 
   /**
    * Reads and returns a single line.
-   * @return line, or {@code null}
+   * @return line or {@code null}
    * @throws IOException I/O exception
    */
   public String readLine() throws IOException {

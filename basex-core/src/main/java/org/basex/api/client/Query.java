@@ -87,7 +87,7 @@ public abstract class Query {
 
   /**
    * Returns the next item of the query.
-   * @return item string or {@code null}.
+   * @return item string or {@code null}
    * @throws IOException I/O exception
    */
   public final String next() throws IOException {
@@ -127,7 +127,7 @@ public abstract class Query {
 
   /**
    * Returns the complete result of the query.
-   * @return item string or {@code null}.
+   * @return item string or {@code null}
    * @throws IOException I/O exception
    */
   public abstract String execute() throws IOException;

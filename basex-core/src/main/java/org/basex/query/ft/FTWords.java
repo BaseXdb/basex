@@ -303,7 +303,7 @@ public final class FTWords extends FTExpr {
   }
 
   /**
-   * Returns the next token of the specified iterator, or {@code null}.
+   * Returns the next token of the specified iterator or {@code null}.
    * @param iter iterator to be checked
    * @return item
    * @throws QueryException query exception

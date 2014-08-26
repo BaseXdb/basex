@@ -182,7 +182,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   /**
    * Serializes the value with the specified serialization parameters and returns the cached result.
-   * @param options serialization parameters (can be {@code null})
+   * @param options serialization parameters (may be {@code null})
    * @return serialized value
    * @throws QueryIOException query I/O exception
    */

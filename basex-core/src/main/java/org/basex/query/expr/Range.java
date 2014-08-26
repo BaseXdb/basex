@@ -64,7 +64,7 @@ public final class Range extends Arr {
   }
 
   /**
-   * Returns the start and end value of the range operator, or {@code null}
+   * Returns the start and end value of the range operator or {@code null}
    * if the range could not be evaluated.
    * @param qc query context
    * @return value array

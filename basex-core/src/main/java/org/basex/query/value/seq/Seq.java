@@ -142,7 +142,7 @@ public abstract class Seq extends Value {
    * @return string
    */
   private String toString(final boolean error) {
-    final StringBuilder sb = new StringBuilder(PAR1);
+    final StringBuilder sb = new StringBuilder(PAREN1);
     for(int i = 0; i < size; ++i) {
       sb.append(i == 0 ? "" : SEP);
       final Item it = itemAt(i);
@@ -152,6 +152,6 @@ public abstract class Seq extends Value {
       sb.append(SEP).append(DOTS);
       break;
     }
-    return sb.append(PAR2).toString();
+    return sb.append(PAREN2).toString();
   }
 }

@@ -168,7 +168,7 @@ public abstract class AQuery extends Command {
 
   /**
    * Evaluates the query and returns the result as {@link DBNodes} instance.
-   * @return result, or {@code null} if result cannot be represented as {@link DBNodes} instance.
+   * @return result or {@code null} if result cannot be represented as {@link DBNodes} instance.
    */
   final DBNodes dbNodes() {
     try {

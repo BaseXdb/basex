@@ -194,7 +194,7 @@ public final class RepoManager {
    * Looks for a file with the specified name.
    * @param name name
    * @param repo repository
-   * @return file, or {@code null}
+   * @return file or {@code null}
    */
   public static IOFile file(final String name, final Repo repo) {
     // traverse all files, find exact matches

@@ -463,7 +463,7 @@ public final class Token {
   /**
    * Checks if the specified value equals a constant token.
    * @param dbl value to be converted
-   * @return byte array or zero, or {@code null}
+   * @return byte array or zero or {@code null}
    */
   private static byte[] tok(final double dbl) {
     if(dbl == Double.POSITIVE_INFINITY) return INF;

@@ -85,6 +85,6 @@ public final class Extension extends Single {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     for(final Pragma p : pragmas) sb.append(p).append(' ');
-    return sb.append(BRACE1 + ' ').append(expr).append(' ').append(BRACE2).toString();
+    return sb.append(CURLY1 + ' ').append(expr).append(' ').append(CURLY2).toString();
   }
 }

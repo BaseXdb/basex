@@ -108,7 +108,7 @@ public final class BaseXFileChooser {
   /**
    * Selects a file or directory.
    * @param mode type defined by {@link Mode}
-   * @return resulting input reference, or {@code null} if no file was selected
+   * @return resulting input reference or {@code null} if no file was selected
    */
   public IOFile select(final Mode mode) {
     final IOFile[] files = selectAll(mode);

@@ -818,6 +818,8 @@ public enum Err {
   NSNOTALL(XPST, 3, "Namespace axis is not available in XQuery."),
   /** XPST0003. */
   SIMPLETYPE_X(XPST, 3, "Simple type expected, '%(' found."),
+  /** XPST0003. */
+  KEYSPEC(XPST, 3, "Expecting key specifier after '?'."),
 
   /** XPST0008. */
   VARUNDEF_X(XPST, 8, "Undefined variable %."),

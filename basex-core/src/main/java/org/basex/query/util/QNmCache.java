@@ -16,9 +16,9 @@ public final class QNmCache extends TokenSet {
 
   /**
    * Creates a QName for the specified key, or returns an existing one.
-   * @param prefix prefix (may be {@code null)}
+   * @param prefix prefix (can be {@code null)}
    * @param local local name
-   * @param uri namespace uri (may be {@code null)}
+   * @param uri namespace uri (can be {@code null)}
    * @return name
    */
   public QNm index(final byte[] prefix, final byte[] local, final byte[] uri) {

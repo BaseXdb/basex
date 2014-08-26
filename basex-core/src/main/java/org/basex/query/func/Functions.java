@@ -268,7 +268,7 @@ public final class Functions extends TokenSet {
    * Returns an exception if the name of a built-in function is similar to the specified name.
    * @param name name of input function
    * @param ii input info
-   * @return query exception, or {@code null}
+   * @return query exception or {@code null}
    */
   QueryException similarError(final QNm name, final InputInfo ii) {
     // find functions with identical local names

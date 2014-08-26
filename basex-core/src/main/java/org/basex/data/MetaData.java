@@ -146,7 +146,7 @@ public final class MetaData {
    * removes duplicate and leading slashes.
    * Returns {@code null} if the path contains invalid characters.
    * @param path input path
-   * @return normalized path, or {@code null}
+   * @return normalized path or {@code null}
    */
   public static String normPath(final String path) {
     final StringBuilder sb = new StringBuilder();
@@ -235,7 +235,7 @@ public final class MetaData {
   }
 
   /**
-   * Returns the specified binary file, or {@code null} if the resource
+   * Returns the specified binary file or {@code null} if the resource
    * path cannot be resolved (e.g. if it points to a parent directory).
    * @param pth internal file path
    * @return binary directory
@@ -250,7 +250,7 @@ public final class MetaData {
   /**
    * Drops the specified database files.
    * Should only be called if database is disk-based.
-   * @param pattern file pattern, or {@code null} if all files are to be deleted
+   * @param pattern file pattern or {@code null} if all files are to be deleted
    * @return result of check
    */
   public synchronized boolean drop(final String pattern) {

@@ -37,9 +37,9 @@ public final class Reflect {
   }
 
   /**
-   * Caches and returns a reference to the specified class, or {@code null}.
+   * Caches and returns a reference to the specified class or {@code null}.
    * @param name fully qualified class name
-   * @return reference, or {@code null} if the class is not found
+   * @return reference or {@code null} if the class is not found
    */
   public static Class<?> find(final String name) {
     try {
@@ -66,10 +66,10 @@ public final class Reflect {
   }
 
   /**
-   * Caches and returns a reference to the specified field, or {@code null}.
+   * Caches and returns a reference to the specified field or {@code null}.
    * @param clazz class to search for the constructor
    * @param name field name
-   * @return reference, or {@code null} if the field is not found
+   * @return reference or {@code null} if the field is not found
    */
   public static Field field(final Class<?> clazz, final String name) {
     final String key = clazz.getName() + name;
@@ -88,16 +88,16 @@ public final class Reflect {
    * or {@code null}.
    * @param pattern class pattern
    * @param ext optional extension
-   * @return reference, or {@code null} if the class is not found
+   * @return reference or {@code null} if the class is not found
    */
   public static Class<?> find(final String pattern, final Object... ext) {
     return find(Util.info(pattern, ext));
   }
 
   /**
-   * Returns a class reference to one of the specified classes, or {@code null}.
+   * Returns a class reference to one of the specified classes or {@code null}.
    * @param names fully qualified class names
-   * @return reference, or {@code null} if the class is not found
+   * @return reference or {@code null} if the class is not found
    */
   public static Class<?> find(final String[] names) {
     for(final String n : names) {
@@ -144,7 +144,7 @@ public final class Reflect {
    * @param clazz class to search for the method
    * @param name method name
    * @param types method parameters
-   * @return reference, or {@code null} if the method is not found
+   * @return reference or {@code null} if the method is not found
    */
   public static Method method(final Class<?> clazz, final String name, final Class<?>... types) {
     if(clazz == null) return null;
@@ -178,7 +178,7 @@ public final class Reflect {
   }
 
   /**
-   * Returns a class instance, or {@code null}.
+   * Returns a class instance or {@code null}.
    * @param clazz class
    * @param args arguments
    * @param <O> class type

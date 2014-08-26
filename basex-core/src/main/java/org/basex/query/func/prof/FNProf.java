@@ -104,7 +104,7 @@ public final class FNProf extends StandardFunc {
   /**
    * Dumps the memory consumption.
    * @param min initial memory usage
-   * @param msg message (can be {@code null})
+   * @param msg message (may be {@code null})
    * @param qc query context
    */
   private static void dump(final long min, final byte[] msg, final QueryContext qc) {

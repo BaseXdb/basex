@@ -153,8 +153,8 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Returns the parent of this file or directory, or {@code null} if there is no parent directory.
-   * @return directory, or {@code null}
+   * Returns the parent of this file or directory or {@code null} if there is no parent directory.
+   * @return directory or {@code null}
    */
   public IOFile parent() {
     final String parent = file.getParent();

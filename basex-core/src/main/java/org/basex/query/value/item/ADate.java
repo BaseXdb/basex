@@ -233,7 +233,7 @@ public abstract class ADate extends ADateDur {
   /**
    * Adjusts the timezone.
    * @param tz timezone
-   * @param spec indicates if zone has been specified (can be {@code null})
+   * @param spec indicates if zone has been specified (may be {@code null})
    * @param ii input info
    * @throws QueryException query exception
    */
@@ -243,7 +243,7 @@ public abstract class ADate extends ADateDur {
   /**
    * Adjusts the timezone.
    * @param tz timezone
-   * @param spec indicates if zone has been specified (can be {@code null})
+   * @param spec indicates if zone has been specified (may be {@code null})
    * @param ii input info
    * @throws QueryException query exception
    */

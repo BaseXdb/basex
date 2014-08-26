@@ -329,8 +329,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields a number or {@Code null}.
-   * Returns the number, {@Code null} or throws an exception.
+   * Checks if the specified expression yields a number or {@code null}.
+   * Returns the number, {@code null}, or throws an exception.
    * @param ex expression to be checked
    * @param qc query context
    * @return double

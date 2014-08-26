@@ -92,13 +92,13 @@ public final class XQDoc extends Inspect {
       annotations(sf.ann, function);
 
       final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(sf.ann);
-      tb.add(FUNCTION).add(' ').add(name.string()).add(PAR1);
+      tb.add(FUNCTION).add(' ').add(name.string()).add(PAREN1);
       for(int i = 0; i < al; i++) {
         final Var v = sf.args[i];
         if(i > 0) tb.add(SEP);
         tb.add(DOLLAR).add(v.name.string()).add(' ').add(AS).add(' ').addExt(t.argTypes[i]);
       }
-      tb.add(PAR2).add(' ' + AS + ' ' + t.retType);
+      tb.add(PAREN2).add(' ' + AS + ' ' + t.retType);
       if(sf.expr == null) tb.add(" external");
 
       elem("signature", function).add(tb.toString());

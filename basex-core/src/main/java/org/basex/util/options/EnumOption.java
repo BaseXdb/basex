@@ -42,7 +42,7 @@ public final class EnumOption<V extends Enum<V>> extends Option<V> {
   }
 
   /**
-   * Returns an enumeration value for the specified string, or {@code null}.
+   * Returns an enumeration value for the specified string or {@code null}.
    * @param string value
    * @return enumeration
    */

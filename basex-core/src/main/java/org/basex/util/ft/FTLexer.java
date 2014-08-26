@@ -151,8 +151,8 @@ public final class FTLexer extends FTIterator implements IndexToken {
   }
 
   /**
-   * Returns the full-text options. Can be {@code null}.
-   * @return full-text options
+   * Returns the full-text options.
+   * @return full-text options (may be {@code null})
    */
   public FTOpt ftOpt() {
     return ftopt;

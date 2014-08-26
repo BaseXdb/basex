@@ -45,7 +45,7 @@ public final class Language implements Comparable<Language> {
   }
 
   /**
-   * Returns an instance for the specified language code, or {@code null}.
+   * Returns an instance for the specified language code or {@code null}.
    * @param lang name or code of language
    * @return language code
    */

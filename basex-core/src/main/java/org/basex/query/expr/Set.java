@@ -79,7 +79,7 @@ abstract class Set extends Arr {
 
   @Override
   public final String toString() {
-    return PAR1 + toString(' ' + Util.className(this).toLowerCase(Locale.ENGLISH) + ' ') + PAR2;
+    return PAREN1 + toString(' ' + Util.className(this).toLowerCase(Locale.ENGLISH) + ' ') + PAREN2;
   }
 
   /**

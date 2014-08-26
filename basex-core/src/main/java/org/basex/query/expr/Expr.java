@@ -84,7 +84,7 @@ public abstract class Expr extends ExprInfo {
    * as it may be called by this method.
    * @param qc query context
    * @param ii input info
-   * @return iterator
+   * @return iterator or {@code null}
    * @throws QueryException query exception
    */
   public abstract Item item(final QueryContext qc, final InputInfo ii) throws QueryException;

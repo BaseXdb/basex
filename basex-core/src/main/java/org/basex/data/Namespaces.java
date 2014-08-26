@@ -124,7 +124,7 @@ public final class Namespaces {
   }
 
   /**
-   * Returns the default namespace of the database, or {@code null}
+   * Returns the default namespace of the database or {@code null}
    * if several (default or prefixed) namespaces are defined.
    * @return global default namespace
    */

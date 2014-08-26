@@ -214,7 +214,7 @@ public abstract class JavaMapping extends Arr {
    * @param qc query context
    * @param sc static context
    * @param ii input info
-   * @return Java function, or {@code null}
+   * @return Java function or {@code null}
    * @throws QueryException query exception
    */
   static JavaMapping get(final QNm name, final Expr[] args, final QueryContext qc,
@@ -257,7 +257,7 @@ public abstract class JavaMapping extends Arr {
   /**
    * Returns an appropriate XQuery type for the specified Java object.
    * @param o object
-   * @return item type, or {@code null} if no appropriate type was found
+   * @return item type or {@code null} if no appropriate type was found
    */
   private static Type type(final Object o) {
     final Type t = type(o.getClass());
@@ -296,7 +296,7 @@ public abstract class JavaMapping extends Arr {
   /**
    * Returns an appropriate XQuery type for the specified Java class.
    * @param type Java type
-   * @return item type, or {@code null} if no appropriate type was found
+   * @return item type or {@code null} if no appropriate type was found
    */
   static Type type(final Class<?> type) {
     for(int j = 0; j < JAVA.length; ++j) {

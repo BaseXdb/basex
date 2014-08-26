@@ -87,7 +87,7 @@ final class DOTData {
   };
 
   /**
-   * Returns the color for the specified string, or {@code null}.
+   * Returns the color for the specified string or {@code null}.
    * @param string string string
    * @return color
    */

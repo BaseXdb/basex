@@ -89,7 +89,7 @@ abstract class FormatUtil {
    * Returns a character sequence the first character of which equals the
    * specified character.
    * @param ch character to be checked
-   * @return character sequence, or {@code null}
+   * @return character sequence or {@code null}
    */
   static String sequence(final int ch) {
     for(final String seq : SEQS) if(ch == seq.charAt(0)) return seq;

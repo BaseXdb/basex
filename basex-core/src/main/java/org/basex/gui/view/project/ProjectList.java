@@ -208,7 +208,7 @@ final class ProjectList extends JList<String> {
   }
 
   /**
-   * Returns a single selected node, or {@code null} if zero or more than node is selected.
+   * Returns a single selected node or {@code null} if zero or more than node is selected.
    * @return selected node
    */
   private String selectedValue() {
@@ -217,7 +217,7 @@ final class ProjectList extends JList<String> {
   }
 
   /**
-   * Returns a single selected node, or {@code null} if zero or more than node is selected.
+   * Returns a single selected node or {@code null} if zero or more than node is selected.
    * @return selected node
    */
   private IOFile[] selectedValues() {

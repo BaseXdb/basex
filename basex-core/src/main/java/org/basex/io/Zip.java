@@ -116,7 +116,7 @@ public final class Zip extends Proc {
   }
 
   /**
-   * Returns the contents of the specified entry, or {@code null}.
+   * Returns the contents of the specified entry or {@code null}.
    * @param in input stream
    * @param entry entry to be found
    * @return entry

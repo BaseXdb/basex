@@ -88,7 +88,7 @@ public final class OptimizeAll extends ACreate {
    * Recreates the database, drops the old instance and renames the recreated instance.
    * @param data disk data
    * @param ctx database context
-   * @param cmd command reference, or {@code null}
+   * @param cmd command reference or {@code null}
    * @throws IOException I/O Exception during index rebuild
    * @throws BaseXException database exception
    */
@@ -161,13 +161,13 @@ public final class OptimizeAll extends ACreate {
   private static final class DBParser extends Parser {
     /** Disk data. */
     private final DiskData data;
-    /** Calling command (can be {@code null}). */
+    /** Calling command (may be {@code null}). */
     final OptimizeAll cmd;
 
     /**
      * Constructor.
      * @param data disk data
-     * @param cmd calling command (can be {@code null})
+     * @param cmd calling command (may be {@code null})
      */
     DBParser(final DiskData data, final OptimizeAll cmd) {
       super(data.meta.original.isEmpty() ? null : IO.get(data.meta.original), data.meta.options);

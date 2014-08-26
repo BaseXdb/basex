@@ -131,7 +131,7 @@ public final class JavaFunc extends JavaMapping {
    * @param vTypes value types
    * @param args arguments
    * @param stat static flag
-   * @return argument array, or {@code null}
+   * @return argument array or {@code null}
    * @throws QueryException query exception
    */
   static Object[] args(final Class<?>[] params, final boolean[] vTypes, final Value[] args,
@@ -199,6 +199,6 @@ public final class JavaFunc extends JavaMapping {
 
   @Override
   public String toString() {
-    return clazz + "." + method + PAR1 + toString(SEP) + PAR2;
+    return clazz + "." + method + PAREN1 + toString(SEP) + PAREN2;
   }
 }

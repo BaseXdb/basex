@@ -82,7 +82,7 @@ public final class StaticContext {
   }
 
   /**
-   * Returns an IO representation of the static base URI, or {@code null}.
+   * Returns an IO representation of the static base URI or {@code null}.
    * @return IO reference
    */
   public IO baseIO() {

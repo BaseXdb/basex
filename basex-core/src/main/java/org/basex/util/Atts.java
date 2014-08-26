@@ -97,7 +97,7 @@ public final class Atts extends ElementList {
   }
 
   /**
-   * Returns the value for the specified name, or {@code null}.
+   * Returns the value for the specified name or {@code null}.
    * @param name name to be found
    * @return offset or -1
    */

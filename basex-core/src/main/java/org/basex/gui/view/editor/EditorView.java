@@ -437,7 +437,7 @@ public final class EditorView extends View {
   /**
    * Opens and parses the specified query file.
    * @param file query file
-   * @return opened editor, or {@code null} if file could not be opened
+   * @return opened editor or {@code null} if file could not be opened
    */
   public EditorArea open(final IOFile file) {
     return open(file, true, true);
@@ -448,7 +448,7 @@ public final class EditorView extends View {
    * @param file query file
    * @param parse parse contents
    * @param error display error if file does not exist
-   * @return opened editor, or {@code null} if file could not be opened
+   * @return opened editor or {@code null} if file could not be opened
    */
   private EditorArea open(final IOFile file, final boolean parse, final boolean error) {
     if(!visible()) GUIMenuCmd.C_SHOWEDITOR.execute(gui);
@@ -568,7 +568,7 @@ public final class EditorView extends View {
 
   /**
    * Evaluates the info message resulting from command or query parsing.
-   * @param ex exception, or {@code null}
+   * @param ex exception or {@code null}
    */
   private void info(final Exception ex) {
     info(ex, false, false);
@@ -591,7 +591,7 @@ public final class EditorView extends View {
   /**
    * Retrieves the contents of the specified file, or opens it externally.
    * @param file query file
-   * @return contents, or {@code null} reference
+   * @return contents or {@code null} reference
    * @throws IOException I/O exception
    */
   private byte[] read(final IOFile file) throws IOException {
@@ -698,7 +698,7 @@ public final class EditorView extends View {
 
   /**
    * Processes the result from a command or query execution.
-   * @param th exception, or {@code null}
+   * @param th exception or {@code null}
    * @param stopped {@code true} if evaluation was interrupted
    * @param refresh refresh buttons
    */

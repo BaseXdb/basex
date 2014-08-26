@@ -654,7 +654,7 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Returns an option name similar to the specified string, or {@code null}.
+   * Returns an option name similar to the specified string or {@code null}.
    * @param name name to be found
    * @return similar name
    */

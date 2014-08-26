@@ -208,7 +208,7 @@ public final class HTTPPayload {
 
   /**
    * Reads the next line of an HTTP multipart content.
-   * @return line, or {@code null} if end of stream is reached
+   * @return line or {@code null} if end of stream is reached
    * @throws IOException I/O Exception
    */
   private byte[] readLine() throws IOException {
@@ -254,7 +254,7 @@ public final class HTTPPayload {
   /**
    * Extracts the encapsulation boundary from the content type.
    * @param ct content type
-   * @return boundary, or {@code null}
+   * @return boundary or {@code null}
    * @throws QueryException query exception
    */
   private byte[] boundary(final String ct) throws QueryException {
@@ -273,7 +273,7 @@ public final class HTTPPayload {
   /**
    * Returns a map with multipart form data.
    * @param ext content type extension (may be {@code null})
-   * @return map, or {@code null}
+   * @return map or {@code null}
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */

@@ -109,9 +109,9 @@ public final class FElem extends FNode {
    * Constructor for creating an element with nodes, attributes and
    * namespace declarations.
    * @param name element name
-   * @param ns namespaces; can be {@code null}
-   * @param children children; can be {@code null}
-   * @param atts attributes; can be {@code null}
+   * @param ns namespaces, may be {@code null}
+   * @param children children, may be {@code null}
+   * @param atts attributes, may be {@code null}
    */
   public FElem(final QNm name, final Atts ns, final ANodeList children, final ANodeList atts) {
     super(NodeType.ELM);

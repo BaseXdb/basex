@@ -62,7 +62,7 @@ public final class IndexInfo {
    * Checks if the specified expression can be rewritten for index access.
    * @param ex expression (must be {@link Context} or {@link AxisPath})
    * @param ft full-text flag
-   * @return location step, or {@code null}
+   * @return location step or {@code null}
    */
   public boolean check(final Expr ex, final boolean ft) {
     orig = ex;

@@ -35,7 +35,7 @@ public final class IntObjMap<E> extends IntSet {
   /**
    * Returns the value for the specified key.
    * @param key key to be looked up
-   * @return value, or {@code null} if the key was not found
+   * @return value or {@code null} if the key was not found
    */
   @SuppressWarnings("unchecked")
   public E get(final int key) {

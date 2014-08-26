@@ -41,7 +41,7 @@ public final class NamePool {
   }
 
   /**
-   * Returns the name of a duplicate attribute, or {@code null}.
+   * Returns the name of a duplicate attribute or {@code null}.
    * @return name of duplicate attribute
    */
   QNm duplicate() {

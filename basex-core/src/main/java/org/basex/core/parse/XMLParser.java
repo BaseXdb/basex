@@ -224,19 +224,18 @@ final class XMLParser extends CmdParser {
   }
 
   /**
-   * Checks the syntax of the specified command. Returns an error with the expected
-   * syntax if the check fails. The passed on strings describe the arguments of a
-   * command. They may be:
+   * Checks the syntax of the specified command. Returns an error with the expected syntax if the
+   * check fails. The passed on strings describe the arguments of a command. They may be:
    * <ul>
-   * <li> attribute names</li>
-   * <li> labels for text nodes, if prefixed with "#"</li>
-   * <li> labels for text or descendant nodes, if prefixed with "<"</li>
+   *   <li> attribute names</li>
+   *   <li> labels for text nodes, if prefixed with "#"</li>
+   *   <li> labels for text or descendant nodes, if prefixed with "<"</li>
    * </ul>
    * Arguments are optional, if they suffixed with "?". Examples:
    * <ul>
-   * <li> <code>{"name","#input?"}</code> indicates that the command must have one "name"
-   *   attribute and may have one text node, but nothing else</li>
-   * <li> <code>{}</code> means that the command must not have any arguments }</li>
+   *   <li> <code>{"name","#input?"}</code> indicates that the command must have one "name"
+   *     attribute and may have one text node, but nothing else</li>
+   *   <li> <code>{}</code> means that the command must not have any arguments }</li>
    * </ul>
    * @param root root node
    * @param checks checks to be performed.
