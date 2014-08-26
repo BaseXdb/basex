@@ -72,6 +72,8 @@ public class QueryParser extends InputParser {
     KEYWORDS30.add(FuncType.ANY_FUN.string());
     KEYWORDS30.add(NodeType.NSP.string());
     KEYWORDS30.add(SWITCH);
+    KEYWORDS30.add(MAP);
+    KEYWORDS30.add(ARRAY);
   }
 
   /** Modules loaded by the current file. */
