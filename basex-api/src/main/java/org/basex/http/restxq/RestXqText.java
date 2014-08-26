@@ -3,8 +3,8 @@ package org.basex.http.restxq;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
-import org.basex.query.path.*;
 import org.basex.query.value.item.*;
 
 /**

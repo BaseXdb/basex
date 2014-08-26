@@ -4,7 +4,7 @@ import static org.basex.query.util.Err.*;
 import static org.basex.query.value.type.AtomType.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.CmpV.*;
+import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;

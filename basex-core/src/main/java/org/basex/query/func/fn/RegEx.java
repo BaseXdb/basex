@@ -5,7 +5,7 @@ import java.util.regex.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.regex.parse.*;
+import org.basex.query.util.regex.parse.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 

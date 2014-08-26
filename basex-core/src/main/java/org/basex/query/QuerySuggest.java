@@ -6,7 +6,7 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.index.path.*;
-import org.basex.query.path.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
 import org.basex.util.list.*;

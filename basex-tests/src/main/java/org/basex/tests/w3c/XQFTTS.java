@@ -4,7 +4,7 @@ import java.util.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.ft.*;
+import org.basex.query.expr.ft.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;

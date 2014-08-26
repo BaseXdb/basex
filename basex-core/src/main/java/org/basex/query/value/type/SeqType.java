@@ -4,8 +4,8 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
-import org.basex.query.path.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;

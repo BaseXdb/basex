@@ -2,7 +2,7 @@ package org.basex.http.restxq;
 
 import java.util.*;
 
-import org.basex.query.path.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 
 /**

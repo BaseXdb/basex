@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.ft.*;
+import org.basex.query.expr.ft.*;
 import org.basex.util.ft.*;
 import org.basex.util.ft.FTBitapSearch.TokenComparator;
 import org.basex.util.list.*;

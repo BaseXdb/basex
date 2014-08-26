@@ -8,7 +8,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
+import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 
 /**

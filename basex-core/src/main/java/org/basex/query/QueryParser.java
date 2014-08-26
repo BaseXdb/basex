@@ -19,14 +19,15 @@ import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.expr.Expr.Flag;
 import org.basex.query.expr.Context;
 import org.basex.query.expr.List;
-import org.basex.query.ft.*;
+import org.basex.query.expr.constr.*;
+import org.basex.query.expr.ft.*;
+import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.gflwor.GFLWOR.Clause;
+import org.basex.query.expr.gflwor.Window.Condition;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.gflwor.*;
-import org.basex.query.gflwor.GFLWOR.Clause;
-import org.basex.query.gflwor.Window.Condition;
 import org.basex.query.iter.*;
-import org.basex.query.path.*;
 import org.basex.query.up.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.format.*;
@@ -1481,10 +1482,7 @@ public class QueryParser extends InputParser {
     final Expr e = stringConcat();
 
     final int i = pos;
-    // extensions to the official extension: "=>" and "<-"
-    if(consume('=') && consume('>') || consume('<') && consume('-')) {
-      skipWs();
-    } else if(!wsConsumeWs(CONTAINS) || !wsConsumeWs(TEXT)) {
+    if(!wsConsumeWs(CONTAINS) || !wsConsumeWs(TEXT)) {
       pos = i;
       return e;
     }
@@ -1999,36 +1997,42 @@ public class QueryParser extends InputParser {
    */
   private Expr postfix() throws QueryException {
     Expr e = primary(), old;
-    do {
-      old = e;
-      if(wsConsume(SQUARE1)) {
-        // parses the "Predicate" rule
-        if(e == null) throw error(PREDMISSING);
-        final ExprList el = new ExprList();
-        do {
-          add(el, expr());
-          wsCheck(SQUARE2);
-        } while(wsConsume(SQUARE1));
-        e = Filter.get(info(), e, el.finish());
-      } else if(e != null) {
-        // parses the "ArgumentList" rule
-        if(!wsConsume(PAREN1)) break;
-
-        final InputInfo ii = info();
-        final ExprList argList = new ExprList();
-        final int[] holes = argumentList(argList, e);
-        final Expr[] args = argList.finish();
-        // only set updating flag if updating and non-updating expressions are mixed
-        Ann ann = null;
-        if(e instanceof FuncItem) ann = ((FuncItem) e).annotations();
-        else if(e instanceof FuncLit) ann = ((FuncLit) e).annotations();
-        else if(e instanceof PartFunc) ann = ((PartFunc) e).annotations();
-        final boolean up = sc.mixUpdates && ann != null && ann.contains(Ann.Q_UPDATING);
-        if(up) qc.updating();
-        e = holes == null ? new DynFuncCall(ii, sc, up, e, args) :
-          new PartFunc(sc, ii, e, args, holes);
-      }
-    } while(e != old);
+    if(e != null) {
+      do {
+        old = e;
+        if(wsConsume(SQUARE1)) {
+          // parses the "Predicate" rule
+          if(e == null) throw error(PREDMISSING);
+          final ExprList el = new ExprList();
+          do {
+            add(el, expr());
+            wsCheck(SQUARE2);
+          } while(wsConsume(SQUARE1));
+          e = Filter.get(info(), e, el.finish());
+        } else if(consume(PAREN1)) {
+          // parses the "ArgumentList" rule
+          final InputInfo ii = info();
+          final ExprList argList = new ExprList();
+          final int[] holes = argumentList(argList, e);
+          final Expr[] args = argList.finish();
+          // only set updating flag if updating and non-updating expressions are mixed
+          Ann ann = null;
+          if(e instanceof FuncItem) ann = ((FuncItem) e).annotations();
+          else if(e instanceof FuncLit) ann = ((FuncLit) e).annotations();
+          else if(e instanceof PartFunc) ann = ((PartFunc) e).annotations();
+          final boolean up = sc.mixUpdates && ann != null && ann.contains(Ann.Q_UPDATING);
+          if(up) qc.updating();
+          e = holes == null ? new DynFuncCall(ii, sc, up, e, args) :
+            new PartFunc(sc, ii, e, args, holes);
+        } else if(consume(QUESTION)) {
+          // parses the "Lookup" rule
+          keySpecifier();
+        } else if(consume(ARROW)) {
+          // parses the "ArrowPostfix" rule
+          arrowPostfix();
+        }
+      } while(e != old);
+    }
     return e;
   }
 
@@ -2049,7 +2053,7 @@ public class QueryParser extends InputParser {
       return resolveVar(varName(), ii);
     }
     // parentheses
-    if(c == '(' && next() != '#') return parenthesized();
+    if(next() != '#' && consume('(')) return parenthesized();
     // direct constructor
     if(c == '<') return constructor();
     // function item
@@ -2098,13 +2102,28 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void keySpecifier() throws QueryException {
-    if(consume(ASTERISK)) {
-    } else if(curr('(')) {
+    if(wsConsume(ASTERISK)) {
+    } else if(consume(PAREN1)) {
       parenthesized();
     } else if(digit(curr())) {
       numericLiteral(true);
     } else {
       ncName(KEYSPEC);
+    }
+  }
+
+  /**
+   * Parses the "ArrowPostfix" rule.
+   * @throws QueryException query exception
+   */
+  private void arrowPostfix() throws QueryException {
+    // parses the "ArrowFunctionSpecifier" rule
+    if(wsConsume(PAREN1)) {
+      parenthesized();
+    } else if(curr() == '$') {
+      varName();
+    } else {
+      eQName(ARROWSPEC, sc.funcNS);
     }
   }
 
@@ -2313,12 +2332,11 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "ParenthesizedExpr" rule.
+   * Parses the "ParenthesizedExpr" rule without the opening parenthesis.
    * @return query expression
    * @throws QueryException query exception
    */
   private Expr parenthesized() throws QueryException {
-    wsCheck(PAREN1);
     final Expr e = expr();
     wsCheck(PAREN2);
     return e == null ? Empty.SEQ : e;
@@ -3665,8 +3683,7 @@ public class QueryParser extends InputParser {
    * Parses the "EQName" rule.
    * @param err optional error message. Will be thrown if no EQName is found,
    *   or ignored if set to {@code null}
-   * @param def default namespace, or operation mode
-   *   ({@link #URICHECK}, {@link #SKIPCHECK})
+   * @param def default namespace, or operation mode ({@link #URICHECK}, {@link #SKIPCHECK})
    * @return QName (may be {@code null})
    * @throws QueryException query exception
    */

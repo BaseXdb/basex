@@ -3,7 +3,7 @@ package org.basex.query;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
-import org.basex.query.ft.*;
+import org.basex.query.expr.ft.*;
 import org.junit.*;
 
 /**

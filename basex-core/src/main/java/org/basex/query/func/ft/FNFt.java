@@ -10,7 +10,7 @@ import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
-import org.basex.query.ft.*;
+import org.basex.query.expr.ft.*;
 import org.basex.query.func.*;
 import org.basex.query.func.index.*;
 import org.basex.query.iter.*;

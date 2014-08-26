@@ -8,7 +8,7 @@ options {
 
 PARSER_BEGIN(RegExParser)
 
-package org.basex.query.regex.parse;
+package org.basex.query.util.regex.parse;
 
 import static org.basex.query.util.Err.*;
 

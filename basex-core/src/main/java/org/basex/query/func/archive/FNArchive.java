@@ -12,10 +12,10 @@ import java.util.zip.*;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.convert.*;
 import org.basex.query.iter.*;
-import org.basex.query.path.*;
 import org.basex.query.util.archive.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;

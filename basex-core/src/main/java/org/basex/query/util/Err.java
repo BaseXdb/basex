@@ -819,7 +819,9 @@ public enum Err {
   /** XPST0003. */
   SIMPLETYPE_X(XPST, 3, "Simple type expected, '%(' found."),
   /** XPST0003. */
-  KEYSPEC(XPST, 3, "Expecting key specifier after '?'."),
+  KEYSPEC(XPST, 3, "Expecting specifier after '?'."),
+  /** XPST0003. */
+  ARROWSPEC(XPST, 3, "Expecting specifier after '=>'."),
 
   /** XPST0008. */
   VARUNDEF_X(XPST, 8, "Undefined variable %."),

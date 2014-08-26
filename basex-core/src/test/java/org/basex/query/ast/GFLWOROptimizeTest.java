@@ -1,7 +1,7 @@
 package org.basex.query.ast;
 
 import org.basex.query.expr.*;
-import org.basex.query.gflwor.*;
+import org.basex.query.expr.gflwor.*;
 import org.basex.util.*;
 import org.junit.*;
 

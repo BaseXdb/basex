@@ -423,6 +423,8 @@ public interface QueryText {
   String QUESTION = "?";
   /** Parser Token. */
   String ASTERISK = "*";
+  /** Parser token. */
+  String ARROW = "=>";
 
   // TOKENS ===================================================================
 

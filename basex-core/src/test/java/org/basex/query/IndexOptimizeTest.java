@@ -9,7 +9,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
 import org.basex.query.expr.*;
-import org.basex.query.ft.*;
+import org.basex.query.expr.ft.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;

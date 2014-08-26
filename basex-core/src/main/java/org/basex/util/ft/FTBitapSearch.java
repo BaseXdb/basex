@@ -3,7 +3,7 @@ package org.basex.util.ft;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.ft.*;
+import org.basex.query.expr.ft.*;
 import org.basex.util.list.*;
 
 /**

@@ -2,8 +2,8 @@ package org.basex.query.expr;
 
 import org.basex.query.*;
 import org.basex.query.expr.CmpV.OpV;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
-import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
