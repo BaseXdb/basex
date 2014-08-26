@@ -45,7 +45,7 @@ public final class QueryResources {
   private boolean globalData;
 
   /** Module loader. */
-  public ModuleLoader modules;
+  private ModuleLoader modules;
   /** External resources. */
   private final HashMap<Class<? extends DataResources>, DataResources> external = new HashMap<>();
 

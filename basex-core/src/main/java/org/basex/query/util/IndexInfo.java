@@ -30,7 +30,7 @@ public final class IndexInfo {
   /** Flag for text index access. */
   public boolean text;
   /** Flag for attribute index access. */
-  public boolean attr;
+  private boolean attr;
 
   /** Optimization info. */
   public String info;

@@ -22,7 +22,7 @@ abstract class DateTime extends StandardFunc {
    * @return duration
    * @throws QueryException query exception
    */
-  protected Dur checkDur(final Item it) throws QueryException {
+  Dur checkDur(final Item it) throws QueryException {
     if(it instanceof Dur) return (Dur) it;
     if(it.type.isUntyped()) return new Dur(it.string(info), info);
     throw castError(info, it, AtomType.DUR);
@@ -37,7 +37,7 @@ abstract class DateTime extends StandardFunc {
    * @return date
    * @throws QueryException query exception
    */
-  protected ADate checkDate(final Item it, final AtomType t, final QueryContext qc)
+  ADate checkDate(final Item it, final AtomType t, final QueryContext qc)
       throws QueryException {
     return (ADate) (it.type.isUntyped() ? t.cast(it, qc, sc, info) : checkType(it, t));
   }
@@ -47,7 +47,7 @@ abstract class DateTime extends StandardFunc {
    * @param it input item
    * @return timezone
    */
-  protected static DTDur zon(final ADate it) {
+  static DTDur zon(final ADate it) {
     final int tz = it.zon();
     return tz == Short.MAX_VALUE ? null : new DTDur(0, tz);
   }
@@ -60,7 +60,7 @@ abstract class DateTime extends StandardFunc {
    * @return duration
    * @throws QueryException query exception
    */
-  protected ADate adjust(final Item it, final AtomType t, final QueryContext qc)
+  ADate adjust(final Item it, final AtomType t, final QueryContext qc)
       throws QueryException {
 
     final ADate ad;

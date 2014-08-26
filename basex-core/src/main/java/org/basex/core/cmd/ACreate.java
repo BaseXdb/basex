@@ -46,7 +46,7 @@ public abstract class ACreate extends Command {
    * @return IO reference
    * @throws IOException I/O exception
    */
-  protected final IO sourceToIO(final String name) throws IOException {
+  final IO sourceToIO(final String name) throws IOException {
     IO io = null;
     if(args[1] != null && !args[1].isEmpty()) {
       io = IO.get(args[1]);
@@ -75,14 +75,14 @@ public abstract class ACreate extends Command {
    * Starts an update operation.
    * @return success flag
    */
-  protected final boolean startUpdate() {
+  final boolean startUpdate() {
     return startUpdate(context.data());
   }
 
   /**
    * Finalizes an update operation.
    */
-  protected final void finishUpdate() {
+  final void finishUpdate() {
     finishUpdate(context.data());
   }
 
@@ -116,7 +116,7 @@ public abstract class ACreate extends Command {
    * @param data data reference
    * @return success flag
    */
-  protected static boolean drop(final IndexType type, final Data data) {
+  static boolean drop(final IndexType type, final Data data) {
     data.meta.dirty = true;
     final boolean ok = data.dropIndex(type);
     if(ok) {

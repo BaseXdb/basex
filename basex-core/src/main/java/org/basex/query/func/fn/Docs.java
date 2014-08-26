@@ -26,7 +26,7 @@ abstract class Docs extends StandardFunc {
    * @return collection
    * @throws QueryException query exception
    */
-  protected Value collection(final QueryContext qc) throws QueryException {
+  Value collection(final QueryContext qc) throws QueryException {
     // return default collection
     final Item it = exprs.length == 0 ? null : exprs[0].atomItem(qc, info);
     if(it == null) return qc.resources.collection(info);
@@ -43,7 +43,7 @@ abstract class Docs extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  protected ANode doc(final QueryContext qc) throws QueryException {
+  ANode doc(final QueryContext qc) throws QueryException {
     final Item it = exprs[0].item(qc, info);
     if(it == null) return null;
     final byte[] in = toToken(it);

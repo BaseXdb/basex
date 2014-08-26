@@ -31,7 +31,7 @@ public abstract class Parse extends StandardFunc {
    * @return content
    * @throws QueryException query exception
    */
-  protected Item unparsedText(final QueryContext qc, final boolean check) throws QueryException {
+  Item unparsedText(final QueryContext qc, final boolean check) throws QueryException {
     checkCreate(qc);
     final byte[] path = toToken(exprs[0], qc);
     final IO base = sc.baseIO();
@@ -82,7 +82,7 @@ public abstract class Parse extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  protected ANode parseXml(final QueryContext qc, final boolean frag) throws QueryException {
+  ANode parseXml(final QueryContext qc, final boolean frag) throws QueryException {
     final Item it = exprs[0].item(qc, info);
     if(it == null) return null;
 

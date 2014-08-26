@@ -28,8 +28,8 @@ abstract class RegEx extends StandardFunc {
    * @return pattern modifier
    * @throws QueryException query exception
    */
-  protected Pattern pattern(final Expr pattern, final Expr modifier, final QueryContext qc,
-      final boolean check) throws QueryException {
+  Pattern pattern(final Expr pattern, final Expr modifier, final QueryContext qc,
+                  final boolean check) throws QueryException {
 
     final byte[] pat = toToken(pattern, qc);
     final byte[] mod = modifier != null ? toToken(modifier, qc) : null;

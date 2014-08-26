@@ -28,9 +28,9 @@ public final class ValueAccess extends IndexAccess {
   /** Expression. */
   private Expr expr;
   /** Text index. */
-  final boolean text;
+  private final boolean text;
   /** Parent name test. */
-  final byte[] name;
+  private final byte[] name;
 
   /**
    * Constructor.

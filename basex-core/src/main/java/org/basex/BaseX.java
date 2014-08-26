@@ -30,7 +30,7 @@ public class BaseX extends CLI {
   /** Flag for writing options to disk. */
   private boolean writeOptions;
   /** Console mode. May be set to {@code false} during execution. */
-  protected boolean console;
+  private boolean console;
 
   /**
    * Main method, launching the standalone mode.
@@ -210,7 +210,7 @@ public class BaseX extends CLI {
    * Quits the console mode.
    * @throws IOException I/O exception
    */
-  protected final void quit() throws IOException {
+  private void quit() throws IOException {
     if(out == System.out || out == System.err) out.flush();
     else out.close();
   }
@@ -219,7 +219,7 @@ public class BaseX extends CLI {
    * Tests if this is a local client.
    * @return local mode
    */
-  protected boolean local() {
+  boolean local() {
     return true;
   }
 

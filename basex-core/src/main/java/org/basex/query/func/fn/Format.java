@@ -22,7 +22,7 @@ abstract class Format extends StandardFunc {
    * @return string
    * @throws QueryException query exception
    */
-  protected Item formatDate(final AtomType tp, final QueryContext qc) throws QueryException {
+  Item formatDate(final AtomType tp, final QueryContext qc) throws QueryException {
     final Item it = exprs[0].atomItem(qc, info);
     final byte[] pic = toEmptyToken(exprs[1], qc);
     final byte[] lng = exprs.length == 5 ? toEmptyToken(exprs[2], qc) : EMPTY;

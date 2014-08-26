@@ -380,7 +380,7 @@ public final class DataAccess implements AutoCloseable {
    * Sets the file length.
    * @param l file length
    */
-  public synchronized void length(final long l) {
+  private synchronized void length(final long l) {
     if(l != len) {
       changed = true;
       len = l;

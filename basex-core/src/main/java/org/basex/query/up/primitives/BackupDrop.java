@@ -38,5 +38,5 @@ public final class BackupDrop extends NameUpdate {
   public void prepare() { }
 
   @Override
-  public String operation() { return "dropped"; }
+  protected String operation() { return "dropped"; }
 }

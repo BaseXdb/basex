@@ -11,7 +11,7 @@ import org.basex.util.*;
  */
 public final class NumericRange implements IndexToken {
   /** Index type. */
-  public final boolean text;
+  private final boolean text;
   /** Minimum value. */
   public final double min;
   /** Maximum value. */

@@ -28,7 +28,7 @@ public abstract class Filter extends Preds {
    * @param root root expression
    * @param preds predicates
    */
-  protected Filter(final InputInfo info, final Expr root, final Expr... preds) {
+  Filter(final InputInfo info, final Expr root, final Expr... preds) {
     super(info, preds);
     this.root = root;
   }

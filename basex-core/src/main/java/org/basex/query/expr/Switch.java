@@ -73,7 +73,7 @@ public final class Switch extends ParseExpr {
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  public Expr opt(final QueryContext qc) throws QueryException {
+  private Expr opt(final QueryContext qc) throws QueryException {
     // pre-evaluate cases
     final boolean pre = cond.isValue();
     // cache expressions

@@ -71,7 +71,7 @@ public final class QuerySuggest extends QueryParser {
   }
 
   @Override
-  protected void checkAxis(final Axis axis) {
+  void checkAxis(final Axis axis) {
     all = axis != Axis.CHILD && axis != Axis.DESC ?
       new ArrayList<PathNode>() : PathSummary.desc(curr, axis == Axis.DESC);
     curr = all;

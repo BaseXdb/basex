@@ -86,7 +86,7 @@ public final class ValueList extends ElementList {
    * Warning: the function must only be called if the list is discarded afterwards.
    * @return array (internal representation!)
    */
-  public Value[] finish() {
+  private Value[] finish() {
     Value[] lst = list;
     final int s = size;
     if(s != lst.length) {

@@ -18,7 +18,7 @@ public final class Uri extends AStr {
   /** Empty URI. */
   public static final Uri EMPTY = new Uri(Token.EMPTY);
   /** String data. */
-  final byte[] value;
+  private final byte[] value;
 
   /**
    * Constructor.

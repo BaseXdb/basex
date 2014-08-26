@@ -25,7 +25,7 @@ abstract class Num extends StandardFunc {
    * @return number
    * @throws QueryException query exception
    */
-  protected ANum round(final QueryContext qc, final boolean even) throws QueryException {
+  ANum round(final QueryContext qc, final boolean even) throws QueryException {
     final ANum num = toNumber(exprs[0], qc);
     final long p = exprs.length == 1 ? 0 : Math.max(Integer.MIN_VALUE, toLong(exprs[1], qc));
     return num == null ? null : p > Integer.MAX_VALUE ? num : num.round((int) p, even);
@@ -38,7 +38,7 @@ abstract class Num extends StandardFunc {
    * @return resulting item
    * @throws QueryException query exception
    */
-  protected Item minmax(final OpV cmp, final QueryContext qc) throws QueryException {
+  Item minmax(final OpV cmp, final QueryContext qc) throws QueryException {
     final Collation coll = toCollation(1, qc);
 
     final Iter iter = exprs[0].atomIter(qc, info);

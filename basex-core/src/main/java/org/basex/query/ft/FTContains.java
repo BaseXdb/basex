@@ -22,7 +22,7 @@ import org.basex.util.hash.*;
  */
 public final class FTContains extends Single {
   /** Full-text parser. */
-  final FTLexer lex;
+  private final FTLexer lex;
   /** Full-text expression. */
   public FTExpr ftexpr;
 

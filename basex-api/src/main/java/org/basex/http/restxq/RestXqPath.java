@@ -12,7 +12,7 @@ final class RestXqPath implements Comparable<RestXqPath> {
   /** Path segments. */
   final String[] segment;
   /** Template flags. */
-  final boolean[] template;
+  private final boolean[] template;
   /** Number of segments. */
   final int size;
 

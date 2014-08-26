@@ -220,7 +220,7 @@ public abstract class Path extends ParseExpr {
    * @param index index
    * @return step
    */
-  public final Step axisStep(final int index) {
+  private Step axisStep(final int index) {
     return steps[index] instanceof Step ? (Step) steps[index] : null;
   }
 

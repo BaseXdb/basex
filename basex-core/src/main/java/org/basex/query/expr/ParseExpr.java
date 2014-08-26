@@ -348,7 +348,7 @@ public abstract class ParseExpr extends Expr {
    * @return double
    * @throws QueryException query exception
    */
-  protected final ANum toNumber(final Item it) throws QueryException {
+  private ANum toNumber(final Item it) throws QueryException {
     if(it.type.isUntyped()) return Dbl.get(it.dbl(info));
     if(it instanceof ANum) return (ANum) it;
     throw numberError(this, it);
@@ -437,7 +437,7 @@ public abstract class ParseExpr extends Expr {
    * @return node or {@code null}
    * @throws QueryException query exception
    */
-  protected final ANode toEmptyNode(final Item it) throws QueryException {
+  final ANode toEmptyNode(final Item it) throws QueryException {
     return it == null ? null : toNode(it);
   }
 
@@ -462,7 +462,7 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  protected final Item toItem(final Expr ex, final QueryContext qc, final Type type)
+  private Item toItem(final Expr ex, final QueryContext qc, final Type type)
       throws QueryException {
     return checkNoEmpty(ex.item(qc, info), type);
   }
@@ -510,7 +510,7 @@ public abstract class ParseExpr extends Expr {
    * @return binary item
    * @throws QueryException query exception
    */
-  protected final Bin toBin(final Item it) throws QueryException {
+  private Bin toBin(final Item it) throws QueryException {
     if(checkNoEmpty(it) instanceof Bin) return (Bin) it;
     throw BINARY_X.get(info, it.type);
   }

@@ -94,7 +94,7 @@ public abstract class Arr extends ParseExpr {
    * Returns true if at least one argument is empty or will yield 0 results.
    * @return result of check
    */
-  protected final boolean oneIsEmpty() {
+  final boolean oneIsEmpty() {
     for(final Expr e : exprs) if(e.isEmpty()) return true;
     return false;
   }

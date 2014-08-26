@@ -26,17 +26,17 @@ import org.basex.util.list.*;
  */
 public class DiskValues implements Index {
   /** ID references. */
-  protected final DataAccess idxr;
+  final DataAccess idxr;
   /** ID lists. */
-  protected final DataAccess idxl;
+  final DataAccess idxl;
   /** Data reference. */
-  protected final Data data;
+  final Data data;
   /** Cached index entries: mapping between keys and index entries. */
-  protected final IndexCache cache = new IndexCache();
+  final IndexCache cache = new IndexCache();
   /** Cached texts: mapping between key positions and indexed texts. */
-  protected final IntObjMap<byte[]> ctext = new IntObjMap<>();
+  final IntObjMap<byte[]> ctext = new IntObjMap<>();
   /** Number of current index entries. */
-  protected final AtomicInteger size = new AtomicInteger();
+  final AtomicInteger size = new AtomicInteger();
 
   /** Value type (texts/attributes). */
   private final boolean text;
@@ -164,7 +164,7 @@ public class DiskValues implements Index {
    * @param id id value
    * @return pre value
    */
-  protected int pre(final int id) {
+  int pre(final int id) {
     return id;
   }
 
@@ -174,7 +174,7 @@ public class DiskValues implements Index {
    * @param key token to be found
    * @return if the key is found: index of the key else: (-(insertion point) - 1)
    */
-  protected int get(final byte[] key) {
+  int get(final byte[] key) {
     return get(key, 0, size());
   }
 
@@ -186,7 +186,7 @@ public class DiskValues implements Index {
    * @param last end of the search interval (exclusive)
    * @return if the key is found: index of the key else: (-(insertion point) - 1)
    */
-  protected int get(final byte[] key, final int first, final int last) {
+  int get(final byte[] key, final int first, final int last) {
     int l = first, h = last - 1;
     synchronized(monitor) {
       while(l <= h) {
@@ -205,7 +205,7 @@ public class DiskValues implements Index {
    * Returns the number of index entries.
    * @return number of index entries
    */
-  protected int size() {
+  int size() {
     return size.get();
   }
 

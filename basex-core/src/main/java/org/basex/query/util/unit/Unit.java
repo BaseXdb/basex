@@ -26,7 +26,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class Unit {
+final class Unit {
   /** Database context. */
   private final Context ctx;
   /** File. */

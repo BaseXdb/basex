@@ -43,7 +43,7 @@ public class DBAlter extends NameUpdate {
   public void prepare() throws QueryException { }
 
   @Override
-  public String operation() { return "renamed"; }
+  protected String operation() { return "renamed"; }
 
   @Override
   public void databases(final StringList db) {

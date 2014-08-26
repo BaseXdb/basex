@@ -830,7 +830,7 @@ public final class GFLWOR extends ParseExpr {
      * @param info input info
      * @param vars declared variables
      */
-    protected Clause(final InputInfo info, final Var... vars) {
+    Clause(final InputInfo info, final Var... vars) {
       super(info);
       this.vars = vars;
     }

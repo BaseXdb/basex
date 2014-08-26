@@ -189,7 +189,7 @@ public final class BaseXServer extends CLI implements Runnable {
   /**
    * Shuts down the server.
    */
-  protected synchronized void quit() {
+  private synchronized void quit() {
     if(!running) return;
     running = false;
 

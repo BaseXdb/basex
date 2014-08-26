@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public abstract class FormatParser extends FormatUtil {
   /** Input information. */
-  final InputInfo info;
+  private final InputInfo info;
 
   /** Case. */
   Case cs;

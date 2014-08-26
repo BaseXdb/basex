@@ -314,7 +314,7 @@ public final class IOFile extends IO {
    * @return path
    * @throws IOException I/O exception
    */
-  public Path toPath() throws IOException {
+  private Path toPath() throws IOException {
     try {
       return Paths.get(pth);
     } catch(final InvalidPathException ex) {

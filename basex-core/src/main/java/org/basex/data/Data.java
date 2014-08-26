@@ -104,9 +104,9 @@ public abstract class Data {
   public int pins = 1;
 
   /** Table access file. */
-  protected TableAccess table;
+  TableAccess table;
   /** ID->PRE mapping. */
-  protected IdPreMap idmap;
+  IdPreMap idmap;
   /** States if distance caching is active. */
   public boolean cache;
 

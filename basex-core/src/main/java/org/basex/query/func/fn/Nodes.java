@@ -23,7 +23,7 @@ abstract class Nodes extends StandardFunc {
    * @return outermost/innermost nodes
    * @throws QueryException exception
    */
-  protected Iter most(final QueryContext qc, final boolean outer) throws QueryException {
+  Iter most(final QueryContext qc, final boolean outer) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
     final NodeSeqBuilder nc = new NodeSeqBuilder().check();
     for(Item it; (it = iter.next()) != null;) nc.add(toNode(it));

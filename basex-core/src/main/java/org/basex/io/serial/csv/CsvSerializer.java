@@ -17,7 +17,7 @@ import org.basex.util.list.*;
  */
 abstract class CsvSerializer extends OutputSerializer {
   /** CSV options. */
-  protected final CsvOptions copts;
+  final CsvOptions copts;
   /** Separator. */
   private final int separator;
   /** Generate quotes. */

@@ -24,7 +24,7 @@ abstract class Aggr extends StandardFunc {
    * @return summed up item
    * @throws QueryException query exception
    */
-  protected Item sum(final Iter iter, final Item it, final boolean avg) throws QueryException {
+  Item sum(final Iter iter, final Item it, final boolean avg) throws QueryException {
     Item rs = it.type.isUntyped() ? Dbl.get(it.string(info), info) : it;
     final boolean num = rs instanceof ANum, dtd = rs.type == DTD, ymd = rs.type == YMD;
     if(!num && (!(rs instanceof Dur) || rs.type == DUR)) throw SUM_X_X.get(info, rs.type, rs);

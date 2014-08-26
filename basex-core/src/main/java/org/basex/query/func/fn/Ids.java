@@ -25,7 +25,7 @@ abstract class Ids extends StandardFunc {
    * @return ids
    * @throws QueryException query exception
    */
-  protected final byte[][] ids(final Iter iter) throws QueryException {
+  final byte[][] ids(final Iter iter) throws QueryException {
     final TokenList tl = new TokenList();
     for(Item id; (id = iter.next()) != null;) {
       for(final byte[] i : split(normalize(toToken(id)), ' ')) tl.add(i);
@@ -40,8 +40,8 @@ abstract class Ids extends StandardFunc {
    * @param nc node cache
    * @param node node
    */
-  protected static void add(final byte[][] ids, final NodeSeqBuilder nc, final ANode node,
-      final boolean idref) {
+  static void add(final byte[][] ids, final NodeSeqBuilder nc, final ANode node,
+                  final boolean idref) {
     AxisIter ai = node.attributes();
     for(ANode at; (at = ai.next()) != null;) {
       final byte[][] val = split(at.string(), ' ');
@@ -63,7 +63,7 @@ abstract class Ids extends StandardFunc {
    * @return specified node
    * @throws QueryException query exception
    */
-  protected ANode checkRoot(final ANode node) throws QueryException {
+  ANode checkRoot(final ANode node) throws QueryException {
     if(node instanceof FNode) {
       ANode n = node;
       while(n.type != NodeType.DOC) {

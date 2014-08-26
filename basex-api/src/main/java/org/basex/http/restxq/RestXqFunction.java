@@ -54,7 +54,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   RestXqPath path;
 
   /** Error. */
-  RestXqError error;
+  private RestXqError error;
   /** Query parameters. */
   private final ArrayList<RestXqParam> errorParams = new ArrayList<>();
 

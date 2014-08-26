@@ -24,7 +24,7 @@ public class SimpleMap extends Arr {
    * @param info input info
    * @param exprs expressions
    */
-  protected SimpleMap(final InputInfo info, final Expr... exprs) {
+  SimpleMap(final InputInfo info, final Expr... exprs) {
     super(info, exprs);
   }
 

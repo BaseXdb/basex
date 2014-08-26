@@ -35,5 +35,5 @@ public final class DBDrop extends NameUpdate {
   }
 
   @Override
-  public String operation() { return "dropped"; }
+  protected String operation() { return "dropped"; }
 }

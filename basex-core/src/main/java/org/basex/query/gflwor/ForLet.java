@@ -25,7 +25,7 @@ abstract class ForLet extends GFLWOR.Clause {
    * @param expr expression
    * @param vars variable
    */
-  protected ForLet(final InputInfo info, final Var var, final Expr expr, final Var... vars) {
+  ForLet(final InputInfo info, final Var var, final Expr expr, final Var... vars) {
     super(info, vars);
     this.var = var;
     this.expr = expr;

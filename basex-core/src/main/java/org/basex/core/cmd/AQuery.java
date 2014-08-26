@@ -35,7 +35,7 @@ public abstract class AQuery extends Command {
   private QueryInfo info;
 
   /** Query result. */
-  protected Result result;
+  Result result;
 
   /**
    * Protected constructor.

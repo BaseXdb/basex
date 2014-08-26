@@ -373,7 +373,7 @@ public final class DiskData extends Data {
   }
 
   @Override
-  protected void indexBegin() {
+  void indexBegin() {
     txtBuffer = new TokenObjMap<>();
     atvBuffer = new TokenObjMap<>();
   }
@@ -385,7 +385,7 @@ public final class DiskData extends Data {
   }
 
   @Override
-  protected void indexDelete() {
+  void indexDelete() {
     if(!txtBuffer.isEmpty()) ((DiskValues) textIndex).delete(txtBuffer);
     if(!atvBuffer.isEmpty()) ((DiskValues) attrIndex).delete(atvBuffer);
   }
