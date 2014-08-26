@@ -21,8 +21,6 @@ import org.basex.util.hash.*;
 final class CachedPath extends AxisPath {
   /** Flag for result caching. */
   private boolean cache;
-  /** Cached result. */
-  private NodeSeqBuilder citer;
 
   /**
    * Constructor.
@@ -43,12 +41,7 @@ final class CachedPath extends AxisPath {
     final Value r = root != null ? qc.value(root) : cv;
 
     try {
-      /* cache values if:
-       * - caching is desirable
-       * - the code is called for the first time
-       * - the value has changed and the underlying node is not the same
-       */
-      citer = new NodeSeqBuilder().check();
+      final NodeSeqBuilder nb = new NodeSeqBuilder().check();
       if(r != null) {
         final Iter ir = qc.iter(r);
         for(Item it; (it = ir.next()) != null;) {
@@ -56,14 +49,13 @@ final class CachedPath extends AxisPath {
           if(root != null && !(it instanceof ANode))
             throw PATHNODE_X_X_X.get(info, steps[0], it.type, it);
           qc.value = it;
-          iter(0, citer, qc);
+          iter(0, nb, qc);
         }
       } else {
         qc.value = null;
-        iter(0, citer, qc);
+        iter(0, nb, qc);
       }
-      citer.sort();
-      return citer;
+      return nb.sort();
     } finally {
       qc.value = cv;
       qc.size = cs;

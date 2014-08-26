@@ -64,7 +64,7 @@ public final class GroupBy extends GFLWOR.Clause {
       final InputInfo info) {
     super(info, vars(specs, post));
     this.specs = specs;
-    this.preExpr = pre;
+    preExpr = pre;
     this.post = post;
     this.nonOcc = nonOcc;
   }

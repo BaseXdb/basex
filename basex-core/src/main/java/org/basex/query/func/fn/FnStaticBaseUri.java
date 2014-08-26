@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public final class FnStaticBaseUri extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) {
     final Uri uri = sc.baseURI();
     return uri == Uri.EMPTY ? null : uri;
   }

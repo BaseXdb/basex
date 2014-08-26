@@ -48,7 +48,7 @@ public final class Extension extends Single {
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) {
     seqType = expr.seqType();
     size = expr.size();
     return this;

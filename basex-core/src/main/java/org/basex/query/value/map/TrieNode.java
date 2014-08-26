@@ -56,8 +56,8 @@ abstract class TrieNode {
     @Override
     StringBuilder toString(final StringBuilder sb) { return sb; }
     @Override
-    void apply(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo ii)
-        throws QueryException { }
+    void apply(final ValueBuilder vb, final FItem func, final QueryContext qc,
+        final InputInfo ii) { }
   };
 
   /** Size of this node. */

@@ -161,24 +161,24 @@ public enum Function {
   FALSE(FnFalse.class, "false()", arg(), BLN),
   /** XQuery function. */
   FILTER(FnFilter.class, "filter(items,function)",
-      arg(ITEM_ZM, FuncType.get(BLN, ITEM).seqType()), ITEM_ZM, flag(Flag.HOF)),
+      arg(ITEM_ZM, FuncType.get(BLN, ITEM).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   FLOOR(FnFloor.class, "floor(num)", arg(AAT_ZO), AAT_ZO),
   /** XQuery function. */
   FOLD_LEFT(FnFoldLeft.class, "fold-left(items,zero,function)",
       arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM).seqType()),
-      ITEM_ZM, flag(Flag.HOF)),
+      ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   FOLD_RIGHT(FnFoldRight.class, "fold-right(items,zero,function)",
       arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM, ITEM_ZM).seqType()),
-      ITEM_ZM, flag(Flag.HOF)),
+      ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   FOR_EACH(FnForEach.class, "for-each(items,function)",
-      arg(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM).seqType()), ITEM_ZM, flag(Flag.HOF)),
+      arg(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   FOR_EACH_PAIR(FnForEachPair.class, "for-each-pair(items1,items2,function)",
       arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM, ITEM).seqType()),
-      ITEM_ZM, flag(Flag.HOF)),
+      ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   FORMAT_DATE(FnFormatDate.class, "format-date(date,picture,[language,calendar,place])",
       arg(DAT_ZO, STR, STR_ZO, STR_ZO, STR_ZO), STR_ZO),
@@ -199,7 +199,7 @@ public enum Function {
   FUNCTION_ARITY(FnFunctionArity.class, "function-arity(function)", arg(FUN_O), ITR),
   /** XQuery function. */
   FUNCTION_LOOKUP(FnFunctionLookup.class, "function-lookup(name,arity)",
-      arg(QNM, ITR), FUN_OZ, flag(CTX, FCS, NDT, Flag.HOF)),
+      arg(QNM, ITR), FUN_OZ, flag(CTX, FCS, NDT, HOF)),
   /** XQuery function. */
   FUNCTION_NAME(FnFunctionName.class, "function-name(function)", arg(FUN_O), QNM_ZO),
   /** XQuery function. */
@@ -425,7 +425,7 @@ public enum Function {
   _MAP_KEYS(FNMap.class, "keys(map)", arg(MAP_O), AAT_ZM),
   /** XQuery function. */
   _MAP_FOR_EACH_ENTRY(FNMap.class, "for-each-entry(map,function)",
-      arg(MAP_O, FuncType.get(ITEM_ZM, AAT, ITEM_ZM).seqType()), ITEM_ZM, flag(Flag.HOF)),
+      arg(MAP_O, FuncType.get(ITEM_ZM, AAT, ITEM_ZM).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   _MAP_SERIALIZE(FNMap.class, "serialize(map)", arg(MAP_O), STR),
 
@@ -452,22 +452,22 @@ public enum Function {
   _ARRAY_JOIN(FNArray.class, "join(array)", arg(ARRAY_ZM), ITEM_ZM),
   /** XQuery function. */
   _ARRAY_FOR_EACH_MEMBER(FNArray.class, "for-each-member(array,function)",
-      arg(ARRAY_O, FuncType.get(ITEM_ZM, ITEM_ZM).seqType()), ARRAY_O, flag(Flag.HOF)),
+      arg(ARRAY_O, FuncType.get(ITEM_ZM, ITEM_ZM).seqType()), ARRAY_O, flag(HOF)),
   /** XQuery function. */
   _ARRAY_FILTER(FNArray.class, "filter(array,function)",
-      arg(ARRAY_O, FuncType.get(BLN, ITEM_ZM).seqType()), ARRAY_O, flag(Flag.HOF)),
+      arg(ARRAY_O, FuncType.get(BLN, ITEM_ZM).seqType()), ARRAY_O, flag(HOF)),
   /** XQuery function. */
   _ARRAY_FOLD_LEFT(FNArray.class, "fold-left(array,zero,function)",
       arg(ARRAY_O, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()), ITEM_ZM,
-      flag(Flag.HOF)),
+      flag(HOF)),
   /** XQuery function. */
   _ARRAY_FOLD_RIGHT(FNArray.class, "fold-right(array,zero,function)",
       arg(ARRAY_O, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()), ITEM_ZM,
-      flag(Flag.HOF)),
+      flag(HOF)),
   /** XQuery function. */
   _ARRAY_FOR_EACH_PAIR(FNArray.class, "for-each-pair(array1,array2,function)",
       arg(ARRAY_O, ARRAY_O, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()), ARRAY_O,
-      flag(Flag.HOF)),
+      flag(HOF)),
   /** XQuery function. */
   _ARRAY_SERIALIZE(FNArray.class, "serialize(array)", arg(ARRAY_O), STR),
 
@@ -897,16 +897,16 @@ public enum Function {
   _HOF_CONST(FNHof.class, "const(return,ignore)", arg(ITEM_ZM, ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
   _HOF_UNTIL(FNHof.class, "until(pred,function,start)", arg(FuncType.get(BLN, ITEM_ZM).seqType(),
-      FuncType.get(ITEM_ZM, ITEM_ZM).seqType(), ITEM_ZM), ITEM_ZM, flag(Flag.HOF)),
+      FuncType.get(ITEM_ZM, ITEM_ZM).seqType(), ITEM_ZM), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   _HOF_FOLD_LEFT1(FNHof.class, "fold-left1(non-empty-items,function)",
-      arg(ITEM_OM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM).seqType()), ITEM_ZM, flag(Flag.HOF)),
+      arg(ITEM_OM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   _HOF_TOP_K_BY(FNHof.class, "top-k-by(items,key-fun,k)",
-      arg(ITEM_ZM, FuncType.arity(1).seqType(), ITR), ITEM_ZM, flag(Flag.HOF)),
+      arg(ITEM_ZM, FuncType.arity(1).seqType(), ITR), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   _HOF_TOP_K_WITH(FNHof.class, "top-k-with(items,less-than,k)",
-      arg(ITEM_ZM, FuncType.get(BLN, ITEM_ZO, ITEM_ZO).seqType(), ITR), ITEM_ZM, flag(Flag.HOF)),
+      arg(ITEM_ZM, FuncType.get(BLN, ITEM_ZO, ITEM_ZO).seqType(), ITR), ITEM_ZM, flag(HOF)),
 
   /* FNHtml functions. */
 
@@ -945,7 +945,7 @@ public enum Function {
   /** XQuery function. */
   _INSPECT_CONTEXT(FNInspect.class, "context()", arg(), ELM),
   /** XQuery function. */
-  _INSPECT_FUNCTIONS(FNInspect.class, "functions([uri])", arg(STR), FUN_ZM, flag(Flag.HOF)),
+  _INSPECT_FUNCTIONS(FNInspect.class, "functions([uri])", arg(STR), FUN_ZM, flag(HOF)),
   /** XQuery function. */
   _INSPECT_XQDOC(FNInspect.class, "xqdoc(path)", arg(STR), ELM),
 

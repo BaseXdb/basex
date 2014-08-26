@@ -73,7 +73,7 @@ public final class FNRandom extends StandardFunc {
       long c;
 
       @Override
-      public Item next() throws QueryException {
+      public Item next() {
         return ++c <= num ? Int.get(
             max == Integer.MAX_VALUE ? r.nextInt() : r.nextInt((int) max)) : null;
       }

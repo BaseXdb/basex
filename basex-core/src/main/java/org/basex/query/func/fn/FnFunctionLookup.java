@@ -32,7 +32,7 @@ public final class FnFunctionLookup extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+  protected Expr opt(final QueryContext qc, final VarScope scp) {
     for(final StaticFunc sf : qc.funcs.funcs()) sf.compile(qc);
     return this;
   }

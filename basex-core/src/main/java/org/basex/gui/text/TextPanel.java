@@ -591,10 +591,10 @@ public class TextPanel extends BaseXPanel {
       down = false;
     } else if(NEXTPAGE_RO.is(e) && !hist.active()) {
       lc = editor.linesDown(getHeight() / fh, false, lastCol);
-    } else if(PREVPAGE.is(e) && !BaseXKeys.sc(e)) {
+    } else if(PREVPAGE.is(e) && !sc(e)) {
       lc = editor.linesUp(getHeight() / fh, shift, lastCol);
       down = false;
-    } else if(NEXTPAGE.is(e) && !BaseXKeys.sc(e)) {
+    } else if(NEXTPAGE.is(e) && !sc(e)) {
       lc = editor.linesDown(getHeight() / fh, shift, lastCol);
     } else if(NEXTLINE.is(e) && !MOVEDOWN.is(e)) {
       lc = editor.linesDown(1, shift, lastCol);

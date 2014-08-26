@@ -55,7 +55,7 @@ public final class PathNode {
    * @param count counter
    */
   private PathNode(final int name, final byte kind, final PathNode parent, final int count) {
-    this.children = new PathNode[0];
+    children = new PathNode[0];
     this.name = (short) name;
     this.kind = kind;
     this.parent = parent;

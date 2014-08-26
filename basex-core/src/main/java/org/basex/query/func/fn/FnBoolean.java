@@ -29,7 +29,7 @@ public final class FnBoolean extends StandardFunc {
   }
 
   @Override
-  public Expr optimizeEbv(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimizeEbv(final QueryContext qc, final VarScope scp) {
     // expr[boolean(A)] -> expr[A]
     final Expr e = exprs[0];
     if(!e.seqType().mayBeNumber()) {

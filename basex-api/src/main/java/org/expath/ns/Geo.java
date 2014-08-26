@@ -655,7 +655,7 @@ public final class Geo extends QueryModule {
    * @return geometry
    * @throws QueryException query exception
    */
-  private Geometry checkGeo(final ANode node) throws QueryException {
+  private static Geometry checkGeo(final ANode node) throws QueryException {
     final Geometry geo = geo(node, QNAMES);
     if(geo == null) throw GeoErrors.unrecognizedGeo(node.qname().local());
     return geo;

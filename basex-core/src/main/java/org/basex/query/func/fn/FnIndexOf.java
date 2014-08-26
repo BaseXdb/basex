@@ -39,7 +39,7 @@ public final class FnIndexOf extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+  protected Expr opt(final QueryContext qc, final VarScope scp) {
     if(exprs[0].seqType().zeroOrOne()) seqType = SeqType.get(seqType().type, Occ.ZERO_ONE);
     return this;
   }

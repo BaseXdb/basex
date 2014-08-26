@@ -22,7 +22,7 @@ public final class FTPos {
    */
   FTPos(final int pre, final IntList list) {
     this.pre = pre;
-    this.poss = list;
+    poss = list;
   }
 
   /**

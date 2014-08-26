@@ -220,10 +220,10 @@ public enum BaseXKeys {
     if((mod & InputEvent.ALT_MASK) != 0) sb.append("alt").append(' ');
     if((mod & InputEvent.SHIFT_MASK) != 0) sb.append("shift").append(' ');
 
-    if(key == KeyEvent.VK_ENTER) sb.append("ENTER");
-    else if(key == KeyEvent.VK_DELETE) sb.append("DELETE");
-    else if(key == KeyEvent.VK_PERIOD) sb.append("PERIOD");
-    else sb.append(KeyEvent.getKeyText(key));
+    if(key == VK_ENTER) sb.append("ENTER");
+    else if(key == VK_DELETE) sb.append("DELETE");
+    else if(key == VK_PERIOD) sb.append("PERIOD");
+    else sb.append(getKeyText(key));
     return sb.toString();
   }
 }

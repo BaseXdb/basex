@@ -51,7 +51,7 @@ final class JarParser {
         // [CG] Packaging: add warning if unknown elements are encountered
       }
       if(desc.jars.isEmpty()) throw BXRE_JARDESC_X.get(info, NOJARS);
-      else if(desc.classes.isEmpty()) throw BXRE_JARDESC_X.get(info, NOCLASSES);
+      if(desc.classes.isEmpty()) throw BXRE_JARDESC_X.get(info, NOCLASSES);
       return desc;
     } catch(final IOException ex) {
       throw BXRE_JARFAIL_X.get(info, ex);

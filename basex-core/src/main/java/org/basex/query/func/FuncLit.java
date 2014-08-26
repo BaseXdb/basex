@@ -50,7 +50,7 @@ public final class FuncLit extends Single implements Scope {
     super(info, expr);
     this.ann = ann;
     this.name = name;
-    this.args = arg;
+    args = arg;
     this.scope = scope;
     this.sc = sc;
     check = ft == null;

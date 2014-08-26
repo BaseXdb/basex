@@ -528,7 +528,7 @@ public final class TextEditor {
     int p = pos;
     while(--p >= 0 && XMLToken.isChar(text[p]));
     ++p;
-    final String key = Token.string(text, p, pos - p);
+    final String key = string(text, p, pos - p);
     final byte[] value = XMLToken.getEntity(token(key));
     if(value != null) {
       replace(p, pos + (space ? 1 : 0), string(value));

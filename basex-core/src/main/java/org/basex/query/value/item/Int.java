@@ -102,7 +102,7 @@ public final class Int extends ANum {
 
   @Override
   public Int abs() {
-    return value < 0 ? Int.get(-value) : type != AtomType.ITR ? Int.get(value) : this;
+    return value < 0 ? get(-value) : type != AtomType.ITR ? get(value) : this;
   }
 
   @Override
@@ -118,7 +118,7 @@ public final class Int extends ANum {
   @Override
   public ANum round(final int scale, final boolean even) {
     final long v = rnd(scale, even);
-    return v == value ? this : Int.get(v);
+    return v == value ? this : get(v);
   }
 
   /**

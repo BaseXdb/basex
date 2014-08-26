@@ -41,7 +41,7 @@ public final class NameTest extends Test {
     local = name != null ? name.local() : null;
     defElemNS = elemNS != null ? elemNS : Token.EMPTY;
     this.name = name;
-    this.kind = mode;
+    kind = mode;
   }
 
   @Override

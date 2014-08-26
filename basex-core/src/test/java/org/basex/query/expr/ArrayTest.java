@@ -236,6 +236,6 @@ public final class ArrayTest extends AdvancedQueryTest {
    * @param exp expected result
    */
   private static void array(final String query, final String exp) {
-    query(_ARRAY_SERIALIZE.args(" " + query), exp);
+    query(_ARRAY_SERIALIZE.args(' ' + query), exp);
   }
 }

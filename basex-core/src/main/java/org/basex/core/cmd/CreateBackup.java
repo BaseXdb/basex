@@ -47,7 +47,7 @@ public final class CreateBackup extends ABackup {
       // don't open databases marked as updating
       if(MetaData.file(context.globalopts.dbpath(db), DATAUPD).exists()) {
         // reject backups of databases that are currently being updated (or corrupt)
-        info(Text.DB_UPDATED_X, db);
+        info(DB_UPDATED_X, db);
         ok = false;
       } else {
         try {

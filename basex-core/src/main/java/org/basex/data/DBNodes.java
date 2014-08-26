@@ -22,7 +22,7 @@ public final class DBNodes implements Result {
   /** Pre values comprise all documents of the database. */
   public boolean all;
   /** Root node. */
-  public Data data;
+  public final Data data;
   /** Pre values. */
   public int[] pres;
   /** Sorted pre values. */

@@ -94,6 +94,6 @@ public final class FNMapTest extends AdvancedQueryTest {
    * @param count expected number of entries
    */
   private static void count(final String query, final int count) {
-    query(_MAP_SIZE.args(" " + query), count);
+    query(_MAP_SIZE.args(' ' + query), count);
   }
 }

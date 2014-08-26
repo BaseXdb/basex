@@ -129,7 +129,7 @@ final class RestXqWadl {
    * @param xqdoc documentation (may be {@code null})
    * @param parent parent node
    */
-  private void addDoc(final byte[] xqdoc, final FElem parent) {
+  private static void addDoc(final byte[] xqdoc, final FElem parent) {
     if(xqdoc == null) return;
     final FElem doc = elem("doc", parent);
     doc.namespaces().add(EMPTY, token(XHTML_URL));

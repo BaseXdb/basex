@@ -67,7 +67,7 @@ public class Options implements Iterable<Option<?>> {
       values.put(e.getKey(), e.getValue());
     for(final Entry<String, String> e : opts.free.entrySet())
       free.put(e.getKey(), e.getValue());
-    user.append(opts.user.toString());
+    user.append(opts.user);
     file = opts.file;
   }
 

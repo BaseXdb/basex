@@ -89,7 +89,7 @@ public final class DialogProps extends BaseXDialog {
       labels[i] = new BaseXLabel(LABELS[i]).large();
       panels[i] = new BaseXBack(new BorderLayout(0, 4));
       infos[i] = new TextPanel(Token.token(PLEASE_WAIT_D), false, this);
-      infos[i].setFont(GUIConstants.dmfont);
+      infos[i].setFont(dmfont);
       BaseXLayout.setHeight(infos[i], 200);
       if(i != 1) {
         indxs[i] = new BaseXButton(" ", this);

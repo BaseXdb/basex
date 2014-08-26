@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.nio.charset.*;
 import java.nio.file.*;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.zip.*;
 
@@ -353,7 +354,7 @@ public final class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item write(final QueryContext qc) throws QueryException {
-    final java.nio.file.Path path = toPath(0, qc);
+    final Path path = toPath(0, qc);
     final B64 archive = toB64(exprs[1], qc, false);
     final TokenSet hs = entries(2, qc);
 
@@ -363,7 +364,7 @@ public final class FNArchive extends StandardFunc {
         final ZipEntry ze = in.entry();
         final String name = ze.getName();
         if(hs == null || hs.delete(token(name)) != 0) {
-          final java.nio.file.Path file = path.resolve(name);
+          final Path file = path.resolve(name);
           if(ze.isDirectory()) {
             Files.createDirectories(file);
           } else {
@@ -449,7 +450,7 @@ public final class FNArchive extends StandardFunc {
     if(cont instanceof AStr && enc != null && enc != UTF8) val = encode(val, enc, qc);
 
     try {
-      out.level(lvl == null ? level : Token.toInt(lvl));
+      out.level(lvl == null ? level : toInt(lvl));
     } catch(final IllegalArgumentException ex) {
       throw ARCH_LEVEL_X.get(info, lvl);
     }

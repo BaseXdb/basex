@@ -111,7 +111,7 @@ public abstract class IO {
    * @param path file path
    */
   private void init(final String path) {
-    this.pth = path;
+    pth = path;
     final String n = path.substring(path.lastIndexOf('/') + 1);
     // use current time if no name is given
     nm = n.isEmpty() ? Long.toString(System.currentTimeMillis()) + BASEXSUFFIX + XMLSUFFIX : n;

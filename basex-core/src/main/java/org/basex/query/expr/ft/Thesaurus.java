@@ -97,7 +97,7 @@ public final class Thesaurus {
   public Thesaurus(final IO file, final byte[] res, final long min, final long max,
       final Context ctx) {
     this.file = file;
-    this.rel = res;
+    rel = res;
     this.min = min;
     this.max = max;
     this.ctx = ctx;

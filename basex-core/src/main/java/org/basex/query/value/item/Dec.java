@@ -82,24 +82,24 @@ public final class Dec extends ANum {
 
   @Override
   public Dec abs() {
-    return value.signum() == -1 ? Dec.get(value.negate()) : this;
+    return value.signum() == -1 ? get(value.negate()) : this;
   }
 
   @Override
   public Dec ceiling() {
-    return Dec.get(value.setScale(0, BigDecimal.ROUND_CEILING));
+    return get(value.setScale(0, BigDecimal.ROUND_CEILING));
   }
 
   @Override
   public Dec floor() {
-    return Dec.get(value.setScale(0, BigDecimal.ROUND_FLOOR));
+    return get(value.setScale(0, BigDecimal.ROUND_FLOOR));
   }
 
   @Override
   public Dec round(final int scale, final boolean even) {
     final int s = value.signum();
-    return s == 0 ? this : Dec.get(value.setScale(scale, even ? BigDecimal.ROUND_HALF_EVEN :
-           s == 1 ? BigDecimal.ROUND_HALF_UP : BigDecimal.ROUND_HALF_DOWN));
+    return s == 0 ? this : get(value.setScale(scale, even ? BigDecimal.ROUND_HALF_EVEN :
+    s == 1 ? BigDecimal.ROUND_HALF_UP : BigDecimal.ROUND_HALF_DOWN));
   }
 
   @Override

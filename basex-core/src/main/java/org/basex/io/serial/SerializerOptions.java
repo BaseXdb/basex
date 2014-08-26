@@ -204,7 +204,7 @@ public final class SerializerOptions extends Options {
     SerializerOptions o = OPTIONS[indent ? 1 : 0];
     if(o == null) {
       o = new SerializerOptions();
-      if(!indent) o.set(SerializerOptions.INDENT, YesNo.NO);
+      if(!indent) o.set(INDENT, YesNo.NO);
       OPTIONS[indent ? 1 : 0] = o;
     }
     return o;

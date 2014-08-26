@@ -70,6 +70,6 @@ public final class ArrayOutput extends PrintOutput {
 
   @Override
   public String toString() {
-    return Token.string(buffer, 0, (int) size);
+    return string(buffer, 0, (int) size);
   }
 }

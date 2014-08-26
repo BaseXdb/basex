@@ -13,7 +13,7 @@ import org.basex.query.value.item.*;
  */
 public final class FnAvailableEnvironmentVariables extends StandardFunc {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) {
     final ValueBuilder vb = new ValueBuilder();
     for(final Object k : System.getenv().keySet()) vb.add(Str.get(k.toString()));
     return vb;

@@ -25,7 +25,7 @@ public final class IterMap extends SimpleMap {
   }
 
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) {
     return new Iter() {
       final int sz = exprs.length;
       final Iter[] iter = new Iter[sz];

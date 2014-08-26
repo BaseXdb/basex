@@ -120,7 +120,7 @@ public final class Empty extends Value {
   }
 
   @Override
-  public long atomSize() throws QueryException {
+  public long atomSize() {
     return 0;
   }
 

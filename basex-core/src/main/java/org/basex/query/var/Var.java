@@ -56,7 +56,7 @@ public final class Var extends ExprInfo {
     this.sc = sc;
     this.name = name;
     this.param = param;
-    this.promote = param;
+    promote = param;
     this.declType = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
     seqType = SeqType.ITEM_ZM;
     id = qc.varIDs++;

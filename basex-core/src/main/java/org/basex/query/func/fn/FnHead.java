@@ -23,7 +23,7 @@ public final class FnHead extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+  protected Expr opt(final QueryContext qc, final VarScope scp) {
     seqType = SeqType.get(exprs[0].seqType().type, Occ.ZERO_ONE);
     return this;
   }

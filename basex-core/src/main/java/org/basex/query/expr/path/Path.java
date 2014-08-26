@@ -184,7 +184,7 @@ public abstract class Path extends ParseExpr {
         !step.preds[0].seqType().mayBeNumber()) {
       final Expr s = step.merge(this, qc, scp);
       if(s != step) {
-        qc.compInfo(QueryText.OPTWRITE, this);
+        qc.compInfo(OPTWRITE, this);
         step.preds = new Expr[0];
         return s;
       }
@@ -263,8 +263,8 @@ public abstract class Path extends ParseExpr {
    */
   public final boolean cheap() {
     if(!(root instanceof ANode) || ((Value) root).type != NodeType.DOC) return false;
-    final Axis[] expensive = { Axis.DESC, Axis.DESCORSELF, Axis.PREC, Axis.PRECSIBL,
-        Axis.FOLL, Axis.FOLLSIBL };
+    final Axis[] expensive = { DESC, DESCORSELF, PREC, PRECSIBL,
+        FOLL, FOLLSIBL };
     final int sl = steps.length;
     for(int i = 0; i < sl; i++) {
       final Step s = axisStep(i);
@@ -294,7 +294,7 @@ public abstract class Path extends ParseExpr {
         // multiple, unsorted results - only iterate at last step,
         // or if last step uses attribute axis
         case DESC: case DESCORSELF: case FOLL: case FOLLSIBL:
-          return s + 1 == sl || s + 2 == sl && ((Step) steps[s + 1]).axis == Axis.ATTR;
+          return s + 1 == sl || s + 2 == sl && ((Step) steps[s + 1]).axis == ATTR;
         // allow iteration for CHILD, ATTR, PARENT and SELF axes
         default:
       }
@@ -313,7 +313,7 @@ public abstract class Path extends ParseExpr {
     // no root or context expression: return context
     if(root == null || root instanceof Context) return v;
     // root reference
-    if(root instanceof Root) return v != null && v instanceof Item ? Root.root(v) : v;
+    if(root instanceof Root) return v instanceof Item ? Root.root(v) : v;
     // root is value: return root
     if(root.isValue()) return (Value) root;
     // data reference
@@ -618,7 +618,7 @@ public abstract class Path extends ParseExpr {
         final Axis ax = axisStep(s).axis.invert();
         if(s == 0) {
           // add document test for collections and axes other than ancestors
-          if(test != Test.DOC || ax != Axis.ANC && ax != Axis.ANCORSELF)
+          if(test != Test.DOC || ax != ANC && ax != ANCORSELF)
             invSteps.add(Step.get(info, ax, test));
         } else {
           final Step prev = axisStep(s - 1);
@@ -644,7 +644,7 @@ public abstract class Path extends ParseExpr {
       Step step;
       if(ls < 0 || !(resultSteps.get(ls) instanceof Step)) {
         // add at least one self axis step
-        step = Step.get(info, Axis.SELF, Test.NOD);
+        step = Step.get(info, SELF, Test.NOD);
         ls++;
       } else {
         step = (Step) resultSteps.get(ls);
@@ -670,7 +670,7 @@ public abstract class Path extends ParseExpr {
       // ensure that the index step does not use wildcard
       if(step.test.kind == Kind.WILDCARD && s != iStep) continue;
       // consider child steps with name test and without predicates
-      if(step.test.kind != Kind.NAME || step.axis != Axis.CHILD ||
+      if(step.test.kind != Kind.NAME || step.axis != CHILD ||
           s != iStep && step.preds.length > 0) return true;
 
       // support only unique paths with nodes on the correct level
@@ -767,7 +767,7 @@ public abstract class Path extends ParseExpr {
    * @param expr expression to be checked
    * @return result of check
    */
-  private boolean simpleChild(final Expr expr) {
+  private static boolean simpleChild(final Expr expr) {
     if(expr instanceof Step) {
       final Step n = (Step) expr;
       if(n.axis == CHILD && !n.has(Flag.FCS)) return true;

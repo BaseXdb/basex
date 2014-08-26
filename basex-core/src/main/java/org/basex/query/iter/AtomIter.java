@@ -34,7 +34,7 @@ public final class AtomIter extends Iter {
     this.iter = iter;
     this.info = info;
     this.qc = qc;
-    this.size = array ? -1 : iter.size();
+    size = array ? -1 : iter.size();
   }
 
   @Override

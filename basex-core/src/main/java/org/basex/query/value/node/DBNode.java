@@ -74,7 +74,7 @@ public class DBNode extends ANode {
     super(type);
     this.data = data;
     this.pre = pre;
-    this.parent = par;
+    parent = par;
   }
 
   /**

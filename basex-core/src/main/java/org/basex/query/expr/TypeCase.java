@@ -69,7 +69,7 @@ public final class TypeCase extends Single {
   }
 
   @Override
-  public TypeCase optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public TypeCase optimize(final QueryContext qc, final VarScope scp) {
     seqType = expr.seqType();
     return this;
   }

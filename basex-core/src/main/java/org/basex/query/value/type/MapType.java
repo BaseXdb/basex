@@ -26,7 +26,7 @@ public final class MapType extends FuncType {
    */
   MapType(final AtomType type, final SeqType rt) {
     super(new Ann(), new SeqType[] { type.seqType() }, rt);
-    this.keyType = type;
+    keyType = type;
   }
 
   @Override

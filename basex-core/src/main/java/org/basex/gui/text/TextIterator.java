@@ -230,6 +230,6 @@ final class TextIterator {
     int ls = pos, le = ls;
     while(ls > 0 && text[ls - 1] != TokenBuilder.ULINE) ls--;
     while(le < length && text[le] != TokenBuilder.ULINE) le++;
-    return Token.string(text, ls, le - ls);
+    return string(text, ls, le - ls);
   }
 }

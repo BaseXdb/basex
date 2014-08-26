@@ -132,7 +132,7 @@ final class RestXqModule {
    * @param func function to be found
    * @return function
    */
-  private StaticFunc find(final QueryContext qctx, final StaticFunc func) {
+  private static StaticFunc find(final QueryContext qctx, final StaticFunc func) {
     for(final StaticFunc sf : qctx.funcs.funcs()) {
       if(func.info.equals(sf.info)) return sf;
     }

@@ -22,9 +22,9 @@ final class CsvMapConverter extends CsvConverter {
   private static final byte[] ENTRY = token("entry");
 
   /** Headers. */
-  private final TokenList headers = new TokenList();
+  private final TokenList headers = new TokenList(1);
   /** All records. */
-  private final ArrayList<ValueBuilder> records = new ArrayList<>();
+  private final ArrayList<ValueBuilder> records = new ArrayList<>(1);
 
   /** Current record. */
   private ValueBuilder record = new ValueBuilder();

@@ -45,10 +45,10 @@ public final class MemData extends Data {
     table = new TableMemAccess(meta);
     final boolean up = meta.updindex;
     if(up) idmap = new IdPreMap(meta.lastid);
-    this.textIndex = txtindex == null ? new MemValues(this, up) : txtindex;
-    this.attrIndex = atvindex == null ? new MemValues(this, up) : atvindex;
-    this.elemNames = elmindex == null ? new Names(meta) : elmindex;
-    this.attrNames = atnindex == null ? new Names(meta) : atnindex;
+    textIndex = txtindex == null ? new MemValues(this, up) : txtindex;
+    attrIndex = atvindex == null ? new MemValues(this, up) : atvindex;
+    elemNames = elmindex == null ? new Names(meta) : elmindex;
+    attrNames = atnindex == null ? new Names(meta) : atnindex;
     this.paths = paths == null ? new PathSummary(this) : paths;
     this.nspaces = nspaces == null ? new Namespaces() : nspaces;
   }

@@ -34,7 +34,7 @@ final class NSNode {
   NSNode(final int pre) {
     values = new int[0];
     children = new NSNode[0];
-    this.pr = pre;
+    pr = pre;
   }
 
   /**

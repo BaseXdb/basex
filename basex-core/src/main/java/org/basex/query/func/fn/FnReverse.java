@@ -52,7 +52,7 @@ public final class FnReverse extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+  protected Expr opt(final QueryContext qc, final VarScope scp) {
     seqType = exprs[0].seqType();
     return this;
   }

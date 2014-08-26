@@ -61,7 +61,7 @@ public final class Try extends Single {
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) {
     seqType = expr.seqType();
     for(final Catch c : catches) {
       if(!c.expr.isFunction(Function.ERROR)) seqType = seqType.union(c.seqType());

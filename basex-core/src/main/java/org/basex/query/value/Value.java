@@ -95,9 +95,8 @@ public abstract class Value extends Expr implements Iterable<Item> {
   /**
    * Computes the number of atomized items.
    * @return atomized item
-   * @throws QueryException query exception
    */
-  public abstract long atomSize() throws QueryException;
+  public abstract long atomSize();
 
   @Override
   public final boolean isValue() {

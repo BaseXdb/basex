@@ -250,8 +250,8 @@ public final class FNFile extends StandardFunc {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void list(final int index, final Path dir, final TokenList list, final boolean rec,
-      final Pattern pat) throws QueryException, IOException {
+  private static void list(final int index, final Path dir, final TokenList list, final boolean rec,
+                           final Pattern pat) throws QueryException, IOException {
 
     // skip invalid directories
     final ArrayList<Path> children = new ArrayList<>();

@@ -60,7 +60,7 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) {
     // return first branch if all branches are equal (e.g., empty) and use no variables
     final TypeCase tc = cases[0];
     boolean eq = tc.var == null;

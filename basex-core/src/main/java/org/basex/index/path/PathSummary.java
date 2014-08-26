@@ -52,7 +52,7 @@ public final class PathSummary implements Index {
    * @throws IOException I/O exception
    */
   public PathSummary(final Data data, final DataInput in) throws IOException {
-    this.root = in.readBool() ? new PathNode(in, null) : new PathNode();
+    root = in.readBool() ? new PathNode(in, null) : new PathNode();
     this.data = data;
   }
 

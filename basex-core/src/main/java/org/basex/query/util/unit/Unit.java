@@ -263,7 +263,7 @@ final class Unit {
       qctx.compile();
 
       final Iter iter = qctx.iter();
-      while(iter.next() != null) throw UNIT_EMPTY_X.get(null, func.name.local());
+      if(iter.next() != null) throw UNIT_EMPTY_X.get(null, func.name.local());
 
     } finally {
       proc.proc(null);

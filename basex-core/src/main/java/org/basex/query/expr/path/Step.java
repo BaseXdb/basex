@@ -30,7 +30,7 @@ public abstract class Step extends Preds {
   /** Axis. */
   Axis axis;
   /** Kind test. */
-  public Test test;
+  public final Test test;
 
   /**
    * This method creates a step instance.

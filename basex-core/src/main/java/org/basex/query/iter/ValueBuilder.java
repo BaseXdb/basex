@@ -37,7 +37,7 @@ public final class ValueBuilder extends ValueIter implements Result {
    * @param capacity initial capacity
    */
   public ValueBuilder(final int capacity) {
-    this.items = new Item[capacity];
+    items = new Item[capacity];
   }
 
   /**

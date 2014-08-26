@@ -27,7 +27,7 @@ public class BuilderSerializer extends Serializer {
    * @param builder builder to be used
    */
   public BuilderSerializer(final Builder builder) {
-    this.build = builder;
+    build = builder;
   }
 
   @Override

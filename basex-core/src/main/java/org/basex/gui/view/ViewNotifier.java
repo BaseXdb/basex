@@ -169,7 +169,7 @@ public final class ViewNotifier {
 
     // add new entry if current node set has not been cached yet
     final DBNodes newn = nodes.discardDocs();
-    final DBNodes empty = new DBNodes(ctx.data(), ctx.marked.ftpos(), new int[0]);
+    final DBNodes empty = new DBNodes(ctx.data(), ctx.marked.ftpos());
     final DBNodes curr = quick ? ctx.current() : null;
     final DBNodes cmp = quick ? curr : ctx.marked;
     if(cont[hist] == null ? cmp != null : cmp == null || !cont[hist].equals(cmp)) {

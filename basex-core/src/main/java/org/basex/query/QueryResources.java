@@ -50,7 +50,7 @@ public final class QueryResources {
   private final HashMap<Class<? extends DataResources>, DataResources> external = new HashMap<>();
 
   /** Pending output. */
-  public final ValueBuilder output = new ValueBuilder();;
+  public final ValueBuilder output = new ValueBuilder();
   /** Pending updates. */
   Updates updates;
 

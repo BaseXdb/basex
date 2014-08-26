@@ -107,7 +107,7 @@ public final class FNInspect extends StandardFunc {
     final ArrayList<StaticFunc> old = new ArrayList<>();
     if(exprs.length > 0) {
       // cache existing functions
-      for(final StaticFunc sf : qc.funcs.funcs()) old.add(sf);
+      Collections.addAll(old, qc.funcs.funcs());
       try {
         final IO io = checkPath(exprs[0], qc);
         qc.parse(Token.string(io.read()), io.path(), sc);

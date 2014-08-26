@@ -125,7 +125,7 @@ public final class GUIMacOSX {
     /** Called when the user selects the About item in the application menu. */
     public void handleAbout() {
       // explicit cast to circumvent Java compiler bug
-      ((GUICommand) GUIMenuCmd.C_ABOUT).execute(main);
+      GUIMenuCmd.C_ABOUT.execute(main);
     }
 
     /**
@@ -148,7 +148,7 @@ public final class GUIMacOSX {
     /** Called when the Preference item in the application menu is selected. */
     public void handlePreferences() {
       // explicit cast to circumvent Java compiler bug
-      ((GUICommand) GUIMenuCmd.C_PREFS).execute(main);
+      GUIMenuCmd.C_PREFS.execute(main);
     }
 
     /**

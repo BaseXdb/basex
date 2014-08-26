@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public final class FnDefaultCollation extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) {
     final Collation coll = sc.collation;
     return Uri.uri(coll == null ? QueryText.COLLATIONURI : coll.uri());
   }

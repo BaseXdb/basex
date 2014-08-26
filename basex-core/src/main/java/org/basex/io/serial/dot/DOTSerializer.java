@@ -24,7 +24,7 @@ public final class DOTSerializer extends OutputSerializer {
   private final boolean compact;
 
   /** Cached children. */
-  private final ArrayList<IntList> children = new ArrayList<>();
+  private final ArrayList<IntList> children = new ArrayList<>(1);
   /** Cached attributes. */
   private final TokenBuilder tb = new TokenBuilder();
   /** Cached nodes. */

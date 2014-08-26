@@ -113,7 +113,7 @@ public final class Array extends FItem {
 
   @Override
   public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
-      final InputInfo ii) throws QueryException {
+      final InputInfo ii) {
     return null;
   }
 
@@ -285,7 +285,7 @@ public final class Array extends FItem {
 
   @Override
   public String toString() {
-    final StringBuilder tb = new StringBuilder().append("[");
+    final StringBuilder tb = new StringBuilder().append('[');
     for(int a = 0; a < size; a++) {
       if(a != 0) tb.append(", ");
       final Value value = get(a);
@@ -293,7 +293,7 @@ public final class Array extends FItem {
       if(vs != 1) tb.append('(');
       for(int i = 0; i < vs; i++) {
         if(i != 0) tb.append(", ");
-        tb.append(value.itemAt(i).toString());
+        tb.append(value.itemAt(i));
       }
       if(vs != 1) tb.append(')');
     }

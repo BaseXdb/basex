@@ -59,7 +59,7 @@ public final class Lookup extends Arr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    if(exprs.length > 1) sb.append(exprs[1]).append(" ");
+    if(exprs.length > 1) sb.append(exprs[1]).append(' ');
     return sb.append("? ").append(exprs[0]).toString();
   }
 }

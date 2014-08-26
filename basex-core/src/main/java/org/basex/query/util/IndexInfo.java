@@ -41,10 +41,6 @@ public final class IndexInfo {
 
   /** Original expression. */
   private Expr orig;
-  /** Flag for full-text index access. */
-  private boolean fulltext;
-  /** Flag for element access. */
-  private boolean elem;
 
   /**
    * Constructor.
@@ -82,7 +78,7 @@ public final class IndexInfo {
 
     // check if step points to leaf element
     final Data data = ic.data;
-    elem = s.test.type == NodeType.ELM;
+    final boolean elem = s.test.type == NodeType.ELM;
     if(elem) {
       // only do check if database is up-to-date, if no namespaces occur and if name test is used
       if(!data.meta.uptodate || data.nspaces.size() != 0 || s.test.kind != Kind.NAME) return false;
@@ -92,10 +88,8 @@ public final class IndexInfo {
     }
 
     // check for full-text index access
-    if(ft) {
-      fulltext = (elem || s.test.type == NodeType.TXT) && data.meta.ftxtindex;
-      return fulltext;
-    }
+    if(ft) return (elem || s.test.type == NodeType.TXT) && data.meta.ftxtindex;
+
     // check for text or attribute index access
     text = (elem || s.test.type == NodeType.TXT) && data.meta.textindex;
     attr = !text && s.test.type == NodeType.ATT && data.meta.attrindex;

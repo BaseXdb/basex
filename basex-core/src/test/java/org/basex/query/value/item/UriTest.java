@@ -47,7 +47,8 @@ public class UriTest {
    * @param expected expected value
    */
   private static void assertUriIsValid(final String uri, final boolean expected) {
-    assertEquals("Uri validation failed for '" + uri + "'" + uri, expected, Uri.uri(uri).isValid());
+    assertEquals("Uri validation failed for '" + uri + '\'' + uri, expected,
+        Uri.uri(uri).isValid());
   }
 
   /**
@@ -56,7 +57,7 @@ public class UriTest {
    * @param expected expected value
    */
   private static void assertUriIsAbsolute(final String uri, final boolean expected) {
-    assertEquals("Uri absolute check failed for '" + uri + "'", expected,
+    assertEquals("Uri absolute check failed for '" + uri + '\'', expected,
         Uri.uri(uri).isAbsolute());
   }
 }

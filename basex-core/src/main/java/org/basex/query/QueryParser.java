@@ -894,7 +894,7 @@ public class QueryParser extends InputParser {
    * @param name name to be checked
    * @return result of check
    */
-  private boolean keyword(final QNm name) {
+  private static boolean keyword(final QNm name) {
     return !name.hasPrefix() && KEYWORDS30.contains(name.string());
   }
 
@@ -1748,12 +1748,10 @@ public class QueryParser extends InputParser {
    */
   private Expr map() throws QueryException {
     final Expr e = path();
-    if(e != null) {
-      while(next() != '=' && wsConsumeWs(EXCL)) {
-        final ExprList el = new ExprList(e);
-        do add(el, path()); while(next() != '=' && wsConsumeWs(EXCL));
-        return SimpleMap.get(info(), el.finish());
-      }
+    if(e != null && next() != '=' && wsConsumeWs(EXCL)) {
+      final ExprList el = new ExprList(e);
+      do add(el, path()); while(next() != '=' && wsConsumeWs(EXCL));
+      return SimpleMap.get(info(), el.finish());
     }
     return e;
   }

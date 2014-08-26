@@ -96,7 +96,7 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
-  public boolean indexAccessible(final IndexInfo ii) throws QueryException {
+  public boolean indexAccessible(final IndexInfo ii) {
     return false;
   }
 

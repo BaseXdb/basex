@@ -90,25 +90,25 @@ public final class Dbl extends ANum {
 
   @Override
   public Dbl abs() {
-    return value > 0d || 1 / value > 0 ? this : Dbl.get(-value);
+    return value > 0d || 1 / value > 0 ? this : get(-value);
   }
 
   @Override
   public Dbl ceiling() {
     final double d = Math.ceil(value);
-    return d == value ? this : Dbl.get(d);
+    return d == value ? this : get(d);
   }
 
   @Override
   public Dbl floor() {
     final double d = Math.floor(value);
-    return d == value ? this : Dbl.get(d);
+    return d == value ? this : get(d);
   }
 
   @Override
   public Dbl round(final int scale, final boolean even) {
     final double v = rnd(scale, even);
-    return v == value ? this : Dbl.get(v);
+    return v == value ? this : get(v);
   }
 
   /**

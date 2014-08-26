@@ -19,7 +19,7 @@ import org.xmldb.api.base.Collection;
  */
 public final class BXDatabase implements Database, BXXMLDBText {
   /** Database context. */
-  Context ctx = new Context();
+  final Context ctx = new Context();
 
   @Override
   public boolean acceptsURI(final String uri) throws XMLDBException {

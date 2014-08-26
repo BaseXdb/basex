@@ -10,7 +10,6 @@ import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -200,7 +199,7 @@ public final class JsonSerializerTest extends SandboxTest {
       serialize(query, format, spec);
       fail("Error expected: " + BXJS_SERIAL_X);
     } catch(final QueryIOException ex) {
-      assertEquals(Err.BXJS_SERIAL_X, ex.getCause().err());
+      assertEquals(BXJS_SERIAL_X, ex.getCause().err());
     } catch(final Exception ex) {
       Util.stack(ex);
       fail(ex.toString());

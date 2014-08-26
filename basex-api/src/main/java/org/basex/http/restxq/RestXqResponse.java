@@ -71,7 +71,7 @@ final class RestXqResponse {
       Item item = iter.next();
 
       // handle response element
-      if(item != null && item instanceof ANode) {
+      if(item instanceof ANode) {
         final ANode node = (ANode) item;
         // send redirect to browser
         if(REST_REDIRECT.eq(node)) {

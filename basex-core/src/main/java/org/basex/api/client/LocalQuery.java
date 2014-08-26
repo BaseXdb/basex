@@ -27,7 +27,7 @@ public class LocalQuery extends Query {
    */
   LocalQuery(final String query, final Context context, final OutputStream output) {
     ql = new ServerQuery(query, context);
-    this.out = output;
+    out = output;
   }
 
   @Override

@@ -11,7 +11,7 @@ import org.basex.util.*;
  */
 public abstract class DataUpdate extends Update {
   /** Target data reference. */
-  Data data;
+  final Data data;
 
   /**
    * Constructor.

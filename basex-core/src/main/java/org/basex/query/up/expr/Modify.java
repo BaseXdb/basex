@@ -105,7 +105,7 @@ public final class Modify extends Arr {
 
   @Override
   public String toString() {
-    return toString(" " + QueryText.UPDATE + " ");
+    return toString(' ' + QueryText.UPDATE + ' ');
   }
 
   @Override

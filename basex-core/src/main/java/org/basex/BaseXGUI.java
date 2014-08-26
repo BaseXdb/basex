@@ -87,7 +87,7 @@ public final class BaseXGUI extends Main {
 
           final IOFile io = new IOFile(file);
           final boolean xml = file.endsWith(IO.XMLSUFFIX);
-          if(xml && BaseXDialog.confirm(gui, Util.info(Text.CREATE_DB_FILE, io))) {
+          if(xml && BaseXDialog.confirm(gui, Util.info(CREATE_DB_FILE, io))) {
             gopts.set(GUIOptions.INPUTPATH, io.path());
             gopts.set(GUIOptions.DBNAME, io.dbname());
             DialogProgress.execute(gui, new Check(file));

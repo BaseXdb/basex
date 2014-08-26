@@ -24,7 +24,7 @@ public enum HTTPMethod {
   public final boolean body;
 
   /** Default constructor. */
-  private HTTPMethod() {
+  HTTPMethod() {
     this(false);
   }
 
@@ -32,7 +32,7 @@ public enum HTTPMethod {
    * Constructor, specifying a body flag.
    * @param body body flag
    */
-  private HTTPMethod(final boolean body) {
+  HTTPMethod(final boolean body) {
     this.body = body;
   }
 

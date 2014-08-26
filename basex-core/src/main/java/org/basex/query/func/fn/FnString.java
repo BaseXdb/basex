@@ -27,7 +27,7 @@ public final class FnString extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+  protected Expr opt(final QueryContext qc, final VarScope scp) {
     // string('x') -> 'x'
     return exprs.length != 0 && exprs[0].seqType().eq(SeqType.STR) ? optPre(exprs[0], qc) : this;
   }
