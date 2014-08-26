@@ -187,7 +187,7 @@ public final class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  boolean clean(final QueryContext qc, final IntObjMap<Var> decl, final BitArray used) {
+  boolean clean(final IntObjMap<Var> decl, final BitArray used) {
     // delete unused variables
     final int len = refs.length;
     for(int i = refs.length; --i >= 0;)

@@ -127,7 +127,7 @@ public final class GFLWOR extends ParseExpr {
       changed |= inlineLets(qc, scp);
 
       // clean unused variables from group-by and order-by expression
-      changed |= cleanDeadVars(qc);
+      changed |= cleanDeadVars();
 
       // include the clauses of nested FLWR expressions into this one
       changed |= unnestFLWR(qc, scp);
@@ -423,10 +423,9 @@ public final class GFLWOR extends ParseExpr {
 
   /**
    * Cleans dead entries from the tuples that {@link GroupBy} and {@link OrderBy} handle.
-   * @param qc query context
    * @return change flag
    */
-  private boolean cleanDeadVars(final QueryContext qc) {
+  private boolean cleanDeadVars() {
     final IntObjMap<Var> decl = new IntObjMap<>();
     final BitArray used = new BitArray();
 
@@ -444,7 +443,7 @@ public final class GFLWOR extends ParseExpr {
     boolean changed = false;
     for(int c = clauses.size(); --c >= 0;) {
       final Clause clause = clauses.get(c);
-      changed |= clause.clean(qc, decl, used);
+      changed |= clause.clean(decl, used);
       clause.accept(marker);
       for(final Var v : clause.vars()) used.clear(v.id);
     }
@@ -837,13 +836,12 @@ public final class GFLWOR extends ParseExpr {
 
     /**
      * Cleans unused variables from this clause.
-     * @param qc query context
-     * @param used list of the IDs of all variables used in the following clauses
      * @param decl variables declared by this FLWOR expression
+     * @param used list of the IDs of all variables used in the following clauses
      * @return {@code true} if something changed, {@code false} otherwise
      */
     @SuppressWarnings("unused")
-    boolean clean(final QueryContext qc, final IntObjMap<Var> decl, final BitArray used) {
+    boolean clean(final IntObjMap<Var> decl, final BitArray used) {
       return false;
     }
 

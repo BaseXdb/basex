@@ -260,7 +260,7 @@ public final class GroupBy extends GFLWOR.Clause {
   }
 
   @Override
-  boolean clean(final QueryContext qc, final IntObjMap<Var> decl, final BitArray used) {
+  boolean clean(final IntObjMap<Var> decl, final BitArray used) {
     // [LW] does not fix {@link #vars}
     final int len = preExpr.length;
     for(int i = 0; i < post.length; i++) {
