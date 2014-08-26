@@ -116,7 +116,7 @@ public enum AtomType implements Type {
     public Str cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       final byte[] v = normalize(item.string(ii));
-      if(!LANGPATTERN.matcher(Token.string(v)).matches()) invValue(item, ii);
+      if(!LANGPATTERN.matcher(Token.string(v)).matches()) throw funCastErr(item, ii);
       return new Str(v, this);
     }
     @Override
@@ -132,7 +132,7 @@ public enum AtomType implements Type {
     public Str cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       final byte[] v = normalize(item.string(ii));
-      if(!XMLToken.isNMToken(v)) invValue(item, ii);
+      if(!XMLToken.isNMToken(v)) throw funCastErr(item, ii);
       return new Str(v, this);
     }
     @Override
@@ -148,7 +148,7 @@ public enum AtomType implements Type {
     public Str cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       final byte[] v = normalize(item.string(ii));
-      if(!XMLToken.isName(v)) invValue(item, ii);
+      if(!XMLToken.isName(v)) throw funCastErr(item, ii);
       return new Str(v, this);
     }
     @Override
@@ -450,8 +450,9 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      return item instanceof Dur ? new Dur((Dur) item) : str(item) ?
-          new Dur(item.string(ii), ii) : invCast(item, ii);
+      if(item instanceof Dur) return new Dur((Dur) item);
+      if(str(item)) return new Dur(item.string(ii), ii);
+      throw castError(ii, item, this);
     }
     @Override
     public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
@@ -465,8 +466,9 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      return item instanceof Dur ? new YMDur((Dur) item) : str(item) ?
-          new YMDur(item.string(ii), ii) : invCast(item, ii);
+      if(item instanceof Dur) return new YMDur((Dur) item);
+      if(str(item)) return new YMDur(item.string(ii), ii);
+      throw castError(ii, item, this);
     }
     @Override
     public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
@@ -480,8 +482,9 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      return item instanceof Dur ? new DTDur((Dur) item) : str(item) ?
-          new DTDur(item.string(ii), ii) : invCast(item, ii);
+      if(item instanceof Dur) return new DTDur((Dur) item);
+      if(str(item)) return new DTDur(item.string(ii), ii);
+      throw castError(ii, item, this);
     }
     @Override
     public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
@@ -495,8 +498,9 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      return item.type == DAT ? new Dtm((ADate) item) : str(item) ?
-        new Dtm(item.string(ii), ii) : invCast(item, ii);
+      if(item.type == DAT) return new Dtm((ADate) item);
+      if(str(item)) return new Dtm(item.string(ii), ii);
+      throw castError(ii, item, this);
     }
     @Override
     public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
@@ -513,8 +517,9 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      return item.type == DTM ? new Dat((ADate) item) : str(item) ?
-          new Dat(item.string(ii), ii) : invCast(item, ii);
+      if(item.type == DTM) return new Dat((ADate) item);
+      if(str(item)) return new Dat(item.string(ii), ii);
+      throw castError(ii, item, this);
     }
     @Override
     public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
@@ -528,8 +533,9 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      return item.type == DTM ? new Tim((ADate) item) : str(item) ?
-          new Tim(item.string(ii), ii) : invCast(item, ii);
+      if(item.type == DTM) return new Tim((ADate) item);
+      if(str(item)) return new Tim(item.string(ii), ii);
+      throw castError(ii, item, this);
     }
     @Override
     public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
@@ -543,9 +549,9 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      return item.type == DTM || item.type == DAT ?
-          new GDt((ADate) item, this) : str(item) ?
-          new GDt(item.string(ii), this, ii) : invCast(item, ii);
+      if(item.type == DTM || item.type == DAT) return new GDt((ADate) item, this);
+      if(str(item)) return new GDt(item.string(ii), this, ii);
+      throw castError(ii, item, this);
     }
     @Override
     public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
@@ -559,9 +565,9 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      return item.type == DTM || item.type == DAT ?
-          new GDt((ADate) item, this) : str(item) ?
-          new GDt(item.string(ii), this, ii) : invCast(item, ii);
+      if(item.type == DTM || item.type == DAT) return new GDt((ADate) item, this);
+      if(str(item)) return new GDt(item.string(ii), this, ii);
+      throw castError(ii, item, this);
     }
     @Override
     public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
@@ -575,9 +581,9 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      return item.type == DTM || item.type == DAT ?
-          new GDt((ADate) item, this) : str(item) ?
-          new GDt(item.string(ii), this, ii) : invCast(item, ii);
+      if(item.type == DTM || item.type == DAT) return new GDt((ADate) item, this);
+      if(str(item)) return new GDt(item.string(ii), this, ii);
+      throw castError(ii, item, this);
     }
     @Override
     public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
@@ -591,9 +597,9 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      return item.type == DTM || item.type == DAT ?
-          new GDt((ADate) item, this) : str(item) ?
-          new GDt(item.string(ii), this, ii) : invCast(item, ii);
+      if(item.type == DTM || item.type == DAT) return new GDt((ADate) item, this);
+      if(str(item)) return new GDt(item.string(ii), this, ii);
+      throw castError(ii, item, this);
     }
     @Override
     public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
@@ -607,9 +613,9 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      return item.type == DTM || item.type == DAT ?
-          new GDt((ADate) item, this) : str(item) ?
-          new GDt(item.string(ii), this, ii) : invCast(item, ii);
+      if(item.type == DTM || item.type == DAT) return new GDt((ADate) item, this);
+      if(str(item)) return new GDt(item.string(ii), this, ii);
+      throw castError(ii, item, this);
     }
     @Override
     public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
@@ -623,8 +629,9 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      return item instanceof ANum ? Bln.get(item.bool(ii)) : str(item) ?
-          Bln.get(Bln.parse(item.string(ii), ii)) : invCast(item, ii);
+      if(item instanceof ANum) return Bln.get(item.bool(ii));
+      if(str(item)) return Bln.get(Bln.parse(item.string(ii), ii));
+      throw castError(ii, item, this);
     }
     @Override
     public Bln cast(final Object value, final QueryContext qc, final StaticContext sc,
@@ -642,8 +649,9 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      return item instanceof Bin ? new B64((Bin) item, ii) : str(item) ?
-          new B64(item.string(ii), ii) : invCast(item, ii);
+      if(item instanceof Bin) return new B64((Bin) item, ii);
+      if(str(item)) return new B64(item.string(ii), ii);
+      throw castError(ii, item, this);
     }
     @Override
     public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
@@ -657,8 +665,9 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      return item instanceof Bin ? new Hex((Bin) item, ii) : str(item) ?
-          new Hex(item.string(ii), ii) : invCast(item, ii);
+      if(item instanceof Bin) return new Hex((Bin) item, ii);
+      if(str(item)) return new Hex(item.string(ii), ii);
+      throw castError(ii, item, this);
     }
     @Override
     public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
@@ -673,9 +682,9 @@ public enum AtomType implements Type {
     public Uri cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
 
-      if(!item.type.isStringOrUntyped()) invCast(item, ii);
+      if(!item.type.isStringOrUntyped()) throw castError(ii, item, this);
       final Uri u = Uri.uri(item.string(ii));
-      if(!u.isValid()) throw funCastError(ii, this, item);
+      if(!u.isValid()) throw funCastErr(item, ii);
       return u;
     }
     @Override
@@ -691,9 +700,9 @@ public enum AtomType implements Type {
     public QNm cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
 
-      if(item.type != STR && !item.type.isUntyped()) invCast(item, ii);
+      if(item.type != STR && !item.type.isUntyped()) throw castError(ii, item, this);
       final byte[] nm = trim(item.string(ii));
-      if(!XMLToken.isQName(nm)) throw funCastError(ii, this, nm);
+      if(!XMLToken.isQName(nm)) throw funCastErr(item, ii);
       final QNm qn = new QNm(nm, sc);
       if(!qn.hasURI() && qn.hasPrefix()) throw NSDECL_X.get(ii, qn.prefix());
       return qn;
@@ -792,7 +801,8 @@ public enum AtomType implements Type {
   @Override
   public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return item.type == this ? item : invCast(item, ii);
+    if(item.type == this) return item;
+    throw castError(ii, item, this);
   }
 
   @Override
@@ -860,15 +870,15 @@ public enum AtomType implements Type {
 
   /**
    * Throws an exception if the specified item cannot be converted to a number.
-   * @param it item
+   * @param item item
    * @param ii input info
    * @return item argument
    * @throws QueryException query exception
    */
-  final Item checkNum(final Item it, final InputInfo ii) throws QueryException {
-    final Type ip = it.type;
-    return it instanceof ANum || ip.isStringOrUntyped() && ip != URI || ip == BLN ? it :
-      invCast(it, ii);
+  final Item checkNum(final Item item, final InputInfo ii) throws QueryException {
+    final Type ip = item.type;
+    if(item instanceof ANum || ip.isStringOrUntyped() && ip != URI || ip == BLN) return item;
+    throw castError(ii, item, this);
   }
 
   /**
@@ -923,30 +933,18 @@ public enum AtomType implements Type {
    */
   final byte[] checkName(final Item it, final InputInfo ii) throws QueryException {
     final byte[] v = normalize(it.string(ii));
-    if(!XMLToken.isNCName(v)) invValue(it, ii);
+    if(!XMLToken.isNCName(v)) throw funCastErr(it, ii);
     return v;
   }
 
   /**
-   * Throws a casting exception.
+   * Returns a casting exception.
    * @param it item to be included in the error message
    * @param ii input info
-   * @return dummy item
-   * @throws QueryException query exception
+   * @return query exception
    */
-  final Item invCast(final Item it, final InputInfo ii) throws QueryException {
-    throw castError(ii, it, this);
-  }
-
-  /**
-   * Throws a casting exception.
-   * @param it item to be included in the error message
-   * @param ii input info
-   * @return dummy item
-   * @throws QueryException query exception
-   */
-  final Item invValue(final Item it, final InputInfo ii) throws QueryException {
-    throw FUNCCAST_X_X_X.get(ii, it.type, this, it);
+  final QueryException funCastErr(final Item it, final InputInfo ii)  {
+    return FUNCCAST_X_X_X.get(ii, it.type, this, it);
   }
 
   @Override
