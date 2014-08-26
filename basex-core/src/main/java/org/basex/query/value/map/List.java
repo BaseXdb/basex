@@ -224,6 +224,11 @@ final class List extends TrieNode {
   }
 
   @Override
+  void values(final ValueBuilder vs) {
+    for(final Value v : values) vs.add(v);
+  }
+
+  @Override
   void apply(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo ii)
       throws QueryException {
     for(int i = 0; i < size; i++) {

@@ -43,6 +43,8 @@ abstract class TrieNode {
     @Override
     void keys(final ValueBuilder ks) { }
     @Override
+    void values(final ValueBuilder vs) { }
+    @Override
     boolean hasType(final AtomType kt, final SeqType vt) { return true; }
     @Override
     int hash(final InputInfo ii) { return 0; }
@@ -173,6 +175,12 @@ abstract class TrieNode {
    * @param ks key cache
    */
   abstract void keys(final ValueBuilder ks);
+
+  /**
+   * Collects all values in this subtree.
+   * @param vs value cache
+   */
+  abstract void values(final ValueBuilder vs);
 
   /**
    * Applies a function on all entries.

@@ -181,6 +181,16 @@ public final class Map extends FItem {
   }
 
   /**
+   * All values defined in this map.
+   * @return list of keys
+   */
+  public ValueBuilder values() {
+    final ValueBuilder res = new ValueBuilder(root.size);
+    root.values(res);
+    return res;
+  }
+
+  /**
    * Applies a function on all entries.
    * @param func function to apply on keys and values
    * @param qc query context

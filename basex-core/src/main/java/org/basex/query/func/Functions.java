@@ -219,15 +219,14 @@ public final class Functions extends TokenSet {
    * or {@code null}.
    * @param name name of the function
    * @param args optional arguments
-   * @param dyn compile-/run-time flag
    * @param qc query context
    * @param sc static context
    * @param ii input info
    * @return function instance
    * @throws QueryException query exception
    */
-  public static TypedFunc get(final QNm name, final Expr[] args, final boolean dyn,
-      final QueryContext qc, final StaticContext sc, final InputInfo ii) throws QueryException {
+  public static TypedFunc get(final QNm name, final Expr[] args, final QueryContext qc,
+      final StaticContext sc, final InputInfo ii) throws QueryException {
 
     // get namespace and local name
     // parse type constructors
@@ -258,7 +257,7 @@ public final class Functions extends TokenSet {
     if(jf != null) return TypedFunc.java(jf);
 
     // add user-defined function that has not been declared yet
-    if(!dyn && FuncType.find(name) == null) return qc.funcs.getFuncRef(name, args, sc, ii);
+    if(FuncType.find(name) == null) return qc.funcs.getFuncRef(name, args, sc, ii);
 
     // no function found
     return null;

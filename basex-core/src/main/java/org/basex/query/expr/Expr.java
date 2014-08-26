@@ -91,6 +91,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns the resulting value.
+   * The implementation of this method is optional.
    * @param qc query context
    * @return iterator
    * @throws QueryException query exception

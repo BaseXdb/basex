@@ -198,6 +198,11 @@ final class Branch extends TrieNode {
   }
 
   @Override
+  void values(final ValueBuilder vs) {
+    for(final TrieNode nd : kids) if(nd != null) nd.values(vs);
+  }
+
+  @Override
   void apply(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo ii)
       throws QueryException {
     for(final TrieNode nd : kids) if(nd != null) nd.apply(vb, func, qc, ii);

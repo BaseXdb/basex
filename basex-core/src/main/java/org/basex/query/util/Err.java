@@ -962,6 +962,8 @@ public enum Err {
   MAPDUPLKEY_X_X_X(XQDY, 137, "Key % already exists in map (value: % vs. %)."),
   /** XQDY0138. */
   ARRAYPOS_X(XQDY, 138, "No value exists at array index %."),
+  /** XQDY0140. */
+  CTXMAPARRAY(XQDY, 140, "Input of lookup operator is not a map or array: %."),
 
   /** XQST0009. */
   IMPLSCHEMA(XQST, 9, "Schema import not supported."),

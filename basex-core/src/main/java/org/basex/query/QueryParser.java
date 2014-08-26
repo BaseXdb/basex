@@ -2024,12 +2024,25 @@ public class QueryParser extends InputParser {
           if(up) qc.updating();
           e = holes == null ? new DynFuncCall(ii, sc, up, e, args) :
             new PartFunc(sc, ii, e, args, holes);
-        } else if(consume(QUESTION)) {
+        } else if(sc.xquery3() && consume(QUESTION)) {
           // parses the "Lookup" rule
-          keySpecifier();
-        } else if(consume(ARROW)) {
-          // parses the "ArrowPostfix" rule
-          arrowPostfix();
+          e = new Lookup(info(), keySpecifier(), e);
+        } else if(sc.xquery3() && consume(ARROW)) {
+          final Expr ex = arrowPostfix();
+          wsCheck(PAREN1);
+
+          if(ex instanceof QNm) {
+            final QNm name = (QNm) ex;
+            if(keyword(name)) throw error(RESERVED_X, name.local());
+            e = function(name, e);
+          } else {
+            final InputInfo ii = info();
+            final ExprList argList = new ExprList(e);
+            final int[] holes = argumentList(argList, e);
+            final Expr[] args = argList.finish();
+            e = holes == null ? new DynFuncCall(ii, sc, false, ex, args) :
+              new PartFunc(sc, ii, ex, args, holes);
+          }
         }
       } while(e != old);
     }
@@ -2060,6 +2073,19 @@ public class QueryParser extends InputParser {
     if(sc.xquery3()) {
       final Expr e = functionItem();
       if(e != null) return e;
+      // map (including legacy syntax)
+      if(wsConsumeWs(MAPSTR, CURLY1, INCOMPLETE) || curr('{')) return new CMap(info(), keyValues());
+      // square array constructor
+      if(wsConsumeWs(SQUARE1)) return new CArray(info(), false, values());
+      // curly array constructor
+      if(wsConsumeWs(ARRAYSTR, CURLY1, INCOMPLETE)) {
+        wsCheck(CURLY1);
+        final Expr a = expr();
+        wsCheck(CURLY2);
+        return a == null ? new CArray(info(), true) : new CArray(info(), true, a);
+      }
+      // unary lookup
+      if(wsConsumeWs(QUESTION)) return new Lookup(info(), keySpecifier());
     }
     // function call
     Expr e = functionCall();
@@ -2070,23 +2096,6 @@ public class QueryParser extends InputParser {
     // ordered expression
     if(wsConsumeWs(ORDERED, CURLY1, INCOMPLETE) || wsConsumeWs(UNORDERED, CURLY1, INCOMPLETE))
       return enclosed(NOENCLEXPR);
-    // map (including legacy syntax)
-    if(wsConsumeWs(MAPSTR, CURLY1, INCOMPLETE) || curr('{')) return new CMap(info(), keyValues());
-    // square array constructor
-    if(wsConsumeWs(SQUARE1)) return new CArray(info(), false, values());
-    // curly array constructor
-    if(wsConsumeWs(ARRAYSTR, CURLY1, INCOMPLETE)) {
-      wsCheck(CURLY1);
-      final Expr a = expr();
-      wsCheck(CURLY2);
-      return a == null ? new CArray(info(), true) : new CArray(info(), true, a);
-    }
-    // unary lookup
-    // square array constructor
-    if(wsConsumeWs(QUESTION)) {
-      keySpecifier();
-      return Empty.SEQ;
-    }
     // context value
     if(c == '.' && !digit(next())) {
       if(next() == '.') return null;
@@ -2099,32 +2108,24 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "KeySpecifier" rule.
+   * @return specifier expression ({@code null} means wildcard)
    * @throws QueryException query exception
    */
-  private void keySpecifier() throws QueryException {
-    if(wsConsume(ASTERISK)) {
-    } else if(consume(PAREN1)) {
-      parenthesized();
-    } else if(digit(curr())) {
-      numericLiteral(true);
-    } else {
-      ncName(KEYSPEC);
-    }
+  private Expr keySpecifier() throws QueryException {
+    return wsConsume(ASTERISK) ? Str.WC :
+      consume(PAREN1) ? parenthesized() :
+      digit(curr()) ? numericLiteral(true) :
+      Str.get(ncName(KEYSPEC));
   }
 
   /**
    * Parses the "ArrowPostfix" rule.
+   * @return function specifier
    * @throws QueryException query exception
    */
-  private void arrowPostfix() throws QueryException {
-    // parses the "ArrowFunctionSpecifier" rule
-    if(wsConsume(PAREN1)) {
-      parenthesized();
-    } else if(curr() == '$') {
-      varName();
-    } else {
+  private Expr arrowPostfix() throws QueryException {
+    return wsConsume(PAREN1) ? parenthesized() : curr() == '$' ? resolveVar(varName(), info()) :
       eQName(ARROWSPEC, sc.funcNS);
-    }
   }
 
   /**
@@ -2167,7 +2168,7 @@ public class QueryParser extends InputParser {
    * Parses the "NamedFunctionRef" rule.
    * Parses the "LiteralFunctionItem" rule.
    * Parses the "InlineFunction" rule.
-   * @return query expression (may be {@code null})
+   * @return function item (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr functionItem() throws QueryException {
@@ -2344,7 +2345,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "FunctionCall" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr functionCall() throws QueryException {
@@ -2352,54 +2353,63 @@ public class QueryParser extends InputParser {
     final QNm name = eQName(null, sc.funcNS);
     if(name != null && !keyword(name)) {
       if(wsConsume(PAREN1)) {
-        final InputInfo ii = info();
-        final ExprList argList = new ExprList();
-        final int[] holes = argumentList(argList, name.string());
-        final Expr[] args = argList.finish();
-        alter = FUNCUNKNOWN_X;
-        alterFunc = name;
-        alterPos = pos;
-
-        final Expr ret;
-        if(holes != null) {
-          final int card = args.length + holes.length;
-          final Expr lit = Functions.getLiteral(name, card, qc, sc, ii);
-          final Expr f = lit != null ? lit : FuncLit.unknown(name, card, qc, sc, ii);
-          ret = new PartFunc(sc, ii, f, args, holes);
-          if(lit != null && (lit instanceof FuncItem ? ((FuncItem) f).annotations() :
-            ((FuncLit) lit).annotations()).contains(Ann.Q_UPDATING)) qc.updating();
-        } else {
-          final TypedFunc f = Functions.get(name, args, false, qc, sc, ii);
-          if(f == null) {
-            ret = null;
-          } else {
-            if(f.ann.contains(Ann.Q_UPDATING)) qc.updating();
-            ret = f.fun;
-          }
-        }
-
-        if(ret != null) {
-          alter = null;
-          return ret;
-        }
+        final Expr ret = function(name);
+        if(ret != null) return ret;
       }
     }
-
     pos = i;
     return null;
   }
 
   /**
+   * Returns a function.
+   * @param name function name
+   * @param exprs initial expressions
+   * @return function (may be {@code null})
+   * @throws QueryException query exception
+   */
+  private Expr function(final QNm name, final Expr... exprs) throws QueryException {
+    final InputInfo ii = info();
+    final ExprList argList = new ExprList().add(exprs);
+    final int[] holes = argumentList(argList, name.string());
+    final Expr[] args = argList.finish();
+    alter = FUNCUNKNOWN_X;
+    alterFunc = name;
+    alterPos = pos;
+
+    final Expr ret;
+    if(holes != null) {
+      final int card = args.length + holes.length;
+      final Expr lit = Functions.getLiteral(name, card, qc, sc, ii);
+      final Expr f = lit != null ? lit : FuncLit.unknown(name, card, qc, sc, ii);
+      ret = new PartFunc(sc, ii, f, args, holes);
+      if(lit != null && (lit instanceof FuncItem ? ((FuncItem) f).annotations() :
+        ((FuncLit) lit).annotations()).contains(Ann.Q_UPDATING)) qc.updating();
+    } else {
+      final TypedFunc f = Functions.get(name, args, qc, sc, ii);
+      if(f == null) {
+        ret = null;
+      } else {
+        if(f.ann.contains(Ann.Q_UPDATING)) qc.updating();
+        ret = f.fun;
+      }
+    }
+
+    if(ret != null) alter = null;
+    return ret;
+  }
+
+  /**
    * Parses the "ArgumentList" rule without the opening parenthesis.
    * @param args list to put the argument expressions into
-   * @param name name of the function (item)
+   * @param name name of the function (item); only required for error messages
    * @return array of arguments, place-holders '?' are represented as {@code null} entries
    * @throws QueryException query exception
    */
   private int[] argumentList(final ExprList args, final Object name) throws QueryException {
     int[] holes = null;
     if(!wsConsume(PAREN2)) {
-      int i = 0;
+      int i = args.size();
       do {
         if(wsConsume(QUESTION)) {
           holes = holes == null ? new int[] { i } : Array.add(holes, i);
@@ -2689,7 +2699,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ComputedConstructor" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr compConstructor() throws QueryException {
@@ -3945,9 +3955,9 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Opens a new sub-scope inside the current one. The returned marker has to be supplied to
-   * the corresponding call to {@link #closeSubScope(int)} in order to mark the variables
-   * as inaccessible.
+   * Opens a new sub-scope inside the current one. The returned marker has to be supplied to the
+   * corresponding call to {@link #closeSubScope(int)} in order to mark the variables as
+   * inaccessible.
    * @return marker for the current bindings
    */
   private int openSubScope() {
@@ -3963,8 +3973,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Checks if the specified character is not found. An error is raised if the
-   * input is exhausted.
+   * Checks if the specified character is not found. An error is raised if the input is exhausted.
    * @param ch character to be found
    * @return result of check
    * @throws QueryException query exception
@@ -3990,8 +3999,8 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Consumes the specified two strings or jumps back to the old query position.
-   * If the strings are found, the cursor is placed after the first token.
+   * Consumes the specified two strings or jumps back to the old query position. If the strings are
+   * found, the cursor is placed after the first token.
    * @param s1 string to be consumed
    * @param s2 second string
    * @param expr alternative error message
@@ -4012,8 +4021,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Skips whitespaces, consumes the specified string and ignores trailing
-   * characters.
+   * Skips whitespaces, consumes the specified string and ignores trailing characters.
    * @param str string to consume
    * @return true if string was found
    * @throws QueryException query exception

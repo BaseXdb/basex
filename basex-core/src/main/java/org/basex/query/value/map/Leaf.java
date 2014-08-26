@@ -160,6 +160,11 @@ final class Leaf extends TrieNode {
   }
 
   @Override
+  void values(final ValueBuilder vs) {
+    vs.add(value);
+  }
+
+  @Override
   void apply(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo ii)
       throws QueryException {
     vb.add(func.invokeValue(qc, ii, key, value));
