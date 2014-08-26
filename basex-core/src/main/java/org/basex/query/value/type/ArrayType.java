@@ -59,7 +59,7 @@ public final class ArrayType extends FuncType {
       final ArrayType mt = (ArrayType) t;
       return mt.instanceOf(this) ? this : get(retType.union(mt.retType));
     }
-    return t instanceof FuncType ? t.union(this) : AtomType.ITEM;
+    return t instanceof MapType ? ANY_FUN : t instanceof FuncType ? t.union(this) : AtomType.ITEM;
   }
 
   @Override

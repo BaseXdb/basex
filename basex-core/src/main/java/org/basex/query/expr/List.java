@@ -98,7 +98,7 @@ public final class List extends Arr {
       SeqType st = null;
       for(final Expr e : exprs) {
         final SeqType et = e.seqType();
-        if(!e.isEmpty() && et.occ != Occ.ZERO) st = st == null ? et : st.union(et);
+        if(et.occ != Occ.ZERO) st = st == null ? et : st.union(et);
       }
       seqType = SeqType.get(st == null ? AtomType.ITEM : st.type, o);
     }

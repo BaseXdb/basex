@@ -68,7 +68,7 @@ public final class MapType extends FuncType {
       final AtomType a = (AtomType) keyType.intersect(mt.keyType);
       return a != null ? get(a, retType.union(mt.retType)) : ANY_FUN;
     }
-    return t instanceof FuncType ? t.union(this) : AtomType.ITEM;
+    return t instanceof ArrayType ? ANY_FUN : t instanceof FuncType ? t.union(this) : AtomType.ITEM;
   }
 
   @Override

@@ -35,4 +35,10 @@ public final class MapTest extends AdvancedQueryTest {
     query("let $x := map { 'f': { 1: 1, 2: 2 } } "
         + "return (every $k in map:keys($x('f')) satisfies $k eq $x('f')($k))", true);
   }
+
+  /** Stack overflow bug. */
+  @Test public void soType() {
+    query("count(( map { }, array { <a/> } ))", 2);
+    query("count(( array { <a/> }, map { } ))", 2);
+  }
 }
