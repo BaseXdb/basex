@@ -117,15 +117,13 @@ public final class RESTGetTest extends RESTTest {
   @Test
   public void queryOption() throws IOException {
     assertEquals("2",
-        get("?query=switch(1)+case+1+return+2+default+return+3&" +
-        MainOptions.XQUERY3.name() + "=true")
+        get("?query=2,delete+node+<a/>&" + MainOptions.MIXUPDATES.name() + "=true")
     );
     try {
-      get("?query=switch(1)+case+1+return+2+default+return+3&" +
-          MainOptions.XQUERY3.name() + "=false");
+      get("?query=1,delete+node+<a/>&" + MainOptions.MIXUPDATES.name() + "=false");
       fail("Error expected.");
     } catch(final IOException ex) {
-      assertContains(ex.getMessage(), "[XPST0003]");
+      assertContains(ex.getMessage(), "[XUST0001]");
     }
   }
 

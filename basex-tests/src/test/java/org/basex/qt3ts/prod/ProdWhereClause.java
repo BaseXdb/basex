@@ -237,7 +237,6 @@ public class ProdWhereClause extends QT3TestSet {
    */
   @org.junit.Test
   public void k2WhereExpr1() {
-    xquery10();
     final XQuery query = new XQuery(
       "for $a in 1 where true() where true() return $a",
       ctx);
@@ -667,7 +666,6 @@ public class ProdWhereClause extends QT3TestSet {
    */
   @org.junit.Test
   public void whereExpr020() {
-    xquery10();
     final XQuery query = new XQuery(
       "for $file in (//Folder)[1]/File where true() where false() return $file/FileName",
       ctx);
@@ -710,7 +708,6 @@ public class ProdWhereClause extends QT3TestSet {
    */
   @org.junit.Test
   public void whereExpr021() {
-    xquery10();
     final XQuery query = new XQuery(
       "for $file in (//Folder)[1]/File where (. instance of element(File)) return $file/FileName",
       ctx);

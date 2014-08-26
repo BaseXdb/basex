@@ -410,6 +410,8 @@ public interface QueryText {
   /** Parser token. */
   String XQ30 = "3.0";
   /** Parser token. */
+  String XQ31 = "3.1";
+  /** Parser token. */
   String PAREN1 = "(";
   /** Parser token. */
   String PAREN2 = ")";

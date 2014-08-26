@@ -38,7 +38,7 @@ abstract class RegEx extends StandardFunc {
     final byte[] key = tb.finish();
     Pattern p = patterns.get(key);
     if(p == null) {
-      p = RegExParser.parse(pat, mod, sc.xquery3(), info, check);
+      p = RegExParser.parse(pat, mod, info, check);
       patterns.put(key, p);
     }
     return p;

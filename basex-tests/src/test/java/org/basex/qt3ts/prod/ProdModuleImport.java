@@ -168,7 +168,6 @@ public class ProdModuleImport extends QT3TestSet {
    */
   @org.junit.Test
   public void errata8001() {
-    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "        import module namespace errata8_1a=\"http://www.w3.org/TestModules/errata8_1a\"; \n" +
@@ -219,7 +218,6 @@ public class ProdModuleImport extends QT3TestSet {
    */
   @org.junit.Test
   public void errata8002() {
-    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "        import module namespace errata8_2a=\"http://www.w3.org/TestModules/errata8_2a\"; \n" +
@@ -1119,7 +1117,6 @@ public class ProdModuleImport extends QT3TestSet {
    */
   @org.junit.Test
   public void modules28() {
-    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "        import module namespace defs1 = \"http://www.w3.org/TestModules/defs1\"; \n" +
@@ -1246,7 +1243,7 @@ public class ProdModuleImport extends QT3TestSet {
   }
 
   /**
-   *  Module that uses a variable from an imported module and modifies a variable. 
+   *  Module that uses a variable from an imported module and modifies a variable.
    *         The importing module in turn uses that modified value. .
    */
   @org.junit.Test

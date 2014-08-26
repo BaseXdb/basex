@@ -30,9 +30,4 @@ public final class FnStringJoin extends StandardFunc {
     do tb.add(token).add(toToken(it)); while((it = iter.next()) != null);
     return Str.get(tb.finish());
   }
-
-  @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.X30 && exprs.length == 1 || super.has(flag);
-  }
 }

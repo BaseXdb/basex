@@ -245,10 +245,6 @@ public final class QT3TS extends Main {
     // expected result
     final XdmValue expected = new XQuery("*:result/*[1]", ctx).context(test).value();
 
-    // use XQuery 1.0 if XQ10 or XP20 is specified
-    if(new XQuery("*:dependency[@type='spec'][matches(@value,'(XQ10)([^+]|$)')]", ctx).
-        context(test).next() != null) ctx.options.set(MainOptions.XQUERY3, false);
-
     // check if environment is defined in test-case
     QT3Env e = null;
     final XdmValue ienv = new XQuery("*:environment[*]", ctx).context(test).value();
@@ -378,9 +374,6 @@ public final class QT3TS extends Main {
       if(l > 100000000) slow.put(-l, name);
     }
 
-    // revert to XQuery as default
-    ctx.options.set(MainOptions.XQUERY3, true);
-
     final String exp = test(result, expected);
     final TokenBuilder tmp = new TokenBuilder();
     tmp.add(name).add(NL);
@@ -451,11 +444,13 @@ public final class QT3TS extends Main {
       // skip limits
       "@type = 'limits' and @value = ('big_integer') or " +
       // skip non-XQuery tests
-      "@type = 'spec' and not(contains(@value, 'XQ'))" +
+      "@type = 'spec' and not(matches(@value, 'XQ3|XQ\\d\\d\\+'))" +
       "]", ctx).context(test).value().size() == 0;
   }
 
-  /**
+  //if(new XQuery("*:dependency[@type='spec'][matches(@value,'(XQ10)([^+]|$)')]", ctx).
+
+      /**
    * Returns the specified environment, or {@code null}.
    * @param envs environments
    * @param ref reference

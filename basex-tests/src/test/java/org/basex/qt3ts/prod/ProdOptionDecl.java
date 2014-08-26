@@ -17,7 +17,6 @@ public class ProdOptionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void kOptionDeclarationProlog1() {
-    xquery10();
     final XQuery query = new XQuery(
       "declare option myopt \"option value\"; 1",
       ctx);
@@ -34,8 +33,8 @@ public class ProdOptionDecl extends QT3TestSet {
   }
 
   /**
-   * 
-   *       	The name of an option need not be a full QName in XQuery 3.0. 
+   *
+   *       	The name of an option need not be a full QName in XQuery 3.0.
    *       .
    */
   @org.junit.Test

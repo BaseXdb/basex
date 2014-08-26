@@ -389,7 +389,6 @@ public class FnDistinctValues extends QT3TestSet {
    */
   @org.junit.Test
   public void cbclDistinctValues002() {
-    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "      \tdeclare function local:create($arg) as xs:anyAtomicType* {\n" +

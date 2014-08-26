@@ -15,9 +15,4 @@ public final class FnRound extends Num {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return round(qc, false);
   }
-
-  @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.X30 && exprs.length == 2 || super.has(flag);
-  }
 }

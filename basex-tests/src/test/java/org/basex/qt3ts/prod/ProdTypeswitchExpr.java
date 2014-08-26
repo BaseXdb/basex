@@ -798,7 +798,6 @@ public class ProdTypeswitchExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void typeswitchUnionInXquery10() {
-    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\t for $x in (<e/>, 1, \"x\") return\n" +

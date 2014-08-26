@@ -13529,7 +13529,6 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void castAs673a() {
-    xquery10();
     final XQuery query = new XQuery(
       "let $var := \"ABC\" return $var cast as xs:QName",
       ctx);
@@ -13572,7 +13571,6 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void castAs674() {
-    xquery10();
     final XQuery query = new XQuery(
       "let $var := <e>xml:space</e> return $var cast as xs:QName",
       ctx);
@@ -13621,7 +13619,6 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void castAs675() {
-    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "        declare function local:clarkname($q as xs:QName) as xs:string { \n" +
@@ -13874,7 +13871,6 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast10() {
-    xquery10();
     final XQuery query = new XQuery(
       "'string' cast as item()",
       ctx);
@@ -13975,7 +13971,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:gYear constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:gYear constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -15116,7 +15112,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:gMonthDay constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:gMonthDay constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -16125,7 +16121,6 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast11() {
-    xquery10();
     final XQuery query = new XQuery(
       "'string' cast as node()",
       ctx);
@@ -16306,7 +16301,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:gDay constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:gDay constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -17447,7 +17442,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:gMonth constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:gMonth constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -18376,7 +18371,6 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast12() {
-    xquery10();
     final XQuery query = new XQuery(
       "'string' cast as attribute()",
       ctx);
@@ -18657,7 +18651,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:boolean constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:boolean constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -18738,7 +18732,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Applying fn:boolean() to a value of type xs:boolean that has the lexical value ' "true" ' 
+   *  Applying fn:boolean() to a value of type xs:boolean that has the lexical value ' "true" '
    *       should result in the boolean value true..
    */
   @org.junit.Test
@@ -19799,7 +19793,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:base64Binary constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:base64Binary constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -20628,7 +20622,6 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast13() {
-    xquery10();
     final XQuery query = new XQuery(
       "'string' cast as empty-sequence()",
       ctx);
@@ -20989,7 +20982,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:hexBinary constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:hexBinary constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -22130,7 +22123,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:anyURI constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:anyURI constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -22232,7 +22225,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Applying fn:boolean() to a value of type xs:anyURI that has the lexical value 
+   *  Applying fn:boolean() to a value of type xs:anyURI that has the lexical value
    *       ' "http://www.example.com/an/arbitrary/URI.ext" ' should result in the boolean value true..
    */
   @org.junit.Test
@@ -23318,8 +23311,8 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:QName constructor function produces values 
-   *         of the correct type. The subsequence() function makes it more difficult for optimizers to take 
+   *  Verify with 'instance of' that the xs:QName constructor function produces values
+   *         of the correct type. The subsequence() function makes it more difficult for optimizers to take
    *         short cuts based on static type information..
    */
   @org.junit.Test
@@ -28232,7 +28225,6 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast3() {
-    xquery10();
     final XQuery query = new XQuery(
       "'string' cast as xs:anyType*",
       ctx);
@@ -30481,7 +30473,6 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast4() {
-    xquery10();
     final XQuery query = new XQuery(
       "'string' cast as xs:anySimpleType",
       ctx);
@@ -30778,7 +30769,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:untypedAtomic constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:untypedAtomic constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -30983,7 +30974,6 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast422() {
-    xquery10();
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"an arbitrary string(untypedAtomic source)\") cast as xs:QName",
       ctx);
@@ -31100,7 +31090,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:string constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:string constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -31361,7 +31351,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:float constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:float constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -32422,7 +32412,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:double constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:double constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -32727,7 +32717,6 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast5() {
-    xquery10();
     final XQuery query = new XQuery(
       "'string' cast as xs:untyped",
       ctx);
@@ -33524,7 +33513,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:decimal constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:decimal constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -34665,7 +34654,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:integer constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:integer constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -35850,7 +35839,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:duration constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:duration constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -37025,7 +37014,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:yearMonthDuration constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:yearMonthDuration constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -37210,7 +37199,6 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast7() {
-    xquery10();
     final XQuery query = new XQuery(
       "'string' cast as xs:anyType",
       ctx);
@@ -37651,7 +37639,6 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast71a() {
-    xquery10();
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"ncname\") cast as xs:QName?",
       ctx);
@@ -38208,7 +38195,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:dayTimeDuration constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:dayTimeDuration constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -39349,7 +39336,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:dateTime constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:dateTime constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -40530,7 +40517,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:time constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:time constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -41671,7 +41658,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:date constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:date constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -41696,7 +41683,6 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast9() {
-    xquery10();
     final XQuery query = new XQuery(
       "3 cast as xs:doesNotExist",
       ctx);
@@ -42853,7 +42839,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Verify with 'instance of' that the xs:gYearMonth constructor function produces values of the correct type. 
+   *  Verify with 'instance of' that the xs:gYearMonth constructor function produces values of the correct type.
    *       The subsequence() function makes it more difficult for optimizers to take short cuts based on static type information..
    */
   @org.junit.Test
@@ -46344,8 +46330,8 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  Construct an xs:anyURI from an invalid string. 
-   *       However, in F&O 17.1.1, it is said that "For xs:anyURI, the extent to which an 
+   *  Construct an xs:anyURI from an invalid string.
+   *       However, in F&O 17.1.1, it is said that "For xs:anyURI, the extent to which an
    *       implementation validates the lexical form of xs:anyURI is implementation dependent."..
    */
   @org.junit.Test
@@ -46430,7 +46416,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  '%' is not a disallowed character and therefore it's not encoded 
+   *  '%' is not a disallowed character and therefore it's not encoded
    *       before being considered for RFC 2396 validness..
    */
   @org.junit.Test
@@ -53327,7 +53313,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  The minus sign is allowed unsignedLong. 
+   *  The minus sign is allowed unsignedLong.
    *       S4S is considered normative, and XSD 1.1 adjusted the prose to say the same..
    */
   @org.junit.Test
@@ -53448,7 +53434,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  The minus sign is allowed unsignedInt. 
+   *  The minus sign is allowed unsignedInt.
    *       S4S is considered normative, and XSD 1.1 adjusted the prose to say the same..
    */
   @org.junit.Test
@@ -53469,7 +53455,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  The minus sign is allowed unsignedShort. 
+   *  The minus sign is allowed unsignedShort.
    *       S4S is considered normative, and XSD 1.1 adjusted the prose to say the same..
    */
   @org.junit.Test
@@ -53490,7 +53476,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  The minus sign is allowed in unsignedByte. 
+   *  The minus sign is allowed in unsignedByte.
    *       S4S is considered normative, and XSD 1.1 adjusted the prose to say the same..
    */
   @org.junit.Test
@@ -53551,7 +53537,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  The plus sign is allowed in unsignedLong. 
+   *  The plus sign is allowed in unsignedLong.
    *       S4S is considered normative, and XSD 1.1 adjusted the prose to say the same..
    */
   @org.junit.Test
@@ -53572,7 +53558,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  The plus sign is allowed in unsignedInt. 
+   *  The plus sign is allowed in unsignedInt.
    *       S4S is considered normative, and XSD 1.1 adjusted the prose to say the same..
    */
   @org.junit.Test
@@ -53613,7 +53599,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  The plus sign is allowed in unsignedShort. 
+   *  The plus sign is allowed in unsignedShort.
    *       S4S is considered normative, and XSD 1.1 adjusted the prose to say the same..
    */
   @org.junit.Test
@@ -53634,7 +53620,7 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
-   *  The plus sign is allowed in unsignedByte. 
+   *  The plus sign is allowed in unsignedByte.
    *       S4S is considered normative, and XSD 1.1 adjusted the prose to say the same..
    */
   @org.junit.Test

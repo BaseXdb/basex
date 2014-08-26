@@ -36,14 +36,13 @@ public class RegExParser implements RegExParserConstants {
    * Compiles this regular expression to a {@link Pattern}.
    * @param regex regular expression to parse
    * @param mod modifiers
-   * @param ext XQuery 3.0 syntax
    * @param ii input info
    * @param check check result for empty strings
    * @return the pattern
    * @throws QueryException query exception
    */
-  public static Pattern parse(final byte[] regex, final byte[] mod, final boolean ext,
-      final InputInfo ii, final boolean check) throws QueryException {
+  public static Pattern parse(final byte[] regex, final byte[] mod, final InputInfo ii,
+      final boolean check) throws QueryException {
     // process modifiers
     int m = 0;
     boolean strip = false;
@@ -52,7 +51,7 @@ public class RegExParser implements RegExParserConstants {
         if(b == 'i') m |= CASE_INSENSITIVE | UNICODE_CASE;
         else if(b == 'm') m |= MULTILINE;
         else if(b == 's') m |= DOTALL;
-        else if(b == 'q' && ext) m |= LITERAL;
+        else if(b == 'q') m |= LITERAL;
         else if(b == 'x') strip = true;
         else throw REGMOD_X.get(ii, (char) b);
       }

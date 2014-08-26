@@ -49,7 +49,6 @@ public abstract class QT3TestSet {
   public void buildUp() throws BaseXException {
     ctx = new Context();
     new Set(MainOptions.CHOP, false).execute(ctx);
-    new Set(MainOptions.XQUERY3, true).execute(ctx);
     result = null;
   }
 
@@ -59,11 +58,6 @@ public abstract class QT3TestSet {
     ctx.close();
     ctx = null;
     result = null;
-  }
-
-  /** Sets the XQuery version to 1.0. */
-  protected void xquery10() {
-    ctx.options.set(MainOptions.XQUERY3, false);
   }
 
   /**

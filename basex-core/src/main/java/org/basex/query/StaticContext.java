@@ -48,8 +48,6 @@ public final class StaticContext {
   /** Copy-namespaces mode: (no-)inherit. */
   public boolean inheritNS = true;
 
-  /** XQuery version flag. */
-  private boolean xquery3;
   /** Static Base URI. */
   private Uri baseURI = Uri.EMPTY;
 
@@ -60,7 +58,6 @@ public final class StaticContext {
   public StaticContext(final Context ctx) {
     final MainOptions opts = ctx.options;
     mixUpdates = opts.get(MainOptions.MIXUPDATES);
-    xquery3 = opts.get(MainOptions.XQUERY3);
   }
 
   /**
@@ -124,22 +121,6 @@ public final class StaticContext {
     } else {
       baseURI = Uri.uri(baseIO().merge(uri).url());
     }
-  }
-
-  /**
-   * Assigns the XQuery 3.0 flag.
-   * @param xq30 XQuery 3.0 flag
-   */
-  public void xquery3(final boolean xq30) {
-    xquery3 = xq30;
-  }
-
-  /**
-   * Checks if XQuery 3.0 features are allowed.
-   * @return {@code true} if XQuery 3.0 is allowed, {@code false} otherwise
-   */
-  public boolean xquery3() {
-    return xquery3;
   }
 
   @Override

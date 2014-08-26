@@ -570,32 +570,30 @@ public abstract class ParseExpr extends Expr {
    * Returns the item or throws an exception.
    * @param ex expression to be checked
    * @param qc query context
-   * @param sc static context
    * @param empty allow empty result
    * @return QNm item
    * @throws QueryException query exception
    */
-  protected final QNm toQNm(final Expr ex, final QueryContext qc, final StaticContext sc,
-      final boolean empty) throws QueryException {
-    return toQNm(ex.atomItem(qc, info), sc, empty);
+  protected final QNm toQNm(final Expr ex, final QueryContext qc, final boolean empty)
+      throws QueryException {
+    return toQNm(ex.atomItem(qc, info), empty);
   }
 
   /**
    * Checks if the specified item is a QName.
    * Returns the item or throws an exception.
    * @param it item
-   * @param sc static context
    * @param empty allow empty result
    * @return QNm item
    * @throws QueryException query exception
    */
-  protected final QNm toQNm(final Item it, final StaticContext sc, final boolean empty)
+  protected final QNm toQNm(final Item it, final boolean empty)
       throws QueryException {
 
     if(empty && it == null) return null;
     final Type ip = checkNoEmpty(it, AtomType.QNM).type;
     if(ip == AtomType.QNM) return (QNm) it;
-    if(ip.isUntyped() && sc.xquery3()) throw NSSENS_X_X.get(info, ip, AtomType.QNM);
+    if(ip.isUntyped()) throw NSSENS_X_X.get(info, ip, AtomType.QNM);
     throw castError(info, it, AtomType.QNM);
   }
 

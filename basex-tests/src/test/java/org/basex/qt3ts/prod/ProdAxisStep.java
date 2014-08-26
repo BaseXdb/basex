@@ -4550,7 +4550,6 @@ public class ProdAxisStep extends QT3TestSet {
    */
   @org.junit.Test
   public void axes127() {
-    xquery10();
     final XQuery query = new XQuery(
       "/*/namespace-node()",
       ctx);
@@ -6440,11 +6439,11 @@ public class ProdAxisStep extends QT3TestSet {
   }
 
   /**
-   *  A significant set of path expressions with different combinations of source values, axes and node tests, 
-   *         that always evaluate to the empty sequence, no matter what document structure that is being walked. 
-   *         The list is not guaranteed to be exhaustive. Some implementations detect this and rewrite away such 
-   *         combinations or warn the user about such constructs. Since static typing implementations may infer 
-   *         these expressions to the empty sequence, they may raise XPST0005.attribute axis, and all other axes 
+   *  A significant set of path expressions with different combinations of source values, axes and node tests,
+   *         that always evaluate to the empty sequence, no matter what document structure that is being walked.
+   *         The list is not guaranteed to be exhaustive. Some implementations detect this and rewrite away such
+   *         combinations or warn the user about such constructs. Since static typing implementations may infer
+   *         these expressions to the empty sequence, they may raise XPST0005.attribute axis, and all other axes
    *         that inference can assert might produce attributes.
    *       .
    */

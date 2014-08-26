@@ -691,8 +691,7 @@ public enum AtomType implements Type {
     public QNm cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
 
-      // xquery 3.0 also allows untyped arguments
-      if(item.type != STR && !(sc.xquery3() && item.type.isUntyped())) invCast(item, ii);
+      if(item.type != STR && !item.type.isUntyped()) invCast(item, ii);
       final byte[] nm = trim(item.string(ii));
       if(!XMLToken.isQName(nm)) throw funCastError(ii, this, nm);
       final QNm qn = new QNm(nm, sc);

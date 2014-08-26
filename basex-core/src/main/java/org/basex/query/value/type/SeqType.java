@@ -469,10 +469,7 @@ public final class SeqType {
         if(tp.instanceOf(type)) {
           vb.add(atom);
         } else if(tp == AtomType.ATM) {
-          if(type.nsSensitive()) {
-            if(sc.xquery3()) throw NSSENS_X_X.get(ii, item.type, type);
-            throw treatError(ii, item, withOcc(Occ.ONE));
-          }
+          if(type.nsSensitive()) throw NSSENS_X_X.get(ii, item.type, type);
           vb.add(type.cast(atom, qc, sc, ii));
         } else if(type == AtomType.DBL && (tp == AtomType.FLT || tp.instanceOf(AtomType.DEC))) {
           vb.add(Dbl.get(atom.dbl(ii)));

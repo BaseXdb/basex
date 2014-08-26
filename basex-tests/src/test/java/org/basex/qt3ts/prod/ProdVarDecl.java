@@ -141,7 +141,6 @@ public class ProdVarDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void kInternalVariablesWith15a() {
-    xquery10();
     final XQuery query = new XQuery(
       "declare variable $var1 := $var1; true()",
       ctx);
@@ -182,7 +181,6 @@ public class ProdVarDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void kInternalVariablesWith16() {
-    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "      declare variable $var := local:func1(); \n" +
@@ -235,7 +233,6 @@ public class ProdVarDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void kInternalVariablesWith17() {
-    xquery10();
     final XQuery query = new XQuery(
       "declare variable $var := local:func1(); declare function local:func1() { local:func2($var) }; declare function local:func2($arg2) { 1 }; true()",
       ctx);
@@ -276,7 +273,6 @@ public class ProdVarDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void kInternalVariablesWith18() {
-    xquery10();
     final XQuery query = new XQuery(
       "declare variable $var := local:func1(); declare function local:func1() { local:func2($var) }; declare function local:func2($arg2) { $arg2 }; $var",
       ctx);
@@ -317,7 +313,6 @@ public class ProdVarDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void kInternalVariablesWith19() {
-    xquery10();
     final XQuery query = new XQuery(
       "declare variable $var2 := local:func1(); declare variable $var := ($var2 treat as xs:integer) + 1; declare function local:func1() { local:func2() }; declare function local:func2() { local:func3() }; declare function local:func3() { local:func4() }; declare function local:func4() { $var }; boolean($var)",
       ctx);
@@ -378,7 +373,6 @@ public class ProdVarDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void kInternalVariablesWith20() {
-    xquery10();
     final XQuery query = new XQuery(
       "declare variable $var := local:func1(); declare function local:func1() { local:func2() }; declare function local:func2() { local:func3() }; declare variable $var2 := local:func2(); declare function local:func3() { $var2 }; boolean($var)",
       ctx);
@@ -499,12 +493,11 @@ public class ProdVarDecl extends QT3TestSet {
   }
 
   /**
-   *  A prolog variable depending on a variable which is not in scope, 
+   *  A prolog variable depending on a variable which is not in scope,
    *       and the variable is not used. .
    */
   @org.junit.Test
   public void kInternalVariablesWith6a() {
-    xquery10();
     final XQuery query = new XQuery(
       "declare variable $var1 := $var2; declare variable $var2 := 2; true()",
       ctx);
@@ -521,7 +514,7 @@ public class ProdVarDecl extends QT3TestSet {
   }
 
   /**
-   *  A prolog variable depending on a variable which is (in XQuery 3.0) in scope, 
+   *  A prolog variable depending on a variable which is (in XQuery 3.0) in scope,
    *       and the variable is not used. .
    */
   @org.junit.Test
@@ -586,7 +579,6 @@ public class ProdVarDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void kInternalVariablesWith9a() {
-    xquery10();
     final XQuery query = new XQuery(
       "declare variable $var1 := $var2; declare variable $var2 := 2; $var1",
       ctx);
@@ -647,7 +639,6 @@ public class ProdVarDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void k2InternalVariablesWithout1() {
-    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "        declare variable $local:myVar := local:myFunction(); \n" +
@@ -820,7 +811,6 @@ public class ProdVarDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void k2InternalVariablesWithout2() {
-    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "        declare variable $local:myVar := local:myFunction(); \n" +
@@ -869,7 +859,6 @@ public class ProdVarDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void k2InternalVariablesWithout3() {
-    xquery10();
     final XQuery query = new XQuery(
       "declare variable $local:myVar := local:myFunction(); declare function local:myFunction() { $local:myVar, 1, local:myFunction() }; $local:myVar",
       ctx);
@@ -910,7 +899,6 @@ public class ProdVarDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void k2InternalVariablesWithout4() {
-    xquery10();
     final XQuery query = new XQuery(
       "declare variable $local:myVar := local:myFunction(); declare function local:myFunction() { $local:myVar, 1, local:myFunction() }; $local:myVar",
       ctx);
@@ -951,7 +939,6 @@ public class ProdVarDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void k2InternalVariablesWithout5() {
-    xquery10();
     final XQuery query = new XQuery(
       "declare variable $local:myVar := local:myFunction(); declare function local:myFunction2() { $local:myVar, 1, local:myFunction() }; declare function local:myFunction() { local:myFunction2() }; $local:myVar",
       ctx);
@@ -992,7 +979,6 @@ public class ProdVarDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void k2InternalVariablesWithout6() {
-    xquery10();
     final XQuery query = new XQuery(
       "declare variable $local:myVar := local:myFunction(); declare function local:myFunction2() { local:myFunction(), $local:myVar }; declare function local:myFunction() { local:myFunction2() }; local:myFunction()",
       ctx);
@@ -1033,7 +1019,6 @@ public class ProdVarDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void k2InternalVariablesWithout7() {
-    xquery10();
     final XQuery query = new XQuery(
       "declare variable $local:myVar := local:myFunction(); declare function local:myFunction2() { local:myFunction(), $local:myVar }; declare function local:myFunction4() { local:myFunction2() }; declare function local:myFunction3() { local:myFunction4() }; declare function local:myFunction() { local:myFunction3() }; local:myFunction()",
       ctx);
@@ -1074,7 +1059,6 @@ public class ProdVarDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void k2InternalVariablesWithout8() {
-    xquery10();
     final XQuery query = new XQuery(
       "declare variable $local:myVar := local:myFunction(); declare function local:myFunction2() { local:myFunction4() }; declare function local:myFunction4() { local:myFunction2(), $local:myVar }; declare function local:myFunction3() { local:myFunction4() }; declare function local:myFunction() { local:myFunction3() }; local:myFunction()",
       ctx);
@@ -1115,7 +1099,6 @@ public class ProdVarDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void k2InternalVariablesWithout9() {
-    xquery10();
     final XQuery query = new XQuery(
       "declare variable $local:myVar := local:myFunc(3); declare function local:myFunc($arg) { local:myFunc($local:myVar) }; $local:myVar",
       ctx);
@@ -2464,7 +2447,6 @@ public class ProdVarDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void vardeclerr() {
-    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "      declare namespace foo = \"http://www..oracle.com/xquery/test\"; \n" +
@@ -2631,12 +2613,11 @@ public class ProdVarDecl extends QT3TestSet {
   }
 
   /**
-   *  Evaluates an internal variable declaration with type and expression. 
+   *  Evaluates an internal variable declaration with type and expression.
    *       Test usage of variable with no assigned value at time of expression definition. .
    */
   @org.junit.Test
   public void vardeclwithtype15a() {
-    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "      declare variable $var as xs:integer := $e +1; \n" +
@@ -2656,7 +2637,7 @@ public class ProdVarDecl extends QT3TestSet {
   }
 
   /**
-   *  Evaluates an internal variable declaration with type and expression. 
+   *  Evaluates an internal variable declaration with type and expression.
    *       Test usage of variable with no assigned value at time of expression definition. .
    */
   @org.junit.Test

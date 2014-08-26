@@ -273,7 +273,6 @@ public class ProdFunctionCall extends QT3TestSet {
    */
   @org.junit.Test
   public void kFunctionCallExpr12() {
-    xquery10();
     final XQuery query = new XQuery(
       "unparsed-text(\"example.com/file.ext\")",
       ctx);
@@ -294,7 +293,6 @@ public class ProdFunctionCall extends QT3TestSet {
    */
   @org.junit.Test
   public void kFunctionCallExpr13() {
-    xquery10();
     final XQuery query = new XQuery(
       "unparsed-text-available(\"example.com/file.ext\")",
       ctx);
@@ -335,7 +333,6 @@ public class ProdFunctionCall extends QT3TestSet {
    */
   @org.junit.Test
   public void kFunctionCallExpr15() {
-    xquery10();
     final XQuery query = new XQuery(
       "format-number(3, \"0000\")",
       ctx);
@@ -376,7 +373,6 @@ public class ProdFunctionCall extends QT3TestSet {
    */
   @org.junit.Test
   public void kFunctionCallExpr16() {
-    xquery10();
     final XQuery query = new XQuery(
       "matches(format-time(current-time(), \"[H01]:[m01]\"), \"[0-2][0-9]:[0-5][0-9]\")",
       ctx);
@@ -417,7 +413,6 @@ public class ProdFunctionCall extends QT3TestSet {
    */
   @org.junit.Test
   public void kFunctionCallExpr17() {
-    xquery10();
     final XQuery query = new XQuery(
       "matches(format-time(current-time(), \"[H01]:[m01]\", (), (), ()), \"..:..\")",
       ctx);
@@ -634,7 +629,6 @@ public class ProdFunctionCall extends QT3TestSet {
    */
   @org.junit.Test
   public void kFunctionCallExpr25() {
-    xquery10();
     final XQuery query = new XQuery(
       "generate-id(<a/>) castable as xs:NCName",
       ctx);
@@ -1085,7 +1079,6 @@ public class ProdFunctionCall extends QT3TestSet {
    */
   @org.junit.Test
   public void k2FunctionCallExpr6() {
-    xquery10();
     final XQuery query = new XQuery(
       "generate-id(\"str\")",
       ctx);
@@ -1106,7 +1099,6 @@ public class ProdFunctionCall extends QT3TestSet {
    */
   @org.junit.Test
   public void k2FunctionCallExpr7() {
-    xquery10();
     final XQuery query = new XQuery(
       "generate-id()",
       ctx);
@@ -1641,7 +1633,6 @@ public class ProdFunctionCall extends QT3TestSet {
    */
   @org.junit.Test
   public void functionCallReservedFunctionNames014() {
-    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
@@ -1666,7 +1657,6 @@ public class ProdFunctionCall extends QT3TestSet {
    */
   @org.junit.Test
   public void functionCallReservedFunctionNames015() {
-    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
@@ -1691,7 +1681,6 @@ public class ProdFunctionCall extends QT3TestSet {
    */
   @org.junit.Test
   public void functionCallReservedFunctionNames016() {
-    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +

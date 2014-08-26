@@ -12957,7 +12957,6 @@ public class ProdCastableExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void castableAs648() {
-    xquery10();
     final XQuery query = new XQuery(
       "for $var in \"ABC\" return $var castable as xs:QName",
       ctx);
@@ -13100,7 +13099,6 @@ public class ProdCastableExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCastable12() {
-    xquery10();
     final XQuery query = new XQuery(
       "(xs:double(1), xs:double(2), xs:double(3)) castable as xs:double*",
       ctx);
@@ -13149,7 +13147,6 @@ public class ProdCastableExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCastable13() {
-    xquery10();
     final XQuery query = new XQuery(
       "'string' castable as item()",
       ctx);
@@ -13754,7 +13751,6 @@ public class ProdCastableExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCastable4() {
-    xquery10();
     final XQuery query = new XQuery(
       "'string' castable as xs:anyType*",
       ctx);
@@ -13803,7 +13799,6 @@ public class ProdCastableExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCastable5() {
-    xquery10();
     final XQuery query = new XQuery(
       "'string' castable as xs:anySimpleType",
       ctx);
@@ -13844,7 +13839,6 @@ public class ProdCastableExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCastable6() {
-    xquery10();
     final XQuery query = new XQuery(
       "'string' castable as xs:untyped",
       ctx);

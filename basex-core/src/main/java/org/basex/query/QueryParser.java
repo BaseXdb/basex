@@ -53,27 +53,18 @@ public class QueryParser extends InputParser {
   private static final byte[] URICHECK = {};
   /** QName check: skip namespace check. */
   private static final byte[] SKIPCHECK = {};
-  /** Reserved function names (XQuery 1.0). */
-  private static final TokenSet KEYWORDS10 = new TokenSet();
   /** Reserved function names (XQuery 3.0). */
   private static final TokenSet KEYWORDS30 = new TokenSet();
 
   static {
     final byte[][] keys = {
-      NodeType.ATT.string(), NodeType.COM.string(), NodeType.DOC.string(),
-      NodeType.ELM.string(), token(EMPTY_SEQUENCE), token(IF), AtomType.ITEM.string(),
-      NodeType.NOD.string(), NodeType.PI.string(), token(SCHEMA_ATTRIBUTE),
-      token(SCHEMA_ELEMENT), NodeType.TXT.string(), token(TYPESWITCH)
+      FuncType.ANY_FUN.string(), ARRAY, NodeType.ATT.string(), NodeType.COM.string(),
+      NodeType.DOC.string(), NodeType.ELM.string(), token(EMPTY_SEQUENCE), token(IF),
+      AtomType.ITEM.string(), MAP, NodeType.NSP.string(), NodeType.NOD.string(),
+      NodeType.PI.string(), token(SCHEMA_ATTRIBUTE), token(SCHEMA_ELEMENT), token(SWITCH),
+      NodeType.TXT.string(), token(TYPESWITCH)
     };
-    for(final byte[] key : keys) {
-      KEYWORDS10.add(key);
-      KEYWORDS30.add(key);
-    }
-    KEYWORDS30.add(FuncType.ANY_FUN.string());
-    KEYWORDS30.add(NodeType.NSP.string());
-    KEYWORDS30.add(SWITCH);
-    KEYWORDS30.add(MAP);
-    KEYWORDS30.add(ARRAY);
+    for(final byte[] key : keys) KEYWORDS30.add(key);
   }
 
   /** Modules loaded by the current file. */
@@ -309,12 +300,10 @@ public class QueryParser extends InputParser {
     if(version) {
       // parse xquery version
       final String ver = string(stringLiteral());
-      if(ver.equals(XQ10)) sc.xquery3(false);
-      else if(eq(ver, XQ11, XQ30)) sc.xquery3(true);
-      else throw error(XQUERYVER_X, ver);
+      if(!ver.equals(XQ10) && !eq(ver, XQ11, XQ30, XQ31)) throw error(XQUERYVER_X, ver);
     }
     // parse xquery encoding (ignored, as input always comes in as string)
-    if((version || sc.xquery3()) && wsConsumeWs(ENCODING)) {
+    if(wsConsumeWs(ENCODING)) {
       final String enc = string(stringLiteral());
       if(!supported(enc)) throw error(XQUERYENC2_X, enc);
     } else if(!version) {
@@ -335,7 +324,7 @@ public class QueryParser extends InputParser {
       if(wsConsumeWs(DECLARE)) {
         if(wsConsumeWs(DEFAULT)) {
           if(!defaultNamespaceDecl() && !defaultCollationDecl() &&
-             !emptyOrderDecl() && !(sc.xquery3() && decimalFormatDecl(true)))
+             !emptyOrderDecl() && !decimalFormatDecl(true))
             throw error(DECLINCOMPLETE);
         } else if(wsConsumeWs(BOUNDARY_SPACE)) {
           boundarySpaceDecl();
@@ -349,7 +338,7 @@ public class QueryParser extends InputParser {
           revalidationDecl();
         } else if(wsConsumeWs(COPY_NAMESPACES)) {
           copyNamespacesDecl();
-        } else if(sc.xquery3() && wsConsumeWs(DECIMAL_FORMAT)) {
+        } else if(wsConsumeWs(DECIMAL_FORMAT)) {
           decimalFormatDecl(false);
         } else if(wsConsumeWs(NSPACE)) {
           namespaceDecl();
@@ -388,7 +377,7 @@ public class QueryParser extends InputParser {
       final int i = pos;
       if(!wsConsumeWs(DECLARE)) break;
 
-      if(sc.xquery3() && wsConsumeWs(CONTEXT)) {
+      if(wsConsumeWs(CONTEXT)) {
         contextItemDecl();
       } else if(wsConsumeWs(OPTION)) {
         optionDecl();
@@ -399,7 +388,7 @@ public class QueryParser extends InputParser {
         while(true) {
           if(wsConsumeWs(UPDATING)) {
             ann.add(Ann.Q_UPDATING, Empty.SEQ, info());
-          } else if(sc.xquery3() && consume('%')) {
+          } else if(consume('%')) {
             annotation(ann);
           } else {
             break;
@@ -525,11 +514,11 @@ public class QueryParser extends InputParser {
    */
   private void optionDecl() throws QueryException {
     skipWs();
-    final QNm qnm = eQName(QNAME_X, sc.xquery3() ? XQURI : URICHECK);
+    final QNm qnm = eQName(QNAME_X, XQURI);
     final byte[] val = stringLiteral();
     final String name = string(qnm.local());
 
-    if(sc.xquery3() && eq(qnm.uri(), OUTPUTURI)) {
+    if(eq(qnm.uri(), OUTPUTURI)) {
       // output declaration
       if(module != null) throw error(MODOUT);
 
@@ -559,7 +548,7 @@ public class QueryParser extends InputParser {
           throw error(OUTDOC_X, val);
         }
       }
-    } else if(sc.xquery3() && eq(qnm.uri(), XQURI)) {
+    } else if(eq(qnm.uri(), XQURI)) {
       throw error(DECLOPTION_X, qnm);
     } else if(eq(qnm.uri(), DBURI)) {
       // project-specific declaration
@@ -774,7 +763,6 @@ public class QueryParser extends InputParser {
     if(u != null) {
       if(!eq(uri, u)) throw error(WRONGMODULE_X_X, uri,
           qc.context.user.has(Perm.ADMIN) ? io.path() : io.name());
-      if(!sc.xquery3() && qc.modStack.contains(p)) throw error(CIRCMODULE);
       return;
     }
     qc.modParsed.put(p, uri);
@@ -850,7 +838,7 @@ public class QueryParser extends InputParser {
     final boolean external = wsConsumeWs(EXTERNAL);
     final Expr bind;
     if(external) {
-      bind = sc.xquery3() && wsConsumeWs(ASSIGN) ? check(single(), NOVARDECL) : null;
+      bind = wsConsumeWs(ASSIGN) ? check(single(), NOVARDECL) : null;
     } else {
       wsCheck(ASSIGN);
       bind = check(single(), NOVARDECL);
@@ -887,7 +875,7 @@ public class QueryParser extends InputParser {
   private void functionDecl(final Ann ann) throws QueryException {
     final InputInfo ii = info();
     final QNm name = eQName(FUNCNAME, sc.funcNS);
-    if(sc.xquery3() && keyword(name)) throw error(RESERVED_X, name.local());
+    if(keyword(name)) throw error(RESERVED_X, name.local());
     wsCheck(PAREN1);
     if(module != null && !eq(name.uri(), module.uri())) throw error(MODULENS_X, name);
 
@@ -907,7 +895,7 @@ public class QueryParser extends InputParser {
    * @return result of check
    */
   private boolean keyword(final QNm name) {
-    return !name.hasPrefix() && (sc.xquery3() ? KEYWORDS30 : KEYWORDS10).contains(name.string());
+    return !name.hasPrefix() && KEYWORDS30.contains(name.string());
   }
 
   /**
@@ -1020,7 +1008,7 @@ public class QueryParser extends InputParser {
         alter = NOWHERE;
       }
 
-      if(sc.xquery3() && wsConsumeWs(GROUP)) {
+      if(wsConsumeWs(GROUP)) {
         wsCheck(BY);
         skipWs();
         alterPos = pos;
@@ -1073,12 +1061,12 @@ public class QueryParser extends InputParser {
         alter = ORDERBY;
       }
 
-      if(sc.xquery3() && wsConsumeWs(COUNT, DOLLAR, NOCOUNT)) {
+      if(wsConsumeWs(COUNT, DOLLAR, NOCOUNT)) {
         final Var v = addVar(varName(), SeqType.ITR, false);
         curr.put(v.name.id(), v);
         clauses.add(new Count(v, info()));
       }
-    } while(sc.xquery3() && size < clauses.size());
+    } while(size < clauses.size());
 
     if(!wsConsumeWs(RETURN)) throw alter == null ? error(FLWORRETURN) : error();
 
@@ -1101,7 +1089,7 @@ public class QueryParser extends InputParser {
       if(cls == null) cls = new LinkedList<>();
       if(let) letClause(cls);
       else    forClause(cls);
-    } else if(sc.xquery3()) {
+    } else {
       // WindowClause
       final boolean slide = wsConsumeWs(FOR, SLIDING, NOWINDOW);
       if(slide || wsConsumeWs(FOR, TUMBLING, NOWINDOW)) {
@@ -1123,7 +1111,7 @@ public class QueryParser extends InputParser {
       final QNm nm = varName();
       final SeqType tp = optAsType();
 
-      final boolean emp = sc.xquery3() && wsConsume(ALLOWING);
+      final boolean emp = wsConsume(ALLOWING);
       if(emp) wsCheck(EMPTYORD);
 
       final QNm p = wsConsumeWs(AT) ? varName() : null;
@@ -1328,7 +1316,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr switchh() throws QueryException {
-    if(!sc.xquery3() || !wsConsumeWs(SWITCH, PAREN1, TYPEPAR)) return null;
+    if(!wsConsumeWs(SWITCH, PAREN1, TYPEPAR)) return null;
     wsCheck(PAREN1);
     final Expr expr = check(expr(), NOSWITCH);
     SwitchCase[] exprs = { };
@@ -1381,7 +1369,7 @@ public class QueryParser extends InputParser {
       }
       if(cs) {
         do types.add(sequenceType());
-        while(sc.xquery3() && wsConsume(PIPE));
+        while(wsConsume(PIPE));
       }
       wsCheck(RETURN);
       final Expr ret = check(single(), NOTYPESWITCH);
@@ -1956,7 +1944,7 @@ public class QueryParser extends InputParser {
       return new NameTest(new QNm(ncName(QNAME_X)), NameTest.Kind.NAME, att, sc.elemNS);
     }
 
-    if(sc.xquery3() && consume(EQNAME)) {
+    if(consume(EQNAME)) {
       // name test: Q{uri}*
       final byte[] uri = bracedURILiteral();
       if(consume('*')) {
@@ -2026,10 +2014,10 @@ public class QueryParser extends InputParser {
           if(up) qc.updating();
           e = holes == null ? new DynFuncCall(ii, sc, up, e, args) :
             new PartFunc(sc, ii, e, args, holes);
-        } else if(sc.xquery3() && consume(QUESTION)) {
+        } else if(consume(QUESTION)) {
           // parses the "Lookup" rule
           e = new Lookup(info(), keySpecifier(), e);
-        } else if(sc.xquery3() && consume(ARROW)) {
+        } else if(consume(ARROW)) {
           final Expr ex = arrowPostfix();
           wsCheck(PAREN1);
 
@@ -2072,25 +2060,10 @@ public class QueryParser extends InputParser {
     // direct constructor
     if(c == '<') return constructor();
     // function item
-    if(sc.xquery3()) {
-      final Expr e = functionItem();
-      if(e != null) return e;
-      // map (including legacy syntax)
-      if(wsConsumeWs(MAPSTR, CURLY1, INCOMPLETE) || curr('{')) return new CMap(info(), keyValues());
-      // square array constructor
-      if(wsConsumeWs(SQUARE1)) return new CArray(info(), false, values());
-      // curly array constructor
-      if(wsConsumeWs(ARRAYSTR, CURLY1, INCOMPLETE)) {
-        wsCheck(CURLY1);
-        final Expr a = expr();
-        wsCheck(CURLY2);
-        return a == null ? new CArray(info(), true) : new CArray(info(), true, a);
-      }
-      // unary lookup
-      if(wsConsumeWs(QUESTION)) return new Lookup(info(), keySpecifier());
-    }
+    Expr e = functionItem();
+    if(e != null) return e;
     // function call
-    Expr e = functionCall();
+    e = functionCall();
     if(e != null) return e;
     // computed constructors
     e = compConstructor();
@@ -2098,6 +2071,19 @@ public class QueryParser extends InputParser {
     // ordered expression
     if(wsConsumeWs(ORDERED, CURLY1, INCOMPLETE) || wsConsumeWs(UNORDERED, CURLY1, INCOMPLETE))
       return enclosed(NOENCLEXPR);
+    // map (including legacy syntax)
+    if(wsConsumeWs(MAPSTR, CURLY1, INCOMPLETE) || curr('{')) return new CMap(info(), keyValues());
+    // square array constructor
+    if(wsConsumeWs(SQUARE1)) return new CArray(info(), false, values());
+    // curly array constructor
+    if(wsConsumeWs(ARRAYSTR, CURLY1, INCOMPLETE)) {
+      wsCheck(CURLY1);
+      final Expr a = expr();
+      wsCheck(CURLY2);
+      return a == null ? new CArray(info(), true) : new CArray(info(), true, a);
+    }
+    // unary lookup
+    if(wsConsumeWs(QUESTION)) return new Lookup(info(), keySpecifier());
     // context value
     if(c == '.' && !digit(next())) {
       if(next() == '.') return null;
@@ -2796,7 +2782,6 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compNamespace() throws QueryException {
-    if(!sc.xquery3()) return null;
     skipWs();
 
     final Expr name;
@@ -2876,12 +2861,8 @@ public class QueryParser extends InputParser {
       t = AtomType.find(name, false);
       if(t == null) {
         if(wsConsume(PAREN1)) throw error(SIMPLETYPE_X, name);
-        if(sc.xquery3()) {
-          if(!AtomType.AST.name.eq(name)) throw error(TYPE30_X, name.prefixId(XML));
-          t = AtomType.AST;
-        } else {
-          throw error(TYPEUNKNOWN_X, name);
-        }
+        if(!AtomType.AST.name.eq(name)) throw error(TYPE30_X, name.prefixId(XML));
+        t = AtomType.AST;
       }
       if(t == AtomType.AST || t == AtomType.AAT || t == AtomType.NOT)
         throw error(CASTUNKNOWN_X, name.prefixId(XML));
@@ -2931,7 +2912,7 @@ public class QueryParser extends InputParser {
     }
 
     // parse optional annotation and type name
-    final Ann ann = sc.xquery3() && curr('%') ? annotations() : null;
+    final Ann ann = curr('%') ? annotations() : null;
     final QNm name = eQName(TYPEINVALID, null);
     skipWs();
     // check if name is followed by parentheses
@@ -3034,10 +3015,7 @@ public class QueryParser extends InputParser {
       default:  break;
     }
     wsCheck(PAREN2);
-    if(tp != null) return tp;
-    tp = Test.get(t);
-    if(tp == Test.NSP && !sc.xquery3()) throw error(NSNOTALL);
-    return tp;
+    return tp == null ? Test.get(t) : tp;
   }
 
   /**
@@ -3133,7 +3111,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr tryCatch() throws QueryException {
-    if(!sc.xquery3() || !wsConsumeWs(TRY)) return null;
+    if(!wsConsumeWs(TRY)) return null;
 
     final Expr tr = enclosed(NOENCLEXPR);
     wsCheck(CATCH);
@@ -3701,7 +3679,7 @@ public class QueryParser extends InputParser {
    */
   private QNm eQName(final Err err, final byte[] def) throws QueryException {
     final int i = pos;
-    if(sc.xquery3() && consume(EQNAME)) {
+    if(consume(EQNAME)) {
       final byte[] uri = bracedURILiteral();
       final byte[] name = ncName(null);
       if(name.length != 0) {
@@ -3930,11 +3908,10 @@ public class QueryParser extends InputParser {
     // static variable
     final byte[] uri = name.uri();
 
-    // accept variable reference if:
-    // - XQuery 3.0 is used or variable is declared, and
-    // - a variable uses the module or an imported URI or if it is specified in the main module
-    if((sc.xquery3() || qc.vars.declared(name)) &&
-        (module == null || eq(module.uri(), uri) || modules.contains(uri)))
+    // accept variable reference...
+    // - if a variable uses the module or an imported URI, or
+    // - if it is specified in the main module
+    if(module == null || eq(module.uri(), uri) || modules.contains(uri))
       return qc.vars.newRef(name, sc, ii);
 
     throw error(VARUNDEF_X, '$' + string(name.string()));

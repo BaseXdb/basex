@@ -852,8 +852,6 @@ public enum Err {
   JAVAAMBIG_X(XPST, 17, "Several implementations found for '%'."),
   /** XPST0017. */
   JAVAINIT_X(XPST, 17, "Class cannot be initialized: %."),
-  /** XPST0003. */
-  FUNC30(XPST, 17, "Function not available in XQuery 1.0."),
 
   /** XPST0051. */
   TYPEUNKNOWN_X(XPST, 51, "Unknown type: %."),
@@ -931,7 +929,7 @@ public enum Err {
   /** XQDY0044. */
   CAINV_(XQDY, 44, "Invalid attribute prefix/namespace: '%'."),
   /** XQDY0054. */
-  CIRCVAR30_X(XQDY, 54, "Static variable depends on itself: %"),
+  CIRCVAR_X(XQDY, 54, "Static variable depends on itself: %"),
   /** XQDY0054. */
   CIRCCTX(XQDY, 54, "Context value is not defined."),
   /** XQDY0064. */
@@ -999,8 +997,6 @@ public enum Err {
   VARDUPL_X(XQST, 49, "Duplicate declaration of static variable $%."),
   /** XQST0052. */
   TYPE30_X(XQST, 52, "Unknown cast type: %."),
-  /** XQST0054. */
-  CIRCVAR_X(XQST, 54, "Global variable depends on itself: %"),
   /** XQST0055. */
   DUPLCOPYNS(XQST, 55, "Duplicate 'copy-namespace' declaration."),
   /** XQST0057. */
@@ -1456,7 +1452,7 @@ public enum Err {
    * @return never
    */
   public static QueryException circVarError(final StaticVar var) {
-    return (var.sc.xquery3() ? CIRCVAR30_X : CIRCVAR_X).get(var.info, var);
+    return CIRCVAR_X.get(var.info, var);
   }
 
   /**

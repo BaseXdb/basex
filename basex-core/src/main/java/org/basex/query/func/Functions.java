@@ -239,7 +239,6 @@ public final class Functions extends TokenSet {
     // built-in functions
     final StandardFunc fun = get().get(name, args, sc, ii);
     if(fun != null) {
-      if(!sc.xquery3() && fun.has(Flag.X30)) throw FUNC30.get(ii);
       final Ann ann = new Ann();
       if(fun.func.has(Flag.UPD)) {
         ann.add(Ann.Q_UPDATING, Empty.SEQ, ii);

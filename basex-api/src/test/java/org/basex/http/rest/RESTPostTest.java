@@ -101,16 +101,16 @@ public final class RESTPostTest extends RESTTest {
   @Test
   public void postOption() throws IOException {
     assertEquals("2", post("", "<query xmlns=\"" + URI + "\">" +
-        "<text>switch(1) case 1 return 2 default return 3</text>" +
-        "<option name='" + MainOptions.XQUERY3.name() + "' value='true'/></query>", APP_XML));
+        "<text>2, delete node &lt;a/&gt;</text>" +
+        "<option name='" + MainOptions.MIXUPDATES.name() + "' value='true'/></query>", APP_XML));
 
     try {
       post("", "<query xmlns=\"" + URI + "\">" +
-        "<text>switch(1) case 1 return 2 default return 3</text>" +
-        "<option name='" + MainOptions.XQUERY3.name() + "' value='false'/></query>", APP_XML);
+          "<text>1, delete node &lt;a/&gt;</text>" +
+        "<option name='" + MainOptions.MIXUPDATES.name() + "' value='false'/></query>", APP_XML);
       fail("Error expected.");
     } catch(final IOException ex) {
-      assertContains(ex.getMessage(), "[XPST0003]");
+      assertContains(ex.getMessage(), "[XUST0001]");
     }
   }
 

@@ -34,7 +34,6 @@ public abstract class Expr extends ExprInfo {
     /** Non-deterministic. Example: random:double(). */      NDT,
     /** Focus-dependent. Example: position(). */             FCS,
     /** Performs updates. Example: insert expression. */     UPD,
-    /** XQuery 3.0 function. Example: has-children(). */     X30,
     /** Invokes user-supplied functions. Example: fold. */   HOF,
   }
 

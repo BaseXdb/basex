@@ -126,7 +126,7 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public boolean has(final Flag flag) {
-    return func.has(flag) || flag != Flag.X30 && flag != Flag.HOF && super.has(flag);
+    return func.has(flag) || flag != Flag.HOF && super.has(flag);
   }
 
   @Override
@@ -276,7 +276,7 @@ public abstract class StandardFunc extends Arr {
         if(it instanceof Str) {
           key = it.string(null);
         } else {
-          final QNm qnm = toQNm(it, sc, false);
+          final QNm qnm = toQNm(it, false);
           final TokenBuilder tb = new TokenBuilder();
           if(qnm.uri() != null) tb.add('{').add(qnm.uri()).add('}');
           key = tb.add(qnm.local()).finish();

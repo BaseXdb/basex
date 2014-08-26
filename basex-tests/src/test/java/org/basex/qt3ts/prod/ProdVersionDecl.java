@@ -13,7 +13,7 @@ import org.basex.tests.qt3ts.*;
 public class ProdVersionDecl extends QT3TestSet {
 
   /**
-   *  A simple version declaration including encoding. Since it's implementation defined how comments 
+   *  A simple version declaration including encoding. Since it's implementation defined how comments
    *         before the version declaration is handled, any error is allowed. .
    */
   @org.junit.Test
@@ -42,7 +42,6 @@ public class ProdVersionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void kVersionProlog2() {
-    xquery10();
     final XQuery query = new XQuery(
       "xquery version \"1.0\" ; 1 eq 1",
       ctx);
@@ -83,7 +82,6 @@ public class ProdVersionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void kVersionProlog3() {
-    xquery10();
     final XQuery query = new XQuery(
       "xquery version \"1.0\" encoding \"UTF-8 \"; 1",
       ctx);
@@ -124,7 +122,6 @@ public class ProdVersionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void kVersionProlog4() {
-    xquery10();
     final XQuery query = new XQuery(
       "xquery version \"1.0\" encoding \"ISO-8859-1|\"; 1",
       ctx);
@@ -165,7 +162,6 @@ public class ProdVersionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void kVersionProlog5() {
-    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "        xquery version \"1.0\" encoding \"ISO-8859-1\"; \n" +
@@ -272,7 +268,6 @@ public class ProdVersionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void k2VersionProlog3() {
-    xquery10();
     final XQuery query = new XQuery(
       "xquery version \"1.0\" default; 1",
       ctx);
@@ -353,7 +348,6 @@ public class ProdVersionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void versionDeclV1ProcessorAndV3Query() {
-    xquery10();
     final XQuery query = new XQuery(
       "xquery version \"3.0\"; <bib/>",
       ctx);
@@ -398,7 +392,6 @@ public class ProdVersionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void prologVersion1() {
-    xquery10();
     final XQuery query = new XQuery(
       "xquery version \"1.0\" encoding \"utf-8\"; 1,2",
       ctx);
@@ -439,7 +432,6 @@ public class ProdVersionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void prologVersion3() {
-    xquery10();
     final XQuery query = new XQuery(
       "xquery version \"1.0\" encoding \"US-ASCII\"; 1,2",
       ctx);
@@ -480,7 +472,6 @@ public class ProdVersionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void prologVersion4() {
-    xquery10();
     final XQuery query = new XQuery(
       "xquery version \"1.0\"; 1,2",
       ctx);
@@ -521,7 +512,6 @@ public class ProdVersionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void prologVersion5() {
-    xquery10();
     final XQuery query = new XQuery(
       "xquery version \"1.0\"; <bib/>",
       ctx);
@@ -562,7 +552,6 @@ public class ProdVersionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void prologVersion6() {
-    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "        xquery version '1.0'; \n" +
@@ -617,7 +606,6 @@ public class ProdVersionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void prologVersion7() {
-    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "        xquery version \"1.0\"; \n" +
@@ -668,7 +656,7 @@ public class ProdVersionDecl extends QT3TestSet {
   }
 
   /**
-   * 
+   *
    *          The production for VersionDecl includes the final Separator.
    *          Thus, a Comment occurring after the bulk of a VersionDecl but before the semicolon,
    *          still "occurs before the end of the version declaration".
@@ -784,7 +772,6 @@ public class ProdVersionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void versionDeclaration010() {
-    xquery10();
     final XQuery query = new XQuery(
       "xquery version \"1.0\" encoding \"999-UTF-8-*\"; \"ABC\"",
       ctx);
@@ -865,7 +852,6 @@ public class ProdVersionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void versionDeclaration022V1() {
-    xquery10();
     final XQuery query = new XQuery(
       "xquery encoding \"utf-8\" version \"1.0\"; 1",
       ctx);
@@ -906,7 +892,6 @@ public class ProdVersionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void versionDeclaration023V1() {
-    xquery10();
     final XQuery query = new XQuery(
       "xquery encoding \"utf-8\"; 1",
       ctx);

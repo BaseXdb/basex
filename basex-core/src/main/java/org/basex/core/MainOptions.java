@@ -102,8 +102,6 @@ public final class MainOptions extends Options {
 
   /** Detailed query information. */
   public static final BooleanOption QUERYINFO = new BooleanOption("QUERYINFO", false);
-  /** Default XQuery version. */
-  public static final BooleanOption XQUERY3 = new BooleanOption("XQUERY3", true);
   /** Flag for mixing updates and items. */
   public static final BooleanOption MIXUPDATES = new BooleanOption("MIXUPDATES", false);
   /** External variables, separated by commas. */
