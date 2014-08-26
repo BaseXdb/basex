@@ -288,19 +288,11 @@ public final class Array extends FItem {
     final StringBuilder tb = new StringBuilder().append("[");
     for(int a = 0; a < size; a++) {
       if(a != 0) tb.append(", ");
-      if(tb.length() > 16) {
-        tb.append("...");
-        break;
-      }
       final Value value = get(a);
       final long vs = value.size();
       if(vs != 1) tb.append('(');
       for(int i = 0; i < vs; i++) {
         if(i != 0) tb.append(", ");
-        if(tb.length() > 16) {
-          tb.append("...");
-          break;
-        }
         tb.append(value.itemAt(i).toString());
       }
       if(vs != 1) tb.append(')');

@@ -7,9 +7,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -43,7 +41,7 @@ public final class FnTrace extends StandardFunc {
 
   /**
    * Dumps the specified item.
-   * @param it item to be dumped
+   * @param it item to be dumped (may be {@code null})
    * @param label label
    * @param info input info
    * @param qc query context
@@ -55,12 +53,10 @@ public final class FnTrace extends StandardFunc {
       final byte[] value;
       if(it == null) {
         value = token(SeqType.EMP.toString());
-      } else if(it.type == NodeType.ATT || it.type == NodeType.NSP) {
+      } else if(it instanceof FuncItem) {
+        value = token((((FuncItem) it).expr).toString());
+      } else if(it instanceof FItem || it.type == NodeType.ATT || it.type == NodeType.NSP) {
         value = token(it.toString());
-      } else if(it instanceof Map) {
-        value = ((Map) it).serialize(info);
-      } else if(it instanceof Array) {
-        value = ((Array) it).serialize(info);
       } else {
         value = it.serialize(SerializerOptions.get(false)).finish();
       }
