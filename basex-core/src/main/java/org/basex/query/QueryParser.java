@@ -447,13 +447,13 @@ public class QueryParser extends InputParser {
     final QNm name = eQName(QNAME_X, XQURI);
 
     final ValueBuilder vb = new ValueBuilder();
-    if(wsConsumeWs(PAR1)) {
+    if(wsConsumeWs(PAREN1)) {
       do {
         final Expr ex = literal();
         if(!(ex instanceof Item)) throw error(ANNVALUE);
         vb.add((Item) ex);
       } while(wsConsumeWs(COMMA));
-      wsCheck(PAR2);
+      wsCheck(PAREN2);
     }
     skipWs();
     ann.add(name, vb.value(), info);
@@ -859,7 +859,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses an optional SeqType declaration.
-   * @return type if preceded by {@code as}, {@code null} otherwise
+   * @return type if preceded by {@code as} (may be {@code null})
    * @throws QueryException query exception
    */
   private SeqType optAsType() throws QueryException {
@@ -885,12 +885,12 @@ public class QueryParser extends InputParser {
     final InputInfo ii = info();
     final QNm name = eQName(FUNCNAME, sc.funcNS);
     if(sc.xquery3() && keyword(name)) throw error(RESERVED_X, name.local());
-    wsCheck(PAR1);
+    wsCheck(PAREN1);
     if(module != null && !eq(name.uri(), module.uri())) throw error(MODULENS_X, name);
 
     pushVarContext(null);
     final Var[] args = paramList();
-    wsCheck(PAR2);
+    wsCheck(PAREN2);
     final SeqType type = optAsType();
     if(ann.contains(Ann.Q_UPDATING)) qc.updating();
     final Expr expr = wsConsumeWs(EXTERNAL) ? null : enclosed(NOFUNBODY);
@@ -904,8 +904,7 @@ public class QueryParser extends InputParser {
    * @return result of check
    */
   private boolean keyword(final QNm name) {
-    return !name.hasPrefix() &&
-        (sc.xquery3() ? KEYWORDS30 : KEYWORDS10).contains(name.string());
+    return !name.hasPrefix() && (sc.xquery3() ? KEYWORDS30 : KEYWORDS10).contains(name.string());
   }
 
   /**
@@ -938,15 +937,15 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr enclosed(final Err err) throws QueryException {
-    wsCheck(BRACE1);
+    wsCheck(CURLY1);
     final Expr e = check(expr(), err);
-    wsCheck(BRACE2);
+    wsCheck(CURLY2);
     return e;
   }
 
   /**
    * Parses the "Expr" rule.
-   * @return query expression (can be {@code null})
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr expr() throws QueryException {
@@ -964,7 +963,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ExprSingle" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr single() throws QueryException {
@@ -991,7 +990,7 @@ public class QueryParser extends InputParser {
    * Parses the "OrderByClause" rule.
    * Parses the "OrderSpecList" rule.
    * Parses the "GroupByClause" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr flwor() throws QueryException {
@@ -1091,8 +1090,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private LinkedList<Clause> initialClause(final LinkedList<Clause> clauses)
-      throws QueryException {
+  private LinkedList<Clause> initialClause(final LinkedList<Clause> clauses) throws QueryException {
     LinkedList<Clause> cls = clauses;
     // ForClause / LetClause
     final boolean let = wsConsumeWs(LET, SCORE, NOLET) || wsConsumeWs(LET, DOLLAR, NOLET);
@@ -1280,8 +1278,7 @@ public class QueryParser extends InputParser {
 
       final Collation coll = wsConsumeWs(COLLATION) ? Collation.get(stringLiteral(),
           qc, sc, info(), FLWORCOLL_X) : sc.collation;
-      final GroupBy.Spec spec =
-          new GroupBy.Spec(ii, addVar(name, declType, false), by, coll);
+      final GroupBy.Spec spec = new GroupBy.Spec(ii, addVar(name, declType, false), by, coll);
       if(specs == null) {
         specs = new GroupBy.Spec[] { spec };
       } else {
@@ -1299,7 +1296,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "QuantifiedExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr quantified() throws QueryException {
@@ -1324,15 +1321,15 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "SwitchExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr switchh() throws QueryException {
-    if(!sc.xquery3() || !wsConsumeWs(SWITCH, PAR1, TYPEPAR)) return null;
-    wsCheck(PAR1);
+    if(!sc.xquery3() || !wsConsumeWs(SWITCH, PAREN1, TYPEPAR)) return null;
+    wsCheck(PAREN1);
     final Expr expr = check(expr(), NOSWITCH);
     SwitchCase[] exprs = { };
-    wsCheck(PAR2);
+    wsCheck(PAREN2);
 
     // collect all cases
     ExprList cases;
@@ -1354,14 +1351,14 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "TypeswitchExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr typeswitch() throws QueryException {
-    if(!wsConsumeWs(TYPESWITCH, PAR1, TYPEPAR)) return null;
-    wsCheck(PAR1);
+    if(!wsConsumeWs(TYPESWITCH, PAREN1, TYPEPAR)) return null;
+    wsCheck(PAREN1);
     final Expr ts = check(expr(), NOTYPESWITCH);
-    wsCheck(PAR2);
+    wsCheck(PAREN2);
 
     TypeCase[] cases = { };
     final ArrayList<SeqType> types = new ArrayList<>();
@@ -1395,14 +1392,14 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "IfExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr iff() throws QueryException {
-    if(!wsConsumeWs(IF, PAR1, IFPAR)) return null;
-    wsCheck(PAR1);
+    if(!wsConsumeWs(IF, PAREN1, IFPAR)) return null;
+    wsCheck(PAREN1);
     final Expr iff = check(expr(), NOIF);
-    wsCheck(PAR2);
+    wsCheck(PAREN2);
     if(!wsConsumeWs(THEN)) throw error(NOIF);
     final Expr thn = check(single(), NOIF);
     if(!wsConsumeWs(ELSE)) throw error(NOIF);
@@ -1412,14 +1409,14 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "OrExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr or() throws QueryException {
     final Expr e = and();
     if(!wsConsumeWs(OR)) return e;
 
-    final ExprList el = new ExprList(e);
+    final ExprList el = new ExprList(2).add(e);
     do add(el, and()); while(wsConsumeWs(OR));
     return new Or(info(), el.finish());
   }
@@ -1433,14 +1430,14 @@ public class QueryParser extends InputParser {
     final Expr e = update();
     if(!wsConsumeWs(AND)) return e;
 
-    final ExprList el = new ExprList(e);
+    final ExprList el = new ExprList(2).add(e);
     do add(el, update()); while(wsConsumeWs(AND));
     return new And(info(), el.finish());
   }
 
   /**
    * Parses the "UpdateExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr update() throws QueryException {
@@ -1459,7 +1456,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ComparisonExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr comparison() throws QueryException {
@@ -1477,7 +1474,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "FTContainsExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr ftContains() throws QueryException {
@@ -1503,7 +1500,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "StringConcatExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr stringConcat() throws QueryException {
@@ -1517,7 +1514,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "RangeExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr range() throws QueryException {
@@ -1528,7 +1525,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "AdditiveExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr additive() throws QueryException {
@@ -1543,7 +1540,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "MultiplicativeExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr multiplicative() throws QueryException {
@@ -1559,7 +1556,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "UnionExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr union() throws QueryException {
@@ -1585,7 +1582,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "IntersectExceptExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr intersect() throws QueryException {
@@ -1606,7 +1603,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "InstanceofExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr instanceoff() throws QueryException {
@@ -1618,7 +1615,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "TreatExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr treat() throws QueryException {
@@ -1630,7 +1627,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "CastableExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr castable() throws QueryException {
@@ -1642,7 +1639,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "CastExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr cast() throws QueryException {
@@ -1654,7 +1651,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "UnaryExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr unary() throws QueryException {
@@ -1676,7 +1673,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ValueExpr" rule.
-   * @return query expression, or {@code null}
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr value() throws QueryException {
@@ -1694,7 +1691,7 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(VALIDATE)) return;
 
     boolean brace = true;
-    if(consume(BRACE1)) {
+    if(consume(CURLY1)) {
       brace = false;
     } else if(consume(TYPE)) {
       final QNm qnm = eQName(QNAME_X, SKIPCHECK);
@@ -1704,15 +1701,15 @@ public class QueryParser extends InputParser {
       return;
     }
 
-    if(brace) wsCheck(BRACE1);
+    if(brace) wsCheck(CURLY1);
     check(single(), NOVALIDATE);
-    wsCheck(BRACE2);
+    wsCheck(CURLY2);
     throw error(IMPLVAL);
   }
 
   /**
    * Parses the "ExtensionExpr" rule.
-   * @return query expression, or {@code null}
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr extension() throws QueryException {
@@ -1724,7 +1721,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "Pragma" rule.
-   * @return array of pragmas
+   * @return array of pragmas (may be {@code null})
    * @throws QueryException query exception
    */
   private Pragma[] pragma() throws QueryException {
@@ -1758,7 +1755,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "MapExpr" rule.
-   * @return query expression, or {@code null}
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr map() throws QueryException {
@@ -1775,7 +1772,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "PathExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr path() throws QueryException {
@@ -1790,7 +1787,7 @@ public class QueryParser extends InputParser {
       if(consume('/')) {
         // two slashes: absolute descendant path
         checkAxis(Axis.DESC);
-        add(el, descOrSelf());
+        add(el, Step.get(info(), Axis.DESCORSELF, Test.NOD));
         mark();
         ex = step();
         if(ex == null) {
@@ -1832,7 +1829,7 @@ public class QueryParser extends InputParser {
     while(true) {
       if(consume('/')) {
         if(consume('/')) {
-          add(el, descOrSelf());
+          add(el, Step.get(info(), Axis.DESCORSELF, Test.NOD));
           checkAxis(Axis.DESC);
         } else {
           checkAxis(Axis.CHILD);
@@ -1845,14 +1842,6 @@ public class QueryParser extends InputParser {
       if(st == null) throw error(PATHMISS_X, found());
       add(el, st);
     }
-  }
-
-  /**
-   * Returns a standard descendant-or-self::node() step.
-   * @return step
-   */
-  private Step descOrSelf() {
-    return Step.get(info(), Axis.DESCORSELF, Test.NOD);
   }
 
   // methods for query suggestions
@@ -1886,7 +1875,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "StepExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr step() throws QueryException {
@@ -1896,7 +1885,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "AxisStep" rule.
-   * @return query expression
+   * @return step (may be {@code null})
    * @throws QueryException query exception
    */
   private Step axisStep() throws QueryException {
@@ -1940,10 +1929,10 @@ public class QueryParser extends InputParser {
     if(test == null) return null;
 
     final ExprList el = new ExprList();
-    while(wsConsume(BR1)) {
+    while(wsConsume(SQUARE1)) {
       checkPred(true);
       add(el, expr());
-      wsCheck(BR2);
+      wsCheck(SQUARE2);
       checkPred(false);
     }
     return Step.get(info(), ax, test, el.finish());
@@ -1955,7 +1944,7 @@ public class QueryParser extends InputParser {
    * Parses the "KindTest" rule.
    * @param att attribute flag
    * @param all check all tests, or only names
-   * @return query expression
+   * @return test (may be {@code null})
    * @throws QueryException query exception
    */
   private Test nodeTest(final boolean att, final boolean all) throws QueryException {
@@ -1980,7 +1969,7 @@ public class QueryParser extends InputParser {
     final QNm name = eQName(null, SKIPCHECK);
     if(name != null) {
       final int i2 = pos;
-      if(all && wsConsumeWs(PAR1)) {
+      if(all && wsConsumeWs(PAREN1)) {
         final NodeType type = NodeType.find(name);
         if(type != null) return kindTest(type);
       } else {
@@ -2004,25 +1993,26 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "FilterExpr" rule.
-   * Parses the "Predicate" rule.
-   * @return postfix expression
+   * Parses the "PostfixExpr" rule.
+   * @return postfix expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr postfix() throws QueryException {
     Expr e = primary(), old;
     do {
       old = e;
-      if(wsConsume(BR1)) {
+      if(wsConsume(SQUARE1)) {
+        // parses the "Predicate" rule
         if(e == null) throw error(PREDMISSING);
         final ExprList el = new ExprList();
         do {
           add(el, expr());
-          wsCheck(BR2);
-        } while(wsConsume(BR1));
+          wsCheck(SQUARE2);
+        } while(wsConsume(SQUARE1));
         e = Filter.get(info(), e, el.finish());
       } else if(e != null) {
-        if(!wsConsume(PAR1)) break;
+        // parses the "ArgumentList" rule
+        if(!wsConsume(PAREN1)) break;
 
         final InputInfo ii = info();
         final ExprList argList = new ExprList();
@@ -2047,7 +2037,7 @@ public class QueryParser extends InputParser {
    * Parses the "VarRef" rule.
    * Parses the "ContextItem" rule.
    * Parses the "Literal" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr primary() throws QueryException {
@@ -2074,20 +2064,25 @@ public class QueryParser extends InputParser {
     e = compConstructor();
     if(e != null) return e;
     // ordered expression
-    if(wsConsumeWs(ORDERED, BRACE1, INCOMPLETE) || wsConsumeWs(UNORDERED, BRACE1, INCOMPLETE))
+    if(wsConsumeWs(ORDERED, CURLY1, INCOMPLETE) || wsConsumeWs(UNORDERED, CURLY1, INCOMPLETE))
       return enclosed(NOENCLEXPR);
     // map (including legacy syntax)
-    if(wsConsumeWs(MAPSTR, BRACE1, INCOMPLETE) || curr('{')) return new CMap(info(), keyValues());
+    if(wsConsumeWs(MAPSTR, CURLY1, INCOMPLETE) || curr('{')) return new CMap(info(), keyValues());
     // square array constructor
-    if(wsConsumeWs(BR1)) return new CArray(info(), false, values());
+    if(wsConsumeWs(SQUARE1)) return new CArray(info(), false, values());
     // curly array constructor
-    if(wsConsumeWs(ARRAYSTR, BRACE1, INCOMPLETE)) {
-      wsCheck(BRACE1);
+    if(wsConsumeWs(ARRAYSTR, CURLY1, INCOMPLETE)) {
+      wsCheck(CURLY1);
       final Expr a = expr();
-      wsCheck(BRACE2);
+      wsCheck(CURLY2);
       return a == null ? new CArray(info(), true) : new CArray(info(), true, a);
     }
-
+    // unary lookup
+    // square array constructor
+    if(wsConsumeWs(QUESTION)) {
+      keySpecifier();
+      return Empty.SEQ;
+    }
     // context value
     if(c == '.' && !digit(next())) {
       if(next() == '.') return null;
@@ -2099,20 +2094,35 @@ public class QueryParser extends InputParser {
   }
 
   /**
+   * Parses the "KeySpecifier" rule.
+   * @throws QueryException query exception
+   */
+  private void keySpecifier() throws QueryException {
+    if(consume(ASTERISK)) {
+    } else if(curr('(')) {
+      parenthesized();
+    } else if(digit(curr())) {
+      numericLiteral(true);
+    } else {
+      ncName(KEYSPEC);
+    }
+  }
+
+  /**
    * Parses keys and values of maps.
    * @return map literals
    * @throws QueryException query exception
    */
   private Expr[] keyValues() throws QueryException {
-    wsCheck(BRACE1);
+    wsCheck(CURLY1);
     final ExprList el = new ExprList();
-    if(!wsConsume(BRACE2)) {
+    if(!wsConsume(CURLY2)) {
       do {
         add(el, check(single(), INVMAPKEY));
         if(!wsConsume(ASSIGN)) check(':');
         add(el, check(single(), INVMAPVAL));
       } while(wsConsume(COMMA));
-      wsCheck(BRACE2);
+      wsCheck(CURLY2);
     }
     return el.finish();
   }
@@ -2124,11 +2134,11 @@ public class QueryParser extends InputParser {
    */
   private Expr[] values() throws QueryException {
     final ExprList el = new ExprList();
-    if(!wsConsume(BR2)) {
+    if(!wsConsume(SQUARE2)) {
       do {
         add(el, check(single(), INVMAPVAL));
       } while(wsConsume(COMMA));
-      wsCheck(BR2);
+      wsCheck(SQUARE2);
     }
     return el.finish();
   }
@@ -2138,7 +2148,7 @@ public class QueryParser extends InputParser {
    * Parses the "NamedFunctionRef" rule.
    * Parses the "LiteralFunctionItem" rule.
    * Parses the "InlineFunction" rule.
-   * @return query expression, or {@code null}
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr functionItem() throws QueryException {
@@ -2148,14 +2158,14 @@ public class QueryParser extends InputParser {
     // parse annotations; will only be visited for XQuery 3.0 expressions
     final Ann ann = curr('%') ? annotations() : null;
     // inline function
-    if(wsConsume(FUNCTION) && wsConsume(PAR1)) {
+    if(wsConsume(FUNCTION) && wsConsume(PAREN1)) {
       if(ann != null) {
         if(ann.contains(Ann.Q_PRIVATE) || ann.contains(Ann.Q_PUBLIC)) throw error(INVISIBLE);
       }
       final HashMap<Var, Expr> nonLocal = new HashMap<>();
       pushVarContext(nonLocal);
       final Var[] args = paramList();
-      wsCheck(PAR2);
+      wsCheck(PAREN2);
       final SeqType type = optAsType();
       final Expr body = enclosed(NOFUNBODY);
       final VarScope scope = popVarContext();
@@ -2182,7 +2192,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "Literal" rule.
-   * @return query expression, or {@code null}
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr literal() throws QueryException {
@@ -2198,7 +2208,7 @@ public class QueryParser extends InputParser {
    * Parses the "DecimalLiteral" rule.
    * Parses the "IntegerLiteral" rule.
    * @param itr integer flag
-   * @return query expression
+   * @return numeric literal
    * @throws QueryException query exception
    */
   private Expr numericLiteral(final boolean itr) throws QueryException {
@@ -2227,8 +2237,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "DoubleLiteral" rule. Checks if a number is followed by a
-   * whitespace.
+   * Parses the "DoubleLiteral" rule. Checks if a number is followed by a whitespace.
    * @return expression
    * @throws QueryException query exception
    */
@@ -2286,7 +2295,7 @@ public class QueryParser extends InputParser {
   private byte[] bracedURILiteral() throws QueryException {
     tok.reset();
     while(!consume('}')) {
-      if(!more()) throw error(WRONGCHAR_X_X, BRACE2, found());
+      if(!more()) throw error(WRONGCHAR_X_X, CURLY2, found());
       entity(tok);
     }
     return tok.toArray();
@@ -2294,7 +2303,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "VarName" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private QNm varName() throws QueryException {
@@ -2309,9 +2318,9 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr parenthesized() throws QueryException {
-    wsCheck(PAR1);
+    wsCheck(PAREN1);
     final Expr e = expr();
-    wsCheck(PAR2);
+    wsCheck(PAREN2);
     return e == null ? Empty.SEQ : e;
   }
 
@@ -2324,7 +2333,7 @@ public class QueryParser extends InputParser {
     final int i = pos;
     final QNm name = eQName(null, sc.funcNS);
     if(name != null && !keyword(name)) {
-      if(wsConsume(PAR1)) {
+      if(wsConsume(PAREN1)) {
         final InputInfo ii = info();
         final ExprList argList = new ExprList();
         final int[] holes = argumentList(argList, name.string());
@@ -2363,7 +2372,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "ArgumentList" rule after the opening parenthesis was read.
+   * Parses the "ArgumentList" rule without the opening parenthesis.
    * @param args list to put the argument expressions into
    * @param name name of the function (item)
    * @return array of arguments, place-holders '?' are represented as {@code null} entries
@@ -2371,10 +2380,10 @@ public class QueryParser extends InputParser {
    */
   private int[] argumentList(final ExprList args, final Object name) throws QueryException {
     int[] holes = null;
-    if(!wsConsume(PAR2)) {
+    if(!wsConsume(PAREN2)) {
       int i = 0;
       do {
-        if(wsConsume(PLHOLDER)) {
+        if(wsConsume(QUESTION)) {
           holes = holes == null ? new int[] { i } : Array.add(holes, i);
         } else {
           final Expr e = single();
@@ -2383,7 +2392,7 @@ public class QueryParser extends InputParser {
         }
         i++;
       } while(wsConsume(COMMA));
-      if(!wsConsume(PAR2)) throw error(FUNCMISS_X, name);
+      if(!wsConsume(PAREN2)) throw error(FUNCMISS_X, name);
     }
     return holes;
   }
@@ -2583,7 +2592,7 @@ public class QueryParser extends InputParser {
    * Returns a string item.
    * @param tb token builder
    * @param strip strip flag
-   * @return text or {@code null}
+   * @return string item (may be {@code null})
    */
   private Str text(final TokenBuilder tb, final boolean strip) {
     final byte[] t = tb.toArray();
@@ -2681,7 +2690,7 @@ public class QueryParser extends InputParser {
    * Consumes the specified expression or resets the query position.
    * @param expr expression
    * @param p query position
-   * @return expression or {@code null}
+   * @return expression (may be {@code null})
    */
   private Expr consume(final Expr expr, final int p) {
     if(expr == null) pos = p;
@@ -2694,9 +2703,9 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compDoc() throws QueryException {
-    if(!wsConsume(BRACE1)) return null;
+    if(!wsConsume(CURLY1)) return null;
     final Expr e = check(expr(), NODOCCONS);
-    wsCheck(BRACE2);
+    wsCheck(CURLY2);
     return new CDoc(sc, info(), e);
   }
 
@@ -2715,14 +2724,14 @@ public class QueryParser extends InputParser {
       name = qn;
       names.add(new QNmCheck(qn));
     } else {
-      if(!wsConsume(BRACE1)) return null;
+      if(!wsConsume(CURLY1)) return null;
       name = check(expr(), NOELEMNAME);
-      wsCheck(BRACE2);
+      wsCheck(CURLY2);
     }
 
-    if(!wsConsume(BRACE1)) return null;
+    if(!wsConsume(CURLY1)) return null;
     final Expr e = expr();
-    wsCheck(BRACE2);
+    wsCheck(CURLY2);
     return new CElem(sc, info(), name, null, e == null ? new Expr[0] : new Expr[] { e });
   }
 
@@ -2740,14 +2749,14 @@ public class QueryParser extends InputParser {
       name = qn;
       names.add(new QNmCheck(qn, false));
     } else {
-      if(!wsConsume(BRACE1)) return null;
+      if(!wsConsume(CURLY1)) return null;
       name = check(expr(), NOATTNAME);
-      wsCheck(BRACE2);
+      wsCheck(CURLY2);
     }
 
-    if(!wsConsume(BRACE1)) return null;
+    if(!wsConsume(CURLY1)) return null;
     final Expr e = expr();
-    wsCheck(BRACE2);
+    wsCheck(CURLY2);
     return new CAttr(sc, info(), true, name, e == null ? Empty.SEQ : e);
   }
 
@@ -2763,16 +2772,16 @@ public class QueryParser extends InputParser {
     final Expr name;
     final byte[] str = ncName(null);
     if(str.length == 0) {
-      if(!wsConsume(BRACE1)) return null;
+      if(!wsConsume(CURLY1)) return null;
       name = check(expr(), NSWRONG);
-      wsCheck(BRACE2);
+      wsCheck(CURLY2);
     } else {
       name = Str.get(str);
     }
 
-    if(!wsConsume(BRACE1)) return null;
+    if(!wsConsume(CURLY1)) return null;
     final Expr e = expr();
-    wsCheck(BRACE2);
+    wsCheck(CURLY2);
     return new CNSpace(sc, info(), name, e == null ? Empty.SEQ : e);
   }
 
@@ -2782,9 +2791,9 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compText() throws QueryException {
-    if(!wsConsume(BRACE1)) return null;
+    if(!wsConsume(CURLY1)) return null;
     final Expr e = check(expr(), NOTXTCONS);
-    wsCheck(BRACE2);
+    wsCheck(CURLY2);
     return new CTxt(sc, info(), e);
   }
 
@@ -2794,9 +2803,9 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compComment() throws QueryException {
-    if(!wsConsume(BRACE1)) return null;
+    if(!wsConsume(CURLY1)) return null;
     final Expr e = check(expr(), NOCOMCONS);
-    wsCheck(BRACE2);
+    wsCheck(CURLY2);
     return new CComm(sc, info(), e);
   }
 
@@ -2811,16 +2820,16 @@ public class QueryParser extends InputParser {
     final Expr name;
     final byte[] str = ncName(null);
     if(str.length == 0) {
-      if(!wsConsume(BRACE1)) return null;
+      if(!wsConsume(CURLY1)) return null;
       name = check(expr(), PIWRONG);
-      wsCheck(BRACE2);
+      wsCheck(CURLY2);
     } else {
       name = Str.get(str);
     }
 
-    if(!wsConsume(BRACE1)) return null;
+    if(!wsConsume(CURLY1)) return null;
     final Expr e = expr();
-    wsCheck(BRACE2);
+    wsCheck(CURLY2);
     return new CPI(sc, info(), name, e == null ? Empty.SEQ : e);
   }
 
@@ -2836,7 +2845,7 @@ public class QueryParser extends InputParser {
     if(t == null) {
       t = AtomType.find(name, false);
       if(t == null) {
-        if(wsConsume(PAR1)) throw error(SIMPLETYPE_X, name);
+        if(wsConsume(PAREN1)) throw error(SIMPLETYPE_X, name);
         if(sc.xquery3()) {
           if(!AtomType.AST.name.eq(name)) throw error(TYPE30_X, name.prefixId(XML));
           t = AtomType.AST;
@@ -2860,9 +2869,9 @@ public class QueryParser extends InputParser {
    */
   private SeqType sequenceType() throws QueryException {
     // empty sequence
-    if(wsConsumeWs(EMPTY_SEQUENCE, PAR1, null)) {
-      wsCheck(PAR1);
-      wsCheck(PAR2);
+    if(wsConsumeWs(EMPTY_SEQUENCE, PAREN1, null)) {
+      wsCheck(PAREN1);
+      wsCheck(PAREN2);
       return SeqType.get(AtomType.ITEM, Occ.ZERO);
     }
 
@@ -2885,9 +2894,9 @@ public class QueryParser extends InputParser {
     skipWs();
 
     // parenthesized item type
-    if(consume(PAR1)) {
+    if(consume(PAREN1)) {
       final SeqType ret = itemType();
-      wsCheck(PAR2);
+      wsCheck(PAREN2);
       return ret;
     }
 
@@ -2901,7 +2910,7 @@ public class QueryParser extends InputParser {
     // item type
     Type t = null;
     if(func) {
-      consume(PAR1);
+      consume(PAREN1);
       // item type
       if(name.eq(AtomType.ITEM.name)) t = AtomType.ITEM;
       // node types
@@ -2926,10 +2935,10 @@ public class QueryParser extends InputParser {
     if(ann != null) throw error(NOANN);
 
     // atomic value, or closing parenthesis
-    if(!func || wsConsume(PAR2)) return t.seqType();
+    if(!func || wsConsume(PAREN2)) return t.seqType();
 
     // raise error if type different to node is not finalized by a parenthesis
-    if(!(t instanceof NodeType)) wsCheck(PAR2);
+    if(!(t instanceof NodeType)) wsCheck(PAREN2);
 
     // return type with an optional kind test for node types
     return SeqType.get(t, Occ.ONE, kindTest((NodeType) t));
@@ -2945,7 +2954,7 @@ public class QueryParser extends InputParser {
   private Type functionTest(final Ann ann, final Type t) throws QueryException {
     // wildcard
     if(wsConsume(ASTERISK)) {
-      wsCheck(PAR2);
+      wsCheck(PAREN2);
       return t;
     }
 
@@ -2955,22 +2964,22 @@ public class QueryParser extends InputParser {
       if(!key.instanceOf(AtomType.AAT)) throw error(MAPTAAT_X, key);
       wsCheck(COMMA);
       final MapType tp = MapType.get((AtomType) key, sequenceType());
-      wsCheck(PAR2);
+      wsCheck(PAREN2);
       return tp;
     }
     // array
     if(t instanceof ArrayType) {
       final ArrayType tp = ArrayType.get(sequenceType());
-      wsCheck(PAR2);
+      wsCheck(PAREN2);
       return tp;
     }
     // function type
     SeqType[] args = { };
-    if(!wsConsume(PAR2)) {
+    if(!wsConsume(PAREN2)) {
       // function has got arguments
       do args = Array.add(args, sequenceType());
       while(wsConsume(COMMA));
-      wsCheck(PAR2);
+      wsCheck(PAREN2);
     }
     wsCheck(AS);
     final SeqType st = sequenceType();
@@ -2994,7 +3003,7 @@ public class QueryParser extends InputParser {
       case SCA: tp = schemaTest(); break;
       default:  break;
     }
-    wsCheck(PAR2);
+    wsCheck(PAREN2);
     if(tp != null) return tp;
     tp = Test.get(t);
     if(tp == Test.NSP && !sc.xquery3()) throw error(NSNOTALL);
@@ -3010,10 +3019,10 @@ public class QueryParser extends InputParser {
     final boolean elem = consume(ELEMENT);
     if(!elem && !consume(SCHEMA_ELEMENT)) return null;
 
-    wsCheck(PAR1);
+    wsCheck(PAREN1);
     skipWs();
     final Test t = elem ? elementTest() : schemaTest();
-    wsCheck(PAR2);
+    wsCheck(PAREN2);
     return new DocTest(t != null ? t : Test.ELM);
   }
 
@@ -3034,7 +3043,7 @@ public class QueryParser extends InputParser {
       if(type == null) type = AtomType.find(tn, true);
       if(type == null) throw error(TYPEUNDEF_X, tn);
       // parse optional question mark
-      wsConsume(PLHOLDER);
+      wsConsume(QUESTION);
     }
     return new NodeTest(NodeType.ELM, name, type, sc.strip);
   }
@@ -3090,7 +3099,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "TryCatch" rules.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr tryCatch() throws QueryException {
@@ -3270,15 +3279,15 @@ public class QueryParser extends InputParser {
   private FTExpr ftPrimary(final boolean prg) throws QueryException {
     final Pragma[] pragmas = pragma();
     if(pragmas != null) {
-      wsCheck(BRACE1);
+      wsCheck(CURLY1);
       final FTExpr e = ftSelection(true);
-      wsCheck(BRACE2);
+      wsCheck(CURLY2);
       return new FTExtensionSelection(info(), pragmas, e);
     }
 
-    if(wsConsumeWs(PAR1)) {
+    if(wsConsumeWs(PAREN1)) {
       final FTExpr e = ftSelection(false);
-      wsCheck(PAR2);
+      wsCheck(PAREN2);
       return e;
     }
 
@@ -3412,11 +3421,11 @@ public class QueryParser extends InputParser {
         if(opt.th != null) throw error(FTDUP_X, THESAURUS);
         opt.th = new ThesQuery();
         if(using) {
-          final boolean par = wsConsume(PAR1);
+          final boolean par = wsConsume(PAREN1);
           if(!wsConsumeWs(DEFAULT)) ftThesaurusID(opt.th);
           while(par && wsConsume(COMMA))
             ftThesaurusID(opt.th);
-          if(par) wsCheck(PAR2);
+          if(par) wsCheck(PAREN2);
         }
       } else if(wsConsumeWs(STOP)) {
         // add union/except
@@ -3430,13 +3439,13 @@ public class QueryParser extends InputParser {
           boolean union = false;
           boolean except = false;
           while(using) {
-            if(wsConsume(PAR1)) {
+            if(wsConsume(PAREN1)) {
               do {
                 final byte[] sl = stringLiteral();
                 if(except) opt.sw.delete(sl);
                 else if(!union || !opt.sw.contains(sl)) opt.sw.add(sl);
               } while(wsConsume(COMMA));
-              wsCheck(PAR2);
+              wsCheck(PAREN2);
             } else if(wsConsumeWs(AT)) {
               final String fn = string(stringLiteral());
               // optional: resolve URI reference
@@ -3492,7 +3501,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "InsertExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr insert() throws QueryException {
@@ -3526,7 +3535,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "DeleteExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr deletee() throws QueryException {
@@ -3541,7 +3550,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "RenameExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr rename() throws QueryException {
@@ -3560,7 +3569,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ReplaceExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr replace() throws QueryException {
@@ -3585,7 +3594,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "TransformExpr" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr transform() throws QueryException {
@@ -3612,24 +3621,24 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "UpdatingFunctionCall" rule.
-   * @return query expression
+   * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
   private Expr updatingFunctionCall() throws QueryException {
     final int p = pos;
     if(wsConsumeWs(UPDATING)) {
       final Expr func = primary();
-      if(wsConsume(PAR1)) {
+      if(wsConsume(PAREN1)) {
         final InputInfo ii = info();
         final ExprList argList = new ExprList();
 
-        if(!wsConsume(PAR2)) {
+        if(!wsConsume(PAREN2)) {
           do {
             final Expr e = single();
             if(e == null) throw error(FUNCMISS_X, func);
             argList.add(e);
           } while(wsConsume(COMMA));
-          if(!wsConsume(PAR2)) throw error(FUNCMISS_X, func);
+          if(!wsConsume(PAREN2)) throw error(FUNCMISS_X, func);
         }
         qc.updating();
         return new DynFuncCall(ii, sc, true, func, argList.finish());
@@ -3658,7 +3667,7 @@ public class QueryParser extends InputParser {
    *   or ignored if set to {@code null}
    * @param def default namespace, or operation mode
    *   ({@link #URICHECK}, {@link #SKIPCHECK})
-   * @return string
+   * @return QName (may be {@code null})
    * @throws QueryException query exception
    */
   private QNm eQName(final Err err, final byte[] def) throws QueryException {
@@ -3701,7 +3710,7 @@ public class QueryParser extends InputParser {
    * Parses the "QName" rule.
    * @param err optional error message. Will be thrown if no QName is found, and
    *   ignored if set to {@code null}
-   * @return string
+   * @return QName string
    * @throws QueryException query exception
    */
   private byte[] qName(final Err err) throws QueryException {
@@ -3804,7 +3813,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Raises an error if the specified expression is empty.
+   * Raises an error if the specified expression is {@code null}.
    * @param <E> expression type
    * @param expr expression
    * @param err error message
@@ -3826,8 +3835,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Skips whitespaces, raises an error if the specified string cannot be
-   * consumed.
+   * Skips whitespaces, raises an error if the specified string cannot be consumed.
    * @param s string to be found
    * @throws QueryException query exception
    */
@@ -3847,10 +3855,10 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Resolves a local variable reference.
+   * Tries to resolve a local variable reference.
    * @param name variable name
    * @param ii input info
-   * @return variable reference if the variable was found, {@code null} otherwise
+   * @return variable reference (may be {@code null})
    */
   private VarRef resolveLocalVar(final QNm name, final InputInfo ii) {
     int i = localVars.size();
