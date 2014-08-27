@@ -33,5 +33,9 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Stephan/Dropbox/BaProjekt/Neuer Ordner/lucene_tika_jar/lucene-analyzers-common-4.9.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Stephan/Dropbox/BaProjekt/Neuer Ordner/lucene_tika_jar/lucene-core-4.9.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Stephan/Dropbox/BaProjekt/Neuer Ordner/lucene_tika_jar/lucene-demo-4.9.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Stephan/Dropbox/BaProjekt/Neuer Ordner/lucene_tika_jar/lucene-queryparser-4.9.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
