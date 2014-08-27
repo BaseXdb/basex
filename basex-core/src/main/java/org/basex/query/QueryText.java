@@ -346,6 +346,8 @@ public interface QueryText {
   /** Parser token. */
   String DF_GRP = "grouping-separator";
   /** Parser token. */
+  String DF_EXP = "exponent-separator";
+  /** Parser token. */
   String DF_INF = "infinity";
   /** Parser token. */
   String DF_MIN = "minus-sign";
@@ -372,7 +374,7 @@ public interface QueryText {
 
   /** Decimal declarations. */
   byte[][] DECFORMATS = tokens(
-    DF_DEC, DF_DIG, DF_GRP, DF_INF, DF_MIN, DF_NAN, DF_PAT, DF_PC, DF_PM, DF_ZG
+    DF_DEC, DF_DIG, DF_GRP, DF_EXP, DF_INF, DF_MIN, DF_NAN, DF_PAT, DF_PC, DF_PM, DF_ZG
   );
 
   /** Parser token. */

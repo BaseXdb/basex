@@ -71,6 +71,7 @@ public final class FNFormatNumTest extends QueryTest {
       { "formnum 280", strings("123,45,6"), "format-number(123456, '#,##,#')" },
       { "formnum 290", strings("1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"),
         "format-number(xs:decimal('11111111111111111111'), '#,#')" },
+      { "formnum 300", strings("12.346e2"), "format-number(1234.5678, '00.000e0')" },
 
       // http://www.w3schools.com/XSL/func_formatnumber.asp
       { "formnum w3-10", strings("500100"), "format-number(500100, '#')" },
