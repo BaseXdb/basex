@@ -1,4 +1,4 @@
-package org.basex.query.func;
+package org.basex.query.func.fn;
 
 import org.basex.query.*;
 
@@ -8,7 +8,7 @@ import org.basex.query.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FNFormatIntTest extends QueryTest {
+public final class FnFormatIntTest extends QueryTest {
   /** Constructor. */
   static {
     queries = new Object[][] {
