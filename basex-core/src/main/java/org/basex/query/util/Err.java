@@ -542,6 +542,9 @@ public enum Err {
   /** FORG0008. */
   FUNZONE_X_X(FORG, 8, "% and % have different timezones."),
 
+  /** FORG0010. */
+  IETF_X_X_X(FORG, 10, "Invalid input (% expected, '%' found): '%'."),
+
   /** FORX0001. */
   REGMOD_X(FORX, 1, "Invalid regular modifier: '%'."),
   /** FORX0002. */

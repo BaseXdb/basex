@@ -27,11 +27,11 @@ public class InputParser {
 
   /**
    * Constructor.
-   * @param in input
+   * @param input input
    */
-  public InputParser(final String in) {
-    input = in;
-    length = in.length();
+  public InputParser(final String input) {
+    this.input = input;
+    length = input.length();
   }
 
   /**
