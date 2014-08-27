@@ -66,6 +66,34 @@ public final class FnTest extends AdvancedQueryTest {
     query("fn:parse-ietf-date('Wed Jun 06 11:54:45 EST 0090')", "0090-06-06T11:54:45-05:00");
     query("fn:parse-ietf-date('Sunday, 06-Nov-94 08:49:37 GMT')", "1994-11-06T08:49:37Z");
     query("fn:parse-ietf-date('Wed, 6 Jun 94 07:29:35 +0500')", "1994-06-06T07:29:35+05:00");
-    error("fn:parse-ietf-date('Wed, 99 Jun 94 07:29:35 +0500')", DATEFORMAT_X_X_X);
+    query("fn:parse-ietf-date(' 1 Nov 1234 05:06:07.89 gmt')", "1234-11-01T05:06:07.89Z");
+
+    query("fn:parse-ietf-date(' 01-feb-3456 07:08:09 GMT')", "3456-02-01T07:08:09Z");
+    query("fn:parse-ietf-date(' 01-FEB-3456 07:08:09 GMT')", "3456-02-01T07:08:09Z");
+    query("fn:parse-ietf-date('Wed, 06 Jun 94 07:29:35 +0000 (GMT)')", "1994-06-06T07:29:35Z");
+    query("fn:parse-ietf-date('Wed, 06 Jun 94 07:29:35')", "1994-06-06T07:29:35Z");
+
+    String s = "Wed, Jan-01 07:29:35 GMT 19";
+    query("fn:parse-ietf-date('" + s + "')", "1919-01-01T07:29:35Z");
+    for(int i = s.length(); --i >= 0;) {
+      error("fn:parse-ietf-date('" + s.substring(0, i) + "')", IETF_PARSE_X_X_X);
+    }
+
+    s = "Wed, 06 Jun 1994 07:29";
+    query("fn:parse-ietf-date('" + s + "')", "1994-06-06T07:29:00Z");
+    for(int i = s.length(); --i >= 0;) {
+      error("fn:parse-ietf-date('" + s.substring(0, i) + "')", IETF_PARSE_X_X_X);
+    }
+    error("fn:parse-ietf-date('" + s + "X')", IETF_PARSE_X_X_X);
+
+    error("fn:parse-ietf-date('Wed, 99 Jun 94 07:29:35 +0000 (')", IETF_PARSE_X_X_X);
+    error("fn:parse-ietf-date('Wed, 99 Jun 94 07:29:35 +0000 (GT)')", IETF_PARSE_X_X_X);
+    error("fn:parse-ietf-date('Wed, 99 Jun 94 07:29:35 +0000 (GMT')", IETF_PARSE_X_X_X);
+
+    error("fn:parse-ietf-date('Wed, 99 Jun 94 07:29:35. GMT')", IETF_PARSE_X_X_X);
+    error("fn:parse-ietf-date('Wed, 99 Jun 94 07:29:35 0500')", IETF_PARSE_X_X_X);
+    error("fn:parse-ietf-date('Wed, 99 Jun 94 07:29:35 +5')", IETF_PARSE_X_X_X);
+    error("fn:parse-ietf-date('Wed, 99 Jun 94 07:29:35 -050')", IETF_PARSE_X_X_X);
+    error("fn:parse-ietf-date('Wed, 99 Jun 94 07:29:35 +0500')", IETF_INIT_X);
   }
 }
