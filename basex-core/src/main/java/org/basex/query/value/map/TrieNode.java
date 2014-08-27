@@ -1,8 +1,9 @@
 package org.basex.query.value.map;
 
 import org.basex.query.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -236,7 +237,7 @@ abstract class TrieNode {
    */
   static boolean deep(final Value a, final Value b, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return a.size() == b.size() && new DeepCompare(ii).collation(coll).equal(a, b);
+    return a.size() == b.size() && new Compare(ii).collation(coll).equal(a, b);
   }
 
   /**

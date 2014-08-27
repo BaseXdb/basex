@@ -6,7 +6,7 @@ import static org.basex.query.util.Err.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 

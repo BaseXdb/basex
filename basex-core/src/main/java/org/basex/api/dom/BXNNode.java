@@ -1,6 +1,6 @@
 package org.basex.api.dom;
 
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.util.*;
 import org.w3c.dom.*;
 

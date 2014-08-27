@@ -4,9 +4,8 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
-import org.basex.query.util.unit.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -48,7 +47,7 @@ public final class FNUnit extends StandardFunc {
   private Item assertEquals(final QueryContext qc) throws QueryException {
     final Item it = exprs.length < 3 ? null : toItem(exprs[2], qc);
     final Iter iter1 = qc.iter(exprs[0]), iter2 = qc.iter(exprs[1]);
-    final DeepCompare comp = new DeepCompare(info);
+    final Compare comp = new Compare(info);
     Item it1, it2;
     int c = 1;
     while(true) {

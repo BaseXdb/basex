@@ -5,8 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.util.*;
-import org.basex.query.util.DeepCompare.Mode;
+import org.basex.query.func.fn.Compare.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -19,7 +18,7 @@ import org.basex.util.*;
 public final class FnDeepEqualOpt extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final DeepCompare cmp = new DeepCompare(info);
+    final Compare cmp = new Compare(info);
     final Mode[] modes = Mode.values();
     if(exprs.length == 3) {
       for(final Item it : exprs[2].atomValue(qc, info)) {

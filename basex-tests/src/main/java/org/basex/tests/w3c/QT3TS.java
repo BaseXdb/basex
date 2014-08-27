@@ -18,7 +18,7 @@ import org.basex.io.serial.*;
 import org.basex.io.serial.SerializerOptions.YesNo;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.util.DeepCompare.Mode;
+import org.basex.query.func.fn.Compare.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.tests.bxapi.*;

@@ -1,7 +1,7 @@
 package org.basex.query.expr.path;
 
 import org.basex.query.expr.*;
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.util.*;
 
 /**

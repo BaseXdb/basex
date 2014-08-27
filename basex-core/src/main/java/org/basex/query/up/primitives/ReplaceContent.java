@@ -1,7 +1,7 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.*;
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.util.*;
 
 /**

@@ -5,8 +5,11 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -255,7 +258,7 @@ public final class Array extends FItem {
       if(size != o.size) return false;
       for(int a = 0; a < size; a++) {
         final Value v1 = get(a), v2 = o.get(a);
-        if(v1.size() != v2.size() || !new DeepCompare(ii).collation(coll).equal(v1, v2))
+        if(v1.size() != v2.size() || !new Compare(ii).collation(coll).equal(v1, v2))
           return false;
       }
       return true;

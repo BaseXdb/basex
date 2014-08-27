@@ -16,11 +16,11 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.func.fn.*;
+import org.basex.query.func.http.*;
+import org.basex.query.func.http.HTTPRequest.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.util.Err.ErrType;
-import org.basex.query.util.http.*;
-import org.basex.query.util.http.HTTPRequest.Part;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -693,7 +693,7 @@ public class FnHttpTest extends HTTPTest {
     resultIter.add(Str.get(".... fanciest formatted version of same  message  goes  here\n...\n"));
 
     // Compare response with expected result
-    if(!new DeepCompare().equal(resultIter, expIter)) {
+    if(!new Compare().equal(resultIter, expIter)) {
       final TokenBuilder exp = new TokenBuilder();
       for(final Item it : expIter) exp.add("- ").add(it.toString()).add('\n');
       final TokenBuilder res = new TokenBuilder();
@@ -785,7 +785,7 @@ public class FnHttpTest extends HTTPTest {
         + "It DOES end with a linebreak.\n\n"));
 
     // Compare response with expected result
-    if(!new DeepCompare().equal(resultIter, expIter)) {
+    if(!new Compare().equal(resultIter, expIter)) {
       final TokenBuilder exp = new TokenBuilder();
       for(final Item it : expIter) exp.add(it.toString()).add('\n');
       final TokenBuilder res = new TokenBuilder();

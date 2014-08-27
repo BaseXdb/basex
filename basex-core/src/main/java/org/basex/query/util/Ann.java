@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -79,7 +80,7 @@ public final class Ann extends ElementList {
   public boolean contains(final QNm k, final Value v) {
     try {
       for(int i = 0; i < size; ++i) {
-        if(names[i].eq(k) && new DeepCompare().equal(v, values[i])) return true;
+        if(names[i].eq(k) && new Compare().equal(v, values[i])) return true;
       }
       return false;
     } catch(final QueryException e) {
@@ -131,7 +132,7 @@ public final class Ann extends ElementList {
       final Value val = values[i];
       try {
         for(int j = 0; j < ann.size; j++) {
-          if(name.eq(ann.names[j]) && new DeepCompare().equal(val, ann.values[j]))
+          if(name.eq(ann.names[j]) && new Compare().equal(val, ann.values[j]))
             o.add(name, val, infos[i]);
         }
       } catch(final QueryException ex) {

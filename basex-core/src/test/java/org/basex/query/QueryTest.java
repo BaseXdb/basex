@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.query.util.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -40,7 +40,7 @@ public abstract class QueryTest extends SandboxTest {
       final QueryProcessor qp = new QueryProcessor(query, context);
       try {
         final Value val = qp.value();
-        if(!correct || !new DeepCompare().equal(val, cmp)) {
+        if(!correct || !new Compare().equal(val, cmp)) {
           sb.append("[" + qu[0] + "] " + query);
           String s = correct && cmp.size() != 1 ? "#" + cmp.size() : "";
           sb.append("\n[E" + s + "] ");

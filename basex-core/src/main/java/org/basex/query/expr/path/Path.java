@@ -15,6 +15,7 @@ import org.basex.query.expr.Context;
 import org.basex.query.expr.List;
 import org.basex.query.expr.path.Test.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;

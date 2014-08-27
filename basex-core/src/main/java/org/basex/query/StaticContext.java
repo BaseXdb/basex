@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;

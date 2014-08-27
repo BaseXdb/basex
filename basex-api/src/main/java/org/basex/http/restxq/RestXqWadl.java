@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.regex.*;
 
 import org.basex.http.*;
-import org.basex.query.util.inspect.*;
+import org.basex.query.func.inspect.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;

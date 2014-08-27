@@ -3,7 +3,7 @@ package org.basex.tests.bxapi.xdm;
 import javax.xml.namespace.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -86,7 +86,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    */
   public boolean deepEqual(final XdmValue value) {
     try {
-      return new DeepCompare().equal(internal(), value.internal());
+      return new Compare().equal(internal(), value.internal());
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }

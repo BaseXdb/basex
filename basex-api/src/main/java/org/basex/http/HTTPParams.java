@@ -10,8 +10,8 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.func.http.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.http.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 
