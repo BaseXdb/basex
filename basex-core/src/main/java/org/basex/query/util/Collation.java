@@ -7,10 +7,12 @@ import static org.basex.util.Token.*;
 import java.text.*;
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.options.*;
 
 /**
  * This class organizes collations.
@@ -20,26 +22,13 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class Collation {
+  /** UCA collations. */
+  private static final byte[] UCA = token("http://www.w3.org/2013/collation/UCA");
   /** Implementation-defined collation URL. */
   private static final byte[] URL = token(Prop.URL + "/collation");
-  /** Available locales, indexed by language code. */
-  private static final HashMap<String, Locale> LOCALES = new HashMap<>();
-  /** Strengths. */
-  private static final byte[][] STRENGTHS = tokens(
-    "primary", "secondary", "tertiary", "identical");
-  /** Decompositions. */
-  private static final byte[][] DECOMPOSITIONS = tokens("none", "full", "standard");
-  /** Language string. */
-  private static final byte[] LANG = token("lang");
-  /** Strength string. */
-  private static final byte[] STRENGTH = token("strength");
-  /** Decomposition string. */
-  private static final byte[] DECOMPOSITION = token("decomposition");
 
-  static {
-    for(final Locale l : Locale.getAvailableLocales())
-      LOCALES.put(l.toString().replace('_', '-'), l);
-  }
+  /** Available locales, indexed by language code. */
+  private static HashMap<String, Locale> locales;
 
   /** Collator. */
   private final Collator coll;
@@ -72,69 +61,86 @@ public final class Collation {
     // return default collation
     if(uri == null) return sc.collation;
 
-    byte[] args = uri;
-    final Uri u = Uri.uri(args);
-    if(!u.isValid()) throw INVURI_X.get(info, args);
-    if(!u.isAbsolute() && !Token.startsWith(args, '?')) {
-      args = sc.baseURI().resolve(u, info).string();
+    byte[] url = uri;
+    final Uri u = Uri.uri(url);
+    if(!u.isValid()) throw INVURI_X.get(info, url);
+    if(!u.isAbsolute()) {
+      if(Token.startsWith(url, '?')) {
+        url = concat(URL, url);
+      } else {
+        url = sc.baseURI().resolve(u, info).string();
+      }
     }
     // return unicode point collation
-    if(eq(COLLATIONURI, args)) return null;
-
-    // normalize arguments
-    if(Token.startsWith(args, URL)) args = substring(args, URL.length);
-    if(Token.startsWith(args, '?')) args = substring(args, 1);
-    args = replace(args, '&', ';');
+    if(eq(COLLATIONURI, url)) return null;
 
     // create new collation or return cached instance
-    final byte[] full = new TokenBuilder(URL).add('?').add(args).finish();
     if(qc.collations == null) qc.collations = new TokenObjMap<>();
-    Collation coll = qc.collations.get(full);
+    Collation coll = qc.collations.get(url);
     if(coll == null) {
-      final Collator cl = get(args);
-      if(cl == null) throw err.get(info, uri);
-      coll = new Collation(cl, full);
-      qc.collations.put(full, coll);
+      final Collator cl = get(url, info, err);
+      if(cl == null) return null;
+      coll = new Collation(get(url, info, err), url);
+      qc.collations.put(url, coll);
     }
     return coll;
   }
 
   /**
    * Returns a collator instance for the specified uri.
-   * @param args arguments
+   * @param uri uri
+   * @param info input info
+   * @param err error code for unknown collation uris
    * @return collator instance or {@code null} if uri is invalid.
+   * @throws QueryException query exception
    */
-  private static Collator get(final byte[] args) {
-    Locale locale = Locale.getDefault();
-    int strngth = -1;
-    int dcmpstn = -1;
-    for(final byte[] param : split(args, ';')) {
-      final byte[][] kv = split(param, '=');
+  private static Collator get(final byte[] uri, final InputInfo info, final Err err)
+      throws QueryException {
+
+    final int q = Token.indexOf(uri, '?');
+    final byte[] base = q == -1 ? uri : substring(uri, 0, q);
+    final String args = q == -1 ? "" : string(replace(substring(uri, q + 1), '&', ';'));
+
+    final Options opts;
+    final boolean uca = eq(UCA, base);
+    if(uca) {
+      opts = new UCAOptions();
+    } else if(eq(URL, base)) {
+      opts = new CollationOptions();
+    } else {
+      throw err.get(info, uri);
+    }
+
+    final boolean nomercy = !uca || args.contains("fallback=no");
+    for(final String param : args.split(";")) {
+      final String[] kv = param.split("=");
       if(kv.length != 2) return null;
-      final byte[] key = kv[0];
-      final byte[] val = kv[1];
-      if(eq(key, LANG)) {
-        locale = LOCALES.get(string(val));
-        if(locale == null) return null;
-      } else if(eq(key, STRENGTH)) {
-        final int ss = STRENGTHS.length;
-        int s = -1;
-        while(++s < ss && !eq(val, STRENGTHS[s]));
-        if(s == ss) return null;
-        strngth = s;
-      } else if(eq(key, DECOMPOSITION)) {
-        final int ss = DECOMPOSITIONS.length;
-        int s = -1;
-        while(++s < ss && !eq(val, DECOMPOSITIONS[s]));
-        if(s == ss) return null;
-        dcmpstn = s;
-      } else {
-        return null;
+      final String key = kv[0], val = kv[1];
+      try {
+        opts.assign(key, val);
+      } catch(final BaseXException ex) {
+        if(nomercy || key.equals(UCAOptions.FALLBACK.name())) throw err.get(info, uri);;
       }
     }
+    if(uca) {
+      if(nomercy) throw err.get(info, uri);
+      return null;
+    }
+
+    if(locales == null) {
+      // initializes locales
+      locales = new HashMap<>();
+      for(final Locale l : Locale.getAvailableLocales())
+        locales.put(l.toString().replace('_', '-'), l);
+    }
+    final Locale locale = locales.get(opts.get(CollationOptions.LANG));
+    if(locale == null) throw err.get(info, uri);
+
     final Collator coll = Collator.getInstance(locale);
-    if(strngth != -1) coll.setStrength(strngth);
-    if(dcmpstn != -1) coll.setDecomposition(dcmpstn);
+    if(opts.contains(CollationOptions.STRENGTH))
+      coll.setStrength(opts.get(CollationOptions.STRENGTH).value);
+    if(opts.contains(CollationOptions.DECOMPOSITION))
+      coll.setDecomposition(opts.get(CollationOptions.DECOMPOSITION).value);
     return coll;
   }
 

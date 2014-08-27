@@ -54,7 +54,7 @@ public class JsonOptions extends Options {
 
     @Override
     public String toString() {
-      return super.toString().toLowerCase(Locale.ENGLISH);
+      return name().toLowerCase(Locale.ENGLISH);
     }
   }
 

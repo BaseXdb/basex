@@ -1,5 +1,8 @@
 package org.basex.query;
 
+import static org.basex.query.util.Err.*;
+
+import org.basex.query.util.CollationOptions.Strength;
 import org.junit.*;
 
 /**
@@ -15,15 +18,14 @@ public class CollationTest extends AdvancedQueryTest {
   private static final String COLLATION = "http://basex.org/collation?" + ARGS;
   /** Default collation used in the tests. */
   private static final String PROLOG = "declare default collation '" + COLLATION + "'; ";
-  /** Strengths. */
-  private static final String[] STRENGTHS = { "primary", "secondary", "tertiary", "identical" };
 
   /** Checks the German collation and different strengths. */
   @Test
   public void german() {
-    for(int s = 0; s < STRENGTHS.length; s++) {
+    for(final Strength strength : Strength.values()) {
+      final int s = strength.ordinal();
       final String prolog = "declare default collation " +
-          "'http://basex.org/collation?lang=de;strength=" + STRENGTHS[s] + "'; ";
+          "'http://basex.org/collation?lang=de;strength=" + strength + "'; ";
       query(prolog + "'A'     ='A'      ", true);
       query(prolog + "'\u00c4'='A\u0308'", s < 3);
       query(prolog + "'A'     ='a'      ", s < 2);
@@ -32,6 +34,15 @@ public class CollationTest extends AdvancedQueryTest {
 
       query(prolog + "count(('A', '\u00c4')[. >= 'A' and . <= 'B']) eq 2", true);
     }
+  }
+
+  /** Tests errors. */
+  @Test
+  public void errors() {
+    error("compare('a', 'b', 'http://basex.org/collation?unknown=value')", WHICHCOLL_X);
+    error("compare('a', 'b', 'http://basex.org/collation?strength=unknown')", WHICHCOLL_X);
+    error("compare('a', 'b', 'http://basex.org/collation?decomposition=unknown')", WHICHCOLL_X);
+    error("compare('a', 'b', 'http://basex.org/collation?lang=unknown')", WHICHCOLL_X);
   }
 
   /** Tests operators. */
