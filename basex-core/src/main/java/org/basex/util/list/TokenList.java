@@ -53,6 +53,15 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   }
 
   /**
+   * Lightweight constructor, assigning the specified array.
+   * @param elements initial array
+   */
+  public TokenList(final byte[]... elements) {
+    list = elements;
+    size = elements.length;
+  }
+
+  /**
    * Adds an element.
    * @param element element to be added
    * @return self reference

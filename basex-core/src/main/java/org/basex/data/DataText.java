@@ -105,6 +105,8 @@ public interface DataText {
   String DATASWL = "swl";
   /** Database - Updating flag. */
   String DATAUPD = "upd";
+  /** Database - Document path index. */
+  String DATADOC = "pth";
 
   // XML SERIALIZATION ============================================================================
 

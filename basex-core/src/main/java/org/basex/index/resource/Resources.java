@@ -61,7 +61,6 @@ public final class Resources implements Index {
 
   @Override
   public synchronized void init() {
-    docs.init();
   }
 
   /**
@@ -121,12 +120,12 @@ public final class Resources implements Index {
   }
 
   /**
-   * Returns the pre value of the node that matches the specified path, or {@code -1}.
+   * Returns the pre value of the document node that matches the specified path, or {@code -1}.
    * @param path input path
-   * @return pre value
+   * @return pre value, or {@code -1}
    */
   public int doc(final String path) {
-    return docs.doc(path, true);
+    return docs.doc(path);
   }
 
   /**

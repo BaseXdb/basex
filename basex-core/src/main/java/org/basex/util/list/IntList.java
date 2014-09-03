@@ -154,7 +154,7 @@ public class IntList extends ElementList {
    * @param diff difference
    * @param index index of the first element
    */
-  public final void move(final int diff, final int index) {
+  public final void incFrom(final int diff, final int index) {
     final int[] lst = list;
     final int sz = size;
     for(int a = index; a < sz; a++) lst[a] += diff;

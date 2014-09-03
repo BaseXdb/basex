@@ -88,7 +88,6 @@ public final class Optimize extends ACreate {
     final MetaData md = data.meta;
     if(!md.uptodate) {
       data.paths.init();
-      data.resources.init();
       data.elemNames.init();
       data.attrNames.init();
       md.dirty = true;

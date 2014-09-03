@@ -1,5 +1,6 @@
 package org.basex.index.resource;
 
+import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -37,13 +38,17 @@ final class Docs {
   /** Ordered path indexes (may be {@code null}).
    * This variable should always be requested via {@link #order()}. */
   private int[] pathOrder;
+  /** Dirty flag. */
+  private boolean dirty;
+  /** Indicates if a path index is available. */
+  private boolean pathIndex;
 
   /**
    * Constructor.
-   * @param d data reference
+   * @param data data reference
    */
-  Docs(final Data d) {
-    data = d;
+  Docs(final Data data) {
+    this.data = data;
   }
 
   /**
@@ -53,6 +58,7 @@ final class Docs {
    */
   synchronized void read(final DataInput in) throws IOException {
     docList = in.readDiffs();
+    pathIndex = data.meta.dbfile(DATADOC).exists();
   }
 
   /**
@@ -62,16 +68,15 @@ final class Docs {
    */
   void write(final DataOutput out) throws IOException {
     out.writeDiffs(docs());
-  }
-
-  /**
-   * Initializes the document index. Currently, will only be called if the database is
-   * optimized, and the resource index will be rebuilt.
-   */
-  synchronized void init() {
-    docList = null;
-    pathList = null;
-    docs();
+    if(dirty && pathIndex) {
+      // write paths
+      try(final DataOutput doc = new DataOutput(data.meta.dbfile(DATADOC))) {
+        final TokenList paths = paths();
+        doc.writeNum(paths.size());
+        for(final byte[] path : paths) doc.writeToken(path);
+      }
+      dirty = false;
+    }
   }
 
   /**
@@ -87,7 +92,7 @@ final class Docs {
         if(k == Data.DOC) il.add(i);
         i += data.size(i, k);
       }
-      data.meta.dirty = true;
+      update();
       docList = il;
     }
     return docList;
@@ -98,14 +103,25 @@ final class Docs {
    * @return document paths (internal representation!)
    */
   private synchronized TokenList paths() {
+    if(pathList == null && pathIndex) {
+      // try to read paths from disk
+      try(final DataInput in = new DataInput(data.meta.dbfile(DATADOC))) {
+        pathList = new TokenList(in.readTokens());
+      } catch(final IOException ignore) { }
+    }
+
+    // generate paths
     if(pathList == null) {
+      // paths have not been stored to disk yet; scan table
       final IntList docs = docs();
       final int ds = docs.size();
       final TokenList paths = new TokenList(ds);
       for(int d = 0; d < ds; d++) {
         paths.add(normalize(data.text(docs.get(d), true)));
       }
+      pathIndex = true;
       pathList = paths;
+      update();
     }
     return pathList;
   }
@@ -115,9 +131,7 @@ final class Docs {
    * @return path order (internal representation!)
    */
   private synchronized int[] order() {
-    if(pathOrder == null) {
-      pathOrder = Array.createOrder(paths().toArray(), false, true);
-    }
+    if(pathOrder == null) pathOrder = Array.createOrder(paths().toArray(), false, true);
     return pathOrder;
   }
 
@@ -136,24 +150,27 @@ final class Docs {
       dpre += src.size(dpre, k);
     }
     final int[] pres = il.finish();
-
-    // insert DOC nodes and move pre values of following DOC nodes
     final int ps = pres.length;
-    final IntList docs = docs();
-    final TokenList paths = paths();
 
+    // find insertion offset
+    final IntList docs = docs();
     int i = docs.sortedIndexOf(pre);
     if(i < 0) i = -i - 1;
-    docs.insert(i, pres);
-    docs.move(clip.size(), i + ps);
 
-    final byte[][] t = new byte[ps][];
-    for(int j = 0; j < t.length; j++) {
-      // subtract pre to retrieve paths from given data instance
-      t[j] = normalize(src.text(pres[j] - pre, true));
+    // insert paths from given data instance
+    if(pathIndex) {
+      final TokenList paths = paths();
+      final byte[][] tmp = new byte[ps][];
+      for(int t = 0; t < ps; t++) tmp[t] = normalize(clip.data.text(pres[t] - pre, true));
+      paths.insert(i, tmp);
     }
-    paths.insert(i, t);
-    pathOrder = null;
+
+    // insert pre values
+    docs.insert(i, pres);
+    // adjust pre values of following document nodes
+    docs.incFrom(clip.size(), i + ps);
+
+    update();
   }
 
   /**
@@ -162,18 +179,19 @@ final class Docs {
    * @param size number of deleted nodes
    */
   void delete(final int pre, final int size) {
+    // find insertion offset
     final IntList docs = docs();
-    final TokenList paths = paths();
+    int doc = docs.sortedIndexOf(pre);
 
-    int i = docs.sortedIndexOf(pre);
-    final boolean found = i >= 0;
-    if(i < 0) i = -i - 1;
-    else docs.deleteAt(i);
-    docs.move(-size, i);
+    // pre value points to a document node...
+    if(doc >= 0) {
+      if(pathIndex) paths().deleteAt(doc);
+      docs.deleteAt(doc);
+    }
 
-    if(!found) return;
-    paths.deleteAt(i);
-    pathOrder = null;
+    // adjust pre values of following document nodes
+    docs.incFrom(-size, doc < 0 ? -doc - 1 : doc);
+    update();
   }
 
   /**
@@ -182,10 +200,8 @@ final class Docs {
    * @param value new name
    */
   void rename(final int pre, final byte[] value) {
-    final IntList docs = docs();
-    final TokenList paths = paths();
-    paths.set(docs.sortedIndexOf(pre), normalize(value));
-    pathOrder = null;
+    if(pathIndex) paths().set(docs().sortedIndexOf(pre), normalize(value));
+    update();
   }
 
   /**
@@ -197,6 +213,15 @@ final class Docs {
   void replace(final int pre, final int size, final DataClip clip) {
     delete(pre, size);
     insert(pre, clip);
+  }
+
+  /**
+   * Notifies the meta structures of an update and invalidates the indexes.
+   */
+  private synchronized void update() {
+    pathOrder = null;
+    data.meta.dirty = true;
+    dirty = true;
   }
 
   /**
@@ -215,8 +240,7 @@ final class Docs {
     if(pth.isEmpty()) return docs;
 
     // normalize paths
-    byte[] exct = EMPTY;
-    byte[] pref = normalize(token(pth));
+    byte[] exct = EMPTY, pref = normalize(token(pth));
     // check for explicit directory indicator
     if(!pth.endsWith("/")) {
       exct = pref;
@@ -225,47 +249,25 @@ final class Docs {
 
     // relevant paths: exact hits and prefixes
     final IntList il = new IntList();
-    /* could be optimized for future access by sorting the paths first
-     * and then accessing only the relevant paths. Sorting might slow down
-     * bulk operations like insert/delete/replace though. */
     final TokenList paths = paths();
-    for(int p = 0; p < paths.size(); p++) {
-      final byte[] b = paths.get(p);
-      if(eq(b, exct) || !exact && startsWith(b, pref)) il.add(docs.get(p));
+    final int ps = paths.size();
+    for(int p = 0; p < ps; p++) {
+      final byte[] pt = paths.get(p);
+      if(eq(pt, exct) || !exact && startsWith(pt, pref)) il.add(docs.get(p));
     }
     return il.sort();
   }
 
   /**
-   * Returns the pre value of the document node matching the specified path.
-   * Exact match! Document paths can be sorted for faster future access or
-   * sorting can be disabled as it slows down bulk inserts/deletes/replaces.
+   * Returns the pre value of a document node that matches the specified path.
    * @param path input path
-   * @param sort sort paths before access
-   * @return pre value of document node
+   * @return pre value of document node, or {@code -1}
    */
-  synchronized int doc(final String path, final boolean sort) {
+  synchronized int doc(final String path) {
     // invalid or empty path, or no documents: return -1
     final String pth = MetaData.normPath(path);
-    if(pth == null || pth.isEmpty()) return -1;
-
-    // normalize paths
-    final byte[] exct = normalize(token(pth));
-
-    // relevant paths: exact match
-    final IntList docs = docs();
-    final TokenList paths = paths();
-    final int ts = paths.size();
-
-    if(sort) {
-      final int[] order = order();
-      final int p = find(exct);
-      return p > -1 && p < ts && eq(paths.get(order[p]), exct) ? docs.get(order[p]) : -1;
-    }
-    for(int t = 0; t < ts; t++) {
-      if(eq(paths.get(t), exct)) return docs.get(t);
-    }
-    return -1;
+    // find path; return -1 if path is empty or does not exist
+    return pth == null || pth.isEmpty() ? -1 : Math.max(-1, find(normalize(token(pth))));
   }
 
   /**
@@ -308,28 +310,23 @@ final class Docs {
   }
 
   /**
-   * Returns the first position matching the specified path
-   * (might equal the array size).
-   * @param v value to be found
-   * @return position
+   * Returns the pre value of the addressed resource.
+   * @param path path to be found
+   * @return pre value, or {@code -1}
    */
-  private int find(final byte[] v) {
+  private int find(final byte[] path) {
     // binary search
     final TokenList paths = paths();
-    final int[] po = pathOrder;
-    int l = 0, h = po.length - 1;
+    final int[] order = order();
+    int l = 0, h = order.length - 1;
     while(l <= h) {
       int m = l + h >>> 1;
-      final int c = diff(paths.get(po[m]), v);
-      if(c == 0) {
-        // find first entry
-        while(m > 0 && eq(paths.get(po[m - 1]), v)) --m;
-        return m;
-      }
+      final int c = diff(paths.get(order[m]), path);
+      if(c == 0) return docs().get(m);
       if(c < 0) l = m + 1;
       else h = m - 1;
     }
-    return l;
+    return -1;
   }
 
   /**
