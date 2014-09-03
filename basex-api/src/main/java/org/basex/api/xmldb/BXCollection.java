@@ -170,7 +170,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
     // document exists - delete old one first
     final Resource old = getResource(id);
-    if(old != null) removeResource(getResource(id));
+    if(old != null) removeResource(old);
 
     // create parser, dependent on input type
     final Object cont = xml.content;
