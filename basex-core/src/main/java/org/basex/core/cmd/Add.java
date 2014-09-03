@@ -121,7 +121,7 @@ public final class Add extends ACreate {
       } else {
         build = new MemBuilder(name, parser);
       }
-      clip = new DataClip(build.build());
+      clip = build.dataClip();
       return true;
     } catch(final IOException ex) {
       return error(Util.message(ex));

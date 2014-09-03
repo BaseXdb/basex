@@ -8,6 +8,7 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.data.atomic.*;
 import org.basex.index.name.*;
 import org.basex.index.path.*;
 import org.basex.io.*;
@@ -196,6 +197,13 @@ public abstract class Builder extends Proc {
    * @throws IOException I/O exception
    */
   public abstract Data build() throws IOException;
+
+  /**
+   * Returns a data clip with the parsed input.
+   * @return data data clip
+   * @throws IOException I/O exception
+   */
+  public abstract DataClip dataClip() throws IOException;
 
   /**
    * Closes open references.

@@ -71,7 +71,7 @@ public final class MemData extends Data {
   }
 
   /**
-   * Finishes build process.
+   * Finishes the build process.
    */
   public void finish() {
     values(true).finish();

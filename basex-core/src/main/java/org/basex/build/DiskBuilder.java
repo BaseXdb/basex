@@ -8,6 +8,7 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
+import org.basex.data.atomic.*;
 import org.basex.index.name.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
@@ -61,11 +62,8 @@ public final class DiskBuilder extends Builder implements AutoCloseable {
 
   @Override
   public DiskData build() throws IOException {
-    final IO file = parser.src;
     final MetaData md = new MetaData(dbname, context);
-    md.original = file != null ? file.path() : "";
-    md.filesize = file != null ? file.length() : 0;
-    md.time = file != null ? file.timeStamp() : System.currentTimeMillis();
+    md.assign(parser);
     md.dirty = true;
 
     // calculate optimized output buffer sizes to reduce disk fragmentation
@@ -117,6 +115,11 @@ public final class DiskBuilder extends Builder implements AutoCloseable {
       Util.debug(ex);
     }
     if(meta != null) DropDB.drop(meta.name, context);
+  }
+
+  @Override
+  public DataClip dataClip() throws IOException {
+    return new DataClip(build());
   }
 
   @Override

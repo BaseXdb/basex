@@ -129,10 +129,11 @@ final class Docs {
   void insert(final int pre, final DataClip clip) {
     // find all document nodes in the given data instance
     final IntList il = new IntList();
+    final Data src = clip.data;
     for(int dpre = clip.start; dpre < clip.end;) {
-      final int k = clip.data.kind(dpre);
+      final int k = src.kind(dpre);
       if(k == Data.DOC) il.add(pre + dpre);
-      dpre += clip.data.size(dpre, k);
+      dpre += src.size(dpre, k);
     }
     final int[] pres = il.finish();
 
@@ -149,7 +150,7 @@ final class Docs {
     final byte[][] t = new byte[ps][];
     for(int j = 0; j < t.length; j++) {
       // subtract pre to retrieve paths from given data instance
-      t[j] = normalize(clip.data.text(pres[j] - pre, true));
+      t[j] = normalize(src.text(pres[j] - pre, true));
     }
     paths.insert(i, t);
     pathOrder = null;

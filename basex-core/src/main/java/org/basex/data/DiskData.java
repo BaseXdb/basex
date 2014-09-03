@@ -217,21 +217,26 @@ public final class DiskData extends Data {
   @Override
   public void startUpdate() throws IOException {
     if(!table.lock(true)) throw new BaseXException(Text.DB_PINNED_X, meta.name);
-    final IOFile uf = updateFile();
-    if(uf.exists()) throw new BaseXException(Text.DB_UPDATED_X, meta.name);
-    if(!uf.touch()) throw Util.notExpected("Database '%': could not create lock file.", meta.name);
+    if(meta.options.get(MainOptions.AUTOFLUSH)) {
+      final IOFile uf = updateFile();
+      if(uf.exists()) throw new BaseXException(Text.DB_UPDATED_X, meta.name);
+      if(!uf.touch()) throw Util.notExpected("%: could not create lock file.", meta.name);
+    }
   }
 
   @Override
   public synchronized void finishUpdate() {
     // remove updating file
-    final IOFile uf = updateFile();
-    if(!uf.exists()) throw Util.notExpected("Database '%': lock file does not exist.", meta.name);
-    if(!uf.delete()) throw Util.notExpected("Database '%': could not delete lock file.", meta.name);
+    final boolean auto = meta.options.get(MainOptions.AUTOFLUSH);
+    if(auto) {
+      final IOFile uf = updateFile();
+      if(!uf.exists()) throw Util.notExpected("%: lock file does not exist.", meta.name);
+      if(!uf.delete()) throw Util.notExpected("%: could not delete lock file.", meta.name);
+    }
 
     // db:optimize(..., true) will close the database before this function is called
     if(!closed) {
-      flush(meta.options.get(MainOptions.AUTOFLUSH));
+      flush(auto);
       if(!table.lock(false)) throw Util.notExpected("Database '%': could not unlock.", meta.name);
     }
   }

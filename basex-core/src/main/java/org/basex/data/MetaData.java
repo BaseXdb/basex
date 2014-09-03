@@ -375,6 +375,17 @@ public final class MetaData {
     ftxtindex = false;
   }
 
+  /**
+   * Assigns parser information.
+   * @param parser parser
+   */
+  public void assign(final Parser parser) {
+    final IO file = parser.src;
+    original = file != null ? file.path() : "";
+    filesize = file != null ? file.length() : 0;
+    time = file != null ? file.timeStamp() : System.currentTimeMillis();
+  }
+
   // PRIVATE METHODS ==========================================================
 
   /**

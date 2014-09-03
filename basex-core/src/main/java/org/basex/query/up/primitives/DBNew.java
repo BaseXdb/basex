@@ -79,9 +79,8 @@ final class DBNew {
     // add input
     final IOFile dbpath = ctx.globalopts.dbpath(string(ni.dbname));
     try {
-      final Parser p = new DirParser(ni.io, ctx, dbpath).target(string(ni.path));
-      final MemBuilder b = new MemBuilder(dbname, p);
-      return new DataClip(b.build());
+      final Parser parser = new DirParser(ni.io, ctx, dbpath).target(string(ni.path));
+      return new MemBuilder(dbname, parser).dataClip();
     } catch(final IOException ex) {
       throw IOERR_X.get(info, ex);
     }
