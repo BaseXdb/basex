@@ -32,7 +32,7 @@ final class TreeNodeCache implements TreeConstants {
     for(int i = 0; i < rs; ++i) {
       final int root = roots.get(i);
       alil.get(0).add(root);
-      final int sh = i + 1 == roots.size() ? ts : roots.get(i + 1);
+      final int sh = i + 1 == rs ? ts : roots.get(i + 1);
       for(int p = root + 1; p < sh; ++p) {
         final int k = data.kind(p);
         if(!atts && k == Data.ATTR) continue;
