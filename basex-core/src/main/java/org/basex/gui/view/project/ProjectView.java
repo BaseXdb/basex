@@ -249,8 +249,8 @@ public final class ProjectView extends BaseXPanel {
     final IOFile dir3 = dir2.resolve(gopts.get(GlobalOptions.RESTXQPATH));
     final StringList sl = new StringList();
     for(final IOFile f : new IOFile[] { dir1, dir2, dir3}) {
-      final String p = f.normalize().parent().path();
-      if(!sl.contains(p)) sl.add(p);
+      final IOFile p = f.normalize().parent();
+      if(p != null && !sl.contains(p.path())) sl.add(p.path());
     }
     return sl.sort().unique().get(0);
   }
