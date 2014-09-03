@@ -1,5 +1,8 @@
 package org.basex.query.value.seq;
 
+import static org.basex.query.QueryText.*;
+import static org.basex.query.func.Function.*;
+
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -79,6 +82,20 @@ public final class DBNodeSeq extends NativeSeq {
     final ValueBuilder vb = new ValueBuilder((int) size);
     for(int s = 0; s < size; s++) vb.add(itemAt(s).atomValue(ii));
     return vb.value();
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(PAREN1);
+    for(int i = 0; i < size; ++i) {
+      sb.append(i == 0 ? "" : SEP);
+      sb.append(_DB_OPEN_PRE.args(data.meta.name, pres[i]));
+      if(sb.length() <= 16 || i + 1 == size) continue;
+      // output is chopped to prevent too long error strings
+      sb.append(SEP).append(DOTS);
+      break;
+    }
+    return sb.append(PAREN2).toString();
   }
 
   // STATIC METHODS =====================================================================
