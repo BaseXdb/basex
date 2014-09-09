@@ -67,11 +67,11 @@ final class DialogUser extends BaseXBack {
     layout(new TableLayout(7, 1, 0, 4)).border(8);
 
     user = new BaseXTextField("", dia);
-    BaseXLayout.setWidth(user, 100);
+    user.setColumns(13);
     create = new BaseXButton(CREATE, dia);
     pass = new BaseXPassword(dia);
+    pass.setColumns(13);
 
-    BaseXLayout.setWidth(pass, 100);
     alter = new BaseXButton(S_ALTER, dia);
     drop = new BaseXButton(DROP + DOTS, dia);
     info = new BaseXLabel(" ");

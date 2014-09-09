@@ -53,9 +53,9 @@ final class DialogEditorPrefs extends BaseXBack {
     auto = new BaseXCheckBox(AUTO_ADD_CHARS, GUIOptions.AUTO, gopts, d);
     saverun = new BaseXCheckBox(SAVE_BEFORE_EXECUTE, GUIOptions.SAVERUN, gopts, d);
     files = new BaseXTextField(GUIOptions.FILES, gopts, d);
-    BaseXLayout.setWidth(margin, 30);
-    BaseXLayout.setWidth(indent, 30);
-    BaseXLayout.setWidth(files, 150);
+    margin.setColumns(4);
+    indent.setColumns(3);
+    files.setColumns(18);
 
     BaseXBack p = new BaseXBack().layout(new TableLayout(8, 1));
     p.add(new BaseXLabel(VIEW + COL, true, true));

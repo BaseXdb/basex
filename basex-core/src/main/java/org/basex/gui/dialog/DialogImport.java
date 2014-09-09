@@ -94,7 +94,7 @@ final class DialogImport extends BaseXBack {
     parsers.setSelectedItem(opts.get(MainOptions.PARSER).name());
 
     filter = new BaseXTextField(opts.get(MainOptions.CREATEFILTER), dial);
-    BaseXLayout.setWidth(filter, 200);
+    filter.setColumns(30);
 
     addRaw = new BaseXCheckBox(ADD_RAW_FILES, MainOptions.ADDRAW, opts, dial);
     skipCorrupt = new BaseXCheckBox(SKIP_CORRUPT_FILES, MainOptions.SKIPCORRUPT, opts, dial);

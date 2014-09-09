@@ -89,7 +89,7 @@ public final class DialogExport extends BaseXDialog {
     method.setSelectedItem(sopts.get(SerializerOptions.METHOD).name());
 
     mparams = new BaseXTextField(this);
-    BaseXLayout.setWidth(mparams, BaseXTextField.DWIDTH * 2 / 3);
+    mparams.setColumns(24);
 
     final BaseXBack mth = new BaseXBack(new TableLayout(1, 2, 8, 0));
     mth.add(method);

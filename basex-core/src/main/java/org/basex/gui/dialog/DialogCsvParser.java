@@ -77,8 +77,8 @@ final class DialogCsvParser extends DialogParser {
       seps.setSelectedIndex(sa.length);
     }
     sepchar = new BaseXTextField(s, d);
+    sepchar.setColumns(2);
     sep.add(sepchar);
-    BaseXLayout.setWidth(sepchar, 35);
 
     p.add(new BaseXLabel(SEPARATOR, true, true));
     p.add(sep);
