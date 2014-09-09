@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
-import javax.swing.border.*;
 import javax.swing.tree.*;
 
 /**
@@ -22,6 +21,7 @@ public class BaseXTree extends JTree {
   public BaseXTree(final DefaultMutableTreeNode root, final Window w) {
     super(root);
     BaseXLayout.addInteraction(this, w);
+    setLargeModel(true);
     addMouseListener(new MouseAdapter() {
       @Override
       public void mousePressed(final MouseEvent e) {
@@ -40,7 +40,7 @@ public class BaseXTree extends JTree {
    * @return self reference
    */
   public BaseXTree border(final int t, final int l, final int b, final int r) {
-    setBorder(new EmptyBorder(t, l, b, r));
+    setBorder(BaseXLayout.border(t, l, b, r));
     return this;
   }
 }

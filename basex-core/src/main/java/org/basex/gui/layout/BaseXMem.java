@@ -28,7 +28,7 @@ public final class BaseXMem extends BaseXPanel {
   public BaseXMem(final Window win, final boolean mouse) {
     super(win);
     BaseXLayout.setWidth(this, DWIDTH);
-    BaseXLayout.setHeight(this, getFont().getSize() + 6);
+    setPreferredSize(new Dimension(getPreferredSize().width, getFont().getSize() + 6));
     if(mouse) {
       setCursor(CURSORHAND);
       addMouseListener(this);

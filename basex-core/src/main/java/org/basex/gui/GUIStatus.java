@@ -23,7 +23,7 @@ public final class GUIStatus extends BaseXPanel {
    */
   GUIStatus(final AGUI main) {
     super(main);
-    BaseXLayout.setHeight(this, getFont().getSize() + 6);
+    setPreferredSize(new Dimension(getPreferredSize().width, (int) (getFont().getSize() * 1.5)));
     addMouseListener(this);
     addMouseMotionListener(this);
 

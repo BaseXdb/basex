@@ -17,9 +17,9 @@ import org.basex.util.options.*;
  */
 public final class BaseXSlider extends BaseXPanel {
   /** Default width of slider. */
-  private static final int DWIDTH = 120;
-  /** Slider width. */
-  private static final double SLIDERW = 20;
+  private static final int DWIDTH = (int) (GUIConstants.SCALE * 120);
+  /** Width of slider mover. */
+  private static final double SLIDERW = (int) (GUIConstants.SCALE * 20);
   /** Listener. */
   private final BaseXDialog dialog;
   /** Minimum slider value. */
@@ -69,7 +69,7 @@ public final class BaseXSlider extends BaseXPanel {
     dialog = w instanceof BaseXDialog ? (BaseXDialog) w : null;
     mode(Fill.NONE).setFocusable(true);
 
-    setPreferredSize(new Dimension(DWIDTH, getFont().getSize() + 3));
+    setPreferredSize(new Dimension(DWIDTH, (int) (getFont().getSize() * 1.2)));
     addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(final FocusEvent e) {
@@ -109,18 +109,19 @@ public final class BaseXSlider extends BaseXPanel {
     final int w = getWidth();
     final int h = getHeight();
     final int hh = h / 2;
+    final int s = (int) (3 * GUIConstants.SCALE);
 
     g.setColor(hasFocus() ? Color.white : GUIConstants.LGRAY);
-    g.fillRect(0, hh - 3, w, 4);
+    g.fillRect(0, hh - s, w, s * 2 - 1);
     g.setColor(Color.black);
-    g.drawLine(0, hh - 3, w, hh - 3);
-    g.drawLine(0, hh - 3, 0, hh + 2);
+    g.drawLine(0, hh - s, w, hh - s);
+    g.drawLine(0, hh - s, 0, hh + s - 1);
     g.setColor(GUIConstants.GRAY);
-    g.drawLine(w - 1, hh - 3, w - 1, hh + 2);
-    g.drawLine(0, hh + 2, w, hh + 2);
+    g.drawLine(w - 1, hh - s, w - 1, hh + s - 1);
+    g.drawLine(0, hh + s - 1, w, hh + s - 1);
 
     final double x = (value - min) * (w - SLIDERW) / (max - min);
-    BaseXLayout.drawCell(g, (int) x, (int) (x + SLIDERW), hh - 6, hh + 6, oldValue != -1);
+    BaseXLayout.drawCell(g, (int) x, (int) (x + SLIDERW), hh - s * 2, hh + s * 2, oldValue != -1);
   }
 
   @Override

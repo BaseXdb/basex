@@ -456,8 +456,8 @@ public final class TreeView extends View implements TreeConstants {
         s = s.substring(0, (s.length() - 2) / 2) + "..";
       }
     }
-    final int yy = (int) (y + (nodeHeight + fontHeight - 4) / 2d);
-    g.drawString(s, (int) (rm - tw / 2d + BORDER_PADDING), yy);
+    final double yy = y + (nodeHeight + fontHeight * .5) / 2;
+    g.drawString(s, (int) (rm - tw / 2d + BORDER_PADDING), (int) yy);
   }
 
   /**
@@ -1002,18 +1002,18 @@ public final class TreeView extends View implements TreeConstants {
       final int th = sub.subtreeHeight(i);
       if(th > lvs) lvs = th;
     }
-    nodeHeight = MAX_NODE_HEIGHT;
-    int lD;
-    while((lD = (int) ((h - lvs * nodeHeight) / (double) (lvs - 1))) <
-        (nodeHeight <= BEST_NODE_HEIGHT ? MIN_LEVEL_DISTANCE
-        : BEST_LEVEL_DISTANCE)
-        && nodeHeight >= MIN_NODE_HEIGHT)
-      nodeHeight--;
-    levelDistance = lD < MIN_LEVEL_DISTANCE ? MIN_LEVEL_DISTANCE
-        : lD > MAX_LEVEL_DISTANCE ? MAX_LEVEL_DISTANCE : lD;
-    final int ih = (int) ((h - (levelDistance * (lvs - 1) + lvs * nodeHeight))
-        / 2d);
-    topMargin = ih < TOP_MARGIN ? TOP_MARGIN : ih;
+    int nh = (int) (fontSize * 1.4);
+    final int dist = nh <= BEST_NODE_HEIGHT ? MIN_LEVEL_DISTANCE : BEST_LEVEL_DISTANCE;
+    while(true) {
+      final double ld = (h - lvs * nh) / (lvs - 1d);
+      if(ld >= dist || nh < MIN_NODE_HEIGHT) {
+        levelDistance = Math.max(MIN_LEVEL_DISTANCE, Math.min(MAX_LEVEL_DISTANCE, (int) ld));
+        break;
+      }
+      nh--;
+    }
+    nodeHeight = nh;
+    topMargin = Math.max(TOP_MARGIN, (h - (levelDistance * (lvs - 1) + lvs * nh)) / 2);
   }
 
   /**

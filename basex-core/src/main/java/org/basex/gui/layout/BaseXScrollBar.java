@@ -15,8 +15,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class BaseXScrollBar extends BaseXPanel {
-  /** Scrollbar size. */
-  public static final int SIZE = 16;
+  /** Scaled Scrollbar size. */
+  public static final int SIZE = (int) (16 * GUIConstants.SCALE);
   /** Maximum scrolling speed. */
   private static final int MAXSTEP = 15;
   /** Animated scrollbar zooming steps. */
@@ -72,7 +72,7 @@ public final class BaseXScrollBar extends BaseXPanel {
     addKeyListener(this);
     addMouseMotionListener(this);
     mode(Fill.NONE);
-    BaseXLayout.setWidth(this, SIZE);
+    setPreferredSize(new Dimension(SIZE, getPreferredSize().height));
     ww = SIZE;
   }
 
@@ -130,11 +130,12 @@ public final class BaseXScrollBar extends BaseXPanel {
     int bh = ww - 2 + barPos;
     BaseXLayout.drawCell(g, 0, ww, bh, bh + barSize, false);
 
-    bh += barSize >> 1;
+    final int d = (int) (2 * GUIConstants.SCALE);
+    bh += barSize / 2;
     g.setColor(GUIConstants.DGRAY);
     g.drawLine(5, bh, ww - 6, bh);
-    g.drawLine(5, bh - 2, ww - 6, bh - 2);
-    g.drawLine(5, bh + 2, ww - 6, bh + 2);
+    g.drawLine(5, bh - d, ww - 6, bh - d);
+    g.drawLine(5, bh + d, ww - 6, bh + d);
     smooth(g);
 
     // draw scroll buttons

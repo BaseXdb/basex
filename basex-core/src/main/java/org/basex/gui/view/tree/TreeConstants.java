@@ -34,8 +34,6 @@ interface TreeConstants {
   int BEST_NODE_HEIGHT = 8;
   /** Minimum node height. */
   int MIN_NODE_HEIGHT = 1;
-  /** Maximum node height. */
-  int MAX_NODE_HEIGHT = 26;
   /** Minimum node distance to draw node connections. */
   int MIN_NODE_DIST_CONN = 5;
 

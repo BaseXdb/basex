@@ -11,7 +11,6 @@ import java.util.*;
 import java.util.regex.*;
 
 import javax.swing.*;
-import javax.swing.border.*;
 import javax.swing.event.*;
 
 import org.basex.build.*;
@@ -68,7 +67,7 @@ public final class EditorView extends View {
   /** Splitter. */
   private final BaseXSplit split;
   /** Header string. */
-  private final BaseXLabel label;
+  private final BaseXHeader header;
   /** Query area. */
   private final BaseXTabs tabs;
   /** Query file that has last been evaluated. */
@@ -89,8 +88,7 @@ public final class EditorView extends View {
     super(EDITORVIEW, man);
     layout(new BorderLayout());
 
-    label = new BaseXLabel(EDITOR, true, false);
-    label.setForeground(GRAY);
+    header = new BaseXHeader(EDITOR);
 
     tabs = new BaseXTabs(gui);
     tabs.setFocusable(Prop.MAC);
@@ -129,7 +127,7 @@ public final class EditorView extends View {
 
     final BaseXBack north = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     north.add(buttons, BorderLayout.WEST);
-    north.add(label, BorderLayout.EAST);
+    north.add(header, BorderLayout.EAST);
 
     // status and query pane
     search.editor(addTab(), false);
@@ -297,12 +295,12 @@ public final class EditorView extends View {
 
   @Override
   public void refreshLayout() {
-    label.border(-6, 0, 0, 2).setFont(lfont);
+    header.refreshLayout();
     for(final EditorArea edit : editors()) edit.setFont(mfont);
     search.refreshLayout();
-    final Font ef = GUIConstants.font.deriveFont(7f + (fontSize >> 1));
-    info.setFont(ef);
-    pos.setFont(ef);
+    final Font f = GUIConstants.font.deriveFont((float) ((FONTSIZE * SCALE + fontSize) / 2));
+    info.setFont(f);
+    pos.setFont(f);
     project.refreshLayout();
   }
 
@@ -996,7 +994,7 @@ public final class EditorView extends View {
    */
   private AbstractButton tabButton(final String icon, final String rollover) {
     final AbstractButton b = BaseXButton.get(icon, null, false, gui);
-    b.setBorder(new EmptyBorder(2, 0, 2, 0));
+    b.setBorder(BaseXLayout.border(2, 0, 2, 0));
     b.setContentAreaFilled(false);
     b.setFocusable(false);
     b.setRolloverIcon(BaseXImages.icon(rollover));

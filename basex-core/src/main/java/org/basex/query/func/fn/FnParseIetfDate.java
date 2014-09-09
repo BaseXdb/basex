@@ -247,7 +247,7 @@ public final class FnParseIetfDate extends StandardFunc {
      * @throws QueryException query exception
      */
     private boolean seconds() throws QueryException {
-      int d = twoDigits();
+      final int d = twoDigits();
       if(d == -1) return false;
       BigDecimal bd = BigDecimal.valueOf(d);
       if(consume('.')) {

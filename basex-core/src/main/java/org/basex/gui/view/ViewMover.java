@@ -100,6 +100,6 @@ final class ViewMover extends BaseXPanel {
    */
   public void refreshLayout() {
     height = Math.max(10, 6 + (int) (GUIConstants.fontSize * 0.333));
-    BaseXLayout.setHeight(this, height);
+    setPreferredSize(new Dimension(getPreferredSize().width, height));
   }
 }

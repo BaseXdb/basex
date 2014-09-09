@@ -31,7 +31,7 @@ public final class InfoView extends View implements LinkListener {
   /** Current text. */
   private final TokenBuilder text = new TokenBuilder();
   /** Header label. */
-  private final BaseXLabel label;
+  private final BaseXHeader header;
   /** Timer label. */
   private final BaseXLabel timer;
   /** Text Area. */
@@ -64,8 +64,7 @@ public final class InfoView extends View implements LinkListener {
     super(GUIConstants.INFOVIEW, man);
     border(5).layout(new BorderLayout(0, 5));
 
-    label = new BaseXLabel(QUERY_INFO);
-    label.setForeground(GUIConstants.GRAY);
+    header = new BaseXHeader(QUERY_INFO);
 
     timer = new BaseXLabel(" ", true, false);
     timer.setForeground(GUIConstants.DGRAY);
@@ -82,7 +81,7 @@ public final class InfoView extends View implements LinkListener {
 
     final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     b.add(buttons, BorderLayout.WEST);
-    b.add(label, BorderLayout.EAST);
+    b.add(header, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
     final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout());
@@ -111,7 +110,7 @@ public final class InfoView extends View implements LinkListener {
 
   @Override
   public void refreshLayout() {
-    label.border(-6, 0, 0, 2).setFont(GUIConstants.lfont);
+    header.refreshLayout();
     timer.setFont(GUIConstants.font);
     area.setFont(GUIConstants.font);
     editor.bar().refreshLayout();
@@ -308,8 +307,8 @@ public final class InfoView extends View implements LinkListener {
     if(l == 0) return;
 
     final int fs = GUIConstants.fontSize;
-    h = label.getHeight() + 4;
-    w = (int) (getWidth() * .98 - fs / 2 - label.getWidth());
+    h = header.getHeight() + 4;
+    w = (int) (getWidth() * .98 - fs / 2 - header.getWidth());
     bw = fs * 2 + w / 10;
     bs = bw / (l - 1);
 

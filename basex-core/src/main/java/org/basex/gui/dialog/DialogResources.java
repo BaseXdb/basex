@@ -54,6 +54,7 @@ public final class DialogResources extends BaseXBack {
     tree = new BaseXTree(rootNode, dp).border(4, 4, 4, 4);
     tree.setRootVisible(false);
     tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+    tree.setRowHeight(getFontMetrics(getFont()).getHeight());
 
     tree.setCellRenderer(new TreeNodeRenderer());
     tree.addTreeSelectionListener(new TreeSelectionListener() {

@@ -9,7 +9,6 @@ import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
-import javax.swing.border.*;
 
 import org.basex.core.cmd.*;
 import org.basex.gui.*;
@@ -63,7 +62,7 @@ final class ProjectList extends JList<String> {
    */
   ProjectList(final ProjectView view) {
     project = view;
-    setBorder(new EmptyBorder(4, 4, 4, 4));
+    setBorder(BaseXLayout.border(4, 4, 4, 4));
     setCellRenderer(new CellRenderer());
     addMouseListener(new MouseAdapter() {
       @Override

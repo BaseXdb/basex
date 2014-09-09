@@ -69,14 +69,14 @@ public final class BaseXGUI extends Main {
     // reduce number of results to save memory
     context.options.set(MainOptions.MAXHITS, gopts.get(GUIOptions.MAXHITS));
 
+    // initialize look and feel
+    init(gopts);
     // initialize fonts and colors
     GUIConstants.init(gopts);
 
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        // initialize look and feel
-        init(gopts);
         // open main window
         final GUI gui = new GUI(context, gopts);
         if(osxGUI != null) osxGUI.init(gui);

@@ -181,7 +181,7 @@ final class Docs {
   void delete(final int pre, final int size) {
     // find insertion offset
     final IntList docs = docs();
-    int doc = docs.sortedIndexOf(pre);
+    final int doc = docs.sortedIndexOf(pre);
 
     // pre value points to a document node...
     if(doc >= 0) {
@@ -320,7 +320,7 @@ final class Docs {
     final int[] order = order();
     int l = 0, h = order.length - 1;
     while(l <= h) {
-      int m = l + h >>> 1;
+      final int m = l + h >>> 1;
       final int c = diff(paths.get(order[m]), path);
       if(c == 0) return docs().get(m);
       if(c < 0) l = m + 1;

@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
+import javax.swing.border.*;
 
 import org.basex.gui.*;
 import org.basex.gui.text.*;
@@ -77,31 +78,34 @@ public final class BaseXLayout {
   }
 
   /**
-   * Sets the component width, adopting the original component height.
+   * Sets the scaled component width, adopting the original component height.
    * @param comp component
    * @param w width
    */
   public static void setWidth(final Component comp, final int w) {
-    comp.setPreferredSize(new Dimension(w, comp.getPreferredSize().height));
+    comp.setPreferredSize(new Dimension((int) (w * SCALE), comp.getPreferredSize().height));
   }
 
   /**
-   * Sets the component height, adopting the original component width.
+   * Sets the scaled component height, adopting the original component width.
    * @param comp component
    * @param h height
    */
   public static void setHeight(final Component comp, final int h) {
-    comp.setPreferredSize(new Dimension(comp.getPreferredSize().width, h));
+    comp.setPreferredSize(new Dimension(comp.getPreferredSize().width, (int) (h * SCALE)));
   }
 
   /**
-   * Sets the component size.
-   * @param comp component
-   * @param w width
-   * @param h height
+   * Returns a border with the specified insets.
+   * @param t top distance
+   * @param l left distance
+   * @param b bottom distance
+   * @param r right distance
+   * @return border
    */
-  static void setSize(final Component comp, final int w, final int h) {
-    comp.setPreferredSize(new Dimension(w, h));
+  public static EmptyBorder border(final int t, final int l, final int b, final int r) {
+    return new EmptyBorder((int) (t * ASCALE), (int) (l * ASCALE),
+        (int) (b * ASCALE), (int) (r * ASCALE));
   }
 
   /**
@@ -377,8 +381,7 @@ public final class BaseXLayout {
     g.drawRect(xs, ys, xe - xs - 1, ye - ys - 1);
     g.setColor(Color.white);
     g.drawRect(xs + 1, ys + 1, xe - xs - 3, ye - ys - 3);
-
-    fill(g, focus ? LGRAY : Color.white, LGRAY, xs + 2, ys + 2, xe - 1, ye - 1);
+    fill(g, focus ? LGRAY : Color.white, LGRAY, xs + 1, ys + 1, xe - 1, ye - 1);
   }
 
   /**

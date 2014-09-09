@@ -3,7 +3,6 @@ package org.basex.gui.layout;
 import java.awt.*;
 
 import javax.swing.*;
-import javax.swing.border.*;
 
 import org.basex.gui.GUIConstants.Msg;
 
@@ -38,8 +37,9 @@ public class BaseXLabel extends JLabel {
    */
   public BaseXLabel(final String txt, final boolean dist, final boolean bold) {
     super(txt);
-    if(dist) border(0, 0, 6, 0);
-    setFont(getFont().deriveFont(bold ? Font.BOLD : Font.PLAIN));
+    final Font f = getFont();
+    if(dist) border(0, 0, f.getSize() / 2, 0);
+    if(bold) setFont(f.deriveFont(Font.BOLD));
   }
 
   /**
@@ -51,7 +51,7 @@ public class BaseXLabel extends JLabel {
    * @return self reference
    */
   public BaseXLabel border(final int t, final int l, final int b, final int r) {
-    setBorder(new EmptyBorder(t, l, b, r));
+    setBorder(BaseXLayout.border(t, l, b, r));
     return this;
   }
 
@@ -84,7 +84,7 @@ public class BaseXLabel extends JLabel {
    */
   public BaseXLabel large() {
     final Font f = getFont();
-    setFont(new Font(f.getName(), Font.PLAIN, (int) f.getSize2D() + 7));
+    setFont(new Font(f.getName(), Font.BOLD, (int) (f.getSize2D() * 1.4)));
     return this;
   }
 

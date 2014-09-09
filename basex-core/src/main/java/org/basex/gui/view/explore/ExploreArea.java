@@ -95,7 +95,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
   private void addInput(final int pos) {
     final BaseXTextField txt = new BaseXTextField(gui);
     BaseXLayout.setWidth(txt, COMPW);
-    BaseXLayout.setHeight(txt, txt.getFont().getSize() + 11);
+    txt.setPreferredSize(new Dimension(getPreferredSize().width, txt.getFont().getSize() + 11));
     txt.setMargin(new Insets(0, 0, 0, 10));
     txt.addKeyListener(new KeyAdapter() {
       @Override

@@ -536,7 +536,7 @@ public final class GUI extends AGUI {
     if(n == 0 && n2 == 2) {
       views.border(0);
     } else {
-      views.setBorder(new CompoundBorder(new EmptyBorder(3, 1, 3, 1), new EtchedBorder()));
+      views.setBorder(new CompoundBorder(BaseXLayout.border(3, 1, 3, 1), new EtchedBorder()));
     }
   }
 
@@ -562,7 +562,7 @@ public final class GUI extends AGUI {
     } else if(comp == menu) {
       if(!show) menuHeight = menu.getHeight();
       final int s = show ? menuHeight : 0;
-      BaseXLayout.setHeight(menu, s);
+      comp.setPreferredSize(new Dimension(comp.getPreferredSize().width, s));
       menu.setSize(menu.getWidth(), s);
     } else { // buttons, input
       if(show) control.add(comp, layout);

@@ -70,7 +70,7 @@ public final class ProjectView extends BaseXPanel {
 
     final BaseXBack back = new BaseXBack().layout(new BorderLayout(2, 2));
     back.setBorder(new CompoundBorder(new MatteBorder(0, 0, 1, 0, GUIConstants.GRAY),
-        new EmptyBorder(3, 1, 3, 2)));
+        BaseXLayout.border(3, 1, 3, 2)));
 
     path = new BaseXTextField(gui);
     path.setText(root.file.path());
@@ -92,9 +92,9 @@ public final class ProjectView extends BaseXPanel {
 
     // add scroll bars
     final JScrollPane lscroll = new JScrollPane(list);
-    lscroll.setBorder(new EmptyBorder(0, 0, 0, 0));
+    lscroll.setBorder(BaseXLayout.border(0, 0, 0, 0));
     final JScrollPane tscroll = new JScrollPane(tree);
-    tscroll.setBorder(new EmptyBorder(0, 0, 0, 0));
+    tscroll.setBorder(BaseXLayout.border(0, 0, 0, 0));
 
     split = new BaseXSplit(false);
     split.mode(Fill.NONE);

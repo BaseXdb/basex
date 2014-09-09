@@ -22,7 +22,7 @@ import org.basex.gui.view.*;
  */
 public final class ExploreView extends View {
   /** Header string. */
-  private final BaseXLabel label;
+  private final BaseXHeader header;
   /** Current search panel. */
   private final ExploreArea search;
   /** Filter button. */
@@ -36,8 +36,7 @@ public final class ExploreView extends View {
     super(EXPLOREVIEW, man);
     border(5).layout(new BorderLayout(0, 4));
 
-    label = new BaseXLabel(EXPLORER, true, false);
-    label.setForeground(GRAY);
+    header = new BaseXHeader(EXPLORER);
 
     filter = BaseXButton.command(GUIMenuCmd.C_FILTER, gui);
     filter.addKeyListener(this);
@@ -48,7 +47,7 @@ public final class ExploreView extends View {
 
     final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     b.add(buttons, BorderLayout.WEST);
-    b.add(label, BorderLayout.EAST);
+    b.add(header, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
     search = new ExploreArea(this);
@@ -82,7 +81,7 @@ public final class ExploreView extends View {
 
   @Override
   public void refreshLayout() {
-    label.border(-6, 0, 0, 2).setFont(lfont);
+    header.refreshLayout();
     refreshMark();
   }
 

@@ -53,7 +53,7 @@ final class DialogVisualPrefs extends BaseXBack {
     mapOffsets = new BaseXCombo(d, GUIOptions.MAPOFFSETS, gopts, MAP_CHOICES);
     mapWeight = new BaseXSlider(0, 100, GUIOptions.MAPWEIGHT, gopts, d);
     mapAtts = new BaseXCheckBox(SHOW_ATTS, GUIOptions.MAPATTS, gopts, d);
-    mapAlgo.setSize(200, 100);
+    mapAlgo.setSize((int) (GUIConstants.SCALE * 200), (int) (GUIConstants.SCALE * 100));
     BaseXLayout.setWidth(mapWeight, 150);
 
     final StringList lafs = new StringList("(default)");

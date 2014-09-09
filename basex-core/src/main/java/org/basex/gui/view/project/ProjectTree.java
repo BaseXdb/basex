@@ -49,6 +49,8 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
 
     setCellEditor(new ProjectCellEditor(this, renderer));
     setEditable(true);
+    final int h = getFontMetrics(getFont()).getHeight();
+    if(h > 16) setRowHeight(Math.max(32, h));
 
     // add popup
     new BaseXPopup(this, pv.gui,

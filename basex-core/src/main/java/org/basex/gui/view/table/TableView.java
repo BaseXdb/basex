@@ -107,6 +107,7 @@ public final class TableView extends View implements Runnable {
     if(!visible() || tdata.rows == null) return;
 
     scroll.height(tdata.rows.size() * tdata.rowH(1));
+    header.refreshLayout();
     refreshContext(false, true);
   }
 

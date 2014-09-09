@@ -109,7 +109,8 @@ public final class DialogInsert extends BaseXDialog {
   private void change(final Object src) {
     int n = 0;
     for(int r = 0; r < radio.length; ++r) if(src == radio[r]) n = r;
-    BaseXLayout.setHeight(input2, n == Data.ATTR ? 25 : 350);
+    final int h = n == Data.ATTR ? input1.getHeight() : (int) (GUIConstants.SCALE * 350);
+    input2.setPreferredSize(new Dimension(input2.getPreferredSize().width, h));
 
     back.removeAll();
     back.layout(new BorderLayout(0, 4));

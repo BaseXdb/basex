@@ -29,7 +29,7 @@ public final class DialogAbout extends BaseXDialog {
     super(main, ABOUT);
 
     BaseXBack p = new BaseXBack(new BorderLayout(12, 0));
-    p.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(10, 10, 15, 22)));
+    p.setBorder(new CompoundBorder(new EtchedBorder(), BaseXLayout.border(10, 10, 15, 22)));
 
     final BaseXLabel label = new BaseXLabel();
     label.setIcon(BaseXImages.icon("logo"));

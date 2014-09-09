@@ -15,10 +15,12 @@ import org.basex.gui.GUIConstants.Fill;
  * @author Christian Gruen
  */
 public final class BaseXDSlider extends BaseXPanel {
+  /** Label space (unscaled). */
+  public static final int LABELW = 300;
   /** Slider width. */
   private static final int ARROW = 17;
-  /** Label space. */
-  public static final int LABELW = 300;
+  /** Label space (scaled). */
+  private static final int SLABELW = (int) (LABELW * SCALE);
 
   /** Minimum slider value. */
   public final double totMin;
@@ -69,8 +71,8 @@ public final class BaseXDSlider extends BaseXPanel {
     log = StrictMath.log(totMax) - StrictMath.log(totMin) > 5 && totMax - totMin > 100;
     mode(Fill.NONE).setFocusable(true);
 
-    BaseXLayout.setHeight(this, getFont().getSize() + 9);
     BaseXLayout.setWidth(this, 200 + LABELW);
+    setPreferredSize(new Dimension(getPreferredSize().width, getFont().getSize() + 9));
 
     addFocusListener(new FocusAdapter() {
       @Override
@@ -199,18 +201,20 @@ public final class BaseXDSlider extends BaseXPanel {
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
 
-    final int w = getWidth() - LABELW;
+    final int w = getWidth() - SLABELW;
     final int h = getHeight();
-    final int hh = h / 2;
+    final int hc = h / 2;
+    final int s = (int) (4 * ASCALE);
 
     final boolean focus = hasFocus();
-    g.fillRect(0, hh - 4, w, 8);
+    g.setColor(Color.white);
+    g.fillRect(0, hc - s, w, s * 2);
     g.setColor(Color.black);
-    g.drawLine(0, hh - 4, w - 1, hh - 4);
-    g.drawLine(0, hh - 4, 0, hh + 4);
+    g.drawLine(0, hc - s, w - 1, hc - s);
+    g.drawLine(0, hc - s, 0, hc + s);
     g.setColor(color2);
-    g.drawLine(w - 1, hh - 4, w - 1, hh + 4);
-    g.drawLine(0, hh + 4, w, hh + 4);
+    g.drawLine(w - 1, hc - s, w - 1, hc + s);
+    g.drawLine(0, hc + s, w, hc + s);
 
     final Range r = new Range(this);
     BaseXLayout.drawCell(g, r.xs, r.xe + ARROW, 2, h - 2, false);
@@ -231,21 +235,21 @@ public final class BaseXDSlider extends BaseXPanel {
     // draw arrows
     final Polygon pol = new Polygon(
         new int[] { r.xs + 11, r.xs + 5, r.xs + 5, r.xs + 11 },
-        new int[] { hh - 5, hh - 1, hh, hh + 5 }, 4);
+        new int[] { hc - 5, hc - 1, hc, hc + 5 }, 4);
     g.setColor(focus ? color4 : GRAY);
     g.fillPolygon(pol);
     pol.xpoints = new int[] { r.xe + 5, r.xe + 12, r.xe + 12, r.xe + 5 };
     g.fillPolygon(pol);
 
     g.setColor(focus ? Color.black : DGRAY);
-    g.drawLine(r.xs + 11, hh - 5, r.xs + 11, hh + 4);
-    g.drawLine(r.xs + 11, hh - 5, r.xs + 6, hh - 1);
-    g.drawLine(r.xe + 5, hh - 5, r.xe + 5, hh + 4);
-    g.drawLine(r.xe + 5, hh - 5, r.xe + 11, hh - 1);
+    g.drawLine(r.xs + 11, hc - 5, r.xs + 11, hc + 4);
+    g.drawLine(r.xs + 11, hc - 5, r.xs + 6, hc - 1);
+    g.drawLine(r.xe + 5, hc - 5, r.xe + 5, hc + 4);
+    g.drawLine(r.xe + 5, hc - 5, r.xe + 11, hc - 1);
 
     g.setColor(Color.white);
-    g.drawLine(r.xs + 10, hh + 4, r.xs + 6, hh + 1);
-    g.drawLine(r.xe + 6, hh + 4, r.xe + 11, hh + 1);
+    g.drawLine(r.xs + 10, hc + 4, r.xs + 6, hc + 1);
+    g.drawLine(r.xe + 6, hc + 4, r.xe + 11, hc + 1);
 
     // draw range info
     g.setColor(Color.black);
@@ -301,7 +305,7 @@ public final class BaseXDSlider extends BaseXPanel {
      * @param s slider reference
      */
     Range(final BaseXDSlider s) {
-      w = s.getWidth() - LABELW - ARROW * 2;
+      w = s.getWidth() - SLABELW - ARROW * 2;
       dist = s.encode(s.totMax - s.totMin);
       xs = (int) (s.encode(s.min - s.totMin) * w / dist);
       xe = (s.totMin == s.totMax ? w : (int) (s.encode(s.max - s.totMin) * w / dist)) + ARROW;

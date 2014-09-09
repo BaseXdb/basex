@@ -50,7 +50,7 @@ final class TableHeader extends BaseXPanel {
     mode(Fill.NONE).setFocusable(true);
     tdata = v.tdata;
     view = v;
-    BaseXLayout.setHeight(this, fontSize + 8 << 1);
+    refreshLayout();
     addMouseListener(this);
     addMouseMotionListener(this);
     addKeyListener(this);
@@ -73,6 +73,14 @@ final class TableHeader extends BaseXPanel {
     });
   }
 
+  /**
+   * Called when GUI design has changed.
+   */
+  public void refreshLayout() {
+    setPreferredSize(new Dimension(getPreferredSize().width, fontSize * 3));
+    setSize(getPreferredSize());
+  }
+
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
@@ -87,7 +95,7 @@ final class TableHeader extends BaseXPanel {
     final int fsz = fontSize;
     int w = getWidth();
     final int h = getHeight();
-    final int hh = h >> 1;
+    final int hh = h / 2;
     g.setColor(color2);
     g.drawLine(0, h - 1, w, h - 1);
 
@@ -138,13 +146,15 @@ final class TableHeader extends BaseXPanel {
     final boolean clicked = nc == clickCol;
     BaseXLayout.drawCell(g, (int) x, w + bs, 0, hh, clicked && header);
     BaseXLayout.drawCell(g, (int) x, w + bs, hh - 1, h, clicked && !header);
-    g.setColor(Color.black);
-    g.setFont(bfont);
     smooth(g);
 
     int o = header && clicked ? 1 : 0;
-    g.fillPolygon(new int[] { (int) x + o + 4, (int) x + o + bs - 4, (int) x + o + bs / 2 },
-        new int[] { o + 6, o + 6, o + bs - 3 }, 3);
+    final int xo = (int) (4 * SCALE), yo = (int) (6 * SCALE);
+    g.setColor(Color.black);
+    g.fillPolygon(
+        new int[] { (int) x + o + xo, (int) x + o + bs - xo, (int) x + o + bs / 2 },
+        new int[] { o + yo, o + yo, o + bs - yo }, 3);
+    g.setFont(bfont);
 
     o = !header && clicked ? 1 : 0;
     final byte[] reset = { 'x' };

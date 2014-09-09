@@ -42,7 +42,7 @@ final class DialogParsing extends BaseXBack {
     border(8);
     gui = d.gui;
     tabs = t;
-    label = new BaseXLabel().border(0, 0, 12, 0).large();
+    label = new BaseXLabel().border(0, 0, 8, 0).large();
 
     final MainOptions opts = gui.context.options;
     parsers = new DialogParser[] { new DialogXmlParser(d, opts), new DialogHtmlParser(d, opts),

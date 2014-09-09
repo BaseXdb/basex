@@ -36,7 +36,7 @@ public final class TextView extends View {
   private final SearchEditor search;
 
   /** Header string. */
-  private final BaseXLabel label;
+  private final BaseXHeader header;
   /** Home button. */
   private final AbstractButton home;
   /** Text Area. */
@@ -55,8 +55,7 @@ public final class TextView extends View {
     super(TEXTVIEW, man);
     border(5).layout(new BorderLayout(0, 5));
 
-    label = new BaseXLabel(RESULT, true, false);
-    label.setForeground(GRAY);
+    header = new BaseXHeader(RESULT);
 
     home = BaseXButton.command(GUIMenuCmd.C_HOME, gui);
     home.setEnabled(false);
@@ -76,7 +75,7 @@ public final class TextView extends View {
 
     final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     b.add(buttons, BorderLayout.WEST);
-    b.add(label, BorderLayout.EAST);
+    b.add(header, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
     add(search, BorderLayout.CENTER);
@@ -111,7 +110,7 @@ public final class TextView extends View {
 
   @Override
   public void refreshLayout() {
-    label.border(-6, 0, 0, 2).setFont(lfont);
+    header.refreshLayout();
     text.setFont(mfont);
     search.bar().refreshLayout();
   }
@@ -195,7 +194,7 @@ public final class TextView extends View {
       System.arraycopy(chop, 0, buf, size - chop.length, chop.length);
     }
     text.setText(buf, size);
-    label.setText((out.finished() ? CHOPPED : "") + RESULT);
+    header.setText((out.finished() ? CHOPPED : "") + RESULT);
     home.setEnabled(gui.context.data() != null);
   }
 
