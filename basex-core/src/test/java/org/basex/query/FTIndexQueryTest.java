@@ -58,13 +58,6 @@ public final class FTIndexQueryTest extends SandboxTest {
       if(q.length == 3) assertQuery((String) q[2]);
   }
 
-  /** Run all tests from {@link XPathMarkFTTest}. */
-  @Test
-  @InputData(XPathMarkFTTest.DOC)
-  public void testXPathMarkFTTest() {
-    for(final Object[] q : XPathMarkFTTest.QUERIES) assertQuery((String) q[2]);
-  }
-
   /** Word distance test. */
   @Test
   @Ignore("GH-359")

@@ -10,7 +10,7 @@ import org.basex.query.*;
  */
 public final class XPathMarkFTTest extends QueryTest {
   /** Test document. */
-  public static final String DOC =
+  private static final String DOC =
       "<?xml version='1.0' encoding='UTF-8'?>" +
       //"<!DOCTYPE A SYSTEM 'alphabet.dtd'>" +
       "<A id='n1' pre='1' post='26' xml:lang='en'>" +
@@ -49,7 +49,7 @@ public final class XPathMarkFTTest extends QueryTest {
   static { create(DOC); }
 
   /** Test queries. */
-  public static final Object[][] QUERIES = {
+  private static final Object[][] QUERIES = {
       { "A01", nodes(59, 64, 79), "//L/*" },
       { "A02", nodes(20), "//L/parent::*" },
       { "A03", nodes(59, 64, 68, 73, 79), "//L/descendant::*" },
