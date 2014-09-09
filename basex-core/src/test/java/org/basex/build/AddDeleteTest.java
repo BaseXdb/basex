@@ -235,10 +235,10 @@ public final class AddDeleteTest extends SandboxTest {
     io.write(Token.token("<x"));
 
     new Set(MainOptions.SKIPCORRUPT, true).execute(context);
-    assertEquals(0, context.data().resources.docs("").size());
+    assertEquals(0, context.data().resources.docsIn("").size());
     new Add("x", "<x").execute(context);
     new Add("x", CORRUPT).execute(context);
-    assertEquals(0, context.data().resources.docs("").size());
+    assertEquals(0, context.data().resources.docsIn("").size());
     new Set(MainOptions.SKIPCORRUPT, false).execute(context);
 
     try {
@@ -254,6 +254,6 @@ public final class AddDeleteTest extends SandboxTest {
    * @return number of documents
    */
   private static int docs() {
-    return context.data().resources.docs("").size();
+    return context.data().resources.docsIn("").size();
   }
 }

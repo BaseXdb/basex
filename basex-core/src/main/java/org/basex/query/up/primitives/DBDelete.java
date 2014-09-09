@@ -27,7 +27,7 @@ public final class DBDelete extends DBUpdate {
   public DBDelete(final Data data, final String path, final InputInfo info) {
     super(UpdateType.DBDELETE, data, info);
     paths.add(path);
-    size = data.resources.binaries(path).size();
+    size = data.resources.binariesIn(path).size();
   }
 
   @Override

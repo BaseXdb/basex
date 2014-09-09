@@ -264,6 +264,7 @@ password             = Password
 paste                = Paste
 path                 = Path
 path_index           = Path Summary
+path_invalid_%       = Path '%' is invalid.
 perm_required_%      = % permission needed.
 perm_unknown_%       = % permission is unknown.
 pi                   = PI

@@ -264,6 +264,7 @@ password             = Parola chiave
 paste                = Incolla
 path                 = Percorso
 path_index           = Indice strutturale
+path_invalid_%       = Percorso '%' invalido.
 perm_required_%      = % permessi richiesti.
 perm_unknown_%       = % permesso sconosciuto.
 pi                   = PI

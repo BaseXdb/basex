@@ -78,7 +78,7 @@ public final class Add extends ACreate {
    */
   boolean build() {
     String name = MetaData.normPath(args[0]);
-    if(name == null) return error(NAME_INVALID_X, args[0]);
+    if(name == null) return error(PATH_INVALID_X, args[0]);
 
     // retrieve input
     final IO io;

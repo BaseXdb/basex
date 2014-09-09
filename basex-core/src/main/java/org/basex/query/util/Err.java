@@ -110,7 +110,7 @@ public enum Err {
   /** BXDB0013. */
   BXDB_CREATEARGS_X_X(BXDB, 13, "Number of specified inputs and paths differs: % vs. %."),
   /** BXDB0014. */
-  BXDB_DIR_X(BXDB, 14, "Database path '%' points to a directory."),
+  BXDB_REPLACE_X(BXDB, 14, "Invalid target path: %."),
   /** BXDB0015. */
   BXDB_NOBACKUP_X(BXDB, 15, "No backup found: %."),
   /** BXDB0016. */

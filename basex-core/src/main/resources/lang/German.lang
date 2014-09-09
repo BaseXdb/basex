@@ -264,6 +264,7 @@ password             = Passwort
 paste                = Einfügen
 path                 = Pfad
 path_index           = Pfadindex
+path_invalid_%       = Der Pfad '%' ist ungültig.
 perm_required_%      = %-Recht benötigt.
 perm_unknown_%       = %-Recht ist unbekannt.
 pi                   = PI

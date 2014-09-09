@@ -264,6 +264,7 @@ password             = Kata kunci
 paste                = Tempel
 path                 = Rintis
 path_index           = Ringkasan rintis
+path_invalid_%       = Rintis '%' tidak sah.
 perm_required_%      = izin % dibutuhkan.
 perm_unknown_%       = izin % tidak dikenal.
 pi                   = PI

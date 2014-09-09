@@ -264,6 +264,7 @@ password             = Нууц үг
 paste                = Хуулж тавих
 path                 = зам
 path_index           = Замын байршил
+path_invalid_%       = Зам '%' буруу байна.
 perm_required_%      = % хэрэглэгчийн эрх шаардагдаж байна.
 perm_unknown_%       = % хэрэглэгчийн эрх тодорхойгүй.
 pi                   = PI

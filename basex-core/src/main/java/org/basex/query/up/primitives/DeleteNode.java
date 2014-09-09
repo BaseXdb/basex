@@ -41,6 +41,9 @@ public final class DeleteNode extends NodeUpdate {
   }
 
   @Override
+  public void prepare(final MemData tmp) { }
+
+  @Override
   public void merge(final Update up) {
     /* Multiple delete primitives can operate on the same
      * target node, see XQUF. */

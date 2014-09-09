@@ -264,6 +264,7 @@ password             = Parolă
 paste                = Lipește
 path                 = Cale
 path_index           = Rezumatul caii.
+path_invalid_%       = '%', Cale este invalid.
 perm_required_%      = % permisiuni necesare.
 perm_unknown_%       = Permisiunea % este necunoscuta.
 pi                   = PI

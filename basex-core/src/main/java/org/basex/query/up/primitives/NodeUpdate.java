@@ -38,6 +38,13 @@ public abstract class NodeUpdate extends DataUpdate {
   }
 
   /**
+   * Prepares this update primitive before execution. This includes e.g. the
+   * preparation of insertion sequences.
+   * @param tmp temporary database
+   */
+  public abstract void prepare(final MemData tmp);
+
+  /**
    * Merges two update primitives, as they have the same target node.
    * @param p primitive to merge with
    * @throws QueryException exception

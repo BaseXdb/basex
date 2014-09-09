@@ -33,6 +33,9 @@ public final class RenameNode extends NodeUpdate {
   }
 
   @Override
+  public void prepare(final MemData tmp) { }
+
+  @Override
   public void merge(final Update up) throws QueryException {
     throw UPMULTREN_X.get(info, node());
   }

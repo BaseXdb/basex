@@ -45,20 +45,26 @@ public final class Replace extends ACreate {
     }
 
     final String path = MetaData.normPath(args[0]);
-    if(path == null || path.isEmpty()) return error(NO_DIR_ALLOWED_X, args[0]);
+    if(path == null || path.isEmpty() || path.endsWith(".")) return error(PATH_INVALID_X, args[0]);
 
     final Data data = context.data();
+    final IOFile bin = data.meta.binary(path);
+    if(bin == null || bin.isDir()) return error(PATH_INVALID_X, args[0]);
 
     if(!startUpdate()) return false;
     try {
-      final IOFile file = data.inMemory() ? null : data.meta.binary(path);
-      int sz = 1;
-      if(file != null && file.exists()) {
+      // retrieve old list of resources
+      final AtomicUpdateCache auc = new AtomicUpdateCache(data);
+
+      final IntList docs = data.resources.docs(path);
+      int d = 0, bs = 0;
+      if(bin.exists()) {
         // replace binary file if it already exists
         final Store store = new Store(path);
         store.setInput(in);
         store.lock = false;
         if(!store.run(context)) return error(store.info());
+        bs = 1;
       } else {
         // otherwise, add new document as xml
         final Add add = new Add(path);
@@ -67,24 +73,25 @@ public final class Replace extends ACreate {
           add.init(context, out);
           if(!add.build()) return error(add.info());
 
-          // retrieve old list of resources
-          final AtomicUpdateCache auc = new AtomicUpdateCache(data);
-          final IntList docs = data.resources.docs(path, false);
-          sz = docs.size();
           if(docs.isEmpty()) {
             auc.addInsert(data.meta.size, -1, add.clip);
           } else {
             auc.addReplace(docs.get(0), add.clip);
-            for(int d = 1; d < sz; d++) auc.addDelete(docs.get(d));
+            d = 1;
           }
 
           context.invalidate();
-          auc.execute(false);
         } finally {
           add.close();
         }
       }
-      return info(RES_REPLACED_X_X, sz, perf);
+
+      // delete old documents
+      final int ds = docs.size();
+      for(; d < ds; d++) auc.addDelete(docs.get(d));
+      auc.execute(false);
+
+      return info(RES_REPLACED_X_X, ds + bs, perf);
     } finally {
       finishUpdate();
     }

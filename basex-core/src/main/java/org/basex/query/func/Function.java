@@ -698,9 +698,9 @@ public enum Function {
   _DB_ATTRIBUTE_RANGE(FNDb.class, "attribute-range(database,from,to[,name])",
       arg(STR, ITEM, ITEM, STR), NOD_ZM, flag(NDT)),
   /** XQuery function. */
-  _DB_LIST(FNDb.class, "list([database[,path]])", arg(STR, STR), STR_ZM),
+  _DB_LIST(FNDb.class, "list([database[,path]])", arg(STR, STR), STR_ZM, flag(NDT)),
   /** XQuery function. */
-  _DB_LIST_DETAILS(FNDb.class, "list-details([database[,path]])", arg(STR, STR), ELM_ZM),
+  _DB_LIST_DETAILS(FNDb.class, "list-details([database[,path]])", arg(STR, STR), ELM_ZM, flag(NDT)),
   /** XQuery function. */
   _DB_BACKUPS(FNDb.class, "backups([database])", arg(ITEM), ELM_ZM),
   /** XQuery function. */
@@ -926,7 +926,7 @@ public enum Function {
   /* FNIndex functions. */
 
   /** XQuery function. */
-  _INDEX_FACETS(FNIndex.class, "facets(database[,type])", arg(STR, STR), DOC_O),
+  _INDEX_FACETS(FNIndex.class, "facets(database[,type])", arg(STR, STR), DOC_O, flag(NDT)),
   /** XQuery function. */
   _INDEX_TEXTS(FNIndex.class, "texts(database[,prefix[,ascending]])",
       arg(STR, STR, BLN), NOD_ZM, flag(NDT)),

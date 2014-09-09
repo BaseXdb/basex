@@ -108,9 +108,7 @@ final class DataUpdates {
 
     for(int i = 0; i < s; ++i) {
       final NodeUpdates ups = nodeUpdates.get(nodes.get(i));
-      for(final NodeUpdate p : ups.updates) {
-        if(p instanceof NodeCopy) ((NodeCopy) p).prepare(tmp);
-      }
+      for(final NodeUpdate p : ups.updates) p.prepare(tmp);
     }
 
     // check attribute duplicates

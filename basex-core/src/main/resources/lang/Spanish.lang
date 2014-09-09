@@ -264,6 +264,7 @@ password             = Clave
 paste                = Pegar
 path                 = Ruta
 path_index           = Resumen de ruta
+path_invalid_%       = Ruta '%' es inválida.
 perm_required_%      = Se necesita el permiso %.
 perm_unknown_%       = El permiso % es desconocido.
 pi                   = PI

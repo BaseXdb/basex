@@ -228,7 +228,7 @@ final class Docs {
    * Returns the pre values of all document nodes matching the specified path.
    * @param path input path
    * @param exact exact (no prefix) matches
-   * @return root nodes (internal representation!)
+   * @return pre values (internal representation!)
    */
   synchronized IntList docs(final String path, final boolean exact) {
     // invalid path, or no documents: return empty list
@@ -331,6 +331,7 @@ final class Docs {
 
   /**
    * Returns the normalized index path representation for the specified path.
+   * The returned path begins with a slash and uses lower case on non-Unix machines.
    * @param path input path (without leading slash)
    * @return canonical path
    */

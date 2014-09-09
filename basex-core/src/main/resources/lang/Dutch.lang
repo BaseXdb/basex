@@ -264,6 +264,7 @@ password             = Wachtwoord
 paste                = Plak
 path                 = Pad
 path_index           = Pad opsomming(index)
+path_invalid_%       = Pad '%' is ongeldig.
 perm_required_%      = % toegang geweigerd.
 perm_unknown_%       = % permissie is onbekend.
 pi                   = PI

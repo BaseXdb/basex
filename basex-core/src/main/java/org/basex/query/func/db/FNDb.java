@@ -12,7 +12,6 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.index.query.*;
-import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
@@ -134,7 +133,7 @@ public final class FNDb extends StandardFunc {
   private Value open(final QueryContext qc) throws QueryException {
     final Data data = checkData(qc);
     final String path = exprs.length < 2 ? "" : path(1, qc);
-    return DBNodeSeq.get(data.resources.docs(path), data, true, path.isEmpty());
+    return DBNodeSeq.get(data.resources.docsIn(path), data, true, path.isEmpty());
   }
 
   /**
@@ -221,31 +220,31 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter list(final QueryContext qc) throws QueryException {
-    final TokenList tl = new TokenList();
     final int el = exprs.length;
     if(el == 0) {
+      final TokenList tl = new TokenList();
       for(final String s : qc.context.databases.listDBs()) tl.add(s);
-    } else {
-      final Data data = checkData(qc);
-      final String path = string(el == 1 ? Token.EMPTY : toToken(exprs[1], qc));
-      // add xml resources
-      final Resources res = data.resources;
-      final IntList il = res.docs(path);
-      final int is = il.size();
-      for(int i = 0; i < is; i++) tl.add(data.text(il.get(i), true));
-      // add binary resources
-      for(final byte[] file : res.binaries(path)) tl.add(file);
+      return StrSeq.get(tl).iter();
     }
-    tl.sort(Prop.CASE);
 
+    final Data data = checkData(qc);
+    final String path = string(exprs.length == 1 ? Token.EMPTY : toToken(exprs[1], qc));
+    final IntList il = data.resources.docsIn(path);
+    final TokenList tl = data.resources.binariesIn(path);
     return new Iter() {
-      int pos;
+      final int is = il.size(), ts = tl.size();
+      int ip, tp;
       @Override
-      public Str get(final long i) { return Str.get(tl.get((int) i)); }
+      public Str get(final long i) {
+        return i < is ? Str.get(data.text(il.get((int) i), true)) :
+          i < is + ts ? Str.get(tl.get((int) i - is)) : null;
+      }
       @Override
-      public Str next() { return pos < size() ? get(pos++) : null; }
+      public Str next() {
+        return ip < is ? get(ip++) : tp < ts ? get(ip + tp++) : null;
+      }
       @Override
-      public long size() { return tl.size(); }
+      public long size() { return is + ts; }
     };
   }
 
@@ -286,8 +285,8 @@ public final class FNDb extends StandardFunc {
 
     final Data data = checkData(qc);
     final String path = string(exprs.length == 1 ? Token.EMPTY : toToken(exprs[1], qc));
-    final IntList il = data.resources.docs(path);
-    final TokenList tl = data.resources.binaries(path);
+    final IntList il = data.resources.docsIn(path);
+    final TokenList tl = data.resources.binariesIn(path);
 
     return new Iter() {
       final int is = il.size(), ts = tl.size();
@@ -567,24 +566,23 @@ public final class FNDb extends StandardFunc {
     final Item item = toItem(exprs[2], qc);
     final Options opts = toOptions(3, Q_OPTIONS, new Options(), qc);
 
-    // remove old documents
-    final Resources res = data.resources;
-    final IntList pre = res.docs(path, true);
     final Updates updates = qc.resources.updates();
-    for(int p = 0; p < pre.size(); p++) {
-      updates.add(new DeleteNode(pre.get(p), data, info), qc);
-    }
+    final IntList docs = data.resources.docs(path);
 
     // delete binary resources
-    final IOFile bin = data.inMemory() ? null : data.meta.binary(path);
-    if(bin != null) {
-      if(bin.exists() || item instanceof Bin) {
-        if(bin.isDir()) throw BXDB_DIR_X.get(info, path);
-        updates.add(new DBStore(data, path, item, info), qc);
-      } else {
-        updates.add(new DBAdd(data, checkInput(item, token(path)), opts, qc, info), qc);
-      }
+    final IOFile bin = data.meta.binary(path);
+    if(bin == null || bin.isDir()) throw BXDB_REPLACE_X.get(info, path);
+
+    if(item instanceof Bin) {
+      updates.add(new DBStore(data, path, item, info), qc);
+    } else {
+      if(bin.exists()) updates.add(new DBDelete(data, path, info), qc);
+      updates.add(new DBAdd(data, checkInput(item, token(path)), opts, qc, info), qc);
     }
+
+    // remove old documents
+    final int ds = docs.size();
+    for(int d = 0; d < ds; d++) updates.add(new DeleteNode(docs.get(d), data, info), qc);
     return null;
   }
 
@@ -599,7 +597,7 @@ public final class FNDb extends StandardFunc {
     final String path = path(1, qc);
 
     // delete XML resources
-    final IntList docs = data.resources.docs(path);
+    final IntList docs = data.resources.docsIn(path);
     final int is = docs.size();
     final Updates updates = qc.resources.updates();
     for(int i = 0; i < is; i++) {
@@ -759,7 +757,7 @@ public final class FNDb extends StandardFunc {
 
     // the first step of the path should be the database name
     final Updates updates = qc.resources.updates();
-    final IntList il = data.resources.docs(source);
+    final IntList il = data.resources.docsIn(source);
     final int is = il.size();
     for(int i = 0; i < is; i++) {
       final int pre = il.get(i);
