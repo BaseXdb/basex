@@ -27,7 +27,7 @@ import org.basex.util.*;
  */
 public final class Map extends FItem {
   /** The empty map. */
-  public static final Map EMPTY = new Map(TrieNode.EMPTY);
+  public static final Map EMPTY = new Map(TrieNode.EMPTY, 0);
   /** Number of bits per level, maximum is 5 because {@code 1 << 5 == 32}. */
   static final int BITS = 5;
 
@@ -35,14 +35,18 @@ public final class Map extends FItem {
   private final TrieNode root;
   /** Key sequence. */
   private Value keys;
+  /** Date/time entries (negative: without timezone). */
+  private final int dt;
 
   /**
    * Constructor.
    * @param root map
+   * @param dt number of date/time entries (negative: without timezone)
    */
-  private Map(final TrieNode root) {
+  private Map(final TrieNode root, final int dt) {
     super(SeqType.ANY_MAP, new Ann());
     this.root = root;
+    this.dt = dt;
   }
 
   @Override
@@ -91,7 +95,15 @@ public final class Map extends FItem {
    */
   public Map delete(final Item key, final InputInfo ii) throws QueryException {
     final TrieNode del = root.delete(key.hash(ii), key, 0, ii);
-    return del == root ? this : del != null ? new Map(del) : EMPTY;
+    if(del == root) return this;
+    if(del == null) return EMPTY;
+    // update date counter
+    int t = dt;
+    if(key instanceof ADate) {
+      final boolean tz = ((ADate) key).zon() != Short.MAX_VALUE;
+      t += tz ? -1 : +1;
+    }
+    return new Map(del, t);
   }
 
   /**
@@ -127,7 +139,9 @@ public final class Map extends FItem {
   public Map addAll(final Map map, final InputInfo ii) throws QueryException {
     if(map == EMPTY) return this;
     final TrieNode upd = root.addAll(map.root, 0, ii);
-    return upd == map.root ? map : new Map(upd);
+    if(upd == map.root) return map;
+    if(map.dt != 0 && dt != 0 && (map.dt > 0 ? dt < 0 : dt > 0)) throw MAPTZ.get(ii);
+    return new Map(upd, map.dt + dt);
   }
 
   /**
@@ -157,7 +171,14 @@ public final class Map extends FItem {
    */
   public Map insert(final Item key, final Value value, final InputInfo ii) throws QueryException {
     final TrieNode ins = root.insert(key.hash(ii), key, value, 0, ii);
-    return ins == root ? this : new Map(ins);
+    // update date counter
+    int t = dt;
+    if(key instanceof ADate) {
+      final boolean tz = ((ADate) key).zon() != Short.MAX_VALUE;
+      if(tz ? t < 0 : t > 0) throw MAPTZ.get(ii);
+      t += tz ? 1 : -1;
+    }
+    return ins == root ? this : new Map(ins, t);
   }
 
   /**

@@ -963,9 +963,11 @@ public enum Err {
   /** XQDY0136. */
   MAPKEY_X(XQDY, 136, "Key must be a single atomic value: %."),
   /** XQDY0137. */
-  MAPDUPLKEY_X_X_X(XQDY, 137, "Key % already exists in map (value: % vs. %)."),
+  MAPDUPLKEY_X_X_X(XQDY, 137, "Key % already exists in map (values: % vs. %)."),
   /** XQDY0138. */
   ARRAYPOS_X(XQDY, 138, "No value exists at array index %."),
+  /** XQDY0138. */
+  MAPTZ(XQDY, 138, "Map contains keys with and without timezone."),
   /** XQDY0140. */
   CTXMAPARRAY(XQDY, 140, "Input of lookup operator is not a map or array: %."),
 
