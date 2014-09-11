@@ -1,0 +1,23 @@
+package org.basex.query.func.file;
+
+import java.io.*;
+import java.nio.file.*;
+import java.nio.file.attribute.*;
+
+import org.basex.query.*;
+import org.basex.query.value.item.*;
+
+/**
+ * Function implementation.
+ *
+ * @author BaseX Team 2005-14, BSD License
+ * @author Christian Gruen
+ */
+public final class FileSize extends FileFn {
+  @Override
+  public Item item(final QueryContext qc) throws IOException, QueryException {
+    final Path path = toPath(0, qc);
+    final BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
+    return Int.get(attrs.isDirectory() ? 0 : attrs.size());
+  }
+}

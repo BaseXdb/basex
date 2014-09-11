@@ -279,17 +279,6 @@ public abstract class Expr extends ExprInfo {
    * Will be useful for inlining functions, or for copying static queries.
    * @param qc query context
    * @param scp variable scope for creating new variables
-   * @return copied expression
-   */
-  public final Expr copy(final QueryContext qc, final VarScope scp) {
-    return copy(qc, scp, new IntObjMap<Var>());
-  }
-
-  /**
-   * Copies an expression.
-   * Will be useful for inlining functions, or for copying static queries.
-   * @param qc query context
-   * @param scp variable scope for creating new variables
    * @param vs mapping from old variable IDs to new variable copies
    * @return copied expression
    */

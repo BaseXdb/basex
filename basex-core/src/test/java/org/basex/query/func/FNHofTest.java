@@ -5,6 +5,7 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.query.ast.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.func.hof.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -46,21 +47,23 @@ public final class FNHofTest extends QueryPlanTest {
   public void foldLeft1Test() {
     query("hof:fold-left1(1 to 10, function($x, $y) { $x + $y })", "55");
     error("hof:fold-left1((), function($x, $y) { $x + $y })", EMPTYFOUND);
+
     // should be unrolled and evaluated at compile time
-    check("hof:fold-left1(1 to 9, function($a,$b) {$a+$b})",
-        "45",
-        "empty(//" + Util.className(FNHof.class) + "[contains(@name, 'fold-left1')])",
+    final int limit = FnForEach.UNROLL_LIMIT;
+    check("hof:fold-left1(1 to " + limit + ", function($a,$b) {$a+$b})",
+        "55",
+        "empty(//" + Util.className(HofFoldLeft1.class) + "[contains(@name, 'fold-left1')])",
         "exists(*/" + Util.className(Int.class) + ')');
     // should be unrolled but not evaluated at compile time
-    check("hof:fold-left1(1 to 9, function($a,$b) {0*random:integer($a)+$b})",
-        "9",
-        "empty(//" + Util.className(FNHof.class) + "[contains(@name, 'fold-left1')])",
+    check("hof:fold-left1(1 to " + limit + ", function($a,$b) {0*random:integer($a)+$b})",
+        "10",
+        "empty(//" + Util.className(HofFoldLeft1.class) + "[contains(@name, 'fold-left1')])",
         "empty(*/" + Util.className(Int.class) + ')',
-        "count(//" + Util.className(Arith.class) + "[@op = '+']) eq 8");
+        "count(//" + Util.className(Arith.class) + "[@op = '+']) eq 9");
     // should not be unrolled
-    check("hof:fold-left1(1 to 10, function($a,$b) {$a+$b})",
-        "55",
-        "exists(//" + Util.className(FNHof.class) + "[contains(@name, 'fold-left1')])");
+    check("hof:fold-left1(1 to " + (limit + 1) + ", function($a,$b) {$a+$b})",
+        "66",
+        "exists(//" + Util.className(HofFoldLeft1.class) + "[contains(@name, 'fold-left1')])");
   }
 
   /** Test method. */

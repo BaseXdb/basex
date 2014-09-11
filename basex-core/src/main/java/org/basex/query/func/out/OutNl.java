@@ -1,0 +1,22 @@
+package org.basex.query.func.out;
+
+import org.basex.query.*;
+import org.basex.query.func.*;
+import org.basex.query.value.item.*;
+import org.basex.util.*;
+
+/**
+ * Output functions.
+ *
+ * @author BaseX Team 2005-14, BSD License
+ * @author Christian Gruen
+ */
+public final class OutNl extends StandardFunc {
+  /** Newline character. */
+  private static final Str NL = Str.get("\n");
+
+  @Override
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return NL;
+  }
+}

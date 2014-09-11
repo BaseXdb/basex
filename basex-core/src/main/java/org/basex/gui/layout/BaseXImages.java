@@ -35,7 +35,7 @@ public final class BaseXImages {
   private static final Icon RAWTEXT = icon("text_raw");
 
   /** Large icons. */
-  private static final boolean large = GUIConstants.HEIGHT > 16;
+  private static final boolean LARGE = GUIConstants.HEIGHT > 16;
   /** Icon for closed directories. */
   private static final Icon DIR1 = icon("file_dir1");
   /** Icon for opened directories. */
@@ -88,7 +88,7 @@ public final class BaseXImages {
     Image img;
     if(GUIConstants.SCALE > 1) {
       // choose large image or none
-      final URL url = large ? BaseXImages.class.getResource("/img/" + name + "_32.png") : null;
+      final URL url = LARGE ? BaseXImages.class.getResource("/img/" + name + "_32.png") : null;
       if(url == null) {
         // resize low-res image
         img = get(url(name));
@@ -161,7 +161,7 @@ public final class BaseXImages {
     if(path.contains(IO.BASEXSUFFIX)) return BASEX;
 
     // only works with standard dpi (https://bugs.openjdk.java.net/browse/JDK-6817929)
-    if(Prop.WIN && !large) {
+    if(Prop.WIN && !LARGE) {
       // retrieve system icons (only supported on Windows)
       final int p = path.lastIndexOf(path, '.');
       final String suffix = p != -1 ? path.substring(p + 1) : null;

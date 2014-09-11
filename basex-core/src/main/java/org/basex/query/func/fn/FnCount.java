@@ -38,9 +38,8 @@ public final class FnCount extends StandardFunc {
     final long c = e.size();
     if(c >= 0) return Int.get(c);
 
-    if(e instanceof FNMap) {
-      final FNMap f = (FNMap) e;
-      if(f.func == Function._MAP_KEYS) return Function._MAP_SIZE.get(sc, info, f.exprs);
+    if(e instanceof MapKeys) {
+      return Function._MAP_SIZE.get(sc, info, ((MapKeys) e).exprs);
     }
     return this;
   }

@@ -241,24 +241,13 @@ final class QueryCompiler {
     final IntList adj = new IntList(0);
     final boolean ok = curr.visit(new ASTVisitor() {
       @Override
-      public boolean staticVar(final StaticVar var) {
-        return var != curr && neighbor(var);
-      }
-
+      public boolean staticVar(final StaticVar var) { return var != curr && neighbor(var); }
       @Override
-      public boolean staticFuncCall(final StaticFuncCall call) {
-        return neighbor(call.func());
-      }
-
+      public boolean staticFuncCall(final StaticFuncCall call) { return neighbor(call.func()); }
       @Override
-      public boolean inlineFunc(final Scope sub) {
-        return sub.visit(this);
-      }
-
+      public boolean inlineFunc(final Scope sub) { return sub.visit(this); }
       @Override
-      public boolean funcItem(final FuncItem func) {
-        return neighbor(func);
-      }
+      public boolean funcItem(final FuncItem func) { return neighbor(func); }
 
       /**
        * Adds a neighbor of the currently inspected scope.

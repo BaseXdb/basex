@@ -1,0 +1,135 @@
+package org.basex.query.func.xquery;
+
+import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
+import static org.basex.util.Token.*;
+
+import java.util.*;
+
+import org.basex.core.*;
+import org.basex.query.*;
+import org.basex.query.func.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.util.*;
+import org.basex.util.options.*;
+
+/**
+ * XQuery functions.
+ *
+ * @author BaseX Team 2005-14, BSD License
+ * @author Christian Gruen
+ */
+public class XQueryEval extends StandardFunc {
+  /** Module prefix. */
+  private static final String PREFIX = "xquery";
+  /** QName. */
+  private static final QNm Q_OPTIONS = QNm.get(PREFIX, "options", XQUERYURI);
+
+  /** XQuery options. */
+  public static class XQueryOptions extends Options {
+    /** Permission. */
+    public static final StringOption PERMISSION = new StringOption("permission", Perm.ADMIN.name());
+    /** Timeout in seconds. */
+    public static final NumberOption TIMEOUT = new NumberOption("timeout", 0);
+    /** Maximum amount of megabytes that may be allocated by the query. */
+    public static final NumberOption MEMORY = new NumberOption("memory", 0);
+  }
+
+  @Override
+  public Iter iter(final QueryContext qc) throws QueryException {
+    return eval(qc, toToken(exprs[0], qc), null, false);
+  }
+
+  @Override
+  public final Value value(final QueryContext qc) throws QueryException {
+    return iter(qc).value();
+  }
+
+  /**
+   * Evaluates the specified string.
+   * @param qc query context
+   * @param qu query string
+   * @param path path to query file (may be {@code null})
+   * @param updating updating query
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  final ValueBuilder eval(final QueryContext qc, final byte[] qu, final String path,
+      final boolean updating) throws QueryException {
+
+    // bind variables and context value
+    final HashMap<String, Value> bindings = toBindings(1, qc);
+    final QueryContext qctx = qc.proc(new QueryContext(qc));
+
+    final Timer to = new Timer(true);
+    final Perm tmp = qc.context.user.perm;
+    if(exprs.length > 2) {
+      final Options opts = toOptions(2, Q_OPTIONS, new XQueryOptions(), qc);
+      qc.context.user.perm = Perm.get(opts.get(XQueryOptions.PERMISSION));
+      // initial memory consumption: perform garbage collection and calculate usage
+      Performance.gc(2);
+      final long mb = opts.get(XQueryOptions.MEMORY);
+      if(mb != 0) {
+        final long limit = Performance.memory() + (mb << 20);
+        to.schedule(new TimerTask() {
+          @Override
+          public void run() {
+            // limit reached: perform garbage collection and check again
+            if(Performance.memory() > limit) {
+              Performance.gc(1);
+              if(Performance.memory() > limit) qctx.stop();
+            }
+          }
+        }, 500, 500);
+      }
+      final long ms = opts.get(XQueryOptions.TIMEOUT) * 1000L;
+      if(ms != 0) {
+        to.schedule(new TimerTask() {
+          @Override
+          public void run() { qctx.stop(); }
+        }, ms);
+      }
+    }
+
+    // evaluate query
+    try {
+      final StaticContext sctx = new StaticContext(qctx.context);
+      for(final Map.Entry<String, Value> it : bindings.entrySet()) {
+        final String key = it.getKey();
+        final Value val = it.getValue();
+        if(key.isEmpty()) qctx.context(val, sctx);
+        else qctx.bind(key, val);
+      }
+      qctx.parseMain(string(qu), path, sctx);
+
+      if(updating) {
+        if(!sc.mixUpdates && !qctx.updating && !qctx.root.expr.isVacuous())
+          throw BXXQ_NOUPDATE.get(info);
+      } else {
+        if(qctx.updating) throw BXXQ_UPDATING.get(info);
+      }
+      qctx.compile();
+
+      final ValueBuilder vb = new ValueBuilder();
+      cache(qctx.iter(), vb, qctx);
+      return vb;
+    } catch(final ProcException ex) {
+      throw BXXQ_STOPPED.get(info);
+    } catch(final QueryException ex) {
+      throw ex.err() == BASX_PERM_X ? BXXQ_PERM_X.get(info, ex.getLocalizedMessage()) : ex;
+    } finally {
+      qc.context.user.perm = tmp;
+      qc.proc(null);
+      qctx.close();
+      to.cancel();
+    }
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitor.lock(null) && super.accept(visitor);
+  }
+}

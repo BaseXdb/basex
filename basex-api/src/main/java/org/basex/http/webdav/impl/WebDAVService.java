@@ -113,7 +113,7 @@ public final class WebDAVService<T> {
    */
   public long timestamp(final String db) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(DATA.args(_DB_INFO.args("$path") +
-        "/descendant::" + FNDb.toName(Text.TIMESTAMP) + "[1]")).bind("path",  db);
+        "/descendant::" + DbFn.toName(Text.TIMESTAMP) + "[1]")).bind("path",  db);
 
     try {
       // retrieve and parse timestamp

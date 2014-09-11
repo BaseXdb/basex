@@ -1,5 +1,6 @@
 package org.basex.query.func.archive;
 
+import static org.basex.query.func.archive.ArchiveText.*;
 import static org.basex.query.util.Err.*;
 
 import java.io.*;
@@ -31,8 +32,8 @@ public abstract class ArchiveOut {
    */
   public static ArchiveOut get(final String format, final InputInfo info) throws QueryException {
     try {
-      if(format.equals(FNArchive.ZIP)) return new ZIPOut();
-      if(format.equals(FNArchive.GZIP)) return new GZIPOut();
+      if(format.equals(ZIP)) return new ZIPOut();
+      if(format.equals(GZIP)) return new GZIPOut();
     } catch(final IOException ex) {
       throw ARCH_FAIL_X.get(info, ex);
     }

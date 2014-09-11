@@ -1,0 +1,25 @@
+package org.basex.query.func.db;
+
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.query.up.primitives.*;
+import org.basex.query.value.item.*;
+import org.basex.util.*;
+import org.basex.util.options.*;
+
+/**
+ * Function implementation.
+ *
+ * @author BaseX Team 2005-14, BSD License
+ * @author Christian Gruen
+ */
+public class DbOptimize extends DbNew {
+  @Override
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Data data = checkData(qc);
+    final boolean all = exprs.length > 1 && toBoolean(exprs[1], qc);
+    final Options opts = toOptions(2, Q_OPTIONS, new Options(), qc);
+    qc.resources.updates().add(new DBOptimize(data, all, opts, qc, info), qc);
+    return null;
+  }
+}

@@ -312,8 +312,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Checks if the current user has create permissions. If negative, an
-   * exception is thrown.
+   * Checks if the current user has create permissions. If negative, an exception is thrown.
    * @param qc query context
    * @throws QueryException query exception
    */
@@ -362,17 +361,13 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Checks if one of the specified arguments point to databases that need to be locked.
+   * Tries to mark the specified argument for locking.
    * @param visitor visitor
-   * @param dbs database arguments
-   * @return result of check
+   * @param i index of argument
+   * @return success flag
    */
-  protected final boolean dataLock(final ASTVisitor visitor, final int dbs) {
-    boolean more = true;
-    for(int db = 0; db < dbs; db++) {
-      more &= visitor.lock(exprs[db] instanceof Str ? string(((Str) exprs[db]).string()) : null);
-    }
-    return more;
+  protected final boolean dataLock(final ASTVisitor visitor, final int i) {
+    return visitor.lock(exprs[i] instanceof Str ? string(((Str) exprs[i]).string()) : null);
   }
 
   /**

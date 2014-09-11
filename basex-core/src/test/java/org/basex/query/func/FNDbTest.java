@@ -617,7 +617,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void flush() {
     query(_DB_FLUSH.args(NAME));
-    error(_DB_FLUSH.args(NAME + 'x'), BXDB_OPEN_X);
+    error(_DB_FLUSH.args(NAME + "unknown"), BXDB_OPEN_X);
   }
 
   /** Test method. */
@@ -710,7 +710,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     // invalid name
     error(_DB_CREATE_BACKUP.args(" ''"), BXDB_NAME_X);
     // try to backup non-existing database
-    error(_DB_CREATE_BACKUP.args(NAME + 'x'), BXDB_WHICH_X);
+    error(_DB_CREATE_BACKUP.args(NAME + "backup"), BXDB_WHICH_X);
   }
 
   /**
@@ -745,11 +745,11 @@ public final class FNDbTest extends AdvancedQueryTest {
     new Close().execute(context);
 
     // copy database to new name and vice versa
-    query(_DB_COPY.args(NAME, NAME + 'x'));
+    query(_DB_COPY.args(NAME, NAME + 'c'));
     try {
-      query(_DB_COPY.args(NAME + 'x', NAME));
+      query(_DB_COPY.args(NAME + 'c', NAME));
     } finally {
-      query(_DB_DROP.args(NAME + 'x'));
+      query(_DB_DROP.args(NAME + 'c'));
     }
 
     // invalid names
@@ -759,7 +759,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     // same name is disallowed
     error(_DB_COPY.args(NAME, NAME), BXDB_SAME_X);
     // source database does not exist
-    error(_DB_COPY.args(NAME + "xx", NAME), BXDB_WHICH_X);
+    error(_DB_COPY.args(NAME + "copy", NAME), BXDB_WHICH_X);
   }
 
   /**
@@ -772,8 +772,8 @@ public final class FNDbTest extends AdvancedQueryTest {
     new Close().execute(context);
 
     // rename database to new name and vice versa
-    query(_DB_ALTER.args(NAME, NAME + 'x'));
-    query(_DB_ALTER.args(NAME + 'x', NAME));
+    query(_DB_ALTER.args(NAME, NAME + 'a'));
+    query(_DB_ALTER.args(NAME + 'a', NAME));
 
     // invalid names
     error(_DB_ALTER.args("x", " ''"), BXDB_NAME_X);
@@ -782,7 +782,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     // same name is disallowed
     error(_DB_ALTER.args(NAME, NAME), BXDB_SAME_X);
     // source database does not exist
-    error(_DB_ALTER.args(NAME + "xx", NAME), BXDB_WHICH_X);
+    error(_DB_ALTER.args(NAME + "alter", NAME), BXDB_WHICH_X);
   }
 
   /**

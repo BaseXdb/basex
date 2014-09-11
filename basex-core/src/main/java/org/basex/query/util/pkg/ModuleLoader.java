@@ -217,11 +217,11 @@ public final class ModuleLoader {
       throw MODINITERR_X.get(ii, th);
     }
 
-    final boolean qm = clz.getSuperclass() == QueryModule.class;
     final Object jm = Reflect.get(clz);
     if(jm == null) throw INSTERR_X.get(ii, cp);
 
     // add all public methods of the class (ignore methods from super classes)
+    final boolean qm = QueryModule.class.isAssignableFrom(clz);
     final ArrayList<Method> list = new ArrayList<>();
     for(final Method m : clz.getMethods()) {
       // if class is inherited from {@link QueryModule}, no super methods are accepted
