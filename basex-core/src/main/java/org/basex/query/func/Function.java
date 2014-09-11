@@ -377,7 +377,7 @@ public enum Function {
   /** XQuery function. */
   TOKENIZE(FnTokenize.class, "tokenize(string[,pattern[,mod]])", arg(STR_ZO, STR, STR), STR_ZM),
   /** XQuery function. */
-  TRACE(FnTrace.class, "trace(value,label)", arg(ITEM_ZM, STR), ITEM_ZM, flag(NDT)),
+  TRACE(FnTrace.class, "trace(value[,label])", arg(ITEM_ZM, STR), ITEM_ZM, flag(NDT)),
   /** XQuery function. */
   TRANSLATE(FnTranslate.class, "translate(string,map,trans)", arg(STR_ZO, STR, STR), STR),
   /** XQuery function. */

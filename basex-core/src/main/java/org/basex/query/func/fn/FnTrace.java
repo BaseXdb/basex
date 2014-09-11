@@ -23,7 +23,7 @@ public final class FnTrace extends StandardFunc {
   public Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
       final Iter ir = exprs[0].iter(qc);
-      final byte[] label = toToken(exprs[1], qc);
+      final byte[] label = exprs.length > 1 ? toToken(exprs[1], qc) : null;
       boolean empty = true;
       @Override
       public Item next() throws QueryException {
