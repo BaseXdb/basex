@@ -427,9 +427,8 @@ public enum Function {
   /** XQuery function. */
   _MAP_KEYS(MapKeys.class, "keys(map)", arg(MAP_O), AAT_ZM, MAP_URI),
   /** XQuery function. */
-  _MAP_FOR_EACH_ENTRY(MapForEachEntry.class, "for-each-entry(map,function)",
-      arg(MAP_O, FuncType.get(ITEM_ZM, AAT, ITEM_ZM).seqType()), ITEM_ZM, flag(HOF),
-      MAP_URI),
+  _MAP_FOR_EACH(MapForEach.class, "for-each(map,function)",
+      arg(MAP_O, FuncType.get(ITEM_ZM, AAT, ITEM_ZM).seqType()), ITEM_ZM, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_SERIALIZE(MapSerialize.class, "serialize(map)", arg(MAP_O), STR, MAP_URI),
 
@@ -437,6 +436,8 @@ public enum Function {
 
   /** XQuery function. */
   _ARRAY_SIZE(ArraySize.class, "size(array)", arg(ARRAY_O), ITR, ARRAY_URI),
+  /** XQuery function. */
+  _ARRAY_GET(ArrayGet.class, "get(array,pos)", arg(ARRAY_O, ITR), ITEM_ZM, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_APPEND(ArrayAppend.class, "append(array,value)",
       arg(ARRAY_O, ITEM_ZM), ARRAY_O, ARRAY_URI),
@@ -457,7 +458,7 @@ public enum Function {
   /** XQuery function. */
   _ARRAY_JOIN(ArrayJoin.class, "join(array)", arg(ARRAY_ZM), ITEM_ZM, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_FOR_EACH_MEMBER(ArrayForEachMember.class, "for-each-member(array,function)",
+  _ARRAY_FOR_EACH(ArrayForEach.class, "for-each(array,function)",
       arg(ARRAY_O, FuncType.get(ITEM_ZM, ITEM_ZM).seqType()), ARRAY_O, flag(HOF),
       ARRAY_URI),
   /** XQuery function. */

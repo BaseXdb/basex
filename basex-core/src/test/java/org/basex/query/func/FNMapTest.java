@@ -82,10 +82,10 @@ public final class FNMapTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
-  public void forEachEntry() {
-    query(_MAP_FOR_EACH_ENTRY.args(" map{}", "function($a, $b) { 1 }"), "");
-    query(_MAP_FOR_EACH_ENTRY.args(" map{1:2}", "function($a, $b) { $a+$b }"), "3");
-    query(_MAP_FOR_EACH_ENTRY.args(" map{'a':1, 'b':2}", "function($a, $b) { $b }"), "1 2");
+  public void forEach() {
+    query(_MAP_FOR_EACH.args(" map{}", "function($a, $b) { 1 }"), "");
+    query(_MAP_FOR_EACH.args(" map{1:2}", "function($a, $b) { $a+$b }"), "3");
+    query(_MAP_FOR_EACH.args(" map{'a':1, 'b':2}", "function($a, $b) { $b }"), "1 2");
   }
 
   /**

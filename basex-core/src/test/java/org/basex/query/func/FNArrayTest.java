@@ -114,11 +114,11 @@ public final class FNArrayTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test public void forEachMember() {
-    array(_ARRAY_FOR_EACH_MEMBER.args(" []", "function($a) { $a }"), "[]");
-    array(_ARRAY_FOR_EACH_MEMBER.args(" [1]", "function($a) { $a }"), "[1]");
-    array(_ARRAY_FOR_EACH_MEMBER.args(" [1,2]", "function($a) { $a+1 }"), "[2, 3]");
-    array(_ARRAY_FOR_EACH_MEMBER.args(" [1,2,3]", "function($a) { () }"), "[(), (), ()]");
+  @Test public void forEach() {
+    array(_ARRAY_FOR_EACH.args(" []", "function($a) { $a }"), "[]");
+    array(_ARRAY_FOR_EACH.args(" [1]", "function($a) { $a }"), "[1]");
+    array(_ARRAY_FOR_EACH.args(" [1,2]", "function($a) { $a+1 }"), "[2, 3]");
+    array(_ARRAY_FOR_EACH.args(" [1,2,3]", "function($a) { () }"), "[(), (), ()]");
   }
 
   /** Test method. */

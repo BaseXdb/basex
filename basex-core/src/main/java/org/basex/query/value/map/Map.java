@@ -77,7 +77,7 @@ public final class Map extends FItem {
   @Override
   public Item invItem(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return get(args[0].item(qc, ii), ii).item(qc, ii);
+    return invValue(qc, ii, args).item(qc, ii);
   }
 
   @Override
