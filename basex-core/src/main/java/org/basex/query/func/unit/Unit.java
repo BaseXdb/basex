@@ -86,7 +86,7 @@ final class Unit {
         final int as = ann.size();
         boolean xq = false;
         for(int a = 0; !xq && a < as; a++) {
-          xq |= eq(ann.names[a].uri(), QueryText.UNITURI);
+          xq |= eq(ann.names[a].uri(), QueryText.UNIT_URI);
         }
         if(!xq) continue;
 
@@ -208,7 +208,7 @@ final class Unit {
         error.add(element(ue.expected, EXPECTED, ue.count));
       } else if(!fail) {
         // exception other than failure: add type
-        error.add(TYPE, ex.qname().prefixId(QueryText.ERRORURI));
+        error.add(TYPE, ex.qname().prefixId(QueryText.ERROR_URI));
       }
 
       // add info
@@ -299,7 +299,7 @@ final class Unit {
     int pos = -1;
     for(int a = 0; a < as; a++) {
       final QNm nm = ann.names[a];
-      if(eq(nm.uri(), QueryText.UNITURI) && eq(nm.local(), name)) {
+      if(eq(nm.uri(), QueryText.UNIT_URI) && eq(nm.local(), name)) {
         if(pos != -1) throw UNIT_TWICE_X_X.get(null, '%', nm.local());
         pos = a;
       }

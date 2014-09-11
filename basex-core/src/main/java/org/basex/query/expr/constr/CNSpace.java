@@ -37,9 +37,9 @@ public final class CNSpace extends CName {
     if(cp.length != 0 && !XMLToken.isNCName(cp)) throw INVNSNAME_X.get(info, cp);
 
     final byte[] cu = trim(value(qc, ii));
-    if(eq(cp, XML) ^ eq(cu, XMLURI)) throw CNXML.get(info);
+    if(eq(cp, XML) ^ eq(cu, XML_URI)) throw CNXML.get(info);
     if(eq(cp, XMLNS)) throw CNINV_X.get(info, cp);
-    if(eq(cu, XMLNSURI) || cu.length == 0) throw CNINVNS_X.get(info, cu);
+    if(eq(cu, XMLNS_URI) || cu.length == 0) throw CNINVNS_X.get(info, cu);
 
     return new FNames(cp, cu);
   }

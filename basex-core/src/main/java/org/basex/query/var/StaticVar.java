@@ -22,7 +22,7 @@ import org.basex.util.*;
  */
 public final class StaticVar extends StaticDecl {
   /** Annotation for lazy evaluation. */
-  private static final QNm LAZY = new QNm(QueryText.LAZY, BASEXURI);
+  private static final QNm LAZY = new QNm(QueryText.LAZY, BASEX_URI);
 
   /** If this variable can be bound from outside the query. */
   private final boolean external;

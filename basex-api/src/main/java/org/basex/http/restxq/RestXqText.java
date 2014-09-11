@@ -124,13 +124,13 @@ public interface RestXqText {
   /** Serializer node test. */
   NodeTest OUTPUT_SERIAL = new NodeTest(FuncOptions.Q_SPARAM);
   /** HTTP Response test. */
-  NodeTest HTTP_RESPONSE = new NodeTest(QNm.get(RESPONSE, HTTPURI));
+  NodeTest HTTP_RESPONSE = new NodeTest(QNm.get(RESPONSE, HTTP_URI));
   /** RESTXQ Response test. */
-  NodeTest REST_RESPONSE = new NodeTest(QNm.get(RESPONSE, RESTURI));
+  NodeTest REST_RESPONSE = new NodeTest(QNm.get(RESPONSE, REST_URI));
   /** RESTXQ Redirect test. */
-  NodeTest REST_REDIRECT = new NodeTest(QNm.get(REDIRECT, RESTURI));
+  NodeTest REST_REDIRECT = new NodeTest(QNm.get(REDIRECT, REST_URI));
   /** RESTXQ Forward test. */
-  NodeTest REST_FORWARD = new NodeTest(QNm.get(FORWARD, RESTURI));
+  NodeTest REST_FORWARD = new NodeTest(QNm.get(FORWARD, REST_URI));
   /** HTTP Header test. */
-  NodeTest HTTP_HEADER = new NodeTest(QNm.get(HEADER, HTTPURI));
+  NodeTest HTTP_HEADER = new NodeTest(QNm.get(HEADER, HTTP_URI));
 }

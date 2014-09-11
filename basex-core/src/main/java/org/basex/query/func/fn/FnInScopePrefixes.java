@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class FnInScopePrefixes extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Atts ns = toElem(exprs[0], qc).nsScope().add(XML, XMLURI);
+    final Atts ns = toElem(exprs[0], qc).nsScope().add(XML, XML_URI);
     final int as = ns.size();
     final ValueBuilder vb = new ValueBuilder(as);
     for(int a = 0; a < as; ++a) {

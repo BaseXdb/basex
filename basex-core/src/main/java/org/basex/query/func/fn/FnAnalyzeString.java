@@ -17,16 +17,14 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FnAnalyzeString extends RegEx {
-  /** Module prefix. */
-  private static final String PREFIX = "fn";
   /** QName. */
-  private static final QNm Q_ANALYZE = QNm.get(PREFIX, "analyze-string-result", FNURI);
+  private static final QNm Q_ANALYZE = QNm.get(FN_PREFIX, "analyze-string-result", FN_URI);
   /** QName. */
-  private static final QNm Q_MATCH = QNm.get(PREFIX, "match", FNURI);
+  private static final QNm Q_MATCH = QNm.get(FN_PREFIX, "match", FN_URI);
   /** QName. */
-  private static final QNm Q_NONMATCH = QNm.get(PREFIX, "non-match", FNURI);
+  private static final QNm Q_NONMATCH = QNm.get(FN_PREFIX, "non-match", FN_URI);
   /** QName. */
-  private static final QNm Q_MGROUP = QNm.get(PREFIX, "group", FNURI);
+  private static final QNm Q_MGROUP = QNm.get(FN_PREFIX, "group", FN_URI);
   /** Attribute for the analyze-string-result function. */
   private static final String NR = "nr";
 

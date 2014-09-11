@@ -20,11 +20,11 @@ import org.basex.util.list.*;
  */
 public final class Ann extends ElementList {
   /** Annotation "private". */
-  public static final QNm Q_PRIVATE = new QNm(PRIVATE, XQURI);
+  public static final QNm Q_PRIVATE = new QNm(PRIVATE, XQ_URI);
   /** Annotation "public". */
-  public static final QNm Q_PUBLIC = new QNm(PUBLIC, XQURI);
+  public static final QNm Q_PUBLIC = new QNm(PUBLIC, XQ_URI);
   /** Annotation "updating". */
-  public static final QNm Q_UPDATING = new QNm(UPDATING, XQURI);
+  public static final QNm Q_UPDATING = new QNm(UPDATING, XQ_URI);
 
   /** Supported REST annotations. */
   private static final byte[][] ANN_REST = tokens("error", "path", "produces", "consumes",
@@ -164,15 +164,15 @@ public final class Ann extends ElementList {
       } else if(NSGlobal.reserved(name.uri())) {
         // no global namespaces allowed
         throw ANNRES_X_X.get(infos[a], '%', name.string());
-      } else if(eq(uri, OUTPUTURI)) {
+      } else if(eq(uri, OUTPUT_URI)) {
         if(SerializerOptions.get(true).option(string(local)) == null)
           throw BASX_ANNOT_X_X.get(infos[a], '%', name.string());
         if(values[a].size() != 1 || !values[a].itemAt(0).type.isStringOrUntyped()) {
           throw BASX_ANNOTARGS_X_X.get(infos[a], '%', name.string());
         }
-      } else if(eq(uri, RESTURI)) {
+      } else if(eq(uri, REST_URI)) {
         if(!eq(local, ANN_REST)) throw BASX_ANNOT_X_X.get(infos[a], '%', name.string());
-      } else if(eq(uri, UNITURI)) {
+      } else if(eq(uri, UNIT_URI)) {
         if(!eq(local, ANN_UNIT)) throw BASX_ANNOT_X_X.get(infos[a], '%', name.string());
       }
     }

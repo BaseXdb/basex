@@ -75,7 +75,7 @@ public final class Functions extends TokenSet {
     for(final AtomType t : AtomType.VALUES) {
       if(t.parent == null) continue;
       final byte[] u = t.name.uri();
-      if(eq(u, XSURI) && t != AtomType.NOT && t != AtomType.AAT && ls.similar(
+      if(eq(u, XS_URI) && t != AtomType.NOT && t != AtomType.AAT && ls.similar(
           lc(ln), lc(t.string()))) throw FUNCSIMILAR_X_X.get(ii, name.string(), t.string());
     }
     // no similar name: constructor function found, or abstract type specified
@@ -131,7 +131,7 @@ public final class Functions extends TokenSet {
       final StaticContext sc, final InputInfo ii) throws QueryException {
 
     // parse type constructors
-    if(eq(name.uri(), XSURI)) {
+    if(eq(name.uri(), XS_URI)) {
       final Type type = getCast(name, arity, ii);
       final VarScope scp = new VarScope(sc);
       final Var[] args = { scp.newLocal(qc, new QNm(ITEMM, ""), SeqType.AAT_ZO, true) };
@@ -230,7 +230,7 @@ public final class Functions extends TokenSet {
 
     // get namespace and local name
     // parse type constructors
-    if(eq(name.uri(), XSURI)) {
+    if(eq(name.uri(), XS_URI)) {
       final Type type = getCast(name, args.length, ii);
       final SeqType to = SeqType.get(type, Occ.ZERO_ONE);
       return TypedFunc.constr(new Cast(sc, ii, args[0], to));
@@ -300,7 +300,7 @@ public final class Functions extends TokenSet {
    */
   private static QueryException similarError(final QNm name, final InputInfo ii, final byte[] key) {
     final int i = indexOf(key, '}');
-    return FUNCSIMILAR_X_X.get(ii, name.prefixId(FNURI), new TokenBuilder(
+    return FUNCSIMILAR_X_X.get(ii, name.prefixId(FN_URI), new TokenBuilder(
         NSGlobal.prefix(substring(key, 2, i))).add(':').add(substring(key, i + 1)).finish());
   }
 

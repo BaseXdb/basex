@@ -23,10 +23,8 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public class XQueryEval extends StandardFunc {
-  /** Module prefix. */
-  private static final String PREFIX = "xquery";
   /** QName. */
-  private static final QNm Q_OPTIONS = QNm.get(PREFIX, "options", XQUERYURI);
+  private static final QNm Q_OPTIONS = QNm.get(XQUERY_PREFIX, "options", XQUERY_URI);
 
   /** XQuery options. */
   public static class XQueryOptions extends Options {

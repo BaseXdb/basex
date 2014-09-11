@@ -63,8 +63,8 @@ public final class CElem extends CName {
       // create and check QName
       final QNm nm = qname(qc, ii);
       final byte[] cp = nm.prefix(), cu = nm.uri();
-      if(eq(cp, XML) ^ eq(cu, XMLURI)) throw CEXML.get(info, cu, cp);
-      if(eq(cu, XMLNSURI)) throw CEINV_X.get(info, cu);
+      if(eq(cp, XML) ^ eq(cu, XML_URI)) throw CEXML.get(info, cu, cp);
+      if(eq(cu, XMLNS_URI)) throw CEINV_X.get(info, cu);
       if(eq(cp, XMLNS)) throw CEINV_X.get(info, cp);
       if(!nm.hasURI() && nm.hasPrefix()) throw INVPREF_X.get(info, nm);
 

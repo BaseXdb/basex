@@ -147,8 +147,8 @@ public abstract class RESTCmd extends Command {
   static SerializerOptions serial(final HTTPContext http) {
     final SerializerOptions sopts = http.sopts();
     if(http.wrapping) {
-      sopts.set(SerializerOptions.WRAP_PREFIX, REST);
-      sopts.set(SerializerOptions.WRAP_URI, RESTURI);
+      sopts.set(SerializerOptions.WRAP_PREFIX, REST_PREFIX);
+      sopts.set(SerializerOptions.WRAP_URI, REST_URI);
     }
     return sopts;
   }

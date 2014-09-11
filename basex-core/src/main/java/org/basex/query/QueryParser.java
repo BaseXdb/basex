@@ -438,7 +438,7 @@ public class QueryParser extends InputParser {
   private void annotation(final Ann ann) throws QueryException {
     skipWs();
     final InputInfo info = info();
-    final QNm name = eQName(QNAME_X, XQURI);
+    final QNm name = eQName(QNAME_X, XQ_URI);
 
     final ValueBuilder vb = new ValueBuilder();
     if(wsConsumeWs(PAREN1)) {
@@ -497,8 +497,8 @@ public class QueryParser extends InputParser {
     if(!elem && !wsConsumeWs(FUNCTION)) return false;
     wsCheck(NSPACE);
     final byte[] uri = stringLiteral();
-    if(eq(XMLURI, uri)) throw error(BINDXMLURI_X_X, uri, XML);
-    if(eq(XMLNSURI, uri)) throw error(BINDXMLURI_X_X, uri, XMLNS);
+    if(eq(XML_URI, uri)) throw error(BINDXMLURI_X_X, uri, XML);
+    if(eq(XMLNS_URI, uri)) throw error(BINDXMLURI_X_X, uri, XMLNS);
 
     if(elem) {
       if(!decl.add(ELEMENT)) throw error(DUPLNS);
@@ -516,11 +516,11 @@ public class QueryParser extends InputParser {
    */
   private void optionDecl() throws QueryException {
     skipWs();
-    final QNm qnm = eQName(QNAME_X, XQURI);
+    final QNm qnm = eQName(QNAME_X, XQ_URI);
     final byte[] val = stringLiteral();
     final String name = string(qnm.local());
 
-    if(eq(qnm.uri(), OUTPUTURI)) {
+    if(eq(qnm.uri(), OUTPUT_URI)) {
       // output declaration
       if(module != null) throw error(MODOUT);
 
@@ -550,9 +550,9 @@ public class QueryParser extends InputParser {
           throw error(OUTDOC_X, val);
         }
       }
-    } else if(eq(qnm.uri(), XQURI)) {
+    } else if(eq(qnm.uri(), XQ_URI)) {
       throw error(DECLOPTION_X, qnm);
-    } else if(eq(qnm.uri(), DBURI)) {
+    } else if(eq(qnm.uri(), DB_URI)) {
       // project-specific declaration
       final String ukey = name.toUpperCase(Locale.ENGLISH);
       final Option<?> opt = qc.context.options.option(ukey);
@@ -560,7 +560,7 @@ public class QueryParser extends InputParser {
       // cache old value (to be reset after query evaluation)
       qc.staticOpts.put(opt, qc.context.options.get(opt));
       qc.tempOpts.add(name).add(string(val));
-    } else if(eq(qnm.uri(), QUERYURI)) {
+    } else if(eq(qnm.uri(), QUERY_URI)) {
       // query-specific options
       if(name.equals(READ_LOCK)) {
         for(final byte[] lock : split(val, ','))
@@ -1730,7 +1730,7 @@ public class QueryParser extends InputParser {
       }
 
       final byte[] v = tok.trim().toArray();
-      if(eq(name.prefix(), DB)) {
+      if(eq(name.prefix(), DB_PREFIX)) {
         // project-specific declaration
         final String key = string(uc(name.local()));
         final Option<?> opt = qc.context.options.option(key);
@@ -2503,7 +2503,7 @@ public class QueryParser extends InputParser {
         if(!simple) throw error(NSCONS);
         final byte[] pref = pr ? local(atn) : EMPTY;
         final byte[] uri = attv.isEmpty() ? EMPTY : ((Str) attv.get(0)).string();
-        if(eq(pref, XML) && eq(uri, XMLURI)) {
+        if(eq(pref, XML) && eq(uri, XML_URI)) {
           if(xmlDecl) throw error(DUPLNSDEF_X, XML);
           xmlDecl = true;
         } else {
@@ -2511,11 +2511,11 @@ public class QueryParser extends InputParser {
           if(pr) {
             if(uri.length == 0) throw error(NSEMPTYURI);
             if(eq(pref, XML, XMLNS)) throw error(BINDXML_X, pref);
-            if(eq(uri, XMLURI)) throw error(BINDXMLURI_X_X, uri, XML);
-            if(eq(uri, XMLNSURI)) throw error(BINDXMLURI_X_X, uri, XMLNS);
+            if(eq(uri, XML_URI)) throw error(BINDXMLURI_X_X, uri, XML);
+            if(eq(uri, XMLNS_URI)) throw error(BINDXMLURI_X_X, uri, XMLNS);
             sc.ns.add(pref, uri);
           } else {
-            if(eq(uri, XMLURI)) throw error(XMLNSDEF_X, uri);
+            if(eq(uri, XML_URI)) throw error(XMLNSDEF_X, uri);
             sc.elemNS = uri;
           }
           if(ns.contains(pref)) throw error(DUPLNSDEF_X, pref);

@@ -22,9 +22,9 @@ import org.basex.util.*;
  */
 public class SqlExecute extends SqlFn {
   /** QName. */
-  private static final QNm Q_ROW = QNm.get(PREFIX, "row", SQLURI);
+  private static final QNm Q_ROW = QNm.get(SQL_PREFIX, "row", SQL_URI);
   /** QName. */
-  private static final QNm Q_COLUMN = QNm.get(PREFIX, "column", SQLURI);
+  private static final QNm Q_COLUMN = QNm.get(SQL_PREFIX, "column", SQL_URI);
   /** Name. */
   private static final String NAME = "name";
 

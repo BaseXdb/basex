@@ -175,6 +175,6 @@ public final class PkgParser {
    * @return result of check
    */
   private static boolean eqNS(final byte[] cmp, final QNm name) {
-    return name.eq(new QNm(cmp, QueryText.PKGURI));
+    return name.eq(new QNm(cmp, QueryText.PKG_URI));
   }
 }

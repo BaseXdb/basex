@@ -21,7 +21,7 @@ import org.basex.util.*;
  */
 public final class HtmlParse extends StandardFunc {
   /** QName. */
-  private static final QNm Q_OPTIONS = QNm.get("options", HTMLURI);
+  private static final QNm Q_OPTIONS = QNm.get("options", HTML_URI);
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {

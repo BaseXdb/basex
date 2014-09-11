@@ -42,7 +42,7 @@ public enum ListType implements Type {
    * @param type atomic type
    */
   ListType(final String name, final AtomType type) {
-    this.name = new QNm(name, XSURI);
+    this.name = new QNm(name, XS_URI);
     this.type = type;
   }
 

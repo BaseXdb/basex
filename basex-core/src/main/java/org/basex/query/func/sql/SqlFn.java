@@ -14,9 +14,6 @@ import org.basex.query.func.*;
  * @author Rositsa Shadura
  */
 abstract class SqlFn extends StandardFunc {
-  /** Module prefix. */
-  static final String PREFIX = "sql";
-
   /**
    * Returns a connection.
    * @param qc query context

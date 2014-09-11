@@ -25,7 +25,7 @@ import org.basex.util.options.*;
  */
 public final class FuncOptions {
   /** QName. */
-  public static final QNm Q_SPARAM = QNm.get("serialization-parameters", OUTPUTURI);
+  public static final QNm Q_SPARAM = QNm.get("serialization-parameters", OUTPUT_URI);
   /** Value. */
   private static final String VALUE = "value";
 

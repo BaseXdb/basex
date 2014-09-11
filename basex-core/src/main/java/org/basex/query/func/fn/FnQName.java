@@ -21,7 +21,7 @@ public final class FnQName extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] uri = toEmptyToken(exprs[0], qc);
     final byte[] name = toToken(exprs[1], qc);
-    final byte[] str = !contains(name, ':') && eq(uri, XMLURI) ? concat(XMLC, name) : name;
+    final byte[] str = !contains(name, ':') && eq(uri, XML_URI) ? concat(XMLC, name) : name;
     if(!XMLToken.isQName(str)) throw valueError(info, AtomType.QNM, name);
     final QNm nm = new QNm(str, uri);
     if(nm.hasPrefix() && uri.length == 0) throw valueError(info, AtomType.URI, nm.uri());

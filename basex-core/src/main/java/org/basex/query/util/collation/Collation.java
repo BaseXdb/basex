@@ -74,7 +74,7 @@ public class Collation {
       }
     }
     // return unicode point collation
-    if(eq(COLLATIONURI, url)) return null;
+    if(eq(COLLATION_URI, url)) return null;
     // return unicode point collation
     if(eq(NoCaseCollation.URL, url)) return NoCaseCollation.get();
 

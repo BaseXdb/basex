@@ -12,10 +12,10 @@ import org.basex.util.*;
  */
 final class GeoErrors {
   /** Error namespace. */
-  private static final byte[] NS = QueryText.EXPERROR;
+  private static final byte[] NS = QueryText.EXPERROR_URI;
   /** Namespace and error code prefix. */
   private static final String PREFIX =
-      new TokenBuilder(QueryText.EXPERR).add(":GEO").toString();
+      new TokenBuilder(QueryText.EXPERR_PREFIX).add(":GEO").toString();
 
   /** Private constructor, preventing instantiation. */
   private GeoErrors() { }

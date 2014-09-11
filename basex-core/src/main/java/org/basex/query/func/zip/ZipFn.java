@@ -13,14 +13,12 @@ import org.basex.query.value.item.*;
  * @author Christian Gruen
  */
 abstract class ZipFn extends StandardFunc {
-  /** Module prefix. */
-  private static final String PREFIX = "zip";
   /** QName. */
-  static final QNm Q_FILE = QNm.get(PREFIX, "file", ZIPURI);
+  static final QNm Q_FILE = QNm.get(ZIP_PREFIX, "file", ZIP_URI);
   /** QName. */
-  static final QNm Q_DIR = QNm.get(PREFIX, "dir", ZIPURI);
+  static final QNm Q_DIR = QNm.get(ZIP_PREFIX, "dir", ZIP_URI);
   /** QName. */
-  static final QNm Q_ENTRY = QNm.get(PREFIX, "entry", ZIPURI);
+  static final QNm Q_ENTRY = QNm.get(ZIP_PREFIX, "entry", ZIP_URI);
 
   /** Attribute: href. */
   static final byte[] HREF = token("href");

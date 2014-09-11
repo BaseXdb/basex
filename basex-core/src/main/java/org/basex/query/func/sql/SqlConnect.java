@@ -22,7 +22,7 @@ import org.basex.util.options.*;
  */
 public final class SqlConnect extends SqlFn {
   /** QName. */
-  private static final QNm Q_OPTIONS = QNm.get(PREFIX, "options", SQLURI);
+  private static final QNm Q_OPTIONS = QNm.get(SQL_PREFIX, "options", SQL_URI);
 
   /** Auto-commit mode. */
   private static final String AUTO_COMM = "autocommit";

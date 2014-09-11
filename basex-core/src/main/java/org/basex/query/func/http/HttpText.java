@@ -30,16 +30,14 @@ public interface HttpText {
   /** Filename string. */
   String FILENAME_IS = "filename=";
 
-  /** Module prefix. */
-  String PREFIX = "http";
   /** QName. */
-  QNm Q_BODY = QNm.get(PREFIX, "body", HTTPURI);
+  QNm Q_BODY = QNm.get(HTTP_PREFIX, "body", HTTP_URI);
   /** QName. */
-  QNm Q_RESPONSE = QNm.get(PREFIX, "response", HTTPURI);
+  QNm Q_RESPONSE = QNm.get(HTTP_PREFIX, "response", HTTP_URI);
   /** QName. */
-  QNm Q_HEADER = QNm.get(PREFIX, "header", HTTPURI);
+  QNm Q_HEADER = QNm.get(HTTP_PREFIX, "header", HTTP_URI);
   /** QName. */
-  QNm Q_MULTIPART = QNm.get(PREFIX, "multipart", HTTPURI);
+  QNm Q_MULTIPART = QNm.get(HTTP_PREFIX, "multipart", HTTP_URI);
 
   /** Request attribute: HTTP method. */
   byte[] METHOD = token("method");

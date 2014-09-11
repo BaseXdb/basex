@@ -22,7 +22,7 @@ public abstract class RESTTest extends HTTPTest {
   static final String ROOT = "http://" + Text.S_LOCALHOST + ":9998/" + REST + '/';
 
   /** REST URI. */
-  static final String URI = RESTText.RESTURI;
+  static final String URI = RESTText.REST_URI;
   /** Opening result. */
   static final String WRAP =
       '<' + REST + ":results xmlns:" + REST + "=\"" + URI + "\"/>";

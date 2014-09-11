@@ -20,9 +20,9 @@ import org.basex.query.value.type.*;
  */
 public final class SqlExecutePrepared extends SqlExecute {
   /** QName. */
-  private static final QNm Q_PARAMETERS = QNm.get(PREFIX, "parameters", SQLURI);
+  private static final QNm Q_PARAMETERS = QNm.get(SQL_PREFIX, "parameters", SQL_URI);
   /** QName. */
-  private static final QNm Q_PARAMETER = QNm.get(PREFIX, "parameter", SQLURI);
+  private static final QNm Q_PARAMETER = QNm.get(SQL_PREFIX, "parameter", SQL_URI);
 
   /** Type int. */
   private static final byte[] INT = AtomType.INT.string();

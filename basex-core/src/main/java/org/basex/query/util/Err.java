@@ -1,5 +1,6 @@
 package org.basex.query.util;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.ErrType.*;
 
 import org.basex.core.*;
@@ -1255,34 +1256,34 @@ public enum Err {
   public enum ErrType {
     // Project errors
 
-    /** BASX Error type. */ BASX(QueryText.BXERR, QueryText.BXERRORS),
+    /** BASX Error type. */ BASX(BXERR_PREFIX, BXERRORS_URI),
 
-    /** BXCL Error type. */ BXCL(QueryText.BXERR, QueryText.BXERRORS),
-    /** BXCO Error type. */ BXCO(QueryText.BXERR, QueryText.BXERRORS),
-    /** BXCS Error type. */ BXCS(QueryText.BXERR, QueryText.BXERRORS),
-    /** BXDB Error type. */ BXDB(QueryText.BXERR, QueryText.BXERRORS),
-    /** BXFE Error type. */ BXFE(QueryText.BXERR, QueryText.BXERRORS),
-    /** BXFT Error type. */ BXFT(QueryText.BXERR, QueryText.BXERRORS),
-    /** BXHL Error type. */ BXHL(QueryText.BXERR, QueryText.BXERRORS),
-    /** BXJS Error type. */ BXJS(QueryText.BXERR, QueryText.BXERRORS),
-    /** BXPR Error type. */ BXPR(QueryText.BXERR, QueryText.BXERRORS),
-    /** BXRA Error type. */ BXRA(QueryText.BXERR, QueryText.BXERRORS),
-    /** BXRE Error type. */ BXRE(QueryText.BXERR, QueryText.BXERRORS),
-    /** BXSL Error type. */ BXSL(QueryText.BXERR, QueryText.BXERRORS),
-    /** BXSQ Error type. */ BXSQ(QueryText.BXERR, QueryText.BXERRORS),
-    /** BXVA Error type. */ BXVA(QueryText.BXERR, QueryText.BXERRORS),
-    /** BXXQ Error type. */ BXXQ(QueryText.BXERR, QueryText.BXERRORS),
-    /** HASH Error type. */ HASH(QueryText.BXERR, QueryText.BXERRORS),
-    /** UNIT Error type. */ UNIT(QueryText.UNIT,  QueryText.UNITURI),
+    /** BXCL Error type. */ BXCL(BXERR_PREFIX, BXERRORS_URI),
+    /** BXCO Error type. */ BXCO(BXERR_PREFIX, BXERRORS_URI),
+    /** BXCS Error type. */ BXCS(BXERR_PREFIX, BXERRORS_URI),
+    /** BXDB Error type. */ BXDB(BXERR_PREFIX, BXERRORS_URI),
+    /** BXFE Error type. */ BXFE(BXERR_PREFIX, BXERRORS_URI),
+    /** BXFT Error type. */ BXFT(BXERR_PREFIX, BXERRORS_URI),
+    /** BXHL Error type. */ BXHL(BXERR_PREFIX, BXERRORS_URI),
+    /** BXJS Error type. */ BXJS(BXERR_PREFIX, BXERRORS_URI),
+    /** BXPR Error type. */ BXPR(BXERR_PREFIX, BXERRORS_URI),
+    /** BXRA Error type. */ BXRA(BXERR_PREFIX, BXERRORS_URI),
+    /** BXRE Error type. */ BXRE(BXERR_PREFIX, BXERRORS_URI),
+    /** BXSL Error type. */ BXSL(BXERR_PREFIX, BXERRORS_URI),
+    /** BXSQ Error type. */ BXSQ(BXERR_PREFIX, BXERRORS_URI),
+    /** BXVA Error type. */ BXVA(BXERR_PREFIX, BXERRORS_URI),
+    /** BXXQ Error type. */ BXXQ(BXERR_PREFIX, BXERRORS_URI),
+    /** HASH Error type. */ HASH(BXERR_PREFIX, BXERRORS_URI),
+    /** UNIT Error type. */ UNIT(UNIT_PREFIX,  UNIT_URI),
 
     // EXPath errors
 
-    /** ARCH Error type. */ ARCH(QueryText.EXPERR, QueryText.EXPERROR),
-    /** BIN  Error type. */ BIN(QueryText.BIN,     QueryText.BINURI),
-    /** CX   Error type. */ CX(QueryText.EXPERR,   QueryText.EXPERROR),
-    /** FILE Error type. */ FILE(QueryText.FILE,   QueryText.FILEURI),
-    /** HC   Error type. */ HC(QueryText.EXPERR,   QueryText.EXPERROR),
-    /** ZIP  Error type. */ ZIP(QueryText.EXPERR,  QueryText.EXPERROR),
+    /** ARCH Error type. */ ARCH(EXPERR_PREFIX, EXPERROR_URI),
+    /** BIN  Error type. */ BIN(BIN_PREFIX,     BIN_URI),
+    /** CX   Error type. */ CX(EXPERR_PREFIX,   EXPERROR_URI),
+    /** FILE Error type. */ FILE(FILE_PREFIX,   FILE_URI),
+    /** HC   Error type. */ HC(EXPERR_PREFIX,   EXPERROR_URI),
+    /** ZIP  Error type. */ ZIP(EXPERR_PREFIX,  EXPERROR_URI),
 
     // W3 errors
 
@@ -1337,7 +1338,7 @@ public enum Err {
      * {@code http://www.w3.org/2005/xqt-errors}.
      */
     ErrType() {
-      this(QueryText.ERR, QueryText.ERRORURI);
+      this(ERR_PREFIX, ERROR_URI);
     }
   }
 

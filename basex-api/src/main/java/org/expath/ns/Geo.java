@@ -27,7 +27,7 @@ public final class Geo extends QueryModule {
   /** GML URI. */
   private static final byte[] URI = token("http://www.opengis.net/gml");
   /** Prefix: "gml". */
-  private static final String GML = "gml";
+  private static final byte[] GML = token("gml");
 
   /** QName gml:Point. */
   private static final QNm Q_GML_POINT = QNm.get(GML, "Point", URI);
@@ -69,7 +69,7 @@ public final class Geo extends QueryModule {
    */
   @Deterministic
   public QNm geometryType(final ANode node) throws QueryException {
-    return new QNm(GML + ':' + checkGeo(node).getGeometryType(), URI);
+    return QNm.get(GML, checkGeo(node).getGeometryType(), URI);
   }
 
   /**

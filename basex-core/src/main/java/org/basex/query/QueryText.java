@@ -454,100 +454,105 @@ public interface QueryText {
   /** Error token. */
   byte[] E_ADDITIONAL = token("additional");
 
-  /** Error prefix. */
-  byte[] ERR = token("err");
-  /** FN token. */
-  byte[] FN = token("fn");
-  /** Ann token. */
-  byte[] ANN = token("ann");
-  /** Math token. */
-  byte[] MATH = token("math");
-  /** Output token. */
-  byte[] OUTPUT = token("output");
-  /** BaseX token. */
-  byte[] BASEX = token("basex");
-  /** BXErr token. */
-  byte[] BXERR = token("bxerr");
-  /** Admin token. */
-  byte[] ADMIN = token("admin");
-  /** Client token. */
-  byte[] CLIENT = token("client");
-  /** Convert token. */
-  byte[] CONVERT = token("convert");
-  /** CSV token. */
-  byte[] CSV = token("csv");
-  /** DB token. */
-  byte[] DB = token("db");
-  /** QUERY token. */
-  byte[] QUERY = token("query");
-  /** Index token. */
-  byte[] INDEX = token("index");
-  /** FETCH token. */
-  byte[] FETCH = token("fetch");
-  /** FT token. */
-  byte[] FT = token("ft");
-  /** XS token. */
-  byte[] XS = token("xs");
-  /** XS token. */
-  byte[] XSI = token("xsi");
-  /** XS token. */
-  byte[] LOCAL = token("local");
-  /** Archive module token. */
-  byte[] ARCHIVE = token("archive");
-  /** File module token. */
-  byte[] FILE = token("file");
-  /** HTTP Client token. */
-  byte[] HTTP = token("http");
-  /** Output token. */
-  byte[] OUT = token("out");
-  /** Profiling token. */
-  byte[] PROF = token("prof");
-  /** Hash token. */
-  byte[] HASH = token("hash");
-  /** XSLT token. */
-  byte[] XSLT = token("xslt");
-  /** ZIP token. */
-  byte[] ZIP = token("zip");
-  /** HOF token. */
-  byte[] HOF = token("hof");
-  /** HTML token. */
-  byte[] HTML = token("html");
-  /** JSON token. */
-  byte[] JSON = token("json");
-  /** MAP token. */
-  byte[] MAP = token(MAPSTR);
   /** Array token. */
   byte[] ARRAY = token(ARRAYSTR);
+  /** Map token. */
+  byte[] MAP = token(MAPSTR);
+
+  /** Error prefix. */
+  byte[] ERR_PREFIX = token("err");
+  /** FN token. */
+  byte[] FN_PREFIX = token("fn");
+  /** Ann token. */
+  byte[] ANN_PREFIX = token("ann");
+  /** Math token. */
+  byte[] MATH_PREFIX = token("math");
+  /** Output token. */
+  byte[] OUTPUT_PREFIX = token("output");
+  /** BaseX token. */
+  byte[] BASEX_PREFIX = token("basex");
+  /** BXErr token. */
+  byte[] BXERR_PREFIX = token("bxerr");
+  /** Admin token. */
+  byte[] ADMIN_PREFIX = token("admin");
+  /** Client token. */
+  byte[] CLIENT_PREFIX = token("client");
+  /** Convert token. */
+  byte[] CONVERT_PREFIX = token("convert");
+  /** CSV token. */
+  byte[] CSV_PREFIX = token("csv");
+  /** DB token. */
+  byte[] DB_PREFIX = token("db");
+  /** QUERY token. */
+  byte[] QUERY_PREFIX = token("query");
+  /** Index token. */
+  byte[] INDEX_PREFIX = token("index");
+  /** FETCH token. */
+  byte[] FETCH_PREFIX = token("fetch");
+  /** FT token. */
+  byte[] FT_PREFIX = token("ft");
+  /** XS token. */
+  byte[] XS_PREFIX = token("xs");
+  /** XS token. */
+  byte[] XSI_PREFIX = token("xsi");
+  /** XS token. */
+  byte[] LOCAL_PREFIX = token("local");
+  /** Archive module token. */
+  byte[] ARCHIVE_PREFIX = token("archive");
+  /** File module token. */
+  byte[] FILE_PREFIX = token("file");
+  /** HTTP Client token. */
+  byte[] HTTP_PREFIX = token("http");
+  /** Output token. */
+  byte[] OUT_PREFIX = token("out");
+  /** Profiling token. */
+  byte[] PROF_PREFIX = token("prof");
+  /** Hash token. */
+  byte[] HASH_PREFIX = token("hash");
+  /** XSLT token. */
+  byte[] XSLT_PREFIX = token("xslt");
+  /** ZIP token. */
+  byte[] ZIP_PREFIX = token("zip");
+  /** HOF token. */
+  byte[] HOF_PREFIX = token("hof");
+  /** HTML token. */
+  byte[] HTML_PREFIX = token("html");
+  /** JSON token. */
+  byte[] JSON_PREFIX = token("json");
+  /** MAP token. */
+  byte[] MAP_PREFIX = MAP;
+  /** Array token. */
+  byte[] ARRAY_PREFIX = ARRAY;
   /** Package token. */
-  byte[] PKG = token("pkg");
+  byte[] PKG_PREFIX = token("pkg");
   /** Process token. */
-  byte[] PROC = token("proc");
+  byte[] PROC_PREFIX = token("proc");
   /** SQL token. */
-  byte[] SQL = token("sql");
+  byte[] SQL_PREFIX = token("sql");
   /** SQL token. */
-  byte[] STREAM = token("stream");
+  byte[] STREAM_PREFIX = token("stream");
   /** Binary token. */
-  byte[] BIN = token("bin");
+  byte[] BIN_PREFIX = token("bin");
   /** Cryptography token. */
-  byte[] CRYPTO = token("crypto");
+  byte[] CRYPTO_PREFIX = token("crypto");
   /** Random token. */
-  byte[] RANDOM = token("random");
+  byte[] RANDOM_PREFIX = token("random");
   /** Repository token. */
-  byte[] REPO = token("repo");
+  byte[] REPO_PREFIX = token("repo");
   /** Validate token. */
-  byte[] VLDT = token("validate");
+  byte[] VLDT_PREFIX = token("validate");
   /** XQDoc token. */
-  byte[] INSPECT = token("inspect");
+  byte[] INSPECT_PREFIX = token("inspect");
   /** XQuery token. */
-  byte[] XQRY = token(XQUERY);
+  byte[] XQUERY_PREFIX = token(XQUERY);
   /** Unit token. */
-  byte[] UNIT = token("unit");
+  byte[] UNIT_PREFIX = token("unit");
   /** Rest token. */
-  byte[] REST = token("rest");
+  byte[] REST_PREFIX = token("rest");
   /** RestXQ token. */
-  byte[] RESTXQ = token("restxq");
+  byte[] RESTXQ_PREFIX = token("restxq");
   /** EXErr token. */
-  byte[] EXPERR = token("experr");
+  byte[] EXPERR_PREFIX = token("experr");
 
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
@@ -555,118 +560,118 @@ public interface QueryText {
   // URIS =====================================================================
 
   /** W3 URI. */
-  String W3URI = "http://www.w3.org";
+  String W3_URI = "http://www.w3.org";
   /** XML URI. */
-  byte[] XMLURI = token(W3URI + "/XML/1998/namespace");
+  byte[] XML_URI = token(W3_URI + "/XML/1998/namespace");
   /** Functions URI. */
-  byte[] FNURI = token(W3URI + "/2005/xpath-functions");
+  byte[] FN_URI = token(W3_URI + "/2005/xpath-functions");
   /** Math URI. */
-  byte[] MATHURI = token(W3URI + "/2005/xpath-functions/math");
+  byte[] MATH_URI = token(W3_URI + "/2005/xpath-functions/math");
   /** XMLNS URI. */
-  byte[] XMLNSURI = token(W3URI + "/2000/xmlns/");
+  byte[] XMLNS_URI = token(W3_URI + "/2000/xmlns/");
   /** Local Functions URI. */
-  byte[] LOCALURI = token(W3URI + "/2005/xquery-local-functions");
+  byte[] LOCAL_URI = token(W3_URI + "/2005/xquery-local-functions");
   /** XMLSchema URI. */
-  byte[] XSURI = token(W3URI + "/2001/XMLSchema");
+  byte[] XS_URI = token(W3_URI + "/2001/XMLSchema");
   /** XMLSchema Instance URI. */
-  byte[] XSIURI = token(W3URI + "/2001/XMLSchema-instance");
+  byte[] XSI_URI = token(W3_URI + "/2001/XMLSchema-instance");
   /** Output URI. */
-  byte[] OUTPUTURI = token(W3URI + "/2010/xslt-xquery-serialization");
+  byte[] OUTPUT_URI = token(W3_URI + "/2010/xslt-xquery-serialization");
   /** Error URI. */
-  byte[] ERRORURI = token(W3URI + "/2005/xqt-errors");
+  byte[] ERROR_URI = token(W3_URI + "/2005/xqt-errors");
   /** Map URI. */
-  byte[] MAPURI = token(W3URI + "/2005/xpath-functions/map");
+  byte[] MAP_URI = token(W3_URI + "/2005/xpath-functions/map");
   /** Array URI. */
-  byte[] ARRAYURI = token(W3URI + "/2005/xpath-functions/array");
+  byte[] ARRAY_URI = token(W3_URI + "/2005/xpath-functions/array");
   /** Annotations URI. */
-  byte[] XQURI = token(W3URI + "/2012/xquery");
+  byte[] XQ_URI = token(W3_URI + "/2012/xquery");
 
   /** EXQuery URI. */
   String EXQUERY = "http://exquery.org/ns/";
   /** RESTXQ URI. */
-  byte[] RESTURI = token(EXQUERY + "restxq");
+  byte[] REST_URI = token(EXQUERY + "restxq");
 
   /** EXPath URI. */
   String EXPATH = "http://expath.org/ns/";
   /** URI of Binary Module. */
-  byte[] BINURI = token(EXPATH + "binary");
+  byte[] BIN_URI = token(EXPATH + "binary");
   /** URI of Cryptographic Module. */
-  byte[] CRYPTOURI = token(EXPATH + "crypto");
+  byte[] CRYPTO_URI = token(EXPATH + "crypto");
   /** URI of File Module. */
-  byte[] FILEURI = token(EXPATH + "file");
+  byte[] FILE_URI = token(EXPATH + "file");
   /** URI of HTTP Client Module. */
-  byte[] HTTPURI = token(EXPATH + "http-client");
+  byte[] HTTP_URI = token(EXPATH + "http-client");
   /** URI of Package API. */
-  byte[] PKGURI = token(EXPATH + "pkg");
+  byte[] PKG_URI = token(EXPATH + "pkg");
   /** URI of ZIP Module.*/
-  byte[] ZIPURI = token(EXPATH + "zip");
+  byte[] ZIP_URI = token(EXPATH + "zip");
   /** URI of EXPath errors. */
-  byte[] EXPERROR = token(EXPATH + "error");
+  byte[] EXPERROR_URI = token(EXPATH + "error");
 
   /** Project URI. */
-  byte[] BASEXURI = token(Prop.URL);
+  byte[] BASEX_URI = token(Prop.URL);
   /** Project modules. */
-  String BXMODULES = Prop.URL + "/modules/";
+  String BXMODULES_URI = Prop.URL + "/modules/";
   /** Project errors. */
-  byte[] BXERRORS = token(Prop.URL + "/errors");
+  byte[] BXERRORS_URI = token(Prop.URL + "/errors");
 
   /** Database module URI. */
-  byte[] ADMINURI = token(BXMODULES + "admin");
+  byte[] ADMIN_URI = token(BXMODULES_URI + "admin");
   /** Archive module URI.*/
-  byte[] ARCHIVEURI = token(BXMODULES + "archive");
+  byte[] ARCHIVE_URI = token(BXMODULES_URI + "archive");
   /** Client module URI. */
-  byte[] CLIENTURI = token(BXMODULES + "client");
+  byte[] CLIENT_URI = token(BXMODULES_URI + "client");
   /** Conversion module URI. */
-  byte[] CONVERTURI = token(BXMODULES + "convert");
+  byte[] CONVERT_URI = token(BXMODULES_URI + "convert");
   /** CSV module URI. */
-  byte[] CSVURI = token(BXMODULES + "csv");
+  byte[] CSV_URI = token(BXMODULES_URI + "csv");
   /** Database module URI. */
-  byte[] DBURI = token(BXMODULES + "db");
+  byte[] DB_URI = token(BXMODULES_URI + "db");
   /** Fetch module URI. */
-  byte[] FETCHURI = token(BXMODULES + "fetch");
+  byte[] FETCH_URI = token(BXMODULES_URI + "fetch");
   /** Full-text module URI. */
-  byte[] FTURI = token(BXMODULES + "ft");
+  byte[] FT_URI = token(BXMODULES_URI + "ft");
   /** Hash module URI. */
-  byte[] HASHURI = token(BXMODULES + "hash");
+  byte[] HASH_URI = token(BXMODULES_URI + "hash");
   /** Higher-order module URI. */
-  byte[] HOFURI = token(BXMODULES + "hof");
+  byte[] HOF_URI = token(BXMODULES_URI + "hof");
   /** Html module URI. */
-  byte[] HTMLURI = token(BXMODULES + "html");
+  byte[] HTML_URI = token(BXMODULES_URI + "html");
   /** Index module URI. */
-  byte[] INDEXURI = token(BXMODULES + "index");
+  byte[] INDEX_URI = token(BXMODULES_URI + "index");
   /** Inspect module URI. */
-  byte[] INSPECTURI = token(BXMODULES + "inspect");
+  byte[] INSPECT_URI = token(BXMODULES_URI + "inspect");
   /** JSON module URI. */
-  byte[] JSONURI = token(BXMODULES + "json");
+  byte[] JSON_URI = token(BXMODULES_URI + "json");
   /** Output module URI. */
-  byte[] OUTURI = token(BXMODULES + "out");
+  byte[] OUT_URI = token(BXMODULES_URI + "out");
   /** Process module URI. */
-  byte[] PROCURI = token(BXMODULES + "proc");
+  byte[] PROC_URI = token(BXMODULES_URI + "proc");
   /** Profiling module URI. */
-  byte[] PROFURI = token(BXMODULES + "prof");
+  byte[] PROF_URI = token(BXMODULES_URI + "prof");
   /** Query module URI. */
-  byte[] QUERYURI = token(BXMODULES + "query");
+  byte[] QUERY_URI = token(BXMODULES_URI + "query");
   /** Random module URI. */
-  byte[] RANDOMURI = token(BXMODULES + "random");
+  byte[] RANDOM_URI = token(BXMODULES_URI + "random");
   /** Repository module URI. */
-  byte[] REPOURI = token(BXMODULES + "repo");
+  byte[] REPO_URI = token(BXMODULES_URI + "repo");
   /** SQL module URI. */
-  byte[] SQLURI = token(BXMODULES + "sql");
+  byte[] SQL_URI = token(BXMODULES_URI + "sql");
   /** Streaming module URI. */
-  byte[] STREAMURI = token(BXMODULES + "stream");
+  byte[] STREAM_URI = token(BXMODULES_URI + "stream");
   /** Unit module URI. */
-  byte[] UNITURI = token(BXMODULES + "unit");
+  byte[] UNIT_URI = token(BXMODULES_URI + "unit");
   /** Validate module URI. */
-  byte[] VALIDATEURI = token(BXMODULES + "validate");
+  byte[] VALIDATE_URI = token(BXMODULES_URI + "validate");
   /** XQuery module URI. */
-  byte[] XQUERYURI = token(BXMODULES + "xquery");
+  byte[] XQUERY_URI = token(BXMODULES_URI + "xquery");
   /** XSLT module URI. */
-  byte[] XSLTURI = token(BXMODULES + "xslt");
+  byte[] XSLT_URI = token(BXMODULES_URI + "xslt");
 
   /** Java prefix. */
   byte[] JAVAPREF = token("java:");
   /** URI of default collation. */
-  byte[] COLLATIONURI = concat(FNURI, token("/collation/codepoint"));
+  byte[] COLLATION_URI = concat(FN_URI, token("/collation/codepoint"));
 
   /** Supported documentation tags. */
   byte[][] DOC_TAGS = tokens("description", "author", "version", "param",

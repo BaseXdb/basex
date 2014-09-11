@@ -46,8 +46,8 @@ public final class CAttr extends CName {
     final byte[] cp = nm.prefix();
     if(comp) {
       final byte[] cu = nm.uri();
-      if(eq(cp, XML) ^ eq(cu, XMLURI)) throw CAXML.get(info);
-      if(eq(cu, XMLNSURI)) throw CAINV_.get(info, cu);
+      if(eq(cp, XML) ^ eq(cu, XML_URI)) throw CAXML.get(info);
+      if(eq(cu, XMLNS_URI)) throw CAINV_.get(info, cu);
       if(eq(cp, XMLNS) || cp.length == 0 && eq(nm.string(), XMLNS))
         throw CAINV_.get(info, nm.string());
 

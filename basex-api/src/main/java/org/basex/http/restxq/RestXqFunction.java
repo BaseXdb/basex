@@ -121,7 +121,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       final InputInfo info = function.ann.infos[a];
       final byte[] local = name.local();
       final byte[] uri = name.uri();
-      final boolean rexq = eq(uri, QueryText.RESTURI);
+      final boolean rexq = eq(uri, QueryText.REST_URI);
       if(rexq) {
         if(eq(PATH, local)) {
           // annotation "path"
@@ -170,7 +170,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
           if(get(mth) == null) throw error(info, ANN_UNKNOWN, "%", name.string());
           addMethod(mth, value, name, declared, info);
         }
-      } else if(eq(uri, QueryText.OUTPUTURI)) {
+      } else if(eq(uri, QueryText.OUTPUT_URI)) {
         // serialization parameters
         try {
           output.assign(string(local), toString(value, name));

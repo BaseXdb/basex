@@ -532,7 +532,7 @@ public final class QT3TS extends Main {
 
     final QNm resErr = result.err.getException().qname();
 
-    String name = exp, uri = string(QueryText.ERRORURI);
+    String name = exp, uri = string(QueryText.ERROR_URI);
     final Matcher m = BIND.matcher(exp);
     if(m.find()) {
       uri = m.group(1);

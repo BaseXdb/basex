@@ -196,7 +196,7 @@ public abstract class QT3TestSet {
     if(result.value != null) return fail(Util.info("Error: '%'", code));
     if(code.equals("*")) return true;
 
-    String name = code, uri = string(QueryText.ERRORURI);
+    String name = code, uri = string(QueryText.ERROR_URI);
     final Matcher m = BIND.matcher(code);
     if(m.find()) {
       uri = m.group(1);

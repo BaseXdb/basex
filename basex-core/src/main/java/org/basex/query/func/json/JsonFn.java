@@ -13,5 +13,5 @@ import org.basex.query.value.item.*;
  */
 abstract class JsonFn extends StandardFunc {
   /** Element: options. */
-  static final QNm Q_OPTIONS = QNm.get("json:options", JSONURI);
+  static final QNm Q_OPTIONS = QNm.get(JSON_PREFIX, "options", JSON_URI);
 }

@@ -366,7 +366,7 @@ public final class FElem extends FNode {
 
   @Override
   public byte[] baseURI() {
-    final byte[] b = attribute(new QNm(BASE, XMLURI));
+    final byte[] b = attribute(new QNm(BASE, XML_URI));
     return b != null ? b : EMPTY;
   }
 

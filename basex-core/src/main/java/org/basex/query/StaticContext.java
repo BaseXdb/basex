@@ -27,12 +27,12 @@ public final class StaticContext {
   /** Mix updates flag. */
   public final boolean mixUpdates;
 
-  /** Default collation (default collection ({@link QueryText#COLLATIONURI}): {@code null}). */
+  /** Default collation (default collection ({@link QueryText#COLLATION_URI}): {@code null}). */
   public Collation collation;
   /** Default element/type namespace. */
   public byte[] elemNS;
   /** Default function namespace. */
-  public byte[] funcNS = FNURI;
+  public byte[] funcNS = FN_URI;
   /** Static type of context value. */
   public SeqType contextType;
 

@@ -300,8 +300,8 @@ public final class QNm extends Item {
    * @param uri namespace uri
    * @return instance
    */
-  public static QNm get(final String prefix, final String local, final byte[] uri) {
-    return CACHE.index(token(prefix), token(local), uri);
+  public static QNm get(final byte[] prefix, final String local, final byte[] uri) {
+    return CACHE.index(prefix, token(local), uri);
   }
 
   /**

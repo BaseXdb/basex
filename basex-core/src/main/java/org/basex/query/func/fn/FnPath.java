@@ -61,7 +61,7 @@ public final class FnPath extends StandardFunc {
 
     final TokenBuilder tb = new TokenBuilder();
     // add root function
-    if(node.type != NodeType.DOC) tb.add("Q{").add(QueryText.FNURI).add("}root()");
+    if(node.type != NodeType.DOC) tb.add("Q{").add(QueryText.FN_URI).add("}root()");
     // add all steps in reverse order
     for(int i = tl.size() - 1; i >= 0; --i) tb.add('/').add(tl.get(i));
     return Str.get(tb.isEmpty() ? Token.SLASH : tb.finish());

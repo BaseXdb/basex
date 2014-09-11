@@ -162,7 +162,7 @@ public final class Catch extends Single {
    * @return QName
    */
   private static QNm create(final byte[] n) {
-    return new QNm(concat(ERR, COLON, n), ERRORURI);
+    return new QNm(concat(ERR_PREFIX, COLON, n), ERROR_URI);
   }
 
   @Override

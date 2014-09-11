@@ -29,7 +29,7 @@ import org.basex.util.options.*;
  */
 public class XsltTransform extends XsltFn {
   /** Element: parameters. */
-  private static final QNm Q_PARAMETERS = QNm.get("parameters", XSLTURI);
+  private static final QNm Q_PARAMETERS = QNm.get("parameters", XSLT_URI);
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {

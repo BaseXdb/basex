@@ -237,7 +237,7 @@ public class QueryException extends Exception {
     final TokenBuilder tb = new TokenBuilder();
     if(info != null) tb.add(STOPPED_AT).add(info.toString()).add(COL).add(NL);
     final byte[] code = name.local();
-    if(code.length != 0) tb.add('[').add(name.prefixId(QueryText.ERRORURI)).add("] ");
+    if(code.length != 0) tb.add('[').add(name.prefixId(QueryText.ERROR_URI)).add("] ");
     tb.add(getLocalizedMessage());
     if(!stack.isEmpty()) {
       tb.add(NL).add(NL).add(STACK_TRACE).add(COL);
