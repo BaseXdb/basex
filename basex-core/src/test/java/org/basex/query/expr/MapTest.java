@@ -27,7 +27,7 @@ public final class MapTest extends AdvancedQueryTest {
 
   /** Tests keys. */
   @Test public void keys() {
-    error(" map{ ('a', 'b'): 'b' }", MAPKEY_X);
+    error(" map{ ('a', 'b'): 'b' }", SEQFOUND_X);
     error(" map{ 'a': 'b', 'a': 'c' }", MAPDUPLKEY_X_X_X);
     error(" map{ xs:time('01:01:01'):1, xs:time('01:01:01'):1 }", MAPDUPLKEY_X_X_X);
 

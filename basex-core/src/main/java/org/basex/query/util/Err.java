@@ -960,8 +960,6 @@ public enum Err {
   CNINVNS_X(XQDY, 101, "Invalid namespace URI '%'."),
   /** XQDY0102. */
   DUPLNSCONS_X(XQDY, 102, "Duplicate namespace declaration: '%'."),
-  /** XQDY0136. */
-  MAPKEY_X(XQDY, 136, "Key must be a single atomic value: %."),
   /** XQDY0137. */
   MAPDUPLKEY_X_X_X(XQDY, 137, "Key % already exists in map (values: % vs. %)."),
   /** XQDY0138. */
