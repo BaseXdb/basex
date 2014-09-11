@@ -339,6 +339,9 @@ public enum Function {
   /** XQuery function. */
   SERIALIZE(FnSerialize.class, "serialize(items[,params])", arg(ITEM_ZM, ITEM_ZO), STR),
   /** XQuery function. */
+  SORT(FnSort.class, "sort(items[,key-func])",
+      arg(ITEM_ZM, FuncType.arity(1).seqType()), ITEM_ZM, flag(HOF)),
+  /** XQuery function. */
   STARTS_WITH(FnStartsWith.class, "starts-with(string,sub[,collation])",
       arg(STR_ZO, STR_ZO, STR), BLN),
   /** XQuery function. */
@@ -951,10 +954,10 @@ public enum Function {
       arg(ITEM_OM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM).seqType()), ITEM_ZM, flag(HOF),
       HOF_URI),
   /** XQuery function. */
-  _HOF_TOP_K_BY(HofTopKBy.class, "top-k-by(items,key-fun,k)",
+  _HOF_TOP_K_BY(HofTopKBy.class, "top-k-by(items,key-func,k)",
       arg(ITEM_ZM, FuncType.arity(1).seqType(), ITR), ITEM_ZM, flag(HOF), HOF_URI),
   /** XQuery function. */
-  _HOF_TOP_K_WITH(HofTopKWith.class, "top-k-with(items,less-than,k)",
+  _HOF_TOP_K_WITH(HofTopKWith.class, "top-k-with(items,less-than-func,k)",
       arg(ITEM_ZM, FuncType.get(BLN, ITEM_ZO, ITEM_ZO).seqType(), ITR), ITEM_ZM, flag(HOF),
       HOF_URI),
 

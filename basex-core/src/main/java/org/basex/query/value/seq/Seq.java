@@ -42,6 +42,15 @@ public abstract class Seq extends Value {
   /**
    * Returns a value representation of the specified items.
    * @param value value
+   * @return resulting item or sequence
+   */
+  public static Value get(final Item[] value) {
+    return get(value, value.length);
+  }
+
+  /**
+   * Returns a value representation of the specified items.
+   * @param value value
    * @param size size
    * @return resulting item or sequence
    */

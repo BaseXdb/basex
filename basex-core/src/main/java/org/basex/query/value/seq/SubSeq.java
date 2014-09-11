@@ -59,7 +59,7 @@ public final class SubSeq extends Seq {
     final int n = (int) size;
     final Item[] items = new Item[n];
     for(int i = 0; i < n; i++) items[n - 1 - i] = itemAt(i);
-    return Seq.get(items, n);
+    return Seq.get(items);
   }
 
   @Override

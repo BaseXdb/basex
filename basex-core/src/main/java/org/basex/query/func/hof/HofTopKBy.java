@@ -30,8 +30,7 @@ public final class HofTopKBy extends StandardFunc {
     if(k < 1 || k > Integer.MAX_VALUE / 2) return Empty.SEQ;
 
     final Iter iter = exprs[0].iter(qc);
-    final MinHeap<Item, Item> heap = new MinHeap<>((int) k,
-        new Comparator<Item>() {
+    final MinHeap<Item, Item> heap = new MinHeap<>((int) k, new Comparator<Item>() {
       @Override
       public int compare(final Item it1, final Item it2) {
         try {
@@ -51,6 +50,6 @@ public final class HofTopKBy extends StandardFunc {
 
     final Item[] arr = new Item[heap.size()];
     for(int i = arr.length; --i >= 0;) arr[i] = heap.removeMin();
-    return Seq.get(arr, arr.length);
+    return Seq.get(arr);
   }
 }

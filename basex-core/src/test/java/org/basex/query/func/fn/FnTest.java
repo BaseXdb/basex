@@ -96,4 +96,11 @@ public final class FnTest extends AdvancedQueryTest {
     error("fn:parse-ietf-date('Wed, 99 Jun 94 07:29:35 -050')", IETF_PARSE_X_X_X);
     error("fn:parse-ietf-date('Wed, 99 Jun 94 07:29:35 +0500')", IETF_INIT_X);
   }
+
+  /** Tests for the {@code fn:sort} function. */
+  @Test
+  public void sort() {
+    query("fn:sort((1, 4, 6, 5, 3))", "1 3 4 5 6");
+    query("fn:sort((1, -2, 5, 10, -10, 10, 8), fn:abs#1)", "1 -2 5 8 10 -10 10");
+  }
 }

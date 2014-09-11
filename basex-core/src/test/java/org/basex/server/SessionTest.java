@@ -482,7 +482,7 @@ public abstract class SessionTest extends SandboxTest {
     query.close();
 
     query = session.query("declare variable $a external; $a");
-    query.bind("a", Seq.get(new Item[] { Int.get(1), Str.get("X") }, 2));
+    query.bind("a", Seq.get(new Item[] { Int.get(1), Str.get("X") }));
     assertEqual("1", query.next());
     assertEqual("X", query.next());
     query.close();

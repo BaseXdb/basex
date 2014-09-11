@@ -20,6 +20,14 @@ public final class MinHeap<K, V> {
 
   /**
    * Constructs a heap with the given initial capacity and order.
+   * @param cmp comparator
+   */
+  public MinHeap(final Comparator<K> cmp) {
+    this(Array.CAPACITY, cmp);
+  }
+
+  /**
+   * Constructs a heap with the given initial capacity and order.
    * @param cap initial capacity
    * @param cmp comparator
    */

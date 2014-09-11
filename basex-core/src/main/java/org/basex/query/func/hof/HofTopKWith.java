@@ -39,6 +39,6 @@ public final class HofTopKWith extends HofFn {
 
     final Item[] arr = new Item[heap.size()];
     for(int i = arr.length; --i >= 0;) arr[i] = heap.removeMin();
-    return Seq.get(arr, arr.length);
+    return Seq.get(arr);
   }
 }
