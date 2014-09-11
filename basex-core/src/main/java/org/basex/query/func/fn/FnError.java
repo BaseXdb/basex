@@ -23,7 +23,7 @@ public final class FnError extends StandardFunc {
     final int al = exprs.length;
     if(al == 0) throw FUNERR1.get(info);
 
-    QNm name = toQNm(exprs[0], qc, al != 1);
+    QNm name = toQNm(exprs[0], qc, true);
     if(name == null) name = FUNERR1.qname();
 
     String msg = FUNERR1.desc;
