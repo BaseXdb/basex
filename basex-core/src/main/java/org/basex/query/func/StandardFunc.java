@@ -39,7 +39,7 @@ public abstract class StandardFunc extends Arr {
   /** Function signature. */
   public Function func;
   /** Static context. */
-  protected StaticContext sc;
+  public StaticContext sc;
 
   /**
    * Constructor.

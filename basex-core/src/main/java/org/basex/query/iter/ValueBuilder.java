@@ -56,8 +56,13 @@ public final class ValueBuilder extends ValueIter implements Result {
    * @return self reference
    */
   public ValueBuilder add(final Value value) {
-    for(final long sz = value.size(); items.length - size < sz;) items = extend(items);
-    size += value.writeTo(items, size);
+    if(value instanceof Item) return add((Item) value);
+
+    final int s = size;
+    Item[] tmp = items;
+    for(final long sz = value.size(); tmp.length - s < sz;) tmp = extend(tmp);
+    size = s + value.writeTo(tmp, s);
+    items = tmp;
     return this;
   }
 
@@ -67,8 +72,12 @@ public final class ValueBuilder extends ValueIter implements Result {
    * @return self reference
    */
   public ValueBuilder add(final Item item) {
-    if(size == items.length) items = extend(items);
-    items[size++] = item;
+    final int s = size;
+    Item[] tmp = items;
+    if(s == tmp.length) tmp = extend(tmp);
+    tmp[s] = item;
+    size = s + 1;
+    items = tmp;
     return this;
   }
 

@@ -480,6 +480,9 @@ public enum Function {
       arg(ARRAY_O, ARRAY_O, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()), ARRAY_O,
       flag(HOF), ARRAY_URI),
   /** XQuery function. */
+  _ARRAY_SORT(ArraySort.class, "sort(array[,key-func])",
+      arg(ARRAY_O, FuncType.arity(1).seqType()), ARRAY_O, flag(HOF), ARRAY_URI),
+  /** XQuery function. */
   _ARRAY_SERIALIZE(ArraySerialize.class, "serialize(array)", arg(ARRAY_O), STR, ARRAY_URI),
 
   /* Math Module. */

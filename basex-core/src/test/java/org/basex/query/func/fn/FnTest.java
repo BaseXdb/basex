@@ -39,7 +39,7 @@ public final class FnTest extends AdvancedQueryTest {
     contains(SERIALIZE.args("<x>a</x>", serialParams("<method value='text'/>")), "a");
   }
 
-  /** Tests for the {@code fn:replace} function. */
+  /** Tests for the {@code replace} function. */
   @Test
   public void replace() {
     // tests for issue GH-573:
@@ -48,7 +48,7 @@ public final class FnTest extends AdvancedQueryTest {
     error("replace('asdf','a{12,3}','')", REGPAT_X);
   }
 
-  /** Tests for the {@code fn:sum} function. */
+  /** Tests for the {@code sum} function. */
   @Test
   public void sum() {
     query("sum(1)", "1");
@@ -58,49 +58,50 @@ public final class FnTest extends AdvancedQueryTest {
     query("sum(1 to 4294967295)", "9223372034707292160");
   }
 
-  /** Tests for the {@code fn:parse-ietf-date} function. */
+  /** Tests for the {@code parse-ietf-date} function. */
   @Test
   public void parseIetfDate() {
-    query("fn:parse-ietf-date('Wed, 06 Jun 1994 07:29:35 GMT')", "1994-06-06T07:29:35Z");
-    query("fn:parse-ietf-date('Wed, 6 Jun 94 07:29:35 GMT')", "1994-06-06T07:29:35Z");
-    query("fn:parse-ietf-date('Wed Jun 06 11:54:45 EST 0090')", "0090-06-06T11:54:45-05:00");
-    query("fn:parse-ietf-date('Sunday, 06-Nov-94 08:49:37 GMT')", "1994-11-06T08:49:37Z");
-    query("fn:parse-ietf-date('Wed, 6 Jun 94 07:29:35 +0500')", "1994-06-06T07:29:35+05:00");
-    query("fn:parse-ietf-date(' 1 Nov 1234 05:06:07.89 gmt')", "1234-11-01T05:06:07.89Z");
+    query("parse-ietf-date('Wed, 06 Jun 1994 07:29:35 GMT')", "1994-06-06T07:29:35Z");
+    query("parse-ietf-date('Wed, 6 Jun 94 07:29:35 GMT')", "1994-06-06T07:29:35Z");
+    query("parse-ietf-date('Wed Jun 06 11:54:45 EST 0090')", "0090-06-06T11:54:45-05:00");
+    query("parse-ietf-date('Sunday, 06-Nov-94 08:49:37 GMT')", "1994-11-06T08:49:37Z");
+    query("parse-ietf-date('Wed, 6 Jun 94 07:29:35 +0500')", "1994-06-06T07:29:35+05:00");
+    query("parse-ietf-date(' 1 Nov 1234 05:06:07.89 gmt')", "1234-11-01T05:06:07.89Z");
 
-    query("fn:parse-ietf-date(' 01-feb-3456 07:08:09 GMT')", "3456-02-01T07:08:09Z");
-    query("fn:parse-ietf-date(' 01-FEB-3456 07:08:09 GMT')", "3456-02-01T07:08:09Z");
-    query("fn:parse-ietf-date('Wed, 06 Jun 94 07:29:35 +0000 (GMT)')", "1994-06-06T07:29:35Z");
-    query("fn:parse-ietf-date('Wed, 06 Jun 94 07:29:35')", "1994-06-06T07:29:35Z");
+    query("parse-ietf-date(' 01-feb-3456 07:08:09 GMT')", "3456-02-01T07:08:09Z");
+    query("parse-ietf-date(' 01-FEB-3456 07:08:09 GMT')", "3456-02-01T07:08:09Z");
+    query("parse-ietf-date('Wed, 06 Jun 94 07:29:35 +0000 (GMT)')", "1994-06-06T07:29:35Z");
+    query("parse-ietf-date('Wed, 06 Jun 94 07:29:35')", "1994-06-06T07:29:35Z");
 
     String s = "Wed, Jan-01 07:29:35 GMT 19";
-    query("fn:parse-ietf-date('" + s + "')", "1919-01-01T07:29:35Z");
+    query("parse-ietf-date('" + s + "')", "1919-01-01T07:29:35Z");
     for(int i = s.length(); --i >= 0;) {
-      error("fn:parse-ietf-date('" + s.substring(0, i) + "')", IETF_PARSE_X_X_X);
+      error("parse-ietf-date('" + s.substring(0, i) + "')", IETF_PARSE_X_X_X);
     }
 
     s = "Wed, 06 Jun 1994 07:29";
-    query("fn:parse-ietf-date('" + s + "')", "1994-06-06T07:29:00Z");
+    query("parse-ietf-date('" + s + "')", "1994-06-06T07:29:00Z");
     for(int i = s.length(); --i >= 0;) {
-      error("fn:parse-ietf-date('" + s.substring(0, i) + "')", IETF_PARSE_X_X_X);
+      error("parse-ietf-date('" + s.substring(0, i) + "')", IETF_PARSE_X_X_X);
     }
-    error("fn:parse-ietf-date('" + s + "X')", IETF_PARSE_X_X_X);
+    error("parse-ietf-date('" + s + "X')", IETF_PARSE_X_X_X);
 
-    error("fn:parse-ietf-date('Wed, 99 Jun 94 07:29:35 +0000 (')", IETF_PARSE_X_X_X);
-    error("fn:parse-ietf-date('Wed, 99 Jun 94 07:29:35 +0000 (GT)')", IETF_PARSE_X_X_X);
-    error("fn:parse-ietf-date('Wed, 99 Jun 94 07:29:35 +0000 (GMT')", IETF_PARSE_X_X_X);
+    error("parse-ietf-date('Wed, 99 Jun 94 07:29:35 +0000 (')", IETF_PARSE_X_X_X);
+    error("parse-ietf-date('Wed, 99 Jun 94 07:29:35 +0000 (GT)')", IETF_PARSE_X_X_X);
+    error("parse-ietf-date('Wed, 99 Jun 94 07:29:35 +0000 (GMT')", IETF_PARSE_X_X_X);
 
-    error("fn:parse-ietf-date('Wed, 99 Jun 94 07:29:35. GMT')", IETF_PARSE_X_X_X);
-    error("fn:parse-ietf-date('Wed, 99 Jun 94 07:29:35 0500')", IETF_PARSE_X_X_X);
-    error("fn:parse-ietf-date('Wed, 99 Jun 94 07:29:35 +5')", IETF_PARSE_X_X_X);
-    error("fn:parse-ietf-date('Wed, 99 Jun 94 07:29:35 -050')", IETF_PARSE_X_X_X);
-    error("fn:parse-ietf-date('Wed, 99 Jun 94 07:29:35 +0500')", IETF_INIT_X);
+    error("parse-ietf-date('Wed, 99 Jun 94 07:29:35. GMT')", IETF_PARSE_X_X_X);
+    error("parse-ietf-date('Wed, 99 Jun 94 07:29:35 0500')", IETF_PARSE_X_X_X);
+    error("parse-ietf-date('Wed, 99 Jun 94 07:29:35 +5')", IETF_PARSE_X_X_X);
+    error("parse-ietf-date('Wed, 99 Jun 94 07:29:35 -050')", IETF_PARSE_X_X_X);
+    error("parse-ietf-date('Wed, 99 Jun 94 07:29:35 +0500')", IETF_INIT_X);
   }
 
-  /** Tests for the {@code fn:sort} function. */
+  /** Tests for the {@code sort} function. */
   @Test
   public void sort() {
-    query("fn:sort((1, 4, 6, 5, 3))", "1 3 4 5 6");
-    query("fn:sort((1, -2, 5, 10, -10, 10, 8), fn:abs#1)", "1 -2 5 8 10 -10 10");
+    query(SORT.args("(1, 4, 6, 5, 3)"), "1 3 4 5 6");
+    query(SORT.args("(1,-2,5,10,-10,10,8)", " abs#1"), "1 -2 5 8 10 -10 10");
+    query(SORT.args("((1,0), (1,1), (0,1), (0,0))"), "0 0 0 0 1 1 1 1");
   }
 }
