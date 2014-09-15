@@ -7,7 +7,7 @@ import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 
 /**
- * Unit functions.
+ * Unit function.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen

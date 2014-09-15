@@ -15,7 +15,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 
 /**
- * Index functions.
+ * Index function.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen

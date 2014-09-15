@@ -6,7 +6,7 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * Thrown to indicate an XQuery unit exception.
+ * Thrown to indicate an XQUnit exception.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen

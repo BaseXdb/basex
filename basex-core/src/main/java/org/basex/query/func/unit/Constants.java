@@ -3,7 +3,7 @@ package org.basex.query.func.unit;
 import static org.basex.util.Token.*;
 
 /**
- * XQuery Unit tests.
+ * XQUnit constants.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen

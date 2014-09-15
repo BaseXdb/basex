@@ -6,7 +6,7 @@ import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 
 /**
- * Admin constants.
+ * Archive constants.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen

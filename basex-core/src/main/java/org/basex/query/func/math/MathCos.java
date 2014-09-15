@@ -8,7 +8,7 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * Math functions.
+ * Function implementation.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen

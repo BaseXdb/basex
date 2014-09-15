@@ -10,7 +10,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 
 /**
- * Aggregation functions.
+ * Aggregation function.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen

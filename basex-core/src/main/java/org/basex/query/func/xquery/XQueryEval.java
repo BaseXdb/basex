@@ -17,7 +17,7 @@ import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
- * XQuery functions.
+ * Function implementation.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen

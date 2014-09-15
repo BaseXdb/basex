@@ -16,8 +16,7 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This class contains functions for inspecting XQuery modules and
- * generating XQuery documentation.
+ * Inspect function.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen

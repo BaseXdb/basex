@@ -4,7 +4,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 
 /**
- * XQuery functions.
+ * Function implementation.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen

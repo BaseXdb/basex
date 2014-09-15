@@ -8,7 +8,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 
 /**
- * Implementation-specific functions on functions.
+ * Higher-order function.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler

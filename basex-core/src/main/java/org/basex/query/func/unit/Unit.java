@@ -21,7 +21,7 @@ import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
- * XQuery Unit tests: Testing single modules.
+ * XQUnit tests: Testing single modules.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen

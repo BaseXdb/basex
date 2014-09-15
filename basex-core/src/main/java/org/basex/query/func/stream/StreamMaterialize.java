@@ -8,7 +8,7 @@ import org.basex.query.value.*;
 import org.basex.query.var.*;
 
 /**
- * Streaming functions.
+ * Function implementation.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
