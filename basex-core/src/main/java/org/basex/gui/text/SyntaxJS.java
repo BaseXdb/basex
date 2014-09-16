@@ -25,16 +25,19 @@ public final class SyntaxJS extends Syntax {
   private int quote;
   /** Variable flag. */
   private boolean var;
+  /** Backslash. */
+  private boolean back;
 
   // initialize xquery keys
   static {
-    // add keywords
-    final String[] keywords = {
-      "break", "case", "catch", "continue", "default", "delete", "do", "else", "false", "for",
-      "function", "if", "in", "instanceof", "new", "null", "return", "super", "switch",
-      "this", "throw", "true", "try", "typeof", "var", "while", "with"
-    };
-    for(final String key : keywords) Collections.addAll(KEYWORDS, key);
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#Keywords
+    for(final String key : new String[] {
+      "await", "break", "case", "catch", "class", "const", "continue", "debugger", "default",
+      "delete", "do", "else", "enum", "export", "extends", "finally", "for", "function", "if",
+      "implements", "import", "in", "instanceof", "interface", "let", "new", "package", "private",
+      "protected", "public", "return", "static", "super", "switch", "this", "throw", "try",
+      "typeof", "var", "void", "while", "with", "yield"
+    }) Collections.addAll(KEYWORDS, key);
   }
 
   @Override
@@ -42,6 +45,7 @@ public final class SyntaxJS extends Syntax {
     super.init(color);
     quote = 0;
     var = false;
+    back = false;
     comment1 = 0;
     comment2 = 0;
   }
@@ -52,7 +56,13 @@ public final class SyntaxJS extends Syntax {
 
     // opened quote
     if(quote != 0) {
-      if(ch == quote) quote = 0;
+      if(back) {
+        back = false;
+      } else if(ch == quote) {
+        quote = 0;
+      } else {
+        back = ch == '\\';
+      }
       return STRING;
     }
 
@@ -80,10 +90,15 @@ public final class SyntaxJS extends Syntax {
     }
 
     // quotes
-    if(ch == '"' || ch == '\'') {
+    if(back) {
+      back = false;
+    } else if(ch == '\\') {
+      back = true;
+    } else if(ch == '"' || ch == '\'') {
       quote = ch;
       return STRING;
     }
+
     // variables
     if(ch == '$') {
       var = true;
@@ -93,16 +108,15 @@ public final class SyntaxJS extends Syntax {
       var = XMLToken.isNCStartChar(ch);
       return VARIABLE;
     }
+
     // digits
     if(Token.digit(ch)) return FUNCTION;
     // special characters
     if(!XMLToken.isNCStartChar(ch)) return COMMENT;
+    // check for keywords
+    if(KEYWORDS.contains(iter.nextString())) return KEYWORD;
 
-    // check for keywords and function names
-    final String word = iter.nextString();
-    if(KEYWORDS.contains(word)) return KEYWORD;
-
-    // letters and numbers
+    // standard text
     return plain;
   }
 
