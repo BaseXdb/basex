@@ -171,6 +171,10 @@ public interface DataText {
   byte[] XQCOMM_O = token("(:");
   /** XQuery comment. */
   byte[] XQCOMM_C = token(":)");
+  /** Javascript comment. */
+  byte[] JSCOMM_O = token("/*");
+  /** Javascript comment. */
+  byte[] JSCOMM_C = token("*/");
 
   /** PI output. */
   byte[] PI_O = token("<?");

@@ -40,6 +40,8 @@ public abstract class IO {
   public static final String JSONSUFFIX = ".json";
   /** JAR file suffix. */
   public static final String JARSUFFIX = ".jar";
+  /** JS file suffix. */
+  public static final String JSSUFFIX = ".js";
   /** TGZIP file suffix. */
   public static final String TARGZSUFFIX = ".tar.gz";
   /** TGZIP file suffix. */
