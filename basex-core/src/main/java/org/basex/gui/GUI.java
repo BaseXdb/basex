@@ -226,6 +226,7 @@ public final class GUI extends AGUI {
     go.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
+        input.store();
         execute();
       }
     });
