@@ -187,7 +187,6 @@ public final class Functions extends TokenSet {
     return jm == null ? null : new FuncLit(new Ann(), name, vs, jm, jt, scp, sc, ii);
   }
 
-
   /**
    * Returns a function item for a user-defined function.
    * @param sf static function

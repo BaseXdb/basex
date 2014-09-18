@@ -38,7 +38,6 @@ public final class FnOneOrMore extends StandardFunc {
     };
   }
 
-
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value val = qc.value(exprs[0]);

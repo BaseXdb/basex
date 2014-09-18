@@ -12,7 +12,6 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
-
 /**
  * GFLWOR {@code count} clause.
  *

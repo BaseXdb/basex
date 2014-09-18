@@ -241,7 +241,6 @@ public final class FElem extends FNode {
     return this;
   }
 
-
   /**
    * Adds a namespace declaration for the namespace in the given QName.
    * @return self reference

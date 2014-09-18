@@ -104,7 +104,6 @@ public final class PathTest extends SandboxTest {
     qp.close();
   }
 
-
   /**
    * Checks the results of the query without index access.
    * @throws Exception exception

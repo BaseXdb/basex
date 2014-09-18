@@ -74,7 +74,6 @@ public final class FnSubsequence extends StandardFunc {
     };
   }
 
-
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final double dstart = toDouble(exprs[1], qc);

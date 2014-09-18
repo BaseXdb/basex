@@ -102,7 +102,6 @@ public abstract class Parser extends Proc {
     return new SAXWrapper(source, opts);
   }
 
-
   /**
    * Returns a parser instance, based on the current options.
    * @param source input source

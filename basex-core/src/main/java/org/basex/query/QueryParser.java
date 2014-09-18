@@ -1742,7 +1742,6 @@ public class QueryParser extends InputParser {
     return el.toArray(new Pragma[el.size()]);
   }
 
-
   /**
    * Parses the "MapExpr" rule.
    * @return query expression (may be {@code null})

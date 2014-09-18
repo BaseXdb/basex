@@ -3,7 +3,6 @@ package org.basex.util;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 
-
 /**
  * This class contains information on the original query, which will be evaluated for
  * error feedback and debugging purposes.

@@ -1115,6 +1115,8 @@ public enum Err {
   UPPATHREN_X(XUDY, 15, "Path can only be renamed once: '%'."),
   /** XUDY0016. */
   UPMULTREPL_X(XUDY, 16, "Node can only be replaced once: %."),
+  /** XUDY0016. */
+  UPMULTDOC_X(XUDY, 16, "Document can only be replaced once: %."),
   /** XUDY0017. */
   UPMULTREPV_X(XUDY, 17, "Node can only be replaced once: %"),
   /** XUDY0021. */

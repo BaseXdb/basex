@@ -588,9 +588,6 @@ public final class GFLWOR extends ParseExpr {
     return changed;
   }
 
-
-
-
   /** Merges consecutive {@code where} clauses. */
   private void mergeWheres() {
     Where before = null;

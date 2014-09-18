@@ -212,7 +212,6 @@ public abstract class Serializer {
     return null;
   }
 
-
   /**
    * Serializes a namespace if it has not been serialized by an ancestor yet.
    * @param prefix prefix

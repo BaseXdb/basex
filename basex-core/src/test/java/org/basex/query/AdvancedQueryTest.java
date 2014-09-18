@@ -37,7 +37,6 @@ public abstract class AdvancedQueryTest extends SandboxTest {
     }
   }
 
-
   /**
    * Checks if a query yields the specified string.
    * @param query query string

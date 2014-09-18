@@ -9,7 +9,6 @@ import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
-
 /**
  * <p>This class converts a <a href="http://jsonml.org">JsonML</a>
  * document to XML.

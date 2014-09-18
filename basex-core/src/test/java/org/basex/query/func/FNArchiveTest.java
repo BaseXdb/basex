@@ -197,7 +197,6 @@ public final class FNArchiveTest extends AdvancedQueryTest {
         _ARCHIVE_DELETE.args(" .", "X"), ARCH_MODIFY_X);
   }
 
-
   /** Test method. */
   @Test
   public void write() {

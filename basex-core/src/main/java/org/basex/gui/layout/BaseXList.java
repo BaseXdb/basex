@@ -38,7 +38,6 @@ public final class BaseXList extends BaseXBack {
   /** Numeric list. */
   private boolean num = true;
 
-
   /**
    * Default constructor.
    * @param choice the input values for the list

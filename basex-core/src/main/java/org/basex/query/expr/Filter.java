@@ -87,7 +87,6 @@ public abstract class Filter extends Preds {
     return e;
   }
 
-
   /**
    * Adds a predicate to the filter.
    * This function is e.g. called by {@link For#addPredicate}.

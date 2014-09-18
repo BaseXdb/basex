@@ -201,7 +201,7 @@ public final class QueryResources {
     // favor default database
     final Data gd = globalData();
     if(qc.context.options.get(MainOptions.DEFAULTDB) && gd != null) {
-      final IntList pres = gd.resources.docsIn(qi.original);
+      final IntList pres = gd.resources.docs(qi.original);
       return DBNodeSeq.get(pres, gd, true, qi.original.isEmpty());
     }
 
@@ -233,7 +233,7 @@ public final class QueryResources {
     // open new database, or create new instance
     if(dt == null) dt = open(qi);
     if(dt == null) dt = create(qi, false, baseIO, info);
-    return DBNodeSeq.get(dt.resources.docsIn(qi.path), dt, true, qi.path.isEmpty());
+    return DBNodeSeq.get(dt.resources.docs(qi.path), dt, true, qi.path.isEmpty());
   }
 
   /**
@@ -417,7 +417,7 @@ public final class QueryResources {
       throws QueryException {
 
     // get all document nodes of the specified database
-    final IntList docs = dt.resources.docsIn(qi.path);
+    final IntList docs = dt.resources.docs(qi.path);
     // ensure that a single document was filtered
     if(docs.size() == 1) return new DBNode(dt, docs.get(0), Data.DOC);
     throw (docs.isEmpty() ? BXDB_NODOC_X : BXDB_SINGLE_X).get(info, qi.original);

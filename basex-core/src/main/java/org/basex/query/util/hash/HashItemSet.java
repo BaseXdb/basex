@@ -29,7 +29,6 @@ public class HashItemSet extends ASet implements ItemSet {
     keys = new Item[Array.CAPACITY];
   }
 
-
   @Override
   public final boolean add(final Item key, final InputInfo ii) throws QueryException {
     return index(key, ii) > 0;

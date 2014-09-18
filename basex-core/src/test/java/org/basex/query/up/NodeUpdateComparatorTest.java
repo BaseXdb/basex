@@ -514,7 +514,6 @@ public class NodeUpdateComparatorTest extends AdvancedQueryTest {
     Collections.sort(l, c);
     Collections.sort(l2, c);
 
-
     final int s = order.length;
     // check if primitives are ordered as expected
     for(int i = 0; i < s; i++) {

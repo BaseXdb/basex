@@ -1,6 +1,5 @@
 package org.basex.util.options;
 
-
 /**
  * Single option, stored in {@link Options} instances.
  *

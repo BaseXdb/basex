@@ -36,7 +36,6 @@ final class DialogXmlParser extends DialogParser {
   /** Browse Catalog file. */
   private final BaseXButton browsec;
 
-
   /**
    * Constructor.
    * @param d dialog reference

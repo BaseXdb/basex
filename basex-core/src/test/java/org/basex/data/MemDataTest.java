@@ -84,7 +84,6 @@ public class MemDataTest extends SandboxTest {
     assertEquals("Second node not found", 2, Integer.parseInt(c));
   }
 
-
   /**
    * Insert node update test.
    * @throws BaseXException query exception

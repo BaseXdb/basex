@@ -1,6 +1,5 @@
 package org.basex.data.atomic;
 
-
 /**
  * Base class for structural updates that add to/remove from the table and introduce
  * shifts.

@@ -34,7 +34,6 @@ public final class TypedFunc {
     return new TypedFunc(cast, new Ann());
   }
 
-
   /**
    * Creates a type constructor function.
    * @param f java function

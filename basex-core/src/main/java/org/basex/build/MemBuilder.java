@@ -17,7 +17,6 @@ public final class MemBuilder extends Builder {
   /** Data reference. */
   private MemData data;
 
-
   /**
    * Constructor.
    * @param name name of database

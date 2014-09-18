@@ -549,7 +549,6 @@ public final class Window extends Clause {
     /** Current position. */
     long p;
 
-
     /**
      * Reads the next item from {@code iter} if it isn't {@code null} and sets it to
      * {@code null} if it's drained.

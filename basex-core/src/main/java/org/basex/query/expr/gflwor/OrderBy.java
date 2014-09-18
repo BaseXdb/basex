@@ -18,7 +18,6 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
-
 /**
  * FLWOR {@code order by}-expression.
  *

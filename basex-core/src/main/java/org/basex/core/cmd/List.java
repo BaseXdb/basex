@@ -123,7 +123,7 @@ public final class List extends Command {
       // add xml documents
       final Data data = Open.open(db, context);
       final Resources res = data.resources;
-      final IntList il = res.docsIn(path);
+      final IntList il = res.docs(path);
       final int ds = il.size();
       for(int i = 0; i < ds; i++) {
         final int pre = il.get(i);
@@ -136,7 +136,7 @@ public final class List extends Command {
         table.contents.add(tl);
       }
       // add binary resources
-      for(final byte[] file : res.binariesIn(path)) {
+      for(final byte[] file : res.binaries(path)) {
         final String f = string(file);
         final TokenList tl = new TokenList(3);
         tl.add(file);
