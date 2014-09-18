@@ -47,8 +47,8 @@ public final class DBAdd extends DBUpdate {
   }
 
   @Override
-  public void merge(final Update up) {
-    final DBAdd a = (DBAdd) up;
+  public void merge(final Update update) {
+    final DBAdd a = (DBAdd) update;
     for(final NewInput input : a.add.inputs) add.inputs.add(input);
   }
 

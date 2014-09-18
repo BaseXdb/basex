@@ -31,9 +31,9 @@ public final class DBDelete extends DBUpdate {
   }
 
   @Override
-  public void merge(final Update up) {
-    for(final String path : ((DBDelete) up).paths) paths.add(path);
-    size += up.size();
+  public void merge(final Update update) {
+    for(final String path : ((DBDelete) update).paths) paths.add(path);
+    size += update.size();
   }
 
   @Override

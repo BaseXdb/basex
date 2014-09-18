@@ -46,11 +46,11 @@ public abstract class NodeUpdate extends DataUpdate {
 
   /**
    * Merges two update primitives, as they have the same target node.
-   * @param p primitive to merge with
+   * @param update primitive to merge with
    * @throws QueryException exception
    */
   @Override
-  public abstract void merge(final Update p) throws QueryException;
+  public abstract void merge(final Update update) throws QueryException;
 
   /**
    * Updates the name pool, which is used to find duplicate attributes
@@ -61,9 +61,9 @@ public abstract class NodeUpdate extends DataUpdate {
 
   /**
    * Adds the atomic update operations for this update primitive to the given list.
-   * @param l list of atomic updates
+   * @param auc list of atomic updates
    */
-  public abstract void addAtomics(final AtomicUpdateCache l);
+  public abstract void addAtomics(final AtomicUpdateCache auc);
 
   /**
    * Substitutes the update primitive if necessary. For instance a 'Replace Value

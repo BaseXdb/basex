@@ -20,31 +20,24 @@ final class NodeUpdates {
 
   /**
    * Adds an update to this container.
-   * @param up node update
+   * @param update node update
    * @throws QueryException query exception
    */
-  void add(final NodeUpdate up) throws QueryException {
+  void add(final NodeUpdate update) throws QueryException {
     // Primitives can be merged eventually ...
-    final int typeIndex = index(up.type);
-    if(typeIndex == -1) {
-      updates.add(up);
+    final int index = indexOf(update.type);
+    if(index == -1) {
+      updates.add(update);
     } else {
-      final NodeUpdate nodeUp = updates.get(typeIndex);
-      // but an insertInto could be part of a substitute of a replaceElementContent,
-      // then we cannot merge them, as this would insert unwanted nodes
-      if(nodeUp instanceof InsertInto) {
-        final InsertInto oprim = (InsertInto) nodeUp;
-        final InsertInto nprim = (InsertInto) up;
-        // if the new primitive substitutes, than replace the old one with the new one
-        if(nprim instanceof ReplaceContent) {
-          updates.set(typeIndex, nprim);
-        } else if(!(oprim instanceof ReplaceContent)) {
-          // if neither substitutes, merge them.
-          nodeUp.merge(up);
-        }
+      final NodeUpdate oldUpdate = updates.get(index);
+      // if an insertInto is part of a substitute of a replaceElementContent,
+      // we cannot merge them, as this would insert unwanted nodes.
+      // if the new primitive substitutes, then replace the old one with the new one
+      if(oldUpdate instanceof InsertInto && update instanceof ReplaceContent) {
+        updates.set(index, update);
       } else {
         // all other primitives can be merged regardless
-        nodeUp.merge(up);
+        oldUpdate.merge(update);
       }
     }
   }
@@ -67,7 +60,7 @@ final class NodeUpdates {
    * @param t PrimitiveType
    * @return index of primitive with given type or -1 if not found
    */
-  private int index(final UpdateType t) {
+  private int indexOf(final UpdateType t) {
     final int us = updates.size();
     for(int u = 0; u < us; u++) {
       if(updates.get(u).type == t) return u;

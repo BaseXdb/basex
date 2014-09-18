@@ -35,13 +35,13 @@ public final class ReplaceNode extends NodeCopy {
   }
 
   @Override
-  public void merge(final Update up) throws QueryException {
+  public void merge(final Update update) throws QueryException {
     throw UPMULTREPL_X.get(info, node());
   }
 
   @Override
-  public void addAtomics(final AtomicUpdateCache l) {
-    l.addReplace(pre, insseq);
+  public void addAtomics(final AtomicUpdateCache auc) {
+    auc.addReplace(pre, insseq);
   }
 
   @Override

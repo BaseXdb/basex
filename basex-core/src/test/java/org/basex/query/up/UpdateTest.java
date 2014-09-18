@@ -384,7 +384,8 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void replaceelementcontent5() {
     testBothSequences("<n><A/></n>", "<n>newText</n>",
-        "replace value of node $input with 'newText'", "insert node <newA/> into $input");
+        "replace value of node $input with 'newText'",
+        "insert node <newA/> into $input");
   }
 
   /**

@@ -36,12 +36,12 @@ public abstract class ContextModifier {
   /**
    * Adds an update primitive to this context modifier.
    * Will be called by {@link #add(Update, QueryContext)}.
-   * @param up update primitive
+   * @param update update primitive
    * @throws QueryException query exception
    */
-  final void add(final Update up) throws QueryException {
-    if(up instanceof DataUpdate) {
-      final DataUpdate dataUp = (DataUpdate) up;
+  final void add(final Update update) throws QueryException {
+    if(update instanceof DataUpdate) {
+      final DataUpdate dataUp = (DataUpdate) update;
       final Data data = dataUp.data();
       DataUpdates ups = dbUpdates.get(data);
       if(ups == null) {
@@ -52,7 +52,7 @@ public abstract class ContextModifier {
       if(tmp == null) tmp = new MemData(data.meta.options);
       ups.add(dataUp, tmp);
     } else {
-      final NameUpdate nameUp = (NameUpdate) up;
+      final NameUpdate nameUp = (NameUpdate) update;
       final String name = nameUp.name();
       NameUpdates ups = nameUpdates.get(name);
       if(ups == null) {

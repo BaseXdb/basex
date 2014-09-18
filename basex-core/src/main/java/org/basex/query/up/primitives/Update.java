@@ -27,10 +27,10 @@ public abstract class Update {
 
   /**
    * Merges two update operations pointing to the same target.
-   * @param p operation to merge with
+   * @param update operation to merge with
    * @throws QueryException exception
    */
-  public abstract void merge(final Update p) throws QueryException;
+  public abstract void merge(final Update update) throws QueryException;
 
   /**
    * Returns the number of update operations.

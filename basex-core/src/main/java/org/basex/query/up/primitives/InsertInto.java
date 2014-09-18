@@ -26,15 +26,15 @@ public class InsertInto extends NodeCopy {
   }
 
   @Override
-  public final void merge(final Update up) {
-    final ANodeList newInsert = ((NodeCopy) up).nodes;
+  public void merge(final Update update) {
+    final ANodeList newInsert = ((NodeCopy) update).nodes;
     for(final ANode n : newInsert) nodes.add(n);
   }
 
   @Override
-  public final void addAtomics(final AtomicUpdateCache l) {
+  public final void addAtomics(final AtomicUpdateCache auc) {
     final int s = data.size(pre, data.kind(pre));
-    l.addInsert(pre + s, pre, insseq);
+    auc.addInsert(pre + s, pre, insseq);
   }
 
   @Override

@@ -21,4 +21,8 @@ public final class ReplaceContent extends InsertInto {
   public ReplaceContent(final int pre, final Data data, final InputInfo ii, final ANodeList nodes) {
     super(pre, data, ii, nodes);
   }
+
+  @Override
+  public void merge(final Update update) {
+  }
 }

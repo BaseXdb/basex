@@ -53,7 +53,7 @@ public abstract class NameUpdate extends Update implements Comparable<NameUpdate
   protected abstract String operation();
 
   @Override
-  public void merge(final Update up) throws QueryException {
+  public void merge(final Update update) throws QueryException {
     throw BXDB_ONCE_X_X.get(info, name, operation());
   }
 

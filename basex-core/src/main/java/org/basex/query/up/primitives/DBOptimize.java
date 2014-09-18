@@ -51,8 +51,8 @@ public final class DBOptimize extends DBUpdate {
   }
 
   @Override
-  public void merge(final Update up) {
-    all |= ((DBOptimize) up).all;
+  public void merge(final Update update) {
+    all |= ((DBOptimize) update).all;
   }
 
   @Override

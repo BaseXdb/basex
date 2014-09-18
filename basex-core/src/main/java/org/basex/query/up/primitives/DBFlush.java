@@ -22,7 +22,7 @@ public final class DBFlush extends DBUpdate {
   }
 
   @Override
-  public void merge(final Update up) { }
+  public void merge(final Update update) { }
 
   @Override
   public void apply() {

@@ -29,6 +29,7 @@ public class DbReplace extends DbNew {
 
     final Updates updates = qc.resources.updates();
     final IntList docs = data.resources.docs(path);
+    int d = 0;
 
     // delete binary resources
     final IOFile bin = data.meta.binary(path);
@@ -38,12 +39,18 @@ public class DbReplace extends DbNew {
       updates.add(new DBStore(data, path, item, info), qc);
     } else {
       if(bin.exists()) updates.add(new DBDelete(data, path, info), qc);
-      updates.add(new DBAdd(data, checkInput(item, token(path)), opts, qc, info), qc);
+      final NewInput input = checkInput(item, token(path));
+      if(docs.isEmpty()) {
+        updates.add(new DBAdd(data, input, opts, qc, info), qc);
+      } else {
+        updates.add(new DBAdd(data, input, opts, qc, info), qc);
+        //d = 1;
+      }
     }
 
-    // remove old documents
+    // delete old documents
     final int ds = docs.size();
-    for(int d = 0; d < ds; d++) updates.add(new DeleteNode(docs.get(d), data, info), qc);
+    for(; d < ds; d++) updates.add(new DeleteNode(docs.get(d), data, info), qc);
     return null;
   }
 }

@@ -34,8 +34,8 @@ public final class DBRename extends DBUpdate {
   }
 
   @Override
-  public void merge(final Update up) throws QueryException {
-    for(final Entry<String, String> e : ((DBRename) up).map.entrySet()) {
+  public void merge(final Update update) throws QueryException {
+    for(final Entry<String, String> e : ((DBRename) update).map.entrySet()) {
       final String src = e.getKey();
       if(map.containsKey(src)) throw UPPATHREN_X.get(info, src);
       map.put(src, e.getValue());

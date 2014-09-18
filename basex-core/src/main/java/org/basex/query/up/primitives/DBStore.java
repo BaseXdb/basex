@@ -36,8 +36,8 @@ public final class DBStore extends DBUpdate {
   }
 
   @Override
-  public void merge(final Update up) {
-    final DBStore put = (DBStore) up;
+  public void merge(final Update update) {
+    final DBStore put = (DBStore) update;
     for(final byte[] path : put.map) map.put(path, put.map.get(path));
   }
 

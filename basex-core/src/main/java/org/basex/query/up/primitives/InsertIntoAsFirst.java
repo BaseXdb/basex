@@ -27,14 +27,14 @@ public final class InsertIntoAsFirst extends NodeCopy {
   }
 
   @Override
-  public void merge(final Update up) {
-    final ANodeList newInsert = ((NodeCopy) up).nodes;
+  public void merge(final Update update) {
+    final ANodeList newInsert = ((NodeCopy) update).nodes;
     for(final ANode n : newInsert) nodes.add(n);
   }
 
   @Override
-  public void addAtomics(final AtomicUpdateCache l) {
-    l.addInsert(pre + data.attSize(pre, data.kind(pre)), pre, insseq);
+  public void addAtomics(final AtomicUpdateCache auc) {
+    auc.addInsert(pre + data.attSize(pre, data.kind(pre)), pre, insseq);
   }
 
   @Override
