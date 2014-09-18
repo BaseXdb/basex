@@ -42,9 +42,4 @@ public final class InsertAttribute extends NodeCopy {
   public void addAtomics(final AtomicUpdateCache auc) {
     auc.addInsert(pre + 1, pre, insseq);
   }
-
-  @Override
-  public NodeUpdate[] substitute(final MemData tmp) {
-    return new NodeUpdate[] { this };
-  }
 }

@@ -105,17 +105,8 @@ public final class Resources implements Index {
    * @param path input path
    * @return pre values (internal representation!)
    */
-  public synchronized IntList docsIn(final String path) {
-    return docs.docs(path, false);
-  }
-
-  /**
-   * Returns the pre values of all document nodes matching the specified path.
-   * @param path input path
-   * @return pre values (internal representation!)
-   */
   public synchronized IntList docs(final String path) {
-    return docs.docs(path, true);
+    return docs.docs(path, false);
   }
 
   /**
@@ -132,7 +123,7 @@ public final class Resources implements Index {
    * @param path input path
    * @return root nodes
    */
-  public synchronized TokenList binariesIn(final String path) {
+  public synchronized TokenList binaries(final String path) {
     return bins.bins(path);
   }
 

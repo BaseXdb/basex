@@ -61,9 +61,4 @@ public final class RenameNode extends NodeUpdate {
   public void addAtomics(final AtomicUpdateCache auc) {
     auc.addRename(pre, name.string(), name.uri());
   }
-
-  @Override
-  public NodeUpdate[] substitute(final MemData tmp) {
-    return new NodeUpdate[] { this };
-  }
 }

@@ -24,7 +24,7 @@ public final class DbDelete extends DbAccess {
     final String path = path(1, qc);
 
     // delete XML resources
-    final IntList docs = data.resources.docsIn(path);
+    final IntList docs = data.resources.docs(path);
     final int is = docs.size();
     final Updates updates = qc.resources.updates();
     for(int i = 0; i < is; i++) {

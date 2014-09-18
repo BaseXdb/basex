@@ -24,7 +24,7 @@ public final class DbStore extends DbAccess {
     if(data.inMemory()) throw BXDB_MEM_X.get(info, data.meta.name);
 
     final IOFile file = data.meta.binary(path);
-    if(file == null || file.isDir()) throw RESINV_X.get(info, path);
+    if(file == null || path.isEmpty()) throw RESINV_X.get(info, path);
     qc.resources.updates().add(new DBStore(data, path, item, info), qc);
     return null;
   }

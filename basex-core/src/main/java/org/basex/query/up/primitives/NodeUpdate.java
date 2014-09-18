@@ -41,8 +41,9 @@ public abstract class NodeUpdate extends DataUpdate {
    * Prepares this update primitive before execution. This includes e.g. the
    * preparation of insertion sequences.
    * @param tmp temporary database
+   * @throws QueryException query exception
    */
-  public abstract void prepare(final MemData tmp);
+  public abstract void prepare(final MemData tmp) throws QueryException;
 
   /**
    * Merges two update primitives, as they have the same target node.
@@ -81,5 +82,8 @@ public abstract class NodeUpdate extends DataUpdate {
    * @return An array that contains the substituting primitives or this update primitive
    * if no substitution is necessary.
    */
-  public abstract NodeUpdate[] substitute(final MemData tmp);
+  @SuppressWarnings("unused")
+  public NodeUpdate[] substitute(final MemData tmp) {
+    return new NodeUpdate[] { this };
+  }
 }

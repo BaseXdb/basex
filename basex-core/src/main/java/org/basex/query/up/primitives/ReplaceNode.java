@@ -43,9 +43,4 @@ public final class ReplaceNode extends NodeCopy {
   public void addAtomics(final AtomicUpdateCache auc) {
     auc.addReplace(pre, insseq);
   }
-
-  @Override
-  public NodeUpdate[] substitute(final MemData tmp) {
-    return new NodeUpdate[] { this };
-  }
 }

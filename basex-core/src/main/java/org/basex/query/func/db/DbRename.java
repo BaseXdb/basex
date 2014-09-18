@@ -28,7 +28,7 @@ public final class DbRename extends DbAccess {
 
     // the first step of the path should be the database name
     final Updates updates = qc.resources.updates();
-    final IntList il = data.resources.docsIn(source);
+    final IntList il = data.resources.docs(source);
     final int is = il.size();
     for(int i = 0; i < is; i++) {
       final int pre = il.get(i);

@@ -22,7 +22,7 @@ public final class DbOpen extends DbAccess {
   public Value value(final QueryContext qc) throws QueryException {
     final Data data = checkData(qc);
     final String path = exprs.length < 2 ? "" : path(1, qc);
-    return DBNodeSeq.get(data.resources.docsIn(path), data, true, path.isEmpty());
+    return DBNodeSeq.get(data.resources.docs(path), data, true, path.isEmpty());
   }
 
   @Override

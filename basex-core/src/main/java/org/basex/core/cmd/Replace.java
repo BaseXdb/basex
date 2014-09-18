@@ -49,7 +49,7 @@ public final class Replace extends ACreate {
 
     final Data data = context.data();
     final IOFile bin = data.meta.binary(path);
-    if(bin == null || bin.isDir()) return error(PATH_INVALID_X, args[0]);
+    if(bin == null) return error(PATH_INVALID_X, args[0]);
 
     if(!startUpdate()) return false;
     try {

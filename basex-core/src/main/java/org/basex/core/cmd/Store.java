@@ -45,7 +45,7 @@ public final class Store extends ACreate {
   protected boolean run() {
     final boolean create = context.user.has(Perm.CREATE);
     String path = MetaData.normPath(args[0]);
-    if(path == null || path.endsWith(".")) return error(PATH_INVALID_X, args[0]);
+    if(path == null || path.isEmpty() || path.endsWith(".")) return error(PATH_INVALID_X, args[0]);
 
     if(in == null) {
       final IO io = IO.get(args[1]);
@@ -55,15 +55,12 @@ public final class Store extends ACreate {
       if((path.isEmpty() || path.endsWith("/")) && !(io instanceof IOContent)) path += io.name();
     }
 
-    // ensure that the final name is not empty
-    if(path.isEmpty()) return error(PATH_INVALID_X, path);
-
     // ensure that the name is not empty and contains no trailing dots
     final Data data = context.data();
     if(data.inMemory()) return error(NO_MAINMEM);
 
     final IOFile file = data.meta.binary(path);
-    if(path.isEmpty() || path.endsWith(".") || file == null || file.isDir())
+    if(path.isEmpty() || path.endsWith(".") || file == null)
       return error(PATH_INVALID_X, create ? path : args[0]);
 
     // start update
@@ -87,6 +84,7 @@ public final class Store extends ACreate {
    */
   public static void store(final InputSource in, final IOFile file) throws IOException {
     // add directory if it does not exist anyway
+    if(file.isDir()) file.delete();
     file.parent().md();
 
     try(final PrintOutput po = new PrintOutput(file.path())) {

@@ -38,10 +38,5 @@ public class InsertInto extends NodeCopy {
   }
 
   @Override
-  public final NodeUpdate[] substitute(final MemData tmp) {
-    return new NodeUpdate[] { this };
-  }
-
-  @Override
   public final void update(final NamePool pool) { }
 }

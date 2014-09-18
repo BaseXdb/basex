@@ -22,14 +22,14 @@ import org.basex.util.*;
  */
 final class DBNew {
   /** Query context. */
-  private final QueryContext qc;
+  final QueryContext qc;
   /** Input info. */
-  private final InputInfo info;
+  final InputInfo info;
 
   /** Inputs to add. */
   List<NewInput> inputs;
   /** Insertion sequence. */
-  Data md;
+  Data data;
 
   /**
    * Constructor.
@@ -45,15 +45,32 @@ final class DBNew {
 
   /**
    * Inserts all documents to be added to a temporary database.
+   * @param md temporary database
+   * @param name name of database
+   * @param options database options
+   * @throws QueryException query exception
+   */
+  void addDocs(final MemData md, final String name, final DBOptions options) throws QueryException {
+    final MainOptions opts = qc.context.options;
+    options.assign(opts);
+    try {
+      addDocs(new MemData(md), name);
+    } finally {
+      options.reset(opts);
+    }
+  }
+
+  /**
+   * Inserts all documents to be added to a temporary database.
    * @param dt target database
    * @param name name of database
    * @throws QueryException query exception
    */
   void addDocs(final MemData dt, final String name) throws QueryException {
-    md = dt;
+    data = dt;
     final long ds = inputs.size();
     for(int i = 0; i < ds; i++) {
-      md.insert(md.meta.size, -1, data(inputs.get(i), name));
+      data.insert(data.meta.size, -1, data(inputs.get(i), name));
       // clear list to recover memory
       inputs.set(i, null);
     }
@@ -67,7 +84,7 @@ final class DBNew {
    * @return database clip
    * @throws QueryException query exception
    */
-  private DataClip data(final NewInput ni, final String dbname) throws QueryException {
+  DataClip data(final NewInput ni, final String dbname) throws QueryException {
     // add document node
     final Context ctx = qc.context;
     if(ni.node != null) {

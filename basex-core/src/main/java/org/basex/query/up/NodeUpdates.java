@@ -92,7 +92,7 @@ final class NodeUpdates {
 
     // If T is replaced, all primitives other than InsertBefore and InsertAfter can be
     // removed.
-    final ReplaceNode replace = (ReplaceNode) find(REPLACENODE);
+    final NodeUpdate replace = find(REPLACENODE);
     if(replace != null) {
       for(final NodeUpdate p : updates) {
         if(p.type == REPLACENODE || p.type == INSERTBEFORE || p.type == INSERTAFTER)

@@ -46,7 +46,7 @@ public final class DBStore extends DBUpdate {
     for(final byte[] path : map) {
       try {
         final IOFile file = data.meta.binary(string(path));
-        if(file == null) throw UPDBPUT_X.get(info, path);
+        if(file.isDir()) file.delete();
         file.parent().md();
         final Object item = map.get(path);
         file.write(item instanceof Item ? ((Item) item).input(info) :

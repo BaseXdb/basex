@@ -45,8 +45,8 @@ public final class DbListDetails extends DbList {
 
     final Data data = checkData(qc);
     final String path = string(exprs.length == 1 ? Token.EMPTY : toToken(exprs[1], qc));
-    final IntList il = data.resources.docsIn(path);
-    final TokenList tl = data.resources.binariesIn(path);
+    final IntList il = data.resources.docs(path);
+    final TokenList tl = data.resources.binaries(path);
 
     return new Iter() {
       final int is = il.size(), ts = tl.size();

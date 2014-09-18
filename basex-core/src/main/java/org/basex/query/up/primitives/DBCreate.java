@@ -71,10 +71,10 @@ public final class DBCreate extends NameUpdate {
       final Data data = CreateDB.create(name, Parser.emptyParser(opts), qc.context);
 
       // add initial documents and optimize database
-      if(add.md != null) {
+      if(add.data != null) {
         data.startUpdate();
         try {
-          data.insert(data.meta.size, -1, new DataClip(add.md));
+          data.insert(data.meta.size, -1, new DataClip(add.data));
           Optimize.optimize(data, null);
         } finally {
           data.finishUpdate();

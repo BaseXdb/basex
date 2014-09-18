@@ -38,10 +38,5 @@ public final class InsertIntoAsFirst extends NodeCopy {
   }
 
   @Override
-  public NodeUpdate[] substitute(final MemData tmp) {
-    return new NodeUpdate[] { this };
-  }
-
-  @Override
   public void update(final NamePool pool) { }
 }

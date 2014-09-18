@@ -65,11 +65,6 @@ public final class DeleteNode extends NodeUpdate {
   }
 
   @Override
-  public NodeUpdate[] substitute(final MemData tmp) {
-    return new NodeUpdate[] { this };
-  }
-
-  @Override
   public void addAtomics(final AtomicUpdateCache auc) {
     auc.addDelete(pre);
   }
