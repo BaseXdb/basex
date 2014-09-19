@@ -1,5 +1,6 @@
 package org.basex.query.up;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 import static org.junit.Assert.*;
 
@@ -1209,5 +1210,12 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void updateCheck() {
     query("declare function local:a() { fold-left((), (), function($a, $b) { local:a() }) };"
         + "declare function local:b() { () }; ()", "");
+  }
+
+  /** Test output URI is correctly resolved. */
+  @Test
+  public void resolveUri() {
+    final String output = sandbox().merge("test.xml").url();
+    query(PUT.args("<a/>", output));
   }
 }
