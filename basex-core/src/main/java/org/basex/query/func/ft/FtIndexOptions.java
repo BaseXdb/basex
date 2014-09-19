@@ -1,5 +1,6 @@
-package org.basex.util.ft;
+package org.basex.query.func.ft;
 
+import org.basex.util.ft.*;
 import org.basex.util.options.*;
 
 /**
@@ -8,7 +9,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class FTIndexOptions extends Options {
+public class FtIndexOptions extends Options {
   /** Option: wildcards. */
   public static final EnumOption<FTMode> MODE = new EnumOption<>("mode", FTMode.ANY);
   /** Option: fuzzy. */

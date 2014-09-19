@@ -44,7 +44,7 @@ public final class DBCreate extends NameUpdate {
     final ArrayList<Option<?>> supported = new ArrayList<>();
     Collections.addAll(supported, DBOptions.INDEXING);
     Collections.addAll(supported, DBOptions.PARSING);
-    options = new DBOptions(opts.free(), supported, info);
+    options = new DBOptions(opts, supported, info);
     add = new DBNew(qc, input, info);
   }
 

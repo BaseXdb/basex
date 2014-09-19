@@ -811,6 +811,8 @@ public enum Function {
   /** XQuery function. */
   _FETCH_BINARY(FetchBinary.class, "binary(uri)", arg(STR), B64, flag(NDT), FETCH_URI),
   /** XQuery function. */
+  _FETCH_XML(FetchXml.class, "xml(uri[,options])", arg(STR, ITEM), DOC_ZO, flag(NDT), FETCH_URI),
+  /** XQuery function. */
   _FETCH_CONTENT_TYPE(FetchContentType.class, "content-type(uri)", arg(STR), STR, flag(NDT),
       FETCH_URI),
 

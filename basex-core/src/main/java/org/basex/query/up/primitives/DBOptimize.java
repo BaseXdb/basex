@@ -47,7 +47,7 @@ public final class DBOptimize extends DBUpdate {
     for(final Option<?> option : DBOptions.INDEXING) {
       if(all || option != MainOptions.UPDINDEX) supported.add(option);
     }
-    options = new DBOptions(opts.free(), supported, info);
+    options = new DBOptions(opts, supported, info);
   }
 
   @Override

@@ -21,16 +21,16 @@ public final class FtContains extends FtAccess {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Value input = qc.value(exprs[0]);
     final Value query = qc.value(exprs[1]);
-    final FTOptions opts = toOptions(2, Q_OPTIONS, new FTOptions(), qc);
+    final FtOptions opts = toOptions(2, Q_OPTIONS, new FtOptions(), qc);
 
     final FTOpt opt = new FTOpt();
-    final FTMode mode = opts.get(FTIndexOptions.MODE);
-    opt.set(FZ, opts.get(FTIndexOptions.FUZZY));
-    opt.set(WC, opts.get(FTIndexOptions.WILDCARDS));
-    opt.set(DC, opts.get(FTOptions.DIACRITICS) == FTDiacritics.SENSITIVE);
-    opt.set(ST, opts.get(FTOptions.STEMMING));
-    opt.ln = Language.get(opts.get(FTOptions.LANGUAGE));
-    opt.cs = opts.get(FTOptions.CASE);
+    final FTMode mode = opts.get(FtIndexOptions.MODE);
+    opt.set(FZ, opts.get(FtIndexOptions.FUZZY));
+    opt.set(WC, opts.get(FtIndexOptions.WILDCARDS));
+    opt.set(DC, opts.get(FtOptions.DIACRITICS) == FTDiacritics.SENSITIVE);
+    opt.set(ST, opts.get(FtOptions.STEMMING));
+    opt.ln = Language.get(opts.get(FtOptions.LANGUAGE));
+    opt.cs = opts.get(FtOptions.CASE);
     if(opt.is(FZ) && opt.is(WC)) throw BXFT_MATCH.get(info, this);
 
     final FTOpt tmp = qc.ftOpt();

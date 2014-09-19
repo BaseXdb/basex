@@ -1,5 +1,6 @@
-package org.basex.util.ft;
+package org.basex.query.func.ft;
 
+import org.basex.util.ft.*;
 import org.basex.util.options.*;
 
 /**
@@ -8,7 +9,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class FTOptions extends FTIndexOptions {
+public final class FtOptions extends FtIndexOptions {
   /** Option: case. */
   public static final EnumOption<FTCase> CASE = new EnumOption<>("case", FTCase.class);
   /** Option: case. */

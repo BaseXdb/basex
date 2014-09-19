@@ -35,7 +35,7 @@ public final class DBAdd extends DBUpdate {
       final InputInfo info) throws QueryException {
 
     super(UpdateType.DBADD, data, info);
-    options = new DBOptions(opts.free(), Arrays.asList(DBOptions.PARSING), info);
+    options = new DBOptions(opts, DBOptions.PARSING, info);
 
     final ArrayList<NewInput> docs = new ArrayList<>();
     docs.add(input);

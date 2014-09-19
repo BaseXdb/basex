@@ -25,16 +25,16 @@ public final class FtSearch extends FtAccess {
   public Iter iter(final QueryContext qc) throws QueryException {
     final Data data = checkData(qc);
     final Value terms = qc.value(exprs[1]);
-    final FTOptions opts = toOptions(2, Q_OPTIONS, new FTOptions(), qc);
+    final FtOptions opts = toOptions(2, Q_OPTIONS, new FtOptions(), qc);
 
     final IndexContext ic = new IndexContext(data, false);
     if(!data.meta.ftxtindex) throw BXDB_INDEX_X.get(info, data.meta.name,
         IndexType.FULLTEXT.toString().toLowerCase(Locale.ENGLISH));
 
     final FTOpt opt = new FTOpt().copy(data.meta);
-    final FTMode mode = opts.get(FTIndexOptions.MODE);
-    opt.set(FZ, opts.get(FTIndexOptions.FUZZY));
-    opt.set(WC, opts.get(FTIndexOptions.WILDCARDS));
+    final FTMode mode = opts.get(FtIndexOptions.MODE);
+    opt.set(FZ, opts.get(FtIndexOptions.FUZZY));
+    opt.set(WC, opts.get(FtIndexOptions.WILDCARDS));
     if(opt.is(FZ) && opt.is(WC)) throw BXFT_MATCH.get(info, this);
 
     final FTOpt tmp = qc.ftOpt();

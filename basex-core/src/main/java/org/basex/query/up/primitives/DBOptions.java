@@ -17,18 +17,18 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-final class DBOptions {
-  /** Index options. */
-  static final Option<?>[] INDEXING = { MainOptions.MAXCATS, MainOptions.MAXLEN,
-    MainOptions.INDEXSPLITSIZE, MainOptions.FTINDEXSPLITSIZE, MainOptions.LANGUAGE,
-    MainOptions.STOPWORDS, MainOptions.TEXTINDEX, MainOptions.ATTRINDEX, MainOptions.FTINDEX,
-    MainOptions.STEMMING, MainOptions.CASESENS, MainOptions.DIACRITICS, MainOptions.UPDINDEX };
+public final class DBOptions {
   /** Parsing options. */
-  static final Option<?>[] PARSING = { MainOptions.CREATEFILTER, MainOptions.ADDARCHIVES,
+  public static final Option<?>[] PARSING = { MainOptions.CREATEFILTER, MainOptions.ADDARCHIVES,
     MainOptions.SKIPCORRUPT, MainOptions.ADDRAW, MainOptions.ADDCACHE, MainOptions.CSVPARSER,
     MainOptions.TEXTPARSER, MainOptions.JSONPARSER, MainOptions.HTMLPARSER, MainOptions.PARSER,
     MainOptions.CHOP, MainOptions.INTPARSE, MainOptions.STRIPNS, MainOptions.DTD,
     MainOptions.CATFILE };
+  /** Indexing options. */
+  static final Option<?>[] INDEXING = { MainOptions.MAXCATS, MainOptions.MAXLEN,
+    MainOptions.INDEXSPLITSIZE, MainOptions.FTINDEXSPLITSIZE, MainOptions.LANGUAGE,
+    MainOptions.STOPWORDS, MainOptions.TEXTINDEX, MainOptions.ATTRINDEX, MainOptions.FTINDEX,
+    MainOptions.STEMMING, MainOptions.CASESENS, MainOptions.DIACRITICS, MainOptions.UPDINDEX };
 
   /** Runtime options. */
   private final HashMap<Option<?>, Object> rOptions = new HashMap<>();
@@ -42,15 +42,27 @@ final class DBOptions {
    * @param info input info
    * @throws QueryException query exception
    */
-  DBOptions(final HashMap<String, String> options, final List<Option<?>> supported,
+  public DBOptions(final Options options, final List<Option<?>> supported,
       final InputInfo info) throws QueryException {
+    this(options, supported.toArray(new Option<?>[supported.size()]), info);
+  }
+
+  /**
+   * Constructor.
+   * @param options query options
+   * @param supported supported options
+   * @param info input info
+   * @throws QueryException query exception
+   */
+  public DBOptions(final Options options, final Option<?>[] supported, final InputInfo info)
+      throws QueryException {
 
     final HashMap<String, Option<?>> opts = new HashMap<>();
     for(final Option<?> option : supported) {
       opts.put(option.name().toLowerCase(Locale.ENGLISH), option);
     }
 
-    for(final Entry<String, String> entry : options.entrySet()) {
+    for(final Entry<String, String> entry : options.free().entrySet()) {
       final String key = entry.getKey();
       final Option<?> option = opts.get(key);
       if(option == null) throw BASX_OPTIONS_X.get(info, key);
@@ -80,10 +92,10 @@ final class DBOptions {
   }
 
   /**
-   * Caches original options and assigns runtime options.
+   * Caches original options and assigns runtime options to the specified main options.
    * @param opts main options
    */
-  void assign(final MainOptions opts) {
+  public void assign(final MainOptions opts) {
     for(final Map.Entry<Option<?>, Object> entry : rOptions.entrySet()) {
       final Option<?> option = entry.getKey();
       oOptions.put(option, opts.get(option));
@@ -95,7 +107,7 @@ final class DBOptions {
    * Restores original options.
    * @param opts main options
    */
-  void reset(final MainOptions opts) {
+  public void reset(final MainOptions opts) {
     for(final Entry<Option<?>, Object> e : oOptions.entrySet()) {
       opts.put(e.getKey(), e.getValue());
     }
