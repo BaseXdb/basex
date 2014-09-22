@@ -23,18 +23,15 @@ import org.basex.util.list.*;
  * @author Andreas Weiler
  */
 public final class BaseXServer extends CLI implements Runnable {
-  /** Flag for server activity. */
-  private volatile boolean running;
-  /** Event server socket. */
-  private ServerSocket esocket;
-  /** Stop file. */
-  private IOFile stop;
-
   /** New sessions. */
   private final HashSet<ClientListener> auth = new HashSet<>();
-  /** Stopped flag. */
-  private volatile boolean stopped;
-  /** EventsListener. */
+  /** Indicates if server is running. */
+  private volatile boolean running;
+  /** Indicates if server is to be stopped. */
+  private volatile boolean stop;
+  /** Event server socket. */
+  private ServerSocket esocket;
+  /** Events listener. */
   private EventListener events;
   /** Initial commands. */
   private StringList commands;
@@ -42,6 +39,10 @@ public final class BaseXServer extends CLI implements Runnable {
   private ServerSocket socket;
   /** Start as daemon. */
   private boolean service;
+  /** Quiet flag. */
+  private boolean quiet;
+  /** Stop file. */
+  private IOFile stopFile;
 
   /**
    * Main method, launching the server process.
@@ -78,7 +79,7 @@ public final class BaseXServer extends CLI implements Runnable {
     final GlobalOptions gopts = context.globalopts;
     final int port = gopts.get(GlobalOptions.SERVERPORT);
     final int eport = gopts.get(GlobalOptions.EVENTPORT);
-    // check if ports are distinct
+    // ensure that port numbers are different
     if(port == eport) throw new BaseXException(PORT_TWICE_X, port);
 
     final String host = gopts.get(GlobalOptions.SERVERHOST);
@@ -86,14 +87,14 @@ public final class BaseXServer extends CLI implements Runnable {
 
     if(service) {
       start(port, args);
-      Util.outln(SRV_STARTED_PORT_X, port);
+      if(!quiet) Util.outln(SRV_STARTED_PORT_X, port);
       Performance.sleep(1000);
       return;
     }
 
-    if(stopped) {
+    if(stop) {
       stop(port, eport);
-      Util.outln(SRV_STOPPED_PORT_X, port);
+      if(!quiet) Util.outln(SRV_STOPPED_PORT_X, port);
       Performance.sleep(1000);
       return;
     }
@@ -103,49 +104,51 @@ public final class BaseXServer extends CLI implements Runnable {
       for(final String c : commands) execute(c);
 
       socket = new ServerSocket();
-      // reuse address (on non-Windows machines: !Prop.WIN);
       socket.setReuseAddress(true);
       socket.bind(new InetSocketAddress(addr, port));
       esocket = new ServerSocket();
       esocket.setReuseAddress(true);
       esocket.bind(new InetSocketAddress(addr, eport));
-      stop = stopFile(port);
-
-      // show info when server is aborted
-      context.log.writeServer(OK, Util.info(SRV_STARTED_PORT_X, port));
-      Runtime.getRuntime().addShutdownHook(new Thread() {
-        @Override
-        public void run() {
-          context.log.writeServer(OK, Util.info(SRV_STOPPED_PORT_X, port));
-          Util.outln(SRV_STOPPED_PORT_X, port);
-        }
-      });
-
-      new Thread(this).start();
-      while(!running) Performance.sleep(10);
-
-      Util.outln(S_CONSOLE + Util.info(SRV_STARTED_PORT_X, port), S_SERVER);
-
+      stopFile = stopFile(port);
     } catch(final IOException ex) {
       context.log.writeError(ex);
       throw ex;
     }
+
+    // start socket listener
+    new Thread(this).start();
   }
 
   @Override
   public void run() {
+    final GlobalOptions gopts = context.globalopts;
+    final int port = gopts.get(GlobalOptions.SERVERPORT);
+
+    // show info that server has been started
+    context.log.writeServer(OK, Util.info(SRV_STARTED_PORT_X, port));
+    if(!quiet) Util.outln(S_CONSOLE + Util.info(SRV_STARTED_PORT_X, port), S_SERVER);
+
+    // show info when server is terminated
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      @Override
+      public void run() {
+        context.log.writeServer(OK, Util.info(SRV_STOPPED_PORT_X, port));
+        if(!quiet) Util.outln(SRV_STOPPED_PORT_X, port);
+      }
+    });
+
     running = true;
     while(running) {
       try {
         final Socket s = socket.accept();
-        if(stop.exists()) {
-          if(!stop.delete()) {
-            context.log.writeServer(ERROR + COL + Util.info(FILE_NOT_DELETED_X, stop));
+        if(stopFile.exists()) {
+          if(!stopFile.delete()) {
+            context.log.writeServer(ERROR + COL + Util.info(FILE_NOT_DELETED_X, stopFile));
           }
           quit();
         } else {
           // drop inactive connections
-          final long ka = context.globalopts.get(GlobalOptions.KEEPALIVE) * 1000L;
+          final long ka = gopts.get(GlobalOptions.KEEPALIVE) * 1000L;
           if(ka > 0) {
             final long ms = System.currentTimeMillis();
             for(final ClientListener cs : context.sessions) {
@@ -154,7 +157,7 @@ public final class BaseXServer extends CLI implements Runnable {
           }
           final ClientListener cl = new ClientListener(s, context, this);
           // start authentication timeout
-          final long to = context.globalopts.get(GlobalOptions.KEEPALIVE) * 1000L;
+          final long to = gopts.get(GlobalOptions.KEEPALIVE) * 1000L;
           if(to > 0) {
             cl.auth.schedule(new TimerTask() {
               @Override
@@ -238,6 +241,9 @@ public final class BaseXServer extends CLI implements Runnable {
           case 'p': // parse server port
             context.globalopts.set(GlobalOptions.SERVERPORT, arg.number());
             break;
+          case 'q': // quiet flag (hidden)
+            quiet = true;
+            break;
           case 'S': // set service flag
             service = !daemon;
             break;
@@ -249,7 +255,7 @@ public final class BaseXServer extends CLI implements Runnable {
         }
       } else {
         if("stop".equalsIgnoreCase(arg.string())) {
-          stopped = true;
+          stop = true;
         } else {
           throw arg.usage();
         }
@@ -360,7 +366,7 @@ public final class BaseXServer extends CLI implements Runnable {
       while(running) {
         try {
           final Socket es = esocket.accept();
-          if(stop.exists()) {
+          if(stopFile.exists()) {
             esocket.close();
             break;
           }

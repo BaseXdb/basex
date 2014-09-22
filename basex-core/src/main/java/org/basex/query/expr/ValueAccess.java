@@ -103,6 +103,7 @@ public final class ValueAccess extends IndexAccess {
     return new IndexIterator() {
       final Data data = ictx.data;
       final byte kind = text ? Data.TEXT : Data.ATTR;
+      final int sz = data.meta.size;
       int pre = -1;
 
       @Override
@@ -111,14 +112,14 @@ public final class ValueAccess extends IndexAccess {
       }
       @Override
       public boolean more() {
-        while(++pre < data.meta.size) {
+        while(++pre < sz) {
           if(data.kind(pre) == kind && eq(data.text(pre, text), value)) return true;
         }
         return false;
       }
       @Override
       public int size() {
-        return Math.max(1, data.meta.size >>> 1);
+        return Math.max(1, sz >>> 1);
       }
     };
   }
@@ -130,11 +131,12 @@ public final class ValueAccess extends IndexAccess {
   private AxisIter scanEmpty() {
     return new AxisIter() {
       final Data data = ictx.data;
+      final int sz = data.meta.size;
       int pre = -1;
 
       @Override
       public DBNode next() {
-        while(++pre < data.meta.size) {
+        while(++pre < sz) {
           if(data.kind(pre) == Data.ELEM && data.size(pre, Data.ELEM) == 1)
             return new DBNode(data, pre, Data.ELEM);
         }

@@ -94,7 +94,7 @@ public final class DbListDetails extends DbList {
         }
 
         final FElem res = new FElem(DATABASE);
-        res.add(RESOURCES, token(meta.ndocs));
+        res.add(RESOURCES, token(meta.ndocs.intValue()));
         res.add(MDATE, DateTime.format(new Date(meta.dbtime()), DateTime.FULL));
         res.add(SIZE, token(meta.dbsize()));
         if(qc.context.perm(Perm.CREATE, meta)) res.add(PATH, meta.original);

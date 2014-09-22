@@ -254,7 +254,8 @@ public abstract class Formatter extends FormatUtil {
         if(max) {
           // limit maximum length of numeric output
           int mx = 0;
-          for(int s = 0; s < fp.primary.length; s += cl(fp.primary, s)) mx++;
+          final int fl = fp.primary.length;
+          for(int s = 0; s < fl; s += cl(fp.primary, s)) mx++;
           if(mx > 1) fp.max = mx;
         }
 

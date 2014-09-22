@@ -292,7 +292,7 @@ public final class SeqTypeTest {
    */
   private static void eq(final SeqType s, final SeqType r) {
     if(r == null) {
-      assertNull("\nExpected: " + r + "\nReturned: " + s, s);
+      assertNull("\nExpected: null\nReturned: " + s, s);
     } else {
       assertNotNull("\nExpected: " + r + "\nReturned: " + s, s);
       assertTrue("\nExpected: " + r + "\nReturned: " + s, s.eq(r));

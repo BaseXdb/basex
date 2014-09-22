@@ -77,10 +77,9 @@ public final class RESTPutTest extends RESTTest {
     put(NAME + '?' + MainOptions.CHOP.name() + "=false", new FileInputStream(FILE));
     assertEquals("22", get(NAME + "?query=count(//text())"));
 
-    try {
-      put(NAME + "?xxx=yyy", new FileInputStream(FILE));
+    try(final FileInputStream fis = new FileInputStream(FILE)) {
+      put(NAME + "?xxx=yyy", fis);
       fail("Error expected.");
-    } catch(final IOException ignored) {
-    }
+    } catch(final IOException ignored) { }
   }
 }

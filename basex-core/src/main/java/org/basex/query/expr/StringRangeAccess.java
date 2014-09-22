@@ -58,6 +58,8 @@ public final class StringRangeAccess extends IndexAccess {
   private IndexIterator scan() {
     return new IndexIterator() {
       final byte kind = index.text ? Data.TEXT : Data.ATTR;
+      final Data data = ictx.data;
+      final int sz = data.meta.size;
       int pre = -1;
 
       @Override
@@ -66,8 +68,7 @@ public final class StringRangeAccess extends IndexAccess {
       }
       @Override
       public boolean more() {
-        final Data data = ictx.data;
-        while(++pre < data.meta.size) {
+        while(++pre < sz) {
           if(data.kind(pre) != kind) continue;
           final byte[] t = data.text(pre, index.text);
           final int mn = Token.diff(t, index.min);
@@ -78,7 +79,7 @@ public final class StringRangeAccess extends IndexAccess {
       }
       @Override
       public int size() {
-        return Math.max(1, ictx.data.meta.size >>> 2);
+        return Math.max(1, sz >>> 2);
       }
     };
   }

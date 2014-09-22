@@ -76,7 +76,8 @@ public class FtMark extends StandardFunc {
             db.ftpos(mark, qc.ftPosData, len).build(toDBNode(it));
 
             final IntList il = new IntList();
-            for(int p = 0; p < md.meta.size; p += md.size(p, md.kind(p))) il.add(p);
+            final int s = md.meta.size;
+            for(int p = 0; p < s; p += md.size(p, md.kind(p))) il.add(p);
             vi = DBNodeSeq.get(il, md, false, false).iter();
           } finally {
             qc.ftPosData = tmp;

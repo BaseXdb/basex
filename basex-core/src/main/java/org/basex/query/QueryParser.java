@@ -3990,9 +3990,9 @@ public class QueryParser extends InputParser {
 
     final int i1 = pos;
     if(!wsConsumeWs(s1)) return false;
-    alter = expr;
-    alterPos = pos;
     final int i2 = pos;
+    alter = expr;
+    alterPos = i2;
     final boolean ok = wsConsume(s2);
     pos = ok ? i2 : i1;
     return ok;

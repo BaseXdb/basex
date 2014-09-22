@@ -182,6 +182,7 @@ public final class FTWords extends FTExpr {
     final FTTokens fttokens = ftt.cache(lex.get());
 
     return new FTIndexIterator() {
+      final int sz = data.meta.size;
       int pre = -1, ps;
 
       @Override
@@ -190,7 +191,7 @@ public final class FTWords extends FTExpr {
       }
       @Override
       public boolean more() {
-        while(++pre < data.meta.size) {
+        while(++pre < sz) {
           if(data.kind(pre) != Data.TEXT) continue;
           input.init(data.text(pre, true));
           matches.reset(ps);
@@ -213,7 +214,7 @@ public final class FTWords extends FTExpr {
       @Override
       public int size() {
         // worst case
-        return Math.max(1, data.meta.size >>> 1);
+        return Math.max(1, sz >>> 1);
       }
     };
   }

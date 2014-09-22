@@ -81,7 +81,7 @@ public final class WebDAVLockService {
     query.bind("type", type);
     query.bind("depth", depth);
     query.bind("owner", user);
-    query.bind("timeout", to == null ? Long.MAX_VALUE : to);
+    query.bind("timeout", to == null ? Long.valueOf(Long.MAX_VALUE) : to);
     execute(query);
     return token;
   }

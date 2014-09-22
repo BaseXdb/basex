@@ -5,6 +5,7 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.concurrent.atomic.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
@@ -38,10 +39,10 @@ public final class MetaData {
   public volatile String original = "";
   /** Size of original document. */
   public volatile long filesize;
-  /** Number of stored documents. */
-  public volatile int ndocs;
   /** Timestamp of original document. */
   public volatile long time;
+  /** Number of stored documents. */
+  public AtomicInteger ndocs = new AtomicInteger();
 
   /** Flag for whitespace chopping. */
   public volatile boolean chop;
@@ -85,7 +86,7 @@ public final class MetaData {
   /** Dirty flag. */
   public volatile boolean dirty;
 
-  /** Table size. */
+  /** Number of nodes. */
   public volatile int size;
   /** Last (highest) id assigned to a node. */
   public volatile int lastid = -1;
@@ -288,7 +289,7 @@ public final class MetaData {
         else if(k.equals(DBFTSW))     stopwords  = v;
         else if(k.equals(DBFTLN))     language   = Language.get(v);
         else if(k.equals(DBSIZE))     size       = toInt(v);
-        else if(k.equals(DBNDOCS))    ndocs      = toInt(v);
+        else if(k.equals(DBNDOCS))    ndocs      = new AtomicInteger(toInt(v));
         else if(k.equals(DBSCTYPE))   scoring    = toInt(v);
         else if(k.equals(DBMAXLEN))   maxlen     = toInt(v);
         else if(k.equals(DBMAXCATS))  maxcats    = toInt(v);
@@ -335,7 +336,7 @@ public final class MetaData {
     writeInfo(out, DBTIME,     time);
     writeInfo(out, IDBSTR,     ISTORAGE);
     writeInfo(out, DBFSIZE,    filesize);
-    writeInfo(out, DBNDOCS,    ndocs);
+    writeInfo(out, DBNDOCS,    ndocs.intValue());
     writeInfo(out, DBENC,      encoding);
     writeInfo(out, DBSIZE,     size);
     writeInfo(out, DBCHOP,     chop);

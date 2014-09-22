@@ -168,7 +168,9 @@ public final class DigitalSignature {
           throw CX_KSNULL_X.get(info, ex);
         }
 
-        ks.load(new FileInputStream(ksURI), ksPW.toCharArray());
+        try(final FileInputStream fis = new FileInputStream(ksURI)) {
+          ks.load(fis, ksPW.toCharArray());
+        }
         pk = (PrivateKey) ks.getKey(kAlias, pkPW.toCharArray());
         final X509Certificate x509ce = (X509Certificate) ks.getCertificate(kAlias);
         if(x509ce == null) throw CX_ALINV_X.get(info, kAlias);

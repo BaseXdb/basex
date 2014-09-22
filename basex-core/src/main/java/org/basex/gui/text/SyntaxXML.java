@@ -89,9 +89,8 @@ public final class SyntaxXML extends Syntax {
    */
   private Color comment(final int ch) {
     switch(comment) {
-      // "<!"
-      case 1: comment = ch == '-' ? comment + 1 : 6; break;
-      // "<!-"
+      // "<!", "<!-"
+      case 1:
       case 2: comment = ch == '-' ? comment + 1 : 6; break;
       // "<!--"
       case 3: if(ch == '-') comment = 4; break;

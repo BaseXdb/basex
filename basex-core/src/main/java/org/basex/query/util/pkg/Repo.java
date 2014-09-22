@@ -76,19 +76,7 @@ public final class Repo {
    */
   synchronized void add(final Package pkg, final String dir) {
     init();
-
-    final byte[] name = pkg.uniqueName();
-    // update namespace dictionary
-    for(final Component comp : pkg.comps) {
-      final TokenSet dict = nsDict.get(comp.uri);
-      if(dict != null) {
-        dict.add(name);
-      } else {
-        nsDict.put(comp.uri, new TokenSet(name));
-      }
-    }
-    // update package dictionary
-    pkgDict.put(name, token(dir));
+    addPkg(pkg, dir);
   }
 
   /**
@@ -135,25 +123,35 @@ public final class Repo {
   private void readPkg(final IOFile dir) {
     final IOFile desc = new IOFile(dir, DESCRIPTOR);
     if(!desc.exists()) return;
+
     try {
-      final Package pkg = new PkgParser(null).parse(desc);
-      final byte[] name = pkg.uniqueName();
-      // read package components
-      for(final Component comp : pkg.comps) {
-        // add component's namespace to namespace dictionary
-        if(comp.uri != null) {
-          final TokenSet dict = nsDict.get(comp.uri);
-          if(dict != null) {
-            dict.add(name);
-          } else {
-            nsDict.put(comp.uri, new TokenSet(name));
-          }
-        }
-      }
-      // add package to package dictionary
-      pkgDict.put(name, token(dir.name()));
+      addPkg(new PkgParser(null).parse(desc), dir.name());
     } catch(final QueryException ex) {
       Util.errln(ex);
     }
   }
+
+  /**
+   * Adds a package to the package dictionary.
+   * @param pkg package
+   * @param dir name of package directory
+   */
+  private void addPkg(final Package pkg, final String dir) {
+    final byte[] name = pkg.uniqueName();
+    // read package components
+    for(final Component comp : pkg.comps) {
+      // add component's namespace to namespace dictionary
+      if(comp.uri != null) {
+        TokenSet dict = nsDict.get(comp.uri);
+        if(dict == null) {
+          dict = new TokenSet();
+          nsDict.put(comp.uri, dict);
+        }
+        dict.add(name);
+      }
+    }
+    // add package to package dictionary
+    pkgDict.put(name, token(dir));
+  }
+
 }

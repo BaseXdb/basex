@@ -27,8 +27,14 @@ public class Collation {
   /** Implementation-defined collation URL. */
   private static final byte[] URL = token(Prop.URL + "/collation");
 
-  /** Available locales, indexed by language code. */
-  private static HashMap<String, Locale> locales;
+  /** Initialization of locales. */
+  private static class Locales {
+    /** Available locales, indexed by language code. */
+    static HashMap<String, Locale> map = new HashMap<>();
+    static {
+      for(final Locale l : Locale.getAvailableLocales()) map.put(l.toString().replace('_', '-'), l);
+    }
+  }
 
   /** Collator. */
   @SuppressWarnings("rawtypes")
@@ -131,13 +137,7 @@ public class Collation {
       return null;
     }
 
-    if(locales == null) {
-      // initializes locales
-      locales = new HashMap<>();
-      for(final Locale l : Locale.getAvailableLocales())
-        locales.put(l.toString().replace('_', '-'), l);
-    }
-    final Locale locale = locales.get(opts.get(CollationOptions.LANG));
+    final Locale locale = Locales.map.get(opts.get(CollationOptions.LANG));
     if(locale == null) throw err.get(info, uri);
 
     final Collator coll = Collator.getInstance(locale);

@@ -559,7 +559,7 @@ public abstract class Data {
         case DOC:
           // add document
           doc(pre, ssize, data.text(spre, true));
-          meta.ndocs++;
+          meta.ndocs.incrementAndGet();
           break;
         case ELEM:
           // add element
@@ -652,7 +652,7 @@ public abstract class Data {
     }
 
     // preserve empty root node
-    if(kind(pre) == DOC) --meta.ndocs;
+    if(kind(pre) == DOC) meta.ndocs.decrementAndGet();
 
     if(meta.updindex) {
       // delete node and descendants from ID -> PRE map:
@@ -742,7 +742,7 @@ public abstract class Data {
           // add document
           nspaces.prepare();
           doc(pre, ssize, data.text(spre, true));
-          meta.ndocs++;
+          meta.ndocs.incrementAndGet();
           preStack.push(pre);
           break;
         case ELEM:

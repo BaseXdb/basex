@@ -308,7 +308,7 @@ public final class InfoView extends View implements LinkListener {
 
     final int fs = GUIConstants.fontSize;
     h = header.getHeight() + 4;
-    w = (int) (getWidth() * .98 - fs / 2 - header.getWidth());
+    w = (int) (getWidth() * .98 - fs / 2d - header.getWidth());
     bw = fs * 2 + w / 10;
     bs = bw / (l - 1);
 
