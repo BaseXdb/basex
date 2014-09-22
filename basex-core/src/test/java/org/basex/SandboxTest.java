@@ -1,18 +1,24 @@
 package org.basex;
 
-import static org.basex.core.Text.*;
-import static org.junit.Assert.*;
+import org.basex.api.client.ClientSession;
+import org.basex.core.Command;
+import org.basex.core.Context;
+import org.basex.core.GlobalOptions;
+import org.basex.io.IOFile;
+import org.basex.io.out.NullOutput;
+import org.basex.util.Prop;
+import org.basex.util.Util;
+import org.basex.util.list.StringList;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
-import java.io.*;
-import java.util.concurrent.*;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.concurrent.CountDownLatch;
 
-import org.basex.api.client.*;
-import org.basex.core.*;
-import org.basex.io.*;
-import org.basex.io.out.*;
-import org.basex.util.*;
-import org.basex.util.list.*;
-import org.junit.*;
+import static org.basex.core.Text.S_ADMIN;
+import static org.basex.core.Text.S_LOCALHOST;
+import static org.junit.Assert.assertTrue;
 
 /**
  * If this class is extended, tests will be run in a sandbox.
@@ -81,7 +87,7 @@ public abstract class SandboxTest {
       System.setOut(NULL);
       final StringList sl = new StringList().add("-z").add("-p9999").add("-e9998");
       for(final String a : args) sl.add(a);
-      final BaseXServer server = new BaseXServer(sl.finish());
+      final BaseXServer server = BaseXServer.createServer(sl.finish());
       server.context.globalopts.set(GlobalOptions.DBPATH, sandbox().path());
       return server;
     } finally {

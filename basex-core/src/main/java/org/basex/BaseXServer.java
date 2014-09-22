@@ -1,18 +1,23 @@
 package org.basex;
 
-import static org.basex.core.Text.*;
-
-import java.io.*;
-import java.net.*;
-import java.util.*;
-
-import org.basex.api.client.*;
-import org.basex.core.*;
-import org.basex.io.*;
-import org.basex.io.in.*;
-import org.basex.server.*;
+import org.basex.api.client.ClientSession;
+import org.basex.core.BaseXException;
+import org.basex.core.CLI;
+import org.basex.core.Context;
+import org.basex.core.GlobalOptions;
+import org.basex.io.IOFile;
+import org.basex.io.in.BufferInput;
+import org.basex.server.ClientListener;
+import org.basex.server.LoginException;
 import org.basex.util.*;
-import org.basex.util.list.*;
+import org.basex.util.list.StringList;
+
+import java.io.IOException;
+import java.net.*;
+import java.util.HashSet;
+import java.util.TimerTask;
+
+import static org.basex.core.Text.*;
 
 /**
  * This is the starter class for running the database server. It handles
@@ -50,7 +55,7 @@ public final class BaseXServer extends CLI implements Runnable {
    */
   public static void main(final String[] args) {
     try {
-      new BaseXServer(args);
+      createServer(args);
     } catch(final IOException ex) {
       Util.errln(ex);
       System.exit(1);
@@ -58,12 +63,26 @@ public final class BaseXServer extends CLI implements Runnable {
   }
 
   /**
-   * Constructor.
+   * Create a new server instance.
    * @param args command-line arguments
+   * @return server
    * @throws IOException I/O exception
    */
-  public BaseXServer(final String... args) throws IOException {
-    this(null, args);
+  public static BaseXServer createServer(final String... args) throws IOException {
+    return createServer(null, args);
+  }
+
+  /**
+   * Create a new server instance.
+   * @param ctx database context
+   * @param args command-line arguments
+   * @return server
+   * @throws IOException I/O exception
+   */
+  public static BaseXServer createServer(final Context ctx, final String... args) throws IOException {
+    BaseXServer server = new BaseXServer(ctx, args);
+    server.start();
+    return server;
   }
 
   /**
@@ -72,7 +91,7 @@ public final class BaseXServer extends CLI implements Runnable {
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
-  public BaseXServer(final Context ctx, final String... args) throws IOException {
+  private BaseXServer(final Context ctx, final String... args) throws IOException {
     super(args, ctx);
 
     final GlobalOptions gopts = context.globalopts;
@@ -121,15 +140,21 @@ public final class BaseXServer extends CLI implements Runnable {
         }
       });
 
-      new Thread(this).start();
-      while(!running) Performance.sleep(10);
-
-      Util.outln(S_CONSOLE + Util.info(SRV_STARTED_PORT_X, port), S_SERVER);
-
     } catch(final IOException ex) {
       context.log.writeError(ex);
       throw ex;
     }
+  }
+
+  /**
+   * Actually start the server thread.
+   */
+  public void start() {
+    final int port = context.globalopts.get(GlobalOptions.SERVERPORT);
+    new Thread(this).start();
+    while(!running) Performance.sleep(10);
+
+    Util.outln(S_CONSOLE + Util.info(SRV_STARTED_PORT_X, port), S_SERVER);
   }
 
   @Override
