@@ -177,7 +177,6 @@ public final class StringParser extends CmdParser {
       case HELP:
         return new Help(name(null));
       case EXIT:
-        return new Exit();
       case QUIT:
         return new Exit();
       case FLUSH:

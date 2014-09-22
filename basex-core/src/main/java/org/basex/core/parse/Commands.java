@@ -85,6 +85,8 @@ public interface Commands {
   String OPTIMIZE_ALL = "optimize-all";
   /** Command string: "password". */
   String PASSWORD = "password";
+  /** Command string: "quit". */
+  String QUIT = "quit";
   /** Command string: "rename". */
   String RENAME = "rename";
   /** Command string: "replace". */

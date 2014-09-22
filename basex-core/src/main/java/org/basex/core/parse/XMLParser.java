@@ -128,6 +128,8 @@ final class XMLParser extends CmdParser {
       return new OptimizeAll();
     if(e.equals(PASSWORD) && check(root, '#' + PASSWORD + '?'))
       return new Password(password(root));
+    if(e.equals(QUIT) && check(root))
+      return new Exit();
     if(e.equals(RENAME) && check(root, PATH, NEWPATH))
       return new Rename(value(root, PATH), value(root, NEWPATH));
     if(e.equals(REPLACE) && check(root, PATH, '<' + INPUT))
