@@ -674,6 +674,7 @@ public class TextPanel extends BaseXPanel {
       if(p < m || p > y) {
         final int align = (Integer) algn;
         scroll.pos(align == 0 ? y : align == 1 ? y - getHeight() / 2 : m);
+        rend.repaint();
       }
     }
   };
