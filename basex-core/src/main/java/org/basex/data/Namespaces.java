@@ -319,8 +319,7 @@ public final class Namespaces {
   }
 
   /**
-   * Recursively adds namespace nodes to the given list, starting at the children of
-   * the given node.
+   * Recursively adds namespace nodes to the given list, starting at the children of the given node.
    * @param curr current namespace node
    * @param list list with namespace nodes
    * @param pre pre value
@@ -328,12 +327,35 @@ public final class Namespaces {
    */
   private static List<NSNode> addNSNodes(final NSNode curr, final List<NSNode> list,
       final int pre) {
-    for(int i = 0; i < curr.sz; i++) {
-      final NSNode ch = curr.children[i];
+
+    final int sz = curr.sz;
+    int s = find(curr, pre);
+    while(s > 0 && (s == sz || curr.children[s].pr >= pre)) s--;
+    for(; s < sz; s++) {
+      final NSNode ch = curr.children[s];
       if(ch.pr >= pre) list.add(ch);
       addNSNodes(ch, list, pre);
     }
     return list;
+  }
+
+  /**
+   * Returns the index of the specified pre value.
+   * @param curr current namespace node
+   * @param pre int pre value
+   * @return index
+   */
+  private static int find(final NSNode curr, final int pre) {
+    // binary search
+    int l = 0, h = curr.sz - 1;
+    while(l <= h) {
+      final int m = l + h >>> 1;
+      final int c = curr.children[m].pr - pre;
+      if(c == 0) return m;
+      if(c < 0) l = m + 1;
+      else h = m - 1;
+    }
+    return l;
   }
 
   // Updating Namespaces ================================================================
