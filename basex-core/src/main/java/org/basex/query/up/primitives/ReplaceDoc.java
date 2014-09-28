@@ -33,34 +33,31 @@ public class ReplaceDoc extends NodeUpdate {
    * @param info input info
    * @throws QueryException query exception
    */
-  public ReplaceDoc(int pre, Data data, final NewInput input, final Options opts,
+  public ReplaceDoc(final int pre, final Data data, final NewInput input, final Options opts,
       final QueryContext qc, final InputInfo info) throws QueryException {
 
     super(UpdateType.REPLACENODE, pre, data, info);
     options = new DBOptions(opts, DBOptions.PARSING, info);
-
-    final ArrayList<NewInput> docs = new ArrayList<>();
-    docs.add(input);
-    replace = new DBNew(qc, docs, info);
+    replace = new DBNew(qc, Arrays.asList(input), info);
   }
 
   @Override
-  public void prepare(MemData tmp) throws QueryException {
+  public void prepare(final MemData tmp) throws QueryException {
     replace.addDocs(tmp, data.meta.name, options);
   }
 
   @Override
-  public void merge(Update update) throws QueryException {
+  public void merge(final Update update) throws QueryException {
     throw UPMULTDOC_X.get(info, replace.inputs.get(0).path);
   }
 
   @Override
-  public void update(NamePool pool) {
+  public void update(final NamePool pool) {
     throw Util.notExpected();
   }
 
   @Override
-  public void addAtomics(AtomicUpdateCache auc) {
+  public void addAtomics(final AtomicUpdateCache auc) {
     auc.addReplace(pre, new DataClip(replace.data));
   }
 
