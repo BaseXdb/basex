@@ -47,6 +47,10 @@ public final class DocTest extends QueryTest {
       { "Child Error 1", "./" },
       { "Child Error 2", "html/" },
 
+      // should only return each element once, see GH-1001
+      { "Parent 1", nodes(13, 15), "/html/body/*/../*" },
+      { "Parent 2", nodes(20, 22), "//li/parent::ul/li" },
+
       { "Desc 1", nodes(20, 22), "//li" },
       { "Desc 2", nodes(20, 22), "//ul/li" },
       { "Desc 3", nodes(20, 22), "//ul//li" },
