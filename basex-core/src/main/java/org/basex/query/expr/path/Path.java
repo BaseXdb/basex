@@ -290,7 +290,7 @@ public abstract class Path extends ParseExpr {
     for(int s = 0; s < sl; ++s) {
       switch(((Step) steps[s]).axis) {
         // reverse axes - don't iterate
-        case ANC: case ANCORSELF: case PREC: case PRECSIBL:
+        case ANC: case ANCORSELF: case PREC: case PRECSIBL: case PARENT:
           return false;
         // multiple, unsorted results - only iterate at last step,
         // or if last step uses attribute axis
