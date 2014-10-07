@@ -21,7 +21,7 @@ public enum BaseXKeys {
   /** Right.                 */ NEXTCHAR(VK_RIGHT),
   /** Word left.             */ PREVWORD(MAC ? ALT : META, VK_LEFT),
   /** Word right.            */ NEXTWORD(MAC ? ALT : META, VK_RIGHT),
-  /** Beginning of line.     */ LINESTART(MAC ? META : 0, MAC ? VK_LEFT : VK_HOME),
+  /** Beginning of line.     */ LINESTART(MAC ? META : 0, MAC ? VK_LEFT : VK_HOME, true),
   /** End of line.           */ LINEEND(MAC ? META : 0, MAC ? VK_RIGHT : VK_END),
 
   /** Up.                    */ PREVLINE(VK_UP),
