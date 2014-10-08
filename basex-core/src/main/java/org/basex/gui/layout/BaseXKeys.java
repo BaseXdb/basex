@@ -125,10 +125,11 @@ public enum BaseXKeys {
    * @param m modifiers
    * @param k key code
    * @param ex modifiers exclusive:
-   *  0 = NONE
+   *  0 = ALL
    *  1 = SHIFT
    *  2 = ALT
    *  4 = CTRL
+   *  9 = NONE
    *  any combiantion, 5 = SHIFT and ALT are both excluded 
    */
   BaseXKeys(final int m, final int k, final int ex) {
