@@ -50,6 +50,8 @@ public final class DocTest extends QueryTest {
       // should only return each element once, see GH-1001
       { "Parent 1", nodes(13, 15), "/html/body/*/../*" },
       { "Parent 2", nodes(20, 22), "//li/parent::ul/li" },
+      { "Following 1", nodes(3, 7, 8, 24), "/*/node()/following-sibling::node()" },
+      { "Following-Sibling 1", nodes(20, 22), "/*/node()/following::li" },
 
       { "Desc 1", nodes(20, 22), "//li" },
       { "Desc 2", nodes(20, 22), "//ul/li" },

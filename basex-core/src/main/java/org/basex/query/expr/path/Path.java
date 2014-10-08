@@ -291,10 +291,11 @@ public abstract class Path extends ParseExpr {
       switch(((Step) steps[s]).axis) {
         // reverse axes - don't iterate
         case ANC: case ANCORSELF: case PREC: case PRECSIBL: case PARENT:
+        case FOLL: case FOLLSIBL:
           return false;
         // multiple, unsorted results - only iterate at last step,
         // or if last step uses attribute axis
-        case DESC: case DESCORSELF: case FOLL: case FOLLSIBL:
+        case DESC: case DESCORSELF:
           return s + 1 == sl || s + 2 == sl && ((Step) steps[s + 1]).axis == ATTR;
         // allow iteration for CHILD, ATTR, PARENT and SELF axes
         default:
