@@ -65,6 +65,14 @@ public final class RewritingsTest extends QueryPlanTest {
    */
   @Test
   public void optimizeEbv() {
+    query("not(<a/>[b])", "true");
+    query("empty(<a/>[b])", "true");
+    query("exists(<a/>[b])", "false");
+
+    query("not(<a/>[b = 'c'])", "true");
+    query("empty(<a/>[b = 'c'])", "true");
+    query("exists(<a/>[b = 'c'])", "false");
+
     check("empty(<a>X</a>[text()])", null, "//@axis = 'child'");
     check("exists(<a>X</a>[text()])", null, "//@axis = 'child'");
     check("boolean(<a>X</a>[text()])", null, "//@axis = 'child'");
