@@ -1,5 +1,6 @@
 package org.basex.query.ast;
 
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -84,5 +85,24 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $a in <a>X</a> where $a[text()] return $a", null, "//@axis = 'child'");
 
     check("empty(<a>X</a>/.[text()])", null, "//@axis = 'child'");
+  }
+
+  /**
+   * Checks if iterative evaluation of XPaths is used iff no duplicated occur (see GH-1001).
+   * @throws BaseXException if creating or dropping the database fails
+   */
+  @Test
+  public void iterPath() throws BaseXException {
+    new CreateDB(NAME, "<a id='0' x:id='' x='' xmlns:x='x'><b id='1'/><c id='2'/>"
+        + "<d id='3'/><e id='4'/></a>").execute(context);
+    check("(/a/*/../*) ! name()", "b c d e", "empty(//IterPath)");
+    check("(exactly-one(/a/b)/../*) ! name()", "b c d e", "exists(//IterPath)");
+    check("(/a/*/following::*) ! name()", "c d e", "empty(//IterPath)");
+    check("(exactly-one(/a/b)/following::*) ! name()", "c d e", "exists(//IterPath)");
+    check("(/a/*/following-sibling::*) ! name()", "c d e", "empty(//IterPath)");
+    check("(exactly-one(/a/b)/following-sibling::*) ! name()", "c d e", "exists(//IterPath)");
+    check("(/*/@id/../*) ! name()", "b c d e", "empty(//IterPath)");
+    check("(exactly-one(/a)/@id/../*) ! name()", "b c d e", "exists(//IterPath)");
+    new DropDB(NAME).execute(context);
   }
 }
