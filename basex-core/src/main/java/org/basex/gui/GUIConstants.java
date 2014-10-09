@@ -286,8 +286,6 @@ public final class GUIConstants {
   public static final int CTRL = Event.CTRL_MASK;
   /** Shortcut key (CTRL/META). */
   public static final int META = Prop.MAC ? Event.META_MASK : Event.CTRL_MASK;
-  /** Shortcuts: do not exclude any keys. */
-  public static final int ALL_MODS = SHIFT | ALT | CTRL | META;
 
   static {
     LABEL = new JLabel();
