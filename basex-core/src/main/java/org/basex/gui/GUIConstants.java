@@ -276,6 +276,8 @@ public final class GUIConstants {
 
   // KEYS =====================================================================
 
+  /** No modifer. */
+  public static final int NO_MOD = 0;
   /** Shift key. */
   public static final int SHIFT = Event.SHIFT_MASK;
   /** Alt key. */
@@ -284,6 +286,8 @@ public final class GUIConstants {
   public static final int CTRL = Event.CTRL_MASK;
   /** Shortcut key (CTRL/META). */
   public static final int META = Prop.MAC ? Event.META_MASK : Event.CTRL_MASK;
+  /** Shortcuts: do not exclude any keys. */
+  public static final int ALL_MODS = SHIFT | ALT | CTRL | META;
 
   static {
     LABEL = new JLabel();
