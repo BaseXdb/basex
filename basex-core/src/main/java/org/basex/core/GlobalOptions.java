@@ -55,10 +55,10 @@ public final class GlobalOptions extends Options {
 
   /** Server: host, used for binding the server. Empty string for wildcard.*/
   public static final StringOption SERVERHOST = new StringOption("SERVERHOST", "");
-  /** Server: proxy host. */
+  /** Server: proxy host (default: ignored). */
   public static final StringOption PROXYHOST = new StringOption("PROXYHOST", "");
-  /** Server: proxy port. */
-  public static final NumberOption PROXYPORT = new NumberOption("PROXYPORT", 80);
+  /** Server: proxy port (default: ignored). */
+  public static final NumberOption PROXYPORT = new NumberOption("PROXYPORT", 0);
   /** Server: non-proxy host. */
   public static final StringOption NONPROXYHOSTS = new StringOption("NONPROXYHOSTS", "");
 
@@ -104,7 +104,7 @@ public final class GlobalOptions extends Options {
       setSystem("https.proxyHost", ph);
     }
     final String pp = Integer.toString(get(PROXYPORT));
-    if(!pp.isEmpty()) {
+    if(!pp.equals(0)) {
       setSystem("http.proxyPort", pp);
       setSystem("https.proxyPort", pp);
     }
