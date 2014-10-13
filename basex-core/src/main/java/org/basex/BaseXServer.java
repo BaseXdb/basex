@@ -115,28 +115,25 @@ public final class BaseXServer extends CLI implements Runnable {
       throw ex;
     }
 
-    // start socket listener
     new Thread(this).start();
-  }
-
-  @Override
-  public void run() {
-    final GlobalOptions gopts = context.globalopts;
-    final int port = gopts.get(GlobalOptions.SERVERPORT);
+    do Thread.yield(); while(!running);
 
     // show info that server has been started
     context.log.writeServer(OK, Util.info(SRV_STARTED_PORT_X, port));
     if(!quiet) Util.outln(S_CONSOLE + Util.info(SRV_STARTED_PORT_X, port), S_SERVER);
 
-    // show info when server is terminated
+    // show info when server is aborted
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
         context.log.writeServer(OK, Util.info(SRV_STOPPED_PORT_X, port));
-        if(!quiet) Util.outln(SRV_STOPPED_PORT_X, port);
+        Util.outln(SRV_STOPPED_PORT_X, port);
       }
     });
+  }
 
+  @Override
+  public void run() {
     running = true;
     while(running) {
       try {
@@ -148,7 +145,7 @@ public final class BaseXServer extends CLI implements Runnable {
           quit();
         } else {
           // drop inactive connections
-          final long ka = gopts.get(GlobalOptions.KEEPALIVE) * 1000L;
+          final long ka = context.globalopts.get(GlobalOptions.KEEPALIVE) * 1000L;
           if(ka > 0) {
             final long ms = System.currentTimeMillis();
             for(final ClientListener cs : context.sessions) {
@@ -157,7 +154,7 @@ public final class BaseXServer extends CLI implements Runnable {
           }
           final ClientListener cl = new ClientListener(s, context, this);
           // start authentication timeout
-          final long to = gopts.get(GlobalOptions.KEEPALIVE) * 1000L;
+          final long to = context.globalopts.get(GlobalOptions.KEEPALIVE) * 1000L;
           if(to > 0) {
             cl.auth.schedule(new TimerTask() {
               @Override

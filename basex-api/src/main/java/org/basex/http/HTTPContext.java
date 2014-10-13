@@ -53,6 +53,8 @@ public final class HTTPContext {
   private static Context context;
   /** Initialization flag. */
   private static boolean init;
+  /** Initialized failed. */
+  private static IOException exception;
 
   /** Performance. */
   private final Performance perf = new Performance();
@@ -279,6 +281,14 @@ public final class HTTPContext {
   }
 
   /**
+   * Returns an exception that may have been caught by the initialization of the database server.
+   * @return exception
+   */
+  public static IOException exception() {
+    return exception;
+  }
+
+  /**
    * Assigns serialization parameters.
    * @param opts serialization parameters.
    */
@@ -358,7 +368,14 @@ public final class HTTPContext {
     }
 
     // start server instance
-    if(!context.globalopts.get(GlobalOptions.HTTPLOCAL)) new BaseXServer(context);
+    if(!context.globalopts.get(GlobalOptions.HTTPLOCAL)) {
+      try {
+        new BaseXServer(context);
+      } catch(final IOException ex) {
+        exception = ex;
+        throw ex;
+      }
+    }
   }
 
   /**
