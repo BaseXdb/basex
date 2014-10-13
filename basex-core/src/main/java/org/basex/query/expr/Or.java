@@ -44,7 +44,6 @@ public final class Or extends Logical {
         // merge adjacent comparisons
         while(i + 1 < es && exprs[i + 1] instanceof CmpG) {
           final Expr tmp = ((CmpG) e).union((CmpG) exprs[i + 1], qc, scp);
-          System.out.println("[O] " + tmp);
           if(tmp != null) {
             e = tmp;
             i++;
