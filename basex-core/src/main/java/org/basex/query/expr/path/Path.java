@@ -31,6 +31,10 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Path extends ParseExpr {
+  /** XPath axes that are expected to be expensive when at the start of a path. */
+  private static final EnumSet<Axis> EXPENSIVE = EnumSet.of(DESC, DESCORSELF, PREC, PRECSIBL,
+      FOLL, FOLLSIBL);
+
   /** Root expression. */
   public Expr root;
   /** Path steps. */
@@ -264,13 +268,10 @@ public abstract class Path extends ParseExpr {
    */
   public final boolean cheap() {
     if(!(root instanceof ANode) || ((Value) root).type != NodeType.DOC) return false;
-    final Axis[] expensive = { DESC, DESCORSELF, PREC, PRECSIBL,
-        FOLL, FOLLSIBL };
     final int sl = steps.length;
     for(int i = 0; i < sl; i++) {
       final Step s = axisStep(i);
-      if(s == null) return false;
-      if(i < 2) for(final Axis a : expensive) if(s.axis == a) return false;
+      if(s == null || i < 2 && EXPENSIVE.contains(s.axis)) return false;
       final Expr[] ps = s.preds;
       if(!(ps.length == 0 || ps.length == 1 && ps[0] instanceof Pos)) return false;
     }
@@ -286,19 +287,55 @@ public abstract class Path extends ParseExpr {
   private static boolean iterative(final Expr root, final Expr... steps) {
     if(root == null || !root.iterable()) return false;
 
+    final long size = root.size();
+    final SeqType tp = root.seqType();
+    boolean atMostOne = size == 0 || size == 1 || tp.zeroOrOne();
+    boolean sameDepth = atMostOne || tp.type == NodeType.DOC || tp.type == NodeType.DEL;
+
     final int sl = steps.length;
     for(int s = 0; s < sl; ++s) {
-      switch(((Step) steps[s]).axis) {
-        // reverse axes - don't iterate
-        case ANC: case ANCORSELF: case PREC: case PRECSIBL: case PARENT:
-        case FOLL: case FOLLSIBL:
+      final Step step = (Step) steps[s];
+      switch(step.axis) {
+        case ANC:
+        case ANCORSELF:
+        case PREC:
+        case PRECSIBL:
+          // backwards axes must be reordered
           return false;
-        // multiple, unsorted results - only iterate at last step,
-        // or if last step uses attribute axis
-        case DESC: case DESCORSELF:
-          return s + 1 == sl || s + 2 == sl && ((Step) steps[s + 1]).axis == ATTR;
-        // allow iteration for CHILD, ATTR, PARENT and SELF axes
+        case FOLL:
+          // can overlap
+          if(!atMostOne) return false;
+          atMostOne = false;
+          sameDepth = false;
+          break;
+        case FOLLSIBL:
+          // can overlap, preserves level
+          if(!atMostOne) return false;
+          atMostOne = false;
+          break;
+        case ATTR:
+          // only unique for exact QName matching
+          atMostOne &= step.test.kind == Kind.URI_NAME;
+          break;
+        case CHILD:
+          atMostOne = false;
+          break;
+        case DESC:
+        case DESCORSELF:
+          // non-overlapping if all nodes are on the same level
+          if(!sameDepth) return false;
+          atMostOne = false;
+          sameDepth = false;
+          break;
+        case PARENT:
+          // overlaps
+          if(!atMostOne) return false;
+          break;
+        case SELF:
+          // nothing changes
+          break;
         default:
+          throw Util.notExpected();
       }
     }
     return true;
