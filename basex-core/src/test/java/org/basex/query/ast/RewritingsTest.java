@@ -104,5 +104,45 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(/*/@id/../*) ! name()", "b c d e", "empty(//IterPath)");
     check("(exactly-one(/a)/@id/../*) ! name()", "b c d e", "exists(//IterPath)");
     new DropDB(NAME).execute(context);
+  };
+
+  /**
+   * Checks OR optimizations.
+   */
+  @Test
+  public void or() {
+    check("('' or '')", "false", "empty(//Or)");
+    check("('x' or 'x' = 'x')", "true", "empty(//Or)");
+    check("(false()   or <x/> = 'x')", "false", "empty(//Or)");
+    check("(true()    or <x/> = 'x')", "true", "empty(//Or)");
+    check("('x' = 'x' or <x/> = 'x')", "true", "empty(//Or)");
+
+    // {@link CmpG} rewritings
+    check("let $x := <x/>     return ($x = 'x' or $x = 'y')", "false", "empty(//Or)");
+    check("let $x := <x>x</x> return ($x = 'x' or $x = 'y')", "true",  "empty(//Or)");
+  }
+
+  /**
+   * Checks AND optimizations.
+   */
+  @Test
+  public void and() {
+    check("('x' and 'y')", "true", "empty(//And)");
+    check("('x' and 'x' = 'x')", "true", "empty(//And)");
+    check("(true()    and <x>x</x> = 'x')", "true", "empty(//And)");
+    check("(false()   and <x>x</x> = 'x')", "false", "empty(//And)");
+    check("('x' = 'x' and <x>x</x> = 'x')", "true", "empty(//And)");
+
+    // {@link Pos} rewritings
+    check("(<a/>,<b/>)[position() > 1 and position() < 3]", "<b/>", "count(//Pos) = 1");
+    check("(<a/>,<b/>)[position() > 1 and position() < 3 and <b/>]", "<b/>", "count(//Pos) = 1");
+    // {@link CmpR} rewritings
+    check("<a>5</a>[text() > 1 and text() < 9]", "<a>5</a>", "count(//CmpR) = 1");
+    check("<a>5</a>[text() > 1 and text() < 9 and <b/>]", "<a>5</a>", "count(//CmpR) = 1");
+    check("<a>5</a>[text() > 1 and . < 9]", "<a>5</a>", "count(//CmpG) = 1 and count(//CmpR) = 1");
+    // {@link CmpSR} rewritings
+    check("<a>5</a>[text() > '1' and text() < '9']", "<a>5</a>", "count(//CmpSR) = 1");
+    check("<a>5</a>[text() > '1' and text() < '9' and <b/>]", "<a>5</a>", "count(//CmpSR) = 1");
+    check("<a>5</a>[text() > '1' and . < '9']", "<a>5</a>", "count(//CmpSR) = 2");
   }
 }

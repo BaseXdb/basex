@@ -36,41 +36,47 @@ public final class And extends Logical {
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    // merge predicates if possible
     final int es = exprs.length;
     final ExprList el = new ExprList(es);
-    Pos ps = null;
-    CmpR cr = null;
-    CmpSR cs = null;
-    for(final Expr e : exprs) {
-      Expr tmp = null;
+    for(int i = 0; i < es; i++) {
+      Expr e = exprs[i];
       if(e instanceof Pos) {
-        // merge numeric predicates
-        tmp = ps == null ? e : ps.intersect((Pos) e, info);
-        if(!(tmp instanceof Pos)) return tmp;
-        ps = (Pos) tmp;
+        // merge adjacent numeric predicates
+        while(i + 1 < es && exprs[i + 1] instanceof Pos) {
+          e = ((Pos) e).intersect((Pos) exprs[++i], info);
+        }
       } else if(e instanceof CmpR) {
-        // merge comparisons
-        tmp = cr == null ? e : cr.intersect((CmpR) e);
-        if(tmp instanceof CmpR) cr = (CmpR) tmp;
-        else if(tmp != null) return tmp;
+        // merge adjacent range comparisons
+        while(i + 1 < es && exprs[i + 1] instanceof CmpR) {
+          final Expr tmp = ((CmpR) e).intersect((CmpR) exprs[i + 1]);
+          if(tmp != null) {
+            e = tmp;
+            i++;
+          } else {
+            break;
+          }
+        }
       } else if(e instanceof CmpSR) {
-        // merge comparisons
-        tmp = cs == null ? e : cs.intersect((CmpSR) e);
-        if(tmp instanceof CmpSR) cs = (CmpSR) tmp;
-        else if(tmp != null) return tmp;
+        // merge adjacent string range comparisons
+        while(i + 1 < es && exprs[i + 1] instanceof CmpSR) {
+          final Expr tmp = ((CmpSR) e).intersect((CmpSR) exprs[i + 1]);
+          if(tmp != null) {
+            e = tmp;
+            i++;
+          } else {
+            break;
+          }
+        }
+      } else if(e.isValue()) {
+        e = optPre(value(qc), qc);
       }
-      // no optimization found; add original expression
-      if(tmp == null && e != Bln.TRUE) {
-        if(e == Bln.FALSE) return optPre(Bln.FALSE, qc);
-        el.add(e);
-      }
+      // expression will always return false
+      if(e == Bln.FALSE) return optPre(Bln.FALSE, qc);
+      // skip expression yielding true
+      if(e != Bln.TRUE) el.add(e);
     }
-    if(ps != null) el.add(ps);
-    if(cr != null) el.add(cr);
-    if(cs != null) el.add(cs);
 
-    // all arguments were true()
+    // all arguments return true
     if(el.isEmpty()) return optPre(Bln.TRUE, qc);
 
     if(es != el.size()) qc.compInfo(OPTWRITE, this);

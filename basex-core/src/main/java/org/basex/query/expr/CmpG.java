@@ -286,15 +286,17 @@ public final class CmpG extends Cmp {
    * @param g general comparison
    * @param qc query context
    * @param scp variable scope
-   * @return true if union was successful
+   * @return resulting expression or {@code null}
    * @throws QueryException query exception
    */
-  boolean union(final CmpG g, final QueryContext qc, final VarScope scp) throws QueryException {
-    if(op != g.op || !exprs[0].sameAs(g.exprs[0])) return false;
-    exprs[1] = new List(info, exprs[1], g.exprs[1]).compile(qc, scp);
-    final SeqType st = exprs[1].seqType();
-    atomic = atomic && st.zeroOrOne() && !st.mayBeArray();
-    return true;
+  Expr union(final CmpG g, final QueryContext qc, final VarScope scp) throws QueryException {
+    if(op != g.op || coll != g.coll || !exprs[0].sameAs(g.exprs[0])) return null;
+
+    final Expr list = new List(info, exprs[1], g.exprs[1]).optimize(qc, scp);
+    final CmpG cmp = new CmpG(exprs[0], list, op, coll, info);
+    final SeqType st = list.seqType();
+    cmp.atomic = atomic && st.zeroOrOne() && !st.mayBeArray();;
+    return cmp;
   }
 
   @Override

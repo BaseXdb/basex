@@ -36,25 +36,32 @@ public final class Or extends Logical {
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    // merge predicates if possible
-    CmpG cmpg = null;
-    final ExprList el = new ExprList(exprs.length);
-    for(final Expr e : exprs) {
-      boolean merged = false;
+    final int es = exprs.length;
+    final ExprList el = new ExprList(es);
+    for(int i = 0; i < es; i++) {
+      Expr e = exprs[i];
       if(e instanceof CmpG) {
-        // merge general comparisons
-        final CmpG g = (CmpG) e;
-        if(cmpg == null) cmpg = g;
-        else if(cmpg.union(g, qc, scp)) merged = true;
+        // merge adjacent comparisons
+        while(i + 1 < es && exprs[i + 1] instanceof CmpG) {
+          final Expr tmp = ((CmpG) e).union((CmpG) exprs[i + 1], qc, scp);
+          System.out.println("[O] " + tmp);
+          if(tmp != null) {
+            e = tmp;
+            i++;
+          } else {
+            break;
+          }
+        }
+      } else if(e.isValue()) {
+        e = optPre(value(qc), qc);
       }
-      // no optimization found; add original expression
-      if(!(merged || e == Bln.FALSE)) {
-        if(e == Bln.TRUE) return optPre(Bln.TRUE, qc);
-        el.add(e);
-      }
+      // expression will always return true
+      if(e == Bln.TRUE) return optPre(Bln.TRUE, qc);
+      // skip expression yielding false
+      if(e != Bln.FALSE) el.add(e);
     }
 
-    // all arguments were false()
+    // all arguments return false
     if(el.isEmpty()) return optPre(Bln.FALSE, qc);
 
     if(exprs.length != el.size()) {
