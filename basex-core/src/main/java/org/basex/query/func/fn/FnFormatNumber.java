@@ -21,7 +21,9 @@ public final class FnFormatNumber extends StandardFunc {
     // evaluate arguments
     Item it = exprs[0].atomItem(qc, info);
     if(it == null) it = Dbl.NAN;
+    else if(it.type.isUntyped()) it = Dbl.get(it.dbl(ii));
     else if(!it.type.isNumberOrUntyped()) throw numberError(this, it);
+
     // retrieve picture
     final byte[] pic = toToken(exprs[1], qc);
     // retrieve format declaration
