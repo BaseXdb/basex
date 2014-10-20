@@ -27,8 +27,6 @@ public class BaseX extends CLI {
   private IntList ops;
   /** Command arguments. */
   private StringList vals;
-  /** Flag for writing options to disk. */
-  private boolean writeOptions;
   /** Console mode. May be set to {@code false} during execution. */
   private boolean console;
 
@@ -152,9 +150,6 @@ public class BaseX extends CLI {
         } else if(c == 'w') {
           // toggle chopping of whitespaces
           execute(new Set(MainOptions.CHOP, null), false);
-        } else if(c == 'W') {
-          // hidden option: toggle writing of options before exit
-          writeOptions ^= true;
         } else if(c == 'x') {
           // show/hide xml query plan
           execute(new Set(MainOptions.XMLPLAN, null), false);
@@ -169,8 +164,6 @@ public class BaseX extends CLI {
         verbose = qi || qp || v;
       }
       if(console) console();
-
-      if(writeOptions) context.globalopts.write();
     } finally {
       quit();
     }
@@ -239,7 +232,7 @@ public class BaseX extends CLI {
           // options followed by a string
           v = arg.string();
         } else if(c == 'd' || c == 'D' && local() || c == 'L' || c == 'u' && local() || c == 'R' ||
-            c == 'v' || c == 'V' || c == 'w' || c == 'W' || c == 'x' || c == 'X' || c == 'z') {
+            c == 'v' || c == 'V' || c == 'w' || c == 'x' || c == 'X' || c == 'z') {
           // options to be toggled
           v = "";
         } else if(!local()) {
