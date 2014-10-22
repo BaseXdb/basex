@@ -83,12 +83,14 @@ public final class Map extends FItem {
   @Override
   public Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return get(args[0].item(qc, ii), ii);
+    final Item key = args[0].item(qc, ii);
+    if(key == null) throw EMPTYFOUND.get(ii);
+    return get(key, ii);
   }
 
   /**
    * Deletes a key from this map.
-   * @param key key to delete (must be atomic value)
+   * @param key key to delete (must not be {@code null})
    * @param ii input info
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
@@ -108,7 +110,7 @@ public final class Map extends FItem {
 
   /**
    * Gets the value from this map.
-   * @param key key to look for (must be atomic value)
+   * @param key key to look for (must not be {@code null})
    * @param ii input info
    * @return bound value if found, the empty sequence {@code ()} otherwise
    * @throws QueryException query exception
@@ -120,7 +122,7 @@ public final class Map extends FItem {
 
   /**
    * Checks if the given key exists in the map.
-   * @param key key to look for (must be atomic value)
+   * @param key key to look for (must not be {@code null})
    * @param ii input info
    * @return {@code true()}, if the key exists, {@code false()} otherwise
    * @throws QueryException query exception
@@ -163,7 +165,7 @@ public final class Map extends FItem {
 
   /**
    * Inserts the given value into this map.
-   * @param key key to insert (must be atomic value)
+   * @param key key to insert (must not be {@code null})
    * @param value value to insert
    * @param ii input info
    * @return updated map if changed, {@code this} otherwise
