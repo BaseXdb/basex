@@ -72,7 +72,7 @@ public class JsonMLConverter extends JsonXmlConverter {
   }
 
   @Override
-  public void closePair() throws QueryIOException { }
+  public void closePair(final boolean add) { }
 
   @Override
   public void closeObject() {
@@ -100,7 +100,7 @@ public class JsonMLConverter extends JsonXmlConverter {
   public void openItem() { }
 
   @Override
-  public void closeItem() throws QueryIOException { }
+  public void closeItem() { }
 
   @Override
   public void closeArray() throws QueryIOException {
@@ -158,7 +158,7 @@ public class JsonMLConverter extends JsonXmlConverter {
 
   @Override public void openArg() { }
 
-  @Override public void closeArg() throws QueryIOException { }
+  @Override public void closeArg() { }
 
-  @Override public void closeConstr() throws QueryIOException { }
+  @Override public void closeConstr() { }
 }

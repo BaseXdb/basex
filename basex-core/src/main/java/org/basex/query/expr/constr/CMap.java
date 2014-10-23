@@ -45,7 +45,7 @@ public final class CMap extends Arr {
       final Item k = (Item) key;
       final Value v = qc.value(exprs[e + 1]);
       if(map.contains(k, ii)) throw MAPDUPLKEY_X_X_X.get(ii, k, map.get(k, ii), v);
-      map = map.insert(k, v, ii);
+      map = map.put(k, v, ii);
     }
     return map;
   }

@@ -1,7 +1,6 @@
 package org.basex.io.parse.json;
 
 import org.basex.build.*;
-import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -12,7 +11,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public final class JsonStringConverter extends JsonConverter {
+final class JsonStringConverter extends JsonConverter {
   /** The token builder. */
   private final TokenBuilder tb;
   /** Flag for first array entry, object member or constructor argument. */
@@ -29,21 +28,23 @@ public final class JsonStringConverter extends JsonConverter {
   }
 
   /**
-   * Writes a pretty-printed representation of the given JSON string to the given builder.
+   * Writes a pretty-printed representation of the given JSON string.
    *
    * @param json JSON string
-   * @param spec JSON spec for parsing
-   * @param un unescape flag
-   * @param tb token builder
+   * @param liberal liberal parsing
+   * @param unescape unescape flag
+   * @return resulting string
    * @throws QueryIOException query I/O exception
    */
-  public static void print(final String json, final JsonSpec spec, final boolean un,
-      final TokenBuilder tb) throws QueryIOException {
+  public static String toString(final String json, final boolean liberal, final boolean unescape)
+      throws QueryIOException {
 
     final JsonParserOptions jopts = new JsonParserOptions();
-    jopts.set(JsonOptions.SPEC, spec);
-    jopts.set(JsonParserOptions.UNESCAPE, un);
+    jopts.set(JsonParserOptions.LIBERAL, liberal);
+    jopts.set(JsonParserOptions.UNESCAPE, unescape);
+    final TokenBuilder tb = new TokenBuilder();
     JsonParser.parse(json, null, jopts, new JsonStringConverter(jopts, tb));
+    return tb.toString();
   }
 
   @Override
@@ -60,7 +61,7 @@ public final class JsonStringConverter extends JsonConverter {
   }
 
   @Override
-  public void closePair() {
+  public void closePair(final boolean add) {
     first = false;
   }
 
@@ -92,23 +93,23 @@ public final class JsonStringConverter extends JsonConverter {
 
   @Override
   public void openConstr(final byte[] name) {
-    tb.add("new ").add(name).addByte((byte) '(');
+    tb.add("new ").add(name).add('(');
     first = true;
   }
 
   @Override
   public void openArg() {
-    if(!first) tb.add(", ");
+    openItem();
   }
 
   @Override
   public void closeArg() {
-    first = false;
+    closeItem();
   }
 
   @Override
   public void closeConstr() {
-    tb.addByte((byte) ')');
+    tb.add(')');
   }
 
   @Override
@@ -118,13 +119,13 @@ public final class JsonStringConverter extends JsonConverter {
 
   @Override
   void stringLit(final byte[] value) {
-    tb.addByte((byte) '"');
+    tb.add('"');
     for(int i = 0; i < value.length; i += Token.cl(value, i)) {
       final int cp = Token.cp(value, i);
       switch(cp) {
         case '\\':
         case '"':
-          tb.addByte((byte) '\\').addByte((byte) cp);
+          tb.add('\\').add(cp);
           break;
         case '\b':
           tb.add("\\b");
@@ -143,17 +144,17 @@ public final class JsonStringConverter extends JsonConverter {
           break;
         default:
           if(Character.isISOControl(cp)) {
-            tb.addByte((byte) '\\').addByte((byte) 'u');
+            tb.add('\\').add('u');
             for(int j = 4; --j >= 0;) {
               final int hex = cp >>> (j << 2) & 0xF;
-              tb.addByte((byte) (hex + (hex > 9 ? 'A' - 10 : '0')));
+              tb.add(hex + (hex > 9 ? 'A' - 10 : '0'));
             }
           } else {
             tb.add(cp);
           }
       }
     }
-    tb.addByte((byte) '"');
+    tb.add('"');
   }
 
   @Override

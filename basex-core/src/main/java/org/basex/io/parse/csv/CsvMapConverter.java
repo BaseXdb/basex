@@ -60,7 +60,7 @@ final class CsvMapConverter extends CsvConverter {
       byte[] name = headers.get(col++);
       if(name == null) name = ENTRY;
       try {
-        record.set(0, ((Map) record.get(0)).insert(Str.get(name), Str.get(value), null));
+        record.set(0, ((Map) record.get(0)).put(Str.get(name), Str.get(value), null));
       } catch(final QueryException ex) {
         throw new QueryIOException(ex);
       }
@@ -73,7 +73,7 @@ final class CsvMapConverter extends CsvConverter {
       Map map = Map.EMPTY;
       int row = 1;
       for(final ValueBuilder vb : records) {
-        map = map.insert(Int.get(row++), vb.value(), null);
+        map = map.put(Int.get(row++), vb.value(), null);
       }
       return map;
     } catch(final QueryException ex) {

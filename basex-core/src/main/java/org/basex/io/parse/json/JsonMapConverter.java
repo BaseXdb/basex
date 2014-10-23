@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.build.*;
 import org.basex.query.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
@@ -34,6 +35,10 @@ import org.basex.util.*;
 public final class JsonMapConverter extends JsonConverter {
   /** Stack for intermediate values. */
   private final Stack<Value> stack = new Stack<>();
+  /** Stack for intermediate array values. */
+  private final Stack<ValueList> arrays = new Stack<>();
+  /** Stack for intermediate maps values. */
+  private final Stack<Map> maps = new Stack<>();
 
   /**
    * Constructor.
@@ -45,12 +50,13 @@ public final class JsonMapConverter extends JsonConverter {
 
   @Override
   public Item finish() {
-    return stack.peek().isEmpty() ? null : (Item) stack.pop();
+    final Value v = stack.pop();
+    return v.isEmpty() ? null : (Item) v;
   }
 
   @Override
   void openObject() {
-    stack.push(Map.EMPTY);
+    maps.push(Map.EMPTY);
   }
 
   @Override
@@ -59,37 +65,41 @@ public final class JsonMapConverter extends JsonConverter {
   }
 
   @Override
-  void closePair() throws QueryIOException {
+  void closePair(final boolean add) throws QueryIOException {
     final Value val = stack.pop();
     final Item key = (Item) stack.pop();
-    final Map map = (Map) stack.pop();
-    try {
-      stack.push(map.insert(key, val, null));
-    } catch(final QueryException ex) {
-      throw new QueryIOException(ex);
+    if(add) {
+      try {
+        maps.push(maps.pop().put(key, val, null));
+      } catch(final QueryException ex) {
+        throw new QueryIOException(ex);
+      }
     }
   }
 
   @Override
-  void closeObject() { }
+  void closeObject() {
+    stack.push(maps.pop());
+  }
 
   @Override
   void openArray() {
-    stack.push(Map.EMPTY);
+    arrays.push(new ValueList());
   }
 
   @Override
   void openItem() {
-    stack.push(Int.get(((Map) stack.peek()).mapSize() + 1));
   }
 
   @Override
   void closeItem() throws QueryIOException {
-    closePair();
+    arrays.peek().add(stack.pop());
   }
 
   @Override
-  void closeArray() { }
+  void closeArray() {
+    stack.push(arrays.pop().array());
+  }
 
   @Override
   public void openConstr(final byte[] name) {
@@ -109,7 +119,7 @@ public final class JsonMapConverter extends JsonConverter {
   @Override
   public void closeConstr() throws QueryIOException {
     closeArray();
-    closePair();
+    closePair(true);
     closeObject();
   }
 

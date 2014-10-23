@@ -104,4 +104,17 @@ public final class FnTest extends AdvancedQueryTest {
     query(SORT.args("(1,-2,5,10,-10,10,8)", " abs#1"), "1 -2 5 8 10 -10 10");
     query(SORT.args("((1,0), (1,1), (0,1), (0,0))"), "0 0 0 0 1 1 1 1");
   }
+
+  /** Tests for the {@code parse-json} function. */
+  @Test
+  public void parseJson() {
+    error(PARSE_JSON.args("\"\"\"x\\u0000\"\"\""), JSON_INVALID_X);
+  }
+
+  /** Tests for the {@code json-doc} function. */
+  @Test
+  public void jsonDoc() {
+    query(JSON_DOC.args("src/test/resources/example.json") + "('address')('state')", "NY");
+    query(JSON_DOC.args("src/test/resources/example.json") + "?address?state", "NY");
+  }
 }

@@ -3,7 +3,6 @@ package org.basex.io.serial.json;
 import java.io.*;
 
 import org.basex.build.*;
-import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.io.serial.*;
 
 /**
@@ -15,8 +14,6 @@ import org.basex.io.serial.*;
 public abstract class JsonSerializer extends OutputSerializer {
   /** JSON options. */
   final JsonSerialOptions jopts;
-  /** JSON spec. */
-  final JsonSpec spec;
   /** Escape special characters. */
   private final boolean escape;
 
@@ -30,7 +27,6 @@ public abstract class JsonSerializer extends OutputSerializer {
     super(os, opts);
     jopts = opts.get(SerializerOptions.JSON);
     escape = jopts.get(JsonSerialOptions.ESCAPE);
-    spec = jopts.get(JsonOptions.SPEC);
     if(jopts.contains(JsonSerialOptions.INDENT)) indent = jopts.get(JsonSerialOptions.INDENT);
   }
 

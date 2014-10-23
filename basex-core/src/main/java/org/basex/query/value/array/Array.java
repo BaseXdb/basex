@@ -26,7 +26,7 @@ import org.basex.util.*;
  */
 public final class Array extends FItem {
   /** Empty array. */
-  private static final Array EMPTY = new Array(new Value[0], 0, 0);
+  public static final Array EMPTY = new Array(new Value[0], 0, 0);
   /** Members of the array. */
   private final Value[] members;
   /** Starting index. */

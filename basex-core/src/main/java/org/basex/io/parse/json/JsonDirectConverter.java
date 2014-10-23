@@ -90,7 +90,7 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   }
 
   @Override
-  void closePair() { }
+  void closePair(final boolean add) { }
 
   @Override
   void closeObject() {
@@ -137,7 +137,7 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   @Override
   public void closeConstr() {
     closeArray();
-    closePair();
+    closePair(true);
     closeObject();
   }
 

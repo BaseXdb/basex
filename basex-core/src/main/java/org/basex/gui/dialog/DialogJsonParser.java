@@ -7,7 +7,6 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.build.JsonOptions.JsonFormat;
-import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.gui.*;
@@ -40,6 +39,8 @@ final class DialogJsonParser extends DialogParser {
   private final BaseXCombo encoding;
   /** JSON: format. */
   private final BaseXCombo format;
+  /** JSON: liberal. */
+  private final BaseXCheckBox liberal;
   /** JSON: unescape. */
   private final BaseXCheckBox unescape;
   /** JSON: lax name conversion. */
@@ -48,8 +49,6 @@ final class DialogJsonParser extends DialogParser {
   private final BaseXCheckBox merge;
   /** JSON: include string types. */
   private final BaseXCheckBox strings;
-  /** JSON: specification. */
-  private final BaseXCombo spec;
 
   /**
    * Constructor.
@@ -69,27 +68,22 @@ final class DialogJsonParser extends DialogParser {
     format = new BaseXCombo(d, frmts.finish());
     format.setSelectedItem(jopts.get(JsonOptions.FORMAT));
 
-    final StringList spcs = new StringList();
-    for(final JsonSpec cs : JsonSpec.values()) spcs.add(cs.toString());
-    spec = new BaseXCombo(d, spcs.finish());
-    spec.setSelectedItem(jopts.get(JsonOptions.SPEC));
-
+    liberal = new BaseXCheckBox(LIBERAL_PARSING, JsonParserOptions.LIBERAL, jopts, d);
     unescape = new BaseXCheckBox(UNESCAPE_CHARS, JsonParserOptions.UNESCAPE, jopts, d);
     merge = new BaseXCheckBox(MERGE_TYPES, JsonOptions.MERGE, jopts, d);
     strings = new BaseXCheckBox(INCLUDE_STRINGS, JsonOptions.STRINGS, jopts, d);
     lax = new BaseXCheckBox(LAX_NAME_CONVERSION, JsonOptions.LAX, jopts, d);
 
     final BaseXBack pp = new BaseXBack(new TableLayout(2, 1, 0, 8));
-    BaseXBack p = new BaseXBack(new TableLayout(3, 2, 8, 4));
+    BaseXBack p = new BaseXBack(new TableLayout(2, 2, 8, 4));
     p.add(new BaseXLabel(ENCODING + COL, true, true));
     p.add(encoding);
     p.add(new BaseXLabel(FORMAT + COL, true, true));
     p.add(format);
-    p.add(new BaseXLabel(SPECIFICATION + COL, true, true));
-    p.add(spec);
     pp.add(p);
 
-    p = new BaseXBack(new TableLayout(4, 1));
+    p = new BaseXBack(new TableLayout(5, 1));
+    p.add(liberal);
     p.add(unescape);
     p.add(merge);
     p.add(strings);
@@ -106,7 +100,7 @@ final class DialogJsonParser extends DialogParser {
   @Override
   boolean action(final boolean active) {
     try {
-      final JsonSpec js = jopts.get(JsonOptions.SPEC);
+      final boolean jl = jopts.get(JsonParserOptions.LIBERAL);
       final JsonFormat jf = jopts.get(JsonOptions.FORMAT);
       lax.setEnabled(jf == JsonFormat.DIRECT);
       merge.setEnabled(jf != JsonFormat.JSONML);
@@ -116,10 +110,8 @@ final class DialogJsonParser extends DialogParser {
         final String json;
         if(jf == JsonFormat.JSONML) {
           json = EXAMPLEML;
-        } else if(js == JsonSpec.LIBERAL) {
+        } else if(jl) {
           json = EXAMPLE.replace("\"Person\"", "Person").replace(" }", ", }");
-        } else if(js == JsonSpec.ECMA_262) {
-          json = "\"John\\nMiller\"";
         } else {
           json = EXAMPLE;
         }
@@ -136,11 +128,11 @@ final class DialogJsonParser extends DialogParser {
   void update() {
     final String enc = encoding.getSelectedItem();
     jopts.set(JsonParserOptions.ENCODING, enc.equals(Token.UTF8) ? null : enc);
+    jopts.set(JsonParserOptions.LIBERAL, liberal.isSelected());
     jopts.set(JsonParserOptions.UNESCAPE, unescape.isSelected());
     jopts.set(JsonOptions.MERGE, merge.isSelected());
     jopts.set(JsonOptions.STRINGS, strings.isSelected());
     jopts.set(JsonOptions.FORMAT, format.getSelectedItem());
-    jopts.set(JsonOptions.SPEC, spec.getSelectedItem());
     jopts.set(JsonOptions.LAX, lax.isSelected());
   }
 

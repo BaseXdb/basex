@@ -14,6 +14,6 @@ import org.basex.util.*;
 public class MapPut extends StandardFunc {
   @Override
   public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return toMap(exprs[0], qc).insert(toAtomItem(exprs[1], qc), qc.value(exprs[2]), ii);
+    return toMap(exprs[0], qc).put(toAtomItem(exprs[1], qc), qc.value(exprs[2]), ii);
   }
 }

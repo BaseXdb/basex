@@ -29,7 +29,7 @@ public abstract class Parse extends StandardFunc {
    * Performs the unparsed-text function.
    * @param qc query context
    * @param check only check if text is available
-   * @return content
+   * @return content string or boolean success flag
    * @throws QueryException query exception
    */
   Item unparsedText(final QueryContext qc, final boolean check) throws QueryException {

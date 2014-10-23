@@ -296,7 +296,7 @@ public final class HttpPayload {
             final Str k = Str.get(fn);
             final Value v = new ValueBuilder().add(m.get(k, info)).add(
                 new B64(cont.next())).value();
-            val = m.insert(k, v, info);
+            val = m.put(k, v, info);
           } else {
             val = Str.get(cont.next());
           }

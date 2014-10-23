@@ -139,6 +139,10 @@ public enum Err {
   /** BXJS0001. */
   BXJS_PARSE_X_X_X(BXJS, 1, "JSON parser (%:%): %."),
   /** BXJS0001. */
+  BXJS_DUPLICATE_X(BXJS, 1, "JSON parser: (%:%): %."),
+  /** BXJS0001. */
+  BXJS_INVALID_X(BXJS, 1, "JSON parser: (%:%): %."),
+  /** BXJS0001. */
   BXJS_PARSEML_X(BXJS, 1, "JsonML parser: %."),
   /** BXJS0002. */
   BXJS_SERIAL_X(BXJS, 2, "JSON serializer: %."),
@@ -474,6 +478,14 @@ public enum Err {
   CALWHICH_X(FOFD, 1340, "Unknown calendar: '%'."),
   /** FOFD1350. */
   PICINVCOMP_X_X(FOFD, 1350, "Component '[%]' not applicable to % values."),
+
+  /** BXJS0001. */
+  JSON_PARSE_X(BXJS, 1, "%"),
+  /** BXJS0002. */
+  JSON_INVALID_X(BXJS, 2, "%"),
+  /** BXJS0003. */
+  JSON_DUPLICATE_X(BXJS, 3, "%"),
+
 
   /** FONS0004. */
   NSDECL_X(FONS, 4, "No namespace declared for prefix '%'."),

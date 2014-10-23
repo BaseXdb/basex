@@ -1139,10 +1139,10 @@ public interface Text {
   String MERGE_TYPES = lang("merge_types");
   /** Merge type information. */
   String INCLUDE_STRINGS = lang("include_strings");
-  /** Specification. */
-  String SPECIFICATION = lang("specification");
   /** Unescape characters. */
   String UNESCAPE_CHARS = lang("unescape_chars");
+  /** Liberal parsing. */
+  String LIBERAL_PARSING = lang("liberal_parsing");
 
   /** General info. */
   String GENERAL = lang("general");

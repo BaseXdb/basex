@@ -46,13 +46,13 @@ final class Branch extends TrieNode {
   }
 
   @Override
-  TrieNode insert(final int h, final Item k, final Value v, final int l, final InputInfo ii)
+  TrieNode put(final int h, final Item k, final Value v, final int l, final InputInfo ii)
       throws QueryException {
     final int key = key(h, l);
     final TrieNode sub = kids[key], nsub;
     final int bs, rem;
     if(sub != null) {
-      nsub = sub.insert(h, k, v, l + 1, ii);
+      nsub = sub.put(h, k, v, l + 1, ii);
       if(nsub == sub) return this;
       bs = used;
       rem = sub.size;

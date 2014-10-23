@@ -164,15 +164,15 @@ public final class Map extends FItem {
   }
 
   /**
-   * Inserts the given value into this map.
+   * Puts the given value into this map and replaces existing keys.
    * @param key key to insert (must not be {@code null})
    * @param value value to insert
    * @param ii input info
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public Map insert(final Item key, final Value value, final InputInfo ii) throws QueryException {
-    final TrieNode ins = root.insert(key.hash(ii), key, value, 0, ii);
+  public Map put(final Item key, final Value value, final InputInfo ii) throws QueryException {
+    final TrieNode ins = root.put(key.hash(ii), key, value, 0, ii);
     // update date counter
     int t = dt;
     if(key instanceof ADate) {

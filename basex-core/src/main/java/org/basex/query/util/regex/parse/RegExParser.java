@@ -8,8 +8,8 @@ import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.util.regex.*;
+import org.basex.query.util.*;
 import org.basex.util.*;
-
 import static org.basex.util.Token.*;
 import static java.util.regex.Pattern.*;
 
@@ -120,7 +120,7 @@ public class RegExParser implements RegExParserConstants {
         brs = new RegExp[] { nd };
     label_1:
     while (true) {
-      switch (jj_ntk==-1?jj_ntk():jj_ntk) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case OR:
         ;
         break;
@@ -151,7 +151,7 @@ public class RegExParser implements RegExParserConstants {
     Quantifier qu = null;
     label_2:
     while (true) {
-      switch (jj_ntk==-1?jj_ntk():jj_ntk) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case NPAR_OPEN:
       case PAR_OPEN:
       case CHAR:
@@ -171,7 +171,7 @@ public class RegExParser implements RegExParserConstants {
         break label_2;
       }
       atom = atom();
-      switch (jj_ntk==-1?jj_ntk():jj_ntk) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case Q_MARK:
       case STAR:
       case PLUS:
@@ -201,7 +201,7 @@ public class RegExParser implements RegExParserConstants {
     int min = 0, max = 0;
     boolean lazy = false;
     int[] qu = null;
-    switch (jj_ntk==-1?jj_ntk():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case Q_MARK:
       jj_consume_token(Q_MARK);
                  max = 1;
@@ -225,7 +225,7 @@ public class RegExParser implements RegExParserConstants {
       jj_consume_token(-1);
       throw new ParseException();
     }
-    switch (jj_ntk==-1?jj_ntk():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case Q_MARK:
       jj_consume_token(Q_MARK);
                  lazy = true;
@@ -254,11 +254,11 @@ public class RegExParser implements RegExParserConstants {
       } catch(final NumberFormatException ex) {
         {if (true) throw new ParseException("Number in quantifier is too large");}
       }
-    switch (jj_ntk==-1?jj_ntk():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case COMMA:
       jj_consume_token(COMMA);
                 qty[1] = -1;
-      switch (jj_ntk==-1?jj_ntk():jj_ntk) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case NUMBER:
         jj_consume_token(NUMBER);
           try {
@@ -289,7 +289,7 @@ public class RegExParser implements RegExParserConstants {
    */
   final public RegExp atom() throws ParseException {
     RegExp nd = null;
-    switch (jj_ntk==-1?jj_ntk():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case CHAR:
     case DIGIT:
       nd = Char();
@@ -335,7 +335,7 @@ public class RegExParser implements RegExParserConstants {
    * @throws ParseException parsing exception
    */
   final public Literal Char() throws ParseException {
-    switch (jj_ntk==-1?jj_ntk():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case CHAR:
       jj_consume_token(CHAR);
       break;
@@ -362,7 +362,7 @@ public class RegExParser implements RegExParserConstants {
       backref = token.image.charAt(1) - '0';
     label_3:
     while (true) {
-      if (jj_2_1(1) && 10 * backref + token.next.image.charAt(0) - '0' <= groups) {
+      if (jj_2_1(1) && (10 * backref + token.next.image.charAt(0) - '0' <= groups)) {
         ;
       } else {
         break label_3;
@@ -383,7 +383,7 @@ public class RegExParser implements RegExParserConstants {
    */
   final public RegExp charClass() throws ParseException {
     RegExp nd = null;
-    switch (jj_ntk==-1?jj_ntk():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case SINGLE_ESC:
     case MULTI_ESC:
     case CAT_ESC:
@@ -419,7 +419,7 @@ public class RegExParser implements RegExParserConstants {
    * @throws ParseException parsing exception
    */
   final public RegExp charClassEsc() throws ParseException {
-    switch (jj_ntk==-1?jj_ntk():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case SINGLE_ESC:
       jj_consume_token(SINGLE_ESC);
       break;
@@ -450,7 +450,7 @@ public class RegExParser implements RegExParserConstants {
     CharGroup group = null;
     CharClass sub = null;
     jj_consume_token(BR_OPEN);
-    switch (jj_ntk==-1?jj_ntk():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NEG:
       jj_consume_token(NEG);
       group = posCharGroup();
@@ -465,7 +465,7 @@ public class RegExParser implements RegExParserConstants {
         throw new ParseException();
       }
     }
-    switch (jj_ntk==-1?jj_ntk():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case TO:
       jj_consume_token(TO);
       sub = charClassExpr();
@@ -493,11 +493,11 @@ public class RegExParser implements RegExParserConstants {
         sub = charRange();
                                        cg.add(sub);
       } else {
-        switch (jj_ntk==-1?jj_ntk():jj_ntk) {
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case SINGLE_ESC:
         case MULTI_ESC:
         case CAT_ESC:
-          switch (jj_ntk==-1?jj_ntk():jj_ntk) {
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case SINGLE_ESC:
             jj_consume_token(SINGLE_ESC);
             break;
@@ -544,7 +544,7 @@ public class RegExParser implements RegExParserConstants {
         if(a > b) {if (true) throw new ParseException("Illegal range, " +
             "lower > upper bound: " + Literal.escape(a) + "-" + Literal.escape(b));}
     } else {
-      switch (jj_ntk==-1?jj_ntk():jj_ntk) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case CHAR:
       case DIGIT:
         a = XmlChar();
@@ -566,7 +566,7 @@ public class RegExParser implements RegExParserConstants {
    */
   final public int charOrEsc() throws ParseException {
     int cp = -1;
-    switch (jj_ntk==-1?jj_ntk():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case CHAR:
     case DIGIT:
       cp = XmlChar();
@@ -590,7 +590,7 @@ public class RegExParser implements RegExParserConstants {
    * @throws ParseException parsing exception
    */
   final public int XmlChar() throws ParseException {
-    switch (jj_ntk==-1?jj_ntk():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case CHAR:
       jj_consume_token(CHAR);
       break;
@@ -606,31 +606,31 @@ public class RegExParser implements RegExParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  private boolean jj_2_1(final int xla) {
+  private boolean jj_2_1(int xla) {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
     try { return !jj_3_1(); }
-    catch(final LookaheadSuccess ls) { return true; }
+    catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(0, xla); }
   }
 
-  private boolean jj_2_2(final int xla) {
+  private boolean jj_2_2(int xla) {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
     try { return !jj_3_2(); }
-    catch(final LookaheadSuccess ls) { return true; }
+    catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(1, xla); }
   }
 
-  private boolean jj_2_3(final int xla) {
+  private boolean jj_2_3(int xla) {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
     try { return !jj_3_3(); }
-    catch(final LookaheadSuccess ls) { return true; }
+    catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(2, xla); }
   }
 
-  private boolean jj_2_4(final int xla) {
+  private boolean jj_2_4(int xla) {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
     try { return !jj_3_4(); }
-    catch(final LookaheadSuccess ls) { return true; }
+    catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(3, xla); }
   }
 
@@ -764,7 +764,7 @@ public class RegExParser implements RegExParserConstants {
 
 
   /** Constructor with user supplied Token Manager. */
-  public RegExParser(final TokenManager tm) {
+  public RegExParser(TokenManager tm) {
     token_source = tm;
     token = new Token();
     jj_ntk = -1;
@@ -774,7 +774,7 @@ public class RegExParser implements RegExParserConstants {
   }
 
   /** Reinitialise. */
-  public void ReInit(final TokenManager tm) {
+  public void ReInit(TokenManager tm) {
     token_source = tm;
     token = new Token();
     jj_ntk = -1;
@@ -783,7 +783,7 @@ public class RegExParser implements RegExParserConstants {
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
-  private Token jj_consume_token(final int kind) throws ParseException {
+  private Token jj_consume_token(int kind) throws ParseException {
     Token oldToken;
     if ((oldToken = token).next != null) token = token.next;
     else token = token.next = token_source.getNextToken();
@@ -792,8 +792,8 @@ public class RegExParser implements RegExParserConstants {
       jj_gen++;
       if (++jj_gc > 100) {
         jj_gc = 0;
-        for(final JJCalls jj_2_rtn : jj_2_rtns) {
-          JJCalls c = jj_2_rtn;
+        for (int i = 0; i < jj_2_rtns.length; i++) {
+          JJCalls c = jj_2_rtns[i];
           while (c != null) {
             if (c.gen < jj_gen) c.first = null;
             c = c.next;
@@ -808,8 +808,8 @@ public class RegExParser implements RegExParserConstants {
   }
 
   static private final class LookaheadSuccess extends java.lang.Error { }
-  static final private LookaheadSuccess jj_ls = new LookaheadSuccess();
-  private boolean jj_scan_token(final int kind) {
+  final private LookaheadSuccess jj_ls = new LookaheadSuccess();
+  private boolean jj_scan_token(int kind) {
     if (jj_scanpos == jj_lastpos) {
       jj_la--;
       if (jj_scanpos.next == null) {
@@ -841,7 +841,7 @@ public class RegExParser implements RegExParserConstants {
   }
 
 /** Get the specific Token. */
-  final public Token getToken(final int index) {
+  final public Token getToken(int index) {
     Token t = jj_lookingAhead ? jj_scanpos : token;
     for (int i = 0; i < index; i++) {
       if (t.next != null) t = t.next;
@@ -852,18 +852,18 @@ public class RegExParser implements RegExParserConstants {
 
   private int jj_ntk() {
     if ((jj_nt=token.next) == null)
-      return jj_ntk = (token.next=token_source.getNextToken()).kind;
+      return (jj_ntk = (token.next=token_source.getNextToken()).kind);
     else
-      return jj_ntk = jj_nt.kind;
+      return (jj_ntk = jj_nt.kind);
   }
 
-  private final java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
+  private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
   private int[] jj_expentry;
   private int jj_kind = -1;
-  private final int[] jj_lasttokens = new int[100];
+  private int[] jj_lasttokens = new int[100];
   private int jj_endpos;
 
-  private void jj_add_error_token(final int kind, final int pos) {
+  private void jj_add_error_token(int kind, int pos) {
     if (pos >= 100) return;
     if (pos == jj_endpos + 1) {
       jj_lasttokens[jj_endpos++] = kind;
@@ -872,8 +872,8 @@ public class RegExParser implements RegExParserConstants {
       for (int i = 0; i < jj_endpos; i++) {
         jj_expentry[i] = jj_lasttokens[i];
       }
-      jj_entries_loop: for(final Object name : jj_expentries) {
-        final int[] oldentry = (int[])name;
+      jj_entries_loop: for (java.util.Iterator<?> it = jj_expentries.iterator(); it.hasNext();) {
+        int[] oldentry = (int[])(it.next());
         if (oldentry.length == jj_expentry.length) {
           for (int i = 0; i < jj_expentry.length; i++) {
             if (oldentry[i] != jj_expentry[i]) {
@@ -891,7 +891,7 @@ public class RegExParser implements RegExParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    final boolean[] la1tokens = new boolean[25];
+    boolean[] la1tokens = new boolean[25];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -899,7 +899,7 @@ public class RegExParser implements RegExParserConstants {
     for (int i = 0; i < 18; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
-          if ((jj_la1_0[i] & 1<<j) != 0) {
+          if ((jj_la1_0[i] & (1<<j)) != 0) {
             la1tokens[j] = true;
           }
         }
@@ -915,7 +915,7 @@ public class RegExParser implements RegExParserConstants {
     jj_endpos = 0;
     jj_rescan_token();
     jj_add_error_token(0, 0);
-    final int[][] exptokseq = new int[jj_expentries.size()][];
+    int[][] exptokseq = new int[jj_expentries.size()][];
     for (int i = 0; i < jj_expentries.size(); i++) {
       exptokseq[i] = jj_expentries.get(i);
     }
@@ -947,12 +947,12 @@ public class RegExParser implements RegExParserConstants {
         }
         p = p.next;
       } while (p != null);
-      } catch(final LookaheadSuccess ls) { }
+      } catch(LookaheadSuccess ls) { }
     }
     jj_rescan = false;
   }
 
-  private void jj_save(final int index, final int xla) {
+  private void jj_save(int index, int xla) {
     JJCalls p = jj_2_rtns[index];
     while (p.gen > jj_gen) {
       if (p.next == null) { p = p.next = new JJCalls(); break; }

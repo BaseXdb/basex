@@ -235,6 +235,8 @@ public enum Function {
   /** XQuery function. */
   IRI_TO_URI(FnIriToUri.class, "iri-to-uri(string)", arg(STR_ZO), STR),
   /** XQuery function. */
+  JSON_DOC(FnJsonDoc.class, "json-doc(uri[,options])", arg(STR_ZO, ITEM), DOC_ZO),
+  /** XQuery function. */
   LANG(FnLang.class, "lang(ids[,node])", arg(STR_ZO, NOD), BLN),
   /** XQuery function. */
   LAST(FnLast.class, "last()", arg(), ITR, flag(FCS, CTX)),
@@ -296,6 +298,8 @@ public enum Function {
   OUTERMOST(FnOutermost.class, "outermost(nodes)", arg(NOD_ZM), NOD_ZM),
   /** XQuery function. */
   PARSE_IETF_DATE(FnParseIetfDate.class, "parse-ietf-date(string)", arg(STR_ZO), DTM_ZO),
+  /** XQuery function. */
+  PARSE_JSON(FnParseJson.class, "parse-json(string[,options])", arg(STR_ZO, ITEM), DTM_ZO),
   /** XQuery function. */
   PARSE_XML(FnParseXml.class, "parse-xml(string)", arg(STR_ZO), DOC_O, flag(CNS)),
   /** XQuery function. */

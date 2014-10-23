@@ -8,7 +8,6 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.build.JsonOptions.JsonFormat;
-import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.value.item.*;
@@ -131,8 +130,6 @@ public final class JsonNodeSerializer extends JsonSerializer {
       print('{');
     } else if(eq(type, ARRAY)) {
       print('[');
-    } else if(lvl == 0 && spec == JsonSpec.RFC4627) {
-      error("<%> must be typed as \"%\" or \"%\"", JSON, OBJECT, ARRAY);
     }
   }
 

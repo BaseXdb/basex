@@ -17,33 +17,8 @@ public class JsonOptions extends Options {
   public static final BooleanOption STRINGS = new BooleanOption("strings", false);
   /** Option: lax conversion of names to QNames. */
   public static final BooleanOption LAX = new BooleanOption("lax", false);
-  /** Option: parser specification. */
-  public static final EnumOption<JsonSpec> SPEC = new EnumOption<>("spec", JsonSpec.RFC4627);
   /** Option: format. */
   public static final EnumOption<JsonFormat> FORMAT = new EnumOption<>("format", JsonFormat.DIRECT);
-
-  /** JSON specs. */
-  public enum JsonSpec {
-    /** Parse the input according to RFC 4627.           */ RFC4627("RFC4627"),
-    /** Parse the input being as compatible as possible. */ LIBERAL("liberal"),
-    /** Parse the input according to ECMA-262.           */ ECMA_262("ECMA-262");
-
-    /** String. */
-    private final String string;
-
-    /**
-     * Constructor.
-     * @param str description
-     */
-    JsonSpec(final String str) {
-      string = str;
-    }
-
-    @Override
-    public String toString() {
-      return string;
-    }
-  }
 
   /** JSON formats. */
   public enum JsonFormat {

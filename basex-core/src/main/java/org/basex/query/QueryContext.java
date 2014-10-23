@@ -10,7 +10,6 @@ import java.util.regex.*;
 
 import org.basex.build.*;
 import org.basex.build.JsonOptions.JsonFormat;
-import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.core.Context;
@@ -699,7 +698,6 @@ public final class QueryContext extends Proc {
     if(type.equalsIgnoreCase(MainParser.JSON.name())) {
       try {
         final JsonParserOptions jp = new JsonParserOptions();
-        jp.set(JsonOptions.SPEC, JsonSpec.ECMA_262);
         jp.set(JsonOptions.FORMAT, JsonFormat.MAP);
         final JsonConverter conv = JsonConverter.get(jp);
         conv.convert(token(vl.toString()), null);

@@ -15,7 +15,7 @@ import org.junit.*;
 public final class JsonModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
-  public void parse() {
+  public void parseXml() {
     // default output
     parse("[]", "", "<json type=\"array\"/>");
     parse("{}", "", "<json type=\"object\"/>");
@@ -66,20 +66,37 @@ public final class JsonModuleTest extends AdvancedQueryTest {
     parseError("{ \"\" : 0.1. }", "");
     parseError("{ \"\" : 0.1e }", "");
     parseError("{ \"a\" : 0 }}", "");
-    parseError("{ \"a\" : 0, }", "'format':'RFC4627'");
+    parseError("{ \"a\" : 0, }", "'liberal':false()");
+  }
+
+  /** Test method. */
+  @Test
+  public void parseMap() {
+    final String map = " map { 'format':'map' }";
+    query(_MAP_SERIALIZE.args(_JSON_PARSE.args("{}", map)), "{}");
+    query(_MAP_SERIALIZE.args(_JSON_PARSE.args("{\"A\":1}", map)), "{\"A\": 1}");
+    query(_MAP_SERIALIZE.args(_JSON_PARSE.args("{\"\":null}", map)), "{\"\": ()}");
+
+    query(_ARRAY_SERIALIZE.args(_JSON_PARSE.args("[]", map)), "[]");
+    query(_ARRAY_SERIALIZE.args(_JSON_PARSE.args("[\"A\"]", map)), "[\"A\"]");
+    query(_ARRAY_SERIALIZE.args(_JSON_PARSE.args("[1,true]", map)), "[1, true()]");
+
+    query(_JSON_PARSE.args("1", map), "1");
+    query(_JSON_PARSE.args("\"\"\"f\"\"\"", map), "f");
+    query(_JSON_PARSE.args("false", map), "false");
+    query(_JSON_PARSE.args("null", map), "");
   }
 
   /** Test method. */
   @Test
   public void serialize() {
     serialError("<a/>", ""); // invalid tag
-    serialError("<json/>", ""); // no type specified
     serialError("<json type='o'/>", ""); // invalid type
     serial("<json type='object'/>", "", "{}");
     serial("<json objects='json'/>", "", "{}");
     serial("<json type='array'/>", "", "[]");
     serial("<json arrays='json'/>", "", "[]");
-    serialError("<json type='number'>1</json>", ""); // no text allowed in json tag
+    serial("<json type='number'>1</json>", "", "1"); // no text allowed in json tag
     serial("<json type='array'><_ type='null'/></json>", "", "[null]");
     serialError("<json type='array'><_ type='number'/></json>", ""); // value needed
     serialError("<json type='array'><_ type='boolean'/></json>", ""); // value needed
@@ -99,12 +116,12 @@ public final class JsonModuleTest extends AdvancedQueryTest {
   @Test public void config() {
     query("json:parse('[\"foo\",{\"test\":\"asdf\"}]', map {'format':'jsonml'})",
         "<foo test=\"asdf\"/>");
-    query("map:size(json:parse('[\"foo\",{\"test\":\"asdf\"}]', map {'format':'map'}))",
+    query("array:size(json:parse('[\"foo\",{\"test\":\"asdf\"}]', map {'format':'map'}))",
         "2");
-    query("json:parse('\"\\t\\u000A\"', map {'format':'map','unescape':false(),'spec':'liberal'})",
+    query("json:parse('\"\\t\\u000A\"', map {'format':'map','unescape':false(),'liberal':true()})",
         "\\t\\u000A");
     query("string-to-codepoints(json:parse('\"\\t\\u000A\"'," +
-        "  map {'format':'map','unescape':true(),'spec':'liberal'}))", "9 10");
+        "  map {'format':'map','unescape':true(),'liberal':true()}))", "9 10");
     error("json:parse('42', map {'spec':'garbage'})", INVALIDOPT_X);
   }
 

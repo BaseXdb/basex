@@ -52,7 +52,7 @@ abstract class TrieNode {
     @Override
     boolean deep(final InputInfo ii, final TrieNode o, final Collation coll) { return this == o; }
     @Override
-    public TrieNode insert(final int h, final Item k, final Value v, final int l,
+    public TrieNode put(final int h, final Item k, final Value v, final int l,
         final InputInfo i) { return new Leaf(h, k, v); }
     @Override
     StringBuilder toString(final StringBuilder sb) { return sb; }
@@ -72,7 +72,7 @@ abstract class TrieNode {
   }
 
   /**
-   * Inserts the given value into this map.
+   * Puts the given value into this map and replaces existing keys.
    * @param hash hash code used as key
    * @param key key to insert
    * @param val value to insert
@@ -81,7 +81,7 @@ abstract class TrieNode {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode insert(final int hash, final Item key, final Value val,
+  abstract TrieNode put(final int hash, final Item key, final Value val,
       final int lvl, final InputInfo ii) throws QueryException;
 
   /**

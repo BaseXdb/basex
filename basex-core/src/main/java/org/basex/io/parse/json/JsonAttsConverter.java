@@ -39,7 +39,7 @@ public final class JsonAttsConverter extends JsonXmlConverter {
   }
 
   @Override
-  void closePair() {
+  void closePair(final boolean add) {
     curr = (FElem) curr.parent();
   }
 
@@ -89,7 +89,7 @@ public final class JsonAttsConverter extends JsonXmlConverter {
   @Override
   public void closeConstr() {
     closeArray();
-    closePair();
+    closePair(true);
     closeObject();
   }
 

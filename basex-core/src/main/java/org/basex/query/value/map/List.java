@@ -74,7 +74,7 @@ final class List extends TrieNode {
   }
 
   @Override
-  TrieNode insert(final int h, final Item k, final Value v, final int l, final InputInfo ii)
+  TrieNode put(final int h, final Item k, final Value v, final int l, final InputInfo ii)
       throws QueryException {
 
     // same hash, replace or merge
@@ -95,7 +95,7 @@ final class List extends TrieNode {
     final int a = key(h, l), b = key(hash, l);
     final int used;
     if(a == b) {
-      ch[a] = insert(h, k, v, l + 1, ii);
+      ch[a] = put(h, k, v, l + 1, ii);
       used = 1 << a;
     } else {
       ch[a] = new Leaf(h, k, v);

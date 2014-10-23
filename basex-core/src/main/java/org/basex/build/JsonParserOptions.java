@@ -1,5 +1,7 @@
 package org.basex.build;
 
+import java.util.*;
+
 import org.basex.util.options.*;
 
 /**
@@ -13,6 +15,23 @@ public final class JsonParserOptions extends JsonOptions {
   public static final StringOption ENCODING = new StringOption("encoding");
   /** Option: unescape special characters. */
   public static final BooleanOption UNESCAPE = new BooleanOption("unescape", true);
+  /** Option: liberal parsing. */
+  public static final BooleanOption LIBERAL = new BooleanOption("liberal", false);
+  /** Option: handle duplicates. */
+  public static final EnumOption<JsonDuplicates> DUPLICATES =
+      new EnumOption<>("duplicates", JsonDuplicates.USE_LAST);
+
+  /** Duplicate handling. */
+  public enum JsonDuplicates {
+    /** Reject.    */ REJECT,
+    /** Use first. */ USE_FIRST,
+    /** Use last.  */ USE_LAST;
+
+    @Override
+    public String toString() {
+      return name().toLowerCase(Locale.ENGLISH).replace('_', '-');
+    }
+  }
 
   /**
    * Default constructor.

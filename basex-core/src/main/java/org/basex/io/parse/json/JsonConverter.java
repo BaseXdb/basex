@@ -76,9 +76,10 @@ public abstract class JsonConverter {
 
   /**
    * Called when a pair of a JSON object is closed.
+   * @param add add pair
    * @throws QueryIOException query exception
    */
-  abstract void closePair() throws QueryIOException;
+  abstract void closePair(boolean add) throws QueryIOException;
 
   /**
    * Called when a JSON object is closed.
