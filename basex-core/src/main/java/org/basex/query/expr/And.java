@@ -67,9 +67,8 @@ public final class And extends Logical {
             break;
           }
         }
-      } else if(e.isValue()) {
-        e = optPre(value(qc), qc);
       }
+
       // expression will always return false
       if(e == Bln.FALSE) return optPre(Bln.FALSE, qc);
       // skip expression yielding true

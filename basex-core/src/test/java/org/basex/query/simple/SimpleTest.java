@@ -77,6 +77,7 @@ public final class SimpleTest extends QueryTest {
       { "Or 1", booleans(true), "<a/> or <a/>" },
       { "Or 2", booleans(true), "<a/> or (<a/> or <a/>)" },
       { "Or 3", booleans(false), "not(<a/>) or (not(<a/>) or not(<a/>))" },
+      { "Or 4", booleans(true), "fold-left(true(), false(), function($a, $b) { $a or $b })" },
 
       { "Seq 1", integers(), "((( )  )    )" },
       { "Seq 2", integers(1), "((( 1 )  )    )" },

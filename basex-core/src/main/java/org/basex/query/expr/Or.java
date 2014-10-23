@@ -51,8 +51,6 @@ public final class Or extends Logical {
             break;
           }
         }
-      } else if(e.isValue()) {
-        e = optPre(value(qc), qc);
       }
       // expression will always return true
       if(e == Bln.TRUE) return optPre(Bln.TRUE, qc);
