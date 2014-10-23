@@ -66,4 +66,9 @@ public final class MapTest extends AdvancedQueryTest {
     query("count(( map { }, array { <a/> } ))", 2);
     query("count(( array { <a/> }, map { } ))", 2);
   }
+
+  /** GitHub bug (#1012). */
+  @Test public void gh1012() {
+    error("map {}(())", EMPTYFOUND);
+  }
 }
