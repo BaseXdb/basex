@@ -111,7 +111,7 @@ public enum BaseXKeys {
 
   /** Space key.             */ SPACE(NO_MOD, VK_SPACE),
   /** Enter.                 */ ENTER(NO_MOD, VK_ENTER),
-  /** Shift Enter.           */ OPEN(SHIFT, VK_ENTER);
+  /** Shift Enter.           */ SHIFT_ENTER(SHIFT, VK_ENTER);
 
   /** Modifiers. */
   private final int modifiers;

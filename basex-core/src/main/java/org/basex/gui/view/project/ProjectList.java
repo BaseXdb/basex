@@ -33,7 +33,7 @@ final class ProjectList extends JList<String> {
     new GUIPopupCmd(OPEN, BaseXKeys.ENTER) {
       @Override public void execute() { open(); }
     },
-    new GUIPopupCmd(OPEN_EXTERNALLY, BaseXKeys.OPEN) {
+    new GUIPopupCmd(OPEN_EXTERNALLY, BaseXKeys.SHIFT_ENTER) {
       @Override public void execute() { openExternal(); }
     }, null,
     new GUIPopupCmd(RUN_TESTS, BaseXKeys.UNIT) {

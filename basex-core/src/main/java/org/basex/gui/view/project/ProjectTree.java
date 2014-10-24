@@ -274,7 +274,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   /** Open externally command. */
   final class OpenExternalCmd extends GUIPopupCmd {
     /** Constructor. */
-    OpenExternalCmd() { super(OPEN_EXTERNALLY, BaseXKeys.OPEN); }
+    OpenExternalCmd() { super(OPEN_EXTERNALLY, BaseXKeys.SHIFT_ENTER); }
 
     @Override public void execute() {
       for(final ProjectNode node : selectedNodes()) {

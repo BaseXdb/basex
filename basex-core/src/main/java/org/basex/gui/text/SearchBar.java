@@ -95,7 +95,9 @@ public final class SearchBar extends BaseXBack {
         } else if(ESCAPE.is(e)) {
           deactivate(search.getText().isEmpty());
         } else if(ENTER.is(e)) {
-          editor.jump(e.isShiftDown() ? SearchDir.BACKWARD : SearchDir.FORWARD, true);
+          editor.jump(SearchDir.FORWARD, true);
+        } else if(SHIFT_ENTER.is(e)) {
+          editor.jump(SearchDir.BACKWARD, true);
         }
       }
       @Override
