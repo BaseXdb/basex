@@ -3,7 +3,7 @@
 
 about_%              = % névjegye
 access_denied        = Hozzáférés megtagadva.
-add                  = Hozzáad
+add                  = Hozzáadás
 add_raw_files        = A többi fájl raw fájlként történő hozzáadása
 add_resources        = Erőforrások hozzáadása
 adjust_nodes         = Csomópontok szöveggé alakítása
@@ -186,14 +186,14 @@ input_size           = Bemeneti méret
 insert_new_data      = Bemeneti új adat
 install              = Telepítés
 install_from_url     = Telepítés URL-ről
-int_parser           = Belső XML elemező használata
+int_parser           = Belső XML-elemező használata
 interrupted          = Megszakítva.
 invalid_%            = % érvénytelen.
 italics              = Dőlt
 jump_to_file         = Ugrás a fájlhoz
 kill_self_%          = '%' nem tudja kilőni önmagát.
 language             = Nyelv
-lax_name_conversion  = Lax név konverzió
+lax_name_conversion  = Lax névkonverzió
 liberal_parsing      = Liberális elemzés
 license              = BSD Licenc
 line                 = Sor
