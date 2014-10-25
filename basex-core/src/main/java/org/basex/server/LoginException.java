@@ -19,6 +19,7 @@ public final class LoginException extends IOException {
   public LoginException() {
     super(ACCESS_DENIED);
   }
+
   /**
    * Constructs an exception with the specified message and extension.
    * @param message message

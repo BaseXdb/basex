@@ -104,8 +104,7 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns the name of the node, composed of an optional prefix
-   * and the local name.
+   * Returns the name of the node, composed of an optional prefix and the local name.
    * This function must only be called for element and attribute nodes.
    * It is more efficient than calling {@link #qname}, as no {@link QNm}
    * instance is created.

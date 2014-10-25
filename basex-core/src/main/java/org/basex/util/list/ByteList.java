@@ -98,6 +98,7 @@ public class ByteList extends ElementList {
     size = 0;
     return Arrays.copyOf(list, s);
   }
+
   /**
    * Returns an array with all elements and invalidates the internal array.
    * Warning: the function must only be called if the list is discarded afterwards.

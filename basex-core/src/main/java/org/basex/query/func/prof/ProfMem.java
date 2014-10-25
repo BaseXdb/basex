@@ -43,6 +43,7 @@ public final class ProfMem extends StandardFunc {
       }
     };
   }
+
   /**
    * Dumps the memory consumption.
    * @param min initial memory usage

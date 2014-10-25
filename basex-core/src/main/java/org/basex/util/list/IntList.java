@@ -62,6 +62,7 @@ public class IntList extends ElementList {
     size = s;
     return this;
   }
+
   /**
    * Adds elements to the array.
    * @param elements elements to be added

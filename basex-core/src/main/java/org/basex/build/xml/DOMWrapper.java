@@ -122,6 +122,7 @@ public final class DOMWrapper extends Parser {
     boolean more() {
       return ++i < nl.getLength();
     }
+
     /**
      * Returns the current node.
      * @return current node

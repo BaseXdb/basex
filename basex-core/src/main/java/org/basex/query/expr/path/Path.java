@@ -801,6 +801,7 @@ public abstract class Path extends ParseExpr {
     }
     return true;
   }
+
   /**
    * Checks if the expressions is a simple child step.
    * @param expr expression to be checked

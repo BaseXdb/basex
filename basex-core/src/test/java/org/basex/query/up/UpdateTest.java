@@ -193,6 +193,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     query(transform("<n><r>a</r></n>", "replace node $input/r with <r>b</r>"),
         "<n><r>b</r></n>");
   }
+
   /**
    * ReplaceValue on attribute.
    */

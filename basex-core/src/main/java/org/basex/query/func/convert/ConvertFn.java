@@ -62,6 +62,7 @@ public abstract class ConvertFn extends StandardFunc {
       throw BXCO_BASE64_X_X.get(info, chop(in, info), enc);
     }
   }
+
   /**
    * Converts the first argument from a string to a byte array.
    * @param in input string
