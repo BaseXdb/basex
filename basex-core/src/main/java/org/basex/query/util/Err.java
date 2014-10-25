@@ -666,6 +666,10 @@ public enum Err {
   SEROPT_X(SEPM, 17, "%."),
   /** SEPM0017. */
   SEROPTION_X(SEPM, 17, "Serialization parameter '%' is invalid."),
+  /** SERE0020. */
+  SERNUMBER_X(SERE, 20, "Numeric value cannot be represented: '%'"),
+  /** SERE0022. */
+  SERDUPL_X(SERE, 22, "Duplicate name found: '%'"),
 
   /** XPDY0002. */
   NOCTX_X(XPDY, 2, "%: no context value bound."),

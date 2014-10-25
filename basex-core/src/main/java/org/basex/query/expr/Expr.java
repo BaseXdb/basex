@@ -46,7 +46,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Compiles and optimizes the expression, assigns types and cardinalities.
-   * This method will be initially called by {@link QueryContext#compile}.
+   * This method will be initially called by {@link QueryContext#compile()}.
    * @param qc query context
    * @param scp variable scope
    * @return optimized expression
@@ -68,8 +68,8 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns an iterator on the resulting items.
-   * If this method is not overwritten, {@link #item} must be implemented by an expression,
-   * as it may be called by this method.
+   * If this method is not overwritten, {@link #item(QueryContext, InputInfo)} must be implemented
+   * by an expression, as it may be called by this method.
    * @param qc query context
    * @return resulting item
    * @throws QueryException query exception
@@ -79,8 +79,8 @@ public abstract class Expr extends ExprInfo {
   /**
    * Evaluates the expression and returns the resulting item,
    * or a {@code null} reference if the expression yields an empty sequence.
-   * If this method is not overwritten, {@link #iter} must be implemented by an expression,
-   * as it may be called by this method.
+   * If this method is not overwritten, {@link #iter(QueryContext)} must be implemented by an
+   * expression, as it may be called by this method.
    * @param qc query context
    * @param ii input info
    * @return iterator or {@code null}

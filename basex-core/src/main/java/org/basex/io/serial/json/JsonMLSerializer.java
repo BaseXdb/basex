@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.data.*;
 import org.basex.io.serial.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -49,7 +50,7 @@ public final class JsonMLSerializer extends JsonSerializer {
   @Override
   protected void attribute(final byte[] name, final byte[] value) throws IOException {
     print(",");
-    if(indent) print(' ');
+    print(' ');
     if(!att) {
       print("{");
       att = true;
@@ -71,7 +72,7 @@ public final class JsonMLSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void finishText(final byte[] value) throws IOException {
+  protected void text(final byte[] value, final FTPos ftp) throws IOException {
     print(',');
     indent();
     print('"');
@@ -91,10 +92,10 @@ public final class JsonMLSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void finishComment(final byte[] value) { }
+  protected void comment(final byte[] value) { }
 
   @Override
-  protected void finishPi(final byte[] name, final byte[] value) { }
+  protected void pi(final byte[] name, final byte[] value) { }
 
   @Override
   protected void atomic(final Item value, final boolean iter) throws IOException {

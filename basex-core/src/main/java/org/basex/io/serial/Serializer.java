@@ -133,7 +133,7 @@ public abstract class Serializer {
     } else if(item instanceof FItem) {
       throw SERFUNC_X.getIO(item.seqType());
     } else {
-      finishElement();
+      prepare();
       atomic(item, iter);
     }
     closeResult();
@@ -166,8 +166,8 @@ public abstract class Serializer {
    * @param name element name
    * @throws IOException I/O exception
    */
-  final void startElement(final byte[] name) throws IOException {
-    finishElement();
+  final void openElement(final byte[] name) throws IOException {
+    prepare();
     nstack.push(nspaces.size());
     opening = true;
     elem = name;
@@ -190,16 +190,6 @@ public abstract class Serializer {
     }
   }
 
-  /**
-   * Serializes a text.
-   * @param value value
-   * @param ftp full-text positions, used for visualization highlighting
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  void finishText(final byte[] value, final FTPos ftp) throws IOException {
-    text(value);
-  }
   /**
    * Gets the namespace URI currently bound by the given prefix.
    * @param prefix namespace prefix
@@ -292,16 +282,17 @@ public abstract class Serializer {
   /**
    * Serializes a text.
    * @param value value
+   * @param ftp full-text positions, used for visualization highlighting
    * @throws IOException I/O exception
    */
-  protected abstract void finishText(final byte[] value) throws IOException;
+  protected abstract void text(final byte[] value, final FTPos ftp) throws IOException;
 
   /**
    * Serializes a comment.
    * @param value value
    * @throws IOException I/O exception
    */
-  protected abstract void finishComment(final byte[] value) throws IOException;
+  protected abstract void comment(final byte[] value) throws IOException;
 
   /**
    * Serializes a processing instruction.
@@ -309,7 +300,7 @@ public abstract class Serializer {
    * @param value value
    * @throws IOException I/O exception
    */
-  protected abstract void finishPi(final byte[] name, final byte[] value) throws IOException;
+  protected abstract void pi(final byte[] name, final byte[] value) throws IOException;
 
   /**
    * Serializes an atomic value.
@@ -326,17 +317,17 @@ public abstract class Serializer {
    * @param node node to be serialized
    * @throws IOException I/O exception
    */
-  private void serialize(final ANode node) throws IOException {
+  protected void serialize(final ANode node) throws IOException {
     if(node instanceof DBNode) {
       serialize((DBNode) node);
     } else {
       final Type type = node.type;
       if(type == NodeType.COM) {
-        comment(node.string());
+        prepareComment(node.string());
       } else if(type == NodeType.TXT) {
-        text(node.string());
+        prepareText(node.string(), null);
       } else if(type == NodeType.PI) {
-        pi(node.name(), node.string());
+        preparePi(node.name(), node.string());
       } else if(type == NodeType.ATT) {
         attribute(node.name(), node.string());
       } else if(type == NodeType.NSP) {
@@ -348,7 +339,7 @@ public abstract class Serializer {
       } else {
         // serialize elements (code will never be called for attributes)
         final QNm name = node.qname();
-        startElement(name.string());
+        openElement(name.string());
 
         // serialize declared namespaces
         final Atts nsp = node.namespaces();
@@ -411,18 +402,16 @@ public abstract class Serializer {
         openDoc(data.text(p++, true));
         doc = true;
       } else if(k == Data.TEXT) {
-        final FTPos ftd = ft != null ? ft.get(data, p) : null;
-        if(ftd != null) text(data.text(p++, true), ftd);
-        else text(data.text(p++, true));
+        prepareText(data.text(p++, true), ft != null ? ft.get(data, p) : null);
       } else if(k == Data.COMM) {
-        comment(data.text(p++, true));
+        prepareComment(data.text(p++, true));
       } else {
         if(k == Data.PI) {
-          pi(data.name(p, Data.PI), data.atom(p++));
+          preparePi(data.name(p, Data.PI), data.atom(p++));
         } else {
           // add element node
           final byte[] name = data.name(p, k);
-          startElement(name);
+          openElement(name);
 
           // add namespace definitions
           if(nsp != null) {
@@ -471,34 +460,24 @@ public abstract class Serializer {
   }
 
   /**
+   * Serializes a comment.
+   * @param value value
+   * @throws IOException I/O exception
+   */
+  private void prepareComment(final byte[] value) throws IOException {
+    prepare();
+    comment(value);
+  }
+
+  /**
    * Serializes a text.
    * @param value text bytes
    * @param ftp full-text positions, used for visualization highlighting
    * @throws IOException I/O exception
    */
-  private void text(final byte[] value, final FTPos ftp) throws IOException {
-    finishElement();
-    finishText(value, ftp);
-  }
-
-  /**
-   * Serializes a comment.
-   * @param value value
-   * @throws IOException I/O exception
-   */
-  private void comment(final byte[] value) throws IOException {
-    finishElement();
-    finishComment(value);
-  }
-
-  /**
-   * Serializes a text.
-   * @param value text bytes
-   * @throws IOException I/O exception
-   */
-  private void text(final byte[] value) throws IOException {
-    finishElement();
-    finishText(value);
+  private void prepareText(final byte[] value, final FTPos ftp) throws IOException {
+    prepare();
+    text(value, ftp);
   }
 
   /**
@@ -507,16 +486,16 @@ public abstract class Serializer {
    * @param value value
    * @throws IOException I/O exception
    */
-  private void pi(final byte[] name, final byte[] value) throws IOException {
-    finishElement();
-    finishPi(name, value);
+  private void preparePi(final byte[] name, final byte[] value) throws IOException {
+    prepare();
+    pi(name, value);
   }
 
   /**
    * Finishes an opening element node if necessary.
    * @throws IOException I/O exception
    */
-  private void finishElement() throws IOException {
+  private void prepare() throws IOException {
     if(!opening) return;
     opening = false;
     finishOpen();

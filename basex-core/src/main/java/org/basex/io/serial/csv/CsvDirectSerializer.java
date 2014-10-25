@@ -7,6 +7,7 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.build.CsvOptions.CsvFormat;
+import org.basex.data.*;
 import org.basex.io.serial.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -68,7 +69,7 @@ public final class CsvDirectSerializer extends CsvSerializer {
   }
 
   @Override
-  protected void finishText(final byte[] value) throws IOException {
+  protected void text(final byte[] value, final FTPos ftp) throws IOException {
     if(lvl == 3) cache(value);
   }
 
@@ -103,10 +104,10 @@ public final class CsvDirectSerializer extends CsvSerializer {
   }
 
   @Override
-  protected void finishComment(final byte[] value) { }
+  protected void comment(final byte[] value) { }
 
   @Override
-  protected void finishPi(final byte[] name, final byte[] value) { }
+  protected void pi(final byte[] name, final byte[] value) { }
 
   @Override
   protected void atomic(final Item value, final boolean iter) throws IOException {

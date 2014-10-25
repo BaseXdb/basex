@@ -8,7 +8,9 @@ import org.basex.build.*;
 import org.basex.build.JsonOptions.JsonFormat;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
+import org.basex.io.serial.SerializerOptions.YesNo;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -25,10 +27,10 @@ public final class JsonSerializerTest extends SandboxTest {
    */
   @Test public void direct() {
     final JsonFormat format = JsonFormat.DIRECT;
-    error("'x'", format);
-    error("1", format);
-    error("true()", format);
-    error("<_/>", format);
+    serialize("'x'", "'x'", format);
+    serialize("1", "1", format);
+    serialize("true()", "true", format);
+    serialize("<_/>", "'<_/>'", format);
 
     serialize("<json/>", "''", format);
     serialize("<json type='object'/>", "{}", format);
@@ -39,22 +41,22 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("<json type='object'><a>\"</a></json>", "{'a':'\\''}", format);
     serialize("<json type='object'><a>1</a><b/></json>", "{'a':'1','b':''}", format);
 
-    error("<json type='object' name=\"x\"/>", format);
-    error("<json type='object'><a name='X'/></json>", format);
-    error("<json type='object'><_ type='number'/></json>", format);
-    error("<json type='object'><_ type='boolean'/></json>", format);
-    error("<json type='object'><_ type='x'>1</_></json>", format);
+    error("<json type='object' name=\"x\"/>", format, BXJS_SERIAL_X);
+    error("<json type='object'><a name='X'/></json>", format, BXJS_SERIAL_X);
+    error("<json type='object'><_ type='number'/></json>", format, BXJS_SERIAL_X);
+    error("<json type='object'><_ type='boolean'/></json>", format, BXJS_SERIAL_X);
+    error("<json type='object'><_ type='x'>1</_></json>", format, BXJS_SERIAL_X);
 
     serialize("<json type='array'/>", "[]", format);
     serialize("<json type='array'><_/></json>", "['']", format);
     serialize("<json type='array'><_>x</_></json>", "['x']", format);
 
-    error("<json type='array'><X/></json>", format);
-    error("<json type='array' name='X'><_/></json>", format);
-    error("<json type='array'><_ name='X'/></json>", format);
-    error("<json type='array'><_ _='_'/></json>", format);
-    error("<json type='array'><_ type='number'>x</_></json>", format);
-    error("<json type='array'><_ type='boolean'>x</_></json>", format);
+    error("<json type='array'><X/></json>", format, BXJS_SERIAL_X);
+    error("<json type='array' name='X'><_/></json>", format, BXJS_SERIAL_X);
+    error("<json type='array'><_ name='X'/></json>", format, BXJS_SERIAL_X);
+    error("<json type='array'><_ _='_'/></json>", format, BXJS_SERIAL_X);
+    error("<json type='array'><_ type='number'>x</_></json>", format, BXJS_SERIAL_X);
+    error("<json type='array'><_ type='boolean'>x</_></json>", format, BXJS_SERIAL_X);
   }
 
   /**
@@ -62,10 +64,10 @@ public final class JsonSerializerTest extends SandboxTest {
    */
   @Test public void attributes() {
     final JsonFormat format = JsonFormat.ATTRIBUTES;
-    error("'x'", format);
-    error("1", format);
-    error("true()", format);
-    error("<_/>", format);
+    serialize("'x'", "'x'", format);
+    serialize("1", "1", format);
+    serialize("true()", "true", format);
+    serialize("<_/>", "'<_/>'", format);
 
     serialize("<json/>", "''", format);
     serialize("<json type='object'/>", "{}", format);
@@ -77,10 +79,10 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("<json type='object'><pair name='a'>1</pair><pair name='b'/></json>",
         "{'a':'1','b':''}", format);
 
-    error("<json type='object'><_/></json>", format);
-    error("<json type='object'><pair/></json>", format);
-    error("<json type='object'><pair type='null'/></json>", format);
-    error("<json type='object'><pair>1</pair></json>", format);
+    error("<json type='object'><_/></json>", format, BXJS_SERIAL_X);
+    error("<json type='object'><pair/></json>", format, BXJS_SERIAL_X);
+    error("<json type='object'><pair type='null'/></json>", format, BXJS_SERIAL_X);
+    error("<json type='object'><pair>1</pair></json>", format, BXJS_SERIAL_X);
 
     serialize("<json type='array'/>", "[]", format);
     serialize("<json type='array'><item/></json>", "['']", format);
@@ -91,10 +93,10 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("<json>a</json>", "'a'", format);
     serialize("<json type='number'>1</json>", "1", format);
 
-    error("<json type='array'><_/></json>", format);
-    error("<json type='array'><item type='number'>x</item></json>", format);
-    error("<json type='array'><item type='boolean'>x</item></json>", format);
-    error("<json type='number'>x</json>", format);
+    error("<json type='array'><_/></json>", format, BXJS_SERIAL_X);
+    error("<json type='array'><item type='number'>x</item></json>", format, BXJS_SERIAL_X);
+    error("<json type='array'><item type='boolean'>x</item></json>", format, BXJS_SERIAL_X);
+    error("<json type='number'>x</json>", format, BXJS_SERIAL_X);
   }
 
   /**
@@ -105,48 +107,53 @@ public final class JsonSerializerTest extends SandboxTest {
 
     // objects
     serialize("map { }", "{}", format);
-    serialize("map { '': () }", "{'':null}", format);
-    serialize("map { 'A' : 'B' }", "{'A':'B'}", format);
-    serialize("map { 'A': 1 }", "{'A':1}", format);
-    serialize("map { 'A': 1.2 }", "{'A':1.2}", format);
-    serialize("map { 'A': .2 }", "{'A':0.2}", format);
-    serialize("map { 'A': .0 }", "{'A':0}", format);
-    serialize("map { 'A': 1 div 0.0e0 }", "{'A':'INF'}", format);
-    serialize("map { 'A': -1 div 0.0e0 }", "{'A':'-INF'}", format);
-    serialize("map { 'A': 0 div 0.0e0 }", "{'A':'NaN'}", format);
-    serialize("map { 'A': true() }", "{'A':true}", format);
-    serialize("map { 'A': false() }", "{'A':false}", format);
-    serialize("map { 'A': false() }", "{'A':false}", format);
+    serialize("map { '': () }", "{'': null}", format);
+    serialize("map { 'A' : 'B' }", "{'A': 'B'}", format);
+    serialize("map { 'A': 1 }", "{'A': 1}", format);
+    serialize("map { 'A': 1.2 }", "{'A': 1.2}", format);
+    serialize("map { 'A': .2 }", "{'A': 0.2}", format);
+    serialize("map { 'A': .0 }", "{'A': 0}", format);
+    serialize("map { 'A': true() }", "{'A': true}", format);
+    serialize("map { 'A': false() }", "{'A': false}", format);
+    serialize("map { 'A': false() }", "{'A': false}", format);
+    serialize("map { true(): false() }", "{'true': false}", format);
+    serialize("map { 1: 'E' }", "{'1': 'E'}", format);
 
-    error("map { true(): false() }", format);
-    error("map { true(): true#0 }", format);
-    error("map { 'A': ('B','C') }", format);
-    error("map { 'A': 'B', 'C': 'D', 1: 'E' }", format);
-    error("map { 1: 'B', 2: 'C', 'C': 'D' }", format);
+    error("map { 'A': 1 div 0.0e0 }", format, SERNUMBER_X);
+    error("map { 'A': -1 div 0.0e0 }", format, SERNUMBER_X);
+    error("map { 'A': 0 div 0.0e0 }", format, SERNUMBER_X);
+
+    error("map { true(): true#0 }", format, FIATOM_X);
+    error("map { 'A': ('B','C') }", format, BXJS_SERIAL_X);
 
     // arrays
-    serialize("map { 1:() }", "[null]", format);
-    serialize("map { 1:2 }", "[2]", format);
-    serialize("map { 1:2,2:3 }", "[2,3]", format);
-    serialize("map { 1:2,3:4 }", "[2,null,4]", format);
-    serialize("map { 3:4,1:2 }", "[2,null,4]", format);
+    serialize("[()]", "[null]", format);
+    serialize("[2]", "[2]", format);
+    serialize("[2, 3]", "[2,3]", format);
+    serialize("[2, (), 4]", "[2,null,4]", format);
 
     // mixed
-    serialize("map { 'A':map {} }", "{'A':{}}", format);
-    serialize("map { 'A':map {'B':'C'} }", "{'A':{'B':'C'}}", format);
-    serialize("map { 'A':map {1:'B'} }", "{'A':['B']}", format);
-    serialize("map { 'A':map {4:true(),2:map {'C':'D'},1:0} }",
-        "{'A':[0,{'C':'D'},null,true]}", format);
+    serialize("map { 'A':map {} }", "{'A': {}}", format);
+    serialize("map { 'A':map {'B':'C'} }", "{'A': {'B': 'C'}}", format);
+    serialize("map { 'A':array {'B'} }", "{'A': ['B']}", format);
+    serialize("map { '0': () }", "{'0': null}", format);
+    serialize("map { '-1': () }", "{'-1': null}", format);
 
     // atomic values
     serialize("'A'", "'A'", format);
     serialize("true()", "true", format);
     serialize("1", "1", format);
-    serialize("(1,2)", "1 2", format);
-
-    error("map { 0: () }", format);
-    error("map { -1: () }", format);
+    serialize("(1,'x')", "1 'x'", format);
   }
+
+  /**
+   * Tests for the 'map' serialization format.
+   */
+  @Test public void x() {
+    final JsonFormat format = JsonFormat.MAP;
+    serialize("(1,'x')", "1 'x'", format);
+  }
+
 
   /**
    * Serializes the specified input as JSON.
@@ -168,13 +175,14 @@ public final class JsonSerializerTest extends SandboxTest {
    * Serializes the specified input as JSON.
    * @param query query string
    * @param format format
+   * @param err expected error
    */
-  private static void error(final String query, final JsonFormat format) {
+  private static void error(final String query, final JsonFormat format, final Err err) {
     try {
-      serialize(query, format);
-      fail("Error expected: " + BXJS_SERIAL_X);
+      final String s = serialize(query, format);
+      fail("Expected: " + err + ", Returned: " + s);
     } catch(final QueryIOException ex) {
-      assertEquals(BXJS_SERIAL_X, ex.getCause().err());
+      assertEquals(err.name(), ex.getCause().err().name());
     } catch(final Exception ex) {
       Util.stack(ex);
       fail(ex.toString());
@@ -195,10 +203,10 @@ public final class JsonSerializerTest extends SandboxTest {
     final ArrayOutput ao = new ArrayOutput();
 
     final JsonSerialOptions jopts = new JsonSerialOptions();
-    jopts.set(JsonSerialOptions.INDENT, false);
     jopts.set(JsonOptions.FORMAT, format);
 
     final SerializerOptions sopts = new SerializerOptions();
+    sopts.set(SerializerOptions.INDENT, YesNo.NO);
     sopts.set(SerializerOptions.METHOD, SerialMethod.JSON);
     sopts.set(SerializerOptions.JSON, jopts);
 

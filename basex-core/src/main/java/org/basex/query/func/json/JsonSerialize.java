@@ -1,7 +1,6 @@
 package org.basex.query.func.json;
 
 import static org.basex.query.util.Err.*;
-import static org.basex.util.Token.*;
 
 import org.basex.build.*;
 import org.basex.io.serial.*;
@@ -25,6 +24,6 @@ public final class JsonSerialize extends JsonFn {
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.JSON);
     sopts.set(SerializerOptions.JSON, jopts);
-    return Str.get(delete(serialize(iter, sopts, INVALIDOPT_X), '\r'));
+    return Str.get(serialize(iter, sopts, INVALIDOPT_X));
   }
 }

@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.*;
+import org.basex.data.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -31,7 +32,7 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  protected final void finishText(final byte[] value) throws IOException {
+  protected final void text(final byte[] value, final FTPos ftp) throws IOException {
     build.text(value);
   }
 
@@ -40,7 +41,7 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  protected final void finishPi(final byte[] name, final byte[] value) throws IOException {
+  protected final void pi(final byte[] name, final byte[] value) throws IOException {
     build.pi(concat(name, SPACE, value));
   }
 
@@ -69,7 +70,7 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  protected final void finishComment(final byte[] value) throws IOException {
+  protected final void comment(final byte[] value) throws IOException {
     build.comment(value);
   }
 

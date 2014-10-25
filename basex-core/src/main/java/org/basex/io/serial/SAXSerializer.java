@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.data.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.xml.sax.*;
@@ -206,7 +207,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  protected void finishText(final byte[] value) throws IOException {
+  protected void text(final byte[] value, final FTPos ftp) throws IOException {
     try {
       final String s = string(value);
       final char[] c = s.toCharArray();
@@ -217,7 +218,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  protected void finishComment(final byte[] value) throws IOException {
+  protected void comment(final byte[] value) throws IOException {
     if(lexicalHandler != null) {
       try {
         final String s = string(value);
@@ -230,7 +231,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  protected void finishPi(final byte[] name, final byte[] value) throws IOException {
+  protected void pi(final byte[] name, final byte[] value) throws IOException {
     try {
       contentHandler.processingInstruction(string(name), string(value));
     } catch(final SAXException ex) {

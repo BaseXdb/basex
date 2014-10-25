@@ -8,9 +8,15 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.build.JsonOptions.JsonFormat;
+import org.basex.data.*;
+import org.basex.io.out.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
+import org.basex.io.serial.SerializerOptions.*;
+import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -33,9 +39,15 @@ public final class JsonNodeSerializer extends JsonSerializer {
   private final boolean lax;
   /** Attributes flag. */
   private final boolean atts;
+  /** Escape special characters. */
+  private final Serializer ser;
+  /** Node output cache. */
+  private final ArrayOutput cache = new ArrayOutput();
 
   /** Current name of a pair. */
   private byte[] key;
+  /** Custom serialization. */
+  private boolean custom;
 
   /**
    * Constructor.
@@ -47,14 +59,36 @@ public final class JsonNodeSerializer extends JsonSerializer {
       throws IOException {
 
     super(os, opts);
+
+    final SerializerOptions so = new SerializerOptions();
+    so.set(SerializerOptions.METHOD, opts.get(SerializerOptions.JSON_NODE_OUTPUT_METHOD));
+    so.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.YES);
+    ser = Serializer.get(cache, so);
+
     for(int t = 0; t < typeCache.length; t++) typeCache[t] = new TokenMap();
     atts = jopts.get(JsonOptions.FORMAT) == JsonFormat.ATTRIBUTES;
     lax = jopts.get(JsonOptions.LAX) || atts;
   }
 
   @Override
+  protected void serialize(final ANode node) throws IOException {
+    final boolean doc = node.type == NodeType.DOC;
+    final boolean elm = node.type == NodeType.ELM && eq(JSON, node.name());
+    if(custom || (doc || elm)) {
+      final boolean c = custom;
+      if(!custom) custom = elm;
+      super.serialize(node);
+      custom = c;
+    } else {
+      ser.serialize(node);
+      ser.close();
+      string(cache.toArray());
+      cache.reset();
+    }
+  }
+
+  @Override
   protected void startOpen(final byte[] name) throws IOException {
-    if(lvl == 0 && !eq(name, JSON)) error("<%> expected as root node", JSON);
     types.set(lvl, null);
     comma.set(lvl + 1, false);
     key = atts ? null : name;
@@ -75,13 +109,13 @@ public final class JsonNodeSerializer extends JsonSerializer {
 
     if(eq(name, TYPE)) {
       // add single type
-      if(!eq(value, TYPES)) error("<%> has invalid type \"%\"", elem, value);
+      if(!eq(value, TYPES)) throw error("<%> has invalid type \"%\"", elem, value);
       types.set(lvl, value);
     } else if(atts && eq(name, NAME)) {
       key = value;
-      if(!eq(elem, PAIR)) error("<%> found, <pair> expected", elem);
+      if(!eq(elem, PAIR)) throw error("<%> found, <pair> expected", elem);
     } else if(!eq(name, XMLNS) && !startsWith(name, XMLNSC)) {
-      error("<%> has invalid attribute \"%\"", elem, name);
+      throw error("<%> has invalid attribute \"%\"", elem, name);
     }
   }
 
@@ -91,26 +125,25 @@ public final class JsonNodeSerializer extends JsonSerializer {
     else comma.set(lvl, true);
 
     if(lvl > 0) {
-      indent(lvl);
+      indent();
       final byte[] ptype = types.get(lvl - 1);
       if(eq(ptype, OBJECT)) {
-        if(atts && !eq(elem, PAIR)) error("<%> found, <%> expected", elem, PAIR);
-        if(key == null) error("<%> has no name attribute", elem);
+        if(atts && !eq(elem, PAIR)) throw error("<%> found, <%> expected", elem, PAIR);
+        if(key == null) throw error("<%> has no name attribute", elem);
         print('"');
         final byte[] name = atts ? key : XMLToken.decode(key, lax);
-        if(name == null) error("Name of element <%> is invalid", key);
+        if(name == null) throw error("Name of element <%> is invalid", key);
         print(name);
         print("\":");
-        if(indent) print(' ');
       } else if(eq(ptype, ARRAY)) {
         if(atts) {
-          if(!eq(elem, ITEM)) error("<%> found, <%> expected", elem, ITEM);
-          if(key != null) error("<%> must have no name attribute", elem);
+          if(!eq(elem, ITEM)) throw error("<%> found, <%> expected", elem, ITEM);
+          if(key != null) throw error("<%> must have no name attribute", elem);
         } else {
-          if(!eq(elem, VALUE)) error("<%> found, <%> expected", elem, VALUE);
+          if(!eq(elem, VALUE)) throw error("<%> found, <%> expected", elem, VALUE);
         }
       } else {
-        error("<%> is typed as \"%\" and cannot be nested", elems.get(lvl - 1), ptype);
+        throw error("<%> is typed as \"%\" and cannot be nested", elems.get(lvl - 1), ptype);
       }
     }
 
@@ -134,7 +167,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void finishText(final byte[] value) throws IOException {
+  protected void text(final byte[] value, final FTPos ftp) throws IOException {
     final byte[] type = types.get(lvl - 1);
     if(eq(type, STRING)) {
       print('"');
@@ -142,14 +175,14 @@ public final class JsonNodeSerializer extends JsonSerializer {
       print('"');
     } else if(eq(type, BOOLEAN)) {
       if(!eq(value, TRUE, FALSE))
-        error("Value of <%> is no boolean: \"%\"", elems.get(lvl - 1), value);
+        throw error("Value of <%> is no boolean: \"%\"", elems.get(lvl - 1), value);
       print(value);
     } else if(eq(type, NUMBER)) {
       if(Double.isNaN(toDouble(value)))
-        error("Value of <%> is no number: \"%\"", elems.get(lvl - 1), value);
+        throw error("Value of <%> is no number: \"%\"", elems.get(lvl - 1), value);
       print(value);
     } else if(trim(value).length != 0) {
-      error("<%> is typed as \"%\" and cannot have a value", elems.get(lvl - 1), type);
+      throw error("<%> is typed as \"%\" and cannot have a value", elems.get(lvl - 1), type);
     }
   }
 
@@ -162,7 +195,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
     } else if(eq(type, NULL)) {
       print(NULL);
     } else if(!eq(type, OBJECT, ARRAY)) {
-      error("Value expected for type \"%\"", type);
+      throw error("Value expected for type \"%\"", type);
     }
     finishClose();
   }
@@ -171,48 +204,36 @@ public final class JsonNodeSerializer extends JsonSerializer {
   protected void finishClose() throws IOException {
     final byte[] type = types.get(lvl);
     if(eq(type, ARRAY)) {
-      indent(lvl);
+      indent();
       print(']');
     } else if(eq(type, OBJECT)) {
-      indent(lvl);
+      indent();
       print('}');
     }
   }
 
   @Override
-  protected void finishComment(final byte[] value) throws IOException {
-    error("Comments cannot be serialized");
+  protected void comment(final byte[] value) throws IOException {
+    throw error("Comments cannot be serialized");
   }
 
   @Override
-  protected void finishPi(final byte[] name, final byte[] value) throws IOException {
-    error("Processing instructions cannot be serialized");
+  protected void pi(final byte[] name, final byte[] value) throws IOException {
+    throw error("Processing instructions cannot be serialized");
   }
 
   @Override
   protected void atomic(final Item value, final boolean iter) throws IOException {
-    error("Atomic values cannot be serialized");
-  }
-
-  /**
-   * Prints some indentation.
-   * @param level level
-   * @throws IOException I/O exception
-   */
-  private void indent(final int level) throws IOException {
-    if(!indent) return;
-    print(nl);
-    final int ls = level * indents;
-    for(int l = 0; l < ls; ++l) print(tab);
+    throw error("Atomic values cannot be serialized");
   }
 
   /**
    * Raises an error with the specified message.
    * @param msg error message
    * @param ext error details
-   * @throws IOException I/O exception
+   * @return I/O exception
    */
-  private static void error(final String msg, final Object... ext) throws IOException {
-    throw BXJS_SERIAL_X.getIO(Util.inf(msg, ext));
+  private static QueryIOException error(final String msg, final Object... ext) {
+    return BXJS_SERIAL_X.getIO(Util.inf(msg, ext));
   }
 }

@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
+import org.basex.data.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -87,17 +88,17 @@ public final class DOTSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void finishText(final byte[] value) throws IOException {
+  protected void text(final byte[] value, final FTPos ftp) throws IOException {
     print(normalize(value), DOTData.TEXT);
   }
 
   @Override
-  protected void finishComment(final byte[] value) throws IOException {
+  protected void comment(final byte[] value) throws IOException {
     print(new TokenBuilder(COMM_O).add(normalize(value)).add(COMM_C).finish(), COMM);
   }
 
   @Override
-  protected void finishPi(final byte[] name, final byte[] value) throws IOException {
+  protected void pi(final byte[] name, final byte[] value) throws IOException {
     print(new TokenBuilder(PI_O).add(name).add(SPACE).add(value).add(PI_C).finish(), DOTData.PI);
   }
 

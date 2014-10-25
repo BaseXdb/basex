@@ -5,6 +5,7 @@ import static org.basex.query.util.Err.*;
 
 import java.io.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 
@@ -38,9 +39,9 @@ public class XMLSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void finishText(final byte[] value) throws IOException {
+  protected void text(final byte[] value, final FTPos ftp) throws IOException {
     if(elems.isEmpty()) check();
-    super.finishText(value);
+    super.text(value, ftp);
   }
 
   @Override

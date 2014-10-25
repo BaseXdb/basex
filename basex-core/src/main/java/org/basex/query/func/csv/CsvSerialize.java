@@ -1,7 +1,6 @@
 package org.basex.query.func.csv;
 
 import static org.basex.query.util.Err.*;
-import static org.basex.util.Token.*;
 
 import org.basex.build.*;
 import org.basex.io.serial.*;
@@ -25,6 +24,6 @@ public class CsvSerialize extends CsvFn {
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.CSV);
     sopts.set(SerializerOptions.CSV, copts);
-    return Str.get(delete(serialize(iter, sopts, INVALIDOPT_X), '\r'));
+    return Str.get(serialize(iter, sopts, INVALIDOPT_X));
   }
 }

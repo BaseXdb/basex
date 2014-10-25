@@ -112,17 +112,17 @@ public abstract class StandardFunc extends Arr {
   protected byte[] serialize(final Iter ir, final SerializerOptions opts, final Err err)
       throws QueryException {
 
-    final ArrayOutput ao = new ArrayOutput();
     try {
+      final ArrayOutput ao = new ArrayOutput();
       final Serializer ser = Serializer.get(ao, opts);
       for(Item it; (it = ir.next()) != null;) ser.serialize(it);
       ser.close();
+      return delete(ao.finish(), '\r');
     } catch(final QueryIOException ex) {
       throw ex.getCause(info);
     } catch(final IOException ex) {
       throw err.get(info, ex);
     }
-    return ao.finish();
   }
 
   @Override

@@ -73,6 +73,12 @@ public final class SerializerOptions extends Options {
   /** Parameter document. */
   public static final StringOption PARAMETER_DOCUMENT =
       new StringOption("parameter-document", "");
+  /** Serialization parameter: xml/xhtml/html/text. */
+  public static final EnumOption<YesNo> ALLOW_DUPLICATE_NAMES =
+      new EnumOption<>("allow-duplicate-names", YesNo.NO);
+  /** Serialization parameter: xml/xhtml/html/text. */
+  public static final EnumOption<SerialMethod> JSON_NODE_OUTPUT_METHOD =
+      new EnumOption<>("json-node-output-method", SerialMethod.XML);
 
   /** Specific serialization parameter: newline. */
   public static final EnumOption<Newline> NEWLINE =

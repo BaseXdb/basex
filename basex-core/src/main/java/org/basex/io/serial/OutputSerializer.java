@@ -52,10 +52,10 @@ public abstract class OutputSerializer extends Serializer {
   /** New line. */
   protected final byte[] nl;
   /** Output stream. */
-  final PrintOutput out;
+  protected final PrintOutput out;
 
   /** Item flag (used for formatting). */
-  private boolean item;
+  private boolean atomic;
   /** Charset encoder. */
   private CharsetEncoder encoder;
   /** Encoding buffer. */
@@ -206,7 +206,7 @@ public abstract class OutputSerializer extends Serializer {
 
     // open results element
     if(wrap) {
-      startElement(concat(wPre, COLON, T_RESULTS));
+      openElement(concat(wPre, COLON, T_RESULTS));
       namespace(wPre, token(opts.get(WRAP_URI)));
     }
   }
@@ -214,7 +214,7 @@ public abstract class OutputSerializer extends Serializer {
   @Override
   public final void reset() {
     sep = false;
-    item = false;
+    atomic = false;
     isep = false;
   }
 
@@ -247,7 +247,7 @@ public abstract class OutputSerializer extends Serializer {
         isep = true;
       }
     }
-    if(wrap) startElement(wPre.length == 0 ? T_RESULT : concat(wPre, COLON, T_RESULT));
+    if(wrap) openElement(wPre.length == 0 ? T_RESULT : concat(wPre, COLON, T_RESULT));
   }
 
   @Override
@@ -277,45 +277,43 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   @Override
-  protected void finishText(final byte[] value) throws IOException {
-    final int bl = value.length;
-    if(cdata.isEmpty() || elems.isEmpty() || !cdata.contains(elems.peek())) {
-      for(int k = 0; k < bl; k += cl(value, k)) encode(cp(value, k));
-    } else {
-      print(CDATA_O);
-      int c = 0;
-      for(int k = 0; k < value.length; k += cl(value, k)) {
-        final int ch = cp(value, k);
-        if(ch == ']') {
-          ++c;
-        } else {
-          if(c > 1 && ch == '>') {
-            print(CDATA_C);
-            print(CDATA_O);
+  protected void text(final byte[] value, final FTPos ftp) throws IOException {
+    if(ftp == null) {
+      final int bl = value.length;
+      if(cdata.isEmpty() || elems.isEmpty() || !cdata.contains(elems.peek())) {
+        for(int k = 0; k < bl; k += cl(value, k)) encode(cp(value, k));
+      } else {
+        print(CDATA_O);
+        int c = 0;
+        for(int k = 0; k < value.length; k += cl(value, k)) {
+          final int ch = cp(value, k);
+          if(ch == ']') {
+            ++c;
+          } else {
+            if(c > 1 && ch == '>') {
+              print(CDATA_C);
+              print(CDATA_O);
+            }
+            c = 0;
           }
-          c = 0;
+          printChar(ch);
         }
-        printChar(ch);
+        print(CDATA_C);
       }
-      print(CDATA_C);
+    } else {
+      final FTLexer lex = new FTLexer().sc().init(value);
+      while(lex.hasNext()) {
+        final FTSpan span = lex.next();
+        if(!span.special && ftp.contains(span.pos)) print((char) TokenBuilder.MARK);
+        final byte[] t = span.text;
+        for(int k = 0; k < t.length; k += cl(t, k)) encode(cp(t, k));
+      }
     }
     sep = false;
   }
 
   @Override
-  protected void finishText(final byte[] value, final FTPos ftp) throws IOException {
-    final FTLexer lex = new FTLexer().sc().init(value);
-    while(lex.hasNext()) {
-      final FTSpan span = lex.next();
-      if(!span.special && ftp.contains(span.pos)) print((char) TokenBuilder.MARK);
-      final byte[] t = span.text;
-      for(int k = 0; k < t.length; k += cl(t, k)) encode(cp(t, k));
-    }
-    sep = false;
-  }
-
-  @Override
-  protected void finishComment(final byte[] value) throws IOException {
+  protected void comment(final byte[] value) throws IOException {
     if(sep) indent();
     print(COMM_O);
     print(value);
@@ -324,7 +322,7 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   @Override
-  protected void finishPi(final byte[] name, final byte[] value) throws IOException {
+  protected void pi(final byte[] name, final byte[] value) throws IOException {
     if(sep) indent();
     print(PI_O);
     print(name);
@@ -336,8 +334,7 @@ public abstract class OutputSerializer extends Serializer {
 
   @Override
   protected void atomic(final Item it, final boolean iter) throws IOException {
-    if(sep && item) print(' ');
-
+    if(sep && atomic) print(' ');
     try {
       if(it instanceof StrStream) {
         try(final InputStream ni = ((StrStream) it).input(null)) {
@@ -356,7 +353,7 @@ public abstract class OutputSerializer extends Serializer {
       throw new QueryIOException(ex);
     }
     sep = true;
-    item = true;
+    atomic = true;
   }
 
   @Override
@@ -441,15 +438,15 @@ public abstract class OutputSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   protected void indent() throws IOException {
-    if(item) {
-      item = false;
+    if(atomic) {
+      atomic = false;
     } else if(indent) {
       if(!suppress.isEmpty() && !elems.isEmpty()) {
         for(final byte[] t : elems) if(suppress.contains(t)) return;
       }
       print(nl);
       final int ls = lvl * indents;
-      for(int l = 0; l < ls; ++l) print(tab);
+      for(int l = 0; l < ls; l++) print(tab);
     }
   }
 

@@ -812,7 +812,7 @@ public final class Token {
    */
   public static int indexOf(final byte[] token, final int ch) {
     final int tl = token.length;
-    if(ch < 128) {
+    if(ch < 0x80) {
       for(int t = 0; t < tl; t++) if(token[t] == ch) return t;
     } else {
       for(int t = 0; t < tl; t += cl(token, t)) if(cp(token, t) == ch) return t;

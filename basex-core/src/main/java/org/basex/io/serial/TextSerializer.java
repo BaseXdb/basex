@@ -23,10 +23,10 @@ public class TextSerializer extends OutputSerializer {
   protected void attribute(final byte[] name, final byte[] value) throws IOException { }
 
   @Override
-  protected void finishComment(final byte[] value) throws IOException { }
+  protected void comment(final byte[] value) throws IOException { }
 
   @Override
-  protected void finishPi(final byte[] name, final byte[] value) throws IOException { }
+  protected void pi(final byte[] name, final byte[] value) throws IOException { }
 
   @Override
   protected void startOpen(final byte[] name) throws IOException { }

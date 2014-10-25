@@ -66,7 +66,7 @@ public class HTMLSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void finishComment(final byte[] value) throws IOException {
+  protected void comment(final byte[] value) throws IOException {
     if(sep) indent();
     print(COMM_O);
     print(value);
@@ -74,7 +74,7 @@ public class HTMLSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void finishPi(final byte[] name, final byte[] value) throws IOException {
+  protected void pi(final byte[] name, final byte[] value) throws IOException {
     if(sep) indent();
     if(contains(value, '>')) throw SERPI.getIO();
     print(PI_O);
