@@ -2536,8 +2536,7 @@ public class QueryParser extends InputParser {
       check('>');
       while(curr() != '<' || next() != '/') {
         final Expr e = dirElemContent(name.string());
-        if(e == null) continue;
-        add(cont, e);
+        if(e != null) add(cont, e);
       }
       pos += 2;
 
@@ -2624,13 +2623,12 @@ public class QueryParser extends InputParser {
     check('-');
     final TokenBuilder tb = new TokenBuilder();
     do {
-      while(not('-')) tb.add(consume());
-      consume();
-      if(consume('-')) {
+      final char ch = consumeContent();
+      if(ch == '-' && consume('-')) {
         check('>');
         return new CComm(sc, info(), Str.get(tb.finish()));
       }
-      tb.add('-');
+      tb.add(ch);
     } while(true);
   }
 
@@ -2647,15 +2645,12 @@ public class QueryParser extends InputParser {
     final boolean space = skipWs();
     final TokenBuilder tb = new TokenBuilder();
     do {
-      while(not('?')) {
-        if(!space) throw error(PIWRONG);
-        tb.add(consume());
-      }
-      consume();
-      if(consume('>')) {
+      final char ch = consumeContent();
+      if(ch == '?' && consume('>')) {
         return new CPI(sc, info(), Str.get(str), Str.get(tb.finish()));
       }
-      tb.add('?');
+      if(!space) throw error(PIWRONG);
+      tb.add(ch);
     } while(true);
   }
 
@@ -2667,20 +2662,12 @@ public class QueryParser extends InputParser {
   private byte[] cDataSection() throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     while(true) {
-      while(not(']')) {
-        char ch = consume();
-        if(ch == '\r') {
-          ch = '\n';
-          if(curr(ch)) consume();
-        }
-        tb.add(ch);
-      }
-      consume();
-      if(curr(']') && next() == '>') {
+      final char ch = consumeContent();
+      if(ch == ']' && curr(']') && next() == '>') {
         pos += 2;
         return tb.finish();
       }
-      tb.add(']');
+      tb.add(ch);
     }
   }
 
@@ -3951,15 +3938,18 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Checks if the specified character is not found. An error is raised if the input is exhausted.
-   * @param ch character to be found
-   * @return result of check
+   * Consumes the next character and normalizes new line characters.
+   * @return next character
    * @throws QueryException query exception
    */
-  private boolean not(final char ch) throws QueryException {
-    final char c = curr();
-    if(c == 0) throw error(WRONGCHAR_X_X, ch, found());
-    return c != ch;
+  private char consumeContent() throws QueryException {
+    char ch = consume();
+    if(ch == 0) throw error(WRONGCHAR_X_X, ch, found());
+    if(ch == '\r') {
+      ch = '\n';
+      consume('\n');
+    }
+    return ch;
   }
 
   /**

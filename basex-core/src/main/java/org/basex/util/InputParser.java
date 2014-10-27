@@ -70,7 +70,7 @@ public class InputParser {
 
   /**
    * Returns the next character.
-   * @return result of check
+   * @return next character, or {@code 0} if string is exhausted
    */
   protected final char next() {
     final int i = pos + 1;
@@ -78,8 +78,8 @@ public class InputParser {
   }
 
   /**
-   * Returns next character.
-   * @return next character
+   * Consumes the next character.
+   * @return next character, or {@code 0} if string is exhausted
    */
   public final char consume() {
     return pos < length ? input.charAt(pos++) : 0;
