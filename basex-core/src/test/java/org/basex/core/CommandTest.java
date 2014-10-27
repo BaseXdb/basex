@@ -35,7 +35,7 @@ public class CommandTest extends SandboxTest {
 
   /** Starts the server.
    * @throws IOException I/O exception
-  */
+   */
   @BeforeClass
   public static void start() throws IOException {
     session = new LocalSession(context);
