@@ -26,7 +26,6 @@ public class Collation {
   private static final byte[] UCA = token("http://www.w3.org/2013/collation/UCA");
   /** Implementation-defined collation URL. */
   private static final byte[] URL = token(Prop.URL + "/collation");
-
   /** Initialization of locales. */
   private static class Locales {
     /** Available locales, indexed by language code. */
@@ -44,13 +43,13 @@ public class Collation {
 
   /**
    * Private Constructor.
-   * @param cl comparator instance
-   * @param u uri
+   * @param comp comparator instance
+   * @param uri uri
    */
   @SuppressWarnings("rawtypes")
-  Collation(final Comparator cl, final byte[] u) {
-    comp = cl;
-    uri = u;
+  Collation(final Comparator comp, final byte[] uri) {
+    this.comp = comp;
+    this.uri = uri;
   }
 
   /**
@@ -167,9 +166,9 @@ public class Collation {
    * @return result of check
    * @throws QueryException query exception
    */
-  public boolean contains(final byte[] string, final byte[] sub, final InputInfo info)
+  public final boolean contains(final byte[] string, final byte[] sub, final InputInfo info)
       throws QueryException {
-    return indexOf(string(string), string(sub), false, false, info) != -1;
+    return indexOf(string(string), string(sub), Mode.INDEX_OF, info) != -1;
   }
 
   /**
@@ -180,12 +179,9 @@ public class Collation {
    * @return result of check
    * @throws QueryException query exception
    */
-  public boolean startsWith(final byte[] string, final byte[] sub, final InputInfo info)
+  public final boolean startsWith(final byte[] string, final byte[] sub, final InputInfo info)
       throws QueryException {
-
-    final RuleBasedCollator rbc = rbc(info);
-    return startsWith(rbc.getCollationElementIterator(string(string)),
-        rbc.getCollationElementIterator(string(sub)));
+    return indexOf(string(string), string(sub), Mode.STARTS_WITH, info) != -1;
   }
 
   /**
@@ -196,9 +192,9 @@ public class Collation {
    * @return result of check
    * @throws QueryException query exception
    */
-  public boolean endsWith(final byte[] string, final byte[] sub, final InputInfo info)
+  public final boolean endsWith(final byte[] string, final byte[] sub, final InputInfo info)
       throws QueryException {
-    return indexOf(string(string), string(sub), false, true, info) != -1;
+    return indexOf(string(string), string(sub), Mode.ENDS_WITH, info) != -1;
   }
 
   /**
@@ -209,11 +205,11 @@ public class Collation {
    * @return substring
    * @throws QueryException query exception
    */
-  public byte[] after(final byte[] string, final byte[] sub, final InputInfo info)
+  public final byte[] after(final byte[] string, final byte[] sub, final InputInfo info)
       throws QueryException {
 
     final String st = string(string);
-    final int i = indexOf(st, string(sub), false, false, info);
+    final int i = indexOf(st, string(sub), Mode.INDEX_OF, info);
     return i == -1 ? EMPTY : token(st.substring(i));
   }
 
@@ -225,11 +221,11 @@ public class Collation {
    * @return substring
    * @throws QueryException query exception
    */
-  public byte[] before(final byte[] string, final byte[] sub, final InputInfo info)
+  public final byte[] before(final byte[] string, final byte[] sub, final InputInfo info)
       throws QueryException {
 
     final String st = string(string);
-    final int i = indexOf(st, string(sub), true, false, info);
+    final int i = indexOf(st, string(sub), Mode.INDEX_AFTER, info);
     return i == -1 ? EMPTY : token(st.substring(0, i));
   }
 
@@ -237,22 +233,29 @@ public class Collation {
    * Returns the collation URI.
    * @return uri
    */
-  public byte[] uri() {
+  public final byte[] uri() {
     return uri;
+  }
+
+  /** Search modes. */
+  protected static enum Mode {
+    /** Default. */      INDEX_OF,
+    /** End position. */ INDEX_AFTER,
+    /** Starts-with. */  STARTS_WITH,
+    /** Ends-with. */    ENDS_WITH
   }
 
   /**
    * Returns the start or end position of the specified substring.
    * @param string string
    * @param sub substring to be found
-   * @param start return start or end position
-   * @param ends checks if string ends with substring
+   * @param mode search mode
    * @param info input info
-   * @return result of check
+   * @return string index
    * @throws QueryException query exception
-  */
-  private int indexOf(final String string, final String sub, final boolean start,
-      final boolean ends, final InputInfo info) throws QueryException {
+   */
+  protected int indexOf(final String string, final String sub, final Mode mode,
+      final InputInfo info) throws QueryException {
 
     final RuleBasedCollator rbc = rbc(info);
     final CollationElementIterator i = rbc.getCollationElementIterator(string);
@@ -261,21 +264,31 @@ public class Collation {
       final int cs = next(is);
       if(cs == -1) return 0;
       int c;
+      // find first equal character
       do {
         c = next(i);
         if(c == -1) return -1;
       } while(c != cs);
 
       final int s = i.getOffset();
-      if(startsWith(i, is) && (!ends || next(i) == -1))
-        return start ? s - 1 : i.getOffset();
+      if(startsWith(i, is)) {
+        if(mode == Mode.INDEX_AFTER) {
+          return i.getOffset();
+        } else if(mode == Mode.ENDS_WITH) {
+          if(next(i) == -1) return s - 1;
+        } else {
+          return s - 1;
+        }
+      }
       i.setOffset(s);
       is.reset();
-    } while(true);
+    } while(mode != Mode.STARTS_WITH);
+
+    return -1;
   }
 
   /**
-   * Determine whether one string starts with another.
+   * Determines whether one string starts with another.
    * @param i string iterator
    * @param is substring iterator
    * @return result of check

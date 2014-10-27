@@ -406,7 +406,7 @@ public enum Err {
   /** FOCH0003. */
   NORMUNI_X(FOCH, 3, "Unsupported normalization form ('%')."),
   /** FOCH0004. */
-  CHARCOLL(FOCH, 4, "Collation does not support function."),
+  CHARCOLL(FOCH, 4, "Collation does not operate on character-by-character basis."),
 
   /** FODC0001. */
   IDDOC(FODC, 1, "Specified node has no document node as root."),
