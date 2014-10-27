@@ -82,7 +82,7 @@ public final class PermissionTest extends SandboxTest {
       adminSession.execute(new DropDB(NAME));
       adminSession.close();
       // give the server some time to clean up the sessions before next test
-      Performance.sleep(50);
+      Performance.sleep(100);
     } catch(final Exception ex) {
       fail(Util.message(ex));
     }
