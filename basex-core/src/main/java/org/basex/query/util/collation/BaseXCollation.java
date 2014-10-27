@@ -33,38 +33,37 @@ public final class BaseXCollation extends Collation {
   }
 
   @Override
-  protected int indexOf(final String string, final String sub, final Mode mode,
+  protected int indexOf(final String string, final String contains, final Mode mode,
       final InputInfo info) throws QueryException {
 
     if(!(collator instanceof RuleBasedCollator)) throw CHARCOLL.get(info);
     final RuleBasedCollator rbc = (RuleBasedCollator) collator;
-    final CollationElementIterator st = rbc.getCollationElementIterator(string);
-    final CollationElementIterator sb = rbc.getCollationElementIterator(sub);
-    do {
-      final int cs = next(sb);
-      if(cs == -1) return 0;
-      int c;
-      // find first equal character
-      do {
-        c = next(st);
-        if(c == -1) return -1;
-      } while(c != cs);
+    final CollationElementIterator iterS = rbc.getCollationElementIterator(string);
+    final CollationElementIterator iterC = rbc.getCollationElementIterator(contains);
 
-      final int s = st.getOffset();
-      if(startsWith(st, sb)) {
+    final int elemC = next(iterC);
+    if(elemC == -1) return 0;
+    final int offC = iterC.getOffset();
+    do {
+      // find first equal character
+      for(int elemS; (elemS = next(iterS)) != elemC;) {
+        if(elemS == elemC) break;
+        if(elemS == -1 || mode == Mode.STARTS_WITH) return -1;
+      }
+
+      final int offS = iterS.getOffset();
+      if(startsWith(iterS, iterC)) {
         if(mode == Mode.INDEX_AFTER) {
-          return st.getOffset();
+          return iterS.getOffset();
         } else if(mode == Mode.ENDS_WITH) {
-          if(next(st) == -1) return s - 1;
+          if(next(iterS) == -1) return offS - 1;
         } else {
-          return s - 1;
+          return offS - 1;
         }
       }
-      st.setOffset(s);
-      sb.reset();
-    } while(mode != Mode.STARTS_WITH);
-
-    return -1;
+      iterS.setOffset(offS);
+      iterC.setOffset(offC);
+    } while(true);
   }
 
   /**
@@ -75,11 +74,11 @@ public final class BaseXCollation extends Collation {
    */
   private static boolean startsWith(final CollationElementIterator string,
       final CollationElementIterator sub) {
-    do {
-      final int s = next(sub);
-      if(s == -1) return true;
+
+    for(int s; (s = next(sub)) != -1;) {
       if(s != next(string)) return false;
-    } while(true);
+    }
+    return true;
   }
 
   /**

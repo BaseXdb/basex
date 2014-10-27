@@ -75,31 +75,6 @@ public class CollationTest extends AdvancedQueryTest {
     query(PROLOG + "'\u00c4' ge 'a'", true);
   }
 
-  /** Tests functions. */
-  @Test
-  public void functions() {
-    query("compare('a', '\u00c4', '" + COLLATION + "')", "0");
-    query(PROLOG + "compare('a', '\u00c4')", "0");
-
-    query(PROLOG + "contains('XaX', '\u00c4')", true);
-    query(PROLOG + "starts-with('aX', '\u00c4')", true);
-    query(PROLOG + "ends-with('Xa', '\u00c4')", true);
-    query(PROLOG + "starts-with('Xa', '\u00c4')", false);
-    query(PROLOG + "ends-with('aX', '\u00c4')", false);
-    query(PROLOG + "substring-before('XaY', '\u00c4')", "X");
-    query(PROLOG + "substring-after('XaY', '\u00c4')", "Y");
-
-    query(PROLOG + "distinct-values(('a', '\u00c4'))", "a");
-    query(PROLOG + "index-of('a', '\u00c4')", "1");
-    query(PROLOG + "deep-equal('a', '\u00c4')", true);
-
-    query(PROLOG + "min(('\u00c4', 'a'))", "\u00c4");
-    query(PROLOG + "max(('a', '\u00c4'))", "a");
-
-    query(PROLOG + "default-collation()", COLLATION);
-    query("declare default collation '?" + ARGS + "'; default-collation()", COLLATION);
-  }
-
   /** Tests the order by clause. */
   @Test
   public void orderBy() {

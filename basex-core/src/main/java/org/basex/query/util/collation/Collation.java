@@ -170,7 +170,7 @@ public abstract class Collation {
       throws QueryException {
 
     final String st = string(string);
-    final int i = indexOf(st, string(sub), Mode.INDEX_OF, info);
+    final int i = indexOf(st, string(sub), Mode.INDEX_AFTER, info);
     return i == -1 ? EMPTY : token(st.substring(i));
   }
 
@@ -186,7 +186,7 @@ public abstract class Collation {
       throws QueryException {
 
     final String st = string(string);
-    final int i = indexOf(st, string(sub), Mode.INDEX_AFTER, info);
+    final int i = indexOf(st, string(sub), Mode.INDEX_OF, info);
     return i == -1 ? EMPTY : token(st.substring(0, i));
   }
 

@@ -26,8 +26,6 @@ public final class UCACollation extends Collation {
   /** Method. */
   private static final Method CEI_SET_OFFSET = Reflect.method(CEI, "setOffset", int.class);
   /** Method. */
-  private static final Method CEI_RESET = Reflect.method(CEI, "reset");
-  /** Method. */
   private static final Method CEI_NEXT = Reflect.method(CEI, "next");
 
 
@@ -48,37 +46,36 @@ public final class UCACollation extends Collation {
   }
 
   @Override
-  protected int indexOf(final String string, final String sub, final Mode mode,
+  protected int indexOf(final String string, final String contains, final Mode mode,
       final InputInfo info) throws QueryException {
 
     final RuleBasedCollator rbc = (RuleBasedCollator) collator;
-    final Object st = Reflect.invoke(RBC_GCEI, rbc, string);
-    final Object sb = Reflect.invoke(RBC_GCEI, rbc, sub);
-    do {
-      final int cs = next(sb);
-      if(cs == -1) return 0;
-      int c;
-      // find first equal character
-      do {
-        c = next(st);
-        if(c == -1) return -1;
-      } while(c != cs);
+    final Object iterS = Reflect.invoke(RBC_GCEI, rbc, string);
+    final Object iterC = Reflect.invoke(RBC_GCEI, rbc, contains);
 
-      final int s = (Integer) Reflect.invoke(CEI_GET_OFFSET, sb);
-      if(startsWith(st, sb)) {
+    final int elemC = next(iterC);
+    if(elemC == -1) return 0;
+    final int offC = (int) Reflect.invoke(CEI_GET_OFFSET, iterC);
+    do {
+      // find first equal character
+      for(int elemS; (elemS = next(iterS)) != elemC;) {
+        if(elemS == elemC) break;
+        if(elemS == -1 || mode == Mode.STARTS_WITH) return -1;
+      }
+
+      final int offS = (Integer) Reflect.invoke(CEI_GET_OFFSET, iterS);
+      if(startsWith(iterS, iterC)) {
         if(mode == Mode.INDEX_AFTER) {
-          return (int) Reflect.invoke(CEI_GET_OFFSET, st);
+          return (int) Reflect.invoke(CEI_GET_OFFSET, iterS);
         } else if(mode == Mode.ENDS_WITH) {
-          if(next(st) == -1) return s - 1;
+          if(next(iterS) == -1) return offS - 1;
         } else {
-          return s - 1;
+          return offS - 1;
         }
       }
-      Reflect.invoke(CEI_SET_OFFSET, sb, s);
-      Reflect.invoke(CEI_RESET, sb);
-    } while(mode != Mode.STARTS_WITH);
-
-    return -1;
+      Reflect.invoke(CEI_SET_OFFSET, iterC, offS);
+      Reflect.invoke(CEI_SET_OFFSET, iterC, offC);
+    } while(true);
   }
 
   /**
