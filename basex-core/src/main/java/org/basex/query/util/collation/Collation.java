@@ -8,12 +8,12 @@ import java.text.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.io.serial.SerializerOptions.YesNo;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.options.*;
 
 /**
  * This class organizes collations.
@@ -110,17 +110,17 @@ public class Collation {
     final byte[] base = q == -1 ? uri : substring(uri, 0, q);
     final String args = q == -1 ? "" : string(replace(substring(uri, q + 1), '&', ';'));
 
-    final Options opts;
+    final CollationOptions opts;
     final boolean uca = eq(UCA, base);
     if(uca) {
       opts = new UCAOptions();
     } else if(eq(URL, base)) {
-      opts = new CollationOptions();
+      opts = new BaseXCollationOptions();
     } else {
       throw err.get(info, uri);
     }
 
-    final boolean nomercy = !uca || args.contains("fallback=no");
+    String fail = null;
     for(final String param : args.split(";")) {
       final String[] kv = param.split("=");
       if(kv.length != 2) return null;
@@ -128,22 +128,17 @@ public class Collation {
       try {
         opts.assign(key, val);
       } catch(final BaseXException ex) {
-        if(nomercy || key.equals(UCAOptions.FALLBACK.name())) throw err.get(info, uri);;
+        fail = key;
       }
     }
-    if(uca) {
-      if(nomercy) throw err.get(info, uri);
-      return null;
-    }
+    if(fail != null && (!uca || fail.equals(UCAOptions.FALLBACK.name()) ||
+        opts.get(UCAOptions.FALLBACK) == YesNo.NO)) throw err.get(info, uri);;
 
-    final Locale locale = Locales.map.get(opts.get(CollationOptions.LANG));
+    final Locale locale = Locales.map.get(opts.get(BaseXCollationOptions.LANG));
     if(locale == null) throw err.get(info, uri);
 
     final Collator coll = Collator.getInstance(locale);
-    if(opts.contains(CollationOptions.STRENGTH))
-      coll.setStrength(opts.get(CollationOptions.STRENGTH).value);
-    if(opts.contains(CollationOptions.DECOMPOSITION))
-      coll.setDecomposition(opts.get(CollationOptions.DECOMPOSITION).value);
+    if(!opts.assign(coll)) throw err.get(info, uri);
     return coll;
   }
 

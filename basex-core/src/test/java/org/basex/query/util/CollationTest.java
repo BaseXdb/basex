@@ -3,7 +3,7 @@ package org.basex.query.util;
 import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
-import org.basex.query.util.collation.CollationOptions.*;
+import org.basex.query.util.collation.BaseXCollationOptions.*;
 import org.junit.*;
 
 /**
