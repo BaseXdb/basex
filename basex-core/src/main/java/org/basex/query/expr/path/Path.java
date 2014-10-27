@@ -318,6 +318,8 @@ public abstract class Path extends ParseExpr {
           atMostOne &= step.test.kind == Kind.URI_NAME;
           break;
         case CHILD:
+          // order is only ensured if all nodes are on the same level
+          if(!sameDepth) return false;
           atMostOne = false;
           break;
         case DESC:

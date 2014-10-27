@@ -112,6 +112,7 @@ public final class SimpleTest extends QueryTest {
       { "ContextItem 8", integers(1, 1), "('a', 'b') ! count(.)" },
 
       { "Path 1", empty(), "<a/>[./(@*)]" },
+      { "Path 2", strings("A", "B"), "<_><x><x>A</x>B</x></_>//x/node()[last()] ! string()" },
 
       { "Cast 1", integers(1), "xs:integer('+1')" },
       { "Cast 2", "xs:integer('++1')" },
