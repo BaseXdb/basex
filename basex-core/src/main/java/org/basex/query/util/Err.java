@@ -402,7 +402,7 @@ public enum Err {
   /** FOCH0001. */
   INVCODE_X(FOCH, 1, "Invalid XML character '&#x%;'."),
   /** FOCH0002. */
-  WHICHCOLL_X(FOCH, 2, "Unknown collation '%'."),
+  WHICHCOLL_X(FOCH, 2, "%."),
   /** FOCH0003. */
   NORMUNI_X(FOCH, 3, "Unsupported normalization form ('%')."),
   /** FOCH0004. */
@@ -1000,7 +1000,7 @@ public enum Err {
   /** XQST0038. */
   DUPLCOLL(XQST, 38, "Duplicate 'collation' declaration."),
   /** XQST0038. */
-  WHICHDEFCOLL_X(XQST, 38, "Unknown collation '%'."),
+  WHICHDEFCOLL_X(XQST, 38, "%."),
   /** XQST0039. */
   FUNCDUPL_X(XQST, 39, "Duplicate function argument %."),
   /** XQST0040. */
@@ -1058,7 +1058,7 @@ public enum Err {
   /** XQST0075. */
   IMPLVAL(XQST, 75, "Validation not supported."),
   /** XQST0076. */
-  FLWORCOLL_X(XQST, 76, "Unknown collation '%'."),
+  FLWORCOLL_X(XQST, 76, "%."),
   /** XQST0079. */
   NOPRAGMA(XQST, 79, "Expecting pragma expression."),
   /** XQST0085. */

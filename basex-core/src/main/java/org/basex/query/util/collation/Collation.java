@@ -4,11 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.text.*;
-import java.util.*;
-
-import org.basex.core.*;
-import org.basex.io.serial.SerializerOptions.YesNo;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -21,35 +16,24 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class Collation {
+public abstract class Collation {
+  /** Case-insensitive collation. */
+  private static final byte[] NOCASE =
+      token("http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive");
+
   /** UCA collations. */
   private static final byte[] UCA = token("http://www.w3.org/2013/collation/UCA");
-  /** Implementation-defined collation URL. */
+  /** Implementation-defined collation URI. */
   private static final byte[] URL = token(Prop.URL + "/collation");
-  /** Initialization of locales. */
-  private static class Locales {
-    /** Available locales, indexed by language code. */
-    static HashMap<String, Locale> map = new HashMap<>();
-    static {
-      for(final Locale l : Locale.getAvailableLocales()) map.put(l.toString().replace('_', '-'), l);
-    }
-  }
-
-  /** Collator. */
-  @SuppressWarnings("rawtypes")
-  private final Comparator comp;
   /** Collation URI. */
-  private final byte[] uri;
+  private byte[] uri = EMPTY;
 
-  /**
-   * Private Constructor.
-   * @param comp comparator instance
-   * @param uri uri
-   */
-  @SuppressWarnings("rawtypes")
-  Collation(final Comparator comp, final byte[] uri) {
-    this.comp = comp;
-    this.uri = uri;
+  /** Search modes. */
+  protected static enum Mode {
+    /** Default. */      INDEX_OF,
+    /** End position. */ INDEX_AFTER,
+    /** Starts-with. */  STARTS_WITH,
+    /** Ends-with. */    ENDS_WITH
   }
 
   /**
@@ -80,77 +64,59 @@ public class Collation {
     }
     // return unicode point collation
     if(eq(COLLATION_URI, url)) return null;
-    // return unicode point collation
-    if(eq(NoCaseCollation.URL, url)) return NoCaseCollation.get();
 
     // create new collation or return cached instance
     if(qc.collations == null) qc.collations = new TokenObjMap<>();
     Collation coll = qc.collations.get(url);
     if(coll == null) {
-      final Collator cl = get(url, info, err);
-      if(cl == null) return null;
-      coll = new Collation(get(url, info, err), url);
+      coll = get(url, info, err);
       qc.collations.put(url, coll);
     }
     return coll;
   }
 
   /**
-   * Returns a collator instance for the specified uri.
-   * @param uri uri
+   * Returns a collation instance for the specified URI.
+   * @param uri collation URI
    * @param info input info
-   * @param err error code for unknown collation uris
-   * @return collator instance or {@code null} if uri is invalid.
+   * @param err error code for unknown collation URIs
+   * @return collation instance or {@code null} if uri is invalid.
    * @throws QueryException query exception
    */
-  private static Collator get(final byte[] uri, final InputInfo info, final Err err)
+  private static Collation get(final byte[] uri, final InputInfo info, final Err err)
       throws QueryException {
+
+    // case-insensitive collation
+    if(eq(NOCASE, uri)) return new NoCaseCollation();
 
     final int q = Token.indexOf(uri, '?');
     final byte[] base = q == -1 ? uri : substring(uri, 0, q);
     final String args = q == -1 ? "" : string(replace(substring(uri, q + 1), '&', ';'));
 
     final CollationOptions opts;
-    final boolean uca = eq(UCA, base);
-    if(uca) {
+    if(eq(UCA, base) && UCAOptions.ACTIVE) {
       opts = new UCAOptions();
     } else if(eq(URL, base)) {
       opts = new BaseXCollationOptions();
     } else {
-      throw err.get(info, uri);
+      throw err.get(info, Util.inf("Unknown collation '%'", uri));
     }
 
-    String fail = null;
-    for(final String param : args.split(";")) {
-      final String[] kv = param.split("=");
-      if(kv.length != 2) return null;
-      final String key = kv[0], val = kv[1];
-      try {
-        opts.assign(key, val);
-      } catch(final BaseXException ex) {
-        fail = key;
-      }
+    try {
+      return opts.get(args).uri(uri);
+    } catch(final IllegalArgumentException ex) {
+      throw err.get(info, ex);
     }
-    if(fail != null && (!uca || fail.equals(UCAOptions.FALLBACK.name()) ||
-        opts.get(UCAOptions.FALLBACK) == YesNo.NO)) throw err.get(info, uri);;
-
-    final Locale locale = Locales.map.get(opts.get(BaseXCollationOptions.LANG));
-    if(locale == null) throw err.get(info, uri);
-
-    final Collator coll = Collator.getInstance(locale);
-    if(!opts.assign(coll)) throw err.get(info, uri);
-    return coll;
   }
 
   /**
-   * Compares two strings.
-   * @param string string
-   * @param compare string to be compared
-   * @return result of check
+   * Assigns the specified URI.
+   * @param u uri
+   * @return self reference
    */
-  @SuppressWarnings("unchecked")
-  public int compare(final byte[] string, final byte[] compare) {
-    return comp.compare(string(string), string(compare));
+  public final Collation uri(final byte[] u) {
+    uri = u;
+    return this;
   }
 
   /**
@@ -232,13 +198,13 @@ public class Collation {
     return uri;
   }
 
-  /** Search modes. */
-  protected static enum Mode {
-    /** Default. */      INDEX_OF,
-    /** End position. */ INDEX_AFTER,
-    /** Starts-with. */  STARTS_WITH,
-    /** Ends-with. */    ENDS_WITH
-  }
+  /**
+   * Compares two strings.
+   * @param string string
+   * @param compare string to be compared
+   * @return result of check
+   */
+  public abstract int compare(final byte[] string, final byte[] compare);
 
   /**
    * Returns the start or end position of the specified substring.
@@ -249,74 +215,6 @@ public class Collation {
    * @return string index
    * @throws QueryException query exception
    */
-  protected int indexOf(final String string, final String sub, final Mode mode,
-      final InputInfo info) throws QueryException {
-
-    final RuleBasedCollator rbc = rbc(info);
-    final CollationElementIterator i = rbc.getCollationElementIterator(string);
-    final CollationElementIterator is = rbc.getCollationElementIterator(sub);
-    do {
-      final int cs = next(is);
-      if(cs == -1) return 0;
-      int c;
-      // find first equal character
-      do {
-        c = next(i);
-        if(c == -1) return -1;
-      } while(c != cs);
-
-      final int s = i.getOffset();
-      if(startsWith(i, is)) {
-        if(mode == Mode.INDEX_AFTER) {
-          return i.getOffset();
-        } else if(mode == Mode.ENDS_WITH) {
-          if(next(i) == -1) return s - 1;
-        } else {
-          return s - 1;
-        }
-      }
-      i.setOffset(s);
-      is.reset();
-    } while(mode != Mode.STARTS_WITH);
-
-    return -1;
-  }
-
-  /**
-   * Determines whether one string starts with another.
-   * @param i string iterator
-   * @param is substring iterator
-   * @return result of check
-   */
-  private static boolean startsWith(final CollationElementIterator i,
-      final CollationElementIterator is) {
-    do {
-      final int cs = next(is);
-      if(cs == -1) return true;
-      if(cs != next(i)) return false;
-    } while(true);
-  }
-
-  /**
-   * Returns the next element from an iterator.
-   * @param i iterator
-   * @return next element, or {@code -1}
-   */
-  private static int next(final CollationElementIterator i) {
-    do {
-      final int c = i.next();
-      if(c != 0) return c;
-    } while(true);
-  }
-
-  /**
-   * Converts the collator to a rule-based collator, or raises an error.
-   * @param info input info
-   * @return rule-based collator
-   * @throws QueryException query exception
-   */
-  private RuleBasedCollator rbc(final InputInfo info) throws QueryException {
-    if(comp instanceof RuleBasedCollator) return (RuleBasedCollator) comp;
-    throw CHARCOLL.get(info);
-  }
+  protected abstract int indexOf(final String string, final String sub, final Mode mode,
+      final InputInfo info) throws QueryException;
 }

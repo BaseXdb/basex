@@ -13,7 +13,7 @@ import org.basex.util.options.*;
  */
 public final class BaseXCollationOptions extends CollationOptions {
   /** Option: language. */
-  public static final StringOption LANG = new StringOption("lang", "");
+  public static final StringOption LANG = new StringOption("lang");
   /** Option: strength. */
   public static final EnumOption<Strength> STRENGTH = new EnumOption<>("strength", Strength.class);
   /** Option: decomposition. */
@@ -68,9 +68,19 @@ public final class BaseXCollationOptions extends CollationOptions {
   }
 
   @Override
-  boolean assign(final Collator coll) {
+  Collation get(final String args) {
+    final String error = check(args);
+    if(error != null) throw new IllegalArgumentException("Invalid option \"" + error + "\"");
+
+    Locale locale = Locale.US;
+    if(contains(LANG)) {
+      locale = Locales.map.get(get(LANG));
+      if(locale == null) throw error(LANG);
+    }
+
+    final Collator coll = Collator.getInstance(locale);
     if(contains(STRENGTH)) coll.setStrength(get(STRENGTH).value);
     if(contains(DECOMPOSITION)) coll.setDecomposition(get(DECOMPOSITION).value);
-    return true;
+    return new BaseXCollation(coll);
   }
 }

@@ -7,11 +7,11 @@ import java.io.*;
 import org.basex.data.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.io.serial.SerializerOptions.YesNo;
 import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.Options.YesNo;
 
 /**
  * Fn:put operation primitive.

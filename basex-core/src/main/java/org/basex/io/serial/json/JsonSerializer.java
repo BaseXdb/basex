@@ -7,7 +7,6 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.io.serial.*;
-import org.basex.io.serial.SerializerOptions.YesNo;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
@@ -16,6 +15,7 @@ import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.hash.*;
+import org.basex.util.options.Options.YesNo;
 
 /**
  * Abstract JSON serializer class.

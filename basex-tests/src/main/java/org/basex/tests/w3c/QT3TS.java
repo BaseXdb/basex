@@ -15,15 +15,15 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.io.serial.SerializerOptions.YesNo;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.func.fn.Compare.*;
+import org.basex.query.func.fn.Compare.Mode;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.tests.bxapi.*;
 import org.basex.tests.bxapi.xdm.*;
 import org.basex.util.*;
+import org.basex.util.options.Options.YesNo;
 
 /**
  * Driver for the XQuery/XPath/XSLT 3.* Test Suite, located at

@@ -19,13 +19,13 @@ import javax.xml.xpath.*;
 
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.io.serial.SerializerOptions.YesNo;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.options.Options.YesNo;
 import org.w3c.dom.*;
 import org.xml.sax.*;
 

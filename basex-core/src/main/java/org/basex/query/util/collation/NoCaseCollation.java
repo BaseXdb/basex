@@ -2,8 +2,6 @@ package org.basex.query.util.collation;
 
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.util.*;
 
@@ -14,19 +12,15 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class NoCaseCollation extends Collation {
-  /** Case-insensitive collation. */
-  static final byte[] URL =
-      token("http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive");
-
-  /** Private constructor. */
-  private static final NoCaseCollation INSTANCE = new NoCaseCollation();
-
-  /**
-   * Returns a singleton instance of this class.
-   * @return instance
-   */
-  static NoCaseCollation get() {
-    return INSTANCE;
+  @Override
+  public int compare(final byte[] string, final byte[] compare) {
+    final String str = string(string), cmp = string(compare);
+    final int tl = str.length(), cl = cmp.length(), l = Math.min(tl, cl);
+    for(int i = 0; i < l; ++i) {
+      final int c = diff(str.charAt(i), cmp.charAt(i));
+      if(c != 0) return c;
+    }
+    return tl - cl;
   }
 
   @Override
@@ -39,30 +33,12 @@ public final class NoCaseCollation extends Collation {
 
     for(int t = mode == Mode.ENDS_WITH ? tl - sl : 0; t < tl; ++t) {
       int s = 0;
-      while(comp(string.charAt(t + s), sub.charAt(s)) == 0) {
+      while(diff(string.charAt(t + s), sub.charAt(s)) == 0) {
         if(++s == sl) return mode == Mode.INDEX_AFTER ? t + s : t;
       }
       if(mode == Mode.STARTS_WITH) return -1;
     }
     return -1;
-  }
-
-  /** Private Constructor. */
-  @SuppressWarnings("rawtypes")
-  private NoCaseCollation() {
-    super(new Comparator() {
-      @Override
-      public int compare(final Object o1, final Object o2) {
-        final String s1 = (String) o1, s2 = (String) o2;
-        final int n1 = s1.length(), n2 = s2.length();
-        final int sl = Math.min(n1, n2);
-        for(int s = 0; s < sl; s++) {
-          final int d = comp(s1.charAt(s), s2.charAt(s));
-          if(d != 0) return d;
-        }
-        return n1 - n2;
-      }
-    }, URL);
   }
 
   /**
@@ -71,7 +47,7 @@ public final class NoCaseCollation extends Collation {
    * @param ch2 second character
    * @return difference
    */
-  private static int comp(final char ch1, final char ch2) {
+  private static int diff(final char ch1, final char ch2) {
     if(ch1 != ch2) {
       final int c1 = ch1 >= 'a' && ch1 <= 'z' ? ch1 - 0x20 : ch1;
       final int c2 = ch2 >= 'a' && ch2 <= 'z' ? ch2 - 0x20 : ch2;

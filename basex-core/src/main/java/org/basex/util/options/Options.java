@@ -25,6 +25,29 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public class Options implements Iterable<Option<?>> {
+  /** Yes/No enumeration. */
+  public enum YesNo {
+    /** Yes. */ YES,
+    /** No.  */ NO;
+
+    @Override
+    public String toString() {
+      return super.toString().toLowerCase(Locale.ENGLISH);
+    }
+  }
+
+  /** Yes/No/Omit enumeration. */
+  public enum YesNoOmit {
+    /** Yes.  */ YES,
+    /** No.   */ NO,
+    /** Omit. */ OMIT;
+
+    @Override
+    public String toString() {
+      return super.toString().toLowerCase(Locale.ENGLISH);
+    }
+  }
+
   /** Comment in configuration file. */
   private static final String PROPUSER = "# Local Options";
 
