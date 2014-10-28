@@ -648,7 +648,7 @@ public abstract class ParseExpr extends Expr {
    * Assures that the specified item item is an array.
    * @param it item to check
    * @return the array
-   * @throws QueryException if the item is not a array
+   * @throws QueryException if the item is not an array
    */
   protected Array toArray(final Item it) throws QueryException {
     if(it instanceof Array) return (Array) it;

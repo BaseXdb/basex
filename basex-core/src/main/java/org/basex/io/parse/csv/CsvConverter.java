@@ -41,9 +41,9 @@ public abstract class CsvConverter {
   }
 
   /**
-   * Returns a  for the given configuration.
+   * Returns a CSV converter for the given configuration.
    * @param copts options
-   * @return a CSV converter
+   * @return CSV converter
    */
   public static CsvConverter get(final CsvParserOptions copts) {
     switch(copts.get(CsvOptions.FORMAT)) {

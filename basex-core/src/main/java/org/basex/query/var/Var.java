@@ -167,9 +167,12 @@ public final class Var extends ExprInfo {
    * of this variable.
    *
    * Due to insufficient typing, the check will only be performed if:
-   * - the variable type is an instance of the specified type.
-   *   This way, expressions with super types like item() will not be rejected
-   * - the expression is to be promoted, and it is not of type node (eg: function-declaration-016)
+   * <ul>
+   *   <li> The variable type is an instance of the specified type.
+   *        This way, expressions with super types like item() will not be rejected.</li>
+   *   <li> The expression is to be promoted, and it is not of type node
+   *        (eg: function-declaration-016)</li>
+   * </ul>
    *
    * @param expr expression
    * @param info input info

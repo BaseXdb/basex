@@ -314,12 +314,12 @@ public final class TokenBuilder {
   /**
    * Adds the string representation of an object:
    * <ul>
-   * <li> objects of type {@link Throwable} are converted to a string representation
-   *      via {@link Util#message}.</li>
-   * <li> objects of type {@link Class} are converted via {@link Util#className(Class)}.</li>
-   * <li> {@code null} references are replaced by the string {@code "null"}.</li>
-   * <li> byte arrays are directly inserted as tokens.</li>
-   * <li> for all other typed, {@link Object#toString} is called.</li>
+   *   <li> objects of type {@link Throwable} are converted to a string representation
+   *        via {@link Util#message}.</li>
+   *   <li> objects of type {@link Class} are converted via {@link Util#className(Class)}.</li>
+   *   <li> {@code null} references are replaced by the string {@code "null"}.</li>
+   *   <li> byte arrays are directly inserted as tokens.</li>
+   *   <li> for all other typed, {@link Object#toString} is called.</li>
    * </ul>
    * The specified string may contain {@code "%"} characters as place holders.
    * All place holders will be replaced by the specified extensions. If a digit is

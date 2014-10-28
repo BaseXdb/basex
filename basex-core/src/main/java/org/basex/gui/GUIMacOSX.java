@@ -253,8 +253,7 @@ public final class GUIMacOSX {
   /**
    * Invokes a method on the given object that expects multiple arguments.
    * @param clazz class object to get the method from
-   * @param obj object on which the method should be invoked. Can be
-   *          {@code null} for static methods
+   * @param obj object on which the method should be invoked. Can be {@code null} for static methods
    * @param method name of the method to invoke
    * @param argClasses "types" of the arguments
    * @param argObjects argument values

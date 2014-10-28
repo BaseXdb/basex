@@ -90,8 +90,7 @@ abstract class TrieNode {
    * @param key key to delete
    * @param lvl level
    * @param ii input info
-   * @return updated map if changed, {@code null} if deleted,
-   *         {@code this} otherwise
+   * @return updated map if changed, {@code null} if deleted, {@code this} otherwise
    * @throws QueryException query exception
    */
   abstract TrieNode delete(int hash, Item key, int lvl, final InputInfo ii)

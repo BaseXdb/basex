@@ -48,9 +48,9 @@ public abstract class JsonConverter {
   }
 
   /**
-   * Returns a  for the given configuration.
+   * Returns a JSON converter for the given configuration.
    * @param jopts options
-   * @return a JSON converter
+   * @return JSON converter
    */
   public static JsonConverter get(final JsonParserOptions jopts) {
     switch(jopts.get(JsonOptions.FORMAT)) {

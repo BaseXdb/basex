@@ -246,8 +246,7 @@ public class ClientSession extends Session {
 
   /**
    * Receives the info string.
-   * @param output output stream to send result to. If {@code null}, no result
-   *           will be requested
+   * @param output output stream to send result to. If {@code null}, no result will be requested
    * @throws IOException I/O exception
    */
   private void receive(final OutputStream output) throws IOException {

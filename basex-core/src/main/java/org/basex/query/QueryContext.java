@@ -457,9 +457,9 @@ public final class QueryContext extends Proc {
   /**
    * Binds a value to a global variable. The specified type is interpreted as follows:
    * <ul>
-   *   <li>If {@code "json"} is specified, the value is converted according to the rules
-   *       specified in {@link JsonMapConverter}.</li>
-   *   <li>Otherwise, the type is cast to the specified XDM type.</li>
+   *   <li> If {@code "json"} is specified, the value is converted according to the rules
+   *        specified in {@link JsonMapConverter}.</li>
+   *   <li> Otherwise, the type is cast to the specified XDM type.</li>
    * </ul>
    * If the value is an XQuery {@link Value}, it is directly assigned.
    * Otherwise, it is cast to the XQuery data model, using a Java/XQuery mapping.

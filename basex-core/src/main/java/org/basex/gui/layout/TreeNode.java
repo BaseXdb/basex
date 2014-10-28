@@ -17,7 +17,7 @@ public abstract class TreeNode extends DefaultMutableTreeNode implements TreeWil
   /** Node name. */
   public final byte[] name;
   /** Relative path to this node. Starts with one slash, no trailing slashes.
-   *  File / folder name is not part of the path. */
+   *  File/folder name is not part of the path. */
   final byte[] path;
   /** Tree reference for lazy loading. */
   final BaseXTree tree;

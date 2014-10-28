@@ -69,7 +69,7 @@ public class Restore extends ABackup {
    * @param backup name of backup
    * @param cmd calling command instance
    * @param context database context
-   * @throws IOException  I/O exception
+   * @throws IOException I/O exception
    */
   public static void restore(final String db, final String backup, final Restore cmd,
       final Context context) throws IOException {

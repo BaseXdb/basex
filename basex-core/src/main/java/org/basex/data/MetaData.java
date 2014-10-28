@@ -50,7 +50,7 @@ public final class MetaData {
   public volatile boolean updindex;
   /** Indicates if a text index exists. */
   public volatile boolean textindex;
-  /** Indicates if a attribute index exists. */
+  /** Indicates if an attribute index exists. */
   public volatile boolean attrindex;
   /** Indicates if a full-text index exists. */
   public volatile boolean ftxtindex;
@@ -78,10 +78,9 @@ public final class MetaData {
   /** Language of full-text search index. */
   public volatile Language language;
 
-  /** Flag for out-of-date index structures.
-   *  Will be removed as soon as all indexes support updates. */
+  /** Indicates if index structures are out-dated. */
   public volatile boolean uptodate = true;
-  /** Flag to indicate possible corruption. */
+  /** Indicate if the database may be corrupt. */
   public volatile boolean corrupt;
   /** Dirty flag. */
   public volatile boolean dirty;

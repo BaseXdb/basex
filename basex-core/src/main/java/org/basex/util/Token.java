@@ -740,7 +740,7 @@ public final class Token {
    * @param token first token
    * @param compare token to be compared
    * @return 0 if tokens are equal, negative if first token is smaller,
-   *   positive if first token is bigger
+   *         positive if first token is bigger
    */
   public static int diff(final byte[] token, final byte[] compare) {
     final int tl = token.length;

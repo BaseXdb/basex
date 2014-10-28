@@ -31,7 +31,7 @@ public final class FTMatch extends ElementList implements Iterable<FTStringMatch
   }
 
   /**
-   * Adds a all matches of a full-text match.
+   * Adds all matches of a full-text match.
    * @param ftm match to be added
    * @return self reference
    */

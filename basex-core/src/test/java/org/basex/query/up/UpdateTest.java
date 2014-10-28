@@ -299,8 +299,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   }
 
   /**
-   *  **** TC tries to provoke multiple delete atomics on the same PRE within the same
-   * snapshot. *****
+   * TC tries to provoke multiple delete atomics on the same PRE within the same snapshot.
    *
    * Only delete primitives {@link DeleteNode} are allowed to create atomic delete
    * updates {@link AtomicUpdateCache}. This ensures that

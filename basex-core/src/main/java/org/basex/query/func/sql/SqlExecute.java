@@ -46,8 +46,7 @@ public class SqlExecute extends SqlFn {
   /**
    * Builds a sequence of elements from a query's result set.
    * @param rs result set
-   * @return sequence of elements <tuple/> each of which represents a row from
-   *         the result set
+   * @return sequence of elements <tuple/> each of which represents a row from the result set
    * @throws QueryException query exception
    */
   final NodeSeqBuilder buildResult(final ResultSet rs) throws QueryException {

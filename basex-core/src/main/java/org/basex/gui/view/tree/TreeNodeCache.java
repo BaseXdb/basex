@@ -131,14 +131,6 @@ final class TreeNodeCache implements TreeConstants {
   }
 
   /**
-   * Returns pre by given index.
-   * @param bo border
-   * @param ix index
-   * @return pre int getPrePerIndex(final TreeBorder bo, final int ix) { return
-   *         nodes[bo.level].get(bo.start + ix); }
-   */
-
-  /**
    * Searches for pre value or pre range.
    * @param lv level
    * @param lb left TreeBorder

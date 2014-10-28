@@ -1276,9 +1276,9 @@ public enum Function {
    * Constructs a function signature.
    * @param func reference to the class containing the function implementation
    * @param desc descriptive function string, containing the function name and its
-   *            arguments in parentheses. Optional arguments are represented in nested
-   *            square brackets; three dots indicate that the number of arguments of a
-   *            function is not limited
+   *             arguments in parentheses. Optional arguments are represented in nested
+   *             square brackets; three dots indicate that the number of arguments of a
+   *             function is not limited
    * @param args types of the function arguments
    * @param ret return type
    * @param flag static function properties

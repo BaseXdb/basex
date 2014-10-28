@@ -59,7 +59,7 @@ public final class DBLocking implements Locking {
   /**
    * Lock for global write locking.
    *
-   * Exclusive lock - if globally writing
+   * Exclusive lock - if globally writing,
    * Shared lock    - else
    */
   private final ReentrantReadWriteLock writeAll = new ReentrantReadWriteLock();

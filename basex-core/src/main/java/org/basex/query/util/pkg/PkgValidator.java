@@ -73,8 +73,7 @@ public final class PkgValidator {
   }
 
   /**
-   * Checks if secondary package, i.e. package involved in a dependency is
-   * already installed.
+   * Checks if secondary package, i.e. package involved in a dependency is already installed.
    * @param dep dependency
    * @return result
    */
@@ -116,7 +115,7 @@ public final class PkgValidator {
    * Checks compatibility of dependency version with installed version.
    * @param dep dependency
    * @param versions current versions - either currently installed versions
-   *        for a package or current version of BaseX
+   * for a package or current version of BaseX
    * @return available appropriate version
    */
   private static byte[] availVersion(final Dependency dep, final TokenSet versions) {

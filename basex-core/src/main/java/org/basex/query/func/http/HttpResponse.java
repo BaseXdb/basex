@@ -40,8 +40,7 @@ public final class HttpResponse {
    * Constructs http:response element and reads HTTP response content.
    * @param conn HTTP connection
    * @param status indicates if content is required
-   * @param utype content type provided by the user to interpret the
-   *          response content
+   * @param utype content type provided by the user to interpret the response content
    * @return result sequence of <http:response/> and content items
    * @throws IOException I/O Exception
    * @throws QueryException query exception

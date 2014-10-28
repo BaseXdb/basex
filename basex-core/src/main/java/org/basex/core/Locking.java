@@ -15,9 +15,9 @@ interface Locking {
    *
    * @param pr process
    * @param read names of databases to put read locks on.
-   *   Global locking is performed if the passed on reference is {@code null}
+   * Global locking is performed if the passed on reference is {@code null}
    * @param write names of databases to put write locks on.
-   *   Global locking is performed if the passed on reference is {@code null}
+   * Global locking is performed if the passed on reference is {@code null}
    */
   void acquire(final Proc pr, final StringList read, final StringList write);
 

@@ -3657,8 +3657,8 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "EQName" rule.
-   * @param err optional error message. Will be thrown if no EQName is found,
-   *   or ignored if set to {@code null}
+   * @param err optional error message. Will be thrown if no EQName is found, or ignored if set to
+   * {@code null}
    * @param def default namespace, or operation mode ({@link #URICHECK}, {@link #SKIPCHECK})
    * @return QName (may be {@code null})
    * @throws QueryException query exception
@@ -3701,8 +3701,8 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "QName" rule.
-   * @param err optional error message. Will be thrown if no QName is found, and
-   *   ignored if set to {@code null}
+   * @param err optional error message. Will be thrown if no QName is found, and ignored if set to
+   * {@code null}
    * @return QName string
    * @throws QueryException query exception
    */

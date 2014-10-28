@@ -112,15 +112,15 @@ public final class Prop {
    * <p>Determines the project's home directory for storing property files
    * and directories. The directory is chosen as follows:</p>
    * <ol>
-   * <li>First, the <b>system property</b> {@code "org.basex.path"} is checked.
-   *   If it contains a value, it is adopted as home directory.</li>
-   * <li>If not, the <b>current working directory</b> (defined by the system
-   *   property {@code "user.dir"}) is chosen if the file {@code .basex} or
-   *   {@code .basexhome} is found in this directory.</li>
-   * <li>Otherwise, the files are searched in the <b>application directory</b>
-   *   (the folder in which the application code is located).</li>
-   * <li>Otherwise, the <b>user's home directory</b> (defined in
-   *   {@code "user.home"}) is chosen.</li>
+   *   <li> First, the <b>system property</b> {@code "org.basex.path"} is checked.
+   *        If it contains a value, it is adopted as home directory.</li>
+   *   <li> If not, the <b>current working directory</b> (defined by the system
+   *        property {@code "user.dir"}) is chosen if the file {@code .basex} or
+   *        {@code .basexhome} is found in this directory.</li>
+   *   <li> Otherwise, the files are searched in the <b>application directory</b>
+   *        (the folder in which the application code is located).</li>
+   *   <li> Otherwise, the <b>user's home directory</b> (defined in
+   *        {@code "user.home"}) is chosen.</li>
    * </ol>
    * @return home directory
    */
