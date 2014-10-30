@@ -274,7 +274,7 @@ public abstract class StandardFunc extends Arr {
       final Map map = toMap(exprs[i], qc);
       for(final Item it : map.keys()) {
         final byte[] key;
-        if(it instanceof Str) {
+        if(it.type.isStringOrUntyped()) {
           key = it.string(null);
         } else {
           final QNm qnm = toQNm(it, false);

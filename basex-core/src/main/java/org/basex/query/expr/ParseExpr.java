@@ -587,9 +587,7 @@ public abstract class ParseExpr extends Expr {
    * @return QNm item
    * @throws QueryException query exception
    */
-  protected final QNm toQNm(final Item it, final boolean empty)
-      throws QueryException {
-
+  protected final QNm toQNm(final Item it, final boolean empty) throws QueryException {
     if(empty && it == null) return null;
     final Type ip = checkNoEmpty(it, AtomType.QNM).type;
     if(ip == AtomType.QNM) return (QNm) it;
