@@ -56,8 +56,8 @@
       <artifactId>junit</artifactId>
     </dependency>
     <dependency>
-    	<groupId>com.vividsolutions</groupId>
-    	<artifactId>jts</artifactId>
+      <groupId>com.vividsolutions</groupId>
+      <artifactId>jts</artifactId>
     </dependency>
   </dependencies>
 

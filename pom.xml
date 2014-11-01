@@ -26,7 +26,7 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.8.2</version>
+        <version>4.11</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -46,7 +46,7 @@
       <dependency>
         <groupId>org.ccil.cowan.tagsoup</groupId>
         <artifactId>tagsoup</artifactId>
-        <version>1.2</version>
+        <version>1.2.1</version>
         <scope>runtime</scope>
         <optional>true</optional>
       </dependency>
@@ -122,7 +122,7 @@
       <dependency>
         <groupId>commons-fileupload</groupId>
         <artifactId>commons-fileupload</artifactId>
-        <version>1.2.2</version>
+        <version>1.3.1</version>
       </dependency>
       <dependency>
         <groupId>com.vividsolutions</groupId>
@@ -132,14 +132,10 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-nop</artifactId>
-        <version>1.7.5</version>
+        <version>1.7.7</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <dependencies><!-- TODO --></dependencies>
-
-
 
   <!-- Project Information -->
   <name>BaseX</name>
@@ -158,11 +154,6 @@
     <name>BaseX Team</name>
     <url>http://basex.org</url>
   </organization>
-
-  <developers><!-- TODO --></developers>
-  <contributors><!-- TODO --></contributors>
-
-
 
   <!-- Environment Settings -->
   <issueManagement>
@@ -217,9 +208,6 @@
     <maven>3.0.0</maven>
   </prerequisites>
 
-  <ciManagement><!-- TODO --></ciManagement>
-  <pluginRepositories><!-- TODO --></pluginRepositories>
-
   <profiles>
     <profile>
       <id>release</id>
@@ -230,7 +218,7 @@
         <plugins>
           <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
-            <version>2.4</version>
+            <version>2.4.1</version>
             <inherited>true</inherited>
             <executions>
               <execution>
@@ -280,7 +268,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.1</version>
+          <version>3.2</version>
           <inherited>true</inherited>
           <configuration>
             <source>${compileSource}</source>
@@ -292,7 +280,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>buildnumber-maven-plugin</artifactId>
-          <version>1.2</version>
+          <version>1.3</version>
           <executions>
             <execution>
               <phase>validate</phase>
@@ -311,7 +299,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>2.4</version>
+          <version>2.5</version>
           <inherited>true</inherited>
           <configuration>
             <archive>
@@ -328,7 +316,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.15</version>
+          <version>2.17</version>
           <inherited>true</inherited>
           <configuration>
             <!-- <skipTests>true</skipTests> -->
@@ -339,7 +327,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
-          <version>2.2.1</version>
+          <version>2.4</version>
           <inherited>true</inherited>
           <configuration>
             <outputDirectory>target</outputDirectory>
@@ -358,7 +346,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
-          <version>2.4.1</version>
+          <version>2.5.1</version>
           <configuration>
             <tagNameFormat>@{project.version}</tagNameFormat>
             <releaseProfiles>release</releaseProfiles>
@@ -369,7 +357,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.8</version>
+          <version>2.9</version>
           <inherited>true</inherited>
           <configuration>
             <outputDirectory>${project.lib.directory}</outputDirectory>
@@ -389,7 +377,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
-          <version>1.2.1</version>
+          <version>1.3.2</version>
           <inherited>true</inherited>
           <executions>
             <execution>
@@ -403,14 +391,14 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
-          <version>2.7</version>
+          <version>2.8.2</version>
           <inherited>true</inherited>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.9</version>
+          <version>2.10.1</version>
           <inherited>true</inherited>
           <executions>
             <execution>
@@ -425,7 +413,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>2.10</version>
+          <version>2.13</version>
           <inherited>true</inherited>
           <executions>
             <execution>
@@ -498,11 +486,9 @@
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh-external</artifactId>
-        <version>2.6</version>
+        <version>2.7</version>
       </extension>
     </extensions>
   </build>
-
-  <reporting><!-- TODO --></reporting>
 
 </project>

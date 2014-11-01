@@ -150,7 +150,6 @@ final class BXServletRequest extends AbstractRequest {
     try {
       if(isMultiPart()) {
         parseQueryString(params, req.getQueryString());
-        @SuppressWarnings("unchecked")
         final List<FileItem> items = new ServletFileUpload().parseRequest(req);
         for(final FileItem item : items) {
           if(item.isFormField())
