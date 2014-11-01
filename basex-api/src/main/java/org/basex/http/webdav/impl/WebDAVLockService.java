@@ -118,7 +118,7 @@ public final class WebDAVLockService {
    * @throws IOException I/O exception
    */
   public boolean conflictingLocks(final String db, final String p) throws IOException {
-    return execute(new WebDAVQuery("w:conflicting-locks(" +
+    return !execute(new WebDAVQuery("w:conflicting-locks(" +
         "<w:lockinfo>" +
         "<w:path>{ $path }</w:path>" +
         "<w:scope>exclusive</w:scope>" +
