@@ -23,6 +23,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public class BaseX extends CLI {
+  /** Default prompt. */
+  private static final String PROMPT = "> ";
   /** Commands to be executed. */
   private IntList ops;
   /** Command arguments. */
@@ -181,7 +183,7 @@ public class BaseX extends CLI {
     // loop until console is set to false (may happen in server mode)
     while(console) {
       // get next line
-      final String in = cr.readLine();
+      final String in = cr.readLine(PROMPT);
       // end of input: break loop
       if(in == null) break;
       // skip empty lines
