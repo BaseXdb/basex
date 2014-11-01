@@ -1,11 +1,11 @@
 package org.basex.io.serial;
 
+import static org.junit.Assert.*;
+
 import javax.xml.bind.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.sax.*;
-
-import junit.framework.Assert;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
@@ -45,7 +45,7 @@ public class SAXSerializerTest extends SandboxTest {
 
       final SAXSerializerObject dom = jaxbContext.createUnmarshaller().unmarshal(saxSource,
           SAXSerializerObject.class).getValue();
-      Assert.assertEquals(42, dom.getValue());
+      assertEquals(42, dom.getValue());
     }
   }
 
@@ -63,7 +63,7 @@ public class SAXSerializerTest extends SandboxTest {
 
       final DOMResult result = new DOMResult();
       TransformerFactory.newInstance().newTransformer().transform(saxSource, result);
-      Assert.assertEquals("x", result.getNode().getFirstChild().getNamespaceURI());
+      assertEquals("x", result.getNode().getFirstChild().getNamespaceURI());
     }
   }
 }
