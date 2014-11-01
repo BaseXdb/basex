@@ -17,11 +17,6 @@ import org.basex.examples.local.*;
  * @author BaseX Team 2005-14, BSD License
  */
 public final class ServerAndLocal {
-  /** Local database context. */
-  static final Context CONTEXT = new Context();
-  /** Reference to the client session. */
-  static ClientSession session;
-
   /**
    * Runs the example code.
    * @param args (ignored) command-line arguments
@@ -30,65 +25,57 @@ public final class ServerAndLocal {
   public static void main(final String[] args) throws Exception {
     System.out.println("=== ServerAndLocal ===");
 
-    // ------------------------------------------------------------------------
+    // Create global context
+    final Context context = new Context();
+
     // Start server
     System.out.println("\n* Start server.");
     BaseXServer server = new BaseXServer();
 
-    // ------------------------------------------------------------------------
     // Create a client session with host name, port, user name and password
     System.out.println("\n* Create a client session.");
 
-    session = new ClientSession("localhost", 1984, "admin", "admin");
+    try(ClientSession session = new ClientSession("localhost", 1984, "admin", "admin")) {
+      // Locally cache the result of a server-side query
+      System.out.println("\n* Cache server-side query results.");
 
-    // -------------------------------------------------------------------------
-    // Locally cache the result of a server-side query
-    System.out.println("\n* Cache server-side query results.");
+      String result = send(session,
+          "XQUERY for $x in doc('src/main/resources/xml/input.xml') return $x");
 
-    String result = send(
-        "XQUERY for $x in doc('src/main/resources/xml/input.xml') return $x");
+      // Create a local database from the XML result string
+      System.out.println("\n* Create a local database.");
 
-    // -------------------------------------------------------------------------
-    // Create a local database from the XML result string
-    System.out.println("\n* Create a local database.");
+      new CreateDB("LocalDB", result).execute(context);
 
-    new CreateDB("LocalDB", result).execute(CONTEXT);
+      // Run a query on the locally cached results
+      System.out.print("\n* Run a local query: ");
 
-    // -------------------------------------------------------------------------
-    // Run a query on the locally cached results
-    System.out.print("\n* Run a local query: ");
+      System.out.println(new XQuery("//title").execute(context));
+    }
 
-    System.out.println(new XQuery("//title").execute(CONTEXT));
-
-    // ------------------------------------------------------------------------
-    // Close the client session
-    System.out.println("\n* Close the client session.");
-
-    session.close();
-
-    // ------------------------------------------------------------------------
     // Stop the server
     System.out.println("\n* Stop the server.");
     server.stop();
 
-    // ----------------------------------------------------------------------
     // Drop the local database
     System.out.println("\n* Drop the local database.");
 
-    new DropDB("LocalDB").execute(CONTEXT);
+    new DropDB("LocalDB").execute(context);
+
+    // Close context
+    context.close();
   }
 
   /**
    * Executes the specified command on the server and writes the
    * response to out.
    * Command info is printed to System.out by default.
+   * @param session client session
    * @param command command to be executed
    * @return string result of command
    * @throws IOException I/O exception
    */
-  private static String send(final String command) throws IOException {
-
-    // ------------------------------------------------------------------------
+  private static String send(final ClientSession session, final String command) throws IOException {
     // Execute the command
     return session.execute(command);
   }

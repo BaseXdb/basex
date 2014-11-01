@@ -21,13 +21,11 @@ public final class QueryCollection {
 
     System.out.println("=== QueryCollection ===");
 
-    // ------------------------------------------------------------------------
     // Create a collection from all XML documents in the specified directory
     System.out.println("\n* Create a collection.");
 
     new CreateDB("Collection", "src/main/resources/").execute(context);
 
-    // ------------------------------------------------------------------------
     // List all documents in the database
     System.out.println("\n* List all documents in the database:");
 
@@ -37,7 +35,6 @@ public final class QueryCollection {
         "return <doc path='{ base-uri($doc) }'/>"
     ).execute(context));
 
-    // ------------------------------------------------------------------------
     // Evaluate a query on a single document
     System.out.println("\n* Evaluate a query on a single document:");
 
@@ -50,13 +47,11 @@ public final class QueryCollection {
         "return concat($file-path, ' has ', count($doc//*), ' elements')"
     ).execute(context));
 
-    // ------------------------------------------------------------------------
     // Drop the database
     System.out.println("\n* Drop the database.");
 
     new DropDB("Collection").execute(context);
 
-    // ------------------------------------------------------------------------
     // Close the database context
     context.close();
   }

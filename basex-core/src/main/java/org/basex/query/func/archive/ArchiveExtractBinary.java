@@ -37,8 +37,7 @@ public class ArchiveExtractBinary extends ArchiveFn {
     final TokenSet hs = entries(1, qc);
 
     final TokenList tl = new TokenList();
-    final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
-    try {
+    try(final ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
       while(in.more()) {
         final ZipEntry ze = in.entry();
         if(!ze.isDirectory() && (hs == null || hs.delete(token(ze.getName())) != 0))
@@ -46,8 +45,6 @@ public class ArchiveExtractBinary extends ArchiveFn {
       }
     } catch(final IOException ex) {
       throw ARCH_FAIL_X.get(info, ex);
-    } finally {
-      in.close();
     }
     return tl;
   }

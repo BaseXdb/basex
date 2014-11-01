@@ -198,8 +198,7 @@ public final class GUIInput extends BaseXTextField {
     if(data == null) return;
 
     StringList sl;
-    final QueryContext qc = new QueryContext(gui.context);
-    try {
+    try(final QueryContext qc = new QueryContext(gui.context)) {
       final QuerySuggest qs = new QuerySuggest(query, qc, data);
       qs.parseMain();
       sl = qs.complete();
@@ -207,8 +206,6 @@ public final class GUIInput extends BaseXTextField {
     } catch(final QueryException ex) {
       sl = ex.suggest();
       pre = query.substring(0, ex.column() - 1);
-    } finally {
-      qc.close();
     }
     if(getCaretPosition() < pre.length()) sl = null;
     createCombo(sl);

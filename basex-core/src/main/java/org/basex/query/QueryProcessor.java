@@ -21,7 +21,7 @@ import org.basex.query.value.node.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class QueryProcessor extends Proc {
+public final class QueryProcessor extends Proc implements AutoCloseable {
   /** Pattern for detecting library modules. */
   private static final Pattern LIBMOD_PATTERN = Pattern.compile(
   "^(xquery( version ['\"].*?['\"])?( encoding ['\"].*?['\"])? ?; ?)?module namespace.*");
@@ -233,9 +233,7 @@ public final class QueryProcessor extends Proc {
     return query;
   }
 
-  /**
-   * Closes the processor.
-   */
+  @Override
   public void close() {
     qc.close();
   }

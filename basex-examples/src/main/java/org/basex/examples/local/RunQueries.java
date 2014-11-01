@@ -30,30 +30,25 @@ public final class RunQueries {
   public static void main(final String[] args) throws IOException, QueryException {
     System.out.println("=== RunQueries ===");
 
-    // ------------------------------------------------------------------------
     // Evaluate the specified XQuery
     String query =
         "for $x in doc('src/main/resources/xml/input.xml')//li return data($x)";
 
-    // ------------------------------------------------------------------------
     // Process the query by using the database command
     System.out.println("\n* Use the database command:");
 
     query(query);
 
-    // ------------------------------------------------------------------------
     // Directly use the query processor
     System.out.println("\n* Use the query processor:");
 
     process(query);
 
-    // ------------------------------------------------------------------------
     // Iterate through all query results
     System.out.println("\n* Serialize each single result:");
 
     serialize(query);
 
-    // ------------------------------------------------------------------------
     // Iterate through all query results
     System.out.println("\n* Convert each result to its Java representation:");
 
@@ -84,21 +79,14 @@ public final class RunQueries {
    * @throws QueryException if an error occurs while evaluating the query
    */
   static void process(final String query) throws QueryException {
-    // ------------------------------------------------------------------------
     // Create a query processor
-    QueryProcessor proc = new QueryProcessor(query, context);
+    try(QueryProcessor proc = new QueryProcessor(query, context)) {
+      // Execute the query
+      Result result = proc.execute();
 
-    // ------------------------------------------------------------------------
-    // Execute the query
-    Result result = proc.execute();
-
-    // ------------------------------------------------------------------------
-    // Print result as string.
-    System.out.println(result);
-
-    // ------------------------------------------------------------------------
-    // Close the query processor
-    proc.close();
+      // Print result as string.
+      System.out.println(result);
+    }
   }
 
   /**
@@ -110,23 +98,16 @@ public final class RunQueries {
    * @throws QueryException if an error occurs while evaluating the query
    */
   static void iterate(final String query) throws QueryException {
-    // ------------------------------------------------------------------------
     // Create a query processor
-    QueryProcessor proc = new QueryProcessor(query, context);
+    try(QueryProcessor proc = new QueryProcessor(query, context)) {
+      // Store the pointer to the result in an iterator:
+      Iter iter = proc.iter();
 
-    // ------------------------------------------------------------------------
-    // Store the pointer to the result in an iterator:
-    Iter iter = proc.iter();
-
-    // ------------------------------------------------------------------------
-    // Iterate through all items and serialize
-    for(Item item; (item = iter.next()) != null;) {
-      System.out.println(item.toJava());
+      // Iterate through all items and serialize
+      for(Item item; (item = iter.next()) != null;) {
+        System.out.println(item.toJava());
+      }
     }
-
-    // ------------------------------------------------------------------------
-    // Close the query processor
-    proc.close();
   }
 
   /**
@@ -139,31 +120,23 @@ public final class RunQueries {
    * @throws IOException if an error occurs while serializing the results
    */
   static void serialize(final String query) throws QueryException, IOException {
-    // ------------------------------------------------------------------------
     // Create a query processor
-    QueryProcessor proc = new QueryProcessor(query, context);
+    try(QueryProcessor proc = new QueryProcessor(query, context)) {
 
-    // ------------------------------------------------------------------------
-    // Store the pointer to the result in an iterator:
-    Iter iter = proc.iter();
+      // Store the pointer to the result in an iterator:
+      Iter iter = proc.iter();
 
-    // ------------------------------------------------------------------------
-    // Create a serializer instance
-    Serializer ser = proc.getSerializer(System.out);
+      // Create a serializer instance
+      Serializer ser = proc.getSerializer(System.out);
 
-    // ------------------------------------------------------------------------
-    // Iterate through all items and serialize contents
-    for(Item item; (item = iter.next()) != null;) {
-      ser.serialize(item);
+      // Iterate through all items and serialize contents
+      for(Item item; (item = iter.next()) != null;) {
+        ser.serialize(item);
+      }
+
+      // Close the serializer
+      ser.close();
+      System.out.println();
     }
-
-    // ------------------------------------------------------------------------
-    // Close the serializer
-    ser.close();
-    System.out.println();
-
-    // ------------------------------------------------------------------------
-    // Close the query processor
-    proc.close();
   }
 }

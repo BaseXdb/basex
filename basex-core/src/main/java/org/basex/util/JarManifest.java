@@ -29,12 +29,9 @@ final class JarManifest {
         while(list.hasMoreElements()) {
           final URL url = list.nextElement();
           if(!url.getFile().contains(jar)) continue;
-          final InputStream in = url.openStream();
-          try {
+          try(final InputStream in = url.openStream()) {
             m = new Manifest(in).getMainAttributes();
             break;
-          } finally {
-            in.close();
           }
         }
       } catch(final IOException ex) {

@@ -9,20 +9,12 @@ import org.basex.examples.local.*;
 
 /**
  * This class demonstrates database access via the client/server architecture.
- * It shows how to {@link #add(String, String)} and {@link #modify()} files.
+ * It shows how to add and modify files.
  * For further options see {@link QueryCollection}.
  *
  * @author BaseX Team 2005-14, BSD License
  */
 public final class ServerCollection {
-  /** Session reference. */
-  static ClientSession session;
-  /** XML Document Fragment Pt. 1. */
-  static final String XML_1 = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
-    + "<text version=\"draft\"><title>Chapter ";
-  /** XML Document Fragment Pt. 2. */
-  static final String XML_2 = "</title></text>";
-
   /**
    * Runs the example code.
    * @param args (ignored) command-line arguments
@@ -31,48 +23,42 @@ public final class ServerCollection {
   public static void main(final String[] args) throws Exception {
     System.out.println("=== ServerCollection ===");
 
-    // ------------------------------------------------------------------------
     // Start server
     System.out.println("\n* Start server.");
     BaseXServer server = new BaseXServer();
 
     // Create a client session with host name, port, user name and password
-    session = new ClientSession("localhost", 1984, "admin", "admin");
+    try(ClientSession session = new ClientSession("localhost", 1984, "admin", "admin")) {
 
-    // ------------------------------------------------------------------------
-    System.out.println("\n* Create a Collection.");
-    session.execute("CREATE DB input");
+      System.out.println("\n* Create a Collection.");
+      session.execute("CREATE DB input");
 
-    // ------------------------------------------------------------------------
-    // Add some 50 documents
-    System.out.println("\n* Adding 50 documents");
+      // Add some 50 documents
+      System.out.println("\n* Adding 50 documents");
 
-    for(int i = 0; i < 50; i++) {
-      String path = "/book/chapters/" + i + "/Chapter-" + i + ".xml";
-      add(path, XML_1 + i + XML_2);
+      // XML fragment to add
+      String xml1 = "<text version=\"draft\"><title>Chapter ";
+      String xml2 = "</title></text>";
+
+      for(int i = 0; i < 50; i++) {
+        String path = "/book/chapters/" + i + "/Chapter-" + i + ".xml";
+        add(session, path, xml1 + i + xml2);
+      }
+      // Add another Test Document in folder /book/chapters/0
+      String path = "/book/chapters/0/Chapter-test.xml";
+      add(session, path, xml1 + "test" + xml2);
+
+      // Find some documents using the collection command
+      find(session);
+
+      // Modify specific document(s)
+      System.out.println("\n* Modifying documents in folder /book/chapters/0:");
+      modify(session);
+
+      // Drop the database
+      session.execute("DROP DB input");
     }
-    // Add another Test Document in folder /book/chapters/0
-    String path = "/book/chapters/0/Chapter-test.xml";
-    add(path, XML_1 + "test" + XML_2);
 
-    // ------------------------------------------------------------------------
-    // Find some documents using the collection command
-    find();
-
-    // ------------------------------------------------------------------------
-    // Modify specific document(s)
-    System.out.println("\n* Modifying documents in folder /book/chapters/0:");
-    modify();
-
-    // ------------------------------------------------------------------------
-    // Drop the database
-    session.execute("DROP DB input");
-
-    // ------------------------------------------------------------------------
-    // Close the client session
-    session.close();
-
-    // ------------------------------------------------------------------------
     // Stop the server
     System.out.println("\n* Stop server.");
     server.stop();
@@ -80,10 +66,10 @@ public final class ServerCollection {
 
   /**
    * This Methods performs a simple path based search in a collection.
+   * @param session client session
    * @throws IOException I/O exception
    */
-  private static void find() throws IOException {
-    // ------------------------------------------------------------------------
+  private static void find(final ClientSession session) throws IOException {
     System.out.println("\n* Finding documents in folder /book/chapters/0:");
     System.out.println(session.execute(
         new XQuery(
@@ -94,9 +80,10 @@ public final class ServerCollection {
   /**
    * This method shows how to modify multiple documents at once.
    * It replaces the title of the matching documents with 1 2 3.
+   * @param session client session
    * @throws IOException I/O exception
    */
-  private static void modify() throws IOException {
+  private static void modify(final ClientSession session) throws IOException {
     session.execute(new XQuery(
         "for $doc in collection('input/book/chapters/0/')" + " return "
             + "replace value of node $doc/text/title  "
@@ -110,11 +97,12 @@ public final class ServerCollection {
   /**
    * Adds a document to the collection.
    * @param target optional target path
+   * @param session client session
    * @param xmlFragment XML Fragment
    * @throws IOException I/O exception
    */
-  private static void add(final String target, final String xmlFragment) throws IOException {
-
+  private static void add(final ClientSession session, final String target,
+      final String xmlFragment) throws IOException {
     session.execute(new Add(target, xmlFragment));
   }
 }

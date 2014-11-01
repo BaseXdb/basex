@@ -529,14 +529,11 @@ public final class EditorView extends View {
         execFile = file;
       } else {
         // parse query
-        final QueryContext qc = new QueryContext(gui.context);
-        try {
+        try(final QueryContext qc = new QueryContext(gui.context)) {
           qc.parse(input, lib, null, null);
           info(null);
         } catch(final QueryException ex) {
           info(ex);
-        } finally {
-          qc.close();
         }
       }
     } else if(file.hasSuffix(IO.JSONSUFFIX)) {

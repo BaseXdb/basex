@@ -25,19 +25,18 @@ public final class CreateCollection {
 
     System.out.println("=== CreateCollection ===");
 
-    // ------------------------------------------------------------------------
     // You can modify the CREATEFILTER property to import XML
     // files with suffixes other than XML (for example KML):
     new Set("CREATEFILTER", "*.xml").execute(context);
 
-    // Variant 1 --------------------------------------------------------------
+    // Variant 1:
     // Create a collection and add all documents within the specified path
     System.out.println("\n* Create a collection.");
 
     new CreateDB("Collection", "src/main/resources/").execute(context);
     new DropDB("Collection").execute(context);
 
-    // Variant 2 --------------------------------------------------------------
+    // Variant 2:
     // Or: Create an empty collection, add documents in a second pass
     // and optimize the database to refresh the index structures
     System.out.println("\n* Create an empty collection and add documents.");
@@ -46,25 +45,21 @@ public final class CreateCollection {
     new Add("", "src/main/resources/").execute(context);
     new Optimize().execute(context);
 
-    // ------------------------------------------------------------------------
     // Remove a single document from the collection
     System.out.println("\n* Remove a single document.");
 
     new Delete("test.xml").execute(context);
 
-    // ------------------------------------------------------------------------
     // Show information on the currently opened database
     System.out.println("\n* Show database information:");
 
     System.out.println(new InfoDB().execute(context));
 
-    // ------------------------------------------------------------------------
     // Drop the database
     System.out.println("\n* Drop the collection.");
 
     new DropDB("Collection").execute(context);
 
-    // ------------------------------------------------------------------------
     // Close the database context
     context.close();
   }

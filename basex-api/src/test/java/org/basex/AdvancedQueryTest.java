@@ -19,8 +19,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
    * @return result
    */
   private static String query(final String query) {
-    final QueryProcessor qp = new QueryProcessor(query, context);
-    try {
+    try(final QueryProcessor qp = new QueryProcessor(query, context)) {
       final ArrayOutput ao = new ArrayOutput();
       final Serializer ser = qp.getSerializer(ao);
       qp.execute().serialize(ser);
@@ -30,8 +29,6 @@ public abstract class AdvancedQueryTest extends SandboxTest {
       final AssertionError err = new AssertionError("Query failed:\n" + query);
       err.initCause(ex);
       throw err;
-    } finally {
-      qp.close();
     }
   }
 

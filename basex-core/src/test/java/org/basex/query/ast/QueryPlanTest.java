@@ -22,8 +22,7 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
    * @param pr queries on the query plan
    */
   protected static void check(final String qu, final String res, final String... pr) {
-    final QueryProcessor qp = new QueryProcessor(qu, context);
-    try {
+    try(final QueryProcessor qp = new QueryProcessor(qu, context)) {
       // parse and compile query plan
       qp.compile();
       // retrieve compiled query plan
@@ -41,8 +40,6 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
       final AssertionError err = new AssertionError(Util.message(ex));
       err.initCause(ex);
       throw err;
-    } finally {
-      qp.close();
     }
   }
 }

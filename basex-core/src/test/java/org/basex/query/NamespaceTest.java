@@ -713,9 +713,10 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void stripNS() throws Exception {
     final IO io = IO.get("<a xmlns:a='a'><b><c/><c/><c/></b></a>");
-    final QueryProcessor qp = new QueryProcessor("/*:a/*:b", context).context(new DBNode(io));
-    final ANode sub = (ANode) qp.iter().next();
-    DataBuilder.stripNS(sub, token("a"), context);
+    try(final QueryProcessor qp = new QueryProcessor("/*:a/*:b", context).context(new DBNode(io))) {
+      final ANode sub = (ANode) qp.iter().next();
+      DataBuilder.stripNS(sub, token("a"), context);
+    }
   }
 
   /**
@@ -725,14 +726,15 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   @Ignore
   public void xuty0004() {
-    try {
-      new QueryProcessor("declare variable $input-context external;" +
-          "let $source as node()* := (" +
-          "    <status>on leave</status>," +
-          "    <!-- for 6 months -->" +
-          "  )," +
-          "  $target := $input-context/works[1]/employee[1]" +
-          "return insert nodes $source into $target", context).execute();
+    final String query = "declare variable $input-context external;" +
+        "let $source as node()* := (" +
+        "    <status>on leave</status>," +
+        "    <!-- for 6 months -->" +
+        "  )," +
+        "  $target := $input-context/works[1]/employee[1]" +
+        "return insert nodes $source into $target";
+    try(final QueryProcessor qp = new QueryProcessor(query, context)) {
+      qp.execute();
     } catch(final QueryException ex) {
       assertEquals("XUTY0004", string(ex.qname().local()));
     }
@@ -768,7 +770,6 @@ public final class NamespaceTest extends AdvancedQueryTest {
    * @throws Exception exception
    */
   @Test
-  @Ignore
   public void defaultNS() throws Exception {
     create(1);
     query("<h xmlns='U'>{ doc('d1')/x }</h>/*", "");

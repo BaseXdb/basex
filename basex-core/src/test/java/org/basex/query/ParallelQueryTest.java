@@ -46,7 +46,9 @@ public final class ParallelQueryTest {
    * @throws QueryException exception
    */
   private String query() throws QueryException {
-    return new QueryProcessor(QUERY, context).value().toString();
+    try(final QueryProcessor qp = new QueryProcessor(QUERY, context)) {
+      return qp.value().toString();
+    }
   }
 
   /**

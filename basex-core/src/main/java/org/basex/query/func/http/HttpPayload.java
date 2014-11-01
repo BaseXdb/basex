@@ -109,8 +109,7 @@ public final class HttpPayload {
    * @throws IOException I/O Exception
    */
   private byte[] extract(final String ctype, final String ce) throws IOException {
-    final BufferedInputStream bis = new BufferedInputStream(in);
-    try {
+    try(final BufferedInputStream bis = new BufferedInputStream(in)) {
       final ByteList bl = new ByteList();
       for(int i; (i = bis.read()) != -1;) bl.add(i);
       // In case of XML, HTML or text content type, use supplied character set
@@ -119,8 +118,6 @@ public final class HttpPayload {
 
       // In case of binary data, do not encode anything
       return bl.finish();
-    } finally {
-      bis.close();
     }
   }
 
@@ -282,7 +279,6 @@ public final class HttpPayload {
     final byte[] bound = concat(DASHES, boundary(ext)), last = concat(bound, DASHES);
 
     final HashMap<String, Value> map = new HashMap<>();
-
     final ByteList cont = new ByteList();
     int lines = -1;
     String name = null, fn = null;
@@ -352,9 +348,11 @@ public final class HttpPayload {
       } else if(isText(ctype)) {
         val = Str.get(new TextInput(in).content());
       } else if(isMultipart(ctype)) {
-        final HttpPayload hp = new HttpPayload(in.inputStream(), true, null, opts);
-        hp.extractParts(concat(DASHES, hp.boundary(ext)), null);
-        val = hp.payloads();
+        try(final InputStream is = in.inputStream()) {
+          final HttpPayload hp = new HttpPayload(in.inputStream(), true, null, opts);
+          hp.extractParts(concat(DASHES, hp.boundary(ext)), null);
+          val = hp.payloads();
+        }
       }
     }
     return val == null ? new B64(in.read()) : val;

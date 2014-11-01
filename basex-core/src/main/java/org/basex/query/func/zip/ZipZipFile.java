@@ -101,12 +101,8 @@ public class ZipZipFile extends ZipFn {
           // write file to zip archive
           if(!new IOFile(src).exists()) throw ZIP_NOTFOUND_X.get(info, src);
 
-          BufferedInputStream bis = null;
-          try {
-            bis = new BufferedInputStream(new FileInputStream(src));
+          try(final BufferedInputStream bis = new BufferedInputStream(new FileInputStream(src))) {
             for(int c; (c = bis.read(data)) != -1;) zos.write(data, 0, c);
-          } finally {
-            if(bis != null) try { bis.close(); } catch(final IOException ignored) { }
           }
         } else {
           // no source reference: the child nodes are treated as file contents

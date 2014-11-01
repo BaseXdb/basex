@@ -300,7 +300,7 @@ public final class BaseXServer extends CLI implements Runnable {
   public static boolean ping(final String host, final int port) {
     try {
       // connect server with invalid login data
-      new ClientSession(host, port, "", "");
+      try(final ClientSession cs = new ClientSession(host, port, "", "")) { }
       return false;
     } catch(final LoginException ex) {
       // if login was checked, server is running

@@ -44,9 +44,8 @@ public final class ArchiveUpdate extends ArchiveCreate {
     if(en != null) do e++; while(entr.next() != null);
     if(e != c) throw ARCH_DIFF_X_X.get(info, e, c);
 
-    final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
-    final ArchiveOut out = ArchiveOut.get(in.format(), info);
-    try {
+    try(final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
+        final ArchiveOut out = ArchiveOut.get(in.format(), info)) {
       if(in instanceof GZIPIn)
         throw ARCH_MODIFY_X.get(info, in.format().toUpperCase(Locale.ENGLISH));
       // delete entries to be updated
@@ -57,12 +56,9 @@ public final class ArchiveUpdate extends ArchiveCreate {
         final Item[] it = hm.get(h);
         add(it[0], it[1], out, ZipEntry.DEFLATED, qc);
       }
+      return new B64(out.toArray());
     } catch(final IOException ex) {
       throw ARCH_FAIL_X.get(info, ex);
-    } finally {
-      in.close();
-      out.close();
     }
-    return new B64(out.toArray());
   }
 }

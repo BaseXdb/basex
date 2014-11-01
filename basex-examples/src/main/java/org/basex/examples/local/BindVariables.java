@@ -22,45 +22,36 @@ public final class BindVariables {
 
     System.out.println("=== BindVariable ===");
 
-    // ------------------------------------------------------------------------
     // Specify query to be executed
     String query =
       "declare variable $var1 as xs:string external;\n" +
       "declare variable $var2 external;\n" +
       "($var1, $var2)";
 
-    // ------------------------------------------------------------------------
     // Show query
     System.out.println("\n* Query:");
     System.out.println(query);
 
-    // ------------------------------------------------------------------------
     // Create a query processor
-    QueryProcessor proc = new QueryProcessor(query, context);
+    try(QueryProcessor proc = new QueryProcessor(query, context)) {
 
-    // ------------------------------------------------------------------------
-    // Define the items to be bound
-    String string = "Hello World!\n";
-    String number = "123";
+      // Define the items to be bound
+      String string = "Hello World!\n";
+      String number = "123";
 
-    // ------------------------------------------------------------------------
-    // Bind the variables
-    proc.bind("var1", string);
-    proc.bind("var2", number, "xs:integer");
+      // Bind the variables
+      proc.bind("var1", string);
+      proc.bind("var2", number, "xs:integer");
 
-    // ------------------------------------------------------------------------
-    // Execute the query
-    Result result = proc.execute();
+      // Execute the query
+      Result result = proc.execute();
 
-    System.out.println("\n* Result:");
+      System.out.println("\n* Result:");
 
-    // ------------------------------------------------------------------------
-    // Print result as string
-    System.out.println(result);
-
-    // ------------------------------------------------------------------------
-    // Close the query processor
-    proc.close();
+      // ------------------------------------------------------------------------
+      // Print result as string
+      System.out.println(result);
+    }
 
     // ------------------------------------------------------------------------
     // Close the database context

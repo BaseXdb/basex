@@ -22,41 +22,30 @@ public final class BindContext {
 
     System.out.println("=== BindContext ===");
 
-    // ------------------------------------------------------------------------
     // Specify query to be executed
     String query = "declare context item external; .";
 
-    // ------------------------------------------------------------------------
     // Show query
     System.out.println("\n* Query:");
     System.out.println(query);
 
-    // ------------------------------------------------------------------------
     // Create a query processor
-    QueryProcessor proc = new QueryProcessor(query, context);
+    try(QueryProcessor qp = new QueryProcessor(query, context)) {
 
-    // ------------------------------------------------------------------------
-    // Define the items to be bound
-    String item = "Hello World!\n";
+      // Define the items to be bound
+      String item = "Hello World!\n";
 
-    // ------------------------------------------------------------------------
-    // Bind the variables
-    proc.context(item);
+      // Bind the variables
+      qp.context(item);
 
-    // ------------------------------------------------------------------------
-    // Execute the query
-    Result result = proc.execute();
+      // Execute the query
+      Result result = qp.execute();
 
-    // ------------------------------------------------------------------------
-    // Print result as string
-    System.out.println("\n* Result:");
-    System.out.println(result);
+      // Print result as string
+      System.out.println("\n* Result:");
+      System.out.println(result);
+    }
 
-    // ------------------------------------------------------------------------
-    // Close the query processor
-    proc.close();
-
-    // ------------------------------------------------------------------------
     // Close the database context
     context.close();
   }

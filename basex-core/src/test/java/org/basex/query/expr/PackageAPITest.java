@@ -210,13 +210,13 @@ public final class PackageAPITest extends AdvancedQueryTest {
    */
   @Test
   public void importTwoModulesFromPkg() throws QueryException {
-    final QueryProcessor qp = new QueryProcessor(
+    try(final QueryProcessor qp = new QueryProcessor(
       "import module namespace ns1='ns1';" +
       "import module namespace ns3='ns3';" +
       "(ns1:test2() eq 'pkg2mod1') and (ns3:test() eq 'pkg2mod2')",
-      context);
-    assertEquals(qp.execute().toString(), "true");
-    qp.execute();
+      context)) {
+      assertEquals(qp.execute().toString(), "true");
+    }
   }
 
   /**
@@ -263,10 +263,10 @@ public final class PackageAPITest extends AdvancedQueryTest {
     assertTrue(file(dir + "/jar/wrapper.xq"));
 
     // use package
-    final QueryProcessor qp = new QueryProcessor(
-        "import module namespace j='jar'; j:print('test')", context);
-    assertEquals(qp.execute().toString(), "test");
-    qp.close();
+    try(final QueryProcessor qp = new QueryProcessor(
+        "import module namespace j='jar'; j:print('test')", context)) {
+      assertEquals(qp.execute().toString(), "test");
+    }
 
     // delete package
     assertTrue("Repo directory could not be deleted.", new IOFile(REPO, dir).delete());
@@ -279,16 +279,15 @@ public final class PackageAPITest extends AdvancedQueryTest {
   @Test
   public void importPkg() throws QueryException {
     // try with a package without dependencies
-    final QueryProcessor qp1 = new QueryProcessor(
-        "import module namespace ns3='ns3'; ns3:test()", context);
-    assertEquals(qp1.execute().toString(), "pkg2mod2");
-    qp1.execute();
-
+    try(final QueryProcessor qp = new QueryProcessor(
+        "import module namespace ns3='ns3'; ns3:test()", context)) {
+      assertEquals(qp.execute().toString(), "pkg2mod2");
+    }
     // try with a package with dependencies
-    final QueryProcessor qp2 = new QueryProcessor(
-        "import module namespace ns2='ns2'; ns2:test()", context);
-    assertEquals(qp2.execute().toString(), "pkg2mod2");
-    qp2.execute();
+    try(final QueryProcessor qp = new QueryProcessor(
+        "import module namespace ns2='ns2'; ns2:test()", context)) {
+      assertEquals(qp.execute().toString(), "pkg2mod2");
+    }
   }
 
   /**

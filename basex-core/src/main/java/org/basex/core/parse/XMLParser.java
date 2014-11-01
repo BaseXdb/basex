@@ -43,8 +43,9 @@ final class XMLParser extends CmdParser {
         if(!execute(COMMANDS + "/text()/string()", node).trim().isEmpty())
           throw error(Text.SYNTAX_X, '<' + COMMANDS + "><...></" + COMMANDS + '>');
       }
-      final QueryProcessor qa = new QueryProcessor(query, ctx).context(node);
-      for(final Item ia : qa.value()) cmds.add(command(ia));
+      try(final QueryProcessor qp = new QueryProcessor(query, ctx).context(node)) {
+        for(final Item ia : qp.value()) cmds.add(command(ia));
+      }
     } catch(final IOException ex) {
       throw error(Text.STOPPED_AT + '%', ex);
     }
@@ -208,7 +209,9 @@ final class XMLParser extends CmdParser {
    * @throws QueryException query exception
    */
   private String xml(final Item root) throws QueryException {
-    return new QueryProcessor("node()", ctx).context(root).execute().toString().trim();
+    try(final QueryProcessor qp = new QueryProcessor("node()", ctx)) {
+      return qp.context(root).execute().toString().trim();
+    }
   }
 
   /**
@@ -219,10 +222,11 @@ final class XMLParser extends CmdParser {
    * @throws QueryException query exception
    */
   private String execute(final String query, final Item context) throws QueryException {
-    final QueryProcessor qp = new QueryProcessor(query, ctx).context(context);
-    final Iter ir = qp.iter();
-    final Item it = ir.next();
-    return it == null ? "" : it.toJava().toString().trim();
+    try(final QueryProcessor qp = new QueryProcessor(query, ctx).context(context)) {
+      final Iter ir = qp.iter();
+      final Item it = ir.next();
+      return it == null ? "" : it.toJava().toString().trim();
+    }
   }
 
   /**
@@ -285,10 +289,10 @@ final class XMLParser extends CmdParser {
     }
 
     // run query
-    final QueryProcessor qp = new QueryProcessor(tb.toString(), ctx).context(root);
-    qp.bind("A", ma.value()).bind("O", oa.value());
-    if(!qp.execute().toString().isEmpty()) return true;
-
+    try(final QueryProcessor qp = new QueryProcessor(tb.toString(), ctx).context(root)) {
+      qp.bind("A", ma.value()).bind("O", oa.value());
+      if(!qp.execute().toString().isEmpty()) return true;
+    }
     // build error string
     final TokenBuilder syntax = new TokenBuilder();
     final byte[] nm = ((ANode) root).qname().string();

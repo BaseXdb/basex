@@ -199,19 +199,19 @@ public final class JsonSerializerTest extends SandboxTest {
   private static String serialize(final String qu, final JsonFormat format)
       throws Exception {
 
-    final QueryProcessor qp = new QueryProcessor(qu, context);
     final ArrayOutput ao = new ArrayOutput();
+    try(final QueryProcessor qp = new QueryProcessor(qu, context)) {
+      final JsonSerialOptions jopts = new JsonSerialOptions();
+      jopts.set(JsonOptions.FORMAT, format);
 
-    final JsonSerialOptions jopts = new JsonSerialOptions();
-    jopts.set(JsonOptions.FORMAT, format);
+      final SerializerOptions sopts = new SerializerOptions();
+      sopts.set(SerializerOptions.INDENT, YesNo.NO);
+      sopts.set(SerializerOptions.METHOD, SerialMethod.JSON);
+      sopts.set(SerializerOptions.JSON, jopts);
 
-    final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.INDENT, YesNo.NO);
-    sopts.set(SerializerOptions.METHOD, SerialMethod.JSON);
-    sopts.set(SerializerOptions.JSON, jopts);
-
-    final Serializer ser = Serializer.get(ao, sopts);
-    for(final Item it : qp.value()) ser.serialize(it);
+      final Serializer ser = Serializer.get(ao, sopts);
+      for(final Item it : qp.value()) ser.serialize(it);
+    }
     // replace quotes with apostrophes to increase legibility of tests
     return ao.toString().replace("\"", "'");
   }

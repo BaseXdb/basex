@@ -22,7 +22,6 @@ public final class WikiExample {
 
     System.out.println("=== WikiExample ===");
 
-    // ----------------------------------------------------------------------
     // Create a database from a remote XML document
     System.out.println("\n* Create a database from a file via http.");
 
@@ -32,7 +31,6 @@ public final class WikiExample {
     final String doc = "http://en.wikipedia.org/wiki/Wikipedia";
     new CreateDB("WikiExample", doc).execute(context);
 
-    // -------------------------------------------------------------------------
     // Insert a node before the closing body tag
     // N.B. do not forget to specify the namespace
     System.out.println("\n* Update the document.");
@@ -45,7 +43,6 @@ public final class WikiExample {
         "into //body"
     ).execute(context);
 
-    // ----------------------------------------------------------------------
     // Match all paragraphs' textual contents against
     // 'edit.*' AND ('article' or 'page')
     System.out.println("\n* Perform a full-text query:");

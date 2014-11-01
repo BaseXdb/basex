@@ -35,15 +35,12 @@ public final class GFLWORTest extends AdvancedQueryTest {
    * @param expected expected output
    */
   private static void query(final String query, final String expected) {
-    final QueryProcessor proc = new QueryProcessor(query, context);
-    try {
+    try(final QueryProcessor proc = new QueryProcessor(query, context)) {
       final String result = proc.value().serialize().toString();
       // quotes are replaced by apostrophes to simplify comparison
       assertEquals(expected.replaceAll("\"", "'"), result.replaceAll("\"", "'"));
     } catch(final Exception ex) {
       throw (Error) new AssertionError(Util.message(ex)).initCause(ex);
-    } finally {
-      proc.close();
     }
   }
 }

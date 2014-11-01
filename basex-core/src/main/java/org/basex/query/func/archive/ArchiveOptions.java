@@ -25,8 +25,7 @@ public final class ArchiveOptions extends StandardFunc {
     String format = null;
     int level = -1;
 
-    final ArchiveIn arch = ArchiveIn.get(archive.input(info), info);
-    try {
+    try(final ArchiveIn arch = ArchiveIn.get(archive.input(info), info)) {
       format = arch.format();
       while(arch.more()) {
         final ZipEntry ze = arch.entry();
@@ -36,8 +35,6 @@ public final class ArchiveOptions extends StandardFunc {
       }
     } catch(final IOException ex) {
       throw ARCH_FAIL_X.get(info, ex);
-    } finally {
-      arch.close();
     }
 
     // create result element

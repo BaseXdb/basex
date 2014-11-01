@@ -30,15 +30,11 @@ public final class Events extends HashMap<String, Sessions> {
   public Events() {
     if(!file.exists()) return;
 
-    DataInput in = null;
-    try {
-      in = new DataInput(file);
+    try(final DataInput in = new DataInput(file)) {
       final int s = in.readNum();
       for(int u = 0; u < s; ++u) put(string(in.readToken()), new Sessions());
     } catch(final IOException ex) {
       Util.errln(ex);
-    } finally {
-      if(in != null) try { in.close(); } catch(final IOException ignored) { }
     }
   }
 

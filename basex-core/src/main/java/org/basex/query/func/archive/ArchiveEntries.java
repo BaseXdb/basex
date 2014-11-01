@@ -24,8 +24,7 @@ public final class ArchiveEntries extends StandardFunc {
   public Iter iter(final QueryContext qc) throws QueryException {
     final B64 archive = toB64(exprs[0], qc, false);
     final ValueBuilder vb = new ValueBuilder();
-    final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
-    try {
+    try(final ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
       while(in.more()) {
         final ZipEntry ze = in.entry();
         if(ze.isDirectory()) continue;
@@ -42,8 +41,6 @@ public final class ArchiveEntries extends StandardFunc {
       return vb;
     } catch(final IOException ex) {
       throw ARCH_FAIL_X.get(info, ex);
-    } finally {
-      in.close();
     }
   }
 }

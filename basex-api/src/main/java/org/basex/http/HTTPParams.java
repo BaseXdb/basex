@@ -120,10 +120,12 @@ public final class HTTPParams {
       throws QueryException, IOException {
 
     final MainOptions opts = http.context().options;
-    final HttpPayload hp = new HttpPayload(body().inputStream(), true, null, opts);
-    final HashMap<String, Value> mp = hp.multiForm(ext);
-    for(final Map.Entry<String, Value> entry : mp.entrySet()) {
-      params.put(entry.getKey(), entry.getValue());
+    try(final InputStream is = body().inputStream()) {
+      final HttpPayload hp = new HttpPayload(is, true, null, opts);
+      final HashMap<String, Value> mp = hp.multiForm(ext);
+      for(final Map.Entry<String, Value> entry : mp.entrySet()) {
+        params.put(entry.getKey(), entry.getValue());
+      }
     }
   }
 

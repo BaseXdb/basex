@@ -55,44 +55,48 @@ final class RESTPost {
     try {
       // handle serialization parameters
       final SerializerOptions sopts = http.sopts();
-      QueryProcessor qp = new QueryProcessor("*/*:parameter", ctx).context(doc);
-      for(final Item param : qp.value()) {
-        final String name = value("@name", param, ctx);
-        final String value = value("@value", param, ctx);
-        if(sopts.option(name) != null) {
-          sopts.assign(name, value);
-        } else if(name.equals(WRAP)) {
-          http.wrapping = Util.yes(value);
-        } else {
-          throw HTTPCode.UNKNOWN_PARAM_X.get(name);
+      try(QueryProcessor qp = new QueryProcessor("*/*:parameter", ctx).context(doc)) {
+        for(final Item param : qp.value()) {
+          final String name = value("@name", param, ctx);
+          final String value = value("@value", param, ctx);
+          if(sopts.option(name) != null) {
+            sopts.assign(name, value);
+          } else if(name.equals(WRAP)) {
+            http.wrapping = Util.yes(value);
+          } else {
+            throw HTTPCode.UNKNOWN_PARAM_X.get(name);
+          }
         }
       }
 
       // handle database options
-      qp = new QueryProcessor("*/*:option", ctx).context(doc);
-      for(final Item it : qp.value()) {
-        final String name = value("@name", it, ctx).toUpperCase(Locale.ENGLISH);
-        final String value = value("@value", it, ctx);
-        ctx.options.assign(name, value);
+      try(final QueryProcessor qp = new QueryProcessor("*/*:option", ctx).context(doc)) {
+        for(final Item it : qp.value()) {
+          final String name = value("@name", it, ctx).toUpperCase(Locale.ENGLISH);
+          final String value = value("@value", it, ctx);
+          ctx.options.assign(name, value);
+        }
       }
 
       // handle variables
       final Map<String, String[]> vars = new HashMap<>();
-      qp = new QueryProcessor("*/*:variable", ctx).context(doc);
-      for(final Item it : qp.value()) {
-        final String name = value("@name", it, ctx);
-        final String value = value("@value", it, ctx);
-        final String type = value("@type", it, ctx);
-        vars.put(name, new String[] { value, type });
+      try(final QueryProcessor qp = new QueryProcessor("*/*:variable", ctx).context(doc)) {
+        for(final Item it : qp.value()) {
+          final String name = value("@name", it, ctx);
+          final String value = value("@value", it, ctx);
+          final String type = value("@type", it, ctx);
+          vars.put(name, new String[] { value, type });
+        }
       }
 
       // handle input
-      qp = new QueryProcessor("*/*:context/node()", ctx).context(doc);
-      String value = null;
-      for(final Item it : qp.value()) {
-        if(value != null) throw HTTPCode.MULTIPLE_CONTEXT_X.get();
-        // create main memory instance of the specified node
-        value = DataBuilder.stripNS((ANode) it, Token.token(REST_URI), ctx).serialize().toString();
+      String val = null;
+      try(final QueryProcessor qp = new QueryProcessor("*/*:context/node()", ctx).context(doc)) {
+        for(final Item it : qp.value()) {
+          if(val != null) throw HTTPCode.MULTIPLE_CONTEXT_X.get();
+          // create main memory instance of the specified node
+          val = DataBuilder.stripNS((ANode) it, Token.token(REST_URI), ctx).serialize().toString();
+        }
       }
 
       // handle request
@@ -100,8 +104,8 @@ final class RESTPost {
       final String text = value("*/*:text/text()", doc, ctx);
 
       if(request.equals(COMMAND)) return RESTCommand.get(rs, text);
-      if(request.equals(RUN)) return RESTRun.get(rs, text, vars, value);
-      return RESTQuery.get(rs, text, vars, value);
+      if(request.equals(RUN)) return RESTRun.get(rs, text, vars, val);
+      return RESTQuery.get(rs, text, vars, val);
 
     } catch(final QueryException ex) {
       throw HTTPCode.BAD_REQUEST_X.get(ex);
@@ -119,9 +123,10 @@ final class RESTPost {
   private static String value(final String query, final Item value, final Context ctx)
       throws QueryException {
 
-    final QueryProcessor qp = new QueryProcessor(query, ctx).context(value);
-    final Item it = qp.iter().next();
-    return it == null ? null : Token.string(it.string(null));
+    try(final QueryProcessor qp = new QueryProcessor(query, ctx).context(value)) {
+      final Item it = qp.iter().next();
+      return it == null ? null : Token.string(it.string(null));
+    }
   }
 
   /**

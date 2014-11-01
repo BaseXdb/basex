@@ -159,11 +159,8 @@ public final class UpdIndexTest extends SandboxTest {
    * @throws QueryException database exception
    */
   protected static String query(final String query) throws QueryException {
-    final QueryProcessor qp = new QueryProcessor(query, context);
-    try {
+    try(final QueryProcessor qp = new QueryProcessor(query, context)) {
       return qp.execute().toString().replaceAll("(\\r|\\n) *", "");
-    } finally {
-      qp.close();
     }
   }
 

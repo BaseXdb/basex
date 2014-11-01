@@ -1,5 +1,6 @@
 package org.basex.tests.bxapi;
 
+import java.io.*;
 import java.util.*;
 
 import javax.xml.namespace.*;
@@ -24,7 +25,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class XQuery implements Iterable<XdmItem> {
+public final class XQuery implements Iterable<XdmItem>, Closeable {
   /** Query processor. */
   private final QueryProcessor qp;
   /** Query iterator. */
@@ -249,11 +250,7 @@ public final class XQuery implements Iterable<XdmItem> {
     return qp.qc.serParams();
   }
 
-  /**
-   * Closes the query; will be called whenever if items have been returned.
-   * Should be manually called if not all items are retrieved.
-   * @throws XQueryException exception
-   */
+  @Override
   public void close() {
     qp.close();
   }

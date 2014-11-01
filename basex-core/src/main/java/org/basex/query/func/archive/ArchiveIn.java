@@ -17,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class ArchiveIn {
+public abstract class ArchiveIn implements AutoCloseable {
   /** Buffer. */
   private final byte[] data = new byte[IO.BLOCKSIZE];
 
@@ -78,8 +78,6 @@ public abstract class ArchiveIn {
     return ao.finish();
   }
 
-  /**
-   * Closes the stream.
-   */
+  @Override
   public abstract void close();
 }

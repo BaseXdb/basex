@@ -225,13 +225,13 @@ public final class RepoManager {
       throws QueryException, IOException {
 
     // parse module to find namespace uri
-    final Context ctx = repo.context;
-    final byte[] uri = new QueryContext(ctx).parseLibrary(string(content), path, null).name.uri();
-
-    // copy file to rewritten URI file path
-    final String uriPath = ModuleLoader.uri2path(string(uri));
-    if(uriPath == null) throw BXRE_URI_X.get(info, uri);
-    return write(uriPath + IO.XQMSUFFIX, content);
+    try(final QueryContext qc = new QueryContext(repo.context)) {
+      final byte[] uri = qc.parseLibrary(string(content), path, null).name.uri();
+      // copy file to rewritten URI file path
+      final String uriPath = ModuleLoader.uri2path(string(uri));
+      if(uriPath == null) throw BXRE_URI_X.get(info, uri);
+      return write(uriPath + IO.XQMSUFFIX, content);
+    }
   }
 
   /**

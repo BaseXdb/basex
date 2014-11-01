@@ -60,7 +60,6 @@ public final class FTIndexQueryTest extends SandboxTest {
 
   /** Word distance test. */
   @Test
-  @Ignore("GH-359")
   public void testWordsDistance() {
     assertQuery(
         "//*[text() contains text 'A B' all words distance exactly 0 words]");
@@ -68,7 +67,6 @@ public final class FTIndexQueryTest extends SandboxTest {
 
   /** {@code ft:mark()} test with ft option {@code all words}. */
   @Test
-  @Ignore("GH-337")
   public void testFTMarkAllWords() {
     assertQuery(
         _FT_MARK.args(" //*[text() contains text {'A B'} all words], 'b'"));

@@ -160,16 +160,13 @@ public abstract class AdvancedQueryTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   private static String run(final String query) throws QueryException, IOException {
-    final QueryProcessor qp = new QueryProcessor(query, context);
-    qp.sc.baseURI(BASEURI);
-    try {
-      final ArrayOutput ao = new ArrayOutput();
+    final ArrayOutput ao = new ArrayOutput();
+    try(final QueryProcessor qp = new QueryProcessor(query, context)) {
+      qp.sc.baseURI(BASEURI);
       final Serializer ser = qp.getSerializer(ao);
       qp.execute().serialize(ser);
       ser.close();
-      return ao.toString().replaceAll("(\\r|\\n)+ *", "");
-    } finally {
-      qp.close();
     }
+    return ao.toString().replaceAll("(\\r|\\n)+ *", "");
   }
 }

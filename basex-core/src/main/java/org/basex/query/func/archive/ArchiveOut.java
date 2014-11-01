@@ -17,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class ArchiveOut {
+public abstract class ArchiveOut implements AutoCloseable {
   /** Output. */
   final ArrayOutput ao = new ArrayOutput();
   /** Buffer. */
@@ -61,9 +61,7 @@ public abstract class ArchiveOut {
    */
   public abstract void write(final ZipEntry entry, final byte[] value) throws IOException;
 
-  /**
-   * Closes the stream.
-   */
+  @Override
   public abstract void close();
 
   /**

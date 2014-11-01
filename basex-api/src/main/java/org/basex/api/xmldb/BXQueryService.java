@@ -118,8 +118,8 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
    */
   private BXResourceSet query(final String query, final Value nodes) throws XMLDBException {
     // creates a query instance
-    final QueryProcessor qp = new QueryProcessor(query, coll.ctx).context(nodes);
-    try {
+    try(final QueryProcessor qp = new QueryProcessor(query, coll.ctx)) {
+      qp.context(nodes);
       qp.parse();
       try {
         coll.ctx.register(qp);

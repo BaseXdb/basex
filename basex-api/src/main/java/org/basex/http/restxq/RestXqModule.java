@@ -44,8 +44,7 @@ final class RestXqModule {
     functions.clear();
 
     // loop through all functions
-    final QueryContext qc = parseModule(http);
-    try {
+    try(final QueryContext qc = qc(http)) {
       // loop through all functions
       final String name = file.name();
       for(final StaticFunc uf : qc.funcs.funcs()) {
@@ -55,8 +54,6 @@ final class RestXqModule {
           if(rxf.parse()) functions.add(rxf);
         }
       }
-    } finally {
-      qc.close();
     }
     return !functions.isEmpty();
   }
@@ -95,25 +92,22 @@ final class RestXqModule {
       throws Exception {
 
     // create new XQuery instance
-    final QueryContext qc = parseModule(http);
-    try {
+    try(final QueryContext qc = qc(http)) {
       final RestXqFunction rxf = new RestXqFunction(find(qc, func.function), qc, this);
       rxf.parse();
       new RestXqResponse().create(rxf, qc, http, error);
-    } finally {
-      qc.close();
     }
   }
 
   // PRIVATE METHODS ====================================================================
 
   /**
-   * Parses the module and returns the query context.
+   * Retrieves a query context for the given module.
    * @param http http context
    * @return query context
    * @throws QueryException query exception
    */
-  private QueryContext parseModule(final HTTPContext http) throws QueryException {
+  private QueryContext qc(final HTTPContext http) throws QueryException {
     final QueryContext qc = new QueryContext(http.context());
     try {
       qc.parse(string(file.read()), file.path(), null);
@@ -121,8 +115,6 @@ final class RestXqModule {
     } catch(final IOException ex) {
       // may be triggered when reading the file
       throw IOERR_X.get(null, ex);
-    } finally {
-      qc.close();
     }
   }
 

@@ -283,189 +283,188 @@ public abstract class W3CTS extends Main {
       }
 
       context.options.set(MainOptions.QUERYINFO, compile);
-      final QueryProcessor qp = new QueryProcessor(in, context);
-      if(curr != null) qp.context(curr);
-      context.options.set(MainOptions.QUERYINFO, false);
+      try(final QueryProcessor qp = new QueryProcessor(in, context)) {
+        if(curr != null) qp.context(curr);
+        context.options.set(MainOptions.QUERYINFO, false);
 
-      final ArrayOutput ao = new ArrayOutput();
-      final TokenBuilder files = new TokenBuilder();
+        final ArrayOutput ao = new ArrayOutput();
+        final TokenBuilder files = new TokenBuilder();
 
-      try {
-        files.add(file(nodes("*:input-file", state),
-            nodes("*:input-file/@variable", state), qp, s == 0));
-        files.add(file(nodes("*:defaultCollection", state), null, qp, s == 0));
-        var(nodes("*:input-URI", state), nodes("*:input-URI/@variable", state), qp);
-        eval(nodes("*:input-query/@name", state), nodes("*:input-query/@variable", state), pth, qp);
+        try {
+          files.add(file(nodes("*:input-file", state),
+              nodes("*:input-file/@variable", state), qp, s == 0));
+          files.add(file(nodes("*:defaultCollection", state), null, qp, s == 0));
+          var(nodes("*:input-URI", state), nodes("*:input-URI/@variable", state), qp);
+          eval(nodes("*:input-query/@name", state), nodes("*:input-query/@variable", state), pth, qp);
 
-        parse(qp, state);
+          parse(qp, state);
 
-        for(final Item node : nodes("*:module", root)) {
-          final String uri = text("@namespace", node);
-          final String file = IO.get(mods.get(string(node.string(null))) + IO.XQSUFFIX).path();
-          qp.module(uri, file);
-        }
-
-        // evaluate query
-        value = qp.value();
-
-        // serialize query
-        final SerializerOptions sp = new SerializerOptions();
-        sp.set(SerializerOptions.INDENT, NO);
-        final Serializer ser = Serializer.get(ao, sp);
-        for(final Item it : value) ser.serialize(it);
-        ser.close();
-
-      } catch(final Exception ex) {
-        if(!(ex instanceof QueryException || ex instanceof IOException)) {
-          Util.errln("\n*** " + outname + " ***");
-          Util.errln(in + '\n');
-          Util.stack(ex);
-        }
-        er = ex.getMessage();
-        if(er.startsWith(STOPPED_AT)) er = er.substring(er.indexOf('\n') + 1);
-        if(!er.isEmpty() && er.charAt(0) == '[')
-          er = er.replaceAll("\\[(.*?)\\] (.*)", "$1 $2");
-        // unexpected error - dump stack trace
-      }
-
-      // print compilation steps
-      if(compile) {
-        Util.errln("---------------------------------------------------------");
-        Util.err(qp.info());
-        Util.errln(in);
-      }
-
-      final Value expOut = nodes("*:output-file/text()", state);
-      final TokenList result = new TokenList();
-      for(final Item item : expOut) {
-        final String resFile = string(item.string(null));
-        final IOFile exp = new IOFile(expected + pth + resFile);
-        result.add(read(exp).replaceAll("\r\n|\r|\n", Prop.NL));
-      }
-
-      final Value cmpFiles = nodes("*:output-file/@compare", state);
-      boolean xml = false, frag = false, ignore = false;
-      for(final Item item : cmpFiles) {
-        final byte[] type = item.string(null);
-        xml |= eq(type, XML);
-        frag |= eq(type, FRAGMENT);
-        ignore |= eq(type, IGNORE);
-      }
-
-      String expError = text("*:expected-error/text()", state);
-
-      final StringBuilder log = new StringBuilder(pth + inname + IO.XQSUFFIX);
-      if(!files.isEmpty()) log.append(" [").append(files).append(']');
-      log.append(NL);
-
-      // Remove comments.
-      log.append(norm(in)).append(NL);
-      final String logStr = log.toString();
-      // skip queries with variable results
-      final boolean print = currTime || !logStr.contains("current-");
-
-      boolean correctError = false;
-      if(er != null && (expOut.size() == 0 || !expError.isEmpty())) {
-        expError = error(pth + outname, expError);
-        final String code = er.substring(0, Math.min(8, er.length()));
-        for(final String e : SLASH.split(expError)) {
-          if(code.equals(e)) {
-            correctError = true;
-            break;
+          for(final Item node : nodes("*:module", root)) {
+            final String uri = text("@namespace", node);
+            final String file = IO.get(mods.get(string(node.string(null))) + IO.XQSUFFIX).path();
+            qp.module(uri, file);
           }
+
+          // evaluate query
+          value = qp.value();
+
+          // serialize query
+          final SerializerOptions sp = new SerializerOptions();
+          sp.set(SerializerOptions.INDENT, NO);
+          final Serializer ser = Serializer.get(ao, sp);
+          for(final Item it : value) ser.serialize(it);
+          ser.close();
+
+        } catch(final Exception ex) {
+          if(!(ex instanceof QueryException || ex instanceof IOException)) {
+            Util.errln("\n*** " + outname + " ***");
+            Util.errln(in + '\n');
+            Util.stack(ex);
+          }
+          er = ex.getMessage();
+          if(er.startsWith(STOPPED_AT)) er = er.substring(er.indexOf('\n') + 1);
+          if(!er.isEmpty() && er.charAt(0) == '[')
+            er = er.replaceAll("\\[(.*?)\\] (.*)", "$1 $2");
+          // unexpected error - dump stack trace
         }
-      }
 
-      if(correctError) {
-        if(print) {
-          logOK.append(logStr);
-          logOK.append("[Right] ");
-          logOK.append(norm(er));
-          logOK.append(NL);
-          logOK.append(NL);
-          addLog(pth, outname + ".log", er);
+        // print compilation steps
+        if(compile) {
+          Util.errln("---------------------------------------------------------");
+          Util.err(qp.info());
+          Util.errln(in);
         }
-        ++ok;
-      } else if(er == null) {
-        int r = -1;
-        final int rs = result.size();
 
-        while(!ignore && ++r < rs) {
-          inspect |= r < cmpFiles.size() && eq(cmpFiles.itemAt(r).string(null), INSPECT);
+        final Value expOut = nodes("*:output-file/text()", state);
+        final TokenList result = new TokenList();
+        for(final Item item : expOut) {
+          final String resFile = string(item.string(null));
+          final IOFile exp = new IOFile(expected + pth + resFile);
+          result.add(read(exp).replaceAll("\r\n|\r|\n", Prop.NL));
+        }
 
-          final String expect = string(result.get(r));
-          final String actual = ao.toString();
-          if(expect.equals(actual)) break;
+        final Value cmpFiles = nodes("*:output-file/@compare", state);
+        boolean xml = false, frag = false, ignore = false;
+        for(final Item item : cmpFiles) {
+          final byte[] type = item.string(null);
+          xml |= eq(type, XML);
+          frag |= eq(type, FRAGMENT);
+          ignore |= eq(type, IGNORE);
+        }
 
-          if(xml || frag) {
-            try {
-              final Value v = toValue(expect.replaceAll("^<\\?xml.*?\\?>", "").trim(), frag);
-              if(new Compare().equal(value.iter(), v.iter())) break;
-              if(new Compare().equal(toValue(actual, frag).iter(), v.iter())) break;
-            } catch(final Throwable ex) {
-              Util.errln('\n' + outname + ':');
-              Util.stack(ex);
+        String expError = text("*:expected-error/text()", state);
+
+        final StringBuilder log = new StringBuilder(pth + inname + IO.XQSUFFIX);
+        if(!files.isEmpty()) log.append(" [").append(files).append(']');
+        log.append(NL);
+
+        // Remove comments.
+        log.append(norm(in)).append(NL);
+        final String logStr = log.toString();
+        // skip queries with variable results
+        final boolean print = currTime || !logStr.contains("current-");
+
+        boolean correctError = false;
+        if(er != null && (expOut.size() == 0 || !expError.isEmpty())) {
+          expError = error(pth + outname, expError);
+          final String code = er.substring(0, Math.min(8, er.length()));
+          for(final String e : SLASH.split(expError)) {
+            if(code.equals(e)) {
+              correctError = true;
+              break;
             }
           }
         }
-        if((rs > 0 || !expError.isEmpty()) && r == rs && !inspect) {
-          if(print) {
-            if(expOut.size() == 0) result.add(error(pth + outname, expError));
-            logErr.append(logStr);
-            logErr.append('[' + testid + " ] ");
-            logErr.append(norm(string(result.get(0))));
-            logErr.append(NL);
-            logErr.append("[Wrong] ");
-            logErr.append(norm(ao.toString()));
-            logErr.append(NL);
-            logErr.append(NL);
-            addLog(pth, outname + (xml ? IO.XMLSUFFIX : ".txt"), ao.toString());
-          }
-          correct = false;
-          ++err;
-        } else {
+
+        if(correctError) {
           if(print) {
             logOK.append(logStr);
             logOK.append("[Right] ");
-            logOK.append(norm(ao.toString()));
+            logOK.append(norm(er));
             logOK.append(NL);
             logOK.append(NL);
-            addLog(pth, outname + (xml ? IO.XMLSUFFIX : ".txt"), ao.toString());
+            addLog(pth, outname + ".log", er);
           }
           ++ok;
-        }
-      } else {
-        if(expOut.size() == 0 || !expError.isEmpty()) {
-          if(print) {
-            logOK2.append(logStr);
-            logOK2.append('[' + testid + " ] ");
-            logOK2.append(norm(expError));
-            logOK2.append(NL);
-            logOK2.append("[Rght?] ");
-            logOK2.append(norm(er));
-            logOK2.append(NL);
-            logOK2.append(NL);
-            addLog(pth, outname + ".log", er);
+        } else if(er == null) {
+          int r = -1;
+          final int rs = result.size();
+
+          while(!ignore && ++r < rs) {
+            inspect |= r < cmpFiles.size() && eq(cmpFiles.itemAt(r).string(null), INSPECT);
+
+            final String expect = string(result.get(r));
+            final String actual = ao.toString();
+            if(expect.equals(actual)) break;
+
+            if(xml || frag) {
+              try {
+                final Value v = toValue(expect.replaceAll("^<\\?xml.*?\\?>", "").trim(), frag);
+                if(new Compare().equal(value.iter(), v.iter())) break;
+                if(new Compare().equal(toValue(actual, frag).iter(), v.iter())) break;
+              } catch(final Throwable ex) {
+                Util.errln('\n' + outname + ':');
+                Util.stack(ex);
+              }
+            }
           }
-          ++ok2;
+          if((rs > 0 || !expError.isEmpty()) && r == rs && !inspect) {
+            if(print) {
+              if(expOut.size() == 0) result.add(error(pth + outname, expError));
+              logErr.append(logStr);
+              logErr.append('[' + testid + " ] ");
+              logErr.append(norm(string(result.get(0))));
+              logErr.append(NL);
+              logErr.append("[Wrong] ");
+              logErr.append(norm(ao.toString()));
+              logErr.append(NL);
+              logErr.append(NL);
+              addLog(pth, outname + (xml ? IO.XMLSUFFIX : ".txt"), ao.toString());
+            }
+            correct = false;
+            ++err;
+          } else {
+            if(print) {
+              logOK.append(logStr);
+              logOK.append("[Right] ");
+              logOK.append(norm(ao.toString()));
+              logOK.append(NL);
+              logOK.append(NL);
+              addLog(pth, outname + (xml ? IO.XMLSUFFIX : ".txt"), ao.toString());
+            }
+            ++ok;
+          }
         } else {
-          if(print) {
-            logErr2.append(logStr);
-            logErr2.append('[' + testid + " ] ");
-            logErr2.append(norm(string(result.get(0))));
-            logErr2.append(NL);
-            logErr2.append("[Wrong] ");
-            logErr2.append(norm(er));
-            logErr2.append(NL);
-            logErr2.append(NL);
-            addLog(pth, outname + ".log", er);
+          if(expOut.size() == 0 || !expError.isEmpty()) {
+            if(print) {
+              logOK2.append(logStr);
+              logOK2.append('[' + testid + " ] ");
+              logOK2.append(norm(expError));
+              logOK2.append(NL);
+              logOK2.append("[Rght?] ");
+              logOK2.append(norm(er));
+              logOK2.append(NL);
+              logOK2.append(NL);
+              addLog(pth, outname + ".log", er);
+            }
+            ++ok2;
+          } else {
+            if(print) {
+              logErr2.append(logStr);
+              logErr2.append('[' + testid + " ] ");
+              logErr2.append(norm(string(result.get(0))));
+              logErr2.append(NL);
+              logErr2.append("[Wrong] ");
+              logErr2.append(norm(er));
+              logErr2.append(NL);
+              logErr2.append(NL);
+              addLog(pth, outname + ".log", er);
+            }
+            correct = false;
+            ++err2;
           }
-          correct = false;
-          ++err2;
         }
       }
-      //if(curr != null) Close.close(curr.data, context);
-      qp.close();
     }
 
     if(reporting) {
@@ -602,9 +601,9 @@ public abstract class W3CTS extends Main {
     for(int n = 0; n < ns; ++n) {
       final String file = pth + string(nodes.itemAt(n).string(null)) + IO.XQSUFFIX;
       final String in = read(new IOFile(queries + file));
-      final QueryProcessor xq = new QueryProcessor(in, context);
-      qp.bind(string(vars.itemAt(n).string(null)), xq.value());
-      xq.close();
+      try(final QueryProcessor xq = new QueryProcessor(in, context)) {
+        qp.bind(string(vars.itemAt(n).string(null)), xq.value());
+      }
     }
   }
 
@@ -664,7 +663,9 @@ public abstract class W3CTS extends Main {
    * @throws QueryException query exception
    */
   protected Value nodes(final String qu, final Value root) throws QueryException {
-    return new QueryProcessor(qu, context).context(root).value();
+    try(final QueryProcessor qp = new QueryProcessor(qu, context)) {
+      return qp.context(root).value();
+    }
   }
 
   /**

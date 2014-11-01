@@ -79,9 +79,13 @@ public final class HttpResponse {
     // construct <http:body/>
     final boolean body = status == null || !Bln.parse(status, info);
     if(is != null) {
-      final HttpPayload hp = new HttpPayload(is, body, info, options);
-      response.add(hp.parse(error, type, utype));
-      if(body) vb.add(hp.payloads());
+      try {
+        final HttpPayload hp = new HttpPayload(is, body, info, options);
+        response.add(hp.parse(error, type, utype));
+        if(body) vb.add(hp.payloads());
+      } finally {
+        is.close();
+      }
     }
     return vb;
   }

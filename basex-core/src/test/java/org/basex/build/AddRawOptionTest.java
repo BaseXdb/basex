@@ -70,13 +70,10 @@ public class AddRawOptionTest extends SandboxTest {
    */
   private static void assertAllFilesExist() throws IOException {
     final HashSet<String> files = new HashSet<>();
-    final Session session = new LocalSession(context);
-    try {
-      final Query q = session.query(Function._DB_LIST.args(NAME));
-      while(q.more()) files.add(q.next());
-      q.close();
-    } finally {
-      session.close();
+    try(final Session session = new LocalSession(context)) {
+      try(final Query q = session.query(Function._DB_LIST.args(NAME))) {
+        while(q.more()) files.add(q.next());
+      }
     }
 
     assertFalse("No files were imported", files.isEmpty());

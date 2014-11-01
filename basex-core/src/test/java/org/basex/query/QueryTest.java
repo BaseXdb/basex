@@ -37,8 +37,7 @@ public abstract class QueryTest extends SandboxTest {
       final String query = qu[correct ? 2 : 1].toString();
       final Value cmp = correct ? (Value) qu[1] : null;
 
-      final QueryProcessor qp = new QueryProcessor(query, context);
-      try {
+      try(final QueryProcessor qp = new QueryProcessor(query, context)) {
         final Value val = qp.value();
         if(!correct || !new Compare().equal(val, cmp)) {
           sb.append("[" + qu[0] + "] " + query);
@@ -68,8 +67,6 @@ public abstract class QueryTest extends SandboxTest {
           ex.printStackTrace();
           ++fail;
         }
-      } finally {
-        qp.close();
       }
     }
     if(fail != 0) fail(fail + " Errors. [E] = expected, [F] = found:\n" + sb.toString().trim());

@@ -122,8 +122,7 @@ public final class OptimizeAll extends ACreate {
 
     // build database and index structures
     try(final DiskBuilder builder = new DiskBuilder(tname, new DBParser(old, cmd), ctx)) {
-      final DiskData d = builder.build();
-      try {
+      try(final DiskData d = builder.build()) {
         if(m.createtext) create(IndexType.TEXT, d, cmd);
         if(m.createattr) create(IndexType.ATTRIBUTE, d, cmd);
         if(m.createftxt) create(IndexType.FULLTEXT, d, cmd);
@@ -140,8 +139,6 @@ public final class OptimizeAll extends ACreate {
         if(bin.exists()) bin.rename(d.meta.binaries());
         final IOFile upd = old.updateFile();
         if(upd.exists()) upd.copyTo(d.updateFile());
-      } finally {
-        d.close();
       }
     }
     // return database instance

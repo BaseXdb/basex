@@ -42,7 +42,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class QueryContext extends Proc {
+public final class QueryContext extends Proc implements AutoCloseable {
   /** URL pattern (matching Clark and EQName notation). */
   private static final Pattern BIND = Pattern.compile("^((\"|')(.*?)\\2:|Q?(\\{(.*?)\\}))(.+)$");
 
@@ -556,9 +556,7 @@ public final class QueryContext extends Proc {
     updating = true;
   }
 
-  /**
-   * Closes the query context.
-   */
+  @Override
   public void close() {
     // close only once
     if(closed) return;

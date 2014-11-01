@@ -74,8 +74,7 @@ final class Unit {
     final ArrayList<StaticFunc> test = new ArrayList<>(0);
     final Performance perf = new Performance();
 
-    final QueryContext qc = new QueryContext(ctx);
-    try {
+    try(final QueryContext qc = new QueryContext(ctx)) {
       input = string(file.read());
       qc.parse(input, file.path(), null);
 
@@ -163,9 +162,6 @@ final class Unit {
         suite.add(tc);
         addError(ex, tc, null);
       }
-
-    } finally {
-      qc.close();
     }
 
     if(suite.hasChildren()) {
@@ -255,19 +251,16 @@ final class Unit {
   private void eval(final StaticFunc func) throws QueryException {
     current = func;
 
-    final QueryContext qctx = proc.proc(new QueryContext(ctx));
-    qctx.listen = proc.listen;
-    try {
+    try(final QueryContext qctx = new QueryContext(ctx)) {
+      qctx.listen = proc.listen;
       qctx.parse(input, file.path(), null);
       qctx.mainModule(new MainModule(find(qctx, func), new Expr[0]));
       qctx.compile();
 
       final Iter iter = qctx.iter();
       if(iter.next() != null) throw UNIT_EMPTY_X.get(null, func.name.local());
-
     } finally {
       proc.proc(null);
-      qctx.close();
     }
   }
 

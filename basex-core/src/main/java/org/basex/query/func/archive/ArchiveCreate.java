@@ -29,43 +29,42 @@ public class ArchiveCreate extends ArchiveFn {
     final Options opts = toOptions(2, Q_OPTIONS, new ArchOptions(), qc);
 
     final String format = opts.get(ArchOptions.FORMAT);
-    final ArchiveOut out = ArchiveOut.get(format.toLowerCase(Locale.ENGLISH), info);
-    // check algorithm
-    final String alg = opts.get(ArchOptions.ALGORITHM);
-    int level = ZipEntry.DEFLATED;
-    if(alg != null) {
-      if(format.equals(ZIP)  && !eq(alg, STORED, DEFLATE) ||
-         format.equals(GZIP) && !eq(alg, DEFLATE)) {
-        throw ARCH_SUPP_X_X.get(info, ArchOptions.ALGORITHM.name(), alg);
+    try(final ArchiveOut out = ArchiveOut.get(format.toLowerCase(Locale.ENGLISH), info)) {
+      // check algorithm
+      final String alg = opts.get(ArchOptions.ALGORITHM);
+      int level = ZipEntry.DEFLATED;
+      if(alg != null) {
+        if(format.equals(ZIP)  && !eq(alg, STORED, DEFLATE) ||
+           format.equals(GZIP) && !eq(alg, DEFLATE)) {
+          throw ARCH_SUPP_X_X.get(info, ArchOptions.ALGORITHM.name(), alg);
+        }
+        if(eq(alg, STORED)) level = ZipEntry.STORED;
+        else if(eq(alg, DEFLATE)) level = ZipEntry.DEFLATED;
       }
-      if(eq(alg, STORED)) level = ZipEntry.STORED;
-      else if(eq(alg, DEFLATE)) level = ZipEntry.DEFLATED;
-    }
-    out.level(level);
+      out.level(level);
 
-    try {
-      Item en, cn;
-      int e = 0, c = 0;
-      while(true) {
-        en = entr.next();
-        cn = cont.next();
-        if(en == null || cn == null) break;
-        if(out instanceof GZIPOut && c > 0)
-          throw ARCH_ONE_X.get(info, format.toUpperCase(Locale.ENGLISH));
-        add(checkElemToken(en), cn, out, level, qc);
-        e++;
-        c++;
+      try {
+        Item en, cn;
+        int e = 0, c = 0;
+        while(true) {
+          en = entr.next();
+          cn = cont.next();
+          if(en == null || cn == null) break;
+          if(out instanceof GZIPOut && c > 0)
+            throw ARCH_ONE_X.get(info, format.toUpperCase(Locale.ENGLISH));
+          add(checkElemToken(en), cn, out, level, qc);
+          e++;
+          c++;
+        }
+        // count remaining entries
+        if(cn != null) do c++; while(cont.next() != null);
+        if(en != null) do e++; while(entr.next() != null);
+        if(e != c) throw ARCH_DIFF_X_X.get(info, e, c);
+      } catch(final IOException ex) {
+        throw ARCH_FAIL_X.get(info, ex);
       }
-      // count remaining entries
-      if(cn != null) do c++; while(cont.next() != null);
-      if(en != null) do e++; while(entr.next() != null);
-      if(e != c) throw ARCH_DIFF_X_X.get(info, e, c);
-    } catch(final IOException ex) {
-      throw ARCH_FAIL_X.get(info, ex);
-    } finally {
-      out.close();
+      return new B64(out.toArray());
     }
-    return new B64(out.toArray());
   }
 
   /**

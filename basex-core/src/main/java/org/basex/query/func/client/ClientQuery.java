@@ -35,9 +35,7 @@ public final class ClientQuery extends ClientFn {
     final ClientSession cs = session(qc, false);
     final String query = Token.string(toToken(exprs[1], qc));
     final ValueBuilder vb = new ValueBuilder();
-    org.basex.api.client.ClientQuery cq = null;
-    try {
-      cq = cs.query(query);
+    try(org.basex.api.client.ClientQuery cq = cs.query(query)) {
       // bind variables and context value
       for(final Map.Entry<String, Value> binding : toBindings(2, qc).entrySet()) {
         final String k = binding.getKey();
@@ -63,8 +61,6 @@ public final class ClientQuery extends ClientFn {
       throw BXCL_QUERY_X.get(info, ex);
     } catch(final IOException ex) {
       throw BXCL_COMM_X.get(info, ex);
-    } finally {
-      if(cq != null) try { cq.close(); } catch(final IOException ignored) { }
     }
   }
 }

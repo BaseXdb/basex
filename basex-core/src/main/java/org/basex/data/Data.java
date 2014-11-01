@@ -68,7 +68,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class Data {
+public abstract class Data implements AutoCloseable {
   /** Node kind: document (code: {@code 0}). */
   public static final byte DOC = 0x00;
   /** Node kind: element (code: {@code 1}). */
@@ -110,9 +110,7 @@ public abstract class Data {
   /** States if distance caching is active. */
   public boolean cache;
 
-  /**
-   * Closes the database.
-   */
+  @Override
   public abstract void close();
 
   /**

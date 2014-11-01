@@ -36,8 +36,6 @@ public final class InspectFunctions extends StandardFunc {
         qc.compile();
       } catch(final IOException ex) {
         throw IOERR_X.get(info, ex);
-      } finally {
-        qc.close();
       }
     }
 

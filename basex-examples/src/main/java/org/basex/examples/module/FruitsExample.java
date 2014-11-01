@@ -22,7 +22,6 @@ public final class FruitsExample {
 
     System.out.println("=== FruitsExample ===");
 
-    // ------------------------------------------------------------------------
     // Specify query to be executed
     String query =
         "import module namespace fruits = " +
@@ -40,25 +39,17 @@ public final class FruitsExample {
     System.out.println("\n* Query:");
     System.out.println(query);
 
-    // ------------------------------------------------------------------------
     // Create a query processor
-    QueryProcessor processor = new QueryProcessor(query, context);
+    try(QueryProcessor processor = new QueryProcessor(query, context)) {
+      // Execute the query
+      Result result = processor.execute();
 
-    // ------------------------------------------------------------------------
-    // Execute the query
-    Result result = processor.execute();
+      System.out.println("\n* Result:");
 
-    System.out.println("\n* Result:");
+      // Print result as string
+      System.out.println(result);
+    }
 
-    // ------------------------------------------------------------------------
-    // Print result as string
-    System.out.println(result);
-
-    // ------------------------------------------------------------------------
-    // Close the query processor
-    processor.close();
-
-    // ------------------------------------------------------------------------
     // Close the database context
     context.close();
   }

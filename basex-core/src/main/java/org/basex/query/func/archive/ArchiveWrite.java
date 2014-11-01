@@ -27,8 +27,7 @@ public final class ArchiveWrite extends ArchiveFn {
     final B64 archive = toB64(exprs[1], qc, false);
     final TokenSet hs = entries(2, qc);
 
-    final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
-    try {
+    try(final ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
       while(in.more()) {
         final ZipEntry ze = in.entry();
         final String name = ze.getName();
@@ -44,8 +43,6 @@ public final class ArchiveWrite extends ArchiveFn {
       }
     } catch(final IOException ex) {
       throw ARCH_FAIL_X.get(info, ex);
-    } finally {
-      in.close();
     }
     return null;
   }
