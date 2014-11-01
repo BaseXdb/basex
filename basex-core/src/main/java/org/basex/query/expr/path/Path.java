@@ -125,8 +125,8 @@ public abstract class Path extends ParseExpr {
     if(steps.length == 0) return root == null ? new Context(info) : root;
 
     final Value init = qc.value, cv = initial(qc);
-    final boolean doc = cv != null && cv.type == NodeType.DOC;
     qc.value = cv;
+    final boolean doc = cv != null && cv.type == NodeType.DOC;
     try {
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
@@ -349,6 +349,16 @@ public abstract class Path extends ParseExpr {
    * @return root
    */
   private Value initial(final QueryContext qc) {
+    return initial(qc, root);
+  }
+
+  /**
+   * Returns the initial context value for the given root, or {@code null}.
+   * @param qc query context (may be @code null)
+   * @param root root expression
+   * @return root
+   */
+  public static Value initial(final QueryContext qc, final Expr root) {
     // current context value
     final Value v = qc != null ? qc.value : null;
     // no root or context expression: return context

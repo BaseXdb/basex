@@ -30,7 +30,7 @@ public final class ValidateDtd extends ValidateDtdInfo {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Value seq = super.value(qc);
-    if(seq == Empty.SEQ) return null;
+    if(seq.isEmpty()) return null;
     throw BXVA_FAIL_X.get(info, seq.iter().next());
   }
 }

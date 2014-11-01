@@ -51,9 +51,16 @@ public abstract class Preds extends ParseExpr {
 
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    final int pl = preds.length;
-    for(int p = 0; p < pl; ++p) preds[p] = preds[p].compile(qc, scp).optimizeEbv(qc, scp);
-    return this;
+    final Value init = qc.value;
+    // never compile predicates with empty sequence as context value (#1016)
+    if(init != null && init.isEmpty()) qc.value = null;
+    try {
+      final int pl = preds.length;
+      for(int p = 0; p < pl; ++p) preds[p] = preds[p].compile(qc, scp).optimizeEbv(qc, scp);
+      return this;
+    } finally {
+      qc.value = init;
+    }
   }
 
   @Override

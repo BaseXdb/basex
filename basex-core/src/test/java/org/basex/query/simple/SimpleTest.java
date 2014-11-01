@@ -160,6 +160,7 @@ public final class SimpleTest extends QueryTest {
         "declare function local:bar() { 1 };" +
         "local:foo()')" },
       { "FuncTest 3", "local:a(), local:a(1)" },
+      { "FuncTest 4", empty(), "()/x[function($x as item()){1}(.)]" },
 
       { "StaticVar 1", "declare variable $CONFIG := $CONFIG; delete node <a/>" },
 

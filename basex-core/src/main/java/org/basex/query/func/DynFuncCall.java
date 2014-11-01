@@ -73,7 +73,7 @@ public final class DynFuncCall extends FuncCall {
 
       // try to inline the function
       if(!(f instanceof FuncItem && comesFrom((FuncItem) f)) && !updating) {
-        final Expr[] args = Arrays.copyOf(exprs, exprs.length - 1);
+        final Expr[] args = Arrays.copyOf(exprs, ar);
         final Expr inl = ((XQFunctionExpr) f).inlineExpr(args, qc, scp, info);
         if(inl != null) return inl;
       }

@@ -70,12 +70,12 @@ public abstract class Filter extends Preds {
   public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     root = root.compile(qc, scp);
     // invalidate current context value (will be overwritten by filter)
-    final Value cv = qc.value;
+    final Value init = qc.value;
+    qc.value = Path.initial(qc, root);
     try {
-      qc.value = null;
       super.compile(qc, scp);
     } finally {
-      qc.value = cv;
+      qc.value = init;
     }
     return optimize(qc, scp);
   }
