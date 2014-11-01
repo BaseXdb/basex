@@ -128,7 +128,7 @@ public class FnHttpTest extends HTTPTest {
     // GET1 - just send a GET request
     try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='get' href='" + ROOT + "'/>"), ctx)) {
-      Result r = qp.execute();
+      final Result r = qp.execute();
       checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
       assertEquals(NodeType.DOC, ((Iter) r).get(1).type);
@@ -137,7 +137,7 @@ public class FnHttpTest extends HTTPTest {
     // GET2 - with override-media-type='text/plain'
     try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='get' override-media-type='text/plain'/>", ROOT), ctx)) {
-      Result r = qp.execute();
+      final Result r = qp.execute();
       checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
       assertEquals(AtomType.STR, ((Iter) r).get(1).type);

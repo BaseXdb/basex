@@ -73,7 +73,7 @@ public final class FnSort extends StandardFunc {
             final Value v1 = vl.get(i1), v2 = vl.get(i2);
             final long s1 = v1.size(), s2 = v2.size(), sl = Math.min(s1, s2);
             for(int v = 0; v < sl; v++) {
-              Item it1 = v1.itemAt(v), it2 = v2.itemAt(v);
+              final Item it1 = v1.itemAt(v), it2 = v2.itemAt(v);
               if(!it1.comparable(it2)) {
                 if(it1 instanceof FItem) throw FIEQ_X.get(sf.info, it1.type);
                 if(it2 instanceof FItem) throw FIEQ_X.get(sf.info, it2.type);
