@@ -20,35 +20,17 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 final class RestXqResponse {
-  /** Function to be evaluated. */
-  private final RestXqFunction function;
-  /** Query context. */
-  private final QueryContext query;
-  /** HTTP context. */
-  private final HTTPContext http;
-  /** Optional query error. */
-  private final QueryException error;
-
-  /**
-   * Constructor.
-   * @param rxf function to be evaluated
-   * @param qc query context
-   * @param hc HTTP context
-   * @param err optional query error
-   */
-  RestXqResponse(final RestXqFunction rxf, final QueryContext qc, final HTTPContext hc,
-      final QueryException err) {
-    function = rxf;
-    query = qc;
-    http = hc;
-    error = err;
-  }
-
   /**
    * Evaluates the specified function and creates a response.
+   * @param function function to be evaluated
+   * @param query query context
+   * @param http HTTP context
+   * @param error optional query error
    * @throws Exception exception (including unexpected ones)
    */
-  void create() throws Exception {
+  void create(final RestXqFunction function, final QueryContext query, final HTTPContext http,
+      final QueryException error) throws Exception {
+
     // bind variables
     final StaticFunc sf = function.function;
     final Expr[] args = new Expr[sf.args.length];

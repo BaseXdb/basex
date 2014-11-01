@@ -99,7 +99,7 @@ final class RestXqModule {
     try {
       final RestXqFunction rxf = new RestXqFunction(find(qc, func.function), qc, this);
       rxf.parse();
-      new RestXqResponse(rxf, qc, http, error).create();
+      new RestXqResponse().create(rxf, qc, http, error);
     } finally {
       qc.close();
     }
