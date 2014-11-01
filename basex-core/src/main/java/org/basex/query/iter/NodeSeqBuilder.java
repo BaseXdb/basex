@@ -161,7 +161,7 @@ public final class NodeSeqBuilder extends AxisIter {
   }
 
   /**
-   * Sorts the nodes, if necessary.
+   * Sorts the nodes if necessary.
    * @return self reference
    */
   public NodeSeqBuilder sort() {

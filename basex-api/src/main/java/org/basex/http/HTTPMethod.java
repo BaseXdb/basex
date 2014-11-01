@@ -20,7 +20,7 @@ public enum HTTPMethod {
   /** OPTIONS method. */
   OPTIONS;
 
-  /** Flag showing, if body can be present in the HTTP request with the current method. */
+  /** Flag showing if body can be present in the HTTP request with the current method. */
   public final boolean body;
 
   /** Default constructor. */

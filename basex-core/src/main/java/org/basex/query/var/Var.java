@@ -191,7 +191,7 @@ public final class Var extends ExprInfo {
   /**
    * Checks whether the given variable is identical to this one, i.e. has the same ID.
    * @param var variable to check
-   * @return {@code true}, if the IDs are equal, {@code false} otherwise
+   * @return {@code true} if the IDs are equal, {@code false} otherwise
    */
   public boolean is(final Var var) {
     return id == var.id;

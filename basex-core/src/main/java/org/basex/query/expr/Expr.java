@@ -216,8 +216,8 @@ public abstract class Expr extends ExprInfo {
    * Checks if the specified variable is replaceable by a context value.
    * The following tests might return false:
    * <ul>
-   * <li>{@link Preds#removable}, if one of the variables is used within a predicate.</li>
-   * <li>{@link MixedPath#removable}, if the variable occurs within the path.</li>
+   * <li>{@link Preds#removable} if one of the variables is used within a predicate.</li>
+   * <li>{@link MixedPath#removable} if the variable occurs within the path.</li>
    * </ul>
    * This method is called by {@link GFLWOR#compile(QueryContext, VarScope)} to rewrite where
    * clauses into predicates.
@@ -292,7 +292,7 @@ public abstract class Expr extends ExprInfo {
    * If the arguments of the called expression return a boolean anyway,
    * the expression will be simplified.</p>
    * <p>Example in {@link CmpV}:
-   * <code>if($x eq true())</code> is rewritten to <code>if($x)</code>, if <code>$x</code>
+   * <code>if($x eq true())</code> is rewritten to <code>if($x)</code> if <code>$x</code>
    * is known to return a single boolean.</p>
    * @param qc query context
    * @param scp variable scope

@@ -124,7 +124,7 @@ public final class Map extends FItem {
    * Checks if the given key exists in the map.
    * @param key key to look for (must not be {@code null})
    * @param ii input info
-   * @return {@code true()}, if the key exists, {@code false()} otherwise
+   * @return {@code true()} if the key exists, {@code false()} otherwise
    * @throws QueryException query exception
    */
   public boolean contains(final Item key, final InputInfo ii) throws QueryException {

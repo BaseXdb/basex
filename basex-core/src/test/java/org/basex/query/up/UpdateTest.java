@@ -25,7 +25,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Creates a database.
-   * @param input input database string, if null, then use default.
+   * @param input input database string; use default if {@code null}
    * @throws BaseXException database exception
    */
   private static void createDB(final String input) throws BaseXException {

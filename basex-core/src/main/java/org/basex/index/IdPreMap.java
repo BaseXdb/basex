@@ -295,8 +295,7 @@ public class IdPreMap {
   /**
    * Search for a given pre value.
    * @param pre pre value
-   * @return index of the record where the pre is found, or the insertion point, if not
-   * found
+   * @return index of the record where the pre is found, or the insertion point if not found
    */
   private int findPre(final int pre) {
     int low = 0;

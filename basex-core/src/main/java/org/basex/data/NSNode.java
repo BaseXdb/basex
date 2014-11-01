@@ -135,7 +135,7 @@ final class NSNode {
 
   /**
    * Finds a specific pre value in the child array utilizing binary search
-   * and returns its position, if it is contained.
+   * and returns its position if it is contained.
    * If it is not contained, it returns the position of the biggest element in
    * the array that is still smaller than p. If all elements in the array are
    * bigger, it returns -1.

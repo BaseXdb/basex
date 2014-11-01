@@ -320,7 +320,7 @@ public final class GUI extends AGUI {
   }
 
   /**
-   * Launches a query. Adds the default namespace, if available. The command is ignored if an update
+   * Launches a query. Adds the default namespace if available. The command is ignored if an update
    * operation takes place.
    * @param qu query to be run
    * @param edit editor panel

@@ -48,7 +48,7 @@ public abstract class BasicUpdate {
   /**
    * Returns whether this updates destroys the target nodes identity. Used to determine
    * superfluous operations on the subtree of the target.
-   * @return true, if target node identity destroyed
+   * @return {@code true} if target node identity destroyed
    */
   abstract boolean destructive();
 

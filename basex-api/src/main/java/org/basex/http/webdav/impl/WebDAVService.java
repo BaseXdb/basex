@@ -163,7 +163,7 @@ public final class WebDAVService<T> {
     session.execute(new Open(db));
     session.execute(new Delete(path));
 
-    // create dummy, if parent is an empty folder
+    // create dummy if parent is an empty folder
     final int ix = path.lastIndexOf(SEP);
     if(ix > 0) createDummy(db, path.substring(0, ix));
   }
@@ -180,11 +180,11 @@ public final class WebDAVService<T> {
     session.execute(new Open(db));
     session.execute(new Rename(path, npath));
 
-    // create dummy, if old parent is an empty folder
+    // create dummy if old parent is an empty folder
     final int i1 = path.lastIndexOf(SEP);
     if(i1 > 0) createDummy(db, path.substring(0, i1));
 
-    // delete dummy, if new parent is an empty folder
+    // delete dummy if new parent is an empty folder
     final int i2 = npath.lastIndexOf(SEP);
     if(i2 > 0) deleteDummy(db, npath.substring(0, i2));
   }

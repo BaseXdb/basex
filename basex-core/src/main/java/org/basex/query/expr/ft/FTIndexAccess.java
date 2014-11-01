@@ -49,7 +49,7 @@ public final class FTIndexAccess extends Simple {
         if(it != null) {
           // cache entry for visualizations or ft:mark/ft:extract
           if(qc.ftPosData != null) qc.ftPosData.add(it.data, it.pre, it.all);
-          // assign scoring, if not done yet
+          // assign scoring if not done yet
           it.score();
           // remove matches reference to save memory
           it.all = null;

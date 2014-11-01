@@ -234,10 +234,10 @@ final class XMLParser extends CmdParser {
    * check fails. The passed on strings describe the arguments of a command. They may be:
    * <ul>
    *   <li> attribute names</li>
-   *   <li> labels for text nodes, if prefixed with "#"</li>
-   *   <li> labels for text or descendant nodes, if prefixed with "<"</li>
+   *   <li> labels for text nodes if prefixed with "#"</li>
+   *   <li> labels for text or descendant nodes if prefixed with "<"</li>
    * </ul>
-   * Arguments are optional, if they suffixed with "?". Examples:
+   * Arguments are optional if they suffixed with "?". Examples:
    * <ul>
    *   <li> <code>{"name","#input?"}</code> indicates that the command must have one "name"
    *     attribute and may have one text node, but nothing else</li>

@@ -244,7 +244,7 @@ public final class DigitalSignature {
         signContext = new DOMSignContext(pk, inputNode);
       }
 
-      // set Signature element namespace prefix, if given
+      // set Signature element namespace prefix if given
       if(ns.length > 0) signContext.setDefaultNamespacePrefix(string(ns));
 
       // actually sign the document

@@ -178,7 +178,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
 
   /**
    * Get the active lock for the current resource.
-   * @return - the current lock, if the resource is locked, or null
+   * @return - the current lock if the resource is locked, or null
    */
   @Override
   public LockToken getCurrentLock() {

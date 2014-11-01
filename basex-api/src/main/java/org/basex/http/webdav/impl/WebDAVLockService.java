@@ -128,7 +128,7 @@ public final class WebDAVLockService {
   }
 
   /**
-   * Creates the lock database, if it does not exist.
+   * Creates the lock database if it does not exist.
    * @throws IOException I/O exception
    */
   private void initLockDb() throws IOException {

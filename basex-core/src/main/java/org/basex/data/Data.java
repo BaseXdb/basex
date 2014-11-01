@@ -42,7 +42,7 @@ import org.basex.util.list.*;
  * - Byte  8-11:  SIZE: Number of descendants
  * ELEMENT NODES (kind = 1):
  * - Byte     0:  ATTS: Number of attributes (bits: 7-3).
- *                      Calculated in real-time, if bit range is too small
+ *                      Calculated in real-time if bit range is too small
  * - Byte  1- 2:  NAME: Namespace Flag (bit: 15), Name (bits: 14-0)
  * - Byte     3:  NURI: Namespace URI
  * - Byte  4- 7:  DIST: Distance to parent node
@@ -52,7 +52,7 @@ import org.basex.util.list.*;
  * - Byte  8-11:  DIST: Distance to parent node
  * ATTRIBUTE NODES (kind = 3):
  * - Byte     0:  DIST: Distance to parent node (bits: 7-3)
- *                      Calculated in real-time, if bit range is too small
+ *                      Calculated in real-time if bit range is too small
  * - Byte  1- 2:  NAME: Namespace Flag (bit: 15), Name (bits: 14-0)
  * - Byte  3- 7:  TEXT: Attribute value reference
  * - Byte    11:  NURI: Namespace (bits: 7-3)
@@ -314,7 +314,7 @@ public abstract class Data implements AutoCloseable {
         return table.read4(pre, 8);
       case ATTR:
         int d = table.read1(pre, 0) >> 3 & IO.MAXATTS;
-        // skip additional attributes, if value is larger than maximum range
+        // skip additional attributes if value is larger than maximum range
         if(d >= IO.MAXATTS) while(d < pre && kind(pre - d) == ATTR) d++;
         return d;
       default:
@@ -340,7 +340,7 @@ public abstract class Data implements AutoCloseable {
    */
   public final int attSize(final int pre, final int kind) {
     int s = kind == ELEM ? table.read1(pre, 0) >> 3 & IO.MAXATTS : 1;
-    // skip additional attributes, if value is larger than maximum range
+    // skip additional attributes if value is larger than maximum range
     if(s >= IO.MAXATTS) while(s < meta.size - pre && kind(pre + s) == ATTR) s++;
     return s;
   }

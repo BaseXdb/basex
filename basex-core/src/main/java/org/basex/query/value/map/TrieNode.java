@@ -113,7 +113,7 @@ abstract class TrieNode {
    * @param key key to look for
    * @param lvl level
    * @param ii input info
-   * @return {@code true}, if the key exists, {@code false} otherwise
+   * @return {@code true} if the key exists, {@code false} otherwise
    * @throws QueryException query exception
    */
   abstract boolean contains(int hash, Item key, int lvl, final InputInfo ii)
@@ -133,7 +133,7 @@ abstract class TrieNode {
       throws QueryException;
 
   /**
-   * Add a leaf to this node, if the key isn't already used.
+   * Add a leaf to this node if the key isn't already used.
    * @param o leaf to insert
    * @param lvl level
    * @param ii input info
@@ -143,7 +143,7 @@ abstract class TrieNode {
   abstract TrieNode add(final Leaf o, final int lvl, final InputInfo ii) throws QueryException;
 
   /**
-   * Add an overflow list to this node, if the key isn't already used.
+   * Add an overflow list to this node if the key isn't already used.
    * @param o leaf to insert
    * @param lvl level
    * @param ii input info

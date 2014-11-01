@@ -17,7 +17,7 @@ import org.basex.util.*;
 abstract class Nodes extends StandardFunc {
   /**
    * Returns the outermost/innermost nodes of a node sequence, i.e. a node is
-   * only contained, if none of its ancestors/descendants are.
+   * only contained if none of its ancestors/descendants are.
    * @param qc query context
    * @param outer outermost flag
    * @return outermost/innermost nodes

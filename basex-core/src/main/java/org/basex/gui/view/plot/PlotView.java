@@ -878,7 +878,7 @@ public final class PlotView extends View {
     final int size = itemImg.getWidth() / 2;
     int focusedPre = gui.context.focused;
     // if mouse pointer is outside of the plot the focused item is set to -1,
-    // focus may be refreshed, if necessary
+    // focus may be refreshed if necessary
     if(mouseX < MARGIN[1] ||
         mouseX > getWidth() - MARGIN[3] + size ||
         mouseY < MARGIN[0] - size || mouseY > getHeight() - MARGIN[2]) {

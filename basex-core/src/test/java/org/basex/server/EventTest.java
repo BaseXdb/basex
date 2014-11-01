@@ -51,7 +51,7 @@ public final class EventTest extends SandboxTest {
   @Before
   public void startSessions() throws IOException {
     session = createClient();
-    // drop event, if not done yet
+    // drop event if not done yet
     try {
       session.execute("drop event " + NAME);
     } catch(final IOException ignored) { }

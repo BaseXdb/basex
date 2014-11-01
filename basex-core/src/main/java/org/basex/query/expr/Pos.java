@@ -63,7 +63,7 @@ public final class Pos extends Simple {
   }
 
   /**
-   * Returns an instance of this class, if possible, and the input expression otherwise.
+   * Returns an instance of this class if possible, and the input expression otherwise.
    * @param cmp comparator
    * @param expr argument
    * @param fallback fallback expression (optional, may be {@code null})

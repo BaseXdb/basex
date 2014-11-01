@@ -91,7 +91,7 @@ public abstract class IndexBuilder extends Proc {
   }
 
   /**
-   * Performs memory cleanup after writing partial memory, if necessary.
+   * Performs memory cleanup after writing partial memory if necessary.
    */
   protected final void finishSplit() {
     if(splitSize <= 0) Performance.gc(1);

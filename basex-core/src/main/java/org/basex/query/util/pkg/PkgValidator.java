@@ -51,7 +51,7 @@ public final class PkgValidator {
   }
 
   /**
-   * Checks dependency elements, if packages involved in dependencies are
+   * Checks dependency elements if packages involved in dependencies are
    * already installed and if processor dependencies are fulfilled.
    * @param pkg package
    * @throws QueryException query exception

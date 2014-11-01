@@ -536,7 +536,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    * Creates a small insertion sequence data containing 2 nodes.
    * @param d parent data instance
    * @param n name of the elements to be inserted
-   * @param b add tree w/ size==2, if false add tree w/ size==1
+   * @param b add tree w/ size==2 if false add tree w/ size==1
    * @return insertion sequence data instance
    */
   private static DataClip clipE(final Data d, final String n, final boolean b) {

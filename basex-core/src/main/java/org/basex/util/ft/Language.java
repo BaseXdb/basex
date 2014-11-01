@@ -68,8 +68,7 @@ public final class Language implements Comparable<Language> {
   }
 
   /**
-   * Returns the user language as default language, or English, if the user
-   * language cannot be assigned.
+   * Returns the user language as default language, or English if the language cannot be assigned.
    * @return default language
    */
   public static Language def() {
