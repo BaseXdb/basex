@@ -9,8 +9,5 @@ set CP=%PWD%/../target/classes
 set LIB=%PWD%/../lib
 for /R "%LIB%" %%a in (*.jar) do set CP=!CP!;%%a
 
-REM Options for virtual machine
-set VM=
-
 REM Run code
-java -cp "%CP%" %VM% org.basex.BaseXClient %*
+java -cp "%CP%" %BASEX_JVM% org.basex.BaseXClient %*

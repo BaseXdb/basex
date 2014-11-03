@@ -12,7 +12,7 @@ set LIB=%PWD%/../../basex-core/lib
 for /R "%LIB%" %%a in (*.jar) do set CP=!CP!;%%a
 
 REM Options for virtual machine
-set VM=-Xmx512m
+set BASEX_JVM=-Xmx512m %BASEX_JVM%
 
 REM Run code
-java -cp "%CP%;." %VM% org.basex.BaseXHTTP %*
+java -cp "%CP%;." "%BASEX_JVM%" org.basex.BaseXHTTP %*

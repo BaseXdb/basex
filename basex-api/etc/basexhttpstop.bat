@@ -1,7 +1,6 @@
 @echo off
 setLocal EnableDelayedExpansion
 
-
 REM Path to this script
 set PWD=%~dp0
 
@@ -12,8 +11,5 @@ for /R "%LIB%" %%a in (*.jar) do set CP=!CP!;%%a
 set LIB=%PWD%/../../basex-core/lib
 for /R "%LIB%" %%a in (*.jar) do set CP=!CP!;%%a
 
-REM Options for virtual machine
-set VM=
-
 REM Run code
-java -cp "%CP%;." %VM% org.basex.BaseXHTTP %* stop
+java -cp "%CP%;." "%BASEX_JVM%" org.basex.BaseXHTTP %* stop
