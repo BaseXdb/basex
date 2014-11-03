@@ -93,8 +93,7 @@ public class ClientQuery extends Query {
 
   @Override
   public void context(final Object value, final String type) throws IOException {
-    cache = null;
-    cs.exec(ServerCmd.CONTEXT, id + '\0' + value + '\0' + (type == null ? "" : type), null);
+    bind(null, value, type);
   }
 
   @Override
