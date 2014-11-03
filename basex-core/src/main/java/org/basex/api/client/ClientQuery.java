@@ -2,6 +2,7 @@ package org.basex.api.client;
 
 import java.io.*;
 
+import org.basex.api.dom.*;
 import org.basex.core.*;
 import org.basex.io.in.*;
 import org.basex.io.serial.*;
@@ -59,19 +60,19 @@ public class ClientQuery extends Query {
   public void bind(final String name, final Object value, final String type) throws IOException {
     cache = null;
 
-    String t = type, v;
-    if(value instanceof Value) {
-      final Value val = (Value) value;
+    final Object vl = value  instanceof BXNode ? ((BXNode) value).getNode() : value;
+    String t = type == null ? "" : type, v;
+    if(vl instanceof Value) {
+      final Value val = (Value) vl;
       final Type tp = val.type;
-      if(t == null || t.isEmpty())
-        t = val.isEmpty() ? QueryText.EMPTY_SEQUENCE + "()" : tp.toString();
+      if(t.isEmpty()) t = val.isEmpty() ? QueryText.EMPTY_SEQUENCE + "()" : tp.toString();
 
       try {
         final TokenBuilder tb = new TokenBuilder();
         for(final Item it : val) {
           if(!tb.isEmpty()) tb.add(1);
           if(it.type instanceof NodeType) {
-            tb.add(it.serialize(SerializerOptions.get(false)).toArray());
+            tb.add(it.serialize(SerializerOptions.get(false)).finish());
           } else {
             tb.add(it.string(null));
           }
@@ -83,7 +84,6 @@ public class ClientQuery extends Query {
       }
     } else {
       v = value.toString();
-      if(t == null) t = "";
     }
 
     final ServerCmd cmd = name == null ? ServerCmd.CONTEXT : ServerCmd.BIND;

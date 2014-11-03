@@ -8,12 +8,14 @@ import java.io.*;
 
 import org.basex.*;
 import org.basex.api.client.*;
+import org.basex.api.dom.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -517,6 +519,36 @@ public abstract class SessionTest extends SandboxTest {
     final Query query = session.query("declare variable $a external; $a//text()");
     query.bind("$a", "<a>XML</a>", "document-node()");
     assertEqual("XML", query.execute());
+  }
+
+  /** Binds a node to an external variable.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryBindBXNode() throws IOException {
+    Query query = session.query("declare variable $a as element() external; $a");
+    query.bind("$a", BXNode.get(new FElem("a")));
+    assertEqual("<a/>", query.execute());
+
+    String string = "declare variable $a external; $a";
+    query = session.query(string);
+    query.bind("$a", BXNode.get(new FElem("a")));
+    assertEqual("<a/>", query.execute());
+
+    query = session.query(string);
+    query.bind("$a", BXNode.get(new FDoc().add(new FElem("a"))));
+    assertEqual("<a/>", query.execute());
+
+    query = session.query(string);
+    query.bind("$a", BXNode.get(new FTxt("a")));
+    assertEqual("a", query.execute());
+
+    query = session.query(string);
+    query.bind("$a", BXNode.get(new FPI("a", "b")));
+    assertEqual("<?a b?>", query.execute());
+
+    query = session.query(string);
+    query.bind("$a", BXNode.get(new FComm("a")));
+    assertEqual("<!--a-->", query.execute());
   }
 
   /** Runs a query with a bound context value.
