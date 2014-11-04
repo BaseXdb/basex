@@ -45,6 +45,7 @@ public final class HttpResponse {
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
+  @SuppressWarnings("resource")
   public ValueIter getResponse(final HttpURLConnection conn, final byte[] status,
       final String utype) throws IOException, QueryException {
 

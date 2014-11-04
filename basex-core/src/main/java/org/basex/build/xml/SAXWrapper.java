@@ -91,14 +91,8 @@ public final class SAXWrapper extends SingleParser {
       throw new IOException(msg, ex);
     } finally {
       if(is != null) {
-        try {
-          final Reader r = is.getCharacterStream();
-          if(r != null) r.close();
-          final InputStream ist = is.getByteStream();
-          if(ist != null) ist.close();
-        } catch(final IOException ex) {
-          Util.debug(ex);
-        }
+        try(final Reader r = is.getCharacterStream()) { }
+        try(final InputStream ist = is.getByteStream()) { }
       }
     }
   }
@@ -110,6 +104,7 @@ public final class SAXWrapper extends SingleParser {
    * @return resulting stream
    * @throws IOException I/O exception
    */
+  @SuppressWarnings("resource")
   private InputSource wrap(final InputSource is) throws IOException {
     if(is == null) return null;
 
@@ -126,6 +121,7 @@ public final class SAXWrapper extends SingleParser {
     } else {
       return is;
     }
+
     // retrieve/estimate number of bytes to be read
     length = src.length();
     try {

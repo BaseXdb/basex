@@ -242,29 +242,27 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
   private static void check(final String query, final String result) {
     // compile query
     String plan = null;
-    QueryProcessor qp = new QueryProcessor(query, context);
     try {
-      String string = qp.execute().serialize();
-      if(result != null) assertEquals(result, string.replaceAll("\\r?\\n", ""));
+      try(QueryProcessor qp = new QueryProcessor(query, context)) {
+        final String string = qp.execute().serialize();
+        if(result != null) assertEquals(result, string.replaceAll("\\r?\\n", ""));
 
-      // fetch query plan
-      plan = qp.plan().serialize().toString();
-      qp.close();
+        // fetch query plan
+        plan = qp.plan().serialize().toString();
+      }
 
       // check if index is used
-      qp = new QueryProcessor(plan + "/descendant-or-self::*" +
-          "[self::" + Util.className(ValueAccess.class) +
-          "|self::" + Util.className(FTIndexAccess.class) + ']', context);
-      string = qp.execute().serialize();
-
-      assertFalse("No index used:\n- Query: " + query + "\n- Plan: " + plan + "\n- " +
-          qp.info().trim(), string.isEmpty());
+      try(QueryProcessor qp = new QueryProcessor(plan + "/descendant-or-self::*" +
+            "[self::" + Util.className(ValueAccess.class) +
+            "|self::" + Util.className(FTIndexAccess.class) + ']', context)) {
+        final String string = qp.execute().serialize();
+        assertFalse("No index used:\n- Query: " + query + "\n- Plan: " + plan + "\n- " +
+            qp.info().trim(), string.isEmpty());
+      }
     } catch(final QueryException ex) {
       fail(Util.message(ex) + "\n- Query: " + query + "\n- Plan: " + plan);
     } catch(final IOException ex) {
       fail(Util.message(ex));
-    } finally {
-      qp.close();
     }
   }
 }

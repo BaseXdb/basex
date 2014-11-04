@@ -104,10 +104,10 @@ public final class CreateDB extends ACreate {
           if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, this);
 
           // for testing purposes
-          Class<?> luceneClass = Reflect.find("org.basex.modules.LuceneIndex");
+          final Class<?> luceneClass = Reflect.find("org.basex.modules.LuceneIndex");
           if(luceneClass != null) {
             Util.errln("Creating Lucene Index...");
-            Method m = Reflect.method(luceneClass, "luceneIndex", Context.class);
+            final Method m = Reflect.method(luceneClass, "luceneIndex", Context.class);
             Reflect.invoke(m, null, context);
           }
 

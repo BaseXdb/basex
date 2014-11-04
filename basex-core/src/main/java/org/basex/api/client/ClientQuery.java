@@ -107,6 +107,7 @@ public class ClientQuery extends Query {
   }
 
   @Override
+  @SuppressWarnings("resource")
   protected void cache() throws IOException {
     cs.sout.write(ServerCmd.RESULTS.code);
     cs.send(id);

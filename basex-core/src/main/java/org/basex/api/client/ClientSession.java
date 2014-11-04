@@ -96,6 +96,7 @@ public class ClientSession extends Session {
    * be returned as strings.
    * @throws IOException I/O exception
    */
+  @SuppressWarnings("resource")
   public ClientSession(final String host, final int port, final String user, final String pass,
       final OutputStream output) throws IOException {
 
@@ -249,6 +250,7 @@ public class ClientSession extends Session {
    * @param output output stream to send result to. If {@code null}, no result will be requested
    * @throws IOException I/O exception
    */
+  @SuppressWarnings("resource")
   private void receive(final OutputStream output) throws IOException {
     final BufferInput bi = new BufferInput(sin);
     if(output != null) receive(bi, output);
@@ -310,6 +312,7 @@ public class ClientSession extends Session {
    * @return string
    * @throws IOException I/O exception
    */
+  @SuppressWarnings("resource")
   String exec(final ServerCmd command, final String arg, final OutputStream output)
       throws IOException {
 

@@ -60,68 +60,70 @@ public class XQueryEval extends StandardFunc {
 
     // bind variables and context value
     final HashMap<String, Value> bindings = toBindings(1, qc);
-    final QueryContext qctx = qc.proc(new QueryContext(qc));
-
-    final Timer to = new Timer(true);
     final Perm tmp = qc.context.user.perm;
-    if(exprs.length > 2) {
-      final Options opts = toOptions(2, Q_OPTIONS, new XQueryOptions(), qc);
-      qc.context.user.perm = Perm.get(opts.get(XQueryOptions.PERMISSION));
-      // initial memory consumption: perform garbage collection and calculate usage
-      Performance.gc(2);
-      final long mb = opts.get(XQueryOptions.MEMORY);
-      if(mb != 0) {
-        final long limit = Performance.memory() + (mb << 20);
-        to.schedule(new TimerTask() {
-          @Override
-          public void run() {
-            // limit reached: perform garbage collection and check again
-            if(Performance.memory() > limit) {
-              Performance.gc(1);
-              if(Performance.memory() > limit) qctx.stop();
+    final Timer to = new Timer(true);
+
+    try(final QueryContext qctx = qc.proc(new QueryContext(qc))) {
+      if(exprs.length > 2) {
+        final Options opts = toOptions(2, Q_OPTIONS, new XQueryOptions(), qc);
+        qc.context.user.perm = Perm.get(opts.get(XQueryOptions.PERMISSION));
+
+        // initial memory consumption: perform garbage collection and calculate usage
+        Performance.gc(2);
+        final long mb = opts.get(XQueryOptions.MEMORY);
+        if(mb != 0) {
+          final long limit = Performance.memory() + (mb << 20);
+          to.schedule(new TimerTask() {
+            @Override
+            public void run() {
+              // limit reached: perform garbage collection and check again
+              if(Performance.memory() > limit) {
+                Performance.gc(1);
+                if(Performance.memory() > limit) qctx.stop();
+              }
             }
-          }
-        }, 500, 500);
+          }, 500, 500);
+        }
+        final long ms = opts.get(XQueryOptions.TIMEOUT) * 1000L;
+        if(ms != 0) {
+          to.schedule(new TimerTask() {
+            @Override
+            public void run() { qctx.stop(); }
+          }, ms);
+        }
       }
-      final long ms = opts.get(XQueryOptions.TIMEOUT) * 1000L;
-      if(ms != 0) {
-        to.schedule(new TimerTask() {
-          @Override
-          public void run() { qctx.stop(); }
-        }, ms);
-      }
-    }
 
-    // evaluate query
-    try {
-      final StaticContext sctx = new StaticContext(qctx.context);
-      for(final Map.Entry<String, Value> it : bindings.entrySet()) {
-        final String key = it.getKey();
-        final Value val = it.getValue();
-        if(key.isEmpty()) qctx.context(val, sctx);
-        else qctx.bind(key, val, sctx);
-      }
-      qctx.parseMain(string(qu), path, sctx);
+      // evaluate query
+      try {
+        final StaticContext sctx = new StaticContext(qctx.context);
+        for(final Map.Entry<String, Value> it : bindings.entrySet()) {
+          final String key = it.getKey();
+          final Value val = it.getValue();
+          if(key.isEmpty()) qctx.context(val, sctx);
+          else qctx.bind(key, val, sctx);
+        }
+        qctx.parseMain(string(qu), path, sctx);
 
-      if(updating) {
-        if(!sc.mixUpdates && !qctx.updating && !qctx.root.expr.isVacuous())
-          throw BXXQ_NOUPDATE.get(info);
-      } else {
-        if(qctx.updating) throw BXXQ_UPDATING.get(info);
-      }
-      qctx.compile();
+        if(updating) {
+          if(!sc.mixUpdates && !qctx.updating && !qctx.root.expr.isVacuous())
+            throw BXXQ_NOUPDATE.get(info);
+        } else {
+          if(qctx.updating) throw BXXQ_UPDATING.get(info);
+        }
+        qctx.compile();
 
-      final ValueBuilder vb = new ValueBuilder();
-      cache(qctx.iter(), vb, qctx);
-      return vb;
-    } catch(final ProcException ex) {
-      throw BXXQ_STOPPED.get(info);
-    } catch(final QueryException ex) {
-      throw ex.err() == BASX_PERM_X ? BXXQ_PERM_X.get(info, ex.getLocalizedMessage()) : ex;
+        final ValueBuilder vb = new ValueBuilder();
+        cache(qctx.iter(), vb, qctx);
+        return vb;
+      } catch(final ProcException ex) {
+        throw BXXQ_STOPPED.get(info);
+      } catch(final QueryException ex) {
+        throw ex.err() == BASX_PERM_X ? BXXQ_PERM_X.get(info, ex.getLocalizedMessage()) : ex;
+      }
+
     } finally {
       qc.context.user.perm = tmp;
       qc.proc(null);
-      qctx.close();
       to.cancel();
     }
   }

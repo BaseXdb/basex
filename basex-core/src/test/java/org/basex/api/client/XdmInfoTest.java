@@ -53,12 +53,12 @@ public final class XdmInfoTest extends SandboxTest {
   public void testIter() throws IOException {
     for(final Object[] t : TYPES) {
       if(t.length < 2) continue;
-      final TestQuery tq = session.query(t[1].toString());
-      final TestItem ti = tq.iter();
-      assertSame("Types are different.\nExpected: " + t[0] +
-          "\nFound: " + TYPES[ti.type][0], t, TYPES[ti.type]);
-      assertEquals(Token.string(ti.result), TYPES[ti.type][2]);
-      tq.close();
+      try(final TestQuery tq = session.query(t[1].toString())) {
+        final TestItem ti = tq.iter();
+        assertSame("Types are different.\nExpected: " + t[0] +
+            "\nFound: " + TYPES[ti.type][0], t, TYPES[ti.type]);
+        assertEquals(Token.string(ti.result), TYPES[ti.type][2]);
+      }
     }
   }
 
@@ -70,13 +70,13 @@ public final class XdmInfoTest extends SandboxTest {
   public void testFull() throws IOException {
     for(final Object[] t : TYPES) {
       if(t.length < 2) continue;
-      final TestQuery tq = session.query(t[1].toString());
-      final TestItem ti = tq.full();
-      assertSame("Types are different.\nExpected: " + t[0] +
-          "\nFound: " + TYPES[ti.type][0], t, TYPES[ti.type]);
-      assertEquals(Token.string(ti.result), TYPES[ti.type][2]);
-      if(t.length > 3) assertEquals(Token.string(ti.uri), TYPES[ti.type][3]);
-      tq.close();
+      try(final TestQuery tq = session.query(t[1].toString())) {
+        final TestItem ti = tq.full();
+        assertSame("Types are different.\nExpected: " + t[0] +
+            "\nFound: " + TYPES[ti.type][0], t, TYPES[ti.type]);
+        assertEquals(Token.string(ti.result), TYPES[ti.type][2]);
+        if(t.length > 3) assertEquals(Token.string(ti.uri), TYPES[ti.type][3]);
+      }
     }
   }
 
@@ -109,6 +109,7 @@ public final class XdmInfoTest extends SandboxTest {
      * @return string
      * @throws IOException I/O exception
      */
+    @SuppressWarnings("resource")
     byte[] exec(final ServerCmd cmd, final String arg) throws IOException {
       final ArrayOutput o = new ArrayOutput();
       sout.write(cmd.code);
