@@ -3,6 +3,8 @@ package org.basex.query.value.item;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
+import java.util.regex.*;
+
 import javax.xml.namespace.*;
 
 import org.basex.query.*;
@@ -19,6 +21,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class QNm extends Item {
+  /** URL pattern (matching Clark and EQName notation). */
+  public static final Pattern BIND = Pattern.compile("^((\"|')(.*?)\\2:|Q?(\\{(.*?)\\}))(.+)$");
   /** Singleton instance. */
   private static final QNmCache CACHE = new QNmCache();
 
@@ -101,6 +105,38 @@ public final class QNm extends Item {
   public QNm(final QName name) {
     this(token(name.getPrefix().isEmpty() ? name.getLocalPart() :
       name.getPrefix() + ':' + name.getLocalPart()), token(name.getNamespaceURI()));
+  }
+
+  /**
+   * Resolves a QName string.
+   * @param name name to resolve
+   * @param def default namespace (can be {@code null})
+   * @param sc static context
+   * @param info input info
+   * @return string
+   * @throws QueryException query exception
+   */
+  public static QNm resolve(final byte[] name, final byte[] def, final StaticContext sc,
+      final InputInfo info) throws QueryException {
+
+    // check for namespace declaration
+    final Matcher m = BIND.matcher(Token.string(name));
+    byte[] uri = EMPTY, nm = name;
+    if(m.find()) {
+      final String u = m.group(3);
+      uri = token(u == null ? m.group(5) : u);
+      nm = token(m.group(6));
+    } else {
+      final int i = indexOf(nm, ':');
+      if(i != -1) {
+        uri = sc.ns.uri(substring(nm, 0, i));
+        if(uri == null) throw NOURI_X.get(info, name);
+      } else {
+        uri = def;
+      }
+    }
+    if(!XMLToken.isQName(nm)) throw BINDNAME_X.get(info, name);
+    return new QNm(nm, uri);
   }
 
   /**

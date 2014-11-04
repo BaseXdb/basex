@@ -99,7 +99,7 @@ public class XQueryEval extends StandardFunc {
         final String key = it.getKey();
         final Value val = it.getValue();
         if(key.isEmpty()) qctx.context(val, sctx);
-        else qctx.bind(key, val);
+        else qctx.bind(key, val, sctx);
       }
       qctx.parseMain(string(qu), path, sctx);
 

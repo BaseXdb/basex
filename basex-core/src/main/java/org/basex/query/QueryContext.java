@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.regex.*;
 
 import org.basex.build.*;
 import org.basex.build.JsonOptions.JsonFormat;
@@ -43,9 +42,6 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class QueryContext extends Proc implements AutoCloseable {
-  /** URL pattern (matching Clark and EQName notation). */
-  private static final Pattern BIND = Pattern.compile("^((\"|')(.*?)\\2:|Q?(\\{(.*?)\\}))(.+)$");
-
   /** The evaluation stack. */
   public final QueryStack stack = new QueryStack();
   /** Static variables. */
@@ -434,7 +430,7 @@ public final class QueryContext extends Proc implements AutoCloseable {
 
   /**
    * Binds the context value, using the same rules as for
-   * {@link #bind(String, Object, String) binding variables}.
+   * {@link #bind(String, Object, String, StaticContext) binding variables}.
    * @param val value to be bound
    * @param type type (may be {@code null})
    * @param sc static context
@@ -466,36 +462,25 @@ public final class QueryContext extends Proc implements AutoCloseable {
    * @param name name of variable
    * @param val value to be bound
    * @param type type (may be {@code null})
+   * @param sc static context
    * @throws QueryException query exception
    */
-  public void bind(final String name, final Object val, final String type) throws QueryException {
-    bind(name, cast(val, type));
+  public void bind(final String name, final Object val, final String type, final StaticContext sc)
+      throws QueryException {
+    bind(name, cast(val, type), sc);
   }
 
   /**
    * Binds a value to a global variable.
    * @param name name of variable
    * @param val value to be bound
+   * @param sc static context
    * @throws QueryException query exception
    */
-  public void bind(final String name, final Value val) throws QueryException {
-    // remove optional $ prefix
-    String nm = name.indexOf('$') == 0 ? name.substring(1) : name;
-    byte[] uri = EMPTY;
-
-    // check for namespace declaration
-    final Matcher m = BIND.matcher(nm);
-    if(m.find()) {
-      String u = m.group(3);
-      if(u == null) u = m.group(5);
-      uri = token(u);
-      nm = m.group(6);
-    }
-    final byte[] ln = token(nm);
-    if(nm.isEmpty() || !XMLToken.isNCName(ln)) throw BINDNAME_X.get(null, nm);
-
-    // bind variable
-    bindings.put(new QNm(ln, uri), val);
+  public void bind(final String name, final Value val, final StaticContext sc)
+      throws QueryException {
+    final byte[] n = token(name);
+    bindings.put(QNm.resolve(indexOf(n, '$') == 0 ? substring(n, 1) : n, null, sc, null), val);
   }
 
   /**
@@ -652,7 +637,7 @@ public final class QueryContext extends Proc implements AutoCloseable {
 
   /**
    * Casts a value to the specified type.
-   * See {@link #bind(String, Object, String)} for more infos.
+   * See {@link #bind(String, Object, String, StaticContext)} for more infos.
    * @param val value to be cast
    * @param type type (may be {@code null})
    * @return cast value

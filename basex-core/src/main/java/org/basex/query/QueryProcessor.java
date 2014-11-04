@@ -114,7 +114,7 @@ public final class QueryProcessor extends Proc implements AutoCloseable {
    */
   public QueryProcessor bind(final String name, final Object value, final String type)
       throws QueryException {
-    qc.bind(name, value, type);
+    qc.bind(name, value, type, sc);
     return this;
   }
 
@@ -137,7 +137,7 @@ public final class QueryProcessor extends Proc implements AutoCloseable {
    * @throws QueryException query exception
    */
   public QueryProcessor bind(final String name, final Value value) throws QueryException {
-    qc.bind(name, value);
+    qc.bind(name, value, sc);
     return this;
   }
 

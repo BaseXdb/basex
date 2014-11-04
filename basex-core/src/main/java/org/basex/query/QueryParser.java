@@ -145,7 +145,7 @@ public class QueryParser extends InputParser {
       } else {
         if(ch == ',') {
           if(s + 1 == sl || bind.charAt(s + 1) != ',') {
-            qc.bind(key.toString().trim(), new Atm(val.toString()));
+            qc.bind(key.toString().trim(), new Atm(val.toString()), sc);
             key.setLength(0);
             val.setLength(0);
             first = true;
@@ -157,7 +157,7 @@ public class QueryParser extends InputParser {
         val.append(ch);
       }
     }
-    if(key.length() != 0) qc.bind(key.toString().trim(), new Atm(val.toString()));
+    if(key.length() != 0) qc.bind(key.toString().trim(), new Atm(val.toString()), sc);
   }
 
   /**

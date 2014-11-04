@@ -67,10 +67,12 @@ final class Unit {
    */
   public void test(final FElem suites) throws IOException {
     final FElem suite = new FElem(TESTSUITE).add(NAME, file.url());
-    final ArrayList<StaticFunc> before = new ArrayList<>(0);
-    final ArrayList<StaticFunc> after = new ArrayList<>(0);
     final ArrayList<StaticFunc> beforeModule = new ArrayList<>(0);
     final ArrayList<StaticFunc> afterModule = new ArrayList<>(0);
+    final ArrayList<StaticFunc> before = new ArrayList<>(0);
+    final ArrayList<StaticFunc> after = new ArrayList<>(0);
+    final ArrayList<QNm> beforeFilter = new ArrayList<>();
+    final ArrayList<QNm> afterFilter = new ArrayList<>();
     final ArrayList<StaticFunc> test = new ArrayList<>(0);
     final Performance perf = new Performance();
 
@@ -81,11 +83,10 @@ final class Unit {
       // loop through all functions
       for(final StaticFunc sf : qc.funcs.funcs()) {
         // find Unit annotations
-        final Ann ann = sf.ann;
-        final int as = ann.size();
+        final int as = sf.ann.size();
         boolean xq = false;
         for(int a = 0; !xq && a < as; a++) {
-          xq |= eq(ann.names[a].uri(), QueryText.UNIT_URI);
+          xq |= eq(sf.ann.names[a].uri(), QueryText.UNIT_URI);
         }
         if(!xq) continue;
 
@@ -93,10 +94,18 @@ final class Unit {
         if(sf.ann.contains(Ann.Q_PRIVATE)) throw UNIT_PRIVATE_X.get(null, sf.name.local());
         if(sf.args.length > 0) throw UNIT_ARGS_X.get(null, sf.name.local());
 
-        if(indexOf(sf, BEFORE) != -1) before.add(sf);
-        if(indexOf(sf, AFTER) != -1) after.add(sf);
         if(indexOf(sf, BEFORE_MODULE) != -1) beforeModule.add(sf);
         if(indexOf(sf, AFTER_MODULE) != -1) afterModule.add(sf);
+        int i = indexOf(sf, BEFORE);
+        if(i != -1) {
+          before.add(sf);
+          beforeFilter.add(name(sf, i));
+        }
+        i = indexOf(sf, AFTER);
+        if(i != -1) {
+          after.add(sf);
+          afterFilter.add(name(sf, i));
+        }
         if(indexOf(sf, TEST) != -1) test.add(sf);
       }
 
@@ -126,11 +135,19 @@ final class Unit {
         if(skip == -1) {
           try {
             // call functions marked with "before"
-            for(final StaticFunc fn : before) eval(fn);
-            // call functions
+            int l = before.size();
+            for(int i = 0; i < l; i++) {
+              final QNm name = beforeFilter.get(i);
+              if(name == null || name.eq(sf.name)) eval(before.get(i));
+            }
+            // call function
             eval(sf);
             // call functions marked with "after"
-            for(final StaticFunc fn : after) eval(fn);
+            l = after.size();
+            for(int i = 0; i < l; i++) {
+              final QNm name = afterFilter.get(i);
+              if(name == null || name.eq(sf.name)) eval(after.get(i));
+            }
 
             if(code != null) {
               failures++;
@@ -173,6 +190,22 @@ final class Unit {
       suites.add(suite);
     }
   }
+
+  /**
+   * Returns an annotation argument at the specified offset as QName.
+   * @param sf static function
+   * @param i index
+   * @return QName
+   * @throws QueryException query exception
+   */
+  private QNm name(final StaticFunc sf, final int i) throws QueryException {
+    if(!sf.ann.values[i].isEmpty()) {
+      final byte[] name = sf.ann.values[i].itemAt(i).string(null);
+      if(name.length != 0) return QNm.resolve(name, sf.name.uri(), sf.sc, sf.info);
+    }
+    return null;
+  }
+
 
   /**
    * Adds an error element to the specified test case.
@@ -278,7 +311,7 @@ final class Unit {
   }
 
   /**
-   * Checks if a unit annotation has been specified.
+   * Checks if the specified unit annotation has been specified.
    * If positive, returns its offset in the annotation array.
    *
    * @param func user function

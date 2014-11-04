@@ -809,7 +809,7 @@ public enum Err {
   /** XPST0003. */
   WHICHTYPE_X(XPST, 3, "Unknown type: %."),
   /** XPST0003. */
-  BINDNAME_X(XPST, 3, "Invalid variable name: '%'."),
+  BINDNAME_X(XPST, 3, "Invalid name: '%'."),
   /** XPST0003. */
   PIXML_X(XPST, 3, "Processing instruction has illegal name: '%'."),
   /** XPST0003. */
