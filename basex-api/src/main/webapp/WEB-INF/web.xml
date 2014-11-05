@@ -13,17 +13,6 @@
        <context-param/> elements, as shown below. Please checkout
        http://docs.basex.org/wiki/Options for a list of all options. -->
 
-  <!-- Set default credentials
-  <context-param>
-    <param-name>org.basex.user</param-name>
-    <param-value>admin</param-value>
-  </context-param>
-  <context-param>
-    <param-name>org.basex.password</param-name>
-    <param-value>admin</param-value>
-  </context-param>
-  -->
-
   <!--
   <context-param>
     <param-name>org.basex.restxqpath</param-name>
@@ -62,16 +51,6 @@
     <servlet-name>RESTXQ</servlet-name>
     <servlet-class>org.basex.http.restxq.RestXqServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
-    <!-- service-specific credentials
-    <init-param>
-      <param-name>org.basex.user</param-name>
-      <param-value/>
-    </init-param>
-    <init-param>
-      <param-name>org.basex.password</param-name>
-      <param-value/>
-    </init-param>
-    -->
   </servlet>
   <servlet-mapping>
     <servlet-name>RESTXQ</servlet-name>
