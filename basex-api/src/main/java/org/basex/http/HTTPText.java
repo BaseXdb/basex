@@ -11,6 +11,8 @@ public interface HTTPText {
   String WWW_AUTHENTICATE = "WWW-Authenticate";
   /** HTTP header: Authorization. */
   String AUTHORIZATION = "Authorization";
+  /** HTTP header: Accept. */
+  String ACCEPT = "Accept";
   /** HTTP basic authentication. */
   String BASIC = "Basic";
 

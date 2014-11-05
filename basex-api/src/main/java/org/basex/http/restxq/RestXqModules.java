@@ -55,6 +55,7 @@ public final class RestXqModules {
    */
   RestXqFunction find(final HTTPContext http, final QNm error) throws Exception {
     cache(http);
+
     // collect all functions
     final ArrayList<RestXqFunction> list = new ArrayList<>();
     for(final RestXqModule mod : modules.values()) {
@@ -64,26 +65,46 @@ public final class RestXqModules {
     }
     // no path matches
     if(list.isEmpty()) return null;
-    // choose most appropriate function
-    RestXqFunction first = list.get(0);
-    if(list.size() > 1) {
-      // sort by specifity
-      Collections.sort(list);
-      first = list.get(0);
-      // disallow more than one path with the same specifity
-      if(first.compareTo(list.get(1)) == 0) {
-        final TokenBuilder tb = new TokenBuilder();
-        for(final RestXqFunction rxf : list) {
-          if(first.compareTo(rxf) != 0) break;
-          tb.add(Prop.NL).add(rxf.function.info.toString());
+
+    // sort by relevance
+    Collections.sort(list);
+
+    // return best matching function
+    RestXqFunction best = list.get(0);
+    if(list.size() == 1 || best.compareTo(list.get(1)) != 0) return best;
+
+    // Check accepted mime types
+    final HTTPAccept[] accepts = http.accepts();
+
+    double qf = 0;
+    for(final RestXqFunction rxf : list) {
+      if(best.compareTo(rxf) != 0) break;
+      for(final String p : rxf.produces) {
+        for(final HTTPAccept accept : accepts) {
+          final double nqf = accept.qf;
+          if(MimeTypes.matches(p, accept.type) && nqf > 0) {
+            if(qf < nqf) {
+              qf = nqf;
+              best = rxf;
+            } else if(qf == nqf) {
+              qf = -1;
+              break;
+            }
+          }
         }
-        throw first.path == null ?
-          first.error(ERROR_CONFLICT, error, tb) :
-          first.error(PATH_CONFLICT, first.path, tb);
       }
     }
-    // choose most specific function
-    return first;
+    if(qf > 0) return best;
+
+    // show error if more than one path with the same specifity exists
+    final TokenBuilder tb = new TokenBuilder();
+    for(final RestXqFunction rxf : list) {
+      if(best.compareTo(rxf) != 0) break;
+      tb.add(Prop.NL).add(rxf.function.info.toString());
+    }
+    throw best.path == null ?
+      best.error(ERROR_CONFLICT, error, tb) :
+      best.error(PATH_CONFLICT, best.path, tb);
   }
 
   /**

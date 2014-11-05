@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.*;
 
@@ -72,7 +73,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   /** Consumed media types. */
   private final StringList consumes = new StringList();
   /** Returned media types. */
-  private final StringList produces = new StringList();
+  final StringList produces = new StringList();
   /** Post/Put variable. */
   private QNm requestBody;
 
@@ -127,12 +128,12 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
           // annotation "path"
           if(path != null) throw error(info, ANN_TWICE, "%", name.string());
           try {
-            path = new RestXqPath(toString(value, name));
+            path = new RestXqPath(toString(value, name), info);
           } catch(final IllegalArgumentException ex) {
             throw error(info, ex.getMessage());
           }
-          for(int s = 0; s < path.size; s++) {
-            if(path.isTemplate(s)) checkVariable(path.segment[s], AtomType.AAT, declared);
+          for(final QNm v : path.vars()) {
+            checkVariable(v, AtomType.AAT, declared);
           }
         } else if(eq(ERROR, local)) {
           // annotation "error"
@@ -241,13 +242,10 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
     // bind variables from segments
     if(path != null) {
-      for(int s = 0; s < path.size; s++) {
-        final Matcher m = TEMPLATE.matcher(path.segment[s]);
-        if(m.find()) {
-          final QNm qnm = new QNm(token(m.group(1)), function.sc);
-          if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
-          bind(qnm, arg, new Atm(http.segment(s)));
-        }
+      for(final Entry<QNm, String> entry : path.values(http).entrySet()) {
+        final QNm qnm = new QNm(entry.getKey().string(), function.sc);
+        if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
+        bind(qnm, arg, new Atm(entry.getValue()));
       }
     }
 
@@ -347,19 +345,35 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   private QNm checkVariable(final String tmp, final Type type, final boolean... declared)
       throws QueryException {
 
-    final Var[] args = function.args;
     final Matcher m = TEMPLATE.matcher(tmp);
     if(!m.find()) throw error(INV_TEMPLATE, tmp);
     final byte[] vn = token(m.group(1));
     if(!XMLToken.isQName(vn)) throw error(INV_VARNAME, vn);
     final QNm name = new QNm(vn);
+    return checkVariable(name, type, declared);
+  }
+
+  /**
+   * Checks if the specified variable exists in the current function.
+   * @param name variable
+   * @param type allowed type
+   * @param declared variable declaration flags
+   * @return resulting variable
+   * @throws QueryException query exception
+   */
+  private QNm checkVariable(final QNm name, final Type type, final boolean[] declared)
+      throws QueryException {
+
     if(name.hasPrefix()) name.uri(function.sc.ns.uri(name.prefix()));
     int r = -1;
+    final Var[] args = function.args;
     while(++r < args.length && !args[r].name.eq(name));
-    if(r == args.length) throw error(UNKNOWN_VAR, vn);
-    if(declared[r]) throw error(VAR_ASSIGNED, vn);
+    if(r == args.length) throw error(UNKNOWN_VAR, name.string());
+    if(declared[r]) throw error(VAR_ASSIGNED, name.string());
     final SeqType st = args[r].declaredType();
-    if(args[r].checksType() && !st.type.instanceOf(type)) throw error(INV_VARTYPE, vn, type);
+    if(args[r].checksType() && !st.type.instanceOf(type))
+      throw error(INV_VARTYPE, name.string(), type);
+
     declared[r] = true;
     return name;
   }
@@ -383,7 +397,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   }
 
   /**
-   * Checks if the produced content type matches.
+   * Checks if the produced media type matches.
    * @param http http context
    * @return result of check
    */
@@ -391,9 +405,9 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     // return true if no type is given
     if(produces.isEmpty()) return true;
     // check if any combination matches
-    for(final String pr : http.produces()) {
+    for(final HTTPAccept accept : http.accepts()) {
       for(final String p : produces) {
-        if(MimeTypes.matches(p, pr)) return true;
+        if(MimeTypes.matches(p, accept.type)) return true;
       }
     }
     return false;

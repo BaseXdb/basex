@@ -500,9 +500,8 @@ public final class Token {
 
   /**
    * Converts the specified token into a double value.
-   * {@link Double#NaN} is returned if the input is invalid.
    * @param token token to be converted
-   * @return resulting double value
+   * @return resulting double value, or {@link Double#NaN} is returned if the input is invalid
    */
   public static double toDouble(final byte[] token) {
     final int tl = token.length;
