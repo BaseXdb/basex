@@ -9,6 +9,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.regex.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -31,6 +32,9 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class HTTPContext {
+  /** Quality factor pattern. */
+  private static final Pattern QF = Pattern.compile("^(.*);\\s*q\\s*=(.*)$");
+
   /** Servlet request. */
   public final HttpServletRequest req;
   /** Servlet response. */
@@ -199,20 +203,28 @@ public final class HTTPContext {
   }
 
   /**
-   * Returns an array with all accepted content types.
-   * if the root directory was specified.
-   * @return database
+   * Returns all accepted media types.
+   * @return accepted media types
    */
-  public String[] produces() {
-    final String accept = req.getHeader("Accept");
-    if(accept == null) return new String[0];
+  public HTTPAccept[] accepts() {
+    final String accept = req.getHeader(ACCEPT);
+    if(accept == null) return new HTTPAccept[0];
 
-    final String[] acc = accept.split("\\s*,\\s*");
-    final int as = acc.length;
-    for(int a = 0; a < as; a++) {
-      if(acc[a].indexOf(';') != -1) acc[a] = acc[a].replaceAll("\\w*;.*", "");
+    final ArrayList<HTTPAccept> list = new ArrayList<>();
+    for(final String produce : accept.split("\\s*,\\s*")) {
+      final HTTPAccept acc = new HTTPAccept();
+      // check if quality factor was specified
+      final Matcher m = QF.matcher(produce);
+      if(m.find()) {
+        acc.type = m.group(1);
+        acc.qf = Token.toDouble(Token.token(m.group(2)));
+      } else {
+        acc.type = produce;
+      }
+      // only accept valid double values
+      if(acc.qf > 0 && acc.qf <= 1) list.add(acc);
     }
-    return acc;
+    return list.toArray(new HTTPAccept[list.size()]);
   }
 
   /**

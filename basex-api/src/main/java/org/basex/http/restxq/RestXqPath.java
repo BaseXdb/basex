@@ -1,6 +1,12 @@
 package org.basex.http.restxq;
 
 import org.basex.http.*;
+import org.basex.query.QueryException;
+import org.basex.query.value.item.QNm;
+import org.basex.util.InputInfo;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class represents the path of a RESTXQ function.
@@ -9,23 +15,20 @@ import org.basex.http.*;
  * @author Christian Gruen
  */
 final class RestXqPath implements Comparable<RestXqPath> {
-  /** Path segments. */
-  final String[] segment;
-  /** Template flags. */
-  private final boolean[] template;
-  /** Number of segments. */
-  final int size;
+  /** Path. */
+  private final String path;
+  /** Path matcher. */
+  private final RestXqPathMatcher matcher;
 
   /**
    * Constructor.
    * @param path path
+   * @param info input info
+   * @throws QueryException query exception
    */
-  RestXqPath(final String path) {
-    segment = HTTPContext.toSegments(path);
-    size = segment.length;
-    template = new boolean[size];
-    for(int s = 0; s < size; s++) template[s] = segment[s].trim().startsWith("{");
-    HTTPContext.decode(segment);
+  RestXqPath(final String path, final InputInfo info) throws QueryException {
+    this.path = path;
+    this.matcher = RestXqPathMatcher.parse(path, info);
   }
 
   /**
@@ -34,13 +37,24 @@ final class RestXqPath implements Comparable<RestXqPath> {
    * @return result of check
    */
   boolean matches(final HTTPContext http) {
-    // check if number of segments match
-    if(size != http.depth()) return false;
-    // check single segments
-    for(int s = 0; s < size; s++) {
-      if(!segment[s].equals(http.segment(s)) && !isTemplate(s)) return false;
-    }
-    return true;
+    return matcher.matches(http.req.getPathInfo());
+  }
+
+  /**
+   * Returns the names of the template variables.
+   * @return list of qualified variable names
+   */
+  List<QNm> vars() {
+    return matcher.vars;
+  }
+
+  /**
+   * Gets the variable values for the given HTTP context path.
+   * @param http HTTP context
+   * @return map with variable values
+   */
+  Map<QNm, String> values(final HTTPContext http) {
+    return matcher.values(http.req.getPathInfo());
   }
 
   /**
@@ -48,15 +62,16 @@ final class RestXqPath implements Comparable<RestXqPath> {
    * @param s offset of segment
    * @return result of check
    */
-  boolean isTemplate(final int s) {
-    return template[s];
+  private boolean isTemplate(final int s) {
+    return matcher.varsPos.testBit(s);
   }
 
   @Override
   public int compareTo(final RestXqPath rxs) {
-    final int d = size - rxs.size;
+    final int ms = matcher.segments;
+    final int d = ms - rxs.matcher.segments;
     if(d != 0) return d;
-    for(int s = 0; s < size; s++) {
+    for(int s = 0; s < ms; s++) {
       final boolean wc1 = isTemplate(s), wc2 = rxs.isTemplate(s);
       if(wc1 != wc2) return wc1 ? 1 : -1;
     }
@@ -65,8 +80,6 @@ final class RestXqPath implements Comparable<RestXqPath> {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("/");
-    for(int s = 0; s < size; s++) sb.append(segment[s]).append('/');
-    return sb.toString();
+    return path;
   }
 }

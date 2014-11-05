@@ -55,6 +55,7 @@ public final class RestXqModules {
    */
   RestXqFunction find(final HTTPContext http, final QNm error) throws Exception {
     cache(http);
+
     // collect all functions
     final ArrayList<RestXqFunction> list = new ArrayList<>();
     for(final RestXqModule mod : modules.values()) {
@@ -64,26 +65,59 @@ public final class RestXqModules {
     }
     // no path matches
     if(list.isEmpty()) return null;
-    // choose most appropriate function
-    RestXqFunction first = list.get(0);
-    if(list.size() > 1) {
-      // sort by specifity
-      Collections.sort(list);
-      first = list.get(0);
-      // disallow more than one path with the same specifity
-      if(first.compareTo(list.get(1)) == 0) {
-        final TokenBuilder tb = new TokenBuilder();
-        for(final RestXqFunction rxf : list) {
-          if(first.compareTo(rxf) != 0) break;
-          tb.add(Prop.NL).add(rxf.function.info.toString());
+
+    // sort by relevance
+    Collections.sort(list);
+
+    // return best matching function
+    final RestXqFunction best = list.get(0);
+    if(list.size() == 1 || best.compareTo(list.get(1)) != 0) return best;
+
+    final RestXqFunction bestQf = bestQf(list, http);
+    if(bestQf != null) return bestQf;
+
+    // show error if more than one path with the same specifity exists
+    final TokenBuilder tb = new TokenBuilder();
+    for(final RestXqFunction rxf : list) {
+      if(best.compareTo(rxf) != 0) break;
+      tb.add(Prop.NL).add(rxf.function.info.toString());
+    }
+    throw best.path == null ?
+      best.error(ERROR_CONFLICT, error, tb) :
+      best.error(PATH_CONFLICT, best.path, tb);
+  }
+
+  /**
+   * Returns the function that has a mime type the quality factor of which matches the HTTP request
+   * best.
+   * @param list list of functions
+   * @param http http context
+   * @return best function, or {@code null} if more than one function exists
+   */
+  private RestXqFunction bestQf(final ArrayList<RestXqFunction> list, final HTTPContext http) {
+    // mime types accepted by the client
+    final HTTPAccept[] accepts = http.accepts();
+
+    double bestQf = 0;
+    RestXqFunction best = list.get(0);
+    for(final RestXqFunction rxf : list) {
+      // skip remaining functions with a weaker specifity
+      if(best.compareTo(rxf) != 0) break;
+      for(final String p : rxf.produces) {
+        for(final HTTPAccept accept : accepts) {
+          final double qf = accept.qf;
+          if(MimeTypes.matches(p, accept.type)) {
+            // multiple functions with the same quality factor
+            if(bestQf == qf) return null;
+            if(bestQf < qf) {
+              bestQf = qf;
+              best = rxf;
+            }
+          }
         }
-        throw first.path == null ?
-          first.error(ERROR_CONFLICT, error, tb) :
-          first.error(PATH_CONFLICT, first.path, tb);
       }
     }
-    // choose most specific function
-    return first;
+    return best;
   }
 
   /**

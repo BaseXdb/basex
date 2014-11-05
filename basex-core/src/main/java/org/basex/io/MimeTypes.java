@@ -77,8 +77,8 @@ public final class MimeTypes {
   }
 
   /**
-   * Checks if the content type is an XQuery content type.
-   * @param type content type
+   * Checks if the mime type is an XQuery mime type.
+   * @param type mime type
    * @return result of check
    */
   public static boolean isXQuery(final String type) {
@@ -86,8 +86,8 @@ public final class MimeTypes {
   }
 
   /**
-   * Checks if the content type is an XML content type.
-   * @param type content type
+   * Checks if the mime type is an XML mime type.
+   * @param type mime type
    * @return result of check
    */
   public static boolean isXML(final String type) {
@@ -95,8 +95,8 @@ public final class MimeTypes {
   }
 
   /**
-   * Checks if the content type is an JSON content type.
-   * @param type content type
+   * Checks if the mime type is a JSON mime type.
+   * @param type mime type
    * @return result of check
    */
   public static boolean isJSON(final String type) {
@@ -104,8 +104,8 @@ public final class MimeTypes {
   }
 
   /**
-   * Checks if the main part of the content type is {@code "text"}.
-   * @param type content type
+   * Checks if the main part of the mime type is {@code "text"}.
+   * @param type mime type
    * @return result of check
    */
   public static boolean isText(final String type) {
@@ -113,8 +113,8 @@ public final class MimeTypes {
   }
 
   /**
-   * Checks if the content type is a multipart content type.
-   * @param type content type
+   * Checks if the mime type is a multipart mime type.
+   * @param type mime type
    * @return result of check
    */
   public static boolean isMultipart(final String type) {
@@ -122,17 +122,33 @@ public final class MimeTypes {
   }
 
   /**
-   * Checks if a content type is accepted by the specified pattern.
-   * @param type content type
+   * Checks if a mime type is accepted by the specified pattern.
+   * @param type mime type
    * @param pattern pattern
    * @return result of check
    */
   public static boolean matches(final String type, final String pattern) {
-    final String[] t = type.split("/", 2);
-    final String[] p = pattern.split("/", 2);
-    return t.length == 2 && p.length == 2 &&
-        ("*".equals(p[0]) || p[0].equals(t[0])) &&
-        ("*".equals(p[1]) || p[1].equals(t[1]));
+    final String[] t = prepareType(type), p = prepareType(pattern);
+    return Token.eq(p[0], t[0], "*") && Token.eq(p[1], t[1], "*");
+  }
+
+  /**
+   * Prepares the specified mime type for comparison.
+   * @param type mime type
+   * @return mime type array
+   */
+  private static String[] prepareType(final String type) {
+    final String[] t = { type, "" };
+    if(type.equals("*")) {
+      t[1] = type;
+    } else {
+      final int i = type.indexOf('/');
+      if(i != -1) {
+        t[0] = type.substring(i);
+        t[1] = type.substring(i + 1);
+      }
+    }
+    return t;
   }
 
   /** Hash map containing all assignments. */

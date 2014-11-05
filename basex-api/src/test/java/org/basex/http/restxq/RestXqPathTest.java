@@ -21,7 +21,7 @@ public final class RestXqPathTest extends RestXqTest {
   @Test
   public void get() throws Exception {
     get("declare %R:path('/') function m:f() { 'root' };", "", "root");
-    get("declare %R:path('') function m:f() { 'root' };", "/", "root");
+    get("declare %R:path('') function m:f() { 'root' };", "", "root");
     // explicit GET method
     get("declare %R:GET %R:path('') function m:f() { 'root' };", "", "root");
     // duplicate GET method
@@ -169,6 +169,8 @@ public final class RestXqPathTest extends RestXqTest {
     getE("declare %R:path('') function m:f($x) {()};", "");
     // variable must inherit xs:anyAtomicType
     getE("declare %R:path('{$x}') function m:f($x as node()) {$x};", "1");
+
+    get("declare %R:path('path/{$x=.+}') function m:f($x) {$x};", "path/a/b/c", "a/b/c");
   }
 
   /**
