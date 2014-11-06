@@ -60,7 +60,7 @@ public final class Levenshtein {
     if(tl == 0) return false;
 
     // use exact search for too short and too long values
-    if(sl < 4 || tl > MAX || sl > MAX) return sl == tl && same(token, sub);
+    if(err == 0 && sl < 4 || tl > MAX || sl > MAX) return sl == tl && same(token, sub);
 
     // skip different tokens with too different lengths
     final int k = err == 0 ? Math.max(1, sl >> 2) : err;
