@@ -335,10 +335,10 @@ public final class QueryContext extends Proc implements AutoCloseable {
         // if parent context exists, updates will be performed by main context
         if(qcParent == null) {
           final ValueBuilder output = resources.output;
-          final StringList dbs = updates.databases();
-          final HashSet<Data> datas = updates.prepare();
 
           // copy nodes that will be affected by an update operation
+          final HashSet<Data> datas = updates.prepare();
+          final StringList dbs = updates.databases();
           copy(cache, datas, dbs);
           copy(output, datas, dbs);
 

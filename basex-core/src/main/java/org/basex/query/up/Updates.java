@@ -118,7 +118,9 @@ public final class Updates {
    * @throws QueryException query exception
    */
   public HashSet<Data> prepare() throws QueryException {
-    return mod == null ? null : mod.prepare();
+    final HashSet<Data> datas = new HashSet<>();
+    if(mod != null) mod.prepare(datas);
+    return datas;
   }
 
   /**
@@ -130,7 +132,7 @@ public final class Updates {
   }
 
   /**
-   * Adds all databases to be updated to the specified list.
+   * Returns the names of all databases that will be updated.
    * @return databases
    */
   public StringList databases() {

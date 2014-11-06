@@ -64,7 +64,7 @@ public abstract class ContextModifier {
   }
 
   /**
-   * Adds all databases to be updated to the specified list.
+   * Adds the names of all databases to be updated to the specified list.
    * @param db databases
    */
   void databases(final StringList db) {
@@ -77,12 +77,11 @@ public abstract class ContextModifier {
   }
 
   /**
-   * Prepares update operations.
-   * @return updated data references
+   * Prepares the update operations and adds all databases to be updated to the specified list.
+   * @param datas updated data references
    * @throws QueryException query exception
    */
-  final HashSet<Data> prepare() throws QueryException {
-    final HashSet<Data> datas = new HashSet<>(dbUpdates.size());
+  final void prepare(final HashSet<Data> datas) throws QueryException {
     for(final DataUpdates up : dbUpdates.values()) {
       // create temporary mem data instance if not available yet
       if(tmp == null) tmp = new MemData(up.data().meta.options);
@@ -90,7 +89,6 @@ public abstract class ContextModifier {
       datas.add(up.data());
     }
     for(final NameUpdates up : nameUpdates.values()) up.prepare();
-    return datas;
   }
 
   /**
