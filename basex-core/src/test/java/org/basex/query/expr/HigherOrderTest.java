@@ -77,6 +77,13 @@ public final class HigherOrderTest extends AdvancedQueryTest {
       "true");
   }
 
+  /** Closure test (#1023). */
+  @Test
+  public void closureTest() {
+    query("for $n in (<a/>, <b/>) let $f := function() as element()* { trace($n) } return $f()",
+        "<a/><b/>");
+  }
+
   /**  Test for name heavy currying. */
   @Test
   public void placeHolderTest() {

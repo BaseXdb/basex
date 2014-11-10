@@ -49,20 +49,26 @@ public final class TypeCheck extends Single {
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     final SeqType argType = expr.seqType();
+
+    // return type is already correct
     if(argType.instanceOf(seqType)) {
       qc.compInfo(QueryText.OPTCAST, seqType);
       return expr;
     }
 
+    // function item coercion
+    if(expr instanceof FuncItem && seqType.type instanceof FuncType) {
+      if(!seqType.occ.check(1)) throw INVTREAT_X_X.get(info, argType, seqType);
+      final FuncItem fi = (FuncItem) expr;
+      return optPre(fi.coerceTo((FuncType) seqType.type, qc, info, true), qc);
+    }
+
+    // we can type check immediately
     if(expr.isValue()) {
-      if(expr instanceof FuncItem && seqType.type instanceof FuncType) {
-        if(!seqType.occ.check(1)) throw INVTREAT_X_X.get(info, expr.seqType(), seqType);
-        final FuncItem fit = (FuncItem) expr;
-        return optPre(fit.coerceTo((FuncType) seqType.type, qc, info, true), qc);
-      }
       return optPre(value(qc), qc);
     }
 
+    // check at each call
     if(argType.type.instanceOf(seqType.type) && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {
       final SeqType.Occ occ = argType.occ.intersect(seqType.occ);
       if(occ == null) throw INVCAST_X_X.get(info, argType, seqType);
