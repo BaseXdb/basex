@@ -13,4 +13,4 @@ BX="$( cd -P "$(dirname "$FILE")/.." && pwd )"
 CP="$BX/target/classes$(printf ":%s" "$BX/lib/"*.jar)"
 
 # Run code
-java -cp $CP $BASEX_JVM org.basex.BaseXClient $@
+java -cp "$CP" $BASEX_JVM org.basex.BaseXClient "$@"

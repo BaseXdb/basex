@@ -16,4 +16,4 @@ CP="$BX/target/classes$(printf ":%s" "$BX/lib/"*.jar)"
 BASEX_JVM="-Xmx512m $BASEX_JVM"
 
 # Run code
-java -cp $CP $BASEX_JVM org.basex.BaseX $@
+java -cp "$CP" $BASEX_JVM org.basex.BaseX "$@"
