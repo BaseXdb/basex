@@ -258,4 +258,13 @@ public final class FuncItemTest extends QueryPlanTest {
     error("declare function local:f() as item()+ { error() }; local:f()", FUNERR1);
     error("function() as item()+ { error() }()", FUNERR1);
   }
+
+  /** Checks that run-time values are not inlined into the static AST. */
+  @Test
+  public void gh1023() {
+    check("for $n in (<a/>, <b/>)"
+        + "let $f := function() as element()* { trace($n) }"
+        + "return $f()",
+        String.format("<a/>%n<b/>"));
+  }
 }
