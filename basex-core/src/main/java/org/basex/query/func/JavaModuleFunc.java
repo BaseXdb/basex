@@ -41,11 +41,17 @@ public final class JavaModuleFunc extends JavaMapping {
    */
   JavaModuleFunc(final StaticContext sc, final InputInfo info, final Object module,
       final Method method, final Expr[] args) {
+
     super(sc, info, args);
     this.module = module;
     this.method = method;
     params = method.getParameterTypes();
     vTypes = JavaFunc.values(params);
+  }
+
+  @Override
+  public boolean isVacuous() {
+    return method.getReturnType() == Void.TYPE;
   }
 
   @Override
