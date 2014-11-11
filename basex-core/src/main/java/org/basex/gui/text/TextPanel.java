@@ -80,16 +80,16 @@ public class TextPanel extends BaseXPanel {
   /**
    * Default constructor.
    * @param txt initial text
-   * @param edit editable flag
+   * @param editable editable flag
    * @param win parent window
    */
-  public TextPanel(final byte[] txt, final boolean edit, final Window win) {
+  public TextPanel(final byte[] txt, final boolean editable, final Window win) {
     super(win);
-    editable = edit;
+    this.editable = editable;
     editor = new TextEditor(gui);
 
     setFocusable(true);
-    setFocusTraversalKeysEnabled(!edit);
+    setFocusTraversalKeysEnabled(!editable);
 
     addMouseMotionListener(this);
     addMouseWheelListener(this);
@@ -119,16 +119,16 @@ public class TextPanel extends BaseXPanel {
     add(scroll, BorderLayout.EAST);
 
     setText(txt);
-    hist = new History(edit ? editor.text() : null);
+    hist = new History(editable ? editor.text() : null);
 
-    if(edit) {
+    if(editable) {
       setBackground(Color.white);
       setBorder(new MatteBorder(1, 1, 0, 0, GUIConstants.color(6)));
     } else {
       mode(Fill.NONE);
     }
 
-    new BaseXPopup(this, edit ?
+    new BaseXPopup(this, editable ?
       new GUICommand[] {
         new FindCmd(), new FindNextCmd(), new FindPrevCmd(), null, new GotoCmd(), null,
         new UndoCmd(), new RedoCmd(), null,

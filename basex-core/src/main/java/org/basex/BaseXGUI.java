@@ -81,7 +81,7 @@ public final class BaseXGUI extends Main {
         final GUI gui = new GUI(context, gopts);
         if(osxGUI != null) osxGUI.init(gui);
 
-        // open specified document or database
+        // open specified file
         for(final String file : files.finish()) {
           if(file.matches("^.*\\" + IO.BASEXSUFFIX + "[^.]*$")) continue;
 

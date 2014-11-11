@@ -9,7 +9,6 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
@@ -17,7 +16,6 @@ import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.view.editor.*;
 import org.basex.io.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Project file tree.
@@ -61,7 +59,8 @@ public final class ProjectView extends BaseXPanel {
     setLayout(new BorderLayout());
 
     tree = new ProjectTree(this);
-    root = new ProjectDir(new IOFile(root()), this);
+    final String proj = gui.gopts.get(GUIOptions.PROJECTPATH);
+    root = new ProjectDir(new IOFile(proj.isEmpty() ? Prop.HOME : proj), this);
     tree.init(root);
 
     filter = new ProjectFilter(this);
@@ -236,26 +235,6 @@ public final class ProjectView extends BaseXPanel {
   }
 
   /**
-   * Returns a common parent directory.
-   * @return root directory
-   */
-  private String root() {
-    final GlobalOptions gopts = gui.context.globalopts;
-    final String proj = gui.gopts.get(GUIOptions.PROJECTPATH);
-    if(!proj.isEmpty()) return proj;
-
-    final IOFile dir1 = new IOFile(gopts.get(GlobalOptions.REPOPATH));
-    final IOFile dir2 = new IOFile(gopts.get(GlobalOptions.WEBPATH));
-    final IOFile dir3 = dir2.resolve(gopts.get(GlobalOptions.RESTXQPATH));
-    final StringList sl = new StringList();
-    for(final IOFile f : new IOFile[] { dir1, dir2, dir3}) {
-      final IOFile p = f.normalize().parent();
-      if(p != null && !sl.contains(p.path())) sl.add(p.path());
-    }
-    return sl.sort().unique().get(0);
-  }
-
-  /**
    * Opens the selected file.
    * @param file file to be opened
    * @param search search string
@@ -280,12 +259,21 @@ public final class ProjectView extends BaseXPanel {
     final ProjectNode child = tree.selectedNode();
     final BaseXFileChooser fc = new BaseXFileChooser(CHOOSE_DIR, child.file.path(), gui);
     final IOFile io = fc.select(Mode.DOPEN);
-    if(io != null) {
-      root.file = io;
-      root.refresh();
-      filter.reset();
-      path.setText(io.path());
-      gui.gopts.set(GUIOptions.PROJECTPATH, io.path());
-    }
+    if(io != null) changeRoot(io, true);
+  }
+
+  /**
+   * Changes the root directory.
+   * @param io root directory
+   * @param force enforce new directory
+   */
+  public void changeRoot(final IOFile io, final boolean force) {
+    final String proj = gui.gopts.get(GUIOptions.PROJECTPATH);
+    if(!force && !proj.isEmpty()) return;
+    root.file = io;
+    root.refresh();
+    filter.reset();
+    path.setText(io.path());
+    if(force) gui.gopts.set(GUIOptions.PROJECTPATH, new IOFile(Prop.HOME).eq(io) ? "" : io.path());
   }
 }

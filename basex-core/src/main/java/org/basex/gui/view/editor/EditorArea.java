@@ -25,7 +25,7 @@ public final class EditorArea extends TextPanel {
   /** File label. */
   final BaseXLabel label;
   /** File in tab. */
-  IOFile file;
+  private IOFile file;
   /** Flag for modified content. */
   boolean modified;
   /** Last input. */
@@ -40,16 +40,16 @@ public final class EditorArea extends TextPanel {
 
   /**
    * Constructor.
-   * @param v view reference
-   * @param f file reference
+   * @param view view reference
+   * @param file file reference
    */
-  EditorArea(final EditorView v, final IOFile f) {
-    super(true, v.gui);
-    view = v;
-    file = f;
-    label = new BaseXLabel(f.name());
+  EditorArea(final EditorView view, final IOFile file) {
+    super(true, view.gui);
+    this.view = view;
+    this.file = file;
+    label = new BaseXLabel(file.name());
     label.setIcon(BaseXImages.file(new IOFile(IO.XQSUFFIX)));
-    setSyntax(f, false);
+    setSyntax(file, false);
 
     addFocusListener(new FocusAdapter() {
       @Override
@@ -216,6 +216,7 @@ public final class EditorArea extends TextPanel {
       file = io;
       label.setIcon(BaseXImages.file(io));
       setSyntax(io, true);
+      repaint();
     }
     tstamp = file.timeStamp();
     hist.save();

@@ -187,7 +187,7 @@ public final class EditorView extends View {
 
         // create popup menu with of recently opened files
         final StringList opened = new StringList();
-        for(final EditorArea ea : editors()) opened.add(ea.file.path());
+        for(final EditorArea ea : editors()) opened.add(ea.file().path());
 
         final StringList hst = new StringList(HISTORY);
         final StringList all = new StringList(gui.gopts.get(GUIOptions.EDITOR));
@@ -273,6 +273,14 @@ public final class EditorView extends View {
         for(final String file : gui.gopts.get(GUIOptions.OPEN)) {
           open(new IOFile(file), false, false);
         }
+        // initialize project root
+        for(final Component c : tabs.getComponents()) {
+          if(!(c instanceof EditorArea)) continue;
+          final EditorArea ea = (EditorArea) c;
+          if(!ea.opened()) continue;
+          project.changeRoot(ea.file().parent(), false);
+          break;
+        }
       }
     });
   }
@@ -357,7 +365,7 @@ public final class EditorView extends View {
    */
   public void jumpToFile() {
     final EditorArea editor = getEditor();
-    if(editor.opened()) project.jump(editor.file);
+    if(editor.opened()) project.jump(editor.file());
   }
 
   /**
@@ -398,7 +406,7 @@ public final class EditorView extends View {
   public boolean saveAs() {
     // open file chooser for XML creation
     final EditorArea edit = getEditor();
-    final String path = edit.opened() ? edit.file.path() : gui.gopts.get(GUIOptions.WORKPATH);
+    final String path = edit.opened() ? edit.file().path() : gui.gopts.get(GUIOptions.WORKPATH);
     final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS, path, gui);
     fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
     fc.filter(BXS_FILES, IO.BXSSUFFIX);
@@ -497,7 +505,7 @@ public final class EditorView extends View {
       }
     }
 
-    IOFile file = editor.file;
+    IOFile file = editor.file();
     editor.last = in;
 
     final boolean xquery = file.hasSuffix(IO.XQSUFFIXES) || !file.path().contains(".");
@@ -512,7 +520,7 @@ public final class EditorView extends View {
       if(exec && lib) {
         final EditorArea ea = execEditor();
         if(ea != null) {
-          file = ea.file;
+          file = ea.file();
           input = string(ea.getText());
           lib = false;
         }
@@ -576,7 +584,7 @@ public final class EditorView extends View {
   private EditorArea execEditor() {
     if(execFile != null) {
       for(final EditorArea edit : editors()) {
-        if(edit.file.path().equals(execFile.path())) return edit;
+        if(edit.file().path().equals(execFile.path())) return edit;
       }
     }
     execFile = null;
@@ -650,7 +658,7 @@ public final class EditorView extends View {
     if(!confirm(ea)) return false;
 
     // remove reference to last executed file
-    if(execFile != null && ea.file.path().equals(execFile.path())) execFile = null;
+    if(execFile != null && ea.file().path().equals(execFile.path())) execFile = null;
     tabs.remove(ea);
     final int t = tabs.getTabCount();
     final int i = tabs.getSelectedIndex();
@@ -727,10 +735,10 @@ public final class EditorView extends View {
         errorInfo = ((QueryException) th).info();
       } else if(th instanceof SAXParseException) {
         final SAXParseException ex = (SAXParseException) th;
-        final String path = getEditor().file.path();
+        final String path = getEditor().file().path();
         errorInfo = new InputInfo(path, ex.getLineNumber(), ex.getColumnNumber());
       } else {
-        errorInfo = new InputInfo(getEditor().file.path(), 1, 1);
+        errorInfo = new InputInfo(getEditor().file().path(), 1, 1);
       }
       error(false);
     }
@@ -821,7 +829,7 @@ public final class EditorView extends View {
     // remember opened files
     final StringList files = new StringList();
     for(final EditorArea edit : editors()) {
-      if(edit.opened()) files.add(edit.file.path());
+      if(edit.opened()) files.add(edit.file().path());
     }
     gui.gopts.set(GUIOptions.OPEN, files.finish());
     return true;
@@ -856,21 +864,21 @@ public final class EditorView extends View {
       final boolean dir = renamed.isDir();
       final String oldPath = old.file().getCanonicalPath() + (dir ? File.separator : "");
       // iterate through all tabs
-      final int s = tabs.getTabCount() - 1;
-      for(int i = 0; i < s; i++) {
-        final Component c = tabs.getComponentAt(i);
+      for(final Component c : tabs.getComponents()) {
         if(!(c instanceof EditorArea)) continue;
 
         final EditorArea ea = (EditorArea) c;
-        final String editPath = ea.file.file().getCanonicalPath();
+        if(!ea.opened()) continue;
+
+        final String editPath = ea.file().file().getCanonicalPath();
         if(dir) {
           // change path to files in a renamed directory
           if(editPath.startsWith(oldPath)) {
-            ea.file = new IOFile(renamed + File.separator + editPath.substring(oldPath.length()));
+            ea.file(new IOFile(renamed + File.separator + editPath.substring(oldPath.length())));
           }
         } else if(oldPath.equals(editPath)) {
           // update file reference and label of editor tab
-          ea.file = renamed;
+          ea.file(renamed);
           ea.label.setText(renamed.name());
           break;
         }
@@ -892,10 +900,10 @@ public final class EditorView extends View {
     if(edit.modified == oe && !force) return;
 
     // update tab title
-    String title = edit.file.name();
+    String title = edit.file().name();
     if(edit.modified) title += '*';
     edit.label.setText(title);
-    edit.script = edit.file.hasSuffix(IO.BXSSUFFIX);
+    edit.script = edit.file().hasSuffix(IO.BXSSUFFIX);
 
     // update components
     gui.refreshControls();
@@ -920,7 +928,7 @@ public final class EditorView extends View {
    */
   private EditorArea find(final IO file, final boolean opened) {
     for(final EditorArea edit : editors()) {
-      if(edit.file.eq(file) && (!opened || edit.opened())) return edit;
+      if(edit.file().eq(file) && (!opened || edit.opened())) return edit;
     }
     return null;
   }
@@ -934,7 +942,7 @@ public final class EditorView extends View {
     final BoolList bl = new BoolList();
     for(final EditorArea edit : editors()) {
       if(edit.opened()) continue;
-      final String n = edit.file.name().substring(FILE.length());
+      final String n = edit.file().name().substring(FILE.length());
       bl.set(n.isEmpty() ? 1 : Integer.parseInt(n), true);
     }
     // find first free file number
@@ -1005,7 +1013,7 @@ public final class EditorView extends View {
    */
   private boolean confirm(final EditorArea edit) {
     if(edit.modified && (edit.opened() || edit.getText().length != 0)) {
-      final Boolean ok = BaseXDialog.yesNoCancel(gui, Util.info(CLOSE_FILE_X, edit.file.name()));
+      final Boolean ok = BaseXDialog.yesNoCancel(gui, Util.info(CLOSE_FILE_X, edit.file().name()));
       if(ok == null || ok && !save()) return false;
     }
     return true;
