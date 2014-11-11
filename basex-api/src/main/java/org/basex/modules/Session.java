@@ -7,6 +7,7 @@ import javax.servlet.http.*;
 import org.basex.data.*;
 import org.basex.http.*;
 import org.basex.query.*;
+import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -71,42 +72,45 @@ public final class Session extends QueryModule {
    * @throws QueryException query exception
    */
   @Requires(Permission.NONE)
-  public Item get(final Str key) throws QueryException {
+  public Value get(final Str key) throws QueryException {
     return get(key, null);
   }
 
   /**
    * Returns a session attribute.
    * @param key key to be requested
-   * @param def default item
+   * @param def default value
    * @return session attribute
    * @throws QueryException query exception
    */
   @Requires(Permission.NONE)
-  public Item get(final Str key, final Item def) throws QueryException {
+  public Value get(final Str key, final Value def) throws QueryException {
     final Object o = session().getAttribute(key.toJava());
     if(o == null) return def;
-    if(o instanceof Item) return (Item) o;
+    if(o instanceof Value) return (Value) o;
     throw SessionErrors.noAttribute(Util.className(o));
   }
 
   /**
    * Updates a session attribute.
    * @param key key of the attribute
-   * @param item item to be stored
+   * @param value value to be stored
    * @throws QueryException query exception
    */
   @Requires(Permission.NONE)
-  public void set(final Str key, final Item item) throws QueryException {
-    Item it = item;
-    final Data d = it.data();
-    if(d != null && !d.inMemory()) {
-      // convert database node to main memory data instance
-      it = ((ANode) it).dbCopy(queryContext.context.options);
-    } else if(it instanceof FItem) {
-      throw SessionErrors.functionItem();
+  public void set(final Str key, final Value value) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(Math.max(1, (int) value.size()));
+    for(final Item item : value) {
+      if(item instanceof FItem) throw SessionErrors.functionItem();
+      final Data d = item.data();
+      if(d != null && !d.inMemory()) {
+        // convert database node to main memory data instance
+        vb.add(((ANode) item).dbCopy(queryContext.context.options));
+      } else {
+        vb.add(item);
+      }
     }
-    session().setAttribute(key.toJava(), it);
+    session().setAttribute(key.toJava(), vb.value());
   }
 
   /**
