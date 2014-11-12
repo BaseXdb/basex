@@ -268,18 +268,18 @@ public final class Functions extends TokenSet {
    * @return query exception or {@code null}
    */
   QueryException similarError(final QNm name, final InputInfo ii) {
-    // find functions with identical local names
-    final byte[] local = name.local(), uri = name.uri();
-    for(final byte[] key : this) {
-      final int i = indexOf(key, '}');
-      if(eq(local, substring(key, i + 1))) return similarError(name, ii, key);
-    }
     // find functions with identical URIs and similar local names
+    final byte[] local = name.local(), uri = name.uri();
     final Levenshtein ls = new Levenshtein();
     for(final byte[] key : this) {
       final int i = indexOf(key, '}');
       if(eq(uri, substring(key, 2, i)) && ls.similar(local, substring(key, i + 1)))
         return similarError(name, ii, key);
+    }
+    // find functions with identical local names
+    for(final byte[] key : this) {
+      final int i = indexOf(key, '}');
+      if(eq(local, substring(key, i + 1))) return similarError(name, ii, key);
     }
     // find functions with identical URIs and local names that start with the specified name
     for(final byte[] key : this) {
