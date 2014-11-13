@@ -257,7 +257,8 @@ public final class ProjectView extends BaseXPanel {
    */
   private void change() {
     final ProjectNode child = tree.selectedNode();
-    final BaseXFileChooser fc = new BaseXFileChooser(CHOOSE_DIR, child.file.path(), gui);
+    final IOFile file = (child != null ? child : root).file;
+    final BaseXFileChooser fc = new BaseXFileChooser(CHOOSE_DIR, file.path(), gui);
     final IOFile io = fc.select(Mode.DOPEN);
     if(io != null) changeRoot(io, true);
   }

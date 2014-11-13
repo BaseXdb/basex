@@ -71,7 +71,10 @@ final class CsvParser {
     while(ch != -1) {
       if(quoted) {
         // quoted state
-        if(ch == '"') {
+        if(ch == '\\') {
+          ch = bs();
+          if(ch == -1) break;
+        } else if(ch == '"') {
           ch = input.read();
           if(ch != '"') {
             quoted = false;
@@ -92,12 +95,27 @@ final class CsvParser {
         first = true;
         data = true;
       } else {
+        if(ch == '\\') ch = bs();
+        if(ch == -1) break;
         // parse any other character
         entry.add(XMLToken.valid(ch) ? ch : '?');
       }
       ch = input.read();
     }
     record(entry, !entry.isEmpty());
+  }
+
+  /**
+   * Parses a backslash character.
+   * @return resulting character
+   * @throws IOException query I/O exception
+   */
+  private int bs() throws IOException {
+    final int ch = input.read();
+    if(ch == 'r') return 0xd;
+    if(ch == 'n') return 0xa;
+    if(ch == 't') return 0x9;
+    return ch;
   }
 
   /**

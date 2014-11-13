@@ -1070,12 +1070,12 @@ public enum Function {
   _RANDOM_INTEGER(RandomInteger.class, "integer([max])", arg(ITR), ITR, flag(NDT), RANDOM_URI),
   /** XQuery function. */
   _RANDOM_SEEDED_DOUBLE(RandomSeededDouble.class, "seeded-double(seed,num)",
-      arg(ITR, ITR), ITEM_ZM, flag(NDT), RANDOM_URI),
+      arg(ITR, ITR), DBL_ZM, flag(NDT), RANDOM_URI),
   /** XQuery function. */
   _RANDOM_SEEDED_INTEGER(RandomSeededInteger.class, "seeded-integer(seed,num[,max])",
-      arg(ITR, ITR, ITR), ITEM_ZM, flag(NDT), RANDOM_URI),
+      arg(ITR, ITR, ITR), ITR_ZM, flag(NDT), RANDOM_URI),
   /** XQuery function. */
-  _RANDOM_GAUSSIAN(RandomGaussian.class, "gaussian(num)", arg(ITR), ITEM_ZM, flag(NDT), RANDOM_URI),
+  _RANDOM_GAUSSIAN(RandomGaussian.class, "gaussian(num)", arg(ITR), DBL_ZM, flag(NDT), RANDOM_URI),
   /** XQuery function. */
   _RANDOM_UUID(RandomUuid.class, "uuid()", arg(), STR, flag(NDT), RANDOM_URI),
 
