@@ -291,7 +291,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       checked = fi.coerceTo((FuncType) ret.type, qc, info, true);
     } else if(body.isValue()) {
       // we can type check immediately
-      checked = seqType.promote(qc, sc, info, (Value) body, false);
+      final Value val = (Value) body;
+      checked = ret.instance(val) ? val : ret.promote(qc, sc, info, val, false);
     } else {
       // check at each call
       if(argType.type.instanceOf(ret.type) && !body.has(Flag.NDT) && !body.has(Flag.UPD)) {
