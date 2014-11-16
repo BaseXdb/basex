@@ -32,7 +32,7 @@ public final class FnIndexOf extends StandardFunc {
           final Item it = ir.next();
           if(it == null) return null;
           ++c;
-          if(it.comparable(srch) && OpV.EQ.eval(it, srch, coll, info)) return Int.get(c);
+          if(it.comparable(srch) && OpV.EQ.eval(it, srch, coll, sc, info)) return Int.get(c);
         }
       }
     };

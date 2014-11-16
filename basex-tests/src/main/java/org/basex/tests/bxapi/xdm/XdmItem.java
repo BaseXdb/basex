@@ -33,14 +33,14 @@ public abstract class XdmItem extends XdmValue {
   public abstract Item internal();
 
   /**
-   * Checks if the two items are equal, according to XQuery.
+   * Checks if the two items are equal, according to XQuery semantics.
    * @param item second item
    * @return result of check
    * @throws XQueryException exception
    */
   public boolean equal(final XdmItem item) {
     try {
-      return item != null && internal().eq(item.internal(), null, null);
+      return item != null && internal().eq(item.internal(), null, null, null);
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }

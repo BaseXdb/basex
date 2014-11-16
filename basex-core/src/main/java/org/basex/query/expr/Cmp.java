@@ -17,6 +17,7 @@ import org.basex.util.*;
 public abstract class Cmp extends Arr {
   /** Collation used for comparisons. */
   final Collation coll;
+
   /**
    * Constructor.
    * @param info input info

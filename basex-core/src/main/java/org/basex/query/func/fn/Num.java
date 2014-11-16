@@ -46,13 +46,13 @@ abstract class Num extends StandardFunc {
     if(rs == null) return null;
 
     // check if first item is comparable
-    cmp.eval(rs, rs, coll, info);
+    cmp.eval(rs, rs, coll, sc, info);
 
     // strings
     if(rs instanceof AStr) {
       for(Item it; (it = iter.next()) != null;) {
         if(!(it instanceof AStr)) throw EXPTYPE_X_X_X.get(info, rs.type, it.type, it);
-        if(cmp.eval(rs, it, coll, info)) rs = it;
+        if(cmp.eval(rs, it, coll, sc, info)) rs = it;
       }
       return rs;
     }
@@ -60,7 +60,7 @@ abstract class Num extends StandardFunc {
     if(rs instanceof ADate || rs instanceof Dur || rs instanceof Bin || rs.type == BLN) {
       for(Item it; (it = iter.next()) != null;) {
         if(rs.type != it.type) throw EXPTYPE_X_X_X.get(info, rs.type, it.type, it);
-        if(cmp.eval(rs, it, coll, info)) rs = it;
+        if(cmp.eval(rs, it, coll, sc, info)) rs = it;
       }
       return rs;
     }
@@ -68,7 +68,7 @@ abstract class Num extends StandardFunc {
     if(rs.type.isUntyped()) rs = DBL.cast(rs, qc, sc, info);
     for(Item it; (it = iter.next()) != null;) {
       final Type t = numType(rs, it);
-      if(cmp.eval(rs, it, coll, info) || Double.isNaN(it.dbl(info))) rs = it;
+      if(cmp.eval(rs, it, coll, sc, info) || Double.isNaN(it.dbl(info))) rs = it;
       if(rs.type != t) rs = (Item) t.cast(rs, qc, sc, info);
     }
     return rs;

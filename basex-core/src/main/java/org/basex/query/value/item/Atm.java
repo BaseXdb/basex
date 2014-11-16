@@ -47,9 +47,10 @@ public final class Atm extends Item {
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
+  public boolean eq(final Item it, final Collation coll, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
     return it.type.isUntyped() ? coll == null ? Token.eq(value, it.string(ii)) :
-      coll.compare(value, it.string(ii)) == 0 : it.eq(this, coll, ii);
+      coll.compare(value, it.string(ii)) == 0 : it.eq(this, coll, sc, ii);
   }
 
   @Override

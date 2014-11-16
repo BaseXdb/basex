@@ -192,7 +192,7 @@ public abstract class Preds extends ParseExpr {
           if(expr1 instanceof Context) path = root;
           // a[text() = 'x'] -> a/text() = 'x'
           if(expr1 instanceof Path) path = Path.get(info, root, expr1).optimize(qc, scp);
-          if(path != null) return new CmpG(path, expr2, cmp.op, cmp.coll, cmp.info);
+          if(path != null) return new CmpG(path, expr2, cmp.op, cmp.coll, cmp.sc, cmp.info);
         }
       }
 

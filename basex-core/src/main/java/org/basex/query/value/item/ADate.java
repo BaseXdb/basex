@@ -359,8 +359,8 @@ public abstract class ADate extends ADateDur {
   }
 
   @Override
-  public final boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public final boolean eq(final Item it, final Collation coll, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
     final ADate d = (ADate) (it instanceof ADate ? it : type.cast(it, null, null, ii));
     final BigDecimal d1 = seconds().add(days().multiply(DAYSECONDS));
     final BigDecimal d2 = d.seconds().add(d.days().multiply(DAYSECONDS));

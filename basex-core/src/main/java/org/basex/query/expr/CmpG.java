@@ -110,6 +110,8 @@ public final class CmpG extends Cmp {
     public String toString() { return name; }
   }
 
+  /** Static context. */
+  public final StaticContext sc;
   /** Comparator. */
   public OpG op;
   /** Flag for atomic evaluation. */
@@ -121,12 +123,14 @@ public final class CmpG extends Cmp {
    * @param expr2 second expression
    * @param op operator
    * @param coll collation
+   * @param sc static context
    * @param info input info
    */
   public CmpG(final Expr expr1, final Expr expr2, final OpG op, final Collation coll,
-      final InputInfo info) {
+      final StaticContext sc, final InputInfo info) {
     super(info, expr1, expr2, coll);
     this.op = op;
+    this.sc = sc;
     seqType = SeqType.BLN;
   }
 
@@ -270,7 +274,7 @@ public final class CmpG extends Cmp {
     if(!(it1 instanceof FItem || it2 instanceof FItem) &&
         (t1 == t2 || t1.isUntyped() || t2.isUntyped() ||
         it1 instanceof ANum && it2 instanceof ANum ||
-        it1 instanceof AStr && it2 instanceof AStr)) return op.op.eval(it1, it2, coll, info);
+        it1 instanceof AStr && it2 instanceof AStr)) return op.op.eval(it1, it2, coll, sc, info);
     throw diffError(info, it1, it2);
   }
 
@@ -278,7 +282,7 @@ public final class CmpG extends Cmp {
   public CmpG invert() {
     final Expr e1 = exprs[0], e2 = exprs[1];
     return e1.size() != 1 || e1.seqType().mayBeArray() || e2.size() != 1 ||
-        e2.seqType().mayBeArray() ? this : new CmpG(e1, e2, op.invert(), coll, info);
+        e2.seqType().mayBeArray() ? this : new CmpG(e1, e2, op.invert(), coll, sc, info);
   }
 
   /**
@@ -293,7 +297,7 @@ public final class CmpG extends Cmp {
     if(op != g.op || coll != g.coll || !exprs[0].sameAs(g.exprs[0])) return null;
 
     final Expr list = new List(info, exprs[1], g.exprs[1]).optimize(qc, scp);
-    final CmpG cmp = new CmpG(exprs[0], list, op, coll, info);
+    final CmpG cmp = new CmpG(exprs[0], list, op, coll, sc, info);
     final SeqType st = list.seqType();
     cmp.atomic = atomic && st.zeroOrOne() && !st.mayBeArray();;
     return cmp;
@@ -359,7 +363,7 @@ public final class CmpG extends Cmp {
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CmpG(exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs), op, coll, info);
+    return new CmpG(exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs), op, coll, sc, info);
   }
 
   @Override

@@ -142,12 +142,13 @@ public abstract class Item extends Value {
    * Checks the items for equality.
    * @param it item to be compared
    * @param coll collation
+   * @param sc static context
    * @param ii input info
    * @return result of check
    * @throws QueryException query exception
    */
-  public abstract boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException;
+  public abstract boolean eq(final Item it, final Collation coll, final StaticContext sc,
+      final InputInfo ii) throws QueryException;
 
   /**
    * Checks the items for equivalence.
@@ -161,7 +162,7 @@ public abstract class Item extends Value {
       throws QueryException {
     // check if both values are NaN, or if values are equal..
     return (this == Dbl.NAN || this == Flt.NAN) && it instanceof ANum && Double.isNaN(it.dbl(ii)) ||
-        comparable(it) && eq(it, coll, ii);
+        comparable(it) && eq(it, coll, null, ii);
   }
 
   /**

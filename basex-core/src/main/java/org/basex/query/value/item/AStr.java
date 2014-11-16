@@ -36,8 +36,8 @@ public abstract class AStr extends Item {
   }
 
   @Override
-  public final boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public final boolean eq(final Item it, final Collation coll, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
     return coll == null ? Token.eq(string(ii), it.string(ii)) :
       coll.compare(string(ii), it.string(ii)) == 0;
   }

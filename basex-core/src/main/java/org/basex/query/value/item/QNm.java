@@ -177,9 +177,19 @@ public final class QNm extends Item {
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
-    if(it instanceof QNm) return eq((QNm) it);
-    throw diffError(ii, this, it);
+  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
+
+    final QNm nm;
+    if(item instanceof QNm) {
+      nm = (QNm) item;
+    } else if(item.type.isUntyped() && sc != null) {
+      nm = new QNm(item.string(ii), sc);
+      if(!nm.hasURI() && nm.hasPrefix()) throw NSDECL_X.get(ii, nm.string());
+    } else {
+      throw diffError(ii, this, item);
+    }
+    return eq(nm);
   }
 
   /**

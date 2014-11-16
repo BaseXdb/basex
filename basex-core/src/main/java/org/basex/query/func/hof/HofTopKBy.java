@@ -34,7 +34,7 @@ public final class HofTopKBy extends StandardFunc {
       @Override
       public int compare(final Item it1, final Item it2) {
         try {
-          return CmpV.OpV.LT.eval(it1, it2, sc.collation, info) ? -1 : 1;
+          return CmpV.OpV.LT.eval(it1, it2, sc.collation, sc, info) ? -1 : 1;
         } catch(final QueryException qe) {
           throw new QueryRTException(qe);
         }
