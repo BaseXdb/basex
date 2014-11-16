@@ -89,11 +89,13 @@ public final class NodeSeqBuilder extends AxisIter {
 
   @Override
   public ANode get(final long i) {
+    if(check) sort(sort);
     return i < size ? nodes[(int) i] : null;
   }
 
   @Override
   public long size() {
+    if(check) sort(sort);
     return size;
   }
 
@@ -132,9 +134,9 @@ public final class NodeSeqBuilder extends AxisIter {
    * @return position, or {@code -1}
    */
   public int indexOf(final ANode n, final boolean db) {
-    if(db) return n instanceof DBNode ?
-        Math.max(binarySearch((DBNode) n, 0, size), -1) : -1;
-    for(int s = 0; s < size(); ++s) if(nodes[s].is(n)) return s;
+    if(db) return n instanceof DBNode ? Math.max(binarySearch((DBNode) n, 0, size), -1) : -1;
+    final long sz = size();
+    for(int s = 0; s < sz; ++s) if(nodes[s].is(n)) return s;
     return -1;
   }
 

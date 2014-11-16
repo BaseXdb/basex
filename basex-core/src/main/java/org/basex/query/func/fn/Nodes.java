@@ -63,11 +63,9 @@ abstract class Nodes extends StandardFunc {
             before = nd.pre;
           }
         }
-
         // nodes were added in reverse order, correct that
         Array.reverse(nc.nodes, 0, (int) nc.size());
       }
-
       return nc;
     }
 
@@ -78,7 +76,7 @@ abstract class Nodes extends StandardFunc {
       final AxisIter ax = outer ? nd.ancestor() : nd.descendant();
       for(ANode a; (a = ax.next()) != null;)
         if(nc.indexOf(a, false) != -1) continue OUTER;
-      out.add(nc.nodes[i]);
+      out.add(nd);
     }
     return out;
   }

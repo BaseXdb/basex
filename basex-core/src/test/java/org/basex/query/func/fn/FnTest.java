@@ -105,6 +105,13 @@ public final class FnTest extends AdvancedQueryTest {
     query(SORT.args("((1,0), (1,1), (0,1), (0,0))"), "0 0 0 0 1 1 1 1");
   }
 
+  /** Tests for the {@code outermost} and {@code innermost} functions. */
+  @Test
+  public void most() {
+    query("let $n := <li/> return " + OUTERMOST.args("($n, $n)"), "<li/>");
+    query("let $n := <li/> return " + INNERMOST.args("($n, $n)"), "<li/>");
+  }
+
   /** Tests for the {@code parse-json} function. */
   @Test
   public void parseJson() {
