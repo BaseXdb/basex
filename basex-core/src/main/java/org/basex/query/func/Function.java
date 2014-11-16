@@ -62,7 +62,7 @@ public enum Function {
   // Standard functions
 
   /** XQuery function. */
-  ABS(FnAbs.class, "abs(num)", arg(AAT_ZO), AAT_ZO),
+  ABS(FnAbs.class, "abs(num)", arg(NUM_ZO), NUM_ZO),
   /** XQuery function. */
   ADJUST_DATE_TO_TIMEZONE(FnAdjustDateToTimezone.class, "adjust-date-to-timezone(date[,zone])",
       arg(DAT_ZO, DTD_ZO), DAT_ZO),
@@ -85,7 +85,7 @@ public enum Function {
   /** XQuery function. */
   BOOLEAN(FnBoolean.class, "boolean(items)", arg(ITEM_ZM), BLN),
   /** XQuery function. */
-  CEILING(FnCeiling.class, "ceiling(num)", arg(AAT_ZO), AAT_ZO),
+  CEILING(FnCeiling.class, "ceiling(num)", arg(NUM_ZO), NUM_ZO),
   /** XQuery function. */
   CODEPOINT_EQUAL(FnCodepointEqual.class, "codepoint-equal(string1,string2)",
       arg(STR_ZO, STR_ZO), BLN_ZO),
@@ -164,7 +164,7 @@ public enum Function {
   FILTER(FnFilter.class, "filter(items,function)",
       arg(ITEM_ZM, FuncType.get(BLN, ITEM).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
-  FLOOR(FnFloor.class, "floor(num)", arg(AAT_ZO), AAT_ZO),
+  FLOOR(FnFloor.class, "floor(num)", arg(NUM_ZO), NUM_ZO),
   /** XQuery function. */
   FOLD_LEFT(FnFoldLeft.class, "fold-left(items,zero,function)",
       arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM).seqType()),
@@ -192,7 +192,7 @@ public enum Function {
       arg(ITR_ZO, STR, STR), STR),
   /** XQuery function. */
   FORMAT_NUMBER(FnFormatNumber.class, "format-number(number,picture[,format])",
-      arg(ITR_ZO, STR, STR_ZO), STR),
+      arg(NUM_ZO, STR, STR_ZO), STR),
   /** XQuery function. */
   FORMAT_TIME(FnFormatTime.class, "format-time(number,picture,[language,calendar,place])",
       arg(TIM_ZO, STR, STR_ZO, STR_ZO, STR_ZO), STR_ZO),
@@ -328,10 +328,10 @@ public enum Function {
   /** XQuery function. */
   ROOT(FnRoot.class, "root([node])", arg(NOD_ZO), NOD_ZO),
   /** XQuery function. */
-  ROUND(FnRound.class, "round(num[,prec])", arg(AAT_ZO, ITR), AAT_ZO),
+  ROUND(FnRound.class, "round(num[,prec])", arg(NUM_ZO, ITR), NUM_ZO),
   /** XQuery function. */
   ROUND_HALF_TO_EVEN(FnRoundHalfToEven.class, "round-half-to-even(num[,prec])",
-      arg(AAT_ZO, ITR), AAT_ZO),
+      arg(NUM_ZO, ITR), NUM_ZO),
   /** XQuery function. */
   SECONDS_FROM_DATETIME(FnSecondsFromDateTime.class, "seconds-from-dateTime(datetime)",
       arg(DTM_ZO), DEC_ZO),
@@ -508,7 +508,7 @@ public enum Function {
   /** XQuery function. */
   _MATH_ATAN2(MathAtan2.class, "atan2(number1,number2)", arg(DBL, DBL), DBL, MATH_URI),
   /** XQuery function. */
-  _MATH_POW(MathPow.class, "pow(number1,number2)", arg(DBL_ZO, ITR), DBL_ZO, MATH_URI),
+  _MATH_POW(MathPow.class, "pow(number1,number2)", arg(DBL_ZO, NUM), DBL_ZO, MATH_URI),
   /** XQuery function. */
   _MATH_EXP(MathExp.class, "exp(number)", arg(DBL_ZO), DBL_ZO, MATH_URI),
   /** XQuery function. */

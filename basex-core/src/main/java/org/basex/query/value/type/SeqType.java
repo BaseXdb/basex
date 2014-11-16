@@ -112,6 +112,12 @@ public final class SeqType {
   public static final SeqType AAT_ZO = new SeqType(AtomType.AAT, Occ.ZERO_ONE);
   /** Zero or more xs:anyAtomicType. */
   public static final SeqType AAT_ZM = new SeqType(AtomType.AAT, Occ.ZERO_MORE);
+  /** Zero or one xs:numeric. */
+  public static final SeqType NUM = AtomType.NUM.seqType();
+  /** Zero or one xs:numeric. */
+  public static final SeqType NUM_ZO = new SeqType(AtomType.NUM, Occ.ZERO_ONE);
+  /** Zero or more xs:numeric. */
+  public static final SeqType NUM_ZM = new SeqType(AtomType.NUM, Occ.ZERO_MORE);
   /** Single xs:boolean. */
   public static final SeqType BLN = AtomType.BLN.seqType();
   /** Zero or one xs:boolean. */

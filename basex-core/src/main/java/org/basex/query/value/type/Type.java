@@ -85,6 +85,7 @@ public interface Type {
     /** xs:anyURI.                */ URI(81),
     /** xs:QName.                 */ QNM(82),
     /** xs:NOTATION.              */ NOT(83),
+    /** xs:numeric.               */ NUM(84),
     /** java().                   */ JAVA(86);
 
     /** Cached enums (faster). */

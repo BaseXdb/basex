@@ -214,8 +214,24 @@ public enum AtomType implements Type {
     }
   },
 
+  /** Numeric type. */
+  NUM("numeric", AAT, XS_URI, true, false, false, Type.ID.NUM) {
+    @Override
+    public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
+        final InputInfo ii) throws QueryException {
+      // return double
+      return item.type.isNumber() ? item : Dbl.get(checkNum(item, ii).dbl(ii));
+    }
+    @Override
+    public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
+        final InputInfo ii) throws QueryException {
+      // return double
+      return cast(Str.get(value, qc, ii), qc, sc, ii);
+    }
+  },
+
   /** Float type. */
-  FLT("float", AAT, XS_URI, true, false, false, Type.ID.FLT) {
+  FLT("float", NUM, XS_URI, true, false, false, Type.ID.FLT) {
     @Override
     public Flt cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
@@ -229,7 +245,7 @@ public enum AtomType implements Type {
   },
 
   /** Double type. */
-  DBL("double", AAT, XS_URI, true, false, false, Type.ID.DBL) {
+  DBL("double", NUM, XS_URI, true, false, false, Type.ID.DBL) {
     @Override
     public Dbl cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
@@ -243,7 +259,7 @@ public enum AtomType implements Type {
   },
 
   /** Decimal type. */
-  DEC("decimal", AAT, XS_URI, true, false, false, Type.ID.DEC) {
+  DEC("decimal", NUM, XS_URI, true, false, false, Type.ID.DEC) {
     @Override
     public Dec cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
