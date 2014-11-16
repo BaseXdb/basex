@@ -36,7 +36,7 @@ public final class FnParseIetfDate extends StandardFunc {
     };
     /** Timezones. */
     private static final String[] TZNAMES = {
-      "ut", "utc", "gmt", "est", "edt", "cst", "cdt", "mst", "mdt", "pst", "pdt"
+      "utc", "ut", "gmt", "est", "edt", "cst", "cdt", "mst", "mdt", "pst", "pdt"
     };
     /** Associated times. */
     private static final int[] TIMES = {
