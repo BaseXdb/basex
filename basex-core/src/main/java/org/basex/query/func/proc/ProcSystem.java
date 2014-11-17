@@ -3,6 +3,7 @@ package org.basex.query.func.proc;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
+import org.basex.query.util.Err.ErrType;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -19,7 +20,7 @@ public final class ProcSystem extends ProcFn {
     if(result.code == 0) return Str.get(norm(result.output));
 
     // create error message
-    final QNm name = new QNm("PROC" + String.format("%04d", result.code));
+    final QNm name = new QNm(ErrType.BXPR + String.format("%04d", result.code));
     throw new QueryException(info, name, string(norm(result.error)));
   }
 }
