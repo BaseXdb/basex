@@ -47,8 +47,6 @@ public class XMLCommandTest extends SandboxTest {
     ok("<create-user name='X'/>");
     ok("<create-user name='X'>X</create-user>");
 
-    ok("<cs>X</cs>");
-
     ok("<delete path='X'/>");
 
     ok("<drop-backup name='X'/>");
@@ -95,6 +93,7 @@ public class XMLCommandTest extends SandboxTest {
     ok("<list name='X' path='X'/>");
 
     ok("<open name='X'/>");
+    ok("<open name='X' path='Y'/>");
 
     ok("<optimize/>");
 

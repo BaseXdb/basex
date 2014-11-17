@@ -1,7 +1,6 @@
 package org.basex.http.rest;
 
 import static org.basex.http.rest.RESTText.*;
-import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -132,11 +131,7 @@ public abstract class RESTCmd extends Command {
    */
   static void open(final RESTSession rs) {
     final String db = rs.http.db();
-    if(db == null) return;
-    final String dbpath = rs.http.dbpath();
-
-    rs.add(new Open(db));
-    if(!dbpath.isEmpty()) rs.add(new Cs(_DB_OPEN.args(db, dbpath)));
+    if(db != null) rs.add(new Open(db, rs.http.dbpath()));
   }
 
   /**

@@ -94,7 +94,7 @@ public final class StringParser extends CmdParser {
         }
         break;
       case OPEN:
-        return new Open(name(cmd));
+        return new Open(name(cmd), string(null));
       case CHECK:
         return new Check(string(cmd));
       case ADD:
@@ -166,8 +166,6 @@ public final class StringParser extends CmdParser {
         return new Execute(string(cmd, false));
       case FIND:
         return new Find(string(cmd, false));
-      case CS:
-        return new Cs(xquery(cmd));
       case GET:
         return new Get(name(null));
       case SET:

@@ -390,10 +390,6 @@ public interface Text {
     '[' + S_INPUT + ']', lang("c_execute1"), lang("c_execute2", S_INPUT)
   };
   /** Command help. */
-  String[] HELPCS = {
-    '[' + S_QUERY + ']', lang("c_cs1"), lang("c_cs2")
-  };
-  /** Command help. */
   String[] HELPKILL = {
     '[' + S_NAME + ']', lang("c_kill1"), lang("c_kill2")
   };

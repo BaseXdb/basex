@@ -40,7 +40,7 @@ class RESTQuery extends RESTCmd {
 
   /**
    * Evaluates the specified query.
-   * @param path set query path
+   * @param path query path
    * @throws HTTPException REST exception
    * @throws IOException I/O exception
    */

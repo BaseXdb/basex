@@ -9,7 +9,6 @@ import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.Commands.CmdIndex;
-import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -166,19 +165,6 @@ public class CommandTest extends SandboxTest {
 
     ok(new CreateUser(Databases.DBCHARS, md5("")));
     ok(new DropUser(Databases.DBCHARS));
-  }
-
-  /** Command test. */
-  @Test
-  public final void cs() {
-    no(new Cs("//li"));
-    ok(new CreateDB(NAME, FILE));
-    ok(new Cs("//  li"));
-    ok(context.current(), 2);
-    ok(new Cs("."));
-    ok(context.current(), 2);
-    ok(new Cs("/"));
-    ok(context.current(), 1);
   }
 
   /** Command test. */
@@ -362,6 +348,8 @@ public class CommandTest extends SandboxTest {
     ok(new CreateDB(NAME, FILE));
     ok(new Open(NAME));
     ok(new Open(NAME));
+    ok(new Open(NAME, FILE));
+    ok(new Open(NAME, "abc"));
     no(new Open(":"));
   }
 
@@ -580,15 +568,6 @@ public class CommandTest extends SandboxTest {
    */
   private static void ok(final boolean flag) {
     assertTrue(flag);
-  }
-
-  /**
-   * Assumes that the nodes have the specified number of nodes.
-   * @param nodes context nodes
-   * @param size expected size
-   */
-  private static void ok(final DBNodes nodes, final int size) {
-    if(nodes != null) assertEquals(size, nodes.size());
   }
 
   /**

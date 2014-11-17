@@ -103,13 +103,17 @@ public class FuncType implements Type {
     final FuncType ft = (FuncType) t;
 
     // check annotations
-    if(ann.size() != ft.ann.size()) return false;
-    for(int i = 0; i < ann.size(); i++) {
-      if(!ann.contains(ft.ann.names[i], ft.ann.values[i])) return false;
+    final int as = ann.size();
+    if(as != ft.ann.size()) return false;
+    for(int a = 0; a < as; a++) {
+      if(!ann.contains(ft.ann.names[a], ft.ann.values[a])) return false;
     }
 
     if(this == ANY_FUN || ft == ANY_FUN || argTypes.length != ft.argTypes.length) return false;
-    for(int i = 0; i < argTypes.length; i++) if(!argTypes[i].eq(ft.argTypes[i])) return false;
+    final int al = argTypes.length;
+    for(int i = 0; i < al; i++) {
+      if(!argTypes[i].eq(ft.argTypes[i])) return false;
+    }
     return retType.eq(ft.retType);
   }
 
@@ -121,14 +125,18 @@ public class FuncType implements Type {
 
     // check annotations
     final FuncType ft = (FuncType) t;
-    for(int i = 0; i < ft.ann.size(); i++)
-      if(!ann.contains(ft.ann.names[i], ft.ann.values[i])) return false;
+    final int as = ft.ann.size();
+    for(int a = 0; a < as; a++) {
+      if(!ann.contains(ft.ann.names[a], ft.ann.values[a])) return false;
+    }
 
     // takes care of FunType.ANY
     if(this == ft || ft == ANY_FUN) return true;
-    if(this == ANY_FUN || argTypes.length != ft.argTypes.length ||
-        !retType.instanceOf(ft.retType)) return false;
-    for(int a = 0; a < argTypes.length; a++) {
+    if(this == ANY_FUN || argTypes.length != ft.argTypes.length || !retType.instanceOf(ft.retType))
+      return false;
+
+    final int al = argTypes.length;
+    for(int a = 0; a < al; a++) {
       if(!ft.argTypes[a].instanceOf(argTypes[a])) return false;
     }
     return true;

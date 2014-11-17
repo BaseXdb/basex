@@ -20,7 +20,16 @@ public final class Open extends Command {
    * @param name name of database
    */
   public Open(final String name) {
-    super(Perm.NONE, name);
+    this(name, null);
+  }
+
+  /**
+   * Default constructor.
+   * @param name name of database
+   * @param path database path
+   */
+  public Open(final String name, final String path) {
+    super(Perm.NONE, name, path);
   }
 
   @Override
@@ -35,6 +44,11 @@ public final class Open extends Command {
       try {
         data = open(db, context);
         context.openDB(data);
+
+        final String path = args[1];
+        if(path != null && !path.isEmpty()) {
+          context.current(new DBNodes(data, data.resources.docs(path).toArray()));
+        }
         if(data.meta.oldindex()) info(H_INDEX_FORMAT);
         if(data.meta.corrupt)  info(DB_CORRUPT);
       } catch(final IOException ex) {

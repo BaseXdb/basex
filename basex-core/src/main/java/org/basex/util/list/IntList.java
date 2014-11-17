@@ -226,6 +226,20 @@ public class IntList extends ElementList {
   }
 
   /**
+   * Removes duplicate entries from a sorted list.
+   * @return self reference
+   */
+  public IntList distinct() {
+    int i = 1;
+    for(int j = 1; j < size; ++j) {
+      while(j < size && list[i - 1] == list[j]) j++;
+      if(j < size) list[i++] = list[j];
+    }
+    size = i;
+    return this;
+  }
+
+  /**
    * Sorts the data.
    * @return self reference
    */

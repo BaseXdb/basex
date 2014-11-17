@@ -81,8 +81,6 @@ final class XMLParser extends CmdParser {
       return new CreateIndex(value(root, TYPE));
     if(e.equals(CREATE_USER) && check(root, NAME, '#' + PASSWORD + '?'))
       return new CreateUser(value(root, NAME), password(root));
-    if(e.equals(CS) && check(root, '#' + QUERY))
-      return new Cs(value(root));
     if(e.equals(DELETE) && check(root, PATH))
       return new Delete(value(root, PATH));
     if(e.equals(DROP_BACKUP) && check(root, NAME))
@@ -121,8 +119,8 @@ final class XMLParser extends CmdParser {
       return new Kill(value(root, TARGET));
     if(e.equals(LIST) && check(root, NAME + '?', PATH + '?'))
       return new List(value(root, NAME), value(root, PATH));
-    if(e.equals(OPEN) && check(root, NAME))
-      return new Open(value(root, NAME));
+    if(e.equals(OPEN) && check(root, NAME, PATH + '?'))
+      return new Open(value(root, NAME), value(root, PATH));
     if(e.equals(OPTIMIZE) && check(root))
       return new Optimize();
     if(e.equals(OPTIMIZE_ALL) && check(root))
