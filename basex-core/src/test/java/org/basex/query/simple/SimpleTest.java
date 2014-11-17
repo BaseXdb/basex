@@ -20,7 +20,7 @@ public final class SimpleTest extends QueryTest {
       { "Annotation 2", integers(1), "declare %local:x(1.) variable $a := 1; $a" },
       { "Annotation 3", "declare %local:x(.) variable $a := 1; $a" },
 
-      { "Compare 1", "xs:QName('a') = attribute a { 'b' }" },
+      { "Compare 1", booleans(true), "xs:QName('b') = attribute a { 'b' }" },
       { "Compare 2", booleans(false), "<a/>/x = (c, ())" },
       { "Compare 3", booleans(false), "(4,5,6) < (1,2)" },
       { "Compare 4", booleans(false), "(4,5) < (1,2,3)" },
