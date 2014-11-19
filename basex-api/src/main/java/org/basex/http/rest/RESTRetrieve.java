@@ -80,7 +80,8 @@ final class RESTRetrieve extends RESTCmd {
    */
   static RESTCmd get(final RESTSession rs) {
     final HTTPContext http = rs.http;
-    if(http.depth() == 0) return new RESTList(rs.add(new List()));
-    return new RESTRetrieve(rs.add(new Open(http.db())));
+    final String db = http.db();
+    if(db.isEmpty()) return new RESTList(rs.add(new List()));
+    return new RESTRetrieve(rs.add(new Open(db)));
   }
 }

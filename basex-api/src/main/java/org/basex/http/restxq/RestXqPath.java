@@ -37,7 +37,7 @@ final class RestXqPath implements Comparable<RestXqPath> {
    * @return result of check
    */
   boolean matches(final HTTPContext http) {
-    return matcher.matches(http.req.getPathInfo());
+    return matcher.matches(http.path());
   }
 
   /**
@@ -54,7 +54,7 @@ final class RestXqPath implements Comparable<RestXqPath> {
    * @return map with variable values
    */
   Map<QNm, String> values(final HTTPContext http) {
-    return matcher.values(http.req.getPathInfo());
+    return matcher.values(http.path());
   }
 
   /**

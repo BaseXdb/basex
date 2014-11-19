@@ -1,19 +1,17 @@
 package org.basex.http.restxq;
 
+import static java.math.BigInteger.*;
 import static org.basex.http.restxq.RestXqText.*;
-import static java.math.BigInteger.ZERO;
 
-import org.basex.query.QueryException;
-import org.basex.query.util.Err;
-import org.basex.query.value.item.QNm;
-import org.basex.util.*;
-
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.net.URLDecoder;
+import java.math.*;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.regex.*;
+
+import org.basex.http.*;
+import org.basex.query.*;
+import org.basex.query.util.*;
+import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * RESTXQ path template.
@@ -79,8 +77,7 @@ final class RestXqPathMatcher {
    * @return pattern matcher
    */
   private Matcher matcher(final String input) {
-    final String p = decode(input);
-    return pattern.matcher(p.startsWith("/") ? p : p + '/');
+    return pattern.matcher(input);
   }
 
   /**
@@ -176,7 +173,7 @@ final class RestXqPathMatcher {
    */
   private static void decodeAndEscape(final StringBuilder literals, final StringBuilder result) {
     if(literals.length() > 0) {
-      final String decoded = decode(literals.toString());
+      final String decoded = HTTPContext.decode(literals.toString());
       final int n = decoded.length();
       for(int i = 0; i < n; ++i) {
         final char c = decoded.charAt(i);
@@ -205,19 +202,6 @@ final class RestXqPathMatcher {
    */
   private static QueryException error(final InputInfo info, final String msg, final Object... e) {
     return Err.BASX_RESTXQ_X.get(info, Util.info(msg, e));
-  }
-
-  /**
-   * Decodes the given URL.
-   * @param p string to decode.
-   * @return decoded value
-   */
-  private static String decode(final String p) {
-    try {
-      return URLDecoder.decode(p, "UTF-8");
-    } catch(final UnsupportedEncodingException ex) {
-      throw new IllegalArgumentException(ex);
-    }
   }
 
   /** Character iterator. */

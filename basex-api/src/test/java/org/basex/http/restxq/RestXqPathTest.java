@@ -13,15 +13,19 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class RestXqPathTest extends RestXqTest {
-
   /**
    * Retrieves the root.
    * @throws Exception exception
    */
   @Test
   public void get() throws Exception {
-    get("declare %R:path('/') function m:f() { 'root' };", "", "root");
+    // ignore duplicate slashes
     get("declare %R:path('') function m:f() { 'root' };", "", "root");
+    get("declare %R:path('') function m:f() { 'root' };", "/", "root");
+    get("declare %R:path('') function m:f() { 'root' };", "//", "root");
+    get("declare %R:path('') function m:f() { 'root' };", "/////", "root");
+    get("declare %R:path('/') function m:f() { 'root' };", "", "root");
+    get("declare %R:path('/') function m:f() { 'root' };", "/", "root");
     // explicit GET method
     get("declare %R:GET %R:path('') function m:f() { 'root' };", "", "root");
     // duplicate GET method

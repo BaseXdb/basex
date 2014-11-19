@@ -22,7 +22,6 @@ import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.server.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 import org.basex.util.options.*;
 
 /**
@@ -62,24 +61,24 @@ public final class HTTPContext {
 
   /** Performance. */
   private final Performance perf = new Performance();
-  /** Segments. */
-  private final String[] segments;
+  /** Path, starting with a slash. */
+  private final String path;
 
   /**
    * Constructor.
-   * @param rq request
-   * @param rs response
+   * @param req request
+   * @param res response
    * @param servlet calling servlet instance
    * @throws IOException I/O exception
    */
-  public HTTPContext(final HttpServletRequest rq, final HttpServletResponse rs,
+  public HTTPContext(final HttpServletRequest req, final HttpServletResponse res,
       final BaseXServlet servlet) throws IOException {
 
-    req = rq;
-    res = rs;
+    this.req = req;
+    this.res = res;
     params = new HTTPParams(this);
 
-    method = rq.getMethod();
+    method = req.getMethod();
 
     final StringBuilder uri = new StringBuilder(req.getRequestURL());
     final String qs = req.getQueryString();
@@ -88,7 +87,7 @@ public final class HTTPContext {
 
     // set UTF8 as default encoding (can be overwritten)
     res.setCharacterEncoding(UTF8);
-    segments = decode(toSegments(req.getPathInfo()));
+    path = decode(normalize(req.getPathInfo()));
 
     // adopt servlet-specific credentials or use global ones
     final GlobalOptions mprop = context().globalopts;
@@ -163,43 +162,29 @@ public final class HTTPContext {
   }
 
   /**
-   * Returns the path depth.
-   * @return path depth
+   * Returns the URL path.
+   * @return path path
    */
-  public int depth() {
-    return segments.length;
-  }
-
-  /**
-   * Returns a single path segment.
-   * @param i index
-   * @return segment
-   */
-  public String segment(final int i) {
-    return segments[i];
+  public String path() {
+    return path;
   }
 
   /**
    * Returns the database path (i.e., all path entries except for the first).
-   * @return path depth
+   * @return database path
    */
   public String dbpath() {
-    final TokenBuilder tb = new TokenBuilder();
-    final int ps = segments.length;
-    for(int p = 1; p < ps; p++) {
-      if(!tb.isEmpty()) tb.add('/');
-      tb.add(segments[p]);
-    }
-    return tb.toString();
+    final int s = path.indexOf('/', 1);
+    return s == -1 ? "" : path.substring(s + 1);
   }
 
   /**
-   * Returns the addressed database (i.e., the first path entry), or {@code null}
-   * if the root directory was specified.
-   * @return database
+   * Returns the addressed database (i.e., the first path entry).
+   * @return database, or {@code null} if the root directory was specified.
    */
   public String db() {
-    return depth() == 0 ? null : segments[0];
+    final int s = path.indexOf('/', 1);
+    return path.substring(1, s == -1 ? path.length() : s);
   }
 
   /**
@@ -391,27 +376,29 @@ public final class HTTPContext {
   }
 
   /**
-   * Converts the path to a string array, containing the single segments.
+   * Normalizes the path information.
    * @param path path, or {@code null}
-   * @return path depth
+   * @return normalized path
    */
-  public static String[] toSegments(final String path) {
-    final StringList sl = new StringList();
+  public static String normalize(final String path) {
+    final TokenBuilder tmp = new TokenBuilder();
     if(path != null) {
       final TokenBuilder tb = new TokenBuilder();
-      for(int s = 0; s < path.length(); s++) {
-        final char ch = path.charAt(s);
+      final int pl = path.length();
+      for(int p = 0; p < pl; p++) {
+        final char ch = path.charAt(p);
         if(ch == '/') {
           if(tb.isEmpty()) continue;
-          sl.add(tb.toString());
+          tmp.add('/').add(tb.toArray());
           tb.reset();
         } else {
           tb.add(ch);
         }
       }
-      if(!tb.isEmpty()) sl.add(tb.toString());
+      if(!tb.isEmpty()) tmp.add('/').add(tb.finish());
     }
-    return sl.toArray();
+    if(tmp.isEmpty()) tmp.add('/');
+    return tmp.toString();
   }
 
   /**
@@ -420,13 +407,9 @@ public final class HTTPContext {
    * @return argument
    * @throws IllegalArgumentException invalid path segments
    */
-  public static String[] decode(final String[] segments) {
+  public static String decode(final String segments) {
     try {
-      final int sl = segments.length;
-      for(int s = 0; s < sl; s++) {
-        segments[s] = URLDecoder.decode(segments[s], Prop.ENCODING);
-      }
-      return segments;
+      return URLDecoder.decode(segments, Prop.ENCODING);
     } catch(final UnsupportedEncodingException ex) {
       throw new IllegalArgumentException(ex);
     }

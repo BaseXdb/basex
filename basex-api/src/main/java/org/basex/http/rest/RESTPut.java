@@ -30,7 +30,8 @@ final class RESTPut {
   public static RESTExec get(final RESTSession rs) throws IOException {
     // create new database or update resource
     final HTTPContext http = rs.http;
-    if(http.depth() == 0) throw HTTPCode.NO_PATH.get();
+    final String db = http.db();
+    if(db.isEmpty()) throw HTTPCode.NO_PATH.get();
 
     RESTCmd.parseOptions(rs);
 
@@ -58,8 +59,8 @@ final class RESTPut {
     if(parser != null) rs.context.options.set(MainOptions.PARSER, parser);
 
     // store data as XML or raw file, depending on content type
-    final String db = http.db();
-    if(http.depth() == 1) {
+    final String path = http.dbpath();
+    if(path.isEmpty()) {
       if(xml) {
         rs.add(new CreateDB(db), is);
       } else {
@@ -68,7 +69,6 @@ final class RESTPut {
       }
     } else {
       rs.add(new Open(db));
-      final String path = http.dbpath();
       if(xml) {
         rs.add(new Replace(path), is);
       } else {

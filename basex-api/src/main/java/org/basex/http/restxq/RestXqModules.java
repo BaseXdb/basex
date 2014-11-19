@@ -103,6 +103,8 @@ public final class RestXqModules {
     for(final RestXqFunction rxf : list) {
       // skip remaining functions with a weaker specifity
       if(best.compareTo(rxf) != 0) break;
+      if(rxf.produces.isEmpty()) return null;
+
       for(final String p : rxf.produces) {
         for(final HTTPAccept accept : accepts) {
           final double qf = accept.qf;
