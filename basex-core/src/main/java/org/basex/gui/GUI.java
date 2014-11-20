@@ -690,6 +690,7 @@ public final class GUI extends AGUI {
     if(disk.compareTo(used) < 0) {
       // update version option to latest used version
       gopts.set(GUIOptions.UPDATEVERSION, used.toString());
+      gopts.write();
     } else {
       try {
         final String page = Token.string(new IOUrl(Prop.VERSION_URL).read());
@@ -703,6 +704,7 @@ public final class GUI extends AGUI {
             } else {
               // don't show update dialog anymore if it has been rejected once
               gopts.set(GUIOptions.UPDATEVERSION, latest.toString());
+              gopts.write();
             }
           }
         }

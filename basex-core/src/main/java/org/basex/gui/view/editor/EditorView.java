@@ -265,24 +265,6 @@ public final class EditorView extends View {
         if(file instanceof File) open(new IOFile((File) file));
       }
     });
-
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        // remember opened files; don't complain about missing files
-        for(final String file : gui.gopts.get(GUIOptions.OPEN)) {
-          open(new IOFile(file), false, false);
-        }
-        // initialize project root
-        for(final Component c : tabs.getComponents()) {
-          if(!(c instanceof EditorArea)) continue;
-          final EditorArea ea = (EditorArea) c;
-          if(!ea.opened()) continue;
-          project.changeRoot(ea.file().parent(), false);
-          break;
-        }
-      }
-    });
   }
 
   @Override
@@ -376,6 +358,23 @@ public final class EditorView extends View {
     final int s = tabs.getTabCount() - 1;
     final int i = (s + tabs.getSelectedIndex() + (next ? 1 : -1)) % s;
     tabs.setSelectedIndex(i);
+  }
+
+  /**
+   * Opens the previously opened and new files.
+   * @param files files to be opened
+   */
+  public void init(final ArrayList<IOFile> files) {
+    // open previous files; do not complain about missing files
+    final String[] fs = gui.gopts.get(GUIOptions.OPEN);
+    for(final String file : fs) open(new IOFile(file), false, false);
+
+    // open specified files
+    for(final IOFile file : files) open(file);
+
+    // initialize project root with path of first file
+    final IOFile f = fs.length != 0 ? new IOFile(fs[0]) : !files.isEmpty() ? files.get(0) : null;
+    if(f != null) project.changeRoot(f.parent(), false);
   }
 
   /**

@@ -71,4 +71,9 @@ public final class DialogFonts extends BaseXDialog {
     font2.setFont(font2.getValue(), type.getIndex());
     gui.updateLayout();
   }
+
+  @Override
+  public void close() {
+    super.close();
+  }
 }

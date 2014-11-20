@@ -266,15 +266,18 @@ public final class ProjectView extends BaseXPanel {
   /**
    * Changes the root directory.
    * @param io root directory
-   * @param force enforce new directory
+   * @param force enforce directory and setting change
    */
   public void changeRoot(final IOFile io, final boolean force) {
-    final String proj = gui.gopts.get(GUIOptions.PROJECTPATH);
-    if(!force && !proj.isEmpty()) return;
+    final String project = gui.gopts.get(GUIOptions.PROJECTPATH);
+    if(!force && !project.isEmpty()) return;
     root.file = io;
     root.refresh();
     filter.reset();
     path.setText(io.path());
-    if(force) gui.gopts.set(GUIOptions.PROJECTPATH, new IOFile(Prop.HOME).eq(io) ? "" : io.path());
+    if(force) {
+      gui.gopts.set(GUIOptions.PROJECTPATH, io.path());
+      gui.gopts.write();
+    }
   }
 }
