@@ -97,7 +97,6 @@ public final class BaseXGUI extends Main {
           }
         }
         gui.editor.init(xqfiles);
-
       }
     });
 

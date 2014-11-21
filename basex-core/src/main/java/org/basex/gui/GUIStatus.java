@@ -21,7 +21,7 @@ public final class GUIStatus extends BaseXPanel {
    * Constructor.
    * @param main reference to the main window
    */
-  GUIStatus(final AGUI main) {
+  GUIStatus(final GUI main) {
     super(main);
     setPreferredSize(new Dimension(getPreferredSize().width, (int) (getFont().getSize() * 1.5)));
     addMouseListener(this);

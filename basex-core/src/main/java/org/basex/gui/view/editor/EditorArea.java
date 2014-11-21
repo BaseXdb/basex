@@ -27,7 +27,7 @@ public final class EditorArea extends TextPanel {
   /** File in tab. */
   private IOFile file;
   /** Flag for modified content. */
-  boolean modified;
+  private boolean modified;
   /** Last input. */
   byte[] last;
   /** This flag indicates if the input is a command script. */
@@ -70,11 +70,27 @@ public final class EditorArea extends TextPanel {
   }
 
   /**
-   * Returns {@code true} if the file was opened from disk, or was saved to disk.
+   * Returns {@code true} if the tab content was opened from disk, or was saved to disk.
    * @return result of check
    */
   public boolean opened() {
     return tstamp != 0;
+  }
+
+  /**
+   * Returns {@code true} if the tab content was modified.
+   * @return result of check
+   */
+  public boolean modified() {
+    return modified;
+  }
+
+  /**
+   * Sets the modified flag.
+   * @param mod modified flag
+   */
+  public void modified(final boolean mod) {
+    modified = mod;
   }
 
   /**

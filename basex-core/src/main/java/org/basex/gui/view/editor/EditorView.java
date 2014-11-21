@@ -256,6 +256,7 @@ public final class EditorView extends View {
         posCode.invokeLater();
         refreshMark();
         run(ea, Action.PARSE);
+        gui.setTitle();
       }
     });
 
@@ -375,6 +376,8 @@ public final class EditorView extends View {
     // initialize project root with path of first file
     final IOFile f = fs.length != 0 ? new IOFile(fs[0]) : !files.isEmpty() ? files.get(0) : null;
     if(f != null) project.changeRoot(f.parent(), false);
+
+    gui.setTitle();
   }
 
   /**
@@ -470,8 +473,8 @@ public final class EditorView extends View {
 
         // get current editor
         edit = getEditor();
-        // create new tab if current text is stored on disk or has been modified
-        if(edit.opened() || edit.modified) edit = addTab();
+        // create new tab if text in current tab is stored on disk or has been modified
+        if(edit.opened() || edit.modified()) edit = addTab();
         edit.initText(text);
         edit.file(file);
         if(parse) run(edit, Action.PARSE);
@@ -835,15 +838,6 @@ public final class EditorView extends View {
   }
 
   /**
-   * Checks if the current text can be saved or reverted.
-   * @return result of check
-   */
-  public boolean modified() {
-    final EditorArea edit = getEditor();
-    return edit.modified || !edit.opened();
-  }
-
-  /**
    * Returns the current editor.
    * @return editor
    */
@@ -894,18 +888,20 @@ public final class EditorView extends View {
    */
   void refreshControls(final EditorArea edit, final boolean force) {
     // update modification flag
-    final boolean oe = edit.modified;
-    edit.modified = edit.hist != null && edit.hist.modified();
-    if(edit.modified == oe && !force) return;
+    final boolean mod = edit.hist != null && edit.hist.modified();
+    if(mod == edit.modified() && !force) return;
+
+    edit.modified(mod);
 
     // update tab title
     String title = edit.file().name();
-    if(edit.modified) title += '*';
+    if(mod) title += '*';
     edit.label.setText(title);
     edit.script = edit.file().hasSuffix(IO.BXSSUFFIX);
 
     // update components
     gui.refreshControls();
+    gui.setTitle();
     posCode.invokeLater();
     refreshMark();
   }
@@ -1011,7 +1007,7 @@ public final class EditorView extends View {
    * @return {@code false} if confirmation was canceled
    */
   private boolean confirm(final EditorArea edit) {
-    if(edit.modified && (edit.opened() || edit.getText().length != 0)) {
+    if(edit.modified() && (edit.opened() || edit.getText().length != 0)) {
       final Boolean ok = BaseXDialog.yesNoCancel(gui, Util.info(CLOSE_FILE_X, edit.file().name()));
       if(ok == null || ok && !save()) return false;
     }

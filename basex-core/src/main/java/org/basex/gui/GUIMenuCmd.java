@@ -10,6 +10,7 @@ import org.basex.data.*;
 import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
+import org.basex.gui.view.editor.*;
 import org.basex.io.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -151,7 +152,8 @@ public enum GUIMenuCmd implements GUICommand {
 
     @Override
     public boolean enabled(final GUI gui) {
-      return gui.gopts.get(GUIOptions.SHOWEDITOR) && gui.editor.modified();
+      final EditorArea ea = gui.editor == null ? null : gui.editor.getEditor();
+      return gui.gopts.get(GUIOptions.SHOWEDITOR) && ea != null && (ea.modified() || !ea.opened());
     }
   },
 

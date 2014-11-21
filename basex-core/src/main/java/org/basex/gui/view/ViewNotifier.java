@@ -79,7 +79,7 @@ public final class ViewNotifier {
     gui.context.focused = -1;
     for(final View v : view) v.refreshInit();
     gui.layoutViews();
-    gui.setTitle(data != null ? data.meta.name : null);
+    gui.setTitle();
   }
 
   /**

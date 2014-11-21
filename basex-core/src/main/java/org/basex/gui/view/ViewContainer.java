@@ -31,7 +31,7 @@ public final class ViewContainer extends BaseXBack {
   }
 
   /** Reference to main window. */
-  private final AGUI gui;
+  private final GUI gui;
   /** View Layout. */
   private ViewAlignment layout;
   /** Current layout string. */
@@ -56,7 +56,7 @@ public final class ViewContainer extends BaseXBack {
    * @param main reference to the main window
    * @param v view panels
    */
-  public ViewContainer(final AGUI main, final View... v) {
+  public ViewContainer(final GUI main, final View... v) {
     layout(new BorderLayout()).mode(Fill.PLAIN);
     logo = BaseXImages.get("logo");
     setBackground(Color.white);
