@@ -82,7 +82,42 @@ public final class TypeCheck extends Single {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
+    final Iter iter = expr.iter(qc);
+
+    return new Iter() {
+      /** Item cache. */
+      final ValueBuilder vb = new ValueBuilder();
+      /** Item cache index. */
+      int c;
+      /** Result index. */
+      int i;
+
+      @Override
+      public Item next() throws QueryException {
+        final SeqType st = seqType;
+        while(c == vb.size()) {
+          qc.checkStop();
+          vb.size(0);
+          c = 0;
+
+          final Item it = iter.next();
+          if(it == null || st.instance(it, true)) {
+            vb.add(it);
+          } else {
+            st.promote(qc, sc, info, it, false, vb);
+          }
+        }
+
+        final Item it = vb.get(c);
+        vb.set(c++, null);
+
+        if(it == null && i < st.occ.min || i > st.occ.max)
+          throw INVTREAT_X_X.get(info, expr.seqType(), st);
+
+        i++;
+        return it;
+      }
+    };
   }
 
   @Override

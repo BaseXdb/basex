@@ -135,9 +135,7 @@ public abstract class Path extends ParseExpr {
         // axis step: if input is a document, its type is temporarily generalized
         final boolean as = e instanceof Step;
         if(as && s == 0 && doc) cv.type = NodeType.NOD;
-
-        e = e.compile(qc, scp);
-        steps[s] = e;
+        steps[s] = e.compile(qc, scp);
 
         // no axis step: invalidate context value
         if(!as) qc.value = null;

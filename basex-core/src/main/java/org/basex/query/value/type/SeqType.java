@@ -340,7 +340,7 @@ public final class SeqType {
    * @param knd check kind
    * @return result of check
    */
-  private boolean instance(final Item it, final boolean knd) {
+  public boolean instance(final Item it, final boolean knd) {
     // maps and arrays don't have type information attached to them, you have to look...
     return type instanceof MapType ? it instanceof Map && ((Map) it).hasType((MapType) type) :
       type instanceof ArrayType ? it instanceof Array && ((Array) it).hasType((ArrayType) type) :
@@ -466,7 +466,7 @@ public final class SeqType {
    * @param vb value builder
    * @throws QueryException query exception
    */
-  private void promote(final QueryContext qc, final StaticContext sc, final InputInfo ii,
+  public void promote(final QueryContext qc, final StaticContext sc, final InputInfo ii,
       final Item item, final boolean opt, final ValueBuilder vb) throws QueryException {
 
     if(type instanceof AtomType) {
