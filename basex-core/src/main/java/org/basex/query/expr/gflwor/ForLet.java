@@ -17,18 +17,23 @@ abstract class ForLet extends GFLWOR.Clause {
   public final Var var;
   /** Bound expression. */
   public Expr expr;
+  /** Scoring flag. */
+  final boolean scoring;
 
   /**
    * Constructor.
    * @param info input info
-   * @param var variable
+   * @param var variables
    * @param expr expression
    * @param vars variable
+   * @param scoring scoring flag
    */
-  ForLet(final InputInfo info, final Var var, final Expr expr, final Var... vars) {
+  ForLet(final InputInfo info, final Var var, final Expr expr, final boolean scoring,
+      final Var... vars) {
     super(info, vars);
     this.var = var;
     this.expr = expr;
+    this.scoring = scoring;
   }
 
   @Override

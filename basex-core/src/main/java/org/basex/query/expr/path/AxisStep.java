@@ -37,6 +37,7 @@ final class AxisStep extends Step {
     }
 
     // evaluate predicates
+    final boolean scoring = qc.scoring;
     for(final Expr p : preds) {
       qc.size = nc.size();
       qc.pos = 1;
@@ -46,8 +47,9 @@ final class AxisStep extends Step {
         final Item i = p.test(qc, info);
         if(i != null) {
           // assign score value
-          nc.get(n).score(i.score());
-          nc.nodes[c++] = nc.get(n);
+          final ANode node = nc.get(n);
+          if(scoring) node.score(i.score());
+          nc.nodes[c++] = node;
         }
         qc.pos++;
       }

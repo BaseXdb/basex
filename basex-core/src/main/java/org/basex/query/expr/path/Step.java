@@ -82,6 +82,12 @@ public abstract class Step extends Preds {
   }
 
   @Override
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
+      throws QueryException {
+    return inlineAll(qc, scp, preds, var, ex) ? optimize(qc, scp) : null;
+  }
+
+  @Override
   public abstract Step copy(QueryContext qc, VarScope scp, IntObjMap<Var> vs);
 
   /**

@@ -137,10 +137,13 @@ public abstract class Preds extends ParseExpr {
    * Checks if the predicates are successful for the specified item.
    * @param it item to be checked
    * @param qc query context
+   * @param scoring scoring flag
    * @return result of check
    * @throws QueryException query exception
    */
-  protected final boolean preds(final Item it, final QueryContext qc) throws QueryException {
+  protected final boolean preds(final Item it, final QueryContext qc,
+      final boolean scoring) throws QueryException {
+
     if(preds.length == 0) return true;
 
     // set context value and position
@@ -150,7 +153,7 @@ public abstract class Preds extends ParseExpr {
         qc.value = it;
         final Item i = p.test(qc, info);
         if(i == null) return false;
-        it.score(i.score());
+        if(scoring) it.score(i.score());
       }
       return true;
     } finally {
@@ -231,12 +234,6 @@ public abstract class Preds extends ParseExpr {
   @Override
   public VarUsage count(final Var var) {
     return VarUsage.sum(var, preds);
-  }
-
-  @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
-      throws QueryException {
-    return inlineAll(qc, scp, preds, var, ex) ? optimize(qc, scp) : null;
   }
 
   /**

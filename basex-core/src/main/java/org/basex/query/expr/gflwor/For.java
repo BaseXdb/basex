@@ -47,7 +47,7 @@ public final class For extends ForLet {
    */
   public For(final Var var, final Var pos, final Var score, final Expr expr, final boolean empty,
       final InputInfo info) {
-    super(info, var, expr, vars(var, pos, score));
+    super(info, var, expr, score != null, vars(var, pos, score));
     this.pos = pos;
     this.score = score;
     this.empty = empty;
@@ -60,6 +60,7 @@ public final class For extends ForLet {
       private Iter iter;
       /** Current position. */
       private long p;
+
       @Override
       public boolean next(final QueryContext qc) throws QueryException {
         while(true) {
@@ -84,7 +85,13 @@ public final class For extends ForLet {
           if(!sub.next(qc)) return false;
 
           // next iteration, reset iterator and counter
-          iter = expr.iter(qc);
+          final boolean s = qc.scoring;
+          try {
+            qc.scoring = scoring;
+            iter = expr.iter(qc);
+          } finally {
+            qc.scoring = s;
+          }
           p = 0;
         }
       }

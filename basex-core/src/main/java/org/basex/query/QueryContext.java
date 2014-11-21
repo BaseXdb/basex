@@ -89,6 +89,8 @@ public final class QueryContext extends Proc implements AutoCloseable {
   private FTOpt ftOpt;
   /** Full-text token positions (needed for highlighting full-text results). */
   public int ftPos;
+  /** Scoring flag. */
+  public boolean scoring;
 
   /** Current Date. */
   public Item date;

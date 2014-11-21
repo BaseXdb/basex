@@ -112,8 +112,9 @@ public final class FTContains extends Single {
 
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
-    // return if step is no text node, or if no index is available
+    // return false if step is no text node, or if no index is available
     if(!ii.check(expr, true) || !ftexpr.indexAccessible(ii)) return false;
+
     ii.create(new FTIndexAccess(info, ftexpr, ii.ic), info, Util.info(OPTFTXINDEX, ftexpr), true);
     return true;
   }

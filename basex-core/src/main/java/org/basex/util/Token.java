@@ -1119,11 +1119,21 @@ public final class Token {
    * @return resulting token
    */
   public static byte[] delete(final byte[] token, final int ch) {
-    // skip step if specified ascii character is not contained
-    if(ch < 0x80 && !contains(token, ch)) return token;
+    // ascii character
+    if(ch < 0x80) {
+      // skip deletion if character is not found
+      if(!contains(token, ch)) return token;
+
+      final int tl = token.length;
+      final TokenBuilder tb = new TokenBuilder(tl);
+      for(final byte c : token) {
+        if(c != ch) tb.add(c);
+      }
+      return tb.finish();
+    }
     // remove character
-    final TokenBuilder tb = new TokenBuilder(token.length);
     final int tl = token.length;
+    final TokenBuilder tb = new TokenBuilder(tl);
     for(int i = 0; i < tl; i += cl(token, i)) {
       final int c = cp(token, i);
       if(c != ch) tb.add(c);

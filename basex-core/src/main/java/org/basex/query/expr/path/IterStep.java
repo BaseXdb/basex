@@ -28,6 +28,7 @@ final class IterStep extends Step {
 
   @Override
   public NodeIter iter(final QueryContext qc) {
+    final boolean scoring = qc.scoring;
     return new NodeIter() {
       AxisIter ai;
 
@@ -39,7 +40,7 @@ final class IterStep extends Step {
           final ANode node = ai.next();
           if(node == null) return null;
           // evaluate node test and predicates
-          if(test.eq(node) && preds(node, qc)) return node.finish();
+          if(test.eq(node) && preds(node, qc, scoring)) return node.finish();
         }
       }
     };

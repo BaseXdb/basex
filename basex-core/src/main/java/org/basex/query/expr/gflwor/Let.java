@@ -26,9 +26,6 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class Let extends ForLet {
-  /** Score flag. */
-  private final boolean score;
-
   /**
    * Constructor.
    * @param var variable
@@ -37,8 +34,7 @@ public final class Let extends ForLet {
    * @param info input info
    */
   public Let(final Var var, final Expr expr, final boolean score, final InputInfo info) {
-    super(info, var, expr, var);
-    this.score = score;
+    super(info, var, expr, score, var);
   }
 
   /**
@@ -85,13 +81,14 @@ public final class Let extends ForLet {
 
   @Override
   public Clause compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    var.refineType(score ? SeqType.DBL : expr.seqType(), qc, info);
-    return super.compile(qc, scp);
+    final Clause c = super.compile(qc, scp);
+    var.refineType(scoring ? SeqType.DBL : expr.seqType(), qc, info);
+    return c;
   }
 
   @Override
   public Let optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    if(!score && expr instanceof TypeCheck) {
+    if(!scoring && expr instanceof TypeCheck) {
       final TypeCheck tc = (TypeCheck) expr;
       if(tc.isRedundant(var) || var.adoptCheck(tc.seqType(), tc.promote)) {
         qc.compInfo(OPTCAST, tc.seqType());
@@ -99,13 +96,13 @@ public final class Let extends ForLet {
       }
     }
 
-    seqType = score ? SeqType.DBL : expr.seqType();
+    seqType = scoring ? SeqType.DBL : expr.seqType();
     var.refineType(seqType, qc, info);
     if(var.checksType() && expr.isValue()) {
       expr = var.checkType((Value) expr, qc, info, true);
       var.refineType(expr.seqType(), qc, info);
     }
-    size = score ? 1 : expr.size();
+    size = scoring ? 1 : expr.size();
     var.size = size;
     var.data = expr.data();
     return this;
@@ -115,7 +112,7 @@ public final class Let extends ForLet {
   public Let copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final Var v = scp.newCopyOf(qc, var);
     vs.put(var.id, v);
-    return new Let(v, expr.copy(qc, scp, vs), score, info);
+    return new Let(v, expr.copy(qc, scp, vs), scoring, info);
   }
 
   @Override
@@ -135,14 +132,14 @@ public final class Let extends ForLet {
    * @throws QueryException query exception
    */
   public Expr inlineExpr(final QueryContext qc, final VarScope scp) throws QueryException {
-    return score ? Function._FT_SCORE.get(null, info, expr).optimize(qc, scp)
-                 : var.checked(expr, qc, scp, info);
+    return scoring ? Function._FT_SCORE.get(null, info, expr).optimize(qc, scp)
+                   : var.checked(expr, qc, scp, info);
   }
 
   @Override
   public void plan(final FElem plan) {
     final FElem e = planElem();
-    if(score) e.add(planAttr(Token.token(SCORE), Token.TRUE));
+    if(scoring) e.add(planAttr(Token.token(SCORE), Token.TRUE));
     var.plan(e);
     expr.plan(e);
     plan.add(e);
@@ -150,7 +147,7 @@ public final class Let extends ForLet {
 
   @Override
   public String toString() {
-    return LET + ' ' + (score ? SCORE + ' ' : "") + var + ' ' + ASSIGN + ' ' + expr;
+    return LET + ' ' + (scoring ? SCORE + ' ' : "") + var + ' ' + ASSIGN + ' ' + expr;
   }
 
   /** Evaluator for a block of {@code let} expressions. */
@@ -174,8 +171,15 @@ public final class Let extends ForLet {
     @Override
     public boolean next(final QueryContext qc) throws QueryException {
       if(!sub.next(qc)) return false;
-      for(final Let let : lets)
-        qc.set(let.var, let.score ? score(let.expr.iter(qc)) : qc.value(let.expr), let.info);
+      for(final Let let : lets) {
+        final boolean s = qc.scoring;
+        try {
+          qc.scoring = let.scoring;
+          qc.set(let.var, let.scoring ? score(let.expr.iter(qc)) : qc.value(let.expr), let.info);
+        } finally {
+          qc.scoring = s;
+        }
+      }
       return true;
     }
   }

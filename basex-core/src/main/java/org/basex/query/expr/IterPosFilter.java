@@ -31,6 +31,7 @@ final class IterPosFilter extends Filter {
 
   @Override
   public Iter iter(final QueryContext qc) {
+    final boolean scoring = qc.scoring;
     return new Iter() {
       boolean skip, direct;
       Iter iter;
@@ -85,7 +86,7 @@ final class IterPosFilter extends Filter {
               qc.checkStop();
               qc.size = 0;
               qc.pos = cpos++;
-              if(preds(item, qc)) break;
+              if(preds(item, qc, scoring)) break;
               // remember last node
               lnode = item;
               qc.pos = cp;
