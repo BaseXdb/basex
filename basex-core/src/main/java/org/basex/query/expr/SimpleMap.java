@@ -69,7 +69,7 @@ public abstract class SimpleMap extends Arr {
 
   @Override
   public final boolean has(final Flag flag) {
-    return flag == Flag.CTX || super.has(flag);
+    return flag == Flag.CTX ? exprs[0].has(flag) : super.has(flag);
   }
 
   @Override
