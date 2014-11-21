@@ -5,7 +5,6 @@ import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
@@ -138,26 +137,31 @@ public abstract class Filter extends Preds {
     // no numeric predicates.. use simple iterator
     if(!super.has(Flag.FCS)) return copy(new IterFilter(info, root, preds));
 
-    // pre-evaluate if root is value and if one single position() or last() function is specified
-    final boolean iter = posIterator();
-    if(preds.length == 1 && root.isValue()) {
-      final Value v = (Value) root;
-      if(last) return optPre(SubSeq.get(v, v.size() - 1, 1), qc);
-      if(pos != null) return optPre(SubSeq.get(v, pos.min - 1, pos.max - pos.min + 1), qc);
-    }
-
-    // only choose deterministic and context-independent offsets; e.g., skip:
-    // (1 to 10)[random:integer(10)]  or  (1 to 10)[.]
-    boolean off = false;
+    boolean iter = false, index = false;
     if(preds.length == 1) {
+      // pre-evaluate if root is value and if one single position() or last() function is specified
+      iter = posIterator();
+      if(root.isValue()) {
+        final Value v = (Value) root;
+        if(last) return optPre(SubSeq.get(v, v.size() - 1, 1), qc);
+        if(pos != null) return optPre(SubSeq.get(v, pos.min - 1, pos.max - pos.min + 1), qc);
+      }
+
+      // only choose deterministic and context-independent offsets; e.g., skip:
+      // (1 to 10)[random:integer(10)]  or  (1 to 10)[.]
       final Expr p = preds[0];
       final SeqType pt = p.seqType();
-      off = pt.type.isNumber() && pt.zeroOrOne() && !p.has(Flag.CTX) && !p.has(Flag.NDT);
-      if(off) seqType = SeqType.get(seqType.type, Occ.ZERO_ONE);
+      if(pt.type.isNumber() && pt.zeroOrOne() && !p.has(Flag.CTX) && !p.has(Flag.NDT)) {
+        seqType = SeqType.get(seqType.type, Occ.ZERO_ONE);
+        index = true;
+      }
     }
 
-    // iterator for simple numeric predicate
-    return off || iter ? copy(new IterPosFilter(info, off, root, preds)) : get(info, root, preds);
+    // evaluation of positional predicates
+    if(index || iter) return copy(new IterPosFilter(info, index, root, preds));
+
+    // standard iterator
+    return get(info, root, preds);
   }
 
   @Override
@@ -205,13 +209,6 @@ public abstract class Filter extends Preds {
     int sz = 1;
     for(final Expr e : preds) sz += e.exprSize();
     return sz + root.exprSize();
-  }
-
-  @Override
-  public final void plan(final FElem plan) {
-    final FElem el = planElem();
-    addPlan(plan, el, root);
-    super.plan(el);
   }
 
   @Override

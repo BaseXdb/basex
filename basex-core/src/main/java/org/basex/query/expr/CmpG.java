@@ -293,7 +293,7 @@ public final class CmpG extends Cmp {
    * @return resulting expression or {@code null}
    * @throws QueryException query exception
    */
-  Expr union(final CmpG g, final QueryContext qc, final VarScope scp) throws QueryException {
+  CmpG union(final CmpG g, final QueryContext qc, final VarScope scp) throws QueryException {
     if(op != g.op || coll != g.coll || !exprs[0].sameAs(g.exprs[0])) return null;
 
     final Expr list = new List(info, exprs[1], g.exprs[1]).optimize(qc, scp);
@@ -362,7 +362,7 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+  public CmpG copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     return new CmpG(exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs), op, coll, sc, info);
   }
 

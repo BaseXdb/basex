@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -78,5 +79,12 @@ final class CachedFilter extends Filter {
   @Override
   public Filter copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     return copy(new CachedFilter(info, root.copy(qc, scp, vs), Arr.copyAll(qc, scp, vs, preds)));
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    final FElem el = planElem();
+    addPlan(plan, el, root);
+    super.plan(el);
   }
 }

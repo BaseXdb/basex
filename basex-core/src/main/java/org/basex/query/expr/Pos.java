@@ -38,16 +38,26 @@ public final class Pos extends Simple {
   }
 
   /**
+   * Returns a position expression for the specified index, or an optimized boolean item.
+   * @param index index position
+   * @param info input info
+   * @return expression
+   */
+  public static Expr get(final long index, final InputInfo info) {
+    return get(index, index, info);
+  }
+
+  /**
    * Returns a position expression for the specified range, or an optimized boolean item.
    * @param min minimum value
    * @param max minimum value
-   * @param ii input info
+   * @param info input info
    * @return expression
    */
-  public static Expr get(final long min, final long max, final InputInfo ii) {
+  public static Expr get(final long min, final long max, final InputInfo info) {
     // suppose that positions always fit in long values..
     return min > max || max < 1 ? Bln.FALSE : min <= 1 && max == Long.MAX_VALUE ? Bln.TRUE :
-      new Pos(Math.max(1, min), Math.max(1, max), ii);
+      new Pos(Math.max(1, min), Math.max(1, max), info);
   }
 
   /**
@@ -80,7 +90,7 @@ public final class Pos extends Simple {
       final long p = it.itr();
       final boolean ex = p == it.dbl();
       switch(cmp) {
-        case EQ: return ex ? get(p, p, ii) : Bln.FALSE;
+        case EQ: return ex ? get(p, ii) : Bln.FALSE;
         case GE: return get(ex ? p : p + 1, Long.MAX_VALUE, ii);
         case GT: return get(p + 1, Long.MAX_VALUE, ii);
         case LE: return get(1, p, ii);

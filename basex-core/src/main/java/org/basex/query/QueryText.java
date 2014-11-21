@@ -701,6 +701,8 @@ public interface QueryText {
   /** Query Plan. */
   byte[] OP = token("op");
   /** Query Plan. */
+  byte[] OFFSET = token("offset");
+  /** Query Plan. */
   byte[] POS = token("pos");
   /** Query Plan. */
   byte[] VAR = token("var");
