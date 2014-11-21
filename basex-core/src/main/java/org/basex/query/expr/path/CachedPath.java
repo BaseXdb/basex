@@ -89,11 +89,8 @@ final class CachedPath extends AxisPath {
 
   @Override
   public AxisPath copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final int sl = steps.length;
-    final Step[] stps = new Step[sl];
-    for(int s = 0; s < sl; ++s) stps[s] = step(s).copy(qc, scp, vs);
     final Expr rt = root == null ? null : root.copy(qc, scp, vs);
-    final CachedPath ap = copyType(new CachedPath(info, rt, stps));
+    final CachedPath ap = copyType(new CachedPath(info, rt, Arr.copyAll(qc, scp, vs, steps)));
     ap.cache = cache;
     return ap;
   }
