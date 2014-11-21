@@ -66,15 +66,20 @@ public abstract class Preds extends ParseExpr {
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     for(int p = 0; p < preds.length; ++p) {
-      // position() = last() -> last()
       final Expr pr = preds[p];
       if(pr instanceof CmpG || pr instanceof CmpV) {
         final Cmp cmp = (Cmp) pr;
-        if(cmp.exprs[0].isFunction(Function.POSITION) && cmp.exprs[1].isFunction(Function.LAST)) {
-          if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
-             cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
-            qc.compInfo(OPTWRITE, pr);
-            preds[p] = cmp.exprs[1];
+        if(cmp.exprs[0].isFunction(Function.POSITION)) {
+          final Expr e2 = cmp.exprs[1];
+          final SeqType st2 = e2.seqType();
+          // position() = last() -> last()
+          // position() = $n (numeric) -> $n
+          if(e2.isFunction(Function.LAST) || st2.one() && st2.type.isNumber()) {
+            if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
+               cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
+              qc.compInfo(OPTWRITE, pr);
+              preds[p] = e2;
+            }
           }
         }
       } else if(pr instanceof And) {
@@ -96,7 +101,7 @@ public abstract class Preds extends ParseExpr {
         final ANum it = (ANum) pr;
         final long i = it.itr();
         if(i == it.dbl()) {
-          preds[p] = Pos.get(i, i, info);
+          preds[p] = Pos.get(i, info);
         } else {
           qc.compInfo(OPTREMOVE, this, pr);
           return Empty.SEQ;
@@ -123,12 +128,11 @@ public abstract class Preds extends ParseExpr {
   protected final boolean posIterator() {
     // check if first predicate is numeric
     if(preds.length == 1) {
-      if(preds[0] instanceof Int) {
-        final long p = ((Int) preds[0]).itr();
-        preds[0] = Pos.get(p, p, info);
-      }
-      pos = preds[0] instanceof Pos ? (Pos) preds[0] : null;
-      last = preds[0].isFunction(Function.LAST);
+      Expr p = preds[0];
+      if(p instanceof Int) p = Pos.get(((Int) p).itr(), info);
+      pos = p instanceof Pos ? (Pos) p : null;
+      last = p.isFunction(Function.LAST);
+      preds[0] = p;
     }
     return pos != null || last;
   }
@@ -141,8 +145,8 @@ public abstract class Preds extends ParseExpr {
    * @return result of check
    * @throws QueryException query exception
    */
-  protected final boolean preds(final Item it, final QueryContext qc,
-      final boolean scoring) throws QueryException {
+  protected final boolean preds(final Item it, final QueryContext qc, final boolean scoring)
+      throws QueryException {
 
     if(preds.length == 0) return true;
 
