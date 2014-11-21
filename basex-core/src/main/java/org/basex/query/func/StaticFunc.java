@@ -273,6 +273,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
     if(!inline(qc)) return null;
     qc.compInfo(OPTINLINE, id());
+
     // create let bindings for all variables
     final LinkedList<GFLWOR.Clause> cls = exprs.length == 0 ? null :
       new LinkedList<GFLWOR.Clause>();
