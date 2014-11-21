@@ -174,7 +174,14 @@ public final class RestXqPathTest extends RestXqTest {
     // variable must inherit xs:anyAtomicType
     getE("declare %R:path('{$x}') function m:f($x as node()) {$x};", "1");
 
-    get("declare %R:path('path/{$x=.+}') function m:f($x) {$x};", "path/a/b/c", "a/b/c");
+    // regular expression
+    get("declare %R:path('p/{$x=.+}') function m:f($x) {$x};", "p/a/b/c", "a/b/c");
+    get("declare %R:path('p/{$x=[0-9]+}') function m:f($x) {$x};", "p/123", "123");
+    getE("declare %R:path('p/{$x=[0-9]+}') function m:f($x) {$x};", "p/123a");
+    get("declare %R:path('{$a=\\d+}{$b=\\w+}{$c=\\d}') function m:f($a,$b,$c) {$c||$b||$a};",
+        "12ab3", "3ab12");
+    getE("declare %R:path('{$a=\\d+}{$b=\\w+}{$c=\\d}') function m:f($a,$b,$c) {$c||$b||$a};",
+        "12ab3x");
   }
 
   /**
