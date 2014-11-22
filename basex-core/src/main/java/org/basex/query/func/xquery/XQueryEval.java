@@ -61,7 +61,7 @@ public class XQueryEval extends StandardFunc {
     // bind variables and context value
     final HashMap<String, Value> bindings = toBindings(1, qc);
     final Perm tmp = qc.context.user.perm;
-    final Timer to = new Timer(true);
+    Timer to = null;
 
     try(final QueryContext qctx = qc.proc(new QueryContext(qc))) {
       if(exprs.length > 2) {
@@ -73,6 +73,7 @@ public class XQueryEval extends StandardFunc {
         final long mb = opts.get(XQueryOptions.MEMORY);
         if(mb != 0) {
           final long limit = Performance.memory() + (mb << 20);
+          to = new Timer(true);
           to.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -86,6 +87,7 @@ public class XQueryEval extends StandardFunc {
         }
         final long ms = opts.get(XQueryOptions.TIMEOUT) * 1000L;
         if(ms != 0) {
+          if(to != null) to = new Timer(true);
           to.schedule(new TimerTask() {
             @Override
             public void run() { qctx.stop(); }
@@ -124,7 +126,7 @@ public class XQueryEval extends StandardFunc {
     } finally {
       qc.context.user.perm = tmp;
       qc.proc(null);
-      to.cancel();
+      if(to != null) to.cancel();
     }
   }
 
