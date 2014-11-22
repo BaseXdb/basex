@@ -83,12 +83,13 @@ public final class FTIndex implements Index {
     inZ = new DataAccess(d.meta.dbfile(DATAFTX + 'z'));
     inX = new DataAccess(d.meta.dbfile(DATAFTX + 'x'));
     tp = new int[d.meta.maxlen + 3];
-    for(int i = 0; i < tp.length; ++i) tp[i] = -1;
+    final int tl = tp.length;
+    for(int i = 0; i < tl; ++i) tp[i] = -1;
     int is = inX.readNum();
     while(--is >= 0) {
       int p = inX.readNum();
       final int r;
-      if(p < tp.length) {
+      if(p < tl) {
         r = inX.read4();
       } else {
         // legacy issue (7.0.2 -> 7.1)
@@ -98,7 +99,7 @@ public final class FTIndex implements Index {
       }
       tp[p] = r;
     }
-    tp[tp.length - 1] = (int) inY.length();
+    tp[tl - 1] = (int) inY.length();
   }
 
   @Override
@@ -170,7 +171,8 @@ public final class FTIndex implements Index {
           }
         }
         // find next available entry group
-        while(++ti < tp.length - 1) {
+        final int tl = tp.length;
+        while(++ti < tl - 1) {
           i = tp[ti];
           if(i == -1) continue;
           int c = ti + 1;
@@ -279,17 +281,17 @@ public final class FTIndex implements Index {
    */
   private void addOccs(final IndexStats stats) {
     int i = 0;
-    while(i < tp.length && tp[i] == -1) ++i;
-    int p = tp[i];
-    int j = i + 1;
-    while(j < tp.length && tp[j] == -1) ++j;
+    final int tl = tp.length;
+    while(i < tl && tp[i] == -1) ++i;
+    int p = tp[i], j = i + 1;
+    while(j < tl && tp[j] == -1) ++j;
 
-    while(p < tp[tp.length - 1]) {
+    while(p < tp[tl - 1]) {
       if(stats.adding(size(p, i))) stats.add(inY.readBytes(p, i));
       p += i + ENTRY;
       if(p == tp[j]) {
         i = j;
-        while(j + 1 < tp.length && tp[++j] == -1);
+        while(j + 1 < tl && tp[++j] == -1);
       }
     }
   }
@@ -322,16 +324,15 @@ public final class FTIndex implements Index {
    */
   private synchronized IndexIterator fuzzy(final byte[] token, final int k) {
     FTIndexIterator it = FTIndexIterator.FTEMPTY;
-    final int tl = token.length;
-    final int e = Math.min(tp.length - 1, tl + k);
-    int s = Math.max(1, tl - k) - 1;
+    final int tokl = token.length, tl = tp.length;
+    final int e = Math.min(tl - 1, tokl + k);
+    int s = Math.max(1, tokl - k) - 1;
 
     while(++s <= e) {
       int p = tp[s];
       if(p == -1) continue;
-      int i = s + 1;
-      int r = -1;
-      while(i < tp.length && r == -1) r = tp[i++];
+      int t = s + 1, r = -1;
+      while(t < tl && r == -1) r = tp[t++];
       while(p < r) {
         if(ls.similar(inY.readBytes(p, s), token, k)) {
           it = FTIndexIterator.union(iter(pointer(p, s), size(p, s), inZ, token), it);
@@ -355,13 +356,14 @@ public final class FTIndex implements Index {
     final IntList pr = new IntList();
     final IntList ps = new IntList();
     final byte[] pref = wc.prefix();
-    final int l = Math.min(tp.length - 1, wc.max());
-    for(int ti = pref.length; ti <= l; ti++) {
+    final int pl = pref.length, tl = tp.length;
+    final int l = Math.min(tl - 1, wc.max());
+    for(int ti = pl; ti <= l; ti++) {
       int i = tp[ti];
       if(i == -1) continue;
       int c = ti + 1;
       int e = -1;
-      while(c < tp.length && e == -1) e = tp[c++];
+      while(c < tl && e == -1) e = tp[c++];
       i = find(pref, i, e, ti);
 
       while(i < e) {

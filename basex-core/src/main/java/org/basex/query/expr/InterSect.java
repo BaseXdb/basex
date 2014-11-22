@@ -63,11 +63,13 @@ public final class InterSect extends Set {
     return new SetIter(iter) {
       @Override
       public ANode next() throws QueryException {
-        if(item == null) item = new ANode[iter.length];
+        final int irl = iter.length;
+        if(item == null) item = new ANode[irl];
 
-        for(int i = 0; i != iter.length; ++i) if(!next(i)) return null;
+        for(int i = 0; i < irl; i++) if(!next(i)) return null;
 
-        for(int i = 1; i != item.length;) {
+        final int il = item.length;
+        for(int i = 1; i < il;) {
           final int d = item[0].diff(item[i]);
           if(d > 0) {
             if(!next(i)) return null;

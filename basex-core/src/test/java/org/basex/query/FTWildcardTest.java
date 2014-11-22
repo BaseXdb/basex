@@ -68,7 +68,8 @@ public final class FTWildcardTest {
    */
   @Test
   public void testMatch() {
-    for(int i = 0; i < VALIDWC.length; i++) {
+    final int vl = VALIDWC.length;
+    for(int i = 0; i < vl; i++) {
       final String q = VALIDWC[i];
       final FTWildcard wc = new FTWildcard(token(q));
       assertTrue(wc.parse());

@@ -219,15 +219,16 @@ public final class DecFormatter extends FormatUtil {
    */
   private Picture[] analyze(final byte[][] patterns) {
     // pictures
-    final Picture[] pics = new Picture[patterns.length];
+    final int pl = patterns.length;
+    final Picture[] pics = new Picture[pl];
 
     // analyze patterns
-    for(int s = 0; s < patterns.length; ++s) {
-      final byte[] pt = patterns[s];
+    for(int p = 0; p < pl; p++) {
+      final byte[] pt = patterns[p];
       final Picture pic = new Picture();
 
       // position (integer/fractional)
-      int p = 0;
+      int pos = 0;
       // active character found
       boolean act = false;
       // number of characters after exponent
@@ -236,40 +237,40 @@ public final class DecFormatter extends FormatUtil {
       final int[] opt = new int[2];
 
       // loop through all characters
-      final int pl = pt.length;
-      for(int i = 0, cl; i < pl; i += cl) {
+      final int ptl = pt.length;
+      for(int i = 0, cl; i < ptl; i += cl) {
         final int ch = ch(pt, i);
         cl = cl(pt, i);
         boolean active = contains(actives, ch);
 
         if(ch == decimal) {
-          ++p;
+          ++pos;
           act = false;
         } else if(ch == optional) {
-          opt[p]++;
+          opt[pos]++;
         } else if(ch == exponent) {
           // check if following characters are all digits
           boolean e = true;
-          for(int c = i + cl; c < pl && e; c += cl(pt, c)) e = contains(digits, ch(pt, c));
-          if(e && i + cl < pl) {
+          for(int c = i + cl; c < ptl && e; c += cl(pt, c)) e = contains(digits, ch(pt, c));
+          if(e && i + cl < ptl) {
             // test succeeds, exponent sign found
             exp = 0;
           } else {
             // passive character: add to prefixes/suffixes
-            pic.xyzfix[p == 0 && act ? p + 1 : p].add(ch);
+            pic.xyzfix[pos == 0 && act ? pos + 1 : pos].add(ch);
             active = false;
           }
         } else if(ch == grouping) {
-          if(p == 0) pic.group[p] = Array.add(pic.group[p], pic.min[p] + opt[p]);
+          if(pos == 0) pic.group[pos] = Array.add(pic.group[pos], pic.min[pos] + opt[pos]);
         } else if(contains(digits, ch)) {
-          if(exp == -1) pic.min[p]++;
+          if(exp == -1) pic.min[pos]++;
           else exp++;
         } else {
           // passive characters
           pic.pc |= ch == percent;
           pic.pm |= ch == permille;
           // prefixes/suffixes
-          pic.xyzfix[p == 0 && act ? p + 1 : p].add(ch);
+          pic.xyzfix[pos == 0 && act ? pos + 1 : pos].add(ch);
         }
         act |= active;
       }
@@ -289,7 +290,7 @@ public final class DecFormatter extends FormatUtil {
 
       pic.maxFrac = pic.min[1] + opt[1];
       pic.minExp = Math.max(0, exp);
-      pics[s] = pic;
+      pics[p] = pic;
     }
     return pics;
   }
@@ -364,8 +365,9 @@ public final class DecFormatter extends FormatUtil {
         }
       } else {
         // irregular pattern, or no separators at all
-        for(int i = 0; i < pic.group[0].length; ++i) {
-          final int pos = intgr.size() - pic.group[0][i];
+        final int gl = pic.group[0].length;
+        for(int g = 0; g < gl; ++g) {
+          final int pos = intgr.size() - pic.group[0][g];
           if(pos > 0) intgr.insert(pos, grouping);
         }
       }

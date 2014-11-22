@@ -29,20 +29,24 @@ public final class BinToOctets extends StandardFunc {
       @Override
       public long size() { return s; }
       @Override
-      public Value value() {
-        final long[] vals = new long[bytes.length];
-        for(int i = 0; i < bytes.length; i++) vals[i] = bytes[i];
-        return IntSeq.get(vals, AtomType.ITR);
-      }
+      public Value value() { return toValue(bytes); }
     };
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final B64 b64 = toB64(exprs[0], qc, false);
-    final byte[] bytes = b64.binary(info);
-    final long[] vals = new long[bytes.length];
-    for(int i = 0; i < bytes.length; i++) vals[i] = bytes[i] & 0xFF;
-    return IntSeq.get(vals, AtomType.ITR);
+    return toValue(toB64(exprs[0], qc, false).binary(info));
+  }
+
+  /**
+   * Returns a value representation of the specified bytes.
+   * @param bytes bytes to be wrapped in a value
+   * @return value
+   */
+  private Value toValue(final byte[] bytes) {
+    final int bl = bytes.length;
+    final long[] tmp = new long[bl];
+    for(int b = 0; b < bl; b++) tmp[b] = bytes[b] & 0xFF;
+    return IntSeq.get(tmp, AtomType.ITR);
   }
 }

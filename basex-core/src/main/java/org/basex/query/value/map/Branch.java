@@ -166,15 +166,16 @@ final class Branch extends TrieNode {
   TrieNode add(final Branch o, final int l, final InputInfo ii) throws QueryException {
     TrieNode[] ch = null;
     int nu = used, ns = size;
-    for(int i = 0; i < kids.length; i++) {
-      final TrieNode k = kids[i], ok = o.kids[i];
+    final int kl = kids.length;
+    for(int k = 0; k < kl; k++) {
+      final TrieNode n = kids[k], ok = o.kids[k];
       if(ok != null) {
-        final TrieNode nw = k == null ? ok : ok.addAll(k, l + 1, ii);
-        if(nw != k) {
+        final TrieNode nw = n == null ? ok : ok.addAll(n, l + 1, ii);
+        if(nw != n) {
           if(ch == null) ch = copyKids();
-          ch[i] = nw;
-          nu |= 1 << i;
-          ns += nw.size - (k == null ? 0 : k.size);
+          ch[k] = nw;
+          nu |= 1 << k;
+          ns += nw.size - (n == null ? 0 : n.size);
         }
       }
     }

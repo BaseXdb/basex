@@ -180,12 +180,12 @@ public final class Compare {
 
             // compare namespaces
             if(flags.contains(Mode.NAMESPACES)) {
-              final Atts ns1 = s1.namespaces();
-              final Atts ns2 = s2.namespaces();
-              if(ns1.size() != ns2.size()) return false;
+              final Atts ns1 = s1.namespaces(), ns2 = s2.namespaces();
+              final int nl1 = ns1.size(), nl2 = ns2.size();
+              if(nl1 != nl2) return false;
               LOOP:
-              for(int i1 = 0; i1 < ns1.size(); i1++) {
-                for(int i2 = 0; i2 < ns2.size(); i2++) {
+              for(int i1 = 0; i1 < nl1; i1++) {
+                for(int i2 = 0; i2 < nl2; i2++) {
                   if(!eq(ns1.name(i1), ns2.name(i2))) continue;
                   if(!eq(ns1.value(i1), ns2.value(i2))) return false;
                   continue LOOP;

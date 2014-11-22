@@ -34,23 +34,21 @@ public final class GUIMenu extends JMenuBar {
 
     // create menu for each top level menu entries
     int c = 0;
-    for(int b = 0; b < MENUBAR.length; ++b) {
-      for(int i = 0; i < MENUITEMS[b].length; ++i) ++c;
-    }
+    for(final GUICommand[] cmds : MENUITEMS) c += cmds.length;
     items = new JMenuItem[c];
 
     c = 0;
     // loop through all menu entries
     final StringBuilder gmnem = new StringBuilder();
-    for(int b = 0; b < MENUBAR.length; ++b) {
+    final int bl = MENUBAR.length;
+    for(int b = 0; b < bl; ++b) {
       final JMenu menu = new JMenu(MENUBAR[b]);
       BaseXLayout.setMnemonic(menu, gmnem);
 
       // create menu point for each sub menu entry
       final StringBuilder mnemCache = new StringBuilder();
-      for(int i = 0; i < MENUITEMS[b].length; ++i) {
+      for(final GUICommand cmd : MENUITEMS[b]) {
         // add a separator
-        final GUICommand cmd = MENUITEMS[b][i];
         if(cmd == GUICommand.SEPARATOR) {
           menu.addSeparator();
         } else if(cmd != null) {
@@ -93,12 +91,11 @@ public final class GUIMenu extends JMenuBar {
    */
   void refresh() {
     int c = 0;
-    for(int b = 0; b < MENUBAR.length; ++b) {
-      for(int i = 0; i < MENUITEMS[b].length; ++i) {
-        final GUICommand item = MENUITEMS[b][i];
-        if(item != GUICommand.SEPARATOR && item != null) {
-          items[c].setEnabled(item.enabled(gui));
-          items[c++].setSelected(item.selected(gui));
+    for(final GUICommand[] cmds : MENUITEMS) {
+      for(final GUICommand cmd : cmds) {
+        if(cmd != GUICommand.SEPARATOR && cmd != null) {
+          items[c].setEnabled(cmd.enabled(gui));
+          items[c++].setSelected(cmd.selected(gui));
         }
       }
     }

@@ -1000,8 +1000,9 @@ public class QueryParser extends InputParser {
       do {
         size = clauses.size();
         initialClause(clauses);
-        for(int i = size; i < clauses.size(); i++)
-          for(final Var v : clauses.get(i).vars()) curr.put(v.name.id(), v);
+        for(final Clause c : clauses) {
+          for(final Var v : c.vars()) curr.put(v.name.id(), v);
+        }
       } while(size < clauses.size());
 
       if(wsConsumeWs(WHERE)) {
@@ -2188,8 +2189,8 @@ public class QueryParser extends InputParser {
       if(keyword(name)) throw error(RESERVED_X, name.local());
       final Expr ex = numericLiteral(true);
       if(!(ex instanceof Int)) return ex;
-      final long card = ((ANum) ex).itr();
-      final Expr lit = Functions.getLiteral(name, (int) card, qc, sc, info());
+      final int card = (int) ((ANum) ex).itr();
+      final Expr lit = Functions.getLiteral(name, card, qc, sc, info());
       return lit != null ? lit : FuncLit.unknown(name, card, qc, sc, info());
     }
 
@@ -3113,9 +3114,9 @@ public class QueryParser extends InputParser {
       } while(wsConsumeWs(PIPE));
 
       final int s = openSubScope();
-      final Var[] vs = new Var[Catch.NAMES.length];
-      for(int i = 0; i < Catch.NAMES.length; i++)
-        vs[i] = addVar(Catch.NAMES[i], Catch.TYPES[i], false);
+      final int cl = Catch.NAMES.length;
+      final Var[] vs = new Var[cl];
+      for(int i = 0; i < cl; i++) vs[i] = addVar(Catch.NAMES[i], Catch.TYPES[i], false);
       final Catch c = new Catch(info(), codes, vs);
       c.expr = enclosed(NOENCLEXPR);
       closeSubScope(s);
@@ -3854,12 +3855,12 @@ public class QueryParser extends InputParser {
    * @return variable reference (may be {@code null})
    */
   private VarRef resolveLocalVar(final QNm name, final InputInfo ii) {
-    int i = localVars.size();
+    int l = localVars.size();
     Var var = null;
 
     // look up through the scopes until we find the declaring scope
-    while(--i >= 0) {
-      var = localVars.get(i).stack.get(name);
+    while(--l >= 0) {
+      var = localVars.get(l).stack.get(name);
       if(var != null) break;
     }
 
@@ -3867,8 +3868,9 @@ public class QueryParser extends InputParser {
     if(var == null) return null;
 
     // go down through the scopes and add bindings to their closures
-    while(++i < localVars.size()) {
-      final VarContext vctx = localVars.get(i);
+    final int ls = localVars.size();
+    while(++l < ls) {
+      final VarContext vctx = localVars.get(l);
       final Var local = vctx.addVar(var.name, var.seqType(), false);
       vctx.nonLocal.put(local, new VarRef(ii, var));
       var = local;

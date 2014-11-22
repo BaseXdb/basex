@@ -63,7 +63,8 @@ final class FTList {
     str = new DataAccess(files);
     dat = new DataAccess(filed);
     tp = new int[data.meta.maxlen + 3];
-    for(int i = 0; i < tp.length; ++i) tp[i] = -1;
+    final int tl = tp.length;
+    for(int t = 0; t < tl; t++) tp[t] = -1;
     sizes = data.meta.dbfile(DATAFTX + prefix + 'x');
     try(final DataAccess li = new DataAccess(sizes)) {
       int is = li.readNum();
@@ -71,7 +72,7 @@ final class FTList {
         final int p = li.readNum();
         tp[p] = li.read4();
       }
-      tp[tp.length - 1] = (int) str.length();
+      tp[tl - 1] = (int) str.length();
     }
     next();
   }

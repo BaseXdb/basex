@@ -61,9 +61,8 @@ public final class DataInput extends BufferInput {
    */
   public IntList readDiffs() throws IOException {
     final int[] array = new int[readNum()];
-    for(int a = 0; a < array.length; ++a) {
-      array[a] = (a == 0 ? 0 : array[a - 1]) + readNum();
-    }
+    final int al = array.length;
+    for(int a = 0; a < al; ++a) array[a] = (a == 0 ? 0 : array[a - 1]) + readNum();
     return new IntList(array);
   }
 

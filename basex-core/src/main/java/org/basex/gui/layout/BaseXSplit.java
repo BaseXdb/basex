@@ -123,30 +123,31 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
 
   @Override
   public void layoutContainer(final Container parent) {
-    final Component[] c = getComponents();
+    final Component[] comps = getComponents();
+    final int cl = comps.length;
     final int w = getWidth(), h = getHeight();
-    final int panels = c.length + 1 >> 1;
+    final int panels = comps.length + 1 >> 1;
 
     // calculate proportional size of panels
     if(propSize == null) {
       propSize = new double[panels];
-      for(int n = 0; n < c.length; ++n) {
-        if((n & 1) == 0) propSize[n >> 1] = 1d / panels;
+      for(int c = 0; c < cl; ++c) {
+        if((c & 1) == 0) propSize[c >> 1] = 1d / panels;
       }
     }
     // count number of invisible panels
-    int n = panels - 1;
-    for(final double d : propSize) if(d == 0) n--;
+    int c = panels - 1;
+    for(final double d : propSize) if(d == 0) c--;
 
     // set bounds of all components
-    final int sz = (horiz ? w : h) - n * BaseXSplitSep.SIZE;
+    final int sz = (horiz ? w : h) - c * BaseXSplitSep.SIZE;
     double posD = 0;
     boolean invisible = false;
-    for(n = 0; n < c.length; ++n) {
+    for(c = 0; c < cl; c++) {
       final int size;
-      if((n & 1) == 0) {
+      if((c & 1) == 0) {
         // panel
-        size = (int) (propSize[n >> 1] * sz);
+        size = (int) (propSize[c >> 1] * sz);
         invisible = size == 0;
       } else {
         // splitter: hide when last panel was invisible
@@ -154,9 +155,9 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
       }
       final int pos = (int) posD;
       if(horiz) {
-        c[n].setBounds(pos, 0, size, h);
+        comps[c].setBounds(pos, 0, size, h);
       } else {
-        c[n].setBounds(0, pos, w, size);
+        comps[c].setBounds(0, pos, w, size);
       }
       posD += size;
     }

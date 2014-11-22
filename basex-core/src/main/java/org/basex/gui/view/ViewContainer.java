@@ -61,8 +61,9 @@ public final class ViewContainer extends BaseXBack {
     logo = BaseXImages.get("logo");
     setBackground(Color.white);
 
-    views = new ViewPanel[v.length];
-    for(int i = 0; i < v.length; ++i) views[i] = new ViewPanel(v[i]);
+    final int vl = v.length;
+    views = new ViewPanel[vl];
+    for(int i = 0; i < vl; ++i) views[i] = new ViewPanel(v[i]);
     gui = main;
     // build layout or use default if something goes wrong
     if(!buildLayout(gui.gopts.get(GUIOptions.VIEWS)) && !buildLayout(VIEWS)) {

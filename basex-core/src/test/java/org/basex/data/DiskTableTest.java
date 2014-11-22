@@ -346,8 +346,9 @@ public final class DiskTableTest extends SandboxTest {
    * @return byte array containing the number of entries (all bytes 5)
    */
   private static byte[] getTestEntries(final int e) {
-    final byte[] result = new byte[e << IO.NODEPOWER];
-    for(int i = 0; i < result.length; ++i) result[i] = 5;
+    final int rl = e << IO.NODEPOWER;
+    final byte[] result = new byte[rl];
+    for(int r = 0; r < rl; ++r) result[r] = 5;
     return result;
   }
 }

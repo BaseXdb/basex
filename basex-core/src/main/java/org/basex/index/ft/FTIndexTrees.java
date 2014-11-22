@@ -57,7 +57,8 @@ final class FTIndexTrees {
    */
   boolean more(final int cf) {
     if(ctree != -1 && trees[ctree].more(cf)) return true;
-    while(++ctree < trees.length) if(trees[ctree] != null) return more(cf);
+    final int tl = trees.length;
+    while(++ctree < tl) if(trees[ctree] != null) return more(cf);
     return false;
   }
 

@@ -130,7 +130,8 @@ public abstract class JsonSerializer extends OutputSerializer {
    */
   protected void string(final byte[] str) throws IOException {
     print('"');
-    for(int a = 0; a < str.length; a += cl(str, a)) encode(cp(str, a));
+    final int sl = str.length;
+    for(int s = 0; s < sl; s += cl(str, s)) encode(cp(str, s));
     print('"');
   }
 

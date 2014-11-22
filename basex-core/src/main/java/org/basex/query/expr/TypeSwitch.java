@@ -38,8 +38,9 @@ public final class TypeSwitch extends ParseExpr {
   @Override
   public void checkUp() throws QueryException {
     checkNoUp(ts);
-    final Expr[] tmp = new Expr[cases.length];
-    for(int i = 0; i < cases.length; ++i) tmp[i] = cases[i].expr;
+    final int cl = cases.length;
+    final Expr[] tmp = new Expr[cl];
+    for(int c = 0; c < cl; ++c) tmp[c] = cases[c].expr;
     checkAllUp(tmp);
   }
 
@@ -64,16 +65,13 @@ public final class TypeSwitch extends ParseExpr {
     // return first branch if all branches are equal (e.g., empty) and use no variables
     final TypeCase tc = cases[0];
     boolean eq = tc.var == null;
-    for(int c = 1; eq && c < cases.length; ++c) {
-      eq = tc.expr.sameAs(cases[c].expr);
-    }
+    final int cl = cases.length;
+    for(int c = 1; eq && c < cl; c++) eq = tc.expr.sameAs(cases[c].expr);
     if(eq) return optPre(tc.expr, qc);
 
     // combine return types
     seqType = cases[0].seqType();
-    for(int c = 1; c < cases.length; ++c) {
-      seqType = seqType.union(cases[c].seqType());
-    }
+    for(int c = 1; c < cl; c++) seqType = seqType.union(cases[c].seqType());
     return this;
   }
 
@@ -112,8 +110,9 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp,
-      final Var var, final Expr ex) throws QueryException {
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
+      throws QueryException {
+
     boolean change = inlineAll(qc, scp, cases, var, ex);
     final Expr t = ts.inline(qc, scp, var, ex);
     if(t != null) {
@@ -125,9 +124,7 @@ public final class TypeSwitch extends ParseExpr {
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final TypeCase[] cs = new TypeCase[cases.length];
-    for(int i = 0; i < cs.length; i++) cs[i] = cases[i].copy(qc, scp, vs);
-    return new TypeSwitch(info, ts.copy(qc, scp, vs), cs);
+    return new TypeSwitch(info, ts.copy(qc, scp, vs), Arr.copyAll(qc, scp, vs, cases));
   }
 
   @Override
@@ -137,8 +134,8 @@ public final class TypeSwitch extends ParseExpr {
 
   @Override
   public String toString() {
-    return new TokenBuilder(TYPESWITCH + PAREN1 + ts + PAREN2 + ' ').addSep(
-        cases, " ").toString();
+    return new TokenBuilder(TYPESWITCH + PAREN1 + ts + PAREN2 + ' ').addSep(cases, " ").
+        toString();
   }
 
   @Override

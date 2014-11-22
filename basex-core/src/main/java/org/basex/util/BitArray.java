@@ -153,7 +153,8 @@ public final class BitArray {
       return (wi << WORD_POWER) + numberOfTrailingZeros(word);
     }
 
-    while(++wi < words.length) {
+    final int wl = words.length;
+    while(++wi < wl) {
       if((word = ~words[wi]) != 0) {
         return (wi << WORD_POWER) + numberOfTrailingZeros(word);
       }

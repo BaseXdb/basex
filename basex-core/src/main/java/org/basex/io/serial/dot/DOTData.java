@@ -94,11 +94,12 @@ final class DOTData {
    */
   static String color(final byte[] string) {
     for(final Object[] color : COLORS) {
-      for(int c = 1; c < color.length; c++) {
+      final int cl = color.length;
+      for(int c = 1; c < cl; c++) {
         final Object o = color[c];
-        final byte[] cl = o instanceof byte[] ? (byte[]) o :
+        final byte[] col = o instanceof byte[] ? (byte[]) o :
           Token.token(o instanceof Class ? Util.className((Class<?>) o) : o.toString());
-        if(Token.eq(cl, string)) return color[0].toString();
+        if(Token.eq(col, string)) return color[0].toString();
       }
     }
     return null;

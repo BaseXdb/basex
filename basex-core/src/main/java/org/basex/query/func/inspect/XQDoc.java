@@ -154,7 +154,8 @@ public final class XQDoc extends Inspect {
    */
   private void annotations(final Ann ann, final FElem parent) throws QueryException {
     if(!ann.isEmpty()) annotation(ann, elem("annotations", parent), false);
-    for(int a = 0; a < ann.size(); a++) {
+    final int al = ann.size();
+    for(int a = 0; a < al; a++) {
       final QNm name = ann.names[a];
       if(name.hasPrefix()) nsCache.put(name.prefix(), name.uri());
     }

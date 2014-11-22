@@ -26,9 +26,12 @@ public final class SeqTypeTest {
         { null, ONE,      ONE,  ONE_MORE,  ONE_MORE }
     };
 
-    for(int i = 0; i < occs.length; i++)
-      for(int j = 0; j < occs.length; j++)
-        assertSame("(" + i + ", " + j + ')', table[i][j], occs[i].intersect(occs[j]));
+    final int ol = occs.length;
+    for(int o = 0; o < ol; o++) {
+      for(int p = 0; p < ol; p++) {
+        assertSame("(" + o + ", " + p + ')', table[o][p], occs[o].intersect(occs[p]));
+      }
+    }
   }
 
   /** Tests for {@link Occ#union(Occ)}. */
@@ -42,9 +45,12 @@ public final class SeqTypeTest {
         { ZERO_MORE, ZERO_MORE, ONE_MORE,  ZERO_MORE, ONE_MORE  }
     };
 
-    for(int i = 0; i < occs.length; i++)
-      for(int j = 0; j < occs.length; j++)
-        assertSame("(" + i + ", " + j + ')', table[i][j], occs[i].union(occs[j]));
+    final int ol = occs.length;
+    for(int o = 0; o < ol; o++) {
+      for(int p = 0; p < ol; p++) {
+        assertSame("(" + o + ", " + p + ')', table[o][p], occs[o].union(occs[p]));
+      }
+    }
   }
 
   /** Tests for {@link Occ#instanceOf(Occ)}. */
@@ -54,10 +60,12 @@ public final class SeqTypeTest {
     assertTrue(Occ.ONE.instanceOf(ZERO_MORE));
     assertFalse(Occ.ZERO_MORE.instanceOf(ONE));
     final int bits = 0x014F90E1;
-    for(int i = 0; i < occs.length; i++) {
-      for(int j = 0; j < occs.length; j++) {
-        final boolean inst = (bits >>> 5 * j + i & 1) != 0;
-        assertEquals("(" + i + ", " + j + ')', inst, occs[i].instanceOf(occs[j]));
+
+    final int ol = occs.length;
+    for(int o = 0; o < ol; o++) {
+      for(int p = 0; p < ol; p++) {
+        final boolean inst = (bits >>> 5 * p + o & 1) != 0;
+        assertEquals("(" + o + ", " + p + ')', inst, occs[o].instanceOf(occs[p]));
       }
     }
   }

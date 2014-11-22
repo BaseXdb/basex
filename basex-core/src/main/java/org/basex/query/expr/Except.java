@@ -62,7 +62,8 @@ public final class Except extends Set {
     for(Item it; (it = iter[0].next()) != null;) nc.add(toNode(it));
     final boolean db = nc.dbnodes();
 
-    for(int e = 1; e != exprs.length && nc.size() != 0; ++e) {
+    final int el = exprs.length;
+    for(int e = 1; e < el && nc.size() != 0; e++) {
       final Iter ir = iter[e];
       for(Item it; (it = ir.next()) != null;) {
         final int i = nc.indexOf(toNode(it), db);
@@ -78,16 +79,18 @@ public final class Except extends Set {
       @Override
       public ANode next() throws QueryException {
         if(item == null) {
-          item = new ANode[iter.length];
-          for(int i = 0; i != iter.length; ++i) next(i);
+          final int il = iter.length;
+          item = new ANode[il];
+          for(int i = 0; i < il; i++) next(i);
         }
 
-        for(int i = 1; i != item.length; ++i) {
+        final int il = item.length;
+        for(int i = 1; i < il; i++) {
           if(item[0] == null) return null;
           if(item[i] == null) continue;
           final int d = item[0].diff(item[i]);
 
-          if(d < 0 && i + 1 == item.length) break;
+          if(d < 0 && i + 1 == il) break;
           if(d == 0) {
             next(0);
             i = 0;

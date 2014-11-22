@@ -42,7 +42,8 @@ final class AxisStep extends Step {
       qc.size = nc.size();
       qc.pos = 1;
       int c = 0;
-      for(int n = 0; n < nc.size(); ++n) {
+      final long nl = nc.size();
+      for(int n = 0; n < nl; ++n) {
         qc.value = nc.get(n);
         final Item i = p.test(qc, info);
         if(i != null) {
@@ -60,8 +61,9 @@ final class AxisStep extends Step {
 
   @Override
   public Step copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Expr[] pred = new Expr[preds.length];
-    for(int i = 0; i < pred.length; i++) pred[i] = preds[i].copy(qc, scp, vs);
+    final int pl = preds.length;
+    final Expr[] pred = new Expr[pl];
+    for(int p = 0; p < pl; p++) pred[p] = preds[p].copy(qc, scp, vs);
     return copy(new AxisStep(info, axis, test.copy(), pred));
   }
 }

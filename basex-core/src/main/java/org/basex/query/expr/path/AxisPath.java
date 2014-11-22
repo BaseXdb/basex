@@ -62,7 +62,8 @@ public abstract class AxisPath extends Path {
     if((root == null || ap.root == null) && root != ap.root ||
         steps.length != ap.steps.length || root != null && !root.sameAs(ap.root)) return false;
 
-    for(int s = 0; s < steps.length; ++s) {
+    final int sl = steps.length;
+    for(int s = 0; s < sl; s++) {
       if(!steps[s].sameAs(ap.steps[s])) return false;
     }
     return true;

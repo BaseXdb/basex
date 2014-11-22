@@ -33,8 +33,9 @@ public final class IdPreMapTest {
   /** Set-up method. */
   @Before
   public void setUp() {
-    final int[] map = new int[BASEID + 1];
-    for(int i = 0; i < map.length; ++i) map[i] = i;
+    final int ml = BASEID + 1;
+    final int[] map = new int[ml];
+    for(int m = 0; m < ml; m++) map[m] = m;
     basemap = new DummyIdPreMap(map);
     testedmap = new IdPreMap(BASEID);
     insertedpres = new IntList(ITERATIONS);
@@ -145,7 +146,7 @@ public final class IdPreMapTest {
   private static void insertPerformance(final IdPreMap m) {
     // prepare <pre, id> pairs:
     final int[][] d = new int[ITERATIONS][2];
-    for(int i = 0, id = BASEID + 1; i < d.length; ++id, ++i) {
+    for(int i = 0, id = BASEID + 1; i < ITERATIONS; id++, i++) {
       d[i][0] = RANDOM.nextInt(id);
       d[i][1] = id;
     }
@@ -160,8 +161,9 @@ public final class IdPreMapTest {
    */
   private static void deletePerformance(final IdPreMap m, final DummyIdPreMap b) {
     // prepare <pre, id> pairs:
-    final int[][] d = new int[BASEID + 1][2];
-    for(int i = 0, id = BASEID + 1; i < d.length; --id, ++i) {
+    final int dl = BASEID + 1;
+    final int[][] d = new int[dl][2];
+    for(int i = 0, id = BASEID + 1; i < dl; id--, i++) {
       d[i][0] = RANDOM.nextInt(id);
       d[i][1] = b.id(d[i][0]);
       b.delete(d[i][0], d[i][1], -1);
@@ -208,7 +210,8 @@ public final class IdPreMapTest {
 
   /** Check the two mappings. */
   private void check() {
-    for(int pre = 0; pre < basemap.size(); pre++) {
+    final int bs = basemap.size();
+    for(int pre = 0; pre < bs; pre++) {
       final int id = basemap.id(pre);
       final int p = testedmap.pre(id);
       if(pre != p) fail("Wrong PRE for ID = " + id + ": expected " + pre

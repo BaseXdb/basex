@@ -76,8 +76,10 @@ public abstract class Arr extends ParseExpr {
   @SuppressWarnings("unchecked")
   public static <T extends Expr> T[] copyAll(final QueryContext qc, final VarScope scp,
       final IntObjMap<Var> vs, final T[] arr) {
+
     final T[] copy = arr.clone();
-    for(int i = 0; i < copy.length; i++) copy[i] = (T) copy[i].copy(qc, scp, vs);
+    final int cl = copy.length;
+    for(int c = 0; c < cl; c++) copy[c] = (T) copy[c].copy(qc, scp, vs);
     return copy;
   }
 

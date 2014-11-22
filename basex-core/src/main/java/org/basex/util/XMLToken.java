@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
  */
 public final class XMLToken {
   /** Index for all HTML entities (lazy initialization). */
-  private static final TokenMap HTMLENTS = new TokenMap();
+  private static final TokenMap ENTITIESMAP = new TokenMap();
   /** The underscore. */
   private static final byte[] UNDERSCORE = { '_' };
 
@@ -150,22 +150,23 @@ public final class XMLToken {
   public static byte[] encode(final byte[] name, final boolean lax) {
     // lax encoding: trim whitespaces
     final byte[] nm = lax ? trim(name) : name;
-    if(nm.length == 0) return UNDERSCORE;
+    final int nl = nm.length;
+    if(nl == 0) return UNDERSCORE;
 
-    for(int i = 0; i < nm.length; i += cl(nm, i)) {
-      int cp = cp(nm, i);
-      if(cp == '_' || !(i == 0 ? isNCStartChar(cp) : isNCChar(cp))) {
-        final TokenBuilder tb = new TokenBuilder(nm.length << 1).add(nm, 0, i);
-        for(int j = i; j < nm.length; j += cl(nm, j)) {
-          cp = cp(nm, j);
+    for(int n = 0; n < nl; n += cl(nm, n)) {
+      int cp = cp(nm, n);
+      if(cp == '_' || !(n == 0 ? isNCStartChar(cp) : isNCChar(cp))) {
+        final TokenBuilder tb = new TokenBuilder(nl << 1).add(nm, 0, n);
+        for(int m = n; m < nl; m += cl(nm, m)) {
+          cp = cp(nm, m);
           if(lax) {
             final boolean nc = isNCChar(cp);
             // prefix invalid start chars (numbers, dashes, dots) with underscore
-            if(j == 0 && nc && !isNCStartChar(cp)) tb.add('_');
+            if(m == 0 && nc && !isNCStartChar(cp)) tb.add('_');
             tb.add(nc ? cp : '_');
           } else if(cp == '_') {
             tb.add('_').add('_');
-          } else if(j == 0 ? isNCStartChar(cp) : isNCChar(cp)) {
+          } else if(m == 0 ? isNCStartChar(cp) : isNCChar(cp)) {
             tb.add(cp);
           } else if(cp < 0x10000) {
             addEsc(tb, cp);
@@ -213,7 +214,8 @@ public final class XMLToken {
 
     // mode: 0=normal, 1=unicode, 2=underscore, 3=building unicode
     int mode = 0;
-    for(int n = 0; n < name.length;) {
+    final int nl = name.length;
+    for(int n = 0; n < nl;) {
       final int cp = cp(name, n);
       if(mode >= 3) {
         uc <<= 4;
@@ -338,11 +340,12 @@ public final class XMLToken {
    * @return unicode
    */
   public static byte[] getEntity(final byte[] key) {
-    if(HTMLENTS.isEmpty()) {
-      for(int s = 0; s < HTMLENTITIES.length; s += 2) {
-        HTMLENTS.put(HTMLENTITIES[s], HTMLENTITIES[s + 1]);
-      }
+    final TokenMap map = ENTITIESMAP;
+    if(map.isEmpty()) {
+      final String[] ents = HTMLENTITIES;
+      final int el = ents.length;
+      for(int e = 0; e < el; e += 2) map.put(ents[e], ents[e + 1]);
     }
-    return HTMLENTS.get(key);
+    return map.get(key);
   }
 }

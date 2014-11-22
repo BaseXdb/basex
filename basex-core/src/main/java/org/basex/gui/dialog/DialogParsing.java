@@ -74,7 +74,8 @@ final class DialogParsing extends BaseXBack {
     } else {
       tabs.setEnabledAt(1, true);
       final MainParser[] mps = MainParser.values();
-      for(int t = 0; t < mps.length; t++) if(mps[t] == mp) panel = parsers[t];
+      final int ml = mps.length;
+      for(int t = 0; t < ml; t++) if(mps[t] == mp) panel = parsers[t];
     }
   }
 

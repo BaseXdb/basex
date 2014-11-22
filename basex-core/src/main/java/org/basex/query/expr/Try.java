@@ -34,9 +34,10 @@ public final class Try extends Single {
   @Override
   public void checkUp() throws QueryException {
     // check if no or all try/catch expressions are updating
-    final Expr[] tmp = new Expr[catches.length + 1];
+    final int cl = catches.length;
+    final Expr[] tmp = new Expr[cl + 1];
     tmp[0] = expr;
-    for(int c = 0; c < catches.length; ++c) tmp[c + 1] = catches[c].expr;
+    for(int c = 0; c < cl; ++c) tmp[c + 1] = catches[c].expr;
     checkAllUp(tmp);
   }
 

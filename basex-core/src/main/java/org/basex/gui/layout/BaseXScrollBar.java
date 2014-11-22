@@ -158,7 +158,8 @@ public final class BaseXScrollBar extends BaseXPanel {
    */
   private void drawButton(final Graphics g, final int[][] pol, final int y, final boolean focus) {
     BaseXLayout.drawCell(g, 0, ww, y, y + ww, focus);
-    for(int i = 0; i < pol[0].length; ++i) {
+    final int pl = pol[0].length;
+    for(int i = 0; i < pl; ++i) {
       pol[0][i] += SIZE / 2 - 3;
       pol[1][i] += y + SIZE / 2 - 3;
     }

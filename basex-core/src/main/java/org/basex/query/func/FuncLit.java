@@ -93,14 +93,17 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope o, final IntObjMap<Var> vs) {
-    final Ann a = ann == null ? null : new Ann();
-    if(a != null) for(int i = 0; i < ann.size(); i++) a.add(ann.names[i], ann.values[i], info);
+    final Ann an = ann == null ? null : new Ann();
+    if(an != null) {
+      final int al = ann.size();
+      for(int a = 0; a < al; a++) an.add(ann.names[a], ann.values[a], info);
+    }
     final VarScope scp = new VarScope(sc);
-    final Var[] arg = new Var[args.length];
-    for(int i = 0; i < arg.length; i++)
-      vs.put(args[i].id, arg[i] = scp.newCopyOf(qc, args[i]));
+    final int al = args.length;
+    final Var[] arg = new Var[al];
+    for(int a = 0; a < al; a++) vs.put(args[a].id, arg[a] = scp.newCopyOf(qc, args[a]));
     final Expr call = expr.copy(qc, scp, vs);
-    return new FuncLit(a, name, arg, call, (FuncType) seqType.type, scp, sc, info);
+    return new FuncLit(an, name, arg, call, (FuncType) seqType.type, scp, sc, info);
   }
 
   @Override
@@ -118,15 +121,15 @@ public final class FuncLit extends Single implements Scope {
    * @return function literal
    * @throws QueryException query exception
    */
-  public static FuncLit unknown(final QNm name, final long arity, final QueryContext qc,
+  public static FuncLit unknown(final QNm name, final int arity, final QueryContext qc,
       final StaticContext sc, final InputInfo ii) throws QueryException {
 
     final VarScope scp = new VarScope(sc);
-    final Var[] arg = new Var[(int) arity];
-    final Expr[] refs = new Expr[arg.length];
-    for(int i = 0; i < arg.length; i++) {
-      arg[i] = scp.newLocal(qc, new QNm(QueryText.ARG + (i + 1), ""), SeqType.ITEM_ZM, true);
-      refs[i] = new VarRef(ii, arg[i]);
+    final Var[] arg = new Var[arity];
+    final Expr[] refs = new Expr[arity];
+    for(int a = 0; a < arity; a++) {
+      arg[a] = scp.newLocal(qc, new QNm(QueryText.ARG + (a + 1), ""), SeqType.ITEM_ZM, true);
+      refs[a] = new VarRef(ii, arg[a]);
     }
     final TypedFunc call = qc.funcs.getFuncRef(name, refs, sc, ii);
     return new FuncLit(null, name, arg, call.fun, null, scp, sc, ii);

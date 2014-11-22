@@ -299,9 +299,8 @@ public abstract class JavaMapping extends Arr {
    * @return item type or {@code null} if no appropriate type was found
    */
   static Type type(final Class<?> type) {
-    for(int j = 0; j < JAVA.length; ++j) {
-      if(JAVA[j] == type) return XQUERY[j];
-    }
+    final int jl = JAVA.length;
+    for(int j = 0; j < jl; ++j) if(JAVA[j] == type) return XQUERY[j];
     return null;
   }
 

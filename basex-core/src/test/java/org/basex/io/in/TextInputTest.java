@@ -31,8 +31,9 @@ public final class TextInputTest {
    */
   @Test
   public void read255() throws IOException {
-    final byte[] data = new byte[255];
-    for(int d = 0; d < data.length; d++) data[d] = (byte) (' ' + (d & 0x3F));
+    final int dl = 255;
+    final byte[] data = new byte[dl];
+    for(int d = 0; d < dl; d++) data[d] = (byte) (' ' + (d & 0x3F));
     run(data);
   }
 
@@ -42,8 +43,9 @@ public final class TextInputTest {
    */
   @Test
   public void read4095() throws IOException {
-    final byte[] data = new byte[4095];
-    for(int d = 0; d < data.length; d++) data[d] = (byte) (' ' + (d & 0x3F));
+    final int dl = 4095;
+    final byte[] data = new byte[dl];
+    for(int d = 0; d < dl; d++) data[d] = (byte) (' ' + (d & 0x3F));
     run(data);
   }
 
@@ -53,8 +55,9 @@ public final class TextInputTest {
    */
   @Test
   public void read65535() throws IOException {
-    final byte[] data = new byte[65535];
-    for(int d = 0; d < data.length; d++) data[d] = (byte) (' ' + (d & 0x3F));
+    final int dl = 65536;
+    final byte[] data = new byte[dl];
+    for(int d = 0; d < dl; d++) data[d] = (byte) (' ' + (d & 0x3F));
     run(data);
   }
 

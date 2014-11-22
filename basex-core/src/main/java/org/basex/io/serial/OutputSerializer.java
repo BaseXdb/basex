@@ -285,7 +285,8 @@ public abstract class OutputSerializer extends Serializer {
       } else {
         print(CDATA_O);
         int c = 0;
-        for(int k = 0; k < value.length; k += cl(value, k)) {
+        final int vl = value.length;
+        for(int k = 0; k < vl; k += cl(value, k)) {
           final int ch = cp(value, k);
           if(ch == ']') {
             ++c;
@@ -305,8 +306,9 @@ public abstract class OutputSerializer extends Serializer {
       while(lex.hasNext()) {
         final FTSpan span = lex.next();
         if(!span.special && ftp.contains(span.pos)) print((char) TokenBuilder.MARK);
-        final byte[] t = span.text;
-        for(int k = 0; k < t.length; k += cl(t, k)) encode(cp(t, k));
+        final byte[] text = span.text;
+        final int tl = text.length;
+        for(int t = 0; t < tl; t += cl(text, t)) encode(cp(text, t));
       }
     }
     sep = false;
@@ -344,7 +346,8 @@ public abstract class OutputSerializer extends Serializer {
         }
       } else {
         final byte[] atom = it.string(null);
-        for(int a = 0; a < atom.length; a += cl(atom, a)) {
+        final int al = atom.length;
+        for(int a = 0; a < al; a += cl(atom, a)) {
           final int cp = cp(atom, a);
           if(iter) print(cp); else encode(cp);
         }

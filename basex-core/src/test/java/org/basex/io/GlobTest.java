@@ -59,11 +59,12 @@ public final class GlobTest {
   public void test() {
     for(final TEST g : TEST.values()) {
       final String regex = IOFile.regex(g.glob);
-      for(int i = 0; i < STRINGS.length; i++) {
-        final boolean exp = g.results[i];
-        final boolean res = STRINGS[i].matches(regex);
-        if(exp != res) fail(g + " #" + i + " failed.\n" +
-            "Query: \"" + g.glob + "\" matches \"" + STRINGS[i] +
+      final int sl = STRINGS.length;
+      for(int s = 0; s < sl; s++) {
+        final boolean exp = g.results[s];
+        final boolean res = STRINGS[s].matches(regex);
+        if(exp != res) fail(g + " #" + s + " failed.\n" +
+            "Query: \"" + g.glob + "\" matches \"" + STRINGS[s] +
             "\" \u2192 " + res + "\nExpected: " + exp +
             "\nRegex: " + regex);
       }

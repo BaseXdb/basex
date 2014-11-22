@@ -228,11 +228,12 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       final Expr ex = e.getValue().copy(qc, scp, vs);
       nl.put(var, ex);
     }
-    final Var[] a = args.clone();
-    for(int i = 0; i < a.length; i++) a[i] = vs.get(a[i].id);
+    final Var[] vars = args.clone();
+    final int al = vars.length;
+    for(int a = 0; a < al; a++) vars[a] = vs.get(vars[a].id);
     final Expr e = expr.copy(qc, v, vs);
     e.markTailCalls(null);
-    return copyType(new Closure(info, name, ret, a, e, ann, nl, sc, v));
+    return copyType(new Closure(info, name, ret, vars, e, ann, nl, sc, v));
   }
 
   @Override
@@ -240,15 +241,17 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       final InputInfo ii) throws QueryException {
 
     if(expr.has(Flag.CTX)) return null;
+
     qc.compInfo(OPTINLINE, this);
     // create let bindings for all variables
     final LinkedList<GFLWOR.Clause> cls =
         exprs.length == 0 && nonLocal.isEmpty() ? null : new LinkedList<GFLWOR.Clause>();
     final IntObjMap<Var> vs = new IntObjMap<>();
-    for(int i = 0; i < args.length; i++) {
-      final Var old = args[i], v = scp.newCopyOf(qc, old);
+    final int al = args.length;
+    for(int a = 0; a < al; a++) {
+      final Var old = args[a], v = scp.newCopyOf(qc, old);
       vs.put(old.id, v);
-      cls.add(new Let(v, exprs[i], false, ii).optimize(qc, scp));
+      cls.add(new Let(v, exprs[a], false, ii).optimize(qc, scp));
     }
 
     for(final Entry<Var, Expr> e : nonLocal.entrySet()) {
@@ -339,9 +342,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   public void plan(final FElem plan) {
     final FElem el = planElem();
     addPlan(plan, el, expr);
-    for(int i = 0; i < args.length; ++i) {
-      el.add(planAttr(ARG + i, args[i].name.string()));
-    }
+    final int al = args.length;
+    for(int a = 0; a < al; a++) el.add(planAttr(ARG + a, args[a].name.string()));
   }
 
   @Override
@@ -357,14 +359,16 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final StringBuilder sb = new StringBuilder();
     if (!nonLocal.isEmpty()) {
       sb.append("((: inline-closure :) ");
-      for (final Entry<Var, Expr> e : nonLocal.entrySet())
+      for (final Entry<Var, Expr> e : nonLocal.entrySet()) {
         sb.append("let ").append(e.getKey()).append(" := ").append(e.getValue()).append(' ');
+      }
       sb.append(RETURN).append(' ');
     }
     sb.append(FUNCTION).append(PAREN1);
-    for(int i = 0; i < args.length; i++) {
-      if(i > 0) sb.append(", ");
-      sb.append(args[i]);
+    final int al = args.length;
+    for(int a = 0; a < al; a++) {
+      if(a > 0) sb.append(", ");
+      sb.append(args[a]);
     }
     sb.append(PAREN2).append(' ');
     if(ret != null) sb.append("as ").append(ret).append(' ');

@@ -84,9 +84,10 @@ public class TreeFolder extends TreeNode {
 
     // finally add the necessary leaves
     final byte[] sub = subfolder();
-    int i = 0, m = cmax;
-    while(i < keys.size() && m-- > 0) {
-      final byte[] nm = keys.get(i++);
+    int k = 0, m = cmax;
+    final int ks = keys.size();
+    while(k < ks && m-- > 0) {
+      final byte[] nm = keys.get(k++);
       target.add(new TreeLeaf(nm, sub, tbm.get(nm), false, tree, data));
     }
 

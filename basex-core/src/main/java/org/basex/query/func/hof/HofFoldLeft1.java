@@ -41,7 +41,8 @@ public final class HofFoldLeft1 extends StandardFunc {
       if(seq.isEmpty()) throw EMPTYFOUND.get(info);
       final FItem f = checkArity(exprs[1], 2, qc);
       Expr e = seq.itemAt(0);
-      for(int i = 1, len = (int) seq.size(); i < len; i++)
+      final long is = seq.size();
+      for(int i = 1; i < is; i++)
         e = new DynFuncCall(info, sc, false, f, e, seq.itemAt(i)).optimize(qc, scp);
       return e;
     }

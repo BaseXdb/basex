@@ -126,8 +126,9 @@ final class DialogGeneralPrefs extends BaseXBack {
    * @return credits
    */
   static String creds(final String lng) {
-    for(int i = 0; i < LANGS[0].length; ++i) {
-      if(LANGS[0][i].equals(lng)) return LANGS[1][i];
+    final int ll = LANGS[0].length;
+    for(int l = 0; l < ll; l++) {
+      if(LANGS[0][l].equals(lng)) return LANGS[1][l];
     }
     return "";
   }

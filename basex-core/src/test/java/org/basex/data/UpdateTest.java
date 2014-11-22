@@ -86,8 +86,9 @@ public abstract class UpdateTest extends SandboxTest {
    * @param act actual value
    */
   static void assertArraysEquals(final byte[] exp, final byte[] act) {
-    assertEquals("array lengths don't equal", exp.length, act.length);
-    for(int i = 0; i < exp.length; ++i) assertEquals(exp[i], act[i]);
+    final int el = exp.length;
+    assertEquals("array lengths don't equal", el, act.length);
+    for(int e = 0; e < el; e++) assertEquals(exp[e], act[e]);
   }
 
   /**

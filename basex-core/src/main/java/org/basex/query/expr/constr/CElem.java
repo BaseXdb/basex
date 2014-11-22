@@ -56,9 +56,8 @@ public final class CElem extends CName {
     try {
       // adds in-scope namespaces
       final Atts ns = new Atts();
-      for(int i = 0; i < nspaces.size(); ++i) {
-        ns.add(nspaces.name(i), nspaces.value(i));
-      }
+      final int nl = nspaces.size();
+      for(int i = 0; i < nl; i++) ns.add(nspaces.name(i), nspaces.value(i));
 
       // create and check QName
       final QNm nm = qname(qc, ii);
@@ -101,10 +100,12 @@ public final class CElem extends CName {
 
       // add namespaces from constructor
       final Atts cns = constr.nspaces;
-      for(int a = 0; a < cns.size(); ++a) addNS(cns.name(a), cns.value(a), ns);
+      final int cl = cns.size();
+      for(int c = 0; c < cl; c++) addNS(cns.name(c), cns.value(c), ns);
 
       // add namespaces
-      for(int a = 0; a < constr.atts.size(); ++a) {
+      final int al = constr.atts.size();
+      for(int a = 0; a < al; a++) {
         final ANode att = constr.atts.get(a);
         final QNm qnm = att.qname();
         // skip attributes without prefixes or URIs
@@ -123,7 +124,7 @@ public final class CElem extends CName {
       }
 
       // update and optimize child nodes
-      for(int c = 0; c < constr.children.size(); ++c) constr.children.get(c).optimize();
+      for(final ANode ch : constr.children) ch.optimize();
       // return generated and optimized node
       return node.optimize();
 
@@ -156,8 +157,9 @@ public final class CElem extends CName {
       // prefixes with different URIs exist; new one must be replaced
       byte[] apref = null;
       // check if one of the existing prefixes can be adopted
-      for(int c = 0; c < ns.size(); c++) {
-        if(eq(ns.value(c), uri)) apref = ns.name(c);
+      final int nl = ns.size();
+      for(int n = 0; n < nl; n++) {
+        if(eq(ns.value(n), uri)) apref = ns.name(n);
       }
       // if negative, generate a new one that is not used yet
       if(apref == null) {
@@ -178,8 +180,8 @@ public final class CElem extends CName {
    */
   private int addNS() {
     final NSContext ns = sc.ns;
-    final int s = ns.size();
-    for(int n = 0; n < nspaces.size(); n++) ns.add(nspaces.name(n), nspaces.value(n));
+    final int s = ns.size(), nl = nspaces.size();
+    for(int n = 0; n < nl; n++) ns.add(nspaces.name(n), nspaces.value(n));
     return s;
   }
 }

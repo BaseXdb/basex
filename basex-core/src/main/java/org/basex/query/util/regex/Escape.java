@@ -127,10 +127,11 @@ public final class Escape extends RegExp {
    */
   private static int[][] read(final String string) {
     final ArrayList<int[]> ranges = new ArrayList<>();
-    for(int i = 0; i < string.length();) {
+    final int sl = string.length();
+    for(int s = 0; s < sl;) {
       final int[] rng = new int[2];
-      i += Character.charCount(rng[0] = string.codePointAt(i));
-      i += Character.charCount(rng[1] = string.codePointAt(i));
+      s += Character.charCount(rng[0] = string.codePointAt(s));
+      s += Character.charCount(rng[1] = string.codePointAt(s));
       ranges.add(rng);
     }
     return ranges.toArray(new int[ranges.size()][]);
@@ -639,14 +640,16 @@ public final class Escape extends RegExp {
 
     // add entries for all known character classes
     for(final Entry<String, int[][]> e : m.entrySet()) {
-      final int[][] v = e.getValue();
-      final CharRange[] rs = new CharRange[v.length];
-      for(int i = 0; i < v.length; i++) rs[i] = new CharRange(v[i][0], v[i][1]);
+      final int[][] vals = e.getValue();
+      final int vl = vals.length;
+      final CharRange[] rs = new CharRange[vl];
+      for(int v = 0; v < vl; v++) rs[v] = new CharRange(vals[v][0], vals[v][1]);
       MAP.put("\\p{Is" + e.getKey() + '}', rs);
 
-      final int[][] not = invert(v);
-      final CharRange[] nrs = new CharRange[not.length];
-      for(int i = 0; i < not.length; i++) nrs[i] = new CharRange(not[i][0], not[i][1]);
+      final int[][] not = invert(vals);
+      final int nl = not.length;
+      final CharRange[] nrs = new CharRange[nl];
+      for(int n = 0; n < nl; n++) nrs[n] = new CharRange(not[n][0], not[n][1]);
       MAP.put("\\P{Is" + e.getKey() + '}', nrs);
     }
   }

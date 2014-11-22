@@ -284,7 +284,8 @@ public final class IOFile extends IO {
     final TokenBuilder tb = new TokenBuilder(FILEPREF);
     // add leading slash for Windows paths
     if(!pth.startsWith("/")) tb.add("///");
-    for(int p = 0; p < pth.length(); p++) {
+    final int pl = pth.length();
+    for(int p = 0; p < pl; p++) {
       // replace spaces with %20
       final char ch = pth.charAt(p);
       if(ch == ' ') tb.add("%20");
@@ -376,24 +377,25 @@ public final class IOFile extends IO {
    */
   public static String regex(final String glob, final boolean sub) {
     final StringBuilder sb = new StringBuilder();
-    for(final String g : glob.split(",")) {
-      final String gl = g.trim();
+    for(final String globs : glob.split(",")) {
+      final String glb = globs.trim();
       if(sb.length() != 0) sb.append('|');
       // loop through single pattern
       boolean suf = false;
-      for(int f = 0; f < gl.length(); f++) {
-        char ch = gl.charAt(f);
+      final int gl = glb.length();
+      for(int g = 0; g < gl; g++) {
+        char ch = glb.charAt(g);
         if(ch == '*') {
           // don't allow other dots if pattern ends with a dot
           suf = true;
-          sb.append(gl.endsWith(".") ? "[^.]" : ".");
+          sb.append(glb.endsWith(".") ? "[^.]" : ".");
         } else if(ch == '?') {
           ch = '.';
           suf = true;
         } else if(ch == '.') {
           suf = true;
           // last character is dot: disallow file suffix
-          if(f + 1 == gl.length()) break;
+          if(g + 1 == glb.length()) break;
           sb.append('\\');
         } else if(!Character.isLetterOrDigit(ch)) {
           sb.append('\\');

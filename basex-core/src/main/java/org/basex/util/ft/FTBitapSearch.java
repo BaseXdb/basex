@@ -50,8 +50,9 @@ public final class FTBitapSearch {
 
     // skip empty needles:
     int count = -1;
-    for(int i = 0; i < sorted.length; i++) {
-      if(tokens.get(i) != null && !tokens.get(i).isEmpty()) sorted[++count] = i;
+    final int sl = sorted.length;
+    for(int s = 0; s < sl; s++) {
+      if(tokens.get(s) != null && !tokens.get(s).isEmpty()) sorted[++count] = s;
     }
 
     masks = new BitSet[++count];
@@ -87,7 +88,8 @@ public final class FTBitapSearch {
 
       // check each needle for a match:
       boolean matched = false;
-      for(int i = 0; i < masks.length; i++) {
+      final int ml = masks.length;
+      for(int i = 0; i < ml; i++) {
         final int id = sorted[i];
         final TokenList n = tokens.get(id);
         final BitSet m = masks[id];

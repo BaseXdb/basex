@@ -504,7 +504,8 @@ public final class TextEditor {
     if(space) pos--;
 
     // replace pre-defined completion strings
-    for(int s = 0; s < REPLACE.size(); s += 2) {
+    final int rs = REPLACE.size();
+    for(int s = 0; s < rs; s += 2) {
       final String key = REPLACE.get(s);
       if(!find(key)) continue;
       // key found

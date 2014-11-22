@@ -36,14 +36,17 @@ public final class MainParser {
   public boolean more() {
     // parse all arguments
     final String[] args = main.args();
-    while(arg < args.length) {
+    final int arl = args.length;
+
+    while(arg < arl) {
       // analyze current argument
       final String a = args[arg];
       if(pos == 0) {
         // start from first character
         dash = false;
         // find first relevant character
-        while(pos < a.length()) {
+        final int al = a.length();
+        while(pos < al) {
           final char ch = a.charAt(pos);
           if(ch == '-') {
             // treat input as flag
@@ -94,13 +97,15 @@ public final class MainParser {
    */
   public String string() {
     final String[] args = main.args();
-    while(arg < args.length) {
+    final int arl = args.length;
+    while(arg < arl) {
       final String a = args[arg++];
       int p = pos;
       pos = 0;
-      if(p == a.length()) continue;
+      final int al = a.length();
+      if(p == al) continue;
       final StringBuilder sb = new StringBuilder();
-      while(p < a.length()) sb.append(a.charAt(p++));
+      while(p < al) sb.append(a.charAt(p++));
       final String str = sb.toString();
       return "-".equals(str) ? new Scanner(System.in).useDelimiter("\0").next() : str;
     }

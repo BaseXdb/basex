@@ -168,10 +168,10 @@ public final class DBLocking implements Locking {
 
     // Use pattern similar to merge sort
     int w = 0, r = 0;
-    while(r < readObjects.size() || w < writeObjects.size()) {
+    final int rs = readObjects.size(), ws = writeObjects.size();
+    while(r < rs || w < ws) {
       // Look what token comes earlier in alphabet, prefer writing against reading
-      if(w < writeObjects.size() && (r >= readObjects.size()
-          || writeObjects.get(w).compareTo(readObjects.get(r)) <= 0)) {
+      if(w < ws && (r >= rs || writeObjects.get(w).compareTo(readObjects.get(r)) <= 0)) {
         final String writeObject = writeObjects.get(w++);
         setLockUsed(writeObject);
         getOrCreateLock(writeObject).writeLock().lock();

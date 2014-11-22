@@ -291,10 +291,10 @@ final class TableData {
    */
   int column(final int w, final int mx) {
     double cs = 0;
-    for(int i = 0; i < cols.length; ++i) {
-      final double cw = w * cols[i].width;
-      final double ce = cs + cw;
-      if(mx > cs && mx < ce) return i;
+    final int cl = cols.length;
+    for(int c = 0; c < cl; c++) {
+      final double cw = w * cols[c].width, ce = cs + cw;
+      if(mx > cs && mx < ce) return c;
       cs = ce;
     }
     return -1;

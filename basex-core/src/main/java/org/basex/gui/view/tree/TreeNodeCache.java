@@ -91,9 +91,11 @@ final class TreeNodeCache implements TreeConstants {
       final int min = getMinIndex(i, pre, np);
       if(min == -1) break;
       int c = 0;
-      for(int j = min; j < nodes[i].size(); ++j)
+      final int ns = nodes[i].size();
+      for(int j = min; j < ns; ++j) {
         if(nodes[i].get(j) < np) ++c;
         else break;
+      }
       bo[i] = new TreeBorder(i, min, c);
       ++h;
     }

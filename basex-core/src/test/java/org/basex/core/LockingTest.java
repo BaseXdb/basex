@@ -59,9 +59,8 @@ public final class LockingTest extends SandboxTest {
    */
   @Before
   public void before() {
-    for(int i = 0; i < objects.length; i++) {
-      objects[i] = Integer.toString(i);
-    }
+    final int ol = objects.length;
+    for(int o = 0; o < ol; o++) objects[o] = Integer.toString(o);
   }
 
   /**
@@ -155,17 +154,18 @@ public final class LockingTest extends SandboxTest {
         LockTester.class, (int) (latch.getCount() + 1));
 
     // Start maximum number of allowed transactions
-    for(int i = 0; i < testers.length - 1; i++) {
-      testers[i] = new LockTester(null, objects, NONE, latch);
-      testers[i].start();
+    final int tl = testers.length;
+    for(int t = 0; t < tl - 1; t++) {
+      testers[t] = new LockTester(null, objects, NONE, latch);
+      testers[t].start();
     }
     assertTrue("Couldn't start maximum allowed number of parallel transactions!",
         latch.await(WAIT, TimeUnit.MILLISECONDS));
 
     // Start one more transaction
     final CountDownLatch latch2 = new CountDownLatch(1);
-    testers[testers.length - 1] = new LockTester(null, objects, NONE, latch2);
-    testers[testers.length - 1].start();
+    testers[tl - 1] = new LockTester(null, objects, NONE, latch2);
+    testers[tl - 1].start();
     assertFalse("Shouldn't be able to start another parallel transaction yet!",
         latch2.await(WAIT, TimeUnit.MILLISECONDS));
 
@@ -175,9 +175,7 @@ public final class LockingTest extends SandboxTest {
         latch2.await(WAIT, TimeUnit.MILLISECONDS));
 
     // Stop all other transactions
-    for(int i = 1; i < testers.length; i++) {
-      testers[i].release();
-    }
+    for(int t = 1; t < tl; t++) testers[t].release();
   }
 
   /**

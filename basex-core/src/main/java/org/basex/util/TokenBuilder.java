@@ -304,9 +304,10 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder addSep(final Object[] objects, final String sep) {
-    for(int e = 0; e != objects.length; ++e) {
-      if(e != 0) add(sep);
-      addExt(objects[e]);
+    final int ol = objects.length;
+    for(int o = 0; o < ol; o++) {
+      if(o != 0) add(sep);
+      addExt(objects[o]);
     }
     return this;
   }
@@ -348,15 +349,16 @@ public final class TokenBuilder {
       t = token(s);
     }
 
-    for(int i = 0, e = 0; i < t.length; ++i) {
-      if(t[i] != '%' || e == ext.length) {
+    final int tl = t.length, el = ext.length;
+    for(int i = 0, e = 0; i < tl; ++i) {
+      if(t[i] != '%' || e == el) {
         addByte(t[i]);
       } else {
-        final byte c = i + 1 < t.length ? t[i + 1] : 0;
+        final byte c = i + 1 < tl ? t[i + 1] : 0;
         final boolean d = c >= '1' && c <= '9';
         if(d) ++i;
         final int n = d ? c - '1' : e++;
-        final Object o = n < ext.length ? ext[n] : null;
+        final Object o = n < el ? ext[n] : null;
         addExt(o);
       }
     }

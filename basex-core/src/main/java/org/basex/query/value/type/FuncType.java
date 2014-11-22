@@ -145,12 +145,17 @@ public class FuncType implements Type {
   @Override
   public Type union(final Type t) {
     if(!(t instanceof FuncType)) return AtomType.ITEM;
+
     final FuncType ft = (FuncType) t;
-    if(this == ANY_FUN || ft == ANY_FUN || argTypes.length != ft.argTypes.length) return ANY_FUN;
-    final SeqType[] arg = new SeqType[argTypes.length];
-    for(int i = 0; i < arg.length; i++) {
-      arg[i] = argTypes[i].intersect(ft.argTypes[i]);
-      if(arg[i] == null) return ANY_FUN;
+    if(this == ANY_FUN || ft == ANY_FUN) return ANY_FUN;
+
+    final int al = argTypes.length;
+    if(al != ft.argTypes.length) return ANY_FUN;
+
+    final SeqType[] arg = new SeqType[al];
+    for(int a = 0; a < al; a++) {
+      arg[a] = argTypes[a].intersect(ft.argTypes[a]);
+      if(arg[a] == null) return ANY_FUN;
     }
     return get(ann.intersect(ft.ann), retType.union(ft.retType), arg);
   }
@@ -168,9 +173,10 @@ public class FuncType implements Type {
       final FuncType ft = (FuncType) t;
       // ANY_FUN is excluded by the easy cases
       final SeqType rt = retType.intersect(ft.retType);
-      if(rt != null && argTypes.length == ft.argTypes.length) {
-        final SeqType[] arg = new SeqType[argTypes.length];
-        for(int i = 0; i < arg.length; i++) arg[i] = argTypes[i].union(ft.argTypes[i]);
+      final int al = argTypes.length;
+      if(rt != null && al == ft.argTypes.length) {
+        final SeqType[] arg = new SeqType[al];
+        for(int a = 0; a < al; a++) arg[a] = argTypes[a].union(ft.argTypes[a]);
         final Ann a = ann.union(ft.ann);
         return a == null ? null : get(a, rt, arg);
       }
@@ -233,9 +239,9 @@ public class FuncType implements Type {
    * @return function type
    */
   public static FuncType get(final Ann an, final Var[] args, final SeqType ret) {
-    final SeqType[] at = new SeqType[args.length];
-    for(int a = 0; a < at.length; a++)
-      at[a] = args[a] == null ? SeqType.ITEM_ZM : args[a].declaredType();
+    final int al = args.length;
+    final SeqType[] at = new SeqType[al];
+    for(int a = 0; a < al; a++) at[a] = args[a] == null ? SeqType.ITEM_ZM : args[a].declaredType();
     return new FuncType(an, at, ret == null ? SeqType.ITEM_ZM : ret);
   }
 

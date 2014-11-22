@@ -153,22 +153,24 @@ public final class BaseXFileChooser {
     }
     if(state != JFileChooser.APPROVE_OPTION) return new IOFile[0];
 
-    final File[] fl = fc.isMultiSelectionEnabled() ? fc.getSelectedFiles() :
+    final File[] fls = fc.isMultiSelectionEnabled() ? fc.getSelectedFiles() :
       new File[] { fc.getSelectedFile() };
-    final IOFile[] files = new IOFile[fl.length];
-    for(int f = 0; f < fl.length; f++) files[f] = new IOFile(fl[f].getPath());
+    final int fl = fls.length;
+    final IOFile[] files = new IOFile[fl];
+    for(int f = 0; f < fl; f++) files[f] = new IOFile(fls[f].getPath());
 
     if(mode == Mode.FSAVE) {
       // add file suffix to files
       final FileFilter ff = fc.getFileFilter();
       if(suffix != null) {
-        for(int f = 0; f < files.length; f++) {
+        for(int f = 0; f < fl; f++) {
           final String path = files[f].path();
           if(!path.contains(".")) files[f] = new IOFile(path + suffix);
         }
       } else if(ff instanceof Filter) {
         final String[] sufs = ((Filter) ff).sufs;
-        for(int f = 0; f < files.length && sufs.length != 0; f++) {
+        final int sl = sufs.length;
+        for(int f = 0; f < fl && sl != 0; f++) {
           final String path = files[f].path();
           if(!path.contains(".")) files[f] = new IOFile(path + sufs[0]);
         }

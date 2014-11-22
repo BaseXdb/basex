@@ -25,14 +25,15 @@ public final class FnReplace extends RegEx {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toEmptyToken(exprs[0], qc);
     final byte[] rep = toToken(exprs[2], qc);
-    for(int i = 0; i < rep.length; ++i) {
+    final int rl = rep.length;
+    for(int i = 0; i < rl; ++i) {
       if(rep[i] == '\\') {
-        if(i + 1 == rep.length || rep[i + 1] != '\\' && rep[i + 1] != '$')
+        if(i + 1 == rl || rep[i + 1] != '\\' && rep[i + 1] != '$')
           throw FUNREPBS_X.get(info, rep);
         ++i;
       }
       if(rep[i] == '$' && (i == 0 || rep[i - 1] != '\\') &&
-        (i + 1 == rep.length || !digit(rep[i + 1]))) throw FUNREPDOL_X.get(info, rep);
+        (i + 1 == rl || !digit(rep[i + 1]))) throw FUNREPDOL_X.get(info, rep);
     }
 
     final Pattern p = pattern(exprs[1], exprs.length == 4 ? exprs[3] : null, qc, true);

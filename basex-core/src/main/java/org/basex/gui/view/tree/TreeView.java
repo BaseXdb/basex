@@ -162,9 +162,10 @@ public final class TreeView extends View implements TreeConstants {
 
     final DBNodes nodes = gui.context.current();
     roots = nodes.pres;
-    if(roots.length == 0) return;
+    final int rl = roots.length;
+    if(rl == 0) return;
 
-    for(int i = 0; !showAtts && i < roots.length; ++i) {
+    for(int i = 0; !showAtts && i < rl; ++i) {
       if(roots[i] >= data.meta.size) break;
       if(data.kind(roots[i]) == Data.ATTR) {
         drawMessage(g, NO_ATTS);
@@ -255,8 +256,8 @@ public final class TreeView extends View implements TreeConstants {
       for(int lv = 0; lv < h; ++lv) {
         final boolean br = tr.bigRect(sub, rn, lv);
         final TreeRect[] lr = tr.getTreeRectsPerLevel(rn, lv);
-
-        for(int i = 0; i < lr.length; ++i) {
+        final int ll = lr.length;
+        for(int i = 0; i < ll; ++i) {
           final TreeRect r = lr[i];
           final int pre = sub.prePerIndex(rn, lv, i);
           drawRectangle(tg, rn, lv, r, pre, Draw.RECTANGLE);
@@ -550,10 +551,11 @@ public final class TreeView extends View implements TreeConstants {
     if(mark.length == 0) return;
 
     int rn = 0;
-    while(rn < roots.length) {
+    final int rl = roots.length;
+    while(rn < rl) {
+      final int ml = mark.length;
       final LinkedList<Integer> marklink = new LinkedList<>();
-      for(int i = 0; i < mark.length; ++i)
-        marklink.add(i, mark[i]);
+      for(int m = 0; m < ml; ++m) marklink.add(m, mark[m]);
 
       for(int lv = 0; lv < sub.subtreeHeight(rn); ++lv) {
         final int y = getYperLevel(lv);
@@ -801,7 +803,8 @@ public final class TreeView extends View implements TreeConstants {
     int lvv = lv;
     int cen = parc;
 
-    for(int i = 1; i < subt.length && tr.bigRect(sub, rn, lvv); ++i) {
+    final int sl = subt.length;
+    for(int i = 1; i < sl && tr.bigRect(sub, rn, lvv); ++i) {
       final TreeBorder bos = sub.treeBorder(rn, lvv);
       final TreeBorder bo = subt[i];
 
@@ -904,7 +907,8 @@ public final class TreeView extends View implements TreeConstants {
     if(refreshedFocus) {
       fpre = gui.context.focused;
 
-      for(int r = 0; r < roots.length; ++r) {
+      final int rl = roots.length;
+      for(int r = 0; r < rl; ++r) {
         for(int i = 0; i < sub.subtreeHeight(r); ++i) {
           if(tr.bigRect(sub, r, i)) {
             final int index = sub.preIndex(r, i, fpre);
@@ -937,9 +941,9 @@ public final class TreeView extends View implements TreeConstants {
       if(h < 0 || lv >= h) return false;
 
       final TreeRect[] rL = tr.getTreeRectsPerLevel(rn, lv);
-
-      for(int i = 0; i < rL.length; ++i) {
-        final TreeRect r = rL[i];
+      final int rl = rL.length;
+      for(int l = 0; l < rl; l++) {
+        final TreeRect r = rL[l];
 
         if(r.contains(mx)) {
           frect = r;
@@ -950,7 +954,7 @@ public final class TreeView extends View implements TreeConstants {
           if(tr.bigRect(sub, rn, lv)) {
             pre = tr.getPrePerXPos(sub, rn, lv, mx);
           } else {
-            pre = sub.prePerIndex(rn, lv, i);
+            pre = sub.prePerIndex(rn, lv, l);
           }
           fpre = pre;
           gui.notify.focus(pre, this);
@@ -998,8 +1002,9 @@ public final class TreeView extends View implements TreeConstants {
   private void setLevelDistance() {
     final int h = wheight - BOTTOM_MARGIN;
     int lvs = 0;
-    for(int i = 0; i < roots.length; ++i) {
-      final int th = sub.subtreeHeight(i);
+    final int rl = roots.length;
+    for(int r = 0; r < rl; ++r) {
+      final int th = sub.subtreeHeight(r);
       if(th > lvs) lvs = th;
     }
     int nh = (int) (fontSize * 1.4);

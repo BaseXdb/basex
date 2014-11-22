@@ -168,16 +168,17 @@ public final class InfoView extends View implements LinkListener {
 
     final int runs = Math.max(1, gui.context.options.get(MainOptions.RUNS));
     final String[] split = info.split(NL);
-    for(int i = 0; i < split.length; ++i) {
-      final String line = split[i];
+    final int sl = split.length;
+    for(int s = 0; s < sl; s++) {
+      final String line = split[s];
       if(line.startsWith(PARSING_CC) || line.startsWith(COMPILING_CC) ||
           line.startsWith(EVALUATING_CC) || line.startsWith(PRINTING_CC) ||
           line.startsWith(TOTAL_TIME_CC)) {
         final int t = line.indexOf(" ms");
-        final int s = line.indexOf(':');
-        final int tm = (int) (Double.parseDouble(line.substring(s + 1, t)) * 100);
+        final int d = line.indexOf(':');
+        final int tm = (int) (Double.parseDouble(line.substring(d + 1, t)) * 100);
         times.add(tm);
-        final String key = line.substring(0, s).trim();
+        final String key = line.substring(0, d).trim();
         final String val = Performance.getTime(tm * 10000L * runs, runs);
         timings.add(LI + key + COLS + val);
       } else if(line.startsWith(HITS_X_CC) || line.startsWith(UPDATED_CC) ||
@@ -185,31 +186,31 @@ public final class InfoView extends View implements LinkListener {
           line.startsWith(WRITE_LOCKING_CC)) {
         result.add(LI + line);
       } else if(line.equals(COMPILING + COL)) {
-        while(++i < split.length && !split[i].isEmpty()) comp.add(split[i]);
+        while(++s < sl && !split[s].isEmpty()) comp.add(split[s]);
       } else if(line.equals(QUERY + COL)) {
-        while(++i < split.length && !split[i].isEmpty()) origqu.add(split[i]);
+        while(++s < sl && !split[s].isEmpty()) origqu.add(split[s]);
       } else if(line.equals(OPTIMIZED_QUERY + COL)) {
-        while(++i < split.length && !split[i].isEmpty()) optqu.add(split[i]);
+        while(++s < sl && !split[s].isEmpty()) optqu.add(split[s]);
       } else if(line.startsWith(EVALUATING)) {
-        while(++i < split.length && split[i].startsWith(LI)) eval.add(split[i]);
+        while(++s < sl && split[s].startsWith(LI)) eval.add(split[s]);
       } else if(line.equals(QUERY_PLAN + COL)) {
-        while(++i < split.length && !split[i].isEmpty()) plan.add(split[i]);
+        while(++s < sl && !split[s].isEmpty()) plan.add(split[s]);
       } else if(line.equals(Text.ERROR + COL)) {
-        while(++i < split.length && !split[i].isEmpty()) {
+        while(++s < sl && !split[s].isEmpty()) {
           final Pattern p = Pattern.compile(STOPPED_AT + "(.*)" + COL);
-          final Matcher m = p.matcher(split[i]);
+          final Matcher m = p.matcher(split[s]);
           if(m.find()) {
             final TokenBuilder tb = new TokenBuilder();
             tb.add(STOPPED_AT).uline().add(m.group(1)).uline().add(COL);
-            split[i] = tb.toString();
+            split[s] = tb.toString();
           }
-          err.add(split[i]);
+          err.add(split[s]);
         }
       } else if(line.equals(STACK_TRACE + COL)) {
-        while(++i < split.length && !split[i].isEmpty()) {
+        while(++s < sl && !split[s].isEmpty()) {
           final TokenBuilder tb = new TokenBuilder();
-          final String sp = split[i].replaceAll("<.*", "");
-          final boolean last = !sp.equals(split[i]);
+          final String sp = split[s].replaceAll("<.*", "");
+          final boolean last = !sp.equals(split[s]);
           if(sp.startsWith(LI)) {
             tb.add(LI).uline().add(sp.substring(2)).uline();
           } else {

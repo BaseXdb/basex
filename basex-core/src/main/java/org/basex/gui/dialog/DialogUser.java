@@ -190,7 +190,8 @@ final class DialogUser extends BaseXBack {
         }
       } else if(cmp == add) {
         final String us = addUser.getSelectedItem();
-        for(int r = 0; r < users.contents.size(); ++r) {
+        final int rs = users.contents.size();
+        for(int r = 0; r < rs; ++r) {
           if(!users.value(r, 0).equals(us)) continue;
           int c = 3;
           while(--c >= 0 && users.value(r, c).isEmpty());
@@ -210,7 +211,8 @@ final class DialogUser extends BaseXBack {
     final boolean valname = Databases.validName(user.getText());
     final boolean valpass = new String(pass.getPassword()).matches("[^ ;'\"]*");
     boolean newname = true;
-    for(int r = 0; r < users.contents.size(); ++r)
+    final int rs = users.contents.size();
+    for(int r = 0; r < rs; ++r)
       newname &= !users.value(r, 0).equals(user.getText());
 
     alter.setEnabled(table.getSelectedRows().length == 1);

@@ -1,6 +1,7 @@
 package org.basex.gui.view.table;
 
 import org.basex.data.*;
+import org.basex.gui.view.table.TableData.TableCol;
 
 /**
  * This is an iterator for parsing the rows' contents.
@@ -61,10 +62,10 @@ final class TableIterator {
       if(text || k == Data.ATTR) {
         final int id = text ? elem : data.name(pre);
         // find correct column...
-        for(col = 0; col < tdata.cols.length; ++col) {
-          if(tdata.cols[col].id == id && tdata.cols[col].elem == text) {
-            return true;
-          }
+        final TableCol[] cols = tdata.cols;
+        final int cl = cols.length;
+        for(col = 0; col < cl; ++col) {
+          if(cols[col].id == id && cols[col].elem == text) return true;
         }
       } else if(k == Data.ELEM) {
         // remember name of last element

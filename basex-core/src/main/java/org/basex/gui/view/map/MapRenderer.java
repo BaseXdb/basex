@@ -81,8 +81,10 @@ final class MapRenderer {
       byte[] tok = span.text;
       int wl = 0;
 
-      for(int n = 0; n < tok.length; n += cl(tok, n))
-        wl += BaseXLayout.width(g, cw, cp(tok, n));
+      final int tl = tok.length;
+      for(int t = 0; t < tl; t += cl(tok, t)) {
+        wl += BaseXLayout.width(g, cw, cp(tok, t));
+      }
 
       if(ll + wl >= ww) {
         xx = r.x;
@@ -101,7 +103,7 @@ final class MapRenderer {
           if(twl >= ww) return Integer.MAX_VALUE;
 
           int n = 0;
-          for(; n < tok.length; n += cl(tok, n)) {
+          for(; n < tl; n += cl(tok, n)) {
             final int l = BaseXLayout.width(g, cw, cp(tok, n));
             if(twl + l >= ww) break;
             twl += l;
@@ -288,17 +290,19 @@ final class MapRenderer {
 
     int i = 0;
     int ll = 0;
-    while(i < data[0].length) {
+    final int[] data0 = data[0], data1 = data[1], data2 = data[2];
+    final int dl0 = data0.length, dl1 = data1.length, dl2 = data2.length;
+    while(i < dl0) {
       g.setColor(textc);
 
       int ct = 0;
       int wl = 0;  // word and line length
-      while(i < data[0].length && ppl < data[2].length && data[2][ppl] > pl &&
-        (psl < data[1].length && data[1][psl] > sl || psl >= data[1].length)) {
-        sl += data[0][i];
-        pl += data[0][i];
-        final int lastl = (int) (data[0][i] * r.thumbf);
-        error += data[0][i] * r.thumbf - lastl;
+      while(i < dl0 && ppl < dl2 && data2[ppl] > pl &&
+        (psl < dl1 && data1[psl] > sl || psl >= dl1)) {
+        sl += data0[i];
+        pl += data0[i];
+        final int lastl = (int) (data0[i] * r.thumbf);
+        error += data0[i] * r.thumbf - lastl;
         if(error >= 1) {
           wl += (int) error;
           error -= (int) error;
@@ -310,7 +314,7 @@ final class MapRenderer {
           ++pp;
         }
         ++count;
-        if(i < data[0].length) ++i;
+        if(i < dl0) ++i;
         else break;
       }
 
@@ -349,7 +353,7 @@ final class MapRenderer {
       }
 
       // new sentence
-      if(psl < data[1].length && data[1][psl] == sl) {
+      if(psl < dl1 && data1[psl] == sl) {
         if(ll + r.thumbsw >= ww) {
           yy += r.thumblh;
           ll = 0;
@@ -368,7 +372,7 @@ final class MapRenderer {
       }
 
       // new paragraph
-      if(ppl < data[2].length && data[2][ppl] == pl) {
+      if(ppl < dl2 && data2[ppl] == pl) {
         pl = 0;
         ++ppl;
         if(sen) {
@@ -406,19 +410,20 @@ final class MapRenderer {
     int count = 0;
     int sl = 0, pl = 0;
     int psl = 0, ppl = 0;
-    for(int i = 0; i < data[0].length; ++i) {
-      int wl = (int) (data[0][i] * r.thumbf); // word length
-      e += data[0][i] * r.thumbf - wl;
+    final int[] data0 = data[0], data1 = data[1], data2 = data[2];
+    final int dl0 = data0.length, dl1 = data1.length, dl2 = data2.length;
+    for(int i = 0; i < dl0; ++i) {
+      int wl = (int) (data0[i] * r.thumbf); // word length
+      e += data0[i] * r.thumbf - wl;
 
       if(e >= 1) {
         wl += (int) e;
         e -= (int) e;
       }
-      sl += data[0][i];
-      pl += data[0][i];
+      sl += data0[i];
+      pl += data0[i];
       // check if rectangle fits in line - don't split token and dot
-      if(ll + wl + r.thumbsw * (psl < data[1].length
-          && sl == data[1][psl] ? 1 : 0) >= ww) {
+      if(ll + wl + r.thumbsw * (psl < dl1 && sl == data1[psl] ? 1 : 0) >= ww) {
         yy += r.thumblh;
         ll = 0;
         if(wl >= ww) return r.h + 3;
@@ -433,7 +438,7 @@ final class MapRenderer {
       ll += wl;
       ++count;
 
-      if(psl < data[1].length && sl == data[1][psl]) {
+      if(psl < dl1 && sl == data1[psl]) {
         // new sentence, draw dot
         if(draw) {
           g.setColor(Color.black);
@@ -446,7 +451,7 @@ final class MapRenderer {
       }
 
       ll += r.thumbf;
-      if(ppl < data[2].length && pl == data[2][ppl]) {
+      if(ppl < dl2 && pl == data2[ppl]) {
         // new paragraph
         yy += r.thumblh;
         ll = 0;
@@ -458,11 +463,11 @@ final class MapRenderer {
   }
 
   /**
-   * Checks if cursor is inside the rect.
-   * @param rx int x-value of the rect
-   * @param ry int y-value of the rect
-   * @param rw double width of the rect
-   * @param rh int height of the rect
+   * Checks if cursor is inside the rectangle.
+   * @param rx int x-value
+   * @param ry int y-value
+   * @param rw double width
+   * @param rh int height
    * @param xx int x-value of the cursor
    * @param yy int y-value of the cursor
    * @return boolean
@@ -505,29 +510,30 @@ final class MapRenderer {
     int psl = 0;
     double error = 0;
     double ll = 0; // line length
-    for(int i = 0; i < data[0].length; ++i) {
-      double wl = data[0][i] * r.thumbf;
+    final int[] data0 = data[0], data1 = data[1], data2 = data[2], data3 = data[3], data4 = data[4];
+    final int dl0 = data0.length, dl1 = data1.length, dl2 = data2.length, dl3 = data3.length;
+    for(int i = 0; i < dl0; ++i) {
+      double wl = data0[i] * r.thumbf;
       // sum up error, caused by int cast
-      error += data[0][i] * r.thumbf - wl;
+      error += data0[i] * r.thumbf - wl;
       if(error >= 1) {
         // adjust word length
         wl += error;
         error -= (int) error;
       }
 
-      pl += data[0][i];
-      sl += data[0][i];
-      cc += data[0][i];
+      pl += data0[i];
+      sl += data0[i];
+      cc += data0[i];
 
       // find hovered thumbnail and corresponding text
       boolean ir = false;
-      if(ll + wl + (ds && psl < data[1].length &&
-          data[1][psl] == sl ? r.thumbsw : 0) >= ww) {
+      if(ll + wl + (ds && psl < dl1 && data1[psl] == sl ? r.thumbsw : 0) >= ww) {
         if(ds) {
           // do not split token
           yy += r.thumblh;
           ir = inRect(r.x, yy, wl, r.thumbfh, x, y);
-          ll = wl + (psl < data[1].length && data[1][psl] == sl ?
+          ll = wl + (psl < dl1 && data1[psl] == sl ?
               r.thumbsw : r.thumbf);
         } else {
           // split token to safe space
@@ -535,7 +541,7 @@ final class MapRenderer {
           wl -= ww - ll;
           ir = inRect(r.x, yy, wl, r.thumbfh, x, y);
           ll = wl +
-          (psl < data[1].length && data[1][psl] == sl ? r.thumbsw :  r.thumbf);
+          (psl < dl1 && data1[psl] == sl ? r.thumbsw :  r.thumbf);
         }
       } else {
         ir |= inRect(r.x + ll, yy, wl, r.thumbfh, x, y);
@@ -549,36 +555,34 @@ final class MapRenderer {
         final int sp = BaseXLayout.width(g, cw, ' ');
         final int sd = BaseXLayout.width(g, cw, '.');
         // go some tokens backwards form current token
-        final int bpsl = data[1][psl] == sl ? psl + 1 : psl;
-        final int bsl = data[1][psl] == sl ? 0 : sl;
+        final int bpsl = data1[psl] == sl ? psl + 1 : psl;
+        final int bsl = data1[psl] == sl ? 0 : sl;
         ll = sd * 2 + sp;
         int l;
-        byte[] tok;
-        int p = cc >= data[0][i] ? cc - data[0][i] : 0;
+        int p = cc >= data0[i] ? cc - data0[i] : 0;
         boolean apm;
 
         while(p > -1 && i > -1) {
           // append punctuation mark
-          apm = psl < data[1].length && data[1][psl] == sl;
-          tok = new byte[data[0][i] + (apm ? 1 : 0)];
-          for(int k = 0; k < tok.length - (apm ? 1 : 0); ++k) {
-            tok[k] = (byte) data[3][p + k];
-          }
+          apm = psl < dl1 && data1[psl] == sl;
+          final byte[] tok = new byte[data0[i] + (apm ? 1 : 0)];
+          final int ts = tok.length;
+          for(int k = 0; k < ts - (apm ? 1 : 0); ++k) tok[k] = (byte) data3[p + k];
 
           if(apm) {
-            tok[tok.length - 1] = (byte) data[4][psl];
+            tok[ts - 1] = (byte) data4[psl];
             ++sl;
           }
-          sl -= tok.length;
+          sl -= ts;
 
           if(sl == 0) {
             --psl;
-            if(psl == -1) psl = data[1].length;
-            else sl = data[1][psl];
+            if(psl == -1) psl = dl1;
+            else sl = data1[psl];
           }
 
           l = 0;
-          for(int n = 0; n < tok.length; n += cl(tok, n))
+          for(int n = 0; n < ts; n += cl(tok, n))
             l += BaseXLayout.width(g, cw, cp(tok, n));
           if(si > i && ll + l + sp >= w / 2d) break;
           ll += l + sp;
@@ -587,7 +591,7 @@ final class MapRenderer {
           // find token color
           ttcol.add(ftp != null && ftp.contains(i));
           if(i == 0) break;
-          p -= data[0][i - 1];
+          p -= data0[i - 1];
           --i;
         }
         if(i > 0) {
@@ -601,7 +605,8 @@ final class MapRenderer {
         ul = tl.size() - 1;
         final byte[][] toks = tl.next();
         final boolean[] tc = ttcol.next();
-        for(int j = toks.length - 1; j >= 0; j--) {
+        final int tsl = toks.length;
+        for(int j = tsl - 1; j >= 0; j--) {
           tl.add(toks[j]);
           ttcol.add(tc[j]);
         }
@@ -610,24 +615,25 @@ final class MapRenderer {
         sl = bsl;
         psl = bpsl;
         // process tokens after current token
-        while(p < data[3].length && i < data[0].length) {
+        while(p < dl3 && i < dl0) {
           apm = false;
-          if(psl < data[1].length && data[1][psl] == sl + data[0][i]) {
+          if(psl < dl1 && data1[psl] == sl + data0[i]) {
             apm = true;
             sl = 0;
             ++psl;
           }
-          tok = new byte[data[0][i] + (apm ? 1 : 0)];
+          final byte[] tok = new byte[data0[i] + (apm ? 1 : 0)];
+          final int ts = tok.length;
           l = 0;
 
-          for(int k = 0; k < tok.length - (apm ? 1 : 0); ++k) {
-            tok[k] = (byte) data[3][p + k];
+          for(int k = 0; k < ts - (apm ? 1 : 0); ++k) {
+            tok[k] = (byte) data3[p + k];
           }
 
-          if(apm) tok[tok.length - 1] = (byte) data[4][psl - 1];
-          sl += apm ? sl : tok.length;
+          if(apm) tok[ts - 1] = (byte) data4[psl - 1];
+          sl += apm ? sl : ts;
 
-          for(int n = 0; n < tok.length; n += cl(tok, n))
+          for(int n = 0; n < ts; n += cl(tok, n))
             l += BaseXLayout.width(g, cw, cp(tok, n));
           if(ll + l + sp + 2 * sd >= w / 2d) break;
           ll += l + sp;
@@ -635,10 +641,11 @@ final class MapRenderer {
           tl.add(tok);
 
           ttcol.add(ftp != null && ftp.contains(i));
-          p += tok.length - (apm ? 1 : 0);
+          p += ts - (apm ? 1 : 0);
           ++i;
         }
-        if(i < data[0].length) {
+
+        if(i < dl0) {
           tl.add(new byte[] { '.', '.' });
           ttcol.add(false);
         }
@@ -646,7 +653,7 @@ final class MapRenderer {
       }
 
       // new sentence
-      if(ds && psl < data[1].length && data[1][psl] == sl) {
+      if(ds && psl < dl1 && data1[psl] == sl) {
         if(ll + r.thumbsw >= ww) {
           yy += r.thumblh;
           ll -= ww;
@@ -658,7 +665,7 @@ final class MapRenderer {
       }
 
       // new paragraph
-      if(ppl < data[2].length && data[2][ppl] == pl) {
+      if(ppl < dl2 && data2[ppl] == pl) {
         pl = 0;
         ++ppl;
         if(sen) {
@@ -689,7 +696,8 @@ final class MapRenderer {
     int nl = 1;
     int wi = mr.w / 2;
     final IntList len = new IntList();
-    for(int i = 0; i < tl.size(); ++i) {
+    final int ts = tl.size();
+    for(int i = 0; i < ts; i++) {
       int l = 0;
       final byte[] tok = tl.get(i);
       final int ns = tok.length;

@@ -24,8 +24,9 @@ public final class Int extends ANum {
 
   // caches the first 128 integers
   static {
-    NUMS = new Int[128];
-    for(int i = 0; i < NUMS.length; ++i) NUMS[i] = new Int(i);
+    final int nl = 128;
+    NUMS = new Int[nl];
+    for(int n = 0; n < nl; n++) NUMS[n] = new Int(n);
   }
 
   /**

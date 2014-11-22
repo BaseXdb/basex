@@ -158,7 +158,8 @@ public final class BaseXLayout {
 
     // find and assign unused mnemomic
     final String label = b.getText();
-    for(int l = 0; l < label.length(); l++) {
+    final int ll = label.length();
+    for(int l = 0; l < ll; l++) {
       final char ch = Character.toLowerCase(label.charAt(l));
       if(!letter(ch) || mnem.indexOf(Character.toString(ch)) != -1)
         continue;

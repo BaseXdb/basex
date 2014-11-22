@@ -107,9 +107,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   public void plan(final FElem plan) {
     final FElem el = planElem(NAM, name.string());
     addPlan(plan, el, expr);
-    for(int i = 0; i < args.length; ++i) {
-      el.add(planAttr(ARG + i, args[i].name.string()));
-    }
+    final int al = args.length;
+    for(int a = 0; a < al; ++a) el.add(planAttr(ARG + a, args[a].name.string()));
   }
 
   @Override
@@ -179,7 +178,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final Value cv = qc.value;
     qc.value = null;
     try {
-      for(int i = 0; i < args.length; i++) qc.set(args[i], arg[i], ii);
+      final int al = args.length;
+      for(int a = 0; a < al; a++) qc.set(args[a], arg[a], ii);
       return expr.item(qc, ii);
     } finally {
       qc.value = cv;
@@ -194,7 +194,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final Value cv = qc.value;
     qc.value = null;
     try {
-      for(int i = 0; i < args.length; i++) qc.set(args[i], arg[i], ii);
+      final int al = args.length;
+      for(int a = 0; a < al; a++) qc.set(args[a], arg[a], ii);
       return qc.value(expr);
     } finally {
       qc.value = cv;
@@ -278,10 +279,11 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final LinkedList<GFLWOR.Clause> cls = exprs.length == 0 ? null :
       new LinkedList<GFLWOR.Clause>();
     final IntObjMap<Var> vs = new IntObjMap<>();
-    for(int i = 0; i < args.length; i++) {
-      final Var old = args[i], v = scp.newCopyOf(qc, old);
+    final int al = args.length;
+    for(int a = 0; a < al; a++) {
+      final Var old = args[a], v = scp.newCopyOf(qc, old);
       vs.put(old.id, v);
-      cls.add(new Let(v, exprs[i], false, info).optimize(qc, scp));
+      cls.add(new Let(v, exprs[a], false, info).optimize(qc, scp));
     }
 
     // copy the function body

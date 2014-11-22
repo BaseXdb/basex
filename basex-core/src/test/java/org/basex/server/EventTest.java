@@ -56,7 +56,8 @@ public final class EventTest extends SandboxTest {
       session.execute("drop event " + NAME);
     } catch(final IOException ignored) { }
 
-    for(int i = 0; i < sessions.length; i++) sessions[i] = createClient();
+    final int sl = sessions.length;
+    for(int i = 0; i < sl; i++) sessions[i] = createClient();
   }
 
   /**
@@ -229,8 +230,8 @@ public final class EventTest extends SandboxTest {
 
     // fire events
     final Client[] clients = new Client[CLIENTS];
-    for(int i = 0; i < sessions.length; i++) {
-      clients[i] = new Client(i % 2 == 0, RETURN);
+    for(int c = 0; c < CLIENTS; c++) {
+      clients[c] = new Client(c % 2 == 0, RETURN);
     }
     for(final Client c : clients) c.start();
     for(final Client c : clients) c.join();

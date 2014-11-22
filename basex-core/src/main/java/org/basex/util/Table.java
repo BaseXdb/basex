@@ -44,15 +44,16 @@ public final class Table {
     final Scanner scan = new Scanner(in);
     byte[] line = token(scan.nextLine());
     final IntList il = new IntList();
-    int i = 0;
-    while(i < line.length) {
-      il.add(i);
+    int l = 0;
+    final int ll = line.length;
+    while(l < ll) {
+      il.add(l);
       // find next two spaces
-      while(++i + 1 < line.length && (line[i] != ' ' || line[i + 1] != ' '));
-      header.add(substring(line, il.get(il.size() - 1), i));
-      while(++i < line.length && line[i] == ' ');
+      while(++l + 1 < ll && (line[l] != ' ' || line[l + 1] != ' '));
+      header.add(substring(line, il.get(il.size() - 1), l));
+      while(++l < ll && line[l] == ' ');
     }
-    il.add(i);
+    il.add(l);
 
     // skip delimiter
     scan.nextLine();

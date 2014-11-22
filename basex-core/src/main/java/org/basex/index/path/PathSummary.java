@@ -214,19 +214,17 @@ public final class PathSummary implements Index {
     }
 
     // sort by number of occurrences
-    final int[] tmp = new int[nodes.size()];
-    for(int i = 0; i < nodes.size(); ++i) tmp[i] = nodes.get(i).stats.count;
+    final int ns = nodes.size();
+    final int[] tmp = new int[ns];
+    for(int i = 0; i < ns; ++i) tmp[i] = nodes.get(i).stats.count;
     final int[] occs = Array.createOrder(tmp, false);
 
     // remove non-text/attribute nodes
     final TokenList list = new TokenList();
-    final int ns = nodes.size();
     for(int n = 0; n < ns; n++) {
       final PathNode node = nodes.get(occ ? occs[n] : n);
       final byte[] name = node.token(data);
-      if(name.length != 0 && !list.contains(name) && !contains(name, '(')) {
-        list.add(name);
-      }
+      if(name.length != 0 && !list.contains(name) && !contains(name, '(')) list.add(name);
     }
     if(!occ) list.sort(false);
     return list;

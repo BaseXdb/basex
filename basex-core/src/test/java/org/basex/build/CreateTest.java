@@ -74,7 +74,8 @@ public final class CreateTest extends SandboxTest {
    */
   @Test
   public void createDBWithInput() throws BaseXException {
-    for(int i = 0; i < INPUTS.length; ++i) {
+    final int il = INPUTS.length;
+    for(int i = 0; i < il; i++) {
       new CreateDB(NAME, INPUTS[i]).execute(context);
       // check name of database
       assertEquals(NAME, db());
@@ -90,7 +91,8 @@ public final class CreateTest extends SandboxTest {
   @Test
   public void createDBandAdd() throws BaseXException {
     // add file and folder, skip fragment
-    for(int i = 0; i < INPUTS.length - 1; i++) {
+    final int il = INPUTS.length;
+    for(int i = 0; i < il - 1; i++) {
       new CreateDB(NAME).execute(context);
       new Add("", INPUTS[i]).execute(context);
       assertEquals(NAMES[i], docName());
@@ -104,7 +106,8 @@ public final class CreateTest extends SandboxTest {
   @Test
   public void createDBandAddToName() throws BaseXException {
     // add file and fragment, skip folder
-    for(int i = 0; i < INPUTS.length; i += 2) {
+    final int il = INPUTS.length;
+    for(int i = 0; i < il; i += 2) {
       new CreateDB(NAME).execute(context);
       new Add(DOCNAME, INPUTS[i]).execute(context);
       assertEquals(DOCNAME, docName());
@@ -118,7 +121,8 @@ public final class CreateTest extends SandboxTest {
   @Test
   public void createDBandAddToTarget() throws BaseXException {
     // add file and folder, skip fragment
-    for(int i = 0; i < INPUTS.length - 1; i++) {
+    final int il = INPUTS.length;
+    for(int i = 0; i < il - 1; i++) {
       new CreateDB(NAME).execute(context);
       new Add(TARGET, INPUTS[i]).execute(context);
       assertEquals(TARGET + NAMES[i], docName());
@@ -132,7 +136,8 @@ public final class CreateTest extends SandboxTest {
   @Test
   public void createDBandAddToTargetName() throws BaseXException {
     // add file and fragment, skip folder
-    for(int i = 0; i < INPUTS.length; i += 2) {
+    final int il = INPUTS.length;
+    for(int i = 0; i < il; i += 2) {
       new CreateDB(NAME).execute(context);
       new Add(TARGET + DOCNAME, INPUTS[i]).execute(context);
       assertEquals(TARGET + DOCNAME, docName());

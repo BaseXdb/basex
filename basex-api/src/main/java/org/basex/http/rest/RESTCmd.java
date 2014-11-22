@@ -114,13 +114,14 @@ public abstract class RESTCmd extends Command {
    * @param skip number of columns to skip
    */
   static void list(final Table table, final FElem root, final QNm header, final int skip) {
-    for(final TokenList l : table.contents) {
+    for(final TokenList list : table.contents) {
       final FElem el = new FElem(header);
       // don't show last attribute (input path)
-      for(int i = 1; i < l.size() - skip; i++) {
-        el.add(new QNm(lc(table.header.get(i))), l.get(i));
+      final int ll = list.size() - skip;
+      for(int l = 1; l < ll; l++) {
+        el.add(new QNm(lc(table.header.get(l))), list.get(l));
       }
-      el.add(l.get(0));
+      el.add(list.get(0));
       root.add(el);
     }
   }

@@ -323,7 +323,8 @@ public final class SearchBar extends BaseXBack {
   private static String decode(final String in) {
     final StringBuilder sb = new StringBuilder();
     boolean bs = false;
-    for(int i = 0; i < in.length(); i++) {
+    final int is = in.length();
+    for(int i = 0; i < is; i++) {
       final char ch = in.charAt(i);
       if(bs) {
         if(ch == 'n') {

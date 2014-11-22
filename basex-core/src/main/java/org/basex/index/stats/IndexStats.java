@@ -28,18 +28,18 @@ public final class IndexStats {
 
   /**
    * Default constructor.
-   * @param maxstat maximum number of index occurrences to print
+   * @param size maximum number of index occurrences to print
    */
-  public IndexStats(final int maxstat) {
-    max = maxstat;
-    occMin = new int[max];
-    occMax = new int[max];
-    txtMin = new byte[max][];
-    txtMax = new byte[max][];
-    for(int o = 0; o < txtMin.length; ++o) {
-      txtMin[o] = Token.EMPTY;
-      txtMax[o] = Token.EMPTY;
-      occMin[o] = Integer.MAX_VALUE;
+  public IndexStats(final int size) {
+    max = size;
+    occMin = new int[size];
+    occMax = new int[size];
+    txtMin = new byte[size][];
+    txtMax = new byte[size][];
+    for(int t = 0; t < size; ++t) {
+      txtMin[t] = Token.EMPTY;
+      txtMax[t] = Token.EMPTY;
+      occMin[t] = Integer.MAX_VALUE;
     }
   }
 
@@ -105,10 +105,13 @@ public final class IndexStats {
   private static void print(final TokenBuilder tb, final byte[][] txt, final int[] ocs,
       final int len) {
 
-    for(int o = 0; o < ocs.length; ++o) {
-      if(txt[o].length == 0) continue;
+    final int ol = ocs.length;
+    for(int o = 0; o < ol; ++o) {
+      final int tl = txt[o].length;
+      if(tl == 0) continue;
       tb.add("  ").add(txt[o]);
-      for(int j = 0; j < len - txt[o].length; ++j) tb.add(' ');
+      final int jl = len - tl;
+      for(int j = 0; j < jl; j++) tb.add(' ');
       tb.addInt(ocs[o]).add('x').add(NL);
     }
   }

@@ -81,9 +81,8 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public StaticFuncCall copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Expr[] arg = new Expr[exprs.length];
-    for(int i = 0; i < arg.length; i++) arg[i] = exprs[i].copy(qc, scp, vs);
-    final StaticFuncCall call = new StaticFuncCall(name, arg, sc, func, info);
+    final Expr[] args = Arr.copyAll(qc, scp, vs, exprs);
+    final StaticFuncCall call = new StaticFuncCall(name, args, sc, func, info);
     call.seqType = seqType;
     call.size = size;
     return call;

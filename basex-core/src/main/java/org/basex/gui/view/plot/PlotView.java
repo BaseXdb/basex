@@ -255,8 +255,9 @@ public final class PlotView extends View {
 
     // draw items
     g.setColor(color4);
-    for(int i = 0; i < plotData.pres.length; ++i) {
-      drawItem(g, plotData.xAxis.co[i], plotData.yAxis.co[i], false, false, false);
+    final int pl = plotData.pres.length;
+    for(int p = 0; p < pl; p++) {
+      drawItem(g, plotData.xAxis.co[p], plotData.yAxis.co[p], false, false, false);
     }
   }
 
@@ -394,7 +395,8 @@ public final class PlotView extends View {
 
     // no child nodes of the marked context nodes are marked
     if(!drawSubNodes) {
-      while(i < m.length) {
+      final int ml = m.length;
+      while(i < ml) {
         final int pi = plotData.findPre(m[i]);
         if(pi > -1) drawItem(gi, plotData.xAxis.co[pi], plotData.yAxis.co[pi], false, true, false);
         ++i;
@@ -420,9 +422,9 @@ public final class PlotView extends View {
     // context change (triggered by another view).
     // descendants of marked node set are also checked for intersection
     // with currently plotted nodes
-    while(i < m.length && k < p.length) {
-      final int a = m[i];
-      final int b = p[k];
+    final int ml = m.length, pl = p.length;
+    while(i < ml && k < pl) {
+      final int a = m[i], b = p[k];
       final int ns = data.size(a, data.kind(a)) - 1;
       if(a == b) {
         drawItem(gi, plotData.xAxis.co[k], plotData.yAxis.co[k], false, true, false);
@@ -531,7 +533,8 @@ public final class PlotView extends View {
 
           int j = 0;
           // find value for given plot position
-          while(j < axis.co.length && axis.co[j] != op) ++j;
+          final int al = axis.co.length;
+          while(j < al && axis.co[j] != op) ++j;
           drawCaptionAndGrid(g, drawX, string(axis.getValue(plotData.pres[j])), op);
           // increase to next optimum caption position
           op += capRange;
@@ -542,7 +545,8 @@ public final class PlotView extends View {
         op = .5d;
         int j = 0;
         // find value for given plot position
-        while(j < axis.co.length && axis.co[j] != op) ++j;
+        final int al = axis.co.length;
+        while(j < al && axis.co[j] != op) ++j;
         drawCaptionAndGrid(g, drawX, string(axis.getValue(plotData.pres[j])), op);
       }
       // axis is drawn for numerical data, type INT/DBL
@@ -894,7 +898,8 @@ public final class PlotView extends View {
     focusedPre = -1;
     int dist = Integer.MAX_VALUE;
     // all displayed items are tested for focus
-    for(int i = 0; i < plotData.pres.length && dist != 0; ++i) {
+    final int pl = plotData.pres.length;
+    for(int i = 0; i < pl && dist != 0; ++i) {
       // coordinates and distances for current tested item are calculated
       final int x = calcCoordinate(true, plotData.xAxis.co[i]);
       final int y = calcCoordinate(false, plotData.yAxis.co[i]);
@@ -933,11 +938,12 @@ public final class PlotView extends View {
     // get coordinates for focused item
     final int mx = calcCoordinate(true, plotData.xAxis.co[pre]);
     final int my = calcCoordinate(false, plotData.yAxis.co[pre]);
-    for(int i = 0; i < plotData.pres.length; ++i) {
+    final int pl = plotData.pres.length;
+    for(int p = 0; p < pl; p++) {
       // get coordinates for current item
-      final int x = calcCoordinate(true, plotData.xAxis.co[i]);
-      final int y = calcCoordinate(false, plotData.yAxis.co[i]);
-      if(mx == x && my == y) il.add(plotData.pres[i]);
+      final int x = calcCoordinate(true, plotData.xAxis.co[p]);
+      final int y = calcCoordinate(false, plotData.yAxis.co[p]);
+      if(mx == x && my == y) il.add(plotData.pres[p]);
     }
     return il.finish();
   }
@@ -1036,10 +1042,11 @@ public final class PlotView extends View {
 
     // searches for items located in the selection box
     final IntList il = new IntList();
-    for(int i = 0; i < plotData.pres.length; ++i) {
-      x = calcCoordinate(true, plotData.xAxis.co[i]);
-      y = calcCoordinate(false, plotData.yAxis.co[i]);
-      if(selectionBox.contains(x, y)) il.add(plotData.pres[i]);
+    final int pl = plotData.pres.length;
+    for(int p = 0; p < pl; p++) {
+      x = calcCoordinate(true, plotData.xAxis.co[p]);
+      y = calcCoordinate(false, plotData.yAxis.co[p]);
+      if(selectionBox.contains(x, y)) il.add(plotData.pres[p]);
     }
     gui.notify.mark(new DBNodes(gui.context.data(), il.finish()), this);
     nextContext = gui.context.marked;

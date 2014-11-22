@@ -160,31 +160,35 @@ public class JapaneseTokenizer extends Tokenizer {
     final ArrayList<Morpheme> list = new ArrayList<>();
     try {
       int prev = 0;
-      for(int i = 0; i < morpheme.size(); i++) {
+      final int ms = morpheme.size();
+      for(int i = 0; i < ms; i++) {
         final Object m = morpheme.get(i);
         final String srfc = surface.get(m).toString();
         final String ftr = feature.get(m).toString();
-        final int s = start.getInt(m);
+        final int strt = start.getInt(m);
         if(i != 0) {
-          final int l = s - prev;
+          final int l = strt - prev;
           if(l != 0) {
             list.add(new Morpheme(
-                source.substring(s - 1, s + l - 1), KIGOU_FEATURE)
+                source.substring(strt - 1, strt + l - 1), KIGOU_FEATURE)
             );
           }
         }
-        prev = srfc.length() + s;
+        prev = srfc.length() + strt;
 
         // separates continuous mark (ASCII)
         boolean cont = true;
         final ArrayList<Morpheme> marks = new ArrayList<>();
-        for(int j = 0; j < srfc.length(); j++) {
-          final String c = String.valueOf(srfc.charAt(j));
+        final int sl = srfc.length();
+        for(int s = 0; s < sl; s++) {
+          final String c = String.valueOf(srfc.charAt(s));
           final byte[] t = token(c);
-          if(t.length == 1)
+          if(t.length == 1) {
             if(letter(t[0]) || digit(t[0])) cont = false;
             else marks.add(new Morpheme(c, KIGOU_FEATURE));
-          else cont = false;
+          } else {
+            cont = false;
+          }
         }
 
         if(cont) list.addAll(marks);
@@ -380,14 +384,16 @@ public class JapaneseTokenizer extends Tokenizer {
 
   /**
    * Converts to HANKAKU characters.
-   * @param s Japanese text
+   * @param text Japanese text
    * @return result of conversion(->HANKAKU)
    */
-  private static byte[] toHankaku(final byte[] s) {
-    if(ascii(s)) return s;
-    final TokenBuilder tb = new TokenBuilder(s.length);
-    for(int p = 0; p < s.length; p += cl(s, p)) {
-      final int c = cp(s, p);
+  private static byte[] toHankaku(final byte[] text) {
+    if(ascii(text)) return text;
+
+    final int tl = text.length;
+    final TokenBuilder tb = new TokenBuilder(tl);
+    for(int t = 0; t < tl; t += cl(text, t)) {
+      final int c = cp(text, t);
       if(c >= 0xFF10 && c <= 0xFF19 || c >= 0xFF21 && c <= 0xFF3A
           || c >= 0xFF41 && c <= 0xFF5A) {
         tb.add(c - 0xFEE0);
@@ -501,9 +507,9 @@ public class JapaneseTokenizer extends Tokenizer {
     /** A part of speech in the context, Others. */
     static final int HINSHI_SONOTA = 0;
 
-    /** Surface of Morpheme. */
+    /** Surface of morpheme. */
     private final String mSurface;
-    /** Feature of Morpheme. */
+    /** Feature of morpheme. */
     private final String mFeature;
 
     /**

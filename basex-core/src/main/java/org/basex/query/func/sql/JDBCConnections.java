@@ -47,7 +47,8 @@ public final class JDBCConnections implements DataResources {
 
   @Override
   public void close() {
-    for(int i = 0; i < conns.size(); i++) {
+    final int is = conns.size();
+    for(int i = 0; i < is; i++) {
       final int key = conns.key(i);
       final Object obj = conns.get(key);
       if(obj == null) continue;

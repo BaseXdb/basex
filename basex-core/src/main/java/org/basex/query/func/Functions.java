@@ -179,9 +179,10 @@ public final class Functions extends TokenSet {
     final FuncType jt = FuncType.arity(arity);
     final Var[] vs = new Var[arity];
     final Expr[] refs = new Expr[vs.length];
-    for(int i = 0; i < vs.length; i++) {
-      vs[i] = scp.newLocal(qc, new QNm(ARG + (i + 1), ""), SeqType.ITEM_ZM, true);
-      refs[i] = new VarRef(ii, vs[i]);
+    final int vl = vs.length;
+    for(int v = 0; v < vl; v++) {
+      vs[v] = scp.newLocal(qc, new QNm(ARG + (v + 1), ""), SeqType.ITEM_ZM, true);
+      refs[v] = new VarRef(ii, vs[v]);
     }
     final Expr jm = JavaMapping.get(name, refs, qc, sc, ii);
     return jm == null ? null : new FuncLit(new Ann(), name, vs, jm, jt, scp, sc, ii);

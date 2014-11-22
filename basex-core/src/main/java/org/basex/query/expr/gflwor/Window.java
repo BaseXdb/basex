@@ -81,13 +81,14 @@ public final class Window extends Clause {
     // write variables to the array
     st.writeVars(vs, 0);
     if(nd != null) nd.writeVars(vs, stn);
-    vs[vs.length - 1] = vr;
+    final int vl = vs.length;
+    vs[vl - 1] = vr;
 
     // check for duplicates
-    for(int i = 0; i < vs.length; i++) {
-      final Var v = vs[i];
-      for(int j = i; --j >= 0;)
-        if(v.name.eq(vs[j].name)) throw WINDOWUNIQ_X.get(info, vs[j]);
+    for(int v = 0; v < vl; v++) {
+      final Var var = vs[v];
+      for(int w = v; --w >= 0;)
+        if(var.name.eq(vs[w].name)) throw WINDOWUNIQ_X.get(info, vs[w]);
     }
     return vs;
   }

@@ -283,7 +283,8 @@ public enum GUIMenuCmd implements GUICommand {
     public void execute(final GUI gui) {
       final StringBuilder sb = new StringBuilder();
       final DBNodes n = gui.context.copied;
-      for(int i = 0; i < n.size(); ++i) {
+      final long ns = n.size();
+      for(int i = 0; i < ns; ++i) {
         if(i > 0) sb.append(',');
         sb.append(openPre(n, i));
       }
@@ -307,7 +308,8 @@ public enum GUIMenuCmd implements GUICommand {
       if(!BaseXDialog.confirm(gui, DELETE_NODES)) return;
       final StringBuilder sb = new StringBuilder();
       final DBNodes n = gui.context.marked;
-      for(int i = 0; i < n.size(); ++i) {
+      final long ns = n.size();
+      for(int i = 0; i < ns; ++i) {
         if(i > 0) sb.append(',');
         sb.append(openPre(n, i));
       }

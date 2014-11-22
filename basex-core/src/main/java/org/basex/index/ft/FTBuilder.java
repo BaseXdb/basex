@@ -242,7 +242,8 @@ public final class FTBuilder extends IndexBuilder {
     tbo.add(new byte[4]);
     // merge full-text data of all sorted lists with the same token
     int s = 0;
-    for(int j = 0; j < il.size(); ++j) {
+    final int is = il.size();
+    for(int j = 0; j < is; ++j) {
       final int m = il.get(j);
       for(final int p : v[m].prv) tbp.add(Num.num(p));
       for(final int p : v[m].pov) tbo.add(Num.num(p));
@@ -276,10 +277,8 @@ public final class FTBuilder extends IndexBuilder {
     while(np < ns) {
       // full-text data is stored here, with -scoreU, pre1, pos1, ...,
       // -scoreU, preU, posU
-      for(final int l = np + Num.length(vpre, np); np < l; ++np)
-        out.write(vpre[np]);
-      for(final int l = pp + Num.length(vpos, pp); pp < l; ++pp)
-        out.write(vpos[pp]);
+      for(final int l = np + Num.length(vpre, np); np < l; ++np) out.write(vpre[np]);
+      for(final int l = pp + Num.length(vpos, pp); pp < l; ++pp) out.write(vpos[pp]);
     }
   }
 

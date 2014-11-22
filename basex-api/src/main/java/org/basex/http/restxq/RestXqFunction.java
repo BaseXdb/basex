@@ -186,9 +186,10 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       if(path == null && error == null)
         throw error(function.info, ANN_MISSING, '%', PATH, '%', ERROR);
 
-      for(int i = 0; i < declared.length; i++) {
-        if(declared[i]) continue;
-        throw error(function.info, VAR_UNDEFINED, function.args[i].name.string());
+      final int dl = declared.length;
+      for(int d = 0; d < dl; d++) {
+        if(declared[d]) continue;
+        throw error(function.info, VAR_UNDEFINED, function.args[d].name.string());
       }
     }
     return found;
@@ -288,9 +289,9 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     final Map<String, Value> errs = new HashMap<>();
     if(err != null) {
       final Value[] values = Catch.values(err);
-      for(int v = 0; v < Catch.NAMES.length; v++) {
-        errs.put(string(Catch.NAMES[v].local()), values[v]);
-      }
+      final QNm[] names = Catch.NAMES;
+      final int nl = names.length;
+      for(int n = 0; n < nl; n++) errs.put(string(names[n].local()), values[n]);
     }
     for(final RestXqParam rxp : errorParams) bind(rxp, arg, errs.get(rxp.key));
   }
@@ -365,16 +366,19 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       throws QueryException {
 
     if(name.hasPrefix()) name.uri(function.sc.ns.uri(name.prefix()));
-    int r = -1;
+    int a = -1;
     final Var[] args = function.args;
-    while(++r < args.length && !args[r].name.eq(name));
-    if(r == args.length) throw error(UNKNOWN_VAR, name.string());
-    if(declared[r]) throw error(VAR_ASSIGNED, name.string());
-    final SeqType st = args[r].declaredType();
-    if(args[r].checksType() && !st.type.instanceOf(type))
+    final int al = args.length;
+    while(++a < al && !args[a].name.eq(name));
+
+    if(a == args.length) throw error(UNKNOWN_VAR, name.string());
+    if(declared[a]) throw error(VAR_ASSIGNED, name.string());
+
+    final SeqType st = args[a].declaredType();
+    if(args[a].checksType() && !st.type.instanceOf(type))
       throw error(INV_VARTYPE, name.string(), type);
 
-    declared[r] = true;
+    declared[a] = true;
     return name;
   }
 
@@ -437,8 +441,10 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     // skip nulled values
     if(value == null) return;
 
-    for(int f = 0; f < function.args.length; f++) {
-      final Var var = function.args[f];
+    final Var[] fargs = function.args;
+    final int fl = fargs.length;
+    for(int f = 0; f < fl; f++) {
+      final Var var = fargs[f];
       if(var.name.eq(name)) {
         // casts and binds the value
         final SeqType decl = var.declaredType();

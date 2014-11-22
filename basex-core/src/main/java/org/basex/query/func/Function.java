@@ -1348,7 +1348,7 @@ public enum Function {
     if(arity != 0 && max == Integer.MAX_VALUE) {
       System.arraycopy(args, 0, arg, 0, args.length);
       final SeqType var = args[args.length - 1];
-      for(int i = args.length; i < arg.length; i++) arg[i] = var;
+      for(int a = args.length; a < arity; a++) arg[a] = var;
     } else {
       System.arraycopy(args, 0, arg, 0, arity);
     }

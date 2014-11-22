@@ -53,7 +53,8 @@ public abstract class ExprInfo {
    */
   protected FElem planElem(final Object... atts) {
     final FElem el = new FElem(info());
-    for(int a = 0; a < atts.length - 1; a += 2) {
+    final int al = atts.length;
+    for(int a = 0; a < al - 1; a += 2) {
       if(atts[a + 1] != null) el.add(planAttr(atts[a], atts[a + 1]));
     }
     return el;

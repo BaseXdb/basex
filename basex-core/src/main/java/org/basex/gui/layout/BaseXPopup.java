@@ -94,11 +94,12 @@ public final class BaseXPopup extends JPopupMenu {
 
   @Override
   public void show(final Component comp, final int x, final int y) {
-    for(int b = 0; b < commands.length; ++b) {
-      if(commands[b] != null) {
-        final AbstractButton button = (AbstractButton) getComponent(b);
-        button.setEnabled(commands[b].enabled(gui));
-        button.setSelected(commands[b].selected(gui));
+    final int cl = commands.length;
+    for(int c = 0; c < cl; c++) {
+      if(commands[c] != null) {
+        final AbstractButton button = (AbstractButton) getComponent(c);
+        button.setEnabled(commands[c].enabled(gui));
+        button.setSelected(commands[c].selected(gui));
       }
     }
     super.show(comp, x, y);

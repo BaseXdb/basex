@@ -425,7 +425,8 @@ public abstract class Serializer {
 
             do {
               final Atts ns = data.ns(pp);
-              for(int n = 0; n < ns.size(); ++n) {
+              final int nl = ns.size();
+              for(int n = 0; n < nl; n++) {
                 final byte[] pref = ns.name(n);
                 if(nsp.add(pref)) namespace(pref, ns.value(n));
               }

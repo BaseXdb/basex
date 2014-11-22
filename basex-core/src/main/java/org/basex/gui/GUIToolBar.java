@@ -13,21 +13,21 @@ import org.basex.gui.layout.*;
  */
 final class GUIToolBar extends JToolBar {
   /** Toolbar commands. */
-  private final GUICommand[] cmd;
+  private final GUICommand[] commands;
   /** Reference to main window. */
   private final GUI gui;
 
   /**
    * Default constructor.
-   * @param tb toolbar commands
-   * @param main reference to the main window
+   * @param commands toolbar commands
+   * @param gui reference to the main window
    */
-  GUIToolBar(final GUICommand[] tb, final GUI main) {
+  GUIToolBar(final GUICommand[] commands, final GUI gui) {
     setFloatable(false);
-    cmd = tb;
-    gui = main;
+    this.commands = commands;
+    this.gui = gui;
 
-    for(final GUICommand c : cmd) {
+    for(final GUICommand c : commands) {
       if(c == null) {
         addSeparator();
       } else {
@@ -42,11 +42,12 @@ final class GUIToolBar extends JToolBar {
    * Refreshes the buttons.
    */
   void refresh() {
-    for(int b = 0; b < cmd.length; ++b) {
-      if(cmd[b] != null) {
-        final AbstractButton button = (AbstractButton) getComponent(b);
-        button.setEnabled(cmd[b].enabled(gui));
-        button.setSelected(cmd[b].selected(gui));
+    for(int c = 0; c < commands.length; ++c) {
+      final GUICommand cmd = commands[c];
+      if(cmd != null) {
+        final AbstractButton button = (AbstractButton) getComponent(c);
+        button.setEnabled(cmd.enabled(gui));
+        button.setSelected(cmd.selected(gui));
       }
     }
   }

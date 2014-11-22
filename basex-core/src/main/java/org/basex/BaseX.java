@@ -63,9 +63,10 @@ public class BaseX extends CLI {
       final StringBuilder bind = new StringBuilder();
       SerializerOptions sopts = null;
       boolean v = false, qi = false, qp = false;
-      for(int i = 0; i < ops.size(); i++) {
-        final int c = ops.get(i);
-        String val = vals.get(i);
+      final int os = ops.size();
+      for(int o = 0; o < os; o++) {
+        final int c = ops.get(o);
+        String val = vals.get(o);
 
         if(c == 'b') {
           // set/add variable binding

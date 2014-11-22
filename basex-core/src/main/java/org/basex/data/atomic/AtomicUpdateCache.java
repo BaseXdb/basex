@@ -419,10 +419,11 @@ public final class AtomicUpdateCache {
    */
   private static int refine(final List<StructuralUpdate> updates, final int index,
       final boolean beforeUpdates) {
-    int i = index;
-    final int value = c(updates, i++, beforeUpdates);
-    while(i < updates.size() && c(updates, i, beforeUpdates) == value) i++;
-    return i - 1;
+    int u = index;
+    final int value = c(updates, u++, beforeUpdates);
+    final int us = updates.size();
+    while(u < us && c(updates, u, beforeUpdates) == value) u++;
+    return u - 1;
   }
 
   /**

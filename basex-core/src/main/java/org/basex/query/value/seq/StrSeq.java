@@ -41,16 +41,17 @@ public final class StrSeq extends NativeSeq {
 
   @Override
   public String[] toJava() {
-    final String[] tmp = new String[values.length];
-    for(int v = 0; v < values.length; v++) tmp[v] = Token.string(values[v]);
+    final int vl = values.length;
+    final String[] tmp = new String[vl];
+    for(int v = 0; v < vl; v++) tmp[v] = Token.string(values[v]);
     return tmp;
   }
 
   @Override
   public Value reverse() {
-    final int s = values.length;
-    final byte[][] tmp = new byte[s][];
-    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = values[r];
+    final int vl = values.length;
+    final byte[][] tmp = new byte[vl][];
+    for(int l = 0, r = vl - 1; l < vl; l++, r--) tmp[l] = values[r];
     return get(tmp);
   }
 

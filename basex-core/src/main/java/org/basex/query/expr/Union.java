@@ -72,12 +72,14 @@ public final class Union extends Set {
       @Override
       public ANode next() throws QueryException {
         if(item == null) {
-          item = new ANode[iter.length];
-          for(int i = 0; i != iter.length; ++i) next(i);
+          final int il = iter.length;
+          item = new ANode[il];
+          for(int i = 0; i < il; i++) next(i);
         }
 
         int m = -1;
-        for(int i = 0; i != item.length; ++i) {
+        final int il = item.length;
+        for(int i = 0; i < il; i++) {
           if(item[i] == null) continue;
           final int d = m == -1 ? 1 : item[m].diff(item[i]);
           if(d == 0) {

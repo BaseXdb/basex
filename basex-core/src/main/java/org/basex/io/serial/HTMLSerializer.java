@@ -50,9 +50,10 @@ public class HTMLSerializer extends OutputSerializer {
     final byte[] val = escuri && URIS.contains(nm) ? escape(value) : value;
 
     print(ATT1);
-    for(int k = 0; k < val.length; k += cl(val, k)) {
-      final int ch = cp(val, k);
-      if(ch == '<' || ch == '&' && val[Math.min(k + 1, val.length - 1)] == '{') {
+    final int vl = val.length;
+    for(int v = 0; v < vl; v += cl(val, v)) {
+      final int ch = cp(val, v);
+      if(ch == '<' || ch == '&' && val[Math.min(v + 1, vl - 1)] == '{') {
         print(ch);
       } else if(ch == '"') {
         print(E_QU);

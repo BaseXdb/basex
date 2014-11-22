@@ -123,11 +123,10 @@ final class List extends TrieNode {
 
   @Override
   StringBuilder toString(final StringBuilder sb, final String ind) {
-    sb.append(ind).append("`-- Collision (").append(
-        Integer.toHexString(hash)).append("):\n");
-    for(int i = 0; i < keys.length; i++) {
-      sb.append(ind).append("      ").append(keys[i]).append(" => ").append(
-          values[i]).append('\n');
+    sb.append(ind).append("`-- Collision (").append(Integer.toHexString(hash)).append("):\n");
+    final int kl = keys.length;
+    for(int k = 0; k < kl; k++) {
+      sb.append(ind).append("      ").append(keys[k]).append(" => ").append(values[k]).append('\n');
     }
     return sb;
   }

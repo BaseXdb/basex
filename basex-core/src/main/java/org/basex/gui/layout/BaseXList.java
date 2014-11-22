@@ -128,7 +128,8 @@ public final class BaseXList extends BaseXBack {
           final String regex = glob ? IOFile.regex(txt, false) : null;
 
           final IntList il = new IntList();
-          for(int v = 0; v < values.length; ++v) {
+          final int vl = values.length;
+          for(int v = 0; v < vl; ++v) {
             final String value = values[v].trim().toLowerCase(Locale.ENGLISH);
             if(glob) {
               if(value.matches(regex)) il.add(v);

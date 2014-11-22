@@ -401,8 +401,8 @@ public final class StringParser extends CmdParser {
    * query.
    */
   private void consumeWS() {
-    while(parser.pos < parser.length && parser.input.charAt(parser.pos) <= ' ')
-      ++parser.pos;
+    final int pl = parser.length;
+    while(parser.pos < pl && parser.input.charAt(parser.pos) <= ' ') ++parser.pos;
     parser.mark = parser.pos - 1;
   }
 

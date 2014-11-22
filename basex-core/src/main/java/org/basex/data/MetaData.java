@@ -151,7 +151,8 @@ public final class MetaData {
   public static String normPath(final String path) {
     final StringBuilder sb = new StringBuilder();
     boolean slash = false;
-    for(int p = 0; p < path.length(); p++) {
+    final int pl = path.length();
+    for(int p = 0; p < pl; p++) {
       final char c = path.charAt(p);
       if(c == '\\' || c == '/') {
         if(!slash && p != 0) sb.append('/');

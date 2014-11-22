@@ -322,7 +322,8 @@ public final class GUIConstants {
     colormark4 = new Color(col(r, 1), col(g, 40), col(b, 80));
 
     // create color array
-    for(int c = 1; c < COLORS.length + 1; ++c) {
+    final int cl = COLORS.length;
+    for(int c = 1; c < cl + 1; ++c) {
       COLORS[c - 1] = new Color(Math.max(255 - c * r, 0),
         Math.max(255 - c * g, 0), Math.max(255 - c * b, 0));
     }

@@ -122,7 +122,8 @@ public final class FuncItem extends FItem implements Scope {
       qc.value = ctxVal;
       qc.pos = pos;
       qc.size = size;
-      for(int i = 0; i < params.length; i++) qc.set(params[i], args[i], ii);
+      final int pl = params.length;
+      for(int p = 0; p < pl; p++) qc.set(params[p], args[p], ii);
       return qc.value(expr);
     } finally {
       qc.value = cv;
@@ -141,7 +142,8 @@ public final class FuncItem extends FItem implements Scope {
       qc.value = ctxVal;
       qc.pos = pos;
       qc.size = size;
-      for(int i = 0; i < params.length; i++) qc.set(params[i], args[i], ii);
+      final int pl = params.length;
+      for(int p = 0; p < pl; p++) qc.set(params[p], args[p], ii);
       return expr.item(qc, ii);
     } finally {
       qc.value = cv;
@@ -216,10 +218,11 @@ public final class FuncItem extends FItem implements Scope {
     final LinkedList<GFLWOR.Clause> cls =
         exprs.length == 0 ? null : new LinkedList<GFLWOR.Clause>();
     final IntObjMap<Var> vs = new IntObjMap<>();
-    for(int i = 0; i < params.length; i++) {
-      final Var old = params[i], v = scp.newCopyOf(qc, old);
+    final int pl = params.length;
+    for(int p = 0; p < pl; p++) {
+      final Var old = params[p], v = scp.newCopyOf(qc, old);
       vs.put(old.id, v);
-      cls.add(new Let(v, exprs[i], false, ii).optimize(qc, scp));
+      cls.add(new Let(v, exprs[p], false, ii).optimize(qc, scp));
     }
 
     // copy the function body
@@ -249,7 +252,8 @@ public final class FuncItem extends FItem implements Scope {
   public String toString() {
     final FuncType ft = (FuncType) type;
     final TokenBuilder tb = new TokenBuilder(FUNCTION).add('(');
-    for(final Var v : params) tb.addExt(v).add(v == params[params.length - 1] ? "" : ", ");
+    final int pl = params.length;
+    for(final Var v : params) tb.addExt(v).add(v == params[pl - 1] ? "" : ", ");
     tb.add(')').add(ft.retType != null ? " as " + ft.retType : "");
     return tb.add(" { ").addExt(expr).add(" }").toString();
   }

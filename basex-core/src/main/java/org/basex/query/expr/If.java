@@ -228,12 +228,13 @@ public final class If extends Arr {
   @Override
   public Expr typeCheck(final TypeCheck tc, final QueryContext qc, final VarScope scp)
       throws QueryException {
-    for(int i = 0; i < exprs.length; i++) {
-      final SeqType tp = exprs[i].seqType();
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) {
+      final SeqType tp = exprs[e].seqType();
       try {
-        exprs[i] = tc.check(exprs[i], qc, scp);
+        exprs[e] = tc.check(exprs[e], qc, scp);
       } catch(final QueryException ex) {
-        exprs[i] = FnError.get(ex, tp);
+        exprs[e] = FnError.get(ex, tp);
       }
     }
     return optimize(qc, scp);

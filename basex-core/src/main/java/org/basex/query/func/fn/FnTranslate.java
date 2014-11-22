@@ -23,9 +23,10 @@ public final class FnTranslate extends StandardFunc {
     final TokenBuilder tb = new TokenBuilder(tok.length);
     for(final int t : tok) {
       int j = -1;
-      while(++j < srch.length && t != srch[j]) ;
-      if(j < srch.length) {
-        if(j >= rep.length) continue;
+      final int sl = srch.length, rl = rep.length;
+      while(++j < sl && t != srch[j]) ;
+      if(j < sl) {
+        if(j >= rl) continue;
         tb.add(rep[j]);
       } else {
         tb.add(t);

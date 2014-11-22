@@ -226,8 +226,11 @@ public final class Namespaces {
     final TokenMap nsScope = new TokenMap();
     NSNode node = current;
     do {
-      for(int i = 0; i < node.values.length; i += 2)
-        nsScope.put(prefix(node.values[i]), uri(node.values[i + 1]));
+      final int[] values = node.values;
+      final int vl = values.length;
+      for(int v = 0; v < vl; v += 2) {
+        nsScope.put(prefix(values[v]), uri(values[v + 1]));
+      }
       final int pos = node.find(pre);
       if(pos < 0) break;
       node = node.children[pos];
@@ -473,14 +476,16 @@ public final class Namespaces {
    * @param end end pre value
    */
   private void table(final Table table, final NSNode node, final int start, final int end) {
-    for(int i = 0; i < node.values.length; i += 2) {
+    final int[] values = node.values;
+    final int vl = values.length;
+    for(int i = 0; i < vl; i += 2) {
       if(node.pr < start || node.pr > end) continue;
       final TokenList tl = new TokenList();
-      tl.add(node.values[i + 1]);
+      tl.add(values[i + 1]);
       tl.add(node.pr);
       tl.add(node.pr - node.parent.pr);
-      tl.add(prefs.key(node.values[i]));
-      tl.add(uris.key(node.values[i + 1]));
+      tl.add(prefs.key(values[i]));
+      tl.add(uris.key(values[i + 1]));
       table.contents.add(tl);
     }
     for(int i = 0; i < node.sz; i++) table(table, node.children[i], start, end);
@@ -519,9 +524,11 @@ public final class Namespaces {
    * @param node namespace node
    */
   private void info(final TokenObjMap<TokenList> map, final NSNode node) {
-    for(int i = 0; i < node.values.length; i += 2) {
-      final byte[] key = uris.key(node.values[i + 1]);
-      final byte[] val = prefs.key(node.values[i]);
+    final int[] values = node.values;
+    final int vl = values.length;
+    for(int v = 0; v < vl; v += 2) {
+      final byte[] key = uris.key(values[v + 1]);
+      final byte[] val = prefs.key(values[v]);
       TokenList old = map.get(key);
       if(old == null) {
         old = new TokenList();

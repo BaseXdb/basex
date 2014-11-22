@@ -212,7 +212,8 @@ public final class DBNodes implements Result {
 
   @Override
   public void serialize(final Serializer ser) throws IOException {
-    for(int c = 0; c < pres.length && !ser.finished(); c++) serialize(ser, c);
+    final int pl = pres.length;
+    for(int pre = 0; pre < pl && !ser.finished(); pre++) serialize(ser, pre);
   }
 
   @Override

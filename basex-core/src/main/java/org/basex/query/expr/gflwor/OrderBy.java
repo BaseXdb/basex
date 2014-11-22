@@ -59,7 +59,8 @@ public final class OrderBy extends GFLWOR.Clause {
         final Value[] tuple = tpls[p];
         // free the space occupied by the tuple
         tpls[p] = null;
-        for(int i = 0; i < refs.length; i++) qc.set(refs[i].var, tuple[i], info);
+        final int rl = refs.length;
+        for(int r = 0; r < rl; r++) qc.set(refs[r].var, tuple[r], info);
         return true;
       }
 
@@ -72,14 +73,14 @@ public final class OrderBy extends GFLWOR.Clause {
         // keys are stored at odd positions, values at even ones
         List<Value[]> tuples = new ArrayList<>();
         while(sub.next(qc)) {
-          final Item[] key = new Item[keys.length];
-          for(int i = 0; i < keys.length; i++) {
-            key[i] = keys[i].expr.atomItem(qc, keys[i].info);
-          }
+          final int kl = keys.length;
+          final Item[] key = new Item[kl];
+          for(int k = 0; k < kl; k++) key[k] = keys[k].expr.atomItem(qc, keys[k].info);
           tuples.add(key);
 
-          final Value[] vals = new Value[refs.length];
-          for(int i = 0; i < refs.length; i++) vals[i] = refs[i].value(qc);
+          final int rl = refs.length;
+          final Value[] vals = new Value[rl];
+          for(int r = 0; r < rl; r++) vals[r] = refs[r].value(qc);
           tuples.add(vals);
         }
 
@@ -100,7 +101,8 @@ public final class OrderBy extends GFLWOR.Clause {
             public int compare(final Integer x, final Integer y) {
               try {
                 final Item[] a = ks[x], b = ks[y];
-                for(int k = 0; k < keys.length; k++) {
+                final int kl = keys.length;
+                for(int k = 0; k < kl; k++) {
                   final Key or = keys[k];
                   Item m = a[k], n = b[k];
                   if(m == Dbl.NAN || m == Flt.NAN) m = null;
@@ -136,7 +138,8 @@ public final class OrderBy extends GFLWOR.Clause {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(ORDER).append(' ').append(BY);
-    for(int i = 0; i < keys.length; i++) sb.append(i == 0 ? " " : SEP).append(keys[i]);
+    final int kl = keys.length;
+    for(int k = 0; k < kl; k++) sb.append(k == 0 ? " " : SEP).append(keys[k]);
     return sb.toString();
   }
 
@@ -171,8 +174,9 @@ public final class OrderBy extends GFLWOR.Clause {
   @Override
   public GFLWOR.Clause inline(final QueryContext qc, final VarScope scp, final Var var,
       final Expr ex) throws QueryException {
-    for(int i = refs.length; --i >= 0;)
-      if(var.is(refs[i].var)) refs = Array.delete(refs, i);
+    for(int r = refs.length; --r >= 0;) {
+      if(var.is(refs[r].var)) refs = Array.delete(refs, r);
+    }
     return inlineAll(qc, scp, keys, var, ex) ? optimize(qc, scp) : null;
   }
 
@@ -190,8 +194,9 @@ public final class OrderBy extends GFLWOR.Clause {
   boolean clean(final IntObjMap<Var> decl, final BitArray used) {
     // delete unused variables
     final int len = refs.length;
-    for(int i = refs.length; --i >= 0;)
-      if(!used.get(refs[i].var.id)) refs = Array.delete(refs, i);
+    for(int r = refs.length; --r >= 0;) {
+      if(!used.get(refs[r].var.id)) refs = Array.delete(refs, r);
+    }
     if(refs.length == used.cardinality()) return refs.length != len;
 
     // add new variables, possible when an expression is inlined below this clause

@@ -47,12 +47,13 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
   public RegExLexer(final byte[] regex, final boolean strip) {
     input = regex;
     IntList ls = null;
-    for(int i = 0; i < input.length; i++) {
+    final int il = input.length;
+    for(int i = 0; i < il; i++) {
       final byte c = input[i];
       if(c == '\r' || c == '\n') {
         i++;
-        if(c == '\r' && i < input.length && input[i] == '\n') i++;
-        if(i < input.length) {
+        if(c == '\r' && i < il && input[i] == '\n') i++;
+        if(i < il) {
           if(ls == null) ls = new IntList();
           ls.add(i);
         }
@@ -67,9 +68,10 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
    * @return the code point
    */
   private int next() {
+    final int il = input.length;
     int cp;
     do {
-      if(pos >= input.length) return -1;
+      if(pos >= il) return -1;
       cp = cp(input, pos);
       pos += cl(input, pos);
     } while(skipWs && state <= 0 && ws(cp));
@@ -223,7 +225,8 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
       return QUANT_CLOSE;
     }
     if(curr < '0' || curr > '9') throw error("{", curr);
-    while(pos < input.length) {
+    final int il = input.length;
+    while(pos < il) {
       final byte b = input[pos];
       if(b < '0' || b > '9') break;
       tb.add(b);
@@ -241,10 +244,11 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
   private int[] lineCol(final int start) {
     final int[] lc = new int[4];
     if(lines != null) {
+      final int ls = lines.size();
       int ln = 0, st = 0;
       for(int i = 0; i < 2; i++) {
         final int curr = i == 0 ? start : pos;
-        while(ln < lines.size() && lines.get(ln) < curr) {
+        while(ln < ls && lines.get(ln) < curr) {
           st = lines.get(ln);
           ln++;
         }

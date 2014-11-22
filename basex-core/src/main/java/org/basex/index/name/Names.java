@@ -120,9 +120,9 @@ public final class Names extends TokenSet implements Index {
       final int s = ids[i];
       if(stats[s] == null) continue;
       final byte[] key = keys[s];
-      tb.add("  ");
-      tb.add(key);
-      for(int j = 0; j < len - key.length; ++j) tb.add(' ');
+      tb.add("  ").add(key);
+      final int kl = len - key.length;
+      for(int k = 0; k < kl; ++k) tb.add(' ');
       tb.add(stats[s] + Text.NL);
     }
     return tb.finish();

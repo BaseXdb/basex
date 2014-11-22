@@ -65,7 +65,8 @@ public abstract class Preds extends ParseExpr {
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    for(int p = 0; p < preds.length; ++p) {
+    // number of predicates may change in loop
+    for(int p = 0; p < preds.length; p++) {
       final Expr pr = preds[p];
       if(pr instanceof CmpG || pr instanceof CmpV) {
         final Cmp cmp = (Cmp) pr;

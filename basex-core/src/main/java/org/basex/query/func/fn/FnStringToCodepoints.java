@@ -37,8 +37,9 @@ public final class FnStringToCodepoints extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final int[] tmp = cps(toEmptyToken(exprs[0], qc));
-    final long[] vals = new long[tmp.length];
-    for(int i = 0; i < tmp.length; i++) vals[i] = tmp[i];
+    final int tl = tmp.length;
+    final long[] vals = new long[tl];
+    for(int t = 0; t < tl; t++) vals[t] = tmp[t];
     return IntSeq.get(vals, AtomType.ITR);
   }
 }

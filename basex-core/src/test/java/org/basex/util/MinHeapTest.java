@@ -17,12 +17,13 @@ public final class MinHeapTest {
   @Test
   public void heapSort() {
     final MinHeap<Integer, Integer> heap = new MinHeap<>(2, null);
-    final Integer[] vals = new Integer[1000];
-    for(int i = 0; i < vals.length; i++) vals[i] = i;
+    final int vl = 1000;
+    final Integer[] vals = new Integer[vl];
+    for(int v = 0; v < vl; v++) vals[v] = v;
     Collections.shuffle(Arrays.asList(vals));
 
-    for(final int i : vals) {
-      heap.insert(i, i);
+    for(final int v : vals) {
+      heap.insert(v, v);
       heap.verify();
     }
 

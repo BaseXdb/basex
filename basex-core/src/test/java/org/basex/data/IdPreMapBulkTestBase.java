@@ -28,8 +28,9 @@ public abstract class IdPreMapBulkTestBase {
   /** Set-up method. */
   @Before
   public void setUp() {
-    final int[] map = new int[baseid + 1];
-    for(int i = 0; i < map.length; ++i) map[i] = i;
+    final int ml = baseid + 1;
+    final int[] map = new int[ml];
+    for(int m = 0; m < ml; m++) map[m] = m;
     basemap = new DummyIdPreMap(map);
     testedmap = new IdPreMap(baseid);
     ops = new ArrayList<>(baseid + opcount);
@@ -60,7 +61,8 @@ public abstract class IdPreMapBulkTestBase {
 
   /** Check the two mappings. */
   final void check() {
-    for(int pre = 0; pre < basemap.size(); pre++) {
+    final int bs = basemap.size();
+    for(int pre = 0; pre < bs; pre++) {
       final int id = basemap.id(pre);
       final int p = testedmap.pre(id);
       if(pre != p) {
@@ -136,13 +138,11 @@ public abstract class IdPreMapBulkTestBase {
 
     @Override
     public String toString() {
-      final StringBuilder spres = new StringBuilder();
-      final StringBuilder sids = new StringBuilder();
-      for(int i = 0; i < idlist.size(); ++i) {
-        spres.append(i);
-        spres.append(' ');
-        sids.append(idlist.get(i));
-        sids.append(' ');
+      final StringBuilder spres = new StringBuilder(), sids = new StringBuilder();
+      final int is = idlist.size();
+      for(int i = 0; i < is; ++i) {
+        spres.append(i).append(' ');
+        sids.append(idlist.get(i)).append(' ');
       }
       return spres.append('\n').append(sids).toString();
     }

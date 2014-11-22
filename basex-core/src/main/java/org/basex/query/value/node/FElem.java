@@ -154,7 +154,8 @@ public final class FElem extends FNode {
     }
 
     // add all new namespaces
-    for(int i = 0; i < ns.size(); ++i) nss.put(ns.name(i), ns.value(i));
+    final int nl = ns.size();
+    for(int n = 0; n < nl; n++) nss.put(ns.name(n), ns.value(n));
 
     // no parent, so we have to add all namespaces in scope
     if(par == null) {
@@ -401,9 +402,16 @@ public final class FElem extends FNode {
     final ANodeList at = atts != null ? new ANodeList(atts.size()) : null;
     final Atts as = ns != null ? new Atts() : null;
     final FElem node = new FElem(name, as, ch, at);
-    if(as != null) for(int n = 0; n < ns.size(); ++n) as.add(ns.name(n), ns.value(n));
-    if(at != null) for(final ANode n : atts) at.add(n.copy());
-    if(ch != null) for(final ANode n : children) ch.add(n.copy());
+    if(as != null) {
+      final int nl = ns.size();
+      for(int n = 0; n < nl; ++n) as.add(ns.name(n), ns.value(n));
+    }
+    if(at != null) {
+      for(final ANode n : atts) at.add(n.copy());
+    }
+    if(ch != null) {
+      for(final ANode n : children) ch.add(n.copy());
+    }
     node.parent(parent);
     return node.optimize();
   }
@@ -417,7 +425,8 @@ public final class FElem extends FNode {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder().add('<').add(name.string());
     if(ns != null) {
-      for(int n = 0; n < ns.size(); n++) {
+      final int nl = ns.size();
+      for(int n = 0; n < nl; n++) {
         tb.add(new FNames(ns.name(n), ns.value(n)).toString());
       }
     }

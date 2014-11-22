@@ -37,7 +37,7 @@ public final class And extends Logical {
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     final int es = exprs.length;
-    final ExprList el = new ExprList(es);
+    final ExprList list = new ExprList(es);
     for(int i = 0; i < es; i++) {
       Expr e = exprs[i];
       if(e instanceof Pos) {
@@ -72,14 +72,14 @@ public final class And extends Logical {
       // expression will always return false
       if(e == Bln.FALSE) return optPre(Bln.FALSE, qc);
       // skip expression yielding true
-      if(e != Bln.TRUE) el.add(e);
+      if(e != Bln.TRUE) list.add(e);
     }
 
     // all arguments return true
-    if(el.isEmpty()) return optPre(Bln.TRUE, qc);
+    if(list.isEmpty()) return optPre(Bln.TRUE, qc);
 
-    if(es != el.size()) qc.compInfo(OPTWRITE, this);
-    exprs = el.finish();
+    if(es != list.size()) qc.compInfo(OPTWRITE, this);
+    exprs = list.finish();
     compFlatten(qc);
 
     boolean not = true;
@@ -92,8 +92,9 @@ public final class And extends Logical {
 
     if(not) {
       qc.compInfo(OPTWRITE, this);
-      final Expr[] inner = new Expr[exprs.length];
-      for(int i = 0; i < inner.length; i++) inner[i] = ((Arr) exprs[i]).exprs[0];
+      final int el = exprs.length;
+      final Expr[] inner = new Expr[el];
+      for(int e = 0; e < el; e++) inner[e] = ((Arr) exprs[e]).exprs[0];
       final Expr or = new Or(info, inner).optimize(qc, scp);
       return Function.NOT.get(null, info, or).optimize(qc, scp);
     }
@@ -104,19 +105,17 @@ public final class And extends Logical {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    for(int i = 0; i < exprs.length - 1; i++) {
-      if(!exprs[i].ebv(qc, info).bool(info)) return Bln.FALSE;
+    final int el = exprs.length;
+    for(int e = 0; e < el - 1; e++) {
+      if(!exprs[e].ebv(qc, info).bool(info)) return Bln.FALSE;
     }
-    final Expr last = exprs[exprs.length - 1];
+    final Expr last = exprs[el - 1];
     return tailCall ? last.item(qc, ii) : last.ebv(qc, ii).bool(ii) ? Bln.TRUE : Bln.FALSE;
   }
 
   @Override
   public And copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vars) {
-    final int es = exprs.length;
-    final Expr[] ex = new Expr[es];
-    for(int i = 0; i < es; i++) ex[i] = exprs[i].copy(qc, scp, vars);
-    return new And(info, ex);
+    return new And(info, copyAll(qc, scp, vars, exprs));
   }
 
   @Override

@@ -112,10 +112,11 @@ final class PlotAxis {
       type = StatsType.TEXT;
 
     final int[] items = plotData.pres;
-    if(items.length < 1) return;
-    co = new double[items.length];
-    final byte[][] vals = new byte[items.length][];
-    for(int i = 0; i < items.length; ++i) {
+    final int il = items.length;
+    if(il < 1) return;
+    co = new double[il];
+    final byte[][] vals = new byte[il][];
+    for(int i = 0; i < il; ++i) {
       byte[] value = getValue(items[i]);
       if(type == StatsType.TEXT && value.length > TEXTLENGTH) {
         value = substring(value, 0, TEXTLENGTH);
@@ -131,8 +132,8 @@ final class PlotAxis {
       if(!log) prepareLinAxis();
 
       // coordinates for TEXT already calculated in textToNum()
-      for(int i = 0; i < vals.length; ++i)
-        co[i] = calcPosition(vals[i]);
+      final int vl = vals.length;
+      for(int v = 0; v < vl; ++v) co[v] = calcPosition(vals[v]);
     }
   }
 
@@ -262,12 +263,13 @@ final class PlotAxis {
   private void minMax(final byte[][] vals) {
     min = Integer.MAX_VALUE;
     max = Integer.MIN_VALUE;
-    int i = -1;
+    int v = -1;
     boolean b = false;
-    while(++i < vals.length) {
-      if(vals[i].length > 0) {
+    final int vl = vals.length;
+    while(++v < vl) {
+      if(vals[v].length > 0) {
         b = true;
-        final double d = toDouble(vals[i]);
+        final double d = toDouble(vals[v]);
         if(d < min) min = d;
         if(d > max) max = d;
       }

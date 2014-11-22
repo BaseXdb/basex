@@ -120,8 +120,9 @@ final class JsonStringConverter extends JsonConverter {
   @Override
   void stringLit(final byte[] value) {
     tb.add('"');
-    for(int i = 0; i < value.length; i += Token.cl(value, i)) {
-      final int cp = Token.cp(value, i);
+    final int vl = value.length;
+    for(int v = 0; v < vl; v += Token.cl(value, v)) {
+      final int cp = Token.cp(value, v);
       switch(cp) {
         case '\\':
         case '"':

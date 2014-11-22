@@ -44,8 +44,9 @@ public final class Switch extends ParseExpr {
     checkNoUp(cond);
     for(final SwitchCase sc : cases) sc.checkUp();
     // check if none or all return expressions are updating
-    final Expr[] tmp = new Expr[cases.length];
-    for(int i = 0; i < tmp.length; ++i) tmp[i] = cases[i].exprs[0];
+    final int cl = cases.length;
+    final Expr[] tmp = new Expr[cl];
+    for(int c = 0; c < cl; c++) tmp[c] = cases[c].exprs[0];
     checkAllUp(tmp);
   }
 
@@ -64,7 +65,8 @@ public final class Switch extends ParseExpr {
 
     // expression could not be pre-evaluated
     seqType = cases[0].exprs[0].seqType();
-    for(int c = 1; c < cases.length; c++) seqType = seqType.union(cases[c].exprs[0].seqType());
+    final int cl = cases.length;
+    for(int c = 1; c < cl; c++) seqType = seqType.union(cases[c].exprs[0].seqType());
     return ex;
   }
 

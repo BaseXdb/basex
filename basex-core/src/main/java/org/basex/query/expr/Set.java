@@ -52,8 +52,9 @@ abstract class Set extends Arr {
 
   @Override
   public final NodeIter iter(final QueryContext qc) throws QueryException {
-    final Iter[] iter = new Iter[exprs.length];
-    for(int e = 0; e != exprs.length; ++e) iter[e] = qc.iter(exprs[e]);
+    final int el = exprs.length;
+    final Iter[] iter = new Iter[el];
+    for(int e = 0; e < el; e++) iter[e] = qc.iter(exprs[e]);
     return iterable ? iter(iter) : eval(iter).sort();
   }
 

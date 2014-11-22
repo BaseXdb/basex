@@ -30,9 +30,10 @@ public final class FTPos {
    * @param list sorted positions
    */
   void union(final IntList list) {
-    final IntSet set = new IntSet(poss.size() + list.size());
-    for(int p = 0, s = poss.size(); p < s; p++) set.add(poss.get(p));
-    for(int p = 0, s = list.size(); p < s; p++) set.add(list.get(p));
+    final int ps = poss.size(), ls = list.size();
+    final IntSet set = new IntSet(ps + ls);
+    for(int p = 0, s = ps; p < s; p++) set.add(poss.get(p));
+    for(int l = 0, s = ls; l < s; l++) set.add(list.get(l));
     poss = new IntList(set.toArray()).sort();
   }
 

@@ -139,15 +139,16 @@ public final class TypeCase extends Single {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(types.length == 0 ? DEFAULT : CASE);
+    final int tl = types.length;
+    final TokenBuilder tb = new TokenBuilder(tl == 0 ? DEFAULT : CASE);
     if(var != null) {
       tb.add(' ').add(var.toString());
-      if(types.length != 0) tb.add(' ').add(AS);
+      if(tl != 0) tb.add(' ').add(AS);
     }
-    if(types.length != 0) {
-      for(int i = 0; i < types.length; i++) {
-        if(i > 0) tb.add(" |");
-        tb.add(' ').add(types[i].toString());
+    if(tl != 0) {
+      for(int t = 0; t < tl; t++) {
+        if(t > 0) tb.add(" |");
+        tb.add(' ').add(types[t].toString());
       }
     }
     return tb.add(' ' + RETURN + ' ' + expr).toString();

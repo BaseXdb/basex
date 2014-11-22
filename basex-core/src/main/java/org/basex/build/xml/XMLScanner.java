@@ -82,7 +82,8 @@ final class XMLScanner extends Proc {
     input = new XMLInput(file);
 
     try {
-      for(int e = 0; e < ENTITIES.length; e += 2) ents.put(ENTITIES[e], ENTITIES[e + 1]);
+      final int el = ENTITIES.length;
+      for(int e = 0; e < el; e += 2) ents.put(ENTITIES[e], ENTITIES[e + 1]);
       dtd = opts.get(MainOptions.DTD);
 
       String enc = null;

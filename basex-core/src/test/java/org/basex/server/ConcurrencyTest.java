@@ -61,11 +61,12 @@ public final class ConcurrencyTest extends SandboxTest {
    */
   @Test
   public void runQueries() throws Exception {
-    final QueryClient[] cl = new QueryClient[50];
-    for(int i = 0; i < cl.length; ++i) cl[i] = new QueryClient(i);
-    for(final QueryClient c : cl) c.start();
-    for(final QueryClient c : cl) c.join();
-    for(final QueryClient c : cl) c.session.close();
+    final int cl = 50;
+    final QueryClient[] clients = new QueryClient[cl];
+    for(int c = 0; c < cl; ++c) clients[c] = new QueryClient(c);
+    for(final QueryClient c : clients) c.start();
+    for(final QueryClient c : clients) c.join();
+    for(final QueryClient c : clients) c.session.close();
   }
 
   /** Single client. */
@@ -104,8 +105,9 @@ public final class ConcurrencyTest extends SandboxTest {
    */
   @Test
   public void runCommands() throws Exception {
-    final Thread[] th = new Thread[100];
-    for(int i = 0; i < th.length; ++i) th[i] = new CommandClient();
+    final int tl = 100;
+    final Thread[] th = new Thread[tl];
+    for(int t = 0; t < tl; t++) th[t] = new CommandClient();
     for(final Thread c : th) c.start();
     for(final Thread c : th) c.join();
   }

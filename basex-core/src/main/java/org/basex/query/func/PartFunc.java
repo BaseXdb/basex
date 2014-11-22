@@ -62,7 +62,8 @@ public final class PartFunc extends Arr {
       if(ft.argTypes.length != ar)
         throw INVARITY_X_X_X_X.get(info, f, ar, ar == 1 ? "" : "s", ft.argTypes.length);
       final SeqType[] args = new SeqType[holes.length];
-      for(int i = 0; i < holes.length; i++) args[i] = ft.argTypes[holes[i]];
+      final int hl = holes.length;
+      for(int h = 0; h < hl; h++) args[h] = ft.argTypes[holes[h]];
       seqType = FuncType.get(ft.retType, args).seqType();
     }
 
@@ -73,21 +74,23 @@ public final class PartFunc extends Arr {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FItem f = toFunc(exprs[exprs.length - 1], qc);
 
-    final int ar = exprs.length + holes.length - 1;
+    final int hl = holes.length;
+    final int ar = exprs.length + hl - 1;
     if(f.arity() != ar) throw INVARITY_X_X_X_X.get(info, f, ar, ar == 1 ? "" : "s", f.arity());
 
     final FuncType ft = f.funcType();
     final Expr[] args = new Expr[ar];
     final VarScope scp = new VarScope(sc);
-    final Var[] vars = new Var[holes.length];
-    int p = -1;
-    for(int i = 0; i < holes.length; i++) {
-      while(++p < holes[i]) args[p] = exprs[p - i].value(qc);
-      vars[i] = scp.newLocal(qc, f.argName(holes[i]), null, false);
-      args[p] = new VarRef(info, vars[i]);
-      vars[i].refineType(ft.argTypes[p], qc, ii);
+    final Var[] vars = new Var[hl];
+    int a = -1;
+    for(int h = 0; h < hl; h++) {
+      while(++a < holes[h]) args[a] = exprs[a - h].value(qc);
+      vars[h] = scp.newLocal(qc, f.argName(holes[h]), null, false);
+      args[a] = new VarRef(info, vars[h]);
+      vars[h].refineType(ft.argTypes[a], qc, ii);
     }
-    while(++p < args.length) args[p] = exprs[p - holes.length].value(qc);
+    final int al = args.length;
+    while(++a < al) args[a] = exprs[a - hl].value(qc);
 
     final Ann ann = f.annotations();
     final FuncType tp = FuncType.get(ann, vars, ft.retType);

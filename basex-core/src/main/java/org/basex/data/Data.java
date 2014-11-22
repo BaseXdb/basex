@@ -414,8 +414,10 @@ public abstract class Data {
     final Atts as = new Atts();
     if(nsFlag(pre)) {
       final int[] nsp = nspaces.get(pre, this);
-      for(int n = 0; n < nsp.length; n += 2)
+      final int nl = nsp.length;
+      for(int n = 0; n < nl; n += 2) {
         as.add(nspaces.prefix(nsp[n]), nspaces.uri(nsp[n + 1]));
+      }
     }
     return as;
   }
@@ -751,7 +753,8 @@ public abstract class Data {
           boolean ne = false;
           if(data.nsFlag(spre)) {
             final Atts at = data.ns(spre);
-            for(int a = 0; a < at.size(); ++a) {
+            final int as = at.size();
+            for(int a = 0; a < as; a++) {
               // see if prefix has been declared/ is part of current ns scope
               final byte[] old = nsScope.get(at.name(a));
               if(old == null || !eq(old, at.value(a))) {
@@ -799,8 +802,9 @@ public abstract class Data {
     // reset buffer to old size
     buffer(1);
 
-    // set ns flags
-    for(int f = 0; f < flagPres.size(); f++) {
+    // set namespace flags
+    final int fs = flagPres.size();
+    for(int f = 0; f < fs; f++) {
       final int fl = flagPres.get(f);
       table.write2(fl, 1, name(fl) | 1 << 15);
     }

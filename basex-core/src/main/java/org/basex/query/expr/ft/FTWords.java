@@ -84,7 +84,10 @@ public final class FTWords extends FTExpr {
 
   @Override
   public FTWords compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    if(occ != null) for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].compile(qc, scp);
+    if(occ != null) {
+      final int ol = occ.length;
+      for(int o = 0; o < ol; ++o) occ[o] = occ[o].compile(qc, scp);
+    }
 
     // compile only once
     if(tokens == null) {

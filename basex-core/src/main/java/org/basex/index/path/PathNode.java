@@ -73,7 +73,8 @@ public final class PathNode {
     name = (short) in.readNum();
     kind = (byte) in.read();
     final int count = in.readNum();
-    children = new PathNode[in.readNum()];
+    final int cl = in.readNum();
+    children = new PathNode[cl];
     if(in.readDouble() == 1) {
       // "1" indicates the format introduced with Version 7.1
       stats = new Stats(in);
@@ -83,7 +84,7 @@ public final class PathNode {
       stats.count = count;
     }
     parent = node;
-    for(int c = 0; c < children.length; ++c) children[c] = new PathNode(in, this);
+    for(int c = 0; c < cl; ++c) children[c] = new PathNode(in, this);
   }
 
   /**

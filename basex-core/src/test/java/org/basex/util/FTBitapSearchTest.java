@@ -41,15 +41,15 @@ public final class FTBitapSearchTest {
 
     /**
      * Constructor.
-     * @param h haystack
-     * @param n needle
-     * @param e expected hits
+     * @param hay hay stack
+     * @param needle needles
+     * @param expected expected hits
      */
-    public TestData(final String[] h, final String[][] n, final int[] e) {
-      expected = e;
-      final byte[][] hs = new byte[h.length][];
-      for(int i = 0; i < h.length; i++)
-        hs[i] = token(h[i]);
+    public TestData(final String[] hay, final String[][] needle, final int[] expected) {
+      this.expected = expected;
+      final int hl = hay.length;
+      final byte[][] hs = new byte[hl][];
+      for(int h = 0; h < hay.length; h++) hs[h] = token(hay[h]);
 
       haystack = new FTIterator() {
         /** Index of current element. */
@@ -57,7 +57,7 @@ public final class FTBitapSearchTest {
 
         @Override
         public boolean hasNext() {
-          return cnt < hs.length;
+          return cnt < hl;
         }
 
         @Override
@@ -76,11 +76,12 @@ public final class FTBitapSearchTest {
           return this;
         }
       };
+
       needles = new FTTokens();
-      for(final String[] s : n) {
-        final TokenList needle = new TokenList(s.length);
-        for(final String t : s) needle.add(t);
-        needles.add(needle);
+      for(final String[] s : needle) {
+        final TokenList tl = new TokenList(s.length);
+        for(final String t : s) tl.add(t);
+        needles.add(tl);
       }
     }
   }
@@ -143,9 +144,10 @@ public final class FTBitapSearchTest {
   /** Set up method. */
   @Before
   public void setUp() {
-    searches = new FTBitapSearch[TESTS.length];
-    for(int i = 0; i < searches.length; i++) {
-      searches[i] = new FTBitapSearch(TESTS[i].haystack, TESTS[i].needles, CMP);
+    final int tl = TESTS.length;
+    searches = new FTBitapSearch[tl];
+    for(int t = 0; t < tl; t++) {
+      searches[t] = new FTBitapSearch(TESTS[t].haystack, TESTS[t].needles, CMP);
     }
   }
 
@@ -153,20 +155,21 @@ public final class FTBitapSearchTest {
   @Test
   public void searchIter() {
     try {
-      for(int i = 0; i < TESTS.length; i++) {
-        final FTBitapSearch s = searches[i];
-        for(int j = 0; j < TESTS[i].expected.length; j++) {
+      final int tl = TESTS.length;
+      for(int t = 0; t < tl; t++) {
+        final FTBitapSearch s = searches[t];
+        final TestData test = TESTS[t];
+        final int el = test.expected.length;
+        for(int e = 0; e < el; e++) {
+          final int exp = test.expected[e];
           if(!s.hasNext())
-            fail("Test " + i + ": expected " + TESTS[i].expected.length +
-                " hits, got only " + (j + 1));
+            fail("Test " + t + ": expected " + el + " hits, got only " + (e + 1));
           final int pos = s.next();
-          if(pos != TESTS[i].expected[j])
-            fail("Test " + i + ", result " + j + ": expected " +
-                TESTS[i].expected[j] + ", got " + pos);
+          if(pos != exp)
+            fail("Test " + t + ", result " + e + ": expected " + exp + ", got " + pos);
         }
         if(s.hasNext())
-          fail("Test " + i + ": expected " + TESTS[i].expected.length +
-              " hits, got more!");
+          fail("Test " + t + ": expected " + el + " hits, got more!");
       }
     } catch(final QueryException ex) {
       fail(Util.message(ex));

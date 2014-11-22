@@ -190,11 +190,9 @@ public abstract class Step extends Preds {
   public final boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof Step)) return false;
     final Step st = (Step) cmp;
-    if(preds.length != st.preds.length || axis != st.axis || !test.sameAs(st.test))
-      return false;
-    for(int p = 0; p < preds.length; ++p) {
-      if(!preds[p].sameAs(st.preds[p])) return false;
-    }
+    final int pl = preds.length;
+    if(pl != st.preds.length || axis != st.axis || !test.sameAs(st.test)) return false;
+    for(int p = 0; p < pl; p++) if(!preds[p].sameAs(st.preds[p])) return false;
     return true;
   }
 

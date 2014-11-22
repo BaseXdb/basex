@@ -52,7 +52,8 @@ abstract class JsonXmlConverter extends JsonConverter {
       final ByteList[] types = new ByteList[ATTRS.length];
       for(final TypeCache arr : names.values()) {
         if(arr != null) {
-          for(int i = 0; i < TYPES.length; i++) {
+          final int tl = TYPES.length;
+          for(int i = 0; i < tl; i++) {
             if(arr.type == TYPES[i] && (strings || arr.type != STRING)) {
               if(types[i] == null) types[i] = new ByteList();
               else types[i].add(' ');
@@ -62,8 +63,9 @@ abstract class JsonXmlConverter extends JsonConverter {
           }
         }
       }
-      for(int i = 0; i < types.length; i++) {
-        if(types[i] != null) e.add(ATTRS[i], types[i].finish());
+      final int tl = types.length;
+      for(int t = 0; t < tl; t++) {
+        if(types[t] != null) e.add(ATTRS[t], types[t].finish());
       }
     }
     return new FDoc().add(e);

@@ -77,9 +77,10 @@ public final class GroupBy extends GFLWOR.Clause {
    * @return declared variables
    */
   private static Var[] vars(final Spec[] gs, final Var[] vs) {
-    final Var[] res = new Var[gs.length + vs.length];
-    for(int i = 0; i < gs.length; i++) res[i] = gs[i].var;
-    System.arraycopy(vs, 0, res, gs.length, vs.length);
+    final int gl = gs.length, vl = vs.length;
+    final Var[] res = new Var[gl + vl];
+    for(int g = 0; g < gl; g++) res[g] = gs[g].var;
+    System.arraycopy(vs, 0, res, gl, vl);
     return res;
   }
 
@@ -107,7 +108,8 @@ public final class GroupBy extends GFLWOR.Clause {
             qc.set(spec.var, key == null ? Empty.SEQ : key, info);
           }
         }
-        for(int i = 0; i < post.length; i++) qc.set(post[i], curr.ngv[i].value(), info);
+        final int pl = post.length;
+        for(int i = 0; i < pl; i++) qc.set(post[i], curr.ngv[i].value(), info);
         return true;
       }
 
@@ -120,8 +122,10 @@ public final class GroupBy extends GFLWOR.Clause {
         final ArrayList<Group> grps = new ArrayList<>();
         final IntObjMap<Group> map = new IntObjMap<>();
         final Collation[] colls = new Collation[nonOcc];
-        for(int i = 0, p = 0; i < specs.length; i++)
-          if(!specs[i].occluded) colls[p++] = specs[i].coll;
+        int c = 0;
+        for(final Spec spec : specs) {
+          if(!spec.occluded) colls[c++] = spec.coll;
+        }
 
         while(sub.next(qc)) {
           final Item[] key = new Item[nonOcc];
@@ -149,10 +153,12 @@ public final class GroupBy extends GFLWOR.Clause {
             }
           }
 
+          final int pl = preExpr.length;
           if(grp == null) {
             // new group, add it to the list
-            final ValueBuilder[] ngs = new ValueBuilder[preExpr.length];
-            for(int i = 0; i < ngs.length; i++) ngs[i] = new ValueBuilder();
+            final ValueBuilder[] ngs = new ValueBuilder[pl];
+            final int nl = ngs.length;
+            for(int n = 0; n < nl; n++) ngs[n] = new ValueBuilder();
             grp = new Group(key, ngs);
             grps.add(grp);
 
@@ -167,7 +173,7 @@ public final class GroupBy extends GFLWOR.Clause {
           }
 
           // add values of non-grouping variables to the group
-          for(int j = 0; j < preExpr.length; j++) grp.ngv[j].add(preExpr[j].value(qc));
+          for(int g = 0; g < pl; g++) grp.ngv[g].add(preExpr[g].value(qc));
         }
 
         // we're finished, copy the array so the list can be garbage-collected
@@ -210,9 +216,10 @@ public final class GroupBy extends GFLWOR.Clause {
 
   @Override
   public GroupBy optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    for(int i = 0; i < preExpr.length; i++) {
-      final SeqType it = preExpr[i].seqType();
-      post[i].refineType(it.withOcc(it.mayBeZero() ? Occ.ZERO_MORE : Occ.ONE_MORE), qc, info);
+    final int pl = preExpr.length;
+    for(int p = 0; p < pl; p++) {
+      final SeqType it = preExpr[p].seqType();
+      post[p].refineType(it.withOcc(it.mayBeZero() ? Occ.ZERO_MORE : Occ.ONE_MORE), qc, info);
     }
     return this;
   }
@@ -242,10 +249,11 @@ public final class GroupBy extends GFLWOR.Clause {
 
     // create fresh copies of the post-grouping variables
     final Var[] ps = new Var[post.length];
-    for(int i = 0; i < ps.length; i++) {
-      final Var old = post[i];
-      ps[i] = scp.newCopyOf(qc, old);
-      vs.put(old.id, ps[i]);
+    final int pl = ps.length;
+    for(int p = 0; p < pl; p++) {
+      final Var old = post[p];
+      ps[p] = scp.newCopyOf(qc, old);
+      vs.put(old.id, ps[p]);
     }
 
     // done
@@ -264,10 +272,10 @@ public final class GroupBy extends GFLWOR.Clause {
   boolean clean(final IntObjMap<Var> decl, final BitArray used) {
     // [LW] does not fix {@link #vars}
     final int len = preExpr.length;
-    for(int i = 0; i < post.length; i++) {
-      if(!used.get(post[i].id)) {
-        preExpr = Array.delete(preExpr, i);
-        post = Array.delete(post, i--);
+    for(int p = 0; p < post.length; p++) {
+      if(!used.get(post[p].id)) {
+        preExpr = Array.delete(preExpr, p);
+        post = Array.delete(post, p--);
       }
     }
     return preExpr.length < len;
@@ -307,12 +315,14 @@ public final class GroupBy extends GFLWOR.Clause {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(int i = 0; i < post.length; i++) {
-      sb.append(LET).append(" (: post-group :) ").append(post[i]);
-      sb.append(' ').append(ASSIGN).append(' ').append(preExpr[i]).append(' ');
+    final int pl = post.length;
+    for(int p = 0; p < pl; p++) {
+      sb.append(LET).append(" (: post-group :) ").append(post[p]);
+      sb.append(' ').append(ASSIGN).append(' ').append(preExpr[p]).append(' ');
     }
     sb.append(GROUP).append(' ').append(BY);
-    for(int i = 0; i < specs.length; i++) sb.append(i == 0 ? " " : SEP).append(specs[i]);
+    final int sl = specs.length;
+    for(int s = 0; s < sl; s++) sb.append(s == 0 ? " " : SEP).append(specs[s]);
     return sb.toString();
   }
 

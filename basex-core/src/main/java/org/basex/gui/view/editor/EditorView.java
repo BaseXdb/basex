@@ -641,7 +641,8 @@ public final class EditorView extends View {
       tabs.setToolTipTextAt(tabs.getSelectedIndex(), path);
     }
     final String[] old = gui.gopts.get(GUIOptions.EDITOR);
-    for(int p = 0; paths.size() < HISTORY && p < old.length; p++) {
+    final int ps = paths.size(), ol = old.length;
+    for(int p = 0; ps < HISTORY && p < ol; p++) {
       final IO fl = IO.get(old[p]);
       if(fl.exists() && !fl.eq(file)) paths.add(fl.path());
     }
@@ -941,10 +942,11 @@ public final class EditorView extends View {
       bl.set(n.isEmpty() ? 1 : Integer.parseInt(n), true);
     }
     // find first free file number
-    int c = 0;
-    while(++c < bl.size() && bl.get(c));
+    int b = 0;
+    final int bs = bl.size();
+    while(++b < bs && bl.get(b));
     // create io reference
-    return new IOFile(gui.gopts.get(GUIOptions.WORKPATH), FILE + (c == 1 ? "" : c));
+    return new IOFile(gui.gopts.get(GUIOptions.WORKPATH), FILE + (b == 1 ? "" : b));
   }
 
   /**

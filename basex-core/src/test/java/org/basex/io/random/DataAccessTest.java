@@ -425,13 +425,13 @@ public class DataAccessTest {
    */
   private static int[] stringToByteArray(final String s) {
     final byte[] token = Token.token(s);
-    final int[] len = numToByteArray(token.length);
+    final int tl = token.length;
+    final int[] len = numToByteArray(tl);
 
-    final int[] bytes = new int[len.length + token.length];
-    System.arraycopy(len, 0, bytes, 0, len.length);
-    for(int i = 0; i < token.length; ++i)
-      bytes[len.length + i] = toUnsignedByte(token[i]);
-
+    final int ll = len.length;
+    final int[] bytes = new int[ll + tl];
+    System.arraycopy(len, 0, bytes, 0, ll);
+    for(int t = 0; t < tl; ++t) bytes[ll + t] = toUnsignedByte(token[t]);
     return bytes;
   }
 

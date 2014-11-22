@@ -192,9 +192,10 @@ public final class Token {
    * @return tokens
    */
   public static byte[][] tokens(final String... strings) {
-    final byte[][] t = new byte[strings.length][];
-    for(int i = 0; i < t.length; ++i) t[i] = token(strings[i]);
-    return t;
+    final byte[][] tokens = new byte[strings.length][];
+    final int tl = tokens.length;
+    for(int t = 0; t < tl; ++t) tokens[t] = token(strings[t]);
+    return tokens;
   }
 
   /**
@@ -340,7 +341,8 @@ public final class Token {
    */
   public static int length(final byte[] token) {
     int l = 0;
-    for(int t = 0; t < token.length; t += cl(token, t)) ++l;
+    final int tl = token.length;
+    for(int t = 0; t < tl; t += cl(token, t)) ++l;
     return l;
   }
 
@@ -451,7 +453,8 @@ public final class Token {
 
     // not that brilliant here.. no chance for elegant code either
     // due to the nifty differences between Java and XQuery
-    for(int i = 0; i < FLT.length; ++i) if(flt == FLT[i]) return FLTSTR[i];
+    final int fl = FLT.length;
+    for(int i = 0; i < fl; ++i) if(flt == FLT[i]) return FLTSTR[i];
     final float a = Math.abs(flt);
     final boolean small = a >= 1e-6f && a < 1e6f;
     String s1 = small ? DF.format(flt) : SF.format(flt);
@@ -1227,8 +1230,9 @@ public final class Token {
    */
   public static byte[] uc(final byte[] token) {
     if(ascii(token)) {
-      final byte[] tok = new byte[token.length];
-      for(int i = 0; i < token.length; ++i) tok[i] = (byte) uc(token[i]);
+      final int tl = token.length;
+      final byte[] tok = new byte[tl];
+      for(int t = 0; t < tl; t++) tok[t] = (byte) uc(token[t]);
       return tok;
     }
     return token(string(token).toUpperCase(Locale.ENGLISH));
@@ -1251,8 +1255,9 @@ public final class Token {
    */
   public static byte[] lc(final byte[] token) {
     if(ascii(token)) {
-      final byte[] tok = new byte[token.length];
-      for(int i = 0; i < token.length; ++i) tok[i] = (byte) lc(token[i]);
+      final int tl = token.length;
+      final byte[] tok = new byte[tl];
+      for(int t = 0; t < tl; t++) tok[t] = (byte) lc(token[t]);
       return tok;
     }
     return token(string(token).toLowerCase(Locale.ENGLISH));
@@ -1350,8 +1355,9 @@ public final class Token {
   public static String camelCase(final String string) {
     final StringBuilder sb = new StringBuilder(string.length());
     boolean dash = false;
-    for(int p = 0; p < string.length(); p++) {
-      final char ch = string.charAt(p);
+    final int sl = string.length();
+    for(int s = 0; s < sl; s++) {
+      final char ch = string.charAt(s);
       if(dash) {
         sb.append(Character.toUpperCase(ch));
         dash = false;
@@ -1365,17 +1371,17 @@ public final class Token {
 
   /**
    * Returns a hex representation of the specified byte array.
-   * @param vaue values to be mapped
+   * @param value values to be mapped
    * @param uc upper case
    * @return hex representation
    */
-  public static byte[] hex(final byte[] vaue, final boolean uc) {
-    final int u = uc ? 0x37 : 0x57;
-    final byte[] data = new byte[vaue.length << 1];
-    for(int d = 0, c = 0; d < vaue.length; d++) {
-      int b = vaue[d] >> 4 & 0x0F;
+  public static byte[] hex(final byte[] value, final boolean uc) {
+    final int vl = value.length, u = uc ? 0x37 : 0x57;
+    final byte[] data = new byte[vl << 1];
+    for(int v = 0, c = 0; v < vl; v++) {
+      int b = value[v] >> 4 & 0x0F;
       data[c++] = (byte) (b + (b > 9 ? u : '0'));
-      b = vaue[d] & 0x0F;
+      b = value[v] & 0x0F;
       data[c++] = (byte) (b + (b > 9 ? u : '0'));
     }
     return data;
@@ -1398,9 +1404,11 @@ public final class Token {
   private static synchronized char[] ch() {
     if(norm == null) {
       // will only be initialized if needed
-      norm = new char[0x400];
-      for(int n = 0; n < norm.length; ++n) norm[n] = (char) n;
-      for(final char[] aNC : NC) norm[aNC[0]] = aNC[1];
+      final int nl = 0x400;
+      final char[] nrm = new char[nl];
+      for(int n = 0; n < nl; ++n) nrm[n] = (char) n;
+      for(final char[] aNC : NC) nrm[aNC[0]] = aNC[1];
+      norm = nrm;
     }
     return norm;
   }
