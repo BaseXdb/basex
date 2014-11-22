@@ -402,7 +402,8 @@ public abstract class Serializer {
         openDoc(data.text(p++, true));
         doc = true;
       } else if(k == Data.TEXT) {
-        prepareText(data.text(p++, true), ft != null ? ft.get(data, p) : null);
+        prepareText(data.text(p, true), ft != null ? ft.get(data, p) : null);
+        p++;
       } else if(k == Data.COMM) {
         prepareComment(data.text(p++, true));
       } else {
