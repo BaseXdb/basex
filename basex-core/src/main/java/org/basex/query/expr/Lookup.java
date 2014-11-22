@@ -29,6 +29,18 @@ public final class Lookup extends Arr {
   }
 
   @Override
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    return exprs.length > 1 && (exprs[1] instanceof Map || exprs[1] instanceof Array) &&
+        exprs[0].isValue() ? optPre(value(qc), qc) : this;
+  }
+
+  @Override
   public ValueIter iter(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
     for(final Item ctx : exprs.length == 1 ? ctxValue(qc) : qc.value(exprs[1])) {
