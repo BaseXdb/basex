@@ -3,8 +3,10 @@ package org.basex.query.expr;
 import org.basex.query.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
@@ -147,13 +149,26 @@ public abstract class Filter extends Preds {
         if(pos != null) return optPre(SubSeq.get(v, pos.min - 1, pos.max - pos.min + 1), qc);
       }
 
-      // only choose deterministic and context-independent offsets; e.g., skip:
-      // (1 to 10)[random:integer(10)]  or  (1 to 10)[.]
-      final Expr p = preds[0];
-      final SeqType pt = p.seqType();
-      if(pt.type.isNumber() && pt.zeroOrOne() && !p.has(Flag.CTX) && !p.has(Flag.NDT)) {
+      final Expr pred = preds[0];
+      if(num(pred)) {
+        // only choose deterministic and context-independent offsets; e.g., skip:
+        // (1 to 10)[random:integer(10)]  or  (1 to 10)[.]
         seqType = SeqType.get(seqType.type, Occ.ZERO_ONE);
         index = true;
+      } else if(pred instanceof CmpG) {
+        // rewrite positional range predicate to fn:subsequence(root, start, end, true())
+        final CmpG cmp = (CmpG) pred;
+        if(cmp.exprs[0].isFunction(Function.POSITION)) {
+          final Expr e2 = cmp.exprs[1];
+          if(e2 instanceof Range) {
+            final Range r = (Range) e2;
+            if(num(r.exprs[0]) && num(r.exprs[1])) {
+              qc.compInfo(QueryText.OPTWRITE, this);
+              final Expr[] args = { root, r.exprs[0], r.exprs[1], Bln.TRUE };
+              return Function.SUBSEQUENCE.get(null, info, args);
+            }
+          }
+        }
       }
     }
 
@@ -162,6 +177,16 @@ public abstract class Filter extends Preds {
 
     // standard iterator
     return get(info, root, preds);
+  }
+
+  /**
+   * Checks if the specified expression returns a deterministic numeric value.
+   * @param expr expression
+   * @return result of check
+   */
+  private static boolean num(final Expr expr) {
+    final SeqType pt = expr.seqType();
+    return pt.type.isNumber() && pt.zeroOrOne() && !expr.has(Flag.CTX) && !expr.has(Flag.NDT);
   }
 
   @Override

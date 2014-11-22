@@ -102,16 +102,21 @@ public final class FnSubsequence extends StandardFunc {
     final double ds = toDouble(exprs[1], qc);
     if(Double.isNaN(ds)) return null;
 
-    final long start = StrictMath.round(ds);
+    long start = StrictMath.round(ds);
     final boolean min = start == Long.MIN_VALUE;
     long len = Long.MAX_VALUE;
 
-    if(exprs.length > 2) {
+    final int el = exprs.length;
+    if(el > 2) {
       final double dl = toDouble(exprs[2], qc);
       if(Double.isNaN(dl)) return null;
       if(min && dl == Double.POSITIVE_INFINITY) return null;
       len = StrictMath.round(dl);
     }
+    if(min) return len == Long.MAX_VALUE ? ALL : null;
+
+    // end flag: compute length
+    if(el > 3 && toBoolean(exprs[3], qc)) len = len - start + 1;
     return min ? len == Long.MAX_VALUE ? ALL : null : new long[] { start, len };
   }
 
