@@ -2,6 +2,7 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
+import static org.basex.util.Array.*;
 
 import java.util.*;
 
@@ -10,6 +11,7 @@ import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.array.Array;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -42,7 +44,7 @@ public final class DynFuncCall extends FuncCall {
   public DynFuncCall(final InputInfo info, final StaticContext sc, final boolean updating,
       final Expr expr, final Expr... arg) {
 
-    super(info, Array.add(arg, expr));
+    super(info, add(arg, expr));
     this.sc = sc;
     this.updating = updating;
   }
@@ -67,10 +69,10 @@ public final class DynFuncCall extends FuncCall {
       if(ft.retType != null) seqType = ft.retType;
     }
 
-    if(f instanceof XQFunctionExpr) {
-      // maps can only contain fully evaluated Values, so this is safe
-      if(allAreValues() && f instanceof Map) return optPre(value(qc), qc);
+    // maps and arrays can only contain fully evaluated Values, so this is safe
+    if((f instanceof Map || f instanceof Array) && allAreValues()) return optPre(value(qc), qc);
 
+    if(f instanceof XQFunctionExpr) {
       // try to inline the function
       if(!(f instanceof FuncItem && comesFrom((FuncItem) f)) && !updating) {
         final Expr[] args = Arrays.copyOf(exprs, ar);
@@ -94,7 +96,7 @@ public final class DynFuncCall extends FuncCall {
    */
   public void markInlined(final FuncItem it) {
     final int hash = it.hashCode();
-    inlinedFrom = inlinedFrom == null ? new int[] { hash } : Array.add(inlinedFrom, hash);
+    inlinedFrom = inlinedFrom == null ? new int[] { hash } : add(inlinedFrom, hash);
   }
 
   /**
