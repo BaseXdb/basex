@@ -42,6 +42,7 @@ public final class FTContains extends Single {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final boolean scoring = qc.scoring;
     final Iter iter = expr.iter(qc);
     final FTLexer tmp = qc.ftToken;
 
@@ -55,7 +56,7 @@ public final class FTContains extends Single {
       final FTNode item = ftexpr.item(qc, info);
       if(item.all.matches()) {
         f = true;
-        s += item.score();
+        if(scoring) s += item.score();
         // cache entry for visualizations or ft:mark/ft:extract
         if(ftPosData != null && it instanceof DBNode) {
           final DBNode node = (DBNode) it;
@@ -65,7 +66,7 @@ public final class FTContains extends Single {
       c++;
     }
     qc.ftToken = tmp;
-    return Bln.get(f, Scoring.avg(s, c));
+    return scoring ? Bln.get(f, Scoring.avg(s, c)) : Bln.get(f);
   }
 
   @Override
