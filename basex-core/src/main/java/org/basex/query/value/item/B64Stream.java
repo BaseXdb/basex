@@ -6,7 +6,6 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.util.*;
 import org.basex.util.*;
 
 /**
@@ -19,14 +18,14 @@ public final class B64Stream extends B64 {
   /** File reference. */
   private final IO input;
   /** Error message. */
-  private final Err error;
+  private final QueryError error;
 
   /**
    * Constructor.
    * @param input input
    * @param error error message to be thrown
    */
-  public B64Stream(final IO input, final Err error) {
+  public B64Stream(final IO input, final QueryError error) {
     this.input = input;
     this.error = error;
   }

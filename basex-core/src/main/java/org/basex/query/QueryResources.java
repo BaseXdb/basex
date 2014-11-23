@@ -1,6 +1,6 @@
 package org.basex.query;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.util.*;
@@ -47,7 +47,7 @@ public final class QueryResources {
   /** Module loader. */
   private ModuleLoader modules;
   /** External resources. */
-  private final HashMap<Class<? extends DataResources>, DataResources> external = new HashMap<>();
+  private final HashMap<Class<? extends QueryResource>, QueryResource> external = new HashMap<>();
 
   /** Pending output. */
   public final ValueBuilder output = new ValueBuilder();
@@ -88,7 +88,7 @@ public final class QueryResources {
    * Adds an external resource.
    * @param ext external resource
    */
-  public void add(final DataResources ext) {
+  public void add(final QueryResource ext) {
     external.put(ext.getClass(), ext);
   }
 
@@ -99,7 +99,7 @@ public final class QueryResources {
    * @return resource
    */
   @SuppressWarnings("unchecked")
-  public <R extends DataResources> R get(final Class<? extends R> resource) {
+  public <R extends QueryResource> R get(final Class<? extends R> resource) {
     return (R) external.get(resource);
   }
 
@@ -113,7 +113,7 @@ public final class QueryResources {
     // close dynamically loaded JAR files
     if(modules != null) modules.close();
     // close external resources
-    for(final DataResources c : external.values()) c.close();
+    for(final QueryResource c : external.values()) c.close();
   }
 
   /**

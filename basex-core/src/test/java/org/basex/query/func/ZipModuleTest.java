@@ -1,7 +1,7 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 

@@ -1,7 +1,7 @@
 package org.basex.query.func.archive;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.archive.ArchiveText.*;
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;

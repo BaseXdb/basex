@@ -1,7 +1,7 @@
 package org.basex.query;
 
 import static org.basex.core.Text.*;
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
@@ -280,9 +280,8 @@ public final class QueryContext extends Proc implements AutoCloseable {
         ctxItem.compile(this);
         value = ctxItem.cache(this).value();
       } catch(final QueryException ex) {
-        if(ex.err() != NOCTX_X) throw ex;
-        // only {@link ParseExpr} instances may cause this error
-        throw CIRCCTX.get(ctxItem.info);
+        // only {@link ParseExpr} instances may lead to a missing context
+        throw ex.error() == NOCTX_X ? CIRCCTX.get(ctxItem.info) : ex;
       }
     } else {
       // cache the initial context nodes

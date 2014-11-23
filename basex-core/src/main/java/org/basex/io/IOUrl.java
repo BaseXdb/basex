@@ -59,8 +59,8 @@ public final class IOUrl extends IO {
       if(conn instanceof HttpURLConnection) {
         final InputStream es = ((HttpURLConnection) conn).getErrorStream();
         if(es != null) {
-          final byte[] err = new IOStream(es).read();
-          if(err.length != 0) msg.add(NL).add(INFORMATION).add(COL).add(NL).add(err);
+          final byte[] error = new IOStream(es).read();
+          if(error.length != 0) msg.add(NL).add(INFORMATION).add(COL).add(NL).add(error);
         }
       }
       final IOException io = new IOException(msg.toString());

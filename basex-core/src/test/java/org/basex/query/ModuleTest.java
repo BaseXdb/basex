@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.basex.query.util.*;
 import org.basex.util.*;
 import org.junit.Test;
 
@@ -27,7 +26,7 @@ public class ModuleTest extends SandboxTest {
           "", null);
       fail("Unknown function 'm:bar()' was not detected.");
     } catch(final QueryException e) {
-      assertSame(Err.FUNCUNKNOWN_X, e.err());
+      assertSame(QueryError.FUNCUNKNOWN_X, e.error());
     }
   }
 

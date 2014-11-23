@@ -1,6 +1,6 @@
 package org.basex.query.func.convert;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;

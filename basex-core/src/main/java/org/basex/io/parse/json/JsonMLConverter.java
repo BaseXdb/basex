@@ -1,6 +1,6 @@
 package org.basex.io.parse.json;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.util.*;
 

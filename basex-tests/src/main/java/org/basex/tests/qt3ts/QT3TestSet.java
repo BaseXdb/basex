@@ -206,7 +206,7 @@ public abstract class QT3TestSet {
 
     if(result.exc != null) {
       final QueryException qe = result.exc.getException();
-      final QNm qn = qe.err() != null ? qe.err().qname() : qe.qname();
+      final QNm qn = qe.error() != null ? qe.error().qname() : qe.qname();
       if(qn != null) return result(err.eq(qn), Util.info("% (found: %)", err, qn));
       return fail(Util.info("% (found: %)", err, "?"));
     }

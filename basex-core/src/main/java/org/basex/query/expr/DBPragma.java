@@ -1,6 +1,6 @@
 package org.basex.query.expr;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;

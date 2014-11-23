@@ -1,7 +1,7 @@
 package org.basex.query.func.xquery;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
@@ -120,7 +120,7 @@ public class XQueryEval extends StandardFunc {
       } catch(final ProcException ex) {
         throw BXXQ_STOPPED.get(info);
       } catch(final QueryException ex) {
-        throw ex.err() == BASX_PERM_X ? BXXQ_PERM_X.get(info, ex.getLocalizedMessage()) :
+        throw ex.error() == BASX_PERM_X ? BXXQ_PERM_X.get(info, ex.getLocalizedMessage()) :
           ex.info(info);
       }
 

@@ -1,14 +1,13 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -64,7 +63,7 @@ public final class FuncOptions {
    * @param error raise error if parameter is unknown
    * @throws QueryException query exception
    */
-  private void parse(final Item item, final Options options, final Err error)
+  private void parse(final Item item, final Options options, final QueryError error)
       throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();

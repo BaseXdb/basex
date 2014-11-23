@@ -1,6 +1,6 @@
 package org.basex.query.var;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.util.*;
 import java.util.Map.Entry;

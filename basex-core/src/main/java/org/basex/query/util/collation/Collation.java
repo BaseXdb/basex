@@ -1,11 +1,10 @@
 package org.basex.query.util.collation;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -47,7 +46,7 @@ public abstract class Collation {
    * @throws QueryException query exception
    */
   public static Collation get(final byte[] uri, final QueryContext qc, final StaticContext sc,
-      final InputInfo info, final Err err) throws QueryException {
+      final InputInfo info, final QueryError err) throws QueryException {
 
     // return default collation
     if(uri == null) return sc.collation;
@@ -83,7 +82,7 @@ public abstract class Collation {
    * @return collation instance or {@code null} if uri is invalid.
    * @throws QueryException query exception
    */
-  private static Collation get(final byte[] uri, final InputInfo info, final Err err)
+  private static Collation get(final byte[] uri, final InputInfo info, final QueryError err)
       throws QueryException {
 
     // case-insensitive collation

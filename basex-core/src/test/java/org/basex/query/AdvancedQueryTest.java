@@ -7,7 +7,6 @@ import java.io.*;
 import org.basex.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.query.util.*;
 import org.basex.util.*;
 
 /**
@@ -96,12 +95,12 @@ public abstract class AdvancedQueryTest extends SandboxTest {
    * @param query query string
    * @param error expected error
    */
-  protected static void error(final String query, final Err... error) {
+  protected static void error(final String query, final QueryError... error) {
     try {
       final String res = run(query);
       final StringBuilder sb = new StringBuilder("Query did not fail:\n");
       sb.append(query).append("\n[E]");
-      for(final Err e : error) sb.append(' ').append(e);
+      for(final QueryError e : error) sb.append(' ').append(e);
       fail(sb.append("\n[F] ").append(res).toString());
     } catch(final QueryIOException ex) {
       check(query, ex.getCause(), error);
@@ -117,12 +116,14 @@ public abstract class AdvancedQueryTest extends SandboxTest {
    * Checks if an exception yields one of the specified error codes.
    * @param query query
    * @param ex resulting query exception
-   * @param error expected errors
+   * @param errors expected errors
    */
-  protected static void check(final String query, final QueryException ex, final Err... error) {
+  protected static void check(final String query, final QueryException ex,
+      final QueryError... errors) {
+
     boolean found = false;
-    final Err err = ex.err();
-    for(final Err e : error) found |= err != null ? err == e : e.qname().eq(ex.qname());
+    final QueryError err = ex.error();
+    for(final QueryError e : errors) found |= err != null ? err == e : e.qname().eq(ex.qname());
 
     if(!found) {
       final TokenBuilder tb = new TokenBuilder("\n");
@@ -130,12 +131,12 @@ public abstract class AdvancedQueryTest extends SandboxTest {
       tb.add("Error(s): ");
       if(err != null) {
         int c = 0;
-        for(final Err er : error) tb.add(c++ == 0 ? "" : "/").add(er.name());
+        for(final QueryError er : errors) tb.add(c++ == 0 ? "" : "/").add(er.name());
         ex.printStackTrace();
         fail(tb.add("\nResult: ").add(err.name() + " (" + err.qname() + ')').toString());
       } else {
         int c = 0;
-        for(final Err er : error) tb.add(c++ == 0 ? "" : "/").add(er.qname().local());
+        for(final QueryError er : errors) tb.add(c++ == 0 ? "" : "/").add(er.qname().local());
         fail(tb.add("\nResult: ").add(ex.qname().string()).toString());
       }
     }

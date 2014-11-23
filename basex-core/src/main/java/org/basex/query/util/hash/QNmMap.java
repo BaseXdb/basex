@@ -1,4 +1,4 @@
-package org.basex.query.util;
+package org.basex.query.util.hash;
 
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -10,7 +10,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class QNmCache extends TokenSet {
+public final class QNmMap extends TokenSet {
   /** QNames. */
   private QNm[] values = new QNm[Array.CAPACITY];
 

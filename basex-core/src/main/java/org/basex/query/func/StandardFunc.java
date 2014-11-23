@@ -1,7 +1,7 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -109,7 +109,7 @@ public abstract class StandardFunc extends Arr {
    * @return result
    * @throws QueryException query exception
    */
-  protected byte[] serialize(final Iter ir, final SerializerOptions opts, final Err err)
+  protected byte[] serialize(final Iter ir, final SerializerOptions opts, final QueryError err)
       throws QueryException {
 
     try {
@@ -229,7 +229,7 @@ public abstract class StandardFunc extends Arr {
    * @return text entry
    * @throws QueryException query exception
    */
-  protected final String toEncoding(final int i, final Err err, final QueryContext qc)
+  protected final String toEncoding(final int i, final QueryError err, final QueryContext qc)
       throws QueryException {
 
     if(i >= exprs.length) return null;

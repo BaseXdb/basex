@@ -3,7 +3,7 @@ package org.basex.query.func.proc;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
-import org.basex.query.util.Err.ErrType;
+import org.basex.query.QueryError.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 

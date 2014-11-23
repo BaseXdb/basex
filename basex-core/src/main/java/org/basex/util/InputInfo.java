@@ -1,7 +1,7 @@
 package org.basex.util;
 
+import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.*;
 
 /**
  * This class contains information on the original query, which will be evaluated for
@@ -88,7 +88,7 @@ public final class InputInfo {
   }
 
   /**
-   * Returns the check flag (invoked by {@link Err#get(InputInfo, Object...)}).
+   * Returns the check flag (invoked by {@link QueryError#get(InputInfo, Object...)}).
    * @return check flag
    */
   public boolean check() {

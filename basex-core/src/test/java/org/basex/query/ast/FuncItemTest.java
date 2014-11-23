@@ -1,6 +1,6 @@
 package org.basex.query.ast;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;

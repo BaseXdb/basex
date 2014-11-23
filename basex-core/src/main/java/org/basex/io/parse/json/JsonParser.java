@@ -1,12 +1,11 @@
 package org.basex.io.parse.json;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import org.basex.build.*;
 import org.basex.build.JsonParserOptions.JsonDuplicates;
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -442,7 +441,7 @@ final class JsonParser extends InputParser {
    * @param err error code
    * @return build exception
    */
-  private QueryIOException error(final Err err, final String msg, final Object... ext) {
+  private QueryIOException error(final QueryError err, final String msg, final Object... ext) {
     final InputInfo info = new InputInfo(this);
     return new QueryIOException(err.get(info, info.line(), info.column(), Util.inf(msg, ext)));
   }

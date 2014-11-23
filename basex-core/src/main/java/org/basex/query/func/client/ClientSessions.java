@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class ClientSessions implements DataResources {
+public final class ClientSessions implements QueryResource {
   /** Last inserted id. */
   private int lastId = -1;
   /** Map with all open sessions and their ids. */

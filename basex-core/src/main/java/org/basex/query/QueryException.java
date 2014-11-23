@@ -1,12 +1,11 @@
 package org.basex.query;
 
 import static org.basex.core.Text.*;
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.util.*;
 
 import org.basex.query.expr.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -33,7 +32,7 @@ public class QueryException extends Exception {
   /** Error value. */
   private Value value = Empty.SEQ;
   /** Error reference. */
-  private Err error;
+  private QueryError error;
   /** Code suggestions. */
   private StringList suggest;
   /** Error line and column. */
@@ -44,7 +43,7 @@ public class QueryException extends Exception {
   private boolean catchable = true;
 
   /**
-   * Constructor, specifying an exception or error. {@link Err#BASX_GENERIC_X} will be set
+   * Constructor, specifying an exception or error. {@link QueryError#BASX_GENERIC_X} will be set
    * as error code.
    * @param cause exception or error
    */
@@ -53,7 +52,7 @@ public class QueryException extends Exception {
   }
 
   /**
-   * Constructor, specifying a simple error message. {@link Err#BASX_GENERIC_X} will be set
+   * Constructor, specifying a simple error message. {@link QueryError#BASX_GENERIC_X} will be set
    * as error code.
    * @param message error message
    */
@@ -67,7 +66,7 @@ public class QueryException extends Exception {
    * @param error error reference
    * @param ext error extension
    */
-  public QueryException(final InputInfo info, final Err error, final Object... ext) {
+  public QueryException(final InputInfo info, final QueryError error, final Object... ext) {
     this(info, error.qname(), error.desc, ext);
     this.error = error;
   }
@@ -186,7 +185,7 @@ public class QueryException extends Exception {
    * @param err error
    * @return self reference
    */
-  public QueryException err(final Err err) {
+  public QueryException error(final QueryError err) {
     error = err;
     return this;
   }
@@ -215,7 +214,7 @@ public class QueryException extends Exception {
    * Returns the error.
    * @return error
    */
-  public Err err() {
+  public QueryError error() {
     return error;
   }
 

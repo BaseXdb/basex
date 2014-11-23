@@ -1,7 +1,7 @@
 package org.basex.query.expr.ft;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import org.basex.data.*;
 import org.basex.query.*;

@@ -1,13 +1,12 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import org.basex.build.*;
 import org.basex.build.JsonOptions.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -48,11 +47,11 @@ public class FnParseJson extends Parse {
     } catch(final QueryIOException ex) {
       Util.debug(ex);
       final QueryException qe = ex.getCause(info);
-      final Err err = qe.err();
-      final String msg = ex.getLocalizedMessage();
-      if(err == BXJS_PARSE_X_X_X) throw JSON_PARSE_X.get(ii, msg);
-      if(err == BXJS_INVALID_X) throw JSON_INVALID_X.get(ii, msg);
-      if(err == BXJS_DUPLICATE_X) throw JSON_DUPLICATE_X.get(ii, msg);
+      final QueryError error = qe.error();
+      final String message = ex.getLocalizedMessage();
+      if(error == BXJS_PARSE_X_X_X) throw JSON_PARSE_X.get(ii, message);
+      if(error == BXJS_INVALID_X) throw JSON_INVALID_X.get(ii, message);
+      if(error == BXJS_DUPLICATE_X) throw JSON_DUPLICATE_X.get(ii, message);
       throw qe;
     }
   }

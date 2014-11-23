@@ -1,7 +1,7 @@
 package org.basex.query.func.sql;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.sql.*;

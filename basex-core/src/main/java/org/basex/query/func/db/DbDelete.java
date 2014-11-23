@@ -1,6 +1,6 @@
 package org.basex.query.func.db;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import org.basex.data.*;
 import org.basex.io.*;

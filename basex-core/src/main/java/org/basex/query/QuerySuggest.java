@@ -7,7 +7,6 @@ import java.util.*;
 import org.basex.data.*;
 import org.basex.index.path.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.util.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -125,7 +124,7 @@ public final class QuerySuggest extends QueryParser {
   }
 
   @Override
-  public QueryException error(final Err err, final Object... arg) {
+  public QueryException error(final QueryError err, final Object... arg) {
     return err.get(info(), arg).suggest(this, complete());
   }
 }

@@ -1,7 +1,6 @@
 package org.basex.query.func.unit;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -27,7 +26,7 @@ public class UnitException extends QueryException {
    * @param returned returned result
    * @param count item count
    */
-  public UnitException(final InputInfo info, final Err err, final Item returned,
+  public UnitException(final InputInfo info, final QueryError err, final Item returned,
       final Item expected, final int count) {
     super(info, err, count, expected == null ? "()" : expected, returned == null ? "()" : returned);
     this.expected = expected;

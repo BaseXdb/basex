@@ -1,6 +1,6 @@
 package org.basex.query.func.fn;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -13,7 +13,6 @@ import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.Err.ErrType;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -61,7 +60,7 @@ public abstract class Parse extends StandardFunc {
         return Bln.TRUE;
       }
     } catch(final QueryException ex) {
-      if(check && !ex.err().is(ErrType.XPTY)) return Bln.FALSE;
+      if(check && !ex.error().is(ErrType.XPTY)) return Bln.FALSE;
       throw ex;
     } catch(final IOException ex) {
       if(check) return Bln.FALSE;

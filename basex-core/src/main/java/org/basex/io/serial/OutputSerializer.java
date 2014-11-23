@@ -2,7 +2,7 @@ package org.basex.io.serial;
 
 import static org.basex.data.DataText.*;
 import static org.basex.io.serial.SerializerOptions.*;
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;

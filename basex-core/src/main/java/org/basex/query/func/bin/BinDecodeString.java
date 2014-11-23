@@ -1,6 +1,6 @@
 package org.basex.query.func.bin;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.io.*;
 

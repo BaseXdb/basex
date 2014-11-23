@@ -158,7 +158,7 @@ public final class InfoView extends View implements LinkListener {
     final StringList plan = new StringList(1);
     final StringList result = new StringList(1);
     final StringList stack = new StringList(1);
-    final StringList err = new StringList(1);
+    final StringList error = new StringList(1);
     final StringList origqu = new StringList(1);
     final StringList optqu = new StringList(1);
     final StringList command = new StringList(1);
@@ -204,7 +204,7 @@ public final class InfoView extends View implements LinkListener {
             tb.add(STOPPED_AT).uline().add(m.group(1)).uline().add(COL);
             split[s] = tb.toString();
           }
-          err.add(split[s]);
+          error.add(split[s]);
         }
       } else if(line.equals(STACK_TRACE + COL)) {
         while(++s < sl && !split[s].isEmpty()) {
@@ -220,7 +220,7 @@ public final class InfoView extends View implements LinkListener {
           if(last) break;
         }
       } else if(!ok && !line.isEmpty()) {
-        err.add(line);
+        error.add(line);
       }
     }
 
@@ -239,7 +239,7 @@ public final class InfoView extends View implements LinkListener {
     }
 
     add(COMMAND + COL, command);
-    add(Text.ERROR + COL, err);
+    add(Text.ERROR + COL, error);
     add(STACK_TRACE + COL, stack);
     add(EVALUATING + COL, eval);
     add(COMPILING + COL, comp);

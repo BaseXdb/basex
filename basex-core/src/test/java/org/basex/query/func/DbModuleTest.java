@@ -1,8 +1,8 @@
 package org.basex.query.func;
 
 import static org.basex.core.Text.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
-import static org.basex.query.util.Err.*;
 import static org.junit.Assert.*;
 
 import java.io.*;

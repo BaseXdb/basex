@@ -2,8 +2,8 @@ package org.basex.query.func.http;
 
 import static java.net.HttpURLConnection.*;
 import static org.basex.io.MimeTypes.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.http.HttpText.*;
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;

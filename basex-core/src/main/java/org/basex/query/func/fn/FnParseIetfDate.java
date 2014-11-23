@@ -6,7 +6,6 @@ import java.math.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -103,7 +102,7 @@ public final class FnParseIetfDate extends StandardFunc {
         return new Dtm(tb.finish(), info);
       } catch(final QueryException ex) {
         //throw Err.IETF_INIT_X.get(info, original);
-        throw Err.IETF_INIT_X.get(info, ex);
+        throw QueryError.IETF_INIT_X.get(info, ex);
       }
     }
 
@@ -347,7 +346,7 @@ public final class FnParseIetfDate extends StandardFunc {
      * @return error
      */
     private QueryException error(final String msg) {
-      return Err.IETF_PARSE_X_X_X.get(info, msg, curr(), original);
+      return QueryError.IETF_PARSE_X_X_X.get(info, msg, curr(), original);
     }
 
     /**

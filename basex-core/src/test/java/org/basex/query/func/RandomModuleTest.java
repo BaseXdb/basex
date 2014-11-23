@@ -6,7 +6,6 @@ import static org.junit.Assert.*;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.junit.*;
 
 /**
@@ -36,9 +35,9 @@ public final class RandomModuleTest extends AdvancedQueryTest {
   public void integer() {
     final Integer i = Integer.valueOf(query(_RANDOM_INTEGER.args(5)));
     assertTrue(i >= 0 && i < 5);
-    error(_RANDOM_INTEGER.args(0), Err.BXRA_BOUNDS_X);
-    error(_RANDOM_INTEGER.args(-1), Err.BXRA_BOUNDS_X);
-    error(_RANDOM_INTEGER.args(8000000000L), Err.BXRA_BOUNDS_X);
+    error(_RANDOM_INTEGER.args(0), QueryError.BXRA_BOUNDS_X);
+    error(_RANDOM_INTEGER.args(-1), QueryError.BXRA_BOUNDS_X);
+    error(_RANDOM_INTEGER.args(8000000000L), QueryError.BXRA_BOUNDS_X);
   }
 
   /** Test method. */
@@ -47,9 +46,9 @@ public final class RandomModuleTest extends AdvancedQueryTest {
     final int s = 12345;
     query(_RANDOM_SEEDED_INTEGER.args(s, 1), new Random(s).nextInt());
     query(_RANDOM_SEEDED_INTEGER.args(s, 1, 1000000), new Random(s).nextInt(1000000));
-    error(_RANDOM_SEEDED_INTEGER.args(1, -1), Err.BXRA_NUM_X);
-    error(_RANDOM_SEEDED_INTEGER.args(1, 1, -1), Err.BXRA_BOUNDS_X);
-    error(_RANDOM_SEEDED_INTEGER.args(1, 1, 8000000000L), Err.BXRA_BOUNDS_X);
+    error(_RANDOM_SEEDED_INTEGER.args(1, -1), QueryError.BXRA_NUM_X);
+    error(_RANDOM_SEEDED_INTEGER.args(1, 1, -1), QueryError.BXRA_BOUNDS_X);
+    error(_RANDOM_SEEDED_INTEGER.args(1, 1, 8000000000L), QueryError.BXRA_BOUNDS_X);
   }
 
   /** Test method. */

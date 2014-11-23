@@ -1,6 +1,6 @@
 package org.basex.query.value.item;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.util.regex.*;
@@ -10,6 +10,7 @@ import javax.xml.namespace.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -24,7 +25,7 @@ public final class QNm extends Item {
   /** URL pattern (matching Clark and EQName notation). */
   public static final Pattern BIND = Pattern.compile("^((\"|')(.*?)\\2:|Q?(\\{(.*?)\\}))(.+)$");
   /** Singleton instance. */
-  private static final QNmCache CACHE = new QNmCache();
+  private static final QNmMap CACHE = new QNmMap();
 
   /** Namespace URI. */
   private byte[] uri;

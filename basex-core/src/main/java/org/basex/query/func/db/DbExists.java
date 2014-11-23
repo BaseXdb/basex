@@ -1,6 +1,6 @@
 package org.basex.query.func.db;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import org.basex.data.*;
 import org.basex.io.*;
@@ -29,7 +29,7 @@ public final class DbExists extends DbAccess {
       }
       return Bln.get(raw || data.resources.doc(path) != -1);
     } catch(final QueryException ex) {
-      if(ex.err() == BXDB_OPEN_X) return Bln.FALSE;
+      if(ex.error() == BXDB_OPEN_X) return Bln.FALSE;
       throw ex;
     }
   }

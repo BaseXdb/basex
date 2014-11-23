@@ -1,7 +1,7 @@
-package org.basex.query.util;
+package org.basex.query.func;
 
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
+import org.basex.query.util.*;
 
 /**
  * Wrapper that provides types for function expressions.
@@ -17,12 +17,12 @@ public final class TypedFunc {
 
   /**
    * Constructor.
-   * @param f function expression
-   * @param a annotations
+   * @param fun function expression
+   * @param ann annotations
    */
-  public TypedFunc(final Expr f, final Ann a) {
-    fun = f;
-    ann = a;
+  public TypedFunc(final Expr fun, final Ann ann) {
+    this.fun = fun;
+    this.ann = ann;
   }
 
   /**

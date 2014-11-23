@@ -1,6 +1,6 @@
 package org.basex.query.expr;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
@@ -9,7 +9,6 @@ import org.basex.core.Context;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.util.pkg.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -393,7 +392,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * @param err expected error
    * @param exp information on expected error
    */
-  private static void error(final IO desc, final Err err, final String exp) {
+  private static void error(final IO desc, final QueryError err, final String exp) {
     try {
       new PkgValidator(context.repo, null).check(new PkgParser(null).parse(desc));
       fail(exp);

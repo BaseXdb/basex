@@ -1,7 +1,7 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.util.*;
@@ -54,9 +54,9 @@ public abstract class AQuery extends Command {
    */
   final boolean query(final String query) {
     final Performance p = new Performance();
-    String err;
+    String error;
     if(cause != null) {
-      err = Util.message(cause);
+      error = Util.message(cause);
     } else {
       try {
         long hits = 0;
@@ -112,12 +112,12 @@ public abstract class AQuery extends Command {
 
       } catch(final QueryException | IOException ex) {
         cause = ex;
-        err = Util.message(ex);
+        error = Util.message(ex);
       } catch(final ProcException ex) {
-        err = INTERRUPTED;
+        error = INTERRUPTED;
       } catch(final StackOverflowError ex) {
         Util.debug(ex);
-        err = BASX_STACKOVERFLOW.desc;
+        error = BASX_STACKOVERFLOW.desc;
       } catch(final RuntimeException ex) {
         extError("");
         Util.debug(info());
@@ -127,7 +127,7 @@ public abstract class AQuery extends Command {
         if(qp != null) qp.close();
       }
     }
-    return extError(err);
+    return extError(error);
   }
 
   /**

@@ -1,6 +1,6 @@
 package org.basex.io.serial.json;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.junit.Assert.*;
 
 import org.basex.*;
@@ -9,7 +9,6 @@ import org.basex.build.JsonOptions.JsonFormat;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.options.Options.YesNo;
@@ -177,12 +176,12 @@ public final class JsonSerializerTest extends SandboxTest {
    * @param format format
    * @param err expected error
    */
-  private static void error(final String query, final JsonFormat format, final Err err) {
+  private static void error(final String query, final JsonFormat format, final QueryError err) {
     try {
       final String s = serialize(query, format);
       fail("Expected: " + err + ", Returned: " + s);
     } catch(final QueryIOException ex) {
-      assertEquals(err.name(), ex.getCause().err().name());
+      assertEquals(err.name(), ex.getCause().error().name());
     } catch(final Exception ex) {
       Util.stack(ex);
       fail(ex.toString());

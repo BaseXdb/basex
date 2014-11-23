@@ -9,7 +9,6 @@ import java.util.regex.*;
 
 import org.basex.http.*;
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -201,7 +200,7 @@ final class RestXqPathMatcher {
    * @return query exception
    */
   private static QueryException error(final InputInfo info, final String msg, final Object... e) {
-    return Err.BASX_RESTXQ_X.get(info, Util.info(msg, e));
+    return QueryError.BASX_RESTXQ_X.get(info, Util.info(msg, e));
   }
 
   /** Character iterator. */

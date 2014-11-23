@@ -1,6 +1,6 @@
 package org.basex.query.func.client;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import org.basex.api.client.*;
 import org.basex.query.*;

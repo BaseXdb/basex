@@ -2,7 +2,7 @@ package org.basex.server;
 
 import static org.basex.core.Text.*;
 import static org.basex.io.serial.SerializerOptions.*;
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.io.*;
 

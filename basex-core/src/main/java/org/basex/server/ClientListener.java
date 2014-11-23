@@ -453,7 +453,7 @@ public final class ClientListener extends Thread {
     // iterator argument (query or identifier)
     String arg = in.readString();
 
-    String err = null;
+    String error = null;
     try {
       final ServerQuery qp;
       final StringBuilder info = new StringBuilder();
@@ -514,16 +514,16 @@ public final class ClientListener extends Thread {
 
     } catch(final Throwable ex) {
       // log exception (static or runtime)
-      err = Util.message(ex);
+      error = Util.message(ex);
       log(sc + "[" + arg + ']', null);
-      log(err, false);
+      log(error, false);
       queries.remove(arg);
     }
-    if(err != null) {
+    if(error != null) {
       // send 0 as end marker, 1 as error flag, and {MSG}0
       out.write(0);
       out.write(1);
-      out.print(err);
+      out.print(error);
       out.write(0);
     }
     out.flush();

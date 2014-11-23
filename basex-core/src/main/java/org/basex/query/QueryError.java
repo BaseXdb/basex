@@ -1,10 +1,9 @@
-package org.basex.query.util;
+package org.basex.query;
 
+import static org.basex.query.QueryError.ErrType.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.ErrType.*;
 
 import org.basex.core.*;
-import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -18,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public enum Err {
+public enum QueryError {
 
   // General errors
 
@@ -1196,7 +1195,7 @@ public enum Err {
   UPATTELM2(XUTY, 22, "Insert target must be an element.");
 
   /** Cached enums (faster). */
-  private static final Err[] VALUES = values();
+  private static final QueryError[] VALUES = values();
 
   /** Error code. */
   public final String code;
@@ -1213,7 +1212,7 @@ public enum Err {
    * @param code error code
    * @param desc description
    */
-  Err(final ErrType type, final String code, final String desc) {
+  QueryError(final ErrType type, final String code, final String desc) {
     this.code = code;
     this.desc = desc;
     uri = type.uri;
@@ -1226,7 +1225,7 @@ public enum Err {
    * @param number error number
    * @param desc description
    */
-  Err(final ErrType type, final int number, final String desc) {
+  QueryError(final ErrType type, final int number, final String desc) {
     final StringBuilder sb = new StringBuilder(8).append(type);
     final String n = Integer.toString(number);
     final int s  = 4 - n.length();
@@ -1385,8 +1384,8 @@ public enum Err {
    * @return exception or null
    */
   public static QueryException get(final String name, final String msg, final InputInfo ii) {
-    for(final Err err : VALUES) {
-      if(err.toString().equals(name)) return new QueryException(ii, err.qname(), msg).err(err);
+    for(final QueryError err : VALUES) {
+      if(err.toString().equals(name)) return new QueryException(ii, err.qname(), msg).error(err);
     }
     return null;
   }

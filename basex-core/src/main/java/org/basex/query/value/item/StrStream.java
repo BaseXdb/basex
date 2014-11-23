@@ -7,7 +7,6 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.util.*;
 import org.basex.util.*;
 
 /**
@@ -22,7 +21,7 @@ public final class StrStream extends AStr {
   /** Encoding (optional). */
   private final String encoding;
   /** Error message. */
-  private final Err error;
+  private final QueryError error;
   /** Validation flag. */
   private final boolean validate;
 
@@ -33,7 +32,9 @@ public final class StrStream extends AStr {
    * @param qc query context
    * @param error error message to be thrown
    */
-  public StrStream(final IO input, final String encoding, final Err error, final QueryContext qc) {
+  public StrStream(final IO input, final String encoding, final QueryError error,
+      final QueryContext qc) {
+
     this.input = input;
     this.encoding = encoding;
     this.error = error;

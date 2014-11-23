@@ -1,6 +1,7 @@
 package org.basex.query.func.file;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
+
 import java.io.*;
 import java.nio.file.*;
 

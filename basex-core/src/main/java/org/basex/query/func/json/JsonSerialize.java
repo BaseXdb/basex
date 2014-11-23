@@ -1,6 +1,6 @@
 package org.basex.query.func.json;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import org.basex.build.*;
 import org.basex.io.serial.*;

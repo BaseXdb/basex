@@ -1,6 +1,6 @@
 package org.basex.query.up.primitives;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.util.*;

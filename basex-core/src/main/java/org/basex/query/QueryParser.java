@@ -1,7 +1,7 @@
 package org.basex.query;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
@@ -94,7 +94,7 @@ public class QueryParser extends InputParser {
   private QNm module;
 
   /** Alternative error code. */
-  private Err alter;
+  private QueryError alter;
   /** Function name of alternative error. */
   private QNm alterFunc;
   /** Alternative position. */
@@ -929,7 +929,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr enclosed(final Err err) throws QueryException {
+  private Expr enclosed(final QueryError err) throws QueryException {
     wsCheck(CURLY1);
     final Expr e = check(expr(), err);
     wsCheck(CURLY2);
@@ -3649,7 +3649,7 @@ public class QueryParser extends InputParser {
    * @return string
    * @throws QueryException query exception
    */
-  private byte[] ncName(final Err err) throws QueryException {
+  private byte[] ncName(final QueryError err) throws QueryException {
     tok.reset();
     if(ncName()) return tok.toArray();
     if(err != null) throw error(err, consume());
@@ -3664,7 +3664,7 @@ public class QueryParser extends InputParser {
    * @return QName (may be {@code null})
    * @throws QueryException query exception
    */
-  private QNm eQName(final Err err, final byte[] def) throws QueryException {
+  private QNm eQName(final QueryError err, final byte[] def) throws QueryException {
     final int i = pos;
     if(consume(EQNAME)) {
       final byte[] uri = bracedURILiteral();
@@ -3707,7 +3707,7 @@ public class QueryParser extends InputParser {
    * @return QName string
    * @throws QueryException query exception
    */
-  private byte[] qName(final Err err) throws QueryException {
+  private byte[] qName(final QueryError err) throws QueryException {
     tok.reset();
     if(!ncName()) {
       if(err != null) throw error(err, consume());
@@ -3799,7 +3799,7 @@ public class QueryParser extends InputParser {
    * @param code error code
    * @throws QueryException query exception
    */
-  private void entityError(final int start, final Err code) throws QueryException {
+  private void entityError(final int start, final QueryError code) throws QueryException {
     final String sub = input.substring(start, Math.min(start + 20, length));
     final int semi = sub.indexOf(';');
     final String ent = semi == -1 ? sub + "..." : sub.substring(0, semi + 1);
@@ -3814,7 +3814,7 @@ public class QueryParser extends InputParser {
    * @return expression
    * @throws QueryException query exception
    */
-  private <E extends Expr> E check(final E expr, final Err err) throws QueryException {
+  private <E extends Expr> E check(final E expr, final QueryError err) throws QueryException {
     if(expr == null) throw error(err);
     return expr;
   }
@@ -3977,7 +3977,7 @@ public class QueryParser extends InputParser {
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean wsConsumeWs(final String s1, final String s2, final Err expr)
+  private boolean wsConsumeWs(final String s1, final String s2, final QueryError expr)
       throws QueryException {
 
     final int i1 = pos;
@@ -4092,7 +4092,7 @@ public class QueryParser extends InputParser {
    * @param arg error arguments
    * @return error
    */
-  QueryException error(final Err err, final Object... arg) {
+  QueryException error(final QueryError err, final Object... arg) {
     return err.get(info(), arg);
   }
 
