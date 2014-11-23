@@ -17,6 +17,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 
 /**
@@ -76,7 +77,7 @@ public final class Let extends ForLet {
     double sum = 0;
     int sz = 0;
     for(Item it; (it = iter.next()) != null; sum += it.score(), sz++);
-    return Dbl.get(sum / sz);
+    return Dbl.get(Scoring.avg(sum, sz));
   }
 
   @Override

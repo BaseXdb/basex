@@ -2,6 +2,7 @@ package org.basex.query.expr.ft;
 
 import static org.basex.query.QueryText.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -46,25 +47,25 @@ public final class FTContains extends Single {
 
     qc.ftToken = lex;
     double s = 0;
+    int c = 0;
+    boolean f = false;
+    final FTPosData ftPosData = qc.ftPosData;
     for(Item it; (it = iter.next()) != null;) {
       lex.init(it.string(info));
       final FTNode item = ftexpr.item(qc, info);
-      double d = 0;
       if(item.all.matches()) {
-        d = item.score();
-        // no scoring found - use default value
-        if(d == 0) d = 1;
+        f = true;
+        s += item.score();
+        // cache entry for visualizations or ft:mark/ft:extract
+        if(ftPosData != null && it instanceof DBNode) {
+          final DBNode node = (DBNode) it;
+          ftPosData.add(node.data, node.pre, item.all);
+        }
       }
-      s = s == 0 ? d : Scoring.merge(s, d);
-
-      // cache entry for visualizations or ft:mark/ft:extract
-      if(d > 0 && qc.ftPosData != null && it instanceof DBNode) {
-        final DBNode node = (DBNode) it;
-        qc.ftPosData.add(node.data, node.pre, item.all);
-      }
+      c++;
     }
     qc.ftToken = tmp;
-    return Bln.get(s);
+    return Bln.get(f, Scoring.avg(s, c));
   }
 
   @Override

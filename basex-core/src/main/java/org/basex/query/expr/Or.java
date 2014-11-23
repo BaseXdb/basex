@@ -9,6 +9,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 
 /**
@@ -61,7 +62,7 @@ public final class Or extends Logical {
     // all arguments return false
     if(list.isEmpty()) return optPre(Bln.FALSE, qc);
 
-    if(exprs.length != list.size()) {
+    if(es != list.size()) {
       qc.compInfo(OPTWRITE, this);
       exprs = list.finish();
     }
@@ -80,8 +81,8 @@ public final class Or extends Logical {
       final int el = exprs.length;
       final Expr[] inner = new Expr[el];
       for(int e = 0; e < el; e++) inner[e] = ((Arr) exprs[e]).exprs[0];
-      final Expr and = new And(info, inner).optimize(qc, scp);
-      return Function.NOT.get(null, info, and).optimize(qc, scp);
+      final Expr ex = new And(info, inner).optimize(qc, scp);
+      return Function.NOT.get(null, info, ex).optimize(qc, scp);
     }
 
     // return single expression if it yields a boolean
@@ -90,12 +91,23 @@ public final class Or extends Logical {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final int el = exprs.length;
-    for(int e = 0; e < el - 1; e++) {
-      if(exprs[e].ebv(qc, info).bool(info)) return Bln.TRUE;
+    // compute scoring
+    if(qc.scoring) {
+      double s = 0;
+      boolean f = false;
+      for(final Expr e : exprs) {
+        final Item it = e.ebv(qc, info);
+        f |= it.bool(ii);
+        s += it.score();
+      }
+      return Bln.get(f, Scoring.avg(s, exprs.length));
     }
-    final Expr last = exprs[el - 1];
-    return tailCall ? last.item(qc, ii) : last.ebv(qc, ii).bool(ii) ? Bln.TRUE : Bln.FALSE;
+
+    // standard evaluation
+    for(final Expr e : exprs) {
+      if(e.ebv(qc, info).bool(ii)) return Bln.TRUE;
+    }
+    return Bln.FALSE;
   }
 
   @Override

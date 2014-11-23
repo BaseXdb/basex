@@ -102,7 +102,7 @@ public final class FnSubsequence extends StandardFunc {
     final double ds = toDouble(exprs[1], qc);
     if(Double.isNaN(ds)) return null;
 
-    long start = StrictMath.round(ds);
+    final long start = StrictMath.round(ds);
     final boolean min = start == Long.MIN_VALUE;
     long len = Long.MAX_VALUE;
 

@@ -17,9 +17,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Logical extends Arr {
-  /** Tail-call flag. */
-  boolean tailCall;
-
   /**
    * Constructor.
    * @param info input info
@@ -55,20 +52,14 @@ public abstract class Logical extends Arr {
   public final void markTailCalls(final QueryContext qc) {
     // if the last expression surely returns a boolean, we can jump to it
     final Expr last = exprs[exprs.length - 1];
-    if(last.seqType().eq(SeqType.BLN)) {
-      tailCall = true;
-      last.markTailCalls(qc);
-    }
+    if(last.seqType().eq(SeqType.BLN)) last.markTailCalls(qc);
   }
 
   @Override
   public void plan(final FElem plan) {
     final FElem el = planElem();
-    if(tailCall) el.add(planAttr(TCL, true));
     plan.add(el);
-    for(final ExprInfo e : exprs) {
-      if(e != null) e.plan(el);
-    }
+    for(final ExprInfo e : exprs) if(e != null) e.plan(el);
   }
 
   /**

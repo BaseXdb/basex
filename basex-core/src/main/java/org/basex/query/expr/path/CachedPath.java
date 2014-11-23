@@ -36,10 +36,8 @@ final class CachedPath extends AxisPath {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Value cv = qc.value;
     final long cp = qc.pos, cs = qc.size;
-    final Value r = root != null ? qc.value(root) : cv;
-
+    final Value cv = qc.value, r = root != null ? qc.value(root) : cv;
     try {
       final NodeSeqBuilder nb = new NodeSeqBuilder().check();
       if(r != null) {

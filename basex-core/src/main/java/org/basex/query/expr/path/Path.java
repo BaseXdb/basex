@@ -130,7 +130,7 @@ public abstract class Path extends ParseExpr {
     try {
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
-        Expr e = steps[s];
+        final Expr e = steps[s];
 
         // axis step: if input is a document, its type is temporarily generalized
         final boolean as = e instanceof Step;

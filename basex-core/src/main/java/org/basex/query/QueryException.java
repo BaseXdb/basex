@@ -147,9 +147,11 @@ public class QueryException extends Exception {
   /**
    * Adds an input info to the stack.
    * @param ii input info
+   * @return self reference
    */
-  public void add(final InputInfo ii) {
+  public QueryException add(final InputInfo ii) {
     if(ii != null) stack.add(ii);
+    return this;
   }
 
   /**

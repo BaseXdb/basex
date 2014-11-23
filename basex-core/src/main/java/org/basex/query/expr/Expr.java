@@ -127,9 +127,14 @@ public abstract class Expr extends ExprInfo {
   public abstract Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException;
 
   /**
-   * Checks if the iterator can be dissolved into an effective boolean value.
-   * If not, returns an error. If yes, returns the first value - which can be
-   * also be e.g. an integer, which is later evaluated as numeric predicate.
+   * <p>Checks if the effective boolean value can be computed for this expression:</p>
+   * <ul>
+   *   <li> If it yields an empty sequence, {@link Bln#FALSE} will be returned.
+   *   <li> If it yields a single item, this item will be returned.
+   *   <li> If it yields nodes, the first node will be returned.
+   *   <li> Otherwise, an error will be raised.
+   * </ul>
+   * <p>A single numeric item may later be evaluated as positional predicate.</p>
    * @param qc query context
    * @param ii input info
    * @return item

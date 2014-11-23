@@ -19,6 +19,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.ft.*;
 
 /**
  * Abstract predicate expression, implemented by {@link Filter} and {@link Step}.
@@ -154,12 +155,14 @@ public abstract class Preds extends ParseExpr {
     // set context value and position
     final Value cv = qc.value;
     try {
+      double s = 0;
       for(final Expr p : preds) {
         qc.value = it;
         final Item i = p.test(qc, info);
         if(i == null) return false;
-        if(scoring) it.score(i.score());
+        if(scoring) s += i.score();
       }
+      if(scoring) it.score(Scoring.avg(s, preds.length));
       return true;
     } finally {
       qc.value = cv;

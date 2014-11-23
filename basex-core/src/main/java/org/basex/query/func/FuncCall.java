@@ -45,14 +45,14 @@ public abstract class FuncCall extends Arr {
 
   @Override
   public final void markTailCalls(final QueryContext qc) {
-    if (qc != null) qc.compInfo(QueryText.OPTTCE, this);
+    if(qc != null) qc.compInfo(QueryText.OPTTCE, this);
     tailCall = true;
   }
 
   @Override
   public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return tailCall ? (Item) invokeTail(evalFunc(qc), evalArgs(qc), true, qc, info)
-                    : (Item) invoke(evalFunc(qc), evalArgs(qc), true, qc, info);
+    return (Item) (tailCall ? invokeTail(evalFunc(qc), evalArgs(qc), true, qc, info)
+                            : invoke(evalFunc(qc), evalArgs(qc), true, qc, info));
   }
 
   @Override
@@ -91,8 +91,7 @@ public abstract class FuncCall extends Arr {
         args = qc.pollTailArgs();
       }
     } catch(final QueryException ex) {
-      ex.add(ii);
-      throw ex;
+      throw ex.add(ii);
    } finally {
       qc.stack.exitFrame(fp);
     }
@@ -123,8 +122,7 @@ public abstract class FuncCall extends Arr {
     try {
       return itm ? fun.invItem(qc, ii, arg) : fun.invValue(qc, ii, arg);
     } catch(final QueryException ex) {
-      ex.add(ii);
-      throw ex;
+      throw ex.add(ii);
     } finally {
       qc.tailCalls = calls;
       qc.stack.exitFrame(fp);

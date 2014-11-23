@@ -45,11 +45,12 @@ public final class Bln extends Item {
 
   /**
    * Constructor, adding a full-text score.
+   * @param value boolean value
    * @param score score value
    * @return item
    */
-  public static Bln get(final double score) {
-    return score == 0 ? FALSE : new Bln(true, score);
+  public static Bln get(final boolean value, final double score) {
+    return value && score != 0 ? new Bln(value, score) : get(value);
   }
 
   /**

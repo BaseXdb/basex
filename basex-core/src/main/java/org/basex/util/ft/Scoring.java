@@ -27,22 +27,38 @@ public final class Scoring {
   }
 
   /**
-   * Combines two scoring values.
+   * <p>Combines two scoring values. Both values will be inverted, multiplied with each other,
+   * and the inverted result will be returned. This has the following effects:</p>
+   * <ul>
+   *   <li> The returned value will always be the same as, or higher than the maximum value.</li>
+   *   <li> If one value is {@code 1}, {@code 1} will be returned.</li>
+   *   <li> If one value is {@code 0}, the other value will be returned.</li>
+   * </ul>
    * @param value1 old value
    * @param value2 new value
-   * @return result
-   */
+   * @return score
   public static double merge(final double value1, final double value2) {
     return 1 - (1 - value1) * (1 - value2);
   }
+   */
 
   /**
    * Inverses the scoring value for FTNot.
    * @param value scoring value
-   * @return inverse scoring value
+   * @return score
    */
   public static double not(final double value) {
     return 1 - value;
+  }
+
+  /**
+   * Returns an average scoring value.
+   * @param sum summarized scoring value
+   * @param count number of values
+   * @return score
+   */
+  public static double avg(final double sum, final int count) {
+    return sum / count;
   }
 
   /**
@@ -52,7 +68,7 @@ public final class Scoring {
    * @param size total number of index entries
    * @param token token length
    * @param length text length
-   * @return score value
+   * @return score
    */
   public static double textNode(final int number, final int size, final int token,
       final int length) {

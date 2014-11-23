@@ -119,7 +119,7 @@ public final class FTAnd extends FTExpr {
         all.add(new FTMatch(s1.size() + s2.size()).add(s1).add(s2));
       }
     }
-    i1.score(Scoring.merge(i1.score(), i2.score()));
+    i1.score(Scoring.avg(i1.score() + i2.score(), 2));
     i1.all = all;
   }
 
