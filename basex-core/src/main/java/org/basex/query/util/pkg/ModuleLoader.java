@@ -106,14 +106,30 @@ public final class ModuleLoader {
       }
     }
 
-    // "java:" prefix, or no XQuery package found: try to load Java module
+    // try to load Java module
     uriPath = capitalize(uriPath);
     final String path = context.globalopts.get(GlobalOptions.REPOPATH) + uriPath;
     final IOFile file = new IOFile(path + IO.JARSUFFIX);
     if(file.exists()) addURL(file);
 
     // try to create Java class instance
-    addJava(uriPath, ii);
+    final String cp = camelCase(uriPath.replace('/', '.').substring(1));
+    final Class<?> clz;
+    try {
+      clz = findClass(cp);
+    } catch(final ClassNotFoundException ex) {
+      if(java) throw WHICHCLASS_X.get(ii, ex.getMessage());
+      return false;
+    } catch(final Throwable th) {
+      throw MODINITERR_X.get(ii, th);
+    }
+
+    // add new instance to module cache
+    final Object jm = Reflect.get(clz);
+    if(jm == null) throw INSTERR_X.get(ii, cp);
+
+    if(javaModules == null) javaModules = new HashSet<>();
+    javaModules.add(jm);
     return true;
   }
 
@@ -207,32 +223,6 @@ public final class ModuleLoader {
   }
 
   // PRIVATE METHODS ====================================================================
-
-  /**
-   * Loads a Java class.
-   * @param path file path
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  private void addJava(final String path, final InputInfo ii) throws QueryException {
-    final String cp = camelCase(path.replace('/', '.').substring(1));
-    final Class<?> clz;
-    try {
-      clz = findClass(cp);
-    } catch(final ClassNotFoundException ex) {
-      throw WHICHCLASS_X.get(ii, ex.getMessage());
-      // expected exception
-    } catch(final Throwable th) {
-      throw MODINITERR_X.get(ii, th);
-    }
-
-    // add new instance to module cache
-    final Object jm = Reflect.get(clz);
-    if(jm == null) throw INSTERR_X.get(ii, cp);
-
-    if(javaModules == null) javaModules = new HashSet<>();
-    javaModules.add(jm);
-  }
 
   /**
    * Adds a package from the package repository.
