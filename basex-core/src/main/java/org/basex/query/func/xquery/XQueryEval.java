@@ -87,7 +87,7 @@ public class XQueryEval extends StandardFunc {
         }
         final long ms = opts.get(XQueryOptions.TIMEOUT) * 1000L;
         if(ms != 0) {
-          if(to != null) to = new Timer(true);
+          if(to == null) to = new Timer(true);
           to.schedule(new TimerTask() {
             @Override
             public void run() { qctx.stop(); }
