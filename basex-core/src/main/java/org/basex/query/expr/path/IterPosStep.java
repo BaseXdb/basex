@@ -26,7 +26,6 @@ final class IterPosStep extends Step {
 
   @Override
   public NodeIter iter(final QueryContext qc) {
-    final boolean scoring = qc.scoring;
     return new NodeIter() {
       boolean skip;
       AxisIter ai;
@@ -54,7 +53,7 @@ final class IterPosStep extends Step {
           qc.size = 0;
           qc.pos = ++cpos;
           try {
-            if(preds(node, qc, scoring)) {
+            if(preds(node, qc)) {
               // check if more results can be expected
               skip = pos != null && pos.skip(qc);
               return node.finish();

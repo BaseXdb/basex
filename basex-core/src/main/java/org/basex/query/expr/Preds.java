@@ -143,26 +143,30 @@ public abstract class Preds extends ParseExpr {
    * Checks if the predicates are successful for the specified item.
    * @param it item to be checked
    * @param qc query context
-   * @param scoring scoring flag
    * @return result of check
    * @throws QueryException query exception
    */
-  protected final boolean preds(final Item it, final QueryContext qc, final boolean scoring)
-      throws QueryException {
-
+  protected final boolean preds(final Item it, final QueryContext qc) throws QueryException {
     if(preds.length == 0) return true;
 
     // set context value and position
     final Value cv = qc.value;
     try {
-      double s = 0;
-      for(final Expr p : preds) {
-        qc.value = it;
-        final Item i = p.test(qc, info);
-        if(i == null) return false;
-        if(scoring) s += i.score();
+      if(qc.scoring) {
+        double s = 0;
+        for(final Expr p : preds) {
+          qc.value = it;
+          final Item i = p.test(qc, info);
+          if(i == null) return false;
+          s += i.score();
+        }
+        it.score(Scoring.avg(s, preds.length));
+      } else {
+        for(final Expr p : preds) {
+          qc.value = it;
+          if(p.test(qc, info) == null) return false;
+        }
       }
-      if(scoring) it.score(Scoring.avg(s, preds.length));
       return true;
     } finally {
       qc.value = cv;

@@ -27,9 +27,7 @@ final class IterFilter extends Filter {
 
   @Override
   public Iter iter(final QueryContext qc) {
-    final boolean scoring = qc.scoring;
     return new Iter() {
-      /** Iterator. */
       Iter iter;
 
       @Override
@@ -39,7 +37,7 @@ final class IterFilter extends Filter {
         // filter sequence
         for(Item it; (it = iter.next()) != null;) {
           qc.checkStop();
-          if(preds(it, qc, scoring)) return it;
+          if(preds(it, qc)) return it;
         }
         return null;
       }

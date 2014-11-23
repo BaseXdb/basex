@@ -74,10 +74,10 @@ public final class Let extends ForLet {
    * @throws QueryException evaluation exception
    */
   private static Dbl score(final Iter iter) throws QueryException {
-    double sum = 0;
-    int sz = 0;
-    for(Item it; (it = iter.next()) != null; sum += it.score(), sz++);
-    return Dbl.get(Scoring.avg(sum, sz));
+    double s = 0;
+    int c = 0;
+    for(Item it; (it = iter.next()) != null; s += it.score(), c++);
+    return Dbl.get(Scoring.avg(s, c));
   }
 
   @Override
@@ -172,14 +172,21 @@ public final class Let extends ForLet {
     @Override
     public boolean next(final QueryContext qc) throws QueryException {
       if(!sub.next(qc)) return false;
+
       for(final Let let : lets) {
-        final boolean s = qc.scoring;
-        try {
-          qc.scoring = let.scoring;
-          qc.set(let.var, let.scoring ? score(let.expr.iter(qc)) : qc.value(let.expr), let.info);
-        } finally {
-          qc.scoring = s;
+        final Value vl;
+        if(let.scoring) {
+          final boolean s = qc.scoring;
+          try {
+            qc.scoring = true;
+            vl = score(let.expr.iter(qc));
+          } finally {
+            qc.scoring = s;
+          }
+        } else {
+          vl = qc.value(let.expr);
         }
+        qc.set(let.var, vl, let.info);
       }
       return true;
     }

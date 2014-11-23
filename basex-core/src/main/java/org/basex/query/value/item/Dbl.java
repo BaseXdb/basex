@@ -20,9 +20,9 @@ public final class Dbl extends ANum {
   /** Value "NaN". */
   public static final Dbl NAN = new Dbl(Double.NaN);
   /** Value "0". */
-  private static final Dbl ZERO = new Dbl(0);
+  public static final Dbl ZERO = new Dbl(0);
   /** Value "1". */
-  private static final Dbl ONE = new Dbl(1);
+  public static final Dbl ONE = new Dbl(1);
   /** Data. */
   private final double value;
 

@@ -33,7 +33,6 @@ final class IterPath extends AxisPath {
 
   @Override
   public NodeIter iter(final QueryContext qc) {
-    final boolean scoring = qc.scoring;
     return new NodeIter() {
       final boolean r = root != null;
       final int sz = steps.length + (r ? 1 : 0);
@@ -47,7 +46,10 @@ final class IterPath extends AxisPath {
         // local copy of variables (faster)
         ANode n = node;
         int p = pos;
-        if(p == -1) iter(++p);
+        if(p == -1) {
+          ++p;
+          iter[p] = qc.iter(expr[p]);
+        }
 
         final Value cv = qc.value;
         final long cp = qc.pos, cs = qc.size;
@@ -65,7 +67,8 @@ final class IterPath extends AxisPath {
               if(r && p == 0 && !(it instanceof ANode))
                 throw PATHNODE_X_X_X.get(info, steps[0], it.type, it);
               qc.value = it;
-              iter(++p);
+              ++p;
+              iter[p] = qc.iter(expr[p]);
             } else {
               // remaining steps will always yield nodes
               final ANode nx = (ANode) it;
@@ -83,21 +86,6 @@ final class IterPath extends AxisPath {
           qc.value = cv;
           qc.pos = cp;
           qc.size = cs;
-        }
-      }
-
-      /**
-       * Returns a new iterator.
-       * @param p step index
-       * @throws QueryException query exception
-       */
-      private void iter(final int p) throws QueryException {
-        final boolean s = qc.scoring;
-        try {
-          qc.scoring = scoring;
-          iter[p] = qc.iter(expr[p]);
-        } finally {
-          qc.scoring = s;
         }
       }
     };

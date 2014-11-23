@@ -41,17 +41,16 @@ public final class FTIndexAccess extends Simple {
   @Override
   public NodeIter iter(final QueryContext qc) throws QueryException {
     final FTIter ir = ftexpr.iter(qc);
-    final boolean scoring = qc.scoring;
 
     return new NodeIter() {
       @Override
       public ANode next() throws QueryException {
         final FTNode it = ir.next();
         if(it != null) {
+          // assign scoring
+          if(qc.scoring) it.score();
           // cache entry for visualizations or ft:mark/ft:extract
           if(qc.ftPosData != null) qc.ftPosData.add(it.data, it.pre, it.all);
-          // assign scoring if not done yet
-          if(scoring) it.score();
           // remove matches reference to save memory
           it.all = null;
         }

@@ -64,7 +64,21 @@ public final class For extends ForLet {
       @Override
       public boolean next(final QueryContext qc) throws QueryException {
         while(true) {
-          final Item it = iter == null ? null : iter.next();
+          // next iteration, reset iterator and counter
+          Item it = null;
+          if(iter != null) {
+            if(scoring) {
+              final boolean s = qc.scoring;
+              try {
+                qc.scoring = true;
+                it = iter.next();
+              } finally {
+                qc.scoring = s;
+              }
+            } else {
+              it = iter.next();
+            }
+          }
           if(it != null) {
             // there's another item to serve
             ++p;
@@ -77,7 +91,7 @@ public final class For extends ForLet {
             // expression yields no items, bind the empty sequence instead
             qc.set(var, Empty.SEQ, info);
             if(pos != null) qc.set(pos, Int.get(p), info);
-            if(score != null) qc.set(score, Dbl.get(0), info);
+            if(score != null) qc.set(score, Dbl.ZERO, info);
             iter = null;
             return true;
           }
@@ -85,12 +99,16 @@ public final class For extends ForLet {
           if(!sub.next(qc)) return false;
 
           // next iteration, reset iterator and counter
-          final boolean s = qc.scoring;
-          try {
-            qc.scoring = scoring;
+          if(scoring) {
+            final boolean s = qc.scoring;
+            try {
+              qc.scoring = true;
+              iter = expr.iter(qc);
+            } finally {
+              qc.scoring = s;
+            }
+          } else {
             iter = expr.iter(qc);
-          } finally {
-            qc.scoring = s;
           }
           p = 0;
         }
