@@ -1,6 +1,7 @@
 package org.basex.gui.text;
 
 import static org.basex.util.Token.*;
+import static org.basex.util.FTToken.*;
 
 import java.io.*;
 import java.util.*;
@@ -1072,10 +1073,10 @@ public final class TextEditor {
    * Selects the word at the cursor position.
    */
   void selectWord() {
-    final boolean ch = ftChar(curr());
+    final boolean ch = valid(curr());
     while(pos() > 0) {
       final int cp = back(true);
-      if(cp == '\n' || ch != ftChar(cp)) {
+      if(cp == '\n' || ch != valid(cp)) {
         forward(true);
         break;
       }
@@ -1083,7 +1084,7 @@ public final class TextEditor {
     startSelect();
     while(pos() < size()) {
       final int cp = curr();
-      if(cp == '\n' || ch != ftChar(cp)) break;
+      if(cp == '\n' || ch != valid(cp)) break;
       forward(true);
     }
     endSelection();

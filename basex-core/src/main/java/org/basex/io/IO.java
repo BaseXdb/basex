@@ -1,6 +1,7 @@
 package org.basex.io;
 
 import static org.basex.util.Token.*;
+import static org.basex.util.FTToken.*;
 
 import java.io.*;
 import java.util.*;
@@ -267,7 +268,7 @@ public abstract class IO {
     int i = lastIndexOf(n, '.');
     if(i == -1) i = n.length;
     for(int c = 0; c < i; c += cl(n, c)) {
-      final int ch = norm(cp(n, c));
+      final int ch = noDiacritics(cp(n, c));
       if(Databases.validChar(ch)) tb.add(ch);
     }
     return tb.toString();

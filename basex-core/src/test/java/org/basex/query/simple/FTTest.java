@@ -140,6 +140,9 @@ public final class FTTest extends QueryTest {
       { "FTDiacritics 3", nodes(17),
         "//s[text() contains text 'di\u00e4t joghurt' using diacritics sensitive]" },
 
+      { "FTDiacritics 4", booleans(true),
+        "'\u0065\u0301\u00E9' contains text 'ee' using diacritics insensitive" },
+
       { "FTCaseOption 1", nodes(3, 5, 7, 9, 11),
         "/fttest/co/w[text() contains text 'xml']" },
       { "FTCaseOption 2", nodes(3, 5, 7, 9, 11),

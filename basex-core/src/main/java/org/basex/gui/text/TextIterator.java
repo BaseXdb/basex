@@ -1,5 +1,6 @@
 package org.basex.gui.text;
 
+import static org.basex.util.FTToken.*;
 import static org.basex.util.Token.*;
 
 import org.basex.util.*;
@@ -62,10 +63,10 @@ final class TextIterator {
     // find next token boundary
     int ch = cp(text, p);
     p += cl(text, p);
-    if(ftChar(ch)) {
+    if(valid(ch)) {
       while(p < length) {
         ch = cp(text, p);
-        if(!ftChar(ch)) break;
+        if(!valid(ch)) break;
         p += cl(text, p);
       }
     }

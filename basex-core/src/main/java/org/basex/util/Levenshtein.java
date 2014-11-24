@@ -1,6 +1,7 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
+import static org.basex.util.FTToken.*;
 
 /**
  * Damerau-Levenshtein implementation. Based on the publications from
@@ -90,10 +91,10 @@ public final class Levenshtein {
 
     int e2 = -1, f2 = -1;
     for(int t = 0; t < tl; t += cl(tk, t)) {
-      final int e = norm(lc(cp(tk, t)));
+      final int e = noDiacritics(lc(cp(tk, t)));
       int d = Integer.MAX_VALUE;
       for(int s = 0; s < sl; s += cl(sb, s)) {
-        final int f = norm(lc(cp(sb, s)));
+        final int f = noDiacritics(lc(cp(sb, s)));
         int c = m(mx[t][s + 1] + 1, mx[t + 1][s] + 1, mx[t][s] + (e == f ? 0 : 1));
         if(e == f2 && f == e2) c = mx[t][s];
         mx[t + 1][s + 1] = c;
@@ -127,7 +128,7 @@ public final class Levenshtein {
   private static boolean same(final byte[] tk, final byte[] sb) {
     final int tl = tk.length, sl = sb.length;
     for(int s = 0, t = 0; t < tl && s < sl; t += cl(tk, t), s += cl(sb, s)) {
-      if(lc(norm(cp(tk, t))) != lc(norm(cp(sb, t)))) return false;
+      if(lc(noDiacritics(cp(tk, t))) != lc(noDiacritics(cp(sb, t)))) return false;
     }
     return true;
   }

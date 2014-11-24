@@ -1,6 +1,7 @@
 package org.basex.gui.view.map;
 
 import static org.basex.gui.GUIConstants.*;
+import static org.basex.util.FTToken.*;
 import static org.basex.util.Token.*;
 
 import java.awt.*;
@@ -733,7 +734,7 @@ final class MapRenderer {
         yy += fs + 1;
         wl = 0;
       }
-      final boolean pm = !ftChar(tl.get(i)[tl.get(i).length - 1]);
+      final boolean pm = !valid(tl.get(i)[tl.get(i).length - 1]);
       if(ttcol.get(i)) g.setColor(GREEN);
       g.drawString(string(tl.get(i)), xx + wl, yy);
       if(i == ul) {

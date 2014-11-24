@@ -1,6 +1,7 @@
 package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
+import static org.basex.util.FTToken.*;
 import static org.basex.util.ft.FTFlag.*;
 
 import java.lang.reflect.*;
@@ -344,12 +345,12 @@ public class JapaneseTokenizer extends Tokenizer {
         hinshi == Morpheme.HINSHI_KEIYOUSHI)) {
         n = currToken.getBaseForm();
     }
-    byte[] token = token(n);
-    final boolean a = ascii(token);
-    if(!a && !dc) token = WesternTokenizer.dia(token);
-    if(cs == FTCase.UPPER) token = WesternTokenizer.upper(token, a);
-    else if(cs != FTCase.SENSITIVE) token = WesternTokenizer.lower(token, a);
-    return toHankaku(token);
+    byte[] t = token(n);
+    final boolean a = ascii(t);
+    if(!a && !dc) t = noDiacritics(t);
+    if(cs == FTCase.UPPER) t = WesternTokenizer.upper(t, a);
+    else if(cs != FTCase.SENSITIVE) t = WesternTokenizer.lower(t, a);
+    return toHankaku(t);
   }
 
   /**

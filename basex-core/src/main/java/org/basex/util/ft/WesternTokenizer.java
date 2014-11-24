@@ -1,6 +1,7 @@
 package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
+import static org.basex.util.FTToken.*;
 import static org.basex.util.ft.FTFlag.*;
 
 import java.util.*;
@@ -147,7 +148,7 @@ public final class WesternTokenizer extends Tokenizer {
       } else if(!pa && c == '\n') {
         pa = true;
         ++para;
-      } else if(ftChar(c)) {
+      } else if(valid(c)) {
         if(bs) {
           // backslash (bs) followed by any character is the character itself:
           --cpos;
@@ -179,7 +180,7 @@ public final class WesternTokenizer extends Tokenizer {
           continue;
         }
       }
-      if(!ftChar(c)) {
+      if(!valid(c)) {
         if(bs) --cpos;
         break;
       }
@@ -193,12 +194,12 @@ public final class WesternTokenizer extends Tokenizer {
    * @return result
    */
   private byte[] get() {
-    byte[] n = orig();
-    final boolean a = ascii(n);
-    if(!a && !dc) n = dia(n);
-    if(cs == FTCase.UPPER) n = upper(n, a);
-    else if(cs != FTCase.SENSITIVE) n = lower(n, a);
-    return n;
+    byte[] t = orig();
+    final boolean a = ascii(t);
+    if(!a && !dc) t = noDiacritics(t);
+    if(cs == FTCase.UPPER) t = upper(t, a);
+    else if(cs != FTCase.SENSITIVE) t = lower(t, a);
+    return t;
   }
 
   /**
@@ -230,9 +231,7 @@ public final class WesternTokenizer extends Tokenizer {
         sc = true;
         break;
       }
-      if(ftChar(c)) {
-        break;
-      }
+      if(valid(c)) break;
       sc = true;
     }
 
@@ -247,7 +246,7 @@ public final class WesternTokenizer extends Tokenizer {
     // parse token
     for(; cpos < l; cpos += cl(text, cpos)) {
       final int c = cp(text, cpos);
-      if(!ftChar(c)) {
+      if(!valid(c)) {
         spos = cpos - cl(text, cpos);
         break;
       }
@@ -278,29 +277,6 @@ public final class WesternTokenizer extends Tokenizer {
       }
     }
     return il.get(w);
-  }
-
-  /**
-   * Removes diacritics from the specified token. This method supports all
-   * latin1 characters, including supplements.
-   * @param t token to be converted
-   * @return converted token
-   */
-  static byte[] dia(final byte[] t) {
-    // find first character to be normalized
-    final int tl = t.length;
-    for(int i = 0; i < tl; i += cl(t, i)) {
-      final int c = cp(t, i);
-      // normalized character found; run conversion
-      if(c != norm(c)) {
-        final TokenBuilder tb = new TokenBuilder();
-        tb.add(t, 0, i);
-        for(int j = i; j < tl; j += cl(t, j)) tb.add(norm(cp(t, j)));
-        return tb.finish();
-      }
-    }
-    // return original character
-    return t;
   }
 
   /**
