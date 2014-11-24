@@ -1190,9 +1190,14 @@ public final class UpdateTest extends AdvancedQueryTest {
     query("declare function local:not-used() { local:b#0 };"
         + "declare updating function local:b() { db:output('1') }; local:b()", "1");
 
+    error("function() { delete node <a/> }()", UPNOT_X);
+    error("updating function() { delete node <a/> }()", UPNOT_X);
+    error("updating %updating function() { 1 }()", UPEXPECTF);
+
     error("db:output(?)(<a/>)", UPFUNCUP);
     error("db:output#1(<a/>)", UPFUNCUP);
     error("%updating function($a) { db:output($a) }(1)", UPFUNCUP);
+    error("%updating function() { 1 }()", UPFUNCUP);
     error("declare updating function local:a() { () }; local:a#0()", UPFUNCUP);
     error("declare function local:a() { local:b#0 };"
         + "declare updating function local:b() { db:output('1') }; local:a()()", UPFUNCUP);

@@ -1150,9 +1150,9 @@ public enum QueryError {
   UPURIDUP_X(XUDY, 31, "URI '%' is addressed multiple times."),
 
   /** XUDY0032 (WIP). */
-  UPFUNCNOTUP(XUDY, 32, "Function is not updating."),
+  UPFUNCNOTUP(XUDY, 32, "Function has no %updating annotation."),
   /** XUDY0032 (WIP). */
-  UPFUNCUP(XUDY, 32, "Function is updating."),
+  UPFUNCUP(XUDY, 32, "No 'updating' keyword specified before function call."),
 
   /** XUST0001. */
   UPNOT_X(XUST, 1, "%: no updating expression allowed."),

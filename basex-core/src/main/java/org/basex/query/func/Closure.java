@@ -325,7 +325,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     Boolean b = map.get(flag);
     if(b == null) {
       map.put(flag, false);
-      b = expr == null || super.has(flag);
+      b = expr == null || (flag != Flag.UPD && super.has(flag));
       map.put(flag, b);
     }
     return b;

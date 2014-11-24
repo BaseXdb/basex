@@ -10,8 +10,8 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.array.Array;
+import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -69,15 +69,19 @@ public final class DynFuncCall extends FuncCall {
       if(ft.retType != null) seqType = ft.retType;
     }
 
-    // maps and arrays can only contain fully evaluated Values, so this is safe
+    // maps and arrays can only contain fully evaluated values, so this is safe
     if((f instanceof Map || f instanceof Array) && allAreValues()) return optPre(value(qc), qc);
 
     if(f instanceof XQFunctionExpr) {
       // try to inline the function
-      if(!(f instanceof FuncItem && comesFrom((FuncItem) f)) && !updating) {
+      final XQFunctionExpr fe = (XQFunctionExpr) f;
+      if(!(f instanceof FuncItem && comesFrom((FuncItem) f))) {
+        if(!sc.mixUpdates && updating != fe.annotations().contains(Ann.Q_UPDATING))
+          throw (updating ? UPFUNCNOTUP : UPFUNCUP).get(info);
+
         final Expr[] args = Arrays.copyOf(exprs, ar);
-        final Expr inl = ((XQFunctionExpr) f).inlineExpr(args, qc, scp, info);
-        if(inl != null) return inl;
+        final Expr in = fe.inlineExpr(args, qc, scp, info);
+        if(in != null) return in;
       }
     } else if(f instanceof Item && !(f instanceof FItem)) {
       throw INVFUNCITEM_X.get(info, ((Item) f).type, f);
@@ -87,7 +91,9 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoneUp(Arrays.copyOf(exprs, exprs.length - 1));
+    final int ar = exprs.length - 1;
+    checkNoneUp(Arrays.copyOf(exprs, ar));
+    exprs[ar].checkUp();
   }
 
   /**
@@ -107,8 +113,8 @@ public final class DynFuncCall extends FuncCall {
   private boolean comesFrom(final FuncItem it) {
     if(inlinedFrom != null) {
       final int hash = it.hashCode();
-      for(final int h : inlinedFrom) if(hash == h) {
-        return true;
+      for(final int h : inlinedFrom) {
+        if(hash == h) return true;
       }
     }
     return false;
@@ -158,6 +164,7 @@ public final class DynFuncCall extends FuncCall {
     final int ar = exprs.length - 1;
     final Item it = toItem(exprs[ar], qc);
     if(!(it instanceof FItem)) throw INVFUNCITEM_X.get(info, it.type, it);
+
     final FItem f = (FItem) it;
     if(f.arity() != ar) {
       final Expr e = f instanceof FuncItem ? ((FuncItem) f).expr : f;
