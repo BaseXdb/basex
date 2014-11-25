@@ -32,6 +32,7 @@ public final class FetchModuleTest extends AdvancedQueryTest {
         "//text()[not(normalize-space())])", "false");
     query("exists(" + _FETCH_XML.args(FILE, " map { 'chop':false() }") +
         "//text()[not(normalize-space())])", "true");
+    error(_FETCH_XML.args(FILE, " map { 'parser': 'unknown' }"), BASX_VALUE_X_X);
     error(_FETCH_XML.args(FILE + 'x'), BXFE_IO_X);
   }
 

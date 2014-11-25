@@ -76,6 +76,11 @@ public final class DBOptions {
         final boolean yes = Util.yes(value);
         if(!yes && !Util.no(value)) throw BASX_VALUE_X_X.get(info, key, value);
         rOptions.put(option, yes);
+      } else if(option instanceof EnumOption) {
+        final EnumOption<?> eo = (EnumOption<?>) option;
+        final Object ev = eo.get(value);
+        if(ev == null) throw BASX_VALUE_X_X.get(info, key, value);
+        rOptions.put(option, ev);
       } else {
         rOptions.put(option, value);
       }
