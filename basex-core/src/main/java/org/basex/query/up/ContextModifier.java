@@ -27,29 +27,21 @@ public abstract class ContextModifier {
 
   /**
    * Adds an update primitive to this context modifier.
-   * @param up update primitive
+   * @param update update primitive
    * @param qc query context
    * @throws QueryException query exception
    */
-  abstract void add(final Update up, final QueryContext qc) throws QueryException;
-
-  /**
-   * Adds an update primitive to this context modifier.
-   * Will be called by {@link #add(Update, QueryContext)}.
-   * @param update update primitive
-   * @throws QueryException query exception
-   */
-  final void add(final Update update) throws QueryException {
+  void add(final Update update, final QueryContext qc) throws QueryException {
     if(update instanceof DataUpdate) {
       final DataUpdate dataUp = (DataUpdate) update;
       final Data data = dataUp.data();
       DataUpdates ups = dbUpdates.get(data);
       if(ups == null) {
-        ups = new DataUpdates(data);
+        ups = new DataUpdates(data, qc);
         dbUpdates.put(data, ups);
       }
       // create temporary mem data instance if not available yet
-      if(tmp == null) tmp = new MemData(data.meta.options);
+      if(tmp == null) tmp = new MemData(qc.context.options);
       ups.add(dataUp, tmp);
     } else {
       final NameUpdate nameUp = (NameUpdate) update;
@@ -78,13 +70,14 @@ public abstract class ContextModifier {
 
   /**
    * Prepares the update operations and adds all databases to be updated to the specified list.
+   * @param qc query context
    * @param datas updated data references
    * @throws QueryException query exception
    */
-  final void prepare(final HashSet<Data> datas) throws QueryException {
+  final void prepare(final HashSet<Data> datas, final QueryContext qc) throws QueryException {
     for(final DataUpdates up : dbUpdates.values()) {
       // create temporary mem data instance if not available yet
-      if(tmp == null) tmp = new MemData(up.data().meta.options);
+      if(tmp == null) tmp = new MemData(qc.context.options);
       up.prepare(tmp);
       datas.add(up.data());
     }

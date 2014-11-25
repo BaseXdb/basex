@@ -19,7 +19,6 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
-import org.basex.util.options.*;
 
 /**
  * This class provides access to all kinds of resources (databases, documents, database connections,
@@ -383,24 +382,13 @@ public final class QueryResources {
     if(single && source.isDir()) WHICHRES_X.get(info, baseIO);
 
     // overwrite parsing options with default values
-    final MainOptions opts = context.options;
-    final Option<?>[] options = { MainOptions.SKIPCORRUPT, MainOptions.ADDARCHIVES,
-        MainOptions.ADDRAW, MainOptions.PARSER, MainOptions.CREATEFILTER };
-    final Object[] values = new Object[options.length];
-    final int ol = options.length;
-    for(int o = 0; o < ol; o++) {
-      final Option<?> option = options[o];
-      values[o] = opts.get(option);
-      opts.put(option, option.value());
-    }
+    final MainOptions mo = new MainOptions(context.options);
     try {
-      final boolean fc = context.options.get(MainOptions.FORCECREATE);
-      return addData(CreateDB.create(source.dbname(), new DirParser(source, opts), context, !fc));
+      final boolean fc = mo.get(MainOptions.FORCECREATE);
+      return addData(CreateDB.create(source.dbname(), new DirParser(source, mo), context, !fc));
     } catch(final IOException ex) {
       throw IOERR_X.get(info, ex);
     } finally {
-      // reset original values
-      for(int o = 0; o < ol; o++) opts.put(options[o], values[o]);
       input.path = "";
     }
   }

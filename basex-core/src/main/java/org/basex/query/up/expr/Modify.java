@@ -78,7 +78,7 @@ public final class Modify extends Arr {
       final Value v = qc.value(exprs[1]);
       if(!v.isEmpty()) throw BASEX_MOD.get(info);
 
-      updates.prepare();
+      updates.prepare(qc);
       updates.apply();
       return qc.value;
     } finally {

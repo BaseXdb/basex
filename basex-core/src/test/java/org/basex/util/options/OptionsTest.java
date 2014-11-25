@@ -36,13 +36,13 @@ public class OptionsTest extends SandboxTest {
   @Test
   public void writeBack() throws Exception {
     final BooleanOption name = MainOptions.WRITEBACK;
-    context.options.set(name, true);
 
     final String input = "<a/>";
     final IOFile file = new IOFile(Prop.TMP + NAME + '/' + NAME);
     file.write(Token.token(input));
 
     // check if original file will be updated
+    context.options.set(name, true);
     try {
       new XQuery("delete node doc('" + file + "')/a").execute(context);
       assertEquals("", Token.string(file.read()));

@@ -14,7 +14,7 @@ import org.basex.util.*;
 public final class DbFlush extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    qc.resources.updates().add(new DBFlush(checkData(qc), info), qc);
+    qc.resources.updates().add(new DBFlush(checkData(qc), info, qc), qc);
     return null;
   }
 }

@@ -22,6 +22,6 @@ final class DatabaseModifier extends ContextModifier {
     } else if(!qc.context.perm(Perm.WRITE, ((DataUpdate) up).data().meta)) {
       throw BASX_PERM_X.get(up.info(), Perm.WRITE);
     }
-    add(up);
+    super.add(up, qc);
   }
 }

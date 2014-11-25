@@ -43,15 +43,19 @@ final class DataUpdates {
    * after updates have been carried out. */
   private final IntObjMap<Put> puts = new IntObjMap<>();
 
+  /** Write databases back to disk. */
+  private boolean writeback;
   /** Number of updates. */
   private int size;
 
   /**
    * Constructor.
    * @param data data reference
+   * @param qc query context
    */
-  DataUpdates(final Data data) {
+  DataUpdates(final Data data, final QueryContext qc) {
     this.data = data;
+    writeback = qc.context.options.get(MainOptions.WRITEBACK);
   }
 
   /**
@@ -171,8 +175,7 @@ final class DataUpdates {
     for(final Put put : puts.values()) put.apply();
 
     // optional: write main memory databases of file instances back to disk
-    if(data.inMemory() && !data.meta.original.isEmpty() &&
-        data.meta.options.get(MainOptions.WRITEBACK)) {
+    if(data.inMemory() && !data.meta.original.isEmpty() && writeback) {
       try {
         Export.export(data, data.meta.original, null);
       } catch(final IOException ex) {

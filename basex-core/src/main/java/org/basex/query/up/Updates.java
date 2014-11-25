@@ -114,12 +114,13 @@ public final class Updates {
 
   /**
    * Prepares update operations.
+   * @param qc query context
    * @return updated data references
    * @throws QueryException query exception
    */
-  public HashSet<Data> prepare() throws QueryException {
+  public HashSet<Data> prepare(final QueryContext qc) throws QueryException {
     final HashSet<Data> datas = new HashSet<>();
-    if(mod != null) mod.prepare(datas);
+    if(mod != null) mod.prepare(datas, qc);
     return datas;
   }
 

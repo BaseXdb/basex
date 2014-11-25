@@ -30,8 +30,6 @@ public final class MainOptions extends Options {
   public static final BooleanOption SKIPCORRUPT = new BooleanOption("SKIPCORRUPT", false);
   /** Flag for adding remaining files as raw files. */
   public static final BooleanOption ADDRAW = new BooleanOption("ADDRAW", false);
-  /** Cache new documents before adding them to a database. */
-  public static final BooleanOption ADDCACHE = new BooleanOption("ADDCACHE", false);
   /** Define CSV parser options. */
   public static final OptionsOption<CsvParserOptions> CSVPARSER =
       new OptionsOption<>("CSVPARSER", new CsvParserOptions());
@@ -62,6 +60,11 @@ public final class MainOptions extends Options {
   public static final BooleanOption XINCLUDE = new BooleanOption("XINCLUDE", true);
   /** Path to XML Catalog file. */
   public static final StringOption CATFILE = new StringOption("CATFILE", "");
+
+  // Adding documents
+
+  /** Cache new documents before adding them to a database. */
+  public static final BooleanOption ADDCACHE = new BooleanOption("ADDCACHE", false);
 
   // Indexing
 
@@ -158,6 +161,9 @@ public final class MainOptions extends Options {
   /** Hidden: maximum number of hits to be displayed in the GUI (will be overwritten). */
   public static final NumberOption MAXHITS = new NumberOption("MAXHITS", -1);
 
+  /** Options that are adopted from parent options. */
+  private static final Option<?>[] PARENT = { CHOP, INTPARSE, STRIPNS, DTD, XINCLUDE, CATFILE };
+
   /** Parser. */
   public enum MainParser {
     /** XML.  */ XML,
@@ -174,9 +180,26 @@ public final class MainOptions extends Options {
   }
 
   /**
-   * Constructor.
+   * Default constructor.
    */
   public MainOptions() {
-    setSystem();
+    this(true);
+  }
+
+  /**
+   * Default constructor.
+   * @param system parse system properties
+   */
+  public MainOptions(final boolean system) {
+    if(system) setSystem();
+  }
+
+  /**
+   * Constructor.
+   * @param options parent options
+   */
+  public MainOptions(final MainOptions options) {
+    this(false);
+    for(final Option<?> o : PARENT) put(o, options.get(o));
   }
 }

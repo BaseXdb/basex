@@ -2,6 +2,7 @@ package org.basex.query.up.primitives;
 
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
 
@@ -12,13 +13,18 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class DBFlush extends DBUpdate {
+  /** Autoflush option. */
+  private boolean autoflush;
+
   /**
    * Constructor.
    * @param data data
    * @param info input info
+   * @param qc query context
    */
-  public DBFlush(final Data data, final InputInfo info) {
+  public DBFlush(final Data data, final InputInfo info, final QueryContext qc) {
     super(UpdateType.DBFLUSH, data, info);
+    autoflush = qc.context.options.get(MainOptions.AUTOFLUSH);
   }
 
   @Override
@@ -26,7 +32,7 @@ public final class DBFlush extends DBUpdate {
 
   @Override
   public void apply() {
-    if(!data.meta.options.get(MainOptions.AUTOFLUSH)) data.flush(true);
+    if(!autoflush) data.flush(true);
   }
 
   @Override

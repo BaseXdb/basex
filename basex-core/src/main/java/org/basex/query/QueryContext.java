@@ -339,7 +339,7 @@ public final class QueryContext extends Proc implements AutoCloseable {
           final ValueBuilder output = resources.output;
 
           // copy nodes that will be affected by an update operation
-          final HashSet<Data> datas = updates.prepare();
+          final HashSet<Data> datas = updates.prepare(this);
           final StringList dbs = updates.databases();
           copy(cache, datas, dbs);
           copy(output, datas, dbs);
