@@ -612,9 +612,9 @@ public final class EditorView extends View {
         } catch(final InputException ex) {
           if(valid) {
             valid = false;
-            final Boolean binary = BaseXDialog.yesNoCancel(gui, H_FILE_BINARY);
-            if(binary == null) return null;
-            if(binary) {
+            final String action = BaseXDialog.yesNoCancel(gui, H_FILE_BINARY);
+            if(action == null) return null;
+            if(action == YES) {
               try {
                 file.open();
               } catch(final IOException ioex) {
@@ -825,10 +825,7 @@ public final class EditorView extends View {
    */
   public boolean confirm() {
     // save modified files
-    for(final EditorArea edit : editors()) {
-      tabs.setSelectedComponent(edit);
-      if(!confirm(edit)) return false;
-    }
+    if(!confirm(null)) return false;
     // remember opened files
     final StringList files = new StringList();
     for(final EditorArea edit : editors()) {
@@ -1005,13 +1002,21 @@ public final class EditorView extends View {
 
   /**
    * Shows a quit dialog for the specified editor.
-   * @param edit editor to be saved
+   * @param edit editor to be saved, or {@code null} to save all editors
    * @return {@code false} if confirmation was canceled
    */
   private boolean confirm(final EditorArea edit) {
-    if(edit.modified() && (edit.opened() || edit.getText().length != 0)) {
-      final Boolean ok = BaseXDialog.yesNoCancel(gui, Util.info(CLOSE_FILE_X, edit.file().name()));
-      if(ok == null || ok && !save()) return false;
+    final boolean all = edit == null;
+    final String[] buttons = all ? new String[] { CLOSE_ALL } : new String[0];
+
+    for(final EditorArea editor : all ? editors() : new EditorArea[] { edit }) {
+      tabs.setSelectedComponent(editor);
+      if(editor.modified() && (editor.opened() || editor.getText().length != 0)) {
+        final String msg = Util.info(CLOSE_FILE_X, editor.file().name());
+        final String action = BaseXDialog.yesNoCancel(gui, msg, buttons);
+        if(action == null || action.equals(B_YES) && !save()) return false;
+        else if(action.equals(CLOSE_ALL)) break;
+      }
     }
     return true;
   }

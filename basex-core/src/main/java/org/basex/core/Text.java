@@ -1210,6 +1210,8 @@ public interface Text {
   String DELETE_FILE_X = lang("delete_file_%");
   /** Dialog title for reopening a file. */
   String REOPEN_FILE_X = lang("reopen_file_%");
+  /** Close all. */
+  String CLOSE_ALL = lang("close_all");
 
   /** Dialog title for exporting nodes. */
   String OUTPUT_DIR = lang("output_dir");

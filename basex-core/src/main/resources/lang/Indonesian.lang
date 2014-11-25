@@ -42,6 +42,7 @@ chop_ws              = Potong kelebihan spasi
 chopped              = terpotong
 clear                = Hapus
 close                = Tutup
+close_all            = Tutup semua
 close_file_%         = Simpan perubahan ke %?
 color_schema         = Skema Warna
 colors               = Warna

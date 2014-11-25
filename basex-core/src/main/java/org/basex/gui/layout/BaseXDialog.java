@@ -216,15 +216,14 @@ public abstract class BaseXDialog extends JDialog {
   }
 
   /**
-   * Static yes/no dialog. Returns a {@code null} reference if the dialog
-   * was canceled.
+   * Static yes/no dialog. Returns a {@code null} reference if the dialog was canceled.
    * @param gui parent reference
    * @param text text
+   * @param buttons additional buttons
    * @return true if dialog was confirmed
    */
-  public static Boolean yesNoCancel(final GUI gui, final String text) {
-    final DialogMessage msg = new DialogMessage(gui, text.trim(), Msg.YESNOCANCEL);
-    return msg.canceled() ? null : msg.ok();
+  public static String yesNoCancel(final GUI gui, final String text, final String... buttons) {
+    return new DialogMessage(gui, text.trim(), Msg.YESNOCANCEL, buttons).action();
   }
 
   /**

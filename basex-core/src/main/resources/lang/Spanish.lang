@@ -42,6 +42,7 @@ chop_ws              = Eliminar espacios en blanco
 chopped              = Eliminado
 clear                = Borrar
 close                = Cerrar
+close_all            = Cerrar todo
 close_file_%         = ¿Salvar cambios a %?
 color_schema         = Esquema de Color
 colors               = Colores

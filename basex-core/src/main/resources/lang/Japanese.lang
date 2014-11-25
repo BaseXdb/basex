@@ -42,6 +42,7 @@ chop_ws              = 空白を取り除く
 chopped              = 省略されました
 clear                = クリア
 close                = 閉じる
+close_all            = 全て閉じる
 close_file_%         = % への変更を保存しますか？
 color_schema         = カラースキーマ
 colors               = 色

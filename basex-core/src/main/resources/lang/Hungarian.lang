@@ -42,6 +42,7 @@ chop_ws              = Nem látható karakterek levágása
 chopped              = Levágva
 clear                = Tisztítás
 close                = Bezárás
+close_all            = Összes bezárás
 close_file_%         = Menti a(z) % változásait?
 color_schema         = Színséma
 colors               = Színek

@@ -42,6 +42,7 @@ chop_ws              = Verwijder whitespaces
 chopped              = Afgekapt
 clear                = Clear
 close                = Sluit
+close_all            = Sluit alle
 close_file_%         = Bewaar wijzigingen in %?
 color_schema         = Kleurenschema
 colors               = Kleuren

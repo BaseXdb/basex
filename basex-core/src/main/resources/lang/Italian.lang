@@ -42,6 +42,7 @@ chop_ws              = Taglia gli spazi
 chopped              = tagliato
 clear                = Pulisci
 close                = Chiudi
+close_all            = Chiudi tutti
 close_file_%         = Salva in %?
 color_schema         = Combinazione di colori
 colors               = Colori

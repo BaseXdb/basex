@@ -42,6 +42,7 @@ chop_ws              = Вырезать пробелы
 chopped              = Урезано
 clear                = Очистить
 close                = Закрыть
+close_all            = Закрыть все
 close_file_%         = Сохранить изменения в файле '%'?
 color_schema         = Цветовая схема
 colors               = Цвета

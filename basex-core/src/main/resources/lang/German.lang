@@ -42,6 +42,7 @@ chop_ws              = Leerzeichen entfernen
 chopped              = Gekürztes
 clear                = Leeren
 close                = Schließen
+close_all            = Alle schließen
 close_file_%         = Änderungen speichern in %?
 color_schema         = Farbschema
 colors               = Farben

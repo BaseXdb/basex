@@ -1,6 +1,7 @@
 package org.basex.gui.dialog;
 
 import java.awt.*;
+import java.util.*;
 
 import javax.swing.*;
 
@@ -18,55 +19,49 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class DialogMessage extends BaseXDialog {
-  /** Ok/yes button. */
-  private final BaseXButton yes;
-
-  /** This flag indicates if the dialog was canceled. */
-  private boolean canceled = true;
-  /** No button. */
-  private BaseXButton no;
+  /** Taken action. */
+  private String action;
 
   /**
    * Default constructor.
    * @param main reference to the main window
    * @param txt message text
    * @param ic message type
+   * @param buttons additional buttons
    */
-  public DialogMessage(final GUI main, final String txt, final Msg ic) {
+  public DialogMessage(final GUI main, final String txt, final Msg ic, final String... buttons) {
     super(main, ic == Msg.ERROR ? Text.ERROR : Text.INFORMATION);
 
     panel.setLayout(new BorderLayout());
 
     final BaseXBack back = new BaseXBack(new TableLayout(1, 2, 12, 0));
-    final BaseXLabel b = new BaseXLabel();
-    b.setIcon(ic.large);
-    back.add(b);
+    final BaseXLabel label = new BaseXLabel();
+    label.setIcon(ic.large);
+    back.add(label);
 
     final TextPanel text = new TextPanel(Token.token(txt), false, this);
-    text.setFont(b.getFont());
+    text.setFont(label.getFont());
     back.add(text);
 
     set(back, BorderLayout.NORTH);
 
-    final BaseXBack buttons;
+    final ArrayList<Object> list = new ArrayList<>();
     if(ic == Msg.QUESTION || ic == Msg.YESNOCANCEL) {
-      yes = new BaseXButton(Text.B_YES, this);
-      no = new BaseXButton(Text.B_NO, this);
-      if(ic == Msg.QUESTION) {
-        buttons = newButtons(yes, no);
-      } else {
-        buttons = newButtons(yes, no, new BaseXButton(Text.CANCEL, this));
-      }
+      list.add(Text.B_YES);
+      list.add(Text.B_NO);
+      for(final String b : buttons) list.add(b);
+      if(ic == Msg.YESNOCANCEL) list.add(Text.CANCEL);
     } else {
-      yes = new BaseXButton(Text.B_OK, this);
-      buttons = newButtons(yes);
+      for(final String b : buttons) list.add(b);
+      list.add(Text.B_OK);
     }
-    set(buttons, BorderLayout.SOUTH);
+    final BaseXBack bttns = newButtons(list.toArray(new Object[list.size()]));
+    set(bttns, BorderLayout.SOUTH);
 
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        yes.requestFocusInWindow();
+        ((Container) bttns.getComponent(0)).getComponent(0).requestFocusInWindow();
       }
     });
 
@@ -75,16 +70,23 @@ public final class DialogMessage extends BaseXDialog {
 
   @Override
   public void action(final Object cmp) {
-    canceled = cmp != yes && cmp != no;
-    if(cmp == yes) close();
-    else cancel();
+    final BaseXButton button = (BaseXButton) cmp;
+    final String text = button.getText();
+    if(text.equals(Text.CANCEL)) cancel();
+
+    action = text;
+    if(text.equals(Text.NO)) {
+      cancel();
+    } else {
+      close();
+    }
   }
 
   /**
-   * States if the dialog window was canceled.
-   * @return true when dialog was confirmed
+   * Returns the chosen action.
+   * @return action
    */
-  public boolean canceled() {
-    return canceled;
+  public String action() {
+    return action;
   }
 }

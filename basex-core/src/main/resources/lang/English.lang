@@ -42,6 +42,7 @@ chop_ws              = Chop whitespaces
 chopped              = Chopped
 clear                = Clear
 close                = Close
+close_all            = Close all
 close_file_%         = Save changes to %?
 color_schema         = Color Schema
 colors               = Colors

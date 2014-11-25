@@ -42,6 +42,7 @@ chop_ws              = Taie spaţiile goale
 chopped              = Tocate
 clear                = Șterge
 close                = Închidere
+close_all            = Închidere tot
 close_file_%         = Salvaţi modificările la %?
 color_schema         = Schemă de culori
 colors               = Culori
