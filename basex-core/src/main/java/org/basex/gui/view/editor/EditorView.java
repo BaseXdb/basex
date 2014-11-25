@@ -1007,12 +1007,13 @@ public final class EditorView extends View {
    */
   private boolean confirm(final EditorArea edit) {
     final boolean all = edit == null;
-    final String[] buttons = all ? new String[] { CLOSE_ALL } : new String[0];
+    final EditorArea[] eas = all ? editors() : new EditorArea[] { edit };
+    final String[] buttons = all && eas.length > 1 ? new String[] { CLOSE_ALL } : new String[0];
 
-    for(final EditorArea editor : all ? editors() : new EditorArea[] { edit }) {
-      tabs.setSelectedComponent(editor);
-      if(editor.modified() && (editor.opened() || editor.getText().length != 0)) {
-        final String msg = Util.info(CLOSE_FILE_X, editor.file().name());
+    for(final EditorArea ea : eas) {
+      tabs.setSelectedComponent(ea);
+      if(ea.modified() && (ea.opened() || ea.getText().length != 0)) {
+        final String msg = Util.info(CLOSE_FILE_X, ea.file().name());
         final String action = BaseXDialog.yesNoCancel(gui, msg, buttons);
         if(action == null || action.equals(B_YES) && !save()) return false;
         else if(action.equals(CLOSE_ALL)) break;
