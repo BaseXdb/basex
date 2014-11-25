@@ -118,13 +118,13 @@ public final class HtmlParser extends XMLParser {
       // set TagSoup options
       if(opts.get(HtmlOptions.HTML)) {
         reader.setFeature("http://xml.org/sax/features/namespaces", false);
-        opt("method", "html");
-        opt("omit-xml-declaration", "yes");
+        opt(writer, "method", "html");
+        opt(writer, "omit-xml-declaration", "yes");
       }
       if(opts.get(HtmlOptions.NONS))
         reader.setFeature("http://xml.org/sax/features/namespaces", false);
       if(opts.get(HtmlOptions.OMITXML))
-        opt("omit-xml-declaration", "yes");
+        opt(writer, "omit-xml-declaration", "yes");
       if(opts.get(HtmlOptions.NOBOGONS))
         reader.setFeature(FEATURES + "ignore-bogons", true);
       if(opts.get(HtmlOptions.NODEFAULTS))
@@ -146,11 +146,11 @@ public final class HtmlParser extends XMLParser {
       if(opts.get(HtmlOptions.LEXICAL))
         reader.setProperty("http://xml.org/sax/properties/lexical-handler", writer);
       if(opts.contains(HtmlOptions.METHOD))
-        opt("method", opts.get(HtmlOptions.METHOD));
+        opt(writer, "method", opts.get(HtmlOptions.METHOD));
       if(opts.contains(HtmlOptions.DOCTYPESYS))
-        opt("doctype-system", opts.get(HtmlOptions.DOCTYPESYS));
+        opt(writer, "doctype-system", opts.get(HtmlOptions.DOCTYPESYS));
       if(opts.contains(HtmlOptions.DOCTYPEPUB))
-        opt("doctype-public", opts.get(HtmlOptions.DOCTYPEPUB));
+        opt(writer, "doctype-public", opts.get(HtmlOptions.DOCTYPEPUB));
       if(opts.contains(HtmlOptions.ENCODING))
         is.setEncoding(opts.get(HtmlOptions.ENCODING));
       // end TagSoup options
@@ -167,10 +167,11 @@ public final class HtmlParser extends XMLParser {
 
   /**
    * Reflection invoke XMLWriter.setOutputProperty().
+   * @param writer writer instance
    * @param name property
    * @param value value
    */
-  private static void opt(final String name, final String value) {
-    Reflect.invoke(METHOD, WRITER, name, value);
+  private static void opt(final Object writer, final String name, final String value) {
+    Reflect.invoke(METHOD, writer, name, value);
   }
 }
