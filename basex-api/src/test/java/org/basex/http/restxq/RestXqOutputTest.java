@@ -38,5 +38,13 @@ public final class RestXqOutputTest extends RestXqTest {
         "  <http:response status='200'/>" +
         "</R:response>," +
         "<X>1</X> };", "", "<X>1</X>");
+    getE("declare %R:path('') %output:method('text') function m:f() {" +
+        "<R:response>" +
+        "  <output:serialization-parameters>" +
+        "    <output:method value='xml'/>" +
+        "  </output:serialization-parameters>" +
+        "  <http:response status='200'/>" +
+        "</R:response>," +
+        "1+<a/> };", "");
   }
 }

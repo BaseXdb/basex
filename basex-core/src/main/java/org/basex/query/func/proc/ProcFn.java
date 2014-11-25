@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.nio.charset.*;
 
+import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -52,7 +53,9 @@ abstract class ProcFn extends StandardFunc {
     try {
       proc = new ProcessBuilder(args).start();
     } catch(final IOException ex) {
-      result.error.add(Util.message(ex));
+      try {
+        result.error.write(token(Util.message(ex)));
+      } catch(final IOException ignored) { }
       result.code = 9999;
       return result;
     }
@@ -66,7 +69,9 @@ abstract class ProcFn extends StandardFunc {
       outt.join();
       errt.join();
     } catch(final InterruptedException ex) {
-      result.error.add(Util.message(ex));
+      try {
+        result.error.write(token(Util.message(ex)));
+      } catch(final IOException ignored) { }
     }
     result.code = proc.exitValue();
     return result;
@@ -75,18 +80,18 @@ abstract class ProcFn extends StandardFunc {
   /**
    * Creates a reader thread.
    * @param in input stream
-   * @param tb cache
+   * @param ao cache
    * @param cs charset
    * @return result
    */
-  private static Thread reader(final InputStream in, final TokenBuilder tb, final Charset cs) {
+  private static Thread reader(final InputStream in, final ArrayOutput ao, final Charset cs) {
     final InputStreamReader isr = new InputStreamReader(in, cs);
     final BufferedReader br = new BufferedReader(isr);
     return new Thread() {
       @Override
       public void run() {
         try {
-          for(int b; (b = br.read()) != -1;) tb.add(b);
+          for(int b; (b = br.read()) != -1;) ao.write(b);
         } catch(final IOException ex) {
           Util.stack(ex);
         }
@@ -95,22 +100,13 @@ abstract class ProcFn extends StandardFunc {
   }
 
   /**
-   * Returns a normalized token from the specified builder.
-   * @param tb token builder
-   * @return output
-   */
-  static byte[] norm(final TokenBuilder tb) {
-    return delete(tb.toArray(), '\r');
-  }
-
-  /**
    * Error object.
    */
   static final class Result {
     /** Process output. */
-    final TokenBuilder output = new TokenBuilder();
+    final ArrayOutput output = new ArrayOutput();
     /** Process error. */
-    final TokenBuilder error = new TokenBuilder();
+    final ArrayOutput error = new ArrayOutput();
     /** Exit code. */
     int code;
   }

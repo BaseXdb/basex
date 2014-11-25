@@ -17,10 +17,13 @@ public final class ProcSystem extends ProcFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Result result = exec(qc);
-    if(result.code == 0) return Str.get(norm(result.output));
+    if(result.code == 0) {
+      return Str.get(result.output.normalize().finish());
+    }
 
     // create error message
     final QNm name = new QNm(ErrType.BXPR + String.format("%04d", result.code));
-    throw new QueryException(info, name, string(norm(result.error)));
+    result.error.normalize();
+    throw new QueryException(info, name, string(result.error.normalize().finish()));
   }
 }

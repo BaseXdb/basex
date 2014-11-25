@@ -69,7 +69,7 @@ public final class HttpPayload {
       throws IOException, QueryException {
 
     // error: use text/plain as content type
-    final String ct = error ? TEXT_PLAIN : utype != null ? utype : contentType(ctype);
+    final String ct = utype == null || error ? contentType(ctype) : utype;
 
     final FElem body;
     if(isMultipart(ct)) {

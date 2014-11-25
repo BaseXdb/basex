@@ -28,8 +28,8 @@ public final class ProcExecute extends ProcFn {
     final Result result = exec(qc);
 
     final FElem root = new FElem(RESULT);
-    root.add(new FElem(OUTPUT).add(norm(result.output)));
-    root.add(new FElem(ERROR).add(norm(result.error)));
+    root.add(new FElem(OUTPUT).add(result.output.normalize().finish()));
+    root.add(new FElem(ERROR).add(result.error.normalize().finish()));
     root.add(new FElem(CODE).add(token(result.code)));
     return root;
   }

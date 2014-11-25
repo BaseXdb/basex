@@ -19,6 +19,7 @@ import org.basex.build.*;
 import org.basex.build.JsonOptions.JsonFormat;
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.server.*;
 import org.basex.util.*;
@@ -229,7 +230,12 @@ public final class HTTPContext {
         res.sendError(code, message);
       } else {
         res.setStatus(code);
-        if(message != null) res.getOutputStream().write(token(message));
+        if(message != null) {
+          res.setContentType(TEXT_PLAIN);
+          final ArrayOutput ao = new ArrayOutput();
+          ao.write(token(message));
+          res.getOutputStream().write(ao.normalize().finish());
+        }
       }
     } catch(final IllegalStateException ex) {
       log(Util.message(ex), SC_INTERNAL_SERVER_ERROR);

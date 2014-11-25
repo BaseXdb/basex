@@ -23,9 +23,32 @@ public final class ArrayOutput extends PrintOutput {
   public void write(final int value) {
     final int s = (int) size;
     if(s == max) return;
-    if(s == buffer.length) buffer = Arrays.copyOf(buffer, Array.newSize(s));
-    buffer[s] = (byte) value;
+
+    byte[] bffr = buffer;
+    if(s == bffr.length) bffr = Arrays.copyOf(bffr, Array.newSize(s));
+    bffr[s] = (byte) value;
+    buffer = bffr;
     size = s + 1;
+  }
+
+  /**
+   * Normalizes newlines in the byte array.
+   * @return self reference
+   */
+  public ArrayOutput normalize() {
+    final byte[] bffr = buffer;
+    final int s = (int) size;
+    int n = 0;
+    for(int o = 0; o < s; o++) {
+      byte ch = bffr[o];
+      if(ch == '\r') {
+        ch = '\n';
+        if(o + 1 < s && bffr[o + 1] == '\n') o++;
+      }
+      bffr[n++] = ch;
+    }
+    size = n;
+    return this;
   }
 
   /**

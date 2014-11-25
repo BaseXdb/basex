@@ -117,7 +117,7 @@ public abstract class StandardFunc extends Arr {
       final Serializer ser = Serializer.get(ao, opts);
       for(Item it; (it = ir.next()) != null;) ser.serialize(it);
       ser.close();
-      return delete(ao.finish(), '\r');
+      return ao.normalize().finish();
     } catch(final QueryIOException ex) {
       throw ex.getCause(info);
     } catch(final IOException ex) {
