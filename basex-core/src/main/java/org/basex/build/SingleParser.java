@@ -29,7 +29,7 @@ public abstract class SingleParser extends Parser {
   @Override
   public final void parse(final Builder build) throws IOException {
     builder = build;
-    builder.openDoc(token(target + src.name()));
+    builder.openDoc(token(target + source.name()));
     parse();
     builder.closeDoc();
   }

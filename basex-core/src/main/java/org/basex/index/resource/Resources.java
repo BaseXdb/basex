@@ -2,6 +2,7 @@ package org.basex.index.resource;
 
 import java.io.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.data.atomic.*;
 import org.basex.index.*;
@@ -170,7 +171,7 @@ public final class Resources implements Index {
   }
 
   @Override
-  public byte[] info() {
+  public byte[] info(final MainOptions options) {
     throw Util.notExpected();
   }
 

@@ -3,6 +3,7 @@ package org.basex.query.expr.ft;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.ft.FTFlag.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
@@ -121,26 +122,27 @@ public final class FTWords extends FTExpr {
       @Override
       public FTNode next() throws QueryException {
         if(ftiter == null) {
-          final FTLexer lex = new FTLexer(ftt.opt);
+          final FTLexer lexer = new FTLexer(ftt.opt);
+          lexer.lserror(qc.context.options.get(MainOptions.LSERROR));
 
           // index iterator tree
           // number of distinct tokens
           int t = 0;
           // loop through unique tokens
           for(final byte[] k : unique(tokens != null ? tokens : tokens(qc))) {
-            lex.init(k);
-            if(!lex.hasNext()) return null;
+            lexer.init(k);
+            if(!lexer.hasNext()) return null;
 
             int d = 0;
             FTIndexIterator ii = null;
             do {
-              final byte[] tok = lex.nextToken();
+              final byte[] tok = lexer.nextToken();
               t += tok.length;
               if(ftt.opt.sw != null && ftt.opt.sw.contains(tok)) {
                 ++d;
               } else {
-                final FTIndexIterator ir = lex.get().length > data.meta.maxlen ? scan(lex) :
-                  (FTIndexIterator) data.iter(lex);
+                final FTIndexIterator ir = lexer.get().length > data.meta.maxlen ? scan(lexer) :
+                  (FTIndexIterator) data.iter(lexer);
                 ir.pos(++qc.ftPos);
                 if(ii == null) {
                   ii = ir;
@@ -149,7 +151,7 @@ public final class FTWords extends FTExpr {
                   d = 0;
                 }
               }
-            } while(lex.hasNext());
+            } while(lexer.hasNext());
 
             // create or combine iterator
             if(ftiter == null) {

@@ -88,13 +88,14 @@ public abstract class ANode extends Item {
 
   /**
    * Returns a deep copy of the node.
+   * @param opts main options
    * @return node copy
    */
-  public abstract ANode deepCopy();
+  public abstract ANode deepCopy(final MainOptions opts);
 
   /**
    * Returns a database node representation of the node.
-   * @param opts database options
+   * @param opts main options
    * @return database node
    */
   public DBNode dbCopy(final MainOptions opts) {
@@ -492,7 +493,7 @@ public abstract class ANode extends Item {
 
   @Override
   public final BXNode toJava() {
-    return BXNode.get(deepCopy());
+    return BXNode.get(deepCopy(new MainOptions()));
   }
 
   /**

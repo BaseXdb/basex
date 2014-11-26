@@ -106,42 +106,43 @@ public final class OptimizeAll extends ACreate {
 
     // find unique temporary database name
     final String tname = ctx.globalopts.random(m.name);
+    final MainOptions options = ctx.options;
 
     // adopt original meta information
-    ctx.options.set(MainOptions.CHOP, m.chop);
+    options.set(MainOptions.CHOP, m.chop);
     // adopt original index options
-    ctx.options.set(MainOptions.UPDINDEX, m.updindex);
-    ctx.options.set(MainOptions.MAXCATS,  m.maxcats);
-    ctx.options.set(MainOptions.MAXLEN,   m.maxlen);
+    options.set(MainOptions.UPDINDEX, m.updindex);
+    options.set(MainOptions.MAXCATS,  m.maxcats);
+    options.set(MainOptions.MAXLEN,   m.maxlen);
     // adopt original full-text index options
-    ctx.options.set(MainOptions.STEMMING,   m.stemming);
-    ctx.options.set(MainOptions.CASESENS,   m.casesens);
-    ctx.options.set(MainOptions.DIACRITICS, m.diacritics);
-    ctx.options.set(MainOptions.LANGUAGE,   m.language.toString());
-    ctx.options.set(MainOptions.STOPWORDS,  m.stopwords);
+    options.set(MainOptions.STEMMING,   m.stemming);
+    options.set(MainOptions.CASESENS,   m.casesens);
+    options.set(MainOptions.DIACRITICS, m.diacritics);
+    options.set(MainOptions.LANGUAGE,   m.language.toString());
+    options.set(MainOptions.STOPWORDS,  m.stopwords);
 
     // build database and index structures
-    try(final DiskBuilder builder = new DiskBuilder(tname, new DBParser(old, cmd), ctx)) {
-      final DiskData d = builder.build();
+    try(final DiskBuilder builder = new DiskBuilder(tname, new DBParser(old, options, cmd), ctx)) {
+      final DiskData dt = builder.build();
       try {
-        if(m.createtext) create(IndexType.TEXT, d, cmd);
-        if(m.createattr) create(IndexType.ATTRIBUTE, d, cmd);
-        if(m.createftxt) create(IndexType.FULLTEXT, d, cmd);
+        if(m.createtext) create(IndexType.TEXT, dt, options, cmd);
+        if(m.createattr) create(IndexType.ATTRIBUTE, dt, options, cmd);
+        if(m.createftxt) create(IndexType.FULLTEXT, dt, options, cmd);
         // adopt original meta data
-        d.meta.createtext = m.createtext;
-        d.meta.createattr = m.createattr;
-        d.meta.createftxt = m.createftxt;
-        d.meta.filesize   = m.filesize;
-        d.meta.users      = m.users;
-        d.meta.dirty      = true;
+        dt.meta.createtext = m.createtext;
+        dt.meta.createattr = m.createattr;
+        dt.meta.createftxt = m.createftxt;
+        dt.meta.filesize   = m.filesize;
+        dt.meta.users      = m.users;
+        dt.meta.dirty      = true;
 
         // move binary files
         final IOFile bin = data.meta.binaries();
-        if(bin.exists()) bin.rename(d.meta.binaries());
+        if(bin.exists()) bin.rename(dt.meta.binaries());
         final IOFile upd = old.updateFile();
-        if(upd.exists()) upd.copyTo(d.updateFile());
+        if(upd.exists()) upd.copyTo(dt.updateFile());
       } finally {
-        d.close();
+        dt.close();
       }
     }
     // return database instance
@@ -167,10 +168,11 @@ public final class OptimizeAll extends ACreate {
     /**
      * Constructor.
      * @param data disk data
+     * @param options main options
      * @param cmd calling command (may be {@code null})
      */
-    DBParser(final DiskData data, final OptimizeAll cmd) {
-      super(data.meta.original.isEmpty() ? null : IO.get(data.meta.original), data.meta.options);
+    DBParser(final DiskData data, final MainOptions options, final OptimizeAll cmd) {
+      super(data.meta.original.isEmpty() ? null : IO.get(data.meta.original), options);
       this.data = data;
       this.cmd = cmd;
     }

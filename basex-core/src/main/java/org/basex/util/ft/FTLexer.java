@@ -24,6 +24,8 @@ public final class FTLexer extends FTIterator implements IndexToken {
   private final FTOpt ftopt;
   /** Text to be tokenized. */
   private byte[] text = Token.EMPTY;
+  /** Levenshtein error. */
+  private int lserror;
 
   /** Iterator over result tokens. */
   private FTIterator iter;
@@ -42,13 +44,13 @@ public final class FTLexer extends FTIterator implements IndexToken {
 
   /**
    * Default constructor.
-   * @param opt full-text options
+   * @param ftoptions full-text options
    */
-  public FTLexer(final FTOpt opt) {
-    ftopt = opt;
+  public FTLexer(final FTOpt ftoptions) {
+    this.ftopt = ftoptions;
 
     // check if language option is provided:
-    Language lang = opt != null ? opt.ln : null;
+    Language lang = ftoptions != null ? ftoptions.ln : null;
     if(lang == null) lang = Language.def();
 
     // use default tokenizer if specific tokenizer is not available.
@@ -59,12 +61,12 @@ public final class FTLexer extends FTIterator implements IndexToken {
         break;
       }
     }
-    tok = tk.get(opt);
+    tok = tk.get(ftoptions);
     iter = tok;
 
     // wrap original iterator
-    if(opt != null && opt.is(FTFlag.ST)) {
-      if(opt.sd == null) {
+    if(ftoptions != null && ftoptions.is(FTFlag.ST)) {
+      if(ftoptions.sd == null) {
         // use default stemmer if specific stemmer is not available.
         Stemmer st = Stemmer.IMPL.getFirst();
         for(final Stemmer stem : Stemmer.IMPL) {
@@ -75,7 +77,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
         }
         iter = st.get(lang, iter);
       } else {
-        iter = new DictionaryStemmer(opt.sd, iter);
+        iter = new DictionaryStemmer(ftoptions.sd, iter);
       }
     }
   }
@@ -95,6 +97,23 @@ public final class FTLexer extends FTIterator implements IndexToken {
    */
   public void init() {
     init(text);
+  }
+
+  /**
+   * Sets the Levenshtein error.
+   * @param ls error
+   */
+  public void lserror(final int ls) {
+    lserror = ls;
+  }
+
+  /**
+   * Returns the Levenshtein error for the specified token.
+   * @param token token
+   * @return error
+   */
+  public int lserror(final byte[] token) {
+    return lserror == 0 ? token.length >> 2 : lserror;
   }
 
   @Override

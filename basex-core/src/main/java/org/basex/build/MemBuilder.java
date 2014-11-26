@@ -43,7 +43,7 @@ public final class MemBuilder extends Builder {
    * @throws IOException I/O exception
    */
   public static MemData build(final Parser parser) throws IOException {
-    return build(parser.src.dbname(), parser);
+    return build(parser.source.dbname(), parser);
   }
 
   /**

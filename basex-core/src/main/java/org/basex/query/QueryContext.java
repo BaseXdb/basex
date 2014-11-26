@@ -345,7 +345,7 @@ public final class QueryContext extends Proc implements AutoCloseable {
           copy(output, datas, dbs);
 
           if(context.data() != null) context.invalidate();
-          updates.apply();
+          updates.apply(this);
 
           // append cached outputs
           if(output.size() != 0) {

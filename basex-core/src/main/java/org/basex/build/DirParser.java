@@ -85,8 +85,8 @@ public final class DirParser extends Parser {
   @Override
   public void parse(final Builder build) throws IOException {
     build.meta.filesize = 0;
-    build.meta.original = src.path();
-    parse(build, src);
+    build.meta.original = source.path();
+    parse(build, source);
   }
 
   /**
@@ -108,15 +108,15 @@ public final class DirParser extends Parser {
         try(final TarInputStream is = new TarInputStream(in)) {
           for(TarEntry ze; (ze = is.getNextEntry()) != null;) {
             if(ze.isDirectory()) continue;
-            src = new IOStream(is, ze.getName());
-            src.length(ze.getSize());
+            source = new IOStream(is, ze.getName());
+            source.length(ze.getSize());
             parseResource(builder);
           }
         }
       } else if(name.endsWith(IO.GZSUFFIX)) {
         // process GZIP archive
         try(final GZIPInputStream is = new GZIPInputStream(in)) {
-          src = new IOStream(is, input.name().replaceAll("\\..*", IO.XMLSUFFIX));
+          source = new IOStream(is, input.name().replaceAll("\\..*", IO.XMLSUFFIX));
           parseResource(builder);
         }
       } else {
@@ -124,15 +124,15 @@ public final class DirParser extends Parser {
         try(final ZipInputStream is = new ZipInputStream(in)) {
           for(ZipEntry ze; (ze = is.getNextEntry()) != null;) {
             if(ze.isDirectory()) continue;
-            src = new IOStream(is, ze.getName());
-            src.length(ze.getSize());
+            source = new IOStream(is, ze.getName());
+            source.length(ze.getSize());
             parseResource(builder);
           }
         }
       }
     } else {
       // process regular file
-      src = input;
+      source = input;
       parseResource(builder);
     }
   }
@@ -146,15 +146,15 @@ public final class DirParser extends Parser {
     b.checkStop();
 
     // add file size for database meta information
-    final long l = src.length();
+    final long l = source.length();
     if(l != -1) b.meta.filesize += l;
 
     // use global target as path prefix
     String targ = target;
-    String path = src.path();
+    String path = source.path();
 
     // add relative path without root (prefix) and file name (suffix)
-    final String name = src.name();
+    final String name = source.name();
     if(path.endsWith('/' + name)) {
       path = path.substring(0, path.length() - name.length());
       if(path.startsWith(root)) path = path.substring(root.length());
@@ -164,38 +164,38 @@ public final class DirParser extends Parser {
     // check if file passes the name filter pattern
     boolean exclude = false;
     if(filter != null) {
-      final String nm = Prop.CASE ? src.name() : src.name().toLowerCase(Locale.ENGLISH);
+      final String nm = Prop.CASE ? source.name() : source.name().toLowerCase(Locale.ENGLISH);
       exclude = !filter.matcher(nm).matches();
     }
 
     if(exclude) {
       // exclude file: check if will be added as raw file
       if(addRaw && rawPath != null) {
-        Store.store(src.inputSource(), new IOFile(rawPath, targ + name));
+        Store.store(source.inputSource(), new IOFile(rawPath, targ + name));
       }
     } else {
       if(rawParser) {
         // store input in raw format if database path is known
         if(rawPath != null) {
-          Store.store(src.inputSource(), new IOFile(rawPath, targ + name));
+          Store.store(source.inputSource(), new IOFile(rawPath, targ + name));
         }
       } else {
         // store input as XML
         boolean ok = true;
-        IO in = src;
+        IO in = source;
         if(skipCorrupt) {
           // parse file twice to ensure that it is well-formed
           try {
             // cache file contents to allow or speed up a second run
-            if(!(src instanceof IOContent || dtd)) {
-              in = new IOContent(src.read());
-              in.name(src.name());
+            if(!(source instanceof IOContent || dtd)) {
+              in = new IOContent(source.read());
+              in.name(source.name());
             }
             parser = Parser.singleParser(in, options, targ);
             MemBuilder.build("", parser);
           } catch(final IOException ex) {
             Util.debug(ex);
-            skipped.add(src.path());
+            skipped.add(source.path());
             ok = false;
           }
         }
@@ -230,14 +230,14 @@ public final class DirParser extends Parser {
 
   @Override
   public String det() {
-    return parser != null ? parser.detail() : src.path();
+    return parser != null ? parser.detail() : source.path();
   }
 
   @Override
   public double prog() {
     if(parser != null) return parser.progress();
-    if(lastSrc == src) return 1;
-    lastSrc = src;
+    if(lastSrc == source) return 1;
+    lastSrc = source;
     return Math.random();
   }
 

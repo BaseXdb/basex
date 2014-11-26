@@ -466,9 +466,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void deleteDocumentNode() throws Exception {
     create(2);
-    context.data().startUpdate();
+    context.data().startUpdate(context.options);
     context.data().delete(0);
-    context.data().finishUpdate();
+    context.data().finishUpdate(context.options);
     final byte[] ns = context.data().nspaces.globalNS();
     assertTrue(ns != null && ns.length == 0);
   }

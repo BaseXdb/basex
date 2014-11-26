@@ -99,7 +99,7 @@ public final class Names extends TokenSet implements Index {
   }
 
   @Override
-  public byte[] info() {
+  public byte[] info(final MainOptions options) {
     final int[] tl = new int[size];
     tl[0] = 0;
     int len = 0;

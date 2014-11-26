@@ -178,8 +178,9 @@ public final class DialogProps extends BaseXDialog {
     }
 
     final Data data = gui.context.data();
-    final boolean[] val = { true, true, true, data.meta.textindex, data.meta.attrindex,
-        data.meta.ftxtindex };
+    final boolean[] val = {
+      true, true, true, data.meta.textindex, data.meta.attrindex, data.meta.ftxtindex
+    };
     final int is = il.size();
     for(int i = 0; i < is; i++) {
       final int idx = il.get(i);
@@ -188,7 +189,8 @@ public final class DialogProps extends BaseXDialog {
       new Thread() {
         @Override
         public void run() {
-          infos[idx].setText(val[idx] ? data.info(TYPES[idx]) : Token.token(HELP[idx]));
+          infos[idx].setText(val[idx] ? data.info(TYPES[idx], gui.context.options) :
+            Token.token(HELP[idx]));
           updated.delete(idx);
         }
       }.start();

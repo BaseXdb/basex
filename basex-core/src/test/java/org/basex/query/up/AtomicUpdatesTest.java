@@ -68,7 +68,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   public void treeAwareUpdates0() {
     final String doc = "<n1>" + "<n2 att3='0'><n4/><n5><n6/></n5></n2>" + "</n1>";
     final AtomicUpdateCache auc = atomics(doc);
-    final MemData m = new MemData(auc.data);
+    final MemData m = new MemData(auc.data, context.options);
     final DataClip ins = clipE(m, "<d/>", false);
     auc.addDelete(2);
     auc.addInsert(3, 2, ins);
@@ -95,7 +95,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   public void treeAwareUpdates1() {
     final String doc = "<a><b/></a>";
     final AtomicUpdateCache auc = atomics(doc);
-    final MemData m = new MemData(auc.data);
+    final MemData m = new MemData(auc.data, context.options);
     auc.addDelete(2);
     auc.addInsert(3, 2, clipE(m, "<c/>", false));
     assertEquals(1, auc.updatesSize());
@@ -110,7 +110,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   public void treeAwareUpdates2() {
     final String doc = "<a><b/></a>";
     final AtomicUpdateCache auc = atomics(doc);
-    final MemData m = new MemData(auc.data);
+    final MemData m = new MemData(auc.data, context.options);
     auc.addDelete(2);
     auc.addInsert(3, 2, clipE(m, "<c/>", false));
     auc.addInsert(3, 1, clipE(m, "<d/>", false));
@@ -126,7 +126,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   public void treeAwareUpdates3() {
     final String doc = "<a><b/></a>";
     final AtomicUpdateCache auc = atomics(doc);
-    final MemData m = new MemData(auc.data);
+    final MemData m = new MemData(auc.data, context.options);
     auc.addReplace(2, clipE(m, "<newb/>", false));
     auc.addInsert(3, 1, clipE(m, "<d/>", false));
     assertEquals(2, auc.updatesSize());
@@ -142,7 +142,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   public void treeAwareUpdates4() {
     final String doc = "<a><b/></a>";
     final AtomicUpdateCache auc = atomics(doc);
-    final MemData m = new MemData(auc.data);
+    final MemData m = new MemData(auc.data, context.options);
     auc.addReplace(2, clipE(m, "<newb/>", false));
     auc.addInsert(3, 2, clipE(m, "<c/>", false));
     assertEquals(1, auc.updatesSize());
@@ -184,7 +184,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
 
     // two inserts cannot be merged!
     AtomicUpdateCache auc = atomics(doc);
-    final MemData m = new MemData(auc.data);
+    final MemData m = new MemData(auc.data, context.options);
     auc.addInsert(3, 2, clipE(m, "<c/>", false));
     auc.addInsert(3, 2, clipE(m, "<d/>", false));
     assertEquals(2, auc.updatesSize());
@@ -235,7 +235,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void updateSequence02() {
     final AtomicUpdateCache l = atomics("<a><b/></a>");
-    final MemData m = new MemData(l.data);
+    final MemData m = new MemData(l.data, context.options);
     l.addDelete(2);
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("Multiple deletes/replaces on node");
@@ -248,7 +248,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void updateSequence03() {
     final AtomicUpdateCache l = atomics("<a><b/></a>");
-    final MemData m = new MemData(l.data);
+    final MemData m = new MemData(l.data, context.options);
     l.addReplace(2, clipE(m, "<newb/>", false));
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("Multiple deletes/replaces on node");
@@ -310,7 +310,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void updateSequence08() {
     final AtomicUpdateCache l = atomics("<a><b/></a>");
-    final MemData m = new MemData(l.data);
+    final MemData m = new MemData(l.data, context.options);
     l.addDelete(2);
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("Invalid sequence of delete, insert at location 2");
@@ -323,7 +323,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void updateSequence09() {
     final AtomicUpdateCache l = atomics("<a><b id='0'/></a>");
-    final MemData m = new MemData(l.data);
+    final MemData m = new MemData(l.data, context.options);
     l.addDelete(3);
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("Invalid sequence of delete, insert at location 3");
@@ -336,7 +336,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void updateSequence10() {
     final AtomicUpdateCache l = atomics("<a><b/></a>");
-    final MemData m = new MemData(l.data);
+    final MemData m = new MemData(l.data, context.options);
     l.addReplace(2, clipE(m, "<bb/>", false));
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("Invalid sequence of replace, insert at location 2");
@@ -349,7 +349,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void updateSequence11() {
     final AtomicUpdateCache l = atomics("<a><b id='0'/></a>");
-    final MemData m = new MemData(l.data);
+    final MemData m = new MemData(l.data, context.options);
     l.addReplace(3, clipA(m, "id", "11"));
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("Invalid sequence of replace, insert at location 3");
@@ -399,7 +399,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
 
     auc = atomics(doc);
     // mind that dummy insert data instance size==2!
-    final MemData m = new MemData(auc.data);
+    final MemData m = new MemData(auc.data, context.options);
     auc.addInsert(3, 1, clipE(m, "<dummy3/>", true));
     auc.addInsert(3, 1, clipE(m, "<dummy4/>", true));
     auc.addDelete(3);
@@ -427,7 +427,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
     final String doc = "<n1>" + "<n2>T3</n2>T4<n5/>T6<n7/>"
         + "<n8><n9><n10><n11/><n12/></n10></n9></n8><n13/><n14/>" + "</n1>";
     final AtomicUpdateCache auc = atomics(doc);
-    final MemData m = new MemData(auc.data);
+    final MemData m = new MemData(auc.data, context.options);
     auc.addDelete(3);
     auc.addReplace(5, clipE(m, "dummy1", true));
     auc.addInsert(11, 10, clipE(m, "dummy2", true));
@@ -460,7 +460,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
     final String doc = "<n1>" + "<n2>T3</n2>T4<n5/>T6<n7/>" + "</n1>";
     final AtomicUpdateCache auc = atomics(doc);
     // MemData needed to build valid DataClip object
-    final MemData m = new MemData(auc.data);
+    final MemData m = new MemData(auc.data, context.options);
     auc.addInsert(3, 2, clipT(m, "Tx0"));
     auc.addDelete(3);
     auc.addInsert(4, 2, clipT(m, "Tx01"));

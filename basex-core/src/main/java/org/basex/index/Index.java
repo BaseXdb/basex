@@ -1,5 +1,6 @@
 package org.basex.index;
 
+import org.basex.core.*;
 import org.basex.index.query.*;
 
 /**
@@ -17,9 +18,10 @@ public interface Index {
 
   /**
    * Returns information on the index structure.
+   * @param options main options
    * @return info
    */
-  byte[] info();
+  byte[] info(final MainOptions options);
 
   /**
    * Returns all entries that match the specified token.

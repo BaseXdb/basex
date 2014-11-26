@@ -62,7 +62,7 @@ public final class DBOptimize extends DBUpdate {
   public void apply() throws QueryException {
     // assign database and query options to runtime options
     final MetaData meta = data.meta;
-    final MainOptions opts = meta.options;
+    final MainOptions opts = qc.context.options;
 
     options.assign(MainOptions.TEXTINDEX, meta.createtext);
     options.assign(MainOptions.ATTRINDEX, meta.createattr);
@@ -100,7 +100,7 @@ public final class DBOptimize extends DBUpdate {
 
     try {
       if(all) OptimizeAll.optimizeAll(data, qc.context, null);
-      else Optimize.optimize(data, rebuild, rebuildFT, null);
+      else Optimize.optimize(data, opts, rebuild, rebuildFT, null);
     } catch(final IOException ex) {
       throw UPDBOPTERR_X.get(info, ex);
     } finally {

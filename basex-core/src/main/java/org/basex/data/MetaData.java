@@ -25,8 +25,6 @@ import org.basex.util.ft.*;
 public final class MetaData {
   /** Database path. Set to {@code null} if database is in main memory. */
   public final IOFile path;
-  /** Database options. */
-  public final MainOptions options;
 
   /** Database name. */
   public volatile String name;
@@ -121,7 +119,6 @@ public final class MetaData {
    * @param global global options
    */
   private MetaData(final String name, final MainOptions options, final GlobalOptions global) {
-    this.options = options;
     this.name = name;
     path = global != null ? global.dbpath(name) : null;
     chop = options.get(MainOptions.CHOP);
@@ -381,7 +378,7 @@ public final class MetaData {
    * @param parser parser
    */
   public void assign(final Parser parser) {
-    final IO file = parser.src;
+    final IO file = parser.source;
     original = file != null ? file.path() : "";
     filesize = file != null ? file.length() : 0;
     time = file != null ? file.timeStamp() : System.currentTimeMillis();

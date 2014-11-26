@@ -79,7 +79,7 @@ public final class Modify extends Arr {
       if(!v.isEmpty()) throw BASEX_MOD.get(info);
 
       updates.prepare(qc);
-      updates.apply();
+      updates.apply(qc);
       return qc.value;
     } finally {
       qc.resources.output.size(o);

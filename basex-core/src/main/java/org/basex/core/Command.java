@@ -292,7 +292,7 @@ public abstract class Command extends Proc {
    */
   protected final boolean startUpdate(final Data data) {
     try {
-      data.startUpdate();
+      data.startUpdate(options);
       return true;
     } catch(final IOException ex) {
       info(Util.message(ex));
@@ -305,7 +305,7 @@ public abstract class Command extends Proc {
    * @param data data reference
    */
   protected final void finishUpdate(final Data data) {
-    data.finishUpdate();
+    data.finishUpdate(options);
   }
 
   /**

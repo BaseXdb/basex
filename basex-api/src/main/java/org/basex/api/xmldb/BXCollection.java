@@ -145,10 +145,10 @@ public final class BXCollection implements Collection, BXXMLDBText {
         ErrorCodes.NO_SUCH_RESOURCE, ERR_UNKNOWN + data.meta.name);
 
     try {
-      data.startUpdate();
+      data.startUpdate(ctx.options);
       data.delete(getResource(del.getId()).pre);
       ctx.invalidate();
-      data.finishUpdate();
+      data.finishUpdate(ctx.options);
     } catch(final IOException ex) {
       Util.debug(ex);
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK);
@@ -188,10 +188,10 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
     final Data data = ctx.data();
     try {
-      data.startUpdate();
+      data.startUpdate(ctx.options);
       data.insert(data.meta.size, -1, new DataClip(md));
       ctx.invalidate();
-      data.finishUpdate();
+      data.finishUpdate(ctx.options);
     } catch(final IOException ex) {
       Util.debug(ex);
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK);

@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
@@ -233,7 +234,7 @@ public final class PathSummary implements Index {
   // Info =====================================================================
 
   @Override
-  public byte[] info() {
+  public byte[] info(final MainOptions options) {
     return root != null ? chop(root.info(data, 0), 1 << 20) : EMPTY;
   }
 
@@ -261,6 +262,6 @@ public final class PathSummary implements Index {
 
   @Override
   public String toString() {
-    return string(info());
+    return string(info(null));
   }
 }

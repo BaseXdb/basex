@@ -118,10 +118,12 @@ public abstract class Data {
   /**
    * Drops the specified index.
    * @param type index to be dropped
+   * @param options main options
    * @param cmd calling command
    * @throws IOException I/O exception
    */
-  public abstract void createIndex(IndexType type, Command cmd) throws IOException;
+  public abstract void createIndex(IndexType type, MainOptions options, Command cmd)
+      throws IOException;
 
   /**
    * Drops the specified index.
@@ -133,14 +135,16 @@ public abstract class Data {
   /**
    * Starts an update operation: writes a file to disk to indicate that an update is
    * going on, and exclusively locks the table file.
+   * @param opts main options
    * @throws IOException I/O exception
    */
-  public abstract void startUpdate() throws IOException;
+  public abstract void startUpdate(final MainOptions opts) throws IOException;
 
   /**
    * Finishes an update operation: removes the update file and the exclusive lock.
+   * @param opts main options
    */
-  public abstract void finishUpdate();
+  public abstract void finishUpdate(final MainOptions opts);
 
   /**
    * Flushes updated data.
@@ -170,10 +174,11 @@ public abstract class Data {
   /**
    * Returns info on the specified index structure.
    * @param type index type
+   * @param options main options
    * @return info
    */
-  public final byte[] info(final IndexType type) {
-    return index(type).info();
+  public final byte[] info(final IndexType type, final MainOptions options) {
+    return index(type).info(options);
   }
 
   /**

@@ -66,7 +66,7 @@ public final class Constr {
       for(final Expr e : expr) {
         more = false;
         final Iter iter = qc.iter(e);
-        for(Item ch; (ch = iter.next()) != null && add(ch););
+        for(Item ch; (ch = iter.next()) != null && add(qc, ch););
       }
       if(!text.isEmpty()) children.add(new FTxt(text.toArray()));
       return this;
@@ -78,14 +78,15 @@ public final class Constr {
   /**
    * Recursively adds nodes to the element arrays. Recursion is necessary
    * as documents are resolved to their child nodes.
+   * @param qc query context
    * @param it current item
    * @return true if item was added
    * @throws QueryException query exception
    */
-  private boolean add(final Item it) throws QueryException {
+  private boolean add(final QueryContext qc, final Item it) throws QueryException {
     if(it instanceof Array) {
       for(final Item i : it.atomValue(info)) {
-        if(!add(i)) return false;
+        if(!add(qc, i)) return false;
       }
       return true;
     }
@@ -147,7 +148,7 @@ public final class Constr {
         // type: document node
 
         final AxisIter ai = node.children();
-        for(ANode ch; (ch = ai.next()) != null && add(ch););
+        for(ANode ch; (ch = ai.next()) != null && add(qc, ch););
 
       } else {
         // type: element/comment/processing instruction node
@@ -156,7 +157,7 @@ public final class Constr {
         if(!text.isEmpty()) children.add(new FTxt(text.next()));
 
         // [CG] XQuery, element construction: avoid full copy of sub tree if not needed
-        node = node.deepCopy();
+        node = node.deepCopy(qc.context.options);
         children.add(node);
       }
       more = false;

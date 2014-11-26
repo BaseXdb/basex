@@ -41,9 +41,9 @@ public final class SimpleFSParser extends Parser {
 
   @Override
   public void parse(final Builder b) throws IOException {
-    b.openDoc(token(src.name()));
+    b.openDoc(token(source.name()));
     b.openElem(FSML, atts.clear(), nsp.clear());
-    parse(new File(src.path()), b);
+    parse(new File(source.path()), b);
     b.closeElem();
     b.closeDoc();
   }

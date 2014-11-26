@@ -122,14 +122,12 @@ public final class FTIndex implements Index {
     final byte[] tok = it.get();
 
     // wildcard search
-    final FTOpt opt = ((FTLexer) it).ftOpt();
+    final FTLexer lexer = (FTLexer) it;
+    final FTOpt opt = lexer.ftOpt();
     if(opt.is(WC)) return wc(tok);
 
     // fuzzy search
-    if(opt.is(FZ)) {
-      final int k = data.meta.options.get(MainOptions.LSERROR);
-      return fuzzy(tok, k == 0 ? tok.length >> 2 : k);
-    }
+    if(opt.is(FZ)) return fuzzy(tok, lexer.lserror(tok));
 
     // return cached or new result
     final IndexEntry e = entry(tok);
@@ -222,12 +220,12 @@ public final class FTIndex implements Index {
   }
 
   @Override
-  public synchronized byte[] info() {
+  public synchronized byte[] info(final MainOptions options) {
     final TokenBuilder tb = new TokenBuilder();
     final long l = inX.length() + inY.length() + inZ.length();
     tb.add(LI_SIZE + Performance.format(l, true) + NL);
 
-    final IndexStats stats = new IndexStats(data.meta.options.get(MainOptions.MAXSTAT));
+    final IndexStats stats = new IndexStats(options.get(MainOptions.MAXSTAT));
     addOccs(stats);
     stats.print(tb);
     return tb.finish();

@@ -83,7 +83,7 @@ public final class Transform extends Arr {
       if(!v.isEmpty()) throw BASEX_MOD.get(info);
 
       updates.prepare(qc);
-      updates.apply();
+      updates.apply(qc);
       return qc.value(exprs[1]);
     } finally {
       qc.resources.output.size(o);

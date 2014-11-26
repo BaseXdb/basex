@@ -1,5 +1,6 @@
 package org.basex.query.value.node;
 
+import org.basex.core.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -34,7 +35,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final ANode deepCopy() {
+  public final ANode deepCopy(final MainOptions options) {
     return copy();
   }
 

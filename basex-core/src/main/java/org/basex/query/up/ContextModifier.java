@@ -86,9 +86,10 @@ public abstract class ContextModifier {
 
   /**
    * Applies all updates.
+   * @param qc query context
    * @throws QueryException query exception
    */
-  final void apply() throws QueryException {
+  final void apply(final QueryContext qc) throws QueryException {
     // apply initial updates based on database names
     for(final NameUpdates up : nameUpdates.values()) up.apply(true);
 
@@ -102,17 +103,17 @@ public abstract class ContextModifier {
     int i = 0;
     try {
       for(final Data data : datas) {
-        data.startUpdate();
+        data.startUpdate(qc.context.options);
         i++;
       }
       // apply node and database update
-      for(final DataUpdates up : dbUpdates.values()) up.apply();
+      for(final DataUpdates up : dbUpdates.values()) up.apply(qc);
     } catch(final IOException ex) {
       throw BXDB_LOCK_X.get(null, ex);
     } finally {
       // remove locks: in case of a crash, remove only already acquired write locks
       for(final Data data : datas) {
-        if(i-- > 0) data.finishUpdate();
+        if(i-- > 0) data.finishUpdate(qc.context.options);
       }
     }
 

@@ -236,8 +236,8 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final DBNode deepCopy() {
-    return dbCopy(data.meta.options);
+  public final DBNode deepCopy(final MainOptions options) {
+    return dbCopy(options);
   }
 
   @Override

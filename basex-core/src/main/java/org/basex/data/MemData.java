@@ -24,31 +24,31 @@ public final class MemData extends Data {
    * @param opts database options
    */
   public MemData(final PathSummary paths, final Namespaces nspaces, final MainOptions opts) {
-    this(null, null, paths, nspaces, opts, null, null);
+    this(null, null, paths, nspaces, null, null, opts);
   }
 
   /**
    * Constructor.
-   * @param elmindex element name index
-   * @param atnindex attribute name index
+   * @param elemNames element name index
+   * @param attrNames attribute name index
    * @param paths path summary
    * @param nspaces namespaces
+   * @param textIndex text index
+   * @param attrIndex attribute value index
    * @param options database options
-   * @param txtindex text index
-   * @param atvindex attribute value index
    */
-  private MemData(final Names elmindex, final Names atnindex, final PathSummary paths,
-      final Namespaces nspaces, final MainOptions options, final Index txtindex,
-      final Index atvindex) {
+  private MemData(final Names elemNames, final Names attrNames, final PathSummary paths,
+      final Namespaces nspaces, final Index textIndex, final Index attrIndex,
+      final MainOptions options) {
 
     meta = new MetaData(options);
     table = new TableMemAccess(meta);
     final boolean up = meta.updindex;
     if(up) idmap = new IdPreMap(meta.lastid);
-    textIndex = txtindex == null ? new MemValues(this, up) : txtindex;
-    attrIndex = atvindex == null ? new MemValues(this, up) : atvindex;
-    elemNames = elmindex == null ? new Names(meta) : elmindex;
-    attrNames = atnindex == null ? new Names(meta) : atnindex;
+    this.textIndex = textIndex == null ? new MemValues(this, up) : textIndex;
+    this.attrIndex = attrIndex == null ? new MemValues(this, up) : attrIndex;
+    this.elemNames = elemNames == null ? new Names(meta) : elemNames;
+    this.attrNames = attrNames == null ? new Names(meta) : attrNames;
     this.paths = paths == null ? new PathSummary(this) : paths;
     this.nspaces = nspaces == null ? new Namespaces() : nspaces;
   }
@@ -56,10 +56,10 @@ public final class MemData extends Data {
   /**
    * Light-weight constructor, adopting data structures from the specified database.
    * @param data data reference
+   * @param options main options
    */
-  public MemData(final Data data) {
-    this(data.elemNames, data.attrNames, data.paths, null, data.meta.options, data.textIndex,
-        data.attrIndex);
+  public MemData(final Data data, final MainOptions options) {
+    this(data.elemNames, data.attrNames, data.paths, null, data.textIndex, data.attrIndex, options);
   }
 
   /**
@@ -82,7 +82,7 @@ public final class MemData extends Data {
   public void close() { }
 
   @Override
-  public void createIndex(final IndexType type, final Command cmd) {
+  public void createIndex(final IndexType type, final MainOptions options, final Command cmd) {
     values(type == IndexType.TEXT).create(type);
   }
 
@@ -92,10 +92,10 @@ public final class MemData extends Data {
   }
 
   @Override
-  public void startUpdate() { }
+  public void startUpdate(final MainOptions opts) { }
 
   @Override
-  public void finishUpdate() { }
+  public void finishUpdate(final MainOptions opts) { }
 
   @Override
   public void flush(final boolean all) { }

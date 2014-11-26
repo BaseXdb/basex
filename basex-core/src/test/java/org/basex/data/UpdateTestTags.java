@@ -181,9 +181,9 @@ public final class UpdateTestTags extends UpdateTest {
   @Test
   public void updateTagName() throws IOException {
     final Data data = context.data();
-    data.startUpdate();
+    data.startUpdate(context.options);
     data.update(6, Data.ELEM, T_JUNIT, Token.EMPTY);
-    data.finishUpdate();
+    data.finishUpdate(context.options);
     assertEquals(Data.ELEM, data.kind(6));
     assertArraysEquals(T_JUNIT, data.name(6, Data.ELEM));
     reload();
@@ -215,11 +215,11 @@ public final class UpdateTestTags extends UpdateTest {
         ++currPos;
       }
     }
-    final MemData md = new MemData(data);
+    final MemData md = new MemData(data, context.options);
     md.elem(1, data.elemNames.index(name, null, false), 1, 1, 0, false);
     md.insert(0);
-    data.startUpdate();
+    data.startUpdate(context.options);
     data.insert(root, par, new DataClip(md));
-    data.finishUpdate();
+    data.finishUpdate(context.options);
   }
 }

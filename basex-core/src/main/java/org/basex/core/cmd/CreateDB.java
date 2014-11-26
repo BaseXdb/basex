@@ -99,9 +99,9 @@ public final class CreateDB extends ACreate {
         final Data data = context.data();
         if(!startUpdate()) return false;
         try {
-          if(data.meta.createtext) create(IndexType.TEXT,      data, this);
-          if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, this);
-          if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, this);
+          if(data.meta.createtext) create(IndexType.TEXT,      data, options, this);
+          if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, options, this);
+          if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, options, this);
 
           // for testing purposes
           final Class<?> luceneClass = Reflect.find("org.basex.modules.LuceneIndex");
@@ -128,7 +128,7 @@ public final class CreateDB extends ACreate {
       // - IllegalArgumentException (UTF8, zip files)
       Util.debug(ex);
       abort();
-      return error(NOT_PARSED_X, parser.src);
+      return error(NOT_PARSED_X, parser.source);
     }
   }
 
@@ -176,9 +176,10 @@ public final class CreateDB extends ACreate {
     new DiskBuilder(name, parser, ctx).build().close();
 
     final Data data = Open.open(name, ctx);
-    if(data.meta.createtext) create(IndexType.TEXT,      data, null);
-    if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, null);
-    if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, null);
+    final MainOptions options = ctx.options;
+    if(data.meta.createtext) create(IndexType.TEXT,      data, options, null);
+    if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, options, null);
+    if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, options, null);
     return data;
   }
 

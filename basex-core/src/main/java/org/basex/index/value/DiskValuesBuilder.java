@@ -43,10 +43,11 @@ public final class DiskValuesBuilder extends IndexBuilder {
   /**
    * Constructor.
    * @param data data reference
+   * @param options main options
    * @param text value type (text/attribute)
    */
-  public DiskValuesBuilder(final Data data, final boolean text) {
-    super(data, data.meta.options.get(MainOptions.INDEXSPLITSIZE));
+  public DiskValuesBuilder(final Data data, final MainOptions options, final boolean text) {
+    super(data, options.get(MainOptions.INDEXSPLITSIZE));
     this.text = text;
   }
 

@@ -29,11 +29,12 @@ public final class StopWords extends TokenSet {
    * Constructor, reading stopword list from disk.
    * And creating database stopword file.
    * @param data data reference
-   * @param file stopword list file
+   * @param options main options
    * @throws IOException I/O exception
    */
-  public StopWords(final Data data, final String file) throws IOException {
-    if(!data.meta.options.get(MainOptions.STOPWORDS).isEmpty()) read(IO.get(file), false);
+  public StopWords(final Data data, final MainOptions options) throws IOException {
+    final String file = options.get(MainOptions.STOPWORDS);
+    if(!file.isEmpty()) read(IO.get(file), false);
     try(final DataOutput out = new DataOutput(data.meta.dbfile(DATASWL))) {
       write(out);
     }

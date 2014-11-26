@@ -72,12 +72,12 @@ public final class DBCreate extends NameUpdate {
 
       // add initial documents and optimize database
       if(add.data != null) {
-        data.startUpdate();
+        data.startUpdate(opts);
         try {
           data.insert(data.meta.size, -1, new DataClip(add.data));
-          Optimize.optimize(data, null);
+          Optimize.optimize(data, opts, null);
         } finally {
-          data.finishUpdate();
+          data.finishUpdate(opts);
         }
       }
       Close.close(data, qc.context);

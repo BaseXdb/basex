@@ -114,16 +114,16 @@ public final class SAXWrapper extends SingleParser {
       in = is.getByteStream();
     } else if(is.getSystemId() == null || is.getSystemId().isEmpty()) {
       return is;
-    } else if(src instanceof IOFile) {
-      in = new FileInputStream(src.path());
-    } else if(src instanceof IOContent || src instanceof IOUrl) {
-      in = new ByteArrayInputStream(src.read());
+    } else if(source instanceof IOFile) {
+      in = new FileInputStream(source.path());
+    } else if(source instanceof IOContent || source instanceof IOUrl) {
+      in = new ByteArrayInputStream(source.read());
     } else {
       return is;
     }
 
     // retrieve/estimate number of bytes to be read
-    length = src.length();
+    length = source.length();
     try {
       if(length <= 0) length = in.available();
     } catch(final IOException ex) {
@@ -157,7 +157,7 @@ public final class SAXWrapper extends SingleParser {
 
   @Override
   public String det() {
-    return length == 0 ? super.det() : Util.info(SCANPOS_X_X, src.name(), line);
+    return length == 0 ? super.det() : Util.info(SCANPOS_X_X, source.name(), line);
   }
 
   @Override

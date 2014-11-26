@@ -90,10 +90,13 @@ public abstract class ACreate extends Command {
    * Builds the specified index.
    * @param type index to be built
    * @param data data reference
+   * @param options main options
    * @param cmd calling command
    * @throws IOException I/O exception
    */
-  static void create(final IndexType type, final Data data, final ACreate cmd) throws IOException {
+  static void create(final IndexType type, final Data data, final MainOptions options,
+      final ACreate cmd) throws IOException {
+
     data.meta.dirty = true;
     final boolean ok = data.dropIndex(type);
     if(ok) {
@@ -107,7 +110,7 @@ public abstract class ACreate extends Command {
         throw Util.notExpected();
       }
     }
-    data.createIndex(type, cmd);
+    data.createIndex(type, options, cmd);
   }
 
   /**

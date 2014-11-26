@@ -54,7 +54,7 @@ final class DBNew {
     final MainOptions opts = qc.context.options;
     options.assign(opts);
     try {
-      addDocs(new MemData(md), name);
+      addDocs(new MemData(md, opts), name);
     } finally {
       options.reset(opts);
     }

@@ -156,9 +156,10 @@ final class DataUpdates {
 
   /**
    * Applies all updates for this specific database.
+   * @param qc query context
    * @throws QueryException query exception
    */
-  void apply() throws QueryException {
+  void apply(final QueryContext qc) throws QueryException {
     // execute database updates
     auc.execute(true);
     auc = null;
@@ -175,12 +176,13 @@ final class DataUpdates {
     for(final Put put : puts.values()) put.apply();
 
     // optional: write main memory databases of file instances back to disk
-    if(data.inMemory() && !data.meta.original.isEmpty() && writeback) {
+    final String original = data.meta.original;
+    if(data.inMemory() && !original.isEmpty() && writeback) {
       try {
-        Export.export(data, data.meta.original, null);
+        Export.export(data, original, qc.context.options, null);
       } catch(final IOException ex) {
         Util.debug(ex);
-        throw UPPUTERR_X.get(null, data.meta.original);
+        throw UPPUTERR_X.get(null, original);
       }
     }
   }

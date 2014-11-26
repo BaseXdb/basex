@@ -16,7 +16,7 @@ import org.basex.util.*;
  */
 public abstract class Parser extends Proc {
   /** Source document or {@code null}. */
-  public IO src;
+  public IO source;
   /** Attributes of currently parsed element. */
   protected final Atts atts = new Atts();
   /** Namespaces of currently parsed element. */
@@ -41,8 +41,8 @@ public abstract class Parser extends Proc {
    * @param opts database options
    */
   protected Parser(final IO source, final MainOptions opts) {
-    src = source;
-    options = opts;
+    this.source = source;
+    this.options = opts;
   }
 
   /**

@@ -57,7 +57,7 @@ public final class CreateIndex extends ACreate {
 
     if(!startUpdate()) return false;
     try {
-      create(type, data, this);
+      create(type, data, options, this);
       return info(INDEX_CREATED_X_X, type, perf);
     } catch(final IOException ex) {
       return error(Util.message(ex));

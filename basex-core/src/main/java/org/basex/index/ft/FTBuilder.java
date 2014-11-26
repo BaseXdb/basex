@@ -30,24 +30,24 @@ public final class FTBuilder extends IndexBuilder {
 
   /**
    * Constructor.
-   * @param d data reference
+   * @param data data reference
+   * @param options options
    * @throws IOException IOException
    */
-  public FTBuilder(final Data d) throws IOException {
-    super(d, d.meta.options.get(MainOptions.FTINDEXSPLITSIZE));
-    tree = new FTIndexTrees(d.meta.maxlen);
+  public FTBuilder(final Data data, final MainOptions options) throws IOException {
+    super(data, options.get(MainOptions.FTINDEXSPLITSIZE));
+    tree = new FTIndexTrees(data.meta.maxlen);
 
-    final MainOptions opts = d.meta.options;
     final FTOpt fto = new FTOpt();
-    fto.set(FTFlag.DC, opts.get(MainOptions.DIACRITICS));
-    fto.set(FTFlag.ST, opts.get(MainOptions.STEMMING));
-    fto.cs = opts.get(MainOptions.CASESENS) ? FTCase.SENSITIVE : FTCase.INSENSITIVE;
-    fto.sw = new StopWords(d, opts.get(MainOptions.STOPWORDS));
-    fto.ln = Language.get(opts);
+    fto.set(FTFlag.DC, options.get(MainOptions.DIACRITICS));
+    fto.set(FTFlag.ST, options.get(MainOptions.STEMMING));
+    fto.cs = options.get(MainOptions.CASESENS) ? FTCase.SENSITIVE : FTCase.INSENSITIVE;
+    fto.sw = new StopWords(data, options);
+    fto.ln = Language.get(options);
 
     if(!Tokenizer.supportFor(fto.ln))
       throw new BaseXException(NO_TOKENIZER_X, fto.ln);
-    if(opts.get(MainOptions.STEMMING) && !Stemmer.supportFor(fto.ln))
+    if(options.get(MainOptions.STEMMING) && !Stemmer.supportFor(fto.ln))
       throw new BaseXException(NO_STEMMER_X, fto.ln);
 
     lex = new FTLexer(fto);
