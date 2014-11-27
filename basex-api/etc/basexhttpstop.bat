@@ -12,4 +12,4 @@ set LIB=%PWD%/../../basex-core/lib
 for /R "%LIB%" %%a in (*.jar) do set CP=!CP!;%%a
 
 REM Run code
-java -cp "%CP%;." "%BASEX_JVM%" org.basex.BaseXHTTP %* stop
+java -cp %CP% %BASEX_JVM% org.basex.BaseXHTTP %* stop
