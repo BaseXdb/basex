@@ -56,7 +56,7 @@ public abstract class BaseXServlet extends HttpServlet {
     final boolean restxq = this instanceof RestXqServlet;
     try {
       run(http);
-      http.log("", SC_OK);
+      http.log(SC_OK, "");
     } catch(final HTTPException ex) {
       http.status(ex.getStatus(), Util.message(ex), restxq);
     } catch(final LoginException ex) {

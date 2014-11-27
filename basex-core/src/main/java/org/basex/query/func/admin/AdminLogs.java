@@ -13,6 +13,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.node.*;
 import org.basex.server.*;
 import org.basex.server.Log.LogEntry;
+import org.basex.server.Log.LogType;
 import org.basex.util.*;
 
 /**
@@ -35,6 +36,7 @@ public final class AdminLogs extends AdminFn {
       }
     } else {
       // return content of single log file
+      final String request = LogType.REQUEST.name();
       final String name = Token.string(toToken(exprs[0], qc)) + IO.LOGSUFFIX;
       final boolean merge = exprs.length > 1 && toBoolean(exprs[1], qc);
       final IOFile file = new IOFile(qc.context.log.dir(), name);
@@ -44,17 +46,18 @@ public final class AdminLogs extends AdminFn {
         final LogEntry l1 = logs.get(s);
         final FElem elem = new FElem(ENTRY);
         if(l1.address != null) {
-          if(merge && l1.ms.equals(BigDecimal.ZERO) && !Log.SERVER.equals(l1.address)) {
+          if(merge && l1.ms.equals(BigDecimal.ZERO) &&
+              !Token.eq(l1.address, Log.SERVER, Log.STANDALONE)) {
             for(int l = s + 1; l < logs.size(); l++) {
               final LogEntry l2 = logs.get(l);
               if(l2 != null && l1.address.equals(l2.address)) {
-                if(l2.type.equals(Log.REQUEST)) continue;
-                if(l1.type.equals(Log.REQUEST)) l1.type = "";
+                if(l2.type.equals(request)) continue;
+                if(l1.type.equals(request)) l1.type = "";
                 l1.type = merge(l1.type, l2.type);
                 l1.message = merge(l1.message, l2.message);
                 l1.ms = l1.ms.add(l2.ms);
                 logs.remove(l--);
-                if(!l2.message.equals(Log.REQUEST)) break;
+                if(!l2.message.equals(request)) break;
               }
             }
           }
@@ -93,7 +96,7 @@ public final class AdminLogs extends AdminFn {
       for(String line; (line = nli.readLine()) != null;) {
         final LogEntry log = new LogEntry();
         final String[] cols = line.split("\t");
-        if(cols.length > 2 && (cols[1].matches(".*:\\d+") || cols[1].equals(Log.SERVER))) {
+        if(cols.length > 2) {
           log.time = cols[0];
           log.address = cols[1];
           log.user = cols[2];

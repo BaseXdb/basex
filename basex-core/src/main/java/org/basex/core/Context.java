@@ -28,7 +28,7 @@ public final class Context {
   public final MainOptions options = new MainOptions();
   /** Static options. */
   public final StaticOptions soptions;
-  /** Client connections. */
+  /** Client sessions. */
   public final Sessions sessions;
   /** Event pool. */
   public final Events events;

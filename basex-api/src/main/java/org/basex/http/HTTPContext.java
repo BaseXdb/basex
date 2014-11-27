@@ -22,6 +22,7 @@ import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.server.*;
+import org.basex.server.Log.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -84,7 +85,7 @@ public final class HTTPContext {
     final StringBuilder uri = new StringBuilder(req.getRequestURL());
     final String qs = req.getQueryString();
     if(qs != null) uri.append('?').append(qs);
-    log('[' + method + "] " + uri, null);
+    context.log.write(address(), context.user, LogType.REQUEST, '[' + method + "] " + uri, null);
 
     // set UTF8 as default encoding (can be overwritten)
     res.setCharacterEncoding(UTF8);
@@ -222,7 +223,7 @@ public final class HTTPContext {
    */
   public void status(final int code, final String message, final boolean error) throws IOException {
     try {
-      log(message, code);
+      log(code, message);
       res.resetBuffer();
       if(code == SC_UNAUTHORIZED) res.setHeader(WWW_AUTHENTICATE, BASIC);
 
@@ -238,7 +239,7 @@ public final class HTTPContext {
         }
       }
     } catch(final IllegalStateException ex) {
-      log(Util.message(ex), SC_INTERNAL_SERVER_ERROR);
+      log(SC_INTERNAL_SERVER_ERROR, Util.message(ex));
     }
   }
 
@@ -310,14 +311,11 @@ public final class HTTPContext {
 
   /**
    * Writes a log message.
-   * @param info message info
-   * @param type message type (true/false/null: OK, ERROR, REQUEST, Error Code)
+   * @param type log type
+   * @param info info message
    */
-  public void log(final String info, final Object type) {
-    // add evaluation time if any type is specified
-    context.log.write(type != null ?
-      new Object[] { address(), context.user.name, type, info, perf } :
-      new Object[] { address(), context.user.name, null, info });
+  public void log(final int type, final String info) {
+    context.log.write(address(), context.user, type, info, perf);
   }
 
   // STATIC METHODS =====================================================================

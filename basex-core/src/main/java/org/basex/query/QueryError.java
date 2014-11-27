@@ -1275,6 +1275,7 @@ public enum QueryError {
 
     /** BASX Error type. */ BASX(BXERR_PREFIX, BXERRORS_URI),
 
+    /** BXAD Error type. */ BXAD(BXERR_PREFIX, BXERRORS_URI),
     /** BXCL Error type. */ BXCL(BXERR_PREFIX, BXERRORS_URI),
     /** BXCO Error type. */ BXCO(BXERR_PREFIX, BXERRORS_URI),
     /** BXCS Error type. */ BXCS(BXERR_PREFIX, BXERRORS_URI),

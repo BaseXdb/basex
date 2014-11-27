@@ -12,6 +12,7 @@ import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.server.*;
+import org.basex.server.Log.LogType;
 import org.basex.util.*;
 import org.basex.util.options.*;
 import org.eclipse.jetty.server.*;
@@ -148,7 +149,7 @@ public final class BaseXHTTP extends Main {
         final Log l = context.log;
         if(l != null) {
           for(final Connector c : jetty.getConnectors()) {
-            l.writeServer(OK, Util.info(stopX, c.getPort()));
+            l.writeServer(LogType.OK, Util.info(stopX, c.getPort()));
           }
         }
         context.close();
@@ -157,7 +158,7 @@ public final class BaseXHTTP extends Main {
 
     // log server start at very end (logging flag could have been updated by web.xml)
     for(final Connector c : jetty.getConnectors()) {
-      context.log.writeServer(OK, Util.info(startX, c.getPort()));
+      context.log.writeServer(LogType.OK, Util.info(startX, c.getPort()));
     }
   }
 

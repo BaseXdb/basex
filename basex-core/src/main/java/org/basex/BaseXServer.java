@@ -11,6 +11,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.server.*;
+import org.basex.server.Log.LogType;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -111,7 +112,7 @@ public final class BaseXServer extends CLI implements Runnable {
       esocket.bind(new InetSocketAddress(addr, eport));
       stopFile = stopFile(port);
     } catch(final IOException ex) {
-      context.log.writeError(ex);
+      context.log.writeServer(LogType.ERROR, Util.message(ex));
       throw ex;
     }
 
@@ -119,14 +120,14 @@ public final class BaseXServer extends CLI implements Runnable {
     do Thread.yield(); while(!running);
 
     // show info that server has been started
-    context.log.writeServer(OK, Util.info(SRV_STARTED_PORT_X, port));
+    context.log.writeServer(LogType.OK, Util.info(SRV_STARTED_PORT_X, port));
     if(!quiet) Util.outln(S_CONSOLE + Util.info(SRV_STARTED_PORT_X, port), S_SERVER);
 
     // show info when server is aborted
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
-        context.log.writeServer(OK, Util.info(SRV_STOPPED_PORT_X, port));
+        context.log.writeServer(LogType.OK, Util.info(SRV_STOPPED_PORT_X, port));
         Util.outln(SRV_STOPPED_PORT_X, port);
       }
     });
@@ -140,7 +141,7 @@ public final class BaseXServer extends CLI implements Runnable {
         final Socket s = socket.accept();
         if(stopFile.exists()) {
           if(!stopFile.delete()) {
-            context.log.writeServer(ERROR + COL + Util.info(FILE_NOT_DELETED_X, stopFile));
+            context.log.writeServer(LogType.ERROR, Util.info(FILE_NOT_DELETED_X, stopFile));
           }
           quit();
         } else {
@@ -171,7 +172,7 @@ public final class BaseXServer extends CLI implements Runnable {
       } catch(final Throwable ex) {
         // socket may have been unexpectedly closed
         Util.errln(ex);
-        context.log.writeError(ex);
+        context.log.writeServer(LogType.ERROR, Util.message(ex));
         break;
       }
     }
@@ -207,7 +208,7 @@ public final class BaseXServer extends CLI implements Runnable {
       socket.close();
     } catch(final IOException ex) {
       Util.errln(ex);
-      context.log.writeError(ex);
+      context.log.writeServer(LogType.ERROR, Util.message(ex));
     }
   }
 
