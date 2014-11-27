@@ -20,6 +20,8 @@ final class CsvParser {
   private final CsvConverter conv;
   /** Header flag. */
   private final boolean header;
+  /** Backslash flag. */
+  private final boolean backslash;
   /** Column separator (see {@link CsvOptions#SEPARATOR}). */
   private final int separator;
   /** Parse quotes.  */
@@ -42,6 +44,7 @@ final class CsvParser {
     this.input = input;
     this.conv = conv;
     header = opts.get(CsvOptions.HEADER);
+    backslash = opts.get(CsvOptions.BACKSLASH);
     separator = opts.separator();
     quotes = opts.get(CsvOptions.QUOTES);
   }
@@ -71,9 +74,11 @@ final class CsvParser {
     while(ch != -1) {
       if(quoted) {
         // quoted state
-        if(ch == '\\') {
-          ch = bs();
-          if(ch == -1) break;
+        if(backslash) {
+          if(ch == '\\') {
+            ch = bs();
+            if(ch == -1) break;
+          }
         } else if(ch == '"') {
           ch = input.read();
           if(ch != '"') {
@@ -95,8 +100,10 @@ final class CsvParser {
         first = true;
         data = true;
       } else {
-        if(ch == '\\') ch = bs();
-        if(ch == -1) break;
+        if(backslash) {
+          if(ch == '\\') ch = bs();
+          if(ch == -1) break;
+        }
         // parse any other character
         entry.add(XMLToken.valid(ch) ? ch : '?');
       }

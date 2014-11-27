@@ -17,17 +17,15 @@ public class CsvOptions extends Options {
   public static final StringOption SEPARATOR =
       new StringOption("separator", CsvSep.COMMA.toString());
   /** Option: format. */
-  public static final EnumOption<CsvFormat> FORMAT =
-      new EnumOption<>("format", CsvFormat.DIRECT);
+  public static final EnumOption<CsvFormat> FORMAT = new EnumOption<>("format", CsvFormat.DIRECT);
   /** Option: header line. */
-  public static final BooleanOption HEADER =
-      new BooleanOption("header", false);
+  public static final BooleanOption HEADER = new BooleanOption("header", false);
+  /** Option: backslash flag . */
+  public static final BooleanOption BACKSLASH = new BooleanOption("backslash", false);
   /** Option: lax conversion of strings to QNames. */
-  public static final BooleanOption LAX =
-      new BooleanOption("lax", true);
+  public static final BooleanOption LAX = new BooleanOption("lax", true);
   /** Option: parse quotes. */
-  public static final BooleanOption QUOTES =
-      new BooleanOption("quotes", true);
+  public static final BooleanOption QUOTES = new BooleanOption("quotes", true);
 
   /** CSV formats. */
   public enum CsvFormat {

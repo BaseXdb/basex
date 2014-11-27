@@ -32,7 +32,7 @@ public abstract class CsvConverter {
    * @throws IOException I/O exception
    */
   public void convert(final IO input) throws IOException {
-    try(final TextInput in = new TextInput(input)) {
+    try(final NewlineInput in = new NewlineInput(input)) {
       CsvParser.parse(in.encoding(copts.get(CsvParserOptions.ENCODING)), copts, this);
     }
   }

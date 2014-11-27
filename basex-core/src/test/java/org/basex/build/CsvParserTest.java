@@ -88,7 +88,7 @@ public final class CsvParserTest extends SandboxTest {
 
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("3", new XQuery("count(//record)").execute(context));
-    assertEquals("true", new XQuery("//text() = 'Picard?'").execute(context));
+    assertEquals("true", new XQuery("//text() = 'Picard'").execute(context));
   }
 
   /**
@@ -96,7 +96,7 @@ public final class CsvParserTest extends SandboxTest {
    * @throws Exception exception
    */
   @Test
-  public void sep() throws Exception {
+  public void separator() throws Exception {
     final CsvParserOptions copts = context.options.get(MainOptions.CSVPARSER);
     copts.set(CsvOptions.HEADER, true);
 
@@ -107,6 +107,43 @@ public final class CsvParserTest extends SandboxTest {
     copts.set(CsvOptions.SEPARATOR, ";");
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("0", new XQuery("count(//Name)").execute(context));
+  }
+
+  /**
+   * Checks the quotes flag.
+   * @throws Exception exception
+   */
+  @Test
+  public void quotes() throws Exception {
+    final CsvParserOptions copts = context.options.get(MainOptions.CSVPARSER);
+    copts.set(CsvOptions.HEADER, true);
+
+    copts.set(CsvOptions.QUOTES, false);
+    new CreateDB(NAME, FILE).execute(context);
+    assertEquals("\"H", new XQuery("(//Props[1])/text()").execute(context));
+
+    copts.set(CsvOptions.QUOTES, true);
+    new CreateDB(NAME, FILE).execute(context);
+    assertEquals("H \"U\\", new XQuery("normalize-space((//Props)[1])").execute(context));
+  }
+
+  /**
+   * Checks the backslash flag.
+   * @throws Exception exception
+   */
+  @Test
+  public void backslash() throws Exception {
+    final CsvParserOptions copts = context.options.get(MainOptions.CSVPARSER);
+    copts.set(CsvOptions.HEADER, true);
+
+    copts.set(CsvOptions.BACKSLASH, false);
+    new CreateDB(NAME, FILE).execute(context);
+    assertEquals("H \"U\\", new XQuery("normalize-space((//Props)[1])").execute(context));
+
+    copts.set(CsvOptions.BACKSLASH, true);
+    new CreateDB(NAME, FILE).execute(context);
+    assertEquals("true", new XQuery("starts-with(normalize-space((//Props)[1]), 'H \"\"U\",')").
+        execute(context));
   }
 
   /**
