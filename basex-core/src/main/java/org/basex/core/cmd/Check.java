@@ -55,7 +55,7 @@ public final class Check extends Command {
     // minimum permissions: create
     if(!context.user.has(Perm.CREATE)) return true;
     // database with given name does not exist
-    if(!goptions.dbpath(qi.db).exists()) return false;
+    if(!soptions.dbpath(qi.db).exists()) return false;
     // open database if addressed file does not exist
     if(!qi.input.exists()) return true;
 

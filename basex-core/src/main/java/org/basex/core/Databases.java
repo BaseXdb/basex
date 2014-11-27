@@ -8,7 +8,7 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * Manages a two-way-map of all available databases and backups. Used for locking.
+ * Provides central access to all databases and backups.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Jens Erat
@@ -32,15 +32,15 @@ public final class Databases {
   /** Regex indicator. */
   private static final Pattern REGEX = Pattern.compile(".*[*?,].*");
 
-  /** Global options. */
-  private final GlobalOptions gopts;
+  /** Static options. */
+  private final StaticOptions soptions;
 
   /**
    * Creates a new instance and loads available databases.
-   * @param ctx Database context
+   * @param soptions static options
    */
-  Databases(final Context ctx) {
-    gopts = ctx.globalopts;
+  Databases(final StaticOptions soptions) {
+    this.soptions = soptions;
   }
 
   /**
@@ -86,7 +86,7 @@ public final class Databases {
       pt = null;
     }
 
-    final IOFile[] children = gopts.dbpath().children();
+    final IOFile[] children = soptions.dbpath().children();
     final StringList list = new StringList(children.length);
     final HashSet<String> map = new HashSet<>(children.length);
     for(final IOFile f : children) {
@@ -112,7 +112,7 @@ public final class Databases {
    */
   public StringList backups() {
     final StringList backups = new StringList();
-    for(final IOFile f : gopts.dbpath().children()) {
+    for(final IOFile f : soptions.dbpath().children()) {
       final String n = f.name();
       if(n.endsWith(IO.ZIPSUFFIX)) backups.add(n.substring(0, n.lastIndexOf('.')));
     }
@@ -127,13 +127,13 @@ public final class Databases {
    */
   public StringList backups(final String db) {
     final StringList backups = new StringList();
-    final IOFile file = gopts.dbpath(db + IO.ZIPSUFFIX);
+    final IOFile file = soptions.dbpath(db + IO.ZIPSUFFIX);
     if(file.exists()) {
       backups.add(db);
     } else {
       final String regex = db.replaceAll("([" + REGEXCHARS + "])", "\\\\$1") +
           DateTime.PATTERN + IO.ZIPSUFFIX;
-      for(final IOFile f : gopts.dbpath().children()) {
+      for(final IOFile f : soptions.dbpath().children()) {
         final String n = f.name();
         if(n.matches(regex)) backups.add(n.substring(0, n.lastIndexOf('.')));
       }

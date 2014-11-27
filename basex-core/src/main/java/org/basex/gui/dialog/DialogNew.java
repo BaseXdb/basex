@@ -47,7 +47,7 @@ public final class DialogNew extends BaseXDialog {
     // define buttons first to assign simplest mnemonics
     buttons = okCancel();
 
-    db = List.list(main.context);
+    db = List.list(main.context.soptions);
     final MainOptions opts = gui.context.options;
     final GUIOptions gopts = main.gopts;
 

@@ -51,7 +51,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
       if(f.isDir() && f.name().contains(".")) f.delete();
     }
     context = new Context();
-    context.globalopts.set(GlobalOptions.REPOPATH, REPO);
+    context.soptions.set(StaticOptions.REPOPATH, REPO);
   }
 
   /** Tests repository initialization. */

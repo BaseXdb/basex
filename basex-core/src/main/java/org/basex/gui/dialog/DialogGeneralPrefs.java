@@ -55,7 +55,7 @@ final class DialogGeneralPrefs extends BaseXBack {
     border(8).setLayout(new TableLayout(8, 1));
     gui = d.gui;
 
-    final GlobalOptions opts = gui.context.globalopts;
+    final StaticOptions opts = gui.context.soptions;
     final GUIOptions gopts = gui.gopts;
     path = new BaseXTextField(opts.dbpath().path(), d);
 
@@ -78,7 +78,7 @@ final class DialogGeneralPrefs extends BaseXBack {
     });
     label = new BaseXLabel(" ");
     lang = new BaseXCombo(d, LANGS[0]);
-    lang.setSelectedItem(opts.get(GlobalOptions.LANG));
+    lang.setSelectedItem(opts.get(StaticOptions.LANG));
     creds = new BaseXLabel(" ");
 
     add(new BaseXLabel(DATABASE_PATH + COL, true, true));
@@ -142,16 +142,16 @@ final class DialogGeneralPrefs extends BaseXBack {
     simplefd.assign();
 
     // new database path: close opened database
-    final GlobalOptions opts = gui.context.globalopts;
+    final StaticOptions opts = gui.context.soptions;
     if(source == path || source == button) {
       final String dbpath = path.getText();
-      if(!opts.get(GlobalOptions.DBPATH).equals(dbpath) && gui.context.data() != null) {
+      if(!opts.get(StaticOptions.DBPATH).equals(dbpath) && gui.context.data() != null) {
         new Close().run(gui.context);
         gui.notify.init();
       }
-      opts.set(GlobalOptions.DBPATH, dbpath);
+      opts.set(StaticOptions.DBPATH, dbpath);
     }
-    opts.set(GlobalOptions.LANG, lang.getSelectedItem());
+    opts.set(StaticOptions.LANG, lang.getSelectedItem());
 
     gui.gopts.set(GUIOptions.MAXHITS, HITS[limit.getValue()]);
 

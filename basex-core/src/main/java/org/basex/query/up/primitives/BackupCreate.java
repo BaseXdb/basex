@@ -29,7 +29,7 @@ public class BackupCreate extends NameUpdate {
   @Override
   public void apply() throws QueryException {
     try {
-      CreateBackup.backup(name, qc.context, null);
+      CreateBackup.backup(name, qc.context.soptions, null);
     } catch(final IOException ex) {
       throw UPDBOPTERR_X.get(info, ex);
     }

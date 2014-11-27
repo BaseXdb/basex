@@ -61,7 +61,7 @@ public final class DialogAbout extends BaseXDialog {
     pp.add(new BaseXLabel(TEAM2));
     pp.add(new BaseXLabel(AND_OTHERS));
     pp.add(Box.createVerticalStrut(7));
-    final String lang = main.context.globalopts.get(GlobalOptions.LANG);
+    final String lang = main.context.soptions.get(StaticOptions.LANG);
     pp.add(new BaseXLabel(TRANSLATION + " (" + lang + "): " + DialogGeneralPrefs.creds(lang)));
     p.add(pp, BorderLayout.EAST);
     add(p, BorderLayout.NORTH);

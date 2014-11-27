@@ -36,7 +36,7 @@ public class DropBackup extends ABackup {
 
     // drop all backups
     for(final String db : dbs) {
-      for(final String backup : context.databases.backups(db)) drop(backup, context);
+      for(final String backup : context.databases.backups(db)) drop(backup, soptions);
     }
 
     return info(BACKUP_DROPPED_X, name + '*' + IO.ZIPSUFFIX);
@@ -45,11 +45,11 @@ public class DropBackup extends ABackup {
   /**
    * Drops a backup with the specified name.
    * @param name name of backup file
-   * @param ctx database context
+   * @param sopts static options
    * @return success flag
    */
-  public static boolean drop(final String name, final Context ctx) {
-    return new IOFile(ctx.globalopts.dbpath(), name + IO.ZIPSUFFIX).delete();
+  public static boolean drop(final String name, final StaticOptions sopts) {
+    return new IOFile(sopts.dbpath(), name + IO.ZIPSUFFIX).delete();
   }
 
   @Override

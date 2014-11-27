@@ -114,7 +114,7 @@ public final class QT3TS extends Main {
    * @throws Exception exception
    */
   private void run() throws Exception {
-    ctx.globalopts.set(GlobalOptions.DBPATH, sandbox().path() + "/data");
+    ctx.soptions.set(StaticOptions.DBPATH, sandbox().path() + "/data");
     parseArgs();
     init();
 
@@ -884,7 +884,7 @@ public final class QT3TS extends Main {
         } else if(c == 'a') {
           all = true;
         } else if(c == 'd') {
-          ctx.globalopts.set(GlobalOptions.DEBUG, true);
+          ctx.soptions.set(StaticOptions.DEBUG, true);
         } else if(c == 'i') {
           ignoring = true;
         } else if(c == 'e') {

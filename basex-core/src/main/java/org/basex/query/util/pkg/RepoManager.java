@@ -26,8 +26,8 @@ import org.basex.util.list.*;
 public final class RepoManager {
   /** Main-class pattern. */
   private static final Pattern MAIN_CLASS = Pattern.compile("^Main-Class: *(.+?) *$");
-  /** Repository context. */
-  private final Repo repo;
+  /** Context. */
+  private final Context context;
   /** Input info. */
   private InputInfo info;
 
@@ -36,7 +36,7 @@ public final class RepoManager {
    * @param context database context
    */
   public RepoManager(final Context context) {
-    repo = context.repo;
+    this.context = context;
   }
 
   /**
@@ -87,6 +87,7 @@ public final class RepoManager {
     t.header.add(TYPE);
     t.header.add(PATH);
 
+    final Repo repo = context.repo;
     final TokenMap pkg = repo.pkgDict();
     // traverse EXPath packages
     for(final byte[] p : pkg) {
@@ -134,6 +135,7 @@ public final class RepoManager {
    * @return packages
    */
   public StringList list() {
+    final Repo repo = context.repo;
     final StringList sl = new StringList();
     // traverse EXPath packages
     for(final byte[] p : repo.pkgDict()) {
@@ -161,6 +163,7 @@ public final class RepoManager {
    */
   public void delete(final String pkg) throws QueryException {
     boolean found = false;
+    final Repo repo = context.repo;
     final TokenMap dict = repo.pkgDict();
     final byte[] pp = token(pkg);
     for(final byte[] nextPkg : dict) {
@@ -225,7 +228,7 @@ public final class RepoManager {
       throws QueryException, IOException {
 
     // parse module to find namespace uri
-    try(final QueryContext qc = new QueryContext(repo.context)) {
+    try(final QueryContext qc = new QueryContext(context)) {
       final byte[] uri = qc.parseLibrary(string(content), path, null).name.uri();
       // copy file to rewritten URI file path
       final String uriPath = ModuleLoader.uri2path(string(uri));
@@ -260,7 +263,7 @@ public final class RepoManager {
    * @throws IOException I/O exception
    */
   private boolean write(final String path, final byte[] content) throws IOException {
-    final IOFile rp = new IOFile(repo.context.globalopts.get(GlobalOptions.REPOPATH));
+    final IOFile rp = new IOFile(context.soptions.get(StaticOptions.REPOPATH));
     final IOFile target = new IOFile(rp, path);
     final boolean exists = target.exists();
     target.parent().md();
@@ -283,6 +286,7 @@ public final class RepoManager {
 
     // remove existing package
     final byte[] name = pkg.uniqueName();
+    final Repo repo = context.repo;
     final boolean exists = repo.pkgDict().get(name) != null;
     if(exists) delete(string(name));
     new PkgValidator(repo, info).check(pkg);
@@ -303,7 +307,7 @@ public final class RepoManager {
     String nm = name;
     int c = 0;
     do {
-      final IOFile io = repo.path(nm);
+      final IOFile io = context.repo.path(nm);
       if(!io.exists()) return io;
       nm = name + '-' + ++c;
     } while(true);
@@ -316,6 +320,7 @@ public final class RepoManager {
    * @throws QueryException query exception
    */
   private byte[] primary(final byte[] pkgName) throws QueryException {
+    final Repo repo = context.repo;
     final TokenMap dict = repo.pkgDict();
     for(final byte[] nextPkg : dict) {
       if(nextPkg != null && !eq(nextPkg, pkgName)) {

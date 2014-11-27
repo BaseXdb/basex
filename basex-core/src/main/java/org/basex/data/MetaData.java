@@ -109,18 +109,18 @@ public final class MetaData {
    * @param ctx database context
    */
   public MetaData(final String name, final Context ctx) {
-    this(name, ctx.options, ctx.globalopts);
+    this(name, ctx.options, ctx.soptions);
   }
 
   /**
    * Constructor, specifying the database name.
    * @param name name of the database
    * @param options database options
-   * @param global global options
+   * @param sopts static options
    */
-  private MetaData(final String name, final MainOptions options, final GlobalOptions global) {
+  private MetaData(final String name, final MainOptions options, final StaticOptions sopts) {
     this.name = name;
-    path = global != null ? global.dbpath(name) : null;
+    path = sopts != null ? sopts.dbpath(name) : null;
     chop = options.get(MainOptions.CHOP);
     createtext = options.get(MainOptions.TEXTINDEX);
     createattr = options.get(MainOptions.ATTRINDEX);

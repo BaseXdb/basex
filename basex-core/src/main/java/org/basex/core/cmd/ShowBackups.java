@@ -26,7 +26,7 @@ public final class ShowBackups extends ABackup {
     table.header.add(NAME);
     table.header.add(SIZE);
 
-    final IOFile dbpath = context.globalopts.dbpath();
+    final IOFile dbpath = soptions.dbpath();
     for(final String name : context.databases.backups()) {
       final TokenList tl = new TokenList();
       tl.add(name);

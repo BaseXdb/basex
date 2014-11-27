@@ -116,7 +116,7 @@ public final class Add extends ACreate {
 
       // create random database name for disk-based creation
       if(cache(parser)) {
-        clipDB = context.globalopts.random(data.meta.name);
+        clipDB = soptions.random(data.meta.name);
         build = new DiskBuilder(clipDB, parser, context);
       } else {
         build = new MemBuilder(name, parser);
@@ -134,7 +134,7 @@ public final class Add extends ACreate {
   void close() {
     // close and drop intermediary database instance
     if(clip != null) clip.data.close();
-    if(clipDB != null) DropDB.drop(clipDB, context);
+    if(clipDB != null) DropDB.drop(clipDB, soptions);
   }
 
   /**

@@ -27,14 +27,14 @@ public final class Users {
 
   /**
    * Constructor for global users.
-   * @param ctx database context ({@code null} if instance is local)
+   * @param sopts static options ({@code null} if instance is local)
    */
-  public Users(final Context ctx) {
-    if(ctx == null) return;
+  public Users(final StaticOptions sopts) {
+    if(sopts == null) return;
 
     // try to find permission file in database and home directory
     final String perm = IO.BASEXSUFFIX + "perm";
-    file = new IOFile(ctx.globalopts.dbpath(), perm);
+    file = new IOFile(sopts.dbpath(), perm);
     if(!file.exists()) file = new IOFile(Prop.HOME, perm);
 
     if(file.exists()) {

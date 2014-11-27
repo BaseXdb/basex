@@ -75,7 +75,7 @@ public final class DiskTableTest extends SandboxTest {
   @After
   public void tearDown() throws Exception {
     if(tda != null) tda.close();
-    DropDB.drop(NAME, context);
+    DropDB.drop(NAME, context.soptions);
   }
 
   /**

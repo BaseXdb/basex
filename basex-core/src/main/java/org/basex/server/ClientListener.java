@@ -400,7 +400,7 @@ public final class ClientListener extends Thread {
 
     // initialize server-based event handling
     if(!events) {
-      out.print(Integer.toString(context.globalopts.get(GlobalOptions.EVENTPORT)));
+      out.print(Integer.toString(context.soptions.get(StaticOptions.EVENTPORT)));
       out.write(0);
       out.print(Long.toString(getId()));
       out.write(0);

@@ -29,7 +29,7 @@ public final class DbBackups extends StandardFunc {
 
     final StringList backups = name == null ? qc.context.databases.backups() :
       qc.context.databases.backups(name);
-    final IOFile dbpath = qc.context.globalopts.dbpath();
+    final IOFile dbpath = qc.context.soptions.dbpath();
     return new Iter() {
       int up = -1;
 

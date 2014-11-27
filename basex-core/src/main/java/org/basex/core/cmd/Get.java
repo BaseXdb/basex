@@ -44,7 +44,7 @@ public final class Get extends AGet {
       // retrieve values of all options
       if(context.user.has(Perm.ADMIN)) {
         out.println(GLOBAL_OPTIONS + COL);
-        for(final Option<?> o : goptions) out.println(o.name() + COLS + goptions.get(o));
+        for(final Option<?> o : soptions) out.println(o.name() + COLS + soptions.get(o));
       }
       out.println(NL + LOCAL_OPTIONS + COL);
       for(final Option<?> o : options) out.println(o.name() + COLS + options.get(o));
@@ -71,7 +71,7 @@ public final class Get extends AGet {
     Options opts = ctx.options;
     Option<?> opt = opts.option(name);
     if(opt == null && ctx.user.has(Perm.ADMIN)) {
-      opts = ctx.globalopts;
+      opts = ctx.soptions;
       opt = opts.option(name);
     }
     if(opt == null) throw new BaseXException(ctx.options.error(name));

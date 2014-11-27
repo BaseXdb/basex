@@ -53,11 +53,11 @@ public final class DiskBuilder extends Builder implements AutoCloseable {
    * Constructor.
    * @param name name of database
    * @param parse parser
-   * @param ctx database context
+   * @param context database context
    */
-  public DiskBuilder(final String name, final Parser parse, final Context ctx) {
+  public DiskBuilder(final String name, final Parser parse, final Context context) {
     super(name, parse);
-    context = ctx;
+    this.context = context;
   }
 
   @Override
@@ -72,8 +72,9 @@ public final class DiskBuilder extends Builder implements AutoCloseable {
     bs = Math.max(IO.BLOCKSIZE, bs - bs % IO.BLOCKSIZE);
 
     // drop old database (if available) and create new one
-    DropDB.drop(dbname, context);
-    context.globalopts.dbpath(dbname).md();
+    final StaticOptions sopts = context.soptions;
+    DropDB.drop(dbname, sopts);
+    sopts.dbpath(dbname).md();
 
     meta = md;
     elemNames = new Names(md);
@@ -114,7 +115,7 @@ public final class DiskBuilder extends Builder implements AutoCloseable {
     } catch(final IOException ex) {
       Util.debug(ex);
     }
-    if(meta != null) DropDB.drop(meta.name, context);
+    if(meta != null) DropDB.drop(meta.name, context.soptions);
   }
 
   @Override

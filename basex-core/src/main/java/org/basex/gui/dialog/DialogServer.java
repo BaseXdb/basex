@@ -83,7 +83,7 @@ public final class DialogServer extends BaseXDialog {
   /** Combobox for log files. */
   private final BaseXCombo logc;
   /** String for log dir. */
-  private final IOFile logd = ctx.globalopts.dbpath(".logs");
+  private final IOFile logd = ctx.soptions.dbpath(".logs");
   /** ClientSession. */
   private ClientSession cs;
   /** Boolean for check is server is running. */

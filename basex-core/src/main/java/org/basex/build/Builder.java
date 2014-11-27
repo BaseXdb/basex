@@ -55,12 +55,12 @@ public abstract class Builder extends Proc {
 
   /**
    * Constructor.
-   * @param name name of database
+   * @param dbname name of database
    * @param parser parser
    */
-  Builder(final String name, final Parser parser) {
+  Builder(final String dbname, final Parser parser) {
+    this.dbname = dbname;
     this.parser = parser;
-    dbname = name;
   }
 
   // PUBLIC METHODS ===========================================================

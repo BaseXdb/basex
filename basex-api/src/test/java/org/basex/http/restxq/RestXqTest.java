@@ -71,7 +71,7 @@ public abstract class RestXqTest extends HTTPTest {
    */
   protected static void install(final String function) throws IOException {
     // delete old module
-    final String path = context.globalopts.get(GlobalOptions.WEBPATH);
+    final String path = context.soptions.get(StaticOptions.WEBPATH);
     for(final IOFile f : new IOFile(path).children()) assertTrue(f.delete());
     // create new module
     module().write(new TokenBuilder(HEADER).add(function).finish());
@@ -82,7 +82,7 @@ public abstract class RestXqTest extends HTTPTest {
    * @return test module
    */
   private static IOFile module() {
-    final String path = context.globalopts.get(GlobalOptions.WEBPATH);
+    final String path = context.soptions.get(StaticOptions.WEBPATH);
     return new IOFile(path, NAME + count++ + IO.XQMSUFFIX);
   }
 }

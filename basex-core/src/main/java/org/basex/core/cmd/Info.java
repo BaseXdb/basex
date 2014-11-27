@@ -47,9 +47,9 @@ public final class Info extends AInfo {
       info(tb, USED_MEM, Performance.getMemory());
     }
     if(context.user.has(Perm.ADMIN)) {
-      final GlobalOptions gopts = context.globalopts;
+      final StaticOptions sopts = context.soptions;
       tb.add(NL + GLOBAL_OPTIONS + COL + NL);
-      for(final Option<?> o : gopts) info(tb, o.name(), gopts.get(o));
+      for(final Option<?> o : sopts) info(tb, o.name(), sopts.get(o));
     }
     final MainOptions opts = context.options;
     tb.add(NL + LOCAL_OPTIONS + NL);

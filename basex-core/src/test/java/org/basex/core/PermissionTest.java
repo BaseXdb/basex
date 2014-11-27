@@ -63,7 +63,7 @@ public final class PermissionTest extends SandboxTest {
 
       ok(new CreateUser(NAME, Token.md5(NAME)), adminSession);
       ok(new CreateDB(RENAMED), adminSession);
-      server.context.globalopts.set(GlobalOptions.REPOPATH, REPO);
+      server.context.soptions.set(StaticOptions.REPOPATH, REPO);
       testSession = createClient(NAME, NAME);
 
       ok(new CreateDB(NAME, "<xml/>"), adminSession);

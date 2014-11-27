@@ -76,13 +76,13 @@ public final class BaseXServer extends CLI implements Runnable {
   public BaseXServer(final Context ctx, final String... args) throws IOException {
     super(args, ctx);
 
-    final GlobalOptions gopts = context.globalopts;
-    final int port = gopts.get(GlobalOptions.SERVERPORT);
-    final int eport = gopts.get(GlobalOptions.EVENTPORT);
+    final StaticOptions sopts = context.soptions;
+    final int port = sopts.get(StaticOptions.SERVERPORT);
+    final int eport = sopts.get(StaticOptions.EVENTPORT);
     // ensure that port numbers are different
     if(port == eport) throw new BaseXException(PORT_TWICE_X, port);
 
-    final String host = gopts.get(GlobalOptions.SERVERHOST);
+    final String host = sopts.get(StaticOptions.SERVERHOST);
     final InetAddress addr = host.isEmpty() ? null : InetAddress.getByName(host);
 
     if(service) {
@@ -145,7 +145,7 @@ public final class BaseXServer extends CLI implements Runnable {
           quit();
         } else {
           // drop inactive connections
-          final long ka = context.globalopts.get(GlobalOptions.KEEPALIVE) * 1000L;
+          final long ka = context.soptions.get(StaticOptions.KEEPALIVE) * 1000L;
           if(ka > 0) {
             final long ms = System.currentTimeMillis();
             for(final ClientListener cs : context.sessions) {
@@ -154,7 +154,7 @@ public final class BaseXServer extends CLI implements Runnable {
           }
           final ClientListener cl = new ClientListener(s, context, this);
           // start authentication timeout
-          final long to = context.globalopts.get(GlobalOptions.KEEPALIVE) * 1000L;
+          final long to = context.soptions.get(StaticOptions.KEEPALIVE) * 1000L;
           if(to > 0) {
             cl.auth.schedule(new TimerTask() {
               @Override
@@ -230,13 +230,13 @@ public final class BaseXServer extends CLI implements Runnable {
             daemon = true;
             break;
           case 'e': // parse event port
-            context.globalopts.set(GlobalOptions.EVENTPORT, arg.number());
+            context.soptions.set(StaticOptions.EVENTPORT, arg.number());
             break;
           case 'n': // parse host the server is bound to
-            context.globalopts.set(GlobalOptions.SERVERHOST, arg.string());
+            context.soptions.set(StaticOptions.SERVERHOST, arg.string());
             break;
           case 'p': // parse server port
-            context.globalopts.set(GlobalOptions.SERVERPORT, arg.number());
+            context.soptions.set(StaticOptions.SERVERPORT, arg.number());
             break;
           case 'q': // quiet flag (hidden)
             quiet = true;
@@ -245,7 +245,7 @@ public final class BaseXServer extends CLI implements Runnable {
             service = !daemon;
             break;
           case 'z': // suppress logging
-            context.globalopts.set(GlobalOptions.LOG, false);
+            context.soptions.set(StaticOptions.LOG, false);
             break;
           default:
             throw arg.usage();
@@ -265,8 +265,8 @@ public final class BaseXServer extends CLI implements Runnable {
    * @throws IOException I/O exception
    */
   public void stop() throws IOException {
-    final GlobalOptions gopts = context.globalopts;
-    stop(gopts.get(GlobalOptions.SERVERPORT), gopts.get(GlobalOptions.EVENTPORT));
+    final StaticOptions sopts = context.soptions;
+    stop(sopts.get(StaticOptions.SERVERPORT), sopts.get(StaticOptions.EVENTPORT));
   }
 
   // STATIC METHODS ===========================================================

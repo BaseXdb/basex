@@ -45,10 +45,8 @@ public final class LockingTest extends SandboxTest {
     return params;
   }
 
-  /** Global options, used to read parallel transactions limit. */
-  private final GlobalOptions gopts = new Context().globalopts;
   /** Locking instance used for testing. */
-  private final DBLocking locks = new DBLocking(gopts);
+  private final DBLocking locks = new DBLocking(context.soptions);
   /** Objects used for locking. */
   private final String[] objects = new String[5];
   /** Empty string array for convenience. */
@@ -148,7 +146,7 @@ public final class LockingTest extends SandboxTest {
   @Test
   public void parallelTransactionLimitTest() throws InterruptedException {
     final CountDownLatch latch =
-        new CountDownLatch(Math.max(gopts.get(GlobalOptions.PARALLEL), 1));
+        new CountDownLatch(Math.max(context.soptions.get(StaticOptions.PARALLEL), 1));
     // Container for(maximum number allowed transactions) + 1 testers
     final LockTester[] testers = (LockTester[]) Array.newInstance(
         LockTester.class, (int) (latch.getCount() + 1));

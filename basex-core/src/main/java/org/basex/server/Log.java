@@ -34,8 +34,8 @@ public final class Log {
   /** REQUEST string. */
   public static final String REQUEST = "REQUEST";
 
-  /** Global options. */
-  private final GlobalOptions gopts;
+  /** Static options. */
+  private final StaticOptions sopts;
   /** Start date of log. */
   private String start;
   /** Output stream. */
@@ -43,10 +43,10 @@ public final class Log {
 
   /**
    * Constructor.
-   * @param ctx database context
+   * @param sopts static options
    */
-  public Log(final Context ctx) {
-    gopts = ctx.globalopts;
+  public Log(final StaticOptions sopts) {
+    this.sopts = sopts;
   }
 
   /**
@@ -74,7 +74,7 @@ public final class Log {
    * @param str strings to be written
    */
   public synchronized void write(final Object... str) {
-    if(!gopts.get(GlobalOptions.LOG)) {
+    if(!sopts.get(StaticOptions.LOG)) {
       close();
       return;
     }
@@ -95,7 +95,7 @@ public final class Log {
       }
 
       // construct log text
-      final int ml = gopts.get(GlobalOptions.LOGMSGMAXLEN);
+      final int ml = sopts.get(StaticOptions.LOGMSGMAXLEN);
       final TokenBuilder tb = new TokenBuilder(DateTime.format(date, DateTime.TIME));
       for(final Object s : str) {
         tb.add('\t');
@@ -135,7 +135,7 @@ public final class Log {
    */
   public synchronized IOFile dir() {
     // log suffix, plural
-    return gopts.dbpath(IO.LOGSUFFIX + 's');
+    return sopts.dbpath(IO.LOGSUFFIX + 's');
   }
 
   /**

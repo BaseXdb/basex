@@ -42,13 +42,13 @@ public final class Copy extends Command {
     if(!Databases.validName(trg)) return error(NAME_INVALID_X, trg);
 
     // source database does not exist
-    if(!goptions.dbexists(src)) return error(DB_NOT_FOUND_X, src);
+    if(!soptions.dbexists(src)) return error(DB_NOT_FOUND_X, src);
     // target database already exists
-    if(goptions.dbexists(trg)) return error(DB_EXISTS_X, trg);
+    if(soptions.dbexists(trg)) return error(DB_EXISTS_X, trg);
 
     // try to copy database
     try {
-      copy(src, trg, context, this);
+      copy(src, trg, soptions, this);
       return info(DB_COPIED_X, src, perf);
     } catch(final IOException ex) {
       return error(DB_NOT_COPIED_X, src);
@@ -59,19 +59,18 @@ public final class Copy extends Command {
    * Copies the specified database.
    * @param source name of the database
    * @param target new database name
-   * @param context database context
+   * @param sopts static options
    * @param cmd calling command
    * @throws IOException I/O exception
    */
-  public static void copy(final String source, final String target, final Context context,
+  public static void copy(final String source, final String target, final StaticOptions sopts,
       final Copy cmd) throws IOException {
 
-    final GlobalOptions goptions = context.globalopts;
-    final IOFile src = goptions.dbpath(source);
-    final IOFile trg = goptions.dbpath(target);
+    final IOFile src = sopts.dbpath(source);
+    final IOFile trg = sopts.dbpath(target);
 
     // drop target database
-    DropDB.drop(target, context);
+    DropDB.drop(target, sopts);
 
     // return false if source cannot be opened, or target cannot be created
     final StringList files = src.descendants();
@@ -84,7 +83,7 @@ public final class Copy extends Command {
     } catch(final IOException ex) {
       // drop new database if error occurred
       Util.debug(ex);
-      DropDB.drop(target, context);
+      DropDB.drop(target, sopts);
       throw ex;
     }
   }

@@ -54,7 +54,7 @@ public final class RESTRun extends RESTQuery {
       final String val) throws IOException {
 
     // get root directory for files
-    final IOFile root = new IOFile(rs.context.globalopts.get(GlobalOptions.WEBPATH));
+    final IOFile root = new IOFile(rs.context.soptions.get(StaticOptions.WEBPATH));
 
     // check if file is not found, is a folder or points to parent folder
     final IOFile file = new IOFile(root, path);

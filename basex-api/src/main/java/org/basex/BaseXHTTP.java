@@ -66,8 +66,8 @@ public final class BaseXHTTP extends Main {
     context = HTTPContext.init();
 
     // create jetty instance and set default context to HTTP path
-    final GlobalOptions gopts = context.globalopts;
-    final String webapp = gopts.get(GlobalOptions.WEBPATH);
+    final StaticOptions sopts = context.soptions;
+    final String webapp = sopts.get(StaticOptions.WEBPATH);
     final WebAppContext wac = new WebAppContext(webapp, "/");
     jetty = (Server) new XmlConfiguration(initJetty(webapp).inputStream()).configure();
     jetty.setHandler(wac);
@@ -109,10 +109,10 @@ public final class BaseXHTTP extends Main {
     }
 
     // request password on command line if only the user was specified
-    if(!Options.getSystem(GlobalOptions.USER).isEmpty()) {
-      while(Options.getSystem(GlobalOptions.PASSWORD).isEmpty()) {
+    if(!Options.getSystem(StaticOptions.USER).isEmpty()) {
+      while(Options.getSystem(StaticOptions.PASSWORD).isEmpty()) {
         Util.out(PASSWORD + COLS);
-        Options.setSystem(GlobalOptions.PASSWORD, Util.password());
+        Options.setSystem(StaticOptions.PASSWORD, Util.password());
       }
     }
 
@@ -134,8 +134,8 @@ public final class BaseXHTTP extends Main {
     HTTPContext.init(wac.getServletContext());
 
     // start daemon for stopping web server
-    final int stop = gopts.get(GlobalOptions.STOPPORT);
-    if(stop >= 0) new StopServer(gopts.get(GlobalOptions.SERVERHOST), stop).start();
+    final int stop = sopts.get(StaticOptions.STOPPORT);
+    if(stop >= 0) new StopServer(sopts.get(StaticOptions.SERVERHOST), stop).start();
 
     // show info when HTTP server is aborted. needs to be called in constructor:
     // otherwise, it may only be called if the JVM process is already shut down
@@ -167,14 +167,14 @@ public final class BaseXHTTP extends Main {
    */
   public void stop() throws Exception {
     // notify the jetty monitor to stop
-    final GlobalOptions mprop = context.globalopts;
-    final int stop = num(GlobalOptions.STOPPORT, mprop);
+    final StaticOptions mprop = context.soptions;
+    final int stop = num(StaticOptions.STOPPORT, mprop);
     if(stop >= 0) stop(stop);
 
     // server has been started in a separate process and needs to be stopped
-    if(!bool(GlobalOptions.HTTPLOCAL, mprop)) {
-      final int port = num(GlobalOptions.SERVERPORT, mprop);
-      final int eport = num(GlobalOptions.EVENTPORT, mprop);
+    if(!bool(StaticOptions.HTTPLOCAL, mprop)) {
+      final int port = num(StaticOptions.SERVERPORT, mprop);
+      final int eport = num(StaticOptions.EVENTPORT, mprop);
       BaseXServer.stop(port, eport);
     }
   }
@@ -182,23 +182,23 @@ public final class BaseXHTTP extends Main {
   /**
    * Returns a numeric value for the specified option.
    * @param option option to be retrieved
-   * @param gopts global options
+   * @param sopts static options
    * @return numeric value
    */
-  private static int num(final NumberOption option, final GlobalOptions gopts) {
+  private static int num(final NumberOption option, final StaticOptions sopts) {
     final String val = Options.getSystem(option);
-    return val.isEmpty() ? gopts.get(option) : Token.toInt(val);
+    return val.isEmpty() ? sopts.get(option) : Token.toInt(val);
   }
 
   /**
    * Returns a boolean value for the specified option.
    * @param option option to be retrieved
-   * @param gopts global options
+   * @param sopts static options
    * @return boolean value
    */
-  private static boolean bool(final BooleanOption option, final GlobalOptions gopts) {
+  private static boolean bool(final BooleanOption option, final StaticOptions sopts) {
     final String val = Options.getSystem(option);
-    return val.isEmpty() ? gopts.get(option) : Boolean.parseBoolean(val);
+    return val.isEmpty() ? sopts.get(option) : Boolean.parseBoolean(val);
   }
 
   /**
@@ -267,43 +267,43 @@ public final class BaseXHTTP extends Main {
       if(arg.dash()) {
         switch(arg.next()) {
           case 'd': // activate debug mode
-            Options.setSystem(GlobalOptions.DEBUG, true);
+            Options.setSystem(StaticOptions.DEBUG, true);
             Prop.debug = true;
             break;
           case 'D': // hidden flag: daemon mode
             serve = false;
             break;
           case 'e': // parse event port
-            Options.setSystem(GlobalOptions.EVENTPORT, arg.number());
+            Options.setSystem(StaticOptions.EVENTPORT, arg.number());
             break;
           case 'h': // parse HTTP port
             httpPort = arg.number();
             break;
           case 'l': // use local mode
-            Options.setSystem(GlobalOptions.HTTPLOCAL, true);
+            Options.setSystem(StaticOptions.HTTPLOCAL, true);
             break;
           case 'n': // parse host name
-            Options.setSystem(GlobalOptions.HOST, arg.string());
+            Options.setSystem(StaticOptions.HOST, arg.string());
             break;
           case 'p': // parse server port
             final int p = arg.number();
-            Options.setSystem(GlobalOptions.PORT, p);
-            Options.setSystem(GlobalOptions.SERVERPORT, p);
+            Options.setSystem(StaticOptions.PORT, p);
+            Options.setSystem(StaticOptions.SERVERPORT, p);
             break;
           case 'P': // specify password
-            Options.setSystem(GlobalOptions.PASSWORD, arg.string());
+            Options.setSystem(StaticOptions.PASSWORD, arg.string());
             break;
           case 's': // parse stop port
-            Options.setSystem(GlobalOptions.STOPPORT, arg.number());
+            Options.setSystem(StaticOptions.STOPPORT, arg.number());
             break;
           case 'S': // set service flag
             service = serve;
             break;
           case 'U': // specify user name
-            Options.setSystem(GlobalOptions.USER, arg.string());
+            Options.setSystem(StaticOptions.USER, arg.string());
             break;
           case 'z': // suppress logging
-            Options.setSystem(GlobalOptions.LOG, false);
+            Options.setSystem(StaticOptions.LOG, false);
             break;
           default:
             throw arg.usage();

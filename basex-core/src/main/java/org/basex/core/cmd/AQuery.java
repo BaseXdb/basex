@@ -104,7 +104,7 @@ public abstract class AQuery extends Command {
         // dump some query info
         out.flush();
         // remove string list if global locking is used and if query is updating
-        if(goptions.get(GlobalOptions.GLOBALLOCK) && qp.updating) {
+        if(soptions.get(StaticOptions.GLOBALLOCK) && qp.updating) {
           info.readLocked = null;
           info.writeLocked = null;
         }

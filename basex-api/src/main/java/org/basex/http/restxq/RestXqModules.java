@@ -130,9 +130,10 @@ public final class RestXqModules {
   private synchronized void cache(final HTTPContext http) throws Exception {
     // initialize RESTXQ directory (may be relative against WEBPATH)
     if(restxq == null) {
-      final GlobalOptions gopts = http.context().globalopts;
-      restxq = new IOFile(gopts.get(GlobalOptions.WEBPATH)).resolve(
-          gopts.get(GlobalOptions.RESTXQPATH));
+      final StaticOptions sopts = http.context().soptions;
+      final String webpath = sopts.get(StaticOptions.WEBPATH);
+      final String rxqpath = sopts.get(StaticOptions.RESTXQPATH);
+      restxq = new IOFile(webpath).resolve(rxqpath);
     }
     // create new cache
     final HashMap<String, RestXqModule> cache = new HashMap<>();

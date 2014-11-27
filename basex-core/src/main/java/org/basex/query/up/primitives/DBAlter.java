@@ -36,7 +36,8 @@ public class DBAlter extends NameUpdate {
   public void apply() throws QueryException {
     close();
     close(newName, qc, info);
-    if(!AlterDB.alter(name, newName, qc.context)) throw UPDBERROR_X_X.get(info, name, operation());
+    if(!AlterDB.alter(name, newName, qc.context.soptions))
+      throw UPDBERROR_X_X.get(info, name, operation());
   }
 
   @Override

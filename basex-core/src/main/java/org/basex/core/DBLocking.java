@@ -10,7 +10,7 @@ import org.basex.util.list.*;
 
 /**
  * Manage read and write locks on arbitrary strings. Maximum of
- * {@link GlobalOptions#PARALLEL} concurrent transactions are allowed,
+ * {@link StaticOptions#PARALLEL} concurrent transactions are allowed,
  * further will be queued.
  *
  * This class prevents locking deadlocks by sorting all all strings
@@ -21,7 +21,7 @@ import org.basex.util.list.*;
  * them in parallel by the same thread (it is fine to call arbitrary locking methods by
  * different threads at the same time).
  *
- * This locking can be deactivated by setting {@link GlobalOptions#GLOBALLOCK} to
+ * This locking can be deactivated by setting {@link StaticOptions#GLOBALLOCK} to
  * {@code true}.
  *
  * @author BaseX Team 2005-14, BSD License
@@ -88,15 +88,15 @@ public final class DBLocking implements Locking {
    * everything, an empty array lock nothing.
    */
   private final ConcurrentMap<Long, StringList> readLocked = new ConcurrentHashMap<>();
-  /** BaseX database context. */
-  private final GlobalOptions gopts;
+  /** Static options. */
+  private final StaticOptions sopts;
 
   /**
    * Initialize new Locking instance.
-   * @param opts global options, used to read parallel transactions limit.
+   * @param sopts static options
    */
-  public DBLocking(final GlobalOptions opts) {
-    gopts = opts;
+  public DBLocking(final StaticOptions sopts) {
+    this.sopts = sopts;
   }
 
   @Override
@@ -108,7 +108,7 @@ public final class DBLocking implements Locking {
     // Wait in queue if necessary
     synchronized(queue) { // Guard queue and transaction, monitor for waiting in queue
       queue.add(thread);
-      while(transactions >= Math.max(gopts.get(GlobalOptions.PARALLEL), 1)
+      while(transactions >= Math.max(sopts.get(StaticOptions.PARALLEL), 1)
           || queue.peek() != thread) {
         try {
           queue.wait();
@@ -117,7 +117,7 @@ public final class DBLocking implements Locking {
         }
       }
       final int t = transactions++;
-      assert t <= Math.max(gopts.get(GlobalOptions.PARALLEL), 1);
+      assert t <= Math.max(sopts.get(StaticOptions.PARALLEL), 1);
       queue.remove(thread);
     }
 

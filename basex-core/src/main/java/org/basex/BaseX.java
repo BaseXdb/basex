@@ -242,16 +242,16 @@ public class BaseX extends CLI {
           // client options: need to be set before other options
           if(c == 'n') {
             // set server name
-            context.globalopts.set(GlobalOptions.HOST, arg.string());
+            context.soptions.set(StaticOptions.HOST, arg.string());
           } else if(c == 'p') {
             // set server port
-            context.globalopts.set(GlobalOptions.PORT, arg.number());
+            context.soptions.set(StaticOptions.PORT, arg.number());
           } else if(c == 'P') {
             // specify password
-            context.globalopts.set(GlobalOptions.PASSWORD, arg.string());
+            context.soptions.set(StaticOptions.PASSWORD, arg.string());
           } else if(c == 'U') {
             // specify user name
-            context.globalopts.set(GlobalOptions.USER, arg.string());
+            context.soptions.set(StaticOptions.USER, arg.string());
           } else {
             throw arg.usage();
           }

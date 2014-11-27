@@ -32,7 +32,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
       throws XMLDBException {
     // create database context
     final String name = getCollectionName(uri);
-    final boolean exists = ctx.globalopts.dbexists(name);
+    final boolean exists = ctx.soptions.dbexists(name);
     return exists ? new BXCollection(name, true, this) : null;
   }
 
@@ -77,7 +77,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
       if(main.startsWith(XMLDBURI)) {
         final String host = main.substring(XMLDBURI.length());
         final String localhost = S_LOCALHOST + ':' +
-            ctx.globalopts.get(GlobalOptions.SERVERPORT) + '/';
+            ctx.soptions.get(StaticOptions.SERVERPORT) + '/';
         if(host.startsWith(localhost)) return host.substring(localhost.length());
       }
     }

@@ -80,7 +80,7 @@ public final class Open extends Command {
       Data data = ctx.dbs.pin(name);
       if(data == null) {
         // check if database exists
-        if(!ctx.globalopts.dbexists(name)) throw new BaseXException(dbnf(name));
+        if(!ctx.soptions.dbexists(name)) throw new BaseXException(dbnf(name));
         data = new DiskData(name, ctx);
         ctx.dbs.add(data);
       }

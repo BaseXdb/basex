@@ -61,7 +61,7 @@ public final class DialogPrefs extends BaseXDialog {
   @Override
   public void cancel() {
     gui.gopts.set(GUIOptions.PREFTAB, tabs.getSelectedIndex());
-    gui.context.globalopts.write();
+    gui.context.soptions.write();
     super.cancel();
   }
 }

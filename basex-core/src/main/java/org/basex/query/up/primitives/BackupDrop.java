@@ -31,7 +31,8 @@ public final class BackupDrop extends NameUpdate {
 
   @Override
   public void apply() throws QueryException {
-    if(!DropBackup.drop(name, qc.context)) throw UPDROPBACK_X_X.get(info, name, operation());
+    if(!DropBackup.drop(name, qc.context.soptions))
+      throw UPDROPBACK_X_X.get(info, name, operation());
   }
 
   @Override

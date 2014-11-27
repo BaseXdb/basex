@@ -41,7 +41,7 @@ public final class DropDB extends ACreate {
       if(context.pinned(db)) {
         info(DB_PINNED_X, db);
         ok = false;
-      } else if(!drop(db, context)) {
+      } else if(!drop(db, soptions)) {
         // dropping was not successful
         info(DB_NOT_DROPPED_X, db);
         ok = false;
@@ -55,11 +55,11 @@ public final class DropDB extends ACreate {
   /**
    * Deletes the specified database.
    * @param db name of the database
-   * @param ctx database context
+   * @param sopts static options
    * @return success flag
    */
-  public static synchronized boolean drop(final String db, final Context ctx) {
-    final IOFile dbpath = ctx.globalopts.dbpath(db);
+  public static synchronized boolean drop(final String db, final StaticOptions sopts) {
+    final IOFile dbpath = sopts.dbpath(db);
     return dbpath.exists() && dbpath.delete();
   }
 

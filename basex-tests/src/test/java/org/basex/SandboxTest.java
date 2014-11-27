@@ -52,9 +52,9 @@ public abstract class SandboxTest {
    */
   protected static void initContext(final Context ctx) {
     final IOFile sb = sandbox();
-    ctx.globalopts.set(GlobalOptions.DBPATH, sb.path() + "/data");
-    ctx.globalopts.set(GlobalOptions.WEBPATH, sb.path() + "/webapp");
-    ctx.globalopts.set(GlobalOptions.REPOPATH, sb.path() + "/repo");
+    ctx.soptions.set(StaticOptions.DBPATH, sb.path() + "/data");
+    ctx.soptions.set(StaticOptions.WEBPATH, sb.path() + "/webapp");
+    ctx.soptions.set(StaticOptions.REPOPATH, sb.path() + "/repo");
   }
 
   /**
@@ -80,7 +80,7 @@ public abstract class SandboxTest {
       final StringList sl = new StringList().add("-z").add("-p9999").add("-e9998").add("-q");
       for(final String a : args) sl.add(a);
       final BaseXServer server = new BaseXServer(sl.toArray());
-      server.context.globalopts.set(GlobalOptions.DBPATH, sandbox().path());
+      server.context.soptions.set(StaticOptions.DBPATH, sandbox().path());
       return server;
     } finally {
       System.setOut(OUT);

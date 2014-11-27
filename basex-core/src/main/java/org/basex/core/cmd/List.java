@@ -85,7 +85,7 @@ public final class List extends Command {
       }
 
       // count number of raw files
-      final IOFile dir = new IOFile(goptions.dbpath(name), IO.RAW);
+      final IOFile dir = new IOFile(soptions.dbpath(name), IO.RAW);
       final int bin = dir.descendants().size();
 
       // create entry
@@ -155,12 +155,12 @@ public final class List extends Command {
 
   /**
    * Returns a list of all databases.
-   * @param ctx database context
+   * @param sopts static options
    * @return list of databases
    */
-  public static StringList list(final Context ctx) {
+  public static StringList list(final StaticOptions sopts) {
     final StringList db = new StringList();
-    for(final IOFile f : ctx.globalopts.dbpath().children()) {
+    for(final IOFile f : sopts.dbpath().children()) {
       final String name = f.name();
       if(f.isDir() && !name.startsWith(".")) db.add(name);
     }

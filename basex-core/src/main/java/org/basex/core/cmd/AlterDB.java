@@ -35,9 +35,9 @@ public final class AlterDB extends ACreate {
     if(!Databases.validName(trg)) return error(NAME_INVALID_X, trg);
 
     // database does not exist
-    if(!goptions.dbexists(src)) return error(DB_NOT_FOUND_X, src);
+    if(!soptions.dbexists(src)) return error(DB_NOT_FOUND_X, src);
     // target database already exists
-    if(goptions.dbexists(trg)) return error(DB_EXISTS_X, trg);
+    if(soptions.dbexists(trg)) return error(DB_EXISTS_X, trg);
 
     // close database if it's currently opened and not opened by others
     if(!closed) closed = close(context, src);
@@ -45,7 +45,7 @@ public final class AlterDB extends ACreate {
     if(context.pinned(src)) return error(DB_PINNED_X, src);
 
     // try to alter database
-    return alter(src, trg, context) && (!closed || new Open(trg).run(context)) ?
+    return alter(src, trg, soptions) && (!closed || new Open(trg).run(context)) ?
         info(DB_RENAMED_X, src, trg) : error(DB_NOT_RENAMED_X, src);
   }
 
@@ -58,15 +58,15 @@ public final class AlterDB extends ACreate {
    * Renames the specified database.
    * @param source name of the existing database
    * @param target new database name
-   * @param context database context
+   * @param sopts static options
    * @return success flag
    */
   public static synchronized boolean alter(final String source, final String target,
-      final Context context) {
+      final StaticOptions sopts) {
 
     // drop target database
-    DropDB.drop(target, context);
-    return context.globalopts.dbpath(source).rename(context.globalopts.dbpath(target));
+    DropDB.drop(target, sopts);
+    return sopts.dbpath(source).rename(sopts.dbpath(target));
   }
 
   @Override

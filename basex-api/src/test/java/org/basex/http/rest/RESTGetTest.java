@@ -133,7 +133,7 @@ public final class RESTGetTest extends RESTTest {
    */
   @Test
   public void runOption() throws IOException {
-    final String path = context.globalopts.get(GlobalOptions.WEBPATH);
+    final String path = context.soptions.get(StaticOptions.WEBPATH);
     new IOFile(path, "x.xq").write(Token.token("1"));
     assertEquals("1", get("?run=x.xq"));
 

@@ -40,13 +40,13 @@ public final class Set extends AGet {
     final String name = args[0].toUpperCase(Locale.ENGLISH), val = args[1];
     Options opts = options;
 
-    // check global options: only "debug" can be changed by admin users
+    // check static options: only "debug" can be changed by admin users
     boolean debug = false;
     if(context.user.has(Perm.ADMIN)) {
-      final Option<?> opt = goptions.option(name);
-      if(opt == GlobalOptions.DEBUG) {
+      final Option<?> opt = soptions.option(name);
+      if(opt == StaticOptions.DEBUG) {
         debug = true;
-        opts = goptions;
+        opts = soptions;
       } else if(opt != null) {
         return error(GLOBAL_OPTION_X, name);
       }
@@ -56,7 +56,7 @@ public final class Set extends AGet {
       // set value and return info string with new value
       opts.assign(name, val);
       // assign static debugging flag
-      if(debug) Prop.debug = opts.get(GlobalOptions.DEBUG);
+      if(debug) Prop.debug = opts.get(StaticOptions.DEBUG);
       return info(name + COLS + opts.get(opts.option(name)));
     } catch(final BaseXException ex) {
       Util.debug(ex);

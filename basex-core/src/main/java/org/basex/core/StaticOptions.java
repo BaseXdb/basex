@@ -10,12 +10,12 @@ import org.basex.util.options.*;
 
 /**
  * This class defines options which are used all around the project.
- * They are also stored in the project's home directory.
+ * The initial keys and values are also stored in the project's home directory.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class GlobalOptions extends Options {
+public final class StaticOptions extends Options {
   /** Indicates if the user's home directory has been chosen as home directory. */
   private static final boolean USERHOME = Prop.HOME.equals(Prop.USERHOME);
 
@@ -90,7 +90,7 @@ public final class GlobalOptions extends Options {
    * Constructor, adopting system properties starting with "org.basex.".
    * @param file if {@code true}, options will be read from disk
    */
-  GlobalOptions(final boolean file) {
+  StaticOptions(final boolean file) {
     super(file ? new IOFile(HOME, IO.BASEXSUFFIX) : null);
     setSystem();
 

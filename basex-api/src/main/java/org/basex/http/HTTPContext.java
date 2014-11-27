@@ -91,9 +91,9 @@ public final class HTTPContext {
     path = decode(normalize(req.getPathInfo()));
 
     // adopt servlet-specific credentials or use global ones
-    final GlobalOptions mprop = context().globalopts;
-    user = servlet.user != null ? servlet.user : mprop.get(GlobalOptions.USER);
-    pass = servlet.pass != null ? servlet.pass : mprop.get(GlobalOptions.PASSWORD);
+    final StaticOptions mprop = context().soptions;
+    user = servlet.user != null ? servlet.user : mprop.get(StaticOptions.USER);
+    pass = servlet.pass != null ? servlet.pass : mprop.get(StaticOptions.PASSWORD);
 
     // overwrite credentials with session-specific data
     final String auth = req.getHeader(AUTHORIZATION);
@@ -345,7 +345,7 @@ public final class HTTPContext {
     // set web application path as home directory and HTTPPATH
     final String webapp = sc.getRealPath("/");
     Options.setSystem(Prop.PATH, webapp);
-    Options.setSystem(GlobalOptions.WEBPATH, webapp);
+    Options.setSystem(StaticOptions.WEBPATH, webapp);
 
     // bind all parameters that start with "org.basex." to system properties
     final Enumeration<String> en = sc.getInitParameterNames();
@@ -366,12 +366,12 @@ public final class HTTPContext {
     if(context == null) {
       context = new Context(false);
     } else {
-      context.globalopts.setSystem();
+      context.soptions.setSystem();
       context.options.setSystem();
     }
 
     // start server instance
-    if(!context.globalopts.get(GlobalOptions.HTTPLOCAL)) {
+    if(!context.soptions.get(StaticOptions.HTTPLOCAL)) {
       try {
         new BaseXServer(context);
       } catch(final IOException ex) {

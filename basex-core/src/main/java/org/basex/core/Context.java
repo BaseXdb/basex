@@ -26,8 +26,8 @@ public final class Context {
   public final ClientBlocker blocker;
   /** Options. */
   public final MainOptions options = new MainOptions();
-  /** Global options. */
-  public final GlobalOptions globalopts;
+  /** Static options. */
+  public final StaticOptions soptions;
   /** Client connections. */
   public final Sessions sessions;
   /** Event pool. */
@@ -74,18 +74,18 @@ public final class Context {
    * @param file retrieve options from disk
    */
   public Context(final boolean file) {
-    this(new GlobalOptions(file));
+    this(new StaticOptions(file));
   }
 
   /**
    * Constructor, called by clients, and adopting the variables of the main process.
    * The {@link #user} reference must be set after calling this method.
    * @param ctx context of the main process
-   * @param cl client listener
+   * @param listener client listener
    */
-  public Context(final Context ctx, final ClientListener cl) {
-    listener = cl;
-    globalopts = ctx.globalopts;
+  public Context(final Context ctx, final ClientListener listener) {
+    this.listener = listener;
+    soptions = ctx.soptions;
     dbs = ctx.dbs;
     events = ctx.events;
     sessions = ctx.sessions;
@@ -99,19 +99,20 @@ public final class Context {
 
   /**
    * Private constructor.
-   * @param gopts main options
+   * @param soptions static options
    */
-  private Context(final GlobalOptions gopts) {
-    globalopts = gopts;
+  private Context(final StaticOptions soptions) {
+    this.soptions = soptions;
     dbs = new Datas();
     events = new Events();
     sessions = new Sessions();
     blocker = new ClientBlocker();
-    databases = new Databases(this);
-    locks = gopts.get(GlobalOptions.GLOBALLOCK) ? new ProcLocking(this) : new DBLocking(gopts);
-    users = new Users(this);
-    repo = new Repo(this);
-    log = new Log(this);
+    databases = new Databases(soptions);
+    locks = soptions.get(StaticOptions.GLOBALLOCK) ? new ProcLocking(soptions) :
+      new DBLocking(soptions);
+    users = new Users(soptions);
+    repo = new Repo(soptions);
+    log = new Log(soptions);
     user = users.get(S_ADMIN);
     listener = null;
   }
@@ -231,7 +232,7 @@ public final class Context {
     pr.registered(true);
 
     // administrators will not be affected by the timeout
-    if(!user.has(Perm.ADMIN)) pr.startTimeout(globalopts.get(GlobalOptions.TIMEOUT) * 1000L);
+    if(!user.has(Perm.ADMIN)) pr.startTimeout(soptions.get(StaticOptions.TIMEOUT) * 1000L);
 
     // get touched databases
     final LockResult lr = new LockResult();

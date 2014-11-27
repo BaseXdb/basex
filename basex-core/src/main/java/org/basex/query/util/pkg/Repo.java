@@ -17,9 +17,6 @@ import org.basex.util.hash.*;
  * @author Rositsa Shadura
  */
 public final class Repo {
-  /** Database context. */
-  final Context context;
-
   /** Namespace-dictionary with all namespaces (unique names) available
    * in the repository, and the packages in which they are found. */
   private final TokenObjMap<TokenSet> nsDict = new TokenObjMap<>();
@@ -27,13 +24,15 @@ public final class Repo {
   private final TokenMap pkgDict = new TokenMap();
   /** Repository path; will be initialized after first call. */
   private IOFile path;
+  /** Static options. */
+  private final StaticOptions sopts;
 
   /**
    * Constructor.
-   * @param ctx database context
+   * @param sopts static options
    */
-  public Repo(final Context ctx) {
-    context = ctx;
+  public Repo(final StaticOptions sopts) {
+    this.sopts = sopts;
   }
 
   /**
@@ -107,7 +106,7 @@ public final class Repo {
    */
   private Repo init() {
     if(path == null) {
-      path = new IOFile(context.globalopts.get(GlobalOptions.REPOPATH));
+      path = new IOFile(sopts.get(StaticOptions.REPOPATH));
       for(final IOFile dir : path.children()) {
         if(dir.isDir()) readPkg(dir);
       }

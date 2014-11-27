@@ -35,7 +35,7 @@ class RESTQuery extends RESTCmd {
 
   @Override
   protected void run0() throws IOException {
-    query(session.context.globalopts.get(GlobalOptions.WEBPATH));
+    query(session.context.soptions.get(StaticOptions.WEBPATH));
   }
 
   /**

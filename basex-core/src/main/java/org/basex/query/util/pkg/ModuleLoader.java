@@ -95,7 +95,7 @@ public final class ModuleLoader {
 
     if(!java) {
       // no "java:" prefix: first try to import module as XQuery
-      final String path = context.globalopts.get(GlobalOptions.REPOPATH) + uriPath;
+      final String path = context.soptions.get(StaticOptions.REPOPATH) + uriPath;
       // check for any file with XQuery suffix
       for(final String suf : IO.XQSUFFIXES) {
         final IOFile file = new IOFile(path + suf);
@@ -108,7 +108,7 @@ public final class ModuleLoader {
 
     // try to load Java module
     uriPath = capitalize(uriPath);
-    final String path = context.globalopts.get(GlobalOptions.REPOPATH) + uriPath;
+    final String path = context.soptions.get(StaticOptions.REPOPATH) + uriPath;
     final IOFile file = new IOFile(path + IO.JARSUFFIX);
     if(file.exists()) addURL(file);
 

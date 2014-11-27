@@ -121,7 +121,7 @@ public abstract class W3CTS extends Main {
     input = nm + "Catalog" + IO.XMLSUFFIX;
     testid = nm.substring(0, 4);
     pathlog = testid.toLowerCase(Locale.ENGLISH) + ".log";
-    context.globalopts.set(GlobalOptions.DBPATH, sandbox().path() + "/data");
+    context.soptions.set(StaticOptions.DBPATH, sandbox().path() + "/data");
   }
 
   /**

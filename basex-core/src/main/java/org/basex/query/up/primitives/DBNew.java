@@ -94,7 +94,7 @@ final class DBNew {
     }
 
     // add input
-    final IOFile dbpath = ctx.globalopts.dbpath(string(ni.dbname));
+    final IOFile dbpath = ctx.soptions.dbpath(string(ni.dbname));
     try {
       final Parser parser = new DirParser(ni.io, ctx, dbpath).target(string(ni.path));
       return new MemBuilder(dbname, parser).dataClip();

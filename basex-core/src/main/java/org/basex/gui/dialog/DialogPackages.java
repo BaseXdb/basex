@@ -84,7 +84,7 @@ public final class DialogPackages extends BaseXDialog {
     p.add(packages, BorderLayout.CENTER);
     final BaseXBack ss = new BaseXBack(new TableLayout(1, 2, 8, 0)).border(8, 0, 0, 0);
     ss.add(new BaseXLabel(PATH + COL, true, true), BorderLayout.NORTH);
-    ss.add(new BaseXLabel(main.context.globalopts.get(GlobalOptions.REPOPATH)));
+    ss.add(new BaseXLabel(main.context.soptions.get(StaticOptions.REPOPATH)));
     p.add(ss, BorderLayout.SOUTH);
     set(p, BorderLayout.CENTER);
 
