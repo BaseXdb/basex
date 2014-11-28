@@ -712,8 +712,6 @@ public enum QueryError {
   /** XPST0003. */
   NOATTNAME(XPST, 3, "Expecting attribute name."),
   /** XPST0003. */
-  NOLOCSTEP(XPST, 3, "Incomplete location step."),
-  /** XPST0003. */
   NOEXPR(XPST, 3, "Expecting expression."),
   /** XPST0003. */
   WRONGCHAR_X_X(XPST, 3, "Expecting '%'%."),
@@ -724,7 +722,9 @@ public enum QueryError {
   /** XPST0003. */
   EVALUNARY(XPST, 3, "Unary operator expects a numeric value."),
   /** XPST0003. */
-  PATHMISS_X(XPST, 3, "Expecting location path%."),
+  STEPMISS_X(XPST, 3, "Expecting valid step%."),
+  /** XPST0003. */
+  AXISMISS_X(XPST, 3, "Expecting node test after % axis."),
   /** XPST0003. */
   DECLINCOMPLETE(XPST, 3, "Expecting 'function', 'variable', ..."),
   /** XPST0003. */

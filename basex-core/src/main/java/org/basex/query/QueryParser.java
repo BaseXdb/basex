@@ -1777,17 +1777,12 @@ public class QueryParser extends InputParser {
         checkAxis(Axis.DESC);
         add(el, Step.get(info(), Axis.DESCORSELF, Test.NOD));
         mark();
-        ex = step();
-        if(ex == null) {
-          // two slashes, but no following step: error
-          if(more()) checkInit();
-          throw error(PATHMISS_X, found());
-        }
+        ex = step(true);
       } else {
         // one slash: absolute child path
         checkAxis(Axis.CHILD);
         mark();
-        ex = step();
+        ex = step(false);
         // no more steps: return root expression
         if(ex == null) return root;
       }
@@ -1796,7 +1791,7 @@ public class QueryParser extends InputParser {
     } else {
       // relative path (no preceding slash)
       mark();
-      final Expr ex = step();
+      final Expr ex = step(false);
       if(ex == null) return null;
       // return expression if no slash follows
       if(curr() != '/' && !(ex instanceof Step)) return ex;
@@ -1826,9 +1821,7 @@ public class QueryParser extends InputParser {
         return;
       }
       mark();
-      final Expr st = step();
-      if(st == null) throw error(PATHMISS_X, found());
-      add(el, st);
+      add(el, step(true));
     }
   }
 
@@ -1863,28 +1856,30 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "StepExpr" rule.
+   * @param error show error if nothing is found
    * @return query expression (may be {@code null})
    * @throws QueryException query exception
    */
-  private Expr step() throws QueryException {
+  private Expr step(final boolean error) throws QueryException {
     final Expr e = postfix();
-    return e != null ? e : axisStep();
+    return e != null ? e : axisStep(error);
   }
 
   /**
    * Parses the "AxisStep" rule.
+   * @param error show error if nothing is found
    * @return step (may be {@code null})
    * @throws QueryException query exception
    */
-  private Step axisStep() throws QueryException {
-    Axis ax = null;
+  private Step axisStep(final boolean error) throws QueryException {
+    Axis axis = null;
     Test test = null;
     if(wsConsume(DOT2)) {
-      ax = Axis.PARENT;
+      axis = Axis.PARENT;
       test = Test.NOD;
       checkTest(test, false);
     } else if(consume('@')) {
-      ax = Axis.ATTR;
+      axis = Axis.ATTR;
       test = nodeTest(true, true);
       checkTest(test, true);
       if(test == null) {
@@ -1892,29 +1887,33 @@ public class QueryParser extends InputParser {
         throw error(NOATTNAME);
       }
     } else {
-      for(final Axis a : Axis.VALUES) {
+      for(final Axis ax : Axis.VALUES) {
         final int i = pos;
-        if(!wsConsumeWs(a.name)) continue;
-        alter = NOLOCSTEP;
+        if(!wsConsumeWs(ax.name)) continue;
         if(wsConsumeWs(COLS)) {
           alterPos = pos;
-          ax = a;
-          test = nodeTest(a == Axis.ATTR, true);
-          checkTest(test, a == Axis.ATTR);
+          axis = ax;
+          final boolean attr = ax == Axis.ATTR;
+          test = nodeTest(attr, true);
+          checkTest(test, attr);
+          if(test == null) throw error(AXISMISS_X, axis);
           break;
         }
         pos = i;
       }
-    }
 
-    if(ax == null) {
-      ax = Axis.CHILD;
-      test = nodeTest(false, true);
-      if(test == Test.NSP) throw error(NSNOTALL);
-      if(test != null && test.type == NodeType.ATT) ax = Axis.ATTR;
-      checkTest(test, ax == Axis.ATTR);
+      if(axis == null) {
+        axis = Axis.CHILD;
+        test = nodeTest(false, true);
+        if(test == Test.NSP) throw error(NSNOTALL);
+        if(test != null && test.type == NodeType.ATT) axis = Axis.ATTR;
+        checkTest(test, axis == Axis.ATTR);
+      }
+      if(test == null) {
+        if(error) throw error(STEPMISS_X, found());
+        return null;
+      }
     }
-    if(test == null) return null;
 
     final ExprList el = new ExprList();
     while(wsConsume(SQUARE1)) {
@@ -1923,7 +1922,7 @@ public class QueryParser extends InputParser {
       wsCheck(SQUARE2);
       checkPred(false);
     }
-    return Step.get(info(), ax, test, el.finish());
+    return Step.get(info(), axis, test, el.finish());
   }
 
   /**
