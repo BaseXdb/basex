@@ -52,8 +52,8 @@ abstract class CsvSerializer extends OutputSerializer {
       if(i != 0) print(separator);
 
       byte[] txt = v == null ? EMPTY : v;
-      if(contains(txt, separator) || ((quotes || backslashes) &&
-          (contains(txt, '\n') || contains(txt, '"')))) {
+      if(contains(txt, separator) || (quotes || backslashes) &&
+          (contains(txt, '\n') || contains(txt, '"'))) {
         final TokenBuilder tb = new TokenBuilder();
         if(quotes) tb.add('"');
         final int len = txt.length;

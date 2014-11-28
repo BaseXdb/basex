@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public final class DBFlush extends DBUpdate {
   /** Autoflush option. */
-  private boolean autoflush;
+  private final boolean autoflush;
 
   /**
    * Constructor.

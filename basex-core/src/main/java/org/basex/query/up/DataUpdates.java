@@ -44,7 +44,7 @@ final class DataUpdates {
   private final IntObjMap<Put> puts = new IntObjMap<>();
 
   /** Write databases back to disk. */
-  private boolean writeback;
+  private final boolean writeback;
   /** Number of updates. */
   private int size;
 
